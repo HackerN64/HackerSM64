@@ -53,7 +53,7 @@ u32 __main__(void) {
     mem_stats();
 
     while (TRUE) {
-        func_801A520C();
+        unused_main_renderer();
     }
 
     imout();

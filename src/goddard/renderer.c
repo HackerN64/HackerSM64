@@ -85,10 +85,10 @@ struct DynListBankInfo {
 
 // bss
 #if defined(VERSION_EU) || defined(VERSION_SH)
-static OSMesgQueue D_801BE830; // controller msg queue
-static OSMesg D_801BE848[10];
+static OSMesgQueue sGdContMesgQueue; // controller msg queue
+static OSMesg sGdContMesgArray[10]; // array of OSMesg messages, used for initializing sGdContMesgQueue
 u8 EUpad1[0x40];
-UNUSED static OSMesgQueue D_801BE8B0;
+UNUSED static OSMesgQueue sGdDMACompleteMsgQueue;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
 // static u32 unref_801be870[16];
 // static u32 unref_801be8e0[25];
@@ -96,25 +96,25 @@ static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
 u8 EUpad2[0x64];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
 u8 EUpad3[0x34];
-static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
+static OSMesg sGdDMACompleteMsg; // msg buf for sGdDMACompleteMsgQueue queue
 static OSIoMesg sGdDMAReqMesg;
-static struct ObjView *D_801BE994; // store if View flag 0x40 set
+static struct ObjView *stored_view; // store if View flag 0x40 set
 
 u8 EUpad4[0x88];
 #endif
-static OSContStatus D_801BAE60[4];
+static OSContStatus sGdContStatuses[4];
 static OSContPad sGdContPads[4];    // @ 801BAE70
 static OSContPad sPrevFrameCont[4]; // @ 801BAE88
-static u8 D_801BAEA0;
+static u8 sGdBitPattern; // bit pattern used with osContInit
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
-static u32 D_801BAF28;                                 // RAM addr offset?
+static u32 RAMAddrOffset_unknown;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
 UNUSED static u32 unref_801bb000[3];
 static u8 *sMemBlockPoolBase; // @ 801BB00C
 static u32 sAllocMemory;      // @ 801BB010; malloc-ed bytes
 UNUSED static u32 unref_801bb014;
-static s32 D_801BB018;
-static s32 D_801BB01C;
+static s32 gddlBufferedVertsIndex;
+static s32 gddlLastBuffVertIndex;
 static void *sLoadedTextures[0x10];          // texture pointers
 static s32 sTextureDisplayLists[0x10];            // gd_dl indices
 static s16 sVtxCvrtTCBuf[2];            // @ 801BB0A0
@@ -147,9 +147,9 @@ static struct GdColour sLightScaleColours[2]; // @ 801BB1A0
 static struct LightDirVec sLightDirections[2];
 static s32 sLightId;
 static Hilite sHilites[600];
-static struct GdVec3f D_801BD758;
-static struct GdVec3f D_801BD768; // had to migrate earlier
-static u32 D_801BD774;
+static struct GdVec3f unknown_vec3f_1;
+static struct GdVec3f unknown_vec3f_2; // had to migrate earlier
+static u32 unknown_addr_val1; // set in one location, never read
 static struct GdObj *sMenuGadgets[9]; // @ 801BD778; d_obj ptr storage? menu?
 static struct ObjView *sDebugViews[2];  // Seems to be a list of ObjViews for displaying debug info
 static struct GdDisplayList *sStaticDl;     // @ 801BD7A8
@@ -164,25 +164,23 @@ static s16 *sPickBuf;                                // @ 801BE788
 static LookAt D_801BE790[2];
 static LookAt D_801BE7D0[3];
 #if defined(VERSION_JP) || defined(VERSION_US)
-static OSMesgQueue D_801BE830; // controller msg queue
-static OSMesg D_801BE848[10];
+static OSMesgQueue sGdContMesgQueue; // controller msg queue
+static OSMesg sGdContMesgArray[10];
 UNUSED static u32 unref_801be870[16];
-UNUSED static OSMesgQueue D_801BE8B0;
+UNUSED static OSMesgQueue sGdDMACompleteMsgQueue;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
 UNUSED static u32 unref_801be8e0[25];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
 UNUSED static u32 unref_801be948[13];
-static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
+static OSMesg sGdDMACompleteMsg; // msg buf for sGdDMACompleteMsgQueue queue
 static OSIoMesg sGdDMAReqMesg;
-static struct ObjView *D_801BE994; // store if View flag 0x40 set
+static struct ObjView *stored_view; // store if View flag 0x40 set
 #endif
 
 // data
 UNUSED static u32 unref_801a8670 = 0;
 static s32 D_801A8674 = 0;
 UNUSED static u32 unref_801a8678 = 0;
-static s32 D_801A867C = 0;
-static s32 D_801A8680 = 0;
 static f32 sTracked1FrameTime = 0.0f; // @ 801A8684
 static f32 sDynamicsTime = 0.0f;      // @ 801A8688
 static f32 sDLGenTime = 0.0f;         // @ 801A868C
@@ -191,20 +189,18 @@ static f32 sTimeScaleFactor = 1.0f;   // @ D_801A8694
 static u32 sMemBlockPoolSize = 1;     // @ 801A8698
 static s32 sMemBlockPoolUsed = 0;     // @ 801A869C
 static s32 sTextureCount = 0;  // maybe?
-static struct GdTimer *D_801A86A4 = NULL; // timer for dlgen, dynamics, or rcp
-static struct GdTimer *D_801A86A8 = NULL; // timer for dlgen, dynamics, or rcp
-static struct GdTimer *D_801A86AC = NULL; // timer for dlgen, dynamics, or rcp
+static struct GdTimer *dlgen_dynamics_rcp_timer1 = NULL; // timer for dlgen, dynamics, or rcp
+static struct GdTimer *dlgen_dynamics_rcp_timer2 = NULL; // timer for dlgen, dynamics, or rcp
+static struct GdTimer *dlgen_dynamics_rcp_timer3 = NULL; // timer for dlgen, dynamics, or rcp
 s32 gGdFrameBufNum = 0;                      // @ 801A86B0
-UNUSED static u32 unref_801a86B4 = 0;
 static struct ObjShape *sHandShape = NULL; // @ 801A86B8
-static s32 D_801A86BC = 1;
+static s32 D_801A86BC = 1; // useless
 static s32 D_801A86C0 = 0; // gd_dl id for something?
-UNUSED static u32 unref_801a86C4 = 10;
 static s32 sMtxParamType = G_MTX_PROJECTION;
-UNUSED static struct GdVec3f D_801A86CC = { 1.0f, 1.0f, 1.0f };
+UNUSED static struct GdVec3f unit_vector = { 1.0f, 1.0f, 1.0f }; // unit vec3f
 static struct ObjView *sActiveView = NULL;  // @ 801A86D8 current view? used when drawing dl
 static struct ObjView *sScreenView = NULL; // @ 801A86DC
-static struct ObjView *D_801A86E0 = NULL;
+static struct ObjView *sUnusedDefaultView = NULL;
 static struct ObjView *sHandView = NULL; // @ 801A86E4
 static struct ObjView *sMenuView = NULL; // @ 801A86E8
 static u32 sItemsInMenu = 0;             // @ 801A86EC
@@ -753,7 +749,7 @@ void update_cursor(void);
 void update_view_and_dl(struct ObjView *);
 static void update_render_mode(void);
 void gddl_is_loading_shine_dl(s32);
-void func_801A3370(f32, f32, f32);
+void gd_dl_mul_trans_matrix_set_unknown_vec3f(f32, f32, f32);
 void gd_put_sprite(u16 *, s32, s32, s32, s32);
 void reset_cur_dl_indices(void);
 
@@ -864,12 +860,6 @@ f64 gd_sqrt_d(f64 x) {
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
 #else
-/**
- * Unused
- */
-f64 stub_renderer_1(UNUSED f64 x) {
-    return 0.0;
-}
 
 /* 249BCC -> 24A19C */
 void gd_printf(const char *format, ...) {
@@ -1190,10 +1180,6 @@ void gdm_setup(void) {
     reset_cur_dl_indices();
     setup_stars();
     imout();
-}
-
-/* 24AC18 -> 24AC2C */
-void stub_renderer_2(UNUSED u32 a0) {
 }
 
 /* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
@@ -1641,8 +1627,8 @@ void pop_gddl_stash(void) {
 
 /* 24D084 -> 24D1D4 */
 s32 gd_startdisplist(s32 memarea) {
-    D_801BB018 = 0;
-    D_801BB01C = 1;
+    gddlBufferedVertsIndex = 0;
+    gddlLastBuffVertIndex = 1;
 
     switch (memarea) {
         case 7:  // Create new display list as a child of sStaticDl
@@ -1690,8 +1676,8 @@ s32 gd_enddlsplist_parent(void) {
 }
 
 /* 24D39C -> 24D3D8 */
-void Unknown8019EBCC(s32 num, uintptr_t gfxptr) {
-    sGdDLArray[num]->gfx = (Gfx *) (GD_LOWER_24(gfxptr) + D_801BAF28);
+void set_gddl_num_to(s32 num, uintptr_t gfxptr) {
+    sGdDLArray[num]->gfx = (Gfx *) (GD_LOWER_24(gfxptr) + RAMAddrOffset_unknown);
 }
 
 /* 24D3D8 -> 24D458; orig name: func_8019EC08 */
@@ -1699,12 +1685,12 @@ u32 new_gddl_from(Gfx *dl, UNUSED s32 arg1) {
     struct GdDisplayList *gddl;
 
     gddl = new_gd_dl(0, 0, 0, 0, 0, 0);
-    gddl->gfx = (Gfx *) (GD_LOWER_24((uintptr_t) dl) + D_801BAF28);
+    gddl->gfx = (Gfx *) (GD_LOWER_24((uintptr_t) dl) + RAMAddrOffset_unknown);
     return gddl->number;
 }
 
 /* 24D458 -> 24D4C4 */
-u32 Unknown8019EC88(Gfx *dl, UNUSED s32 arg1) {
+u32 new_gddl_directly_from(Gfx *dl, UNUSED s32 arg1) {
     struct GdDisplayList *gddl;
 
     gddl = new_gd_dl(0, 0, 0, 0, 0, 0);
@@ -1814,11 +1800,14 @@ void gd_dl_scale(f32 x, f32 y, f32 z) {
 }
 
 /* 24DA94 -> 24DAE8 */
-void func_8019F2C4(f32 arg0, s8 arg1) {
+/**
+ * Adds a display list operation that rotates the current matrix around `axis` by `angle`
+ */
+void gd_dl_rot_matrix(f32 angle, s8 axis) {
     Mat4f mtx; // 18
 
     gd_set_identity_mat4(&mtx);
-    gd_absrot_mat4(&mtx, arg1 - 120, -arg0);
+    gd_absrot_mat4(&mtx, axis, -angle);
     gd_dl_mul_matrix(&mtx);
 }
 
@@ -1905,7 +1894,7 @@ void check_tri_display(s32 vtxcount) {
     if (vtxcount != 3) {
         fatal_printf("cant display no tris\n");
     }
-    if (D_801BB018 != 0 || D_801BB01C != 0) {
+    if (gddlBufferedVertsIndex != 0 || gddlLastBuffVertIndex != 0) {
         ;
     }
 }
@@ -1951,13 +1940,16 @@ Vtx *gd_dl_make_vertex(f32 x, f32 y, f32 z, f32 alpha) {
 }
 
 /* 24E6C0 -> 24E724 */
-void func_8019FEF0(void) {
+/**
+ * If enough vertices are buffered, flush them.
+ */
+void gd_dl_flush_at_threshold(void) {
     sTriangleBufCount++;
     if (sVertexBufCount >= 12) {
         gd_dl_flush_vertices();
-        func_801A0038();
+        gd_dl_flush_buffer();    //Unecessary? `gd_dl_flush_vertices` already calls this
     }
-    D_801BB018 = 0;
+    gddlBufferedVertsIndex = 0;
 }
 
 /**
@@ -1976,7 +1968,10 @@ void gd_dl_make_triangle(f32 x1, f32 y1, f32 z1, f32 x2, f32 y2, f32 z2, f32 x3,
 }
 
 /* 24E808 -> 24E840 */
-void func_801A0038(void) {
+/**
+ * Resets the buffer counts and sets the vertex buffer start index to whatever the current vertex index is.
+ */
+void gd_dl_flush_buffer(void) {
     sVertexBufCount = 0;
     sTriangleBufCount = 0;
     sVertexBufStartIndex = sCurrentGdDl->curVtxIdx;
@@ -2000,23 +1995,23 @@ void gd_dl_flush_vertices(void) {
                 0);
         }
     }
-    func_801A0038();
+    gd_dl_flush_buffer();
 }
 
 /**
- * Unused - called by func_801A520C
+ * Unused - called by unused_main_renderer
  */
-UNUSED static void func_801A01EC(void) {
-    if (D_801BE8B0.validCount >= D_801BE8B0.msgCount) {
-        osRecvMesg(&D_801BE8B0, &sGdDMACompleteMsg, OS_MESG_BLOCK);
+UNUSED static void complete_msg_queuer(void) {
+    if (sGdDMACompleteMsgQueue.validCount >= sGdDMACompleteMsgQueue.msgCount) {
+        osRecvMesg(&sGdDMACompleteMsgQueue, &sGdDMACompleteMsg, OS_MESG_BLOCK);
     }
-    osRecvMesg(&D_801BE8B0, &sGdDMACompleteMsg, OS_MESG_BLOCK);
+    osRecvMesg(&sGdDMACompleteMsgQueue, &sGdDMACompleteMsg, OS_MESG_BLOCK);
 }
 
 /**
- * Unused - called by func_801A520C
+ * Unused - called by unused_main_renderer
  */
-UNUSED static void func_801A025C(void) {
+UNUSED static void unused_frame_buffer_swap(void) {
     gGdFrameBufNum ^= 1;
     osViSwapBuffer(sScreenView->parent->colourBufs[gGdFrameBufNum]);
 }
@@ -2291,7 +2286,7 @@ static void update_render_mode(void) {
 }
 
 /* 250300 -> 250640 */
-void Unknown801A1B30(void) {
+UNUSED void render_col_square_fb(void) {
     gDPPipeSync(next_gfx());
     gd_set_color_fb();
     gd_dl_set_fill(&sActiveView->colour);
@@ -2302,7 +2297,7 @@ void Unknown801A1B30(void) {
 }
 
 /* 250640 -> 250AE0 */
-void Unknown801A1E70(void) {
+UNUSED void render_col_square_gdp(void) {
     gDPPipeSync(next_gfx());
     gDPSetCycleType(next_gfx(), G_CYC_FILL);
     gDPSetRenderMode(next_gfx(), G_RM_OPA_SURF, G_RM_OPA_SURF2);
@@ -2321,11 +2316,6 @@ void Unknown801A1E70(void) {
 void gd_set_one_cycle(void) {
     gDPSetCycleType(next_gfx(), G_CYC_1CYCLE);
     update_render_mode();
-}
-
-/* 250B30 -> 250B44 */
-void stub_renderer_3(void) {
-    UNUSED u8 filler[16];
 }
 
 /* 250B44 -> 250B58 */
@@ -2514,59 +2504,49 @@ void parse_p1_controller(void) {
     }
 }
 
-UNUSED void stub_renderer_4(f32 arg0) {
-    return;
-
-    // dead code
-    if (D_801BD768.x * D_801A86CC.x + arg0 * 2.0f > 160.0) {
-        func_801A3370(D_801BD758.x - D_801BD768.x, -20.0f, 0.0f);
-        D_801BD768.x = D_801BD758.x;
-    }
-}
-
 /**
  * Unused
  */
-UNUSED void Unknown801A32F4(s32 arg0) {
-    D_801BD774 = GD_LOWER_24(arg0) + D_801BAF28;
+UNUSED void set_unknown_addr_val_with_offset(s32 addrArg) {
+    unknown_addr_val1 = GD_LOWER_24(addrArg) + RAMAddrOffset_unknown;
 }
 
 /* 251AF4 -> 251B40 */
-void func_801A3324(f32 x, f32 y, f32 z) {
-    D_801BD768.x = x;
-    D_801BD768.y = y;
-    D_801BD768.z = z;
-    D_801BD758.x = x;
-    D_801BD758.y = y;
-    D_801BD758.z = z;
+void set_unknown_vec3fs(f32 x, f32 y, f32 z) {
+    unknown_vec3f_2.x = x;
+    unknown_vec3f_2.y = y;
+    unknown_vec3f_2.z = z;
+    unknown_vec3f_1.x = x;
+    unknown_vec3f_1.y = y;
+    unknown_vec3f_1.z = z;
 }
 
 /* 251B40 -> 251BC8 */
-void func_801A3370(f32 x, f32 y, f32 z) {
+void gd_dl_mul_trans_matrix_set_unknown_vec3f(f32 x, f32 y, f32 z) {
     gd_dl_mul_trans_matrix(x, y, z);
-    D_801BD768.x += x;
-    D_801BD768.y += y;
-    D_801BD768.z += z;
+    unknown_vec3f_2.x += x;
+    unknown_vec3f_2.y += y;
+    unknown_vec3f_2.z += z;
 }
 
 /**
  * Unused
  */
-void Unknown801A33F8(f32 x, f32 y, f32 z) {
-    gd_dl_mul_trans_matrix(x - D_801BD768.x, y - D_801BD768.y, z - D_801BD768.z);
+void gd_dl_mul_trans_matrix_set_unknown_vec3f_subtract(f32 x, f32 y, f32 z) {
+    gd_dl_mul_trans_matrix(x - unknown_vec3f_2.x, y - unknown_vec3f_2.y, z - unknown_vec3f_2.z);
 
-    D_801BD768.x = x;
-    D_801BD768.y = y;
-    D_801BD768.z = z;
+    unknown_vec3f_2.x = x;
+    unknown_vec3f_2.y = y;
+    unknown_vec3f_2.z = z;
 }
 
 /**
  * Unused
  */
-void Unknown801A347C(f32 x, f32 y, f32 z) {
-    D_801A86CC.x = x;
-    D_801A86CC.y = y;
-    D_801A86CC.z = z;
+void gd_dl_set_unit_scale(f32 x, f32 y, f32 z) {
+    unit_vector.x = x;
+    unit_vector.y = y;
+    unit_vector.z = z;
     gd_dl_scale(x, y, z);
 }
 
@@ -2688,10 +2668,6 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
     }
 }
 
-/* 2522B0 -> 2522C0 */
-void stub_renderer_5(void) {
-}
-
 /* 2522C0 -> 25245C */
 void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
     uintptr_t orthoMtx;
@@ -2709,7 +2685,7 @@ void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
     rotMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), rotMtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
 
-    func_801A3324(0.0f, 0.0f, 0.0f);
+    set_unknown_vec3fs(0.0f, 0.0f, 0.0f);
     next_mtx();
 }
 
@@ -2734,7 +2710,7 @@ void gd_create_perspective_matrix(f32 fovy, f32 aspect, f32 near, f32 far) {
     guRotate(&DL_CURRENT_MTX(sCurrentGdDl), 0.0f, 0.0f, 0.0f, 1.0f);
     rotMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), rotMtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-    func_801A3324(0.0f, 0.0f, 0.0f);
+    set_unknown_vec3fs(0.0f, 0.0f, 0.0f);
     next_mtx();
 }
 
@@ -2792,7 +2768,7 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
     view->unk74 = 0;
 
     if (view->flags & VIEW_DEFAULT_PARENT) {
-        view->parent = D_801A86E0;
+        view->parent = sUnusedDefaultView;
     }
 
     return 0;
@@ -2803,18 +2779,14 @@ void gd_init_controllers(void) {
     OSContPad *p1cont = &sPrevFrameCont[0]; // 1c
     u32 i;                                  // 18
 
-    osCreateMesgQueue(&D_801BE830, D_801BE848, ARRAY_COUNT(D_801BE848));
-    osSetEventMesg(OS_EVENT_SI, &D_801BE830, (OSMesg) OS_MESG_SI_COMPLETE);
-    osContInit(&D_801BE830, &D_801BAEA0, D_801BAE60);
-    osContStartReadData(&D_801BE830);
+    osCreateMesgQueue(&sGdContMesgQueue, sGdContMesgArray, ARRAY_COUNT(sGdContMesgArray));
+    osSetEventMesg(OS_EVENT_SI, &sGdContMesgQueue, (OSMesg) OS_MESG_SI_COMPLETE);
+    osContInit(&sGdContMesgQueue, &sGdBitPattern, sGdContStatuses);
+    osContStartReadData(&sGdContMesgQueue);
 
     for (i = 0; i < sizeof(OSContPad); i++) {
         ((u8 *) p1cont)[i] = 0;
     }
-}
-
-/* 252BAC -> 252BC0 */
-void stub_renderer_6(UNUSED struct GdObj *obj) {
 }
 
 /**
@@ -2838,18 +2810,18 @@ long defpup(UNUSED const char *menufmt, ...) {
  * @param itemId  ID of the menu item that was clicked
  *                (1 = "U-64 Analogue Joystick", 2 = "Keyboard", 3 = "Mouse")
  */
-void menu_cb_control_type(UNUSED u32 itemId) {
+UNUSED void menu_cb_control_type(UNUSED u32 itemId) {
 }
 
 /**
  * Unused - called when the user clicks the "Re-Calibrate Controller" item from
  * the "Dynamics" menu.
  */
-void menu_cb_recalibrate_controller(UNUSED u32 itemId) {
+UNUSED void menu_cb_recalibrate_controller(UNUSED u32 itemId) {
 }
 
 /* 252C08 -> 252C70 */
-void func_801A4438(f32 x, f32 y, f32 z) {
+void set_text_draw_pos(f32 x, f32 y, f32 z) {
     sTextDrawPos.x = x - (sActiveView->lowerRight.x / 2.0f);
     sTextDrawPos.y = (sActiveView->lowerRight.y / 2.0f) - y;
     sTextDrawPos.z = z;
@@ -2931,21 +2903,14 @@ void *load_texture_from_file(const char *file, s32 fmt, s32 size, u32 arg3, u32 
 }
 
 /* 252F88 -> 252FAC */
-void Unknown801A47B8(struct ObjView *v) {
+void save_view_to_global(struct ObjView *v) {
     if (v->flags & VIEW_SAVE_TO_GLOBAL) {
-        D_801BE994 = v;
+        stored_view = v;
     }
 }
 
-void stub_renderer_7(void) {
-}
-
-/* 252FC4 -> 252FD8 */
-void stub_renderer_8(UNUSED u32 arg0) {
-}
-
 /**
- * Unused - called by func_801A520C and Unknown801A5344
+ * Unused - called by unused_main_renderer and Unknown801A5344
  */
 void func_801A4808(void) {
     while (D_801A8674 != 0) {
@@ -2956,23 +2921,13 @@ void func_801A4808(void) {
 }
 
 /* 253018 -> 253084 */
-void func_801A4848(s32 linkDl) {
+void gd_dl_get_at(s32 linkDl) {
     struct GdDisplayList *curDl;
 
     curDl = sCurrentGdDl;
     sCurrentGdDl = sMHeadMainDls[gGdFrameBufNum];
     branch_cur_dl_to_num(linkDl);
     sCurrentGdDl = curDl;
-}
-
-/**
- * Unused - called by func_801A520C and Unknown801A5344
- */
-void stub_renderer_9(void) {
-}
-
-/* 253094 -> 2530A8 */
-void stub_renderer_10(UNUSED u32 arg0) {
 }
 
 /* 2530A8 -> 2530C0 */
@@ -2987,13 +2942,10 @@ void set_active_view(struct ObjView *v) {
     sActiveView = v;
 }
 
-void stub_renderer_11(void) {
-}
-
 /**
- * Unused - called by func_801A520C
+ * Unused - called by unused_main_renderer
  */
-void func_801A4918(void) {
+void menu_and_hand_view(void) {
     f32 x;     // c
     f32 y;     // 8
     u32 ydiff; // 4
@@ -3017,15 +2969,15 @@ void func_801A4918(void) {
 }
 
 /* 2532D4 -> 2533DC */
-void Unknown801A4B04(void) {
-    if (D_801A86AC != NULL) {
-        D_801A86AC->prevScaledTotal = 20.0f;
+void scale_timers(void) {
+    if (dlgen_dynamics_rcp_timer3 != NULL) {
+        dlgen_dynamics_rcp_timer3->prevScaledTotal = 20.0f;
     }
-    if (D_801A86A4 != NULL) {
-        D_801A86A4->prevScaledTotal = (f32)((sDLGenTime * 50.0f) + 20.0f);
+    if (dlgen_dynamics_rcp_timer1 != NULL) {
+        dlgen_dynamics_rcp_timer1->prevScaledTotal = (f32)((sDLGenTime * 50.0f) + 20.0f);
     }
-    if (D_801A86A8 != NULL) {
-        D_801A86A8->prevScaledTotal = (f32)((sDLGenTime * 50.0f) + 20.0f);
+    if (dlgen_dynamics_rcp_timer2 != NULL) {
+        dlgen_dynamics_rcp_timer2->prevScaledTotal = (f32)((sDLGenTime * 50.0f) + 20.0f);
     }
     sDLGenTime = get_scaled_timer_total("dlgen");
     sRCPTime = get_scaled_timer_total("rcp");
@@ -3115,7 +3067,7 @@ void Unknown801A4F58(void) {
 }
 
 /* 2538E0 -> 253938 */
-void Proc801A5110(struct ObjView *view) {
+void update_nets_to_verts(struct ObjView *view) {
     if (view->flags & VIEW_UPDATE) {
         apply_to_obj_types_in_group(OBJ_TYPE_NETS, (applyproc_t) convert_net_verts, view->components);
     }
@@ -3131,7 +3083,7 @@ void update_view_and_dl(struct ObjView *view) {
     if (prevFlags & VIEW_UPDATE) {
         sCurrentGdDl = sMHeadMainDls[gGdFrameBufNum];
         if (view->gdDlNum != 0) {
-            func_801A4848(view->gdDlNum);
+            gd_dl_get_at(view->gdDlNum);
         }
     }
 }
@@ -3139,12 +3091,11 @@ void update_view_and_dl(struct ObjView *view) {
 /**
  * Unused - called by __main__
  */
-void func_801A520C(void) {
+void unused_main_renderer(void) {
     UNUSED u8 filler[8];
 
     start_timer("1frame");
     start_timer("cpu");
-    // stub_renderer_9();
     reset_cur_dl_indices();
     parse_p1_controller();
     setup_timers();
@@ -3153,19 +3104,19 @@ void func_801A520C(void) {
     stop_timer("dlgen");
     restart_timer("netupd");
     if (!gGdCtrl.newStartPress) {
-        apply_to_obj_types_in_group(OBJ_TYPE_VIEWS, (applyproc_t) Proc801A5110, gGdViewsGroup);
+        apply_to_obj_types_in_group(OBJ_TYPE_VIEWS, (applyproc_t) update_nets_to_verts, gGdViewsGroup);
     }
     split_timer("netupd");
     split_timer("cpu");
     // func_801A4808();
     restart_timer("cpu");
-    // func_801A025C();
+    // unused_frame_buffer_swap();
     update_cursor();
-    // func_801A4918();
+    // menu_and_hand_view();
     stop_timer("1frame");
     sTracked1FrameTime = get_scaled_timer_total("1frame");
     split_timer("cpu");
-    // func_801A01EC();
+    // complete_msg_queuer();
 }
 
 /**
@@ -3181,8 +3132,7 @@ UNUSED void Unknown801A5344(void) {
     start_view_dl(sScreenView);
     gd_set_one_cycle();
     gd_enddlsplist_parent();
-    func_801A4848(sScreenView->gdDlNum);
-    // stub_renderer_9();
+    gd_dl_get_at(sScreenView->gdDlNum);
     // func_801A4808();
     sScreenView->gdDlNum = 0;
 }
@@ -3198,11 +3148,8 @@ void gd_init(void) {
     data = gd_allocblock(i);
     gd_add_mem_to_heap(i, data, 0x10);
     sAlpha = (u16) 0xff;
-    D_801A867C = 0;
-    D_801A8680 = 0;
     sTextureCount = 0;
     gGdFrameBufNum = 0;
-    D_801A86BC = 1;
     sItemsInMenu = 0;
     sDebugViewsCount = 0;
     sCurrDebugViewIndex = 0;
@@ -3293,18 +3240,6 @@ void reverse_string(char *str, s32 len) {
     }
 }
 
-/* 254168 -> 25417C */
-void stub_renderer_12(UNUSED s8 *arg0) {
-}
-
-/* 25417C -> 254190 */
-void stub_renderer_13(UNUSED void *arg0) {
-}
-
-/* 254190 -> 2541A4 */
-void stub_renderer_14(UNUSED s8 *arg0) {
-}
-
 /**
  * Initializes the pick buffer. This functions like the `pick` or `gselect`
  * functions from IRIS GL.
@@ -3335,29 +3270,17 @@ s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
     return sPickBufPosition / 3;
 }
 
-/* 254250 -> 254264 */
-void stub_renderer_15(UNUSED u32 arg0) {
-}
-
-/* 254264 -> 254278 */
-void stub_renderer_16(UNUSED u32 arg0) {
-}
-
-/* 254278 -> 254288 */
-void stub_renderer_17(void) {
-}
-
 /* 254288 -> 2542B0 */
-void *Unknown801A5AB8(s32 texnum) {
+UNUSED void *loaded_tex_at(s32 texnum) {
     return sLoadedTextures[texnum];
 }
 
 /* 2542B0 -> 254328 */
-void Unknown801A5AE0(s32 arg0) {
-    D_801BB018 = arg0;
-    if (D_801BB01C != D_801BB018) {
-        branch_cur_dl_to_num(sTextureDisplayLists[arg0]);
-        D_801BB01C = D_801BB018;
+UNUSED void set_buffered_vertex_indices(s32 gddlIdx) {
+    gddlBufferedVertsIndex = gddlIdx;
+    if (gddlLastBuffVertIndex != gddlBufferedVertsIndex) {
+        branch_cur_dl_to_num(sTextureDisplayLists[gddlIdx]);
+        gddlLastBuffVertIndex = gddlBufferedVertsIndex;
     }
 }
 
@@ -3706,14 +3629,6 @@ void make_timer_gadgets(void) {
     return;
 }
 
-/* 255600 -> 255614 */
-void stub_renderer_18(UNUSED u32 a0) {
-}
-
-/* 255614 -> 255628 */
-void stub_renderer_19(UNUSED u32 a0) {
-}
-
 #ifndef NO_SEGMENTED_MEMORY
 /**
  * Copies `size` bytes of data from ROM address `romAddr` to RAM address `vAddr`.
@@ -3817,12 +3732,6 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 /**
  * Unused (not called)
  */
-UNUSED void stub_renderer_20(UNUSED u32 a0) {
-}
-
-/**
- * Unused (not called)
- */
 void func_801A71CC(struct ObjNet *net) {
     s32 i; // spB4
     s32 j; // spB0
@@ -3916,8 +3825,4 @@ void func_801A71CC(struct ObjNet *net) {
             fatal_printf("plane not in any zones\n");
         }
     }
-}
-
-/* 255EB0 -> 255EC0 */
-UNUSED void stub_renderer_21(void) {
 }
