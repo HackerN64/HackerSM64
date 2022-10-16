@@ -548,6 +548,10 @@ ALIGNED8 static const Texture texture_font_char_jp_close_parentheses[] = {
 #include "textures/segment2/segment2.073D0.ia1.inc.c"
 };
 
+ALIGNED8 static const Texture texture_font_char_jp_multiply[] = {
+#include "textures/segment2/segment2.073F0.ia1.inc.c"
+};
+
 ALIGNED8 static const Texture texture_font_char_jp_hiragana_a[] = {
 #include "textures/segment2/segment2.07420.ia1.inc.c"
 };
@@ -1986,6 +1990,7 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0xFF38, 10, TEXT_FLAG_PACKED, texture_font_char_jp_X}, // Ｘ
     {0xFF39, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Y}, // Ｙ
     {0xFF3A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Z}, // Ｚ
+    {0xFF58, 10, TEXT_FLAG_PACKED, texture_font_char_jp_multiply}, // ｘ
 
     {0xFF5E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_tilde}, // ～
 };

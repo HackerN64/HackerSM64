@@ -115,12 +115,16 @@ enum DialogResponseDefines {
 typedef char * langarray_t[4];
 #define LANGUAGE_TEXT(english, french, german, japanese) {english, french, german, japanese}
 #define LANGUAGE_ARRAY(cmd) ((cmd)[gInGameLanguage])
+// In Japanese course names, the first two characters are full-width (3 bytes)
+// and the last space is a regular space (1 byte)
+#define COURSE_NAME_STR_OFFSET ((gInGameLanguage == LANGUAGE_JAPANESE) ? 7 : 3)
 
 #else
 
 typedef char * langarray_t;
 #define LANGUAGE_TEXT(english, french, german, japanese) english
 #define LANGUAGE_ARRAY(cmd) (cmd)
+#define COURSE_NAME_STR_OFFSET 3
 
 #endif
 

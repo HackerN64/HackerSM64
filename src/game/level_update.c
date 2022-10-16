@@ -1268,6 +1268,9 @@ void load_language_text(void) {
         case LANGUAGE_GERMAN:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_de_yay0SegmentRomStart, _translation_de_yay0SegmentRomEnd);
             break;
+        case LANGUAGE_JAPANESE:
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_jp_yay0SegmentRomStart, _translation_jp_yay0SegmentRomEnd);
+            break;
     }
 }
 #endif

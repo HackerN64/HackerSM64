@@ -222,6 +222,7 @@ void print_course_number(void) {
     // Change upper part of the wood texture depending of the language defined
     switch (multilang_get_language()) {
         case LANGUAGE_ENGLISH:
+        case LANGUAGE_JAPANESE:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_course_upper);
             break;
         case LANGUAGE_FRENCH:
@@ -240,7 +241,7 @@ void print_course_number(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
     sprintf(courseNum, "%d", gCurrCourseNum);
-    print_hud_lut_string_aligned(SCREEN_CENTER_X, 158, courseNum, TEXT_ALIGN_CENTER);
+    print_hud_lut_string_aligned(157, 158, courseNum, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
@@ -275,7 +276,7 @@ void print_act_selector_strings(void) {
         print_generic_string_aligned(145, 118, LANGUAGE_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);
     }
 
-    print_generic_string_aligned(SCREEN_CENTER_X, 33, currLevelName + 3, TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X, 33, currLevelName + COURSE_NAME_STR_OFFSET, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 

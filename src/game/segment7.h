@@ -23,6 +23,7 @@ extern Gfx dl_menu_texture_kurs_upper[];
 extern const u8 course_strings_en_table[];
 extern const u8 course_strings_fr_table[];
 extern const u8 course_strings_de_table[];
+extern const u8 course_strings_jp_table[];
 extern const u8 *const course_strings_language_table[];
 #endif
 

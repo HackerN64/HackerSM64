@@ -1882,10 +1882,17 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
 
+#define COURSE_NAME_TABLE course_strings_jp_table
+#define COURSE_FILE "jp/courses.h"
+#include "text/define_courses.inc.c"
+#undef COURSE_NAME_TABLE
+#undef COURSE_FILE
+
 const u8 *const course_strings_language_table[] = {
     &course_strings_en_table,
     &course_strings_fr_table,
-    &course_strings_de_table
+    &course_strings_de_table,
+    &course_strings_jp_table,
 };
 
 #endif

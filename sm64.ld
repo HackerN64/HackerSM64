@@ -308,6 +308,7 @@ SECTIONS
    YAY0_SEG(translation_en, 0x19000000)
    YAY0_SEG(translation_fr, 0x19000000)
    YAY0_SEG(translation_de, 0x19000000)
+   YAY0_SEG(translation_jp, 0x19000000)
 #endif
 
    /* mario actor group */

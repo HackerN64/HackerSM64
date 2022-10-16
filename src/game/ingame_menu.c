@@ -45,6 +45,10 @@ extern u8 dialog_table_de[];
 extern u8 course_name_table_de[];
 extern u8 act_name_table_de[];
 
+extern u8 dialog_table_jp[];
+extern u8 course_name_table_jp[];
+extern u8 act_name_table_jp[];
+
 void *languageTable[][3] = {
 #ifndef MULTILANG
     {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table},
@@ -52,6 +56,7 @@ void *languageTable[][3] = {
     {&dialog_table_en, &course_name_table_en, &act_name_table_en},
     {&dialog_table_fr, &course_name_table_fr, &act_name_table_fr},
     {&dialog_table_de, &course_name_table_de, &act_name_table_de},
+    {&dialog_table_jp, &course_name_table_jp, &act_name_table_jp},
 #endif
 };
 
@@ -78,6 +83,12 @@ enum DialogBoxType {
 
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
+
+#ifdef MULTILANG
+#define DIALOG_LINE_HEIGHT ((gInGameLanguage == LANGUAGE_JAPANESE) ? 20 : 16)
+#else
+#define DIALOG_LINE_HEIGHT 16
+#endif
 
 s8 gDialogBoxState = DIALOG_STATE_OPENING;
 f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
@@ -327,8 +338,6 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
     return utf8Entry->kerning;  
 }
 
-#define MAX_STRING_WIDTH 16
-
 /**
  * Prints a generic white string.
  * In JP/EU a IA1 texture is used but in US a IA4 texture is used.
@@ -387,7 +396,7 @@ void print_generic_string(s16 x, s16 y, char *str) {
                 break;**/
             case '\n':
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-                create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * MAX_STRING_WIDTH), 0.0f);
+                create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * DIALOG_LINE_HEIGHT), 0.0f);
                 lineNum++;
                 break;
             case '/':
@@ -422,14 +431,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     u32 curY = y;
     u32 renderX, renderY;
     struct Utf8CharLUTEntry *utf8Entry;
-
-    u32 xStride; // X separation
-
-    /**if (hudLUT == HUD_TEXT_MODE_1CYCLE) {
-        xStride = 16;
-    } else { // HUD_TEXT_MODE_1CYCLE
-        xStride = 12; //? Shindou uses this.
-    }**/
+    u32 kerning;
 
     while (str[strPos] != 0x00) {
         switch (str[strPos]) {
@@ -442,7 +444,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                 if (!(str[strPos] & 0x80)) {
                     const Texture *tex = hudLUT[str[strPos] - ' '].texture;
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, tex);
-                    xStride = hudLUT[str[strPos] - ' '].kerning;
+                    kerning = hudLUT[str[strPos] - ' '].kerning;
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
                     if ((utf8Entry->flags & TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
@@ -455,7 +457,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                         gDPPipeSync(gDisplayListHead++);
                     }
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
-                    xStride = utf8Entry->kerning;
+                    kerning = utf8Entry->kerning;
                 }
 
                 renderX = curX;
@@ -478,7 +480,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                 gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
                                     (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
-                curX += xStride;
+                curX += kerning;
         }
         strPos++;
     }
@@ -724,6 +726,24 @@ void reset_dialog_render_state(void) {
     gDialogResponse = DIALOG_RESPONSE_NONE;
 }
 
+// Constants that control how the dialog box renders, the box is taller in Japanese.
+#define BOX_TRANS_X_EN -7.f
+#define BOX_TRANS_X_JP -5.f
+#define BOX_TRANS_Y_EN  5.f
+#define BOX_TRANS_Y_JP  2.f
+#define BOX_SCALE_EN    5.f
+#define BOX_SCALE_JP    4.f
+
+#ifdef MULTILANG
+#define BOX_TRANS_X ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_X_JP : BOX_TRANS_X_EN)
+#define BOX_TRANS_Y ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_Y_JP : BOX_TRANS_Y_EN)
+#define BOX_SCALE   ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_SCALE_JP   : BOX_SCALE_EN)
+#else
+#define BOX_TRANS_X BOX_TRANS_X_EN
+#define BOX_TRANS_Y BOX_TRANS_Y_EN
+#define BOX_SCALE   BOX_SCALE_EN
+#endif
+
 void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
     create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog->leftOffset, dialog->width, 0);
 
@@ -746,8 +766,8 @@ void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
             break;
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, -7.0f, 5.0f, 0);
-    create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1f, (((f32) linesPerBox / 5.0f) + 0.1f), 1.0f);
+    create_dl_translation_matrix(MENU_MTX_PUSH, BOX_TRANS_X, BOX_TRANS_Y, 0);
+    create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1f, (((f32) linesPerBox / BOX_SCALE) + 0.1f), 1.0f);
 
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -789,7 +809,7 @@ void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s
         *pageState = DIALOG_PAGE_STATE_SCROLL;
         return;
     }
-    create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - (lineNum * 16), 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - (lineNum * DIALOG_LINE_HEIGHT), 0);
 
     *linePos = 0;
     *xMatrix = 1;
@@ -856,7 +876,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
         create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, (f32) gDialogScrollOffsetY, 0);
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, 0.f, 2 - lineNum * 16, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 0.f, 2 - lineNum * DIALOG_LINE_HEIGHT, 0);
 
     while (pageState == DIALOG_PAGE_STATE_NONE) {
         if (customColor == 1) {
@@ -918,7 +938,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                 if ((lineNum >= lowerBound) && (lineNum <= (lowerBound + linesPerBox))) {
                     if (linePos || xMatrix != 1) {
                         create_dl_translation_matrix(
-                            MENU_MTX_NOPUSH, (f32)(5 * (xMatrix - 1)), 0, 0);
+                            MENU_MTX_NOPUSH, (f32)(SPACE_KERNING(segmented_to_virtual(main_font_lut)) * (xMatrix - 1)), 0, 0);
                     }
 
                     if (!(strChar & 0x80)) {
@@ -954,7 +974,7 @@ void render_dialog_triangle_choice(void) {
         handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, &gDialogLineNum, 1, 2);
     }
 
-    create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogLineNum * 56) - 47, 2 - (gLastDialogLineNum * 16), 0);
+    create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogLineNum * 56) - 47, 2 - (gLastDialogLineNum * DIALOG_LINE_HEIGHT), 0);
 
     if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
@@ -972,7 +992,7 @@ void render_dialog_triangle_next(s8 linesPerBox) {
         return;
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, 118.f, (linesPerBox * -16) + 5, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 118.f, (linesPerBox * -DIALOG_LINE_HEIGHT) + 5, 0);
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.8f, 0.8f, 1.0f);
     create_dl_rotation_matrix(MENU_MTX_NOPUSH, -DEFAULT_DIALOG_BOX_ANGLE, 0, 0, 1.0f);
 
@@ -1039,43 +1059,43 @@ langarray_t textEndCutscene2 = LANGUAGE_TEXT(
     "The power of the Stars is restored to the castle...",
     "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
     "Die Macht der Sterne ruht wieder sicher im Schloss...",
-    "おしろにスターが　もどったのね");
+    "おしろにスターが もどったのね");
 
 langarray_t textEndCutscene3 = LANGUAGE_TEXT(
     "...and it's all thanks to you!",
     "...et ceci grâce à toi!",
     "...und alles dank Deiner Hilfe!",
-    "みんな　あなたのおかげだわ！");
+    "みんな あなたのおかげだわ！");
 
 langarray_t textEndCutscene4 = LANGUAGE_TEXT(
     "Thank you, Mario!",
     "Merci, Mario!",
     "Vielen Dank, Mario!",
-    "ありがとう　マリオ");
+    "ありがとう マリオ");
 
 langarray_t textEndCutscene5 = LANGUAGE_TEXT(
     "We have to do something special for you...",
     "Tu mérites une récompense...",
     "Wir haben eine Überraschung für Dich...",
-    "なにか　おれいをしなくちゃ・・");
+    "なにか おれいをしなくちゃ・・");
 
 langarray_t textEndCutscene6 = LANGUAGE_TEXT(
     "Listen, everybody,",
     "Venez les amis...",
     "Hört alle her...",
-    "さあ　みんな");
+    "さあ みんな");
 
 langarray_t textEndCutscene7 = LANGUAGE_TEXT(
     "let's bake a delicious cake...",
     "Allons préparer un délicieux gâteau...",
     "Laßt uns einen leckeren Kuchen backen...",
-    "おいしいケーキを　やきましょう");
+    "おいしいケーキを やきましょう");
 
 langarray_t textEndCutscene8 = LANGUAGE_TEXT(
     "...for Mario...",
     "...pour Mario...",
     "...für Mario...",
-    "マリオの　ために・・・");
+    "マリオの ために・・・");
 
 langarray_t textEndCutscene9 = LANGUAGE_TEXT(
     "Mario!",
@@ -1152,12 +1172,12 @@ void render_dialog_entries(void) {
         case DIALOG_STATE_HORIZONTAL: // scrolling
             gDialogScrollOffsetY += (dialog->linesPerBox * 2);
 
-            if (gDialogScrollOffsetY >= dialog->linesPerBox * 16) {
+            if (gDialogScrollOffsetY >= dialog->linesPerBox * DIALOG_LINE_HEIGHT) {
                 gDialogTextPos = gLastDialogPageStrPos;
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 gDialogScrollOffsetY = 0;
             }
-            lowerBound = (gDialogScrollOffsetY / 16) + 1;
+            lowerBound = (gDialogScrollOffsetY / DIALOG_LINE_HEIGHT) + 1;
             break;
 
         case DIALOG_STATE_CLOSING:
@@ -1190,7 +1210,7 @@ void render_dialog_entries(void) {
                   0,
                   ensure_nonnegative(SCREEN_HEIGHT - dialog->width - 3),
                   SCREEN_WIDTH,
-                  ensure_nonnegative(SCREEN_HEIGHT + (dialog->linesPerBox * 16) - dialog->width));
+                  ensure_nonnegative(SCREEN_HEIGHT + (dialog->linesPerBox * DIALOG_LINE_HEIGHT) - dialog->width));
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
@@ -1509,13 +1529,13 @@ void render_pause_my_score_coins(void) {
         }
 
         print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_ACT_Y,    actName);
-        print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_COURSE_Y, &courseName[3]);
+        print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_COURSE_Y, &courseName[COURSE_NAME_STR_OFFSET]);
 
         if (save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
             print_generic_string_aligned(PAUSE_MENU_LEFT_X + 3, PAUSE_MENU_MY_SCORE_Y, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
         }
     } else {
-        print_generic_string_aligned(SCREEN_CENTER_X, PAUSE_MENU_COURSE_Y, &courseName[3], TEXT_ALIGN_CENTER);
+        print_generic_string_aligned(SCREEN_CENTER_X, PAUSE_MENU_COURSE_Y, &courseName[COURSE_NAME_STR_OFFSET], TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -1576,7 +1596,7 @@ langarray_t textContinue = LANGUAGE_TEXT(
     "CONTINUE",
     "CONTINUER",
     "WEITER",
-    "つづけて　マリオする？");
+    "つづけて マリオする？");
 
 langarray_t textExitCourse = LANGUAGE_TEXT(
     "EXIT COURSE",
