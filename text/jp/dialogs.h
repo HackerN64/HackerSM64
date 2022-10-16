@@ -1,12 +1,5 @@
 // Parameters: dialog enum ID, (unused), lines per box, left offset, width
 
-#define HOW_TO_READ_SIGNS_1 "\
-カンバンは　まえにたって\n\
-ＡかＢボタンでよめます。\n\
-まえにたつだけで　はなし\n\
-かけてくれる　どうぶつも\n\
-います。"
-
 DEFINE_DIALOG(DIALOG_000, NO_SOUND, 5, 30, 200, "\
 おおっと、ここはキケンな\n\
 せんじょうの　どまんなか。\n\
@@ -17,8 +10,12 @@ DEFINE_DIALOG(DIALOG_000, NO_SOUND, 5, 30, 200, "\
 はなしかけてみるといい！\n\
 Ｂボタンではなしができる。\n\
 きっと、ちからになって\n\
-くれるはずだ。\n"\
-HOW_TO_READ_SIGNS_1))
+くれるはずだ。\n\
+カンバンは　まえにたって\n\
+ＡかＢボタンでよめます。\n\
+まえにたつだけで　はなし\n\
+かけてくれる　どうぶつも\n\
+います。")
 
 DEFINE_DIALOG(DIALOG_001, SOUND_OBJ_BOBOMB_BUDDY_TALK, 4, 95, 200, "\
 あぶない　あぶない！！\n\
@@ -1085,11 +1082,9 @@ DEFINE_DIALOG(DIALOG_094, NO_SOUND, 3, 30, 200, "\
 はしりながら　Ｚボタンで\n\
 しゃがんで　ジャンプだ！")
 
-#define HOW_TO_READ_SIGNS_2 "ＡかＢボタンをおし"
-
 DEFINE_DIALOG(DIALOG_095, NO_SOUND, 3, 30, 200, "\
 このように　カンバンの\n\
-まえで" HOW_TO_READ_SIGNS_2 "\n\
+まえでＡかＢボタンをおし\n\
 よむことができます。\n\
 ノコノコや　どうぶつたち\n\
 と　はなすときは、まえに\n\
@@ -1873,22 +1868,17 @@ DEFINE_DIALOG(DIALOG_166, NO_SOUND, 6, 30, 200, "\
 くるといいッス！\n\
 　　　　　　　ノコノコ")
 
-#define A_BUTTON_ACT "\
+DEFINE_DIALOG(DIALOG_167, NO_SOUND, 4, 30, 200, "\
+『ピーチの　おしろ』\n\
+　　　　　すぐそこ\n\
 Ａボタン『ジャンプ』\n\
-　　　　『カンバンよむ』\n"
-#define B_BUTTON_ACT "\
+　　　　『カンバンよむ』\n\
+Ｚボタン『しゃがむ』\n\
 Ｂボタン『パンチ』\n\
 　　　　『カンバンよむ』\n\
 　　　　『ものをもつ』\n\
 　もういちどおすと\n\
-　　　　『なげる』"
-
-DEFINE_DIALOG(DIALOG_167, NO_SOUND, 4, 30, 200, "\
-『ピーチの　おしろ』\n\
-　　　　　すぐそこ\n"\
-A_BUTTON_ACT \
-"Ｚボタン『しゃがむ』\n"\
-B_BUTTON_ACT))
+　　　　『なげる』")
 
 DEFINE_DIALOG(DIALOG_168, SOUND_OBJ_WIGGLER_TALK, 4, 30, 200, "\
 アーン、またまた　\n\

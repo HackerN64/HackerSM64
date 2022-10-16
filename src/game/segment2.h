@@ -55,6 +55,7 @@ extern struct DiacriticLUTEntry main_font_diacritic_lut[];
 extern struct AsciiCharLUTEntry main_font_lut[];
 extern struct Utf8LUT main_font_utf8_lut;
 extern Gfx dl_ia_text_tex_settings[];
+extern Gfx dl_ia_text_tex_settings_packed[];
 extern Gfx dl_rgba16_load_tex_block[];
 extern struct AsciiCharLUTEntry main_credits_font_lut[];
 extern Texture *main_hud_camera_lut[6];

@@ -63,7 +63,7 @@ struct Utf8LUT {
 struct DiacriticLUTEntry {
     const s8 xOffset;
     const s8 yOffset;
-    const Texture *texture;
+    const char *str;
 };
 
 enum TextDiacriticMarks {
@@ -78,6 +78,9 @@ enum TextDiacriticMarks {
     TEXT_DIACRITIC_TILDE_UPPERCASE,
     TEXT_DIACRITIC_UMLAUT,
     TEXT_DIACRITIC_UMLAUT_UPPERCASE,
+
+    TEXT_DIACRITIC_DAKUTEN,
+    TEXT_DIACRITIC_HANDAKUTEN,
 };
 
 enum TextAlignments {

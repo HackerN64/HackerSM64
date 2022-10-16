@@ -447,7 +447,7 @@ const Gfx dl_menu_grabbing_hand[] = {
 };
 
 // 0x070073D0
-ALIGNED8 static const Texture texture_menu_hud_char_katakana_hu[] = {
+ALIGNED8 static const Texture texture_menu_hud_char_katakana_fu[] = {
 #include "levels/menu/main_menu_seg7.073D0.rgba16.inc.c"
 };
 
@@ -589,7 +589,7 @@ ALIGNED8 static const Texture texture_menu_hud_char_kana_dakuten_do[] = {
 // Menu HUD print table, only used in JP
 // 0x0700ABD0
 const Texture *const menu_hud_lut[] = {
-    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a, texture_menu_hud_char_katakana_i,         texture_menu_hud_char_katakana_ru,
+    texture_menu_hud_char_katakana_fu, texture_menu_hud_char_katakana_small_a, texture_menu_hud_char_katakana_i,         texture_menu_hud_char_katakana_ru,
     texture_menu_hud_char_katakana_se, texture_menu_hud_char_katakana_re,      texture_menu_hud_char_katakana_ku,        texture_menu_hud_char_katakana_to,
     texture_menu_hud_char_hiragana_wo, texture_menu_hud_char_katakana_ko,      texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
     texture_menu_hud_char_hiragana_su, texture_menu_hud_char_hiragana_ru,      texture_menu_hud_char_hiragana_ke,        texture_menu_hud_char_katakana_ma,
@@ -665,7 +665,7 @@ ALIGNED8 static const Texture texture_menu_font_char_jp_hiragana_u[] = {
 };
 
 // 0x0700AF88
-ALIGNED8 static const Texture texture_menu_font_char_jp_hiragana_c[] = {
+ALIGNED8 static const Texture texture_menu_font_char_jp_hiragana_e[] = {
 #include "levels/menu/main_menu_seg7.0AF88.ia8.inc.c"
 };
 
@@ -785,7 +785,7 @@ ALIGNED8 static const Texture texture_menu_font_char_jp_hiragana_hi[] = {
 };
 
 // 0x0700B588
-ALIGNED8 static const Texture texture_menu_font_char_jp_hiragana_hu[] = {
+ALIGNED8 static const Texture texture_menu_font_char_jp_hiragana_fu[] = {
 #include "levels/menu/main_menu_seg7.0B588.ia8.inc.c"
 };
 
@@ -1075,7 +1075,7 @@ ALIGNED8 static const Texture texture_menu_font_char_jp_katakana_hi[] = {
 };
 
 // 0x0700C408
-ALIGNED8 static const Texture texture_menu_font_char_jp_katakana_hu[] = {
+ALIGNED8 static const Texture texture_menu_font_char_jp_katakana_fu[] = {
 #include "levels/menu/main_menu_seg7.0C408.ia8.inc.c"
 };
 

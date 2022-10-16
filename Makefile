@@ -530,7 +530,7 @@ endif
 
 # For non-IDO, use objcopy instead of extract_data_for_mio
 ifneq ($(COMPILER),ido)
-  EXTRACT_DATA_FOR_MIO := $(OBJCOPY) -O binary --only-section=.data
+  EXTRACT_DATA_FOR_MIO := $(OBJCOPY) -O binary --only-section=.data --only-section=.rodata
 endif
 
 # Common build print status function

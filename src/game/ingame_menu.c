@@ -245,6 +245,36 @@ s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8
     return length;
 }
 
+static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
+    s32 inPos;
+    u16 bitMask;
+    u8 *out;
+    s16 outPos = 0;
+
+    out = alloc_display_list((u32) width * (u32) height);
+
+    if (out == NULL) {
+        return NULL;
+    }
+
+    for (inPos = 0; inPos < (width * height) / 16; inPos++) {
+        bitMask = 0x8000;
+
+        while (bitMask != 0) {
+            if (in[inPos] & bitMask) {
+                out[outPos] = 0xFF;
+            } else {
+                out[outPos] = 0x00;
+            }
+
+            bitMask /= 2;
+            outPos++;
+        }
+    }
+
+    return out;
+}
+
 u8 render_generic_ascii_char(char c) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
     const Texture *texture = fontLUT[c - ' '].texture;
@@ -263,9 +293,20 @@ u8 render_generic_ascii_char(char c) {
 u8 render_generic_unicode_char(char *str, s32 *strPos) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
 
+    if (utf8Entry->texture == NULL) {
+        return utf8Entry->kerning;
+    }
+
     gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+
+    if (utf8Entry->flags & TEXT_FLAG_PACKED) {
+        void *unpackedTexture = alloc_ia8_text_from_i1(segmented_to_virtual(utf8Entry->texture), 8, 16);
+        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, unpackedTexture);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings_packed);
+    } else {
+        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+    }
 
     if (utf8Entry->flags & TEXT_DIACRITIC_MASK) {
         struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&main_font_diacritic_lut);
@@ -275,9 +316,8 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
             create_dl_translation_matrix(MENU_MTX_PUSH, diacritic->xOffset, diacritic->yOffset, 0.0f);
         }
 
-        gDPPipeSync(gDisplayListHead++);
-        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, diacritic->texture);
-        gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+        s32 fakeStrPos = 0;
+        render_generic_unicode_char(segmented_to_virtual(diacritic->str), &fakeStrPos);
 
         if (diacritic->xOffset | diacritic->yOffset) {
             gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);

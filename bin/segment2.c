@@ -372,7 +372,6 @@ ALIGNED8 static const Texture texture_credits_char_period[] = {
 };
 
 // JP Small Font
-#if defined(VERSION_JP) || defined(VERSION_SH)
 ALIGNED8 static const Texture texture_font_char_jp_0[] = {
 #include "textures/segment2/segment2.07100.ia1.inc.c"
 };
@@ -529,8 +528,8 @@ ALIGNED8 static const Texture texture_font_char_jp_dakuten[] = {
 #include "textures/segment2/segment2.07360.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_handakuten[] = {
-#include "textures/segment2/segment2.07370.ia1.inc.c"
+ALIGNED8 static const Texture texture_font_char_jp_period[] = {
+#include "textures/segment2/segment2.jp_period.ia1.inc.c"
 };
 
 ALIGNED8 static const Texture texture_font_char_jp_percent[] = {
@@ -541,36 +540,12 @@ ALIGNED8 static const Texture texture_font_char_jp_question[] = {
 #include "textures/segment2/segment2.07390.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_left_right_arrow[] = {
-#include "textures/segment2/segment2.073A0.ia1.inc.c"
-};
-
 ALIGNED8 static const Texture texture_font_char_jp_open_parentheses[] = {
 #include "textures/segment2/segment2.073B0.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_close_open_parentheses[] = {
-#include "textures/segment2/segment2.073C0.ia1.inc.c"
-};
-
 ALIGNED8 static const Texture texture_font_char_jp_close_parentheses[] = {
 #include "textures/segment2/segment2.073D0.ia1.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_jp_coin[] = {
-#include "textures/segment2/segment2.073E0.ia1.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_jp_multiply[] = {
-#include "textures/segment2/segment2.073F0.ia1.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_jp_star_filled[] = {
-#include "textures/segment2/segment2.07400.ia1.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_jp_star_hollow[] = {
-#include "textures/segment2/segment2.07410.ia1.inc.c"
 };
 
 ALIGNED8 static const Texture texture_font_char_jp_hiragana_a[] = {
@@ -585,7 +560,7 @@ ALIGNED8 static const Texture texture_font_char_jp_hiragana_u[] = {
 #include "textures/segment2/segment2.07440.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_hiragana_c[] = {
+ALIGNED8 static const Texture texture_font_char_jp_hiragana_e[] = {
 #include "textures/segment2/segment2.07450.ia1.inc.c"
 };
 
@@ -681,7 +656,7 @@ ALIGNED8 static const Texture texture_font_char_jp_hiragana_hi[] = {
 #include "textures/segment2/segment2.075C0.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_hiragana_hu[] = {
+ALIGNED8 static const Texture texture_font_char_jp_hiragana_fu[] = {
 #include "textures/segment2/segment2.075D0.ia1.inc.c"
 };
 
@@ -909,7 +884,7 @@ ALIGNED8 static const Texture texture_font_char_jp_katakana_hi[] = {
 #include "textures/segment2/segment2.07950.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_katakana_hu[] = {
+ALIGNED8 static const Texture texture_font_char_jp_katakana_fu[] = {
 #include "textures/segment2/segment2.07960.ia1.inc.c"
 };
 
@@ -1025,15 +1000,12 @@ ALIGNED8 static const Texture texture_font_char_jp_double_quotation_close[] = {
 #include "textures/segment2/segment2.07B20.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_wave_dash[] = {
+ALIGNED8 static const Texture texture_font_char_jp_tilde[] = {
 #include "textures/segment2/segment2.07B30.ia1.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_jp_ellipsis[] = {
-#include "textures/segment2/segment2.07B40.ia1.inc.c"
-};
 // US Small Font
-#else
+
 ALIGNED8 static const Texture texture_font_char_us_0[] = {
 #include "textures/segment2/font_graphics.05900.ia4.inc.c"
 };
@@ -1437,7 +1409,6 @@ ALIGNED8 static const Texture texture_font_char_diacritic_tilde[] = {
 ALIGNED8 static const Texture texture_font_char_us_i_no_dot[] = {
 #include "textures/segment2/font_graphics.i_no_dot.ia4.inc.c"
 };
-#endif
 
 ALIGNED8 static const Texture texture_font_char_amogus[] = {
 #include "textures/segment2/font_graphics.amogus.ia4.inc.c"
@@ -1595,16 +1566,19 @@ const struct Utf8LUT main_hud_utf8_lut = {
 };
 
 const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
-    {-1, 0, texture_font_char_diacritic_grave}, // TEXT_DIACRITIC_GRAVE,
-    {0, 4, texture_font_char_diacritic_grave}, // TEXT_DIACRITIC_GRAVE_UPPERCASE,
-    {-1, 0, texture_font_char_diacritic_acute}, // TEXT_DIACRITIC_ACUTE,
-    {0, 4, texture_font_char_diacritic_acute}, // TEXT_DIACRITIC_ACUTE_UPPERCASE,
-    {0, 0, texture_font_char_diacritic_circumflex}, // TEXT_DIACRITIC_CIRCUMFLEX,
-    {1, 4, texture_font_char_diacritic_circumflex}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE,
-    {-1, 0, texture_font_char_diacritic_tilde}, // TEXT_DIACRITIC_TILDE,
-    {1, 4, texture_font_char_diacritic_tilde}, // TEXT_DIACRITIC_TILDE_UPPERCASE,
-    {0, 0, texture_font_char_diacritic_umlaut}, // TEXT_DIACRITIC_UMLAUT,
-    {1, 4, texture_font_char_diacritic_umlaut}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE,
+    {-1, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE,
+    {0, 4, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE,
+    {-1, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE,
+    {0, 4, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE,
+    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX,
+    {1, 4, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE,
+    {-1, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE,
+    {1, 4, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE,
+    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT,
+    {1, 4, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE,
+
+    {5, 7, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN,
+    {7, 12, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN,
 };
 
 const struct AsciiCharLUTEntry main_font_lut[] = {
@@ -1769,6 +1743,12 @@ const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00FA, 5, TEXT_DIACRITIC_ACUTE, texture_font_char_us_u}, // ú
     {0x00FB, 5, TEXT_DIACRITIC_CIRCUMFLEX, texture_font_char_us_u}, // û
     {0x00FC, 5, TEXT_DIACRITIC_UMLAUT, texture_font_char_us_u}, // ü
+
+    {0x0300, 0, 0, texture_font_char_diacritic_grave}, // ◌̀
+    {0x0301, 0, 0, texture_font_char_diacritic_acute}, // ◌́
+    {0x0302, 0, 0, texture_font_char_diacritic_circumflex}, // ◌̂
+    {0x0303, 0, 0, texture_font_char_diacritic_tilde}, // ◌̃
+    {0x0308, 0, 0, texture_font_char_diacritic_umlaut}, // ◌̈
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
@@ -1792,6 +1772,222 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x2605, 10, 0, texture_font_char_us_star_filled}, // ★
     {0x2606, 10, 0, texture_font_char_us_star_hollow}, // ☆
     {0x272A, 8, 0, texture_font_char_us_coin}, // ✪
+
+    {0x3000, 10, 0, NULL}, // "　" (ideographic space)
+    {0x3001, 10, TEXT_FLAG_PACKED, texture_font_char_jp_comma}, // 、
+    {0x3002, 10, TEXT_FLAG_PACKED, texture_font_char_jp_period}, // 。
+    {0x300E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_double_quotation_open}, // 『
+    {0x300F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_double_quotation_close}, // 』
+
+    {0x3041, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_a}, // ぁ
+    {0x3042, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_a}, // あ
+    {0x3043, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_i}, // ぃ
+    {0x3044, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_i}, // い
+    {0x3045, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_u}, // ぅ
+    {0x3046, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_u}, // う
+    {0x3047, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_e}, // ぇ
+    {0x3048, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_e}, // え
+    {0x3049, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_o}, // ぉ
+    {0x304A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_o}, // お
+    {0x304B, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ka}, // か
+    {0x304C, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ka}, // が
+    {0x304D, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ki}, // き
+    {0x304E, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ki}, // ぎ
+    {0x304F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ku}, // く
+    {0x3050, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ku}, // ぐ
+    {0x3051, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ke}, // け
+    {0x3052, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ke}, // げ
+    {0x3053, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ko}, // こ
+    {0x3054, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ko}, // ご
+    {0x3055, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_sa}, // さ
+    {0x3056, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_sa}, // ざ
+    {0x3057, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_shi}, // し
+    {0x3058, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_shi}, // じ
+    {0x3059, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_su}, // す
+    {0x305A, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_su}, // ず
+    {0x305B, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_se}, // せ
+    {0x305C, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_se}, // ぜ
+    {0x305D, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_so}, // そ
+    {0x305E, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_so}, // ぞ
+    {0x305F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ta}, // た
+    {0x3060, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ta}, // だ
+    {0x3061, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_chi}, // ち
+    {0x3062, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_chi}, // ぢ
+    {0x3063, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_tsu}, // っ
+    {0x3064, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_tsu}, // つ
+    {0x3065, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_tsu}, // づ
+    {0x3066, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_te}, // て
+    {0x3067, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_te}, // で
+    {0x3068, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_to}, // と
+    {0x3069, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_to}, // ど
+    {0x306A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_na}, // な
+    {0x306B, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ni}, // に
+    {0x306C, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_nu}, // ぬ
+    {0x306D, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ne}, // ね
+    {0x306E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_no}, // の
+    {0x306F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ha}, // は
+    {0x3070, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ha}, // ば
+    {0x3071, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_hiragana_ha}, // ぱ
+    {0x3072, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_hi}, // ひ
+    {0x3073, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_hi}, // び
+    {0x3074, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_hiragana_hi}, // ぴ
+    {0x3075, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_fu}, // ふ
+    {0x3076, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_fu}, // ぶ
+    {0x3077, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_hiragana_fu}, // ぷ
+    {0x3078, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_he}, // へ
+    {0x3079, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_he}, // べ
+    {0x307A, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_hiragana_he}, // ぺ
+    {0x307B, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ho}, // ほ
+    {0x307C, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_hiragana_ho}, // ぼ
+    {0x307D, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_hiragana_ho}, // ぽ
+    {0x307E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ma}, // ま
+    {0x307F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_mi}, // み
+    {0x3080, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_mu}, // む
+    {0x3081, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_me}, // め
+    {0x3082, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_mo}, // も
+    {0x3083, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_ya}, // ゃ
+    {0x3084, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ya}, // や
+    {0x3085, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_yu}, // ゅ
+    {0x3086, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_yu}, // ゆ
+    {0x3087, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_small_yo}, // ょ
+    {0x3088, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_yo}, // よ
+    {0x3089, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ra}, // ら
+    {0x308A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ri}, // り
+    {0x308B, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ru}, // る
+    {0x308C, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_re}, // れ
+    {0x308D, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_ro}, // ろ
+    {0x308F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_wa}, // わ
+    {0x3092, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_wo}, // を
+    {0x3093, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_n}, // ん
+
+    {0x3099, 0, TEXT_FLAG_PACKED, texture_font_char_jp_dakuten}, // ◌゙
+    {0x309A, 0, TEXT_FLAG_PACKED, texture_font_char_jp_period}, // ◌゚
+
+    {0x30A1, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_a}, // ァ
+    {0x30A2, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_a}, // ア
+    {0x30A3, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_i}, // ィ
+    {0x30A4, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_i}, // イ
+    {0x30A5, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_u}, // ゥ
+    {0x30A6, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_u}, // ウ
+    {0x30A7, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_e}, // ェ
+    {0x30A8, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_e}, // エ
+    {0x30A9, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_o}, // ォ
+    {0x30AA, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_o}, // オ
+    {0x30AB, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ka}, // カ
+    {0x30AC, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ka}, // ガ
+    {0x30AD, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ki}, // キ
+    {0x30AE, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ki}, // ギ
+    {0x30AF, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ku}, // ク
+    {0x30B0, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ku}, // グ
+    {0x30B1, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ke}, // ケ
+    {0x30B2, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ke}, // ゲ
+    {0x30B3, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ko}, // コ
+    {0x30B4, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ko}, // ゴ
+    {0x30B5, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_sa}, // サ
+    {0x30B6, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_sa}, // ザ
+    {0x30B7, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_shi}, // シ
+    {0x30B8, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_shi}, // ジ
+    {0x30B9, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_su}, // ス
+    {0x30BA, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_su}, // ズ
+    {0x30BB, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_se}, // セ
+    {0x30BC, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_se}, // ゼ
+    {0x30BD, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_so}, // ソ
+    {0x30BE, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_so}, // ゾ
+    {0x30BF, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ta}, // タ
+    {0x30C0, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ta}, // ダ
+    {0x30C1, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_chi}, // チ
+    {0x30C2, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_chi}, // ヂ
+    {0x30C3, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_tsu}, // ッ
+    {0x30C4, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_tsu}, // ツ
+    {0x30C5, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_tsu}, // ヅ
+    {0x30C6, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_te}, // テ
+    {0x30C7, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_te}, // デ
+    {0x30C8, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_to}, // ト
+    {0x30C9, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_to}, // ド
+    {0x30CA, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_na}, // ナ
+    {0x30CB, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ni}, // ニ
+    {0x30CC, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_nu}, // ヌ
+    {0x30CD, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ne}, // ネ
+    {0x30CE, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_no}, // ノ
+    {0x30CF, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ha}, // ハ
+    {0x30D0, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ha}, // バ
+    {0x30D1, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_katakana_ha}, // パ
+    {0x30D2, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_hi}, // ヒ
+    {0x30D3, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_hi}, // ビ
+    {0x30D4, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_katakana_hi}, // ピ
+    {0x30D5, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_fu}, // フ
+    {0x30D6, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_fu}, // ブ
+    {0x30D7, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_katakana_fu}, // プ
+    {0x30D8, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_he}, // ヘ
+    {0x30D9, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_he}, // ベ
+    {0x30DA, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_katakana_he}, // ペ
+    {0x30DB, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ho}, // ホ
+    {0x30DC, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_DAKUTEN, texture_font_char_jp_katakana_ho}, // ボ
+    {0x30DD, 10, TEXT_FLAG_PACKED | TEXT_DIACRITIC_HANDAKUTEN, texture_font_char_jp_katakana_ho}, // ポ
+    {0x30DE, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ma}, // マ
+    {0x30DF, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_mi}, // ミ
+    {0x30E0, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_mu}, // ム
+    {0x30E1, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_me}, // メ
+    {0x30E2, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_mo}, // モ
+    {0x30E3, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_ya}, // ャ
+    {0x30E4, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ya}, // ヤ
+    {0x30E5, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_yu}, // ュ
+    {0x30E6, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_yu}, // ユ
+    {0x30E7, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_yo}, // ョ
+    {0x30E8, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_yo}, // ヨ
+    {0x30E9, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ra}, // ラ
+    {0x30EA, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ri}, // リ
+    {0x30EB, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ru}, // ル
+    {0x30EC, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_re}, // レ
+    {0x30ED, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_ro}, // ロ
+    {0x30EF, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_wa}, // ワ
+    {0x30F3, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_n}, // ン
+    {0x30FB, 10, TEXT_FLAG_PACKED, texture_font_char_jp_interpunct}, // ・
+    {0x30FC, 10, TEXT_FLAG_PACKED, texture_font_char_jp_long_vowel}, // ー
+
+    {0xFF01, 10, TEXT_FLAG_PACKED, texture_font_char_jp_exclamation}, // ！
+    {0xFF05, 10, TEXT_FLAG_PACKED, texture_font_char_jp_percent}, // ％
+    {0xFF08, 10, TEXT_FLAG_PACKED, texture_font_char_jp_open_parentheses}, // （
+    {0xFF09, 10, TEXT_FLAG_PACKED, texture_font_char_jp_close_parentheses}, // ）
+    {0xFF10, 10, TEXT_FLAG_PACKED, texture_font_char_jp_0}, // ０
+    {0xFF11, 10, TEXT_FLAG_PACKED, texture_font_char_jp_1}, // １
+    {0xFF12, 10, TEXT_FLAG_PACKED, texture_font_char_jp_2}, // ２
+    {0xFF13, 10, TEXT_FLAG_PACKED, texture_font_char_jp_3}, // ３
+    {0xFF14, 10, TEXT_FLAG_PACKED, texture_font_char_jp_4}, // ４
+    {0xFF15, 10, TEXT_FLAG_PACKED, texture_font_char_jp_5}, // ５
+    {0xFF16, 10, TEXT_FLAG_PACKED, texture_font_char_jp_6}, // ６
+    {0xFF17, 10, TEXT_FLAG_PACKED, texture_font_char_jp_7}, // ７
+    {0xFF18, 10, TEXT_FLAG_PACKED, texture_font_char_jp_8}, // ８
+    {0xFF19, 10, TEXT_FLAG_PACKED, texture_font_char_jp_9}, // ９
+    {0xFF1F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_question}, // ？
+    {0xFF21, 10, TEXT_FLAG_PACKED, texture_font_char_jp_A}, // Ａ
+    {0xFF22, 10, TEXT_FLAG_PACKED, texture_font_char_jp_B}, // Ｂ
+    {0xFF23, 10, TEXT_FLAG_PACKED, texture_font_char_jp_C}, // Ｃ
+    {0xFF24, 10, TEXT_FLAG_PACKED, texture_font_char_jp_D}, // Ｄ
+    {0xFF25, 10, TEXT_FLAG_PACKED, texture_font_char_jp_E}, // Ｅ
+    {0xFF26, 10, TEXT_FLAG_PACKED, texture_font_char_jp_F}, // Ｆ
+    {0xFF27, 10, TEXT_FLAG_PACKED, texture_font_char_jp_G}, // Ｇ
+    {0xFF28, 10, TEXT_FLAG_PACKED, texture_font_char_jp_H}, // Ｈ
+    {0xFF29, 10, TEXT_FLAG_PACKED, texture_font_char_jp_I}, // Ｉ
+    {0xFF2A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_J}, // Ｊ
+    {0xFF2B, 10, TEXT_FLAG_PACKED, texture_font_char_jp_K}, // Ｋ
+    {0xFF2C, 10, TEXT_FLAG_PACKED, texture_font_char_jp_L}, // Ｌ
+    {0xFF2D, 10, TEXT_FLAG_PACKED, texture_font_char_jp_M}, // Ｍ
+    {0xFF2E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_N}, // Ｎ
+    {0xFF2F, 10, TEXT_FLAG_PACKED, texture_font_char_jp_O}, // Ｏ
+    {0xFF30, 10, TEXT_FLAG_PACKED, texture_font_char_jp_P}, // Ｐ
+    {0xFF31, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Q}, // Ｑ
+    {0xFF32, 10, TEXT_FLAG_PACKED, texture_font_char_jp_R}, // Ｒ
+    {0xFF33, 10, TEXT_FLAG_PACKED, texture_font_char_jp_S}, // Ｓ
+    {0xFF34, 10, TEXT_FLAG_PACKED, texture_font_char_jp_T}, // Ｔ
+    {0xFF35, 10, TEXT_FLAG_PACKED, texture_font_char_jp_U}, // Ｕ
+    {0xFF36, 10, TEXT_FLAG_PACKED, texture_font_char_jp_V}, // Ｖ
+    {0xFF37, 10, TEXT_FLAG_PACKED, texture_font_char_jp_W}, // Ｗ
+    {0xFF38, 10, TEXT_FLAG_PACKED, texture_font_char_jp_X}, // Ｘ
+    {0xFF39, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Y}, // Ｙ
+    {0xFF3A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Z}, // Ｚ
+
+    {0xFF5E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_tilde}, // ～
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_4byte_lut[] = {
@@ -1809,73 +2005,6 @@ const struct Utf8LUT main_font_utf8_lut = {
     ARRAY_COUNT(main_font_utf8_4byte_lut),
     &main_font_utf8_missing_char,
 };
-
-/**
-    texture_font_char_jp_0, texture_font_char_jp_1, texture_font_char_jp_2, texture_font_char_jp_3,
-    texture_font_char_jp_4, texture_font_char_jp_5, texture_font_char_jp_6, texture_font_char_jp_7,
-    texture_font_char_jp_8, texture_font_char_jp_9, texture_font_char_jp_A, texture_font_char_jp_B,
-    texture_font_char_jp_C, texture_font_char_jp_D, texture_font_char_jp_E, texture_font_char_jp_F,
-    texture_font_char_jp_G, texture_font_char_jp_H, texture_font_char_jp_I, texture_font_char_jp_J,
-    texture_font_char_jp_K, texture_font_char_jp_L, texture_font_char_jp_M, texture_font_char_jp_N,
-    texture_font_char_jp_O, texture_font_char_jp_P, texture_font_char_jp_Q, texture_font_char_jp_R,
-    texture_font_char_jp_S, texture_font_char_jp_T, texture_font_char_jp_U, texture_font_char_jp_V,
-    texture_font_char_jp_W, texture_font_char_jp_X, texture_font_char_jp_Y, texture_font_char_jp_Z,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-    texture_font_char_jp_hiragana_a, texture_font_char_jp_hiragana_i, texture_font_char_jp_hiragana_u, texture_font_char_jp_hiragana_c,
-    texture_font_char_jp_hiragana_o, texture_font_char_jp_hiragana_ka, texture_font_char_jp_hiragana_ki, texture_font_char_jp_hiragana_ku,
-    texture_font_char_jp_hiragana_ke, texture_font_char_jp_hiragana_ko, texture_font_char_jp_hiragana_sa, texture_font_char_jp_hiragana_shi,
-    texture_font_char_jp_hiragana_su, texture_font_char_jp_hiragana_se, texture_font_char_jp_hiragana_so, texture_font_char_jp_hiragana_ta,
-    texture_font_char_jp_hiragana_chi, texture_font_char_jp_hiragana_tsu, texture_font_char_jp_hiragana_te, texture_font_char_jp_hiragana_to,
-    texture_font_char_jp_hiragana_na, texture_font_char_jp_hiragana_ni, texture_font_char_jp_hiragana_nu, texture_font_char_jp_hiragana_ne,
-    texture_font_char_jp_hiragana_no, texture_font_char_jp_hiragana_ha, texture_font_char_jp_hiragana_hi, texture_font_char_jp_hiragana_hu,
-    texture_font_char_jp_hiragana_he, texture_font_char_jp_hiragana_ho, texture_font_char_jp_hiragana_ma, texture_font_char_jp_hiragana_mi,
-    texture_font_char_jp_hiragana_mu, texture_font_char_jp_hiragana_me, texture_font_char_jp_hiragana_mo, texture_font_char_jp_hiragana_ya,
-    texture_font_char_jp_hiragana_yu, texture_font_char_jp_hiragana_yo, texture_font_char_jp_hiragana_ra, texture_font_char_jp_hiragana_ri,
-    texture_font_char_jp_hiragana_ru, texture_font_char_jp_hiragana_re, texture_font_char_jp_hiragana_ro, texture_font_char_jp_hiragana_wa,
-    texture_font_char_jp_hiragana_wo, texture_font_char_jp_hiragana_n,                   0x0, texture_font_char_jp_comma,
-    texture_font_char_jp_katakana_a, texture_font_char_jp_katakana_i, texture_font_char_jp_katakana_u, texture_font_char_jp_katakana_e,
-    texture_font_char_jp_katakana_o, texture_font_char_jp_katakana_ka, texture_font_char_jp_katakana_ki, texture_font_char_jp_katakana_ku,
-    texture_font_char_jp_katakana_ke, texture_font_char_jp_katakana_ko, texture_font_char_jp_katakana_sa, texture_font_char_jp_katakana_shi,
-    texture_font_char_jp_katakana_su, texture_font_char_jp_katakana_se, texture_font_char_jp_katakana_so, texture_font_char_jp_katakana_ta,
-    texture_font_char_jp_katakana_chi, texture_font_char_jp_katakana_tsu, texture_font_char_jp_katakana_te, texture_font_char_jp_katakana_to,
-    texture_font_char_jp_katakana_na, texture_font_char_jp_katakana_ni, texture_font_char_jp_katakana_nu, texture_font_char_jp_katakana_ne,
-    texture_font_char_jp_katakana_no, texture_font_char_jp_katakana_ha, texture_font_char_jp_katakana_hi, texture_font_char_jp_katakana_hu,
-    texture_font_char_jp_katakana_he, texture_font_char_jp_katakana_ho, texture_font_char_jp_katakana_ma, texture_font_char_jp_katakana_mi,
-    texture_font_char_jp_katakana_mu, texture_font_char_jp_katakana_me, texture_font_char_jp_katakana_mo, texture_font_char_jp_katakana_ya,
-    texture_font_char_jp_katakana_yu, texture_font_char_jp_katakana_yo, texture_font_char_jp_katakana_ra, texture_font_char_jp_katakana_ri,
-    texture_font_char_jp_katakana_ru, texture_font_char_jp_katakana_re, texture_font_char_jp_katakana_ro, texture_font_char_jp_katakana_wa,
-                      0x0, texture_font_char_jp_katakana_n,                   0x0, texture_font_char_jp_long_vowel,
-    texture_font_char_jp_hiragana_small_e, texture_font_char_jp_hiragana_small_tsu, texture_font_char_jp_hiragana_small_ya, texture_font_char_jp_hiragana_small_yu,
-    texture_font_char_jp_hiragana_small_yo, texture_font_char_jp_hiragana_small_a, texture_font_char_jp_hiragana_small_i, texture_font_char_jp_hiragana_small_u,
-    texture_font_char_jp_hiragana_small_o,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-    texture_font_char_jp_katakana_small_e, texture_font_char_jp_katakana_small_tsu, texture_font_char_jp_katakana_small_ya, texture_font_char_jp_katakana_small_yu,
-    texture_font_char_jp_katakana_small_yo, texture_font_char_jp_katakana_small_a, texture_font_char_jp_katakana_small_i, texture_font_char_jp_katakana_small_u,
-    texture_font_char_jp_katakana_small_o,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0, texture_font_char_jp_open_parentheses, texture_font_char_jp_close_open_parentheses, texture_font_char_jp_close_parentheses,
-    texture_font_char_jp_left_right_arrow,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-                      0x0,                   0x0,                   0x0,                   0x0,
-    texture_font_char_jp_dakuten, texture_font_char_jp_handakuten, texture_font_char_jp_exclamation, texture_font_char_jp_percent,
-    texture_font_char_jp_question, texture_font_char_jp_double_quotation_open, texture_font_char_jp_double_quotation_close, texture_font_char_jp_wave_dash,
-    texture_font_char_jp_ellipsis, texture_font_char_jp_coin, texture_font_char_jp_star_filled, texture_font_char_jp_multiply,
-    texture_font_char_jp_interpunct, texture_font_char_jp_star_hollow,                   0x0,                   0x0,
-**/
 
 // credits font LUT
 const struct AsciiCharLUTEntry main_credits_font_lut[] = {
@@ -2084,21 +2213,12 @@ const Gfx dl_draw_text_bg_box[] = {
 
 // 0x0200EE28 - 0x0200EE68
 static const Vtx vertex_ia8_char[] = {
-#if defined(VERSION_JP) || defined(VERSION_SH)
-    {{{     0,      0,      0}, 0, {     0,   1024}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     8,      0,      0}, 0, {   512,   1024}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     8,     16,      0}, 0, {   512,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{     0,     16,      0}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
-#else
     {{{     0,      0,      0}, 0, {     0,    256}, {0xff, 0xff, 0xff, 0xff}}},
     {{{     8,      0,      0}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
     {{{     8,     16,      0}, 0, {   480,      0}, {0xff, 0xff, 0xff, 0xff}}},
     {{{     0,     16,      0}, 0, {   480,    256}, {0xff, 0xff, 0xff, 0xff}}},
-#endif
 };
 
-#if defined(VERSION_US) || defined(VERSION_EU)
-// 0x0200EE68 - 0x020073E8
 const Gfx dl_ia_text_begin[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_LIGHTING),
@@ -2121,31 +2241,27 @@ const Gfx dl_ia_text_tex_settings[] = {
     gsSP2Triangles( 0,  1,  2, 0x0, 0,  2,  3, 0x0),
     gsSPEndDisplayList(),
 };
-#elif defined(VERSION_JP) || defined(VERSION_SH)
-// 0x0200EE68 - 0x0200EEA8
-const Gfx dl_ia_text_begin[] = {
-    gsDPPipeSync(),
-    gsSPClearGeometryMode(G_LIGHTING),
-    gsDPSetCombineMode(G_CC_FADEA, G_CC_FADEA),
-    gsDPSetEnvColor(255, 255, 255, 255),
-    gsDPSetRenderMode(G_RM_XLU_SURF, G_RM_XLU_SURF2),
-    gsDPSetTextureFilter(G_TF_POINT),
-    gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
-    gsSPEndDisplayList(),
+
+static const Vtx vertex_ia8_char_packed[] = {
+    {{{     0,      0,      0}, 0, {     0,   1024}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{     8,      0,      0}, 0, {   512,   1024}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{     8,     16,      0}, 0, {   512,      0}, {0xff, 0xff, 0xff, 0xff}}},
+    {{{     0,     16,      0}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
 };
 
 // 0x0200EEA8 - 0x0200EEF0
-const Gfx dl_ia_text_tex_settings[] = {
+const Gfx dl_ia_text_tex_settings_packed[] = {
+    gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON), // gross
     gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_8b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, 4, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, ((8 * 16) - 1), CALC_DXT(8, G_IM_SIZ_8b_BYTES)),
     gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_8b, 1, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 4, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, ((8 - 1) << G_TEXTURE_IMAGE_FRAC), ((16 - 1) << G_TEXTURE_IMAGE_FRAC)),
-    gsSPVertex(vertex_ia8_char, 4, 0),
+    gsSPVertex(vertex_ia8_char_packed, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0, 0,  2,  3, 0x0),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON), // gross
     gsSPEndDisplayList(),
 };
-#endif
 
 // 0x0200EEF0 - 0x0200EF30
 const Gfx dl_ia_text_end[] = {

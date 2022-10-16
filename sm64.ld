@@ -28,6 +28,7 @@ OUTPUT_ARCH (mips)
    BEGIN_SEG(name##_yay0, segAddr) \
    { \
       KEEP(BUILD_DIR/bin/name.szp.o(.data*)); \
+      KEEP(BUILD_DIR/bin/name.szp.o(.rodata*)); \
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_yay0) \
