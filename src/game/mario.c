@@ -537,7 +537,7 @@ u32 mario_floor_is_slippery(struct MarioState *m) {
     f32 normY;
 
     if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE  && m->floor->normal.y < COS1) || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
-        return TRUE;
+        return TRUE; // Forces Mario to do a belly slide rather than a butt slide when on a super slippery floor, no matter his angle, so that the player can't jump.
     }
 
     switch (mario_get_floor_class(m)) {
