@@ -515,7 +515,7 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
  */
 s32 mario_facing_downhill(struct MarioState *m, s32 turnYaw) {
     if (m->floor && m->floor->type == SURFACE_SUPER_SLIPPERY)
-        return 0;
+        return FALSE;
 
     s16 faceAngleYaw = m->faceAngle[1];
 
@@ -535,10 +535,8 @@ s32 mario_facing_downhill(struct MarioState *m, s32 turnYaw) {
  */
 u32 mario_floor_is_slippery(struct MarioState *m) {
     f32 normY;
-    if (m->floor->type == SURFACE_SUPER_SLIPPERY)
-        return TRUE;
 
-    if ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE  && m->floor->normal.y < COS1) {
+    if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE  && m->floor->normal.y < COS1) || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
         return TRUE;
     }
 
@@ -557,11 +555,9 @@ u32 mario_floor_is_slippery(struct MarioState *m) {
  */
 s32 mario_floor_is_slope(struct MarioState *m) {
     f32 normY;
-    if (m->floor->type == SURFACE_SUPER_SLIPPERY)
-        return TRUE;
 
-    if ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
-        && m->floor->normal.y < COS1) {
+    if (((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
+        && m->floor->normal.y < COS1) || (m->floor->type == SURFACE_SUPER_SLIPPERY)) {
         return TRUE;
     }
 
