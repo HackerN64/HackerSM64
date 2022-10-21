@@ -347,7 +347,7 @@ const struct Painting sl_painting = {
 };
 
 const struct Painting rr_painting = {
-    /* ID */ PAINTING_ID_CASTLE_THI_HUGE,
+    /* ID */ PAINTING_ID_CASTLE_RR,
     /* Image Count */ 0,
     /* Textures */ NULL,
     /* Texture w, h */  0,  0,
