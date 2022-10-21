@@ -518,7 +518,7 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
 void clear_objects(void) {
     s32 i;
 
-    gEnteredPainting = NULL;
+    gEnteredPaintingObject = NULL;
     gTHIWaterDrained = 0;
     gTimeStopState = 0;
     gMarioObject = NULL;

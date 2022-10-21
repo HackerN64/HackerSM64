@@ -637,9 +637,9 @@ void initiate_painting_warp(void) {
     struct WarpNode *pWarpNode = NULL;
 
     if (gCurrentArea->paintingWarpNodes == NULL) {
-        gEnteredPainting = NULL;
-    } else if (gEnteredPainting != NULL) {
-        pWarpNode = &gCurrentArea->paintingWarpNodes[gEnteredPainting->oPaintingId];
+        gEnteredPaintingObject = NULL;
+    } else if (gEnteredPaintingObject != NULL) {
+        pWarpNode = &gCurrentArea->paintingWarpNodes[gEnteredPaintingObject->oPaintingId];
 
         if (pWarpNode != NULL) {
             if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
@@ -667,7 +667,7 @@ void initiate_painting_warp(void) {
                 queue_rumble_data(80, 70);
                 queue_rumble_decay(1);
 #endif
-                cutscene_object(CUTSCENE_ENTER_PAINTING, gEnteredPainting);
+                cutscene_object(CUTSCENE_ENTER_PAINTING, gEnteredPaintingObject);
             }
         }
     } else {

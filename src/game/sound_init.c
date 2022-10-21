@@ -188,7 +188,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
  * Called from threads: thread5_game_loop
  */
 void play_painting_eject_sound(void) {
-    if (gRipplingPainting != NULL && gRipplingPainting->oPaintingState == PAINTING_ENTERED) {
+    if (gRipplingPaintingObject != NULL && gRipplingPaintingObject->oPaintingState == PAINTING_ENTERED) {
         // ripple when Mario enters painting
         if (!gPaintingEjectSoundPlayed) {
             play_sound(SOUND_GENERAL_PAINTING_EJECT,

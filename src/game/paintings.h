@@ -176,8 +176,8 @@ struct PaintingMeshVertex {
 }; /*0x0C*/
 
 
-extern struct Object *gRipplingPainting;
-extern struct Object *gEnteredPainting;
+extern struct Object *gRipplingPaintingObject;
+extern struct Object *gEnteredPaintingObject;
 
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);

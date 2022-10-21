@@ -107,12 +107,12 @@ const struct Painting * const* sPaintingGroups[] = {
 /**
  * The painting that is currently rippling. Only one painting can be rippling at once.
  */
-struct Object *gRipplingPainting = NULL;
+struct Object *gRipplingPaintingObject = NULL;
 
 /**
  * The id of the painting Mario has entered.
  */
-struct Object *gEnteredPainting = NULL;
+struct Object *gEnteredPaintingObject = NULL;
 
 /**
  * When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
@@ -217,7 +217,7 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 resetTime
         obj->oPaintingRippleTimer = 0;
     }
 
-    gRipplingPainting = obj;
+    gRipplingPaintingObject = obj;
 }
 
 /**
@@ -300,7 +300,7 @@ void painting_update_ripple_state(const struct Painting *painting) {
         // If the painting is barely rippling, make it stop rippling.
         if (obj->oPaintingCurrRippleMag <= 1.0f) {
             obj->oPaintingState = PAINTING_IDLE;
-            gRipplingPainting = NULL;
+            gRipplingPaintingObject = NULL;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // If the painting is doing the entry ripple but the ripples are as small as those from the
@@ -915,13 +915,13 @@ Gfx *display_painting_not_rippling(const struct Painting *painting) {
 }
 
 /**
- * Clear Mario-related state and clear gRipplingPainting.
+ * Clear Mario-related state and clear gRipplingPaintingObject.
  */
 void reset_painting(struct Object *obj) {
     obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
     obj->oPaintingChangedFlags = RIPPLE_FLAGS_NONE;
 
-    gRipplingPainting = NULL;
+    gRipplingPaintingObject = NULL;
 
 #ifdef NO_SEGMENTED_MEMORY
     // Make sure all variables are reset correctly.
@@ -1066,10 +1066,10 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
         if (obj->oPaintingCurrFlags & RIPPLE_FLAG_ENTER) {
             // Mario has entered the painting.
-            gEnteredPainting = obj;
-        } else if (gEnteredPainting == obj) {
-            // Reset gEnteredPainting if it's this painting and this painting is not entered.
-            gEnteredPainting = NULL;
+            gEnteredPaintingObject = obj;
+        } else if (gEnteredPaintingObject == obj) {
+            // Reset gEnteredPaintingObject if it's this painting and this painting is not entered.
+            gEnteredPaintingObject = NULL;
         }
     }
 

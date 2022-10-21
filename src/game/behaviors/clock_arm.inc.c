@@ -16,8 +16,8 @@ void bhv_rotating_clock_arm_loop(void) {
         }
     } else if (o->oAction == TTC_PAINTING_CLOCK_ARM_ACT_MOVING) {
         // If Mario is entering the Tick Tock Clock painting...
-        if (gEnteredPainting != NULL
-         && gEnteredPainting->oPaintingId == PAINTING_ID_CASTLE_TTC) {
+        if (gEnteredPaintingObject != NULL
+         && gEnteredPaintingObject->oPaintingId == PAINTING_ID_CASTLE_TTC) {
             // And this is the minute hand...
             if (cur_obj_has_behavior(bhvClockMinuteHand)) {
                 // Set Tick Tick Clock's speed based on the angle of the hand.
@@ -40,7 +40,7 @@ void bhv_rotating_clock_arm_loop(void) {
             o->oAction++; // TTC_PAINTING_CLOCK_ARM_ACT_STOPPED
         }
     } else if (o->oAction == TTC_PAINTING_CLOCK_ARM_ACT_STOPPED) {
-        if (gEnteredPainting == NULL) {
+        if (gEnteredPaintingObject == NULL) {
             o->oAction = TTC_PAINTING_CLOCK_ARM_ACT_MOVING;
         }
     }
