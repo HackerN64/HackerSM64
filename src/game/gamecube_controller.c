@@ -168,6 +168,7 @@ u8 __osGamecubeRumbleEnabled[MAXCONTROLLERS];
 
 typedef struct
 {
+    s8 initialized;
     u8 stick_x;
     u8 stick_y;
     u8 c_stick_x;
@@ -201,8 +202,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
     return ret;
 }
 
-s8 gGamecubeControllerCentersInitialized = FALSE;
-ControllerCenters gGamecubeControllerCenters;
+ControllerCenters gGamecubeControllerCenters[MAXCONTROLLERS] = { 0 };
 
 void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -216,24 +216,24 @@ void osContGetReadDataEx(OSContPadEx* data) {
             readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
             data->errno = CHNL_ERR(readformatgcn);
             if (data->errno != 0) {
-                gGamecubeControllerCentersInitialized = FALSE;
+                gGamecubeControllerCenters[i].initialized = FALSE;
                 continue;
             }
 
-            if (!gGamecubeControllerCentersInitialized) {
-                gGamecubeControllerCentersInitialized = TRUE;
-                gGamecubeControllerCenters.stick_x   = readformatgcn.stick_x;
-                gGamecubeControllerCenters.stick_y   = readformatgcn.stick_y;
-                gGamecubeControllerCenters.c_stick_x = readformatgcn.c_stick_x;
-                gGamecubeControllerCenters.c_stick_y = readformatgcn.c_stick_y;
+            if (!gGamecubeControllerCenters[i].initialized) {
+                gGamecubeControllerCenters[i].initialized = TRUE;
+                gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
+                gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
+                gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
+                gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
             }
 
-            stick_x = ((s32)readformatgcn.stick_x) - gGamecubeControllerCenters.stick_x;
-            stick_y = ((s32)readformatgcn.stick_y) - gGamecubeControllerCenters.stick_y;
+            stick_x = ((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x;
+            stick_y = ((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y;
             data->stick_x = stick_x;
             data->stick_y = stick_y;
-            c_stick_x = ((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters.c_stick_x;
-            c_stick_y = ((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters.c_stick_y;
+            c_stick_x = ((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x;
+            c_stick_y = ((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y;
             data->c_stick_x = c_stick_x;
             data->c_stick_y = c_stick_y;
             data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
