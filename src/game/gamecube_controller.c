@@ -166,6 +166,14 @@ extern u8 __osContLastCmd;
 u8 __osControllerTypes[MAXCONTROLLERS];
 u8 __osGamecubeRumbleEnabled[MAXCONTROLLERS];
 
+typedef struct
+{
+    u8 stick_x;
+    u8 stick_y;
+    u8 c_stick_x;
+    u8 c_stick_y;
+} ControllerCenters;
+
 #define GCN_C_STICK_THRESHOLD 38
 
 static void __osPackReadData(void);
@@ -194,8 +202,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
 }
 
 s8 gGamecubeControllerCentersInitialized = FALSE;
-u8 gGamecubeControllerStickCenterX, gGamecubeControllerStickCenterY;
-u8 gGamecubeControllerCStickCenterX, gGamecubeControllerCStickCenterY;
+ControllerCenters gGamecubeControllerCenters;
 
 void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -215,18 +222,18 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
             if (!gGamecubeControllerCentersInitialized) {
                 gGamecubeControllerCentersInitialized = TRUE;
-                gGamecubeControllerStickCenterX  = readformatgcn.stick_x;
-                gGamecubeControllerStickCenterY  = readformatgcn.stick_y;
-                gGamecubeControllerCStickCenterX = readformatgcn.c_stick_x;
-                gGamecubeControllerCStickCenterY = readformatgcn.c_stick_y;
+                gGamecubeControllerCenters.stick_x   = readformatgcn.stick_x;
+                gGamecubeControllerCenters.stick_y   = readformatgcn.stick_y;
+                gGamecubeControllerCenters.c_stick_x = readformatgcn.c_stick_x;
+                gGamecubeControllerCenters.c_stick_y = readformatgcn.c_stick_y;
             }
 
-            stick_x = ((s32)readformatgcn.stick_x) - gGamecubeControllerStickCenterX;
-            stick_y = ((s32)readformatgcn.stick_y) - gGamecubeControllerStickCenterY;
+            stick_x = ((s32)readformatgcn.stick_x) - gGamecubeControllerCenters.stick_x;
+            stick_y = ((s32)readformatgcn.stick_y) - gGamecubeControllerCenters.stick_y;
             data->stick_x = stick_x;
             data->stick_y = stick_y;
-            c_stick_x = ((s32)readformatgcn.c_stick_x) - gGamecubeControllerCStickCenterX;
-            c_stick_y = ((s32)readformatgcn.c_stick_y) - gGamecubeControllerCStickCenterY;
+            c_stick_x = ((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters.c_stick_x;
+            c_stick_y = ((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters.c_stick_y;
             data->c_stick_x = c_stick_x;
             data->c_stick_y = c_stick_y;
             data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
