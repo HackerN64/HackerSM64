@@ -193,6 +193,10 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
     return ret;
 }
 
+s8 gGamecubeControllerCentersInitialized = FALSE;
+u8 gGamecubeControllerStickCenterX, gGamecubeControllerStickCenterY;
+u8 gGamecubeControllerCStickCenterX, gGamecubeControllerCStickCenterY;
+
 void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
@@ -203,12 +207,26 @@ void osContGetReadDataEx(OSContPadEx* data) {
         if (__osControllerTypes[i] == CONT_TYPE_GCN) {
             s32 stick_x, stick_y, c_stick_x, c_stick_y;
             readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
-            stick_x = ((s32)readformatgcn.stick_x) - 128;
-            stick_y = ((s32)readformatgcn.stick_y) - 128;
+            data->errno = CHNL_ERR(readformatgcn);
+            if (data->errno != 0) {
+                gGamecubeControllerCentersInitialized = FALSE;
+                continue;
+            }
+
+            if (!gGamecubeControllerCentersInitialized) {
+                gGamecubeControllerCentersInitialized = TRUE;
+                gGamecubeControllerStickCenterX  = readformatgcn.stick_x;
+                gGamecubeControllerStickCenterY  = readformatgcn.stick_y;
+                gGamecubeControllerCStickCenterX = readformatgcn.c_stick_x;
+                gGamecubeControllerCStickCenterY = readformatgcn.c_stick_y;
+            }
+
+            stick_x = ((s32)readformatgcn.stick_x) - gGamecubeControllerStickCenterX;
+            stick_y = ((s32)readformatgcn.stick_y) - gGamecubeControllerStickCenterY;
             data->stick_x = stick_x;
             data->stick_y = stick_y;
-            c_stick_x = ((s32)readformatgcn.c_stick_x) - 128;
-            c_stick_y = ((s32)readformatgcn.c_stick_y) - 128;
+            c_stick_x = ((s32)readformatgcn.c_stick_x) - gGamecubeControllerCStickCenterX;
+            c_stick_y = ((s32)readformatgcn.c_stick_y) - gGamecubeControllerCStickCenterY;
             data->c_stick_x = c_stick_x;
             data->c_stick_y = c_stick_y;
             data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
