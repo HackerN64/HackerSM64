@@ -32,9 +32,6 @@
 #include "vc_ultra.h"
 #include "profiling.h"
 
-// First 3 controller slots
-struct Controller gControllers[3];
-
 // Gfx handlers
 struct SPTask *gGfxSPTask;
 Gfx *gDisplayListHead;
@@ -42,6 +39,7 @@ u8 *gGfxPoolEnd;
 struct GfxPool *gGfxPool;
 
 // OS Controllers
+struct Controller gControllers[4];
 OSContStatus gControllerStatuses[4];
 OSContPad gControllerPads[4];
 u8 gControllerBits;
@@ -90,7 +88,8 @@ void (*gGoddardVblankCallback)(void) = NULL;
 // Defined controller slots
 struct Controller *gPlayer1Controller = &gControllers[0];
 struct Controller *gPlayer2Controller = &gControllers[1];
-struct Controller *gPlayer3Controller = &gControllers[2]; // Probably debug only, see note below
+struct Controller *gPlayer3Controller = &gControllers[2];
+struct Controller *gPlayer4Controller = &gControllers[3];
 
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
@@ -611,7 +610,7 @@ void read_controller_inputs(s32 threadID) {
     run_demo_inputs();
 #endif
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 4; i++) {
         struct Controller *controller = &gControllers[i];
 
         // if we're receiving inputs, update the controller struct with the new button info.
@@ -634,18 +633,6 @@ void read_controller_inputs(s32 threadID) {
             controller->stickMag = 0;
         }
     }
-
-    // For some reason, player 1's inputs are copied to player 3's port.
-    // This potentially may have been a way the developers "recorded"
-    // the inputs for demos, despite record_demo existing.
-    gPlayer3Controller->rawStickX = gPlayer1Controller->rawStickX;
-    gPlayer3Controller->rawStickY = gPlayer1Controller->rawStickY;
-    gPlayer3Controller->stickX = gPlayer1Controller->stickX;
-    gPlayer3Controller->stickY = gPlayer1Controller->stickY;
-    gPlayer3Controller->stickMag = gPlayer1Controller->stickMag;
-    gPlayer3Controller->buttonPressed = gPlayer1Controller->buttonPressed;
-    gPlayer3Controller->buttonReleased = gPlayer1Controller->buttonReleased;
-    gPlayer3Controller->buttonDown = gPlayer1Controller->buttonDown;
 }
 
 /**
@@ -671,12 +658,8 @@ void init_controllers(void) {
     gSramProbe = nuPiInitSram();
 #endif
 
-    // Loop over the 4 ports and link the controller structs to the appropriate
-    // status and pad. Interestingly, although there are pointers to 3 controllers,
-    // only 2 are connected here. The third seems to have been reserved for debug
-    // purposes and was never connected in the retail ROM, thus gPlayer3Controller
-    // cannot be used, despite being referenced in various code.
-    for (cont = 0, port = 0; port < 4 && cont < 2; port++) {
+    // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
+    for (cont = 0, port = 0; port < 4 && cont < 4; port++) {
         // Is controller plugged in?
         if (gControllerBits & (1 << port)) {
             // The game allows you to have just 1 controller plugged

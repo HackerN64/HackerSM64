@@ -1166,16 +1166,16 @@ void handle_cursor_button_input(void) {
     if (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_A || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B
         || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C
         || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_D) {
-        if (gPlayer3Controller->buttonPressed & (B_BUTTON | START_BUTTON | Z_TRIG)) {
+        if (gPlayer1Controller->buttonPressed & (B_BUTTON | START_BUTTON | Z_TRIG)) {
             sClickPos[0] = sCursorPos[0];
             sClickPos[1] = sCursorPos[1];
             sCursorClickingTimer = 1;
-        } else if (gPlayer3Controller->buttonPressed & A_BUTTON) {
+        } else if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             sScoreFileCoinScoreMode = 1 - sScoreFileCoinScoreMode;
             play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
         }
     } else { // If cursor is clicked
-        if (gPlayer3Controller->buttonPressed
+        if (gPlayer1Controller->buttonPressed
             & (A_BUTTON | B_BUTTON | START_BUTTON)) {
             sClickPos[0] = sCursorPos[0];
             sClickPos[1] = sCursorPos[1];
@@ -1188,8 +1188,8 @@ void handle_cursor_button_input(void) {
  * Cursor function that handles analog stick input and button presses with a function near the end.
  */
 void handle_controller_cursor_input(void) {
-    s16 rawStickX = gPlayer3Controller->rawStickX;
-    s16 rawStickY = gPlayer3Controller->rawStickY;
+    s16 rawStickX = gPlayer1Controller->rawStickX;
+    s16 rawStickY = gPlayer1Controller->rawStickY;
 
     // Handle deadzone
     if (rawStickY > -2 && rawStickY < 2) {

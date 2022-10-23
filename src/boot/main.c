@@ -82,8 +82,8 @@ UNUSED static u16 sDebugTextKeySequence[] = {
 };
 static s16 sDebugTextKey = 0;
 UNUSED void handle_debug_key_sequences(void) {
-    if (gPlayer3Controller->buttonPressed != 0) {
-        if (sDebugTextKeySequence[sDebugTextKey++] == gPlayer3Controller->buttonPressed) {
+    if (gPlayer1Controller->buttonPressed != 0) {
+        if (sDebugTextKeySequence[sDebugTextKey++] == gPlayer1Controller->buttonPressed) {
             if (sDebugTextKey == ARRAY_COUNT(sDebugTextKeySequence)) {
                 sDebugTextKey = 0;
                 gShowDebugText ^= 1;
