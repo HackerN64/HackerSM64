@@ -403,8 +403,10 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall,
     if (ledgeFloor == NULL
         || (*ledgeFloor) == NULL
         || ledgePos[1] < nextPos[1] + 100.0f
+#ifdef DONT_LEDGE_GRAB_STEEP_SLOPES
         || (*ledgeFloor)->normal.y < COS25 // H64 TODO: check if floor is actually slippery
-        || SURFACE_IS_UNSAFE((*ledgeFloor)->type)) {
+#endif
+    ) {
         return NULL;
     }
 
