@@ -124,6 +124,11 @@
 // #define LEDGE_GRABS_CHECK_SLOPE_ANGLE
 
 /**
+ * Prevents ledge grabbing lava, quicksand, death planes, and warps. See SURFACE_IS_UNSAFE.
+ */
+// #define LEDGE_GRABS_CHECK_UNSAFE_FLOORS
+
+/**
  * Disables BLJs and crushes SimpleFlips's dreams.
  */
 // #define DISABLE_BLJ
