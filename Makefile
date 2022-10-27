@@ -870,8 +870,16 @@ $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(Y
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 
 # Build ROM
+ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
+# run with -n / --dry-run
+$(ROM):
+	@$(PRINT) "$(BLUE)DRY RUNS ARE DISABLED$(NO_COL)\n"
+else
+# not running with -n / --dry-run
 $(ROM): $(ELF)
 	$(call print,Building ROM:,$<,$@)
+endif
+
 ifeq      ($(CONSOLE),n64)
 	$(V)$(OBJCOPY) --pad-to=0x101000 --gap-fill=0xFF $< $@ -O binary
 else ifeq ($(CONSOLE),bb)
