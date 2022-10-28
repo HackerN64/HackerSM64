@@ -1529,13 +1529,13 @@ void render_pause_my_score_coins(void) {
         }
 
         print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_ACT_Y,    actName);
-        print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_COURSE_Y, &courseName[COURSE_NAME_STR_OFFSET]);
+        print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_COURSE_Y, courseName);
 
         if (save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
             print_generic_string_aligned(PAUSE_MENU_LEFT_X + 3, PAUSE_MENU_MY_SCORE_Y, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
         }
     } else {
-        print_generic_string_aligned(SCREEN_CENTER_X, PAUSE_MENU_COURSE_Y, &courseName[COURSE_NAME_STR_OFFSET], TEXT_ALIGN_CENTER);
+        print_generic_string_aligned(SCREEN_CENTER_X, PAUSE_MENU_COURSE_Y, courseName, TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -1724,7 +1724,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     void *courseName;
 
-    char strVal[8];
+    char str[8];
     s16 prevCourseIndex = gDialogLineNum;
 
 
@@ -1762,18 +1762,24 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
-        render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
-        sprintf(strVal, "✪× %d", save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
-        print_generic_string(x + 43, y, strVal);
+        print_generic_string(x - 50, y + 35, courseName);
+
+        render_pause_castle_course_stars(x - 65, y, gCurrSaveFileNum - 1, gDialogLineNum);
+
+        sprintf(str, "✪× %d", save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
+        print_generic_string(x - 22, y, str);
+
+        sprintf(str, "%d", gDialogLineNum + 1);
+        print_generic_string_aligned(x - 55, y + 35, str, TEXT_ALIGN_RIGHT);
     } else { // Castle secret stars
         courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
-        sprintf(strVal, "★× %d", save_file_get_total_star_count(gCurrSaveFileNum - 1,
+        print_generic_string_aligned(x, y + 35, courseName, TEXT_ALIGN_CENTER);
+
+        sprintf(str, "★× %d", save_file_get_total_star_count(gCurrSaveFileNum - 1,
                                                              COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                              COURSE_NUM_TO_INDEX(COURSE_MAX)));
-        print_generic_string(x + 49, y + 18, strVal);
+        print_generic_string_aligned(x, y + 18, str, TEXT_ALIGN_CENTER);
     }
-
-    print_generic_string(x, y + 35, courseName);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
@@ -1842,7 +1848,7 @@ s32 render_pause_courses_and_castle(void) {
             shade_screen();
             print_hud_pause_colorful_str();
             render_pause_castle_menu_box(160, 143);
-            render_pause_castle_main_strings(95, 55);
+            render_pause_castle_main_strings(SCREEN_CENTER_X, 55);
 
             if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON | Z_TRIG)) {
                 level_set_transition(0, NULL);

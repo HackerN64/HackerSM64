@@ -276,7 +276,7 @@ void print_act_selector_strings(void) {
         print_generic_string_aligned(145, 118, LANGUAGE_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);
     }
 
-    print_generic_string_aligned(SCREEN_CENTER_X, 33, currLevelName + COURSE_NAME_STR_OFFSET, TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X, 33, currLevelName, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 

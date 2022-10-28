@@ -2015,13 +2015,16 @@ void print_save_file_scores(s8 fileIndex) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
     for ((i = 0); (i < COURSE_STAGES_MAX); (i++)) {
-        print_menu_generic_string((23 + ((i < 9) * 3)), (23 + (12 * (i + 1))), segmented_to_virtual(levelNameTable[i]));
-        print_score_file_star_score(       fileIndex, i, 171, (23 + (12 * (i + 1))));
-        print_score_file_course_coin_score(fileIndex, i, 213, (23 + (12 * (i + 1))));
+        s32 lineY = 35 + (12 * i);
+        sprintf(str, "%d", i + 1);
+        print_menu_generic_string(41, lineY, segmented_to_virtual(levelNameTable[i]));
+        print_menu_generic_string_aligned(37, lineY, str, TEXT_ALIGN_RIGHT);
+        print_score_file_star_score(       fileIndex, i, 171, lineY);
+        print_score_file_course_coin_score(fileIndex, i, 213, lineY);
     }
 
     // Print castle secret stars text
-    print_menu_generic_string(29, 215, segmented_to_virtual(levelNameTable[25]));
+    print_menu_generic_string(41, 215, segmented_to_virtual(levelNameTable[25]));
     // Print castle secret stars score
     print_score_file_castle_secret_stars(fileIndex, 171, 215);
 

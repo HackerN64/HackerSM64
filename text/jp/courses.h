@@ -1,75 +1,75 @@
-COURSE_ACTS(COURSE_BOB, "　１ ボムへいの せんじょう",
+COURSE_ACTS(COURSE_BOB, "ボムへいの せんじょう",
        "やまのうえの ボムキング"    , "はくねつ ノコノコレース"    , "そらのしままで ぶっとべ",
        "８まいの あかコイン"        , "そらにはばたけ はねマリオ"  , "ワンワンの いぬごやで")
 
-COURSE_ACTS(COURSE_WF, "　２ バッタンキングの とりで",
+COURSE_ACTS(COURSE_WF, "バッタンキングの とりで",
        "いかりのバッタン キング"    , "とりでの てっぺんへ"        , "たいほうで ひとっとび",
        "うきしまの ８まいコイン"    , "とりかごへ ストーン"        , "たいほうで ぶっこわせ！")
 
-COURSE_ACTS(COURSE_JRB, "　３ かいぞくの いりえ",
+COURSE_ACTS(COURSE_JRB, "かいぞくの いりえ",
        "ちんぼつせんの おたから"    , "でてこい きょだいウツボ"    , "かいていどうくつの おたから",
        "うかんだフネの あかコイン"  , "いわのはしらへ ひとっとび"  , "ふきだす みずを くぐれ")
 
-COURSE_ACTS(COURSE_CCM, "　４ さむいさむい マウンテン",
+COURSE_ACTS(COURSE_CCM, "さむいさむい マウンテン",
        "スーパースノースライダー"    , "まいごの こペンギン"        , "ペンギン チャンピオンレース",
        "すべって ８まいあかコイン"  , "ゴロゴロ ゆきダルマ"        , "かくれ スーパー カベキック")
 
-COURSE_ACTS(COURSE_BBH, "　５ テレサの ホラーハウス",
+COURSE_ACTS(COURSE_BBH, "テレサの ホラーハウス",
        "おやかたテレサを さがせ"    , "テレサの メリーゴーランド"  , "ほんだなオバケの ナゾ",
        "８まいコインは どこだ"      , "バルコニーの ボステレサ"    , "かくしべやの おおめだま")
 
-COURSE_ACTS(COURSE_HMC, "　６ やみにとける どうくつ",
+COURSE_ACTS(COURSE_HMC, "やみにとける どうくつ",
        "ドッシーのいる ちていこ"    , "そうさリフトの あかコイン"  , "メタルで ダッシュ",
        "ケムリめいろを ぬけて"      , "ケムリめいろの ひじょうぐち", "ゴロゴロいわの ひみつ")
 
-COURSE_ACTS(COURSE_LLL, "　７ ファイアバブル ランド",
+COURSE_ACTS(COURSE_LLL, "ファイアバブル ランド",
        "おとせ ボスどんけつ"        , "たたかえ！どんけつたい"      , "１５パズルの ８まいコイン",
        "コロコロ まるたわたり"      , "かざんの パワースター"      , "かざんの リフトツアー")
 
-COURSE_ACTS(COURSE_SSL, "　８ あっちっち さばく",
+COURSE_ACTS(COURSE_SSL, "あっちっち さばく",
        "いたずらハゲたか ジャンゴ"  , "ピラミッドの てっぺんで"    , "きょだいピラミッドの ないぶ",
        "４つのはしらに たつものへ"  , "とびまわれ ８まいコイン"    , "きょだいピラミッドのナゾ")
 
-COURSE_ACTS(COURSE_DDD, "　９ ウォーター ランド",
+COURSE_ACTS(COURSE_DDD, "ウォーター ランド",
        "クッパの せんすいかん"      , "うずしおの たからばこ"      , "にげたクッパの あかコイン",
        "ふきだす みずを くぐれ"    , "マンタの おくりもの"        , "ボウシが そろったら")
 
-COURSE_ACTS(COURSE_SL, "１０ スノーマンズ ランド",
+COURSE_ACTS(COURSE_SL, "スノーマンズ ランド",
        "おおゆきダルマの おでこ"    , "こおりのくにの どんけつ"    , "こおりの オブジェ",
        "つめたい いけを こえて"    , "コウラにのって あかコイン"  , "フワフワさんの おうち")
 
-COURSE_ACTS(COURSE_WDW, "１１ みずびたシティー",
+COURSE_ACTS(COURSE_WDW, "みずびたシティー",
        "ビリビリの まめリフト"      , "トップオブ ザ シティー"    , "あさせと そらのシークレット",
        "いそげ！かなあみエレベーター", "ダウンタウンの あかコイン"  , "ダウンタウンを かけろ")
 
-COURSE_ACTS(COURSE_TTM, "１２ たかいたかいマウンテン",
+COURSE_ACTS(COURSE_TTM, "たかいたかいマウンテン",
        "たかいたかい やまのうえ"    , "いたずらザル ウッキィのオリ", "おばけキノコの あかコイン",
        "マウンテン スライダー"      , "はしのうえから みわたせば"  , "ぶっとべ はなれキノコへ")
 
-COURSE_ACTS(COURSE_THI, "１３ ちびでか アイランド",
+COURSE_ACTS(COURSE_THI, "ちびでか アイランド",
        "きょだいパックンフラワー"    , "デカじまの てっぺんで"      , "ノコノコ リターンマッチ",
        "チビじまの ５シークレット"  , "ハナチャンの あかコイン"    , "イカリの ハナチャン")
 
-COURSE_ACTS(COURSE_TTC, "１４ チックタックロック",
+COURSE_ACTS(COURSE_TTC, "チックタックロック",
        "グルグル かごのなかへ"      , "ふりこの へや"              , "チックタックはりの うえ",
        "えっへん てっぺん ドッスン", "つきだしを のりこえて"      , "００ふんの あかコイン")
 
-COURSE_ACTS(COURSE_RR, "１５ レインボー クルーズ",
+COURSE_ACTS(COURSE_RR, "レインボー クルーズ",
        "にじを わたる ふね"        , "てんくうの おやしき"        , "タテめいろの あかコイン",
        "カゼきる きょだいブランコ"  , "おおぞら アスレチック"      , "にじの かなたの しま")
 
-SECRET_STAR(COURSE_BITDW,    "　　 やみの せかいの クッパ")
-SECRET_STAR(COURSE_BITFS,    "　　 ほのおの うみの クッパ")
-SECRET_STAR(COURSE_BITS,     "　　 てんくうの たたかい！")
-SECRET_STAR(COURSE_PSS,      "　　 ピーチのかくれスライダー")
-SECRET_STAR(COURSE_COTMC,    "　　 メタルスイッチの たき")
-SECRET_STAR(COURSE_TOTWC,    "　　 はばたけ！はねスイッチへ")
-SECRET_STAR(COURSE_VCUTM,    "　　 おほりのとうめいスイッチ")
-SECRET_STAR(COURSE_WMOTR,    "　　 にじ かける はねマリオ")
-SECRET_STAR(COURSE_SA,       "　　 おさかなと いっしょ")
-SECRET_STAR(COURSE_CAKE_END, "　　 おいしいケーキ")
+SECRET_STAR(COURSE_BITDW,    "やみの せかいの クッパ")
+SECRET_STAR(COURSE_BITFS,    "ほのおの うみの クッパ")
+SECRET_STAR(COURSE_BITS,     "てんくうの たたかい！")
+SECRET_STAR(COURSE_PSS,      "ピーチのかくれスライダー")
+SECRET_STAR(COURSE_COTMC,    "メタルスイッチの たき")
+SECRET_STAR(COURSE_TOTWC,    "はばたけ！はねスイッチへ")
+SECRET_STAR(COURSE_VCUTM,    "おほりのとうめいスイッチ")
+SECRET_STAR(COURSE_WMOTR,    "にじ かける はねマリオ")
+SECRET_STAR(COURSE_SA,       "おさかなと いっしょ")
+SECRET_STAR(COURSE_CAKE_END, "おいしいケーキ")
 
-CASTLE_SECRET_STARS("　　 おしろのかくれスター")
+CASTLE_SECRET_STARS("おしろのかくれスター")
 
 EXTRA_TEXT(0, "おしろのかくれスター")
 EXTRA_TEXT(1, "１００まいコインの スター")
