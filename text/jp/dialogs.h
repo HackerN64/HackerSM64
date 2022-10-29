@@ -283,14 +283,14 @@ DEFINE_DIALOG(DIALOG_025, SOUND_OBJ_BOWSER_INTRO_LAUGH, 3, 95, 200, "\
 このドアを　ひらくには\n\
 スター３まいの　パワーが\n\
 ひつようです。\n\
-あと[%]まいの　スターが\n\
+あと%dまいの　スターが\n\
 ひつようです。")
 
 DEFINE_DIALOG(DIALOG_026, SOUND_OBJ_BOWSER_INTRO_LAUGH, 3, 95, 200, "\
 このドアを　ひらくには\n\
 スター８まいの　パワーが\n\
 ひつようです。\n\
-あと[%]まいの　スターが\n\
+あと%dまいの　スターが\n\
 ひつようです。")
 
 DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 3, 95, 200, "\
@@ -298,13 +298,13 @@ DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 3, 95, 200, "\
 スター３０まいのパワーが\n\
 ひつようです。\n\
 スターがあと\n\
-[%]まいひつようです。")
+%dまいひつようです。")
 
 DEFINE_DIALOG(DIALOG_028, SOUND_OBJ_BOWSER_INTRO_LAUGH, 3, 95, 200, "\
 このドアを　ひらくには\n\
 スター５０まいのパワーが\n\
 ひつようです。\n\
-あと[%]まいの　スターが\n\
+あと%dまいの　スターが\n\
 ひつようです。")
 
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
@@ -312,7 +312,7 @@ DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 ドアを　ひらくには\n\
 スター７０まいのパワーが\n\
 ひつようです・・・・・\n\
-あと[%]まいの　スターが\n\
+あと%dまいの　スターが\n\
 たりません・・・\n\
 ガハハッ！")
 

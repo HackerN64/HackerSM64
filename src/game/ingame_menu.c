@@ -70,12 +70,6 @@ enum DialogBoxState {
     DIALOG_STATE_CLOSING
 };
 
-enum DialogBoxPageState {
-    DIALOG_PAGE_STATE_NONE,
-    DIALOG_PAGE_STATE_SCROLL,
-    DIALOG_PAGE_STATE_END
-};
-
 enum DialogBoxType {
     DIALOG_TYPE_ROTATE, // used in NPCs and level messages
     DIALOG_TYPE_ZOOM    // used in signposts and wall signs and etc
@@ -83,12 +77,6 @@ enum DialogBoxType {
 
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
-
-#ifdef MULTILANG
-#define DIALOG_LINE_HEIGHT ((gInGameLanguage == LANGUAGE_JAPANESE) ? 20 : 16)
-#else
-#define DIALOG_LINE_HEIGHT 16
-#endif
 
 s8 gDialogBoxState = DIALOG_STATE_OPENING;
 f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
@@ -338,19 +326,43 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
     return utf8Entry->kerning;  
 }
 
+// Constants that control how the dialog box renders, the box is taller in Japanese.
+#define DIALOG_LINE_HEIGHT_EN 16
+#define DIALOG_LINE_HEIGHT_JP 20
+#define BOX_TRANS_X_EN -7.f
+#define BOX_TRANS_X_JP -5.f
+#define BOX_TRANS_Y_EN  5.f
+#define BOX_TRANS_Y_JP  2.f
+#define BOX_SCALE_EN    5.f
+#define BOX_SCALE_JP    4.f
+
+#ifdef MULTILANG
+#define DIALOG_LINE_HEIGHT ((gInGameLanguage == LANGUAGE_JAPANESE) ? DIALOG_LINE_HEIGHT_JP : DIALOG_LINE_HEIGHT_EN)
+#define BOX_TRANS_X ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_X_JP : BOX_TRANS_X_EN)
+#define BOX_TRANS_Y ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_Y_JP : BOX_TRANS_Y_EN)
+#define BOX_SCALE   ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_SCALE_JP   : BOX_SCALE_EN)
+#else
+#define DIALOG_LINE_HEIGHT DIALOG_LINE_HEIGHT_EN
+#define BOX_TRANS_X BOX_TRANS_X_EN
+#define BOX_TRANS_Y BOX_TRANS_Y_EN
+#define BOX_SCALE   BOX_SCALE_EN
+#endif
+
 /**
- * Prints a generic white string.
- * In JP/EU a IA1 texture is used but in US a IA4 texture is used.
+ * Prints a generic white string. Used for both dialog entries and regular prints.
+ * Only prints a total of maxLines lines of text. If maxLines is -1, it will print
+ * until the end of the string.
  */
-void print_generic_string(s16 x, s16 y, char *str) {
+static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     s32 strPos = 0;
     u8 lineNum = 1;
 
-    s16 colorLoop;
-    ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
-    u8 customColor = 0;
-    u8 diffTmp     = 0;
-    u8 kerning     = 0;
+    //s16 colorLoop;
+    //ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
+    //u8 customColor = 0;
+    //u8 diffTmp     = 0;
+    u8 kerning = 0;
+    u8 xMatrix = 0;
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
@@ -396,16 +408,26 @@ void print_generic_string(s16 x, s16 y, char *str) {
                 break;**/
             case '\n':
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+                if (lineNum == maxLines) {
+                    return strPos + 1;
+                }
                 create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * DIALOG_LINE_HEIGHT), 0.0f);
                 lineNum++;
+                xMatrix = 0;
                 break;
             case '/':
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, SPACE_KERNING(segmented_to_virtual(main_font_lut)) * 2, 0.0f, 0.0f);
+                xMatrix += 2;
                 break;
             case ' ':
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
+                xMatrix += 1;
                 break;
+            // case '%':
+            // Todo: Reimplement star door amount stuff
             default:
+                if (xMatrix != 0) {
+                    create_dl_translation_matrix(MENU_MTX_NOPUSH, xMatrix * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
+                    xMatrix = 0;
+                }
                 if (!(str[strPos] & 0x80)) {
                     kerning = render_generic_ascii_char(str[strPos]);
                 } else {
@@ -419,6 +441,15 @@ void print_generic_string(s16 x, s16 y, char *str) {
     }
 
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    gLastDialogLineNum = lineNum; // Used for rendering the choice triangle during dialog boxes
+    return -1;
+}
+
+/**
+ * Prints a generic white string.
+ */
+void print_generic_string(s16 x, s16 y, char *str) {
+    render_main_font_text(x, y, str, -1);
 }
 
 /**
@@ -726,24 +757,6 @@ void reset_dialog_render_state(void) {
     gDialogResponse = DIALOG_RESPONSE_NONE;
 }
 
-// Constants that control how the dialog box renders, the box is taller in Japanese.
-#define BOX_TRANS_X_EN -7.f
-#define BOX_TRANS_X_JP -5.f
-#define BOX_TRANS_Y_EN  5.f
-#define BOX_TRANS_Y_JP  2.f
-#define BOX_SCALE_EN    5.f
-#define BOX_SCALE_JP    4.f
-
-#ifdef MULTILANG
-#define BOX_TRANS_X ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_X_JP : BOX_TRANS_X_EN)
-#define BOX_TRANS_Y ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_Y_JP : BOX_TRANS_Y_EN)
-#define BOX_SCALE   ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_SCALE_JP   : BOX_SCALE_EN)
-#else
-#define BOX_TRANS_X BOX_TRANS_X_EN
-#define BOX_TRANS_Y BOX_TRANS_Y_EN
-#define BOX_SCALE   BOX_SCALE_EN
-#endif
-
 void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
     create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog->leftOffset, dialog->width, 0);
 
@@ -771,48 +784,6 @@ void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
 
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-}
-
-void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *customColor) {
-    u8 colorFade;
-
-    if (colorMode == 1) {
-        if (lineNum == 1) {
-            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-        } else {
-            if (lineNum == gDialogLineNum) {
-                colorFade = (gSineTable[gDialogColorFadeTimer >> 4] * 50.0f) + 200.0f;
-                gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
-            } else {
-                gDPSetEnvColor(gDisplayListHead++, 200, 200, 200, 255);
-            }
-        }
-    } else {
-        switch (gDialogBoxType) {
-            case DIALOG_TYPE_ROTATE:
-                if (*customColor == 2) {
-                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-                    *customColor = 0;
-                }
-                break;
-            case DIALOG_TYPE_ZOOM:
-                gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
-                break;
-        }
-    }
-}
-
-void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s8 *xMatrix, s16 *linePos) {
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-
-    if (lineNum == totalLines) {
-        *pageState = DIALOG_PAGE_STATE_SCROLL;
-        return;
-    }
-    create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - (lineNum * DIALOG_LINE_HEIGHT), 0);
-
-    *linePos = 0;
-    *xMatrix = 1;
 }
 
 void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
@@ -845,128 +816,43 @@ u32 ensure_nonnegative(s16 value) {
     return ((value < 0) ? 0 : value);
 }
 
-void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 lowerBound) {
-    u8 strChar;
-    s16 colorLoop;
-    ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
-    u8 customColor = 0;
-    u8 diffTmp = 0;
+static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
     char *str = segmented_to_virtual(dialog->str);
-    s8 lineNum = 1;
     s8 totalLines;
-    s8 pageState = DIALOG_PAGE_STATE_NONE;
-    s8 xMatrix = 1;
-    s8 linesPerBox = dialog->linesPerBox;
-    s32 strIdx;
-    s16 linePos = 0;
-    u8 kerning;
+    s32 printResult;
+    s16 yPos = 2 - DIALOG_LINE_HEIGHT;
 
     if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
         // If scrolling, consider the number of lines for both
         // the current page and the page being scrolled to.
-        totalLines = linesPerBox * 2 + 1;
+        totalLines = dialog->linesPerBox * 2;
+        yPos += gDialogScrollOffsetY;
     } else {
-        totalLines = linesPerBox + 1;
+        totalLines = dialog->linesPerBox;
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    strIdx = gDialogTextPos;
 
-    if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, (f32) gDialogScrollOffsetY, 0);
+    switch (gDialogBoxType) {
+        case DIALOG_TYPE_ROTATE:
+            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+            break;
+        case DIALOG_TYPE_ZOOM:
+            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+            break;
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, 0.f, 2 - lineNum * DIALOG_LINE_HEIGHT, 0);
-
-    while (pageState == DIALOG_PAGE_STATE_NONE) {
-        if (customColor == 1) {
-            gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
-        } else {
-            change_and_flash_dialog_text_color_lines(colorMode, lineNum, &customColor);
-        }
-        strChar = str[strIdx];
-
-        switch (strChar) {
-            case '\0':
-                pageState = DIALOG_PAGE_STATE_END;
-                gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-                break;
-            /**case DIALOG_CHAR_COLOR:
-                customColor = 1;
-                strIdx++;
-                for (colorLoop = (strIdx + 8); strIdx < colorLoop; ++strIdx) {
-                    diffTmp = 0;
-                    if ((str[strIdx] >= 0x24) && (str[strIdx] <= 0x29)) {
-                        diffTmp = 0x1A;
-                    } else if (str[strIdx] >= 0x10) {
-                        customColor = 2;
-                        strIdx = (colorLoop - 8);
-                        for (diffTmp = 0; diffTmp < 8; ++diffTmp) {
-                            if (str[strIdx + diffTmp] != 0x9F) {
-                                break;
-                            }
-                        }
-                        if (diffTmp == 8) {
-                            strIdx += diffTmp;
-                        }
-                        break;
-                    }
-                    if (((8 - (colorLoop - strIdx)) % 2) == 0) {
-                        rgbaColors[(8 - (colorLoop - strIdx)) / 2] = (((str[strIdx] - diffTmp) & 0x0F) << 4);
-                    } else {
-                        rgbaColors[(8 - (colorLoop - strIdx)) / 2] += ((str[strIdx] - diffTmp) & 0x0F);
-                    }
-                }
-                strIdx--;
-                break;**/
-            case '\n':
-                lineNum++;
-                handle_dialog_scroll_page_state(lineNum, totalLines, &pageState, &xMatrix, &linePos);
-                break;
-            case ' ':
-                xMatrix++;
-                linePos++;
-                break;
-            case '/':
-                xMatrix += 2;
-                linePos += 2;
-                break;
-            case 0x100: // come back to this
-                render_star_count_dialog_text(&xMatrix, &linePos);
-                break;
-            default: // any other character
-                if ((lineNum >= lowerBound) && (lineNum <= (lowerBound + linesPerBox))) {
-                    if (linePos || xMatrix != 1) {
-                        create_dl_translation_matrix(
-                            MENU_MTX_NOPUSH, (f32)(SPACE_KERNING(segmented_to_virtual(main_font_lut)) * (xMatrix - 1)), 0, 0);
-                    }
-
-                    if (!(strChar & 0x80)) {
-                        kerning = render_generic_ascii_char(strChar);
-                    } else {
-                        kerning = render_generic_unicode_char(str, &strIdx);
-                    }
-                    create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
-                    xMatrix = 1;
-                    linePos++;
-                }
-        }
-
-
-        strIdx++;
-    }
+    printResult = render_main_font_text(0, yPos, str + gDialogTextPos, totalLines);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     if (gDialogBoxState == DIALOG_STATE_VERTICAL) {
-        if (pageState == DIALOG_PAGE_STATE_END) {
+        if (printResult == -1) { // Reached end of dialog box
             gLastDialogPageStrPos = -1;
         } else {
-            gLastDialogPageStrPos = strIdx;
+            gLastDialogPageStrPos = gDialogTextPos + printResult;
         }
     }
-
-    gLastDialogLineNum = lineNum;
 }
 
 void render_dialog_triangle_choice(void) {
@@ -1123,7 +1009,6 @@ s8  gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8  gDialogCourseActNum     =  1;
 
 void render_dialog_entries(void) {
-    s8 lowerBound = 0;
     void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
     struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
 
@@ -1152,7 +1037,6 @@ void render_dialog_entries(void) {
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 gDialogLineNum = 1;
             }
-            lowerBound = 1;
             break;
 
         case DIALOG_STATE_VERTICAL:
@@ -1167,7 +1051,6 @@ void render_dialog_entries(void) {
                     play_sound(SOUND_MENU_MESSAGE_NEXT_PAGE, gGlobalSoundSource);
                 }
             }
-            lowerBound = 1;
             break;
         case DIALOG_STATE_HORIZONTAL: // scrolling
             gDialogScrollOffsetY += (dialog->linesPerBox * 2);
@@ -1177,7 +1060,6 @@ void render_dialog_entries(void) {
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 gDialogScrollOffsetY = 0;
             }
-            lowerBound = (gDialogScrollOffsetY / DIALOG_LINE_HEIGHT) + 1;
             break;
 
         case DIALOG_STATE_CLOSING:
@@ -1199,7 +1081,6 @@ void render_dialog_entries(void) {
                 gLastDialogPageStrPos = 0;
                 gDialogResponse = DIALOG_RESPONSE_NONE;
             }
-            lowerBound = 1;
             break;
     }
 
@@ -1211,7 +1092,7 @@ void render_dialog_entries(void) {
                   ensure_nonnegative(SCREEN_HEIGHT - dialog->width - 3),
                   SCREEN_WIDTH,
                   ensure_nonnegative(SCREEN_HEIGHT + (dialog->linesPerBox * DIALOG_LINE_HEIGHT) - dialog->width));
-    handle_dialog_text_and_pages(0, dialog, lowerBound);
+    handle_dialog_text_and_pages(dialog);
 
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
         render_dialog_triangle_choice();

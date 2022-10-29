@@ -340,32 +340,32 @@ DEFINE_DIALOG(DIALOG_025, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 3\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s).")
+encore %d étoile(s).")
 
 DEFINE_DIALOG(DIALOG_026, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 8\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s).")
+encore %d étoile(s).")
 
 DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 30\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s).")
+encore %d étoile(s).")
 
 DEFINE_DIALOG(DIALOG_028, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 50\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s).")
+encore %d étoile(s).")
 
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 6, 95, 200, "\
 Vous avez besoin de 70\n\
 étoiles pour arriver en\n\
 haut de “l'escalier sans\n\
 fin”... Il vous manque\n\
-encore [%] étoile(s).\n\
+encore %d étoile(s).\n\
 GWA HA HA HA HA HA!!!")
 
 DEFINE_DIALOG(DIALOG_030, NO_SOUND, 4, 30, 200, "\

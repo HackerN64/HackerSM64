@@ -297,25 +297,25 @@ paintings.")
 DEFINE_DIALOG(DIALOG_025, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 It takes the power of\n\
 3 Stars to open this\n\
-door. You need [%] more\n\
+door. You need %d more\n\
 Stars.")
 
 DEFINE_DIALOG(DIALOG_026, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 It takes the power of\n\
 8 Stars to open this\n\
-door. You need [%] more\n\
+door. You need %d more\n\
 Stars.")
 
 DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 It takes the power of\n\
 30 Stars to open this\n\
-door. You need [%] more\n\
+door. You need %d more\n\
 Stars.")
 
 DEFINE_DIALOG(DIALOG_028, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 It takes the power of\n\
 50 Stars to open this\n\
-door. You need [%] more\n\
+door. You need %d more\n\
 Stars.")
 
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 5, 95, 200, "\

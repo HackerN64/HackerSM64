@@ -298,25 +298,25 @@ einmal die Wandgemälde!")
 DEFINE_DIALOG(DIALOG_025, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Zum Öffnen dieser Tür\n\
 benötigst Du drei Sterne.\n\
-Du mußt also noch [%]\n\
+Du mußt also noch %d\n\
 von ihnen finden!")
 
 DEFINE_DIALOG(DIALOG_026, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Zum Öffnen dieser Tür\n\
 benötigst Du acht Sterne.\n\
-Du mußt also noch [%]\n\
+Du mußt also noch %d\n\
 von ihnen finden!")
 
 DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Zum Öffnen dieser Tür\n\
 benötigst Du 30 Sterne.\n\
-Du mußt also noch [%]\n\
+Du mußt also noch %d\n\
 von ihnen finden.")
 
 DEFINE_DIALOG(DIALOG_028, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Zum Öffnen dieser Tür\n\
 benötigst Du 50 Sterne.\n\
-Du mußt also noch [%]\n\
+Du mußt also noch %d\n\
 von ihnen finden.")
 
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
