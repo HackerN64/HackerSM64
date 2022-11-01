@@ -1,5 +1,5 @@
 #include "seq_macros.inc"
-#include "config.h"
+#include "config_audio.h"
 
 .section .rodata
 .align 0
