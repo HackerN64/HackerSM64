@@ -1,4 +1,5 @@
 // boulder.inc.c
+#include "config.h"
 
 void bhv_big_boulder_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
@@ -52,11 +53,16 @@ void bhv_big_boulder_generator_loop(void) {
     if (o->oTimer >= 256) {
         o->oTimer = 0;
     }
-
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (!current_mario_room_check(4)
         || is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 1500)) {
         return;
     }
+#else 
+    if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 1500)) {
+        return;
+    }
+#endif
 
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 6000)) {
         if (!(o->oTimer & 0x3F)) {
