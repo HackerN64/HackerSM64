@@ -34,3 +34,9 @@
  * Reverb parameters can be configured in audio/synthesis.c to meet desired aesthetic/performance needs. Currently US/JP only. Hurts emulator and console performance.
  */
 // #define BETTER_REVERB
+
+/** 
+ * In vanilla, Mario's sounds are pitch shifted in real time in order to have more variety. This can be annoying when replacing Mario's sounds.
+ * This define will disable this behavior, making sound replacements easier. Don't use unless you're actually replacing Mario's sounds.
+ */
+// #define DISABLE_MARIO_PITCH_SHIFTING

@@ -1,4 +1,5 @@
 #include "seq_macros.inc"
+#include "config.h"
 
 .section .rodata
 .align 0
@@ -2047,11 +2048,15 @@ chan_setlayer 0, .layer_C3C
 chan_end
 
 .layer_C3C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 #if defined(VERSION_EU) || defined(VERSION_SH)
   layer_transpose 2
 #endif
 layer_portamento 0x82, 41, 127
 layer_note1 37, 0x14, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_jump_wah:
@@ -2061,9 +2066,18 @@ chan_setlayer 0, .layer_C4C
 chan_end
 
 .layer_C4C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
+#else
+layer_note1 39, 0x37, 95
+layer_end
+#endif
 .layer_C4E:
+#ifdef DISABLE_MARIO_PITCH_SHIFTING
+layer_note1 39, 0x37, 95
+#else
 layer_note1 38, 0x18, 127
+#endif
 layer_end
 
 .sound_mario_jump_yah:
@@ -2073,10 +2087,19 @@ chan_setlayer 0, .layer_C5A
 chan_end
 
 .layer_C5A:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
+#else
+layer_note1 39, 0x37, 95
+layer_end
+#endif
 .layer_C5C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_portamento 0x82, 39, 200
 layer_note1 38, 0x24, 120
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_hoohoo:
@@ -2086,8 +2109,12 @@ chan_setlayer 0, .layer_C6C
 chan_end
 
 .layer_C6C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_portamento 0x82, 44, 200
 layer_note1 39, 0x30, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_yahoo:
@@ -2097,11 +2124,15 @@ chan_setlayer 0, .layer_C7C
 chan_end
 
 .layer_C7C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_somethingon
 layer_portamento 0x85, 39, 255
 layer_note1 42, 0x1e, 110
 layer_note1 39, 0x41, 110
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_uh:
@@ -2111,9 +2142,13 @@ chan_setlayer 0, .layer_C92
 chan_end
 
 .layer_C92:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_portamento 0x81, 41, 255
 layer_note1 38, 0x2b, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_hrmm:
@@ -2123,8 +2158,12 @@ chan_setlayer 0, .layer_CA4
 chan_end
 
 .layer_CA4:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 44, 0x1e, 110
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_wah2:
@@ -2134,8 +2173,12 @@ chan_setlayer 0, .layer_CB2
 chan_end
 
 .layer_CB2:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -3
 layer_note1 39, 0x1c, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_whoa:
@@ -2145,8 +2188,12 @@ chan_setlayer 0, .layer_CC0
 chan_end
 
 .layer_CC0:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 40, 0x30, 110
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_eeuh:
@@ -2156,8 +2203,12 @@ chan_setlayer 0, .layer_CCE
 chan_end
 
 .layer_CCE:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 40, 0x44, 105
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_attacked:
@@ -2167,8 +2218,12 @@ chan_setlayer 0, .layer_CDC
 chan_end
 
 .layer_CDC:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 41, 0x30, 120
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_ooof:
@@ -2178,8 +2233,12 @@ chan_setlayer 0, .layer_CEA
 chan_end
 
 .layer_CEA:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 38, 0x30, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_here_we_go:
@@ -2189,8 +2248,12 @@ chan_setlayer 0, .layer_CF8
 chan_end
 
 .layer_CF8:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_portamento 0x81, 38, 200
 layer_note1 41, 0x85, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_yawning:
@@ -2200,8 +2263,12 @@ chan_setlayer 0, .layer_D09
 chan_end
 
 .layer_D09:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0x7f, 105
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_snoring1:
@@ -2211,8 +2278,12 @@ chan_setlayer 0, .layer_D17
 chan_end
 
 .layer_D17:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0x60, 64
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_snoring2:
@@ -2222,8 +2293,12 @@ chan_setlayer 0, .layer_D25
 chan_end
 
 .layer_D25:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0x5c, 52
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_waaaooow:
@@ -2233,8 +2308,12 @@ chan_setlayer 0, .layer_D33
 chan_end
 
 .layer_D33:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0xaa, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_haha:
@@ -2244,8 +2323,12 @@ chan_setlayer 0, .layer_D42
 chan_end
 
 .layer_D42:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -1
 layer_note1 39, 0x4d, 120
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_uh2:
@@ -2255,8 +2338,12 @@ chan_setlayer 0, .layer_D50
 chan_end
 
 .layer_D50:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 43, 0x1e, 105
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_on_fire:
@@ -2266,8 +2353,12 @@ chan_setlayer 0, .layer_D5E
 chan_end
 
 .layer_D5E:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0xc8, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_dying:
@@ -2277,8 +2368,12 @@ chan_setlayer 0, .layer_D6D
 chan_end
 
 .layer_D6D:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0x8c, 110
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_panting_cold:
@@ -2288,9 +2383,13 @@ chan_setlayer 0, .layer_D7C
 chan_end
 
 .layer_D7C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_portamento 0x82, 35, 255
 layer_note1 38, 0x30, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_panting1:
@@ -2300,8 +2399,12 @@ chan_setlayer 0, .layer_D8E
 chan_end
 
 .layer_D8E:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0x3c, 100
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_panting2:
@@ -2311,9 +2414,13 @@ chan_setlayer 0, .layer_D9C
 chan_end
 
 .layer_D9C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_delay 0x4
 layer_note1 38, 0x3c, 100
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_panting3:
@@ -2323,9 +2430,13 @@ chan_setlayer 0, .layer_DAC
 chan_end
 
 .layer_DAC:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_delay 0x8
 layer_note1 40, 0x3c, 100
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_coughing1:
@@ -2335,8 +2446,12 @@ chan_setlayer 0, .layer_DBC
 chan_end
 
 .layer_DBC:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_note1 39, 0x10, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_coughing2:
@@ -2346,9 +2461,13 @@ chan_setlayer 0, .layer_DCA
 chan_end
 
 .layer_DCA:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_portamento 0x81, 38, 255
 layer_note1 41, 0x18, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_coughing3:
@@ -2358,11 +2477,15 @@ chan_setlayer 0, .layer_DDC
 chan_end
 
 .layer_DDC:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_somethingon
 layer_portamento 0x85, 38, 255
 layer_note1 41, 0xc, 115
 layer_note1 35, 0x12, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_punch_yah:
@@ -2377,7 +2500,12 @@ chan_setlayer 1, .layer_538
 chan_end
 
 .layer_DFE:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
+#else
+layer_note1 39, 0x37, 95
+layer_end
+#endif
 layer_jump .layer_C5C
 
 .sound_mario_punch_hoo:
@@ -2392,9 +2520,13 @@ chan_setlayer 1, .layer_548
 chan_end
 
 .layer_E17:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_transpose -2
 layer_portamento 0x81, 42, 255
 layer_note1 38, 0x30, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_mama_mia:
@@ -2404,8 +2536,12 @@ chan_setlayer 0, .layer_E29
 chan_end
 
 .layer_E29:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_portamento 0x81, 38, 255
 layer_note1 36, 0x8c, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_okey_dokey:
@@ -2415,7 +2551,11 @@ chan_setlayer 0, .layer_E3A
 chan_end
 
 .layer_E3A:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x60, 115
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_ground_pound_wah:
@@ -2428,7 +2568,11 @@ chan_setlayer 0, .layer_E49
 chan_end
 
 .layer_E49:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 38, 0x91, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_punch_wah:
@@ -2463,7 +2607,11 @@ chan_setlayer 0, .layer_E7C
 chan_end
 
 .layer_E7C:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x5a, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_yippee:
@@ -2473,7 +2621,11 @@ chan_setlayer 0, .layer_E88
 chan_end
 
 .layer_E88:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x5a, 97
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_doh:
@@ -2483,7 +2635,11 @@ chan_setlayer 0, .layer_E94
 chan_end
 
 .layer_E94:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 41, 0x46, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_game_over:
@@ -2493,7 +2649,11 @@ chan_setlayer 0, .layer_EA0
 chan_end
 
 .layer_EA0:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x55, 110
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_hello:
@@ -2503,7 +2663,11 @@ chan_setlayer 0, .layer_EAC
 chan_end
 
 .layer_EAC:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x46, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_press_start_to_play:
@@ -2513,7 +2677,11 @@ chan_setlayer 0, .layer_EB8
 chan_end
 
 .layer_EB8:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x12c, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_twirl_bounce:
@@ -2523,7 +2691,11 @@ chan_setlayer 0, .layer_EC5
 chan_end
 
 .layer_EC5:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_note1 39, 0x30, 127
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_snoring3:
@@ -2543,10 +2715,14 @@ layer_jump .layer_ED1
 layer_end
 
 .layer_fn_EE1:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_setinstr 21
 layer_note1 37, 0x53, 127
 layer_setinstr 15
 layer_note1 37, 0x4e, 64
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_so_longa_bowser:
@@ -2557,8 +2733,12 @@ chan_setlayer 1, .layer_EF7
 chan_end
 
 .layer_EF7:
+#ifndef DISABLE_MARIO_PITCH_SHIFTING
 layer_portamento 0x82, 42, 200
 layer_note1 39, 0xc8, 110
+#else
+layer_note1 39, 0x37, 95
+#endif
 layer_end
 
 .sound_mario_ima_tired:
