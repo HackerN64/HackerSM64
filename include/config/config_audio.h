@@ -38,5 +38,6 @@
 /** 
  * In vanilla, Mario's sounds are pitch shifted in real time in order to have more variety. This can be annoying when replacing Mario's sounds.
  * This define will disable this behavior, making sound replacements easier. Don't use unless you're actually replacing Mario's sounds.
+ * When changing this define, you will need to run `make clean` for it to apply.
  */
 // #define DISABLE_MARIO_PITCH_SHIFTING
