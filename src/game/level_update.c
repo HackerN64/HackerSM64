@@ -743,7 +743,7 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_WARP_FLOOR:
-                if (m->floor->type == SURFACE_WARP && (m->floor->force != NULL) && (m->floor->force != 0x00)) {
+                if (m->floor->type == SURFACE_WARP && (m->floor->force != 0x00)) {
                     sSourceWarpNodeId = m->floor->force;
                 } else {
                 sSourceWarpNodeId = WARP_NODE_WARP_FLOOR;
@@ -759,7 +759,6 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 #endif
                     }                    
                 }
-
 
                 sDelayedWarpTimer = 20;
                 play_transition(WARP_TRANSITION_FADE_INTO_CIRCLE, sDelayedWarpTimer, 0x00, 0x00, 0x00);
