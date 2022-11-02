@@ -743,7 +743,7 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_WARP_FLOOR:
-                if (m->floor->type == SURFACE_WARP && (m->floor->force != 0x00)) {
+                if (m->floor->force != 0x00) {
                     sSourceWarpNodeId = m->floor->force & 0xFF;
                 } else {
                     sSourceWarpNodeId = WARP_NODE_WARP_FLOOR;
@@ -1310,6 +1310,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     sWarpCheckpointActive = FALSE;
     gCurrLevelNum = levelNum;
     gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1];
+	if (gCurrLevelNum == LEVEL_BOB) return 0;
 
     if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
         return FALSE;
