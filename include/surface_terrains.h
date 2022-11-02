@@ -16,7 +16,7 @@ enum SurfaceTypes {
     SURFACE_0007,                       // 0x0007 // Unused
     SURFACE_0008,                       // 0x0008 // Unused
     SURFACE_SLOW,                       // 0x0009 // Slow down Mario, unused
-    SURFACE_DEATH_PLANE,                // 0x000A // Death floor. Warps to the force parameter's second byte if set, otherwise warps to 0xF1.
+    SURFACE_DEATH_PLANE,                // 0x000A // Death floor. Warps to ID of force parameter's second byte if set, otherwise warps to 0xF3 if it exists, otherwise defaults to ID 0xF1.
     SURFACE_CLOSE_CAMERA,               // 0x000B // Close camera
     SURFACE_000C,                       // 0x000C // unused
     SURFACE_WATER,                      // 0x000D // Water, has no action, used on some waterboxes below
