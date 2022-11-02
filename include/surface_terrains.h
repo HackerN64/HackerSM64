@@ -62,7 +62,7 @@ enum SurfaceTypes {
     SURFACE_HARD_SLIPPERY,              // 0x0035 // Hard and slippery (Always has fall damage)
     SURFACE_HARD_VERY_SLIPPERY,         // 0x0036 // Hard and very slippery (Always has fall damage)
     SURFACE_HARD_NOT_SLIPPERY,          // 0x0037 // Hard and Non-slippery (Always has fall damage)
-    SURFACE_VERTICAL_WIND,              // 0x0038 // Death at bottom with vertical wind
+    SURFACE_VERTICAL_WIND,              // 0x0038 // Death at bottom with vertical wind. Warps to ID of force parameter's second byte if set, otherwise warps to 0xF3 if it exists, otherwise defaults to ID 0xF1.
     SURFACE_0039,                       // 0x0039 // Unused
     SURFACE_003A,                       // 0x003A // Unused
     SURFACE_003B,                       // 0x003B // Unused
