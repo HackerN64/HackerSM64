@@ -56,13 +56,11 @@ void bhv_big_boulder_generator_loop(void) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (!current_mario_room_check(4)
         || is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 1500)) {
-        return;
-    }
 #else 
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 1500)) {
+#endif
         return;
     }
-#endif
 
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 6000)) {
         if (!(o->oTimer & 0x3F)) {
