@@ -557,7 +557,7 @@
     .byte \c
 .endm
 
-.macro layer_note1_voice a, b, c
+.macro layer_note1_mario a, b, c
 #ifndef DISABLE_MARIO_PITCH_SHIFTING
     layer_note1 \a, \b, \c
 #else
@@ -586,7 +586,7 @@
     .byte \a
 .endm
 
-.macro layer_transpose_voice a
+.macro layer_transpose_mario a
 #ifndef DISABLE_MARIO_PITCH_SHIFTING
     layer_transpose \a
 #endif
@@ -619,7 +619,7 @@
     .endif
 .endm
 
-.macro layer_portamento_voice a, b, c
+.macro layer_portamento_mario a, b, c
 #ifndef DISABLE_MARIO_PITCH_SHIFTING
     layer_portamento \a, \b, \c
 #endif
