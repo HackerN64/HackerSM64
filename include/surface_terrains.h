@@ -56,7 +56,7 @@ enum SurfaceTypes {
     SURFACE_LOOK_UP_WARP,               // 0x002F // Look up and warp (Wing cap entrance)
     SURFACE_HARD,                       // 0x0030 // Hard floor (Always has fall damage)
     SURFACE_0031,                       // 0x0031 // Unused
-    SURFACE_WARP,                       // 0x0032 // Surface warp
+    SURFACE_WARP,                       // 0x0032 // Surface warp. HackerSM64: It will warp to the 0xF3 node by default, but if the force parameter is set, it will take the warp node from the force's second byte instead.
     SURFACE_TIMER_START,                // 0x0033 // Timer start (Peach's secret slide)
     SURFACE_TIMER_END,                  // 0x0034 // Timer stop (Peach's secret slide)
     SURFACE_HARD_SLIPPERY,              // 0x0035 // Hard and slippery (Always has fall damage)
