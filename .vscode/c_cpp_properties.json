@@ -33,7 +33,7 @@
             "compilerPath": "/usr/bin/mips-linux-gnu-gcc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++14",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x86"
         }
     ],
     "version": 4
