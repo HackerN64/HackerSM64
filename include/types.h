@@ -98,12 +98,6 @@ typedef s8  ObjAction8;
 typedef s32 ObjAction32;
 typedef s16 ColFlags;
 
-// -- Angle --
-typedef s16 Angle;
-typedef u16 UAngle;
-typedef s32 Angle32;
-typedef Angle Vec3a[3];
-
 // -- Collision --
 typedef ROOM_DATA_TYPE RoomData;
 typedef COLLISION_DATA_TYPE Collision; // Collision is by default an s16, but it's best to have it match the type of COLLISION_DATA_TYPE
@@ -489,10 +483,10 @@ struct MarioState {
            Vec3f prevPos;
              f32 lateralSpeed;
              f32 moveSpeed;
-           Angle movePitch;
-           Angle moveYaw;
-           Angle ceilYaw;
-           Angle wallYaw;
+             s16 movePitch;
+             s16 moveYaw;
+             s16 ceilYaw;
+             s16 wallYaw;
     // -- HackerSM64 MarioState fields end --
 };
 
