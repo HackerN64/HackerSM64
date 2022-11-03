@@ -54,12 +54,12 @@ extern f32 gSineTable[];
 #define RAD_PER_DEG (M_PI / 180.0f)
 #define DEG_PER_RAD (180.0f / M_PI)
 
-#define angle_to_degrees(  x) (f32)(((Angle)(x) / 65536.0f) * 360.0f)
-#define degrees_to_angle(  x) (Angle)(((f32)(x) * 0x10000 ) / 360   )
-#define angle_to_radians(  x) (f32)(((Angle)(x) * M_PI    ) / 0x8000)
-#define radians_to_angle(  x) (Angle)(((f32)(x) / M_PI    ) * 0x8000)
-#define degrees_to_radians(x) (f32)(   (f32)(x) * RAD_PER_DEG       )
-#define radians_to_degrees(x) (f32)(   (f32)(x) * DEG_PER_RAD       )
+#define angle_to_degrees(  x) (f32)(((s16)(x) / 65536.0f) * 360.0f)
+#define degrees_to_angle(  x) (s16)(((f32)(x) * 0x10000 ) / 360   )
+#define angle_to_radians(  x) (f32)(((s16)(x) * M_PI    ) / 0x8000)
+#define radians_to_angle(  x) (s16)(((f32)(x) / M_PI    ) * 0x8000)
+#define degrees_to_radians(x) (f32)( (f32)(x) * RAD_PER_DEG       )
+#define radians_to_degrees(x) (f32)( (f32)(x) * DEG_PER_RAD       )
 
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
@@ -562,24 +562,24 @@ void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v);
 void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 
-void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                          );
-void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                          );
-void vec3f_get_lateral_dist_squared(           Vec3f from, Vec3f to,            f32 *lateralDist                          );
-void vec3f_get_dist(                           Vec3f from, Vec3f to, f32 *dist                                            );
-void vec3f_get_dist_squared(                   Vec3f from, Vec3f to, f32 *dist                                            );
-void vec3f_get_dist_and_yaw(                   Vec3f from, Vec3f to, f32 *dist,                                 Angle *yaw);
-void vec3f_get_pitch(                          Vec3f from, Vec3f to,                              Angle *pitch            );
-void vec3f_get_yaw(                            Vec3f from, Vec3f to,                                            Angle *yaw);
-void vec3f_get_angle(                          Vec3f from, Vec3f to,                              Angle *pitch, Angle *yaw);
-void vec3f_get_lateral_dist_and_pitch(         Vec3f from, Vec3f to,            f32 *lateralDist, Angle *pitch            );
-void vec3f_get_lateral_dist_and_yaw(           Vec3f from, Vec3f to,            f32 *lateralDist,               Angle *yaw);
-void vec3f_get_lateral_dist_and_angle(         Vec3f from, Vec3f to,            f32 *lateralDist, Angle *pitch, Angle *yaw);
-void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, Angle *pitch, Angle *yaw);
-void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist,                   Angle *pitch, Angle *yaw);
-void vec3s_get_dist_and_angle(                 Vec3s from, Vec3s to, s16 *dist,                   Angle *pitch, Angle *yaw);
-void vec3f_to_vec3s_get_dist_and_angle(        Vec3f from, Vec3s to, f32 *dist,                   Angle *pitch, Angle *yaw);
-void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   Angle  pitch, Angle  yaw);
-void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   Angle  pitch, Angle  yaw);
+void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                      );
+void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                      );
+void vec3f_get_lateral_dist_squared(           Vec3f from, Vec3f to,            f32 *lateralDist                      );
+void vec3f_get_dist(                           Vec3f from, Vec3f to, f32 *dist                                        );
+void vec3f_get_dist_squared(                   Vec3f from, Vec3f to, f32 *dist                                        );
+void vec3f_get_dist_and_yaw(                   Vec3f from, Vec3f to, f32 *dist,                               s16 *yaw);
+void vec3f_get_pitch(                          Vec3f from, Vec3f to,                              s16 *pitch          );
+void vec3f_get_yaw(                            Vec3f from, Vec3f to,                                          s16 *yaw);
+void vec3f_get_angle(                          Vec3f from, Vec3f to,                              s16 *pitch, s16 *yaw);
+void vec3f_get_lateral_dist_and_pitch(         Vec3f from, Vec3f to,            f32 *lateralDist, s16 *pitch          );
+void vec3f_get_lateral_dist_and_yaw(           Vec3f from, Vec3f to,            f32 *lateralDist,             s16 *yaw);
+void vec3f_get_lateral_dist_and_angle(         Vec3f from, Vec3f to,            f32 *lateralDist, s16 *pitch, s16 *yaw);
+void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, s16 *pitch, s16 *yaw);
+void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist,                   s16 *pitch, s16 *yaw);
+void vec3s_get_dist_and_angle(                 Vec3s from, Vec3s to, s16 *dist,                   s16 *pitch, s16 *yaw);
+void vec3f_to_vec3s_get_dist_and_angle(        Vec3f from, Vec3s to, f32 *dist,                   s16 *pitch, s16 *yaw);
+void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   s16  pitch, s16  yaw);
+void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   s16  pitch, s16  yaw);
 
 s16 approach_angle(s16 current, s16 target, s16 inc);
 s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec);
