@@ -880,7 +880,7 @@ void vec3f_get_angle(Vec3f from, Vec3f to, s16 *pitch, s16 *yaw) {
 }
 
 /// Finds the horizontal distance and pitch between two vectors.
-void vec3f_get_lateral_dist_and_pitch(Vec3f from, Vec3f to, f32 *lateralDist, Angle *pitch) {
+void vec3f_get_lateral_dist_and_pitch(Vec3f from, Vec3f to, f32 *lateralDist, s16 *pitch) {
     Vec3f d;
     vec3_diff(d, to, from);
     *lateralDist = sqrtf(sqr(d[0]) + sqr(d[2]));
@@ -888,7 +888,7 @@ void vec3f_get_lateral_dist_and_pitch(Vec3f from, Vec3f to, f32 *lateralDist, An
 }
 
 /// Finds the horizontal distance and yaw between two vectors.
-void vec3f_get_lateral_dist_and_yaw(Vec3f from, Vec3f to, f32 *lateralDist, Angle *yaw) {
+void vec3f_get_lateral_dist_and_yaw(Vec3f from, Vec3f to, f32 *lateralDist, s16 *yaw) {
     register f32 dx = (to[0] - from[0]);
     register f32 dz = (to[2] - from[2]);
     *lateralDist = sqrtf(sqr(dx) + sqr(dz));
@@ -896,7 +896,7 @@ void vec3f_get_lateral_dist_and_yaw(Vec3f from, Vec3f to, f32 *lateralDist, Angl
 }
 
 /// Finds the horizontal distance and angles between two vectors.
-void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, Angle *pitch, Angle *yaw) {
+void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, s16 *pitch, s16 *yaw) {
     Vec3f d;
     vec3_diff(d, to, from);
     *lateralDist = sqrtf(sqr(d[0]) + sqr(d[2]));
@@ -905,7 +905,7 @@ void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, An
 }
 
 /// Finds the distance and angles between two vectors.
-void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, Angle *pitch, Angle *yaw) {
+void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *yaw) {
     Vec3f d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
@@ -913,7 +913,7 @@ void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, Angle *pitch, Ang
     *pitch          = atan2s(sqrtf(xz), d[1]);
     *yaw            = atan2s(d[2], d[0]);
 }
-void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, Angle *pitch, Angle *yaw) {
+void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, s16 *pitch, s16 *yaw) {
     Vec3s d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
@@ -921,7 +921,7 @@ void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, Angle *pitch, Ang
     *pitch          = atan2s(sqrtf(xz), d[1]);
     *yaw            = atan2s(d[2], d[0]);
 }
-void vec3f_to_vec3s_get_dist_and_angle(Vec3f from, Vec3s to, f32 *dist, Angle *pitch, Angle *yaw) {
+void vec3f_to_vec3s_get_dist_and_angle(Vec3f from, Vec3s to, f32 *dist, s16 *pitch, s16 *yaw) {
     Vec3f d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
@@ -931,7 +931,7 @@ void vec3f_to_vec3s_get_dist_and_angle(Vec3f from, Vec3s to, f32 *dist, Angle *p
 }
 
 /// Finds the distance, horizontal distance, and angles between two vectors.
-void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, Angle *pitch, Angle *yaw) {
+void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, s16 *pitch, s16 *yaw) {
     Vec3f d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
@@ -951,10 +951,10 @@ void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, 
     to[1] = (from[1] + (dist * sins(pitch))); \
     to[2] = (from[2] + (dcos * coss(yaw  ))); \
 }
-void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, Angle pitch, Angle yaw) {
+void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s16 pitch, s16 yaw) {
     vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
 }
-void vec3s_set_dist_and_angle(Vec3s from, Vec3s to, s16 dist, Angle pitch, Angle yaw) {
+void vec3s_set_dist_and_angle(Vec3s from, Vec3s to, s16 dist, s16 pitch, s16 yaw) {
     vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
 }
 

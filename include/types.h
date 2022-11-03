@@ -101,7 +101,6 @@ typedef s16 ColFlags;
 // -- Angle --
 typedef s16 Angle;
 typedef u16 UAngle;
-typedef s32 Angle32;
 typedef Angle Vec3a[3];
 
 // -- Collision --
@@ -489,10 +488,10 @@ struct MarioState {
            Vec3f prevPos;
              f32 lateralSpeed;
              f32 moveSpeed;
-           Angle movePitch;
-           Angle moveYaw;
-           Angle ceilYaw;
-           Angle wallYaw;
+             s16 movePitch;
+             s16 moveYaw;
+             s16 ceilYaw;
+             s16 wallYaw;
     // -- HackerSM64 MarioState fields end --
 };
 
