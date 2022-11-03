@@ -109,6 +109,8 @@ static const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_LIGHT_BLUE,
 };
 
+uintptr_t gCrashAddress = 0x0;
+
 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static u32 sNumBranchArrows = 0;
 
@@ -253,7 +255,7 @@ void draw_crash_context(OSThread *thread) {
     if (fname == NULL) {
         crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
-        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, 34, fname);
+        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, (CRASH_SCREEN_NUM_CHARS_X - 10), fname);
     }
 #endif
 
@@ -334,7 +336,12 @@ void draw_stack_trace(OSThread *thread) {
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
     uintptr_t pc = tc->pc;
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, 35, parse_map(&pc));
+    char *fname = parse_map(&pc);
+    if (fname == NULL) {
+        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+    } else {
+        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, (CRASH_SCREEN_NUM_CHARS_X - 9), fname);
+    }
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
@@ -367,7 +374,7 @@ void draw_stack_trace(OSThread *thread) {
             } else {
                 // Print known function
                 if (sShowFunctionNames) {
-                    crash_screen_print(TEXT_X(9), y, "@%08x^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, 35, fname);
+                    crash_screen_print(TEXT_X(9), y, "@%08x^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, (CRASH_SCREEN_NUM_CHARS_X - 9), fname);
                 } else {
                     crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
                 }
@@ -403,13 +410,13 @@ void draw_address_select(void) {
     crash_screen_draw_vertical_triangle((SCREEN_CENTER_X - TEXT_WIDTH(4) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y1 + TEXT_HEIGHT(3) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
                                         TEXT_WIDTH(1), TEXT_WIDTH(1),
                                         COLOR_RGBA32_CRASH_SELECT_ARROWS, TRUE);
-    crash_screen_print(SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2), JUMP_MENU_Y1 + TEXT_HEIGHT(2), "0x%08X", sAddressSelectTarget);
+    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)), "0x%08X", sAddressSelectTarget);
 
     char *fname = NULL;
     uintptr_t checkAddr = sAddressSelectTarget;
     fname = parse_map(&checkAddr);
     if (fname != NULL) {
-        crash_screen_print(JUMP_MENU_X1, JUMP_MENU_Y1 + TEXT_HEIGHT(4), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, JUMP_MENU_CHARS_X, fname);
+        crash_screen_print(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, JUMP_MENU_CHARS_X, fname);
     }
 
     osWritebackDCacheAll();
@@ -633,7 +640,7 @@ void draw_disasm(OSThread *thread) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-        line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, 41, fname);
+        line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, (CRASH_SCREEN_NUM_CHARS_X - 3), fname);
     }
 
     osWritebackDCacheAll();
@@ -1236,11 +1243,17 @@ void thread2_crash_screen(UNUSED void *arg) {
 #ifdef FUNNY_CRASH_SOUND
                 play_crash_sound(&gCrashScreen, SOUND_MARIO_WAAAOOOW);
 #endif
+                __OSThreadContext *tc = &thread->context;
                 // Default to the assert page if the crash was caused by an assert.
-                if (thread->context.cause == EXC_SYSCALL) {
+                if (tc->cause == EXC_SYSCALL) {
                     sCrashPage = PAGE_ASSERTS;
                 }
-                sSelectedAddress = thread->context.pc;
+                // If a position was specified, use that.
+                if (gCrashAddress != 0x0) {
+                    sCrashPage = PAGE_RAM_VIEWER;
+                    tc->pc = gCrashAddress;
+                }
+                sSelectedAddress = tc->pc;
 #ifdef INCLUDE_DEBUG_MAP
                 map_data_init();
                 fill_function_stack_trace(thread);

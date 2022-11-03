@@ -151,6 +151,7 @@ extern struct CrashScreen gCrashScreen;
 extern struct CrashScreen gCrashScreen2;
 #endif
 
+extern uintptr_t gCrashAddress;
 extern s8 gCrashScreenQueueFramebufferUpdate;
 
 

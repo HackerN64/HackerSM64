@@ -100,4 +100,16 @@
 
 #define FORCE_CRASH do { *(vs8*)0 = 0; } while (0)
 
+#define SET_CRASH_ADDR(ptr) \
+do { \
+    extern uintptr_t gCrashAddress; \
+    gCrashAddress = (uintptr_t)&(ptr); \
+} while (0)
+
+#define FORCE_CRASH_AT_ADDR(ptr) \
+do { \
+    SET_CRASH_ADDR(ptr); \
+    FORCE_CRASH; \
+} while (0)
+
 #endif // MACROS_H
