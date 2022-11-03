@@ -98,11 +98,6 @@ typedef s8  ObjAction8;
 typedef s32 ObjAction32;
 typedef s16 ColFlags;
 
-// -- Angle --
-typedef s16 Angle;
-typedef u16 UAngle;
-typedef Angle Vec3a[3];
-
 // -- Collision --
 typedef ROOM_DATA_TYPE RoomData;
 typedef COLLISION_DATA_TYPE Collision; // Collision is by default an s16, but it's best to have it match the type of COLLISION_DATA_TYPE
