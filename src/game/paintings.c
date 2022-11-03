@@ -286,7 +286,7 @@ void painting_update_ripple_state(const struct Painting *painting) {
     struct Object *obj = gCurGraphNodeObjectNode;
     const struct RippleAnimationInfo *anim = get_ripple_animation(painting);
 
-    if (obj->oPaintingUpdateCounter != obj->oLastPaintingUpdateCounter) {
+    if (obj->oPaintingUpdateCounter != obj->oPaintingLastUpdateCounter) {
         obj->oPaintingCurrRippleMag *= obj->oPaintingRippleDecay;
 
         // Reset the timer to 0 if it overflows.
@@ -1008,13 +1008,13 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
     if (callContext != GEO_CONTEXT_RENDER) {
         // Reset the update counter.
-        obj->oLastPaintingUpdateCounter = (gAreaUpdateCounter - 1);
+        obj->oPaintingLastUpdateCounter = (gAreaUpdateCounter - 1);
         obj->oPaintingUpdateCounter = gAreaUpdateCounter;
 
         reset_painting(obj);
     } else if (callContext == GEO_CONTEXT_RENDER) {
         // Reset the update counter.
-        obj->oLastPaintingUpdateCounter = obj->oPaintingUpdateCounter;
+        obj->oPaintingLastUpdateCounter = obj->oPaintingUpdateCounter;
         obj->oPaintingUpdateCounter = gAreaUpdateCounter;
 
 #if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
