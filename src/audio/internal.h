@@ -27,6 +27,8 @@
 #endif
 #endif // EXPAND_AUDIO_HEAP
 
+#define VIBRATO_DISABLED_VALUE (0xFF * 8)
+
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
 
 enum MuteBehaviors {
@@ -139,7 +141,7 @@ struct VibratoState {
     /*    , 0x14*/ u8 active;
 #else
     /*0x08,     */ s8 *curve;
-    /*0x0C,     */ u8 active;
+    /*0x0C,     */ u8 activeFlags;
     /*0x0E,     */ u16 rate;
     /*0x10,     */ u16 extent;
 #endif
