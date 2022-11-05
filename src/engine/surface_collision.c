@@ -429,7 +429,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         height = get_surface_height_at_location(x, z, surf);
 
         // Exclude floors lower than the previous highest floor.
-        if (height < *pheight) continue;
+        if (height <= *pheight) continue;
 
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
         if (bufferY < height) continue;
