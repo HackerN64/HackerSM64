@@ -176,9 +176,9 @@ const struct RippleAnimationInfo *get_ripple_animation(const struct Painting *pa
  * @param state The state to enter
  * @param painting,paintingGroup identifies the painting that is changing state
  * @param xSource,ySource what to use for the x and y origin of the ripple
- * @param resetTimer if TRUE, set the timer to 0
+ * @param doResetTimer if TRUE, set the timer to 0
  */
-void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 resetTimer) {
+void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTimer) {
     const struct Painting *painting = obj->oPaintingData;
     const struct RippleAnimationInfo *anim = get_ripple_animation(painting);
 
@@ -213,7 +213,7 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 resetTime
     // Set Mario's Y position for the WDW water level.
     gPaintingMarioYEntry = gMarioObject->oPosY;
 
-    if (resetTimer) {
+    if (doResetTimer) {
         obj->oPaintingRippleTimer = 0;
     }
 
