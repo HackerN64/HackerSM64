@@ -14,6 +14,13 @@
  */
 // #define JP_RED_COIN_SOUND
 
+/** 
+ * In vanilla, Mario's sounds are pitch shifted in real time in order to maintain a sense of consistency. This can be annoying when replacing Mario's sounds.
+ * This define will disable this behavior, making sound replacements easier to manage. Use of this is not recommended unless you're actually replacing Mario's sounds.
+ * When toggling this define, you will need to run `make clean` for it to apply.
+ */
+// #define DISABLE_MARIO_PITCH_SHIFTING
+
 /**
  * Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
  * Note that this is REQUIRED in order to use the extended 0C audio bank. Do not disable this if you're planning on using it. 

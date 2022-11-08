@@ -16,7 +16,7 @@ enum SurfaceTypes {
     SURFACE_0007,                       // 0x0007 // Unused
     SURFACE_0008,                       // 0x0008 // Unused
     SURFACE_SLOW,                       // 0x0009 // Slow down Mario, unused
-    SURFACE_DEATH_PLANE,                // 0x000A // Death floor
+    SURFACE_DEATH_PLANE,                // 0x000A // Death floor. Warps to ID of force parameter's second byte if set, otherwise warps to 0xF3 if it exists, otherwise defaults to ID 0xF1.
     SURFACE_CLOSE_CAMERA,               // 0x000B // Close camera
     SURFACE_000C,                       // 0x000C // unused
     SURFACE_WATER,                      // 0x000D // Water, has no action, used on some waterboxes below
@@ -56,13 +56,13 @@ enum SurfaceTypes {
     SURFACE_LOOK_UP_WARP,               // 0x002F // Look up and warp (Wing cap entrance)
     SURFACE_HARD,                       // 0x0030 // Hard floor (Always has fall damage)
     SURFACE_0031,                       // 0x0031 // Unused
-    SURFACE_WARP,                       // 0x0032 // Surface warp
+    SURFACE_WARP,                       // 0x0032 // Surface warp. Warps to ID of force parameter's second byte if set, otherwise defaults to ID 0xF3.
     SURFACE_TIMER_START,                // 0x0033 // Timer start (Peach's secret slide)
     SURFACE_TIMER_END,                  // 0x0034 // Timer stop (Peach's secret slide)
     SURFACE_HARD_SLIPPERY,              // 0x0035 // Hard and slippery (Always has fall damage)
     SURFACE_HARD_VERY_SLIPPERY,         // 0x0036 // Hard and very slippery (Always has fall damage)
     SURFACE_HARD_NOT_SLIPPERY,          // 0x0037 // Hard and Non-slippery (Always has fall damage)
-    SURFACE_VERTICAL_WIND,              // 0x0038 // Death at bottom with vertical wind
+    SURFACE_VERTICAL_WIND,              // 0x0038 // Death at bottom with vertical wind. Warps to ID of force parameter's second byte if set, otherwise warps to 0xF3 if it exists, otherwise defaults to ID 0xF1.
     SURFACE_0039,                       // 0x0039 // Unused
     SURFACE_003A,                       // 0x003A // Unused
     SURFACE_003B,                       // 0x003B // Unused
