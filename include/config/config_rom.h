@@ -17,6 +17,11 @@
 // #define ENABLE_RUMBLE (1 || VERSION_SH)
 
 /**
+ * Informs supported emulators to default to gamecube controller inputs.
+ */
+// #define USE_GAMECUBE_CONTROLLER
+
+/**
  * Height of the black borders at the top and bottom of the screen for NTSC Versions. You can set it to different values for console and emulator.
  * There is generally no reason to have a value other than 0 for emulator. As for console, it provides a (small) performance boost.
  */
