@@ -1891,15 +1891,15 @@ void bhv_init_room(void) {
     o->oRoom = -1;
 }
 
+u32 is_room_loaded(void) {
+    return gMarioCurrentRoom == o->oRoom
+            || gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom
+            || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom;
+}
+
 void cur_obj_enable_rendering_if_mario_in_room(void) {
     if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
-        register s32 marioInRoom = (
-            gMarioCurrentRoom == o->oRoom
-            || gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom
-            || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom
-        );
-
-        if (marioInRoom) {
+        if (is_room_loaded()) {
             cur_obj_enable_rendering();
             o->activeFlags &= ~ACTIVE_FLAG_IN_DIFFERENT_ROOM;
             gNumRoomedObjectsInMarioRoom++;
