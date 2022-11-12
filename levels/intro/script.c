@@ -26,10 +26,10 @@
 #include "game/object_list_processor.h"
 
 const LevelScript level_intro_splash_screen[] = {
-    INIT_LEVEL(),
 #ifdef SKIP_TITLE_SCREEN
     EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
 #endif
+    INIT_LEVEL(),
     LOAD_GODDARD(),
     LOAD_BEHAVIOR_DATA(),
     LOAD_LEVEL_DATA(intro),
@@ -48,6 +48,7 @@ const LevelScript level_intro_splash_screen[] = {
     // Start animation
     LOAD_AREA(/*area*/ 1),
 
+    SET_MENU_MUSIC(/*seq*/ SEQ_SOUND_PLAYER),
     CALL(/*arg*/ LVL_INTRO_PLAY_ITS_A_ME_MARIO, /*func*/ lvl_intro_update),
     CALL(/*arg*/ 0, /*func*/ load_mario_area),
     
@@ -70,6 +71,7 @@ const LevelScript level_intro_splash_screen[] = {
     // Start animation
     LOAD_AREA(/*area*/ 1),
 
+    SET_MENU_MUSIC(/*seq*/ SEQ_SOUND_PLAYER),
     CALL(/*arg*/ LVL_INTRO_PLAY_ITS_A_ME_MARIO, /*func*/ lvl_intro_update),
     SLEEP(/*frames*/ 75),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0x00, 0x00, 0x00),

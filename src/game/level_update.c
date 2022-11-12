@@ -5,6 +5,7 @@
 #include "seq_ids.h"
 #include "dialog_ids.h"
 #include "audio/external.h"
+#include "audio/synthesis.h"
 #include "level_update.h"
 #include "game_init.h"
 #include "level_update.h"
@@ -394,6 +395,9 @@ void init_mario_after_warp(void) {
     }
 
     if (gCurrDemoInput == NULL) {
+#ifdef BETTER_REVERB
+        gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+#endif
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
 
         if (gMarioState->flags & MARIO_METAL_CAP) {
@@ -500,6 +504,9 @@ void warp_credits(void) {
     play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x14, 0x00, 0x00, 0x00);
 
     if (gCurrCreditsEntry == NULL || gCurrCreditsEntry == sCreditsSequence) {
+#ifdef BETTER_REVERB
+        gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+#endif
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
     }
 }
@@ -571,9 +578,14 @@ s16 music_unchanged_through_warp(s16 arg) {
 #endif
         u16 destParam1 = gAreas[destArea].musicParam;
         u16 destParam2 = gAreas[destArea].musicParam2;
-
+#ifdef BETTER_REVERB
+        u16 destParam3 = gAreas[destArea].betterReverbPreset;
+        unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
+               && destParam2 == gCurrentArea->musicParam2 && destParam3 == gCurrentArea->betterReverbPreset;
+#else
         unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
                && destParam2 == gCurrentArea->musicParam2;
+#endif
 
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
@@ -1228,6 +1240,9 @@ s32 init_level(void) {
         }
 
         if (gCurrDemoInput == NULL) {
+#ifdef BETTER_REVERB
+            gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+#endif
             set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
         }
     }

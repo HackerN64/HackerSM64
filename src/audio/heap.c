@@ -9,6 +9,7 @@
 #include "game/game_init.h"
 #include "game/puppyprint.h"
 #include "game/vc_check.h"
+#include "game/debug.h"
 #include "string.h"
 
 struct PoolSplit {
@@ -996,7 +997,7 @@ void init_reverb_eu(void) {
 
     // This is called 4 times for numReverbs to work at higher values. This does eat up some memory though.
     for (j = 0; j < 4; j++) {
-        gSynthesisReverbs[j].useReverb = 0;
+        gSynthesisReverbs[j].useReverb = FALSE;
 
         // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
         if (!sAudioIsInitialized) {
@@ -1010,7 +1011,7 @@ void init_reverb_eu(void) {
         reverb->windowSize = (reverbSettings->windowSize * 0x40);
         reverb->downsampleRate = reverbSettings->downsampleRate;
         reverb->reverbGain = reverbSettings->gain;
-        reverb->useReverb = 8;
+        reverb->useReverb = TRUE;
         if (reverb->windowSize > REVERB_WINDOW_SIZE_MAX) {
             reverb->windowSize = REVERB_WINDOW_SIZE_MAX;
         }
@@ -1056,99 +1057,99 @@ void init_reverb_eu(void) {
 void init_reverb_us(s32 presetId) {
     s16 *mem;
     s32 i;
-#ifdef BETTER_REVERB
-    s8 reverbConsole;
-#endif
 
     s32 reverbWindowSize = gReverbSettings[presetId].windowSize;
     gReverbDownsampleRate = gReverbSettings[presetId].downsampleRate;
 #ifdef BETTER_REVERB
-    if (gIsConsole) {
-        reverbConsole = betterReverbDownsampleConsole; // Console!
-    } else {
-        reverbConsole = betterReverbDownsampleEmulator; // Setting this to 1 is REALLY slow, please use sparingly!
-    }
-    if (reverbConsole <= 0) {
-        reverbConsole = 1;
+    // This will likely crash if given an invalid preset value. Adding a safety check here isn't worth the usability interference.
+    struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPreset];
+
+    betterReverbDownsampleRate = betterReverbPreset->downsampleRate;
+    monoReverb = betterReverbPreset->isMono;
+    reverbFilterCount = betterReverbPreset->filterCount;
+    betterReverbWindowsSize = betterReverbPreset->windowSize;
+    betterReverbRevIndex = betterReverbPreset->reverbIndex;
+    betterReverbGainIndex = betterReverbPreset->gainIndex;
+    gReverbMultsL = betterReverbPreset->reverbMultsL;
+    gReverbMultsR = betterReverbPreset->reverbMultsR;
+
+    if (betterReverbDownsampleRate <= 0) {
         toggleBetterReverb = FALSE;
+        if (betterReverbWindowsSize >= 0)
+            reverbWindowSize = betterReverbWindowsSize;
     } else {
         toggleBetterReverb = TRUE;
-    }
+        gReverbDownsampleRate = (1 << (betterReverbDownsampleRate - 1));
 
-    if (toggleBetterReverb && betterReverbWindowsSize >= 0) {
-        reverbWindowSize = betterReverbWindowsSize;
-    }
-    if (gReverbDownsampleRate < (1 << (reverbConsole - 1))) {
-        gReverbDownsampleRate = (1 << (reverbConsole - 1));
-    }
-    reverbWindowSize /= gReverbDownsampleRate;
-    if (reverbWindowSize < DEFAULT_LEN_2CH) { // Minimum window size to not overflow
-        reverbWindowSize = DEFAULT_LEN_2CH;
+        if (betterReverbWindowsSize >= 0) {
+            reverbWindowSize = betterReverbWindowsSize;
+            reverbWindowSize /= gReverbDownsampleRate;
+            if (reverbWindowSize < DEFAULT_LEN_2CH && betterReverbWindowsSize != 0) // Minimum window size to not overflow
+                reverbWindowSize = DEFAULT_LEN_2CH;
+        }
     }
 #endif
-    if (reverbWindowSize == 0) {
-        gSynthesisReverb.useReverb = 0;
+    if (reverbWindowSize > 0)
+        gSynthesisReverb.useReverb = TRUE;
+    else
+        gSynthesisReverb.useReverb = FALSE;
+
+    if (reverbWindowSize > REVERB_WINDOW_SIZE_MAX) {
+        reverbWindowSize = REVERB_WINDOW_SIZE_MAX;
+    }
+    // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
+    if (!sAudioIsInitialized) {
+        gSynthesisReverb.ringBuffer.left    = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16));
+
+        gSynthesisReverb.resampleStateLeft  = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
+        gSynthesisReverb.resampleStateRight = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
+        gSynthesisReverb.unk24 = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
+        gSynthesisReverb.unk28 = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
+        for (i = 0; i < gAudioUpdatesPerFrame; i++) {
+            mem = soundAlloc(&gNotesAndBuffersPool, DEFAULT_LEN_2CH);
+            gSynthesisReverb.items[0][i].toDownsampleLeft  = mem;
+            gSynthesisReverb.items[0][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
+            mem = soundAlloc(&gNotesAndBuffersPool, DEFAULT_LEN_2CH);
+            gSynthesisReverb.items[1][i].toDownsampleLeft  = mem;
+            gSynthesisReverb.items[1][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
+        }
     } else {
-        gSynthesisReverb.useReverb = 8;
-        if (reverbWindowSize > REVERB_WINDOW_SIZE_MAX) {
-            reverbWindowSize = REVERB_WINDOW_SIZE_MAX;
-        }
-        // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
-        if (!sAudioIsInitialized) {
-            gSynthesisReverb.ringBuffer.left    = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16));
-
-            gSynthesisReverb.resampleStateLeft  = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
-            gSynthesisReverb.resampleStateRight = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
-            gSynthesisReverb.unk24 = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
-            gSynthesisReverb.unk28 = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
-            for (i = 0; i < gAudioUpdatesPerFrame; i++) {
-                mem = soundAlloc(&gNotesAndBuffersPool, DEFAULT_LEN_2CH);
-                gSynthesisReverb.items[0][i].toDownsampleLeft  = mem;
-                gSynthesisReverb.items[0][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
-                mem = soundAlloc(&gNotesAndBuffersPool, DEFAULT_LEN_2CH);
-                gSynthesisReverb.items[1][i].toDownsampleLeft  = mem;
-                gSynthesisReverb.items[1][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
-            }
-#ifdef BETTER_REVERB
-            initialize_better_reverb_buffers();
-#endif
-        } else {
-            bzero(gSynthesisReverb.ringBuffer.left, (REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16)));
-        }
-
-        gSynthesisReverb.ringBuffer.right  = &gSynthesisReverb.ringBuffer.left[reverbWindowSize];
-        gSynthesisReverb.nextRingBufferPos = 0;
-        gSynthesisReverb.unkC              = 0;
-        gSynthesisReverb.curFrame          = 0;
-        gSynthesisReverb.bufSizePerChannel = reverbWindowSize;
-        gSynthesisReverb.reverbGain = gReverbSettings[presetId].gain;
-        gSynthesisReverb.framesLeftToIgnore = 2;
-        if (gReverbDownsampleRate != 1) {
-            gSynthesisReverb.resampleFlags = A_INIT;
-            gSynthesisReverb.resampleRate = (0x8000 / gReverbDownsampleRate);
-            if (sAudioIsInitialized) {
-                bzero(gSynthesisReverb.resampleStateLeft,  (16 * sizeof(s16)));
-                bzero(gSynthesisReverb.resampleStateRight, (16 * sizeof(s16)));
-                bzero(gSynthesisReverb.unk24, (16 * sizeof(s16)));
-                bzero(gSynthesisReverb.unk28, (16 * sizeof(s16)));
-
-                // All reverb downsample buffers are adjacent in memory, so clear them all in a single call
-                bzero(gSynthesisReverb.items[0][0].toDownsampleLeft, (DEFAULT_LEN_1CH * 4 * gAudioUpdatesPerFrame));
-            }
-        }
-
-        // This does not have to be reset after being initialized for the first time, which would speed up load times dramatically.
-        // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
-#ifdef BETTER_REVERB
-        if (toggleBetterReverb) {
-            if (sAudioIsInitialized) {
-                clear_better_reverb_buffers();
-            }
-
-            set_better_reverb_buffers();
-        }
-#endif
+        bzero(gSynthesisReverb.ringBuffer.left, (REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16)));
     }
+
+    gSynthesisReverb.ringBuffer.right  = &gSynthesisReverb.ringBuffer.left[reverbWindowSize];
+    gSynthesisReverb.nextRingBufferPos = 0;
+    gSynthesisReverb.unkC              = 0;
+    gSynthesisReverb.curFrame          = 0;
+    gSynthesisReverb.bufSizePerChannel = reverbWindowSize;
+    gSynthesisReverb.reverbGain = gReverbSettings[presetId].gain;
+    gSynthesisReverb.framesLeftToIgnore = 2;
+    if (gReverbDownsampleRate != 1) {
+        gSynthesisReverb.resampleFlags = A_INIT;
+        gSynthesisReverb.resampleRate = (0x8000 / gReverbDownsampleRate);
+        if (sAudioIsInitialized) {
+            bzero(gSynthesisReverb.resampleStateLeft,  (16 * sizeof(s16)));
+            bzero(gSynthesisReverb.resampleStateRight, (16 * sizeof(s16)));
+            bzero(gSynthesisReverb.unk24, (16 * sizeof(s16)));
+            bzero(gSynthesisReverb.unk28, (16 * sizeof(s16)));
+
+            // All reverb downsample buffers are adjacent in memory, so clear them all in a single call
+            bzero(gSynthesisReverb.items[0][0].toDownsampleLeft, (DEFAULT_LEN_1CH * 4 * gAudioUpdatesPerFrame));
+        }
+    }
+
+#ifdef BETTER_REVERB
+    if (betterReverbPreset->gain > 0)
+        gSynthesisReverb.reverbGain = (u16) betterReverbPreset->gain;
+
+    if (!sAudioIsInitialized)
+        initialize_better_reverb_buffers();
+
+    // This does not have to be reset after being initialized for the first time, which would help speed up load times.
+    // However, resetting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
+    if (toggleBetterReverb)
+        set_better_reverb_buffers(betterReverbPreset->delaysL, betterReverbPreset->delaysR);
+#endif
 }
 #endif
 
