@@ -64,7 +64,7 @@ void sequence_channel_init(struct SequenceChannel *seqChannel) {
 #endif
     seqChannel->vibratoRateTarget = 0x800;
     seqChannel->vibratoRateStart = 0x800;
-    seqChannel->vibratoExtentTarget = 0;
+    seqChannel->vibratoExtentTarget = VIBRATO_DISABLED_VALUE;
     seqChannel->vibratoExtentStart = 0;
     seqChannel->vibratoRateChangeDelay = 0;
     seqChannel->vibratoExtentChangeDelay = 0;
@@ -1942,7 +1942,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
                     case 0xec:
-                        seqChannel->vibratoExtentTarget = 0;
+                        seqChannel->vibratoExtentTarget = VIBRATO_DISABLED_VALUE;
                         seqChannel->vibratoExtentStart = 0;
                         seqChannel->vibratoExtentChangeDelay = 0;
                         seqChannel->vibratoRateTarget = 0;
