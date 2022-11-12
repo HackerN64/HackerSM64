@@ -39,7 +39,7 @@ void bhv_collect_star_loop(void) {
 }
 
 void bhv_star_spawn_init(void) {
-    Angle yaw;
+    s16 yaw;
     vec3f_get_lateral_dist_and_yaw(&o->oPosVec, &o->oHomeVec, &o->oStarSpawnDisFromHome, &yaw);
     o->oMoveAngleYaw = yaw;
     o->oVelY = (o->oHomeY - o->oPosY) / 30.0f;
