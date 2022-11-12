@@ -26,8 +26,6 @@
 #include "game/object_list_processor.h"
 
 const LevelScript level_intro_splash_screen[] = {
-    // Skip straight to main menu
-    JUMP(script_intro_file_select),
     INIT_LEVEL(),
 #ifdef SKIP_TITLE_SCREEN
     EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),

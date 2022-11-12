@@ -18,8 +18,24 @@ if [ -z "$QEMU_IRIX" ]; then
     exit 1
 fi
 
+# detect prefix for MIPS toolchain unless CROSS is already defined
 if [ -z "$CROSS" ]; then
+  if command -v mips64-elf-ld &> /dev/null ; then
+    CROSS=mips64-elf-
+  elif command -v mips-n64-ld &> /dev/null ; then
+    CROSS=mips-n64-
+  elif command -v mips64-ld &> /dev/null ; then
+    CROSS=mips64-
+  elif command -v mips-linux-gnu-ld &> /dev/null ; then
     CROSS=mips-linux-gnu-
+  elif command -v mips64-linux-gnu-ld &> /dev/null ; then
+    CROSS=mips64-linux-gnu-
+  elif command -v mips-ld &> /dev/null ; then
+    CROSS=mips-
+  else
+    echo "Unable to detect a suitable MIPS toolchain installed"
+    exit 1
+  fi
 fi
 
 # bss indexing starts at 3

@@ -5519,6 +5519,17 @@ Gfx mario_000_displaylist_001_mesh_mat_override_metal_0[] = {
 };
 
 
+// 0x04000000 # solid color blue - butt, left thigh, right thigh - all poly types
+
+// 0x04000018 # solid color red - left & right arm, torso (tshirt part), caps - all poly types
+
+// 0x04000030 # solid color white - metal butt & left thigh - normal left & right hand closed & open (with cap too) and all wings - all poly types
+
+// 0x04000048 # solid color brown 1 - foot - all poly types
+
+// 0x04000060 # solid color beige skin - face (cap on and off dls) - all poly types
+
+// 0x04000078  # solid color brown 2 - hair - all poly types
 
 Gfx mario_000_displaylist_002_mesh[] = {
 	gsSPDisplayList(mat_mario_wing_2),

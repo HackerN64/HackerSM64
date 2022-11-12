@@ -762,7 +762,7 @@ void geo_layout_cmd_node_culling_radius(void) {
    cmd+0x07: u8 z direction (directional light) or unused (point light)
 */
 void geo_layout_cmd_scene_light(void) {
-    struct GraphNodeSceneLight *graphNode;
+    struct GraphNodeSceneLight *graphNode = NULL;
     u8 lightType, a, b, c;
     u8 color[3];
 
@@ -785,6 +785,7 @@ void geo_layout_cmd_scene_light(void) {
         /* linear falloff */ sizeof(u8) +
         /* unused */ sizeof(u8)) << CMD_SIZE_SHIFT;
 }
+
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     // set by register_scene_graph_node when gCurGraphNodeIndex is 0
     // and gCurRootGraphNode is NULL

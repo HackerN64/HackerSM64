@@ -48,6 +48,8 @@ static const Vtx snowman_seg5_vertex_0500C488[] = {
 
 // 0x0500C4C8 - 0x0500C500
 const Gfx snowman_seg5_dl_0500C4C8[] = {
+    gsSPLightColor(LIGHT_1, 0x381e0eff),
+    gsSPLightColor(LIGHT_2, 0x1c0f07ff),
     gsSPVertex(snowman_seg5_vertex_0500C488, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP1Triangle( 0,  3,  1, 0x0),
@@ -198,6 +200,8 @@ const Gfx snowman_seg5_dl_0500C978[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snowman_seg5_texture_05008C70),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(snowman_seg5_vertex_0500C7E8, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  4, 0x0),
     gsSP2Triangles( 4,  1,  0, 0x0,  5,  4,  3, 0x0),

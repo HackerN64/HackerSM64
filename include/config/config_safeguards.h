@@ -151,10 +151,6 @@
  * config_game.h
  */
 
-#ifdef DISABLE_LIVES
-    #undef SAVE_NUM_LIVES
-#endif // DISABLE_LIVES
-
 #ifndef START_LEVEL
     #define START_LEVEL LEVEL_CASTLE_GROUNDS
 #endif // !START_LEVEL

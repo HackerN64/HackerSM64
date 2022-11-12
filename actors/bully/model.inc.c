@@ -294,6 +294,8 @@ static const Vtx bully_seg5_vertex_05003608[] = {
 
 // 0x05003708 - 0x050037A0
 const Gfx bully_seg5_dl_05003708[] = {
+    gsSPLightColor(LIGHT_1, 0xe300ff),
+    gsSPLightColor(LIGHT_2, 0x3800ff),
     gsSPVertex(bully_seg5_vertex_05002C68, 14, 0),
     gsDPPipeSync(),
     gsDPSetPrimColor(0, 0, 0, 227, 00, 255),
@@ -311,6 +313,8 @@ const Gfx bully_seg5_dl_05003708[] = {
 
 // 0x050037A0 - 0x05003838
 const Gfx bully_seg5_dl_050037A0[] = {
+    gsSPLightColor(LIGHT_1, 0xff00ff),
+    gsSPLightColor(LIGHT_2, 0x3f00ff),
     gsSPVertex(bully_seg5_vertex_05002D88, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  1, 0x0),
     gsSP2Triangles( 3,  1,  0, 0x0,  5,  6,  7, 0x0),
@@ -325,6 +329,8 @@ const Gfx bully_seg5_dl_050037A0[] = {
 
 // 0x05003878 - 0x05003C50
 const Gfx bully_seg5_dl_05003878[] = {
+    gsSPLightColor(LIGHT_1, 0xff),
+    gsSPLightColor(LIGHT_2, 0xff),
     gsSPVertex(bully_seg5_vertex_05002F08, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  0,  3, 0x0),
     gsSP2Triangles( 1,  3,  4, 0x0,  4,  3,  5, 0x0),
