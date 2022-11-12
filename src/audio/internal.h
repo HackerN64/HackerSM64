@@ -5,6 +5,16 @@
 
 #include "types.h"
 
+#ifdef EXPAND_AUDIO_HEAP // Not technically on the heap but it's memory nonetheless...
+#if defined(VERSION_EU) || defined(VERSION_SH)
+#define SEQUENCE_PLAYERS 4
+#define SEQUENCE_CHANNELS 64
+#else
+#define SEQUENCE_PLAYERS 3
+#define SEQUENCE_CHANNELS 48
+#endif
+#define SEQUENCE_LAYERS (SEQUENCE_CHANNELS * 2)
+#else // EXPAND_AUDIO_HEAP
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define SEQUENCE_PLAYERS 4
 #define SEQUENCE_CHANNELS 48
@@ -12,12 +22,9 @@
 #else
 #define SEQUENCE_PLAYERS 3
 #define SEQUENCE_CHANNELS 32
-#ifdef VERSION_JP
-#define SEQUENCE_LAYERS 48
-#else
 #define SEQUENCE_LAYERS 52
 #endif
-#endif
+#endif // EXPAND_AUDIO_HEAP
 
 #define LAYERS_MAX       4
 #define CHANNELS_MAX     16
