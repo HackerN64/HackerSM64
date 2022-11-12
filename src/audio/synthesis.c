@@ -41,7 +41,6 @@
 #define AUDIO_ALIGN(val, amnt) (((val) + (1 << amnt) - 1) & ~((1 << amnt) - 1))
 
 #ifdef BETTER_REVERB
-
 // Do not touch these values manually, unless you want potential for problems.
 u8 gBetterReverbPreset = 0;
 u8 toggleBetterReverb = FALSE;
@@ -187,7 +186,11 @@ void set_better_reverb_buffers(s32 *inputDelaysL, s32 *inputDelaysR) {
         delaysR[i] = (inputDelaysR[i] / gReverbDownsampleRate);
         delayBufsL[i] = (s32*) &delayBufsL[0][bufOffset];
         bufOffset += delaysL[i];
+<<<<<<< HEAD
         delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interweaved adjacently in memory; not a bug
+=======
+        delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interleaved adjacently in memory; not a bug
+>>>>>>> hackersm64/develop/2.1.0_RCVI-HACK
         bufOffset += delaysR[i];
     }
 
@@ -297,6 +300,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
             }
         }
 #ifdef BETTER_REVERB
+<<<<<<< HEAD
         else if (toggleBetterReverb) {
             reverbFilterCount--; // Temporarily lower filter count for optimized bulk processing
             item = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
@@ -320,6 +324,26 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                         reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
                         gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
                     }
+=======
+    else if (toggleBetterReverb) {
+        reverbFilterCount--; // Temporarily lower filter count for optimized bulk processing
+        item = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
+        if (gSoundMode == SOUND_MODE_MONO || monoReverb) {
+            if (gReverbDownsampleRate != 1) {
+                osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
+                for (srcPos = 0, dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); srcPos += gReverbDownsampleRate, dstPos++) {
+                    reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
+                    gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
+                }
+                for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++) {
+                    reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
+                    gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
+                }
+            } else {
+                for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++) {
+                    reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
+                    gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
+>>>>>>> hackersm64/develop/2.1.0_RCVI-HACK
                 }
             } else {
                 if (gReverbDownsampleRate != 1) {
@@ -335,7 +359,23 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                         reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
                 }
             }
+<<<<<<< HEAD
             reverbFilterCount++; // Reset filter count to accurate numbers
+=======
+        } else {
+            if (gReverbDownsampleRate != 1) {
+                osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
+                for (srcPos = 0, dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); srcPos += gReverbDownsampleRate, dstPos++)
+                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
+                for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++)
+                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
+            } else {
+                for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++)
+                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
+                for (dstPos = 0; dstPos < (item->lengthB / 2); dstPos++)
+                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
+            }
+>>>>>>> hackersm64/develop/2.1.0_RCVI-HACK
         }
 #endif
     }
