@@ -386,7 +386,7 @@ Gfx papyrus_align_127[] = {gsSPEndDisplayList()};
 
 uObjTxtr papyrus_tex[] = {
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_0, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -396,7 +396,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_1, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -406,7 +406,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_2, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -416,7 +416,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_3, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -426,7 +426,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_4, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -436,7 +436,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_5, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -446,7 +446,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_6, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -456,7 +456,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_7, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -466,7 +466,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_8, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -476,7 +476,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_9, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -486,7 +486,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_10, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -496,7 +496,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_11, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -506,7 +506,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_12, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -516,7 +516,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_13, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -526,7 +526,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_14, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -536,7 +536,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_15, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -546,7 +546,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_16, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -556,7 +556,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_17, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -566,7 +566,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_18, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -576,7 +576,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_19, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -586,7 +586,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_20, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -596,7 +596,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_21, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -606,7 +606,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_22, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -616,7 +616,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_23, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -626,7 +626,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_24, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -636,7 +636,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_25, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -646,7 +646,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_26, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -656,7 +656,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_27, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -666,7 +666,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_28, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -676,7 +676,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_29, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -686,7 +686,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_30, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -696,7 +696,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_31, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -706,7 +706,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_32, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -716,7 +716,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_33, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -726,7 +726,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_34, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -736,7 +736,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_35, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -746,7 +746,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_36, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -756,7 +756,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_37, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -766,7 +766,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_38, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -776,7 +776,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_39, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -786,7 +786,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_40, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -796,7 +796,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_41, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -806,7 +806,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_42, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -816,7 +816,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_43, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -826,7 +826,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_44, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -836,7 +836,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_45, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -846,7 +846,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_46, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -856,7 +856,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_47, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -866,7 +866,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_48, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -876,7 +876,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_49, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -886,7 +886,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_50, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -896,7 +896,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_51, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -906,7 +906,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_52, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -916,7 +916,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_53, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -926,7 +926,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_54, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -936,7 +936,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_55, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -946,7 +946,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_56, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -956,7 +956,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_57, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -966,7 +966,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_58, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -976,7 +976,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_59, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -986,7 +986,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_60, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -996,7 +996,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_61, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1006,7 +1006,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_62, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1016,7 +1016,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_63, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1026,7 +1026,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_64, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1036,7 +1036,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_65, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1046,7 +1046,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_66, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1056,7 +1056,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_67, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1066,7 +1066,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_68, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1076,7 +1076,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_69, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1086,7 +1086,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_70, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1096,7 +1096,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_71, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1106,7 +1106,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_72, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1116,7 +1116,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_73, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1126,7 +1126,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_74, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1136,7 +1136,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_75, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1146,7 +1146,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_76, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1156,7 +1156,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_77, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1166,7 +1166,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_78, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1176,7 +1176,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_79, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1186,7 +1186,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_80, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1196,7 +1196,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_81, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1206,7 +1206,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_82, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1216,7 +1216,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_83, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1226,7 +1226,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_84, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1236,7 +1236,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_85, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1246,7 +1246,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_86, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1256,7 +1256,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_87, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1266,7 +1266,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_88, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1276,7 +1276,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_89, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1286,7 +1286,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_90, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1296,7 +1296,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_91, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1306,7 +1306,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_92, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1316,7 +1316,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_93, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1326,7 +1326,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_94, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1336,7 +1336,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_95, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1346,7 +1346,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_96, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1356,7 +1356,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_97, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1366,7 +1366,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_98, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1376,7 +1376,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_99, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1386,7 +1386,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_100, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1396,7 +1396,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_101, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1406,7 +1406,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_102, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1416,7 +1416,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_103, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1426,7 +1426,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_104, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1436,7 +1436,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_105, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1446,7 +1446,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_106, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1456,7 +1456,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_107, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1466,7 +1466,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_108, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1476,7 +1476,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_109, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1486,7 +1486,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_110, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1496,7 +1496,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_111, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1506,7 +1506,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_112, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1516,7 +1516,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_113, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1526,7 +1526,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_114, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1536,7 +1536,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_115, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1546,7 +1546,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_116, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1556,7 +1556,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_117, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1566,7 +1566,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_118, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1576,7 +1576,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_119, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1586,7 +1586,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_120, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1596,7 +1596,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_121, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1606,7 +1606,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_122, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1616,7 +1616,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_123, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1626,7 +1626,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_124, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1636,7 +1636,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_125, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1646,7 +1646,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_126, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
@@ -1656,7 +1656,7 @@ uObjTxtr papyrus_tex[] = {
 	0xFFFFFFFF, /* mask */
 },
 {
-	G_OBJLT_TXTRBLOCK, 
+	G_OBJLT_TXTRBLOCK,
 	(u64 *) &papyrus_tex_127, /* image */
 	GS_PIX2TMEM(0, G_IM_SIZ_8b), /* tmem */
 	GS_TB_TSIZE(64*64,  G_IM_SIZ_8b),  /* tsize   */
