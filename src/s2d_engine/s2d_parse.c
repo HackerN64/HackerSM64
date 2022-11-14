@@ -273,13 +273,14 @@ void s2d_type_print_alloc(int x, int y, int align, const char *str, int *pos) {
 	}
 }
 
-// broken atm
 static int s2d_width(const char *str, int line, int len) {
 	char *p = str;
 	int tmp_len = 0;
 	int curLine = 0;
 	int width = 0;
 	int scale = 1;
+
+	u8 *ktable = seg2virt(s2d_kerning_table);
 
 	if (*p == '\0') return width;
 
@@ -328,7 +329,7 @@ static int s2d_width(const char *str, int line, int len) {
 				break;
 			default:
 				if (current_char != '\0' && curLine == line)
-					width += s2d_kerning_table[(int) current_char] * scale;
+					width += ktable[(int) current_char] * scale;
 		}
 		if (*p == '\0') break;
 		p++;

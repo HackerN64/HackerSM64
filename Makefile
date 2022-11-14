@@ -121,8 +121,16 @@ endif
 
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
-TEXT_ENGINE := none
+TEXT_ENGINE := s2dex_text_engine
 $(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
+
+ifeq ($(TEXT_ENGINE), s2dex_text_engine)
+#   LIBRARIES += s2d_engine
+#   DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
+  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  SRC_DIRS += src/s2d_engine
+endif
+# add more text engines here
 
 #==============================================================================#
 # Optimization flags                                                           #
@@ -409,14 +417,6 @@ endif
 
 LIBRARIES := nustd hvqm2 z goddard
 
-# Text engine
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  LIBRARIES += s2d_engine
-  DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
-endif
-# add more text engines here
-
 LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 export LD_LIBRARY_PATH=./tools
@@ -553,7 +553,6 @@ all: $(ROM)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-	make -C src/s2d_engine clean
 
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
