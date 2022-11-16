@@ -822,24 +822,9 @@ Lights1 defaultLight = gdSPDefLights1(
     0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
 );
 
-Vec3f globalLightDirection = { 0x28, 0x28, 0x28 };
-
 void setup_global_light() {
     gCurDirectionalLight = (Lights1*)alloc_display_list(sizeof(Lights1));
     bcopy(&defaultLight, gCurDirectionalLight, sizeof(Lights1));
-
-#ifdef WORLDSPACE_LIGHTING
-    gCurDirectionalLight->l->l.dir[0] = (s8)(globalLightDirection[0]);
-    gCurDirectionalLight->l->l.dir[1] = (s8)(globalLightDirection[1]);
-    gCurDirectionalLight->l->l.dir[2] = (s8)(globalLightDirection[2]);
-#else
-    Vec3f transformedLightDirection;
-    linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
-    gCurDirectionalLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
-    gCurDirectionalLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
-    gCurDirectionalLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
-#endif
-
     gSPSetLights1(gDisplayListHead++, (*gCurDirectionalLight));
 }
 
@@ -904,7 +889,6 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
     guMtxF2L(scaledCamera, viewMtx);
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
-    setup_global_light();
 
     if (node->fnNode.node.children != 0) {
         gCurGraphNodeCamera = node;

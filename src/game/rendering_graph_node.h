@@ -13,7 +13,8 @@ extern struct GraphNodeObject      *gCurGraphNodeObject;
 extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
 #define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
-extern Vec3f globalLightDirection;
+extern struct GlobalFog gGlobalFog;
+extern s32 gCameraIsUnderwater;
 
 enum AnimType {
     // after processing an object, the type is reset to this
