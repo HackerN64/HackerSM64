@@ -62,13 +62,10 @@ struct MainMenuSaveData {
 #ifdef WIDE
     u8 wideMode: 1;
 #endif
-
 #ifdef MULTILANG
     u8 language: 2;
-#define SUBTRAHEND 8
-#else
-#define SUBTRAHEND 6
 #endif
+
     u8 firstBoot;
 
     #ifdef PUPPYCAM
@@ -198,17 +195,8 @@ void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode);
 s32 check_warp_checkpoint(struct WarpNode *warpNode);
 
 #ifdef MULTILANG
-enum EuLanguages {
-    LANGUAGE_ENGLISH,
-    LANGUAGE_FRENCH,
-    LANGUAGE_GERMAN,
-    LANGUAGE_JAPANESE
-};
-
 void multilang_set_language(u16 language);
 u32 multilang_get_language(void);
-#else
-#define LANGUAGE_ENGLISH 0
 #endif
 
 #endif // SAVE_FILE_H

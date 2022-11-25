@@ -33,7 +33,7 @@ enum HUDFlashModes {
 extern s8 gHudFlash;
 
 extern s8 gDialogCourseActNum;
-extern s16 gInGameLanguage;
+extern u8 gInGameLanguage;
 extern void *languageTable[][3];
 
 struct AsciiCharLUTEntry {
@@ -78,9 +78,10 @@ enum TextDiacriticMarks {
     TEXT_DIACRITIC_TILDE_UPPERCASE,
     TEXT_DIACRITIC_UMLAUT,
     TEXT_DIACRITIC_UMLAUT_UPPERCASE,
-
+#ifdef JAPANESE_CHARACTERS
     TEXT_DIACRITIC_DAKUTEN,
     TEXT_DIACRITIC_HANDAKUTEN,
+#endif
 };
 
 enum TextAlignments {
@@ -97,7 +98,7 @@ struct DialogEntry {
     /*0x04*/ s8 linesPerBox;
     /*0x06*/ s16 leftOffset;
     /*0x08*/ s16 width;
-    /*0x0C*/ const u8 *str;
+    /*0x0C*/ const char *str;
 };
 
 // gDialogResponse
@@ -113,14 +114,23 @@ enum DialogResponseDefines {
 #ifdef MULTILANG
 
 typedef char * langarray_t[4];
-#define LANGUAGE_TEXT(english, french, german, japanese) {english, french, german, japanese}
 #define LANGUAGE_ARRAY(cmd) ((cmd)[gInGameLanguage])
+#define LANGUAGE_TEXT(english, french, german, japanese) {english, french, german, japanese}
+
+enum MultilangLanguages {
+    LANGUAGE_ENGLISH,
+    LANGUAGE_FRENCH,
+    LANGUAGE_GERMAN,
+    LANGUAGE_JAPANESE
+};
 
 #else
 
 typedef char * langarray_t;
-#define LANGUAGE_TEXT(english, french, german, japanese) english
 #define LANGUAGE_ARRAY(cmd) (cmd)
+#define LANGUAGE_TEXT(english, french, german, japanese) english
+
+#define LANGUAGE_ENGLISH 0
 
 #endif
 

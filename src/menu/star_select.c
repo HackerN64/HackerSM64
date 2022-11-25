@@ -222,15 +222,21 @@ void print_course_number(void) {
     // Change upper part of the wood texture depending of the language defined
     switch (multilang_get_language()) {
         case LANGUAGE_ENGLISH:
+#ifdef LANG_JAPANESE
         case LANGUAGE_JAPANESE:
+#endif
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_course_upper);
             break;
+#ifdef LANG_FRENCH
         case LANGUAGE_FRENCH:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_niveau_upper);
             break;
+#endif
+#ifdef LANG_GERMAN
         case LANGUAGE_GERMAN:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_kurs_upper);
             break;
+#endif
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_rgba16_wood_course_end);

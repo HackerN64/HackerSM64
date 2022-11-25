@@ -304,11 +304,18 @@ SECTIONS
 
    /* load YAY0 and level data */
    YAY0_SEG(segment2, 0x02000000)
+
 #ifdef MULTILANG
    YAY0_SEG(translation_en, 0x19000000)
+#ifdef LANG_FRENCH
    YAY0_SEG(translation_fr, 0x19000000)
+#endif
+#ifdef LANG_GERMAN
    YAY0_SEG(translation_de, 0x19000000)
+#endif
+#ifdef LANG_JAPANESE
    YAY0_SEG(translation_jp, 0x19000000)
+#endif
 #endif
 
    /* mario actor group */

@@ -371,6 +371,7 @@ ALIGNED8 static const Texture texture_credits_char_period[] = {
 #include "textures/segment2/segment2.07080.rgba16.inc.c"
 };
 
+#ifdef JAPANESE_CHARACTERS
 // JP Small Font
 ALIGNED8 static const Texture texture_font_char_jp_0[] = {
 #include "textures/segment2/segment2.07100.ia1.inc.c"
@@ -546,10 +547,6 @@ ALIGNED8 static const Texture texture_font_char_jp_open_parentheses[] = {
 
 ALIGNED8 static const Texture texture_font_char_jp_close_parentheses[] = {
 #include "textures/segment2/segment2.073D0.ia1.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_jp_multiply[] = {
-#include "textures/segment2/segment2.073F0.ia1.inc.c"
 };
 
 ALIGNED8 static const Texture texture_font_char_jp_hiragana_a[] = {
@@ -1007,6 +1004,7 @@ ALIGNED8 static const Texture texture_font_char_jp_double_quotation_close[] = {
 ALIGNED8 static const Texture texture_font_char_jp_tilde[] = {
 #include "textures/segment2/segment2.07B30.ia1.inc.c"
 };
+#endif
 
 // US Small Font
 
@@ -1570,19 +1568,20 @@ const struct Utf8LUT main_hud_utf8_lut = {
 };
 
 const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
-    {-1, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE,
-    {0, 4, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE,
-    {-1, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE,
-    {0, 4, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE,
-    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX,
-    {1, 4, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE,
-    {-1, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE,
-    {1, 4, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE,
-    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT,
-    {1, 4, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE,
-
-    {4, 6, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN,
-    {7, 10, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN,
+    {-1, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE
+    {0, 4, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE
+    {-1, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE
+    {0, 4, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE
+    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX
+    {1, 4, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE
+    {-1, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE
+    {1, 4, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE
+    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT
+    {1, 4, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE
+#ifdef JAPANESE_CHARACTERS
+    {4, 6, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN
+    {7, 10, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN
+#endif
 };
 
 const struct AsciiCharLUTEntry main_font_lut[] = {
@@ -1777,6 +1776,7 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x2606, 10, 0, texture_font_char_us_star_hollow}, // ☆
     {0x272A, 8, 0, texture_font_char_us_coin}, // ✪
 
+#ifdef JAPANESE_CHARACTERS
     {0x3000, 10, 0, NULL}, // "　" (ideographic space)
     {0x3001, 10, TEXT_FLAG_PACKED, texture_font_char_jp_comma}, // 、
     {0x3002, 10, TEXT_FLAG_PACKED, texture_font_char_jp_period}, // 。
@@ -1990,9 +1990,9 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0xFF38, 10, TEXT_FLAG_PACKED, texture_font_char_jp_X}, // Ｘ
     {0xFF39, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Y}, // Ｙ
     {0xFF3A, 10, TEXT_FLAG_PACKED, texture_font_char_jp_Z}, // Ｚ
-    {0xFF58, 10, TEXT_FLAG_PACKED, texture_font_char_jp_multiply}, // ｘ
 
     {0xFF5E, 10, TEXT_FLAG_PACKED, texture_font_char_jp_tilde}, // ～
+#endif
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_4byte_lut[] = {

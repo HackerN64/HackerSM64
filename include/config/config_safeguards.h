@@ -155,6 +155,16 @@
     #define START_LEVEL LEVEL_CASTLE_GROUNDS
 #endif // !START_LEVEL
 
+#ifndef MULTILANG
+    #undef LANG_FRENCH
+    #undef LANG_GERMAN
+    #undef LANG_JAPANESE
+#endif // !MULTILANG
+
+#ifdef LANG_JAPANESE
+    #define JAPANESE_CHARACTERS
+#endif // LANG_JAPANESE
+
 
 /*****************
  * config_goddard.h

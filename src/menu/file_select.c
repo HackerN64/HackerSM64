@@ -96,7 +96,24 @@ s8 sSelectedFileNum = 0;
 // coin high score, 1 for high score across all files.
 s8 sScoreFileCoinScoreMode = 0;
 
-// In EU, if no save file exists, open the language menu so the user can find it.
+// Determines which languages are available for the language selector,
+// since the value of the language enums are always constant.
+#ifdef MULTILANG
+const u8 gDefinedLanguages = {
+    LANGUAGE_ENGLISH,
+#ifdef LANG_FRENCH
+    LANGUAGE_FRENCH,
+#endif
+#ifdef LANG_GERMAN
+    LANGUAGE_GERMAN,
+#endif
+#ifdef LANG_JAPANESE
+    LANGUAGE_JAPANESE,
+#endif
+};
+
+#define NUM_DEFINED_LANGUAGES ARRAY_COUNT(gDefinedLanguages)
+#endif
 
 /**
  * Yellow Background Menu Initial Action
@@ -2001,10 +2018,10 @@ void print_save_file_scores(s8 fileIndex) {
     char str[20];
 
 #ifndef MULTILANG
-    void **levelNameTable = segmented_to_virtual(seg2_course_name_table);
+    const char **levelNameTable = segmented_to_virtual(seg2_course_name_table);
 #else
-    void ***levelNameLanguageTable = segmented_to_virtual(course_strings_language_table);
-    void **levelNameTable = segmented_to_virtual(levelNameLanguageTable[gInGameLanguage]);
+    const char ***levelNameLanguageTable = segmented_to_virtual(course_strings_language_table);
+    const char **levelNameTable = segmented_to_virtual(levelNameLanguageTable[gInGameLanguage]);
 #endif
 
     // Print file name at top

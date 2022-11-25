@@ -598,7 +598,7 @@ const Texture *const menu_hud_lut[] = {
     texture_menu_hud_char_katakana_sa, texture_menu_hud_char_katakana_u,       texture_menu_hud_char_katakana_n,         texture_menu_hud_char_kana_dakuten_do,
 };
 
-
+#ifdef JAPANESE_CHARACTERS
 // 0x0700AC48
 ALIGNED8 static const Texture texture_menu_font_char_jp_0[] = {
 #include "levels/menu/main_menu_seg7.0AC48.ia8.inc.c"
@@ -1238,6 +1238,7 @@ ALIGNED8 static const Texture texture_menu_font_char_jp_D[] = {
 ALIGNED8 static const Texture texture_menu_font_char_jp_exclamation[] = {
 #include "levels/menu/main_menu_seg7.0CCC8.ia8.inc.c"
 };
+#endif
 
 // 0x0700AC40
 ALIGNED8 static const Texture texture_menu_font_char_0[] = {
@@ -1495,19 +1496,20 @@ ALIGNED8 const u8 texture_menu_font_char_diacritic_umlaut[] = {
 
 // ASCII todo: add rest of diacritics here
 const struct DiacriticLUTEntry menu_font_diacritic_lut[] = {
-    {0, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE,
-    {0, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE,
-    {0, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE,
-    {0, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE,
-    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX,
-    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE,
-    {0, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE,
-    {0, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE,
-    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT,
-    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE,
-
-    {6, 7, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN,
-    {6, 7, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN,
+    {0, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE
+    {0, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE
+    {0, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE
+    {0, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE
+    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX
+    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE
+    {0, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE
+    {0, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE
+    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT
+    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE
+#ifdef JAPANESE_CHARACTERS
+    {6, 7, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN
+    {6, 7, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN
+#endif
 };
 
 const struct AsciiCharLUTEntry menu_font_lut[] = {
@@ -1628,6 +1630,7 @@ const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
     {0x2605, 10, 0, texture_menu_font_char_star_filled}, // ★
     {0x272A, 8, 0, texture_menu_font_char_coin}, // ✪
 
+#ifdef JAPANESE_CHARACTERS
     {0x3000, 9, 0, NULL}, // "　" (ideographic space)
     {0x3041, 9, 0, texture_menu_font_char_jp_hiragana_small_a}, // ぁ
     {0x3042, 9, 0, texture_menu_font_char_jp_hiragana_a}, // あ
@@ -1810,6 +1813,7 @@ const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
     {0xFF22, 9, 0, texture_menu_font_char_jp_B}, // Ｂ
     {0xFF23, 9, 0, texture_menu_font_char_jp_C}, // Ｃ
     {0xFF24, 9, 0, texture_menu_font_char_jp_D}, // Ｄ
+#endif
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_4byte_lut[] = {
@@ -1928,16 +1932,6 @@ ALIGNED8 static const Texture texture_menu_course_upper[] = {
 #include "levels/menu/main_menu_seg7_course_upper.rgba16.inc.c"
 };
 
-// 0x0700CDA0 - 0x0700DDA0
-ALIGNED8 static const Texture texture_menu_niveau_upper[] = {
-#include "levels/menu/main_menu_seg7_niveau_upper.rgba16.inc.c"
-};
-
-// 0x0700DDA0 - 0x0700EDA0
-ALIGNED8 static const Texture texture_menu_kurs_upper[] = {
-#include "levels/menu/main_menu_seg7_kurs_upper.rgba16.inc.c"
-};
-
 // 0x0700EDA0 - 0x0700FDA0
 ALIGNED8 static const Texture texture_menu_course_lower[] = {
 #include "levels/menu/main_menu_seg7_course_lower.rgba16.inc.c"
@@ -2015,10 +2009,23 @@ const Gfx dl_menu_texture_course_upper[] = {
     gsSPEndDisplayList(),
 };
 
+#ifdef LANG_FRENCH
+// 0x0700CDA0 - 0x0700DDA0
+ALIGNED8 static const Texture texture_menu_niveau_upper[] = {
+#include "levels/menu/main_menu_seg7_niveau_upper.rgba16.inc.c"
+};
+
 // 0x0700FF00 - 0x0700FF10
 const Gfx dl_menu_texture_niveau_upper[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_menu_niveau_upper),
     gsSPEndDisplayList(),
+};
+#endif
+
+#ifdef LANG_GERMAN
+// 0x0700DDA0 - 0x0700EDA0
+ALIGNED8 static const Texture texture_menu_kurs_upper[] = {
+#include "levels/menu/main_menu_seg7_kurs_upper.rgba16.inc.c"
 };
 
 // 0x0700FF10 - 0x0700FF20
@@ -2026,6 +2033,7 @@ const Gfx dl_menu_texture_kurs_upper[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_menu_kurs_upper),
     gsSPEndDisplayList(),
 };
+#endif
 #endif
 
 // 0x0700F2F8 - 0x0700F328
@@ -2055,29 +2063,47 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
 
+#ifdef LANG_FRENCH
 #define COURSE_NAME_TABLE course_strings_fr_table
 #define COURSE_FILE "fr/courses.h"
 #include "text/define_courses.inc.c"
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
+#endif
 
+#ifdef LANG_GERMAN
 #define COURSE_NAME_TABLE course_strings_de_table
 #define COURSE_FILE "de/courses.h"
 #include "text/define_courses.inc.c"
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
+#endif
 
+#ifdef LANG_JAPANESE
 #define COURSE_NAME_TABLE course_strings_jp_table
 #define COURSE_FILE "jp/courses.h"
 #include "text/define_courses.inc.c"
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
+#endif
 
-const u8 *const course_strings_language_table[] = {
+const char **course_strings_language_table[] = {
     &course_strings_en_table,
+#ifdef LANG_FRENCH
     &course_strings_fr_table,
+#else
+    NULL,
+#endif
+#ifdef LANG_GERMAN
     &course_strings_de_table,
+#else
+    NULL,
+#endif
+#ifdef LANG_JAPANESE
     &course_strings_jp_table,
+#else
+    NULL,
+#endif
 };
 
 #endif

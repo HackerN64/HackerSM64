@@ -31,7 +31,7 @@ s32 gDialogVariable;
 u16 gDialogTextAlpha;
 s8 gRedCoinsCollected;
 
-s16 gInGameLanguage = LANGUAGE_ENGLISH;
+u8 gInGameLanguage = LANGUAGE_ENGLISH;
 
 extern u8 dialog_table_en[];
 extern u8 course_name_table_en[];
@@ -54,9 +54,24 @@ void *languageTable[][3] = {
     {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table},
 #else
     {&dialog_table_en, &course_name_table_en, &act_name_table_en},
+
+#ifdef LANG_FRENCH
     {&dialog_table_fr, &course_name_table_fr, &act_name_table_fr},
+#else
+    {NULL, NULL, NULL},
+#endif
+
+#ifdef LANG_GERMAN
     {&dialog_table_de, &course_name_table_de, &act_name_table_de},
+#else
+    {NULL, NULL, NULL},
+#endif
+
+#ifdef LANG_JAPANESE
     {&dialog_table_jp, &course_name_table_jp, &act_name_table_jp},
+#else
+    {NULL, NULL, NULL},
+#endif
 #endif
 };
 
@@ -336,7 +351,7 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
 #define BOX_SCALE_EN    5.f
 #define BOX_SCALE_JP    4.f
 
-#ifdef MULTILANG
+#ifdef LANG_JAPANESE
 #define DIALOG_LINE_HEIGHT ((gInGameLanguage == LANGUAGE_JAPANESE) ? DIALOG_LINE_HEIGHT_JP : DIALOG_LINE_HEIGHT_EN)
 #define BOX_TRANS_X ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_X_JP : BOX_TRANS_X_EN)
 #define BOX_TRANS_Y ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_Y_JP : BOX_TRANS_Y_EN)
@@ -1153,7 +1168,7 @@ void do_cutscene_handler(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
 
-    print_generic_string_aligned(SCREEN_CENTER_X, 13, LANGUAGE_ARRAY(gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X, 13, LANGUAGE_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
