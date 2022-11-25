@@ -365,6 +365,10 @@ void save_file_load_all(void) {
                 break;
         }
     }
+
+#ifdef MULTILANG
+    gInGameLanguage = multilang_get_language();
+#endif
 }
 
 #ifdef PUPPYCAM
@@ -719,6 +723,7 @@ void save_file_move_cap_to_default_location(void) {
 #ifdef MULTILANG
 void multilang_set_language(u16 language) {
     gSaveBuffer.menuData.language = language;
+    gInGameLanguage = language;
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }

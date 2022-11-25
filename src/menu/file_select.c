@@ -99,7 +99,7 @@ s8 sScoreFileCoinScoreMode = 0;
 // Determines which languages are available for the language selector,
 // since the value of the language enums are always constant.
 #ifdef MULTILANG
-const u8 gDefinedLanguages = {
+const u8 gDefinedLanguages[] = {
     LANGUAGE_ENGLISH,
 #ifdef LANG_FRENCH
     LANGUAGE_FRENCH,
@@ -111,6 +111,8 @@ const u8 gDefinedLanguages = {
     LANGUAGE_JAPANESE,
 #endif
 };
+
+s8 sSelectedLanguageIndex = 0;
 
 #define NUM_DEFINED_LANGUAGES ARRAY_COUNT(gDefinedLanguages)
 #endif
@@ -750,30 +752,15 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
     sMainMenuButtons[MENU_BUTTON_HEADSET]->oMenuButtonScale = MENU_BUTTON_SCALE;
 
 #ifdef MULTILANG
-    // English option button
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_ENGLISH] = spawn_object_rel_with_rot(
-        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton,  533, -111, -100, 0x0, -0x8000, 0x0);
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_ENGLISH]->oMenuButtonScale = MENU_BUTTON_SCALE;
-    // French option button
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_FRENCH] = spawn_object_rel_with_rot(
-        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton,    0, -111, -100, 0x0, -0x8000, 0x0);
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_FRENCH]->oMenuButtonScale = MENU_BUTTON_SCALE;
-    // German option button
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_GERMAN] = spawn_object_rel_with_rot(
-        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, -533, -111, -100, 0x0, -0x8000, 0x0);
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_GERMAN]->oMenuButtonScale = MENU_BUTTON_SCALE;
-
     // Return button
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN] = spawn_object_rel_with_rot(
+    sMainMenuButtons[MENU_BUTTON_OPTION_RETURN] = spawn_object_rel_with_rot(
         soundModeButton, MODEL_MAIN_MENU_YELLOW_FILE_BUTTON, bhvMenuButton, 0, -533, -100, 0x0, -0x8000, 0x0);
-    sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN]->oMenuButtonScale = MENU_BUTTON_SCALE;
+    sMainMenuButtons[MENU_BUTTON_OPTION_RETURN]->oMenuButtonScale = MENU_BUTTON_SCALE;
 #else
     // Zoom in current selection
     sMainMenuButtons[MENU_BUTTON_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
 #endif
 }
-
-#undef SOUND_BUTTON_Y
 
 /**
  * In the sound mode menu, checks if a button was clicked to change sound mode & button state.
@@ -798,8 +785,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
 #endif
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
 #ifndef MULTILANG
-                        // Sound menu buttons don't return to Main Menu in EU
-                        // because they don't have a case in bhv_menu_button_manager_loop
+                        // Sound menu buttons don't return to Main Menu with multilang enabled
                         sSelectedButtonID = buttonID;
 #endif
                         sSoundMode = buttonID - MENU_BUTTON_OPTION_MIN;
@@ -807,18 +793,8 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                     }
                 }
 #ifdef MULTILANG
-                // If language mode button clicked, select it and change language
-                if (buttonID == MENU_BUTTON_LANGUAGE_ENGLISH || buttonID == MENU_BUTTON_LANGUAGE_FRENCH
-                         || buttonID == MENU_BUTTON_LANGUAGE_GERMAN) {
-                    if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
-                        play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                        sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
-                        gInGameLanguage = buttonID - MENU_BUTTON_LANGUAGE_MIN;
-                        multilang_set_language(gInGameLanguage);
-                    }
-                }
                 // If neither of the buttons above are pressed, return to main menu
-                if (buttonID == MENU_BUTTON_LANGUAGE_RETURN) {
+                if (buttonID == MENU_BUTTON_OPTION_RETURN) {
                     play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
                     sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                     sSelectedButtonID = buttonID;
@@ -1088,7 +1064,7 @@ void bhv_menu_button_manager_loop(void) {
         case MENU_BUTTON_SOUND_MODE: check_sound_mode_menu_clicked_buttons(sMainMenuButtons[MENU_BUTTON_SOUND_MODE]); break;
 
 #ifdef MULTILANG
-        case MENU_BUTTON_LANGUAGE_RETURN: return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN]); break;
+        case MENU_BUTTON_OPTION_RETURN: return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_OPTION_RETURN]); break;
 #endif
         // STEREO, MONO and HEADSET buttons are undefined so they can be selected without
         // exiting the Options menu, as a result they added a return button
@@ -1846,14 +1822,15 @@ langarray_t textLanguageSelect = LANGUAGE_TEXT(
     "WÄHLE SPRACHE",
     ""); // no japanese translation
 
-langarray_t textLanguage = {
+char *textLanguage[] = {
     "ENGLISH",
     "FRANÇAIS",
     "DEUTSCH",
-    "", // no japanese translation
+    "にほんご",
 };
 
 #define SOUND_LABEL_Y 141
+#define LANGUAGE_SELECT_Y 80
 #else
 #define SOUND_LABEL_Y 87
 #endif
@@ -1863,7 +1840,7 @@ langarray_t textLanguage = {
 /**
  * Prints sound mode menu strings that shows on the purple background menu screen.
  *
- * In EU, this function acts like "print_option_mode_menu_strings" because of languages.
+ * With multilang, this function acts like "print_option_mode_menu_strings" because of languages.
  */
 void print_sound_mode_menu_strings(void) {
     s32 mode;
@@ -1875,7 +1852,7 @@ void print_sound_mode_menu_strings(void) {
 
     print_hud_lut_string(47, 32, LANGUAGE_ARRAY(textSoundSelect));
 #ifdef MULTILANG
-    print_hud_lut_string(47, 101, LANGUAGE_ARRAY(textLanguageSelect));
+    print_hud_lut_string(47, 110, LANGUAGE_ARRAY(textLanguageSelect));
 #endif
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1893,18 +1870,36 @@ void print_sound_mode_menu_strings(void) {
     }
 
 #ifdef MULTILANG
-    // In EU, print language mode names
-    for (mode = 0, textX = SCREEN_CENTER_X - OPTION_LABEL_SPACING; mode < 3; textX += OPTION_LABEL_SPACING, mode++) {
-        if (mode == gInGameLanguage) {
-            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-        } else {
-            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
+    // Handle changing the selected language
+    if (sCursorClickingTimer == 2) {
+        s16 cursorX = sCursorPos[0] + SCREEN_CENTER_X;
+        s16 cursorY = sCursorPos[1] + SCREEN_CENTER_Y;
+
+        s8 oldSelectedLanguageIndex = sSelectedLanguageIndex;
+
+        if (cursorY < LANGUAGE_SELECT_Y + 20 && cursorY >= LANGUAGE_SELECT_Y) {
+            if (cursorX < SCREEN_CENTER_X - 40 && cursorX >= SCREEN_CENTER_X - 60) {
+                sSelectedLanguageIndex--;
+            } else if (cursorX < SCREEN_CENTER_X + 60 && cursorX >= SCREEN_CENTER_X + 40) {
+                sSelectedLanguageIndex++;
+            }
+            // Update language if the language has been changed
+            if (sSelectedLanguageIndex != oldSelectedLanguageIndex) {
+                play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
+                sSelectedLanguageIndex = (sSelectedLanguageIndex + NUM_DEFINED_LANGUAGES) % NUM_DEFINED_LANGUAGES;
+                multilang_set_language(gDefinedLanguages[sSelectedLanguageIndex]);
+            }
         }
-        print_generic_string_aligned(textX, 72, textLanguage[mode], TEXT_ALIGN_CENTER);
     }
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string(182, 29, LANGUAGE_ARRAY(textReturn));
+    // Print current language
+    print_generic_string_aligned(SCREEN_CENTER_X,      LANGUAGE_SELECT_Y, textLanguage[gInGameLanguage], TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X - 50, LANGUAGE_SELECT_Y, "◀", TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X + 50, LANGUAGE_SELECT_Y, "▶", TEXT_ALIGN_CENTER);
+
+    // Print return text
+    print_generic_string(184, 29, LANGUAGE_ARRAY(textReturn));
 #endif
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2105,6 +2100,20 @@ Gfx *geo_file_select_strings_and_menu_cursor(s32 callContext, UNUSED struct Grap
     return NULL;
 }
 
+#ifdef MULTILANG
+/**
+ * Determines the array index of the saved language based on which languages are defined.
+ */
+static u8 get_language_index(u8 language) {
+    for (u32 i = 0; i < NUM_DEFINED_LANGUAGES; i++) {
+        if (language == gDefinedLanguages[i]) {
+            return i;
+        }
+    }
+    return LANGUAGE_ENGLISH;
+}
+#endif
+
 /**
  * Initiates file select values after Mario Screen.
  * Relocates cursor position of the last save if the game goes back to the Mario Screen
@@ -2134,6 +2143,9 @@ s32 lvl_init_menu_values_and_cursor_pos(UNUSED s32 arg, UNUSED s32 unused) {
     sMainMenuTimer = 0;
     sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
     sSoundMode = save_file_get_sound_mode();
+#ifdef MULTILANG
+    sSelectedLanguageIndex = get_language_index(gInGameLanguage);
+#endif
     gCurrLevelNum = LEVEL_UNKNOWN_1;
     return 0;
 }

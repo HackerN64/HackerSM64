@@ -1283,7 +1283,6 @@ void load_language_text(void) {
 
 s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
 #ifdef MULTILANG
-    gInGameLanguage = multilang_get_language();
     load_language_text();
 #endif
     sWarpDest.type = WARP_TYPE_NOT_WARPING;
