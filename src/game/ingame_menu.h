@@ -146,7 +146,6 @@ void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment);
 void print_credits_string(s16 x, s16 y, const char *str);
 
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex);
-s32 get_str_x_pos_from_center(s16 centerPos, char *str, f32 scale);
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y);
 s32 get_dialog_id(void);
 void create_dialog_box(s16 dialog);

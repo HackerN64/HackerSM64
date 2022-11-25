@@ -1581,8 +1581,8 @@ const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
     {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT,
     {1, 4, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE,
 
-    {5, 7, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN,
-    {7, 12, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN,
+    {4, 6, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN,
+    {7, 10, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN,
 };
 
 const struct AsciiCharLUTEntry main_font_lut[] = {

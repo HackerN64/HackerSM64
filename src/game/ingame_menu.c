@@ -274,7 +274,7 @@ static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
     return out;
 }
 
-u8 render_generic_ascii_char(char c) {
+static u32 render_generic_ascii_char(char c) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
     const Texture *texture = fontLUT[c - ' '].texture;
 
@@ -289,7 +289,7 @@ u8 render_generic_ascii_char(char c) {
     return fontLUT[c - ' '].kerning;
 }
 
-u8 render_generic_unicode_char(char *str, s32 *strPos) {
+static u32 render_generic_unicode_char(char *str, s32 *strPos) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
 
     if (utf8Entry->texture == NULL) {
@@ -517,6 +517,40 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     }
 }
 
+static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
+
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[c - ' '].texture);
+
+    gDPLoadSync(gDisplayListHead++);
+    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
+    gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                        (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+
+    return fontLUT[c - ' '].kerning;
+}
+
+static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) {
+    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, strPos);
+
+    if (utf8Entry->flags & TEXT_DIACRITIC_MASK) {
+        struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&menu_font_diacritic_lut);
+        struct DiacriticLUTEntry *diacritic = &diacriticLUT[(utf8Entry->flags & TEXT_DIACRITIC_MASK) - 1];
+
+        s32 fakeStrPos = 0;
+        render_menu_unicode_char(segmented_to_virtual(diacritic->str), &fakeStrPos, curX + diacritic->xOffset, curY - diacritic->yOffset);
+    }
+
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, utf8Entry->texture);
+    
+    gDPLoadSync(gDisplayListHead++);
+    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
+    gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                        (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+
+    return utf8Entry->kerning;
+}
+
 /**
  * Prints a menu white string in the smaller font.
  * Only available in the file select and star select menus.
@@ -535,26 +569,10 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
                 break;
             default:
                 if (str[strPos] & 0x80) {
-                    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, &strPos);
-
-                    if (utf8Entry->flags & TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
-                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, texture_menu_font_char_umlaut);
-                        gDPLoadSync(gDisplayListHead++);
-                        gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-                        gSPTextureRectangle(gDisplayListHead++, curX << 2, (curY - 4) << 2, (curX + 8) << 2,
-                                            (curY + 4) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                    }
-
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, utf8Entry->texture);
-                    kerning = utf8Entry->kerning;
+                    kerning = render_menu_unicode_char(str, &strPos, curX, curY);
                 } else {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos] - ' '].texture);
-                    kerning = fontLUT[str[strPos] - ' '].kerning;
+                    kerning = render_menu_ascii_char(str[strPos], curX, curY);
                 }
-                gDPLoadSync(gDisplayListHead++);
-                gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
-                                    (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
                 curX += kerning;
         }
@@ -666,22 +684,6 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     if ((index & 3) == 0) {
         gMenuHoldKeyTimer = 0;
     }
-}
-
-s32 get_string_width(char *str) {
-    s16 strPos = 0;
-    s16 width = 0;
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
-
-    while (str[strPos] != '\0') {
-        width += fontLUT[str[strPos] - ' '].kerning;
-        strPos++;
-    }
-    return width;
-}
-
-s32 get_str_x_pos_from_center(s16 centerPos, char *str, UNUSED f32 scale) {
-    return (s16)(centerPos - (s16)(get_string_width(str) / 2.0f));
 }
 
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
@@ -892,41 +894,42 @@ void render_dialog_triangle_next(s8 linesPerBox) {
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
+// King Bob-omb (Start), Whomp (Start), King Bob-omb (throw him out), Eyerock (Start), Wiggler (Start)
+static s16 sDialogBossStart[] = { DIALOG_017, DIALOG_114, DIALOG_128, DIALOG_117, DIALOG_150 };
+// Koopa the Quick (BoB), Koopa the Quick (THI), Penguin Race, Fat Penguin Race (120 stars)
+static s16 sDialogRaceSound[] = { DIALOG_005, DIALOG_009, DIALOG_055, DIALOG_164             };
+// Red Switch, Green Switch, Blue Switch, 100 coins star, Bowser Red Coin Star
+static s16 sDialogStarSound[] = { DIALOG_010, DIALOG_011, DIALOG_012, DIALOG_013, DIALOG_014 };
+// King Bob-omb (Start), Whomp (Defeated), King Bob-omb (Defeated, missing in JP), Eyerock (Defeated), Wiggler (Defeated)
+static s16 sDialogBossStop[]  = { DIALOG_017, DIALOG_115, DIALOG_116, DIALOG_118, DIALOG_152 };
+
 void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
-    // King Bob-omb (Start), Whomp (Start), King Bob-omb (throw him out), Eyerock (Start), Wiggler (Start)
-    s16 dialogBossStart[] = { DIALOG_017, DIALOG_114, DIALOG_128, DIALOG_117, DIALOG_150 };
-    // Koopa the Quick (BoB), Koopa the Quick (THI), Penguin Race, Fat Penguin Race (120 stars)
-    s16 dialogRaceSound[] = { DIALOG_005, DIALOG_009, DIALOG_055, DIALOG_164             };
-    // Red Switch, Green Switch, Blue Switch, 100 coins star, Bowser Red Coin Star
-    s16 dialogStarSound[] = { DIALOG_010, DIALOG_011, DIALOG_012, DIALOG_013, DIALOG_014 };
-    // King Bob-omb (Start), Whomp (Defeated), King Bob-omb (Defeated, missing in JP), Eyerock (Defeated), Wiggler (Defeated)
-    s16 dialogBossStop[]  = { DIALOG_017, DIALOG_115, DIALOG_116, DIALOG_118, DIALOG_152 };
     s16 i;
 
-    for (i = 0; i < (s16) ARRAY_COUNT(dialogBossStart); i++) {
-        if (dialogBossStart[i] == dialogID) {
+    for (i = 0; i < (s16) ARRAY_COUNT(sDialogBossStart); i++) {
+        if (sDialogBossStart[i] == dialogID) {
             seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
             play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(4, SEQ_EVENT_BOSS), 0);
             return;
         }
     }
 
-    for (i = 0; i < (s16) ARRAY_COUNT(dialogRaceSound); i++) {
-        if (dialogRaceSound[i] == dialogID && gDialogLineNum == 1) {
+    for (i = 0; i < (s16) ARRAY_COUNT(sDialogRaceSound); i++) {
+        if (sDialogRaceSound[i] == dialogID && gDialogLineNum == 1) {
             play_race_fanfare();
             return;
         }
     }
 
-    for (i = 0; i < (s16) ARRAY_COUNT(dialogStarSound); i++) {
-        if (dialogStarSound[i] == dialogID && gDialogLineNum == 1) {
+    for (i = 0; i < (s16) ARRAY_COUNT(sDialogStarSound); i++) {
+        if (sDialogStarSound[i] == dialogID && gDialogLineNum == 1) {
             play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
             return;
         }
     }
 
-    for (i = 0; i < (s16) ARRAY_COUNT(dialogBossStop); i++) {
-        if (dialogBossStop[i] == dialogID) {
+    for (i = 0; i < (s16) ARRAY_COUNT(sDialogBossStop); i++) {
+        if (sDialogBossStop[i] == dialogID) {
             seq_player_fade_out(SEQ_PLAYER_LEVEL, 1);
             return;
         }
@@ -1882,9 +1885,8 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
-        u32 clearX;
         name = segmented_to_virtual(courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)]);
-        clearX = get_string_width(name) + 79;
+        u32 clearX = get_string_length(name, main_font_lut, &main_font_utf8_lut) + COURSE_COMPLETE_COURSE_X + 16;
 
         // Print course name and clear text
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);

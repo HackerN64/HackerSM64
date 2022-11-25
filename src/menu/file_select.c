@@ -1329,7 +1329,7 @@ langarray_t textOption = LANGUAGE_TEXT(
     "OPTION",
     "OPTION",
     "OPTIONEN",
-    ""); // no japanese translation
+    "オプション");
 #endif
 
 /**
@@ -1905,6 +1905,12 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, secretStarsText);
 }
 
+langarray_t text4Dashes = LANGUAGE_TEXT(
+    "----",
+    "----",
+    "----",
+    "ーーーー");
+
 langarray_t textMarioFace = LANGUAGE_TEXT(
     "{}%s",
     "{}%s",
@@ -1941,7 +1947,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print coin highscore file
         coinScoreFile = (save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF;
         if (coinScoreFile == 0) {
-            print_menu_generic_string(x + 60, y, "----");
+            print_menu_generic_string(x + 60, y, LANGUAGE_ARRAY(text4Dashes));
         } else {
             string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioFace), coinScoreFile - 1);
             print_menu_generic_string(x + 60, y, str);
