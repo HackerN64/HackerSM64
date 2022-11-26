@@ -30,7 +30,6 @@ extern Gfx dl_menu_sound_button[];
 extern Gfx dl_menu_generic_button[];
 extern Gfx dl_menu_idle_hand[];
 extern Gfx dl_menu_grabbing_hand[];
-extern Texture *const menu_hud_lut[];
 extern struct DiacriticLUTEntry menu_font_diacritic_lut[];
 extern struct AsciiCharLUTEntry menu_font_lut[];
 extern struct Utf8LUT menu_font_utf8_lut;

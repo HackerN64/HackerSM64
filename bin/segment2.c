@@ -1436,6 +1436,117 @@ ALIGNED8 static const Texture texture_hud_char_arrow_down[] = {
 #include "textures/segment2/segment2.081D0.rgba16.inc.c"
 };
 
+// Moved from menu segment 7 to segment 2 to be unified with rest of HUD font
+#ifdef JAPANESE_CHARACTERS
+ALIGNED8 static const Texture texture_hud_char_katakana_fu[] = {
+#include "levels/menu/main_menu_seg7.073D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_small_a[] = {
+#include "levels/menu/main_menu_seg7.075D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_i[] = {
+#include "levels/menu/main_menu_seg7.077D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_ru[] = {
+#include "levels/menu/main_menu_seg7.079D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_se[] = {
+#include "levels/menu/main_menu_seg7.07BD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_re[] = {
+#include "levels/menu/main_menu_seg7.07DD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_ku[] = {
+#include "levels/menu/main_menu_seg7.07FD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_to[] = {
+#include "levels/menu/main_menu_seg7.081D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hiragana_wo[] = {
+#include "levels/menu/main_menu_seg7.083D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_ko[] = {
+#include "levels/menu/main_menu_seg7.085D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_kana_handakuten_pi[] = {
+#include "levels/menu/main_menu_seg7.087D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_long_vowel[] = {
+#include "levels/menu/main_menu_seg7.089D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hiragana_su[] = {
+#include "levels/menu/main_menu_seg7.08BD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hiragana_ru[] = {
+#include "levels/menu/main_menu_seg7.08DD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hiragana_ke[] = {
+#include "levels/menu/main_menu_seg7.08FD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_ma[] = {
+#include "levels/menu/main_menu_seg7.091D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_ri[] = {
+#include "levels/menu/main_menu_seg7.093D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_o[] = {
+#include "levels/menu/main_menu_seg7.095D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_su[] = {
+#include "levels/menu/main_menu_seg7.097D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_a[] = {
+#include "levels/menu/main_menu_seg7.099D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hiragana_mi[] = {
+#include "levels/menu/main_menu_seg7.09BD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hira_dakuten_do[] = {
+#include "levels/menu/main_menu_seg7.09DD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_hiragana_no[] = {
+#include "levels/menu/main_menu_seg7.09FD0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_sa[] = {
+#include "levels/menu/main_menu_seg7.0A3D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_u[] = {
+#include "levels/menu/main_menu_seg7.0A5D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_katakana_n[] = {
+#include "levels/menu/main_menu_seg7.0A7D0.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_kana_dakuten_do[] = {
+#include "levels/menu/main_menu_seg7.0A9D0.rgba16.inc.c"
+};
+#endif
+
 const struct AsciiCharLUTEntry main_hud_lut[] = {
     {NULL, 8}, // 32 " "
     {texture_hud_char_exclamation, 12}, // 33 "!"
@@ -1549,6 +1660,41 @@ const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
     {0x263A, 16, 0, texture_hud_char_mario_head}, // ☺
     {0x26BF, 16, 0, texture_hud_char_beta_key}, // ⚿
     {0x272A, 16, 0, texture_hud_char_coin}, // ✪
+
+#ifdef JAPANESE_CHARACTERS
+    {0x3000, 16, 0, NULL}, // "　" (ideographic space)
+
+    {0x3051, 16, 0, texture_hud_char_hiragana_ke}, // け
+    {0x3059, 16, 0, texture_hud_char_hiragana_su}, // す
+    {0x3069, 16, 0, texture_hud_char_hira_dakuten_do}, // ど
+    {0x306E, 16, 0, texture_hud_char_hiragana_no}, // の
+    {0x307F, 16, 0, texture_hud_char_hiragana_mi}, // み
+    {0x308B, 16, 0, texture_hud_char_hiragana_ru}, // る
+    {0x3092, 16, 0, texture_hud_char_hiragana_wo}, // を
+
+    {0x30A1, 16, 0, texture_hud_char_katakana_small_a}, // ァ
+    {0x30A2, 16, 0, texture_hud_char_katakana_a}, // ア
+    {0x30A4, 16, 0, texture_hud_char_katakana_i}, // イ
+    {0x30A6, 16, 0, texture_hud_char_katakana_u}, // ウ
+    {0x30AA, 16, 0, texture_hud_char_katakana_o}, // オ
+    {0x30AF, 16, 0, texture_hud_char_katakana_ku}, // ク
+    {0x30B3, 16, 0, texture_hud_char_katakana_ko}, // コ
+    {0x30B5, 16, 0, texture_hud_char_katakana_sa}, // サ
+    {0x30B9, 16, 0, texture_hud_char_katakana_su}, // ス
+    {0x30BB, 16, 0, texture_hud_char_katakana_se}, // セ
+    {0x30C8, 16, 0, texture_hud_char_katakana_to}, // ト
+    {0x30C9, 16, 0, texture_hud_char_kana_dakuten_do}, // ド
+    {0x30D4, 16, 0, texture_hud_char_kana_handakuten_pi}, // ピ
+    {0x30D5, 16, 0, texture_hud_char_katakana_fu}, // フ
+    {0x30DE, 16, 0, texture_hud_char_katakana_ma}, // マ
+    {0x30EA, 16, 0, texture_hud_char_katakana_ri}, // リ
+    {0x30EB, 16, 0, texture_hud_char_katakana_ru}, // ル
+    {0x30EC, 16, 0, texture_hud_char_katakana_re}, // レ
+    {0x30F3, 16, 0, texture_hud_char_katakana_n}, // ン
+
+    {0x30FC, 16, 0, texture_hud_char_long_vowel}, // ー
+    {0xFF1F, 16, 0, texture_hud_char_question}, // ？
+#endif
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_4byte_lut[] = {
