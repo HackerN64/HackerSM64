@@ -459,7 +459,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         height = get_surface_height_at_location(x, z, surf);
 
         // Exclude floors lower than the previous highest floor.
-        if (height < *pheight) continue;
+        if (height <= *pheight) continue;
 
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
         if (bufferY < height) continue;
@@ -734,7 +734,7 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
 
             // If the location is within a water box and it is a water box.
             // Water is less than 50 val only, while above is gas and such.
-            if (loX < x && x < hiX && loZ < z && z < hiZ && val < 50) {
+            if (loX <= x && x <= hiX && loZ <= z && z <= hiZ && val < 50) {
                 // Set the water height. Since this breaks, only return the first height.
                 waterLevel = *p;
                 break;
