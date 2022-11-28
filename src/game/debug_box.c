@@ -475,7 +475,7 @@ static void render_box(int index) {
 
     // Convert the matrix from floating-point to fixed-point
     mtxf_to_mtx(mtx, mtxFloat);
-    
+
     // Load the calculated matrix
     gSPMatrix(gDisplayListHead++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
 

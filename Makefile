@@ -119,20 +119,10 @@ else ifeq ($(GRUCODE),super3d) # Super3D
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
 endif
 
-LIBRARIES := nustd hvqm2 z goddard
-
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
 TEXT_ENGINE := none
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  LIBRARIES += s2d_engine
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
-endif
-# add more text engines here
-
-LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
-
+$(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
 
 #==============================================================================#
 # Optimization flags                                                           #
@@ -210,6 +200,12 @@ endif
 #   0 - does not
 UNF ?= 0
 $(eval $(call validate-option,UNF,0 1))
+
+# if `unf` is a target, make sure that UNF is set
+ifneq ($(filter unf,$(MAKECMDGOALS)),)
+	UNF = 1
+endif
+
 ifeq ($(UNF),1)
   DEFINES += UNF=1
   SRC_DIRS += src/usb
@@ -411,6 +407,18 @@ else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
 
+LIBRARIES := nustd hvqm2 z goddard
+
+# Text engine
+ifeq ($(TEXT_ENGINE), s2dex_text_engine)
+  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  LIBRARIES += s2d_engine
+  DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
+endif
+# add more text engines here
+
+LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
+
 export LD_LIBRARY_PATH=./tools
 
 AS        := $(CROSS)as
@@ -502,8 +510,13 @@ endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
 EMULATOR = mupen64plus
 EMU_FLAGS =
-LOADER = loader64
-LOADER_FLAGS = -vwf
+
+ifneq (,$(call find-command,wslview))
+    LOADER = ./$(TOOLS_DIR)/UNFLoader.exe
+else
+    LOADER = ./$(TOOLS_DIR)/UNFLoader
+endif
+
 SHA1SUM = sha1sum
 PRINT = printf
 
@@ -553,8 +566,18 @@ test-pj64: $(ROM)
 	wine ~/Desktop/new64/Project64.exe $<
 # someone2639
 
-load: $(ROM)
-	$(LOADER) $(LOADER_FLAGS) $<
+# download and extract most recent unfloader build if needed
+$(LOADER):
+ifeq (,$(wildcard $(LOADER)))
+	@$(PRINT) "Downloading latest UNFLoader...$(NO_COL)\n"
+	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(TOOLS_DIR)
+endif
+
+load: $(ROM) $(LOADER)
+	$(LOADER) -r $<
+
+unf: $(ROM) $(LOADER)
+	$(LOADER) -d -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
 
@@ -850,8 +873,16 @@ $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(Y
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 
 # Build ROM
+ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
+# run with -n / --dry-run
+$(ROM):
+	@$(PRINT) "$(BLUE)DRY RUNS ARE DISABLED$(NO_COL)\n"
+else
+# not running with -n / --dry-run
 $(ROM): $(ELF)
 	$(call print,Building ROM:,$<,$@)
+endif
+
 ifeq      ($(CONSOLE),n64)
 	$(V)$(OBJCOPY) --pad-to=0x101000 --gap-fill=0xFF $< $@ -O binary
 else ifeq ($(CONSOLE),bb)

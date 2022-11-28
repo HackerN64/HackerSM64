@@ -16,6 +16,8 @@
 #include "surface_collision.h"
 #include "game/puppylights.h"
 
+#include "game/print.h"
+
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
 #define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
@@ -858,6 +860,15 @@ void cur_obj_update(void) {
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
+    if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
+        if (o->oRoom != -1 && gMarioCurrentRoom != 0 && !is_room_loaded()) {
+            cur_obj_disable_rendering();
+            o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
+            gNumRoomedObjectsNotInMarioRoom++;
+            return;
+        }
+    }
+
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
         o->oDistanceToMario = dist_between_objects(o, gMarioObject);
@@ -983,6 +994,8 @@ void cur_obj_update(void) {
         s32 red   = (gCurrentObject->oLightColor >> 24) & 0xFF;
         s32 green = (gCurrentObject->oLightColor >> 16) & 0xFF;
         s32 blue  = (gCurrentObject->oLightColor >>  8) & 0xFF;
+
+        print_text(20,20,"hi");
         if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
         {
             emit_light(gCurrentObject->header.gfx.pos,

@@ -8,10 +8,10 @@ enum LLLOctagonalMeshInstructions {
 };
 
 struct LllOctagonalMeshAction {
-    s16   instruction;
-    s16   time;
-    Angle moveAngle;
-    s16   forwardVel;
+    s16 instruction;
+    s16 time;
+    s16 moveAngle;
+    s16 forwardVel;
 };
 
 // Path for big bullies platforms

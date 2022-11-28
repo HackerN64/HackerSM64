@@ -1621,8 +1621,6 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
         gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
         bzero(gCurLookAt, sizeof(LookAt));
-        gCurLookAt->l[1].l.col[1] = 0x80;
-        gCurLookAt->l[1].l.colc[1] = 0x80;
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, node->x * 4, node->y * 4, 511);

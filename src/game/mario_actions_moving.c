@@ -470,10 +470,11 @@ void update_walking_speed(struct MarioState *m) {
 
 s32 should_begin_sliding(struct MarioState *m) {
     if (m->input & INPUT_ABOVE_SLIDE) {
+        s32 superSlippery = (m->floor != NULL) && (m->floor->type == SURFACE_SUPER_SLIPPERY);
         s32 slideLevel = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
         s32 movingBackward = m->forwardVel <= -1.0f;
 
-        if (slideLevel || movingBackward || mario_facing_downhill(m, FALSE)) {
+        if (superSlippery || slideLevel || movingBackward || mario_facing_downhill(m, FALSE)) {
             return TRUE;
         }
     }
