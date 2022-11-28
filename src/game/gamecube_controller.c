@@ -471,8 +471,10 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
     return ret;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+u8 __osContAddressCrc(u16 addr);
+s32 __osPfsSelectBank(OSPfs *pfs, u8 bank);
+s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+
 static void _MakeMotorData(int channel, OSPifRam *mdata) {
     u8 *ptr = (u8 *)mdata->ramarray;
     __OSContRamReadFormat ramreadformat;
@@ -561,4 +563,3 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
     pfs->status = PFS_MOTOR_INITIALIZED;
     return 0;
 }
-#pragma GCC diagnostic pop
