@@ -995,7 +995,6 @@ void cur_obj_update(void) {
         s32 green = (gCurrentObject->oLightColor >> 16) & 0xFF;
         s32 blue  = (gCurrentObject->oLightColor >>  8) & 0xFF;
 
-        print_text(20,20,"hi");
         if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
         {
             emit_light(gCurrentObject->header.gfx.pos,
