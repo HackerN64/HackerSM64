@@ -39,7 +39,7 @@ u8 *gGfxPoolEnd;
 struct GfxPool *gGfxPool;
 
 // OS Controllers
-struct Controller gControllers[MAX_ALLOWED_CONTROLLERS];
+struct Controller gControllers[NUM_SUPPORTED_CONTROLLERS];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 u8 gControllerBits; // Which ports have a controller connected to them.
@@ -85,7 +85,7 @@ u16 sRenderingFramebuffer = 0;
 // Goddard Vblank Function Caller
 void (*gGoddardVblankCallback)(void) = NULL;
 
-// Defined controller slots
+// Defined controller slots. Don't use any higher than NUM_SUPPORTED_CONTROLLERS.
 struct Controller *gPlayer1Controller = &gControllers[0];
 struct Controller *gPlayer2Controller = &gControllers[1];
 struct Controller *gPlayer3Controller = &gControllers[2];
@@ -610,7 +610,7 @@ void read_controller_inputs(s32 threadID) {
     run_demo_inputs();
 #endif
 
-    for (i = 0; i < MAX_ALLOWED_CONTROLLERS; i++) {
+    for (i = 0; i < NUM_SUPPORTED_CONTROLLERS; i++) {
         struct Controller *controller = &gControllers[i];
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
@@ -670,7 +670,7 @@ void init_controllers(void) {
 #endif
 
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
-    for (cont = 0, port = 0, lastUsedPort = 0; port < MAXCONTROLLERS && cont < MAX_ALLOWED_CONTROLLERS; port++) {
+    for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
         // Is controller plugged in?
         if (gControllerBits & (1 << port)) {
             // The game allows you to have just 1 controller plugged

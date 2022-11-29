@@ -24,7 +24,7 @@
  *       so ports 1 and 2 get swapped if port 1 is an N64 controller and port 2 is a GC controller.
  *       This define should be at least 2 if you want to allow GC controllers on those flashcarts.
  */
-#define MAX_ALLOWED_CONTROLLERS 2
+#define NUM_SUPPORTED_CONTROLLERS 2
 
 /**
  * Informs supported emulators to default to gamecube controller inputs.

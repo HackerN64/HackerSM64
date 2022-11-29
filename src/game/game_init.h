@@ -30,7 +30,7 @@ enum ZBmodes {
     CLEAR_ZBUFFER = 1,
 };
 
-extern struct Controller gControllers[MAX_ALLOWED_CONTROLLERS];
+extern struct Controller gControllers[NUM_SUPPORTED_CONTROLLERS];
 extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
 extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 extern OSMesgQueue gGameVblankQueue;
