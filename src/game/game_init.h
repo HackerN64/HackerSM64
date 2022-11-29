@@ -30,9 +30,9 @@ enum ZBmodes {
     CLEAR_ZBUFFER = 1,
 };
 
-extern struct Controller gControllers[4];
-extern OSContStatus gControllerStatuses[4];
-extern OSContPadEx gControllerPads[4];
+extern struct Controller gControllers[MAX_ALLOWED_CONTROLLERS];
+extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
+extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 extern OSMesgQueue gGameVblankQueue;
 extern OSMesgQueue gGfxVblankQueue;
 extern OSMesg gGameMesgBuf[1];
@@ -47,7 +47,6 @@ extern Gfx *gDisplayListHead;
 extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
 extern u8 gControllerBits;
-extern s8 gGamecubeControllerPort;
 extern u8 gIsConsole;
 extern u8 gCacheEmulated;
 extern u8 gBorderHeight;

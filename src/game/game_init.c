@@ -39,11 +39,10 @@ u8 *gGfxPoolEnd;
 struct GfxPool *gGfxPool;
 
 // OS Controllers
-struct Controller gControllers[4];
-OSContStatus gControllerStatuses[4];
-OSContPadEx gControllerPads[4];
-u8 gControllerBits;
-s8 gGamecubeControllerPort = -1; // HackerSM64: This is set to -1 if there's no GC controller, 0 if there's one in the first port and 1 if there's one in the second port.
+struct Controller gControllers[MAX_ALLOWED_CONTROLLERS];
+OSContStatus gControllerStatuses[MAXCONTROLLERS];
+OSContPadEx gControllerPads[MAXCONTROLLERS];
+u8 gControllerBits; // Which ports have a controller connected to them.
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -611,12 +610,12 @@ void read_controller_inputs(s32 threadID) {
     run_demo_inputs();
 #endif
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < MAX_ALLOWED_CONTROLLERS; i++) {
         struct Controller *controller = &gControllers[i];
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && i == gGamecubeControllerPort) {
+            if (gIsConsole && (controller->statusData->type & CONT_GCN)) {
                 u32 oldButton = controller->controllerData->button;
                 u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
                 if (oldButton & Z_TRIG) {
@@ -651,7 +650,7 @@ void read_controller_inputs(s32 threadID) {
  * Initialize the controller structs to point at the OSCont information.
  */
 void init_controllers(void) {
-    s16 port, cont;
+    s16 port, cont, lastUsedPort;
 
     // Set controller 1 to point to the set of status/pads for input 1 and
     // init the controllers.
@@ -671,29 +670,33 @@ void init_controllers(void) {
 #endif
 
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
-    for (cont = 0, port = 0; port < 4 && cont < 4; port++) {
+    for (cont = 0, port = 0, lastUsedPort = 0; port < MAXCONTROLLERS && cont < MAX_ALLOWED_CONTROLLERS; port++) {
         // Is controller plugged in?
         if (gControllerBits & (1 << port)) {
             // The game allows you to have just 1 controller plugged
             // into any port in order to play the game. this was probably
             // so if any of the ports didn't work, you can have controllers
             // plugged into any of them and it will work.
-#if ENABLE_RUMBLE
-            gControllers[cont].port = port;
-#endif
             gControllers[cont].statusData = &gControllerStatuses[port];
-            gControllers[cont++].controllerData = &gControllerPads[port];
+            gControllers[cont].controllerData = &gControllerPads[port];
+            gControllers[cont].port = port;
+
+            lastUsedPort = port;
+
+            cont++;
         }
     }
-    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && (gIsConsole)) {
-        gGamecubeControllerPort = 1;
-        gPlayer1Controller = &gControllers[1];
-    } else {
-        if (__osControllerTypes[0] == CONT_TYPE_GCN) {
-            gGamecubeControllerPort = 0;
-        }
-        gPlayer1Controller = &gControllers[0];
+
+    // Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
+    // so if port 1 is an N64 controller and port 2 is a GC controller, swap them.
+    if (gIsConsole && __osControllerTypes[0] == CONT_TYPE_N64 && __osControllerTypes[1] == CONT_TYPE_GCN) {
+        struct Controller temp = gControllers[0];
+        gControllers[0] = gControllers[1];
+        gControllers[1] = temp;
     }
+
+    // Disable the ports after the last used one.
+    osContSetCh(lastUsedPort + 1);
 }
 
 // Game thread core

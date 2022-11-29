@@ -220,46 +220,45 @@ void osContGetReadDataEx(OSContPadEx* data) {
             s32 stick_x, stick_y, c_stick_x, c_stick_y;
             readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
             data->errno = CHNL_ERR(readformatgcn);
-            if (data->errno != 0) {
+            if (data->errno == 0) {
+                if (!gGamecubeControllerCenters[i].initialized) {
+                    gGamecubeControllerCenters[i].initialized = TRUE;
+                    gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
+                    gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
+                    gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
+                    gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
+                }
+
+                stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
+                stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
+                data->stick_x = stick_x;
+                data->stick_y = stick_y;
+                c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
+                c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
+                data->c_stick_x = c_stick_x;
+                data->c_stick_y = c_stick_y;
+                data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
+                data->l_trig = readformatgcn.l_trig;
+                data->r_trig = readformatgcn.r_trig;
+            } else {
                 gGamecubeControllerCenters[i].initialized = FALSE;
-                continue;
             }
 
-            if (!gGamecubeControllerCenters[i].initialized) {
-                gGamecubeControllerCenters[i].initialized = TRUE;
-                gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
-                gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
-                gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
-                gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
-            }
-
-            stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
-            stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
-            data->stick_x = stick_x;
-            data->stick_y = stick_y;
-            c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
-            c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
-            data->c_stick_x = c_stick_x;
-            data->c_stick_y = c_stick_y;
-            data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
-            data->l_trig = readformatgcn.l_trig;
-            data->r_trig = readformatgcn.r_trig;
             ptr += sizeof(__OSContGCNShortPollFormat);
         } else {
             readformat = *(__OSContReadFormat*)ptr;
             data->errno = CHNL_ERR(readformat);
-            
-            if (data->errno != 0) {
-                continue;
+
+            if (data->errno == 0) {
+                data->stick_x = readformat.stick_x;
+                data->stick_y = readformat.stick_y;
+                data->button = readformat.button;
+                data->c_stick_x = 0;
+                data->c_stick_y = 0;
+                data->l_trig = 0;
+                data->r_trig = 0;
             }
 
-            data->stick_x = readformat.stick_x;
-            data->stick_y = readformat.stick_y;
-            data->button = readformat.button;
-            data->c_stick_x = 0;
-            data->c_stick_y = 0;
-            data->l_trig = 0;
-            data->r_trig = 0;
             ptr += sizeof(__OSContReadFormat);
         }
     }
