@@ -28,7 +28,7 @@ Vec3s gVec3sOne  = {     1,     1,     1 };
 static u16 gRandomSeed16;
 
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
-u32 random_u16(void) {
+u16 random_u16(void) {
     if (gRandomSeed16 == 22026) {
         gRandomSeed16 = 0;
     }
