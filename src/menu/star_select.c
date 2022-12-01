@@ -300,7 +300,7 @@ void print_act_selector_strings(void) {
     // Print the numbers above each star.
     for (i = 1; i <= sVisibleStars; i++) {
         char str[4];
-        sprintf(str, "%d", i);
+        format_int_to_string(str, i);
         print_menu_generic_string_aligned(SCREEN_CENTER_X + (i*2 - sVisibleStars - 1) * 17, 38, str, TEXT_ALIGN_CENTER);
     }
 

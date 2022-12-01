@@ -31,24 +31,32 @@ s32 gDialogVariable;
 u16 gDialogTextAlpha;
 s8 gRedCoinsCollected;
 
+// The language to display the game's text in.
 u8 gInGameLanguage = LANGUAGE_ENGLISH;
 
 extern u8 dialog_table_en[];
 extern u8 course_name_table_en[];
 extern u8 act_name_table_en[];
 
+#ifdef LANG_FRENCH
 extern u8 dialog_table_fr[];
 extern u8 course_name_table_fr[];
 extern u8 act_name_table_fr[];
+#endif
 
+#ifdef LANG_GERMAN
 extern u8 dialog_table_de[];
 extern u8 course_name_table_de[];
 extern u8 act_name_table_de[];
+#endif
 
+#ifdef LANG_JAPANESE
 extern u8 dialog_table_jp[];
 extern u8 course_name_table_jp[];
 extern u8 act_name_table_jp[];
+#endif
 
+// The language table for the game's dialogs, level names and act names.
 void *languageTable[][3] = {
 #ifndef MULTILANG
     {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table},
@@ -199,8 +207,11 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 }
 
-// Determine the UTF8 character to render, given a string and the current position in the string.
-// Return the struct of the relevant character, and increment the position in the string by either 1 or 2.
+/**
+ * Determine which UTF-8 character to render, given a string and the current position in the string.
+ * Returns the table entry of the relevant character.
+ * Also increments the string position by the correct amount to reach the next character.
+ */
 struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos) {
     u32 codepoint;
     struct Utf8CharLUTEntry *usedLUT;
@@ -241,6 +252,9 @@ struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos
     return segmented_to_virtual(lut->missingChar);
 }
 
+/**
+ * Get the exact length of a string of any font in pixels, using the given ASCII and UTF-8 tables.
+ */
 s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
     s32 length = 0;
     s32 strPos = 0;
@@ -259,6 +273,38 @@ s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8
     return length;
 }
 
+/**
+ * Takes a value and writes the string representation of the number into a buffer.
+ * If the language is set to Japanese, the number is written in full-width digits.
+ */
+void format_int_to_string(char *buf, s32 value) {
+#ifdef LANG_JAPANESE
+    if (gInGameLanguage == LANGUAGE_JAPANESE) {
+        u8 digits[10];
+        s32 numDigits = 0;
+        // Copy each digit of the number into an array, in reverse order.
+        do {
+            digits[numDigits++] = value % 10;
+            value /= 10;
+        } while (value != 0);
+        for (s32 i = 0; i < numDigits; i++) {
+            // The UTF-8 encoding of "０" is 0xEF, 0xBC, 0x90
+            buf[i * 3]     = 0xEF;
+            buf[i * 3 + 1] = 0xBC;
+            buf[i * 3 + 2] = 0x90 + digits[numDigits - i - 1];
+        }
+        buf[numDigits * 3] = '\0';
+        return;
+    }
+#endif
+
+    sprintf(buf, "%d", value);
+}
+
+/**
+ * Unpacks a packed I1 character texture into a usable IA8 texture when TEXT_FLAG_PACKED is used.
+ * By default this is used for all the Japanese characters.
+ */
 static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
     s32 inPos;
     u16 bitMask;
@@ -289,21 +335,25 @@ static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
     return out;
 }
 
+/**
+ * Renders a single ASCII character in the generic font.
+ */
 static u32 render_generic_ascii_char(char c) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
     const Texture *texture = fontLUT[c - ' '].texture;
 
-    if (texture == NULL) {
-        return 0;
+    if (texture != NULL) {
+        gDPPipeSync(gDisplayListHead++);
+        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
     }
-
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 
     return fontLUT[c - ' '].kerning;
 }
 
+/**
+ * Renders a single UTF-8 character in the generic font.
+ */
 static u32 render_generic_unicode_char(char *str, s32 *strPos) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
 
@@ -377,7 +427,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     //u8 customColor = 0;
     //u8 diffTmp     = 0;
     u8 kerning = 0;
-    u8 xMatrix = 0;
+    u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
@@ -428,26 +478,46 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 }
                 create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * DIALOG_LINE_HEIGHT), 0.0f);
                 lineNum++;
-                xMatrix = 0;
+                queuedSpaces = 0;
                 break;
             case '/':
-                xMatrix += 2;
+                queuedSpaces += 2;
                 break;
             case ' ':
-                xMatrix += 1;
+                queuedSpaces++;
                 break;
-            // case '%':
-            // Todo: Reimplement star door amount stuff
-            default:
-                if (xMatrix != 0) {
-                    create_dl_translation_matrix(MENU_MTX_NOPUSH, xMatrix * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
-                    xMatrix = 0;
+            // %d: Display value of dialog variable
+            case '%':
+                if (str[strPos + 1] == 'd') {
+                    char dialogVarText[32];
+                    strPos++;
+
+                    // Resolve queued spaces
+                    if (queuedSpaces != 0) {
+                        create_dl_translation_matrix(MENU_MTX_NOPUSH, queuedSpaces * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
+                        queuedSpaces = 0;
+                    }
+
+                    format_int_to_string(dialogVarText, gDialogVariable);
+                    render_main_font_text(0, 0, dialogVarText, -1);
+                    kerning = get_string_length(dialogVarText, main_font_lut, &main_font_utf8_lut);
+                    create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
+                    break;
                 }
+                // Intentional fallthrough
+            default:
+                // Resolve queued spaces
+                if (queuedSpaces != 0) {
+                    create_dl_translation_matrix(MENU_MTX_NOPUSH, queuedSpaces * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
+                    queuedSpaces = 0;
+                }
+
                 if (!(str[strPos] & 0x80)) {
                     kerning = render_generic_ascii_char(str[strPos]);
                 } else {
                     kerning = render_generic_unicode_char(str, &strPos);
                 }
+
                 create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
                 break;
         }
@@ -477,74 +547,80 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     u32 curY = y;
     u32 renderX, renderY;
     struct Utf8CharLUTEntry *utf8Entry;
+    const Texture *texture;
     u32 kerning;
 
-    while (str[strPos] != 0x00) {
-        switch (str[strPos]) {
-            case ' ':
-                curX += SPACE_KERNING(hudLUT);
-                break;
-            default:
-                gDPPipeSync(gDisplayListHead++);
+    while (str[strPos] != '\0') {
+        gDPPipeSync(gDisplayListHead++);
 
-                if (!(str[strPos] & 0x80)) {
-                    const Texture *tex = hudLUT[str[strPos] - ' '].texture;
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, tex);
-                    kerning = hudLUT[str[strPos] - ' '].kerning;
-                } else {
-                    utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
-                    if ((utf8Entry->flags & TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
-                        renderX = curX;
-                        renderY = curY - 4;
-                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
-                        gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
-                        gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
-                                    (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                        gDPPipeSync(gDisplayListHead++);
-                    }
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
-                    kerning = utf8Entry->kerning;
-                }
-
+        if (!(str[strPos] & 0x80)) {
+            texture = hudLUT[str[strPos] - ' '].texture;
+            kerning = hudLUT[str[strPos] - ' '].kerning;
+        } else {
+            utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
+            if ((utf8Entry->flags & TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
                 renderX = curX;
-                renderY = curY;
-                if (str[strPos] == '\'') {
-                    renderX -= 2;
-                    renderY -= 7;
-                } else if (str[strPos] == '"') {
-                    renderX += 1;
-                    renderY -= 7;
-                } else if (str[strPos] == ',') {
-                    renderX -= 4;
-                    renderY += 7;
-                } else if (str[strPos] == '.') {
-                    renderX -= 2;
-                    renderY += 1;
-                }
-
+                renderY = curY - 4;
+                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
                 gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
                 gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
-                                    (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-
-                curX += kerning;
+                            (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gDPPipeSync(gDisplayListHead++);
+            }
+            texture = utf8Entry->texture;
+            kerning = utf8Entry->kerning;
         }
+
+        if (texture != NULL) {
+            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+
+            renderX = curX;
+            renderY = curY;
+            if (str[strPos] == '\'') {
+                renderX -= 2;
+                renderY -= 7;
+            } else if (str[strPos] == '"') {
+                renderX += 1;
+                renderY -= 7;
+            } else if (str[strPos] == ',') {
+                renderX -= 4;
+                renderY += 7;
+            } else if (str[strPos] == '.') {
+                renderX -= 2;
+                renderY += 1;
+            }
+
+            gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
+            gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
+                                (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+        }
+
+        curX += kerning;
         strPos++;
     }
 }
 
+/**
+ * Renders a single ASCII character in the menu font.
+ */
 static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
+    const Texture *texture = fontLUT[c - ' '].texture;
 
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[c - ' '].texture);
-
-    gDPLoadSync(gDisplayListHead++);
-    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-    gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
-                        (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+    if (texture != NULL) {
+        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, texture);
+        gDPLoadSync(gDisplayListHead++);
+        gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
+        gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                            (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+    }
 
     return fontLUT[c - ' '].kerning;
 }
 
+/**
+ * Renders a single UTF-8 character in the menu font.
+ */
 static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, strPos);
 
@@ -557,7 +633,6 @@ static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) 
     }
 
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, utf8Entry->texture);
-    
     gDPLoadSync(gDisplayListHead++);
     gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
     gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
@@ -575,22 +650,15 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
     u32 curX = x;
     u32 curY = y;
     u32 kerning;
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
 
     while (str[strPos] != '\0') {
-        switch (str[strPos]) {
-            case ' ':
-                curX += SPACE_KERNING(fontLUT);
-                break;
-            default:
-                if (str[strPos] & 0x80) {
-                    kerning = render_menu_unicode_char(str, &strPos, curX, curY);
-                } else {
-                    kerning = render_menu_ascii_char(str[strPos], curX, curY);
-                }
-
-                curX += kerning;
+        if (str[strPos] & 0x80) {
+            kerning = render_menu_unicode_char(str, &strPos, curX, curY);
+        } else {
+            kerning = render_menu_ascii_char(str[strPos], curX, curY);
         }
+
+        curX += kerning;
         strPos++;
     }
 }
@@ -645,20 +713,16 @@ void print_credits_string(s16 x, s16 y, const char *str) {
     gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
 
     while (str[strPos] != '\0') {
-        switch (str[strPos]) {
-            case ' ':
-                curX += SPACE_KERNING(main_credits_font_lut);
-                break;
-            default:
-                gDPPipeSync(gDisplayListHead++);
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' '].texture);
-                gDPLoadSync(gDisplayListHead++);
-                gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
-                                    (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                curX += fontLUT[str[strPos] - ' '].kerning;
-                break;
+        if (fontLUT[str[strPos] - ' '].texture != NULL) {
+            gDPPipeSync(gDisplayListHead++);
+            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' '].texture);
+            gDPLoadSync(gDisplayListHead++);
+            gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
+            gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                                (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
         }
+
+        curX += fontLUT[str[strPos] - ' '].kerning;
         strPos++;
     }
 }
@@ -801,32 +865,6 @@ void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
 
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-}
-
-void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
-    s8 tensDigit = gDialogVariable / 10;
-    s8 onesDigit = gDialogVariable - (tensDigit * 10); // remainder
-    u8 kerning;
-
-    if (tensDigit != 0) {
-        if (*xMatrix != 1) {
-            create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(5 * *xMatrix), 0, 0);
-        }
-
-        kerning = render_generic_ascii_char(tensDigit);
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
-        *xMatrix = 1;
-        (*linePos)++;
-    }
-
-    if (*xMatrix != 1) {
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)5 * (*xMatrix - 1), 0, 0);
-    }
-
-    kerning = render_generic_ascii_char(onesDigit);
-    create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
-    (*linePos)++;
-    *xMatrix = 1;
 }
 
 u32 ensure_nonnegative(s16 value) {
@@ -1353,16 +1391,27 @@ void render_pause_red_coins(void) {
     }
 }
 
-/// By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
+langarray_t textAspectRatio43 = LANGUAGE_TEXT(
+    "ASPECT RATIO: 4:3\nPRESS L TO SWITCH",
+    "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR ÉCHANGER",
+    "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
+    "アスペクトひ: ４:３\nＬをおしてきりかえる");
 
+langarray_t textAspectRatio169 = LANGUAGE_TEXT(
+    "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
+    "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR ÉCHANGER",
+    "SEITENVERHÄLTNIS: 16:9\nDRÜCKE L ZUM WECHSELN",
+    "アスペクトひ: １６:９\nＬをおしてきりかえる");
+
+/// By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
 #if defined(WIDE) && !defined(PUPPYCAM)
 void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     if (!gConfig.widescreen) {
-        print_generic_string(10, 20, "ASPECT RATIO: 4:3\nPRESS L TO SWITCH");
+        print_generic_string(10, 20, LANGUAGE_ARRAY(textAspectRatio43));
     } else {
-        print_generic_string(10, 20, "ASPECT RATIO: 16:9\nPRESS L TO SWITCH");
+        print_generic_string(10, 20, LANGUAGE_ARRAY(textAspectRatio169));
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
@@ -1373,10 +1422,10 @@ void render_widescreen_setting(void) {
 #endif
 
 langarray_t textCourseX = LANGUAGE_TEXT(
-    "COURSE %d",
-    "NIVEAU %d",
-    "KURS %d",
-    "コース%d");
+    "COURSE %s",
+    "NIVEAU %s",
+    "KURS %s",
+    "コース%s");
 
 langarray_t textMyScore = LANGUAGE_TEXT(
     "MY SCORE",
@@ -1416,7 +1465,9 @@ void render_pause_my_score_coins(void) {
     char *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
-        sprintf(str, LANGUAGE_ARRAY(textCourseX), gCurrCourseNum);
+        char courseNumText[8];
+        format_int_to_string(courseNumText, gCurrCourseNum);
+        sprintf(str, LANGUAGE_ARRAY(textCourseX), courseNumText);
         print_generic_string_aligned(PAUSE_MENU_LEFT_X, PAUSE_MENU_COURSE_Y, str, TEXT_ALIGN_RIGHT);
 
         char *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
@@ -1624,6 +1675,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     void *courseName;
 
     char str[8];
+    char countText[10];
     s16 prevCourseIndex = gDialogLineNum;
 
 
@@ -1665,18 +1717,20 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
         render_pause_castle_course_stars(x - 65, y, gCurrSaveFileNum - 1, gDialogLineNum);
 
-        sprintf(str, "✪× %d", save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
+        format_int_to_string(countText, save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
+        sprintf(str, "✪× %s", countText);
         print_generic_string(x - 22, y, str);
 
-        sprintf(str, "%d", gDialogLineNum + 1);
+        format_int_to_string(str, gDialogLineNum + 1);
         print_generic_string_aligned(x - 55, y + 35, str, TEXT_ALIGN_RIGHT);
     } else { // Castle secret stars
         courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
         print_generic_string_aligned(x, y + 35, courseName, TEXT_ALIGN_CENTER);
 
-        sprintf(str, "★× %d", save_file_get_total_star_count(gCurrSaveFileNum - 1,
+        format_int_to_string(countText, save_file_get_total_star_count(gCurrSaveFileNum - 1,
                                                              COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                              COURSE_NUM_TO_INDEX(COURSE_MAX)));
+        sprintf(str, "★× %s", countText);
         print_generic_string_aligned(x, y + 18, str, TEXT_ALIGN_CENTER);
     }
 
@@ -1874,6 +1928,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     char *name;
 
     char str[20];
+    char courseNumText[8];
 
     void **actNameTbl    = segmented_to_virtual(languageTable[gInGameLanguage][2]);
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
@@ -1891,7 +1946,8 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         // Print course number
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-        sprintf(str, LANGUAGE_ARRAY(textCourseX), gLastCompletedCourseNum);
+        format_int_to_string(courseNumText, gLastCompletedCourseNum);
+        sprintf(str, LANGUAGE_ARRAY(textCourseX), courseNumText);
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(COURSE_COMPLETE_COURSE_X + 2,  COURSE_COMPLETE_COURSE_Y - 2, str);
 

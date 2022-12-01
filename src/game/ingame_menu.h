@@ -44,26 +44,26 @@ struct AsciiCharLUTEntry {
 #define SPACE_KERNING(lut) (((struct AsciiCharLUTEntry *)(lut))[0].kerning)
 
 struct Utf8CharLUTEntry {
-    const u32 codepoint;
-    const s8 kerning;
-    const u16 flags; // used for diacritics and packed textures
-    const Texture *texture;
+    u32 codepoint;
+    s8 kerning;
+    u16 flags; // used for diacritics and packed textures
+    Texture *texture;
 };
 
 struct Utf8LUT {
-    const struct Utf8CharLUTEntry *lut2Bytes;
-    const struct Utf8CharLUTEntry *lut3Bytes;
-    const struct Utf8CharLUTEntry *lut4Bytes;
-    const u16 length2Bytes;
-    const u16 length3Bytes;
-    const u16 length4Bytes;
-    const struct Utf8CharLUTEntry *missingChar;
+    struct Utf8CharLUTEntry *lut2Bytes;
+    struct Utf8CharLUTEntry *lut3Bytes;
+    struct Utf8CharLUTEntry *lut4Bytes;
+    u16 length2Bytes;
+    u16 length3Bytes;
+    u16 length4Bytes;
+    struct Utf8CharLUTEntry *missingChar;
 };
 
 struct DiacriticLUTEntry {
-    const s8 xOffset;
-    const s8 yOffset;
-    const char *str;
+    s8 xOffset;
+    s8 yOffset;
+    char *str;
 };
 
 enum TextDiacriticMarks {
@@ -147,6 +147,7 @@ void create_dl_ortho_matrix(void);
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 
 s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT);
+void format_int_to_string(char *buf, s32 value);
 void print_generic_string(s16 x, s16 y, char *str);
 void print_hud_lut_string(s16 x, s16 y, char *str);
 void print_menu_generic_string(s16 x, s16 y, char *str);

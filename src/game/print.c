@@ -1,5 +1,4 @@
 #include <ultra64.h>
-#include <string.h>
 
 #include "config.h"
 #include "game_init.h"
@@ -13,10 +12,13 @@
  * appears when printing things such as "PRESS START".
  */
 
+// The maximum number of characters in a single text label.
+#define MAX_TEXT_LABEL_SIZE 50
+
 struct TextLabel {
     u32 x;
     u32 y;
-    char buffer[50];
+    char buffer[MAX_TEXT_LABEL_SIZE];
 };
 
 /**
@@ -31,7 +33,7 @@ s16 sTextLabelsCount = 0;
  * at the given X & Y coordinates.
  */
 void print_text_fmt_int(s32 x, s32 y, char *str, s32 n) {
-    char buffer[50];
+    char buffer[MAX_TEXT_LABEL_SIZE];
     sprintf(buffer, str, n);
     print_text(x, y, buffer);
 }
@@ -49,7 +51,12 @@ void print_text(s32 x, s32 y, char *str) {
     sTextLabels[sTextLabelsCount]->x = x;
     sTextLabels[sTextLabelsCount]->y = y;
 
-    strcpy(sTextLabels[sTextLabelsCount]->buffer, str);
+    u32 i = 0;
+    while (str[i] != '\0') {
+        sTextLabels[sTextLabelsCount]->buffer[i] = str[i];
+        i++;
+    }
+    sTextLabels[sTextLabelsCount]->buffer[i] = '\0';
 
     sTextLabelsCount++;
 }
@@ -81,7 +88,7 @@ void render_text_labels(void) {
     }
 
     guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
-    gSPPerspNormalize((Gfx *) (gDisplayListHead++), 0xFFFF);
+    gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
 

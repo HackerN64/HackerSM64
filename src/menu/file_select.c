@@ -1169,12 +1169,26 @@ void print_menu_cursor(void) {
 }
 
 /**
- * Takes a number 0-3 and a string containing %s, and formats the string to contain the corresponding file letter A-D
+ * Takes a number between 0 and 3 and formats the corresponding file letter A to D into a buffer.
+ * If the language is set to Japanese, the letter is written in full-width digits.
  */
-void string_insert_file_letter(char *dst, char *src, u8 index) {
-    char *fileLetter = "A";
-    fileLetter[0] = 'A' + index;
-    sprintf(dst, src, fileLetter);
+void string_format_file_letter(char *buf, char *str, s32 fileIndex) {
+    char letterBuf[4];
+#ifdef LANG_JAPANESE
+    if (gInGameLanguage == LANGUAGE_JAPANESE) {
+        // The UTF-8 encoding of "Ａ" is 0xEF, 0xBC, 0xA1
+        letterBuf[0] = 0xEF;
+        letterBuf[1] = 0xBC;
+        letterBuf[2] = 0xA1 + fileIndex;
+        letterBuf[3] = '\0';
+        sprintf(buf, str, letterBuf);
+        return;
+    }
+#endif
+
+    letterBuf[0] = 'A' + fileIndex;
+    letterBuf[1] = '\0';
+    sprintf(buf, str, letterBuf);
 }
 
 /**
@@ -1720,7 +1734,7 @@ void erase_menu_display_message(s8 messageID) {
             print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_MARIO_ERASED:
-            string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioXJustErased), sSelectedFileIndex);
+            string_format_file_letter(str, LANGUAGE_ARRAY(textMarioXJustErased), sSelectedFileIndex);
             print_generic_string_fade(SCREEN_CENTER_X, 190, str, TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
@@ -1811,8 +1825,8 @@ void print_erase_menu_strings(void) {
 
 langarray_t textSoundSelect = LANGUAGE_TEXT(
     "SOUND SELECT",
-    "SON",
-    "SOUND",
+    "SELECTION SON",
+    "WÄHLE SOUND",
     "サウンドセレクト");
 
 #ifdef MULTILANG
@@ -1820,7 +1834,7 @@ langarray_t textLanguageSelect = LANGUAGE_TEXT(
     "LANGUAGE SELECT",
     "SELECTION LANGUE",
     "WÄHLE SPRACHE",
-    ""); // no japanese translation
+    "ランゲージセレクト");
 
 char *textLanguage[] = {
     "ENGLISH",
@@ -1910,10 +1924,12 @@ void print_sound_mode_menu_strings(void) {
  */
 void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     char secretStarsText[20];
+    char secretStarsNum[8];
     // Print number of castle secret stars
-    sprintf(secretStarsText, "★× %d", save_file_get_total_star_count(fileIndex,
+    format_int_to_string(secretStarsNum, save_file_get_total_star_count(fileIndex,
                                                                   COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                                   COURSE_NUM_TO_INDEX(COURSE_MAX)));
+    sprintf(secretStarsText, "★× %s", secretStarsNum);
     print_menu_generic_string(x, y, secretStarsText);
 }
 
@@ -1941,7 +1957,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print "[coin] x"
         print_menu_generic_string(x + 25, y, "✪×");
         // Print coin score
-        sprintf(str, "%d", save_file_get_course_coin_score(fileIndex, courseIndex));
+        format_int_to_string(str, save_file_get_course_coin_score(fileIndex, courseIndex));
         print_menu_generic_string(x + 41, y, str);
         // If collected, print 100 coin star
         if (stars & STAR_FLAG_ACT_100_COINS) {
@@ -1954,14 +1970,14 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print "[coin] x"
         print_menu_generic_string(x + 18, y, "✪×");
         // Print coin highscore
-        sprintf(str, "%d", (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
+        format_int_to_string(str, (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
         print_menu_generic_string(x + 34, y, str);
         // Print coin highscore file
         coinScoreFile = (save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF;
         if (coinScoreFile == 0) {
             print_menu_generic_string(x + 60, y, LANGUAGE_ARRAY(text4Dashes));
         } else {
-            string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioFace), coinScoreFile - 1);
+            string_format_file_letter(str, LANGUAGE_ARRAY(textMarioFace), coinScoreFile - 1);
             print_menu_generic_string(x + 60, y, str);
         }
     }
@@ -2011,6 +2027,7 @@ extern langarray_t textMyScore;
 void print_save_file_scores(s8 fileIndex) {
     u32 i;
     char str[20];
+    char fileLetter[4];
 
 #ifndef MULTILANG
     const char **levelNameTable = segmented_to_virtual(seg2_course_name_table);
@@ -2022,7 +2039,9 @@ void print_save_file_scores(s8 fileIndex) {
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    string_insert_file_letter(str, LANGUAGE_ARRAY(textScoreMenuMarioX), fileIndex);
+    fileLetter[0] = 'A' + fileIndex;
+    fileLetter[1] = '\0';
+    sprintf(str, LANGUAGE_ARRAY(textScoreMenuMarioX), fileLetter);
     print_hud_lut_string(25, 15, str);
 
     // Print save file star count at top
@@ -2034,7 +2053,7 @@ void print_save_file_scores(s8 fileIndex) {
 
     for ((i = 0); (i < COURSE_STAGES_MAX); (i++)) {
         s32 lineY = 35 + (12 * i);
-        sprintf(str, "%d", i + 1);
+        format_int_to_string(str, i + 1);
         print_menu_generic_string(41, lineY, segmented_to_virtual(levelNameTable[i]));
         print_menu_generic_string_aligned(37, lineY, str, TEXT_ALIGN_RIGHT);
         print_score_file_star_score(       fileIndex, i, 171, lineY);

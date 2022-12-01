@@ -1545,6 +1545,18 @@ ALIGNED8 static const Texture texture_hud_char_katakana_n[] = {
 ALIGNED8 static const Texture texture_hud_char_kana_dakuten_do[] = {
 #include "levels/menu/main_menu_seg7.0A9D0.rgba16.inc.c"
 };
+
+ALIGNED8 static const Texture texture_hud_char_katakana_ra[] = {
+#include "levels/menu/main_menu_seg7_katakana_ra.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_kana_dakuten_ge[] = {
+#include "levels/menu/main_menu_seg7_kana_dakuten_ge.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture texture_hud_char_kana_dakuten_ji[] = {
+#include "levels/menu/main_menu_seg7_kana_dakuten_ji.rgba16.inc.c"
+};
 #endif
 
 const struct AsciiCharLUTEntry main_hud_lut[] = {
@@ -1678,8 +1690,10 @@ const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
     {0x30A6, 16, 0, texture_hud_char_katakana_u}, // ウ
     {0x30AA, 16, 0, texture_hud_char_katakana_o}, // オ
     {0x30AF, 16, 0, texture_hud_char_katakana_ku}, // ク
+    {0x30B2, 16, 0, texture_hud_char_kana_dakuten_ge}, // ゲ
     {0x30B3, 16, 0, texture_hud_char_katakana_ko}, // コ
     {0x30B5, 16, 0, texture_hud_char_katakana_sa}, // サ
+    {0x30B8, 16, 0, texture_hud_char_kana_dakuten_ji}, // ジ
     {0x30B9, 16, 0, texture_hud_char_katakana_su}, // ス
     {0x30BB, 16, 0, texture_hud_char_katakana_se}, // セ
     {0x30C8, 16, 0, texture_hud_char_katakana_to}, // ト
@@ -1687,6 +1701,7 @@ const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
     {0x30D4, 16, 0, texture_hud_char_kana_handakuten_pi}, // ピ
     {0x30D5, 16, 0, texture_hud_char_katakana_fu}, // フ
     {0x30DE, 16, 0, texture_hud_char_katakana_ma}, // マ
+    {0x30E9, 16, 0, texture_hud_char_katakana_ra}, // ラ
     {0x30EA, 16, 0, texture_hud_char_katakana_ri}, // リ
     {0x30EB, 16, 0, texture_hud_char_katakana_ru}, // ル
     {0x30EC, 16, 0, texture_hud_char_katakana_re}, // レ
