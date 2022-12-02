@@ -106,6 +106,7 @@ f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
 f32 gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE;
 s16 gDialogScrollOffsetY = 0;
 s8 gDialogBoxType = DIALOG_TYPE_ROTATE;
+u8 sGenericFontLineHeight = 0;
 s16 gDialogID = DIALOG_NONE;
 s16 gLastDialogPageStrPos = 0;
 s16 gDialogTextPos = 0;
@@ -282,6 +283,12 @@ void format_int_to_string(char *buf, s32 value) {
     if (gInGameLanguage == LANGUAGE_JAPANESE) {
         u8 digits[10];
         s32 numDigits = 0;
+        // Minus sign
+        if (value < 0) {
+            buf[0] = '-';
+            buf++;
+            value = -value;
+        }
         // Copy each digit of the number into an array, in reverse order.
         do {
             digits[numDigits++] = value % 10;
@@ -374,7 +381,7 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
 
     if (utf8Entry->flags & TEXT_DIACRITIC_MASK) {
         struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&main_font_diacritic_lut);
-        struct DiacriticLUTEntry *diacritic = &diacriticLUT[(utf8Entry->flags & TEXT_DIACRITIC_MASK) - 1];
+        struct DiacriticLUTEntry *diacritic = &diacriticLUT[utf8Entry->flags & TEXT_DIACRITIC_MASK];
         
         if (diacritic->xOffset | diacritic->yOffset) {
             create_dl_translation_matrix(MENU_MTX_PUSH, diacritic->xOffset, diacritic->yOffset, 0.0f);
@@ -476,7 +483,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 if (lineNum == maxLines) {
                     return strPos + 1;
                 }
-                create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * DIALOG_LINE_HEIGHT), 0.0f);
+                create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * sGenericFontLineHeight), 0.0f);
                 lineNum++;
                 queuedSpaces = 0;
                 break;
@@ -534,6 +541,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
  * Prints a generic white string.
  */
 void print_generic_string(s16 x, s16 y, char *str) {
+    sGenericFontLineHeight = DIALOG_LINE_HEIGHT_EN;
     render_main_font_text(x, y, str, -1);
 }
 
@@ -626,7 +634,7 @@ static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) 
 
     if (utf8Entry->flags & TEXT_DIACRITIC_MASK) {
         struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&menu_font_diacritic_lut);
-        struct DiacriticLUTEntry *diacritic = &diacriticLUT[(utf8Entry->flags & TEXT_DIACRITIC_MASK) - 1];
+        struct DiacriticLUTEntry *diacritic = &diacriticLUT[utf8Entry->flags & TEXT_DIACRITIC_MASK];
 
         s32 fakeStrPos = 0;
         render_menu_unicode_char(segmented_to_virtual(diacritic->str), &fakeStrPos, curX + diacritic->xOffset, curY - diacritic->yOffset);
@@ -897,6 +905,7 @@ static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
             break;
     }
 
+    sGenericFontLineHeight = DIALOG_LINE_HEIGHT;
     printResult = render_main_font_text(0, yPos, str + gDialogTextPos, totalLines);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -1393,15 +1402,15 @@ void render_pause_red_coins(void) {
 
 langarray_t textAspectRatio43 = LANGUAGE_TEXT(
     "ASPECT RATIO: 4:3\nPRESS L TO SWITCH",
-    "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR ÉCHANGER",
+    "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
-    "アスペクトひ: ４:３\nＬをおしてきりかえる");
+    "アスペクトひ: ４:３\nＬボタンできりかえ");
 
 langarray_t textAspectRatio169 = LANGUAGE_TEXT(
     "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
-    "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR ÉCHANGER",
+    "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 16:9\nDRÜCKE L ZUM WECHSELN",
-    "アスペクトひ: １６:９\nＬをおしてきりかえる");
+    "アスペクトひ: １６:９\nＬボタンできりかえ");
 
 /// By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
 #if defined(WIDE) && !defined(PUPPYCAM)

@@ -1328,35 +1328,45 @@ ALIGNED8 static const Texture texture_menu_font_char_ampersand[] = {
 #include "levels/menu/main_menu_seg7_us.0B800.ia8.inc.c"
 };
 
-// 0x0700B880
-ALIGNED8 static const Texture texture_menu_font_char_cedilla[] = {
-#include "levels/menu/main_menu_seg7_cedilla.ia8.inc.c"
-};
-
-// 0x0700B8C0
 ALIGNED8 static const Texture texture_menu_font_char_colon[] = {
-#include "levels/menu/main_menu_seg7_colon.ia8.inc.c"
+#include "levels/menu/main_menu_seg7.colon.ia8.inc.c"
 };
 
-ALIGNED8 const u8 texture_menu_font_char_diacritic_umlaut[] = {
-#include "levels/menu/main_menu_seg7_umlaut.ia8.inc.c"
+ALIGNED8 static const u8 texture_menu_font_char_diacritic_grave[] = {
+#include "levels/menu/main_menu_seg7.grave.ia8.inc.c"
+};
+
+ALIGNED8 static const u8 texture_menu_font_char_diacritic_acute[] = {
+#include "levels/menu/main_menu_seg7.acute.ia8.inc.c"
+};
+
+ALIGNED8 static const u8 texture_menu_font_char_diacritic_circumflex[] = {
+#include "levels/menu/main_menu_seg7.circumflex.ia8.inc.c"
+};
+
+ALIGNED8 static const u8 texture_menu_font_char_diacritic_tilde[] = {
+#include "levels/menu/main_menu_seg7.tilde_diacritic.ia8.inc.c"
+};
+
+ALIGNED8 static const u8 texture_menu_font_char_diacritic_umlaut[] = {
+#include "levels/menu/main_menu_seg7.umlaut.ia8.inc.c"
+};
+
+ALIGNED8 static const Texture texture_menu_font_char_diacritic_cedilla[] = {
+#include "levels/menu/main_menu_seg7.cedilla.ia8.inc.c"
 };
 
 // ASCII todo: add rest of diacritics here
 const struct DiacriticLUTEntry menu_font_diacritic_lut[] = {
-    {0, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE
-    {0, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE
-    {0, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE
-    {0, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE
-    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX
-    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE
-    {0, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE
-    {0, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE
-    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT
-    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE
+    [TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE] = {-1,  5, "ˆ"},
+    [TEXT_DIACRITIC_ACUTE_UPPERCASE]      = { 0,  5, "ˊ"},
+    [TEXT_DIACRITIC_GRAVE_UPPERCASE]      = { 0,  5, "ˋ"},
+    [TEXT_DIACRITIC_TILDE_UPPERCASE]      = { 0,  5, "˜"},
+    [TEXT_DIACRITIC_UMLAUT_UPPERCASE]     = { 0,  4, "¨"},
+    [TEXT_DIACRITIC_CEDILLA]              = { 0, -2, "¸"},
 #ifdef JAPANESE_CHARACTERS
-    {6, 7, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN
-    {6, 7, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN
+    [TEXT_DIACRITIC_DAKUTEN]              = { 6,  7, "゛"},
+    [TEXT_DIACRITIC_HANDAKUTEN]           = { 6,  7, "゜"},
 #endif
 };
 
@@ -1459,19 +1469,44 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
+    {0x00A8, 0, 0, texture_menu_font_char_diacritic_umlaut}, // ¨
+    {0x00B8, 0, 0, texture_menu_font_char_diacritic_cedilla}, // ¸
+
+    {0x00C0, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_A}, // À
+    {0x00C1, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_A}, // Á
+    {0x00C2, 6, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_menu_font_char_A}, // Â
+    {0x00C3, 6, TEXT_DIACRITIC_TILDE_UPPERCASE, texture_menu_font_char_A}, // Ã
     {0x00C4, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_A}, // Ä
-    {0x00C7, 5, 0, texture_menu_font_char_cedilla}, // Ç
+
+    {0x00C7, 6, TEXT_DIACRITIC_CEDILLA, texture_menu_font_char_C}, // Ç
+    {0x00C8, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_E}, // È
+    {0x00C9, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_E}, // É
+    {0x00CA, 6, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_menu_font_char_E}, // Ê
     {0x00CB, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_E}, // Ë
+
+    {0x00CC, 5, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_I}, // Ì
+    {0x00CD, 5, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_I}, // Í
+    {0x00CE, 5, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_menu_font_char_I}, // Î
     {0x00CF, 5, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_I}, // Ï
+
+    {0x00D1, 6, TEXT_DIACRITIC_TILDE_UPPERCASE, texture_menu_font_char_N}, // Ñ
+    {0x00D2, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_O}, // Ò
+    {0x00D3, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_O}, // Ó
+    {0x00D4, 6, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_menu_font_char_O}, // Ô
+    {0x00D5, 6, TEXT_DIACRITIC_TILDE_UPPERCASE, texture_menu_font_char_O}, // Õ
     {0x00D6, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_O}, // Ö
+
     {0x00D7, 6, 0, texture_menu_font_char_multiply}, // ×
+
+    {0x00D9, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_U}, // Ù
+    {0x00DA, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_U}, // Ú
+    {0x00DB, 6, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_menu_font_char_U}, // Û
     {0x00DC, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_U}, // Ü
 
-    //{0x0300, 0, 0, texture_menu_font_char_diacritic_grave}, // ◌̀
-    //{0x0301, 0, 0, texture_menu_font_char_diacritic_acute}, // ◌́
-    //{0x0302, 0, 0, texture_menu_font_char_diacritic_circumflex}, // ◌̂
-    //{0x0303, 0, 0, texture_menu_font_char_diacritic_tilde}, // ◌̃
-    {0x0308, 0, 0, texture_menu_font_char_diacritic_umlaut}, // ◌̈
+    {0x02C6, 0, 0, texture_menu_font_char_diacritic_circumflex}, // ˆ
+    {0x02CA, 0, 0, texture_menu_font_char_diacritic_acute}, // ˊ
+    {0x02CB, 0, 0, texture_menu_font_char_diacritic_grave}, // ˋ
+    {0x02DC, 0, 0, texture_menu_font_char_diacritic_tilde}, // ˜
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
@@ -1561,8 +1596,8 @@ const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
     {0x3092, 9, 0, texture_menu_font_char_jp_hiragana_wo}, // を
     {0x3093, 9, 0, texture_menu_font_char_jp_hiragana_n}, // ん
 
-    {0x3099, 0, 0, texture_menu_font_char_jp_dakuten}, // ◌゙
-    {0x309A, 0, 0, texture_menu_font_char_jp_handakuten}, // ◌゚
+    {0x309B, 0, 0, texture_menu_font_char_jp_dakuten}, // ゛
+    {0x309C, 0, 0, texture_menu_font_char_jp_handakuten}, // ゜
 
     {0x30A1, 9, 0, texture_menu_font_char_jp_katakana_small_a}, // ァ
     {0x30A2, 9, 0, texture_menu_font_char_jp_katakana_a}, // ア
@@ -1777,12 +1812,12 @@ const Gfx dl_menu_ia8_text_end[] = {
 
 // 0x0700BDA0 - 0x0700CDA0
 ALIGNED8 static const Texture texture_menu_course_upper[] = {
-#include "levels/menu/main_menu_seg7_course_upper.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.course_upper.rgba16.inc.c"
 };
 
 // 0x0700EDA0 - 0x0700FDA0
 ALIGNED8 static const Texture texture_menu_course_lower[] = {
-#include "levels/menu/main_menu_seg7_course_lower.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.course_lower.rgba16.inc.c"
 };
 
 #else
@@ -1860,7 +1895,7 @@ const Gfx dl_menu_texture_course_upper[] = {
 #ifdef LANG_FRENCH
 // 0x0700CDA0 - 0x0700DDA0
 ALIGNED8 static const Texture texture_menu_niveau_upper[] = {
-#include "levels/menu/main_menu_seg7_niveau_upper.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.niveau_upper.rgba16.inc.c"
 };
 
 // 0x0700FF00 - 0x0700FF10
@@ -1873,7 +1908,7 @@ const Gfx dl_menu_texture_niveau_upper[] = {
 #ifdef LANG_GERMAN
 // 0x0700DDA0 - 0x0700EDA0
 ALIGNED8 static const Texture texture_menu_kurs_upper[] = {
-#include "levels/menu/main_menu_seg7_kurs_upper.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.kurs_upper.rgba16.inc.c"
 };
 
 // 0x0700FF10 - 0x0700FF20

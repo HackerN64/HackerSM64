@@ -1376,36 +1376,32 @@ ALIGNED8 static const Texture texture_font_char_us_button_C_right[] = {
 #include "textures/segment2/font_graphics.06FC0.ia4.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_us_cedilla[] = {
-#include "textures/segment2/font_graphics.cedilla.ia4.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_us_cedilla_uppercase[] = {
-#include "textures/segment2/font_graphics.cedilla_uppercase.ia4.inc.c"
-};
-
 ALIGNED8 static const Texture texture_font_char_eszett[] = {
 #include "textures/segment2/font_graphics.eszett.ia4.inc.c"
-};
-
-ALIGNED8 static const Texture texture_font_char_diacritic_acute[] = {
-#include "textures/segment2/font_graphics.acute.ia4.inc.c"
 };
 
 ALIGNED8 static const Texture texture_font_char_diacritic_grave[] = {
 #include "textures/segment2/font_graphics.grave.ia4.inc.c"
 };
 
+ALIGNED8 static const Texture texture_font_char_diacritic_acute[] = {
+#include "textures/segment2/font_graphics.acute.ia4.inc.c"
+};
+
 ALIGNED8 static const Texture texture_font_char_diacritic_circumflex[] = {
 #include "textures/segment2/font_graphics.circumflex.ia4.inc.c"
+};
+
+ALIGNED8 static const Texture texture_font_char_diacritic_tilde[] = {
+#include "textures/segment2/font_graphics.tilde_diacritic.ia4.inc.c"
 };
 
 ALIGNED8 static const Texture texture_font_char_diacritic_umlaut[] = {
 #include "textures/segment2/font_graphics.umlaut.ia4.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_diacritic_tilde[] = {
-#include "textures/segment2/font_graphics.tilde_diacritic.ia4.inc.c"
+ALIGNED8 static const Texture texture_font_char_diacritic_cedilla[] = {
+#include "textures/segment2/font_graphics.cedilla.ia4.inc.c"
 };
 
 ALIGNED8 static const Texture texture_font_char_us_i_no_dot[] = {
@@ -1547,15 +1543,15 @@ ALIGNED8 static const Texture texture_hud_char_kana_dakuten_do[] = {
 };
 
 ALIGNED8 static const Texture texture_hud_char_katakana_ra[] = {
-#include "levels/menu/main_menu_seg7_katakana_ra.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.katakana_ra.rgba16.inc.c"
 };
 
 ALIGNED8 static const Texture texture_hud_char_kana_dakuten_ge[] = {
-#include "levels/menu/main_menu_seg7_kana_dakuten_ge.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.kana_dakuten_ge.rgba16.inc.c"
 };
 
 ALIGNED8 static const Texture texture_hud_char_kana_dakuten_ji[] = {
-#include "levels/menu/main_menu_seg7_kana_dakuten_ji.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7.kana_dakuten_ji.rgba16.inc.c"
 };
 #endif
 
@@ -1729,19 +1725,20 @@ const struct Utf8LUT main_hud_utf8_lut = {
 };
 
 const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
-    {-1, 0, "\u0300"}, // TEXT_DIACRITIC_GRAVE
-    {0, 4, "\u0300"}, // TEXT_DIACRITIC_GRAVE_UPPERCASE
-    {-1, 0, "\u0301"}, // TEXT_DIACRITIC_ACUTE
-    {0, 4, "\u0301"}, // TEXT_DIACRITIC_ACUTE_UPPERCASE
-    {0, 0, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX
-    {1, 4, "\u0302"}, // TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE
-    {-1, 0, "\u0303"}, // TEXT_DIACRITIC_TILDE
-    {1, 4, "\u0303"}, // TEXT_DIACRITIC_TILDE_UPPERCASE
-    {0, 0, "\u0308"}, // TEXT_DIACRITIC_UMLAUT
-    {1, 4, "\u0308"}, // TEXT_DIACRITIC_UMLAUT_UPPERCASE
+    [TEXT_DIACRITIC_CIRCUMFLEX]           = { 0,  0, "ˆ"},
+    [TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE] = { 1,  4, "ˆ"},
+    [TEXT_DIACRITIC_ACUTE]                = {-1,  0, "ˊ"},
+    [TEXT_DIACRITIC_ACUTE_UPPERCASE]      = { 0,  4, "ˊ"},
+    [TEXT_DIACRITIC_GRAVE]                = {-1,  0, "ˋ"},
+    [TEXT_DIACRITIC_GRAVE_UPPERCASE]      = { 0,  4, "ˋ"},
+    [TEXT_DIACRITIC_TILDE]                = {-1,  0, "˜"},
+    [TEXT_DIACRITIC_TILDE_UPPERCASE]      = { 1,  4, "˜"},
+    [TEXT_DIACRITIC_UMLAUT]               = { 0,  0, "¨"},
+    [TEXT_DIACRITIC_UMLAUT_UPPERCASE]     = { 1,  4, "¨"},
+    [TEXT_DIACRITIC_CEDILLA]              = { 0,  0, "¸"},
 #ifdef JAPANESE_CHARACTERS
-    {4, 6, "\u3099"}, // TEXT_DIACRITIC_DAKUTEN
-    {7, 10, "\u309A"}, // TEXT_DIACRITIC_HANDAKUTEN
+    [TEXT_DIACRITIC_DAKUTEN]              = { 4,  6, "゛"},
+    [TEXT_DIACRITIC_HANDAKUTEN]           = { 7, 10, "゜"},
 #endif
 };
 
@@ -1844,7 +1841,9 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
+    {0x00A8, 0, 0, texture_font_char_diacritic_umlaut}, // ¨
     {0x00B7, 4, 0, texture_font_char_us_interpunct}, // ·
+    {0x00B8, 0, 0, texture_font_char_diacritic_cedilla}, // ¸
 
     {0x00C0, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_font_char_us_A}, // À
     {0x00C1, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_font_char_us_A}, // Á
@@ -1852,7 +1851,7 @@ const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00C3, 6, TEXT_DIACRITIC_TILDE_UPPERCASE, texture_font_char_us_A}, // Ã
     {0x00C4, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_font_char_us_A}, // Ä
 
-    {0x00C7, 6, 0, texture_font_char_us_cedilla_uppercase}, // Ç
+    {0x00C7, 6, TEXT_DIACRITIC_CEDILLA, texture_font_char_us_C}, // Ç
     {0x00C8, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_font_char_us_E}, // È
     {0x00C9, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_font_char_us_E}, // É
     {0x00CA, 6, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_font_char_us_E}, // Ê
@@ -1885,7 +1884,7 @@ const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00E3, 6, TEXT_DIACRITIC_TILDE, texture_font_char_us_a}, // ã
     {0x00E4, 6, TEXT_DIACRITIC_UMLAUT, texture_font_char_us_a}, // ä
 
-    {0x00E7, 5, 0, texture_font_char_us_cedilla}, // ç
+    {0x00E7, 5, TEXT_DIACRITIC_CEDILLA, texture_font_char_us_c}, // ç
     {0x00E8, 5, TEXT_DIACRITIC_GRAVE, texture_font_char_us_e}, // è
     {0x00E9, 5, TEXT_DIACRITIC_ACUTE, texture_font_char_us_e}, // é
     {0x00EA, 5, TEXT_DIACRITIC_CIRCUMFLEX, texture_font_char_us_e}, // ê
@@ -1908,11 +1907,10 @@ const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00FB, 5, TEXT_DIACRITIC_CIRCUMFLEX, texture_font_char_us_u}, // û
     {0x00FC, 5, TEXT_DIACRITIC_UMLAUT, texture_font_char_us_u}, // ü
 
-    {0x0300, 0, 0, texture_font_char_diacritic_grave}, // ◌̀
-    {0x0301, 0, 0, texture_font_char_diacritic_acute}, // ◌́
-    {0x0302, 0, 0, texture_font_char_diacritic_circumflex}, // ◌̂
-    {0x0303, 0, 0, texture_font_char_diacritic_tilde}, // ◌̃
-    {0x0308, 0, 0, texture_font_char_diacritic_umlaut}, // ◌̈
+    {0x02C6, 0, 0, texture_font_char_diacritic_circumflex}, // ˆ
+    {0x02CA, 0, 0, texture_font_char_diacritic_acute}, // ˊ
+    {0x02CB, 0, 0, texture_font_char_diacritic_grave}, // ˋ
+    {0x02DC, 0, 0, texture_font_char_diacritic_tilde}, // ˜
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
@@ -2025,8 +2023,8 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x3092, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_wo}, // を
     {0x3093, 10, TEXT_FLAG_PACKED, texture_font_char_jp_hiragana_n}, // ん
 
-    {0x3099, 0, TEXT_FLAG_PACKED, texture_font_char_jp_dakuten}, // ◌゙
-    {0x309A, 0, TEXT_FLAG_PACKED, texture_font_char_jp_period}, // ◌゚
+    {0x309B, 0, TEXT_FLAG_PACKED, texture_font_char_jp_dakuten}, // ゛
+    {0x309C, 0, TEXT_FLAG_PACKED, texture_font_char_jp_period}, // ゜
 
     {0x30A1, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_small_a}, // ァ
     {0x30A2, 10, TEXT_FLAG_PACKED, texture_font_char_jp_katakana_a}, // ア
