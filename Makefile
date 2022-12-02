@@ -135,7 +135,7 @@ LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 # Default non-gcc opt flags
 DEFAULT_OPT_FLAGS = -Ofast
-SAFETY_OPT_FLAGS = -ftrapping-math -fno-associative-math -fno-unsafe-math-optimizations
+SAFETY_OPT_FLAGS = -ftrapping-math
 
 # Main opt flags
 GCC_MAIN_OPT_FLAGS = \
