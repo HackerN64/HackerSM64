@@ -135,10 +135,15 @@ typedef char * langarray_t;
 
 #endif
 
+typedef union {
+    s32 asInt;
+    char *asStr;
+} DialogVariable;
+
 extern s32 gDialogResponse;
 extern u16 gDialogColorFadeTimer;
 extern s8  gLastDialogLineNum;
-extern s32 gDialogVariable;
+extern DialogVariable gDialogVariable;
 extern u16 gDialogTextAlpha;
 extern s8  gRedCoinsCollected;
 
@@ -161,7 +166,9 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y);
 s32 get_dialog_id(void);
 void create_dialog_box(s16 dialog);
-void create_dialog_box_with_var(s16 dialog, s32 dialogVar);
+void create_dialog_box_with_int_var(s16 dialog, s32 dialogVar);
+void create_dialog_box_with_str_var(s16 dialog, char *dialogVar);
+void create_dialog_box_with_var(s16 dialog, DialogVariable dialogVar);
 void create_dialog_inverted_box(s16 dialog);
 void create_dialog_box_with_response(s16 dialog);
 void reset_dialog_render_state(void);

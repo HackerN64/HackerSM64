@@ -418,7 +418,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
             if (GET_HIGH_U16_OF_32(actionArg) == 0) {
                 create_dialog_box(GET_LOW_U16_OF_32(actionArg));
             } else {
-                create_dialog_box_with_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg));
+                create_dialog_box_with_int_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg));
             }
         }
         // wait until dialog is done

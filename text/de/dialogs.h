@@ -1,4 +1,4 @@
-// Parameters: dialog enum ID, (unused), lines per box, left offset, width
+// Parameters: dialog enum ID, voice sound, lines per box, left offset, width
 
 DEFINE_DIALOG(DIALOG_000, NO_SOUND, 6, 30, 200, "\
 Du bist inmitten der\n\
@@ -108,7 +108,7 @@ der Schnellere ist?\n\
 \n\
 Fertig...?\n\
 \n\
-//Los!/// Später!")
+    Los!       Später!")
 
 DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 3, 30, 200, "\
 Hey!!! Willst Du mich\n\
@@ -152,7 +152,7 @@ Das Ziel liegt hinter\n\
 der Böen-Brücke.\n\
 Fertig?\n\
 \n\
-//Los!/// Später!")
+    Los!       Später!")
 
 /**
  * Special case: if the voice is SEQ_EVENT_SOLVE_PUZZLE,
@@ -171,7 +171,7 @@ dieser Mützen.\n\
 Möchtest Du Deinen\n\
 Spielstand speichern?\n\
 \n\
-//Ja!////Nein!")
+    Ja!        Nein!")
 
 DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Du hast den grünen\n\
@@ -185,7 +185,7 @@ dieser Mützen.\n\
 Möchtest Du Deinen\n\
 Spielstand speichern?\n\
 \n\
-//Ja!////Nein!")
+    Ja!        Nein!")
 
 DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Du hast den blauen\n\
@@ -199,7 +199,7 @@ dieser Mützen.\n\
 Möchtest Du Deinen\n\
 Spielstand speichern?\n\
 \n\
-//Ja!////Nein!")
+    Ja!        Nein!")
 
 DEFINE_DIALOG(DIALOG_013, NO_SOUND, 6, 30, 200, "\
 Du hast 100 Münzen\n\
@@ -207,7 +207,7 @@ eingesammelt. Der\n\
 Stern verleiht Dir\n\
 zusätzliche Kraft.\n\
 Spielstand speichern?\n\
-//Ja!////Nein!")
+    Ja!        Nein!")
 
 DEFINE_DIALOG(DIALOG_014, NO_SOUND, 6, 30, 200, "\
 Unglaublich, Du hast einen\n\
@@ -215,7 +215,7 @@ weiteren Stern erhalten.\n\
 Er verleiht Dir\n\
 zusätzliche Kraft.\n\
 Spielstand speichern?\n\
-//Ja!////Nein!")
+    Ja!        Nein!")
 
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 4, 30, 200, "\
 Setze Deine Fäuste ein,\n\
@@ -709,7 +709,7 @@ Aber Du kannst es ja\n\
 einmal versuchen.\n\
 Wie steht's?\n\
 \n\
-//Na klar!/ Später!")
+    Na klar!   Später!")
 
 DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 6, 30, 200, "\
 Du...Du...ha...hast\n\
@@ -1095,7 +1095,7 @@ losläßt, habe ich eine\n\
 Überraschung für Dich!\n\
 Na, wie sieht's aus?\n\
 \n\
-//Klar!///Vergiß es!")
+    Klar!      Vergiß es!")
 
 DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 3, 30, 200, "\
 Hey Baby, komm schon!\n\
@@ -1177,9 +1177,9 @@ Gefahren. Links benötigst\n\
 Du den Weitsprung, um\n\
 weiterzukommen.\n\
 Rechts: Arbeitsplattform\n\
-////Nebellabyrinth\n\
-Links:/Schwarzes Loch\n\
-////Höhlensee")
+        Nebellabyrinth\n\
+Links:  Schwarzes Loch\n\
+        Höhlensee")
 
 DEFINE_DIALOG(DIALOG_090, SOUND_OBJ_BOWSER_LAUGH, 5, 30, 200, "\
 Hua, hua, hua, ich wußte,\n\
@@ -1476,13 +1476,13 @@ mein Ende abzuwarten...")
 DEFINE_DIALOG(DIALOG_122, NO_SOUND, 4, 30, 200, "\
 Das Schwarze Loch\n\
 Rechts: Arbeitsplattform\n\
-////Nebellabyrinth\n\
-Links:/Höhlensee")
+        Nebellabyrinth\n\
+Links:  Höhlensee")
 
 DEFINE_DIALOG(DIALOG_123, NO_SOUND, 3, 30, 200, "\
 Titanenhöhle\n\
 Rechts: Wasserfall\n\
-Links:/Grüner Schalter")
+Links:  Grüner Schalter")
 
 DEFINE_DIALOG(DIALOG_124, NO_SOUND, 5, 30, 200, "\
 Arbeitsplattform\n\
@@ -1497,15 +1497,15 @@ des Nebellabyrinths. Bitte\n\
 Eingang links benutzen!")
 
 DEFINE_DIALOG(DIALOG_126, NO_SOUND, 3, 30, 200, "\
-Oben:/ Schwarzes Loch\n\
+Oben:   Schwarzes Loch\n\
 Rechts: Arbeitsplattform\n\
-////Nebellabyrinth")
+        Nebellabyrinth")
 
 DEFINE_DIALOG(DIALOG_127, NO_SOUND, 4, 30, 200, "\
 Höhlensee\n\
 Rechts: Titanenhöhle\n\
-Links:/Verlassene Mine\n\
-////(Geschlossen!!!)\n\
+Links:  Verlassene Mine\n\
+        (Geschlossen!!!)\n\
 Hier lebt ein Seemonster.\n\
 Führe auf seinem Rücken\n\
 eine Stampfattacke aus,\n\
@@ -1668,10 +1668,10 @@ erhältst, wenn Du\n\
 100 Münzen sammelst?")
 
 DEFINE_DIALOG(DIALOG_138, NO_SOUND, 4, 30, 200, "\
-Unten:/Höhlensee\n\
-Links:/Schwarzes Loch\n\
+Unten:  Höhlensee\n\
+Links:  Schwarzes Loch\n\
 Rechts: Nebellabyrinth\n\
-////(Geschlossen!!!)")
+        (Geschlossen!!!)")
 
 DEFINE_DIALOG(DIALOG_139, NO_SOUND, 4, 30, 200, "\
 Automatische Plattform\n\
@@ -1686,10 +1686,10 @@ wenn Du sie verläßt.")
 DEFINE_DIALOG(DIALOG_140, NO_SOUND, 6, 30, 200, "\
 Arbeitsplattform\n\
 Rechts: Nebellabyrinth\n\
-////Eingang\n\
-Links:/Schwarzes Loch\n\
-////Aufzug 1\n\
-Pfeil:/Standort")
+        Eingang\n\
+Links:  Schwarzes Loch\n\
+        Aufzug 1\n\
+Pfeil:  Standort")
 
 DEFINE_DIALOG(DIALOG_141, NO_SOUND, 5, 150, 200, "\
 Du hast einen der\n\
@@ -2013,7 +2013,7 @@ Also, Kumpel, wie steht's?\n\
 Sollen wir ein kleines\n\
 Match wagen?\n\
 \n\
-//Okay!///Später!")
+    Okay!      Später!")
 
 DEFINE_DIALOG(DIALOG_165, NO_SOUND, 4, 30, 200, "\
 Sei vorsichtig, wenn Du\n\

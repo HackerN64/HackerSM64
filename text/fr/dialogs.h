@@ -1,4 +1,4 @@
-// Parameters: dialog enum ID, (unused), lines per box, left offset, width
+// Parameters: dialog enum ID, voice sound, lines per box, left offset, width
 
 DEFINE_DIALOG(DIALOG_000, NO_SOUND, 6, 30, 200, "\
 Incroyable! Vous voilà\n\
@@ -137,7 +137,7 @@ Lorsque je dis “partez”,\n\
 la course commence...\n\
 Prêt...\n\
 \n\
-//Partez!//Heu, non.")
+    Partez!    Heu, non.")
 
 DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 4, 30, 200, "\
 Hé! Tu te moques de moi,\n\
@@ -190,7 +190,7 @@ dans la vallée Valvent...\n\
 Prêt...\n\
 \n\
 \n\
-//Partez!// Heu, non.")
+    Partez!     Heu, non.")
 
 /**
  * Special case: if the voice is SEQ_EVENT_SOLVE_PUZZLE,
@@ -212,7 +212,7 @@ rouges que vous\n\
 détruirez...\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non.")
+        Oui        Non.")
 
 DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Vous venez d'actionner\n\
@@ -229,7 +229,7 @@ surgiront des blocs verts\n\
 que vous détruirez...\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non.")
+    Oui        Non.")
 
 DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Vous venez d'actionner\n\
@@ -246,7 +246,7 @@ des blocs bleus que vous\n\
 détruirez...\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non.")
+    Oui        Non.")
 
 DEFINE_DIALOG(DIALOG_013, NO_SOUND, 6, 30, 200, "\
 Vous avez récupéré 100\n\
@@ -254,7 +254,7 @@ pièces! Mario sera\n\
 désormais plus puissant!\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non.")
+    Oui        Non.")
 
 DEFINE_DIALOG(DIALOG_014, NO_SOUND, 6, 30, 200, "\
 Whoa, génial! Une autre\n\
@@ -262,7 +262,7 @@ Whoa, génial! Une autre\n\
 devient de plus en plus\n\
 courageux!\n\
 Voulez-vous sauvegarder?\n\
-//Oui////Non.")
+    Oui        Non.")
 
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 6, 30, 200, "\
 Vous pouvez frapper vos\n\
@@ -387,7 +387,7 @@ un signal sonore se fera\n\
 entendre...\n\
 Mes chers téléspectateurs,\n\
 à bientôt!\n\
-//// --Lakitu--")
+         --Lakitu--")
 
 DEFINE_DIALOG(DIALOG_031, NO_SOUND, 5, 30, 200, "\
 Incroyable! Tu m'as encore\n\
@@ -530,7 +530,7 @@ lisez attentivement le nom\n\
 de chaque étoile au début\n\
 des niveaux.\n\
 \n\
-/// --Roi Bob-omb--")
+       --Roi Bob-omb--")
 
 DEFINE_DIALOG(DIALOG_040, NO_SOUND, 3, 30, 200, "\
 ATTENTION!\n\
@@ -767,7 +767,7 @@ que moi?\n\
 On fait la course,\n\
 mon petit biquet?\n\
 Prêt...\n\
-//Partez!//Heu, non.")
+    Partez!    Heu, non.")
 
 DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, "\
 Qu-qu-quoi? T-t-tu as\n\
@@ -841,7 +841,7 @@ DEFINE_DIALOG(DIALOG_061, NO_SOUND, 4, 30, 200, "\
 Brrrrr!!!\n\
 Baignade déconseillée!!!\n\
 Trop froid...\n\
-// ---Le Pingouin---")
+     ---Le Pingouin---")
 
 DEFINE_DIALOG(DIALOG_062, NO_SOUND, 4, 30, 200, "\
 A l'intérieur des\n\
@@ -958,7 +958,7 @@ pour lancer Bowser.\n\
 Bonne chance, Mario!\n\
 Tu en auras besoin...\n\
 \n\
-// ---Peach---")
+     ---Peach---")
 
 DEFINE_DIALOG(DIALOG_067, SOUND_OBJ_BOWSER_LAUGH, 3, 30, 200, "\
 HA HA! Dommage pour toi,\n\
@@ -1060,7 +1060,7 @@ vous devrez ouvrir les\n\
 coffres dans l'ordre...\n\
 Y arriveras-tu, petit?\n\
 \n\
-// -- Le capitaine --")
+     -- Le capitaine --")
 
 DEFINE_DIALOG(DIALOG_074, NO_SOUND, 5, 30, 200, "\
 Vous pouvez vous\n\
@@ -1163,7 +1163,7 @@ aucun sens de l'humour.\n\
 Lâche-moi et je te\n\
 donnerais un truc cool.\n\
 Ça marche?\n\
-//OK//// Jamais!")
+    OK         Jamais!")
 
 DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 1, 30, 200, "\
 Gnii hi hi hi hi hi!!!")
@@ -1263,17 +1263,17 @@ encore capables de faire\n\
 le Saut en Longueur\n\
 doivent aller à droite.\n\
 Droite: Plate-forme de\n\
-////travail.\n\
-////Labyrinthe\n\
-////toxique.\n\
+        travail.\n\
+        Labyrinthe\n\
+        toxique.\n\
 Gauche: Trou Noir.\n\
-////Lac souterrain.\n\
+        Lac souterrain.\n\
 Cercle rouge:\n\
-////Ascenseur 2.\n\
-////Lac souterrain.\n\
+        Ascenseur 2.\n\
+        Lac souterrain.\n\
 Flèche:\n\
-////Votre position\n\
-////actuelle.")
+        Votre position\n\
+        actuelle.")
 
 DEFINE_DIALOG(DIALOG_090, SOUND_OBJ_BOWSER_LAUGH, 6, 30, 200, "\
 BWA HA HA HA HA HA!!!\n\
@@ -1540,7 +1540,7 @@ Tiens, prends ça...\n\
 Et va-t'en!")
 
 DEFINE_DIALOG(DIALOG_116, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 4, 95, 200, "\
-Hein?/De quoi?\n\
+Hein?  De quoi?\n\
 Moi? J'ai perdu?\n\
 Battu par un tout petit\n\
 bonhomme de rien du tout!\n\
@@ -1622,16 +1622,16 @@ Bye Bye Mario! BWA HA!!")
 DEFINE_DIALOG(DIALOG_122, NO_SOUND, 6, 30, 200, "\
 -Le Trou Noir-\n\
 Droite: Plate-forme de\n\
-////travail.\n\
-////Labyrinthe\n\
-////toxique.\n\
+        travail.\n\
+        Labyrinthe\n\
+        toxique.\n\
 Gauche: Lac souterrain.")
 
 DEFINE_DIALOG(DIALOG_123, NO_SOUND, 5, 30, 200, "\
 -Caverne Métallique-\n\
 Droite: Vers la cascade.\n\
 Gauche: Interrupteur des\n\
-////casquettes-métal.")
+        casquettes-métal.")
 
 DEFINE_DIALOG(DIALOG_124, NO_SOUND, 4, 30, 200, "\
 Plate-forme de travail:\n\
@@ -1654,18 +1654,18 @@ Faites demi-tour!")
 
 DEFINE_DIALOG(DIALOG_126, NO_SOUND, 6, 30, 200, "\
 -Ascenseur 1-\n\
-Haut:/ Trou Noir.\n\
+Haut:   Trou Noir.\n\
 Droite: Plate-forme de\n\
-////travail.\n\
-////Labyrinthe\n\
-////toxique.")
+        travail.\n\
+        Labyrinthe\n\
+        toxique.")
 
 DEFINE_DIALOG(DIALOG_127, NO_SOUND, 5, 30, 200, "\
 -Lac Souterrain-\n\
 Droite: Caverne\n\
-////métallique.\n\
+        métallique.\n\
 Gauche: Mine abandonnée\n\
-////(Fermée).\n\
+        (Fermée).\n\
 Gros Bibi, un gentil\n\
 dragon, vit ici.\n\
 Faites l'Attaque Rodéo\n\
@@ -1868,11 +1868,11 @@ pièces dans un niveau?")
 
 DEFINE_DIALOG(DIALOG_138, NO_SOUND, 6, 30, 200, "\
 -Ascenseur 2-\n\
-Bas://Lac souterrain.\n\
+Bas:    Lac souterrain.\n\
 Gauche: Trou Noir.\n\
 Droite: Labyrinthe\n\
-////toxique\n\
-////(fermé).")
+        toxique\n\
+        (fermé).")
 
 DEFINE_DIALOG(DIALOG_139, NO_SOUND, 4, 30, 200, "\
 \n\
@@ -1890,12 +1890,12 @@ vous tomberez...")
 DEFINE_DIALOG(DIALOG_140, NO_SOUND, 6, 30, 200, "\
 -Plate-forme de travail-\n\
 Droite: Entrée du\n\
-////Labyrinthe\n\
-////toxique.\n\
+        Labyrinthe\n\
+        toxique.\n\
 Gauche: Trou Noir.\n\
-////Ascenseur 1.\n\
+        Ascenseur 1.\n\
 Flèche: Votre position\n\
-////actuelle.")
+        actuelle.")
 
 DEFINE_DIALOG(DIALOG_141, NO_SOUND, 4, 150, 200, "\
 Vous avez récupéré une\n\
@@ -2019,7 +2019,7 @@ casquettes-métal...")
 
 DEFINE_DIALOG(DIALOG_148, NO_SOUND, 6, 30, 200, "\
 Montagne du Bonhomme de\n\
-neige.../DANGER!\n\
+neige...  DANGER!\n\
 Ne pas tenter le Triple\n\
 Saut au-dessus de la\n\
 machine à cracher des\n\
@@ -2208,7 +2208,7 @@ alors...\n\
 Voici quelques munitions!\n\
 A bientôt et merci!\n\
 --Les créateurs de\n\
-/Mario 64...")
+  Mario 64...")
 
 DEFINE_DIALOG(DIALOG_162, NO_SOUND, 2, 30, 200, "\
 Oh, non!\n\
@@ -2261,7 +2261,7 @@ A moins que tu aies peur!\n\
 Alors, c'est d'accord?\n\
 Prêt...\n\
 \n\
-//Partez!//Heu, non!")
+    Partez!    Heu, non!")
 
 DEFINE_DIALOG(DIALOG_165, NO_SOUND, 3, 30, 200, "\
 Tourner autour du poteau\n\
@@ -2299,4 +2299,4 @@ Dehors les touristes!\n\
 Cette caverne est très\n\
 dangereuse!!!\n\
 Alors... DE-HORS!\n\
-/ -- Le capitaine --")
+   -- Le capitaine --")
