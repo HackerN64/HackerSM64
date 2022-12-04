@@ -156,14 +156,14 @@
 #endif // !START_LEVEL
 
 #ifndef MULTILANG
-    #undef LANG_FRENCH
-    #undef LANG_GERMAN
-    #undef LANG_JAPANESE
+    #undef ENABLE_FRENCH
+    #undef ENABLE_GERMAN
+    #undef ENABLE_JAPANESE
 #endif // !MULTILANG
 
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
     #define JAPANESE_CHARACTERS
-#endif // LANG_JAPANESE
+#endif // ENABLE_JAPANESE
 
 
 /*****************

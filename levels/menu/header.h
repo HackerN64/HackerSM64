@@ -44,15 +44,15 @@ extern char **course_strings_language_table[];
 extern Gfx dl_menu_rgba16_wood_course_end[];
 extern Gfx dl_menu_texture_course_upper[];
 extern char *course_strings_en_table[];
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
 extern Gfx dl_menu_texture_niveau_upper[];
 extern char *course_strings_fr_table[];
 #endif
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
 extern Gfx dl_menu_texture_kurs_upper[];
 extern char *course_strings_de_table[];
 #endif
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
 extern char *course_strings_jp_table[];
 #endif
 #endif

@@ -133,15 +133,15 @@ DECLARE_SEGMENT(debug_level_select_mio0)
 #ifdef MULTILANG
 DECLARE_SEGMENT(translation_en_yay0)
 DECLARE_SEGMENT(translation_en_mio0)
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
 DECLARE_SEGMENT(translation_fr_yay0)
 DECLARE_SEGMENT(translation_fr_mio0)
 #endif
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
 DECLARE_SEGMENT(translation_de_yay0)
 DECLARE_SEGMENT(translation_de_mio0)
 #endif
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
 DECLARE_SEGMENT(translation_jp_yay0)
 DECLARE_SEGMENT(translation_jp_mio0)
 #endif

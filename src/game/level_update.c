@@ -1262,17 +1262,17 @@ void load_language_text(void) {
         case LANGUAGE_ENGLISH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_en_yay0SegmentRomStart, _translation_en_yay0SegmentRomEnd);
             break;
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
         case LANGUAGE_FRENCH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_fr_yay0SegmentRomStart, _translation_fr_yay0SegmentRomEnd);
             break;
 #endif
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
         case LANGUAGE_GERMAN:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_de_yay0SegmentRomStart, _translation_de_yay0SegmentRomEnd);
             break;
 #endif
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
         case LANGUAGE_JAPANESE:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_jp_yay0SegmentRomStart, _translation_jp_yay0SegmentRomEnd);
             break;

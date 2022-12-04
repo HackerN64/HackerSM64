@@ -442,7 +442,7 @@ void render_hud_keys(void) {
     }
 }
 
-langarray_t textTime = LANGUAGE_TEXT(
+langarray_t textTime = DEFINE_LANGUAGE_ARRAY(
     "TIME %0d'%02d\"%d",
     "TEMPS %0d'%02d\"%d",
     "ZEIT %0d'%02d\"%d",
@@ -458,7 +458,7 @@ void render_hud_timer(void) {
     u16 timerSecs = (timerValFrames - (timerMins * 1800)) / 30;
     u16 timerFracSecs = ((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3;
 
-    sprintf(str, LANGUAGE_ARRAY(textTime), timerMins, timerSecs, timerFracSecs);
+    sprintf(str, LANG_ARRAY(textTime), timerMins, timerSecs, timerFracSecs);
     print_text_aligned(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(28), 185, str, TEXT_ALIGN_RIGHT);
 }
 

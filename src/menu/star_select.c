@@ -222,17 +222,17 @@ void print_course_number(void) {
     // Change upper part of the wood texture depending of the language defined
     switch (multilang_get_language()) {
         case LANGUAGE_ENGLISH:
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
         case LANGUAGE_JAPANESE:
 #endif
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_course_upper);
             break;
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
         case LANGUAGE_FRENCH:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_niveau_upper);
             break;
 #endif
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
         case LANGUAGE_GERMAN:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_kurs_upper);
             break;
@@ -252,7 +252,7 @@ void print_course_number(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
-langarray_t textActMyScore = LANGUAGE_TEXT(
+langarray_t textActMyScore = DEFINE_LANGUAGE_ARRAY(
     "MYSCORE",
     "MON SCORE",
     "LEISTUNG",
@@ -279,7 +279,7 @@ void print_act_selector_strings(void) {
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
     // Print the "MY SCORE" text if the coin score is more than 0
     if (save_file_get_course_coin_score(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum)) != 0) {
-        print_generic_string_aligned(145, 118, LANGUAGE_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);
+        print_generic_string_aligned(145, 118, LANG_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);
     }
 
     print_generic_string_aligned(SCREEN_CENTER_X, 33, currLevelName, TEXT_ALIGN_CENTER);

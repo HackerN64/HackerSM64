@@ -79,9 +79,9 @@
 /**
  * Toggles for individual languages. Only works when MULTILANG is enabled.
  */
-#define LANG_FRENCH
-#define LANG_GERMAN
-#define LANG_JAPANESE
+#define ENABLE_FRENCH
+#define ENABLE_GERMAN
+#define ENABLE_JAPANESE
 
 /**
  * This define enables support for Japanese characters even when multilang or Japanese is not enabled.

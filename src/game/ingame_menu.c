@@ -38,19 +38,19 @@ extern u8 dialog_table_en[];
 extern u8 course_name_table_en[];
 extern u8 act_name_table_en[];
 
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
 extern u8 dialog_table_fr[];
 extern u8 course_name_table_fr[];
 extern u8 act_name_table_fr[];
 #endif
 
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
 extern u8 dialog_table_de[];
 extern u8 course_name_table_de[];
 extern u8 act_name_table_de[];
 #endif
 
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
 extern u8 dialog_table_jp[];
 extern u8 course_name_table_jp[];
 extern u8 act_name_table_jp[];
@@ -63,19 +63,19 @@ void *languageTable[][3] = {
 #else
     {&dialog_table_en, &course_name_table_en, &act_name_table_en},
 
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
     {&dialog_table_fr, &course_name_table_fr, &act_name_table_fr},
 #else
     {NULL, NULL, NULL},
 #endif
 
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
     {&dialog_table_de, &course_name_table_de, &act_name_table_de},
 #else
     {NULL, NULL, NULL},
 #endif
 
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
     {&dialog_table_jp, &course_name_table_jp, &act_name_table_jp},
 #else
     {NULL, NULL, NULL},
@@ -279,7 +279,7 @@ s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8
  * If the language is set to Japanese, the number is written in full-width digits.
  */
 void format_int_to_string(char *buf, s32 value) {
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
     if (gInGameLanguage == LANGUAGE_JAPANESE) {
         u8 digits[10];
         s32 numDigits = 0;
@@ -425,7 +425,7 @@ static s32 hex_char_to_value(char c) {
 #define BOX_SCALE_EN    5.f
 #define BOX_SCALE_JP    4.f
 
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
 #define DIALOG_LINE_HEIGHT ((gInGameLanguage == LANGUAGE_JAPANESE) ? DIALOG_LINE_HEIGHT_JP : DIALOG_LINE_HEIGHT_EN)
 #define BOX_TRANS_X ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_X_JP : BOX_TRANS_X_EN)
 #define BOX_TRANS_Y ((gInGameLanguage == LANGUAGE_JAPANESE) ? BOX_TRANS_Y_JP : BOX_TRANS_Y_EN)
@@ -1042,55 +1042,55 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
 
 s16 gMenuMode = MENU_MODE_NONE;
 
-langarray_t textEndCutscene1 = LANGUAGE_TEXT(
+langarray_t textEndCutscene1 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "Mario!",
     "マリオ！！");
 
-langarray_t textEndCutscene2 = LANGUAGE_TEXT(
+langarray_t textEndCutscene2 = DEFINE_LANGUAGE_ARRAY(
     "The power of the Stars is restored to the castle...",
     "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
     "Die Macht der Sterne ruht wieder sicher im Schloss...",
     "おしろにスターが もどったのね");
 
-langarray_t textEndCutscene3 = LANGUAGE_TEXT(
+langarray_t textEndCutscene3 = DEFINE_LANGUAGE_ARRAY(
     "...and it's all thanks to you!",
     "...et ceci grâce à toi!",
     "...und alles dank Deiner Hilfe!",
     "みんな あなたのおかげだわ！");
 
-langarray_t textEndCutscene4 = LANGUAGE_TEXT(
+langarray_t textEndCutscene4 = DEFINE_LANGUAGE_ARRAY(
     "Thank you, Mario!",
     "Merci, Mario!",
     "Vielen Dank, Mario!",
     "ありがとう マリオ");
 
-langarray_t textEndCutscene5 = LANGUAGE_TEXT(
+langarray_t textEndCutscene5 = DEFINE_LANGUAGE_ARRAY(
     "We have to do something special for you...",
     "Tu mérites une récompense...",
     "Wir haben eine Überraschung für Dich...",
     "なにか おれいをしなくちゃ・・");
 
-langarray_t textEndCutscene6 = LANGUAGE_TEXT(
+langarray_t textEndCutscene6 = DEFINE_LANGUAGE_ARRAY(
     "Listen, everybody,",
     "Venez les amis...",
     "Hört alle her...",
     "さあ みんな");
 
-langarray_t textEndCutscene7 = LANGUAGE_TEXT(
+langarray_t textEndCutscene7 = DEFINE_LANGUAGE_ARRAY(
     "let's bake a delicious cake...",
     "Allons préparer un délicieux gâteau...",
     "Laßt uns einen leckeren Kuchen backen...",
     "おいしいケーキを やきましょう");
 
-langarray_t textEndCutscene8 = LANGUAGE_TEXT(
+langarray_t textEndCutscene8 = DEFINE_LANGUAGE_ARRAY(
     "...for Mario...",
     "...pour Mario...",
     "...für Mario...",
     "マリオの ために・・・");
 
-langarray_t textEndCutscene9 = LANGUAGE_TEXT(
+langarray_t textEndCutscene9 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "Mario!",
@@ -1257,7 +1257,7 @@ void do_cutscene_handler(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
 
-    print_generic_string_aligned(SCREEN_CENTER_X, 13, LANGUAGE_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X, 13, LANG_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -1442,13 +1442,13 @@ void render_pause_red_coins(void) {
     }
 }
 
-langarray_t textCurrRatio43 = LANGUAGE_TEXT(
+langarray_t textCurrRatio43 = DEFINE_LANGUAGE_ARRAY(
     "ASPECT RATIO: 4:3\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
     "アスペクトひ: ４:３\nＬボタンできりかえ");
 
-langarray_t textCurrRatio169 = LANGUAGE_TEXT(
+langarray_t textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
     "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 16:9\nDRÜCKE L ZUM WECHSELN",
@@ -1460,9 +1460,9 @@ void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     if (!gConfig.widescreen) {
-        print_generic_string(10, 20, LANGUAGE_ARRAY(textCurrRatio43));
+        print_generic_string(10, 20, LANG_ARRAY(textCurrRatio43));
     } else {
-        print_generic_string(10, 20, LANGUAGE_ARRAY(textCurrRatio169));
+        print_generic_string(10, 20, LANG_ARRAY(textCurrRatio169));
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
@@ -1472,13 +1472,13 @@ void render_widescreen_setting(void) {
 }
 #endif
 
-langarray_t textCourseX = LANGUAGE_TEXT(
+langarray_t textCourseX = DEFINE_LANGUAGE_ARRAY(
     "COURSE %s",
     "NIVEAU %s",
     "KURS %s",
     "コース%s");
 
-langarray_t textMyScore = LANGUAGE_TEXT(
+langarray_t textMyScore = DEFINE_LANGUAGE_ARRAY(
     "MY SCORE",
     "MON SCORE",
     "LEISTUNG",
@@ -1518,7 +1518,7 @@ void render_pause_my_score_coins(void) {
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
         char courseNumText[8];
         format_int_to_string(courseNumText, gCurrCourseNum);
-        sprintf(str, LANGUAGE_ARRAY(textCourseX), courseNumText);
+        sprintf(str, LANG_ARRAY(textCourseX), courseNumText);
         print_generic_string_aligned(PAUSE_MENU_LEFT_X, PAUSE_MENU_COURSE_Y, str, TEXT_ALIGN_RIGHT);
 
         char *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
@@ -1533,7 +1533,7 @@ void render_pause_my_score_coins(void) {
         print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_COURSE_Y, courseName);
 
         if (save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
-            print_generic_string_aligned(PAUSE_MENU_LEFT_X + 3, PAUSE_MENU_MY_SCORE_Y, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
+            print_generic_string_aligned(PAUSE_MENU_LEFT_X + 3, PAUSE_MENU_MY_SCORE_Y, LANG_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
         }
     } else {
         print_generic_string_aligned(SCREEN_CENTER_X, PAUSE_MENU_COURSE_Y, courseName, TEXT_ALIGN_CENTER);
@@ -1542,25 +1542,25 @@ void render_pause_my_score_coins(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-langarray_t textLakituMario = LANGUAGE_TEXT(
+langarray_t textLakituMario = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "ジュゲム↔マリオ");
 
-langarray_t textLakituStop = LANGUAGE_TEXT(
+langarray_t textLakituStop = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "ジュゲム↔ストップ");
 
-langarray_t textNormalUpClose = LANGUAGE_TEXT(
+langarray_t textNormalUpClose = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(UP-CLOSE)",
     "(NORMAL)(GROS-PLAN)",
     "(NORMAL)(WEIT-ZOOM)",
     "（おすすめ）（リアル）");
 
-langarray_t textNormalFixed = LANGUAGE_TEXT(
+langarray_t textNormalFixed = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(FIXED)",
     "(NORMAL)(FIXE)",
     "(NORMAL)(STATIV)",
@@ -1572,10 +1572,10 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string_aligned(x + 54,  y,      LANGUAGE_ARRAY(textLakituMario),   TEXT_ALIGN_CENTER);
-    print_generic_string_aligned(x + 54,  y - 15, LANGUAGE_ARRAY(textNormalUpClose), TEXT_ALIGN_CENTER);
-    print_generic_string_aligned(x + 160, y,      LANGUAGE_ARRAY(textLakituStop),    TEXT_ALIGN_CENTER);
-    print_generic_string_aligned(x + 160, y - 15, LANGUAGE_ARRAY(textNormalFixed),   TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(x + 54,  y,      LANG_ARRAY(textLakituMario),   TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(x + 54,  y - 15, LANG_ARRAY(textNormalUpClose), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(x + 160, y,      LANG_ARRAY(textLakituStop),    TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(x + 160, y - 15, LANG_ARRAY(textNormalFixed),   TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     create_dl_translation_matrix(MENU_MTX_PUSH, ((*index - 1) * xIndex) + x, y, 0);
@@ -1593,19 +1593,19 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     }
 }
 
-langarray_t textContinue = LANGUAGE_TEXT(
+langarray_t textContinue = DEFINE_LANGUAGE_ARRAY(
     "CONTINUE",
     "CONTINUER",
     "WEITER",
     "つづけて マリオする？");
 
-langarray_t textExitCourse = LANGUAGE_TEXT(
+langarray_t textExitCourse = DEFINE_LANGUAGE_ARRAY(
     "EXIT COURSE",
     "QUITTER NIVEAU",
     "KURS VERLASSEN",
     "コースからでる？");
 
-langarray_t textCameraAngleR = LANGUAGE_TEXT(
+langarray_t textCameraAngleR = DEFINE_LANGUAGE_ARRAY(
     "SET CAMERA ANGLE WITH Ⓡ",
     "RÉGLAGE CAMÉRA AVEC Ⓡ",
     "KAMERA MIT Ⓡ VERSTELLEN",
@@ -1617,11 +1617,11 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(x, y,      LANGUAGE_ARRAY(textContinue));
-    print_generic_string(x, y - 15, LANGUAGE_ARRAY(textExitCourse));
+    print_generic_string(x, y,      LANG_ARRAY(textContinue));
+    print_generic_string(x, y - 15, LANG_ARRAY(textExitCourse));
 
     if (*index != MENU_OPT_CAMERA_ANGLE_R) {
-        print_generic_string(x, y - 31, LANGUAGE_ARRAY(textCameraAngleR));
+        print_generic_string(x, y - 31, LANG_ARRAY(textCameraAngleR));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
         create_dl_translation_matrix(MENU_MTX_PUSH, x - 14, (y - ((*index - 1) * yIndex)), 0);
@@ -1720,13 +1720,13 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
     print_generic_string(x + 23, y + 18, str);
 }
 
-langarray_t textCoinX = LANGUAGE_TEXT(
+langarray_t textCoinX = DEFINE_LANGUAGE_ARRAY(
     "✪× %s",
     "✪× %s",
     "✪× %s",
     "✪ｘ%s");
 
-langarray_t textStarX = LANGUAGE_TEXT(
+langarray_t textStarX = DEFINE_LANGUAGE_ARRAY(
     "★× %s",
     "★× %s",
     "★× %s",
@@ -1781,7 +1781,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
         render_pause_castle_course_stars(x - 65, y, gCurrSaveFileNum - 1, gDialogLineNum);
 
         format_int_to_string(countText, save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
-        sprintf(str, LANGUAGE_ARRAY(textCoinX), countText);
+        sprintf(str, LANG_ARRAY(textCoinX), countText);
         print_generic_string(x - 22, y, str);
 
         format_int_to_string(str, gDialogLineNum + 1);
@@ -1793,7 +1793,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
         format_int_to_string(countText, save_file_get_total_star_count(gCurrSaveFileNum - 1,
                                                              COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                              COURSE_NUM_TO_INDEX(COURSE_MAX)));
-        sprintf(str, LANGUAGE_ARRAY(textStarX), countText);
+        sprintf(str, LANG_ARRAY(textStarX), countText);
         print_generic_string_aligned(x, y + 18, str, TEXT_ALIGN_CENTER);
     }
 
@@ -1898,13 +1898,13 @@ enum HUDCourseCompleteStringIDs {
     HUD_PRINT_CONGRATULATIONS
 };
 
-langarray_t textHudHiScore = LANGUAGE_TEXT(
+langarray_t textHudHiScore = DEFINE_LANGUAGE_ARRAY(
     "HI SCORE",
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "HISCORE");
 
-langarray_t textCongratulations = LANGUAGE_TEXT(
+langarray_t textCongratulations = DEFINE_LANGUAGE_ARRAY(
     "CONGRATULATIONS",
     "FELICITATIONS",
     "GRATULATION",
@@ -1917,9 +1917,9 @@ void print_hud_course_complete_string(s8 str) {
     gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
 
     if (str == HUD_PRINT_HISCORE) {
-        print_hud_lut_string_aligned(SCREEN_CENTER_X, 36, LANGUAGE_ARRAY(textHudHiScore),      TEXT_ALIGN_CENTER);
+        print_hud_lut_string_aligned(SCREEN_CENTER_X, 36, LANG_ARRAY(textHudHiScore),      TEXT_ALIGN_CENTER);
     } else { // HUD_PRINT_CONGRATULATIONS
-        print_hud_lut_string_aligned(SCREEN_CENTER_X, 67, LANGUAGE_ARRAY(textCongratulations), TEXT_ALIGN_CENTER);
+        print_hud_lut_string_aligned(SCREEN_CENTER_X, 67, LANG_ARRAY(textCongratulations), TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1969,7 +1969,7 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
     }
 }
 
-langarray_t textClear = LANGUAGE_TEXT(
+langarray_t textClear = DEFINE_LANGUAGE_ARRAY(
     "CLEAR",
     "CLEAR",
     "CLEAR",
@@ -2010,7 +2010,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
         format_int_to_string(courseNumText, gLastCompletedCourseNum);
-        sprintf(str, LANGUAGE_ARRAY(textCourseX), courseNumText);
+        sprintf(str, LANG_ARRAY(textCourseX), courseNumText);
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(COURSE_COMPLETE_COURSE_X + 2,  COURSE_COMPLETE_COURSE_Y - 2, str);
 
@@ -2027,10 +2027,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(CONGRATULATIONS_COURSE_X + 2, CONGRATULATIONS_COURSE_Y - 2, name);
-        print_generic_string(clearX                   + 2, CONGRATULATIONS_COURSE_Y - 2, LANGUAGE_ARRAY(textClear));
+        print_generic_string(clearX                   + 2, CONGRATULATIONS_COURSE_Y - 2, LANG_ARRAY(textClear));
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
         print_generic_string(CONGRATULATIONS_COURSE_X,     CONGRATULATIONS_COURSE_Y,     name);
-        print_generic_string(clearX,                       CONGRATULATIONS_COURSE_Y,     LANGUAGE_ARRAY(textClear));
+        print_generic_string(clearX,                       CONGRATULATIONS_COURSE_Y,     LANG_ARRAY(textClear));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
         print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
@@ -2064,19 +2064,19 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-langarray_t textSaveAndContinue = LANGUAGE_TEXT(
+langarray_t textSaveAndContinue = DEFINE_LANGUAGE_ARRAY(
     "SAVE & CONTINUE",
     "SAUVEGARDER & CONTINUER",
     "SPEICHERN & WEITER",
     "セーブしてつづける？");
 
-langarray_t textSaveAndQuit = LANGUAGE_TEXT(
+langarray_t textSaveAndQuit = DEFINE_LANGUAGE_ARRAY(
     "SAVE & QUIT",
     "SAUVEGARDER & QUITTER",
     "SPEICHERN & ENDE",
     "セーブしておわる？");
 
-langarray_t textContinueWithoutSave = LANGUAGE_TEXT(
+langarray_t textContinueWithoutSave = DEFINE_LANGUAGE_ARRAY(
     "CONTINUE, DON'T SAVE",
     "CONTINUER SANS SAUVEGARDER",
     "WEITER OHNE ZU SPEICHERN",
@@ -2088,9 +2088,9 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(x + 12, y,      LANGUAGE_ARRAY(textSaveAndContinue));
-    print_generic_string(x + 12, y - 20, LANGUAGE_ARRAY(textSaveAndQuit));
-    print_generic_string(x + 12, y - 40, LANGUAGE_ARRAY(textContinueWithoutSave));
+    print_generic_string(x + 12, y,      LANG_ARRAY(textSaveAndContinue));
+    print_generic_string(x + 12, y - 20, LANG_ARRAY(textSaveAndQuit));
+    print_generic_string(x + 12, y - 40, LANG_ARRAY(textContinueWithoutSave));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -2106,7 +2106,7 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
 #define SAVE_CONFIRMATION_X_EN  100
 #define SAVE_CONFIRMATION_X_FR  80  
 
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
 #define SAVE_CONFIRMATION_X ((gInGameLanguage == LANGUAGE_FRENCH) ? SAVE_CONFIRMATION_X_FR : SAVE_CONFIRMATION_X_EN)
 #else
 #define SAVE_CONFIRMATION_X SAVE_CONFIRMATION_X_EN

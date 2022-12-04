@@ -1895,7 +1895,7 @@ const Gfx dl_menu_texture_course_upper[] = {
     gsSPEndDisplayList(),
 };
 
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
 // 0x0700CDA0 - 0x0700DDA0
 ALIGNED8 static const Texture texture_menu_niveau_upper[] = {
 #include "levels/menu/main_menu_seg7.niveau_upper.rgba16.inc.c"
@@ -1908,7 +1908,7 @@ const Gfx dl_menu_texture_niveau_upper[] = {
 };
 #endif
 
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
 // 0x0700DDA0 - 0x0700EDA0
 ALIGNED8 static const Texture texture_menu_kurs_upper[] = {
 #include "levels/menu/main_menu_seg7.kurs_upper.rgba16.inc.c"
@@ -1949,7 +1949,7 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
 
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
 #define COURSE_NAME_TABLE course_strings_fr_table
 #define COURSE_FILE "fr/courses.h"
 #include "text/define_courses.inc.c"
@@ -1957,7 +1957,7 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
 #define COURSE_NAME_TABLE course_strings_de_table
 #define COURSE_FILE "de/courses.h"
 #include "text/define_courses.inc.c"
@@ -1965,7 +1965,7 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
 #define COURSE_NAME_TABLE course_strings_jp_table
 #define COURSE_FILE "jp/courses.h"
 #include "text/define_courses.inc.c"
@@ -1975,17 +1975,17 @@ const Collision main_menu_seg7_collision[] = {
 
 const char **course_strings_language_table[] = {
     &course_strings_en_table,
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
     &course_strings_fr_table,
 #else
     NULL,
 #endif
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
     &course_strings_de_table,
 #else
     NULL,
 #endif
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
     &course_strings_jp_table,
 #else
     NULL,

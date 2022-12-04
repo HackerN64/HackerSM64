@@ -307,13 +307,13 @@ SECTIONS
 
 #ifdef MULTILANG
    YAY0_SEG(translation_en, 0x19000000)
-#ifdef LANG_FRENCH
+#ifdef ENABLE_FRENCH
    YAY0_SEG(translation_fr, 0x19000000)
 #endif
-#ifdef LANG_GERMAN
+#ifdef ENABLE_GERMAN
    YAY0_SEG(translation_de, 0x19000000)
 #endif
-#ifdef LANG_JAPANESE
+#ifdef ENABLE_JAPANESE
    YAY0_SEG(translation_jp, 0x19000000)
 #endif
 #endif

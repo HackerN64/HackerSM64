@@ -115,8 +115,8 @@ enum DialogResponseDefines {
 #ifdef MULTILANG
 
 typedef char * langarray_t[4];
-#define LANGUAGE_ARRAY(cmd) ((cmd)[gInGameLanguage])
-#define LANGUAGE_TEXT(english, french, german, japanese) {english, french, german, japanese}
+#define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) {english, french, german, japanese}
 
 enum MultilangLanguages {
     LANGUAGE_ENGLISH,
@@ -128,8 +128,8 @@ enum MultilangLanguages {
 #else
 
 typedef char * langarray_t;
-#define LANGUAGE_ARRAY(cmd) (cmd)
-#define LANGUAGE_TEXT(english, french, german, japanese) english
+#define LANG_ARRAY(cmd) (cmd)
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) english
 
 #define LANGUAGE_ENGLISH 0
 
