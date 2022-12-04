@@ -1872,7 +1872,8 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_tilde, 8}, // 126 "~"
 };
 
-/* This struct defines the UTF-8 characters supported by the main white font!
+/* 
+ * This struct defines the UTF-8 characters supported by the main white font!
  * There are also similar tables for colorful HUD font and the smaller white font.
  * Adding new characters to the font is very easy!
  *
