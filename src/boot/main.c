@@ -7,6 +7,7 @@
 #include "sm64.h"
 #include "audio/external.h"
 #include "game/game_init.h"
+#include "game/debug.h"
 #include "game/memory.h"
 #include "game/sound_init.h"
 #include "buffers/buffers.h"
@@ -32,6 +33,7 @@ enum MessageIDs {
     MESG_VI_VBLANK,
     MESG_START_GFX_SPTASK,
     MESG_NMI_REQUEST,
+    MESG_RCP_HUNG,
 };
 
 // OSThread gUnkThread; // unused?
@@ -303,6 +305,19 @@ void handle_dp_complete(void) {
     sCurrentDisplaySPTask = NULL;
 }
 
+OSTimer RCPHangTimer;
+void start_rcp_hang_timer(void) {
+    osSetTimer(&RCPHangTimer, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
+}
+
+void stop_rcp_hang_timer(void) {
+    osStopTimer(&RCPHangTimer);
+}
+
+void alert_rcp_hung_up(void) {
+    error("RCP is HUNG UP!! Oh! MY GOD!!");
+}
+
 void check_cache_emulation() {
     // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
     u32 saved = __osDisableInt();
@@ -345,8 +360,11 @@ void thread3_main(UNUSED void *arg) {
     if (IO_READ(DPC_CLOCK_REG) == 0) {
         gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
-        gIsVC = IS_VC();
-        check_cache_emulation();
+        if (!gIsVC) {
+            check_cache_emulation();
+        } else {
+            gCacheEmulated = FALSE;
+        }
     } else {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
@@ -369,13 +387,18 @@ void thread3_main(UNUSED void *arg) {
                 handle_sp_complete();
                 break;
             case MESG_DP_COMPLETE:
+                stop_rcp_hang_timer();
                 handle_dp_complete();
                 break;
             case MESG_START_GFX_SPTASK:
+                start_rcp_hang_timer();
                 start_gfx_sptask();
                 break;
             case MESG_NMI_REQUEST:
                 handle_nmi_request();
+                break;
+            case MESG_RCP_HUNG:
+                alert_rcp_hung_up();
                 break;
         }
     }
