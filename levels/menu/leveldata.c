@@ -1356,6 +1356,10 @@ ALIGNED8 static const Texture texture_menu_font_char_diacritic_cedilla[] = {
 #include "levels/menu/main_menu_seg7.cedilla.ia8.inc.c"
 };
 
+ALIGNED8 static const Texture texture_menu_font_missing_character[] = {
+#include "levels/menu/main_menu_seg7.missing_character.ia8.inc.c"
+};
+
 const struct DiacriticLUTEntry menu_font_diacritic_lut[] = {
     [TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE] = {-1,  5, "ˆ"},
     [TEXT_DIACRITIC_ACUTE_UPPERCASE]      = { 0,  5, "ˊ"},
@@ -1702,7 +1706,7 @@ const struct Utf8CharLUTEntry menu_font_utf8_4byte_lut[] = {
 
 };
 
-const struct Utf8CharLUTEntry menu_font_utf8_missing_char = {0, 7, 0, texture_menu_font_char_question};
+const struct Utf8CharLUTEntry menu_font_utf8_missing_char = {0, 8, 0, texture_menu_font_missing_character};
 
 const struct Utf8LUT menu_font_utf8_lut = {
     menu_font_utf8_2byte_lut,

@@ -1412,6 +1412,10 @@ ALIGNED8 static const Texture texture_font_char_amogus[] = {
 #include "textures/segment2/font_graphics.amogus.ia4.inc.c"
 };
 
+ALIGNED8 static const Texture texture_font_missing_character[] = {
+#include "textures/segment2/font_graphics.missing_character.ia4.inc.c"
+};
+
 ALIGNED8 static const Texture texture_hud_char_camera[] = {
 #include "textures/segment2/segment2.07B50.rgba16.inc.c"
 };
@@ -2158,7 +2162,7 @@ const struct Utf8CharLUTEntry main_font_utf8_4byte_lut[] = {
 
 };
 
-const struct Utf8CharLUTEntry main_font_utf8_missing_char = {0, 7, 0, texture_font_char_us_question};
+const struct Utf8CharLUTEntry main_font_utf8_missing_char = {0, 9, 0, texture_font_missing_character};
 
 const struct Utf8LUT main_font_utf8_lut = {
     main_font_utf8_2byte_lut,
