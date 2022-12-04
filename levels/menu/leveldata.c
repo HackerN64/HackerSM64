@@ -1973,7 +1973,7 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
-const char **course_strings_language_table[] = {
+const char *(*course_strings_language_table[])[] = {
     &course_strings_en_table,
 #ifdef ENABLE_FRENCH
     &course_strings_fr_table,

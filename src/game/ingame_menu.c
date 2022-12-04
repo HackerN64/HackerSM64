@@ -220,15 +220,21 @@ struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos
 
     lut = segmented_to_virtual(lut);
     if (!(str[*strPos] & 0x20)) {
-        codepoint = ((str[*strPos] & 0x1F) << 6) | (str[++(*strPos)] & 0x3F);
+        codepoint = ((str[*strPos] & 0x1F) << 6) | (str[*strPos + 1] & 0x3F);
+        *strPos += 1;
+
         usedLUT = segmented_to_virtual(lut->lut2Bytes);
         length = lut->length2Bytes;
     } else if (!(str[*strPos] & 0x10)) {
-        codepoint = ((str[*strPos] & 0xF) << 12) | ((str[++(*strPos)] & 0x3F) << 6) | (str[++(*strPos)] & 0x3F);
+        codepoint = ((str[*strPos] & 0xF) << 12) | ((str[*strPos + 1] & 0x3F) << 6) | (str[*strPos + 2] & 0x3F);
+        *strPos += 2;
+
         usedLUT = segmented_to_virtual(lut->lut3Bytes);
         length = lut->length3Bytes;
     } else {
-        codepoint = ((str[*strPos] & 0x7) << 18) | ((str[++(*strPos)] & 0x3F) << 12) | ((str[++(*strPos)] & 0x3F) << 6) | (str[++(*strPos)] & 0x3F);
+        codepoint = ((str[*strPos] & 0x7) << 18) | ((str[*strPos + 1] & 0x3F) << 12) | ((str[*strPos + 2] & 0x3F) << 6) | (str[*strPos + 3] & 0x3F);
+        *strPos += 3;
+
         usedLUT = segmented_to_virtual(lut->lut4Bytes);
         length = lut->length4Bytes;
     }

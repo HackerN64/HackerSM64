@@ -40,20 +40,20 @@ extern Gfx dl_menu_rgba16_wood_course[];
 extern Collision main_menu_seg7_collision[];
 
 #ifdef MULTILANG
-extern char **course_strings_language_table[];
+extern const char *(*course_strings_language_table[])[];
 extern Gfx dl_menu_rgba16_wood_course_end[];
 extern Gfx dl_menu_texture_course_upper[];
-extern char *course_strings_en_table[];
+extern const char *course_strings_en_table[];
 #ifdef ENABLE_FRENCH
 extern Gfx dl_menu_texture_niveau_upper[];
-extern char *course_strings_fr_table[];
+extern const char *course_strings_fr_table[];
 #endif
 #ifdef ENABLE_GERMAN
 extern Gfx dl_menu_texture_kurs_upper[];
-extern char *course_strings_de_table[];
+extern const char *course_strings_de_table[];
 #endif
 #ifdef ENABLE_JAPANESE
-extern char *course_strings_jp_table[];
+extern const char *course_strings_jp_table[];
 #endif
 #endif
 
