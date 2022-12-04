@@ -127,7 +127,7 @@ void print_displaying_credits_entry(void) {
         }
 
         while (numLines-- > 0) {
-            print_credits_string(CREDIT_TEXT_X_RIGHT - get_string_length(*currStrPtr, main_credits_font_lut, NULL), strY, *currStrPtr);
+            print_credits_string_aligned(CREDIT_TEXT_X_RIGHT, strY, *currStrPtr, TEXT_ALIGN_RIGHT);
 
             strY += lineHeight;
 

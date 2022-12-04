@@ -320,12 +320,13 @@ void puppycam_change_setting(s8 toggle) {
 
 void puppycam_print_text(s32 x, s32 y, unsigned char *str, s32 col) {
     s32 textX = get_str_x_pos_from_center(x, str, 10.0f);
-    gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+    gDialogTextAlpha = 255;
+    gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
     print_generic_string(textX + 1, y - 1,str);
     if (col != 0) {
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     } else {
-        gDPSetEnvColor(gDisplayListHead++, 255,  32,  32, 255);
+        gDPSetEnvColor(gDisplayListHead++, 255,  32,  32, gDialogTextAlpha);
     }
     print_generic_string(textX,y,str);
 }
@@ -384,7 +385,8 @@ void puppycam_display_options() {
     }
     newcam_sinpos = sins(gGlobalTimer * 5000) * 4;
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+    gDialogTextAlpha = 255;
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string( 80 - newcam_sinpos, 132 - (32 * (gPCOptionSelected - gPCOptionScroll)),  (*gPCToggleStringsPtr)[3]);
     print_generic_string(232 + newcam_sinpos, 132 - (32 * (gPCOptionSelected - gPCOptionScroll)),  (*gPCToggleStringsPtr)[4]);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);

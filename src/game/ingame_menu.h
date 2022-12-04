@@ -54,7 +54,7 @@ struct Utf8LUT {
     struct Utf8CharLUTEntry *lut2Bytes;
     struct Utf8CharLUTEntry *lut3Bytes;
     struct Utf8CharLUTEntry *lut4Bytes;
-    u16 length2Bytes;
+    u16 length2Bytes; // set these with the ARRAY_COUNT macro
     u16 length3Bytes;
     u16 length4Bytes;
     struct Utf8CharLUTEntry *missingChar;
@@ -92,7 +92,8 @@ enum TextAlignments {
 };
 
 #define TEXT_FLAG_PACKED 0x8000
-#define TEXT_DIACRITIC_MASK 0x7FFF
+#define TEXT_DIACRITIC_MASK 0x00FF
+// bits 0x0100 through 0x4000 are free for use, and the mask can be reduced if necessary
 
 struct DialogEntry {
     /*0x00*/ s32 voice;
@@ -111,7 +112,7 @@ enum DialogResponseDefines {
     DIALOG_RESPONSE_MAXIMUM = 32
 };
 
-// Macro to create an array of all 4 languages' versions of a string.
+// Types and defines for handling language arrays
 #ifdef MULTILANG
 
 typedef char * langarray_t[4];
@@ -127,6 +128,7 @@ enum MultilangLanguages {
 
 #else
 
+// If multilang is off, ignore all other languages and only include English.
 typedef char * langarray_t;
 #define LANG_ARRAY(cmd) (cmd)
 #define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) english
@@ -157,10 +159,11 @@ void format_int_to_string(char *buf, s32 value);
 void print_generic_string(s16 x, s16 y, char *str);
 void print_hud_lut_string(s16 x, s16 y, char *str);
 void print_menu_generic_string(s16 x, s16 y, char *str);
+void print_credits_string(s16 x, s16 y, char *str);
 void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment);
 void print_hud_lut_string_aligned(s16 x, s16 y, char *str, u32 alignment);
 void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment);
-void print_credits_string(s16 x, s16 y, const char *str);
+void print_credits_string_aligned(s16 x, s16 y, char *str, u32 alignment);
 
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex);
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y);

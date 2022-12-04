@@ -42,9 +42,6 @@ s8 sSelectedButtonID = MENU_BUTTON_NONE;
 // Whether we are on the main menu or one of the submenus.
 s8 sCurrentMenuLevel = MENU_LAYER_MAIN;
 
-// Used for text opacifying. If it is below 250, it is constantly incremented.
-u8 sTextBaseAlpha = 0;
-
 // 2D position of the cursor on the screen.
 // sCursorPos[0]: X | sCursorPos[1]: Y
 f32 sCursorPos[] = {0, 0};
@@ -65,7 +62,7 @@ s8 sFadeOutText = FALSE;
 s8 sStatusMessageID = 0;
 
 // Used for text fading. The alpha value of text is calculated as
-// sTextBaseAlpha - sTextFadeAlpha.
+// gDialogTextAlpha - sTextFadeAlpha.
 u8 sTextFadeAlpha = 0;
 
 // File select timer that keeps counting until it reaches 1000.
@@ -112,6 +109,7 @@ const u8 gDefinedLanguages[] = {
 #endif
 };
 
+// Index of the selected language in the above array.
 s8 sSelectedLanguageIndex = 0;
 
 #define NUM_DEFINED_LANGUAGES ARRAY_COUNT(gDefinedLanguages)
@@ -341,7 +339,7 @@ void bhv_menu_button_loop(void) {
             if (sCurrentMenuLevel == MENU_LAYER_SUBMENU) {
                 bhv_menu_button_growing_from_submenu(gCurrentObject); // Only used for score files
             }
-            sTextBaseAlpha = 0;
+            gDialogTextAlpha = 0;
             sCursorClickingTimer = 4;
             break;
         case MENU_BUTTON_STATE_FULLSCREEN: // Menu state
@@ -353,7 +351,7 @@ void bhv_menu_button_loop(void) {
             if (sCurrentMenuLevel == MENU_LAYER_SUBMENU) {
                 bhv_menu_button_shrinking_to_submenu(gCurrentObject); // Only used for score files
             }
-            sTextBaseAlpha = 0;
+            gDialogTextAlpha = 0;
             sCursorClickingTimer = 4;
             break;
         case MENU_BUTTON_STATE_ZOOM_IN_OUT:
@@ -952,7 +950,7 @@ void bhv_menu_button_manager_init(void) {
                                   bhvMenuButton,  6400, -3500, 0, 0x0, 0x0, 0x0);
     sMainMenuButtons[MENU_BUTTON_SOUND_MODE]->oMenuButtonScale = 1.0f;
 
-    sTextBaseAlpha = 0;
+    gDialogTextAlpha = 0;
 }
 
 /**
@@ -1196,8 +1194,10 @@ void string_format_file_letter(char *buf, char *str, s32 fileIndex) {
  */
 void print_hud_lut_string_fade(s16 x, s16 y, char *text, u32 alignment) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
+    gDialogTextAlpha -= sTextFadeAlpha;
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_hud_lut_string_aligned(x, y, text, alignment);
+    gDialogTextAlpha += sTextFadeAlpha;
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
@@ -1206,8 +1206,10 @@ void print_hud_lut_string_fade(s16 x, s16 y, char *text, u32 alignment) {
  */
 void print_generic_string_fade(s16 x, s16 y, char *text, u32 alignment) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
+    gDialogTextAlpha -= sTextFadeAlpha;
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string_aligned(x, y, text, alignment);
+    gDialogTextAlpha += sTextFadeAlpha;
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
@@ -1349,7 +1351,7 @@ langarray_t textOption = DEFINE_LANGUAGE_ARRAY(
 void print_main_menu_strings(void) {
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_hud_lut_string_aligned(SCREEN_CENTER_X, 35, LANG_ARRAY(textSelectFile), TEXT_ALIGN_CENTER);
     // Print file star counts
     print_save_file_star_count(SAVE_FILE_A, 92, 78);
@@ -1359,7 +1361,7 @@ void print_main_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string_aligned(67, 39, LANG_ARRAY(textScore), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(130, 39, LANG_ARRAY(textCopy), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(191, 39, LANG_ARRAY(textErase), TEXT_ALIGN_CENTER);
@@ -1371,7 +1373,7 @@ void print_main_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_menu_generic_string(92, 65, LANG_ARRAY(textMarioA));
     print_menu_generic_string(207, 65, LANG_ARRAY(textMarioB));
     print_menu_generic_string(92, 105, LANG_ARRAY(textMarioC));
@@ -1451,7 +1453,7 @@ void print_score_menu_strings(void) {
 
     // Print file star counts
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_save_file_star_count(SAVE_FILE_A, 90, 76);
     print_save_file_star_count(SAVE_FILE_B, 211, 76);
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
@@ -1460,7 +1462,7 @@ void print_score_menu_strings(void) {
 
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string_aligned(SUBMENU_LEFT_BUTTON_X, 35, LANG_ARRAY(textReturn), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANG_ARRAY(textCopyFileButton), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANG_ARRAY(textEraseFileButton), TEXT_ALIGN_CENTER);
@@ -1468,7 +1470,7 @@ void print_score_menu_strings(void) {
 
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_menu_generic_string(89, 62, LANG_ARRAY(textMarioA));
     print_menu_generic_string(211, 62, LANG_ARRAY(textMarioB));
     print_menu_generic_string(89, 105, LANG_ARRAY(textMarioC));
@@ -1596,7 +1598,7 @@ void print_copy_menu_strings(void) {
     copy_menu_display_message(sStatusMessageID);
     // Print file star counts
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_save_file_star_count(SAVE_FILE_A, 90, 76);
     print_save_file_star_count(SAVE_FILE_B, 211, 76);
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
@@ -1604,14 +1606,14 @@ void print_copy_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string_aligned(SUBMENU_LEFT_BUTTON_X, 35, LANG_ARRAY(textReturn), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANG_ARRAY(textViewScore), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANG_ARRAY(textEraseFileButton), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_menu_generic_string(89, 62, LANG_ARRAY(textMarioA));
     print_menu_generic_string(211, 62, LANG_ARRAY(textMarioB));
     print_menu_generic_string(89, 105, LANG_ARRAY(textMarioC));
@@ -1692,9 +1694,9 @@ void print_erase_menu_prompt(s16 x, s16 y) {
 
     // Print "YES NO" strings
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, sYesNoColor[0], sYesNoColor[0], sYesNoColor[0], sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, sYesNoColor[0], sYesNoColor[0], sYesNoColor[0], gDialogTextAlpha);
     print_generic_string(x + 56, y, LANG_ARRAY(textYes));
-    gDPSetEnvColor(gDisplayListHead++, sYesNoColor[1], sYesNoColor[1], sYesNoColor[1], sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, sYesNoColor[1], sYesNoColor[1], sYesNoColor[1], gDialogTextAlpha);
     print_generic_string(x + 98, y, LANG_ARRAY(textNo));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
@@ -1798,7 +1800,7 @@ void print_erase_menu_strings(void) {
 
     // Print file star counts
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_save_file_star_count(SAVE_FILE_A, 90, 76);
     print_save_file_star_count(SAVE_FILE_B, 211, 76);
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
@@ -1807,7 +1809,7 @@ void print_erase_menu_strings(void) {
 
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string_aligned(SUBMENU_LEFT_BUTTON_X, 35, LANG_ARRAY(textReturn), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANG_ARRAY(textViewScore), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANG_ARRAY(textCopyFileButton), TEXT_ALIGN_CENTER);
@@ -1815,7 +1817,7 @@ void print_erase_menu_strings(void) {
 
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_menu_generic_string(89, 62, LANG_ARRAY(textMarioA));
     print_menu_generic_string(211, 62, LANG_ARRAY(textMarioB));
     print_menu_generic_string(89, 105, LANG_ARRAY(textMarioC));
@@ -1862,7 +1864,7 @@ void print_sound_mode_menu_strings(void) {
 
     // Print "SOUND SELECT" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     print_hud_lut_string(47, 32, LANG_ARRAY(textSoundSelect));
 #ifdef MULTILANG
@@ -1876,9 +1878,9 @@ void print_sound_mode_menu_strings(void) {
     // Print sound mode names
     for (mode = 0, textX = SCREEN_CENTER_X - OPTION_LABEL_SPACING; mode < 3; textX += OPTION_LABEL_SPACING, mode++) {
         if (mode == sSoundMode) {
-            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
         } else {
-            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
+            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         }
         print_generic_string_aligned(textX, SOUND_LABEL_Y, LANG_ARRAY(*textSoundModes[mode]), TEXT_ALIGN_CENTER);
     }
@@ -1906,7 +1908,7 @@ void print_sound_mode_menu_strings(void) {
         }
     }
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     // Print current language
     print_generic_string_aligned(SCREEN_CENTER_X,      LANGUAGE_SELECT_Y, textLanguage[gInGameLanguage], TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SCREEN_CENTER_X - 50, LANGUAGE_SELECT_Y, "◀", TEXT_ALIGN_CENTER);
@@ -2037,7 +2039,7 @@ void print_save_file_scores(s8 fileIndex) {
 
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     fileLetter[0] = 'A' + fileIndex;
     fileLetter[1] = '\0';
     sprintf(str, LANG_ARRAY(textScoreMenuMarioX), fileLetter);
@@ -2048,7 +2050,7 @@ void print_save_file_scores(s8 fileIndex) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print course scores
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     for ((i = 0); (i < COURSE_STAGES_MAX); (i++)) {
         s32 lineY = 35 + (12 * i);
@@ -2099,8 +2101,8 @@ void print_file_select_strings(void) {
         sAllFilesExist = FALSE;
     }
     // Timers for menu alpha text and the main menu itself
-    if (sTextBaseAlpha < 250) {
-        sTextBaseAlpha += 10;
+    if (gDialogTextAlpha < 250) {
+        gDialogTextAlpha += 10;
     }
     if (sMainMenuTimer < 1000) {
         sMainMenuTimer++;
@@ -2140,7 +2142,7 @@ static u8 get_language_index(u8 language) {
 s32 lvl_init_menu_values_and_cursor_pos(UNUSED s32 arg, UNUSED s32 unused) {
     sSelectedButtonID = MENU_BUTTON_NONE;
     sCurrentMenuLevel = MENU_LAYER_MAIN;
-    sTextBaseAlpha = 0;
+    gDialogTextAlpha = 0;
     // Place the cursor over the save file that was being played.
     // gCurrSaveFileNum is 1 by default when the game boots, as such
     // the cursor will point on Mario A save file.

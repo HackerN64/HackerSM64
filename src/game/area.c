@@ -89,7 +89,7 @@ langarray_t gNoControllerMsg = DEFINE_LANGUAGE_ARRAY(
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
     "CONTROLLER FEHLT",
-    ""); // no japanese translation
+    "NO CONTROLLER");
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;

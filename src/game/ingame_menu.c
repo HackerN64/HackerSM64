@@ -260,15 +260,52 @@ struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos
 }
 
 /**
+ * Convert a character in the range 0-9 or A-F to an integer value. Returns -1 if the character is
+ * not a valid hex digit.
+ */
+static s32 hex_char_to_value(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    return -1;
+}
+
+/**
+ * Determine if the characters following an @ sign are a valid hex color code.
+ */
+static s32 is_color_code_valid(char *str, s32 strPos) {
+    for (s32 i = 0; i < 6; i++) {
+        if (hex_char_to_value(str[strPos + i]) == -1) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+/**
  * Get the exact length of a string of any font in pixels, using the given ASCII and UTF-8 tables.
  */
 s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
     s32 length = 0;
     s32 strPos = 0;
 
+    s32 checkColorCodes = (asciiLut == main_font_lut); // Only check for @ if the font is the main generic font.
+
     asciiLut = segmented_to_virtual(asciiLut);
 
     while (str[strPos] != '\0') {
+        if (checkColorCodes && str[strPos] == '@') {
+            if (is_color_code_valid(str, strPos + 1)) {
+                strPos += 7;
+                continue;
+            }
+        }
         if (str[strPos] & 0x80) {
             length += utf8_lookup(utf8LUT, str, &strPos)->kerning;
         } else {
@@ -404,23 +441,6 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
     return utf8Entry->kerning;  
 }
 
-/**
- * Convert a character in the range 0-9 or A-F to an integer value. Returns -1 if the character is
- * not a valid hex digit.
- */
-static s32 hex_char_to_value(char c) {
-    if (c >= '0' && c <= '9') {
-        return c - '0';
-    }
-    if (c >= 'A' && c <= 'F') {
-        return c - 'A' + 10;
-    }
-    if (c >= 'a' && c <= 'f') {
-        return c - 'a' + 10;
-    }
-    return -1;
-}
-
 // Constants that control how the dialog box renders, the box is taller in Japanese.
 #define DIALOG_LINE_HEIGHT_EN 16
 #define DIALOG_LINE_HEIGHT_JP 20
@@ -467,6 +487,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 }
                 create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * sGenericFontLineHeight), 0.0f);
                 lineNum++;
+                // Can skip any queued spaces
                 queuedSpaces = 0;
                 break;
 
@@ -476,6 +497,8 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 break;
 
             // Backslash / escape character: Force the following character to print normally.
+            // Note that you will have to type '\\' to use this so that the compiler doesn't
+            // interpret it as a real escape character. To render one backslash, use '\\\\'.
             case '\\':
                 strPos++;
                 goto render_character;
@@ -692,6 +715,37 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
 }
 
 /**
+ * Prints a string in the green credits font.
+ */
+void print_credits_string(s16 x, s16 y, const char *str) {
+    s32 strPos = 0;
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
+    u32 curX = x;
+    u32 curY = y;
+
+    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
+                G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
+    gDPTileSync(gDisplayListHead++);
+    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
+                G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
+    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
+
+    while (str[strPos] != '\0') {
+        if (fontLUT[str[strPos] - ' '].texture != NULL) {
+            gDPPipeSync(gDisplayListHead++);
+            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' '].texture);
+            gDPLoadSync(gDisplayListHead++);
+            gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
+            gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                                (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+        }
+
+        curX += fontLUT[str[strPos] - ' '].kerning;
+        strPos++;
+    }
+}
+
+/**
  * Variants of the above that allow for text alignment.
  */
 void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
@@ -724,35 +778,14 @@ void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
     print_menu_generic_string(x, y, str);
 }
 
-/**
- * Prints a string in the green credits font.
- */
-void print_credits_string(s16 x, s16 y, const char *str) {
-    s32 strPos = 0;
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
-    u32 curX = x;
-    u32 curY = y;
-
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
-                G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
-    gDPTileSync(gDisplayListHead++);
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
-                G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
-    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
-
-    while (str[strPos] != '\0') {
-        if (fontLUT[str[strPos] - ' '].texture != NULL) {
-            gDPPipeSync(gDisplayListHead++);
-            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' '].texture);
-            gDPLoadSync(gDisplayListHead++);
-            gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-            gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
-                                (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-        }
-
-        curX += fontLUT[str[strPos] - ' '].kerning;
-        strPos++;
+void print_credits_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
+    s32 strLength = get_string_length(str, main_credits_font_lut, NULL);
+    if (alignment == TEXT_ALIGN_RIGHT) {
+        x -= strLength;
+    } else if (alignment == TEXT_ALIGN_CENTER) {
+        x -= strLength / 2;
     }
+    print_credits_string(x, y, str);
 }
 
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex) {
@@ -944,12 +977,13 @@ static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
+    gDialogTextAlpha = 255;
     switch (gDialogBoxType) {
         case DIALOG_TYPE_ROTATE:
-            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
             break;
         case DIALOG_TYPE_ZOOM:
-            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
             break;
     }
 
@@ -1261,7 +1295,8 @@ void do_cutscene_handler(void) {
     create_dl_ortho_matrix();
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
+    gDialogTextAlpha = gCutsceneMsgFade;
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     print_generic_string_aligned(SCREEN_CENTER_X, 13, LANG_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
@@ -1305,22 +1340,18 @@ void print_peach_letter_message(void) {
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 97.0f, 118.0f, 0);
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
+    gDialogTextAlpha = gCutsceneMsgFade;
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_dl_0700EA58);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gCutsceneMsgFade);
+    gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gDialogTextAlpha);
 
     print_generic_string(38, 142, str);
-#ifdef VERSION_JP
+
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-#else
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    gDPSetEnvColor(gDisplayListHead++, 200, 80, 120, gCutsceneMsgFade);
+    gDPSetEnvColor(gDisplayListHead++, 200, 80, 120, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_us_dl_0700F2E8);
-#endif
 
     // at the start/end of message, reset the fade.
     if (gCutsceneMsgTimer == 0) {

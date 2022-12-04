@@ -6,8 +6,6 @@
 #include "sounds.h"
 #include "seq_ids.h"
 
-#include "make_const_nonconst.h"
-
 #define COURSE_NAME_TABLE course_name_table_fr
 #define ACT_NAME_TABLE act_name_table_fr
 #define DIALOG_TABLE dialog_table_fr

@@ -1360,6 +1360,7 @@ ALIGNED8 static const Texture texture_menu_font_missing_character[] = {
 #include "levels/menu/main_menu_seg7.missing_character.ia8.inc.c"
 };
 
+// Diacritics for the small white menu font
 const struct DiacriticLUTEntry menu_font_diacritic_lut[] = {
     [TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE] = {-1,  5, "ˆ"},
     [TEXT_DIACRITIC_ACUTE_UPPERCASE]      = { 0,  5, "ˊ"},
@@ -1373,6 +1374,7 @@ const struct DiacriticLUTEntry menu_font_diacritic_lut[] = {
 #endif
 };
 
+// ASCII lookup table for the small white menu font
 const struct AsciiCharLUTEntry menu_font_lut[] = {
     {NULL, 4}, // 32 " "
     {texture_menu_font_char_exclamation, 5}, // 33 "!"
@@ -1471,6 +1473,7 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
     {NULL, 0}, // 126 "~" (Unimplemented)
 };
 
+// UTF-8 lookup tables for the small white menu font
 const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
     {0x00A8, 0, 0, texture_menu_font_char_diacritic_umlaut}, // ¨
     {0x00B8, 0, 0, texture_menu_font_char_diacritic_cedilla}, // ¸

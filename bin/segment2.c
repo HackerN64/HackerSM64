@@ -1380,6 +1380,18 @@ ALIGNED8 static const Texture texture_font_char_us_button_C_right[] = {
 #include "textures/segment2/font_graphics.06FC0.ia4.inc.c"
 };
 
+ALIGNED8 static const Texture texture_font_char_plus[] = {
+#include "textures/segment2/font_graphics.plus.ia4.inc.c"
+};
+
+ALIGNED8 static const Texture texture_font_char_slash[] = {
+#include "textures/segment2/font_graphics.slash.ia4.inc.c"
+};
+
+ALIGNED8 static const Texture texture_font_char_backslash[] = {
+#include "textures/segment2/font_graphics.backslash.ia4.inc.c"
+};
+
 ALIGNED8 static const Texture texture_font_char_eszett[] = {
 #include "textures/segment2/font_graphics.eszett.ia4.inc.c"
 };
@@ -1563,6 +1575,7 @@ ALIGNED8 static const Texture texture_hud_char_kana_dakuten_ji[] = {
 };
 #endif
 
+// ASCII lookup table for the colorful HUD font
 const struct AsciiCharLUTEntry main_hud_lut[] = {
     {NULL, 8}, // 32 " "
     {texture_hud_char_exclamation, 12}, // 33 "!"
@@ -1661,6 +1674,7 @@ const struct AsciiCharLUTEntry main_hud_lut[] = {
     {NULL, 0}, // 126 "~" (Unimplemented)
 };
 
+// UTF-8 lookup tables for the colorful HUD font
 const struct Utf8CharLUTEntry main_hud_utf8_2byte_lut[] = {
     {0x00C4, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_A}, // Ä
     {0x00CB, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_E}, // Ë
@@ -1732,6 +1746,7 @@ const struct Utf8LUT main_hud_utf8_lut = {
     &main_hud_utf8_missing_char,
 };
 
+// Diacritics for the generic white font
 const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
     [TEXT_DIACRITIC_CIRCUMFLEX]           = { 0,  0, "ˆ"},
     [TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE] = { 1,  4, "ˆ"},
@@ -1750,6 +1765,7 @@ const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
 #endif
 };
 
+// ASCII lookup table for the generic white font
 const struct AsciiCharLUTEntry main_font_lut[] = {
     {NULL, 5}, // 32 " "
     {texture_font_char_us_exclamation, 5}, // 33 "!"
@@ -1762,11 +1778,11 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_open_parentheses, 5}, // 40 "("
     {texture_font_char_us_close_parentheses, 5}, // 41 ")"
     {NULL, 0}, // 42 "*" (Unimplemented)
-    {NULL, 0}, // 43 "+" (Unimplemented)
+    {texture_font_char_plus, 7}, // 43 "+"
     {texture_font_char_us_comma, 4}, // 44 ","
     {texture_font_char_us_hyphen, 6}, // 45 "-"
     {texture_font_char_us_period, 4}, // 46 "."
-    {NULL, 0}, // 47 "/" (Unimplemented)
+    {texture_font_char_slash, 5}, // 47 "/"
     {texture_font_char_us_0, 7}, // 48 "0"
     {texture_font_char_us_1, 7}, // 49 "1"
     {texture_font_char_us_2, 7}, // 50 "2"
@@ -1811,7 +1827,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_Y, 6}, // 89 "Y"
     {texture_font_char_us_Z, 6}, // 90 "Z"
     {NULL, 0}, // 91 "[" (Unimplemented)
-    {NULL, 0}, // 92 "\\" (Unimplemented)
+    {texture_font_char_backslash, 6}, // 92 "\\"
     {NULL, 0}, // 93 "]" (Unimplemented)
     {NULL, 0}, // 94 "^" (Unimplemented)
     {NULL, 0}, // 95 "_" (Unimplemented)
@@ -1848,6 +1864,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_tilde, 8}, // 126 "~"
 };
 
+// UTF-8 lookup table for the generic white font
 const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00A8, 0, 0, texture_font_char_diacritic_umlaut}, // ¨
     {0x00B7, 4, 0, texture_font_char_us_interpunct}, // ·
@@ -2179,7 +2196,7 @@ const struct Utf8LUT main_font_utf8_lut = {
     &main_font_utf8_missing_char,
 };
 
-// credits font LUT
+// ASCII lookup table for the green credits font
 const struct AsciiCharLUTEntry main_credits_font_lut[] = {
     {NULL, 4}, // 32 " "
     {NULL, 0}, // 33 "!" (Unimplemented)
@@ -2284,6 +2301,8 @@ const Texture *const main_hud_camera_lut[] = {
     texture_hud_char_arrow_up, texture_hud_char_arrow_down,
 };
 
+// If not using multilang, include the text data here in segment 0x02.
+// Otherwise, it will be placed into segment 0x19.
 #ifndef MULTILANG
 #include "sounds.h"
 #include "seq_ids.h"
