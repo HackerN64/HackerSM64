@@ -1872,6 +1872,24 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_tilde, 8}, // 126 "~"
 };
 
+/* This struct defines the UTF-8 characters supported by the main white font!
+ * There are also similar tables for colorful HUD font and the smaller white font.
+ * Adding new characters to the font is very easy!
+ *
+ * Look up the UTF-8 codepoint for your character. If the character is U+0D9E, the codepoint is 0x0D9E.
+ * Determine which table the character belongs to, depending on if it takes up 2, 3 or 4 bytes.
+ * Between U+0080 and U+07FF: 2 bytes
+ * Between U+0800 and U+FFFF: 3 bytes
+ * Between U+10000 and U+10FFFF: 4 bytes
+ *
+ * Add the texture with the other textures above, and add an entry for your new character in the corresponding table.
+ * The format of the entry is: {<codepoint>, <character width>, <flags>, <texture name>}.
+ * (flags will likely be 0).
+ * 
+ * MUST NOTE: You must place your entry in EXACTLY the right spot! The table is sorted by codepoint.
+ * The tables will not work if they are not sorted properly.
+ */
+
 // UTF-8 lookup table for the generic white font
 const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00A1, 5, 0, texture_font_char_inverted_exclamation_mark}, // ¡

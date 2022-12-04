@@ -30,68 +30,68 @@
 
 // Amount of main menu buttons defined in the code called by spawn_object_rel_with_rot.
 // See file_select.h for the names in MenuButtonTypes.
-struct Object *sMainMenuButtons[MENU_BUTTON_OPTION_MAX];
+static struct Object *sMainMenuButtons[MENU_BUTTON_OPTION_MAX];
 
 // Used to defined yes/no fade colors after a file is selected in the erase menu.
 // sYesNoColor[0]: YES | sYesNoColor[1]: NO
-u8 sYesNoColor[2];
+static u8 sYesNoColor[2];
 
 // The button that is selected when it is clicked.
-s8 sSelectedButtonID = MENU_BUTTON_NONE;
+static s8 sSelectedButtonID = MENU_BUTTON_NONE;
 
 // Whether we are on the main menu or one of the submenus.
-s8 sCurrentMenuLevel = MENU_LAYER_MAIN;
+static s8 sCurrentMenuLevel = MENU_LAYER_MAIN;
 
 // 2D position of the cursor on the screen.
 // sCursorPos[0]: X | sCursorPos[1]: Y
-f32 sCursorPos[] = {0, 0};
+static f32 sCursorPos[] = {0, 0};
 
 // Determines which graphic to use for the cursor.
-s16 sCursorClickingTimer = 0;
+static s16 sCursorClickingTimer = 0;
 
 // Equal to sCursorPos if the cursor gets clicked, {-10000, -10000} otherwise.
-s16 sClickPos[] = {-10000, -10000};
+static s16 sClickPos[] = {-10000, -10000};
 
 // Used for determining which file has been selected during copying and erasing.
-s8 sSelectedFileIndex = -1;
+static s8 sSelectedFileIndex = -1;
 
 // Whether to fade out text or not.
-s8 sFadeOutText = FALSE;
+static s8 sFadeOutText = FALSE;
 
 // The message currently being displayed at the top of a menu.
-s8 sStatusMessageID = 0;
+static s8 sStatusMessageID = 0;
 
 // Used for text fading. The alpha value of text is calculated as
 // gDialogTextAlpha - sTextFadeAlpha.
-u8 sTextFadeAlpha = 0;
+static u8 sTextFadeAlpha = 0;
 
 // File select timer that keeps counting until it reaches 1000.
 // Used to prevent buttons from being clickable as soon as a menu loads.
 // Gets reset when you click an empty save, existing saves in copy and erase menus
 // and when you click yes/no in the erase confirmation prompt.
-s16 sMainMenuTimer = 0;
+static s16 sMainMenuTimer = 0;
 
 // Sound mode menu buttonID, has different values compared to gSoundMode in audio.
 // 0: gSoundMode = 0 (Stereo) | 1: gSoundMode = 3 (Mono) | 2: gSoundMode = 1 (Headset)
-s8 sSoundMode = 0;
+static s8 sSoundMode = 0;
 
 // Active language for EU arrays, values defined similar to sSoundMode
 // 0: English | 1: French | 2: German
 
 // Tracks which button will be pressed in the erase confirmation prompt (yes/no).
-s8 sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
+static s8 sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
 
 // Used for the copy menu, defines if the game as all 4 save slots with data.
 // if TRUE, it doesn't allow copying more files.
-s8 sAllFilesExist = FALSE;
+static s8 sAllFilesExist = FALSE;
 
 // Defines the value of the save slot selected in the menu.
 // Mario A: 1 | Mario B: 2 | Mario C: 3 | Mario D: 4
-s8 sSelectedFileNum = 0;
+static s8 sSelectedFileNum = 0;
 
 // Which coin score mode to use when scoring files. 0 for local
 // coin high score, 1 for high score across all files.
-s8 sScoreFileCoinScoreMode = 0;
+static s8 sScoreFileCoinScoreMode = 0;
 
 // Determines which languages are available for the language selector,
 // since the value of the language enums are always constant.
@@ -110,7 +110,10 @@ const u8 gDefinedLanguages[] = {
 };
 
 // Index of the selected language in the above array.
-s8 sSelectedLanguageIndex = 0;
+static s8 sSelectedLanguageIndex = 0;
+
+// Whether to open the language menu when the game is booted.
+static s8 sOpenLangSettings = FALSE;
 
 #define NUM_DEFINED_LANGUAGES ARRAY_COUNT(gDefinedLanguages)
 #endif
@@ -980,6 +983,15 @@ void check_main_menu_clicked_buttons(void) {
             }
         }
     }
+
+#ifdef MULTILANG
+    // Open Options Menu if sOpenLangSettings is TRUE (It's TRUE when there's no saves)
+    if (sOpenLangSettings && (sMainMenuTimer >= 5)) {
+        sMainMenuButtons[MENU_BUTTON_SOUND_MODE]->oMenuButtonState = MENU_BUTTON_STATE_GROWING;
+        sSelectedButtonID = MENU_BUTTON_SOUND_MODE;
+        sOpenLangSettings = FALSE;
+    }
+#endif
 
     // Play sound of the save file clicked
     switch (sSelectedButtonID) {
@@ -2165,6 +2177,15 @@ s32 lvl_init_menu_values_and_cursor_pos(UNUSED s32 arg, UNUSED s32 unused) {
     sSoundMode = save_file_get_sound_mode();
 #ifdef MULTILANG
     sSelectedLanguageIndex = get_language_index(gInGameLanguage);
+
+    for (u32 fileNum = 0; fileNum < NUM_SAVE_FILES; fileNum++) {
+        if (save_file_exists(fileNum) == TRUE) {
+            sOpenLangSettings = FALSE;
+            break;
+        } else {
+            sOpenLangSettings = TRUE;
+        }
+    }
 #endif
     gCurrLevelNum = LEVEL_UNKNOWN_1;
     return 0;
