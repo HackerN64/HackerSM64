@@ -1332,6 +1332,14 @@ ALIGNED8 static const Texture texture_menu_font_char_colon[] = {
 #include "levels/menu/main_menu_seg7.colon.ia8.inc.c"
 };
 
+ALIGNED8 static const Texture texture_menu_font_char_inverted_exclamation_mark[] = {
+#include "levels/menu/main_menu_seg7.inverted_exclamation_mark.ia8.inc.c"
+};
+
+ALIGNED8 static const Texture texture_menu_font_char_inverted_question_mark[] = {
+#include "levels/menu/main_menu_seg7.inverted_question_mark.ia8.inc.c"
+};
+
 ALIGNED8 static const u8 texture_menu_font_char_diacritic_grave[] = {
 #include "levels/menu/main_menu_seg7.grave.ia8.inc.c"
 };
@@ -1475,8 +1483,10 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
 
 // UTF-8 lookup tables for the small white menu font
 const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
+    {0x00A1, 5, 0, texture_menu_font_char_inverted_exclamation_mark}, // ¡
     {0x00A8, 0, 0, texture_menu_font_char_diacritic_umlaut}, // ¨
     {0x00B8, 0, 0, texture_menu_font_char_diacritic_cedilla}, // ¸
+    {0x00BF, 7, 0, texture_menu_font_char_inverted_question_mark}, // ¿
 
     {0x00C0, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_A}, // À
     {0x00C1, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_A}, // Á

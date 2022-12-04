@@ -1392,6 +1392,14 @@ ALIGNED8 static const Texture texture_font_char_backslash[] = {
 #include "textures/segment2/font_graphics.backslash.ia4.inc.c"
 };
 
+ALIGNED8 static const Texture texture_font_char_inverted_exclamation_mark[] = {
+#include "textures/segment2/font_graphics.inverted_exclamation_mark.ia4.inc.c"
+};
+
+ALIGNED8 static const Texture texture_font_char_inverted_question_mark[] = {
+#include "textures/segment2/font_graphics.inverted_question_mark.ia4.inc.c"
+};
+
 ALIGNED8 static const Texture texture_font_char_eszett[] = {
 #include "textures/segment2/font_graphics.eszett.ia4.inc.c"
 };
@@ -1866,9 +1874,11 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
 
 // UTF-8 lookup table for the generic white font
 const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
+    {0x00A1, 5, 0, texture_font_char_inverted_exclamation_mark}, // ¡
     {0x00A8, 0, 0, texture_font_char_diacritic_umlaut}, // ¨
     {0x00B7, 4, 0, texture_font_char_us_interpunct}, // ·
     {0x00B8, 0, 0, texture_font_char_diacritic_cedilla}, // ¸
+    {0x00BF, 7, 0, texture_font_char_inverted_question_mark}, // ¿
 
     {0x00C0, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_font_char_us_A}, // À
     {0x00C1, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_font_char_us_A}, // Á
