@@ -717,7 +717,7 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
 /**
  * Prints a string in the green credits font.
  */
-void print_credits_string(s16 x, s16 y, const char *str) {
+void print_credits_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
     u32 curX = x;
