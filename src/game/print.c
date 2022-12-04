@@ -64,8 +64,14 @@ void print_text(s32 x, s32 y, char *str) {
 /**
  * Prints text in the colorful lettering centered at given X, Y coordinates.
  */
-void print_text_centered(s32 x, s32 y, char *str) {
-    print_text(x - get_string_length(str, main_hud_lut, &main_hud_utf8_lut) / 2, y, str);
+void print_text_aligned(s32 x, s32 y, char *str, u32 alignment) {
+    s32 strLength = get_string_length(str, main_hud_lut, &main_hud_utf8_lut);
+    if (alignment == TEXT_ALIGN_RIGHT) {
+        x -= strLength;
+    } else if (alignment == TEXT_ALIGN_CENTER) {
+        x -= strLength / 2;
+    }
+    print_text(x, y, str);
 }
 
 /**

@@ -1929,7 +1929,7 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     format_int_to_string(secretStarsNum, save_file_get_total_star_count(fileIndex,
                                                                   COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                                   COURSE_NUM_TO_INDEX(COURSE_MAX)));
-    sprintf(secretStarsText, "★× %s", secretStarsNum);
+    sprintf(secretStarsText, "★×%s", secretStarsNum);
     print_menu_generic_string(x, y, secretStarsText);
 }
 
@@ -1950,15 +1950,15 @@ langarray_t textMarioFace = LANGUAGE_TEXT(
  */
 void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     char str[20];
+    char coinScoreText[10];
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
 
     // MYSCORE
     if (sScoreFileCoinScoreMode == 0) {
-        // Print "[coin] x"
-        print_menu_generic_string(x + 25, y, "✪×");
         // Print coin score
-        format_int_to_string(str, save_file_get_course_coin_score(fileIndex, courseIndex));
-        print_menu_generic_string(x + 41, y, str);
+        format_int_to_string(coinScoreText, save_file_get_course_coin_score(fileIndex, courseIndex));
+        sprintf(str, "✪×%s", coinScoreText);
+        print_menu_generic_string(x + 25, y, str);
         // If collected, print 100 coin star
         if (stars & STAR_FLAG_ACT_100_COINS) {
             print_menu_generic_string(x + 70, y, "★");
@@ -1967,11 +1967,10 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
     // HISCORE
     else {
         u16 coinScoreFile;
-        // Print "[coin] x"
-        print_menu_generic_string(x + 18, y, "✪×");
         // Print coin highscore
-        format_int_to_string(str, (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
-        print_menu_generic_string(x + 34, y, str);
+        format_int_to_string(coinScoreText, (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
+        sprintf(str, "✪×%s", coinScoreText);
+        print_menu_generic_string(x + 18, y, str);
         // Print coin highscore file
         coinScoreFile = (save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF;
         if (coinScoreFile == 0) {
@@ -2011,7 +2010,7 @@ langarray_t textScoreMenuMarioX = LANGUAGE_TEXT(
     "MARIO %s",
     "MARIO %s",
     "MARIO %s",
-    "マリオ%s");
+    "マリオ %s");
 
 langarray_t textHiScore = LANGUAGE_TEXT(
     "HI SCORE",
@@ -2067,9 +2066,9 @@ void print_save_file_scores(s8 fileIndex) {
 
     // Print current coin score mode
     if (sScoreFileCoinScoreMode == 0) {
-        print_menu_generic_string(238, 24, LANGUAGE_ARRAY(textMyScore));
+        print_menu_generic_string_aligned(262, 24, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_CENTER);
     } else {
-        print_menu_generic_string(231, 24, LANGUAGE_ARRAY(textHiScore));
+        print_menu_generic_string_aligned(262, 24, LANGUAGE_ARRAY(textHiScore), TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);

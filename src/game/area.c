@@ -111,10 +111,10 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 void print_intro_text(void) {
     if ((gGlobalTimer & 31) < 20) {
         if (gControllerBits == 0) {
-            print_text_centered(SCREEN_CENTER_X, 20, LANGUAGE_ARRAY(gNoControllerMsg));
+            print_text_aligned(SCREEN_CENTER_X, 20, LANGUAGE_ARRAY(gNoControllerMsg), TEXT_ALIGN_CENTER);
         } else {
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
+            print_text_aligned(60, 38, "PRESS", TEXT_ALIGN_CENTER);
+            print_text_aligned(60, 20, "START", TEXT_ALIGN_CENTER);
         }
     }
 }

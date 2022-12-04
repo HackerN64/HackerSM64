@@ -1720,6 +1720,18 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
     print_generic_string(x + 23, y + 18, str);
 }
 
+langarray_t textCoinX = LANGUAGE_TEXT(
+    "✪× %s",
+    "✪× %s",
+    "✪× %s",
+    "✪ｘ%s");
+
+langarray_t textStarX = LANGUAGE_TEXT(
+    "★× %s",
+    "★× %s",
+    "★× %s",
+    "★ｘ%s");
+
 void render_pause_castle_main_strings(s16 x, s16 y) {
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
@@ -1769,7 +1781,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
         render_pause_castle_course_stars(x - 65, y, gCurrSaveFileNum - 1, gDialogLineNum);
 
         format_int_to_string(countText, save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
-        sprintf(str, "✪× %s", countText);
+        sprintf(str, LANGUAGE_ARRAY(textCoinX), countText);
         print_generic_string(x - 22, y, str);
 
         format_int_to_string(str, gDialogLineNum + 1);
@@ -1781,7 +1793,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
         format_int_to_string(countText, save_file_get_total_star_count(gCurrSaveFileNum - 1,
                                                              COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                              COURSE_NUM_TO_INDEX(COURSE_MAX)));
-        sprintf(str, "★× %s", countText);
+        sprintf(str, LANGUAGE_ARRAY(textStarX), countText);
         print_generic_string_aligned(x, y + 18, str, TEXT_ALIGN_CENTER);
     }
 

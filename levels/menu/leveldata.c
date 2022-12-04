@@ -1499,7 +1499,7 @@ const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
     {0x00D5, 6, TEXT_DIACRITIC_TILDE_UPPERCASE, texture_menu_font_char_O}, // Õ
     {0x00D6, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_O}, // Ö
 
-    {0x00D7, 6, 0, texture_menu_font_char_multiply}, // ×
+    {0x00D7, 9, 0, texture_menu_font_char_multiply}, // ×
 
     {0x00D9, 6, TEXT_DIACRITIC_GRAVE_UPPERCASE, texture_menu_font_char_U}, // Ù
     {0x00DA, 6, TEXT_DIACRITIC_ACUTE_UPPERCASE, texture_menu_font_char_U}, // Ú
