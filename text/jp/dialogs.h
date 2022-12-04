@@ -1,4 +1,4 @@
-// Parameters: dialog enum ID, (unused), lines per box, left offset, width
+// Parameters: dialog enum ID, voice sound, lines per box, left offset, width
 
 DEFINE_DIALOG(DIALOG_000, NO_SOUND, 5, 30, 200, "\
 おおっと、ここはキケンな\n\

@@ -27,7 +27,7 @@
 
 u16 gDialogColorFadeTimer;
 s8 gLastDialogLineNum;
-s32 gDialogVariable;
+DialogVariable gDialogVariable;
 u16 gDialogTextAlpha;
 s8 gRedCoinsCollected;
 
@@ -111,7 +111,7 @@ s16 gDialogID = DIALOG_NONE;
 s16 gLastDialogPageStrPos = 0;
 s16 gDialogTextPos = 0;
 s8 gDialogLineNum = 1;
-s8 gLastDialogResponse = 0;
+s8 gDialogHasResponse = FALSE;
 u8 gMenuHoldKeyIndex = 0;
 u8 gMenuHoldKeyTimer = 0;
 s32 gDialogResponse = DIALOG_RESPONSE_NONE;
@@ -398,6 +398,23 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
     return utf8Entry->kerning;  
 }
 
+/**
+ * Convert a character in the range 0-9 or A-F to an integer value. Returns -1 if the character is
+ * not a valid hex digit.
+ */
+static s32 hex_char_to_value(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    return -1;
+}
+
 // Constants that control how the dialog box renders, the box is taller in Japanese.
 #define DIALOG_LINE_HEIGHT_EN 16
 #define DIALOG_LINE_HEIGHT_JP 20
@@ -427,57 +444,16 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
  */
 static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     s32 strPos = 0;
-    u8 lineNum = 1;
-
-    //s16 colorLoop;
-    //ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
-    //u8 customColor = 0;
-    //u8 diffTmp     = 0;
-    u8 kerning = 0;
+    s32 lineNum = 1;
+    s8 kerning = 0;
     u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
+    u8 color[3];
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
     while (str[strPos] != '\0') {
         switch (str[strPos]) {
-            /**case DIALOG_CHAR_COLOR:
-                customColor = 1;
-                strPos++;
-                for (colorLoop = (strPos + 8); strPos < colorLoop; ++strPos) {
-                    diffTmp = 0;
-                    if ((str[strPos] >= 0x24)
-                     && (str[strPos] <= 0x29)) {
-                        diffTmp = 0x1A;
-                    } else if (str[strPos] >= 0x10) {
-                        customColor = 2;
-                        strPos = (colorLoop - 8);
-                        for (diffTmp = 0; diffTmp < 8; ++diffTmp) {
-                            if (str[strPos + diffTmp] != 0x9F) {
-                                break;
-                            }
-                        }
-                        if (diffTmp == 8) {
-                            strPos += diffTmp;
-                        }
-                        break;
-                    }
-                    if (((8 - (colorLoop - strPos)) % 2) == 0) {
-                        rgbaColors[(8 - (colorLoop - strPos)) / 2] = (((str[strPos] - diffTmp) & 0x0F) << 4);
-                    } else {
-                        rgbaColors[(8 - (colorLoop - strPos)) / 2] += ((str[strPos] - diffTmp) & 0x0F);
-                    }
-                }
-                strPos--;
-                if (customColor == 1) {
-                    gDPSetEnvColor(gDisplayListHead++, rgbaColors[0],
-                                                    rgbaColors[1],
-                                                    rgbaColors[2],
-                                                    rgbaColors[3]);
-                } else if (customColor == 2) {
-                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
-                    customColor = 0;
-                }
-                break;**/
+            // Newline
             case '\n':
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 if (lineNum == maxLines) {
@@ -487,32 +463,67 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 lineNum++;
                 queuedSpaces = 0;
                 break;
-            case '/':
-                queuedSpaces += 2;
-                break;
+
+            // Space
             case ' ':
                 queuedSpaces++;
                 break;
-            // %d: Display value of dialog variable
+
+            // Backslash / escape character: Force the following character to print normally.
+            case '\\':
+                strPos++;
+                goto render_character;
+
+            // %d or %s: Display value of dialog variable,
             case '%':
-                if (str[strPos + 1] == 'd') {
-                    char dialogVarText[32];
-                    strPos++;
-
-                    // Resolve queued spaces
-                    if (queuedSpaces != 0) {
-                        create_dl_translation_matrix(MENU_MTX_NOPUSH, queuedSpaces * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
-                        queuedSpaces = 0;
-                    }
-
-                    format_int_to_string(dialogVarText, gDialogVariable);
-                    render_main_font_text(0, 0, dialogVarText, -1);
-                    kerning = get_string_length(dialogVarText, main_font_lut, &main_font_utf8_lut);
-                    create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
-                    break;
+                // Resolve queued spaces
+                if (queuedSpaces != 0) {
+                    create_dl_translation_matrix(MENU_MTX_NOPUSH, queuedSpaces * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
+                    queuedSpaces = 0;
                 }
-                // Intentional fallthrough
+
+                switch (str[strPos + 1]) {
+                    // %d: Display dialog var as a decimal integer,
+                    case 'd':
+                        char dialogVarText[32];
+                        strPos++;
+
+                        format_int_to_string(dialogVarText, gDialogVariable.asInt);
+                        render_main_font_text(0, 0, dialogVarText, -1);
+                        kerning = get_string_length(dialogVarText, main_font_lut, &main_font_utf8_lut);
+                        create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
+                        break;
+                    // %s: Display dialog var as a pointer to a string.
+                    case 's':
+                        strPos++;
+                        render_main_font_text(0, 0, gDialogVariable.asStr, -1);
+                        kerning = get_string_length(gDialogVariable.asStr, main_font_lut, &main_font_utf8_lut);
+                        create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
+                        break;
+                }
+                // If the character following the % is not 'd' or 's', print the % as a normal character.
+                goto render_character;
+
+            // @XXXXXX: Set color of text to an RGB value.
+            // E.g. @FF0000 will set the color to red.
+            // Will use gDialogTextAlpha as the alpha value.
+            case '@':
+                for (u32 i = 0; i < 3; i++) {
+                    s32 firstDigit = hex_char_to_value(str[strPos + i * 2 + 1]);
+                    s32 secondDigit = hex_char_to_value(str[strPos + i * 2 + 2]);
+                    // If the sequence following the @ is not a valid RGBA32 color, interpret it as normal text.
+                    if (firstDigit == -1 || secondDigit == -1) {
+                        goto render_character;
+                    }
+                    color[i] = (firstDigit << 4) | secondDigit;
+                }
+                strPos += 6;
+                gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], gDialogTextAlpha);
+                break;
+
+            // Normal character rendering
             default:
+render_character:
                 // Resolve queued spaces
                 if (queuedSpaces != 0) {
                     create_dl_translation_matrix(MENU_MTX_NOPUSH, queuedSpaces * SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
@@ -631,6 +642,10 @@ static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
  */
 static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, strPos);
+
+    if (utf8Entry->texture == NULL) {
+        return utf8Entry->kerning;
+    }
 
     if (utf8Entry->flags & TEXT_DIACRITIC_MASK) {
         struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&menu_font_diacritic_lut);
@@ -803,6 +818,9 @@ s32 get_dialog_id(void) {
     return gDialogID;
 }
 
+/**
+ * Initialise a dialog box.
+ */
 void create_dialog_box(s16 dialog) {
     if (gDialogID == DIALOG_NONE) {
         gDialogID = dialog;
@@ -810,7 +828,26 @@ void create_dialog_box(s16 dialog) {
     }
 }
 
-void create_dialog_box_with_var(s16 dialog, s32 dialogVar) {
+/**
+ * Initialise a dialog box with an integer variable to be displayed with %d.
+ */
+void create_dialog_box_with_int_var(s16 dialog, s32 dialogVar) {
+    DialogVariable var = { .asInt = dialogVar };
+    create_dialog_box_with_var(dialog, var);
+}
+
+/**
+ * Initialise a dialog box with a string variable to be displayed with %s.
+ */
+void create_dialog_box_with_str_var(s16 dialog, char *dialogVar) {
+    DialogVariable var = { .asStr = dialogVar };
+    create_dialog_box_with_var(dialog, var);
+}
+
+/**
+ * Initialise a dialog box with a general variable.
+ */
+void create_dialog_box_with_var(s16 dialog, DialogVariable dialogVar) {
     if (gDialogID == DIALOG_NONE) {
         gDialogID = dialog;
         gDialogVariable = dialogVar;
@@ -818,6 +855,9 @@ void create_dialog_box_with_var(s16 dialog, s32 dialogVar) {
     }
 }
 
+/**
+ * Initialise a dialog box with black text on a white background instead of white text on black.
+ */
 void create_dialog_inverted_box(s16 dialog) {
     if (gDialogID == DIALOG_NONE) {
         gDialogID = dialog;
@@ -825,11 +865,14 @@ void create_dialog_inverted_box(s16 dialog) {
     }
 }
 
+/**
+ * Initialise a dialog box that asks for a response.
+ */
 void create_dialog_box_with_response(s16 dialog) {
     if (gDialogID == DIALOG_NONE) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ROTATE;
-        gLastDialogResponse = 1;
+        gDialogHasResponse = TRUE;
     }
 }
 
@@ -841,7 +884,7 @@ void reset_dialog_render_state(void) {
     gDialogBoxState = DIALOG_STATE_OPENING;
     gDialogID = DIALOG_NONE;
     gDialogTextPos = 0;
-    gLastDialogResponse = 0;
+    gDialogHasResponse = FALSE;
     gLastDialogPageStrPos = 0;
     gDialogResponse = DIALOG_RESPONSE_NONE;
 }
@@ -1142,7 +1185,7 @@ void render_dialog_entries(void) {
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gDialogID = DIALOG_NONE;
                 gDialogTextPos = 0;
-                gLastDialogResponse = 0;
+                gDialogHasResponse = FALSE;
                 gLastDialogPageStrPos = 0;
                 gDialogResponse = DIALOG_RESPONSE_NONE;
             }
@@ -1159,7 +1202,7 @@ void render_dialog_entries(void) {
                   ensure_nonnegative(SCREEN_HEIGHT + (dialog->linesPerBox * DIALOG_LINE_HEIGHT) - dialog->width));
     handle_dialog_text_and_pages(dialog);
 
-    if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
+    if (gLastDialogPageStrPos == -1 && gDialogHasResponse) {
         render_dialog_triangle_choice();
     }
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, SCREEN_WIDTH - gBorderHeight / 2, SCREEN_HEIGHT - gBorderHeight / 2);
@@ -1400,13 +1443,13 @@ void render_pause_red_coins(void) {
     }
 }
 
-langarray_t textAspectRatio43 = LANGUAGE_TEXT(
+langarray_t textCurrRatio43 = LANGUAGE_TEXT(
     "ASPECT RATIO: 4:3\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
     "アスペクトひ: ４:３\nＬボタンできりかえ");
 
-langarray_t textAspectRatio169 = LANGUAGE_TEXT(
+langarray_t textCurrRatio169 = LANGUAGE_TEXT(
     "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 16:9\nDRÜCKE L ZUM WECHSELN",
@@ -1418,9 +1461,9 @@ void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     if (!gConfig.widescreen) {
-        print_generic_string(10, 20, LANGUAGE_ARRAY(textAspectRatio43));
+        print_generic_string(10, 20, LANGUAGE_ARRAY(textCurrRatio43));
     } else {
-        print_generic_string(10, 20, LANGUAGE_ARRAY(textAspectRatio169));
+        print_generic_string(10, 20, LANGUAGE_ARRAY(textCurrRatio169));
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
@@ -2048,6 +2091,16 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
+// Save option strings are longer in French, so render them further to the left.
+#define SAVE_CONFIRMATION_X_EN  100
+#define SAVE_CONFIRMATION_X_FR  80  
+
+#ifdef LANG_FRENCH
+#define SAVE_CONFIRMATION_X ((gInGameLanguage == LANGUAGE_FRENCH) ? SAVE_CONFIRMATION_X_FR : SAVE_CONFIRMATION_X_EN)
+#else
+#define SAVE_CONFIRMATION_X SAVE_CONFIRMATION_X_EN
+#endif
+
 s32 render_course_complete_screen(void) {
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
@@ -2063,7 +2116,7 @@ s32 render_course_complete_screen(void) {
         case DIALOG_STATE_VERTICAL:
             shade_screen();
             render_course_complete_lvl_info_and_hud_str();
-            render_save_confirmation(100, 86, &gDialogLineNum, 20);
+            render_save_confirmation(SAVE_CONFIRMATION_X, 86, &gDialogLineNum, 20);
 
             if (gCourseDoneMenuTimer > 110 && (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON))) {
                 level_set_transition(0, NULL);

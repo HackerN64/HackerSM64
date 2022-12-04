@@ -1356,7 +1356,6 @@ ALIGNED8 static const Texture texture_menu_font_char_diacritic_cedilla[] = {
 #include "levels/menu/main_menu_seg7.cedilla.ia8.inc.c"
 };
 
-// ASCII todo: add rest of diacritics here
 const struct DiacriticLUTEntry menu_font_diacritic_lut[] = {
     [TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE] = {-1,  5, "ˆ"},
     [TEXT_DIACRITIC_ACUTE_UPPERCASE]      = { 0,  5, "ˊ"},
