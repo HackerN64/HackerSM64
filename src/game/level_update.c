@@ -1173,6 +1173,8 @@ s32 init_level(void) {
     sTransitionTimer = 0;
     sSpecialWarpDest = WARP_SPECIAL_NONE;
 
+    g100CoinStarSpawned = FALSE;
+
     if (gCurrCreditsEntry == NULL) {
         gHudDisplay.flags = HUD_DISPLAY_DEFAULT;
     } else {

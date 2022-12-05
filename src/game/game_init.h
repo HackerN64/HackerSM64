@@ -71,6 +71,8 @@ extern struct DemoInput *gCurrDemoInput;
 extern u16 gDemoInputListID;
 extern struct DemoInput gRecordedDemoInput;
 
+extern u8 g100CoinStarSpawned;
+
 // this area is the demo input + the header. when the demo is loaded in, there is a header the size
 // of a single word next to the input list. this word is the current ID count.
 extern struct DmaHandlerList gMarioAnimsBuf;
