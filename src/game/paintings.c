@@ -914,35 +914,7 @@ Gfx *display_painting_not_rippling(const struct Painting *painting) {
     return dlist;
 }
 
-/**
- * Clear Mario-related state and clear gRipplingPaintingObject.
- */
-void reset_painting(struct Object *obj) {
-    obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
-    obj->oPaintingChangedFlags = RIPPLE_FLAGS_NONE;
-
-    gRipplingPaintingObject = NULL;
-
-#ifdef NO_SEGMENTED_MEMORY
-    // Make sure all variables are reset correctly.
-    // With segmented memory the segments that contain the relevant
-    // Painting structs are reloaded from ROM upon level load.
-    obj->oPaintingState = PAINTING_IDLE;
-    obj->oPaintingCurrRippleMag = 0.0f;
-    obj->oPaintingRippleDecay = 1.0f;
-    obj->oPaintingCurrRippleRate = 0.0f;
-    obj->oPaintingDispersionFactor = 0.0f;
-    obj->oPaintingRippleTimer = 0;
-    obj->oPaintingRippleX = 0;
-    obj->oPaintingRippleY = 0;
-    if ((const struct Painting *)obj->oPaintingData == &ddd_painting) {
-        // Move DDD painting to initial position, in case the animation
-        // that moves the painting stops during level unload.
-        obj->oPosX = 3456.0f;
-    }
-#endif
-}
-
+#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
 /**
  * Controls the x coordinate of the DDD painting.
  *
@@ -979,6 +951,7 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
         obj->oPosX = frontPos;
     }
 }
+#endif
 
 /**
  * Render and update the painting whose id and group matches the values in the GraphNode's parameter.
@@ -1006,13 +979,17 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
     Gfx *paintingDlist = NULL;
 
-    if (callContext != GEO_CONTEXT_RENDER) {
+    if (callContext != GEO_CONTEXT_RENDER) { // Init
         // Reset the update counter.
         obj->oPaintingLastUpdateCounter = (gAreaUpdateCounter - 1);
         obj->oPaintingUpdateCounter = gAreaUpdateCounter;
 
-        reset_painting(obj);
-    } else if (callContext == GEO_CONTEXT_RENDER) {
+        // Clear Mario-related state and clear gRipplingPaintingObject.
+        obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
+        obj->oPaintingChangedFlags = RIPPLE_FLAGS_NONE;
+
+        gRipplingPaintingObject = NULL;
+    } else if (callContext == GEO_CONTEXT_RENDER) { // Update
         // Reset the update counter.
         obj->oPaintingLastUpdateCounter = obj->oPaintingUpdateCounter;
         obj->oPaintingUpdateCounter = gAreaUpdateCounter;
