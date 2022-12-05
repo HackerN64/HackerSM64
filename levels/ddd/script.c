@@ -86,7 +86,7 @@ const LevelScript level_ddd_entry[] = {
         WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_DDD, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x03, /*destNode*/ 0x35, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x03, /*destNode*/ 0x67, /*flags*/ WARP_NO_CHECKPOINT),
-        WHIRLPOOL(/*index*/ 0, /*acts*/ ALL_ACTS,                              /*pos*/ -3174, -4915,   102, /*strength*/  20),
+        WHIRLPOOL(/*index*/ 0, /*acts*/ ALL_ACTS, /*pos*/ -3174, -4915, 102, /*strength*/ 20),
         JUMP_LINK(script_func_local_1),
         JUMP_LINK(script_func_local_2),
         INSTANT_WARP(/*index*/ 3, /*destArea*/ 2, /*displace*/ -8192, 0, 0),
