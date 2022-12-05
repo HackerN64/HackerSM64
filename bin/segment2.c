@@ -2926,8 +2926,10 @@ const Gfx dl_paintings_draw_ripples[] = {
     gsSPEndDisplayList(),
 };
 
-#define PDX (PAINTING_SIZE / 12.0f) // 51.2f
-#define PDY (PAINTING_SIZE / 20.0f) // 30.72f
+// Painting vertex coordinates
+#define PDX(x) ((x) * (PAINTING_SIZE / 12.0f)) // 51.2f
+#define PDY(y) ((y) * (PAINTING_SIZE / 20.0f)) // 30.72f
+#define PAINTING_VERTEX(x, y, r) PDX(x), PDY(y), (r)
 
 // 14A60: triangle mesh
 // 0x02014A60
@@ -2935,163 +2937,163 @@ const PaintingData seg2_painting_triangle_mesh[] = {
     157, // numVtx
     // format:
     // 2D point (x, y), ripple (0 or 1)
-    (PDX * 12), (PDY * 19),   0, // 0
-    (PDX * 12), (PDY * 20),   0, // 1
-    (PDX * 11), (PDY * 20),   0, // 2
-    (PDX * 11), (PDY * 18),   1, // 3
-    (PDX * 12), (PDY * 17),   0, // 4
-    (PDX * 10), (PDY * 19),   1, // 5
-    (PDX * 10), (PDY * 20),   0, // 6
-    (PDX *  6), (PDY * 20),   0, // 7
-    (PDX *  6), (PDY * 19),   1, // 8
-    (PDX *  7), (PDY * 20),   0, // 9
-    (PDX *  5), (PDY * 20),   0, // 10
-    (PDX *  5), (PDY * 18),   1, // 11
-    (PDX *  6), (PDY * 17),   1, // 12
-    (PDX *  7), (PDY * 18),   1, // 13
-    (PDX *  8), (PDY * 19),   1, // 14
-    (PDX *  9), (PDY * 20),   0, // 15
-    (PDX * 10), (PDY * 17),   1, // 16
-    (PDX *  9), (PDY * 18),   1, // 17
-    (PDX *  8), (PDY * 17),   1, // 18
-    (PDX * 11), (PDY * 10),   1, // 19
-    (PDX * 12), (PDY * 11),   0, // 20
-    (PDX * 11), (PDY * 14),   1, // 21
-    (PDX * 12), (PDY * 13),   0, // 22
-    (PDX * 11), (PDY * 12),   1, // 23
-    (PDX * 10), (PDY * 11),   1, // 24
-    (PDX *  9), (PDY * 10),   1, // 25
-    (PDX *  9), (PDY * 14),   1, // 26
-    (PDX * 10), (PDY * 13),   1, // 27
-    (PDX * 10), (PDY * 15),   1, // 28
-    (PDX *  8), (PDY * 11),   1, // 29
-    (PDX *  9), (PDY * 12),   1, // 30
-    (PDX *  7), (PDY * 10),   1, // 31
-    (PDX *  8), (PDY * 15),   1, // 32
-    (PDX *  7), (PDY * 14),   1, // 33
-    (PDX *  8), (PDY * 13),   1, // 34
-    (PDX *  7), (PDY * 12),   1, // 35
-    (PDX *  6), (PDY * 11),   1, // 36
-    (PDX *  5), (PDY * 10),   1, // 37
-    (PDX *  6), (PDY * 13),   1, // 38
-    (PDX *  5), (PDY * 14),   1, // 39
-    (PDX *  6), (PDY * 15),   1, // 40
-    (PDX * 12), (PDY * 15),   0, // 41
-    (PDX * 11), (PDY * 16),   1, // 42
-    (PDX *  9), (PDY * 16),   1, // 43
-    (PDX *  7), (PDY * 16),   1, // 44
-    (PDX *  5), (PDY * 16),   1, // 45
-    (PDX *  8), (PDY *  9),   1, // 46
-    (PDX * 10), (PDY *  9),   1, // 47
-    (PDX *  6), (PDY *  9),   1, // 48
-    (PDX * 12), (PDY *  1),   0, // 49
-    (PDX * 12), (PDY *  0),   0, // 50
-    (PDX * 11), (PDY *  0),   0, // 51
-    (PDX * 11), (PDY *  4),   1, // 52
-    (PDX * 12), (PDY *  3),   0, // 53
-    (PDX * 10), (PDY *  1),   1, // 54
-    (PDX * 11), (PDY *  2),   1, // 55
-    (PDX *  9), (PDY *  0),   0, // 56
-    (PDX * 10), (PDY *  0),   0, // 57
-    (PDX *  9), (PDY *  4),   1, // 58
-    (PDX * 10), (PDY *  3),   1, // 59
-    (PDX * 10), (PDY *  5),   1, // 60
-    (PDX *  8), (PDY *  1),   1, // 61
-    (PDX *  9), (PDY *  2),   1, // 62
-    (PDX *  7), (PDY *  0),   0, // 63
-    (PDX *  8), (PDY *  0),   0, // 64
-    (PDX *  8), (PDY *  3),   1, // 65
-    (PDX *  7), (PDY *  4),   1, // 66
-    (PDX *  8), (PDY *  5),   1, // 67
-    (PDX *  6), (PDY *  1),   1, // 68
-    (PDX *  7), (PDY *  2),   1, // 69
-    (PDX *  5), (PDY *  0),   0, // 70
-    (PDX *  6), (PDY *  0),   0, // 71
-    (PDX *  5), (PDY *  4),   1, // 72
-    (PDX *  6), (PDY *  3),   1, // 73
-    (PDX *  6), (PDY *  5),   1, // 74
-    (PDX * 12), (PDY *  5),   0, // 75
-    (PDX * 11), (PDY *  8),   1, // 76
-    (PDX * 12), (PDY *  7),   0, // 77
-    (PDX * 11), (PDY *  6),   1, // 78
-    (PDX *  9), (PDY *  8),   1, // 79
-    (PDX * 10), (PDY *  7),   1, // 80
-    (PDX *  9), (PDY *  6),   1, // 81
-    (PDX *  7), (PDY *  8),   1, // 82
-    (PDX *  8), (PDY *  7),   1, // 83
-    (PDX *  7), (PDY *  6),   1, // 84
-    (PDX *  5), (PDY *  8),   1, // 85
-    (PDX *  6), (PDY *  7),   1, // 86
-    (PDX *  4), (PDY * 19),   1, // 87
-    (PDX *  0), (PDY * 20),   0, // 88
-    (PDX *  0), (PDY * 19),   0, // 89
-    (PDX *  1), (PDY * 20),   0, // 90
-    (PDX *  1), (PDY * 18),   1, // 91
-    (PDX *  2), (PDY * 19),   1, // 92
-    (PDX *  4), (PDY * 17),   1, // 93
-    (PDX *  3), (PDY * 18),   1, // 94
-    (PDX *  3), (PDY * 20),   0, // 95
-    (PDX *  2), (PDY * 17),   1, // 96
-    (PDX *  5), (PDY * 12),   1, // 97
-    (PDX *  4), (PDY * 11),   1, // 98
-    (PDX *  3), (PDY * 10),   1, // 99
-    (PDX *  3), (PDY * 14),   1, // 100
-    (PDX *  4), (PDY * 13),   1, // 101
-    (PDX *  4), (PDY * 15),   1, // 102
-    (PDX *  3), (PDY * 12),   1, // 103
-    (PDX *  2), (PDY * 11),   1, // 104
-    (PDX *  1), (PDY * 10),   1, // 105
-    (PDX *  1), (PDY * 14),   1, // 106
-    (PDX *  2), (PDY * 13),   1, // 107
-    (PDX *  2), (PDY * 15),   1, // 108
-    (PDX *  1), (PDY * 12),   1, // 109
-    (PDX *  0), (PDY * 11),   0, // 110
-    (PDX *  0), (PDY * 15),   0, // 111
-    (PDX *  3), (PDY * 16),   1, // 112
-    (PDX *  1), (PDY * 16),   1, // 113
-    (PDX *  3), (PDY *  8),   1, // 114
-    (PDX *  2), (PDY *  9),   1, // 115
-    (PDX *  4), (PDY *  9),   1, // 116
-    (PDX *  0), (PDY *  9),   0, // 117
-    (PDX *  1), (PDY *  8),   1, // 118
-    (PDX *  4), (PDY *  1),   1, // 119
-    (PDX *  5), (PDY *  2),   1, // 120
-    (PDX *  4), (PDY *  0),   0, // 121
-    (PDX *  3), (PDY *  0),   0, // 122
-    (PDX *  4), (PDY *  5),   1, // 123
-    (PDX *  4), (PDY *  3),   1, // 124
-    (PDX *  3), (PDY *  4),   1, // 125
-    (PDX *  2), (PDY *  1),   1, // 126
-    (PDX *  3), (PDY *  2),   1, // 127
-    (PDX *  2), (PDY *  0),   0, // 128
-    (PDX *  1), (PDY *  0),   0, // 129
-    (PDX *  1), (PDY *  4),   1, // 130
-    (PDX *  2), (PDY *  3),   1, // 131
-    (PDX *  2), (PDY *  5),   1, // 132
-    (PDX *  0), (PDY *  1),   0, // 133
-    (PDX *  1), (PDY *  2),   1, // 134
-    (PDX *  0), (PDY *  5),   0, // 135
-    (PDX *  5), (PDY *  6),   1, // 136
-    (PDX *  4), (PDY *  7),   1, // 137
-    (PDX *  3), (PDY *  6),   1, // 138
-    (PDX *  2), (PDY *  7),   1, // 139
-    (PDX *  1), (PDY *  6),   1, // 140
-    (PDX *  8), (PDY * 20),   0, // 141
-    (PDX * 12), (PDY * 10),   0, // 142
-    (PDX * 12), (PDY *  9),   0, // 143
-    (PDX * 10), (PDY * 10),   1, // 144
-    (PDX *  8), (PDY * 10),   1, // 145
-    (PDX *  6), (PDY * 10),   1, // 146
-    (PDX *  4), (PDY * 20),   0, // 147
-    (PDX *  0), (PDY * 17),   0, // 148
-    (PDX *  2), (PDY * 20),   0, // 149
-    (PDX *  4), (PDY * 10),   1, // 150
-    (PDX *  2), (PDY * 10),   1, // 151
-    (PDX *  0), (PDY * 13),   0, // 152
-    (PDX *  0), (PDY * 10),   0, // 153
-    (PDX *  0), (PDY *  7),   0, // 154
-    (PDX *  0), (PDY *  3),   0, // 155
-    (PDX *  0), (PDY *  0),   0, // 156
+    PAINTING_VERTEX(12, 19, 0), // 0
+    PAINTING_VERTEX(12, 20, 0), // 1
+    PAINTING_VERTEX(11, 20, 0), // 2
+    PAINTING_VERTEX(11, 18, 1), // 3
+    PAINTING_VERTEX(12, 17, 0), // 4
+    PAINTING_VERTEX(10, 19, 1), // 5
+    PAINTING_VERTEX(10, 20, 0), // 6
+    PAINTING_VERTEX( 6, 20, 0), // 7
+    PAINTING_VERTEX( 6, 19, 1), // 8
+    PAINTING_VERTEX( 7, 20, 0), // 9
+    PAINTING_VERTEX( 5, 20, 0), // 10
+    PAINTING_VERTEX( 5, 18, 1), // 11
+    PAINTING_VERTEX( 6, 17, 1), // 12
+    PAINTING_VERTEX( 7, 18, 1), // 13
+    PAINTING_VERTEX( 8, 19, 1), // 14
+    PAINTING_VERTEX( 9, 20, 0), // 15
+    PAINTING_VERTEX(10, 17, 1), // 16
+    PAINTING_VERTEX( 9, 18, 1), // 17
+    PAINTING_VERTEX( 8, 17, 1), // 18
+    PAINTING_VERTEX(11, 10, 1), // 19
+    PAINTING_VERTEX(12, 11, 0), // 20
+    PAINTING_VERTEX(11, 14, 1), // 21
+    PAINTING_VERTEX(12, 13, 0), // 22
+    PAINTING_VERTEX(11, 12, 1), // 23
+    PAINTING_VERTEX(10, 11, 1), // 24
+    PAINTING_VERTEX( 9, 10, 1), // 25
+    PAINTING_VERTEX( 9, 14, 1), // 26
+    PAINTING_VERTEX(10, 13, 1), // 27
+    PAINTING_VERTEX(10, 15, 1), // 28
+    PAINTING_VERTEX( 8, 11, 1), // 29
+    PAINTING_VERTEX( 9, 12, 1), // 30
+    PAINTING_VERTEX( 7, 10, 1), // 31
+    PAINTING_VERTEX( 8, 15, 1), // 32
+    PAINTING_VERTEX( 7, 14, 1), // 33
+    PAINTING_VERTEX( 8, 13, 1), // 34
+    PAINTING_VERTEX( 7, 12, 1), // 35
+    PAINTING_VERTEX( 6, 11, 1), // 36
+    PAINTING_VERTEX( 5, 10, 1), // 37
+    PAINTING_VERTEX( 6, 13, 1), // 38
+    PAINTING_VERTEX( 5, 14, 1), // 39
+    PAINTING_VERTEX( 6, 15, 1), // 40
+    PAINTING_VERTEX(12, 15, 0), // 41
+    PAINTING_VERTEX(11, 16, 1), // 42
+    PAINTING_VERTEX( 9, 16, 1), // 43
+    PAINTING_VERTEX( 7, 16, 1), // 44
+    PAINTING_VERTEX( 5, 16, 1), // 45
+    PAINTING_VERTEX( 8,  9, 1), // 46
+    PAINTING_VERTEX(10,  9, 1), // 47
+    PAINTING_VERTEX( 6,  9, 1), // 48
+    PAINTING_VERTEX(12,  1, 0), // 49
+    PAINTING_VERTEX(12,  0, 0), // 50
+    PAINTING_VERTEX(11,  0, 0), // 51
+    PAINTING_VERTEX(11,  4, 1), // 52
+    PAINTING_VERTEX(12,  3, 0), // 53
+    PAINTING_VERTEX(10,  1, 1), // 54
+    PAINTING_VERTEX(11,  2, 1), // 55
+    PAINTING_VERTEX( 9,  0, 0), // 56
+    PAINTING_VERTEX(10,  0, 0), // 57
+    PAINTING_VERTEX( 9,  4, 1), // 58
+    PAINTING_VERTEX(10,  3, 1), // 59
+    PAINTING_VERTEX(10,  5, 1), // 60
+    PAINTING_VERTEX( 8,  1, 1), // 61
+    PAINTING_VERTEX( 9,  2, 1), // 62
+    PAINTING_VERTEX( 7,  0, 0), // 63
+    PAINTING_VERTEX( 8,  0, 0), // 64
+    PAINTING_VERTEX( 8,  3, 1), // 65
+    PAINTING_VERTEX( 7,  4, 1), // 66
+    PAINTING_VERTEX( 8,  5, 1), // 67
+    PAINTING_VERTEX( 6,  1, 1), // 68
+    PAINTING_VERTEX( 7,  2, 1), // 69
+    PAINTING_VERTEX( 5,  0, 0), // 70
+    PAINTING_VERTEX( 6,  0, 0), // 71
+    PAINTING_VERTEX( 5,  4, 1), // 72
+    PAINTING_VERTEX( 6,  3, 1), // 73
+    PAINTING_VERTEX( 6,  5, 1), // 74
+    PAINTING_VERTEX(12,  5, 0), // 75
+    PAINTING_VERTEX(11,  8, 1), // 76
+    PAINTING_VERTEX(12,  7, 0), // 77
+    PAINTING_VERTEX(11,  6, 1), // 78
+    PAINTING_VERTEX( 9,  8, 1), // 79
+    PAINTING_VERTEX(10,  7, 1), // 80
+    PAINTING_VERTEX( 9,  6, 1), // 81
+    PAINTING_VERTEX( 7,  8, 1), // 82
+    PAINTING_VERTEX( 8,  7, 1), // 83
+    PAINTING_VERTEX( 7,  6, 1), // 84
+    PAINTING_VERTEX( 5,  8, 1), // 85
+    PAINTING_VERTEX( 6,  7, 1), // 86
+    PAINTING_VERTEX( 4, 19, 1), // 87
+    PAINTING_VERTEX( 0, 20, 0), // 88
+    PAINTING_VERTEX( 0, 19, 0), // 89
+    PAINTING_VERTEX( 1, 20, 0), // 90
+    PAINTING_VERTEX( 1, 18, 1), // 91
+    PAINTING_VERTEX( 2, 19, 1), // 92
+    PAINTING_VERTEX( 4, 17, 1), // 93
+    PAINTING_VERTEX( 3, 18, 1), // 94
+    PAINTING_VERTEX( 3, 20, 0), // 95
+    PAINTING_VERTEX( 2, 17, 1), // 96
+    PAINTING_VERTEX( 5, 12, 1), // 97
+    PAINTING_VERTEX( 4, 11, 1), // 98
+    PAINTING_VERTEX( 3, 10, 1), // 99
+    PAINTING_VERTEX( 3, 14, 1), // 100
+    PAINTING_VERTEX( 4, 13, 1), // 101
+    PAINTING_VERTEX( 4, 15, 1), // 102
+    PAINTING_VERTEX( 3, 12, 1), // 103
+    PAINTING_VERTEX( 2, 11, 1), // 104
+    PAINTING_VERTEX( 1, 10, 1), // 105
+    PAINTING_VERTEX( 1, 14, 1), // 106
+    PAINTING_VERTEX( 2, 13, 1), // 107
+    PAINTING_VERTEX( 2, 15, 1), // 108
+    PAINTING_VERTEX( 1, 12, 1), // 109
+    PAINTING_VERTEX( 0, 11, 0), // 110
+    PAINTING_VERTEX( 0, 15, 0), // 111
+    PAINTING_VERTEX( 3, 16, 1), // 112
+    PAINTING_VERTEX( 1, 16, 1), // 113
+    PAINTING_VERTEX( 3,  8, 1), // 114
+    PAINTING_VERTEX( 2,  9, 1), // 115
+    PAINTING_VERTEX( 4,  9, 1), // 116
+    PAINTING_VERTEX( 0,  9, 0), // 117
+    PAINTING_VERTEX( 1,  8, 1), // 118
+    PAINTING_VERTEX( 4,  1, 1), // 119
+    PAINTING_VERTEX( 5,  2, 1), // 120
+    PAINTING_VERTEX( 4,  0, 0), // 121
+    PAINTING_VERTEX( 3,  0, 0), // 122
+    PAINTING_VERTEX( 4,  5, 1), // 123
+    PAINTING_VERTEX( 4,  3, 1), // 124
+    PAINTING_VERTEX( 3,  4, 1), // 125
+    PAINTING_VERTEX( 2,  1, 1), // 126
+    PAINTING_VERTEX( 3,  2, 1), // 127
+    PAINTING_VERTEX( 2,  0, 0), // 128
+    PAINTING_VERTEX( 1,  0, 0), // 129
+    PAINTING_VERTEX( 1,  4, 1), // 130
+    PAINTING_VERTEX( 2,  3, 1), // 131
+    PAINTING_VERTEX( 2,  5, 1), // 132
+    PAINTING_VERTEX( 0,  1, 0), // 133
+    PAINTING_VERTEX( 1,  2, 1), // 134
+    PAINTING_VERTEX( 0,  5, 0), // 135
+    PAINTING_VERTEX( 5,  6, 1), // 136
+    PAINTING_VERTEX( 4,  7, 1), // 137
+    PAINTING_VERTEX( 3,  6, 1), // 138
+    PAINTING_VERTEX( 2,  7, 1), // 139
+    PAINTING_VERTEX( 1,  6, 1), // 140
+    PAINTING_VERTEX( 8, 20, 0), // 141
+    PAINTING_VERTEX(12, 10, 0), // 142
+    PAINTING_VERTEX(12,  9, 0), // 143
+    PAINTING_VERTEX(10, 10, 1), // 144
+    PAINTING_VERTEX( 8, 10, 1), // 145
+    PAINTING_VERTEX( 6, 10, 1), // 146
+    PAINTING_VERTEX( 4, 20, 0), // 147
+    PAINTING_VERTEX( 0, 17, 0), // 148
+    PAINTING_VERTEX( 2, 20, 0), // 149
+    PAINTING_VERTEX( 4, 10, 1), // 150
+    PAINTING_VERTEX( 2, 10, 1), // 151
+    PAINTING_VERTEX( 0, 13, 0), // 152
+    PAINTING_VERTEX( 0, 10, 0), // 153
+    PAINTING_VERTEX( 0,  7, 0), // 154
+    PAINTING_VERTEX( 0,  3, 0), // 155
+    PAINTING_VERTEX( 0,  0, 0), // 156
     // triangles
     264,
       8,  12,  13, // 0
