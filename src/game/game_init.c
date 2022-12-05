@@ -98,9 +98,6 @@ struct DemoInput *gCurrDemoInput = NULL;
 u16 gDemoInputListID = 0;
 struct DemoInput gRecordedDemoInput = { 0 };
 
-// Prevent multiple 100 coin stars from spawning
-u8 g100CoinStarSpawned = FALSE;
-
 // Display
 // ----------------------------------------------------------------------------------------------------
 
