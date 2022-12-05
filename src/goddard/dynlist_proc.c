@@ -1932,7 +1932,7 @@ void d_set_att_to_offset(UNUSED u32 a) {
         fatal_printf("dSetAttOffset(): Object '%s' isnt attached to anything",
                      sStashedDynObjInfo->name);
     }
-    d_set_att_to_offset(a);
+    // d_set_att_to_offset(a);
     d_unstash_dynobj();
 }
 
