@@ -324,18 +324,26 @@ s32 update_objects_during_time_stop(struct ObjectNode *objList, struct ObjectNod
 
         // Selectively unfreeze certain objects
         if (!(gTimeStopState & TIME_STOP_ALL_OBJECTS)) {
-            if (gCurrentObject == gMarioObject && !(gTimeStopState & TIME_STOP_MARIO_AND_DOORS)) {
+            if (gCurrentObject->activeFlags & (ACTIVE_FLAG_UNIMPORTANT | ACTIVE_FLAG_INITIATED_TIME_STOP)) {
                 unfrozen = TRUE;
             }
 
-            if ((gCurrentObject->oInteractType & (INTERACT_DOOR | INTERACT_WARP_DOOR))
-                && !(gTimeStopState & TIME_STOP_MARIO_AND_DOORS)) {
-                unfrozen = TRUE;
-            }
+            if (!(gTimeStopState & TIME_STOP_MARIO_AND_DOORS)) {
+                // Mario
+                if (gCurrentObject == gMarioObject) {
+                    unfrozen = TRUE;
+                }
 
-            if (gCurrentObject->activeFlags
-                & (ACTIVE_FLAG_UNIMPORTANT | ACTIVE_FLAG_INITIATED_TIME_STOP)) {
-                unfrozen = TRUE;
+                // Doors
+                if (gCurrentObject->oInteractType & (INTERACT_DOOR | INTERACT_WARP_DOOR)) {
+                    unfrozen = TRUE;
+                }
+
+                // Paintings
+                // HackerSM64 TODO: Make this an object flag.
+                if (cur_obj_has_behavior(bhvPainting)) {
+                    unfrozen = TRUE;
+                }
             }
         }
 

@@ -914,45 +914,6 @@ Gfx *display_painting_not_rippling(const struct Painting *painting) {
     return dlist;
 }
 
-#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
-/**
- * Controls the x coordinate of the DDD painting.
- *
- * Before Mario gets the "Board Bowser's Sub" star in DDD, the painting spawns at frontPos.
- *
- * If Mario just got the star, the painting's x coordinate moves to backPos at a rate of `speed` units.
- *
- * When the painting reaches backPos, a save flag is set so that the painting will spawn at backPos
- * whenever it loads.
- */
-void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed) {
-#ifdef UNLOCK_ALL
-    obj->oPosX = backPos;
-    return;
-#endif
-    // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected.
-    if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1) {
-        // Get the other save file flags and check whether DDD has already moved back.
-        if (save_file_get_flags() & SAVE_FLAG_DDD_MOVED_BACK) {
-            // If the painting has already moved back, place it in the back position.
-            obj->oPosX = backPos;
-        } else {
-            // If we've collected the star but not moved the painting back,
-            // Each frame, move the painting by a certain speed towards the back area.
-            obj->oPosX += speed;
-            if (obj->oPosX >= backPos) {
-                obj->oPosX = backPos;
-                // Tell the save file that we've moved DDD back.
-                save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
-            }
-        }
-    } else {
-        // If we haven't collected the star, put the painting at the front.
-        obj->oPosX = frontPos;
-    }
-}
-#endif
-
 /**
  * Render and update the painting whose id and group matches the values in the GraphNode's parameter.
  * Use PAINTING_ID(id, group) to set the right parameter in a level's geo layout.
@@ -993,14 +954,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         // Reset the update counter.
         obj->oPaintingLastUpdateCounter = obj->oPaintingUpdateCounter;
         obj->oPaintingUpdateCounter = gAreaUpdateCounter;
-
-#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
-        // Update the ddd painting before drawing.
-        if (obj->oPaintingGroup == PAINTING_GROUP_INSIDE_CASTLE
-         && obj->oPaintingId == PAINTING_ID_CASTLE_DDD) {
-            move_ddd_painting(obj, 3456.0f, 5529.6f, 20.0f);
-        }
-#endif
 
         // Update the painting info.
         painting_update_mario_pos(obj);
@@ -1094,5 +1047,60 @@ void bhv_painting_init(void) {
     );
 }
 
+
+#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
+s32 gDDDPaintingNotMoved = FALSE;
+
+/**
+ * Controls the x coordinate of the DDD painting.
+ *
+ * Before Mario gets the "Board Bowser's Sub" star in DDD, the painting spawns at frontPos.
+ *
+ * If Mario just got the star, the painting's x coordinate moves to backPos at a rate of `speed` units.
+ *
+ * When the painting reaches backPos, a save flag is set so that the painting will spawn at backPos
+ * whenever it loads.
+ */
+void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed) {
+#ifdef UNLOCK_ALL
+    obj->oPosX = backPos;
+    return;
+#endif
+    // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected.
+    if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1) {
+        // Check whether DDD has already moved back.
+        if (gDDDPaintingNotMoved) {
+            // If we've collected the star but not moved the painting back...
+            // Each frame, move the painting by a certain speed towards the back area.
+            obj->oPosX += speed;
+            if (obj->oPosX >= backPos) {
+                obj->oPosX = backPos;
+
+                gDDDPaintingNotMoved = FALSE;
+            }
+        } else {
+            // If the painting has already moved back, place it in the back position.
+            obj->oPosX = backPos;
+        }
+    } else {
+        // If we haven't collected the star, put the painting at the front.
+        obj->oPosX = frontPos;
+
+        // Set this so the painting gets moved once the star is collected.
+        gDDDPaintingNotMoved = TRUE;
+    }
+}
+
+void bhv_painting_loop(void) {
+    struct Object *obj = o;
+
+    // Update the DDD painting before drawing.
+    if (obj->oPaintingGroup == PAINTING_GROUP_INSIDE_CASTLE
+     && obj->oPaintingId == PAINTING_ID_CASTLE_DDD) {
+        move_ddd_painting(obj, 3456.0f, 5529.6f, 20.0f);
+    }
+}
+#else
 void bhv_painting_loop(void) {
 }
+#endif

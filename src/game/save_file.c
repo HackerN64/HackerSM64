@@ -564,7 +564,6 @@ u32 save_file_get_flags(void) {
             SAVE_FLAG_HAVE_VANISH_CAP        |
             SAVE_FLAG_UNLOCKED_BASEMENT_DOOR |
             SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR |
-            SAVE_FLAG_DDD_MOVED_BACK         |
             SAVE_FLAG_MOAT_DRAINED           |
             SAVE_FLAG_UNLOCKED_PSS_DOOR      |
             SAVE_FLAG_UNLOCKED_WF_DOOR       |
