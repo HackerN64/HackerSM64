@@ -77,7 +77,7 @@ typedef volatile s8   vs8;
 typedef volatile s16 vs16;
 typedef volatile s32 vs32;
 typedef volatile s64 vs64;
-#endif // _LANGUAGE_C
+#endif // _LANGUAGE_ASSEMBLY
 
 /*************************************************************************
  * Common definitions
