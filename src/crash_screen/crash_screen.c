@@ -171,7 +171,7 @@ void crash_screen_print_fpcsr(uintptr_t fpcsr) {
     crash_screen_print(TEXT_X(0), (TEXT_Y(14) + 5), "@%08X%s:", COLOR_RGBA32_CRASH_REGISTER, "FPCSR");
     crash_screen_print(TEXT_X(6), (TEXT_Y(14) + 5), "%08X", fpcsr);
 
-    for (u32 i = 0; i < 6; i++) {
+    for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
         if (fpcsr & bit) {
             crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
             return;
