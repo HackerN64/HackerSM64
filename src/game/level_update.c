@@ -141,6 +141,8 @@ s16 sSourceWarpNodeId;
 s32 sDelayedWarpArg;
 s8 sTimerRunning;
 s8 gNeverEnteredCastle;
+// Prevent multiple 100 coin stars from spawning
+u8 g100CoinStarSpawned = FALSE;
 
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
@@ -1172,6 +1174,8 @@ s32 init_level(void) {
     sDelayedWarpOp = WARP_OP_NONE;
     sTransitionTimer = 0;
     sSpecialWarpDest = WARP_SPECIAL_NONE;
+
+    g100CoinStarSpawned = FALSE;
 
     if (gCurrCreditsEntry == NULL) {
         gHudDisplay.flags = HUD_DISPLAY_DEFAULT;
