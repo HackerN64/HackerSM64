@@ -16,8 +16,10 @@
 .set SP_DMEM_UNK0, 0x040004C0
 .set SP_DMEM_UNK1, 0x04000774
 
-.set INITIAL_DMA_ROMPOS, 0x1000
+// This value must fit in one instruction
+//  - Either use the top 16 bits or the low 16 bits, but not both
 .set INITIAL_DMA_LEN, 0x00100000
+.set INITIAL_DMA_ROMPOS, 0x1000
 
 
 // 0xA0000000-0xBFFFFFFF: KSEG1 direct map non-cache mirror of 0x00000000
