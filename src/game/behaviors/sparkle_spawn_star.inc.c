@@ -41,7 +41,7 @@ void spawned_star_set_target_above_mario(void) {
 
     // Check that the star isn't clipping inside the ceiling
     if (gMarioState->ceil != NULL) {
-        if (o->oHomeY > ((gMarioState->ceilHeight - 50))) {
+        if (o->oHomeY > (gMarioState->ceilHeight - 50)) {
             o->oHomeY = gMarioState->ceilHeight - 50;
         }
     }
