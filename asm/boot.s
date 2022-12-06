@@ -16,7 +16,8 @@
 .set SP_DMEM_UNK0, 0x040004C0
 .set SP_DMEM_UNK1, 0x04000774
 
-.set INITIAL_CHECKSUM_LEN, 0x00100000
+.set INITIAL_DMA_ROMPOS, 0x1000
+.set INITIAL_DMA_LEN, 0x00100000
 
 
 // 0xA0000000-0xBFFFFFFF: KSEG1 direct map non-cache mirror of 0x00000000
@@ -29,12 +30,12 @@
 // IPL3 entry point jumped to from IPL2
 glabel ipl3_entry // 0xA4000040
 .ent ipl3_entry
-    mtc0  $zero, $13
-    mtc0  $zero, $9
-    mtc0  $zero, $11
+    mtc0  $zero, C0_CAUSE
+    mtc0  $zero, C0_COUNT
+    mtc0  $zero, C0_COMPARE
     lui   $t0, %hi(PHYS_TO_K1(RI_BASE_REG))
     addiu $t0, %lo(PHYS_TO_K1(RI_BASE_REG))
-    lw    $t1, 0xc($t0)
+    lw    $t1, %lo(RI_SELECT_REG)($t0)
     bnez  $t1, .LA4000410
      nop
     addiu $sp, $sp, -0x18
@@ -57,8 +58,8 @@ glabel ipl3_entry // 0xA4000040
     addi  $s1, $s1, -1
     bnez  $s1, .LA400009C
      nop
-    sw    $zero, 8($t0)
-    ori   $t1, $zero, 20
+    sw    $zero, %lo(RI_CURRENT_LOAD_REG)($t0)
+    ori   $t1, $zero, 0x14
     sw    $t1, %lo(RI_SELECT_REG)($t0)
     sw    $zero, %lo(RI_MODE_REG)($t0)
     li    $s1, 4
@@ -68,27 +69,27 @@ glabel ipl3_entry // 0xA4000040
     bnez  $s1, .LA40000C0
      nop
     ori   $t1, $zero, 14
-    sw    $t1, ($t0)
+    sw    $t1, %lo(RI_MODE_REG)($t0)
     li    $s1, 32
 .LA40000DC:
     addi  $s1, $s1, -1
     bnez  $s1, .LA40000DC
-    ori   $t1, $zero, 271
+    ori   $t1, $zero, (MI_SET_INIT | 0xF)
     sw    $t1, %lo(MI_MODE_REG)($t4)
     lui   $t1, (0x18082838 >> 16)
     ori   $t1, (0x18082838 & 0xFFFF)
-    sw    $t1, 0x8($t2)
-    sw    $zero, 0x14($t2)
+    sw    $t1, %lo(RDRAM_DELAY_REG)($t2)
+    sw    $zero, %lo(RDRAM_REF_ROW_REG)($t2)
     lui   $t1, 0x8000
-    sw    $t1, 0x4($t2)
+    sw    $t1, %lo(RDRAM_DEVICE_ID_REG)($t2)
     move  $t5, $zero
     move  $t6, $zero
-    lui   $t7, (0xA3F00000 >> 16)
+    lui   $t7, %hi(PHYS_TO_K1(RDRAM_BASE_REG))
     move  $t8, $zero
-    lui   $t9, (0xA3F00000 >> 16)
+    lui   $t9, %hi(PHYS_TO_K1(RDRAM_BASE_REG))
     lui   $s6, (0xA0000000 >> 16)
     move  $s7, $zero
-    lui   $a2, (0xA3F00000 >> 16)
+    lui   $a2, %hi(PHYS_TO_K1(RDRAM_BASE_REG))
     lui   $a3, (0xA0000000 >> 16)
     move  $s2, $zero
     lui   $s4, (0xA0000000 >> 16)
@@ -117,7 +118,7 @@ glabel ipl3_entry // 0xA4000040
     sw    $v0, ($sp)
     li    $t1, 8192
     sw    $t1, %lo(MI_MODE_REG)($t4)
-    lw    $t3, ($t7)
+    lw    $t3, %lo(RDRAM_CONFIG_REG)($t7)
     lui   $t0, 0xf0ff
     and   $t3, $t3, $t0
     sw    $t3, 4($sp)
@@ -175,9 +176,9 @@ glabel ipl3_entry // 0xA4000040
      nop
 .LA400025C:
     li    $t0, 0xc4000000
-    sw    $t0, 0xc($t2)
+    sw    $t0, %lo(RDRAM_MODE_REG)($t2)
     li    $t0, 0x80000000
-    sw    $t0, 0x4($t2)
+    sw    $t0, %lo(RDRAM_DEVICE_ID_REG)($t2)
     move  $sp, $fp
     move  $v1, $zero
 .LA4000274:
@@ -245,13 +246,13 @@ glabel ipl3_entry // 0xA4000040
     slt   $t0, $v1, $t5
     bnez  $t0, .LA4000274
      nop
-    lui   $t2, %hi(PHYS_TO_K1(RI_REFRESH_REG))
+    lui   $t2, %hi(PHYS_TO_K1(RI_BASE_REG))
     sll   $s2, $s2, 0x13
     lui   $t1, (0x00063634 >> 16)
     ori   $t1, (0x00063634 & 0xFFFF)
     or    $t1, $t1, $s2
-    sw    $t1, %lo(PHYS_TO_K1(RI_REFRESH_REG))($t2)
-    lw    $t1, %lo(PHYS_TO_K1(RI_REFRESH_REG))($t2)
+    sw    $t1, %lo(RI_REFRESH_REG)($t2)
+    lw    $t1, %lo(RI_REFRESH_REG)($t2)
     lui   $t0, (0xA0000300 >> 16)
     ori   $t0, (0xA0000300 & 0xFFFF)
     lui   $t1, (0x0FFFFFFF >> 16)
@@ -347,15 +348,15 @@ glabel ipl3_entry // 0xA4000040
     lui   $t0, %hi(PHYS_TO_K1(PI_STATUS_REG))
 .LA40004D0:
     lw    $t0, %lo(PHYS_TO_K1(PI_STATUS_REG))($t0)
-    andi  $t0, $t0, 2
+    andi  $t0, $t0, PI_STATUS_IO_BUSY
     bnezl $t0, .LA40004D0
      lui   $t0, %hi(PHYS_TO_K1(PI_STATUS_REG))
-    li    $t0, 0x1000
+    li    $t0, INITIAL_DMA_ROMPOS
     add   $t0, $t0, $t3
     and   $t0, $t0, $t2
     lui   $at, %hi(PHYS_TO_K1(PI_CART_ADDR_REG))
     sw    $t0, %lo(PHYS_TO_K1(PI_CART_ADDR_REG))($at)
-    li   $t2, INITIAL_CHECKSUM_LEN
+    li   $t2, INITIAL_DMA_LEN
     addiu $t2, -1
     lui   $at, %hi(PHYS_TO_K1(PI_WR_LEN_REG))
     sw    $t2, %lo(PHYS_TO_K1(PI_WR_LEN_REG))($at)
