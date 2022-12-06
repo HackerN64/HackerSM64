@@ -450,6 +450,9 @@ glabel ipl3_entry // 0xA4000040
     xor   $a3, $t6, $t3
     xor   $t8, $s0, $a2
     xor   $s0, $t8, $t4
+#ifdef SKIP_CHECKSUM
+    nop; nop; nop; nop; nop; nop; nop
+#else
     lui   $t3, %hi(PHYS_TO_CART(CART_CHECKSUM0))
     lw    $t0, %lo(PHYS_TO_CART(CART_CHECKSUM0))($t3)
     bne   $a3, $t0, halt
@@ -457,6 +460,7 @@ glabel ipl3_entry // 0xA4000040
     lw    $t0, %lo(PHYS_TO_CART(CART_CHECKSUM1))($t3)
     bne   $s0, $t0, halt
      nop
+#endif // SKIP_CHECKSUM
     bal   func_A4000690
      nop
 
