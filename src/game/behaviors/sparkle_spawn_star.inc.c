@@ -40,8 +40,10 @@ void spawned_star_set_target_above_mario(void) {
     vec3f_copy_y_off(&o->oHomeVec, &gMarioObject->oPosVec, 250.0f);
 
     // Check that the star isn't clipping inside the ceiling
-    if (o->oHomeY > (gMarioState->ceilHeight - 50)) {
-        o->oHomeY = gMarioState->ceilHeight - 50;
+    if (gMarioState->ceil != NULL) {
+        if (o->oHomeY > ((gMarioState->ceilHeight - 50))) {
+            o->oHomeY = gMarioState->ceilHeight - 50;
+        }
     }
 
     o->oPosY = o->oHomeY; 
@@ -70,7 +72,7 @@ void bhv_spawned_star_loop(void) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
             o->oAngleVelYaw = 0x800;
             if (o->oBehParams2ndByte == SPAWN_STAR_POS_CUTSCENE_BP_SPAWN_AT_MARIO) {
-                spawned_star_set_target_above_mario();
+                spawned_star_set_target_above_mario();             
             } else {
                 set_y_home_to_pos();
             }
