@@ -22,8 +22,6 @@
 // 0xA0000000-0xBFFFFFFF: KSEG1 direct map non-cache mirror of 0x00000000
 // 0xA4000000-0xA4000FFF: RSP DMEM
 
-// 0xA4000000-0xA400003F: ROM header
-
 .section .text, "ax"
 
 // 0xA4000040-0xA4000B6F: IPL3

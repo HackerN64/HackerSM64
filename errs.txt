@@ -1,0 +1,8 @@
+Building tools...
+Building ROM...
+b0618fce9e682d4ae5533e77269f41134c07d323  build/us_n64/sm64.z64
+\033[32;5mBuild succeeded.\n\033[0m
+==== Build Options ====\033[0m\n
+\033[0;32mVersion:        \033[0;34mus\033[0m\n
+\033[0;32mMicrocode:      \033[0;34mf3dzex\033[0m\n
+\033[0;32mConsole:        \033[0;34mn64\033[0m\n
