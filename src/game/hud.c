@@ -442,7 +442,7 @@ void render_hud_keys(void) {
     }
 }
 
-langarray_t textTime = DEFINE_LANGUAGE_ARRAY(
+LangArray textTime = DEFINE_LANGUAGE_ARRAY(
     "TIME %0d'%02d\"%d",
     "TEMPS %0d'%02d\"%d",
     "ZEIT %0d'%02d\"%d",

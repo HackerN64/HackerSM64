@@ -1807,7 +1807,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {NULL, 0}, // 61 "=" (Unimplemented)
     {NULL, 0}, // 62 ">" (Unimplemented)
     {texture_font_char_us_question, 7}, // 63 "?"
-    {NULL, 0}, // 64 "@" (Unimplemented)
+    {NULL, 0}, // 64 "@" (Unimplemented, used for color codes by default)
     {texture_font_char_us_A, 6}, // 65 "A"
     {texture_font_char_us_B, 6}, // 66 "B"
     {texture_font_char_us_C, 6}, // 67 "C"

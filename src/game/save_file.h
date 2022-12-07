@@ -66,10 +66,10 @@ struct MainMenuSaveData {
     u8 language: 3;
 #endif
 
-    #ifdef PUPPYCAM
+#ifdef PUPPYCAM
     u8 firstBoot;
     struct gPuppyOptions saveOptions;
-    #endif
+#endif
     struct SaveBlockSignature signature;
 };
 

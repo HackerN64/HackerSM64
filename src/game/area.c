@@ -85,7 +85,7 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-langarray_t gNoControllerMsg = DEFINE_LANGUAGE_ARRAY(
+LangArray gNoControllerMsg = DEFINE_LANGUAGE_ARRAY(
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
     "CONTROLLER FEHLT",

@@ -252,7 +252,7 @@ void print_course_number(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
-langarray_t textActMyScore = DEFINE_LANGUAGE_ARRAY(
+LangArray textActMyScore = DEFINE_LANGUAGE_ARRAY(
     "MYSCORE",
     "MON SCORE",
     "LEISTUNG",

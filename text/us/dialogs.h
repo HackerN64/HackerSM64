@@ -104,7 +104,7 @@ Whaddya say? When I say\n\
 \n\
 Ready....\n\
 \n\
-    Go!        Don't Go")
+\tGo!\t\tDon't Go")
 
 DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 3, 30, 200, "\
 Hey!!! Don't try to scam\n\
@@ -150,7 +150,7 @@ The goal is in\n\
 Windswept Valley.\n\
 Ready?\n\
 \n\
-    Go         Don't Go")
+\tGo\t\t Don't Go")
 
 /**
  * Special case: if the voice is SEQ_EVENT_SOLVE_PUZZLE,
@@ -168,7 +168,7 @@ you find.\n\
 \n\
 Would you like to Save?\n\
 \n\
-    Yes        No")
+\tYes\t\tNo")
 
 DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 You've just stepped on\n\
@@ -181,7 +181,7 @@ green blocks you find.\n\
 \n\
 Would you like to Save?\n\
 \n\
-    Yes        No")
+\tYes\t\tNo")
 
 DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 You've just stepped on\n\
@@ -194,14 +194,14 @@ blocks you find.\n\
 \n\
 Would you like to Save?\n\
 \n\
-    Yes        No")
+\tYes\t\tNo")
 
 DEFINE_DIALOG(DIALOG_013, NO_SOUND, 5, 30, 200, "\
 You've collected 100\n\
 coins! Mario gains more\n\
 power from the castle.\n\
 Do you want to Save?\n\
-    Yes        No")
+\tYes\t\tNo")
 
 DEFINE_DIALOG(DIALOG_014, NO_SOUND, 4, 30, 200, "\
 Wow! Another Power Star!\n\
@@ -210,7 +210,7 @@ from the power of the\n\
 castle.\n\
 Do you want to Save?\n\
 \n\
-    You Bet    Not Now")
+\tYou Bet\tNot Now")
 
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 4, 30, 200, "\
 You can punch enemies to\n\
@@ -495,7 +495,7 @@ perhaps one hint:\n\
 Heed the Star names at\n\
 the beginning of the\n\
 course.\n\
-    --The Big Bob-omb")
+\t--The Big Bob-omb")
 
 DEFINE_DIALOG(DIALOG_040, NO_SOUND, 3, 30, 200, "\
 Warning!\n\
@@ -683,7 +683,7 @@ you know. Whaddya say?\n\
 How about a race?\n\
 Ready...\n\
 \n\
-    Go         Don't Go")
+\tGo\t\t Don't Go")
 
 DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 6, 30, 200, "\
 You brrrr-oke my record!\n\
@@ -947,7 +947,7 @@ ye say?\n\
 \n\
 I'll never tell!\n\
 \n\
-    --The Cap'n")
+\t--The Cap'n")
 
 DEFINE_DIALOG(DIALOG_074, NO_SOUND, 5, 30, 200, "\
 You can grab on to the\n\
@@ -1043,7 +1043,7 @@ I'll give you something\n\
 really good.\n\
 So, how about it?\n\
 \n\
-    Free him   Hold on")
+\tFree him   Hold on")
 
 DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 1, 30, 200, "\
 Eeeh hee hee hee!")
@@ -1133,12 +1133,12 @@ Those who can't do the\n\
 Long Jump, tsk, tsk. Make\n\
 your way to the right.\n\
 Right: Work Elevator\n\
-       Cloudy Maze\n\
+\t   Cloudy Maze\n\
 Left: Black Hole\n\
-      Underground Lake\n\
+\t  Underground Lake\n\
 \n\
 Red Circle: Elevator 2\n\
-         Underground Lake\n\
+\t\t Underground Lake\n\
 Arrow: You are here")
 
 DEFINE_DIALOG(DIALOG_090, SOUND_OBJ_BOWSER_LAUGH, 6, 30, 200, "\
@@ -1466,7 +1466,7 @@ Bwa ha ha!")
 DEFINE_DIALOG(DIALOG_122, NO_SOUND, 4, 30, 200, "\
 The Black Hole\n\
 Right: Work Elevator\n\
-       Cloudy Maze\n\
+\t   Cloudy Maze\n\
 Left: Underground Lake")
 
 DEFINE_DIALOG(DIALOG_123, NO_SOUND, 4, 30, 200, "\
@@ -1491,13 +1491,13 @@ Turn back now.")
 DEFINE_DIALOG(DIALOG_126, NO_SOUND, 3, 30, 200, "\
 Up: Black Hole\n\
 Right: Work Elevator\n\
-       Hazy Maze")
+\t   Hazy Maze")
 
 DEFINE_DIALOG(DIALOG_127, NO_SOUND, 4, 30, 200, "\
 Underground Lake\n\
 Right: Metal Cave\n\
 Left: Abandoned Mine\n\
-      (Closed)\n\
+\t  (Closed)\n\
 A gentle sea dragon lives\n\
 here. Pound on his back to\n\
 make him lower his head.\n\
@@ -1694,9 +1694,9 @@ automatically, too.")
 DEFINE_DIALOG(DIALOG_140, NO_SOUND, 6, 30, 200, "\
 Elevator Area\n\
 Right: Hazy Maze\n\
-       Entrance\n\
+\t   Entrance\n\
 Left: Black Hole\n\
-      Elevator 1\n\
+\t  Elevator 1\n\
 Arrow: You are here")
 
 DEFINE_DIALOG(DIALOG_141, NO_SOUND, 5, 150, 200, "\
@@ -1813,7 +1813,7 @@ freezing pond, your power\n\
 decreases quickly, and\n\
 you won't recover\n\
 automatically.\n\
-    --The Snowman")
+\t--The Snowman")
 
 DEFINE_DIALOG(DIALOG_149, NO_SOUND, 3, 30, 200, "\
 Welcome to\n\
@@ -2041,7 +2041,7 @@ buddy.\n\
 Whaddya say?\n\
 Ready...set...\n\
 \n\
-    Go         Don't Go")
+\tGo\t\t Don't Go")
 
 DEFINE_DIALOG(DIALOG_165, NO_SOUND, 5, 30, 200, "\
 I take no responsibility\n\
@@ -2054,7 +2054,7 @@ DEFINE_DIALOG(DIALOG_166, NO_SOUND, 4, 30, 200, "\
 I'll be back soon.\n\
 I'm out training now,\n\
 so come back later.\n\
-    --Koopa the Quick")
+\t--Koopa the Quick")
 
 DEFINE_DIALOG(DIALOG_167, NO_SOUND, 4, 30, 200, "\
 Princess Toadstool's\n\

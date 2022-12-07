@@ -2079,6 +2079,7 @@ void set_sound_moving_speed(u8 bank, u8 speed) {
  * Called from threads: thread5_game_loop
  */
 void play_dialog_sound(s32 voice) {
+    // 1 was the default value for the unused field that the new speaker field replaces.
     if (voice != NO_SOUND && voice != 1) {
         // "You've stepped on the (Wing|Metal|Vanish) Cap Switch"
         if (voice == SEQ_EVENT_SOLVE_PUZZLE) {

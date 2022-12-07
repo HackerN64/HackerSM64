@@ -289,32 +289,50 @@ static s32 is_color_code_valid(char *str, s32 strPos) {
 }
 
 /**
- * Get the exact length of a string of any font in pixels, using the given ASCII and UTF-8 tables.
+ * Get the exact width of a string of any font in pixels, using the given ASCII and UTF-8 tables.
  */
-s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
-    s32 length = 0;
+s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
+    s32 width = 0;
+    s32 maxWidth = 0;
     s32 strPos = 0;
+    char c;
 
-    s32 checkColorCodes = (asciiLut == main_font_lut); // Only check for @ if the font is the main generic font.
+    s32 isGenericFont = (asciiLut == main_font_lut);
 
     asciiLut = segmented_to_virtual(asciiLut);
 
-    while (str[strPos] != '\0') {
-        if (checkColorCodes && str[strPos] == '@') {
-            if (is_color_code_valid(str, strPos + 1)) {
-                strPos += 7;
+    while ((c = str[strPos]) != '\0') {
+        // Handle color codes and tabs if using generic font
+        if (isGenericFont) {
+            if (c == CHAR_COLOR_CODE) {
+                if (is_color_code_valid(str, strPos + 1)) {
+                    strPos += 7;
+                    continue;
+                }
+            } else if (c == '\t') {
+                width += 4 * SPACE_KERNING(asciiLut);
+                strPos++;
                 continue;
             }
         }
-        if (str[strPos] & 0x80) {
-            length += utf8_lookup(utf8LUT, str, &strPos)->kerning;
+        // Handle newlines
+        if (c == '\n') {
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+            width = 0;
+            strPos++;
+            continue;
+        }
+        if (c & 0x80) {
+            width += utf8_lookup(utf8LUT, str, &strPos)->kerning;
         } else {
-            length += asciiLut[str[strPos] - ' '].kerning;
+            width += asciiLut[ASCII_LUT_INDEX(c)].kerning;
         }
         strPos++;
     }
 
-    return length;
+    return MAX(width, maxWidth);
 }
 
 /**
@@ -390,7 +408,7 @@ static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
  */
 static u32 render_generic_ascii_char(char c) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
-    const Texture *texture = fontLUT[c - ' '].texture;
+    const Texture *texture = fontLUT[ASCII_LUT_INDEX(c)].texture;
 
     if (texture != NULL) {
         gDPPipeSync(gDisplayListHead++);
@@ -398,7 +416,7 @@ static u32 render_generic_ascii_char(char c) {
         gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
     }
 
-    return fontLUT[c - ' '].kerning;
+    return fontLUT[ASCII_LUT_INDEX(c)].kerning;
 }
 
 /**
@@ -438,7 +456,7 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
         }
     }
 
-    return utf8Entry->kerning;  
+    return utf8Entry->kerning;
 }
 
 // Constants that control how the dialog box renders, the box is taller in Japanese.
@@ -470,6 +488,7 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
  */
 static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     s32 strPos = 0;
+    char c;
     s32 lineNum = 1;
     s8 kerning = 0;
     u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
@@ -477,8 +496,8 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
-    while (str[strPos] != '\0') {
-        switch (str[strPos]) {
+    while ((c = str[strPos]) != '\0') {
+        switch (c) {
             // Newline
             case '\n':
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -494,6 +513,11 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             // Space
             case ' ':
                 queuedSpaces++;
+                break;
+
+            // Tab
+            case '\t':
+                queuedSpaces += 4;
                 break;
 
             // Backslash / escape character: Force the following character to print normally.
@@ -517,16 +541,19 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                     strPos++;
                     format_int_to_string(dialogVarText, gDialogVariable.asInt);
                     render_main_font_text(0, 0, dialogVarText, -1);
-                    kerning = get_string_length(dialogVarText, main_font_lut, &main_font_utf8_lut);
+                    kerning = get_string_width(dialogVarText, main_font_lut, &main_font_utf8_lut);
                     create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
                     break;
                 // %s: Display dialog var as a pointer to a string.
                 } else if (str[strPos + 1] == 's') {
                     strPos++;
                     render_main_font_text(0, 0, gDialogVariable.asStr, -1);
-                    kerning = get_string_length(gDialogVariable.asStr, main_font_lut, &main_font_utf8_lut);
+                    kerning = get_string_width(gDialogVariable.asStr, main_font_lut, &main_font_utf8_lut);
                     create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
                     break;
+                // %%: Special case, print only a single %.
+                } else if (str[strPos + 1] == '%') {
+                    strPos++;
                 }
 
                 // If the character following the % is not 'd' or 's', print the % as a normal character.
@@ -535,7 +562,10 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             // @XXXXXX: Set color of text to an RGB value.
             // E.g. @FF0000 will set the color to red.
             // Will use gDialogTextAlpha as the alpha value.
-            case '@':
+
+            // Note: multiple color codes may be needed in dialog as
+            // earlier color codes will not function if they scroll offscreen.
+            case CHAR_COLOR_CODE: // '@'
                 for (u32 i = 0; i < 3; i++) {
                     s32 firstDigit = hex_char_to_value(str[strPos + i * 2 + 1]);
                     s32 secondDigit = hex_char_to_value(str[strPos + i * 2 + 2]);
@@ -558,8 +588,8 @@ render_character:
                     queuedSpaces = 0;
                 }
 
-                if (!(str[strPos] & 0x80)) {
-                    kerning = render_generic_ascii_char(str[strPos]);
+                if (!(c & 0x80)) {
+                    kerning = render_generic_ascii_char(c);
                 } else {
                     kerning = render_generic_unicode_char(str, &strPos);
                 }
@@ -589,6 +619,7 @@ void print_generic_string(s16 x, s16 y, char *str) {
  */
 void print_hud_lut_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
+    char c;
     struct AsciiCharLUTEntry *hudLUT = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
     u32 curX = x;
     u32 curY = y;
@@ -597,12 +628,12 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     const Texture *texture;
     u32 kerning;
 
-    while (str[strPos] != '\0') {
+    while ((c = str[strPos]) != '\0') {
         gDPPipeSync(gDisplayListHead++);
 
-        if (!(str[strPos] & 0x80)) {
-            texture = hudLUT[str[strPos] - ' '].texture;
-            kerning = hudLUT[str[strPos] - ' '].kerning;
+        if (!(c & 0x80)) {
+            texture = hudLUT[ASCII_LUT_INDEX(c)].texture;
+            kerning = hudLUT[ASCII_LUT_INDEX(c)].kerning;
         } else {
             utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
             if ((utf8Entry->flags & TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
@@ -623,16 +654,16 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
 
             renderX = curX;
             renderY = curY;
-            if (str[strPos] == '\'') {
+            if (c == '\'') {
                 renderX -= 2;
                 renderY -= 7;
-            } else if (str[strPos] == '"') {
+            } else if (c == '"') {
                 renderX += 1;
                 renderY -= 7;
-            } else if (str[strPos] == ',') {
+            } else if (c == ',') {
                 renderX -= 4;
                 renderY += 7;
-            } else if (str[strPos] == '.') {
+            } else if (c == '.') {
                 renderX -= 2;
                 renderY += 1;
             }
@@ -652,7 +683,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
  */
 static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
-    const Texture *texture = fontLUT[c - ' '].texture;
+    const Texture *texture = fontLUT[ASCII_LUT_INDEX(c)].texture;
 
     if (texture != NULL) {
         gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, texture);
@@ -662,7 +693,7 @@ static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
                             (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
     }
 
-    return fontLUT[c - ' '].kerning;
+    return fontLUT[ASCII_LUT_INDEX(c)].kerning;
 }
 
 /**
@@ -698,15 +729,16 @@ static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) 
  */
 void print_menu_generic_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
+    char c;
     u32 curX = x;
     u32 curY = y;
     u32 kerning;
 
-    while (str[strPos] != '\0') {
-        if (str[strPos] & 0x80) {
+    while ((c = str[strPos]) != '\0') {
+        if (c & 0x80) {
             kerning = render_menu_unicode_char(str, &strPos, curX, curY);
         } else {
-            kerning = render_menu_ascii_char(str[strPos], curX, curY);
+            kerning = render_menu_ascii_char(c, curX, curY);
         }
 
         curX += kerning;
@@ -719,6 +751,7 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
  */
 void print_credits_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
+    char c;
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
     u32 curX = x;
     u32 curY = y;
@@ -730,17 +763,17 @@ void print_credits_string(s16 x, s16 y, char *str) {
                 G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
     gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
 
-    while (str[strPos] != '\0') {
-        if (fontLUT[str[strPos] - ' '].texture != NULL) {
+    while ((c = str[strPos]) != '\0') {
+        if (fontLUT[ASCII_LUT_INDEX(c)].texture != NULL) {
             gDPPipeSync(gDisplayListHead++);
-            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' '].texture);
+            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[ASCII_LUT_INDEX(c)].texture);
             gDPLoadSync(gDisplayListHead++);
             gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
             gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
                                 (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
         }
 
-        curX += fontLUT[str[strPos] - ' '].kerning;
+        curX += fontLUT[ASCII_LUT_INDEX(c)].kerning;
         strPos++;
     }
 }
@@ -749,41 +782,49 @@ void print_credits_string(s16 x, s16 y, char *str) {
  * Variants of the above that allow for text alignment.
  */
 void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    s32 strLength = get_string_length(str, main_font_lut, &main_font_utf8_lut);
-    if (alignment == TEXT_ALIGN_RIGHT) {
-        x -= strLength;
-    } else if (alignment == TEXT_ALIGN_CENTER) {
-        x -= strLength / 2;
+    if (alignment != TEXT_ALIGN_LEFT) {
+        s32 strLength = get_string_width(str, main_font_lut, &main_font_utf8_lut);
+        if (alignment == TEXT_ALIGN_CENTER) {
+            x -= strLength / 2;
+        } else {
+            x -= strLength / 2;
+        }
     }
     print_generic_string(x, y, str);
 }
 
 void print_hud_lut_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    s32 strLength = get_string_length(str, main_hud_lut, &main_hud_utf8_lut);
-    if (alignment == TEXT_ALIGN_RIGHT) {
-        x -= strLength;
-    } else if (alignment == TEXT_ALIGN_CENTER) {
-        x -= strLength / 2;
+    if (alignment != TEXT_ALIGN_LEFT) {
+        s32 strLength = get_string_width(str, main_hud_lut, &main_hud_utf8_lut);
+        if (alignment == TEXT_ALIGN_CENTER) {
+            x -= strLength / 2;
+        } else {
+            x -= strLength / 2;
+        }
     }
     print_hud_lut_string(x, y, str);
 }
 
 void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    s32 strLength = get_string_length(str, menu_font_lut, &menu_font_utf8_lut);
-    if (alignment == TEXT_ALIGN_RIGHT) {
-        x -= strLength;
-    } else if (alignment == TEXT_ALIGN_CENTER) {
-        x -= strLength / 2;
+    if (alignment != TEXT_ALIGN_LEFT) {
+        s32 strLength = get_string_width(str, menu_font_lut, &menu_font_utf8_lut);
+        if (alignment == TEXT_ALIGN_CENTER) {
+            x -= strLength / 2;
+        } else {
+            x -= strLength / 2;
+        }
     }
     print_menu_generic_string(x, y, str);
 }
 
 void print_credits_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    s32 strLength = get_string_length(str, main_credits_font_lut, NULL);
-    if (alignment == TEXT_ALIGN_RIGHT) {
-        x -= strLength;
-    } else if (alignment == TEXT_ALIGN_CENTER) {
-        x -= strLength / 2;
+    if (alignment != TEXT_ALIGN_LEFT) {
+        s32 strLength = get_string_width(str, main_credits_font_lut, NULL);
+        if (alignment == TEXT_ALIGN_CENTER) {
+            x -= strLength / 2;
+        } else {
+            x -= strLength / 2;
+        }
     }
     print_credits_string(x, y, str);
 }
@@ -1082,61 +1123,61 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
 
 s16 gMenuMode = MENU_MODE_NONE;
 
-langarray_t textEndCutscene1 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene1 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "Mario!",
     "マリオ！！");
 
-langarray_t textEndCutscene2 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene2 = DEFINE_LANGUAGE_ARRAY(
     "The power of the Stars is restored to the castle...",
     "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
     "Die Macht der Sterne ruht wieder sicher im Schloss...",
     "おしろにスターが もどったのね");
 
-langarray_t textEndCutscene3 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene3 = DEFINE_LANGUAGE_ARRAY(
     "...and it's all thanks to you!",
     "...et ceci grâce à toi!",
     "...und alles dank Deiner Hilfe!",
     "みんな あなたのおかげだわ！");
 
-langarray_t textEndCutscene4 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene4 = DEFINE_LANGUAGE_ARRAY(
     "Thank you, Mario!",
     "Merci, Mario!",
     "Vielen Dank, Mario!",
     "ありがとう マリオ");
 
-langarray_t textEndCutscene5 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene5 = DEFINE_LANGUAGE_ARRAY(
     "We have to do something special for you...",
     "Tu mérites une récompense...",
     "Wir haben eine Überraschung für Dich...",
     "なにか おれいをしなくちゃ・・");
 
-langarray_t textEndCutscene6 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene6 = DEFINE_LANGUAGE_ARRAY(
     "Listen, everybody,",
     "Venez les amis...",
     "Hört alle her...",
     "さあ みんな");
 
-langarray_t textEndCutscene7 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene7 = DEFINE_LANGUAGE_ARRAY(
     "let's bake a delicious cake...",
     "Allons préparer un délicieux gâteau...",
     "Laßt uns einen leckeren Kuchen backen...",
     "おいしいケーキを やきましょう");
 
-langarray_t textEndCutscene8 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene8 = DEFINE_LANGUAGE_ARRAY(
     "...for Mario...",
     "...pour Mario...",
     "...für Mario...",
     "マリオの ために・・・");
 
-langarray_t textEndCutscene9 = DEFINE_LANGUAGE_ARRAY(
+LangArray textEndCutscene9 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "Mario!",
     "マリオ！！");
 
-langarray_t *gEndCutsceneStringsEn[] = {
+LangArray *gEndCutsceneStringsEn[] = {
     &textEndCutscene1,
     &textEndCutscene2,
     &textEndCutscene3,
@@ -1479,13 +1520,13 @@ void render_pause_red_coins(void) {
     }
 }
 
-langarray_t textCurrRatio43 = DEFINE_LANGUAGE_ARRAY(
+LangArray textCurrRatio43 = DEFINE_LANGUAGE_ARRAY(
     "ASPECT RATIO: 4:3\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
     "アスペクトひ: ４:３\nＬボタンできりかえ");
 
-langarray_t textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
+LangArray textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
     "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 16:9\nDRÜCKE L ZUM WECHSELN",
@@ -1509,13 +1550,13 @@ void render_widescreen_setting(void) {
 }
 #endif
 
-langarray_t textCourseX = DEFINE_LANGUAGE_ARRAY(
+LangArray textCourseX = DEFINE_LANGUAGE_ARRAY(
     "COURSE %s",
     "NIVEAU %s",
     "KURS %s",
     "コース%s");
 
-langarray_t textMyScore = DEFINE_LANGUAGE_ARRAY(
+LangArray textMyScore = DEFINE_LANGUAGE_ARRAY(
     "MY SCORE",
     "MON SCORE",
     "LEISTUNG",
@@ -1579,25 +1620,25 @@ void render_pause_my_score_coins(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-langarray_t textLakituMario = DEFINE_LANGUAGE_ARRAY(
+LangArray textLakituMario = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "ジュゲム↔マリオ");
 
-langarray_t textLakituStop = DEFINE_LANGUAGE_ARRAY(
+LangArray textLakituStop = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "ジュゲム↔ストップ");
 
-langarray_t textNormalUpClose = DEFINE_LANGUAGE_ARRAY(
+LangArray textNormalUpClose = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(UP-CLOSE)",
     "(NORMAL)(GROS-PLAN)",
     "(NORMAL)(WEIT-ZOOM)",
     "（おすすめ）（リアル）");
 
-langarray_t textNormalFixed = DEFINE_LANGUAGE_ARRAY(
+LangArray textNormalFixed = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(FIXED)",
     "(NORMAL)(FIXE)",
     "(NORMAL)(STATIV)",
@@ -1630,19 +1671,19 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     }
 }
 
-langarray_t textContinue = DEFINE_LANGUAGE_ARRAY(
+LangArray textContinue = DEFINE_LANGUAGE_ARRAY(
     "CONTINUE",
     "CONTINUER",
     "WEITER",
     "つづけて マリオする？");
 
-langarray_t textExitCourse = DEFINE_LANGUAGE_ARRAY(
+LangArray textExitCourse = DEFINE_LANGUAGE_ARRAY(
     "EXIT COURSE",
     "QUITTER NIVEAU",
     "KURS VERLASSEN",
     "コースからでる？");
 
-langarray_t textCameraAngleR = DEFINE_LANGUAGE_ARRAY(
+LangArray textCameraAngleR = DEFINE_LANGUAGE_ARRAY(
     "SET CAMERA ANGLE WITH Ⓡ",
     "RÉGLAGE CAMÉRA AVEC Ⓡ",
     "KAMERA MIT Ⓡ VERSTELLEN",
@@ -1757,13 +1798,13 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
     print_generic_string(x + 23, y + 18, str);
 }
 
-langarray_t textCoinX = DEFINE_LANGUAGE_ARRAY(
+LangArray textCoinX = DEFINE_LANGUAGE_ARRAY(
     "✪× %s",
     "✪× %s",
     "✪× %s",
     "✪ｘ%s");
 
-langarray_t textStarX = DEFINE_LANGUAGE_ARRAY(
+LangArray textStarX = DEFINE_LANGUAGE_ARRAY(
     "★× %s",
     "★× %s",
     "★× %s",
@@ -1935,13 +1976,13 @@ enum HUDCourseCompleteStringIDs {
     HUD_PRINT_CONGRATULATIONS
 };
 
-langarray_t textHudHiScore = DEFINE_LANGUAGE_ARRAY(
+LangArray textHudHiScore = DEFINE_LANGUAGE_ARRAY(
     "HI SCORE",
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "HISCORE");
 
-langarray_t textCongratulations = DEFINE_LANGUAGE_ARRAY(
+LangArray textCongratulations = DEFINE_LANGUAGE_ARRAY(
     "CONGRATULATIONS",
     "FELICITATIONS",
     "GRATULATION",
@@ -2006,7 +2047,7 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
     }
 }
 
-langarray_t textClear = DEFINE_LANGUAGE_ARRAY(
+LangArray textClear = DEFINE_LANGUAGE_ARRAY(
     "CLEAR",
     "CLEAR",
     "CLEAR",
@@ -2057,7 +2098,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
         name = segmented_to_virtual(courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)]);
-        u32 clearX = get_string_length(name, main_font_lut, &main_font_utf8_lut) + COURSE_COMPLETE_COURSE_X + 16;
+        u32 clearX = get_string_width(name, main_font_lut, &main_font_utf8_lut) + COURSE_COMPLETE_COURSE_X + 16;
 
         // Print course name and clear text
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -2101,19 +2142,19 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-langarray_t textSaveAndContinue = DEFINE_LANGUAGE_ARRAY(
+LangArray textSaveAndContinue = DEFINE_LANGUAGE_ARRAY(
     "SAVE & CONTINUE",
     "SAUVEGARDER & CONTINUER",
     "SPEICHERN & WEITER",
     "セーブしてつづける？");
 
-langarray_t textSaveAndQuit = DEFINE_LANGUAGE_ARRAY(
+LangArray textSaveAndQuit = DEFINE_LANGUAGE_ARRAY(
     "SAVE & QUIT",
     "SAUVEGARDER & QUITTER",
     "SPEICHERN & ENDE",
     "セーブしておわる？");
 
-langarray_t textContinueWithoutSave = DEFINE_LANGUAGE_ARRAY(
+LangArray textContinueWithoutSave = DEFINE_LANGUAGE_ARRAY(
     "CONTINUE, DON'T SAVE",
     "CONTINUER SANS SAUVEGARDER",
     "WEITER OHNE ZU SPEICHERN",

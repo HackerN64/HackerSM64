@@ -41,7 +41,15 @@ struct AsciiCharLUTEntry {
     const s8 kerning;
 };
 
-#define SPACE_KERNING(lut) (((struct AsciiCharLUTEntry *)(lut))[0].kerning)
+// Convert an ASCII char to the index in the ASCII LUT. ASCII LUTs start at the space character.
+#define ASCII_LUT_INDEX(c) ((c) - ' ')
+
+// Macro to quickly get the kerning of the space character from an ASCII LUT.
+#define SPACE_KERNING(lut) (((struct AsciiCharLUTEntry *)(lut))[ASCII_LUT_INDEX(' ')].kerning)
+
+// The character used to indicate a color code in a generic string.
+// As of now, must be an ASCII character.
+#define CHAR_COLOR_CODE '@'
 
 struct Utf8CharLUTEntry {
     u32 codepoint;
@@ -115,25 +123,26 @@ enum DialogResponseDefines {
 // Types and defines for handling language arrays
 #ifdef MULTILANG
 
-typedef char * langarray_t[4];
-#define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) {english, french, german, japanese}
-
 enum MultilangLanguages {
     LANGUAGE_ENGLISH,
     LANGUAGE_FRENCH,
     LANGUAGE_GERMAN,
-    LANGUAGE_JAPANESE
+    LANGUAGE_JAPANESE,
+    LANGUAGE_COUNT
 };
+
+typedef char * LangArray[LANGUAGE_COUNT];
+#define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) {english, french, german, japanese}
 
 #else
 
 // If multilang is off, ignore all other languages and only include English.
-typedef char * langarray_t;
+#define LANGUAGE_ENGLISH 0
+
+typedef char * LangArray;
 #define LANG_ARRAY(cmd) (cmd)
 #define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) english
-
-#define LANGUAGE_ENGLISH 0
 
 #endif
 
@@ -154,7 +163,7 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 void create_dl_ortho_matrix(void);
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 
-s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT);
+s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT);
 void format_int_to_string(char *buf, s32 value);
 void print_generic_string(s16 x, s16 y, char *str);
 void print_hud_lut_string(s16 x, s16 y, char *str);
