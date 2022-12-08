@@ -332,15 +332,15 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
  * Get the value to shift the X position of a string by, given a specific alignment.
  */
 static s32 get_alignment_x_offset(char *str, u32 alignment, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
-    if (alignment != TEXT_ALIGN_LEFT) {
-        s32 width = get_string_width(str, asciiLut, utf8LUT);
-        if (alignment == TEXT_ALIGN_CENTER) {
-            return -width / 2;
-        } else { // TEXT_ALIGN_RIGHT
-            return -width;
-        }
+    if (alignment == TEXT_ALIGN_LEFT) {
+        return 0;
     }
-    return 0;
+    s32 width = get_string_width(str, asciiLut, utf8LUT);
+    if (alignment == TEXT_ALIGN_CENTER) {
+        return -width / 2;
+    }
+    // TEXT_ALIGN_RIGHT
+    return -width;
 }
 
 /**
