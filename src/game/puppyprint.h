@@ -1,6 +1,5 @@
 #pragma once
 
-#include "segment2.h"
 #include "profiling.h"
 
 // This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 32's fine.
@@ -19,6 +18,19 @@
 #define PUPPYPRINT_GET_SNAPSHOT()
 #define PUPPYPRINT_GET_SNAPSHOT_TYPE(type)
 #endif
+
+struct PPTextFont {
+    Texture *tex; // Pointer to the texture for the font
+    u8 *kern; // Pointer to the kerning table
+    u16 *offset; // Pointer to the character offset table
+    u8 *pal; // Pointer to the texture pallete. Coming
+    u8 fmt; // Texture format, same as F3D macros
+    u8 siz; // Texture size, same as F3D macros
+    u16 imW; // Texture width
+    u8 imH; // Texture height
+    u8 txW; // Individual character width
+    u8 txH; // Individual character height
+};
 
 struct CallCounter {
     u16 collision_floor;
@@ -128,4 +140,4 @@ extern void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32
 extern void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
 void puppyprint_profiler_process(void);
 s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
-void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font);
+void get_char_from_byte(u8 letter, s32 *textX, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font);
