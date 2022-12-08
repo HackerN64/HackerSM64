@@ -106,7 +106,6 @@ f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
 f32 gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE;
 s16 gDialogScrollOffsetY = 0;
 s8 gDialogBoxType = DIALOG_TYPE_ROTATE;
-u8 sGenericFontLineHeight = 0;
 s16 gDialogID = DIALOG_NONE;
 s16 gLastDialogPageStrPos = 0;
 s16 gDialogTextPos = 0;
@@ -115,6 +114,9 @@ s8 gDialogHasResponse = FALSE;
 u8 gMenuHoldKeyIndex = 0;
 u8 gMenuHoldKeyTimer = 0;
 s32 gDialogResponse = DIALOG_RESPONSE_NONE;
+
+static u8 sGenericFontLineHeight = 0;
+static u8 sGenericFontLineAlignment = TEXT_ALIGN_LEFT;
 
 
 void create_dl_identity_matrix(void) {
@@ -289,7 +291,7 @@ static s32 is_color_code_valid(char *str, s32 strPos) {
 }
 
 /**
- * Get the exact width of a string of any font in pixels, using the given ASCII and UTF-8 tables.
+ * Get the exact width of the line of a string of any font in pixels, using the given ASCII and UTF-8 tables.
  */
 s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
     s32 width = 0;
@@ -301,7 +303,7 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
 
     asciiLut = segmented_to_virtual(asciiLut);
 
-    while ((c = str[strPos]) != '\0') {
+    while ((c = str[strPos]) != '\0' && c != '\n') {
         // Handle color codes and tabs if using generic font
         if (isGenericFont) {
             if (c == CHAR_COLOR_CODE) {
@@ -315,15 +317,6 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
                 continue;
             }
         }
-        // Handle newlines
-        if (c == '\n') {
-            if (width > maxWidth) {
-                maxWidth = width;
-            }
-            width = 0;
-            strPos++;
-            continue;
-        }
         if (c & 0x80) {
             width += utf8_lookup(utf8LUT, str, &strPos)->kerning;
         } else {
@@ -333,6 +326,21 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
     }
 
     return MAX(width, maxWidth);
+}
+
+/**
+ * Get the value to shift the X position of a string by, given a specific alignment.
+ */
+static s32 get_alignment_x_offset(char *str, u32 alignment, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
+    if (alignment != TEXT_ALIGN_LEFT) {
+        s32 width = get_string_width(str, asciiLut, utf8LUT);
+        if (alignment == TEXT_ALIGN_CENTER) {
+            return -width / 2;
+        } else { // TEXT_ALIGN_RIGHT
+            return -width;
+        }
+    }
+    return 0;
 }
 
 /**
@@ -485,6 +493,9 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
  * Prints a generic white string. Used for both dialog entries and regular prints.
  * Only prints a total of maxLines lines of text. If maxLines is -1, it will print
  * until the end of the string.
+ * 
+ * Uses the global variables sGenericFontLineHeight and sGenericFontLineAlignment 
+ * to control printing.
  */
 static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     s32 strPos = 0;
@@ -493,10 +504,16 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     s8 kerning = 0;
     u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
     u8 color[3];
+    s32 alignmentXOffset = get_alignment_x_offset(str, sGenericFontLineAlignment, main_font_lut, &main_font_utf8_lut);
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
     while ((c = str[strPos]) != '\0') {
+        // Handle text alignment if needed
+        if (alignmentXOffset != 0) {
+            create_dl_translation_matrix(MENU_MTX_NOPUSH, alignmentXOffset, 0.0f, 0.0f);
+            alignmentXOffset = 0;
+        }
         switch (c) {
             // Newline
             case '\n':
@@ -508,6 +525,8 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 lineNum++;
                 // Can skip any queued spaces
                 queuedSpaces = 0;
+                // Calculate alignment of new line
+                alignmentXOffset = get_alignment_x_offset(&str[strPos + 1], sGenericFontLineAlignment, main_font_lut, &main_font_utf8_lut);
                 break;
 
             // Space
@@ -610,8 +629,7 @@ render_character:
  * Prints a generic white string.
  */
 void print_generic_string(s16 x, s16 y, char *str) {
-    sGenericFontLineHeight = DIALOG_LINE_HEIGHT_EN;
-    render_main_font_text(x, y, str, -1);
+    print_generic_string_aligned(x, y, str, TEXT_ALIGN_LEFT);
 }
 
 /**
@@ -782,50 +800,23 @@ void print_credits_string(s16 x, s16 y, char *str) {
  * Variants of the above that allow for text alignment.
  */
 void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    if (alignment != TEXT_ALIGN_LEFT) {
-        s32 strLength = get_string_width(str, main_font_lut, &main_font_utf8_lut);
-        if (alignment == TEXT_ALIGN_CENTER) {
-            x -= strLength / 2;
-        } else { // TEXT_ALIGN_RIGHT
-            x -= strLength;
-        }
-    }
-    print_generic_string(x, y, str);
+    sGenericFontLineHeight = DIALOG_LINE_HEIGHT_EN;
+    sGenericFontLineAlignment = alignment;
+    render_main_font_text(x, y, str, -1);
 }
 
 void print_hud_lut_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    if (alignment != TEXT_ALIGN_LEFT) {
-        s32 strLength = get_string_width(str, main_hud_lut, &main_hud_utf8_lut);
-        if (alignment == TEXT_ALIGN_CENTER) {
-            x -= strLength / 2;
-        } else { // TEXT_ALIGN_RIGHT
-            x -= strLength;
-        }
-    }
+    x += get_alignment_x_offset(str, alignment, main_hud_lut, &main_hud_utf8_lut);
     print_hud_lut_string(x, y, str);
 }
 
 void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    if (alignment != TEXT_ALIGN_LEFT) {
-        s32 strLength = get_string_width(str, menu_font_lut, &menu_font_utf8_lut);
-        if (alignment == TEXT_ALIGN_CENTER) {
-            x -= strLength / 2;
-        } else { // TEXT_ALIGN_RIGHT
-            x -= strLength;
-        }
-    }
+    x += get_alignment_x_offset(str, alignment, menu_font_lut, &menu_font_utf8_lut);
     print_menu_generic_string(x, y, str);
 }
 
 void print_credits_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
-    if (alignment != TEXT_ALIGN_LEFT) {
-        s32 strLength = get_string_width(str, main_credits_font_lut, NULL);
-        if (alignment == TEXT_ALIGN_CENTER) {
-            x -= strLength / 2;
-        } else { // TEXT_ALIGN_RIGHT
-            x -= strLength;
-        }
-    }
+    x += get_alignment_x_offset(str, alignment, main_credits_font_lut, NULL);
     print_credits_string(x, y, str);
 }
 
@@ -1029,6 +1020,7 @@ static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
     }
 
     sGenericFontLineHeight = DIALOG_LINE_HEIGHT;
+    sGenericFontLineAlignment = TEXT_ALIGN_LEFT;
     printResult = render_main_font_text(0, yPos, str + gDialogTextPos, totalLines);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
