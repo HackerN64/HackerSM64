@@ -786,8 +786,8 @@ void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
         s32 strLength = get_string_width(str, main_font_lut, &main_font_utf8_lut);
         if (alignment == TEXT_ALIGN_CENTER) {
             x -= strLength / 2;
-        } else {
-            x -= strLength / 2;
+        } else { // TEXT_ALIGN_RIGHT
+            x -= strLength;
         }
     }
     print_generic_string(x, y, str);
@@ -798,8 +798,8 @@ void print_hud_lut_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
         s32 strLength = get_string_width(str, main_hud_lut, &main_hud_utf8_lut);
         if (alignment == TEXT_ALIGN_CENTER) {
             x -= strLength / 2;
-        } else {
-            x -= strLength / 2;
+        } else { // TEXT_ALIGN_RIGHT
+            x -= strLength;
         }
     }
     print_hud_lut_string(x, y, str);
@@ -810,8 +810,8 @@ void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
         s32 strLength = get_string_width(str, menu_font_lut, &menu_font_utf8_lut);
         if (alignment == TEXT_ALIGN_CENTER) {
             x -= strLength / 2;
-        } else {
-            x -= strLength / 2;
+        } else { // TEXT_ALIGN_RIGHT
+            x -= strLength;
         }
     }
     print_menu_generic_string(x, y, str);
@@ -822,8 +822,8 @@ void print_credits_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
         s32 strLength = get_string_width(str, main_credits_font_lut, NULL);
         if (alignment == TEXT_ALIGN_CENTER) {
             x -= strLength / 2;
-        } else {
-            x -= strLength / 2;
+        } else { // TEXT_ALIGN_RIGHT
+            x -= strLength;
         }
     }
     print_credits_string(x, y, str);

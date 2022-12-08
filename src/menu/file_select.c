@@ -2052,7 +2052,7 @@ void print_save_file_scores(s8 fileIndex) {
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-    fileLetter = 'A';
+    fileLetter = 'A' + fileIndex;
     sprintf(str, LANG_ARRAY(textScoreMenuMarioX), fileLetter);
     print_hud_lut_string(25, 15, str);
 
