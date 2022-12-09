@@ -101,6 +101,8 @@ const Gfx inside_castle_seg7_dl_ccm_fake_painting_2[] = {
     gsSPEndDisplayList(),
 };
 
+/// - PAINTING_ID_CASTLE_BOB -
+
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_bob[] = {
     inside_castle_seg7_texture_0700B800,
     inside_castle_seg7_texture_0700A800,
@@ -108,16 +110,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_bob[] 
 
 // 0x07023620 - 0x07023698
 const struct Painting bob_painting = {
-    /* ID */ PAINTING_ID_CASTLE_BOB,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_bob),
     /* Textures */ inside_castle_seg7_painting_textures_bob,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_bob),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_CCM -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ccm[] = {
     inside_castle_seg7_texture_0700D800,
@@ -126,16 +129,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ccm[] 
 
 // 0x07023698 - 0x07023710
 const struct Painting ccm_painting = {
-    /* ID */ PAINTING_ID_CASTLE_CCM,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ccm),
     /* Textures */ inside_castle_seg7_painting_textures_ccm,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ccm),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_WF -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wf[] = {
     inside_castle_seg7_texture_0700F800,
@@ -144,16 +148,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wf[] =
 
 // 0x07023710 - 0x07023788
 const struct Painting wf_painting = {
-    /* ID */ PAINTING_ID_CASTLE_WF,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_wf),
     /* Textures */ inside_castle_seg7_painting_textures_wf,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_wf),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_JRB -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_jrb[] = {
     inside_castle_seg7_texture_07011800,
@@ -162,16 +167,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_jrb[] 
 
 // 0x07023788 - 0x07023800
 const struct Painting jrb_painting = {
-    /* ID */ PAINTING_ID_CASTLE_JRB,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_jrb),
     /* Textures */ inside_castle_seg7_painting_textures_jrb,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_jrb),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_LLL -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_lll[] = {
     inside_castle_seg7_texture_07012800,
@@ -180,16 +186,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_lll[] 
 
 // 0x07023800 - 0x07023878
 const struct Painting lll_painting = {
-    /* ID */ PAINTING_ID_CASTLE_LLL,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_lll),
     /* Textures */ inside_castle_seg7_painting_textures_lll,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_lll),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_SSL -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ssl[] = {
     inside_castle_seg7_texture_07015800,
@@ -198,16 +205,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ssl[] 
 
 // 0x07023878 - 0x070238F0
 const struct Painting ssl_painting = {
-    /* ID */ PAINTING_ID_CASTLE_SSL,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ssl),
     /* Textures */ inside_castle_seg7_painting_textures_ssl,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ssl),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_HMC -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_hmc_env[] = {
     inside_castle_seg7_texture_07016800,
@@ -215,16 +223,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_hmc_en
 
 // 0x070238F0 - 0x07023968
 const struct Painting hmc_painting = {
-    /* ID */ PAINTING_ID_CASTLE_HMC,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_hmc_env),
     /* Textures */ inside_castle_seg7_painting_textures_hmc_env,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_hmc_env),
     /* Texture w, h */ 32, 32,
-    /* Texture Type */ PAINTING_ENV_MAP,
+    /* Texture Type */ PAINTING_TYPE_ENV_MAP,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 768.0f, 768.0f,
 };
+
+/// - PAINTING_ID_CASTLE_DDD -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ddd_env[] = {
     inside_castle_seg7_texture_07017000,
@@ -232,16 +241,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ddd_en
 
 // 0x07023968 - 0x070239E0
 const struct Painting ddd_painting = {
-    /* ID */ PAINTING_ID_CASTLE_DDD,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ddd_env),
     /* Textures */ inside_castle_seg7_painting_textures_ddd_env,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ddd_env),
     /* Texture w, h */ 32, 32,
-    /* Texture Type */ PAINTING_ENV_MAP,
+    /* Texture Type */ PAINTING_TYPE_ENV_MAP,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Shaded */ TRUE,
     /* Alpha */ 0xB4,
     /* Size */ 819.2f, 819.2f,
 };
+
+/// - PAINTING_ID_CASTLE_WDW -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wdw[] = {
     inside_castle_seg7_texture_07018800,
@@ -250,16 +260,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wdw[] 
 
 // 0x070239E0 - 0x07023A58
 const struct Painting wdw_painting = {
-    /* ID */ PAINTING_ID_CASTLE_WDW,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_wdw),
     /* Textures */ inside_castle_seg7_painting_textures_wdw,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_wdw),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 614.0f, 614.0f,
 };
+
+/// - PAINTING_ID_CASTLE_THI_TINY -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_thi[] = {
     inside_castle_seg7_texture_0701A800,
@@ -268,29 +279,31 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_thi[] 
 
 // 0x07023A58 - 0x07023AD0
 const struct Painting thi_tiny_painting = {
-    /* ID */ PAINTING_ID_CASTLE_THI_TINY,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_thi),
     /* Textures */ inside_castle_seg7_painting_textures_thi,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_thi),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 393.216f, 393.216f,
 };
 
+/// - PAINTING_ID_CASTLE_THI_HUGE -
+
 // 0x07023C38 - 0x07023CB0
 const struct Painting thi_huge_painting = {
-    /* ID */ PAINTING_ID_CASTLE_THI_HUGE,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_thi),
     /* Textures */ inside_castle_seg7_painting_textures_thi,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_thi),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 1638.4f, 1638.4f,
 };
+
+/// - PAINTING_ID_CASTLE_TTM -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttm[] = {
     inside_castle_seg7_texture_0701C800,
@@ -299,16 +312,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttm[] 
 
 // 0x07023AD0 - 0x07023B48
 const struct Painting ttm_painting = {
-    /* ID */ PAINTING_ID_CASTLE_TTM,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ttm),
     /* Textures */ inside_castle_seg7_painting_textures_ttm,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ttm),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 256.0f, 256.0f,
 };
+
+/// - PAINTING_ID_CASTLE_TTC -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttc[] = {
     inside_castle_seg7_texture_0701E800,
@@ -317,16 +331,17 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttc[] 
 
 // 0x07023B48 - 0x07023BC0
 const struct Painting ttc_painting = {
-    /* ID */ PAINTING_ID_CASTLE_TTC,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ttc),
     /* Textures */ inside_castle_seg7_painting_textures_ttc,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ttc),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,
     /* Size */ 409.6f, 409.6f,
 };
+
+/// - PAINTING_ID_CASTLE_SL -
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_sl[] = {
     inside_castle_seg7_texture_07020800,
@@ -335,23 +350,23 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_sl[] =
 
 // 0x07023BC0 - 0x07023C38
 const struct Painting sl_painting = {
-    /* ID */ PAINTING_ID_CASTLE_SL,
-    /* Image Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_sl),
     /* Textures */ inside_castle_seg7_painting_textures_sl,
+    /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_sl),
     /* Texture w, h */ 64, 32,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ FALSE,
     /* Alpha */ 0xFF,
     /* Size */ 716.8f, 716.8f,
 };
 
+/// - PAINTING_ID_CASTLE_RR -
+
 const struct Painting rr_painting = {
-    /* ID */ PAINTING_ID_CASTLE_RR,
-    /* Image Count */ 0,
     /* Textures */ NULL,
+    /* Texture Count */ 0,
     /* Texture w, h */  0,  0,
-    /* Texture Type */ PAINTING_IMAGE,
+    /* Texture Type */ PAINTING_TYPE_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Shaded */ TRUE,
     /* Alpha */ 0x00,

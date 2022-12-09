@@ -54,19 +54,11 @@
  */
 
 /**
- * HMC painting group.
+ * Array of pointers to painting data structs.
  */
-const struct Painting *sHmcPaintings[] = {
+const struct Painting *sPaintings[] = {
     /* Painting ID                  */
-    /* PAINTING_ID_HMC_COTMC        */ &cotmc_painting,
-    NULL,
-};
-
-/**
- * Inside Castle painting group.
- */
-const struct Painting *sInsideCastlePaintings[] = {
-    /* Painting ID                  */
+    /* PAINTING_ID_NULL             */ NULL,
     /* PAINTING_ID_CASTLE_BOB       */ &bob_painting,
     /* PAINTING_ID_CASTLE_CCM       */ &ccm_painting,
     /* PAINTING_ID_CASTLE_WF        */ &wf_painting,
@@ -82,26 +74,9 @@ const struct Painting *sInsideCastlePaintings[] = {
     /* PAINTING_ID_CASTLE_SL        */ &sl_painting,
     /* PAINTING_ID_CASTLE_THI_HUGE  */ &thi_huge_painting,
     /* PAINTING_ID_CASTLE_RR        */ &rr_painting,
-    NULL,
-};
-
-/**
- * TTM painting group.
- */
-const struct Painting *sTtmPaintings[] = {
-    /* Painting ID                  */
+    /* PAINTING_ID_HMC_COTMC        */ &cotmc_painting,
     /* PAINTING_ID_TTM_SLIDE        */ &ttm_slide_painting,
     NULL,
-};
-
-/**
- * Array of all painting groups.
- */
-const struct Painting * const* sPaintingGroups[] = {
-    /* Group ID                     */
-    /* PAINTING_GROUP_HMC           */ sHmcPaintings,
-    /* PAINTING_GROUP_INSIDE_CASTLE */ sInsideCastlePaintings,
-    /* PAINTING_GROUP_TTM           */ sTtmPaintings,
 };
 
 /**
@@ -158,9 +133,11 @@ static const struct RippleAnimationInfo sRippleAnimationInfo[] = {
  * Returns a pointer to the RippleAnimationInfo that best fits the painting type.
  */
 const struct RippleAnimationInfo *get_ripple_animation(const struct Painting *painting) {
-    PaintingData rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
+    s8 rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
+
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         rippleAnimationType = RIPPLE_ANIM_PROXIMITY;
+
         if (painting->sizeX >= (PAINTING_SIZE * 2)
          || painting->sizeY >= (PAINTING_SIZE * 2)) {
             rippleAnimationType = RIPPLE_ANIM_PROXIMITY_LARGE;
@@ -496,7 +473,7 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
  * If the textureMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole
  * painting.
  */
-Gfx *render_painting(const Texture *img, PaintingData index, PaintingData imageCount, PaintingData tWidth, PaintingData tHeight, const PaintingData *textureMap, Alpha alpha) {
+Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, const PaintingData *textureMap, Alpha alpha) {
     struct PaintingMeshVertex *mesh = NULL;
     PaintingData group;
     PaintingData groupIndex;
@@ -675,7 +652,7 @@ s32 get_exponent(s32 x) {
 /**
  * Set up the texture format in the display list.
  */
-void painting_setup_textures(Gfx **gfx, PaintingData tWidth, PaintingData tHeight, PaintingData isEnvMap) {
+void painting_setup_textures(Gfx **gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
     s16 cm = isEnvMap ? (G_TX_WRAP | G_TX_NOMIRROR) : G_TX_CLAMP;
     u32 masks = get_exponent(tWidth);
     u32 maskt = get_exponent(tHeight);
@@ -697,13 +674,13 @@ void painting_setup_textures(Gfx **gfx, PaintingData tWidth, PaintingData tHeigh
  * Ripple a painting that has 1 or more images that need to be mapped.
  */
 Gfx *dl_painting_rippling(const struct Painting *painting) {
-    PaintingData i;
-    const PaintingData *textureMap;
-    PaintingData imageCount = painting->imageCount;
-    PaintingData tWidth = painting->textureWidth;
-    PaintingData tHeight = painting->textureHeight;
+    s16 i;
+    const PaintingData *textureMap = NULL;
+    s16 imageCount = painting->imageCount;
+    s16 tWidth = painting->textureWidth;
+    s16 tHeight = painting->textureHeight;
     const Texture **tArray = segmented_to_virtual(painting->textureArray);
-    PaintingData isEnvMap = (painting->textureType == PAINTING_ENV_MAP);
+    s32 isEnvMap = (painting->textureType == PAINTING_TYPE_ENV_MAP);
 
     u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
@@ -784,12 +761,7 @@ Gfx *display_painting_rippling(const struct Painting *painting) {
 
 Gfx *dl_painting_not_rippling(const struct Painting *painting) {
     Alpha alpha = painting->alpha;
-
-    if (alpha == 0x00) {
-        return NULL;
-    }
-
-    PaintingData imageCount = painting->imageCount;
+    s16 imageCount = painting->imageCount;
     s32 shaded = painting->shaded;
     u32 gfxCmds = (
         /*gSPDisplayList        */ 1 +
@@ -820,7 +792,7 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
 
     const Texture **textures = segmented_to_virtual(painting->textureArray);
 
-    s32 isEnvMap = (painting->textureType == PAINTING_ENV_MAP);
+    s32 isEnvMap = (painting->textureType == PAINTING_TYPE_ENV_MAP);
 
     if (isEnvMap) {
         vec3_set(n, 0x00, 0x00, 0x7f);
@@ -833,8 +805,8 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
         gSPDisplayList(gfx++, dl_paintings_textured_vertex_colored_begin);
     }
 
-    PaintingData tWidth = painting->textureWidth;
-    PaintingData tHeight = painting->textureHeight;
+    s16 tWidth = painting->textureWidth;
+    s16 tHeight = painting->textureHeight;
 
     const f32 dx = (PAINTING_SIZE / 1);
     const f32 dy = (PAINTING_SIZE / imageCount);
@@ -926,11 +898,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         return NULL;
     }
 
-    // Failsafe for nonexistent painting groups.
-    if (obj->oPaintingGroup >= PAINTING_NUM_GROUPS) {
-        return NULL;
-    }
-
     // Get the const painting data.
     const struct Painting *painting = obj->oPaintingData;
 
@@ -1009,17 +976,10 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 void bhv_painting_init(void) {
     struct Object *obj = o;
 
-    // Get the painting group and id from the behavior params.
-    obj->oPaintingGroup = GET_BPARAM1(obj->oBehParams);
-    obj->oPaintingId    = GET_BPARAM2(obj->oBehParams);
+    // Get the painting id from the first byte behavior params. The second byte is used for the warp node ID.
+    s32 id = GET_BPARAM1(obj->oBehParams);
 
-    // Failsafe for nonexistent painting groups.
-    if (obj->oPaintingGroup >= PAINTING_NUM_GROUPS) {
-        return;
-    }
-
-    const struct Painting * const* paintingGroup = sPaintingGroups[obj->oPaintingGroup];
-    const struct Painting *painting = segmented_to_virtual(paintingGroup[obj->oPaintingId]);
+    const struct Painting *painting = segmented_to_virtual(sPaintings[id]);
 
     // Set the object's painting data pointer.
     obj->oPaintingData = painting;
@@ -1095,8 +1055,7 @@ void bhv_painting_loop(void) {
     struct Object *obj = o;
 
     // Update the DDD painting before drawing.
-    if (obj->oPaintingGroup == PAINTING_GROUP_INSIDE_CASTLE
-     && obj->oPaintingId == PAINTING_ID_CASTLE_DDD) {
+    if (GET_BPARAM1(obj->oBehParams) == PAINTING_ID_CASTLE_DDD) {
         move_ddd_painting(obj, 3456.0f, 5529.6f, 20.0f);
     }
 }

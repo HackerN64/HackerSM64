@@ -95,7 +95,7 @@ const LevelScript level_hmc_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_HMC_RED_GRILLS,           hmc_geo_000530),
 
     AREA(/*index*/ 1, hmc_geo_000B90),
-        OBJECT(/*model*/ MODEL_PAINTING, /*pos*/  2989, -4485,  5135, /*angle*/ 270,   0, 0, /*behParam*/ PAINTING_ID(PAINTING_ID_HMC_COTMC, PAINTING_GROUP_HMC) << 16, /*beh*/ bhvPainting),
+        OBJECT(/*model*/ MODEL_PAINTING, /*pos*/  2989, -4485,  5135, /*angle*/ 270,   0, 0, /*behParam*/ ((PAINTING_ID_HMC_COTMC << 24) | (0x96 << 16)), /*beh*/ bhvPainting),
         OBJECT(/*model*/ MODEL_NONE,     /*pos*/ -7152,  3161,  7181, /*angle*/   0, 135, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),
         OBJECT(/*model*/ MODEL_NONE,     /*pos*/  3351, -4690,  4773, /*angle*/   0,   0, 0, /*behParam*/ 0x340B0000, /*beh*/ bhvWarp),
         WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_HMC,    /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),

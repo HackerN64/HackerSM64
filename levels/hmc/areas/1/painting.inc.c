@@ -1,5 +1,7 @@
 #include "game/paintings.h"
 
+/// - PAINTING_ID_HMC_COTMC -
+
 // 0x07024CE0 - 0x070254E0
 ALIGNED8 static const Texture hmc_seg7_texture_cotmc_pool_env[] = {
 #include "levels/hmc/7.rgba16.inc.c"
@@ -12,11 +14,10 @@ const Texture *const hmc_seg7_painting_textures_cotmc[] = {
 
 // 0x0702551C (PaintingData)
 const struct Painting cotmc_painting = {
-    /* ID */ PAINTING_ID_HMC_COTMC,
-    /* Image Count */ ARRAY_COUNT(hmc_seg7_painting_textures_cotmc),
     /* Textures */ hmc_seg7_painting_textures_cotmc,
+    /* Texture Count */ ARRAY_COUNT(hmc_seg7_painting_textures_cotmc),
     /* Texture w, h */ 32, 32,
-    /* Texture Type */ PAINTING_ENV_MAP,
+    /* Texture Type */ PAINTING_TYPE_ENV_MAP,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Shaded */ TRUE,
     /* Alpha */ 0xFF,

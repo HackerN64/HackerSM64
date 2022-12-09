@@ -8,10 +8,6 @@
 #include "types.h"
 
 
-/// Use to properly set a GraphNodeGenerated's parameter to point to the right painting.
-/// Use this for both bparam1 and bparam2 for painting objects.
-#define PAINTING_ID(id, grp) ((id) | ((grp) << 8))
-
 /// The default painting side length.
 #define PAINTING_SIZE 614.4f
 
@@ -31,54 +27,34 @@
 #define TC(t) (((t) - 1) << 5)
 
 
-// HMC painting group
-enum HMCPaintingIDs {
+enum PaintingIDs {
     /* Painting ID */
-    /*           0 */ PAINTING_ID_HMC_COTMC,
-};
-
-// Inside Castle painting group
-enum CastlePaintingIDs {
-    /* Painting ID */
-    /*           0 */ PAINTING_ID_CASTLE_BOB,
-    /*           1 */ PAINTING_ID_CASTLE_CCM,
-    /*           2 */ PAINTING_ID_CASTLE_WF,
-    /*           3 */ PAINTING_ID_CASTLE_JRB,
-    /*           4 */ PAINTING_ID_CASTLE_LLL,
-    /*           5 */ PAINTING_ID_CASTLE_SSL,
-    /*           6 */ PAINTING_ID_CASTLE_HMC,
-    /*           7 */ PAINTING_ID_CASTLE_DDD,
-    /*           8 */ PAINTING_ID_CASTLE_WDW,
-    /*           9 */ PAINTING_ID_CASTLE_THI_TINY,
-    /*          10 */ PAINTING_ID_CASTLE_TTM,
-    /*          11 */ PAINTING_ID_CASTLE_TTC,
-    /*          12 */ PAINTING_ID_CASTLE_SL,
-    /*          13 */ PAINTING_ID_CASTLE_THI_HUGE,
-    /*          14 */ PAINTING_ID_CASTLE_RR,
-};
-
-// TTM painting group
-enum TTMPaintingIDs {
-    /* Painting ID */
-    /*           0 */ PAINTING_ID_TTM_SLIDE,
-};
-
-// Painting group IDs
-enum PaintingGroups {
-    /* Group ID */
-    /*        0 */ PAINTING_GROUP_HMC,
-    /*        1 */ PAINTING_GROUP_INSIDE_CASTLE,
-    /*        2 */ PAINTING_GROUP_TTM,
-    PAINTING_NUM_GROUPS,
-    PAINTING_GROUP_NULL = -1,
+    /*        0x00 */ PAINTING_ID_NULL,
+    /*        0x01 */ PAINTING_ID_CASTLE_BOB,
+    /*        0x02 */ PAINTING_ID_CASTLE_CCM,
+    /*        0x03 */ PAINTING_ID_CASTLE_WF,
+    /*        0x04 */ PAINTING_ID_CASTLE_JRB,
+    /*        0x05 */ PAINTING_ID_CASTLE_LLL,
+    /*        0x06 */ PAINTING_ID_CASTLE_SSL,
+    /*        0x07 */ PAINTING_ID_CASTLE_HMC,
+    /*        0x08 */ PAINTING_ID_CASTLE_DDD,
+    /*        0x09 */ PAINTING_ID_CASTLE_WDW,
+    /*        0x0A */ PAINTING_ID_CASTLE_THI_TINY,
+    /*        0x0B */ PAINTING_ID_CASTLE_TTM,
+    /*        0x0C */ PAINTING_ID_CASTLE_TTC,
+    /*        0x0D */ PAINTING_ID_CASTLE_SL,
+    /*        0x0E */ PAINTING_ID_CASTLE_THI_HUGE,
+    /*        0x0F */ PAINTING_ID_CASTLE_RR,
+    /*        0x10 */ PAINTING_ID_HMC_COTMC,
+    /*        0x11 */ PAINTING_ID_TTM_SLIDE,
 };
 
 // Painting->textureType
 enum PaintingType {
     /// Painting that uses 1 or more images as a texture
-    PAINTING_IMAGE,
+    PAINTING_TYPE_IMAGE,
     /// Painting that has one texture used for an environment map effect
-    PAINTING_ENV_MAP
+    PAINTING_TYPE_ENV_MAP
 };
 
 // Painting->rippleTrigger
@@ -138,24 +114,24 @@ struct RippleAnimationInfo {
  * Painting info struct.
  */
 struct Painting {
-    /// ID of the painting and the warp node.
-    /*0x00*/ PaintingData id;
+    /// Texture data.
+    /*0x00*/ const Texture *const *textureArray;
 
-    /// How many images should be drawn when the painting is rippling.
-    /*0x02*/ PaintingData imageCount;
+    /// How many textures the painting uses.
+    /*0x04*/ s32 imageCount;
 
-    // Texture data.
-    /*0x04*/ const Texture *const *textureArray;
-    /*0x08*/ PaintingData textureWidth;
-    /*0x0A*/ PaintingData textureHeight;
+    /// Texture size.
+    /*0x08*/ s16 textureWidth;
+    /*0x0A*/ s16 textureHeight;
 
-    /// Either PAINTING_IMAGE or PAINTING_ENV_MAP.
+
+    /// Either PAINTING_TYPE_IMAGE or PAINTING_TYPE_ENV_MAP.
     /*0x0C*/ s8 textureType;
 
     /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
     /*0x0D*/ s8 rippleTrigger;
 
-    /// Whether to use shading or not.
+    /// Whether the painting uses shading when not rippling. Only used for Snowman's Land in vanilla and makes the transition to/from rippling not seamless.
     /*0x0E*/ s8 shaded;
 
     /// The painting's transparency (0..255). Determines the drawing layer of the painting.

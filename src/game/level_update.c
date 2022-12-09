@@ -635,26 +635,23 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
-    struct WarpNode warpNode;
-    struct WarpNode *pWarpNode = NULL;
+    struct ObjectWarpNode *warpNode = NULL;
 
-    if (gCurrentArea->paintingWarpNodes == NULL) {
-        gEnteredPaintingObject = NULL;
-    } else if (gEnteredPaintingObject != NULL) {
-        pWarpNode = &gCurrentArea->paintingWarpNodes[gEnteredPaintingObject->oPaintingId];
+    if (gEnteredPaintingObject != NULL) {
+        warpNode = area_get_warp_node(GET_BPARAM2(gEnteredPaintingObject->oBehParams));
 
-        if (pWarpNode != NULL) {
+        if (warpNode != NULL) {
             if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
                 play_painting_eject_sound();
-            } else if (pWarpNode->id != 0) {
-                warpNode = *pWarpNode;
+            } else {
+                struct WarpNode *node = &warpNode->node;
 
-                if (!(warpNode.destLevel & WARP_NO_CHECKPOINT)) {
-                    sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
+                if (!(node->destLevel & WARP_NO_CHECKPOINT)) {
+                    sWarpCheckpointActive = check_warp_checkpoint(node);
                 }
 
-                initiate_warp((warpNode.destLevel & WARP_DEST_LEVEL_NUM_MASK), warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
-                check_if_should_set_warp_checkpoint(&warpNode);
+                initiate_warp((node->destLevel & WARP_DEST_LEVEL_NUM_MASK), node->destArea, node->destNode, WARP_FLAGS_NONE);
+                check_if_should_set_warp_checkpoint(node);
 
                 play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45);
                 level_set_transition(74, basic_update);

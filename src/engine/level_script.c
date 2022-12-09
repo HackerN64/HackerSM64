@@ -31,8 +31,6 @@
 
 #include "config.h"
 
-#define NUM_PAINTING_WARP_NODES 45
-
 #define CMD_GET(type, offset) (*(type *) (CMD_PROCESS_OFFSET(offset) + (u8 *) sCurrentCmd))
 
 // These are equal
@@ -559,28 +557,7 @@ static void level_cmd_set_terrain_type(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_create_painting_warp_node(void) {
-    s32 i;
-    struct WarpNode *node;
-
-    if (sCurrAreaIndex != -1) {
-        if (gAreas[sCurrAreaIndex].paintingWarpNodes == NULL) {
-            gAreas[sCurrAreaIndex].paintingWarpNodes =
-                alloc_only_pool_alloc(sLevelPool, NUM_PAINTING_WARP_NODES * sizeof(struct WarpNode));
-
-            for (i = 0; i < NUM_PAINTING_WARP_NODES; i++) {
-                gAreas[sCurrAreaIndex].paintingWarpNodes[i].id = 0;
-            }
-        }
-
-        node = &gAreas[sCurrAreaIndex].paintingWarpNodes[CMD_GET(u8, 2)];
-
-        node->id = 1;
-        node->destLevel = CMD_GET(u8, 3) + CMD_GET(u8, 6);
-        node->destArea = CMD_GET(u8, 4);
-        node->destNode = CMD_GET(u8, 5);
-    }
-
+static void level_cmd_27(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -922,7 +899,7 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_PLACE_OBJECT                */ level_cmd_place_object,
     /*LEVEL_CMD_INIT_MARIO                  */ level_cmd_init_mario,
     /*LEVEL_CMD_CREATE_WARP_NODE            */ level_cmd_create_warp_node,
-    /*LEVEL_CMD_CREATE_PAINTING_WARP_NODE   */ level_cmd_create_painting_warp_node,
+    /*LEVEL_CMD_27                          */ level_cmd_27,
     /*LEVEL_CMD_CREATE_INSTANT_WARP         */ level_cmd_create_instant_warp,
     /*LEVEL_CMD_LOAD_AREA                   */ level_cmd_load_area,
     /*LEVEL_CMD_UNLOAD_AREA                 */ level_cmd_unload_area,
