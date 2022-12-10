@@ -154,8 +154,8 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *mesh, Painti
     f32 rippleTimer = obj->oPaintingRippleTimer;
 
     /// X and Y of the ripple origin.
-    f32 rippleX = obj->oPaintingRippleX;
-    f32 rippleY = obj->oPaintingRippleY;
+    f32 rippleX = obj->oPaintingRipplePosX;
+    f32 rippleY = obj->oPaintingRipplePosY;
 
     f32 sizeRatioX = (painting->sizeX / PAINTING_SIZE);
     f32 sizeRatioY = (painting->sizeY / PAINTING_SIZE);
@@ -996,11 +996,11 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTi
 
     // Set the ripple position.
     if (centerRipples) {
-        obj->oPaintingRippleX = (painting->sizeX * 0.5f);
-        obj->oPaintingRippleY = (painting->sizeY * 0.5f);
+        obj->oPaintingRipplePosX = (painting->sizeX * 0.5f);
+        obj->oPaintingRipplePosY = (painting->sizeY * 0.5f);
     } else {
-        obj->oPaintingRippleX = obj->oPaintingLocalMarioPosX;
-        obj->oPaintingRippleY = obj->oPaintingLocalMarioPosY;
+        obj->oPaintingRipplePosX = obj->oPaintingLocalMarioPosX;
+        obj->oPaintingRipplePosY = obj->oPaintingLocalMarioPosY;
     }
 
     // Set Mario's Y position for the WDW water level.
