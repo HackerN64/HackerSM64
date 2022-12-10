@@ -478,7 +478,7 @@ static void level_cmd_init_mario(void) {
 static void level_cmd_place_object(void) {
     if (
         sCurrAreaIndex != -1
-        && ((CMD_GET(u8, 2) & (1 << (gCurrActNum - 1))) || (CMD_GET(u8, 2) == 0x1F))
+        && (CMD_GET(u8, 2) & (1 << (gCurrActNum - 1)))
     ) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo *spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
@@ -606,22 +606,19 @@ static void level_cmd_3A(void) {
 static void level_cmd_create_whirlpool(void) {
     struct Whirlpool *whirlpool;
     s32 index = CMD_GET(u8, 2);
-    s32 beatBowser2 =
-        (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0;
 
-    if (CMD_GET(u8, 3) == WHIRLPOOL_COND_ALWAYS
-        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_NOT_BEATEN   && !beatBowser2)
-        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_BEATEN       && beatBowser2)
-        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_AT_LEAST_SECOND_STAR && gCurrActNum >= 2)) {
-        if (sCurrAreaIndex != -1 && index < 2) {
-            if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
-                whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));
-                gAreas[sCurrAreaIndex].whirlpools[index] = whirlpool;
-            }
-
-            vec3s_set(whirlpool->pos, CMD_GET(s16, 4), CMD_GET(s16, 6), CMD_GET(s16, 8));
-            whirlpool->strength = CMD_GET(s16, 10);
+    if (
+        sCurrAreaIndex != -1
+        && index < ARRAY_COUNT(gAreas[sCurrAreaIndex].whirlpools)
+        && (CMD_GET(u8, 3) & (1 << (gCurrActNum - 1)))
+    ) {
+        if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
+            whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));
+            gAreas[sCurrAreaIndex].whirlpools[index] = whirlpool;
         }
+
+        vec3s_set(whirlpool->pos, CMD_GET(s16, 4), CMD_GET(s16, 6), CMD_GET(s16, 8));
+        whirlpool->strength = CMD_GET(s16, 10);
     }
 
     sCurrentCmd = CMD_NEXT;
