@@ -178,7 +178,7 @@ static void boo_set_move_yaw_for_during_hit(s32 hurt) {
 }
 
 // Boo Roll
-static Angle sBooHitRotations[] = {
+static s16 sBooHitRotations[] = {
     0x179F, 0x1620, 0x14AC, 0x1346,
     0x11EB, 0x109E, 0x0B75, 0x0E28,
     0x0D01, 0x0BE6, 0x0AD7, 0x09D5,
