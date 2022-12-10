@@ -116,7 +116,7 @@
 /**
  * Makes Mario unable to ledge grab steep slopes to prevent false ledge grabs.
  */
-// #define DONT_LEDGE_GRAB_STEEP_SLOPES
+#define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
  * Disables BLJs and crushes SimpleFlips's dreams.

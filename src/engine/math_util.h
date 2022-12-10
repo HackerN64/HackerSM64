@@ -475,7 +475,7 @@ ALWAYS_INLINE s32 absi(s32 in) {
 
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
-u32 random_u16(void);
+u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 
