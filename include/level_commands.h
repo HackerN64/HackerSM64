@@ -374,13 +374,13 @@ enum GoddardScene {
     CMD_BBBB(LEVEL_CMD_CREATE_WARP_NODE, 0x08, id, destLevel), \
     CMD_BBBB(destArea, destNode, flags, 0x00)
 
-#define CMD27(id, destLevel, destArea, destNode, flags) \
-    CMD_BBBB(LEVEL_CMD_27, 0x08, id, destLevel), \
-    CMD_BBBB(destArea, destNode, flags, 0x00)
-
 // Backwards compatibility:
 #define PAINTING_WARP_NODE(id, destLevel, destArea, destNode, flags) \
     WARP_NODE(id, destLevel, destArea, destNode, flags)
+
+#define CMD27(id, destLevel, destArea, destNode, flags) \
+    CMD_BBBB(LEVEL_CMD_27, 0x08, id, destLevel), \
+    CMD_BBBB(destArea, destNode, flags, 0x00)
 
 #define INSTANT_WARP(index, destArea, displaceX, displaceY, displaceZ) \
     CMD_BBBB(LEVEL_CMD_CREATE_INSTANT_WARP, 0x10, index, destArea), \
