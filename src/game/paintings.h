@@ -152,7 +152,6 @@ struct PaintingMeshVertex {
 }; /*0x0C*/
 
 
-extern struct Object *gRipplingPaintingObject;
 extern struct Object *gEnteredPaintingObject;
 
 

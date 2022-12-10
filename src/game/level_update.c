@@ -631,6 +631,8 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 #endif
 }
 
+s8 gPaintingEjectSoundPlayed = FALSE;
+
 /**
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
@@ -642,7 +644,12 @@ void initiate_painting_warp(void) {
 
         if (warpNode != NULL) {
             if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
-                play_painting_eject_sound();
+                // Plays the painting eject sound effect if it has not already been played.
+                if (!gPaintingEjectSoundPlayed) {
+                    gPaintingEjectSoundPlayed = TRUE;
+                    play_sound(SOUND_GENERAL_PAINTING_EJECT,
+                               gMarioState->marioObj->header.gfx.cameraToObject);
+                }
             } else {
                 struct WarpNode *node = &warpNode->node;
 
@@ -660,7 +667,7 @@ void initiate_painting_warp(void) {
 
                 gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
 
-                play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
+                play_sound(SOUND_MENU_STAR_SOUND, gMarioState->marioObj->header.gfx.cameraToObject);
                 fadeout_music(398);
 #if ENABLE_RUMBLE
                 queue_rumble_data(80, 70);

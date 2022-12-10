@@ -79,11 +79,6 @@ const struct Painting *sPaintings[] = {
 };
 
 /**
- * The painting that is currently rippling. Only one painting can be rippling at once.
- */
-struct Object *gRipplingPaintingObject = NULL;
-
-/**
  * The id of the painting Mario has entered.
  */
 struct Object *gEnteredPaintingObject = NULL;
@@ -766,6 +761,9 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
 /// - INIT -
 
+/**
+ * Updates a painting object's room from a point in front of the center of the painting.
+ */
 void painting_update_room(struct Object *obj) {
     const struct Painting *painting = obj->oPaintingData;
 
@@ -803,14 +801,12 @@ void bhv_painting_init(void) {
     // Set the object's painting data pointer.
     obj->oPaintingData = painting;
 
-    // Update the painting object's room.
-    painting_update_room(obj);
-
-    // Clear Mario-related state and clear gRipplingPaintingObject.
+    // Clear flags.
     obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
     obj->oPaintingChangedFlags = RIPPLE_FLAGS_NONE;
 
-    gRipplingPaintingObject = NULL;
+    // Update the painting object's room.
+    painting_update_room(obj);
 }
 
 /// - LOOP -
@@ -912,7 +908,6 @@ void painting_update_ripple_state(struct Object *obj) {
         // If the painting is barely rippling, make it stop rippling.
         if (obj->oPaintingCurrRippleMag <= 1.0f) {
             obj->oPaintingState = PAINTING_IDLE;
-            gRipplingPaintingObject = NULL;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // If the painting is doing the entry ripple but the ripples are as small as those from the
@@ -1019,8 +1014,6 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTi
     if (doResetTimer) {
         obj->oPaintingRippleTimer = 0;
     }
-
-    gRipplingPaintingObject = obj;
 }
 
 
