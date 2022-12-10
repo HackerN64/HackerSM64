@@ -1003,8 +1003,13 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTi
         obj->oPaintingRipplePosY = obj->oPaintingLocalMarioPosY;
     }
 
-    // Set Mario's Y position for the WDW water level.
-    gPaintingMarioYEntry = gMarioObject->oPosY;
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    if (GET_BPARAM1(obj->oBehParams) == PAINTING_ID_CASTLE_WDW) {
+        // Set Mario's Y position for the WDW water level.
+        // The WDW painting is at 1306 in vanilla.
+        gPaintingMarioYEntry = gMarioObject->oPosY - obj->oPosY;
+    }
+#endif
 
     if (doResetTimer) {
         obj->oPaintingRippleTimer = 0;

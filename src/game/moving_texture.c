@@ -123,7 +123,7 @@ enum MovtexVtxColors {
 s8 gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT;
 
 /// The height at which Mario entered the last painting. Used for Wet-Dry World only.
-float gPaintingMarioYEntry = 0.0f;
+f32 gPaintingMarioYEntry = 0.0f;
 
 /// Variable to ensure the initial Wet-Dry World water level is set only once
 s32 gWdwWaterLevelSet = FALSE;
@@ -261,9 +261,9 @@ Gfx *geo_wdw_set_initial_water_level(s32 callContext, UNUSED struct GraphNode *n
         gWdwWaterLevelSet = FALSE;
     } else if (callContext == GEO_CONTEXT_RENDER && gEnvironmentRegions != NULL
                && !gWdwWaterLevelSet) {
-        if (gPaintingMarioYEntry <= 1382.4f) {
+        if (gPaintingMarioYEntry <= 76.4f) { // A little under one Mario height above the bottom of the painting.
             wdwWaterHeight = 31;
-        } else if (gPaintingMarioYEntry >= 1600.0f) {
+        } else if (gPaintingMarioYEntry >= 294.0f) { // A little under half the painting's height.
             wdwWaterHeight = 2816;
         } else {
             wdwWaterHeight = 1024;
