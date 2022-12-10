@@ -1265,9 +1265,7 @@
 #define /*0x10C*/ oPaintingState                OBJECT_FIELD_S32(0x21)
 #define /*0x110*/ oPaintingRippleTimer          OBJECT_FIELD_S32(0x22)
 #define /*0x1A4*/ oPaintingCurrRippleMag        OBJECT_FIELD_F32(0x47)
-#define /*0x1A8*/ oPaintingRippleDecay          OBJECT_FIELD_F32(0x48)
-#define /*0x1AC*/ oPaintingCurrRippleRate       OBJECT_FIELD_F32(0x49)
-#define /*0x1B0*/ oPaintingDispersionFactor     OBJECT_FIELD_F32(0x4A)
+#define /*0x1A8*/ oPaintingRippleInfo           OBJECT_FIELD_CVPTR(0x48)
 
 
 /*Custom general defines:

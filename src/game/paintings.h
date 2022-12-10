@@ -90,24 +90,21 @@ enum PaintingState {
 
 
 /**
- * A list of preset constants for the ripple animation.
+ * A list of preset constants for the ripple animations.
  */
 struct RippleAnimationInfo {
-    /// Controls how high the peaks of the ripple are.
-    /*0x00*/ f32 passiveRippleMag;
-    /*0x04*/ f32 entryRippleMag;
+    /*0x00*/ const f32 mag;         /// Controls how high the peaks of the ripple are.
+    /*0x04*/ const f32 decay;       /// Multiplier that controls how fast the ripple regresses to the IDLE state.
+    /*0x08*/ const f32 rate;        /// Controls the ripple's frequency.
+    /*0x0C*/ const f32 dispersion;  /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple.
+}; /*0x10*/
 
-    /// Multiplier that controls how fast the ripple regresses to the IDLE state.
-    /*0x08*/ f32 passiveRippleDecay;
-    /*0x0C*/ f32 entryRippleDecay;
-
-    /// Controls the ripple's frequency.
-    /*0x10*/ f32 passiveRippleRate;
-    /*0x14*/ f32 entryRippleRate;
-
-    /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple.
-    /*0x18*/ f32 passiveDispersionFactor;
-    /*0x1C*/ f32 entryDispersionFactor;
+/**
+ * A ripple animation pair.
+ */
+struct RippleAnimationTypeInfo {
+    /*0x00*/ const struct RippleAnimationInfo passive;
+    /*0x10*/ const struct RippleAnimationInfo entry;
 }; /*0x20*/
 
 /**

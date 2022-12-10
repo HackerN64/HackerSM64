@@ -97,29 +97,20 @@ static struct PaintingMeshVertex *sPaintingMesh;
 static Vec3f *sPaintingTriNorms;
 
 /**
- * Info for ripple animations.
+ * A list of preset constants for the ripple animations.
  */
-static const struct RippleAnimationInfo sRippleAnimationInfo[] = {
+static const struct RippleAnimationTypeInfo sRippleAnimations[] = {
     { // RIPPLE_ANIM_CONTINUOUS
-        /*                      passive     entry */
-        /* Ripple Magnitude */    10.0f,    30.0f,
-        /* Ripple Decay */         1.0f,    0.98f,
-        /* Ripple Rate */         0.05f,    0.05f,
-        /* Ripple Dispersion */   15.0f,    15.0f,
+        .passive = { .mag =  10.0f, .decay = 1.0f,    .rate = 0.05f, .dispersion = 15.0f },
+        .entry   = { .mag =  30.0f, .decay = 0.98f,   .rate = 0.05f, .dispersion = 15.0f }
     },
     { // RIPPLE_ANIM_PROXIMITY
-        /*                      passive     entry */
-        /* Ripple Magnitude */    20.0f,    80.0f,
-        /* Ripple Decay */      0.9608f,  0.9524f,
-        /* Ripple Rate */         0.24f,    0.14f,
-        /* Ripple Dispersion */   40.0f,    30.0f,
+        .passive = { .mag =  20.0f, .decay = 0.9608f, .rate = 0.24f, .dispersion = 40.0f },
+        .entry   = { .mag =  80.0f, .decay = 0.9524f, .rate = 0.14f, .dispersion = 30.0f }
     },
     { // RIPPLE_ANIM_PROXIMITY_LARGE
-        /*                      passive     entry */
-        /* Ripple Magnitude */    40.0f,   160.0f,
-        /* Ripple Decay */      0.9608f,  0.9524f,
-        /* Ripple Rate */         0.12f,    0.07f,
-        /* Ripple Dispersion */   80.0f,    60.0f,
+        .passive = { .mag =  40.0f, .decay = 0.9608f, .rate = 0.12f, .dispersion = 80.0f },
+        .entry   = { .mag = 160.0f, .decay = 0.9524f, .rate = 0.07f, .dispersion = 60.0f }
     }
 };
 
@@ -151,13 +142,14 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *mesh, Painti
     sPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
 
     struct PaintingMeshVertex *paintingMesh = sPaintingMesh;
+    const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
 
     /// Controls the peaks of the ripple.
     f32 rippleMag = obj->oPaintingCurrRippleMag;
     /// Controls the ripple's frequency.
-    f32 rippleRate = obj->oPaintingCurrRippleRate;
+    f32 rippleRate = objRippleInfo->rate;
     /// Controls how fast the ripple spreads.
-    f32 dispersionFactor = (1.0f / obj->oPaintingDispersionFactor);
+    f32 dispersionFactor = (1.0f / objRippleInfo->dispersion);
     /// How far the ripple has spread.
     f32 rippleTimer = obj->oPaintingRippleTimer;
 
@@ -800,6 +792,7 @@ void bhv_painting_init(void) {
 
     // Set the object's painting data pointer.
     obj->oPaintingData = painting;
+    obj->oPaintingRippleInfo = NULL;
 
     // Clear flags.
     obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
@@ -868,9 +861,9 @@ void painting_update_mario_pos(struct Object *obj) {
 }
 
 /**
- * Returns a pointer to the RippleAnimationInfo that best fits the painting type.
+ * Returns a pointer to the RippleAnimationTypeInfo that best fits the painting type.
  */
-const struct RippleAnimationInfo *get_ripple_animation(const struct Painting *painting) {
+const struct RippleAnimationTypeInfo *painting_get_ripple_animation_type_info(const struct Painting *painting) {
     s8 rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
 
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
@@ -882,7 +875,15 @@ const struct RippleAnimationInfo *get_ripple_animation(const struct Painting *pa
         }
     }
 
-    return &sRippleAnimationInfo[rippleAnimationType];
+    return &sRippleAnimations[rippleAnimationType];
+}
+
+/**
+ * Set a painting's ripple animation and magnitude.
+ */
+void painting_set_ripple_animation(struct Object *obj, const struct RippleAnimationInfo *baseRippleInfo) {
+    obj->oPaintingCurrRippleMag = baseRippleInfo->mag;
+    obj->oPaintingRippleInfo = baseRippleInfo;
 }
 
 /**
@@ -893,9 +894,11 @@ const struct RippleAnimationInfo *get_ripple_animation(const struct Painting *pa
  */
 void painting_update_ripple_state(struct Object *obj) {
     const struct Painting *painting = obj->oPaintingData;
-    const struct RippleAnimationInfo *anim = get_ripple_animation(painting);
+    const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
 
-    obj->oPaintingCurrRippleMag *= obj->oPaintingRippleDecay;
+    if (objRippleInfo != NULL) {
+        obj->oPaintingCurrRippleMag *= objRippleInfo->decay;
+    }
 
     // Reset the timer to 0 if it overflows.
     if (obj->oPaintingRippleTimer < 0) {
@@ -910,16 +913,14 @@ void painting_update_ripple_state(struct Object *obj) {
             obj->oPaintingState = PAINTING_IDLE;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
+        const struct RippleAnimationTypeInfo *rippleAnim = painting_get_ripple_animation_type_info(painting);
         // If the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple.
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
         if ((obj->oPaintingState == PAINTING_ENTERED)
-         && (obj->oPaintingCurrRippleMag <= anim->passiveRippleMag)) {
+         && (obj->oPaintingCurrRippleMag <= rippleAnim->passive.mag)) {
             obj->oPaintingState = PAINTING_RIPPLE;
-            obj->oPaintingCurrRippleMag    = anim->passiveRippleMag;
-            obj->oPaintingRippleDecay      = anim->passiveRippleDecay;
-            obj->oPaintingCurrRippleRate   = anim->passiveRippleRate;
-            obj->oPaintingDispersionFactor = anim->passiveDispersionFactor;
+            painting_set_ripple_animation(obj, &rippleAnim->passive);
         }
     }
 }
@@ -978,22 +979,16 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
  */
 void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTimer) {
     const struct Painting *painting = obj->oPaintingData;
-    const struct RippleAnimationInfo *anim = get_ripple_animation(painting);
+    const struct RippleAnimationTypeInfo *rippleAnim = painting_get_ripple_animation_type_info(painting);
 
     // Use a different set of variables depending on the state
     switch (state) {
         case PAINTING_RIPPLE:
-            obj->oPaintingCurrRippleMag    = anim->passiveRippleMag;
-            obj->oPaintingRippleDecay      = anim->passiveRippleDecay;
-            obj->oPaintingCurrRippleRate   = anim->passiveRippleRate;
-            obj->oPaintingDispersionFactor = anim->passiveDispersionFactor;
+            painting_set_ripple_animation(obj, &rippleAnim->passive);
             break;
 
         case PAINTING_ENTERED:
-            obj->oPaintingCurrRippleMag    = anim->entryRippleMag;
-            obj->oPaintingRippleDecay      = anim->entryRippleDecay;
-            obj->oPaintingCurrRippleRate   = anim->entryRippleRate;
-            obj->oPaintingDispersionFactor = anim->entryDispersionFactor;
+            painting_set_ripple_animation(obj, &rippleAnim->entry);
             break;
     }
 
