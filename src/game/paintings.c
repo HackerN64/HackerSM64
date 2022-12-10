@@ -541,12 +541,11 @@ Gfx *dl_painting_rippling(const struct Painting *painting) {
     Gfx *beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
     gSPDisplayList(gfx++, beginDl);
 
-    //! TODO: Automatically determine texture maps based on the image count.
+    //! TODO: Automatically create texture maps based on the image count.
     const PaintingData **textureMaps = NULL;
-    if (imageCount > 1) {
-        textureMaps = segmented_to_virtual(seg2_painting_image_texture_maps);
-    } else {
-        textureMaps = segmented_to_virtual(seg2_painting_env_map_texture_maps);
+    switch (imageCount) {
+        case 1: textureMaps = segmented_to_virtual(seg2_painting_texture_maps_1); break;
+        case 2: textureMaps = segmented_to_virtual(seg2_painting_texture_maps_2); break;
     }
 
     painting_setup_textures(&gfx, tWidth, tHeight, isEnvMap);

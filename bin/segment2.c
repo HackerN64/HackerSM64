@@ -3364,6 +3364,7 @@ const PaintingData seg2_painting_triangle_mesh[] = {
 
 #undef PDX
 #undef PDY
+#undef PAINTING_VERTEX
 
 /* 0x02015444: seg2_painting_mesh_neighbor_tris
  * Lists the neighboring triangles for each vertex in the mesh.
@@ -3535,7 +3536,7 @@ const PaintingData seg2_painting_mesh_neighbor_tris[] = {
 };
 
 // 0x07021AE0 - 0x07021FFA
-static const PaintingData seg2_painting_image_texture_map_bottom[] = {
+static const PaintingData seg2_painting_image_texture_map_2_bottom[] = {
     85, // num mappings
     // Format:
     // mesh vtx ID
@@ -3763,7 +3764,7 @@ static const PaintingData seg2_painting_image_texture_map_bottom[] = {
 };
 
 // 0x07021FFC - 0x07022516
-static const PaintingData seg2_painting_image_texture_map_top[] = {
+static const PaintingData seg2_painting_image_texture_map_2_top[] = {
     85, // num mappings
     // Format:
     // mesh vtx ID
@@ -3991,13 +3992,13 @@ static const PaintingData seg2_painting_image_texture_map_top[] = {
 };
 
 // 0x07022518
-const PaintingData *const seg2_painting_image_texture_maps[] = {
-    seg2_painting_image_texture_map_bottom,
-    seg2_painting_image_texture_map_top,
+const PaintingData *const seg2_painting_texture_maps_2[] = {
+    seg2_painting_image_texture_map_2_bottom,
+    seg2_painting_image_texture_map_2_top,
 };
 
 // 0x07022660 - 0x07023042
-static const PaintingData seg2_painting_env_map_texture_map[] = {
+static const PaintingData seg2_painting_texture_map_1[] = {
     157, // num mappings
     // Format:
     // mesh vtx ID
@@ -4430,6 +4431,6 @@ static const PaintingData seg2_painting_env_map_texture_map[] = {
 };
 
 // 0x07023044 - 0x07023048
-const PaintingData *const seg2_painting_env_map_texture_maps[] = {
-    seg2_painting_env_map_texture_map,
+const PaintingData *const seg2_painting_texture_maps_1[] = {
+    seg2_painting_texture_map_1,
 };
