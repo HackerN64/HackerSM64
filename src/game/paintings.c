@@ -79,11 +79,6 @@ const struct Painting *sPaintings[] = {
 };
 
 /**
- * The id of the painting Mario has entered.
- */
-struct Object *gEnteredPaintingObject = NULL;
-
-/**
  * When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
  *
  * This mesh only contains the vertex positions and normals.
@@ -807,7 +802,7 @@ void bhv_painting_init(void) {
 /**
  * Check for Mario entering the painting.
  */
-void painting_update_mario_pos(struct Object *obj) {
+void painting_update_mario_pos_and_flags(struct Object *obj) {
     if (!gMarioObject) {
         return;
     }
@@ -846,6 +841,9 @@ void painting_update_mario_pos(struct Object *obj) {
             rippleFlags |= RIPPLE_FLAG_ENTER;
         }
     }
+    
+    obj->oPaintingLocalMarioPosX = marioLocalPos[0];
+    obj->oPaintingLocalMarioPosY = marioLocalPos[1];
 
     s16 lastFlags = obj->oPaintingCurrFlags;
 
@@ -855,9 +853,15 @@ void painting_update_mario_pos(struct Object *obj) {
     // changedFlags is true if currFlags is true and lastFlags is false
     // (Mario just entered the floor on this frame).
     obj->oPaintingChangedFlags = ((lastFlags ^ obj->oPaintingCurrFlags) & obj->oPaintingCurrFlags);
-
-    obj->oPaintingLocalMarioPosX = marioLocalPos[0];
-    obj->oPaintingLocalMarioPosY = marioLocalPos[1];
+    
+    // Detect whether Mario is entering this painting, and set paintingObj accordingly
+    if (obj->oPaintingCurrFlags & RIPPLE_FLAG_ENTER) {
+        // Mario has entered the painting.
+        gMarioState->paintingObj = obj;
+    } else if (gMarioState->paintingObj == obj) {
+        // Reset gMarioState->paintingObj if it's this painting and this painting is not entered.
+        gMarioState->paintingObj = NULL;
+    }
 }
 
 /**
@@ -1022,7 +1026,7 @@ void bhv_painting_loop(void) {
     const struct Painting *painting = obj->oPaintingData;
 
     // Update the painting info.
-    painting_update_mario_pos(obj);
+    painting_update_mario_pos_and_flags(obj);
 
     // Update the ripple, may automatically reset the painting's state.
     painting_update_ripple_state(obj);
@@ -1048,13 +1052,5 @@ void bhv_painting_loop(void) {
         } else if (obj->oPaintingState == PAINTING_IDLE) {
             painting_state(obj, PAINTING_RIPPLE,  TRUE,  TRUE ); // Idle
         }
-    }
-
-    if (obj->oPaintingCurrFlags & RIPPLE_FLAG_ENTER) {
-        // Mario has entered the painting.
-        gEnteredPaintingObject = obj;
-    } else if (gEnteredPaintingObject == obj) {
-        // Reset gEnteredPaintingObject if it's this painting and this painting is not entered.
-        gEnteredPaintingObject = NULL;
     }
 }

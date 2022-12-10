@@ -149,9 +149,6 @@ struct PaintingMeshVertex {
 }; /*0x0C*/
 
 
-extern struct Object *gEnteredPaintingObject;
-
-
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 
 void bhv_painting_init(void);

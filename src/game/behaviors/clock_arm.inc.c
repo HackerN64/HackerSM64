@@ -4,21 +4,23 @@
  * Main loop of the hour and minute hands of the Tick Tock Clock painting.
  */
 void bhv_rotating_clock_arm_loop(void) {
-    u16 rollAngle = o->oFaceAngleRoll;
+    struct Object *paintingObj = gMarioState->paintingObj;
 
     if (o->oAction == TTC_PAINTING_CLOCK_ARM_WAIT) {
         // Make sure Mario not in a painting & 3 frames pass before allowing him to
         //   change the Tick Tock Clock speed setting.
         // Probably a safety check for when you leave the level through the painting
         //   to make sure the setting isn't accidentally locked in as you fly out.
-        if (gEnteredPaintingObject == NULL && o->oTimer > 3) {
+        if (paintingObj == NULL && o->oTimer > 3) {
             o->oAction++; // TTC_PAINTING_CLOCK_ARM_ACT_MOVING
         }
     } else if (o->oAction == TTC_PAINTING_CLOCK_ARM_ACT_MOVING) {
         // If Mario is entering the Tick Tock Clock painting...
-        if (gEnteredPaintingObject != NULL && GET_BPARAM1(gEnteredPaintingObject->oBehParams) == PAINTING_ID_CASTLE_TTC) {
+        if (paintingObj != NULL && GET_BPARAM1(paintingObj->oBehParams) == PAINTING_ID_CASTLE_TTC) {
             // And this is the minute hand...
             if (cur_obj_has_behavior(bhvClockMinuteHand)) {
+                u16 rollAngle = o->oFaceAngleRoll;
+
                 // Set Tick Tick Clock's speed based on the angle of the hand.
                 // The angle actually counting down from 0xFFFF to 0 so
                 //   11 o'clock is a small value and 1 o'clock is a large value.
@@ -40,7 +42,7 @@ void bhv_rotating_clock_arm_loop(void) {
             o->oAction++; // TTC_PAINTING_CLOCK_ARM_ACT_STOPPED
         }
     } else if (o->oAction == TTC_PAINTING_CLOCK_ARM_ACT_STOPPED) {
-        if (gEnteredPaintingObject == NULL) {
+        if (paintingObj == NULL) {
             o->oAction = TTC_PAINTING_CLOCK_ARM_ACT_MOVING;
         }
     }
