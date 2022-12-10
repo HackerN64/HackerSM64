@@ -82,7 +82,7 @@ enum LevelActs {
     ACT_4 = (1 << 3),
     ACT_5 = (1 << 4),
     ACT_6 = (1 << 5),
-    ALL_ACTS = -1,
+    ALL_ACTS = (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
 };
 
 enum LevelCommandEvalOperation {
