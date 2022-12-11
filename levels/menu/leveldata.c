@@ -1986,6 +1986,14 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
+#ifdef ENABLE_SPANISH
+#define COURSE_NAME_TABLE course_strings_es_table
+#define COURSE_FILE "es/courses.h"
+#include "text/define_courses.inc.c"
+#undef COURSE_NAME_TABLE
+#undef COURSE_FILE
+#endif
+
 const char *(*course_strings_language_table[])[] = {
     &course_strings_en_table,
 #ifdef ENABLE_FRENCH
@@ -2000,6 +2008,11 @@ const char *(*course_strings_language_table[])[] = {
 #endif
 #ifdef ENABLE_JAPANESE
     &course_strings_jp_table,
+#else
+    NULL,
+#endif
+#ifdef ENABLE_SPANISH
+    &course_strings_es_table,
 #else
     NULL,
 #endif
