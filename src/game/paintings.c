@@ -132,12 +132,12 @@ static const struct RippleAnimationTypeInfo sRippleAnimations[] = {
  */
 void painting_generate_mesh(struct Object *obj, const PaintingData *mesh, PaintingData numVtx) {
     const struct Painting *painting = obj->oPaintingData;
+    const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
     PaintingData i, tri;
 
     sPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
 
     struct PaintingMeshVertex *paintingMesh = sPaintingMesh;
-    const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
 
     /// Controls the peaks of the ripple.
     f32 rippleMag = obj->oPaintingCurrRippleMag;
@@ -787,7 +787,6 @@ void bhv_painting_init(void) {
 
     // Set the object's painting data pointer.
     obj->oPaintingData = painting;
-    obj->oPaintingRippleInfo = NULL;
 
     // Clear flags.
     obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
@@ -976,9 +975,9 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
 /**
  * Set the painting's state, causing it to start a passive ripple or a ripple from Mario entering.
  *
+ * @param obj identifies the painting that is changing state
  * @param state The state to enter
- * @param painting,paintingGroup identifies the painting that is changing state
- * @param xSource,ySource what to use for the x and y origin of the ripple
+ * @param centerRipples if TRUE, center the ripples instead of putting them at Mario's position
  * @param doResetTimer if TRUE, set the timer to 0
  */
 void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTimer) {
