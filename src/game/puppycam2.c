@@ -182,6 +182,11 @@ static void newcam_set_language(void) {
         gPCFlagStringsPtr   = &gPCFlagStringsDE;
         gPCToggleStringsPtr = &gPCToggleStringsDE;
         break;
+    case LANGUAGE_SPANISH:
+        gPCOptionStringsPtr = &gPCOptionStringsES;
+        gPCFlagStringsPtr   = &gPCFlagStringsES;
+        gPCToggleStringsPtr = &gPCToggleStringsES;
+        break;
     }
 }
 #endif

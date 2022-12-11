@@ -34,7 +34,7 @@ extern s8 gHudFlash;
 
 extern s8 gDialogCourseActNum;
 extern u8 gInGameLanguage;
-extern void *languageTable[][3];
+extern void *languageTable[][4];
 
 struct AsciiCharLUTEntry {
     const Texture *texture;
@@ -128,12 +128,13 @@ enum MultilangLanguages {
     LANGUAGE_FRENCH,
     LANGUAGE_GERMAN,
     LANGUAGE_JAPANESE,
+    LANGUAGE_SPANISH,
     LANGUAGE_COUNT
 };
 
 typedef char * LangArray[LANGUAGE_COUNT];
 #define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) {english, french, german, japanese}
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) {english, french, german, japanese, spanish}
 
 #else
 
@@ -142,7 +143,7 @@ typedef char * LangArray[LANGUAGE_COUNT];
 
 typedef char * LangArray;
 #define LANG_ARRAY(cmd) (cmd)
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese) english
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) english
 
 #endif
 

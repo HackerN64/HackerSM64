@@ -74,7 +74,7 @@
 /**
  * Adds support for multiple languages to the game.
  */
-// #define MULTILANG
+#define MULTILANG
 
 /**
  * Toggles for individual languages. Only works when MULTILANG is enabled.
@@ -82,6 +82,7 @@
  */
 #define ENABLE_FRENCH
 #define ENABLE_GERMAN
+#define ENABLE_SPANISH
 // #define ENABLE_JAPANESE
 
 /**

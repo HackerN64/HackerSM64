@@ -446,7 +446,8 @@ LangArray textTime = DEFINE_LANGUAGE_ARRAY(
     "TIME %0d'%02d\"%d",
     "TEMPS %0d'%02d\"%d",
     "ZEIT %0d'%02d\"%d",
-    "TIME %0d'%02d\"%d");
+    "TIME %0d'%02d\"%d",
+    "TIEM.%0d'%02d\"%d");
 
 /**
  * Renders the timer when Mario start sliding in PSS.
