@@ -2894,8 +2894,6 @@ const Gfx dl_paintings_env_mapped_begin[] = {
     gsDPSetCombineMode(G_CC_DECALRGB, G_CC_DECALRGB),
     gsSPLightColor(LIGHT_1, 0xffffffff),
     gsSPLightColor(LIGHT_2, 0x505050ff),
-//     gsSPLightColor(LIGHT_1, 0x6464ffff),
-//     gsSPLightColor(LIGHT_2, 0x404080ff),
     gsSPTexture(0x4000, 0x4000, 0, G_TX_RENDERTILE, G_ON),
     gsDPTileSync(),
     gsSPEndDisplayList(),
