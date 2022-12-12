@@ -261,10 +261,6 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
 #define TRI_PER_GRP (VTX_BUF_MAX / 3) //  5 or 10
 #define VTX_PER_GRP (TRI_PER_GRP * 3) // 15 or 30
 
-// Amount by which to shift the painting textures.
-#define PTX_OFFSET_S 0
-#define PTX_OFFSET_T 4
-
 /**
  * Creates a display list that draws the rippling painting, with 'img' mapped to the painting's mesh,
  * using 'textureMap'.
@@ -309,16 +305,16 @@ Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, 
 
     gLoadBlockTexture(gfx++, tWidth, tHeight, G_IM_FMT_RGBA, img);
 
-    // Width and height of the section.
+    // Width and height of each section.
     const f32 dx = (PAINTING_SIZE / 1);
     const f32 dy = (PAINTING_SIZE / imageCount);
 
-    // To scale the vertex positions into texture positions.
+    // These are used to scale the vertex positions into texture positions.
     const f32 tWidthScale  = (TC(tWidth ) / dx);
     const f32 tHeightScale = (TC(tHeight) / dy);
 
-    // Starting Y position of the current section.
-    const s16 y1 = ((index + 1) * dy);
+    // Bottom Y position of the current section.
+    const s16 y2 = ((index + 1) * dy);
 
     // Draw the groups of TRI_PER_GRP first.
     for (group = 0; group < triGroups; group++) {
@@ -342,8 +338,8 @@ Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, 
             currVtx = &paintingMesh[meshVtx];
 
             // Texture coordinates.
-            tx = (PTX_OFFSET_S + (currVtx->pos[0] * tWidthScale));
-            ty = (PTX_OFFSET_T + ((y1 - currVtx->pos[1]) * tHeightScale));
+            tx = (currVtx->pos[0] * tWidthScale);
+            ty = ((y2 - currVtx->pos[1]) * tHeightScale);
 
             // Map the texture and place it in the verts array.
             make_vertex(verts, (groupIndex + map),
@@ -379,8 +375,8 @@ Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, 
         currVtx = &paintingMesh[meshVtx];
 
         // Texture coordinates.
-        tx = (PTX_OFFSET_S + (currVtx->pos[0] * tWidthScale));
-        ty = (PTX_OFFSET_T + ((y1 - currVtx->pos[1]) * tHeightScale));
+        tx = (currVtx->pos[0] * tWidthScale);
+        ty = ((y2 - currVtx->pos[1]) * tHeightScale);
 
         make_vertex(verts, ((triGroups * VTX_PER_GRP) + map),
             currVtx->pos[0],
@@ -610,41 +606,50 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
     s16 tWidth = painting->textureWidth;
     s16 tHeight = painting->textureHeight;
 
+    // Width and height of each section.
     const f32 dx = (PAINTING_SIZE / 1);
     const f32 dy = (PAINTING_SIZE / imageCount);
 
-    // Top left corner texture coordinates.
-    const s16 s1 = PTX_OFFSET_S;
-    const s16 t1 = PTX_OFFSET_T;
-    // Bottom right corner texture coordinates.
-    const s16 s2 = (s1 + TC(tWidth ));
-    const s16 t2 = (t1 + TC(tHeight));
+    // These are used to scale the vertex positions into texture positions.
+    const f32 tWidthScale  = (TC(tWidth ) / dx);
+    const f32 tHeightScale = (TC(tHeight) / dy);
 
-    s32 idx = 0;
+    s16 x1 = 0; // Left
+    s16 x2 = dx; // Right
+    s16 s1 = (x1 * tWidthScale); // Left
+    s16 s2 = (x2 * tWidthScale); // Right
     s16 y1, y2;
+    s16 t1, t2;
+
+    s32 vertIndex = 0;
+    s32 i;
 
     // Generate vertices
-    for (s32 i = 0; i < imageCount; i++) {
-        y1 = (i * dy);
-        y2 = (y1 + dy);
-        make_vertex(verts, idx++,  0, y1, 0, s1, t2, n[0], n[1], n[2], alpha); // Bottom Left
-        make_vertex(verts, idx++, dx, y1, 0, s2, t2, n[0], n[1], n[2], alpha); // Bottom Right
-        make_vertex(verts, idx++, dx, y2, 0, s2, t1, n[0], n[1], n[2], alpha); // Top Right
-        make_vertex(verts, idx++,  0, y2, 0, s1, t1, n[0], n[1], n[2], alpha); // Top left
+    for (i = 0; i < imageCount; i++) {
+        y1 = (i * dy); // Top
+        y2 = (y1 + dy); // Bottom
+        t1 = ((y2 - y1) * tHeightScale); // Top
+        t2 = ((y2 - y2) * tHeightScale); // Bottom
+        make_vertex(verts, vertIndex++,  0, y1, 0, s1, t1, n[0], n[1], n[2], alpha); // Bottom Left
+        make_vertex(verts, vertIndex++, dx, y1, 0, s2, t1, n[0], n[1], n[2], alpha); // Bottom Right
+        make_vertex(verts, vertIndex++, dx, y2, 0, s2, t2, n[0], n[1], n[2], alpha); // Top Right
+        make_vertex(verts, vertIndex++,  0, y2, 0, s1, t2, n[0], n[1], n[2], alpha); // Top left
     }
 
-    gSPVertex(gfx++, verts, idx, 0);
+    gSPVertex(gfx++, verts, vertIndex, 0);
 
     painting_setup_textures(&gfx, tWidth, tHeight, isEnvMap);
 
-    for (s32 i = 0; i < imageCount; i++) {
+    s32 quadIndex;
+
+    for (i = 0; i < imageCount; i++) {
         gDPSetTextureImage(gfx++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, textures[i]);
         gDPLoadSync(gfx++);
         gDPLoadBlock(gfx++, G_TX_LOADTILE, 0, 0, ((tWidth * tHeight) - 1), CALC_DXT(tWidth, G_IM_SIZ_16b_BYTES));
-        s32 q = (i * 4);
+        quadIndex = (i * 4);
         gSP2Triangles(gfx++,
-            (q + 0), (q + 1), (q + 2), 0x0,
-            (q + 0), (q + 2), (q + 3), 0x0
+            (quadIndex + 0), (quadIndex + 1), (quadIndex + 2), 0x0,
+            (quadIndex + 0), (quadIndex + 2), (quadIndex + 3), 0x0
         );
     }
 

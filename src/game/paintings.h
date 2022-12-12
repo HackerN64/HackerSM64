@@ -9,7 +9,7 @@
 
 
 /// The default painting side length.
-#define PAINTING_SIZE 614.4f
+#define PAINTING_SIZE 614.0f
 
 /// The depth of the area in front of the painting which triggers ripples without warping.
 #define PAINTING_WOBBLE_DEPTH 100
