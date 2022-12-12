@@ -81,11 +81,11 @@ enum PaintingRippleFlags {
     RIPPLE_FLAG_ENTER  = BIT(1), // 0x02
 };
 
-// oPaintingState
-enum PaintingState {
-    PAINTING_STATE_IDLE,
-    PAINTING_STATE_RIPPLING,
-    PAINTING_STATE_ENTERED,
+// oAction
+enum oActionsPainting {
+    PAINTING_ACT_IDLE,
+    PAINTING_ACT_RIPPLING,
+    PAINTING_ACT_ENTERED,
 };
 
 
