@@ -163,7 +163,7 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, Pa
                 // Use a cosine wave to make the ripple go up and down,
                 // scaled by the painting's ripple magnitude,
                 // round it to an int and return it.
-                paintingMesh->pos[2] = roundf(rippleMag * coss((s16)((rippleRate * (rippleTimer - rippleDistance)) * 0x10000)));
+                paintingMesh->pos[2] = roundf(rippleMag * coss((u16)((rippleRate * (rippleTimer - rippleDistance)) * (f32)0x10000)));
             }
         } else {
             paintingMesh->pos[2] = 0;
