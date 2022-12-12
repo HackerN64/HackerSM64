@@ -79,19 +79,6 @@ const struct Painting *sPaintings[] = {
 };
 
 /**
- * When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
- *
- * This mesh only contains the vertex positions and normals.
- * Paintings use an additional array to map textures to the mesh.
- */
-static struct PaintingMeshVertex *sPaintingMesh;
-
-/**
- * The painting's surface normals, used to approximate each of the vertex normals (for gouraud shading).
- */
-static Vec3f *sPaintingTriNorms;
-
-/**
  * A list of preset constants for the ripple animations.
  */
 static const struct RippleAnimationTypeInfo sRippleAnimations[] = {
@@ -130,14 +117,10 @@ static const struct RippleAnimationTypeInfo sRippleAnimations[] = {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-void painting_generate_mesh(struct Object *obj, const PaintingData *mesh, PaintingData numVtx) {
+void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
     const struct Painting *painting = obj->oPaintingData;
     const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
     PaintingData i, tri;
-
-    sPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
-
-    struct PaintingMeshVertex *paintingMesh = sPaintingMesh;
 
     /// Controls the peaks of the ripple.
     f32 rippleMag = obj->oPaintingCurrRippleMag;
@@ -162,11 +145,11 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *mesh, Painti
     // Accesses are off by 1 since the first entry is the number of vertices.
     for (i = 0; i < numVtx; i++) {
         tri = (i * 3);
-        paintingMesh->pos[0] = mesh[tri + 1];
-        paintingMesh->pos[1] = mesh[tri + 2];
+        paintingMesh->pos[0] = meshData[tri + 1];
+        paintingMesh->pos[1] = meshData[tri + 2];
         // The "Z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves.
-        if (mesh[tri + 3]) {
+        if (meshData[tri + 3]) {
             // Scale and calculate the distance to the ripple origin.
             dx = ((paintingMesh->pos[0] * sizeRatioX) - rippleX);
             dy = ((paintingMesh->pos[1] * sizeRatioY) - rippleY);
@@ -205,23 +188,21 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *mesh, Painti
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(const PaintingData *mesh, PaintingData numVtx, PaintingData numTris) {
+void painting_calculate_triangle_normals(const PaintingData *meshData, PaintingData numVtx, PaintingData numTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
     PaintingData i;
     Vec3s v;
     Vec3f vp0, vp1, vp2;
 
-    sPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
-
     for (i = 0; i < numTris; i++) {
         // Add 2 because of the 2 length entries preceding the list.
         PaintingData tri = (1 + (numVtx * 3) + 1 + (i * 3));
-        vec3s_copy(v, &mesh[tri]);
-        vec3s_to_vec3f(vp0, sPaintingMesh[v[0]].pos);
-        vec3s_to_vec3f(vp1, sPaintingMesh[v[1]].pos);
-        vec3s_to_vec3f(vp2, sPaintingMesh[v[2]].pos);
+        vec3s_copy(v, &meshData[tri]);
+        vec3s_to_vec3f(vp0, paintingMesh[v[0]].pos);
+        vec3s_to_vec3f(vp1, paintingMesh[v[1]].pos);
+        vec3s_to_vec3f(vp2, paintingMesh[v[2]].pos);
 
         // Cross product to find each triangle's normal vector.
-        find_vector_perpendicular_to_plane(sPaintingTriNorms[i], vp0, vp1, vp2);
+        find_vector_perpendicular_to_plane(paintingTriNorms[i], vp0, vp1, vp2);
     }
 }
 
@@ -240,7 +221,7 @@ void painting_calculate_triangle_normals(const PaintingData *mesh, PaintingData 
  *
  * The table used in game, seg2_painting_mesh_neighbor_tris, is in bin/segment2.c.
  */
-void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingData numVtx) {
+void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
     PaintingData tri;
     PaintingData i, j;
     PaintingData numNeighbors;
@@ -253,7 +234,7 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
         numNeighbors = neighborTris[entry];
         for (j = 0; j < numNeighbors; j++) {
             tri = neighborTris[entry + 1 + j];
-            vec3f_add(n, sPaintingTriNorms[tri]);
+            vec3f_add(n, paintingTriNorms[tri]);
         }
 
         // Move to the next vertex's entry
@@ -265,9 +246,9 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
 
         if (FLT_IS_NONZERO(nlen)) {
             nlen = (127.0f / sqrtf(nlen));
-            vec3_prod_val(sPaintingMesh[i].norm, n, nlen);
+            vec3_prod_val(paintingMesh[i].norm, n, nlen);
         } else {
-            vec3_zero(sPaintingMesh[i].norm);
+            vec3_zero(paintingMesh[i].norm);
         }
     }
 }
@@ -291,8 +272,8 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
  * If the textureMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole
  * painting.
  */
-Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, const PaintingData *textureMap, Alpha alpha) {
-    struct PaintingMeshVertex *mesh = NULL;
+Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, const PaintingData *textureMap, Alpha alpha, struct PaintingMeshVertex *paintingMesh) {
+    struct PaintingMeshVertex *currVtx = NULL;
     PaintingData group;
     PaintingData groupIndex;
     PaintingData map;
@@ -358,21 +339,21 @@ Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, 
             meshVtx = textureMap[1 + mapping];
 
             // Get a pointer to the current mesh.
-            mesh = &sPaintingMesh[meshVtx];
+            currVtx = &paintingMesh[meshVtx];
 
             // Texture coordinates.
-            tx = (PTX_OFFSET_S + (mesh->pos[0] * tWidthScale));
-            ty = (PTX_OFFSET_T + ((y1 - mesh->pos[1]) * tHeightScale));
+            tx = (PTX_OFFSET_S + (currVtx->pos[0] * tWidthScale));
+            ty = (PTX_OFFSET_T + ((y1 - currVtx->pos[1]) * tHeightScale));
 
             // Map the texture and place it in the verts array.
             make_vertex(verts, (groupIndex + map),
-                mesh->pos[0],
-                mesh->pos[1],
-                mesh->pos[2],
+                currVtx->pos[0],
+                currVtx->pos[1],
+                currVtx->pos[2],
                 tx, ty,
-                mesh->norm[0],
-                mesh->norm[1],
-                mesh->norm[2],
+                currVtx->norm[0],
+                currVtx->norm[1],
+                currVtx->norm[2],
                 alpha
             );
         }
@@ -395,20 +376,20 @@ Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, 
         meshVtx = textureMap[1 + mapping];
 
         // Get a pointer to the current mesh.
-        mesh = &sPaintingMesh[meshVtx];
+        currVtx = &paintingMesh[meshVtx];
 
         // Texture coordinates.
-        tx = (PTX_OFFSET_S + (mesh->pos[0] * tWidthScale));
-        ty = (PTX_OFFSET_T + ((y1 - mesh->pos[1]) * tHeightScale));
+        tx = (PTX_OFFSET_S + (currVtx->pos[0] * tWidthScale));
+        ty = (PTX_OFFSET_T + ((y1 - currVtx->pos[1]) * tHeightScale));
 
         make_vertex(verts, ((triGroups * VTX_PER_GRP) + map),
-            mesh->pos[0],
-            mesh->pos[1],
-            mesh->pos[2],
+            currVtx->pos[0],
+            currVtx->pos[1],
+            currVtx->pos[2],
             tx, ty,
-            mesh->norm[0],
-            mesh->norm[1],
-            mesh->norm[2],
+            currVtx->norm[0],
+            currVtx->norm[1],
+            currVtx->norm[2],
             alpha
         );
     }
@@ -491,7 +472,7 @@ void painting_setup_textures(Gfx **gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
 /**
  * Ripple a painting that has 1 or more images that need to be mapped.
  */
-Gfx *dl_painting_rippling(const struct Painting *painting) {
+Gfx *dl_painting_rippling(const struct Painting *painting, struct PaintingMeshVertex *paintingMesh) {
     s16 i;
     const PaintingData *textureMap = NULL;
     s16 imageCount = painting->imageCount;
@@ -536,7 +517,7 @@ Gfx *dl_painting_rippling(const struct Painting *painting) {
     for (i = 0; i < imageCount; i++) {
         textureMap = segmented_to_virtual(textureMaps[i]);
         // Render a section of the painting.
-        gSPDisplayList(gfx++, render_painting(tArray[i], i, imageCount, tWidth, tHeight, textureMap, painting->alpha));
+        gSPDisplayList(gfx++, render_painting(tArray[i], i, imageCount, tWidth, tHeight, textureMap, painting->alpha, paintingMesh));
     }
 
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
@@ -553,23 +534,29 @@ Gfx *dl_painting_rippling(const struct Painting *painting) {
  */
 Gfx *display_painting_rippling(struct Object *obj) {
     const struct Painting *painting = obj->oPaintingData;
-    const PaintingData *mesh = segmented_to_virtual(seg2_painting_triangle_mesh);
+    const PaintingData *meshData = segmented_to_virtual(seg2_painting_triangle_mesh);
     const PaintingData *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
-    PaintingData numVtx = mesh[0];
-    PaintingData numTris = mesh[(numVtx * 3) + 1];
+    PaintingData numVtx = meshData[0];
+    PaintingData numTris = meshData[(numVtx * 3) + 1];
     Gfx *dlist = NULL;
+    // When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
+    // This mesh only contains the vertex positions and normals.
+    // Paintings use an additional array to map textures to the mesh.
+    struct PaintingMeshVertex *paintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
+    // The painting's surface normals, used to approximate each of the vertex normals (for gouraud shading).
+    Vec3f *paintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
 
     // Generate the mesh and its lighting data
-    painting_generate_mesh(obj, mesh, numVtx);
-    painting_calculate_triangle_normals(mesh, numVtx, numTris);
-    painting_average_vertex_normals(neighborTris, numVtx);
+    painting_generate_mesh(obj, meshData, numVtx, paintingMesh);
+    painting_calculate_triangle_normals(meshData, numVtx, numTris, paintingMesh, paintingTriNorms);
+    painting_average_vertex_normals(neighborTris, numVtx, paintingMesh, paintingTriNorms);
 
     // Map the painting's texture depending on the painting's texture type.
-    dlist = dl_painting_rippling(painting);
+    dlist = dl_painting_rippling(painting, paintingMesh);
 
     // The mesh data is freed every frame.
-    mem_pool_free(gEffectsMemoryPool, sPaintingMesh);
-    mem_pool_free(gEffectsMemoryPool, sPaintingTriNorms);
+    mem_pool_free(gEffectsMemoryPool, paintingMesh);
+    mem_pool_free(gEffectsMemoryPool, paintingTriNorms);
 
     return dlist;
 }
