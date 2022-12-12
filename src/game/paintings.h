@@ -49,6 +49,14 @@ enum PaintingIDs {
     /*        0x11 */ PAINTING_ID_TTM_SLIDE,
 };
 
+// Types of ripple animations.
+enum PaintingRippleAnimations {
+    RIPPLE_ANIM_CONTINUOUS,
+    RIPPLE_ANIM_PROXIMITY,
+    RIPPLE_ANIM_PROXIMITY_LARGE,
+};
+
+
 // Painting->textureType
 enum PaintingType {
     /// Painting that uses 1 or more images as a texture
@@ -64,21 +72,14 @@ enum RippleTriggers {
     RIPPLE_TRIGGER_CONTINUOUS,
 };
 
-// Types of ripple animations.
-enum PaintingRippleAnimations {
-    RIPPLE_ANIM_CONTINUOUS,
-    RIPPLE_ANIM_PROXIMITY,
-    RIPPLE_ANIM_PROXIMITY_LARGE,
-};
-
-// oPaintingCurrFlags, oPaintingChangedFlags
-enum PaintingRippleFlags {
+// oPaintingFlags
+enum PaintingFlags {
     // Not rippling.
-    RIPPLE_FLAGS_NONE  = 0x0,
+    PAINTING_FLAGS_NONE  = 0x0,
     // Triggers a passive ripple.
-    RIPPLE_FLAG_RIPPLE = BIT(0), // 0x01
+    PAINTING_FLAG_RIPPLE = BIT(0), // 0x01
     // Triggers an entry ripple.
-    RIPPLE_FLAG_ENTER  = BIT(1), // 0x02
+    PAINTING_FLAG_ENTER  = BIT(1), // 0x02
 };
 
 // oAction

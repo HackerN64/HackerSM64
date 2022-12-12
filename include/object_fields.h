@@ -1260,11 +1260,10 @@
 #define /*0x0FC*/ oPaintingLocalMarioPosY       OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oPaintingRipplePosX           OBJECT_FIELD_F32(0x1E)
 #define /*0x104*/ oPaintingRipplePosY           OBJECT_FIELD_F32(0x1F)
-#define /*0x108*/ oPaintingCurrFlags            OBJECT_FIELD_S16(0x20, 0)
-#define /*0x10A*/ oPaintingChangedFlags         OBJECT_FIELD_S16(0x20, 1)
+#define /*0x108*/ oPaintingFlags                OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oPaintingRippleTimer          OBJECT_FIELD_S32(0x21)
 #define /*0x1A4*/ oPaintingCurrRippleMag        OBJECT_FIELD_F32(0x47)
-#define /*0x1A8*/ oPaintingRippleInfo           OBJECT_FIELD_CVPTR(0x48)
+#define /*0x1A8*/ oPaintingRippleAnimation      OBJECT_FIELD_CVPTR(0x48)
 
 
 /*Custom general defines:

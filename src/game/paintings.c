@@ -80,15 +80,15 @@ const struct PaintingImage *sPaintings[] = {
  * A list of preset constants for the ripple animations.
  */
 const struct RippleAnimationPair sRippleAnimations[] = {
-    { // RIPPLE_ANIM_CONTINUOUS
+    [RIPPLE_ANIM_CONTINUOUS] = {
         .passive = { .mag =  10.0f, .decay = 1.0f,    .rate = 0.05f, .dispersion = 15.0f },
         .entry   = { .mag =  30.0f, .decay = 0.98f,   .rate = 0.05f, .dispersion = 15.0f }
     },
-    { // RIPPLE_ANIM_PROXIMITY
+    [RIPPLE_ANIM_PROXIMITY] = {
         .passive = { .mag =  20.0f, .decay = 0.9608f, .rate = 0.24f, .dispersion = 40.0f },
         .entry   = { .mag =  80.0f, .decay = 0.9524f, .rate = 0.14f, .dispersion = 30.0f }
     },
-    { // RIPPLE_ANIM_PROXIMITY_LARGE
+    [RIPPLE_ANIM_PROXIMITY_LARGE] = {
         .passive = { .mag =  40.0f, .decay = 0.9608f, .rate = 0.12f, .dispersion = 80.0f },
         .entry   = { .mag = 160.0f, .decay = 0.9524f, .rate = 0.07f, .dispersion = 60.0f }
     }
@@ -117,15 +117,15 @@ const struct RippleAnimationPair sRippleAnimations[] = {
  */
 void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    const struct RippleAnimation *objRippleInfo = obj->oPaintingRippleInfo;
+    const struct RippleAnimation *objRippleAnim = obj->oPaintingRippleAnimation;
     PaintingData i, tri;
 
     /// Controls the peaks of the ripple.
     f32 rippleMag = obj->oPaintingCurrRippleMag;
     /// Controls the ripple's frequency.
-    f32 rippleRate = objRippleInfo->rate;
+    f32 rippleRate = objRippleAnim->rate;
     /// Controls how fast the ripple spreads.
-    f32 dispersionFactor = (1.0f / objRippleInfo->dispersion);
+    f32 dispersionFactor = (1.0f / objRippleAnim->dispersion);
     /// How far the ripple has spread.
     f32 rippleTimer = obj->oPaintingRippleTimer;
 
@@ -785,14 +785,14 @@ void bhv_painting_init(void) {
 /// - LOOP -
 
 /**
- * Check for Mario entering the painting.
+ * Check for Mario entering the painting. Returns changed flags.
  */
-void painting_update_mario_pos_and_flags(struct Object *obj) {
+s32 painting_update_mario_pos_and_flags(struct Object *obj) {
     if (!gMarioObject) {
-        return;
+        return PAINTING_FLAGS_NONE;
     }
 
-    s8 rippleFlags = RIPPLE_FLAGS_NONE;
+    s32 nextFlags = PAINTING_FLAGS_NONE;
 
     Vec3f marioWorldPos;
     Vec3f marioLocalPos;
@@ -818,35 +818,35 @@ void painting_update_mario_pos_and_flags(struct Object *obj) {
         // Check whether Mario is inside the wobble zone.
         if (marioLocalPos[2] < PAINTING_WOBBLE_DEPTH
          && marioLocalPos[2] > 0.0f) {
-            rippleFlags |= RIPPLE_FLAG_RIPPLE;
+            nextFlags |= PAINTING_FLAG_RIPPLE;
         }
         // Check whether Mario is inside the warp zone.
         if (marioLocalPos[2] < 0.0f
          && marioLocalPos[2] > -PAINTING_WARP_DEPTH) {
-            rippleFlags |= RIPPLE_FLAG_ENTER;
+            nextFlags |= PAINTING_FLAG_ENTER;
         }
     }
 
     obj->oPaintingLocalMarioPosX = marioLocalPos[0];
     obj->oPaintingLocalMarioPosY = marioLocalPos[1];
 
-    s16 lastFlags = obj->oPaintingCurrFlags;
-
-    // At most 1 of these will be nonzero.
-    obj->oPaintingCurrFlags = rippleFlags;
-
-    // changedFlags is true if currFlags is true and lastFlags is false
-    // (Mario just entered the floor on this frame).
-    obj->oPaintingChangedFlags = ((lastFlags ^ obj->oPaintingCurrFlags) & obj->oPaintingCurrFlags);
-
     // Detect whether Mario is entering this painting, and set paintingObj accordingly
-    if (obj->oPaintingCurrFlags & RIPPLE_FLAG_ENTER) {
+    if (nextFlags & PAINTING_FLAG_ENTER) {
         // Mario has entered the painting.
         gMarioState->paintingObj = obj;
     } else if (gMarioState->paintingObj == obj) {
         // Reset gMarioState->paintingObj if it's this painting and this painting is not entered.
         gMarioState->paintingObj = NULL;
     }
+
+    s32 lastFlags = obj->oPaintingFlags;
+
+    // At most 1 of these will be nonzero.
+    obj->oPaintingFlags = nextFlags;
+
+    // changedFlags is true if currFlags is true and lastFlags is false
+    // (Mario just entered the floor on this frame).
+    return ((lastFlags ^ nextFlags) & nextFlags);
 }
 
 /**
@@ -870,9 +870,9 @@ const struct RippleAnimationPair *painting_get_ripple_animation_type_info(const 
 /**
  * Set a painting's ripple animation and magnitude.
  */
-void painting_set_ripple_animation_type(struct Object *obj, const struct RippleAnimation *baseRippleInfo) {
-    obj->oPaintingCurrRippleMag = baseRippleInfo->mag;
-    obj->oPaintingRippleInfo = baseRippleInfo;
+void painting_set_ripple_animation_type(struct Object *obj, const struct RippleAnimation *baseRippleAnim) {
+    obj->oPaintingCurrRippleMag = baseRippleAnim->mag;
+    obj->oPaintingRippleAnimation = baseRippleAnim;
 }
 
 /**
@@ -883,10 +883,10 @@ void painting_set_ripple_animation_type(struct Object *obj, const struct RippleA
  */
 void painting_update_ripples(struct Object *obj) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    const struct RippleAnimation *objRippleInfo = obj->oPaintingRippleInfo;
+    const struct RippleAnimation *objRippleAnim = obj->oPaintingRippleAnimation;
 
-    if (objRippleInfo != NULL) {
-        obj->oPaintingCurrRippleMag *= objRippleInfo->decay;
+    if (objRippleAnim != NULL) {
+        obj->oPaintingCurrRippleMag *= objRippleAnim->decay;
     }
 
     // Reset the timer to 0 if it overflows.
@@ -1007,7 +1007,7 @@ void bhv_painting_loop(void) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
 
     // Update the painting info.
-    painting_update_mario_pos_and_flags(obj);
+    s32 changedFlags = painting_update_mario_pos_and_flags(obj);
 
     // Update the ripple, may automatically reset the painting's state.
     painting_update_ripples(obj);
@@ -1021,16 +1021,16 @@ void bhv_painting_loop(void) {
 
     if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         // Proximity type:
-        if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
+        if (changedFlags & PAINTING_FLAG_ENTER) {
             obj->oAction = PAINTING_ACT_ENTERED;
             painting_start_ripples(obj, FALSE, TRUE ); // Entering
-        } else if (obj->oAction != PAINTING_ACT_ENTERED && (obj->oPaintingChangedFlags & RIPPLE_FLAG_RIPPLE)) {
+        } else if (obj->oAction != PAINTING_ACT_ENTERED && (changedFlags & PAINTING_FLAG_RIPPLE)) {
             obj->oAction = PAINTING_ACT_RIPPLING;
             painting_start_ripples(obj, FALSE, TRUE ); // Wobbling
         }
     } else if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // Continuous type:
-        if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
+        if (changedFlags & PAINTING_FLAG_ENTER) {
             obj->oAction = PAINTING_ACT_ENTERED;
             painting_start_ripples(obj, FALSE, FALSE); // Entering
         } else if (obj->oAction == PAINTING_ACT_IDLE) {
