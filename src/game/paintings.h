@@ -17,8 +17,8 @@
 /// The depth of the area behind the painting which triggers the warp.
 #define PAINTING_WARP_DEPTH PAINTING_SIZE
 
-/// The space around the edges in which Mario is still considered within painting bounds.
-#define PAINTING_EDGE_MARGIN (PAINTING_SIZE / 2)
+/// The size of the buffer around the edges of the painting in which Mario is still considered within bounds.
+#define PAINTING_EDGE_MARGIN 160
 
 /// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
 #define PAINTING_MARIO_Y_OFFSET 50
@@ -55,7 +55,6 @@ enum PaintingRippleAnimations {
     RIPPLE_ANIM_PROXIMITY,
     RIPPLE_ANIM_PROXIMITY_LARGE,
 };
-
 
 // Painting->textureType
 enum PaintingType {
