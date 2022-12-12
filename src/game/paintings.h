@@ -83,9 +83,9 @@ enum PaintingRippleFlags {
 
 // oPaintingState
 enum PaintingState {
-    PAINTING_IDLE,
-    PAINTING_RIPPLE,
-    PAINTING_ENTERED,
+    PAINTING_STATE_IDLE,
+    PAINTING_STATE_RIPPLING,
+    PAINTING_STATE_ENTERED,
 };
 
 

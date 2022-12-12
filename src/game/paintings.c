@@ -36,12 +36,12 @@
  *          Painting structs, texture pointers, non-ripple display lists.
  *
  * Painting state machine:
- * Paintings spawn in the PAINTING_IDLE state
- *      From IDLE, paintings can change to PAINTING_RIPPLE or PAINTING_ENTERED
+ * Paintings spawn in the PAINTING_STATE_IDLE state
+ *      From IDLE, paintings can change to PAINTING_STATE_RIPPLING or PAINTING_STATE_ENTERED
  *        - This state checks for ENTERED because if Mario waits long enough, a PROXIMITY painting could
  *          reset to IDLE
  *
- * Paintings in the PAINTING_RIPPLE state are passively rippling.
+ * Paintings in the PAINTING_STATE_RIPPLING state are passively rippling.
  *      For RIPPLE_TRIGGER_PROXIMITY paintings, this means Mario bumped the front of the painting.
  *
  *      Paintings that use RIPPLE_TRIGGER_CONTINUOUS try to transition to this state as soon as possible,
@@ -49,7 +49,7 @@
  *
  *      A PROXIMITY painting will automatically reset to IDLE if its ripple magnitude becomes small enough.
  *
- * Paintings in the PAINTING_ENTERED state have been entered by Mario.
+ * Paintings in the PAINTING_STATE_ENTERED state have been entered by Mario.
  *      A CONTINUOUS painting will automatically reset to RIPPLE if its ripple magnitude becomes small enough.
  */
 
@@ -727,7 +727,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
                 SET_GRAPH_NODE_LAYER(node->flags, LAYER_TRANSPARENT);
             }
 
-            if (obj->oPaintingState == PAINTING_IDLE) {
+            if (obj->oPaintingState == PAINTING_STATE_IDLE) {
                 paintingDlist = display_painting_not_rippling(obj);
             } else {
                 paintingDlist = display_painting_rippling(obj);
@@ -905,16 +905,16 @@ void painting_update_ripple_state(struct Object *obj) {
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         // If the painting is barely rippling, make it stop rippling.
         if (obj->oPaintingCurrRippleMag <= 1.0f) {
-            obj->oPaintingState = PAINTING_IDLE;
+            obj->oPaintingState = PAINTING_STATE_IDLE;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         const struct RippleAnimationTypeInfo *rippleAnim = painting_get_ripple_animation_type_info(painting);
         // If the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple.
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
-        if ((obj->oPaintingState == PAINTING_ENTERED)
+        if ((obj->oPaintingState == PAINTING_STATE_ENTERED)
          && (obj->oPaintingCurrRippleMag <= rippleAnim->passive.mag)) {
-            obj->oPaintingState = PAINTING_RIPPLE;
+            obj->oPaintingState = PAINTING_STATE_RIPPLING;
             painting_set_ripple_animation(obj, &rippleAnim->passive);
         }
     }
@@ -978,11 +978,11 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTi
 
     // Use a different set of variables depending on the state
     switch (state) {
-        case PAINTING_RIPPLE:
+        case PAINTING_STATE_RIPPLING:
             painting_set_ripple_animation(obj, &rippleAnim->passive);
             break;
 
-        case PAINTING_ENTERED:
+        case PAINTING_STATE_ENTERED:
             painting_set_ripple_animation(obj, &rippleAnim->entry);
             break;
     }
@@ -1032,16 +1032,16 @@ void bhv_painting_loop(void) {
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         // Proximity type:
         if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
-            painting_state(obj, PAINTING_ENTERED, FALSE, TRUE ); // Entering
-        } else if (obj->oPaintingState != PAINTING_ENTERED && (obj->oPaintingChangedFlags & RIPPLE_FLAG_RIPPLE)) {
-            painting_state(obj, PAINTING_RIPPLE,  FALSE, TRUE ); // Wobbling
+            painting_state(obj, PAINTING_STATE_ENTERED, FALSE, TRUE ); // Entering
+        } else if (obj->oPaintingState != PAINTING_STATE_ENTERED && (obj->oPaintingChangedFlags & RIPPLE_FLAG_RIPPLE)) {
+            painting_state(obj, PAINTING_STATE_RIPPLING,  FALSE, TRUE ); // Wobbling
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // Continuous type:
         if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
-            painting_state(obj, PAINTING_ENTERED, FALSE, FALSE); // Entering
-        } else if (obj->oPaintingState == PAINTING_IDLE) {
-            painting_state(obj, PAINTING_RIPPLE,  TRUE,  TRUE ); // Idle
+            painting_state(obj, PAINTING_STATE_ENTERED, FALSE, FALSE); // Entering
+        } else if (obj->oPaintingState == PAINTING_STATE_IDLE) {
+            painting_state(obj, PAINTING_STATE_RIPPLING,  TRUE,  TRUE ); // Idle
         }
     }
 }
