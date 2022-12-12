@@ -8,7 +8,7 @@
 #include "types.h"
 
 
-/// The default painting side length.
+/// The default painting edge length.
 #define PAINTING_SIZE 614.0f
 
 /// The depth of the area in front of the painting which triggers ripples without warping.
@@ -64,7 +64,7 @@ enum RippleTriggers {
     RIPPLE_TRIGGER_CONTINUOUS,
 };
 
-// Painting->rippleAnimationType
+// Types of ripple animations.
 enum PaintingRippleAnimations {
     RIPPLE_ANIM_CONTINUOUS,
     RIPPLE_ANIM_PROXIMITY,
@@ -75,10 +75,10 @@ enum PaintingRippleAnimations {
 enum PaintingRippleFlags {
     // Not rippling.
     RIPPLE_FLAGS_NONE  = 0x0,
-    // Triggers an entry ripple.
-    RIPPLE_FLAG_ENTER  = BIT(0), // 0x01
     // Triggers a passive ripple.
-    RIPPLE_FLAG_RIPPLE = BIT(1), // 0x02
+    RIPPLE_FLAG_RIPPLE = BIT(0), // 0x01
+    // Triggers an entry ripple.
+    RIPPLE_FLAG_ENTER  = BIT(1), // 0x02
 };
 
 // oPaintingState
@@ -121,7 +121,6 @@ struct PaintingImage {
     /*0x08*/ s16 textureWidth;
     /*0x0A*/ s16 textureHeight;
 
-
     /// Either PAINTING_TYPE_IMAGE or PAINTING_TYPE_ENV_MAP.
     /*0x0C*/ s8 textureType;
 
@@ -134,7 +133,6 @@ struct PaintingImage {
     /// The painting's transparency (0..255). Determines the drawing layer of the painting.
     /*0x0F*/ Alpha alpha;
 
-    /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f (PAINTING_SIZE).
     /*0x10*/ f32 sizeX;
     /*0x14*/ f32 sizeY;
