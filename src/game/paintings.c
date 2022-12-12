@@ -787,10 +787,8 @@ void bhv_painting_init(void) {
 /**
  * Check for Mario entering the painting. Returns changed flags.
  */
-s32 painting_update_mario_pos_and_flags(struct Object *obj) {
-    if (!gMarioObject) {
-        return PAINTING_FLAGS_NONE;
-    }
+s32 painting_update_mario_pos_and_flags(struct Object *obj, f32 *localMarioX, f32 *localMarioY) {
+    struct MarioState *m = gMarioState;
 
     s32 nextFlags = PAINTING_FLAGS_NONE;
 
@@ -799,7 +797,7 @@ s32 painting_update_mario_pos_and_flags(struct Object *obj) {
     Vec3s rotation;
 
     // Add PAINTING_MARIO_Y_OFFSET to make the ripple closer to Mario's center of mass.
-    vec3f_copy_y_off(marioWorldPos, &gMarioObject->oPosVec, PAINTING_MARIO_Y_OFFSET);
+    vec3f_copy_y_off(marioWorldPos, m->pos, PAINTING_MARIO_Y_OFFSET);
 
     // Get the painting's rotation.
     vec3i_to_vec3s(rotation, &obj->oFaceAngleVec);
@@ -827,16 +825,16 @@ s32 painting_update_mario_pos_and_flags(struct Object *obj) {
         }
     }
 
-    obj->oPaintingLocalMarioPosX = marioLocalPos[0];
-    obj->oPaintingLocalMarioPosY = marioLocalPos[1];
+    *localMarioX = marioLocalPos[0];
+    *localMarioY = marioLocalPos[1];
 
     // Detect whether Mario is entering this painting, and set paintingObj accordingly
     if (nextFlags & PAINTING_FLAG_ENTER) {
         // Mario has entered the painting.
-        gMarioState->paintingObj = obj;
-    } else if (gMarioState->paintingObj == obj) {
+        m->paintingObj = obj;
+    } else if (m->paintingObj == obj) {
         // Reset gMarioState->paintingObj if it's this painting and this painting is not entered.
-        gMarioState->paintingObj = NULL;
+        m->paintingObj = NULL;
     }
 
     s32 lastFlags = obj->oPaintingFlags;
@@ -871,8 +869,8 @@ const struct RippleAnimationPair *painting_get_ripple_animation_type_info(const 
  * Set a painting's ripple animation and magnitude.
  */
 void painting_set_ripple_animation_type(struct Object *obj, const struct RippleAnimation *baseRippleAnim) {
-    obj->oPaintingCurrRippleMag = baseRippleAnim->mag;
     obj->oPaintingRippleAnimation = baseRippleAnim;
+    obj->oPaintingCurrRippleMag = baseRippleAnim->mag;
 }
 
 /**
@@ -962,10 +960,10 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
  * Set the painting's action, causing it to start a passive ripple or a ripple from Mario entering.
  *
  * @param obj identifies the painting that is changing state.
- * @param centerRipples if TRUE, center the ripples instead of putting them at Mario's position.
- * @param doResetTimer if TRUE, set the timer to 0.
+ * @param ripplePosX,ripplePosY the position of the ripples.
+ * @param shouldResetTimer if TRUE, set the timer to 0.
  */
-void painting_start_ripples(struct Object *obj, s8 centerRipples, s8 doResetTimer) {
+void painting_start_ripples(struct Object *obj, f32 ripplePosX, f32 ripplePosY, s32 shouldResetTimer) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
     const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(paintingImage);
 
@@ -981,13 +979,8 @@ void painting_start_ripples(struct Object *obj, s8 centerRipples, s8 doResetTime
     }
 
     // Set the ripple position.
-    if (centerRipples) {
-        obj->oPaintingRipplePosX = (paintingImage->sizeX * 0.5f);
-        obj->oPaintingRipplePosY = (paintingImage->sizeY * 0.5f);
-    } else {
-        obj->oPaintingRipplePosX = obj->oPaintingLocalMarioPosX;
-        obj->oPaintingRipplePosY = obj->oPaintingLocalMarioPosY;
-    }
+    obj->oPaintingRipplePosX = ripplePosX;
+    obj->oPaintingRipplePosY = ripplePosY;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (GET_BPARAM1(obj->oBehParams) == PAINTING_ID_CASTLE_WDW) {
@@ -997,7 +990,7 @@ void painting_start_ripples(struct Object *obj, s8 centerRipples, s8 doResetTime
     }
 #endif
 
-    if (doResetTimer) {
+    if (shouldResetTimer) {
         obj->oPaintingRippleTimer = 0;
     }
 }
@@ -1005,9 +998,10 @@ void painting_start_ripples(struct Object *obj, s8 centerRipples, s8 doResetTime
 void bhv_painting_loop(void) {
     struct Object *obj = o;
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
+    f32 localMarioX, localMarioY;
 
     // Update the painting info.
-    s32 changedFlags = painting_update_mario_pos_and_flags(obj);
+    s32 changedFlags = painting_update_mario_pos_and_flags(obj, &localMarioX, &localMarioY);
 
     // Update the ripple, may automatically reset the painting's state.
     painting_update_ripples(obj);
@@ -1023,19 +1017,19 @@ void bhv_painting_loop(void) {
         // Proximity type:
         if (changedFlags & PAINTING_FLAG_ENTER) {
             obj->oAction = PAINTING_ACT_ENTERED;
-            painting_start_ripples(obj, FALSE, TRUE ); // Entering
+            painting_start_ripples(obj, localMarioX, localMarioY, TRUE); // Entering
         } else if (obj->oAction != PAINTING_ACT_ENTERED && (changedFlags & PAINTING_FLAG_RIPPLE)) {
             obj->oAction = PAINTING_ACT_RIPPLING;
-            painting_start_ripples(obj, FALSE, TRUE ); // Wobbling
+            painting_start_ripples(obj, localMarioX, localMarioY, TRUE); // Wobbling
         }
     } else if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // Continuous type:
         if (changedFlags & PAINTING_FLAG_ENTER) {
             obj->oAction = PAINTING_ACT_ENTERED;
-            painting_start_ripples(obj, FALSE, FALSE); // Entering
+            painting_start_ripples(obj, localMarioX, localMarioY, FALSE); // Entering
         } else if (obj->oAction == PAINTING_ACT_IDLE) {
             obj->oAction = PAINTING_ACT_RIPPLING;
-            painting_start_ripples(obj, TRUE,  TRUE ); // Idle
+            painting_start_ripples(obj, (paintingImage->sizeX * 0.5f), (paintingImage->sizeY * 0.5f), TRUE); // Idle
         }
     }
 }
