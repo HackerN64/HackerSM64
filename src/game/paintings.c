@@ -118,7 +118,7 @@ static const struct RippleAnimationTypeInfo sRippleAnimations[] = {
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
 void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
     const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
     PaintingData i, tri;
 
@@ -533,7 +533,7 @@ Gfx *dl_painting_rippling(const struct Painting *painting, struct PaintingMeshVe
  * The mesh and vertex normals are regenerated and freed every frame.
  */
 Gfx *display_painting_rippling(struct Object *obj) {
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
     const PaintingData *meshData = segmented_to_virtual(seg2_painting_triangle_mesh);
     const PaintingData *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
     PaintingData numVtx = meshData[0];
@@ -667,7 +667,7 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
  * Render a normal painting.
  */
 Gfx *display_painting_not_rippling(struct Object *obj) {
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
     u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
@@ -700,7 +700,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     }
 
     // Get the const painting data.
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
 
     if (painting == NULL) {
         return NULL;
@@ -739,7 +739,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
  * Updates a painting object's room from a point in front of the center of the painting.
  */
 void painting_update_room(struct Object *obj) {
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
 
     // The center of the painting, but with an offset since paintings are usually between floor triangle edges laterally.
     Vec3f distPos = {
@@ -773,7 +773,7 @@ void bhv_painting_init(void) {
     const struct Painting *painting = segmented_to_virtual(sPaintings[id]);
 
     // Set the object's painting data pointer.
-    obj->oPaintingData = painting;
+    obj->oPaintingImageInfo = painting;
 
     // Clear flags.
     obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
@@ -809,7 +809,7 @@ void painting_update_mario_pos_and_flags(struct Object *obj) {
     vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, &obj->oPosVec, rotation);
 
     // Get the const painting data.
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
 
     // Check if Mario is within the painting bounds laterally in local space.
     if (marioLocalPos[0] > -PAINTING_EDGE_MARGIN
@@ -883,7 +883,7 @@ void painting_set_ripple_animation(struct Object *obj, const struct RippleAnimat
  * ripple's magnitude becomes small enough.
  */
 void painting_update_ripple_state(struct Object *obj) {
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
     const struct RippleAnimationInfo *objRippleInfo = obj->oPaintingRippleInfo;
 
     if (objRippleInfo != NULL) {
@@ -968,7 +968,7 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
  * @param doResetTimer if TRUE, set the timer to 0
  */
 void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTimer) {
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
     const struct RippleAnimationTypeInfo *rippleAnim = painting_get_ripple_animation_type_info(painting);
 
     // Use a different set of variables depending on the state
@@ -1009,7 +1009,7 @@ void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 doResetTi
 
 void bhv_painting_loop(void) {
     struct Object *obj = o;
-    const struct Painting *painting = obj->oPaintingData;
+    const struct Painting *painting = obj->oPaintingImageInfo;
 
     // Update the painting info.
     painting_update_mario_pos_and_flags(obj);

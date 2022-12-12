@@ -1255,7 +1255,7 @@
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
 
 /* Painting */
-#define /*0x0F4*/ oPaintingData                 OBJECT_FIELD_CVPTR(0x1B)
+#define /*0x0F4*/ oPaintingImageInfo            OBJECT_FIELD_CVPTR(0x1B)
 #define /*0x0F8*/ oPaintingLocalMarioPosX       OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oPaintingLocalMarioPosY       OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oPaintingRipplePosX           OBJECT_FIELD_F32(0x1E)
