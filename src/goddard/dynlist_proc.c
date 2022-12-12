@@ -1890,47 +1890,6 @@ void d_set_att_offset(const struct GdVec3f *off) {
 }
 
 /**
- * An incorrectly-coded recursive function that was presumably supposed to
- * set the offset of an attached object. Now, it will only call itself
- * until it encounters a NULL pointer, which will trigger a `fatal_printf()`
- * call.
- *
- * @note Not called
- */
-void d_set_att_to_offset(UNUSED u32 a) {
-    struct GdObj *dynobj; // sp3c
-    UNUSED u8 filler[24];
-
-    if (sDynListCurObj == NULL) {
-        fatal_printf("proc_dynlist(): No current object");
-    }
-
-    dynobj = sDynListCurObj;
-    d_stash_dynobj();
-    switch (sDynListCurObj->type) {
-        case OBJ_TYPE_JOINTS:
-            set_cur_dynobj(((struct ObjJoint *) dynobj)->attachedToObj);
-            break;
-        case OBJ_TYPE_NETS:
-            set_cur_dynobj(((struct ObjNet *) dynobj)->attachedToObj);
-            break;
-        case OBJ_TYPE_PARTICLES:
-            set_cur_dynobj(((struct ObjParticle *) dynobj)->attachedToObj);
-            break;
-        default:
-            fatal_printf("%s: Object '%s'(%x) does not support this function.", "dSetAttToOffset()",
-                         sDynListCurInfo->name, sDynListCurObj->type);
-    }
-
-    if (sDynListCurObj == NULL) {
-        fatal_printf("dSetAttOffset(): Object '%s' isnt attached to anything",
-                     sStashedDynObjInfo->name);
-    }
-    d_set_att_to_offset(a);
-    d_unstash_dynobj();
-}
-
-/**
  * Store the offset of the attached object into `dst`.
  *
  * @note Not called
