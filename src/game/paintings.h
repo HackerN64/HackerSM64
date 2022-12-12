@@ -92,8 +92,8 @@ enum PaintingState {
 /**
  * A list of preset constants for the ripple animations.
  */
-struct RippleAnimationInfo {
-    /*0x00*/ const f32 mag;         /// Controls how high the peaks of the ripple are.
+struct RippleAnimation {
+    /*0x00*/ const f32 mag;         /// Controls how high the peaks of the ripple are when the animation starts.
     /*0x04*/ const f32 decay;       /// Multiplier that controls how fast the ripple regresses to the IDLE state.
     /*0x08*/ const f32 rate;        /// Controls the ripple's frequency.
     /*0x0C*/ const f32 dispersion;  /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple.
@@ -102,15 +102,15 @@ struct RippleAnimationInfo {
 /**
  * A ripple animation pair.
  */
-struct RippleAnimationTypeInfo {
-    /*0x00*/ const struct RippleAnimationInfo passive;
-    /*0x10*/ const struct RippleAnimationInfo entry;
+struct RippleAnimationPair {
+    /*0x00*/ const struct RippleAnimation passive;  /// The ripple when the painting is continuously rippling or is lightly touched.
+    /*0x10*/ const struct RippleAnimation entry;    /// The ripple when the painting is entered.
 }; /*0x20*/
 
 /**
  * Painting info struct.
  */
-struct Painting {
+struct PaintingImage {
     /// Texture data.
     /*0x00*/ const Texture *const *textureArray;
 
@@ -135,7 +135,7 @@ struct Painting {
     /*0x0F*/ Alpha alpha;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
-    /// By default a painting is 614.0f x 614.0f
+    /// By default a painting is 614.0f x 614.0f (PAINTING_SIZE).
     /*0x10*/ f32 sizeX;
     /*0x14*/ f32 sizeY;
 }; /*0x18*/

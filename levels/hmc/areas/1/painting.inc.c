@@ -13,7 +13,7 @@ const Texture *const hmc_seg7_painting_textures_cotmc[] = {
 };
 
 // 0x0702551C (PaintingData)
-const struct Painting cotmc_painting = {
+const struct PaintingImage cotmc_painting = {
     /* Textures */ hmc_seg7_painting_textures_cotmc,
     /* Texture Count */ ARRAY_COUNT(hmc_seg7_painting_textures_cotmc),
     /* Texture w, h */ 32, 32,

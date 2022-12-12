@@ -9,7 +9,7 @@ ALIGNED8 static const Texture *const ttm_seg7_painting_textures_slide[] = {
 };
 
 // 0x07012F00 (PaintingData)
-const struct Painting ttm_slide_painting = {
+const struct PaintingImage ttm_slide_painting = {
     /* Textures */ ttm_seg7_painting_textures_slide,
     /* Texture Count */ ARRAY_COUNT(ttm_seg7_painting_textures_slide),
     /* Texture w, h */ 64, 32,

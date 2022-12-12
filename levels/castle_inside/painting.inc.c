@@ -109,7 +109,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_bob[] 
 };
 
 // 0x07023620 - 0x07023698
-const struct Painting bob_painting = {
+const struct PaintingImage bob_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_bob,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_bob),
     /* Texture w, h */ 64, 32,
@@ -128,7 +128,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ccm[] 
 };
 
 // 0x07023698 - 0x07023710
-const struct Painting ccm_painting = {
+const struct PaintingImage ccm_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_ccm,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ccm),
     /* Texture w, h */ 64, 32,
@@ -147,7 +147,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wf[] =
 };
 
 // 0x07023710 - 0x07023788
-const struct Painting wf_painting = {
+const struct PaintingImage wf_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_wf,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_wf),
     /* Texture w, h */ 64, 32,
@@ -166,7 +166,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_jrb[] 
 };
 
 // 0x07023788 - 0x07023800
-const struct Painting jrb_painting = {
+const struct PaintingImage jrb_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_jrb,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_jrb),
     /* Texture w, h */ 64, 32,
@@ -185,7 +185,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_lll[] 
 };
 
 // 0x07023800 - 0x07023878
-const struct Painting lll_painting = {
+const struct PaintingImage lll_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_lll,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_lll),
     /* Texture w, h */ 64, 32,
@@ -204,7 +204,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ssl[] 
 };
 
 // 0x07023878 - 0x070238F0
-const struct Painting ssl_painting = {
+const struct PaintingImage ssl_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_ssl,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ssl),
     /* Texture w, h */ 64, 32,
@@ -222,7 +222,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_hmc_en
 };
 
 // 0x070238F0 - 0x07023968
-const struct Painting hmc_painting = {
+const struct PaintingImage hmc_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_hmc_env,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_hmc_env),
     /* Texture w, h */ 32, 32,
@@ -240,7 +240,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ddd_en
 };
 
 // 0x07023968 - 0x070239E0
-const struct Painting ddd_painting = {
+const struct PaintingImage ddd_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_ddd_env,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ddd_env),
     /* Texture w, h */ 32, 32,
@@ -259,7 +259,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wdw[] 
 };
 
 // 0x070239E0 - 0x07023A58
-const struct Painting wdw_painting = {
+const struct PaintingImage wdw_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_wdw,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_wdw),
     /* Texture w, h */ 64, 32,
@@ -278,7 +278,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_thi[] 
 };
 
 // 0x07023A58 - 0x07023AD0
-const struct Painting thi_tiny_painting = {
+const struct PaintingImage thi_tiny_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_thi,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_thi),
     /* Texture w, h */ 64, 32,
@@ -292,7 +292,7 @@ const struct Painting thi_tiny_painting = {
 /// - PAINTING_ID_CASTLE_THI_HUGE -
 
 // 0x07023C38 - 0x07023CB0
-const struct Painting thi_huge_painting = {
+const struct PaintingImage thi_huge_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_thi,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_thi),
     /* Texture w, h */ 64, 32,
@@ -311,7 +311,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttm[] 
 };
 
 // 0x07023AD0 - 0x07023B48
-const struct Painting ttm_painting = {
+const struct PaintingImage ttm_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_ttm,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ttm),
     /* Texture w, h */ 64, 32,
@@ -330,7 +330,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttc[] 
 };
 
 // 0x07023B48 - 0x07023BC0
-const struct Painting ttc_painting = {
+const struct PaintingImage ttc_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_ttc,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_ttc),
     /* Texture w, h */ 64, 32,
@@ -349,7 +349,7 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_sl[] =
 };
 
 // 0x07023BC0 - 0x07023C38
-const struct Painting sl_painting = {
+const struct PaintingImage sl_painting = {
     /* Textures */ inside_castle_seg7_painting_textures_sl,
     /* Texture Count */ ARRAY_COUNT(inside_castle_seg7_painting_textures_sl),
     /* Texture w, h */ 64, 32,
@@ -362,7 +362,7 @@ const struct Painting sl_painting = {
 
 /// - PAINTING_ID_CASTLE_RR -
 
-const struct Painting rr_painting = {
+const struct PaintingImage rr_painting = {
     /* Textures */ NULL,
     /* Texture Count */ 0,
     /* Texture w, h */  0,  0,
