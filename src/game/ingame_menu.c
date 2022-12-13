@@ -1569,7 +1569,7 @@ LangArray textCourseX = DEFINE_LANGUAGE_ARRAY(
     "NIVEAU %s",
     "KURS %s",
     "コース%s",
-    "NIVEL");
+    "NIVEL %s");
 
 LangArray textMyScore = DEFINE_LANGUAGE_ARRAY(
     "MY SCORE",
@@ -2013,7 +2013,7 @@ LangArray textHudHiScore = DEFINE_LANGUAGE_ARRAY(
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "HISCORE",
-    "RÉCORD");
+    "NUEVO RECORD");
 
 LangArray textCongratulations = DEFINE_LANGUAGE_ARRAY(
     "CONGRATULATIONS",
