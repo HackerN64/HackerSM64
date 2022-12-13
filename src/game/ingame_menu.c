@@ -1773,11 +1773,18 @@ void highlight_last_course_complete_stars(void) {
     gDialogLineNum = doneCourseIndex;
 }
 
+LangArray textPause = DEFINE_LANGUAGE_ARRAY(
+    "PAUSE",
+    "PAUSE",
+    "PAUSE",
+    "PAUSE",
+    "PAUSA");
+
 void print_hud_pause_colorful_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_hud_lut_string_aligned(SCREEN_CENTER_X, 81, "PAUSE", TEXT_ALIGN_CENTER);
+    print_hud_lut_string_aligned(SCREEN_CENTER_X, 81, LANG_ARRAY(textPause), TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
