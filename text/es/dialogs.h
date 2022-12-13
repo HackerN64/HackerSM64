@@ -290,7 +290,6 @@ campo de batalla.\n\
 mi peso y hacerme besar\n\
 este suelo real? ¡Lo dudo\n\
 mucho!\n\
-\n\
 ¡Desembomba!")
 
 DEFINE_DIALOG(DIALOG_018, NO_SOUND, 5, 30, 200, "\
@@ -2154,7 +2153,7 @@ rendirme!\n\
 ¿Es cierto lo que dicen?\n\
 ¿De verdad has vencido a\n\
 Bowser? ¿Y has devuelto\n\
-las estrellas al?\n\
+las estrellas al\n\
 castillo?\n\
 ¡Sabía que podrías\n\
 hacerlo! Ahora tengo un\n\

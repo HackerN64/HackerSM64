@@ -1882,7 +1882,7 @@ LangArray textLanguageSelect = DEFINE_LANGUAGE_ARRAY(
     "SELECTION LANGUE",
     "WÄHLE SPRACHE",
     "ランゲージセレクト",
-    "ELEGIR IDIOMA");
+    "IDIOMA");
 
 char *textLanguage[] = {
     "ENGLISH",
