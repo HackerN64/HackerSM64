@@ -82,8 +82,8 @@
  */
 #define ENABLE_FRENCH
 #define ENABLE_GERMAN
-#define ENABLE_SPANISH
 // #define ENABLE_JAPANESE
+#define ENABLE_SPANISH
 
 /**
  * This define enables support for Japanese characters even when multilang or Japanese is not enabled.
