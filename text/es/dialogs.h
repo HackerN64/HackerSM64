@@ -128,11 +128,11 @@ estaba el Gran Bob-omb?\n\
 agallas para enfrentarte a\n\
 este koorredor?\n\
 Cuando diga\n\
-『Ya,』 ¡empezamos!\n\
+“Ya,” ¡empezamos!\n\
 \n\
 Preparados, listos...\n\
 \n\
-//¡Ya!////Te esperas")
+\t¡Ya!\t\tTe esperas")
 
 DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 4, 30, 200, "\
 ¡¡¡Oye!!! ¡No intentes\n\
@@ -156,7 +156,7 @@ CADENAS ¡PELIGRO\n\
 EXTREMO!\n\
 \n\
 \n\
-Acércate y pulsa [C]^\n\
+Acércate y pulsa Ⓒ▲\n\
 para mirarle mejor.\n\
 Da miedito, ¿eh?\n\
 ¿Ves la moneda roja\n\
@@ -182,7 +182,7 @@ echásemos una carrera\n\
 aquí, estaría jugando en\n\
 casa. ¿Te atreves con\n\
 una revancha?\n\
-//Vamos//// Paso")
+\tVamos\t Paso")
 
 DEFINE_DIALOG(DIALOG_010, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Has accionado el botón\n\
@@ -195,7 +195,7 @@ una Gorra Voladora.\n\
 \n\
 ¿Quieres guardar?\n\
 \n\
-//Sí////No")
+\t\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 ¡Acabas de accionar el\n\
@@ -208,7 +208,7 @@ metal de los bloques\n\
 verdes que rompas.\n\
 ¿Quieres guardar?\n\
 \n\
-//Yes////No")
+\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Acabas de accionar el\n\
@@ -221,14 +221,14 @@ bloques azules.\n\
 \n\
 ¿Quieres guardar?\n\
 \n\
-//Sí////No")
+\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_013, NO_SOUND, 5, 30, 200, "\
 ¡Has conseguido 100\n\
 monedas! Mario consigue\n\
 más poder del castillo.\n\
 ¿Quieres guardar?\n\
-//Sí////No")
+\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_014, NO_SOUND, 4, 30, 200, "\
 ¡Guau! ¡Otra estrella de\n\
@@ -237,7 +237,7 @@ del castillo, Marío está\n\
 más decidido que nunca.\n\
 ¿Quieres guardar?\n\
 \n\
-//Claro//Luego")
+\tClaro\tLuego")
 
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 4, 30, 200, "\
 Puedes darle un puñetazo\n\
@@ -363,7 +363,7 @@ estrellas.")
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 5, 95, 200, "\
 Si pretendes subir hasta\n\
 lo alto de las escaleras\n\
-『infinitas』, necesitarás\n\
+“infinitas”, necesitarás\n\
 70 estrellas\n\
 ¡Muajajaja!")
 
@@ -383,8 +383,8 @@ para no hacer ruido.\n\
 Y para terminar de\n\
 comentar en las técnicas\n\
 de grabación, puedes usar\n\
-[C]> y [C]< para mirar a\n\
-tu alrededor. Pulsa [C]|\n\
+Ⓒ▶ y Ⓒ< para mirar a\n\
+tu alrededor. Pulsa Ⓒ▼\n\
 para ver la acción desde\n\
 lejos. Cuando no puedas \n\
 mover más la cámara, \n\
@@ -416,10 +416,10 @@ para despegar.\n\
 Con un cañón, ¡podrías\n\
 volar todavía más alto!\n\
 \n\
-Usa los botones [C] para\n\
+Usa los botones Ⓒ para\n\
 mirad a tu alrededor\n\
 mientras vuelas, y pulsa\n\
-[Z] para aterrizar.")
+Ⓩ para aterrizar.")
 
 DEFINE_DIALOG(DIALOG_033, NO_SOUND, 7, 30, 200, "\
 ¡Hola! Has llegado al\n\
@@ -455,13 +455,13 @@ experiencia que soy,\n\
 grabaré desde el ángulo\n\
 recomendado, pero puedes\n\
 cambiar el ángulo de\n\
-la cámara con [C]\n\
+la cámara con Ⓒ\n\
 Si no podemos movernos\n\
 más, te avisaremos con\n\
 un sonido. Para echar un\n\
 vistazo a tus\n\
 alrededores, párate y\n\
-pulsa [C]^\n\
+pulsa Ⓒ▲\n\
 De momento, esto ha sido\n\
 todo. Seguiremos en\n\
 directo la aventura de\n\
@@ -470,7 +470,7 @@ Mario.")
 DEFINE_DIALOG(DIALOG_035, NO_SOUND, 5, 30, 200, "\
 Hay cuatro botones de\n\
 cámara, también llamados\n\
-botones [C]. Pulsa [C]^\n\
+botones Ⓒ. Pulsa Ⓒ▲\n\
 para mirar a tu alrededor\n\
 con el stick de control.\n\
 Normalmente verás a Mario\n\
@@ -479,36 +479,36 @@ Lakitu. Esta es la cámara\n\
 recomendada para jugar\n\
 casi siempre.\n\
 Puedes cambiar el ángulo\n\
-pulsando [C]>. Si pulsas\n\
-[R], la vista cambia a la\n\
+pulsando Ⓒ▶ y Ⓒ◀. Si pulsas\n\
+Ⓡ, la vista cambia a la\n\
 cámara de Mario, que está\n\
 justo detrás de él.\n\
-Si vuelves a pulsar [R],\n\
+Si vuelves a pulsar Ⓡ,\n\
 volverás a la cámara de\n\
 Lakitu.\n\
 \n\
 \n\
-Pulsa [C]| para ver a\n\
+Pulsa Ⓒ▼ para ver a\n\
 Mario desde lejos, tanto\n\
 con la cámara de Lakitu\n\
 como la de Mario.")
 
 DEFINE_DIALOG(DIALOG_036, NO_SOUND, 6, 30, 200, "\
 MIRADOR\n\
-Pulsa [C]^ para admirar\n\
+Pulsa Ⓒ▲ para admirar\n\
 las vistas. ¡Aprovecha la\n\
 ocasión mira bien!\n\
-Pulsa [R] para cambiar a\n\
+Pulsa Ⓡ para cambiar a\n\
 la cámara de Mario.\n\
 Esta vista siempre sigue\n\
 a Mario. Vuelve a pulsar\n\
-[R] para volver a la\n\
+Ⓡ para volver a la\n\
 cámara de Lakitu. Si \n\
 pausas el juego, puedes\n\
 cambiar el modo de la \n\
 cámara para que se \n\
-quede 『fija』 en un sitio\n\
-al pulsar [R]. ¡Pruébalo!")
+quede “fija” en un sitio\n\
+al pulsar Ⓡ. ¡Pruébalo!")
 
 DEFINE_DIALOG(DIALOG_037, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, "\
 ¡Te he ganado! ¡Y tú has\n\
@@ -544,7 +544,7 @@ una pista:\n\
 Atento a los nombres\n\
 de las estrellas al\n\
 comienzo de cada mundo.\n\
-//--El Gran Bob-omb")
+\t   --El Gran Bob-omb")
 
 DEFINE_DIALOG(DIALOG_040, NO_SOUND, 3, 30, 200, "\
 ¡Peligro! ¡Puente roto!\n\
@@ -575,7 +575,7 @@ mueves el stick de control\n\
 hacia delante, o de un\n\
 salto si pulsas A.\n\
 Cuando quieras dejarte\n\
-caer, pulsa [Z] o mueve\n\
+caer, pulsa Ⓩ o mueve\n\
 el stick de control en la\n\
 dirección contraria a la\n\
 que mira Mario.")
@@ -633,7 +633,7 @@ pequeño salto, luego uno\n\
 un poco más alto,\n\
 y luego uno enorme.\n\
 Vale, ahora toca el salto\n\
-largo. Corre, pulsa [Z]\n\
+largo. Corre, pulsa Ⓩ\n\
 para agacharte y luego\n\
 pulsa Ⓐ para saltar muy\n\
 lejos.\n\
@@ -677,9 +677,9 @@ para ganar impulso.\n\
 práctica!")
 
 DEFINE_DIALOG(DIALOG_050, NO_SOUND, 5, 30, 200, "\
-Mantén pulsado [Z] para\n\
+Mantén pulsado Ⓩ para\n\
 agacharte y deslizarte por\n\
-una cuesta. O pulsa [Z]\n\
+una cuesta. O pulsa Ⓩ\n\
 cuando estés en el aire\n\
 para dar un pisotón.\n\
 Si te paras, te agachas,\n\
@@ -712,7 +712,7 @@ saltarás con más estilo\n\
 que nadie.")
 
 DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200, "\
-Párate y pulsa [Z] para\n\
+Párate y pulsa Ⓩ para\n\
 agacharte, y luego pulsa\n\
 Ⓐ para hacer una pirueta\n\
 giratoria.\n\
@@ -753,7 +753,7 @@ mundo! ¿Lo sabías?\n\
 ¿Echamos una carrera?\n\
 Preparados, listos...\n\
 \n\
-//¡Ya!//// Pasando")
+\t¡Ya!\tPasando")
 
 DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 6, 30, 200, "\
 Has r-r-r-¡Has roto mi\n\
@@ -874,7 +874,7 @@ Usa el stick de control\n\
 para guiar a Mario.\n\
 Muévelo hacia detrás para\n\
 elevarte, hacia arriba\n\
-para descender, y [Z]\n\
+para descender, y Ⓩ\n\
 para aterrizar.")
 
 DEFINE_DIALOG(DIALOG_065, NO_SOUND, 6, 30, 200, "\
@@ -926,7 +926,7 @@ volviendo a pulsar Ⓑ\n\
 \n\
 \n\
 Recuerda que puedes usar\n\
-los botones [C] para\n\
+los botones Ⓒ para\n\
 mirar a tu alrededor.\n\
 Tienes que lanzar a\n\
 Bowser a una de las\n\
@@ -983,7 +983,7 @@ Solo tienes que quedarte\n\
 quieto en el suelo,\n\
 pulsar Start para pausar,\n\
 y luego seleccionar\n\
-『Salir del nivel.』\n\
+“Salir del nivel.”\n\
 No hace falta conseguir\n\
 todas las estrellas de\n\
 Poder en un mundo para\n\
@@ -1042,7 +1042,7 @@ correcto.\n\
 diré, así que buena\n\
 zuerte!\n\
 \n\
-//--El Capitán")
+\t   --El Capitán")
 
 DEFINE_DIALOG(DIALOG_074, NO_SOUND, 6, 30, 200, "\
 Puedes agarrarte a un\n\
@@ -1056,7 +1056,7 @@ bordillo, puedes mover\n\
 el stick de control en\n\
 la dirección contraria a\n\
 la que mira Mario, o\n\
-pulsar [Z].\n\
+pulsar Ⓩ.\n\
 Para subir a lo alto del\n\
 bordillo, puedes mover el\n\
 stick hacia arriba para\n\
@@ -1120,7 +1120,7 @@ pisotón a los pilares.")
 DEFINE_DIALOG(DIALOG_078, NO_SOUND, 5, 30, 200, "\
 Abre el contenedor de\n\
 monedas azules dándole un\n\
-pisotón con el botón [Z].\n\
+pisotón con el botón Ⓩ.\n\
 Una moneda azul equivale\n\
 a 5 monedas amarillas.\n\
 Pero si no eres lo\n\
@@ -1141,7 +1141,7 @@ algo que te va a gustar.\n\
 \n\
 ¿Qué te parece?\n\
 \n\
-//Soltar/ No soltar")
+\tSoltar\t\t No soltar")
 
 DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 1, 30, 200, "\
 ¡Jejejeje!")
@@ -1241,20 +1241,20 @@ sepa hacer el salto\n\
 largo, debe ir a\n\
 la derecha.\n\
 Derecha: Ascensor.\n\
-/// Laberinto gaseoso\n\
+\t\tLaberinto gaseoso\n\
 Izquierda: Agujero Negro\n\
-///Lago subterráneo\n\
+\t\tLago subterráneo\n\
 \n\
 \n\
 Círculo rojo: Ascensor 2\n\
-//// Lago subterráneo\n\
+\t\tLago subterráneo\n\
 Flecha: Tu posición")
 
 DEFINE_DIALOG(DIALOG_090, SOUND_OBJ_BOWSER_LAUGH, 5, 30, 200, "\
 ¡Ja ja ja! ¡Has caído de\n\
 lleno en mi trampa, tal\n\
 y como esperaba! Un\n\
-consejo, 『amigo,』\n\
+consejo, “amigo,”\n\
 ¡cuidado con dónde pisas!")
 
 DEFINE_DIALOG(DIALOG_091, NO_SOUND, 2, 30, 200, "\
@@ -1294,7 +1294,7 @@ DEFINE_DIALOG(DIALOG_094, NO_SOUND, 4, 30, 200, "\
 ¡Coge carrerilla en la\n\
 cuesta! ¿Te acuerdas del\n\
 salto largo? Corre, pulsa\n\
-[Z], y luego salta!")
+Ⓩ, y luego salta!")
 
 DEFINE_DIALOG(DIALOG_095, NO_SOUND, 5, 30, 200, "\
 Para leer un cartel,\n\
@@ -1378,7 +1378,7 @@ la luz hallarás...")
 DEFINE_DIALOG(DIALOG_104, NO_SOUND, 6, 30, 200, "\
 Esa estrella oscura que\n\
 tienes enfrente es un\n\
-『Marcador de estrella.』\n\
+“Marcador de estrella.”\n\
 Cuando consigas 8 monedas\n\
 rojas, una estrella\n\
 aparecerá aquí.")
@@ -1607,7 +1607,7 @@ final juntos!\n\
 DEFINE_DIALOG(DIALOG_122, NO_SOUND, 5, 30, 200, "\
 El Agujero Negro\n\
 Derecha: Ascensor\n\
-/// Laberinto venenoso\n\
+\t\tLaberinto venenoso\n\
 Izquierda: Lago\n\
 subterráneo")
 
@@ -1634,13 +1634,13 @@ Cerrado. No pasar.")
 DEFINE_DIALOG(DIALOG_126, NO_SOUND, 3, 30, 200, "\
 Arriba: Agujero negro\n\
 Derecha: Ascensor\n\
-/// Laberinto venenoso")
+\t\tLaberinto venenoso")
 
 DEFINE_DIALOG(DIALOG_127, NO_SOUND, 5, 30, 200, "\
 Lago subterráneo\n\
 Derecha:Caverna de metal\n\
 Izquierda:Mina abandonada\n\
-///(Cerrado)\n\
+\t\t(Cerrado)\n\
 \n\
 Un amable dragón de agua\n\
 vive aquí. Pisa su cabeza\n\
@@ -1696,7 +1696,7 @@ sólidos.\n\
 Para despegar, haz un\n\
 triple salto, y cuando\n\
 quieras aterrizar, pulsa\n\
-[Z]\n\
+Ⓩ\n\
 Mueve el stick de control\n\
 hacia abajo para\n\
 elevarte, y hacia arriba\n\
@@ -1793,7 +1793,7 @@ nada!\n\
 \n\
 Pero ten cuidado: Bowser\n\
 y sus secuaces son unos\n\
-expertos del 『mal.』\n\
+expertos del “mal.”\n\
 Te voy a dar un consejo:\n\
 \n\
 \n\
@@ -1860,9 +1860,9 @@ autómáticamente.\n\
 DEFINE_DIALOG(DIALOG_140, NO_SOUND, 6, 30, 200, "\
 Zona del ascensor\n\
 Derecha:Laberinto venenoso\n\
-/// Entrada\n\
+\t\tEntrada\n\
 Izquierda: Agujero negro\n\
-///Ascensor 1\n\
+\t\tAscensor 1\n\
 Flecha: Tu posición")
 
 DEFINE_DIALOG(DIALOG_141, NO_SOUND, 6, 150, 200, "\
@@ -1989,7 +1989,7 @@ congelado, tu vida bajará\n\
 muy rápidamente, y no\n\
 la recuperarás en la\n\
 superficie.\n\
-//--El Muñeco de Nieve")
+\t--El Muñeco de Nieve")
 
 DEFINE_DIALOG(DIALOG_149, NO_SOUND, 4, 30, 200, "\
 ¡Bienvenido al tobogán\n\
@@ -2128,9 +2128,9 @@ más alto")
 DEFINE_DIALOG(DIALOG_159, NO_SOUND, 6, 30, 200, "\
 3. Para hacer una pirueta\n\
 hacia atrás, párate,\n\
-pulsa [Z], y luego Ⓐ\n\
+pulsa Ⓩ, y luego Ⓐ\n\
 Para hacer un salto\n\
-largo, pulsa [Z] y Ⓐ\n\
+largo, pulsa Ⓩ y Ⓐ\n\
 mientras corres.")
 
 DEFINE_DIALOG(DIALOG_160, NO_SOUND, 5, 30, 200, "\
@@ -2161,7 +2161,7 @@ hacerlo! Ahora tengo un\n\
 mensaje muy especial para\n\
 ti.\n\
 \n\
-『¡Gracias por jugar a\n\
+“¡Gracias por jugar a\n\
 Super Mario 64! Este es\n\
 el final del juego, pero\n\
 no el final de la\n\
@@ -2172,7 +2172,7 @@ un regalito para ti.\n\
 ¡Disfrútalo!\n\
 \n\
 Firmado: El equipo de\n\
-Super Mario 64.』")
+Super Mario 64.”")
 
 DEFINE_DIALOG(DIALOG_162, NO_SOUND, 4, 30, 200, "\
 ¡No, otra vez tú no!\n\
@@ -2227,7 +2227,7 @@ es contra un amigo.\n\
 ¿Qué me dices?\n\
 Preparados... listos...\n\
 \n\
-//¡Ya!//// ¡Luego!")
+\t¡Ya!\t¡Luego!")
 
 DEFINE_DIALOG(DIALOG_165, NO_SOUND, 6, 30, 200, "\
 Deniego cualquier\n\
@@ -2241,14 +2241,14 @@ DEFINE_DIALOG(DIALOG_166, NO_SOUND, 4, 30, 200, "\
 Volveré pronto.\n\
 Estoy entrenando,\n\
 así que vuelve más tarde.\n\
-//--Koopa el Rápido")
+\t --Koopa el Rápido")
 
 DEFINE_DIALOG(DIALOG_167, NO_SOUND, 4, 30, 200, "\
 El castillo de la princesa\n\
 está justo delante.\n\
 \n\
 \n\
-Pulsa Ⓐ para saltar, [Z]\n\
+Pulsa Ⓐ para saltar, Ⓩ\n\
 para agacharte, y Ⓑ para\n\
 dar un puñetazo, leer un\n\
 cartel, o coger algo.\n\
