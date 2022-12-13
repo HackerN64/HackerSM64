@@ -1833,14 +1833,14 @@ LangArray textCoinX = DEFINE_LANGUAGE_ARRAY(
     "✪× %s",
     "✪× %s",
     "✪ｘ%s",
-    "✪×%s");
+    "✪× %s");
 
 LangArray textStarX = DEFINE_LANGUAGE_ARRAY(
     "★× %s",
     "★× %s",
     "★× %s",
     "★ｘ%s",
-    "★×%s");
+    "★× %s");
 
 void render_pause_castle_main_strings(s16 x, s16 y) {
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
