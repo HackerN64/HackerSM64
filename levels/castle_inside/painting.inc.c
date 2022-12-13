@@ -367,7 +367,7 @@ const struct PaintingImage rr_painting = {
     /* Texture Count */ 0,
     /* Texture w, h */  0,  0,
     /* Texture Type */ PAINTING_TYPE_IMAGE,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_NONE,
     /* Shaded */ TRUE,
     /* Alpha */ 0x00,
     /* Size */ 204.8f, 204.8f,
