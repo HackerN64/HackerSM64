@@ -1537,7 +1537,7 @@ LangArray textCurrRatio43 = DEFINE_LANGUAGE_ARRAY(
     "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
     "アスペクトひ: ４:３\nＬボタンできりかえ",
-    "RELACIÓN DE ASPECTO: 4:3\nPULSA  PARA CAMBIAR");
+    "RELACIÓN DE ASPECTO: 4:3\nPULSA L PARA CAMBIAR");
 
 LangArray textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
     "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
@@ -1826,14 +1826,14 @@ LangArray textCoinX = DEFINE_LANGUAGE_ARRAY(
     "✪× %s",
     "✪× %s",
     "✪ｘ%s",
-    "✪ｘ%s");
+    "✪×%s");
 
 LangArray textStarX = DEFINE_LANGUAGE_ARRAY(
     "★× %s",
     "★× %s",
     "★× %s",
     "★ｘ%s",
-    "★ｘ%s");
+    "★×%s");
 
 void render_pause_castle_main_strings(s16 x, s16 y) {
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
