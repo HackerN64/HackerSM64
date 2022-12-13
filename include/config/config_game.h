@@ -74,7 +74,7 @@
 /**
  * Adds support for multiple languages to the game.
  */
-#define MULTILANG
+// #define MULTILANG
 
 /**
  * Toggles for individual languages. Only works when MULTILANG is enabled.
