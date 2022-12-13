@@ -1131,7 +1131,7 @@ LangArray textEndCutscene1 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "マリオ！！",
-    "¡MARIO!");
+    "¡Mario!");
 
 LangArray textEndCutscene2 = DEFINE_LANGUAGE_ARRAY(
     "The power of the Stars is restored to the castle...",
