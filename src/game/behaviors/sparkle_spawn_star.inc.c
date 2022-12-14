@@ -16,8 +16,12 @@ void bhv_spawned_star_init(void) {
     if (!(o->oInteractionSubtype & INT_SUBTYPE_NO_EXIT)) {
         o->oBehParams = o->parentObj->oBehParams;
     }
-    s32 param = GET_BPARAM1(o->oBehParams);
+    u8 param = GET_BPARAM1(o->oBehParams);
+#ifdef GLOBAL_STAR_IDS
+    if ((1 << (param % 7)) & save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(param / 7))) {
+#else
     if ((1 << param) & save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum))) {
+#endif
         cur_obj_set_model(MODEL_TRANSPARENT_STAR);
     }
 
@@ -32,11 +36,17 @@ void set_sparkle_spawn_star_hitbox(void) {
     }
 }
 
-void set_home_to_mario(void) {
+void spawned_star_set_target_above_mario(void) {
     vec3f_copy_y_off(&o->oHomeVec, &gMarioObject->oPosVec, 250.0f);
 
-    o->oPosY = o->oHomeY;
+    // Check that the star isn't clipping inside the ceiling
+    if (gMarioState->ceil != NULL) {
+        if (o->oHomeY > (gMarioState->ceilHeight - 50)) {
+            o->oHomeY = gMarioState->ceilHeight - 50;
+        }
+    }
 
+    o->oPosY = o->oHomeY; 
     f32 lateralDist;
     vec3f_get_lateral_dist(&o->oPosVec, &o->oHomeVec, &lateralDist);
 
@@ -62,7 +72,7 @@ void bhv_spawned_star_loop(void) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
             o->oAngleVelYaw = 0x800;
             if (o->oBehParams2ndByte == SPAWN_STAR_POS_CUTSCENE_BP_SPAWN_AT_MARIO) {
-                set_home_to_mario();
+                spawned_star_set_target_above_mario();             
             } else {
                 set_y_home_to_pos();
             }

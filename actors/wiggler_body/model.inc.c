@@ -36,22 +36,10 @@ ALIGNED8 static const Texture wiggler_seg5_texture_0500A230[] = {
 };
 
 // 0x0500B230
-static const Lights1 wiggler_seg5_lights_0500B230 = gdSPDefLights1(
-    0x37, 0x00, 0x00,
-    0xdf, 0x00, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x0500B248
-static const Lights1 wiggler_seg5_lights_0500B248 = gdSPDefLights1(
-    0x39, 0x11, 0x00,
-    0xe7, 0x47, 0x00, 0x28, 0x28, 0x28
-);
 
 // Unreferenced light group
-UNUSED static const Lights1 wiggler_body_lights_unused = gdSPDefLights1(
-    0x3a, 0x22, 0x05,
-    0xea, 0x8b, 0x16, 0x28, 0x28, 0x28
-);
 
 // 0x0500B278
 static const Vtx wiggler_seg5_vertex_0500B278[] = {
@@ -267,8 +255,8 @@ static const Vtx wiggler_seg5_vertex_0500BBC8[] = {
 
 // 0x0500BCB8 - 0x0500BE10
 const Gfx wiggler_seg5_dl_0500BCB8[] = {
-    gsSPLight(&wiggler_seg5_lights_0500B230.l, 1),
-    gsSPLight(&wiggler_seg5_lights_0500B230.a, 2),
+    gsSPLightColor(LIGHT_1, 0xdf0000ff),
+    gsSPLightColor(LIGHT_2, 0x370000ff),
     gsSPVertex(wiggler_seg5_vertex_0500B278, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -296,8 +284,8 @@ const Gfx wiggler_seg5_dl_0500BCB8[] = {
 
 // 0x0500BE10 - 0x0500BE98
 const Gfx wiggler_seg5_dl_0500BE10[] = {
-    gsSPLight(&wiggler_seg5_lights_0500B248.l, 1),
-    gsSPLight(&wiggler_seg5_lights_0500B248.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe74700ff),
+    gsSPLightColor(LIGHT_2, 0x391100ff),
     gsSPVertex(wiggler_seg5_vertex_0500B5B8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -311,8 +299,8 @@ const Gfx wiggler_seg5_dl_0500BE10[] = {
 
 // 0x0500BE98 - 0x0500BF20
 const Gfx wiggler_seg5_dl_0500BE98[] = {
-    gsSPLight(&wiggler_seg5_lights_0500B248.l, 1),
-    gsSPLight(&wiggler_seg5_lights_0500B248.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe74700ff),
+    gsSPLightColor(LIGHT_2, 0x391100ff),
     gsSPVertex(wiggler_seg5_vertex_0500B6A8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -326,8 +314,8 @@ const Gfx wiggler_seg5_dl_0500BE98[] = {
 
 // 0x0500BF20 - 0x0500C078
 const Gfx wiggler_seg5_dl_0500BF20[] = {
-    gsSPLight(&wiggler_seg5_lights_0500B230.l, 1),
-    gsSPLight(&wiggler_seg5_lights_0500B230.a, 2),
+    gsSPLightColor(LIGHT_1, 0xdf0000ff),
+    gsSPLightColor(LIGHT_2, 0x370000ff),
     gsSPVertex(wiggler_seg5_vertex_0500B798, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -355,8 +343,8 @@ const Gfx wiggler_seg5_dl_0500BF20[] = {
 
 // 0x0500C078 - 0x0500C100
 const Gfx wiggler_seg5_dl_0500C078[] = {
-    gsSPLight(&wiggler_seg5_lights_0500B248.l, 1),
-    gsSPLight(&wiggler_seg5_lights_0500B248.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe74700ff),
+    gsSPLightColor(LIGHT_2, 0x391100ff),
     gsSPVertex(wiggler_seg5_vertex_0500BAD8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -370,8 +358,8 @@ const Gfx wiggler_seg5_dl_0500C078[] = {
 
 // 0x0500C100 - 0x0500C188
 const Gfx wiggler_seg5_dl_0500C100[] = {
-    gsSPLight(&wiggler_seg5_lights_0500B248.l, 1),
-    gsSPLight(&wiggler_seg5_lights_0500B248.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe74700ff),
+    gsSPLightColor(LIGHT_2, 0x391100ff),
     gsSPVertex(wiggler_seg5_vertex_0500BBC8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),

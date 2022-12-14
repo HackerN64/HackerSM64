@@ -4,28 +4,12 @@
 UNUSED static const u64 small_key_unused_1 = 0;
 
 // 0x05005798
-static const Lights1 small_key_seg5_lights_05005798 = gdSPDefLights1(
-    0x3f, 0x19, 0x0c,
-    0xff, 0x64, 0x32, 0x28, 0x28, 0x28
-);
 
 // 0x050057B0
-static const Lights1 small_key_seg5_lights_050057B0 = gdSPDefLights1(
-    0x0c, 0x3f, 0x19,
-    0x32, 0xff, 0x64, 0x28, 0x28, 0x28
-);
 
 // 0x050057C8
-static const Lights1 small_key_seg5_lights_050057C8 = gdSPDefLights1(
-    0x0c, 0x19, 0x3f,
-    0x32, 0x64, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x050057E0
-static const Lights1 small_key_seg5_lights_050057E0 = gdSPDefLights1(
-    0x33, 0x3f, 0x00,
-    0xcc, 0xff, 0x00, 0x28, 0x28, 0x28
-);
 
 // align
 UNUSED static const u64 small_key_unused_2 = 0;
@@ -404,24 +388,28 @@ const Gfx small_key_seg5_dl_05006700[] = {
 
 // 0x05006A08 - 0x05006A28
 const Gfx small_key_seg5_dl_05006A08[] = {
-    gsSPSetLights1(small_key_seg5_lights_050057C8),
+    gsSPLightColor(LIGHT_1, 0x3264ffff),
+    gsSPLightColor(LIGHT_2, 0xc193fff),
     gsSPBranchList(small_key_seg5_dl_05006700),
 };
 
 // 0x05006A28 - 0x05006A48
 const Gfx small_key_seg5_dl_05006A28[] = {
-    gsSPSetLights1(small_key_seg5_lights_050057B0),
+    gsSPLightColor(LIGHT_1, 0x32ff64ff),
+    gsSPLightColor(LIGHT_2, 0xc3f19ff),
     gsSPBranchList(small_key_seg5_dl_05006700),
 };
 
 // 0x05006A48 - 0x05006A68
 const Gfx small_key_seg5_dl_05006A48[] = {
-    gsSPSetLights1(small_key_seg5_lights_05005798),
+    gsSPLightColor(LIGHT_1, 0xff6432ff),
+    gsSPLightColor(LIGHT_2, 0x3f190cff),
     gsSPBranchList(small_key_seg5_dl_05006700),
 };
 
 // 0x05006A68 - 0x05006A88
 const Gfx small_key_seg5_dl_05006A68[] = {
-    gsSPSetLights1(small_key_seg5_lights_050057E0),
+    gsSPLightColor(LIGHT_1, 0xccff00ff),
+    gsSPLightColor(LIGHT_2, 0x333f00ff),
     gsSPBranchList(small_key_seg5_dl_05006700),
 };

@@ -117,7 +117,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
 #ifdef VISUAL_DEBUG
     vec3f_set(debugPos[0], light->pos[0][0], light->pos[0][1], light->pos[0][2]);
     vec3f_set(debugPos[1], light->pos[1][0], light->pos[1][1], light->pos[1][2]);
-    debug_box_color(0x08FF00FF);
+    debug_box_color(0xFF00FF08);
     if (light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
         debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT);
     } else {

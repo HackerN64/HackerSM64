@@ -146,7 +146,7 @@ const LevelScript level_jrb_entry[] = {
         WARP_NODE(/*id*/ 0xF3, /*destLevel*/ LEVEL_JRB, /*destArea*/ 0x02, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x35, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x67, /*flags*/ WARP_NO_CHECKPOINT),
-        WHIRLPOOL(/*unk2*/ 0, /*unk3*/ 3, /*pos*/ 4979, -5222, 2482, /*strength*/ -30),
+        WHIRLPOOL(/*index*/ 0, /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6, /*pos*/ 4979, -5222, 2482, /*strength*/ -30),
         JUMP_LINK(script_func_local_1),
         JUMP_LINK(script_func_local_2),
         JUMP_LINK(script_func_local_3),
