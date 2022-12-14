@@ -54,7 +54,7 @@
 /**
  * Enables or disables the error buzz sound when trying to move the camera when it's not possible to do so
  */
-#define CAMERA_ERROR_SOUND
+// #define CAMERA_ERROR_SOUND
 
 /**
  * Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
