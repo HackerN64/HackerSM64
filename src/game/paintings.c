@@ -185,8 +185,9 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, Pai
  *
  * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(const PaintingData *triangleData, PaintingData numTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
+void painting_calculate_triangle_normals(const PaintingData *triangleData, struct PaintingNeighborTris *neighborTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
     PaintingData i, j;
+    PaintingData numTris = triangleData[0];
     s16 vi[3]; // Vertex indices
     Vec3f vp[3]; // Vertex positions
 
@@ -196,6 +197,10 @@ void painting_calculate_triangle_normals(const PaintingData *triangleData, Paint
         vec3s_copy(vi, &triangleData[tri]);
         for (j = 0; j < 3; j++) {
             vec3s_to_vec3f(vp[j], paintingMesh[vi[j]].pos);
+            struct PaintingNeighborTris *vtn = &neighborTris[vi[j]];
+            if (vtn->numNeighbors < ARRAY_COUNT(vtn->neighborTris)) {
+                vtn->neighborTris[vtn->numNeighbors++] = i;
+            }
         }
 
         // Cross product to find each triangle's normal vector.
@@ -218,24 +223,22 @@ void painting_calculate_triangle_normals(const PaintingData *triangleData, Paint
  *
  * The table used in game, painting_data_mesh_neighbor_tris, is in bin/segment2.c.
  */
-void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
+void painting_average_vertex_normals(struct PaintingNeighborTris *neighborTris, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
     PaintingData tri;
     PaintingData i, j;
     PaintingData numNeighbors;
-    PaintingData entry = 0;
 
     for (i = 0; i < numVtx; i++) {
         Vec3f n = { 0.0f, 0.0f, 0.0f };
 
         // The first number of each entry is the number of adjacent tris.
-        numNeighbors = neighborTris[entry];
+        struct PaintingNeighborTris *vtn = &neighborTris[i];
+        numNeighbors = vtn->numNeighbors;
+
         for (j = 0; j < numNeighbors; j++) {
-            tri = neighborTris[entry + 1 + j];
+            tri = vtn->neighborTris[j];
             vec3f_add(n, paintingTriNorms[tri]);
         }
-
-        // Move to the next vertex's entry
-        entry += (1 + numNeighbors);
 
         // Average the surface normals from each neighboring tri.
         vec3_div_val(n, numNeighbors);
@@ -453,9 +456,8 @@ void painting_setup_textures(Gfx **gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
 /**
  * Ripple a painting that has 1 or more images that need to be mapped.
  */
-Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct PaintingMeshVertex *paintingMesh) {
+Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct PaintingMeshVertex *paintingMesh, const PaintingData *triangleMap) {
     s16 i;
-    const PaintingData *triangleMap = NULL;
     s16 imageCount = paintingImage->imageCount;
     s16 tWidth = paintingImage->textureWidth;
     s16 tHeight = paintingImage->textureHeight;
@@ -485,20 +487,15 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     Gfx *beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
     gSPDisplayList(gfx++, beginDl);
 
-    //! TODO: Automatically create triangle maps based on the image count.
-    const PaintingData **triangleMaps = NULL;
-    switch (imageCount) {
-        case 1: triangleMaps = segmented_to_virtual(painting_data_triangles_1_array); break;
-        case 2: triangleMaps = segmented_to_virtual(painting_data_triangles_2_array); break;
-    }
-
     painting_setup_textures(&gfx, tWidth, tHeight, isEnvMap);
 
+    PaintingData numTris = (triangleMap[0] / imageCount);
     // Map each image to the mesh's vertices.
     for (i = 0; i < imageCount; i++) {
-        triangleMap = segmented_to_virtual(triangleMaps[i]);
         // Render a section of the painting.
-        gSPDisplayList(gfx++, render_painting_segment(tArray[i], i, imageCount, tWidth, tHeight, paintingMesh, triangleMap, triangleMap[0], paintingImage->alpha));
+        gSPDisplayList(gfx++, render_painting_segment(tArray[i], i, imageCount, tWidth, tHeight, paintingMesh, triangleMap, numTris, paintingImage->alpha));
+
+        triangleMap += (numTris * 3);
     }
 
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
@@ -516,28 +513,32 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
 Gfx *display_painting_rippling(struct Object *obj) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
     const PaintingData *vtxData = segmented_to_virtual(painting_data_vertices);
-    const PaintingData *triangleData = segmented_to_virtual(painting_data_triangles_1);
-    const PaintingData *neighborTris = segmented_to_virtual(painting_data_mesh_neighbor_tris);
+    const PaintingData *triangleData = segmented_to_virtual(painting_data_triangles);
     PaintingData numVtx = vtxData[0];
     PaintingData numTris = triangleData[0];
     Gfx *dlist = NULL;
     // When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
     // This mesh only contains the vertex positions and normals.
     // Paintings use an additional array to map textures to the mesh.
+    //! TODO: Find out why clearing this causes flickering.
     struct PaintingMeshVertex *paintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
+    // A list of neighbor triangles for each vertes. This gets cleared each frame while 'paintingMesh' isn't.
+    struct PaintingNeighborTris *neighborTris = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingNeighborTris)));
+    bzero(neighborTris, (numVtx * sizeof(struct PaintingNeighborTris)));
     // The painting's surface normals, used to approximate each of the vertex normals (for gouraud shading).
     Vec3f *paintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
 
     // Generate the mesh and its lighting data
     painting_generate_mesh(obj, vtxData, numVtx, paintingMesh);
-    painting_calculate_triangle_normals(triangleData, numTris, paintingMesh, paintingTriNorms);
+    painting_calculate_triangle_normals(triangleData, neighborTris, paintingMesh, paintingTriNorms);
     painting_average_vertex_normals(neighborTris, numVtx, paintingMesh, paintingTriNorms);
 
     // Map the painting's texture depending on the painting's texture type.
-    dlist = dl_painting_rippling(paintingImage, paintingMesh);
+    dlist = dl_painting_rippling(paintingImage, paintingMesh, triangleData);
 
     // The mesh data is freed every frame.
     mem_pool_free(gEffectsMemoryPool, paintingMesh);
+    mem_pool_free(gEffectsMemoryPool, neighborTris);
     mem_pool_free(gEffectsMemoryPool, paintingTriNorms);
 
     return dlist;

@@ -139,6 +139,15 @@ struct PaintingMeshVertex {
     /*0x06*/ Vec3c norm;
 }; /*0x0C*/
 
+/**
+ * Lists the neighboring triangles for each vertex in the mesh.
+ * Used when applying gouraud shading to the generated ripple mesh.
+ */
+struct PaintingNeighborTris {
+    /*0x00*/ s16 numNeighbors;
+    /*0x02*/ s16 neighborTris[9];
+}; /*0x14*/
+
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 
