@@ -45,7 +45,7 @@ extern Gfx dl_paintings_textured_vertex_colored_begin[];
 extern Gfx dl_paintings_textured_end[];
 extern Gfx dl_paintings_env_mapped_begin[];
 extern Gfx dl_paintings_env_mapped_end[];
-extern PaintingData painting_data_mesh[];
+extern PaintingData painting_data_vertices[];
 extern PaintingData painting_data_mesh_neighbor_tris[];
 extern PaintingData painting_data_triangles_1[];
 extern PaintingData *const painting_data_triangles_1_array[];

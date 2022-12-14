@@ -29,7 +29,7 @@
  *
  * The ripple effect uses data that is split into several parts:
  *      In bin/segment2.c:
- *          painting_data_mesh: The mesh positions are generated from a base mesh.
+ *          painting_data_vertices: The mesh positions are generated from a base mesh.
  *          painting_data_mesh_neighbor_tris: The lighting for the ripple is also generated from a base table.
  *          Each painting's texture uses yet another table to determine the order to map its texture to the mesh.
  *      In levels/[LEVEL]/painting.inc.c:
@@ -112,7 +112,7 @@ const struct RippleAnimationPair sRippleAnimations[] = {
  *      vN x, vN y, movable
  *      Where x and y are from 0 to PAINTING_SIZE, movable is 0 or 1.
  *
- * The mesh used in game, painting_data_mesh, is in bin/segment2.c.
+ * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
 void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
@@ -183,7 +183,7 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, Pa
  *      triN v0, triN v1, triN v2
  *      Where each v0, v1, v2 is an index into the first list in `mesh`.
  *
- * The mesh used in game, painting_data_mesh, is in bin/segment2.c.
+ * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
 void painting_calculate_triangle_normals(const PaintingData *meshData, PaintingData numTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
     PaintingData i;
@@ -515,7 +515,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
  */
 Gfx *display_painting_rippling(struct Object *obj) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    const PaintingData *meshData = segmented_to_virtual(painting_data_mesh);
+    const PaintingData *meshData = segmented_to_virtual(painting_data_vertices);
     const PaintingData *triangleData = segmented_to_virtual(painting_data_triangles_1);
     const PaintingData *neighborTris = segmented_to_virtual(painting_data_mesh_neighbor_tris);
     PaintingData numVtx = meshData[0];
