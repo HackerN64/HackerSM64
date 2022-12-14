@@ -1922,12 +1922,10 @@ const Gfx dl_menu_texture_niveau_upper[] = {
 #endif
 
 #ifdef ENABLE_GERMAN
-// 0x0700DDA0 - 0x0700EDA0
 ALIGNED8 static const Texture texture_menu_kurs_upper[] = {
 #include "levels/menu/main_menu_seg7.kurs_upper.rgba16.inc.c"
 };
 
-// 0x0700FF10 - 0x0700FF20
 const Gfx dl_menu_texture_kurs_upper[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_menu_kurs_upper),
     gsSPEndDisplayList(),
