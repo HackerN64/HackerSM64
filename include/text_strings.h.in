@@ -5,9 +5,7 @@
 
 #if defined(PUPPYCAM)
 #define NC_CAMX_EN 				_("Camera Sensitivity")
-#define NC_CAMY_EN 				_("Camera Y Sensitivity")
 #define NC_INVERTX_EN			_("Invert Camera")
-#define NC_INVERTY_EN			_("Invert Y Axis")
 #define NC_CAMC_EN 				_("Camera Auto Turn")
 #define NC_ANALOGUE_EN			_("Analogue Camera")
 #define NC_SCHEME_EN			_("Control Scheme")
@@ -26,9 +24,7 @@
 
 #if MULTILANG
 #define NC_CAMX_FR 				_("Sensibilite")
-#define NC_CAMY_FR 				_("Sensibilite sur l'axe Y")
 #define NC_INVERTX_FR			_("Camera invertir")
-#define NC_INVERTY_FR			_("Invertir Axe Y")
 #define NC_CAMC_FR 				_("Vitesse de Centrage")
 #define NC_ANALOGUE_FR			_("Camera Analogue")
 #define NC_SCHEME_FR			_("Control Scheme")
@@ -44,9 +40,7 @@
 #define NC_OPTION_FR 			_("OPTIONS")
 
 #define NC_CAMX_DE 				_("Camera Sensitivity")
-#define NC_CAMY_DE 				_("Camera Y Sensitivity")
-#define NC_INVERTY_DE			_("Invert Camera")
-#define NC_INVERTX_DE			_("Invert X Axis")
+#define NC_INVERTX_DE			_("Invert Camera")
 #define NC_CAMC_DE 				_("Camera Centre Speed")
 #define NC_ANALOGUE_DE			_("Analogue Camera")
 #define NC_SCHEME_DE			_("Control Scheme")

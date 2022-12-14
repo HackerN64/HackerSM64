@@ -55,14 +55,14 @@ struct MemoryPool *gPuppyMemoryPool;
 s32 gPuppyError = 0;
 
 #if defined(VERSION_EU)
-static unsigned char  gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};
-static unsigned char  gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_CAMY_DE}, {NC_INVERTX_DE}, {NC_INVERTY_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE}, {OPTION_LANGUAGE_DE}};
+static unsigned char  gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_INVERTX_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};
+static unsigned char  gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_INVERTX_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE}, {OPTION_LANGUAGE_DE}};
 static unsigned char  gPCFlagStringsFR[][64] = {{OPTION_DISABLED_FR}, {OPTION_ENABLED_FR}, {OPTION_SCHEME1_FR}, {OPTION_SCHEME2_FR}, {OPTION_SCHEME3_FR}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN},};
 static unsigned char  gPCFlagStringsDE[][64] = {{OPTION_DISABLED_DE}, {OPTION_ENABLED_DE}, {OPTION_SCHEME1_DE}, {OPTION_SCHEME2_DE}, {OPTION_SCHEME3_DE}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN},};
 static unsigned char  gPCToggleStringsFR[][64] = {{NC_BUTTON_FR}, {NC_BUTTON2_FR}, {NC_OPTION_FR}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 static unsigned char  gPCToggleStringsDE[][64] = {{NC_BUTTON_DE}, {NC_BUTTON2_DE}, {NC_OPTION_DE}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 #endif
-static unsigned char  gPCOptionStringsEN[][64] = {{NC_ANALOGUE_EN}, {NC_CAMX_EN}, {NC_CAMY_EN}, {NC_INVERTX_EN}, {NC_INVERTY_EN}, {NC_CAMC_EN}, {NC_SCHEME_EN}, {NC_WIDE_EN}, {OPTION_LANGUAGE_EN}};
+static unsigned char  gPCOptionStringsEN[][64] = {{NC_ANALOGUE_EN}, {NC_CAMX_EN}, {NC_INVERTX_EN}, {NC_CAMC_EN}, {NC_SCHEME_EN}, {NC_WIDE_EN}, {OPTION_LANGUAGE_EN}};
 static unsigned char  gPCFlagStringsEN[][64] = {{OPTION_DISABLED_EN}, {OPTION_ENABLED_EN}, {OPTION_SCHEME1_EN}, {OPTION_SCHEME2_EN}, {OPTION_SCHEME3_EN}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN},};
 static unsigned char  gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN}, {NC_OPTION_EN}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 
@@ -85,16 +85,16 @@ struct gPCOptionStruct
 
 static const struct gPCOptionStruct gPCOptions[] = { //If the min and max are 0 and 1, then the value text is used, otherwise it's ignored.
 #ifdef WIDE
-    {/*Option Name*/ 7, /*Option Variable*/ &gConfig.widescreen,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
+    {/*Option Name*/ 5, /*Option Variable*/ &gConfig.widescreen,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
 #endif
 #if MULTILANG
-    {/*Option Name*/ 8, /*Option Variable*/ &gInGameLanguage,       /*Option Value Text Start*/ 4, /*Option Minimum*/ 1, /*Option Maximum*/ 3},
+    {/*Option Name*/ 6, /*Option Variable*/ &gInGameLanguage,       /*Option Value Text Start*/ 4, /*Option Minimum*/ 1, /*Option Maximum*/ 3},
 #endif
     {/*Option Name*/ 0, /*Option Variable*/ &gPuppyCam.options.analogue, /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
-    {/*Option Name*/ 6, /*Option Variable*/ &gPuppyCam.options.inputType, /*Option Value Text Start*/ 2, /*Option Minimum*/ 0, /*Option Maximum*/ 2},
+    {/*Option Name*/ 4, /*Option Variable*/ &gPuppyCam.options.inputType, /*Option Value Text Start*/ 2, /*Option Minimum*/ 0, /*Option Maximum*/ 2},
     {/*Option Name*/ 1, /*Option Variable*/ &gPuppyCam.options.sensitivityX, /*Option Value Text Start*/ 255, /*Option Minimum*/ 1, /*Option Maximum*/ 10},
-    {/*Option Name*/ 3, /*Option Variable*/ &gPuppyCam.options.invertX, /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
-    {/*Option Name*/ 5, /*Option Variable*/ &gPuppyCam.options.turnHelper, /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
+    {/*Option Name*/ 2, /*Option Variable*/ &gPuppyCam.options.invertX, /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
+    {/*Option Name*/ 3, /*Option Variable*/ &gPuppyCam.options.turnHelper, /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
 };
 
 u8 gPCOptionCap = sizeof(gPCOptions) / sizeof(struct gPCOptionStruct); //How many options there are in newcam_uptions.
@@ -544,8 +544,6 @@ static void create_puppycam1_nodes(void) {
         sPuppyVolumeStack[gPuppyVolumeCount]->fov  = 45;
         sPuppyVolumeStack[gPuppyVolumeCount]->area  = newcam_fixedcam[i].newcam_hard_areaID;
         gPuppyVolumeCount++;
-        append_puppyprint_log("X: %d, Y: %d, Z: %d", pos[0], pos[1], pos[2]);
-        append_puppyprint_log("X: %d, Y: %d, Z: %d", diff[0], diff[1], diff[2]);
     }
 }
 
@@ -602,7 +600,7 @@ void puppycam_input_pitch(void) {
 
         // When Mario's moving, his pitch is clamped pretty aggressively, so this exists so you can shift your view up and down momentarily at an actually usable range, rather than the otherwise baby range.
         if (gMarioState->action & ACT_FLAG_MOVING && (gPuppyCam.pitch >= 0x3800 || gPuppyCam.pitch <= 0x2000)) {
-            gPuppyCam.moveFlagAdd = 6;
+            gPuppyCam.movementPitchVel = 6;
         }
     }
 }
@@ -796,7 +794,7 @@ static void puppycam_input_hold(void) {
     gPuppyCam.yawAcceleration = CLAMP(gPuppyCam.yawAcceleration, -100, 100);
 
     gPuppyCam.yawTarget += (12 * gPuppyCam.yawAcceleration * ivX) * (stickMag[0] * 0.01f);
-    gPuppyCam.pitchTarget += ((3 + gPuppyCam.moveFlagAdd) * gPuppyCam.pitchAcceleration) * (stickMag[1] * 0.01f);
+    gPuppyCam.pitchTarget += ((3 + gPuppyCam.movementPitchVel) * gPuppyCam.pitchAcceleration) * (stickMag[1] * 0.01f);
 }
 
 // Handles C Button inputs for modes that have pressed inputs, rather than held.
@@ -837,7 +835,7 @@ static void puppycam_input_press(void) {
     }
     puppycam_input_pitch();
     puppycam_input_centre();
-    gPuppyCam.pitchTarget += ((3 + gPuppyCam.moveFlagAdd) * gPuppyCam.pitchAcceleration) * (stickMag * 0.01f);
+    gPuppyCam.pitchTarget += ((3 + gPuppyCam.movementPitchVel) * gPuppyCam.pitchAcceleration) * (stickMag * 0.01f);
 }
 
 void puppycam_debug_view(void) {
@@ -1172,7 +1170,7 @@ void puppycam_shake(UNUSED s16 x, UNUSED s16 y, UNUSED s16 z) {
 // The centrepiece behind the input side of PuppyCam. The C buttons branch off.
 static void puppycam_input_core(void) {
     puppycam_analogue_stick();
-    gPuppyCam.moveFlagAdd = 0;
+    gPuppyCam.movementPitchVel = 0;
 
     // Decide which input for left and right C buttons to use based on behaviour type.
     if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_NORMAL || gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE) {

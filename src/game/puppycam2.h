@@ -88,7 +88,7 @@ struct gPuppyStruct
     s16 edgePitch;              // Pitch adjustment that's applied when stood near an edge. All pitch adjustment is clamped.
     s16 moveZoom;               // A small zoom value that's added on top of the regular zoom when moving. It's pretty subtle, but gives the feeling of a bit of speed.
     u8  mode3Flags;             // A flagset for classic mode.
-    u8  moveFlagAdd;            // A bit that multiplies movement rate of axes when moving, to centre them faster.
+    u8  movementPitchVel;            // A bit that multiplies movement rate of axes when moving, to centre them faster.
     s16 targetDist[2];          // Used with secondary view targets to smooth out the between status.
     s16 intendedTerrainPitch;   // The pitch that the game wants the game to tilt towards, following the terrain.
     s16 terrainPitch;           // The pitch the game tilts towards, when following terrain inclines.
@@ -214,7 +214,7 @@ extern s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySp
 #define NC_FLAG_POSX PUPPYCAM_BEHAVIOUR_X_MOVEMENT
 #define NC_FLAG_POSY PUPPYCAM_BEHAVIOUR_Y_MOVEMENT
 #define NC_FLAG_POSZ PUPPYCAM_BEHAVIOUR_Z_MOVEMENT
-#define NC_FLAG_COLLISION 
+#define NC_FLAG_COLLISION PUPPYCAM_BEHAVIOUR_COLLISION
 #define NC_FLAG_SLIDECORRECT 0 // Stub
 
 #define NC_MODE_NORMAL 1
