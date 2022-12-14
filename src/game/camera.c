@@ -4551,13 +4551,15 @@ void play_sound_cbutton_down(void) {
 }
 
 void play_sound_cbutton_side(void) {
-#ifdef CAMERA_SOUND
-    play_sound(CAMERA_SOUND, gGlobalSoundSource);
+#ifdef CAMERA_TURN_SOUND
+    play_sound(CAMERA_TURN_SOUND, gGlobalSoundSource);
 #endif
 }
 
 void play_sound_button_change_blocked(void) {
+#ifdef CAMERA_ERROR_SOUND
     play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
+#endif
 }
 
 void play_sound_rbutton_changed(void) {

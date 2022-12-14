@@ -45,11 +45,16 @@
 #define PARALLEL_LAKITU_CAM
 
 /**
- * Decides whether the camera sound is enabled, and which sound it is. 
+ * Decides whether the camera sound that plays when rotating it is enabled, and which sound it is. 
  * If you want the vanilla sound back, set it to SOUND_MENU_CAMERA_TURN
  * Or you can disable the define to turn off the sound entirely.
  */
-#define CAMERA_SOUND SOUND_MENU_MESSAGE_NEXT_PAGE
+#define CAMERA_TURN_SOUND SOUND_MENU_MESSAGE_NEXT_PAGE
+
+/**
+ * Enables or disables the error buzz sound when trying to move the camera when it's not possible to do so
+ */
+#define CAMERA_ERROR_SOUND
 
 /**
  * Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
