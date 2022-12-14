@@ -11,7 +11,7 @@ void bhv_yoshi_init(void) {
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
 
-#if !defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
+#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
     if (sYoshiDead == TRUE) {
 #else
     if ((save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) < 120)
@@ -143,10 +143,12 @@ void yoshi_finish_jumping_and_despawn_loop(void) {
 }
 
 void yoshi_give_present_loop(void) {
-#ifdef ENABLE_LIVES
     s32 globalTimer = gGlobalTimer;
 
-    if (gHudDisplay.lives == MAX_NUM_LIVES) {
+    if (gHudDisplay.lives == 100) {
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(gMarioState->numLives);
+#endif
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
         gSpecialTripleJump = TRUE;
         o->oAction = YOSHI_ACT_WALK_JUMP_OFF_ROOF;
@@ -157,12 +159,6 @@ void yoshi_give_present_loop(void) {
         play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, gGlobalSoundSource);
         gMarioState->numLives++;
     }
-#else
-    play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
-    gSpecialTripleJump = TRUE;
-    o->oAction = YOSHI_ACT_WALK_JUMP_OFF_ROOF;
-    return;
-#endif
 }
 
 void bhv_yoshi_loop(void) {

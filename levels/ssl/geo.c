@@ -22,5 +22,6 @@
 #include "levels/ssl/spindel/geo.inc.c"
 #include "levels/ssl/moving_pyramid_wall/geo.inc.c"
 #include "levels/ssl/pyramid_elevator/geo.inc.c"
+#include "levels/ssl/eyerok_col/geo.inc.c"
 #include "levels/ssl/areas/2/geo.inc.c"
 #include "levels/ssl/areas/3/geo.inc.c"

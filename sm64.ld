@@ -184,8 +184,6 @@ SECTIONS
       lib/PR/audio/n_aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text*);
       _mainSegmentTextEnd = .;
-      /* Overwrite a libultra function with its modified counterpart for GCN controller support */
-      __osContGetInitData = __osContGetInitDataEx;
 
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);

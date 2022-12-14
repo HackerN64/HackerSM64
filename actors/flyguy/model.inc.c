@@ -19,18 +19,46 @@ ALIGNED8 static const Texture flyguy_seg8_texture_0800F888[] = {
 };
 
 // Unreferenced light group
+UNUSED static const Lights1 flyguy_lights_unused1 = gdSPDefLights1(
+    0x3f, 0x3f, 0x3f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x080100A0
+static const Lights1 flyguy_seg8_lights_080100A0 = gdSPDefLights1(
+    0x00, 0x1f, 0x33,
+    0x02, 0x7f, 0xcc, 0x28, 0x28, 0x28
+);
 
 // 0x080100B8
+static const Lights1 flyguy_seg8_lights_080100B8 = gdSPDefLights1(
+    0x3f, 0x32, 0x08,
+    0xff, 0xc8, 0x23, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 flyguy_lights_unused2 = gdSPDefLights1(
+    0x3a, 0x2f, 0x04,
+    0xe8, 0xbd, 0x13, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 flyguy_lights_unused3 = gdSPDefLights1(
+    0x2c, 0x00, 0x00,
+    0xb2, 0x00, 0x00, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 flyguy_lights_unused4 = gdSPDefLights1(
+    0x3f, 0x3f, 0x3f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 flyguy_lights_unused5 = gdSPDefLights1(
+    0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x28, 0x28, 0x28
+);
 
 // 0x08010130
 static const Vtx flyguy_seg8_vertex_08010130[] = {
@@ -183,8 +211,8 @@ static const Vtx flyguy_seg8_vertex_08010770[] = {
 
 // 0x08010840 - 0x08010968
 const Gfx flyguy_seg8_dl_08010840[] = {
-    gsSPLightColor(LIGHT_1, 0x27fccff),
-    gsSPLightColor(LIGHT_2, 0x1f33ff),
+    gsSPLight(&flyguy_seg8_lights_080100A0.l, 1),
+    gsSPLight(&flyguy_seg8_lights_080100A0.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010130, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  6,  8,  9, 0x0),
@@ -210,8 +238,8 @@ const Gfx flyguy_seg8_dl_08010840[] = {
 
 // 0x08010968 - 0x08010A90
 const Gfx flyguy_seg8_dl_08010968[] = {
-    gsSPLightColor(LIGHT_1, 0x27fccff),
-    gsSPLightColor(LIGHT_2, 0x1f33ff),
+    gsSPLight(&flyguy_seg8_lights_080100A0.l, 1),
+    gsSPLight(&flyguy_seg8_lights_080100A0.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010460, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -237,8 +265,8 @@ const Gfx flyguy_seg8_dl_08010968[] = {
 
 // 0x08010A90 - 0x08010AE0
 const Gfx flyguy_seg8_dl_08010A90[] = {
-    gsSPLightColor(LIGHT_1, 0xffc823ff),
-    gsSPLightColor(LIGHT_2, 0x3f3208ff),
+    gsSPLight(&flyguy_seg8_lights_080100B8.l, 1),
+    gsSPLight(&flyguy_seg8_lights_080100B8.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010770, 13, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  0,  2, 0x0,  7,  8,  9, 0x0),
@@ -247,6 +275,10 @@ const Gfx flyguy_seg8_dl_08010A90[] = {
 };
 
 // 0x08010AE0
+static const Lights1 flyguy_seg8_lights_08010AE0 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x08010AF8
 static const Vtx flyguy_seg8_vertex_08010AF8[] = {
@@ -261,8 +293,8 @@ const Gfx flyguy_seg8_dl_08010B38[] = {
     gsDPSetTextureImage(G_IM_FMT_IA, G_IM_SIZ_16b, 1, flyguy_seg8_texture_0800F888),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&flyguy_seg8_lights_08010AE0.l, 1),
+    gsSPLight(&flyguy_seg8_lights_08010AE0.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010AF8, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSPEndDisplayList(),
@@ -287,10 +319,22 @@ const Gfx flyguy_seg8_dl_08010B80[] = {
 };
 
 // 0x08010BF0
+static const Lights1 flyguy_seg8_lights_08010BF0 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x08010C08
+static const Lights1 flyguy_seg8_lights_08010C08 = gdSPDefLights1(
+    0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x28, 0x28, 0x28
+);
 
 // 0x08010C20
+static const Lights1 flyguy_seg8_lights_08010C20 = gdSPDefLights1(
+    0x62, 0x00, 0x13,
+    0xc4, 0x00, 0x26, 0x28, 0x28, 0x28
+);
 
 // 0x08010C38
 static const Vtx flyguy_seg8_vertex_08010C38[] = {
@@ -456,8 +500,8 @@ const Gfx flyguy_seg8_dl_080113A8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, flyguy_seg8_texture_0800F088),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&flyguy_seg8_lights_08010BF0.l, 1),
+    gsSPLight(&flyguy_seg8_lights_08010BF0.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010C38, 9, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  1,  0, 0x0,  2,  5,  0, 0x0),
@@ -471,12 +515,12 @@ const Gfx flyguy_seg8_dl_08011420[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, flyguy_seg8_texture_0800E088),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xff),
-    gsSPLightColor(LIGHT_2, 0xff),
+    gsSPLight(&flyguy_seg8_lights_08010C08.l, 1),
+    gsSPLight(&flyguy_seg8_lights_08010C08.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010CC8, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-    gsSPLightColor(LIGHT_1, 0xc40026ff),
-    gsSPLightColor(LIGHT_2, 0x620013ff),
+    gsSPLight(&flyguy_seg8_lights_08010C20.l, 1),
+    gsSPLight(&flyguy_seg8_lights_08010C20.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08010D28, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  4, 0x0),
     gsSP2Triangles( 1,  5,  3, 0x0,  1,  4,  2, 0x0),
@@ -525,8 +569,8 @@ const Gfx flyguy_seg8_dl_08011420[] = {
 
 // 0x080116D0 - 0x08011710
 const Gfx flyguy_seg8_dl_080116D0[] = {
-    gsSPLightColor(LIGHT_1, 0xff),
-    gsSPLightColor(LIGHT_2, 0xff),
+    gsSPLight(&flyguy_seg8_lights_08010C08.l, 1),
+    gsSPLight(&flyguy_seg8_lights_08010C08.a, 2),
     gsSPVertex(flyguy_seg8_vertex_08011348, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 1,  4,  2, 0x0,  1,  5,  4, 0x0),

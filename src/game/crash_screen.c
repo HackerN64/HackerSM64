@@ -425,7 +425,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 #if ENABLE_RUMBLE
                 block_until_rumble_pak_free();
 #endif
-                osContStartReadDataEx(&gSIEventMesgQueue);
+                osContStartReadData(&gSIEventMesgQueue);
             }
             read_controller_inputs(THREAD_2_CRASH_SCREEN);
             draw_crash_screen(thread);

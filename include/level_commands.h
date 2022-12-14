@@ -82,7 +82,7 @@ enum LevelActs {
     ACT_4 = (1 << 3),
     ACT_5 = (1 << 4),
     ACT_6 = (1 << 5),
-    ALL_ACTS = (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    ALL_ACTS = (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6)
 };
 
 enum LevelCommandEvalOperation {
@@ -112,6 +112,13 @@ enum LevelCommandVar {
 enum WarpCheckpointFlags {
     WARP_NO_CHECKPOINT = (0 << 0), // 0x00
     WARP_CHECKPOINT    = (1 << 7), // 0x80
+};
+
+enum LevelCommandCreateWhirlpoolCondition {
+    WHIRLPOOL_COND_ALWAYS,
+    WHIRLPOOL_COND_BOWSER2_NOT_BEATEN,
+    WHIRLPOOL_COND_BOWSER2_BEATEN,
+    WHIRLPOOL_COND_AT_LEAST_SECOND_STAR
 };
 
 // Head defines
@@ -354,7 +361,7 @@ enum GoddardScene {
     CMD_W(model)
 
 #define OBJECT(model, posX, posY, posZ, angleX, angleY, angleZ, behParam, beh) \
-    OBJECT_WITH_ACTS(model, posX, posY, posZ, angleX, angleY, angleZ, behParam, beh, ALL_ACTS)
+    OBJECT_WITH_ACTS(model, posX, posY, posZ, angleX, angleY, angleZ, behParam, beh, 0x1F)
 
 #define MARIO(model, behArg, beh) \
     CMD_BBH(LEVEL_CMD_INIT_MARIO, 0x0C, model), \
@@ -370,10 +377,9 @@ enum GoddardScene {
     CMD_BBBB(destArea, destNode, flags, 0x00)
 
 #define INSTANT_WARP(index, destArea, displaceX, displaceY, displaceZ) \
-    CMD_BBBB(LEVEL_CMD_CREATE_INSTANT_WARP, 0x10, index, destArea), \
-    CMD_W(displaceX), \
-    CMD_W(displaceY), \
-    CMD_W(displaceZ)
+    CMD_BBBB(LEVEL_CMD_CREATE_INSTANT_WARP, 0x0C, index, destArea), \
+    CMD_HH(displaceX, displaceY), \
+    CMD_HH(displaceZ, 0x0000)
 
 #define LOAD_AREA(area) \
     CMD_BBBB(LEVEL_CMD_LOAD_AREA, 0x04, area, 0x00)
@@ -440,8 +446,8 @@ enum GoddardScene {
     CMD_HH(unk6, unk8), \
     CMD_HH(unk10, 0x0000)
 
-#define WHIRLPOOL(index, acts, posX, posY, posZ, strength) \
-    CMD_BBBB(LEVEL_CMD_CREATE_WHIRLPOOL, 0x0C, index, acts), \
+#define WHIRLPOOL(index, condition, posX, posY, posZ, strength) \
+    CMD_BBBB(LEVEL_CMD_CREATE_WHIRLPOOL, 0x0C, index, condition), \
     CMD_HH(posX, posY), \
     CMD_HH(posZ, strength)
 

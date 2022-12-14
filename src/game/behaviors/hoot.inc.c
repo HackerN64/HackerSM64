@@ -68,7 +68,7 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
 
 void hoot_player_set_yaw(void) {
 #ifdef HOOT_YAW_FIX
-    s16 turnSpeed  = gMarioState->intendedMag * 0x20;
+    Angle turnSpeed  = gMarioState->intendedMag * 0x20;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, gMarioState->intendedYaw, turnSpeed);
 #else
     s16 stickX = gPlayer3Controller->rawStickX;
@@ -193,7 +193,7 @@ void hoot_action_loop(void) {
 }
 
 void hoot_turn_to_home(void) {
-    s16 pitchToHome, yawToHome;
+    Angle pitchToHome, yawToHome;
     vec3f_get_angle(&o->oPosVec, &o->oHomeVec, &pitchToHome, &yawToHome);
 
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, yawToHome, 0x140);

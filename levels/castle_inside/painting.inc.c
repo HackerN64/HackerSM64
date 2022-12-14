@@ -1,6 +1,10 @@
 #include "game/paintings.h"
 
 // 0x07021800 - 0x07021818
+static const Lights1 inside_castle_seg7_lights_07021800 = gdSPDefLights1(
+    0x50, 0x50, 0x50,
+    0xff, 0xff, 0xff, 0x32, 0x32, 0x32
+);
 
 // 0x07021818 - 0x07021898
 static const Vtx inside_castle_seg7_vertex_07021818[] = {
@@ -67,8 +71,8 @@ static const Gfx inside_castle_seg7_dl_07021A48[] = {
     gsDPPipeSync(),
     gsSPSetGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x505050ff),
+    gsSPLight(&inside_castle_seg7_lights_07021800.l, 1),
+    gsSPLight(&inside_castle_seg7_lights_07021800.a, 2),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
@@ -561,8 +565,17 @@ UNUSED static const u64 castle_inside_unused_0 = 0x0;
 
 
 // 0x07022528 - 0x07022540
+static const Lights1 inside_castle_seg7_lights_07022528 = gdSPDefLights1(
+    0x50, 0x50, 0x50,
+    0xff, 0xff, 0xff, 0x32, 0x32, 0x32
+);
 
 // 0x07022540 - 0x07022558
+// No gdSPDefLights1 macro defined because of odd different light value (0xff and 0xfa)
+static const Lights1 inside_castle_seg7_lights_07022540 = {
+    {{  {0x40, 0x40, 0x80}, 0, {0x40, 0x40, 0x80}, 0} },
+    {{{ {0x64, 0x64, 0xff}, 0, {0x64, 0x64, 0xfa}, 0, {0x28, 0x28, 0x28},0} }} 
+};
 
 // 0x07022558 - 0x07022598
 static const Vtx inside_castle_seg7_vertex_07022558[] = {
@@ -585,8 +598,8 @@ static const Vtx inside_castle_seg7_vertex_07022598[] = {
 const Gfx inside_castle_seg7_dl_070225D8[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x505050ff),
+    gsSPLight(&inside_castle_seg7_lights_07022528.l, 1),
+    gsSPLight(&inside_castle_seg7_lights_07022528.a, 2),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsSPVertex(inside_castle_seg7_vertex_07022558, 4, 0),
     gsSPEndDisplayList(),
@@ -1274,8 +1287,8 @@ const Gfx inside_castle_seg7_dl_07023520[] = {
 // 0x07023580 - 0x070235B8
 static const Gfx inside_castle_seg7_painting_dl_07023580[] = {
     gsDPPipeSync(),
-    gsSPLightColor(LIGHT_1, 0x6464ffff),
-    gsSPLightColor(LIGHT_2, 0x404080ff),
+    gsSPLight(&inside_castle_seg7_lights_07022540.l, 1),
+    gsSPLight(&inside_castle_seg7_lights_07022540.a, 2),
     gsSPVertex(inside_castle_seg7_vertex_07022598, 4, 0),
     gsSP1Triangle( 0,  1,  2, 0x0),
     gsSP1Triangle( 0,  2,  3, 0x0),

@@ -1124,7 +1124,12 @@ void unref_8017AEDC(struct ObjGroup *grp) {
  * @bug Nothing is returned if the DL is created
  * @note Contains string literals that suggest a removed `printf` call
  */
-void create_shape_gddl(struct ObjShape *s) {
+#ifdef AVOID_UB
+void
+#else
+s32
+#endif
+create_shape_gddl(struct ObjShape *s) {
     struct ObjShape *shape = s; // 24
     s32 shapedl;                // 20
     UNUSED s32 enddl;           // 1C
@@ -1132,7 +1137,11 @@ void create_shape_gddl(struct ObjShape *s) {
     create_shape_mtl_gddls(shape);
     shapedl = gd_startdisplist(7);
     if (shapedl == 0) {
+#ifdef AVOID_UB
         return;
+#else
+        return -1;
+#endif
     }
 
     setup_lights();
@@ -1259,7 +1268,7 @@ static void find_thisface_verts(struct ObjFace *face, struct ObjGroup *vertexGrp
     struct ListNode *node;
 
     for (i = 0; i < face->vtxCount; i++) {
-        // find the vertex or particle whose index in vertexGrp equals face->vertices[i]
+        // find the vertex or particle whose index in vertexGrp equals face->vertices[i] 
         node = vertexGrp->firstMember;
         currIndex = 0;
         while (node != NULL) {

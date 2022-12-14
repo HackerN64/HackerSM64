@@ -1,16 +1,40 @@
 // Monty Mole
 
 // Unreferenced light group
+UNUSED static const Lights1 monty_mole_lights_unused1 = gdSPDefLights1(
+    0x3f, 0x3f, 0x3f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 monty_mole_lights_unused2 = gdSPDefLights1(
+    0x30, 0x1f, 0x00,
+    0xc3, 0x7e, 0x00, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 monty_mole_lights_unused3 = gdSPDefLights1(
+    0x05, 0x04, 0x05,
+    0x16, 0x13, 0x14, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 monty_mole_lights_unused4 = gdSPDefLights1(
+    0x07, 0x08, 0x07,
+    0x1f, 0x20, 0x1f, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 monty_mole_lights_unused5 = gdSPDefLights1(
+    0x14, 0x0b, 0x0a,
+    0x53, 0x2e, 0x28, 0x28, 0x28, 0x28
+);
 
 // Unreferenced light group
+UNUSED static const Lights1 monty_mole_lights_unused6 = gdSPDefLights1(
+    0x3f, 0x3f, 0x3f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05000970
 ALIGNED8 static const Texture monty_mole_seg5_texture_05000970[] = {
@@ -38,6 +62,10 @@ ALIGNED8 static const Texture monty_mole_seg5_texture_05002970[] = {
 };
 
 // 0x05003170
+static const Lights1 monty_mole_seg5_lights_05003170 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05003188
 static const Vtx monty_mole_seg5_vertex_05003188[] = {
@@ -56,8 +84,8 @@ const Gfx monty_mole_seg5_dl_05003208[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05001170),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05003170.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05003170.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05003188, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  3,  4, 0x0),
     gsSP2Triangles( 2,  1,  3, 0x0,  5,  2,  4, 0x0),
@@ -85,6 +113,10 @@ const Gfx monty_mole_seg5_dl_050032A0[] = {
 };
 
 // 0x05003300
+static const Lights1 monty_mole_seg5_lights_05003300 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05003318
 static const Vtx monty_mole_seg5_vertex_05003318[] = {
@@ -117,8 +149,8 @@ const Gfx monty_mole_seg5_dl_05003438[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05002970),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05003300.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05003300.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05003318, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  6,  5,  7, 0x0),
@@ -161,6 +193,10 @@ const Gfx monty_mole_seg5_dl_05003518[] = {
 };
 
 // 0x05003598
+static const Lights1 monty_mole_seg5_lights_05003598 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x050035B0
 static const Vtx monty_mole_seg5_vertex_050035B0[] = {
@@ -199,8 +235,8 @@ const Gfx monty_mole_seg5_dl_05003730[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05002970),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05003598.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05003598.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_050035B0, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 1,  3,  4, 0x0,  1,  4,  5, 0x0),
@@ -244,6 +280,10 @@ const Gfx monty_mole_seg5_dl_05003820[] = {
 };
 
 // 0x050038A0
+static const Lights1 monty_mole_seg5_lights_050038A0 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x050038B8
 static const Vtx monty_mole_seg5_vertex_050038B8[] = {
@@ -262,8 +302,8 @@ const Gfx monty_mole_seg5_dl_05003938[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05001170),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_050038A0.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_050038A0.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_050038B8, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  4, 0x0),
     gsSP2Triangles( 1,  0,  3, 0x0,  1,  5,  2, 0x0),
@@ -291,6 +331,10 @@ const Gfx monty_mole_seg5_dl_050039D0[] = {
 };
 
 // 0x05003A30
+static const Lights1 monty_mole_seg5_lights_05003A30 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05003A48
 static const Vtx monty_mole_seg5_vertex_05003A48[] = {
@@ -323,8 +367,8 @@ const Gfx monty_mole_seg5_dl_05003B68[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05002970),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05003A30.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05003A30.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05003A48, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  6,  5,  7, 0x0),
@@ -367,6 +411,10 @@ const Gfx monty_mole_seg5_dl_05003C48[] = {
 };
 
 // 0x05003CC8
+static const Lights1 monty_mole_seg5_lights_05003CC8 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05003CE0
 static const Vtx monty_mole_seg5_vertex_05003CE0[] = {
@@ -405,8 +453,8 @@ const Gfx monty_mole_seg5_dl_05003E60[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05002970),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05003CC8.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05003CC8.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05003CE0, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  2,  5, 0x0,  2,  3,  5, 0x0),
@@ -450,6 +498,10 @@ const Gfx monty_mole_seg5_dl_05003F50[] = {
 };
 
 // 0x05003FD0
+static const Lights1 monty_mole_seg5_lights_05003FD0 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05003FE8
 static const Vtx monty_mole_seg5_vertex_05003FE8[] = {
@@ -513,8 +565,8 @@ const Gfx monty_mole_seg5_dl_050042B8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05000970),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05003FD0.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05003FD0.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05003FE8, 13, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  3, 0x0,  7,  5,  4, 0x0),
@@ -573,6 +625,10 @@ const Gfx monty_mole_seg5_dl_050044B0[] = {
 };
 
 // 0x05004518
+static const Lights1 monty_mole_seg5_lights_05004518 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05004530
 static const Vtx monty_mole_seg5_vertex_05004530[] = {
@@ -679,8 +735,8 @@ const Gfx monty_mole_seg5_dl_050049B0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05001970),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05004518.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05004518.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05004530, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  4, 0x0),
     gsSP2Triangles( 0,  3,  5, 0x0,  5,  1,  0, 0x0),
@@ -762,6 +818,10 @@ const Gfx monty_mole_seg5_dl_05004C00[] = {
 };
 
 // 0x05004C90
+static const Lights1 monty_mole_seg5_lights_05004C90 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
 
 // 0x05004CA8
 static const Vtx monty_mole_seg5_vertex_05004CA8[] = {
@@ -776,8 +836,8 @@ const Gfx monty_mole_seg5_dl_05004CE8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, monty_mole_seg5_texture_05002170),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
+    gsSPLight(&monty_mole_seg5_lights_05004C90.l, 1),
+    gsSPLight(&monty_mole_seg5_lights_05004C90.a, 2),
     gsSPVertex(monty_mole_seg5_vertex_05004CA8, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPEndDisplayList(),

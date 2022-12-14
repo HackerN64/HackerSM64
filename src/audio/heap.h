@@ -38,14 +38,8 @@ struct SeqOrBankEntry {
 struct PersistentPool {
     /*0x00*/ u32 numEntries;
     /*0x04*/ struct SoundAllocPool pool;
-#ifdef EXPAND_AUDIO_HEAP // TODO: Make this a configurable define rather than using static values
-    /*0x14*/ struct SeqOrBankEntry entries[64];
-    // size = 0x314
-#else
     /*0x14*/ struct SeqOrBankEntry entries[32];
-    // size = 0x194
-#endif
-};
+}; // size = 0x194
 
 struct TemporaryPool {
     /*EU,   SH*/
@@ -70,14 +64,9 @@ struct SoundMultiPool {
     /*     */ u32 pad2[4];
 }; // size = 0x1D0
 
-#ifdef VERSION_SH
 struct Unk1Pool {
     struct SoundAllocPool pool;
-#ifdef EXPAND_AUDIO_HEAP
-    struct SeqOrBankEntry entries[64];
-#else
     struct SeqOrBankEntry entries[32];
-#endif
 };
 
 struct UnkEntry {
@@ -96,7 +85,6 @@ struct UnkPool {
     /*0x510*/ s32 numEntries;
     /*0x514*/ u32 unk514;
 };
-#endif
 
 extern u8 gAudioHeap[];
 extern s16 gVolume;

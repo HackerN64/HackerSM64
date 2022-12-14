@@ -663,11 +663,11 @@ unpack11:
 			jr		ra
         nop
 
-.end Propack_UnpackM2
-
-        .data
+	.data
         .align 4
 
         .word    0,0,0,0,0,0,0,0,0,0,0,0
 mystack:
 	.word    0
+
+	.end

@@ -360,8 +360,6 @@ static void level_cmd_clear_level(void) {
     clear_area_graph_nodes();
     clear_areas();
     main_pool_pop_state();
-    // the game does a push on level load and a pop on level unload, we need to add another push to store state after the level has been loaded, so one more pop is needed
-    main_pool_pop_state();
     unmap_tlbs();
 
     sCurrentCmd = CMD_NEXT;
@@ -388,7 +386,6 @@ static void level_cmd_free_level_pool(void) {
             break;
         }
     }
-    main_pool_push_state();
 
     sCurrentCmd = CMD_NEXT;
 }
@@ -478,7 +475,7 @@ static void level_cmd_init_mario(void) {
 static void level_cmd_place_object(void) {
     if (
         sCurrAreaIndex != -1
-        && (CMD_GET(u8, 2) & (1 << (gCurrActNum - 1)))
+        && ((CMD_GET(u8, 2) & (1 << (gCurrActNum - 1))) || (CMD_GET(u8, 2) == 0x1F))
     ) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo *spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
@@ -540,12 +537,12 @@ static void level_cmd_create_instant_warp(void) {
 
         warp = gAreas[sCurrAreaIndex].instantWarps + CMD_GET(u8, 2);
 
-        warp[0].id = SURFACE_INSTANT_WARP_1B + CMD_GET(u8, 2);
+        warp[0].id = 1;
         warp[0].area = CMD_GET(u8, 3);
 
-        warp[0].displacement[0] = CMD_GET(s32, 4);
-        warp[0].displacement[1] = CMD_GET(s32, 8);
-        warp[0].displacement[2] = CMD_GET(s32, 12);
+        vec3s_set(warp[0].displacement, CMD_GET(s16, 4),
+                                        CMD_GET(s16, 6),
+                                        CMD_GET(s16, 8));
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -606,19 +603,22 @@ static void level_cmd_3A(void) {
 static void level_cmd_create_whirlpool(void) {
     struct Whirlpool *whirlpool;
     s32 index = CMD_GET(u8, 2);
+    s32 beatBowser2 =
+        (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0;
 
-    if (
-        sCurrAreaIndex != -1
-        && index < ARRAY_COUNT(gAreas[sCurrAreaIndex].whirlpools)
-        && (CMD_GET(u8, 3) & (1 << (gCurrActNum - 1)))
-    ) {
-        if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
-            whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));
-            gAreas[sCurrAreaIndex].whirlpools[index] = whirlpool;
+    if (CMD_GET(u8, 3) == WHIRLPOOL_COND_ALWAYS
+        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_NOT_BEATEN   && !beatBowser2)
+        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_BEATEN       && beatBowser2)
+        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_AT_LEAST_SECOND_STAR && gCurrActNum >= 2)) {
+        if (sCurrAreaIndex != -1 && index < 2) {
+            if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
+                whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));
+                gAreas[sCurrAreaIndex].whirlpools[index] = whirlpool;
+            }
+
+            vec3s_set(whirlpool->pos, CMD_GET(s16, 4), CMD_GET(s16, 6), CMD_GET(s16, 8));
+            whirlpool->strength = CMD_GET(s16, 10);
         }
-
-        vec3s_set(whirlpool->pos, CMD_GET(s16, 4), CMD_GET(s16, 6), CMD_GET(s16, 8));
-        whirlpool->strength = CMD_GET(s16, 10);
     }
 
     sCurrentCmd = CMD_NEXT;
