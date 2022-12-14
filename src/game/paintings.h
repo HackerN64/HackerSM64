@@ -30,7 +30,7 @@
 #define TC(t) (((t) - 1) << 5)
 
 
-enum PaintingIDs {
+enum PaintingImageIDs {
     /* Painting ID */
     /*        0x00 */ PAINTING_ID_NULL,
     /*        0x01 */ PAINTING_ID_CASTLE_BOB,
