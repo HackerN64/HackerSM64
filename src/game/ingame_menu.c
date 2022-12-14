@@ -1648,7 +1648,7 @@ LangArray textLakituStop = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "ジュゲム↔ストップ",
-    "LAKITU ↔ PARAR");
+    "LAKITU ↔ FIJA");
 
 LangArray textNormalUpClose = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(UP-CLOSE)",
@@ -1662,7 +1662,7 @@ LangArray textNormalFixed = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(FIXE)",
     "(NORMAL)(STATIV)",
     "（おすすめ）（とまる）",
-    "(NORMAL)(UP-FIJA)");
+    "(NORMAL)(FIJA)");
 
 void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, index, 1, 2);
@@ -1710,7 +1710,7 @@ LangArray textCameraAngleR = DEFINE_LANGUAGE_ARRAY(
     "RÉGLAGE CAMÉRA AVEC Ⓡ",
     "KAMERA MIT Ⓡ VERSTELLEN",
     "Ｒボタンのカメラきりかえ",
-    "ÁNGULO DE CÁMARA AL PULSAR Ⓡ");
+    "MODO DE CÁMARA CON Ⓡ");
 
 void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
