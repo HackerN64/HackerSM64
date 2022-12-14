@@ -15,7 +15,7 @@ ALIGNED8 static const Texture small_font_default[] = {
 #include "textures/segment2/custom_text.i4.inc.c"
 };
 ALIGNED8 static const Texture small_font_outline[] = {
-#include "textures/segment2/custom_text2.i4.inc.c"
+#include "textures/segment2/custom_text2.ia4.inc.c"
 };
 ALIGNED8 static const Texture small_font_plain[] = {
 #include "textures/segment2/custom_text3.i4.inc.c"
@@ -115,7 +115,7 @@ const struct PPTextFont sPPFont_outline = {
     small_font_kerning_outline,
     small_font_offsets_outline,
     NULL,
-    G_IM_FMT_I, G_IM_SIZ_4b,
+    G_IM_FMT_IA, G_IM_SIZ_4b,
     672, 12,
     8, 12
 };
