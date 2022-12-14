@@ -8,20 +8,23 @@
 #include "types.h"
 
 
-/// The default painting edge length.
-#define PAINTING_SIZE 614.0f
+/// The default painting edge length. Default is 614.4f.
+#define PAINTING_SIZE 614.4f
 
-/// The depth of the area in front of the painting which triggers ripples without warping.
-#define PAINTING_WOBBLE_DEPTH 100
+/// The depth of the area in front of the painting which triggers ripples without warping. Default is 102.4f.
+#define PAINTING_WOBBLE_DEPTH 102.4f
 
-/// The depth of the area behind the painting which triggers the warp.
-#define PAINTING_WARP_DEPTH PAINTING_SIZE
+/// The depth of the area behind the painting which triggers the warp. Default is 409.6f.
+#define PAINTING_WARP_DEPTH 409.6f
+
+/// The threshold relative to the painting's plane between wobbling and warping. Default is -30.72f.
+#define PAINTING_WOBBLE_WARP_THRESHOLD -30.72f
 
 /// The size of the buffer around the edges of the painting in which Mario is still considered within bounds.
-#define PAINTING_EDGE_MARGIN 160
+#define PAINTING_EDGE_MARGIN 160.0f
 
-/// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
-#define PAINTING_MARIO_Y_OFFSET 50
+/// This is added to Mario's Y position to make the ripple closer to Mario's center of mass. Default is 50.0f
+#define PAINTING_MARIO_Y_OFFSET 50.0f
 
 /// Convert image coordinates to texel coordinates.
 #define TC(t) (((t) - 1) << 5)
@@ -69,16 +72,6 @@ enum RippleTriggers {
     RIPPLE_TRIGGER_NONE,
     RIPPLE_TRIGGER_PROXIMITY,
     RIPPLE_TRIGGER_CONTINUOUS,
-};
-
-// oPaintingFlags
-enum PaintingFlags {
-    // Not rippling.
-    PAINTING_FLAGS_NONE  = 0x0,
-    // Triggers a passive ripple.
-    PAINTING_FLAG_RIPPLE = BIT(0), // 0x01
-    // Triggers an entry ripple.
-    PAINTING_FLAG_ENTER  = BIT(1), // 0x02
 };
 
 // oAction
