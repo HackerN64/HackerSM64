@@ -114,7 +114,7 @@ const struct RippleAnimationPair sRippleAnimations[] = {
  *
  * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
-void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
+void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
     const struct RippleAnimation *objRippleAnim = obj->oPaintingRippleAnimation;
     PaintingData i, tri;
@@ -142,11 +142,11 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, Pa
     // Accesses are off by 1 since the first entry is the number of vertices.
     for (i = 0; i < numVtx; i++) {
         tri = (i * 3);
-        paintingMesh->pos[0] = meshData[tri + 1];
-        paintingMesh->pos[1] = meshData[tri + 2];
+        paintingMesh->pos[0] = vtxData[tri + 1];
+        paintingMesh->pos[1] = vtxData[tri + 2];
         // The "Z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves.
-        if (meshData[tri + 3]) {
+        if (vtxData[tri + 3]) {
             // Scale and calculate the distance to the ripple origin.
             dx = ((paintingMesh->pos[0] * sizeRatioX) - rippleX);
             dy = ((paintingMesh->pos[1] * sizeRatioY) - rippleY);
@@ -185,21 +185,21 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *meshData, Pa
  *
  * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(const PaintingData *meshData, PaintingData numTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
-    PaintingData i;
-    Vec3s v;
-    Vec3f vp0, vp1, vp2;
+void painting_calculate_triangle_normals(const PaintingData *triangleData, PaintingData numTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
+    PaintingData i, j;
+    Vec3s vi; // Vertex indices
+    Vec3f vp[3]; // Vertex positions
 
     for (i = 0; i < numTris; i++) {
         // Add 2 because of the 2 length entries preceding the list.
         PaintingData tri = (1 + (i * 3));
-        vec3s_copy(v, &meshData[tri]);
-        vec3s_to_vec3f(vp0, paintingMesh[v[0]].pos);
-        vec3s_to_vec3f(vp1, paintingMesh[v[1]].pos);
-        vec3s_to_vec3f(vp2, paintingMesh[v[2]].pos);
+        vec3s_copy(vi, &triangleData[tri]);
+        for (j = 0; j < 3; j++) {
+            vec3s_to_vec3f(vp[j], paintingMesh[vi[j]].pos);
+        }
 
         // Cross product to find each triangle's normal vector.
-        find_vector_perpendicular_to_plane(paintingTriNorms[i], vp0, vp1, vp2);
+        find_vector_perpendicular_to_plane(paintingTriNorms[i], vp[0], vp[1], vp[2]);
     }
 }
 
@@ -213,8 +213,8 @@ void painting_calculate_triangle_normals(const PaintingData *meshData, PaintingD
  * The table is a list of entries in this format:
  *      numNeighbors, tri0, tri1, ..., triN
  *
- *      Where each 'tri' is an index into sPaintingTriNorms.
- *      Entry i in `neighborTris` corresponds to the vertex at sPaintingMesh[i]
+ *      Where each 'tri' is an index into paintingTriNorms.
+ *      Entry i in `neighborTris` corresponds to the vertex at paintingMesh[i]
  *
  * The table used in game, painting_data_mesh_neighbor_tris, is in bin/segment2.c.
  */
@@ -263,7 +263,7 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
  *
  * If the triangleMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole painting.
  */
-Gfx *render_painting(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, const PaintingData *triangleMap, Alpha alpha, struct PaintingMeshVertex *paintingMesh) {
+Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, const PaintingData *triangleMap, Alpha alpha, struct PaintingMeshVertex *paintingMesh) {
     struct PaintingMeshVertex *currVtx = NULL;
     PaintingData group;
     PaintingData groupIndex;
@@ -498,7 +498,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     for (i = 0; i < imageCount; i++) {
         triangleMap = segmented_to_virtual(triangleMaps[i]);
         // Render a section of the painting.
-        gSPDisplayList(gfx++, render_painting(tArray[i], i, imageCount, tWidth, tHeight, triangleMap, paintingImage->alpha, paintingMesh));
+        gSPDisplayList(gfx++, render_painting_segment(tArray[i], i, imageCount, tWidth, tHeight, triangleMap, paintingImage->alpha, paintingMesh));
     }
 
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
@@ -515,10 +515,10 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
  */
 Gfx *display_painting_rippling(struct Object *obj) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    const PaintingData *meshData = segmented_to_virtual(painting_data_vertices);
+    const PaintingData *vtxData = segmented_to_virtual(painting_data_vertices);
     const PaintingData *triangleData = segmented_to_virtual(painting_data_triangles_1);
     const PaintingData *neighborTris = segmented_to_virtual(painting_data_mesh_neighbor_tris);
-    PaintingData numVtx = meshData[0];
+    PaintingData numVtx = vtxData[0];
     PaintingData numTris = triangleData[0];
     Gfx *dlist = NULL;
     // When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
@@ -529,7 +529,7 @@ Gfx *display_painting_rippling(struct Object *obj) {
     Vec3f *paintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
 
     // Generate the mesh and its lighting data
-    painting_generate_mesh(obj, meshData, numVtx, paintingMesh);
+    painting_generate_mesh(obj, vtxData, numVtx, paintingMesh);
     painting_calculate_triangle_normals(triangleData, numTris, paintingMesh, paintingTriNorms);
     painting_average_vertex_normals(neighborTris, numVtx, paintingMesh, paintingTriNorms);
 
