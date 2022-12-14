@@ -47,11 +47,9 @@ struct gPuppyOptions
 {
     s16 analogue;
     s16 sensitivityX;
-    s16 sensitivityY;
     s16 invertX;
-    s16 invertY;
-    s16 turnAggression;
     s16 inputType;
+    s16 turnHelper;
 };
 
 struct gPuppyStruct
@@ -122,9 +120,9 @@ struct sPuppyAngles
 //Structurally, it's exactly the same as CutsceneSplinePoint
 struct sPuppySpline
 {
-    Vec3s pos; // The vector pos of the spline index itself.
     s8 index;  // The index of the spline. Ends with -1
     u8 speed;  // The amount of frames it takes to get through this index.
+    Vec3s pos; // The vector pos of the spline index itself.
 };
 
 //A bounding volume for activating puppycamera scripts and angles.
@@ -197,5 +195,56 @@ extern void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacement
 extern s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline splineFocus[], s32 mode, s32 index);
 
 #endif
+
+/** 
+ * Backwards compatability additions from Puppycam 1.
+ * This adds support for the original volume format, so you can directly import them in
+ * without having to make any further changes.
+ * Naturally, because it's the old format, they will be severely more limited in flexibility.
+ */
+#define NC_FLAG_XTURN PUPPYCAM_BEHAVIOUR_YAW_ROTATION
+#define NC_FLAG_YTURN PUPPYCAM_BEHAVIOUR_PITCH_ROTATION
+#define NC_FLAG_ZOOM 0 // Stub
+#define NC_FLAG_8D PUPPYCAM_BEHAVIOUR_INPUT_8DIR
+#define NC_FLAG_4D PUPPYCAM_BEHAVIOUR_INPUT_4DIR
+#define NC_FLAG_2D PUPPYCAM_BEHAVIOUR_INPUT_2D
+#define NC_FLAG_FOCUSX PUPPYCAM_BEHAVIOUR_X_MOVEMENT
+#define NC_FLAG_FOCUSY PUPPYCAM_BEHAVIOUR_Y_MOVEMENT
+#define NC_FLAG_FOCUSZ PUPPYCAM_BEHAVIOUR_Z_MOVEMENT
+#define NC_FLAG_POSX PUPPYCAM_BEHAVIOUR_X_MOVEMENT
+#define NC_FLAG_POSY PUPPYCAM_BEHAVIOUR_Y_MOVEMENT
+#define NC_FLAG_POSZ PUPPYCAM_BEHAVIOUR_Z_MOVEMENT
+#define NC_FLAG_COLLISION 
+#define NC_FLAG_SLIDECORRECT 0 // Stub
+
+#define NC_MODE_NORMAL 1
+#define NC_MODE_SLIDE 2
+#define NC_MODE_FIXED 3
+#define NC_MODE_2D 4
+#define NC_MODE_8D 5
+#define NC_MODE_FIXED_NOMOVE 6
+#define NC_MODE_FIXED_NOTURN 7
+#define NC_MODE_NOROTATE 8
+struct newcam_hardpos
+{
+    u8 newcam_hard_levelID;
+    u8 newcam_hard_areaID;
+    u8 newcam_hard_permaswap;
+    u16 newcam_hard_modeset;
+    s32 *newcam_hard_script;
+    s16 newcam_hard_X1;
+    s16 newcam_hard_Y1;
+    s16 newcam_hard_Z1;
+    s16 newcam_hard_X2;
+    s16 newcam_hard_Y2;
+    s16 newcam_hard_Z2;
+    s16 newcam_hard_camX;
+    s16 newcam_hard_camY;
+    s16 newcam_hard_camZ;
+    s16 newcam_hard_lookX;
+    s16 newcam_hard_lookY;
+    s16 newcam_hard_lookZ;
+};
+extern struct newcam_hardpos newcam_fixedcam[];
 
 #endif // PUPPYCAM2_H
