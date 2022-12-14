@@ -3269,7 +3269,7 @@ const PaintingData painting_data_mesh_neighbor_tris[] = {
 
 // 0x07022660 - 0x07023042
 const PaintingData painting_data_triangles_1[] = {
-    264, // num groups
+    264, // num triangles
     // Grouped by 5 + one remainder group,
     // = 15 vertices per group + a few extra triangles
        8,   12,   13, // 1
@@ -3545,7 +3545,7 @@ const PaintingData *const painting_data_triangles_1_array[] = {
 
 // 0x07021AE0 - 0x07021FFA
 const PaintingData painting_data_triangles_2_bottom[] = {
-    132, // num groups
+    132, // num triangles
     // Grouped by 5 + one remainder group,
     // = 15 vertices per group + a few extra triangles
       60,   59,   52,
@@ -3684,7 +3684,7 @@ const PaintingData painting_data_triangles_2_bottom[] = {
 
 // 0x07021FFC - 0x07022516
 const PaintingData painting_data_triangles_2_top[] = {
-    132, // num groups
+    132, // num triangles
     // Grouped by 5 + one remainder group,
     // = 15 vertices per group + a few extra triangles
        9,    8,   13,
