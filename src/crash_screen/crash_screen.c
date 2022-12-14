@@ -66,28 +66,28 @@ static const char *sRegNames[29] = {
 };
 
 static const char *sPageNames[NUM_PAGES] = {
-    /*PAGE_CONTEXT    */ "CONTEXT",
-    /*PAGE_ASSERTS    */ "ASSERT",
+    [PAGE_CONTEXT    ] = "CONTEXT",
+    [PAGE_ASSERTS    ] = "ASSERT",
 #ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG        */ "LOG",
+    [PAGE_LOG        ] = "LOG",
 #endif
-    /*PAGE_STACK_TRACE*/ "STACK TRACE",
-    /*PAGE_RAM_VIEWER */ "RAM VIEW",
-    /*PAGE_DISASM     */ "DISASM",
+    [PAGE_STACK_TRACE] = "STACK TRACE",
+    [PAGE_RAM_VIEWER ] = "RAM VIEW",
+    [PAGE_DISASM     ] = "DISASM",
 };
 
 static const struct ControlType sControlsDescriptions[] = {
-    /*CONT_DESC_SWITCH_PAGE      */ {"L/R",                "switch page"},
-    /*CONT_DESC_SHOW_CONTROLS    */ {"START",              "show/hide page controls"},
-    /*CONT_DESC_CYCLE_DRAW       */ {"Z",                  "cycle drawing overlay and background"},
-    /*CONT_DESC_SCROLL_LIST      */ {"UP/DOWN",            "scroll list"},
-    /*CONT_DESC_CURSOR           */ {"UP/DOWN/LEFT/RIGHT", "move cursor"},
-    /*CONT_DESC_CURSOR_VERTICAL  */ {"UP/DOWN",            "move cursor"},
-    /*CONT_DESC_CURSOR_HORIZONTAL*/ {"LEFT/RIGHT",         "move cursor"},
-    /*CONT_DESC_JUMP_TO_ADDRESS  */ {"A",                  "jump to specific address"},
-    /*CONT_DESC_TOGGLE_ASCII     */ {"B",                  "toggle bytes as hex or ascii"},
-    /*CONT_DESC_TOGGLE_FUNCTIONS */ {"A",                  "toggle function names"},
-    /*CONT_DESC_TOGGLE_UNKNOWNS  */ {"B",                  "toggle unknowns in list"},
+    [CONT_DESC_SWITCH_PAGE      ] = {"L/R",                "switch page"},
+    [CONT_DESC_SHOW_CONTROLS    ] = {"START",              "show/hide page controls"},
+    [CONT_DESC_CYCLE_DRAW       ] = {"Z",                  "cycle drawing overlay and background"},
+    [CONT_DESC_SCROLL_LIST      ] = {"UP/DOWN",            "scroll list"},
+    [CONT_DESC_CURSOR           ] = {"UP/DOWN/LEFT/RIGHT", "move cursor"},
+    [CONT_DESC_CURSOR_VERTICAL  ] = {"UP/DOWN",            "move cursor"},
+    [CONT_DESC_CURSOR_HORIZONTAL] = {"LEFT/RIGHT",         "move cursor"},
+    [CONT_DESC_JUMP_TO_ADDRESS  ] = {"A",                  "jump to specific address"},
+    [CONT_DESC_TOGGLE_ASCII     ] = {"B",                  "toggle bytes as hex or ascii"},
+    [CONT_DESC_TOGGLE_FUNCTIONS ] = {"A",                  "toggle function names"},
+    [CONT_DESC_TOGGLE_UNKNOWNS  ] = {"B",                  "toggle unknowns in list"},
 };
 
 
@@ -1035,14 +1035,14 @@ static const enum ControlTypes disasmPageControls[] = {
 };
 
 struct CrashScreenPage sCrashScreenPages[] = {
-    /*PAGE_CONTEXT    */ {draw_crash_context, crash_screen_input_default,     defaultPageControls   },
-    /*PAGE_ASSERTS    */ {draw_assert,        crash_screen_input_default,     defaultPageControls   },
+    [PAGE_CONTEXT    ] = {draw_crash_context, crash_screen_input_default,     defaultPageControls   },
+    [PAGE_ASSERTS    ] = {draw_assert,        crash_screen_input_default,     defaultPageControls   },
 #ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG        */ {draw_crash_log,     crash_screen_input_default,     defaultPageControls   },
+    [PAGE_LOG        ] = {draw_crash_log,     crash_screen_input_default,     defaultPageControls   },
 #endif
-    /*PAGE_STACK_TRACE*/ {draw_stack_trace,   crash_screen_input_stack_trace, stackTracePageControls},
-    /*PAGE_RAM_VIEWER */ {draw_ram_viewer,    crash_screen_input_ram_viewer,  ramViewerPageControls },
-    /*PAGE_DISASM     */ {draw_disasm,        crash_screen_input_disasm,      disasmPageControls    },
+    [PAGE_STACK_TRACE] = {draw_stack_trace,   crash_screen_input_stack_trace, stackTracePageControls},
+    [PAGE_RAM_VIEWER ] = {draw_ram_viewer,    crash_screen_input_ram_viewer,  ramViewerPageControls },
+    [PAGE_DISASM     ] = {draw_disasm,        crash_screen_input_disasm,      disasmPageControls    },
 };
 
 void update_crash_screen_input(void) {
