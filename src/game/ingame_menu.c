@@ -539,13 +539,6 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 queuedSpaces += 4;
                 break;
 
-            // Backslash / escape character: Force the following character to print normally.
-            // Note that you will have to type '\\' to use this so that the compiler doesn't
-            // interpret it as a real escape character. To render one backslash, use '\\\\'.
-            case '\\':
-                strPos++;
-                goto render_character;
-
             // %d or %s: Display value of dialog variable,
             case '%':
                 // Resolve queued spaces
@@ -585,10 +578,15 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             // Note: multiple color codes may be needed in dialog as
             // earlier color codes will not function if they scroll offscreen.
             case CHAR_COLOR_CODE: // '@'
+                // @@: Special case, print only a single @. Only necessary if the following text is a valid RGB color.
+                if (str[strPos + 1] == CHAR_COLOR_CODE) {
+                    strPos++;
+                    goto render_character;
+                }
                 for (u32 i = 0; i < 3; i++) {
                     s32 firstDigit = hex_char_to_value(str[strPos + i * 2 + 1]);
                     s32 secondDigit = hex_char_to_value(str[strPos + i * 2 + 2]);
-                    // If the sequence following the @ is not a valid RGBA32 color, interpret it as normal text.
+                    // If the sequence following the @ is not a valid RGB color, interpret it as normal text.
                     if (firstDigit == -1 || secondDigit == -1) {
                         goto render_character;
                     }
