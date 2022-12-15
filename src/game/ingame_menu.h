@@ -34,7 +34,7 @@ extern s8 gHudFlash;
 
 extern s8 gDialogCourseActNum;
 extern u8 gInGameLanguage;
-extern void *languageTable[][4];
+extern void *languageTable[][3];
 
 struct AsciiCharLUTEntry {
     const Texture *texture;

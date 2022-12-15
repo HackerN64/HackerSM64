@@ -63,7 +63,7 @@ extern u8 act_name_table_es[];
 #endif
 
 // The language table for the game's dialogs, level names and act names.
-void *languageTable[][4] = {
+void *languageTable[][3] = {
 #ifndef MULTILANG
     {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table},
 #else
