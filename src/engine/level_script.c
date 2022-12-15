@@ -369,8 +369,7 @@ static void level_cmd_clear_level(void) {
 
 static void level_cmd_alloc_level_pool(void) {
     if (sLevelPool == NULL) {
-        sLevelPool = alloc_only_pool_init(main_pool_available() - sizeof(struct AllocOnlyPool),
-                                          MEMORY_POOL_LEFT);
+        sLevelPool = alloc_only_pool_init_from_all_main_pool_memory();
     }
 
     sCurrentCmd = CMD_NEXT;

@@ -144,6 +144,29 @@ extern u8 _framebuffersSegmentBssEnd[];
 extern u8 _zbufferSegmentBssStart[];
 extern u8 _zbufferSegmentBssEnd[];
 
+#define SAFETY_PAD_SIZE 0x40
+
+uintptr_t get_end_considering_holes(uintptr_t start, uintptr_t size) {
+    uintptr_t end = start + size;
+    uintptr_t fbHoleStart = (uintptr_t) _framebuffersSegmentBssStart;
+    uintptr_t fbHoleEnd = (uintptr_t) _framebuffersSegmentBssEnd;
+    uintptr_t zbHoleStart = (uintptr_t) _zbufferSegmentBssStart;
+    uintptr_t zbHoleEnd = (uintptr_t) _zbufferSegmentBssEnd;
+    // We need to figure out if any hole is inside interval [start, end)
+    // It is very to easy to check it - just check if start of any hole is inside the interval
+    // Technically <= condition is not needed for the 'end' checks but I'd rather be safe here
+    if (start <= fbHoleStart && fbHoleStart <= end) {
+        start = fbHoleEnd + SAFETY_PAD_SIZE;
+        end = start + size;
+    }
+    if (start <= zbHoleStart && zbHoleStart <= end) {
+        start = zbHoleEnd + SAFETY_PAD_SIZE;
+        end = start + size;
+    }
+
+    return end;
+}
+
 /**
  * Allocate a block of memory from the pool of given size, and from the
  * specified side of the pool (MEMORY_POOL_LEFT or MEMORY_POOL_RIGHT).
@@ -155,19 +178,13 @@ void *main_pool_alloc(u32 size, u32 side) {
 
     size = ALIGN16(size) + 16;
     if (size != 0 && sPoolFreeSpace >= size) {
-        sPoolFreeSpace -= size;
         if (side == MEMORY_POOL_LEFT) {
-            newListHead = (struct MainPoolBlock *) ((u8 *) sPoolListHeadL + size);
-            if ((u32)newListHead >= (u32)&_framebuffersSegmentBssStart && (u32)newListHead <= (u32)&_framebuffersSegmentBssEnd) {
-                newListHead = (struct MainPoolBlock *)ALIGN16((u32)&_framebuffersSegmentBssEnd + 0x40);
-            }
-            if ((u32)newListHead >= (u32)&_zbufferSegmentBssStart && (u32)newListHead <= (u32)&_zbufferSegmentBssEnd) {
-                newListHead = (struct MainPoolBlock *)ALIGN16((u32)&_zbufferSegmentBssEnd + 0x40);
-            }
+            newListHead = (struct MainPoolBlock *) get_end_considering_holes((uintptr_t) sPoolListHeadL, size);
             sPoolListHeadL->next = newListHead;
             newListHead->prev = sPoolListHeadL;
             newListHead->next = NULL;
-            addr = (u8 *) sPoolListHeadL + 16;
+            addr = ((u8*) newListHead) - size + 16;
+            sPoolFreeSpace -= (((s32)newListHead) - ((s32) sPoolListHeadL));
             sPoolListHeadL = newListHead;
         } else {
             newListHead = (struct MainPoolBlock *) ((u8 *) sPoolListHeadR - size);
@@ -176,8 +193,23 @@ void *main_pool_alloc(u32 size, u32 side) {
             newListHead->prev = NULL;
             sPoolListHeadR = newListHead;
             addr = (u8 *) sPoolListHeadR + 16;
+            sPoolFreeSpace -= size;
         }
     }
+    return addr;
+}
+
+static void *main_pool_alloc_from_all_memory(void) {
+    struct MainPoolBlock *newListHead;
+    void *addr = NULL;
+
+    newListHead = (struct MainPoolBlock *) ((u8*) sPoolListHeadR - 16);
+    sPoolListHeadL->next = newListHead;
+    newListHead->prev = sPoolListHeadL;
+    newListHead->next = NULL;
+    addr = ((u8*) sPoolListHeadL) + 16;
+    sPoolFreeSpace -= (((s32)newListHead) - ((s32) sPoolListHeadL));
+    sPoolListHeadL = newListHead;
     return addr;
 }
 
@@ -487,12 +519,13 @@ void load_engine_code_segment(void) {
  * support freeing allocated memory.
  * Return NULL if there is not enough space in the main pool.
  */
-struct AllocOnlyPool *alloc_only_pool_init(u32 size, u32 side) {
+struct AllocOnlyPool *alloc_only_pool_init_from_all_main_pool_memory(void) {
+    u32 size = main_pool_available() - sizeof(struct AllocOnlyPool);
     void *addr;
     struct AllocOnlyPool *subPool = NULL;
 
     size = ALIGN4(size);
-    addr = main_pool_alloc(size + sizeof(struct AllocOnlyPool), side);
+    addr = main_pool_alloc_from_all_memory();
     if (addr != NULL) {
         subPool = (struct AllocOnlyPool *) addr;
         subPool->totalSpace = size;
@@ -509,12 +542,14 @@ struct AllocOnlyPool *alloc_only_pool_init(u32 size, u32 side) {
  */
 void *alloc_only_pool_alloc(struct AllocOnlyPool *pool, s32 size) {
     void *addr = NULL;
+    u8* newPtr;
 
     size = ALIGN4(size);
     if (size > 0 && pool->usedSpace + size <= pool->totalSpace) {
-        addr = pool->freePtr;
-        pool->freePtr += size;
-        pool->usedSpace += size;
+        newPtr = (u8*) get_end_considering_holes((uintptr_t) pool->freePtr, size);
+        addr = newPtr - size;
+        pool->usedSpace += (newPtr - pool->freePtr);
+        pool->freePtr = newPtr;
     }
     return addr;
 }
