@@ -283,9 +283,9 @@ SECTIONS
    }
    END_NOLOAD(engine)
 #ifndef USE_EXT_RAM
-   . = 0x80200000;
+   . = MAX(0x80200000, ALIGN(0x100000));
 #else
-   . = 0x80400000;
+   . = MAX(0x80400000, ALIGN(0x100000));
 #endif
    BEGIN_NOLOAD(framebuffers)
    {
@@ -293,9 +293,9 @@ SECTIONS
    }
    END_NOLOAD(framebuffers)
 #ifndef USE_EXT_RAM
-   . = 0x80300000;
+   . = MAX(0x80300000, ALIGN(0x100000));
 #else
-   . = 0x80500000;
+   . = MAX(0x80500000, ALIGN(0x100000));
 #endif
    BEGIN_NOLOAD(zbuffer)
    {
