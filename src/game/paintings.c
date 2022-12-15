@@ -462,7 +462,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     s16 tWidth = paintingImage->textureWidth;
     s16 tHeight = paintingImage->textureHeight;
     const Texture **tArray = segmented_to_virtual(paintingImage->textureArray);
-    s32 isEnvMap = (paintingImage->textureType == PAINTING_TYPE_ENV_MAP);
+    s32 isEnvMap = (paintingImage->imageType == PAINTING_IMAGE_TYPE_ENV_MAP);
 
     u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
@@ -577,7 +577,7 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
 
     const Texture **textures = segmented_to_virtual(paintingImage->textureArray);
 
-    s32 isEnvMap = (paintingImage->textureType == PAINTING_TYPE_ENV_MAP);
+    s32 isEnvMap = (paintingImage->imageType == PAINTING_IMAGE_TYPE_ENV_MAP);
 
     if (isEnvMap) {
         vec3_set(n, 0x00, 0x00, 0x7f);
@@ -702,10 +702,11 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
     if (callContext == GEO_CONTEXT_RENDER) {
         // Draw the painting.
-        if (paintingImage->imageCount > 0
-         && paintingImage->textureArray != NULL
+        if (paintingImage->textureArray != NULL
+         && paintingImage->imageCount > 0
          && paintingImage->textureWidth > 0
          && paintingImage->textureHeight > 0
+         && paintingImage->imageType != PAINTING_IMAGE_TYPE_INVISIBLE
          && paintingImage->alpha > 0x00) {
             // Determine whether the painting is opaque or transparent.
             if (paintingImage->alpha == 0xFF) {

@@ -12,14 +12,15 @@ const Texture *const hmc_seg7_painting_textures_cotmc[] = {
     hmc_seg7_texture_cotmc_pool_env,
 };
 
-// 0x0702551C (PaintingData)
 const struct PaintingImage cotmc_painting = {
-    /* Textures */ hmc_seg7_painting_textures_cotmc,
-    /* Texture Count */ ARRAY_COUNT(hmc_seg7_painting_textures_cotmc),
-    /* Texture w, h */ 32, 32,
-    /* Texture Type */ PAINTING_TYPE_ENV_MAP,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
-    /* Shaded */ TRUE,
-    /* Alpha */ 0xFF,
-    /* Size */ 723.968018f, 723.968018f,
+    .textureArray  = hmc_seg7_painting_textures_cotmc,
+    .imageCount    = ARRAY_COUNT(hmc_seg7_painting_textures_cotmc),
+    .textureWidth  = 32,
+    .textureHeight = 32,
+    .imageType     = PAINTING_IMAGE_TYPE_ENV_MAP,
+    .rippleTrigger = RIPPLE_TRIGGER_CONTINUOUS,
+    .shaded        = TRUE,
+    .alpha         = 0xFF,
+    .sizeX         = 723.968018f,
+    .sizeY         = 723.968018f,
 };

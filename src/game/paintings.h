@@ -59,12 +59,14 @@ enum PaintingRippleAnimations {
     RIPPLE_ANIM_PROXIMITY_LARGE,
 };
 
-// Painting->textureType
+// Painting->imageType
 enum PaintingType {
-    /// Painting that uses 1 or more images as a texture
-    PAINTING_TYPE_IMAGE,
-    /// Painting that has one texture used for an environment map effect
-    PAINTING_TYPE_ENV_MAP
+    /// Painting that is invisible.
+    PAINTING_IMAGE_TYPE_INVISIBLE,
+    /// Painting that uses 1 or more textures as a texture.
+    PAINTING_IMAGE_TYPE_TEXTURE,
+    /// Painting that has one texture used for an environment map effect.
+    PAINTING_IMAGE_TYPE_ENV_MAP
 };
 
 // Painting->rippleTrigger
@@ -108,27 +110,27 @@ struct PaintingImage {
     /*0x00*/ const Texture *const *textureArray;
 
     /// How many textures the painting uses.
-    /*0x04*/ s32 imageCount;
+    /*0x04*/ const s32 imageCount;
 
     /// Texture size.
-    /*0x08*/ s16 textureWidth;
-    /*0x0A*/ s16 textureHeight;
+    /*0x08*/ const s16 textureWidth;
+    /*0x0A*/ const s16 textureHeight;
 
-    /// Either PAINTING_TYPE_IMAGE or PAINTING_TYPE_ENV_MAP.
-    /*0x0C*/ s8 textureType;
+    /// Controls how the painting image is displayed. PAINTING_IMAGE_TYPE_INVISIBLE, PAINTING_IMAGE_TYPE_TEXTURE, or PAINTING_IMAGE_TYPE_ENV_MAP.
+    /*0x0C*/ const s8 imageType;
 
-    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    /*0x0D*/ s8 rippleTrigger;
+    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS, or RIPPLE_TRIGGER_PROXIMITY.
+    /*0x0D*/ const s8 rippleTrigger;
 
     /// Whether the painting uses shading when not rippling. Only used for Snowman's Land in vanilla and makes the transition to/from rippling not seamless.
-    /*0x0E*/ s8 shaded;
+    /*0x0E*/ const s8 shaded;
 
     /// The painting's transparency (0..255). Determines the drawing layer of the painting.
-    /*0x0F*/ Alpha alpha;
+    /*0x0F*/ const Alpha alpha;
 
     /// By default a painting is 614.0f x 614.0f (PAINTING_SIZE).
-    /*0x10*/ f32 sizeX;
-    /*0x14*/ f32 sizeY;
+    /*0x10*/ const f32 sizeX;
+    /*0x14*/ const f32 sizeY;
 }; /*0x18*/
 
 /**
