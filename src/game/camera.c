@@ -9585,18 +9585,20 @@ void cutscene_enter_painting(struct Camera *c) {
 
     if (ripplingPainting != NULL) {
         const struct PaintingImage *paintingImage = ripplingPainting->oPaintingImage;
+        f32 sizeX = paintingImage->sizeX;
+        f32 sizeY = paintingImage->sizeY;
     
         vec3i_to_vec3s(paintingAngle, &ripplingPainting->oFaceAngleVec);
 
-        size = ((paintingImage->sizeX + paintingImage->sizeY) / 2.0f);
-        focusOffset[0] = (size * 0.5f);
-        focusOffset[1] = focusOffset[0];
+        focusOffset[0] = (sizeX * 0.5f);
+        focusOffset[1] = (sizeY * 0.5f);
         focusOffset[2] = 0;
 
         vec3f_copy(paintingPos, &ripplingPainting->oPosVec);
 
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
         approach_vec3f_asymptotic(c->focus, focus, 0.1f, 0.1f, 0.1f);
+        size = ((sizeX + sizeY) / 2.0f);
         focusOffset[2] = -(((size * 1000.f) / 2) / 307.f);
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
         floorHeight = find_floor(focus[0], focus[1] + 500.f, focus[2], &highFloor) + 125.f;
