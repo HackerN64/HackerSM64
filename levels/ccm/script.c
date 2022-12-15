@@ -16,6 +16,7 @@
 #include "make_const_nonconst.h"
 #include "levels/ccm/header.h"
 
+
 static const LevelScript script_ccm_area_1_macro_objects[] = {
     // Macro objects
     OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST, /*pos*/ -2412,  2912,  -878, /*angle*/ 0, 180, 0, /*behParam*/ (DIALOG_040 << 16), /*beh*/ bhvMessagePanel),

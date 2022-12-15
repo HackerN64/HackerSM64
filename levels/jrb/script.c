@@ -16,6 +16,7 @@
 #include "make_const_nonconst.h"
 #include "levels/jrb/header.h"
 
+
 static const LevelScript script_jrb_area_1_macro_objects[] = {
     // Macro objects
     OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST, /*pos*/ -6325,  1126,  1730, /*angle*/ 0, 250, 0, /*behParam*/ (DIALOG_060 << 16), /*beh*/ bhvMessagePanel),

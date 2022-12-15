@@ -16,6 +16,7 @@
 #include "make_const_nonconst.h"
 #include "levels/wf/header.h"
 
+
 static const LevelScript script_wf_macro_objects[] = {
     // Macro objects
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  3760,   960,  2740, /*angle*/ 0, 0, 0,   /*behParam*/ ((0) << 16), /*beh*/ bhvCoinFormation),

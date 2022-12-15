@@ -16,6 +16,7 @@
 #include "make_const_nonconst.h"
 #include "levels/bob/header.h"
 
+
 static const LevelScript script_bob_macro_objects[] = {
     // Macro objects
     OBJECT(/*model*/ MODEL_CHAIN_CHOMP, /*pos*/   260,   735,  1920, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvChainChomp),
