@@ -446,7 +446,6 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
         (imageCount * (
             /*gSPDisplayList    */ 1
         )) +
-        /*gSPPopMatrix      */ 1 +
         /*gSPDisplayList    */ 1 +
         /*gSPEndDisplayList */ 1
     );
@@ -471,7 +470,6 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
         triangleMap += (numTris * 3);
     }
 
-    gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     Gfx *endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_rippling_end);
     gSPDisplayList(gfx++, endDl);
     gSPEndDisplayList(gfx);
@@ -563,7 +561,7 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
         gSPDisplayList(gfx++, dl_paintings_textured_vertex_colored_begin);
     }
 
-    s16 tWidth = paintingImage->textureWidth;
+    s16 tWidth  = paintingImage->textureWidth;
     s16 tHeight = paintingImage->textureHeight;
 
     // Width and height of each section.
@@ -613,40 +611,13 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
         );
     }
 
-    if (isEnvMap) {
-        gSPDisplayList(gfx++, dl_paintings_env_mapped_end);
-    } else {
-        gSPDisplayList(gfx++, dl_paintings_textured_end);
-    }
+    Gfx *endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_textured_end);
+    gSPDisplayList(gfx++, endDl);
 
     if (!shaded) {
         gSPSetGeometryMode(gfx++, G_LIGHTING);
     }
 
-    gSPEndDisplayList(gfx);
-
-    return dlist;
-}
-
-/**
- * Render a normal painting.
- */
-Gfx *display_painting_not_rippling(struct Object *obj) {
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    u32 gfxCmds = (
-        /*gSPDisplayList    */ 1 +
-        /*gSPPopMatrix      */ 1 +
-        /*gSPEndDisplayList */ 1
-    );
-    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
-    Gfx *gfx = dlist;
-
-    if (dlist == NULL) {
-        return dlist;
-    }
-
-    gSPDisplayList(gfx++, dl_painting_not_rippling(paintingImage));
-    gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     gSPEndDisplayList(gfx);
 
     return dlist;
@@ -687,7 +658,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
             }
 
             if (obj->oAction == PAINTING_ACT_IDLE) {
-                paintingDlist = display_painting_not_rippling(obj);
+                paintingDlist = dl_painting_not_rippling(paintingImage);
             } else {
                 paintingDlist = display_painting_rippling(obj);
             }
