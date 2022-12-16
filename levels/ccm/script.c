@@ -128,12 +128,12 @@ static const LevelScript script_ccm_area_2_macro_objects[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_1[] = {
+static const LevelScript script_ccm_area_1_objects_1[] = {
     OBJECT(/*model*/ MODEL_CCM_ROPEWAY_LIFT, /*pos*/ 531, -4430, 6426,    /*angle*/ 0,   0, 0, /*behParam*/ 0x07120000, /*beh*/ bhvPlatformOnTrack),
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_ccm_area_1_objects_2[] = {
     OBJECT(/*model*/ MODEL_PENGUIN,          /*pos*/  2650, -3735,  3970, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvSmallPenguin),
     OBJECT(/*model*/ MODEL_PENGUIN,          /*pos*/  -555,  3470, -1000, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallPenguin),
     OBJECT(/*model*/ MODEL_MR_BLIZZARD,      /*pos*/ -2376, -1589,  4256, /*angle*/ 0, 252, 0, /*behParam*/ 0x00010000, /*beh*/ bhvMrBlizzard),
@@ -142,7 +142,7 @@ static const LevelScript script_func_local_2[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_ccm_area_1_objects_3[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,             /*pos*/  2665, -4607,  4525, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCcmTouchedStarSpawn, /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_PENGUIN,          /*pos*/  3450, -4700,  4550, /*angle*/ 0,   0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvTuxiesMother,          /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,             /*pos*/  4200,  -927,   400, /*angle*/ 0,   0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvHiddenRedCoinStar,   /*acts*/ ALL_ACTS),
@@ -151,7 +151,7 @@ static const LevelScript script_func_local_3[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_4[] = {
+static const LevelScript script_ccm_area_2_objects_1[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_PENGUIN, /*pos*/ -4952,  6656, -6075, /*angle*/ 0, 270, 0, /*behParam*/ 0x02000000, /*beh*/ bhvRacingPenguin,   /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     OBJECT(/*model*/ MODEL_NONE,    /*pos*/ -6500, -5836, -6400, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvPenguinRaceFinishLine),
     OBJECT(/*model*/ MODEL_NONE,    /*pos*/ -6393,  -716,  7503, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvPenguinRaceShortcutCheck),
@@ -199,9 +199,9 @@ const LevelScript level_ccm_entry[] = {
         WARP_NODE(/*id*/ 0x20, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x01, /*destNode*/ 0x1F, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x33, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x65, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
-        JUMP_LINK(script_func_local_3),
+        JUMP_LINK(script_ccm_area_1_objects_1),
+        JUMP_LINK(script_ccm_area_1_objects_2),
+        JUMP_LINK(script_ccm_area_1_objects_3),
         TERRAIN(/*terrainData*/ ccm_seg7_area_1_collision),
         JUMP_LINK(script_ccm_area_1_macro_objects),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_048),
@@ -215,7 +215,7 @@ const LevelScript level_ccm_entry[] = {
         WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x02, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x33, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x65, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_4),
+        JUMP_LINK(script_ccm_area_2_objects_1),
         TERRAIN(/*terrainData*/ ccm_seg7_area_2_collision),
         JUMP_LINK(script_ccm_area_2_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_SLIDE),

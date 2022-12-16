@@ -160,18 +160,18 @@ static const LevelScript script_thi_area_3_macro_objects[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_thi_area_2_objects_1[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,    /*pos*/     0, -700, -4500, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvHiddenStar,          /*acts*/ ALL_ACTS),
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_thi_area_3_objects_1[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,             /*pos*/ -1800,   800, -1500, /*angle*/ 0,   0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvHiddenRedCoinStar, /*acts*/ ALL_ACTS),
     OBJECT(/*model*/ MODEL_WIGGLER_HEAD,     /*pos*/    17,  1843,   -62, /*angle*/ 0,   0, 0, /*behParam*/ 0x05000000, /*beh*/ bhvWigglerHead),
     RETURN(),
 };
 
-static const LevelScript script_func_local_4[] = {
+static const LevelScript script_thi_area_1_objects_1[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_KOOPA_WITH_SHELL, /*pos*/ -1900,  -511,  2400, /*angle*/ 0, -30, 0, /*behParam*/ 0x02030000, /*beh*/ bhvKoopa,             /*acts*/ ACT_3),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,             /*pos*/  7400, -1537, -6300, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvKoopaRaceEndpoint, /*acts*/ ACT_3),
     OBJECT(/*model*/ MODEL_NONE,             /*pos*/ -6556, -2969,  6565, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvGoombaTripletSpawner),
@@ -187,18 +187,18 @@ static const LevelScript script_func_local_4[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_5[] = {
+static const LevelScript script_thi_area_1_objects_2[] = {
     OBJECT(/*model*/ MODEL_THI_HUGE_ISLAND_TOP, /*pos*/     0, 3891, -1533, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvThiHugeIslandTop),
     RETURN(),
 };
 
-static const LevelScript script_func_local_6[] = {
+static const LevelScript script_thi_area_2_objects_2[] = {
     OBJECT(/*model*/ MODEL_THI_TINY_ISLAND_TOP, /*pos*/     0, 1167,  -460, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvThiTinyIslandTop),
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/ -1382,   80,  -649, /*angle*/ 0, 0, 0, /*behParam*/ 0x00040000, /*beh*/ bhvThiBowlingBallSpawner),
     RETURN(),
 };
 
-static const LevelScript script_func_local_7[] = {
+static const LevelScript script_thi_area_1_objects_3[] = {
     OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/  6656, -1536, -5632, /*angle*/ 0, 0, 0, /*behParam*/ 0x00320000, /*beh*/ bhvWarpPipe),
     OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/ -5888, -2048, -5888, /*angle*/ 0, 0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvWarpPipe),
     OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/ -3072,   512, -3840, /*angle*/ 0, 0, 0, /*behParam*/ 0x00340000, /*beh*/ bhvWarpPipe),
@@ -208,7 +208,7 @@ static const LevelScript script_func_local_7[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_8[] = {
+static const LevelScript script_thi_area_2_objects_3[] = {
     OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/  1997, -461, -1690, /*angle*/ 0, 0, 0, /*behParam*/ 0x00320000, /*beh*/ bhvWarpPipe),
     OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/ -1766, -614, -1766, /*angle*/ 0, 0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvWarpPipe),
     OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/  -922,  154, -1152, /*angle*/ 0, 0, 0, /*behParam*/ 0x00340000, /*beh*/ bhvWarpPipe),
@@ -251,9 +251,9 @@ const LevelScript level_thi_entry[] = {
         WARP_NODE(/*id*/ 0x0D, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x03, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x37, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x69, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_7),
-        JUMP_LINK(script_func_local_5),
-        JUMP_LINK(script_func_local_4),
+        JUMP_LINK(script_thi_area_1_objects_1),
+        JUMP_LINK(script_thi_area_1_objects_2),
+        JUMP_LINK(script_thi_area_1_objects_3),
         TERRAIN(/*terrainData*/ thi_seg7_area_1_collision),
         JUMP_LINK(script_thi_area_1_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_GRASS),
@@ -269,9 +269,9 @@ const LevelScript level_thi_entry[] = {
         WARP_NODE(/*id*/ 0x0C, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x02, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x33, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x65, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_8),
-        JUMP_LINK(script_func_local_2),
-        JUMP_LINK(script_func_local_6),
+        JUMP_LINK(script_thi_area_2_objects_1),
+        JUMP_LINK(script_thi_area_2_objects_2),
+        JUMP_LINK(script_thi_area_2_objects_3),
         TERRAIN(/*terrainData*/ thi_seg7_area_2_collision),
         JUMP_LINK(script_thi_area_2_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_GRASS),
@@ -287,7 +287,7 @@ const LevelScript level_thi_entry[] = {
         WARP_NODE(/*id*/ 0x0C, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x01, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x37, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x69, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_3),
+        JUMP_LINK(script_thi_area_3_objects_1),
         TERRAIN(/*terrainData*/ thi_seg7_area_3_collision),
         JUMP_LINK(script_thi_area_3_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0004, /*seq*/ SEQ_LEVEL_UNDERGROUND),

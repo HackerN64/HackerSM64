@@ -71,7 +71,7 @@ static const LevelScript script_wf_macro_objects[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_1[] = {
+static const LevelScript script_wf_objects_1[] = {
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  2305, 2432,  -255, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_04, /*pos*/  3405, 1664, -1791, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_05, /*pos*/  3840,    0, -2303, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
@@ -84,7 +84,7 @@ static const LevelScript script_func_local_1[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_wf_objects_2[] = {
     OBJECT(/*model*/ MODEL_WF_SMALL_BOMP,               /*pos*/  3300, 1070,     1, /*angle*/ 0,  90, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBomp),
     OBJECT(/*model*/ MODEL_WF_SMALL_BOMP,               /*pos*/  3300, 1070,  1281, /*angle*/ 0,  90, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBomp),
     OBJECT(/*model*/ MODEL_WF_LARGE_BOMP,               /*pos*/  3300, 1070,   641, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvLargeBomp),
@@ -104,7 +104,7 @@ static const LevelScript script_func_local_2[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_wf_objects_3[] = {
     OBJECT(/*model*/ MODEL_THWOMP,            /*pos*/  3462, 1939, -1545, /*angle*/ 0,  180, 0, /*behParam*/ 0x00000000, /*beh*/ bhvThwomp),
     OBJECT(/*model*/ MODEL_THWOMP,            /*pos*/  3462, 1075, -3314, /*angle*/ 0,   90, 0, /*behParam*/ 0x00000000, /*beh*/ bhvThwomp2),
     OBJECT(/*model*/ MODEL_NONE,              /*pos*/  -856,  922,  3819, /*angle*/ 0,    0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvBetaFishSplashSpawner),
@@ -134,7 +134,7 @@ static const LevelScript script_func_local_3[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_4[] = {
+static const LevelScript script_wf_objects_4[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_WHOMP, /*pos*/     0, 3584,    0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWhompKingBoss,      /*acts*/ ACT_1),
     OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/   300, 5550,    0, /*angle*/ 0, 0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvStar,                 /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ -2500, 1500, -750, /*angle*/ 0, 0, 0, /*behParam*/ 0x02000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
@@ -201,10 +201,10 @@ const LevelScript level_wf_entry[] = {
         WARP_NODE(/*id*/ 0x0C, /*destLevel*/ LEVEL_WF, /*destArea*/ 0x01, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x34, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x66, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
-        JUMP_LINK(script_func_local_3),
-        JUMP_LINK(script_func_local_4),
+        JUMP_LINK(script_wf_objects_1),
+        JUMP_LINK(script_wf_objects_2),
+        JUMP_LINK(script_wf_objects_3),
+        JUMP_LINK(script_wf_objects_4),
         TERRAIN(/*terrainData*/ wf_seg7_collision_070102D8),
         JUMP_LINK(/*objList*/ script_wf_macro_objects),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_030),

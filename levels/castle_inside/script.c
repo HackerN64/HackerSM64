@@ -73,7 +73,7 @@ static const LevelScript script_inside_castle_area_3_macro_objects[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_1[] = {
+static const LevelScript script_castle_inside_area_1_objects_1[] = {
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x02, /*destLevel*/ LEVEL_CASTLE_COURTYARD, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
@@ -147,7 +147,7 @@ static const LevelScript script_func_local_1[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_castle_inside_area_2_objects_1[] = {
     OBJECT(/*model*/ MODEL_CASTLE_KEY_DOOR, /*pos*/ -1100, 512, 3021, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDoorWarp),
     OBJECT(/*model*/ MODEL_CASTLE_KEY_DOOR, /*pos*/  -946, 512, 3021, /*angle*/ 0, 180, 0, /*behParam*/ 0x00010000, /*beh*/ bhvDoorWarp),
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
@@ -216,7 +216,7 @@ static const LevelScript script_func_local_2[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_castle_inside_area_3_objects_1[] = {
     OBJECT(/*model*/ MODEL_CASTLE_KEY_DOOR, /*pos*/ -1100, -1074, 922, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDoorWarp),
     OBJECT(/*model*/ MODEL_CASTLE_KEY_DOOR, /*pos*/  -946, -1074, 922, /*angle*/ 0, 180, 0, /*behParam*/ 0x00010000, /*beh*/ bhvDoorWarp),
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x05, /*flags*/ WARP_NO_CHECKPOINT),
@@ -259,7 +259,7 @@ static const LevelScript script_func_local_3[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_4[] = {
+static const LevelScript script_castle_inside_area_3_objects_2[] = {
     OBJECT(/*model*/ MODEL_RED_FLAME,  /*pos*/ -2037,  -818,  -716, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlame),
     OBJECT(/*model*/ MODEL_RED_FLAME,  /*pos*/ -1648,  -818,  -716, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlame),
     OBJECT(/*model*/ MODEL_RED_FLAME,  /*pos*/ -1648,  -818,  -101, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlame),
@@ -317,7 +317,7 @@ const LevelScript level_castle_inside_entry[] = {
         OBJECT(/*model*/ MODEL_TOAD,       /*pos*/ -1671,    0,  1313, /*angle*/ 0,  83, 0, /*behParam*/ DIALOG_133 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,       /*pos*/  1524,  307,   458, /*angle*/ 0, 110, 0, /*behParam*/ DIALOG_134 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,       /*pos*/   596, -306, -2637, /*angle*/ 0, 152, 0, /*behParam*/ DIALOG_135 << 24, /*beh*/ bhvToadMessage),
-        JUMP_LINK(script_func_local_1),
+        JUMP_LINK(script_castle_inside_area_1_objects_1),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_1_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_1_rooms),
@@ -334,7 +334,7 @@ const LevelScript level_castle_inside_entry[] = {
         OBJECT(/*model*/ MODEL_TOAD,                     /*pos*/  -977, 1203, 2569, /*angle*/ 0,   0, 0, /*behParam*/ DIALOG_076 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,                     /*pos*/ -1584, 2253, 7157, /*angle*/ 0, 136, 0, /*behParam*/ DIALOG_083 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,                     /*pos*/   837, 1203, 3020, /*angle*/ 0, 180, 0, /*behParam*/ DIALOG_137 << 24, /*beh*/ bhvToadMessage),
-        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_castle_inside_area_2_objects_1),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_2_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_2_rooms),
@@ -351,8 +351,8 @@ const LevelScript level_castle_inside_entry[] = {
         OBJECT(/*model*/ MODEL_MIPS,                      /*pos*/ -1509, -1177, -1564, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvMips),
         OBJECT(/*model*/ MODEL_TOAD,                      /*pos*/  1787, -1381, -1957, /*angle*/ 0, 126, 0, /*behParam*/ DIALOG_082 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,                      /*pos*/ -4048, -1381, -1334, /*angle*/ 0,  30, 0, /*behParam*/ DIALOG_136 << 24, /*beh*/ bhvToadMessage),
-        JUMP_LINK(script_func_local_3),
-        JUMP_LINK(script_func_local_4),
+        JUMP_LINK(script_castle_inside_area_3_objects_1),
+        JUMP_LINK(script_castle_inside_area_3_objects_2),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_3_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_3_rooms),

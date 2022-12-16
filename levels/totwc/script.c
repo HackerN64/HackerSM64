@@ -73,12 +73,12 @@ static const LevelScript script_totwc_macro_objects[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_1[] = {
+static const LevelScript script_totwc_objects_1[] = {
     OBJECT(/*model*/ MODEL_CAP_SWITCH, /*pos*/   0, -2047, 10, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCapSwitch),
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_totwc_objects_2[] = {
     OBJECT(/*model*/ MODEL_NONE,       /*pos*/ 800, -1700,  0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenRedCoinStar),
     RETURN(),
 };
@@ -104,8 +104,8 @@ const LevelScript level_totwc_entry[] = {
         WARP_NODE(/*id*/ 0xF3, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x20, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x26, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x23, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_2),
-        JUMP_LINK(script_func_local_1),
+        JUMP_LINK(script_totwc_objects_1),
+        JUMP_LINK(script_totwc_objects_2),
         TERRAIN(/*terrainData*/ totwc_seg7_collision),
         JUMP_LINK(script_totwc_macro_objects),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_131),

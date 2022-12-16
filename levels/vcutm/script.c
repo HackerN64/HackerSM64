@@ -53,7 +53,7 @@ static const LevelScript script_vcutm_macro_objects[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_1[] = {
+static const LevelScript script_vcutm_objects_1[] = {
     OBJECT(/*model*/ MODEL_VCUTM_SEESAW_PLATFORM, /*pos*/   154, -1919, -6256, /*angle*/ 0, 270, 0, /*behParam*/ 0x00070000, /*beh*/ bhvSeesawPlatform),
     OBJECT(/*model*/ MODEL_VCUTM_SEESAW_PLATFORM, /*pos*/ -2047, -3378, -2047, /*angle*/ 0,   0, 0, /*behParam*/ 0x00070000, /*beh*/ bhvSeesawPlatform),
     OBJECT(/*model*/ MODEL_NONE,           /*pos*/  3251, -1082, -6256, /*angle*/ 0, 270, 0, /*behParam*/ 0x014B0000, /*beh*/ bhvCheckerboardElevatorGroup),
@@ -63,12 +63,12 @@ static const LevelScript script_func_local_1[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_vcutm_objects_2[] = {
     OBJECT(/*model*/ MODEL_CAP_SWITCH, /*pos*/ 4506,  26, -6246, /*angle*/ 0, 0, 0, /*behParam*/ 0x00020000, /*beh*/ bhvCapSwitch),
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_vcutm_objects_3[] = {
     OBJECT(/*model*/ MODEL_NONE,       /*pos*/ 4600, 250, -4500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenRedCoinStar),
     RETURN(),
 };
@@ -94,9 +94,9 @@ const LevelScript level_vcutm_entry[] = {
         WARP_NODE(/*id*/ 0xF3, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x07, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x08, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x06, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_3),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_vcutm_objects_1),
+        JUMP_LINK(script_vcutm_objects_2),
+        JUMP_LINK(script_vcutm_objects_3),
         TERRAIN(/*terrainData*/ vcutm_seg7_collision),
         JUMP_LINK(script_vcutm_macro_objects),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_129),
