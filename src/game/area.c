@@ -212,18 +212,14 @@ void clear_area_graph_nodes(void) {
     s32 i;
 
     if (gCurrentArea != NULL) {
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
-#endif
         gCurrentArea = NULL;
         gWarpTransition.isActive = FALSE;
     }
 
     for (i = 0; i < AREA_COUNT; i++) {
         if (gAreaData[i].graphNode != NULL) {
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
             geo_call_global_function_nodes(&gAreaData[i].graphNode->node, GEO_CONTEXT_AREA_INIT);
-#endif
             gAreaData[i].graphNode = NULL;
         }
     }
@@ -248,18 +244,14 @@ void load_area(s32 index) {
         }
 
         load_obj_warp_nodes();
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_LOAD);
-#endif
     }
 }
 
 void unload_area(void) {
     if (gCurrentArea != NULL) {
         unload_objects_from_area(0, gCurrentArea->index);
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
-#endif
 
         gCurrentArea->flags = AREA_FLAG_UNLOAD;
         gCurrentArea = NULL;
