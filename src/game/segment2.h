@@ -37,7 +37,7 @@ extern Gfx dl_skybox_end[];
 extern Gfx dl_waterbox_ia16_begin[];
 extern Gfx dl_waterbox_rgba16_begin[];
 extern Gfx dl_waterbox_end[];
-extern Gfx dl_paintings_draw_ripples[];
+extern Gfx dl_paintings_ripple_triangles[];
 extern Gfx dl_paintings_rippling_begin[];
 extern Gfx dl_paintings_rippling_end[];
 extern Gfx dl_paintings_textured_shaded_begin[];

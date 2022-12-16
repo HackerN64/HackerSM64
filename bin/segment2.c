@@ -2909,7 +2909,7 @@ const Gfx dl_paintings_env_mapped_end[] = {
 };
 
 // 0x02014A30 - 0x02014A60
-const Gfx dl_paintings_draw_ripples[] = {
+const Gfx dl_paintings_ripple_triangles[] = {
 #ifdef F3DEX_GBI_2
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
