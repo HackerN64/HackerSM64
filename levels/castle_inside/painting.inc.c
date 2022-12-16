@@ -1,37 +1,41 @@
 #include "game/paintings.h"
 
+#define CCM_FAKE_SIZE 614
+
 #define CCM_FAKE_1_X -3046
 #define CCM_FAKE_1_Z -3724
-#define CCM_FAKE_1_DX  304 // PAINTING_SIZE * sin(yaw)
-#define CCM_FAKE_1_DZ -534 // PAINTING_SIZE * cos(yaw)
+// yaw ~ 150.33
+#define CCM_FAKE_1_DX  304 // CCM_FAKE_SIZE * sin(yaw)
+#define CCM_FAKE_1_DZ -534 // CCM_FAKE_SIZE * cos(yaw)
 
 // 0x07021918 - 0x07021998
 static const Vtx inside_castle_seg7_vertex_painting_ccm_fake_1[] = {
-    {{{(CCM_FAKE_1_X +             0), -(PAINTING_SIZE / 2), (CCM_FAKE_1_Z +             0)}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{(CCM_FAKE_1_X + CCM_FAKE_1_DX), -(PAINTING_SIZE / 2), (CCM_FAKE_1_Z + CCM_FAKE_1_DZ)}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_1_X +             0), -(CCM_FAKE_SIZE / 2), (CCM_FAKE_1_Z +             0)}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_1_X + CCM_FAKE_1_DX), -(CCM_FAKE_SIZE / 2), (CCM_FAKE_1_Z + CCM_FAKE_1_DZ)}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_1_X + CCM_FAKE_1_DX),                    0, (CCM_FAKE_1_Z + CCM_FAKE_1_DZ)}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_1_X +             0),                    0, (CCM_FAKE_1_Z +             0)}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_1_X +             0),                    0, (CCM_FAKE_1_Z +             0)}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_1_X + CCM_FAKE_1_DX),                    0, (CCM_FAKE_1_Z + CCM_FAKE_1_DZ)}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{(CCM_FAKE_1_X + CCM_FAKE_1_DX),  (PAINTING_SIZE / 2), (CCM_FAKE_1_Z + CCM_FAKE_1_DZ)}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{(CCM_FAKE_1_X +             0),  (PAINTING_SIZE / 2), (CCM_FAKE_1_Z +             0)}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_1_X + CCM_FAKE_1_DX),  (CCM_FAKE_SIZE / 2), (CCM_FAKE_1_Z + CCM_FAKE_1_DZ)}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_1_X +             0),  (CCM_FAKE_SIZE / 2), (CCM_FAKE_1_Z +             0)}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 #define CCM_FAKE_2_X -1866
 #define CCM_FAKE_2_Z -4258
-#define CCM_FAKE_2_DX  304 // PAINTING_SIZE * sin(yaw)
-#define CCM_FAKE_2_DZ  534 // PAINTING_SIZE * cos(yaw)
+// yaw ~ 29.66
+#define CCM_FAKE_2_DX  304 // CCM_FAKE_SIZE * sin(yaw)
+#define CCM_FAKE_2_DZ  534 // CCM_FAKE_SIZE * cos(yaw)
 
 // 0x07021998 - 0x07021A18
 static const Vtx inside_castle_seg7_vertex_painting_ccm_fake_2[] = {
-    {{{(CCM_FAKE_2_X +             0), -(PAINTING_SIZE / 2), (CCM_FAKE_2_Z +             0)}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{(CCM_FAKE_2_X + CCM_FAKE_2_DX), -(PAINTING_SIZE / 2), (CCM_FAKE_2_Z + CCM_FAKE_2_DZ)}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_2_X +             0), -(CCM_FAKE_SIZE / 2), (CCM_FAKE_2_Z +             0)}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_2_X + CCM_FAKE_2_DX), -(CCM_FAKE_SIZE / 2), (CCM_FAKE_2_Z + CCM_FAKE_2_DZ)}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_2_X + CCM_FAKE_2_DX),                    0, (CCM_FAKE_2_Z + CCM_FAKE_2_DZ)}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_2_X +             0),                    0, (CCM_FAKE_2_Z +             0)}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_2_X +             0),                    0, (CCM_FAKE_2_Z +             0)}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{(CCM_FAKE_2_X + CCM_FAKE_2_DX),                    0, (CCM_FAKE_2_Z + CCM_FAKE_2_DZ)}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{(CCM_FAKE_2_X + CCM_FAKE_2_DX),  (PAINTING_SIZE / 2), (CCM_FAKE_2_Z + CCM_FAKE_2_DZ)}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{(CCM_FAKE_2_X +             0),  (PAINTING_SIZE / 2), (CCM_FAKE_2_Z +             0)}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_2_X + CCM_FAKE_2_DX),  (CCM_FAKE_SIZE / 2), (CCM_FAKE_2_Z + CCM_FAKE_2_DZ)}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{(CCM_FAKE_2_X +             0),  (CCM_FAKE_SIZE / 2), (CCM_FAKE_2_Z +             0)}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x07021A18 - 0x07021A30
