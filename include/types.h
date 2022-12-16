@@ -330,7 +330,7 @@ struct Object {
     /*0x1D0*/ u32 bhvStackIndex;
     /*0x1D4*/ uintptr_t bhvStack[8];
     /*0x1F4*/ s16 bhvDelayTimer;
-    /*0x1F6*/ s16 respawnInfoType;
+    /*0x1F6*/ u8 respawnInfo;
     /*0x1F8*/ f32 hitboxRadius;
     /*0x1FC*/ f32 hitboxHeight;
     /*0x200*/ f32 hurtboxRadius;
@@ -341,7 +341,7 @@ struct Object {
     /*0x214*/ struct Object *platform;
     /*0x218*/ void *collisionData;
     /*0x21C*/ Mat4 transform;
-    /*0x25C*/ void *respawnInfo;
+    /*0x25C*/ u8 *respawnInfoPointer;
 #ifdef PUPPYLIGHTS
     struct PuppyLight puppylight;
 #endif

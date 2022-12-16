@@ -5,6 +5,8 @@ void bhv_respawner_loop(void) {
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, o->oRespawnerMinSpawnDist)) {
         spawnedObject = spawn_object(o, o->oRespawnerModelToRespawn, o->oRespawnerBehaviorToRespawn);
         spawnedObject->oBehParams = o->oBehParams;
+        spawnedObject->respawnInfo = o->respawnInfo;
+        spawnedObject->respawnInfoPointer = o->respawnInfoPointer;
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 }
@@ -15,4 +17,6 @@ void create_respawner(ModelID32 model, const BehaviorScript *behToSpawn, s32 min
     respawner->oRespawnerModelToRespawn = model;
     respawner->oRespawnerMinSpawnDist = minSpawnDist;
     respawner->oRespawnerBehaviorToRespawn = behToSpawn;
+    respawner->respawnInfo = o->respawnInfo;
+    respawner->respawnInfoPointer = o->respawnInfoPointer;
 }

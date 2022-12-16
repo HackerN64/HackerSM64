@@ -20,12 +20,6 @@ enum ObjActiveFlags {
     ACTIVE_FLAG_IGNORE_ENV_BOXES               = (1 << 10), // 0x0400
 };
 
-/* respawnInfoType */
-enum RespawnInfoType {
-    RESPAWN_INFO_TYPE_NULL,
-    RESPAWN_INFO_TYPE_NORMAL
-};
-
 /* respawnInfo */
 #define RESPAWN_INFO_DONT_RESPAWN                   0xFF
 

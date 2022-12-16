@@ -31,6 +31,7 @@ struct SpawnInfo {
     /*0x06*/ Vec3s startAngle;
     /*0x0C*/ s8 areaIndex;
     /*0x0D*/ s8 activeAreaIndex;
+    /*0x0E*/ u8 respawnInfo;
     /*0x10*/ u32 behaviorArg;
     /*0x14*/ void *behaviorScript;
     /*0x18*/ struct GraphNode *model;
