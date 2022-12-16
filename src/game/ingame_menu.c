@@ -1532,7 +1532,7 @@ void render_widescreen_setting(void) {
     if (!gConfig.widescreen) {
         print_generic_string(10, 20, LANG_ARRAY(textCurrRatio43));
     } else {
-        print_generic_string(10, 20, LANG_ARRAY(textCurrRatio169));
+        print_generic_string(10, 24, LANG_ARRAY(textCurrRatio169));
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
