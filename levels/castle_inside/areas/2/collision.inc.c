@@ -3730,10 +3730,5 @@ const Collision inside_castle_seg7_area_2_collision[] = {
     COL_TRI(38, 35, 33),
     COL_TRI(38, 37, 35),
     COL_TRI_STOP(),
-    COL_SPECIAL_INIT(4),
-    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_0stars_door, /*pos*/ -2695, 1203,  1828, /*yaw*/  64),
-    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_0stars_door, /*pos*/  6994, 1203,  1828, /*yaw*/  64),
-    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_0stars_door, /*pos*/  1670, 1203,  1828, /*yaw*/ 192),
-    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_wooden_door, /*pos*/  -997, 1203,  1178, /*yaw*/   0),
     COL_END(),
 };

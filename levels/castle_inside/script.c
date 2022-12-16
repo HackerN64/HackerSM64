@@ -16,6 +16,63 @@
 #include "make_const_nonconst.h"
 #include "levels/castle_inside/header.h"
 
+
+static const LevelScript script_inside_castle_area_1_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  1178,   614, -2434, /*angle*/ 0, 90, 0,  /*behParam*/ (DIALOG_075 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -3185,   205,  -410, /*angle*/ 0, 270, 0, /*behParam*/ (DIALOG_046 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -3185,   205,   -51, /*angle*/ 0, 270, 0, /*behParam*/ (DIALOG_070 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/   435,     0, -1137, /*angle*/ 0, 180, 0, /*behParam*/ (DIALOG_069 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  1670,   307, -1144, /*angle*/ 0, 45, 0,  /*behParam*/ (DIALOG_147 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2278,  -410, -3002, /*angle*/ 0, 180, 0, /*behParam*/ (DIALOG_052 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN, /*pos*/  -618,   388,  -324, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN, /*pos*/ -1430,   388,  -324, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN, /*pos*/  -724,   388,  -324, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN, /*pos*/ -1324,   388,  -324, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  2005,   800, -1694, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_1UP, /*pos*/  2036,   800, -1673, /*angle*/ 0, 0, 0,   /*behParam*/ (1 << 16), /*beh*/ bhvHidden1up),
+    // Special objects
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR_UNUSED, /*pos*/  -271,     0,  -824, /*angle*/ 0, 45, 0,  /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR_UNUSED, /*pos*/ -1775,     0,  -824, /*angle*/ 0, 315, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_CASTLE_DOOR, /*pos*/ -1100,     0,  2202, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvDoorWarp),
+    OBJECT(/*model*/ MODEL_CASTLE_CASTLE_DOOR, /*pos*/  -946,     0,  2202, /*angle*/ 0, 180, 0, /*behParam*/ (1 << 16), /*beh*/ bhvDoorWarp),
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR, /*pos*/ -1023,  -101, -5170, /*angle*/ 0, 0, 0,   /*behParam*/ (2 << 16), /*beh*/ bhvDoorWarp),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/ -3122,   205,  -793, /*angle*/ 0, 90, 0,  /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_1_STAR, /*pos*/   256,     0, -1074, /*angle*/ 0, 0, 0,   /*behParam*/ (1 << 24), /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_1_STAR, /*pos*/   644,   614, -1476, /*angle*/ 0, 315, 0, /*behParam*/ (1 << 24), /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_3_STARS, /*pos*/  1075,   205,  -229, /*angle*/ 0, 270, 0, /*behParam*/ (3 << 24), /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_3_STARS, /*pos*/ -2303,     0, -1074, /*angle*/ 0, 0, 0,   /*behParam*/ (3 << 24), /*beh*/ bhvDoor),
+    RETURN(),
+};
+
+static const LevelScript script_inside_castle_area_2_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/   164,  1203,  2278, /*angle*/ 0, 90, 0,  /*behParam*/ (DIALOG_019 << 16), /*beh*/ bhvSignOnWall),
+    // Special objects
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/ -2695,  1203,  1828, /*angle*/ 0, 90, 0,  /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/  6994,  1203,  1828, /*angle*/ 0, 90, 0,  /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/  1670,  1203,  1828, /*angle*/ 0, 270, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR_UNUSED, /*pos*/  -997,  1203,  1178, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    RETURN(),
+};
+
+static const LevelScript script_inside_castle_area_3_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  6400, -1178, -1270, /*angle*/ 0, 0, 0,   /*behParam*/ (DIALOG_077 << 16), /*beh*/ bhvSignOnWall),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  2130, -2508,  -946, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  2130, -2508,   -92, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  3515, -2508,  -946, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  3515, -2508,   -92, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_1UP, /*pos*/  2861, -2508,  -515, /*angle*/ 0, 0, 0,   /*behParam*/ (4 << 16), /*beh*/ bhvHidden1up),
+    // Special objects
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR_UNUSED, /*pos*/ -3097, -1279,  1434, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR_UNUSED, /*pos*/  -332,  -767,   205, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR_UNUSED, /*pos*/   717, -1177,  -869, /*angle*/ 0, 270, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/  1126, -1074, -2661, /*angle*/ 0, 270, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDoor),
+    OBJECT(/*model*/ MODEL_CASTLE_METAL_DOOR, /*pos*/  7885, -1586,  -511, /*angle*/ 0, 270, 0, /*behParam*/ (2 << 16), /*beh*/ bhvDoorWarp),
+    RETURN(),
+};
+
 static const LevelScript script_func_local_1[] = {
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
@@ -264,7 +321,7 @@ const LevelScript level_castle_inside_entry[] = {
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_1_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_1_rooms),
-        MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_1_macro_objs),
+        JUMP_LINK(script_inside_castle_area_1_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
@@ -281,7 +338,7 @@ const LevelScript level_castle_inside_entry[] = {
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_2_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_2_rooms),
-        MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_2_macro_objs),
+        JUMP_LINK(script_inside_castle_area_2_macro_objects),
         INSTANT_WARP(/*index*/ 0, /*destArea*/ 2, /*displace*/ 0, -205, 410),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
@@ -299,7 +356,7 @@ const LevelScript level_castle_inside_entry[] = {
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_3_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_3_rooms),
-        MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_3_macro_objs),
+        JUMP_LINK(script_inside_castle_area_3_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
