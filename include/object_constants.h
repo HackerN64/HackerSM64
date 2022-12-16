@@ -23,8 +23,7 @@ enum ObjActiveFlags {
 /* respawnInfoType */
 enum RespawnInfoType {
     RESPAWN_INFO_TYPE_NULL,
-    RESPAWN_INFO_TYPE_NORMAL,
-    RESPAWN_INFO_TYPE_MACRO_OBJECT
+    RESPAWN_INFO_TYPE_NORMAL
 };
 
 /* respawnInfo */

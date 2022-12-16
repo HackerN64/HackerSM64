@@ -171,7 +171,6 @@ typedef s32 DrawingLayer;
 typedef s16 PaintingData;
 typedef s32 CameraTransitionAngle;
 typedef s16 Movtex;
-typedef s16 MacroObject;
 typedef s16 Trajectory;
 typedef u8  CutsceneID;
 

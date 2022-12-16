@@ -191,7 +191,6 @@ void clear_areas(void) {
         gAreaData[i].graphNode = NULL;
         gAreaData[i].terrainData = NULL;
         gAreaData[i].surfaceRooms = NULL;
-        gAreaData[i].macroObjects = NULL;
         gAreaData[i].warpNodes = NULL;
         gAreaData[i].paintingWarpNodes = NULL;
         gAreaData[i].instantWarps = NULL;
@@ -239,8 +238,7 @@ void load_area(s32 index) {
         gMarioCurrentRoom = 0;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
-                              gCurrentArea->macroObjects);
+            load_area_terrain(gCurrentArea->terrainData, gCurrentArea->surfaceRooms);
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {
