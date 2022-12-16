@@ -1530,7 +1530,7 @@ void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     if (!gConfig.widescreen) {
-        print_generic_string(10, 20, LANG_ARRAY(textCurrRatio43));
+        print_generic_string(10, 24, LANG_ARRAY(textCurrRatio43));
     } else {
         print_generic_string(10, 24, LANG_ARRAY(textCurrRatio169));
     }
