@@ -30,8 +30,6 @@ extern const Gfx ddd_seg7_dl_0700CE48[];
 extern const Gfx ddd_seg7_dl_0700D2A0[];
 extern const Collision ddd_seg7_area_1_collision[];
 extern const Collision ddd_seg7_area_2_collision[];
-extern const MacroObject ddd_seg7_area_1_macro_objs[];
-extern const MacroObject ddd_seg7_area_2_macro_objs[];
 extern const Collision ddd_seg7_collision_submarine[];
 extern const Collision ddd_seg7_collision_bowser_sub_door[];
 extern const struct MovtexQuadCollection ddd_movtex_area1_water[];
