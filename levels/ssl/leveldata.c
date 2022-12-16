@@ -1,7 +1,6 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-#include "level_misc_macros.h"
 #include "macros.h"
 #include "moving_texture_macros.h"
 #include "surface_terrains.h"
