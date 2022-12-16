@@ -15,6 +15,18 @@
 #include "make_const_nonconst.h"
 #include "levels/bowser_3/header.h"
 
+
+static const LevelScript script_bowser_3_macro_objects[] = {
+    // Special objects
+    OBJECT(/*model*/ MODEL_BOWSER, /*pos*/    13,   307, -1024, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvBowser),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/ -3362,  -204,  1121, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/     0,  -204,  3584, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  3362,  -204,  1126, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  2123,  -204, -2912, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/ -2122,  -204, -2912, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    RETURN(),
+};
+
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_BOWSER_3_FALLING_PLATFORM_1,  /*pos*/     0,   0,     0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvFallingBowserPlatform),
     OBJECT(/*model*/ MODEL_BOWSER_3_FALLING_PLATFORM_2,  /*pos*/     0,   0,     0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00020000, /*beh*/ bhvFallingBowserPlatform),
@@ -61,6 +73,7 @@ const LevelScript level_bowser_3_entry[] = {
         JUMP_LINK(script_func_local_1),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_BITS, /*destArea*/ 0x01, /*destNode*/ 0x0C, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ bowser_3_seg7_collision_level),
+        JUMP_LINK(script_bowser_3_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0002, /*seq*/ SEQ_LEVEL_BOSS_KOOPA_FINAL),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),

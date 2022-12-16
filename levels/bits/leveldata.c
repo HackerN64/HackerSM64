@@ -3,8 +3,6 @@
 #include "surface_terrains.h"
 #include "moving_texture_macros.h"
 #include "level_misc_macros.h"
-#include "macro_preset_names.h"
-#include "special_preset_names.h"
 #include "textures.h"
 
 #include "make_const_nonconst.h"
@@ -42,7 +40,6 @@
 #include "levels/bits/areas/1/31/model.inc.c"
 #include "levels/bits/areas/1/32/model.inc.c"
 #include "levels/bits/areas/1/collision.inc.c"
-#include "levels/bits/areas/1/macro.inc.c"
 #include "levels/bits/areas/1/20/collision.inc.c"
 #include "levels/bits/areas/1/21/collision.inc.c"
 #include "levels/bits/areas/1/22/collision.inc.c"

@@ -3,8 +3,6 @@
 #include "surface_terrains.h"
 #include "moving_texture_macros.h"
 #include "level_misc_macros.h"
-#include "macro_preset_names.h"
-#include "special_preset_names.h"
 #include "textures.h"
 
 #include "make_const_nonconst.h"
@@ -43,7 +41,6 @@
 #include "levels/bitfs/sinking_platforms/model.inc.c"
 #include "levels/bitfs/seesaw_platform/model.inc.c"
 #include "levels/bitfs/areas/1/collision.inc.c"
-#include "levels/bitfs/areas/1/macro.inc.c"
 #include "levels/bitfs/elevator/collision.inc.c"
 #include "levels/bitfs/sinking_cage_platform/collision.inc.c"
 #include "levels/bitfs/tilting_square_platform/collision.inc.c"
