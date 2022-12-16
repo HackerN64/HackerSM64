@@ -400,31 +400,6 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
 #undef VTX_PER_GRP
 
 /**
- * Orient the painting mesh for rendering.
- */
-Gfx *painting_model_view_transform(const struct PaintingImage *paintingImage) {
-    u32 gfxCmds = (
-        /*gSPMatrix         */ 1 +
-        /*gSPEndDisplayList */ 1
-    );
-    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
-    Gfx *gfx = dlist;
-
-    // Scale
-    Mtx *scale = alloc_display_list(sizeof(Mtx));
-    guScale(
-        scale,
-        (paintingImage->sizeX / PAINTING_SIZE),
-        (paintingImage->sizeY / PAINTING_SIZE),
-        1.0f
-    );
-    gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
-    gSPEndDisplayList(gfx);
-
-    return dlist;
-}
-
-/**
  * Gets the exponent of an integer by converting it into a float and extracting the exponent bits.
  */
 s32 get_exponent(s32 x) {
@@ -466,7 +441,6 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
 
     u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
-        /*gSPDisplayList    */ 1 +
         /*gDPSetTile        */ 1 +
         /*gDPSetTileSize    */ 1 +
         (imageCount * (
@@ -483,7 +457,6 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
         return dlist;
     }
 
-    gSPDisplayList(gfx++, painting_model_view_transform(paintingImage));
     Gfx *beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
     gSPDisplayList(gfx++, beginDl);
 
@@ -662,7 +635,6 @@ Gfx *display_painting_not_rippling(struct Object *obj) {
     const struct PaintingImage *paintingImage = obj->oPaintingImage;
     u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
-        /*gSPDisplayList    */ 1 +
         /*gSPPopMatrix      */ 1 +
         /*gSPEndDisplayList */ 1
     );
@@ -673,7 +645,6 @@ Gfx *display_painting_not_rippling(struct Object *obj) {
         return dlist;
     }
 
-    gSPDisplayList(gfx++, painting_model_view_transform(paintingImage));
     gSPDisplayList(gfx++, dl_painting_not_rippling(paintingImage));
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     gSPEndDisplayList(gfx);
@@ -767,6 +738,10 @@ void bhv_painting_init(void) {
 
     // Set the object's painting image data pointer.
     obj->oPaintingImage = paintingImage;
+
+    // Set the object's scale.
+    obj->header.gfx.scale[0] = (paintingImage->sizeX / PAINTING_SIZE);
+    obj->header.gfx.scale[1] = (paintingImage->sizeY / PAINTING_SIZE);
 
     // Update the painting object's room.
     painting_update_room(obj);

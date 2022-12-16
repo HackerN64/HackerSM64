@@ -9584,9 +9584,8 @@ void cutscene_enter_painting(struct Camera *c) {
     struct Object *ripplingPainting = gCutsceneFocus;
 
     if (ripplingPainting != NULL) {
-        const struct PaintingImage *paintingImage = ripplingPainting->oPaintingImage;
-        f32 sizeX = paintingImage->sizeX;
-        f32 sizeY = paintingImage->sizeY;
+        f32 sizeX = (ripplingPainting->header.gfx.scale[0] * PAINTING_SIZE);
+        f32 sizeY = (ripplingPainting->header.gfx.scale[1] * PAINTING_SIZE);
     
         vec3i_to_vec3s(paintingAngle, &ripplingPainting->oFaceAngleVec);
 
