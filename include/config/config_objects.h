@@ -130,6 +130,6 @@
  *****************/
 
 /**
- * If you enable this define, you will be able to aim freely in 360 degrees with cannons
+ * Removes the restriction on horizontal turning when aiming a cannon, allowing full 360 degree rotation.
  */
 #define UNRESTRICTED_CANNON_AIMING
