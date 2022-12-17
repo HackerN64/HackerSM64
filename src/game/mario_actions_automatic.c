@@ -725,7 +725,11 @@ s32 act_in_cannon(struct MarioState *m) {
             marioObj->oMarioCannonInputYaw -= (s16)(m->controller->stickX * 10.0f);
 
             m->faceAngle[0] = CLAMP(m->faceAngle[0], 0, DEGREES(80));
+    #ifdef UNRESTRICTED_CANNON_AIMING
+            marioObj->oMarioCannonInputYaw = marioObj->oMarioCannonInputYaw;
+    #else
             marioObj->oMarioCannonInputYaw = CLAMP(marioObj->oMarioCannonInputYaw, -0x4000, 0x4000);
+    #endif
 
             m->faceAngle[1] = (marioObj->oMarioCannonObjectYaw + marioObj->oMarioCannonInputYaw);
             if (m->input & INPUT_A_PRESSED) {

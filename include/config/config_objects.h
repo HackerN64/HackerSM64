@@ -124,3 +124,12 @@
  * The number of segments Wiggler has, not including the head. Vanilla is 4.
  */
 #define WIGGLER_NUM_SEGMENTS     4
+
+/*****************
+ * -- CANNONS --
+ *****************/
+
+/**
+ * If you enable this define, you will be able to aim freely in 360 degrees with cannons
+ */
+#define UNRESTRICTED_CANNON_AIMING
