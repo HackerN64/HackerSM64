@@ -1033,9 +1033,16 @@ s32 play_mode_paused(void) {
         if (gDebugLevelSelect) {
             fade_into_special_warp(WARP_SPECIAL_LEVEL_SELECT, 1);
         } else {
+        #ifdef DEATH_ON_EXIT_COURSE
+            level_trigger_warp(gMarioState, WARP_OP_DEATH);
+            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
+            set_play_mode(PLAY_MODE_NORMAL);
+            gSavedCourseNum = COURSE_NONE;
+        #else
             initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAGS_NONE);
             fade_into_special_warp(WARP_SPECIAL_NONE, 0);
             gSavedCourseNum = COURSE_NONE;
+        #endif
         }
 
         gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
