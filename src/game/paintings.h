@@ -8,25 +8,31 @@
 #include "types.h"
 
 
-/// The default painting edge length. Default is 614.4f.
-#define PAINTING_SIZE 614.4f
+// The size of the stored painting mesh model, before it is created and scaled down to 1x1.
+// Vanilla is 614.4f, changed to 600.0f in HackerSM64 to prevent rounding issues.
+// Changing this affects the painting's lighting. The larger the difference between this and
+// the final size of the painting, the greater the difference in lighting.
+#define PAINTING_SIZE 600.0f
 
-/// The depth of the area in front of the painting which triggers ripples without warping. Default is 102.4f.
+// The threshold of scale at which to use a larger ripple animation in sRippleAnimations. Default is 1200.0f.
+#define PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD 1200.0f
+
+// The depth of the area in front of the painting which triggers ripples without warping. Default is 102.4f.
 #define PAINTING_WOBBLE_DEPTH 102.4f
 
-/// The depth of the area behind the painting which triggers the warp. Default is 409.6f.
+// The depth of the area behind the painting which triggers the warp. Default is 409.6f.
 #define PAINTING_WARP_DEPTH 409.6f
 
-/// The threshold relative to the painting's plane between wobbling and warping. Default is -30.72f.
+// The threshold relative to the painting's plane between wobbling and warping. Default is -30.72f.
 #define PAINTING_WOBBLE_WARP_THRESHOLD -30.72f
 
-/// The size of the buffer around the edges of the painting in which Mario is still considered within bounds.
+// The size of the buffer around the edges of the painting in which Mario is still considered within bounds.
 #define PAINTING_EDGE_MARGIN 160.0f
 
-/// This is added to Mario's Y position to make the ripple closer to Mario's center of mass. Default is 50.0f
+// This is added to Mario's Y position to make the ripple closer to Mario's center of mass. Default is 50.0f
 #define PAINTING_MARIO_Y_OFFSET 50.0f
 
-/// Convert image coordinates to texel coordinates.
+// Convert image coordinates to texel coordinates.
 #define TC(t) (((t) - 1) << 5)
 
 

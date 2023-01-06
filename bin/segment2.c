@@ -3103,6 +3103,7 @@ const PaintingData painting_data_triangles[] = {
     264, // num triangles
     // Grouped by 5 + one remainder group,
     // = 15 vertices per group + a few extra triangles
+
     // Bottom half
       60,   59,   52,
       49,   53,   55,

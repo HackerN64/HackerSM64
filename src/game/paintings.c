@@ -131,8 +131,8 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, Pai
     f32 rippleX = obj->oPaintingRipplePosX;
     f32 rippleY = obj->oPaintingRipplePosY;
 
-    f32 sizeRatioX = obj->header.gfx.scale[0];
-    f32 sizeRatioY = obj->header.gfx.scale[1];
+    f32 sizeRatioX = (obj->header.gfx.scale[0] / PAINTING_SIZE);
+    f32 sizeRatioY = (obj->header.gfx.scale[1] / PAINTING_SIZE);
 
     f32 dx, dy;
     f32 rippleDistance;
@@ -430,6 +430,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     s32 isEnvMap = (paintingImage->imageType == PAINTING_IMAGE_TYPE_ENV_MAP);
 
     u32 gfxCmds = (
+        /*gSPMatrix         */ 1 +
         /*gSPDisplayList    */ 1 +
         /*gDPSetTile        */ 1 +
         /*gDPSetTileSize    */ 1 +
@@ -437,6 +438,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
             /*gSPDisplayList    */ 1
         )) +
         /*gSPDisplayList    */ 1 +
+        /*gSPPopMatrix      */ 1 +
         /*gSPEndDisplayList */ 1
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
@@ -445,6 +447,15 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     if (dlist == NULL) {
         return dlist;
     }
+    // Scale
+    Mtx *scale = alloc_display_list(sizeof(Mtx));
+    guScale(
+        scale,
+        (1.0f / PAINTING_SIZE),
+        (1.0f / PAINTING_SIZE),
+        1.0f
+    );
+    gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
     Gfx *beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
     gSPDisplayList(gfx++, beginDl);
@@ -462,6 +473,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
 
     Gfx *endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_rippling_end);
     gSPDisplayList(gfx++, endDl);
+    gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     gSPEndDisplayList(gfx);
 
     return dlist;
@@ -505,11 +517,13 @@ Gfx *display_painting_rippling(struct Object *obj) {
     return dlist;
 }
 
-Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
+Gfx *dl_painting_not_rippling(struct Object *obj) {
+    const struct PaintingImage *paintingImage = obj->oPaintingImage;
     Alpha alpha = paintingImage->alpha;
     s16 imageCount = paintingImage->imageCount;
     s32 shaded = paintingImage->shaded;
     u32 gfxCmds = (
+        /*gSPMatrix             */ 1 +
         /*gSPDisplayList        */ 1 +
         /*gSPVertex             */ 1 +
         /*gDPSetTile            */ 1 +
@@ -524,6 +538,7 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
         (!shaded * (
             /*gSPSetGeometryMode    */ 1
         )) +
+        /*gSPPopMatrix          */ 1 +
         /*gSPEndDisplayList     */ 1
     );
     Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
@@ -532,6 +547,16 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
     if (dlist == NULL) {
         return dlist;
     }
+
+    // Scale
+    Mtx *scale = alloc_display_list(sizeof(Mtx));
+    guScale(
+        scale,
+        (1.0f / PAINTING_SIZE),
+        (1.0f / PAINTING_SIZE),
+        1.0f
+    );
+    gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
     Vtx *verts = alloc_display_list((imageCount * 4) * sizeof(*verts));
     Vec3c n;
@@ -607,6 +632,7 @@ Gfx *dl_painting_not_rippling(const struct PaintingImage *paintingImage) {
         gSPSetGeometryMode(gfx++, G_LIGHTING);
     }
 
+    gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     gSPEndDisplayList(gfx);
 
     return dlist;
@@ -647,7 +673,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
             }
 
             if (obj->oAction == PAINTING_ACT_IDLE) {
-                paintingDlist = dl_painting_not_rippling(paintingImage);
+                paintingDlist = dl_painting_not_rippling(obj);
             } else {
                 paintingDlist = display_painting_rippling(obj);
             }
@@ -663,12 +689,10 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
  * Updates a painting object's room from a point in front of the center of the painting.
  */
 void painting_update_room(struct Object *obj) {
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
-
     // The center of the painting, but with an offset since paintings are usually between floor triangle edges laterally.
     Vec3f distPos = {
-        (paintingImage->sizeX * 0.5f),
-        (paintingImage->sizeY * 0.5f),
+        (obj->header.gfx.scale[0] * 0.5f),
+        (obj->header.gfx.scale[1] * 0.5f),
         PAINTING_WOBBLE_DEPTH // Distance in front of the painting to check for a room floor.
     };
 
@@ -699,9 +723,9 @@ void bhv_painting_init(void) {
     // Set the object's painting image data pointer.
     obj->oPaintingImage = paintingImage;
 
-    // Set the object's scale.
-    obj->header.gfx.scale[0] = (paintingImage->sizeX / PAINTING_SIZE);
-    obj->header.gfx.scale[1] = (paintingImage->sizeY / PAINTING_SIZE);
+    // Set the object's initial scale.
+    obj->header.gfx.scale[0] = paintingImage->sizeX;
+    obj->header.gfx.scale[1] = paintingImage->sizeY;
 
     // Update the painting object's room.
     painting_update_room(obj);
@@ -730,14 +754,11 @@ s32 painting_update_mario_pos(struct Object *obj, Vec3f marioLocalPos) {
     // Get Mario's position in the painting's local space.
     vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, &obj->oPosVec, rotation);
 
-    // Get the const painting image data.
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
-
     // Check if Mario is within the painting bounds laterally in local space.
     if (marioLocalPos[0] > -PAINTING_EDGE_MARGIN
-     && marioLocalPos[0] < (paintingImage->sizeX + PAINTING_EDGE_MARGIN)
+     && marioLocalPos[0] < (obj->header.gfx.scale[0] + PAINTING_EDGE_MARGIN)
      && marioLocalPos[1] > -PAINTING_EDGE_MARGIN
-     && marioLocalPos[1] < (paintingImage->sizeY + PAINTING_EDGE_MARGIN)) {
+     && marioLocalPos[1] < (obj->header.gfx.scale[1] + PAINTING_EDGE_MARGIN)) {
         if (marioLocalPos[2] > PAINTING_WOBBLE_WARP_THRESHOLD) {
             // In front of the painting, check whether Mario is inside the wobble zone.
             if (marioLocalPos[2] < PAINTING_WOBBLE_DEPTH) {
@@ -775,14 +796,15 @@ s32 painting_update_mario_pos(struct Object *obj, Vec3f marioLocalPos) {
 /**
  * Returns a pointer to the RippleAnimationPair that best fits the painting type.
  */
-const struct RippleAnimationPair *painting_get_ripple_animation_type_info(const struct PaintingImage *paintingImage) {
+const struct RippleAnimationPair *painting_get_ripple_animation_type_info(struct Object *obj) {
+    const struct PaintingImage *paintingImage = obj->oPaintingImage;
     s8 rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
 
     if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         rippleAnimationType = RIPPLE_ANIM_PROXIMITY;
 
-        if (paintingImage->sizeX >= (PAINTING_SIZE * 2)
-         || paintingImage->sizeY >= (PAINTING_SIZE * 2)) {
+        if (obj->header.gfx.scale[0] >= PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD
+         || obj->header.gfx.scale[1] >= PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD) {
             rippleAnimationType = RIPPLE_ANIM_PROXIMITY_LARGE;
         }
     }
@@ -851,8 +873,7 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
  * @param shouldResetTimer if TRUE, set the timer to 0.
  */
 void painting_start_ripples(struct Object *obj, f32 ripplePosX, f32 ripplePosY, s32 shouldResetTimer) {
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(paintingImage);
+    const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(obj);
 
     // Use a different set of variables depending on the state
     switch (obj->oAction) {
@@ -921,7 +942,7 @@ void bhv_painting_loop(void) {
     } else if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // Continuous trigger type:
 
-        const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(paintingImage);
+        const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(obj);
         // If the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple.
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
@@ -936,7 +957,7 @@ void bhv_painting_loop(void) {
             painting_start_ripples(obj, marioLocalPos[0], marioLocalPos[1], FALSE); // Start entering
         } else if (obj->oAction == PAINTING_ACT_IDLE) {
             obj->oAction = PAINTING_ACT_RIPPLING;
-            painting_start_ripples(obj, (paintingImage->sizeX * 0.5f), (paintingImage->sizeY * 0.5f), TRUE); // Start idle wobbling
+            painting_start_ripples(obj, (obj->header.gfx.scale[0] * 0.5f), (obj->header.gfx.scale[1] * 0.5f), TRUE); // Start idle wobbling
         }
     }
 
