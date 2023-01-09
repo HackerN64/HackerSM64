@@ -237,6 +237,11 @@ void print_course_number(void) {
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_kurs_upper);
             break;
 #endif
+#ifdef ENABLE_SPANISH
+        case LANGUAGE_SPANISH:
+            gSPDisplayList(gDisplayListHead++, dl_menu_texture_nivel_upper);
+            break;
+#endif
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_rgba16_wood_course_end);
@@ -256,7 +261,8 @@ LangArray textActMyScore = DEFINE_LANGUAGE_ARRAY(
     "MYSCORE",
     "MON SCORE",
     "LEISTUNG",
-    "マイスコア");
+    "マイスコア",
+    "MI RÉCORD");
 /**
  * Print act selector strings, some with special checks.
  */

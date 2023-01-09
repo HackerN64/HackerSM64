@@ -1933,6 +1933,17 @@ const Gfx dl_menu_texture_kurs_upper[] = {
     gsSPEndDisplayList(),
 };
 #endif
+
+#ifdef ENABLE_SPANISH
+ALIGNED8 static const Texture texture_menu_nivel_upper[] = {
+#include "levels/menu/main_menu_seg7.nivel_upper.rgba16.inc.c"
+};
+
+const Gfx dl_menu_texture_nivel_upper[] = {
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_menu_nivel_upper),
+    gsSPEndDisplayList(),
+};
+#endif
 #endif
 
 // 0x0700F2F8 - 0x0700F328
@@ -1986,6 +1997,14 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
+#ifdef ENABLE_SPANISH
+#define COURSE_NAME_TABLE course_strings_es_table
+#define COURSE_FILE "es/courses.h"
+#include "text/define_courses.inc.c"
+#undef COURSE_NAME_TABLE
+#undef COURSE_FILE
+#endif
+
 const char *(*course_strings_language_table[])[] = {
     &course_strings_en_table,
 #ifdef ENABLE_FRENCH
@@ -2000,6 +2019,11 @@ const char *(*course_strings_language_table[])[] = {
 #endif
 #ifdef ENABLE_JAPANESE
     &course_strings_jp_table,
+#else
+    NULL,
+#endif
+#ifdef ENABLE_SPANISH
+    &course_strings_es_table,
 #else
     NULL,
 #endif

@@ -159,6 +159,7 @@
     #undef ENABLE_FRENCH
     #undef ENABLE_GERMAN
     #undef ENABLE_JAPANESE
+    #undef ENABLE_SPANISH
 #endif // !MULTILANG
 
 #ifdef ENABLE_JAPANESE

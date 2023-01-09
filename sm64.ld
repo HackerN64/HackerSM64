@@ -318,6 +318,9 @@ SECTIONS
 #ifdef ENABLE_JAPANESE
    YAY0_SEG(translation_jp, 0x19000000)
 #endif
+#ifdef ENABLE_SPANISH
+   YAY0_SEG(translation_es, 0x19000000)
+#endif
 #endif
 
    /* mario actor group */
