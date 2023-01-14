@@ -51,6 +51,7 @@
  *      A CONTINUOUS painting will automatically reset to PAINTING_ACT_RIPPLING if its ripple magnitude becomes small enough.
  */
 
+
 /**
  * Array of pointers to painting image data structs.
  */
@@ -81,17 +82,18 @@ const struct PaintingImage *sPaintings[] = {
 const struct RippleAnimationPair sRippleAnimations[] = {
     [RIPPLE_ANIM_CONTINUOUS] = {
         .passive = { .mag =  10.0f, .decay = 1.0f,    .rate = 0.05f, .dispersion = 15.0f },
-        .entry   = { .mag =  30.0f, .decay = 0.98f,   .rate = 0.05f, .dispersion = 15.0f }
+        .entry   = { .mag =  30.0f, .decay = 0.98f,   .rate = 0.05f, .dispersion = 15.0f },
     },
     [RIPPLE_ANIM_PROXIMITY] = {
         .passive = { .mag =  20.0f, .decay = 0.9608f, .rate = 0.24f, .dispersion = 40.0f },
-        .entry   = { .mag =  80.0f, .decay = 0.9524f, .rate = 0.14f, .dispersion = 30.0f }
+        .entry   = { .mag =  80.0f, .decay = 0.9524f, .rate = 0.14f, .dispersion = 30.0f },
     },
     [RIPPLE_ANIM_PROXIMITY_LARGE] = {
         .passive = { .mag =  40.0f, .decay = 0.9608f, .rate = 0.12f, .dispersion = 80.0f },
-        .entry   = { .mag = 160.0f, .decay = 0.9524f, .rate = 0.07f, .dispersion = 60.0f }
-    }
+        .entry   = { .mag = 160.0f, .decay = 0.9524f, .rate = 0.07f, .dispersion = 60.0f },
+    },
 };
+
 
 /// - DRAW -
 
@@ -149,8 +151,8 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, Pai
 
         paintingMesh->pos[0] = vtxX;
         paintingMesh->pos[1] = vtxY;
-        // The "Z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
-        // actual coordinate, it just determines whether the vertex moves.
+        // The "Z coordinate" of each vertex in painting_data_vertices is either 1 or 0.
+        // Instead of being an actual coordinate, it just determines whether the vertex can move or not.
         if (vtxData[tri + 3]) {
             // Scale and calculate the distance to the ripple origin.
             dx = ((vtxX * sizeRatioX) - rippleX);
@@ -405,7 +407,6 @@ void painting_setup_textures(Gfx **gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
     u32 masks = get_exponent(tWidth);
     u32 maskt = get_exponent(tHeight);
 
-    // Set up the textures.
     gDPSetTile((*gfx)++, G_IM_FMT_RGBA, G_IM_SIZ_16b,
         (tWidth >> 2), 0, G_TX_RENDERTILE, 0,
         cm, maskt, G_TX_NOLOD,
@@ -493,7 +494,7 @@ Gfx *display_painting_rippling(struct Object *obj) {
     // When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
     // This mesh only contains the vertex positions and normals.
     // Paintings use an additional array to map textures to the mesh.
-    //! TODO: Find out why clearing this causes flickering.
+    //! TODO: Find out why clearing this between frames causes flickering.
     struct PaintingMeshVertex *paintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
     // A list of neighbor triangles for each vertes. This gets cleared each frame while 'paintingMesh' isn't.
     struct PaintingNeighborTris *neighborTris = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingNeighborTris)));
@@ -510,6 +511,7 @@ Gfx *display_painting_rippling(struct Object *obj) {
     dlist = dl_painting_rippling(paintingImage, paintingMesh, triangleData);
 
     // The mesh data is freed every frame.
+    //! This data is not actually cleared.
     mem_pool_free(gEffectsMemoryPool, paintingMesh);
     mem_pool_free(gEffectsMemoryPool, neighborTris);
     mem_pool_free(gEffectsMemoryPool, paintingTriNorms);
@@ -751,7 +753,7 @@ s32 painting_update_mario_pos(struct Object *obj, Vec3f marioLocalPos) {
     // Get the painting's rotation.
     vec3i_to_vec3s(rotation, &obj->oFaceAngleVec);
 
-    // Get Mario's position in the painting's local space.
+    // Get Mario's position in the painting's frame of reference.
     vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, &obj->oPosVec, rotation);
 
     // Check if Mario is within the painting bounds laterally in local space.

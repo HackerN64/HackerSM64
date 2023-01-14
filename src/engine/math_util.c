@@ -777,7 +777,13 @@ void mtxf_rotate_xy(Mtx *mtx, s16 angle) {
 }
 
 /**
- * Makes 'destWorldPos' the world space equivalent of 'srcLocalPos'.
+ * @brief Converts a position in a local frame of reference into the same
+ * position in global world-space, and stores it in 'destWorldPos'.
+ * 
+ * @param destWorldPos Where the resulting global world-space position is stored.
+ * @param srcLocalPos The position in the local frame of reference to convert from.
+ * @param originPos The origin position of the local frame of reference (in global world-space).
+ * @param rotation The rotation of the local frame of reference (in global world-space).
  */
 void vec3f_local_pos_to_world_pos(Vec3f destWorldPos, Vec3f srcLocalPos, Vec3f originPos, Vec3s rotation) {
     Mat4 mtx;
@@ -788,7 +794,13 @@ void vec3f_local_pos_to_world_pos(Vec3f destWorldPos, Vec3f srcLocalPos, Vec3f o
 }
 
 /**
- * Makes 'destLocalPos' the local space equivalent of 'srcWorldPos'.
+ * @brief Converts a global world-space position into the same position but
+ * from a local frame of reference, and stores the result in 'destLocalPos'.
+ * 
+ * @param destLocalPos Where the resulting position in the local frame of reference is stored.
+ * @param srcWorldPos The position in global world-space to convert from.
+ * @param originPos The origin position of the local frame of reference (in global world-space).
+ * @param rotation The rotation of the local frame of reference (in global world-space).
  */
 void vec3f_world_pos_to_local_pos(Vec3f destLocalPos, Vec3f srcWorldPos, Vec3f originPos, Vec3s rotation) {
     Mat4 mtx;
