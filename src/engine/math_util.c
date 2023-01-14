@@ -100,216 +100,6 @@ void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max) { min_max_3_func(a, b, 
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, c, min, max); }
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
 
-/// Perform a bitwise copy from vector 'src' to 'dest'
-#define vec3_copy_bits(destFmt, dest, srcFmt, src) { \
-    register destFmt x = ((srcFmt *) src)[0];        \
-    register destFmt y = ((srcFmt *) src)[1];        \
-    register destFmt z = ((srcFmt *) src)[2];        \
-    ((destFmt *) dest)[0] = x;                       \
-    ((destFmt *) dest)[1] = y;                       \
-    ((destFmt *) dest)[2] = z;                       \
-}
-void vec3f_copy    (Vec3f dest, const Vec3f src) { vec3_copy_bits(f32, dest, f32, src); } // 32 -> 32
-void vec3i_copy    (Vec3i dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
-void vec3s_copy    (Vec3s dest, const Vec3s src) { vec3_copy_bits(s16, dest, s16, src); } // 16 -> 16
-void vec3s_to_vec3i(Vec3i dest, const Vec3s src) { vec3_copy_bits(s32, dest, s16, src); } // 16 -> 32
-void vec3s_to_vec3f(Vec3f dest, const Vec3s src) { vec3_copy_bits(f32, dest, s16, src); } // 16 -> 32
-void vec3i_to_vec3s(Vec3s dest, const Vec3i src) { vec3_copy_bits(s16, dest, s32, src); } // 32 -> 16
-void vec3i_to_vec3f(Vec3f dest, const Vec3i src) { vec3_copy_bits(f32, dest, s32, src); } // 32 -> 32
-
-void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf) {
-    register f32 x = surf->normal.x;
-    register f32 y = surf->normal.y;
-    register f32 z = surf->normal.z;
-    ((f32 *) dest)[0] = x;
-    ((f32 *) dest)[1] = y;
-    ((f32 *) dest)[2] = z;
-}
-
-/// Convert float vector a to a short vector 'dest' by rounding the components to the nearest integer.
-#define vec3_copy_bits_roundf(fmt, dest, src) { \
-    register fmt x = roundf(src[0]);            \
-    register fmt y = roundf(src[1]);            \
-    register fmt z = roundf(src[2]);            \
-    ((fmt *) dest)[0] = x;                      \
-    ((fmt *) dest)[1] = y;                      \
-    ((fmt *) dest)[2] = z;                      \
-}
-void vec3f_to_vec3s(Vec3s dest, const Vec3f src) { vec3_copy_bits_roundf(s16, dest, src); } // 32 -> 16
-void vec3f_to_vec3i(Vec3i dest, const Vec3f src) { vec3_copy_bits_roundf(s32, dest, src); } // 32 -> 32
-#undef vec3_copy_bits_roundf
-
-#define vec3_copy_y_off_func(destFmt, dest, srcFmt, src, yOff) {\
-    register destFmt x = ((srcFmt *) src)[0];                   \
-    register destFmt y = ((srcFmt *) src)[1] + yOff;            \
-    register destFmt z = ((srcFmt *) src)[2];                   \
-    ((destFmt *) dest)[0] = x;                                  \
-    ((destFmt *) dest)[1] = y;                                  \
-    ((destFmt *) dest)[2] = z;                                  \
-}
-void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff) { vec3_copy_y_off_func(f32, dest, f32, src, yOff); }
-#undef vec3_copy_y_off_func
-
-/// Set vector 'dest' to (x, y, z)
-inline void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
-inline void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z) { vec3_set(dest, x, y, z); }
-inline void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_set(dest, x, y, z); }
-
-/// Add vector 'a' to 'dest'
-#define vec3_add_func(fmt, dest, a) {   \
-    register fmt *temp = (fmt *)(dest); \
-    register fmt sum, sum2;             \
-    register s32 i;                     \
-    for (i = 0; i < 3; i++) {           \
-        sum = *(a);                     \
-        (a)++;                          \
-        sum2 = *temp;                   \
-        *temp = (sum + sum2);           \
-        temp++;                         \
-    }                                   \
-}
-void vec3f_add(Vec3f dest, const Vec3f a) { vec3_add_func(f32, dest, a); }
-void vec3i_add(Vec3i dest, const Vec3i a) { vec3_add_func(s32, dest, a); }
-void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
-#undef vec3_add_func
-
-/// Make 'dest' the sum of vectors a and b.
-#define vec3_sum_func(fmt, dest, a, b) {\
-    register fmt *temp = (fmt *)(dest); \
-    register fmt sum, sum2;             \
-    register s32 i;                     \
-    for (i = 0; i < 3; i++) {           \
-        sum = *(a);                     \
-        (a)++;                          \
-        sum2 = *(b);                    \
-        (b)++;                          \
-        *temp = (sum + sum2);           \
-        temp++;                         \
-    }                                   \
-}
-void vec3f_sum(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_sum_func(f32, dest, a, b); }
-void vec3i_sum(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_sum_func(s32, dest, a, b); }
-void vec3s_sum(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_sum_func(s16, dest, a, b); }
-#undef vec3_sum_func
-
-/// Subtract vector a from 'dest'
-#define vec3_sub_func(fmt, dest, a) {   \
-    register fmt x = ((fmt *) a)[0];    \
-    register fmt y = ((fmt *) a)[1];    \
-    register fmt z = ((fmt *) a)[2];    \
-    ((fmt *) dest)[0] -= x;             \
-    ((fmt *) dest)[1] -= y;             \
-    ((fmt *) dest)[2] -= z;             \
-}
-void vec3f_sub(Vec3f dest, const Vec3f a) { vec3_sub_func(f32, dest, a); }
-void vec3i_sub(Vec3i dest, const Vec3i a) { vec3_sub_func(s32, dest, a); }
-void vec3s_sub(Vec3s dest, const Vec3s a) { vec3_sub_func(s16, dest, a); }
-#undef vec3_sub_func
-
-/// Make 'dest' the difference of vectors a and b.
-#define vec3_diff_func(fmt, dest, a, b) {   \
-    register fmt x1 = ((fmt *) a)[0];       \
-    register fmt y1 = ((fmt *) a)[1];       \
-    register fmt z1 = ((fmt *) a)[2];       \
-    register fmt x2 = ((fmt *) b)[0];       \
-    register fmt y2 = ((fmt *) b)[1];       \
-    register fmt z2 = ((fmt *) b)[2];       \
-    ((fmt *) dest)[0] = (x1 - x2);          \
-    ((fmt *) dest)[1] = (y1 - y2);          \
-    ((fmt *) dest)[2] = (z1 - z2);          \
-}
-void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_diff_func(f32, dest, a, b); }
-void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_diff_func(s32, dest, a, b); }
-void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_diff_func(s16, dest, a, b); }
-#undef vec3_diff_func
-
-/// Multiply vector 'a' into 'dest'
-#define vec3_mul_func(fmt, dest, a) {   \
-    register fmt x = ((fmt *) a)[0];    \
-    register fmt y = ((fmt *) a)[1];    \
-    register fmt z = ((fmt *) a)[2];    \
-    ((fmt *) dest)[0] *= x;             \
-    ((fmt *) dest)[1] *= y;             \
-    ((fmt *) dest)[2] *= z;             \
-}
-void vec3f_mul(Vec3f dest, const Vec3f a) { vec3_mul_func(f32, dest, a); }
-void vec3i_mul(Vec3i dest, const Vec3i a) { vec3_mul_func(s32, dest, a); }
-void vec3s_mul(Vec3s dest, const Vec3s a) { vec3_mul_func(s16, dest, a); }
-#undef vec3_mul_func
-
-/// Make 'dest' the product of vectors a and b.
-#define vec3_prod_func(fmt, dest, a, b) {   \
-    register fmt x1 = ((fmt *) a)[0];       \
-    register fmt y1 = ((fmt *) a)[1];       \
-    register fmt z1 = ((fmt *) a)[2];       \
-    register fmt x2 = ((fmt *) b)[0];       \
-    register fmt y2 = ((fmt *) b)[1];       \
-    register fmt z2 = ((fmt *) b)[2];       \
-    ((fmt *) dest)[0] = (x1 * x2);          \
-    ((fmt *) dest)[1] = (y1 * y2);          \
-    ((fmt *) dest)[2] = (z1 * z2);          \
-}
-void vec3f_prod(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_prod_func(f32, dest, a, b); }
-void vec3i_prod(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_prod_func(s32, dest, a, b); }
-void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, dest, a, b); }
-#undef vec3_prod_func
-
-
-/// Performs element-wise division of two 3-vectors
-#define vec3_div_func(fmt, dest, a) {   \
-    register fmt x = ((fmt *) a)[0];    \
-    register fmt y = ((fmt *) a)[1];    \
-    register fmt z = ((fmt *) a)[2];    \
-    ((fmt *) dest)[0] /= x;             \
-    ((fmt *) dest)[1] /= y;             \
-    ((fmt *) dest)[2] /= z;             \
-}
-void vec3f_div(Vec3f dest, const Vec3f a) { vec3_div_func(f32, dest, a); }
-void vec3i_div(Vec3i dest, const Vec3i a) { vec3_div_func(s32, dest, a); }
-void vec3s_div(Vec3s dest, const Vec3s a) { vec3_div_func(s16, dest, a); }
-#undef vec3_div_func
-
-/// Make 'dest' the quotient of vectors a and b.
-#define vec3_quot_func(fmt, dest, a, b) {   \
-    register fmt x1 = ((fmt *) a)[0];       \
-    register fmt y1 = ((fmt *) a)[1];       \
-    register fmt z1 = ((fmt *) a)[2];       \
-    register fmt x2 = ((fmt *) b)[0];       \
-    register fmt y2 = ((fmt *) b)[1];       \
-    register fmt z2 = ((fmt *) b)[2];       \
-    ((fmt *) dest)[0] = (x1 / x2);          \
-    ((fmt *) dest)[1] = (y1 / y2);          \
-    ((fmt *) dest)[2] = (z1 / z2);          \
-}
-void vec3f_quot(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_quot_func(f32, dest, a, b); }
-void vec3i_quot(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_quot_func(s32, dest, a, b); }
-void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_quot_func(s16, dest, a, b); }
-#undef vec3_quot_func
-
-/// Return the dot product of vectors a and b.
-f32 vec3f_dot(const Vec3f a, const Vec3f b) {
-    return vec3_dot(a, b);
-}
-
-/// Make vector 'dest' the cross product of vectors a and b.
-void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
-    vec3_cross(dest, a, b);
-}
-
-/// Scale vector 'dest' so it has length 1
-void vec3f_normalize(Vec3f dest) {
-    register f32 mag = (sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
-    if (mag > NEAR_ZERO) {
-        register f32 invsqrt = (1.0f / sqrtf(mag));
-        vec3_mul_val(dest, invsqrt);
-    } else {
-        // Default to up vector.
-        dest[0] = 0;
-        ((u32 *) dest)[1] = FLOAT_ONE;
-        dest[2] = 0;
-    }
-}
-
 /// Struct the same data size as a Mat4
 struct CopyMat4 {
     f32 a[0x10];
@@ -343,48 +133,6 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
         *((u32 *) pen) = FLOAT_ONE;
     }
     vec3f_copy(&dest[3][0], &b[0]);
-}
-
-/**
- * Multiply a vector by a matrix of the form
- * | ? ? ? 0 |
- * | ? ? ? 0 |
- * | ? ? ? 0 |
- * | 0 0 0 1 |
- * i.e. a matrix representing a linear transformation over 3 space.
- */
-void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
-    s32 i;
-    for (i = 0; i < 3; i++) {
-        dst[i] = ((m[0][i] * v[0])
-                + (m[1][i] * v[1])
-                + (m[2][i] * v[2]));
-    }
-}
-
-void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v) {
-    s32 i;
-    for (i = 0; i < 3; i++) {
-        dst[i] = ((m[0][i] * v[0])
-                + (m[1][i] * v[1])
-                + (m[2][i] * v[2])
-                +  m[3][i]);
-    }
-}
-
-/**
- * Multiply a vector by the transpose of a matrix of the form
- * | ? ? ? 0 |
- * | ? ? ? 0 |
- * | ? ? ? 0 |
- * | 0 0 0 1 |
- * i.e. a matrix representing a linear transformation over 3 space.
- */
-void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
-    s32 i;
-    for (i = 0; i < 3; i++) {
-        dst[i] = vec3_dot(m[i], v);
-    }
 }
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates.
@@ -662,7 +410,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
     if ((point1[1] - pos[1]) < minY) point1[1] = pos[1];
     if ((point2[1] - pos[1]) < minY) point2[1] = pos[1];
 
-    f32 avgY = average_3(point0[1], point1[1], point2[1]);
+    f32 avgY = (point0[1] + point1[1] + point2[1]) / 3.f;
 
     vec3f_set(forward, sins(yaw), 0.0f, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
@@ -1284,7 +1032,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Get surface normal and extend it by RAY_OFFSET.
     Vec3f norm;
     surface_normal_to_vec3f(norm, surface);
-    vec3_mul_val(norm, RAY_OFFSET);
+    vec3_scale(norm, RAY_OFFSET);
     // Move the face forward by RAY_OFFSET.
     vec3f_add(v0, norm);
     vec3f_add(v1, norm);
@@ -1327,7 +1075,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Successful contact.
     // Make 'add_dir' into 'dir' scaled by 'length'.
     Vec3f add_dir;
-    vec3_prod_val(add_dir, dir, *length);
+    vec3_scale_dest(add_dir, dir, *length);
     // Make 'hit_pos' into the sum of 'orig' and 'add_dir'.
     vec3f_sum(hit_pos, orig, add_dir);
     return TRUE;

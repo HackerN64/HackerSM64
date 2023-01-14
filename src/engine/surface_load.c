@@ -261,7 +261,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     Vec3t offset;
     s16 min, max;
 
-    vec3_prod_val(offset, (*vertexIndices), 3);
+    vec3_scale_dest(offset, (*vertexIndices), 3);
 
     vec3s_copy(v[0], (vertexData + offset[0]));
     vec3s_copy(v[1], (vertexData + offset[1]));
