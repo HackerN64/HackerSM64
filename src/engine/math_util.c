@@ -86,12 +86,12 @@ struct CopyMat4 {
 };
 
 /// Copy matrix 'src' to 'dest' by casting to a struct CopyMat4 pointer.
-void mtxf_copy(register Mat4 dest, register Mat4 src) {
+void mtxf_copy(Mat4 dest, Mat4 src) {
     *((struct CopyMat4 *) dest) = *((struct CopyMat4 *) src);
 }
 
 /// Set mtx to the identity matrix.
-void mtxf_identity(register Mat4 mtx) {
+void mtxf_identity(Mat4 mtx) {
     s32 i;
     f32 *dest;
     for (dest = ((f32 *) mtx + 1), i = 0; i < 14; dest++, i++) {
@@ -104,8 +104,8 @@ void mtxf_identity(register Mat4 mtx) {
 
 /// Set dest to a translation matrix of vector b.
 void mtxf_translate(Mat4 dest, Vec3f b) {
-    register s32 i;
-    register f32 *pen;
+    s32 i;
+    f32 *pen;
     for (pen = ((f32 *) dest + 1), i = 0; i < 12; pen++, i++) {
         *pen = 0;
     }
@@ -117,17 +117,17 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates.
 void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
-    register f32 sx   = sins(rot[0]);
-    register f32 cx   = coss(rot[0]);
-    register f32 sy   = sins(rot[1]);
-    register f32 cy   = coss(rot[1]);
-    register f32 sz   = sins(rot[2]);
-    register f32 cz   = coss(rot[2]);
-    register f32 sysz = (sy * sz);
-    register f32 cycz = (cy * cz);
+    f32 sx   = sins(rot[0]);
+    f32 cx   = coss(rot[0]);
+    f32 sy   = sins(rot[1]);
+    f32 cy   = coss(rot[1]);
+    f32 sz   = sins(rot[2]);
+    f32 cz   = coss(rot[2]);
+    f32 sysz = (sy * sz);
+    f32 cycz = (cy * cz);
     dest[0][0] = ((sysz * sx) + cycz);
-    register f32 cysz = (cy * sz);
-    register f32 sycz = (sy * cz);
+    f32 cysz = (cy * sz);
+    f32 sycz = (sy * cz);
     dest[1][0] = ((sycz * sx) - cysz);
     dest[2][0] = (cx * sy);
     dest[0][1] = (cx * sz);
@@ -142,20 +142,20 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates.
 UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
-    register f32 sx   = sins(rot[0]);
-    register f32 cx   = coss(rot[0]);
-    register f32 sy   = sins(rot[1]);
-    register f32 cy   = coss(rot[1]);
-    register f32 sz   = sins(rot[2]);
-    register f32 cz   = coss(rot[2]);
+    f32 sx   = sins(rot[0]);
+    f32 cx   = coss(rot[0]);
+    f32 sy   = sins(rot[1]);
+    f32 cy   = coss(rot[1]);
+    f32 sz   = sins(rot[2]);
+    f32 cz   = coss(rot[2]);
     dest[0][0] = (cy * cz);
     dest[0][1] = (cy * sz);
     dest[0][2] = -sy;
-    register f32 sxcz = (sx * cz);
-    register f32 cxsz = (cx * sz);
+    f32 sxcz = (sx * cz);
+    f32 cxsz = (cx * sz);
     dest[1][0] = ((sxcz * sy) - cxsz);
-    register f32 sxsz = (sx * sz);
-    register f32 cxcz = (cx * cz);
+    f32 sxsz = (sx * sz);
+    f32 cxcz = (cx * cz);
     dest[1][1] = ((sxsz * sy) + cxcz);
     dest[1][2] = (sx * cy);
     dest[2][0] = ((cxcz * sy) + sxsz);
@@ -167,19 +167,19 @@ UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates and multiplies.
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
-    register f32 sx = sins(rot[0]);
-    register f32 cx = coss(rot[0]);
-    register f32 sy = sins(rot[1]);
-    register f32 cy = coss(rot[1]);
-    register f32 sz = sins(rot[2]);
-    register f32 cz = coss(rot[2]);
+    f32 sx = sins(rot[0]);
+    f32 cx = coss(rot[0]);
+    f32 sy = sins(rot[1]);
+    f32 cy = coss(rot[1]);
+    f32 sz = sins(rot[2]);
+    f32 cz = coss(rot[2]);
     Vec3f entry;
-    register f32 sysz = (sy * sz);
-    register f32 cycz = (cy * cz);
+    f32 sysz = (sy * sz);
+    f32 cycz = (cy * cz);
     entry[0] = ((sysz * sx) + cycz);
     entry[1] = (sz * cx);
-    register f32 cysz = (cy * sz);
-    register f32 sycz = (sy * cz);
+    f32 cysz = (cy * sz);
+    f32 sycz = (sy * cz);
     entry[2] = ((cysz * sx) - sycz);
     linear_mtxf_mul_vec3f(src, dest[0], entry);
     entry[0] = ((sycz * sx) - cysz);
@@ -197,22 +197,22 @@ void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates and multiplies.
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
-    register f32 sx = sins(rot[0]);
-    register f32 cx = coss(rot[0]);
-    register f32 sy = sins(rot[1]);
-    register f32 cy = coss(rot[1]);
-    register f32 sz = sins(rot[2]);
-    register f32 cz = coss(rot[2]);
+    f32 sx = sins(rot[0]);
+    f32 cx = coss(rot[0]);
+    f32 sy = sins(rot[1]);
+    f32 cy = coss(rot[1]);
+    f32 sz = sins(rot[2]);
+    f32 cz = coss(rot[2]);
     Vec3f entry;
     entry[0] = (cy * cz);
     entry[1] = (cy * sz);
     entry[2] = -sy;
     linear_mtxf_mul_vec3f(src, dest[0], entry);
-    register f32 sxcz = (sx * cz);
-    register f32 cxsz = (cx * sz);
+    f32 sxcz = (sx * cz);
+    f32 cxsz = (cx * sz);
     entry[0] = ((sxcz * sy) - cxsz);
-    register f32 sxsz = (sx * sz);
-    register f32 cxcz = (cx * cz);
+    f32 sxsz = (sx * sz);
+    f32 cxcz = (cx * cz);
     entry[1] = ((sxsz * sy) + cxcz);
     entry[2] = (sx * cy);
     linear_mtxf_mul_vec3f(src, dest[1], entry);
@@ -233,9 +233,9 @@ void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
  */
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
     Vec3f colX, colY, colZ;
-    register f32 dx = (to[0] - from[0]);
-    register f32 dz = (to[2] - from[2]);
-    register f32 invLength = sqrtf(sqr(dx) + sqr(dz));
+    f32 dx = (to[0] - from[0]);
+    f32 dz = (to[2] - from[2]);
+    f32 invLength = sqrtf(sqr(dx) + sqr(dz));
     invLength = -(1.0f / MAX(invLength, NEAR_ZERO));
     dx *= invLength;
     dz *= invLength;
@@ -272,10 +272,10 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
  * 'angle' rotates the object while still facing the camera.
  */
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle) {
-    register s32 i;
-    register f32 sx = scale[0];
-    register f32 sy = scale[1];
-    register f32 sz = scale[2];
+    s32 i;
+    f32 sx = scale[0];
+    f32 sy = scale[1];
+    f32 sz = scale[2];
     Mat4* cameraMat = &gCameraTransform;
     for (i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -420,10 +420,10 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
  */
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     Vec3f entry;
-    register f32 *temp  = (f32 *)a;
-    register f32 *temp2 = (f32 *)dest;
-    register f32 *temp3;
-    register s32 i;
+    f32 *temp  = (f32 *)a;
+    f32 *temp2 = (f32 *)dest;
+    f32 *temp3;
+    s32 i;
     for (i = 0; i < 16; i++) {
         vec3_copy(entry, temp);
         for (temp3 = (f32 *)b; (i & 3) != 3; i++) {
@@ -444,10 +444,10 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
 /**
  * Set matrix 'dest' to 'mtx' scaled by vector s
  */
-void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
-    register f32 *temp  = (f32 *)dest;
-    register f32 *temp2 = (f32 *)mtx;
-    register s32 i;
+void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s) {
+    f32 *temp  = (f32 *)dest;
+    f32 *temp2 = (f32 *)mtx;
+    s32 i;
 
     for (i = 0; i < 4; i++) {
         temp[ 0] = temp2[ 0] * s[0];
@@ -466,10 +466,10 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
 void mtxf_rotate_xy(Mtx *mtx, s16 angle) {
-    register s32 i = (coss(angle) * 0x10000);
-    register s32 j = (sins(angle) * 0x10000);
-    register f32 *temp = (f32 *)mtx;
-    register s32 k;
+    s32 i = (coss(angle) * 0x10000);
+    s32 j = (sins(angle) * 0x10000);
+    f32 *temp = (f32 *)mtx;
+    s32 k;
     for (k = 0; k < 16; k++) {
         *temp = 0;
         temp++;
@@ -622,7 +622,7 @@ s16 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
 }
 
 s16 abs_angle_diff(s16 a0, s16 a1) {
-    register s16 diff = (a1 - a0);
+    s16 diff = (a1 - a0);
     if (diff == -0x8000) return 0x7FFF;
     return abss(diff);
 }
