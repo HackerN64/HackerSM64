@@ -63,28 +63,7 @@ s32 random_sign(void) {
     return ((random_u16() >= 0x7FFF) ? 1 : -1);
 }
 
-/// Returns the lowest of three values.
-#define min_3_func(a0, a1, a2) {\
-    if (a1 < a0) a0 = a1;       \
-    if (a2 < a0) a0 = a2;       \
-    return a0;                  \
-}
-
-f32 min_3f(f32 a, f32 b, f32 c) { min_3_func(a, b, c); }
-s32 min_3i(s32 a, s32 b, s32 c) { min_3_func(a, b, c); }
-s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c); }
-
-/// Returns the highest of three values.
-#define max_3_func(a0, a1, a2) {\
-    if (a1 > a0) a0 = a1;       \
-    if (a2 > a0) a0 = a2;       \
-    return a0;                  \
-}
-f32 max_3f(f32 a, f32 b, f32 c) { max_3_func(a, b, c); }
-s32 max_3i(s32 a, s32 b, s32 c) { max_3_func(a, b, c); }
-s32 max_3s(s16 a, s16 b, s16 c) { max_3_func(a, b, c); }
-
-/// A combination of the above.
+// Get the maximum and minimum of three numbers at the same time.
 #define min_max_3_func(a, b, c, min, max) { \
     if (b < a) {                            \
         *max = a;                           \
@@ -96,6 +75,7 @@ s32 max_3s(s16 a, s16 b, s16 c) { max_3_func(a, b, c); }
     if (c < *min) *min = c;                 \
     if (c > *max) *max = c;                 \
 }
+
 void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max) { min_max_3_func(a, b, c, min, max); }
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, c, min, max); }
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
@@ -480,28 +460,6 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
 }
 
 /**
- * Multiply a vector with a transformation matrix, which applies the transformation
- * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
- * true for transformation matrices if the translation has a w component of 1.
- */
-UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
-    register f32 x = b[0];
-    register f32 y = b[1];
-    register f32 z = b[2];
-    register f32 *temp2 = (f32 *)mtx;
-    register s32 i;
-    register s16 *c = b;
-    for (i = 0; i < 3; i++) {
-        c[0] = ((x * temp2[ 0])
-              + (y * temp2[ 4])
-              + (z * temp2[ 8])
-              +      temp2[12]);
-        c++;
-        temp2++;
-    }
-}
-
-/**
  * Set 'mtx' to a transformation matrix that rotates around the z axis.
  */
 #define MATENTRY(a, b)                          \
@@ -522,149 +480,6 @@ void mtxf_rotate_xy(Mtx *mtx, s16 angle) {
     MATENTRY(5,  i)
     ((s16 *) mtx)[10] = 1;
     ((s16 *) mtx)[15] = 1;
-}
-
-/**
- * Take the vector starting at 'from' pointed at 'to' an retrieve the length
- * of that vector, as well as the yaw and pitch angles.
- * Basically it converts the direction to spherical coordinates.
- */
-
-/// Finds the horizontal distance between two vectors.
-void vec3f_get_lateral_dist(Vec3f from, Vec3f to, f32 *lateralDist) {
-    register f32 dx = (to[0] - from[0]);
-    register f32 dz = (to[2] - from[2]);
-    *lateralDist = sqrtf(sqr(dx) + sqr(dz));
-}
-
-/// Finds the squared horizontal distance between two vectors. Avoids a sqrtf call.
-void vec3f_get_lateral_dist_squared(Vec3f from, Vec3f to, f32 *lateralDist) {
-    register f32 dx = (to[0] - from[0]);
-    register f32 dz = (to[2] - from[2]);
-    *lateralDist = (sqr(dx) + sqr(dz));
-}
-
-/// Finds the distance between two vectors.
-void vec3f_get_dist(Vec3f from, Vec3f to, f32 *dist) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *dist = vec3_mag(d);
-}
-
-/// Finds the squared distance between two vectors. Avoids a sqrtf call.
-void vec3f_get_dist_squared(Vec3f from, Vec3f to, f32 *dist) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *dist = vec3_sumsq(d);
-}
-
-/// Finds the distance and yaw etween two vectors.
-void vec3f_get_dist_and_yaw(Vec3f from, Vec3f to, f32 *dist, s16 *yaw) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *dist = vec3_mag(d);
-    *yaw = atan2s(d[2], d[0]);
-}
-
-/// Finds the pitch between two vectors.
-void vec3f_get_pitch(Vec3f from, Vec3f to, s16 *pitch) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *pitch = atan2s(sqrtf(sqr(d[0]) + sqr(d[2])), d[1]);
-}
-
-/// Finds the yaw between two vectors.
-void vec3f_get_yaw(Vec3f from, Vec3f to, s16 *yaw) {
-    register f32 dx = (to[0] - from[0]);
-    register f32 dz = (to[2] - from[2]);
-    *yaw = atan2s(dz, dx);
-}
-
-/// Finds the pitch and yaw between two vectors.
-void vec3f_get_angle(Vec3f from, Vec3f to, s16 *pitch, s16 *yaw) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *pitch = atan2s(sqrtf(sqr(d[0]) + sqr(d[2])), d[1]);
-    *yaw   = atan2s(d[2], d[0]);
-}
-
-/// Finds the horizontal distance and pitch between two vectors.
-void vec3f_get_lateral_dist_and_pitch(Vec3f from, Vec3f to, f32 *lateralDist, s16 *pitch) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *lateralDist = sqrtf(sqr(d[0]) + sqr(d[2]));
-    *pitch       = atan2s(*lateralDist, d[1]);
-}
-
-/// Finds the horizontal distance and yaw between two vectors.
-void vec3f_get_lateral_dist_and_yaw(Vec3f from, Vec3f to, f32 *lateralDist, s16 *yaw) {
-    register f32 dx = (to[0] - from[0]);
-    register f32 dz = (to[2] - from[2]);
-    *lateralDist = sqrtf(sqr(dx) + sqr(dz));
-    *yaw         = atan2s(dz, dx);
-}
-
-/// Finds the horizontal distance and angles between two vectors.
-void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, s16 *pitch, s16 *yaw) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    *lateralDist = sqrtf(sqr(d[0]) + sqr(d[2]));
-    *pitch       = atan2s(*lateralDist, d[1]);
-    *yaw         = atan2s(d[2], d[0]);
-}
-
-/// Finds the distance and angles between two vectors.
-void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *yaw) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    register f32 xz = (sqr(d[0]) + sqr(d[2]));
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *pitch          = atan2s(sqrtf(xz), d[1]);
-    *yaw            = atan2s(d[2], d[0]);
-}
-void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, s16 *pitch, s16 *yaw) {
-    Vec3s d;
-    vec3_diff(d, to, from);
-    register f32 xz = (sqr(d[0]) + sqr(d[2]));
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *pitch          = atan2s(sqrtf(xz), d[1]);
-    *yaw            = atan2s(d[2], d[0]);
-}
-void vec3f_to_vec3s_get_dist_and_angle(Vec3f from, Vec3s to, f32 *dist, s16 *pitch, s16 *yaw) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    register f32 xz = (sqr(d[0]) + sqr(d[2]));
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *pitch          = atan2s(sqrtf(xz), d[1]);
-    *yaw            = atan2s(d[2], d[0]);
-}
-
-/// Finds the distance, horizontal distance, and angles between two vectors.
-void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, s16 *pitch, s16 *yaw) {
-    Vec3f d;
-    vec3_diff(d, to, from);
-    register f32 xz = (sqr(d[0]) + sqr(d[2]));
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *lateralDist    = sqrtf(xz);
-    *pitch          = atan2s(*lateralDist, d[1]);
-    *yaw            = atan2s(d[2], d[0]);
-}
-
-/**
- * Construct the 'to' point which is distance 'dist' away from the 'from' position,
- * and has the angles pitch and yaw.
- */
-#define vec3_set_dist_and_angle(from, to, dist, pitch, yaw) { \
-    register f32 dcos = (dist * coss(pitch)); \
-    to[0] = (from[0] + (dcos * sins(yaw  ))); \
-    to[1] = (from[1] + (dist * sins(pitch))); \
-    to[2] = (from[2] + (dcos * coss(yaw  ))); \
-}
-void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s16 pitch, s16 yaw) {
-    vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
-}
-void vec3s_set_dist_and_angle(Vec3s from, Vec3s to, s16 dist, s16 pitch, s16 yaw) {
-    vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
 }
 
 /**

@@ -304,7 +304,8 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
     //! the first frame, which causes a floating point divide by 0
     fov = 90.0f;
     s16 yaw;
-    vec3f_get_angle(pos, focus, &sSkyBoxInfo[player].pitch, &yaw);
+    f32 dist;
+    vec3f_get_dist_and_angle(pos, focus, &dist, &sSkyBoxInfo[player].pitch, &yaw);
     sSkyBoxInfo[player].yaw = yaw;
     sSkyBoxInfo[player].scaledX = calculate_skybox_scaled_x(player, fov);
     sSkyBoxInfo[player].scaledY = calculate_skybox_scaled_y(player, fov);

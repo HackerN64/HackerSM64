@@ -76,12 +76,24 @@ ALWAYS_INLINE f32 absf(f32 in) {
     return out;
 }
 
-// Get the minimum / maximum of two numbers
+// Get the minimum / maximum of a set of numbers
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-// Clamp a value inbetween a range
-#define CLAMP(x, low, high)  MIN(MAX((x), (low)), (high))
+#define min_3(a, b, c) MIN(MIN(a, b), c)
+#define max_3(a, b, c) MAX(MAX(a, b), c)
+
+#define min_3f min_3
+#define min_3i min_3
+#define min_3s min_3
+
+#define max_3f max_3
+#define max_3i max_3
+#define max_3s max_3
+
+void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
+void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
+void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
 
 
 // Integer limits and clamping
@@ -93,6 +105,10 @@ ALWAYS_INLINE f32 absf(f32 in) {
 #define S16_MIN -32768
 #define U16_MAX 65535
 
+// Clamp a value inbetween a range
+#define CLAMP(x, low, high)  MIN(MAX((x), (low)), (high))
+
+// Clamp a value to the range of a specific data type
 #define CLAMP_U8( x)        CLAMP((x),       0,  U8_MAX)
 #define CLAMP_S8( x)        CLAMP((x),  S8_MIN,  S8_MAX)
 #define CLAMP_U16(x)        CLAMP((x),       0, U16_MAX)
@@ -339,7 +355,7 @@ ALWAYS_INLINE f32 absf(f32 in) {
 
 #define vec3f_dot vec3_dot
 
-/// Make vector 'dest' the cross product of vectors a and b.
+// Make vector 'dest' the cross product of vectors a and b.
 #define vec3_cross(dst, a, b) {                         \
     (dst)[0] = (((a)[1] * (b)[2]) - ((a)[2] * (b)[1])); \
     (dst)[1] = (((a)[2] * (b)[0]) - ((a)[0] * (b)[2])); \
@@ -348,7 +364,7 @@ ALWAYS_INLINE f32 absf(f32 in) {
 
 #define vec3f_cross vec3_cross
 
-/// Scale vector 'v' so it has length 1
+// Scale vector 'v' so it has length 1
 #define vec3_normalize(v) {                       \
     f32 v_invmag = vec3_mag((v));                 \
     v_invmag = (1.0f / MAX(v_invmag, NEAR_ZERO)); \
@@ -392,6 +408,74 @@ ALWAYS_INLINE f32 absf(f32 in) {
 #define linear_mtxf_mul_vec3f linear_mtxf_mul_vec3
 #define linear_mtxf_mul_vec3f_and_translate linear_mtxf_mul_vec3_and_translate
 #define linear_mtxf_transpose_mul_vec3f linear_mtxf_transpose_mul_vec3
+
+
+// Angles and distances between vectors
+
+/// Finds the distance between two vectors
+#define vec3_get_dist(from, to, dist) { \
+    Vec3f d;                            \
+    vec3_diff(d, (to), (from));         \
+    (*dist) = vec3_mag((d));             \
+}
+
+#define vec3f_get_dist vec3_get_dist
+#define vec3s_get_dist vec3_get_dist
+
+/// Finds the horizontal distance between two vectors
+#define vec3_get_lateral_dist(from, to, lateralDist) { \
+    Vec3f d;                                           \
+    vec3_diff(d, (to), (from));                        \
+    (*lateralDist) = sqrtf(sqr(d[0]) + sqr(d[2]));      \
+}
+
+#define vec3f_get_lateral_dist vec3_get_lateral_dist
+#define vec3s_get_lateral_dist vec3_get_lateral_dist
+
+/// Finds the pitch between two vectors
+#define vec3_get_pitch(from, to, pitch) { \
+    Vec3f d;                              \
+    vec3_diff(d, (to), (from));           \
+    (*pitch) = atan2s(sqrtf(sqr(d[0]) + sqr(d[2])), d[1]); \
+}
+
+#define vec3f_get_pitch vec3_get_pitch
+#define vec3s_get_pitch vec3_get_pitch
+
+/// Finds the yaw between two vectors
+#define vec3_get_yaw(from, to, yaw) { \
+    f32 dx = ((to)[0] - (from)[0]);    \
+    f32 dz = ((to)[2] - (from)[2]);    \
+    (*yaw) = atan2s(dz, dx);           \
+}
+
+#define vec3f_get_yaw vec3_get_yaw
+#define vec3s_get_yaw vec3_get_yaw
+
+// Finds the distance, pitch, and yaw between two vectors
+#define vec3_get_dist_and_angle(from, to, dist, pitch, yaw) { \
+    Vec3f d;                                                  \
+    vec3f_diff(d, to, from);                                  \
+    f32 xz = (sqr(d[0]) + sqr(d[2]));                         \
+    *dist  = sqrtf(xz + sqr(d[1]));                           \
+    *pitch = atan2s(sqrtf(xz), d[1]);                         \
+    *yaw   = atan2s(d[2], d[0]);                         \
+}
+
+#define vec3f_get_dist_and_angle vec3_get_dist_and_angle
+#define vec3s_get_dist_and_angle vec3_get_dist_and_angle
+
+// Constructs the 'to' point which is distance 'dist' away from the 'from' position,
+// and has the angles pitch and yaw.
+#define vec3_set_dist_and_angle(from, to, dist, pitch, yaw) { \
+    f32 dcos = (dist * coss(pitch)); \
+    to[0] = (from[0] + (dcos * sins(yaw))); \
+    to[1] = (from[1] + (dist * sins(pitch))); \
+    to[2] = (from[2] + (dcos * coss(yaw))); \
+}
+
+#define vec3f_set_dist_and_angle vec3_set_dist_and_angle
+#define vec3s_set_dist_and_angle vec3_set_dist_and_angle
 
 
 // Matrices
@@ -449,16 +533,6 @@ u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 
-f32  min_3f(   f32 a, f32 b, f32 c);
-s32  min_3i(   s32 a, s32 b, s32 c);
-s32  min_3s(   s16 a, s16 b, s16 c);
-f32  max_3f(   f32 a, f32 b, f32 c);
-s32  max_3i(   s32 a, s32 b, s32 c);
-s32  max_3s(   s16 a, s16 b, s16 c);
-void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
-void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
-void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
-
 void mtxf_copy(Mat4 dest, Mat4 src);
 void mtxf_identity(Mat4 mtx);
 void mtxf_translate(Mat4 dest, Vec3f b);
@@ -482,25 +556,6 @@ ALWAYS_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
 }
 
 void mtxf_rotate_xy(Mtx *mtx, s16 angle);
-
-void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                      );
-void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                      );
-void vec3f_get_lateral_dist_squared(           Vec3f from, Vec3f to,            f32 *lateralDist                      );
-void vec3f_get_dist(                           Vec3f from, Vec3f to, f32 *dist                                        );
-void vec3f_get_dist_squared(                   Vec3f from, Vec3f to, f32 *dist                                        );
-void vec3f_get_dist_and_yaw(                   Vec3f from, Vec3f to, f32 *dist,                               s16 *yaw);
-void vec3f_get_pitch(                          Vec3f from, Vec3f to,                              s16 *pitch          );
-void vec3f_get_yaw(                            Vec3f from, Vec3f to,                                          s16 *yaw);
-void vec3f_get_angle(                          Vec3f from, Vec3f to,                              s16 *pitch, s16 *yaw);
-void vec3f_get_lateral_dist_and_pitch(         Vec3f from, Vec3f to,            f32 *lateralDist, s16 *pitch          );
-void vec3f_get_lateral_dist_and_yaw(           Vec3f from, Vec3f to,            f32 *lateralDist,             s16 *yaw);
-void vec3f_get_lateral_dist_and_angle(         Vec3f from, Vec3f to,            f32 *lateralDist, s16 *pitch, s16 *yaw);
-void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, s16 *pitch, s16 *yaw);
-void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist,                   s16 *pitch, s16 *yaw);
-void vec3s_get_dist_and_angle(                 Vec3s from, Vec3s to, s16 *dist,                   s16 *pitch, s16 *yaw);
-void vec3f_to_vec3s_get_dist_and_angle(        Vec3f from, Vec3s to, f32 *dist,                   s16 *pitch, s16 *yaw);
-void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   s16  pitch, s16  yaw);
-void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   s16  pitch, s16  yaw);
 
 s16 approach_angle(s16 current, s16 target, s16 inc);
 s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec);
