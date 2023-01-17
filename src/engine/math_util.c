@@ -485,22 +485,10 @@ void mtxf_rotate_xy(Mtx *mtx, s16 angle) {
 /**
  * Similar to approach_s32, but converts to s16 and allows for overflow between 32767 and -32768
  */
-s16 approach_angle(s16 current, s16 target, s16 inc) {
-    s32 dist = (s16)(target - current);
-    if (dist < 0) {
-        dist += inc;
-        if (dist > 0) dist = 0;
-    } else if (dist > 0) {
-        dist -= inc;
-        if (dist < 0) dist = 0;
-    }
-    return (target - dist);
-}
-Bool32 approach_angle_bool(s16 *current, s16 target, s16 inc) {
-    *current = approach_angle(*current, target, inc);
+Bool32 approach_s16_bool(s16 *current, s16 target, s16 inc, s16 dec) {
+    *current = approach_s16(*current, target, inc, dec);
     return (*current != target);
 }
-
 s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec) {
     s16 dist = (target - current);
     if (dist >= 0) { // target >= current
@@ -510,15 +498,15 @@ s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec) {
     }
     return current;
 }
-Bool32 approach_s16_bool(s16 *current, s16 target, s16 inc, s16 dec) {
-    *current = approach_s16(*current, target, inc, dec);
-    return (*current != target);
-}
 
 /**
  * Return the value 'current' after it tries to approach target, going up at
  * most 'inc' and going down at most 'dec'.
  */
+Bool32 approach_s32_bool(s32 *current, s32 target, s32 inc, s32 dec) {
+    *current = approach_s32(*current, target, inc, dec);
+    return (*current != target);
+}
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec) {
     s32 dist = (target - current);
     if (dist > 0) { // current < target
@@ -528,15 +516,15 @@ s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec) {
     }
     return current;
 }
-Bool32 approach_s32_bool(s32 *current, s32 target, s32 inc, s32 dec) {
-    *current = approach_s32(*current, target, inc, dec);
-    return (*current != target);
-}
 
 /**
  * Return the value 'current' after it tries to approach target, going up at
  * most 'inc' and going down at most 'dec'.
  */
+Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec) {
+    *current = approach_f32(*current, target, inc, dec);
+    return !(*current == target);
+}
 f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec) {
     f32 dist = (target - current);
     if (dist >= 0.0f) { // target >= current
@@ -545,10 +533,6 @@ f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec) {
         current = ((dist < -dec) ? (current - dec) : target);
     }
     return current;
-}
-Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec) {
-    *current = approach_f32(*current, target, inc, dec);
-    return !(*current == target);
 }
 
 s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {

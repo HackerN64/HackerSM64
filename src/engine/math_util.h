@@ -59,10 +59,12 @@ extern f32 gSineTable[];
 // Various basic helper macros
 
 // Get the square of a number
-#define sqr(x)              (    (x) * (x))
+#define sqr(x) ({         \
+    __auto_type _x = (x); \
+    _x * _x; })
 
 // Get the sign of a number
-#define signum_positive(x) ((x < 0) ? -1 : 1)
+#define signum_positive(x) (((x) < 0) ? -1 : 1)
 
 // Absolute value
 #define ABS(x) ({         \
@@ -644,11 +646,9 @@ ALWAYS_INLINE void mtxf_to_mtx(void *dest, void *src) {
 
 void mtxf_rotate_xy(Mtx *mtx, s16 angle);
 
-s16 approach_angle(s16 current, s16 target, s16 inc);
 s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec);
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec);
 f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec);
-Bool32 approach_angle_bool(s16 *current, s16 target, s16 inc);
 Bool32 approach_s16_bool(s16 *current, s16 target, s16 inc, s16 dec);
 Bool32 approach_s32_bool(s32 *current, s32 target, s32 inc, s32 dec);
 Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec);
@@ -658,6 +658,8 @@ Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec);
 #define approach_s16_symmetric_bool(current, target, inc) approach_s16_bool((current), (target), (inc), (inc))
 #define approach_s32_symmetric_bool(current, target, inc) approach_s32_bool((current), (target), (inc), (inc))
 #define approach_f32_symmetric_bool(current, target, inc) approach_f32_bool((current), (target), (inc), (inc))
+#define approach_angle approach_s16_symmetric
+#define approach_angle_bool approach_s16_symmetric_bool
 s32 approach_f32_signed(f32 *current, f32 target, f32 inc);
 s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
 f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
