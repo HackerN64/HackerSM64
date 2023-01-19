@@ -296,16 +296,16 @@ void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
     vec3_cross(dest, a, b);
 }
 
-f32 fast_inverse_square_root(f32 number) {
+ALWAYS_INLINE f32 fast_inverse_square_root(f32 number) {
 	s32 i;
 	f32 x2, y;
 
 	x2 = number * 0.5f;
 	y  = number;
-	i  = * ( s32 * ) &y;                       // evil floating point bit level hacking
-	i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
+	i  = * ( s32 * ) &y;
+	i  = 0x5f3759df - ( i >> 1 );
 	y  = * ( f32 * ) &i;
-	y  = y * ( 1.5f - ( x2 * y * y ) );   // 1st iteration
+	y  = y * ( 1.5f - ( x2 * y * y ) );
 
 	return y;
 }
