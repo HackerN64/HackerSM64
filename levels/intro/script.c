@@ -102,6 +102,7 @@ const LevelScript level_intro_mario_head_regular[] = {
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_STAR, /*time*/ 20, /*color*/ 0x00, 0x00, 0x00),
     SLEEP(/*frames*/ 20),
 #else
+    PUSH_POOL(),
     BLACKOUT(/*active*/ FALSE),
 #endif
     CALL_LOOP(/*arg*/ LVL_INTRO_REGULAR, /*func*/ lvl_intro_update),

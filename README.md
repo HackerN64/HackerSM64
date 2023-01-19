@@ -14,7 +14,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **ArcticJaguar725**: Most audio configuration and layout changes, colored ia4 text, floombas, various bugfixes, and more
 - **CowQuack**: Adjustable skybox sizes, area-specific skybox function
 - **thecozies**: Water surface types, general maintenance, and time
-- **MrComit**: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
+- **MrComit**: General use object defines, JUMP_KICK_FIX
 - **aglab2**: Bugfixes (particularly puppycam), refactor stuff
 - **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
 - **Arthurtilly**: Platform Displacement 2
@@ -61,7 +61,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Toggle to disable fall damage and the fall damage sound *
 - Nonstop stars *
 - Removed course-specific camera processing *
-- You can increase the number of frames that you have to perform a firsty *
 - Ability to set Mario's movement speed when hanging from a ceiling *
 - Tighter hanging controls (Mario will face the direction of the analog stick directly while hanging from a ceiling) *
 - reonucam3: custom camera by Reonu. This is included as a .patch file in the enhancements folder, you need to apply it if you want this camera.

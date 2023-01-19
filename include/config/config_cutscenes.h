@@ -4,10 +4,16 @@
  * CUTSCENE SETTINGS *
  *********************/
 
-// -- CUTSCENE SKIPS --
+/************************
+ * -- CUTSCENE SKIPS -- *
+ ************************/
 
-// Skips the peach letter cutscene.
+/**
+ * Skips the peach letter cutscene.
+ */
 #define PEACH_SKIP
 
-// Skips the title/splash screen (Super Mario 64 logo).
+/**
+ * Skips the title/splash screen (Super Mario 64 logo).
+ */
 // #define SKIP_TITLE_SCREEN

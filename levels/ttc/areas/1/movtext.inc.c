@@ -1,8 +1,4 @@
 // 0x07015F78 - 0x07015F90
-static const Lights1 ttc_lights_surface_treadmill = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07015F90 - 0x07016790
 ALIGNED8 const Texture ttc_yellow_triangle[] = {
@@ -19,8 +15,8 @@ const Gfx ttc_dl_surface_treadmill_begin[] = {
     gsSPFogPosition(900, 1000),
     gsSPSetGeometryMode(G_FOG),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_PASS2),
-    gsSPLight(&ttc_lights_surface_treadmill.l, 1),
-    gsSPLight(&ttc_lights_surface_treadmill.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),

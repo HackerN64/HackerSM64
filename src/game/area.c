@@ -34,7 +34,7 @@ struct Area gAreaData[AREA_COUNT];
 struct WarpTransition gWarpTransition;
 
 s16 gCurrCourseNum;
-s16 gCurrActNum;
+s16 gCurrActNum = 1;
 s16 gCurrAreaIndex;
 s16 gSavedCourseNum;
 s16 gMenuOptSelectIndex;
@@ -177,7 +177,7 @@ void load_obj_warp_nodes(void) {
 }
 
 void clear_areas(void) {
-    s32 i;
+    s32 i, j;
 
     gCurrentArea = NULL;
     gWarpTransition.isActive = FALSE;
@@ -198,8 +198,9 @@ void clear_areas(void) {
         gAreaData[i].objectSpawnInfos = NULL;
         gAreaData[i].camera = NULL;
         gAreaData[i].unused = NULL;
-        gAreaData[i].whirlpools[0] = NULL;
-        gAreaData[i].whirlpools[1] = NULL;
+        for (j = 0; j < ARRAY_COUNT(gAreaData[i].whirlpools); j++) {
+            gAreaData[i].whirlpools[j] = NULL;
+        }
         gAreaData[i].dialog[0] = DIALOG_NONE;
         gAreaData[i].dialog[1] = DIALOG_NONE;
         gAreaData[i].musicParam = 0;
@@ -232,6 +233,10 @@ void load_area(s32 index) {
     if (gCurrentArea == NULL && gAreaData[index].graphNode != NULL) {
         gCurrentArea = &gAreaData[index];
         gCurrAreaIndex = gCurrentArea->index;
+        main_pool_pop_state();
+        main_pool_push_state();
+
+        gMarioCurrentRoom = 0;
 
         if (gCurrentArea->terrainData != NULL) {
             load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
@@ -431,9 +436,10 @@ void render_game(void) {
 
     gViewportOverride = NULL;
     gViewportClip     = NULL;
-
+    
     profiler_update(PROFILER_TIME_GFX);
     profiler_print_times();
+
 #if PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
 #endif

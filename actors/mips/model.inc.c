@@ -6,16 +6,8 @@ ALIGNED8 static const Texture mips_seg6_texture_0600FB80[] = {
 };
 
 // 0x06010380
-static const Lights1 mips_seg6_lights_06010380 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06010398
-static const Lights1 mips_seg6_lights_06010398 = gdSPDefLights1(
-    0x0f, 0x0d, 0x04,
-    0x27, 0x21, 0x0b, 0x28, 0x28, 0x28
-);
 
 // 0x060103B0
 static const Vtx mips_seg6_vertex_060103B0[] = {
@@ -75,8 +67,8 @@ const Gfx mips_seg6_dl_06010600[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06010380.l, 1),
-    gsSPLight(&mips_seg6_lights_06010380.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_060103B0, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
     gsSP2Triangles( 2,  1,  4, 0x0,  2,  5,  3, 0x0),
@@ -101,13 +93,13 @@ const Gfx mips_seg6_dl_06010600[] = {
 
 // 0x06010748 - 0x060107B8
 const Gfx mips_seg6_dl_06010748[] = {
-    gsSPLight(&mips_seg6_lights_06010398.l, 1),
-    gsSPLight(&mips_seg6_lights_06010398.a, 2),
+    gsSPLightColor(LIGHT_1, 0x27210bff),
+    gsSPLightColor(LIGHT_2, 0xf0d04ff),
     gsSPVertex(mips_seg6_vertex_06010580, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
     gsSP1Triangle( 3,  2,  1, 0x0),
-    gsSPLight(&mips_seg6_lights_06010380.l, 1),
-    gsSPLight(&mips_seg6_lights_06010380.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_060105C0, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 3,  2,  0, 0x0,  2,  1,  0, 0x0),
@@ -133,10 +125,6 @@ const Gfx mips_seg6_dl_060107B8[] = {
 };
 
 // 0x06010820
-static const Lights1 mips_seg6_lights_06010820 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06010838
 static const Vtx mips_seg6_vertex_06010838[] = {
@@ -193,8 +181,8 @@ const Gfx mips_seg6_dl_06010A98[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06010820.l, 1),
-    gsSPLight(&mips_seg6_lights_06010820.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06010838, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  4, 0x0),
     gsSP2Triangles( 0,  5,  1, 0x0,  1,  6,  3, 0x0),
@@ -241,16 +229,8 @@ const Gfx mips_seg6_dl_06010C40[] = {
 };
 
 // 0x06010CA0
-static const Lights1 mips_seg6_lights_06010CA0 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06010CB8
-static const Lights1 mips_seg6_lights_06010CB8 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06010CD0
 static const Vtx mips_seg6_vertex_06010CD0[] = {
@@ -279,13 +259,13 @@ const Gfx mips_seg6_dl_06010DB0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06010CA0.l, 1),
-    gsSPLight(&mips_seg6_lights_06010CA0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_06010CD0, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 0,  4,  1, 0x0,  4,  0,  5, 0x0),
-    gsSPLight(&mips_seg6_lights_06010CB8.l, 1),
-    gsSPLight(&mips_seg6_lights_06010CB8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06010D30, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  0,  3, 0x0),
     gsSP2Triangles( 0,  2,  4, 0x0,  5,  6,  0, 0x0),
@@ -311,22 +291,10 @@ const Gfx mips_seg6_dl_06010E60[] = {
 };
 
 // 0x06010EC0
-static const Lights1 mips_seg6_lights_06010EC0 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06010ED8
-static const Lights1 mips_seg6_lights_06010ED8 = gdSPDefLights1(
-    0x35, 0x38, 0x00,
-    0x85, 0x8e, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06010EF0
-static const Lights1 mips_seg6_lights_06010EF0 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06010F08
 static const Vtx mips_seg6_vertex_06010F08[] = {
@@ -360,17 +328,17 @@ const Gfx mips_seg6_dl_06010FF8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06010EC0.l, 1),
-    gsSPLight(&mips_seg6_lights_06010EC0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_06010F08, 5, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP1Triangle( 3,  2,  4, 0x0),
-    gsSPLight(&mips_seg6_lights_06010ED8.l, 1),
-    gsSPLight(&mips_seg6_lights_06010ED8.a, 2),
+    gsSPLightColor(LIGHT_1, 0x858e00ff),
+    gsSPLightColor(LIGHT_2, 0x353800ff),
     gsSPVertex(mips_seg6_vertex_06010F58, 3, 0),
     gsSP1Triangle( 0,  1,  2, 0x0),
-    gsSPLight(&mips_seg6_lights_06010EF0.l, 1),
-    gsSPLight(&mips_seg6_lights_06010EF0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06010F88, 7, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 3,  2,  4, 0x0,  2,  1,  4, 0x0),
@@ -395,16 +363,8 @@ const Gfx mips_seg6_dl_060110B0[] = {
 };
 
 // 0x06011110
-static const Lights1 mips_seg6_lights_06011110 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06011128
-static const Lights1 mips_seg6_lights_06011128 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06011140
 static const Vtx mips_seg6_vertex_06011140[] = {
@@ -435,13 +395,13 @@ const Gfx mips_seg6_dl_06011240[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06011110.l, 1),
-    gsSPLight(&mips_seg6_lights_06011110.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_06011140, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  3,  0, 0x0),
     gsSP2Triangles( 2,  4,  3, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&mips_seg6_lights_06011128.l, 1),
-    gsSPLight(&mips_seg6_lights_06011128.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_060111A0, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  0, 0x0),
     gsSP2Triangles( 0,  4,  3, 0x0,  5,  6,  1, 0x0),
@@ -469,16 +429,8 @@ const Gfx mips_seg6_dl_06011310[] = {
 };
 
 // 0x06011370
-static const Lights1 mips_seg6_lights_06011370 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06011388
-static const Lights1 mips_seg6_lights_06011388 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x060113A0
 static const Vtx mips_seg6_vertex_060113A0[] = {
@@ -506,13 +458,13 @@ const Gfx mips_seg6_dl_06011470[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06011370.l, 1),
-    gsSPLight(&mips_seg6_lights_06011370.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_060113A0, 5, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  0,  3, 0x0),
     gsSP1Triangle( 3,  4,  1, 0x0),
-    gsSPLight(&mips_seg6_lights_06011388.l, 1),
-    gsSPLight(&mips_seg6_lights_06011388.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_060113F0, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  3,  4, 0x0),
     gsSP2Triangles( 3,  2,  1, 0x0,  3,  5,  6, 0x0),
@@ -539,16 +491,8 @@ const Gfx mips_seg6_dl_06011520[] = {
 };
 
 // 0x06011580
-static const Lights1 mips_seg6_lights_06011580 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06011598
-static const Lights1 mips_seg6_lights_06011598 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x060115B0
 static const Vtx mips_seg6_vertex_060115B0[] = {
@@ -579,13 +523,13 @@ const Gfx mips_seg6_dl_060116B0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06011580.l, 1),
-    gsSPLight(&mips_seg6_lights_06011580.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_060115B0, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  3,  1, 0x0,  2,  5,  0, 0x0),
-    gsSPLight(&mips_seg6_lights_06011598.l, 1),
-    gsSPLight(&mips_seg6_lights_06011598.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06011610, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  4, 0x0),
     gsSP2Triangles( 2,  3,  0, 0x0,  3,  2,  5, 0x0),
@@ -613,16 +557,8 @@ const Gfx mips_seg6_dl_06011780[] = {
 };
 
 // 0x060117E0
-static const Lights1 mips_seg6_lights_060117E0 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x060117F8
-static const Lights1 mips_seg6_lights_060117F8 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06011810
 static const Vtx mips_seg6_vertex_06011810[] = {
@@ -650,13 +586,13 @@ const Gfx mips_seg6_dl_060118E0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_060117E0.l, 1),
-    gsSPLight(&mips_seg6_lights_060117E0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_06011810, 5, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  1, 0x0),
     gsSP1Triangle( 1,  4,  3, 0x0),
-    gsSPLight(&mips_seg6_lights_060117F8.l, 1),
-    gsSPLight(&mips_seg6_lights_060117F8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06011860, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  3, 0x0,  6,  7,  3, 0x0),
@@ -683,16 +619,8 @@ const Gfx mips_seg6_dl_06011990[] = {
 };
 
 // 0x060119F0
-static const Lights1 mips_seg6_lights_060119F0 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06011A08
-static const Lights1 mips_seg6_lights_06011A08 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06011A20
 static const Vtx mips_seg6_vertex_06011A20[] = {
@@ -721,13 +649,13 @@ const Gfx mips_seg6_dl_06011B00[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_060119F0.l, 1),
-    gsSPLight(&mips_seg6_lights_060119F0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_06011A20, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 1,  4,  2, 0x0,  5,  2,  4, 0x0),
-    gsSPLight(&mips_seg6_lights_06011A08.l, 1),
-    gsSPLight(&mips_seg6_lights_06011A08.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06011A80, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  1, 0x0,  1,  3,  6, 0x0),
@@ -753,16 +681,8 @@ const Gfx mips_seg6_dl_06011BB0[] = {
 };
 
 // 0x06011C10
-static const Lights1 mips_seg6_lights_06011C10 = gdSPDefLights1(
-    0x3c, 0x3c, 0x00,
-    0x96, 0x96, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06011C28
-static const Lights1 mips_seg6_lights_06011C28 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06011C40
 static const Vtx mips_seg6_vertex_06011C40[] = {
@@ -790,13 +710,13 @@ const Gfx mips_seg6_dl_06011D10[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mips_seg6_texture_0600FB80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&mips_seg6_lights_06011C10.l, 1),
-    gsSPLight(&mips_seg6_lights_06011C10.a, 2),
+    gsSPLightColor(LIGHT_1, 0x969600ff),
+    gsSPLightColor(LIGHT_2, 0x3c3c00ff),
     gsSPVertex(mips_seg6_vertex_06011C40, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSP2Triangles( 1,  4,  3, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&mips_seg6_lights_06011C28.l, 1),
-    gsSPLight(&mips_seg6_lights_06011C28.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(mips_seg6_vertex_06011CA0, 7, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 3,  4,  5, 0x0,  1,  3,  5, 0x0),
@@ -821,10 +741,6 @@ const Gfx mips_seg6_dl_06011DB0[] = {
 };
 
 // 0x06011E10
-static const Lights1 mips_seg6_lights_06011E10 = gdSPDefLights1(
-    0x34, 0x2c, 0x0f,
-    0x82, 0x6e, 0x26, 0x28, 0x28, 0x28
-);
 
 // 0x06011E28
 static const Vtx mips_seg6_vertex_06011E28[] = {
@@ -838,8 +754,8 @@ static const Vtx mips_seg6_vertex_06011E28[] = {
 
 // 0x06011E88 - 0x06011ED8
 const Gfx mips_seg6_dl_06011E88[] = {
-    gsSPLight(&mips_seg6_lights_06011E10.l, 1),
-    gsSPLight(&mips_seg6_lights_06011E10.a, 2),
+    gsSPLightColor(LIGHT_1, 0x826e26ff),
+    gsSPLightColor(LIGHT_2, 0x342c0fff),
     gsSPVertex(mips_seg6_vertex_06011E28, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  0,  2, 0x0,  2,  5,  4, 0x0),
@@ -856,10 +772,6 @@ const Gfx mips_seg6_dl_06011ED8[] = {
 };
 
 // 0x06011EF8
-static const Lights1 mips_seg6_lights_06011EF8 = gdSPDefLights1(
-    0x34, 0x2c, 0x0f,
-    0x82, 0x6e, 0x26, 0x28, 0x28, 0x28
-);
 
 // 0x06011F10
 static const Vtx mips_seg6_vertex_06011F10[] = {
@@ -873,8 +785,8 @@ static const Vtx mips_seg6_vertex_06011F10[] = {
 
 // 0x06011F70 - 0x06011FC0
 const Gfx mips_seg6_dl_06011F70[] = {
-    gsSPLight(&mips_seg6_lights_06011EF8.l, 1),
-    gsSPLight(&mips_seg6_lights_06011EF8.a, 2),
+    gsSPLightColor(LIGHT_1, 0x826e26ff),
+    gsSPLightColor(LIGHT_2, 0x342c0fff),
     gsSPVertex(mips_seg6_vertex_06011F10, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  2, 0x0,  2,  1,  4, 0x0),

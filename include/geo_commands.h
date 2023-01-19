@@ -58,7 +58,6 @@ enum GeoLayoutCommands {
     /*0x1E*/ GEO_CMD_NOP_1E,
     /*0x1F*/ GEO_CMD_NOP_1F,
     /*0x20*/ GEO_CMD_NODE_CULLING_RADIUS,
-    /*0x21*/ GEO_CMD_BONE,
 };
 
 // geo layout macros
@@ -467,21 +466,5 @@ enum GeoLayoutCommands {
  */
 #define GEO_CULLING_RADIUS(cullingRadius) \
     CMD_BBH(GEO_CMD_NODE_CULLING_RADIUS, 0x00, cullingRadius)
-
-/**
- * 0x21: Create a scene graph node that is rotated by the object's animation + an initial rotation.
- *       u8 drawingLayer
- *       s16 xTranslation
- *       s16 yTranslation
- *       s16 zTranslation
- *       s16 xRotation
- *       s16 yRotation
- *       s16 zRotation
- *       u32 displayList: dislay list segmented address
- */
-#define GEO_BONE(layer, tx, ty, tz, rx, ry, rz, displayList) \
-    CMD_BBH(GEO_CMD_BONE, layer, 0x0000), \
-    CMD_HHHHHH(tx, ty, tz, rx, ry, rz), \
-    CMD_PTR(displayList)
 
 #endif // GEO_COMMANDS_H
