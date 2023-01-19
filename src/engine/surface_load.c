@@ -675,12 +675,12 @@ static void get_optimal_coll_dist(struct Object *obj) {
 }
 #endif
 
+static TerrainData sVertexData[600];
+
 /**
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
-    TerrainData vertexData[600];
-
     TerrainData *collisionData = o->collisionData;
     f32 marioDist = o->oDistanceToMario;
 
@@ -709,11 +709,11 @@ void load_object_collision_model(void) {
         && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
-        transform_object_vertices(&collisionData, vertexData);
+        transform_object_vertices(&collisionData, sVertexData);
 
         // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
         while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-            load_object_surfaces(&collisionData, vertexData, TRUE);
+            load_object_surfaces(&collisionData, sVertexData, TRUE);
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
@@ -723,7 +723,6 @@ void load_object_collision_model(void) {
  * Transform an object's vertices and add them to the static surface pool.
  */
 void load_object_static_model(void) {
-    TerrainData vertexData[600];
     TerrainData *collisionData = o->collisionData;
     u32 surfacePoolData;
 
@@ -734,11 +733,11 @@ void load_object_static_model(void) {
     gSurfacesAllocated = gNumStaticSurfaces;
 
     collisionData++;
-    transform_object_vertices(&collisionData, vertexData);
+    transform_object_vertices(&collisionData, sVertexData);
 
     // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
     while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-        load_object_surfaces(&collisionData, vertexData, FALSE);
+        load_object_surfaces(&collisionData, sVertexData, FALSE);
     }
 
     surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
