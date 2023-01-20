@@ -296,25 +296,11 @@ void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
     vec3_cross(dest, a, b);
 }
 
-ALWAYS_INLINE f32 fast_inverse_square_root(f32 number) {
-	s32 i;
-	f32 x2, y;
-
-	x2 = number * 0.5f;
-	y  = number;
-	i  = * ( s32 * ) &y;
-	i  = 0x5f3759df - ( i >> 1 );
-	y  = * ( f32 * ) &i;
-	y  = y * ( 1.5f - ( x2 * y * y ) );
-
-	return y;
-}
-
 /// Scale vector 'dest' so it has length 1
 void vec3f_normalize(Vec3f dest) {
     register f32 mag = (sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
     if (mag > NEAR_ZERO) {
-        register f32 invsqrt = fast_inverse_square_root(mag);
+        register f32 invsqrt = (1.0f / sqrtf(mag));
         vec3_mul_val(dest, invsqrt);
     } else {
         // Default to up vector.

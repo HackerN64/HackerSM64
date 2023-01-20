@@ -251,6 +251,21 @@ static void add_surface(struct Surface *surface, s32 dynamic) {
     }
 }
 
+// This can cause a few problems with vanilla collision.
+ALWAYS_INLINE f32 fast_inverse_square_root(f32 number) {
+	s32 i;
+	f32 x2, y;
+
+	x2 = number * 0.5f;
+	y  = number;
+	i  = * ( s32 * ) &y;
+	i  = 0x5f3759df - ( i >> 1 );
+	y  = * ( f32 * ) &i;
+	y  = y * ( 1.5f - ( x2 * y * y ) );
+
+	return y;
+}
+
 /**
  * Initializes a Surface struct using the given vertex data
  * @param vertexData The raw data containing vertex positions
@@ -271,7 +286,14 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
 
     find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
-    vec3f_normalize(n);
+    f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    if (mag < NEAR_ZERO) {
+        return NULL;
+    }
+#endif
+    mag = fast_inverse_square_root(mag);
+    vec3_mul_val(n, mag);
 
     struct Surface *surface = alloc_surface(dynamic);
 
