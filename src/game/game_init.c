@@ -687,7 +687,7 @@ void init_controllers(void) {
         }
     }
 
-    // Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
+    //! Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
     // so if port 1 is an N64 controller and port 2 is a GC controller, swap them.
     if (gIsConsole && __osControllerTypes[0] == CONT_TYPE_N64 && __osControllerTypes[1] == CONT_TYPE_GCN) {
         struct Controller temp = gControllers[0];

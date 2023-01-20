@@ -1,18 +1,12 @@
+#include "config.h"
 #include "PR/os_internal.h"
+#include "engine/math_util.h"
 
 /////////////////////////////////////////////////
 // Libultra structs and macros (from ultralib) //
 /////////////////////////////////////////////////
 
-#define ARRLEN(x) ((s32)(sizeof(x) / sizeof(x[0])))
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
-
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#define S8_MAX __SCHAR_MAX__
-#define S8_MIN (-S8_MAX - 1)
-#define CLAMP_S8( x)        CLAMP((x),  S8_MIN,  S8_MAX)
-
-#define CHNL_ERR_MASK		0xC0	/* Bit 6-7: channel errors */
 
 typedef struct
 {
@@ -67,8 +61,6 @@ typedef struct
 
 extern OSPifRam __osContPifRam;
 extern u8 __osMaxControllers;
-
-#define CONT_CMD_READ_BUTTON    1
 
 // Controller accessory addresses
 // https://github.com/joeldipops/TransferBoy/blob/master/docs/TransferPakReference.md
@@ -141,8 +133,8 @@ extern u8 __osMaxControllers;
 #define CONT_CMD_GCN_SHORTPOLL_RX  8
 
 #define CONT_CMD_NOP 0xff
-#define CONT_CMD_END 0xfe //indicates end of a command
-#define CONT_CMD_EXE 1    //set pif ram status byte to this to do a command
+#define CONT_CMD_END 0xfe // indicates end of a command
+#define CONT_CMD_EXE 1    // set pif ram status byte to this to do a command
 
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);
@@ -167,17 +159,18 @@ typedef struct
     /* 0xC */ u8 l_trig;
     /* 0xD */ u8 r_trig;
 } __OSContGCNShortPollFormat;
+
 extern u8 __osContLastCmd;
 u8 __osControllerTypes[MAXCONTROLLERS];
 u8 __osGamecubeRumbleEnabled[MAXCONTROLLERS];
 
 typedef struct
 {
-    s8 initialized;
-    u8 stick_x;
-    u8 stick_y;
-    u8 c_stick_x;
-    u8 c_stick_y;
+    /* 0x0 */ s8 initialized;
+    /* 0x1 */ u8 stick_x;
+    /* 0x2 */ u8 stick_y;
+    /* 0x3 */ u8 c_stick_x;
+    /* 0x4 */ u8 c_stick_y;
 } ControllerCenters;
 
 #define GCN_C_STICK_THRESHOLD 38
@@ -220,6 +213,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
             s32 stick_x, stick_y, c_stick_x, c_stick_y;
             readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
             data->errno = CHNL_ERR(readformatgcn);
+
             if (data->errno == 0) {
                 if (!gGamecubeControllerCenters[i].initialized) {
                     gGamecubeControllerCenters[i].initialized = TRUE;
@@ -270,28 +264,29 @@ static void __osPackReadData(void) {
     __OSContGCNShortPollFormat readformatgcn;
     int i;
 
-    for (i = 0; i < ARRLEN(__osContPifRam.ramarray); i++) {
+    for (i = 0; i < ARRAY_COUNT(__osContPifRam.ramarray); i++) {
         __osContPifRam.ramarray[i] = 0;
     }
 
     __osContPifRam.pifstatus = CONT_CMD_EXE;
-    readformat.dummy = CONT_CMD_NOP;
-    readformat.txsize = CONT_CMD_READ_BUTTON_TX;
-    readformat.rxsize = CONT_CMD_READ_BUTTON_RX;
-    readformat.cmd = CONT_CMD_READ_BUTTON;
-    readformat.button = 0xFFFF;
-    readformat.stick_x = -1;
-    readformat.stick_y = -1;
 
-    readformatgcn.dummy = CONT_CMD_NOP;
-    readformatgcn.txsize = CONT_CMD_GCN_SHORTPOLL_TX;
-    readformatgcn.rxsize = CONT_CMD_GCN_SHORTPOLL_RX;
-    readformatgcn.cmd = CONT_CMD_GCN_SHORTPOLL;
+    readformat.dummy          = CONT_CMD_NOP;
+    readformat.txsize         = CONT_CMD_READ_BUTTON_TX;
+    readformat.rxsize         = CONT_CMD_READ_BUTTON_RX;
+    readformat.cmd            = CONT_CMD_READ_BUTTON;
+    readformat.button         = 0xFFFF;
+    readformat.stick_x        = -1;
+    readformat.stick_y        = -1;
+
+    readformatgcn.dummy       = CONT_CMD_NOP;
+    readformatgcn.txsize      = CONT_CMD_GCN_SHORTPOLL_TX;
+    readformatgcn.rxsize      = CONT_CMD_GCN_SHORTPOLL_RX;
+    readformatgcn.cmd         = CONT_CMD_GCN_SHORTPOLL;
     readformatgcn.analog_mode = 3;
-    readformatgcn.rumble = 0;
-    readformatgcn.button = 0xFFFF;
-    readformatgcn.stick_x = -1;
-    readformatgcn.stick_y = -1;
+    readformatgcn.rumble      = 0;
+    readformatgcn.button      = 0xFFFF;
+    readformatgcn.stick_x     = -1;
+    readformatgcn.stick_y     = -1;
 
     for (i = 0; i < __osMaxControllers; i++) {
         if (__osControllerTypes[i] == CONT_TYPE_GCN) {
@@ -303,7 +298,7 @@ static void __osPackReadData(void) {
             ptr += sizeof(__OSContReadFormat);
         }
     }
-    
+
     *ptr = CONT_CMD_END;
 }
 
@@ -311,60 +306,28 @@ static u16 __osTranslateGCNButtons(u16 input, s32 c_stick_x, s32 c_stick_y) {
     u16 ret = 0;
 
     // Face buttons
-    if (input & CONT_GCN_A) {
-        ret |= A_BUTTON;
-    }
-    if (input & CONT_GCN_B) {
-        ret |= B_BUTTON;
-    }
-    if (input & CONT_GCN_START) {
-        ret |= START_BUTTON;
-    }
-    if (input & CONT_GCN_X) {
-        ret |= GCN_X_BUTTON;
-    }
-    if (input & CONT_GCN_Y) {
-        ret |= GCN_Y_BUTTON;
-    }
+    if (input & CONT_GCN_A      ) ret |= A_BUTTON;
+    if (input & CONT_GCN_B      ) ret |= B_BUTTON;
+    if (input & CONT_GCN_START  ) ret |= START_BUTTON;
+    if (input & CONT_GCN_X      ) ret |= GCN_X_BUTTON;
+    if (input & CONT_GCN_Y      ) ret |= GCN_Y_BUTTON;
 
     // Triggers & Z
-    if (input & CONT_GCN_Z) {
-        ret |= Z_TRIG;
-    }
-    if (input & CONT_GCN_R) {
-        ret |= R_TRIG;
-    }
-    if (input & CONT_GCN_L) {
-        ret |= L_TRIG;
-    }
+    if (input & CONT_GCN_Z      ) ret |= Z_TRIG;
+    if (input & CONT_GCN_R      ) ret |= R_TRIG;
+    if (input & CONT_GCN_L      ) ret |= L_TRIG;
 
     // D-Pad
-    if (input & CONT_GCN_UP) {
-        ret |= U_JPAD;
-    }
-    if (input & CONT_GCN_DOWN) {
-        ret |= D_JPAD;
-    }
-    if (input & CONT_GCN_LEFT) {
-        ret |= L_JPAD;
-    }
-    if (input & CONT_GCN_RIGHT) {
-        ret |= R_JPAD;
-    }
+    if (input & CONT_GCN_UP     ) ret |= U_JPAD;
+    if (input & CONT_GCN_DOWN   ) ret |= D_JPAD;
+    if (input & CONT_GCN_LEFT   ) ret |= L_JPAD;
+    if (input & CONT_GCN_RIGHT  ) ret |= R_JPAD;
 
     // C-stick to C-buttons
-    if (c_stick_x > GCN_C_STICK_THRESHOLD) {
-        ret |= R_CBUTTONS;
-    }
-    if (c_stick_x < -GCN_C_STICK_THRESHOLD) {
-        ret |= L_CBUTTONS;
-    }
-    if (c_stick_y > GCN_C_STICK_THRESHOLD) {
-        ret |= U_CBUTTONS;
-    }
-    if (c_stick_y < -GCN_C_STICK_THRESHOLD) {
-        ret |= D_CBUTTONS;
-    }
+    if (c_stick_x >  GCN_C_STICK_THRESHOLD) ret |= R_CBUTTONS;
+    if (c_stick_x < -GCN_C_STICK_THRESHOLD) ret |= L_CBUTTONS;
+    if (c_stick_y >  GCN_C_STICK_THRESHOLD) ret |= U_CBUTTONS;
+    if (c_stick_y < -GCN_C_STICK_THRESHOLD) ret |= D_CBUTTONS;
 
     return ret;
 }
@@ -398,8 +361,8 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         requestHeader = *(__OSContRequesFormat*)ptr;
         data->error = CHNL_ERR(requestHeader);
         if (data->error == 0) {
-            data->type = requestHeader.typel << 8 | requestHeader.typeh;
-            
+            data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
+
             // Check if the input type is a gamecube controller
             // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type as N64 controller if so.
@@ -411,7 +374,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
             data->status = requestHeader.status;
 
-            bits |= 1 << i;
+            bits |= (1 << i);
         }
     }
     *pattern = bits;
@@ -452,7 +415,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[pfs->channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        ret = READFORMAT(ptr)->rxsize & CHNL_ERR_MASK;
+        ret = (READFORMAT(ptr)->rxsize & CHNL_ERR_MASK);
         if (!ret) {
             if (!flag) {
                 if (READFORMAT(ptr)->datacrc != 0) {
@@ -479,13 +442,13 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
     __OSContRamReadFormat ramreadformat;
     int i;
 
-    ramreadformat.dummy = CONT_CMD_NOP;
+    ramreadformat.dummy  = CONT_CMD_NOP;
     ramreadformat.txsize = CONT_CMD_WRITE_PAK_TX;
     ramreadformat.rxsize = CONT_CMD_WRITE_PAK_RX;
-    ramreadformat.cmd = CONT_CMD_WRITE_PAK;
-    ramreadformat.addrh = CONT_BLOCK_RUMBLE >> 3;
-    ramreadformat.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
-    
+    ramreadformat.cmd    = CONT_CMD_WRITE_PAK;
+    ramreadformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
+    ramreadformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
             *ptr++ = CONT_CMD_REQUEST_STATUS;
@@ -497,8 +460,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
     ptr[0] = CONT_CMD_END;
 }
 
-s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
-{
+s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
     s32 ret;
     u8 temp[32];
 
@@ -509,7 +471,7 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
 
     if (__osControllerTypes[pfs->channel] != CONT_TYPE_GCN) {
         ret = __osPfsSelectBank(pfs, 0xFE);
-        
+
         if (ret == PFS_ERR_NEW_PACK) {
             ret = __osPfsSelectBank(pfs, 0x80);
         }
@@ -536,7 +498,7 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL;
         }
-        
+
         if (ret != 0) {
             return ret;
         }
@@ -545,11 +507,11 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL;
         }
-        
+
         if (ret != 0) {
             return ret;
         }
-        
+
         if (temp[31] != 0x80) {
             return PFS_ERR_DEVICE;
         }
