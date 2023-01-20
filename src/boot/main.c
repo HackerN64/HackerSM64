@@ -337,6 +337,7 @@ void check_cache_emulation() {
  * Increment the first and last values of the stack.
  * If they're different, that means an error has occured, so trigger a crash.
 */
+#ifdef DEBUG
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
@@ -366,6 +367,7 @@ void check_stack_validity(void) {
     }
 #endif
 }
+#endif
 
 
 extern void crash_screen_init(void);
@@ -404,7 +406,7 @@ void thread3_main(UNUSED void *arg) {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
-    
+#ifdef DEBUG
     gIdleThreadStack[0] = 0;
     gIdleThreadStack[THREAD1_STACK - 1] = 0;
     gThread3Stack[0] = 0;
@@ -417,6 +419,7 @@ void thread3_main(UNUSED void *arg) {
     gThread6Stack[0] = 0;
     gThread6Stack[THREAD3_STACK - 1] = 0;
 #endif
+#endif
 
     create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, gThread4Stack + THREAD4_STACK, 20);
     osStartThread(&gSoundThread);
@@ -427,7 +430,9 @@ void thread3_main(UNUSED void *arg) {
     while (TRUE) {
         OSMesg msg;
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
+#ifdef DEBUG
         check_stack_validity();
+#endif
         switch ((uintptr_t) msg) {
             case MESG_VI_VBLANK:
                 handle_vblank();
