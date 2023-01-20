@@ -18,12 +18,12 @@
 
 static const LevelScript script_bowser_3_macro_objects[] = {
     // Special objects
-    OBJECT(/*model*/ MODEL_BOWSER, /*pos*/    13,   307, -1024, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvBowser),
-    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/ -3362,  -204,  1121, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
-    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/     0,  -204,  3584, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
-    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  3362,  -204,  1126, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
-    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  2123,  -204, -2912, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
-    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/ -2122,  -204, -2912, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_BOWSER,            /*pos*/    13,   307, -1024, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvBowser),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/ -3362,  -204,  1121, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/     0,  -204,  3584, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  3362,  -204,  1126, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/  2123,  -204, -2912, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/ -2122,  -204, -2912, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     RETURN(),
 };
 

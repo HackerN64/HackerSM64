@@ -18,7 +18,7 @@
 
 static const LevelScript script_bowser_2_macro_objects[] = {
     // Special objects
-    OBJECT(/*model*/ MODEL_BOWSER, /*pos*/    -8,  1229, -1418, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvBowser),
+    OBJECT(/*model*/ MODEL_BOWSER, /*pos*/    -8,  1229, -1418, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvBowser),
     RETURN(),
 };
 
