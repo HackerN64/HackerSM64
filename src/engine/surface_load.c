@@ -251,7 +251,6 @@ static void add_surface(struct Surface *surface, s32 dynamic) {
     }
 }
 
-// This can cause a few problems with vanilla collision.
 ALWAYS_INLINE f32 fast_inverse_square_root(f32 number) {
 	s32 i;
 	f32 x2, y;
