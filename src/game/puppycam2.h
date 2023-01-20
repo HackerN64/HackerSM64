@@ -61,13 +61,12 @@ struct gPuppyStruct
     s16 pitchTarget;            // Vertical Direction that pitch tries to be.
     f32 pitchAcceleration;      // Vertical Direction that sets pitchTarget.
     s16 zoom;                   // How far the camera is currently zoomed out
-    u8  zoomSet;                // The current setting of which zoompoint to set the target to.
     s16 zoomTarget;             // The value that zoom tries to be.
     s16 zoomPoints[3];          // An array containing distances.
     s16 targetFloorHeight;      // Mario's current floor height
     s16 lastTargetFloorHeight;  // Mirror's mario's floor height when his velocity is not above 0.
-    Vec3s pos;                  // Where the camera is
-    Vec3s focus;                // Where the camera's looking
+    Vec3f pos;                  // Where the camera is
+    Vec3f focus;                // Where the camera's looking
     Vec3s pan;                  // An offset of the camera's focus
     s32 intendedFlags;          // The flagset the camera tries to be when it's not held hostage.
     s32 flags;                  // Behaviour flags that affect different properties of the camera's behaviour
@@ -225,13 +224,19 @@ extern s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySp
 #define NC_MODE_FIXED_NOMOVE 6
 #define NC_MODE_FIXED_NOTURN 7
 #define NC_MODE_NOROTATE 8
-struct newcam_hardpos
-{
+
+enum PuppyCamInput {
+    INPUT_DOUBLE_TAP,
+    INPUT_SINGLE_PRESS,
+    INPUT_CLASSIC
+};
+
+struct newcam_hardpos {
     u8 newcam_hard_levelID;
     u8 newcam_hard_areaID;
     u8 newcam_hard_permaswap;
     u16 newcam_hard_modeset;
-    s32 *newcam_hard_script;
+    void *newcam_hard_script;
     s16 newcam_hard_X1;
     s16 newcam_hard_Y1;
     s16 newcam_hard_Z1;
