@@ -69,24 +69,23 @@ s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
     /* 2 */ {0xCF, 0x73, 0x38, 0x1F},
 };
 
-// TODO: Add WIKI page
-
 /**
  * Format:
- * - downsampleRate
- * - isMono
- * - filterCount
- * - windowSize
- * - gain
- * - gainIndex
- * - reverbIndex
+ * - downsampleRate (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality)
+ * - isMono         (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
+ * - filterCount    (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand)
+ * - windowSize     (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound)
+ * - gain           (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
+ * - gainIndex      (Advanced parameter used to tune the outputs of every first two of three filters)
+ * - reverbIndex    (Advanced parameter used to tune the incoming output of every third filter)
  * 
- * - *delaysL
- * - *delaysR
- * - *reverbMultsL
- * - *reverbMultsR
+ * - *delaysL       (Array of variable audio buffer sizes / delays for each respective filter [left channel])
+ * - *delaysR       (Array of variable audio buffer sizes / delays for each respective filter [right channel])
+ * - *reverbMultsL  (Array of multipliers applied to the final output of each group of 3 filters [left channel])
+ * - *reverbMultsR  (Array of multipliers applied to the final output of each group of 3 filters [right channel])
  * 
  * NOTE: First entry will always be used by default when not using the level commands to specify a preset.
+ * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.
  */
 struct BetterReverbSettings gBetterReverbSettings[] = {
     { /* 0 */
