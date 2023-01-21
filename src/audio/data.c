@@ -94,11 +94,11 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         delaysArr[0], delaysArr[0], reverbMultsArr[0], reverbMultsArr[0]
     },
     { /* 1 */
-        2, FALSE, (NUM_ALLPASS - 9), 0x1000, 0x53FF, 0x30, 0xA0, // Default Console
+        2, FALSE, (NUM_ALLPASS - 9), 0xE00, 0x43FF, 0xA0, 0x30, // Default Console
         delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
     },
     { /* 2 */
-        1, FALSE, NUM_ALLPASS, 0x1000, 0x31FF, 0x60, 0xA0, // Default Emulator (RCVI Hack only)
+        1, FALSE, NUM_ALLPASS, 0xE00, 0x28FF, 0xA0, 0x60, // Default Emulator (RCVI Hack only)
         delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
     },
 };
@@ -139,10 +139,9 @@ struct ReverbSettingsUS gReverbSettings[18] = {
     { 1, 0x0800, 0x2FFF },
 };
 
-struct AudioSessionSettings gAudioSessionPresets[1] = {
-    { 32000, MAX_SIMULTANEOUS_NOTES, 1, 0x1000, 0x2FFF, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM },
-};
+struct AudioSessionSettings gAudioSessionSettings = { 32000, MAX_SIMULTANEOUS_NOTES, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM };
 #endif
+
 // gAudioCosineTable[k] = round((2**15 - 1) * cos(pi/2 * k / 127)). Unused.
 #if defined(VERSION_JP) || defined(VERSION_US)
 u16 gAudioCosineTable[128] = {

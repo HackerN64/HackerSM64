@@ -2505,9 +2505,9 @@ void play_toads_jingle(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void sound_reset(u8 presetId) {
-    if (presetId >= 8) {
-        presetId = 0;
+void sound_reset(u8 reverbPresetId) {
+    if (reverbPresetId >= ARRAY_COUNT(gReverbSettings)) {
+        reverbPresetId = 0;
     }
     sGameLoopTicked = 0;
     disable_all_sequence_players();
@@ -2516,19 +2516,18 @@ void sound_reset(u8 presetId) {
     func_802ad74c(0xF2000000, 0);
 #endif
 #if defined(VERSION_JP) || defined(VERSION_US)
-    audio_reset_session(&gAudioSessionPresets[0], presetId);
+    audio_reset_session(reverbPresetId);
 #else
-    audio_reset_session_eu(presetId);
+    audio_reset_session_eu(reverbPresetId);
 #endif
     osWritebackDCacheAll();
-    if (presetId != 7) {
+    if (reverbPresetId != 7) {
         preload_sequence(SEQ_EVENT_SOLVE_PUZZLE, PRELOAD_BANKS | PRELOAD_SEQUENCE);
         preload_sequence(SEQ_EVENT_PEACH_MESSAGE, PRELOAD_BANKS | PRELOAD_SEQUENCE);
         preload_sequence(SEQ_EVENT_CUTSCENE_STAR_SPAWN, PRELOAD_BANKS | PRELOAD_SEQUENCE);
     }
     seq_player_play_sequence(SEQ_PLAYER_SFX, SEQ_SOUND_PLAYER, 0);
-    D_80332108 = (D_80332108 & 0xf0) + presetId;
-    gSoundMode = D_80332108 >> 4;
+    gSoundMode = D_80332108;
     sHasStartedFadeOut = FALSE;
 }
 
@@ -2536,6 +2535,6 @@ void sound_reset(u8 presetId) {
  * Called from threads: thread5_game_loop
  */
 void audio_set_sound_mode(u8 soundMode) {
-    D_80332108 = (D_80332108 & 0xf) + (soundMode << 4);
+    D_80332108 = soundMode;
     gSoundMode = soundMode;
 }
