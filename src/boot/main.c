@@ -341,20 +341,20 @@ void check_cache_emulation() {
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
-    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 5 stack overflow.")
     gThread3Stack[0]++;
     gThread3Stack[THREAD3_STACK - 1]++;
-    assert(gThread3Stack[0] == gThread3Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    assert(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 5 stack overflow.")
     gThread4Stack[0]++;
     gThread4Stack[THREAD4_STACK - 1]++;
-    assert(gThread4Stack[0] == gThread4Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    assert(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 5 stack overflow.")
     gThread5Stack[0]++;
     gThread5Stack[THREAD5_STACK - 1]++;
     assert(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
 #if ENABLE_RUMBLE
     gThread6Stack[0]++;
     gThread6Stack[THREAD6_STACK - 1]++;
-    assert(gThread6Stack[0] == gThread6Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 5 stack overflow.")
 #endif
 }
 #endif
@@ -407,7 +407,7 @@ void thread3_main(UNUSED void *arg) {
     gThread5Stack[THREAD5_STACK - 1] = 0;
 #if ENABLE_RUMBLE
     gThread6Stack[0] = 0;
-    gThread6Stack[THREAD3_STACK - 1] = 0;
+    gThread6Stack[THREAD6_STACK - 1] = 0;
 #endif
 #endif
 

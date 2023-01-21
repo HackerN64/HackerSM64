@@ -251,20 +251,6 @@ static void add_surface(struct Surface *surface, s32 dynamic) {
     }
 }
 
-ALWAYS_INLINE f32 fast_inverse_square_root(f32 number) {
-	s32 i;
-	f32 x2, y;
-
-	x2 = number * 0.5f;
-	y  = number;
-	i  = * ( s32 * ) &y;
-	i  = 0x5f3759df - ( i >> 1 );
-	y  = * ( f32 * ) &i;
-	y  = y * ( 1.5f - ( x2 * y * y ) );
-
-	return y;
-}
-
 /**
  * Initializes a Surface struct using the given vertex data
  * @param vertexData The raw data containing vertex positions
@@ -291,7 +277,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
         return NULL;
     }
 #endif
-    mag = fast_inverse_square_root(mag);
+    mag = 1.0f / sqrtf(mag);
     vec3_mul_val(n, mag);
 
     struct Surface *surface = alloc_surface(dynamic);
