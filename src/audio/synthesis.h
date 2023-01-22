@@ -141,7 +141,7 @@ extern s16 D_SH_803479B4;
 
 #ifdef BETTER_REVERB
 void initialize_better_reverb_buffers(void);
-void set_better_reverb_buffers(s32 *inputDelaysL, s32 *inputDelaysR);
+void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR);
 #endif
 
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen);

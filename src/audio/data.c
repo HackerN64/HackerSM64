@@ -42,7 +42,8 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 #endif
 
 #ifdef BETTER_REVERB
-s32 delaysArr[][NUM_ALLPASS] = {
+// Each entry represents an array of variable audio buffer sizes / delays for each respective filter.
+u32 delaysArr[][NUM_ALLPASS] = {
     { /* 0 */ 
         4, 4, 4,
         4, 4, 4,
@@ -63,6 +64,8 @@ s32 delaysArr[][NUM_ALLPASS] = {
     },
 };
 
+// Each entry represents an array of multipliers applied to the final output of each group of 3 filters.
+// These values are u8s in spirit, but are set as s32 values to slightly increase performance during calculations.
 s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
     /* 0 */ {0x00, 0x00, 0x00, 0x00},
     /* 1 */ {0xD7, 0x6F, 0x36, 0x22},

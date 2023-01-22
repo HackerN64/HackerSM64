@@ -177,7 +177,7 @@ void initialize_better_reverb_buffers(void) {
     delayBufsR = &delayBufsL[NUM_ALLPASS];
 }
 
-void set_better_reverb_buffers(s32 *inputDelaysL, s32 *inputDelaysR) {
+void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
     s32 bufOffset = 0;
     s32 i;
 
@@ -186,8 +186,8 @@ void set_better_reverb_buffers(s32 *inputDelaysL, s32 *inputDelaysR) {
     // NOTE: Using reverbFilterCount over NUM_ALLPASS will report less memory usage with fewer filters, but poses an additional
     // risk to anybody testing on console with performance compromises, as emulator can be easily overlooked.
     for (i = 0; i < reverbFilterCount; ++i) {
-        delaysL[i] = (inputDelaysL[i] / gReverbDownsampleRate);
-        delaysR[i] = (inputDelaysR[i] / gReverbDownsampleRate);
+        delaysL[i] = (s32) (inputDelaysL[i] / gReverbDownsampleRate);
+        delaysR[i] = (s32) (inputDelaysR[i] / gReverbDownsampleRate);
         delayBufsL[i] = soundAlloc(&gBetterReverbPool, delaysL[i] * sizeof(s32));
         bufOffset += delaysL[i];
         delayBufsR[i] = soundAlloc(&gBetterReverbPool, delaysR[i] * sizeof(s32));

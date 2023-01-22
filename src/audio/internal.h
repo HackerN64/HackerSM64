@@ -737,10 +737,10 @@ struct BetterReverbSettings {
     u8 filterCount;
     s16 windowSize;
     s16 gain;
-    s32 gainIndex;
-    s32 reverbIndex;
-    s32 *delaysL;
-    s32 *delaysR;
+    u8 gainIndex;
+    u8 reverbIndex;
+    u32 *delaysL;
+    u32 *delaysR;
     s32 *reverbMultsL;
     s32 *reverbMultsR;
 };
