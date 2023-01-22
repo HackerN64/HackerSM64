@@ -183,6 +183,10 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
 
     gBetterReverbPool.cur = gBetterReverbPool.start + ALIGN16(BETTER_REVERB_PTR_SIZE); // Reset reverb data pool
 
+    // Don't bother setting any buffers if BETTER_REVERB is disabled
+    if (!toggleBetterReverb)
+        return;
+
     // NOTE: Using reverbFilterCount over NUM_ALLPASS will report less memory usage with fewer filters, but poses an additional
     // risk to anybody testing on console with performance compromises, as emulator can be easily overlooked.
     for (i = 0; i < reverbFilterCount; ++i) {

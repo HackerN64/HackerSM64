@@ -1142,8 +1142,7 @@ void init_reverb_us(s32 presetId) {
 
     // This does not have to be reset after being initialized for the first time, which would help speed up load times.
     // However, resetting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
-    if (toggleBetterReverb)
-        set_better_reverb_buffers(betterReverbPreset->delaysL, betterReverbPreset->delaysR);
+    set_better_reverb_buffers(betterReverbPreset->delaysL, betterReverbPreset->delaysR);
 #endif
 }
 #endif
