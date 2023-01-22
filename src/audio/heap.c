@@ -1084,10 +1084,14 @@ void init_reverb_us(s32 presetId) {
         reverbFilterCount = 3;
     }
 #endif
-    if (reverbWindowSize > 0)
+    if (reverbWindowSize > 0) {
         gSynthesisReverb.useReverb = TRUE;
-    else
+    } else {
         gSynthesisReverb.useReverb = FALSE;
+#ifdef BETTER_REVERB
+        toggleBetterReverb = FALSE;
+#endif
+    }
 
     if (reverbWindowSize > REVERB_WINDOW_SIZE_MAX) {
         reverbWindowSize = REVERB_WINDOW_SIZE_MAX;
