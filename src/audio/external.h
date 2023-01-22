@@ -67,7 +67,6 @@ void play_power_star_jingle(void);
 void play_race_fanfare(void);
 void play_toads_jingle(void);
 void sound_reset(u8 reverbPresetId);
-void audio_set_sound_mode(u8 soundMode);
 
 void audio_init(void); // in load.c
 

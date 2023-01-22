@@ -2,6 +2,7 @@
 
 #include "area.h"
 #include "audio/external.h"
+#include "audio/load.h"
 #include "engine/graph_node.h"
 #include "engine/math_util.h"
 #include "level_table.h"
@@ -35,7 +36,7 @@ static u16 sCurrentCapMusic = MUSIC_NONE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 static u8 sPlayingInfiniteStairs = FALSE;
 #endif
-static s16 sSoundMenuModeToSoundMode[] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
+static s16 sSoundMenuModeToSoundMode[3] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
 // Only the 20th array element is used.
 static u32 sMenuSoundsExtra[] = {
     SOUND_MOVING_TERRAIN_SLIDE + (0 << 16),
@@ -142,8 +143,8 @@ void enable_background_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void set_sound_mode(u16 soundMode) {
-    if (soundMode < 3) {
-        audio_set_sound_mode(sSoundMenuModeToSoundMode[soundMode]);
+    if (soundMode < ARRAY_COUNT(sSoundMenuModeToSoundMode)) {
+        gSoundMode = sSoundMenuModeToSoundMode[soundMode];
     }
 }
 

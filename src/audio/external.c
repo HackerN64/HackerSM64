@@ -326,7 +326,6 @@ u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
 u8 sSoundBankDisabled[16] = { 0 };
-u8 D_80332108 = 0;
 u8 sHasStartedFadeOut = FALSE;
 u16 sSoundBanksThatLowerBackgroundMusic = 0;
 u8 sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
@@ -2527,14 +2526,5 @@ void sound_reset(u8 reverbPresetId) {
         preload_sequence(SEQ_EVENT_CUTSCENE_STAR_SPAWN, PRELOAD_BANKS | PRELOAD_SEQUENCE);
     }
     seq_player_play_sequence(SEQ_PLAYER_SFX, SEQ_SOUND_PLAYER, 0);
-    gSoundMode = D_80332108;
     sHasStartedFadeOut = FALSE;
-}
-
-/**
- * Called from threads: thread5_game_loop
- */
-void audio_set_sound_mode(u8 soundMode) {
-    D_80332108 = soundMode;
-    gSoundMode = soundMode;
 }
