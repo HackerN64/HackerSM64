@@ -272,6 +272,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
     f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
+    // This will never need to be run for custom levels because Fast64 does this step before exporting.
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (mag < NEAR_ZERO) {
         return NULL;
