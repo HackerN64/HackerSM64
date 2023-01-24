@@ -333,6 +333,33 @@ void check_cache_emulation() {
     __osRestoreInt(saved);
 }
 
+/**
+ * Increment the first and last values of the stack.
+ * If they're different, that means an error has occured, so trigger a crash.
+*/
+#ifdef DEBUG
+void check_stack_validity(void) {
+    gIdleThreadStack[0]++;
+    gIdleThreadStack[THREAD1_STACK - 1]++;
+    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.")
+    gThread3Stack[0]++;
+    gThread3Stack[THREAD3_STACK - 1]++;
+    assert(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.")
+    gThread4Stack[0]++;
+    gThread4Stack[THREAD4_STACK - 1]++;
+    assert(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.")
+    gThread5Stack[0]++;
+    gThread5Stack[THREAD5_STACK - 1]++;
+    assert(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+#if ENABLE_RUMBLE
+    gThread6Stack[0]++;
+    gThread6Stack[THREAD6_STACK - 1]++;
+    assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
+#endif
+}
+#endif
+
+
 extern void crash_screen_init(void);
 
 extern void crash_screen_init(void);
@@ -378,16 +405,33 @@ void thread3_main(UNUSED void *arg) {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
+#ifdef DEBUG
+    gIdleThreadStack[0] = 0;
+    gIdleThreadStack[THREAD1_STACK - 1] = 0;
+    gThread3Stack[0] = 0;
+    gThread3Stack[THREAD3_STACK - 1] = 0;
+    gThread4Stack[0] = 0;
+    gThread4Stack[THREAD4_STACK - 1] = 0;
+    gThread5Stack[0] = 0;
+    gThread5Stack[THREAD5_STACK - 1] = 0;
+#if ENABLE_RUMBLE
+    gThread6Stack[0] = 0;
+    gThread6Stack[THREAD6_STACK - 1] = 0;
+#endif
+#endif
 
-    create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
+    create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, gThread4Stack + THREAD4_STACK, 20);
     osStartThread(&gSoundThread);
 
-    create_thread(&gGameLoopThread, THREAD_5_GAME_LOOP, thread5_game_loop, NULL, gThread5Stack + 0x2000, 10);
+    create_thread(&gGameLoopThread, THREAD_5_GAME_LOOP, thread5_game_loop, NULL, gThread5Stack + THREAD5_STACK, 10);
     osStartThread(&gGameLoopThread);
 
     while (TRUE) {
         OSMesg msg;
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
+#ifdef DEBUG
+        check_stack_validity();
+#endif
         switch ((uintptr_t) msg) {
             case MESG_VI_VBLANK:
                 handle_vblank();
@@ -528,7 +572,7 @@ void thread1_idle(UNUSED void *arg) {
     osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
-    create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, gThread3Stack + 0x2000, 100);
+    create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, gThread3Stack + THREAD3_STACK, 100);
     osStartThread(&gMainThread);
 
     osSetThreadPri(NULL, 0);
@@ -566,6 +610,6 @@ void main_func(void) {
 #ifdef ISVPRINT
     osInitialize_fakeisv();
 #endif
-    create_thread(&gIdleThread, THREAD_1_IDLE, thread1_idle, NULL, gIdleThreadStack + 0x800, 100);
+    create_thread(&gIdleThread, THREAD_1_IDLE, thread1_idle, NULL, gIdleThreadStack + THREAD1_STACK, 100);
     osStartThread(&gIdleThread);
 }
