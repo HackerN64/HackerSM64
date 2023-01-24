@@ -11,7 +11,6 @@
 #include "main.h"
 #include "debug.h"
 #include "rumble_init.h"
-#include "buffers/buffers.h"
 
 #include "sm64.h"
 

@@ -3,6 +3,13 @@
 
 #include "config.h"
 
+#define THREAD1_STACK 0x100
+#define THREAD2_STACK 0x800
+#define THREAD3_STACK 0x200
+#define THREAD4_STACK 0x2000
+#define THREAD5_STACK 0x2000
+#define THREAD6_STACK 0x400
+
 enum ThreadID {
     THREAD_0,
     THREAD_1_IDLE,
