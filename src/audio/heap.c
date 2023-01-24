@@ -1088,6 +1088,14 @@ void init_reverb_us(s32 presetId) {
                 reverbWindowSize = DEFAULT_LEN_2CH;
         }
     }
+
+    reverbFilterCount -= reverbFilterCount % 3;
+    
+    if (reverbFilterCount > NUM_ALLPASS) {
+        reverbFilterCount = NUM_ALLPASS;
+    } else if (reverbFilterCount < 3) {
+        reverbFilterCount = 3;
+    }
 #endif
     if (reverbWindowSize > 0)
         gSynthesisReverb.useReverb = TRUE;
@@ -1139,6 +1147,9 @@ void init_reverb_us(s32 presetId) {
     }
 
 #ifdef BETTER_REVERB
+    if (!gSynthesisReverb.useReverb)
+        toggleBetterReverb = FALSE;
+
     if (betterReverbPreset->gain > 0)
         gSynthesisReverb.reverbGain = (u16) betterReverbPreset->gain;
 
@@ -1147,15 +1158,14 @@ void init_reverb_us(s32 presetId) {
 
     // This does not have to be reset after being initialized for the first time, which would help speed up load times.
     // However, resetting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
-    if (toggleBetterReverb)
-        set_better_reverb_buffers(betterReverbPreset->delaysL, betterReverbPreset->delaysR);
+    set_better_reverb_buffers(betterReverbPreset->delaysL, betterReverbPreset->delaysR);
 #endif
 }
 #endif
 
 
 #if defined(VERSION_JP) || defined(VERSION_US)
-void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
+void audio_reset_session(s32 reverbPresetId) {
     if (sAudioIsInitialized) {
         if (gAudioLoadLock != AUDIO_LOCK_UNINITIALIZED) {
             gAudioLoadLock = AUDIO_LOCK_LOADING;
@@ -1177,7 +1187,7 @@ void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
             temporary_pool_clear( &gBankLoadedPool.temporary);
             reset_bank_and_seq_load_status();
 
-            init_reverb_us(presetId);
+            init_reverb_us(reverbPresetId);
             bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
 
             if (gAudioLoadLock != AUDIO_LOCK_UNINITIALIZED) {
@@ -1333,11 +1343,11 @@ void audio_reset_session(void) {
     gMaxAudioCmds = gMaxSimultaneousNotes * 0x10 * gAudioBufferParameters.updatesPerFrame + preset->numReverbs * 0x20 + 0x300;
 #endif
 #else
-    gAiFrequency = osAiSetFrequency(preset->frequency);
-    gMaxSimultaneousNotes = preset->maxSimultaneousNotes;
+    gAiFrequency = osAiSetFrequency(gAudioSessionSettings.frequency);
+    gMaxSimultaneousNotes = gAudioSessionSettings.maxSimultaneousNotes;
     gSamplesPerFrameTarget = ALIGN16(gAiFrequency / 60);
 
-    gVolume = preset->volume;
+    gVolume = gAudioSessionSettings.volume;
     gMinAiBufferLength = gSamplesPerFrameTarget - 0x10;
     gAudioUpdatesPerFrame = updatesPerFrame = gSamplesPerFrameTarget / 160 + 1;
 
@@ -1366,8 +1376,8 @@ void audio_reset_session(void) {
     persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem + preset->unk18 + preset->unkMem28 + 0x10);
     temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem + preset->temporaryBankMem + preset->unk24 + preset->unkMem2C + 0x10);
 #else
-    persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem);
-    temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem + preset->temporaryBankMem);
+    persistentMem = DOUBLE_SIZE_ON_64_BIT(gAudioSessionSettings.persistentSeqMem + gAudioSessionSettings.persistentBankMem);
+    temporaryMem = DOUBLE_SIZE_ON_64_BIT(gAudioSessionSettings.temporarySeqMem + gAudioSessionSettings.temporaryBankMem);
 #endif
     totalMem = persistentMem + temporaryMem;
     wantMisc = gAudioSessionPool.size - totalMem - BETTER_REVERB_SIZE;
@@ -1377,16 +1387,16 @@ void audio_reset_session(void) {
     sSeqAndBankPoolSplit.wantPersistent = persistentMem;
     sSeqAndBankPoolSplit.wantTemporary = temporaryMem;
     seq_and_bank_pool_init(&sSeqAndBankPoolSplit);
-    sPersistentCommonPoolSplit.wantSeq = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem);
-    sPersistentCommonPoolSplit.wantBank = DOUBLE_SIZE_ON_64_BIT(preset->persistentBankMem);
+    sPersistentCommonPoolSplit.wantSeq = DOUBLE_SIZE_ON_64_BIT(gAudioSessionSettings.persistentSeqMem);
+    sPersistentCommonPoolSplit.wantBank = DOUBLE_SIZE_ON_64_BIT(gAudioSessionSettings.persistentBankMem);
 #ifdef VERSION_SH
     sPersistentCommonPoolSplit.wantUnused = preset->unk18;
 #else
     sPersistentCommonPoolSplit.wantUnused = 0;
 #endif
     persistent_pools_init(&sPersistentCommonPoolSplit);
-    sTemporaryCommonPoolSplit.wantSeq = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem);
-    sTemporaryCommonPoolSplit.wantBank = DOUBLE_SIZE_ON_64_BIT(preset->temporaryBankMem);
+    sTemporaryCommonPoolSplit.wantSeq = DOUBLE_SIZE_ON_64_BIT(gAudioSessionSettings.temporarySeqMem);
+    sTemporaryCommonPoolSplit.wantBank = DOUBLE_SIZE_ON_64_BIT(gAudioSessionSettings.temporaryBankMem);
 #ifdef VERSION_SH
     sTemporaryCommonPoolSplit.wantUnused = preset->unk24;
 #else
@@ -1418,7 +1428,7 @@ void audio_reset_session(void) {
 
     init_reverb_eu();
 #else
-    init_reverb_us(presetId);
+    init_reverb_us(reverbPresetId);
 #endif
 
     init_sample_dma_buffers(gMaxSimultaneousNotes);

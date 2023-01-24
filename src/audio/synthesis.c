@@ -46,14 +46,15 @@ u8 gBetterReverbPreset = 0;
 u8 toggleBetterReverb = FALSE;
 u8 monoReverb;
 s8 betterReverbDownsampleRate;
+static u8 reverbMultsL[NUM_ALLPASS / 3] = {0};
+static u8 reverbMultsR[NUM_ALLPASS / 3] = {0};
 static s32 allpassIdxL[NUM_ALLPASS] = {0};
 static s32 allpassIdxR[NUM_ALLPASS] = {0};
 static s32     delaysL[NUM_ALLPASS] = {0};
 static s32     delaysR[NUM_ALLPASS] = {0};
-static u8 reverbMultsL[NUM_ALLPASS / 3] = {0};
-static u8 reverbMultsR[NUM_ALLPASS / 3] = {0};
 static s32 **delayBufsL;
 static s32 **delayBufsR;
+s32 reverbLastFilterIndex;
 s32 reverbFilterCount;
 s32 betterReverbWindowsSize;
 s32 betterReverbRevIndex; // This one is okay to adjust whenever
@@ -107,10 +108,10 @@ static void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 
     s32 k = 0;
     s32 outTmpL = 0;
     s32 outTmpR = 0;
-    s32 tmpCarryoverL = (((delayBufsL[reverbFilterCount][allpassIdxL[reverbFilterCount]] * betterReverbRevIndex) >> 8) + inSampleL);
-    s32 tmpCarryoverR = (((delayBufsR[reverbFilterCount][allpassIdxR[reverbFilterCount]] * betterReverbRevIndex) >> 8) + inSampleR);
+    s32 tmpCarryoverL = ((delayBufsL[reverbLastFilterIndex][allpassIdxL[reverbLastFilterIndex]] * betterReverbRevIndex) >> 8) + inSampleL;
+    s32 tmpCarryoverR = ((delayBufsR[reverbLastFilterIndex][allpassIdxR[reverbLastFilterIndex]] * betterReverbRevIndex) >> 8) + inSampleR;
 
-    for (; i <= reverbFilterCount; ++i, ++j) {
+    for (; i <= reverbLastFilterIndex; ++i, ++j) {
         curDelaySampleL = &delayBufsL[i][allpassIdxL[i]];
         curDelaySampleR = &delayBufsR[i][allpassIdxR[i]];
         historySampleL = *curDelaySampleL;
@@ -118,19 +119,19 @@ static void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 
 
         if (j == 2) {
             j = -1;
-            outTmpL += ((historySampleL * reverbMultsL[k  ]) >> 8);
-            outTmpR += ((historySampleR * reverbMultsR[k++]) >> 8);
+            outTmpL += (historySampleL * reverbMultsL[k  ]) >> 8;
+            outTmpR += (historySampleR * reverbMultsR[k++]) >> 8;
             *curDelaySampleL = tmpCarryoverL;
             *curDelaySampleR = tmpCarryoverR;
-            if (i != reverbFilterCount) {
-                tmpCarryoverL = ((historySampleL * betterReverbRevIndex) >> 8);
-                tmpCarryoverR = ((historySampleR * betterReverbRevIndex) >> 8);
+            if (i != reverbLastFilterIndex) {
+                tmpCarryoverL = ((historySampleL * betterReverbRevIndex) >> 8)/* + inSampleL*/;
+                tmpCarryoverR = ((historySampleR * betterReverbRevIndex) >> 8)/* + inSampleR*/;
             }
         } else {
-            *curDelaySampleL = (((historySampleL * (-betterReverbGainIndex)) >> 8) + tmpCarryoverL);
-            *curDelaySampleR = (((historySampleR * (-betterReverbGainIndex)) >> 8) + tmpCarryoverR);
-            tmpCarryoverL = (((*curDelaySampleL * betterReverbGainIndex) >> 8) + historySampleL);
-            tmpCarryoverR = (((*curDelaySampleR * betterReverbGainIndex) >> 8) + historySampleR);
+            *curDelaySampleL = ((historySampleL * (-betterReverbGainIndex)) >> 8) + tmpCarryoverL;
+            *curDelaySampleR = ((historySampleR * (-betterReverbGainIndex)) >> 8) + tmpCarryoverR;
+            tmpCarryoverL = ((*curDelaySampleL * betterReverbGainIndex) >> 8) + historySampleL;
+            tmpCarryoverR = ((*curDelaySampleR * betterReverbGainIndex) >> 8) + historySampleR;
         }
 
         if (++allpassIdxL[i] == delaysL[i]) allpassIdxL[i] = 0;
@@ -148,9 +149,9 @@ static void reverb_mono_sample(s16 *outSample, s32 inSample) {
     s32 j = 0;
     s32 k = 0;
     s32 outTmp = 0;
-    s32 tmpCarryover = (((delayBufsL[reverbFilterCount][allpassIdxL[reverbFilterCount]] * betterReverbRevIndex) >> 8) + inSample);
+    s32 tmpCarryover = ((delayBufsL[reverbLastFilterIndex][allpassIdxL[reverbLastFilterIndex]] * betterReverbRevIndex) >> 8) + inSample;
 
-    for (; i <= reverbFilterCount; ++i, ++j) {
+    for (; i <= reverbLastFilterIndex; ++i, ++j) {
         curDelaySample = &delayBufsL[i][allpassIdxL[i]];
         historySample = *curDelaySample;
 
@@ -158,11 +159,11 @@ static void reverb_mono_sample(s16 *outSample, s32 inSample) {
             j = -1;
             outTmp += ((historySample * reverbMultsL[k++]) >> 8);
             *curDelaySample = tmpCarryover;
-            if (i != reverbFilterCount)
-                tmpCarryover = ((historySample * betterReverbRevIndex) >> 8);
+            if (i != reverbLastFilterIndex)
+                tmpCarryover = ((historySample * betterReverbRevIndex) >> 8)/* + inSample*/;
         } else {
-            *curDelaySample = (((historySample * (-betterReverbGainIndex)) >> 8) + tmpCarryover);
-            tmpCarryover = (((*curDelaySample * betterReverbGainIndex) >> 8) + historySample);
+            *curDelaySample = ((historySample * (-betterReverbGainIndex)) >> 8) + tmpCarryover;
+            tmpCarryover = ((*curDelaySample * betterReverbGainIndex) >> 8) + historySample;
         }
 
         if (++allpassIdxL[i] == delaysL[i]) allpassIdxL[i] = 0;
@@ -174,29 +175,31 @@ static void reverb_mono_sample(s16 *outSample, s32 inSample) {
 void initialize_better_reverb_buffers(void) {
     delayBufsL = (s32**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
     delayBufsR = &delayBufsL[NUM_ALLPASS];
-    delayBufsL[0] = (s32*) soundAlloc(&gBetterReverbPool, BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE);
 }
 
-void set_better_reverb_buffers(s32 *inputDelaysL, s32 *inputDelaysR) {
+void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
     s32 bufOffset = 0;
     s32 i;
 
-    for (i = 0; i < NUM_ALLPASS; ++i) {
-        delaysL[i] = (inputDelaysL[i] / gReverbDownsampleRate);
-        delaysR[i] = (inputDelaysR[i] / gReverbDownsampleRate);
-        delayBufsL[i] = (s32*) &delayBufsL[0][bufOffset];
+    gBetterReverbPool.cur = gBetterReverbPool.start + ALIGN16(BETTER_REVERB_PTR_SIZE); // Reset reverb data pool
+
+    // Don't bother setting any buffers if BETTER_REVERB is disabled
+    if (!toggleBetterReverb)
+        return;
+
+    // NOTE: Using reverbFilterCount over NUM_ALLPASS will report less memory usage with fewer filters, but poses an additional
+    // risk to anybody testing on console with performance compromises, as emulator can be easily overlooked.
+    for (i = 0; i < reverbFilterCount; ++i) {
+        delaysL[i] = (s32) (inputDelaysL[i] / gReverbDownsampleRate);
+        delaysR[i] = (s32) (inputDelaysR[i] / gReverbDownsampleRate);
+        delayBufsL[i] = soundAlloc(&gBetterReverbPool, delaysL[i] * sizeof(s32));
         bufOffset += delaysL[i];
-<<<<<<< HEAD
-        delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interweaved adjacently in memory; not a bug
-=======
-        delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interleaved adjacently in memory; not a bug
->>>>>>> hackersm64/develop/2.1.0_RCVI-HACK
+        delayBufsR[i] = soundAlloc(&gBetterReverbPool, delaysR[i] * sizeof(s32));
         bufOffset += delaysR[i];
     }
 
-    aggress(bufOffset * sizeof(s32) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
+    aggress(bufOffset * sizeof(s32) <= BETTER_REVERB_SIZE - ALIGN16(BETTER_REVERB_PTR_SIZE), "BETTER_REVERB_SIZE is too small for this preset!");
 
-    bzero(delayBufsL[0], (bufOffset * sizeof(s32)));
     bzero(allpassIdxL, sizeof(allpassIdxL));
     bzero(allpassIdxR, sizeof(allpassIdxR));
 }
@@ -300,9 +303,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
             }
         }
 #ifdef BETTER_REVERB
-<<<<<<< HEAD
         else if (toggleBetterReverb) {
-            reverbFilterCount--; // Temporarily lower filter count for optimized bulk processing
             item = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
             if (gSoundMode == SOUND_MODE_MONO || monoReverb) {
                 if (gReverbDownsampleRate != 1) {
@@ -315,7 +316,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                         reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
                         gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
                     }
-                } else { // Too slow for practical use, not recommended most of the time.
+                } else {
                     for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++) {
                         reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
                         gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
@@ -324,26 +325,6 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                         reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
                         gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
                     }
-=======
-    else if (toggleBetterReverb) {
-        reverbFilterCount--; // Temporarily lower filter count for optimized bulk processing
-        item = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
-        if (gSoundMode == SOUND_MODE_MONO || monoReverb) {
-            if (gReverbDownsampleRate != 1) {
-                osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
-                for (srcPos = 0, dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); srcPos += gReverbDownsampleRate, dstPos++) {
-                    reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
-                    gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
-                }
-                for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++) {
-                    reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
-                    gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
-                }
-            } else {
-                for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++) {
-                    reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
-                    gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
->>>>>>> hackersm64/develop/2.1.0_RCVI-HACK
                 }
             } else {
                 if (gReverbDownsampleRate != 1) {
@@ -352,30 +333,13 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                         reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
                     for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++)
                         reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
-                } else { // Too slow for practical use, not recommended most of the time.
+                } else {
                     for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++)
                         reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
                     for (dstPos = 0; dstPos < (item->lengthB / 2); dstPos++)
                         reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
                 }
             }
-<<<<<<< HEAD
-            reverbFilterCount++; // Reset filter count to accurate numbers
-=======
-        } else {
-            if (gReverbDownsampleRate != 1) {
-                osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
-                for (srcPos = 0, dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); srcPos += gReverbDownsampleRate, dstPos++)
-                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
-                for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++)
-                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
-            } else {
-                for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++)
-                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
-                for (dstPos = 0; dstPos < (item->lengthB / 2); dstPos++)
-                    reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
-            }
->>>>>>> hackersm64/develop/2.1.0_RCVI-HACK
         }
 #endif
     }
@@ -535,14 +499,16 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
     aSegment(cmdBuf, 0, 0);
 
 #ifdef BETTER_REVERB
+    s32 filterCountDiv3 = reverbFilterCount / 3;
+    reverbFilterCount = filterCountDiv3 * 3; // reverbFilterCount should always be a multiple of 3.
+
     if (reverbFilterCount > NUM_ALLPASS) {
         reverbFilterCount = NUM_ALLPASS;
     } else if (reverbFilterCount < 3) {
         reverbFilterCount = 3;
     }
 
-    s32 filterCountDiv3 = reverbFilterCount / 3;
-    reverbFilterCount = filterCountDiv3 * 3; // reverbFilterCount should always be a multiple of 3.
+    reverbLastFilterIndex = reverbFilterCount - 1;
 
     // Update reverbMultsL every audio frame just in case gReverbMults is ever to change.
     if (gReverbMultsL != NULL && gReverbMultsR != NULL) {

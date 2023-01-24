@@ -21,12 +21,12 @@
 
 #ifdef BETTER_REVERB
 
-#define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
+#define NUM_ALLPASS 12 // Maximum number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
 #define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
 
 // Size determined by (all delaysL/R values * 8) / (2 ^ Minimum Downsample Factor).
 // The default value can be increased or decreased in conjunction with the values in delaysL/R
-#define BETTER_REVERB_SIZE ALIGN16(0x1E200 + BETTER_REVERB_PTR_SIZE) // This can be significantly decreased if a downsample rate of 1 is not being used.
+#define BETTER_REVERB_SIZE ALIGN16(0x1E000 + BETTER_REVERB_PTR_SIZE) // This can be significantly decreased if a downsample rate of 1 is not being used.
 
 extern u8 gBetterReverbPreset;
 extern s8 betterReverbDownsampleRate;
@@ -141,7 +141,7 @@ extern s16 D_SH_803479B4;
 
 #ifdef BETTER_REVERB
 void initialize_better_reverb_buffers(void);
-void set_better_reverb_buffers(s32 *inputDelaysL, s32 *inputDelaysR);
+void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR);
 #endif
 
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen);

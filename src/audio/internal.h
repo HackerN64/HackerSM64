@@ -737,12 +737,12 @@ struct BetterReverbSettings {
     s8 downsampleRate;
     u8 isMono;
     u8 filterCount;
-    u16 windowSize;
+    s16 windowSize;
     s16 gain;
-    s32 reverbIndex;
-    s32 gainIndex;
-    s32 *delaysL;
-    s32 *delaysR;
+    u8 gainIndex;
+    u8 reverbIndex;
+    u32 *delaysL;
+    u32 *delaysR;
     s32 *reverbMultsL;
     s32 *reverbMultsR;
 };
@@ -799,15 +799,12 @@ struct AudioSessionSettingsEU {
 struct AudioSessionSettings {
     /*0x00*/ u32 frequency;
     /*0x04*/ u8 maxSimultaneousNotes;
-    /*0x05*/ u8 reverbDownsampleRate; // always 1
-    /*0x06*/ u16 reverbWindowSize;
-    /*0x08*/ u16 reverbGain;
-    /*0x0A*/ u16 volume;
-    /*0x0C*/ u32 persistentSeqMem;
-    /*0x10*/ u32 persistentBankMem;
-    /*0x14*/ u32 temporarySeqMem;
-    /*0x18*/ u32 temporaryBankMem;
-}; // size = 0x1C
+    /*0x06*/ u16 volume;
+    /*0x08*/ u32 persistentSeqMem;
+    /*0x0C*/ u32 persistentBankMem;
+    /*0x10*/ u32 temporarySeqMem;
+    /*0x14*/ u32 temporaryBankMem;
+}; // size = 0x18
 
 struct AudioBufferParametersEU {
     /*0x00*/ s16 presetUnk4; // audio frames per vsync?
