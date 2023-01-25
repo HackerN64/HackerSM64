@@ -1035,6 +1035,7 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_PAUSED);
         }
     }
+    
     return FALSE;
 }
 
