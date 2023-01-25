@@ -78,82 +78,78 @@ s16 *gCurrAnimData;
 
 struct AllocOnlyPool *gDisplayListHeap;
 
-struct RenderModeContainer {
-    u32 modes[LAYER_COUNT];
-};
-
 /* Rendermode settings for cycle 1 for all 8 or 13 layers. */
-struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
-        G_RM_OPA_SURF,                      // LAYER_FORCE
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
-        G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
+struct RenderModeContainer renderModeTable_1Cycle[2] = { 
+    [RENDER_NO_ZB] = { {
+        [LAYER_FORCE] = G_RM_OPA_SURF,
+        [LAYER_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_OPA_SURF,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_OPA_SURF,
+        [LAYER_ALPHA] = G_RM_AA_TEX_EDGE,
 #if SILHOUETTE
-        G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
-        G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_TEX_EDGE | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE,
 #endif
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_XLU_SURF,
+        [LAYER_TRANSPARENT] = G_RM_AA_XLU_SURF,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_XLU_SURF,
     } },
-    { {
-        /* z-buffered */
-        G_RM_ZB_OPA_SURF,                   // LAYER_FORCE
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_OPAQUE
-        G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
-        G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
+    [RENDER_ZB] = { {
+        [LAYER_FORCE] = G_RM_ZB_OPA_SURF,
+        [LAYER_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_ZB_OPA_INTER,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_ZB_OPA_DECAL,
+        [LAYER_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
 #if SILHOUETTE
-        G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
 #endif
-        G_RM_ZB_OVL_SURF,                   // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
-        G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_ZB_XLU_DECAL,
+        [LAYER_TRANSPARENT] = G_RM_AA_ZB_XLU_SURF,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_ZB_XLU_INTER,
     } } };
 
 /* Rendermode settings for cycle 2 for all 13 layers. */
-struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
-        G_RM_OPA_SURF2,                     // LAYER_FORCE
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_INTER
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_DECAL
-        G_RM_AA_TEX_EDGE2,                  // LAYER_ALPHA
+struct RenderModeContainer renderModeTable_2Cycle[2] = {
+    [RENDER_NO_ZB] = { {
+        [LAYER_FORCE] = G_RM_OPA_SURF2,
+        [LAYER_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_OPA_SURF2,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_OPA_SURF2,
+        [LAYER_ALPHA] = G_RM_AA_TEX_EDGE2,
 #if SILHOUETTE
-        G_RM_AA_TEX_EDGE2 | ZMODE_DEC,      // LAYER_ALPHA_DECAL
-        G_RM_AA_OPA_SURF2,                  // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE2,                  // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_OPA_SURF2,                  // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE2,                  // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_TEX_EDGE2 | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE2,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE2,
 #endif
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_XLU_SURF2,
+        [LAYER_TRANSPARENT] = G_RM_AA_XLU_SURF2,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_XLU_SURF2,
     } },
-    { {
-        /* z-buffered */
-        G_RM_ZB_OPA_SURF2,                  // LAYER_FORCE
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OPAQUE
-        G_RM_AA_ZB_OPA_INTER2,              // LAYER_OPAQUE_INTER
-        G_RM_AA_ZB_OPA_DECAL2,              // LAYER_OPAQUE_DECAL
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_ALPHA
+    [RENDER_ZB] = { {
+        [LAYER_FORCE] = G_RM_ZB_OPA_SURF2,
+        [LAYER_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_ZB_OPA_INTER2,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_ZB_OPA_DECAL2,
+        [LAYER_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
 #if SILHOUETTE
-        G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,   // LAYER_ALPHA_DECAL
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
 #endif
-        G_RM_ZB_OVL_SURF2,                  // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
-        G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_ZB_XLU_DECAL2,
+        [LAYER_TRANSPARENT] = G_RM_AA_ZB_XLU_SURF2,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_ZB_XLU_INTER2,
     } } };
 
 ALIGNED16 struct GraphNodeRoot *gCurGraphNodeRoot = NULL;
@@ -203,36 +199,108 @@ struct RenderPhase {
 #endif
 };
 
-//                                               startLayer                      endLayer                        ucode
 static struct RenderPhase sRenderPhases[] = {
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     },
+    [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_ZB]                  = {
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_SILHOUETTE]          = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_NON_SILHOUETTE]      = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE]  = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_NON_ZB]              = {
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
  #else
     // No silhouette, .rej
-    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_ZB_LAST,                  GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     },
+    [RENDER_PHASE_ZEX_BG]                  = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_FIRST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_ZB]                  = {
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_ZB_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_ZEX_ALL]                 = {
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_NON_ZB]              = {
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
  #endif
 #else
  #if SILHOUETTE
     // Silhouette, no .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE    },
-    /* RENDER_PHASE_ZEX_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
-    /* RENDER_PHASE_ZEX_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
-    /* RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST   },
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST                      },
+    [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_SILHOUETTE]          = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_NON_SILHOUETTE]      = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE]  = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
+    [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
+    },
+
  #else
     // No silhouette, no .rej
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_FIRST,                    LAYER_LAST                      },
+    [RENDER_PHASE_ZEX_ALL]                 = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST,
+    },
+
  #endif
 #endif
 };
@@ -1194,6 +1262,34 @@ void geo_try_process_children(struct GraphNode *node) {
     }
 }
 
+typedef void (*GeoProcessFunc)();
+
+// See enum 'GraphNodeTypes' in 'graph_node.h'.
+static GeoProcessFunc GeoProcessJumpTable[] = {
+    [GRAPH_NODE_TYPE_ORTHO_PROJECTION    ] = geo_process_ortho_projection,
+    [GRAPH_NODE_TYPE_PERSPECTIVE         ] = geo_process_perspective,
+    [GRAPH_NODE_TYPE_MASTER_LIST         ] = geo_process_master_list,
+    [GRAPH_NODE_TYPE_LEVEL_OF_DETAIL     ] = geo_process_level_of_detail,
+    [GRAPH_NODE_TYPE_SWITCH_CASE         ] = geo_process_switch,
+    [GRAPH_NODE_TYPE_CAMERA              ] = geo_process_camera,
+    [GRAPH_NODE_TYPE_TRANSLATION_ROTATION] = geo_process_translation_rotation,
+    [GRAPH_NODE_TYPE_TRANSLATION         ] = geo_process_translation,
+    [GRAPH_NODE_TYPE_ROTATION            ] = geo_process_rotation,
+    [GRAPH_NODE_TYPE_OBJECT              ] = geo_process_object,
+    [GRAPH_NODE_TYPE_ANIMATED_PART       ] = geo_process_animated_part,
+    [GRAPH_NODE_TYPE_BILLBOARD           ] = geo_process_billboard,
+    [GRAPH_NODE_TYPE_DISPLAY_LIST        ] = geo_process_display_list,
+    [GRAPH_NODE_TYPE_SCALE               ] = geo_process_scale,
+    [GRAPH_NODE_TYPE_SHADOW              ] = geo_process_shadow,
+    [GRAPH_NODE_TYPE_OBJECT_PARENT       ] = geo_process_object_parent,
+    [GRAPH_NODE_TYPE_GENERATED_LIST      ] = geo_process_generated_list,
+    [GRAPH_NODE_TYPE_BACKGROUND          ] = geo_process_background,
+    [GRAPH_NODE_TYPE_HELD_OBJ            ] = geo_process_held_object,
+    [GRAPH_NODE_TYPE_CULLING_RADIUS      ] = geo_try_process_children,
+    [GRAPH_NODE_TYPE_ROOT                ] = geo_try_process_children,
+    [GRAPH_NODE_TYPE_START               ] = geo_try_process_children,
+};
+
 /**
  * Process a generic geo node and its siblings.
  * The first argument is the start node, and all its siblings will
@@ -1215,28 +1311,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
             if (curGraphNode->flags & GRAPH_RENDER_CHILDREN_FIRST) {
                 geo_try_process_children(curGraphNode);
             } else {
-                switch (curGraphNode->type) {
-                    case GRAPH_NODE_TYPE_ORTHO_PROJECTION:     geo_process_ortho_projection    ((struct GraphNodeOrthoProjection     *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_PERSPECTIVE:          geo_process_perspective         ((struct GraphNodePerspective         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_MASTER_LIST:          geo_process_master_list         ((struct GraphNodeMasterList          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:      geo_process_level_of_detail     ((struct GraphNodeLevelOfDetail       *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_SWITCH_CASE:          geo_process_switch              ((struct GraphNodeSwitchCase          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_CAMERA:               geo_process_camera              ((struct GraphNodeCamera              *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_TRANSLATION_ROTATION: geo_process_translation_rotation((struct GraphNodeTranslationRotation *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_TRANSLATION:          geo_process_translation         ((struct GraphNodeTranslation         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_ROTATION:             geo_process_rotation            ((struct GraphNodeRotation            *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_OBJECT:               geo_process_object              ((struct Object                       *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_ANIMATED_PART:        geo_process_animated_part       ((struct GraphNodeAnimatedPart        *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_BILLBOARD:            geo_process_billboard           ((struct GraphNodeBillboard           *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_DISPLAY_LIST:         geo_process_display_list        ((struct GraphNodeDisplayList         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_SCALE:                geo_process_scale               ((struct GraphNodeScale               *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_SHADOW:               geo_process_shadow              ((struct GraphNodeShadow              *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_OBJECT_PARENT:        geo_process_object_parent       ((struct GraphNodeObjectParent        *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_GENERATED_LIST:       geo_process_generated_list      ((struct GraphNodeGenerated           *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_BACKGROUND:           geo_process_background          ((struct GraphNodeBackground          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_HELD_OBJ:             geo_process_held_object         ((struct GraphNodeHeldObject          *) curGraphNode); break;
-                    default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
-                }
+                GeoProcessJumpTable[curGraphNode->type](curGraphNode);
             }
         } else {
             if (curGraphNode->type == GRAPH_NODE_TYPE_OBJECT) {

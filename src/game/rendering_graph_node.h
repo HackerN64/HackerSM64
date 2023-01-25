@@ -32,6 +32,15 @@ enum AnimType {
 #define IS_LAYER_ZB(    layer) (((layer) >= LAYER_ZB_FIRST    ) || ((layer) <= LAYER_ZB_LAST))
 #define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_NON_ZB_FIRST) || ((layer) <= LAYER_LAST   ))
 
+enum RenderModeTypes {
+    RENDER_NO_ZB = 0,
+    RENDER_ZB,
+};
+
+struct RenderModeContainer {
+    u32 modes[LAYER_COUNT];
+};
+
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej

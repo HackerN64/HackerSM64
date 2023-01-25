@@ -17,6 +17,7 @@
 
 /**
  * Allows all surfaces types to have force, (doesn't require setting force, just allows it to be optional).
+ * Also allows you to pass a warp node to warp floors (SURFACE_WARP, SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND) via the second byte of the force parameter.
  */
 #define ALL_SURFACES_HAVE_FORCE
 

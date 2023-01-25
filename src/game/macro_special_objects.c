@@ -78,7 +78,7 @@ UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 
 }
 
 struct LoadedMacroObject {
-    /*0x00*/ Angle yaw;
+    /*0x00*/ s16 yaw;
     /*0x02*/ Vec3s pos;
     /*0x08*/ s16 params;
 };

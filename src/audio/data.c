@@ -41,6 +41,71 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 };
 #endif
 
+#ifdef BETTER_REVERB
+// Each entry represents an array of variable audio buffer sizes / delays for each respective filter.
+u32 delaysArr[][NUM_ALLPASS] = {
+    { /* 0 */ 
+        4, 4, 4,
+        4, 4, 4,
+        4, 4, 4,
+        4, 4, 4
+    },
+    { /* 1 */ 
+        1080, 1352, 1200,
+        1200, 1232, 1432,
+        1384, 1048, 1352,
+        928, 1504, 1512
+    },
+    { /* 2 */ 
+        1384, 1352, 1048,
+        928, 1512, 1504,
+        1080, 1200, 1352,
+        1200, 1432, 1232
+    },
+};
+
+// Each entry represents an array of multipliers applied to the final output of each group of 3 filters.
+// These values are u8s in spirit, but are set as s32 values to slightly increase performance during calculations.
+s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
+    /* 0 */ {0x00, 0x00, 0x00, 0x00},
+    /* 1 */ {0xD7, 0x6F, 0x36, 0x22},
+    /* 2 */ {0xCF, 0x73, 0x38, 0x1F},
+};
+
+/**
+ * Format:
+ * - downsampleRate (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality)
+ * - isMono         (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
+ * - filterCount    (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand)
+ * - windowSize     (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound)
+ * - gain           (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
+ * - gainIndex      (Advanced parameter used to tune the outputs of every first two of three filters)
+ * - reverbIndex    (Advanced parameter used to tune the incoming output of every third filter)
+ * 
+ * - *delaysL       (Array of variable audio buffer sizes / delays for each respective filter [left channel])
+ * - *delaysR       (Array of variable audio buffer sizes / delays for each respective filter [right channel])
+ * - *reverbMultsL  (Array of multipliers applied to the final output of each group of 3 filters [left channel])
+ * - *reverbMultsR  (Array of multipliers applied to the final output of each group of 3 filters [right channel])
+ * 
+ * NOTE: First entry will always be used by default when not using the level commands to specify a preset.
+ * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.
+ */
+struct BetterReverbSettings gBetterReverbSettings[] = {
+    { /* 0 */
+        -1, FALSE, NUM_ALLPASS, -1, -1, 0x00, 0x00, // Vanilla Reverb
+        delaysArr[0], delaysArr[0], reverbMultsArr[0], reverbMultsArr[0]
+    },
+    { /* 1 */
+        2, FALSE, (NUM_ALLPASS - 9), 0xE00, 0x43FF, 0xA0, 0x30, // Default Console
+        delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
+    },
+    { /* 2 */
+        1, FALSE, NUM_ALLPASS, 0xE00, 0x28FF, 0xA0, 0x60, // Default Emulator (RCVI Hack only)
+        delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
+    },
+};
+#endif
+
 // Format:
 // - frequency
 // - max number of simultaneous notes
@@ -76,10 +141,9 @@ struct ReverbSettingsUS gReverbSettings[18] = {
     { 1, 0x0800, 0x2FFF },
 };
 
-struct AudioSessionSettings gAudioSessionPresets[1] = {
-    { 32000, MAX_SIMULTANEOUS_NOTES, 1, 0x1000, 0x2FFF, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM },
-};
+struct AudioSessionSettings gAudioSessionSettings = { 32000, MAX_SIMULTANEOUS_NOTES, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM };
 #endif
+
 // gAudioCosineTable[k] = round((2**15 - 1) * cos(pi/2 * k / 127)). Unused.
 #if defined(VERSION_JP) || defined(VERSION_US)
 u16 gAudioCosineTable[128] = {

@@ -177,7 +177,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
             }
         }
         for (j = 0; j < gNumSynthesisReverbs; j++) {
-            if (gSynthesisReverbs[j].useReverb != 0) {
+            if (gSynthesisReverbs[j].useReverb) {
                 prepare_reverb_ring_buffer(chunkLen, gAudioBufferParameters.updatesPerFrame - i, j);
             }
         }
@@ -319,7 +319,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
     i = 0;
     for (j = 0; j < gNumSynthesisReverbs; j++) {
         gUseReverb = gSynthesisReverbs[j].useReverb;
-        if (gUseReverb != 0) {
+        if (gUseReverb) {
             cmd = synthesis_resample_and_mix_reverb(cmd, bufLen, j, updateIndex);
         }
         for (; i < notePos; i++) {
@@ -334,7 +334,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
                 break;
             }
         }
-        if (gSynthesisReverbs[j].useReverb != 0) {
+        if (gSynthesisReverbs[j].useReverb) {
             if (gSynthesisReverbs[j].unk100 != NULL) {
                 aFilter(cmd++, 0x02, bufLen * 2, gSynthesisReverbs[j].unk100);
                 aFilter(cmd++, gSynthesisReverbs[j].resampleFlags, DMEM_ADDR_WET_LEFT_CH, gSynthesisReverbs[j].unk108);

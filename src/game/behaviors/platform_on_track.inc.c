@@ -384,7 +384,7 @@ void bhv_platform_on_track_update(void) {
         platform_on_track_rock_ski_lift();
     } else if (o->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET) {
 #ifdef CONTROLLABLE_PLATFORM_SPEED
-        Angle targetRoll; // Visually, this is the platform's pitch, since these platforms technically move sideways
+        s16 targetRoll; // Visually, this is the platform's pitch, since these platforms technically move sideways
         if (gMarioObject->platform == o) {
             if (!o->oPlatformOnTrackWasStoodOn) {
                 o->oPlatformOnTrackOffsetY    = -8.0f;
