@@ -1092,7 +1092,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
         }
 
         get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
+        s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1185,7 +1185,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
         }
 
         get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
+        s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1401,7 +1401,7 @@ void puppyprint_print_deferred(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
     for (u32 i = 0; i < sPuppyprintTextBufferPos;) {
         u8 length = sPuppyprintTextBuffer[i + 8];
-        char *text = mem_pool_alloc(gEffectsMemoryPool, length);
+        char *text = mem_pool_alloc(gEffectsMemoryPool, length + 1);
         if (text == NULL) {
             print_small_text_light(160, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             return;
@@ -1418,6 +1418,7 @@ void puppyprint_print_deferred(void) {
         u8 amount = (sPuppyprintTextBuffer[i + 10] == 255 ? -1 : sPuppyprintTextBuffer[i + 10]);
         u8 font = sPuppyprintTextBuffer[i + 11];
         bcopy(&sPuppyprintTextBuffer[i + HEADERSIZE], text, length);
+        text[length] = '\0';
         if (sPuppyprintTextBuffer[i + 12]) {
             print_small_text_light(x, y, text, alignment, amount, font);
         } else {
