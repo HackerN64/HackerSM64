@@ -893,16 +893,16 @@ s32 get_text_width(const char *str, s32 font) {
     textSizeTotal = textSizeTemp * textSize;
 
     for (i = 0; i < strLen; i++) {
-        if (str[i] == '\n') {
-            textPos = 0;
-            continue;
-        }
         while (i < strLen && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, FALSE);
             if (commandOffset == 0)
                 break;
 
             i += commandOffset;
+            if (str[i] == '\n') {
+                textPos = 0;
+                break;
+            }
         }
 
         if (i >= strLen)
@@ -927,17 +927,21 @@ s32 get_text_height(const char *str) {
     textPos = topLineHeight;
 
     for (i = 0; i < strLen; i++) {
-        if (str[i] == '\n') {
-            textPos += topLineHeight;
-            topLineHeight = 12 * textSizeTotal;
-            continue;
-        }
         while (i < strLen && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, FALSE);
             if (commandOffset == 0)
                 break;
 
             i += commandOffset;
+        }
+
+        if (i >= strLen)
+            break;
+
+        if (str[i] == '\n') {
+            textPos += topLineHeight;
+            topLineHeight = 12 * textSizeTotal;
+            continue;
         }
     }
 
@@ -981,7 +985,6 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     f32 wavePos;
     f32 shakePos[2];
     s8 offsetY = 0;
-    s8 offsetX = 0;
     u8 spaceX = 0;
     u8 widthX = 0;
     u8 lines = 0;
@@ -1004,12 +1007,6 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
         for (s32 i = 0; i < strLen; i++) {
-            if (str[i] == '\n') {
-                textPos[0] = 0;
-                lines++;
-                wideX[lines] = 0;
-                continue;
-            }
             while (i < strLen && str[i] == '<') {
                 commandOffset = text_iterate_command(str, i, FALSE);
                 if (commandOffset == 0)
@@ -1018,8 +1015,15 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                 i += commandOffset;
             }
 
-            if (i >= strLen)
+            if (i >= strLen || str[i] == '\0')
                 break;
+
+            if (str[i] == '\n') {
+                textPos[0] = 0;
+                lines++;
+                wideX[lines] = 0;
+                continue;
+            }
 
             get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
@@ -1040,10 +1044,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     lines = 0;
     
     shakeTablePos = gGlobalTimer % sizeof(sTextShakeTable);
-    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imH, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
         if (str[i] == '\n') {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
@@ -1052,7 +1055,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                 textPos[0] = -(wideX[lines] / 2);
             }
             textPos[1] += topLineHeight;
-            topLineHeight = (f32)fnt->txH * textSizeTotal;
+            topLineHeight = (f32) fnt->txH * textSizeTotal;
             continue;
         }
 
@@ -1065,8 +1068,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             textLength += commandOffset;
         }
 
-        if (i >= textLength)
+        if (i >= textLength || str[i] == '\0') {
             break;
+        }
 
         if (shakeToggle) {
             shakePos[0] = (sTextShakeTable[shakeTablePos++] * textSizeTotal);
@@ -1088,6 +1092,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
         }
 
         get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
+        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
         if (str[i] != ' ') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1164,7 +1169,6 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
         if (str[i] == '\n') {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
@@ -1175,8 +1179,13 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
             textPos[1] += 12;
             continue;
         }
+        
+        if (i >= textLength || str[i] == '\0') {
+            break;
+        }
 
         get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
+        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
         if (str[i] != ' ') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1369,14 +1378,13 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 5] = gCurrEnvCol[1];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 6] = gCurrEnvCol[2];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 7] = gCurrEnvCol[3];
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen + 1;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = align;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? 255 : amount;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = font;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12] = gIsLightText;
     bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + HEADERSIZE], strLen);
-    sPuppyprintTextBuffer[strLen + HEADERSIZE] = '\0';
-    sPuppyprintTextBufferPos += strLen + HEADERSIZE + 1;
+    sPuppyprintTextBufferPos += strLen + HEADERSIZE;
 }
 
 void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
@@ -1391,8 +1399,7 @@ void puppyprint_print_deferred(void) {
     bzero(&gCurrEnvCol, sizeof(ColorRGBA));
     print_set_envcolour(255, 255, 255, 255);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    for (u32 i = 0; i < sPuppyprintTextBufferPos;)
-    {
+    for (u32 i = 0; i < sPuppyprintTextBufferPos;) {
         u8 length = sPuppyprintTextBuffer[i + 8];
         char *text = mem_pool_alloc(gEffectsMemoryPool, length);
         if (text == NULL) {
