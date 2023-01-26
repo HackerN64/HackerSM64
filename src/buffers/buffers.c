@@ -12,12 +12,12 @@
 ALIGNED8 u8 gDecompressionHeap[0xD000];
 ALIGNED16 u8 gAudioHeap[DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE)];
 
-ALIGNED8 u8 gIdleThreadStack[0x800];
-ALIGNED8 u8 gThread3Stack[0x2000];
-ALIGNED8 u8 gThread4Stack[0x2000];
-ALIGNED8 u8 gThread5Stack[0x2000];
+ALIGNED8 u8 gIdleThreadStack[THREAD1_STACK];
+ALIGNED8 u8 gThread3Stack[THREAD3_STACK];
+ALIGNED8 u8 gThread4Stack[THREAD4_STACK];
+ALIGNED8 u8 gThread5Stack[THREAD5_STACK];
 #if ENABLE_RUMBLE
-ALIGNED8 u8 gThread6Stack[0x2000];
+ALIGNED8 u8 gThread6Stack[THREAD6_STACK];
 #endif
 // 0x400 bytes
 #if UNF

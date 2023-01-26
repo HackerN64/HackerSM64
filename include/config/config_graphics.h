@@ -124,11 +124,6 @@
 // #define FIX_REFLECT_MTX
 
 /**
- * This improves performance a bit, and does not seem to break anything.
- */
-#define DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
-
-/**
  * Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
  */
 // #define DISABLE_SHADOWS

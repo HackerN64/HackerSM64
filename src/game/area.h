@@ -72,6 +72,9 @@ struct Area {
     /*0x30*/ u8 dialog[2]; // Level start dialog number (set by level script cmd 0x30)
     /*0x32*/ u16 musicParam;
     /*0x34*/ u16 musicParam2;
+#ifdef BETTER_REVERB
+    /*0x36*/ u8 betterReverbPreset;
+#endif
 };
 
 // All the transition data to be used in screen_transition.c
