@@ -87,9 +87,15 @@ void (*gGoddardVblankCallback)(void) = NULL;
 
 // Defined controller slots. Don't use any higher than NUM_SUPPORTED_CONTROLLERS.
 struct Controller *gPlayer1Controller = &gControllers[0];
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
 struct Controller *gPlayer2Controller = &gControllers[1];
+#endif
+#if (NUM_SUPPORTED_CONTROLLERS > 2)
 struct Controller *gPlayer3Controller = &gControllers[2];
+#endif
+#if (NUM_SUPPORTED_CONTROLLERS > 3)
 struct Controller *gPlayer4Controller = &gControllers[3];
+#endif
 
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
@@ -651,6 +657,7 @@ void read_controller_inputs(s32 threadID) {
  */
 void init_controllers(void) {
     s16 port, cont, lastUsedPort;
+    struct Controller *controller = NULL;
 
     // Set controller 1 to point to the set of status/pads for input 1 and
     // init the controllers.
@@ -673,13 +680,25 @@ void init_controllers(void) {
     for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
         // Is controller plugged in?
         if (gControllerBits & (1 << port)) {
+            controller = &gControllers[cont];
+
             // The game allows you to have just 1 controller plugged
             // into any port in order to play the game. this was probably
             // so if any of the ports didn't work, you can have controllers
             // plugged into any of them and it will work.
-            gControllers[cont].statusData = &gControllerStatuses[port];
-            gControllers[cont].controllerData = &gControllerPads[port];
-            gControllers[cont].port = port;
+            controller->statusData = &gControllerStatuses[port];
+            controller->controllerData = &gControllerPads[port];
+            controller->port = port;
+
+            if (controller->statusData->type & CONT_GCN) {
+                osSyncPrintf("GameCube controller ");
+            } else {
+                osSyncPrintf("N64 controller ");
+            }
+            if (controller->statusData->status & CONT_CARD_ON) {
+                osSyncPrintf("with pak ");
+            }
+            osSyncPrintf("found in port %d\n", port);
 
             lastUsedPort = port;
 
@@ -687,13 +706,20 @@ void init_controllers(void) {
         }
     }
 
+#if (NUM_SUPPORTED_CONTROLLERS >= 2)
     //! Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
     // so if port 1 is an N64 controller and port 2 is a GC controller, swap them.
-    if (gIsConsole && __osControllerTypes[0] == CONT_TYPE_N64 && __osControllerTypes[1] == CONT_TYPE_GCN) {
+    if (gIsConsole
+     && gControllers[0].statusData != NULL
+     && !(gControllers[0].statusData->type & CONT_GCN)
+     && gControllers[1].statusData != NULL
+     && (gControllers[1].statusData->type & CONT_GCN)) {
         struct Controller temp = gControllers[0];
         gControllers[0] = gControllers[1];
         gControllers[1] = temp;
+        osSyncPrintf("Swapped controllers 1 and 2\n");
     }
+#endif
 
     // Disable the ports after the last used one.
     osContSetCh(lastUsedPort + 1);

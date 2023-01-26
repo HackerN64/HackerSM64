@@ -1,6 +1,7 @@
 #include "config.h"
 #include "PR/os_internal.h"
 #include "engine/math_util.h"
+#include "game_init.h"
 
 /////////////////////////////////////////////////
 // Libultra structs and macros (from ultralib) //
@@ -14,9 +15,16 @@ typedef struct
     /* 0x3C */ u32 pifstatus;
 } OSPifRam; // size = 0x40
 
+typedef struct {
+    /* 0x0 */ u8 align;
+    /* 0x1 */ u8 txsize;
+    /* 0x2 */ u8 rxsize;
+    /* 0x3 */ u8 cmd;
+} OSPifRamChCmd; // size = 0x4
+
 typedef struct
 {
-    /* 0x0 */ u8 dummy;
+    /* 0x0 */ u8 align;
     /* 0x1 */ u8 txsize;
     /* 0x2 */ u8 rxsize;
     /* 0x3 */ u8 cmd;
@@ -27,7 +35,7 @@ typedef struct
 
 typedef struct
 {
-    /* 0x0 */ u8 dummy;
+    /* 0x0 */ u8 align;
     /* 0x1 */ u8 txsize;
     /* 0x2 */ u8 rxsize;
     /* 0x3 */ u8 cmd;
@@ -49,7 +57,7 @@ typedef struct
 
 typedef struct
 {
-    /* 0x0 */ u8 dummy;
+    /* 0x0 */ u8 align;
     /* 0x1 */ u8 txsize;
     /* 0x2 */ u8 rxsize;
     /* 0x3 */ u8 cmd;
@@ -86,11 +94,9 @@ extern u8 __osContLastCmd;
 #define CONT_BLOCK_GB_STATUS CONT_BLOCKS(CONT_ADDR_GB_STATUS)
 
 typedef struct {
-    u8 dummy;
     u8 tx;
     u8 rx;
-    u8 cmd;
-} ContCmd;
+} ContCmdData;
 
 enum ContCmds {
     // N64 Controller
@@ -124,36 +130,36 @@ enum ContCmds {
 };
 
 // Joybus commands
-//from: http://en64.shoutwiki.com/wiki/SI_Registers_Detailed#CONT_CMD_Usage
-static const ContCmd sContCmds[] = {
+// from: http://en64.shoutwiki.com/wiki/SI_Registers_Detailed#CONT_CMD_Usage
+static const ContCmdData sContCmds[] = {
     // N64 Controller
-    [CONT_CMD_REQUEST_STATUS    ] = { .dummy = 0xFF, .tx =  1, .rx =  3, .cmd = 0x00}, // Info
-    [CONT_CMD_READ_BUTTON       ] = { .dummy = 0xFF, .tx =  1, .rx =  4, .cmd = 0x01}, // Input Status
+    [CONT_CMD_REQUEST_STATUS    ] = { .tx =  1, .rx =  3 }, // Info
+    [CONT_CMD_READ_BUTTON       ] = { .tx =  1, .rx =  4 }, // Input Status
     // Controller Accessory
-    [CONT_CMD_READ_MEMPAK       ] = { .dummy = 0xFF, .tx =  3, .rx = 33, .cmd = 0x02}, // Read Controller Accessory
-    [CONT_CMD_WRITE_MEMPAK      ] = { .dummy = 0xFF, .tx = 35, .rx =  1, .cmd = 0x03}, // Write Controller Accessory
+    [CONT_CMD_READ_MEMPAK       ] = { .tx =  3, .rx = 33 }, // Read Controller Accessory
+    [CONT_CMD_WRITE_MEMPAK      ] = { .tx = 35, .rx =  1 }, // Write Controller Accessory
     // EEPROM
-    [CONT_CMD_READ_EEPROM       ] = { .dummy = 0xFF, .tx =  2, .rx =  8, .cmd = 0x04}, // Read EEPROM
-    [CONT_CMD_WRITE_EEPROM      ] = { .dummy = 0xFF, .tx = 10, .rx =  1, .cmd = 0x05}, // Write EEPROM
+    [CONT_CMD_READ_EEPROM       ] = { .tx =  2, .rx =  8 }, // Read EEPROM
+    [CONT_CMD_WRITE_EEPROM      ] = { .tx = 10, .rx =  1 }, // Write EEPROM
     // RTC
-    [CONT_CMD_READ_RTC_STATUS   ] = { .dummy = 0xFF, .tx =  1, .rx =  3, .cmd = 0x06}, // RTC Info
-    [CONT_CMD_READ_RTC_BLOCK    ] = { .dummy = 0xFF, .tx =  2, .rx =  9, .cmd = 0x07}, // Read RTC Block
-    [CONT_CMD_WRITE_RTC_BLOCK   ] = { .dummy = 0xFF, .tx = 10, .rx =  1, .cmd = 0x08}, // Write RTC Block
+    [CONT_CMD_READ_RTC_STATUS   ] = { .tx =  1, .rx =  3 }, // RTC Info
+    [CONT_CMD_READ_RTC_BLOCK    ] = { .tx =  2, .rx =  9 }, // Read RTC Block
+    [CONT_CMD_WRITE_RTC_BLOCK   ] = { .tx = 10, .rx =  1 }, // Write RTC Block
     // VRU
-    [CONT_CMD_READ36_VOICE      ] = { .dummy = 0xFF, .tx =  3, .rx = 37, .cmd = 0x09}, // Read from VRx //! is .rx 25 or 37?
-    [CONT_CMD_WRITE20_VOICE     ] = { .dummy = 0xFF, .tx = 23, .rx =  1, .cmd = 0x0A}, // Write to VRx //! is .tx 17 or 23?
-    [CONT_CMD_READ2_VOICE       ] = { .dummy = 0xFF, .tx =  3, .rx =  3, .cmd = 0x0B}, // Read Status VRx
-    [CONT_CMD_WRITE4_VOICE      ] = { .dummy = 0xFF, .tx =  7, .rx =  1, .cmd = 0x0C}, // Write Config VRx
-    [CONT_CMD_SWRITE_VOICE      ] = { .dummy = 0xFF, .tx =  3, .rx =  1, .cmd = 0x0D}, // Write Init VRx
+    [CONT_CMD_READ36_VOICE      ] = { .tx =  3, .rx = 37 }, // Read from VRx //! is .rx 25 or 37?
+    [CONT_CMD_WRITE20_VOICE     ] = { .tx = 23, .rx =  1 }, // Write to VRx //! is .tx 17 or 23?
+    [CONT_CMD_READ2_VOICE       ] = { .tx =  3, .rx =  3 }, // Read Status VRx
+    [CONT_CMD_WRITE4_VOICE      ] = { .tx =  7, .rx =  1 }, // Write Config VRx
+    [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx
     // Randnet Keyboard
-    [CONT_CMD_KEY_PRESS_REQUEST ] = { .dummy = 0xFF, .tx =  2, .rx =  7, .cmd = 0x13}, // Randnet Keyboard Read Keypress
+    [CONT_CMD_KEY_PRESS_REQUEST ] = { .tx =  2, .rx =  7 }, // Randnet Keyboard Read Keypress
     // GCN CONTROLLER
-    [CONT_CMD_GCN_SHORT_POLL    ] = { .dummy = 0xFF, .tx =  3, .rx =  8, .cmd = 0x40}, // GameCube Shortpoll
-    [CONT_CMD_GCN_READ_ORIGIN   ] = { .dummy = 0xFF, .tx =  1, .rx = 10, .cmd = 0x41}, // GameCube Read Origin
-    [CONT_CMD_GCN_CALIBRATE     ] = { .dummy = 0xFF, .tx =  3, .rx = 10, .cmd = 0x42}, // GameCube Calibrate
-    [CONT_CMD_GCN_LONG_POLL     ] = { .dummy = 0xFF, .tx =  3, .rx = 10, .cmd = 0x43}, // GameCube Longpoll
+    [CONT_CMD_GCN_SHORT_POLL    ] = { .tx =  3, .rx =  8 }, // GameCube Shortpoll
+    [CONT_CMD_GCN_READ_ORIGIN   ] = { .tx =  1, .rx = 10 }, // GameCube Read Origin
+    [CONT_CMD_GCN_CALIBRATE     ] = { .tx =  3, .rx = 10 }, // GameCube Calibrate
+    [CONT_CMD_GCN_LONG_POLL     ] = { .tx =  3, .rx = 10 }, // GameCube Longpoll
 
-    [CONT_CMD_RESET             ] = { .dummy = 0xFF, .tx =  1, .rx =  3, .cmd = 0xFF}, // Reset/Info
+    [CONT_CMD_RESET             ] = { .tx =  1, .rx =  3 }, // Reset/Info
 };
 
 // RX Errors
@@ -176,7 +182,7 @@ void __osSiRelAccess(void);
 
 typedef struct
 {
-    /* 0x0 */ u8 dummy;
+    /* 0x0 */ u8 align;
     /* 0x1 */ u8 txsize;
     /* 0x2 */ u8 rxsize;
     /* 0x3 */ u8 cmd;
@@ -200,7 +206,7 @@ typedef struct
     /* 0x4 */ u8 c_stick_y;
 } ControllerCenters;
 
-u8 __osControllerTypes[MAXCONTROLLERS] = { DEVICE_N64_CONTROLLER };
+u8 __osControllerTypes[MAXCONTROLLERS] = { DEVICE_NONE };
 u8 __osGamecubeRumbleEnabled[MAXCONTROLLERS] = { MOTOR_STOP };
 ControllerCenters gGamecubeControllerCenters[MAXCONTROLLERS] = { 0 };
 
@@ -240,53 +246,66 @@ void osContGetReadDataEx(OSContPadEx* data) {
     int i;
 
     for (i = 0; i < __osMaxControllers; i++, data++) {
-        if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
-            s32 stick_x, stick_y, c_stick_x, c_stick_y;
-            readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
-            data->errno = CHNL_ERR(readformatgcn);
+        if (gControllerBits & (1 << i)) {
+            ptr = (u8 *)ALIGN(ptr, 4);
 
-            if (data->errno == 0) {
-                if (!gGamecubeControllerCenters[i].initialized) {
-                    gGamecubeControllerCenters[i].initialized = TRUE;
-                    gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
-                    gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
-                    gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
-                    gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
+            if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
+                s32 stick_x, stick_y, c_stick_x, c_stick_y;
+                readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
+                data->errno = CHNL_ERR(readformatgcn);
+
+                if (data->errno == 0) {
+                    if (!gGamecubeControllerCenters[i].initialized) {
+                        gGamecubeControllerCenters[i].initialized = TRUE;
+                        gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
+                        gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
+                        gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
+                        gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
+                    }
+
+                    stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
+                    stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
+                    data->stick_x = stick_x;
+                    data->stick_y = stick_y;
+                    c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
+                    c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
+                    data->c_stick_x = c_stick_x;
+                    data->c_stick_y = c_stick_y;
+                    data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
+                    data->l_trig = readformatgcn.l_trig;
+                    data->r_trig = readformatgcn.r_trig;
+                } else {
+                    gGamecubeControllerCenters[i].initialized = FALSE;
                 }
 
-                stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
-                stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
-                data->stick_x = stick_x;
-                data->stick_y = stick_y;
-                c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
-                c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
-                data->c_stick_x = c_stick_x;
-                data->c_stick_y = c_stick_y;
-                data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
-                data->l_trig = readformatgcn.l_trig;
-                data->r_trig = readformatgcn.r_trig;
+                ptr += sizeof(__OSContGCNShortPollFormat);
             } else {
-                gGamecubeControllerCenters[i].initialized = FALSE;
-            }
+                readformat = *(__OSContReadFormat*)ptr;
+                data->errno = CHNL_ERR(readformat);
 
-            ptr += sizeof(__OSContGCNShortPollFormat);
+                if (data->errno == 0) {
+                    data->stick_x   = readformat.stick_x;
+                    data->stick_y   = readformat.stick_y;
+                    data->button    = readformat.button;
+                    data->c_stick_x = 0;
+                    data->c_stick_y = 0;
+                    data->l_trig    = 0;
+                    data->r_trig    = 0;
+                }
+
+                ptr += sizeof(__OSContReadFormat);
+            }
         } else {
-            readformat = *(__OSContReadFormat*)ptr;
-            data->errno = CHNL_ERR(readformat);
-
-            if (data->errno == 0) {
-                data->stick_x   = readformat.stick_x;
-                data->stick_y   = readformat.stick_y;
-                data->button    = readformat.button;
-                data->c_stick_x = 0;
-                data->c_stick_y = 0;
-                data->l_trig    = 0;
-                data->r_trig    = 0;
-            }
-
-            ptr += sizeof(__OSContReadFormat);
+            ptr++;
         }
     }
+}
+
+void __osCreateRequestData(OSPifRamChCmd *readformat, enum ContCmds cmd) {
+    readformat->align = CONT_CMD_NOP;
+    readformat->txsize = sContCmds[cmd].tx;
+    readformat->rxsize = sContCmds[cmd].rx;
+    readformat->cmd = cmd;
 }
 
 // Called by osContStartReadDataEx
@@ -300,32 +319,38 @@ static void __osPackReadData(void) {
 
     __osContPifRam.pifstatus = CONT_CMD_EXE;
 
-    readformat.dummy          = sContCmds[CONT_CMD_READ_BUTTON].dummy;
-    readformat.txsize         = sContCmds[CONT_CMD_READ_BUTTON].tx;
-    readformat.rxsize         = sContCmds[CONT_CMD_READ_BUTTON].rx;
-    readformat.cmd            = sContCmds[CONT_CMD_READ_BUTTON].cmd;
+    __osCreateRequestData((OSPifRamChCmd *)&readformat, CONT_CMD_READ_BUTTON);
     readformat.button         = 0xFFFF;
     readformat.stick_x        = -1;
     readformat.stick_y        = -1;
 
-    readformatgcn.dummy       = sContCmds[CONT_CMD_GCN_SHORT_POLL].dummy;
-    readformatgcn.txsize      = sContCmds[CONT_CMD_GCN_SHORT_POLL].tx;
-    readformatgcn.rxsize      = sContCmds[CONT_CMD_GCN_SHORT_POLL].rx;
-    readformatgcn.cmd         = sContCmds[CONT_CMD_GCN_SHORT_POLL].cmd;
+    __osCreateRequestData((OSPifRamChCmd *)&readformatgcn, CONT_CMD_GCN_SHORT_POLL);
     readformatgcn.analog_mode = 3;
     readformatgcn.rumble      = 0;
     readformatgcn.button      = 0xFFFF;
     readformatgcn.stick_x     = -1;
     readformatgcn.stick_y     = -1;
 
+    u8 skipped = 0;
     for (i = 0; i < __osMaxControllers; i++) {
-        if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
-            readformatgcn.rumble = __osGamecubeRumbleEnabled[i];
-            *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
-            ptr += sizeof(__OSContGCNShortPollFormat);
+        if (gControllerBits & (1 << i)) {
+            ptr = (u8 *)ALIGN(ptr, 4);
+            if (skipped) {
+                *(u32 *)(ptr - 4) = ~BITMASK(skipped * 8);
+                skipped = 0;
+            }
+
+            if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
+                readformatgcn.rumble = __osGamecubeRumbleEnabled[i];
+                *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
+                ptr += sizeof(__OSContGCNShortPollFormat);
+            } else {
+                *(__OSContReadFormat*)ptr = readformat;
+                ptr += sizeof(__OSContReadFormat);
+            }
         } else {
-            *(__OSContReadFormat*)ptr = readformat;
-            ptr += sizeof(__OSContReadFormat);
+            ptr++;
+            skipped++;
         }
     }
 
@@ -384,11 +409,19 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         if (data->error == 0) {
             data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
 
+            __osControllerTypes[i] = DEVICE_N64_CONTROLLER;
+
             // Check if the input type is a gamecube controller
             // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type as N64 controller if so.
-            if ((data->type & CONT_GCN) && (s16)data->type != -1) {
-                __osControllerTypes[i] = DEVICE_GCN_CONTROLLER;
+            if ((s16)data->type != -1) {
+                if (data->type & CONT_GCN) {
+                    __osControllerTypes[i] = DEVICE_GCN_CONTROLLER;
+                } else if (data->type & CONT_TYPE_MOUSE) {
+                    __osControllerTypes[i] = DEVICE_MOUSE;
+                } else if (data->type & CONT_TYPE_VOICE) {
+                    __osControllerTypes[i] = DEVICE_VRU;
+                }
             }
 
             data->status = requestHeader.status;
@@ -463,10 +496,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
     __OSContRamReadFormat ramreadformat;
     int i;
 
-    ramreadformat.dummy  = sContCmds[CONT_CMD_WRITE_MEMPAK].dummy;
-    ramreadformat.txsize = sContCmds[CONT_CMD_WRITE_MEMPAK].tx;
-    ramreadformat.rxsize = sContCmds[CONT_CMD_WRITE_MEMPAK].rx;
-    ramreadformat.cmd    = sContCmds[CONT_CMD_WRITE_MEMPAK].cmd;
+    __osCreateRequestData((OSPifRamChCmd *)&ramreadformat, CONT_CMD_WRITE_MEMPAK);
     ramreadformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
     ramreadformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 

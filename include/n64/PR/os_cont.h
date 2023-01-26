@@ -194,8 +194,24 @@ typedef struct {
 #define	CONT_ERR_VOICE_WORD		14
 #define	CONT_ERR_VOICE_NO_RESPONSE	15
 
-#define CONT_TYPE_N64 0
-#define CONT_TYPE_GCN 1
+enum ContDevices {
+	DEVICE_NONE,
+    DEVICE_N64_CONTROLLER,
+    DEVICE_GCN_CONTROLLER,
+    DEVICE_RUMBLE_PAK,
+    DEVICE_CONTROLLER_PAK,
+    DEVICE_TRANSFER_PAK,
+    DEVICE_PULSE_SENSOR,
+    DEVICE_MOUSE,
+    DEVICE_TRAIN_CONTROLLER,
+    DEVICE_FISHING_ROD,
+    DEVICE_DANCE_PAD,
+    DEVICE_VRU,
+    DEVICE_KEYBOARD,
+    DEVICE_KIOSK,
+    DEVICE_ASCII_CONTROLLER,
+    DEVICE_SNAP_STATION_PRINTER,
+};
 
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
@@ -213,7 +229,6 @@ typedef struct {
  *
  */
 
-extern u8 __osControllerTypes[MAXCONTROLLERS];
 
 /**************************************************************************
  *
