@@ -660,10 +660,12 @@ https://github.com/buu342/N64-UNFLoader
                                 dataleft = 0;
                             break;
                         }
+                        // fallthrough
                     case '@':
                         filestep++;
                         if (filestep < 3)
                             break;
+                        // fallthrough
                     default:
                         // Decide what to do based on the file handle
                         if (filestep == 0 && debug_command_incoming_start[tok] == -1)
