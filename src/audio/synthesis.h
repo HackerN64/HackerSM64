@@ -21,28 +21,22 @@
 
 #ifdef BETTER_REVERB
 
-#define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
+#define NUM_ALLPASS 12 // Maximum number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
 #define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
 
- // Size determined by (all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor).
- // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
-#define BETTER_REVERB_SIZE ALIGN16(0xF200 + BETTER_REVERB_PTR_SIZE)
+// Size determined by (all delaysL/R values * 8) / (2 ^ Minimum Downsample Factor).
+// The default value can be increased or decreased in conjunction with the values in delaysL/R
+#define BETTER_REVERB_SIZE ALIGN16(0x1E000 + BETTER_REVERB_PTR_SIZE) // This can be significantly decreased if a downsample rate of 1 is not being used.
 
-// #define BETTER_REVERB_SIZE (0x7A00 + BETTER_REVERB_PTR_SIZE) // Default for use only with a downsampling value of 3 (i.e. double the emulator default)
-// #define BETTER_REVERB_SIZE (0x1E200 + BETTER_REVERB_PTR_SIZE) // Default for use with a downsampling value of 1 (i.e. no downsampling at all)
-
-extern s8 betterReverbDownsampleConsole;
-extern s8 betterReverbDownsampleEmulator;
-extern u8 monoReverbConsole;
-extern u8 monoReverbEmulator;
-extern s32 reverbFilterCountConsole;
-extern s32 reverbFilterCountEmulator;
+extern u8 gBetterReverbPreset;
+extern s8 betterReverbDownsampleRate;
+extern u8 monoReverb;
+extern s32 reverbFilterCount;
 extern s32 betterReverbWindowsSize;
-
-extern s32 delaysBaselineL[NUM_ALLPASS];
-extern s32 delaysBaselineR[NUM_ALLPASS];
-extern s32 gReverbMultsL[NUM_ALLPASS / 3];
-extern s32 gReverbMultsR[NUM_ALLPASS / 3];
+extern s32 betterReverbRevIndex;
+extern s32 betterReverbGainIndex;
+extern s32 *gReverbMultsL;
+extern s32 *gReverbMultsR;
 
 extern u8 toggleBetterReverb;
 #define REVERB_WINDOW_SIZE_MAX 0x2000
@@ -147,8 +141,7 @@ extern s16 D_SH_803479B4;
 
 #ifdef BETTER_REVERB
 void initialize_better_reverb_buffers(void);
-void clear_better_reverb_buffers(void);
-void set_better_reverb_buffers(void);
+void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR);
 #endif
 
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen);

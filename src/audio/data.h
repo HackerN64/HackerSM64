@@ -44,10 +44,12 @@
 extern struct AudioSessionSettingsEU gAudioSessionPresets[];
 extern struct ReverbSettingsEU sReverbSettings[8];
 #else
-extern struct AudioSessionSettings gAudioSessionPresets[1];
+extern struct AudioSessionSettings gAudioSessionSettings;
 extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
-extern u16 D_80332388[128]; // unused
+#ifdef BETTER_REVERB
+extern struct BetterReverbSettings gBetterReverbSettings[];
+#endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern f32 gPitchBendFrequencyScale[256];

@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include "insn_disasm.h"
+#include "game/main.h"
 
 
 enum CrashScreenMessageIDs {
@@ -55,11 +56,11 @@ enum ControlTypes {
 };
 
 // The number of functions to save to the stack trace buffer.
-#define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
+#define STACK_SIZE 256 // (s32)(THREAD2_STACK / sizeof(u64))
 
 struct CrashScreen {
     /*0x000*/ OSThread thread;
-    /*0x1B0*/ u64 stack[0x800 / sizeof(u64)];
+    /*0x1B0*/ u64 stack[THREAD2_STACK / sizeof(u64)];
     /*0x9B0*/ OSMesgQueue mesgQueue;
     /*0x9C8*/ OSMesg mesg;
 }; /*0x9CC*/

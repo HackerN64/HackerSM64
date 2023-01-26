@@ -22,6 +22,12 @@
 // #define USE_GAMECUBE_CONTROLLER
 
 /**
+ * RCVI hack. Increases performance on emulator, and does nothing on console.
+ * Might break on some emulators. Use at your own risk, and don't use it unless you actually need the extra performance.
+ */
+// #define RCVI_HACK
+
+/**
  * Height of the black borders at the top and bottom of the screen for NTSC Versions. You can set it to different values for console and emulator.
  * There is generally no reason to have a value other than 0 for emulator. As for console, it provides a (small) performance boost.
  */

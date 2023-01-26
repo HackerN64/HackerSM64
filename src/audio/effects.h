@@ -31,6 +31,12 @@ enum ADSRDelays {
     ADSR_RESTART = -3,
 };
 
+enum VibratoModes {
+    VIBMODE_NONE       = 0,
+    VIBMODE_VIBRATO    = (1 << 0),
+    VIBMODE_PORTAMENTO = (1 << 1),
+};
+
 // Envelopes are always stored as big endian, to match sequence files which are
 // byte blobs and can embed envelopes. Hence this byteswapping macro.
 #if IS_BIG_ENDIAN
