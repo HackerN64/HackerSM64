@@ -5,7 +5,7 @@
 
 #include "config.h"
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
 
 extern s32 gRumblePakTimer;
 

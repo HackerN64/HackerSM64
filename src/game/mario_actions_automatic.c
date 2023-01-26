@@ -133,7 +133,7 @@ s32 act_holding_pole(struct MarioState *m) {
 
         add_tree_leaf_particles(m);
         play_climbing_sounds(m, 2);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         reset_rumble_timers_slip();
 #endif
         set_sound_moving_speed(SOUND_BANK_MOVING, m->angleVel[1] / 0x100 * 2);
@@ -356,7 +356,7 @@ void update_hang_stationary(struct MarioState *m) {
 }
 
 s32 act_start_hanging(struct MarioState *m) {
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
     if (m->actionTimer++ == 0) {
         queue_rumble_data(5, 80);
     }
@@ -481,7 +481,7 @@ s32 act_hang_moving(struct MarioState *m) {
 
     if (m->marioObj->header.gfx.animInfo.animFrame == 12) {
         play_sound(SOUND_ACTION_HANGING_STEP, m->marioObj->header.gfx.cameraToObject);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_data(1, 30);
 #endif
     }
@@ -675,7 +675,7 @@ s32 act_grabbed(struct MarioState *m) {
 
         m->faceAngle[1] = m->usedObj->oMoveAngleYaw;
         vec3f_copy(m->pos, m->marioObj->header.gfx.pos);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_data(5, 60);
 #endif
 
@@ -747,14 +747,14 @@ s32 act_in_cannon(struct MarioState *m) {
                 marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 
                 set_mario_action(m, ACT_SHOT_FROM_CANNON, 0);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                 queue_rumble_data(60, 70);
 #endif
                 m->usedObj->oAction = OPENED_CANNON_ACT_SHOOT;
                 return FALSE;
             } else if (m->faceAngle[0] != startFacePitch || m->faceAngle[1] != startFaceYaw) {
                 play_sound(SOUND_MOVING_AIM_CANNON, marioObj->header.gfx.cameraToObject);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                 reset_rumble_timers_vibrate(0);
 #endif
             }
@@ -840,7 +840,7 @@ s32 act_tornado_twirling(struct MarioState *m) {
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1] + m->twirlYaw, 0);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
     reset_rumble_timers_slip();
 #endif
 

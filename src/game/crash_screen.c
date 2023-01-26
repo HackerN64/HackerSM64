@@ -422,7 +422,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             }
         } else {
             if (gControllerBits) {
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                 block_until_rumble_pak_free();
 #endif
                 osContStartReadDataEx(&gSIEventMesgQueue);

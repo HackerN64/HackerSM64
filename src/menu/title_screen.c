@@ -193,7 +193,7 @@ s32 intro_regular(void) {
 #endif
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_data(60, 70);
         queue_rumble_decay(1);
 #endif
@@ -225,7 +225,7 @@ s32 intro_game_over(void) {
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_data(60, 70);
         queue_rumble_decay(1);
 #endif

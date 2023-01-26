@@ -553,7 +553,7 @@ static s32 act_breaststroke(struct MarioState *m) {
         reset_bob_variables(m);
     }
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
     if (m->actionTimer < 6) {
         queue_rumble_submerged();
     }
@@ -801,7 +801,7 @@ static s32 act_water_throw(struct MarioState *m) {
 
     if (m->actionTimer++ == 5) {
         mario_throw_held_object(m);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_data(3, 50);
 #endif
     }
@@ -977,7 +977,7 @@ static s32 act_water_plunge(struct MarioState *m) {
 
         m->particleFlags |= PARTICLE_WATER_SPLASH;
         m->actionState = ACT_STATE_WATER_PLUNGE_SINK;
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         if (m->prevAction & ACT_FLAG_AIR) {
             queue_rumble_data(5, 80);
         }
@@ -1086,7 +1086,7 @@ static s32 act_caught_in_whirlpool(struct MarioState *m) {
     set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
     reset_rumble_timers_slip();
 #endif
 

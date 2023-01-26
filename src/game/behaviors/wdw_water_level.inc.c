@@ -49,7 +49,7 @@ void bhv_water_level_diamond_loop(void) {
                         cur_obj_play_sound_1(SOUND_ENV_WATER_DRAIN);
                     }
                     o->oAngleVelYaw = 0x800;
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                     reset_rumble_timers_vibrate(2);
 #endif
                 }

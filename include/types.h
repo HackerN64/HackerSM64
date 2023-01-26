@@ -44,7 +44,7 @@ struct Controller {
   /*0x18*/ OSContStatus *statusData;
   /*0x1C*/ OSContPadEx *controllerData;
   /*0x20*/ s32 port;
-};
+}; /* 0x24 */
 
 // -- Booleans --
 

@@ -263,9 +263,6 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     return dl;
 }
 
-#if defined(VERSION_SH)
-extern Gfx title_screen_bg_dl_rumble_pak[];
-#endif
 #ifdef GODDARD_EASTER_EGG
 extern Gfx title_screen_bg_dl_face_easter_egg_begin[];
 extern Gfx title_screen_bg_dl_face_easter_egg_end[];
@@ -405,7 +402,46 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 }
 #endif
 
-#if defined(VERSION_SH)
+#ifdef ENABLE_RUMBLE
+ALIGNED8 static const Texture title_texture_rumble_pak_en[] = {
+#include "levels/intro/rumble_pak_en.rgba16.inc.c"
+};
+//! TODO: Use these after ASCII/multilang is merged.
+#if MULTILANG
+ALIGNED8 static const Texture title_texture_rumble_pak_fr[] = {
+#include "levels/intro/rumble_pak_fr.rgba16.inc.c"
+};
+ALIGNED8 static const Texture title_texture_rumble_pak_de[] = {
+#include "levels/intro/rumble_pak_de.rgba16.inc.c"
+};
+ALIGNED8 static const Texture title_texture_rumble_pak_jp[] = {
+#include "levels/intro/rumble_pak_jp.rgba16.inc.c"
+};
+ALIGNED8 static const Texture title_texture_rumble_pak_es[] = {
+#include "levels/intro/rumble_pak_es.rgba16.inc.c"
+};
+#endif
+
+const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_COPY),
+    gsDPSetTexturePersp(G_TP_NONE),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
+    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, (SCREEN_WIDTH - 1), (SCREEN_HEIGHT - 1)),
+    gsSPEndDisplayList(),
+};
+
+const Gfx title_screen_bg_dl_rumble_pak_end[] = {
+    gsSPTextureRectangle((220 << 2), (200 << 2), ((300 - 1) << 2), ((224 - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsSPEndDisplayList(),
+};
+
 Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;
@@ -423,10 +459,18 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             backgroundTileSix = gameOverBackgroundTable[6];
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
-            dl = alloc_display_list(3 * sizeof(*dl));
+            u32 gfxCmds = (
+                /*gSPDisplayList    */ 1 +
+                /*gDPLoadTextureTile*/ 7 +
+                /*gSPDisplayList    */ 1 +
+                /*gSPEndDisplayList */ 1
+            );
+            dl = alloc_display_list(gfxCmds * sizeof(*dl));
             if (dl != NULL) {
                 dlIter = dl;
-                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak);
+                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
+                gDPLoadTextureTile(dlIter++, title_texture_rumble_pak_en, G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 0, 0, 0, (80 - 1), (24 - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 7, 5, G_TX_NOLOD, G_TX_NOLOD);
+                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
                 gSPEndDisplayList(dlIter);
             }
         } else {
@@ -435,5 +479,4 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
     }
     return dl;
 }
-
-#endif
+#endif // ENABLE_RUMBLE

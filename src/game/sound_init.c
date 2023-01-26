@@ -175,7 +175,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
     if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
     if (soundMenuFlags & SOUND_MENU_FLAG_LETGOMARIOFACE) {
         queue_rumble_data(10, 60);
     }

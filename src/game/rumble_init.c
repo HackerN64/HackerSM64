@@ -6,7 +6,7 @@
 #include "rumble_init.h"
 #include "config.h"
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
 
 OSThread gRumblePakThread;
 
@@ -120,7 +120,7 @@ static void update_rumble_data_queue(void) {
     if (gRumbleDataQueue[0].comm) {
         gCurrRumbleSettings.count = 0;
         gCurrRumbleSettings.start = 4;
-        gCurrRumbleSettings.event  = gRumbleDataQueue[0].comm;
+        gCurrRumbleSettings.event = gRumbleDataQueue[0].comm;
         gCurrRumbleSettings.timer = gRumbleDataQueue[0].time;
         gCurrRumbleSettings.level = gRumbleDataQueue[0].level;
         gCurrRumbleSettings.decay = gRumbleDataQueue[0].decay;
@@ -261,7 +261,7 @@ void cancel_rumble(void) {
 
 void create_thread_6(void) {
     osCreateMesgQueue(&gRumbleThreadVIMesgQueue, gRumbleThreadVIMesgBuf, 1);
-    osCreateThread(&gRumblePakThread, THREAD_6_RUMBLE, thread6_rumble_loop, NULL, gThread6Stack + 0x400, 30);
+    osCreateThread(&gRumblePakThread, THREAD_6_RUMBLE, thread6_rumble_loop, NULL, (gThread6Stack + THREAD6_STACK), 30);
     osStartThread(&gRumblePakThread);
 }
 

@@ -13,7 +13,7 @@ void bhv_1up_interact(void) {
         gMarioState->numLives++;
 #endif
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
     }
