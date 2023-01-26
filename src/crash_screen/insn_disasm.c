@@ -229,39 +229,39 @@ ALIGNED32 static const InsnTemplate insn_db[] = {
 
 static const InsnData insn_masks[] = {
 //                       opcode,      rs,      rt,      rd,      sa, function
-    /*PARAM_NOP*/ {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}}, // NOP
-    /*PARAM_N  */ {.i={0b111111, 0b11111, 0b11111, 0b11111,       0, 0b111111}}, //
-    /*PARAM_SYS*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}}, //
-    /*PARAM_SYN*/ {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}}, //
-    /*PARAM_S  */ {.i={0b111111,       0, 0b11111, 0b11111, 0b11111, 0b111111}}, // rs
-    /*PARAM_T  */ {.i={0b111111, 0b11111,       0, 0b11111, 0b11111, 0b111111}}, // rt
-    /*PARAM_D  */ {.i={0b111111, 0b11111, 0b11111,       0, 0b11111, 0b111111}}, // rd
-    /*PARAM_ST */ {.i={0b111111,       0,       0, 0b11111, 0b11111, 0b111111}}, // rs, rt
-    /*PARAM_ST2*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}}, // rs, rt
-    /*PARAM_DS */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rd, rs
-    /*PARAM_TD */ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, rd
-    /*PARAM_SD */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rs, rd
-    /*PARAM_STD*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rt, rd
-    /*PARAM_SDT*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rd, rt
-    /*PARAM_DST*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rs, rt
-    /*PARAM_DTS*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rt, rs
-    /*PARAM_DTA*/ {.i={0b111111, 0b11111,       0,       0,       0, 0b111111}}, // rd, rt, shift
-    /*PARAM_SI */ {.i={0b111111,       0, 0b11111,       0,       0,        0}}, // rs, 0xI
-    /*PARAM_TI */ {.i={0b111111, 0b11111,       0,       0,       0,        0}}, // rt, 0xI
-    /*PARAM_STI*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rs, rt, 0xI
-    /*PARAM_TSI*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rt, rs, 0xI
-    /*PARAM_TOS*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rt, 0xI(rs)
-    /*PARAM_SO */ {.i={0b111111,       0, 0b11111,       0,       0,        0}}, // rs, offset
-    /*PARAM_STO*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rs, rt, offset
-    /*PARAM_O  */ {.i={0b111111, 0b11111, 0b11111,       0,       0,        0}}, // offset
-    /*PARAM_J  */ {.i={0b111111,       0,       0,       0,       0,        0}}, // func
+    [PARAM_NOP] = {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}}, // NOP
+    [PARAM_N  ] = {.i={0b111111, 0b11111, 0b11111, 0b11111,       0, 0b111111}}, //
+    [PARAM_SYS] = {.i={0b111111,       0,       0,       0,       0, 0b111111}}, //
+    [PARAM_SYN] = {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}}, //
+    [PARAM_S  ] = {.i={0b111111,       0, 0b11111, 0b11111, 0b11111, 0b111111}}, // rs
+    [PARAM_T  ] = {.i={0b111111, 0b11111,       0, 0b11111, 0b11111, 0b111111}}, // rt
+    [PARAM_D  ] = {.i={0b111111, 0b11111, 0b11111,       0, 0b11111, 0b111111}}, // rd
+    [PARAM_ST ] = {.i={0b111111,       0,       0, 0b11111, 0b11111, 0b111111}}, // rs, rt
+    [PARAM_ST2] = {.i={0b111111,       0,       0,       0,       0, 0b111111}}, // rs, rt
+    [PARAM_DS ] = {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rd, rs
+    [PARAM_TD ] = {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, rd
+    [PARAM_SD ] = {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rs, rd
+    [PARAM_STD] = {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rt, rd
+    [PARAM_SDT] = {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rd, rt
+    [PARAM_DST] = {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rs, rt
+    [PARAM_DTS] = {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rt, rs
+    [PARAM_DTA] = {.i={0b111111, 0b11111,       0,       0,       0, 0b111111}}, // rd, rt, shift
+    [PARAM_SI ] = {.i={0b111111,       0, 0b11111,       0,       0,        0}}, // rs, 0xI
+    [PARAM_TI ] = {.i={0b111111, 0b11111,       0,       0,       0,        0}}, // rt, 0xI
+    [PARAM_STI] = {.i={0b111111,       0,       0,       0,       0,        0}}, // rs, rt, 0xI
+    [PARAM_TSI] = {.i={0b111111,       0,       0,       0,       0,        0}}, // rt, rs, 0xI
+    [PARAM_TOS] = {.i={0b111111,       0,       0,       0,       0,        0}}, // rt, 0xI(rs)
+    [PARAM_SO ] = {.i={0b111111,       0, 0b11111,       0,       0,        0}}, // rs, offset
+    [PARAM_STO] = {.i={0b111111,       0,       0,       0,       0,        0}}, // rs, rt, offset
+    [PARAM_O  ] = {.i={0b111111, 0b11111, 0b11111,       0,       0,        0}}, // offset
+    [PARAM_J  ] = {.i={0b111111,       0,       0,       0,       0,        0}}, // func
 //                         COP1,    fmt,       rt,      fs,      fd,      MOV
-    /*PARAM_FOS*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // ft, 0xI(rs)
-    /*PARAM_TFS*/ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, fs
-    /*PARAM_FF */ {.i={0b111111,       0, 0b11111,       0,       0, 0b111111}}, // fd, fs
-    /*PARAM_FFF*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}}, // fd, fs, ft
-    /*PARAM_CON*/ {.i={0b111111,       0,       0,       0, 0b00011, 0b110000}}, // fs, ft
-    /*PARAM_BC1*/ {.i={0b111111, 0b11111, 0b00011,       0,       0,        0}}, // offset
+    [PARAM_FOS] = {.i={0b111111,       0,       0,       0,       0,        0}}, // ft, 0xI(rs)
+    [PARAM_TFS] = {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, fs
+    [PARAM_FF ] = {.i={0b111111,       0, 0b11111,       0,       0, 0b111111}}, // fd, fs
+    [PARAM_FFF] = {.i={0b111111,       0,       0,       0,       0, 0b111111}}, // fd, fs, ft
+    [PARAM_CON] = {.i={0b111111,       0,       0,       0, 0b00011, 0b110000}}, // fs, ft
+    [PARAM_BC1] = {.i={0b111111, 0b11111, 0b00011,       0,       0,        0}}, // offset
 };
 
 // C.cond.fmt
@@ -324,10 +324,10 @@ static char insn_as_string[CHAR_BUFFER_SIZE];
 
 static char fmt_to_char(InsnData insn) {
     switch (insn.i.rs) {
-        case 16: return 'S'; // Single
-        case 17: return 'D'; // Doubleword
-        case 20: return 'W'; // Word
-        case 21: return 'L'; // Long
+        case FMT_SINGLE:     return 'S'; // Single
+        case FMT_DOUBLEWORD: return 'D'; // Doubleword
+        case FMT_WORD:       return 'W'; // Word
+        case FMT_LONG:       return 'L'; // Long
     }
 
     return 'X'; // Unknown

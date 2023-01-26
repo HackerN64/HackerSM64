@@ -7,6 +7,9 @@
 
 // RGBA16
 
+/**
+ * A fast lerp function between two RGBA16 colors.
+ */
 RGBA16 rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac) {
     RGBA16 ds, d = MSK_RGBA16_A;
     RGBA16 s = (MSK_RGBA16_C << SIZ_RGBA16_A);

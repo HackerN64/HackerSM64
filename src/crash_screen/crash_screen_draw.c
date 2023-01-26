@@ -153,6 +153,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
 
     RGBA16 *dst;
 
+    // Swap the points so that the second point is after the first.
     if (x1 > x2) SWAP(x1, x2);
     if (y1 > y2) SWAP(y1, y2);
 
@@ -172,7 +173,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
 }
 
 void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color) {
-    if (glyph == 0) {
+    if (glyph == 0) { // Null
         color = COLOR_RGBA32_GRAY;
     }
     const Alpha alpha = RGBA32_A(color);
@@ -208,6 +209,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32
     }
 }
 
+// Copy the framebuffer data from gFramebuffers one frame at a time, forcing alpha to true to disable broken anti-aliasing.
 void crash_screen_take_screenshot(RGBA16 *dst) {
     u32 *src = (u32 *)gFramebuffers[sRenderingFramebuffer];
     u32 *ptr = (u32 *)dst;

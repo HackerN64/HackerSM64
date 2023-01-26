@@ -102,6 +102,14 @@ enum DisasmColors {
     DISASM_COLOR_OFFSET,
 };
 
+// fmt_to_char
+enum FormatCodes {
+    FMT_SINGLE     = 16,
+    FMT_DOUBLEWORD = 17,
+    FMT_WORD       = 20,
+    FMT_LONG       = 21,
+};
+
 
 #define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
 

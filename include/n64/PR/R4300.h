@@ -197,16 +197,15 @@
 #define	CAUSE_SW2	0x00000200	/* Software level 2 pending */
 #define	CAUSE_SW1	0x00000100	/* Software level 1 pending */
 
-#define	CAUSE_IPMASK	0x0000FF00	/* Pending interrupt mask */
 #define	CAUSE_IPSHIFT	8
-
-#define	CAUSE_EXCMASK	0x0000007C	/* Cause code bits */
+#define	CAUSE_IPMASK	(0xFF << CAUSE_IPSHIFT)	/* Pending interrupt mask */
 
 #define	CAUSE_EXCSHIFT	2
+#define	CAUSE_EXCMASK	(0x1F << CAUSE_EXCSHIFT)	/* Cause code bits */
 
 /* Cause register exception codes */
 
-#define	EXC_CODE(x)	((x)<<2)
+#define	EXC_CODE(x)	((x) << CAUSE_EXCSHIFT)
 
 /* Hardware exception codes */
 #define	EXC_INT		EXC_CODE(0)	/* interrupt */
