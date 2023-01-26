@@ -5,6 +5,7 @@
 
 #include "sm64.h"
 #include "audio/external.h"
+#include "audio/synthesis.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/area.h"
@@ -735,18 +736,43 @@ static void level_cmd_show_dialog(void) {
 static void level_cmd_set_music(void) {
     if (sCurrAreaIndex != -1) {
         gAreas[sCurrAreaIndex].musicParam = CMD_GET(s16, 2);
-        gAreas[sCurrAreaIndex].musicParam2 = CMD_GET(s16, 4);
+#ifdef BETTER_REVERB
+        if (gIsConsole)
+            gAreas[sCurrAreaIndex].betterReverbPreset = CMD_GET(u8, 4);
+        else
+            gAreas[sCurrAreaIndex].betterReverbPreset = CMD_GET(u8, 5);
+#endif
+        gAreas[sCurrAreaIndex].musicParam2 = CMD_GET(s16, 6);
     }
     sCurrentCmd = CMD_NEXT;
 }
 
 static void level_cmd_set_menu_music(void) {
+#ifdef BETTER_REVERB
+    // Must come before set_background_music()
+    if (gIsConsole)
+        gBetterReverbPreset = CMD_GET(u8, 4);
+    else
+        gBetterReverbPreset = CMD_GET(u8, 5);
+#endif
     set_background_music(0, CMD_GET(s16, 2), 0);
     sCurrentCmd = CMD_NEXT;
 }
 
 static void level_cmd_fadeout_music(void) {
-    fadeout_music(CMD_GET(s16, 2));
+    s16 dur = CMD_GET(s16, 2);
+    if (sCurrAreaIndex != -1 && dur == 0) {
+        // Allow persistent block overrides for SET_BACKGROUND_MUSIC_WITH_REVERB
+        gAreas[sCurrAreaIndex].musicParam = 0x00;
+        gAreas[sCurrAreaIndex].musicParam2 = 0x00;
+#ifdef BETTER_REVERB
+        gAreas[sCurrAreaIndex].betterReverbPreset = 0x00;
+#endif
+    } else {
+        if (dur < 0)
+            dur = 0;
+        fadeout_music(dur);
+    }
     sCurrentCmd = CMD_NEXT;
 }
 

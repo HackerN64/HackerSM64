@@ -1423,6 +1423,7 @@ void note_init_all(void) {
         note->prevParentLayer = NO_LAYER;
 #if defined(VERSION_EU) || defined(VERSION_SH)
         note->waveId = 0;
+        note->vibratoState.active = FALSE;
 #else
         note->reverbVol = 0;
         note->usesHeadsetPanEffects = FALSE;
@@ -1432,12 +1433,12 @@ void note_init_all(void) {
         note->targetVolRight = 0;
         note->frequency = 0.0f;
         note->unused1 = 0x3f;
+        note->vibratoState.activeFlags = VIBMODE_NONE;
 #endif
         note->attributes.velocity = 0.0f;
         note->adsrVolScale = 0;
         note->adsr.state = ADSR_STATE_DISABLED;
         note->adsr.action = 0;
-        note->vibratoState.active = FALSE;
         note->portamento.cur = 0.0f;
         note->portamento.speed = 0.0f;
 #if defined(VERSION_SH)
