@@ -543,7 +543,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
                     }
 
                     a3 = ((uintptr_t)v0_2 & 0xf);
-                    aligned = ALIGN4(t0 * unk_s6 + 16);
+                    aligned = ALIGN16(t0 * unk_s6 + 16);
                     addr = (DMEM_ADDR_COMPRESSED_ADPCM_DATA - aligned) & 0xffff;
                     aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(v0_2 - a3), addr, ALIGN16(t0 * unk_s6 + 16));
                 } else {
