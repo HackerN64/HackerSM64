@@ -562,30 +562,32 @@ void run_demo_inputs(void) {
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
 void adjust_analog_stick(struct Controller *controller) {
+    s16 deadzone = (gIsConsole && (controller->statusData->type & CONT_GCN)) ? 12 : 8;
+    s16 offset = (deadzone - 2);
+
     // Reset the controller's x and y floats.
     controller->stickX = 0;
     controller->stickY = 0;
 
     // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -8) {
-        controller->stickX = controller->rawStickX + 6;
+    if (controller->rawStickX <= -deadzone) {
+        controller->stickX = controller->rawStickX + offset;
     }
 
-    if (controller->rawStickX >= 8) {
-        controller->stickX = controller->rawStickX - 6;
+    if (controller->rawStickX >= deadzone) {
+        controller->stickX = controller->rawStickX - offset;
     }
 
-    if (controller->rawStickY <= -8) {
-        controller->stickY = controller->rawStickY + 6;
+    if (controller->rawStickY <= -deadzone) {
+        controller->stickY = controller->rawStickY + offset;
     }
 
-    if (controller->rawStickY >= 8) {
-        controller->stickY = controller->rawStickY - 6;
+    if (controller->rawStickY >= deadzone) {
+        controller->stickY = controller->rawStickY - offset;
     }
 
     // Calculate f32 magnitude from the center by vector length.
-    controller->stickMag =
-        sqrtf(controller->stickX * controller->stickX + controller->stickY * controller->stickY);
+    controller->stickMag = sqrtf(sqr(controller->stickX) + sqr(controller->stickY));
 
     // Magnitude cannot exceed 64.0f: if it does, modify the values
     // appropriately to flatten the values down to the allowed maximum value.
