@@ -146,8 +146,8 @@ static const ContCmdData sContCmds[] = {
     [CONT_CMD_READ_RTC_BLOCK    ] = { .tx =  2, .rx =  9 }, // Read RTC Block
     [CONT_CMD_WRITE_RTC_BLOCK   ] = { .tx = 10, .rx =  1 }, // Write RTC Block
     // VRU
-    [CONT_CMD_READ36_VOICE      ] = { .tx =  3, .rx = 37 }, // Read from VRx //! is .rx 25 or 37?
-    [CONT_CMD_WRITE20_VOICE     ] = { .tx = 23, .rx =  1 }, // Write to VRx //! is .tx 17 or 23?
+    [CONT_CMD_READ36_VOICE      ] = { .tx =  3, .rx = 37 }, // Read from VRx
+    [CONT_CMD_WRITE20_VOICE     ] = { .tx = 23, .rx =  1 }, // Write to VRx
     [CONT_CMD_READ2_VOICE       ] = { .tx =  3, .rx =  3 }, // Read Status VRx
     [CONT_CMD_WRITE4_VOICE      ] = { .tx =  7, .rx =  1 }, // Write Config VRx
     [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx
@@ -247,6 +247,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
     for (i = 0; i < __osMaxControllers; i++, data++) {
         if (gControllerBits & (1 << i)) {
+            // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN(ptr, 4);
 
             if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
@@ -257,20 +258,16 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 if (data->errno == 0) {
                     if (!gGamecubeControllerCenters[i].initialized) {
                         gGamecubeControllerCenters[i].initialized = TRUE;
-                        gGamecubeControllerCenters[i].stick_x   = readformatgcn.stick_x;
-                        gGamecubeControllerCenters[i].stick_y   = readformatgcn.stick_y;
-                        gGamecubeControllerCenters[i].c_stick_x = readformatgcn.c_stick_x;
-                        gGamecubeControllerCenters[i].c_stick_y = readformatgcn.c_stick_y;
+                        gGamecubeControllerCenters[i].stick_x     = readformatgcn.stick_x;
+                        gGamecubeControllerCenters[i].stick_y     = readformatgcn.stick_y;
+                        gGamecubeControllerCenters[i].c_stick_x   = readformatgcn.c_stick_x;
+                        gGamecubeControllerCenters[i].c_stick_y   = readformatgcn.c_stick_y;
                     }
 
-                    stick_x = CLAMP_S8(((s32)readformatgcn.stick_x) - gGamecubeControllerCenters[i].stick_x);
-                    stick_y = CLAMP_S8(((s32)readformatgcn.stick_y) - gGamecubeControllerCenters[i].stick_y);
-                    data->stick_x = stick_x;
-                    data->stick_y = stick_y;
-                    c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
-                    c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
-                    data->c_stick_x = c_stick_x;
-                    data->c_stick_y = c_stick_y;
+                    data->stick_x   = stick_x   = CLAMP_S8(((s32)readformatgcn.stick_x  ) - gGamecubeControllerCenters[i].stick_x  );
+                    data->stick_y   = stick_y   = CLAMP_S8(((s32)readformatgcn.stick_y  ) - gGamecubeControllerCenters[i].stick_y  );
+                    data->c_stick_x = c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
+                    data->c_stick_y = c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
                     data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
                     data->l_trig = readformatgcn.l_trig;
                     data->r_trig = readformatgcn.r_trig;
@@ -296,16 +293,18 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
+            // Skip empty channel/ports.
             ptr++;
         }
     }
 }
 
-void __osMakeRequestData(OSPifRamChCmd *readformat, enum ContCmds cmd) {
-    readformat->align = CONT_CMD_NOP;
-    readformat->txsize = sContCmds[cmd].tx;
-    readformat->rxsize = sContCmds[cmd].rx;
-    readformat->cmd = cmd;
+void __osMakeRequestData(void *readformat, enum ContCmds cmd) {
+    OSPifRamChCmd *data = (OSPifRamChCmd *)readformat;
+    data->align = CONT_CMD_NOP;
+    data->txsize = sContCmds[cmd].tx;
+    data->rxsize = sContCmds[cmd].rx;
+    data->cmd = cmd;
 }
 
 // Called by osContStartReadDataEx
@@ -320,12 +319,12 @@ static void __osPackReadData(void) {
 
     __osContPifRam.pifstatus = CONT_CMD_EXE;
 
-    __osMakeRequestData((OSPifRamChCmd *)&readformat, CONT_CMD_READ_BUTTON);
+    __osMakeRequestData(&readformat, CONT_CMD_READ_BUTTON);
     readformat.button         = 0xFFFF;
     readformat.stick_x        = -1;
     readformat.stick_y        = -1;
 
-    __osMakeRequestData((OSPifRamChCmd *)&readformatgcn, CONT_CMD_GCN_SHORT_POLL);
+    __osMakeRequestData(&readformatgcn, CONT_CMD_GCN_SHORT_POLL);
     readformatgcn.analog_mode = 3;
     readformatgcn.rumble      = 0;
     readformatgcn.button      = 0xFFFF;
@@ -334,8 +333,12 @@ static void __osPackReadData(void) {
 
     for (i = 0; i < __osMaxControllers; i++) {
         if (gControllerBits & (1 << i)) {
+            // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN(ptr, 4);
             if (skipped) {
+                // If channels were skipped, fill the previous 4 bytes with 0x00 byte each skipped channel, and 0xFF for alignment.
+                // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
+                //  while bytes of 0x00 increment the channel counter.
                 *(u32 *)(ptr - 4) = ~BITMASK(skipped * 8);
                 skipped = 0;
             }
@@ -349,6 +352,7 @@ static void __osPackReadData(void) {
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
+            // Skip empty channel/ports.
             ptr++;
             skipped++;
         }
@@ -395,13 +399,10 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
 // Linker script will resolve references to the original function with this one instead.
 // Called by osContInit and osContGetQuery
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
-    u8* ptr;
+    u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequesFormat requestHeader;
-    s32 i;
-    u8 bits;
-
-    bits = 0;
-    ptr = (u8*)__osContPifRam.ramarray;
+    u8 bits = 0;
+    int i;
 
     for (i = 0; i < __osMaxControllers; i++, ptr += sizeof(requestHeader), data++) {
         requestHeader = *(__OSContRequesFormat*)ptr;
@@ -411,10 +412,10 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
             __osControllerTypes[i] = DEVICE_N64_CONTROLLER;
 
-            // Check if the input type is a gamecube controller
+            // Check the type of controller
             // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
-            //   so check for that and set the input type as N64 controller if so.
-            if ((s16)data->type != -1) {
+            //   so check for that and leave the input type as N64 controller if so.
+            if ((s16)data->type == -1) {
                 if (data->type & CONT_GCN) {
                     __osControllerTypes[i] = DEVICE_GCN_CONTROLLER;
                 } else if (data->type & CONT_TYPE_MOUSE) {
@@ -443,9 +444,9 @@ static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 // osMotorStart & osMotorStop
 s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
-    int i;
     s32 ret = 0;
     u8* ptr = (u8*)&__MotorDataBuf[pfs->channel];
+    int i;
 
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
         return 5;
@@ -496,7 +497,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
     __OSContRamReadFormat ramreadformat;
     int i;
 
-    __osMakeRequestData((OSPifRamChCmd *)&ramreadformat, CONT_CMD_WRITE_MEMPAK);
+    __osMakeRequestData(&ramreadformat, CONT_CMD_WRITE_MEMPAK);
     ramreadformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
     ramreadformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
