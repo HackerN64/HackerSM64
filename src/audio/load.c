@@ -9,8 +9,6 @@
 #include "seqplayer.h"
 #include "game/puppyprint.h"
 
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 struct SharedDma {
     /*0x0*/ u8 *buffer;       // target, points to pre-allocated buffer
     /*0x4*/ uintptr_t source; // device address
