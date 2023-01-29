@@ -15,7 +15,8 @@ enum ADSRStates {
     ADSR_STATE_HANG,
     ADSR_STATE_DECAY,
     ADSR_STATE_RELEASE,
-    ADSR_STATE_SUSTAIN
+    ADSR_STATE_SUSTAIN,
+    ADSR_STATE_RESTART
 };
 
 enum ADSRActions {
@@ -52,7 +53,7 @@ void adsr_init(struct AdsrState *adsr, struct AdsrEnvelope *envelope, s16 *volOu
 #if defined(VERSION_EU) || defined(VERSION_SH)
 f32 adsr_update(struct AdsrState *adsr);
 #else
-s32 adsr_update(struct AdsrState *adsr);
+s32 adsr_update(struct Note *note);
 #endif
 
 #endif // AUDIO_EFFECTS_H

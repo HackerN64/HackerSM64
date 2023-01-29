@@ -1313,8 +1313,14 @@ u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemI
 u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings,
                       UNUSED u32 flags) {
     struct VolumeChange vol;
-    vol.sourceLeft = note->curVolLeft;
-    vol.sourceRight = note->curVolRight;
+    if (note->initFullVelocity) {
+        note->initFullVelocity = FALSE;
+        vol.sourceLeft = note->targetVolLeft;
+        vol.sourceRight = note->targetVolRight;
+    } else {
+        vol.sourceLeft = note->curVolLeft;
+        vol.sourceRight = note->curVolRight;
+    }
     vol.targetLeft = note->targetVolLeft;
     vol.targetRight = note->targetVolRight;
     note->curVolLeft = vol.targetLeft;
@@ -1650,6 +1656,7 @@ void note_enable(struct Note *note) {
     note->stereoStrongRight = FALSE;
     note->stereoStrongLeft = FALSE;
     note->usesHeadsetPanEffects = FALSE;
+    note->initFullVelocity = FALSE;
     note->headsetPanLeft = 0;
     note->headsetPanRight = 0;
     note->prevHeadsetPanRight = 0;
