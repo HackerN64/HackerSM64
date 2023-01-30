@@ -2,6 +2,7 @@
 #include "PR/os_internal.h"
 #include "engine/math_util.h"
 #include "game_init.h"
+#include "rumble_init.h"
 
 /////////////////////////////////////////////////
 // Libultra structs and macros (from ultralib) //
@@ -268,9 +269,9 @@ void osContGetReadDataEx(OSContPadEx* data) {
                     data->stick_y   = stick_y   = CLAMP_S8(((s32)readformatgcn.stick_y  ) - gGamecubeControllerCenters[i].stick_y  );
                     data->c_stick_x = c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
                     data->c_stick_y = c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
-                    data->button = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
-                    data->l_trig = readformatgcn.l_trig;
-                    data->r_trig = readformatgcn.r_trig;
+                    data->button    = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
+                    data->l_trig    = readformatgcn.l_trig;
+                    data->r_trig    = readformatgcn.r_trig;
                 } else {
                     gGamecubeControllerCenters[i].initialized = FALSE;
                 }
@@ -336,7 +337,8 @@ static void __osPackReadData(void) {
             // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN(ptr, 4);
             if (skipped) {
-                // If channels were skipped, fill the previous 4 bytes with 0x00 byte each skipped channel, and 0xFF for alignment.
+                // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00)
+                // byte for each skipped channel, and CONT_CMD_NOP (0xFF) for alignment.
                 // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
                 //  while bytes of 0x00 increment the channel counter.
                 *(u32 *)(ptr - 4) = ~BITMASK(skipped * 8);
@@ -449,7 +451,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
     int i;
 
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
-        return 5;
+        return PFS_ERR_INVALID;
     }
 
     if (__osControllerTypes[pfs->channel] == DEVICE_GCN_CONTROLLER) {
@@ -473,10 +475,12 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         ret = (READFORMAT(ptr)->rxsize & CHNL_ERR_MASK);
         if (!ret) {
             if (!flag) {
+                // MOTOR_STOP
                 if (READFORMAT(ptr)->datacrc != 0) {
                     ret = PFS_ERR_CONTRFAIL;
                 }
             } else {
+                // MOTOR_START
                 if (READFORMAT(ptr)->datacrc != 0xEB) {
                     ret = PFS_ERR_CONTRFAIL;
                 }
@@ -498,8 +502,8 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
     int i;
 
     __osMakeRequestData(&ramreadformat, CONT_CMD_WRITE_MEMPAK);
-    ramreadformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
-    ramreadformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+    ramreadformat.addrh = (CONT_BLOCK_RUMBLE >> 3);
+    ramreadformat.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
@@ -509,7 +513,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
 
     *READFORMAT(ptr) = ramreadformat;
     ptr += sizeof(__OSContRamReadFormat);
-    ptr[0] = CONT_CMD_END;
+    *ptr = CONT_CMD_END;
 }
 
 s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {

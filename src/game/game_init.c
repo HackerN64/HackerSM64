@@ -694,8 +694,10 @@ void init_controllers(void) {
 
             if (controller->statusData->type & CONT_GCN) {
                 osSyncPrintf("GameCube controller ");
-            } else {
+            } else if (controller->statusData->type & CONT_TYPE_NORMAL) {
                 osSyncPrintf("N64 controller ");
+            } else {
+                osSyncPrintf("Unknown controller ");
             }
             if (controller->statusData->status & CONT_CARD_ON) {
                 osSyncPrintf("with pak ");
