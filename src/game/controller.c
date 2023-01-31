@@ -163,16 +163,16 @@ static const ContCmdData sContCmds[] = {
     [CONT_CMD_RESET             ] = { .tx =  1, .rx =  3 }, // Reset/Info
 };
 
+#define CONT_CMD_NOP                0xFF
+#define CONT_CMD_END                0xFE // indicates end of a command
+#define CONT_CMD_EXE                0x01 // set pif ram status byte to this to do a command
+#define CONT_CMD_SKIP_CHNL          0x00 // Skip channel
+
 // RX Error flags
 #define CONT_CMD_RX_SUCCESSFUL      0x00
 #define CONT_CMD_RX_ERROR_IO        0x40
 #define CONT_CMD_RX_ERROR_NO_DEVICE 0x80
 #define CONT_CMD_RX_ERROR_MASK      0xC0
-
-#define CONT_CMD_NOP                0xFF
-#define CONT_CMD_END                0xFE // indicates end of a command
-#define CONT_CMD_EXE                0x01 // set pif ram status byte to this to do a command
-#define CONT_CMD_SKIP_CHNL          0x00 // Skip channel
 
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);
@@ -525,7 +525,7 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
     pfs->activebank = 0xFF;
     pfs->status = 0;
 
-    if (__osControllerTypes[pfs->channel] != DEVICE_GCN_CONTROLLER) {
+    if (__osControllerTypes[channel] != DEVICE_GCN_CONTROLLER) {
         ret = __osPfsSelectBank(pfs, 0xFE);
 
         if (ret == PFS_ERR_NEW_PACK) {
