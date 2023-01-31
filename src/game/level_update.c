@@ -1281,9 +1281,14 @@ void load_language_text(void) {
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_jp_yay0SegmentRomStart, _translation_jp_yay0SegmentRomEnd);
             break;
 #endif
-#ifdef ENABLE_SPANISH
-        case LANGUAGE_SPANISH:
+#ifdef ENABLE_SPANISH_CASTILIAN
+        case LANGUAGE_SPANISH_CASTILIAN:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_yay0SegmentRomStart, _translation_es_yay0SegmentRomEnd);
+            break;
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+        case LANGUAGE_SPANISH_LATIN_AMERICAN:
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_la_yay0SegmentRomStart, _translation_es_la_yay0SegmentRomEnd);
             break;
 #endif
     }

@@ -56,10 +56,16 @@ extern u8 course_name_table_jp[];
 extern u8 act_name_table_jp[];
 #endif
 
-#ifdef ENABLE_SPANISH
+#ifdef ENABLE_SPANISH_CASTILIAN
 extern u8 dialog_table_es[];
 extern u8 course_name_table_es[];
 extern u8 act_name_table_es[];
+#endif
+
+#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+extern u8 dialog_table_es_la[];
+extern u8 course_name_table_es_la[];
+extern u8 act_name_table_es_la[];
 #endif
 
 // The language table for the game's dialogs, level names and act names.
@@ -86,8 +92,13 @@ void *languageTable[][3] = {
 #else
     {NULL, NULL, NULL},
 #endif
-#ifdef ENABLE_SPANISH
+#ifdef ENABLE_SPANISH_CASTILIAN
     {&dialog_table_es, &course_name_table_es, &act_name_table_es},
+#else
+    {NULL, NULL, NULL},
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+    {&dialog_table_es_la, &course_name_table_es_la, &act_name_table_es_la},
 #else
     {NULL, NULL, NULL},
 #endif

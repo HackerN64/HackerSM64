@@ -63,7 +63,7 @@ struct MainMenuSaveData {
     u8 wideMode: 1;
 #endif
 #ifdef MULTILANG
-    u8 language: 3;
+    u8 language: 4;
 #endif
 
 #ifdef PUPPYCAM

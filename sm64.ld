@@ -318,8 +318,11 @@ SECTIONS
 #ifdef ENABLE_JAPANESE
    YAY0_SEG(translation_jp, 0x19000000)
 #endif
-#ifdef ENABLE_SPANISH
+#ifdef ENABLE_SPANISH_CASTILIAN
    YAY0_SEG(translation_es, 0x19000000)
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+   YAY0_SEG(translation_es_la, 0x19000000)
 #endif
 #endif
 
