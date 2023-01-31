@@ -29,6 +29,6 @@ ALIGNED8 u8 gGfxSPTaskStack[SP_DRAM_STACK_SIZE8];
 ALIGNED8 u8 gGfxSPTaskYieldBuffer[OS_YIELD_DATA_SIZE];
 #endif // UNF
 // 0x200 bytes
-struct SaveBuffer __attribute__ ((aligned (8))) gSaveBuffer;
+ALIGNED8 struct SaveBuffer gSaveBuffer;
 // 0x190a0 bytes
 struct GfxPool gGfxPools[2];
