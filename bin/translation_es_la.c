@@ -1,4 +1,4 @@
-// SM64 (EU) Segment 19 - Español Latino (Not vanilla: Translation created by Alice for the Render96 project. Used with permission.)
+// SM64 (EU) Segment 19 - Español Latino (Not vanilla: Translation created by LonicTH for the Render96 project. Used with permission.)
 
 #include "macros.h"
 
