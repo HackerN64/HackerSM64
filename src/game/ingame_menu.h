@@ -135,7 +135,7 @@ enum MultilangLanguages {
 
 typedef char * LangArray[LANGUAGE_COUNT];
 #define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) {english, french, german, japanese, spanish}
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_castilian, spanish_latin_american) {english, french, german, japanese, spanish_castilian, spanish_latin_american}
 
 #else
 

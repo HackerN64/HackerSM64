@@ -30,6 +30,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
+- **Alice**: Latin American Spanish translation (originally created for Render96, used with permission)
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 

@@ -1142,6 +1142,7 @@ LangArray textEndCutscene1 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "マリオ！！",
+    "¡Mario!",
     "¡Mario!");
 
 LangArray textEndCutscene2 = DEFINE_LANGUAGE_ARRAY(
@@ -1149,6 +1150,7 @@ LangArray textEndCutscene2 = DEFINE_LANGUAGE_ARRAY(
     "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
     "Die Macht der Sterne ruht wieder sicher im Schloss...",
     "おしろにスターが もどったのね",
+    "El poder de las estrellas ha vuelto al castillo...",
     "El poder de las estrellas ha vuelto al castillo...");
 
 LangArray textEndCutscene3 = DEFINE_LANGUAGE_ARRAY(
@@ -1156,6 +1158,7 @@ LangArray textEndCutscene3 = DEFINE_LANGUAGE_ARRAY(
     "...et ceci grâce à toi!",
     "...und alles dank Deiner Hilfe!",
     "みんな あなたのおかげだわ！",
+    "¡y es todo gracias a ti!",
     "¡y es todo gracias a ti!");
 
 LangArray textEndCutscene4 = DEFINE_LANGUAGE_ARRAY(
@@ -1163,6 +1166,7 @@ LangArray textEndCutscene4 = DEFINE_LANGUAGE_ARRAY(
     "Merci, Mario!",
     "Vielen Dank, Mario!",
     "ありがとう マリオ",
+    "¡Gracias, Mario!",
     "¡Gracias, Mario!");
 
 LangArray textEndCutscene5 = DEFINE_LANGUAGE_ARRAY(
@@ -1170,6 +1174,7 @@ LangArray textEndCutscene5 = DEFINE_LANGUAGE_ARRAY(
     "Tu mérites une récompense...",
     "Wir haben eine Überraschung für Dich...",
     "なにか おれいをしなくちゃ・・",
+    "Tenemos que prepararte algo especial...",
     "Tenemos que prepararte algo especial...");
 
 LangArray textEndCutscene6 = DEFINE_LANGUAGE_ARRAY(
@@ -1177,20 +1182,23 @@ LangArray textEndCutscene6 = DEFINE_LANGUAGE_ARRAY(
     "Venez les amis...",
     "Hört alle her...",
     "さあ みんな",
-    "Escuchadme todos:");
+    "Escuchadme todos:",
+    "Escúchenme todos:");
 
 LangArray textEndCutscene7 = DEFINE_LANGUAGE_ARRAY(
     "let's bake a delicious cake...",
     "Allons préparer un délicieux gâteau...",
     "Laßt uns einen leckeren Kuchen backen...",
     "おいしいケーキを やきましょう",
-    "Hagamos una deliciosa tarta...");
+    "Hagamos una deliciosa tarta...",
+    "Cocinemos una deliciosa tarta...");
 
 LangArray textEndCutscene8 = DEFINE_LANGUAGE_ARRAY(
     "...for Mario...",
     "...pour Mario...",
     "...für Mario...",
     "マリオの ために・・・",
+    "...para Mario...",
     "...para Mario...");
 
 LangArray textEndCutscene9 = DEFINE_LANGUAGE_ARRAY(
@@ -1198,6 +1206,7 @@ LangArray textEndCutscene9 = DEFINE_LANGUAGE_ARRAY(
     "Mario!",
     "Mario!",
     "マリオ！！",
+    "¡Mario!",
     "¡Mario!");
 
 LangArray *gEndCutsceneStringsEn[] = {
@@ -1548,14 +1557,16 @@ LangArray textCurrRatio43 = DEFINE_LANGUAGE_ARRAY(
     "RATIO D'ASPECT: 4:3\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 4:3\nDRÜCKE L ZUM WECHSELN",
     "アスペクトひ: ４:３\nＬボタンできりかえ",
-    "RELACIÓN DE ASPECTO: 4:3\nPULSA L PARA CAMBIAR");
+    "RELACIÓN DE ASPECTO: 4:3\nPULSA L PARA CAMBIAR",
+    "RELACIÓN DE ASPECTO: 4:3\nPRESIONA L PARA CAMBIAR");
 
 LangArray textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
     "ASPECT RATIO: 16:9\nPRESS L TO SWITCH",
     "RATIO D'ASPECT: 16:9\nAPPUYEZ SUR L POUR CHANGER",
     "SEITENVERHÄLTNIS: 16:9\nDRÜCKE L ZUM WECHSELN",
     "アスペクトひ: １６:９\nＬボタンできりかえ",
-    "RELACIÓN DE ASPECTO: 16:9\nPULSA L PARA CAMBIAR");
+    "RELACIÓN DE ASPECTO: 16:9\nPULSA L PARA CAMBIAR",
+    "RELACIÓN DE ASPECTO: 16:9\nPRESIONA L PARA CAMBIAR");
 
 /// By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
 #if defined(WIDE) && !defined(PUPPYCAM)
@@ -1580,6 +1591,7 @@ LangArray textCourseX = DEFINE_LANGUAGE_ARRAY(
     "NIVEAU %s",
     "KURS %s",
     "コース%s",
+    "NIVEL %s",
     "NIVEL %s");
 
 LangArray textMyScore = DEFINE_LANGUAGE_ARRAY(
@@ -1587,6 +1599,7 @@ LangArray textMyScore = DEFINE_LANGUAGE_ARRAY(
     "MON SCORE",
     "LEISTUNG",
     "マイスコア",
+    "MI RÉCORD",
     "MI RÉCORD");
 
 #define PAUSE_MENU_LEFT_X  106
@@ -1652,6 +1665,7 @@ LangArray textLakituMario = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "ジュゲム↔マリオ",
+    "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO");
 
 LangArray textLakituStop = DEFINE_LANGUAGE_ARRAY(
@@ -1659,6 +1673,7 @@ LangArray textLakituStop = DEFINE_LANGUAGE_ARRAY(
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "ジュゲム↔ストップ",
+    "LAKITU ↔ FIJA",
     "LAKITU ↔ FIJA");
 
 LangArray textNormalUpClose = DEFINE_LANGUAGE_ARRAY(
@@ -1666,6 +1681,7 @@ LangArray textNormalUpClose = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(GROS-PLAN)",
     "(NORMAL)(WEIT-ZOOM)",
     "（おすすめ）（リアル）",
+    "(NORMAL)(CERCA)",
     "(NORMAL)(CERCA)");
 
 LangArray textNormalFixed = DEFINE_LANGUAGE_ARRAY(
@@ -1673,6 +1689,7 @@ LangArray textNormalFixed = DEFINE_LANGUAGE_ARRAY(
     "(NORMAL)(FIXE)",
     "(NORMAL)(STATIV)",
     "（おすすめ）（とまる）",
+    "(NORMAL)(FIJA)",
     "(NORMAL)(FIJA)");
 
 void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
@@ -1707,6 +1724,7 @@ LangArray textContinue = DEFINE_LANGUAGE_ARRAY(
     "CONTINUER",
     "WEITER",
     "つづけて マリオする？",
+    "CONTINUAR",
     "CONTINUAR");
 
 LangArray textExitCourse = DEFINE_LANGUAGE_ARRAY(
@@ -1714,6 +1732,7 @@ LangArray textExitCourse = DEFINE_LANGUAGE_ARRAY(
     "QUITTER NIVEAU",
     "KURS VERLASSEN",
     "コースからでる？",
+    "SALIR DEL NIVEL",
     "SALIR DEL NIVEL");
 
 LangArray textCameraAngleR = DEFINE_LANGUAGE_ARRAY(
@@ -1721,6 +1740,7 @@ LangArray textCameraAngleR = DEFINE_LANGUAGE_ARRAY(
     "RÉGLAGE CAMÉRA AVEC Ⓡ",
     "KAMERA MIT Ⓡ VERSTELLEN",
     "Ｒボタンのカメラきりかえ",
+    "MODO DE CÁMARA CON Ⓡ",
     "MODO DE CÁMARA CON Ⓡ");
 
 void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
@@ -1789,6 +1809,7 @@ LangArray textPause = DEFINE_LANGUAGE_ARRAY(
     "PAUSE",
     "PAUSE",
     "PAUSE",
+    "PAUSA",
     "PAUSA");
 
 void print_hud_pause_colorful_str(void) {
@@ -1844,6 +1865,7 @@ LangArray textCoinX = DEFINE_LANGUAGE_ARRAY(
     "✪× %s",
     "✪× %s",
     "✪ｘ%s",
+    "✪× %s",
     "✪× %s");
 
 LangArray textStarX = DEFINE_LANGUAGE_ARRAY(
@@ -1851,6 +1873,7 @@ LangArray textStarX = DEFINE_LANGUAGE_ARRAY(
     "★× %s",
     "★× %s",
     "★ｘ%s",
+    "★× %s",
     "★× %s");
 
 void render_pause_castle_main_strings(s16 x, s16 y) {
@@ -2024,6 +2047,7 @@ LangArray textHudHiScore = DEFINE_LANGUAGE_ARRAY(
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "HISCORE",
+    "NUEVO RECORD",
     "NUEVO RECORD");
 
 LangArray textCongratulations = DEFINE_LANGUAGE_ARRAY(
@@ -2031,6 +2055,7 @@ LangArray textCongratulations = DEFINE_LANGUAGE_ARRAY(
     "FELICITATIONS",
     "GRATULATION",
     "CONGRATULATIONS",
+    "FELICIDADES",
     "FELICIDADES");
 
 void print_hud_course_complete_string(s8 str) {
@@ -2097,6 +2122,7 @@ LangArray textClear = DEFINE_LANGUAGE_ARRAY(
     "CLEAR",
     "CLEAR",
     "クリア！",
+    "HECHO",
     "HECHO");
 
 #define COURSE_COMPLETE_COURSE_X 63
@@ -2193,6 +2219,7 @@ LangArray textSaveAndContinue = DEFINE_LANGUAGE_ARRAY(
     "SAUVEGARDER & CONTINUER",
     "SPEICHERN & WEITER",
     "セーブしてつづける？",
+    "GUARDAR Y CONTINUAR",
     "GUARDAR Y CONTINUAR");
 
 LangArray textSaveAndQuit = DEFINE_LANGUAGE_ARRAY(
@@ -2200,6 +2227,7 @@ LangArray textSaveAndQuit = DEFINE_LANGUAGE_ARRAY(
     "SAUVEGARDER & QUITTER",
     "SPEICHERN & ENDE",
     "セーブしておわる？",
+    "GUARDAR Y SALIR",
     "GUARDAR Y SALIR");
 
 LangArray textContinueWithoutSave = DEFINE_LANGUAGE_ARRAY(
@@ -2207,6 +2235,7 @@ LangArray textContinueWithoutSave = DEFINE_LANGUAGE_ARRAY(
     "CONTINUER SANS SAUVEGARDER",
     "WEITER OHNE ZU SPEICHERN",
     "セーブしないでつづける？",
+    "CONTINUAR SIN GUARDAR",
     "CONTINUAR SIN GUARDAR");
 
 void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
