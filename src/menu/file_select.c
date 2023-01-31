@@ -1287,7 +1287,7 @@ LangArray textSelectFile = DEFINE_LANGUAGE_ARRAY(
     "WÄHLE SPIEL",
     "ファイルセレクト",
     "ELIGE ARCHIVO",
-    "SELECCIONA ARCHIVO");
+    "SELECCIONA FICHERO");
 
 LangArray textScore = DEFINE_LANGUAGE_ARRAY(
     "SCORE",
@@ -1484,7 +1484,7 @@ LangArray textEraseFileButton = DEFINE_LANGUAGE_ARRAY(
     "LÖSCHEN",
     "ファイルけす",
     "BORRAR ARCHIVO",
-    "BORRAR ARCHIVO");
+    "BORRAR FICHERO");
 
 /**
  * Prints score menu strings that shows on the green background menu screen.
@@ -1923,7 +1923,7 @@ char *textLanguage[] = {
     "FRANÇAIS",
     "DEUTSCH",
     "にほんご",
-    "ESPAÑOL DE ESPAÑA",
+    "ESPAÑOL ESPAÑA",
     "ESPAÑOL LATINO",
 };
 
