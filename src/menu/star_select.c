@@ -267,6 +267,7 @@ LangArray textActMyScore = DEFINE_LANGUAGE_ARRAY(
     "MON SCORE",
     "LEISTUNG",
     "マイスコア",
+    "MI RÉCORD",
     "MI RÉCORD");
 /**
  * Print act selector strings, some with special checks.

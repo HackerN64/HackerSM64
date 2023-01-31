@@ -1650,6 +1650,7 @@ LangArray textViewScore = DEFINE_LANGUAGE_ARRAY(
     "SCORE",
     "LEISTUNG",
     "スコアをみる",
+    "VER RÉCORDS",
     "VER RÉCORDS");
 
 /**
@@ -1775,8 +1776,8 @@ LangArray textEraseFile = DEFINE_LANGUAGE_ARRAY(
     "EFFACER  FICHIER",
     "SPIEL LÖSCHEN",
     "ファイルけす",
-    "BORRAR ARCHIVO"),
-    "BORRAR FICHERO";
+    "BORRAR ARCHIVO",
+    "BORRAR FICHERO");
 
 LangArray textSure = DEFINE_LANGUAGE_ARRAY(
     "SURE?",
