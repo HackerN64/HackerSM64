@@ -62,7 +62,7 @@ extern u8 course_name_table_es[];
 extern u8 act_name_table_es[];
 #endif
 
-#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
 extern u8 dialog_table_es_la[];
 extern u8 course_name_table_es_la[];
 extern u8 act_name_table_es_la[];
@@ -97,7 +97,7 @@ void *languageTable[][3] = {
 #else
     {NULL, NULL, NULL},
 #endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
     {&dialog_table_es_la, &course_name_table_es_la, &act_name_table_es_la},
 #else
     {NULL, NULL, NULL},

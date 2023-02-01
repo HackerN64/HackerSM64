@@ -242,8 +242,8 @@ void print_course_number(void) {
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_nivel_upper);
             break;
 #endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICAN
-        case LANGUAGE_SPANISH_LATIN_AMERICAN:
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
+        case LANGUAGE_SPANISH_LATIN_AMERICA:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_nivel_upper);
             break;
 #endif

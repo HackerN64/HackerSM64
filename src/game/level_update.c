@@ -1286,8 +1286,8 @@ void load_language_text(void) {
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_yay0SegmentRomStart, _translation_es_yay0SegmentRomEnd);
             break;
 #endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICAN
-        case LANGUAGE_SPANISH_LATIN_AMERICAN:
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
+        case LANGUAGE_SPANISH_LATIN_AMERICA:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_la_yay0SegmentRomStart, _translation_es_la_yay0SegmentRomEnd);
             break;
 #endif

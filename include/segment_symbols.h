@@ -149,7 +149,7 @@ DECLARE_SEGMENT(translation_jp_mio0)
 DECLARE_SEGMENT(translation_es_yay0)
 DECLARE_SEGMENT(translation_es_mio0)
 #endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICAN
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
 DECLARE_SEGMENT(translation_es_la_yay0)
 DECLARE_SEGMENT(translation_es_la_mio0)
 #endif
