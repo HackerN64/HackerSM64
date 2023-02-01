@@ -1934,7 +1934,7 @@ const Gfx dl_menu_texture_kurs_upper[] = {
 };
 #endif
 
-#if defined(ENABLE_SPANISH_CASTILIAN) || defined(ENABLE_SPANISH_LATIN_AMERICAN)
+#if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICAN)
 ALIGNED8 static const Texture texture_menu_nivel_upper[] = {
 #include "levels/menu/main_menu_seg7.nivel_upper.rgba16.inc.c"
 };
@@ -1997,7 +1997,7 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
-#ifdef ENABLE_SPANISH_CASTILIAN
+#ifdef ENABLE_SPANISH_SPAIN
 #define COURSE_NAME_TABLE course_strings_es_table
 #define COURSE_FILE "es/courses.h"
 #include "text/define_courses.inc.c"
@@ -2031,7 +2031,7 @@ const char *(*course_strings_language_table[])[] = {
 #else
     NULL,
 #endif
-#ifdef ENABLE_SPANISH_CASTILIAN
+#ifdef ENABLE_SPANISH_SPAIN
     &course_strings_es_table,
 #else
     NULL,

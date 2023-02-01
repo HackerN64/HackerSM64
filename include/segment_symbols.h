@@ -145,7 +145,7 @@ DECLARE_SEGMENT(translation_de_mio0)
 DECLARE_SEGMENT(translation_jp_yay0)
 DECLARE_SEGMENT(translation_jp_mio0)
 #endif
-#ifdef ENABLE_SPANISH_CASTILIAN
+#ifdef ENABLE_SPANISH_SPAIN
 DECLARE_SEGMENT(translation_es_yay0)
 DECLARE_SEGMENT(translation_es_mio0)
 #endif
