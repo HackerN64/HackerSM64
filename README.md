@@ -19,14 +19,14 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
 - **Arthurtilly**: ASCII / UTF-8 support, Multilang, Platform Displacement 2
 - **Fazana**: PuppyLib, ucode swapping, audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
-- **Reonu**: Starting the project + widescreen, reonucam, various defines for hacker QoL, and a custom Spanish (Spain) translation of the game.
+- **Reonu**: Starting the project. Widescreen, reonucam, various defines for hacker QoL, and a custom Spanish (Spain) translation of the game.
 - **JoshDuMan**: Decomp guy, general assistance
 - **Arceveti**: Silhouette, shadow optimisation, better hanging, breath meter
-- **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
+- **axollyon**: Console testing, bugfixes, idea-guying, initial ASCII implementation, and had a hand in silhouettes
 - **Wiseguy**:  World scale reimplementation, silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
 - **Kaze**: Graph node optimisations, automatic optimal collision distance
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
-- **CrashOveride**: creating the [ultrasm64](https://github.com/CrashOveride95/ultrasm64) repo
+- **CrashOveride**: creating the [ultrasm64](https://github.com/CrashOveride95/ultrasm64) repo that this repo is based on
 - **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
