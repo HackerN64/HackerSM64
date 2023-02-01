@@ -23,10 +23,10 @@ mirarlos y presionar Ⓑ.")
 DEFINE_DIALOG(DIALOG_001, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200,"\
 ¡Cuidado! Si caminas\n\
 por aquí, eres propenso a\n\
-que te peguen por una\n\
-bomba de agua! Estos\n\
+que te peguen con una\n\
+bomba de agua! A estos\n\
 Bob-ombs enemigos les\n\
-gusta pelear, y hayarán\n\
+gusta pelear, y hallarán\n\
 alguna forma de atacar-\n\
 te. Esta pradera se ha\n\
 vuelto en un campo de\n\
@@ -35,7 +35,7 @@ Gran Bob-omb tuvo sus\n\
 manos en la Estrella de\n\
 Poder ¿Puedes recuperar la\n\
 Estrella por nosotros?\n\
-cruza el puente y vé por\n\
+cruza el puente y ve por\n\
 el camino de la izquierda.\n\
 Para encontrar al Gran\n\
 Bob-omb ¡Por favor ven a\n\
@@ -52,8 +52,8 @@ Cruza los dos\n\
 puentes venideros, y\n\
 fíjate por las bombas\n\
 de agua que caen.\n\
-El Gran Bob-omb está en\n\
-el tope de la montaña es\n\
+El Gran Bob-omb, en\n\
+el tope de la montaña, es\n\
 muy poderoso-- ¡No le\n\
 dejes que te agarre!\n\
 Somos Bob-omb amigables,\n\
@@ -107,13 +107,13 @@ el Gran Bob-omb estuvo?\n\
 ciará\n\
 Listo....\n\
 \n\
-//¡Ya!///No aún")
+\t¡Ya!\t\tNo aún")
 
 DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 3, 30, 200,"\
 ¡¡¡Oye!!! No intentes\n\
-engañarme Tienes que\n\
+engañarme. Tienes que\n\
 correr toda la pista.\n\
-Luego. Ven a verme\n\
+Venga, ven a verme\n\
 cuando quieras una\n\
 verdadera carrera.")
 
@@ -139,7 +139,7 @@ Poder aparecerá en el\n\
 prado por el puente.")
 
 DEFINE_DIALOG(DIALOG_009, SOUND_OBJ_KOOPA_TALK, 5, 30, 200,"\
-¡Tiempo de no vernos!\n\
+¡Cuánto tiempo!\n\
 ¡Vaya, te has puesto\n\
 veloz! ¿Has estado entre-\n\
 nando a escondidas, o es\n\
@@ -153,7 +153,7 @@ La meta está en el\n\
 Valle Ventoso.\n\
 ¿Listo?\n\
 \n\
-//¡Ya!///No aún")
+\tVamos\t No aún")
 
 DEFINE_DIALOG(DIALOG_010, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200,"\
 Has apretado el\n\
@@ -166,40 +166,40 @@ ques rojos que encuentres.\n\
 \n\
 ¿Quieres guardar?\n\
 \n\
-//Sí/////No")
+\t\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200,"\
 Has apretado el Interrup-\n\
-tor De la Gorra Metálica!\n\
+tor de la Gorra Metálica!\n\
 Con ella hace que Mario\n\
 sea invencible. Ahora las\n\
 Gorras Metálicas saldrán\n\
-saldrán de los bloques\n\
+de los bloques\n\
 verdes que encuentres.\n\
 \n\
 ¿Quieres guardar?\n\
 \n\
-//Sí/////No")
+\t\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200,"\
 Has apretado el Interrup-\n\
 tor de la Gorra Transpa-\n\
 rente. Con la Gorra Trans-\n\
 parente Mario desapare-\n\
-cerá ahora las Gorras\n\
-Transparentes. Saldrán\n\
+cerá. Ahora las Gorras\n\
+Transparentes saldrán\n\
 de los bloques azules que\n\
 encuentres.\n\
 ¿Quieres guardar?\n\
 \n\
-//Sí/////No")
+\t\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_013, NO_SOUND, 5, 30, 200,"\
 ¡Has conseguido 100\n\
 monedas! Mario obtiene\n\
 poder del castillo.\n\
 ¿Quieres guardar?\n\
-//Sí/////No")
+\t\tSí\t\tNo")
 
 DEFINE_DIALOG(DIALOG_014, NO_SOUND, 4, 30, 200,"\
 ¡Genial! ¡Otra Estrella de\n\
@@ -208,15 +208,15 @@ coraje del poder del\n\
 castillo.\n\
 ¿Quieres guardar?\n\
 \n\
-//¡Claro!///No")
+\tClaro\tLuego")
 
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 5, 30, 200,"\
 Puedes pegarle a los ene-\n\
-migos hasta que caiga.\n\
+migos hasta que caigan.\n\
 Presiona Ⓐ para saltar,\n\
 Ⓑ para pegar. Presiona\n\
-Ⓐ luego Ⓑ para patar.\n\
-para agarrar algo presiona\n\
+Ⓐ y luego Ⓑ para patar.\n\
+Para agarrar algo presiona\n\
 Ⓑ, tambien para tirar\n\
 algo que sostienes \n\
 presiona Ⓑ otra vez.")
@@ -231,10 +231,10 @@ DEFINE_DIALOG(DIALOG_017, 1, 4, 30, 200,"\
 Soy el Gran Bob-omb,\n\
 señor de toda la materia\n\
 explosiva ¡Rey de las\n\
-explociones de todo el\n\
+explosiones de todo el\n\
 mundo! ¿Cómo te atreves\n\
 escalar mi montaña? ¿Con\n\
-que derecho pisas la cima\n\
+qué derecho pisas la cima\n\
 de mi montaña imperial?\n\
 ¡Puede que hayas evitado\n\
 mis guardias, pero nunca\n\
@@ -242,7 +242,7 @@ escaparás de mi alcance...\n\
 \n\
 ...y nunca me quitarás\n\
 mi Estrella de Poder.\n\
-Por la presente razón\n\
+¡Por la presente razón\n\
 te desafío, Mario!\n\
 Si quieres la Estrella que\n\
 poseo, debes demostrar\n\
@@ -330,9 +330,9 @@ DEFINE_DIALOG(DIALOG_030, NO_SOUND, 6, 30, 200,"\
 ¡Hola! Los Hermanos\n\
 Lakitu, grabando en vivo\n\
 una actualización en el\n\
-progreso de Mario. Va ha\n\
+progreso de Mario. Va a\n\
 aprender una técnica para\n\
-escurridirse por los\n\
+escabullirse entre los\n\
 enemigos. El truco es\n\
 este: Tiene caminar\n\
 lentamente para andar con\n\
@@ -340,9 +340,9 @@ cautela.\n\
 \n\
 \n\
 Y para acabar las técnicas\n\
-de cámara antes mensiona-\n\
+de cámara antes menciona-\n\
 das, para echar un vistazo\n\
-alrededor Usa Ⓒ▶ y Ⓒ<.\n\
+alrededor usa Ⓒ▶ y Ⓒ<.\n\
 Presiona Ⓒ| para ver la\n\
 acción desde una distan-\n\
 cia. Cuando no puedas\n\
@@ -365,10 +365,10 @@ ganador de la carrera.\n\
 DEFINE_DIALOG(DIALOG_032, NO_SOUND, 5, 30, 200,"\
 Si tienes la Gorra Alada,\n\
 ¡Podrás volar! Ponte la\n\
-gorra, entonces has un\n\
+gorra, entonces haz un\n\
 Triple Salto--salta tres\n\
 veces en cadena-para\n\
-dejar el suelo. Puedes\n\
+dejar el suelo. ¡Puedes\n\
 volar aún más alto\n\
 si eres disparado desde\n\
 un cañón portando la\n\
@@ -401,7 +401,7 @@ las afueras del castillo\n\
 de la Princesa.\n\
 \n\
 Mario acaba de llegar\n\
-a la escena, y estaremos\n\
+a la escena, y seguiremos\n\
 la acción en vivo y va\n\
 en la misión de recuperar\n\
 y perseguir las Estrellas\n\
@@ -455,17 +455,17 @@ vista de Lakitu o Mario.")
 DEFINE_DIALOG(DIALOG_036, NO_SOUND, 5, 30, 200,"\
 PLATAFORMA DE OBSERVACIÓN\n\
 Presiona Ⓒ▲ para mirar\n\
-alrededor. No te pierdas\n\
-de nada!\n\
+alrededor. ¡No te pierdas\n\
+nada!\n\
 \n\
 Presiona [R] para cambiar\n\
 a la cámara de Mario. Esta\n\
 siempre seguirá a Mario.\n\
 Presiona [R] otra vez para\n\
 cambiar a la cámara de\n\
-Lakitu. Pausa el Juego y\n\
+Lakitu. Pausa el juego y\n\
 cambia la cámara de Mario\n\
-al modo“arreglado”la\n\
+al modo “fijo” la\n\
 cámara estará estática al\n\
 mantener [R]. ¡Pruébalo!")
 
@@ -488,7 +488,7 @@ por decreto del Gran\n\
 Bob-omb\n\
 \n\
 Nunca daré mis Estrellas,\n\
-porqué contienen el\n\
+porque contienen el\n\
 poder del castillo en\n\
 su brillo.\n\
 Son un regalo de\n\
@@ -558,7 +558,7 @@ agarrarte. Suelta Ⓐ para\n\
 soltarte. Te llevaré a\n\
 donde quieras. Mientras\n\
 tanto que mis alas\n\
-aguanten. Observa y\n\
+aguanten. Observa mi\n\
 sombra, y sostente.")
 
 DEFINE_DIALOG(DIALOG_045, NO_SOUND, 6, 95, 200,"\
@@ -583,7 +583,7 @@ entonces salta y saltarás\n\
 bien alto. Después, vé por\n\
 distancia con el Salto\n\
 largo. Corre, presiona Ⓩ\n\
-agacharte luego Ⓐ\n\
+para, agacharte luego Ⓐ\n\
 para saltar bien lejos.\n\
 Para hacer un Salto de\n\
 Pared, presiona Ⓐ para\n\
@@ -598,12 +598,12 @@ vivir sin usarlos.")
 
 DEFINE_DIALOG(DIALOG_047, SOUND_OBJ_BOBOMB_BUDDY_TALK, 2, 95, 200,"\
 ¡Hola! ¡Prepararé el\n\
-cañón para tí!")
+cañón para ti!")
 
 DEFINE_DIALOG(DIALOG_048, NO_SOUND, 5, 30, 200,"\
 Cumbre de la montaña de\n\
 nieve ¡Cuidado con las\n\
-condiciones resbaladisas!\n\
+condiciones resbaladizas!\n\
 Por favor entra a la\n\
 cabaña antes.")
 
@@ -654,18 +654,18 @@ estilo.")
 DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200,"\
 ¡Detente y presiona Ⓩ\n\
 para agacharte, luego pre-\n\
-siona Ⓐ para hacer una,\n\
+siona Ⓐ para hacer un\n\
 Salto Mortal hacia atrás!\n\
 \n\
 Para hacer una voltereta\n\
-Lateral, corre, has una\n\
+Lateral, corre, haz una\n\
 vuelta en U y salta.\n\
 Puedes tomar bastante\n\
 altura con los dos saltos.")
 
 DEFINE_DIALOG(DIALOG_053, NO_SOUND, 5, 30, 200,"\
-A veces, si pasas por a-\n\
-través por un anillo de\n\
+A veces, si pasas por-\n\
+un anillo de\n\
 monedas o encuentras un\n\
 secreto en el nivel, un\n\
 número rojo aparecerá.\n\
@@ -693,7 +693,7 @@ sabes. ¿Qué dices?\n\
 ¿Te parece una carrera?\n\
 Listo...\n\
 \n\
-//Ya//// No aún")
+\t¡Ya!\tNo aún")
 
 DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 5, 30, 200,"\
 ¡Rrrompiste mi récord!\n\
@@ -769,12 +769,12 @@ saltar fuera.")
 DEFINE_DIALOG(DIALOG_061, NO_SOUND, 4, 30, 200,"\
 ¡BRRR! ¡Peligro de\n\
 congelarse! No nade aquí.\n\
-Enserio.\n\
+En serio.\n\
 /--La Pingüina")
 
 DEFINE_DIALOG(DIALOG_062, NO_SOUND, 3, 30, 200,"\
 Ocultos dentro de los\n\
-bloques está la azombrosa\n\
+bloques está la asombrosa\n\
 Gorra Metálica. Portándola\n\
 no recibás daño,\n\
 prenderte en fuego, o ser\n\
@@ -799,7 +799,7 @@ paredes.")
 DEFINE_DIALOG(DIALOG_064, NO_SOUND, 6, 30, 200,"\
 Cuando te pones la Gorra\n\
 Alada que sale de los\n\
-Bloques Rojos, has el\n\
+Bloques Rojos, haz el\n\
 Triple Salto para despegar\n\
 alto en el cielo. Usa el\n\
 Stick de Control para gui-\n\
@@ -820,7 +820,7 @@ Presiona y mantén Ⓐ para\n\
 hacer un lento, nadado\n\
 constante. Mueve hacia\n\
 arriba en el Stick de con-\n\
-trol para busear, y muéve-\n\
+trol para bucear, y muéve-\n\
 lo hacia atrás para sacar\n\
 la cabeza a la superficie.\n\
 Para saltar fuera del agua\n\
@@ -867,7 +867,7 @@ está en tus manos.")
 
 DEFINE_DIALOG(DIALOG_067, SOUND_OBJ_BOWSER_LAUGH, 5, 30, 200,"\
 ¡Mala Suerte, Mario!\n\
-La Princesa Toadstool no\n\
+La Princesa no\n\
 está aquí...¡¡Gwa ja ja!!\n\
 ¡Acércate--intenta aga-\n\
 rrarme por la cola!\n\
@@ -930,8 +930,8 @@ la pista.")
 DEFINE_DIALOG(DIALOG_071, NO_SOUND, 3, 30, 200,"\
 ¡Peligro adelante!\n\
 ¡Cuidado con la nube\n\
-extraña! ¡No inale!\n\
-¡Si se siente debil,\n\
+extraña! ¡No inhale!\n\
+¡Si se siente débil,\n\
 busque suelo alto y\n\
 aire fresco!\n\
 Círculo: Refugio\n\
@@ -992,9 +992,9 @@ que han sido selladas por\n\
 Bowser pueden ser abiertas\n\
 con Poder Estelar.\n\
 \n\
-Pero hay pasadisos\n\
+Pero hay pasadizos\n\
 secretos en el castillo,\n\
-pasadisos que Bowser no\n\
+pasadizos que Bowser no\n\
 encontró.\n\
 \n\
 Uno de esos pasillos está\n\
@@ -1030,11 +1030,11 @@ Y cuando vayas al pueblo\n\
 acuático, puedes inundarlo\n\
 con un gran salto a la\n\
 pintura. ¡Oh, además,\n\
-Mira que encontré!")
+mira qué encontré!")
 
 DEFINE_DIALOG(DIALOG_077, NO_SOUND, 3, 150, 200,"\
-Desenderá para aquel\n\
-que se atreva a\n\
+Está decretado que\n\
+se deben\n\
 bajar los pilares.")
 
 DEFINE_DIALOG(DIALOG_078, NO_SOUND, 6, 30, 200,"\
@@ -1060,7 +1060,7 @@ ir, te daré algo muy\n\
 bueno.\n\
 Así que, ¿Te perece bien?\n\
 \n\
-//Liberarlo/ Sostenerlo")
+\tLiberarlo \tSostenerlo")
 
 DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 1, 30, 200,"\
 ¡Eeeh jee jee jee!")
@@ -1244,7 +1244,7 @@ Ven aquí...\n\
 DEFINE_DIALOG(DIALOG_099, SOUND_OBJ_BOO_LAUGH_LONG, 5, 95, 200,"\
 Eh je je... Ahora,\n\
 eres mío, ¡jee jee!\n\
-Pasaré através de esta\n\
+Pasaré a través de esta\n\
 pared. ¿Puedes hacer\n\
 eso? Jeh, jeh, jeh!")
 
@@ -1284,7 +1284,7 @@ deberá iluminarse...")
 
 DEFINE_DIALOG(DIALOG_104, NO_SOUND, 5, 30, 200,"\
 La sombra estellada frente\n\
-a tí es una“Marca Estre-\n\
+a tí es una “Marca Estre-\n\
 llas.” Cuando recolectes\n\
 las 8 Monedas Rojas, la\n\
 Estrella aparecerá aquí.")
@@ -1382,7 +1382,7 @@ nan obre todos nosotros.\n\
 ¡No! Bueno, no vas a\n\
 limpiarte los zapatos\n\
 sobre mí! ¡Creo que te\n\
-aplasaré por diversión!\n\
+aplastaré por diversión!\n\
 ¿Algún problema con\n\
 ello? Solo trata de\n\
 pegarme, ¡Debilucho! ¡Ja!")
@@ -1456,7 +1456,7 @@ luego!")
 DEFINE_DIALOG(DIALOG_120, NO_SOUND, 4, 30, 200,"\
 ¡Ooowaah! ¿¿¿Cómo pude\n\
 perder??? El poder de las\n\
-Estrellas me fallaron...\n\
+Estrellas me falló...\n\
 esta vez.\n\
 Considera esto un empate.\n\
 La próxima, Estaré en\n\
@@ -1471,17 +1471,17 @@ la torre.\n\
 
 DEFINE_DIALOG(DIALOG_121, NO_SOUND, 5, 30, 200,"\
 ¡Nooo! ¡No puede ser!\n\
-¡¡¿Enserio me venciste,\n\
+¡¡¿En serio me venciste,\n\
 Mario?!! ¡Les dí poder\n\
 a mis tropas, pero ahora\n\
-me desasparezco!\n\
+me desaparezco!\n\
 ¡Arrgghh! ¡Puedo ver paz\n\
 regresar al mundo!\n\
 ¡No puedo verlo! Hmmm...\n\
 Pero no he acabado...\n\
 \n\
 ¡Vamos tropas! ¡Vamos a\n\
-ver el desenlane juntos!\n\
+ver el desenlance juntos!\n\
 ¡Bwa ja ja!")
 
 DEFINE_DIALOG(DIALOG_122, NO_SOUND, 6, 30, 200,"\
@@ -1540,7 +1540,7 @@ DEFINE_DIALOG(DIALOG_129, NO_SOUND, 6, 30, 200,"\
 la Gorra Invisible! Todos\n\
 los bloques azúles que\n\
 encuentres se volverán\n\
-sólidos una vez preciones\n\
+sólidos una vez presiones\n\
 interruptor. Desaparecerás\n\
 cuando te pongas la Gorra\n\
 Invisible, con ella serás\n\
@@ -1553,7 +1553,7 @@ DEFINE_DIALOG(DIALOG_130, NO_SOUND, 5, 30, 200,"\
 Gorra Metálica! Una vez el\n\
 interruptor de la Gorra,\n\
 los bloques verdes se\n\
-volverán solidos. Cuando\n\
+volverán sólidos. Cuando\n\
 tu cuerpo se vuelve\n\
 metálico con la Gorra\n\
 Metálica, ¡Puedes caminar\n\
@@ -1671,7 +1671,7 @@ carás de aquí en poco\n\
 tiempo!\n\
 Aún así, sé cuidadoso.\n\
 Bowser y su banda escri-\n\
-bieron “malo”en el libro.\n\
+bieron “malo” en el libro.\n\
 Sigue mi consejo: Cuando\n\
 ocupes recuperarte de tus\n\
 heridas, agarra monedas.\n\
@@ -1687,7 +1687,7 @@ de Monedas Azúles.\n\
 \n\
 \n\
 \n\
-también, si te caes de un\n\
+También, si te caes de un\n\
 lugar alto, podrías mini-\n\
 mizar el daño si pegas al\n\
 Suelo al momento que vayas\n\
@@ -1749,7 +1749,7 @@ la búsqueda por las\n\
 Estrellas!")
 
 DEFINE_DIALOG(DIALOG_142, NO_SOUND, 5, 150, 200,"\
-¡Haz recuperado tres\n\
+¡Has recuperado tres\n\
 Estrellas de Poder! Ahora\n\
 puedes abrir cualquier\n\
 puerta con un 3 en su\n\
@@ -1785,7 +1785,7 @@ recuperarla!\n\
 Dicen que Bowser se ha\n\
 escabullido por el mar\n\
 y hacia el subsuelo.\n\
-¿Ya lo lograste\n\
+¿Ya lograste\n\
 acorralarlo?")
 
 DEFINE_DIALOG(DIALOG_145, NO_SOUND, 6, 150, 200,"\
@@ -2083,7 +2083,7 @@ jo compañero deslizante.\n\
 ¿Qué te parece?\n\
 Preparado...Listo...\n\
 \n\
-//Ya// Aún no")
+\t¡Ya!\t¡Luego!")
 
 DEFINE_DIALOG(DIALOG_165, NO_SOUND, 5, 30, 200,"\
 No me hago responsable\n\
