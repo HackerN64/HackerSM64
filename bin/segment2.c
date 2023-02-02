@@ -2831,6 +2831,24 @@ const Gfx dl_ia8_up_arrow_end[] = {
 };
 
 // 0x02014958 - 0x02014960
+ALIGNED8 const Texture texture_controller_port[] = {
+#include "textures/segment2/controller_port.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_noport[] = {
+#include "textures/segment2/controller_noport.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_standard[] = {
+#include "textures/segment2/controller_standard.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gamecube[] = {
+#include "textures/segment2/controller_gamecube.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_mouse[] = {
+#include "textures/segment2/controller_mouse.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_voice[] = {
+#include "textures/segment2/controller_voice.rgba16.inc.c"
+};
 
 // 0x02014970 - 0x020149A8
 const Gfx dl_paintings_rippling_begin[] = {
