@@ -47,6 +47,8 @@ extern Gfx *gDisplayListHead;
 extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
 extern u8 gControllerBits;
+extern u8 gRepollingControllers;
+extern u32 gRepollTimer;
 extern u8 gIsConsole;
 extern u8 gCacheEmulated;
 extern u8 gBorderHeight;
@@ -64,9 +66,15 @@ extern s8 gSramProbe;
 
 extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
 extern struct Controller *gPlayer2Controller;
+#endif
+#if (NUM_SUPPORTED_CONTROLLERS > 2)
 extern struct Controller *gPlayer3Controller;
+#endif
+#if (NUM_SUPPORTED_CONTROLLERS > 3)
 extern struct Controller *gPlayer4Controller;
+#endif
 extern struct DemoInput *gCurrDemoInput;
 extern u16 gDemoInputListID;
 extern struct DemoInput gRecordedDemoInput;
@@ -92,5 +100,6 @@ void end_master_display_list(void);
 void render_init(void);
 void select_gfx_pool(void);
 void display_and_vsync(void);
+void start_repolling_controllers();
 
 #endif // GAME_INIT_H

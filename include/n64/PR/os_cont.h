@@ -183,6 +183,9 @@ typedef struct {
 #define CONT_GCN_RIGHT       0x0002
 #define CONT_GCN_LEFT        0x0001
 
+#define GCN_C_STICK_THRESHOLD 38
+#define GCN_TRIGGER_THRESHOLD 85
+
 /* Controller error number */
 
 #define	CONT_ERR_NO_CONTROLLER		PFS_ERR_NOPACK 		/* 1 */

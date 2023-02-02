@@ -211,8 +211,6 @@ u8 __osControllerTypes[MAXCONTROLLERS] = { DEVICE_NONE };
 u8 __osGamecubeRumbleEnabled[MAXCONTROLLERS] = { MOTOR_STOP };
 ControllerCenters gGamecubeControllerCenters[MAXCONTROLLERS] = { 0 };
 
-#define GCN_C_STICK_THRESHOLD 38
-
 ////////////////////
 // contreaddata.c //
 ////////////////////
@@ -341,6 +339,7 @@ static void __osPackReadData(void) {
         if (gControllerBits & (1 << i)) {
             // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN(ptr, 4);
+
             if (skipped) {
                 // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00)
                 // byte for each skipped channel, and CONT_CMD_NOP (0xFF) for alignment.

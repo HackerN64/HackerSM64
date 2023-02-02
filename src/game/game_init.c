@@ -31,6 +31,7 @@
 #include "vc_check.h"
 #include "vc_ultra.h"
 #include "profiling.h"
+#include "fasttext.h"
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -600,22 +601,13 @@ void adjust_analog_stick(struct Controller *controller) {
     }
 }
 
+#define START_REPOLL_COMBO (A_BUTTON | B_BUTTON | START_BUTTON)
+
 /**
  * Update the controller struct with available inputs if present.
  */
-void read_controller_inputs(s32 threadID) {
+void read_controller_inputs(void) {
     s32 i;
-
-    // If any controllers are plugged in, update the controller information.
-    if (gControllerBits) {
-        if (threadID == THREAD_5_GAME_LOOP) {
-            osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-        }
-        osContGetReadDataEx(&gControllerPads[0]);
-#ifdef ENABLE_RUMBLE
-        release_rumble_pak_control();
-#endif
-    }
 
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
@@ -623,8 +615,8 @@ void read_controller_inputs(s32 threadID) {
 
     for (i = 0; i < NUM_SUPPORTED_CONTROLLERS; i++) {
         struct Controller *controller = &gControllers[i];
-        // if we're receiving inputs, update the controller struct with the new button info.
-        if (controller->controllerData != NULL) {
+        // If we're receiving inputs, update the controller struct with the new button info.
+        if (!gRepollingControllers && controller->controllerData != NULL) {
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
             if (gIsConsole && (controller->statusData->type & CONT_GCN)) {
                 u32 oldButton = controller->controllerData->button;
@@ -632,17 +624,21 @@ void read_controller_inputs(s32 threadID) {
                 if (oldButton & Z_TRIG) {
                     newButton |= L_TRIG;
                 }
-                if (controller->controllerData->l_trig > 85) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
+                if (controller->controllerData->l_trig > GCN_TRIGGER_THRESHOLD) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
                     newButton |= Z_TRIG;
                 }
                 controller->controllerData->button = newButton;
             }
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = ~controller->buttonDown & controller->controllerData->button;
-            controller->buttonReleased = ~controller->controllerData->button & controller->buttonDown;
+            controller->buttonPressed = (~controller->buttonDown & controller->controllerData->button);
+            controller->buttonReleased = (~controller->controllerData->button & controller->buttonDown);
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
+            if ((controller->buttonDown & START_REPOLL_COMBO) == START_REPOLL_COMBO) {
+                start_repolling_controllers();
+                return;
+            }
             adjust_analog_stick(controller);
         } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
             controller->rawStickX = 0;
@@ -782,30 +778,42 @@ extern s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data);
 void handle_input(void) {
     if (gRepollingControllers) {
         // Check for new controllers once per second.
-        if ((gRepollTimer++ % 30) == 0) {
-#ifdef ENABLE_RUMBLE
-            block_until_rumble_pak_free();
-#endif
+        if ((gRepollTimer % 30) == 0) {
             osContRepoll(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
+        }
 
-            if (gControllerBits) {
-                init_controllers();
-                gRepollingControllers = FALSE;
-            }
-#ifdef ENABLE_RUMBLE
-            release_rumble_pak_control();
-#endif
-        }
-    } else {
-        // Normal input.
-        if (gControllerBits) {
-#ifdef ENABLE_RUMBLE
-            block_until_rumble_pak_free();
-#endif
-            osContStartReadDataEx(&gSIEventMesgQueue);
-        }
-        read_controller_inputs(THREAD_5_GAME_LOOP);
+        gRepollTimer++;
     }
+
+    // Normal input. If any controllers are plugged in, update the controller information.
+    if (gControllerBits) {
+#ifdef ENABLE_RUMBLE
+        block_until_rumble_pak_free();
+#endif
+        osContStartReadDataEx(&gSIEventMesgQueue);
+        osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        osContGetReadDataEx(&gControllerPads[0]);
+
+        if (gRepollingControllers && gRepollTimer > 30) {
+            for (int i = 0; i < MAXCONTROLLERS; i++) {
+                if (gControllerPads[i].button) {
+                    // If any button is pressed, stop polling and assign the controllers.
+                    init_controllers();
+                    gRepollingControllers = FALSE;
+                    break;
+                }
+            }
+        }
+#ifdef ENABLE_RUMBLE
+        release_rumble_pak_control();
+#endif
+    } else if (!gRepollingControllers) {
+        // Start repolling controllers if all ports are empty and we're not already polling.
+        start_repolling_controllers();
+    }
+
+    read_controller_inputs();
+
     profiler_update(PROFILER_TIME_CONTROLLERS);
 }
 

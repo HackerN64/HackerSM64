@@ -26,6 +26,7 @@
 #include "debug_box.h"
 #include "engine/colors.h"
 #include "profiling.h"
+#include "fasttext.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
@@ -85,14 +86,6 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-#if MULTILANG
-const char *gNoControllerMsg[] = {
-    "NO CONTROLLER",
-    "MANETTE DEBRANCHEE",
-    "CONTROLLER FEHLT",
-};
-#endif
-
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
 
@@ -115,20 +108,12 @@ void print_intro_text(void) {
     s32 language = eu_get_language();
 #endif
     if ((gGlobalTimer & 31) < 20) {
-        if (gControllerBits == 0) {
-#if MULTILANG
-            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
-#endif
-        } else {
 #ifdef VERSION_EU
-            print_text(20, 20, "START");
+        print_text(20, 20, "START");
 #else
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
+        print_text_centered(60, 38, "PRESS");
+        print_text_centered(60, 20, "START");
 #endif
-        }
     }
 }
 
@@ -375,6 +360,87 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
+const Gfx dl_controller_icons_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_COPY),
+    gsDPSetTexturePersp(G_TP_NONE),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
+    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, (SCREEN_WIDTH - 1), (SCREEN_HEIGHT - 1)),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_controller_icons_end[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsSPEndDisplayList(),
+};
+
+void render_controllers_overlay(void) {
+    if (gRepollingControllers) {
+        drawSmallStringDL((SCREEN_CENTER_X - 78), (SCREEN_CENTER_Y - 40), "CONTROLLER DISCONNECTED");
+        if ((gRepollTimer & 31) < 20) {
+            drawSmallStringDL((SCREEN_CENTER_X - 64), (SCREEN_CENTER_Y - 28), "Waiting for Controllers...");
+        }
+
+        u32 x = SCREEN_CENTER_X;
+        u32 y = (SCREEN_CENTER_Y - 16);
+        u32 w = 32;
+        u32 h = 32;
+        Gfx* dlHead = gDisplayListHead;
+        gSPDisplayList(dlHead++, dl_controller_icons_begin);
+
+        Texture *texture_controller = texture_controller_noport;
+        for (int i = 0; i < MAXCONTROLLERS; i++) {
+            x = (SCREEN_CENTER_X - 64) + (32 * i);
+            if (gControllerBits & (1 << i)) {
+                u16 type = gControllerStatuses[i].type;
+                if (type & CONT_TYPE_NORMAL) {
+                    texture_controller = texture_controller_standard;
+                } else if (type & CONT_GCN) {
+                    texture_controller = texture_controller_gamecube;
+                } else if (type & CONT_TYPE_MOUSE) {
+                    texture_controller = texture_controller_mouse;
+                } else if (type & CONT_TYPE_VOICE) {
+                    texture_controller = texture_controller_voice;
+                } else {
+                    texture_controller = texture_controller_port;
+                }
+            } else {
+                texture_controller = texture_controller_noport;
+            }
+            gDPLoadTextureTile(dlHead++, texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b, w, 0, 0, 0, (w - 1), (h - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+            gSPTextureRectangle(dlHead++, (x << 2), (y << 2), ((x + w - 1) << 2), ((y + h - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10));
+        }
+
+        gSPDisplayList(dlHead++, dl_controller_icons_end);
+        gDisplayListHead = dlHead;
+
+
+        int playerNum = 0;
+        char text_buffer_player_num[2 + 1];
+        for (int i = 0; i < MAXCONTROLLERS; i++) {
+            if (gControllerBits & (1 << i)) {
+                x = (SCREEN_CENTER_X - 64) + (32 * i) + 8;
+                playerNum++;
+                sprintf(text_buffer_player_num, "P%d", playerNum);
+                drawSmallStringDL(x, (SCREEN_CENTER_Y + 16), text_buffer_player_num);
+            }
+        }
+
+        char text_buffer_controller_count[15 + 1];
+        sprintf(text_buffer_controller_count, "%d/%d Controllers", __builtin_popcount(gControllerBits), NUM_SUPPORTED_CONTROLLERS);
+        drawSmallStringDL((SCREEN_CENTER_X - 44), (SCREEN_CENTER_Y + 28), text_buffer_controller_count);
+
+        if (gControllerBits) {
+            drawSmallStringDL((SCREEN_CENTER_X - 52), (SCREEN_CENTER_Y + 40), "PRESS ANY BUTTON");
+        }
+    }
+}
+
 void render_game(void) {
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
@@ -431,7 +497,9 @@ void render_game(void) {
 
     gViewportOverride = NULL;
     gViewportClip     = NULL;
-    
+
+    render_controllers_overlay();
+
     profiler_update(PROFILER_TIME_GFX);
     profiler_print_times();
 

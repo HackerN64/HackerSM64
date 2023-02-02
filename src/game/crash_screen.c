@@ -392,7 +392,7 @@ OSThread *get_crashed_thread(void) {
 extern u16 sRenderedFramebuffer;
 extern void audio_signal_game_loop_tick(void);
 extern void stop_sounds_in_continuous_banks(void);
-extern void read_controller_inputs(s32 threadID);
+extern void read_controller_inputs(void);
 extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 
 void thread2_crash_screen(UNUSED void *arg) {
@@ -421,13 +421,18 @@ void thread2_crash_screen(UNUSED void *arg) {
                 continue;
             }
         } else {
+            // If any controllers are plugged in, update the controller information.
             if (gControllerBits) {
 #ifdef ENABLE_RUMBLE
                 block_until_rumble_pak_free();
 #endif
                 osContStartReadDataEx(&gSIEventMesgQueue);
+                osContGetReadDataEx(&gControllerPads[0]);
+#ifdef ENABLE_RUMBLE
+                release_rumble_pak_control();
+#endif
             }
-            read_controller_inputs(THREAD_2_CRASH_SCREEN);
+            read_controller_inputs();
             draw_crash_screen(thread);
         }
     }
