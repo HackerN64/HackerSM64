@@ -43,6 +43,8 @@ struct Controller gControllers[NUM_SUPPORTED_CONTROLLERS];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 u8 gControllerBits; // Which ports have a controller connected to them.
+u8 gRepollingControllers = FALSE;
+u32 gRepollTimer = 0;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -614,6 +616,7 @@ void read_controller_inputs(s32 threadID) {
         release_rumble_pak_control();
 #endif
     }
+
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
 #endif
@@ -761,6 +764,52 @@ void setup_game_memory(void) {
 }
 
 /**
+ * Start polling for new controllers.
+ */
+void start_repolling_controllers(void) {
+    gRepollingControllers = TRUE;
+    gRepollTimer = 0;
+#ifdef ENABLE_RUMBLE
+    cancel_rumble();
+#endif
+}
+
+extern s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data);
+
+/**
+ * Handle input and status from controllers.
+ */
+void handle_input(void) {
+    if (gRepollingControllers) {
+        // Check for new controllers once per second.
+        if ((gRepollTimer++ % 30) == 0) {
+#ifdef ENABLE_RUMBLE
+            block_until_rumble_pak_free();
+#endif
+            osContRepoll(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
+
+            if (gControllerBits) {
+                init_controllers();
+                gRepollingControllers = FALSE;
+            }
+#ifdef ENABLE_RUMBLE
+            release_rumble_pak_control();
+#endif
+        }
+    } else {
+        // Normal input.
+        if (gControllerBits) {
+#ifdef ENABLE_RUMBLE
+            block_until_rumble_pak_free();
+#endif
+            osContStartReadDataEx(&gSIEventMesgQueue);
+        }
+        read_controller_inputs(THREAD_5_GAME_LOOP);
+    }
+    profiler_update(PROFILER_TIME_CONTROLLERS);
+}
+
+/**
  * Main game loop thread. Runs forever as long as the game continues.
  */
 void thread5_game_loop(UNUSED void *arg) {
@@ -800,19 +849,11 @@ void thread5_game_loop(UNUSED void *arg) {
             continue;
         }
 
-        // If any controllers are plugged in, start read the data for when
-        // read_controller_inputs is called later.
-        if (gControllerBits) {
-#ifdef ENABLE_RUMBLE
-            block_until_rumble_pak_free();
-#endif
-            osContStartReadDataEx(&gSIEventMesgQueue);
-        }
-
         audio_game_loop_tick();
         select_gfx_pool();
-        read_controller_inputs(THREAD_5_GAME_LOOP);
-        profiler_update(PROFILER_TIME_CONTROLLERS);
+
+        handle_input();
+
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();

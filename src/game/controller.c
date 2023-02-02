@@ -251,6 +251,11 @@ void osContGetReadDataEx(OSContPadEx* data) {
             // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN(ptr, 4);
 
+            if (CHNL_ERR(*(__OSContReadFormat*)ptr) & (CHNL_ERR_NORESP >> 4)) {
+                start_repolling_controllers();
+                return;
+            }
+
             if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
                 s32 stick_x, stick_y, c_stick_x, c_stick_y;
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
@@ -390,6 +395,49 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
     if (c_stick_x < -GCN_C_STICK_THRESHOLD) ret |= L_CBUTTONS;
     if (c_stick_y >  GCN_C_STICK_THRESHOLD) ret |= U_CBUTTONS;
     if (c_stick_y < -GCN_C_STICK_THRESHOLD) ret |= D_CBUTTONS;
+
+    return ret;
+}
+
+/////////////////
+// contreset.c //
+/////////////////
+
+void __osPackResetData(void);
+void __osPackRequestData(u8);
+void __osContGetInitDataEx(u8*, OSContStatus*);
+
+// Modified version of osContReset. Used to re-poll for controllers after osContInit has already been run.
+s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data) {
+    s32 ret;
+
+    __osSiGetAccess();
+
+    // Slight optimization by changing this here instead of calling osContSetCh beforehand.
+    __osMaxControllers = MAXCONTROLLERS;
+
+    if (__osContLastCmd != CONT_CMD_RESET) {
+        __osPackResetData();
+
+        ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
+        osRecvMesg(mq, NULL, OS_MESG_BLOCK);
+
+        ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
+        osRecvMesg(mq, NULL, OS_MESG_BLOCK);
+
+        __osPackRequestData(CONT_CMD_RESET);
+
+        ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
+        osRecvMesg(mq, NULL, OS_MESG_BLOCK);
+
+        __osContLastCmd = CONT_CMD_RESET;
+    }
+
+    ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
+    osRecvMesg(mq, NULL, OS_MESG_BLOCK);
+
+    __osContGetInitDataEx(bitpattern, data);
+    __osSiRelAccess();
 
     return ret;
 }

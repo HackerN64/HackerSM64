@@ -422,6 +422,11 @@ ALIGNED8 static const Texture title_texture_rumble_pak_es[] = {
 };
 #endif
 
+#define RUMBLE_X 220
+#define RUMBLE_Y 200
+#define RUMBLE_W 80
+#define RUMBLE_H 24
+
 const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_COPY),
@@ -433,7 +438,7 @@ const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
 };
 
 const Gfx title_screen_bg_dl_rumble_pak_end[] = {
-    gsSPTextureRectangle((220 << 2), (200 << 2), ((300 - 1) << 2), ((224 - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
+    gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), ((RUMBLE_X + RUMBLE_W - 1) << 2), ((RUMBLE_Y + RUMBLE_H - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
     gsDPSetTexturePersp(G_TP_PERSP),
@@ -469,7 +474,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
-                gDPLoadTextureTile(dlIter++, title_texture_rumble_pak_en, G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 0, 0, 0, (80 - 1), (24 - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 7, 5, G_TX_NOLOD, G_TX_NOLOD);
+                gDPLoadTextureTile(dlIter++, title_texture_rumble_pak_en, G_IM_FMT_RGBA, G_IM_SIZ_16b, RUMBLE_W, 0, 0, 0, (RUMBLE_W - 1), (RUMBLE_H - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
                 gSPEndDisplayList(dlIter);
             }

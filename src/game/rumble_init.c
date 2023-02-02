@@ -237,7 +237,7 @@ static void thread6_rumble_loop(UNUSED void *arg) {
             if (sRumblePakErrorCount >= 30) {
                 sRumblePakActive = FALSE;
             }
-        } else if ((gNumVblanks % 60) == 0) {
+        } else if ((gNumVblanks % 60) == 0) { // Check Rumble Pak status once per second.
             sRumblePakActive = !osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gControllers[0].port);
             sRumblePakErrorCount = 0;
         }
