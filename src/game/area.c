@@ -27,6 +27,7 @@
 #include "engine/colors.h"
 #include "profiling.h"
 #include "fasttext.h"
+#include "controller.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];

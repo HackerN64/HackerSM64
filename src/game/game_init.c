@@ -18,6 +18,7 @@
 #include "print.h"
 #include "segment2.h"
 #include "segment_symbols.h"
+#include "controller.h"
 #include "rumble_init.h"
 #ifdef HVQM
 #include <hvqm/hvqm.h>
@@ -43,7 +44,7 @@ struct GfxPool *gGfxPool;
 struct Controller gControllers[NUM_SUPPORTED_CONTROLLERS];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
-u8 gControllerBits; // Which ports have a controller connected to them.
+u8 gControllerBits = 0x0; // Which ports have a controller connected to them.
 u8 gRepollingControllers = FALSE;
 u32 gRepollTimer = 0;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
@@ -769,8 +770,6 @@ void start_repolling_controllers(void) {
     cancel_rumble();
 #endif
 }
-
-extern s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data);
 
 /**
  * Handle input and status from controllers.
