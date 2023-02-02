@@ -1283,7 +1283,7 @@ void load_language_text(void) {
 #endif
 #ifdef ENABLE_SPANISH_SPAIN
         case LANGUAGE_SPANISH_SPAIN:
-            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_yay0SegmentRomStart, _translation_es_yay0SegmentRomEnd);
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_es_yay0SegmentRomStart, _translation_es_es_yay0SegmentRomEnd);
             break;
 #endif
 #ifdef ENABLE_SPANISH_LATIN_AMERICA

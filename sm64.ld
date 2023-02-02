@@ -319,7 +319,7 @@ SECTIONS
    YAY0_SEG(translation_jp, 0x19000000)
 #endif
 #ifdef ENABLE_SPANISH_SPAIN
-   YAY0_SEG(translation_es, 0x19000000)
+   YAY0_SEG(translation_es_es, 0x19000000)
 #endif
 #ifdef ENABLE_SPANISH_LATIN_AMERICA
    YAY0_SEG(translation_es_la, 0x19000000)

@@ -56,7 +56,7 @@ extern const char *course_strings_de_table[];
 extern const char *course_strings_jp_table[];
 #endif
 #ifdef ENABLE_SPANISH_SPAIN
-extern const char *course_strings_es_table[];
+extern const char *course_strings_es_es_table[];
 #endif
 #ifdef ENABLE_SPANISH_LATIN_AMERICA
 extern const char *course_strings_es_la_table[];

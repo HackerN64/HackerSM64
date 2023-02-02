@@ -1998,8 +1998,8 @@ const Collision main_menu_seg7_collision[] = {
 #endif
 
 #ifdef ENABLE_SPANISH_SPAIN
-#define COURSE_NAME_TABLE course_strings_es_table
-#define COURSE_FILE "es/courses.h"
+#define COURSE_NAME_TABLE course_strings_es_es_table
+#define COURSE_FILE "es_es/courses.h"
 #include "text/define_courses.inc.c"
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
@@ -2032,7 +2032,7 @@ const char *(*course_strings_language_table[])[] = {
     NULL,
 #endif
 #ifdef ENABLE_SPANISH_SPAIN
-    &course_strings_es_table,
+    &course_strings_es_es_table,
 #else
     NULL,
 #endif
