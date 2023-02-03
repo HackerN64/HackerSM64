@@ -102,7 +102,7 @@ typedef struct {
 #define MAXCONTROLLERS  6
 #endif
 
-/* controller errors */
+/* Controller errors */
 #define CONT_NO_RESPONSE_ERROR          0x8
 #define CONT_OVERRUN_ERROR              0x4
 #ifdef _HW_VERSION_1
@@ -126,12 +126,12 @@ typedef struct {
 #define	CONT_TYPE_MASK          (0x1F00 | CONT_ABSOLUTE | CONT_RELATIVE | CONT_JOYPORT | CONT_GCN | CONT_WIRELESS) // 0x1F8F
 
 #define	CONT_TYPE_NORMAL        (0x0000 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
-#define CONT_TYPE_GCN           (0x0000 | CONT_GCN | CONT_ABSOLUTE) // 0x0009
 #define	CONT_TYPE_MOUSE         (0x0000 | CONT_RELATIVE) // 0x0002
 #define	CONT_TYPE_VOICE         (0x0100) // 0x0100
 #define CONT_TYPE_KEYBOARD      (0x0200) // 0x0200
 #define CONT_TYPE_TRAIN         (0x0400 | 0x0020) // 0x0420
 #define CONT_TYPE_GBA           (0x0400) // 0x0400
+#define CONT_TYPE_GCN           (0x0000 | CONT_GCN | CONT_ABSOLUTE) // 0x0009
 #define CONT_TYPE_GCN_RECEIVER  (0x0000 | CONT_WIRELESS | CONT_GCN) // 0x0088
 #define CONT_TYPE_GCN_WAVEBIRD  (0x1000 | CONT_WIRELESS | CONT_GCN | CONT_ABSOLUTE | CONT_RELATIVE) // 0x108B
 #define CONT_TYPE_GCN_WHEEL     (0x0000 | CONT_GCN) // 0x0008
@@ -143,7 +143,7 @@ typedef struct {
 #define CONT_CARD_ON            0x01
 #define CONT_CARD_PULL          0x02
 #define CONT_ADDR_CRC_ER        0x04
-#define CONT_EEPROM_BUSY	0x80
+#define CONT_EEPROM_BUSY        0x80
 
 /* Buttons */
 

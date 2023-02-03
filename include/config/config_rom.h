@@ -18,12 +18,9 @@
 /**
  * The maximum number of supported controllers. 1-4.
  * This will save performance if the player has extra unused controllers plugged in.
- * NOTE: Default is 2, maximum is 4.
- * NOTE: Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
- *       so ports 1 and 2 get swapped if port 1 is an N64 controller and port 2 is a GC controller.
- *       This define should be at least 2 if you want to allow GC controllers on those flashcarts.
+ * NOTE: Default is 1, maximum is 4.
  */
-#define NUM_SUPPORTED_CONTROLLERS 2
+#define NUM_SUPPORTED_CONTROLLERS 1
 
 /**
  * Informs supported emulators to default to gamecube controller inputs.

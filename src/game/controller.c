@@ -7,7 +7,7 @@
 
 // Joybus commands
 // from: http://en64.shoutwiki.com/wiki/SI_Registers_Detailed#CONT_CMD_Usage
-static const ContCmdData sContCmds[] = {
+static const OSContCmdData sContCmds[] = {
     // N64 Controller
     [CONT_CMD_REQUEST_STATUS    ] = { .tx =  1, .rx =  3 }, // Info
     [CONT_CMD_READ_BUTTON       ] = { .tx =  1, .rx =  4 }, // Input Status //! .rx is 8 for GCN rumble only
@@ -45,9 +45,8 @@ void __osSiRelAccess(void);
 // Gamecube additions //
 ////////////////////////
 
-u8 __osControllerTypes[MAXCONTROLLERS] = { DEVICE_NONE };
-u8 __osGamecubeRumbleEnabled[MAXCONTROLLERS] = { MOTOR_STOP };
 ControllerCenter gGamecubeControllerCenters[MAXCONTROLLERS] = { 0 };
+OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
 
 ////////////////////
 // contreaddata.c //
@@ -55,6 +54,7 @@ ControllerCenter gGamecubeControllerCenters[MAXCONTROLLERS] = { 0 };
 
 static void __osPackReadData(void);
 static u16 __osTranslateGCNButtons(u16, s32, s32);
+
 
 // Called by threads
 s32 osContStartReadDataEx(OSMesgQueue* mq) {
@@ -83,16 +83,18 @@ void osContGetReadDataEx(OSContPadEx* data) {
     int i;
 
     for (i = 0; i < __osMaxControllers; i++, data++) {
-        if (gControllerBits & (1 << i)) {
+        OSPortInfo *portInfo = &gPortInfo[i];
+
+        if (portInfo->plugged && (gRepollingControllers || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
-            ptr = (u8 *)ALIGN(ptr, 4);
+            ptr = (u8 *)ALIGN4(ptr);
 
             if (CHNL_ERR(*(__OSContReadFormat*)ptr) & (CHNL_ERR_NORESP >> 4)) {
                 start_repolling_controllers();
                 return;
             }
 
-            if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
+            if (portInfo->type & CONT_GCN) {
                 s32 stick_x, stick_y, c_stick_x, c_stick_y;
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
                 data->errno = CHNL_ERR(readformatgcn);
@@ -174,21 +176,23 @@ static void __osPackReadData(void) {
     readformatgcn.stick_y     = -1;
 
     for (i = 0; i < __osMaxControllers; i++) {
-        if (gControllerBits & (1 << i)) {
+        OSPortInfo *portInfo = &gPortInfo[i];
+
+        if (portInfo->plugged && (gRepollingControllers || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
-            ptr = (u8 *)ALIGN(ptr, 4);
+            ptr = (u8 *)ALIGN4(ptr);
 
             if (skipped) {
                 // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00)
-                // byte for each skipped channel, and CONT_CMD_NOP (0xFF) for alignment.
+                //   byte for each skipped channel, and CONT_CMD_NOP (0xFF) for alignment.
                 // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
-                //  while bytes of 0x00 increment the channel counter.
+                //   while bytes of 0x00 increment the channel counter.
                 *(u32 *)(ptr - 4) = ~BITMASK(skipped * 8);
                 skipped = 0;
             }
 
-            if (__osControllerTypes[i] == DEVICE_GCN_CONTROLLER) {
-                readformatgcn.rumble = __osGamecubeRumbleEnabled[i];
+            if (portInfo->type & CONT_GCN) {
+                readformatgcn.rumble = portInfo->gcRumble;
                 *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
                 ptr += sizeof(__OSContGCNShortPollFormat);
             } else {
@@ -237,46 +241,13 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
 }
 
 /////////////////
-// contreset.c //
+// contquery.c //
 /////////////////
 
-void __osPackResetData(void);
-void __osPackRequestData(u8);
 void __osContGetInitDataEx(u8*, OSContStatus*);
 
-// Modified version of osContReset. Used to re-poll for controllers after osContInit has already been run.
-s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data) {
-    s32 ret;
-
-    __osSiGetAccess();
-
-    // Slight optimization by changing this here instead of calling osContSetCh beforehand.
-    __osMaxControllers = MAXCONTROLLERS;
-
-    if (__osContLastCmd != CONT_CMD_RESET) {
-        __osPackResetData();
-
-        ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
-        osRecvMesg(mq, NULL, OS_MESG_BLOCK);
-
-        ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
-        osRecvMesg(mq, NULL, OS_MESG_BLOCK);
-
-        __osPackRequestData(CONT_CMD_RESET);
-
-        ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
-        osRecvMesg(mq, NULL, OS_MESG_BLOCK);
-
-        __osContLastCmd = CONT_CMD_RESET;
-    }
-
-    ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
-    osRecvMesg(mq, NULL, OS_MESG_BLOCK);
-
+void osContGetQueryEx(u8 *bitpattern, OSContStatus* data) {
     __osContGetInitDataEx(bitpattern, data);
-    __osSiRelAccess();
-
-    return ret;
 }
 
 //////////////////
@@ -284,7 +255,7 @@ s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data) {
 //////////////////
 
 // Linker script will resolve references to the original function with this one instead.
-// Called by osContInit and osContGetQuery
+// Called by osContInit, osContGetQuery, and osContReset
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequesFormat requestHeader;
@@ -296,24 +267,20 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         data->error = CHNL_ERR(requestHeader);
         if (data->error == 0) {
             data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
-
-            __osControllerTypes[i] = DEVICE_N64_CONTROLLER;
+            OSPortInfo *portInfo = &gPortInfo[i];
 
             // Check the type of controller
             // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
-            //   so check for that and leave the input type as N64 controller if so.
+            //   so check for that and set the input type to N64 controller if so.
             if ((s16)data->type == -1) {
-                if (data->type & CONT_GCN) {
-                    __osControllerTypes[i] = DEVICE_GCN_CONTROLLER;
-                } else if (data->type & CONT_TYPE_MOUSE) {
-                    __osControllerTypes[i] = DEVICE_MOUSE;
-                } else if (data->type & CONT_TYPE_VOICE) {
-                    __osControllerTypes[i] = DEVICE_VRU;
-                }
+                portInfo->type = CONT_TYPE_NORMAL;
+            } else {
+                portInfo->type = data->type;
             }
 
             data->status = requestHeader.status;
 
+            portInfo->plugged = TRUE;
             bits |= (1 << i);
         }
     }
@@ -327,10 +294,8 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
-#define READFORMAT(ptr) ((__OSContRamReadFormat*)(ptr))
-
 // osMotorStart & osMotorStop
-s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
+s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
     s32 ret = 0;
     u8* ptr = (u8*)&__MotorDataBuf[pfs->channel];
     int i;
@@ -339,8 +304,8 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         return PFS_ERR_INVALID;
     }
 
-    if (__osControllerTypes[pfs->channel] == DEVICE_GCN_CONTROLLER) {
-        __osGamecubeRumbleEnabled[pfs->channel] = flag;
+    if (gPortInfo[pfs->channel].type & CONT_GCN) {
+        gPortInfo[pfs->channel].gcRumble = vibrate;
         __osContLastCmd = CONT_CMD_END;
     } else {
         __osSiGetAccess();
@@ -348,7 +313,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         ptr += pfs->channel;
 
         for (i = 0; i < BLOCKSIZE; i++) {
-            READFORMAT(ptr)->data[i] = flag;
+            READFORMAT(ptr)->data[i] = vibrate;
         }
 
         __osContLastCmd = CONT_CMD_END;
@@ -359,7 +324,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
 
         ret = (READFORMAT(ptr)->rxsize & CHNL_ERR_MASK);
         if (!ret) {
-            if (!flag) {
+            if (!vibrate) {
                 // MOTOR_STOP
                 if (READFORMAT(ptr)->datacrc != 0) {
                     ret = PFS_ERR_CONTRFAIL;
@@ -403,18 +368,18 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
 
 s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
     s32 ret;
-    u8 temp[32];
+    u8 temp[BLOCKSIZE];
 
     pfs->queue = mq;
     pfs->channel = channel;
     pfs->activebank = 0xFF;
     pfs->status = 0;
 
-    if (__osControllerTypes[channel] != DEVICE_GCN_CONTROLLER) {
+    if (gPortInfo[channel].type == CONT_TYPE_NORMAL) {
         ret = __osPfsSelectBank(pfs, 0xFE);
 
         if (ret == PFS_ERR_NEW_PACK) {
-            ret = __osPfsSelectBank(pfs, 0x80);
+            ret = __osPfsSelectBank(pfs, MOTOR_ID);
         }
 
         if (ret != 0) {
@@ -431,11 +396,11 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
             return ret;
         }
 
-        if (temp[31] == 0xFE) {
+        if (temp[BLOCKSIZE - 1] == 0xFE) {
             return PFS_ERR_DEVICE;
         }
 
-        ret = __osPfsSelectBank(pfs, 0x80);
+        ret = __osPfsSelectBank(pfs, MOTOR_ID);
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL;
         }

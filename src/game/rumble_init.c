@@ -260,7 +260,7 @@ void cancel_rumble(void) {
     gRumbleDataQueue[2].comm = 0;
 
     gCurrRumbleSettings.timer = 0;
-    gCurrRumbleSettings.slip  = 0;
+    gCurrRumbleSettings.slip = 0;
 
     gRumblePakTimer = 0;
 }
@@ -271,7 +271,7 @@ void create_thread_6(void) {
     osStartThread(&gRumblePakThread);
 }
 
-#define VRTC 0x56525443
+#define VRTC (('V' << 24) | ('R' << 16) | ('T' << 8) | ('C' << 0))
 
 void rumble_thread_update_vi(void) {
     if (!sRumblePakThreadActive) {

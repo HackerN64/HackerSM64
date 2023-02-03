@@ -30,7 +30,7 @@ enum ZBmodes {
     CLEAR_ZBUFFER = 1,
 };
 
-extern struct Controller gControllers[NUM_SUPPORTED_CONTROLLERS];
+extern struct Controller gControllers[MAXCONTROLLERS];
 extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
 extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 extern OSMesgQueue gGameVblankQueue;
@@ -46,6 +46,7 @@ extern struct SPTask *gGfxSPTask;
 extern Gfx *gDisplayListHead;
 extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
+extern u8 gNumPlayers;
 extern u8 gControllerBits;
 extern u8 gRepollingControllers;
 extern u32 gRepollTimer;
@@ -64,17 +65,18 @@ extern s8 gEepromProbe;
 extern s8 gSramProbe;
 #endif
 
+// This button combo should be standard, so don't change it unless you have a very good reason.
+#define START_CONTROLLER_REPOLL_COMBO       (A_BUTTON | B_BUTTON | START_BUTTON)
+// How long after doing the combo to either start polling or start looking for the combo again, in frames. Default is 15.
+#define CONTROLLER_REPOLL_COMBO_COOLDOWN    15
+// How often to repoll for controllers when gRepollingControllers is true, in frames. Default is 30.
+#define CONTROLLER_REPOLL_TIME              30
+
 extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
 extern struct Controller *gPlayer2Controller;
-#endif
-#if (NUM_SUPPORTED_CONTROLLERS > 2)
 extern struct Controller *gPlayer3Controller;
-#endif
-#if (NUM_SUPPORTED_CONTROLLERS > 3)
 extern struct Controller *gPlayer4Controller;
-#endif
 extern struct DemoInput *gCurrDemoInput;
 extern u16 gDemoInputListID;
 extern struct DemoInput gRecordedDemoInput;

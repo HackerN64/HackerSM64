@@ -10,6 +10,16 @@
 
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
+/**
+ * 00000000 00000000
+ * 00000000 00000000
+ * 00000000 00000000
+ * 00000000 00000000
+ * 00000000 00000000
+ * 00000000 00000000
+ *                ^^
+ *         pifstatus
+ */
 typedef struct
 {
     /* 0x00 */ u32 ramarray[15];
@@ -97,7 +107,7 @@ extern u8 __osContLastCmd;
 typedef struct {
     /* 0x00 */ u8 tx;
     /* 0x01 */ u8 rx;
-} ContCmdData; // size = 0x02
+} OSContCmdData; // size = 0x02
 
 enum ContCmds {
     // N64 Controller
@@ -171,6 +181,22 @@ typedef struct
     /* 0x04 */ u8 c_stick_y;
 } ControllerCenter; // size = 0x05
 
-s32 osContRepoll(OSMesgQueue *mq, u8* bitpattern, OSContStatus *data);
+typedef struct
+{
+    /* 0x00 */ u8 plugged : 1;  // Whether a controller is plugged in.
+    /* 0x01 */ u16 type;        // Device type
+    /* 0x03 */ u8 playerNum;    // 0-4. 0 = not assigned to a player.
+    /* 0x04 */ u8 gcRumble : 1; // GameCube Rumble
+} OSPortInfo; // size = 0x05
+
+extern OSPortInfo gPortInfo[MAXCONTROLLERS];
+
+/////////////
+// motor.c //
+/////////////
+
+#define MOTOR_ID 0x80
+
+#define READFORMAT(ptr) ((__OSContRamReadFormat*)(ptr))
 
 #endif /* CONTROLLER_H */

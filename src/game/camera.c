@@ -6721,9 +6721,6 @@ void reset_pan_distance(UNUSED struct Camera *c) {
     sPanDistance = 0;
 }
 
-#if (NUM_SUPPORTED_CONTROLLERS < 2)
-#define player2_rotate_cam(c, minPitch, maxPitch, minYaw, maxYaw)
-#else
 /**
  * Easter egg: the player 2 controller can move the camera's focus in the ending and credits.
  */
@@ -6760,7 +6757,6 @@ void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw
     vec3f_set_dist_and_angle(c->pos, sPlayer2FocusOffset, distCamToFocus, pitch, yaw);
     vec3f_sub(sPlayer2FocusOffset, c->focus);
 }
-#endif
 
 /**
  * Store camera info for the cannon opening cutscene

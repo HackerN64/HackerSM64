@@ -35,4 +35,16 @@ static inline void drawSmallStringColDL(int x, int y, const char* string, int r,
     gDisplayListHead = dlHead;
 }
 
+#define drawSmallStringPrintf(x, y, string, ...) {  \
+    char _text_buffer[sizeof(string)];              \
+    sprintf(_text_buffer, string, __VA_ARGS__);     \
+    drawSmallStringDL(x, y, _text_buffer);          \
+}
+
+#define drawSmallStringColPrintf(x, y, r, g, b, string, ...) {  \
+    char _text_buffer[sizeof(string)];                          \
+    sprintf(_text_buffer, string, __VA_ARGS__);                 \
+    drawSmallStringColDL(x, y, _text_buffer, r, g, b);          \
+}
+
 #endif

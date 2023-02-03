@@ -41,10 +41,11 @@ u8 *gGfxPoolEnd;
 struct GfxPool *gGfxPool;
 
 // OS Controllers
-struct Controller gControllers[NUM_SUPPORTED_CONTROLLERS];
+struct Controller gControllers[MAXCONTROLLERS];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 u8 gControllerBits = 0x0; // Which ports have a controller connected to them.
+u8 gNumPlayers = 1;
 u8 gRepollingControllers = FALSE;
 u32 gRepollTimer = 0;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
@@ -89,17 +90,11 @@ u16 sRenderingFramebuffer = 0;
 // Goddard Vblank Function Caller
 void (*gGoddardVblankCallback)(void) = NULL;
 
-// Defined controller slots. Don't use any higher than NUM_SUPPORTED_CONTROLLERS.
+// Defined controller slots. Anything above NUM_SUPPORTED_CONTROLLERS will be unused.
 struct Controller *gPlayer1Controller = &gControllers[0];
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
 struct Controller *gPlayer2Controller = &gControllers[1];
-#endif
-#if (NUM_SUPPORTED_CONTROLLERS > 2)
 struct Controller *gPlayer3Controller = &gControllers[2];
-#endif
-#if (NUM_SUPPORTED_CONTROLLERS > 3)
 struct Controller *gPlayer4Controller = &gControllers[3];
-#endif
 
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
@@ -508,36 +503,25 @@ UNUSED static void record_demo(void) {
  */
 void run_demo_inputs(void) {
     // Eliminate the unused bits.
-    gControllers[0].controllerData->button &= VALID_BUTTONS;
+    gPlayer1Controller->controllerData->button &= VALID_BUTTONS;
 
     // Check if a demo inputs list exists and if so,
     // run the active demo input list.
     if (gCurrDemoInput != NULL) {
-        // Clear player 2's inputs if they exist. Player 2's controller
-        // cannot be used to influence a demo. At some point, Nintendo
-        // may have planned for there to be a demo where 2 players moved
-        // around instead of just one, so clearing player 2's influence from
-        // the demo had to have been necessary to perform this. Co-op mode, perhaps?
-        if (gControllers[1].controllerData != NULL) {
-            gControllers[1].controllerData->stick_x = 0;
-            gControllers[1].controllerData->stick_y = 0;
-            gControllers[1].controllerData->button = 0;
-        }
-
         // The timer variable being 0 at the current input means the demo is over.
         // Set the button to the END_DEMO mask to end the demo.
         if (gCurrDemoInput->timer == 0) {
-            gControllers[0].controllerData->stick_x = 0;
-            gControllers[0].controllerData->stick_y = 0;
-            gControllers[0].controllerData->button = END_DEMO;
+            gPlayer1Controller->controllerData->stick_x = 0;
+            gPlayer1Controller->controllerData->stick_y = 0;
+            gPlayer1Controller->controllerData->button = END_DEMO;
         } else {
             // Backup the start button if it is pressed, since we don't want the
             // demo input to override the mask where start may have been pressed.
-            u16 startPushed = gControllers[0].controllerData->button & START_BUTTON;
+            u16 startPushed = gPlayer1Controller->controllerData->button & START_BUTTON;
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gControllers[0].controllerData->stick_x = gCurrDemoInput->rawStickX;
-            gControllers[0].controllerData->stick_y = gCurrDemoInput->rawStickY;
+            gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
+            gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
 
             // To assign the demo input, the button information is stored in
             // an 8-bit mask rather than a 16-bit mask. this is because only
@@ -546,11 +530,11 @@ void run_demo_inputs(void) {
             // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
             // match the correct input mask. We then add this to the masked
             // lower 4 bits to get the correct button mask.
-            gControllers[0].controllerData->button =
+            gPlayer1Controller->controllerData->button =
                 ((gCurrDemoInput->buttonMask & 0xF0) << 8) + ((gCurrDemoInput->buttonMask & 0xF));
 
             // If start was pushed, put it into the demo sequence being input to end the demo.
-            gControllers[0].controllerData->button |= startPushed;
+            gPlayer1Controller->controllerData->button |= startPushed;
 
             // Run the current demo input's timer down. if it hits 0, advance the demo input list.
             if (--gCurrDemoInput->timer == 0) {
@@ -602,8 +586,6 @@ void adjust_analog_stick(struct Controller *controller) {
     }
 }
 
-#define START_REPOLL_COMBO (A_BUTTON | B_BUTTON | START_BUTTON)
-
 /**
  * Update the controller struct with available inputs if present.
  */
@@ -616,55 +598,62 @@ void read_controller_inputs(void) {
 
     for (i = 0; i < NUM_SUPPORTED_CONTROLLERS; i++) {
         struct Controller *controller = &gControllers[i];
+        OSContPadEx *controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
-        if (!gRepollingControllers && controller->controllerData != NULL) {
-            // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && (controller->statusData->type & CONT_GCN)) {
-                u32 oldButton = controller->controllerData->button;
-                u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
-                if (oldButton & Z_TRIG) {
-                    newButton |= L_TRIG;
-                }
-                if (controller->controllerData->l_trig > GCN_TRIGGER_THRESHOLD) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
-                    newButton |= Z_TRIG;
-                }
-                controller->controllerData->button = newButton;
-            }
-            controller->rawStickX = controller->controllerData->stick_x;
-            controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = (~controller->buttonDown & controller->controllerData->button);
-            controller->buttonReleased = (~controller->controllerData->button & controller->buttonDown);
-            // 0.5x A presses are a good meme
-            controller->buttonDown = controller->controllerData->button;
-            if ((controller->buttonDown & START_REPOLL_COMBO) == START_REPOLL_COMBO) {
+        if (!gRepollingControllers && controllerData != NULL) {
+            u16 button = controllerData->button;
+            if ((gRepollTimer > 15) && (button & START_CONTROLLER_REPOLL_COMBO) == START_CONTROLLER_REPOLL_COMBO) {
                 start_repolling_controllers();
                 return;
             }
+            // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
+            if (gIsConsole && (controller->statusData->type & CONT_GCN)) {
+                u16 newButton = button & ~(Z_TRIG | L_TRIG);
+                if (button & Z_TRIG) {
+                    newButton |= L_TRIG;
+                }
+                if (controllerData->l_trig > GCN_TRIGGER_THRESHOLD) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
+                    newButton |= Z_TRIG;
+                }
+                button = newButton;
+            }
+            controller->rawStickX = controllerData->stick_x;
+            controller->rawStickY = controllerData->stick_y;
+            controller->buttonPressed = (~controller->buttonDown & button);
+            controller->buttonReleased = (~button & controller->buttonDown);
+            // 0.5x A presses are a good meme
+            controller->buttonDown = button;
             adjust_analog_stick(controller);
         } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
-            controller->rawStickX = 0;
-            controller->rawStickY = 0;
-            controller->buttonPressed = 0;
+            controller->rawStickX      = 0;
+            controller->rawStickY      = 0;
+            controller->buttonPressed  = 0;
             controller->buttonReleased = 0;
-            controller->buttonDown = 0;
-            controller->stickX = 0;
-            controller->stickY = 0;
-            controller->stickMag = 0;
+            controller->buttonDown     = 0;
+            controller->stickX         = 0;
+            controller->stickY         = 0;
+            controller->stickMag       = 0;
         }
     }
 }
 
 /**
+ * Link the controller struct to the appropriate status and pad.
+ */
+void assign_controller_data(struct Controller *controller, int port) {
+    controller->statusData = &gControllerStatuses[port];
+    controller->controllerData = &gControllerPads[port];
+    controller->port = port;
+}
+
+/**
  * Initialize the controller structs to point at the OSCont information.
+ * Automatically assignins controller numbers based on port order.
  */
 void init_controllers(void) {
     s16 port, cont, lastUsedPort;
-    struct Controller *controller = NULL;
 
-    // Set controller 1 to point to the set of status/pads for input 1 and
-    // init the controllers.
-    gControllers[0].statusData = &gControllerStatuses[0];
-    gControllers[0].controllerData = &gControllerPads[0];
+    // Init the controllers.
     osContInit(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
 
 #ifdef EEP
@@ -679,30 +668,15 @@ void init_controllers(void) {
 #endif
 
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
+    // The game allows you to have a controller plugged into any port in order to play the game.
     for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
-        // Is controller plugged in?
-        if (gControllerBits & (1 << port)) {
-            controller = &gControllers[cont];
+        OSPortInfo *portInfo = &gPortInfo[port];
 
-            // The game allows you to have just 1 controller plugged
-            // into any port in order to play the game. this was probably
-            // so if any of the ports didn't work, you can have controllers
-            // plugged into any of them and it will work.
-            controller->statusData = &gControllerStatuses[port];
-            controller->controllerData = &gControllerPads[port];
-            controller->port = port;
+        // Is the controller plugged in?
+        if (portInfo->plugged) {
+            assign_controller_data(&gControllers[cont], port);
 
-            if (controller->statusData->type & CONT_GCN) {
-                osSyncPrintf("GameCube controller ");
-            } else if (controller->statusData->type & CONT_TYPE_NORMAL) {
-                osSyncPrintf("N64 controller ");
-            } else {
-                osSyncPrintf("Unknown controller ");
-            }
-            if (controller->statusData->status & CONT_CARD_ON) {
-                osSyncPrintf("with pak ");
-            }
-            osSyncPrintf("found in port %d\n", port);
+            portInfo->playerNum = cont + 1;
 
             lastUsedPort = port;
 
@@ -710,20 +684,28 @@ void init_controllers(void) {
         }
     }
 
-#if (NUM_SUPPORTED_CONTROLLERS >= 2)
-    //! Some flashcarts (eg. ED64p) don't let you start a ROM with a GameCube controller in port 1,
-    // so if port 1 is an N64 controller and port 2 is a GC controller, swap them.
-    if (gIsConsole
-     && gControllers[0].statusData != NULL
-     && !(gControllers[0].statusData->type & CONT_GCN)
-     && gControllers[1].statusData != NULL
-     && (gControllers[1].statusData->type & CONT_GCN)) {
-        struct Controller temp = gControllers[0];
-        gControllers[0] = gControllers[1];
-        gControllers[1] = temp;
-        osSyncPrintf("Swapped controllers 1 and 2\n");
+    // Disable the ports after the last used one.
+    osContSetCh(lastUsedPort + 1);
+}
+
+/**
+ * Initialize the controller structs to point at the OSCont information.
+ * Assigns controllers based on assigned data from repolling.
+ */
+void assign_controllers(void) {
+    s16 lastUsedPort = -1;
+
+    // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
+    // The game allows you to have a controller plugged into any port in order to play the game.
+    for (int port = 0; port < MAXCONTROLLERS; port++) {
+        OSPortInfo *portInfo = &gPortInfo[port];
+        // Is controller plugged in and assigned to a player?
+        if (portInfo->plugged && portInfo->playerNum) {
+            assign_controller_data(&gControllers[portInfo->playerNum - 1], port);
+
+            lastUsedPort = port;
+        }
     }
-#endif
 
     // Disable the ports after the last used one.
     osContSetCh(lastUsedPort + 1);
@@ -761,29 +743,79 @@ void setup_game_memory(void) {
 }
 
 /**
- * Start polling for new controllers.
+ * Check for new controller data
+ */
+void repoll_controllers(void) {
+#ifdef ENABLE_RUMBLE
+    block_until_rumble_pak_free();
+#endif
+    osContSetCh(MAXCONTROLLERS);
+    osContStartQuery(&gSIEventMesgQueue);
+    osRecvMesg(&gSIEventMesgQueue, NULL, OS_MESG_BLOCK);
+    osContGetQueryEx(&gControllerBits, &gControllerStatuses[0]);
+#ifdef ENABLE_RUMBLE
+    release_rumble_pak_control();
+#endif
+}
+
+/**
+ * Start polling for new controllers and open the UI.
  */
 void start_repolling_controllers(void) {
     gRepollingControllers = TRUE;
     gRepollTimer = 0;
+    gNumPlayers = 1;
+    bzero(gPortInfo, sizeof(gPortInfo));
 #ifdef ENABLE_RUMBLE
     cancel_rumble();
 #endif
 }
 
 /**
+ * Stop polling for new controllers and assign them to their player numbers.
+ */
+void stop_repolling_controllers(void) {
+    gRepollingControllers = FALSE;
+    gRepollTimer = 0;
+    gNumPlayers--;
+    assign_controllers();
+#ifdef ENABLE_RUMBLE
+    cancel_rumble();
+#endif
+}
+
+/**
+ * Assign controllers based on 
+ */
+void read_repolling_inputs(void) {
+    for (int i = 0; i < MAXCONTROLLERS; i++) {
+        OSPortInfo *portInfo = &gPortInfo[i];
+
+        if (portInfo->plugged) {
+            u16 button = gControllerPads[i].button;
+
+            // If a button is pressed on an unassigned controller, assign it the current player number.
+            if (button && !portInfo->playerNum) {
+                portInfo->playerNum = gNumPlayers;
+                gNumPlayers++;
+                break;
+            }
+
+            // If the combo is pressed, stop polling and assign the current controllers.
+            if (gNumPlayers > __builtin_popcount(gControllerBits)
+             || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
+             || ((button & START_CONTROLLER_REPOLL_COMBO) == START_CONTROLLER_REPOLL_COMBO)) {
+                stop_repolling_controllers();
+                break;
+            }
+        }
+    }
+}
+
+/**
  * Handle input and status from controllers.
  */
 void handle_input(void) {
-    if (gRepollingControllers) {
-        // Check for new controllers once per second.
-        if ((gRepollTimer % 30) == 0) {
-            osContRepoll(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
-        }
-
-        gRepollTimer++;
-    }
-
     // Normal input. If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
 #ifdef ENABLE_RUMBLE
@@ -792,24 +824,23 @@ void handle_input(void) {
         osContStartReadDataEx(&gSIEventMesgQueue);
         osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         osContGetReadDataEx(&gControllerPads[0]);
-
-        if (gRepollingControllers && gRepollTimer > 30) {
-            for (int i = 0; i < MAXCONTROLLERS; i++) {
-                if (gControllerPads[i].button) {
-                    // If any button is pressed, stop polling and assign the controllers.
-                    init_controllers();
-                    gRepollingControllers = FALSE;
-                    break;
-                }
-            }
-        }
 #ifdef ENABLE_RUMBLE
         release_rumble_pak_control();
 #endif
+        if (gRepollingControllers && (gRepollTimer > CONTROLLER_REPOLL_COMBO_COOLDOWN)) { // 0.5 second cooldown after repolling.
+            read_repolling_inputs();
+        }
     } else if (!gRepollingControllers) {
         // Start repolling controllers if all ports are empty and we're not already polling.
         start_repolling_controllers();
     }
+
+    // Check for new controllers about once per second.
+    if (gRepollingControllers && ((gRepollTimer % CONTROLLER_REPOLL_TIME) == 0)) {
+        repoll_controllers();
+    }
+
+    gRepollTimer++;
 
     read_controller_inputs();
 
