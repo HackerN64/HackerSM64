@@ -6721,6 +6721,9 @@ void reset_pan_distance(UNUSED struct Camera *c) {
     sPanDistance = 0;
 }
 
+#if (NUM_SUPPORTED_CONTROLLERS < 2)
+#define player2_rotate_cam(c, minPitch, maxPitch, minYaw, maxYaw)
+#else
 /**
  * Easter egg: the player 2 controller can move the camera's focus in the ending and credits.
  */
@@ -6729,7 +6732,7 @@ void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw
     s16 pitch, yaw, pitchCap;
 
     // Change the camera rotation to match the 2nd player's stick
-    approach_s16_asymptotic_bool(&sCreditsPlayer2Yaw, -(s16)(gPlayer2Controller->stickX * 250.f), 4);
+    approach_s16_asymptotic_bool(&sCreditsPlayer2Yaw,   -(s16)(gPlayer2Controller->stickX * 250.f), 4);
     approach_s16_asymptotic_bool(&sCreditsPlayer2Pitch, -(s16)(gPlayer2Controller->stickY * 265.f), 4);
     vec3f_get_dist_and_angle(c->pos, c->focus, &distCamToFocus, &pitch, &yaw);
 
@@ -6749,25 +6752,15 @@ void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw
         minPitch = pitchCap;
     }
 
-    if (sCreditsPlayer2Pitch > maxPitch) {
-        sCreditsPlayer2Pitch = maxPitch;
-    }
-    if (sCreditsPlayer2Pitch < minPitch) {
-        sCreditsPlayer2Pitch = minPitch;
-    }
-
-    if (sCreditsPlayer2Yaw > maxYaw) {
-        sCreditsPlayer2Yaw = maxYaw;
-    }
-    if (sCreditsPlayer2Yaw < minYaw) {
-        sCreditsPlayer2Yaw = minYaw;
-    }
+    sCreditsPlayer2Pitch = CLAMP(sCreditsPlayer2Pitch, minPitch, maxPitch);
+    sCreditsPlayer2Yaw   = CLAMP(sCreditsPlayer2Yaw,   minYaw,   maxYaw  );
 
     pitch += sCreditsPlayer2Pitch;
     yaw += sCreditsPlayer2Yaw;
     vec3f_set_dist_and_angle(c->pos, sPlayer2FocusOffset, distCamToFocus, pitch, yaw);
     vec3f_sub(sPlayer2FocusOffset, c->focus);
 }
+#endif
 
 /**
  * Store camera info for the cannon opening cutscene

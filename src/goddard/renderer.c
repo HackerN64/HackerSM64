@@ -18,6 +18,7 @@
 #include "shape_helper.h"
 #include "skin.h"
 #include "types.h"
+#include "game/game_init.h"
 
 #define MAX_GD_DLS 1000
 #define OS_MESG_SI_COMPLETE 0x33333333
@@ -2396,16 +2397,18 @@ void start_view_dl(struct ObjView *view) {
 /* 251014 -> 251A1C; orig name: func_801A2844 */
 void parse_p1_controller(void) {
     u32 i;
-    struct GdControl *gdctrl = &gGdCtrl;
+    struct GdControl *gdctrl;
     OSContPadEx *currInputs;
     OSContPadEx *prevInputs;
 
-    // Copy current inputs to previous
-    u8 *src = (u8 *) gdctrl;
-    u8 *dest = (u8 *) gdctrl->prevFrame;
-    for (i = 0; i < sizeof(struct GdControl); i++) {
-        *dest++ = *src++;
+    if (gRepollingControllers) {
+        return;
     }
+
+    gdctrl = &gGdCtrl;
+
+    // Copy current inputs to previous
+    *gdctrl->prevFrame = *gdctrl;
 
     gdctrl->unk50 = gdctrl->unk4C = gdctrl->dup = gdctrl->ddown = 0;
 
@@ -2421,25 +2424,22 @@ void parse_p1_controller(void) {
     gdctrl->stickDeltaX -= gdctrl->stickX;
     gdctrl->stickDeltaY -= gdctrl->stickY;
     // button values (as bools)
-    gdctrl->trgL   = (currInputs->button & L_TRIG) != 0;
-    gdctrl->trgR   = (currInputs->button & R_TRIG) != 0;
-    gdctrl->btnA   = (currInputs->button & A_BUTTON) != 0;
-    gdctrl->btnB   = (currInputs->button & B_BUTTON) != 0;
-    gdctrl->cleft  = (currInputs->button & L_CBUTTONS) != 0;
-    gdctrl->cright = (currInputs->button & R_CBUTTONS) != 0;
-    gdctrl->cup    = (currInputs->button & U_CBUTTONS) != 0;
-    gdctrl->cdown  = (currInputs->button & D_CBUTTONS) != 0;
+    gdctrl->trgL   = ((currInputs->button & L_TRIG    ) != 0);
+    gdctrl->trgR   = ((currInputs->button & R_TRIG    ) != 0);
+    gdctrl->btnA   = ((currInputs->button & A_BUTTON  ) != 0);
+    gdctrl->btnB   = ((currInputs->button & B_BUTTON  ) != 0);
+    gdctrl->cleft  = ((currInputs->button & L_CBUTTONS) != 0);
+    gdctrl->cright = ((currInputs->button & R_CBUTTONS) != 0);
+    gdctrl->cup    = ((currInputs->button & U_CBUTTONS) != 0);
+    gdctrl->cdown  = ((currInputs->button & D_CBUTTONS) != 0);
     // but not these buttons??
-    gdctrl->dleft  = currInputs->button & L_JPAD;
-    gdctrl->dright = currInputs->button & R_JPAD;
-    gdctrl->dup    = currInputs->button & U_JPAD;
-    gdctrl->ddown  = currInputs->button & D_JPAD;
+    gdctrl->dleft  = (currInputs->button & L_JPAD);
+    gdctrl->dright = (currInputs->button & R_JPAD);
+    gdctrl->dup    = (currInputs->button & U_JPAD);
+    gdctrl->ddown  = (currInputs->button & D_JPAD);
 
-    if (gdctrl->btnA && !gdctrl->dragging) {
-        gdctrl->startedDragging = TRUE;
-    } else {
-        gdctrl->startedDragging = FALSE;
-    }
+    gdctrl->startedDragging = (gdctrl->btnA && !gdctrl->dragging);
+
     // toggle if A is pressed? or is this just some seed for an rng?
     gdctrl->dragging = gdctrl->btnA;
     gdctrl->unkD8b20 = gdctrl->unkD8b40 = FALSE;
@@ -2459,11 +2459,11 @@ void parse_p1_controller(void) {
     }
     gdctrl->currFrame++;
 
-    if (currInputs->button & START_BUTTON && !(prevInputs->button & START_BUTTON)) {
+    if ((currInputs->button & START_BUTTON) && !(prevInputs->button & START_BUTTON)) {
         gdctrl->newStartPress ^= 1;
     }
 
-    if (currInputs->button & Z_TRIG && !(prevInputs->button & Z_TRIG)) {
+    if ((currInputs->button & Z_TRIG) && !(prevInputs->button & Z_TRIG)) {
         sCurrDebugViewIndex++;
     }
 
@@ -2479,7 +2479,7 @@ void parse_p1_controller(void) {
         activate_timing();
     }
 
-    for (i = 0; ((s32) i) < sDebugViewsCount; i++) {
+    for (i = 0; (s32) i < sDebugViewsCount; i++) {
         sDebugViews[i]->flags &= ~VIEW_UPDATE;
     }
 
@@ -2509,9 +2509,7 @@ void parse_p1_controller(void) {
         gdctrl->csrY = sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f;
     }
 
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
-        ((u8 *) prevInputs)[i] = ((u8 *) currInputs)[i];
-    }
+    *prevInputs = *currInputs;
 }
 
 UNUSED void stub_renderer_4(f32 arg0) {
