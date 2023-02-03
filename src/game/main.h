@@ -3,6 +3,12 @@
 
 #include "config.h"
 
+enum VIModes {
+    MODE_NTSC,
+    MODE_MPAL,
+    MODE_PAL,
+};
+
 #define THREAD1_STACK 0x100
 #define THREAD2_STACK 0x800
 #define THREAD3_STACK 0x200

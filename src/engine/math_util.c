@@ -1487,9 +1487,7 @@ static ALWAYS_INLINE float construct_float(const float f)
 
 // Converts a floating point matrix to a fixed point matrix
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
-__attribute__((optimize("Os")))
-void mtxf_to_mtx_fast(s16* dst, float* src)
-{
+OPTIMIZE_OS void mtxf_to_mtx_fast(s16* dst, float* src) {
     float scale = construct_float(65536.0f / WORLD_SCALE);
     // Iterate over pairs of values in the input matrix
     for (int i = 0; i < 8; i++)
