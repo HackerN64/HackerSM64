@@ -112,16 +112,31 @@ typedef struct {
 
 /* Controller type */
 
+#define CONT_NONE               0x0000
+
 #define CONT_ABSOLUTE           0x0001
 #define CONT_RELATIVE           0x0002
 #define CONT_JOYPORT            0x0004
 #define CONT_GCN                0x0008
-#define CONT_EEPROM		0x8000
-#define CONT_EEP16K		0x4000
-#define	CONT_TYPE_MASK		0x1f07
-#define	CONT_TYPE_NORMAL	0x0005
-#define	CONT_TYPE_MOUSE		0x0002
-#define	CONT_TYPE_VOICE		0x0100
+#define CONT_WIRELESS           0x0080
+
+#define CONT_EEPROM             0x8000
+#define CONT_EEP16K             0x4000
+
+#define	CONT_TYPE_MASK          (0x1F00 | CONT_ABSOLUTE | CONT_RELATIVE | CONT_JOYPORT | CONT_GCN | CONT_WIRELESS) // 0x1F8F
+
+#define	CONT_TYPE_NORMAL        (0x0000 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
+#define CONT_TYPE_GCN           (0x0000 | CONT_GCN | CONT_ABSOLUTE) // 0x0009
+#define	CONT_TYPE_MOUSE         (0x0000 | CONT_RELATIVE) // 0x0002
+#define	CONT_TYPE_VOICE         (0x0100) // 0x0100
+#define CONT_TYPE_KEYBOARD      (0x0200) // 0x0200
+#define CONT_TYPE_TRAIN         (0x0400 | 0x0020) // 0x0420
+#define CONT_TYPE_GBA           (0x0400) // 0x0400
+#define CONT_TYPE_GCN_RECEIVER  (0x0000 | CONT_WIRELESS | CONT_GCN) // 0x0088
+#define CONT_TYPE_GCN_WAVEBIRD  (0x1000 | CONT_WIRELESS | CONT_GCN | CONT_ABSOLUTE | CONT_RELATIVE) // 0x108B
+#define CONT_TYPE_GCN_WHEEL     (0x0000 | CONT_GCN) // 0x0008
+#define CONT_TYPE_GCN_KEYBOARD  (0x0200 | CONT_GCN) // 0x0208
+#define CONT_TYPE_GCN_DANCE     (0x0800 | CONT_GCN) // 0x0808
 
 /* Controller status */
 
@@ -197,25 +212,6 @@ typedef struct {
 #define	CONT_ERR_VOICE_WORD		14
 #define	CONT_ERR_VOICE_NO_RESPONSE	15
 
-enum ContDevices {
-    DEVICE_NONE,
-    DEVICE_N64_CONTROLLER,
-    DEVICE_GCN_CONTROLLER,
-    DEVICE_RUMBLE_PAK,
-    DEVICE_CONTROLLER_PAK,
-    DEVICE_TRANSFER_PAK,
-    DEVICE_PULSE_SENSOR,
-    DEVICE_MOUSE,
-    DEVICE_TRAIN_CONTROLLER,
-    DEVICE_FISHING_ROD,
-    DEVICE_DANCE_PAD,
-    DEVICE_VRU,
-    DEVICE_KEYBOARD,
-    DEVICE_KIOSK,
-    DEVICE_ASCII_CONTROLLER,
-    DEVICE_SNAP_STATION_PRINTER,
-};
-
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
 
@@ -250,6 +246,7 @@ extern s32		osContStartReadDataEx(OSMesgQueue *mq);
 extern s32		osContSetCh(u8 ch);
 #endif
 extern void		osContGetQuery(OSContStatus *status);
+extern void		osContGetQueryEx(u8 *bitpattern, OSContStatus *status);
 extern void		osContGetReadData(OSContPad *pad);
 extern void		osContGetReadDataEx(OSContPadEx *pad);
 

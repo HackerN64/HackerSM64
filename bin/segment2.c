@@ -2837,8 +2837,8 @@ ALIGNED8 const Texture texture_controller_port[] = {
 ALIGNED8 const Texture texture_controller_noport[] = {
 #include "textures/segment2/controller_noport.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_standard[] = {
-#include "textures/segment2/controller_standard.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_normal[] = {
+#include "textures/segment2/controller_normal.rgba16.inc.c"
 };
 ALIGNED8 const Texture texture_controller_gamecube[] = {
 #include "textures/segment2/controller_gamecube.rgba16.inc.c"
@@ -2848,6 +2848,12 @@ ALIGNED8 const Texture texture_controller_mouse[] = {
 };
 ALIGNED8 const Texture texture_controller_voice[] = {
 #include "textures/segment2/controller_voice.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_keyboard[] = {
+#include "textures/segment2/controller_keyboard.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_train[] = {
+#include "textures/segment2/controller_train.rgba16.inc.c"
 };
 
 // 0x02014970 - 0x020149A8
