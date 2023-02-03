@@ -45,6 +45,17 @@ extern Texture texture_controller_mouse[];
 extern Texture texture_controller_voice[];
 extern Texture texture_controller_keyboard[];
 extern Texture texture_controller_train[];
+#ifdef ENABLE_RUMBLE
+//! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
+extern Texture title_texture_rumble_pak_en[];
+//! TODO: Use these after ASCII/multilang is merged.
+ #if MULTILANG
+extern Texture title_texture_rumble_pak_fr[];
+extern Texture title_texture_rumble_pak_de[];
+extern Texture title_texture_rumble_pak_jp[];
+extern Texture title_texture_rumble_pak_es[];
+ #endif // MULTILANG
+#endif // ENABLE_RUMBLE
 extern Gfx dl_paintings_draw_ripples[];
 extern Gfx dl_paintings_rippling_begin[];
 extern Gfx dl_paintings_rippling_end[];

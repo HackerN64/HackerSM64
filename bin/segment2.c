@@ -2856,6 +2856,28 @@ ALIGNED8 const Texture texture_controller_train[] = {
 #include "textures/segment2/controller_train.rgba16.inc.c"
 };
 
+#ifdef ENABLE_RUMBLE
+//! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
+ALIGNED8 const Texture title_texture_rumble_pak_en[] = {
+#include "levels/intro/rumble_pak_en.rgba16.inc.c"
+};
+//! TODO: Use these after ASCII/multilang is merged.
+ #if MULTILANG
+ALIGNED8 const Texture title_texture_rumble_pak_fr[] = {
+#include "levels/intro/rumble_pak_fr.rgba16.inc.c"
+};
+ALIGNED8 const Texture title_texture_rumble_pak_de[] = {
+#include "levels/intro/rumble_pak_de.rgba16.inc.c"
+};
+ALIGNED8 const Texture title_texture_rumble_pak_jp[] = {
+#include "levels/intro/rumble_pak_jp.rgba16.inc.c"
+};
+ALIGNED8 const Texture title_texture_rumble_pak_es[] = {
+#include "levels/intro/rumble_pak_es.rgba16.inc.c"
+};
+ #endif // MULTILANG
+#endif // ENABLE_RUMBLE
+
 // 0x02014970 - 0x020149A8
 const Gfx dl_paintings_rippling_begin[] = {
     gsDPPipeSync(),

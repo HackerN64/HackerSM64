@@ -419,8 +419,9 @@ void render_controllers_overlay(void) {
                 drawSmallStringPrintf(((SCREEN_CENTER_X - 64) + (32 * i) + 8), (SCREEN_CENTER_Y + 16), "P%d", portInfo->playerNum);
             }
         }
-
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
         drawSmallStringDL((SCREEN_CENTER_X - 48), (SCREEN_CENTER_Y + 28), "OR COMBO TO EXIT");
+#endif
     }
 }
 

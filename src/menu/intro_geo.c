@@ -403,31 +403,14 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 #endif
 
 #ifdef ENABLE_RUMBLE
-ALIGNED8 static const Texture title_texture_rumble_pak_en[] = {
-#include "levels/intro/rumble_pak_en.rgba16.inc.c"
-};
-//! TODO: Use these after ASCII/multilang is merged.
-#if MULTILANG
-ALIGNED8 static const Texture title_texture_rumble_pak_fr[] = {
-#include "levels/intro/rumble_pak_fr.rgba16.inc.c"
-};
-ALIGNED8 static const Texture title_texture_rumble_pak_de[] = {
-#include "levels/intro/rumble_pak_de.rgba16.inc.c"
-};
-ALIGNED8 static const Texture title_texture_rumble_pak_jp[] = {
-#include "levels/intro/rumble_pak_jp.rgba16.inc.c"
-};
-ALIGNED8 static const Texture title_texture_rumble_pak_es[] = {
-#include "levels/intro/rumble_pak_es.rgba16.inc.c"
-};
-#endif
+//! TODO: Move rumble pak graphic textures here once build order is fixed.
 
 #define RUMBLE_X 220
 #define RUMBLE_Y 200
 #define RUMBLE_W 80
 #define RUMBLE_H 24
 
-const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
+static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_COPY),
     gsDPSetTexturePersp(G_TP_NONE),
@@ -437,7 +420,7 @@ const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
     gsSPEndDisplayList(),
 };
 
-const Gfx title_screen_bg_dl_rumble_pak_end[] = {
+static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
     gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), ((RUMBLE_X + RUMBLE_W - 1) << 2), ((RUMBLE_Y + RUMBLE_H - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
@@ -457,7 +440,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
         dl = NULL;
     } else if (callContext == GEO_CONTEXT_RENDER) {
         SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
-        s32 introContext = genNode->parameter & 0xFF;
+        s32 introContext = (genNode->parameter & 0xFF);
         if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];
         } else if (introContext == INTRO_CONTEXT_GAME_OVER) {
