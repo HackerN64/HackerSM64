@@ -16,6 +16,13 @@
 
 #include "printf.h"
 
+enum CrashScreenMessageIDs {
+    CRASH_SCREEN_MSG_NONE,
+    CRASH_SCREEN_MSG_CPU_BREAK,
+    CRASH_SCREEN_MSG_FAULT,
+    CRASH_SCREEN_MSG_VI_VBLANK,
+};
+
 enum crashPages {
     PAGE_CONTEXT,
 #if PUPPYPRINT_DEBUG
@@ -399,11 +406,15 @@ void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) 1);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) CRASH_SCREEN_MSG_FAULT);
+
     while (TRUE) {
         if (thread == NULL) {
-            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
+            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
+
+            osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
+
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {
@@ -427,6 +438,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 block_until_rumble_pak_free();
 #endif
                 osContStartReadDataEx(&gSIEventMesgQueue);
+                osRecvMesg(&gSIEventMesgQueue, &mesg, OS_MESG_BLOCK);
                 osContGetReadDataEx(&gControllerPads[0]);
 #ifdef ENABLE_RUMBLE
                 release_rumble_pak_control();
