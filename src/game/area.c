@@ -90,6 +90,7 @@ LangArray gNoControllerMsg = DEFINE_LANGUAGE_ARRAY(
     "MANETTE DEBRANCHEE",
     "CONTROLLER FEHLT",
     "NO CONTROLLER",
+    "NO HAY MANDO",
     "NO HAY MANDO");
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {

@@ -6,12 +6,12 @@
 #include "sounds.h"
 #include "seq_ids.h"
 
-#define COURSE_NAME_TABLE course_name_table_es
-#define ACT_NAME_TABLE act_name_table_es
-#define DIALOG_TABLE dialog_table_es
+#define COURSE_NAME_TABLE course_name_table_es_es
+#define ACT_NAME_TABLE act_name_table_es_es
+#define DIALOG_TABLE dialog_table_es_es
 
-#define DIALOG_FILE "es/dialogs.h"
-#define COURSE_FILE "es/courses.h"
+#define DIALOG_FILE "es_es/dialogs.h"
+#define COURSE_FILE "es_es/courses.h"
 #include "text/define_text.inc.c"
 #undef DIALOG_FILE
 #undef COURSE_FILE

@@ -55,8 +55,13 @@ extern const char *course_strings_de_table[];
 #ifdef ENABLE_JAPANESE
 extern const char *course_strings_jp_table[];
 #endif
-#ifdef ENABLE_SPANISH
-extern const char *course_strings_es_table[];
+#ifdef ENABLE_SPANISH_SPAIN
+extern const char *course_strings_es_es_table[];
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
+extern const char *course_strings_es_la_table[];
+#endif
+#if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
 extern Gfx dl_menu_texture_nivel_upper[];
 #endif
 #endif
