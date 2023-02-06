@@ -381,48 +381,79 @@ static const Gfx dl_controller_icons_end[] = {
 };
 
 void render_controllers_overlay(void) {
-    if (gRepollingControllers) {
-        if ((gRepollTimer > CONTROLLER_REPOLL_COMBO_COOLDOWN) && ((gRepollTimer & 31) < 20)) {
-            drawSmallStringDL((SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...");
-            drawSmallStringPrintf((SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
-        }
+    const s32 w = 32;
+    const s32 h = 32;
+    s32 x = SCREEN_CENTER_X;
+    s32 y = (SCREEN_CENTER_Y - (h / 2));
+    Texture *texture_controller = texture_controller_noport;
+    char text_buffer[32];
 
-        u32 x = SCREEN_CENTER_X;
-        u32 y = (SCREEN_CENTER_Y - 16);
-        u32 w = 32;
-        u32 h = 32;
-        Texture *texture_controller = texture_controller_noport;
-        Gfx* dlHead = gDisplayListHead;
-        gSPDisplayList(dlHead++, dl_controller_icons_begin);
-        for (int i = 0; i < MAXCONTROLLERS; i++) {
-            switch (gPortInfo[i].type) {
-                case CONT_NONE:             texture_controller = texture_controller_noport;   break;
-                case CONT_TYPE_NORMAL:      texture_controller = texture_controller_normal;   break;
-                case CONT_TYPE_MOUSE:       texture_controller = texture_controller_mouse;    break;
-                case CONT_TYPE_VOICE:       texture_controller = texture_controller_voice;    break;
-                case CONT_TYPE_KEYBOARD:    texture_controller = texture_controller_keyboard; break;
-                case CONT_TYPE_TRAIN:       texture_controller = texture_controller_train;    break;
-                case CONT_TYPE_GCN:         texture_controller = texture_controller_gamecube; break;
-                default:                    texture_controller = texture_controller_port;     break;
-            }
-            x = (SCREEN_CENTER_X - 64) + (32 * i);
-            gDPLoadTextureTile(dlHead++, texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b, w, 0, 0, 0, (w - 1), (h - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
-            gSPTextureRectangle(dlHead++, (x << 2), (y << 2), ((x + w - 1) << 2), ((y + h - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10));
-        }
-        gSPDisplayList(dlHead++, dl_controller_icons_end);
-        gDisplayListHead = dlHead;
+    if (!gRepollingControllers) {
+        return;
+    }
 
-        for (int i = 0; i < MAXCONTROLLERS; i++) {
-            OSPortInfo *portInfo = &gPortInfo[i];
+    Gfx* dlHead = gDisplayListHead;
 
-            if (portInfo->plugged && portInfo->playerNum) {
-                drawSmallStringPrintf(((SCREEN_CENTER_X - 64) + (32 * i) + 8), (SCREEN_CENTER_Y + 16), "P%d", portInfo->playerNum);
-            }
+    // Draw the port icons:
+
+    gSPDisplayList(dlHead++, dl_controller_icons_begin);
+    for (int i = 0; i < MAXCONTROLLERS; i++) {
+        switch (gPortInfo[i].type) {
+            case CONT_NONE:             texture_controller = texture_controller_noport;   break;
+            case CONT_TYPE_NORMAL:      texture_controller = texture_controller_normal;   break;
+            case CONT_TYPE_MOUSE:       texture_controller = texture_controller_mouse;    break;
+            case CONT_TYPE_VOICE:       texture_controller = texture_controller_voice;    break;
+            case CONT_TYPE_KEYBOARD:    texture_controller = texture_controller_keyboard; break;
+            case CONT_TYPE_TRAIN:       texture_controller = texture_controller_train;    break;
+            case CONT_TYPE_GCN:         texture_controller = texture_controller_gamecube; break;
+            //! TODO: Remaining devices
+            default:                    texture_controller = texture_controller_port;     break;
         }
+        x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * i);
+        gDPLoadTextureTile(dlHead++,
+            texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
+            w, h, 0, 0,
+            (w - 1), (h - 1), 0,
+            (G_TX_NOMIRROR | G_TX_CLAMP),
+            (G_TX_NOMIRROR | G_TX_CLAMP),
+            0, 0, G_TX_NOLOD, G_TX_NOLOD
+        );
+        gSPTextureRectangle(dlHead++,
+            (x << 2), (y << 2),
+            (((x + w) - 1) << 2),
+            (((y + h) - 1) << 2),
+            G_TX_RENDERTILE, 0, 0,
+            (4 << 10), (1 << 10)
+        );
+    }
+    gSPDisplayList(dlHead++, dl_controller_icons_end);
+
+    // Draw the text:
+
+    gSPDisplayList(dlHead++, dl_fasttext_begin);
+
+    if ((gRepollTimer & 31) < 20) {
+        drawSmallString(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...");
+        sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
+        drawSmallString(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer);
+
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-        drawSmallStringDL((SCREEN_CENTER_X - 48), (SCREEN_CENTER_Y + 28), "OR COMBO TO EXIT");
+        drawSmallString(&dlHead, (SCREEN_CENTER_X - 48), (SCREEN_CENTER_Y + 28), "OR COMBO TO EXIT");
 #endif
     }
+
+    for (int i = 0; i < MAXCONTROLLERS; i++) {
+        OSPortInfo *portInfo = &gPortInfo[i];
+
+        if (portInfo->plugged && portInfo->playerNum) {
+            sprintf(text_buffer, "P%d", portInfo->playerNum);
+            drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * i) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
+        }
+    }
+
+    gSPDisplayList(dlHead++, dl_fasttext_end);
+
+    gDisplayListHead = dlHead;
 }
 
 void render_game(void) {

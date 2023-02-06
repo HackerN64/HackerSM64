@@ -66,7 +66,7 @@ extern s8 gSramProbe;
 #endif
 
 // This button combo should be standard, so don't change it unless you have a very good reason.
-#define START_CONTROLLER_REPOLL_COMBO       (A_BUTTON | B_BUTTON | START_BUTTON)
+#define CONTROLLER_REPOLL_COMBO             (A_BUTTON | B_BUTTON | START_BUTTON)
 // How long after doing the combo to either start polling or start looking for the combo again, in frames. Default is 15.
 #define CONTROLLER_REPOLL_COMBO_COOLDOWN    15
 // How often to repoll for controllers when gRepollingControllers is true, in frames. Default is 30.

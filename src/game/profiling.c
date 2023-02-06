@@ -253,7 +253,7 @@ void profiler_print_times() {
             microseconds[PROFILER_TIME_RSP_AUDIO]
         );
 
-        drawSmallStringColDL(10, 10, text_buffer, 255, 255, 255);
+        drawSmallStringDL(10, 10, text_buffer);
     }
 }
 

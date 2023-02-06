@@ -2,6 +2,9 @@
 // See the original repo for more details.
 
 #include <ultra64.h>
+#include "config.h"
+#include "macros.h"
+#include "types.h"
 
 #define TEX_ASCII_START '!'
 #define TAB_WIDTH 16
@@ -16,7 +19,7 @@ __asm__(
  ".previous\n"
 );
 
-extern u8 fast_font[];
+extern Texture fast_font[];
 
 int computeS(unsigned char letter) {
     int idx = letter;  
@@ -53,7 +56,6 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
 
     gDPLoadTextureBlock_4bS(dlHead++, fast_font, G_IM_FMT_IA, 672, 12, 0, G_TX_MIRROR | G_TX_WRAP, G_TX_MIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
     gDPSetPrimColor(dlHead++, 0, 0, r, g, b, 255);
-    gDPSetCombineMode(dlHead++, G_CC_TEXT, G_CC_TEXT);
     gDPPipeSync(dlHead++);
 
     while (string[i] != '\0') {
@@ -85,3 +87,23 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
 
     *dl = dlHead;
 }
+
+const Gfx dl_fasttext_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetRenderMode(G_RM_TEX_EDGE, G_RM_TEX_EDGE2),
+    gsDPSetTexturePersp(G_TP_NONE),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsDPSetTextureLUT(G_TT_NONE),
+    gsDPSetCombineMode(G_CC_TEXT, G_CC_TEXT),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_fasttext_end[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsSPEndDisplayList(),
+};

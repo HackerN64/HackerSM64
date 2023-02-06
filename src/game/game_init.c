@@ -602,7 +602,7 @@ void read_controller_inputs(void) {
         // If we're receiving inputs, update the controller struct with the new button info.
         if (!gRepollingControllers && controllerData != NULL) {
             u16 button = controllerData->button;
-            if ((gRepollTimer > 15) && (button & START_CONTROLLER_REPOLL_COMBO) == START_CONTROLLER_REPOLL_COMBO) {
+            if ((gRepollTimer > 15) && (button & CONTROLLER_REPOLL_COMBO) == CONTROLLER_REPOLL_COMBO) {
                 start_repolling_controllers();
                 return;
             }
@@ -746,6 +746,7 @@ void setup_game_memory(void) {
  * Check for new controller data
  */
 void repoll_controllers(void) {
+    gRepollTimer = 0;
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -800,14 +801,15 @@ void read_repolling_inputs(void) {
                 gNumPlayers++;
                 break;
             }
-
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
             // If the combo is pressed, stop polling and assign the current controllers.
             if (gNumPlayers > __builtin_popcount(gControllerBits)
              || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
-             || ((button & START_CONTROLLER_REPOLL_COMBO) == START_CONTROLLER_REPOLL_COMBO)) {
+             || ((button & CONTROLLER_REPOLL_COMBO) == CONTROLLER_REPOLL_COMBO)) {
                 stop_repolling_controllers();
                 break;
             }
+#endif
         }
     }
 }
