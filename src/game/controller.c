@@ -308,6 +308,10 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         gPortInfo[pfs->channel].gcRumble = vibrate;
         __osContLastCmd = CONT_CMD_END;
     } else {
+        if (vibrate == MOTOR_STOP_HARD) {
+            vibrate = MOTOR_STOP;
+        }
+
         __osSiGetAccess();
         __MotorDataBuf[pfs->channel].pifstatus = CONT_CMD_EXE;
         ptr += pfs->channel;

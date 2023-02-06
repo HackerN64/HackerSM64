@@ -64,8 +64,10 @@ extern "C" {
 extern s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int controller_no);
 extern s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int controller_no);
 #if	1
+#define MOTOR_STOP_HARD		2
 #define MOTOR_START		1
 #define MOTOR_STOP		0
+#define	osMotorStopHard(x)	__osMotorAccessEx((x), MOTOR_STOP_HARD)
 #define	osMotorStart(x)		__osMotorAccessEx((x), MOTOR_START)
 #define	osMotorStop(x)		__osMotorAccessEx((x), MOTOR_STOP)
 extern s32 __osMotorAccess(OSPfs *pfs, s32 flag);
@@ -73,6 +75,7 @@ extern s32 __osMotorAccessEx(OSPfs *pfs, s32 flag);
 #else
 extern s32 osMotorStop( OSPfs *pfs);
 extern s32 osMotorStart(OSPfs *pfs);
+extern s32 osMotorStopHard( OSPfs *pfs);
 #endif
 
 
