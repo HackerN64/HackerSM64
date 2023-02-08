@@ -29,24 +29,28 @@ static const OSContCmdData sContCmds[] = {
     [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx
     // Randnet Keyboard
     [CONT_CMD_KEY_PRESS_REQUEST ] = { .tx =  2, .rx =  7 }, // Randnet Keyboard Read Keypress
+    // GBA //! No room for 64GB read/write commands (https://pastebin.com/06VzdT3w)
+    [CONT_CMD_READ_GBA          ] = { .tx =  3, .rx = 33 }, // Read GBA
+    [CONT_CMD_WRITE_GBA         ] = { .tx = 35, .rx =  1 }, // Write GBA
+    // Game ID (BlueRetro controller adapter)
+    [CONT_CMD_SET_GAME_ID       ] = { .tx =  0, .rx =  0 }, // Configure BlueRetro controller adapter (unverified tx/rx)
+    // GCN Steering Wheel
+    [CONT_CMD_GCN_WHEEL_FEEDBACK] = { .tx =  3, .rx =  8 }, // Force Feedback (unverified tx/rx)
     // GCN CONTROLLER
-    [CONT_CMD_GCN_SHORT_POLL    ] = { .tx =  3, .rx =  8 }, // GameCube Shortpoll
+    [CONT_CMD_GCN_SHORT_POLL    ] = { .tx =  3, .rx =  8 }, // GameCube Shortpoll (status)
     [CONT_CMD_GCN_READ_ORIGIN   ] = { .tx =  1, .rx = 10 }, // GameCube Read Origin
-    [CONT_CMD_GCN_CALIBRATE     ] = { .tx =  3, .rx = 10 }, // GameCube Calibrate
-    [CONT_CMD_GCN_LONG_POLL     ] = { .tx =  3, .rx = 10 }, // GameCube Longpoll
+    [CONT_CMD_GCN_CALIBRATE     ] = { .tx =  3, .rx = 10 }, // GameCube Recalibrate
+    [CONT_CMD_GCN_LONG_POLL     ] = { .tx =  3, .rx = 10 }, // GameCube Longpoll (input)
+    // GCN Keyboard
+    [CONT_CMD_GCN_POLL_KEYBOARD ] = { .tx =  3, .rx =  8 }, // GameCube Keyboard Poll
 
     [CONT_CMD_RESET             ] = { .tx =  1, .rx =  3 }, // Reset/Info
 };
 
+OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
+
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);
-
-////////////////////////
-// Gamecube additions //
-////////////////////////
-
-ControllerCenter gGamecubeControllerCenters[MAXCONTROLLERS] = { 0 };
-OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
 
 ////////////////////
 // contreaddata.c //
@@ -94,29 +98,30 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 return;
             }
 
-            if (portInfo->type & CONT_GCN) {
+            if (portInfo->type & CONT_CONSOLE_GCN) {
+                OSContCenter *contCenter = &gPortInfo[i].contCenter;
                 s32 stick_x, stick_y, c_stick_x, c_stick_y;
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
                 data->errno = CHNL_ERR(readformatgcn);
 
                 if (data->errno == 0) {
-                    if (!gGamecubeControllerCenters[i].initialized) {
-                        gGamecubeControllerCenters[i].initialized = TRUE;
-                        gGamecubeControllerCenters[i].stick_x     = readformatgcn.stick_x;
-                        gGamecubeControllerCenters[i].stick_y     = readformatgcn.stick_y;
-                        gGamecubeControllerCenters[i].c_stick_x   = readformatgcn.c_stick_x;
-                        gGamecubeControllerCenters[i].c_stick_y   = readformatgcn.c_stick_y;
+                    if (!contCenter->initialized) {
+                        contCenter->initialized = TRUE;
+                        contCenter->stick_x     = readformatgcn.stick_x;
+                        contCenter->stick_y     = readformatgcn.stick_y;
+                        contCenter->c_stick_x   = readformatgcn.c_stick_x;
+                        contCenter->c_stick_y   = readformatgcn.c_stick_y;
                     }
 
-                    data->stick_x   = stick_x   = CLAMP_S8(((s32)readformatgcn.stick_x  ) - gGamecubeControllerCenters[i].stick_x  );
-                    data->stick_y   = stick_y   = CLAMP_S8(((s32)readformatgcn.stick_y  ) - gGamecubeControllerCenters[i].stick_y  );
-                    data->c_stick_x = c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - gGamecubeControllerCenters[i].c_stick_x);
-                    data->c_stick_y = c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - gGamecubeControllerCenters[i].c_stick_y);
+                    data->stick_x   = stick_x   = CLAMP_S8(((s32)readformatgcn.stick_x  ) - contCenter->stick_x  );
+                    data->stick_y   = stick_y   = CLAMP_S8(((s32)readformatgcn.stick_y  ) - contCenter->stick_y  );
+                    data->c_stick_x = c_stick_x = CLAMP_S8(((s32)readformatgcn.c_stick_x) - contCenter->c_stick_x);
+                    data->c_stick_y = c_stick_y = CLAMP_S8(((s32)readformatgcn.c_stick_y) - contCenter->c_stick_y);
                     data->button    = __osTranslateGCNButtons(readformatgcn.button, c_stick_x, c_stick_y);
                     data->l_trig    = readformatgcn.l_trig;
                     data->r_trig    = readformatgcn.r_trig;
                 } else {
-                    gGamecubeControllerCenters[i].initialized = FALSE;
+                    contCenter->initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNShortPollFormat);
@@ -183,15 +188,15 @@ static void __osPackReadData(void) {
             ptr = (u8 *)ALIGN4(ptr);
 
             if (skipped) {
-                // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00)
-                //   byte for each skipped channel, and CONT_CMD_NOP (0xFF) for alignment.
+                // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00) byte
+                //   for each skipped channel, and set the rest to CONT_CMD_NOP (0xFF) for alignment.
                 // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
                 //   while bytes of 0x00 increment the channel counter.
                 *(u32 *)(ptr - 4) = ~BITMASK(skipped * 8);
                 skipped = 0;
             }
 
-            if (portInfo->type & CONT_GCN) {
+            if (portInfo->type & CONT_CONSOLE_GCN) {
                 readformatgcn.rumble = portInfo->gcRumble;
                 *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
                 ptr += sizeof(__OSContGCNShortPollFormat);
@@ -209,37 +214,30 @@ static void __osPackReadData(void) {
     *ptr = CONT_CMD_END;
 }
 
-// Called by osContGetReadDataEx
+// Convert GCN input bits to N64 input bits. Called by osContGetReadDataEx
 static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
-    u16 ret = 0x0;
+    N64Buttons n64 = { .raw = 0x0     };
+    GCNButtons gcn = { .raw = buttons };
 
-    // Face buttons
-    if (buttons & CONT_GCN_A    ) ret |= A_BUTTON;
-    if (buttons & CONT_GCN_B    ) ret |= B_BUTTON;
-    if (buttons & CONT_GCN_START) ret |= START_BUTTON;
-    if (buttons & CONT_GCN_X    ) ret |= GCN_X_BUTTON;
-    if (buttons & CONT_GCN_Y    ) ret |= GCN_Y_BUTTON;
+    n64.buttons.A       = gcn.buttons.A;
+    n64.buttons.B       = gcn.buttons.B;
+    n64.buttons.Z       = gcn.buttons.Z;
+    n64.buttons.START   = gcn.buttons.START;
+    n64.buttons.D_UP    = gcn.buttons.D_UP;
+    n64.buttons.D_DOWN  = gcn.buttons.D_DOWN;
+    n64.buttons.D_LEFT  = gcn.buttons.D_LEFT;
+    n64.buttons.D_RIGHT = gcn.buttons.D_RIGHT;
+    n64.buttons.RESET   = gcn.buttons.X;
+    n64.buttons.unused  = gcn.buttons.Y;
+    n64.buttons.L       = gcn.buttons.L;
+    n64.buttons.R       = gcn.buttons.R;
+    n64.buttons.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);
+    n64.buttons.C_DOWN  = (c_stick_y < -GCN_C_STICK_THRESHOLD);
+    n64.buttons.C_LEFT  = (c_stick_x < -GCN_C_STICK_THRESHOLD);
+    n64.buttons.C_RIGHT = (c_stick_x >  GCN_C_STICK_THRESHOLD);
 
-    // Triggers & Z
-    if (buttons & CONT_GCN_Z    ) ret |= Z_TRIG;
-    if (buttons & CONT_GCN_R    ) ret |= R_TRIG;
-    if (buttons & CONT_GCN_L    ) ret |= L_TRIG;
-
-    // D-Pad
-    if (buttons & CONT_GCN_UP   ) ret |= U_JPAD;
-    if (buttons & CONT_GCN_DOWN ) ret |= D_JPAD;
-    if (buttons & CONT_GCN_LEFT ) ret |= L_JPAD;
-    if (buttons & CONT_GCN_RIGHT) ret |= R_JPAD;
-
-    // C-stick to C-buttons
-    if (c_stick_x >  GCN_C_STICK_THRESHOLD) ret |= R_CBUTTONS;
-    if (c_stick_x < -GCN_C_STICK_THRESHOLD) ret |= L_CBUTTONS;
-    if (c_stick_y >  GCN_C_STICK_THRESHOLD) ret |= U_CBUTTONS;
-    if (c_stick_y < -GCN_C_STICK_THRESHOLD) ret |= D_CBUTTONS;
-
-    return ret;
+    return n64.raw;
 }
-
 /////////////////
 // contquery.c //
 /////////////////
@@ -304,7 +302,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         return PFS_ERR_INVALID;
     }
 
-    if (gPortInfo[pfs->channel].type & CONT_GCN) {
+    if (gPortInfo[pfs->channel].type & CONT_CONSOLE_GCN) {
         gPortInfo[pfs->channel].gcRumble = vibrate;
         __osContLastCmd = CONT_CMD_END;
     } else {
@@ -376,14 +374,14 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
 
     pfs->queue = mq;
     pfs->channel = channel;
-    pfs->activebank = 0xFF;
+    pfs->activebank = ACCESSORY_ID_NULL;
     pfs->status = 0;
 
-    if (gPortInfo[channel].type == CONT_TYPE_NORMAL) {
-        ret = __osPfsSelectBank(pfs, 0xFE);
+    if (!(gPortInfo[channel].type & CONT_CONSOLE_GCN)) {
+        ret = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
 
         if (ret == PFS_ERR_NEW_PACK) {
-            ret = __osPfsSelectBank(pfs, MOTOR_ID);
+            ret = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         }
 
         if (ret != 0) {
@@ -393,20 +391,20 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
         ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
 
         if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+            ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
 
         if (ret != 0) {
             return ret;
         }
 
-        if (temp[BLOCKSIZE - 1] == 0xFE) {
+        if (temp[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
             return PFS_ERR_DEVICE;
         }
 
-        ret = __osPfsSelectBank(pfs, MOTOR_ID);
+        ret = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+            ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
 
         if (ret != 0) {
@@ -415,14 +413,14 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
 
         ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
         if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+            ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
 
         if (ret != 0) {
             return ret;
         }
 
-        if (temp[31] != 0x80) {
+        if (temp[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
             return PFS_ERR_DEVICE;
         }
 

@@ -69,8 +69,8 @@ extern s8 gSramProbe;
 #define CONTROLLER_REPOLL_COMBO             (A_BUTTON | B_BUTTON | START_BUTTON)
 // How long after doing the combo to either start polling or start looking for the combo again, in frames. Default is 15.
 #define CONTROLLER_REPOLL_COMBO_COOLDOWN    15
-// How often to repoll for controllers when gRepollingControllers is true, in frames. Default is 30.
-#define CONTROLLER_REPOLL_TIME              30
+// How often to repoll for controllers when gRepollingControllers is true, in frames. Default is 15.
+#define CONTROLLER_REPOLL_TIME              15
 
 extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;

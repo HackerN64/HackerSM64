@@ -550,7 +550,7 @@ void run_demo_inputs(void) {
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
 void adjust_analog_stick(struct Controller *controller) {
-    s16 deadzone = (gIsConsole && (controller->statusData->type & CONT_GCN)) ? 12 : 8;
+    s16 deadzone = (gIsConsole && (controller->statusData->type & CONT_CONSOLE_GCN)) ? 12 : 8;
     s16 offset = (deadzone - 2);
 
     // Reset the controller's x and y floats.
@@ -607,7 +607,7 @@ void read_controller_inputs(void) {
                 return;
             }
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && (controller->statusData->type & CONT_GCN)) {
+            if (gIsConsole && (controller->statusData->type & CONT_CONSOLE_GCN)) {
                 u16 newButton = button & ~(Z_TRIG | L_TRIG);
                 if (button & Z_TRIG) {
                     newButton |= L_TRIG;
@@ -746,7 +746,6 @@ void setup_game_memory(void) {
  * Check for new controller data
  */
 void repoll_controllers(void) {
-    gRepollTimer = 0;
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -801,15 +800,17 @@ void read_repolling_inputs(void) {
                 gNumPlayers++;
                 break;
             }
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
+
             // If the combo is pressed, stop polling and assign the current controllers.
             if (gNumPlayers > __builtin_popcount(gControllerBits)
              || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
-             || ((button & CONTROLLER_REPOLL_COMBO) == CONTROLLER_REPOLL_COMBO)) {
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
+             || ((button & CONTROLLER_REPOLL_COMBO) == CONTROLLER_REPOLL_COMBO)
+#endif
+            ) {
                 stop_repolling_controllers();
                 break;
             }
-#endif
         }
     }
 }
@@ -837,7 +838,7 @@ void handle_input(void) {
         start_repolling_controllers();
     }
 
-    // Check for new controllers about once per second.
+    // Check for new controllers about twice per second.
     if (gRepollingControllers && ((gRepollTimer % CONTROLLER_REPOLL_TIME) == 0)) {
         repoll_controllers();
     }

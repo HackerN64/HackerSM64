@@ -108,34 +108,67 @@ typedef struct {
 #ifdef _HW_VERSION_1
 #define CONT_FRAME_ERROR                0x2
 #define CONT_COLLISION_ERROR            0x1
-#endif 
+#endif
 
-/* Controller type */
+/* Controller types (byteswapped) */
 
-#define CONT_NONE               0x0000
+#define CONT_NONE                           0x0000
 
-#define CONT_ABSOLUTE           0x0001
-#define CONT_RELATIVE           0x0002
-#define CONT_JOYPORT            0x0004
-#define CONT_GCN                0x0008
-#define CONT_WIRELESS           0x0080
+// N64:
+#define CONT_ABSOLUTE                       0x0001
+#define CONT_RELATIVE                       0x0002
+#define CONT_JOYPORT                        0x0004
+
+// Console ID:
+#define CONT_CONSOLE_MASK                   0x0018 // 0: N64, 1: Dolphin
+#define CONT_CONSOLE_N64                    0x0000
+#define CONT_CONSOLE_GCN                    0x0008
+
+// Gamecube:
+#define CONT_GCN_WIRELESS                   0x0080 // 0: wired, 1: wireless
+#define CONT_GCN_MOMOTOR                    0x0020 // 0: available, 1: not available
+#define CONT_GCN_STANDARD                   0x0001 // 0: non standard controller, 1: Dolphin Standard Controller
+
+// Wireless (WaveBird):
+#define CONT_GCN_RECEIVED                   0x0040 // 0: not wireless, 1: wireless
+#define CONT_GCN_WIRELESS_RF                0x0004 // 0: IF, 1: RF
+#define CONT_GCN_WIRELESS_STATE_FIXED       0x0002 // 0: variable, 1: fixed
+#define CONT_GCN_WIRELESS_VALID_ORIGIN      0x2000 // 0: invalid, 1: valid
+#define CONT_GCN_WIRELESS_FIX_ID            0x1000 // 0: not fixed, 1: fixed
+#define CONT_GCN_WIRELESS_TYPE_MASK         0x0F00 // 0x0: normal, 0x4: lite, 0x8: non-controller
+#define CONT_GCN_WIRELESS_LITE_MASK         0x0C00
+#define CONT_GCN_WIRELESS_LITE              0x0400 // 0: normal, 1: lite controller
+#define CONT_GCN_WIRELESS_NON_CONTROLLER    0x0800 // 0: normal, 1: non-controller (?)
+
+#define CONT_GCN_WIRELESS_ID                0xC000
+#define CONT_GCN_WIRELESS_TYPE_ID           (CONT_GCN_WIRELESS_TYPE_MASK | CONT_GCN_WIRELESS_ID)
+
+
 
 #define CONT_EEPROM             0x8000
 #define CONT_EEP16K             0x4000
 
-#define	CONT_TYPE_MASK          (0x1F00 | CONT_ABSOLUTE | CONT_RELATIVE | CONT_JOYPORT | CONT_GCN | CONT_WIRELESS) // 0x1F8F
-
-#define	CONT_TYPE_NORMAL        (0x0000 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
-#define	CONT_TYPE_MOUSE         (0x0000 | CONT_RELATIVE) // 0x0002
-#define	CONT_TYPE_VOICE         (0x0100) // 0x0100
-#define CONT_TYPE_KEYBOARD      (0x0200) // 0x0200
+#define CONT_TYPE_NULL          (0xFFFF)
+#define CONT_TYPE_UNKNOWN       (0x0000)
+// N64:
+#define	CONT_TYPE_NORMAL        (0x0000 | CONT_CONSOLE_N64 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
+#define	CONT_TYPE_MOUSE         (0x0000 | CONT_CONSOLE_N64 | CONT_RELATIVE) // 0x0002
+#define	CONT_TYPE_VOICE         (0x0100 | CONT_CONSOLE_N64) // 0x0100
+#define CONT_TYPE_KEYBOARD      (0x0200 | CONT_CONSOLE_N64) // 0x0200
+#define CONT_TYPE_DANCEPAD      CONT_TYPE_NORMAL
+#define CONT_TYPE_DENSHA        CONT_TYPE_NORMAL
+#define CONT_TYPE_FISHING       CONT_TYPE_NORMAL
+// GBA:
+#define CONT_TYPE_64GB          (0x0003) // 0x0003
 #define CONT_TYPE_GBA           (0x0400) // 0x0400
-#define CONT_TYPE_GCN           (0x0000 | CONT_GCN | CONT_ABSOLUTE) // 0x0009
-#define CONT_TYPE_GCN_RECEIVER  (0x0000 | CONT_WIRELESS | CONT_GCN) // 0x0088
-#define CONT_TYPE_GCN_WAVEBIRD  (0x1000 | CONT_WIRELESS | CONT_GCN | CONT_ABSOLUTE | CONT_RELATIVE) // 0x108B
-#define CONT_TYPE_GCN_WHEEL     (0x0000 | CONT_GCN) // 0x0008
-#define CONT_TYPE_GCN_KEYBOARD  (0x0200 | CONT_GCN) // 0x0208
-#define CONT_TYPE_GCN_DANCE     (0x0800 | CONT_GCN) // 0x0808
+// Gamecube:
+#define CONT_TYPE_GCN_NORMAL    (0x0000 | CONT_CONSOLE_GCN | CONT_GCN_STANDARD) // 0x0009
+#define CONT_TYPE_GCN_RECEIVER  (0x0000 | CONT_CONSOLE_GCN | CONT_GCN_WIRELESS) // 0x0088
+#define CONT_TYPE_GCN_WAVEBIRD  (0x0000 | CONT_CONSOLE_GCN | CONT_GCN_WIRELESS | CONT_GCN_STANDARD | CONT_GCN_WIRELESS_STATE_FIXED | CONT_GCN_WIRELESS_FIX_ID) // 0x108B
+#define CONT_TYPE_GCN_WHEEL     (0x0000 | CONT_CONSOLE_GCN) // 0x0008
+#define CONT_TYPE_GCN_KEYBOARD  (0x2000 | CONT_CONSOLE_GCN) // 0x2008
+#define CONT_TYPE_GCN_DANCEPAD  (0x0800 | CONT_CONSOLE_GCN | CONT_GCN_STANDARD) // 0x0808
+#define CONT_TYPE_GCN_DKONGAS   CONT_TYPE_GCN_NORMAL
 
 /* Controller status */
 
@@ -148,12 +181,14 @@ typedef struct {
 
 #define CONT_A      0x8000
 #define CONT_B      0x4000
-#define CONT_G	    0x2000
+#define CONT_G      0x2000
 #define CONT_START  0x1000
 #define CONT_UP     0x0800
 #define CONT_DOWN   0x0400
 #define CONT_LEFT   0x0200
 #define CONT_RIGHT  0x0100
+#define CONT_RESET  0x0080
+#define CONT_UNUSED 0x0040
 #define CONT_L      0x0020
 #define CONT_R      0x0010
 #define CONT_E      0x0008
@@ -163,25 +198,27 @@ typedef struct {
 
 /* Nintendo's official button names */
 
-#define A_BUTTON	CONT_A
-#define B_BUTTON	CONT_B
-#define L_TRIG		CONT_L
-#define R_TRIG		CONT_R
-#define Z_TRIG		CONT_G
-#define START_BUTTON	CONT_START
-#define U_JPAD		CONT_UP
-#define L_JPAD		CONT_LEFT
-#define R_JPAD		CONT_RIGHT
-#define D_JPAD		CONT_DOWN
-#define U_CBUTTONS	CONT_E
-#define L_CBUTTONS	CONT_C
-#define R_CBUTTONS	CONT_F
-#define D_CBUTTONS	CONT_D
-#define GCN_X_BUTTON 0x0040
-#define GCN_Y_BUTTON 0x0080
+#define A_BUTTON        CONT_A      // 0x8000
+#define B_BUTTON        CONT_B      // 0x4000
+#define X_BUTTON        CONT_RESET  // 0x0080
+#define Y_BUTTON        CONT_UNUSED // 0x0040
+#define L_TRIG          CONT_L      // 0x0020
+#define R_TRIG          CONT_R      // 0x0010
+#define Z_TRIG          CONT_G      // 0x2000
+#define START_BUTTON    CONT_START  // 0x1000
+#define U_JPAD          CONT_UP     // 0x0800
+#define L_JPAD          CONT_LEFT   // 0x0200
+#define R_JPAD          CONT_RIGHT  // 0x0100
+#define D_JPAD          CONT_DOWN   // 0x0400
+#define U_CBUTTONS      CONT_E      // 0x0008
+#define L_CBUTTONS      CONT_C      // 0x0002
+#define R_CBUTTONS      CONT_F      // 0x0001
+#define D_CBUTTONS      CONT_D      // 0x0004
 
 /* Gamecube controller buttons */
 
+#define CONT_GCN_ERRSTAT     0x8000
+#define CONT_GCN_ERRLATCH    0x4000
 #define CONT_GCN_GET_ORIGIN  0x2000
 #define CONT_GCN_START       0x1000
 #define CONT_GCN_Y           0x0800
@@ -196,6 +233,8 @@ typedef struct {
 #define CONT_GCN_DOWN        0x0004
 #define CONT_GCN_RIGHT       0x0002
 #define CONT_GCN_LEFT        0x0001
+
+/* Gamecube controller constants */
 
 #define GCN_C_STICK_THRESHOLD 38
 #define GCN_TRIGGER_THRESHOLD 85
