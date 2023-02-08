@@ -48,8 +48,8 @@ extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
 extern u8 gNumPlayers;
 extern u8 gControllerBits;
-extern u8 gRepollingControllers;
-extern u32 gRepollTimer;
+extern u8 gContStatusPolling;
+extern u32 gContStasusPollTimer;
 extern u8 gIsConsole;
 extern u8 gCacheEmulated;
 extern u8 gBorderHeight;
@@ -65,12 +65,21 @@ extern s8 gEepromProbe;
 extern s8 gSramProbe;
 #endif
 
+// Controller Status Polling:
+
 // This button combo should be standard, so don't change it unless you have a very good reason.
-#define CONTROLLER_REPOLL_COMBO             (A_BUTTON | B_BUTTON | START_BUTTON)
+#define TOGGLE_CONT_STATUS_POLLING_COMBO            (A_BUTTON | B_BUTTON | START_BUTTON)
 // How long after doing the combo to either start polling or start looking for the combo again, in frames. Default is 15.
-#define CONTROLLER_REPOLL_COMBO_COOLDOWN    15
-// How often to repoll for controllers when gRepollingControllers is true, in frames. Default is 15.
-#define CONTROLLER_REPOLL_TIME              15
+#define TOGGLE_CONT_STATUS_POLLING_COMBO_COOLDOWN   15
+// How often to poll for controller status when gContStatusPolling is true, in frames. Default is 15.
+#define CONT_STATUS_POLLING_TIME                    15
+
+// GameCube controller specific:
+
+// How far the player has to move the C-stick for it to register as a C button when converting to N64 input. Default is 38.
+#define GCN_C_STICK_THRESHOLD 38
+// How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%. Default is 85.
+#define GCN_TRIGGER_THRESHOLD 85
 
 extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;
@@ -102,6 +111,6 @@ void end_master_display_list(void);
 void render_init(void);
 void select_gfx_pool(void);
 void display_and_vsync(void);
-void start_repolling_controllers();
+void start_controller_status_polling();
 
 #endif // GAME_INIT_H

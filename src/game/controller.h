@@ -181,10 +181,10 @@ enum ContCmds {
     CONT_CMD_RESET = 0xFF,
 };
 
-#define CONT_CMD_NOP                0xFF
-#define CONT_CMD_END                0xFE // indicates end of a command
-#define CONT_CMD_EXE                0x01 // set pif ram status byte to this to do a command
-#define CONT_CMD_SKIP_CHNL          0x00 // Skip channel
+#define CONT_CMD_SKIP_CHNL          0x00 // Skip channel.
+#define CONT_CMD_NOP                0xFF // Deos nothing, used for alignment.
+#define CONT_CMD_END                0xFE // Indicates end of a command.
+#define CONT_CMD_EXE                0x01 // Set pif ram status byte to this to do a command.
 
 // RX Error flags
 #define CONT_CMD_RX_SUCCESSFUL      0x00
@@ -228,8 +228,16 @@ typedef struct PACKED
     /* 0x0 */ u16 D_DOWN     : 1; // CONT_DOWN
     /* 0x0 */ u16 D_LEFT     : 1; // CONT_LEFT
     /* 0x0 */ u16 D_RIGHT    : 1; // CONT_RIGHT
-    /* 0x1 */ u16 RESET      : 1; // CONT_RESET
-    /* 0x1 */ u16 unused     : 1; // CONT_UNUSED
+    union {
+        u16 RESET   : 1; // CONT_RESET
+        u16 X       : 1;
+    };
+    union {
+        u16 unused  : 1; // CONT_UNUSED
+        u16 Y       : 1;
+    };
+    // /* 0x1 */ u16 RESET      : 1; // CONT_RESET
+    // /* 0x1 */ u16 unused     : 1; // CONT_UNUSED
     /* 0x1 */ u16 L          : 1; // CONT_L
     /* 0x1 */ u16 R          : 1; // CONT_R
     /* 0x1 */ u16 C_UP       : 1; // CONT_E

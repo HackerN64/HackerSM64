@@ -46,8 +46,8 @@ OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 u8 gControllerBits = 0x0; // Which ports have a controller connected to them.
 u8 gNumPlayers = 1;
-u8 gRepollingControllers = FALSE;
-u32 gRepollTimer = 0;
+u8 gContStatusPolling = FALSE;
+u32 gContStasusPollTimer = 0;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -600,10 +600,10 @@ void read_controller_inputs(void) {
         struct Controller *controller = &gControllers[i];
         OSContPadEx *controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
-        if (!gRepollingControllers && controllerData != NULL) {
+        if (!gContStatusPolling && controllerData != NULL) {
             u16 button = controllerData->button;
-            if ((gRepollTimer > 15) && (button & CONTROLLER_REPOLL_COMBO) == CONTROLLER_REPOLL_COMBO) {
-                start_repolling_controllers();
+            if ((gContStasusPollTimer > 15) && (button & TOGGLE_CONT_STATUS_POLLING_COMBO) == TOGGLE_CONT_STATUS_POLLING_COMBO) {
+                start_controller_status_polling();
                 return;
             }
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
@@ -612,7 +612,7 @@ void read_controller_inputs(void) {
                 if (button & Z_TRIG) {
                     newButton |= L_TRIG;
                 }
-                if (controllerData->l_trig > GCN_TRIGGER_THRESHOLD) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
+                if (controllerData->l_trig > GCN_TRIGGER_THRESHOLD) {
                     newButton |= Z_TRIG;
                 }
                 button = newButton;
@@ -690,7 +690,7 @@ void init_controllers(void) {
 
 /**
  * Initialize the controller structs to point at the OSCont information.
- * Assigns controllers based on assigned data from repolling.
+ * Assigns controllers based on assigned data from status polling.
  */
 void assign_controllers(void) {
     s16 lastUsedPort = -1;
@@ -743,15 +743,30 @@ void setup_game_memory(void) {
 }
 
 /**
- * Check for new controller data
+ * Read raw controller input data.
  */
-void repoll_controllers(void) {
+void poll_controller_input(void) {
+#ifdef ENABLE_RUMBLE
+    block_until_rumble_pak_free();
+#endif
+    osContStartReadDataEx(&gSIEventMesgQueue);
+    osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+    osContGetReadDataEx(&gControllerPads[0]);
+#ifdef ENABLE_RUMBLE
+    release_rumble_pak_control();
+#endif
+}
+
+/**
+ * Check for new controller data.
+ */
+void poll_controller_status(void) {
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
     osContSetCh(MAXCONTROLLERS);
     osContStartQuery(&gSIEventMesgQueue);
-    osRecvMesg(&gSIEventMesgQueue, NULL, OS_MESG_BLOCK);
+    osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     osContGetQueryEx(&gControllerBits, &gControllerStatuses[0]);
 #ifdef ENABLE_RUMBLE
     release_rumble_pak_control();
@@ -761,9 +776,9 @@ void repoll_controllers(void) {
 /**
  * Start polling for new controllers and open the UI.
  */
-void start_repolling_controllers(void) {
-    gRepollingControllers = TRUE;
-    gRepollTimer = 0;
+void start_controller_status_polling(void) {
+    gContStatusPolling = TRUE;
+    gContStasusPollTimer = 0;
     gNumPlayers = 1;
     bzero(gPortInfo, sizeof(gPortInfo));
 #ifdef ENABLE_RUMBLE
@@ -774,9 +789,9 @@ void start_repolling_controllers(void) {
 /**
  * Stop polling for new controllers and assign them to their player numbers.
  */
-void stop_repolling_controllers(void) {
-    gRepollingControllers = FALSE;
-    gRepollTimer = 0;
+void stop_controller_status_polling(void) {
+    gContStatusPolling = FALSE;
+    gContStasusPollTimer = 0;
     gNumPlayers--;
     assign_controllers();
 #ifdef ENABLE_RUMBLE
@@ -785,9 +800,9 @@ void stop_repolling_controllers(void) {
 }
 
 /**
- * Assign controllers based on 
+ * Assign controllers based on player input.
  */
-void read_repolling_inputs(void) {
+void controller_status_polling_read_inputs(void) {
     for (int i = 0; i < MAXCONTROLLERS; i++) {
         OSPortInfo *portInfo = &gPortInfo[i];
 
@@ -798,52 +813,46 @@ void read_repolling_inputs(void) {
             if (button && !portInfo->playerNum) {
                 portInfo->playerNum = gNumPlayers;
                 gNumPlayers++;
-                break;
+                return;
             }
 
             // If the combo is pressed, stop polling and assign the current controllers.
             if (gNumPlayers > __builtin_popcount(gControllerBits)
              || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-             || ((button & CONTROLLER_REPOLL_COMBO) == CONTROLLER_REPOLL_COMBO)
+             || ((button & TOGGLE_CONT_STATUS_POLLING_COMBO) == TOGGLE_CONT_STATUS_POLLING_COMBO)
 #endif
             ) {
-                stop_repolling_controllers();
-                break;
+                stop_controller_status_polling();
+                return;
             }
         }
     }
 }
 
 /**
- * Handle input and status from controllers.
+ * General input handling function.
  */
 void handle_input(void) {
-    // Normal input. If any controllers are plugged in, update the controller information.
+    // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
-#ifdef ENABLE_RUMBLE
-        block_until_rumble_pak_free();
-#endif
-        osContStartReadDataEx(&gSIEventMesgQueue);
-        osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-        osContGetReadDataEx(&gControllerPads[0]);
-#ifdef ENABLE_RUMBLE
-        release_rumble_pak_control();
-#endif
-        if (gRepollingControllers && (gRepollTimer > CONTROLLER_REPOLL_COMBO_COOLDOWN)) { // 0.5 second cooldown after repolling.
-            read_repolling_inputs();
+        poll_controller_input();
+
+        if (gContStatusPolling && (gContStasusPollTimer > TOGGLE_CONT_STATUS_POLLING_COMBO_COOLDOWN)) {
+            // 0.5 second cooldown after starting controller status polling.
+            controller_status_polling_read_inputs();
         }
-    } else if (!gRepollingControllers) {
-        // Start repolling controllers if all ports are empty and we're not already polling.
-        start_repolling_controllers();
+    } else if (!gContStatusPolling) {
+        // Start controller status polling if all ports are empty and we're not already polling.
+        start_controller_status_polling();
     }
 
-    // Check for new controllers about twice per second.
-    if (gRepollingControllers && ((gRepollTimer % CONTROLLER_REPOLL_TIME) == 0)) {
-        repoll_controllers();
+    // Only poll controller status about twice per second.
+    if (gContStatusPolling && ((gContStasusPollTimer % CONT_STATUS_POLLING_TIME) == 0)) {
+        poll_controller_status();
     }
 
-    gRepollTimer++;
+    gContStasusPollTimer++;
 
     read_controller_inputs();
 

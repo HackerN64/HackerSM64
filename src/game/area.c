@@ -388,7 +388,7 @@ void render_controllers_overlay(void) {
     Texture *texture_controller = texture_controller_noport;
     char text_buffer[32];
 
-    if (!gRepollingControllers) {
+    if (!gContStatusPolling) {
         return;
     }
 
@@ -431,7 +431,7 @@ void render_controllers_overlay(void) {
 
     gSPDisplayList(dlHead++, dl_fasttext_begin);
 
-    if ((gRepollTimer & 31) < 20) {
+    if ((gContStasusPollTimer & 31) < 20) {
         drawSmallString(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...");
         sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
         drawSmallString(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer);

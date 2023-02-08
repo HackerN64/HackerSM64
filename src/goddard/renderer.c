@@ -2401,7 +2401,7 @@ void parse_p1_controller(void) {
     OSContPadEx *currInputs;
     OSContPadEx *prevInputs;
 
-    if (gRepollingControllers) {
+    if (gContStatusPolling) {
         return;
     }
 
