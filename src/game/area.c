@@ -404,7 +404,6 @@ void render_controllers_overlay(void) {
             case CONT_TYPE_MOUSE:       texture_controller = texture_controller_mouse;    break;
             case CONT_TYPE_VOICE:       texture_controller = texture_controller_voice;    break;
             case CONT_TYPE_KEYBOARD:    texture_controller = texture_controller_keyboard; break;
-            case CONT_TYPE_TRAIN:       texture_controller = texture_controller_train;    break;
             case CONT_TYPE_GCN:         texture_controller = texture_controller_gamecube; break;
             //! TODO: Remaining devices
             default:                    texture_controller = texture_controller_port;     break;

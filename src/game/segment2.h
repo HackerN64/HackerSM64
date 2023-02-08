@@ -40,11 +40,10 @@ extern Gfx dl_waterbox_end[];
 extern Texture texture_controller_port[];
 extern Texture texture_controller_noport[];
 extern Texture texture_controller_normal[];
-extern Texture texture_controller_gamecube[];
 extern Texture texture_controller_mouse[];
 extern Texture texture_controller_voice[];
 extern Texture texture_controller_keyboard[];
-extern Texture texture_controller_train[];
+extern Texture texture_controller_gamecube[];
 #ifdef ENABLE_RUMBLE
 //! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
 extern Texture title_texture_rumble_pak_en[];

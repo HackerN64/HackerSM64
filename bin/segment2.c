@@ -2840,9 +2840,6 @@ ALIGNED8 const Texture texture_controller_noport[] = {
 ALIGNED8 const Texture texture_controller_normal[] = {
 #include "textures/segment2/controller_normal.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_gamecube[] = {
-#include "textures/segment2/controller_gamecube.rgba16.inc.c"
-};
 ALIGNED8 const Texture texture_controller_mouse[] = {
 #include "textures/segment2/controller_mouse.rgba16.inc.c"
 };
@@ -2852,8 +2849,8 @@ ALIGNED8 const Texture texture_controller_voice[] = {
 ALIGNED8 const Texture texture_controller_keyboard[] = {
 #include "textures/segment2/controller_keyboard.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_train[] = {
-#include "textures/segment2/controller_train.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_gamecube[] = {
+#include "textures/segment2/controller_gamecube.rgba16.inc.c"
 };
 
 #ifdef ENABLE_RUMBLE

@@ -129,7 +129,6 @@ typedef struct {
 #define	CONT_TYPE_MOUSE         (0x0000 | CONT_RELATIVE) // 0x0002
 #define	CONT_TYPE_VOICE         (0x0100) // 0x0100
 #define CONT_TYPE_KEYBOARD      (0x0200) // 0x0200
-#define CONT_TYPE_TRAIN         (0x0400 | 0x0020) // 0x0420
 #define CONT_TYPE_GBA           (0x0400) // 0x0400
 #define CONT_TYPE_GCN           (0x0000 | CONT_GCN | CONT_ABSOLUTE) // 0x0009
 #define CONT_TYPE_GCN_RECEIVER  (0x0000 | CONT_WIRELESS | CONT_GCN) // 0x0088
