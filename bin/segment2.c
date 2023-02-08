@@ -2860,18 +2860,26 @@ ALIGNED8 const Texture title_texture_rumble_pak_en[] = {
 };
 //! TODO: Use these after ASCII/multilang is merged.
  #if MULTILANG
+  #ifdef ENABLE_FRENCH
 ALIGNED8 const Texture title_texture_rumble_pak_fr[] = {
 #include "textures/segment2/rumble_pak_fr.rgba16.inc.c"
 };
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
 ALIGNED8 const Texture title_texture_rumble_pak_de[] = {
 #include "textures/segment2/rumble_pak_de.rgba16.inc.c"
 };
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
 ALIGNED8 const Texture title_texture_rumble_pak_jp[] = {
 #include "textures/segment2/rumble_pak_jp.rgba16.inc.c"
 };
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
 ALIGNED8 const Texture title_texture_rumble_pak_es[] = {
 #include "textures/segment2/rumble_pak_es.rgba16.inc.c"
 };
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
  #endif // MULTILANG
 #endif // ENABLE_RUMBLE
 

@@ -11,11 +11,12 @@
 #include "types.h"
 #include "buffers/framebuffers.h"
 #include "game/game_init.h"
+#include "game/save_file.h" //! TODO: Change this to "game/ingame_menu.h" after ASCII/multilang is merged.
 #include "audio/external.h"
 
 // frame counts for the zoom in, hold, and zoom out of title model
-#define INTRO_STEPS_ZOOM_IN 20
-#define INTRO_STEPS_HOLD_1 75
+#define INTRO_STEPS_ZOOM_IN  20
+#define INTRO_STEPS_HOLD_1   75
 #define INTRO_STEPS_ZOOM_OUT 91
 
 // background types
@@ -430,6 +431,25 @@ static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
     gsSPEndDisplayList(),
 };
 
+Texture *title_texture_rumble_pak_language_array[] = {
+    title_texture_rumble_pak_en,
+//! TODO: Use these after ASCII/multilang is merged.
+ #if MULTILANG
+  #ifdef ENABLE_FRENCH
+    title_texture_rumble_pak_fr,
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
+    title_texture_rumble_pak_de,
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
+    title_texture_rumble_pak_jp,
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
+    title_texture_rumble_pak_es,
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
+ #endif // MULTILANG
+};
+
 Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;
@@ -457,7 +477,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
-                gDPLoadTextureTile(dlIter++, title_texture_rumble_pak_en, G_IM_FMT_RGBA, G_IM_SIZ_16b, RUMBLE_W, 0, 0, 0, (RUMBLE_W - 1), (RUMBLE_H - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+                gDPLoadTextureTile(dlIter++, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], G_IM_FMT_RGBA, G_IM_SIZ_16b, RUMBLE_W, 0, 0, 0, (RUMBLE_W - 1), (RUMBLE_H - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
                 gSPEndDisplayList(dlIter);
             }

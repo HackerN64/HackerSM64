@@ -49,10 +49,18 @@ extern Texture texture_controller_gamecube[];
 extern Texture title_texture_rumble_pak_en[];
 //! TODO: Use these after ASCII/multilang is merged.
  #if MULTILANG
+  #ifdef ENABLE_FRENCH
 extern Texture title_texture_rumble_pak_fr[];
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
 extern Texture title_texture_rumble_pak_de[];
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
 extern Texture title_texture_rumble_pak_jp[];
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
 extern Texture title_texture_rumble_pak_es[];
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
  #endif // MULTILANG
 #endif // ENABLE_RUMBLE
 extern Gfx dl_paintings_draw_ripples[];

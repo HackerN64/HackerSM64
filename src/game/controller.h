@@ -230,14 +230,12 @@ typedef struct PACKED
     /* 0x0 */ u16 D_RIGHT    : 1; // CONT_RIGHT
     union {
         u16 RESET   : 1; // CONT_RESET
-        u16 X       : 1;
+        u16 X       : 1; // GCN
     };
     union {
         u16 unused  : 1; // CONT_UNUSED
-        u16 Y       : 1;
+        u16 Y       : 1; // GCN
     };
-    // /* 0x1 */ u16 RESET      : 1; // CONT_RESET
-    // /* 0x1 */ u16 unused     : 1; // CONT_UNUSED
     /* 0x1 */ u16 L          : 1; // CONT_L
     /* 0x1 */ u16 R          : 1; // CONT_R
     /* 0x1 */ u16 C_UP       : 1; // CONT_E
