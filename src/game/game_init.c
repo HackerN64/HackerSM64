@@ -651,6 +651,11 @@ void assign_controller_data(struct Controller *controller, int port) {
  * Automatically assignins controller numbers based on port order.
  */
 void init_controllers(void) {
+#ifdef PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT
+    const s32 prioritizeGCN = TRUE;
+#else
+    const s32 prioritizeGCN = FALSE;
+#endif
     s16 port, cont, lastUsedPort;
 
     // Init the controllers.
@@ -667,20 +672,24 @@ void init_controllers(void) {
     gSramProbe = nuPiInitSram();
 #endif
 
-    // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
-    // The game allows you to have a controller plugged into any port in order to play the game.
-    for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
-        OSPortInfo *portInfo = &gPortInfo[port];
+    // Two passes if PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT is enabled.
+    // The first pass is for only GameCube controllers and the second pass for everything else.
+    for (int i = 0; i < (1 + prioritizeGCN); i++) {
+        // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
+        // The game allows you to have a controller plugged into any port in order to play the game.
+        for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
+            OSPortInfo *portInfo = &gPortInfo[port];
 
-        // Is the controller plugged in?
-        if (portInfo->plugged) {
-            assign_controller_data(&gControllers[cont], port);
+            // Is the controller plugged in?
+            if (portInfo->plugged && (!prioritizeGCN || i == !(portInfo->type & CONT_CONSOLE_GCN))) {
+                assign_controller_data(&gControllers[cont], port);
 
-            portInfo->playerNum = cont + 1;
+                portInfo->playerNum = (cont + 1);
 
-            lastUsedPort = port;
+                lastUsedPort = port;
 
-            cont++;
+                cont++;
+            }
         }
     }
 

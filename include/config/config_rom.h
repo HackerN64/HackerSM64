@@ -23,9 +23,14 @@
 #define NUM_SUPPORTED_CONTROLLERS 1
 
 /**
- * Informs supported emulators to default to gamecube controller inputs.
+ * Informs supported emulators to default to GameCube controller inputs.
  */
 // #define USE_GAMECUBE_CONTROLLER
+
+/**
+ * Prioritize GameCube controllers when assigning player numbers to controllers on boot.
+ */
+// #define PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT
 
 /**
  * RCVI hack. Increases performance on emulator, and does nothing on console.
