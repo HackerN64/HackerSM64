@@ -325,15 +325,16 @@ static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
  */
 s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
     s32 ret = 0;
-    u8* ptr = (u8*)&__MotorDataBuf[pfs->channel];
+    int channel = pfs->channel;
+    u8* ptr = (u8*)&__MotorDataBuf[channel];
     int i;
 
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
         return PFS_ERR_INVALID;
     }
 
-    if (gPortInfo[pfs->channel].type & CONT_CONSOLE_GCN) {
-        gPortInfo[pfs->channel].gcRumble = vibrate;
+    if (gPortInfo[channel].type & CONT_CONSOLE_GCN) {
+        gPortInfo[channel].gcRumble = vibrate;
         __osContLastCmd = CONT_CMD_END;
     } else {
         if (vibrate == MOTOR_STOP_HARD) {
@@ -341,17 +342,17 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         }
 
         __osSiGetAccess();
-        __MotorDataBuf[pfs->channel].pifstatus = CONT_CMD_EXE;
-        ptr += pfs->channel;
+        __MotorDataBuf[channel].pifstatus = CONT_CMD_EXE;
+        ptr += channel;
 
         for (i = 0; i < BLOCKSIZE; i++) {
             READFORMAT(ptr)->data[i] = vibrate;
         }
 
         __osContLastCmd = CONT_CMD_END;
-        __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[pfs->channel]);
+        __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
-        __osSiRawStartDma(OS_READ, &__MotorDataBuf[pfs->channel]);
+        __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
         ret = (READFORMAT(ptr)->rxsize & CHNL_ERR_MASK);

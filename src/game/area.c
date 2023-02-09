@@ -82,10 +82,28 @@ u8 sSpawnTypeFromWarpBhv[] = {
     MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
 };
 
-Vp gViewport = { {
-    { 640, 480, 511, 0 },
-    { 640, 480, 511, 0 },
-} };
+ALIGNED4 const struct ControllerIcon gControllerIcons[] = {
+    { .type = CONT_NONE,                .texture = texture_controller_port         },
+    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
+    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
+    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
+    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
+    { .type = CONT_TYPE_64GB,           .texture = texture_controller_64gb         },
+    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
+    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
+    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
+    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird },
+    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel    },
+    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
+    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
+};
+
+Vp gViewport = {
+    .vp = {
+        .vscale = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+        .vtrans = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+    }
+};
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
@@ -367,7 +385,7 @@ static const Gfx dl_controller_icons_begin[] = {
     gsDPSetTexturePersp(G_TP_NONE),
     gsDPSetTextureFilter(G_TF_POINT),
     gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
-    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, (SCREEN_WIDTH - 1), (SCREEN_HEIGHT - 1)),
+    gsDPSetAlphaCompare(G_AC_THRESHOLD),
     gsSPEndDisplayList(),
 };
 
@@ -377,48 +395,61 @@ static const Gfx dl_controller_icons_end[] = {
     gsDPSetTexturePersp(G_TP_PERSP),
     gsDPSetTextureFilter(G_TF_BILERP),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetAlphaCompare(G_AC_NONE),
     gsSPEndDisplayList(),
 };
+
+extern void shade_screen(void);
 
 void render_controllers_overlay(void) {
     const s32 w = 32;
     const s32 h = 32;
+    const s32 texW = 32;
+    const s32 texH = 32;
     s32 x = SCREEN_CENTER_X;
     s32 y = (SCREEN_CENTER_Y - (h / 2));
     OSPortInfo *portInfo = NULL;
-    Texture *texture_controller = texture_controller_noport;
+    Texture *texture_controller = texture_controller_unknown;
     char text_buffer[32];
+    int port;
 
     if (!gContStatusPolling) {
         return;
     }
 
+    // Darken the screen while polling controller status, similar to pausing the game.
+    shade_screen();
+
     Gfx* dlHead = gDisplayListHead;
+
+    // Allow drawing outside borders.
+    gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Draw the port icons:
 
     gSPDisplayList(dlHead++, dl_controller_icons_begin);
-    for (int i = 0; i < MAXCONTROLLERS; i++) {
-        portInfo = &gPortInfo[i];
-    
-        switch (portInfo->type) {
-            case CONT_NONE:             texture_controller = texture_controller_noport;   break;
-            case CONT_TYPE_NORMAL:      texture_controller = texture_controller_normal;   break;
-            case CONT_TYPE_MOUSE:       texture_controller = texture_controller_mouse;    break;
-            case CONT_TYPE_VOICE:       texture_controller = texture_controller_voice;    break;
-            case CONT_TYPE_KEYBOARD:    texture_controller = texture_controller_keyboard; break;
-            case CONT_TYPE_GCN_NORMAL:  texture_controller = texture_controller_gamecube; break;
-            //! TODO: Remaining devices
-            default:                    texture_controller = texture_controller_port;     break;
+
+    for (port = 0; port < MAXCONTROLLERS; port++) {
+        portInfo = &gPortInfo[port];
+
+        // Loop through gControllerIcons to get the port's corresponding texture.
+        for (int i = 0; i < ARRAY_COUNT(gControllerIcons); i++) {
+            if (portInfo->type == gControllerIcons[i].type) {
+                texture_controller = gControllerIcons[i].texture;
+                break;
+            }
         }
-        x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * i);
+
+        // Center pos 
+        x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port);
         gDPLoadTextureTile(dlHead++,
             texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
-            w, h, 0, 0,
-            (w - 1), (h - 1), 0,
+            texW, texH, 0, 0,
+            (texW - 1), (texH - 1), 0,
             (G_TX_NOMIRROR | G_TX_CLAMP),
             (G_TX_NOMIRROR | G_TX_CLAMP),
-            0, 0, G_TX_NOLOD, G_TX_NOLOD
+            G_TX_NOMASK, G_TX_NOMASK,
+            G_TX_NOLOD,  G_TX_NOLOD
         );
         gSPTextureRectangle(dlHead++,
             (x << 2), (y << 2),
@@ -428,6 +459,7 @@ void render_controllers_overlay(void) {
             (4 << 10), (1 << 10)
         );
     }
+
     gSPDisplayList(dlHead++, dl_controller_icons_end);
 
     // Draw the text:
@@ -436,24 +468,30 @@ void render_controllers_overlay(void) {
 
     if ((gContStasusPollTimer & 31) < 20) {
         drawSmallString(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...");
-        sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
-        drawSmallString(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer);
-
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
-        drawSmallString(&dlHead, (SCREEN_CENTER_X - 48), (SCREEN_CENTER_Y + 28), "OR COMBO TO EXIT");
-#endif
     }
 
-    for (int i = 0; i < MAXCONTROLLERS; i++) {
-        portInfo = &gPortInfo[i];
+    // Instructions:
+    sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
+    drawSmallString(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer);
+
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
+    drawSmallString(&dlHead, (SCREEN_CENTER_X - 64), (SCREEN_CENTER_Y + 28), "OR A+B+START TO EXIT");
+#endif
+
+    // Print the assigned port numbers.
+    for (port = 0; port < MAXCONTROLLERS; port++) {
+        portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && portInfo->playerNum) {
             sprintf(text_buffer, "P%d", portInfo->playerNum);
-            drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * i) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
+            drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
         }
     }
 
     gSPDisplayList(dlHead++, dl_fasttext_end);
+
+    // Disallow drawing outside borders.
+    gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
 
     gDisplayListHead = dlHead;
 }
@@ -484,10 +522,10 @@ void render_game(void) {
 
         if (gViewportClip != NULL) {
             make_viewport_clip_rect(gViewportClip);
-        } else
+        } else {
             gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
                           SCREEN_HEIGHT - gBorderHeight);
-
+        }
         if (gWarpTransition.isActive) {
             if (gWarpTransDelay == 0) {
                 gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time,

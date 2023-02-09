@@ -816,11 +816,11 @@ void stop_controller_status_polling(void) {
 void controller_status_polling_read_inputs(void) {
     OSPortInfo *portInfo = NULL;
 
-    for (int i = 0; i < MAXCONTROLLERS; i++) {
-        portInfo = &gPortInfo[i];
+    for (int port = 0; port < MAXCONTROLLERS; port++) {
+        portInfo = &gPortInfo[port];
 
         if (portInfo->plugged) {
-            u16 button = gControllerPads[i].button;
+            u16 button = gControllerPads[port].button;
 
             // If a button is pressed on an unassigned controller, assign it the current player number.
             if (button && !portInfo->playerNum) {

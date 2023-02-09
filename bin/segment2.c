@@ -2834,23 +2834,44 @@ const Gfx dl_ia8_up_arrow_end[] = {
 ALIGNED8 const Texture texture_controller_port[] = {
 #include "textures/segment2/controller_port.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_noport[] = {
-#include "textures/segment2/controller_noport.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_unknown[] = {
+#include "textures/segment2/controller_unknown.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_normal[] = {
-#include "textures/segment2/controller_normal.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_n64_normal[] = {
+#include "textures/segment2/controller_n64_normal.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_mouse[] = {
-#include "textures/segment2/controller_mouse.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_n64_mouse[] = {
+#include "textures/segment2/controller_n64_mouse.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_voice[] = {
-#include "textures/segment2/controller_voice.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_n64_voice[] = {
+#include "textures/segment2/controller_n64_voice.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_keyboard[] = {
-#include "textures/segment2/controller_keyboard.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_n64_keyboard[] = {
+#include "textures/segment2/controller_n64_keyboard.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_gamecube[] = {
-#include "textures/segment2/controller_gamecube.rgba16.inc.c"
+ALIGNED8 const Texture texture_controller_64gb[] = {
+#include "textures/segment2/controller_64gb.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gba[] = {
+#include "textures/segment2/controller_gba.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_normal[] = {
+#include "textures/segment2/controller_gcn_normal.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_receiver[] = {
+#include "textures/segment2/controller_gcn_receiver.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_wavebird[] = {
+#include "textures/segment2/controller_gcn_wavebird.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_wheel[] = {
+#include "textures/segment2/controller_gcn_wheel.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_keyboard[] = {
+#include "textures/segment2/controller_gcn_keyboard.rgba16.inc.c"
+};
+ALIGNED8 const Texture texture_controller_gcn_dancepad[] = {
+#include "textures/segment2/controller_gcn_dancepad.rgba16.inc.c"
 };
 
 #ifdef ENABLE_RUMBLE

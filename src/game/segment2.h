@@ -38,12 +38,19 @@ extern Gfx dl_waterbox_ia16_begin[];
 extern Gfx dl_waterbox_rgba16_begin[];
 extern Gfx dl_waterbox_end[];
 extern Texture texture_controller_port[];
-extern Texture texture_controller_noport[];
-extern Texture texture_controller_normal[];
-extern Texture texture_controller_mouse[];
-extern Texture texture_controller_voice[];
-extern Texture texture_controller_keyboard[];
-extern Texture texture_controller_gamecube[];
+extern Texture texture_controller_unknown[];
+extern Texture texture_controller_n64_normal[];
+extern Texture texture_controller_n64_mouse[];
+extern Texture texture_controller_n64_voice[];
+extern Texture texture_controller_n64_keyboard[];
+extern Texture texture_controller_64gb[];
+extern Texture texture_controller_gba[];
+extern Texture texture_controller_gcn_normal[];
+extern Texture texture_controller_gcn_receiver[];
+extern Texture texture_controller_gcn_wavebird[];
+extern Texture texture_controller_gcn_wheel[];
+extern Texture texture_controller_gcn_keyboard[];
+extern Texture texture_controller_gcn_dancepad[];
 #ifdef ENABLE_RUMBLE
 //! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
 extern Texture title_texture_rumble_pak_en[];
