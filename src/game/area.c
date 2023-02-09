@@ -385,6 +385,7 @@ void render_controllers_overlay(void) {
     const s32 h = 32;
     s32 x = SCREEN_CENTER_X;
     s32 y = (SCREEN_CENTER_Y - (h / 2));
+    OSPortInfo *portInfo = NULL;
     Texture *texture_controller = texture_controller_noport;
     char text_buffer[32];
 
@@ -398,7 +399,9 @@ void render_controllers_overlay(void) {
 
     gSPDisplayList(dlHead++, dl_controller_icons_begin);
     for (int i = 0; i < MAXCONTROLLERS; i++) {
-        switch (gPortInfo[i].type) {
+        portInfo = &gPortInfo[i];
+    
+        switch (portInfo->type) {
             case CONT_NONE:             texture_controller = texture_controller_noport;   break;
             case CONT_TYPE_NORMAL:      texture_controller = texture_controller_normal;   break;
             case CONT_TYPE_MOUSE:       texture_controller = texture_controller_mouse;    break;
@@ -442,7 +445,7 @@ void render_controllers_overlay(void) {
     }
 
     for (int i = 0; i < MAXCONTROLLERS; i++) {
-        OSPortInfo *portInfo = &gPortInfo[i];
+        portInfo = &gPortInfo[i];
 
         if (portInfo->plugged && portInfo->playerNum) {
             sprintf(text_buffer, "P%d", portInfo->playerNum);

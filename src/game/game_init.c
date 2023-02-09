@@ -651,12 +651,13 @@ void assign_controller_data(struct Controller *controller, int port) {
  * Automatically assignins controller numbers based on port order.
  */
 void init_controllers(void) {
+    OSPortInfo *portInfo = NULL;
+    s16 port, cont, lastUsedPort;
 #ifdef PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT
     const s32 prioritizeGCN = TRUE;
 #else
     const s32 prioritizeGCN = FALSE;
 #endif
-    s16 port, cont, lastUsedPort;
 
     // Init the controllers.
     osContInit(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
@@ -674,14 +675,14 @@ void init_controllers(void) {
 
     // Two passes if PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT is enabled.
     // The first pass is for only GameCube controllers and the second pass for everything else.
-    for (int i = 0; i < (1 + prioritizeGCN); i++) {
+    for (int pass = 0; pass < (1 + prioritizeGCN); pass++) {
         // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
         // The game allows you to have a controller plugged into any port in order to play the game.
         for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
-            OSPortInfo *portInfo = &gPortInfo[port];
+            portInfo = &gPortInfo[port];
 
             // Is the controller plugged in?
-            if (portInfo->plugged && (!prioritizeGCN || i == !(portInfo->type & CONT_CONSOLE_GCN))) {
+            if (portInfo->plugged && (!prioritizeGCN || pass == !(portInfo->type & CONT_CONSOLE_GCN))) {
                 assign_controller_data(&gControllers[cont], port);
 
                 portInfo->playerNum = (cont + 1);
@@ -702,12 +703,13 @@ void init_controllers(void) {
  * Assigns controllers based on assigned data from status polling.
  */
 void assign_controllers(void) {
+    OSPortInfo *portInfo = NULL;
     s16 lastUsedPort = -1;
 
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
     // The game allows you to have a controller plugged into any port in order to play the game.
     for (int port = 0; port < MAXCONTROLLERS; port++) {
-        OSPortInfo *portInfo = &gPortInfo[port];
+        portInfo = &gPortInfo[port];
         // Is controller plugged in and assigned to a player?
         if (portInfo->plugged && portInfo->playerNum) {
             assign_controller_data(&gControllers[portInfo->playerNum - 1], port);
@@ -754,7 +756,7 @@ void setup_game_memory(void) {
 /**
  * Read raw controller input data.
  */
-void poll_controller_input(void) {
+void poll_controller_inputs(void) {
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -809,11 +811,13 @@ void stop_controller_status_polling(void) {
 }
 
 /**
- * Assign controllers based on player input.
+ * Assign player numbers to controllers based on player input.
  */
 void controller_status_polling_read_inputs(void) {
+    OSPortInfo *portInfo = NULL;
+
     for (int i = 0; i < MAXCONTROLLERS; i++) {
-        OSPortInfo *portInfo = &gPortInfo[i];
+        portInfo = &gPortInfo[i];
 
         if (portInfo->plugged) {
             u16 button = gControllerPads[i].button;
@@ -845,7 +849,7 @@ void controller_status_polling_read_inputs(void) {
 void handle_input(void) {
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
-        poll_controller_input();
+        poll_controller_inputs();
 
         if (gContStatusPolling && (gContStasusPollTimer > TOGGLE_CONT_STATUS_POLLING_COMBO_COOLDOWN)) {
             // 0.5 second cooldown after starting controller status polling.

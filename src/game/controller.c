@@ -89,10 +89,11 @@ void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
+    OSPortInfo *portInfo = NULL;
     int i;
 
     for (i = 0; i < __osMaxControllers; i++, data++) {
-        OSPortInfo *portInfo = &gPortInfo[i];
+        portInfo = &gPortInfo[i];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
@@ -173,6 +174,7 @@ static void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
+    OSPortInfo *portInfo = NULL;
     int skipped = 0;
     int i;
 
@@ -193,7 +195,7 @@ static void __osPackReadData(void) {
     readformatgcn.stick_y     = -1;
 
     for (i = 0; i < __osMaxControllers; i++) {
-        OSPortInfo *portInfo = &gPortInfo[i];
+        portInfo = &gPortInfo[i];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
@@ -279,6 +281,7 @@ void osContGetQueryEx(u8 *bitpattern, OSContStatus* data) {
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequesFormat requestHeader;
+    OSPortInfo *portInfo = NULL;
     u8 bits = 0;
     int i;
 
@@ -286,7 +289,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         requestHeader = *(__OSContRequesFormat*)ptr;
         data->error = CHNL_ERR(requestHeader);
         if (data->error == 0) {
-            OSPortInfo *portInfo = &gPortInfo[i];
+            portInfo = &gPortInfo[i];
 
             data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
 
