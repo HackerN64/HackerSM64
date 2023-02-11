@@ -423,7 +423,7 @@ void render_controllers_overlay(void) {
 
     Gfx* dlHead = gDisplayListHead;
 
-    // Allow drawing outside borders.
+    // Allow drawing outside the screen borders.
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Draw the port icons:
@@ -489,7 +489,7 @@ void render_controllers_overlay(void) {
 
     gSPDisplayList(dlHead++, dl_fasttext_end);
 
-    // Disallow drawing outside borders.
+    // Disallow drawing outside the screen borders.
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
 
     gDisplayListHead = dlHead;

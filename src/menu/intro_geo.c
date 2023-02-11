@@ -431,9 +431,9 @@ static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
     gsSPEndDisplayList(),
 };
 
+//! TODO: Use DEFINE_LANGUAGE_ARRAY after ASCII/multilang is merged.
 Texture *title_texture_rumble_pak_language_array[] = {
     title_texture_rumble_pak_en,
-//! TODO: Use these after ASCII/multilang is merged.
  #if MULTILANG
   #ifdef ENABLE_FRENCH
     title_texture_rumble_pak_fr,
@@ -477,7 +477,20 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
-                gDPLoadTextureTile(dlIter++, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], G_IM_FMT_RGBA, G_IM_SIZ_16b, RUMBLE_W, 0, 0, 0, (RUMBLE_W - 1), (RUMBLE_H - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+                gDPLoadTextureTile(dlIter++,
+                    title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH],
+                    G_IM_FMT_RGBA, G_IM_SIZ_16b,
+                    RUMBLE_W,
+                    RUMBLE_H,
+                    0, 0,
+                    (RUMBLE_W - 1),
+                    (RUMBLE_H - 1),
+                    0,
+                    (G_TX_NOMIRROR | G_TX_CLAMP),
+                    (G_TX_NOMIRROR | G_TX_CLAMP),
+                    G_TX_NOMASK, G_TX_NOMASK,
+                    G_TX_NOLOD,  G_TX_NOLOD
+                );
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
                 gSPEndDisplayList(dlIter);
             }

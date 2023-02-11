@@ -4,6 +4,15 @@
 #include "types.h"
 #include "PR/os_internal.h"
 
+////////////
+// Config //
+////////////
+
+// How far the player has to move the C-stick for it to register as a C button when converting to N64 input. Default is 38.
+#define GCN_C_STICK_THRESHOLD 38
+// How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%. Default is 85.
+#define GCN_TRIGGER_THRESHOLD 85
+
 /////////////////////////////////////////////////
 // Libultra structs and macros (from ultralib) //
 /////////////////////////////////////////////////

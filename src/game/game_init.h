@@ -74,13 +74,6 @@ extern s8 gSramProbe;
 // How often to poll for controller status when gContStatusPolling is true, in frames. Default is 15.
 #define CONT_STATUS_POLLING_TIME                    15
 
-// GameCube controller specific:
-
-// How far the player has to move the C-stick for it to register as a C button when converting to N64 input. Default is 38.
-#define GCN_C_STICK_THRESHOLD 38
-// How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%. Default is 85.
-#define GCN_TRIGGER_THRESHOLD 85
-
 extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;
 extern struct Controller *gPlayer2Controller;
