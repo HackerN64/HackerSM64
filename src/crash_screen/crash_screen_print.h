@@ -5,7 +5,7 @@
 #include "types.h"
 
 
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     /*0x00*/ u16 newLine : 1;
     /*0x01*/ u16 shift   : 15;
     /*0x02*/ u16 print   : 1;

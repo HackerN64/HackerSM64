@@ -61,14 +61,14 @@ enum InsnParamTypes {
 };
 
 // Lower 16 bits of instruction
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     /*0x00*/ u16 rd        : 5; // fs
     /*0x00*/ u16 sa        : 5; // fd
     /*0x01*/ u16 function  : 6;
 } RTypeData; /*0x02*/
 
 // Instruction struct
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     /*0x00*/ u16 opcode : 6;
     /*0x00*/ u16 rs     : 5; // fr
     /*0x01*/ u16 rt     : 5; // ft
@@ -85,7 +85,7 @@ typedef union {
 } InsnData; /*0x04*/
 
 // Instruction database format
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     /*0x00*/ InsnData i;
     /*0x04*/ s32 paramType;
     /*0x08*/ char name[8];
