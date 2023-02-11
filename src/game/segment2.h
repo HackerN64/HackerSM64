@@ -43,7 +43,6 @@ extern Texture texture_controller_n64_normal[];
 extern Texture texture_controller_n64_mouse[];
 extern Texture texture_controller_n64_voice[];
 extern Texture texture_controller_n64_keyboard[];
-extern Texture texture_controller_64gb[];
 extern Texture texture_controller_gba[];
 extern Texture texture_controller_gcn_normal[];
 extern Texture texture_controller_gcn_receiver[];

@@ -2866,9 +2866,6 @@ ALIGNED8 const Texture texture_controller_n64_voice[] = {
 ALIGNED8 const Texture texture_controller_n64_keyboard[] = {
 #include "textures/segment2/controller_n64_keyboard.rgba16.inc.c"
 };
-ALIGNED8 const Texture texture_controller_64gb[] = {
-#include "textures/segment2/controller_64gb.rgba16.inc.c"
-};
 ALIGNED8 const Texture texture_controller_gba[] = {
 #include "textures/segment2/controller_gba.rgba16.inc.c"
 };

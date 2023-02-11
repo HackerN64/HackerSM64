@@ -88,7 +88,6 @@ ALIGNED4 const struct ControllerIcon gControllerIcons[] = {
     { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
     { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
     { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
-    { .type = CONT_TYPE_64GB,           .texture = texture_controller_64gb         },
     { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
     { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
     { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
