@@ -449,20 +449,25 @@ extern f32 gSineTable[];
     }                                   \
 }
 
+// Float lerp.
 // Return the value between [a, b] based on f's value between [0.0, 1.0].
+#define LERP(a, b, f) ({                \
+    __auto_type _a = (a);               \
+    (_a + ((f) * ((b) - _a)));          \
+})
+
+// Precise float lerp.
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+// Sloer but more precise than the regular float lerp.
 #define LERP_PRECISE(a, b, f) ({        \
     __auto_type _f = (f);               \
     (((a) * (1.0f - _f)) + ((b) * _f)); \
 })
 
-// Return the value between [a, b] based on f's value between [0.0, 1.0].
-#define LERP_FAST(a, b, f) ({           \
-    __auto_type _a = (a);               \
-    (_a + ((f) * ((b) - _a)));          \
-})
-
+// Integer lerp.
 // Return the value between [a, b] based on f's value between [0, 256].
-#define LERP_INT(a, b, f) ({            \
+// Faster than float lerps.
+#define LERPI(a, b, f) ({               \
     __auto_type _a = (a);               \
     ((((f) * ((b) - _a)) >> 8) + _a);   \
 })
