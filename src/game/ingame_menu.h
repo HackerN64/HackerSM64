@@ -153,35 +153,35 @@ enum MultilangLanguages {
 };
 
 #ifdef ENABLE_FRENCH
-#define LANG_ARRAY_COND_FRENCH(text) [LANGUAGE_FRENCH] = (text),
+#define LANG_ARRAY_COND_FRENCH(...) [LANGUAGE_FRENCH] = __VA_ARGS__,
 #else
-#define LANG_ARRAY_COND_FRENCH(text)
+#define LANG_ARRAY_COND_FRENCH(...)
 #endif
 #ifdef ENABLE_GERMAN
-#define LANG_ARRAY_COND_GERMAN(text) [LANGUAGE_GERMAN] = (text),
+#define LANG_ARRAY_COND_GERMAN(...) [LANGUAGE_GERMAN] = __VA_ARGS__,
 #else
-#define LANG_ARRAY_COND_GERMAN(text)
+#define LANG_ARRAY_COND_GERMAN(...)
 #endif
 #ifdef ENABLE_JAPANESE
-#define LANG_ARRAY_COND_JAPANESE(text) [LANGUAGE_JAPANESE] = (text),
+#define LANG_ARRAY_COND_JAPANESE(...) [LANGUAGE_JAPANESE] = __VA_ARGS__,
 #else
-#define LANG_ARRAY_COND_JAPANESE(text)
+#define LANG_ARRAY_COND_JAPANESE(...)
 #endif
 #ifdef ENABLE_SPANISH_SPAIN
-#define LANG_ARRAY_COND_SPANISH_SPAIN(text) [LANGUAGE_SPANISH_SPAIN] = (text),
+#define LANG_ARRAY_COND_SPANISH_SPAIN(...) [LANGUAGE_SPANISH_SPAIN] = __VA_ARGS__,
 #else
-#define LANG_ARRAY_COND_SPANISH_SPAIN(text)
+#define LANG_ARRAY_COND_SPANISH_SPAIN(...)
 #endif
 #ifdef ENABLE_SPANISH_LATIN_AMERICA
-#define LANG_ARRAY_COND_LATIN_AMERICA(text) [LANGUAGE_SPANISH_LATIN_AMERICA] = (text),
+#define LANG_ARRAY_COND_LATIN_AMERICA(...) [LANGUAGE_SPANISH_LATIN_AMERICA] = __VA_ARGS__,
 #else
-#define LANG_ARRAY_COND_LATIN_AMERICA(text)
+#define LANG_ARRAY_COND_LATIN_AMERICA(...)
 #endif
 
 typedef char * LangArray[LANGUAGE_COUNT];
 #define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
 #define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA) {\
-    [LANGUAGE_ENGLISH] = (english),                                                                     \
+    [LANGUAGE_ENGLISH] = english,                                                                       \
     LANG_ARRAY_COND_FRENCH(french)                                                                      \
     LANG_ARRAY_COND_GERMAN(german)                                                                      \
     LANG_ARRAY_COND_JAPANESE(japanese)                                                                  \
@@ -196,7 +196,7 @@ typedef char * LangArray[LANGUAGE_COUNT];
 
 typedef char * LangArray;
 #define LANG_ARRAY(cmd) (cmd)
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) (english)
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA) english
 
 #endif
 

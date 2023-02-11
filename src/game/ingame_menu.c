@@ -34,6 +34,17 @@ s8 gRedCoinsCollected;
 // The language to display the game's text in.
 u8 gInGameLanguage = LANGUAGE_ENGLISH;
 
+#ifdef MULTILANG
+// Determines which languages are available for the language selector.
+const u8 gDefinedLanguages[] = DEFINE_LANGUAGE_ARRAY(
+    LANGUAGE_ENGLISH,
+    LANGUAGE_FRENCH,
+    LANGUAGE_GERMAN,
+    LANGUAGE_JAPANESE,
+    LANGUAGE_SPANISH_SPAIN,
+    LANGUAGE_SPANISH_LATIN_AMERICA
+);
+
 extern u8 dialog_table_en[];
 extern u8 course_name_table_en[];
 extern u8 act_name_table_en[];
@@ -67,42 +78,24 @@ extern u8 dialog_table_es_la[];
 extern u8 course_name_table_es_la[];
 extern u8 act_name_table_es_la[];
 #endif
+#else // !MULTILANG
+#define dialog_table_en      seg2_dialog_table
+#define course_name_table_en seg2_course_name_table
+#define act_name_table_en    seg2_act_name_table
+#endif // !MULTILANG
+
+#define LANGUAGE_TABLES(dialog, course_name, act_name) { (u8 *)(dialog), (u8 *)(course_name), (u8 *)(act_name) }
 
 // The language table for the game's dialogs, level names and act names.
-const struct LanguageTables gLanguageTables[] = {
-#ifndef MULTILANG
-    [LANGUAGE_ENGLISH               ] = { .dialog_table = seg2_dialog_table,  .course_name_table = seg2_course_name_table,  .act_name_table = seg2_act_name_table  },
-#else
-    [LANGUAGE_ENGLISH               ] = { .dialog_table = dialog_table_en,    .course_name_table = course_name_table_en,    .act_name_table = act_name_table_en    },
- #ifdef ENABLE_FRENCH
-    [LANGUAGE_FRENCH                ] = { .dialog_table = dialog_table_fr,    .course_name_table = course_name_table_fr,    .act_name_table = act_name_table_fr    },
- #endif
- #ifdef ENABLE_GERMAN
-    [LANGUAGE_GERMAN                ] = { .dialog_table = dialog_table_de,    .course_name_table = course_name_table_de,    .act_name_table = act_name_table_de    },
- #endif
- #ifdef ENABLE_JAPANESE
-    [LANGUAGE_JAPANESE              ] = { .dialog_table = dialog_table_jp,    .course_name_table = course_name_table_jp,    .act_name_table = act_name_table_jp    },
- #endif
- #ifdef ENABLE_SPANISH_SPAIN
-    [LANGUAGE_SPANISH_SPAIN         ] = { .dialog_table = dialog_table_es_es, .course_name_table = course_name_table_es_es, .act_name_table = act_name_table_es_es },
- #endif
- #ifdef ENABLE_SPANISH_LATIN_AMERICA
-    [LANGUAGE_SPANISH_LATIN_AMERICA ] = { .dialog_table = dialog_table_es_la, .course_name_table = course_name_table_es_la, .act_name_table = act_name_table_es_la },
- #endif
-#endif
-};
-
-// Determines which languages are available for the language selector.
-#ifdef MULTILANG
-const u8 gDefinedLanguages[] = DEFINE_LANGUAGE_ARRAY(
-    LANGUAGE_ENGLISH,
-    LANGUAGE_FRENCH,
-    LANGUAGE_GERMAN,
-    LANGUAGE_JAPANESE,
-    LANGUAGE_SPANISH_SPAIN,
-    LANGUAGE_SPANISH_LATIN_AMERICA
+// #ifdef MULTILANG
+const struct LanguageTables gLanguageTables[] = DEFINE_LANGUAGE_ARRAY(
+    LANGUAGE_TABLES(dialog_table_en,    course_name_table_en,    act_name_table_en    ),
+    LANGUAGE_TABLES(dialog_table_fr,    course_name_table_fr,    act_name_table_fr    ),
+    LANGUAGE_TABLES(dialog_table_de,    course_name_table_de,    act_name_table_de    ),
+    LANGUAGE_TABLES(dialog_table_jp,    course_name_table_jp,    act_name_table_jp    ),
+    LANGUAGE_TABLES(dialog_table_es_es, course_name_table_es_es, act_name_table_es_es ),
+    LANGUAGE_TABLES(dialog_table_es_la, course_name_table_es_la, act_name_table_es_la )
 );
-#endif
 
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
