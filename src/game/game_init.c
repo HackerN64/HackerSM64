@@ -660,7 +660,7 @@ void init_controllers(void) {
 #endif
 
     // Init the controllers.
-    osContInit(&gSIEventMesgQueue, &gControllerBits, &gControllerStatuses[0]);
+    osContInit(&gSIEventMesgQueue, &gControllerBits, gControllerStatuses);
 
 #ifdef EEP
     // strangely enough, the EEPROM probe for save data is done in this function.
@@ -762,7 +762,7 @@ void poll_controller_inputs(void) {
 #endif
     osContStartReadDataEx(&gSIEventMesgQueue);
     osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-    osContGetReadDataEx(&gControllerPads[0]);
+    osContGetReadDataEx(gControllerPads);
 #ifdef ENABLE_RUMBLE
     release_rumble_pak_control();
 #endif
@@ -778,7 +778,7 @@ void poll_controller_status(void) {
     osContSetCh(MAXCONTROLLERS);
     osContStartQuery(&gSIEventMesgQueue);
     osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-    osContGetQueryEx(&gControllerBits, &gControllerStatuses[0]);
+    osContGetQueryEx(&gControllerBits, gControllerStatuses);
 #ifdef ENABLE_RUMBLE
     release_rumble_pak_control();
 #endif

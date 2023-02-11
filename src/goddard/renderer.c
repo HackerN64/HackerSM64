@@ -19,6 +19,7 @@
 #include "skin.h"
 #include "types.h"
 #include "game/game_init.h"
+#include "game/area.h"
 
 #define MAX_GD_DLS 1000
 #define OS_MESG_SI_COMPLETE 0x33333333
@@ -85,35 +86,18 @@ struct DynListBankInfo {
 };
 
 // bss
-#if defined(VERSION_EU) || defined(VERSION_SH)
-static OSMesgQueue sGdSIEventMesgQueue; // controller msg queue
-static OSMesg sGdSIEventMesgBuf[10];
-u8 EUpad1[0x40];
 UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-// static u32 unref_801be870[16];
-// static u32 unref_801be8e0[25];
-// static u32 unref_801be948[13];
-u8 EUpad2[0x64];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
-u8 EUpad3[0x34];
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
 static struct ObjView *D_801BE994; // store if View flag 0x40 set
-
-u8 EUpad4[0x88];
-#endif
-static OSContStatus sGdContStatuses[4];
-static OSContPadEx sGdContPads[4];    // @ 801BAE70
-static OSContPadEx sPrevFrameCont[4]; // @ 801BAE88
-static u8 sGdContBits;
+static OSContPadEx sPrevFrameCont[MAXCONTROLLERS] = { 0 };
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
 static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
-UNUSED static u32 unref_801bb000[3];
 static u8 *sMemBlockPoolBase; // @ 801BB00C
 static u32 sAllocMemory;      // @ 801BB010; malloc-ed bytes
-UNUSED static u32 unref_801bb014;
 static s32 D_801BB018;
 static s32 D_801BB01C;
 static void *sLoadedTextures[0x10];          // texture pointers
@@ -164,19 +148,6 @@ static s32 sPickBufPosition;                         // @ 801BE784
 static s16 *sPickBuf;                                // @ 801BE788
 static LookAt D_801BE790[2];
 static LookAt D_801BE7D0[3];
-#if defined(VERSION_JP) || defined(VERSION_US)
-static OSMesgQueue sGdSIEventMesgQueue; // controller msg queue
-static OSMesg sGdSIEventMesgBuf[10];
-UNUSED static u32 unref_801be870[16];
-UNUSED static OSMesgQueue D_801BE8B0;
-static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-UNUSED static u32 unref_801be8e0[25];
-static OSMesg sGdMesgBuf[1]; // @ 801BE944
-UNUSED static u32 unref_801be948[13];
-static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
-static OSIoMesg sGdDMAReqMesg;
-static struct ObjView *D_801BE994; // store if View flag 0x40 set
-#endif
 
 // data
 UNUSED static u32 unref_801a8670 = 0;
@@ -1140,14 +1111,6 @@ void Unknown8019C270(u8 *buf) {
     gGdStreamBuffer = buf;
 }
 
-/* 24AA58 -> 24AAA8 */
-void Unknown8019C288(s32 stickX, s32 stickY) {
-    struct GdControl *ctrl = &gGdCtrl; // 4
-
-    ctrl->stickXf = (f32) stickX;
-    ctrl->stickYf = (f32)(stickY / 2);
-}
-
 /* 24AAA8 -> 24AAE0; orig name: func_8019C2D8 */
 void gd_add_to_heap(void *addr, u32 size) {
     // TODO: is this `1` for permanence special?
@@ -1285,22 +1248,6 @@ void gd_vblank(void) {
     update_cursor();
 }
 
-/**
- * Copies the player1 controller data from p1cont to sGdContPads[0].
- */
-void gd_copy_p1_contpad(OSContPadEx *p1cont) {
-    u32 i;                                    // 24
-    u8 *src = (u8 *) p1cont;             // 20
-    u8 *dest = (u8 *) &sGdContPads[0]; // 1c
-
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
-        dest[i] = src[i];
-    }
-
-    if (p1cont->button & Z_TRIG) {
-        print_all_timers();
-    }
-}
 
 /* 24B058 -> 24B088; orig name: gd_sfx_to_play */
 s32 gd_sfx_to_play(void) {
@@ -1311,7 +1258,6 @@ s32 gd_sfx_to_play(void) {
 Gfx *gdm_gettestdl(s32 id) {
     struct GdObj *dobj;
     struct GdDisplayList *gddl;
-    UNUSED u8 filler[8];
     struct GdVec3f vec;
 
     start_timer("dlgen");
@@ -2400,8 +2346,11 @@ void parse_p1_controller(void) {
     struct GdControl *gdctrl;
     OSContPadEx *currInputs;
     OSContPadEx *prevInputs;
+    u16 buttonPressed;
 
-    if (gContStatusPolling) {
+    if (gContStatusPolling
+     || gPlayer1Controller->controllerData == NULL
+     || gWarpTransition.isActive) {
         return;
     }
 
@@ -2412,8 +2361,8 @@ void parse_p1_controller(void) {
 
     gdctrl->unk50 = gdctrl->unk4C = gdctrl->dup = gdctrl->ddown = 0;
 
-    currInputs = &sGdContPads[0];
-    prevInputs = &sPrevFrameCont[0];
+    currInputs = gPlayer1Controller->controllerData;
+    prevInputs = &sPrevFrameCont[gPlayer1Controller->port];
     // stick values
     gdctrl->stickXf     = currInputs->stick_x;
     gdctrl->stickYf     = currInputs->stick_y;
@@ -2432,11 +2381,10 @@ void parse_p1_controller(void) {
     gdctrl->cright = ((currInputs->button & R_CBUTTONS) != 0);
     gdctrl->cup    = ((currInputs->button & U_CBUTTONS) != 0);
     gdctrl->cdown  = ((currInputs->button & D_CBUTTONS) != 0);
-    // but not these buttons??
-    gdctrl->dleft  = (currInputs->button & L_JPAD);
-    gdctrl->dright = (currInputs->button & R_JPAD);
-    gdctrl->dup    = (currInputs->button & U_JPAD);
-    gdctrl->ddown  = (currInputs->button & D_JPAD);
+    gdctrl->dleft  = ((currInputs->button & L_JPAD    ) != 0);
+    gdctrl->dright = ((currInputs->button & R_JPAD    ) != 0);
+    gdctrl->dup    = ((currInputs->button & U_JPAD    ) != 0);
+    gdctrl->ddown  = ((currInputs->button & D_JPAD    ) != 0);
 
     gdctrl->startedDragging = (gdctrl->btnA && !gdctrl->dragging);
 
@@ -2459,12 +2407,15 @@ void parse_p1_controller(void) {
     }
     gdctrl->currFrame++;
 
-    if ((currInputs->button & START_BUTTON) && !(prevInputs->button & START_BUTTON)) {
+    buttonPressed = (~prevInputs->button & currInputs->button);
+
+    if (buttonPressed & START_BUTTON) {
         gdctrl->newStartPress ^= 1;
     }
 
-    if ((currInputs->button & Z_TRIG) && !(prevInputs->button & Z_TRIG)) {
+    if (buttonPressed & Z_TRIG) {
         sCurrDebugViewIndex++;
+        print_all_timers();
     }
 
     if (sCurrDebugViewIndex > sDebugViewsCount) {
@@ -2794,25 +2745,6 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
     }
 
     return 0;
-}
-
-/* 252AF8 -> 252BAC; orig name: _InitControllers */
-void gd_init_controllers(void) {
-    OSContPadEx *p1cont = &sPrevFrameCont[0]; // 1c
-    u32 i;                                  // 18
-
-    osCreateMesgQueue(&sGdSIEventMesgQueue, sGdSIEventMesgBuf, ARRAY_COUNT(sGdSIEventMesgBuf));
-    osSetEventMesg(OS_EVENT_SI, &sGdSIEventMesgQueue, (OSMesg) OS_MESG_SI_COMPLETE);
-    osContInit(&sGdSIEventMesgQueue, &sGdContBits, sGdContStatuses);
-    osContStartReadDataEx(&sGdSIEventMesgQueue);
-
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
-        ((u8 *) p1cont)[i] = 0;
-    }
-}
-
-/* 252BAC -> 252BC0 */
-void stub_renderer_6(UNUSED struct GdObj *obj) {
 }
 
 /**

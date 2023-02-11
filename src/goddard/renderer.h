@@ -108,7 +108,6 @@ void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
 void gd_create_perspective_matrix(f32 fovy, f32 aspect, f32 near, f32 far);
 s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, UNUSED s32 uly,
                        UNUSED s32 lrx, UNUSED s32 lry);
-void gd_init_controllers(void);
 long defpup(UNUSED const char *menufmt, ...);
 void menu_cb_control_type(u32);
 void menu_cb_recalibrate_controller(u32);
