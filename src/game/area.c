@@ -416,7 +416,7 @@ void render_controllers_overlay(void) {
         return;
     }
 
-    Color col = lerp_remap_range(-1, 1, 127, 255, get_cycle(1.0f, 1.0f, gContStasusPollTimer));
+    Color col = REMAP(get_cycle(1.0f, 1.0f, gContStasusPollTimer), -1, 1, 127, 255);
 
     // Darken the screen while polling controller status, similar to pausing the game.
     shade_screen();

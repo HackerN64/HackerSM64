@@ -60,27 +60,7 @@ f32 random_float(void) {
 
 // Return either -1 or 1 with a 50:50 chance.
 s32 random_sign(void) {
-    return ((random_u16() >= 0x7FFF) ? 1 : -1);
-}
-
-// Return the value between [a, b] based on f's value between [0.0, 1.0].
-f32 lerp_f32_precise(f32 a, f32 b, f32 f) {
-    return ((a * (1.0f - f)) + (b * f));
-}
-
-// Return the value between [a, b] based on f's value between [0.0, 1.0].
-f32 lerp_f32_fast(f32 a, f32 b, f32 f) {
-    return (a + (f * (b - a)));
-}
-
-// Return the value between [a, b] based on f's value between [0, 256].
-s32 lerp_int(s32 a, s32 b, u32 f) {
-    return (((f * (b - a)) >> 8) + a);
-}
-
-// Return the value between [fromB, toB] based on X's value between [fromA, toA].
-f32 lerp_remap_range(f32 fromA, f32 toA, f32 fromB, f32 toB, f32 f) {
-    return ((((f - fromA) / (toA - fromA)) * (toB - fromB)) + fromB);
+    return ((random_u16() & 0x2) - 1);
 }
 
 /**

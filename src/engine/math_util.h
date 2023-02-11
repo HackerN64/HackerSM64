@@ -449,6 +449,31 @@ extern f32 gSineTable[];
     }                                   \
 }
 
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+#define LERP_PRECISE(a, b, f) ({        \
+    __auto_type _f = (f);               \
+    (((a) * (1.0f - _f)) + ((b) * _f)); \
+})
+
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+#define LERP_FAST(a, b, f) ({           \
+    __auto_type _a = (a);               \
+    (_a + ((f) * ((b) - _a)));          \
+})
+
+// Return the value between [a, b] based on f's value between [0, 256].
+#define LERP_INT(a, b, f) ({            \
+    __auto_type _a = (a);               \
+    ((((f) * ((b) - _a)) >> 8) + _a);   \
+})
+
+// Remaps a number from one range to another.
+#define REMAP(f, fromA, toA, fromB, toB) ({                             \
+    __auto_type _fromA = (fromA);                                       \
+    __auto_type _fromB = (fromB);                                       \
+    (((((f) - _fromA) / ((toA) - _fromA)) * ((toB) - _fromB)) + _fromB);\
+})
+
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
 
 /// From Wiseguy
@@ -479,10 +504,6 @@ u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 
-f32 lerp_f32_precise(f32 a, f32 b, f32 f);
-f32 lerp_f32_fast(f32 a, f32 b, f32 f);
-s32 lerp_int(s32 a, s32 b, u32 f);
-f32 lerp_remap_range(f32 fromA, f32 toA, f32 fromB, f32 toB, f32 f);
 f32 get_cycle(f32 cycleLength, f32 cycleOffset, u32 timer);
 
 f32  min_3f(   f32 a, f32 b, f32 c);
