@@ -69,49 +69,39 @@ extern u8 act_name_table_es_la[];
 #endif
 
 // The language table for the game's dialogs, level names and act names.
-void *languageTable[][3] = {
+const struct LanguageTables gLanguageTables[] = {
 #ifndef MULTILANG
-    [LANGUAGE_ENGLISH               ] = { &seg2_dialog_table,  &seg2_course_name_table,  &seg2_act_name_table  },
+    [LANGUAGE_ENGLISH               ] = { .dialog_table = seg2_dialog_table,  .course_name_table = seg2_course_name_table,  .act_name_table = seg2_act_name_table  },
 #else
-    [LANGUAGE_ENGLISH               ] = { &dialog_table_en,    &course_name_table_en,    &act_name_table_en    },
+    [LANGUAGE_ENGLISH               ] = { .dialog_table = dialog_table_en,    .course_name_table = course_name_table_en,    .act_name_table = act_name_table_en    },
  #ifdef ENABLE_FRENCH
-    [LANGUAGE_FRENCH                ] = { &dialog_table_fr,    &course_name_table_fr,    &act_name_table_fr    },
+    [LANGUAGE_FRENCH                ] = { .dialog_table = dialog_table_fr,    .course_name_table = course_name_table_fr,    .act_name_table = act_name_table_fr    },
  #endif
  #ifdef ENABLE_GERMAN
-    [LANGUAGE_GERMAN                ] = { &dialog_table_de,    &course_name_table_de,    &act_name_table_de    },
+    [LANGUAGE_GERMAN                ] = { .dialog_table = dialog_table_de,    .course_name_table = course_name_table_de,    .act_name_table = act_name_table_de    },
  #endif
  #ifdef ENABLE_JAPANESE
-    [LANGUAGE_JAPANESE              ] = { &dialog_table_jp,    &course_name_table_jp,    &act_name_table_jp    },
+    [LANGUAGE_JAPANESE              ] = { .dialog_table = dialog_table_jp,    .course_name_table = course_name_table_jp,    .act_name_table = act_name_table_jp    },
  #endif
  #ifdef ENABLE_SPANISH_SPAIN
-    [LANGUAGE_SPANISH_SPAIN         ] = { &dialog_table_es_es, &course_name_table_es_es, &act_name_table_es_es },
+    [LANGUAGE_SPANISH_SPAIN         ] = { .dialog_table = dialog_table_es_es, .course_name_table = course_name_table_es_es, .act_name_table = act_name_table_es_es },
  #endif
  #ifdef ENABLE_SPANISH_LATIN_AMERICA
-    [LANGUAGE_SPANISH_LATIN_AMERICA ] = { &dialog_table_es_la, &course_name_table_es_la, &act_name_table_es_la },
+    [LANGUAGE_SPANISH_LATIN_AMERICA ] = { .dialog_table = dialog_table_es_la, .course_name_table = course_name_table_es_la, .act_name_table = act_name_table_es_la },
  #endif
 #endif
 };
 
 // Determines which languages are available for the language selector.
 #ifdef MULTILANG
-const u8 gDefinedLanguages[] = {
-    [LANGUAGE_ENGLISH               ] = LANGUAGE_ENGLISH,
-#ifdef ENABLE_FRENCH
-    [LANGUAGE_FRENCH                ] = LANGUAGE_FRENCH,
-#endif
-#ifdef ENABLE_GERMAN
-    [LANGUAGE_GERMAN                ] = LANGUAGE_GERMAN,
-#endif
-#ifdef ENABLE_JAPANESE
-    [LANGUAGE_JAPANESE              ] = LANGUAGE_JAPANESE,
-#endif
-#ifdef ENABLE_SPANISH_SPAIN
-    [LANGUAGE_SPANISH_SPAIN         ] = LANGUAGE_SPANISH_SPAIN,
-#endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-    [LANGUAGE_SPANISH_LATIN_AMERICA ] = LANGUAGE_SPANISH_LATIN_AMERICA,
-#endif
-};
+const u8 gDefinedLanguages[] = DEFINE_LANGUAGE_ARRAY(
+    LANGUAGE_ENGLISH,
+    LANGUAGE_FRENCH,
+    LANGUAGE_GERMAN,
+    LANGUAGE_JAPANESE,
+    LANGUAGE_SPANISH_SPAIN,
+    LANGUAGE_SPANISH_LATIN_AMERICA
+);
 #endif
 
 extern u8 gLastCompletedCourseNum;
@@ -1242,7 +1232,7 @@ s8  gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8  gDialogCourseActNum     =  1;
 
 void render_dialog_entries(void) {
-    void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
+    void **dialogTable = segmented_to_virtual(gLanguageTables[gInGameLanguage].dialog_table);
     struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
 
     // if the dialog entry is invalid, set the ID to DIALOG_NONE.
@@ -1420,7 +1410,7 @@ void do_cutscene_handler(void) {
 
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
-    void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
+    void **dialogTable = segmented_to_virtual(gLanguageTables[gInGameLanguage].dialog_table);
     struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
     char *str = segmented_to_virtual(dialog->str);
 
@@ -1625,8 +1615,8 @@ LangArray textMyScore = DEFINE_LANGUAGE_ARRAY(
 void render_pause_my_score_coins(void) {
     char str[20];
 
-    void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
-    void    **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
+    void **courseNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].course_name_table);
+    void    **actNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].act_name_table);
 
     u8 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
     u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
@@ -1890,7 +1880,7 @@ LangArray textStarX = DEFINE_LANGUAGE_ARRAY(
     "★× %s");
 
 void render_pause_castle_main_strings(s16 x, s16 y) {
-    void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+    void **courseNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].course_name_table);
 
     void *courseName;
 
@@ -2156,8 +2146,8 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     char str[20];
     char courseNumText[8];
 
-    void **actNameTbl    = segmented_to_virtual(languageTable[gInGameLanguage][2]);
-    void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+    void **actNameTbl    = segmented_to_virtual(gLanguageTables[gInGameLanguage].act_name_table);
+    void **courseNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].course_name_table);
 
     if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
         print_hud_course_complete_coins(COURSE_COMPLETE_COINS_X, COURSE_COMPLETE_COINS_Y);

@@ -272,9 +272,9 @@ LangArray textActMyScore = DEFINE_LANGUAGE_ARRAY(
  * Print act selector strings, some with special checks.
  */
 void print_act_selector_strings(void) {
-    char **levelNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+    char **levelNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].course_name_table);
     char *currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
-    char **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
+    char **actNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].act_name_table);
     char *selectedActName;
     s8 i;
 
