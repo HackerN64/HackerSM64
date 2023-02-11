@@ -2014,33 +2014,13 @@ const Collision main_menu_seg7_collision[] = {
 #endif
 
 
-const char *(*course_strings_language_table[])[] = {
+const char *(*course_strings_language_table[])[] = DEFINE_LANGUAGE_ARRAY(
     &course_strings_en_table,
-#ifdef ENABLE_FRENCH
     &course_strings_fr_table,
-#else
-    NULL,
-#endif
-#ifdef ENABLE_GERMAN
     &course_strings_de_table,
-#else
-    NULL,
-#endif
-#ifdef ENABLE_JAPANESE
     &course_strings_jp_table,
-#else
-    NULL,
-#endif
-#ifdef ENABLE_SPANISH_SPAIN
     &course_strings_es_es_table,
-#else
-    NULL,
-#endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-    &course_strings_es_la_table,
-#else
-    NULL,
-#endif
-};
+    &course_strings_es_la_table
+);
 
 #endif

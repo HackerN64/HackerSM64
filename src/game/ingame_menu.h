@@ -122,20 +122,65 @@ enum DialogResponseDefines {
 
 // Types and defines for handling language arrays
 #ifdef MULTILANG
+extern const u8 gDefinedLanguages[];
 
 enum MultilangLanguages {
     LANGUAGE_ENGLISH,
+#ifdef ENABLE_FRENCH
     LANGUAGE_FRENCH,
+#endif
+#ifdef ENABLE_GERMAN
     LANGUAGE_GERMAN,
+#endif
+#ifdef ENABLE_JAPANESE
     LANGUAGE_JAPANESE,
+#endif
+#ifdef ENABLE_SPANISH_SPAIN
     LANGUAGE_SPANISH_SPAIN,
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
     LANGUAGE_SPANISH_LATIN_AMERICA,
-    LANGUAGE_COUNT
+#endif
+    LANGUAGE_COUNT,
+    NUM_DEFINED_LANGUAGES = (LANGUAGE_COUNT - 1),
 };
+
+#ifdef ENABLE_FRENCH
+#define LANG_ARRAY_COND_FRENCH(text) [LANGUAGE_FRENCH] = (text),
+#else
+#define LANG_ARRAY_COND_FRENCH(text)
+#endif
+#ifdef ENABLE_GERMAN
+#define LANG_ARRAY_COND_GERMAN(text) [LANGUAGE_GERMAN] = (text),
+#else
+#define LANG_ARRAY_COND_GERMAN(text)
+#endif
+#ifdef ENABLE_JAPANESE
+#define LANG_ARRAY_COND_JAPANESE(text) [LANGUAGE_JAPANESE] = (text),
+#else
+#define LANG_ARRAY_COND_JAPANESE(text)
+#endif
+#ifdef ENABLE_SPANISH_SPAIN
+#define LANG_ARRAY_COND_SPANISH_SPAIN(text) [LANGUAGE_SPANISH_SPAIN] = (text),
+#else
+#define LANG_ARRAY_COND_SPANISH_SPAIN(text)
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
+#define LANG_ARRAY_COND_LATIN_AMERICA(text) [LANGUAGE_SPANISH_LATIN_AMERICA] = (text),
+#else
+#define LANG_ARRAY_COND_LATIN_AMERICA(text)
+#endif
 
 typedef char * LangArray[LANGUAGE_COUNT];
 #define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA) {english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA}
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA) { \
+    [LANGUAGE_ENGLISH] = (english), \
+    LANG_ARRAY_COND_FRENCH(french) \
+    LANG_ARRAY_COND_GERMAN(german) \
+    LANG_ARRAY_COND_JAPANESE(japanese) \
+    LANG_ARRAY_COND_SPANISH_SPAIN(spanish_SPAIN) \
+    LANG_ARRAY_COND_LATIN_AMERICA(spanish_LATIN_AMERICA) \
+}
 
 #else
 
@@ -144,7 +189,7 @@ typedef char * LangArray[LANGUAGE_COUNT];
 
 typedef char * LangArray;
 #define LANG_ARRAY(cmd) (cmd)
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) english
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) (english)
 
 #endif
 

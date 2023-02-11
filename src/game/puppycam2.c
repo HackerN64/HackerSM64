@@ -167,26 +167,26 @@ void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ) {
 #ifdef MULTILANG
 static void newcam_set_language(void) {
     switch (gInGameLanguage) {
-    case LANGUAGE_ENGLISH:
-        gPCOptionStringsPtr = &gPCOptionStringsEN;
-        gPCFlagStringsPtr   = &gPCFlagStringsEN;
-        gPCToggleStringsPtr = &gPCToggleStringsEN;
-        break;
-    case LANGUAGE_FRENCH:
-        gPCOptionStringsPtr = &gPCOptionStringsFR;
-        gPCFlagStringsPtr   = &gPCFlagStringsFR;
-        gPCToggleStringsPtr = &gPCToggleStringsFR;
-        break;
-    case LANGUAGE_GERMAN:
-        gPCOptionStringsPtr = &gPCOptionStringsDE;
-        gPCFlagStringsPtr   = &gPCFlagStringsDE;
-        gPCToggleStringsPtr = &gPCToggleStringsDE;
-        break;
-    case LANGUAGE_SPANISH:
-        gPCOptionStringsPtr = &gPCOptionStringsES;
-        gPCFlagStringsPtr   = &gPCFlagStringsES;
-        gPCToggleStringsPtr = &gPCToggleStringsES;
-        break;
+        case LANGUAGE_ENGLISH:
+            gPCOptionStringsPtr = &gPCOptionStringsEN;
+            gPCFlagStringsPtr   = &gPCFlagStringsEN;
+            gPCToggleStringsPtr = &gPCToggleStringsEN;
+            break;
+        case LANGUAGE_FRENCH:
+            gPCOptionStringsPtr = &gPCOptionStringsFR;
+            gPCFlagStringsPtr   = &gPCFlagStringsFR;
+            gPCToggleStringsPtr = &gPCToggleStringsFR;
+            break;
+        case LANGUAGE_GERMAN:
+            gPCOptionStringsPtr = &gPCOptionStringsDE;
+            gPCFlagStringsPtr   = &gPCFlagStringsDE;
+            gPCToggleStringsPtr = &gPCToggleStringsDE;
+            break;
+        case LANGUAGE_SPANISH:
+            gPCOptionStringsPtr = &gPCOptionStringsES;
+            gPCFlagStringsPtr   = &gPCFlagStringsES;
+            gPCToggleStringsPtr = &gPCToggleStringsES;
+            break;
     }
 }
 #endif

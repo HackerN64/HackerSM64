@@ -93,35 +93,12 @@ static s8 sSelectedFileNum = 0;
 // coin high score, 1 for high score across all files.
 static s8 sScoreFileCoinScoreMode = 0;
 
-// Determines which languages are available for the language selector,
-// since the value of the language enums are always constant.
 #ifdef MULTILANG
-const u8 gDefinedLanguages[] = {
-    LANGUAGE_ENGLISH,
-#ifdef ENABLE_FRENCH
-    LANGUAGE_FRENCH,
-#endif
-#ifdef ENABLE_GERMAN
-    LANGUAGE_GERMAN,
-#endif
-#ifdef ENABLE_JAPANESE
-    LANGUAGE_JAPANESE,
-#endif
-#ifdef ENABLE_SPANISH_SPAIN
-    LANGUAGE_SPANISH_SPAIN,
-#endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-    LANGUAGE_SPANISH_LATIN_AMERICA,
-#endif
-};
-
 // Index of the selected language in the above array.
-static s8 sSelectedLanguageIndex = 0;
+static s8 sSelectedLanguageIndex = LANGUAGE_ENGLISH;
 
 // Whether to open the language menu when the game is booted.
 static s8 sOpenLangSettings = FALSE;
-
-#define NUM_DEFINED_LANGUAGES ARRAY_COUNT(gDefinedLanguages)
 #endif
 
 /**
@@ -1168,12 +1145,12 @@ void print_menu_cursor(void) {
     handle_controller_cursor_input();
     create_dl_translation_matrix(MENU_MTX_PUSH, sCursorPos[0] + 160.0f - 5.0, sCursorPos[1] + 120.0f - 25.0, 0.0f);
     // Get the right graphic to use for the cursor.
-    if (sCursorClickingTimer == 0)
-        // Idle
+    if (sCursorClickingTimer == 0) { // Idle
         gSPDisplayList(gDisplayListHead++, dl_menu_idle_hand);
-    if (sCursorClickingTimer != 0)
-        // Grabbing
+    }
+    if (sCursorClickingTimer != 0) { // Grabbing
         gSPDisplayList(gDisplayListHead++, dl_menu_grabbing_hand);
+    }
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
     if (sCursorClickingTimer != 0) {
         sCursorClickingTimer++; // This is a very strange way to implement a timer? It counts up and
@@ -1918,14 +1895,14 @@ LangArray textLanguageSelect = DEFINE_LANGUAGE_ARRAY(
     "IDIOMA",
     "IDIOMA");
 
-char *textLanguage[] = {
+LangArray textLanguage = DEFINE_LANGUAGE_ARRAY(
     "ENGLISH",
     "FRANÇAIS",
     "DEUTSCH",
     "にほんご",
     "ESPAÑOL ESPAÑA",
-    "ESPAÑOL LATINO",
-};
+    "ESPAÑOL LATINO"
+);
 
 #define SOUND_LABEL_Y 141
 #define LANGUAGE_SELECT_Y 80
@@ -1984,7 +1961,7 @@ void print_sound_mode_menu_strings(void) {
             // Update language if the language has been changed
             if (sSelectedLanguageIndex != oldSelectedLanguageIndex) {
                 play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
-                sSelectedLanguageIndex = (sSelectedLanguageIndex + NUM_DEFINED_LANGUAGES) % NUM_DEFINED_LANGUAGES;
+                sSelectedLanguageIndex = (sSelectedLanguageIndex + LANGUAGE_COUNT) % LANGUAGE_COUNT;
                 multilang_set_language(gDefinedLanguages[sSelectedLanguageIndex]);
             }
         }
@@ -2208,20 +2185,6 @@ Gfx *geo_file_select_strings_and_menu_cursor(s32 callContext, UNUSED struct Grap
     }
     return NULL;
 }
-
-#ifdef MULTILANG
-/**
- * Determines the array index of the saved language based on which languages are defined.
- */
-static u8 get_language_index(u8 language) {
-    for (u32 i = 0; i < NUM_DEFINED_LANGUAGES; i++) {
-        if (language == gDefinedLanguages[i]) {
-            return i;
-        }
-    }
-    return LANGUAGE_ENGLISH;
-}
-#endif
 
 /**
  * Initiates file select values after Mario Screen.

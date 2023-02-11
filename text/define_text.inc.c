@@ -62,3 +62,6 @@ const char *const ACT_NAME_TABLE[] = {
 #include COURSE_FILE
     NULL
 };
+
+#undef COURSE_ACTS
+#undef EXTRA_TEXT

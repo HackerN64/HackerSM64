@@ -367,7 +367,8 @@ void save_file_load_all(void) {
     }
 
 #ifdef MULTILANG
-    gInGameLanguage = multilang_get_language();
+    // Failsafe in case the language in the save file isn't defined.
+    multilang_set_language(get_language_index(multilang_get_language()));
 #endif
 }
 
@@ -721,7 +722,7 @@ void save_file_move_cap_to_default_location(void) {
 }
 
 #ifdef MULTILANG
-void multilang_set_language(u16 language) {
+void multilang_set_language(u32 language) {
     gSaveBuffer.menuData.language = language;
     gInGameLanguage = language;
     gMainMenuDataModified = TRUE;
@@ -730,6 +731,18 @@ void multilang_set_language(u16 language) {
 
 u32 multilang_get_language(void) {
     return gSaveBuffer.menuData.language;
+}
+
+/**
+ * Determines the array index of the saved language based on which languages are defined.
+ */
+u32 get_language_index(u32 language) {
+    for (u32 i = 0; i < LANGUAGE_COUNT; i++) {
+        if (language == gDefinedLanguages[i]) {
+            return i;
+        }
+    }
+    return LANGUAGE_ENGLISH;
 }
 #endif
 

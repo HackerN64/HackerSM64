@@ -209,7 +209,6 @@ void bhv_act_selector_loop(void) {
 /**
  * Print the course number selected with the wood rgba16 course texture.
  */
-
 void print_course_number(void) {
     char courseNum[4];
 
@@ -220,7 +219,7 @@ void print_course_number(void) {
 
 #ifdef MULTILANG
     // Change upper part of the wood texture depending of the language defined
-    switch (multilang_get_language()) {
+    switch (gInGameLanguage) {
         case LANGUAGE_ENGLISH:
 #ifdef ENABLE_JAPANESE
         case LANGUAGE_JAPANESE:

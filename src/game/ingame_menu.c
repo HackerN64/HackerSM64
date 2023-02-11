@@ -71,39 +71,48 @@ extern u8 act_name_table_es_la[];
 // The language table for the game's dialogs, level names and act names.
 void *languageTable[][3] = {
 #ifndef MULTILANG
-    {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table},
+    [LANGUAGE_ENGLISH               ] = { &seg2_dialog_table,  &seg2_course_name_table,  &seg2_act_name_table  },
 #else
-    {&dialog_table_en, &course_name_table_en, &act_name_table_en},
-
-#ifdef ENABLE_FRENCH
-    {&dialog_table_fr, &course_name_table_fr, &act_name_table_fr},
-#else
-    {NULL, NULL, NULL},
-#endif
-
-#ifdef ENABLE_GERMAN
-    {&dialog_table_de, &course_name_table_de, &act_name_table_de},
-#else
-    {NULL, NULL, NULL},
-#endif
-
-#ifdef ENABLE_JAPANESE
-    {&dialog_table_jp, &course_name_table_jp, &act_name_table_jp},
-#else
-    {NULL, NULL, NULL},
-#endif
-#ifdef ENABLE_SPANISH_SPAIN
-    {&dialog_table_es_es, &course_name_table_es_es, &act_name_table_es_es},
-#else
-    {NULL, NULL, NULL},
-#endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-    {&dialog_table_es_la, &course_name_table_es_la, &act_name_table_es_la},
-#else
-    {NULL, NULL, NULL},
-#endif
+    [LANGUAGE_ENGLISH               ] = { &dialog_table_en,    &course_name_table_en,    &act_name_table_en    },
+ #ifdef ENABLE_FRENCH
+    [LANGUAGE_FRENCH                ] = { &dialog_table_fr,    &course_name_table_fr,    &act_name_table_fr    },
+ #endif
+ #ifdef ENABLE_GERMAN
+    [LANGUAGE_GERMAN                ] = { &dialog_table_de,    &course_name_table_de,    &act_name_table_de    },
+ #endif
+ #ifdef ENABLE_JAPANESE
+    [LANGUAGE_JAPANESE              ] = { &dialog_table_jp,    &course_name_table_jp,    &act_name_table_jp    },
+ #endif
+ #ifdef ENABLE_SPANISH_SPAIN
+    [LANGUAGE_SPANISH_SPAIN         ] = { &dialog_table_es_es, &course_name_table_es_es, &act_name_table_es_es },
+ #endif
+ #ifdef ENABLE_SPANISH_LATIN_AMERICA
+    [LANGUAGE_SPANISH_LATIN_AMERICA ] = { &dialog_table_es_la, &course_name_table_es_la, &act_name_table_es_la },
+ #endif
 #endif
 };
+
+// Determines which languages are available for the language selector.
+#ifdef MULTILANG
+const u8 gDefinedLanguages[] = {
+    [LANGUAGE_ENGLISH               ] = LANGUAGE_ENGLISH,
+#ifdef ENABLE_FRENCH
+    [LANGUAGE_FRENCH                ] = LANGUAGE_FRENCH,
+#endif
+#ifdef ENABLE_GERMAN
+    [LANGUAGE_GERMAN                ] = LANGUAGE_GERMAN,
+#endif
+#ifdef ENABLE_JAPANESE
+    [LANGUAGE_JAPANESE              ] = LANGUAGE_JAPANESE,
+#endif
+#ifdef ENABLE_SPANISH_SPAIN
+    [LANGUAGE_SPANISH_SPAIN         ] = LANGUAGE_SPANISH_SPAIN,
+#endif
+#ifdef ENABLE_SPANISH_LATIN_AMERICA
+    [LANGUAGE_SPANISH_LATIN_AMERICA ] = LANGUAGE_SPANISH_LATIN_AMERICA,
+#endif
+};
+#endif
 
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
@@ -667,6 +676,10 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     struct Utf8CharLUTEntry *utf8Entry;
     const Texture *texture;
     u32 kerning;
+
+    if (str == NULL) {
+        return;
+    }
 
     while ((c = str[strPos]) != '\0') {
         gDPPipeSync(gDisplayListHead++);

@@ -194,8 +194,9 @@ void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode);
 s32 check_warp_checkpoint(struct WarpNode *warpNode);
 
 #ifdef MULTILANG
-void multilang_set_language(u16 language);
+void multilang_set_language(u32 language);
 u32 multilang_get_language(void);
+u32 get_language_index(u32 language);
 #endif
 
 #endif // SAVE_FILE_H
