@@ -451,33 +451,30 @@ extern f32 gSineTable[];
 
 // Float lerp.
 // Return the value between [a, b] based on f's value between [0.0, 1.0].
-#define LERP(a, b, f) ({                \
-    __auto_type _a = (a);               \
-    (_a + ((f) * ((b) - _a)));          \
-})
+ALWAYS_INLINE f32 lerpf(f32 a, f32 b, f32 f) {
+    return (a + (f * (b - a)));
+}
 
 // Precise float lerp.
 // Return the value between [a, b] based on f's value between [0.0, 1.0].
 // Sloer but more precise than the regular float lerp.
-#define LERP_PRECISE(a, b, f) ({        \
-    __auto_type _f = (f);               \
-    (((a) * (1.0f - _f)) + ((b) * _f)); \
-})
+ALWAYS_INLINE f32 lerpf_precise(f32 a, f32 b, f32 f) {
+    return ((a * (1.0f - f)) + (b * f));
+}
 
 // Integer lerp.
 // Return the value between [a, b] based on f's value between [0, 256].
 // Faster than float lerps.
-#define LERPI(a, b, f) ({               \
-    __auto_type _a = (a);               \
-    ((((f) * ((b) - _a)) >> 8) + _a);   \
-})
+ALWAYS_INLINE s32 lerpi(s32 a, s32 b, u32 f) {
+    return (((f * (b - a)) >> 8) + a);
+}
 
 // Remaps a number from one range to another.
-#define REMAP(f, fromA, toA, fromB, toB) ({                             \
-    __auto_type _fromA = (fromA);                                       \
-    __auto_type _fromB = (fromB);                                       \
-    (((((f) - _fromA) / ((toA) - _fromA)) * ((toB) - _fromB)) + _fromB);\
-})
+// Return the value between [fromB, toB] based on X's value between [fromA, toA].
+// Equivalent to lerp but with a custom range for f.
+ALWAYS_INLINE f32 remap(f32 f, f32 fromA, f32 toA, f32 fromB, f32 toB) {
+    return ((((f - fromA) / (toA - fromA)) * (toB - fromB)) + fromB);
+}
 
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
 
