@@ -244,8 +244,8 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
     n64.buttons.D_DOWN  = gcn.buttons.D_DOWN;
     n64.buttons.D_LEFT  = gcn.buttons.D_LEFT;
     n64.buttons.D_RIGHT = gcn.buttons.D_RIGHT;
-    n64.buttons.RESET   = gcn.buttons.X;
-    n64.buttons.unused  = gcn.buttons.Y;
+    n64.buttons.X       = gcn.buttons.X;
+    n64.buttons.Y       = gcn.buttons.Y;
     n64.buttons.L       = gcn.buttons.L;
     n64.buttons.R       = gcn.buttons.R;
     n64.buttons.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);

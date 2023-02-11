@@ -479,6 +479,12 @@ u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 
+f32 lerp_f32_precise(f32 a, f32 b, f32 f);
+f32 lerp_f32_fast(f32 a, f32 b, f32 f);
+s32 lerp_int(s32 a, s32 b, u32 f);
+f32 lerp_remap_range(f32 fromA, f32 toA, f32 fromB, f32 toB, f32 f);
+f32 get_cycle(f32 cycleLength, f32 cycleOffset, u32 timer);
+
 f32  min_3f(   f32 a, f32 b, f32 c);
 s32  min_3i(   s32 a, s32 b, s32 c);
 s32  min_3s(   s16 a, s16 b, s16 c);

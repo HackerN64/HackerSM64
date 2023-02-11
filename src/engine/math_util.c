@@ -63,6 +63,40 @@ s32 random_sign(void) {
     return ((random_u16() >= 0x7FFF) ? 1 : -1);
 }
 
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+f32 lerp_f32_precise(f32 a, f32 b, f32 f) {
+    return ((a * (1.0f - f)) + (b * f));
+}
+
+// Return the value between [a, b] based on f's value between [0.0, 1.0].
+f32 lerp_f32_fast(f32 a, f32 b, f32 f) {
+    return (a + (f * (b - a)));
+}
+
+// Return the value between [a, b] based on f's value between [0, 256].
+s32 lerp_int(s32 a, s32 b, u32 f) {
+    return (((f * (b - a)) >> 8) + a);
+}
+
+// Return the value between [fromB, toB] based on X's value between [fromA, toA].
+f32 lerp_remap_range(f32 fromA, f32 toA, f32 fromB, f32 toB, f32 f) {
+    return ((((f - fromA) / (toA - fromA)) * (toB - fromB)) + fromB);
+}
+
+/**
+ * @brief Get a value that cycles over time (in seconds).
+ *
+ * @param cycleLength f32: Time in seconds to complete a cycle.
+ * @param cycleOffset f32: Where the cycle should begin when timer is 0, 0.5 would be halfways through the cycle.
+ * @param timer u32: The timer source that should increment once per frame (e.g. gGlobalTimer).
+ * @return f32: A number between [-1, 1], cycling over time.
+ */
+f32 get_cycle(f32 cycleLength, f32 cycleOffset, u32 timer) {
+    f32 rate = (f32)DEGREES(360 / 30) * (1.0f / cycleLength);
+    f32 offset = (f32)DEGREES(360) * cycleOffset;
+    return sins(roundf((rate * (f32)timer) + offset));
+}
+
 /// Returns the lowest of three values.
 #define min_3_func(a0, a1, a2) {\
     if (a1 < a0) a0 = a1;       \
