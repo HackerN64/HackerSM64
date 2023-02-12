@@ -399,7 +399,7 @@ OSThread *get_crashed_thread(void) {
 extern u16 sRenderedFramebuffer;
 extern void audio_signal_game_loop_tick(void);
 extern void stop_sounds_in_continuous_banks(void);
-extern void read_controller_inputs(void);
+extern void read_controller_inputs_normal(void);
 extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 
 void thread2_crash_screen(UNUSED void *arg) {
@@ -444,7 +444,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 release_rumble_pak_control();
 #endif
             }
-            read_controller_inputs();
+            read_controller_inputs_normal();
             draw_crash_screen(thread);
         }
     }

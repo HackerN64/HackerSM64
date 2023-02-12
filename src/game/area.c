@@ -470,12 +470,15 @@ void render_controllers_overlay(void) {
     drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);
 
     // Instructions:
-    sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
-    drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
-
+    if (gContStatusPollingReadyForInput) {
+        sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
+        drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-    drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 53), (SCREEN_CENTER_Y + 28), "A+B+START TO EXIT", col, col, col);
+        drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 53), (SCREEN_CENTER_Y + 28), "A+B+START TO EXIT", col, col, col);
 #endif
+    } else {
+        drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);
+    }
 
     // Print the assigned port numbers.
     for (port = 0; port < MAXCONTROLLERS; port++) {

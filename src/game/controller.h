@@ -216,12 +216,13 @@ typedef struct
 
 typedef struct
 {
-    /* 0x00 */ u8 plugged : 1;          // Whether a controller is plugged in.
-    /* 0x01 */ u16 type;                // Device type.
-    /* 0x03 */ u8 playerNum;            // 0-4. 0 = not assigned to a player.
-    /* 0x04 */ OSContCenter contCenter; // Gamecube Controller Center.
-    /* 0x09 */ u8 gcRumble : 1;         // GameCube Rumble.
-} OSPortInfo; // size = 0x0A
+    /* 0x00 */ u16 type;                // Device type.
+    /* 0x02 */ u16 pollingInput;        // Input, only used when status polling.
+    /* 0x04 */ u8 plugged : 1;          // Whether a controller is plugged in.
+    /* 0x05 */ u8 playerNum;            // 0-4. 0 = not assigned to a player.
+    /* 0x06 */ OSContCenter contCenter; // Gamecube Controller Center.
+    /* 0x0B */ u8 gcRumble : 1;         // GameCube Rumble bit.
+} OSPortInfo; // size = 0x0C
 
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
 

@@ -50,6 +50,7 @@ extern u8 gNumPlayers;
 extern u8 gControllerBits;
 extern u8 gContStatusPolling;
 extern u32 gContStasusPollTimer;
+extern u8 gContStatusPollingReadyForInput;
 extern u8 gIsConsole;
 extern u8 gCacheEmulated;
 extern u8 gBorderHeight;
@@ -69,9 +70,12 @@ extern s8 gSramProbe;
 
 // This button combo should be standard, so don't change it unless you have a very good reason.
 #define TOGGLE_CONT_STATUS_POLLING_COMBO            (A_BUTTON | B_BUTTON | START_BUTTON)
-// How long after doing the combo to either start polling or start looking for the combo again, in frames. Default is 15.
-#define TOGGLE_CONT_STATUS_POLLING_COMBO_COOLDOWN   15
-// How often to poll for controller status when gContStatusPolling is true, in frames. Default is 15.
+// How long after exiting polling to start accepting inputs.
+// The purpose of this is to allow the player to release all the combo buttons before the game would recognize them.
+// Default is 3.
+#define CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN      3
+// How often to poll for controller status when gContStatusPolling is true, in frames.
+// Default is 15.
 #define CONT_STATUS_POLLING_TIME                    15
 
 extern void (*gGoddardVblankCallback)(void);

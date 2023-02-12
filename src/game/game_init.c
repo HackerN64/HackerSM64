@@ -47,6 +47,8 @@ OSContPadEx gControllerPads[MAXCONTROLLERS];
 u8 gControllerBits = 0x0; // Which ports have a controller connected to them.
 u8 gNumPlayers = 1;
 u8 gContStatusPolling = FALSE;
+// u8 gContStatusPollingHoldingCombo = FALSE;
+u8 gContStatusPollingReadyForInput = TRUE;
 u32 gContStasusPollTimer = 0;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
@@ -488,12 +490,14 @@ UNUSED static void record_demo(void) {
 
     // Rrecord the distinct input and timer so long as they are unique.
     // If the timer hits 0xFF, reset the timer for the next demo input.
-    if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
-        || rawStickX != gRecordedDemoInput.rawStickX || rawStickY != gRecordedDemoInput.rawStickY) {
+    if (gRecordedDemoInput.timer == 0xFF
+     || buttonMask != gRecordedDemoInput.buttonMask
+     || rawStickX  != gRecordedDemoInput.rawStickX
+     || rawStickY  != gRecordedDemoInput.rawStickY) {
         gRecordedDemoInput.timer = 0;
         gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.rawStickX = rawStickX;
-        gRecordedDemoInput.rawStickY = rawStickY;
+        gRecordedDemoInput.rawStickX  = rawStickX;
+        gRecordedDemoInput.rawStickY  = rawStickY;
     }
     gRecordedDemoInput.timer++;
 }
@@ -543,7 +547,6 @@ void run_demo_inputs(void) {
         }
     }
 }
-
 #endif
 
 /**
@@ -586,29 +589,29 @@ void adjust_analog_stick(struct Controller *controller) {
     }
 }
 
+ALWAYS_INLINE s32 check_button_combo(u16 buttonDown, u16 buttonPressed, u16 combo) {
+    return ((buttonDown & combo) == combo && (buttonPressed & combo));
+}
+
 /**
  * Update the controller struct with available inputs if present.
  */
-void read_controller_inputs(void) {
-    s32 i;
+void read_controller_inputs_normal(void) {
+    s32 cont;
 
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
 #endif
 
-    for (i = 0; i < NUM_SUPPORTED_CONTROLLERS; i++) {
-        struct Controller *controller = &gControllers[i];
+    for (cont = 0; cont < NUM_SUPPORTED_CONTROLLERS; cont++) {
+        struct Controller *controller = &gControllers[cont];
         OSContPadEx *controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
-        if (!gContStatusPolling && controllerData != NULL) {
+        if (controllerData != NULL && gContStasusPollTimer > CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN) {
             u16 button = controllerData->button;
-            if ((gContStasusPollTimer > 15) && (button & TOGGLE_CONT_STATUS_POLLING_COMBO) == TOGGLE_CONT_STATUS_POLLING_COMBO) {
-                start_controller_status_polling();
-                return;
-            }
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
             if (gIsConsole && (controller->statusData->type & CONT_CONSOLE_GCN)) {
-                u16 newButton = button & ~(Z_TRIG | L_TRIG);
+                u16 newButton = (button & ~(Z_TRIG | L_TRIG));
                 if (button & Z_TRIG) {
                     newButton |= L_TRIG;
                 }
@@ -624,6 +627,16 @@ void read_controller_inputs(void) {
             // 0.5x A presses are a good meme
             controller->buttonDown = button;
             adjust_analog_stick(controller);
+
+            if (controller->buttonReleased & TOGGLE_CONT_STATUS_POLLING_COMBO) {
+                gContStatusPollingReadyForInput = TRUE;
+            }
+
+            if (gContStatusPollingReadyForInput
+             && check_button_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+                start_controller_status_polling();
+                return;
+            }
         } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
             controller->rawStickX      = 0;
             controller->rawStickY      = 0;
@@ -790,8 +803,11 @@ void poll_controller_status(void) {
 void start_controller_status_polling(void) {
     gContStatusPolling = TRUE;
     gContStasusPollTimer = 0;
+    gContStatusPollingReadyForInput = FALSE;
     gNumPlayers = 1;
     bzero(gPortInfo, sizeof(gPortInfo));
+    bzero(gControllers, sizeof(gControllers));
+    // poll_controller_status();
 #ifdef ENABLE_RUMBLE
     cancel_rumble();
 #endif
@@ -803,6 +819,7 @@ void start_controller_status_polling(void) {
 void stop_controller_status_polling(void) {
     gContStatusPolling = FALSE;
     gContStasusPollTimer = 0;
+    gContStatusPollingReadyForInput = FALSE;
     gNumPlayers--;
     assign_controllers();
 #ifdef ENABLE_RUMBLE
@@ -813,33 +830,46 @@ void stop_controller_status_polling(void) {
 /**
  * Assign player numbers to controllers based on player input.
  */
-void controller_status_polling_read_inputs(void) {
+void read_controller_inputs_status_polling(void) {
     OSPortInfo *portInfo = NULL;
+    u16 totalInput = 0x0;
 
     for (int port = 0; port < MAXCONTROLLERS; port++) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged) {
             u16 button = gControllerPads[port].button;
-
-            // If a button is pressed on an unassigned controller, assign it the current player number.
-            if (button && !portInfo->playerNum) {
-                portInfo->playerNum = gNumPlayers;
-                gNumPlayers++;
-                return;
-            }
-
-            // If the combo is pressed, stop polling and assign the current controllers.
-            if (gNumPlayers > __builtin_popcount(gControllerBits)
-             || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-             || ((button & TOGGLE_CONT_STATUS_POLLING_COMBO) == TOGGLE_CONT_STATUS_POLLING_COMBO)
+            u16 pressed = (~portInfo->pollingInput & button);
 #endif
-            ) {
-                stop_controller_status_polling();
-                return;
+            portInfo->pollingInput = button;
+            totalInput |= button;
+
+            if (gContStatusPollingReadyForInput) {
+                // If a button is pressed on an unassigned controller, assign it the current player number.
+                if (button && !portInfo->playerNum) {
+                    portInfo->playerNum = gNumPlayers;
+                    gNumPlayers++;
+                }
+
+                // If the combo is pressed, stop polling and assign the current controllers.
+                if (gNumPlayers > __builtin_popcount(gControllerBits)
+                 || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
+                 || check_button_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)
+#endif
+                ) {
+                    stop_controller_status_polling();
+                    return;
+                }
             }
+        } else {
+            portInfo->pollingInput = 0x0;
         }
+    }
+
+    if (totalInput == 0) {
+        gContStatusPollingReadyForInput = TRUE;
     }
 }
 
@@ -849,11 +879,15 @@ void controller_status_polling_read_inputs(void) {
 void handle_input(void) {
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
+        // Read the raw input data from the controllers.
         poll_controller_inputs();
 
-        if (gContStatusPolling && (gContStasusPollTimer > TOGGLE_CONT_STATUS_POLLING_COMBO_COOLDOWN)) {
-            // 0.5 second cooldown after starting controller status polling.
-            controller_status_polling_read_inputs();
+        if (gContStatusPolling) {
+            // Input handling while status polling.
+            read_controller_inputs_status_polling();
+        } else {
+            // Input handling for normal gameplay.
+            read_controller_inputs_normal();
         }
     } else if (!gContStatusPolling) {
         // Start controller status polling if all ports are empty and we're not already polling.
@@ -866,8 +900,6 @@ void handle_input(void) {
     }
 
     gContStasusPollTimer++;
-
-    read_controller_inputs();
 
     profiler_update(PROFILER_TIME_CONTROLLERS);
 }
