@@ -807,7 +807,6 @@ void start_controller_status_polling(void) {
     gNumPlayers = 1;
     bzero(gPortInfo, sizeof(gPortInfo));
     bzero(gControllers, sizeof(gControllers));
-    // poll_controller_status();
 #ifdef ENABLE_RUMBLE
     cancel_rumble();
 #endif

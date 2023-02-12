@@ -34,7 +34,9 @@ extern OSMesgQueue gRumblePakSchedulerMesgQueue;
 extern OSMesg gRumbleThreadVIMesgBuf[1];
 extern OSMesgQueue gRumbleThreadVIMesgQueue;
 
-extern struct RumbleData gRumbleDataQueue[3];
+#define RUMBLE_DATA_QUEUE_SIZE 3
+
+extern struct RumbleData gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE];
 extern struct RumbleSettings gCurrRumbleSettings;
 
 

@@ -18,7 +18,7 @@ OSMesgQueue gRumblePakSchedulerMesgQueue;
 OSMesg gRumbleThreadVIMesgBuf[1];
 OSMesgQueue gRumbleThreadVIMesgQueue;
 
-struct RumbleData gRumbleDataQueue[3];
+struct RumbleData gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE];
 struct RumbleSettings gCurrRumbleSettings;
 
 s32 sRumblePakThreadActive = FALSE;
@@ -37,11 +37,19 @@ void init_rumble_pak_scheduler_queue(void) {
     osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg) 0, OS_MESG_NOBLOCK);
 }
 
+/**
+ * Locks controller input data while reading new inputs or another thread is using the current inputs.
+ * This prevents new inputs overwriting the current inputs while they are in use.
+ */
 void block_until_rumble_pak_free(void) {
     OSMesg msg;
     osRecvMesg(&gRumblePakSchedulerMesgQueue, &msg, OS_MESG_BLOCK);
 }
 
+/**
+ * Unlocks controller input data, allowing to read new inputs or another thread to access the most recently
+ * polled inputs.
+ */
 void release_rumble_pak_control(void) {
     osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg) 0, OS_MESG_NOBLOCK);
 }
@@ -133,10 +141,11 @@ static void update_rumble_data_queue(void) {
         gCurrRumbleSettings.decay = gRumbleDataQueue[0].decay;
     }
 
-    gRumbleDataQueue[0] = gRumbleDataQueue[1];
-    gRumbleDataQueue[1] = gRumbleDataQueue[2];
+    for (int i = 0; i < ARRAY_COUNT(gRumbleDataQueue) - 1; i++) {
+        gRumbleDataQueue[i] = gRumbleDataQueue[i + 1];
+    }
 
-    gRumbleDataQueue[2].comm = 0;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].comm = RUMBLE_EVENT_NOMESG;
 }
 
 void queue_rumble_data(s16 time, s16 level) {
@@ -144,19 +153,14 @@ void queue_rumble_data(s16 time, s16 level) {
         return;
     }
 
-    if (level > 70) {
-        gRumbleDataQueue[2].comm = RUMBLE_EVENT_CONSTON;
-    } else {
-        gRumbleDataQueue[2].comm = RUMBLE_EVENT_LEVELON;
-    }
-
-    gRumbleDataQueue[2].level = level;
-    gRumbleDataQueue[2].time = time;
-    gRumbleDataQueue[2].decay = 0;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].comm = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].level = level;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].time = time;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].decay = 0;
 }
 
 void queue_rumble_decay(s16 decay) {
-    gRumbleDataQueue[2].decay = decay;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].decay = decay;
 }
 
 u32 is_rumble_finished_and_queue_empty(void) {
@@ -164,9 +168,11 @@ u32 is_rumble_finished_and_queue_empty(void) {
         return FALSE;
     }
 
-    if (gRumbleDataQueue[0].comm != RUMBLE_EVENT_NOMESG) return FALSE;
-    if (gRumbleDataQueue[1].comm != RUMBLE_EVENT_NOMESG) return FALSE;
-    if (gRumbleDataQueue[2].comm != RUMBLE_EVENT_NOMESG) return FALSE;
+    for (int i = 0; i < ARRAY_COUNT(gRumbleDataQueue); i++) {
+        if (gRumbleDataQueue[i].comm != RUMBLE_EVENT_NOMESG) {
+            return FALSE;
+        }
+    }
 
     return TRUE;
 }
@@ -200,12 +206,8 @@ void reset_rumble_timers_vibrate(s32 level) {
         gCurrRumbleSettings.slip = 4;
     }
 
-    switch (level) {
-        case 0: gCurrRumbleSettings.vibrate = 5; break;
-        case 1: gCurrRumbleSettings.vibrate = 4; break;
-        case 2: gCurrRumbleSettings.vibrate = 3; break;
-        case 3: gCurrRumbleSettings.vibrate = 2; break;
-        case 4: gCurrRumbleSettings.vibrate = 1; break;
+    if (level < 5) {
+        gCurrRumbleSettings.vibrate = (5 - level);
     }
 }
 
@@ -258,9 +260,9 @@ void cancel_rumble(void) {
         osMotorStop(&gRumblePakPfs);
     }
 
-    gRumbleDataQueue[0].comm = 0;
-    gRumbleDataQueue[1].comm = 0;
-    gRumbleDataQueue[2].comm = 0;
+    for (int i = 0; i < ARRAY_COUNT(gRumbleDataQueue); i++) {
+        gRumbleDataQueue[i].comm = RUMBLE_EVENT_NOMESG;
+    }
 
     gCurrRumbleSettings.timer = 0;
     gCurrRumbleSettings.slip = 0;
@@ -281,9 +283,9 @@ void rumble_thread_update_vi(void) {
         return;
     }
 
-    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg) VRTC, OS_MESG_NOBLOCK);
+    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg)VRTC, OS_MESG_NOBLOCK);
 }
 
 #undef VRTC
 
-#endif
+#endif // ENABLE_RUMBLE
