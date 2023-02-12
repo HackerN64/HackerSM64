@@ -1,10 +1,11 @@
 #include <ultra64.h>
 #include "macros.h"
+#include "config.h"
 
 #include "buffers/buffers.h"
 #include "main.h"
 #include "rumble_init.h"
-#include "config.h"
+#include "level_update.h"
 
 #ifdef ENABLE_RUMBLE
 
@@ -220,11 +221,11 @@ void queue_rumble_submerged(void) {
 static void thread6_rumble_loop(UNUSED void *arg) {
     OSMesg msg;
 
-	osSyncPrintf("start motor thread\n");
+    // osSyncPrintf("start motor thread\n");
     cancel_rumble();
 
     sRumblePakThreadActive = TRUE;
-	osSyncPrintf("go motor thread\n");
+    // osSyncPrintf("go motor thread\n");
 
     while (TRUE) {
         // Block until VI
@@ -238,7 +239,8 @@ static void thread6_rumble_loop(UNUSED void *arg) {
                 sRumblePakActive = FALSE;
             }
         } else if ((gNumVblanks % 60) == 0) { // Check Rumble Pak status once per second.
-            sRumblePakActive = !osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gControllers[0].port);
+            struct Controller *controller = (gMarioState->controller != NULL) ? gMarioState->controller : &gControllers[0];
+            sRumblePakActive = !osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, controller->port);
             sRumblePakErrorCount = 0;
         }
 
@@ -249,7 +251,8 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 }
 
 void cancel_rumble(void) {
-    sRumblePakActive = !osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gControllers[0].port);
+    struct Controller *controller = (gMarioState->controller != NULL) ? gMarioState->controller : &gControllers[0];
+    sRumblePakActive = !osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, controller->port);
 
     if (sRumblePakActive) {
         osMotorStop(&gRumblePakPfs);
