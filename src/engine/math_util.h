@@ -476,7 +476,7 @@ ALWAYS_INLINE f32 remap(f32 f, f32 fromA, f32 toA, f32 fromB, f32 toB) {
     return ((((f - fromA) / (toA - fromA)) * (toB - fromB)) + fromB);
 }
 
-#define ABS(x)  (((x) > 0) ? (x) : -(x))
+#define ABS(x) (((x) > 0) ? (x) : -(x))
 
 /// From Wiseguy
 ALWAYS_INLINE s32 roundf(f32 in) {

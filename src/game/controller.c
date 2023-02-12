@@ -61,6 +61,7 @@ static u16 __osTranslateGCNButtons(u16, s32, s32);
 
 /**
  * @brief Sets up PIF commands to poll controller inputs.
+ * Only __osPackReadData is modified from vanilla.
  * Called by handle_input (thread2_crash_screen), thread_5_game_loop and gd_init_controllers
  */
 s32 osContStartReadDataEx(OSMesgQueue* mq) {
@@ -99,6 +100,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
             // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN4(ptr);
 
+            // If a controller being read was unplugged, start status polling on all 4 ports.
             if (CHNL_ERR(*(__OSContReadFormat*)ptr) & (CHNL_ERR_NORESP >> 4)) {
                 start_controller_status_polling();
                 return;
@@ -175,7 +177,7 @@ static void __osPackReadData(void) {
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
     OSPortInfo *portInfo = NULL;
-    int skipped = 0;
+    int numSkipped = 0;
     int i;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
@@ -201,13 +203,14 @@ static void __osPackReadData(void) {
             // Go to the next 4-byte boundary.
             ptr = (u8 *)ALIGN4(ptr);
 
-            if (skipped) {
-                // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00) byte
-                //   for each skipped channel, and set the rest to CONT_CMD_NOP (0xFF) for alignment.
+            if (numSkipped) {
+                // Channel skipping:
+                // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00) byte for
+                //   each skipped channel, and set the rest of those bytes to CONT_CMD_NOP (0xFF) for alignment.
                 // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
                 //   while bytes of 0x00 increment the channel counter.
-                *(u32 *)(ptr - 4) = ~BITMASK(skipped * 8);
-                skipped = 0;
+                *(u32 *)(ptr - 4) = ~BITMASK(numSkipped * 8);
+                numSkipped = 0;
             }
 
             if (portInfo->type & CONT_CONSOLE_GCN) {
@@ -221,7 +224,7 @@ static void __osPackReadData(void) {
         } else {
             // Skip empty channel/ports.
             ptr++;
-            skipped++;
+            numSkipped++;
         }
     }
 
@@ -282,30 +285,27 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequesFormat requestHeader;
     OSPortInfo *portInfo = NULL;
-    u8 bits = 0;
+    u8 bits = 0x0;
     int i;
 
     for (i = 0; i < __osMaxControllers; i++, ptr += sizeof(requestHeader), data++) {
         requestHeader = *(__OSContRequesFormat*)ptr;
         data->error = CHNL_ERR(requestHeader);
+
         if (data->error == 0) {
             portInfo = &gPortInfo[i];
 
+            // Byteswap the SI identifier.
             data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
 
             // Check the type of controller
-            // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
+            // Some mupen cores seem to send back a controller type of 0xFFFF (null) if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type to N64 controller if so.
-            if ((s16)data->type == -1) {
-                portInfo->type = CONT_TYPE_NORMAL;
-            } else {
-                portInfo->type = data->type;
-            }
+            portInfo->type = ((s16)data->type == -1) ? CONT_TYPE_NORMAL : data->type;
 
+            // Set this port's status.
             data->status = requestHeader.status;
-
             portInfo->plugged = TRUE;
-
             bits |= (1 << i);
         }
     }
@@ -337,6 +337,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         gPortInfo[channel].gcRumble = vibrate;
         __osContLastCmd = CONT_CMD_END;
     } else {
+        // N64 Controllers don't have MOTOR_STOP_HARD.
         if (vibrate == MOTOR_STOP_HARD) {
             vibrate = MOTOR_STOP;
         }
