@@ -21,7 +21,7 @@
 
 /*---------------------------------------------------------------------*
         Copyright (C) 1998 Nintendo. (Originated by SGI)
-        
+
         $RCSfile: os_cont.h,v $
         $Revision: 1.1 $
         $Date: 1998/10/09 08:01:05 $
@@ -47,40 +47,40 @@ extern "C" {
  */
 
 /*
- * Structure for controllers 
+ * Structure for controllers
  */
 
 typedef struct {
-	u16     type;                   /* Controller Type */
-	u8      status;                 /* Controller status */
+	u16 type;                   /* Controller Type */
+	u8  status;                 /* Controller status */
 	u8	error;
-}OSContStatus;
+} OSContStatus;
 
 typedef struct {
-	u16     button;
-	s8      stick_x;		/* -80 <= stick_x <= 80 */
-	s8      stick_y;		/* -80 <= stick_y <= 80 */
-	u8      error;
+	u16 button;
+	s8  stick_x;		/* -80 <= stick_x <= 80 */
+	s8  stick_y;		/* -80 <= stick_y <= 80 */
+	u8  error;
 } OSContPad;
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
-	u16     button;
-	s8      stick_x;		/* -80 <= stick_x <= 80 */
-	s8      stick_y;		/* -80 <= stick_y <= 80 */
-	s8      c_stick_x;
-	s8      c_stick_y;
-	u8      l_trig;
-	u8      r_trig;
+	u16 button;
+	s8  stick_x;		/* -80 <= stick_x <= 80 */
+	s8  stick_y;		/* -80 <= stick_y <= 80 */
+	s8  c_stick_x;
+	s8  c_stick_y;
+	u8  l_trig;
+	u8  r_trig;
 	u8	errno;
 } OSContPadEx;
 
 typedef struct {
-	void    *address;               /* Ram pad Address:  11 bits */
-	u8      databuffer[32];         /* address of the data buffer */
-    u8      addressCrc;             /* CRC code for address */
-	u8      dataCrc;                /* CRC code for data */
-	u8      error;
+	void *address;               /* Ram pad Address:  11 bits */
+	u8   databuffer[32];         /* address of the data buffer */
+    u8   addressCrc;             /* CRC code for address */
+	u8   dataCrc;                /* CRC code for data */
+	u8   error;
 } OSContRamIo;
 
 
@@ -93,7 +93,7 @@ typedef struct {
  */
 
 /*
- *  Controllers  number
+ * Number of controllers
  */
 
 #ifndef _HW_VERSION_1
@@ -142,7 +142,6 @@ typedef struct {
 
 #define CONT_GCN_WIRELESS_ID                0xC000
 #define CONT_GCN_WIRELESS_TYPE_ID           (CONT_GCN_WIRELESS_TYPE_MASK | CONT_GCN_WIRELESS_ID)
-
 
 
 #define CONT_EEPROM             0x8000
