@@ -153,9 +153,9 @@ void queue_rumble_data(s16 time, s16 level) {
         return;
     }
 
-    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].comm = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].comm  = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
     gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].level = level;
-    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].time = time;
+    gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].time  = time;
     gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].decay = 0;
 }
 
