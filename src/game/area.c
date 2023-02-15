@@ -122,9 +122,6 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#if MULTILANG
-    s32 language = eu_get_language();
-#endif
     if ((gGlobalTimer & 31) < 20) {
 #ifdef VERSION_EU
         print_text(20, 20, "START");
@@ -426,10 +423,9 @@ void render_controllers_overlay(void) {
     // Allow drawing outside the screen borders.
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    // Draw the port icons:
-
     gSPDisplayList(dlHead++, dl_controller_icons_begin);
 
+    // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
         portInfo = &gPortInfo[port];
 
@@ -441,7 +437,6 @@ void render_controllers_overlay(void) {
             }
         }
 
-        // Center pos 
         x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port);
         gDPLoadTextureTile(dlHead++,
             texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
@@ -462,22 +457,21 @@ void render_controllers_overlay(void) {
     }
 
     gSPDisplayList(dlHead++, dl_controller_icons_end);
-
-    // Draw the text:
-
     gSPDisplayList(dlHead++, dl_fasttext_begin);
 
     drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);
 
     // Instructions:
-    if (gContStatusPollingReadyForInput) {
-        sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
-        drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
+    if (gControllerBits) {
+        if (gContStatusPollingReadyForInput) {
+            sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-        drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 53), (SCREEN_CENTER_Y + 28), "A+B+START TO EXIT", col, col, col);
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 62), (SCREEN_CENTER_Y + 28), "OR A+B+START TO EXIT", col, col, col);
 #endif
-    } else {
-        drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);
+        } else {
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);
+        }
     }
 
     // Print the assigned port numbers.
