@@ -73,8 +73,9 @@ extern "C" {
  */
 
 /* Perform alignment on input 's' */
+#ifndef ALIGN
 #define	ALIGN(s, align)	(((u32)(s) + ((align)-1)) & ~((align)-1))
-//commented out due to sm64 conflict
+#endif
 
 /***************************************
  *
