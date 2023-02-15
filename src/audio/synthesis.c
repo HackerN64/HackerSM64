@@ -536,11 +536,22 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
                 chunkLen += 8;
             }
         }
+
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SEQUENCES);
         process_sequences(i - 1);
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SEQUENCES);
+
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS);
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB);
+
         if (gSynthesisReverb.useReverb) {
             prepare_reverb_ring_buffer(chunkLen, gAudioUpdatesPerFrame - i);
         }
         cmd = synthesis_do_one_audio_update((s16 *) aiBufPtr, chunkLen, cmd, gAudioUpdatesPerFrame - i);
+
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB);
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS);
+
         bufLen -= chunkLen;
         aiBufPtr += chunkLen;
     }
@@ -705,7 +716,14 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
 
     if (!gSynthesisReverb.useReverb) {
         aClearBuffer(cmd++, DMEM_ADDR_LEFT_CH, DEFAULT_LEN_2CH);
+
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB);
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+
         cmd = synthesis_process_notes(aiBuf, bufLen, cmd);
+        
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB);
     } else {
         if (gReverbDownsampleRate == 1) {
             // Put the oldest samples in the ring buffer into the wet channels
@@ -741,7 +759,15 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
             aMix(cmd++, 0, /*gain*/ 0x8000 + gSynthesisReverb.reverbGain, /*in*/ DMEM_ADDR_LEFT_CH, /*out*/ DMEM_ADDR_LEFT_CH);
             aDMEMMove(cmd++, DMEM_ADDR_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
         }
+
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB);
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+
         cmd = synthesis_process_notes(aiBuf, bufLen, cmd);
+        
+        AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+        AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB);
+
         if (gReverbDownsampleRate == 1) {
             aSetSaveBufferPair(cmd++, 0, v1->lengthA, v1->startPos);
             if (v1->lengthB != 0) {
@@ -1020,15 +1046,29 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                             if (audioBookSample->loaded == 0x81) {
                                 v0_2 = sampleAddr + temp * 9;
                             } else {
+                                AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+                                AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_DMA);
+
                                 v0_2 = dma_sample_data(
                                     (uintptr_t) (sampleAddr + temp * 9),
                                     t0 * 9, flags, &synthesisState->sampleDmaIndex);
+            
+                                AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_DMA);
+                                AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
                             }
 #else
+                            // HACKERSM64_TODO: Is the EU thing above applicable to US? Could potentially save some resources.
                             temp = (note->samplePosInt - s2 + 0x10) / 16;
+            
+                            AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+                            AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_DMA);
+
                             v0_2 = dma_sample_data(
                                 (uintptr_t) (sampleAddr + temp * 9),
                                 t0 * 9, flags, &note->sampleDmaIndex);
+            
+                            AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_DMA);
+                            AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
 #endif
                             a3 = (u32)((uintptr_t) v0_2 & 0xf);
                             aSetBuffer(cmd++, 0, DMEM_ADDR_COMPRESSED_ADPCM_DATA, 0, t0 * 9 + a3);
@@ -1224,11 +1264,15 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                 leftRight = 0;
             }
 
+            AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
+            AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_ENVELOPE);
 #ifdef VERSION_EU
             cmd = process_envelope(cmd, noteSubEu, synthesisState, bufLen, 0, leftRight, flags);
 #else
             cmd = process_envelope(cmd, note, bufLen, 0, leftRight, flags);
 #endif
+            AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_ENVELOPE);
+            AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
 
 #ifdef VERSION_EU
             if (noteSubEu->usesHeadsetPanEffects) {

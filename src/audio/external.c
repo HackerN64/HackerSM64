@@ -606,6 +606,8 @@ struct SPTask *create_next_audio_frame_task(void) {
         return NULL;
     }
 
+    AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_UPDATE);
+
     gAudioTaskIndex ^= 1;
     gCurrAiBufferIndex++;
     gCurrAiBufferIndex %= NUMAIBUFFERS;
@@ -656,6 +658,8 @@ struct SPTask *create_next_audio_frame_task(void) {
         sGameLoopTicked = 0;
     }
 
+    AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_UPDATE);
+
     // For the function to match we have to preserve some arbitrary variable
     // across this function call.
     flags = 0;
@@ -664,6 +668,8 @@ struct SPTask *create_next_audio_frame_task(void) {
         gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, gCurrAiBuffer, gAiBufferLengths[index]);
         gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
     }
+
+    AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_UPDATE);
 
     index = gAudioTaskIndex;
     gAudioTask->msgqueue = NULL;
@@ -688,6 +694,9 @@ struct SPTask *create_next_audio_frame_task(void) {
     task->yield_data_size = 0;
 
     decrease_sample_dma_ttls();
+
+    AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_UPDATE);
+
     return gAudioTask;
 }
 #endif

@@ -10,11 +10,6 @@
 
 #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625) // 62.5 million cycles per frame
 
-typedef struct {
-    u32 counts[PROFILING_BUFFER_SIZE];
-    u32 total;
-} ProfileTimeData;
-
 ProfileTimeData all_profiling_data[PROFILER_TIME_COUNT];
 
 int profile_buffer_index = -1;
@@ -28,6 +23,12 @@ u32 audio_start;
 u32 audio_buffer_index;
 u32 preempted_time;
 u32 collision_time = 0;
+
+#ifdef AUDIO_PROFILING
+#define AUDIO_SUBSET_SIZE PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START
+u32 audio_subset_starts[AUDIO_SUBSET_SIZE];
+u32 audio_subset_tallies[AUDIO_SUBSET_SIZE];
+#endif
 
 static void buffer_update(ProfileTimeData* data, u32 new, int buffer_index) {
     u32 old = data->counts[buffer_index];
@@ -85,6 +86,12 @@ void profiler_rsp_resumed() {
 
 void profiler_audio_started() {
     audio_start = osGetCount();
+
+#ifdef AUDIO_PROFILING
+    for (s32 i = 0; i < AUDIO_SUBSET_SIZE; i++) {
+        audio_subset_tallies[i] = 0;
+    }
+#endif
 }
 
 void profiler_collision_reset() {
@@ -115,6 +122,14 @@ void profiler_audio_completed() {
 
     preempted_time = time;
     buffer_update(cur_data, time, cur_index);
+
+#ifdef AUDIO_PROFILING
+    for (s32 i = 0; i < AUDIO_SUBSET_SIZE; i++) {
+        cur_data = &all_profiling_data[i + PROFILER_TIME_SUB_AUDIO_START];
+        buffer_update(cur_data, audio_subset_tallies[i], cur_index);
+    }
+#endif
+
     cur_index++;
     if (cur_index >= PROFILING_BUFFER_SIZE) {
         cur_index = 0;
@@ -122,6 +137,19 @@ void profiler_audio_completed() {
 
     audio_buffer_index = cur_index;
 }
+
+#ifdef AUDIO_PROFILING
+void profiler_audio_subset_started_func(enum ProfilerTime index) {
+    audio_subset_starts[index] = osGetCount();
+}
+
+void profiler_audio_subset_completed_func(enum ProfilerTime index) {
+    u32 time = osGetCount();
+
+    audio_subset_tallies[index] += time - audio_subset_starts[index];
+    audio_subset_starts[index] = time;
+}
+#endif
 
 static void update_fps_timer() {
     u32 diff = start - prev_start;

@@ -140,4 +140,4 @@ extern void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32
 extern void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
 void puppyprint_profiler_process(void);
 s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
-void get_char_from_byte(u8 letter, s32 *textX, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font);
+void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font);

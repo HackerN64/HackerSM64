@@ -2682,8 +2682,11 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 // This runs 240 times per second.
 void process_sequences(UNUSED s32 iterationsRemaining) {
     s32 i;
+
+    AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SEQUENCES_SCRIPT);
     for (i = 0; i < SEQUENCE_PLAYERS; i++) {
         if (gSequencePlayers[i].enabled == TRUE) {
+
 #if defined(VERSION_EU) || defined(VERSION_SH)
             sequence_player_process_sequence(&gSequencePlayers[i]);
             sequence_player_process_sound(&gSequencePlayers[i]);
@@ -2691,12 +2694,19 @@ void process_sequences(UNUSED s32 iterationsRemaining) {
             sequence_player_process_sequence(gSequencePlayers + i);
             sequence_player_process_sound(gSequencePlayers + i);
 #endif
+
         }
     }
+    AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SEQUENCES_SCRIPT);
+
 #if defined(VERSION_JP) || defined(VERSION_US)
+    AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SEQUENCES_RECLAIM);
     reclaim_notes();
+    AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SEQUENCES_RECLAIM);
 #endif
+    AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING);
     process_notes();
+    AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING);
 }
 
 void init_sequence_player(u32 player) {

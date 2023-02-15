@@ -373,7 +373,9 @@ void thread4_sound(UNUSED void *arg) {
             struct SPTask *spTask;
             spTask = create_next_audio_frame_task();
             if (spTask != NULL) {
+                AUDIO_PROFILER_START(PROFILER_TIME_SUB_AUDIO_UPDATE);
                 dispatch_audio_sptask(spTask);
+                AUDIO_PROFILER_COMPLETE(PROFILER_TIME_SUB_AUDIO_UPDATE);
             }
         }
         profiler_audio_completed();

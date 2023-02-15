@@ -50,6 +50,8 @@ a modern game engine's developer's console.
 
 #ifdef PUPPYPRINT
 
+#define TAB_WIDTH 16
+
 #ifdef ENABLE_CREDITS_BENCHMARK
 u8 fDebug = TRUE;
 #else
@@ -171,8 +173,8 @@ ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
     { 204,   0, 102 },
     {   0, 153, 153 },
     { 153, 255, 153 },
-    {   0,   0, 128 },
-    { 128,   0, 128 },
+    { 127, 127, 255 },
+    { 255, 127, 255 },
     { 218, 165,  32 },
     { 107, 142,  35 },
     { 188, 143, 143 },
@@ -285,41 +287,53 @@ void print_ram_overview(void) {
     }
 }
 
-const char *audioPoolNames[NUM_AUDIO_POOLS] = {
-    "Audio Init Pool",
-    "Notes And Buffers Pool",
-    "Persistent Sequence Pool",
-    "Persistent Bank Pool",
-    "Temporary Sequence Pool",
-    "Temporary Bank Pool",
+static const char *audioPoolNames[NUM_AUDIO_POOLS] = {
+    "Audio Init Pool:\t\t\t\t  ",
+    "Notes And Buffers Pool:\t  ",
+    "Persistent Sequence Pool:  ",
+    "Persistent Bank Pool:\t\t  ",
+    "Temporary Sequence Pool:\t  ",
+    "Temporary Bank Pool:\t\t  ",
 #ifdef BETTER_REVERB
     "Better Reverb Pool",
 #endif
 };
 
-void print_audio_ram_overview(void) {
-    char textBytes[128];
-    const s32 x = 16;
-    s32 y = 16;
+#ifdef AUDIO_PROFILING
+static const char *audioBenchmarkNames[PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START] = {
+    "Sequence Processing:\t  ",
+    "  Script Parsing:\t\t\t    ",
+    "  Reclaim Notes:\t\t\t    ",
+    "  Note Processing:\t\t    ",
+    "Synthesis:\t\t\t\t\t  ",
+    "  Note Processing:\t\t    ",
+    "  Reverb:\t\t\t\t\t    ",
+    "  Envelopes:\t\t\t\t    ",
+    "  Audio DMAs:\t\t\t\t    ",
+    "Audio Update:\t\t\t\t  "
+};
+
+STATIC_ASSERT(ARRAY_COUNT(audioBenchmarkNames) == PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START, "audioBenchmarkNames has incorrect number of entries!");
+#endif
+
+static void print_audio_ram_overview(s32 x, char *textBytes) {
     s32 percentage = 0;
-    s32 tmpY = y;
+    s32 y = SCREEN_HEIGHT - 6;
     s32 totalMemory[2] = { 0, 0 };
     s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
-    prepare_blank_box();
-    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 64, 64, 64, 168);
-    finish_blank_box();
 
     puppyprint_get_allocated_pools(audioPoolSizes[0]);
 
-    y += 24;
-    for (u8 i = 0; i < NUM_AUDIO_POOLS; i++) {
+    for (s8 i = NUM_AUDIO_POOLS - 1; i >= 0; i--) {
+        y -= 12;
+
         if (audioPoolSizes[i][0] == 0) {
             percentage = 1000;
         } else {
             percentage = (((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0]);
         }
 
-        sprintf(textBytes, "%s: %X / %X (%d.%d%%)", audioPoolNames[i],
+        sprintf(textBytes, "  %s%X / %X (%d.%d%%)", audioPoolNames[i],
                 audioPoolSizes[i][1],
                 audioPoolSizes[i][0],
                 percentage / 10,
@@ -330,11 +344,10 @@ void print_audio_ram_overview(void) {
                             colourChart[i][2], 255);
         print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
-        y += 12;
-
         totalMemory[0] += audioPoolSizes[i][0];
         totalMemory[1] += audioPoolSizes[i][1];
     }
+    y -= 12;
 
     if (totalMemory[0] == 0) {
         percentage = 0;
@@ -342,21 +355,70 @@ void print_audio_ram_overview(void) {
         percentage = (((s64) totalMemory[1] * 1000) / totalMemory[0]);
     }
     if (totalMemory[0] == gAudioHeapSize) {
-        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d%%)",
+        sprintf(textBytes, "TOTAL AUDIO MEMORY:\t\t%X / %X (%d.%d%%)",
                 totalMemory[1],
                 totalMemory[0],
                 percentage / 10,
                 percentage % 10);
     } else {
-        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
+        sprintf(textBytes, "TOTAL AUDIO MEMORY:\t\t%X / %X (Incorrect!)",
                 totalMemory[1],
                 totalMemory[0]);
     }
 
-    print_set_envcolour(colourChart[30][0],
-                        colourChart[30][1],
-                        colourChart[30][2], 255);
-    print_small_text_light(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    print_set_envcolour(255, 255, 255, 255);
+    print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+}
+
+static void print_audio_overview(void) {
+    char textBytes[128];
+    const s32 x = 12;
+    s32 y = 6;
+    u32 us;
+    u32 percentInt;
+    u32 percentDec;
+
+    prepare_blank_box();
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 64, 64, 64, 95);
+    finish_blank_box();
+
+    us = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE) * 2;
+    percentInt = us / 33;
+    percentDec = percentInt % 10;
+    percentInt /= 10;
+
+    sprintf(textBytes, "TOTAL AUDIO CPU:\t\t%d (%d.%d%%)", us, percentInt, percentDec);
+
+    print_set_envcolour(255, 255, 255, 255);
+    print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+
+#ifdef AUDIO_PROFILING
+    for (s32 i = 0; i < ARRAY_COUNT(audioBenchmarkNames); i++) {
+        y += 12;
+
+        us = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_SUB_AUDIO_START + i].total / PROFILING_BUFFER_SIZE) * 2;
+
+        if (audioBenchmarkNames[i][0] != ' ') {
+            percentInt = us / 33;
+            percentDec = percentInt % 10;
+            percentInt /= 10;
+            sprintf(textBytes, "  %s%d (%d.%d%%)", audioBenchmarkNames[i], us, percentInt, percentDec);
+        } else {
+            sprintf(textBytes, "  %s%d", audioBenchmarkNames[i], us);
+        }
+
+        print_set_envcolour(colourChart[NUM_AUDIO_POOLS + i][0],
+                            colourChart[NUM_AUDIO_POOLS + i][1],
+                            colourChart[NUM_AUDIO_POOLS + i][2], 255);
+        print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    }
+#else
+        print_set_envcolour(255, 95, 95, 255);
+        print_small_text(x + 8, y + 12, "Verbose audio profiling is disabled!\nPlease toggle the <COL_7F7FFFFF>AUDIO PROFILING<COL_--------> define\n"
+            "In <COL_FFFF1FFF>profiling.h<COL_-------->.", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+#endif
+
+    print_audio_ram_overview(x, textBytes);
 }
 
 char consoleLogTable[LOG_BUFFER_SIZE][255];
@@ -599,7 +661,7 @@ struct PuppyPrintPage ppPages[] = {
     {&puppyprint_render_minimal,        "Minimal"},
 #endif
     {&puppyprint_render_general_vars,   "General"},
-    {&print_audio_ram_overview,         "Audio"},
+    {&print_audio_overview,             "Audio"},
     {&print_ram_overview,               "Segments"},
     {&puppyprint_render_collision,      "Collision"},
     {&print_console_log,                "Log"},
@@ -908,7 +970,7 @@ s32 get_text_width(const char *str, s32 font) {
         if (i >= strLen)
             break;
 
-        get_char_from_byte(str[i], &textX, &pad, &spaceX, &offsetY, font);
+        get_char_from_byte(&textX, &textPos, str[i], &pad, &spaceX, &offsetY, font);
         textPos += (spaceX + 1) * textSizeTotal;
         wideX = MAX(textPos, wideX);
     }
@@ -1025,7 +1087,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                 continue;
             }
 
-            get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
+            get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
@@ -1091,9 +1153,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             wavePos = 0;
         }
 
-        get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
+        get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
         s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
-        if (str[i] != ' ') {
+        if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
                 if (xlu > 250) {
@@ -1153,7 +1215,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
                 continue;
             }
 
-            get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
+            get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
@@ -1184,9 +1246,9 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
             break;
         }
 
-        get_char_from_byte(str[i], &textX, &widthX, &spaceX, &offsetY, font);
+        get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
         s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
-        if (str[i] != ' ') {
+        if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
                 if (xlu > 250) {
@@ -1318,40 +1380,50 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     return len;
 }
 
-void get_char_from_byte(u8 letter, s32 *textX, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font) {
+void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spaceX, s8 *offsetY, u8 font) {
     *offsetY = 0;
     u32 let = letter - '!';
     struct PPTextFont **fntPtr = segmented_to_virtual(gPuppyPrintFontTable);
     struct PPTextFont *fnt = segmented_to_virtual(fntPtr[font]);
 
-    if (letter != ' ') {
-
-        if (fnt->kern == NULL || gMonoSpace) {
-            *spaceX = fnt->txW;
-        } else {
-            u8 *kern = segmented_to_virtual(fnt->kern);
-            *spaceX = kern[let];
-
-        }
-        if (fnt->offset == NULL) {
-            *textX = let >> 2;
-            *wideX = fnt->txW;
-        } else {
-            u16 *off = segmented_to_virtual(fnt->offset);
-            *textX = off[let] >> 1;
-            *wideX = (off[let + 1] - off[let]);
-        }
-
-        switch (letter) {
-            // This is for the letters that sit differently on the line. It just moves them down a bit.
-            case 'g': *offsetY = 2 * textSizeTotal; break;
-            case 'q': *offsetY = 2 * textSizeTotal; break;
-            case 'j': *offsetY = 2 * textSizeTotal; break;
-            case 'p': *offsetY = 2 * textSizeTotal; break;
-            case 'y': *offsetY = 2 * textSizeTotal; break;
-        }
-    } else {
+    if (letter == ' ') {
         *spaceX = 2;
+        return;
+    }
+
+    if (letter == '\t') {
+        s32 offset = (*textPos % TAB_WIDTH);
+        if (offset == TAB_WIDTH - 1) {
+            offset -= TAB_WIDTH;
+        }
+        *textPos += TAB_WIDTH - offset - 1;
+        *spaceX = 0;
+        return;
+    }
+
+    if (fnt->kern == NULL || gMonoSpace) {
+        *spaceX = fnt->txW;
+    } else {
+        u8 *kern = segmented_to_virtual(fnt->kern);
+        *spaceX = kern[let];
+
+    }
+    if (fnt->offset == NULL) {
+        *textX = let >> 2;
+        *wideX = fnt->txW;
+    } else {
+        u16 *off = segmented_to_virtual(fnt->offset);
+        *textX = off[let] >> 1;
+        *wideX = (off[let + 1] - off[let]);
+    }
+
+    switch (letter) {
+        // This is for the letters that sit differently on the line. It just moves them down a bit.
+        case 'g': *offsetY = 2 * textSizeTotal; break;
+        case 'q': *offsetY = 2 * textSizeTotal; break;
+        case 'j': *offsetY = 2 * textSizeTotal; break;
+        case 'p': *offsetY = 2 * textSizeTotal; break;
+        case 'y': *offsetY = 2 * textSizeTotal; break;
     }
 }
 
