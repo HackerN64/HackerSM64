@@ -307,8 +307,7 @@ static const char *audioBenchmarkNames[PROFILER_TIME_SUB_AUDIO_END - PROFILER_TI
     "  Note Processing:\t\t    ",
     "Synthesis:\t\t\t\t\t  ",
     "  Note Processing:\t\t    ",
-    "  Reverb:\t\t\t\t\t    ",
-    "  Envelopes:\t\t\t\t    ",
+    "  Envelopes / Reverb:\t    ",
     "  Audio DMAs:\t\t\t\t    ",
     "Audio Update:\t\t\t\t  "
 };

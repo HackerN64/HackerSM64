@@ -6,15 +6,16 @@
 #include "config/config_debug.h"
 #include "config/config_safeguards.h"
 
-#ifdef PUPPYPRINT_DEBUG
-
+#if defined(USE_PROFILER) && defined(PUPPYPRINT_DEBUG)
 /**
  * Toggle this define to enable verbose audio profiling with Pupprprint Debug.
- * This is disabled by default because it wants to add a few ms of lag to the game. Could just be bad perf lotto but may as well play it safe.
 */
-// #define AUDIO_PROFILING
-
+#define AUDIO_PROFILING
 #endif
+
+#define OS_GET_COUNT_INLINE(x) asm volatile("mfc0 %0, $9" : "=r"(x): )
+
+#define PROFILING_BUFFER_SIZE 64
 
 #define AUDIO_SUBSET_ENTRIES \
     PROFILER_TIME_SUB_AUDIO_START, \
@@ -24,13 +25,10 @@
     PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING, \
     PROFILER_TIME_SUB_AUDIO_SYNTHESIS, \
     PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING, \
-    PROFILER_TIME_SUB_AUDIO_SYNTHESIS_REVERB, \
-    PROFILER_TIME_SUB_AUDIO_SYNTHESIS_ENVELOPE, \
+    PROFILER_TIME_SUB_AUDIO_SYNTHESIS_ENVELOPE_REVERB, \
     PROFILER_TIME_SUB_AUDIO_SYNTHESIS_DMA, \
     PROFILER_TIME_SUB_AUDIO_UPDATE, \
     PROFILER_TIME_SUB_AUDIO_END
-
-#define PROFILING_BUFFER_SIZE 64
 
 enum ProfilerTime {
     PROFILER_TIME_FPS,
@@ -76,17 +74,6 @@ enum ProfilerDeltaTime {
     PROFILER_DELTA_PUPPYPRINT2
 #endif
 };
-
-#ifdef AUDIO_PROFILING
-void AUDIO_PROFILER_START(enum ProfilerTime which);
-void AUDIO_PROFILER_COMPLETE(enum ProfilerTime which);
-#else
-enum ProfilerTimeAudioUnused {
-    AUDIO_SUBSET_ENTRIES
-};
-#define AUDIO_PROFILER_START(which)
-#define AUDIO_PROFILER_COMPLETE(which)
-#endif
 
 #ifndef PUPPYPRINT_DEBUG
 #define PROFILER_TIME_PUPPYPRINT1 0
@@ -144,16 +131,62 @@ static ALWAYS_INLINE void profiler_rsp_yielded() {
 #define profiler_get_rdp_microseconds() 0
 #endif
 
-
 #ifdef AUDIO_PROFILING
-void profiler_audio_subset_started_func(enum ProfilerTime index);
-void profiler_audio_subset_completed_func(enum ProfilerTime index);
+#define AUDIO_SUBSET_SIZE PROFILER_TIME_SUB_AUDIO_END - PROFILER_TIME_SUB_AUDIO_START
+extern u32 audio_subset_starts[AUDIO_SUBSET_SIZE];
+extern u32 audio_subset_tallies[AUDIO_SUBSET_SIZE];
 
-#define AUDIO_PROFILER_START(which) profiler_audio_subset_started_func(which - PROFILER_TIME_SUB_AUDIO_START)
-#define AUDIO_PROFILER_COMPLETE(which) profiler_audio_subset_completed_func(which - PROFILER_TIME_SUB_AUDIO_START)
-#else
+static ALWAYS_INLINE void profiler_audio_subset_switch_func(enum ProfilerTime complete, enum ProfilerTime start) {
+    u32 time;
+    OS_GET_COUNT_INLINE(time);
+
+    audio_subset_tallies[complete] += time - audio_subset_starts[complete];
+    audio_subset_starts[start] = time;
+}
+
+static ALWAYS_INLINE void profiler_audio_subset_complete_and_switch_func(enum ProfilerTime complete1, enum ProfilerTime complete2, enum ProfilerTime start) {
+    u32 time;
+    OS_GET_COUNT_INLINE(time);
+
+    audio_subset_tallies[complete1] += time - audio_subset_starts[complete1];
+    audio_subset_tallies[complete2] += time - audio_subset_starts[complete2];
+    audio_subset_starts[start] = time;
+}
+
+static ALWAYS_INLINE void profiler_audio_subset_start_shared_func(enum ProfilerTime first, enum ProfilerTime new) {
+    audio_subset_starts[new] = audio_subset_starts[first];
+}
+
+static ALWAYS_INLINE void profiler_audio_subset_start_func(enum ProfilerTime index) {
+    OS_GET_COUNT_INLINE(audio_subset_starts[index]);
+}
+
+static ALWAYS_INLINE void profiler_audio_subset_complete_func(enum ProfilerTime index) {
+    u32 time;
+    OS_GET_COUNT_INLINE(time);
+
+    audio_subset_tallies[index] += time - audio_subset_starts[index];
+}
+
+#define AUDIO_PROFILER_SWITCH(complete, begin) profiler_audio_subset_switch_func(complete - PROFILER_TIME_SUB_AUDIO_START, begin - PROFILER_TIME_SUB_AUDIO_START)
+#define AUDIO_PROFILER_COMPLETE_AND_SWITCH(complete1, complete2, begin) profiler_audio_subset_complete_and_switch_func(complete1 - PROFILER_TIME_SUB_AUDIO_START, \
+    complete2 - PROFILER_TIME_SUB_AUDIO_START, begin - PROFILER_TIME_SUB_AUDIO_START)
+#define AUDIO_PROFILER_START_SHARED(first, new) profiler_audio_subset_start_shared_func(first - PROFILER_TIME_SUB_AUDIO_START, new - PROFILER_TIME_SUB_AUDIO_START)
+
+// These two are unused by the default audio profiler; left in for cases of manual profiling of smaller functions as needed
+#define AUDIO_PROFILER_START(which) profiler_audio_subset_start_func(which - PROFILER_TIME_SUB_AUDIO_START)
+#define AUDIO_PROFILER_COMPLETE(which) profiler_audio_subset_complete_func(which - PROFILER_TIME_SUB_AUDIO_START)
+#else // AUDIO_PROFILING
+enum ProfilerTimeAudioUnused {
+    AUDIO_SUBSET_ENTRIES
+};
+#define AUDIO_PROFILER_SWITCH(complete, begin)
+#define AUDIO_PROFILER_COMPLETE_AND_SWITCH(complete1, complete2, begin)
+#define AUDIO_PROFILER_START_SHARED(first, new)
+
+// These two are unused by the default audio profiler; left in for cases of manual profiling of smaller functions as needed
 #define AUDIO_PROFILER_START(which)
 #define AUDIO_PROFILER_COMPLETE(which)
-#endif
+#endif // AUDIO_PROFILING
 
 #endif
