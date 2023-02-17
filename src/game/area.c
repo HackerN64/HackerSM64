@@ -25,9 +25,9 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "engine/colors.h"
+#include "controller.h"
 #include "profiling.h"
 #include "fasttext.h"
-#include "controller.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
@@ -413,7 +413,7 @@ void render_controllers_overlay(void) {
         return;
     }
 
-    Color col = remap(get_cycle(((f32)CONT_STATUS_POLLING_TIME / 30.0f), 1.0f, gContStasusPollTimer), -1, 1, 127, 255);
+    Color col = remap(get_cycle(((f32)CONT_STATUS_POLLING_TIME / 30.0f), 1.0f, gContStatusPollTimer), -1, 1, 127, 255);
 
     // Darken the screen while polling controller status, similar to pausing the game.
     shade_screen();

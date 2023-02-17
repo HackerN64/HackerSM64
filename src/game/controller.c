@@ -6,6 +6,7 @@
 #include "controller.h"
 #include "engine/math_util.h"
 #include "game_init.h"
+#include "game_input.h"
 #include "rumble_init.h"
 
 // Joybus commands

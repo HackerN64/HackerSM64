@@ -7,6 +7,7 @@
 #include "rumble_init.h"
 #include "level_update.h"
 #include "controller.h"
+#include "game_input.h"
 
 #ifdef ENABLE_RUMBLE
 
@@ -55,6 +56,7 @@ static void set_rumble(s32 flag) {
         return;
     }
 
+    // Don't run if already set.
     if (flag == sRumblePakMotorState) {
         return;
     }
@@ -63,9 +65,9 @@ static void set_rumble(s32 flag) {
 
     block_until_rumble_pak_free();
 
+    // Equivalent to osMotorStart or osMotorStop.
     s32 err = __osMotorAccessEx(&gRumblePakPfs, flag);
 
-    // Equivalent to osMotorStart or osMotorStop.
     if (err == PFS_ERR_SUCCESS) {
         sRumblePakErrorCount = 0;
     } else {

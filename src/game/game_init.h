@@ -3,12 +3,12 @@
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
-#include <PR/os_cont.h>
 #include <PR/os_message.h>
 
 #include "types.h"
-#include "memory.h"
 #include "config.h"
+#include "memory.h"
+#include "game_input.h"
 
 #define MARIO_ANIMS_POOL_SIZE 0x4000
 #define DEMO_INPUTS_POOL_SIZE 0x800
@@ -18,21 +18,11 @@ struct GfxPool {
     struct SPTask spTask;
 };
 
-struct DemoInput {
-    u8 timer; // time until next input. if this value is 0, it means the demo is over
-    s8 rawStickX;
-    s8 rawStickY;
-    u8 buttonMask;
-};
-
 enum ZBmodes {
     KEEP_ZBUFFER = 0,
     CLEAR_ZBUFFER = 1,
 };
 
-extern struct Controller gControllers[MAXCONTROLLERS];
-extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
-extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 extern OSMesgQueue gGameVblankQueue;
 extern OSMesgQueue gGfxVblankQueue;
 extern OSMesg gGameMesgBuf[1];
@@ -46,11 +36,6 @@ extern struct SPTask *gGfxSPTask;
 extern Gfx *gDisplayListHead;
 extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
-extern u8 gNumPlayers;
-extern u8 gControllerBits;
-extern u8 gContStatusPolling;
-extern u32 gContStasusPollTimer;
-extern u8 gContStatusPollingReadyForInput;
 extern u8 gIsConsole;
 extern u8 gCacheEmulated;
 extern u8 gBorderHeight;
@@ -66,26 +51,7 @@ extern s8 gEepromProbe;
 extern s8 gSramProbe;
 #endif
 
-// Controller Status Polling:
-
-// This button combo should be standard, so don't change it unless you have a very good reason.
-#define TOGGLE_CONT_STATUS_POLLING_COMBO            (A_BUTTON | B_BUTTON | START_BUTTON)
-// How long after exiting polling to start accepting inputs.
-// The purpose of this is to allow the player to release all the combo buttons before the game would recognize them.
-// Default is 3.
-#define CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN      3
-// How often to poll for controller status when gContStatusPolling is true, in frames.
-// Default is 15.
-#define CONT_STATUS_POLLING_TIME                    15
-
 extern void (*gGoddardVblankCallback)(void);
-extern struct Controller *gPlayer1Controller;
-extern struct Controller *gPlayer2Controller;
-extern struct Controller *gPlayer3Controller;
-extern struct Controller *gPlayer4Controller;
-extern struct DemoInput *gCurrDemoInput;
-extern u16 gDemoInputListID;
-extern struct DemoInput gRecordedDemoInput;
 
 // this area is the demo input + the header. when the demo is loaded in, there is a header the size
 // of a single word next to the input list. this word is the current ID count.
@@ -108,6 +74,5 @@ void end_master_display_list(void);
 void render_init(void);
 void select_gfx_pool(void);
 void display_and_vsync(void);
-void start_controller_status_polling();
 
 #endif // GAME_INIT_H

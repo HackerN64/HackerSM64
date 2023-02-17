@@ -1,8 +1,6 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include <PR/ultratypes.h>
-
 #include "types.h"
 #include "PR/os_internal.h"
 
@@ -165,7 +163,7 @@ typedef struct
 typedef struct {
     /*0x00*/ u8 tx;
     /*0x01*/ u8 rx;
-} OSContCmdData; // size = 0x02
+} OSContCmdData; /*0x02*/
 
 enum ContCmds {
     // N64 Controller

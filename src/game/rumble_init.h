@@ -34,10 +34,10 @@ enum RumbleEvents {
 };
 
 // Number of frames to rumble before entering the 'timer' phase of a rumble.
-#define RUMBLE_START_TIME 4
+#define RUMBLE_START_TIME       4
 
 // Number of rumble commands that can be called per frane.
-#define RUMBLE_DATA_QUEUE_SIZE 3
+#define RUMBLE_DATA_QUEUE_SIZE  3
 
 extern OSThread gRumblePakThread;
 
