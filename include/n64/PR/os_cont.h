@@ -287,7 +287,7 @@ extern void osContGetReadData(  OSContPad   *pad);
 extern void osContGetReadDataEx(OSContPadEx *pad);
 
 
-#endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
+#endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }

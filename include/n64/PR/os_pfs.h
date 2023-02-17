@@ -88,9 +88,9 @@ typedef struct {
 #define	OS_PFS_VERSION_LO   (OS_PFS_VERSION & 0xFF) // 0x0000
 
 #define PFS_FILE_NAME_LEN   sizeof(((OSPfsState*)0)->game_name) // 16
-#define PFS_FILE_EXT_LEN    sizeof(((OSPfsState*)0)->ext_name ) // 4
-#define BLOCKSIZE           sizeof(((OSPfs     *)0)->id       ) // 32 bytes
-#define PFS_ONE_PAGE        8 /* blocks */
+#define PFS_FILE_EXT_LEN    sizeof(((OSPfsState*)0)->ext_name ) //  4
+#define BLOCKSIZE           32 /* bytes  */
+#define PFS_ONE_PAGE         8 /* blocks */
 #define PFS_MAX_BANKS       62
 
 /* File System flag */
@@ -168,7 +168,7 @@ extern s32 osPfsFreeBlocks(   OSPfs *pfs, s32 *bytes_not_used);
 extern s32 osPfsNumFiles(     OSPfs *pfs, s32 *max_files, s32 *files_used);
 
 
-#endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
+#endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }

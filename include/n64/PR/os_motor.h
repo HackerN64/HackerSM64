@@ -75,7 +75,7 @@ extern s32 __osMotorAccess(  OSPfs *pfs, s32 flag);
 extern s32 __osMotorAccessEx(OSPfs *pfs, s32 flag);
 
 
-#endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
+#endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }

@@ -235,6 +235,7 @@ void handle_vblank(void) {
             profiler_rsp_started(PROFILER_RSP_GFX);
         }
     }
+
 #ifdef ENABLE_RUMBLE
     rumble_thread_update_vi();
 #endif

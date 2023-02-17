@@ -758,6 +758,7 @@ s32 act_in_cannon(struct MarioState *m) {
                 reset_rumble_timers_vibrate(0);
 #endif
             }
+            break;
     }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);

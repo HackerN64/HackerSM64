@@ -12,8 +12,8 @@
 // from: http://en64.shoutwiki.com/wiki/SI_Registers_Detailed#CONT_CMD_Usage
 static const OSContCmdData sContCmds[] = {
     // N64 Controller
-    [CONT_CMD_REQUEST_STATUS    ] = { .tx =  1, .rx =  3 }, // Info
-    [CONT_CMD_READ_BUTTON       ] = { .tx =  1, .rx =  4 }, // Input Status //! .rx is 8 for GCN rumble only
+    [CONT_CMD_REQUEST_STATUS    ] = { .tx =  1, .rx =  3 }, // Read Controller type/status.
+    [CONT_CMD_READ_BUTTON       ] = { .tx =  1, .rx =  4 }, // Read Input Status
     // Controller Accessory
     [CONT_CMD_READ_MEMPAK       ] = { .tx =  3, .rx = 33 }, // Read Controller Accessory
     [CONT_CMD_WRITE_MEMPAK      ] = { .tx = 35, .rx =  1 }, // Write Controller Accessory
@@ -65,8 +65,8 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y);
 
 /**
  * @brief Sets up PIF commands to poll controller inputs.
- * Only __osPackReadData is modified from vanilla.
- * Called by handle_input (thread2_crash_screen), thread_5_game_loop and gd_init_controllers
+ * Unmodified from vanilla libultra, but __osPackReadData is modified.
+ * Called by poll_controller_inputs (thread5_game_loop) and thread2_crash_screen.
  */
 s32 osContStartReadDataEx(OSMesgQueue* mq) {
     s32 ret = 0;
@@ -88,7 +88,9 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
 
 /**
  * @brief Reads PIF command result written by __osPackReadData and converts it into OSContPadEx data.
- * Called by thread2_crash_screen and handle_input (thread5_game_loop).
+ * Modified from vanilla libultra to handle GameCube controllers, skip empty/unassigned ports,
+ *   and trigger status polling if an active controller is unplugged.
+ * Called by poll_controller_inputs (thread5_game_loop) and thread2_crash_screen.
  */
 void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -174,7 +176,8 @@ static void __osMakeRequestData(void* readformat, enum ContCmds cmd) {
 
 /**
  * @brief Writes PIF commands to poll controller inputs.
- * Called by osContStartReadDataEx
+ * Modified from vanilla libultra to handle GameCube controllers and skip empty/unassigned ports.
+ * Called by osContStartReadData and osContStartReadDataEx.
  */
 static void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -237,7 +240,7 @@ static void __osPackReadData(void) {
 
 /**
  * @brief Maps GCN input bits to N64 input bits.
- * Called by osContGetReadDataEx.
+ * Called by osContGetReadData and osContGetReadDataEx.
  */
 static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
     N64Buttons n64 = { .raw = 0x0     };
@@ -251,8 +254,8 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
     n64.buttons.D_DOWN  = gcn.buttons.D_DOWN;
     n64.buttons.D_LEFT  = gcn.buttons.D_LEFT;
     n64.buttons.D_RIGHT = gcn.buttons.D_RIGHT;
-    n64.buttons.X       = gcn.buttons.X;
-    n64.buttons.Y       = gcn.buttons.Y;
+    n64.buttons.X       = gcn.buttons.X; // N64 reset bit.
+    n64.buttons.Y       = gcn.buttons.Y; // N64 unused bit.
     n64.buttons.L       = gcn.buttons.L;
     n64.buttons.R       = gcn.buttons.R;
     n64.buttons.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);
@@ -269,7 +272,8 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data);
 
 /**
- * @brief Modified version of osContGetQuer to return bitpattern like osContInit.
+ * @brief Read status query data written by osContStartQuery.
+ * odified from vanilla libultra to return bitpattern, similar to osContInit.
  * Called by poll_controller_status.
  */
 void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
@@ -283,7 +287,8 @@ void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
 /**
  * @brief Reads PIF command result written by __osPackRequestData and converts it into OSContStatus data.
  * Linker script will resolve references to the original function with this one instead.
- * Called by osContInit, osContGetQuery, and osContReset
+ * Modified from vanilla libultra to set gPortInfo type and plugged status.
+ * Called by osContInit, osContGetQuery, osContGetQueryEx, and osContReset.
  */
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -325,10 +330,11 @@ static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 /**
  * @brief Turns controller rumble on or off.
+ * Modified from vanilla libultra to handle GameCube controller rumble.
  * Called by osMotorStart, osMotorStop, and osMotorStopHard via macro.
  */
-s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
-    s32 ret = 0;
+s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
+    s32 err = PFS_ERR_SUCCESS;
     int channel = pfs->channel;
     u8* ptr = (u8*)&__MotorDataBuf[channel];
 
@@ -337,12 +343,12 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
     }
 
     if (gPortInfo[channel].type & CONT_CONSOLE_GCN) {
-        gPortInfo[channel].gcRumble = vibrate;
+        gPortInfo[channel].gcRumble = flag;
         __osContLastCmd = CONT_CMD_END;
     } else {
         // N64 Controllers don't have MOTOR_STOP_HARD.
-        if (vibrate == MOTOR_STOP_HARD) {
-            vibrate = MOTOR_STOP;
+        if (flag == MOTOR_STOP_HARD) {
+            flag = MOTOR_STOP;
         }
 
         __osSiGetAccess();
@@ -351,7 +357,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
 
         __OSContRamReadFormat* readformat = (__OSContRamReadFormat*)ptr;
 
-        memset(readformat->data, vibrate, sizeof(readformat->data));
+        memset(readformat->data, flag, sizeof(readformat->data));
 
         __osContLastCmd = CONT_CMD_END;
         __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
@@ -359,24 +365,24 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        ret = (readformat->rxsize & CHNL_ERR_MASK);
-        if (!ret) {
-            if (!vibrate) {
+        err = (readformat->rxsize & CHNL_ERR_MASK);
+        if (!err) {
+            if (!flag) {
                 // MOTOR_STOP
                 if (readformat->datacrc != 0) {
-                    ret = PFS_ERR_CONTRFAIL;
+                    err = PFS_ERR_CONTRFAIL;
                 }
             } else {
                 // MOTOR_START
                 if (readformat->datacrc != 0xEB) {
-                    ret = PFS_ERR_CONTRFAIL;
+                    err = PFS_ERR_CONTRFAIL;
                 }
             }
         }
         __osSiRelAccess();
     }
 
-    return ret;
+    return err;
 }
 
 u8 __osContAddressCrc(u16 addr);
@@ -385,7 +391,8 @@ s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
 
 /**
  * @brief Writes PIF commands to control the rumble pak.
- * Called by osMotorInitEx.
+ * Unmodified from vanilla libultra.
+ * Called by osMotorInit and osMotorInitEx.
  */
 static void _MakeMotorData(int channel, OSPifRam* mdata) {
     u8* ptr = (u8*)mdata->ramarray;
@@ -409,11 +416,12 @@ static void _MakeMotorData(int channel, OSPifRam* mdata) {
 
 /**
  * @brief Initializes the Rumble Pak.
+ * Modified from vanilla libultra to ignore GameCube controllers.
  * Called by thread6_rumble_loop and cancel_rumble.
  */
 s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
-    s32 ret;
-    u8 temp[BLOCKSIZE];
+    s32 err;
+    u8 data[BLOCKSIZE];
 
     pfs->queue = mq;
     pfs->channel = channel;
@@ -421,43 +429,43 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     pfs->status = PFS_STATUS_NONE;
 
     if (!(gPortInfo[channel].type & CONT_CONSOLE_GCN)) {
-        ret = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
+        err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         }
-        if (ret != PFS_ERR_SUCCESS) {
-            return ret;
-        }
-
-        ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
-        }
-        if (ret != PFS_ERR_SUCCESS) {
-            return ret;
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
         }
 
-        if (temp[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
+        err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
+        }
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
+        }
+
+        if (data[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
             return PFS_ERR_DEVICE; // Wrong device
         }
 
-        ret = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
+        err = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
-        if (ret != PFS_ERR_SUCCESS) {
-            return ret;
-        }
-
-        ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
-        }
-        if (ret != PFS_ERR_SUCCESS) {
-            return ret;
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
         }
 
-        if (temp[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
+        err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
+        }
+        if (err != PFS_ERR_SUCCESS) {
+            return err;
+        }
+
+        if (data[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
             return PFS_ERR_DEVICE; // Wrong device
         }
 

@@ -665,28 +665,15 @@ void assign_controller_data(struct Controller *controller, int port) {
  * Initialize the controller structs to point at the OSCont information.
  * Automatically assignins controller numbers based on port order.
  */
-void init_controllers(void) {
-    OSPortInfo *portInfo = NULL;
-    s16 port, cont, lastUsedPort;
+void assign_controllers_auto(void) {
 #ifdef PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT
     const s32 prioritizeGCN = TRUE;
 #else
     const s32 prioritizeGCN = FALSE;
 #endif
-
-    // Init the controllers.
-    osContInit(&gSIEventMesgQueue, &gControllerBits, gControllerStatuses);
-
-#ifdef EEP
-    // strangely enough, the EEPROM probe for save data is done in this function.
-    // save pak detection?
-    gEepromProbe = gIsVC
-                 ? osEepromProbeVC(&gSIEventMesgQueue)
-                 : osEepromProbe  (&gSIEventMesgQueue);
-#endif
-#ifdef SRAM
-    gSramProbe = nuPiInitSram();
-#endif
+    OSPortInfo *portInfo = NULL;
+    int port, cont;
+    int lastUsedPort = -1;
 
     // Two passes if PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT is enabled.
     // The first pass is for only GameCube controllers and the second pass for everything else.
@@ -717,13 +704,14 @@ void init_controllers(void) {
  * Initialize the controller structs to point at the OSCont information.
  * Assigns controllers based on assigned data from status polling.
  */
-void assign_controllers(void) {
+void assign_controllers_by_player_num(void) {
     OSPortInfo *portInfo = NULL;
-    s16 lastUsedPort = -1;
+    int port;
+    int lastUsedPort = -1;
 
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
     // The game allows you to have a controller plugged into any port in order to play the game.
-    for (int port = 0; port < MAXCONTROLLERS; port++) {
+    for (port = 0; port < MAXCONTROLLERS; port++) {
         portInfo = &gPortInfo[port];
         // Is controller plugged in and assigned to a player?
         if (portInfo->plugged && portInfo->playerNum) {
@@ -735,6 +723,28 @@ void assign_controllers(void) {
 
     // Disable the ports after the last used one.
     osContSetCh(lastUsedPort + 1);
+}
+
+/**
+ * Initialize controllers on boot.
+ */
+void init_controllers(void) {
+    // Init the controllers.
+    osContInit(&gSIEventMesgQueue, &gControllerBits, gControllerStatuses);
+
+#ifdef EEP
+    // Strangely enough, the EEPROM probe for save data is done in this function.
+    // Save pak detection?
+    gEepromProbe = gIsVC
+                 ? osEepromProbeVC(&gSIEventMesgQueue)
+                 : osEepromProbe  (&gSIEventMesgQueue);
+#endif
+#ifdef SRAM
+    gSramProbe = nuPiInitSram();
+#endif
+
+    // Automatically assign controllers based on port order.
+    assign_controllers_auto();
 }
 
 // Game thread core
@@ -820,7 +830,7 @@ void stop_controller_status_polling(void) {
     gContStatusPolling = FALSE;
     gContStasusPollTimer = 0;
     gNumPlayers--;
-    assign_controllers();
+    assign_controllers_by_player_num();
 #ifdef ENABLE_RUMBLE
     cancel_rumble();
 #endif
@@ -911,9 +921,6 @@ void handle_input(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     setup_game_memory();
-#ifdef ENABLE_RUMBLE
-    init_rumble_pak_scheduler_queue();
-#endif
     init_controllers();
 #ifdef ENABLE_RUMBLE
     create_thread_6_rumble();
