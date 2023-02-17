@@ -82,7 +82,7 @@ u8 sSpawnTypeFromWarpBhv[] = {
     MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
 };
 
-ALIGNED4 const struct ControllerIcon gControllerIcons[] = {
+ALIGNED4 static const struct ControllerIcon gControllerIcons[] = {
     { .type = CONT_NONE,                .texture = texture_controller_port         },
     { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
     { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },

@@ -8,22 +8,22 @@
 #ifdef ENABLE_RUMBLE
 
 struct RumbleData {
-    u8  comm;
-    u8  level;
-    s16 time;
-    s16 decay;
-};
+    /*0x00*/ u8  comm;
+    /*0x01*/ u8  level;
+    /*0x02*/ s16 time;
+    /*0x04*/ s16 decay;
+}; /*0x06*/
 
 struct RumbleSettings {
-    s16 event;
-    s16 level;
-    s16 timer;
-    s16 count;
-    s16 start;
-    s16 slip;
-    s16 vibrate;
-    s16 decay;
-};
+    /*0x00*/ s16 event;
+    /*0x02*/ s16 level;
+    /*0x04*/ s16 timer;
+    /*0x06*/ s16 count;
+    /*0x08*/ s16 start;
+    /*0x0A*/ s16 slip;
+    /*0x0C*/ s16 vibrate;
+    /*0x0E*/ s16 decay;
+}; /*0x10*/
 
 extern OSThread gRumblePakThread;
 
@@ -38,7 +38,6 @@ extern OSMesgQueue gRumbleThreadVIMesgQueue;
 
 extern struct RumbleData gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE];
 extern struct RumbleSettings gCurrRumbleSettings;
-
 
 extern s32 gRumblePakTimer;
 

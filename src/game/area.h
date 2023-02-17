@@ -134,10 +134,10 @@ struct WarpTransition {
 };
 
 struct ControllerIcon {
-    /* 0x00 */ u16 align;
-    /* 0x02 */ u16 type;
-    /* 0x04 */ Texture *texture;
-}; /* 0x08 */
+    /*0x00*/ u16 align;
+    /*0x02*/ u16 type;
+    /*0x04*/ Texture *texture;
+}; /*0x08*/
 
 enum CurrSaveFileNum {
     SAVE_FILE_NUM_A = 0x1,

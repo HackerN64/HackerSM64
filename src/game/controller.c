@@ -1,4 +1,7 @@
+#include <ultra64.h>
 #include "config.h"
+
+#include "string.h"
 #include "PR/os_internal.h"
 #include "controller.h"
 #include "engine/math_util.h"
@@ -26,14 +29,15 @@ static const OSContCmdData sContCmds[] = {
     [CONT_CMD_WRITE20_VOICE     ] = { .tx = 23, .rx =  1 }, // Write to VRx
     [CONT_CMD_READ2_VOICE       ] = { .tx =  3, .rx =  3 }, // Read Status VRx
     [CONT_CMD_WRITE4_VOICE      ] = { .tx =  7, .rx =  1 }, // Write Config VRx
-    [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx
+    [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx (Clear Dictionary)
     // Randnet Keyboard
     [CONT_CMD_KEY_PRESS_REQUEST ] = { .tx =  2, .rx =  7 }, // Randnet Keyboard Read Keypress
-    // GBA //! No room for 64GB read/write commands (https://pastebin.com/06VzdT3w)
+    //! No room for 64GB read/write commands 0x13 and 0x14 (https://pastebin.com/06VzdT3w)
+    // GBA
     [CONT_CMD_READ_GBA          ] = { .tx =  3, .rx = 33 }, // Read GBA
     [CONT_CMD_WRITE_GBA         ] = { .tx = 35, .rx =  1 }, // Write GBA
-    // Game ID (BlueRetro controller adapter)
-    [CONT_CMD_SET_GAME_ID       ] = { .tx =  0, .rx =  0 }, // Configure BlueRetro controller adapter (unverified tx/rx)
+    // Game ID https://gitlab.com/pixelfx-public/n64-game-id
+    [CONT_CMD_WRITE_GAME_ID     ] = { .tx = 10, .rx =  1 }, // The EverDrive sends the game ID on the first controller port on boot using this.
     // GCN Steering Wheel
     [CONT_CMD_GCN_WHEEL_FEEDBACK] = { .tx =  3, .rx =  8 }, // Force Feedback (unverified tx/rx)
     // GCN CONTROLLER
@@ -160,7 +164,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
  * @brief Formats a single aligned PIF command.
  * Called by __osPackReadData and _MakeMotorData.
  */
-void __osMakeRequestData(void *readformat, enum ContCmds cmd) {
+static void __osMakeRequestData(void *readformat, enum ContCmds cmd) {
     OSPifRamChCmd *data = (OSPifRamChCmd *)readformat;
     data->align = CONT_CMD_NOP;
     data->txsize = sContCmds[cmd].tx;
@@ -182,7 +186,7 @@ static void __osPackReadData(void) {
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
 
-    __osContPifRam.pifstatus = CONT_CMD_EXE;
+    __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
     __osMakeRequestData(&readformat, CONT_CMD_READ_BUTTON);
     readformat.button         = 0xFFFF;
@@ -327,7 +331,6 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
     s32 ret = 0;
     int channel = pfs->channel;
     u8* ptr = (u8*)&__MotorDataBuf[channel];
-    int i;
 
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
         return PFS_ERR_INVALID;
@@ -343,12 +346,12 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         }
 
         __osSiGetAccess();
-        __MotorDataBuf[channel].pifstatus = CONT_CMD_EXE;
+        __MotorDataBuf[channel].pifstatus = PIF_STATUS_EXE;
         ptr += channel;
 
-        for (i = 0; i < BLOCKSIZE; i++) {
-            READFORMAT(ptr)->data[i] = vibrate;
-        }
+        __OSContRamReadFormat *readformat = (__OSContRamReadFormat *)ptr;
+
+        memset(readformat->data, vibrate, BLOCKSIZE);
 
         __osContLastCmd = CONT_CMD_END;
         __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
@@ -356,16 +359,16 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        ret = (READFORMAT(ptr)->rxsize & CHNL_ERR_MASK);
+        ret = (readformat->rxsize & CHNL_ERR_MASK);
         if (!ret) {
             if (!vibrate) {
                 // MOTOR_STOP
-                if (READFORMAT(ptr)->datacrc != 0) {
+                if (readformat->datacrc != 0) {
                     ret = PFS_ERR_CONTRFAIL;
                 }
             } else {
                 // MOTOR_START
-                if (READFORMAT(ptr)->datacrc != 0xEB) {
+                if (readformat->datacrc != 0xEB) {
                     ret = PFS_ERR_CONTRFAIL;
                 }
             }
@@ -399,7 +402,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
         }
     }
 
-    *READFORMAT(ptr) = ramreadformat;
+    *(__OSContRamReadFormat*)ptr = ramreadformat;
     ptr += sizeof(__OSContRamReadFormat);
     *ptr = CONT_CMD_END;
 }
@@ -415,39 +418,34 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
     pfs->queue = mq;
     pfs->channel = channel;
     pfs->activebank = ACCESSORY_ID_NULL;
-    pfs->status = 0;
+    pfs->status = PFS_STATUS_NONE;
 
     if (!(gPortInfo[channel].type & CONT_CONSOLE_GCN)) {
         ret = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
-
         if (ret == PFS_ERR_NEW_PACK) {
             ret = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         }
-
-        if (ret != 0) {
+        if (ret != PFS_ERR_SUCCESS) {
             return ret;
         }
 
         ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
-
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
-
-        if (ret != 0) {
+        if (ret != PFS_ERR_SUCCESS) {
             return ret;
         }
 
         if (temp[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
-            return PFS_ERR_DEVICE;
+            return PFS_ERR_DEVICE; // Wrong device
         }
 
         ret = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
-
-        if (ret != 0) {
+        if (ret != PFS_ERR_SUCCESS) {
             return ret;
         }
 
@@ -455,13 +453,12 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
         if (ret == PFS_ERR_NEW_PACK) {
             ret = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
-
-        if (ret != 0) {
+        if (ret != PFS_ERR_SUCCESS) {
             return ret;
         }
 
         if (temp[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
-            return PFS_ERR_DEVICE;
+            return PFS_ERR_DEVICE; // Wrong device
         }
 
         if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
@@ -471,5 +468,5 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
 
     pfs->status = PFS_MOTOR_INITIALIZED;
 
-    return 0;
+    return PFS_ERR_SUCCESS;
 }

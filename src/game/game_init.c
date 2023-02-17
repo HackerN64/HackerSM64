@@ -634,10 +634,12 @@ void read_controller_inputs_normal(void) {
 
             if (gContStatusPollingReadyForInput
              && check_button_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+                gContStatusPollingReadyForInput = FALSE;
                 start_controller_status_polling();
                 return;
             }
-        } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
+        } else {
+            // Otherwise, if the controllerData is NULL, 0 out all of the inputs.
             controller->rawStickX      = 0;
             controller->rawStickY      = 0;
             controller->buttonPressed  = 0;
@@ -803,7 +805,6 @@ void poll_controller_status(void) {
 void start_controller_status_polling(void) {
     gContStatusPolling = TRUE;
     gContStasusPollTimer = 0;
-    gContStatusPollingReadyForInput = FALSE;
     gNumPlayers = 1;
     bzero(gPortInfo, sizeof(gPortInfo));
     bzero(gControllers, sizeof(gControllers));
@@ -818,7 +819,6 @@ void start_controller_status_polling(void) {
 void stop_controller_status_polling(void) {
     gContStatusPolling = FALSE;
     gContStasusPollTimer = 0;
-    gContStatusPollingReadyForInput = FALSE;
     gNumPlayers--;
     assign_controllers();
 #ifdef ENABLE_RUMBLE
@@ -833,6 +833,7 @@ void read_controller_inputs_status_polling(void) {
     OSPortInfo *portInfo = NULL;
     u16 totalInput = 0x0;
 
+    // Check all four ports while status polling.
     for (int port = 0; port < MAXCONTROLLERS; port++) {
         portInfo = &gPortInfo[port];
 
@@ -858,6 +859,7 @@ void read_controller_inputs_status_polling(void) {
                  || check_button_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)
 #endif
                 ) {
+                    gContStatusPollingReadyForInput = FALSE;
                     stop_controller_status_polling();
                     return;
                 }
@@ -867,6 +869,7 @@ void read_controller_inputs_status_polling(void) {
         }
     }
 
+    // Wait for all inputs to be realseased before checking for player assignment inputs or the combo being entered again.
     if (totalInput == 0) {
         gContStatusPollingReadyForInput = TRUE;
     }

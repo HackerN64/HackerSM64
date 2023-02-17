@@ -110,7 +110,7 @@ typedef struct {
 #define CONT_COLLISION_ERROR            0x1
 #endif
 
-/* Controller types (byteswapped) */
+/* Controller types (byteswapped due to __osContGetInitData/__osContGetInitDataEx) */
 
 #define CONT_NONE                           0x0000
 

@@ -100,6 +100,7 @@ typedef struct {
 #define PFS_CREATE              2
 
 /* File System status */
+#define PFS_STATUS_NONE		0x0
 #define PFS_INITIALIZED		0x1
 #define PFS_CORRUPTED		0x2		/* File system was corrupted */
 #define PFS_ID_BROKEN		0x4
@@ -108,6 +109,7 @@ typedef struct {
 
 /* File System error number */
 
+#define PFS_ERR_SUCCESS		0
 #define PFS_ERR_NOPACK		1	/* no memory card is plugged or   */
 #define PFS_ERR_NEW_PACK        2	/* ram pack has been changed to a */
 					/* different one 		  */
