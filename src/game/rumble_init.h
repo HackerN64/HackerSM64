@@ -51,7 +51,7 @@ void reset_rumble_timers_slip(void);
 void reset_rumble_timers_vibrate(s32 level);
 void queue_rumble_submerged(void);
 void cancel_rumble(void);
-void create_thread_6(void);
+void create_thread_6_rumble(void);
 void rumble_thread_update_vi(void);
 
 #endif // ENABLE_RUMBLE

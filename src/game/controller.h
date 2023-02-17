@@ -10,9 +10,11 @@
 // Config //
 ////////////
 
-// How far the player has to move the C-stick for it to register as a C button when converting to N64 input. Default is 38.
+// How far the player has to move the C-stick for it to register as a C button when converting to N64 controller input.
+// [-80, 80]. Default is 38.
 #define GCN_C_STICK_THRESHOLD 38
-// How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%. Default is 85.
+// How far the player has to press the L trigger for it to be considered a Z press.
+// [0, 255]. Default is 85.
 #define GCN_TRIGGER_THRESHOLD 85
 
 /////////////////////////////////////////////////
@@ -35,72 +37,72 @@
  */
 typedef struct
 {
-    /*0x00*/ u32 ramarray[15];      // The command data.
+    /*0x00*/ u32 ramarray[16 - 1];  // The command data.
     /*0x3C*/ u32 pifstatus;         // Set this to PIF_STATUS_EXE to run the commands in ramarray.
-} OSPifRam; // size = 0x40
+} OSPifRam; /*0x40*/
 
 typedef struct {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit.
+    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
     /*0x02*/ u8 rxsize;             // Number of bytes to receive.
     /*0x03*/ u8 cmd;                // The ID of the command to run.
-} OSPifRamChCmd; // size = 0x04
+} OSPifRamChCmd; /*0x04*/
 
 // CONT_CMD_READ_BUTTON
 typedef struct
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit.
+    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
     /*0x02*/ u8 rxsize;             // Number of bytes to receive.
     /*0x03*/ u8 cmd;                // The ID of the command to run.
-    // Received data (4 bytes):
+    // Receive data (4 bytes):
     /*0x04*/ u16 button;            // The received button data.
     /*0x06*/ s8 stick_x;            // The received analog stick X position [-80, 80].
     /*0x07*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
-} __OSContReadFormat; // size = 0x08
+} __OSContReadFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS
 typedef struct
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit.
+    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
     /*0x02*/ u8 rxsize;             // Number of bytes to receive.
     /*0x03*/ u8 cmd;                // The ID of the command to run.
-    // Received data (4 bytes):
+    // Receive data (4 bytes):
     /*0x04*/ u8 typeh;              // HI byte of device type.
     /*0x05*/ u8 typel;              // LO byte of device type.
     /*0x06*/ u8 status;             // Status byte, depends on device type.
     /*0x07*/ u8 dummy1;             // 
-} __OSContRequesFormat; // size = 0x08
+} __OSContRequesFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS
 typedef struct
 {
     // Command data (3 bytes):
-    /*0x00*/ u8 txsize;             // Number of bytes to transmit.
+    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1.
     /*0x01*/ u8 rxsize;             // Number of bytes to receive.
     /*0x02*/ u8 cmd;                // The ID of the command to run.
-    // Received data (3 bytes):
+    // Receive data (3 bytes):
     /*0x03*/ u8 typeh;              // HI byte of device type.
     /*0x04*/ u8 typel;              // LO byte of device type.
     /*0x05*/ u8 status;             // Status byte, depends on device type.
-} __OSContRequesFormatShort; // size = 0x06
+} __OSContRequesFormatShort; /*0x06*/
 
 // CONT_CMD_GCN_SHORT_POLL
 typedef struct
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit.
+    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
     /*0x02*/ u8 rxsize;             // Number of bytes to receive.
     /*0x03*/ u8 cmd;                // The ID of the command to run.
-    // Sent data (2 bytes):
+    // Transmit data (2 bytes):
     /*0x04*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
     /*0x05*/ u8 rumble;             // Rumble bit.
-    // Received data (8 bytes):
+    // Receive data (8 bytes):
     /*0x06*/ u16 button;            // The received button data.
     /*0x08*/ u8 stick_x;            // The received analog stick X position [-80, 80].
     /*0x09*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
@@ -108,22 +110,22 @@ typedef struct
     /*0x0B*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
     /*0x0C*/ u8 l_trig;             // The received L trigger position [0, 255].
     /*0x0D*/ u8 r_trig;             // The received R trigger position [0, 255].
-} __OSContGCNShortPollFormat; // size = 0x0E
+} __OSContGCNShortPollFormat; /*0x0E*/
 
 // CONT_CMD_WRITE_MEMPAK
 typedef struct
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit.
+    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
     /*0x02*/ u8 rxsize;             // Number of bytes to receive.
     /*0x03*/ u8 cmd;                // The ID of the command to run.
-    // Received data (35 bytes):
+    // Receive data (35 bytes):
     /*0x04*/ u8 addrh;
     /*0x05*/ u8 addrl;
     /*0x06*/ u8 data[BLOCKSIZE];    // All 0 for no rumble, all 1 for rumble.
     /*0x26*/ u8 datacrc;
-} __OSContRamReadFormat; // size = 0x27
+} __OSContRamReadFormat; /*0x27*/
 
 // Controller accessory addresses:
 // https://github.com/joeldipops/TransferBoy/blob/master/docs/TransferPakReference.md
@@ -228,23 +230,23 @@ enum ContCmds {
 
 typedef struct
 {
-    /*0x00*/ s8 initialized;
-    /*0x01*/ u8 stick_x;
-    /*0x02*/ u8 stick_y;
-    /*0x03*/ u8 c_stick_x;
-    /*0x04*/ u8 c_stick_y;
-} OSContCenter; // size = 0x05
+    /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
+    /*0x01*/ u8 stick_x;                // The received analog stick X position [-80, 80].
+    /*0x02*/ u8 stick_y;                // The received analog stick Y position [-80, 80].
+    /*0x03*/ u8 c_stick_x;              // The received C stick X position [-80, 80].
+    /*0x04*/ u8 c_stick_y;              // The received C stick Y position [-80, 80].
+} OSContCenter; /*0x05*/
 
 typedef struct
 {
-    /*0x00*/ u16 type;                // Device type.
-    /*0x02*/ u16 accessory;           // Accessory type.
-    /*0x02*/ u16 pollingInput;        // Input, only used when status polling.
-    /*0x04*/ u8 plugged;              // Whether a controller is plugged in.
-    /*0x05*/ u8 playerNum;            // 0-4. 0 = not assigned to a player.
-    /*0x06*/ OSContCenter contCenter; // Gamecube Controller Center.
-    /*0x0B*/ u8 gcRumble;             // GameCube Rumble bit.
-} OSPortInfo; // size = 0x0C
+    /*0x00*/ u16 type;                  // Device type.
+    /*0x02*/ u16 accessory;             // Accessory type.
+    /*0x02*/ u16 pollingInput;          // Input, only used when status polling.
+    /*0x04*/ u8 plugged;                // Whether a controller is plugged in.
+    /*0x05*/ u8 playerNum;              // 0-4. 0 = not assigned to a player.
+    /*0x06*/ OSContCenter contCenter;   // Gamecube Controller Center.
+    /*0x0B*/ u8 gcRumble;               // GameCube Rumble bit.
+} OSPortInfo; /*0x0C*/
 
 /////////////////////
 // Buttons structs //
@@ -277,9 +279,9 @@ typedef union {
         /*0x1*/ u16 C_DOWN      : 1; // CONT_D
         /*0x1*/ u16 C_LEFT      : 1; // CONT_C
         /*0x1*/ u16 C_RIGHT     : 1; // CONT_F
-    } buttons; // size = 0x2
+    } buttons; /*0x2*/
     u16 raw;
-} N64Buttons; // size = 0x2
+} N64Buttons; /*0x2*/
 
 // -- GCN Controller buttons --
 
@@ -302,9 +304,9 @@ typedef union {
         /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
         /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
         /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
-    } buttons; // size = 0x2
+    } buttons; /*0x2*/
     u16 raw;
-} GCNButtons; // size = 0x2
+} GCNButtons; /*0x2*/
 
 // -- Mouse buttons --
 
@@ -314,9 +316,9 @@ typedef union {
         /*0x0*/ u16 CLICK_LEFT  : 1;
         /*0x0*/ u16 CLICK_RIGHT : 1;
         /*0x0*/ u16 unused      : 14;
-    } buttons; // size = 0x2
+    } buttons; /*0x2*/
     u16 raw;
-} N64MouseButtons; // size = 0x2
+} N64MouseButtons; /*0x2*/
 
 // -- Train Controller buttons --
 
@@ -336,9 +338,9 @@ typedef union {
         /*0x1*/ u16 C           : 1;
         /*0x1*/ u16 SELECT      : 1;
         /*0x1*/ u16 BRAKE       : 4;
-    } buttons; // size = 0x2
+    } buttons; /*0x2*/
     u16 raw;
-} N64TrainButtons; // size = 0x2
+} N64TrainButtons; /*0x2*/
 
 /////////////
 // externs //
@@ -347,6 +349,7 @@ typedef union {
 extern OSPifRam __osContPifRam;
 extern u8 __osMaxControllers;
 extern u8 __osContLastCmd;
+
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
 
 #endif /* CONTROLLER_H */

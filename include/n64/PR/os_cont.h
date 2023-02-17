@@ -32,10 +32,11 @@
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
-#endif
+#endif /* _LANGUAGE_C_PLUS_PLUS */
 
 #include <PR/ultratypes.h>
 #include "os_message.h"
+#include "os_pfs.h"
 
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
@@ -51,37 +52,37 @@ extern "C" {
  */
 
 typedef struct {
-	u16 type;                   /* Controller Type */
-	u8  status;                 /* Controller status */
-	u8	error;
-} OSContStatus;
+    /*0x00*/ u16 type;              /* Controller Type */
+    /*0x02*/ u8  status;            /* Controller status */
+    /*0x03*/ u8	error;              /* Error */
+} OSContStatus; /*0x04*/
 
 typedef struct {
-	u16 button;
-	s8  stick_x;		/* -80 <= stick_x <= 80 */
-	s8  stick_y;		/* -80 <= stick_y <= 80 */
-	u8  error;
-} OSContPad;
+    /*0x00*/ u16 button;            /* Button data */
+    /*0x02*/ s8  stick_x;           /* -80 <= stick_x <=  80 */
+    /*0x03*/ s8  stick_y;           /* -80 <= stick_y <=  80 */
+    /*0x04*/ u8  error;             /* Error */
+} OSContPad; /*0x05*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
-	u16 button;
-	s8  stick_x;		/* -80 <= stick_x <= 80 */
-	s8  stick_y;		/* -80 <= stick_y <= 80 */
-	s8  c_stick_x;
-	s8  c_stick_y;
-	u8  l_trig;
-	u8  r_trig;
-	u8	errno;
-} OSContPadEx;
+    /*0x00*/ u16 button;            /* Button data */
+    /*0x02*/ s8  stick_x;           /* -80 <=   stick_x <=  80 */
+    /*0x03*/ s8  stick_y;           /* -80 <=   stick_y <=  80 */
+    /*0x04*/ s8  c_stick_x;         /* -80 <= c_stick_x <=  80 */
+    /*0x05*/ s8  c_stick_y;         /* -80 <= c_stick_y <=  80 */
+    /*0x06*/ u8  l_trig;            /*   0 <= l_trig    <= 255 */
+    /*0x07*/ u8  r_trig;            /*   0 <= r_trig    <= 255 */
+    /*0x08*/ u8	errno;              /* Error number */
+} OSContPadEx; /*0x09*/
 
 typedef struct {
-	void *address;               /* Ram pad Address:  11 bits */
-	u8   databuffer[32];         /* address of the data buffer */
-    u8   addressCrc;             /* CRC code for address */
-	u8   dataCrc;                /* CRC code for data */
-	u8   error;
-} OSContRamIo;
+    /*0x00*/ void *address;         /* Ram pad Address:  11 bits */
+    /*0x04*/ u8   databuffer[32];   /* address of the data buffer */
+    /*0x05*/ u8   addressCrc;       /* CRC code for address */
+    /*0x06*/ u8   dataCrc;          /* CRC code for data */
+    /*0x07*/ u8   error;            /* Error */
+} OSContRamIo; /*0x08*/
 
 
 #endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
@@ -97,58 +98,59 @@ typedef struct {
  */
 
 #ifndef _HW_VERSION_1
-#define MAXCONTROLLERS  4
-#else
-#define MAXCONTROLLERS  6
-#endif
+#define MAXCONTROLLERS 4
+#else /* !_HW_VERSION_1 */
+#define MAXCONTROLLERS 6
+#endif /* !_HW_VERSION_1 */
 
 /* Controller errors */
-#define CONT_NO_RESPONSE_ERROR          0x8
-#define CONT_OVERRUN_ERROR              0x4
+#define CONT_NO_RESPONSE_ERROR              (1 << 3) /* 0x8 */
+#define CONT_OVERRUN_ERROR                  (1 << 2) /* 0x4 */
 #ifdef _HW_VERSION_1
-#define CONT_FRAME_ERROR                0x2
-#define CONT_COLLISION_ERROR            0x1
-#endif
+#define CONT_FRAME_ERROR                    (1 << 1) /* 0x2 */
+#define CONT_COLLISION_ERROR                (1 << 0) /* 0x1 */
+#endif /* _HW_VERSION_1 */
 
-/* Controller types (byteswapped due to __osContGetInitData/__osContGetInitDataEx) */
+/* Controller type bits (byteswapped due to __osContGetInitData/__osContGetInitDataEx) */
 
 #define CONT_NONE                           0x0000
 
 // N64:
-#define CONT_ABSOLUTE                       0x0001
-#define CONT_RELATIVE                       0x0002
-#define CONT_JOYPORT                        0x0004
+#define CONT_ABSOLUTE                       (  1 <<  0) // 0x0001
+#define CONT_RELATIVE                       (  1 <<  1) // 0x0002
+#define CONT_JOYPORT                        (  1 <<  2) // 0x0004
 
 // Console ID:
-#define CONT_CONSOLE_MASK                   0x0018 // 0: N64, 1: Dolphin
-#define CONT_CONSOLE_N64                    0x0000
-#define CONT_CONSOLE_GCN                    0x0008
+#define CONT_CONSOLE_MASK                   (0x3 <<  3) // 0x0018 | 0: N64, 1: Dolphin
+#define CONT_CONSOLE_N64                    (  0 <<  3) // 0x0000
+#define CONT_CONSOLE_GCN                    (  1 <<  3) // 0x0008
 
 // Gamecube:
-#define CONT_GCN_WIRELESS                   0x0080 // 0: wired, 1: wireless
-#define CONT_GCN_MOMOTOR                    0x0020 // 0: available, 1: not available
-#define CONT_GCN_STANDARD                   0x0001 // 0: non standard controller, 1: Dolphin Standard Controller
+#define CONT_GCN_WIRELESS                   (  1 <<  7) // 0x0080 | 0: wired, 1: wireless
+#define CONT_GCN_MOMOTOR                    (  1 <<  5) // 0x0020 | 0: available, 1: not available
+#define CONT_GCN_STANDARD                   (  1 <<  0) // 0x0001 | 0: non standard controller, 1: Dolphin Standard Controller
 
 // Wireless (WaveBird):
-#define CONT_GCN_RECEIVED                   0x0040 // 0: not wireless, 1: wireless
-#define CONT_GCN_WIRELESS_RF                0x0004 // 0: IF, 1: RF
-#define CONT_GCN_WIRELESS_STATE_FIXED       0x0002 // 0: variable, 1: fixed
-#define CONT_GCN_WIRELESS_VALID_ORIGIN      0x2000 // 0: invalid, 1: valid
-#define CONT_GCN_WIRELESS_FIX_ID            0x1000 // 0: not fixed, 1: fixed
-#define CONT_GCN_WIRELESS_TYPE_MASK         0x0F00 // 0x0: normal, 0x4: lite, 0x8: non-controller
-#define CONT_GCN_WIRELESS_LITE_MASK         0x0C00
-#define CONT_GCN_WIRELESS_LITE              0x0400 // 0: normal, 1: lite controller
-#define CONT_GCN_WIRELESS_NON_CONTROLLER    0x0800 // 0: normal, 1: non-controller (?)
+#define CONT_GCN_RECEIVED                   (  1 <<  6) // 0x0040 | 0: not wireless, 1: wireless
+#define CONT_GCN_WIRELESS_RF                (  1 <<  2) // 0x0004 | 0: IF, 1: RF
+#define CONT_GCN_WIRELESS_STATE_FIXED       (  1 <<  1) // 0x0002 | 0: variable, 1: fixed
+#define CONT_GCN_WIRELESS_VALID_ORIGIN      (  1 << 13) // 0x2000 | 0: invalid, 1: valid
+#define CONT_GCN_WIRELESS_FIX_ID            (  1 << 12) // 0x1000 | 0: not fixed, 1: fixed
+#define CONT_GCN_WIRELESS_TYPE_MASK         (0xF <<  8) // 0x0F00 | 0x0: normal, 0x4: lite, 0x8: non-controller
+#define CONT_GCN_WIRELESS_LITE_MASK         (0xC <<  8) // 0x0C00
+#define CONT_GCN_WIRELESS_LITE              (  1 << 10) // 0x0400 | 0: normal, 1: lite controller
+#define CONT_GCN_WIRELESS_NON_CONTROLLER    (  1 << 11) // 0x0800 | 0: normal, 1: non-controller (?)
 
-#define CONT_GCN_WIRELESS_ID                0xC000
+#define CONT_GCN_WIRELESS_ID                (0xC <<  8) // 0x0C00
 #define CONT_GCN_WIRELESS_TYPE_ID           (CONT_GCN_WIRELESS_TYPE_MASK | CONT_GCN_WIRELESS_ID)
 
-
-#define CONT_EEPROM             0x8000
-#define CONT_EEP16K             0x4000
+/* Controller types (byteswapped due to __osContGetInitData/__osContGetInitDataEx) */
 
 #define CONT_TYPE_NULL          (0xFFFF)
 #define CONT_TYPE_UNKNOWN       (0x0000)
+// EEP:
+#define CONT_EEPROM             (0x8000)
+#define CONT_EEP16K             (0x4000)
 // N64:
 #define	CONT_TYPE_NORMAL        (0x0000 | CONT_CONSOLE_N64 | CONT_ABSOLUTE | CONT_JOYPORT) // 0x0005
 #define	CONT_TYPE_MOUSE         (0x0000 | CONT_CONSOLE_N64 | CONT_RELATIVE) // 0x0002
@@ -171,78 +173,80 @@ typedef struct {
 
 /* Controller status */
 
-#define CONT_CARD_ON            0x01
-#define CONT_CARD_PULL          0x02
-#define CONT_ADDR_CRC_ER        0x04
-#define CONT_EEPROM_BUSY        0x80
+#define CONT_CARD_ON            (1 << 0) // 0x01
+#define CONT_CARD_PULL          (1 << 1) // 0x02
+#define CONT_ADDR_CRC_ER        (1 << 2) // 0x04
+#define CONT_EEPROM_BUSY        (1 << 7) // 0x80
 
-/* Buttons */
+/* N64 Buttons */
 
-#define CONT_A      0x8000
-#define CONT_B      0x4000
-#define CONT_G      0x2000
-#define CONT_START  0x1000
-#define CONT_UP     0x0800
-#define CONT_DOWN   0x0400
-#define CONT_LEFT   0x0200
-#define CONT_RIGHT  0x0100
-#define CONT_RESET  0x0080
-#define CONT_UNUSED 0x0040
-#define CONT_L      0x0020
-#define CONT_R      0x0010
-#define CONT_E      0x0008
-#define CONT_D      0x0004
-#define CONT_C      0x0002
-#define CONT_F      0x0001
+#define CONT_A                  (1 << 15) // 0x8000
+#define CONT_B                  (1 << 14) // 0x4000
+#define CONT_G                  (1 << 13) // 0x2000
+#define CONT_START              (1 << 12) // 0x1000
+#define CONT_UP                 (1 << 11) // 0x0800
+#define CONT_DOWN               (1 << 10) // 0x0400
+#define CONT_LEFT               (1 <<  9) // 0x0200
+#define CONT_RIGHT              (1 <<  8) // 0x0100
+#define CONT_RESET              (1 <<  7) // 0x0080
+#define CONT_UNUSED             (1 <<  6) // 0x0040
+#define CONT_L                  (1 <<  5) // 0x0020
+#define CONT_R                  (1 <<  4) // 0x0010
+#define CONT_E                  (1 <<  3) // 0x0008
+#define CONT_D                  (1 <<  2) // 0x0004
+#define CONT_C                  (1 <<  1) // 0x0002
+#define CONT_F                  (1 <<  0) // 0x0001
 
 /* Nintendo's official button names */
 
-#define A_BUTTON        CONT_A      // 0x8000
-#define B_BUTTON        CONT_B      // 0x4000
-#define X_BUTTON        CONT_RESET  // 0x0080
-#define Y_BUTTON        CONT_UNUSED // 0x0040
-#define L_TRIG          CONT_L      // 0x0020
-#define R_TRIG          CONT_R      // 0x0010
-#define Z_TRIG          CONT_G      // 0x2000
-#define START_BUTTON    CONT_START  // 0x1000
-#define U_JPAD          CONT_UP     // 0x0800
-#define L_JPAD          CONT_LEFT   // 0x0200
-#define R_JPAD          CONT_RIGHT  // 0x0100
-#define D_JPAD          CONT_DOWN   // 0x0400
-#define U_CBUTTONS      CONT_E      // 0x0008
-#define L_CBUTTONS      CONT_C      // 0x0002
-#define R_CBUTTONS      CONT_F      // 0x0001
-#define D_CBUTTONS      CONT_D      // 0x0004
+#define A_BUTTON                CONT_A      // 0x8000
+#define B_BUTTON                CONT_B      // 0x4000
+#define X_BUTTON                CONT_RESET  // 0x0080
+#define Y_BUTTON                CONT_UNUSED // 0x0040
+#define L_TRIG                  CONT_L      // 0x0020
+#define R_TRIG                  CONT_R      // 0x0010
+#define Z_TRIG                  CONT_G      // 0x2000
+#define START_BUTTON            CONT_START  // 0x1000
+#define U_JPAD                  CONT_UP     // 0x0800
+#define L_JPAD                  CONT_LEFT   // 0x0200
+#define R_JPAD                  CONT_RIGHT  // 0x0100
+#define D_JPAD                  CONT_DOWN   // 0x0400
+#define U_CBUTTONS              CONT_E      // 0x0008
+#define L_CBUTTONS              CONT_C      // 0x0002
+#define R_CBUTTONS              CONT_F      // 0x0001
+#define D_CBUTTONS              CONT_D      // 0x0004
 
 /* Gamecube controller buttons */
 
-#define CONT_GCN_ERRSTAT     0x8000
-#define CONT_GCN_ERRLATCH    0x4000
-#define CONT_GCN_GET_ORIGIN  0x2000
-#define CONT_GCN_START       0x1000
-#define CONT_GCN_Y           0x0800
-#define CONT_GCN_X           0x0400
-#define CONT_GCN_B           0x0200
-#define CONT_GCN_A           0x0100
-#define CONT_GCN_USE_ORIGIN  0x0080
-#define CONT_GCN_L           0x0040
-#define CONT_GCN_R           0x0020
-#define CONT_GCN_Z           0x0010
-#define CONT_GCN_UP          0x0008
-#define CONT_GCN_DOWN        0x0004
-#define CONT_GCN_RIGHT       0x0002
-#define CONT_GCN_LEFT        0x0001
+#define CONT_GCN_ERRSTAT        (1 << 15) // 0x8000
+#define CONT_GCN_ERRLATCH       (1 << 14) // 0x4000
+#define CONT_GCN_GET_ORIGIN     (1 << 13) // 0x2000
+#define CONT_GCN_START          (1 << 12) // 0x1000
+#define CONT_GCN_Y              (1 << 11) // 0x0800
+#define CONT_GCN_X              (1 << 10) // 0x0400
+#define CONT_GCN_B              (1 <<  9) // 0x0200
+#define CONT_GCN_A              (1 <<  8) // 0x0100
+#define CONT_GCN_USE_ORIGIN     (1 <<  7) // 0x0080
+#define CONT_GCN_L              (1 <<  6) // 0x0040
+#define CONT_GCN_R              (1 <<  5) // 0x0020
+#define CONT_GCN_Z              (1 <<  4) // 0x0010
+#define CONT_GCN_UP             (1 <<  3) // 0x0008
+#define CONT_GCN_DOWN           (1 <<  2) // 0x0004
+#define CONT_GCN_RIGHT          (1 <<  1) // 0x0002
+#define CONT_GCN_LEFT           (1 <<  0) // 0x0001
 
 /* Controller error number */
 
-#define	CONT_ERR_NO_CONTROLLER		PFS_ERR_NOPACK 		/* 1 */
-#define	CONT_ERR_CONTRFAIL		CONT_OVERRUN_ERROR	/* 4 */
-#define	CONT_ERR_INVALID		PFS_ERR_INVALID		/* 5 */
-#define	CONT_ERR_DEVICE			PFS_ERR_DEVICE 		/* 11 */
-#define	CONT_ERR_NOT_READY		12
-#define	CONT_ERR_VOICE_MEMORY		13
-#define	CONT_ERR_VOICE_WORD		14
-#define	CONT_ERR_VOICE_NO_RESPONSE	15
+enum OSContError {
+    CONT_ERR_NO_CONTROLLER = PFS_ERR_NOPACK,      /*  1 */
+    CONT_ERR_CONTRFAIL     = CONT_OVERRUN_ERROR,  /*  4 */
+    CONT_ERR_INVALID       = PFS_ERR_INVALID,     /*  5 */
+    CONT_ERR_DEVICE        = PFS_ERR_DEVICE,      /* 11 */
+    CONT_ERR_NOT_READY,
+    CONT_ERR_VOICE_MEMORY,
+    CONT_ERR_VOICE_WORD,
+    CONT_ERR_VOICE_NO_RESPONSE,
+};
 
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
@@ -269,24 +273,24 @@ typedef struct {
 
 /* Controller interface */
 
-extern s32		osContInit(         OSMesgQueue *mq, u8 *bitpattern, OSContStatus *status);
-extern s32		osContReset(        OSMesgQueue *mq,                 OSContStatus *status);
-extern s32		osContStartQuery(   OSMesgQueue *mq);
-extern s32		osContStartReadData(OSMesgQueue *mq);
-extern s32		osContStartReadDataEx(OSMesgQueue *mq);
+extern s32  osContInit(           OSMesgQueue *mq, u8 *bitpattern, OSContStatus *status);
+extern s32  osContReset(          OSMesgQueue *mq,                 OSContStatus *status);
+extern s32  osContStartQuery(     OSMesgQueue *mq);
+extern s32  osContStartReadData(  OSMesgQueue *mq);
+extern s32  osContStartReadDataEx(OSMesgQueue *mq);
 #ifndef _HW_VERSION_1
-extern s32		osContSetCh(u8 ch);
+extern s32  osContSetCh(u8 ch);
 #endif
-extern void		osContGetQuery(OSContStatus *status);
-extern void		osContGetQueryEx(u8 *bitpattern, OSContStatus *status);
-extern void		osContGetReadData(OSContPad *pad);
-extern void		osContGetReadDataEx(OSContPadEx *pad);
+extern void osContGetQuery(                  OSContStatus *status);
+extern void osContGetQueryEx(u8 *bitpattern, OSContStatus *status);
+extern void osContGetReadData(  OSContPad   *pad);
+extern void osContGetReadDataEx(OSContPadEx *pad);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
-#endif
+#endif /* _LANGUAGE_C_PLUS_PLUS */
 
 #endif /* !_OS_CONT_H_ */

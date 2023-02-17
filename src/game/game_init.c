@@ -639,7 +639,7 @@ void read_controller_inputs_normal(void) {
                 return;
             }
         } else {
-            // Otherwise, if the controllerData is NULL, 0 out all of the inputs.
+            // Otherwise, if controllerData is NULL or the cooldown hasn't finished, zero out all of the inputs.
             controller->rawStickX      = 0;
             controller->rawStickY      = 0;
             controller->buttonPressed  = 0;
@@ -916,7 +916,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #endif
     init_controllers();
 #ifdef ENABLE_RUMBLE
-    create_thread_6();
+    create_thread_6_rumble();
 #endif
 #ifdef HVQM
     createHvqmThread();

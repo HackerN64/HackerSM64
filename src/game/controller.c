@@ -61,7 +61,7 @@ void __osSiRelAccess(void);
 ////////////////////
 
 static void __osPackReadData(void);
-static u16 __osTranslateGCNButtons(u16, s32, s32);
+static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y);
 
 /**
  * @brief Sets up PIF commands to poll controller inputs.
@@ -94,7 +94,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
-    OSPortInfo *portInfo = NULL;
+    OSPortInfo* portInfo = NULL;
     int i;
 
     for (i = 0; i < __osMaxControllers; i++, data++) {
@@ -102,7 +102,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
-            ptr = (u8 *)ALIGN4(ptr);
+            ptr = (u8*)ALIGN4(ptr);
 
             // If a controller being read was unplugged, start status polling on all 4 ports.
             if (CHNL_ERR(*(__OSContReadFormat*)ptr) & (CHNL_ERR_NORESP >> 4)) {
@@ -111,7 +111,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
             }
 
             if (portInfo->type & CONT_CONSOLE_GCN) {
-                OSContCenter *contCenter = &gPortInfo[i].contCenter;
+                OSContCenter* contCenter = &gPortInfo[i].contCenter;
                 s32 stick_x, stick_y, c_stick_x, c_stick_y;
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
                 data->errno = CHNL_ERR(readformatgcn);
@@ -164,8 +164,8 @@ void osContGetReadDataEx(OSContPadEx* data) {
  * @brief Formats a single aligned PIF command.
  * Called by __osPackReadData and _MakeMotorData.
  */
-static void __osMakeRequestData(void *readformat, enum ContCmds cmd) {
-    OSPifRamChCmd *data = (OSPifRamChCmd *)readformat;
+static void __osMakeRequestData(void* readformat, enum ContCmds cmd) {
+    OSPifRamChCmd* data = (OSPifRamChCmd*)readformat;
     data->align = CONT_CMD_NOP;
     data->txsize = sContCmds[cmd].tx;
     data->rxsize = sContCmds[cmd].rx;
@@ -180,7 +180,7 @@ static void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
-    OSPortInfo *portInfo = NULL;
+    OSPortInfo* portInfo = NULL;
     int numSkipped = 0;
     int i;
 
@@ -205,7 +205,7 @@ static void __osPackReadData(void) {
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
-            ptr = (u8 *)ALIGN4(ptr);
+            ptr = (u8*)ALIGN4(ptr);
 
             if (numSkipped) {
                 // Channel skipping:
@@ -213,7 +213,7 @@ static void __osPackReadData(void) {
                 //   each skipped channel, and set the rest of those bytes to CONT_CMD_NOP (0xFF) for alignment.
                 // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
                 //   while bytes of 0x00 increment the channel counter.
-                *(u32 *)(ptr - 4) = ~BITMASK(numSkipped * 8);
+                *(u32*)(ptr - 4) = ~BITMASK(numSkipped * 8);
                 numSkipped = 0;
             }
 
@@ -266,13 +266,13 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
 // contquery.c //
 /////////////////
 
-void __osContGetInitDataEx(u8*, OSContStatus*);
+void __osContGetInitDataEx(u8* pattern, OSContStatus* data);
 
 /**
  * @brief Modified version of osContGetQuer to return bitpattern like osContInit.
  * Called by poll_controller_status.
  */
-void osContGetQueryEx(u8 *bitpattern, OSContStatus* data) {
+void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
     __osContGetInitDataEx(bitpattern, data);
 }
 
@@ -288,7 +288,7 @@ void osContGetQueryEx(u8 *bitpattern, OSContStatus* data) {
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequesFormat requestHeader;
-    OSPortInfo *portInfo = NULL;
+    OSPortInfo* portInfo = NULL;
     u8 bits = 0x0;
     int i;
 
@@ -349,9 +349,9 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
         __MotorDataBuf[channel].pifstatus = PIF_STATUS_EXE;
         ptr += channel;
 
-        __OSContRamReadFormat *readformat = (__OSContRamReadFormat *)ptr;
+        __OSContRamReadFormat* readformat = (__OSContRamReadFormat*)ptr;
 
-        memset(readformat->data, vibrate, BLOCKSIZE);
+        memset(readformat->data, vibrate, sizeof(readformat->data));
 
         __osContLastCmd = CONT_CMD_END;
         __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
@@ -380,15 +380,15 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 vibrate) {
 }
 
 u8 __osContAddressCrc(u16 addr);
-s32 __osPfsSelectBank(OSPfs *pfs, u8 bank);
-s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+s32 __osPfsSelectBank(OSPfs* pfs, u8 bank);
+s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
 
 /**
  * @brief Writes PIF commands to control the rumble pak.
  * Called by osMotorInitEx.
  */
-static void _MakeMotorData(int channel, OSPifRam *mdata) {
-    u8 *ptr = (u8 *)mdata->ramarray;
+static void _MakeMotorData(int channel, OSPifRam* mdata) {
+    u8* ptr = (u8*)mdata->ramarray;
     __OSContRamReadFormat ramreadformat;
     int i;
 
@@ -411,7 +411,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
  * @brief Initializes the Rumble Pak.
  * Called by thread6_rumble_loop and cancel_rumble.
  */
-s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
+s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     s32 ret;
     u8 temp[BLOCKSIZE];
 
