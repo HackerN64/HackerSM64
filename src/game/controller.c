@@ -98,10 +98,10 @@ void osContGetReadDataEx(OSContPadEx* data) {
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
     OSPortInfo* portInfo = NULL;
-    int i;
+    int port;
 
-    for (i = 0; i < __osMaxControllers; i++, data++) {
-        portInfo = &gPortInfo[i];
+    for (port = 0; port < __osMaxControllers; port++, data++) {
+        portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
@@ -114,7 +114,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
             }
 
             if (portInfo->type & CONT_CONSOLE_GCN) {
-                OSContCenter* contCenter = &gPortInfo[i].contCenter;
+                OSContCenter* contCenter = &gPortInfo[port].contCenter;
                 s32 stick_x, stick_y, c_stick_x, c_stick_y;
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
                 data->errno = CHNL_ERR(readformatgcn);
@@ -186,7 +186,7 @@ static void __osPackReadData(void) {
     __OSContGCNShortPollFormat readformatgcn;
     OSPortInfo* portInfo = NULL;
     int numSkipped = 0;
-    int i;
+    int port;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
 
@@ -204,8 +204,8 @@ static void __osPackReadData(void) {
     readformatgcn.stick_x     = -1;
     readformatgcn.stick_y     = -1;
 
-    for (i = 0; i < __osMaxControllers; i++) {
-        portInfo = &gPortInfo[i];
+    for (port = 0; port < __osMaxControllers; port++) {
+        portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // Go to the next 4-byte boundary.
@@ -296,14 +296,14 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     __OSContRequesFormat requestHeader;
     OSPortInfo* portInfo = NULL;
     u8 bits = 0x0;
-    int i;
+    int port;
 
-    for (i = 0; i < __osMaxControllers; i++, ptr += sizeof(requestHeader), data++) {
+    for (port = 0; port < __osMaxControllers; port++, ptr += sizeof(requestHeader), data++) {
         requestHeader = *(__OSContRequesFormat*)ptr;
         data->error = CHNL_ERR(requestHeader);
 
         if (data->error == 0) {
-            portInfo = &gPortInfo[i];
+            portInfo = &gPortInfo[port];
 
             // Byteswap the SI identifier.
             data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
@@ -316,7 +316,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
             // Set this port's status.
             data->status = requestHeader.status;
             portInfo->plugged = TRUE;
-            bits |= (1 << i);
+            bits |= (1 << port);
         }
     }
 
