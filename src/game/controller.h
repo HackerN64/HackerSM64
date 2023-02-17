@@ -33,13 +33,14 @@
  *                ^^
  *         pifstatus
  */
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ u32 ramarray[16 - 1];  // The command data.
     /*0x3C*/ u32 pifstatus;         // Set this to PIF_STATUS_EXE to run the commands in ramarray.
 } OSPifRam; /*0x40*/
 
-typedef struct {
+typedef struct PACKED
+{
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
     /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
@@ -48,7 +49,7 @@ typedef struct {
 } OSPifRamChCmd; /*0x04*/
 
 // CONT_CMD_READ_BUTTON
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
@@ -62,7 +63,7 @@ typedef struct
 } __OSContReadFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
@@ -77,7 +78,7 @@ typedef struct
 } __OSContRequesFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS
-typedef struct
+typedef struct PACKED
 {
     // Command data (3 bytes):
     /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1.
@@ -90,7 +91,7 @@ typedef struct
 } __OSContRequesFormatShort; /*0x06*/
 
 // CONT_CMD_GCN_SHORT_POLL
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
@@ -111,7 +112,7 @@ typedef struct
 } __OSContGCNShortPollFormat; /*0x0E*/
 
 // CONT_CMD_WRITE_MEMPAK
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
@@ -160,7 +161,8 @@ typedef struct
 #define ACCESSORY_ID_PRINTER        0x85
 #define ACCESSORY_ID_TRANSFER_OFF   0xFE
 
-typedef struct {
+typedef struct PACKED
+{
     /*0x00*/ u8 tx;
     /*0x01*/ u8 rx;
 } OSContCmdData; /*0x02*/
@@ -226,7 +228,7 @@ enum ContCmds {
 // Gamecube additions //
 ////////////////////////
 
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
     /*0x01*/ u8 stick_x;                // The received analog stick X position [-80, 80].
@@ -235,7 +237,7 @@ typedef struct
     /*0x04*/ u8 c_stick_y;              // The received C stick Y position [-80, 80].
 } OSContCenter; /*0x05*/
 
-typedef struct
+typedef struct PACKED
 {
     /*0x00*/ u16 type;                  // Device type.
     /*0x02*/ u16 accessory;             // Accessory type.
