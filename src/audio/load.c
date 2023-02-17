@@ -9,8 +9,6 @@
 #include "seqplayer.h"
 #include "game/puppyprint.h"
 
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 struct SharedDma {
     /*0x0*/ u8 *buffer;       // target, points to pre-allocated buffer
     /*0x4*/ uintptr_t source; // device address
@@ -919,8 +917,8 @@ void audio_init() {
     alSeqFileNew(gAlTbl, gSoundDataRaw);
 
     // Load bank sets for each sequence
-    gAlBankSets = soundAlloc(&gAudioInitPool, BANK_SETS_ALLOC);
-    audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, BANK_SETS_ALLOC);
+    gAlBankSets = soundAlloc(&gAudioInitPool, MAX_NUM_SOUNDBANKS * sizeof(s32));
+    audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, MAX_NUM_SOUNDBANKS * sizeof(s32));
 
     init_sequence_players();
     gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;

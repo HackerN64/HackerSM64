@@ -466,7 +466,7 @@ ia *png2ia(const char *png_filename, int *width, int *height)
    switch (channels) {
       case 3: // red, green, blue
       case 4: // red, green, blue, alpha
-         ERROR("Warning: averaging RGB PNG to create IA\n");
+         // ERROR("Warning: averaging RGB PNG to create IA\n"); // Comment out to silence Puppyprint texture warnings
          for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
                int idx = j*w + i;
