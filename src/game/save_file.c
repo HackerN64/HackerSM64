@@ -18,8 +18,13 @@
 #endif
 #include "puppycam2.h"
 
+#ifdef UNIQUE_SAVE_DATA
+u16 MENU_DATA_MAGIC = 0x4849;
+u16 SAVE_FILE_MAGIC = 0x4441;
+#else
 #define MENU_DATA_MAGIC 0x4849
 #define SAVE_FILE_MAGIC 0x4441
+#endif
 
 //STATIC_ASSERT(sizeof(struct SaveBuffer) == EEPROM_SIZE, "eeprom buffer size must match");
 
@@ -332,9 +337,27 @@ void save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
     save_file_do_save(destFileIndex);
 }
 
+#ifdef UNIQUE_SAVE_DATA
+// This should only be called once on boot and never again.
+static void calculate_unique_save_magic(void) {
+    u16 checksum = 0;
+
+    for (s32 i = 0; i < 20; i++) {
+        checksum += (u16) INTERNAL_ROM_NAME[i] << (i & 0x07);
+    }
+
+    MENU_DATA_MAGIC += checksum;
+    SAVE_FILE_MAGIC += checksum;
+}
+#endif
+
 void save_file_load_all(void) {
     s32 file;
     s32 validSlots;
+
+#ifdef UNIQUE_SAVE_DATA
+    calculate_unique_save_magic(); // This should only be called once on boot and never again.
+#endif
 
     gMainMenuDataModified = FALSE;
     gSaveFileModified = FALSE;
