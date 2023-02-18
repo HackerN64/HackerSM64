@@ -14,42 +14,42 @@
 static const OSContCmdData sContCmds[] = {
     // N64 Controller
     [CONT_CMD_REQUEST_STATUS    ] = { .tx =  1, .rx =  3 }, // Read Controller type/status.
-    [CONT_CMD_READ_BUTTON       ] = { .tx =  1, .rx =  4 }, // Read Input Status
+    [CONT_CMD_READ_BUTTON       ] = { .tx =  1, .rx =  4 }, // Read Input Status.
     // Controller Accessory
-    [CONT_CMD_READ_MEMPAK       ] = { .tx =  3, .rx = 33 }, // Read Controller Accessory
-    [CONT_CMD_WRITE_MEMPAK      ] = { .tx = 35, .rx =  1 }, // Write Controller Accessory
+    [CONT_CMD_READ_MEMPAK       ] = { .tx =  3, .rx = 33 }, // Read Controller Accessory.
+    [CONT_CMD_WRITE_MEMPAK      ] = { .tx = 35, .rx =  1 }, // Write Controller Accessory.
     // EEPROM
-    [CONT_CMD_READ_EEPROM       ] = { .tx =  2, .rx =  8 }, // Read EEPROM
-    [CONT_CMD_WRITE_EEPROM      ] = { .tx = 10, .rx =  1 }, // Write EEPROM
+    [CONT_CMD_READ_EEPROM       ] = { .tx =  2, .rx =  8 }, // Read EEPROM.
+    [CONT_CMD_WRITE_EEPROM      ] = { .tx = 10, .rx =  1 }, // Write EEPROM.
     // RTC
-    [CONT_CMD_READ_RTC_STATUS   ] = { .tx =  1, .rx =  3 }, // RTC Info
-    [CONT_CMD_READ_RTC_BLOCK    ] = { .tx =  2, .rx =  9 }, // Read RTC Block
-    [CONT_CMD_WRITE_RTC_BLOCK   ] = { .tx = 10, .rx =  1 }, // Write RTC Block
+    [CONT_CMD_READ_RTC_STATUS   ] = { .tx =  1, .rx =  3 }, // RTC Info.
+    [CONT_CMD_READ_RTC_BLOCK    ] = { .tx =  2, .rx =  9 }, // Read RTC Block.
+    [CONT_CMD_WRITE_RTC_BLOCK   ] = { .tx = 10, .rx =  1 }, // Write RTC Block.
     // VRU
-    [CONT_CMD_READ36_VOICE      ] = { .tx =  3, .rx = 37 }, // Read from VRx
-    [CONT_CMD_WRITE20_VOICE     ] = { .tx = 23, .rx =  1 }, // Write to VRx
-    [CONT_CMD_READ2_VOICE       ] = { .tx =  3, .rx =  3 }, // Read Status VRx
-    [CONT_CMD_WRITE4_VOICE      ] = { .tx =  7, .rx =  1 }, // Write Config VRx
-    [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx (Clear Dictionary)
+    [CONT_CMD_READ36_VOICE      ] = { .tx =  3, .rx = 37 }, // Read from VRx.
+    [CONT_CMD_WRITE20_VOICE     ] = { .tx = 23, .rx =  1 }, // Write to VRx.
+    [CONT_CMD_READ2_VOICE       ] = { .tx =  3, .rx =  3 }, // Read Status VRx.
+    [CONT_CMD_WRITE4_VOICE      ] = { .tx =  7, .rx =  1 }, // Write Config VRx.
+    [CONT_CMD_SWRITE_VOICE      ] = { .tx =  3, .rx =  1 }, // Write Init VRx (Clear Dictionary).
     // Randnet Keyboard
-    [CONT_CMD_KEY_PRESS_REQUEST ] = { .tx =  2, .rx =  7 }, // Randnet Keyboard Read Keypress
-    //! No room for 64GB read/write commands 0x13 and 0x14 (https://pastebin.com/06VzdT3w)
+    [CONT_CMD_KEY_PRESS_REQUEST ] = { .tx =  2, .rx =  7 }, // Randnet Keyboard Read Keypress.
+    //! No room for 64GB read/write commands 0x13 and 0x14 (https://pastebin.com/06VzdT3w).
     // GBA
-    [CONT_CMD_READ_GBA          ] = { .tx =  3, .rx = 33 }, // Read GBA
-    [CONT_CMD_WRITE_GBA         ] = { .tx = 35, .rx =  1 }, // Write GBA
-    // Game ID https://gitlab.com/pixelfx-public/n64-game-id
-    [CONT_CMD_WRITE_GAME_ID     ] = { .tx = 10, .rx =  1 }, // The EverDrive sends the game ID on the first controller port on boot using this.
+    [CONT_CMD_READ_GBA          ] = { .tx =  3, .rx = 33 }, // Read GBA.
+    [CONT_CMD_WRITE_GBA         ] = { .tx = 35, .rx =  1 }, // Write GBA.
+    // Game ID https://gitlab.com/pixelfx-public/n64-game-id.
+    [CONT_CMD_WRITE_GAME_ID     ] = { .tx = 10, .rx =  1 }, // The EverDrive sends the game ID on the first controller port on boot using this..
     // GCN Steering Wheel
-    [CONT_CMD_GCN_WHEEL_FEEDBACK] = { .tx =  3, .rx =  8 }, // Force Feedback (unverified tx/rx)
+    [CONT_CMD_GCN_WHEEL_FEEDBACK] = { .tx =  3, .rx =  8 }, // Force Feedback (unverified tx/rx).
     // GCN CONTROLLER
-    [CONT_CMD_GCN_SHORT_POLL    ] = { .tx =  3, .rx =  8 }, // GameCube Shortpoll (status)
-    [CONT_CMD_GCN_READ_ORIGIN   ] = { .tx =  1, .rx = 10 }, // GameCube Read Origin
-    [CONT_CMD_GCN_CALIBRATE     ] = { .tx =  3, .rx = 10 }, // GameCube Recalibrate
-    [CONT_CMD_GCN_LONG_POLL     ] = { .tx =  3, .rx = 10 }, // GameCube Longpoll (input)
+    [CONT_CMD_GCN_SHORT_POLL    ] = { .tx =  3, .rx =  8 }, // GameCube Shortpoll (input).
+    [CONT_CMD_GCN_READ_ORIGIN   ] = { .tx =  1, .rx = 10 }, // GameCube Read Origin.
+    [CONT_CMD_GCN_CALIBRATE     ] = { .tx =  3, .rx = 10 }, // GameCube Recalibrate.
+    [CONT_CMD_GCN_LONG_POLL     ] = { .tx =  3, .rx = 10 }, // GameCube Longpoll (input).
     // GCN Keyboard
-    [CONT_CMD_GCN_POLL_KEYBOARD ] = { .tx =  3, .rx =  8 }, // GameCube Keyboard Poll
+    [CONT_CMD_GCN_POLL_KEYBOARD ] = { .tx =  3, .rx =  8 }, // GameCube Keyboard Poll.
 
-    [CONT_CMD_RESET             ] = { .tx =  1, .rx =  3 }, // Reset/Info
+    [CONT_CMD_RESET             ] = { .tx =  1, .rx =  3 }, // Reset/Info.
 };
 
 OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
@@ -104,11 +104,8 @@ void osContGetReadDataEx(OSContPadEx* data) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
-            // Go to the next 4-byte boundary.
-            ptr = (u8*)ALIGN4(ptr);
-
             // If a controller being read was unplugged, start status polling on all 4 ports.
-            if (CHNL_ERR(*(__OSContReadFormat*)ptr) & (CHNL_ERR_NORESP >> 4)) {
+            if (CHNL_ERR((*(__OSContReadFormat*)ptr).cmd) & (CHNL_ERR_NORESP >> 4)) {
                 start_controller_status_polling();
                 return;
             }
@@ -117,7 +114,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 OSContCenter* contCenter = &gPortInfo[port].contCenter;
                 s32 stick_x, stick_y, c_stick_x, c_stick_y;
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
-                data->errno = CHNL_ERR(readformatgcn);
+                data->errno = CHNL_ERR(readformatgcn.cmd);
 
                 if (data->errno == 0) {
                     if (!contCenter->initialized) {
@@ -142,12 +139,12 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 ptr += sizeof(__OSContGCNShortPollFormat);
             } else {
                 readformat = *(__OSContReadFormat*)ptr;
-                data->errno = CHNL_ERR(readformat);
+                data->errno = CHNL_ERR(readformat.cmd);
 
                 if (data->errno == 0) {
+                    data->button    = readformat.button;
                     data->stick_x   = readformat.stick_x;
                     data->stick_y   = readformat.stick_y;
-                    data->button    = readformat.button;
                     data->c_stick_x = 0;
                     data->c_stick_y = 0;
                     data->l_trig    = 0;
@@ -167,12 +164,10 @@ void osContGetReadDataEx(OSContPadEx* data) {
  * @brief Formats a single aligned PIF command.
  * Called by __osPackReadData and _MakeMotorData.
  */
-static void __osMakeRequestData(void* readformat, enum ContCmds cmd) {
-    OSPifRamChCmd* data = (OSPifRamChCmd*)readformat;
-    data->align = CONT_CMD_NOP;
-    data->txsize = sContCmds[cmd].tx;
-    data->rxsize = sContCmds[cmd].rx;
-    data->cmd = cmd;
+static void __osMakeRequestData(OSPifRamChCmd* readformat, enum ContCmds cmd) {
+    readformat->txsize = sContCmds[cmd].tx;
+    readformat->rxsize = sContCmds[cmd].rx;
+    readformat->cmd = cmd;
 }
 
 /**
@@ -185,19 +180,18 @@ static void __osPackReadData(void) {
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
     OSPortInfo* portInfo = NULL;
-    int numSkipped = 0;
     int port;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
 
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
-    __osMakeRequestData(&readformat, CONT_CMD_READ_BUTTON);
+    __osMakeRequestData(&readformat.cmd, CONT_CMD_READ_BUTTON);
     readformat.button         = 0xFFFF;
     readformat.stick_x        = -1;
     readformat.stick_y        = -1;
 
-    __osMakeRequestData(&readformatgcn, CONT_CMD_GCN_SHORT_POLL);
+    __osMakeRequestData(&readformatgcn.cmd, CONT_CMD_GCN_SHORT_POLL);
     readformatgcn.analog_mode = 3;
     readformatgcn.rumble      = 0;
     readformatgcn.button      = 0xFFFF;
@@ -208,19 +202,6 @@ static void __osPackReadData(void) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
-            // Go to the next 4-byte boundary.
-            ptr = (u8*)ALIGN4(ptr);
-
-            if (numSkipped) {
-                // Channel skipping:
-                // If channels were skipped, fill the previous 4 bytes with a CONT_CMD_SKIP_CHNL (0x00) byte for
-                //   each skipped channel, and set the rest of those bytes to CONT_CMD_NOP (0xFF) for alignment.
-                // The PIF chip ignores bytes that are 0xFF without incrementing the channel counter,
-                //   while bytes of 0x00 increment the channel counter.
-                *(u32*)(ptr - 4) = ~BITMASK(numSkipped * 8);
-                numSkipped = 0;
-            }
-
             if (portInfo->type & CONT_CONSOLE_GCN) {
                 readformatgcn.rumble = portInfo->gcRumble;
                 *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
@@ -230,9 +211,8 @@ static void __osPackReadData(void) {
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
-            // Skip empty channel/ports.
+            // Empty channel/port, so Leave a CONT_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
             ptr++;
-            numSkipped++;
         }
     }
 
@@ -300,7 +280,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
     for (port = 0; port < __osMaxControllers; port++, ptr += sizeof(requestHeader), data++) {
         requestHeader = *(__OSContRequesFormat*)ptr;
-        data->error = CHNL_ERR(requestHeader);
+        data->error = CHNL_ERR(requestHeader.cmd);
 
         if (data->error == 0) {
             portInfo = &gPortInfo[port];
@@ -366,7 +346,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        err = (readformat->rxsize & CHNL_ERR_MASK);
+        err = (readformat->cmd.rxsize & CHNL_ERR_MASK);
         if (!err) {
             if (!flag) {
                 // MOTOR_STOP
@@ -400,7 +380,8 @@ static void _MakeMotorData(int channel, OSPifRam* mdata) {
     __OSContRamReadFormat ramreadformat;
     int i;
 
-    __osMakeRequestData(&ramreadformat, CONT_CMD_WRITE_MEMPAK);
+    ramreadformat.align = CONT_CMD_NOP;
+    __osMakeRequestData(&ramreadformat.cmd, CONT_CMD_WRITE_MEMPAK);
     ramreadformat.addrh = (CONT_BLOCK_RUMBLE >> 3);
     ramreadformat.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 

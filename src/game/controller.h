@@ -41,35 +41,29 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
-    /*0x02*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x03*/ u8 cmd;                // The ID of the command to run.
-} OSPifRamChCmd; /*0x04*/
+    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1.
+    /*0x01*/ u8 rxsize;             // Number of bytes to receive.
+    /*0x02*/ u8 cmd;                // The ID of the command to run.
+} OSPifRamChCmd; /*0x03*/
 
 // CONT_CMD_READ_BUTTON
 typedef struct PACKED
 {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
-    /*0x02*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x03*/ u8 cmd;                // The ID of the command to run.
+    /*0x00*/ OSPifRamChCmd cmd;
     // Receive data (4 bytes):
-    /*0x04*/ u16 button;            // The received button data.
-    /*0x06*/ s8 stick_x;            // The received analog stick X position [-80, 80].
-    /*0x07*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
-} __OSContReadFormat; /*0x08*/
+    /*0x03*/ u16 button;            // The received button data.
+    /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
+    /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
+} __OSContReadFormat; /*0x07*/
 
 // CONT_CMD_REQUEST_STATUS
 typedef struct PACKED
 {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
-    /*0x02*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x03*/ u8 cmd;                // The ID of the command to run.
+    /*0x01*/ OSPifRamChCmd cmd;
     // Receive data (4 bytes):
     /*0x04*/ u8 typeh;              // HI byte of device type.
     /*0x05*/ u8 typel;              // LO byte of device type.
@@ -81,9 +75,7 @@ typedef struct PACKED
 typedef struct PACKED
 {
     // Command data (3 bytes):
-    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1.
-    /*0x01*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x02*/ u8 cmd;                // The ID of the command to run.
+    /*0x00*/ OSPifRamChCmd cmd;
     // Receive data (3 bytes):
     /*0x03*/ u8 typeh;              // HI byte of device type.
     /*0x04*/ u8 typel;              // LO byte of device type.
@@ -93,14 +85,11 @@ typedef struct PACKED
 // CONT_CMD_GCN_SHORT_POLL
 typedef struct PACKED
 {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
-    /*0x02*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x03*/ u8 cmd;                // The ID of the command to run.
+    /*0x00*/ OSPifRamChCmd cmd;
     // Transmit data (2 bytes):
-    /*0x04*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
-    /*0x05*/ u8 rumble;             // Rumble bit.
+    /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
+    /*0x04*/ u8 rumble;             // Rumble bit.
     // Receive data (8 bytes):
     /*0x06*/ u16 button;            // The received button data.
     /*0x08*/ u8 stick_x;            // The received analog stick X position [-80, 80].
@@ -114,11 +103,9 @@ typedef struct PACKED
 // CONT_CMD_WRITE_MEMPAK
 typedef struct PACKED
 {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF).
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     // Command data (3 bytes):
-    /*0x01*/ u8 txsize;             // Number of bytes to transmit + 1.
-    /*0x02*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x03*/ u8 cmd;                // The ID of the command to run.
+    /*0x01*/ OSPifRamChCmd cmd;
     // Receive data (35 bytes):
     /*0x04*/ u8 addrh;
     /*0x05*/ u8 addrl;

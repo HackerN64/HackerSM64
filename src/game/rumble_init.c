@@ -114,7 +114,7 @@ static void update_rumble_pak(void) {
                 gCurrRumbleSettings.count -= 0x100;
 
                 set_rumble(MOTOR_START);
-            } else { // count < 0x100, stop rumbling until count >= 0x100 again.
+            } else { // count < 256, stop rumbling until count >= 256 again.
                 s16 level = gCurrRumbleSettings.level;
                 gCurrRumbleSettings.count += ((level * level * level) / 0x200) + 4;
 
@@ -350,7 +350,7 @@ void create_thread_6_rumble(void) {
 }
 
 /**
- * Sends a 'VRTC' message to gRumbleThreadVIMesgQueue every vblank.
+ * Sends a 'VRTC' message on gRumbleThreadVIMesgQueue every vblank.
  * Called by handle_vblank.
  */
 void rumble_thread_update_vi(void) {
