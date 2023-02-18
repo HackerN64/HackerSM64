@@ -1877,16 +1877,7 @@ s32 is_item_in_array(s8 item, s8 *array) {
 }
 
 void bhv_init_room(void) {
-    struct Surface *floor = NULL;
-    if (gCurrentArea->surfaceRooms != NULL) {
-        find_room_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-
-        if (floor != NULL) {
-            o->oRoom = floor->room;
-            return;
-        }
-    }
-    o->oRoom = -1;
+    o->oRoom = get_room_at_pos(o->oPosX, o->oPosY, o->oPosZ);
 }
 
 s32 is_mario_in_room(void) {
