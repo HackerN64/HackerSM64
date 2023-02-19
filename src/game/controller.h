@@ -19,17 +19,6 @@
 // Libultra structs and macros (from ultralib) //
 /////////////////////////////////////////////////
 
-enum OSGCNModes {
-    GCN_MODE_0_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
-    GCN_MODE_1_C4_T8_B4, // c:4 t:8 b:4 | 4 bits c-stick, 8 bits triggers, 4 bits buttons
-    GCN_MODE_2_C4_T4_B8, // c:4 t:4 b:8 | 4 bits c-stick, 4 bits triggers, 8 bits buttons
-    GGN_MODE_3_C8_T8,    // c:8 t:8 b:0 | 8 bits c-stick, 8 bits triggers, 0 bits buttons
-    GCN_MODE_4_C8_B8,    // c:8 t:0 b:8 | 8 bits c-stick, 0 bits triggers, 8 bits buttons
-    GCN_MODE_5_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
-    GCN_MODE_6_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
-    GCN_MODE_7_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
-};
-
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
 /**
@@ -62,7 +51,7 @@ typedef struct PACKED
 typedef struct PACKED
 {
     // Command data (3 bytes):
-    /*0x00*/ OSPifRamChCmd cmd;
+    /*0x00*/ OSPifRamChCmd cmd;     // The 3-byte command.
     // Receive data (4 bytes):
     /*0x03*/ u16 button;            // The received button data.
     /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
@@ -74,19 +63,19 @@ typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     // Command data (3 bytes):
-    /*0x01*/ OSPifRamChCmd cmd;
+    /*0x01*/ OSPifRamChCmd cmd;     // The 3-byte command.
     // Receive data (4 bytes):
     /*0x04*/ u8 typeh;              // HI byte of device type.
     /*0x05*/ u8 typel;              // LO byte of device type.
     /*0x06*/ u8 status;             // Status byte, depends on device type.
-    /*0x07*/ u8 dummy1;             // 
+    /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
 } __OSContRequesFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS
 typedef struct PACKED
 {
     // Command data (3 bytes):
-    /*0x00*/ OSPifRamChCmd cmd;
+    /*0x00*/ OSPifRamChCmd cmd;     // The 3-byte command.
     // Receive data (3 bytes):
     /*0x03*/ u8 typeh;              // HI byte of device type.
     /*0x04*/ u8 typel;              // LO byte of device type.
@@ -97,7 +86,7 @@ typedef struct PACKED
 typedef struct PACKED
 {
     // Command data (3 bytes):
-    /*0x00*/ OSPifRamChCmd cmd;
+    /*0x00*/ OSPifRamChCmd cmd;     // The 3-byte command.
     // Transmit data (2 bytes):
     /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
     /*0x04*/ u8 rumble;             // Rumble bit.
@@ -116,12 +105,12 @@ typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     // Command data (3 bytes):
-    /*0x01*/ OSPifRamChCmd cmd;
+    /*0x01*/ OSPifRamChCmd cmd;     // The 3-byte command.
     // Receive data (35 bytes):
-    /*0x04*/ u8 addrh;
-    /*0x05*/ u8 addrl;
-    /*0x06*/ u8 data[BLOCKSIZE];    // All 0 for no rumble, all 1 for rumble.
-    /*0x26*/ u8 datacrc;
+    /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
+    /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
+    /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
+    /*0x26*/ u8 datacrc;            // CRC code for data.
 } __OSContRamReadFormat; /*0x27*/
 
 // Controller accessory addresses:

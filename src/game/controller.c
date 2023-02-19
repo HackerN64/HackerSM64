@@ -192,6 +192,10 @@ static void __osPackReadData(void) {
     readformat.stick_y        = -1;
 
     __osMakeRequestData(&readformatgcn.cmd, CONT_CMD_GCN_SHORT_POLL);
+    // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
+    // Mode 3 uses 8 bits for both c-stick and shoulder triggers.
+    // https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/HW/SI/SI_DeviceGCController.cpp
+    // https://github.com/extremscorner/gba-as-controller/blob/gc/controller/source/main.iwram.c
     readformatgcn.analog_mode = 3;
     readformatgcn.rumble      = 0;
     readformatgcn.button      = 0xFFFF;

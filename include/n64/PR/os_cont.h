@@ -52,36 +52,36 @@ extern "C" {
  */
 
 typedef struct {
-    /*0x00*/ u16 type;              /* Controller Type */
-    /*0x02*/ u8  status;            /* Controller status */
-    /*0x03*/ u8	error;              /* Error */
+    /*0x00*/ u16 type;                      /* Controller Type */
+    /*0x02*/ u8  status;                    /* Controller status */
+    /*0x03*/ u8	 error;                     /* Error */
 } OSContStatus; /*0x04*/
 
 typedef struct {
-    /*0x00*/ u16 button;            /* Button data */
-    /*0x02*/ s8  stick_x;           /* -80 <= stick_x <=  80 */
-    /*0x03*/ s8  stick_y;           /* -80 <= stick_y <=  80 */
-    /*0x04*/ u8  error;             /* Error */
+    /*0x00*/ u16 button;                    /* Button data */
+    /*0x02*/ s8  stick_x;                   /* -80 <= stick_x <=  80 */
+    /*0x03*/ s8  stick_y;                   /* -80 <= stick_y <=  80 */
+    /*0x04*/ u8  error;                     /* Error */
 } OSContPad; /*0x05*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
-    /*0x00*/ u16 button;            /* Button data */
-    /*0x02*/ s8  stick_x;           /* -80 <=   stick_x <=  80 */
-    /*0x03*/ s8  stick_y;           /* -80 <=   stick_y <=  80 */
-    /*0x04*/ s8  c_stick_x;         /* -80 <= c_stick_x <=  80 */
-    /*0x05*/ s8  c_stick_y;         /* -80 <= c_stick_y <=  80 */
-    /*0x06*/ u8  l_trig;            /*   0 <= l_trig    <= 255 */
-    /*0x07*/ u8  r_trig;            /*   0 <= r_trig    <= 255 */
-    /*0x08*/ u8	errno;              /* Error number */
+    /*0x00*/ u16 button;                    /* Button data */
+    /*0x02*/ s8  stick_x;                   /* -80 <=   stick_x <=  80 */
+    /*0x03*/ s8  stick_y;                   /* -80 <=   stick_y <=  80 */
+    /*0x04*/ s8  c_stick_x;                 /* -80 <= c_stick_x <=  80 */
+    /*0x05*/ s8  c_stick_y;                 /* -80 <= c_stick_y <=  80 */
+    /*0x06*/ u8  l_trig;                    /*   0 <= l_trig    <= 255 */
+    /*0x07*/ u8  r_trig;                    /*   0 <= r_trig    <= 255 */
+    /*0x08*/ u8	errno;                      /* Error number */
 } OSContPadEx; /*0x09*/
 
 typedef struct {
-    /*0x00*/ void *address;         /* Ram pad Address:  11 bits */
-    /*0x04*/ u8   databuffer[32];   /* address of the data buffer */
-    /*0x05*/ u8   addressCrc;       /* CRC code for address */
-    /*0x06*/ u8   dataCrc;          /* CRC code for data */
-    /*0x07*/ u8   error;            /* Error */
+    /*0x00*/ void *address;                 /* Ram pad Address:  11 bits */
+    /*0x04*/ u8   databuffer[BLOCKSIZE];    /* address of the data buffer */
+    /*0x05*/ u8   addressCrc;               /* CRC code for address */
+    /*0x06*/ u8   dataCrc;                  /* CRC code for data */
+    /*0x07*/ u8   error;                    /* Error */
 } OSContRamIo; /*0x08*/
 
 
