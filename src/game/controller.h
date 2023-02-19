@@ -19,6 +19,17 @@
 // Libultra structs and macros (from ultralib) //
 /////////////////////////////////////////////////
 
+enum OSGCNModes {
+    GCN_MODE_0_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
+    GCN_MODE_1_C4_T8_B4, // c:4 t:8 b:4 | 4 bits c-stick, 8 bits triggers, 4 bits buttons
+    GCN_MODE_2_C4_T4_B8, // c:4 t:4 b:8 | 4 bits c-stick, 4 bits triggers, 8 bits buttons
+    GGN_MODE_3_C8_T8,    // c:8 t:8 b:0 | 8 bits c-stick, 8 bits triggers, 0 bits buttons
+    GCN_MODE_4_C8_B8,    // c:8 t:0 b:8 | 8 bits c-stick, 0 bits triggers, 8 bits buttons
+    GCN_MODE_5_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
+    GCN_MODE_6_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
+    GCN_MODE_7_C8_T4_B4, // c:8 t:4 b:4 | 8 bits c-stick, 4 bits triggers, 4 bits buttons
+};
+
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
 /**
@@ -91,14 +102,14 @@ typedef struct PACKED
     /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
     /*0x04*/ u8 rumble;             // Rumble bit.
     // Receive data (8 bytes):
-    /*0x06*/ u16 button;            // The received button data.
-    /*0x08*/ u8 stick_x;            // The received analog stick X position [-80, 80].
-    /*0x09*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
-    /*0x0A*/ u8 c_stick_x;          // The received C stick X position [-80, 80].
-    /*0x0B*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
-    /*0x0C*/ u8 l_trig;             // The received L trigger position [0, 255].
-    /*0x0D*/ u8 r_trig;             // The received R trigger position [0, 255].
-} __OSContGCNShortPollFormat; /*0x0E*/
+    /*0x05*/ u16 button;            // The received button data.
+    /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
+    /*0x08*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
+    /*0x09*/ u8 c_stick_x;          // The received C stick X position [-80, 80].
+    /*0x0A*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
+    /*0x0B*/ u8 l_trig;             // The received L trigger position [0, 255].
+    /*0x0V*/ u8 r_trig;             // The received R trigger position [0, 255].
+} __OSContGCNShortPollFormat; /*0x0D*/
 
 // CONT_CMD_WRITE_MEMPAK
 typedef struct PACKED
