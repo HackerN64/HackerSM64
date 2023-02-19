@@ -92,7 +92,7 @@ static OSMesg sGdMesgBuf[1]; // @ 801BE944
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
 static struct ObjView *D_801BE994; // store if View flag 0x40 set
-static OSContPadEx sPrevFrameCont[MAXCONTROLLERS] = { 0 };
+// static OSContPadEx sPrevFrameCont[MAXCONTROLLERS] = { 0 };
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
 static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
@@ -2342,11 +2342,9 @@ void start_view_dl(struct ObjView *view) {
 
 /* 251014 -> 251A1C; orig name: func_801A2844 */
 void parse_p1_controller(void) {
-    u32 i;
+    s32 i;
     struct GdControl *gdctrl;
-    OSContPadEx *currInputs;
-    OSContPadEx *prevInputs;
-    u16 buttonPressed;
+    u16 button, buttonPressed;
 
     if (gContStatusPolling
      || gPlayer1Controller->controllerData == NULL
@@ -2360,35 +2358,33 @@ void parse_p1_controller(void) {
     *gdctrl->prevFrame = *gdctrl;
 
     gdctrl->unk50 = gdctrl->unk4C = gdctrl->dup = gdctrl->ddown = 0;
-
-    currInputs = gPlayer1Controller->controllerData;
-    prevInputs = &sPrevFrameCont[gPlayer1Controller->port];
-    // stick values
-    gdctrl->stickXf     = currInputs->stick_x;
-    gdctrl->stickYf     = currInputs->stick_y;
+    // Stick values
+    gdctrl->stickXf     = gPlayer1Controller->rawStickX;
+    gdctrl->stickYf     = gPlayer1Controller->rawStickY;
     gdctrl->stickDeltaX = gdctrl->stickX;
     gdctrl->stickDeltaY = gdctrl->stickY;
-    gdctrl->stickX      = currInputs->stick_x;
-    gdctrl->stickY      = currInputs->stick_y;
+    gdctrl->stickX      = gPlayer1Controller->rawStickX;
+    gdctrl->stickY      = gPlayer1Controller->rawStickY;
     gdctrl->stickDeltaX -= gdctrl->stickX;
     gdctrl->stickDeltaY -= gdctrl->stickY;
-    // button values (as bools)
-    gdctrl->trgL   = ((currInputs->button & L_TRIG    ) != 0);
-    gdctrl->trgR   = ((currInputs->button & R_TRIG    ) != 0);
-    gdctrl->btnA   = ((currInputs->button & A_BUTTON  ) != 0);
-    gdctrl->btnB   = ((currInputs->button & B_BUTTON  ) != 0);
-    gdctrl->cleft  = ((currInputs->button & L_CBUTTONS) != 0);
-    gdctrl->cright = ((currInputs->button & R_CBUTTONS) != 0);
-    gdctrl->cup    = ((currInputs->button & U_CBUTTONS) != 0);
-    gdctrl->cdown  = ((currInputs->button & D_CBUTTONS) != 0);
-    gdctrl->dleft  = ((currInputs->button & L_JPAD    ) != 0);
-    gdctrl->dright = ((currInputs->button & R_JPAD    ) != 0);
-    gdctrl->dup    = ((currInputs->button & U_JPAD    ) != 0);
-    gdctrl->ddown  = ((currInputs->button & D_JPAD    ) != 0);
+    // Button values (as bools)
+    button = gPlayer1Controller->buttonDown;
+    gdctrl->trgL   = ((button & L_TRIG    ) != 0);
+    gdctrl->trgR   = ((button & R_TRIG    ) != 0);
+    gdctrl->btnA   = ((button & A_BUTTON  ) != 0);
+    gdctrl->btnB   = ((button & B_BUTTON  ) != 0);
+    gdctrl->cleft  = ((button & L_CBUTTONS) != 0);
+    gdctrl->cright = ((button & R_CBUTTONS) != 0);
+    gdctrl->cup    = ((button & U_CBUTTONS) != 0);
+    gdctrl->cdown  = ((button & D_CBUTTONS) != 0);
+    gdctrl->dleft  = ((button & L_JPAD    ) != 0);
+    gdctrl->dright = ((button & R_JPAD    ) != 0);
+    gdctrl->dup    = ((button & U_JPAD    ) != 0);
+    gdctrl->ddown  = ((button & D_JPAD    ) != 0);
 
     gdctrl->startedDragging = (gdctrl->btnA && !gdctrl->dragging);
 
-    // toggle if A is pressed? or is this just some seed for an rng?
+    // Toggle if A is pressed? or is this just some seed for an rng?
     gdctrl->dragging = gdctrl->btnA;
     gdctrl->unkD8b20 = gdctrl->unkD8b40 = FALSE;
     gdctrl->AbtnPressWait = FALSE;
@@ -2407,10 +2403,10 @@ void parse_p1_controller(void) {
     }
     gdctrl->currFrame++;
 
-    buttonPressed = (~prevInputs->button & currInputs->button);
+    buttonPressed = gPlayer1Controller->buttonPressed;
 
     if (buttonPressed & START_BUTTON) {
-        gdctrl->newStartPress ^= 1;
+        gdctrl->newStartPress ^= TRUE;
     }
 
     if (buttonPressed & Z_TRIG) {
@@ -2430,7 +2426,7 @@ void parse_p1_controller(void) {
         activate_timing();
     }
 
-    for (i = 0; (s32) i < sDebugViewsCount; i++) {
+    for (i = 0; i < sDebugViewsCount; i++) {
         sDebugViews[i]->flags &= ~VIEW_UPDATE;
     }
 
@@ -2438,15 +2434,15 @@ void parse_p1_controller(void) {
         sDebugViews[sCurrDebugViewIndex - 1]->flags |= VIEW_UPDATE;
     }
 
-    // deadzone checks
+    // Deadzone checks
     if (ABS(gdctrl->stickX) >= 6) {
-        gdctrl->csrX += gdctrl->stickX * 0.1;
+        gdctrl->csrX += gdctrl->stickX * 0.1f;
     }
     if (ABS(gdctrl->stickY) >= 6) {
-        gdctrl->csrY -= gdctrl->stickY * 0.1;
+        gdctrl->csrY -= gdctrl->stickY * 0.1f;
     }
 
-    // clamp cursor position within screen view bounds
+    // Clamp cursor position within screen view bounds
     if (gdctrl->csrX < sScreenView->parent->upperLeft.x + 16.0f) {
         gdctrl->csrX = sScreenView->parent->upperLeft.x + 16.0f;
     }
@@ -2459,8 +2455,6 @@ void parse_p1_controller(void) {
     if (gdctrl->csrY > sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f) {
         gdctrl->csrY = sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f;
     }
-
-    *prevInputs = *currInputs;
 }
 
 UNUSED void stub_renderer_4(f32 arg0) {
