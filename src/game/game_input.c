@@ -111,7 +111,7 @@ void assign_controllers_auto(void) {
         // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
         // The game allows you to have a controller plugged into any port in order to play the game.
         for (port = 0; port < MAXCONTROLLERS; port++) {
-            if (cont < NUM_SUPPORTED_CONTROLLERS) {
+            if (cont >= NUM_SUPPORTED_CONTROLLERS) {
                 break;
             }
 
