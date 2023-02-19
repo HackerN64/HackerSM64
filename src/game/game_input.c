@@ -102,7 +102,7 @@ void assign_controllers_auto(void) {
     const s32 prioritizeGCN = FALSE;
 #endif
     OSPortInfo *portInfo = NULL;
-    int port, cont;
+    int port, cont = 0;
     int lastUsedPort = -1;
 
     // Two passes if PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT is enabled.
@@ -110,16 +110,22 @@ void assign_controllers_auto(void) {
     for (int pass = 0; pass < (1 + prioritizeGCN); pass++) {
         // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
         // The game allows you to have a controller plugged into any port in order to play the game.
-        for (cont = 0, port = 0, lastUsedPort = -1; port < MAXCONTROLLERS && cont < NUM_SUPPORTED_CONTROLLERS; port++) {
+        for (port = 0; port < MAXCONTROLLERS; port++) {
+            if (cont < NUM_SUPPORTED_CONTROLLERS) {
+                break;
+            }
+
             portInfo = &gPortInfo[port];
 
-            // Is the controller plugged in?
-            if (portInfo->plugged && (!prioritizeGCN || pass == !(portInfo->type & CONT_CONSOLE_GCN))) {
+            // Is the controller plugged in, and is it a GameCube controller on the first pass?
+            if (portInfo->plugged && (!prioritizeGCN || (pass == !(portInfo->type & CONT_CONSOLE_GCN)))) {
                 assign_controller_data(&gControllers[cont], port);
 
                 portInfo->playerNum = (cont + 1);
 
-                lastUsedPort = port;
+                if (lastUsedPort < port) {
+                    lastUsedPort = port;
+                }
 
                 cont++;
             }
