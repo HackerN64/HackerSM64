@@ -395,8 +395,9 @@ static const Gfx dl_controller_icons_end[] = {
     gsSPEndDisplayList(),
 };
 
-extern void shade_screen(void);
-
+/**
+ * Displays controller info (eg. type and player number) while polling for controller statuses.
+ */
 void render_controllers_overlay(void) {
     const s32 w = 32;
     const s32 h = 32;

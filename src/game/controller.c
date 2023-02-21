@@ -100,7 +100,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
     OSPortInfo* portInfo = NULL;
     int port;
 
-    for (port = 0; port < __osMaxControllers; port++, data++) {
+    for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
@@ -116,7 +116,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
                 data->errno = CHNL_ERR(readformatgcn.cmd);
 
-                if (data->errno == 0) {
+                if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
                     if (!contCenter->initialized) {
                         contCenter->initialized = TRUE;
                         contCenter->stick_x     = readformatgcn.stick_x;
@@ -141,7 +141,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 readformat = *(__OSContReadFormat*)ptr;
                 data->errno = CHNL_ERR(readformat.cmd);
 
-                if (data->errno == 0) {
+                if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
                     data->button    = readformat.button;
                     data->stick_x   = readformat.stick_x;
                     data->stick_y   = readformat.stick_y;
@@ -157,6 +157,8 @@ void osContGetReadDataEx(OSContPadEx* data) {
             // Skip empty channel/ports.
             ptr++;
         }
+
+        data++;
     }
 }
 
@@ -167,7 +169,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
 static void __osMakeRequestData(OSPifRamChCmd* readformat, enum ContCmds cmd) {
     readformat->txsize = sContCmds[cmd].tx;
     readformat->rxsize = sContCmds[cmd].rx;
-    readformat->cmd = cmd;
+    readformat->cmd    = cmd;
 }
 
 /**
@@ -197,7 +199,7 @@ static void __osPackReadData(void) {
     // https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/HW/SI/SI_DeviceGCController.cpp
     // https://github.com/extremscorner/gba-as-controller/blob/gc/controller/source/main.iwram.c
     readformatgcn.analog_mode = 3;
-    readformatgcn.rumble      = 0;
+    readformatgcn.rumble      = MOTOR_STOP;
     readformatgcn.button      = 0xFFFF;
     readformatgcn.stick_x     = -1;
     readformatgcn.stick_y     = -1;
@@ -250,6 +252,7 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y) {
 
     return n64.raw;
 }
+
 /////////////////
 // contquery.c //
 /////////////////
@@ -282,26 +285,29 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8 bits = 0x0;
     int port;
 
-    for (port = 0; port < __osMaxControllers; port++, ptr += sizeof(requestHeader), data++) {
+    for (port = 0; port < __osMaxControllers; port++) {
         requestHeader = *(__OSContRequesFormat*)ptr;
         data->error = CHNL_ERR(requestHeader.cmd);
 
-        if (data->error == 0) {
+        if (data->error == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
             portInfo = &gPortInfo[port];
 
             // Byteswap the SI identifier.
             data->type = ((requestHeader.typel << 8) | requestHeader.typeh);
 
             // Check the type of controller
-            // Some mupen cores seem to send back a controller type of 0xFFFF (null) if the core doesn't initialize the input plugin quickly enough,
+            // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type to N64 controller if so.
-            portInfo->type = ((s16)data->type == -1) ? CONT_TYPE_NORMAL : data->type;
+            portInfo->type = ((s16)data->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : data->type;
 
             // Set this port's status.
             data->status = requestHeader.status;
             portInfo->plugged = TRUE;
             bits |= (1 << port);
         }
+
+        ptr += sizeof(requestHeader);
+        data++;
     }
 
     *pattern = bits;
@@ -355,12 +361,12 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
             if (!flag) {
                 // MOTOR_STOP
                 if (readformat->datacrc != 0) {
-                    err = PFS_ERR_CONTRFAIL;
+                    err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             } else {
                 // MOTOR_START
                 if (readformat->datacrc != 0xEB) {
-                    err = PFS_ERR_CONTRFAIL;
+                    err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             }
         }
@@ -409,20 +415,23 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     s32 err;
     u8 data[BLOCKSIZE];
 
-    pfs->queue = mq;
-    pfs->channel = channel;
+    pfs->status     = PFS_STATUS_NONE;
+    pfs->queue      = mq;
+    pfs->channel    = channel;
     pfs->activebank = ACCESSORY_ID_NULL;
-    pfs->status = PFS_STATUS_NONE;
 
     if (!(gPortInfo[channel].type & CONT_CONSOLE_GCN)) {
+        // Write probe value (ensure Transfer Pak is turned off).
         err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
         if (err == PFS_ERR_NEW_PACK) {
+            // Write probe value (Rumble bank).
             err = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         }
         if (err != PFS_ERR_SUCCESS) {
             return err;
         }
 
+        // Read probe value (1).
         err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
         if (err == PFS_ERR_NEW_PACK) {
             err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
@@ -431,10 +440,12 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
             return err;
         }
 
+        // Ensure the accessory is not a turned off Transfer Pak.
         if (data[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
             return PFS_ERR_DEVICE; // Wrong device
         }
 
+        // Write probe value (Rumble bank).
         err = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         if (err == PFS_ERR_NEW_PACK) {
             err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
@@ -443,6 +454,7 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
             return err;
         }
 
+        // Read probe value (2).
         err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
         if (err == PFS_ERR_NEW_PACK) {
             err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
@@ -451,10 +463,12 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
             return err;
         }
 
+        // Ensure the accessory is a Rumble Pak.
         if (data[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
             return PFS_ERR_DEVICE; // Wrong device
         }
 
+        // Write the PIF command.
         if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
             _MakeMotorData(channel, &__MotorDataBuf[channel]);
         }

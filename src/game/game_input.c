@@ -177,7 +177,7 @@ static void poll_controller_inputs(void) {
 }
 
 /**
- * Check for new controller data.
+ * Check for new controller data on all ports.
  */
 static void poll_controller_status(void) {
 #ifdef ENABLE_RUMBLE

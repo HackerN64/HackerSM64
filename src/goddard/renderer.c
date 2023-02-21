@@ -2343,7 +2343,7 @@ void start_view_dl(struct ObjView *view) {
 /* 251014 -> 251A1C; orig name: func_801A2844 */
 void parse_p1_controller(void) {
     s32 i;
-    struct GdControl *gdctrl;
+    struct GdControl *gdctrl = &gGdCtrl;
     u16 button, buttonPressed;
 
     if (gContStatusPolling
@@ -2351,8 +2351,6 @@ void parse_p1_controller(void) {
      || gWarpTransition.isActive) {
         return;
     }
-
-    gdctrl = &gGdCtrl;
 
     // Copy current inputs to previous
     *gdctrl->prevFrame = *gdctrl;

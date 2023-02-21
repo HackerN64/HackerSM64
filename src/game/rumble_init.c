@@ -109,14 +109,14 @@ static void update_rumble_pak(void) {
             set_rumble(MOTOR_START);
         } else { // RUMBLE_EVENT_LEVELON
             // Modulate rumble based on 'count' and 'level'.
-            // Rumble when ((count + (((level^3) / 512) + 4)) >= 256).
+            // Rumble when ((count + (((level^3) / 512) + RUMBLE_START_TIME)) >= 256).
             if (gCurrRumbleSettings.count >= 0x100) {
                 gCurrRumbleSettings.count -= 0x100;
 
                 set_rumble(MOTOR_START);
             } else { // count < 256, stop rumbling until count >= 256 again.
                 s16 level = gCurrRumbleSettings.level;
-                gCurrRumbleSettings.count += ((level * level * level) / 0x200) + 4;
+                gCurrRumbleSettings.count += ((level * level * level) / 0x200) + RUMBLE_START_TIME;
 
                 set_rumble(MOTOR_STOP);
             }
@@ -191,7 +191,7 @@ void queue_rumble_decay(s16 decay) {
  */
 u32 is_rumble_finished_and_queue_empty(void) {
     // Check whether currently rumbling.
-    if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= 4) {
+    if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= RUMBLE_START_TIME) {
         return FALSE;
     }
 

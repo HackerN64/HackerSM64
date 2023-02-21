@@ -41,8 +41,14 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
+    /*0x00*/ u8 tx;                 // Number of bytes to transmit + 1 for cmd ID byte.
+    /*0x01*/ u8 rx;                 // Number of bytes to receive.
+} OSContCmdData; /*0x02*/
+
+typedef struct PACKED
+{
     // Command data (3 bytes):
-    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1.
+    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1 for cmd ID byte.
     /*0x01*/ u8 rxsize;             // Number of bytes to receive.
     /*0x02*/ u8 cmd;                // The ID of the command to run.
 } OSPifRamChCmd; /*0x03*/
@@ -142,17 +148,11 @@ typedef struct PACKED
 #define ACCESSORY_ID_NULL           0xFF
 #define ACCESSORY_ID_RUMBLE         0x80
 #define ACCESSORY_ID_BIO_PULSE      0x81
-#define ACCESSORY_ID_UNKNOWN        0x82
+#define ACCESSORY_ID_UNKNOWN_82     0x82
 #define ACCESSORY_ID_64GB           0x83
 #define ACCESSORY_ID_TRANSFER_ON    0x84
 #define ACCESSORY_ID_PRINTER        0x85
 #define ACCESSORY_ID_TRANSFER_OFF   0xFE
-
-typedef struct PACKED
-{
-    /*0x00*/ u8 tx;
-    /*0x01*/ u8 rx;
-} OSContCmdData; /*0x02*/
 
 enum ContCmds {
     // N64 Controller
@@ -232,7 +232,7 @@ typedef struct PACKED
     /*0x04*/ u8 plugged;                // Whether a controller is plugged in.
     /*0x05*/ u8 playerNum;              // 0-4. 0 = not assigned to a player.
     /*0x06*/ OSContCenter contCenter;   // Gamecube Controller Center.
-    /*0x0B*/ u8 gcRumble;               // GameCube Rumble bit.
+    /*0x0B*/ u8 gcRumble;               // GameCube Rumble status.
 } OSPortInfo; /*0x0C*/
 
 /////////////////////
