@@ -41,83 +41,131 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-    /*0x00*/ u8 tx;                 // Number of bytes to transmit + 1 for cmd ID byte.
-    /*0x01*/ u8 rx;                 // Number of bytes to receive.
+    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1 for cmd ID byte.
+    /*0x01*/ u8 rxsize;             // Number of bytes to receive.
 } OSContCmdData; /*0x02*/
 
+//////////////////////////////
+// Specific command formats //
+//////////////////////////////
+
+// CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
+typedef struct PACKED
+{
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+    // Command data (3 bytes):
+    /*0x01*/ OSContCmdData cmd;     // The 3-byte command.
+    // Send Data (1 byte):
+    struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
+    } send;
+    // Receive data (4 bytes):
+    struct PACKED {
+        /*0x04*/ u8 typeh;              // HI byte of device type.
+        /*0x05*/ u8 typel;              // LO byte of device type.
+        /*0x06*/ u8 status;             // Status byte, depends on device type.
+    } recv;
+    /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+} __OSContRequesFormat; /*0x08*/
+
+// CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
 typedef struct PACKED
 {
     // Command data (3 bytes):
-    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1 for cmd ID byte.
-    /*0x01*/ u8 rxsize;             // Number of bytes to receive.
-    /*0x02*/ u8 cmd;                // The ID of the command to run.
-} OSPifRamChCmd; /*0x03*/
+    /*0x00*/ OSContCmdData cmd;     // The 3-byte command.
+    // Send Data (1 byte):
+    struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
+    } send;
+    // Receive data (3 bytes):
+    struct PACKED {
+        /*0x03*/ u8 typeh;              // HI byte of device type.
+        /*0x04*/ u8 typel;              // LO byte of device type.
+        /*0x05*/ u8 status;             // Status byte, depends on device type.
+    } recv;
+} __OSContRequesFormatShort; /*0x06*/
 
 // CONT_CMD_READ_BUTTON
 typedef struct PACKED
 {
     // Command data (3 bytes):
-    /*0x00*/ OSPifRamChCmd cmd;     // The 3-byte command.
+    /*0x00*/ OSContCmdData cmd;     // The 3-byte command.
+    // Send Data (1 byte):
+    struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
+    } send;
     // Receive data (4 bytes):
-    /*0x03*/ u16 button;            // The received button data.
-    /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
-    /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
+    struct PACKED {
+        /*0x03*/ u16 button;            // The received button data.
+        /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
+        /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
+    } recv;
 } __OSContReadFormat; /*0x07*/
 
-// CONT_CMD_REQUEST_STATUS
+// CONT_CMD_READ_MEMPAK
 typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     // Command data (3 bytes):
-    /*0x01*/ OSPifRamChCmd cmd;     // The 3-byte command.
-    // Receive data (4 bytes):
-    /*0x04*/ u8 typeh;              // HI byte of device type.
-    /*0x05*/ u8 typel;              // LO byte of device type.
-    /*0x06*/ u8 status;             // Status byte, depends on device type.
-    /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
-} __OSContRequesFormat; /*0x08*/
-
-// CONT_CMD_REQUEST_STATUS
-typedef struct PACKED
-{
-    // Command data (3 bytes):
-    /*0x00*/ OSPifRamChCmd cmd;     // The 3-byte command.
-    // Receive data (3 bytes):
-    /*0x03*/ u8 typeh;              // HI byte of device type.
-    /*0x04*/ u8 typel;              // LO byte of device type.
-    /*0x05*/ u8 status;             // Status byte, depends on device type.
-} __OSContRequesFormatShort; /*0x06*/
-
-// CONT_CMD_GCN_SHORT_POLL
-typedef struct PACKED
-{
-    // Command data (3 bytes):
-    /*0x00*/ OSPifRamChCmd cmd;     // The 3-byte command.
-    // Transmit data (2 bytes):
-    /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
-    /*0x04*/ u8 rumble;             // Rumble bit.
-    // Receive data (8 bytes):
-    /*0x05*/ u16 button;            // The received button data.
-    /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
-    /*0x08*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
-    /*0x09*/ u8 c_stick_x;          // The received C stick X position [-80, 80].
-    /*0x0A*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
-    /*0x0B*/ u8 l_trig;             // The received L trigger position [0, 255].
-    /*0x0V*/ u8 r_trig;             // The received R trigger position [0, 255].
-} __OSContGCNShortPollFormat; /*0x0D*/
+    /*0x01*/ OSContCmdData cmd;     // The 3-byte command.
+    // Send Data (3 bytes):
+    struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK).
+        /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
+        /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
+    } send;
+    // Receive data (33 bytes):
+    struct PACKED {
+        /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
+        /*0x26*/ u8 datacrc;            // CRC code for data.
+    } recv;
+} __OSContRamReadFormat; /*0x27*/
 
 // CONT_CMD_WRITE_MEMPAK
 typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     // Command data (3 bytes):
-    /*0x01*/ OSPifRamChCmd cmd;     // The 3-byte command.
-    // Receive data (35 bytes):
-    /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
-    /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
-    /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
-    /*0x26*/ u8 datacrc;            // CRC code for data.
-} __OSContRamReadFormat; /*0x27*/
+    /*0x01*/ OSContCmdData cmd;     // The 3-byte command.
+    // Send Data (35 bytes):
+    struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK).
+        /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
+        /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
+        /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
+    } send;
+    // Receive data (1 byte):
+    struct PACKED {
+        /*0x26*/ u8 datacrc;            // CRC code for data.
+    } recv;
+} __OSContRamWriteFormat; /*0x27*/
+
+// CONT_CMD_GCN_SHORT_POLL
+typedef struct PACKED
+{
+    // Command data (3 bytes):
+    /*0x00*/ OSContCmdData cmd;     // The 3-byte command.
+    // Semd data (3 bytes):
+    struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
+        /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
+        /*0x04*/ u8 rumble;             // Rumble bit.
+    } send;
+    // Receive data (8 bytes):
+    struct PACKED {
+        /*0x05*/ u16 button;            // The received button data.
+        /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
+        /*0x08*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
+        /*0x09*/ u8 c_stick_x;          // The received C stick X position [-80, 80].
+        /*0x0A*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
+        /*0x0B*/ u8 l_trig;             // The received L trigger position [0, 255].
+        /*0x0V*/ u8 r_trig;             // The received R trigger position [0, 255].
+    } recv;
+} __OSContGCNShortPollFormat; /*0x0D*/
+
+////////////////////////////
+// Controller accessories //
+////////////////////////////
 
 // Controller accessory addresses:
 // https://github.com/joeldipops/TransferBoy/blob/master/docs/TransferPakReference.md
@@ -156,43 +204,43 @@ typedef struct PACKED
 
 enum ContCmds {
     // N64 Controller
-    CONT_CMD_REQUEST_STATUS,
-    CONT_CMD_READ_BUTTON,
+    CONT_CMD_REQUEST_STATUS,            // Read Controller type/status.
+    CONT_CMD_READ_BUTTON,               // Read Input Status.
     // Controller Accessory
-    CONT_CMD_READ_MEMPAK,
-    CONT_CMD_WRITE_MEMPAK,
+    CONT_CMD_READ_MEMPAK,               // Read Controller Accessory.
+    CONT_CMD_WRITE_MEMPAK,              // Write Controller Accessory.
     // EEPROM
-    CONT_CMD_READ_EEPROM,
-    CONT_CMD_WRITE_EEPROM,
+    CONT_CMD_READ_EEPROM,               // Read EEPROM.
+    CONT_CMD_WRITE_EEPROM,              // Write EEPROM.
     // RTC
-    CONT_CMD_READ_RTC_STATUS,
-    CONT_CMD_READ_RTC_BLOCK,
-    CONT_CMD_WRITE_RTC_BLOCK,
+    CONT_CMD_READ_RTC_STATUS,           // RTC Info.
+    CONT_CMD_READ_RTC_BLOCK,            // Read RTC Block.
+    CONT_CMD_WRITE_RTC_BLOCK,           // Write RTC Block.
     // VRU
-    CONT_CMD_READ36_VOICE,
-    CONT_CMD_WRITE20_VOICE,
-    CONT_CMD_READ2_VOICE,
-    CONT_CMD_WRITE4_VOICE,
-    CONT_CMD_SWRITE_VOICE,
+    CONT_CMD_READ36_VOICE,              // Read from VRx.
+    CONT_CMD_WRITE20_VOICE,             // Write to VRx.
+    CONT_CMD_READ2_VOICE,               // Read Status VRx.
+    CONT_CMD_WRITE4_VOICE,              // Write Config VRx.
+    CONT_CMD_SWRITE_VOICE,              // Write Init VRx (Clear Dictionary).
     // Randnet Keyboard
-    CONT_CMD_KEY_PRESS_REQUEST = 0x13,
+    CONT_CMD_KEY_PRESS_REQUEST = 0x13,  // Randnet Keyboard Read Keypress.
     //! No room for 64GB read/write commands 0x13 and 0x14 (https://pastebin.com/06VzdT3w)
     // GBA
-    CONT_CMD_READ_GBA,
-    CONT_CMD_WRITE_GBA,
+    CONT_CMD_READ_GBA,                  // Read GBA.
+    CONT_CMD_WRITE_GBA,                 // Write GBA.
     // Game ID https://gitlab.com/pixelfx-public/n64-game-id
-    CONT_CMD_WRITE_GAME_ID = 0x1D,
+    CONT_CMD_WRITE_GAME_ID = 0x1D,      // The EverDrive sends the game ID on the first controller port on boot using this.
     // GCN Steering Wheel
-    CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30,
+    CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30, // Force Feedback (unverified tx/rx).
     // GCN Controller
-    CONT_CMD_GCN_SHORT_POLL = 0x40,
-    CONT_CMD_GCN_READ_ORIGIN,
-    CONT_CMD_GCN_CALIBRATE,
-    CONT_CMD_GCN_LONG_POLL,
+    CONT_CMD_GCN_SHORT_POLL = 0x40,     // GameCube Shortpoll (input).
+    CONT_CMD_GCN_READ_ORIGIN,           // GameCube Read Origin.
+    CONT_CMD_GCN_CALIBRATE,             // GameCube Recalibrate.
+    CONT_CMD_GCN_LONG_POLL,             // GameCube Longpoll (input).
     // GCN Keyboard
-    CONT_CMD_GCN_POLL_KEYBOARD = 0x54,
+    CONT_CMD_GCN_POLL_KEYBOARD = 0x54,  // GameCube Keyboard Poll.
 
-    CONT_CMD_RESET = 0xFF,
+    CONT_CMD_RESET = 0xFF,              // Reset/Info.
 };
 
 #define CONT_CMD_NOP                0xFF // Deos nothing, used for alignment.
@@ -252,14 +300,8 @@ typedef union {
         /*0x0*/ u16 D_DOWN      : 1; // CONT_DOWN
         /*0x0*/ u16 D_LEFT      : 1; // CONT_LEFT
         /*0x0*/ u16 D_RIGHT     : 1; // CONT_RIGHT
-        /*0x1*/ union {
-                    u16 RESET       : 1; // CONT_RESET
-                    u16 X           : 1; // GCN
-                };
-        /*0x1*/ union {
-                    u16 unused      : 1; // CONT_UNUSED
-                    u16 Y           : 1; // GCN
-                };
+        /*0x1*/ u16 RESET       : 1; // CONT_RESET
+        /*0x1*/ u16 unused      : 1; // CONT_UNUSED
         /*0x1*/ u16 L           : 1; // CONT_L
         /*0x1*/ u16 R           : 1; // CONT_R
         /*0x1*/ u16 C_UP        : 1; // CONT_E
