@@ -24,7 +24,7 @@ static u16 __osTranslateGCNButtons(u16 buttons, s32 c_stick_x, s32 c_stick_y);
 /**
  * @brief Sets up PIF commands to poll controller inputs.
  * Unmodified from vanilla libultra, but __osPackReadData is modified.
- * Called by poll_controller_inputs (thread5_game_loop) and thread2_crash_screen.
+ * Called by poll_controller_inputs.
  */
 s32 osContStartReadDataEx(OSMesgQueue* mq) {
     s32 ret = 0;
@@ -48,7 +48,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
  * @brief Reads PIF command result written by __osPackReadData and converts it into OSContPadEx data.
  * Modified from vanilla libultra to handle GameCube controllers, skip empty/unassigned ports,
  *   and trigger status polling if an active controller is unplugged.
- * Called by poll_controller_inputs (thread5_game_loop) and thread2_crash_screen.
+ * Called by poll_controller_inputs.
  */
 void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;

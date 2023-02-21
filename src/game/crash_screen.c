@@ -8,6 +8,7 @@
 #include "audio/external.h"
 #include "farcall.h"
 #include "game_init.h"
+#include "game_input.h"
 #include "main.h"
 #include "debug.h"
 #include "rumble_init.h"
@@ -396,11 +397,10 @@ OSThread *get_crashed_thread(void) {
     return NULL;
 }
 
-extern u16 sRenderedFramebuffer;
-extern void audio_signal_game_loop_tick(void);
-extern void stop_sounds_in_continuous_banks(void);
-extern void read_controller_inputs_normal(void);
+extern RGBA16 sRenderedFramebuffer;
 extern struct SequenceQueueItem sBackgroundMusicQueue[6];
+void audio_signal_game_loop_tick(void);
+void stop_sounds_in_continuous_banks(void);
 
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
@@ -434,17 +434,9 @@ void thread2_crash_screen(UNUSED void *arg) {
         } else {
             // If any controllers are plugged in, update the controller information.
             if (gControllerBits) {
-#ifdef ENABLE_RUMBLE
-                block_until_rumble_pak_free();
-#endif
-                osContStartReadDataEx(&gSIEventMesgQueue);
-                osRecvMesg(&gSIEventMesgQueue, &mesg, OS_MESG_BLOCK);
-                osContGetReadDataEx(&gControllerPads[0]);
-#ifdef ENABLE_RUMBLE
-                release_rumble_pak_control();
-#endif
+                poll_controller_inputs(&mesg);
+                read_controller_inputs_normal();
             }
-            read_controller_inputs_normal();
             draw_crash_screen(thread);
         }
     }
