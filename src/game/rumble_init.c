@@ -350,7 +350,7 @@ void create_thread_6_rumble(void) {
 }
 
 /**
- * Sends a 'VRTC' message on gRumbleThreadVIMesgQueue every vblank.
+ * Sends a "VRTC" message on gRumbleThreadVIMesgQueue every vblank.
  * Called by handle_vblank.
  */
 void rumble_thread_update_vi(void) {

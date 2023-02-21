@@ -41,7 +41,7 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-    /*0x00*/ u8 txsize;             // Number of bytes to transmit + 1 for cmd ID byte.
+    /*0x00*/ u8 txsize;             // Number of bytes to transmit.
     /*0x01*/ u8 rxsize;             // Number of bytes to receive.
 } OSContCmdData; /*0x02*/
 
@@ -53,105 +53,87 @@ typedef struct PACKED
 typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
-    // Command data (3 bytes):
-    /*0x01*/ OSContCmdData cmd;     // The 3-byte command.
-    // Send Data (1 byte):
+    /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
-    } send;
-    // Receive data (4 bytes):
+    } send; /*0x01*/
     struct PACKED {
         /*0x04*/ u8 typeh;              // HI byte of device type.
         /*0x05*/ u8 typel;              // LO byte of device type.
         /*0x06*/ u8 status;             // Status byte, depends on device type.
-    } recv;
+    } recv; /*0x03*/
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
 } __OSContRequesFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
 typedef struct PACKED
 {
-    // Command data (3 bytes):
-    /*0x00*/ OSContCmdData cmd;     // The 3-byte command.
-    // Send Data (1 byte):
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
-    } send;
-    // Receive data (3 bytes):
+    } send; /*0x01*/
     struct PACKED {
         /*0x03*/ u8 typeh;              // HI byte of device type.
         /*0x04*/ u8 typel;              // LO byte of device type.
         /*0x05*/ u8 status;             // Status byte, depends on device type.
-    } recv;
+    } recv; /*0x03*/
 } __OSContRequesFormatShort; /*0x06*/
 
 // CONT_CMD_READ_BUTTON
 typedef struct PACKED
 {
-    // Command data (3 bytes):
-    /*0x00*/ OSContCmdData cmd;     // The 3-byte command.
-    // Send Data (1 byte):
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
-    } send;
-    // Receive data (4 bytes):
+    } send; /*0x01*/
     struct PACKED {
         /*0x03*/ u16 button;            // The received button data.
         /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
         /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
-    } recv;
+    } recv; /*0x04*/
 } __OSContReadFormat; /*0x07*/
 
 // CONT_CMD_READ_MEMPAK
 typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
-    // Command data (3 bytes):
-    /*0x01*/ OSContCmdData cmd;     // The 3-byte command.
-    // Send Data (3 bytes):
+    /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK).
         /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
         /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
-    } send;
-    // Receive data (33 bytes):
+    } send; /*0x03*/
     struct PACKED {
         /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
         /*0x26*/ u8 datacrc;            // CRC code for data.
-    } recv;
+    } recv; /*0x21*/
 } __OSContRamReadFormat; /*0x27*/
 
 // CONT_CMD_WRITE_MEMPAK
 typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
-    // Command data (3 bytes):
-    /*0x01*/ OSContCmdData cmd;     // The 3-byte command.
-    // Send Data (35 bytes):
+    /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK).
         /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
         /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
         /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
-    } send;
-    // Receive data (1 byte):
+    } send; /*0x23*/
     struct PACKED {
         /*0x26*/ u8 datacrc;            // CRC code for data.
-    } recv;
+    } recv; /*0x01*/
 } __OSContRamWriteFormat; /*0x27*/
 
 // CONT_CMD_GCN_SHORT_POLL
 typedef struct PACKED
 {
-    // Command data (3 bytes):
-    /*0x00*/ OSContCmdData cmd;     // The 3-byte command.
-    // Semd data (3 bytes):
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
         /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
         /*0x04*/ u8 rumble;             // Rumble bit.
-    } send;
-    // Receive data (8 bytes):
+    } send; /*0x03*/
     struct PACKED {
         /*0x05*/ u16 button;            // The received button data.
         /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
@@ -160,7 +142,7 @@ typedef struct PACKED
         /*0x0A*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
         /*0x0B*/ u8 l_trig;             // The received L trigger position [0, 255].
         /*0x0V*/ u8 r_trig;             // The received R trigger position [0, 255].
-    } recv;
+    } recv; /*0x08*/
 } __OSContGCNShortPollFormat; /*0x0D*/
 
 ////////////////////////////
