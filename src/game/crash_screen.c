@@ -432,11 +432,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 continue;
             }
         } else {
-            // If any controllers are plugged in, update the controller information.
-            if (gControllerBits) {
-                poll_controller_inputs(&mesg);
-                read_controller_inputs_normal();
-            }
+            handle_input(&mesg);
             draw_crash_screen(thread);
         }
     }

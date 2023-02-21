@@ -525,7 +525,7 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
 
-        handle_input();
+        handle_input(&gMainReceivedMesg);
 
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)

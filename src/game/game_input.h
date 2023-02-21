@@ -48,9 +48,7 @@ extern struct DemoInput *gCurrDemoInput;
 
 void start_controller_status_polling(void);
 void stop_controller_status_polling(void);
-void handle_input(void);
+void handle_input(OSMesg *mesg);
 void init_controllers(void);
-void poll_controller_inputs(OSMesg *mesg);
-void read_controller_inputs_normal(void);
 
 #endif /* GAME_INPUT */

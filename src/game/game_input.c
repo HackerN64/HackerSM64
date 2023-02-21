@@ -164,7 +164,7 @@ void assign_controllers_by_player_num(void) {
 /**
  * Read raw controller input data.
  */
-void poll_controller_inputs(OSMesg *mesg) {
+static void poll_controller_inputs(OSMesg *mesg) {
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -179,7 +179,7 @@ void poll_controller_inputs(OSMesg *mesg) {
 /**
  * Check for new controller data on all ports.
  */
-void poll_controller_status(OSMesg *mesg) {
+static void poll_controller_status(OSMesg *mesg) {
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -360,11 +360,11 @@ void read_controller_inputs_normal(void) {
 /**
  * General input handling function.
  */
-void handle_input(void) {
+void handle_input(OSMesg *mesg) {
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
         // Read the raw input data from the controllers.
-        poll_controller_inputs(&gMainReceivedMesg);
+        poll_controller_inputs(mesg);
 
         if (gContStatusPolling) {
             // Input handling while status polling.
@@ -380,7 +380,7 @@ void handle_input(void) {
 
     // Only poll controller status about twice per second.
     if (gContStatusPolling && ((gContStatusPollTimer % CONT_STATUS_POLLING_TIME) == 0)) {
-        poll_controller_status(&gMainReceivedMesg);
+        poll_controller_status(mesg);
     }
 
     gContStatusPollTimer++;
