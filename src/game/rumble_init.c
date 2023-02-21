@@ -354,13 +354,13 @@ void create_thread_6_rumble(void) {
  * Called by handle_vblank.
  */
 void rumble_thread_update_vi(void) {
-    const OSMesg VRTC = (OSMesg)(('V' << 24) | ('R' << 16) | ('T' << 8) | ('C' << 0));
+    union { char asStr[sizeof("VRTC")]; OSMesg asMesg; } VRTC = { .asStr = "VRTC" };
 
     if (!sRumblePakThreadActive) {
         return;
     }
 
-    osSendMesg(&gRumbleThreadVIMesgQueue, VRTC, OS_MESG_NOBLOCK);
+    osSendMesg(&gRumbleThreadVIMesgQueue, VRTC.asMesg, OS_MESG_NOBLOCK);
 }
 
 #endif // ENABLE_RUMBLE
