@@ -1,8 +1,7 @@
 #include <ultra64.h>
+#include <PR/os_internal.h>
 #include "config.h"
-
 #include "string.h"
-#include "PR/os_internal.h"
 #include "controller.h"
 #include "engine/math_util.h"
 #include "game_init.h"
@@ -111,7 +110,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
-            // Skip empty channel/ports.
+            // Skip empty channels/ports.
             ptr++;
         }
 
@@ -135,6 +134,7 @@ static void __osPackReadData(void) {
 
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
+    // N64 controller poll format.
     readformat.cmd.txsize          = sizeof(readformat.send);
     readformat.cmd.rxsize          = sizeof(readformat.recv);
     readformat.send.cmdID          = CONT_CMD_READ_BUTTON;
@@ -142,6 +142,7 @@ static void __osPackReadData(void) {
     readformat.recv.stick_x        = -1;
     readformat.recv.stick_y        = -1;
 
+    // GameCube controller poll format.
     readformatgcn.cmd.txsize       = sizeof(readformatgcn.send);
     readformatgcn.cmd.rxsize       = sizeof(readformatgcn.recv);
     readformatgcn.send.cmdID       = CONT_CMD_GCN_SHORT_POLL;
@@ -213,7 +214,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data);
 /**
  * @brief Read status query data written by osContStartQuery.
  * odified from vanilla libultra to return bitpattern, similar to osContInit.
- * Called by poll_controller_status.
+ * Called by poll_controller_statuses.
  */
 void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
     __osContGetInitDataEx(bitpattern, data);
@@ -231,13 +232,13 @@ void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
  */
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContRequesFormat requestHeader;
+    __OSContRequestFormat requestHeader;
     OSPortInfo* portInfo = NULL;
     u8 bits = 0x0;
     int port;
 
     for (port = 0; port < __osMaxControllers; port++) {
-        requestHeader = *(__OSContRequesFormat*)ptr;
+        requestHeader = *(__OSContRequestFormat*)ptr;
         data->error = CHNL_ERR(requestHeader.cmd);
 
         if (data->error == (CONT_CMD_RX_SUCCESSFUL >> 4)) {

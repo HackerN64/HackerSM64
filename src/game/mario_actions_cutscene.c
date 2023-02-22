@@ -38,8 +38,8 @@ static s16 sEndToadAnims[2];
 
 Vp sEndCutsceneVp = {
     .vp = {
-        .vscale = { (SCREEN_WIDTH  * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
-        .vtrans = { (SCREEN_WIDTH  * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+        .vscale = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
+        .vtrans = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
     }
 };
 struct CreditsEntry *sDispCreditsEntry = NULL;

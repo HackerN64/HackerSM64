@@ -401,12 +401,12 @@ static const Gfx dl_controller_icons_end[] = {
 void render_controllers_overlay(void) {
     const s32 w = 32;
     const s32 h = 32;
+    s32 x = SCREEN_CENTER_X;
+    const s32 y = (SCREEN_CENTER_Y - (h / 2));
     const s32 texW = 32;
     const s32 texH = 32;
-    s32 x = SCREEN_CENTER_X;
-    s32 y = (SCREEN_CENTER_Y - (h / 2));
-    OSPortInfo *portInfo = NULL;
     Texture *texture_controller = texture_controller_unknown;
+    OSPortInfo *portInfo = NULL;
     char text_buffer[32];
     int port;
 

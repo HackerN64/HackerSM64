@@ -449,4 +449,3 @@ void crash_screen_init(void) {
                   );
     osStartThread(&gCrashScreen.thread);
 }
-

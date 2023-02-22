@@ -1,8 +1,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <PR/os_internal.h>
 #include "types.h"
-#include "PR/os_internal.h"
 
 ////////////
 // Config //
@@ -54,25 +54,25 @@ typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
-    struct PACKED {
+    /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
     } send; /*0x01*/
-    struct PACKED {
+    /*0x04*/ struct PACKED {
         /*0x04*/ u8 typeh;              // HI byte of device type.
         /*0x05*/ u8 typel;              // LO byte of device type.
         /*0x06*/ u8 status;             // Status byte, depends on device type.
     } recv; /*0x03*/
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
-} __OSContRequesFormat; /*0x08*/
+} __OSContRequestFormat; /*0x08*/
 
 // CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
 typedef struct PACKED
 {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
-    struct PACKED {
+    /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
     } send; /*0x01*/
-    struct PACKED {
+    /*0x03*/ struct PACKED {
         /*0x03*/ u8 typeh;              // HI byte of device type.
         /*0x04*/ u8 typel;              // LO byte of device type.
         /*0x05*/ u8 status;             // Status byte, depends on device type.
@@ -83,10 +83,10 @@ typedef struct PACKED
 typedef struct PACKED
 {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
-    struct PACKED {
+    /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
     } send; /*0x01*/
-    struct PACKED {
+    /*0x03*/ struct PACKED {
         /*0x03*/ u16 button;            // The received button data.
         /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
         /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
@@ -98,12 +98,12 @@ typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
-    struct PACKED {
+    /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK).
         /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
         /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
     } send; /*0x03*/
-    struct PACKED {
+    /*0x06*/ struct PACKED {
         /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
         /*0x26*/ u8 datacrc;            // CRC code for data.
     } recv; /*0x21*/
@@ -114,13 +114,13 @@ typedef struct PACKED
 {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
-    struct PACKED {
+    /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK).
         /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
         /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
         /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
     } send; /*0x23*/
-    struct PACKED {
+    /*0x26*/ struct PACKED {
         /*0x26*/ u8 datacrc;            // CRC code for data.
     } recv; /*0x01*/
 } __OSContRamWriteFormat; /*0x27*/
@@ -129,12 +129,12 @@ typedef struct PACKED
 typedef struct PACKED
 {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
-    struct PACKED {
+    /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
         /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
         /*0x04*/ u8 rumble;             // Rumble bit.
     } send; /*0x03*/
-    struct PACKED {
+    /*0x05*/ struct PACKED {
         /*0x05*/ u16 button;            // The received button data.
         /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
         /*0x08*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
@@ -205,11 +205,13 @@ enum ContCmds {
     CONT_CMD_WRITE4_VOICE,              // Write Config VRx.
     CONT_CMD_SWRITE_VOICE,              // Write Init VRx (Clear Dictionary).
     // Randnet Keyboard
-    CONT_CMD_KEY_PRESS_REQUEST = 0x13,  // Randnet Keyboard Read Keypress.
-    //! No room for 64GB read/write commands 0x13 and 0x14 (https://pastebin.com/06VzdT3w)
+    CONT_CMD_READ_KEYBOARD = 0x13,      // Randnet Keyboard Read Keypress.
+    // 64GB (https://pastebin.com/06VzdT3w)
+    CONT_CMD_READ_64GB  = 0x13,         // Read 64GB.
+    CONT_CMD_WRITE_64GB = 0x14,         // Write 64GB.
     // GBA
-    CONT_CMD_READ_GBA,                  // Read GBA.
-    CONT_CMD_WRITE_GBA,                 // Write GBA.
+    CONT_CMD_READ_GBA  = 0x14,          // Read GBA.
+    CONT_CMD_WRITE_GBA = 0x15,          // Write GBA.
     // Game ID https://gitlab.com/pixelfx-public/n64-game-id
     CONT_CMD_WRITE_GAME_ID = 0x1D,      // The EverDrive sends the game ID on the first controller port on boot using this.
     // GCN Steering Wheel
@@ -220,7 +222,7 @@ enum ContCmds {
     CONT_CMD_GCN_CALIBRATE,             // GameCube Recalibrate.
     CONT_CMD_GCN_LONG_POLL,             // GameCube Longpoll (input).
     // GCN Keyboard
-    CONT_CMD_GCN_POLL_KEYBOARD = 0x54,  // GameCube Keyboard Poll.
+    CONT_CMD_GCN_READ_KEYBOARD = 0x54,  // GameCube Keyboard Poll.
 
     CONT_CMD_RESET = 0xFF,              // Reset/Info.
 };
@@ -294,31 +296,6 @@ typedef union {
     u16 raw;
 } N64Buttons; /*0x2*/
 
-// -- GCN Controller buttons --
-
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
-        /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
-        /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
-        /*0x0*/ u16 START       : 1; // CONT_GCN_START
-        /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
-        /*0x0*/ u16 X           : 1; // CONT_GCN_X
-        /*0x0*/ u16 B           : 1; // CONT_GCN_B
-        /*0x0*/ u16 A           : 1; // CONT_GCN_A
-        /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
-        /*0x1*/ u16 L           : 1; // CONT_GCN_L
-        /*0x1*/ u16 R           : 1; // CONT_GCN_R
-        /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
-        /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
-        /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
-        /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
-        /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
-    } buttons; /*0x2*/
-    u16 raw;
-} GCNButtons; /*0x2*/
-
 // -- Mouse buttons --
 
 typedef union {
@@ -352,6 +329,31 @@ typedef union {
     } buttons; /*0x2*/
     u16 raw;
 } N64TrainButtons; /*0x2*/
+
+// -- GCN Controller buttons --
+
+typedef union {
+    struct PACKED
+    {
+        /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
+        /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
+        /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
+        /*0x0*/ u16 START       : 1; // CONT_GCN_START
+        /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
+        /*0x0*/ u16 X           : 1; // CONT_GCN_X
+        /*0x0*/ u16 B           : 1; // CONT_GCN_B
+        /*0x0*/ u16 A           : 1; // CONT_GCN_A
+        /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
+        /*0x1*/ u16 L           : 1; // CONT_GCN_L
+        /*0x1*/ u16 R           : 1; // CONT_GCN_R
+        /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
+        /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
+        /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
+        /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
+        /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
+    } buttons; /*0x2*/
+    u16 raw;
+} GCNButtons; /*0x2*/
 
 /////////////
 // externs //
