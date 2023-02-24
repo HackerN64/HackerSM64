@@ -21,6 +21,14 @@
 
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
+typedef union {
+    struct PACKED {
+        /*0x00*/ u16 x : 8;
+        /*0x01*/ u16 y : 8;
+    }; /*0x02*/
+    /*0x00*/ u16 raw;
+} AnalogStick; /*0x02*/
+
 /////////////////////
 // Buttons structs //
 /////////////////////
@@ -180,6 +188,14 @@ typedef struct PACKED
 
 // -- Standard N64 input poll --
 
+typedef union {
+    struct PACKED {
+        /*0x00*/ N64Buttons button;     // The received button data.
+        /*0x02*/ AnalogStick stick;     // The received analog stick position [-80, 80].
+    };
+    u32 raw;
+} N64InputData; /*0x04*/
+
 // CONT_CMD_READ_BUTTON
 typedef struct PACKED
 {
@@ -188,9 +204,7 @@ typedef struct PACKED
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
     } send; /*0x01*/
     /*0x03*/ struct PACKED {
-        /*0x03*/ N64Buttons button;     // The received button data.
-        /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
-        /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
+        /*0x03*/ N64InputData input;    // The received input data.
     } recv; /*0x04*/
 } __OSContReadFormat; /*0x07*/
 
@@ -230,6 +244,19 @@ typedef struct PACKED
 
 // -- GCN Controller Input poll & calibration --
 
+typedef union {
+    struct PACKED {
+        /*0x00*/ GCNButtons button;     // The received button data.
+        /*0x02*/ AnalogStick stick;     // The received analog stick position [-80, 80].
+        /*0x04*/ AnalogStick c_stick;   // The received C stick position [-80, 80].
+        /*0x06*/ u8 l_trig;             // The received L trigger position [0, 255].
+        /*0x07*/ u8 r_trig;             // The received R trigger position [0, 255].
+    }; /*0x08*/
+    struct PACKED {
+        /*0x00*/ u32 raw[2];
+    }; /*0x08*/
+} GCNInputData; /*0x08*/
+
 // CONT_CMD_GCN_SHORT_POLL
 typedef struct PACKED
 {
@@ -240,13 +267,7 @@ typedef struct PACKED
         /*0x04*/ u8 rumble;             // Rumble bit.
     } send; /*0x03*/
     /*0x05*/ struct PACKED {
-        /*0x05*/ GCNButtons button;     // The received button data.
-        /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
-        /*0x08*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
-        /*0x09*/ u8 c_stick_x;          // The received C stick X position [-80, 80].
-        /*0x0A*/ u8 c_stick_y;          // The received C stick Y position [-80, 80].
-        /*0x0B*/ u8 l_trig;             // The received L trigger position [0, 255].
-        /*0x0V*/ u8 r_trig;             // The received R trigger position [0, 255].
+        /*0x05*/ GCNInputData input;
     } recv; /*0x08*/
 } __OSContGCNShortPollFormat; /*0x0D*/
 
@@ -355,10 +376,8 @@ enum ContCmds {
 typedef struct PACKED
 {
     /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
-    /*0x01*/ u8 stick_x;                // The received analog stick X position [-80, 80].
-    /*0x02*/ u8 stick_y;                // The received analog stick Y position [-80, 80].
-    /*0x03*/ u8 c_stick_x;              // The received C stick X position [-80, 80].
-    /*0x04*/ u8 c_stick_y;              // The received C stick Y position [-80, 80].
+    /*0x01*/ AnalogStick stick;         // The received analog stick position [-80, 80].
+    /*0x03*/ AnalogStick c_stick;       // The received C stick X position [-80, 80].
 } OSContCenter; /*0x05*/
 
 typedef struct PACKED
