@@ -21,6 +21,103 @@
 
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
+/////////////////////
+// Buttons structs //
+/////////////////////
+
+// -- N64 Standard Controller buttons --
+
+typedef union {
+    struct PACKED
+    {
+        /*0x0*/ u16 A           : 1; // CONT_A
+        /*0x0*/ u16 B           : 1; // CONT_B
+        /*0x0*/ u16 Z           : 1; // CONT_G
+        /*0x0*/ u16 START       : 1; // CONT_START
+        /*0x0*/ u16 D_UP        : 1; // CONT_UP
+        /*0x0*/ u16 D_DOWN      : 1; // CONT_DOWN
+        /*0x0*/ u16 D_LEFT      : 1; // CONT_LEFT
+        /*0x0*/ u16 D_RIGHT     : 1; // CONT_RIGHT
+        /*0x1*/ u16 RESET       : 1; // CONT_RESET
+        /*0x1*/ u16 unused      : 1; // CONT_UNUSED
+        /*0x1*/ u16 L           : 1; // CONT_L
+        /*0x1*/ u16 R           : 1; // CONT_R
+        /*0x1*/ u16 C_UP        : 1; // CONT_E
+        /*0x1*/ u16 C_DOWN      : 1; // CONT_D
+        /*0x1*/ u16 C_LEFT      : 1; // CONT_C
+        /*0x1*/ u16 C_RIGHT     : 1; // CONT_F
+    } button; /*0x02*/
+    u16 raw;
+} N64StandardButtons; /*0x02*/
+
+// -- Mouse buttons --
+
+typedef union {
+    struct PACKED
+    {
+        /*0x0*/ u16 CLICK_LEFT  : 1;
+        /*0x0*/ u16 CLICK_RIGHT : 1;
+        /*0x0*/ u16 unused      : 14;
+    } button; /*0x02*/
+    u16 raw;
+} N64MouseButtons; /*0x02*/
+
+// -- Train Controller buttons --
+
+typedef union {
+    struct PACKED
+    {
+        /*0x0*/ u16 B           : 1;
+        /*0x0*/ u16 A           : 1;
+        /*0x0*/ u16 ACC1        : 1;
+        /*0x0*/ u16 START       : 1;
+        /*0x0*/ u16 ACC2        : 1;
+        /*0x0*/ u16 EX1         : 1;
+        /*0x0*/ u16 EX2         : 1;
+        /*0x0*/ u16 ACC3        : 1;
+        /*0x1*/ u16 EX3         : 1;
+        /*0x1*/ u16 EX4         : 1;
+        /*0x1*/ u16 C           : 1;
+        /*0x1*/ u16 SELECT      : 1;
+        /*0x1*/ u16 BRAKE       : 4;
+    } button; /*0x02*/
+    u16 raw;
+} N64TrainButtons; /*0x02*/
+
+// -- N64 buttons --
+
+typedef union {
+    N64StandardButtons standard;
+    N64MouseButtons mouse;
+    N64TrainButtons train;
+    u16 raw;
+} N64Buttons; /*0x02*/
+
+// -- GCN Controller buttons --
+
+typedef union {
+    struct PACKED
+    {
+        /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
+        /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
+        /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
+        /*0x0*/ u16 START       : 1; // CONT_GCN_START
+        /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
+        /*0x0*/ u16 X           : 1; // CONT_GCN_X
+        /*0x0*/ u16 B           : 1; // CONT_GCN_B
+        /*0x0*/ u16 A           : 1; // CONT_GCN_A
+        /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
+        /*0x1*/ u16 L           : 1; // CONT_GCN_L
+        /*0x1*/ u16 R           : 1; // CONT_GCN_R
+        /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
+        /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
+        /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
+        /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
+        /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
+    } button; /*0x02*/
+    u16 raw;
+} GCNButtons; /*0x02*/
+
 /**
  * 00000000 00000000
  * 00000000 00000000
@@ -48,6 +145,8 @@ typedef struct PACKED
 //////////////////////////////
 // Specific command formats //
 //////////////////////////////
+
+// -- Standard for all devices --
 
 // CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
 typedef struct PACKED
@@ -79,6 +178,8 @@ typedef struct PACKED
     } recv; /*0x03*/
 } __OSContRequesFormatShort; /*0x06*/
 
+// -- Standard N64 input poll --
+
 // CONT_CMD_READ_BUTTON
 typedef struct PACKED
 {
@@ -87,11 +188,13 @@ typedef struct PACKED
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
     } send; /*0x01*/
     /*0x03*/ struct PACKED {
-        /*0x03*/ u16 button;            // The received button data.
+        /*0x03*/ N64Buttons button;     // The received button data.
         /*0x05*/ s8 stick_x;            // The received analog stick X position [-80, 80].
         /*0x06*/ s8 stick_y;            // The received analog stick Y position [-80, 80].
     } recv; /*0x04*/
 } __OSContReadFormat; /*0x07*/
+
+// -- Controller Pak Read/Write --
 
 // CONT_CMD_READ_MEMPAK
 typedef struct PACKED
@@ -125,6 +228,8 @@ typedef struct PACKED
     } recv; /*0x01*/
 } __OSContRamWriteFormat; /*0x27*/
 
+// -- GCN Controller Input poll & calibration --
+
 // CONT_CMD_GCN_SHORT_POLL
 typedef struct PACKED
 {
@@ -135,7 +240,7 @@ typedef struct PACKED
         /*0x04*/ u8 rumble;             // Rumble bit.
     } send; /*0x03*/
     /*0x05*/ struct PACKED {
-        /*0x05*/ u16 button;            // The received button data.
+        /*0x05*/ GCNButtons button;     // The received button data.
         /*0x07*/ u8 stick_x;            // The received analog stick X position [-80, 80].
         /*0x08*/ u8 stick_y;            // The received analog stick Y position [-80, 80].
         /*0x09*/ u8 c_stick_x;          // The received C stick X position [-80, 80].
@@ -266,94 +371,6 @@ typedef struct PACKED
     /*0x06*/ OSContCenter contCenter;   // Gamecube Controller Center.
     /*0x0B*/ u8 gcRumble;               // GameCube Rumble status.
 } OSPortInfo; /*0x0C*/
-
-/////////////////////
-// Buttons structs //
-/////////////////////
-
-// -- N64 Controller buttons --
-
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 A           : 1; // CONT_A
-        /*0x0*/ u16 B           : 1; // CONT_B
-        /*0x0*/ u16 Z           : 1; // CONT_G
-        /*0x0*/ u16 START       : 1; // CONT_START
-        /*0x0*/ u16 D_UP        : 1; // CONT_UP
-        /*0x0*/ u16 D_DOWN      : 1; // CONT_DOWN
-        /*0x0*/ u16 D_LEFT      : 1; // CONT_LEFT
-        /*0x0*/ u16 D_RIGHT     : 1; // CONT_RIGHT
-        /*0x1*/ u16 RESET       : 1; // CONT_RESET
-        /*0x1*/ u16 unused      : 1; // CONT_UNUSED
-        /*0x1*/ u16 L           : 1; // CONT_L
-        /*0x1*/ u16 R           : 1; // CONT_R
-        /*0x1*/ u16 C_UP        : 1; // CONT_E
-        /*0x1*/ u16 C_DOWN      : 1; // CONT_D
-        /*0x1*/ u16 C_LEFT      : 1; // CONT_C
-        /*0x1*/ u16 C_RIGHT     : 1; // CONT_F
-    } buttons; /*0x2*/
-    u16 raw;
-} N64Buttons; /*0x2*/
-
-// -- Mouse buttons --
-
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 CLICK_LEFT  : 1;
-        /*0x0*/ u16 CLICK_RIGHT : 1;
-        /*0x0*/ u16 unused      : 14;
-    } buttons; /*0x2*/
-    u16 raw;
-} N64MouseButtons; /*0x2*/
-
-// -- Train Controller buttons --
-
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 B           : 1;
-        /*0x0*/ u16 A           : 1;
-        /*0x0*/ u16 ACC1        : 1;
-        /*0x0*/ u16 START       : 1;
-        /*0x0*/ u16 ACC2        : 1;
-        /*0x0*/ u16 EX1         : 1;
-        /*0x0*/ u16 EX2         : 1;
-        /*0x0*/ u16 ACC3        : 1;
-        /*0x1*/ u16 EX3         : 1;
-        /*0x1*/ u16 EX4         : 1;
-        /*0x1*/ u16 C           : 1;
-        /*0x1*/ u16 SELECT      : 1;
-        /*0x1*/ u16 BRAKE       : 4;
-    } buttons; /*0x2*/
-    u16 raw;
-} N64TrainButtons; /*0x2*/
-
-// -- GCN Controller buttons --
-
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
-        /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
-        /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
-        /*0x0*/ u16 START       : 1; // CONT_GCN_START
-        /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
-        /*0x0*/ u16 X           : 1; // CONT_GCN_X
-        /*0x0*/ u16 B           : 1; // CONT_GCN_B
-        /*0x0*/ u16 A           : 1; // CONT_GCN_A
-        /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
-        /*0x1*/ u16 L           : 1; // CONT_GCN_L
-        /*0x1*/ u16 R           : 1; // CONT_GCN_R
-        /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
-        /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
-        /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
-        /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
-        /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
-    } buttons; /*0x2*/
-    u16 raw;
-} GCNButtons; /*0x2*/
 
 /////////////
 // externs //
