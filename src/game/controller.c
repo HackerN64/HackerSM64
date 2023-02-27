@@ -85,7 +85,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                     data->stick_y   = stick_y   = CLAMP_S8(((s32)readformatgcn.recv.input.stick.y  ) - contCenter->stick.y  );
                     data->c_stick_x = c_stick_x = CLAMP_S8(((s32)readformatgcn.recv.input.c_stick.x) - contCenter->c_stick.x);
                     data->c_stick_y = c_stick_y = CLAMP_S8(((s32)readformatgcn.recv.input.c_stick.y) - contCenter->c_stick.y);
-                    data->button    = __osTranslateGCNButtons(readformatgcn.recv.input.button, c_stick_x, c_stick_y);
+                    data->button    = __osTranslateGCNButtons(readformatgcn.recv.input.buttons, c_stick_x, c_stick_y);
                     data->l_trig    = readformatgcn.recv.input.l_trig;
                     data->r_trig    = readformatgcn.recv.input.r_trig;
                 } else {
@@ -98,7 +98,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 data->errno = CHNL_ERR(readformat.cmd);
 
                 if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                    data->button    = readformat.recv.input.button.raw;
+                    data->button    = readformat.recv.input.buttons.raw;
                     data->stick_x   = readformat.recv.input.stick.x;
                     data->stick_y   = readformat.recv.input.stick.y;
                     data->c_stick_x = 0;
@@ -135,24 +135,24 @@ static void __osPackReadData(void) {
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
     // N64 controller poll format.
-    readformat.cmd.txsize               = sizeof(readformat.send);
-    readformat.cmd.rxsize               = sizeof(readformat.recv);
-    readformat.send.cmdID               = CONT_CMD_READ_BUTTON;
-    readformat.recv.input.button.raw    = 0xFFFF;
-    readformat.recv.input.stick.raw     = 0xFFFF;
+    readformat.cmd.txsize                = sizeof(readformat.send);
+    readformat.cmd.rxsize                = sizeof(readformat.recv);
+    readformat.send.cmdID                = CONT_CMD_READ_BUTTON;
+    readformat.recv.input.buttons.raw    = 0xFFFF;
+    readformat.recv.input.stick.raw      = 0xFFFF;
 
     // GameCube controller poll format.
-    readformatgcn.cmd.txsize            = sizeof(readformatgcn.send);
-    readformatgcn.cmd.rxsize            = sizeof(readformatgcn.recv);
-    readformatgcn.send.cmdID            = CONT_CMD_GCN_SHORT_POLL;
+    readformatgcn.cmd.txsize             = sizeof(readformatgcn.send);
+    readformatgcn.cmd.rxsize             = sizeof(readformatgcn.recv);
+    readformatgcn.send.cmdID             = CONT_CMD_GCN_SHORT_POLL;
     // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
     // Mode 3 uses 8 bits for both c-stick and shoulder triggers.
     // https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/HW/SI/SI_DeviceGCController.cpp
     // https://github.com/extremscorner/gba-as-controller/blob/gc/controller/source/main.iwram.c
-    readformatgcn.send.analog_mode      = 3;
-    readformatgcn.send.rumble           = MOTOR_STOP;
-    readformatgcn.recv.input.button.raw = 0xFFFF;
-    readformatgcn.recv.input.stick.raw  = 0xFFFF;
+    readformatgcn.send.analog_mode       = 3;
+    readformatgcn.send.rumble            = MOTOR_STOP;
+    readformatgcn.recv.input.buttons.raw = 0xFFFF;
+    readformatgcn.recv.input.stick.raw   = 0xFFFF;
 
     for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
@@ -182,22 +182,22 @@ static void __osPackReadData(void) {
 static u16 __osTranslateGCNButtons(GCNButtons gcn, s32 c_stick_x, s32 c_stick_y) {
     N64Buttons n64 = { .raw = 0x0 };
 
-    n64.standard.button.A       = gcn.button.A;
-    n64.standard.button.B       = gcn.button.B;
-    n64.standard.button.Z       = gcn.button.Z;
-    n64.standard.button.START   = gcn.button.START;
-    n64.standard.button.D_UP    = gcn.button.D_UP;
-    n64.standard.button.D_DOWN  = gcn.button.D_DOWN;
-    n64.standard.button.D_LEFT  = gcn.button.D_LEFT;
-    n64.standard.button.D_RIGHT = gcn.button.D_RIGHT;
-    n64.standard.button.RESET   = gcn.button.X;
-    n64.standard.button.unused  = gcn.button.Y;
-    n64.standard.button.L       = gcn.button.L;
-    n64.standard.button.R       = gcn.button.R;
-    n64.standard.button.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);
-    n64.standard.button.C_DOWN  = (c_stick_y < -GCN_C_STICK_THRESHOLD);
-    n64.standard.button.C_LEFT  = (c_stick_x < -GCN_C_STICK_THRESHOLD);
-    n64.standard.button.C_RIGHT = (c_stick_x >  GCN_C_STICK_THRESHOLD);
+    n64.standard.A       = gcn.standard.A;
+    n64.standard.B       = gcn.standard.B;
+    n64.standard.Z       = gcn.standard.Z;
+    n64.standard.START   = gcn.standard.START;
+    n64.standard.D_UP    = gcn.standard.D_UP;
+    n64.standard.D_DOWN  = gcn.standard.D_DOWN;
+    n64.standard.D_LEFT  = gcn.standard.D_LEFT;
+    n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
+    n64.standard.RESET   = gcn.standard.X;
+    n64.standard.unused  = gcn.standard.Y;
+    n64.standard.L       = gcn.standard.L;
+    n64.standard.R       = gcn.standard.R;
+    n64.standard.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);
+    n64.standard.C_DOWN  = (c_stick_y < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C_LEFT  = (c_stick_x < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C_RIGHT = (c_stick_x >  GCN_C_STICK_THRESHOLD);
 
     return n64.raw;
 }

@@ -21,6 +21,10 @@
 
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
+///////////////////
+// Input structs //
+///////////////////
+
 typedef union {
     struct PACKED {
         /*0x00*/ u16 x : 8;
@@ -29,67 +33,51 @@ typedef union {
     /*0x00*/ u16 raw;
 } AnalogStick; /*0x02*/
 
-/////////////////////
-// Buttons structs //
-/////////////////////
-
 // -- N64 Standard Controller buttons --
 
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 A           : 1; // CONT_A
-        /*0x0*/ u16 B           : 1; // CONT_B
-        /*0x0*/ u16 Z           : 1; // CONT_G
-        /*0x0*/ u16 START       : 1; // CONT_START
-        /*0x0*/ u16 D_UP        : 1; // CONT_UP
-        /*0x0*/ u16 D_DOWN      : 1; // CONT_DOWN
-        /*0x0*/ u16 D_LEFT      : 1; // CONT_LEFT
-        /*0x0*/ u16 D_RIGHT     : 1; // CONT_RIGHT
-        /*0x1*/ u16 RESET       : 1; // CONT_RESET
-        /*0x1*/ u16 unused      : 1; // CONT_UNUSED
-        /*0x1*/ u16 L           : 1; // CONT_L
-        /*0x1*/ u16 R           : 1; // CONT_R
-        /*0x1*/ u16 C_UP        : 1; // CONT_E
-        /*0x1*/ u16 C_DOWN      : 1; // CONT_D
-        /*0x1*/ u16 C_LEFT      : 1; // CONT_C
-        /*0x1*/ u16 C_RIGHT     : 1; // CONT_F
-    } button; /*0x02*/
-    u16 raw;
+typedef struct PACKED {
+    /*0x0*/ u16 A           : 1; // CONT_A
+    /*0x0*/ u16 B           : 1; // CONT_B
+    /*0x0*/ u16 Z           : 1; // CONT_G
+    /*0x0*/ u16 START       : 1; // CONT_START
+    /*0x0*/ u16 D_UP        : 1; // CONT_UP
+    /*0x0*/ u16 D_DOWN      : 1; // CONT_DOWN
+    /*0x0*/ u16 D_LEFT      : 1; // CONT_LEFT
+    /*0x0*/ u16 D_RIGHT     : 1; // CONT_RIGHT
+    /*0x1*/ u16 RESET       : 1; // CONT_RESET
+    /*0x1*/ u16 unused      : 1; // CONT_UNUSED
+    /*0x1*/ u16 L           : 1; // CONT_L
+    /*0x1*/ u16 R           : 1; // CONT_R
+    /*0x1*/ u16 C_UP        : 1; // CONT_E
+    /*0x1*/ u16 C_DOWN      : 1; // CONT_D
+    /*0x1*/ u16 C_LEFT      : 1; // CONT_C
+    /*0x1*/ u16 C_RIGHT     : 1; // CONT_F
 } N64StandardButtons; /*0x02*/
 
 // -- Mouse buttons --
 
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 CLICK_LEFT  : 1;
-        /*0x0*/ u16 CLICK_RIGHT : 1;
-        /*0x0*/ u16 unused      : 14;
-    } button; /*0x02*/
-    u16 raw;
+typedef struct PACKED {
+    /*0x0*/ u16 CLICK_LEFT  :  1;
+    /*0x0*/ u16 CLICK_RIGHT :  1;
+    /*0x0*/ u16             : 14;
 } N64MouseButtons; /*0x02*/
 
 // -- Train Controller buttons --
 
-typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 B           : 1;
-        /*0x0*/ u16 A           : 1;
-        /*0x0*/ u16 ACC1        : 1;
-        /*0x0*/ u16 START       : 1;
-        /*0x0*/ u16 ACC2        : 1;
-        /*0x0*/ u16 EX1         : 1;
-        /*0x0*/ u16 EX2         : 1;
-        /*0x0*/ u16 ACC3        : 1;
-        /*0x1*/ u16 EX3         : 1;
-        /*0x1*/ u16 EX4         : 1;
-        /*0x1*/ u16 C           : 1;
-        /*0x1*/ u16 SELECT      : 1;
-        /*0x1*/ u16 BRAKE       : 4;
-    } button; /*0x02*/
-    u16 raw;
+typedef struct PACKED {
+    /*0x0*/ u16 B           : 1;
+    /*0x0*/ u16 A           : 1;
+    /*0x0*/ u16 ACC1        : 1;
+    /*0x0*/ u16 START       : 1;
+    /*0x0*/ u16 ACC2        : 1;
+    /*0x0*/ u16 EX1         : 1;
+    /*0x0*/ u16 EX2         : 1;
+    /*0x0*/ u16 ACC3        : 1;
+    /*0x1*/ u16 EX3         : 1;
+    /*0x1*/ u16 EX4         : 1;
+    /*0x1*/ u16 C           : 1;
+    /*0x1*/ u16 SELECT      : 1;
+    /*0x1*/ u16 BRAKE       : 4;
 } N64TrainButtons; /*0x02*/
 
 // -- N64 buttons --
@@ -103,26 +91,41 @@ typedef union {
 
 // -- GCN Controller buttons --
 
+typedef struct PACKED {
+    /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
+    /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
+    /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
+    /*0x0*/ u16 START       : 1; // CONT_GCN_START
+    /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
+    /*0x0*/ u16 X           : 1; // CONT_GCN_X
+    /*0x0*/ u16 B           : 1; // CONT_GCN_B
+    /*0x0*/ u16 A           : 1; // CONT_GCN_A
+    /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
+    /*0x1*/ u16 L           : 1; // CONT_GCN_L
+    /*0x1*/ u16 R           : 1; // CONT_GCN_R
+    /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
+    /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
+    /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
+    /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
+    /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
+} GCNStandardButtons; /*0x02*/
+
+typedef struct PACKED {
+    /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT
+    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN
+    /*0x0*/ u16 START           : 1; // CONT_GCN_START
+    /*0x0*/ u16 LEFT_TOP        : 1;
+    /*0x0*/ u16 RIGHT_TOP       : 1;
+    /*0x0*/ u16 LEFT_BOTTOM     : 1;
+    /*0x0*/ u16 RIGHT_BOTTOM    : 1;
+    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN
+    /*0x1*/ u16                 : 7;
+} GCNDKBongosButtons; /*0x02*/
+
 typedef union {
-    struct PACKED
-    {
-        /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
-        /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
-        /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
-        /*0x0*/ u16 START       : 1; // CONT_GCN_START
-        /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
-        /*0x0*/ u16 X           : 1; // CONT_GCN_X
-        /*0x0*/ u16 B           : 1; // CONT_GCN_B
-        /*0x0*/ u16 A           : 1; // CONT_GCN_A
-        /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
-        /*0x1*/ u16 L           : 1; // CONT_GCN_L
-        /*0x1*/ u16 R           : 1; // CONT_GCN_R
-        /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
-        /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
-        /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
-        /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
-        /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
-    } button; /*0x02*/
+    GCNStandardButtons standard;
+    GCNDKBongosButtons dkbongos;
     u16 raw;
 } GCNButtons; /*0x02*/
 
@@ -138,14 +141,12 @@ typedef union {
  *                ^^
  *         pifstatus
  */
-typedef struct PACKED
-{
+typedef struct PACKED {
     /*0x00*/ u32 ramarray[16 - 1];  // The command data.
     /*0x3C*/ u32 pifstatus;         // Set this to PIF_STATUS_EXE to run the commands in ramarray.
 } OSPifRam; /*0x40*/
 
-typedef struct PACKED
-{
+typedef struct PACKED {
     /*0x00*/ u8 txsize;             // Number of bytes to transmit.
     /*0x01*/ u8 rxsize;             // Number of bytes to receive.
 } OSContCmdData; /*0x02*/
@@ -156,9 +157,8 @@ typedef struct PACKED
 
 // -- Standard for all devices --
 
-// CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
-typedef struct PACKED
-{
+// 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
+typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
@@ -172,9 +172,8 @@ typedef struct PACKED
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
 } __OSContRequestFormat; /*0x08*/
 
-// CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET
-typedef struct PACKED
-{
+// 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
+typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
@@ -190,15 +189,14 @@ typedef struct PACKED
 
 typedef union {
     struct PACKED {
-        /*0x00*/ N64Buttons button;     // The received button data.
+        /*0x00*/ N64Buttons buttons;    // The received button data.
         /*0x02*/ AnalogStick stick;     // The received analog stick position [-80, 80].
-    };
+    }; /*0x04*/
     u32 raw;
 } N64InputData; /*0x04*/
 
-// CONT_CMD_READ_BUTTON
-typedef struct PACKED
-{
+// 0x01: CONT_CMD_READ_BUTTON
+typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
@@ -210,9 +208,8 @@ typedef struct PACKED
 
 // -- Controller Pak Read/Write --
 
-// CONT_CMD_READ_MEMPAK
-typedef struct PACKED
-{
+// 0x02: CONT_CMD_READ_MEMPAK
+typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
@@ -226,9 +223,8 @@ typedef struct PACKED
     } recv; /*0x21*/
 } __OSContRamReadFormat; /*0x27*/
 
-// CONT_CMD_WRITE_MEMPAK
-typedef struct PACKED
-{
+// 0x03: CONT_CMD_WRITE_MEMPAK
+typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
@@ -246,20 +242,19 @@ typedef struct PACKED
 
 typedef union {
     struct PACKED {
-        /*0x00*/ GCNButtons button;     // The received button data.
+        /*0x00*/ GCNButtons buttons;    // The received button data.
         /*0x02*/ AnalogStick stick;     // The received analog stick position [-80, 80].
         /*0x04*/ AnalogStick c_stick;   // The received C stick position [-80, 80].
         /*0x06*/ u8 l_trig;             // The received L trigger position [0, 255].
-        /*0x07*/ u8 r_trig;             // The received R trigger position [0, 255].
+        /*0x07*/ u8 r_trig;             // The received R trigger position [0, 255]. The DK Bongos' clap detector microphone uses this.
     }; /*0x08*/
     struct PACKED {
         /*0x00*/ u32 raw[2];
     }; /*0x08*/
 } GCNInputData; /*0x08*/
 
-// CONT_CMD_GCN_SHORT_POLL
-typedef struct PACKED
-{
+// 0x40: CONT_CMD_GCN_SHORT_POLL
+typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
@@ -312,45 +307,45 @@ typedef struct PACKED
 
 enum ContCmds {
     // N64 Controller
-    CONT_CMD_REQUEST_STATUS,            // Read Controller type/status.
-    CONT_CMD_READ_BUTTON,               // Read Input Status.
+    CONT_CMD_REQUEST_STATUS,            // 0x00: Read Controller type/status.
+    CONT_CMD_READ_BUTTON,               // 0x01: Read Input Status.
     // Controller Accessory
-    CONT_CMD_READ_MEMPAK,               // Read Controller Accessory.
-    CONT_CMD_WRITE_MEMPAK,              // Write Controller Accessory.
+    CONT_CMD_READ_MEMPAK,               // 0x02: Read Controller Accessory.
+    CONT_CMD_WRITE_MEMPAK,              // 0x03: Write Controller Accessory.
     // EEPROM
-    CONT_CMD_READ_EEPROM,               // Read EEPROM.
-    CONT_CMD_WRITE_EEPROM,              // Write EEPROM.
+    CONT_CMD_READ_EEPROM,               // 0x04: Read EEPROM.
+    CONT_CMD_WRITE_EEPROM,              // 0x05: Write EEPROM.
     // RTC
-    CONT_CMD_READ_RTC_STATUS,           // RTC Info.
-    CONT_CMD_READ_RTC_BLOCK,            // Read RTC Block.
-    CONT_CMD_WRITE_RTC_BLOCK,           // Write RTC Block.
+    CONT_CMD_READ_RTC_STATUS,           // 0x06: RTC Info.
+    CONT_CMD_READ_RTC_BLOCK,            // 0x07: Read RTC Block.
+    CONT_CMD_WRITE_RTC_BLOCK,           // 0x08: Write RTC Block.
     // VRU
-    CONT_CMD_READ36_VOICE,              // Read from VRx.
-    CONT_CMD_WRITE20_VOICE,             // Write to VRx.
-    CONT_CMD_READ2_VOICE,               // Read Status VRx.
-    CONT_CMD_WRITE4_VOICE,              // Write Config VRx.
-    CONT_CMD_SWRITE_VOICE,              // Write Init VRx (Clear Dictionary).
+    CONT_CMD_READ36_VOICE,              // 0x09: Read from VRx.
+    CONT_CMD_WRITE20_VOICE,             // 0x0A: Write to VRx.
+    CONT_CMD_READ2_VOICE,               // 0x0B: Read Status VRx.
+    CONT_CMD_WRITE4_VOICE,              // 0x0C: Write Config VRx.
+    CONT_CMD_SWRITE_VOICE,              // 0x0D: Write Init VRx (Clear Dictionary).
     // Randnet Keyboard
-    CONT_CMD_READ_KEYBOARD = 0x13,      // Randnet Keyboard Read Keypress.
+    CONT_CMD_READ_KEYBOARD = 0x13,      // 0x13: Randnet Keyboard Read Keypress.
     // 64GB (https://pastebin.com/06VzdT3w)
-    CONT_CMD_READ_64GB  = 0x13,         // Read 64GB.
-    CONT_CMD_WRITE_64GB = 0x14,         // Write 64GB.
+    CONT_CMD_READ_64GB  = 0x13,         // 0x13: Read 64GB.
+    CONT_CMD_WRITE_64GB = 0x14,         // 0x14: Write 64GB.
     // GBA
-    CONT_CMD_READ_GBA  = 0x14,          // Read GBA.
-    CONT_CMD_WRITE_GBA = 0x15,          // Write GBA.
+    CONT_CMD_READ_GBA  = 0x14,          // 0x14: Read GBA.
+    CONT_CMD_WRITE_GBA = 0x15,          // 0x15: Write GBA.
     // Game ID https://gitlab.com/pixelfx-public/n64-game-id
-    CONT_CMD_WRITE_GAME_ID = 0x1D,      // The EverDrive sends the game ID on the first controller port on boot using this.
+    CONT_CMD_WRITE_GAME_ID = 0x1D,      // 0x1D: The EverDrive sends the game ID on the first controller port on boot using this.
     // GCN Steering Wheel
-    CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30, // Force Feedback (unverified tx/rx).
+    CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30, // 0x30: Logitech Speed Force Feedback.
     // GCN Controller
-    CONT_CMD_GCN_SHORT_POLL = 0x40,     // GameCube Shortpoll (input).
-    CONT_CMD_GCN_READ_ORIGIN,           // GameCube Read Origin.
-    CONT_CMD_GCN_CALIBRATE,             // GameCube Recalibrate.
-    CONT_CMD_GCN_LONG_POLL,             // GameCube Longpoll (input).
+    CONT_CMD_GCN_SHORT_POLL = 0x40,     // 0x40: GameCube Shortpoll (input).
+    CONT_CMD_GCN_READ_ORIGIN,           // 0x41: GameCube Read Origin.
+    CONT_CMD_GCN_CALIBRATE,             // 0x42: GameCube Recalibrate.
+    CONT_CMD_GCN_LONG_POLL,             // 0x43: GameCube Longpoll (input).
     // GCN Keyboard
-    CONT_CMD_GCN_READ_KEYBOARD = 0x54,  // GameCube Keyboard Poll.
+    CONT_CMD_GCN_READ_KEYBOARD = 0x54,  // 0x54: GameCube Keyboard Poll.
 
-    CONT_CMD_RESET = 0xFF,              // Reset/Info.
+    CONT_CMD_RESET = 0xFF,              // 0xFF: Reset/Info.
 };
 
 #define CONT_CMD_NOP                0xFF // Deos nothing, used for alignment.
@@ -366,22 +361,22 @@ enum ContCmds {
 #define CONT_CMD_RX_ERROR_MASK      0xC0
 
 // PIF status:
-#define PIF_STATUS_DONE             0x00 // Command is done.
-#define PIF_STATUS_EXE              0x01 // Set pif ram status byte to this to do a command.
+enum PIFStatuses {
+    PIF_STATUS_DONE, // Command is done.
+    PIF_STATUS_EXE,  // Set pif ram status byte to this to do a command.
+};
 
-////////////////////////
-// Gamecube additions //
-////////////////////////
+//////////////////////////
+// HackerSM64 additions //
+//////////////////////////
 
-typedef struct PACKED
-{
+typedef struct PACKED {
     /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
     /*0x01*/ AnalogStick stick;         // The received analog stick position [-80, 80].
     /*0x03*/ AnalogStick c_stick;       // The received C stick X position [-80, 80].
 } OSContCenter; /*0x05*/
 
-typedef struct PACKED
-{
+typedef struct PACKED {
     /*0x00*/ u16 type;                  // Device type.
     /*0x02*/ u16 accessory;             // Accessory type.
     /*0x02*/ u16 pollingInput;          // Input, only used when status polling.
