@@ -30,13 +30,21 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
 
     __osSiGetAccess();
 
+    // If this was called twice in a row, there is no need to write the command again.
     if (__osContLastCmd != CONT_CMD_READ_BUTTON) {
+        // Write the command to __osContPifRam.
         __osPackReadData();
+
+        // Write __osContPifRam to the PIF RAM.
         ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
+
+        // Wait for the command to execute.
         osRecvMesg(mq, NULL, OS_MESG_BLOCK);
     }
 
+    // Read the resulting __osContPifRam from the PIF RAM.
     ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
+
     __osContLastCmd = CONT_CMD_READ_BUTTON;
 
     __osSiRelAccess();
@@ -168,7 +176,7 @@ static void __osPackReadData(void) {
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
-            // Empty channel/port, so Leave a CONT_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+            // Empty channel/port, so leave a CONT_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
             ptr++;
         }
     }
@@ -191,8 +199,8 @@ static u16 __osTranslateGCNButtons(GCNButtons gcn, s32 c_stick_x, s32 c_stick_y)
     n64.standard.D_DOWN  = gcn.standard.D_DOWN;
     n64.standard.D_LEFT  = gcn.standard.D_LEFT;
     n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
-    n64.standard.RESET   = gcn.standard.X;
-    n64.standard.unused  = gcn.standard.Y;
+    n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on an N64 controller to recalibrate the analog stick (which also unsets the START bit).
+    n64.standard.unused  = gcn.standard.Y; // N64 controller's unused bit.
     n64.standard.L       = gcn.standard.L;
     n64.standard.R       = gcn.standard.R;
     n64.standard.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);
@@ -242,10 +250,10 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         if (data->error == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
             portInfo = &gPortInfo[port];
 
-            // Byteswap the SI identifier.
-            data->type = ((requestHeader.recv.typel << 8) | requestHeader.recv.typeh);
+            // Byteswap the SI identifier. This is done in vanilla libultra.
+            data->type = ((requestHeader.recv.type.l << 8) | requestHeader.recv.type.h);
 
-            // Check the type of controller
+            // Check the type of controller device connected to the port.
             // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type to N64 controller if so.
             portInfo->type = ((s16)data->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : data->type;
@@ -283,10 +291,10 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         return PFS_ERR_INVALID;
     }
 
-    if (gPortInfo[channel].type & CONT_CONSOLE_GCN) {
+    if (gPortInfo[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
         gPortInfo[channel].gcRumble = flag;
         __osContLastCmd = CONT_CMD_END;
-    } else {
+    } else { // N64 Controllers.
         // N64 Controllers don't have MOTOR_STOP_HARD.
         if (flag == MOTOR_STOP_HARD) {
             flag = MOTOR_STOP;
@@ -294,16 +302,23 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
 
         __osSiGetAccess();
 
+        // Set the PIF to be ready to run a command.
         __MotorDataBuf[channel].pifstatus = PIF_STATUS_EXE;
+
+        // Leave a CONT_CMD_SKIP_CHNL (0x00) byte in __MotorDataBuf for each skipped channel.
         ptr += channel;
 
         __OSContRamWriteFormat* readformat = (__OSContRamWriteFormat*)ptr;
 
+        // Set the entire block to either
         memset(readformat->send.data, flag, sizeof(readformat->send.data));
 
         __osContLastCmd = CONT_CMD_END;
+
+        // Write __MotorDataBuf to the PIF RAM and then wait for the command to execute.
         __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
+        // Read the resulting __MotorDataBuf from the PIF RAM and then wait for the command to execute.
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
@@ -342,13 +357,14 @@ static void _MakeMotorData(int channel, OSPifRam* mdata) {
     __OSContRamWriteFormat ramwriteformat;
     int i;
 
-    ramwriteformat.align      = CONT_CMD_NOP;
-    ramwriteformat.cmd.txsize = sizeof(ramwriteformat.send);
-    ramwriteformat.cmd.rxsize = sizeof(ramwriteformat.recv);
-    ramwriteformat.send.cmdID = CONT_CMD_WRITE_MEMPAK;
-    ramwriteformat.send.addrh = (CONT_BLOCK_RUMBLE >> 3);
-    ramwriteformat.send.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+    ramwriteformat.align       = CONT_CMD_NOP;
+    ramwriteformat.cmd.txsize  = sizeof(ramwriteformat.send);
+    ramwriteformat.cmd.rxsize  = sizeof(ramwriteformat.recv);
+    ramwriteformat.send.cmdID  = CONT_CMD_WRITE_MEMPAK;
+    ramwriteformat.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
+    ramwriteformat.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
+    // Leave a CONT_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
             *ptr++ = CONT_CMD_SKIP_CHNL;

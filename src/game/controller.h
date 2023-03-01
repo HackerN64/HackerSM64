@@ -151,6 +151,14 @@ typedef struct PACKED {
     /*0x01*/ u8 rxsize;             // Number of bytes to receive.
 } OSContCmdData; /*0x02*/
 
+typedef union {
+    struct PACKED {
+        /*0x00*/ u8 h;              // HI byte.
+        /*0x01*/ u8 l;              // LO byte.
+    }; /*0x02*/
+    u16 hl;
+} HiLo16; /*0x02*/
+
 //////////////////////////////
 // Specific command formats //
 //////////////////////////////
@@ -159,14 +167,13 @@ typedef struct PACKED {
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+    /*0x00*/ u8 align0;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
     } send; /*0x01*/
     /*0x04*/ struct PACKED {
-        /*0x04*/ u8 typeh;              // HI byte of device type.
-        /*0x05*/ u8 typel;              // LO byte of device type.
+        /*0x04*/ HiLo16 type;           // Device type.
         /*0x06*/ u8 status;             // Status byte, depends on device type.
     } recv; /*0x03*/
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
@@ -179,8 +186,7 @@ typedef struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
     } send; /*0x01*/
     /*0x03*/ struct PACKED {
-        /*0x03*/ u8 typeh;              // HI byte of device type.
-        /*0x04*/ u8 typel;              // LO byte of device type.
+        /*0x03*/ HiLo16 type;           // Device type.
         /*0x05*/ u8 status;             // Status byte, depends on device type.
     } recv; /*0x03*/
 } __OSContRequesFormatShort; /*0x06*/
@@ -208,14 +214,13 @@ typedef struct PACKED {
 
 // -- Controller Pak Read/Write --
 
-// 0x02: CONT_CMD_READ_MEMPAK
+// 0x02: CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA
 typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK).
-        /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
-        /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA).
+        /*0x04*/ HiLo16 addr;           // CRC code for address.
     } send; /*0x03*/
     /*0x06*/ struct PACKED {
         /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
@@ -223,20 +228,141 @@ typedef struct PACKED {
     } recv; /*0x21*/
 } __OSContRamReadFormat; /*0x27*/
 
-// 0x03: CONT_CMD_WRITE_MEMPAK
+// 0x03: CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA
 typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK).
-        /*0x04*/ u8 addrh;              // HI byte of CRC code for address.
-        /*0x05*/ u8 addrl;              // LO byte of CRC code for address.
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA).
+        /*0x04*/ HiLo16 addr;           // CRC code for address.
         /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
     } send; /*0x23*/
     /*0x26*/ struct PACKED {
         /*0x26*/ u8 datacrc;            // CRC code for data.
     } recv; /*0x01*/
 } __OSContRamWriteFormat; /*0x27*/
+
+// -- EEPROM Read/Write --
+
+// 0x04: CONT_CMD_READ_EEPROM
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_EEPROM).
+        /*0x03*/ u8 block;              // Which block of EEPROM to read from.
+    } send; /*0x02*/
+    /*0x04*/ struct PACKED {
+        /*0x04*/ u8 data[EEPROM_BLOCK_SIZE]; // Address of the data buffer.
+    } recv; /*0x08*/
+} __OSContReadEEPROMFormat; /*0x0C*/
+
+// 0x05: CONT_CMD_WRITE_EEPROM
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_EEPROM).
+        /*0x03*/ u8 block;              // Which block of EEPROM to write to.
+        /*0x04*/ u8 data[EEPROM_BLOCK_SIZE]; // Address of the data buffer.
+    } send; /*0x0A*/
+    /*0x0C*/ struct PACKED {
+        /*0x0C*/ u8 busy;               // 0x80 = busy, 0x00 otherwise.
+    } recv; /*0x01*/
+} __OSContWriteEEPROMFormat; /*0x0D*/
+
+// -- RTC Commands --
+
+#define RTC_BLOCK_SIZE 8
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ u8 stopped     : 1; // Clock is halted, and it is safe to write to block 2.
+        /*0x00*/ u8             : 5; // These bits have never been seen set.
+        /*0x00*/ u8 crystalFail : 1; // If this bit is set, the crystal is not working.
+        /*0x00*/ u8 batteryFail : 1; // If this bit is set, the supply voltage of the RTC became too low.
+
+    } bits;
+    u8 raw;
+} RTCStatus; /*0x01*/
+
+// 0x06: CONT_CMD_READ_RTC_STATUS
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_RTC_STATUS).
+    } send; /*0x01*/
+    /*0x03*/ struct PACKED {
+        /*0x03*/ HiLo16 identifier;     // 0x0080 = 4 Kibibits (512 bytes), 0x00C0 = 16 Kibibits (2048 bytes)
+        /*0x05*/ RTCStatus status;      // RTC clock status.
+    } recv; /*0x03*/
+} __OSContReadRTCStatusFormat; /*0x06*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ union {
+                struct PACKED {
+                    u8          : 6;    // Always 0.
+                    u8 RTC      : 1;    // Write protects field 2 (RTC).
+                    u8 NVRAM    : 1;    // Write protects field 1 (NVRAM).
+                };
+                u8 raw;
+            } writeProtect;
+        /*0x01*/ union {
+                struct PACKED {
+                    u8 unknown  : 1;    // Exists, changeable, no visible function.
+                    u8          : 4;    // Always 0.
+                    u8 stop     : 2;    // If either bit is set, stops RTC from counting.
+                    u8          : 1;    // Always 0.
+                };
+                u8 raw;
+            } control;
+        /*0x02*/ u8 unused0[2];
+        /*0x04*/ u8 writable[2];    // Can be updated but have no visible function.
+        /*0x06*/ u8 unused1[2];
+    } block0; // Block 0: Control Registers. Determines the current clock "mode".
+    struct PACKED {
+        /*0x00*/ u8 unknown[RTC_BLOCK_SIZE];
+    } block1; // Block 1: 8 bytes of battery-backed SRAM
+    struct PACKED {
+        /*0x00*/ u8 seconds;        // [0, 59].
+        /*0x01*/ u8 minutes;        // [0, 59].
+        /*0x02*/ u8 hours;          // [0, 23] + 0x80.
+        /*0x03*/ u8 day_of_month;   // [1, 31].
+        /*0x04*/ u8 day_of_week;    // Sunday - Saturday, [0, 6].
+        /*0x05*/ u8 month;          // [1, 12].
+        /*0x06*/ u8 yearXX;         // Last two digits of year [0, 99].
+        /*0x07*/ u8 century;        // Centuries since 1900, [0, 1].
+    } block2; // Block 2: The current date and time in binary-coded decimal.
+    struct PACKED {
+        /*0x00*/ u8 unused[RTC_BLOCK_SIZE];
+    } block3; // Block 3: Always 0
+    u8 raw[RTC_BLOCK_SIZE];
+} RTCBlockData; /*0x08*/
+
+// 0x07: CONT_CMD_READ_RTC_BLOCK
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_RTC_BLOCK).
+        /*0x03*/ u8 block;              // Which RTC block to read from [0, 3].
+    } send; /*0x02*/
+    /*0x04*/ struct PACKED {
+        /*0x04*/ RTCBlockData data;     // Address of the data buffer.
+        /*0x0C*/ RTCStatus status;      // RTC clock status.
+    } recv; /*0x09*/
+} __OSContReadRTCBlockFormat; /*0x0D*/
+
+// 0x08: CONT_CMD_WRITE_RTC_BLOCK
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_RTC_BLOCK).
+        /*0x03*/ u8 block;              // Which RTC block to write to [0, 3].
+        /*0x04*/ RTCBlockData data;     // Address of the data buffer.
+    } send; /*0x0A*/
+    /*0x0C*/ struct PACKED {
+        /*0x0C*/ RTCStatus status;      // RTC clock status.
+    } recv; /*0x01*/
+} __OSContRWriteRTCBlockFormat; /*0x0D*/
 
 // -- GCN Controller Input poll & calibration --
 
@@ -262,7 +388,7 @@ typedef struct PACKED {
         /*0x04*/ u8 rumble;             // Rumble bit.
     } send; /*0x03*/
     /*0x05*/ struct PACKED {
-        /*0x05*/ GCNInputData input;
+        /*0x05*/ GCNInputData input;    // The received input data.
     } recv; /*0x08*/
 } __OSContGCNShortPollFormat; /*0x0D*/
 
@@ -391,9 +517,9 @@ typedef struct PACKED {
 // externs //
 /////////////
 
-extern OSPifRam __osContPifRam;
-extern u8 __osMaxControllers;
-extern u8 __osContLastCmd;
+extern OSPifRam __osContPifRam;     // A buffer for the PIF RAM.
+extern u8       __osMaxControllers; // The last port to read controllers on..
+extern u8       __osContLastCmd;    // The ID of the last command that was executed.
 
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
 
