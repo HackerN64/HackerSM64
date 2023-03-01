@@ -262,9 +262,6 @@ static s32 init_and_check_rumble_pak(void) {
 
     if (!success) {
         sRumblePakMotorState = MOTOR_STOP;
-        osSyncPrintf("init_and_check_rumble_pak error %d\n", err);
-    } else {
-        osSyncPrintf("init_and_check_rumble_pak\n");
     }
 
     return success;
