@@ -92,8 +92,8 @@ typedef union {
 // -- GCN Controller buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT
-    /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH
+    /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
+    /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR on GCN.
     /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
     /*0x0*/ u16 START       : 1; // CONT_GCN_START
     /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
@@ -348,6 +348,7 @@ enum ContCmds {
     CONT_CMD_RESET = 0xFF,              // 0xFF: Reset/Info.
 };
 
+// Special control bytes used outside of commands.
 #define CONT_CMD_NOP                0xFF // Deos nothing, used for alignment.
 #define CONT_CMD_END                0xFE // End command.
 #define CONT_CMD_RESET_CHNL         0xFD // Reset channel.

@@ -26,8 +26,7 @@ struct RumbleSettings gCurrRumbleSettings = { 0 };
 s32 sRumblePakThreadActive = FALSE;             // Set to TRUE when the rumble thread starts.
 s32 sRumblePakActive       = FALSE;             // Whether the rumble pak is plugged in.
 s32 sRumblePakMotorState   = MOTOR_STOP;        // Current rumble motor state.
-s32 sRumblePakError        = PFS_ERR_SUCCESS;   // The last error from a failed motor start/stop.
-s32 sRumblePakErrorCount   = 0;                 // Number of failed motor start/stops.
+s32 sRumblePakError        = PFS_ERR_SUCCESS;   // The last error from a motor start/stop.
 s32 gRumblePakTimer        = 0;                 // Only used to time the drowning warning rumble.
 
 /**
@@ -51,13 +50,13 @@ void release_rumble_pak_control(void) {
  * Turn the Rumble Pak motor on or off.
  * flag = MOTOR_STOP, MOTOR_START, or MOTOR_STOP_HARD (GameCube controller only).
  */
-static void set_rumble(s32 flag) {
+static void set_rumble(s32 flag, s32 bypass) {
     if (!sRumblePakActive) {
         return;
     }
 
-    // Don't run if already set.
-    if (flag == sRumblePakMotorState) {
+    // If not bypassing the check, Don't run if already set.
+    if (!bypass && flag == sRumblePakMotorState) {
         return;
     }
 
@@ -66,14 +65,7 @@ static void set_rumble(s32 flag) {
     block_until_rumble_pak_free();
 
     // Equivalent to osMotorStart or osMotorStop.
-    s32 err = __osMotorAccessEx(&gRumblePakPfs, flag);
-
-    if (err == PFS_ERR_SUCCESS) {
-        sRumblePakErrorCount = 0;
-    } else {
-        sRumblePakErrorCount++;
-        sRumblePakError = err;
-    }
+    sRumblePakError = __osMotorAccessEx(&gRumblePakPfs, flag);
 
     release_rumble_pak_control();
 }
@@ -84,7 +76,7 @@ static void set_rumble(s32 flag) {
 static void update_rumble_pak(void) {
     // Stop rumble after pressing the reset button.
     if (gResetTimer > 0) {
-        set_rumble(MOTOR_STOP);
+        set_rumble(MOTOR_STOP, FALSE);
         return;
     }
 
@@ -92,7 +84,7 @@ static void update_rumble_pak(void) {
     if (gCurrRumbleSettings.start > 0) { // Start phase.
         gCurrRumbleSettings.start--;
 
-        set_rumble(MOTOR_START);
+        set_rumble(MOTOR_START, FALSE);
     } else if (gCurrRumbleSettings.timer > 0) { // Timer phase.
         // Handle rumbling during the duration of the timer.
         gCurrRumbleSettings.timer--;
@@ -106,19 +98,19 @@ static void update_rumble_pak(void) {
         // Rumble event type.
         if (gCurrRumbleSettings.event == RUMBLE_EVENT_CONSTON) {
             // Constant rumble for the duration of the timer phase.
-            set_rumble(MOTOR_START);
+            set_rumble(MOTOR_START, FALSE);
         } else { // RUMBLE_EVENT_LEVELON
             // Modulate rumble based on 'count' and 'level'.
             // Rumble when ((count + (((level^3) / 512) + RUMBLE_START_TIME)) >= 256).
             if (gCurrRumbleSettings.count >= 0x100) {
                 gCurrRumbleSettings.count -= 0x100;
 
-                set_rumble(MOTOR_START);
+                set_rumble(MOTOR_START, FALSE);
             } else { // count < 256, stop rumbling until count >= 256 again.
                 s16 level = gCurrRumbleSettings.level;
                 gCurrRumbleSettings.count += ((level * level * level) / 0x200) + RUMBLE_START_TIME;
 
-                set_rumble(MOTOR_STOP);
+                set_rumble(MOTOR_STOP, FALSE);
             }
         }
     } else { // Slip phase.
@@ -126,11 +118,11 @@ static void update_rumble_pak(void) {
         gCurrRumbleSettings.timer = 0;
 
         if (gCurrRumbleSettings.slip >= 5) { // Rumble until 'slip' gets too low.
-            set_rumble(MOTOR_START);
+            set_rumble(MOTOR_START, FALSE);
         } else if ((gCurrRumbleSettings.slip >= 2) && ((gNumVblanks % gCurrRumbleSettings.vibrate) == 0)) { // Rumble every 'vibrate' frames.
-            set_rumble(MOTOR_START);
+            set_rumble(MOTOR_START, FALSE);
         } else { // Rumble fully ended.
-            set_rumble(MOTOR_STOP);
+            set_rumble(MOTOR_STOP, FALSE);
         }
     }
 
@@ -270,6 +262,9 @@ static s32 init_and_check_rumble_pak(void) {
 
     if (!success) {
         sRumblePakMotorState = MOTOR_STOP;
+        osSyncPrintf("init_and_check_rumble_pak error %d\n", err);
+    } else {
+        osSyncPrintf("init_and_check_rumble_pak\n");
     }
 
     return success;
@@ -293,15 +288,21 @@ static void thread6_rumble_loop(UNUSED void *arg) {
         update_rumble_pak();
 
         if (sRumblePakActive) {
+            if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check Rumble Pak status about once per second.
+                // Runs __osMotorAccesEx and checks for errors without changing rumble motor state.
+                set_rumble(sRumblePakMotorState, TRUE);
+            }
             // Disable the rumble pak if there were too many failed start/stop attempts without a success.
-            if (sRumblePakErrorCount >= 30) {
+            if (sRumblePakError != PFS_ERR_SUCCESS) {
                 sRumblePakActive = FALSE;
                 sRumblePakMotorState = MOTOR_STOP;
                 osSyncPrintf("Rumble Pak error: %d\n", sRumblePakError);
             }
-        } else if ((gNumVblanks % 60) == 0) { // Check Rumble Pak status about once per second.
-            sRumblePakActive = init_and_check_rumble_pak();
-            sRumblePakErrorCount = 0;
+        } else {
+            if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check Rumble Pak status about once per second.
+                sRumblePakActive = init_and_check_rumble_pak();
+                sRumblePakError = PFS_ERR_SUCCESS;
+            }
         }
 
         if (gRumblePakTimer > 0) {
@@ -329,7 +330,7 @@ void cancel_rumble(void) {
 
     // Reset timers.
     gCurrRumbleSettings.timer = 0;
-    gCurrRumbleSettings.slip = 0;
+    gCurrRumbleSettings.slip  = 0;
 
     gRumblePakTimer = 0;
 }
@@ -354,7 +355,10 @@ void create_thread_6_rumble(void) {
  * Called by handle_vblank.
  */
 void rumble_thread_update_vi(void) {
-    union { char asStr[sizeof("VRTC")]; OSMesg asMesg; } VRTC = { .asStr = "VRTC" };
+    union {
+        char asStr[sizeof("VRTC")];
+        OSMesg asMesg;
+    } VRTC = { .asStr = "VRTC" };
 
     if (!sRumblePakThreadActive) {
         return;

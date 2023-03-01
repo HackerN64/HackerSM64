@@ -33,9 +33,10 @@ enum RumbleEvents {
     RUMBLE_EVENT_LEVELON, // Modulate rumble using 'count' and 'level'.
 };
 
+// Number of vblanks between each rumble pak check.
+#define RUMBLE_PAK_CHECK_TIME   60
 // Number of frames to rumble before entering the 'timer' phase of a rumble.
 #define RUMBLE_START_TIME       4
-
 // Number of rumble commands that can be called per frane.
 #define RUMBLE_DATA_QUEUE_SIZE  3
 

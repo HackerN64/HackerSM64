@@ -38,6 +38,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
 
     ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
     __osContLastCmd = CONT_CMD_READ_BUTTON;
+
     __osSiRelAccess();
 
     return ret;
@@ -125,8 +126,8 @@ void osContGetReadDataEx(OSContPadEx* data) {
  */
 static void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContReadFormat readformat;
-    __OSContGCNShortPollFormat readformatgcn;
+    __OSContReadFormat writeformat;
+    __OSContGCNShortPollFormat writeformatgcn;
     OSPortInfo* portInfo = NULL;
     int port;
 
@@ -135,35 +136,35 @@ static void __osPackReadData(void) {
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
     // N64 controller poll format.
-    readformat.cmd.txsize                = sizeof(readformat.send);
-    readformat.cmd.rxsize                = sizeof(readformat.recv);
-    readformat.send.cmdID                = CONT_CMD_READ_BUTTON;
-    readformat.recv.input.buttons.raw    = 0xFFFF;
-    readformat.recv.input.stick.raw      = 0xFFFF;
+    writeformat.cmd.txsize                = sizeof(writeformat.send);
+    writeformat.cmd.rxsize                = sizeof(writeformat.recv);
+    writeformat.send.cmdID                = CONT_CMD_READ_BUTTON;
+    writeformat.recv.input.buttons.raw    = 0xFFFF;
+    writeformat.recv.input.stick.raw      = 0xFFFF;
 
     // GameCube controller poll format.
-    readformatgcn.cmd.txsize             = sizeof(readformatgcn.send);
-    readformatgcn.cmd.rxsize             = sizeof(readformatgcn.recv);
-    readformatgcn.send.cmdID             = CONT_CMD_GCN_SHORT_POLL;
+    writeformatgcn.cmd.txsize             = sizeof(writeformatgcn.send);
+    writeformatgcn.cmd.rxsize             = sizeof(writeformatgcn.recv);
+    writeformatgcn.send.cmdID             = CONT_CMD_GCN_SHORT_POLL;
     // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
     // Mode 3 uses 8 bits for both c-stick and shoulder triggers.
     // https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/HW/SI/SI_DeviceGCController.cpp
     // https://github.com/extremscorner/gba-as-controller/blob/gc/controller/source/main.iwram.c
-    readformatgcn.send.analog_mode       = 3;
-    readformatgcn.send.rumble            = MOTOR_STOP;
-    readformatgcn.recv.input.buttons.raw = 0xFFFF;
-    readformatgcn.recv.input.stick.raw   = 0xFFFF;
+    writeformatgcn.send.analog_mode       = 3;
+    writeformatgcn.send.rumble            = MOTOR_STOP;
+    writeformatgcn.recv.input.buttons.raw = 0xFFFF;
+    writeformatgcn.recv.input.stick.raw   = 0xFFFF;
 
     for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             if (portInfo->type & CONT_CONSOLE_GCN) {
-                readformatgcn.send.rumble = portInfo->gcRumble;
-                *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
+                writeformatgcn.send.rumble = portInfo->gcRumble;
+                *(__OSContGCNShortPollFormat*)ptr = writeformatgcn;
                 ptr += sizeof(__OSContGCNShortPollFormat);
             } else {
-                *(__OSContReadFormat*)ptr = readformat;
+                *(__OSContReadFormat*)ptr = writeformat;
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
@@ -292,6 +293,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         }
 
         __osSiGetAccess();
+
         __MotorDataBuf[channel].pifstatus = PIF_STATUS_EXE;
         ptr += channel;
 
@@ -309,16 +311,17 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         if (!err) {
             if (!flag) {
                 // MOTOR_STOP
-                if (readformat->recv.datacrc != 0) {
+                if (readformat->recv.datacrc != 0) { // 0xFF = Disconnected.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             } else {
                 // MOTOR_START
-                if (readformat->recv.datacrc != 0xEB) {
+                if (readformat->recv.datacrc != 0xEB) { // 0x14 = Uninitialized.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             }
         }
+
         __osSiRelAccess();
     }
 
@@ -336,15 +339,15 @@ s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
  */
 static void _MakeMotorData(int channel, OSPifRam* mdata) {
     u8* ptr = (u8*)mdata->ramarray;
-    __OSContRamWriteFormat ramreadformat;
+    __OSContRamWriteFormat ramwriteformat;
     int i;
 
-    ramreadformat.align      = CONT_CMD_NOP;
-    ramreadformat.cmd.txsize = sizeof(ramreadformat.send);
-    ramreadformat.cmd.rxsize = sizeof(ramreadformat.recv);
-    ramreadformat.send.cmdID = CONT_CMD_WRITE_MEMPAK;
-    ramreadformat.send.addrh = (CONT_BLOCK_RUMBLE >> 3);
-    ramreadformat.send.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+    ramwriteformat.align      = CONT_CMD_NOP;
+    ramwriteformat.cmd.txsize = sizeof(ramwriteformat.send);
+    ramwriteformat.cmd.rxsize = sizeof(ramwriteformat.recv);
+    ramwriteformat.send.cmdID = CONT_CMD_WRITE_MEMPAK;
+    ramwriteformat.send.addrh = (CONT_BLOCK_RUMBLE >> 3);
+    ramwriteformat.send.addrl = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
@@ -352,7 +355,7 @@ static void _MakeMotorData(int channel, OSPifRam* mdata) {
         }
     }
 
-    *(__OSContRamWriteFormat*)ptr = ramreadformat;
+    *(__OSContRamWriteFormat*)ptr = ramwriteformat;
     ptr += sizeof(__OSContRamWriteFormat);
     *ptr = CONT_CMD_END;
 }
