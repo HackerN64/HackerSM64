@@ -215,7 +215,7 @@ typedef union {
                 /*0x02*/ Analog16  buttons; // Analog buttons used by some controllers.
             } m4; /*0x04*/
             struct PACKED { // ASCII Controller.
-                /*0x00*/ u8 keypress[3];    // Which keys are pressed (up to 3 keys can be pressed at a time).
+                /*0x00*/ u8 keypress[3];    // Which keys are pressed (up to 3 keys can be pressed at a time). //! TODO: Key IDs.
                 /*0x03*/ u8 status;         // Keyboard status.
             } keyboard; /*0x04*/
             struct PACKED { // DK Bongos.
@@ -288,7 +288,7 @@ typedef union {
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
 typedef struct PACKED {
-    /*0x00*/ u8 align0;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+    /*0x00*/ u8 align0;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
@@ -297,7 +297,7 @@ typedef struct PACKED {
         /*0x04*/ HiLo16 type;           // Device type.
         /*0x06*/ OSContRequestStatus status; // Status byte, depends on device type.
     } recv; /*0x03*/
-    /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+    /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
 } __OSContRequestFormat; /*0x08*/
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
@@ -329,7 +329,7 @@ typedef struct PACKED {
 
 // 0x02: CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA).
@@ -343,7 +343,7 @@ typedef struct PACKED {
 
 // 0x03: CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). //! TODO: verify whether this is necessary.
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA).
@@ -475,6 +475,87 @@ typedef struct PACKED {
         /*0x0C*/ RTCStatus status;      // RTC clock status.
     } recv; /*0x01*/
 } __OSContRWriteRTCBlockFormat; /*0x0D*/
+
+// -- Randnet Keyboard input poll --
+
+// 0x13: CONT_CMD_READ_KEYBOARD
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_64GB).
+        /*0x03*/ union {
+            struct PACKED {
+                /*0x00*/ u8             : 5;
+                /*0x00*/ u8 power       : 1;    // Power LED on.
+                /*0x00*/ u8 capLock     : 1;    // Caps Lock LED on.
+                /*0x00*/ u8 numLock     : 1;    // Num Lock LED on.
+            }; /*0x01*/
+            u8 raw;
+        } LEDs; /*0x01*/
+    } send; /*0x03*/
+    /*0x04*/ struct PACKED {
+        /*0x04*/ u16 keypress[3];       // Which keys are pressed (up to 3 keys can be pressed at a time). //! TODO: Key IDs.
+        /*0x0A*/ union {
+            struct PACKED {
+                /*0x00*/ u8             : 3;
+                /*0x00*/ u8 tooManyKeys : 1;    // Too many keys pressed?
+                /*0x00*/ u8             : 3;
+                /*0x00*/ u8 homeKey     : 1;    // Home key pressed.
+            }; /*0x01*/
+            u8 raw;
+        } status; /*0x01*/
+    } recv; /*0x07*/
+} __OSContReadKeyboardFormat; /*0x0B*/
+
+// -- Send Game ID on boot --
+
+// 0x1D: CONT_CMD_WRITE_GAME_ID
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_GAME_ID).
+        /*0x03*/ u32 crc_hi;            // CRC HI / CRC1 (bytes [0x10-0x13] of the ROM).
+        /*0x07*/ u32 crc_lo;            // CRC LO / CRC2 (bytes [0x14-0x17] of the ROM).
+        /*0x0B*/ u8 mediaformat;        // Media format ROM type (byte 0x3B of the ROM).
+        /*0x0C*/ u8 country_id;         // Country Code (byte 0x3E of the ROM).
+    } send; /*0x0B*/
+    /*0x0D*/ struct PACKED {
+        /*0x0D*/ u8 recv[1];            // Always 0?
+    } recv; /*0x01*/
+} __OSContWriteGameIDFormat; /*0x0E*/
+
+// -- GCN Wheel Feedback --
+
+// 0x30: CONT_CMD_GCN_WHEEL_FEEDBACK
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_WHEEL_FEEDBACK).
+        /*0x03*/ union {
+            struct PACKED {
+                /*0x00*/ u16            : 5;
+                /*0x00*/ u16 unknown    : 1;  // Unknown. Always 1?
+                /*0x00*/ u16 state      : 1;  // 0 = motor off, 1 = motor on.
+                /*0x00*/ u16 strength   : 9;  // Force strength [0, 256]. 0 = left strong, 256 = right strong.
+            }; /*0x02*/
+            u16 raw;
+        } force; /*0x02*/
+    } send; /*0x0B*/
+    /*0x0D*/ struct PACKED {
+        /*0x05*/ GCNButtons buttons;    // The received button data.
+        /*0x07*/ union {
+            struct PACKED {
+                /*0x00*/ u8             : 4;  // Unknown.
+                /*0x00*/ u8 pedal       : 1;  // Whether the pedals are connected.
+                /*0x00*/ u8             : 3;  // Unknown.
+            }; /*0x01*/
+            u8 raw;
+        } flags; /*0x01*/
+        /*0x08*/ s8 wheel;              // How far the wheel is turned in a direction [-128, 127].
+        /*0x09*/ Analog16 pedal;        // Pedals, if connected [0, 255].
+        /*0x0B*/ Analog16 paddle;       // Paddles on the back of the wheel [0, 255].
+    } recv; /*0x08*/
+} __OSContGCNWheelForceFormat; /*0x0D*/
 
 // -- GCN Controller Input poll & calibration --
 
@@ -613,7 +694,7 @@ enum ContCmds {
     // GBA
     CONT_CMD_READ_GBA  = 0x14,          // 0x14: Read GBA.
     CONT_CMD_WRITE_GBA = 0x15,          // 0x15: Write GBA.
-    // Game ID https://gitlab.com/pixelfx-public/n64-game-id
+    // Game ID (https://gitlab.com/pixelfx-public/n64-game-id)
     CONT_CMD_WRITE_GAME_ID = 0x1D,      // 0x1D: The EverDrive sends the game ID on the first controller port on boot using this.
     // GCN Steering Wheel
     CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30, // 0x30: Logitech Speed Force Feedback.

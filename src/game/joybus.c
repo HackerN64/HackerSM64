@@ -214,7 +214,7 @@ static const __OSContReadFormat sN64WriteFormat = {
     .cmd.txsize         = sizeof(((__OSContReadFormat*)0)->send),
     .cmd.rxsize         = sizeof(((__OSContReadFormat*)0)->recv),
     .send.cmdID         = CONT_CMD_READ_BUTTON,
-    .recv.input.raw     = -1,
+    .recv.input.raw     = -1, // 0xFFFF
 };
 
 // Default GCN Controller Input Short Poll command:
@@ -224,7 +224,7 @@ static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
     .send.cmdID         = CONT_CMD_READ_BUTTON,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
-    .recv.input.raw     = -1,
+    .recv.input.raw     = -1, // 0xFFFFFFFF
 };
 
 /**
