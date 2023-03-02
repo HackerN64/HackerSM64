@@ -100,12 +100,31 @@ typedef struct PACKED {
     /*0x1*/ u16 BRAKE           : 4;
 } N64TrainButtons; /*0x02*/
 
+// -- Fishing Rod buttons --
+
+typedef struct PACKED {
+    /*0x0*/ u16 A               : 1; // CONT_A
+    /*0x0*/ u16 B               : 1; // CONT_B
+    /*0x0*/ u16 Z               : 1; // CONT_G
+    /*0x0*/ u16 START           : 1; // CONT_START
+    /*0x0*/ u16 REEL            : 1; // Reel (clockwise); turning counterclockwise trips a slip gear.
+    /*0x0*/ u16                 : 1;
+    /*0x0*/ u16 TENSION_UP      : 1; // Increase Tension (toward player).
+    /*0x0*/ u16 TENSION_DOWN    : 1; // Decrease Tension (away from player).
+    /*0x1*/ u16                 : 4;
+    /*0x1*/ u16 C_UP            : 1; // CONT_E
+    /*0x1*/ u16 C_DOWN          : 1; // CONT_D
+    /*0x1*/ u16 C_LEFT          : 1; // CONT_C
+    /*0x1*/ u16 C_RIGHT         : 1; // CONT_F
+} N64FishingRodButtons; /*0x02*/
+
 // -- N64 buttons union --
 
 typedef union {
     N64StandardButtons standard;
     N64MouseButtons mouse;
     N64TrainButtons train;
+    N64FishingRodButtons rod;
     u16 raw;
 } N64Buttons; /*0x02*/
 
@@ -264,7 +283,7 @@ typedef struct PACKED {
 typedef union {
     struct PACKED { // Standard N64 Controller.
         /*0x00*/ u8              : 5;
-        /*0x00*/ u8 chksumErr    : 1;
+        /*0x00*/ u8 crcError     : 1;
         /*0x00*/ u8 noPak        : 1;
         /*0x00*/ u8 yesPak       : 1;
     } n64; /*0x01*/
@@ -388,10 +407,10 @@ typedef struct PACKED {
 
 typedef union {
     struct PACKED {
-        /*0x00*/ u8 stopped     : 1; // Clock is halted, and it is safe to write to block 2.
-        /*0x00*/ u8             : 5; // These bits have never been seen set.
-        /*0x00*/ u8 crystalFail : 1; // If this bit is set, the crystal is not working.
-        /*0x00*/ u8 batteryFail : 1; // If this bit is set, the supply voltage of the RTC became too low.
+        /*0x00*/ u8 stopped     : 1;    // Clock is halted, and it is safe to write to block 2.
+        /*0x00*/ u8             : 5;    // These bits have never been seen set.
+        /*0x00*/ u8 crystalFail : 1;    // If this bit is set, the crystal is not working.
+        /*0x00*/ u8 batteryFail : 1;    // If this bit is set, the supply voltage of the RTC became too low.
     } bits; /*0x01*/
     u8 raw;
 } RTCStatus; /*0x01*/
@@ -476,6 +495,89 @@ typedef struct PACKED {
     } recv; /*0x01*/
 } __OSContRWriteRTCBlockFormat; /*0x0D*/
 
+// -- VRU Commands --
+
+typedef union {
+    struct PACKED { //! TODO: Check if this is byteswapped.
+        /*0x00*/ u16 addr : 11; // Address.
+        /*0x01*/ u16 crc  :  5; // CRC.
+    }; /*0x02*/
+    u16 raw;
+} VRUAddrCRC; /*0x02*/
+
+// 0x09: CONT_CMD_READ_VOICE
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_VOICE).
+        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
+    } send; /*0x02*/
+    /*0x04*/ struct PACKED {
+        /*0x04*/ u8 data[0x24];         // Address of the data buffer. Data is 16 bit byteswapped.
+        /*0x28*/ u8 datacrc;            // CRC code for data.
+    } recv; /*0x25*/
+} __OSContRead36VoiceFormat; /*0x29*/
+
+// 0x0A: CONT_CMD_WRITE_VOICE
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_VOICE).
+        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
+        /*0x04*/ u8 data[0x14];         // Address of the data buffer. Data is 16 bit byteswapped.
+    } send; /*0x02*/
+    /*0x28*/ struct PACKED {
+        /*0x28*/ u8 datacrc;            // CRC code for data.
+    } recv; /*0x25*/
+} __OSContWrite20VoiceFormat; /*0x29*/
+
+typedef union {
+    struct PACKED { //! TODO: Check if this is byteswapped.
+        /*0x00*/ u16 unknown : 13; // Unknown status.
+        /*0x01*/ u16 mode    :  3; // Mode.
+    }; /*0x02*/
+    u16 raw;
+} VRUStatus; /*0x02*/
+
+// 0x0B: CONT_CMD_READ_VOICE_STATUS
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_VOICE_STATUS).
+        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
+    } send; /*0x03*/
+    struct PACKED {
+        /*0x05*/ VRUStatus statusMode;  // Unknown status and VRU mode.
+        /*0x07*/ u8 datacrc;            // CRC code for data.
+    } recv; /*0x03*/
+} __OSContRead2VoiceFormat; /*0x08*/
+
+// 0x0C: CONT_CMD_WRITE_VOICE_STATUS
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_VOICE_STATUS).
+        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
+        /*0x05*/ VRUStatus statusMode;  // Unknown status and VRU mode.
+        /*0x07*/ u16 arg;               // Unknown argument(s).
+    } send; /*0x07*/
+    /*0x09*/ struct PACKED {
+        /*0x09*/ u8 datacrc;            // CRC code for data.
+    } recv; /*0x01*/
+} __OSContWrite4VoiceFormat; /*0x0A*/
+
+// 0x0D: CONT_CMD_RESET_VOICE
+typedef struct PACKED {
+    /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_RESET_VOICE).
+        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
+    } send; /*0x03*/
+    /*0x05*/ struct PACKED {
+        /*0x05*/ u8 error;              // Error flags.
+    } recv; /*0x01*/
+} __OSContSWriteVoiceFormat; /*0x06*/
+
 // -- Randnet Keyboard input poll --
 
 // 0x13: CONT_CMD_READ_KEYBOARD
@@ -507,7 +609,7 @@ typedef struct PACKED {
     } recv; /*0x07*/
 } __OSContReadKeyboardFormat; /*0x0B*/
 
-// -- Send Game ID on boot --
+// -- Send Game ID to controller --
 
 // 0x1D: CONT_CMD_WRITE_GAME_ID
 typedef struct PACKED {
@@ -536,7 +638,7 @@ typedef struct PACKED {
                 /*0x00*/ u16            : 5;
                 /*0x00*/ u16 unknown    : 1;  // Unknown. Always 1?
                 /*0x00*/ u16 state      : 1;  // 0 = motor off, 1 = motor on.
-                /*0x00*/ u16 strength   : 9;  // Force strength [0, 256]. 0 = left strong, 256 = right strong.
+                /*0x00*/ u16 strength   : 9;  // Force strength [0, 256]. 0 = left strong, 128 = center, 256 = right strong.
             }; /*0x02*/
             u16 raw;
         } force; /*0x02*/
@@ -681,32 +783,32 @@ enum ContCmds {
     CONT_CMD_READ_RTC_BLOCK,            // 0x07: Read RTC Block.
     CONT_CMD_WRITE_RTC_BLOCK,           // 0x08: Write RTC Block.
     // VRU
-    CONT_CMD_READ36_VOICE,              // 0x09: Read from VRx.
-    CONT_CMD_WRITE20_VOICE,             // 0x0A: Write to VRx.
-    CONT_CMD_READ2_VOICE,               // 0x0B: Read Status VRx.
-    CONT_CMD_WRITE4_VOICE,              // 0x0C: Write Config VRx.
-    CONT_CMD_SWRITE_VOICE,              // 0x0D: Write Init VRx (Clear Dictionary).
+    CONT_CMD_READ_VOICE,                // 0x09: Read from VRx.
+    CONT_CMD_WRITE_VOICE,               // 0x0A: Write to VRx.
+    CONT_CMD_READ_VOICE_STATUS,         // 0x0B: Read Status VRx.
+    CONT_CMD_WRITE_VOICE_STATUS,        // 0x0C: Write Config VRx.
+    CONT_CMD_RESET_VOICE,               // 0x0D: Write Init VRx (Clear Dictionary).
     // Randnet Keyboard
-    CONT_CMD_READ_KEYBOARD = 0x13,      // 0x13: Randnet Keyboard Read Keypress.
+    CONT_CMD_READ_KEYBOARD      = 0x13, // 0x13: Randnet Keyboard Read Keypress.
     // 64GB (https://pastebin.com/06VzdT3w)
-    CONT_CMD_READ_64GB  = 0x13,         // 0x13: Read 64GB.
-    CONT_CMD_WRITE_64GB = 0x14,         // 0x14: Write 64GB.
+    CONT_CMD_READ_64GB          = 0x13, // 0x13: Read 64GB.
+    CONT_CMD_WRITE_64GB         = 0x14, // 0x14: Write 64GB.
     // GBA
-    CONT_CMD_READ_GBA  = 0x14,          // 0x14: Read GBA.
-    CONT_CMD_WRITE_GBA = 0x15,          // 0x15: Write GBA.
+    CONT_CMD_READ_GBA           = 0x14, // 0x14: Read GBA.
+    CONT_CMD_WRITE_GBA          = 0x15, // 0x15: Write GBA.
     // Game ID (https://gitlab.com/pixelfx-public/n64-game-id)
-    CONT_CMD_WRITE_GAME_ID = 0x1D,      // 0x1D: The EverDrive sends the game ID on the first controller port on boot using this.
+    CONT_CMD_WRITE_GAME_ID      = 0x1D, // 0x1D: The EverDrive sends the game ID on the first controller port on boot using this.
     // GCN Steering Wheel
     CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30, // 0x30: Logitech Speed Force Feedback.
     // GCN Controller
-    CONT_CMD_GCN_SHORT_POLL = 0x40,     // 0x40: GameCube Shortpoll (input).
+    CONT_CMD_GCN_SHORT_POLL     = 0x40, // 0x40: GameCube Shortpoll (input).
     CONT_CMD_GCN_READ_ORIGIN,           // 0x41: GameCube Read Origin.
     CONT_CMD_GCN_CALIBRATE,             // 0x42: GameCube Recalibrate.
     CONT_CMD_GCN_LONG_POLL,             // 0x43: GameCube Longpoll (input).
     // GCN Keyboard
-    CONT_CMD_GCN_READ_KEYBOARD = 0x54,  // 0x54: GameCube Keyboard Poll.
+    CONT_CMD_GCN_READ_KEYBOARD  = 0x54, // 0x54: GameCube Keyboard Poll.
 
-    CONT_CMD_RESET = 0xFF,              // 0xFF: Reset/Info.
+    CONT_CMD_RESET              = 0xFF, // 0xFF: Reset/Info.
 };
 
 // Special control bytes used outside of commands.
