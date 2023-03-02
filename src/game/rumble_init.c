@@ -50,13 +50,14 @@ void release_rumble_pak_control(void) {
  * Turn the Rumble Pak motor on or off.
  * flag = MOTOR_STOP, MOTOR_START, or MOTOR_STOP_HARD (GameCube controller only).
  */
-static void set_rumble(s32 flag, s32 bypass) {
+static void set_rumble(s32 flag) {
     if (!sRumblePakActive) {
         return;
     }
 
     // If not bypassing the check, Don't run if already set.
-    if (!bypass && flag == sRumblePakMotorState) {
+    // Bypass this once per second just to check for errors (eg. the rumble pak being unplugged).
+    if (flag == sRumblePakMotorState && ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) != 0)) {
         return;
     }
 
@@ -76,7 +77,7 @@ static void set_rumble(s32 flag, s32 bypass) {
 static void update_rumble_pak(void) {
     // Stop rumble after pressing the reset button.
     if (gResetTimer > 0) {
-        set_rumble(MOTOR_STOP, FALSE);
+        set_rumble(MOTOR_STOP);
         return;
     }
 
@@ -84,7 +85,7 @@ static void update_rumble_pak(void) {
     if (gCurrRumbleSettings.start > 0) { // Start phase.
         gCurrRumbleSettings.start--;
 
-        set_rumble(MOTOR_START, FALSE);
+        set_rumble(MOTOR_START);
     } else if (gCurrRumbleSettings.timer > 0) { // Timer phase.
         // Handle rumbling during the duration of the timer.
         gCurrRumbleSettings.timer--;
@@ -98,19 +99,19 @@ static void update_rumble_pak(void) {
         // Rumble event type.
         if (gCurrRumbleSettings.event == RUMBLE_EVENT_CONSTON) {
             // Constant rumble for the duration of the timer phase.
-            set_rumble(MOTOR_START, FALSE);
+            set_rumble(MOTOR_START);
         } else { // RUMBLE_EVENT_LEVELON
             // Modulate rumble based on 'count' and 'level'.
             // Rumble when ((count + (((level^3) / 512) + RUMBLE_START_TIME)) >= 256).
             if (gCurrRumbleSettings.count >= 0x100) {
                 gCurrRumbleSettings.count -= 0x100;
 
-                set_rumble(MOTOR_START, FALSE);
+                set_rumble(MOTOR_START);
             } else { // count < 256, stop rumbling until count >= 256 again.
                 s16 level = gCurrRumbleSettings.level;
                 gCurrRumbleSettings.count += ((level * level * level) / 0x200) + RUMBLE_START_TIME;
 
-                set_rumble(MOTOR_STOP, FALSE);
+                set_rumble(MOTOR_STOP);
             }
         }
     } else { // Slip phase.
@@ -118,11 +119,11 @@ static void update_rumble_pak(void) {
         gCurrRumbleSettings.timer = 0;
 
         if (gCurrRumbleSettings.slip >= 5) { // Rumble until 'slip' gets too low.
-            set_rumble(MOTOR_START, FALSE);
+            set_rumble(MOTOR_START);
         } else if ((gCurrRumbleSettings.slip >= 2) && ((gNumVblanks % gCurrRumbleSettings.vibrate) == 0)) { // Rumble every 'vibrate' frames.
-            set_rumble(MOTOR_START, FALSE);
+            set_rumble(MOTOR_START);
         } else { // Rumble fully ended.
-            set_rumble(MOTOR_STOP, FALSE);
+            set_rumble(MOTOR_STOP);
         }
     }
 
@@ -285,10 +286,6 @@ static void thread6_rumble_loop(UNUSED void *arg) {
         update_rumble_pak();
 
         if (sRumblePakActive) {
-            if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check Rumble Pak status about once per second.
-                // Runs __osMotorAccesEx and checks for errors without changing rumble motor state.
-                set_rumble(sRumblePakMotorState, TRUE);
-            }
             // Disable the rumble pak if there were too many failed start/stop attempts without a success.
             if (sRumblePakError != PFS_ERR_SUCCESS) {
                 sRumblePakActive = FALSE;
