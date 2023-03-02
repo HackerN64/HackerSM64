@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <string.h>
 
 #include "config.h"
 #include "area.h"
@@ -96,6 +97,27 @@ ALIGNED4 static const struct ControllerIcon gControllerIcons[] = {
     { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
     { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
 };
+
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
+static const char* sButtonStr[16] = {
+    "A",       // A_BUTTON
+    "B",       // B_BUTTON
+    "Z",       // Z_TRIG
+    "START",   // START_BUTTON
+    "D UP",    // U_JPAD
+    "D DOWN",  // D_JPAD
+    "D LEFT",  // L_JPAD
+    "D RIGHT", // R_JPAD
+    "X",       // X_BUTTON
+    "Y",       // Y_BUTTON
+    "L",       // L_TRIG
+    "R",       // R_TRIG
+    "C UP",    // U_CBUTTONS
+    "C DOWN",  // D_CBUTTONS
+    "C LEFT",  // L_CBUTTONS
+    "C RIGHT", // R_CBUTTONS
+};
+#endif
 
 Vp gViewport = {
     .vp = {
@@ -395,6 +417,29 @@ static const Gfx dl_controller_icons_end[] = {
     gsSPEndDisplayList(),
 };
 
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
+/**
+ * Creates a string from a combination of buttons and adds it to 'strp'.
+ */
+static u32 button_combo_to_string(char *strp, u16 buttons) {
+    u32 count = 0;
+
+    for (int i = 0; i < ARRAY_COUNT(sButtonStr); i++) {
+        if (buttons & ((1 << (ARRAY_COUNT(sButtonStr) - 1)) >> i)) { // 0x8000 >> i
+            if (count) {
+                strcat(strp, "+");
+                count += strlen("+");
+            }
+
+            strcat(strp, sButtonStr[i]);
+            count += strlen(sButtonStr[i]);
+        }
+    }
+
+    return count;
+}
+#endif
+
 /**
  * Displays controller info (eg. type and player number) while polling for controller statuses.
  */
@@ -407,7 +452,7 @@ void render_controllers_overlay(void) {
     const s32 texH = 32;
     Texture *texture_controller = texture_controller_unknown;
     OSPortInfo *portInfo = NULL;
-    char text_buffer[32];
+    char text_buffer[32] = "";
     int port;
 
     if (!gContStatusPolling) {
@@ -468,7 +513,11 @@ void render_controllers_overlay(void) {
             sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 62), (SCREEN_CENTER_Y + 28), "OR A+B+START TO EXIT", col, col, col);
+            char comboStr[32] = "";
+            u32 count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
+            sprintf(text_buffer, "OR %s TO EXIT", comboStr);
+            s32 xOffset = ((strlen("ORTOEXIT") + 1 + count) / 2) * 7; // Center the text based on char count.
+            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
 #endif
         } else {
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);

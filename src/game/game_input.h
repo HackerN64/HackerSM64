@@ -20,11 +20,11 @@
 #define CONT_STATUS_POLLING_TIME                    15
 
 struct DemoInput {
-    u8 timer; // time until next input. if this value is 0, it means the demo is over
-    s8 rawStickX;
-    s8 rawStickY;
-    u8 buttonMask;
-};
+    /*0x00*/ u8 timer; // time until next input. if this value is 0, it means the demo is over
+    /*0x01*/ s8 rawStickX;
+    /*0x02*/ s8 rawStickY;
+    /*0x03*/ u8 buttonMask;
+}; /*0x04*/
 
 // Player Controllers
 extern struct Controller gControllers[MAXCONTROLLERS];
