@@ -18,7 +18,6 @@ void __osSiRelAccess(void);
 ////////////////////
 
 static void __osPackReadData(void);
-static u16 __osTranslateGCNButtons(GCNButtons gcn, s32 c_stick_x, s32 c_stick_y);
 
 /**
  * @brief Sets up PIF commands to poll controller inputs.
@@ -53,6 +52,52 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
 }
 
 /**
+ * @brief Writes controller data to OSContPadEx and stores the controller center on first run.
+ * Called by osContGetReadDataEx.
+ */
+static void __osContWriteGCNInputData(OSContPadEx* data, OSContCenter* contCenter, GCNButtons gcn, Analog16 stick, Analog16 c_stick, Analog16 trig) {
+    N64Buttons n64 = { .raw = 0x0 };
+
+    // The first time the controller is connected, store the origins for the controller's analog sticks.
+    if (!contCenter->initialized) {
+        contCenter->initialized = TRUE;
+        contCenter->stick.x     = stick.x;
+        contCenter->stick.y     = stick.y;
+        contCenter->c_stick.x   = c_stick.x;
+        contCenter->c_stick.y   = c_stick.y;
+    }
+
+    // Write the analog data.
+    data->stick_x   = CLAMP_S8((s32)stick.x   - contCenter->stick.x  );
+    data->stick_y   = CLAMP_S8((s32)stick.y   - contCenter->stick.y  );
+    data->c_stick_x = CLAMP_S8((s32)c_stick.x - contCenter->c_stick.x);
+    data->c_stick_y = CLAMP_S8((s32)c_stick.y - contCenter->c_stick.y);
+    data->l_trig    = trig.l;
+    data->r_trig    = trig.r;
+
+    // Map GCN button bits to N64 button bits.
+    n64.standard.A       = gcn.standard.A;
+    n64.standard.B       = gcn.standard.B;
+    n64.standard.Z       = gcn.standard.Z;
+    n64.standard.START   = gcn.standard.START;
+    n64.standard.D_UP    = gcn.standard.D_UP;
+    n64.standard.D_DOWN  = gcn.standard.D_DOWN;
+    n64.standard.D_LEFT  = gcn.standard.D_LEFT;
+    n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
+    n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on an N64 controller to recalibrate the analog stick (which also unsets the START bit).
+    n64.standard.unused  = gcn.standard.Y; // The N64 controller's unused bit.
+    n64.standard.L       = gcn.standard.L;
+    n64.standard.R       = gcn.standard.R;
+    n64.standard.C_UP    = (data->c_stick_y >  GCN_C_STICK_THRESHOLD);
+    n64.standard.C_DOWN  = (data->c_stick_y < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C_LEFT  = (data->c_stick_x < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C_RIGHT = (data->c_stick_x >  GCN_C_STICK_THRESHOLD);
+
+    // Write the button data.
+    data->button = n64.raw;
+}
+
+/**
  * @brief Reads PIF command result written by __osPackReadData and converts it into OSContPadEx data.
  * Modified from vanilla libultra to handle GameCube controllers, skip empty/unassigned ports,
  *   and trigger status polling if an active controller is unplugged.
@@ -60,35 +105,33 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
  */
 void osContGetReadDataEx(OSContPadEx* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContReadFormat readformat;
-    __OSContGCNShortPollFormat readformatgcn;
+    __OSContReadFormat *readformatptr = NULL;
     OSPortInfo* portInfo = NULL;
     OSContCenter* contCenter = NULL;
-    s32 stick_x, stick_y, c_stick_x, c_stick_y, l_trig, r_trig;
-    u8 cmdID = CONT_CMD_SKIP_CHNL;
+    N64InputData n64Input;
+    GCNInputData gcnInput;
     int port;
 
     for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
+            readformatptr = (__OSContReadFormat*)ptr;
+            data->errno = CHNL_ERR(readformatptr->cmd);
+
             // If a controller being read was unplugged, start status polling on all 4 ports.
-            if (CHNL_ERR(*(OSContCmdData*)ptr) & (CHNL_ERR_NORESP >> 4)) {
+            if (data->errno & (CHNL_ERR_NORESP >> 4)) {
                 start_controller_status_polling();
                 return;
             }
 
-            cmdID = (*(__OSContReadFormat*)ptr).send.cmdID;
-
-            switch (cmdID) {
+            switch (readformatptr->send.cmdID) {
                 case CONT_CMD_READ_BUTTON:
-                    readformat = *(__OSContReadFormat*)ptr;
-                    data->errno = CHNL_ERR(readformat.cmd);
-
                     if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                        data->button    = readformat.recv.input.buttons.raw;
-                        data->stick_x   = readformat.recv.input.stick.x;
-                        data->stick_y   = readformat.recv.input.stick.y;
+                        n64Input        = (*(__OSContReadFormat*)ptr).recv.input;
+                        data->button    = n64Input.buttons.raw;
+                        data->stick_x   = n64Input.stick.x;
+                        data->stick_y   = n64Input.stick.y;
                         data->c_stick_x = 0;
                         data->c_stick_y = 0;
                         data->l_trig    = 0;
@@ -99,71 +142,57 @@ void osContGetReadDataEx(OSContPadEx* data) {
                     break;
                 case CONT_CMD_GCN_SHORT_POLL:
                     contCenter = &gPortInfo[port].contCenter;
-                    readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
-                    data->errno = CHNL_ERR(readformatgcn.cmd);
 
                     if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                        stick_x = readformatgcn.recv.input.stick.x;
-                        stick_y = readformatgcn.recv.input.stick.y;
+                        Analog16 c_stick, trig;
+                        gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
 
                         // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
-                        switch (readformatgcn.send.analog_mode) {
+                        switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
                             default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
-                                c_stick_x = (readformatgcn.recv.input.m0.c_stick.x << 0);
-                                c_stick_y = (readformatgcn.recv.input.m0.c_stick.y << 0);
-                                l_trig    = (readformatgcn.recv.input.m0.trig.l    << 4);
-                                r_trig    = (readformatgcn.recv.input.m0.trig.r    << 4);
+                                c_stick = gcnInput.m0.c_stick;
+                                trig    = ANALOG8_TO_16(gcnInput.m0.trig);
                                 break;
                             case GCN_MODE_1_121:
-                                c_stick_x = (readformatgcn.recv.input.m1.c_stick.x << 4);
-                                c_stick_y = (readformatgcn.recv.input.m1.c_stick.y << 4);
-                                l_trig    = (readformatgcn.recv.input.m1.trig.l    << 0);
-                                r_trig    = (readformatgcn.recv.input.m1.trig.r    << 0);
+                                c_stick = ANALOG8_TO_16(gcnInput.m1.c_stick);
+                                trig    = gcnInput.m1.trig;
                                 break;
                             case GCN_MODE_2_112:
-                                c_stick_x = (readformatgcn.recv.input.m2.c_stick.x << 4);
-                                c_stick_y = (readformatgcn.recv.input.m2.c_stick.y << 4);
-                                l_trig    = (readformatgcn.recv.input.m2.trig.l    << 4);
-                                r_trig    = (readformatgcn.recv.input.m2.trig.r    << 4);
+                                c_stick = ANALOG8_TO_16(gcnInput.m2.c_stick);
+                                trig    = ANALOG8_TO_16(gcnInput.m2.trig);
                                 break;
                             case GCN_MODE_3_220:
-                                c_stick_x = (readformatgcn.recv.input.m3.c_stick.x << 0);
-                                c_stick_y = (readformatgcn.recv.input.m3.c_stick.y << 0);
-                                l_trig    = (readformatgcn.recv.input.m3.trig.l    << 0);
-                                r_trig    = (readformatgcn.recv.input.m3.trig.r    << 0);
+                                c_stick = gcnInput.m3.c_stick;
+                                trig    = gcnInput.m3.trig;
                                 break;
                             case GCN_MODE_4_202:
-                                c_stick_x = (readformatgcn.recv.input.m3.c_stick.x << 0);
-                                c_stick_y = (readformatgcn.recv.input.m3.c_stick.y << 0);
-                                l_trig    = 0;
-                                r_trig    = 0;
+                                c_stick = gcnInput.m3.c_stick;
+                                trig    = (Analog16){ 0x00, 0x00 };
                                 break;
                         }
 
-                        // Store the origins for the controller's analog sticks the first time it is conencted.
-                        if (!contCenter->initialized) {
-                            contCenter->initialized = TRUE;
-                            contCenter->stick.x     = stick_x;
-                            contCenter->stick.y     = stick_y;
-                            contCenter->c_stick.x   = c_stick_x;
-                            contCenter->c_stick.y   = c_stick_y;
-                        }
-
-                        data->stick_x   = stick_x   = CLAMP_S8(stick_x   - contCenter->stick.x  );
-                        data->stick_y   = stick_y   = CLAMP_S8(stick_y   - contCenter->stick.y  );
-                        data->c_stick_x = c_stick_x = CLAMP_S8(c_stick_x - contCenter->c_stick.x);
-                        data->c_stick_y = c_stick_y = CLAMP_S8(c_stick_y - contCenter->c_stick.y);
-                        data->l_trig    = l_trig;
-                        data->r_trig    = r_trig;
-                        data->button    = __osTranslateGCNButtons(readformatgcn.recv.input.buttons, c_stick_x, c_stick_y);
+                        __osContWriteGCNInputData(data, contCenter, gcnInput.buttons, gcnInput.stick, c_stick, trig);
                     } else {
                         contCenter->initialized = FALSE;
                     }
 
                     ptr += sizeof(__OSContGCNShortPollFormat);
                     break;
+                case CONT_CMD_GCN_LONG_POLL:
+                    contCenter = &gPortInfo[port].contCenter;
+
+                    if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+                        gcnInput = (*(__OSContGCNLongPollFormat*)ptr).recv.input;
+
+                        __osContWriteGCNInputData(data, contCenter, gcnInput.buttons, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
+                    } else {
+                        contCenter->initialized = FALSE;
+                    }
+
+                    ptr += sizeof(__OSContGCNLongPollFormat);
+                    break;
                 default:
-                    osSyncPrintf("ERROR: Unknown input poll command.\n");
+                    osSyncPrintf("osContGetReadDataEx: Unknown input poll command: %.02X\n", readformatptr->send.cmdID);
                     return;
             }
         } else {
@@ -192,19 +221,17 @@ static void __osPackReadData(void) {
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
     // N64 controller poll format.
-    writeformat.cmd.txsize                = sizeof(writeformat.send);
-    writeformat.cmd.rxsize                = sizeof(writeformat.recv);
-    writeformat.send.cmdID                = CONT_CMD_READ_BUTTON;
+    writeformat.cmd.txsize          = sizeof(writeformat.send);
+    writeformat.cmd.rxsize          = sizeof(writeformat.recv);
+    writeformat.send.cmdID          = CONT_CMD_READ_BUTTON;
     memset(&writeformat.recv, 0xFF, sizeof(writeformat.recv));
 
     // GameCube controller poll format.
-    writeformatgcn.cmd.txsize             = sizeof(writeformatgcn.send);
-    writeformatgcn.cmd.rxsize             = sizeof(writeformatgcn.recv);
-    writeformatgcn.send.cmdID             = CONT_CMD_GCN_SHORT_POLL;
-    // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
-    // Mode 3 uses 8 bits for both c-stick and shoulder triggers.
-    writeformatgcn.send.analog_mode       = GCN_MODE_3_220;
-    writeformatgcn.send.rumble            = MOTOR_STOP;
+    writeformatgcn.cmd.txsize       = sizeof(writeformatgcn.send);
+    writeformatgcn.cmd.rxsize       = sizeof(writeformatgcn.recv);
+    writeformatgcn.send.cmdID       = CONT_CMD_GCN_SHORT_POLL;
+    writeformatgcn.send.analog_mode = GCN_MODE_3_220;
+    writeformatgcn.send.rumble      = MOTOR_STOP;
     memset(&writeformatgcn.recv, 0xFF, sizeof(writeformatgcn.recv));
 
     for (port = 0; port < __osMaxControllers; port++) {
@@ -226,33 +253,6 @@ static void __osPackReadData(void) {
     }
 
     *ptr = CONT_CMD_END;
-}
-
-/**
- * @brief Maps GCN input bits to N64 standard controller input bits.
- * Called by osContGetReadData and osContGetReadDataEx.
- */
-static u16 __osTranslateGCNButtons(GCNButtons gcn, s32 c_stick_x, s32 c_stick_y) {
-    N64Buttons n64 = { .raw = 0x0 };
-
-    n64.standard.A       = gcn.standard.A;
-    n64.standard.B       = gcn.standard.B;
-    n64.standard.Z       = gcn.standard.Z;
-    n64.standard.START   = gcn.standard.START;
-    n64.standard.D_UP    = gcn.standard.D_UP;
-    n64.standard.D_DOWN  = gcn.standard.D_DOWN;
-    n64.standard.D_LEFT  = gcn.standard.D_LEFT;
-    n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
-    n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on an N64 controller to recalibrate the analog stick (which also unsets the START bit).
-    n64.standard.unused  = gcn.standard.Y; // N64 controller's unused bit.
-    n64.standard.L       = gcn.standard.L;
-    n64.standard.R       = gcn.standard.R;
-    n64.standard.C_UP    = (c_stick_y >  GCN_C_STICK_THRESHOLD);
-    n64.standard.C_DOWN  = (c_stick_y < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C_LEFT  = (c_stick_x < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C_RIGHT = (c_stick_x >  GCN_C_STICK_THRESHOLD);
-
-    return n64.raw;
 }
 
 /////////////////
@@ -303,7 +303,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
             portInfo->type = ((s16)data->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : data->type;
 
             // Set this port's status.
-            data->status = requestHeader.recv.status;
+            data->status = requestHeader.recv.status.raw;
             portInfo->plugged = TRUE;
             bits |= (1 << port);
         }

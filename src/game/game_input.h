@@ -20,7 +20,7 @@
 #define CONT_STATUS_POLLING_TIME                    15
 
 struct DemoInput {
-    /*0x00*/ u8 timer; // time until next input. if this value is 0, it means the demo is over
+    /*0x00*/ u8 timer; // Time until next input. If this value is 0, it means the demo is over
     /*0x01*/ s8 rawStickX;
     /*0x02*/ s8 rawStickY;
     /*0x03*/ u8 buttonMask;
