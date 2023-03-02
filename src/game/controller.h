@@ -25,59 +25,51 @@
 // Input structs //
 ///////////////////
 
-typedef union {
-    struct PACKED {
-        /*0x00*/ u16 x : 8;
-        /*0x01*/ u16 y : 8;
-    }; /*0x02*/
-    /*0x00*/ u16 raw;
-} AnalogStick; /*0x02*/
-
 // -- N64 Standard Controller buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 A           : 1; // CONT_A
-    /*0x0*/ u16 B           : 1; // CONT_B
-    /*0x0*/ u16 Z           : 1; // CONT_G
-    /*0x0*/ u16 START       : 1; // CONT_START
-    /*0x0*/ u16 D_UP        : 1; // CONT_UP
-    /*0x0*/ u16 D_DOWN      : 1; // CONT_DOWN
-    /*0x0*/ u16 D_LEFT      : 1; // CONT_LEFT
-    /*0x0*/ u16 D_RIGHT     : 1; // CONT_RIGHT
-    /*0x1*/ u16 RESET       : 1; // CONT_RESET
-    /*0x1*/ u16 unused      : 1; // CONT_UNUSED
-    /*0x1*/ u16 L           : 1; // CONT_L
-    /*0x1*/ u16 R           : 1; // CONT_R
-    /*0x1*/ u16 C_UP        : 1; // CONT_E
-    /*0x1*/ u16 C_DOWN      : 1; // CONT_D
-    /*0x1*/ u16 C_LEFT      : 1; // CONT_C
-    /*0x1*/ u16 C_RIGHT     : 1; // CONT_F
+    /*0x0*/ u16 A               : 1; // CONT_A
+    /*0x0*/ u16 B               : 1; // CONT_B
+    /*0x0*/ u16 Z               : 1; // CONT_G
+    /*0x0*/ u16 START           : 1; // CONT_START
+    /*0x0*/ u16 D_UP            : 1; // CONT_UP
+    /*0x0*/ u16 D_DOWN          : 1; // CONT_DOWN
+    /*0x0*/ u16 D_LEFT          : 1; // CONT_LEFT
+    /*0x0*/ u16 D_RIGHT         : 1; // CONT_RIGHT
+    /*0x1*/ u16 RESET           : 1; // CONT_RESET
+    /*0x1*/ u16 unused          : 1; // CONT_UNUSED
+    /*0x1*/ u16 L               : 1; // CONT_L
+    /*0x1*/ u16 R               : 1; // CONT_R
+    /*0x1*/ u16 C_UP            : 1; // CONT_E
+    /*0x1*/ u16 C_DOWN          : 1; // CONT_D
+    /*0x1*/ u16 C_LEFT          : 1; // CONT_C
+    /*0x1*/ u16 C_RIGHT         : 1; // CONT_F
 } N64StandardButtons; /*0x02*/
 
 // -- Mouse buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 CLICK_LEFT  :  1;
-    /*0x0*/ u16 CLICK_RIGHT :  1;
-    /*0x0*/ u16             : 14;
+    /*0x0*/ u16 CLICK_LEFT      :  1;
+    /*0x0*/ u16 CLICK_RIGHT     :  1;
+    /*0x0*/ u16                 : 14;
 } N64MouseButtons; /*0x02*/
 
 // -- Train Controller buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 B           : 1;
-    /*0x0*/ u16 A           : 1;
-    /*0x0*/ u16 ACC1        : 1;
-    /*0x0*/ u16 START       : 1;
-    /*0x0*/ u16 ACC2        : 1;
-    /*0x0*/ u16 EX1         : 1;
-    /*0x0*/ u16 EX2         : 1;
-    /*0x0*/ u16 ACC3        : 1;
-    /*0x1*/ u16 EX3         : 1;
-    /*0x1*/ u16 EX4         : 1;
-    /*0x1*/ u16 C           : 1;
-    /*0x1*/ u16 SELECT      : 1;
-    /*0x1*/ u16 BRAKE       : 4;
+    /*0x0*/ u16 B               : 1;
+    /*0x0*/ u16 A               : 1;
+    /*0x0*/ u16 ACC1            : 1;
+    /*0x0*/ u16 START           : 1;
+    /*0x0*/ u16 ACC2            : 1;
+    /*0x0*/ u16 EX1             : 1;
+    /*0x0*/ u16 EX2             : 1;
+    /*0x0*/ u16 ACC3            : 1;
+    /*0x1*/ u16 EX3             : 1;
+    /*0x1*/ u16 EX4             : 1;
+    /*0x1*/ u16 C               : 1;
+    /*0x1*/ u16 SELECT          : 1;
+    /*0x1*/ u16 BRAKE           : 4;
 } N64TrainButtons; /*0x02*/
 
 // -- N64 buttons --
@@ -92,22 +84,22 @@ typedef union {
 // -- GCN Controller buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 ERRSTAT     : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
-    /*0x0*/ u16 ERRLATCH    : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR on GCN.
-    /*0x0*/ u16 GET_ORIGIN  : 1; // CONT_GCN_GET_ORIGIN
-    /*0x0*/ u16 START       : 1; // CONT_GCN_START
-    /*0x0*/ u16 Y           : 1; // CONT_GCN_Y
-    /*0x0*/ u16 X           : 1; // CONT_GCN_X
-    /*0x0*/ u16 B           : 1; // CONT_GCN_B
-    /*0x0*/ u16 A           : 1; // CONT_GCN_A
-    /*0x1*/ u16 USE_ORIGIN  : 1; // CONT_GCN_USE_ORIGIN
-    /*0x1*/ u16 L           : 1; // CONT_GCN_L
-    /*0x1*/ u16 R           : 1; // CONT_GCN_R
-    /*0x1*/ u16 Z           : 1; // CONT_GCN_Z
-    /*0x1*/ u16 D_UP        : 1; // CONT_GCN_UP
-    /*0x1*/ u16 D_DOWN      : 1; // CONT_GCN_DOWN
-    /*0x1*/ u16 D_RIGHT     : 1; // CONT_GCN_LEFT
-    /*0x1*/ u16 D_LEFT      : 1; // CONT_GCN_RIGHT
+    /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
+    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR on GCN.
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN
+    /*0x0*/ u16 START           : 1; // CONT_GCN_START
+    /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
+    /*0x0*/ u16 X               : 1; // CONT_GCN_X
+    /*0x0*/ u16 B               : 1; // CONT_GCN_B
+    /*0x0*/ u16 A               : 1; // CONT_GCN_A
+    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN
+    /*0x1*/ u16 L               : 1; // CONT_GCN_L
+    /*0x1*/ u16 R               : 1; // CONT_GCN_R
+    /*0x1*/ u16 Z               : 1; // CONT_GCN_Z
+    /*0x1*/ u16 D_UP            : 1; // CONT_GCN_UP
+    /*0x1*/ u16 D_DOWN          : 1; // CONT_GCN_DOWN
+    /*0x1*/ u16 D_RIGHT         : 1; // CONT_GCN_LEFT
+    /*0x1*/ u16 D_LEFT          : 1; // CONT_GCN_RIGHT
 } GCNStandardButtons; /*0x02*/
 
 typedef struct PACKED {
@@ -128,6 +120,30 @@ typedef union {
     GCNDKBongosButtons dkbongos;
     u16 raw;
 } GCNButtons; /*0x02*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ union {
+            u8 x:4, l:4, a:4;
+        };
+        /*0x00*/ union {
+            u8 y:4, r:4, b:4;
+        };
+    }; /*0x01*/
+    /*0x00*/ u8 raw;
+} Analog8; /*0x01*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ union {
+            u8 x, l, a;
+        };
+        /*0x01*/ union {
+            u8 y, r, b;
+        };
+    }; /*0x02*/
+    /*0x00*/ u16 raw;
+} Analog16; /*0x02*/
 
 /**
  * 00000000 00000000
@@ -196,7 +212,7 @@ typedef struct PACKED {
 typedef union {
     struct PACKED {
         /*0x00*/ N64Buttons buttons;    // The received button data.
-        /*0x02*/ AnalogStick stick;     // The received analog stick position [-80, 80].
+        /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
     }; /*0x04*/
     u32 raw;
 } N64InputData; /*0x04*/
@@ -279,8 +295,7 @@ typedef union {
         /*0x00*/ u8             : 5; // These bits have never been seen set.
         /*0x00*/ u8 crystalFail : 1; // If this bit is set, the crystal is not working.
         /*0x00*/ u8 batteryFail : 1; // If this bit is set, the supply voltage of the RTC became too low.
-
-    } bits;
+    } bits; /*0x01*/
     u8 raw;
 } RTCStatus; /*0x01*/
 
@@ -300,23 +315,23 @@ typedef union {
     struct PACKED {
         /*0x00*/ union {
                 struct PACKED {
-                    u8          : 6;    // Always 0.
-                    u8 RTC      : 1;    // Write protects field 2 (RTC).
-                    u8 NVRAM    : 1;    // Write protects field 1 (NVRAM).
-                };
+                    /*0x00*/ u8          : 6;    // Always 0.
+                    /*0x00*/ u8 RTC      : 1;    // Write protects field 2 (RTC).
+                    /*0x00*/ u8 NVRAM    : 1;    // Write protects field 1 (NVRAM).
+                }; /*0x01*/
                 u8 raw;
             } writeProtect;
         /*0x01*/ union {
                 struct PACKED {
-                    u8 unknown  : 1;    // Exists, changeable, no visible function.
-                    u8          : 4;    // Always 0.
-                    u8 stop     : 2;    // If either bit is set, stops RTC from counting.
-                    u8          : 1;    // Always 0.
-                };
+                    /*0x00*/ u8 unknown  : 1;    // Exists, changeable, no visible function.
+                    /*0x00*/ u8          : 4;    // Always 0.
+                    /*0x00*/ u8 stop     : 2;    // If either bit is set, stops RTC from counting.
+                    /*0x00*/ u8          : 1;    // Always 0.
+                }; /*0x01*/
                 u8 raw;
             } control;
         /*0x02*/ u8 unused0[2];
-        /*0x04*/ u8 writable[2];    // Can be updated but have no visible function.
+        /*0x04*/ u8 unknown[2];     // Can be updated but have no visible function.
         /*0x06*/ u8 unused1[2];
     } block0; // Block 0: Control Registers. Determines the current clock "mode".
     struct PACKED {
@@ -366,17 +381,60 @@ typedef struct PACKED {
 
 // -- GCN Controller Input poll & calibration --
 
+enum OSGCNModes {
+    GCN_MODE_0_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_1_121, // 1-byte c-stick, 2-byte triggers, 1-byte buttons.
+    GCN_MODE_2_112, // 1-byte c-stick, 1-byte triggers, 2-byte buttons.
+    GCN_MODE_3_220, // 2-byte c-stick, 2-byte triggers, 0-byte buttons.
+    GCN_MODE_4_202, // 2-byte c-stick, 0-byte triggers, 2-byte buttons.
+    GCN_MODE_5_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_6_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_7_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
+};
+
 typedef union {
     struct PACKED {
         /*0x00*/ GCNButtons buttons;    // The received button data.
-        /*0x02*/ AnalogStick stick;     // The received analog stick position [-80, 80].
-        /*0x04*/ AnalogStick c_stick;   // The received C stick position [-80, 80].
-        /*0x06*/ u8 l_trig;             // The received L trigger position [0, 255].
-        /*0x07*/ u8 r_trig;             // The received R trigger position [0, 255]. The DK Bongos' clap detector microphone uses this.
+        /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
+        union {
+            struct PACKED {
+                /*0x00*/ Analog16 c_stick;  // The received C stick position [-80, 80].
+                /*0x02*/ Analog8  trig;     // The received trigger position [0, 255].
+                /*0x03*/ Analog8  buttons;  // Analog buttons used by some controllers.
+            } m0; /*0x04*/ // used for modes 0, 5, 6, 7 
+            struct PACKED {
+                /*0x00*/ Analog8  c_stick;  // The received C stick position [-80, 80].
+                /*0x01*/ Analog16 trig;     // The received trigger position [0, 255].
+                /*0x03*/ Analog8  buttons;  // Analog buttons used by some controllers.
+            } m1; /*0x04*/
+            struct PACKED {
+                /*0x00*/ Analog8  c_stick;  // The received C stick position [-80, 80].
+                /*0x01*/ Analog8  trig;     // The received trigger position [0, 255].
+                /*0x02*/ Analog16 buttons;  // Analog buttons used by some controllers.
+            } m2; /*0x04*/
+            struct PACKED {
+                /*0x00*/ Analog16  c_stick; // The received C stick position [-80, 80].
+                /*0x02*/ Analog16  trig;    // The received trigger position [0, 255].
+            } m3; /*0x04*/
+            struct PACKED {
+                /*0x00*/ Analog16  c_stick; // The received C stick position [-80, 80].
+                /*0x02*/ Analog16  buttons; // Analog buttons used by some controllers.
+            } m4; /*0x04*/
+            struct PACKED {
+                /*0x00*/ u8 keypress[3];    // Which keys are pressed (up to 3 keys can be pressed at a time).
+                /*0x03*/ u8 status;         // Keyboard status.
+            } keyboard; /*0x04*/
+            struct PACKED {
+                /*0x00*/ u8 unused[3];
+                /*0x03*/ u8 mic;            // The DK Bongos' clap detector microphone.
+            } bongos; /*0x04*/
+        };
     }; /*0x08*/
-    struct PACKED {
-        /*0x00*/ u32 raw[2];
-    }; /*0x08*/
+    union {
+        u32 u32[2];
+        u16 u16[4];
+        u8  u8[8];
+    } raw; /*0x08*/
 } GCNInputData; /*0x08*/
 
 // 0x40: CONT_CMD_GCN_SHORT_POLL
@@ -384,8 +442,8 @@ typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
         /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
-        /*0x03*/ u8 analog_mode;        // Analog mode. //! TODO: documentation
-        /*0x04*/ u8 rumble;             // Rumble bit.
+        /*0x03*/ u8 analog_mode;        // Analog mode (see OSGCNModes).
+        /*0x04*/ u8 rumble;             // Rumble byte.
     } send; /*0x03*/
     /*0x05*/ struct PACKED {
         /*0x05*/ GCNInputData input;    // The received input data.
@@ -499,8 +557,8 @@ enum PIFStatuses {
 
 typedef struct PACKED {
     /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
-    /*0x01*/ AnalogStick stick;         // The received analog stick position [-80, 80].
-    /*0x03*/ AnalogStick c_stick;       // The received C stick X position [-80, 80].
+    /*0x01*/ Analog16 stick;            // The received analog stick position [-80, 80].
+    /*0x03*/ Analog16 c_stick;           // The received C stick X position [-80, 80].
 } OSContCenter; /*0x05*/
 
 typedef struct PACKED {

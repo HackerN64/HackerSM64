@@ -63,6 +63,9 @@ void osContGetReadDataEx(OSContPadEx* data) {
     __OSContReadFormat readformat;
     __OSContGCNShortPollFormat readformatgcn;
     OSPortInfo* portInfo = NULL;
+    OSContCenter* contCenter = NULL;
+    s32 stick_x, stick_y, c_stick_x, c_stick_y, l_trig, r_trig;
+    u8 cmdID = CONT_CMD_SKIP_CHNL;
     int port;
 
     for (port = 0; port < __osMaxControllers; port++) {
@@ -70,53 +73,98 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             // If a controller being read was unplugged, start status polling on all 4 ports.
-            if (CHNL_ERR((*(__OSContReadFormat*)ptr).cmd) & (CHNL_ERR_NORESP >> 4)) {
+            if (CHNL_ERR(*(OSContCmdData*)ptr) & (CHNL_ERR_NORESP >> 4)) {
                 start_controller_status_polling();
                 return;
             }
 
-            if (portInfo->type & CONT_CONSOLE_GCN) {
-                OSContCenter* contCenter = &gPortInfo[port].contCenter;
-                s32 stick_x, stick_y, c_stick_x, c_stick_y;
-                readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
-                data->errno = CHNL_ERR(readformatgcn.cmd);
+            cmdID = (*(__OSContReadFormat*)ptr).send.cmdID;
 
-                if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                    if (!contCenter->initialized) {
-                        contCenter->initialized = TRUE;
-                        contCenter->stick.x     = readformatgcn.recv.input.stick.x;
-                        contCenter->stick.y     = readformatgcn.recv.input.stick.y;
-                        contCenter->c_stick.x   = readformatgcn.recv.input.c_stick.x;
-                        contCenter->c_stick.y   = readformatgcn.recv.input.c_stick.y;
+            switch (cmdID) {
+                case CONT_CMD_READ_BUTTON:
+                    readformat = *(__OSContReadFormat*)ptr;
+                    data->errno = CHNL_ERR(readformat.cmd);
+
+                    if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+                        data->button    = readformat.recv.input.buttons.raw;
+                        data->stick_x   = readformat.recv.input.stick.x;
+                        data->stick_y   = readformat.recv.input.stick.y;
+                        data->c_stick_x = 0;
+                        data->c_stick_y = 0;
+                        data->l_trig    = 0;
+                        data->r_trig    = 0;
                     }
 
-                    data->stick_x   = stick_x   = CLAMP_S8(((s32)readformatgcn.recv.input.stick.x  ) - contCenter->stick.x  );
-                    data->stick_y   = stick_y   = CLAMP_S8(((s32)readformatgcn.recv.input.stick.y  ) - contCenter->stick.y  );
-                    data->c_stick_x = c_stick_x = CLAMP_S8(((s32)readformatgcn.recv.input.c_stick.x) - contCenter->c_stick.x);
-                    data->c_stick_y = c_stick_y = CLAMP_S8(((s32)readformatgcn.recv.input.c_stick.y) - contCenter->c_stick.y);
-                    data->button    = __osTranslateGCNButtons(readformatgcn.recv.input.buttons, c_stick_x, c_stick_y);
-                    data->l_trig    = readformatgcn.recv.input.l_trig;
-                    data->r_trig    = readformatgcn.recv.input.r_trig;
-                } else {
-                    contCenter->initialized = FALSE;
-                }
+                    ptr += sizeof(__OSContReadFormat);
+                    break;
+                case CONT_CMD_GCN_SHORT_POLL:
+                    contCenter = &gPortInfo[port].contCenter;
+                    readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
+                    data->errno = CHNL_ERR(readformatgcn.cmd);
 
-                ptr += sizeof(__OSContGCNShortPollFormat);
-            } else {
-                readformat = *(__OSContReadFormat*)ptr;
-                data->errno = CHNL_ERR(readformat.cmd);
+                    if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+                        stick_x = readformatgcn.recv.input.stick.x;
+                        stick_y = readformatgcn.recv.input.stick.y;
 
-                if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                    data->button    = readformat.recv.input.buttons.raw;
-                    data->stick_x   = readformat.recv.input.stick.x;
-                    data->stick_y   = readformat.recv.input.stick.y;
-                    data->c_stick_x = 0;
-                    data->c_stick_y = 0;
-                    data->l_trig    = 0;
-                    data->r_trig    = 0;
-                }
+                        // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
+                        switch (readformatgcn.send.analog_mode) {
+                            default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
+                                c_stick_x = (readformatgcn.recv.input.m0.c_stick.x << 0);
+                                c_stick_y = (readformatgcn.recv.input.m0.c_stick.y << 0);
+                                l_trig    = (readformatgcn.recv.input.m0.trig.l    << 4);
+                                r_trig    = (readformatgcn.recv.input.m0.trig.r    << 4);
+                                break;
+                            case GCN_MODE_1_121:
+                                c_stick_x = (readformatgcn.recv.input.m1.c_stick.x << 4);
+                                c_stick_y = (readformatgcn.recv.input.m1.c_stick.y << 4);
+                                l_trig    = (readformatgcn.recv.input.m1.trig.l    << 0);
+                                r_trig    = (readformatgcn.recv.input.m1.trig.r    << 0);
+                                break;
+                            case GCN_MODE_2_112:
+                                c_stick_x = (readformatgcn.recv.input.m2.c_stick.x << 4);
+                                c_stick_y = (readformatgcn.recv.input.m2.c_stick.y << 4);
+                                l_trig    = (readformatgcn.recv.input.m2.trig.l    << 4);
+                                r_trig    = (readformatgcn.recv.input.m2.trig.r    << 4);
+                                break;
+                            case GCN_MODE_3_220:
+                                c_stick_x = (readformatgcn.recv.input.m3.c_stick.x << 0);
+                                c_stick_y = (readformatgcn.recv.input.m3.c_stick.y << 0);
+                                l_trig    = (readformatgcn.recv.input.m3.trig.l    << 0);
+                                r_trig    = (readformatgcn.recv.input.m3.trig.r    << 0);
+                                break;
+                            case GCN_MODE_4_202:
+                                c_stick_x = (readformatgcn.recv.input.m3.c_stick.x << 0);
+                                c_stick_y = (readformatgcn.recv.input.m3.c_stick.y << 0);
+                                l_trig    = 0;
+                                r_trig    = 0;
+                                break;
+                        }
 
-                ptr += sizeof(__OSContReadFormat);
+                        // Store the origins for the controller's analog sticks the first time it is conencted.
+                        if (!contCenter->initialized) {
+                            contCenter->initialized = TRUE;
+                            contCenter->stick.x     = stick_x;
+                            contCenter->stick.y     = stick_y;
+                            contCenter->c_stick.x   = c_stick_x;
+                            contCenter->c_stick.y   = c_stick_y;
+                        }
+
+                        data->stick_x   = stick_x   = CLAMP_S8(stick_x   - contCenter->stick.x  );
+                        data->stick_y   = stick_y   = CLAMP_S8(stick_y   - contCenter->stick.y  );
+                        data->c_stick_x = c_stick_x = CLAMP_S8(c_stick_x - contCenter->c_stick.x);
+                        data->c_stick_y = c_stick_y = CLAMP_S8(c_stick_y - contCenter->c_stick.y);
+                        data->l_trig    = l_trig;
+                        data->r_trig    = r_trig;
+                        data->button    = __osTranslateGCNButtons(readformatgcn.recv.input.buttons, c_stick_x, c_stick_y);
+                    } else {
+                        contCenter->initialized = FALSE;
+                    }
+
+                    ptr += sizeof(__OSContGCNShortPollFormat);
+                    break;
+                default:
+                    osSyncPrintf("ERROR: Unknown input poll command.\n");
+                    return;
             }
         } else {
             // Skip empty channels/ports.
@@ -147,8 +195,7 @@ static void __osPackReadData(void) {
     writeformat.cmd.txsize                = sizeof(writeformat.send);
     writeformat.cmd.rxsize                = sizeof(writeformat.recv);
     writeformat.send.cmdID                = CONT_CMD_READ_BUTTON;
-    writeformat.recv.input.buttons.raw    = 0xFFFF;
-    writeformat.recv.input.stick.raw      = 0xFFFF;
+    memset(&writeformat.recv, 0xFF, sizeof(writeformat.recv));
 
     // GameCube controller poll format.
     writeformatgcn.cmd.txsize             = sizeof(writeformatgcn.send);
@@ -156,12 +203,9 @@ static void __osPackReadData(void) {
     writeformatgcn.send.cmdID             = CONT_CMD_GCN_SHORT_POLL;
     // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
     // Mode 3 uses 8 bits for both c-stick and shoulder triggers.
-    // https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/HW/SI/SI_DeviceGCController.cpp
-    // https://github.com/extremscorner/gba-as-controller/blob/gc/controller/source/main.iwram.c
-    writeformatgcn.send.analog_mode       = 3;
+    writeformatgcn.send.analog_mode       = GCN_MODE_3_220;
     writeformatgcn.send.rumble            = MOTOR_STOP;
-    writeformatgcn.recv.input.buttons.raw = 0xFFFF;
-    writeformatgcn.recv.input.stick.raw   = 0xFFFF;
+    memset(&writeformatgcn.recv, 0xFF, sizeof(writeformatgcn.recv));
 
     for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
