@@ -116,7 +116,11 @@ typedef union {
         /*0x00*/ N64Buttons buttons;    // The received button data.
         /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
     }; /*0x04*/
-    u32 raw;
+    union {
+        u8 u8[4];
+        u16 u16[2];
+        u32 u32[1];
+    } raw;
 } N64InputData; /*0x04*/
 
 // -- GCN Controller buttons --
@@ -166,14 +170,14 @@ typedef union {
 // -- GCN Analog Modes --
 
 enum OSGCNAnalogModes {
-    GCN_MODE_0_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
-    GCN_MODE_1_121, // 1-byte c-stick, 2-byte triggers, 1-byte buttons.
-    GCN_MODE_2_112, // 1-byte c-stick, 1-byte triggers, 2-byte buttons.
-    GCN_MODE_3_220, // 2-byte c-stick, 2-byte triggers, 0-byte buttons.
-    GCN_MODE_4_202, // 2-byte c-stick, 0-byte triggers, 2-byte buttons.
-    GCN_MODE_5_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
-    GCN_MODE_6_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
-    GCN_MODE_7_211, // 2-byte c-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_0_211, // 2-byte C-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_1_121, // 1-byte C-stick, 2-byte triggers, 1-byte buttons.
+    GCN_MODE_2_112, // 1-byte C-stick, 1-byte triggers, 2-byte buttons.
+    GCN_MODE_3_220, // 2-byte C-stick, 2-byte triggers, 0-byte buttons.
+    GCN_MODE_4_202, // 2-byte C-stick, 0-byte triggers, 2-byte buttons.
+    GCN_MODE_5_211, // 2-byte C-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_6_211, // 2-byte C-stick, 1-byte triggers, 1-byte buttons.
+    GCN_MODE_7_211, // 2-byte C-stick, 1-byte triggers, 1-byte buttons.
 };
 
 // -- GCN Input Data union --
@@ -184,30 +188,30 @@ typedef union {
         /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
         union {
             struct PACKED { // Default, same as mode 3.
-                /*0x00*/ Analog16  c_stick; // The received C stick position [-80, 80].
+                /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
                 /*0x02*/ Analog16  trig;    // The received trigger position [0, 255].
             }; /*0x04*/
             struct PACKED { // Mode 0, 5, 6, 7.
-                /*0x00*/ Analog16 c_stick;  // The received C stick position [-80, 80].
+                /*0x00*/ Analog16 c_stick;  // The received C-stick position [-80, 80].
                 /*0x02*/ Analog8  trig;     // The received trigger position [0, 255].
                 /*0x03*/ Analog8  buttons;  // Analog buttons used by some controllers.
             } m0; /*0x04*/
             struct PACKED { // Mode 1.
-                /*0x00*/ Analog8  c_stick;  // The received C stick position [-80, 80].
+                /*0x00*/ Analog8  c_stick;  // The received C-stick position [-80, 80].
                 /*0x01*/ Analog16 trig;     // The received trigger position [0, 255].
                 /*0x03*/ Analog8  buttons;  // Analog buttons used by some controllers.
             } m1; /*0x04*/
             struct PACKED { // Mode 2.
-                /*0x00*/ Analog8  c_stick;  // The received C stick position [-80, 80].
+                /*0x00*/ Analog8  c_stick;  // The received C-stick position [-80, 80].
                 /*0x01*/ Analog8  trig;     // The received trigger position [0, 255].
                 /*0x02*/ Analog16 buttons;  // Analog buttons used by some controllers.
             } m2; /*0x04*/
             struct PACKED { // Mode 3.
-                /*0x00*/ Analog16  c_stick; // The received C stick position [-80, 80].
+                /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
                 /*0x02*/ Analog16  trig;    // The received trigger position [0, 255].
             } m3; /*0x04*/
             struct PACKED { // Mode 4.
-                /*0x00*/ Analog16  c_stick; // The received C stick position [-80, 80].
+                /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
                 /*0x02*/ Analog16  buttons; // Analog buttons used by some controllers.
             } m4; /*0x04*/
             struct PACKED { // ASCII Controller.
@@ -221,9 +225,9 @@ typedef union {
         };
     }; /*0x08*/
     union {
-        u32 u32[2];
+        u8 u8[8];
         u16 u16[4];
-        u8  u8[8];
+        u32 u32[2];
     } raw; /*0x08*/
 } GCNInputData; /*0x08*/
 
@@ -252,14 +256,6 @@ typedef struct PACKED {
     /*0x00*/ u8 txsize;             // Number of bytes to transmit.
     /*0x01*/ u8 rxsize;             // Number of bytes to receive.
 } OSContCmdData; /*0x02*/
-
-typedef union {
-    struct PACKED {
-        /*0x00*/ u8 h;              // HI byte.
-        /*0x01*/ u8 l;              // LO byte.
-    }; /*0x02*/
-    u16 hl;
-} HiLo16; /*0x02*/
 
 /////////////////////////////////////
 // Specific command format structs //
@@ -530,7 +526,7 @@ typedef struct PACKED {
         /*0x04*/ u8 rumble;             // Rumble byte.
     } send; /*0x03*/
     /*0x0D*/ struct PACKED {
-        /*0x05*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte c-stick and triggers) regardless of input command.
+        /*0x05*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte C-stick and triggers) regardless of input command.
         /*0x0D*/ Analog16 buttons;      // Analog buttons used by some controllers.
     } recv; /*0x0A*/
 } __OSContGCNLongPollFormat; /*0x0F*/
@@ -658,7 +654,7 @@ enum PIFStatuses {
 typedef struct PACKED {
     /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
     /*0x01*/ Analog16 stick;            // The received analog stick position [-80, 80].
-    /*0x03*/ Analog16 c_stick;          // The received C stick X position [-80, 80].
+    /*0x03*/ Analog16 c_stick;          // The received C-stick X position [-80, 80].
 } OSContCenter; /*0x05*/
 
 typedef struct PACKED {
@@ -666,19 +662,21 @@ typedef struct PACKED {
     /*0x02*/ u16 accessory;             // Accessory type.
     /*0x02*/ u16 pollingInput;          // Input, only used when status polling.
     /*0x04*/ u8 plugged;                // Whether a controller is plugged in.
-    /*0x05*/ u8 playerNum;              // 0-4. 0 = not assigned to a player.
-    /*0x06*/ OSContCenter contCenter;   // Gamecube Controller Center.
-    /*0x0B*/ u8 gcRumble;               // GameCube Rumble status.
+    /*0x05*/ u8 playerNum;              // [0, 4]. 0 = not assigned to a player.
+    /*0x06*/ OSContCenter contCenter;   // GCN Controller Center.
+    /*0x0B*/ u8 gcRumble;               // GCN Rumble byte.
 } OSPortInfo; /*0x0C*/
 
 /////////////
 // externs //
 /////////////
 
+// From vanilla libultra:
 extern OSPifRam __osContPifRam;     // A buffer for the PIF RAM.
-extern u8       __osMaxControllers; // The last port to read controllers on..
+extern u8       __osMaxControllers; // The last port to read controllers on.
 extern u8       __osContLastCmd;    // The ID of the last command that was executed.
 
+// From HackerSM64:
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
 
 #endif /* CONTROLLER_H */

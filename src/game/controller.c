@@ -115,6 +115,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
     for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
 
+        // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             readformatptr = (__OSContReadFormat*)ptr;
             data->errno = CHNL_ERR(readformatptr->cmd);
@@ -128,7 +129,8 @@ void osContGetReadDataEx(OSContPadEx* data) {
             switch (readformatptr->send.cmdID) {
                 case CONT_CMD_READ_BUTTON:
                     if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                        n64Input        = (*(__OSContReadFormat*)ptr).recv.input;
+                        n64Input = (*(__OSContReadFormat*)ptr).recv.input;
+
                         data->button    = n64Input.buttons.raw;
                         data->stick_x   = n64Input.stick.x;
                         data->stick_y   = n64Input.stick.y;
@@ -140,12 +142,13 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
                     ptr += sizeof(__OSContReadFormat);
                     break;
+
                 case CONT_CMD_GCN_SHORT_POLL:
                     contCenter = &gPortInfo[port].contCenter;
 
                     if (data->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
-                        Analog16 c_stick, trig;
                         gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
+                        Analog16 c_stick, trig;
 
                         // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
                         switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
@@ -178,6 +181,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
                     ptr += sizeof(__OSContGCNShortPollFormat);
                     break;
+
                 case CONT_CMD_GCN_LONG_POLL:
                     contCenter = &gPortInfo[port].contCenter;
 
@@ -191,6 +195,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
 
                     ptr += sizeof(__OSContGCNLongPollFormat);
                     break;
+
                 default:
                     osSyncPrintf("osContGetReadDataEx: Unknown input poll command: %.02X\n", readformatptr->send.cmdID);
                     return;
@@ -204,6 +209,24 @@ void osContGetReadDataEx(OSContPadEx* data) {
     }
 }
 
+// Default N64 Controller Input Poll command:
+static const __OSContReadFormat sN64WriteFormat = {
+    .cmd.txsize         = sizeof(((__OSContReadFormat*)0)->send),
+    .cmd.rxsize         = sizeof(((__OSContReadFormat*)0)->recv),
+    .send.cmdID         = CONT_CMD_READ_BUTTON,
+    .recv.input.raw     = -1,
+};
+
+// Default GCN Controller Input Short Poll command:
+static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
+    .cmd.txsize         = sizeof(((__OSContGCNShortPollFormat*)0)->send),
+    .cmd.rxsize         = sizeof(((__OSContGCNShortPollFormat*)0)->recv),
+    .send.cmdID         = CONT_CMD_READ_BUTTON,
+    .send.analog_mode   = GCN_MODE_3_220,
+    .send.rumble        = MOTOR_STOP,
+    .recv.input.raw     = -1,
+};
+
 /**
  * @brief Writes PIF commands to poll controller inputs.
  * Modified from vanilla libultra to handle GameCube controllers and skip empty/unassigned ports.
@@ -211,39 +234,25 @@ void osContGetReadDataEx(OSContPadEx* data) {
  */
 static void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContReadFormat writeformat;
-    __OSContGCNShortPollFormat writeformatgcn;
     OSPortInfo* portInfo = NULL;
     int port;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
-
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
-
-    // N64 controller poll format.
-    writeformat.cmd.txsize          = sizeof(writeformat.send);
-    writeformat.cmd.rxsize          = sizeof(writeformat.recv);
-    writeformat.send.cmdID          = CONT_CMD_READ_BUTTON;
-    memset(&writeformat.recv, 0xFF, sizeof(writeformat.recv));
-
-    // GameCube controller poll format.
-    writeformatgcn.cmd.txsize       = sizeof(writeformatgcn.send);
-    writeformatgcn.cmd.rxsize       = sizeof(writeformatgcn.recv);
-    writeformatgcn.send.cmdID       = CONT_CMD_GCN_SHORT_POLL;
-    writeformatgcn.send.analog_mode = GCN_MODE_3_220;
-    writeformatgcn.send.rumble      = MOTOR_STOP;
-    memset(&writeformatgcn.recv, 0xFF, sizeof(writeformatgcn.recv));
 
     for (port = 0; port < __osMaxControllers; port++) {
         portInfo = &gPortInfo[port];
 
+        // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             if (portInfo->type & CONT_CONSOLE_GCN) {
-                writeformatgcn.send.rumble = portInfo->gcRumble;
-                *(__OSContGCNShortPollFormat*)ptr = writeformatgcn;
+                (*(__OSContGCNShortPollFormat*)ptr)= sGCNWriteFormatShort;
+                (*(__OSContGCNShortPollFormat*)ptr).send.rumble = portInfo->gcRumble;
+
                 ptr += sizeof(__OSContGCNShortPollFormat);
             } else {
-                *(__OSContReadFormat*)ptr = writeformat;
+                (*(__OSContReadFormat*)ptr) = sN64WriteFormat;
+
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
@@ -319,6 +328,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 // motor.c //
 /////////////
 
+// A buffer to hold the rumble commands for each port.
 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 /**
@@ -354,7 +364,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
 
         __OSContRamWriteFormat* readformat = (__OSContRamWriteFormat*)ptr;
 
-        // Set the entire block to either
+        // Set the entire block to either MOTOR_STOP or MOTOR_START.
         memset(readformat->send.data, flag, sizeof(readformat->send.data));
 
         __osContLastCmd = CONT_CMD_END;

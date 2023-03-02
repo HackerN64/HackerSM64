@@ -83,42 +83,6 @@ u8 sSpawnTypeFromWarpBhv[] = {
     MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
 };
 
-ALIGNED4 static const struct ControllerIcon gControllerIcons[] = {
-    { .type = CONT_NONE,                .texture = texture_controller_port         },
-    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
-    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
-    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
-    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
-    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
-    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
-    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
-    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird },
-    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel    },
-    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
-    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
-};
-
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
-static const char* sButtonStr[16] = {
-    "A",       // A_BUTTON
-    "B",       // B_BUTTON
-    "Z",       // Z_TRIG
-    "START",   // START_BUTTON
-    "D UP",    // U_JPAD
-    "D DOWN",  // D_JPAD
-    "D LEFT",  // L_JPAD
-    "D RIGHT", // R_JPAD
-    "X",       // X_BUTTON
-    "Y",       // Y_BUTTON
-    "L",       // L_TRIG
-    "R",       // R_TRIG
-    "C UP",    // U_CBUTTONS
-    "C DOWN",  // D_CBUTTONS
-    "C LEFT",  // L_CBUTTONS
-    "C RIGHT", // R_CBUTTONS
-};
-#endif
-
 Vp gViewport = {
     .vp = {
         .vscale = { (SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2), (G_MAXZ / 2), 0 },
@@ -397,6 +361,63 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
+ALIGNED8 static const char* sButtonStr[16] = {
+    "A",       // A_BUTTON
+    "B",       // B_BUTTON
+    "Z",       // Z_TRIG
+    "START",   // START_BUTTON
+    "D UP",    // U_JPAD
+    "D DOWN",  // D_JPAD
+    "D LEFT",  // L_JPAD
+    "D RIGHT", // R_JPAD
+    "X",       // X_BUTTON
+    "Y",       // Y_BUTTON
+    "L",       // L_TRIG
+    "R",       // R_TRIG
+    "C UP",    // U_CBUTTONS
+    "C DOWN",  // D_CBUTTONS
+    "C LEFT",  // L_CBUTTONS
+    "C RIGHT", // R_CBUTTONS
+};
+
+/**
+ * Creates a string from a combination of buttons and adds it to 'strp'.
+ */
+static size_t button_combo_to_string(char *strp, u16 buttons) {
+    size_t count = 0;
+
+    for (int i = 0; i < ARRAY_COUNT(sButtonStr); i++) {
+        if (buttons & ((1 << (ARRAY_COUNT(sButtonStr) - 1)) >> i)) { // 0x8000 >> i
+            if (count) {
+                strcat(strp, "+");
+                count += strlen("+");
+            }
+
+            strcat(strp, sButtonStr[i]);
+            count += strlen(sButtonStr[i]);
+        }
+    }
+
+    return count;
+}
+#endif
+
+ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
+    { .type = CONT_NONE,                .texture = texture_controller_port         },
+    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
+    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
+    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
+    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
+    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
+    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
+    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
+    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird },
+    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel    },
+    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
+    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
+};
+
 static const Gfx dl_controller_icons_begin[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_COPY),
@@ -416,29 +437,6 @@ static const Gfx dl_controller_icons_end[] = {
     gsDPSetAlphaCompare(G_AC_NONE),
     gsSPEndDisplayList(),
 };
-
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
-/**
- * Creates a string from a combination of buttons and adds it to 'strp'.
- */
-static u32 button_combo_to_string(char *strp, u16 buttons) {
-    u32 count = 0;
-
-    for (int i = 0; i < ARRAY_COUNT(sButtonStr); i++) {
-        if (buttons & ((1 << (ARRAY_COUNT(sButtonStr) - 1)) >> i)) { // 0x8000 >> i
-            if (count) {
-                strcat(strp, "+");
-                count += strlen("+");
-            }
-
-            strcat(strp, sButtonStr[i]);
-            count += strlen(sButtonStr[i]);
-        }
-    }
-
-    return count;
-}
-#endif
 
 /**
  * Displays controller info (eg. type and player number) while polling for controller statuses.
@@ -475,10 +473,10 @@ void render_controllers_overlay(void) {
     for (port = 0; port < MAXCONTROLLERS; port++) {
         portInfo = &gPortInfo[port];
 
-        // Loop through gControllerIcons to get the port's corresponding texture.
-        for (int i = 0; i < ARRAY_COUNT(gControllerIcons); i++) {
-            if (portInfo->type == gControllerIcons[i].type) {
-                texture_controller = gControllerIcons[i].texture;
+        // Loop through sControllerIcons to get the port's corresponding texture.
+        for (int i = 0; i < ARRAY_COUNT(sControllerIcons); i++) {
+            if (portInfo->type == sControllerIcons[i].type) {
+                texture_controller = sControllerIcons[i].texture;
                 break;
             }
         }
@@ -514,7 +512,7 @@ void render_controllers_overlay(void) {
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
             char comboStr[32] = "";
-            u32 count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
+            size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
             s32 xOffset = ((strlen("ORTOEXIT") + 1 + count) / 2) * 7; // Center the text based on char count.
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
