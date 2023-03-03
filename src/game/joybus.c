@@ -74,7 +74,7 @@ static void __osContWriteGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16
     // Map GCN button bits to N64 button bits.
     n64.standard.A       = gcn.standard.A;
     n64.standard.B       = gcn.standard.B;
-    n64.standard.Z       = (trig.l > GCN_TRIGGER_THRESHOLD);
+    n64.standard.Z       = (trig.l > GCN_TRIGGER_THRESHOLD); // Swap L and Z.
     n64.standard.START   = gcn.standard.START;
     n64.standard.D_UP    = gcn.standard.D_UP;
     n64.standard.D_DOWN  = gcn.standard.D_DOWN;
@@ -82,7 +82,7 @@ static void __osContWriteGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16
     n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
     n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on an N64 controller to recalibrate the analog stick (which also unsets the START bit).
     n64.standard.unused  = gcn.standard.Y; // The N64 controller's unused bit.
-    n64.standard.L       = gcn.standard.Z;
+    n64.standard.L       = gcn.standard.Z; // Swap L and Z.
     n64.standard.R       = gcn.standard.R;
     n64.standard.C_UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
     n64.standard.C_DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
@@ -105,14 +105,14 @@ void osContGetReadDataEx(OSContPadEx* pad) {
     N64InputData n64Input;
     GCNInputData gcnInput;
 
-    while (*ptr != CONT_CMD_END) {
-        if (*ptr == CONT_CMD_SKIP_CHNL) {
+    while (*ptr != PIF_CMD_END) {
+        if (*ptr == PIF_CMD_SKIP_CHNL) {
             // Skip empty channels/ports.
             pad++;
             ptr++;
             continue;
         }
-        if (*ptr == CONT_CMD_NOP) {
+        if (*ptr == PIF_CMD_NOP) {
             // Skip 0xFF bytes.
             ptr++;
             continue;
@@ -129,7 +129,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
         switch (readformatptr->send.cmdID) {
             case CONT_CMD_READ_BUTTON:
-                if (pad->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+                if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
 
                     pad->button  = n64Input.buttons.raw;
@@ -142,7 +142,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 break;
 
             case CONT_CMD_GCN_SHORT_POLL:
-                if (pad->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+                if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
                     Analog16 c_stick, trig;
 
@@ -179,7 +179,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 break;
 
             case CONT_CMD_GCN_LONG_POLL:
-                if (pad->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+                if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     gcnInput = (*(__OSContGCNLongPollFormat*)ptr).recv.input;
 
                     // Long poll is the same as analog mode 3 for the c-stick and triggers.
@@ -247,12 +247,12 @@ static void __osPackReadData(void) {
                 ptr += sizeof(__OSContReadFormat);
             }
         } else {
-            // Empty channel/port, so leave a CONT_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+            // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
             ptr++;
         }
     }
 
-    *ptr = CONT_CMD_END;
+    *ptr = PIF_CMD_END;
 }
 
 /////////////////
@@ -291,7 +291,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         requestHeader = *(__OSContRequestFormat*)ptr;
         data->error = CHNL_ERR(requestHeader.cmd);
 
-        if (data->error == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
+        if (data->error == (CHNL_ERR_SUCCESS >> 4)) {
             portInfo = &gPortInfo[port];
 
             // Byteswap the SI identifier. This is done in vanilla libultra.
@@ -338,7 +338,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
 
     if (gPortInfo[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
         gPortInfo[channel].gcRumble = flag;
-        __osContLastCmd = CONT_CMD_END;
+        __osContLastCmd = PIF_CMD_END;
     } else { // N64 Controllers.
         // N64 Controllers don't have MOTOR_STOP_HARD.
         if (flag == MOTOR_STOP_HARD) {
@@ -350,7 +350,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         // Set the PIF to be ready to run a command.
         __MotorDataBuf[channel].pifstatus = PIF_STATUS_EXE;
 
-        // Leave a CONT_CMD_SKIP_CHNL (0x00) byte in __MotorDataBuf for each skipped channel.
+        // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in __MotorDataBuf for each skipped channel.
         ptr += channel;
 
         __OSContRamWriteFormat* readformat = (__OSContRamWriteFormat*)ptr;
@@ -358,7 +358,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         // Set the entire block to either MOTOR_STOP or MOTOR_START.
         memset(readformat->send.data, flag, sizeof(readformat->send.data));
 
-        __osContLastCmd = CONT_CMD_END;
+        __osContLastCmd = PIF_CMD_END;
 
         // Write __MotorDataBuf to the PIF RAM and then wait for the command to execute.
         __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
@@ -402,23 +402,23 @@ static void _MakeMotorData(int channel, OSPifRam* mdata) {
     __OSContRamWriteFormat ramwriteformat;
     int i;
 
-    ramwriteformat.align       = CONT_CMD_NOP;
+    ramwriteformat.align       = PIF_CMD_NOP;
     ramwriteformat.cmd.txsize  = sizeof(ramwriteformat.send);
     ramwriteformat.cmd.rxsize  = sizeof(ramwriteformat.recv);
     ramwriteformat.send.cmdID  = CONT_CMD_WRITE_MEMPAK;
     ramwriteformat.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
     ramwriteformat.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
-    // Leave a CONT_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
+    // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
-            *ptr++ = CONT_CMD_SKIP_CHNL;
+            *ptr++ = PIF_CMD_SKIP_CHNL;
         }
     }
 
     *(__OSContRamWriteFormat*)ptr = ramwriteformat;
     ptr += sizeof(__OSContRamWriteFormat);
-    *ptr = CONT_CMD_END;
+    *ptr = PIF_CMD_END;
 }
 
 /**

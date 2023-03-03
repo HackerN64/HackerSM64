@@ -279,7 +279,7 @@ typedef union {
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
 typedef struct PACKED {
-    /*0x00*/ u8 align0;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
@@ -288,7 +288,7 @@ typedef struct PACKED {
                 /*0x00*/ HiLo16 type;           // Device type.
                 /*0x02*/ OSContRequestStatus status; // Status byte, depends on device type.
             } recv; /*0x03*/
-    /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x07*/ u8 align1;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
 } __OSContRequestFormat; /*0x08*/
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
@@ -320,7 +320,7 @@ typedef struct PACKED {
 
 // 0x02: CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA).
@@ -334,7 +334,7 @@ typedef struct PACKED {
 
 // 0x03: CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x00*/ u8 align;              // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA).
@@ -740,7 +740,7 @@ typedef struct PACKED {
 #define ACCESSORY_ID_PRINTER        0x85
 #define ACCESSORY_ID_TRANSFER_OFF   0xFE
 
-enum ContCmds {
+enum OSContCmds {
     // N64 Controller
     CONT_CMD_REQUEST_STATUS,            // 0x00: Read Controller type/status.
     CONT_CMD_READ_BUTTON,               // 0x01: Read Input Status.
@@ -784,17 +784,13 @@ enum ContCmds {
 };
 
 // Special control bytes used outside of commands.
-#define CONT_CMD_NOP                0xFF // Deos nothing, used for alignment.
-#define CONT_CMD_END                0xFE // End command.
-#define CONT_CMD_RESET_CHNL         0xFD // Reset channel.
-#define CONT_CMD_SKIP_CHNL          0x00 // Skip channel.
+enum OSPIFControlBytes {
+    PIF_CMD_SKIP_CHNL  = 0x00, // Increment the channel counter without doing anything.
+    PIF_CMD_RESET_CHNL = 0xFD, // Reset the channel.
+    PIF_CMD_END        = 0xFE, // End the entire command.
+    PIF_CMD_NOP        = 0xFF, // Deos nothing, used for alignment.
 
-// RX Error flags
-#define CONT_CMD_RX_SUCCESSFUL      0x00 // No error.
-#define CONT_CMD_RX_ERROR_IO        0x40 // IO error.
-#define CONT_CMD_RX_ERROR_NO_DEVICE 0x80 // Nothing is plugged into the port.
-
-#define CONT_CMD_RX_ERROR_MASK      0xC0
+};
 
 // PIF status:
 enum PIFStatuses {
