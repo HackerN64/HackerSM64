@@ -44,8 +44,7 @@ void run_demo_inputs(void) {
         // The timer variable being 0 at the current input means the demo is over.
         // Set the button to the END_DEMO mask to end the demo.
         if (gCurrDemoInput->timer == 0) {
-            gPlayer1Controller->controllerData->stick_x = 0;
-            gPlayer1Controller->controllerData->stick_y = 0;
+            gPlayer1Controller->controllerData->stick = (Analog16){ 0x00, 0x00 };
             gPlayer1Controller->controllerData->button = END_DEMO;
         } else {
             // Backup the start button if it is pressed, since we don't want the
@@ -53,8 +52,8 @@ void run_demo_inputs(void) {
             u16 startPushed = (gPlayer1Controller->controllerData->button & START_BUTTON);
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
-            gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
+            gPlayer1Controller->controllerData->stick.x = gCurrDemoInput->rawStickX;
+            gPlayer1Controller->controllerData->stick.y = gCurrDemoInput->rawStickY;
 
             // To assign the demo input, the button information is stored in
             // an 8-bit mask rather than a 16-bit mask. this is because only
@@ -313,8 +312,8 @@ void read_controller_inputs_normal(void) {
         OSContPadEx *controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
         if (controllerData != NULL && gContStatusPollTimer > CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN) {
-            controller->rawStickX = controllerData->stick_x;
-            controller->rawStickY = controllerData->stick_y;
+            controller->rawStickX = controllerData->stick.x;
+            controller->rawStickY = controllerData->stick.y;
             controller->buttonPressed  = (~controller->buttonDown & controllerData->button);
             controller->buttonReleased = (~controllerData->button & controller->buttonDown);
             // 0.5x A presses are a good meme

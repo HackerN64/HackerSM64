@@ -75,7 +75,15 @@ typedef union {
     u16 raw;
 } Analog16; /*0x02*/
 
-#define ANALOG8_TO_16(src) (Analog16){ ((src).a << 4), ((src).b << 4) }
+#define ANALOG8_TO_16(src) ((Analog16){ \
+    ((src).a << 4),                     \
+    ((src).b << 4),                     \
+})
+
+#define ANALOG16_CENTER(stick, center) ((Analog16){ \
+    CLAMP_S8((s32)(stick).x - (center).x),          \
+    CLAMP_S8((s32)(stick).y - (center).y),          \
+})
 
 /*
  * Structure for controllers
@@ -103,12 +111,9 @@ typedef struct PACKED {
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
     /*0x00*/ u16 button;                    /* Button data */
-    /*0x02*/ s8  stick_x;                   /* -80 <=   stick_x <=  80 */
-    /*0x03*/ s8  stick_y;                   /* -80 <=   stick_y <=  80 */
-    /*0x04*/ s8  c_stick_x;                 /* -80 <= c_stick_x <=  80 */
-    /*0x05*/ s8  c_stick_y;                 /* -80 <= c_stick_y <=  80 */
-    /*0x06*/ u8  l_trig;                    /*   0 <= l_trig    <= 255 */
-    /*0x07*/ u8  r_trig;                    /*   0 <= r_trig    <= 255 */
+    /*0x02*/ Analog16 stick;                /* -80 <=   stick <=  80 */
+    /*0x04*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
+    /*0x06*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
     /*0x08*/ OSContCenters contCenters;     /* GCN Analog Centers */
     /*0x0D*/ u8	errno;                      /* Error number */
 } OSContPadEx; /*0x0E*/

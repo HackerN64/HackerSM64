@@ -62,19 +62,14 @@ static void __osContWriteGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16
     // The first time the controller is connected, store the origins for the controller's analog sticks.
     if (!contCenters->initialized) {
         contCenters->initialized = TRUE;
-        contCenters->stick.x     = stick.x;
-        contCenters->stick.y     = stick.y;
-        contCenters->c_stick.x   = c_stick.x;
-        contCenters->c_stick.y   = c_stick.y;
+        contCenters->stick   = stick;
+        contCenters->c_stick = c_stick;
     }
 
     // Write the analog data.
-    pad->stick_x   = CLAMP_S8((s32)stick.x   - contCenters->stick.x  );
-    pad->stick_y   = CLAMP_S8((s32)stick.y   - contCenters->stick.y  );
-    pad->c_stick_x = CLAMP_S8((s32)c_stick.x - contCenters->c_stick.x);
-    pad->c_stick_y = CLAMP_S8((s32)c_stick.y - contCenters->c_stick.y);
-    pad->l_trig    = trig.l;
-    pad->r_trig    = trig.r;
+    pad->stick   = ANALOG16_CENTER(stick,   contCenters->stick);
+    pad->c_stick = ANALOG16_CENTER(c_stick, contCenters->c_stick);
+    pad->trig    = trig;
 
     // Map GCN button bits to N64 button bits.
     n64.standard.A       = gcn.standard.A;
@@ -89,10 +84,10 @@ static void __osContWriteGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16
     n64.standard.unused  = gcn.standard.Y; // The N64 controller's unused bit.
     n64.standard.L       = gcn.standard.Z;
     n64.standard.R       = gcn.standard.R;
-    n64.standard.C_UP    = (pad->c_stick_y >  GCN_C_STICK_THRESHOLD);
-    n64.standard.C_DOWN  = (pad->c_stick_y < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C_LEFT  = (pad->c_stick_x < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C_RIGHT = (pad->c_stick_x >  GCN_C_STICK_THRESHOLD);
+    n64.standard.C_UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
+    n64.standard.C_DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C_LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C_RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
     // Write the button data.
     pad->button = n64.raw;
@@ -137,13 +132,10 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 if (pad->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
 
-                    pad->button    = n64Input.buttons.raw;
-                    pad->stick_x   = n64Input.stick.x;
-                    pad->stick_y   = n64Input.stick.y;
-                    pad->c_stick_x = 0;
-                    pad->c_stick_y = 0;
-                    pad->l_trig    = 0;
-                    pad->r_trig    = 0;
+                    pad->button  = n64Input.buttons.raw;
+                    pad->stick   = n64Input.stick;
+                    pad->c_stick = (Analog16){ 0x00, 0x00 };
+                    pad->trig    = (Analog16){ 0x00, 0x00 };
                 }
 
                 ptr += sizeof(__OSContReadFormat);
