@@ -26,7 +26,7 @@ struct RumbleSettings gCurrRumbleSettings = { 0 };
 s32 sRumblePakThreadActive = FALSE;             // Set to TRUE when the rumble thread starts.
 s32 sRumblePakActive       = FALSE;             // Whether the rumble pak is plugged in.
 s32 sRumblePakMotorState   = MOTOR_STOP;        // Current rumble motor state.
-s32 sRumblePakError        = PFS_ERR_SUCCESS;   // The last error from a motor start/stop.
+s32 sRumblePfsError        = PFS_ERR_SUCCESS;   // The last error from a motor start/stop.
 s32 gRumblePakTimer        = 0;                 // Only used to time the drowning warning rumble.
 
 /**
@@ -47,16 +47,16 @@ void release_rumble_pak_control(void) {
 }
 
 /**
- * Turn the Rumble Pak motor on or off.
- * flag = MOTOR_STOP, MOTOR_START, or MOTOR_STOP_HARD (GameCube controller only).
+ * Turn the Rumble Pak motor on or off. This is called every frame.
+ * flag = MOTOR_STOP, MOTOR_START, or MOTOR_STOP_HARD (MOTOR_STOP_HARD is for GameCube controllers only).
  */
 static void set_rumble(s32 flag) {
     if (!sRumblePakActive) {
         return;
     }
 
-    // If not bypassing the check, Don't run if already set.
-    // Bypass this once per second just to check for errors (eg. the rumble pak being unplugged).
+    // Don't run if motor state wouldn't change.
+    // Bypass this once per second just to allow __osMotorAccessEx to run to check for errors (eg. the rumble pak being unplugged).
     if (flag == sRumblePakMotorState && ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) != 0)) {
         return;
     }
@@ -66,7 +66,7 @@ static void set_rumble(s32 flag) {
     block_until_rumble_pak_free();
 
     // Equivalent to osMotorStart or osMotorStop.
-    sRumblePakError = __osMotorAccessEx(&gRumblePakPfs, flag);
+    sRumblePfsError = __osMotorAccessEx(&gRumblePakPfs, flag);
 
     release_rumble_pak_control();
 }
@@ -268,6 +268,23 @@ static s32 init_and_check_rumble_pak(void) {
     return success;
 }
 
+ALIGNED8 static const char *sPfsErrorDesc[] = {
+    [PFS_ERR_SUCCESS     ] = "successful",                  /* no error                                     */
+    [PFS_ERR_NOPACK      ] = "no pak",                      /* no memory card is plugged or                 */
+    [PFS_ERR_NEW_PACK    ] = "changed pak",                 /* ram pack has been changed to a different one */
+    [PFS_ERR_INCONSISTENT] = "inconsistent, run Pfs check", /* need to run Pfschecker                       */
+    [PFS_ERR_CONTRFAIL   ] = "communication error",         /* CONT_OVERRUN_ERROR                           */
+    [PFS_ERR_INVALID     ] = "invalid param or no file",    /* invalid parameter or file not exist          */
+    [PFS_ERR_BAD_DATA    ] = "bad data read",               /* the data read from pack are bad              */
+    [PFS_DATA_FULL       ] = "pages full",                  /* no free pages on ram pack                    */
+    [PFS_DIR_FULL        ] = "directories full",            /* no free directories on ram pack              */
+    [PFS_ERR_EXIST       ] = "file exists",                 /* file exists                                  */
+    [PFS_ERR_ID_FATAL    ] = "dead pak",                    /* dead ram pack                                */
+    [PFS_ERR_DEVICE      ] = "wrong type",                  /* wrong device type                            */
+    [PFS_ERR_NO_GBCART   ] = "no GB cart",                  /* no gb cartridge (64GB-PAK)                   */
+    [PFS_ERR_NEW_GBCART  ] = "changed GB cart",             /* gb cartridge may be changed                  */
+};
+
 /**
  * Rumble thread loop.
  */
@@ -287,15 +304,15 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 
         if (sRumblePakActive) {
             // Disable the rumble pak if there were too many failed start/stop attempts without a success.
-            if (sRumblePakError != PFS_ERR_SUCCESS) {
+            if (sRumblePfsError != PFS_ERR_SUCCESS) {
                 sRumblePakActive = FALSE;
                 sRumblePakMotorState = MOTOR_STOP;
-                osSyncPrintf("Rumble Pak error: %d\n", sRumblePakError);
+                osSyncPrintf("Rumble Pak error (%d): %s\n", sRumblePfsError, sPfsErrorDesc[sRumblePfsError]);
             }
         } else {
             if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check Rumble Pak status about once per second.
                 sRumblePakActive = init_and_check_rumble_pak();
-                sRumblePakError = PFS_ERR_SUCCESS;
+                sRumblePfsError = PFS_ERR_SUCCESS;
             }
         }
 
