@@ -313,34 +313,21 @@ void read_controller_inputs_normal(void) {
         OSContPadEx *controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
         if (controllerData != NULL && gContStatusPollTimer > CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN) {
-            u16 button = controllerData->button;
-            // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (controller->statusData->type & CONT_CONSOLE_GCN) {
-                u16 newButton = (button & ~(Z_TRIG | L_TRIG));
-                if (button & Z_TRIG) {
-                    newButton |= L_TRIG;
-                }
-                if (controllerData->l_trig > GCN_TRIGGER_THRESHOLD) {
-                    newButton |= Z_TRIG;
-                }
-                button = newButton;
-            }
             controller->rawStickX = controllerData->stick_x;
             controller->rawStickY = controllerData->stick_y;
-            controller->buttonPressed = (~controller->buttonDown & button);
-            controller->buttonReleased = (~button & controller->buttonDown);
+            controller->buttonPressed  = (~controller->buttonDown & controllerData->button);
+            controller->buttonReleased = (~controllerData->button & controller->buttonDown);
             // 0.5x A presses are a good meme
-            controller->buttonDown = button;
+            controller->buttonDown = controllerData->button;
             adjust_analog_stick(controller);
 
-            if (controller->buttonReleased & TOGGLE_CONT_STATUS_POLLING_COMBO) {
+            if (gContStatusPollingReadyForInput) {
+                if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+                    gContStatusPollingReadyForInput = FALSE;
+                    start_controller_status_polling();
+                }
+            } else if ((controller->buttonDown & TOGGLE_CONT_STATUS_POLLING_COMBO) != TOGGLE_CONT_STATUS_POLLING_COMBO) { //! this should only check the controller that pressed the combo to exit
                 gContStatusPollingReadyForInput = TRUE;
-            }
-
-            if (gContStatusPollingReadyForInput
-             && check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
-                gContStatusPollingReadyForInput = FALSE;
-                start_controller_status_polling();
             }
         } else {
             // Otherwise, if controllerData is NULL or the cooldown hasn't finished, zero out all of the inputs.
