@@ -273,7 +273,7 @@ void read_controller_inputs_status_polling(void) {
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
 static void adjust_analog_stick(struct Controller *controller) {
-    s16 deadzone = (gIsConsole && (controller->statusData->type & CONT_CONSOLE_GCN)) ? 12 : 8;
+    s16 deadzone = (controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8;
     s16 offset = (deadzone - 2);
 
     // Reset the controller's x and y floats.
@@ -315,7 +315,7 @@ void read_controller_inputs_normal(void) {
         if (controllerData != NULL && gContStatusPollTimer > CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN) {
             u16 button = controllerData->button;
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && (controller->statusData->type & CONT_CONSOLE_GCN)) {
+            if (controller->statusData->type & CONT_CONSOLE_GCN) {
                 u16 newButton = (button & ~(Z_TRIG | L_TRIG));
                 if (button & Z_TRIG) {
                     newButton |= L_TRIG;
@@ -341,7 +341,6 @@ void read_controller_inputs_normal(void) {
              && check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
                 gContStatusPollingReadyForInput = FALSE;
                 start_controller_status_polling();
-                return;
             }
         } else {
             // Otherwise, if controllerData is NULL or the cooldown hasn't finished, zero out all of the inputs.

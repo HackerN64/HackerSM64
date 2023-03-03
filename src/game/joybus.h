@@ -146,7 +146,7 @@ typedef union {
 
 typedef struct PACKED {
     /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
-    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR on GCN.
+    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
     /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
@@ -166,8 +166,8 @@ typedef struct PACKED {
 // -- GCN DK Bongos buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT
-    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH
+    /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
+    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
     /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 LEFT_TOP        : 1;
@@ -205,7 +205,7 @@ typedef union {
     struct PACKED {
         /*0x00*/ GCNButtons buttons;    // The received button data.
         /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
-        union {
+        union { // Lower bits:
             struct PACKED { // Default, same as mode 3.
                 /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
                 /*0x02*/ Analog16  trig;    // The received trigger position [0, 255].
@@ -310,12 +310,12 @@ typedef struct PACKED {
     /*0x00*/ u8 align0;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
-    } send; /*0x01*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
+            } send; /*0x01*/
     /*0x04*/ struct PACKED {
-        /*0x04*/ HiLo16 type;           // Device type.
-        /*0x06*/ OSContRequestStatus status; // Status byte, depends on device type.
-    } recv; /*0x03*/
+                /*0x00*/ HiLo16 type;           // Device type.
+                /*0x02*/ OSContRequestStatus status; // Status byte, depends on device type.
+            } recv; /*0x03*/
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
 } __OSContRequestFormat; /*0x08*/
 
@@ -323,12 +323,12 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
-    } send; /*0x01*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
+            } send; /*0x01*/
     /*0x03*/ struct PACKED {
-        /*0x03*/ HiLo16 type;           // Device type.
-        /*0x05*/ OSContRequestStatus status; // Status byte, depends on device type.
-    } recv; /*0x03*/
+                /*0x00*/ HiLo16 type;           // Device type.
+                /*0x02*/ OSContRequestStatus status; // Status byte, depends on device type.
+            } recv; /*0x03*/
 } __OSContRequesFormatShort; /*0x06*/
 
 // -- Standard N64 input poll --
@@ -337,11 +337,11 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
-    } send; /*0x01*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
+            } send; /*0x01*/
     /*0x03*/ struct PACKED {
-        /*0x03*/ N64InputData input;    // The received input data.
-    } recv; /*0x04*/
+                /*0x00*/ N64InputData input;    // The received input data.
+            } recv; /*0x04*/
 } __OSContReadFormat; /*0x07*/
 
 // -- Controller Pak Read/Write --
@@ -351,13 +351,13 @@ typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA).
-        /*0x04*/ HiLo16 addr;           // CRC code for address.
-    } send; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA).
+                /*0x01*/ HiLo16 addr;           // CRC code for address.
+            } send; /*0x03*/
     /*0x06*/ struct PACKED {
-        /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
-        /*0x26*/ u8 datacrc;            // CRC code for data.
-    } recv; /*0x21*/
+                /*0x00*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
+                /*0x20*/ u8 datacrc;            // CRC code for data.
+            } recv; /*0x21*/
 } __OSContRamReadFormat; /*0x27*/
 
 // 0x03: CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA
@@ -365,13 +365,13 @@ typedef struct PACKED {
     /*0x00*/ u8 align;              // For 4-byte alignment. Always CONT_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA).
-        /*0x04*/ HiLo16 addr;           // CRC code for address.
-        /*0x06*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
-    } send; /*0x23*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA).
+                /*0x01*/ HiLo16 addr;           // CRC code for address.
+                /*0x03*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
+            } send; /*0x23*/
     /*0x26*/ struct PACKED {
-        /*0x26*/ u8 datacrc;            // CRC code for data.
-    } recv; /*0x01*/
+                /*0x00*/ u8 datacrc;            // CRC code for data.
+            } recv; /*0x01*/
 } __OSContRamWriteFormat; /*0x27*/
 
 // -- EEPROM Read/Write --
@@ -380,25 +380,25 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_EEPROM).
-        /*0x03*/ u8 block;              // Which block of EEPROM to read from.
-    } send; /*0x02*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_EEPROM).
+                /*0x01*/ u8 block;              // Which block of EEPROM to read from.
+            } send; /*0x02*/
     /*0x04*/ struct PACKED {
-        /*0x04*/ u8 data[EEPROM_BLOCK_SIZE]; // Address of the data buffer.
-    } recv; /*0x08*/
+                /*0x00*/ u8 data[EEPROM_BLOCK_SIZE]; // Address of the data buffer.
+            } recv; /*0x08*/
 } __OSContReadEEPROMFormat; /*0x0C*/
 
 // 0x05: CONT_CMD_WRITE_EEPROM
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_EEPROM).
-        /*0x03*/ u8 block;              // Which block of EEPROM to write to.
-        /*0x04*/ u8 data[EEPROM_BLOCK_SIZE]; // Address of the data buffer.
-    } send; /*0x0A*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_EEPROM).
+                /*0x01*/ u8 block;              // Which block of EEPROM to write to.
+                /*0x02*/ u8 data[EEPROM_BLOCK_SIZE]; // Address of the data buffer.
+            } send; /*0x0A*/
     /*0x0C*/ struct PACKED {
-        /*0x0C*/ u8 busy;               // 0x80 = busy, 0x00 otherwise.
-    } recv; /*0x01*/
+                /*0x00*/ u8 busy;               // 0x80 = busy, 0x00 otherwise.
+            } recv; /*0x01*/
 } __OSContWriteEEPROMFormat; /*0x0D*/
 
 // -- RTC Commands --
@@ -419,33 +419,33 @@ typedef union {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_RTC_STATUS).
-    } send; /*0x01*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_RTC_STATUS).
+            } send; /*0x01*/
     /*0x03*/ struct PACKED {
-        /*0x03*/ HiLo16 identifier;     // 0x0080 = 4 Kibibits (512 bytes), 0x00C0 = 16 Kibibits (2048 bytes)
-        /*0x05*/ RTCStatus status;      // RTC clock status.
-    } recv; /*0x03*/
+                /*0x00*/ HiLo16 identifier;     // 0x0080 = 4 Kibibits (512 bytes), 0x00C0 = 16 Kibibits (2048 bytes)
+                /*0x02*/ RTCStatus status;      // RTC clock status.
+            } recv; /*0x03*/
 } __OSContReadRTCStatusFormat; /*0x06*/
 
 typedef union {
     struct PACKED {
         /*0x00*/ union {
-                struct PACKED {
-                    /*0x00*/ u8          : 6;    // Always 0.
-                    /*0x00*/ u8 RTC      : 1;    // Write protects field 2 (RTC).
-                    /*0x00*/ u8 NVRAM    : 1;    // Write protects field 1 (NVRAM).
-                }; /*0x01*/
-                u8 raw;
-            } writeProtect;
+                    struct PACKED {
+                        /*0x00*/ u8          : 6;    // Always 0.
+                        /*0x00*/ u8 RTC      : 1;    // Write protects field 2 (RTC).
+                        /*0x00*/ u8 NVRAM    : 1;    // Write protects field 1 (NVRAM).
+                    }; /*0x01*/
+                    u8 raw;
+                } writeProtect;
         /*0x01*/ union {
-                struct PACKED {
-                    /*0x00*/ u8 unknown  : 1;    // Exists, changeable, no visible function.
-                    /*0x00*/ u8          : 4;    // Always 0.
-                    /*0x00*/ u8 stop     : 2;    // If either bit is set, stops RTC from counting.
-                    /*0x00*/ u8          : 1;    // Always 0.
-                }; /*0x01*/
-                u8 raw;
-            } control;
+                    struct PACKED {
+                        /*0x00*/ u8 unknown  : 1;    // Exists, changeable, no visible function.
+                        /*0x00*/ u8          : 4;    // Always 0.
+                        /*0x00*/ u8 stop     : 2;    // If either bit is set, stops RTC from counting.
+                        /*0x00*/ u8          : 1;    // Always 0.
+                    }; /*0x01*/
+                    u8 raw;
+                } control;
         /*0x02*/ u8 unused0[2];
         /*0x04*/ u8 unknown[2];     // Can be updated but have no visible function.
         /*0x06*/ u8 unused1[2];
@@ -473,26 +473,26 @@ typedef union {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_RTC_BLOCK).
-        /*0x03*/ u8 block;              // Which RTC block to read from [0, 3].
-    } send; /*0x02*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_RTC_BLOCK).
+                /*0x01*/ u8 block;              // Which RTC block to read from [0, 3].
+            } send; /*0x02*/
     /*0x04*/ struct PACKED {
-        /*0x04*/ RTCBlockData data;     // Address of the data buffer.
-        /*0x0C*/ RTCStatus status;      // RTC clock status.
-    } recv; /*0x09*/
+                /*0x00*/ RTCBlockData data;     // Address of the data buffer.
+                /*0x08*/ RTCStatus status;      // RTC clock status.
+            } recv; /*0x09*/
 } __OSContReadRTCBlockFormat; /*0x0D*/
 
 // 0x08: CONT_CMD_WRITE_RTC_BLOCK
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_RTC_BLOCK).
-        /*0x03*/ u8 block;              // Which RTC block to write to [0, 3].
-        /*0x04*/ RTCBlockData data;     // Address of the data buffer.
-    } send; /*0x0A*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_RTC_BLOCK).
+                /*0x01*/ u8 block;              // Which RTC block to write to [0, 3].
+                /*0x02*/ RTCBlockData data;     // Address of the data buffer.
+            } send; /*0x0A*/
     /*0x0C*/ struct PACKED {
-        /*0x0C*/ RTCStatus status;      // RTC clock status.
-    } recv; /*0x01*/
+                /*0x00*/ RTCStatus status;      // RTC clock status.
+            } recv; /*0x01*/
 } __OSContRWriteRTCBlockFormat; /*0x0D*/
 
 // -- VRU Commands --
@@ -509,26 +509,26 @@ typedef union {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_VOICE).
-        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
-    } send; /*0x02*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_VOICE).
+                /*0x01*/ VRUAddrCRC addrcrc;    // Address and CRC.
+            } send; /*0x03*/
     /*0x04*/ struct PACKED {
-        /*0x04*/ u8 data[0x24];         // Address of the data buffer. Data is 16 bit byteswapped.
-        /*0x28*/ u8 datacrc;            // CRC code for data.
-    } recv; /*0x25*/
+                /*0x00*/ u8 data[0x24];         // Address of the 36-byte data buffer. Data is 16 bit byteswapped.
+                /*0x24*/ u8 datacrc;            // CRC code for data.
+            } recv; /*0x25*/
 } __OSContRead36VoiceFormat; /*0x29*/
 
 // 0x0A: CONT_CMD_WRITE_VOICE
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_VOICE).
-        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
-        /*0x04*/ u8 data[0x14];         // Address of the data buffer. Data is 16 bit byteswapped.
-    } send; /*0x02*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_VOICE).
+                /*0x01*/ VRUAddrCRC addrcrc;    // Address and CRC.
+                /*0x03*/ u8 data[0x14];         // Address of the 20-byte data buffer. Data is 16 bit byteswapped.
+            } send; /*0x17*/
     /*0x28*/ struct PACKED {
-        /*0x28*/ u8 datacrc;            // CRC code for data.
-    } recv; /*0x25*/
+                /*0x00*/ u8 datacrc;            // CRC code for data.
+            } recv; /*0x01*/
 } __OSContWrite20VoiceFormat; /*0x29*/
 
 typedef union {
@@ -543,39 +543,39 @@ typedef union {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_VOICE_STATUS).
-        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
-    } send; /*0x03*/
-    struct PACKED {
-        /*0x05*/ VRUStatus statusMode;  // Unknown status and VRU mode.
-        /*0x07*/ u8 datacrc;            // CRC code for data.
-    } recv; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_VOICE_STATUS).
+                /*0x01*/ VRUAddrCRC addrcrc;    // Address and CRC.
+            } send; /*0x03*/
+    /*0x05*/ struct PACKED {
+                /*0x00*/ VRUStatus statusMode;  // Unknown status and VRU mode.
+                /*0x02*/ u8 datacrc;            // CRC code for data.
+            } recv; /*0x03*/
 } __OSContRead2VoiceFormat; /*0x08*/
 
 // 0x0C: CONT_CMD_WRITE_VOICE_STATUS
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_VOICE_STATUS).
-        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
-        /*0x05*/ VRUStatus statusMode;  // Unknown status and VRU mode.
-        /*0x07*/ u16 arg;               // Unknown argument(s).
-    } send; /*0x07*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_VOICE_STATUS).
+                /*0x01*/ VRUAddrCRC addrcrc;    // Address and CRC.
+                /*0x03*/ VRUStatus statusMode;  // Unknown status and VRU mode.
+                /*0x05*/ u16 arg;               // Unknown argument(s).
+            } send; /*0x07*/
     /*0x09*/ struct PACKED {
-        /*0x09*/ u8 datacrc;            // CRC code for data.
-    } recv; /*0x01*/
+                /*0x00*/ u8 datacrc;            // CRC code for data.
+            } recv; /*0x01*/
 } __OSContWrite4VoiceFormat; /*0x0A*/
 
 // 0x0D: CONT_CMD_RESET_VOICE
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_RESET_VOICE).
-        /*0x03*/ VRUAddrCRC addrcrc;    // Address and CRC.
-    } send; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_RESET_VOICE).
+                /*0x01*/ VRUAddrCRC addrcrc;    // Address and CRC.
+            } send; /*0x03*/
     /*0x05*/ struct PACKED {
-        /*0x05*/ u8 error;              // Error flags.
-    } recv; /*0x01*/
+                /*0x00*/ u8 error;              // Error flags.
+            } recv; /*0x01*/
 } __OSContSWriteVoiceFormat; /*0x06*/
 
 // -- Randnet Keyboard input poll --
@@ -584,29 +584,29 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_64GB).
-        /*0x03*/ union {
-            struct PACKED {
-                /*0x00*/ u8             : 5;
-                /*0x00*/ u8 power       : 1;    // Power LED on.
-                /*0x00*/ u8 capLock     : 1;    // Caps Lock LED on.
-                /*0x00*/ u8 numLock     : 1;    // Num Lock LED on.
-            }; /*0x01*/
-            u8 raw;
-        } LEDs; /*0x01*/
-    } send; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_64GB).
+                /*0x01*/ union {
+                            struct PACKED {
+                                /*0x00*/ u8             : 5;
+                                /*0x00*/ u8 power       : 1;    // Power LED on.
+                                /*0x00*/ u8 capLock     : 1;    // Caps Lock LED on.
+                                /*0x00*/ u8 numLock     : 1;    // Num Lock LED on.
+                            }; /*0x01*/
+                            u8 raw;
+                        } LEDs; /*0x01*/
+            } send; /*0x03*/
     /*0x04*/ struct PACKED {
-        /*0x04*/ u16 keypress[3];       // Which keys are pressed (up to 3 keys can be pressed at a time). //! TODO: Key IDs.
-        /*0x0A*/ union {
-            struct PACKED {
-                /*0x00*/ u8             : 3;
-                /*0x00*/ u8 tooManyKeys : 1;    // Too many keys pressed?
-                /*0x00*/ u8             : 3;
-                /*0x00*/ u8 homeKey     : 1;    // Home key pressed.
-            }; /*0x01*/
-            u8 raw;
-        } status; /*0x01*/
-    } recv; /*0x07*/
+                /*0x00*/ u16 keypress[3];       // Which keys are pressed (up to 3 keys can be pressed at a time). //! TODO: Key IDs.
+                /*0x06*/ union {
+                            struct PACKED {
+                                /*0x00*/ u8             : 3;
+                                /*0x00*/ u8 tooManyKeys : 1;    // Too many keys pressed?
+                                /*0x00*/ u8             : 3;
+                                /*0x00*/ u8 homeKey     : 1;    // Home key pressed.
+                            }; /*0x01*/
+                            u8 raw;
+                        } status; /*0x01*/
+            } recv; /*0x07*/
 } __OSContReadKeyboardFormat; /*0x0B*/
 
 // -- Send Game ID to controller --
@@ -615,15 +615,15 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_GAME_ID).
-        /*0x03*/ u32 crc_hi;            // CRC HI / CRC1 (bytes [0x10-0x13] of the ROM).
-        /*0x07*/ u32 crc_lo;            // CRC LO / CRC2 (bytes [0x14-0x17] of the ROM).
-        /*0x0B*/ u8 mediaformat;        // Media format ROM type (byte 0x3B of the ROM).
-        /*0x0C*/ u8 country_id;         // Country Code (byte 0x3E of the ROM).
-    } send; /*0x0B*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_GAME_ID).
+                /*0x01*/ u32 crc_hi;            // CRC HI / CRC1 (bytes [0x10-0x13] of the ROM).
+                /*0x05*/ u32 crc_lo;            // CRC LO / CRC2 (bytes [0x14-0x17] of the ROM).
+                /*0x09*/ u8 mediaformat;        // Media format ROM type (byte 0x3B of the ROM).
+                /*0x0A*/ u8 country_id;         // Country Code (byte 0x3E of the ROM).
+            } send; /*0x0B*/
     /*0x0D*/ struct PACKED {
-        /*0x0D*/ u8 recv[1];            // Always 0?
-    } recv; /*0x01*/
+                /*0x00*/ u8 recv[1];            // Always 0?
+            } recv; /*0x01*/
 } __OSContWriteGameIDFormat; /*0x0E*/
 
 // -- GCN Wheel Feedback --
@@ -632,31 +632,31 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_WHEEL_FEEDBACK).
-        /*0x03*/ union {
-            struct PACKED {
-                /*0x00*/ u16            : 5;
-                /*0x00*/ u16 unknown    : 1;  // Unknown. Always 1?
-                /*0x00*/ u16 state      : 1;  // 0 = motor off, 1 = motor on.
-                /*0x00*/ u16 strength   : 9;  // Force strength [0, 256]. 0 = left strong, 128 = center, 256 = right strong.
-            }; /*0x02*/
-            u16 raw;
-        } force; /*0x02*/
-    } send; /*0x0B*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_WHEEL_FEEDBACK).
+                /*0x01*/ union {
+                            struct PACKED {
+                                /*0x00*/ u16            : 5;
+                                /*0x00*/ u16 unknown    : 1;  // Unknown. Always 1?
+                                /*0x00*/ u16 state      : 1;  // 0 = motor off, 1 = motor on.
+                                /*0x00*/ u16 strength   : 9;  // Force strength [0, 256]. 0 = left strong, 128 = center, 256 = right strong.
+                            }; /*0x02*/
+                            u16 raw;
+                        } force; /*0x02*/
+            } send; /*0x03*/
     /*0x0D*/ struct PACKED {
-        /*0x05*/ GCNButtons buttons;    // The received button data.
-        /*0x07*/ union {
-            struct PACKED {
-                /*0x00*/ u8             : 4;  // Unknown.
-                /*0x00*/ u8 pedal       : 1;  // Whether the pedals are connected.
-                /*0x00*/ u8             : 3;  // Unknown.
-            }; /*0x01*/
-            u8 raw;
-        } flags; /*0x01*/
-        /*0x08*/ s8 wheel;              // How far the wheel is turned in a direction [-128, 127].
-        /*0x09*/ Analog16 pedal;        // Pedals, if connected [0, 255].
-        /*0x0B*/ Analog16 paddle;       // Paddles on the back of the wheel [0, 255].
-    } recv; /*0x08*/
+                /*0x00*/ GCNButtons buttons;    // The received button data.
+                /*0x02*/ union {
+                            struct PACKED {
+                                /*0x00*/ u8             : 4;  // Unknown.
+                                /*0x00*/ u8 pedal       : 1;  // Whether the pedals are connected.
+                                /*0x00*/ u8             : 3;  // Unknown.
+                            }; /*0x01*/
+                            u8 raw;
+                        } flags; /*0x01*/
+                /*0x03*/ s8 wheel;              // How far the wheel is turned in a direction [-128, 127].
+                /*0x04*/ Analog16 pedal;        // Pedals, if connected [0, 255].
+                /*0x06*/ Analog16 paddle;       // Paddles on the back of the wheel [0, 255].
+            } recv; /*0x08*/
 } __OSContGCNWheelForceFormat; /*0x0D*/
 
 // -- GCN Controller Input poll & calibration --
@@ -665,53 +665,53 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
-        /*0x03*/ u8 analog_mode;        // Analog mode (see OSGCNAnalogModes).
-        /*0x04*/ u8 rumble;             // Rumble byte.
-    } send; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_SHORT_POLL).
+                /*0x01*/ u8 analog_mode;        // Analog mode (see OSGCNAnalogModes).
+                /*0x02*/ u8 rumble;             // Rumble byte.
+            } send; /*0x03*/
     /*0x05*/ struct PACKED {
-        /*0x05*/ GCNInputData input;    // The received input data.
-    } recv; /*0x08*/
+                /*0x00*/ GCNInputData input;    // The received input data.
+            } recv; /*0x08*/
 } __OSContGCNShortPollFormat; /*0x0D*/
 
 // 0x41: CONT_CMD_GCN_READ_ORIGIN
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_READ_ORIGIN).
-    } send; /*0x01*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_READ_ORIGIN).
+            } send; /*0x01*/
     /*0x0D*/ struct PACKED {
-        /*0x03*/ GCNInputData origins;  // Only the analog values are used.
-        /*0x0B*/ Analog16 buttons;      // Analog buttons used by some controllers. Both always 0x02?
-    } recv; /*0x0A*/
+                /*0x00*/ GCNInputData origins;  // Only the analog values are used.
+                /*0x08*/ Analog16 buttons;      // Analog buttons used by some controllers. Both always 0x02?
+            } recv; /*0x0A*/
 } __OSContGCNReadOriginFormat; /*0x0D*/
 
 // 0x42: CONT_CMD_GCN_CALIBRATE
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_CALIBRATE).
-        /*0x03*/ u8 analog_mode;        // Ignored. Analog mode (see OSGCNAnalogModes).
-        /*0x04*/ u8 rumble;             // Ignored. Rumble byte.
-    } send; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_CALIBRATE).
+                /*0x01*/ u8 analog_mode;        // Ignored. Analog mode (see OSGCNAnalogModes).
+                /*0x02*/ u8 rumble;             // Ignored. Rumble byte.
+            } send; /*0x03*/
     /*0x0D*/ struct PACKED {
-        /*0x05*/ GCNInputData origins;  // Only the analog values are used.
-        /*0x0D*/ Analog16 buttons;      // Analog buttons used by some controllers. Both always 0x02?
-    } recv; /*0x0A*/
+                /*0x00*/ GCNInputData origins;  // Only the analog values are used.
+                /*0x08*/ Analog16 buttons;      // Analog buttons used by some controllers. Both always 0x02?
+            } recv; /*0x0A*/
 } __OSContGCNCalibrateFormat; /*0x0F*/
 
 // 0x43: CONT_CMD_GCN_LONG_POLL
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_LONG_POLL).
-        /*0x03*/ u8 analog_mode;        // Ignored. Analog mode (see OSGCNAnalogModes).
-        /*0x04*/ u8 rumble;             // Rumble byte.
-    } send; /*0x03*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_LONG_POLL).
+                /*0x01*/ u8 analog_mode;        // Ignored. Analog mode (see OSGCNAnalogModes).
+                /*0x02*/ u8 rumble;             // Rumble byte.
+            } send; /*0x03*/
     /*0x0D*/ struct PACKED {
-        /*0x05*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte C-stick and triggers) regardless of input command.
-        /*0x0D*/ Analog16 buttons;      // Analog buttons used by some controllers.
-    } recv; /*0x0A*/
+                /*0x00*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte C-stick and triggers) regardless of input command.
+                /*0x08*/ Analog16 buttons;      // Analog buttons used by some controllers.
+            } recv; /*0x0A*/
 } __OSContGCNLongPollFormat; /*0x0F*/
 
 // -- GCN Keyboard input poll --
@@ -720,13 +720,13 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x00*/ OSContCmdData cmd;     // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-        /*0x02*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_READ_KEYBOARD).
-        /*0x03*/ u8 analog_mode;        // Ignored? Analog mode (see OSGCNAnalogModes).
-        /*0x04*/ u8 rumble;             // Ignored? Rumble byte.
-    } send; /*0x0B*/
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_READ_KEYBOARD).
+                /*0x01*/ u8 analog_mode;        // Ignored? Analog mode (see OSGCNAnalogModes).
+                /*0x02*/ u8 rumble;             // Ignored? Rumble byte.
+            } send; /*0x0B*/
     /*0x0D*/ struct PACKED {
-        /*0x05*/ GCNInputData input;    // The received input data.
-    } recv; /*0x08*/
+                /*0x00*/ GCNInputData input;    // The received input data.
+            } recv; /*0x08*/
 } __OSContGCNReadKeyboardFormat; /*0x0D*/
 
 ////////////////////////////
