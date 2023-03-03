@@ -55,23 +55,24 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
  * @brief Writes controller data to OSContPadEx and stores the controller center on first run.
  * Called by osContGetReadDataEx.
  */
-static void __osContWriteGCNInputData(OSContPadEx* pad, OSContCenter* contCenter, GCNButtons gcn, Analog16 stick, Analog16 c_stick, Analog16 trig) {
+static void __osContWriteGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16 stick, Analog16 c_stick, Analog16 trig) {
+    OSContCenters* contCenters = &pad->contCenters;
     N64Buttons n64 = { .raw = 0x0 };
 
     // The first time the controller is connected, store the origins for the controller's analog sticks.
-    if (!contCenter->initialized) {
-        contCenter->initialized = TRUE;
-        contCenter->stick.x     = stick.x;
-        contCenter->stick.y     = stick.y;
-        contCenter->c_stick.x   = c_stick.x;
-        contCenter->c_stick.y   = c_stick.y;
+    if (!contCenters->initialized) {
+        contCenters->initialized = TRUE;
+        contCenters->stick.x     = stick.x;
+        contCenters->stick.y     = stick.y;
+        contCenters->c_stick.x   = c_stick.x;
+        contCenters->c_stick.y   = c_stick.y;
     }
 
     // Write the analog data.
-    pad->stick_x   = CLAMP_S8((s32)stick.x   - contCenter->stick.x  );
-    pad->stick_y   = CLAMP_S8((s32)stick.y   - contCenter->stick.y  );
-    pad->c_stick_x = CLAMP_S8((s32)c_stick.x - contCenter->c_stick.x);
-    pad->c_stick_y = CLAMP_S8((s32)c_stick.y - contCenter->c_stick.y);
+    pad->stick_x   = CLAMP_S8((s32)stick.x   - contCenters->stick.x  );
+    pad->stick_y   = CLAMP_S8((s32)stick.y   - contCenters->stick.y  );
+    pad->c_stick_x = CLAMP_S8((s32)c_stick.x - contCenters->c_stick.x);
+    pad->c_stick_y = CLAMP_S8((s32)c_stick.y - contCenters->c_stick.y);
     pad->l_trig    = trig.l;
     pad->r_trig    = trig.r;
 
@@ -103,19 +104,16 @@ static void __osContWriteGCNInputData(OSContPadEx* pad, OSContCenter* contCenter
  *   and trigger status polling if an active controller is unplugged.
  * Called by poll_controller_inputs.
  */
-void osContGetReadDataEx(OSContPadEx* data) {
+void osContGetReadDataEx(OSContPadEx* pad) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    OSContPadEx* pad = NULL;
     __OSContReadFormat *readformatptr = NULL;
-    OSContCenter* contCenter = NULL;
     N64InputData n64Input;
     GCNInputData gcnInput;
-    int port = 0;
 
     while (*ptr != CONT_CMD_END) {
         if (*ptr == CONT_CMD_SKIP_CHNL) {
             // Skip empty channels/ports.
-            port++;
+            pad++;
             ptr++;
             continue;
         }
@@ -125,7 +123,6 @@ void osContGetReadDataEx(OSContPadEx* data) {
             continue;
         }
 
-        pad = &data[port];
         readformatptr = (__OSContReadFormat*)ptr;
         pad->errno = CHNL_ERR(readformatptr->cmd);
 
@@ -153,13 +150,11 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 break;
 
             case CONT_CMD_GCN_SHORT_POLL:
-                contCenter = &gPortInfo[port].contCenter;
-
                 if (pad->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
                     gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
                     Analog16 c_stick, trig;
 
-                    // The GameCube controller has various modes for returning the lower analog bits (4-bit vs. 8-bit).
+                    // The GameCube controller has various modes for returning the lower analog bits (4-bit per axis vs. 8-bit per axis).
                     switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
                         default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
                             c_stick = gcnInput.m0.c_stick;
@@ -183,23 +178,22 @@ void osContGetReadDataEx(OSContPadEx* data) {
                             break;
                     }
 
-                    __osContWriteGCNInputData(pad, contCenter, gcnInput.buttons, gcnInput.stick, c_stick, trig);
+                    __osContWriteGCNInputData(pad, gcnInput.buttons, gcnInput.stick, c_stick, trig);
                 } else {
-                    contCenter->initialized = FALSE;
+                    pad->contCenters.initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNShortPollFormat);
                 break;
 
             case CONT_CMD_GCN_LONG_POLL:
-                contCenter = &gPortInfo[port].contCenter;
-
                 if (pad->errno == (CONT_CMD_RX_SUCCESSFUL >> 4)) {
                     gcnInput = (*(__OSContGCNLongPollFormat*)ptr).recv.input;
 
-                    __osContWriteGCNInputData(pad, contCenter, gcnInput.buttons, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
+                    // Long poll is the same as analog mode 3 for the c-stick and triggers.
+                    __osContWriteGCNInputData(pad, gcnInput.buttons, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
                 } else {
-                    contCenter->initialized = FALSE;
+                    pad->contCenters.initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNLongPollFormat);
@@ -210,7 +204,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
                 return;
         }
 
-        port++;
+        pad++;
     }
 }
 

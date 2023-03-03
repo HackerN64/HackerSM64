@@ -25,34 +25,6 @@
 // Input structs //
 ///////////////////
 
-// -- Analog pairs --
-
-typedef union {
-    struct PACKED {
-        /*0x00*/ union {
-            s8 x:4; u8 l:4; u8 a:4;
-        };
-        /*0x00*/ union {
-            s8 y:4; u8 r:4; u8 b:4;
-        };
-    }; /*0x01*/
-    u8 raw;
-} Analog8; /*0x01*/
-
-typedef union {
-    struct PACKED {
-        /*0x00*/ union {
-            s8 x; u8 l; u8 a;
-        };
-        /*0x01*/ union {
-            s8 y; u8 r; u8 b;
-        };
-    }; /*0x02*/
-    u16 raw;
-} Analog16; /*0x02*/
-
-#define ANALOG8_TO_16(src) (Analog16){ ((src).a << 4), ((src).b << 4) }
-
 // -- N64 Standard Controller buttons --
 
 typedef struct PACKED {
@@ -835,20 +807,13 @@ enum PIFStatuses {
 //////////////////////////
 
 typedef struct PACKED {
-    /*0x00*/ s8 initialized;            // Whether this controller's centers have been set.
-    /*0x01*/ Analog16 stick;            // The received analog stick position [-80, 80].
-    /*0x03*/ Analog16 c_stick;          // The received C-stick X position [-80, 80].
-} OSContCenter; /*0x05*/
-
-typedef struct PACKED {
-    /*0x00*/ u16 type;                  // Device type.
-    /*0x02*/ u16 accessory;             // Accessory type.
-    /*0x02*/ u16 pollingInput;          // Input, only used when status polling.
-    /*0x04*/ u8 plugged;                // Whether a controller is plugged in.
-    /*0x05*/ u8 playerNum;              // [0, 4]. 0 = not assigned to a player.
-    /*0x06*/ OSContCenter contCenter;   // GCN Controller Center.
-    /*0x0B*/ u8 gcRumble;               // GCN Rumble byte.
-} OSPortInfo; /*0x0C*/
+    /*0x00*/ u16 type;                  // The SI identifier of the device plugged into this port.
+    /*0x02*/ u16 accessory;             //! TODO: Accessory type in the controller plugged into in this port.
+    /*0x04*/ u16 pollingInput;          // Input, only used when status polling to save the previous frame's inputs.
+    /*0x06*/ u8 plugged;                // Whether a controller is plugged in to this port.
+    /*0x07*/ u8 playerNum;              // The player number. [0, 4]. 0 = not assigned to a player.
+    /*0x08*/ u8 gcRumble;               // GCN Rumble byte.
+} OSPortInfo; /*0x09*/
 
 /////////////
 // externs //

@@ -38,6 +38,8 @@ extern "C" {
 #include "os_message.h"
 #include "os_pfs.h"
 
+#include "macros.h"
+
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
 
@@ -46,6 +48,34 @@ extern "C" {
  * Type definitions
  *
  */
+
+// -- Analog pairs --
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ union {
+            s8 x:4; u8 l:4; u8 a:4;
+        };
+        /*0x00*/ union {
+            s8 y:4; u8 r:4; u8 b:4;
+        };
+    }; /*0x01*/
+    u8 raw;
+} Analog8; /*0x01*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ union {
+            s8 x; u8 l; u8 a;
+        };
+        /*0x01*/ union {
+            s8 y; u8 r; u8 b;
+        };
+    }; /*0x02*/
+    u16 raw;
+} Analog16; /*0x02*/
+
+#define ANALOG8_TO_16(src) (Analog16){ ((src).a << 4), ((src).b << 4) }
 
 /*
  * Structure for controllers
@@ -64,6 +94,12 @@ typedef struct {
     /*0x04*/ u8  error;                     /* Error */
 } OSContPad; /*0x05*/
 
+typedef struct PACKED {
+    /*0x00*/ s8 initialized;                /* Whether this controller's centers have been set. */
+    /*0x01*/ Analog16 stick;                /* -80 <=   stick <=  80 */
+    /*0x03*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
+} OSContCenters; /*0x05*/
+
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
     /*0x00*/ u16 button;                    /* Button data */
@@ -73,11 +109,12 @@ typedef struct {
     /*0x05*/ s8  c_stick_y;                 /* -80 <= c_stick_y <=  80 */
     /*0x06*/ u8  l_trig;                    /*   0 <= l_trig    <= 255 */
     /*0x07*/ u8  r_trig;                    /*   0 <= r_trig    <= 255 */
-    /*0x08*/ u8	errno;                      /* Error number */
-} OSContPadEx; /*0x09*/
+    /*0x08*/ OSContCenters contCenters;     /* GCN Analog Centers */
+    /*0x0D*/ u8	errno;                      /* Error number */
+} OSContPadEx; /*0x0E*/
 
 typedef struct {
-    /*0x00*/ void *address;                 /* Ram pad Address:  11 bits */
+    /*0x00*/ void *address;                 /* Ram pad Address: 11 bits */
     /*0x04*/ u8   databuffer[BLOCKSIZE];    /* address of the data buffer */
     /*0x05*/ u8   addressCrc;               /* CRC code for address */
     /*0x06*/ u8   dataCrc;                  /* CRC code for data */
