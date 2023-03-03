@@ -6,7 +6,7 @@
 #include "main.h"
 #include "rumble_init.h"
 #include "level_update.h"
-#include "controller.h"
+#include "joybus.h"
 #include "game_input.h"
 
 #ifdef ENABLE_RUMBLE

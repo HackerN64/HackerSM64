@@ -1,7 +1,7 @@
 #include <ultra64.h>
 #include "config.h"
 
-#include "controller.h"
+#include "joybus.h"
 #include "engine/math_util.h"
 #include "main.h"
 #include "game_init.h"

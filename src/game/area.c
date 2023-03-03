@@ -26,7 +26,7 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "engine/colors.h"
-#include "controller.h"
+#include "joybus.h"
 #include "profiling.h"
 #include "fasttext.h"
 
@@ -362,7 +362,7 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 }
 
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-ALIGNED8 static const char* sButtonStr[16] = {
+ALIGNED8 static const char* sN64ButtonNames[16] = {
     "A",       // A_BUTTON
     "B",       // B_BUTTON
     "Z",       // Z_TRIG
@@ -387,15 +387,15 @@ ALIGNED8 static const char* sButtonStr[16] = {
 static size_t button_combo_to_string(char *strp, u16 buttons) {
     size_t count = 0;
 
-    for (int i = 0; i < ARRAY_COUNT(sButtonStr); i++) {
-        if (buttons & ((1 << (ARRAY_COUNT(sButtonStr) - 1)) >> i)) { // 0x8000 >> i
+    for (int i = 0; i < ARRAY_COUNT(sN64ButtonNames); i++) {
+        if (buttons & ((1 << (ARRAY_COUNT(sN64ButtonNames) - 1)) >> i)) { // 0x8000 >> i
             if (count) {
                 strcat(strp, "+");
                 count += strlen("+");
             }
 
-            strcat(strp, sButtonStr[i]);
-            count += strlen(sButtonStr[i]);
+            strcat(strp, sN64ButtonNames[i]);
+            count += strlen(sN64ButtonNames[i]);
         }
     }
 

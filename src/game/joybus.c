@@ -2,7 +2,7 @@
 #include <PR/os_internal.h>
 #include "config.h"
 #include "string.h"
-#include "controller.h"
+#include "joybus.h"
 #include "engine/math_util.h"
 #include "game_init.h"
 #include "game_input.h"
