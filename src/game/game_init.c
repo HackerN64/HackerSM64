@@ -481,6 +481,7 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     setup_game_memory();
+    init_controllers();
 #ifdef EEP
     // EEPROM probe for save data.
     gEepromProbe = gIsVC
@@ -490,7 +491,6 @@ void thread5_game_loop(UNUSED void *arg) {
 #ifdef SRAM
     gSramProbe = nuPiInitSram();
 #endif
-    init_controllers();
 #ifdef ENABLE_RUMBLE
     create_thread_6_rumble();
 #endif

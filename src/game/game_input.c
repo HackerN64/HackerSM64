@@ -213,6 +213,12 @@ void stop_controller_status_polling(void) {
     gContStatusPollTimer = 0;
     gNumPlayers--;
     assign_controllers_by_player_num();
+#ifdef EEP
+    // EEPROM probe for save data.
+    gEepromProbe = gIsVC
+                 ? osEepromProbeVC(&gSIEventMesgQueue)
+                 : osEepromProbe  (&gSIEventMesgQueue);
+#endif
 #ifdef ENABLE_RUMBLE
     cancel_rumble();
 #endif
