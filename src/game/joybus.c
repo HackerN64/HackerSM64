@@ -119,7 +119,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
         }
 
         readformatptr = (__OSContReadFormat*)ptr;
-        pad->errno = CHNL_ERR(readformatptr->cmd);
+        pad->errno = CHNL_ERR(readformatptr->size);
 
         // If a controller being read was unplugged, start status polling on all 4 ports.
         if (pad->errno & (CHNL_ERR_NORESP >> 4)) {
@@ -202,16 +202,16 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
 // Default N64 Controller Input Poll command:
 static const __OSContReadFormat sN64WriteFormat = {
-    .cmd.txsize         = sizeof(((__OSContReadFormat*)0)->send),
-    .cmd.rxsize         = sizeof(((__OSContReadFormat*)0)->recv),
+    .size.tx            = sizeof(((__OSContReadFormat*)0)->send),
+    .size.rx            = sizeof(((__OSContReadFormat*)0)->recv),
     .send.cmdID         = CONT_CMD_READ_BUTTON,
     .recv.input.raw     = -1, // 0xFFFF
 };
 
 // Default GCN Controller Input Short Poll command:
 static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
-    .cmd.txsize         = sizeof(((__OSContGCNShortPollFormat*)0)->send),
-    .cmd.rxsize         = sizeof(((__OSContGCNShortPollFormat*)0)->recv),
+    .size.tx            = sizeof(((__OSContGCNShortPollFormat*)0)->send),
+    .size.rx            = sizeof(((__OSContGCNShortPollFormat*)0)->recv),
     .send.cmdID         = CONT_CMD_READ_BUTTON,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
@@ -289,7 +289,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
     for (port = 0; port < __osMaxControllers; port++) {
         requestHeader = *(__OSContRequestFormat*)ptr;
-        data->error = CHNL_ERR(requestHeader.cmd);
+        data->error = CHNL_ERR(requestHeader.size);
 
         if (data->error == (CHNL_ERR_SUCCESS >> 4)) {
             portInfo = &gPortInfo[port];
@@ -366,7 +366,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
         // Check for errors.
-        err = CHNL_ERR(readformat->cmd);
+        err = CHNL_ERR(readformat->size);
         if (err == (CHNL_ERR_SUCCESS >> 4)) {
             if (flag == MOTOR_STOP) {
                 if (readformat->recv.datacrc != 0) { // 0xFF = Disconnected.
@@ -400,8 +400,8 @@ static void _MakeMotorData(int channel, OSPifRam* mdata) {
     int i;
 
     ramwriteformat.align       = PIF_CMD_NOP;
-    ramwriteformat.cmd.txsize  = sizeof(ramwriteformat.send);
-    ramwriteformat.cmd.rxsize  = sizeof(ramwriteformat.recv);
+    ramwriteformat.size.tx     = sizeof(ramwriteformat.send);
+    ramwriteformat.size.rx     = sizeof(ramwriteformat.recv);
     ramwriteformat.send.cmdID  = CONT_CMD_WRITE_MEMPAK;
     ramwriteformat.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
     ramwriteformat.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
