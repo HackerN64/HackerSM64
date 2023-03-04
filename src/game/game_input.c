@@ -8,6 +8,8 @@
 #include "rumble_init.h"
 #include "game_input.h"
 #include "profiling.h"
+#include "vc_check.h"
+#include "vc_ultra.h"
 
 // Player Controllers
 struct Controller gControllers[MAXCONTROLLERS];
