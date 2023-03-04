@@ -240,7 +240,8 @@ void reset_rumble_timers_vibrate(s32 level) {
 }
 
 /**
- * Called by act_breaststroke. Ignores the rumble queue.
+ * Bypasses the queue by changing gCurrRumbleSettings directly.
+ * Called by act_breaststroke.
  */
 void queue_rumble_submerged(void) {
     if (gCurrDemoInput != NULL) {

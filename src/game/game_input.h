@@ -11,7 +11,7 @@
 
 // This button combo should be standard, so don't change it unless you have a very good reason.
 #define TOGGLE_CONT_STATUS_POLLING_COMBO            (A_BUTTON | B_BUTTON | START_BUTTON)
-// How long after exiting polling to start accepting inputs.
+// How long after exiting polling to start accepting inputs, in frames.
 // The purpose of this is to allow the player to release all the combo buttons before the game would recognize them.
 // Default is 3.
 #define CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN      3

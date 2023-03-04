@@ -119,7 +119,7 @@ typedef union {
 typedef struct PACKED {
     /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
     /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates if get origin (0x41) was called.
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
     /*0x0*/ u16 X               : 1; // CONT_GCN_X
@@ -140,7 +140,7 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
     /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates if get origin (0x41) was called.
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 LEFT_TOP        : 1;
     /*0x0*/ u16 RIGHT_TOP       : 1;
@@ -252,6 +252,7 @@ typedef struct PACKED {
 // Specific command format structs //
 /////////////////////////////////////
 
+// Third byte returned by CONT_CMD_REQUEST_STATUS or CONT_CMD_RESET.
 typedef union {
     struct PACKED { // Standard N64 Controller.
         /*0x00*/ u8              : 5;
@@ -273,7 +274,7 @@ typedef union {
         /*0x00*/ u8              : 7;
     } eep; /*0x01*/
     u8 raw;
-} OSContRequestStatus; /*0x01*/
+} OSStatusByte3; /*0x01*/
 
 // -- Standard for all devices --
 
@@ -286,7 +287,7 @@ typedef struct PACKED {
             } send; /*0x01*/
     /*0x04*/ struct PACKED {
                 /*0x00*/ HiLo16 type;           // Device type.
-                /*0x02*/ OSContRequestStatus status; // Status byte, depends on device type.
+                /*0x02*/ OSStatusByte3 status;  // Status byte, depends on device type.
             } recv; /*0x03*/
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
 } __OSContRequestFormat; /*0x08*/
@@ -299,7 +300,7 @@ typedef struct PACKED {
             } send; /*0x01*/
     /*0x03*/ struct PACKED {
                 /*0x00*/ HiLo16 type;           // Device type.
-                /*0x02*/ OSContRequestStatus status; // Status byte, depends on device type.
+                /*0x02*/ OSStatusByte3 status;  // Status byte, depends on device type.
             } recv; /*0x03*/
 } __OSContRequesFormatShort; /*0x06*/
 
@@ -383,7 +384,7 @@ typedef union {
         /*0x00*/ u8             : 5;    // These bits have never been seen set.
         /*0x00*/ u8 crystalFail : 1;    // If this bit is set, the crystal is not working.
         /*0x00*/ u8 batteryFail : 1;    // If this bit is set, the supply voltage of the RTC became too low.
-    } bits; /*0x01*/
+    }; /*0x01*/
     u8 raw;
 } RTCStatus; /*0x01*/
 
@@ -419,7 +420,7 @@ typedef union {
                     u8 raw;
                 } control;
         /*0x02*/ u8 unused0[2];
-        /*0x04*/ u8 unknown[2];     // Can be updated but have no visible function.
+        /*0x04*/ u8 unknown[2];     // These two can be updated but have no visible function.
         /*0x06*/ u8 unused1[2];
     } block0; // Block 0: Control Registers. Determines the current clock "mode".
     struct PACKED {

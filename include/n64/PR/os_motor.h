@@ -63,6 +63,8 @@ extern "C" {
 
 extern s32 osMotorInit(  OSMesgQueue *mq, OSPfs *pfs, int controller_no);
 extern s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int controller_no);
+#define MOTOR_MASK_N64  0b01
+#define MOTOR_MASK_GCN  0b11
 enum OSMotorOP {
     MOTOR_STOP,
     MOTOR_START,

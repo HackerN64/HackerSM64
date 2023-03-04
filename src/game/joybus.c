@@ -74,13 +74,13 @@ static void __osContWriteGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16
     // Map GCN button bits to N64 button bits.
     n64.standard.A       = gcn.standard.A;
     n64.standard.B       = gcn.standard.B;
-    n64.standard.Z       = (trig.l > GCN_TRIGGER_THRESHOLD); // Swap L and Z.
+    n64.standard.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
     n64.standard.START   = gcn.standard.START;
     n64.standard.D_UP    = gcn.standard.D_UP;
     n64.standard.D_DOWN  = gcn.standard.D_DOWN;
     n64.standard.D_LEFT  = gcn.standard.D_LEFT;
     n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
-    n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on an N64 controller to recalibrate the analog stick (which also unsets the START bit).
+    n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
     n64.standard.unused  = gcn.standard.Y; // The N64 controller's unused bit.
     n64.standard.L       = gcn.standard.Z; // Swap L and Z.
     n64.standard.R       = gcn.standard.R;
@@ -113,7 +113,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             continue;
         }
         if (*ptr == PIF_CMD_NOP) {
-            // Skip 0xFF bytes.
+            // Skip bytes that are PIF_CMD_NOP (0xFF).
             ptr++;
             continue;
         }
@@ -146,7 +146,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
                     Analog16 c_stick, trig;
 
-                    // The GameCube controller has various modes for returning the lower analog bits (4-bit per axis vs. 8-bit per axis).
+                    // The GameCube controller has various modes for returning the lower analog bits (4 bits per axis vs. 8 bits per axis).
                     switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
                         default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
                             c_stick = gcnInput.m0.c_stick;
@@ -182,7 +182,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     gcnInput = (*(__OSContGCNLongPollFormat*)ptr).recv.input;
 
-                    // Long poll is the same as analog mode 3 for the c-stick and triggers.
+                    // Long poll returns 8 bits for all analog axes (equivalent to mode 3 but with 2 more bytes for the usually unused analog buttons (1 byte each)).
                     __osContWriteGCNInputData(pad, gcnInput.buttons, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
                 } else {
                     pad->contCenters.initialized = FALSE;
@@ -237,7 +237,7 @@ static void __osPackReadData(void) {
         // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
         if (portInfo->plugged && (gContStatusPolling || portInfo->playerNum)) {
             if (portInfo->type & CONT_CONSOLE_GCN) {
-                (*(__OSContGCNShortPollFormat*)ptr)= sGCNWriteFormatShort;
+                (*(__OSContGCNShortPollFormat*)ptr) = sGCNWriteFormatShort;
                 (*(__OSContGCNShortPollFormat*)ptr).send.rumble = portInfo->gcRumble;
 
                 ptr += sizeof(__OSContGCNShortPollFormat);
@@ -319,7 +319,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 // motor.c //
 /////////////
 
-// A buffer to hold the rumble commands for each port.
+// A buffer to hold separate rumble commands for each port.
 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 /**
@@ -340,10 +340,8 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         gPortInfo[channel].gcRumble = flag;
         __osContLastCmd = PIF_CMD_END;
     } else { // N64 Controllers.
-        // N64 Controllers don't have MOTOR_STOP_HARD.
-        if (flag == MOTOR_STOP_HARD) {
-            flag = MOTOR_STOP;
-        }
+        // N64 rumble pak can only use MOTOR_STOP or MOTOR_START.
+        flag &= MOTOR_MASK_N64;
 
         __osSiGetAccess();
 
@@ -367,15 +365,14 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        err = (readformat->cmd.rxsize & CHNL_ERR_MASK);
-        if (!err) {
-            if (!flag) {
-                // MOTOR_STOP
+        // Check for errors.
+        err = CHNL_ERR(readformat->cmd);
+        if (err == (CHNL_ERR_SUCCESS >> 4)) {
+            if (flag == MOTOR_STOP) {
                 if (readformat->recv.datacrc != 0) { // 0xFF = Disconnected.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
-            } else {
-                // MOTOR_START
+            } else { // MOTOR_START
                 if (readformat->recv.datacrc != 0xEB) { // 0x14 = Uninitialized.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }

@@ -30,7 +30,7 @@ u32 gContStatusPollTimer = 0;
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
 
-#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
+#if (!defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD))
 /**
  * If a demo sequence exists, this will run the demo input list until it is complete.
  */
@@ -309,7 +309,7 @@ static void adjust_analog_stick(struct Controller *controller) {
 void read_controller_inputs_normal(void) {
     s32 cont;
 
-#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
+#if (!defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD))
     run_demo_inputs();
 #endif
 
