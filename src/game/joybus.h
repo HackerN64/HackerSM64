@@ -119,13 +119,13 @@ typedef union {
 typedef struct PACKED {
     /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
     /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates if get origin (0x41) was called.
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
     /*0x0*/ u16 X               : 1; // CONT_GCN_X
     /*0x0*/ u16 B               : 1; // CONT_GCN_B
     /*0x0*/ u16 A               : 1; // CONT_GCN_A
-    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN
+    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
     /*0x1*/ u16 L               : 1; // CONT_GCN_L
     /*0x1*/ u16 R               : 1; // CONT_GCN_R
     /*0x1*/ u16 Z               : 1; // CONT_GCN_Z
@@ -140,13 +140,13 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
     /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates if get origin (0x41) was called.
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 LEFT_TOP        : 1;
     /*0x0*/ u16 RIGHT_TOP       : 1;
     /*0x0*/ u16 LEFT_BOTTOM     : 1;
     /*0x0*/ u16 RIGHT_BOTTOM    : 1;
-    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN
+    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
     /*0x1*/ u16                 : 7;
 } GCNDKBongosButtons; /*0x02*/
 
