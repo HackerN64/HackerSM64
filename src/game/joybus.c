@@ -108,7 +108,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16 
  */
 void osContGetReadDataEx(OSContPadEx* pad) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContReadFormat *readformatptr = NULL;
+    __OSContGenericFormat *readformatptr = NULL;
     N64InputData n64Input;
     GCNInputData gcnInput;
 
@@ -125,7 +125,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             continue;
         }
 
-        readformatptr = (__OSContReadFormat*)ptr;
+        readformatptr = (__OSContGenericFormat*)ptr;
         pad->errno = CHNL_ERR(readformatptr->size);
 
         // If a controller being read was unplugged, start status polling on all 4 ports.

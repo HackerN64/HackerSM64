@@ -252,6 +252,18 @@ typedef struct PACKED {
 // Specific command format structs //
 /////////////////////////////////////
 
+// Generic command format for reading fields common to all formats.
+typedef struct PACKED {
+    /*0x01*/ OSContCmdSize size;    // The TX/RX sizes.
+    /*0x02*/ struct PACKED {
+                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
+            } send; /*0x01*/
+    /*0x04*/ struct PACKED {
+            } recv; /*0x00*/
+} __OSContGenericFormat; /*0x04*/
+
+// -- Standard for all devices --
+
 // Third byte returned by CONT_CMD_REQUEST_STATUS or CONT_CMD_RESET.
 typedef union {
     struct PACKED { // Standard N64 Controller.
@@ -275,8 +287,6 @@ typedef union {
     } eep; /*0x01*/
     u8 raw;
 } OSStatusByte3; /*0x01*/
-
-// -- Standard for all devices --
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
 typedef struct PACKED {
