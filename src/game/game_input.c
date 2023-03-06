@@ -376,11 +376,11 @@ void handle_input(OSMesg* mesg) {
 
     if (gContStatusPolling) {
         // Only poll controller status about twice per second.
-        if (gContStatusPollTimer > CONT_STATUS_POLLING_TIME) {
-            gContStatusPollTimer = 0;
+        if (gContStatusPollTimer == 0) {
+            gContStatusPollTimer = CONT_STATUS_POLLING_TIME;
             poll_controller_statuses(mesg);
         } else {
-            gContStatusPollTimer++;
+            gContStatusPollTimer--;
         }
     }
 
