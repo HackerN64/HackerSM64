@@ -212,17 +212,17 @@ static const __OSContReadFormat sN64WriteFormat = {
     .size.tx            = sizeof(((__OSContReadFormat*)0)->send),
     .size.rx            = sizeof(((__OSContReadFormat*)0)->recv),
     .send.cmdID         = CONT_CMD_READ_BUTTON,
-    .recv.input.raw.u8  = { -1 }, // 4 bytes of 0xFF.
+    .recv.input.raw.u8  = { PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
 };
 
 // Default GCN Controller Input Short Poll command:
 static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
     .size.tx            = sizeof(((__OSContGCNShortPollFormat*)0)->send),
     .size.rx            = sizeof(((__OSContGCNShortPollFormat*)0)->recv),
-    .send.cmdID         = CONT_CMD_READ_BUTTON,
+    .send.cmdID         = CONT_CMD_GCN_SHORT_POLL,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
-    .recv.input.raw.u8  = { -1 }, // 8 bytes of 0xFF.
+    .recv.input.raw.u8  = { PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
 };
 
 /**
