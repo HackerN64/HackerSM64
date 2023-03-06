@@ -240,9 +240,9 @@ void read_controller_inputs_status_polling(void) {
         if (portInfo->plugged) {
             u16 button = gControllerPads[port].button;
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
-            u16 pressed = (~portInfo->pollingInput & button);
+            u16 pressed = (~portInfo->statusPollButtons & button);
 #endif
-            portInfo->pollingInput = button;
+            portInfo->statusPollButtons = button;
             totalInput |= button;
 
             if (gContStatusPollingReadyForInput) {
@@ -269,7 +269,7 @@ void read_controller_inputs_status_polling(void) {
                 }
             }
         } else {
-            portInfo->pollingInput = 0x0000;
+            portInfo->statusPollButtons = 0x0000;
         }
     }
 
