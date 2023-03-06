@@ -1883,19 +1883,19 @@ void bhv_init_room(void) {
 s32 is_mario_in_room(void) {
     if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
         if (is_room_loaded()) {
-            return TRUE;
+            return MARIO_INSIDE_ROOM;
         }
-        return FALSE;
+        return MARIO_OUTSIDE_ROOM;
     }
-    return -1;
+    return MARIO_ROOM_UNDEFINED;
 }
 
 void cur_obj_enable_disable_room_rendering(s32 inRoom) {
-    if (inRoom == TRUE) {
+    if (inRoom == MARIO_INSIDE_ROOM) {
         cur_obj_enable_rendering();
         o->activeFlags &= ~ACTIVE_FLAG_IN_DIFFERENT_ROOM;
         gNumRoomedObjectsInMarioRoom++;
-    } else if (inRoom == FALSE) {
+    } else if (inRoom == MARIO_OUTSIDE_ROOM) {
         cur_obj_disable_rendering();
         o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
         gNumRoomedObjectsNotInMarioRoom++;

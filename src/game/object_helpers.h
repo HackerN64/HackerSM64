@@ -219,6 +219,12 @@ enum ObjScaleAxis {
     SCALE_AXIS_Z = (1 << 2), // 0x04
 };
 
+enum MarioRoomStates {
+    MARIO_ROOM_UNDEFINED = -1,
+    MARIO_OUTSIDE_ROOM,
+    MARIO_INSIDE_ROOM
+};
+
 void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox);
 s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks);
 s32 cur_obj_is_mario_ground_pounding_platform(void);
