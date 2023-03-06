@@ -56,23 +56,23 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
  * Called by osContGetReadDataEx.
  */
 static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16 stick, Analog16 c_stick, Analog16 trig) {
-    OSContCenters* contCenters = &pad->contCenters;
+    OSContOrigins* origins = &pad->origins;
     N64Buttons n64 = { .raw = 0x0 };
 
     // The first time the controller is connected, store the origins for the controller's analog sticks.
-    if (!contCenters->initialized) {
+    if (!origins->initialized) {
         //! TODO: Repoll for origins (0x41) if gcn.standard.GET_ORIGIN is set.
-        contCenters->initialized = TRUE;
-        contCenters->stick   = stick;
-        contCenters->c_stick = c_stick;
-        contCenters->trig    = trig;
+        origins->initialized = TRUE;
+        origins->stick   = stick;
+        origins->c_stick = c_stick;
+        origins->trig    = trig;
     }
 
     // Write the analog data.
     if (gcn.standard.USE_ORIGIN) {
-        pad->stick   = ANALOG_S16_CENTER(stick,   contCenters->stick);
-        pad->c_stick = ANALOG_S16_CENTER(c_stick, contCenters->c_stick);
-        pad->trig    = ANALOG_U16_CENTER(trig,    contCenters->trig);
+        pad->stick   = ANALOG_S16_CENTER(stick,   origins->stick);
+        pad->c_stick = ANALOG_S16_CENTER(c_stick, origins->c_stick);
+        pad->trig    = ANALOG_U16_CENTER(trig,    origins->trig);
     } else {
         pad->stick   = stick;
         pad->c_stick = c_stick;
@@ -182,7 +182,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
                     __osContReadGCNInputData(pad, gcnInput.buttons, gcnInput.stick, c_stick, trig);
                 } else {
-                    pad->contCenters.initialized = FALSE;
+                    pad->origins.initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNShortPollFormat);
@@ -195,7 +195,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     // Long poll returns 8 bits for all analog axes (equivalent to mode 3 but with 2 more bytes for the usually unused analog buttons (1 byte each)).
                     __osContReadGCNInputData(pad, gcnInput.buttons, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
                 } else {
-                    pad->contCenters.initialized = FALSE;
+                    pad->origins.initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNLongPollFormat);

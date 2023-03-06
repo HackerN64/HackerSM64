@@ -98,11 +98,11 @@ typedef struct {
 } OSContPad; /*0x05*/
 
 typedef struct PACKED {
-    /*0x00*/ s8 initialized;                /* Whether this controller's centers have been set. */
+    /*0x00*/ s8 initialized;                /* Whether this controller's origins have been set. */
     /*0x01*/ Analog16 stick;                /* -80 <=   stick <=  80 */
     /*0x03*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
     /*0x05*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
-} OSContCenters; /*0x07*/
+} OSContOrigins; /*0x07*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
@@ -111,7 +111,7 @@ typedef struct {
     /*0x04*/ Analog16 stick;                /* -80 <=   stick <=  80 */
     /*0x06*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
     /*0x08*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
-    /*0x0A*/ OSContCenters contCenters;     /* GCN Analog Centers */
+    /*0x0A*/ OSContOrigins origins;         /* GCN Analog Origins */
     /*0x0F*/ u8	errno;                      /* Error number */
 } OSContPadEx; /*0x10*/
 
