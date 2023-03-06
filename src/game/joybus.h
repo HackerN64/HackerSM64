@@ -256,7 +256,7 @@ typedef struct PACKED {
 typedef struct PACKED {
     /*0x01*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ struct PACKED {
-                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
+                /*0x00*/ u8 cmdID;              // The ID of the command to run.
             } send; /*0x01*/
     /*0x04*/ struct PACKED {
             } recv; /*0x00*/
