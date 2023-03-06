@@ -61,6 +61,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16 
 
     // The first time the controller is connected, store the origins for the controller's analog sticks.
     if (!contCenters->initialized) {
+        //! TODO: Repoll for origins (0x41) if gcn.standard.GET_ORIGIN is set.
         contCenters->initialized = TRUE;
         contCenters->stick   = stick;
         contCenters->c_stick = c_stick;
@@ -113,7 +114,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
     GCNInputData gcnInput;
 
     while (*ptr != PIF_CMD_END) {
-        if (*ptr == PIF_CMD_SKIP_CHNL) {
+        if (*ptr == PIF_CMD_SKIP_CHNL || *ptr == PIF_CMD_RESET_CHNL) {
             // Skip empty channels/ports.
             pad++;
             ptr++;
@@ -125,15 +126,17 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             continue;
         }
 
+        // Not a special byte, so read a poll command:
         readformatptr = (__OSContGenericFormat*)ptr;
         pad->errno = CHNL_ERR(readformatptr->size);
 
-        // If a controller being read was unplugged, start status polling on all 4 ports.
-        if (pad->errno & (CHNL_ERR_NORESP >> 4)) {
+        // If the controller being read was unplugged, start status polling on all 4 ports.
+        if (pad->errno == (CHNL_ERR_NORESP >> 4)) {
             start_controller_status_polling();
             return;
         }
 
+        // Handle different types of poll commands:
         switch (readformatptr->send.cmdID) {
             case CONT_CMD_READ_BUTTON:
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
@@ -209,20 +212,20 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
 // Default N64 Controller Input Poll command:
 static const __OSContReadFormat sN64WriteFormat = {
-    .size.tx            = sizeof(((__OSContReadFormat*)0)->send),
-    .size.rx            = sizeof(((__OSContReadFormat*)0)->recv),
+    .size.tx            = sizeof(sN64WriteFormat.send),
+    .size.rx            = sizeof(sN64WriteFormat.recv),
     .send.cmdID         = CONT_CMD_READ_BUTTON,
-    .recv.input.raw.u8  = { PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
+    .recv.input.raw.u8  = { [0 ... (sizeof(sN64WriteFormat.recv.input.raw.u8) - 1)] = PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
 };
 
 // Default GCN Controller Input Short Poll command:
 static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
-    .size.tx            = sizeof(((__OSContGCNShortPollFormat*)0)->send),
-    .size.rx            = sizeof(((__OSContGCNShortPollFormat*)0)->recv),
+    .size.tx            = sizeof(sGCNWriteFormatShort.send),
+    .size.rx            = sizeof(sGCNWriteFormatShort.recv),
     .send.cmdID         = CONT_CMD_GCN_SHORT_POLL,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
-    .recv.input.raw.u8  = { PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
+    .recv.input.raw.u8  = { [0 ... (sizeof(sGCNWriteFormatShort.recv.input.raw.u8) - 1)] = PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
 };
 
 /**

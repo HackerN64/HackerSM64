@@ -52,26 +52,16 @@ extern "C" {
 // -- Analog pairs --
 
 typedef union {
-    struct PACKED {
-        /*0x00*/ union {
-            s8 x:4; u8 l:4; u8 a:4;
-        };
-        /*0x00*/ union {
-            s8 y:4; u8 r:4; u8 b:4;
-        };
-    }; /*0x01*/
+    struct PACKED { s8 x:4, y:4; };
+    struct PACKED { u8 l:4, r:4; };
+    struct PACKED { u8 a:4, b:4; };
     u8 raw;
 } Analog8; /*0x01*/
 
 typedef union {
-    struct PACKED {
-        /*0x00*/ union {
-            s8 x; u8 l; u8 a;
-        };
-        /*0x01*/ union {
-            s8 y; u8 r; u8 b;
-        };
-    }; /*0x02*/
+    struct PACKED { s8 x:8, y:8; };
+    struct PACKED { u8 l:8, r:8; };
+    struct PACKED { u8 a:8, b:8; };
     u16 raw;
 } Analog16; /*0x02*/
 
