@@ -14,23 +14,23 @@
 // Player Controllers
 struct Controller gControllers[MAXCONTROLLERS];
 // Defined controller slots. Anything above NUM_SUPPORTED_CONTROLLERS will be unused.
-struct Controller *gPlayer1Controller = &gControllers[0];
-struct Controller *gPlayer2Controller = &gControllers[1];
-struct Controller *gPlayer3Controller = &gControllers[2];
-struct Controller *gPlayer4Controller = &gControllers[3];
+struct Controller* const gPlayer1Controller = &gControllers[0];
+struct Controller* const gPlayer2Controller = &gControllers[1];
+struct Controller* const gPlayer3Controller = &gControllers[2];
+struct Controller* const gPlayer4Controller = &gControllers[3];
 
 // OS Controllers
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
 u8 gNumPlayers = 0;
-u8 gControllerBits = 0x0; // Which ports have a controller connected to them.
+u8 gControllerBits = 0b0000; // Which ports have a controller connected to them.
 u8 gContStatusPolling = FALSE;
 u8 gContStatusPollingReadyForInput = TRUE;
 u32 gContStatusPollTimer = 0;
 
 // Title Screen Demo Handler
-struct DemoInput *gCurrDemoInput = NULL;
+struct DemoInput* gCurrDemoInput = NULL;
 
 #if (!defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD))
 /**
@@ -86,7 +86,7 @@ ALWAYS_INLINE s32 check_button_pressed_combo(u16 buttonDown, u16 buttonPressed, 
 /**
  * Link the controller struct to the appropriate status and pad.
  */
-void assign_controller_data(struct Controller *controller, int port) {
+void assign_controller_data(struct Controller* controller, int port) {
     controller->statusData = &gControllerStatuses[port];
     controller->controllerData = &gControllerPads[port];
     controller->port = port;
@@ -102,7 +102,7 @@ void assign_controllers_auto(void) {
 #else
     const s32 prioritizeGCN = FALSE;
 #endif
-    OSPortInfo *portInfo = NULL;
+    OSPortInfo* portInfo = NULL;
     int port, cont = 0;
     int lastUsedPort = -1;
 
@@ -142,7 +142,7 @@ void assign_controllers_auto(void) {
  * Assigns controllers based on assigned data from status polling.
  */
 void assign_controllers_by_player_num(void) {
-    OSPortInfo *portInfo = NULL;
+    OSPortInfo* portInfo = NULL;
     int port;
     int lastUsedPort = -1;
 
@@ -165,7 +165,7 @@ void assign_controllers_by_player_num(void) {
 /**
  * Read raw controller input data.
  */
-static void poll_controller_inputs(OSMesg *mesg) {
+static void poll_controller_inputs(OSMesg* mesg) {
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -180,7 +180,7 @@ static void poll_controller_inputs(OSMesg *mesg) {
 /**
  * Check for new controller data on all ports.
  */
-static void poll_controller_statuses(OSMesg *mesg) {
+static void poll_controller_statuses(OSMesg* mesg) {
 #ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
 #endif
@@ -230,7 +230,7 @@ void stop_controller_status_polling(void) {
  * Assign player numbers to controllers based on player input.
  */
 void read_controller_inputs_status_polling(void) {
-    OSPortInfo *portInfo = NULL;
+    OSPortInfo* portInfo = NULL;
     u16 totalInput = 0x0;
 
     // Read inputs from all four ports when status polling.
@@ -250,26 +250,31 @@ void read_controller_inputs_status_polling(void) {
                 if (button && !portInfo->playerNum) {
                     portInfo->playerNum = ++gNumPlayers;
                 }
-
+#if (NUM_SUPPORTED_CONTROLLERS > 1)
                 // If the combo is pressed, stop polling and assign the current controllers.
+                if (portInfo->playerNum
+                 && check_button_pressed_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+                    gControllerPads[port].lockedButton = TOGGLE_CONT_STATUS_POLLING_COMBO;
+                    gContStatusPollingReadyForInput = FALSE;
+                    stop_controller_status_polling();
+                    return;
+                }
+#endif
+                // If we've exceeded the number of controllers, stop polling and assign the current controllers.
                 if (gNumPlayers >= __builtin_popcount(gControllerBits)
                  || gNumPlayers >= NUM_SUPPORTED_CONTROLLERS
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
-                 || check_button_pressed_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)
-#endif
                 ) {
-                    gContStatusPollingReadyForInput = FALSE;
                     stop_controller_status_polling();
                     return;
                 }
             }
         } else {
-            portInfo->pollingInput = 0x0;
+            portInfo->pollingInput = 0x0000;
         }
     }
 
     // Wait for all inputs to be realseased before checking for player assignment inputs or the combo being entered again.
-    if (totalInput == 0) {
+    if (!totalInput) {
         gContStatusPollingReadyForInput = TRUE;
     }
 }
@@ -278,13 +283,13 @@ void read_controller_inputs_status_polling(void) {
 /**
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
-static void adjust_analog_stick(struct Controller *controller) {
+static void adjust_analog_stick(struct Controller* controller) {
     s16 deadzone = (controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8;
     s16 offset = (deadzone - 2);
 
     // Reset the controller's x and y floats.
-    controller->stickX = 0;
-    controller->stickY = 0;
+    controller->stickX = 0.0f;
+    controller->stickY = 0.0f;
 
     // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
     if (controller->rawStickX <= -deadzone) controller->stickX = (controller->rawStickX + offset);
@@ -315,36 +320,35 @@ void read_controller_inputs_normal(void) {
 #endif
 
     for (cont = 0; cont < NUM_SUPPORTED_CONTROLLERS; cont++) {
-        struct Controller *controller = &gControllers[cont];
-        OSContPadEx *controllerData = controller->controllerData;
+        struct Controller* controller = &gControllers[cont];
+        OSContPadEx* controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
-        if (controllerData != NULL && gContStatusPollTimer > CONT_STATUS_POLLING_EXIT_INPUT_COOLDOWN) {
+        if (controllerData != NULL) {
             controller->rawStickX = controllerData->stick.x;
             controller->rawStickY = controllerData->stick.y;
-            controller->buttonPressed  = (~controller->buttonDown & controllerData->button);
-            controller->buttonReleased = (~controllerData->button & controller->buttonDown);
+            // Lock buttons that were used in the combo to exit status polling until they are released.
+            controllerData->lockedButton &= controllerData->button;
+            u16 button = controllerData->button &= ~controllerData->lockedButton;
+            controller->buttonPressed  = (~controller->buttonDown & button);
+            controller->buttonReleased = (~button & controller->buttonDown);
             // 0.5x A presses are a good meme
-            controller->buttonDown = controllerData->button;
+            controller->buttonDown = button;
             adjust_analog_stick(controller);
 
-            if (gContStatusPollingReadyForInput) {
-                if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
-                    gContStatusPollingReadyForInput = FALSE;
-                    start_controller_status_polling();
-                }
-            } else if ((controller->buttonDown & TOGGLE_CONT_STATUS_POLLING_COMBO) != TOGGLE_CONT_STATUS_POLLING_COMBO) { //! this should only check the controller that pressed the combo to exit
-                gContStatusPollingReadyForInput = TRUE;
+            if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+                gContStatusPollingReadyForInput = FALSE;
+                start_controller_status_polling();
             }
         } else {
             // Otherwise, if controllerData is NULL or the cooldown hasn't finished, zero out all of the inputs.
             controller->rawStickX      = 0;
             controller->rawStickY      = 0;
-            controller->buttonPressed  = 0;
-            controller->buttonReleased = 0;
-            controller->buttonDown     = 0;
-            controller->stickX         = 0;
-            controller->stickY         = 0;
-            controller->stickMag       = 0;
+            controller->buttonPressed  = 0x0000;
+            controller->buttonReleased = 0x0000;
+            controller->buttonDown     = 0x0000;
+            controller->stickX         = 0.0f;
+            controller->stickY         = 0.0f;
+            controller->stickMag       = 0.0f;
         }
     }
 }
@@ -352,7 +356,7 @@ void read_controller_inputs_normal(void) {
 /**
  * General input handling function.
  */
-void handle_input(OSMesg *mesg) {
+void handle_input(OSMesg* mesg) {
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
         // Read the raw input data from the controllers.
@@ -370,12 +374,15 @@ void handle_input(OSMesg *mesg) {
         start_controller_status_polling();
     }
 
-    // Only poll controller status about twice per second.
-    if (gContStatusPolling && ((gContStatusPollTimer % CONT_STATUS_POLLING_TIME) == 0)) {
-        poll_controller_statuses(mesg);
+    if (gContStatusPolling) {
+        // Only poll controller status about twice per second.
+        if (gContStatusPollTimer > CONT_STATUS_POLLING_TIME) {
+            gContStatusPollTimer = 0;
+            poll_controller_statuses(mesg);
+        } else {
+            gContStatusPollTimer++;
+        }
     }
-
-    gContStatusPollTimer++;
 
     profiler_update(PROFILER_TIME_CONTROLLERS);
 }

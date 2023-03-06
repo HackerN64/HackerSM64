@@ -384,7 +384,7 @@ ALIGNED8 static const char* sN64ButtonNames[16] = {
 /**
  * Creates a string from a combination of buttons and adds it to 'strp'.
  */
-static size_t button_combo_to_string(char *strp, u16 buttons) {
+static size_t button_combo_to_string(char* strp, u16 buttons) {
     size_t count = 0;
 
     for (int i = 0; i < ARRAY_COUNT(sN64ButtonNames); i++) {
@@ -448,8 +448,8 @@ void render_controllers_overlay(void) {
     const s32 y = (SCREEN_CENTER_Y - (h / 2));
     const s32 texW = 32;
     const s32 texH = 32;
-    Texture *texture_controller = texture_controller_unknown;
-    OSPortInfo *portInfo = NULL;
+    Texture* texture_controller = texture_controller_unknown;
+    OSPortInfo* portInfo = NULL;
     char text_buffer[32] = "";
     int port;
 

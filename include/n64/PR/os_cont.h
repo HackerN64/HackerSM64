@@ -107,12 +107,13 @@ typedef struct PACKED {
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
     /*0x00*/ u16 button;                    /* Button data */
-    /*0x02*/ Analog16 stick;                /* -80 <=   stick <=  80 */
-    /*0x04*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
-    /*0x06*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
-    /*0x08*/ OSContCenters contCenters;     /* GCN Analog Centers */
-    /*0x0D*/ u8	errno;                      /* Error number */
-} OSContPadEx; /*0x0E*/
+    /*0x02*/ u16 lockedButton;              /* Button data to ignore */
+    /*0x04*/ Analog16 stick;                /* -80 <=   stick <=  80 */
+    /*0x06*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
+    /*0x08*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
+    /*0x0A*/ OSContCenters contCenters;     /* GCN Analog Centers */
+    /*0x0F*/ u8	errno;                      /* Error number */
+} OSContPadEx; /*0x10*/
 
 typedef struct {
     /*0x00*/ void *address;                 /* Ram pad Address: 11 bits */
