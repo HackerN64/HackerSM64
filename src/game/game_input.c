@@ -23,7 +23,7 @@ struct Controller *gPlayer4Controller = &gControllers[3];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
-u8 gNumPlayers = 1;
+u8 gNumPlayers = 0;
 u8 gControllerBits = 0x0; // Which ports have a controller connected to them.
 u8 gContStatusPolling = FALSE;
 u8 gContStatusPollingReadyForInput = TRUE;
@@ -199,9 +199,10 @@ static void poll_controller_statuses(OSMesg *mesg) {
 void start_controller_status_polling(void) {
     gContStatusPolling = TRUE;
     gContStatusPollTimer = 0;
-    gNumPlayers = 1;
+    gNumPlayers = 0;
     bzero(gPortInfo, sizeof(gPortInfo));
     bzero(gControllers, sizeof(gControllers));
+    bzero(gControllerStatuses, sizeof(gControllerStatuses));
 #ifdef ENABLE_RUMBLE
     cancel_rumble();
 #endif
@@ -213,7 +214,6 @@ void start_controller_status_polling(void) {
 void stop_controller_status_polling(void) {
     gContStatusPolling = FALSE;
     gContStatusPollTimer = 0;
-    gNumPlayers--;
     assign_controllers_by_player_num();
 #ifdef EEP
     // EEPROM probe for save data.
@@ -248,13 +248,12 @@ void read_controller_inputs_status_polling(void) {
             if (gContStatusPollingReadyForInput) {
                 // If a button is pressed on an unassigned controller, assign it the current player number.
                 if (button && !portInfo->playerNum) {
-                    portInfo->playerNum = gNumPlayers;
-                    gNumPlayers++;
+                    portInfo->playerNum = ++gNumPlayers;
                 }
 
                 // If the combo is pressed, stop polling and assign the current controllers.
-                if (gNumPlayers > __builtin_popcount(gControllerBits)
-                 || gNumPlayers > NUM_SUPPORTED_CONTROLLERS
+                if (gNumPlayers >= __builtin_popcount(gControllerBits)
+                 || gNumPlayers >= NUM_SUPPORTED_CONTROLLERS
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
                  || check_button_pressed_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)
 #endif

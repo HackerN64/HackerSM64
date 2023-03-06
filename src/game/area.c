@@ -508,7 +508,7 @@ void render_controllers_overlay(void) {
     // Instructions:
     if (gControllerBits) {
         if (gContStatusPollingReadyForInput) {
-            sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", gNumPlayers);
+            sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", (gNumPlayers + 1));
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
             char comboStr[32] = "";
