@@ -13,9 +13,9 @@
 // Number of frames to rumble before entering the 'timer' phase of a rumble.
 #define RUMBLE_START_TIME       4
 // Number of rumble commands that can be called per frane.
-#define RUMBLE_DATA_QUEUE_SIZE  3
+#define RUMBLE_QUEUE_SIZE       3
 
-// Rumble command.
+// A rumble command.
 struct RumbleData {
     /*0x00*/ s16 event;     // The type of rumble command. see RumbleEvents enum.
     /*0x02*/ s16 level;     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
@@ -23,26 +23,18 @@ struct RumbleData {
     /*0x06*/ s16 decay;     // How much 'level' decreases each frame during the 'timer' phase.
 }; /*0x08*/
 
-// Current rumble data.
-struct RumbleSettings {
-    /*0x00*/ s16 event;     // The type of rumble command. see RumbleEvents enum.
-    /*0x02*/ s16 level;     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
-    /*0x04*/ s16 timer;     // How many frames the main portion of the rumble lasts.
-    /*0x0E*/ s16 decay;     // How much 'level' decreases each frame during the 'timer' phase.
-    /*0x06*/ s16 count;     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
-    /*0x08*/ s16 start;     // The time to initially rumble for before the 'timer' phase.
-    /*0x0A*/ s16 slip;      // A second timer independent from 'timer', for after 'timer' runs out. Decrements regardless.
-    /*0x0C*/ s16 vibrate;   // How often to rumble when 'timer' is 0 and 'slip' is between [2, 5).
-}; /*0x10*/
-
 // Rumble Info for each port.
 struct RumbleInfo {
-    OSPfs pfs;      // Rumble Pak file system data.
-    struct RumbleSettings settings; // The current rumble settings.
-    struct RumbleData queue[RUMBLE_DATA_QUEUE_SIZE]; // The rumble settings queue.
-    s32 state;      // Current rumble motor state.
-    s32 timer;      // Only used to time the drowning warning rumble.
-    s32 error;      // The last error from a motor start/stop.
+    /*0x00*/ OSPfs pfs;                                     // Rumble Pak file system data.
+    /*0x66*/ s16 count;                                     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    /*0x68*/ s16 start;                                     // The time to initially rumble for before the 'timer' phase.
+    /*0x6A*/ s16 slip;                                      // A second timer independent from 'timer', for after 'timer' runs out. Decrements regardless.
+    /*0x6C*/ s16 vibrate;                                   // How often to rumble when 'timer' is 0 and 'slip' is between [2, 5).
+    /*0x6E*/ struct RumbleData current;                     // The current rumble command.
+    /*0x76*/ struct RumbleData queue[RUMBLE_QUEUE_SIZE];    // The rumble command queue.
+    /*0x8E*/ s32 motorState;                                // Current rumble motor state.
+    /*0x00*/ s32 breathTimer;                               // Only used to time the drowning warning rumble.
+    /*0x00*/ s32 error;                                     // The last error from a motor start/stop.
 };
 
 enum RumbleEvents {

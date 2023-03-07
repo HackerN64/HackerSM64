@@ -332,7 +332,7 @@ ALIGNED8 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
  * Modified from vanilla libultra to handle GameCube controller rumble.
  * Called by osMotorStart, osMotorStop, and osMotorStopHard via macro.
  */
-s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
+s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     s32 err = PFS_ERR_SUCCESS;
     int channel = pfs->channel;
     u8* ptr = (u8*)&__MotorDataBuf[channel];
@@ -342,11 +342,11 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
     }
 
     if (gPortInfo[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
-        gPortInfo[channel].gcRumble = flag;
+        gPortInfo[channel].gcRumble = motorState;
         __osContLastCmd = PIF_CMD_END;
     } else { // N64 Controllers.
         // N64 rumble pak can only use MOTOR_STOP or MOTOR_START.
-        flag &= MOTOR_MASK_N64;
+        motorState &= MOTOR_MASK_N64;
 
         __osSiGetAccess();
 
@@ -359,7 +359,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         __OSContRamWriteFormat* readformat = (__OSContRamWriteFormat*)ptr;
 
         // Set the entire block to either MOTOR_STOP or MOTOR_START.
-        memset(readformat->send.data, flag, sizeof(readformat->send.data));
+        memset(readformat->send.data, motorState, sizeof(readformat->send.data));
 
         __osContLastCmd = PIF_CMD_END;
 
@@ -373,8 +373,8 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
         // Check for errors.
         err = CHNL_ERR(readformat->size);
         if (err == (CHNL_ERR_SUCCESS >> 4)) {
-            if (flag == MOTOR_STOP) {
-                if (readformat->recv.datacrc != 0) { // 0xFF = Disconnected.
+            if (motorState == MOTOR_STOP) {
+                if (readformat->recv.datacrc != 0x00) { // 0xFF = Disconnected.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             } else { // MOTOR_START
