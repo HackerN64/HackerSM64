@@ -1469,14 +1469,14 @@ void update_mario_health(struct MarioState *m) {
         if (((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) && (m->health < 0x300)) {
             play_sound(SOUND_MOVING_ALMOST_DROWNING, gGlobalSoundSource);
  #ifdef ENABLE_RUMBLE
-            if (gRumblePakTimer == 0) {
-                gRumblePakTimer = 36;
+            if (gRumbleInfos[m->controller->port].timer == 0) {
+                gRumbleInfos[m->controller->port].timer = 36;
                 if (is_rumble_finished_and_queue_empty(m->controller)) {
                     queue_rumble_data(m->controller, 3, 30);
                 }
             }
         } else {
-            gRumblePakTimer = 0;
+            gRumbleInfos[m->controller->port].timer = 0;
  #endif // ENABLE_RUMBLE
         }
 #endif // BREATH_METER
@@ -1492,14 +1492,14 @@ void update_mario_breath(struct MarioState *m) {
                 // Play a noise to alert the player when Mario is close to drowning.
                 play_sound(SOUND_MOVING_ALMOST_DROWNING, gGlobalSoundSource);
 #ifdef ENABLE_RUMBLE
-                if (gRumblePakTimer == 0) {
-                    gRumblePakTimer = 36;
+                if (gRumbleInfos[m->controller->port].timer == 0) {
+                    gRumbleInfos[m->controller->port].timer = 36;
                     if (is_rumble_finished_and_queue_empty(m->controller)) {
                         queue_rumble_data(m->controller, 3, 30);
                     }
                 }
             } else {
-                gRumblePakTimer = 0;
+                gRumbleInfos[m->controller->port].timer = 0;
 #endif // ENABLE_RUMBLE
             }
         } else if (!(m->input & INPUT_IN_POISON_GAS)) {

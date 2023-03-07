@@ -47,7 +47,8 @@ static void set_rumble(int channel, s32 flag) {
     struct RumbleInfo *info = &gRumbleInfos[channel];
     OSPfs *pfs = &info->pfs;
 
-    if (!info->active || info->pfs.channel != channel) {
+    // Check the rumble pak's status and make sure it's initialized to the correct port.
+    if (!(pfs->status & PFS_MOTOR_INITIALIZED) || pfs->channel != channel) {
         return;
     }
 
@@ -62,7 +63,7 @@ static void set_rumble(int channel, s32 flag) {
     block_until_rumble_pak_free();
 
     // Equivalent to osMotorStart or osMotorStop.
-    info->error = __osMotorAccessEx(&info->pfs, flag);
+    info->error = __osMotorAccessEx(pfs, flag);
 
     release_rumble_pak_control();
 }
@@ -263,21 +264,6 @@ void queue_rumble_submerged(struct Controller *controller) {
     settings->vibrate = RUMBLE_START_TIME;
 }
 
-/**
- * Initializes the Rumble Pak and checks its status.
- * Returns whether the Rumble Pak is detected.
- * Called by thread6_rumble_loop and cancel_rumble.
- */
-static void init_and_check_rumble_pak(int channel) {
-    struct RumbleInfo *info = &gRumbleInfos[channel];
-    s32 err = osMotorInitEx(&gSIEventMesgQueue, &info->pfs, channel);
-    info->active = (err == PFS_ERR_SUCCESS);
-
-    if (!info->active) {
-        gRumbleInfos[channel].state = MOTOR_STOP;
-    }
-}
-
 ALIGNED8 static const char *sPfsErrorDesc[] = {
     [PFS_ERR_SUCCESS     ] = "successful",                  /* no error                                     */
     [PFS_ERR_NOPACK      ] = "no pak",                      /* no memory card is plugged or                 */
@@ -315,16 +301,18 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 
             struct RumbleInfo *info = &gRumbleInfos[channel];
 
-            if (info->active) {
+            if (info->pfs.status & PFS_MOTOR_INITIALIZED) {
                 // Disable the rumble pak if there were too many failed start/stop attempts without a success.
                 if (info->error != PFS_ERR_SUCCESS) {
-                    info->active = FALSE;
+                    info->pfs.status = PFS_STATUS_NONE;
                     info->state = MOTOR_STOP;
                     osSyncPrintf("Rumble Pak error (%d): %s\n", info->error, sPfsErrorDesc[info->error]);
                 }
             } else {
                 if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check Rumble Pak status about once per second.
-                    init_and_check_rumble_pak(channel);
+                    if (osMotorInitEx(&gSIEventMesgQueue, &info->pfs, channel) != PFS_ERR_SUCCESS) {
+                        gRumbleInfos[channel].state = MOTOR_STOP;
+                    }
                     info->error = PFS_ERR_SUCCESS;
                 }
             }
@@ -343,7 +331,8 @@ void cancel_rumble(void) {
     for (int channel = 0; channel < __osMaxControllers; channel++) {
         struct RumbleInfo *info = &gRumbleInfos[channel];
 
-        init_and_check_rumble_pak(channel);
+        // Check the rumble pak status.
+        osMotorInitEx(&gSIEventMesgQueue, &info->pfs, channel);
 
         // Stop the rumble pak if it's plugged in.
         set_rumble(channel, MOTOR_STOP);

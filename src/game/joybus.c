@@ -325,7 +325,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 /////////////
 
 // A buffer to hold separate rumble commands for each port.
-static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
+ALIGNED8 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 /**
  * @brief Turns controller rumble on or off.
