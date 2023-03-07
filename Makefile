@@ -129,7 +129,7 @@ $(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
 #==============================================================================#
 
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS = -Ofast -ggdb3
+DEFAULT_OPT_FLAGS = -Ofast
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # TODO: Figure out how to allow -fassociative-math to be enabled
