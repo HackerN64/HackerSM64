@@ -8,6 +8,13 @@
 
 #ifdef ENABLE_RUMBLE
 
+// Number of vblanks between each rumble pak check.
+#define RUMBLE_PAK_CHECK_TIME   60
+// Number of frames to rumble before entering the 'timer' phase of a rumble.
+#define RUMBLE_START_TIME       4
+// Number of rumble commands that can be called per frane.
+#define RUMBLE_DATA_QUEUE_SIZE  3
+
 // Rumble command.
 struct RumbleData {
     /*0x00*/ s16 event;     // The type of rumble command. see RumbleEvents enum.
@@ -28,32 +35,31 @@ struct RumbleSettings {
     /*0x0E*/ s16 decay;     // How much 'level' decreases each frame during the 'timer' phase.
 }; /*0x10*/
 
+// Rumble Info for each port.
+struct RumbleInfo {
+    s32 active;     // Whether the rumble pak is plugged in.
+    OSPfs pfs;      // Rumble Pak file system data.
+    s32 state;      // Current rumble motor state.
+    s32 error;      // The last error from a motor start/stop.
+    struct RumbleSettings settings;
+    struct RumbleData queue[RUMBLE_DATA_QUEUE_SIZE];
+    s32 timer;      // Only used to time the drowning warning rumble.
+};
+
 enum RumbleEvents {
     RUMBLE_EVENT_NOMESG,  // No command.
     RUMBLE_EVENT_CONSTON, // Constant rumble strength.
     RUMBLE_EVENT_LEVELON, // Modulate rumble using 'count' and 'level'.
 };
 
-// Number of vblanks between each rumble pak check.
-#define RUMBLE_PAK_CHECK_TIME   60
-// Number of frames to rumble before entering the 'timer' phase of a rumble.
-#define RUMBLE_START_TIME       4
-// Number of rumble commands that can be called per frane.
-#define RUMBLE_DATA_QUEUE_SIZE  3
-
 extern OSThread gRumblePakThread;
-
-extern OSPfs gRumblePakPfs;
 
 extern OSMesg gRumblePakSchedulerMesgBuf[1];
 extern OSMesgQueue gRumblePakSchedulerMesgQueue;
 extern OSMesg gRumbleThreadVIMesgBuf[1];
 extern OSMesgQueue gRumbleThreadVIMesgQueue;
 
-extern struct RumbleData gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE];
-extern struct RumbleSettings gCurrRumbleSettings;
-
-extern s32 gRumblePakTimer;
+extern struct RumbleInfo gRumbleInfos[MAXCONTROLLERS];
 
 void block_until_rumble_pak_free(void);
 void release_rumble_pak_control(void);
