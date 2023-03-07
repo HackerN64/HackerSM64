@@ -241,7 +241,6 @@ void cur_obj_call_action_function(ObjActionFunc actionFunctions[]);
 s32 cur_obj_mario_far_away(void);
 s32 is_mario_moving_fast_or_in_air(s32 speedThreshold);
 s32 is_item_in_array(s8 item, s8 *array);
-u32 is_room_loaded(void);
 s32 is_mario_in_room(void);
 void cur_obj_enable_disable_room_rendering(s32 inRoom);
 s32 cur_obj_set_hitbox_and_die_if_attacked(struct ObjectHitbox *hitbox, s32 deathSound, s32 noLootCoins);
