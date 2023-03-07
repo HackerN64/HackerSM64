@@ -1882,7 +1882,11 @@ void bhv_init_room(void) {
 
 s32 is_mario_in_room(void) {
     if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
-        if (is_room_loaded()) {
+        if (
+            gMarioCurrentRoom == o->oRoom ||
+            gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom ||
+            gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom
+        ) {
             return MARIO_INSIDE_ROOM;
         }
         return MARIO_OUTSIDE_ROOM;
