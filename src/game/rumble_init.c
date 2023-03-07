@@ -159,7 +159,7 @@ static void update_rumble_data_queue(void) {
 /**
  * Writes a rumble command to the end of the queue.
  */
-void queue_rumble_data(s16 timer, s16 level) {
+void queue_rumble_data(UNUSED struct Controller *controller, s16 timer, s16 level) {
     if (gCurrDemoInput != NULL) {
         return;
     }
@@ -175,14 +175,14 @@ void queue_rumble_data(s16 timer, s16 level) {
  * Sets the 'decay' parameter for the last command in the queue.
  * Called after queue_rumble_data.
  */
-void queue_rumble_decay(s16 decay) {
+void queue_rumble_decay(UNUSED struct Controller *controller, s16 decay) {
     gRumbleDataQueue[RUMBLE_DATA_QUEUE_SIZE - 1].decay = decay;
 }
 
 /**
  * Used after setting gRumblePakTimer to check if any rumble commands are being executed or queued.
  */
-u32 is_rumble_finished_and_queue_empty(void) {
+u32 is_rumble_finished_and_queue_empty(UNUSED struct Controller *controller) {
     // Check whether currently rumbling.
     if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= RUMBLE_START_TIME) {
         return FALSE;
@@ -214,7 +214,7 @@ static void reset_rumble_slip(void) {
 /**
  * Resets the 'slip' timer and sets 'vibrate' to 7.
  */
-void reset_rumble_timers_slip(void) {
+void reset_rumble_timers_slip(UNUSED struct Controller *controller) {
     if (gCurrDemoInput != NULL) {
         return;
     }
@@ -227,7 +227,7 @@ void reset_rumble_timers_slip(void) {
 /**
  * Resets the 'slip' timer and sets 'vibrate' based on the arg.
  */
-void reset_rumble_timers_vibrate(s32 level) {
+void reset_rumble_timers_vibrate(UNUSED struct Controller *controller, s32 level) {
     if (gCurrDemoInput != NULL) {
         return;
     }
@@ -243,7 +243,7 @@ void reset_rumble_timers_vibrate(s32 level) {
  * Bypasses the queue by changing gCurrRumbleSettings directly.
  * Called by act_breaststroke.
  */
-void queue_rumble_submerged(void) {
+void queue_rumble_submerged(UNUSED struct Controller *controller) {
     if (gCurrDemoInput != NULL) {
         return;
     }

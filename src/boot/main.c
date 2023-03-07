@@ -236,9 +236,7 @@ void handle_vblank(void) {
         }
     }
 
-#ifdef ENABLE_RUMBLE
     rumble_thread_update_vi();
-#endif
 
     // Notify the game loop about the vblank.
     if (gVblankHandler1 != NULL) osSendMesg(gVblankHandler1->queue, gVblankHandler1->msg, OS_MESG_NOBLOCK);
@@ -356,9 +354,9 @@ void check_stack_validity(void) {
     gThread6Stack[0]++;
     gThread6Stack[THREAD6_STACK - 1]++;
     assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
- #endif
+ #endif // ENABLE_RUMBLE
 }
-#endif
+#endif // DEBUG
 
 
 extern void crash_screen_init(void);
@@ -416,8 +414,8 @@ void thread3_main(UNUSED void *arg) {
  #ifdef ENABLE_RUMBLE
     gThread6Stack[0] = 0;
     gThread6Stack[THREAD6_STACK - 1] = 0;
- #endif
-#endif
+ #endif // ENABLE_RUMBLE
+#endif // DEBUG
 
     create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, gThread4Stack + THREAD4_STACK, 20);
     osStartThread(&gSoundThread);

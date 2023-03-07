@@ -7,6 +7,7 @@
 #include "object_helpers.h"
 #include "object_list_processor.h"
 #include "sm64.h"
+#include "level_update.h"
 #include "spawn_sound.h"
 #include "rumble_init.h"
 
@@ -64,17 +65,12 @@ void cur_obj_play_sound_1(s32 soundMagic) {
 void cur_obj_play_sound_2(s32 soundMagic) {
     if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
         play_sound(soundMagic, gCurrentObject->header.gfx.cameraToObject);
-#ifdef ENABLE_RUMBLE
-        if (soundMagic == SOUND_OBJ_BOWSER_WALK) {
-            queue_rumble_data(3, 60);
+
+        switch (soundMagic) {
+            case SOUND_OBJ_BOWSER_WALK:   queue_rumble_data(gMarioState->controller, 3, 60); break;
+            case SOUND_OBJ_POUNDING_LOUD: queue_rumble_data(gMarioState->controller, 3, 60); break;
+            case SOUND_OBJ_WHOMP:         queue_rumble_data(gMarioState->controller, 5, 80); break;
         }
-        if (soundMagic == SOUND_OBJ_POUNDING_LOUD) {
-            queue_rumble_data(3, 60);
-        }
-        if (soundMagic == SOUND_OBJ_WHOMP) {
-            queue_rumble_data(5, 80);
-        }
-#endif
     }
 }
 

@@ -1471,15 +1471,15 @@ void update_mario_health(struct MarioState *m) {
  #ifdef ENABLE_RUMBLE
             if (gRumblePakTimer == 0) {
                 gRumblePakTimer = 36;
-                if (is_rumble_finished_and_queue_empty()) {
-                    queue_rumble_data(3, 30);
+                if (is_rumble_finished_and_queue_empty(m->controller)) {
+                    queue_rumble_data(m->controller, 3, 30);
                 }
             }
         } else {
             gRumblePakTimer = 0;
- #endif
+ #endif // ENABLE_RUMBLE
         }
-#endif
+#endif // BREATH_METER
     }
 }
 
@@ -1494,13 +1494,13 @@ void update_mario_breath(struct MarioState *m) {
 #ifdef ENABLE_RUMBLE
                 if (gRumblePakTimer == 0) {
                     gRumblePakTimer = 36;
-                    if (is_rumble_finished_and_queue_empty()) {
-                        queue_rumble_data(3, 30);
+                    if (is_rumble_finished_and_queue_empty(m->controller)) {
+                        queue_rumble_data(m->controller, 3, 30);
                     }
                 }
             } else {
                 gRumblePakTimer = 0;
-#endif
+#endif // ENABLE_RUMBLE
             }
         } else if (!(m->input & INPUT_IN_POISON_GAS)) {
             m->breath += 0x1A;
@@ -1687,14 +1687,14 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
 #ifdef ENABLE_RUMBLE
 void queue_rumble_particles(struct MarioState *m) {
     if (m->particleFlags & PARTICLE_HORIZONTAL_STAR) {
-        queue_rumble_data(5, 80);
+        queue_rumble_data(m->controller, 5, 80);
     } else if (m->particleFlags & PARTICLE_VERTICAL_STAR) {
-        queue_rumble_data(5, 80);
+        queue_rumble_data(m->controller, 5, 80);
     } else if (m->particleFlags & PARTICLE_TRIANGLE) {
-        queue_rumble_data(5, 80);
+        queue_rumble_data(m->controller, 5, 80);
     }
     if (m->heldObj && m->heldObj->behavior == segmented_to_virtual(bhvBobomb)) {
-        reset_rumble_timers_slip();
+        reset_rumble_timers_slip(m->controller);
     }
 }
 #endif

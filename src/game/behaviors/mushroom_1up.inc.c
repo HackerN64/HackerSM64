@@ -3,6 +3,7 @@
 void bhv_1up_interact(void) {
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
+        queue_rumble_data(gMarioState->controller, 5, 80);
 #ifdef MUSHROOMS_HEAL
         gMarioState->healCounter   = 31;
 #ifdef BREATH_METER
@@ -13,9 +14,6 @@ void bhv_1up_interact(void) {
         gMarioState->numLives++;
 #endif
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-#ifdef ENABLE_RUMBLE
-        queue_rumble_data(5, 80);
-#endif
     }
 }
 

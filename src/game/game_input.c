@@ -166,31 +166,27 @@ void assign_controllers_by_player_num(void) {
  * Read raw controller input data.
  */
 static void poll_controller_inputs(OSMesg* mesg) {
-#ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
-#endif
+
     osContStartReadDataEx(&gSIEventMesgQueue);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetReadDataEx(gControllerPads);
-#ifdef ENABLE_RUMBLE
+
     release_rumble_pak_control();
-#endif
 }
 
 /**
  * Check for new controller data on all ports.
  */
 static void poll_controller_statuses(OSMesg* mesg) {
-#ifdef ENABLE_RUMBLE
     block_until_rumble_pak_free();
-#endif
+
     osContSetCh(MAXCONTROLLERS);
     osContStartQuery(&gSIEventMesgQueue);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetQueryEx(&gControllerBits, gControllerStatuses);
-#ifdef ENABLE_RUMBLE
+
     release_rumble_pak_control();
-#endif
 }
 
 /**
@@ -203,9 +199,7 @@ void start_controller_status_polling(void) {
     bzero(gPortInfo, sizeof(gPortInfo));
     bzero(gControllers, sizeof(gControllers));
     bzero(gControllerStatuses, sizeof(gControllerStatuses));
-#ifdef ENABLE_RUMBLE
     cancel_rumble();
-#endif
 }
 
 /**
@@ -221,9 +215,7 @@ void stop_controller_status_polling(void) {
                  ? osEepromProbeVC(&gSIEventMesgQueue)
                  : osEepromProbe  (&gSIEventMesgQueue);
 #endif
-#ifdef ENABLE_RUMBLE
     cancel_rumble();
-#endif
 }
 
 /**
