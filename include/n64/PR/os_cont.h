@@ -53,29 +53,41 @@ extern "C" {
 
 typedef union {
     struct PACKED { s8 x:4, y:4; };
+    struct PACKED { s8 l:4, r:4; };
+    struct PACKED { s8 a:4, b:4; };
+    s8 raw;
+} Analog_s4; /*0x01*/
+typedef union {
+    struct PACKED { u8 x:4, y:4; };
     struct PACKED { u8 l:4, r:4; };
     struct PACKED { u8 a:4, b:4; };
     u8 raw;
-} Analog8; /*0x01*/
+} Analog_u4; /*0x01*/
 
 typedef union {
     struct PACKED { s8 x:8, y:8; };
+    struct PACKED { s8 l:8, r:8; };
+    struct PACKED { s8 a:8, b:8; };
+    s16 raw;
+} Analog_s8; /*0x02*/
+typedef union {
+    struct PACKED { u8 x:8, y:8; };
     struct PACKED { u8 l:8, r:8; };
     struct PACKED { u8 a:8, b:8; };
     u16 raw;
-} Analog16; /*0x02*/
+} Analog_u8; /*0x02*/
 
-#define ANALOG8_TO_16(src) ((Analog16){ \
+#define ANALOG_4_TO_8(src) ((Analog_u8){\
     ((src).a << 4),                     \
     ((src).b << 4),                     \
 })
 
-#define ANALOG_S16_CENTER(stick, center) ((Analog16){   \
+#define ANALOG_S8_CENTER(stick, center) ((Analog_s8){   \
     CLAMP_S8((s32)(stick).x - (center).x),              \
     CLAMP_S8((s32)(stick).y - (center).y),              \
 })
 
-#define ANALOG_U16_CENTER(stick, center) ((Analog16){   \
+#define ANALOG_U8_CENTER(stick, center) ((Analog_u8){   \
     CLAMP_U8((s32)(stick).x - (center).x),              \
     CLAMP_U8((s32)(stick).y - (center).y),              \
 })
@@ -99,18 +111,18 @@ typedef struct {
 
 typedef struct PACKED {
     /*0x00*/ s8 initialized;                /* Whether this controller's origins have been set. */
-    /*0x01*/ Analog16 stick;                /* -80 <=   stick <=  80 */
-    /*0x03*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
-    /*0x05*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
+    /*0x01*/ Analog_u8 stick;                /* -80 <=   stick <=  80 */
+    /*0x03*/ Analog_u8 c_stick;              /* -80 <= c_stick <=  80 */
+    /*0x05*/ Analog_u8 trig;                 /*   0 <= trig    <= 255 */
 } OSContOrigins; /*0x07*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
     /*0x00*/ u16 button;                    /* Button data */
     /*0x02*/ u16 lockedButton;              /* Button data to ignore */
-    /*0x04*/ Analog16 stick;                /* -80 <=   stick <=  80 */
-    /*0x06*/ Analog16 c_stick;              /* -80 <= c_stick <=  80 */
-    /*0x08*/ Analog16 trig;                 /*   0 <= trig    <= 255 */
+    /*0x04*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
+    /*0x06*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
+    /*0x08*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
     /*0x0A*/ OSContOrigins origins;         /* GCN Analog Origins */
     /*0x0F*/ u8	errno;                      /* Error number */
 } OSContPadEx; /*0x10*/

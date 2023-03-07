@@ -105,7 +105,7 @@ typedef union {
 typedef union {
     struct PACKED {
         /*0x00*/ N64Buttons buttons;    // The received button data.
-        /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
+        /*0x02*/ Analog_s8 stick;       // The received analog stick position [-80, 80].
     }; /*0x04*/
     union {
         u8 u8[4];
@@ -176,34 +176,34 @@ enum OSGCNAnalogModes {
 typedef union {
     struct PACKED {
         /*0x00*/ GCNButtons buttons;    // The received button data.
-        /*0x02*/ Analog16 stick;        // The received analog stick position [-80, 80].
+        /*0x02*/ Analog_u8 stick;       // The received analog stick position [-80, 80].
         union { // Lower bits:
             struct PACKED { // Default, same as mode 3.
-                /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
-                /*0x02*/ Analog16  trig;    // The received trigger position [0, 255].
+                /*0x00*/ Analog_u8  c_stick; // The received C-stick position [-80, 80].
+                /*0x02*/ Analog_u8  trig;    // The received trigger position [0, 255].
             }; /*0x04*/
             struct PACKED { // Mode 0, 5, 6, 7.
-                /*0x00*/ Analog16 c_stick;  // The received C-stick position [-80, 80].
-                /*0x02*/ Analog8  trig;     // The received trigger position [0, 255].
-                /*0x03*/ Analog8  buttons;  // Analog buttons used by some controllers.
+                /*0x00*/ Analog_u8 c_stick;  // The received C-stick position [-80, 80].
+                /*0x02*/ Analog_u4 trig;     // The received trigger position [0, 255].
+                /*0x03*/ Analog_u4 buttons;  // Analog buttons used by some controllers.
             } m0; /*0x04*/
             struct PACKED { // Mode 1.
-                /*0x00*/ Analog8  c_stick;  // The received C-stick position [-80, 80].
-                /*0x01*/ Analog16 trig;     // The received trigger position [0, 255].
-                /*0x03*/ Analog8  buttons;  // Analog buttons used by some controllers.
+                /*0x00*/ Analog_u4 c_stick;  // The received C-stick position [-80, 80].
+                /*0x01*/ Analog_u8 trig;     // The received trigger position [0, 255].
+                /*0x03*/ Analog_u4 buttons;  // Analog buttons used by some controllers.
             } m1; /*0x04*/
             struct PACKED { // Mode 2.
-                /*0x00*/ Analog8  c_stick;  // The received C-stick position [-80, 80].
-                /*0x01*/ Analog8  trig;     // The received trigger position [0, 255].
-                /*0x02*/ Analog16 buttons;  // Analog buttons used by some controllers.
+                /*0x00*/ Analog_u4 c_stick;  // The received C-stick position [-80, 80].
+                /*0x01*/ Analog_u4 trig;     // The received trigger position [0, 255].
+                /*0x02*/ Analog_u8 buttons;  // Analog buttons used by some controllers.
             } m2; /*0x04*/
             struct PACKED { // Mode 3.
-                /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
-                /*0x02*/ Analog16  trig;    // The received trigger position [0, 255].
+                /*0x00*/ Analog_u8 c_stick; // The received C-stick position [-80, 80].
+                /*0x02*/ Analog_u8 trig;    // The received trigger position [0, 255].
             } m3; /*0x04*/
             struct PACKED { // Mode 4.
-                /*0x00*/ Analog16  c_stick; // The received C-stick position [-80, 80].
-                /*0x02*/ Analog16  buttons; // Analog buttons used by some controllers.
+                /*0x00*/ Analog_u8 c_stick; // The received C-stick position [-80, 80].
+                /*0x02*/ Analog_u8 buttons; // Analog buttons used by some controllers.
             } m4; /*0x04*/
             struct PACKED { // ASCII Controller.
                 /*0x00*/ u8 keypress[3];    // Which keys are pressed (up to 3 keys can be pressed at a time). //! TODO: Key IDs.
@@ -637,8 +637,8 @@ typedef struct PACKED {
                             u8 raw;
                         } flags; /*0x01*/
                 /*0x03*/ s8 wheel;              // How far the wheel is turned in a direction [-128, 127].
-                /*0x04*/ Analog16 pedal;        // Pedals, if connected [0, 255].
-                /*0x06*/ Analog16 paddle;       // Paddles on the back of the wheel [0, 255].
+                /*0x04*/ Analog_u8 pedal;       // Pedals, if connected [0, 255].
+                /*0x06*/ Analog_u8 paddle;      // Paddles on the back of the wheel [0, 255].
             } recv; /*0x08*/
 } __OSContGCNWheelForceFormat; /*0x0D*/
 
@@ -665,7 +665,7 @@ typedef struct PACKED {
             } send; /*0x01*/
     /*0x0D*/ struct PACKED {
                 /*0x00*/ GCNInputData origins;  // Only the analog values are used.
-                /*0x08*/ Analog16 buttons;      // Analog buttons used by some controllers. Both always 0x02?
+                /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers. Both always 0x02?
             } recv; /*0x0A*/
 } __OSContGCNReadOriginFormat; /*0x0D*/
 
@@ -679,7 +679,7 @@ typedef struct PACKED {
             } send; /*0x03*/
     /*0x0D*/ struct PACKED {
                 /*0x00*/ GCNInputData origins;  // Only the analog values are used.
-                /*0x08*/ Analog16 buttons;      // Analog buttons used by some controllers. Both always 0x02?
+                /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers. Both always 0x02?
             } recv; /*0x0A*/
 } __OSContGCNCalibrateFormat; /*0x0F*/
 
@@ -693,7 +693,7 @@ typedef struct PACKED {
             } send; /*0x03*/
     /*0x0D*/ struct PACKED {
                 /*0x00*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte C-stick and triggers) regardless of input command.
-                /*0x08*/ Analog16 buttons;      // Analog buttons used by some controllers.
+                /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers.
             } recv; /*0x0A*/
 } __OSContGCNLongPollFormat; /*0x0F*/
 
@@ -819,7 +819,8 @@ typedef struct PACKED {
     /*0x04*/ u16 statusPollButtons; // Input, only used when status polling to save the previous frame's inputs.
     /*0x06*/ u8 plugged;            // Whether a controller is plugged in to this port.
     /*0x07*/ u8 playerNum;          // The player number. [0, 4]. 0 = not assigned to a player.
-    /*0x08*/ u8 gcRumble;           // GCN Rumble byte.
+    /*0x08*/ u8 gcReadOrigins;      // Whether the GCN controller needs its origins updated.
+    /*0x09*/ u8 gcRumble;           // GCN Rumble byte.
 } OSPortInfo; /*0x09*/
 
 /////////////

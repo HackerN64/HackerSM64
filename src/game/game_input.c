@@ -46,7 +46,7 @@ void run_demo_inputs(void) {
         // The timer variable being 0 at the current input means the demo is over.
         // Set the button to the END_DEMO mask to end the demo.
         if (gCurrDemoInput->timer == 0) {
-            gPlayer1Controller->controllerData->stick = (Analog16){ 0x00, 0x00 };
+            gPlayer1Controller->controllerData->stick = (Analog_s8){ 0x00, 0x00 };
             gPlayer1Controller->controllerData->button = END_DEMO;
         } else {
             // Backup the start button if it is pressed, since we don't want the

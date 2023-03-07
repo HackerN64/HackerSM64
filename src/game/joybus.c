@@ -55,7 +55,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
  * @brief Writes controller data to OSContPadEx and stores the controller center on first run.
  * Called by osContGetReadDataEx.
  */
-static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16 stick, Analog16 c_stick, Analog16 trig) {
+static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     OSContOrigins* origins = &pad->origins;
     N64Buttons n64 = { .raw = 0x0 };
 
@@ -69,15 +69,10 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog16 
     }
 
     // Write the analog data.
-    if (gcn.standard.USE_ORIGIN) {
-        pad->stick   = ANALOG_S16_CENTER(stick,   origins->stick);
-        pad->c_stick = ANALOG_S16_CENTER(c_stick, origins->c_stick);
-        pad->trig    = ANALOG_U16_CENTER(trig,    origins->trig);
-    } else {
-        pad->stick   = stick;
-        pad->c_stick = c_stick;
-        pad->trig    = trig;
-    }
+    //! TODO: gcn.standard.USE_ORIGIN behavior.
+    pad->stick   = ANALOG_S8_CENTER(stick,   origins->stick);
+    pad->c_stick = ANALOG_S8_CENTER(c_stick, origins->c_stick);
+    pad->trig    = ANALOG_U8_CENTER(trig,    origins->trig);
 
     // Map GCN button bits to N64 button bits.
     n64.standard.A       = gcn.standard.A;
@@ -144,8 +139,8 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
                     pad->button  = n64Input.buttons.raw;
                     pad->stick   = n64Input.stick;
-                    pad->c_stick = (Analog16){ 0x00, 0x00 };
-                    pad->trig    = (Analog16){ 0x00, 0x00 };
+                    pad->c_stick = (Analog_s8){ 0x00, 0x00 };
+                    pad->trig    = (Analog_u8){ 0x00, 0x00 };
                 }
 
                 ptr += sizeof(__OSContReadFormat);
@@ -154,21 +149,21 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             case CONT_CMD_GCN_SHORT_POLL:
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
-                    Analog16 c_stick, trig;
+                    Analog_u8 c_stick, trig;
 
                     // The GameCube controller has various modes for returning the lower analog bits (4 bits per axis vs. 8 bits per axis).
                     switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
                         default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
                             c_stick = gcnInput.m0.c_stick;
-                            trig    = ANALOG8_TO_16(gcnInput.m0.trig);
+                            trig    = ANALOG_4_TO_8(gcnInput.m0.trig);
                             break;
                         case GCN_MODE_1_121:
-                            c_stick = ANALOG8_TO_16(gcnInput.m1.c_stick);
+                            c_stick = ANALOG_4_TO_8(gcnInput.m1.c_stick);
                             trig    = gcnInput.m1.trig;
                             break;
                         case GCN_MODE_2_112:
-                            c_stick = ANALOG8_TO_16(gcnInput.m2.c_stick);
-                            trig    = ANALOG8_TO_16(gcnInput.m2.trig);
+                            c_stick = ANALOG_4_TO_8(gcnInput.m2.c_stick);
+                            trig    = ANALOG_4_TO_8(gcnInput.m2.trig);
                             break;
                         case GCN_MODE_3_220:
                             c_stick = gcnInput.m3.c_stick;
@@ -176,7 +171,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                             break;
                         case GCN_MODE_4_202:
                             c_stick = gcnInput.m3.c_stick;
-                            trig    = (Analog16){ 0x00, 0x00 };
+                            trig    = (Analog_u8){ 0x00, 0x00 };
                             break;
                     }
 
