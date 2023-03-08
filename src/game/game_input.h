@@ -22,7 +22,7 @@ struct DemoInput {
     /*0x03*/ u8 buttonMask;
 }; /*0x04*/
 
-// Player Controllers
+// Player Controllers.
 extern struct Controller gControllers[MAXCONTROLLERS];
 // Defined controller slots. Anything above NUM_SUPPORTED_CONTROLLERS will be unused.
 extern struct Controller* const gPlayer1Controller;
@@ -37,13 +37,14 @@ extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 extern u8 gNumPlayers;
 extern u8 gControllerBits;
 extern u8 gContStatusPolling;
+extern u8 gContStatusPollingIsBootMode;
 extern u8 gContStatusPollingReadyForInput;
 extern u32 gContStatusPollTimer;
 
 extern struct DemoInput* gCurrDemoInput;
 
-void start_controller_status_polling(void);
-void stop_controller_status_polling(void);
+void start_controller_status_polling(s32 isBootMode);
+void stop_controller_status_polling(OSContPadEx *pad);
 void handle_input(OSMesg* mesg);
 void init_controllers(void);
 

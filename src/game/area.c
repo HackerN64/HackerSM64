@@ -382,7 +382,7 @@ ALIGNED8 static const char* sN64ButtonNames[16] = {
 };
 
 /**
- * Creates a string from a combination of buttons and adds it to 'strp'.
+ * @brief Creates a string from a combination of buttons and adds it to 'strp'.
  */
 static size_t button_combo_to_string(char* strp, u16 buttons) {
     size_t count = 0;
@@ -439,7 +439,7 @@ static const Gfx dl_controller_icons_end[] = {
 };
 
 /**
- * Displays controller info (eg. type and player number) while polling for controller statuses.
+ * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
  */
 void render_controllers_overlay(void) {
     const s32 w = 32;
@@ -453,7 +453,8 @@ void render_controllers_overlay(void) {
     char text_buffer[32] = "";
     int port;
 
-    if (!gContStatusPolling) {
+    // Only show UI when status polling and not in boot mode.
+    if (!gContStatusPolling || gContStatusPollingIsBootMode) {
         return;
     }
 

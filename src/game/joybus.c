@@ -127,7 +127,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
         // If the controller being read was unplugged, start status polling on all 4 ports.
         if (pad->errno == (CHNL_ERR_NORESP >> 4)) {
-            start_controller_status_polling();
+            start_controller_status_polling(FALSE);
             return;
         }
 

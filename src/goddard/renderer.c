@@ -6,7 +6,6 @@
 #include "draw_objects.h"
 #include "dynlist_proc.h"
 #include "dynlists/dynlists.h"
-#include "gd_macros.h"
 #include "gd_main.h"
 #include "gd_math.h"
 #include "gd_memory.h"
@@ -18,6 +17,7 @@
 #include "shape_helper.h"
 #include "skin.h"
 #include "types.h"
+#include "engine/math_util.h"
 #include "game/game_init.h"
 #include "game/area.h"
 
@@ -2035,7 +2035,7 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
     sp40.z = cam->unkE8[0][2] + arg4->x;
     sp40.y = cam->unkE8[1][2] + arg4->y;
     sp40.x = cam->unkE8[2][2] + arg4->z;
-    sp3C = sqrtf(SQ(sp40.z) + SQ(sp40.y) + SQ(sp40.x));
+    sp3C = sqrtf(sqr(sp40.z) + sqr(sp40.y) + sqr(sp40.x));
     if (sp3C > 0.1) {
         sp3C = 1.0 / sp3C; //? 1.0f
         sp40.z *= sp3C;
@@ -2351,11 +2351,11 @@ void parse_p1_controller(void) {
         return;
     }
 
-    // Copy current inputs to previous
+    // Copy current inputs to previous.
     *gdctrl->prevFrame = *gdctrl;
 
     gdctrl->unk50 = gdctrl->unk4C = gdctrl->dup = gdctrl->ddown = 0;
-    // Stick values
+    // Stick values.
     gdctrl->stickXf     = gPlayer1Controller->rawStickX;
     gdctrl->stickYf     = gPlayer1Controller->rawStickY;
     gdctrl->stickDeltaX = gdctrl->stickX;
@@ -2364,8 +2364,11 @@ void parse_p1_controller(void) {
     gdctrl->stickY      = gPlayer1Controller->rawStickY;
     gdctrl->stickDeltaX -= gdctrl->stickX;
     gdctrl->stickDeltaY -= gdctrl->stickY;
-    // Button values (as bools)
-    button = gPlayer1Controller->buttonDown;
+
+    button        = gPlayer1Controller->buttonDown;
+    buttonPressed = gPlayer1Controller->buttonPressed;
+
+    // Button values (as bools).
     gdctrl->trgL   = ((button & L_TRIG    ) != 0);
     gdctrl->trgR   = ((button & R_TRIG    ) != 0);
     gdctrl->btnA   = ((button & A_BUTTON  ) != 0);
@@ -2400,8 +2403,6 @@ void parse_p1_controller(void) {
     }
     gdctrl->currFrame++;
 
-    buttonPressed = gPlayer1Controller->buttonPressed;
-
     if (buttonPressed & START_BUTTON) {
         gdctrl->newStartPress ^= TRUE;
     }
@@ -2431,27 +2432,18 @@ void parse_p1_controller(void) {
         sDebugViews[sCurrDebugViewIndex - 1]->flags |= VIEW_UPDATE;
     }
 
-    // Deadzone checks
-    if (ABS(gdctrl->stickX) >= 6) {
-        gdctrl->csrX += gdctrl->stickX * 0.1f;
-    }
-    if (ABS(gdctrl->stickY) >= 6) {
-        gdctrl->csrY -= gdctrl->stickY * 0.1f;
-    }
+    // Deadzone checks.
+    if (absi(gdctrl->stickX) > 7) gdctrl->csrX += (gdctrl->stickX * 0.1f);
+    if (absi(gdctrl->stickY) > 7) gdctrl->csrY -= (gdctrl->stickY * 0.1f);
 
-    // Clamp cursor position within screen view bounds
-    if (gdctrl->csrX < sScreenView->parent->upperLeft.x + 16.0f) {
-        gdctrl->csrX = sScreenView->parent->upperLeft.x + 16.0f;
-    }
-    if (gdctrl->csrX > sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f) {
-        gdctrl->csrX = sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f;
-    }
-    if (gdctrl->csrY < sScreenView->parent->upperLeft.y + 16.0f) {
-        gdctrl->csrY = sScreenView->parent->upperLeft.y + 16.0f;
-    }
-    if (gdctrl->csrY > sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f) {
-        gdctrl->csrY = sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f;
-    }
+    // Clamp cursor position within screen view bounds.
+    const f32 ulx = sScreenView->parent->upperLeft.x;
+    const f32 uly = sScreenView->parent->upperLeft.y;
+    const f32 lrx = sScreenView->parent->lowerRight.x;
+    const f32 lry = sScreenView->parent->lowerRight.y;
+
+    gdctrl->csrX = CLAMP(gdctrl->csrX, (ulx + 16.0f), (ulx + lrx - 48.0f));
+    gdctrl->csrY = CLAMP(gdctrl->csrY, (uly + 16.0f), (uly + lry - 32.0f));
 }
 
 UNUSED void stub_renderer_4(f32 arg0) {
