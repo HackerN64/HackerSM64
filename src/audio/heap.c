@@ -1048,8 +1048,14 @@ void init_reverb_us(s32 presetId) {
     s32 reverbWindowSize = gReverbSettings[presetId].windowSize;
     gReverbDownsampleRate = gReverbSettings[presetId].downsampleRate;
 #ifdef BETTER_REVERB
-    // This will likely crash if given an invalid preset value. Adding a safety check here isn't worth the usability interference.
-    struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPreset];
+    struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPresetValue];
+
+    if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
+        aggress(gBetterReverbPresetCount > 0, "No BETTER_REVERB presets exist!");
+
+        assert(gBetterReverbPresetValue < gBetterReverbPresetCount, "BETTER_REVERB preset value exceeds total number of available presets!");
+        betterReverbPreset = &gBetterReverbSettings[0];
+    }
 
     betterReverbLightweight = betterReverbPreset->useLightweightSettings;
     betterReverbDownsampleRate = betterReverbPreset->downsampleRate;

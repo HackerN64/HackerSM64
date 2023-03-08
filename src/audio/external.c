@@ -232,7 +232,7 @@ struct MusicDynamic sMusicDynamics[8] = {
 #define STUB_LEVEL(_0, _1, _2, _3, echo1, echo2, echo3, _7, _8) { echo1, echo2, echo3 },
 #define DEFINE_LEVEL(_0, _1, _2, _3, _4, _5, echo1, echo2, echo3, _9, _10) { echo1, echo2, echo3 },
 
-u8 sLevelAreaReverbs[LEVEL_COUNT][3] = {
+s8 sLevelAreaReverbs[LEVEL_COUNT][3] = {
     { 0x00, 0x00, 0x00 }, // LEVEL_NONE
 #include "levels/level_defines.h"
 };
@@ -1138,7 +1138,8 @@ static f32 get_sound_freq_scale(u8 bank, u8 item) {
 static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelIndex) {
     u8 area;
     u8 level;
-    u8 reverb;
+    s8 areaEcho;
+    s16 reverb;
 
     // Disable level reverb if NO_ECHO is set
     if (sSoundBanks[bank][soundIndex].soundBits & SOUND_NO_ECHO) {
@@ -1152,18 +1153,27 @@ static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelInde
         }
     }
 
-    // reverb = reverb adjustment + level reverb + a volume-dependent value
+    areaEcho = sLevelAreaReverbs[level][area];
+
+    if (gAreaData[gCurrAreaIndex].useEchoOverride && !(sSoundBanks[bank][soundIndex].soundBits & SOUND_NO_ECHO)) {
+        areaEcho = gAreaData[gCurrAreaIndex].echoOverride;
+    }
+
+    // reverb = reverb adjustment + level reverb (or level script override value) + a volume-dependent value
     // The volume-dependent value is 0 when volume is at maximum, and raises to
     // LOW_VOLUME_REVERB when the volume is 0
-    reverb = (u8)(u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]
-                  + sLevelAreaReverbs[level][area]
-                  + ((1.0f - gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume)
-                        * LOW_VOLUME_REVERB);
+    reverb = (s16) ((u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]) + areaEcho;
 
-    if (reverb > 0x7f) {
+    // NOTE: In some cases, it may be better to apply this after ensuring reverb is non-negative so the result doesn't end up sounding way too dry.
+    // This has been left as-is however because in most cases where negative reverb is even used, this is probably desirable anyway.
+    reverb += (s16) ((1.0f - gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume) * LOW_VOLUME_REVERB);
+
+    if (reverb < 0 || areaEcho <= -0x80) {
+        reverb = 0;
+    } else if (reverb > 0x7f) {
         reverb = 0x7f;
     }
-    return reverb;
+    return (u8) reverb;
 }
 
 /**

@@ -54,6 +54,7 @@ extern struct AudioSessionSettings gAudioSessionSettings;
 extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
 #ifdef BETTER_REVERB
+extern u8 gBetterReverbPresetCount;
 extern struct BetterReverbSettings gBetterReverbSettings[];
 #endif
 

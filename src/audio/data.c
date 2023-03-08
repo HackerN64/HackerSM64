@@ -913,6 +913,10 @@ s16 gAiBufferLengths[NUMAIBUFFERS];
 
 u32 gAudioRandom;
 
+#ifdef BETTER_REVERB
+u8 gBetterReverbPresetCount = ARRAY_COUNT(gBetterReverbSettings);
+#endif
+
 #if defined(VERSION_EU) || defined(VERSION_SH)
 s32 gAudioErrorFlags;
 #endif

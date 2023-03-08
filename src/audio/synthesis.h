@@ -54,7 +54,7 @@ enum ChannelIndexes {
 /* ------------ BETTER REVERB EXTERNED VARIABLES ------------ */
 
 extern u8 toggleBetterReverb;
-extern u8 gBetterReverbPreset;
+extern u8 gBetterReverbPresetValue;
 extern u8 betterReverbLightweight;
 extern s8 betterReverbDownsampleRate;
 extern u8 monoReverb;
