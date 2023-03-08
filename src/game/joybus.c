@@ -304,20 +304,20 @@ void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
  */
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContRequestFormat requestHeader;
+    __OSContRequestFormatAligned requestHeader;
     OSPortInfo* portInfo = NULL;
     u8 bits = 0x0;
     int port;
 
     for (port = 0; port < __osMaxControllers; port++) {
-        requestHeader = *(__OSContRequestFormat*)ptr;
-        data->error = CHNL_ERR(requestHeader.size);
+        requestHeader = *(__OSContRequestFormatAligned*)ptr;
+        data->error = CHNL_ERR(requestHeader.fmt.size);
 
         if (data->error == (CHNL_ERR_SUCCESS >> 4)) {
             portInfo = &gPortInfo[port];
 
             // Byteswap the SI identifier. This is done in vanilla libultra.
-            data->type = ((requestHeader.recv.type.l << 8) | requestHeader.recv.type.h);
+            data->type = ((requestHeader.fmt.recv.type.l << 8) | requestHeader.fmt.recv.type.h);
 
             // Check the type of controller device connected to the port.
             // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
@@ -325,7 +325,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
             portInfo->type = ((s16)data->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : data->type;
 
             // Set this port's status.
-            data->status = requestHeader.recv.status.raw;
+            data->status = requestHeader.fmt.recv.status.raw;
             portInfo->plugged = TRUE;
             bits |= (1 << port);
         }
@@ -377,10 +377,10 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
         // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in __MotorDataBuf for each skipped channel.
         ptr += channel;
 
-        __OSContRamWriteFormat* readformat = (__OSContRamWriteFormat*)ptr;
+        __OSContRamWriteFormatAligned* readformat = (__OSContRamWriteFormatAligned*)ptr;
 
         // Set the entire block to either MOTOR_STOP or MOTOR_START.
-        memset(readformat->send.data, motorState, sizeof(readformat->send.data));
+        memset(readformat->fmt.send.data, motorState, sizeof(readformat->fmt.send.data));
 
         __osContLastCmd = PIF_CMD_END;
 
@@ -392,14 +392,14 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
         // Check for errors.
-        err = CHNL_ERR(readformat->size);
+        err = CHNL_ERR(readformat->fmt.size);
         if (err == (CHNL_ERR_SUCCESS >> 4)) {
             if (motorState == MOTOR_STOP) {
-                if (readformat->recv.datacrc != 0x00) { // 0xFF = Disconnected.
+                if (readformat->fmt.recv.datacrc != 0x00) { // 0xFF = Disconnected.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             } else { // MOTOR_START
-                if (readformat->recv.datacrc != 0xEB) { // 0x14 = Uninitialized.
+                if (readformat->fmt.recv.datacrc != 0xEB) { // 0x14 = Uninitialized.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
                 }
             }
@@ -425,15 +425,15 @@ s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
  */
 static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
     u8* ptr = (u8*)mdata->ramarray;
-    __OSContRamWriteFormat ramwriteformat;
+    __OSContRamWriteFormatAligned ramwriteformat;
     int i;
 
-    ramwriteformat.align       = PIF_CMD_NOP;
-    ramwriteformat.size.tx     = sizeof(ramwriteformat.send);
-    ramwriteformat.size.rx     = sizeof(ramwriteformat.recv);
-    ramwriteformat.send.cmdID  = CONT_CMD_WRITE_MEMPAK;
-    ramwriteformat.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
-    ramwriteformat.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+    ramwriteformat.align0          = PIF_CMD_NOP;
+    ramwriteformat.fmt.size.tx     = sizeof(ramwriteformat.fmt.send);
+    ramwriteformat.fmt.size.rx     = sizeof(ramwriteformat.fmt.recv);
+    ramwriteformat.fmt.send.cmdID  = CONT_CMD_WRITE_MEMPAK;
+    ramwriteformat.fmt.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
+    ramwriteformat.fmt.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
     // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
     if (channel != 0) {
@@ -442,8 +442,8 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
         }
     }
 
-    *(__OSContRamWriteFormat*)ptr = ramwriteformat;
-    ptr += sizeof(__OSContRamWriteFormat);
+    *(__OSContRamWriteFormatAligned*)ptr = ramwriteformat;
+    ptr += sizeof(__OSContRamWriteFormatAligned);
     *ptr = PIF_CMD_END;
 }
 

@@ -177,7 +177,7 @@ typedef union {
     struct PACKED {
         /*0x00*/ GCNButtons buttons;    // The received button data.
         /*0x02*/ Analog_u8 stick;       // The received analog stick position [-80, 80].
-        union { // Lower bits:
+        union {                         // Lower bits:
             struct PACKED { // Default, same as mode 3.
                 /*0x00*/ Analog_u8  c_stick; // The received C-stick position [-80, 80].
                 /*0x02*/ Analog_u8  trig;    // The received trigger position [0, 255].
@@ -273,44 +273,6 @@ typedef struct PACKED {
 
 // -- Standard for all devices --
 
-// Third byte returned by CONT_CMD_REQUEST_STATUS or CONT_CMD_RESET.
-typedef union {
-    struct PACKED { // Standard N64 Controller.
-        /*0x00*/ u8              : 5;
-        /*0x00*/ u8 crcError     : 1;
-        /*0x00*/ u8 noPak        : 1;
-        /*0x00*/ u8 yesPak       : 1;
-    } n64; /*0x01*/
-    struct PACKED { // VRU.
-        /*0x00*/ u8              : 7;
-        /*0x00*/ u8 initialized  : 1;
-    } vru; /*0x01*/
-    struct PACKED { // Standard GCN Controller.
-        /*0x00*/ u8              : 4;
-        /*0x00*/ u8 rumble       : 1;
-        /*0x00*/ u8              : 3; // always 0x3?
-    } gcn; /*0x01*/
-    struct PACKED { // ERPROM.
-        /*0x00*/ u8 busy         : 1;
-        /*0x00*/ u8              : 7;
-    } eep; /*0x01*/
-    u8 raw;
-} OSStatusByte3; /*0x01*/
-
-// 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
-typedef struct PACKED {
-    /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
-    /*0x01*/ OSContCmdSize size;    // The TX/RX sizes.
-    /*0x02*/ struct PACKED {
-                /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_REQUEST_STATUS, CONT_CMD_RESET).
-            } send; /*0x01*/
-    /*0x04*/ struct PACKED {
-                /*0x00*/ HiLo16 type;           // Device type.
-                /*0x02*/ OSStatusByte3 status;  // Status byte, depends on device type.
-            } recv; /*0x03*/
-    /*0x07*/ u8 align1;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
-} __OSContRequestFormat; /*0x08*/
-
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
 typedef struct PACKED {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
@@ -319,9 +281,36 @@ typedef struct PACKED {
             } send; /*0x01*/
     /*0x03*/ struct PACKED {
                 /*0x00*/ HiLo16 type;           // Device type.
-                /*0x02*/ OSStatusByte3 status;  // Status byte, depends on device type.
+                /*0x02*/ union {                // Status byte, depends on device type.
+                            struct PACKED { // Standard N64 Controller.
+                                /*0x00*/ u8              : 5;
+                                /*0x00*/ u8 crcError     : 1;
+                                /*0x00*/ u8 noPak        : 1;
+                                /*0x00*/ u8 yesPak       : 1;
+                            } n64; /*0x01*/
+                            struct PACKED { // VRU.
+                                /*0x00*/ u8              : 7;
+                                /*0x00*/ u8 initialized  : 1;
+                            } vru; /*0x01*/
+                            struct PACKED { // Standard GCN Controller.
+                                /*0x00*/ u8              : 4;
+                                /*0x00*/ u8 rumble       : 1;
+                                /*0x00*/ u8              : 3; // always 0x3?
+                            } gcn; /*0x01*/
+                            struct PACKED { // ERPROM.
+                                /*0x00*/ u8 busy         : 1;
+                                /*0x00*/ u8              : 7;
+                            } eep; /*0x01*/
+                            u8 raw;
+                        } status; /*0x01*/
             } recv; /*0x03*/
-} __OSContRequesFormatShort; /*0x06*/
+} __OSContRequestFormat; /*0x06*/
+
+typedef struct PACKED {
+    /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x01*/ __OSContRequestFormat fmt;
+    /*0x07*/ u8 align1;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+} __OSContRequestFormatAligned; /*0x08*/
 
 // -- Standard N64 input poll --
 
@@ -340,31 +329,39 @@ typedef struct PACKED {
 
 // 0x02: CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
-    /*0x01*/ OSContCmdSize size;    // The TX/RX sizes.
+    /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA).
                 /*0x01*/ HiLo16 addr;           // CRC code for address.
             } send; /*0x03*/
-    /*0x06*/ struct PACKED {
+    /*0x05*/ struct PACKED {
                 /*0x00*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
                 /*0x20*/ u8 datacrc;            // CRC code for data.
             } recv; /*0x21*/
-} __OSContRamReadFormat; /*0x27*/
+} __OSContRamReadFormat; /*0x26*/
+
+typedef struct PACKED {
+    /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x01*/ __OSContRamReadFormat fmt;
+} __OSContRamReadFormatAligned; /*0x27*/
 
 // 0x03: CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA
 typedef struct PACKED {
-    /*0x00*/ u8 align;              // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
-    /*0x01*/ OSContCmdSize size;    // The TX/RX sizes.
+    /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA).
                 /*0x01*/ HiLo16 addr;           // CRC code for address.
                 /*0x03*/ u8 data[BLOCKSIZE];    // Address of the data buffer. All 0 for no rumble, all 1 for rumble.
             } send; /*0x23*/
-    /*0x26*/ struct PACKED {
+    /*0x25*/ struct PACKED {
                 /*0x00*/ u8 datacrc;            // CRC code for data.
             } recv; /*0x01*/
-} __OSContRamWriteFormat; /*0x27*/
+} __OSContRamWriteFormat; /*0x26*/
+
+typedef struct PACKED {
+    /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
+    /*0x01*/ __OSContRamWriteFormat fmt;
+} __OSContRamWriteFormatAligned; /*0x27*/
 
 // -- EEPROM Read/Write --
 
@@ -793,10 +790,10 @@ enum OSContCmds {
     // GCN Steering Wheel
     CONT_CMD_GCN_WHEEL_FEEDBACK = 0x30, // 0x30: Logitech Speed Force Feedback.
     // GCN Controller
-    CONT_CMD_GCN_SHORT_POLL     = 0x40, // 0x40: GameCube Shortpoll (input).
+    CONT_CMD_GCN_SHORT_POLL     = 0x40, // 0x40: GameCube Short Poll (input).
     CONT_CMD_GCN_READ_ORIGIN,           // 0x41: GameCube Read Origin.
     CONT_CMD_GCN_CALIBRATE,             // 0x42: GameCube Recalibrate.
-    CONT_CMD_GCN_LONG_POLL,             // 0x43: GameCube Longpoll (input).
+    CONT_CMD_GCN_LONG_POLL,             // 0x43: GameCube Long Poll (input).
     // GCN Keyboard
     CONT_CMD_GCN_READ_KEYBOARD  = 0x54, // 0x54: GameCube Keyboard Poll.
 
