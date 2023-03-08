@@ -1422,16 +1422,16 @@ void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spac
 
 static u8 gIsLightText = FALSE;
 
-// This is where the deferred printing will be stored. When text is made, it will store text with an 12 byte header, then the rest will be the text data itself.
+// This is where the deferred printing will be stored. When text is made, it will store text with a 12 byte header, then the rest will be the text data itself.
 // The first 4 bytes of the header will be the X and Y pos
 // The next 4 bytes will be the current envcolour set by print_set_envcolour
 // Then the string length, text alignment, amount and font each get a byte.
 // The data afterwards is the text data itself, using the string length byte to know when to stop.
-#define HEADERSIZE 13
+#define HEADERSIZE 12
 void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
-    u8 strLen = MIN((signed)strlen(str), 254);
+    u8 bufLen = (amount == -1) ? MIN((signed) strlen(str), 255) : amount;
     // Compare the cursor position and the string length, plus 12 (header size) and return if it overflows.
-    if (sPuppyprintTextBufferPos + strLen + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
+    if (sPuppyprintTextBufferPos + bufLen + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
         return;
     x += 0x8000;
     y += 0x8000;
@@ -1443,13 +1443,12 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 5] = gCurrEnvCol[1];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 6] = gCurrEnvCol[2];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 7] = gCurrEnvCol[3];
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = align;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? strLen : amount;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = font;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12] = gIsLightText;
-    bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + HEADERSIZE], strLen);
-    sPuppyprintTextBufferPos += strLen + HEADERSIZE;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = align;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = bufLen;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = font;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = gIsLightText;
+    bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + HEADERSIZE], bufLen);
+    sPuppyprintTextBufferPos += bufLen + HEADERSIZE;
 }
 
 void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
@@ -1465,7 +1464,7 @@ void puppyprint_print_deferred(void) {
     print_set_envcolour(255, 255, 255, 255);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
     for (u32 i = 0; i < sPuppyprintTextBufferPos;) {
-        u8 length = sPuppyprintTextBuffer[i + 8];
+        u8 length = sPuppyprintTextBuffer[i + 9];
         char *text = mem_pool_alloc(gEffectsMemoryPool, length + 1);
         if (text == NULL) {
             print_small_text_light(SCREEN_WIDTH / 2, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
@@ -1479,15 +1478,14 @@ void puppyprint_print_deferred(void) {
         y -= 0x8000;
         ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
         print_set_envcolour(sPuppyprintTextBuffer[i + 4], sPuppyprintTextBuffer[i + 5], sPuppyprintTextBuffer[i + 6], sPuppyprintTextBuffer[i + 7]);
-        u8 alignment = sPuppyprintTextBuffer[i + 9];
-        u8 amount = sPuppyprintTextBuffer[i + 10];
-        u8 font = sPuppyprintTextBuffer[i + 11];
+        u8 alignment = sPuppyprintTextBuffer[i + 8];
+        u8 font = sPuppyprintTextBuffer[i + 10];
         bcopy(&sPuppyprintTextBuffer[i + HEADERSIZE], text, length);
         text[length] = '\0';
-        if (sPuppyprintTextBuffer[i + 12]) {
-            print_small_text_light(x, y, text, alignment, amount, font);
+        if (sPuppyprintTextBuffer[i + 11]) {
+            print_small_text_light(x, y, text, alignment, length, font);
         } else {
-            print_small_text(x, y, text, alignment, amount, font);
+            print_small_text(x, y, text, alignment, length, font);
         }
         mem_pool_free(gEffectsMemoryPool, text);
         print_set_envcolour(originalEnvCol[0], originalEnvCol[1], originalEnvCol[2], originalEnvCol[3]);
