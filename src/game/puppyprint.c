@@ -1431,7 +1431,7 @@ static u8 gIsLightText = FALSE;
 void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
     u8 strLen = MIN((signed)strlen(str), 254);
     // Compare the cursor position and the string length, plus 12 (header size) and return if it overflows.
-    if (sPuppyprintTextBufferPos + strLen + 1 + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
+    if (sPuppyprintTextBufferPos + strLen + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
         return;
     x += 0x8000;
     y += 0x8000;
@@ -1445,7 +1445,7 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 7] = gCurrEnvCol[3];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = align;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? 255 : amount;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? strLen : amount;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = font;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12] = gIsLightText;
     bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + HEADERSIZE], strLen);
@@ -1468,7 +1468,7 @@ void puppyprint_print_deferred(void) {
         u8 length = sPuppyprintTextBuffer[i + 8];
         char *text = mem_pool_alloc(gEffectsMemoryPool, length + 1);
         if (text == NULL) {
-            print_small_text_light(160, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+            print_small_text_light(SCREEN_WIDTH / 2, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             return;
         }
         s32 x = ((sPuppyprintTextBuffer[i] & 0xFF) << 8);
@@ -1480,7 +1480,7 @@ void puppyprint_print_deferred(void) {
         ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
         print_set_envcolour(sPuppyprintTextBuffer[i + 4], sPuppyprintTextBuffer[i + 5], sPuppyprintTextBuffer[i + 6], sPuppyprintTextBuffer[i + 7]);
         u8 alignment = sPuppyprintTextBuffer[i + 9];
-        u8 amount = (sPuppyprintTextBuffer[i + 10] == 255 ? -1 : sPuppyprintTextBuffer[i + 10]);
+        u8 amount = sPuppyprintTextBuffer[i + 10];
         u8 font = sPuppyprintTextBuffer[i + 11];
         bcopy(&sPuppyprintTextBuffer[i + HEADERSIZE], text, length);
         text[length] = '\0';
