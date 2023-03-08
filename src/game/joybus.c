@@ -325,7 +325,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 /////////////
 
 // A buffer to hold separate rumble commands for each port.
-ALIGNED8 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
+ALIGNED8 static OSPifRamEx __MotorDataBuf[MAXCONTROLLERS];
 
 /**
  * @brief Turns controller rumble on or off.
@@ -399,7 +399,7 @@ s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
  * Unmodified from vanilla libultra.
  * Called by osMotorInit and osMotorInitEx.
  */
-static void _MakeMotorData(int channel, OSPifRam* mdata) {
+static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
     u8* ptr = (u8*)mdata->ramarray;
     __OSContRamWriteFormat ramwriteformat;
     int i;

@@ -227,6 +227,7 @@ typedef union {
 ////////////////////////////
 
 /**
+ * PIF RAM format:
  * 00000000 00000000
  * 00000000 00000000
  * 00000000 00000000
@@ -238,14 +239,22 @@ typedef union {
  *                ^^
  *         pifstatus
  */
+// PIF RAM format used by vanilla libultra functions, pifstatus uses/overwrites the last 4 bytes.
 typedef struct PACKED {
-    /*0x00*/ u32 ramarray[16 - 1];  // The command data.
-    /*0x3C*/ u32 pifstatus;         // Set this to PIF_STATUS_EXE to run the commands in ramarray.
+    /*0x00*/ u32 ramarray[(PIF_RAM_SIZE / 4) - 1];  // The command data.
+    /*0x3C*/ u32 pifstatus;                         // Set this to PIF_STATUS_EXE to run the commands in ramarray.
 } OSPifRam; /*0x40*/
 
+//; PIF RAM format, pifstatus only uses the last byte and frees up the previous 3 bytes for commands that only use this format.
 typedef struct PACKED {
-    /*0x00*/ u8 tx;                 // Number of bytes to transmit.
-    /*0x01*/ u8 rx;                 // Number of bytes to receive.
+    /*0x00*/ u8 ramarray[PIF_RAM_SIZE - 1];         // The command data.
+    /*0x3F*/ u8 pifstatus;                          // Set this to PIF_STATUS_EXE to run the commands in ramarray.
+} OSPifRamEx; /*0x40*/
+
+// Send/receive data that signifies the start of a SI command.
+typedef struct PACKED {
+    /*0x00*/ u8 tx; // The number of bytes of data to transmit.
+    /*0x01*/ u8 rx; // The number of bytes of data to receive.
 } OSContCmdSize; /*0x02*/
 
 /////////////////////////////////////
@@ -819,8 +828,7 @@ typedef struct PACKED {
     /*0x04*/ u16 statusPollButtons; // Input, only used when status polling to save the previous frame's inputs.
     /*0x06*/ u8 plugged;            // Whether a controller is plugged in to this port.
     /*0x07*/ u8 playerNum;          // The player number. [0, 4]. 0 = not assigned to a player.
-    /*0x08*/ u8 gcReadOrigins;      // Whether the GCN controller needs its origins updated.
-    /*0x09*/ u8 gcRumble;           // GCN Rumble byte.
+    /*0x08*/ u8 gcRumble;           // Stored GCN Rumble byte.
 } OSPortInfo; /*0x09*/
 
 /////////////
@@ -828,9 +836,9 @@ typedef struct PACKED {
 /////////////
 
 // From vanilla libultra:
-extern OSPifRam __osContPifRam;     // A buffer for the PIF RAM.
-extern u8       __osMaxControllers; // The last port to read controllers on.
-extern u8       __osContLastCmd;    // The ID of the last command that was executed.
+extern OSPifRamEx __osContPifRam;       // A buffer for the PIF RAM.
+extern u8        __osMaxControllers;    // The last port to read controllers on.
+extern u8        __osContLastCmd;       // The ID of the last command that was executed.
 
 // From HackerSM64:
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
