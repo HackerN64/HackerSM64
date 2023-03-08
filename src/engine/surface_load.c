@@ -559,9 +559,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
-#ifdef PUPPYPRINT_DEBUG
     profiler_collision_update(first);
-#endif
 }
 
 /**
@@ -583,9 +581,7 @@ void clear_dynamic_surfaces(void) {
         sNumCellsUsed = 0;
         sClearAllCells = FALSE;
     }
-#ifdef PUPPYPRINT_DEBUG
     profiler_collision_update(first);
-#endif
 }
 
 /**
@@ -736,9 +732,7 @@ void load_object_collision_model(void) {
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
-#ifdef PUPPYPRINT_DEBUG
     profiler_collision_update(first);
-#endif
 }
 
 /**
@@ -769,7 +763,5 @@ void load_object_static_model(void) {
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
-#ifdef PUPPYPRINT_DEBUG
     profiler_collision_update(first);
-#endif
 }

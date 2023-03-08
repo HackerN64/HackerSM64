@@ -67,13 +67,7 @@ s8 logViewer    = FALSE;
 u8 sPPDebugPage = 0;
 u8 sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
-s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0
-};
+s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = { 0 };
 s32 mempool;
 u32 gPoolMem;
 u32 gPPSegScroll = 0;

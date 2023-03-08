@@ -211,9 +211,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     colData->numWalls = 0;
 
     if (is_outside_level_bounds(x, z)) {
-#ifdef PUPPYPRINT_DEBUG
-    profiler_collision_update(first);
-#endif
+        profiler_collision_update(first);
         return numCollisions;
     }
 
@@ -236,10 +234,8 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     // Increment the debug tracker.
     gNumCalls.wall++;
 #endif
-#ifdef PUPPYPRINT_DEBUG
-    profiler_collision_update(first);
-#endif
 
+    profiler_collision_update(first);
     return numCollisions;
 }
 
@@ -363,9 +359,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
-#ifdef PUPPYPRINT_DEBUG
-    profiler_collision_update(first);
-#endif
+        profiler_collision_update(first);
         return height;
     }
 
@@ -407,10 +401,8 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     // Increment the debug tracker.
     gNumCalls.ceil++;
 #endif
-#ifdef PUPPYPRINT_DEBUG
-    profiler_collision_update(first);
-#endif
 
+    profiler_collision_update(first);
     return height;
 }
 
@@ -607,9 +599,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = NULL;
 
     if (is_outside_level_bounds(x, z)) {
-#ifdef PUPPYPRINT_DEBUG
-    profiler_collision_update(first);
-#endif
+        profiler_collision_update(first);
         return height;
     }
     // Each level is split into cells to limit load, find the appropriate cell.
@@ -654,9 +644,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     // Increment the debug tracker.
     gNumCalls.floor++;
 #endif
-#ifdef PUPPYPRINT_DEBUG
+
     profiler_collision_update(first);
-#endif
     return height;
 }
 
@@ -735,9 +724,8 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
     } else {
         *pfloor = floor;
     }
-#ifdef PUPPYPRINT_DEBUG
+
     profiler_collision_update(first);
-#endif
     return waterLevel;
 }
 
@@ -773,9 +761,8 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
             p++;
         }
     }
-#ifdef PUPPYPRINT_DEBUG
+
     profiler_collision_update(first);
-#endif
 
     return waterLevel;
 }
@@ -815,10 +802,8 @@ s32 find_poison_gas_level(s32 x, s32 z) {
             p += 6;
         }
     }
-#ifdef PUPPYPRINT_DEBUG
+    
     profiler_collision_update(first);
-#endif
-
     return gasLevel;
 }
 
