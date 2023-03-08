@@ -24,7 +24,7 @@ void bhv_star_door_loop(void) {
         case STAR_DOOR_ACT_OPENING:
             if (o->oTimer == 0 && (s16) o->oMoveAngleYaw >= 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_OPEN);
-                queue_rumble_data(gMarioState->controller, 35, 30);
+                queue_rumble_data(gMarioState->controller, 35, 30, 0);
             }
             cur_obj_become_intangible();
             o->oLeftVel = -8.0f;
@@ -43,7 +43,7 @@ void bhv_star_door_loop(void) {
         case STAR_DOOR_ACT_CLOSING:
             if (o->oTimer == 0 && (s16) o->oMoveAngleYaw >= 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_CLOSE);
-                queue_rumble_data(gMarioState->controller, 35, 30);
+                queue_rumble_data(gMarioState->controller, 35, 30, 0);
             }
             o->oLeftVel = 8.0f;
             star_door_update_pos();

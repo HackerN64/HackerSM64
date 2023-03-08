@@ -178,7 +178,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
     }
 
     if (soundMenuFlags & SOUND_MENU_FLAG_LETGOMARIOFACE) {
-        queue_rumble_data(gPlayer1Controller, 10, 60);
+        queue_rumble_data(gPlayer1Controller, 10, 60, 0);
     }
 }
 

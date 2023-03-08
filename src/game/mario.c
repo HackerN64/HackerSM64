@@ -1472,7 +1472,7 @@ void update_mario_health(struct MarioState *m) {
             if (gRumbleInfos[m->controller->port].breathTimer == 0) {
                 gRumbleInfos[m->controller->port].breathTimer = 36;
                 if (is_rumble_finished_and_queue_empty(m->controller)) {
-                    queue_rumble_data(m->controller, 3, 30);
+                    queue_rumble_data(m->controller, 3, 30, 0);
                 }
             }
         } else {
@@ -1495,7 +1495,7 @@ void update_mario_breath(struct MarioState *m) {
                 if (gRumbleInfos[m->controller->port].breathTimer == 0) {
                     gRumbleInfos[m->controller->port].breathTimer = 36;
                     if (is_rumble_finished_and_queue_empty(m->controller)) {
-                        queue_rumble_data(m->controller, 3, 30);
+                        queue_rumble_data(m->controller, 3, 30, 0);
                     }
                 }
             } else {
@@ -1687,11 +1687,11 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
 #ifdef ENABLE_RUMBLE
 void queue_rumble_particles(struct MarioState *m) {
     if (m->particleFlags & PARTICLE_HORIZONTAL_STAR) {
-        queue_rumble_data(m->controller, 5, 80);
+        queue_rumble_data(m->controller, 5, 80, 0);
     } else if (m->particleFlags & PARTICLE_VERTICAL_STAR) {
-        queue_rumble_data(m->controller, 5, 80);
+        queue_rumble_data(m->controller, 5, 80, 0);
     } else if (m->particleFlags & PARTICLE_TRIANGLE) {
-        queue_rumble_data(m->controller, 5, 80);
+        queue_rumble_data(m->controller, 5, 80, 0);
     }
     if (m->heldObj && m->heldObj->behavior == segmented_to_virtual(bhvBobomb)) {
         reset_rumble_timers_slip(m->controller);

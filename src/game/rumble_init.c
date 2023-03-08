@@ -199,7 +199,7 @@ static void update_rumble_data_queue(struct RumbleInfo *info) {
 /**
  * Writes a rumble command to the end of the queue.
  */
-void queue_rumble_data(struct Controller *controller, s16 timer, s16 level) {
+void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 decay) {
     if (gCurrDemoInput != NULL) {
         return;
     }
@@ -210,15 +210,7 @@ void queue_rumble_data(struct Controller *controller, s16 timer, s16 level) {
     queueEnd->event = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
     queueEnd->level = level;
     queueEnd->timer = timer;
-    queueEnd->decay = 0;
-}
-
-/**
- * Sets the 'decay' parameter for the last (most recently set) command in the queue.
- * Called after queue_rumble_data.
- */
-void queue_rumble_decay(struct Controller *controller, s16 decay) {
-    gRumbleInfos[controller->port].queue[RUMBLE_QUEUE_SIZE - 1].decay = decay;
+    queueEnd->decay = decay;
 }
 
 /**

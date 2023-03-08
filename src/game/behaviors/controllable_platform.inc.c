@@ -81,7 +81,7 @@ void controllable_platform_hit_wall(s8 nextDirection) {
     sControllablePlatformDirectionState = 5;
 
     cur_obj_play_sound_2(SOUND_GENERAL_QUIET_POUND1);
-    queue_rumble_data(gMarioState->controller, 50, 80);
+    queue_rumble_data(gMarioState->controller, 50, 80, 0);
 }
 
 void controllable_platform_check_walls(s8 nextDirection, s8 wallDisplacement[3], Vec3f dist1, UNUSED Vec3f dist2, Vec3f dist3) {

@@ -205,10 +205,8 @@ s32 intro_regular(void) {
         }
 #endif
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#ifdef ENABLE_RUMBLE
-        queue_rumble_data(gPlayer1Controller, 60, 70);
-        queue_rumble_decay(gPlayer1Controller, 1);
-#endif
+        queue_rumble_data(gPlayer1Controller, 60, 70, 1);
+
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
@@ -237,8 +235,7 @@ s32 intro_game_over(void) {
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-        queue_rumble_data(gPlayer1Controller, 60, 70);
-        queue_rumble_decay(gPlayer1Controller, 1);
+        queue_rumble_data(gPlayer1Controller, 60, 70, 1);
 
         // same criteria as intro_regular
         level = LEVEL_FILE_SELECT + gDebugLevelSelect;

@@ -426,7 +426,7 @@ void exit_score_file_to_score_menu(struct Object *scoreFileButton, s8 scoreButto
     // Begin exit
     if (scoreFileButton->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN && sCursorClickingTimer == 2) {
         play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
-        queue_rumble_data(gPlayer1Controller, 5, 80);
+        queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
         scoreFileButton->oMenuButtonState = MENU_BUTTON_STATE_SHRINKING;
     }
@@ -516,7 +516,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
                  || buttonID == MENU_BUTTON_SCORE_COPY_FILE
                  || buttonID == MENU_BUTTON_SCORE_ERASE_FILE) {
                     play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                    queue_rumble_data(gPlayer1Controller, 5, 80);
+                    queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                     sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                     sSelectedButtonID = buttonID;
@@ -525,14 +525,14 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
                         // If clicked in a existing save file, select it too see it's score
                         if (save_file_exists(buttonID - MENU_BUTTON_SCORE_MIN) == TRUE) {
                             play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
-                            queue_rumble_data(gPlayer1Controller, 5, 80);
+                            queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                             sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_GROWING;
                             sSelectedButtonID = buttonID;
                         } else {
                             // If clicked in a non-existing save file, play buzz sound
                             play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
-                            queue_rumble_data(gPlayer1Controller, 5, 80);
+                            queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                             sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                             if (sMainMenuTimer >= SCORE_TIMER) {
@@ -565,7 +565,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
             if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN) == TRUE) {
                 // If clicked in a existing save file, ask where it wants to copy
                 play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                queue_rumble_data(gPlayer1Controller, 5, 80);
+                queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                 sMainMenuButtons[copyFileButtonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
                 sSelectedFileIndex = copyFileButtonID - MENU_BUTTON_COPY_MIN;
@@ -575,7 +575,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
             } else {
                 // If clicked in a non-existing save file, play buzz sound
                 play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
-                queue_rumble_data(gPlayer1Controller, 5, 80);
+                queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                 sMainMenuButtons[copyFileButtonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                 if (sMainMenuTimer >= BUZZ_TIMER) {
@@ -589,7 +589,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
             if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN) == FALSE) {
                 // If clicked in a non-existing save file, copy the file
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-                queue_rumble_data(gPlayer1Controller, 5, 80);
+                queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                 copyButton->oMenuButtonActionPhase = COPY_PHASE_COPY_COMPLETE;
                 sFadeOutText = TRUE;
@@ -603,7 +603,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
                 // If clicked in a existing save file, play buzz sound
                 if (MENU_BUTTON_COPY_FILE_A + sSelectedFileIndex == copyFileButtonID) {
                     play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
-                    queue_rumble_data(gPlayer1Controller, 5, 80);
+                    queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                     sMainMenuButtons[MENU_BUTTON_COPY_FILE_A + sSelectedFileIndex]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_OUT;
                     copyButton->oMenuButtonActionPhase = COPY_PHASE_MAIN;
@@ -639,7 +639,7 @@ void check_copy_menu_clicked_buttons(struct Object *copyButton) {
                  || buttonID == MENU_BUTTON_COPY_ERASE_FILE) {
                     if (copyButton->oMenuButtonActionPhase == COPY_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                        queue_rumble_data(gPlayer1Controller, 5, 80);
+                        queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                         sSelectedButtonID = buttonID;
@@ -672,7 +672,7 @@ void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID)
             if (save_file_exists(eraseFileButtonID - MENU_BUTTON_ERASE_MIN)) {
                 // If clicked in a existing save file, ask if it wants to delete it
                 play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                queue_rumble_data(gPlayer1Controller, 5, 80);
+                queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                 sMainMenuButtons[eraseFileButtonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
                 sSelectedFileIndex = eraseFileButtonID - MENU_BUTTON_ERASE_MIN;
@@ -682,7 +682,7 @@ void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID)
             } else {
                 // If clicked in a non-existing save file, play buzz sound
                 play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
-                queue_rumble_data(gPlayer1Controller, 5, 80);
+                queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                 sMainMenuButtons[eraseFileButtonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
 
@@ -698,7 +698,7 @@ void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID)
                 // Note: The prompt functions are actually called when the ERASE_MSG_PROMPT
                 // message is displayed with print_erase_menu_prompt
                 play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                queue_rumble_data(gPlayer1Controller, 5, 80);
+                queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                 sMainMenuButtons[MENU_BUTTON_ERASE_MIN + sSelectedFileIndex]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_OUT;
                 eraseButton->oMenuButtonActionPhase = ERASE_PHASE_MAIN;
@@ -728,7 +728,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
                  || buttonID == MENU_BUTTON_ERASE_COPY_FILE) {
                     if (eraseButton->oMenuButtonActionPhase == ERASE_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                        queue_rumble_data(gPlayer1Controller, 5, 80);
+                        queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                         sSelectedButtonID = buttonID;
@@ -820,7 +820,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                     || buttonID == MENU_BUTTON_HEADSET) {
                     if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-                        queue_rumble_data(gPlayer1Controller, 5, 80);
+                        queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
 #if !MULTILANG
@@ -1042,20 +1042,19 @@ void check_main_menu_clicked_buttons(void) {
         case MENU_BUTTON_PLAY_FILE_C:
         case MENU_BUTTON_PLAY_FILE_D:
             play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
-            queue_rumble_data(gPlayer1Controller, 60, 70);
-            queue_rumble_decay(gPlayer1Controller, 1);
+            queue_rumble_data(gPlayer1Controller, 60, 70, 1);
             break;
         // Play sound of the button clicked and render buttons of that menu.
         case MENU_BUTTON_SCORE:
         case MENU_BUTTON_COPY:
         case MENU_BUTTON_ERASE:
             play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
-            queue_rumble_data(gPlayer1Controller, 5, 80);
+            queue_rumble_data(gPlayer1Controller, 5, 80, 0);
             render_menu_buttons(sSelectedButtonID);
             break;
         case MENU_BUTTON_SOUND_MODE:
             play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
-            queue_rumble_data(gPlayer1Controller, 5, 80);
+            queue_rumble_data(gPlayer1Controller, 5, 80, 0);
             render_sound_mode_menu_buttons(sMainMenuButtons[MENU_BUTTON_SOUND_MODE]);
             break;
     }
@@ -1558,7 +1557,7 @@ void print_erase_menu_prompt(s16 x, s16 y) {
         // ..and is hovering "YES", delete file
         if (sEraseYesNoHoverState == MENU_ERASE_HOVER_YES) {
             play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
-            queue_rumble_data(gPlayer1Controller, 5, 80);
+            queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
             sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonActionPhase = ERASE_PHASE_MARIO_ERASED;
             sFadeOutText = TRUE;
@@ -1572,7 +1571,7 @@ void print_erase_menu_prompt(s16 x, s16 y) {
             // ..and is hovering "NO", return back to main phase
         } else if (sEraseYesNoHoverState == MENU_ERASE_HOVER_NO) {
             play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
-            queue_rumble_data(gPlayer1Controller, 5, 80);
+            queue_rumble_data(gPlayer1Controller, 5, 80, 0);
 
             sMainMenuButtons[MENU_BUTTON_ERASE_MIN + sSelectedFileIndex]->oMenuButtonState =
                 MENU_BUTTON_STATE_ZOOM_OUT;

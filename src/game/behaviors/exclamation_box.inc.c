@@ -94,7 +94,7 @@ void exclamation_box_act_active(void) {
         o->oGravity = -8.0f;
         o->oFloorHeight = o->oPosY;
         o->oAction = EXCLAMATION_BOX_ACT_SCALING;
-        queue_rumble_data(gMarioState->controller, 5, 80);
+        queue_rumble_data(gMarioState->controller, 5, 80, 0);
     }
     load_object_collision_model();
 }
