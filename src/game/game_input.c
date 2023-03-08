@@ -83,10 +83,10 @@ void run_demo_inputs(void) {
 /**
  * @brief Check if a combo has finished being pressed on this frame.
  *
- * @param[in] buttonDown Buttons held down.
- * @param[in] buttonPressed Buttons freshly pressed on this frame.
- * @param[out] combo The button combo to check for.
- * @return s32 Whether the check is successful.
+ * @param[in ] buttonDown    The buttons that are currently held down.
+ * @param[in ] buttonPressed The buttons that are freshly pressed on this frame.
+ * @param[out] combo         The button combo to check for.
+ * @returns s32 Boolean whether the check is successful.
  */
 ALWAYS_INLINE s32 check_button_pressed_combo(u16 buttonDown, u16 buttonPressed, u16 combo) {
     return (((buttonDown & combo) == combo) && (buttonPressed & combo));
@@ -96,7 +96,7 @@ ALWAYS_INLINE s32 check_button_pressed_combo(u16 buttonDown, u16 buttonPressed, 
  * @brief Links a controller struct to the appropriate status and pad.
  *
  * @param[out] controller The controller to link.
- * @param[in] port The port to get the data from.
+ * @param[in ] port The port to get the data from.
  */
 void assign_controller_data(struct Controller* controller, int port) {
     controller->statusData = &gControllerStatuses[port];
@@ -176,7 +176,7 @@ void assign_controllers_by_player_num(void) {
 
 /**
  * @brief Reads raw controller input data.
- * 
+ *
  * @param[in] mesg The SI message to wait for.
  * Called by
  */
@@ -192,7 +192,7 @@ static void poll_controller_inputs(OSMesg* mesg) {
 
 /**
  * @brief Checks for new controller data on all ports.
- * 
+ *
  * @param[in] mesg The SI message to wait for.
  */
 static void poll_controller_statuses(OSMesg* mesg) {
@@ -224,7 +224,7 @@ void start_controller_status_polling(s32 isBootMode) {
 
 /**
  * @brief Stop polling for new controllers and assign them to their player numbers.
- * 
+ *
  * @param[in,out] pad The controller that stopped the polling.
  */
 void stop_controller_status_polling(OSContPadEx *pad) {
@@ -250,9 +250,9 @@ void stop_controller_status_polling(OSContPadEx *pad) {
 /**
  * @brief Checks whether any analog sticks on a controller pad are outside a deadzone.
  *
- * @param[in] pad The controller pad to check.
+ * @param[in] pad      The controller pad to check.
  * @param[in] deadzone The deadzone to compare with.
- * @return s32 Whether any input was detected.
+ * @returns s32 Boolean whether any input was detected.
  */
 static s32 detect_analog_stick_input(OSContPadEx *pad, const s8 deadzone) {
     return (abss(pad->stick.x  ) > deadzone
@@ -321,7 +321,7 @@ void read_controller_inputs_status_polling(void) {
 
 /**
  * @brief Takes the updated controller struct and calculate the new x, y, and distance floats.
- * 
+ *
  * @param[in,out] controller The controller to operate on.
  */
 static void adjust_analog_stick(struct Controller* controller) {
@@ -397,7 +397,7 @@ void read_controller_inputs_normal(void) {
 
 /**
  * @brief General input handling function.
- * 
+ *
  * @param[in] mesg The SI message to wait for.
  */
 void handle_input(OSMesg* mesg) {

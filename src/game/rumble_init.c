@@ -23,7 +23,7 @@ s32 sRumblePakThreadActive = FALSE;             // Set to TRUE when the rumble t
 struct RumbleInfo gRumbleInfos[MAXCONTROLLERS] = { 0 };
 
 /**
- * Locks controller input data while reading new inputs or another thread is using the current inputs.
+ * @brief Locks controller input data while reading new inputs or another thread is using the current inputs.
  * This prevents new inputs overwriting the current inputs while they are in use.
  */
 void block_until_rumble_pak_free(void) {
@@ -32,12 +32,13 @@ void block_until_rumble_pak_free(void) {
 }
 
 /**
- * Unlocks controller input data, allowing to read new inputs or another thread to access the most recently
+ * @brief Unlocks controller input data, allowing to read new inputs or another thread to access the most recently
  * polled inputs.
  */
 void release_rumble_pak_control(void) {
     osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg) 0, OS_MESG_NOBLOCK);
 }
+
 ALIGNED8 static const char *sPfsErrorDesc[] = {
     [PFS_ERR_SUCCESS     ] = "successful",                  /* no error                                     */
     [PFS_ERR_NOPACK      ] = "no pak",                      /* no memory card is plugged or                 */
@@ -56,8 +57,11 @@ ALIGNED8 static const char *sPfsErrorDesc[] = {
 };
 
 /**
- * Check the rumble pak status.
+ * @brief Check the rumble pak status.
  * Called by thread6_rumble_loop.
+ *
+ * @param[in,out] rumbleInfo A pointer to a rumble info struct.
+ * @param[in    ] channel    The port ID to operate on.
  */
 static void detect_rumble_pak(struct RumbleInfo *info, int channel) {
     if (info->pfs.status & PFS_MOTOR_INITIALIZED) {
@@ -78,8 +82,10 @@ static void detect_rumble_pak(struct RumbleInfo *info, int channel) {
 }
 
 /**
- * Turn the Rumble Pak motor on or off. This is called every frame.
- * motorState = MOTOR_STOP, MOTOR_START, or MOTOR_STOP_HARD (MOTOR_STOP_HARD is for GameCube controllers only).
+ * @brief Turn the Rumble Pak motor on or off. This is called every frame.
+ *
+ * @param[in,out] rumbleInfo A pointer to a rumble info struct.
+ * @param[in    ] motorState MOTOR_STOP = stop motor, MOTOR_START = start motor, MOTOR_STOP_HARD (GCN only) = motor brake.
  */
 static void set_motor(struct RumbleInfo *info, s32 motorState) {
     OSPfs *pfs = &info->pfs;
@@ -106,7 +112,9 @@ static void set_motor(struct RumbleInfo *info, s32 motorState) {
 }
 
 /**
- * Handle turning the motor on/off based on current rumble settings data.
+ * @brief Handle turning the motor on/off based on current rumble settings data.
+ *
+ * @param[in,out] rumbleInfo A pointer to a rumble info struct.
  */
 static void update_rumble_pak(struct RumbleInfo *info) {
     struct RumbleData *current = &info->current;
@@ -174,7 +182,11 @@ static void update_rumble_pak(struct RumbleInfo *info) {
     }
 }
 
-// Rumble commands are written to the end of the queue, move down through the queue each frame, and trigger when they reach the beginning.
+/**
+ * @brief Rumble commands are written to the end of the queue, move down through the queue each frame, and trigger when they reach the beginning.
+ *
+ * @param[in,out] rumbleInfo A pointer to a rumble info struct.
+ */
 static void update_rumble_data_queue(struct RumbleInfo *info) {
     struct RumbleData *queue = &info->queue[0];
 
@@ -197,14 +209,19 @@ static void update_rumble_data_queue(struct RumbleInfo *info) {
 }
 
 /**
- * Writes a rumble command to the end of the queue.
+ * @brief Writes a rumble command to the end of the queue.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ * @param[in] timer      How many frames the main portion of the rumble lasts.
+ * @param[in] level      If 70 or lower, Used to modulate rumble during the main portion, otherwise the motor will be constantly on for that phase.
+ * @param[in] decay      How much 'level' decreases each frame during the 'timer' phase.
  */
 void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 decay) {
+    struct RumbleData *queueEnd = &gRumbleInfos[controller->port].queue[RUMBLE_QUEUE_SIZE - 1];
+
     if (gCurrDemoInput != NULL) {
         return;
     }
-
-    struct RumbleData *queueEnd = &gRumbleInfos[controller->port].queue[RUMBLE_QUEUE_SIZE - 1];
 
     // Write the rumble command.
     queueEnd->event = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
@@ -214,9 +231,12 @@ void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 
 }
 
 /**
- * Used after setting gRumblePakTimer to check if any rumble commands are being executed or queued.
+ * @brief Used after setting gRumblePakTimer to check if any rumble commands are being executed or queued.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ * @returns s32 Boolean, whether the controller is done rumbling.
  */
-u32 is_rumble_finished_and_queue_empty(struct Controller *controller) {
+s32 is_rumble_finished_and_queue_empty(struct Controller *controller) {
     struct RumbleInfo *info = &gRumbleInfos[controller->port];
 
     // Check whether currently rumbling.
@@ -235,7 +255,9 @@ u32 is_rumble_finished_and_queue_empty(struct Controller *controller) {
 }
 
 /**
- * Resets the 'slip' timer.
+ * @brief Resets the 'slip' timer.
+ *
+ * @param[in,out] rumbleInfo A pointer to a rumble info struct.
  */
 static void reset_rumble_slip(struct RumbleInfo *info) {
     if (info->slip == 0) {
@@ -248,7 +270,9 @@ static void reset_rumble_slip(struct RumbleInfo *info) {
 }
 
 /**
- * Resets the 'slip' timer and sets 'vibrate' to 7.
+ * @brief Resets the 'slip' timer and sets 'vibrate' to 7.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
  */
 void reset_rumble_timers_slip(struct Controller *controller) {
     struct RumbleInfo *info = &gRumbleInfos[controller->port];
@@ -263,7 +287,10 @@ void reset_rumble_timers_slip(struct Controller *controller) {
 }
 
 /**
- * Resets the 'slip' timer and sets 'vibrate' based on the arg.
+ * @brief Resets the 'slip' timer and sets 'vibrate' based on the arg.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
+ * @param[in] level      Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
  */
 void reset_rumble_timers_vibrate(struct Controller *controller, s32 level) {
     struct RumbleInfo *info = &gRumbleInfos[controller->port];
@@ -280,8 +307,10 @@ void reset_rumble_timers_vibrate(struct Controller *controller, s32 level) {
 }
 
 /**
- * Bypasses the queue by changing the current rumble command directly.
+ * @brief Bypasses the queue by changing the current rumble command directly.
  * Called by act_breaststroke.
+ *
+ * @param[in] controller A pointer to the controller to rumble.
  */
 void queue_rumble_submerged(struct Controller *controller) {
     struct RumbleInfo *info = &gRumbleInfos[controller->port];
@@ -296,7 +325,9 @@ void queue_rumble_submerged(struct Controller *controller) {
 
 
 /**
- * Rumble thread loop.
+ * @brief Rumble thread loop.
+ *
+ * @param[in] arg Unused argument.
  */
 static void thread6_rumble_loop(UNUSED void *arg) {
     OSMesg msg;
@@ -322,7 +353,7 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 }
 
 /**
- * Reinitialize the Rumble Pak and stop the motor.
+ * @brief Reinitialize the Rumble Pak and stop the motor.
  */
 void cancel_rumble(void) {
     for (int channel = 0; channel < __osMaxControllers; channel++) {
@@ -348,7 +379,7 @@ void cancel_rumble(void) {
 }
 
 /**
- * Creates the Rumble Pak scheduler message queue and thread.
+ * @brief Creates the Rumble Pak scheduler message queue and thread.
  * Called by thread5_game_loop.
  */
 void create_thread_6_rumble(void) {
@@ -363,7 +394,7 @@ void create_thread_6_rumble(void) {
 }
 
 /**
- * Sends a "VRTC" message on gRumbleThreadVIMesgQueue every vblank.
+ * @brief Sends a "VRTC" message on gRumbleThreadVIMesgQueue every vblank.
  * Called by handle_vblank.
  */
 void rumble_thread_update_vi(void) {

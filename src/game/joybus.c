@@ -23,6 +23,9 @@ static void __osPackReadData(void);
  * @brief Sets up PIF commands to poll controller inputs.
  * Unmodified from vanilla libultra, but __osPackReadData is modified.
  * Called by poll_controller_inputs.
+ *
+ * @param[in] mq The SI event message queue.
+ * @returns Error status: -1 = busy, 0 = success.
  */
 s32 osContStartReadDataEx(OSMesgQueue* mq) {
     s32 ret = 0;
@@ -54,6 +57,12 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
 /**
  * @brief Writes controller data to OSContPadEx and stores the controller center on first run.
  * Called by osContGetReadDataEx.
+ *
+ * @param[out] pad     The controller pad to write data to.
+ * @param[in ] gcn     The raw GCN button data.
+ * @param[in ] stick   The raw GCN analog stick data.
+ * @param[in ] c_stick The raw GCN C-stick data.
+ * @param[in ] trig    The raw GCN analog triggers data.
  */
 static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     OSContOrigins* origins = &pad->origins;
@@ -101,6 +110,8 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
  * Modified from vanilla libultra to handle GameCube controllers, skip empty/unassigned ports,
  *   and trigger status polling if an active controller is unplugged.
  * Called by poll_controller_inputs.
+ *
+ * @param[in,out] pad A pointer to the data for the 4 controller pads.
  */
 void osContGetReadDataEx(OSContPadEx* pad) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -270,6 +281,9 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data);
  * @brief Read status query data written by osContStartQuery.
  * odified from vanilla libultra to return bitpattern, similar to osContInit.
  * Called by poll_controller_statuses.
+ *
+ * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
+ * @param[out] data       A pointer to the 4 controller statuses.
  */
 void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
     __osContGetInitDataEx(bitpattern, data);
@@ -284,6 +298,9 @@ void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
  * Linker script will resolve references to the original function with this one instead.
  * Modified from vanilla libultra to set gPortInfo type and plugged status.
  * Called by osContInit, osContGetQuery, osContGetQueryEx, and osContReset.
+ *
+ * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
+ * @param[out] data       A pointer to the 4 controller statuses.
  */
 void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -331,6 +348,10 @@ ALIGNED8 static OSPifRamEx __MotorDataBuf[MAXCONTROLLERS];
  * @brief Turns controller rumble on or off.
  * Modified from vanilla libultra to handle GameCube controller rumble.
  * Called by osMotorStart, osMotorStop, and osMotorStopHard via macro.
+ *
+ * @param[in] pfs        A pointer to a buffer for the controller pak (AKA rumble pak) file system.
+ * @param[in] motorState MOTOR_STOP = stop motor, MOTOR_START = start motor, MOTOR_STOP_HARD (GCN only) = motor brake.
+ * @returns PIF error status.
  */
 s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     s32 err = PFS_ERR_SUCCESS;
@@ -398,6 +419,9 @@ s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
  * @brief Writes PIF commands to control the rumble pak.
  * Unmodified from vanilla libultra.
  * Called by osMotorInit and osMotorInitEx.
+ *
+ * @param[in] channel The port ID to operate on.
+ * @param[in] mdata   A pointer to a buffer for the PIF RAM command data.
  */
 static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
     u8* ptr = (u8*)mdata->ramarray;
@@ -427,6 +451,11 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
  * @brief Initializes the Rumble Pak.
  * Modified from vanilla libultra to ignore GameCube controllers.
  * Called by thread6_rumble_loop and cancel_rumble.
+ *
+ * @param[in]  mq      The SI event message queue.
+ * @param[out] pfs     A pointer to a buffer for the controller pak (AKA rumble pak) file system.
+ * @param[in]  channel The port ID to operate on.
+ * @returns    PFS error status.
  */
 s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     s32 err;

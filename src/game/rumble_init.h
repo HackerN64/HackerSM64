@@ -17,10 +17,10 @@
 
 // A rumble command.
 struct RumbleData {
-    /*0x00*/ s16 event;     // The type of rumble command. see RumbleEvents enum.
-    /*0x02*/ s16 level;     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
-    /*0x04*/ s16 timer;     // How many frames the main portion of the rumble lasts.
-    /*0x06*/ s16 decay;     // How much 'level' decreases each frame during the 'timer' phase.
+    /*0x00*/ s16 event; // The type of rumble command. see RumbleEvents enum.
+    /*0x02*/ s16 level; // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    /*0x04*/ s16 timer; // How many frames the main portion of the rumble lasts.
+    /*0x06*/ s16 decay; // How much 'level' decreases each frame during the 'timer' phase.
 }; /*0x08*/
 
 // Rumble Info for each port.
@@ -55,7 +55,7 @@ extern struct RumbleInfo gRumbleInfos[MAXCONTROLLERS];
 void block_until_rumble_pak_free(void);
 void release_rumble_pak_control(void);
 void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 decay);
-u32 is_rumble_finished_and_queue_empty(struct Controller *controller);
+s32 is_rumble_finished_and_queue_empty(struct Controller *controller);
 void reset_rumble_timers_slip(struct Controller *controller);
 void reset_rumble_timers_vibrate(struct Controller *controller, s32 level);
 void queue_rumble_submerged(struct Controller *controller);
