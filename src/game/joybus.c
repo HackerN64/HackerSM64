@@ -155,15 +155,15 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
                         default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
                             c_stick = gcnInput.m0.c_stick;
-                            trig    = ANALOG_4_TO_8(gcnInput.m0.trig);
+                            trig    = ANALOG_U4_TO_U8(gcnInput.m0.trig);
                             break;
                         case GCN_MODE_1_121:
-                            c_stick = ANALOG_4_TO_8(gcnInput.m1.c_stick);
+                            c_stick = ANALOG_U4_TO_U8(gcnInput.m1.c_stick);
                             trig    = gcnInput.m1.trig;
                             break;
                         case GCN_MODE_2_112:
-                            c_stick = ANALOG_4_TO_8(gcnInput.m2.c_stick);
-                            trig    = ANALOG_4_TO_8(gcnInput.m2.trig);
+                            c_stick = ANALOG_U4_TO_U8(gcnInput.m2.c_stick);
+                            trig    = ANALOG_U4_TO_U8(gcnInput.m2.trig);
                             break;
                         case GCN_MODE_3_220:
                             c_stick = gcnInput.m3.c_stick;

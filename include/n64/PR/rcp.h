@@ -151,12 +151,12 @@ The Indy development board use cartridge domain 1:
  */
 #define CHNL_ERR_SUCCESS	0x00
 
-#define CHNL_ERR_NORESP		(1 << 7)	/* 0x80: Bit 7 (Rx): No response error */
-#define CHNL_ERR_OVERRUN	(1 << 6)	/* 0x40: Bit 6 (Rx): Overrun error */
-#define CHNL_ERR_FRAME		(1 << 7)	/* 0x80: Bit 7 (Tx): Frame error */
-#define CHNL_ERR_COLLISION	(1 << 6)	/* 0x40: Bit 6 (Tx): Collision error */
+#define CHNL_ERR_NORESP		(0b1 << 7)	/* 0x80: Bit 7 (Rx): No response error */
+#define CHNL_ERR_OVERRUN	(0b1 << 6)	/* 0x40: Bit 6 (Rx): Overrun error */
+#define CHNL_ERR_FRAME		(0b1 << 7)	/* 0x80: Bit 7 (Tx): Frame error */
+#define CHNL_ERR_COLLISION	(0b1 << 6)	/* 0x40: Bit 6 (Tx): Collision error */
 
-#define CHNL_ERR_MASK		(2 << 6)	/* 0xC0: Bit 6-7: channel errors */
+#define CHNL_ERR_MASK		(0b11 << 6)	/* 0xC0: Bit 6-7: channel errors */
 
 
 /*************************************************************************

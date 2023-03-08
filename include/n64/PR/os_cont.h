@@ -77,9 +77,9 @@ typedef union {
     u16 raw;
 } Analog_u8; /*0x02*/
 
-#define ANALOG_4_TO_8(src) ((Analog_u8){\
-    ((src).a << 4),                     \
-    ((src).b << 4),                     \
+#define ANALOG_U4_TO_U8(src) ((Analog_u8){  \
+    ((src).a << 4),                         \
+    ((src).b << 4),                         \
 })
 
 #define ANALOG_S8_CENTER(stick, center) ((Analog_s8){   \
@@ -123,7 +123,7 @@ typedef struct {
     /*0x04*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
     /*0x06*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
     /*0x08*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
-    /*0x0A*/ OSContOrigins origins;         /* GCN Analog Origins */
+    /*0x0A*/ OSContOrigins origins;         /* GCN analog origins */
     /*0x0F*/ u8	errno;                      /* Error number */
 } OSContPadEx; /*0x10*/
 
