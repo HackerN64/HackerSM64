@@ -108,40 +108,29 @@ void assign_controller_data(struct Controller* controller, int port) {
  * @brief Initialize the controller structs to point at the OSCont information.
  * Automatically assignins controller numbers based on port order.
  */
-void assign_controllers_auto(void) {
-#ifdef PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT
-    const s32 prioritizeGCN = TRUE;
-#else
-    const s32 prioritizeGCN = FALSE;
-#endif
+void assign_controllers_by_port_order(void) {
     OSPortInfo* portInfo = NULL;
     int port, cont = 0;
     int lastUsedPort = -1;
 
-    // Two passes if PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT is enabled.
-    // The first pass is for only GameCube controllers and the second pass for everything else.
-    for (int pass = 0; pass < (1 + prioritizeGCN); pass++) {
-        // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
-        // The game allows you to have a controller plugged into any port in order to play the game.
-        for (port = 0; port < MAXCONTROLLERS; port++) {
-            if (cont >= NUM_SUPPORTED_CONTROLLERS) {
-                break;
-            }
+    // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
+    // The game allows you to have a controller plugged into any port in order to play the game.
+    for (port = 0; port < MAXCONTROLLERS; port++) {
+        if (cont >= NUM_SUPPORTED_CONTROLLERS) {
+            break;
+        }
 
-            portInfo = &gPortInfo[port];
+        portInfo = &gPortInfo[port];
 
-            // Is the controller plugged in, and is it a GameCube controller on the first pass?
-            if (portInfo->plugged && (!prioritizeGCN || (pass == !(portInfo->type & CONT_CONSOLE_GCN)))) {
-                assign_controller_data(&gControllers[cont], port);
+        // Is the controller plugged in?
+        if (portInfo->plugged) {
+            portInfo->playerNum = (cont + 1);
 
-                portInfo->playerNum = (cont + 1);
+            assign_controller_data(&gControllers[cont], port);
 
-                if (lastUsedPort < port) {
-                    lastUsedPort = port;
-                }
+            lastUsedPort = port;
 
-                cont++;
-            }
+            cont++;
         }
     }
 
@@ -162,6 +151,7 @@ void assign_controllers_by_player_num(void) {
     // The game allows you to have a controller plugged into any port in order to play the game.
     for (port = 0; port < MAXCONTROLLERS; port++) {
         portInfo = &gPortInfo[port];
+
         // Is controller plugged in and assigned to a player?
         if (portInfo->plugged && portInfo->playerNum) {
             assign_controller_data(&gControllers[portInfo->playerNum - 1], port);
@@ -444,7 +434,7 @@ void init_controllers(void) {
 
 #if (NUM_SUPPORTED_CONTROLLERS > 1)
     // Automatically assign controllers based on port order.
-    assign_controllers_auto();
+    assign_controllers_by_port_order();
 #else
     // The controller with the first detected input becomes player 1.
     start_controller_status_polling(TRUE);

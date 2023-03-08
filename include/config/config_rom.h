@@ -35,11 +35,6 @@
 // #define USE_GAMECUBE_CONTROLLER
 
 /**
- * Prioritize GameCube controllers when assigning player numbers to controllers on boot.
- */
-// #define PRIORITIZE_GAMECUBE_CONTROLLERS_ON_BOOT
-
-/**
  * RCVI hack. Increases performance on emulator, and does nothing on console.
  * Might break on some emulators. Use at your own risk, and don't use it unless you actually need the extra performance.
  */
