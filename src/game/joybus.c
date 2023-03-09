@@ -358,12 +358,15 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     int channel = pfs->channel;
     u8* ptr = (u8*)&__MotorDataBuf[channel];
 
+    // Make sure the rumble pak pfs was initialized.
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
         return PFS_ERR_INVALID;
     }
 
     if (gPortInfo[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
         gPortInfo[channel].gcRumble = motorState;
+
+        // Change the last command ID so that input poll command (which includes rumble) gets written again.
         __osContLastCmd = PIF_CMD_END;
     } else { // N64 Controllers.
         // N64 rumble pak can only use MOTOR_STOP or MOTOR_START.
@@ -387,6 +390,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
         // Write __MotorDataBuf to the PIF RAM and then wait for the command to execute.
         __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
+
         // Read the resulting __MotorDataBuf from the PIF RAM and then wait for the command to execute.
         __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
@@ -488,7 +492,7 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
 
         // Ensure the accessory is not a turned off Transfer Pak.
         if (data[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
-            return PFS_ERR_DEVICE; // Wrong device
+            return PFS_ERR_DEVICE; // Wrong device.
         }
 
         // Write probe value (Rumble bank).
@@ -511,7 +515,7 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
 
         // Ensure the accessory is a Rumble Pak.
         if (data[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
-            return PFS_ERR_DEVICE; // Wrong device
+            return PFS_ERR_DEVICE; // Wrong device.
         }
 
         // Write the PIF command.

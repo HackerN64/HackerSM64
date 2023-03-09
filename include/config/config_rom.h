@@ -23,11 +23,11 @@
 #define ENABLE_RUMBLE
 
 /**
- * The maximum number of supported controllers. 1-4.
+ * The maximum number of supported players/controllers. 1-4.
  * This will save performance if the player has extra unused controllers plugged in.
  * NOTE: Default is 1, maximum is 4.
  */
-#define NUM_SUPPORTED_CONTROLLERS 1
+#define MAX_NUM_PLAYERS 1
 
 /**
  * Informs supported emulators to default to GameCube controller inputs.

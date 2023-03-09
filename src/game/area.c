@@ -361,7 +361,7 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
+#if (MAX_NUM_PLAYERS > 1)
 ALIGNED8 static const char* sN64ButtonNames[16] = {
     "A",       // A_BUTTON
     "B",       // B_BUTTON
@@ -511,7 +511,7 @@ void render_controllers_overlay(void) {
         if (gContStatusPollingReadyForInput) {
             sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", (gNumPlayers + 1));
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
+#if (MAX_NUM_PLAYERS > 1)
             char comboStr[32] = "";
             size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);

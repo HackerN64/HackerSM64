@@ -49,8 +49,8 @@ struct Controller {
     /*0x10*/ u16 buttonDown;              // Buttons held down on the current frame.
     /*0x12*/ u16 buttonPressed;           // Buttons pressed on the current frame but not held on the previous frame.
     /*0x14*/ u16 buttonReleased;          // Burrons released on the current frame and held on the previous frame.
-    /*0x18*/ OSContStatus *statusData;    // Pointer to the controller status data in gControllerStatuses.
-    /*0x1C*/ OSContPadEx *controllerData; // Pointer to the raw input data in gControllerPads.
+    /*0x18*/ OSContStatus* statusData;    // Pointer to the controller status data in gControllerStatuses.
+    /*0x1C*/ OSContPadEx* controllerData; // Pointer to the raw input data in gControllerPads.
     /*0x20*/ s32 port;                    // The port index this controller is plugged into [0, 3].
 }; /*0x24*/
 

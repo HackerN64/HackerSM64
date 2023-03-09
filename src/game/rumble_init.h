@@ -15,6 +15,12 @@
 // Number of rumble commands that can be called per frane.
 #define RUMBLE_QUEUE_SIZE       3
 
+enum RumbleEvents {
+    RUMBLE_EVENT_NOMESG,  // No command.
+    RUMBLE_EVENT_CONSTON, // Constant rumble strength.
+    RUMBLE_EVENT_LEVELON, // Modulate rumble using 'count' and 'level'.
+};
+
 // A rumble command.
 struct RumbleData {
     /*0x00*/ s16 event; // The type of rumble command. see RumbleEvents enum.
@@ -35,12 +41,6 @@ struct RumbleInfo {
     /*0x8E*/ s32 motorState;                                // Current rumble motor state.
     /*0x00*/ s32 breathTimer;                               // Only used to time the drowning warning rumble.
     /*0x00*/ s32 error;                                     // The last error from a motor start/stop.
-};
-
-enum RumbleEvents {
-    RUMBLE_EVENT_NOMESG,  // No command.
-    RUMBLE_EVENT_CONSTON, // Constant rumble strength.
-    RUMBLE_EVENT_LEVELON, // Modulate rumble using 'count' and 'level'.
 };
 
 extern OSThread gRumblePakThread;

@@ -24,7 +24,7 @@ struct DemoInput {
 
 // Player Controllers.
 extern struct Controller gControllers[MAXCONTROLLERS];
-// Defined controller slots. Anything above NUM_SUPPORTED_CONTROLLERS will be unused.
+// Defined controller slots. Anything above MAX_NUM_PLAYERS will be unused.
 extern struct Controller* const gPlayer1Controller;
 extern struct Controller* const gPlayer2Controller;
 extern struct Controller* const gPlayer3Controller;

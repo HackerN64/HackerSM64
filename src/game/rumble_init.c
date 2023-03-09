@@ -18,7 +18,7 @@ OSMesgQueue gRumblePakSchedulerMesgQueue;
 OSMesg gRumbleThreadVIMesgBuf[1];
 OSMesgQueue gRumbleThreadVIMesgQueue;
 
-s32 sRumblePakThreadActive = FALSE;             // Set to TRUE when the rumble thread starts.
+s32 sRumblePakThreadActive = FALSE; // Set to TRUE when the rumble thread starts.
 
 struct RumbleInfo gRumbleInfos[MAXCONTROLLERS] = { 0 };
 
@@ -72,7 +72,7 @@ static void detect_rumble_pak(struct RumbleInfo *info, int channel) {
             osSyncPrintf("Rumble Pak error (%d): %s\n", info->error, sPfsErrorDesc[info->error]);
         }
     } else {
-        if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check Rumble Pak status about once per second.
+        if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check the Rumble Pak status about once per second.
             if (osMotorInitEx(&gSIEventMesgQueue, &info->pfs, channel) != PFS_ERR_SUCCESS) {
                 gRumbleInfos[channel].motorState = MOTOR_STOP;
             }
@@ -190,7 +190,7 @@ static void update_rumble_pak(struct RumbleInfo *info) {
 static void update_rumble_data_queue(struct RumbleInfo *info) {
     struct RumbleData *queue = &info->queue[0];
 
-    // If the first queue entry has a command
+    // If the first queue entry has a command...
     if (queue[0].event != RUMBLE_EVENT_NOMESG) {
         info->count = 0;
         info->start = RUMBLE_START_TIME;
@@ -231,7 +231,7 @@ void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 
 }
 
 /**
- * @brief Used after setting gRumblePakTimer to check if any rumble commands are being executed or queued.
+ * @brief Used after setting 'breathTimer' to check if any rumble commands are being executed or queued.
  *
  * @param[in] controller A pointer to the controller to rumble.
  * @returns s32 Boolean, whether the controller is done rumbling.
@@ -357,7 +357,7 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 }
 
 /**
- * @brief Reinitialize the Rumble Pak and stop the motor.
+ * @brief Reinitialize the Rumble Pak and stops the motor.
  */
 void cancel_rumble(void) {
     for (int channel = 0; channel < __osMaxControllers; channel++) {

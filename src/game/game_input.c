@@ -13,7 +13,7 @@
 
 // Player Controllers.
 struct Controller gControllers[MAXCONTROLLERS];
-// Defined controller slots. Anything above NUM_SUPPORTED_CONTROLLERS will be unused.
+// Defined controller slots. Anything above MAX_NUM_PLAYERS will be unused.
 struct Controller* const gPlayer1Controller = &gControllers[0];
 struct Controller* const gPlayer2Controller = &gControllers[1];
 struct Controller* const gPlayer3Controller = &gControllers[2];
@@ -116,7 +116,7 @@ void assign_controllers_by_port_order(void) {
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
     // The game allows you to have a controller plugged into any port in order to play the game.
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        if (cont >= NUM_SUPPORTED_CONTROLLERS) {
+        if (cont >= MAX_NUM_PLAYERS) {
             break;
         }
 
@@ -275,7 +275,7 @@ void read_controller_inputs_status_polling(void) {
                 ) {
                     portInfo->playerNum = ++gNumPlayers;
                 }
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
+#if (MAX_NUM_PLAYERS > 1)
                 u16 pressed = (~portInfo->statusPollButtons & button);
 
                 // If the combo is pressed, stop polling and assign the current controllers.
@@ -289,7 +289,7 @@ void read_controller_inputs_status_polling(void) {
 #endif
                 // If we've exceeded the number of controllers, stop polling and assign the current controllers.
                 if (gNumPlayers >= __builtin_popcount(gControllerBits)
-                 || gNumPlayers >= NUM_SUPPORTED_CONTROLLERS
+                 || gNumPlayers >= MAX_NUM_PLAYERS
                 ) {
                     stop_controller_status_polling(pad);
                     return;
@@ -351,7 +351,7 @@ void read_controller_inputs_normal(void) {
     run_demo_inputs();
 #endif
 
-    for (cont = 0; cont < NUM_SUPPORTED_CONTROLLERS; cont++) {
+    for (cont = 0; cont < MAX_NUM_PLAYERS; cont++) {
         struct Controller* controller = &gControllers[cont];
         OSContPadEx* controllerData = controller->controllerData;
         // If we're receiving inputs, update the controller struct with the new button info.
@@ -432,7 +432,7 @@ void init_controllers(void) {
     // Init the controllers.
     osContInit(&gSIEventMesgQueue, &gControllerBits, gControllerStatuses);
 
-#if (NUM_SUPPORTED_CONTROLLERS > 1)
+#if (MAX_NUM_PLAYERS > 1)
     // Automatically assign controllers based on port order.
     assign_controllers_by_port_order();
 #else

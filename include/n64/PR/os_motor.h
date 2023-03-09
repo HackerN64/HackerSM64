@@ -68,7 +68,7 @@ extern s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int controller_no);
 enum OSMotorOP {
     MOTOR_STOP,
     MOTOR_START,
-    MOTOR_STOP_HARD,
+    MOTOR_STOP_HARD, // GCN only.
 };
 #define	osMotorStopHard(x)  __osMotorAccessEx((x), MOTOR_STOP_HARD)
 #define	osMotorStart(x)     __osMotorAccessEx((x), MOTOR_START)
