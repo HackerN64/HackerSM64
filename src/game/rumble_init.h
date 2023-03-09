@@ -7,6 +7,15 @@
 
 #ifdef ENABLE_RUMBLE
 
+// Number of vblanks between each rumble pak check.
+#define RUMBLE_PAK_CHECK_TIME   60
+// Number of errors before the rumble pak is considered disconnected.
+#define RUMBLE_MAX_ERRORS       30
+// Number of frames to rumble before entering the 'timer' phase of a rumble.
+#define RUMBLE_START_TIME       4
+// Number of rumble commands that can be called per frane.
+#define RUMBLE_QUEUE_SIZE       3
+
 enum RumbleEvents {
     RUMBLE_EVENT_NOMESG,
     RUMBLE_EVENT_CONSTON,
@@ -14,9 +23,9 @@ enum RumbleEvents {
 };
 
 struct RumbleData {
-    u8  comm;
-    u8  level;
-    s16 time;
+    s16 event;
+    s16 level;
+    s16 timer;
     s16 decay;
 };
 
@@ -40,14 +49,14 @@ extern OSMesgQueue gRumblePakSchedulerMesgQueue;
 extern OSMesg gRumbleThreadVIMesgBuf[1];
 extern OSMesgQueue gRumbleThreadVIMesgQueue;
 
-extern struct RumbleData gRumbleDataQueue[3];
+extern struct RumbleData gRumbleDataQueue[RUMBLE_QUEUE_SIZE];
 extern struct RumbleSettings gCurrRumbleSettings;
 
 extern s32 gRumblePakTimer;
 
 void block_until_rumble_pak_free(void);
 void release_rumble_pak_control(void);
-void queue_rumble_data(struct Controller *controller, s16 time, s16 level, s16 decay);
+void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 decay);
 u32 is_rumble_finished_and_queue_empty(struct Controller *controller);
 void reset_rumble_timers_slip(struct Controller *controller);
 void reset_rumble_timers_vibrate(struct Controller *controller, s32 level);
