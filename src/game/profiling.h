@@ -97,9 +97,15 @@ void profiler_rsp_completed(enum ProfilerRSPTime which);
 void profiler_rsp_resumed();
 void profiler_audio_started();
 void profiler_audio_completed();
+#ifdef PUPPYPRINT_DEBUG
 void profiler_collision_reset();
 void profiler_collision_completed();
 void profiler_collision_update(u32 time);
+#else
+#define profiler_collision_reset()
+#define profiler_collision_completed()
+#define profiler_collision_update(time)
+#endif
 u32 profiler_get_delta(enum ProfilerDeltaTime which);
 u32 profiler_get_cpu_microseconds();
 u32 profiler_get_rsp_microseconds();

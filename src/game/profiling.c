@@ -95,6 +95,8 @@ void profiler_audio_started() {
 #endif
 }
 
+#ifdef PUPPYPRINT_DEBUG
+
 void profiler_collision_reset() {
     collision_time = 0;
 }
@@ -107,6 +109,8 @@ void profiler_collision_completed() {
     ProfileTimeData* cur_data = &all_profiling_data[PROFILER_TIME_COLLISION];
     buffer_update(cur_data, collision_time, profile_buffer_index);
 }
+
+#endif
 
 u32 profiler_get_delta(enum ProfilerDeltaTime which) {
     if (which == PROFILER_DELTA_COLLISION) {
