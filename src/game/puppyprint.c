@@ -815,7 +815,7 @@ void puppyprint_profiler_process(void) {
 }
 #endif
 
-u8 print_set_envcolour(u8 r, u8 g, u8 b, u8 a) {
+s32 print_set_envcolour(u8 r, u8 g, u8 b, u8 a) {
     if ((r != gCurrEnvCol[0])
         || (g != gCurrEnvCol[1])
         || (b != gCurrEnvCol[2])
