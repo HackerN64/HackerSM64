@@ -17,27 +17,27 @@
 #define RUMBLE_QUEUE_SIZE       3
 
 enum RumbleEvents {
-    RUMBLE_EVENT_NOMESG,
-    RUMBLE_EVENT_CONSTON,
-    RUMBLE_EVENT_LEVELON,
+    RUMBLE_EVENT_NOMESG,  // No command.
+    RUMBLE_EVENT_CONSTON, // Constant rumble strength.
+    RUMBLE_EVENT_LEVELON, // Modulate rumble using 'count' and 'level'.
 };
 
 struct RumbleData {
-    s16 event;
-    s16 level;
-    s16 timer;
-    s16 decay;
-};
+    /*0x00*/ s16 event; // The type of rumble command. see RumbleEvents enum.
+    /*0x02*/ s16 level; // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    /*0x04*/ s16 timer; // How many frames the main portion of the rumble lasts.
+    /*0x06*/ s16 decay; // How much 'level' decreases each frame during the 'timer' phase.
+}; /*0x08*/
 
 struct RumbleSettings {
-    s16 event;
-    s16 level;
-    s16 timer;
-    s16 count;
-    s16 start;
-    s16 slip;
-    s16 vibrate;
-    s16 decay;
+    s16 event;      // The type of rumble command. see RumbleEvents enum.
+    s16 level;      // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    s16 timer;      // How many frames the main portion of the rumble lasts.
+    s16 decay;      // How much 'level' decreases each frame during the 'timer' phase.
+    s16 count;      // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    s16 start;      // The time to initially rumble for before the 'timer' phase.
+    s16 slip;       // A second timer independent from 'timer', for after 'timer' runs out. Decrements regardless.
+    s16 vibrate;    // How often to rumble when 'timer' is 0 and 'slip' is between [2, 5).
 };
 
 extern OSThread gRumblePakThread;
