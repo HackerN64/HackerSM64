@@ -1,22 +1,19 @@
 #include "PR/os_internal.h"
+#include "config.h"
+#include "string.h"
+#include "engine/math_util.h"
 
 /////////////////////////////////////////////////
 // Libultra structs and macros (from ultralib) //
 /////////////////////////////////////////////////
 
-#define ARRLEN(x) ((s32)(sizeof(x) / sizeof(x[0])))
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
-
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#define S8_MAX __SCHAR_MAX__
-#define S8_MIN (-S8_MAX - 1)
-#define CLAMP_S8( x)        CLAMP((x),  S8_MIN,  S8_MAX)
 
 #define CHNL_ERR_MASK		0xC0	/* Bit 6-7: channel errors */
 
 typedef struct
 {
-    /* 0x0 */ u32 ramarray[15];
+    /* 0x00 */ u32 ramarray[16 - 1];
     /* 0x3C */ u32 pifstatus;
 } OSPifRam;
 
@@ -67,8 +64,6 @@ typedef struct
 
 extern OSPifRam __osContPifRam;
 extern u8 __osMaxControllers;
-
-#define CONT_CMD_READ_BUTTON    1
 
 // Controller accessory addresses
 // https://github.com/joeldipops/TransferBoy/blob/master/docs/TransferPakReference.md
@@ -248,7 +243,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
         } else {
             readformat = *(__OSContReadFormat*)ptr;
             data->errno = CHNL_ERR(readformat);
-            
+
             if (data->errno != 0) {
                 continue;
             }
@@ -271,9 +266,7 @@ static void __osPackReadData(void) {
     __OSContGCNShortPollFormat readformatgcn;
     int i;
 
-    for (i = 0; i < ARRLEN(__osContPifRam.ramarray); i++) {
-        __osContPifRam.ramarray[i] = 0;
-    }
+    bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
 
     __osContPifRam.pifstatus = CONT_CMD_EXE;
     readformat.dummy = CONT_CMD_NOP;
@@ -289,7 +282,7 @@ static void __osPackReadData(void) {
     readformatgcn.rxsize = CONT_CMD_GCN_SHORTPOLL_RX;
     readformatgcn.cmd = CONT_CMD_GCN_SHORTPOLL;
     readformatgcn.analog_mode = 3;
-    readformatgcn.rumble = 0;
+    readformatgcn.rumble = MOTOR_STOP;
     readformatgcn.button = 0xFFFF;
     readformatgcn.stick_x = -1;
     readformatgcn.stick_y = -1;
@@ -304,7 +297,7 @@ static void __osPackReadData(void) {
             ptr += sizeof(__OSContReadFormat);
         }
     }
-    
+
     *ptr = CONT_CMD_END;
 }
 
@@ -400,7 +393,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         data->error = CHNL_ERR(requestHeader);
         if (data->error == 0) {
             data->type = requestHeader.typel << 8 | requestHeader.typeh;
-            
+
             // Check if the input type is a gamecube controller
             // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type as N64 controller if so.
@@ -422,57 +415,57 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 // motor.c //
 /////////////
 
-static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
+ALIGNED64 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
-#define READFORMAT(ptr) ((__OSContRamReadFormat*)(ptr))
-
-s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
-    int i;
-    s32 ret = 0;
-    u8* ptr = (u8*)&__MotorDataBuf[pfs->channel];
+s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
+    s32 err = 0;
+    int channel = pfs->channel;
+    u8* ptr = (u8*)&__MotorDataBuf[channel];
 
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
-        return 5;
+        return PFS_ERR_INVALID;
     }
 
-    if (__osControllerTypes[pfs->channel] == CONT_TYPE_GCN) {
-        __osGamecubeRumbleEnabled[pfs->channel] = flag;
+    if (__osControllerTypes[channel] == CONT_TYPE_GCN) {
+        __osGamecubeRumbleEnabled[channel] = motorState;
         __osContLastCmd = CONT_CMD_END;
     } else {
         __osSiGetAccess();
-        __MotorDataBuf[pfs->channel].pifstatus = CONT_CMD_EXE;
-        ptr += pfs->channel;
+        __MotorDataBuf[channel].pifstatus = CONT_CMD_EXE;
+        ptr += channel;
 
-        for (i = 0; i < BLOCKSIZE; i++) {
-            READFORMAT(ptr)->data[i] = flag;
-        }
+        __OSContRamReadFormat* readformat = (__OSContRamReadFormat*)ptr;
+
+        memset(readformat->data, motorState, sizeof(readformat->data));
 
         __osContLastCmd = CONT_CMD_END;
-        __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[pfs->channel]);
+        __osSiRawStartDma(OS_WRITE, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
-        __osSiRawStartDma(OS_READ, &__MotorDataBuf[pfs->channel]);
+        __osSiRawStartDma(OS_READ, &__MotorDataBuf[channel]);
         osRecvMesg(pfs->queue, NULL, OS_MESG_BLOCK);
 
-        ret = READFORMAT(ptr)->rxsize & CHNL_ERR_MASK;
-        if (!ret) {
-            if (!flag) {
-                if (READFORMAT(ptr)->datacrc != 0) {
-                    ret = PFS_ERR_CONTRFAIL;
+        err = (readformat->rxsize & CHNL_ERR_MASK);
+        if (!err) {
+            if (motorState == MOTOR_STOP) {
+                if (readformat->datacrc != 0x00) {
+                    err = PFS_ERR_CONTRFAIL;
                 }
-            } else {
-                if (READFORMAT(ptr)->datacrc != 0xEB) {
-                    ret = PFS_ERR_CONTRFAIL;
+            } else { // MOTOR_START
+                if (readformat->datacrc != 0xEB) {
+                    err = PFS_ERR_CONTRFAIL;
                 }
             }
         }
         __osSiRelAccess();
     }
 
-    return ret;
+    return err;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+u8 __osContAddressCrc(u16 addr);
+s32 __osPfsSelectBank(OSPfs *pfs, u8 bank);
+s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+
 static void _MakeMotorData(int channel, OSPifRam *mdata) {
     u8 *ptr = (u8 *)mdata->ramarray;
     __OSContRamReadFormat ramreadformat;
@@ -491,65 +484,64 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
         }
     }
 
-    *READFORMAT(ptr) = ramreadformat;
+    *(__OSContRamReadFormat*)ptr = ramreadformat;
     ptr += sizeof(__OSContRamReadFormat);
-    ptr[0] = CONT_CMD_END;
+    *ptr = CONT_CMD_END;
 }
 
-s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
-{
-    s32 ret;
-    u8 temp[32];
+s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
+    s32 err;
+    u8 data[BLOCKSIZE];
 
     pfs->queue = mq;
     pfs->channel = channel;
     pfs->activebank = 0xFF;
     pfs->status = 0;
 
-    if (__osControllerTypes[pfs->channel] != CONT_TYPE_GCN) {
-        ret = __osPfsSelectBank(pfs, 0xFE);
-        
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = __osPfsSelectBank(pfs, 0x80);
+    if (__osControllerTypes[channel] != CONT_TYPE_GCN) {
+        err = __osPfsSelectBank(pfs, 0xFE);
+
+        if (err == PFS_ERR_NEW_PACK) {
+            err = __osPfsSelectBank(pfs, 0x80);
         }
 
-        if (ret != 0) {
-            return ret;
+        if (err != 0) {
+            return err;
         }
 
-        ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
+        err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
 
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL;
         }
 
-        if (ret != 0) {
-            return ret;
+        if (err != 0) {
+            return err;
         }
 
-        if (temp[31] == 254) {
+        if (data[BLOCKSIZE - 1] == 0xFE) {
             return PFS_ERR_DEVICE;
         }
 
-        ret = __osPfsSelectBank(pfs, 0x80);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
-        }
-        
-        if (ret != 0) {
-            return ret;
+        err = __osPfsSelectBank(pfs, 0x80);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL;
         }
 
-        ret = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, temp);
-        if (ret == PFS_ERR_NEW_PACK) {
-            ret = PFS_ERR_CONTRFAIL;
+        if (err != 0) {
+            return err;
         }
-        
-        if (ret != 0) {
-            return ret;
+
+        err = __osContRamRead(mq, channel, CONT_BLOCK_DETECT, data);
+        if (err == PFS_ERR_NEW_PACK) {
+            err = PFS_ERR_CONTRFAIL;
         }
-        
-        if (temp[31] != 0x80) {
+
+        if (err != 0) {
+            return err;
+        }
+
+        if (data[BLOCKSIZE - 1] != 0x80) {
             return PFS_ERR_DEVICE;
         }
 
@@ -559,6 +551,6 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
     }
 
     pfs->status = PFS_MOTOR_INITIALIZED;
+
     return 0;
 }
-#pragma GCC diagnostic pop

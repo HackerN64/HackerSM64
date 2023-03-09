@@ -430,10 +430,8 @@ s32 lvl_update_obj_and_load_act_button_actions(UNUSED s32 arg, UNUSED s32 unused
         // If any of these buttons are pressed, play sound and go to course act
         if ((gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON | B_BUTTON | Z_TRIG))) {
             play_sound(SOUND_MENU_STAR_SOUND_LETS_A_GO, gGlobalSoundSource);
-#if ENABLE_RUMBLE
-            queue_rumble_data(60, 70);
-            queue_rumble_decay(1);
-#endif
+            queue_rumble_data(gPlayer3Controller, 60, 70, 1);
+
             if (sInitSelectedActNum >= sSelectedActIndex + 1) {
                 sLoadedActNum = sSelectedActIndex + 1;
             } else {

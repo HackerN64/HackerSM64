@@ -195,6 +195,11 @@
  * config_rom.h
  */
 
+#ifdef VERSION_SH
+    #undef ENABLE_RUMBLE
+    #define ENABLE_RUMBLE
+#endif // VERSION_SH
+
 #ifndef TARGET_N64
     #undef BORDER_HEIGHT_CONSOLE
     #define BORDER_HEIGHT_CONSOLE  0

@@ -35,9 +35,7 @@ void bhv_purple_switch_loop(void) {
                 cur_obj_play_sound_2(SOUND_GENERAL2_PURPLE_SWITCH);
                 o->oAction = PURPLE_SWITCH_ACT_TICKING;
                 cur_obj_shake_screen(SHAKE_POS_SMALL);
-#if ENABLE_RUMBLE
-                queue_rumble_data(5, 80);
-#endif
+                queue_rumble_data(gMarioState->controller, 5, 80, 0);
             }
             break;
 

@@ -48,9 +48,7 @@ void cap_switch_act_being_pressed(void) {
             cur_obj_shake_screen(SHAKE_POS_SMALL);
             spawn_mist_particles();
             spawn_triangle_break_particles(60, MODEL_CARTOON_STAR, 0.3f, o->oBehParams2ndByte);
-#if ENABLE_RUMBLE
-            queue_rumble_data(5, 80);
-#endif
+            queue_rumble_data(gMarioState->controller, 5, 80, 0);
         }
     } else {
         //! Neither of these flags are defined in this function so they do nothing.

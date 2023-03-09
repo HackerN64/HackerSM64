@@ -14,7 +14,7 @@
  * Enables Rumble Pak Support.
  * Currently not recommended, as it may cause random crashes.
  */
-// #define ENABLE_RUMBLE (1 || VERSION_SH)
+#define ENABLE_RUMBLE
 
 /**
  * Screen Size Defines.

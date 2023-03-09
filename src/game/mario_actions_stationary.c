@@ -765,16 +765,14 @@ s32 act_stop_crawling(struct MarioState *m) {
 
 s32 act_shockwave_bounce(struct MarioState *m) {
     if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_SHOCKWAVE) {
-#if ENABLE_RUMBLE
-        queue_rumble_data(70, 40);
-#endif
+        queue_rumble_data(m->controller, 70, 40, 0);
+
         return hurt_and_set_mario_action(m, ACT_SHOCKED, 0, 4);
     }
 
     if (m->actionTimer == 0) {
-#if ENABLE_RUMBLE
-        queue_rumble_data(70, 40);
-#endif
+        queue_rumble_data(m->controller, 70, 40, 0);
+
         if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_KNOCKBACK_DMG) {
             return hurt_and_set_mario_action(m, ACT_BACKWARD_GROUND_KB, 0, 0xc);
         }
