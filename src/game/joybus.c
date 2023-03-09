@@ -342,7 +342,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 /////////////
 
 // A buffer to hold separate rumble commands for each port.
-ALIGNED8 static OSPifRamEx __MotorDataBuf[MAXCONTROLLERS];
+ALIGNED64 static OSPifRamEx __MotorDataBuf[MAXCONTROLLERS];
 
 /**
  * @brief Turns controller rumble on or off.
@@ -458,7 +458,7 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
  * @returns    PFS error status.
  */
 s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
-    s32 err;
+    s32 err = PFS_ERR_SUCCESS;
     u8 data[BLOCKSIZE];
 
     pfs->status     = PFS_STATUS_NONE;

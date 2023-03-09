@@ -559,10 +559,10 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
 void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
     switch (copyButton->oMenuButtonActionPhase) {
         case COPY_PHASE_MAIN: // Copy Menu Main Phase
-            if (sAllFilesExist == TRUE) { // Don't enable copy if all save files exists
+            if (sAllFilesExist) { // Don't enable copy if all save files exists
                 return;
             }
-            if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN) == TRUE) {
+            if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN)) {
                 // If clicked in a existing save file, ask where it wants to copy
                 play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
                 queue_rumble_data(gPlayer1Controller, 5, 80, 0);
@@ -586,7 +586,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
             break;
         case COPY_PHASE_COPY_WHERE: // Copy Menu "COPY IT TO WHERE?" Phase (after a file is selected)
             sMainMenuButtons[copyFileButtonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
-            if (save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN) == FALSE) {
+            if (!save_file_exists(copyFileButtonID - MENU_BUTTON_COPY_MIN)) {
                 // If clicked in a non-existing save file, copy the file
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 queue_rumble_data(gPlayer1Controller, 5, 80, 0);

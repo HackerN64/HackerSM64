@@ -429,7 +429,6 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
-                continue;
             }
         } else {
             handle_input(&mesg);

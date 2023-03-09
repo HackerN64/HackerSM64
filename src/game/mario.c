@@ -1479,7 +1479,7 @@ void update_mario_health(struct MarioState *m) {
             gRumbleInfos[m->controller->port].breathTimer = 0;
  #endif // ENABLE_RUMBLE
         }
-#endif // BREATH_METER
+#endif // !BREATH_METER
     }
 }
 
@@ -1517,7 +1517,7 @@ void update_mario_breath(struct MarioState *m) {
         }
     }
 }
-#endif
+#endif // BREATH_METER
 
 /**
  * Updates some basic info for camera usage.

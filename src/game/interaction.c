@@ -740,7 +740,6 @@ u32 interact_coin(struct MarioState *m, UNUSED u32 interactType, struct Object *
         g100CoinStarSpawned = TRUE;
     }
 #endif
-
     if (obj->oDamageOrCoinValue >= 2) {
         queue_rumble_data(m->controller, 5, 80, 0);
     }

@@ -739,13 +739,14 @@ s32 act_in_cannon(struct MarioState *m) {
                 marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 
                 set_mario_action(m, ACT_SHOT_FROM_CANNON, 0);
+
                 queue_rumble_data(m->controller, 60, 70, 0);
 
                 m->usedObj->oAction = OPENED_CANNON_ACT_SHOOT;
+
                 return FALSE;
             } else if (m->faceAngle[0] != startFacePitch || m->faceAngle[1] != startFaceYaw) {
                 play_sound(SOUND_MOVING_AIM_CANNON, marioObj->header.gfx.cameraToObject);
-
                 reset_rumble_timers_vibrate(m->controller, 0);
             }
             break;

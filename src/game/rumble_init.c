@@ -217,11 +217,11 @@ static void update_rumble_data_queue(struct RumbleInfo *info) {
  * @param[in] decay      How much 'level' decreases each frame during the 'timer' phase.
  */
 void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 decay) {
-    struct RumbleData *queueEnd = &gRumbleInfos[controller->port].queue[RUMBLE_QUEUE_SIZE - 1];
-
-    if (gCurrDemoInput != NULL) {
+    if (gCurrDemoInput != NULL || controller == NULL) {
         return;
     }
+
+    struct RumbleData *queueEnd = &gRumbleInfos[controller->port].queue[RUMBLE_QUEUE_SIZE - 1];
 
     // Write the rumble command.
     queueEnd->event = (level > 70) ? RUMBLE_EVENT_CONSTON : RUMBLE_EVENT_LEVELON;
@@ -237,6 +237,10 @@ void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 
  * @returns s32 Boolean, whether the controller is done rumbling.
  */
 s32 is_rumble_finished_and_queue_empty(struct Controller *controller) {
+    if (controller == NULL) {
+        return FALSE;
+    }
+
     struct RumbleInfo *info = &gRumbleInfos[controller->port];
 
     // Check whether currently rumbling.
@@ -275,11 +279,11 @@ static void reset_rumble_slip(struct RumbleInfo *info) {
  * @param[in] controller A pointer to the controller to rumble.
  */
 void reset_rumble_timers_slip(struct Controller *controller) {
-    struct RumbleInfo *info = &gRumbleInfos[controller->port];
-
-    if (gCurrDemoInput != NULL) {
+    if (gCurrDemoInput != NULL || controller == NULL) {
         return;
     }
+
+    struct RumbleInfo *info = &gRumbleInfos[controller->port];
 
     reset_rumble_slip(info);
 
@@ -293,11 +297,11 @@ void reset_rumble_timers_slip(struct Controller *controller) {
  * @param[in] level      Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
  */
 void reset_rumble_timers_vibrate(struct Controller *controller, s32 level) {
-    struct RumbleInfo *info = &gRumbleInfos[controller->port];
-
-    if (gCurrDemoInput != NULL) {
+    if (gCurrDemoInput != NULL || controller == NULL) {
         return;
     }
+
+    struct RumbleInfo *info = &gRumbleInfos[controller->port];
 
     reset_rumble_slip(info);
 
@@ -313,11 +317,11 @@ void reset_rumble_timers_vibrate(struct Controller *controller, s32 level) {
  * @param[in] controller A pointer to the controller to rumble.
  */
 void queue_rumble_submerged(struct Controller *controller) {
-    struct RumbleInfo *info = &gRumbleInfos[controller->port];
-
-    if (gCurrDemoInput != NULL) {
+    if (gCurrDemoInput != NULL || controller == NULL) {
         return;
     }
+
+    struct RumbleInfo *info = &gRumbleInfos[controller->port];
 
     info->slip    = RUMBLE_START_TIME;
     info->vibrate = RUMBLE_START_TIME;

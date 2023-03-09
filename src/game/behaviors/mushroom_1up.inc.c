@@ -6,13 +6,13 @@ void bhv_1up_interact(void) {
         queue_rumble_data(gMarioState->controller, 5, 80, 0);
 #ifdef MUSHROOMS_HEAL
         gMarioState->healCounter   = 31;
-#ifdef BREATH_METER
+ #ifdef BREATH_METER
         gMarioState->breathCounter = 31;
-#endif
-#endif
+ #endif // BREATH_METER
+#endif // MUSHROOMS_HEAL
 #ifdef ENABLE_LIVES
         gMarioState->numLives++;
-#endif
+#endif // ENABLE_LIVES
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 }
