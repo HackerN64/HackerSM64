@@ -119,7 +119,7 @@ extern u8 gLastWarpID;
 extern struct CallCounter gPuppyCallCounter;
 
 extern void puppyprint_render_profiler(void);
-extern void print_set_envcolour(u8 r, u8 g, u8 b, u8 a);
+extern u8 print_set_envcolour(u8 r, u8 g, u8 b, u8 a);
 extern void prepare_blank_box(void);
 extern void finish_blank_box(void);
 extern void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font);
