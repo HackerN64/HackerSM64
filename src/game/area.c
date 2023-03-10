@@ -361,7 +361,8 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
-#if (MAX_NUM_PLAYERS > 1)
+#ifdef ALLOW_STATUS_REPOLLING_COMBO
+ #if (MAX_NUM_PLAYERS > 1)
 ALIGNED8 static const char* sN64ButtonNames[16] = {
     "A",       // A_BUTTON
     "B",       // B_BUTTON
@@ -401,7 +402,7 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 
     return count;
 }
-#endif
+ #endif // (MAX_NUM_PLAYERS > 1)
 
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
     { .type = CONT_NONE,                .texture = texture_controller_port         },
@@ -511,13 +512,13 @@ void render_controllers_overlay(void) {
         if (gContStatusPollingReadyForInput) {
             sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", (gNumPlayers + 1));
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
-#if (MAX_NUM_PLAYERS > 1)
+ #if (MAX_NUM_PLAYERS > 1)
             char comboStr[32] = "";
             size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
             s32 xOffset = ((strlen("ORTOEXIT") + 1 + count) / 2) * 7; // Center the text based on char count.
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
-#endif
+ #endif // (MAX_NUM_PLAYERS > 1)
         } else {
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);
         }
@@ -540,6 +541,7 @@ void render_controllers_overlay(void) {
 
     gDisplayListHead = dlHead;
 }
+#endif // ALLOW_STATUS_REPOLLING_COMBO
 
 void render_game(void) {
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
@@ -598,7 +600,9 @@ void render_game(void) {
     gViewportOverride = NULL;
     gViewportClip     = NULL;
 
+#ifdef ALLOW_STATUS_REPOLLING_COMBO
     render_controllers_overlay();
+#endif
 
     profiler_update(PROFILER_TIME_GFX);
     profiler_print_times();

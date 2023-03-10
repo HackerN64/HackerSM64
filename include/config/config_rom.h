@@ -30,6 +30,11 @@
 #define MAX_NUM_PLAYERS 1
 
 /**
+ * Allows the player to use a button combo (defined in game_input.h) to toggle the ability to plug/unplug controllers and change the controller order.
+ */
+#define ALLOW_STATUS_REPOLLING_COMBO
+
+/**
  * Informs supported emulators to default to GameCube controller inputs.
  */
 // #define USE_GAMECUBE_CONTROLLER

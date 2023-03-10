@@ -23,12 +23,12 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
-u8 gNumPlayers = 0;
-u8 gControllerBits = 0b0000; // Which ports have a controller connected to them.
-u8 gContStatusPolling = FALSE;
-u8 gContStatusPollingIsBootMode = FALSE;
-u8 gContStatusPollingReadyForInput = TRUE;
-u32 gContStatusPollTimer = 0;
+u8  gNumPlayers                     = 0;        // The number of controllers currently assigned to a player.
+u8  gControllerBits                 = 0b0000;   // Which ports have a controller connected to them (low to high).
+u8  gContStatusPolling              = FALSE;    // Whether controller status polling is enabled.
+u8  gContStatusPollingIsBootMode    = FALSE;    // Whether controller status polling was triggered on boot and should be invisible.
+u8  gContStatusPollingReadyForInput = TRUE;     // Whether all inputs have been released after starting status repolling.
+u32 gContStatusPollTimer            = 0;        // Time since controller status repolling has started.
 
 // Title Screen Demo Handler
 struct DemoInput* gCurrDemoInput = NULL;
@@ -202,6 +202,9 @@ static void poll_controller_statuses(OSMesg* mesg) {
  *   invisible and the controller with the first detected input (including analog sticks) becomes player 1.
  */
 void start_controller_status_polling(s32 isBootMode) {
+    if (isBootMode) {
+        gContStatusPollingReadyForInput = TRUE;
+    }
     gContStatusPollingIsBootMode = isBootMode;
     gContStatusPolling = TRUE;
     gContStatusPollTimer = 0;
@@ -275,7 +278,7 @@ void read_controller_inputs_status_polling(void) {
                 ) {
                     portInfo->playerNum = ++gNumPlayers;
                 }
-#if (MAX_NUM_PLAYERS > 1)
+#if (defined(ALLOW_STATUS_REPOLLING_COMBO) && (MAX_NUM_PLAYERS > 1))
                 u16 pressed = (~portInfo->statusPollButtons & button);
 
                 // If the combo is pressed, stop polling and assign the current controllers.
@@ -366,11 +369,12 @@ void read_controller_inputs_normal(void) {
             // 0.5x A presses are a good meme
             controller->buttonDown = button;
             adjust_analog_stick(controller);
-
+#ifdef ALLOW_STATUS_REPOLLING_COMBO
             if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
                 gContStatusPollingReadyForInput = FALSE;
                 start_controller_status_polling(FALSE);
             }
+#endif
         } else {
             // Otherwise, if controllerData is NULL or the cooldown hasn't finished, zero out all of the inputs.
             controller->rawStickX      = 0;
