@@ -403,8 +403,6 @@ const BehaviorScript bhvStarDoor[] = {
     SET_INT(oIntangibleTimer, 0),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_star_door_loop),
-        CALL_NATIVE(bhv_door_rendering_loop),
-        CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
 };
 
