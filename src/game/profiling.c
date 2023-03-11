@@ -239,7 +239,7 @@ void profiler_print_times() {
 
 #ifndef PUPPYPRINT_DEBUG
     static u8 show_profiler = 0;
-    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+    if ((gPlayer1Controller->buttonPressed & (L_TRIG | U_JPAD)) && (gPlayer1Controller->buttonDown & L_TRIG) && (gPlayer1Controller->buttonDown & U_JPAD)) {
         show_profiler ^= 1;
     }
 #endif
