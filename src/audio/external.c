@@ -688,6 +688,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     task->yield_data_size = 0;
 
     decrease_sample_dma_ttls();
+
     return gAudioTask;
 }
 #endif
@@ -2186,7 +2187,7 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
 
     // Abort if the queue is already full.
     if (sBackgroundMusicQueueSize >= MAX_BACKGROUND_MUSIC_QUEUE_SIZE) {
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Sequence queue full, aborting.");
 #endif
         return;
