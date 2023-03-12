@@ -425,8 +425,6 @@ void handle_input(OSMesg* mesg) {
             gContStatusPollTimer--;
         }
     }
-
-    profiler_update(PROFILER_TIME_CONTROLLERS);
 }
 
 /**

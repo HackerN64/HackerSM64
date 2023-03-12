@@ -544,10 +544,14 @@ void render_controllers_overlay(void) {
 #endif // ALLOW_STATUS_REPOLLING_COMBO
 
 void render_game(void) {
+    PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
         }
+#ifdef PUPPYPRINT
+        bzero(gCurrEnvCol, sizeof(ColorRGBA));
+#endif
 
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
 
@@ -557,6 +561,9 @@ void render_game(void) {
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         render_text_labels();
+#ifdef PUPPYPRINT
+        puppyprint_print_deferred();
+#endif
         do_cutscene_handler();
         print_displaying_credits_entry();
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
@@ -590,6 +597,9 @@ void render_game(void) {
         }
     } else {
         render_text_labels();
+#ifdef PUPPYPRINT
+        puppyprint_print_deferred();
+#endif
         if (gViewportClip != NULL) {
             clear_viewport(gViewportClip, gWarpTransFBSetColor);
         } else {
@@ -604,10 +614,9 @@ void render_game(void) {
     render_controllers_overlay();
 #endif
 
-    profiler_update(PROFILER_TIME_GFX);
+    profiler_update(PROFILER_TIME_GFX, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
     profiler_print_times();
-
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
 #endif
 }

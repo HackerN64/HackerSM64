@@ -87,7 +87,7 @@ enum Codecs {
 #include "game/puppyprint.h"
 
 #ifdef VERSION_EU
-/*#if PUPPYPRINT_DEBUG
+/*#ifdef PUPPYPRINT_DEBUG
 #define eu_stubbed_printf_0(msg) append_puppyprint_log(msg)
 #define eu_stubbed_printf_1(msg, a) append_puppyprint_log(msg, a)
 #define eu_stubbed_printf_2(msg, a, b) append_puppyprint_log(msg, a, b)
