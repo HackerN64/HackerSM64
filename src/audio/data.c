@@ -94,7 +94,7 @@ s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
  */
 struct BetterReverbSettings gBetterReverbSettings[] = {
     { /* Preset 0 - Vanilla Reverb [Default Preset] */
-        .useLightweightSettings = FALSE,         // Ignored with vanilla reverb
+        .useLightweightSettings = FALSE,   // Ignored with vanilla reverb
         .downsampleRate = -1,              // Signifies use of vanilla reverb
         .isMono = FALSE,                   // Ignored with vanilla reverb
         .filterCount = NUM_ALLPASS,        // Ignored with vanilla reverb
