@@ -42,7 +42,7 @@
 // Do not touch these values manually, unless you want potential for problems.
 u8 gBetterReverbPreset = 0;
 u8 toggleBetterReverb = FALSE;
-u8 betterReverbLight = FALSE;
+u8 betterReverbLightweight = FALSE;
 u8 monoReverb;
 s8 betterReverbDownsampleRate;
 static u8 reverbMultsL[NUM_ALLPASS / 3] = {0};
@@ -247,7 +247,7 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
     s32 i;
     s32 filterCount = reverbFilterCount;
 
-    if (betterReverbLight)
+    if (betterReverbLightweight)
         filterCount = BETTER_REVERB_FILTER_COUNT_LIGHT;
 
     gBetterReverbPool.cur = gBetterReverbPool.start + ALIGN16(BETTER_REVERB_PTR_SIZE); // Reset reverb data pool
@@ -385,7 +385,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
 
             // This block could be simplified probably with function pointers or rewriting reverb_mono_sample to support L and R individually. Another idea would be to process more than one sample at a time
             // for each function call. In practice with HackerSM64, these ideas either aren't super trivial to implement efficiently or don't benefit performance at all, so I'm leaving this as it is for now.
-            if (betterReverbLight) {
+            if (betterReverbLightweight) {
                 if (gSoundMode == SOUND_MODE_MONO || monoReverb) {
                     if (gReverbDownsampleRate != 1) {
                         osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);

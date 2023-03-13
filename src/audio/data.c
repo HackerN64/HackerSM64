@@ -74,39 +74,72 @@ s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
 
 /**
  * Format:
- * - useLightSettings (Reduce some runtime configurability options in favor of a slight speed boost during processing; Light configurability settings are found in synthesis.h)
- * - downsampleRate   (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality)
- * - isMono           (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
- * - filterCount      (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
+ * - useLightweightSettings (Reduce some runtime configurability options in favor of a slight speed boost during processing; Light configurability settings are found in synthesis.h)
+ * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality)
+ * - isMono                 (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
+ * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
  * 
- * - windowSize       (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound)
- * - gain             (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
- * - gainIndex        (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
- * - reverbIndex      (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
+ * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound)
+ * - gain                   (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
+ * - gainIndex              (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
+ * - reverbIndex            (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
  * 
- * - *delaysL         (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel]; overridden when using light settings)
- * - *delaysR         (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel]; overridden when using light settings)
- * - *reverbMultsL    (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel])
- * - *reverbMultsR    (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel])
+ * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel]; overridden when using light settings)
+ * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel]; overridden when using light settings)
+ * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel])
+ * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel])
  * 
  * NOTE: The first entry will always be used by default when not using the level commands to specify a preset.
  * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.
  */
 struct BetterReverbSettings gBetterReverbSettings[] = {
-    { /* 0 */
-        FALSE, -1, FALSE, NUM_ALLPASS, // Vanilla Reverb
-        -1, -1, 0x00, 0x00,
-        delaysArr[0], delaysArr[0], reverbMultsArr[0], reverbMultsArr[0]
+    { /* Preset 0 - Vanilla Reverb [Default Preset] */
+        .useLightweightSettings = FALSE,         // Ignored with vanilla reverb
+        .downsampleRate = -1,              // Signifies use of vanilla reverb
+        .isMono = FALSE,                   // Ignored with vanilla reverb
+        .filterCount = NUM_ALLPASS,        // Ignored with vanilla reverb
+
+        .windowSize = -1,                  // Use vanilla preset window size
+        .gain = -1,                        // Use vanilla preset gain value
+        .gainIndex = 0x00,                 // Ignored with vanilla reverb
+        .reverbIndex = 0x00,               // Ignored with vanilla reverb
+
+        .delaysL = delaysArr[0],           // Ignored with vanilla reverb
+        .delaysR = delaysArr[0],           // Ignored with vanilla reverb
+        .reverbMultsL = reverbMultsArr[0], // Ignored with vanilla reverb
+        .reverbMultsR = reverbMultsArr[0], // Ignored with vanilla reverb
     },
-    { /* 1 */
-        TRUE, 2, FALSE, (NUM_ALLPASS - 9), // Default Console
-        0x0E00, 0x43FF, 0xA0, 0x30,
-        delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
+    { /* Preset 1 - Sample Console Configuration */
+        .useLightweightSettings = TRUE,
+        .downsampleRate = 2,
+        .isMono = FALSE,
+        .filterCount = (NUM_ALLPASS - 9),  // Ignored with lightweight settings
+
+        .windowSize = 0x0E00,
+        .gain = 0x43FF,
+        .gainIndex = 0xA0,                 // Ignored with lightweight settings
+        .reverbIndex = 0x30,               // Ignored with lightweight settings
+
+        .delaysL = delaysArr[1],
+        .delaysR = delaysArr[2],
+        .reverbMultsL = reverbMultsArr[1], // Ignored with lightweight settings
+        .reverbMultsR = reverbMultsArr[2], // Ignored with lightweight settings
     },
-    { /* 2 */
-        FALSE, 1, FALSE, NUM_ALLPASS, // Default Emulator (RCVI Hack only)
-        0x0E00, 0x28FF, 0xA0, 0x60,
-        delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
+    { /* Preset 2 - Sample Emulator Configuration (RCVI Hack Only) */
+        .useLightweightSettings = FALSE,
+        .downsampleRate = 1,
+        .isMono = FALSE,
+        .filterCount = NUM_ALLPASS,
+
+        .windowSize = 0x0E00,
+        .gain = 0x28FF,
+        .gainIndex = 0xA0,
+        .reverbIndex = 0x60,
+
+        .delaysL = delaysArr[1],
+        .delaysR = delaysArr[2],
+        .reverbMultsL = reverbMultsArr[1],
+        .reverbMultsR = reverbMultsArr[2],
     },
 };
 #endif
