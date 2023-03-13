@@ -822,12 +822,15 @@ void cur_obj_update(void) {
 
     s32 inRoom = is_mario_in_room();
 
+    // Breaks HMC at the moment, requires further investigation
+#ifdef TODO_IGNORE_OBJECTS_OUTSIDE_ROOM
     if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
         if (inRoom == MARIO_OUTSIDE_ROOM) {
             cur_obj_enable_disable_room_rendering(MARIO_OUTSIDE_ROOM);
             return;
         }
     }
+#endif
 
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
