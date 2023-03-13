@@ -132,13 +132,13 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
                 room = get_room_at_pos(gMarioObject->oPosX,
                                        gMarioObject->oPosY,
                                        gMarioObject->oPosZ);
-            } else if (gMarioState->floor) {
+            } else if (gMarioState->floor != NULL) {
                 // Since no intangible floors are nearby, use Mario's floor instead.
                 room = gMarioState->floor->room;
             }
             if (room != -1) {
 #else
-            if (gMarioState->floor) {
+            if (gMarioState->floor != NULL) {
                 room = gMarioState->floor->room;
 #endif
                 gMarioCurrentRoom = room;
