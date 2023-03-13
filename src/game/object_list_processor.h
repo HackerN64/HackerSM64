@@ -109,9 +109,9 @@ enum CollisionFlags {
 };
 
 /**
- * The number of door/transition rooms that load two rooms of objects at once.
+ * The maximum number of door/transition rooms that load two rooms of objects at once.
  */
-#define NUM_TRANSITION_ROOMS 60
+#define MAX_NUM_TRANSITION_ROOMS 60
 
 struct TransitionRoomData {
     /*0x00*/ RoomData forwardRoom;
@@ -121,7 +121,7 @@ struct TransitionRoomData {
 extern s16 gCollisionFlags;
 extern TerrainData *gEnvironmentRegions;
 extern s32 gEnvironmentLevels[20];
-extern struct TransitionRoomData gDoorAdjacentRooms[NUM_TRANSITION_ROOMS];
+extern struct TransitionRoomData gDoorAdjacentRooms[MAX_NUM_TRANSITION_ROOMS];
 extern s16 gMarioCurrentRoom;
 extern s16 gTHIWaterDrained;
 extern s16 gTTCSpeedSetting;
