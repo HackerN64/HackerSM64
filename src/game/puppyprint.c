@@ -289,7 +289,7 @@ static const char *audioPoolNames[NUM_AUDIO_POOLS] = {
     "Temporary Sequence Pool:\t  ",
     "Temporary Bank Pool:\t\t  ",
 #ifdef BETTER_REVERB
-    "Better Reverb Pool",
+    "Better Reverb Pool:\t\t  ",
 #endif
 };
 
