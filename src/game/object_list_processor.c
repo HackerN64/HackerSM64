@@ -147,7 +147,7 @@ struct MemoryPool *gObjectMemoryPool;
 s16 gCollisionFlags = COLLISION_FLAGS_NONE;
 TerrainData *gEnvironmentRegions;
 s32 gEnvironmentLevels[20];
-struct TransitionRoomData gDoorAdjacentRooms[NUM_TRANSITION_ROOMS];
+struct TransitionRoomData gDoorAdjacentRooms[MAX_NUM_TRANSITION_ROOMS];
 s16 gMarioCurrentRoom;
 s16 gTHIWaterDrained;
 s16 gTTCSpeedSetting;
