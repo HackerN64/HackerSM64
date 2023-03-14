@@ -710,8 +710,11 @@ static void puppycam_input_hold_preset3(f32 ivX) {
             gPuppyCam.yawTarget += 0x2000 - gPuppyCam.yawTarget % 0x2000;
         }
 
-        if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ZOOMED_MED) gPuppyCam.pitchTarget = approach_s32(gPuppyCam.pitchTarget, 0x3800, 0x200, 0x200);
-        if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ZOOMED_OUT) gPuppyCam.pitchTarget = approach_s32(gPuppyCam.pitchTarget, 0x3000, 0x200, 0x200);
+        if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ZOOMED_OUT) {
+            gPuppyCam.pitchTarget = approach_s32(gPuppyCam.pitchTarget, 0x3300, 0x200, 0x200);
+        } else {
+            gPuppyCam.pitchTarget = approach_s32(gPuppyCam.pitchTarget, 0x3800, 0x200, 0x200);
+        }
 
         if ((gPlayer1Controller->buttonPressed & L_CBUTTONS && !gPuppyCam.options.analogue) || (gPuppyCam.stick2[0] > DEADZONE && !gPuppyCam.stickN[0])) {
             gPuppyCam.stickN[0] = 1;
@@ -731,7 +734,8 @@ static void puppycam_input_hold_preset3(f32 ivX) {
             gPuppyCam.stickN[1]   = 1;
             gPuppyCam.mode3Flags |= PUPPYCAM_MODE3_ZOOMED_IN;
             gPuppyCam.mode3Flags &= ~PUPPYCAM_MODE3_ZOOMED_MED;
-            gPuppyCam.zoomTarget  = 80;
+            gPuppyCam.pitchTarget = 0x4000;
+            gPuppyCam.zoomTarget = 80;
             gPuppyCam.mode3Flags |= PUPPYCAM_MODE3_ENTER_FIRST_PERSON;
 
             play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
@@ -753,14 +757,16 @@ static void puppycam_input_hold_preset3(f32 ivX) {
             play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
         }
     }
-    if ((gPlayer1Controller->buttonPressed & D_CBUTTONS && !gPuppyCam.options.analogue) || (gPuppyCam.stick2[1] < -DEADZONE && !gPuppyCam.stickN[1]) ||
-        gPlayer1Controller->buttonPressed & B_BUTTON || gPlayer1Controller->buttonPressed & A_BUTTON) {
+    if (((gPlayer1Controller->buttonPressed & D_CBUTTONS && !gPuppyCam.options.analogue) || (gPuppyCam.stick2[1] < -DEADZONE && !gPuppyCam.stickN[1]) ||
+        gPlayer1Controller->buttonPressed & B_BUTTON || gPlayer1Controller->buttonPressed & A_BUTTON) && gPlayer1Controller->stickMag < DEADZONE) {
         if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ZOOMED_IN) {
             gPuppyCam.stickN[1]   = 1;
             gPuppyCam.mode3Flags |= PUPPYCAM_MODE3_ZOOMED_MED;
             gPuppyCam.mode3Flags &= ~PUPPYCAM_MODE3_ZOOMED_IN;
             gPuppyCam.zoomTarget  = gPuppyCam.zoomPoints[1];
             gPuppyCam.mode3Flags &= ~PUPPYCAM_MODE3_ENTER_FIRST_PERSON;
+            gPuppyCam.pitch = 0x4000;
+            gPuppyCam.pitchTarget = 0x4000;
 
             play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
         }
@@ -1153,8 +1159,6 @@ void puppycam_projection_behaviours(void) {
                 // Disable collision because it shouldn't trigger intentionally at this distance anyway.
                 gPuppyCam.flags &= ~PUPPYCAM_BEHAVIOUR_COLLISION;
             }
-            print_text_fmt_int(32,32,"%d", (s32) gPuppyCam.floorY[0]);
-            print_text_fmt_int(32,48,"%d", (s32) gPuppyCam.floorY[1]);
         } else {
             gPuppyCam.floorY[0] = 0;
             gPuppyCam.floorY[1] = 0;
@@ -1264,6 +1268,14 @@ static void puppycam_projection(void) {
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_X_MOVEMENT) gPuppyCam.pos[0] = gPuppyCam.targetObj->oPosX + LENSIN(tempSin, gPuppyCam.yaw) + gPuppyCam.shake[0];
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Y_MOVEMENT) gPuppyCam.pos[1] = gPuppyCam.targetObj->oPosY + gPuppyCam.povHeight + LENCOS(gPuppyCam.targetDist[1], pitchTotal) + gPuppyCam.shake[1] - gPuppyCam.floorY[1];
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Z_MOVEMENT) gPuppyCam.pos[2] = gPuppyCam.targetObj->oPosZ + LENCOS(tempSin, gPuppyCam.yaw) + gPuppyCam.shake[2];
+
+        // To improve precision in first person, apply an offset to the focus position so it's not noticably jerky.
+        if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ENTER_FIRST_PERSON && gPuppyCam.zoom < 400 && gPuppyCam.zoomTarget < 100) {
+            f32 zoomDist = LENSIN(1000.0f, pitchTotal);
+            gPuppyCam.focus[0] = gPuppyCam.targetObj->oPosX + LENSIN(zoomDist, gPuppyCam.yaw + 0x8000) + gPuppyCam.shake[0];
+            gPuppyCam.focus[1] = gPuppyCam.targetObj->oPosY + (gPuppyCam.povHeight * 2) + LENCOS(1000.0f, gPuppyCam.pitch) + gPuppyCam.shake[1];
+            gPuppyCam.focus[2] = gPuppyCam.targetObj->oPosZ + LENCOS(zoomDist, gPuppyCam.yaw + 0x8000) + gPuppyCam.shake[2];
+        }
     }
 
 }
