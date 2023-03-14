@@ -26,14 +26,14 @@
 #define PERSISTENT_BANK_MEM 0xDC00
 #define TEMPORARY_SEQ_MEM 0xE800
 #define TEMPORARY_BANK_MEM 0x5500
-#define BANK_SETS_ALLOC 0x400
+#define MAX_NUM_SOUNDBANKS 0x100
 #define EXT_AUDIO_INIT_POOL_SIZE 0x2000
 #else
 #define PERSISTENT_SEQ_MEM 0x4100
 #define PERSISTENT_BANK_MEM 0x6E00
 #define TEMPORARY_SEQ_MEM 0x7400
 #define TEMPORARY_BANK_MEM 0x2A80
-#define BANK_SETS_ALLOC 0x100
+#define MAX_NUM_SOUNDBANKS 0x40
 #define EXT_AUDIO_INIT_POOL_SIZE 0x0
 #endif
 
@@ -44,10 +44,12 @@
 extern struct AudioSessionSettingsEU gAudioSessionPresets[];
 extern struct ReverbSettingsEU sReverbSettings[8];
 #else
-extern struct AudioSessionSettings gAudioSessionPresets[1];
+extern struct AudioSessionSettings gAudioSessionSettings;
 extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
-extern u16 D_80332388[128]; // unused
+#ifdef BETTER_REVERB
+extern struct BetterReverbSettings gBetterReverbSettings[];
+#endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern f32 gPitchBendFrequencyScale[256];
@@ -183,9 +185,9 @@ extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define AUDIO_INIT_POOL_SIZE (0x2B00 + BANK_SETS_ALLOC + EXT_AUDIO_INIT_POOL_SIZE)
+#define AUDIO_INIT_POOL_SIZE (0x2B00 + (MAX_NUM_SOUNDBANKS * sizeof(s32)) + EXT_AUDIO_INIT_POOL_SIZE)
 #else
-#define AUDIO_INIT_POOL_SIZE (0x2400 + BANK_SETS_ALLOC + EXT_AUDIO_INIT_POOL_SIZE)
+#define AUDIO_INIT_POOL_SIZE (0x2400 + (MAX_NUM_SOUNDBANKS * sizeof(s32)) + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
 
 // TODO: needs validation once EU can compile. EU is very likely incorrect!

@@ -223,7 +223,7 @@ void hvqm_main_proc() {
         --video_remain;
         
         //if (1) {
-            //osAiSetFrequency(gAudioSessionPresets[0].frequency);
+            //osAiSetFrequency(gAudioSessionPresets.frequency);
             //osSendMesg(&gDmaMesgQueue, 0, OS_MESG_BLOCK);
             //osDestroyThread(&hvqmMesgQ);
         //}

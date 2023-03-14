@@ -14,18 +14,36 @@
  *                      WALLS                     *
  **************************************************/
 
-#define CALC_OFFSET(vert, next_step) {          \
-    if (FLT_IS_NONZERO((vert)[1])) {            \
-        v = (v2[1] / (vert)[1]);                \
-        if ((v < 0.0f) || (v > 1.0f)) next_step;\
-        d00 = (((vert)[0] * v) - v2[0]);        \
-        d01 = (((vert)[2] * v) - v2[2]);        \
-        invDenom = sqrtf(sqr(d00) + sqr(d01));  \
-        offset   = (invDenom - margin_radius);  \
-        if (offset > 0.0f) next_step;           \
-        goto check_collision;                   \
-    }                                           \
-    next_step;                                  \
+static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
+    f32 v = ((d11 * d20) - (d01 * d21)) * invDenom;
+    if (v < 0.0f || v > 1.0f) {
+        return TRUE;
+    }
+
+    f32 w = ((d00 * d21) - (d01 * d20)) * invDenom;
+    if (w < 0.0f || w > 1.0f || v + w > 1.0f) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+s32 check_wall_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32 *offset, f32 margin_radius) {
+    if (FLT_IS_NONZERO(vert[1])) {
+        f32 v = (v2[1] / vert[1]);
+        if (v < 0.0f || v > 1.0f) {
+            return TRUE;
+        }
+
+        *d00 = ((vert[0] * v) - v2[0]);
+        *d01 = ((vert[2] * v) - v2[2]);
+        *invDenom = sqrtf(sqr(*d00) + sqr(*d01));
+        *offset = (*invDenom - margin_radius);
+
+        return (*offset > 0.0f);
+    }
+
+    return TRUE;
 }
 
 /**
@@ -34,16 +52,15 @@
  */
 static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struct WallCollisionData *data) {
     const f32 corner_threshold = -0.9f;
-    register struct Surface *surf;
-    register f32 offset;
-    register f32 radius = data->radius;
+    struct Surface *surf;
+    f32 offset;
+    f32 radius = data->radius;
 
     Vec3f pos = { data->x, data->y + data->offsetY, data->z };
     Vec3f v0, v1, v2;
-    register f32 d00, d01, d11, d20, d21;
-    register f32 invDenom;
-    register f32 v, w;
-    register TerrainData type = SURFACE_DEFAULT;
+    f32 d00, d01, d11, d20, d21;
+    f32 invDenom;
+    TerrainData type = SURFACE_DEFAULT;
     s32 numCols = 0;
 
     // Max collision radius = 200
@@ -79,11 +96,14 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         }
 
         // Dot of normal and pos, + origin offset
-        offset = (surf->normal.x * pos[0]) + (surf->normal.y * pos[1]) + (surf->normal.z * pos[2]) + surf->originOffset;
+        offset = (surf->normal.x * pos[0])
+               + (surf->normal.y * pos[1])
+               + (surf->normal.z * pos[2])
+               + surf->originOffset;
 
         // Exclude surfaces outside of the radius.
         if (offset < -radius || offset > radius) continue;
-    
+
         vec3_diff(v0, surf->vertex2, surf->vertex1);
         vec3_diff(v1, surf->vertex3, surf->vertex1);
         vec3_diff(v2, pos,           surf->vertex1);
@@ -96,38 +116,48 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         d21 = vec3_dot(v2, v1);
 
         invDenom = (d00 * d11) - (d01 * d01);
-        if (FLT_IS_NONZERO(invDenom)) invDenom = 1.0f / invDenom;
+        if (FLT_IS_NONZERO(invDenom)) {
+            invDenom = 1.0f / invDenom;
+        }
 
-        v = ((d11 * d20) - (d01 * d21)) * invDenom;
-        if (v < 0.0f || v > 1.0f) goto edge_1_2;
+        if (check_wall_vw(d00, d01, d11, d20, d21, invDenom)) {
+            if (offset < 0) {
+                continue;
+            }
 
-        w = ((d00 * d21) - (d01 * d20)) * invDenom;
-        if (w < 0.0f || w > 1.0f || v + w > 1.0f) goto edge_1_2;
+            // Edge 1-2
+            if (check_wall_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                // Edge 1-3
+                if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                    vec3_diff(v1, surf->vertex3, surf->vertex2);
+                    vec3_diff(v2, pos, surf->vertex2);
+                    // Edge 2-3
+                    if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                        continue;
+                    }
+                }
+            }
 
-        pos[0] += surf->normal.x * (radius - offset);
-        pos[2] += surf->normal.z * (radius - offset);
-        goto hasCollision;
+            // Check collision
+            if (FLT_IS_NONZERO(invDenom)) {
+                invDenom = (offset / invDenom);
+            }
 
-    edge_1_2:
-        if (offset < 0) continue;
-        CALC_OFFSET(v0, goto edge_1_3);
+            // Update pos
+            pos[0] += (d00 *= invDenom);
+            pos[2] += (d01 *= invDenom);
+            margin_radius += 0.01f;
 
-    edge_1_3:
-        CALC_OFFSET(v1, goto edge_2_3);
+            if ((d00 * surf->normal.x) + (d01 * surf->normal.z) < (corner_threshold * offset)) {
+                continue;
+            }
+        } else {
+            // Update pos
+            pos[0] += surf->normal.x * (radius - offset);
+            pos[2] += surf->normal.z * (radius - offset);
+        }
 
-    edge_2_3:
-        vec3_diff(v1, surf->vertex3, surf->vertex2);
-        vec3_diff(v2, pos, surf->vertex2);
-        CALC_OFFSET(v1, continue);
-
-    check_collision:
-        if (FLT_IS_NONZERO(invDenom)) invDenom = (offset / invDenom);
-        pos[0] += (d00 *= invDenom);
-        pos[2] += (d01 *= invDenom);
-        margin_radius += 0.01f;
-        if ((d00 * surf->normal.x) + (d01 * surf->normal.z) < (corner_threshold * offset)) continue;
-
-    hasCollision:
+        // Has collision
         if (data->numWalls < MAX_REFERENCED_WALLS) {
             data->walls[data->numWalls++] = surf;
         }
@@ -137,11 +167,11 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             break;
         }
     }
+
     data->x = pos[0];
     data->z = pos[2];
     return numCols;
 }
-#undef CALC_OFFSET
 
 /**
  * Formats the position and wall search for find_wall_collisions.
@@ -175,10 +205,13 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 numCollisions = 0;
     s32 x = colData->x;
     s32 z = colData->z;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_wall);
+    PUPPYPRINT_GET_SNAPSHOT();
 
     colData->numWalls = 0;
 
     if (is_outside_level_bounds(x, z)) {
+        profiler_collision_update(first);
         return numCollisions;
     }
 
@@ -202,6 +235,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     gNumCalls.wall++;
 #endif
 
+    profiler_collision_update(first);
     return numCollisions;
 }
 
@@ -317,12 +351,15 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     f32 height        = CELL_HEIGHT_LIMIT;
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_ceil);
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 x = posX;
     s32 y = posY;
     s32 z = posZ;
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+        profiler_collision_update(first);
         return height;
     }
 
@@ -365,6 +402,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     gNumCalls.ceil++;
 #endif
 
+    profiler_collision_update(first);
     return height;
 }
 
@@ -429,7 +467,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         height = get_surface_height_at_location(x, z, surf);
 
         // Exclude floors lower than the previous highest floor.
-        if (height < *pheight) continue;
+        if (height <= *pheight) continue;
 
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
         if (bufferY < height) continue;
@@ -545,6 +583,9 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
  * Find the highest floor under a given position and return the height.
  */
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_floor);
+    PUPPYPRINT_GET_SNAPSHOT();
+
     f32 height        = FLOOR_LOWER_LIMIT;
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
@@ -558,6 +599,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+        profiler_collision_update(first);
         return height;
     }
     // Each level is split into cells to limit load, find the appropriate cell.
@@ -602,12 +644,28 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     // Increment the debug tracker.
     gNumCalls.floor++;
 #endif
+
+    profiler_collision_update(first);
     return height;
 }
 
 f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor) {
     gCollisionFlags |= (COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
     return find_floor(x, y, z, pfloor);
+}
+
+/**
+ * Get the room index at a given position.
+ */
+s32 get_room_at_pos(f32 x, f32 y, f32 z) {
+    if (gCurrentArea->surfaceRooms != NULL) {
+        struct Surface *floor;
+        find_room_floor(x, y, z, &floor);
+        if (floor) {
+            return floor->room;
+        }
+    }
+    return -1;
 }
 
 /**
@@ -654,6 +712,8 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_water);
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 waterLevel = find_water_floor(x, y, z, &floor);
 
     if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
@@ -679,6 +739,7 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
         *pfloor = floor;
     }
 
+    profiler_collision_update(first);
     return waterLevel;
 }
 
@@ -690,6 +751,8 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_water);
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
@@ -704,7 +767,7 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
 
             // If the location is within a water box and it is a water box.
             // Water is less than 50 val only, while above is gas and such.
-            if (loX < x && x < hiX && loZ < z && z < hiZ && val < 50) {
+            if (loX <= x && x <= hiX && loZ <= z && z <= hiZ && val < 50) {
                 // Set the water height. Since this breaks, only return the first height.
                 waterLevel = *p;
                 break;
@@ -712,6 +775,8 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
             p++;
         }
     }
+
+    profiler_collision_update(first);
 
     return waterLevel;
 }
@@ -724,6 +789,8 @@ s32 find_poison_gas_level(s32 x, s32 z) {
     s32 loX, hiX, loZ, hiZ;
     s32 gasLevel = FLOOR_LOWER_LIMIT;
     TerrainData *p = gEnvironmentRegions;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_water);
+    PUPPYPRINT_GET_SNAPSHOT();
 
     if (p != NULL) {
         s32 numRegions = *p++;
@@ -749,7 +816,8 @@ s32 find_poison_gas_level(s32 x, s32 z) {
             p += 6;
         }
     }
-
+    
+    profiler_collision_update(first);
     return gasLevel;
 }
 

@@ -34,7 +34,7 @@ struct Area gAreaData[AREA_COUNT];
 struct WarpTransition gWarpTransition;
 
 s16 gCurrCourseNum;
-s16 gCurrActNum;
+s16 gCurrActNum = 1;
 s16 gCurrAreaIndex;
 s16 gSavedCourseNum;
 s16 gMenuOptSelectIndex;
@@ -177,7 +177,7 @@ void load_obj_warp_nodes(void) {
 }
 
 void clear_areas(void) {
-    s32 i;
+    s32 i, j;
 
     gCurrentArea = NULL;
     gWarpTransition.isActive = FALSE;
@@ -198,12 +198,16 @@ void clear_areas(void) {
         gAreaData[i].objectSpawnInfos = NULL;
         gAreaData[i].camera = NULL;
         gAreaData[i].unused = NULL;
-        gAreaData[i].whirlpools[0] = NULL;
-        gAreaData[i].whirlpools[1] = NULL;
+        for (j = 0; j < ARRAY_COUNT(gAreaData[i].whirlpools); j++) {
+            gAreaData[i].whirlpools[j] = NULL;
+        }
         gAreaData[i].dialog[0] = DIALOG_NONE;
         gAreaData[i].dialog[1] = DIALOG_NONE;
         gAreaData[i].musicParam = 0;
         gAreaData[i].musicParam2 = 0;
+#ifdef BETTER_REVERB
+        gAreaData[i].betterReverbPreset = 0;
+#endif
     }
 }
 
@@ -211,18 +215,14 @@ void clear_area_graph_nodes(void) {
     s32 i;
 
     if (gCurrentArea != NULL) {
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
-#endif
         gCurrentArea = NULL;
         gWarpTransition.isActive = FALSE;
     }
 
     for (i = 0; i < AREA_COUNT; i++) {
         if (gAreaData[i].graphNode != NULL) {
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
             geo_call_global_function_nodes(&gAreaData[i].graphNode->node, GEO_CONTEXT_AREA_INIT);
-#endif
             gAreaData[i].graphNode = NULL;
         }
     }
@@ -232,6 +232,10 @@ void load_area(s32 index) {
     if (gCurrentArea == NULL && gAreaData[index].graphNode != NULL) {
         gCurrentArea = &gAreaData[index];
         gCurrAreaIndex = gCurrentArea->index;
+        main_pool_pop_state();
+        main_pool_push_state();
+
+        gMarioCurrentRoom = 0;
 
         if (gCurrentArea->terrainData != NULL) {
             load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
@@ -243,18 +247,14 @@ void load_area(s32 index) {
         }
 
         load_obj_warp_nodes();
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_LOAD);
-#endif
     }
 }
 
 void unload_area(void) {
     if (gCurrentArea != NULL) {
         unload_objects_from_area(0, gCurrentArea->index);
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
-#endif
 
         gCurrentArea->flags = AREA_FLAG_UNLOAD;
         gCurrentArea = NULL;
@@ -376,10 +376,14 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 }
 
 void render_game(void) {
+    PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
         }
+#ifdef PUPPYPRINT
+        bzero(gCurrEnvCol, sizeof(ColorRGBA));
+#endif
 
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
 
@@ -389,6 +393,9 @@ void render_game(void) {
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         render_text_labels();
+#ifdef PUPPYPRINT
+        puppyprint_print_deferred();
+#endif
         do_cutscene_handler();
         print_displaying_credits_entry();
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
@@ -422,6 +429,9 @@ void render_game(void) {
         }
     } else {
         render_text_labels();
+#ifdef PUPPYPRINT
+        puppyprint_print_deferred();
+#endif
         if (gViewportClip != NULL) {
             clear_viewport(gViewportClip, gWarpTransFBSetColor);
         } else {
@@ -432,9 +442,9 @@ void render_game(void) {
     gViewportOverride = NULL;
     gViewportClip     = NULL;
 
-    profiler_update(PROFILER_TIME_GFX);
+    profiler_update(PROFILER_TIME_GFX, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
     profiler_print_times();
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
 #endif
 }

@@ -1,14 +1,6 @@
 // 0x0700E950 - 0x0700E968
-static const Lights1 ttc_seg7_lights_0700E950 = gdSPDefLights1(
-    0x55, 0x55, 0x55,
-    0xaa, 0xaa, 0xaa, 0x28, 0x28, 0x28
-);
 
 // 0x0700E968 - 0x0700E980
-static const Lights1 ttc_seg7_lights_0700E968 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0700E980 - 0x0700EA20
 static const Vtx ttc_seg7_vertex_0700E980[] = {
@@ -63,13 +55,13 @@ static const Gfx ttc_seg7_dl_0700EBC0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, machine_09001000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ttc_seg7_lights_0700E950.l, 1),
-    gsSPLight(&ttc_seg7_lights_0700E950.a, 2),
+    gsSPLightColor(LIGHT_1, 0xaaaaaaff),
+    gsSPLightColor(LIGHT_2, 0x555555ff),
     gsSPVertex(ttc_seg7_vertex_0700E980, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  4, 0x0),
     gsSP2Triangles( 5,  6,  7, 0x0,  8,  6,  9, 0x0),
-    gsSPLight(&ttc_seg7_lights_0700E968.l, 1),
-    gsSPLight(&ttc_seg7_lights_0700E968.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ttc_seg7_vertex_0700EA20, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  4, 0x0),
     gsSP2Triangles( 5,  6,  7, 0x0,  8,  6,  9, 0x0),

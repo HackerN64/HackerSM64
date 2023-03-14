@@ -42,7 +42,7 @@ struct Controller {
   /*0x12*/ u16 buttonPressed;
   /*0x14*/ u16 buttonReleased;
   /*0x18*/ OSContStatus *statusData;
-  /*0x1C*/ OSContPad *controllerData;
+  /*0x1C*/ OSContPadEx *controllerData;
 #if ENABLE_RUMBLE
   /*0x20*/ s32 port;
 #endif
@@ -98,12 +98,6 @@ typedef void (*ObjActionFunc)(void);
 typedef s8  ObjAction8;
 typedef s32 ObjAction32;
 typedef s16 ColFlags;
-
-// -- Angle --
-typedef s16 Angle;
-typedef u16 UAngle;
-typedef s32 Angle32;
-typedef Angle Vec3a[3];
 
 // -- Collision --
 typedef ROOM_DATA_TYPE RoomData;
@@ -490,10 +484,10 @@ struct MarioState {
            Vec3f prevPos;
              f32 lateralSpeed;
              f32 moveSpeed;
-           Angle movePitch;
-           Angle moveYaw;
-           Angle ceilYaw;
-           Angle wallYaw;
+             s16 movePitch;
+             s16 moveYaw;
+             s16 ceilYaw;
+             s16 wallYaw;
     // -- HackerSM64 MarioState fields end --
 };
 

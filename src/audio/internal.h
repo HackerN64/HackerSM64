@@ -7,20 +7,27 @@
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define SEQUENCE_PLAYERS 4
-#define SEQUENCE_CHANNELS 48
-#define SEQUENCE_LAYERS 64
 #else
 #define SEQUENCE_PLAYERS 3
-#define SEQUENCE_CHANNELS 32
-#ifdef VERSION_JP
-#define SEQUENCE_LAYERS 48
-#else
-#define SEQUENCE_LAYERS 52
-#endif
 #endif
 
 #define LAYERS_MAX       4
 #define CHANNELS_MAX     16
+
+#ifdef EXPAND_AUDIO_HEAP // Not technically on the heap but it's memory nonetheless...
+#define SEQUENCE_CHANNELS (SEQUENCE_PLAYERS * CHANNELS_MAX)
+#define SEQUENCE_LAYERS ((SEQUENCE_CHANNELS * LAYERS_MAX) / 2) // This should be more than plenty in nearly all circumstances.
+#else // EXPAND_AUDIO_HEAP
+#if defined(VERSION_EU) || defined(VERSION_SH)
+#define SEQUENCE_CHANNELS 48
+#define SEQUENCE_LAYERS 64
+#else
+#define SEQUENCE_CHANNELS 32
+#define SEQUENCE_LAYERS 52
+#endif
+#endif // EXPAND_AUDIO_HEAP
+
+#define VIBRATO_DISABLED_VALUE (0xFF * 8)
 
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
 
@@ -80,7 +87,7 @@ enum Codecs {
 #include "game/puppyprint.h"
 
 #ifdef VERSION_EU
-/*#if PUPPYPRINT_DEBUG
+/*#ifdef PUPPYPRINT_DEBUG
 #define eu_stubbed_printf_0(msg) append_puppyprint_log(msg)
 #define eu_stubbed_printf_1(msg, a) append_puppyprint_log(msg, a)
 #define eu_stubbed_printf_2(msg, a, b) append_puppyprint_log(msg, a, b)
@@ -134,7 +141,7 @@ struct VibratoState {
     /*    , 0x14*/ u8 active;
 #else
     /*0x08,     */ s8 *curve;
-    /*0x0C,     */ u8 active;
+    /*0x0C,     */ u8 activeFlags;
     /*0x0E,     */ u16 rate;
     /*0x10,     */ u16 extent;
 #endif
@@ -723,6 +730,22 @@ struct NoteSynthesisBuffers {
 #endif
 };
 
+#ifdef BETTER_REVERB
+struct BetterReverbSettings {
+    s8 downsampleRate;
+    u8 isMono;
+    u8 filterCount;
+    s16 windowSize;
+    s16 gain;
+    u8 gainIndex;
+    u8 reverbIndex;
+    u32 *delaysL;
+    u32 *delaysR;
+    s32 *reverbMultsL;
+    s32 *reverbMultsR;
+};
+#endif
+
 #ifdef VERSION_EU
 struct ReverbSettingsEU {
     u8 downsampleRate;
@@ -774,15 +797,12 @@ struct AudioSessionSettingsEU {
 struct AudioSessionSettings {
     /*0x00*/ u32 frequency;
     /*0x04*/ u8 maxSimultaneousNotes;
-    /*0x05*/ u8 reverbDownsampleRate; // always 1
-    /*0x06*/ u16 reverbWindowSize;
-    /*0x08*/ u16 reverbGain;
-    /*0x0A*/ u16 volume;
-    /*0x0C*/ u32 persistentSeqMem;
-    /*0x10*/ u32 persistentBankMem;
-    /*0x14*/ u32 temporarySeqMem;
-    /*0x18*/ u32 temporaryBankMem;
-}; // size = 0x1C
+    /*0x06*/ u16 volume;
+    /*0x08*/ u32 persistentSeqMem;
+    /*0x0C*/ u32 persistentBankMem;
+    /*0x10*/ u32 temporarySeqMem;
+    /*0x14*/ u32 temporaryBankMem;
+}; // size = 0x18
 
 struct AudioBufferParametersEU {
     /*0x00*/ s16 presetUnk4; // audio frames per vsync?

@@ -1,8 +1,4 @@
 // 0x0701D888 - 0x0701D8A0
-static const Lights1 ttm_seg7_lights_0701D888 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0701D8A0 - 0x0701D9A0
 static const Vtx ttm_seg7_vertex_0701D8A0[] = {
@@ -57,8 +53,8 @@ static const Gfx ttm_seg7_dl_0701DAE0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mountain_09000800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ttm_seg7_lights_0701D888.l, 1),
-    gsSPLight(&ttm_seg7_lights_0701D888.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(ttm_seg7_vertex_0701D8A0, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 1,  4,  3, 0x0,  0,  2,  5, 0x0),

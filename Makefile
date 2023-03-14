@@ -5,6 +5,8 @@ include util.mk
 # Default target
 default: all
 
+TARGET_STRING := sm64
+
 # Preprocessor definitions
 DEFINES :=
 
@@ -85,6 +87,9 @@ else ifeq ($(VERSION),sh)
   DEFINES += VERSION_SH=1
 endif
 
+# FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
+FIXLIGHTS ?= 1
+
 DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
 TARGET := sm64
@@ -114,20 +119,10 @@ else ifeq ($(GRUCODE),super3d) # Super3D
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
 endif
 
-LIBRARIES := nustd hvqm2 z goddard
-
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
 TEXT_ENGINE := none
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  LIBRARIES += s2d_engine
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
-endif
-# add more text engines here
-
-LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
-
+$(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
 
 #==============================================================================#
 # Optimization flags                                                           #
@@ -135,10 +130,14 @@ LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 # Default non-gcc opt flags
 DEFAULT_OPT_FLAGS = -Ofast
+# Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
+# this conflicts with -ftrapping-math apparently.
+# TODO: Figure out how to allow -fassociative-math to be enabled
+SAFETY_OPT_FLAGS = -ftrapping-math -fno-associative-math
 
 # Main opt flags
 GCC_MAIN_OPT_FLAGS = \
-  -Ofast \
+  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
   --param case-values-threshold=20 \
   --param max-completely-peeled-insns=10 \
   --param max-unrolled-insns=10 \
@@ -149,7 +148,7 @@ GCC_MAIN_OPT_FLAGS = \
 
 # Surface Collision
 GCC_COLLISION_OPT_FLAGS = \
-  -Ofast \
+  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
   --param case-values-threshold=20 \
   --param max-completely-peeled-insns=100 \
   --param max-unrolled-insns=100 \
@@ -162,7 +161,7 @@ GCC_COLLISION_OPT_FLAGS = \
 
 # Math Util
 GCC_MATH_UTIL_OPT_FLAGS = \
-  -Ofast \
+  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
   -fno-unroll-loops \
   -fno-peel-loops \
   --param case-values-threshold=20  \
@@ -174,7 +173,7 @@ GCC_MATH_UTIL_OPT_FLAGS = \
 
 # Rendering graph node
 GCC_GRAPH_NODE_OPT_FLAGS = \
-  -Ofast \
+  $(DEFAULT_OPT_FLAGS) $(SAFETY_OPT_FLAGS) \
   --param case-values-threshold=20 \
   --param max-completely-peeled-insns=100 \
   --param max-unrolled-insns=100 \
@@ -186,14 +185,12 @@ GCC_GRAPH_NODE_OPT_FLAGS = \
 #==============================================================================#
 
 ifeq ($(COMPILER),gcc)
-  NON_MATCHING := 1
   MIPSISET     := -mips3
   OPT_FLAGS           := $(GCC_MAIN_OPT_FLAGS)
   COLLISION_OPT_FLAGS  = $(GCC_COLLISION_OPT_FLAGS)
   MATH_UTIL_OPT_FLAGS  = $(GCC_MATH_UTIL_OPT_FLAGS)
   GRAPH_NODE_OPT_FLAGS = $(GCC_GRAPH_NODE_OPT_FLAGS)
 else ifeq ($(COMPILER),clang)
-  NON_MATCHING := 1
   # clang doesn't support ABI 'o32' for 'mips3'
   MIPSISET     := -mips2
   OPT_FLAGS    := $(DEFAULT_OPT_FLAGS)
@@ -202,39 +199,26 @@ else ifeq ($(COMPILER),clang)
   GRAPH_NODE_OPT_FLAGS = $(DEFAULT_OPT_FLAGS)
 endif
 
-
-# NON_MATCHING - whether to build a matching, identical copy of the ROM
-#   1 - enable some alternate, more portable code that does not produce a matching ROM
-#   0 - build a matching ROM
-NON_MATCHING ?= 1
-$(eval $(call validate-option,NON_MATCHING,0 1))
-
-ifeq ($(TARGET_N64),0)
-  NON_MATCHING := 1
-endif
-
-ifeq ($(NON_MATCHING),1)
-  DEFINES += NON_MATCHING=1 AVOID_UB=1
-endif
-
-
-TARGET_STRING := sm64
-
 # UNF - whether to use UNFLoader flashcart library
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 UNF ?= 0
 $(eval $(call validate-option,UNF,0 1))
+
+# if `unf` is a target, make sure that UNF is set
+ifneq ($(filter unf,$(MAKECMDGOALS)),)
+	UNF = 1
+endif
+
 ifeq ($(UNF),1)
   DEFINES += UNF=1
   SRC_DIRS += src/usb
-  USE_DEBUG := 1
 endif
 
 # ISVPRINT - whether to fake IS-Viewer presence,
 # allowing for usage of CEN64 (and possibly Project64) to print messages to terminal.
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 ISVPRINT ?= 0
 $(eval $(call validate-option,ISVPRINT,0 1))
 ifeq ($(ISVPRINT),1)
@@ -244,15 +228,18 @@ endif
 
 ifeq ($(USE_DEBUG),1)
   ULTRALIB := ultra_d
-  DEFINES += DEBUG=1
+  DEFINES += DEBUG=1 OVERWRITE_OSPRINT=1
+else ifeq ($(UNF),1)
+  ULTRALIB := ultra
+  DEFINES += _FINALROM=1 NDEBUG=1 OVERWRITE_OSPRINT=1
 else
   ULTRALIB := ultra_rom
-  DEFINES += _FINALROM=1 NDEBUG=1
+  DEFINES += _FINALROM=1 NDEBUG=1 OVERWRITE_OSPRINT=0
 endif
 
 # HVQM - whether to use HVQM fmv library
 #   1 - includes code in ROM
-#   0 - does not 
+#   0 - does not
 HVQM ?= 0
 $(eval $(call validate-option,HVQM,0 1))
 ifeq ($(HVQM),1)
@@ -284,15 +271,6 @@ endif
 
 GZIPVER ?= std
 $(eval $(call validate-option,GZIPVER,std libdef))
-
-# GODDARD - whether to use libgoddard (Mario Head)
-#   1 - includes code in ROM
-#   0 - does not 
-GODDARD ?= 0
-$(eval $(call validate-option,GODDARD,0 1))
-ifeq ($(GODDARD),1)
-  DEFINES += GODDARD=1
-endif
 
 # Whether to hide commands or not
 VERBOSE ?= 0
@@ -423,8 +401,6 @@ DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(B
 # detect prefix for MIPS toolchain
 ifneq ($(call find-command,mips64-elf-ld),)
   CROSS := mips64-elf-
-else ifneq ($(call find-command,mips-n64-ld),)
-  CROSS := mips-n64-
 else ifneq ($(call find-command,mips64-ld),)
   CROSS := mips64-
 else ifneq ($(call find-command,mips-linux-gnu-ld),)
@@ -436,6 +412,18 @@ else ifneq ($(call find-command,mips-ld),)
 else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
+
+LIBRARIES := nustd hvqm2 z goddard
+
+# Text engine
+ifeq ($(TEXT_ENGINE), s2dex_text_engine)
+  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  LIBRARIES += s2d_engine
+  DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
+endif
+# add more text engines here
+
+LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 export LD_LIBRARY_PATH=./tools
 
@@ -513,6 +501,7 @@ AIFF_EXTRACT_CODEBOOK := $(TOOLS_DIR)/aiff_extract_codebook
 VADPCM_ENC            := $(TOOLS_DIR)/vadpcm_enc
 EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
 SKYCONV               := $(TOOLS_DIR)/skyconv
+FIXLIGHTS_PY          := $(TOOLS_DIR)/fixlights.py
 ifeq ($(GZIPVER),std)
 GZIP                  := gzip
 else
@@ -527,8 +516,13 @@ endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
 EMULATOR = mupen64plus
 EMU_FLAGS =
-LOADER = loader64
-LOADER_FLAGS = -vwf
+
+ifneq (,$(call find-command,wslview))
+    LOADER = ./$(TOOLS_DIR)/UNFLoader.exe
+else
+    LOADER = ./$(TOOLS_DIR)/UNFLoader
+endif
+
 SHA1SUM = sha1sum
 PRINT = printf
 
@@ -578,8 +572,18 @@ test-pj64: $(ROM)
 	wine ~/Desktop/new64/Project64.exe $<
 # someone2639
 
-load: $(ROM)
-	$(LOADER) $(LOADER_FLAGS) $<
+# download and extract most recent unfloader build if needed
+$(LOADER):
+ifeq (,$(wildcard $(LOADER)))
+	@$(PRINT) "Downloading latest UNFLoader...$(NO_COL)\n"
+	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(TOOLS_DIR)
+endif
+
+load: $(ROM) $(LOADER)
+	$(LOADER) -r $<
+
+unf: $(ROM) $(LOADER)
+	$(LOADER) -d -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
 
@@ -689,9 +693,11 @@ $(BUILD_DIR)/%.ci4.inc.c: %.ci4.png
 $(BUILD_DIR)/%.elf: $(BUILD_DIR)/%.o
 	$(call print,Linking ELF file:,$<,$@)
 	$(V)$(LD) -e 0 -Ttext=$(SEGMENT_ADDRESS) -Map $@.map -o $@ $<
-# Override for leveldata.elf, which otherwise matches the above pattern
+# Override for leveldata.elf, which otherwise matches the above pattern.
+# Has to be a static pattern rule for make-4.4 and above to trigger the second
+# expansion.
 .SECONDEXPANSION:
-$(BUILD_DIR)/levels/%/leveldata.elf: $(BUILD_DIR)/levels/%/leveldata.o $(BUILD_DIR)/bin/$$(TEXTURE_BIN).elf
+$(LEVEL_ELF_FILES): $(BUILD_DIR)/levels/%/leveldata.elf: $(BUILD_DIR)/levels/%/leveldata.o $(BUILD_DIR)/bin/$$(TEXTURE_BIN).elf
 	$(call print,Linking ELF file:,$<,$@)
 	$(V)$(LD) -e 0 -Ttext=$(SEGMENT_ADDRESS) -Map $@.map --just-symbols=$(BUILD_DIR)/bin/$(TEXTURE_BIN).elf -o $@ $<
 
@@ -704,17 +710,17 @@ $(BUILD_DIR)/levels/%/leveldata.bin: $(BUILD_DIR)/levels/%/leveldata.elf
 	$(V)$(EXTRACT_DATA_FOR_MIO) $< $@
 
 ifeq ($(COMPRESS),gzip)
-include gziprules.mk
+include compression/gziprules.mk
 else ifeq ($(COMPRESS),rnc1)
-include rnc1rules.mk
+include compression/rnc1rules.mk
 else ifeq ($(COMPRESS),rnc2)
-include rnc2rules.mk
+include compression/rnc2rules.mk
 else ifeq ($(COMPRESS),yay0)
-include yay0rules.mk
+include compression/yay0rules.mk
 else ifeq ($(COMPRESS),mio0)
-include mio0rules.mk
+include compression/mio0rules.mk
 else ifeq ($(COMPRESS),uncomp)
-include uncomprules.mk
+include compression/uncomprules.mk
 endif
 
 #==============================================================================#
@@ -814,6 +820,11 @@ $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 #==============================================================================#
 
 # Compile C code
+ifeq ($(FIXLIGHTS),1)
+# This must not be run multiple times at once, so we run it ahead of time rather than in a rule
+DUMMY != $(FIXLIGHTS_PY) actors
+DUMMY != $(FIXLIGHTS_PY) levels
+endif
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
@@ -834,7 +845,7 @@ $(BUILD_DIR)/rsp/%.bin $(BUILD_DIR)/rsp/%_data.bin: rsp/%.s
 # Run linker script through the C preprocessor
 $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT) $(BUILD_DIR)/goddard.txt
 	$(call print,Preprocessing linker script:,$<,$@)
-	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) $(DEBUG_MAP_STACKTRACE_FLAG) -MMD -MP -MT $@ -MF $@.d -o $@ $<
+	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) $(DEBUG_MAP_STACKTRACE_FLAG) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
 # Link libgoddard
 $(BUILD_DIR)/libgoddard.a: $(GODDARD_O_FILES)
@@ -849,7 +860,7 @@ $(BUILD_DIR)/libz.a: $(LIBZ_O_FILES)
 # SS2: Goddard rules to get size
 $(BUILD_DIR)/sm64_prelim.ld: sm64.ld $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/libgoddard.a $(BUILD_DIR)/libz.a
 	$(call print,Preprocessing preliminary linker script:,$<,$@)
-	$(V)$(CPP) $(CPPFLAGS) -DPRELIMINARY=1 -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ -MF $@.d -o $@ $<
+	$(V)$(CPP) $(CPPFLAGS) -DPRELIMINARY=1 -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
 $(BUILD_DIR)/sm64_prelim.elf: $(BUILD_DIR)/sm64_prelim.ld
 	@$(PRINT) "$(GREEN)Linking Preliminary ELF file:  $(BLUE)$@ $(NO_COL)\n"
@@ -870,8 +881,16 @@ $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(Y
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 
 # Build ROM
+ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
+# run with -n / --dry-run
+$(ROM):
+	@$(PRINT) "$(BLUE)DRY RUNS ARE DISABLED$(NO_COL)\n"
+else
+# not running with -n / --dry-run
 $(ROM): $(ELF)
 	$(call print,Building ROM:,$<,$@)
+endif
+
 ifeq      ($(CONSOLE),n64)
 	$(V)$(OBJCOPY) --pad-to=0x101000 --gap-fill=0xFF $< $@ -O binary
 else ifeq ($(CONSOLE),bb)
@@ -884,7 +903,7 @@ endif
 $(BUILD_DIR)/$(TARGET).objdump: $(ELF)
 	$(OBJDUMP) -D $< > $@
 
-.PHONY: all clean distclean default diff test load
+.PHONY: all clean distclean default test load
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
 .SECONDARY:
 

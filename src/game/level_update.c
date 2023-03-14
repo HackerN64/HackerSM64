@@ -4,6 +4,7 @@
 #include "seq_ids.h"
 #include "dialog_ids.h"
 #include "audio/external.h"
+#include "audio/synthesis.h"
 #include "level_update.h"
 #include "game_init.h"
 #include "level_update.h"
@@ -141,6 +142,8 @@ s16 sSourceWarpNodeId;
 s32 sDelayedWarpArg;
 s8 sTimerRunning;
 s8 gNeverEnteredCastle;
+// Prevent multiple 100 coin stars from spawning
+u8 g100CoinStarSpawned = FALSE;
 
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
@@ -393,6 +396,9 @@ void init_mario_after_warp(void) {
     }
 
     if (gCurrDemoInput == NULL) {
+#ifdef BETTER_REVERB
+        gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+#endif
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
 
         if (gMarioState->flags & MARIO_METAL_CAP) {
@@ -410,7 +416,7 @@ void init_mario_after_warp(void) {
         }
 
         if (sWarpDest.levelNum == LEVEL_CASTLE && sWarpDest.areaIdx == 1
-            && (sWarpDest.nodeId == 31 || sWarpDest.nodeId == 32)
+            && (sWarpDest.nodeId == 32)
         ) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
@@ -421,7 +427,19 @@ void init_mario_after_warp(void) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
 #endif
+#ifndef DISABLE_EXIT_COURSE
+       if (sWarpDest.levelNum == EXIT_COURSE_LEVEL && sWarpDest.areaIdx == EXIT_COURSE_AREA
+            && sWarpDest.nodeId == EXIT_COURSE_NODE
+        ) {
+            play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
+        }
+#endif
     }
+#ifdef PUPPYPRINT_DEBUG
+    gPuppyWarp = 0;
+    gLastWarpID = sWarpDest.nodeId;
+    gPuppyWarpArea = 0;
+#endif
 }
 
 // used for warps inside one level
@@ -492,6 +510,9 @@ void warp_credits(void) {
     play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x14, 0x00, 0x00, 0x00);
 
     if (gCurrCreditsEntry == NULL || gCurrCreditsEntry == sCreditsSequence) {
+#ifdef BETTER_REVERB
+        gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+#endif
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
     }
 }
@@ -550,9 +571,9 @@ s16 music_unchanged_through_warp(s16 arg) {
 
     s16 destArea = warpNode->node.destArea;
     s16 unchanged = TRUE;
-    s16 currBgMusic;
 
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    s16 currBgMusic;
     if (levelNum == LEVEL_BOB && levelNum == gCurrLevelNum && destArea == gCurrAreaIndex) {
         currBgMusic = get_current_background_music();
         if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_VARIATION)
@@ -563,14 +584,19 @@ s16 music_unchanged_through_warp(s16 arg) {
 #endif
         u16 destParam1 = gAreas[destArea].musicParam;
         u16 destParam2 = gAreas[destArea].musicParam2;
-
+#ifdef BETTER_REVERB
+        u16 destParam3 = gAreas[destArea].betterReverbPreset;
+        unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
+               && destParam2 == gCurrentArea->musicParam2 && destParam3 == gCurrentArea->betterReverbPreset;
+#else
         unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
                && destParam2 == gCurrentArea->musicParam2;
+#endif
 
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
         }
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     }
 #endif
     return unchanged;
@@ -691,9 +717,6 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
     s32 fadeMusic = TRUE;
 
     if (sDelayedWarpOp == WARP_OP_NONE) {
-#ifdef SAVE_NUM_LIVES
-        save_file_set_num_lives(m->numLives);
-#endif
         m->invincTimer = -1;
         sDelayedWarpArg = WARP_FLAGS_NONE;
         sDelayedWarpOp = warpOp;
@@ -724,7 +747,7 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_DEATH:
-#ifndef DISABLE_LIVES
+#ifdef ENABLE_LIVES
                 if (m->numLives == 0) {
                     sDelayedWarpOp = WARP_OP_GAME_OVER;
                 }
@@ -739,17 +762,21 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_WARP_FLOOR:
-                sSourceWarpNodeId = WARP_NODE_WARP_FLOOR;
-                if (area_get_warp_node(sSourceWarpNodeId) == NULL) {
-#ifndef DISABLE_LIVES
-                    if (m->numLives == 0) {
-                        sDelayedWarpOp = WARP_OP_GAME_OVER;
-                    } else {
-                        sSourceWarpNodeId = WARP_NODE_DEATH;
-                    }
+                if ((m->floor) && (m->floor->force & 0xFF)) {
+                    sSourceWarpNodeId = m->floor->force & 0xFF;
+                } else {
+                    sSourceWarpNodeId = WARP_NODE_WARP_FLOOR;
+                    if (area_get_warp_node(sSourceWarpNodeId) == NULL) {
+#ifdef ENABLE_LIVES
+                        if (m->numLives == 0) {
+                            sDelayedWarpOp = WARP_OP_GAME_OVER;
+                        } else {
+                            sSourceWarpNodeId = WARP_NODE_DEATH;
+                        }
 #else
-                    sSourceWarpNodeId = WARP_NODE_DEATH;
+                        sSourceWarpNodeId = WARP_NODE_DEATH;
 #endif
+                    }                    
                 }
 
                 sDelayedWarpTimer = 20;
@@ -822,6 +849,12 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 void initiate_delayed_warp(void) {
     struct ObjectWarpNode *warpNode;
     s32 destWarpNode;
+
+#ifdef PUPPYPRINT_DEBUG
+    if (gPuppyWarp) {
+        initiate_warp(gPuppyWarp, gPuppyWarpArea, 0x0A, 0);
+    }
+#endif
 
     if (sDelayedWarpOp != WARP_OP_NONE && --sDelayedWarpTimer == 0) {
         reset_dialog_render_state();
@@ -909,30 +942,19 @@ void update_hud_values(void) {
             }
         }
 
-#ifdef SAVE_NUM_LIVES
+#ifdef ENABLE_LIVES
         if (gMarioState->numLives > MAX_NUM_LIVES) {
             gMarioState->numLives = MAX_NUM_LIVES;
-            save_file_set_num_lives(MAX_NUM_LIVES);
-        }
-#else
-        if (gMarioState->numLives > 100) {
-            gMarioState->numLives = 100;
         }
 #endif
 
-#if BUGFIX_MAX_LIVES
-        if (gMarioState->numCoins > 999) {
-            gMarioState->numCoins = 999;
+        if (gMarioState->numCoins > MAX_NUM_COINS) {
+            gMarioState->numCoins = MAX_NUM_COINS;
         }
 
-        if (gHudDisplay.coins > 999) {
-            gHudDisplay.coins = 999;
+        if (gHudDisplay.coins > MAX_NUM_COINS) {
+            gHudDisplay.coins = MAX_NUM_COINS;
         }
-#else
-        if (gMarioState->numCoins > 999) {
-            gMarioState->numLives = (s8) 999; //! Wrong variable
-        }
-#endif
 
         gHudDisplay.stars = gMarioState->numStars;
         gHudDisplay.lives = gMarioState->numLives;
@@ -985,18 +1007,31 @@ s32 play_mode_normal(void) {
     warp_area();
     check_instant_warp();
 
+#ifdef PUPPYPRINT_DEBUG
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+        if (sTimerRunning && gHudDisplay.timer < 17999) {
+            gHudDisplay.timer++;
+        }
+        area_update_objects();
+    }
+#else
     if (sTimerRunning && gHudDisplay.timer < 17999) {
         gHudDisplay.timer++;
     }
-
     area_update_objects();
+#endif
     update_hud_values();
 #ifdef PUPPYLIGHTS
     delete_lights();
 #endif
-
     if (gCurrentArea != NULL) {
+#ifdef PUPPYPRINT_DEBUG
+        if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+            update_camera(gCurrentArea->camera);
+        }
+#else
         update_camera(gCurrentArea->camera);
+#endif
     }
 
     initiate_painting_warp();
@@ -1018,7 +1053,7 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_PAUSED);
         }
     }
-
+    
     return FALSE;
 }
 
@@ -1166,7 +1201,7 @@ s32 update_level(void) {
 
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
 
@@ -1175,6 +1210,8 @@ s32 init_level(void) {
     sDelayedWarpOp = WARP_OP_NONE;
     sTransitionTimer = 0;
     sSpecialWarpDest = WARP_SPECIAL_NONE;
+
+    g100CoinStarSpawned = FALSE;
 
     if (gCurrCreditsEntry == NULL) {
         gHudDisplay.flags = HUD_DISPLAY_DEFAULT;
@@ -1230,6 +1267,9 @@ s32 init_level(void) {
         }
 
         if (gCurrDemoInput == NULL) {
+#ifdef BETTER_REVERB
+            gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+#endif
             set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
         }
     }
@@ -1247,7 +1287,7 @@ s32 init_level(void) {
     puppylights_allocate();
 #endif
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     append_puppyprint_log("Level loaded in %dc", (s32)(osGetTime() - first));
 #else
@@ -1287,10 +1327,10 @@ s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
 #endif
     sWarpDest.type = WARP_TYPE_NOT_WARPING;
     sDelayedWarpOp = WARP_OP_NONE;
-#ifdef CASTLE_MUSIC_FIX
-    gNeverEnteredCastle = 0;
-#else
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     gNeverEnteredCastle = !save_file_exists(gCurrSaveFileNum - 1);
+#else
+    gNeverEnteredCastle = 0;
 #endif
     gCurrLevelNum = levelNum;
     gCurrCourseNum = COURSE_NONE;

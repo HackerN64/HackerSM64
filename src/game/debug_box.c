@@ -133,12 +133,12 @@ extern Mat4 gMatStack[32]; // XXX: Hack
 /**
  * The debug boxes' default color. sCurBoxColor is reset to this every frame.
  */
-#define DBG_BOX_DEF_COLOR 0xFF0000
+#define DBG_BOX_DEF_COLOR 0xFF000000
 
 /**
  * The color that new boxes will be drawn with.
  */
-u32 sCurBoxColor = ((DBG_BOX_ALPHA << 24) | DBG_BOX_DEF_COLOR);
+u32 sCurBoxColor = DBG_BOX_DEF_COLOR | DBG_BOX_ALPHA;
 
 /**
  * The allocated size of a rotated box's dl
@@ -349,20 +349,16 @@ void visual_surface_loop(void) {
      || !gMarioState->marioObj) {
         return;
     }
-    Mtx *mtx   = alloc_display_list(sizeof(Mtx));
     Vtx *verts = alloc_display_list((iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2]) * 3) * sizeof(Vtx));
 
     gVisualSurfaceCount = 0;
     gVisualOffset       = 0;
 
-    if ((mtx == NULL) || (verts == NULL)) {
+    if (verts == NULL) {
         return;
     }
-    mtxf_to_mtx(mtx, gMatStack[1]);
 
     gSPDisplayList(gDisplayListHead++, dl_visual_surface);
-
-    gSPMatrix(gDisplayListHead++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 
     iterate_surfaces_visual(gMarioState->pos[0], gMarioState->pos[2], verts);
 
@@ -374,7 +370,6 @@ void visual_surface_loop(void) {
 
     visual_surface_display(verts, 1);
 
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
     gSPDisplayList(gDisplayListHead++, dl_debug_box_end);
 }
 
@@ -402,12 +397,12 @@ static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
 
 /**
  * Draw new boxes with the given color.
- * Color format is 32-bit ARGB.
+ * Color format is 32-bit RGBA.
  * If the alpha component is zero, DBG_BOX_ALPHA (0x7f) will be used instead.
- * Ex: 0xFF0000 becomes 0x7FFF0000
+ * Ex: 0xFF000000 becomes 0xFF00007F
  */
 void debug_box_color(u32 color) {
-    if ((color >> 24) == 0) color |= (DBG_BOX_ALPHA << 24);
+    if ((color & 0xFF) == 0) color |= (DBG_BOX_ALPHA);
     sCurBoxColor = color;
 }
 
@@ -456,34 +451,36 @@ void debug_box_pos_rot(Vec3f pMin, Vec3f pMax, s16 yaw, s32 type) {
 static void render_box(int index) {
     struct DebugBox *box = &sBoxes[index];
     s32 color = box->color;
+    Mat4 mtxFloat;
 
-    // Translate to the origin, rotate, then translate back, effectively rotating the box about its center
-    Mtx *mtx       = alloc_display_list(sizeof(Mtx));
-    Mtx *translate = alloc_display_list(sizeof(Mtx));
-    Mtx *rotate    = alloc_display_list(sizeof(Mtx));
-    Mtx *scale     = alloc_display_list(sizeof(Mtx));
+    // Allocate the transformation matrix for this box
+    Mtx *mtx = alloc_display_list(sizeof(Mtx));
 
-    if ((mtx       == NULL)
-     || (translate == NULL)
-     || (rotate    == NULL)
-     || (scale     == NULL)) return;
+    if (mtx == NULL) return;
 
-    mtxf_to_mtx(mtx, gMatStack[1]);
-    guTranslate(translate, box->center[0],  box->center[1],  box->center[2]);
-    guRotate(rotate, ((box->yaw / (f32)0x10000) * 360.0f), 0, 1.0f, 0);
-    guScale(scale, ((f32) box->bounds[0] * 0.01f),
-                   ((f32) box->bounds[1] * 0.01f),
-                   ((f32) box->bounds[2] * 0.01f));
+    // Calculate rotation matrix
+    guRotateF(mtxFloat, ((box->yaw / (f32)0x10000) * 360.0f), 0, 1.0f, 0);
 
-    gSPMatrix(gDisplayListHead++, mtx,       (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
-    gSPMatrix(gDisplayListHead++, translate, (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
-    gSPMatrix(gDisplayListHead++, rotate,    (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
-    gSPMatrix(gDisplayListHead++, scale,     (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+    // Apply scale to column vectors of matrix
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            mtxFloat[i][j] *= box->bounds[j] * 0.01f;
+        }
+    }
 
-    gDPSetEnvColor(gDisplayListHead++, ((color >> 16) & 0xFF),
-                                       ((color >>  8) & 0xFF),
-                                       ((color      ) & 0xFF),
-                                       ((color >> 24) & 0xFF));
+    // Copy translation into matrix
+    for (int i = 0; i < 3; i++) {
+        mtxFloat[3][i] = box->center[i];
+    }
+
+    // Convert the matrix from floating-point to fixed-point
+    mtxf_to_mtx(mtx, mtxFloat);
+
+    // Load the calculated matrix
+    gSPMatrix(gDisplayListHead++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+
+    // Set env color to the color of this box
+    gDPSetColor(gDisplayListHead++, G_SETENVCOLOR, color);
 
     if (box->type & DEBUG_SHAPE_BOX) {
         gSPDisplayList(gDisplayListHead++, dl_debug_box_verts);
@@ -491,8 +488,6 @@ static void render_box(int index) {
     if (box->type & DEBUG_SHAPE_CYLINDER) {
         gSPDisplayList(gDisplayListHead++, dl_debug_cylinder_verts);
     }
-
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
 void render_debug_boxes(s32 type) {

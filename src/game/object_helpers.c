@@ -28,17 +28,13 @@
 #include "spawn_sound.h"
 #include "puppylights.h"
 
-static s8 sLevelsWithRooms[] = { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC, -1 };
-
 static s32 clear_move_flag(u32 *bitSet, s32 flag);
 
 Gfx *geo_update_projectile_pos_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        Mat4 mtx2;
         struct Object *projObj = (struct Object *) gCurGraphNodeObject; // TODO: change global type to Object pointer
         if (projObj->prevObj) {
-            create_transformation_from_matrices(mtx2, mtx, *gCurGraphNodeCamera->matrixPtr);
-            obj_update_pos_from_parent_transformation(mtx2, projObj->prevObj);
+            obj_update_pos_from_parent_transformation(mtx, projObj->prevObj);
             obj_set_gfx_pos_from_pos(projObj->prevObj);
         }
     }
@@ -868,7 +864,7 @@ s32 cur_obj_has_model(ModelID16 modelID) {
 
 // HackerSM64 function
 ModelID32 obj_get_model_id(struct Object *obj) {
-    if (!obj->header.gfx.sharedChild) {
+    if (obj->header.gfx.sharedChild != NULL) {
         for (s32 i = MODEL_NONE; i < MODEL_ID_COUNT; i++) {
             if (obj->header.gfx.sharedChild == gLoadedGraphNodes[i]) {
                 return i;
@@ -1881,35 +1877,32 @@ s32 is_item_in_array(s8 item, s8 *array) {
 }
 
 void bhv_init_room(void) {
-    struct Surface *floor = NULL;
-    if (is_item_in_array(gCurrLevelNum, sLevelsWithRooms)) {
-        find_room_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-
-        if (floor != NULL) {
-            o->oRoom = floor->room;
-            return;
-        }
-    }
-    o->oRoom = -1;
+    o->oRoom = get_room_at_pos(o->oPosX, o->oPosY, o->oPosZ);
 }
 
-void cur_obj_enable_rendering_if_mario_in_room(void) {
+s32 is_mario_in_room(void) {
     if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
-        register s32 marioInRoom = (
-            gMarioCurrentRoom == o->oRoom
-            || gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom
-            || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom
-        );
-
-        if (marioInRoom) {
-            cur_obj_enable_rendering();
-            o->activeFlags &= ~ACTIVE_FLAG_IN_DIFFERENT_ROOM;
-            gNumRoomedObjectsInMarioRoom++;
-        } else {
-            cur_obj_disable_rendering();
-            o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
-            gNumRoomedObjectsNotInMarioRoom++;
+        if (
+            gMarioCurrentRoom == o->oRoom ||
+            gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom ||
+            gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom
+        ) {
+            return MARIO_INSIDE_ROOM;
         }
+        return MARIO_OUTSIDE_ROOM;
+    }
+    return MARIO_ROOM_UNDEFINED;
+}
+
+void cur_obj_enable_disable_room_rendering(s32 inRoom) {
+    if (inRoom == MARIO_INSIDE_ROOM) {
+        cur_obj_enable_rendering();
+        o->activeFlags &= ~ACTIVE_FLAG_IN_DIFFERENT_ROOM;
+        gNumRoomedObjectsInMarioRoom++;
+    } else if (inRoom == MARIO_OUTSIDE_ROOM) {
+        cur_obj_disable_rendering();
+        o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
+        gNumRoomedObjectsNotInMarioRoom++;
     }
 }
 

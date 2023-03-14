@@ -20,14 +20,10 @@ struct ObjectWarpNode {
     /*0x08*/ struct ObjectWarpNode *next;
 };
 
-// From Surface 0x1B to 0x1E
-#define INSTANT_WARP_INDEX_START  0x00 // Equal and greater than Surface 0x1B
-#define INSTANT_WARP_INDEX_STOP   0x04 // Less than Surface 0x1F
-
 struct InstantWarp {
     /*0x00*/ u8 id; // 0 = 0x1B / 1 = 0x1C / 2 = 0x1D / 3 = 0x1E
     /*0x01*/ u8 area;
-    /*0x02*/ Vec3s displacement;
+    /*0x04*/ Vec3f displacement;
 };
 
 struct SpawnInfo {
@@ -77,6 +73,9 @@ struct Area {
     /*0x34*/ u8 dialog[2]; // Level start dialog number (set by level script cmd 0x30)
     /*0x36*/ u16 musicParam;
     /*0x38*/ u16 musicParam2;
+#ifdef BETTER_REVERB
+    /*0x3A*/ u8 betterReverbPreset;
+#endif
 };
 
 // All the transition data to be used in screen_transition.c

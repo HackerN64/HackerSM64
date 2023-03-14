@@ -155,7 +155,7 @@ void bhv_snowmans_bottom_loop(void) {
 
 void bhv_snowmans_head_init(void) {
     u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
-    s8 behParams = GET_BPARAM1(o->oBehParams);
+    u8 behParams = GET_BPARAM1(o->oBehParams);
 
     cur_obj_scale(0.7f);
 

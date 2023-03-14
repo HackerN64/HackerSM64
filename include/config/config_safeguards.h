@@ -100,7 +100,7 @@
     #define PUPPYPRINT
 
     #undef PUPPYPRINT_DEBUG
-    #define PUPPYPRINT_DEBUG 1
+    #define PUPPYPRINT_DEBUG
 
     #undef VISUAL_DEBUG
     #define VISUAL_DEBUG
@@ -150,10 +150,6 @@
 /*****************
  * config_game.h
  */
-
-#ifdef DISABLE_LIVES
-    #undef SAVE_NUM_LIVES
-#endif // DISABLE_LIVES
 
 #ifndef START_LEVEL
     #define START_LEVEL LEVEL_CASTLE_GROUNDS

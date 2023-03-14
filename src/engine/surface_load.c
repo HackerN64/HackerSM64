@@ -23,6 +23,14 @@
  */
 SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
+struct CellCoords {
+    u8 z;
+    u8 x;
+    u8 partition;
+};
+struct CellCoords sCellsUsed[NUM_CELLS];
+u16 sNumCellsUsed;
+u8 sClearAllCells;
 
 /**
  * Pools of data that can contain either surface nodes or surfaces.
@@ -111,7 +119,6 @@ static void clear_static_surfaces(void) {
  */
 static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surface *surface) {
     struct SurfaceNode *list;
-    s32 priority;
     s32 sortDir = 1; // highest to lowest, then insertion order (water and floors)
     s32 listIndex;
 
@@ -127,26 +134,39 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         sortDir = 0; // insertion order
     }
 
-    s32 surfacePriority = surface->upperY * sortDir;
 
     struct SurfaceNode *newNode = alloc_surface_node(dynamic);
     newNode->surface = surface;
 
     if (dynamic) {
         list = &gDynamicSurfacePartition[cellZ][cellX][listIndex];
+        if (sNumCellsUsed >= sizeof(sCellsUsed) / sizeof(struct CellCoords)) {
+            sClearAllCells = TRUE;
+        } else {
+            if (list->next == NULL) {
+                sCellsUsed[sNumCellsUsed].z = cellZ;
+                sCellsUsed[sNumCellsUsed].x = cellX;
+                sCellsUsed[sNumCellsUsed].partition = listIndex;
+                sNumCellsUsed++;
+            }
+        }
     } else {
         list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
     }
 
     // Loop until we find the appropriate place for the surface in the list.
-    while (list->next != NULL) {
-        priority = list->next->surface->upperY * sortDir;
+    if (listIndex == SPATIAL_PARTITION_WATER) {
+        s32 surfacePriority = surface->upperY * sortDir;
+        s32 priority;
+        while (list->next != NULL) {
+            priority = list->next->surface->upperY * sortDir;
 
-        if (surfacePriority > priority) {
-            break;
+            if (surfacePriority > priority) {
+                break;
+            }
+
+            list = list->next;
         }
-
-        list = list->next;
     }
 
     newNode->next = list->next;
@@ -251,7 +271,15 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
 
     find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
-    vec3f_normalize(n);
+    f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
+    // This will never need to be run for custom levels because Fast64 does this step before exporting.
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    if (mag < NEAR_ZERO) {
+        return NULL;
+    }
+#endif
+    mag = 1.0f / sqrtf(mag);
+    vec3_mul_val(n, mag);
 
     struct Surface *surface = alloc_surface(dynamic);
 
@@ -470,6 +498,7 @@ u32 get_area_terrain_size(TerrainData *data) {
  * boxes (water, gas, JRB fog).
  */
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
     u32 surfacePoolData;
@@ -478,6 +507,9 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gEnvironmentRegions = NULL;
     gSurfaceNodesAllocated = 0;
     gSurfacesAllocated = 0;
+    bzero(&sCellsUsed, sizeof(sCellsUsed));
+    sNumCellsUsed = 0;
+    sClearAllCells = TRUE;
 
     clear_static_surfaces();
 
@@ -527,20 +559,29 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }
 
 /**
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
-
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
-
-        clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
+        if (sClearAllCells) {
+            clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
+        } else {
+            for (u32 i = 0; i < sNumCellsUsed; i++) {
+                gDynamicSurfacePartition[sCellsUsed[i].z][sCellsUsed[i].x][sCellsUsed[i].partition].next = NULL;
+            }
+        }
+        sNumCellsUsed = 0;
+        sClearAllCells = FALSE;
     }
+    profiler_collision_update(first);
 }
 
 /**
@@ -648,12 +689,13 @@ static void get_optimal_coll_dist(struct Object *obj) {
 }
 #endif
 
+static TerrainData sVertexData[600];
+
 /**
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
-    TerrainData vertexData[600];
-
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
     f32 marioDist = o->oDistanceToMario;
 
@@ -682,21 +724,22 @@ void load_object_collision_model(void) {
         && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
-        transform_object_vertices(&collisionData, vertexData);
+        transform_object_vertices(&collisionData, sVertexData);
 
         // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
         while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-            load_object_surfaces(&collisionData, vertexData, TRUE);
+            load_object_surfaces(&collisionData, sVertexData, TRUE);
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+    profiler_collision_update(first);
 }
 
 /**
  * Transform an object's vertices and add them to the static surface pool.
  */
 void load_object_static_model(void) {
-    TerrainData vertexData[600];
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
     u32 surfacePoolData;
 
@@ -707,11 +750,11 @@ void load_object_static_model(void) {
     gSurfacesAllocated = gNumStaticSurfaces;
 
     collisionData++;
-    transform_object_vertices(&collisionData, vertexData);
+    transform_object_vertices(&collisionData, sVertexData);
 
     // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
     while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-        load_object_surfaces(&collisionData, vertexData, FALSE);
+        load_object_surfaces(&collisionData, sVertexData, FALSE);
     }
 
     surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
@@ -720,4 +763,5 @@ void load_object_static_model(void) {
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }

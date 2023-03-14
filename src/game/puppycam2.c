@@ -564,7 +564,7 @@ void puppycam_init(void) {
     gPuppyCam.targetObj2 = NULL;
 
     gPuppyCam.intendedFlags = PUPPYCAM_BEHAVIOUR_DEFAULT;
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_PSS || (gCurrLevelNum == LEVEL_TTM && gCurrAreaIndex == 2) || (gCurrLevelNum == LEVEL_CCM && gCurrAreaIndex == 2)) {
         gPuppyCam.intendedFlags |= PUPPYCAM_BEHAVIOUR_SLIDE_CORRECTION;
     }
@@ -1009,7 +1009,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
-        debug_box_color(0x0000FF00);
+        debug_box_color(0x00FF0000);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, DEBUG_SHAPE_BOX | DEBUG_UCODE_DEFAULT);
 #endif
         // Now compare values.
@@ -1027,7 +1027,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
-        debug_box_color(0x0000FF00);
+        debug_box_color(0x00FF0000);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT);
 #endif
         f32 distCheck = (dist < sqr(sPuppyVolumeStack[index]->radius[0]));
@@ -1438,6 +1438,10 @@ void puppycam_loop(void) {
     if (!gPuppyCam.cutscene && sDelayedWarpOp == 0) {
         // Sets this before going through any possible modifications.
         gPuppyCam.flags = gPuppyCam.intendedFlags;
+#ifdef PUPPYPRINT_DEBUG
+        if (sPPDebugPage == PUPPYPRINT_PAGE_CAMERA)
+            gPuppyCam.flags |= PUPPYCAM_BEHAVIOUR_FREE | PUPPYCAM_BEHAVIOUR_PITCH_ROTATION | PUPPYCAM_BEHAVIOUR_YAW_ROTATION;
+#endif
         puppycam_input_core();
         puppycam_projection();
         puppycam_script();

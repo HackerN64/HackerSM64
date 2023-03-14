@@ -43,8 +43,9 @@ struct GfxPool *gGfxPool;
 
 // OS Controllers
 OSContStatus gControllerStatuses[4];
-OSContPad gControllerPads[4];
+OSContPadEx gControllerPads[4];
 u8 gControllerBits;
+s8 gGamecubeControllerPort = -1; // HackerSM64: This is set to -1 if there's no GC controller, 0 if there's one in the first port and 1 if there's one in the second port.
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -122,10 +123,7 @@ const Gfx init_rdp[] = {
     gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
     gsDPSetColorDither(G_CD_MAGICSQ),
     gsDPSetCycleType(G_CYC_FILL),
-
-// #ifdef VERSION_SH
     gsDPSetAlphaDither(G_AD_PATTERN),
-// #endif
     gsSPEndDisplayList(),
 };
 
@@ -136,13 +134,8 @@ const Gfx init_rsp[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD),
     gsSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING),
-    gsSPNumLights(NUMLIGHTS_1),
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
-    // @bug Failing to set the clip ratio will result in warped triangles in F3DEX2
-    // without this change: https://jrra.zone/n64/doc/n64man/gsp/gSPClipRatio.htm
-#ifdef F3DEX_GBI_2
-    gsSPClipRatio(FRUSTRATIO_1),
-#endif
+    gsSPClipRatio(FRUSTRATIO_2),
     gsSPEndDisplayList(),
 };
 
@@ -603,7 +596,7 @@ void read_controller_inputs(s32 threadID) {
         if (threadID == THREAD_5_GAME_LOOP) {
             osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         }
-        osContGetReadData(&gControllerPads[0]);
+        osContGetReadDataEx(&gControllerPads[0]);
 #if ENABLE_RUMBLE
         release_rumble_pak_control();
 #endif
@@ -614,9 +607,20 @@ void read_controller_inputs(s32 threadID) {
 
     for (i = 0; i < 2; i++) {
         struct Controller *controller = &gControllers[i];
-
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
+            // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
+            if (gIsConsole && i == gGamecubeControllerPort) {
+                u32 oldButton = controller->controllerData->button;
+                u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
+                if (oldButton & Z_TRIG) {
+                    newButton |= L_TRIG;
+                }
+                if (controller->controllerData->l_trig > 85) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
+                    newButton |= Z_TRIG;
+                }
+                controller->controllerData->button = newButton;
+            }
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
             controller->buttonPressed = ~controller->buttonDown & controller->controllerData->button;
@@ -691,6 +695,15 @@ void init_controllers(void) {
             gControllers[cont++].controllerData = &gControllerPads[port];
         }
     }
+    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && (gIsConsole)) {
+        gGamecubeControllerPort = 1;
+        gPlayer1Controller = &gControllers[1];
+    } else {
+        if (__osControllerTypes[0] == CONT_TYPE_GCN) {
+            gGamecubeControllerPort = 0;
+        }
+        gPlayer1Controller = &gControllers[0];
+    }
 }
 
 // Game thread core
@@ -714,6 +727,10 @@ void setup_game_memory(void) {
     gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
+#ifdef PUPPYPRINT_DEBUG
+    set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
+    set_segment_memory_printout(SEGMENT_DEMO_INPUTS, DEMO_INPUTS_POOL_SIZE);
+#endif
     // Setup Demo Inputs List
     gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
@@ -763,25 +780,29 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
-
+#ifdef PUPPYPRINT_DEBUG
+    bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
+#endif
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
         if (gControllerBits) {
 #if ENABLE_RUMBLE
             block_until_rumble_pak_free();
 #endif
-            osContStartReadData(&gSIEventMesgQueue);
+            osContStartReadDataEx(&gSIEventMesgQueue);
         }
 
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
-        profiler_update(PROFILER_TIME_CONTROLLERS);
+        profiler_update(PROFILER_TIME_CONTROLLERS, 0);
+        profiler_collision_reset();
         addr = level_script_execute(addr);
-#if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
+        profiler_collision_completed();
+#if !defined(PUPPYPRINT_DEBUG) && defined(VISUAL_DEBUG)
         debug_box_input();
 #endif
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         puppyprint_profiler_process();
 #endif
 
