@@ -120,25 +120,20 @@ Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void 
 
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
-    RoomData room = -1;
+    RoomData room;
 
-    if (callContext == GEO_CONTEXT_RENDER) {
-        if (gMarioObject == NULL) {
-            switchCase->selectedCase = 0;
-        } else {
-            // ~50us
-            room = get_room_at_pos(
-                gMarioObject->oPosX,
-                gMarioObject->oPosY,
-                gMarioObject->oPosZ
-            );
+    if (callContext == GEO_CONTEXT_RENDER && gMarioObject != NULL) {
+        room = get_room_at_pos(
+            gMarioObject->oPosX,
+            gMarioObject->oPosY,
+            gMarioObject->oPosZ
+        );
 
-            gMarioCurrentRoom = room;
-            print_debug_top_down_objectinfo("areainfo %d", room);
+        gMarioCurrentRoom = room;
+        print_debug_top_down_objectinfo("areainfo %d", room);
 
-            if (room > 0) {
-                switchCase->selectedCase = (room - 1);
-            }
+        if (room > 0) {
+            switchCase->selectedCase = (room - 1);
         }
     } else {
         switchCase->selectedCase = 0;
