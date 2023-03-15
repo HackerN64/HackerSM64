@@ -822,9 +822,8 @@ void cur_obj_update(void) {
 
     s32 inRoom = cur_obj_is_mario_in_room();
 
-    if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)
-     && (inRoom == MARIO_OUTSIDE_ROOM)) {
-        cur_obj_disable_rendering_in_room();
+    if (inRoom == MARIO_OUTSIDE_ROOM && (objFlags & OBJ_FLAG_ONLY_PROCESS_INSIDE_ROOM)) {
+        cur_obj_enable_disable_room_rendering(MARIO_OUTSIDE_ROOM);
         return;
     }
 
@@ -927,8 +926,7 @@ void cur_obj_update(void) {
     // Handle visibility of object
     if (o->oRoom != -1) {
         // If the object is in a room, only show it when Mario is in the room.
-        if ((objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
-         || distanceFromMario < o->oDrawingDistance) {
+        if ((objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR) || distanceFromMario < o->oDrawingDistance) {
             if (inRoom == MARIO_OUTSIDE_ROOM) {
                 cur_obj_disable_rendering_in_room();
             } else if (inRoom == MARIO_INSIDE_ROOM) {

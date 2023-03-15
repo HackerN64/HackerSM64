@@ -498,6 +498,7 @@ u32 get_area_terrain_size(TerrainData *data) {
  * boxes (water, gas, JRB fog).
  */
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
     u32 surfacePoolData;
@@ -558,12 +559,14 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }
 
 /**
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
@@ -578,6 +581,7 @@ void clear_dynamic_surfaces(void) {
         sNumCellsUsed = 0;
         sClearAllCells = FALSE;
     }
+    profiler_collision_update(first);
 }
 
 /**
@@ -691,6 +695,7 @@ static TerrainData sVertexData[600];
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
     f32 marioDist = o->oDistanceToMario;
 
@@ -727,12 +732,14 @@ void load_object_collision_model(void) {
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+    profiler_collision_update(first);
 }
 
 /**
  * Transform an object's vertices and add them to the static surface pool.
  */
 void load_object_static_model(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
     u32 surfacePoolData;
 
@@ -756,4 +763,5 @@ void load_object_static_model(void) {
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }
