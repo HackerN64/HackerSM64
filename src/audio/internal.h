@@ -734,6 +734,7 @@ struct NoteSynthesisBuffers {
 
 #ifdef BETTER_REVERB
 struct BetterReverbSettings {
+    u8 useLightweightSettings;
     s8 downsampleRate;
     u8 isMono;
     u8 filterCount;
