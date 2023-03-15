@@ -34,7 +34,10 @@ void set_door_camera_event(void) {
 }
 
 void play_door_open_noise(void) {
-    s32 isMetalDoor = (cur_obj_has_model(MODEL_HMC_METAL_DOOR) || cur_obj_has_model(MODEL_CASTLE_METAL_DOOR));
+    s32 isMetalDoor = (
+        cur_obj_has_model(MODEL_HMC_METAL_DOOR) ||
+        cur_obj_has_model(MODEL_CASTLE_METAL_DOOR)
+    );
     if (o->oTimer == 0) {
         cur_obj_play_sound_2(sDoorOpenSounds[isMetalDoor]);
         gTimeStopState |= TIME_STOP_MARIO_OPENED_DOOR;
@@ -45,7 +48,10 @@ void play_door_open_noise(void) {
 }
 
 void play_warp_door_open_noise(void) {
-    s32 isMetalDoor = (cur_obj_has_model(MODEL_HMC_METAL_DOOR) || cur_obj_has_model(MODEL_CASTLE_METAL_DOOR));
+    s32 isMetalDoor = (
+        cur_obj_has_model(MODEL_HMC_METAL_DOOR) ||
+        cur_obj_has_model(MODEL_CASTLE_METAL_DOOR)
+    );
     if (o->oTimer == 30) {
         cur_obj_play_sound_2(sDoorCloseSounds[isMetalDoor]);
     }
@@ -121,18 +127,17 @@ void bhv_door_init(void) {
 }
 
 void bhv_door_rendering_loop(void) {
-    s16 marioRoom = gMarioCurrentRoom;
-    struct TransitionRoomData* transitionRoom = &gDoorAdjacentRooms[marioRoom];
+    struct TransitionRoomData* transitionRoom = &gDoorAdjacentRooms[gMarioCurrentRoom];
 
     o->oDoorIsRendering = (
-        marioRoom == 0                                      // Mario is in the "global" room.
-     || marioRoom == o->oDoorSelfRoom                       // Mario is in the same room as the door.
-     || marioRoom == o->oDoorForwardRoom                    // Mario is in the door's  forward room.
-     || marioRoom == o->oDoorBackwardRoom                   // Mario is in the door's backward room.
-     || transitionRoom->forwardRoom  == o->oDoorForwardRoom  // The transition room's  forward room is in the same room as this door's  forward room.
-     || transitionRoom->forwardRoom  == o->oDoorBackwardRoom // The transition room's  forward room is in the same room as this door's backward room.
-     || transitionRoom->backwardRoom == o->oDoorForwardRoom  // The transition room's backward room is in the same room as this door's  forward room.
-     || transitionRoom->backwardRoom == o->oDoorBackwardRoom // The transition room's backward room is in the same room as this door's backward room.
+        gMarioCurrentRoom            == 0                    || // Mario is in the "global" room.
+        gMarioCurrentRoom            == o->oDoorSelfRoom     || // Mario is in the same room as the door.
+        gMarioCurrentRoom            == o->oDoorForwardRoom  || // Mario is in the door's  forward room.
+        gMarioCurrentRoom            == o->oDoorBackwardRoom || // Mario is in the door's backward room.
+        transitionRoom->forwardRoom  == o->oDoorForwardRoom  || // The transition room's  forward room is in the same room as this door's  forward room.
+        transitionRoom->forwardRoom  == o->oDoorBackwardRoom || // The transition room's  forward room is in the same room as this door's backward room.
+        transitionRoom->backwardRoom == o->oDoorForwardRoom  || // The transition room's backward room is in the same room as this door's  forward room.
+        transitionRoom->backwardRoom == o->oDoorBackwardRoom    // The transition room's backward room is in the same room as this door's backward room.
     );
 
     COND_BIT(o->oDoorIsRendering, o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
