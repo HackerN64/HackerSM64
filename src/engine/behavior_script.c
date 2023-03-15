@@ -822,7 +822,7 @@ void cur_obj_update(void) {
 
     s32 inRoom = is_mario_in_room();
 
-    if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
+    if (objFlags & OBJ_FLAG_ONLY_PROCESS_INSIDE_ROOM) {
         if (inRoom == MARIO_OUTSIDE_ROOM) {
             cur_obj_enable_disable_room_rendering(MARIO_OUTSIDE_ROOM);
             return;
