@@ -908,7 +908,7 @@ static void puppycam_view_panning(void) {
     s32 expectedPanX, expectedPanZ;
     s32 height = gPuppyCam.targetObj->oPosY;
      //Removes the basic panning when idling if the zoom level is at the closest.
-    s32 panEx = ((gPuppyCam.zoomTarget >= 1000) * 200) * (1.0f + MIN(gMarioState->forwardVel / 24.0f, 1.5f));
+    s32 panEx = ((gPuppyCam.zoomTarget >= 1000) * 200) * (1.0f + MIN(gMarioState->forwardVel / 16.0f, 2.0f));
     f32 slideSpeed = 1.0f;
 
     f32 panMulti = CLAMP(gPuppyCam.zoom / (f32)gPuppyCam.zoomPoints[2], 0.f, 1.f);
