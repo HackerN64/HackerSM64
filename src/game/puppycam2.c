@@ -918,13 +918,15 @@ static void puppycam_view_panning(void) {
     if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_PANSHIFT && gMarioState->action != ACT_HOLDING_BOWSER && gMarioState->action != ACT_SLEEPING && gMarioState->action != ACT_START_SLEEPING) {
         if (gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE) {
             slideSpeed = 10.0f;
+        } else if (gMarioState->action & ACT_FLAG_MOVING) {
+            slideSpeed = MIN(gMarioState->forwardVel / 12.0f, 3.0f);
         }
         f32 speedMul = panEx + (400.0f * CLAMP(gMarioState->forwardVel / 320.0f, 0.25f, 1.0f));
         expectedPanX = LENCOS(LENSIN(speedMul, gMarioState->faceAngle[1] - gPuppyCam.yaw) * panMulti, ABS(gPuppyCam.yaw));
         expectedPanZ = LENSIN(LENCOS(speedMul, gMarioState->faceAngle[1]) * panMulti, ABS(gPuppyCam.yaw));
 
-        gPuppyCam.pan[0] = approach_f32_asymptotic(gPuppyCam.pan[0], expectedPanX, 0.03f*slideSpeed);
-        gPuppyCam.pan[2] = approach_f32_asymptotic(gPuppyCam.pan[2], expectedPanZ, 0.03f*slideSpeed);
+        gPuppyCam.pan[0] = approach_f32_asymptotic(gPuppyCam.pan[0], expectedPanX, 0.01f * slideSpeed);
+        gPuppyCam.pan[2] = approach_f32_asymptotic(gPuppyCam.pan[2], expectedPanZ, 0.01f * slideSpeed);
         if (gMarioState->vel[1] == 0.0f) {
             f32 panFloor = CLAMP(find_floor_height((s16)(gPuppyCam.targetObj->oPosX+expectedPanX), (s16)(gPuppyCam.targetObj->oPosY + 200),
             (s16)(gPuppyCam.targetObj->oPosZ+expectedPanZ)), gPuppyCam.targetObj->oPosY - 50,gPuppyCam.targetObj->oPosY + 50);
