@@ -61,8 +61,4 @@ void bhv_star_door_loop(void) {
             o->oAction = STAR_DOOR_ACT_CLOSED;
             break;
     }
-
-    load_object_collision_model();
-
-    bhv_door_rendering_loop();
 }
