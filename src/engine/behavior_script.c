@@ -820,13 +820,11 @@ void cur_obj_update(void) {
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
-    s32 inRoom = is_mario_in_room();
+    s32 inRoom = cur_obj_is_mario_in_room();
 
-    if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
-        if (inRoom == MARIO_OUTSIDE_ROOM) {
-            cur_obj_enable_disable_room_rendering(MARIO_OUTSIDE_ROOM);
-            return;
-        }
+    if (inRoom == MARIO_OUTSIDE_ROOM && (objFlags & OBJ_FLAG_ONLY_PROCESS_INSIDE_ROOM)) {
+        cur_obj_disable_rendering_in_room();
+        return;
     }
 
     // Calculate the distance from the object to Mario.
@@ -932,7 +930,11 @@ void cur_obj_update(void) {
             (objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
             || distanceFromMario < o->oDrawingDistance
         ) {
-            cur_obj_enable_disable_room_rendering(inRoom);
+            if (inRoom == MARIO_OUTSIDE_ROOM) {
+                cur_obj_disable_rendering_in_room();
+            } else if (inRoom == MARIO_INSIDE_ROOM) {
+                cur_obj_enable_rendering_in_room();
+            }
             o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
         } else {
             o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
