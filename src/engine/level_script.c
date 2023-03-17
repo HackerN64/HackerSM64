@@ -347,6 +347,9 @@ void unmap_tlbs(void) {
                     osUnmapTLB(gTlbEntries);
                     gTlbSegments[i]--;
                     gTlbEntries--;
+#ifdef PUPPYPRINT_DEBUG
+                    set_segment_memory_printout(i, 0);
+#endif
                 }
             } else {
                 gTlbEntries -= gTlbSegments[i];
@@ -823,7 +826,7 @@ static void level_cmd_puppyvolume(void) {
     if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume))) == NULL) {
         sCurrentCmd = CMD_NEXT;
         gPuppyError |= PUPPY_ERROR_POOL_FULL;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppycamera volume allocation failed.");
 #endif
         return;
@@ -873,7 +876,7 @@ static void level_cmd_puppylight_node(void) {
 #ifdef PUPPYLIGHTS
     gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight));
     if (gPuppyLights[gNumLights] == NULL) {
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppylight allocation failed.");
 #endif
         sCurrentCmd = CMD_NEXT;

@@ -205,10 +205,13 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 numCollisions = 0;
     s32 x = colData->x;
     s32 z = colData->z;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_wall);
+    PUPPYPRINT_GET_SNAPSHOT();
 
     colData->numWalls = 0;
 
     if (is_outside_level_bounds(x, z)) {
+        profiler_collision_update(first);
         return numCollisions;
     }
 
@@ -232,6 +235,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     gNumCalls.wall++;
 #endif
 
+    profiler_collision_update(first);
     return numCollisions;
 }
 
@@ -347,12 +351,15 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     f32 height        = CELL_HEIGHT_LIMIT;
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_ceil);
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 x = posX;
     s32 y = posY;
     s32 z = posZ;
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+        profiler_collision_update(first);
         return height;
     }
 
@@ -395,6 +402,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     gNumCalls.ceil++;
 #endif
 
+    profiler_collision_update(first);
     return height;
 }
 
@@ -575,6 +583,9 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
  * Find the highest floor under a given position and return the height.
  */
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_floor);
+    PUPPYPRINT_GET_SNAPSHOT();
+
     f32 height        = FLOOR_LOWER_LIMIT;
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
@@ -588,6 +599,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+        profiler_collision_update(first);
         return height;
     }
     // Each level is split into cells to limit load, find the appropriate cell.
@@ -632,11 +644,14 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     // Increment the debug tracker.
     gNumCalls.floor++;
 #endif
+
+    profiler_collision_update(first);
     return height;
 }
 
 f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor) {
-    gCollisionFlags |= (COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+    gCollisionFlags |= (COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+
     return find_floor(x, y, z, pfloor);
 }
 
@@ -646,11 +661,14 @@ f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor) {
 s32 get_room_at_pos(f32 x, f32 y, f32 z) {
     if (gCurrentArea->surfaceRooms != NULL) {
         struct Surface *floor;
+
         find_room_floor(x, y, z, &floor);
-        if (floor) {
+
+        if (floor != NULL) {
             return floor->room;
         }
     }
+
     return -1;
 }
 
@@ -698,6 +716,8 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_water);
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 waterLevel = find_water_floor(x, y, z, &floor);
 
     if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
@@ -723,6 +743,7 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
         *pfloor = floor;
     }
 
+    profiler_collision_update(first);
     return waterLevel;
 }
 
@@ -734,6 +755,8 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_water);
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
@@ -757,6 +780,8 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
         }
     }
 
+    profiler_collision_update(first);
+
     return waterLevel;
 }
 
@@ -768,6 +793,8 @@ s32 find_poison_gas_level(s32 x, s32 z) {
     s32 loX, hiX, loZ, hiZ;
     s32 gasLevel = FLOOR_LOWER_LIMIT;
     TerrainData *p = gEnvironmentRegions;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_water);
+    PUPPYPRINT_GET_SNAPSHOT();
 
     if (p != NULL) {
         s32 numRegions = *p++;
@@ -793,7 +820,8 @@ s32 find_poison_gas_level(s32 x, s32 z) {
             p += 6;
         }
     }
-
+    
+    profiler_collision_update(first);
     return gasLevel;
 }
 

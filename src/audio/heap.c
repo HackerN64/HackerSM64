@@ -301,7 +301,7 @@ void sound_init_main_pools(s32 sizeForAudioInitPool) {
     sound_alloc_pool_init(&gAudioSessionPool, (gAudioHeap + sizeForAudioInitPool), (gAudioHeapSize - sizeForAudioInitPool));
 }
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 void puppyprint_get_allocated_pools(s32 *audioPoolList) {
     u32 i, j;
     const struct SoundAllocPool *pools[NUM_AUDIO_POOLS] = {
@@ -1051,6 +1051,7 @@ void init_reverb_us(s32 presetId) {
     // This will likely crash if given an invalid preset value. Adding a safety check here isn't worth the usability interference.
     struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPreset];
 
+    betterReverbLightweight = betterReverbPreset->useLightweightSettings;
     betterReverbDownsampleRate = betterReverbPreset->downsampleRate;
     monoReverb = betterReverbPreset->isMono;
     reverbFilterCount = betterReverbPreset->filterCount;
@@ -1204,7 +1205,7 @@ void audio_reset_session(void) {
 #if defined(VERSION_JP) || defined(VERSION_US)
     s8 updatesPerFrame;
 #endif
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
     s32 j;
@@ -1436,7 +1437,7 @@ void audio_reset_session(void) {
         gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
     }
 #endif
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     append_puppyprint_log("Audio Initialised in %dc.", (s32)(osGetTime() - first));
 #else
