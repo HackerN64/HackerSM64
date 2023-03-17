@@ -34,10 +34,7 @@ void set_door_camera_event(void) {
 }
 
 void play_door_open_noise(void) {
-    s32 isMetalDoor = (
-        cur_obj_has_model(MODEL_HMC_METAL_DOOR) ||
-        cur_obj_has_model(MODEL_CASTLE_METAL_DOOR)
-    );
+    s32 isMetalDoor = cur_obj_has_model(MODEL_METAL_DOOR);
     if (o->oTimer == 0) {
         cur_obj_play_sound_2(sDoorOpenSounds[isMetalDoor]);
         gTimeStopState |= TIME_STOP_MARIO_OPENED_DOOR;
@@ -48,10 +45,7 @@ void play_door_open_noise(void) {
 }
 
 void play_warp_door_open_noise(void) {
-    s32 isMetalDoor = (
-        cur_obj_has_model(MODEL_HMC_METAL_DOOR) ||
-        cur_obj_has_model(MODEL_CASTLE_METAL_DOOR)
-    );
+    s32 isMetalDoor = cur_obj_has_model(MODEL_METAL_DOOR);
     if (o->oTimer == 30) {
         cur_obj_play_sound_2(sDoorCloseSounds[isMetalDoor]);
     }

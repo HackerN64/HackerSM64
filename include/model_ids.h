@@ -46,7 +46,7 @@
 #define MODEL_BBH_HAUNTED_DOOR                 0x1D        // haunted_door_geo
 #define MODEL_HMC_WOODEN_DOOR                  0x1D        // wooden_door_geo
 #define MODEL_UNKNOWN_DOOR_1E                  0x1E        // referenced in special presets, undefined
-#define MODEL_HMC_METAL_DOOR                   0x1F        // metal_door_geo
+#define MODEL_UNUSED_1F                        0x1F        // unused, previously metal_door_geo
 #define MODEL_HMC_HAZY_MAZE_DOOR               0x20        // hazy_maze_door_geo
 #define MODEL_UNKNOWN_DOOR_21                  0x21        // referenced in special presets, undefined
 #define MODEL_CASTLE_DOOR_0_STARS              0x22        // castle_door_0_star_geo
@@ -59,8 +59,10 @@
 #define MODEL_COURTYARD_WOODEN_DOOR            0x27        // wooden_door_geo
 #define MODEL_CCM_CABIN_DOOR                   0x27        // cabin_door_geo
 #define MODEL_UNKNOWN_DOOR_28                  0x28        // referenced in special presets, undefined
-#define MODEL_CASTLE_METAL_DOOR                0x29        // metal_door_geo
-#define MODEL_CASTLE_GROUNDS_METAL_DOOR        0x29        // metal_door_geo
+#define MODEL_METAL_DOOR                       0x29        // metal_door_geo
+#define MODEL_HMC_METAL_DOOR                   MODEL_METAL_DOOR // metal_door_geo
+#define MODEL_CASTLE_METAL_DOOR                MODEL_METAL_DOOR // metal_door_geo
+#define MODEL_CASTLE_GROUNDS_METAL_DOOR        MODEL_METAL_DOOR // metal_door_geo
 #define MODEL_UNKNOWN_DOOR_2A                  0x2A        // referenced in special presets, undefined
 #define MODEL_UNKNOWN_DOOR_2B                  0x2B        // referenced in special presets, undefined
 #define MODEL_WF_TOWER_TRAPEZOID_PLATORM       0x2C        // wf_geo_000AF8 - unused
