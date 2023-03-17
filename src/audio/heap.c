@@ -1051,6 +1051,7 @@ void init_reverb_us(s32 presetId) {
     // This will likely crash if given an invalid preset value. Adding a safety check here isn't worth the usability interference.
     struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPreset];
 
+    betterReverbLightweight = betterReverbPreset->useLightweightSettings;
     betterReverbDownsampleRate = betterReverbPreset->downsampleRate;
     monoReverb = betterReverbPreset->isMono;
     reverbFilterCount = betterReverbPreset->filterCount;
