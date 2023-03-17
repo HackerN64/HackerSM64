@@ -87,7 +87,7 @@ static const struct ControlType sControlsDescriptions[] = {
     [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = "A",                  .description = "jump to specific address"},
     [CONT_DESC_TOGGLE_ASCII     ] = { .control = "B",                  .description = "toggle bytes as hex or ascii"},
     [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = "A",                  .description = "toggle function names"},
-    [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = "B",   
+    [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = "B",                  .description = "toggle unknowns in list"},
 };
 
 
