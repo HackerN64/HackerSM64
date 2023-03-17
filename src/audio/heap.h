@@ -129,7 +129,7 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size);
 void *sound_alloc_uninitialized(struct SoundAllocPool *pool, u32 size);
 void sound_init_main_pools(s32 sizeForAudioInitPool);
 void sound_alloc_pool_init(struct SoundAllocPool *pool, void *memAddr, u32 size);
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 void puppyprint_get_allocated_pools(s32 *audioPoolList);
 #endif
 #ifdef VERSION_SH

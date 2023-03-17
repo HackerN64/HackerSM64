@@ -349,14 +349,13 @@ void thread4_sound(UNUSED void *arg) {
         OSMesg msg;
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
-        profiler_audio_started();
+        profiler_audio_started(); // also starts PROFILER_TIME_SUB_AUDIO_UPDATE inside
         if (gResetTimer < 25) {
-            struct SPTask *spTask;
-            spTask = create_next_audio_frame_task();
+            struct SPTask *spTask = create_next_audio_frame_task();
             if (spTask != NULL) {
                 dispatch_audio_sptask(spTask);
             }
         }
-        profiler_audio_completed();
+        profiler_audio_completed(); // also completes PROFILER_TIME_SUB_AUDIO_UPDATE inside
     }
 }

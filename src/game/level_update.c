@@ -437,6 +437,11 @@ void init_mario_after_warp(void) {
         }
 #endif
     }
+#ifdef PUPPYPRINT_DEBUG
+    gPuppyWarp = 0;
+    gLastWarpID = sWarpDest.nodeId;
+    gPuppyWarpArea = 0;
+#endif
 }
 
 // used for warps inside one level
@@ -835,6 +840,12 @@ void initiate_delayed_warp(void) {
     struct ObjectWarpNode *warpNode;
     s32 destWarpNode;
 
+#ifdef PUPPYPRINT_DEBUG
+    if (gPuppyWarp) {
+        initiate_warp(gPuppyWarp, gPuppyWarpArea, 0x0A, 0);
+    }
+#endif
+
     if (sDelayedWarpOp != WARP_OP_NONE && --sDelayedWarpTimer == 0) {
         reset_dialog_render_state();
 
@@ -986,18 +997,31 @@ s32 play_mode_normal(void) {
     warp_area();
     check_instant_warp();
 
+#ifdef PUPPYPRINT_DEBUG
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+        if (sTimerRunning && gHudDisplay.timer < 17999) {
+            gHudDisplay.timer++;
+        }
+        area_update_objects();
+    }
+#else
     if (sTimerRunning && gHudDisplay.timer < 17999) {
         gHudDisplay.timer++;
     }
-
     area_update_objects();
+#endif
     update_hud_values();
 #ifdef PUPPYLIGHTS
     delete_lights();
 #endif
-
     if (gCurrentArea != NULL) {
+#ifdef PUPPYPRINT_DEBUG
+        if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+            update_camera(gCurrentArea->camera);
+        }
+#else
         update_camera(gCurrentArea->camera);
+#endif
     }
 
     initiate_painting_warp();
@@ -1019,7 +1043,7 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_PAUSED);
         }
     }
-
+    
     return FALSE;
 }
 
@@ -1167,7 +1191,7 @@ s32 update_level(void) {
 
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
 
@@ -1253,7 +1277,7 @@ s32 init_level(void) {
     puppylights_allocate();
 #endif
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     append_puppyprint_log("Level loaded in %dc", (s32)(osGetTime() - first));
 #else

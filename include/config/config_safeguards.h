@@ -100,7 +100,7 @@
     #define PUPPYPRINT
 
     #undef PUPPYPRINT_DEBUG
-    #define PUPPYPRINT_DEBUG 1
+    #define PUPPYPRINT_DEBUG
 
     #undef VISUAL_DEBUG
     #define VISUAL_DEBUG
