@@ -397,7 +397,7 @@ OSThread *get_crashed_thread(void) {
     return NULL;
 }
 
-extern RGBA16 sRenderedFramebuffer;
+extern u16 sRenderedFramebuffer;
 extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 void audio_signal_game_loop_tick(void);
 void stop_sounds_in_continuous_banks(void);
