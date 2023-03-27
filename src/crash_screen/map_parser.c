@@ -31,6 +31,7 @@ static u32 headless_pi_status(void) {
 
 void map_data_init(void) {
     headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), RAM_1MB);
+
     while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 
@@ -42,10 +43,14 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
 s32 is_in_code_segment(uintptr_t addr) {
-    return (IS_IN_RAM(addr)
-        && (IS_IN_SEGMENT(addr, main)
-         || IS_IN_SEGMENT(addr, engine)
-         || IS_IN_SEGMENT(addr, goddard)));
+    return (
+        IS_IN_RAM(addr) &&
+        (
+            IS_IN_SEGMENT(addr, main   ) ||
+            IS_IN_SEGMENT(addr, engine ) ||
+            IS_IN_SEGMENT(addr, goddard)
+        )
+    );
 }
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -56,7 +61,9 @@ char *parse_map(uintptr_t *addr) {
                 if (gMapEntries[i].addr > *addr) {
                     i--;
                 }
+
                 *addr = gMapEntries[i].addr;
+
                 return (char*) ((uintptr_t)gMapStrings + gMapEntries[i].name_offset);
             }
         }
