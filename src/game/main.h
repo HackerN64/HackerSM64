@@ -16,12 +16,6 @@ enum VIModes {
 #define THREAD5_STACK 0x2000
 #define THREAD6_STACK 0x400
 
-enum VIModes {
-    MODE_NTSC,
-    MODE_MPAL,
-    MODE_PAL,
-};
-
 enum ThreadID {
     THREAD_0,
     THREAD_1_IDLE,

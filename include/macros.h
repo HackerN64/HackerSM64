@@ -35,9 +35,9 @@
 
 // Fall through a switch case.
 #ifdef __GNUC__
-#define NORETURN __attribute__((noreturn))
+#define FALL_THROUGH __attribute__((fallthrough))
 #else
-#define NORETURN
+#define FALL_THROUGH
 #endif
 
 // Use Og when compiling the function.
