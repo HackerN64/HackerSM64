@@ -4,6 +4,7 @@
 #include "sm64.h"
 #include "crash_screen.h"
 #include "crash_screen_draw.h"
+#include "crash_screen_print.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/game_init.h"
@@ -173,7 +174,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
 }
 
 void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color) {
-    if (glyph == 0) { // Null
+    if (glyph == CHAR_NULL) { // Null
         color = COLOR_RGBA32_GRAY;
     }
     const Alpha alpha = RGBA32_A(color);
@@ -280,17 +281,21 @@ void draw_crashed_image_i4(void) {
 
         // Convert upper 4 bits to RGBA16
         color = (srcColor & (MSK_I4 << shiftUpper));
-        *fb_u16++ = (SSHIFTL(color, (IDX_RGBA16_R + diffShiftUpper)) // color << 8
-                   | SSHIFTL(color, (IDX_RGBA16_G + diffShiftUpper)) // color << 3
-                   | SSHIFTL(color, (IDX_RGBA16_B + diffShiftUpper)) // color >> 2
-                   | MSK_RGBA16_A);
+        *fb_u16++ = (
+            SSHIFTL(color, (IDX_RGBA16_R + diffShiftUpper)) | // color <<  8
+            SSHIFTL(color, (IDX_RGBA16_G + diffShiftUpper)) | // color <<  3
+            SSHIFTL(color, (IDX_RGBA16_B + diffShiftUpper)) | // color >>  2
+            MSK_RGBA16_A
+        );
 
         // Convert lower 4 bits to RGBA16
         color = (srcColor & (MSK_I4 << shiftLower));
-        *fb_u16++ = (SSHIFTL(color, (IDX_RGBA16_R + diffShiftLower)) // color << 12
-                   | SSHIFTL(color, (IDX_RGBA16_G + diffShiftLower)) // color <<  7
-                   | SSHIFTL(color, (IDX_RGBA16_B + diffShiftLower)) // color <<  2
-                   | MSK_RGBA16_A);
+        *fb_u16++ = (
+            SSHIFTL(color, (IDX_RGBA16_R + diffShiftLower)) | // color << 12
+            SSHIFTL(color, (IDX_RGBA16_G + diffShiftLower)) | // color <<  7
+            SSHIFTL(color, (IDX_RGBA16_B + diffShiftLower)) | // color <<  2
+            MSK_RGBA16_A
+        );
     }
 }
 #endif // CRASH_SCREEN_CRASH_SCREEN
