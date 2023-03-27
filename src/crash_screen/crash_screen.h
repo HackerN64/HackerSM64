@@ -27,17 +27,23 @@ enum CrashPages {
     PAGES_MAX = 255,
 };
 
-enum CrashScreenDirectionFlags {
-    CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE         = 0x0,
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP       = BIT(0),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN     = BIT(1),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT     = BIT(2),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT    = BIT(3),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP    = BIT(4),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN  = BIT(5),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT  = BIT(6),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT = BIT(7),
-};
+typedef union {
+    struct PACKED {
+        u8 up    : 1;
+        u8 down  : 1;
+        u8 left  : 1;
+        u8 right : 1;
+        u8 : 4;
+    } pressed;
+    struct PACKED {
+        u8 : 4;
+        u8 up    : 1;
+        u8 down  : 1;
+        u8 left  : 1;
+        u8 right : 1;
+    } held;
+    u8 raw;
+} CrashScreenDirections;
 
 enum ControlTypes {
     CONT_DESC_LIST_END = -1,

@@ -6,7 +6,7 @@
 
 
 #define INSN_ID_1(opcode, rs, rt, rd, shift, function, paramType, name) \
-    {{.i={  opcode,      rs,      rt,      rd,   shift, function}}, paramType, name     },
+    {{  opcode,      rs,      rt,      rd,   shift, function}, paramType, name     },
 
 #ifdef DISASM_INCLUDE_ALL_INSTRUCTIONS
     #define INSN_ID_0(opcode, rs, rt, rd, shift, function, paramType, name) INSN_ID_1(opcode, rs, rt, rd, shift, function, paramType, name)
@@ -60,28 +60,22 @@ enum InsnParamTypes {
     PARAM_UNK, // unimpl
 };
 
-// Lower 16 bits of instruction
-typedef struct PACKED {
-    /*0x00*/ u16 rd        : 5; // fs
-    /*0x00*/ u16 sa        : 5; // fd
-    /*0x01*/ u16 function  : 6;
-} RTypeData; /*0x02*/
-
-// Instruction struct
-typedef struct PACKED {
-    /*0x00*/ u16 opcode : 6;
-    /*0x00*/ u16 rs     : 5; // fr
-    /*0x01*/ u16 rt     : 5; // ft
-    /*0x02*/ union {
-                 RTypeData rdata;
-                 u16 immediate;
-             };
-} Insn; /*0x04*/
-
 // Instruction data
 typedef union {
-    Insn i;
-    u32  d;
+    struct PACKED { // Instruction struct
+        /*0x00*/ u16 opcode : 6;
+        /*0x00*/ u16 rs     : 5; // fr
+        /*0x01*/ u16 rt     : 5; // ft
+        /*0x02*/ union { // Lower 16 bits of instruction
+                    struct PACKED {
+                        /*0x00*/ u16 rd        : 5; // fs
+                        /*0x00*/ u16 sa        : 5; // fd
+                        /*0x01*/ u16 function  : 6;
+                    } rdata; /*0x02*/
+                    u16 immediate;
+                };
+    }; /*0x04*/
+    u32 raw;
 } InsnData; /*0x04*/
 
 // Instruction database format
