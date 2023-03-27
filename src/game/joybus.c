@@ -88,18 +88,18 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     n64.standard.B       = gcn.standard.B;
     n64.standard.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
     n64.standard.START   = gcn.standard.START;
-    n64.standard.D_UP    = gcn.standard.D_UP;
-    n64.standard.D_DOWN  = gcn.standard.D_DOWN;
-    n64.standard.D_LEFT  = gcn.standard.D_LEFT;
-    n64.standard.D_RIGHT = gcn.standard.D_RIGHT;
+    n64.standard.D.UP    = gcn.standard.D.UP;
+    n64.standard.D.DOWN  = gcn.standard.D.DOWN;
+    n64.standard.D.LEFT  = gcn.standard.D.LEFT;
+    n64.standard.D.RIGHT = gcn.standard.D.RIGHT;
     n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
     n64.standard.unused  = gcn.standard.Y; // The N64 controller's unused bit.
     n64.standard.L       = gcn.standard.Z; // Swap L and Z.
     n64.standard.R       = gcn.standard.R;
-    n64.standard.C_UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
-    n64.standard.C_DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C_LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C_RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
+    n64.standard.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
+    n64.standard.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
+    n64.standard.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
     // Write the button data.
     pad->button = n64.raw;

@@ -28,22 +28,37 @@
 // -- N64 Standard Controller buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 A               : 1; // CONT_A
-    /*0x0*/ u16 B               : 1; // CONT_B
-    /*0x0*/ u16 Z               : 1; // CONT_G
-    /*0x0*/ u16 START           : 1; // CONT_START
-    /*0x0*/ u16 D_UP            : 1; // CONT_UP
-    /*0x0*/ u16 D_DOWN          : 1; // CONT_DOWN
-    /*0x0*/ u16 D_LEFT          : 1; // CONT_LEFT
-    /*0x0*/ u16 D_RIGHT         : 1; // CONT_RIGHT
-    /*0x1*/ u16 RESET           : 1; // CONT_RESET
-    /*0x1*/ u16 unused          : 1; // CONT_UNUSED
-    /*0x1*/ u16 L               : 1; // CONT_L
-    /*0x1*/ u16 R               : 1; // CONT_R
-    /*0x1*/ u16 C_UP            : 1; // CONT_E
-    /*0x1*/ u16 C_DOWN          : 1; // CONT_D
-    /*0x1*/ u16 C_LEFT          : 1; // CONT_C
-    /*0x1*/ u16 C_RIGHT         : 1; // CONT_F
+    /*0x0*/ u16       : 4;
+    /*0x0*/ u16 UP    : 1; // CONT_UP
+    /*0x0*/ u16 DOWN  : 1; // CONT_DOWN
+    /*0x0*/ u16 LEFT  : 1; // CONT_LEFT
+    /*0x0*/ u16 RIGHT : 1; // CONT_RIGHT
+    /*0x1*/ u16       : 8;
+} N64Buttons_D; /*0x02*/
+
+typedef struct PACKED {
+    /*0x0*/ u16       : 12;
+    /*0x1*/ u16 UP    : 1; // CONT_E
+    /*0x1*/ u16 DOWN  : 1; // CONT_D
+    /*0x1*/ u16 LEFT  : 1; // CONT_C
+    /*0x1*/ u16 RIGHT : 1; // CONT_F
+} N64Buttons_C; /*0x02*/
+
+typedef union {
+    struct PACKED {
+        /*0x0*/ u16 A               : 1; // CONT_A
+        /*0x0*/ u16 B               : 1; // CONT_B
+        /*0x0*/ u16 Z               : 1; // CONT_G
+        /*0x0*/ u16 START           : 1; // CONT_START
+        /*0x0*/ u16                 : 4; // N64Buttons_D
+        /*0x1*/ u16 RESET           : 1; // CONT_RESET
+        /*0x1*/ u16 unused          : 1; // CONT_UNUSED
+        /*0x1*/ u16 L               : 1; // CONT_L
+        /*0x1*/ u16 R               : 1; // CONT_R
+        /*0x1*/ u16                 : 4; // N64Buttons_C
+    }; /*0x02*/
+    N64Buttons_D D;
+    N64Buttons_C C;
 } N64StandardButtons; /*0x02*/
 
 // -- Mouse buttons --
@@ -74,20 +89,20 @@ typedef struct PACKED {
 
 // -- Fishing Rod buttons --
 
-typedef struct PACKED {
-    /*0x0*/ u16 A               : 1; // CONT_A
-    /*0x0*/ u16 B               : 1; // CONT_B
-    /*0x0*/ u16 Z               : 1; // CONT_G
-    /*0x0*/ u16 START           : 1; // CONT_START
-    /*0x0*/ u16 REEL            : 1; // Reel (clockwise); turning counterclockwise trips a slip gear.
-    /*0x0*/ u16                 : 1;
-    /*0x0*/ u16 TENSION_UP      : 1; // Increase Tension (toward player).
-    /*0x0*/ u16 TENSION_DOWN    : 1; // Decrease Tension (away from player).
-    /*0x1*/ u16                 : 4;
-    /*0x1*/ u16 C_UP            : 1; // CONT_E
-    /*0x1*/ u16 C_DOWN          : 1; // CONT_D
-    /*0x1*/ u16 C_LEFT          : 1; // CONT_C
-    /*0x1*/ u16 C_RIGHT         : 1; // CONT_F
+typedef union {
+    struct PACKED {
+        /*0x0*/ u16 A               : 1; // CONT_A
+        /*0x0*/ u16 B               : 1; // CONT_B
+        /*0x0*/ u16 Z               : 1; // CONT_G
+        /*0x0*/ u16 START           : 1; // CONT_START
+        /*0x0*/ u16 REEL            : 1; // Reel (clockwise); turning counterclockwise trips a slip gear.
+        /*0x0*/ u16                 : 1;
+        /*0x0*/ u16 TENSION_UP      : 1; // Increase Tension (toward player).
+        /*0x0*/ u16 TENSION_DOWN    : 1; // Decrease Tension (away from player).
+        /*0x1*/ u16                 : 4;
+        /*0x1*/ u16                 : 4; // N64Buttons_C
+    };
+    N64Buttons_C C;
 } N64FishingRodButtons; /*0x02*/
 
 // -- N64 buttons union --
@@ -117,22 +132,30 @@ typedef union {
 // -- GCN Controller buttons --
 
 typedef struct PACKED {
-    /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
-    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
-    /*0x0*/ u16 START           : 1; // CONT_GCN_START
-    /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
-    /*0x0*/ u16 X               : 1; // CONT_GCN_X
-    /*0x0*/ u16 B               : 1; // CONT_GCN_B
-    /*0x0*/ u16 A               : 1; // CONT_GCN_A
-    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
-    /*0x1*/ u16 L               : 1; // CONT_GCN_L
-    /*0x1*/ u16 R               : 1; // CONT_GCN_R
-    /*0x1*/ u16 Z               : 1; // CONT_GCN_Z
-    /*0x1*/ u16 D_UP            : 1; // CONT_GCN_UP
-    /*0x1*/ u16 D_DOWN          : 1; // CONT_GCN_DOWN
-    /*0x1*/ u16 D_RIGHT         : 1; // CONT_GCN_LEFT
-    /*0x1*/ u16 D_LEFT          : 1; // CONT_GCN_RIGHT
+    /*0x0*/ u16       : 12;
+    /*0x1*/ u16 UP    : 1; // CONT_GCN_UP
+    /*0x1*/ u16 DOWN  : 1; // CONT_GCN_DOWN
+    /*0x1*/ u16 RIGHT : 1; // CONT_GCN_LEFT
+    /*0x1*/ u16 LEFT  : 1; // CONT_GCN_RIGHT
+} GCNButtons_D; /*0x02*/
+
+typedef union {
+    struct PACKED {
+        /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
+        /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
+        /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
+        /*0x0*/ u16 START           : 1; // CONT_GCN_START
+        /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
+        /*0x0*/ u16 X               : 1; // CONT_GCN_X
+        /*0x0*/ u16 B               : 1; // CONT_GCN_B
+        /*0x0*/ u16 A               : 1; // CONT_GCN_A
+        /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
+        /*0x1*/ u16 L               : 1; // CONT_GCN_L
+        /*0x1*/ u16 R               : 1; // CONT_GCN_R
+        /*0x1*/ u16 Z               : 1; // CONT_GCN_Z
+        /*0x1*/ u16                 : 4; // GCNButtons_D
+    }; /*0x02*/
+    GCNButtons_D D;
 } GCNStandardButtons; /*0x02*/
 
 // -- GCN DK Bongos buttons --
