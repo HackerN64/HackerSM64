@@ -32,7 +32,7 @@ typedef union {
         /*0x01*/ u16 shift   : 15; // How many spaces after the previous char to move the index.
         /*0x02*/ u16 print   :  1; // Whether to print a char.
         /*0x03*/ u16 skip    : 15; // Number of chars in the string to skip.
-    } d; /*0x04*/
+    }; /*0x04*/
     u32 raw;
 } PrintCommand;
 
