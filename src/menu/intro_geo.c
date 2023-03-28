@@ -467,13 +467,13 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             backgroundTileSix = gameOverBackgroundTable[6];
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
-            u32 gfxCmds = (
-                /*gSPDisplayList    */ 1 +
-                /*gDPLoadTextureTile*/ 7 +
-                /*gSPDisplayList    */ 1 +
-                /*gSPEndDisplayList */ 1
+            dl = alloc_display_list(
+                sizeof((Gfx[]){gsSPDisplayList(0)}) +
+                sizeof((Gfx[]){gsDPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)}) +
+                sizeof((Gfx[]){gsSPDisplayList(0)}) +
+                sizeof((Gfx[]){gsSPEndDisplayList()})
             );
-            dl = alloc_display_list(gfxCmds * sizeof(*dl));
+
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
