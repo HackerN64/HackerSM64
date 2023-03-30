@@ -13,74 +13,19 @@
 #include "game/printf.h"
 
 
-PrintCommand gCrashScreenPrintBuffer[CHAR_BUFFER_SIZE];
+PrintBuffer gCrashScreenPrintBuffer[CHAR_BUFFER_SIZE];
+PrintBuffer gCrashScreenScrollBuffer[CHAR_BUFFER_SIZE];
 
 s8 gCrashScreenWordWrap = TRUE;
 
 
-void crash_screen_parse_formatting(PrintCommand *cmd, const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, u8* printEscape, s32 isMain);
-
-
-void crash_screen_format_space(PrintCommand *cmd, const char *buf, u32 index, u32 size, u32 x, u32 y) {
-    PrintCommand cmd2 = { .raw = 0 };
-    UNUSED RGBA32 checkColor = COLOR_RGBA32_WHITE;
-
-    // Parse space:
-
-    // Count the number of spaces
-    u32 numSpaces = 0;
-    while (buf[index++] == CHAR_SPACE) {
-        if (index > size) {
-            break;
-        }
-
-        numSpaces++;
-    }
-
-    // index is now the first non-space
-    x += TEXT_WIDTH(numSpaces);
-    if (x >= CRASH_SCREEN_TEXT_X2) {
-        cmd->newLine = TRUE;
-        cmd->skip = numSpaces;
-        return;
-    }
-
-    u32 remainingSize = (size - index);
-    u32 checkX = x;
-    u32 checkY = y;
-    u8 printEscape2 = FALSE;
-    if (remainingSize > 0) {
-        for (u32 i = 0; i < remainingSize; i += (1 + cmd2.skip)) {
-            if (buf[index + i] == CHAR_SPACE) {
-                break;
-            }
-
-            crash_screen_parse_formatting(&cmd2, buf, (index + i), size, &checkColor, checkX, checkY, &printEscape2, FALSE);
-
-            if (cmd2.newLine) {
-                break;
-            }
-
-            checkX += TEXT_WIDTH(cmd2.shift);
-        }
-    }
-
-    if (gCrashScreenWordWrap && (checkX >= CRASH_SCREEN_TEXT_X2)) {
-        cmd->newLine = TRUE;
-    } else {
-        cmd->shift = (1 + numSpaces);
-    }
-
-    cmd->skip = numSpaces;
-}
-
 static s32 glyph_to_hex(char *dest, unsigned char glyph) {
     if (IS_NUMERIC(glyph)) {
-        *dest = ((glyph - '0') & BITMASK(4));
-    } else if (IS_UPPERCASE(glyph)) {
-        *dest = (((glyph - 'A') + 10) & BITMASK(4));
-    } else if (IS_LOWERCASE(glyph)) {
-        *dest = (((glyph - 'a') + 10) & BITMASK(4));
+        *dest = ((glyph - CHAR_NUMERIC_START) & BITMASK(4));
+    } else if (IS_UPPERCASE_HEX(glyph)) {
+        *dest = (((glyph - CHAR_UPPERCASE_HEX_START) + 10) & BITMASK(4));
+    } else if (IS_LOWERCASE_HEX(glyph)) {
+        *dest = (((glyph - CHAR_LOWERCASE_HEX_START) + 10) & BITMASK(4));
     } else {
         return FALSE;
     }
@@ -114,191 +59,192 @@ static s32 read_str_to_bytes(u8 dest[], const char *buf, u32 index, size_t numBy
     return TRUE;
 }
 
-
-void crash_screen_format_text_color(PrintCommand *cmd, const char *buf, u32 index, size_t size, RGBA32 *color) {
-    ColorRGBA rgba = { 0x00, 0x00, 0x00, 0x00 };
-    *color = COLOR_RGBA32_WHITE;
-    const u32 numCharsToRead = (sizeof(RGBA32) * 2);
-
-    if ((index + numCharsToRead) > size) {
-        return;
-    }
-
-    if (!read_str_to_bytes(rgba, buf, index, sizeof(RGBA32))) {
-        return;
-    }
-    index += numCharsToRead;
-
-    *color = COLORRGBA_TO_RGBA32(rgba);
-    cmd->skip = numCharsToRead;
+static s32 is_special_char(unsigned char glyph) {
+    return (
+        glyph == CHAR_ESCAPE  ||
+        glyph == CHAR_NEWLINE ||
+        glyph == CHAR_RETURN  ||
+        glyph == CHAR_COLOR
+    );
 }
 
-void crash_screen_format_escape(PrintCommand *cmd, const char *buf, u32 index, u8* printEscape) {
-    unsigned char glyph = buf[index];
+static u32 crash_screen_format_print_buffer(const char *buf, size_t totalSize) {
+    u32 bufferCount = 0;
+    // uRGBA32 color = { .raw32 = COLOR_RGBA32_WHITE }; // Initial color
+    RGBA32 color = COLOR_RGBA32_WHITE;
+    u8 escaped = FALSE;
 
-    if (!*printEscape
-     && glyph != CHAR_NULL
-     && (glyph == CHAR_NEWLINE
-      || glyph == CHAR_RETURN
-      || glyph == CHAR_COLOR
-      || glyph == CHAR_SCROLL
-      || glyph == CHAR_ESCAPE)) {
-        *printEscape = TRUE;
-    } else {
-        cmd->print = TRUE;
-        cmd->shift = 1;
-    }
-}
+    // Pass 1: control characters and formatting
+    for (u32 index = 0; index < totalSize; index++) {
+        PrintBuffer *data = &gCrashScreenPrintBuffer[bufferCount];
+        u8 print = FALSE;
+        unsigned char glyph = buf[index];
 
-void crash_screen_format_local_scroll(PrintCommand *cmd, const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, s32 isMain) {
-    unsigned char glyph = buf[index];
-    const size_t numCharsToRead = (sizeof(u8) * 2);
+        if (glyph == CHAR_NULL) {
+            break;
+        }
 
-    if ((index + numCharsToRead) > size) {
-        return;
-    }
-
-    u8 maxNumChars = 0x00;
-
-    if (!read_str_to_bytes(&maxNumChars, buf, index, sizeof(u8))) {
-        return;
-    }
-    index += numCharsToRead;
-
-    maxNumChars = MIN(maxNumChars, (size - index));
-
-    if ((index + maxNumChars) > size) {
-        return;
-    }
-
-    u8 numChars = 0;
-
-    // Count how many total characters will need to be scrolled if they exceed the limit.
-    while (glyph != CHAR_NULL && glyph != CHAR_SPACE) {
-        numChars++;
-        glyph = buf[index + numChars];
-    }
-
-    if (isMain && numChars > 0) {
-        if (numChars > maxNumChars) {
-            // Scroll text
-            u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
-            for (u32 i = 0; i < maxNumChars; i++) {
-                glyph = buf[index + ((i + offset) % (numChars + TEXT_SCROLL_NUM_SPACES))];
-                if (glyph != CHAR_NULL) {
-                    crash_screen_draw_glyph(x, y, glyph, *color);
-                }
-
-                x += TEXT_WIDTH(1);
-            }
-
-            gCrashScreenQueueFramebufferUpdate = TRUE;
+        // Handle special characters.
+        if (escaped) {
+            print = TRUE;
+            data->isEscaped = TRUE;
+            escaped = FALSE;
         } else {
-            // Print "normally"
-            for (u32 i = 0; i < numChars; i++) {
-                glyph = buf[index + i];
-                if (glyph != CHAR_NULL) {
-                    crash_screen_draw_glyph(x, y, glyph, *color);
-                }
-
-                x += TEXT_WIDTH(1);
+            switch (glyph) {
+                case CHAR_ESCAPE:
+                    if ((index + 1) >= totalSize) {
+                        print = TRUE;
+                        break;
+                    }
+                    if (!is_special_char(buf[index + 1])) {
+                        print = TRUE;
+                        break;
+                    }
+                    escaped = TRUE;
+                    break;
+                case CHAR_COLOR: // @RRGGBBAA
+                    if ((index + 8) >= totalSize) {
+                        print = TRUE;
+                        break;
+                    }
+                    //! TODO: ColorRGBA/u32 union
+                    ColorRGBA tempColor; // Only set 'color' if 'read_str_to_bytes' is successful.
+                    if (!read_str_to_bytes(tempColor, buf, (index + 1), sizeof(color))) {
+                        print = TRUE;
+                        break;
+                    }
+                    color = *(u32*)tempColor;
+                    index += 8;
+                    break;
+                default:
+                    print = TRUE;
+                    break;
             }
+        }
+
+        if (print) {
+            data->color = color;
+            data->glyph = glyph;
+            bufferCount++;
         }
     }
 
-    cmd->shift = cmd->skip = (numCharsToRead + numChars);
+    return bufferCount;
 }
 
-void crash_screen_format_normal_glyph(PrintCommand *cmd, u32 index, u32 size, u32 x) {
-    cmd->print = TRUE;
-    if (gCrashScreenWordWrap && (index < size) && ((x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2)) {
-        cmd->newLine = TRUE;
-    } else {
-        cmd->shift = 1;
+static u32 get_next_word_length(PrintBuffer *buf, u32 index, size_t size) {
+    u32 count = 0;
+
+    while (index < size) {
+        unsigned char glyph = buf[index].glyph;
+        if (glyph == CHAR_NULL
+         || glyph == CHAR_SPACE
+         || glyph == CHAR_NEWLINE
+         || glyph == CHAR_RETURN) {
+            break;
+        }
+
+        index++;
+        count++;
     }
+
+    return count;
 }
 
-void crash_screen_parse_formatting(PrintCommand *cmd, const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y, u8 *printEscape, s32 isMain) {
-    unsigned char glyph = buf[index++];
+static u32 crash_screen_print_from_buffer(size_t bufferCount, u32 x, u32 y) {
+    u32 startX = x;
+    u32 numLines = 1;
 
-    if (*printEscape) {
-        *printEscape = FALSE;
-        crash_screen_format_normal_glyph(cmd, index, size, x);
-    } else {
+    // Pass 3: whitespace, newlines, and print
+    for (u32 index = 0; index < bufferCount; index++) {
+        u8 print = FALSE;
+        u8 newline = FALSE;
+        PrintBuffer *data = &gCrashScreenPrintBuffer[index];
+        unsigned char glyph = data->glyph;
+
         switch (glyph) {
             case CHAR_NEWLINE:
             case CHAR_RETURN:
-                cmd->newLine = TRUE;
+                if (data->isEscaped) {
+                    print = TRUE;
+                } else {
+                    newline = TRUE;
+                }
                 break;
             case CHAR_SPACE:
-                crash_screen_format_space(cmd, buf, index, size, x, y);
-                break;
-            case CHAR_COLOR: // @RRGGBBAA color prefix
-                crash_screen_format_text_color(cmd, buf, index, size, color);
-                break;
-            case CHAR_ESCAPE:
-                crash_screen_format_escape(cmd, buf, index, printEscape);
-                break;
-            case CHAR_SCROLL:
-                crash_screen_format_local_scroll(cmd, buf, index, size, color, x, y, isMain);
+                if ((x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount))) >= CRASH_SCREEN_TEXT_X2) {
+                    newline = TRUE;
+                }
                 break;
             default:
-                crash_screen_format_normal_glyph(cmd, index, size, x);
+                print = TRUE;
                 break;
+        }
+
+        if (print) {
+            if (gCrashScreenWordWrap && (x >= CRASH_SCREEN_TEXT_X2)) {
+                newline = TRUE;
+                index--;
+            } else {
+                crash_screen_draw_glyph(x, y, data->glyph, data->color);
+            }
+        }
+
+        if (gCrashScreenWordWrap && newline) {
+            x = startX;
+            y += TEXT_HEIGHT(1);
+            numLines++;
+        } else {
+            x += TEXT_WIDTH(1);
         }
     }
 
-    if (glyph != CHAR_ESCAPE) {
-        *printEscape = FALSE;
-    }
+    return numLines;
 }
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return ((char *) memcpy(buffer, data, size) + size);
 }
 
-u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
+void scroll_buffer(u32 bufferCount, u32 charLimit) {
+    bzero(&gCrashScreenScrollBuffer, sizeof(gCrashScreenScrollBuffer));
+
+    u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
+    u32 size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
+
+    for (u32 index = 0; index < bufferCount; index++) {
+        gCrashScreenScrollBuffer[index] = gCrashScreenPrintBuffer[((index + offset) % size)];
+        if (gCrashScreenScrollBuffer[index].glyph == CHAR_NULL) {
+            gCrashScreenScrollBuffer[index].glyph = CHAR_SPACE;
+        }
+    }
+
+    memcpy(&gCrashScreenPrintBuffer, &gCrashScreenScrollBuffer, (charLimit * sizeof(PrintBuffer)));
+
+    gCrashScreenQueueFramebufferUpdate = TRUE;
+}
+
+u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char *fmt, ...) {
     char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
 
     va_list args;
     va_start(args, fmt);
 
-    u32 size = _Printf(write_to_buf, buf, fmt, args);
+    size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
+    u32 numLines = 0;
 
-    RGBA32 color = COLOR_RGBA32_WHITE;
+    if (totalSize > 0) {
+        bzero(&gCrashScreenPrintBuffer, sizeof(gCrashScreenPrintBuffer));
 
-    u32 x = startX;
-    u32 y = startY;
+        size_t bufferCount = crash_screen_format_print_buffer(buf, totalSize);
 
-    u32 numLines = 1;
-
-    PrintCommand cmd = { .raw = 0 };
-
-    u8 printEscape = FALSE;
-
-    if (size > 0) {
-        for (u32 index = 0; index < size; index += (1 + cmd.skip)) {
-            if (buf[index] == CHAR_NULL) {
-                break;
-            }
-
-            bzero(&cmd, sizeof(cmd));
-
-            crash_screen_parse_formatting(&cmd, buf, index, size, &color, x, y, &printEscape, TRUE);
-
-            if (cmd.print) {
-                crash_screen_draw_glyph(x, y, buf[index], color);
-            }
-
-            if (cmd.newLine) {
-                x = startX;
-                y += TEXT_HEIGHT(1);
-                numLines++;
-            }
-
-            x += TEXT_WIDTH(cmd.shift);
+        if (0 < charLimit && charLimit < bufferCount) {
+            scroll_buffer(bufferCount, charLimit);
+            bufferCount = charLimit;
         }
+
+        numLines = crash_screen_print_from_buffer(bufferCount, x, y);
     }
 
     va_end(args);

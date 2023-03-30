@@ -73,18 +73,19 @@ struct CrashScreen {
 
 struct FunctionInStack {
     /*0x00*/ uintptr_t addr;
-    /*0x04*/ char *name;
+    /*0x04*/ const char *name;
 }; /*0x08*/
 
 struct CrashScreenPage {
     /*0x00*/ void (*drawFunc)(OSThread *thread);
     /*0x04*/ void (*inputFunc)(void);
     /*0x08*/ const enum ControlTypes *pageControlsList;//void (*controlsDrawFunc)(void);
-}; /*0x10*/
+    /*0x10*/ const char *name;
+}; /*0x14*/
 
 struct ControlType {
-    /*0x00*/ char *control;
-    /*0x04*/ char *description;
+    /*0x00*/ const char *control;
+    /*0x04*/ const char *description;
 }; /*0x08*/
 
 struct BranchArrow {

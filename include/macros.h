@@ -12,6 +12,9 @@
 #define GLUE(a, b) a ## b
 #define GLUE2(a, b) GLUE(a, b)
 
+#define TO_STRING(s)    #s
+#define TO_STRING2(s)   TO_STRING(s)
+
 // Avoid compiler warnings for unused variables.
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))

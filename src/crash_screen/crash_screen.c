@@ -65,17 +65,6 @@ static const char *sRegNames[29] = {
     "S8", "RA",
 };
 
-static const char *sPageNames[NUM_PAGES] = {
-    [PAGE_CONTEXT    ] = "CONTEXT",
-    [PAGE_ASSERTS    ] = "ASSERT",
-#ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = "LOG",
-#endif
-    [PAGE_STACK_TRACE] = "STACK TRACE",
-    [PAGE_RAM_VIEWER ] = "RAM VIEW",
-    [PAGE_DISASM     ] = "DISASM",
-};
-
 static const struct ControlType sControlsDescriptions[] = {
     [CONT_DESC_SWITCH_PAGE      ] = { .control = "L/R",                .description = "switch page"                          },
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = "START",              .description = "show/hide page controls"              },
@@ -144,6 +133,8 @@ static u32 sStackTraceIndex = 0;
 
 s8 gCrashScreenQueueFramebufferUpdate = FALSE;
 
+struct CrashScreenPage sCrashScreenPages[];
+
 
 void crash_screen_sleep(u32 ms) {
     u64 cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
@@ -155,7 +146,7 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, void *addr) {
     uintptr_t bits = *(uintptr_t*) addr;
     s32 exponent = (((bits >> 23) & (uintptr_t)BITMASK(8)) - 0x7F);
 
-    crash_screen_print(x, y, "@%08XF%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
+    crash_screen_print(x, y, STR_COLOR_PREFIX"%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
 
     if ((exponent >= -0x7E && exponent <= 0x7F) || (bits == 0x0)) {
         f32 val = *(f32 *) addr;
@@ -168,12 +159,12 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, void *addr) {
 void crash_screen_print_fpcsr(u32 fpcsr) {
     u32 bit = BIT(17);
 
-    crash_screen_print(TEXT_X(0), (TEXT_Y(14) + 5), "@%08X%s:", COLOR_RGBA32_CRASH_REGISTER, "FPCSR");
-    crash_screen_print(TEXT_X(6), (TEXT_Y(14) + 5), "%08X", fpcsr);
+    crash_screen_print(TEXT_X(0), (TEXT_Y(14) + 5), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_REGISTER, "FPCSR");
+    crash_screen_print(TEXT_X(6), (TEXT_Y(14) + 5), STR_HEX_WORD, fpcsr);
 
     for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
         if (fpcsr & bit) {
-            crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
+            crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
             return;
         }
 
@@ -182,8 +173,8 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 }
 
 void crash_screen_print_reg(u32 x, u32 y, const char *name, uintptr_t addr) {
-    crash_screen_print(x, y, "@%08X%s:", COLOR_RGBA32_CRASH_REGISTER, name);
-    crash_screen_print((x + TEXT_WIDTH(3)), y, "%08X", addr);
+    crash_screen_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_REGISTER, name);
+    crash_screen_print((x + TEXT_WIDTH(3)), y, STR_HEX_WORD, addr);
 }
 
 void crash_screen_print_registers(__OSThreadContext *tc) {
@@ -243,19 +234,19 @@ void draw_crash_context(OSThread *thread) {
 
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XTHREAD:%d", COLOR_RGBA32_CRASH_THREAD, thread->id);
-    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", thread->id);
+    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
 
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
     uintptr_t pc = tc->pc;
-    char *fname = parse_map(&pc);
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCRASH AT:", COLOR_RGBA32_CRASH_AT);
+    const char *fname = parse_map(&pc);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_AT, "CRASH AT");
     if (fname == NULL) {
-        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+        crash_screen_print(TEXT_X(10), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
-        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, (CRASH_SCREEN_NUM_CHARS_X - 10), fname);
+        crash_screen_print_scroll(TEXT_X(10), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 10), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 #endif
 
@@ -269,16 +260,16 @@ void draw_crash_context(OSThread *thread) {
 void draw_assert(UNUSED OSThread *thread) {
     u32 line = 1;
 
-    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_PAGE_NAME, sPageNames[PAGE_ASSERTS]);
+    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, sCrashScreenPages[PAGE_ASSERTS].name);
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (__n64Assert_Filename != NULL) {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XFILE:%s", COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%s", COLOR_RGBA32_CRASH_FILE_NAME, "FILE", __n64Assert_Filename);
         crash_screen_draw_divider(DIVIDER_Y(line));
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XLINE:%d", COLOR_RGBA32_CRASH_AT, __n64Assert_LineNum);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_AT, "LINE", __n64Assert_LineNum);
         crash_screen_draw_divider(DIVIDER_Y(line));
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XMESSAGE:", COLOR_RGBA32_CRASH_HEADER);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_HEADER, "MESSAGE");
         line += crash_screen_print(TEXT_X(0), (TEXT_Y(line) + 5), "%s", __n64Assert_Message);
     } else {
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "no failed assert to report.");
@@ -291,7 +282,7 @@ void draw_assert(UNUSED OSThread *thread) {
 void draw_crash_log(UNUSED OSThread *thread) {
     u32 i;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), "@%08X%s", COLOR_RGBA32_CRASH_PAGE_NAME, sPageNames[PAGE_LOG]);
+    crash_screen_print(TEXT_X(0), TEXT_Y(1), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, sCrashScreenPages[PAGE_LOG].name);
     crash_screen_draw_divider(DIVIDER_Y(2));
 
     osWritebackDCacheAll();
@@ -329,18 +320,18 @@ void draw_stack_trace(OSThread *thread) {
 
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_PAGE_NAME, sPageNames[PAGE_STACK_TRACE]);
-    line += crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM %08X", temp_sp);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, sCrashScreenPages[PAGE_STACK_TRACE].name);
+    line += crash_screen_print(TEXT_X(12), TEXT_Y(line), "%s "STR_HEX_WORD, "FROM", temp_sp);
     crash_screen_draw_divider(DIVIDER_Y(line));
 
 #ifdef INCLUDE_DEBUG_MAP
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_AT, "CURRFUNC");
     uintptr_t pc = tc->pc;
-    char *fname = parse_map(&pc);
+    const char *fname = parse_map(&pc);
     if (fname == NULL) {
-        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
-        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, (CRASH_SCREEN_NUM_CHARS_X - 9), fname);
+        line += crash_screen_print_scroll(TEXT_X(9), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 
     crash_screen_draw_divider(DIVIDER_Y(line));
@@ -364,19 +355,19 @@ void draw_stack_trace(OSThread *thread) {
 
         if (function != NULL) {
             uintptr_t faddr = function->addr;
-            char *fname = function->name;
+            const char *fname = function->name;
 
-            crash_screen_print(TEXT_X(0), y, "%08X:", faddr);
+            crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", faddr);
 
             if (!sStackTraceSkipUnknowns && (fname == NULL)) {
                 // Print unknown function
-                crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
+                crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
                 // Print known function
                 if (sShowFunctionNames) {
-                    crash_screen_print(TEXT_X(9), y, "@%08x^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, (CRASH_SCREEN_NUM_CHARS_X - 9), fname);
+                    crash_screen_print_scroll(TEXT_X(9), y, (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
                 } else {
-                    crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
+                    crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
                 }
             }
         }
@@ -404,7 +395,7 @@ void draw_address_select(void) {
         3
     );
 
-    crash_screen_print(SCREEN_CENTER_X - TEXT_WIDTH(3), JUMP_MENU_Y1, "GO TO:");
+    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(3)), JUMP_MENU_Y1, "%s:", "GO TO");
 
     crash_screen_draw_vertical_triangle(
         ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1),
@@ -420,13 +411,13 @@ void draw_address_select(void) {
         COLOR_RGBA32_CRASH_SELECT_ARROWS,
         TRUE
     );
-    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)), "0x%08X", sAddressSelectTarget);
+    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)), (STR_HEX_PREFIX STR_HEX_WORD), sAddressSelectTarget);
 
-    char *fname = NULL;
+    const char *fname = NULL;
     uintptr_t checkAddr = sAddressSelectTarget;
     fname = parse_map(&checkAddr);
     if (fname != NULL) {
-        crash_screen_print(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, JUMP_MENU_CHARS_X, fname);
+        crash_screen_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 
     osWritebackDCacheAll();
@@ -449,8 +440,8 @@ void draw_ram_viewer(OSThread *thread) {
     u32 charX, charY;
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_PAGE_NAME, sPageNames[PAGE_RAM_VIEWER]);
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "%08X in %08X-%08X", sSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION));
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, sCrashScreenPages[PAGE_RAM_VIEWER].name);
+    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), (STR_HEX_WORD" %s "STR_HEX_WORD"-"STR_HEX_WORD), sSelectedAddress, "in", startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     charX = (TEXT_X(8) + 3);
@@ -460,7 +451,7 @@ void draw_ram_viewer(OSThread *thread) {
             charX += 2;
         }
 
-        crash_screen_print(charX, TEXT_Y(line), "@%08X%02X", ((i % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_H1 : COLOR_RGBA32_CRASH_RAM_VIEW_H2), i);
+        crash_screen_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_H1 : COLOR_RGBA32_CRASH_RAM_VIEW_H2), i);
 
         charX += (TEXT_WIDTH(2) + 1);
     }
@@ -469,30 +460,26 @@ void draw_ram_viewer(OSThread *thread) {
 
     crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(line + RAM_VIEWER_NUM_ROWS - 1), COLOR_RGBA32_LIGHT_GRAY);
 
-    line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
+    line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "%s", "MEMORY");
 
     charX = (TEXT_X(8) + 3);
     charY = TEXT_Y(line);
 
-    RGBA32 color;
-    uintptr_t currAddr;
-    u8 byte;
-
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
         uintptr_t rowAddr = startAddr + (y * RAM_VIEWER_STEP);
-        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), "@%08X%08X", ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD), ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr);
 
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
-            currAddr = (rowAddr + x);
-            byte = *((u8 *)currAddr);
+            uintptr_t currAddr = (rowAddr + x);
+            u8 byte = *((u8 *)currAddr);
 
             if ((x % 4) == 0) {
                 charX += 2;
             }
 
-            color = ((sShowRamAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            RGBA32 color = ((sShowRamAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
 
             if (currAddr == tc->pc) {
                 crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_RED);
@@ -505,7 +492,7 @@ void draw_ram_viewer(OSThread *thread) {
             if (sShowRamAsAscii) {
                 crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, color);
             } else {
-                crash_screen_print(charX, charY, "@%08X%02X", color, byte);
+                crash_screen_print(charX, charY, (STR_COLOR_PREFIX STR_HEX_BYTE), color, byte);
             }
 
             charX += (TEXT_WIDTH(2) + 1);
@@ -619,7 +606,7 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
 
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    char *fname = NULL;
+    const char *fname = NULL;
     uintptr_t alignedSelectedAddr = (sSelectedAddress & ~(DISASM_STEP - 1));
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -635,15 +622,15 @@ void draw_disasm(OSThread *thread) {
 
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_PAGE_NAME, sPageNames[PAGE_DISASM]);
-    line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X in %08X-%08X", alignedSelectedAddr, sScrollAddress, (sScrollAddress + DISASM_SHOWN_SECTION));
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, sCrashScreenPages[PAGE_DISASM].name);
+    line += crash_screen_print(TEXT_X(7), TEXT_Y(line), (STR_HEX_WORD" %s "STR_HEX_WORD"-"STR_HEX_WORD), alignedSelectedAddr, "in", sScrollAddress, (sScrollAddress + DISASM_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (fname == NULL) {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "%s", "NOT IN A FUNCTION");
     } else {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-        line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, (CRASH_SCREEN_NUM_CHARS_X - 3), fname);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "%s:", "IN");
+        line += crash_screen_print_scroll(TEXT_X(3), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 3), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 
     osWritebackDCacheAll();
@@ -690,8 +677,19 @@ void draw_disasm(OSThread *thread) {
         }
 
         if (is_in_code_segment(addr)) {
-            crash_screen_print(charX, charY, "%s", insn_disasm(insn, (addr == tc->pc)));
-        } else if (sShowRamAsAscii) {
+            fname = NULL;
+            char *insnAsStr = insn_disasm(insn, &fname);
+            crash_screen_print(charX, charY, "%s", insnAsStr);
+            if (addr == tc->pc) {
+                char crashStr[] = "<-- CRASH";
+                crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(strlen(crashStr))), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
+            }
+#ifdef INCLUDE_DEBUG_MAP
+            if (fname != NULL) {
+                crash_screen_print_scroll((charX + TEXT_WIDTH(18)), charY, 26, STR_COLOR_PREFIX"%s", sDisasmColors[DISASM_COLOR_ADDRESS], fname);
+            }
+#endif
+        } else if (sShowRamAsAscii) { // Binary:
             // for (u32 c = 0; c < 4; c++) {
             //     crash_screen_draw_glyph(charX + (c * TEXT_WIDTH(1)), charY, (unsigned char)(insn.raw >> ((32 - 8) - (8 * c))), COLOR_RGBA32_WHITE);
             // }
@@ -700,11 +698,11 @@ void draw_disasm(OSThread *thread) {
                 if ((c % 8) == 0) {
                     bitX += TEXT_WIDTH(1);
                 }
-                crash_screen_draw_glyph(bitX, charY, ((insn.raw >> (32 - c)) % 2) ? '1' : '0', COLOR_RGBA32_WHITE);
+                crash_screen_draw_glyph(bitX, charY, (((insn.raw >> (32 - c)) % 2) ? '1' : '0'), COLOR_RGBA32_WHITE);
                 bitX += TEXT_WIDTH(1);
             }
         } else {
-            crash_screen_print(charX, charY, "%08X", insn.raw);
+            crash_screen_print(charX, charY, STR_HEX_WORD, insn.raw);
         }
     }
 
@@ -918,7 +916,7 @@ void crash_screen_select_address(void) {
         sSelectedAddress = sAddressSelectTarget;
 #ifdef INCLUDE_DEBUG_MAP
         uintptr_t funcAddr = sSelectedAddress;
-        char *fname = parse_map(&funcAddr);
+        const char *fname = parse_map(&funcAddr);
         crash_screen_fill_branch_buffer(fname, funcAddr);
 #endif
         sUpdateBuffer = TRUE;
@@ -1005,7 +1003,7 @@ void crash_screen_input_disasm(void) {
             sSelectedAddress &= ~(DISASM_STEP - 1);
             uintptr_t newFunc = sSelectedAddress;
             parse_map(&oldPos);
-            char *fname = parse_map(&newFunc);
+            const char *fname = parse_map(&newFunc);
             if (oldPos != newFunc) {
                 crash_screen_fill_branch_buffer(fname, newFunc);
             }
@@ -1052,14 +1050,14 @@ static const enum ControlTypes disasmPageControls[] = {
 };
 
 struct CrashScreenPage sCrashScreenPages[] = {
-    [PAGE_CONTEXT    ] = {.drawFunc = draw_crash_context, .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls   },
-    [PAGE_ASSERTS    ] = {.drawFunc = draw_assert,        .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls   },
+    [PAGE_CONTEXT    ] = {.drawFunc = draw_crash_context, .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls,    .name = "CONTEXT"    },
+    [PAGE_ASSERTS    ] = {.drawFunc = draw_assert,        .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls,    .name = "ASSERTS"    },
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = {.drawFunc = draw_crash_log,     .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls   },
+    [PAGE_LOG        ] = {.drawFunc = draw_crash_log,     .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls,    .name = "LOG"        },
 #endif
-    [PAGE_STACK_TRACE] = {.drawFunc = draw_stack_trace,   .inputFunc = crash_screen_input_stack_trace, .pageControlsList = stackTracePageControls},
-    [PAGE_RAM_VIEWER ] = {.drawFunc = draw_ram_viewer,    .inputFunc = crash_screen_input_ram_viewer,  .pageControlsList = ramViewerPageControls },
-    [PAGE_DISASM     ] = {.drawFunc = draw_disasm,        .inputFunc = crash_screen_input_disasm,      .pageControlsList = disasmPageControls    },
+    [PAGE_STACK_TRACE] = {.drawFunc = draw_stack_trace,   .inputFunc = crash_screen_input_stack_trace, .pageControlsList = stackTracePageControls, .name = "STACK TRACE"},
+    [PAGE_RAM_VIEWER ] = {.drawFunc = draw_ram_viewer,    .inputFunc = crash_screen_input_ram_viewer,  .pageControlsList = ramViewerPageControls,  .name = "RAM VIEW"   },
+    [PAGE_DISASM     ] = {.drawFunc = draw_disasm,        .inputFunc = crash_screen_input_disasm,      .pageControlsList = disasmPageControls,     .name = "DISASM"     },
 };
 
 void update_crash_screen_input(void) {
@@ -1095,7 +1093,7 @@ void draw_controls_box(void) {
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         3
     );
-    crash_screen_print(TEXT_X(1), TEXT_Y(1), "@%08X%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, sPageNames[sCrashPage]);
+    crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, sCrashScreenPages[sCrashPage].name, "PAGE CONTROLS");
 
     const enum ControlTypes *list = sCrashScreenPages[sCrashPage].pageControlsList;
     const struct ControlType *desc = NULL;
@@ -1104,7 +1102,7 @@ void draw_controls_box(void) {
 
     while (*list != CONT_DESC_LIST_END) {
         desc = &sControlsDescriptions[*list++];
-        line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n @%08X%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS, desc->description);
+        line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS, desc->description);
     }
 
     osWritebackDCacheAll();
@@ -1122,9 +1120,9 @@ void draw_crash_screen(OSThread *thread) {
 
             // Draw the header.
             u32 line = 0;
-            crash_screen_print(TEXT_X( 0), TEXT_Y(line), "@%08XHackerSM64 v%s", COLOR_RGBA32_CRASH_HEADER, HACKERSM64_VERSION);
-            crash_screen_print(TEXT_X(19), TEXT_Y(line), "@%08XSTART:controls", COLOR_RGBA32_CRASH_HEADER);
-            line += crash_screen_print(TEXT_X(35), TEXT_Y(line), "@%08X<Page:%02d>", COLOR_RGBA32_CRASH_HEADER, (sCrashPage + 1));
+            crash_screen_print(TEXT_X( 0), TEXT_Y(line), STR_COLOR_PREFIX"%s v%s", COLOR_RGBA32_CRASH_HEADER, "HackerSM64", HACKERSM64_VERSION);
+            crash_screen_print(TEXT_X(19), TEXT_Y(line), STR_COLOR_PREFIX"%s:%s", COLOR_RGBA32_CRASH_HEADER, sControlsDescriptions[CONT_DESC_SHOW_CONTROLS].control, "controls");
+            line += crash_screen_print(TEXT_X(35), TEXT_Y(line), STR_COLOR_PREFIX"<%s:%02d>", COLOR_RGBA32_CRASH_HEADER, "Page", (sCrashPage + 1));
             crash_screen_draw_divider(DIVIDER_Y(line));
 
             // Run the page-specific draw function.
@@ -1166,7 +1164,7 @@ void fill_function_stack_trace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
     struct FunctionInStack *function = NULL;
-    char *fname;
+    const char *fname;
 
     // Fill the stack buffer.
     for (u32 i = 0; i < STACK_SIZE; i++) {
