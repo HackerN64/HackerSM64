@@ -1,7 +1,7 @@
 #include <ultra64.h>
 #include <PR/gs2dex.h>
 
-#include "config.h"
+#include "s2d_config.h"
 
 #define s2d_text gspS2DEX2_fifoTextStart
 #define s2d_data gspS2DEX2_fifoDataStart
@@ -25,8 +25,11 @@
     #error S2DEX Text Engine only works with other EX2 series microcodes
 #endif
 
+extern void s2d_reset_defer_index();
 
 extern void s2d_init(void);
+
+extern void s2d_handle_deferred();
 
 extern void s2d_stop(void);
 

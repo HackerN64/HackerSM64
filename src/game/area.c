@@ -26,6 +26,9 @@
 #include "debug_box.h"
 #include "engine/colors.h"
 #include "profiling.h"
+#ifdef S2DEX_TEXT_ENGINE
+#include "s2d_engine/init.h"
+#endif
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];

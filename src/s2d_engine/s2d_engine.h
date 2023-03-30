@@ -1,6 +1,6 @@
 #pragma once
 
-#include "config.h"
+#include "s2d_config.h"
 #include "init.h"
 #include "s2d_print.h"
 #include "mtx.h"

@@ -3,7 +3,7 @@
 #include <PR/gu.h>
 #include <stdarg.h>
 
-#include "config.h"
+#include "s2d_config.h"
 
 #include "s2d_draw.h"
 #include "s2d_print.h"
@@ -15,6 +15,8 @@
 
 static int s2d_width(const char *str, int line, int len);
 static void s2d_snprint(int x, int y, int align, const char *str, int len);
+
+extern void *s2d_calloc(size_t);
 
 void insert_el_char(S2DList *s, S2DListNode *n) {
     if (n == NULL) return;
@@ -48,7 +50,7 @@ void insert_el_char(S2DList *s, S2DListNode *n) {
 }
 
 #define FTOFIX16(x) (long)((x) * (float)(1 << 2))
-void mtx_pipeline_op(uObjMtx *m, int x, int y, float scale) {
+void mtx_pipeline_op(uObjSubMtx *m, int x, int y, float scale) {
     m->m.BaseScaleX = FTOFIX32(scale);
     // m->m.B = 0;
     // m->m.C = 0;
@@ -64,9 +66,9 @@ void make_glyph(S2DList *s, int x, int y,
                 float scl,
                 int d, int dx, int dy
 ) {
-    S2DListNode *t = s2d_calloc(sizeof(S2DListNode));
+    S2DListNode *t = (S2DListNode *) s2d_calloc(sizeof(S2DListNode));
 
-    t->mtx = s2d_calloc(sizeof(uObjMtx));
+    t->mtx = (uObjSubMtx *) s2d_calloc(sizeof(uObjSubMtx));
 
     mtx_pipeline_op(t->mtx, x, y, scl);
 
@@ -78,9 +80,9 @@ void make_glyph(S2DList *s, int x, int y,
     t->glyph = glyph;
 
     if (d == 1) {
-        t->dropshadow = s2d_calloc(sizeof(uObjMtx));
+        t->dropshadow = (uObjSubMtx *) s2d_calloc(sizeof(uObjSubMtx));
         // mtx_pipeline_op(t->dropshadow, x + dx, y + dy, scl);
-        mtx_pipeline_op(t->dropshadow, x + 8, y + 8, scl);
+        mtx_pipeline_op(t->dropshadow, dx, dy, scl);
     }
 
     if (s->head == NULL) {
@@ -141,7 +143,7 @@ void draw_all_glyphs(S2DList *s) {
 
 
 static void s2d_snprint(int x, int y, int align, const char *str, int len) {
-    char *p = str;
+    char *p = (char *) str;
     int tmp_len = 0;
     int orig_x = x;
     int orig_y = y;
@@ -164,7 +166,7 @@ static void s2d_snprint(int x, int y, int align, const char *str, int len) {
             x = orig_x - s2d_width(str, line, len);
     }
 
-    S2DList *s2d_list = s2d_calloc(sizeof(S2DList));
+    S2DList *s2d_list = (S2DList *) s2d_calloc(sizeof(S2DList));
 
     do {
         char current_char = *p;
@@ -278,15 +280,15 @@ static void s2d_snprint(int x, int y, int align, const char *str, int len) {
 void s2d_print_optimized(int x, int y, const char *str) {
     int len;
 
-    if (s2d_check_str(str)     != 0) return;
+    if (s2d_check_str((char *)str)     != 0) return;
 
-    len = s2d_strlen(str);
+    len = s2d_strlen((char *)str);
 
     s2d_snprint(x, y, ALIGN_LEFT, str, len);
 }
 
 static int s2d_width(const char *str, int line, int len) {
-    char *p = str;
+    char *p = (char *) str;
     int tmp_len = 0;
     int curLine = 0;
     int width = 0;

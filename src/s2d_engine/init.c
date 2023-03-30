@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include <PR/gs2dex.h>
-#include "config.h"
+#include "s2d_config.h"
 #include "init.h"
 #include "debug.h"
 #include "s2d_error.h"
