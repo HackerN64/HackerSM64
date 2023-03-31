@@ -16,7 +16,11 @@
 #include "game/rumble_init.h"
 #include "pages/disasm.h"
 
+
+_Bool gAddressSelectMenuOpen = FALSE;
+static uintptr_t sAddressSelectTarget = 0x00000000;
 static s8 sAddressSelecCharIndex = 2;
+
 
 void draw_address_select(void) {
     crash_screen_draw_dark_rect(
@@ -42,9 +46,9 @@ void draw_address_select(void) {
         TRUE
     );
 
-    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)), (STR_HEX_PREFIX STR_HEX_WORD), gAddressSelectTarget);
+    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)), (STR_HEX_PREFIX STR_HEX_WORD), sAddressSelectTarget);
 
-    uintptr_t checkAddr = gAddressSelectTarget;
+    uintptr_t checkAddr = sAddressSelectTarget;
     const char *fname = parse_map(&checkAddr);
     if (fname != NULL) {
         crash_screen_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
@@ -56,25 +60,25 @@ void draw_address_select(void) {
 void crash_screen_select_address(void) {
     if (gCrashScreenDirectionFlags.pressed.left) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex - 1) & 0x7); // % 8
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
     if (gCrashScreenDirectionFlags.pressed.right) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex + 1) & 0x7); // % 8
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
-    uintptr_t nextSelectedAddress = gAddressSelectTarget;
+    uintptr_t nextSelectedAddress = sAddressSelectTarget;
     u32 shift = ((32 - 4) - (sAddressSelecCharIndex * 4));
-    u8 digit = GET_HEX_DIGIT(gAddressSelectTarget, shift);
+    u8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
     s8 new = digit;
 
     if (gCrashScreenDirectionFlags.pressed.up) {
         // Increment the selected digit.
         new = ((digit + 1) & BITMASK(4));
-        if (!IS_IN_RAM(SET_HEX_DIGIT(gAddressSelectTarget, new, shift))) {
+        if (!IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
             // Find the digit to wrap to
             for (new = 0x0; new < 0xF; new++) {
-                if (IS_IN_RAM(SET_HEX_DIGIT(gAddressSelectTarget, new, shift))) {
+                if (IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
                     break;
                 }
             }
@@ -83,10 +87,10 @@ void crash_screen_select_address(void) {
     if (gCrashScreenDirectionFlags.pressed.down) {
         // Decrement the selected digit.
         new = ((digit - 1) & BITMASK(4));
-        if (!IS_IN_RAM(SET_HEX_DIGIT(gAddressSelectTarget, new, shift))) {
+        if (!IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
             // Find the digit to wrap to
             for (new = 0xF; new > 0x0; new--) {
-                if (IS_IN_RAM(SET_HEX_DIGIT(gAddressSelectTarget, new, shift))) {
+                if (IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
                     break;
                 }
             }
@@ -94,38 +98,39 @@ void crash_screen_select_address(void) {
     }
 
     if (new != digit) {
-        nextSelectedAddress = SET_HEX_DIGIT(gAddressSelectTarget, new, shift);
+        nextSelectedAddress = SET_HEX_DIGIT(sAddressSelectTarget, new, shift);
 
         if (IS_IN_RAM(nextSelectedAddress)) {
-            gAddressSelectTarget = nextSelectedAddress;
-            gCrashScreenUpdateBuffer = TRUE;
+            sAddressSelectTarget = nextSelectedAddress;
+            gCrashScreenUpdateFramebuffer = TRUE;
         }
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: Not if address select was just opened
-        gPlayer1Controller->buttonPressed &= A_BUTTON; //! ??
+        gPlayer1Controller->buttonPressed &= A_BUTTON;
         // Jump to the address and close the popup.
         gAddressSelectMenuOpen = FALSE;
-        gSelectedAddress = gAddressSelectTarget;
-#ifdef INCLUDE_DEBUG_MAP //! TODO: Don't refill buffer if new cunction is the same as the old one
-        uintptr_t funcAddr = gSelectedAddress;
-        const char *fname = parse_map(&funcAddr);
-        // draw_loading_arrows_message();
-        crash_screen_fill_branch_buffer(fname, funcAddr);
+#ifdef INCLUDE_DEBUG_MAP
+        if (gCrashPage == PAGE_DISASM) {
+            if (!is_in_same_function(gSelectedAddress, sAddressSelectTarget)) {
+                gFillBranchBuffer = TRUE;
+            }
+        }
 #endif
-        gCrashScreenUpdateBuffer = TRUE;
+        gSelectedAddress = sAddressSelectTarget;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
         // Close the popup without jumping.
         gAddressSelectMenuOpen = FALSE;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 }
 
 // Open the jump to address popup.
 void open_address_select(uintptr_t dest) {
     gAddressSelectMenuOpen = TRUE;
-    gAddressSelectTarget = dest;
-    gCrashScreenUpdateBuffer = TRUE;
+    sAddressSelectTarget = dest;
+    gCrashScreenUpdateFramebuffer = TRUE;
 }

@@ -218,7 +218,7 @@ static void scroll_buffer(u32 bufferCount, u32 charLimit) {
 
     memcpy(&gCrashScreenPrintBuffer, &gCrashScreenScrollBuffer, (charLimit * sizeof(PrintBuffer)));
 
-    gCrashScreenQueueFramebufferUpdate = TRUE;
+    gCrashScreenUpdateFramebuffer = TRUE;
 }
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {

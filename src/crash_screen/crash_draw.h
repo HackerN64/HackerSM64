@@ -69,6 +69,7 @@ typedef u32 FontRow;
 // Size of the crashed crash screen image.
 #define SRC_IMG_SIZE (SCREEN_SIZE * sizeof(Texture) / sizeof(RGBA32))
 
+
 void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken);
 void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color);
 void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip);

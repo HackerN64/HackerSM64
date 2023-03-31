@@ -9,15 +9,9 @@
 #include "game/debug.h"
 #include "game/game_init.h"
 
-const enum ControlTypes ramViewerPageControls[] = {
-    CONT_DESC_SWITCH_PAGE,
-    CONT_DESC_SHOW_CONTROLS,
-    CONT_DESC_CYCLE_DRAW,
-    CONT_DESC_CURSOR,
-    CONT_DESC_JUMP_TO_ADDRESS,
-    CONT_DESC_TOGGLE_ASCII,
-    CONT_DESC_LIST_END,
-};
+
+static _Bool sRamViewShowAsAscii = FALSE;
+
 
 void draw_ram_viewer(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
@@ -67,7 +61,7 @@ void draw_ram_viewer(OSThread *thread) {
                 charX += 2;
             }
 
-            RGBA32 color = ((gShowRamAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            RGBA32 color = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
 
             if (currAddr == tc->pc) {
                 crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_RED);
@@ -77,7 +71,7 @@ void draw_ram_viewer(OSThread *thread) {
                 color = COLOR_RGBA32_BLACK;
             }
 
-            if (gShowRamAsAscii) {
+            if (sRamViewShowAsAscii) {
                 crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, color);
             } else {
                 crash_screen_print(charX, charY, (STR_COLOR_PREFIX STR_HEX_BYTE), color, byte);
@@ -97,29 +91,41 @@ void draw_ram_viewer(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
+
+const enum ControlTypes ramViewerPageControls[] = {
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_CURSOR,
+    CONT_DESC_JUMP_TO_ADDRESS,
+    CONT_DESC_TOGGLE_ASCII,
+    CONT_DESC_LIST_END,
+};
+
+
 void crash_screen_input_ram_viewer(void) {
     if ((gCrashScreenDirectionFlags.pressed.up)
      && ((gSelectedAddress - RAM_VIEWER_STEP) >= RAM_START)) {
         // Scroll up.
         gSelectedAddress -= RAM_VIEWER_STEP;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
     if ((gCrashScreenDirectionFlags.pressed.down)
      && ((gSelectedAddress + RAM_VIEWER_STEP) < RAM_END)) {
         // Scroll down.
         gSelectedAddress += RAM_VIEWER_STEP;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
     if ((gCrashScreenDirectionFlags.pressed.left)
      && (((gSelectedAddress - 1) & BITMASK(4)) != 0xF)) {
         gSelectedAddress--;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
     if ((gCrashScreenDirectionFlags.pressed.right)
      && (((gSelectedAddress + 1) & BITMASK(4)) != 0x0)) {
         gSelectedAddress++;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed
@@ -127,6 +133,7 @@ void crash_screen_input_ram_viewer(void) {
     }
 
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-        toggle_show_ram_as_ascii();
+        // Toggle whether the memory is printed as hex values or as ASCII chars.
+        toggle_display_var(&sRamViewShowAsAscii);
     }
 }

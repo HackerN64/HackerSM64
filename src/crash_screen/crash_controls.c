@@ -19,10 +19,14 @@
 #include "crash_controls.h"
 #include "pages/stack_trace.h"
 
+
+_Bool gDrawControls = FALSE;
+
 CrashScreenDirections gCrashScreenDirectionFlags;
 
 static OSTime sCrashScreenInputTimeY = 0;
 static OSTime sCrashScreenInputTimeX = 0;
+
 
 // Input string defines:
 #define STR_A       "A"
@@ -36,7 +40,7 @@ static OSTime sCrashScreenInputTimeX = 0;
 #define STR_L       "L"
 #define STR_R       "R"
 
-//! TODO: Check if this actually saves memory space.
+//! TODO: Check if doing this actually saves memory space.
 const char moveCursor[] = "move cursor";
 
 const struct ControlType gCrashControlsDescriptions[] = {
@@ -49,9 +53,10 @@ const struct ControlType gCrashControlsDescriptions[] = {
     [CONT_DESC_CURSOR_HORIZONTAL] = { .control = STR_LEFT"/"STR_RIGHT,                      .description = moveCursor                             },
     [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = STR_A,                                     .description = "jump to specific address"             },
     [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii"         },
-    [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_A,                                     .description = "toggle function names"                },
-    [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = STR_B,                                     .description = "toggle unknowns in list"              },
+    [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = STR_A,                                     .description = "toggle unknowns in list"              },
+    [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names"                },
 };
+
 
 void update_crash_screen_direction_input(void) {
     OSTime currTime = osGetTime();
@@ -117,31 +122,27 @@ const enum ControlTypes defaultPageControls[] = {
     CONT_DESC_LIST_END,
 };
 
-void crash_screen_input_default(void) {
-}
-
 _Bool update_crash_screen_page(void) {
-    u8 prevPage = gCrashPage;
+    enum CrashScreenPages prevPage = gCrashPage;
 
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
-        // Previous Page.
-        gCrashPage--;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashPage--; // Previous Page.
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
     if (gPlayer1Controller->buttonPressed & R_TRIG) {
-        // Next page.
-        gCrashPage++;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashPage++; // Next page.
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
     if (gCrashPage != prevPage) {
         // Wrap pages.
-        if ((gCrashPage >= NUM_PAGES) && (gCrashPage != PAGES_MAX)) {
-            gCrashPage = PAGE_CONTEXT;
-        }
-        if (gCrashPage == PAGES_MAX) {
+        if (gCrashPage > MAX_PAGES) {
             gCrashPage = (NUM_PAGES - 1);
         }
+        if (gCrashPage >= NUM_PAGES) {
+            gCrashPage = FIRST_PAGE;
+        }
+        gCrashScreenUpdateFramebuffer = TRUE;
 
         // Reset certain values when the page is changed.
         gStackTraceIndex = 0;
@@ -165,12 +166,12 @@ void update_crash_screen_input(void) {
             gDrawBackground = TRUE;
             gDrawControls = FALSE;
         }
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
     if (gDrawCrashScreen && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
         gDrawControls ^= TRUE;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
     }
 
     if (gDrawCrashScreen) {

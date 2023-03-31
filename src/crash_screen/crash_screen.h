@@ -19,8 +19,9 @@ enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_VI_VBLANK,
 };
 
-enum CrashPages {
-    PAGE_CONTEXT,
+enum CrashScreenPages {
+    FIRST_PAGE,
+    PAGE_CONTEXT = FIRST_PAGE,
     PAGE_ASSERTS,
 #ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
@@ -29,7 +30,7 @@ enum CrashPages {
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
     NUM_PAGES,
-    PAGES_MAX = 255,
+    MAX_PAGES = 255U,
 };
 
 // The number of functions to save to the stack trace buffer.
@@ -49,6 +50,7 @@ struct CrashScreenPage {
     /*0x10*/ const char *name;
 }; /*0x14*/
 
+
 // Time conversion macros
 #define FPS_COUNT 30
 #define FRAMES_TO_NESC(f)   (((u64)(f) * 1000000000LL) / FPS_COUNT)
@@ -66,22 +68,18 @@ extern struct CrashScreen gCrashScreen2;
 
 extern _Bool gDrawCrashScreen;
 extern _Bool gDrawBackground;
-extern _Bool gDrawControls;
 extern _Bool gCrashScreenSwitchedPage;
-extern _Bool gAddressSelectMenuOpen;
-extern _Bool gShowRamAsAscii;
-extern _Bool gCrashScreenUpdateBuffer;
-extern u8 gCrashPage;
+extern _Bool gCrashScreenUpdateFramebuffer;
+
+extern enum CrashScreenPages gCrashPage;
 extern uintptr_t gCrashAddress;
 extern uintptr_t gScrollAddress;
 extern uintptr_t gSelectedAddress;
-extern uintptr_t gAddressSelectTarget;
-
-extern _Bool gCrashScreenQueueFramebufferUpdate;
 
 extern struct CrashScreenPage gCrashScreenPages[];
 
-void toggle_show_ram_as_ascii(void);
+
+void toggle_display_var(_Bool *var);
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color);
 void clamp_view_to_selection(const u32 numRows, const u32 step);
 void crash_screen_init(void);

@@ -31,14 +31,14 @@
 
 
 struct CrashScreenPage gCrashScreenPages[] = {
-    [PAGE_CONTEXT    ] = {.drawFunc = draw_crash_context, .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls,    .name = "CONTEXT"    },
-    [PAGE_ASSERTS    ] = {.drawFunc = draw_assert,        .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls,    .name = "ASSERTS"    },
+    [PAGE_CONTEXT    ] = { .drawFunc = draw_crash_context, .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "CONTEXT"     },
+    [PAGE_ASSERTS    ] = { .drawFunc = draw_assert,        .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "ASSERTS"     },
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = {.drawFunc = draw_crash_log,     .inputFunc = crash_screen_input_default,     .pageControlsList = defaultPageControls,    .name = "LOG"        },
+    [PAGE_LOG        ] = { .drawFunc = draw_crash_log,     .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "LOG"         },
 #endif
-    [PAGE_STACK_TRACE] = {.drawFunc = draw_stack_trace,   .inputFunc = crash_screen_input_stack_trace, .pageControlsList = stackTracePageControls, .name = "STACK TRACE"},
-    [PAGE_RAM_VIEWER ] = {.drawFunc = draw_ram_viewer,    .inputFunc = crash_screen_input_ram_viewer,  .pageControlsList = ramViewerPageControls,  .name = "RAM VIEW"   },
-    [PAGE_DISASM     ] = {.drawFunc = draw_disasm,        .inputFunc = crash_screen_input_disasm,      .pageControlsList = disasmPageControls,     .name = "DISASM"     },
+    [PAGE_STACK_TRACE] = { .drawFunc = draw_stack_trace,   .inputFunc = crash_screen_input_stack_trace, .pageControlsList = stackTracePageControls, .name = "STACK TRACE" },
+    [PAGE_RAM_VIEWER ] = { .drawFunc = draw_ram_viewer,    .inputFunc = crash_screen_input_ram_viewer,  .pageControlsList = ramViewerPageControls,  .name = "RAM VIEW"    },
+    [PAGE_DISASM     ] = { .drawFunc = draw_disasm,        .inputFunc = crash_screen_input_disasm,      .pageControlsList = disasmPageControls,     .name = "DISASM"      },
 };
 
 
@@ -48,21 +48,18 @@ struct CrashScreen gCrashScreen2;
 #endif
 
 
-
 _Bool gDrawCrashScreen = TRUE;
 _Bool gDrawBackground = TRUE;
-_Bool gDrawControls = FALSE;
-_Bool gCrashScreenSwitchedPage = FALSE;
-_Bool gAddressSelectMenuOpen = FALSE;
-_Bool gShowRamAsAscii = FALSE;
-_Bool gCrashScreenUpdateBuffer = TRUE;
-u8 gCrashPage = PAGE_CONTEXT;
-uintptr_t gCrashAddress = 0x0;
-uintptr_t gScrollAddress = 0;
-uintptr_t gSelectedAddress = 0;
-uintptr_t gAddressSelectTarget = 0;
 
-_Bool gCrashScreenQueueFramebufferUpdate = FALSE;
+_Bool gCrashScreenSwitchedPage = FALSE;
+
+_Bool gCrashScreenUpdateFramebuffer = TRUE; // Sets the framebuffer to be updated.
+
+enum CrashScreenPages gCrashPage = FIRST_PAGE;
+
+uintptr_t gCrashAddress        = 0x00000000;
+uintptr_t gScrollAddress       = 0x00000000;
+uintptr_t gSelectedAddress     = 0x00000000;
 
 
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
@@ -84,10 +81,9 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
     crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color);
 }
 
-// Toggle whether the memory is printed as hex values or as ASCII chars.
-void toggle_show_ram_as_ascii(void) {
-    gShowRamAsAscii ^= TRUE;
-    gCrashScreenUpdateBuffer = TRUE;
+void toggle_display_var(_Bool *var) {
+    *var ^= TRUE;
+    gCrashScreenUpdateFramebuffer = TRUE;
 }
 
 void clamp_view_to_selection(const u32 numRows, const u32 step) {
@@ -98,8 +94,42 @@ void clamp_view_to_selection(const u32 numRows, const u32 step) {
     gScrollAddress = ALIGN(gScrollAddress, step);
 }
 
+void draw_crash_screen_heaader(void) {
+    // Draw the header.
+    u32 line = 0;
+    crash_screen_print(TEXT_X( 0), TEXT_Y(line),
+        STR_COLOR_PREFIX"%s v%s",
+        COLOR_RGBA32_CRASH_HEADER,
+        "HackerSM64",
+        HACKERSM64_VERSION
+    );
+    _Bool start = (gPlayer1Controller->buttonDown & START_BUTTON);
+    crash_screen_print(TEXT_X(19), TEXT_Y(line),
+        STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX":%s",
+        start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, gCrashControlsDescriptions[CONT_DESC_SHOW_CONTROLS].control,
+        COLOR_RGBA32_CRASH_HEADER, "controls"
+    );
+
+    // line += crash_screen_print(TEXT_X(35), TEXT_Y(line), STR_COLOR_PREFIX"<%s:%02d>", COLOR_RGBA32_CRASH_HEADER, "Page", (gCrashPage + 1)); //! TODO:
+    _Bool pageLeft  = (gPlayer1Controller->buttonDown & L_TRIG);
+    _Bool pageRight = (gPlayer1Controller->buttonDown & R_TRIG);
+    if (start || pageLeft || pageRight) {
+        gCrashScreenUpdateFramebuffer = TRUE;
+    }
+    line += crash_screen_print(TEXT_X(35), TEXT_Y(line),
+        STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
+        pageLeft ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '<',
+        COLOR_RGBA32_CRASH_HEADER,
+        "Page", (gCrashPage + 1),
+        pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '>'
+    ); //! TODO:
+
+    crash_screen_draw_divider(DIVIDER_Y(line));
+}
+
 void draw_crash_screen_main(OSThread *thread) {
-    if (gCrashScreenUpdateBuffer) {
+    if (gCrashScreenUpdateFramebuffer) {
+        gCrashScreenUpdateFramebuffer = FALSE;
         crash_screen_reset_framebuffer(gDrawBackground);
 
         if (gDrawCrashScreen) {
@@ -108,29 +138,13 @@ void draw_crash_screen_main(OSThread *thread) {
                 crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, 2);
             }
 
-            // Draw the header.
-            u32 line = 0;
-            crash_screen_print(TEXT_X( 0), TEXT_Y(line), STR_COLOR_PREFIX"%s v%s", COLOR_RGBA32_CRASH_HEADER, "HackerSM64", HACKERSM64_VERSION);
-            crash_screen_print(TEXT_X(19), TEXT_Y(line), STR_COLOR_PREFIX"%s:%s", COLOR_RGBA32_CRASH_HEADER, gCrashControlsDescriptions[CONT_DESC_SHOW_CONTROLS].control, "controls");
-
-            // line += crash_screen_print(TEXT_X(35), TEXT_Y(line), STR_COLOR_PREFIX"<%s:%02d>", COLOR_RGBA32_CRASH_HEADER, "Page", (gCrashPage + 1)); //! TODO:
-            _Bool pageLeft  = (gPlayer1Controller->buttonDown & L_TRIG);
-            _Bool pageRight = (gPlayer1Controller->buttonDown & R_TRIG);
-            if (pageLeft || pageRight) {
-                gCrashScreenQueueFramebufferUpdate = TRUE;
-            }
-            line += crash_screen_print(TEXT_X(35), TEXT_Y(line), STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX">", 
-                pageLeft ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER,
-                COLOR_RGBA32_CRASH_HEADER,
-                "Page", (gCrashPage + 1),
-                pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER
-            ); //! TODO: 
-
-            crash_screen_draw_divider(DIVIDER_Y(line));
+            draw_crash_screen_heaader();
 
             // Run the page-specific draw function.
             if (gCrashScreenPages[gCrashPage].drawFunc != NULL) {
                 gCrashScreenPages[gCrashPage].drawFunc(thread);
+            } else {
+                //! TODO: "Null page" print
             }
 
             if (gAddressSelectMenuOpen) {
@@ -143,12 +157,6 @@ void draw_crash_screen_main(OSThread *thread) {
         }
 
         crash_screen_update_framebuffer();
-
-        if (gCrashScreenQueueFramebufferUpdate)  {
-            gCrashScreenQueueFramebufferUpdate = FALSE;
-        } else {
-            gCrashScreenUpdateBuffer = FALSE;
-        }
     }
 }
 
@@ -274,7 +282,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             }
         } else {
             if (gControllerBits) {
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                 block_until_rumble_pak_free();
 #endif
                 osContStartReadDataEx(&gSIEventMesgQueue);

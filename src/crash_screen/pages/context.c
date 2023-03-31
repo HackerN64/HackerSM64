@@ -8,34 +8,35 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 
+
 static const char *sCauseDesc[18] = {
-    /*EXC_INT    */ "Interrupt",
-    /*EXC_MOD    */ "TLB modification",
-    /*EXC_RMISS  */ "TLB exception on load or inst.",
-    /*EXC_WMISS  */ "TLB exception on store",
-    /*EXC_RADE   */ "Address error on load or inst.",
-    /*EXC_WADE   */ "Address error on store",
-    /*EXC_IBE    */ "Bus error on inst.",
-    /*EXC_DBE    */ "Bus error on data",
-    /*EXC_SYSCALL*/ "Failed Assert: See Assert Page",
-    /*EXC_BREAK  */ "Breakpoint exception",
-    /*EXC_II     */ "Reserved instruction",
-    /*EXC_CPU    */ "Coprocessor unusable",
-    /*EXC_OV     */ "Arithmetic overflow",
-    /*EXC_TRAP   */ "Trap exception",
-    /*EXC_VCEI   */ "Virtual coherency on inst.",
-    /*EXC_FPE    */ "Floating point exception",
-    /*EXC_WATCH  */ "Watchpoint exception",
-    /*EXC_VCED   */ "Virtual coherency on data",
+    /*EXC_INT       */ "Interrupt",
+    /*EXC_MOD       */ "TLB modification",
+    /*EXC_RMISS     */ "TLB exception on load or inst.",
+    /*EXC_WMISS     */ "TLB exception on store",
+    /*EXC_RADE      */ "Address error on load or inst.",
+    /*EXC_WADE      */ "Address error on store",
+    /*EXC_IBE       */ "Bus error on inst.",
+    /*EXC_DBE       */ "Bus error on data",
+    /*EXC_SYSCALL   */ "Failed Assert: See Assert Page",
+    /*EXC_BREAK     */ "Breakpoint exception",
+    /*EXC_II        */ "Reserved instruction",
+    /*EXC_CPU       */ "Coprocessor unusable",
+    /*EXC_OV        */ "Arithmetic overflow",
+    /*EXC_TRAP      */ "Trap exception",
+    /*EXC_VCEI      */ "Virtual coherency on inst.",
+    /*EXC_FPE       */ "Floating point exception",
+    /*EXC_WATCH     */ "Watchpoint exception",
+    /*EXC_VCED      */ "Virtual coherency on data",
 };
 
 static const char *sFpcsrDesc[6] = {
-    /*FPCSR_CE*/ "Unimplemented operation",
-    /*FPCSR_CV*/ "Invalid operation",
-    /*FPCSR_CZ*/ "Division by zero",
-    /*FPCSR_CO*/ "Overflow",
-    /*FPCSR_CU*/ "Underflow",
-    /*FPCSR_CI*/ "Inexact operation",
+    /*FPCSR_CE      */ "Unimplemented operation",
+    /*FPCSR_CV      */ "Invalid operation",
+    /*FPCSR_CZ      */ "Division by zero",
+    /*FPCSR_CO      */ "Overflow",
+    /*FPCSR_CU      */ "Underflow",
+    /*FPCSR_CI      */ "Inexact operation",
 };
 
 static const char *sRegNames[29] = {
@@ -51,6 +52,7 @@ static const char *sRegNames[29] = {
     "S8", "RA",
 };
 
+
 void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, void *addr) {
     uintptr_t bits = *(uintptr_t*) addr;
     s32 exponent = (((bits >> 23) & (uintptr_t)BITMASK(8)) - 0x7F);
@@ -61,7 +63,7 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, void *addr) {
         f32 val = *(f32 *) addr;
         crash_screen_print(x + TEXT_WIDTH(4), y, "%s%.3e", ((val < 0) ? "" : " "), val);
     } else {
-        crash_screen_print(x + TEXT_WIDTH(4), y, "%08XD", bits);
+        crash_screen_print(x + TEXT_WIDTH(4), y, STR_HEX_WORD"D", bits);
     }
 }
 

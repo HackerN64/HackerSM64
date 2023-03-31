@@ -12,21 +12,12 @@
 #define TEXT_SCROLL_NUM_SPACES 2
 
 // Char macros:
-#define CHAR_NULL       '\0'
-#define CHAR_NEWLINE    '\n'
-#define CHAR_RETURN     '\r'
-#define CHAR_SPACE      ' '
-#define CHAR_COLOR      '@'
-#define CHAR_ESCAPE     '\\' // CHAR_BACKSLASH?
-
-// Preset strings:
-#define STR_HEX_PREFIX  "0x"
-
-#define STR_HEX_WORD        "%08X"
-#define STR_HEX_HALFWORD    "%04X"
-#define STR_HEX_BYTE        "%02X"
-
-#define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
+#define CHAR_NULL                   '\0'
+#define CHAR_NEWLINE                '\n'
+#define CHAR_RETURN                 '\r'
+#define CHAR_SPACE                  ' '
+#define CHAR_COLOR                  '@'
+#define CHAR_ESCAPE                 '\\' // CHAR_BACKSLASH?
 
 // Alphanumeric checks:
 #define CHAR_NUMERIC_START          '0'
@@ -42,14 +33,26 @@
 #define CHAR_LOWERCASE_HEX_START    CHAR_LOWERCASE_START
 #define CHAR_LOWERCASE_HEX_END      'f'
 
-#define IS_NUMERIC(c)       ((c) >= CHAR_NUMERIC_START       && (c) <= CHAR_NUMERIC_END      )
+// Alphanumeric check macros:
+#define IS_NUMERIC(c)           ((c) >= CHAR_NUMERIC_START       && (c) <= CHAR_NUMERIC_END      )
 
-#define IS_UPPERCASE(c)     ((c) >= CHAR_UPPERCASE_START     && (c) <= CHAR_UPPERCASE_END    )
-#define IS_LOWERCASE(c)     ((c) >= CHAR_LOWERCASE_START     && (c) <= CHAR_LOWERCASE_END    )
-#define IS_UPPERCASE_HEX(c) ((c) >= CHAR_UPPERCASE_HEX_START && (c) <= CHAR_UPPERCASE_HEX_END)
-#define IS_LOWERCASE_HEX(c) ((c) >= CHAR_LOWERCASE_HEX_START && (c) <= CHAR_LOWERCASE_HEX_END)
+#define IS_UPPERCASE(c)         ((c) >= CHAR_UPPERCASE_START     && (c) <= CHAR_UPPERCASE_END    )
+#define IS_LOWERCASE(c)         ((c) >= CHAR_LOWERCASE_START     && (c) <= CHAR_LOWERCASE_END    )
 
-#define IS_ALPHANUMERIC(c) (IS_NUMERIC(c) || IS_UPPERCASE(c) || IS_LOWERCASE(c))
+#define IS_UPPERCASE_HEX(c)     ((c) >= CHAR_UPPERCASE_HEX_START && (c) <= CHAR_UPPERCASE_HEX_END)
+#define IS_LOWERCASE_HEX(c)     ((c) >= CHAR_LOWERCASE_HEX_START && (c) <= CHAR_LOWERCASE_HEX_END)
+
+#define IS_ALPHANUMERIC(c)      (IS_NUMERIC(c) || IS_UPPERCASE(c)     || IS_LOWERCASE(c)    )
+#define IS_ALPHANUMERIC_HEX(c)  (IS_NUMERIC(c) || IS_UPPERCASE_HEX(c) || IS_LOWERCASE_HEX(c))
+
+// Preset strings:
+#define STR_HEX_PREFIX      "0x"
+
+#define STR_HEX_WORD        "%08X"
+#define STR_HEX_HALFWORD    "%04X"
+#define STR_HEX_BYTE        "%02X"
+
+#define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 
 typedef struct PACKED {
     RGBA32 color;

@@ -8,6 +8,7 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 
+
 void draw_assert(UNUSED OSThread *thread) {
     u32 line = 1;
 

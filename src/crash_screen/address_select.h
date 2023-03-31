@@ -5,6 +5,7 @@
 #include "types.h"
 #include "crash_screen.h"
 
+
 // Address Select constants
 #define JUMP_MENU_CHARS_X 20
 #define JUMP_MENU_CHARS_Y  5
@@ -24,6 +25,10 @@
 // Macros used to modify individual digits in a hexadecimal value.
 #define GET_HEX_DIGIT(src, shift)       (((src) >> (shift)) & BITMASK(4))
 #define SET_HEX_DIGIT(dst, src, shift)  (((dst) & ~(BITMASK(4) << (shift))) | ((src) << (shift)))
+
+
+extern _Bool gAddressSelectMenuOpen;
+
 
 void draw_address_select(void);
 void crash_screen_select_address(void);

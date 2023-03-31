@@ -228,12 +228,18 @@ ALIGNED32 static const InsnTemplate insn_db[] = {
     INSN_ID_0(OPC_COP3,       0,       0,       0,       0,        0, PARAM_N,   "COP3"   ) // Coprocessor-3 Operation (CP3)
 };
 
-#define STR_IREG        "%s"                            // Register
-#define STR_IMMEDIATE   STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
-#define STR_OFFSET      "%c"STR_IMMEDIATE               // +-Offset
-#define STR_FUNCTION    STR_HEX_PREFIX STR_HEX_WORD     // Function address
-#define STR_REGOFFSET   "("STR_IREG")"                  // Offset register
-#define STR_FREG        "F%02d"                         // Float Register
+#define STR_NOP             "NOP"
+#define STR_UNIMPLEMENTED   "unimpl"
+#define STR_INSN_NAME       "%-6s"
+#define STR_FORMAT          "%c"
+#define STR_CONDITION       "%s"
+
+#define STR_IREG            "%s"                            // Register
+#define STR_IMMEDIATE       STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
+#define STR_OFFSET          "%c"STR_IMMEDIATE               // +-Offset
+#define STR_FUNCTION        STR_HEX_PREFIX STR_HEX_WORD     // Function address
+#define STR_IREG_OFFSET     "("STR_IREG")"                  // Offset register
+#define STR_FREG            "F%02d"                         // Float Register
 
 const char strParamsNone[] = "";
 const char strParamsR[]    = STR_COLOR_PREFIX STR_IREG; // R
@@ -241,12 +247,12 @@ const char strParamsRR[]   = STR_COLOR_PREFIX STR_IREG", "STR_IREG; // R R
 const char strParamsRRR[]  = STR_COLOR_PREFIX STR_IREG", "STR_IREG", "STR_IREG; // R R R
 const char strParamsRRI[]  = STR_COLOR_PREFIX STR_IREG", "STR_IREG", "STR_COLOR_PREFIX STR_IMMEDIATE; // R R 0xI
 const char strParamsRI[]   = STR_COLOR_PREFIX STR_IREG", "STR_COLOR_PREFIX STR_IMMEDIATE; // R 0xI
-const char strParamsROR[]  = STR_COLOR_PREFIX STR_IREG", "STR_COLOR_PREFIX STR_IMMEDIATE STR_COLOR_PREFIX STR_REGOFFSET; // R 0xI(R)
+const char strParamsROR[]  = STR_COLOR_PREFIX STR_IREG", "STR_COLOR_PREFIX STR_IMMEDIATE STR_COLOR_PREFIX STR_IREG_OFFSET; // R 0xI(R)
 const char strParamsRO[]   = STR_COLOR_PREFIX STR_IREG", "STR_COLOR_PREFIX STR_OFFSET; // R +-O
 const char strParamsRRO[]  = STR_COLOR_PREFIX STR_IREG", "STR_IREG", "STR_COLOR_PREFIX STR_OFFSET; // R R +-O
 const char strParamsO[]    = STR_COLOR_PREFIX STR_OFFSET; // +-O
 const char strParamsJ[]    = STR_COLOR_PREFIX STR_FUNCTION; // function address
-const char strParamsFOR[]  = STR_COLOR_PREFIX STR_FREG", "STR_COLOR_PREFIX STR_IMMEDIATE STR_COLOR_PREFIX STR_REGOFFSET; // F 0xI(R)
+const char strParamsFOR[]  = STR_COLOR_PREFIX STR_FREG", "STR_COLOR_PREFIX STR_IMMEDIATE STR_COLOR_PREFIX STR_IREG_OFFSET; // F 0xI(R)
 
 const char strParamsRF[]   = STR_COLOR_PREFIX STR_IREG", "STR_FREG; // R F
 const char strParamsFF[]   = STR_COLOR_PREFIX STR_FREG", "STR_FREG; // F F
@@ -347,6 +353,7 @@ const RGBA32 sDisasmColors[] = {
     [DISASM_COLOR_OFFSET   ] = COLOR_RGBA32_CRASH_FUNCTION_NAME_2,
 };
 
+
 static char fmt_to_char(InsnData insn) {
     switch (insn.fmt) {
         case FMT_SINGLE:     return 'S'; // Single
@@ -361,6 +368,7 @@ static char fmt_to_char(InsnData insn) {
 const InsnTemplate *get_insn_type(InsnData insn) { //! TODO: Optimize this
     if (insn.raw != 0) {
         const InsnTemplate *checkInsn = insn_db;
+
         for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
             if ((insn.raw & param_types[checkInsn->paramType].mask.raw) == checkInsn->i.raw) {
                 return checkInsn;
@@ -373,16 +381,16 @@ const InsnTemplate *get_insn_type(InsnData insn) { //! TODO: Optimize this
     return NULL;
 }
 
-s32 get_branch_offset(InsnData insn) {
+s16 get_branch_offset(InsnData insn) {
     const InsnTemplate *type = get_insn_type(insn);
 
-    if (type) {
+    if (type != NULL) {
         switch (type->paramType) {
             case PARAM_SO:
             case PARAM_STO:
             case PARAM_O:
             case PARAM_BC1:
-                return (s16)insn.offset;
+                return insn.offset;
         }
     }
 
@@ -394,7 +402,7 @@ uintptr_t get_branch_target_from_addr(uintptr_t addr) {
     insn.raw = *(uintptr_t *)addr;
     const InsnTemplate *type = get_insn_type(insn);
 
-    if (type) {
+    if (type != NULL) {
         switch (type->paramType) {
             case PARAM_SO:
             case PARAM_STO:
@@ -410,7 +418,7 @@ uintptr_t get_branch_target_from_addr(uintptr_t addr) {
     return addr;
 }
 
-char *insn_disasm(InsnData insn, const char **fname) {
+char *insn_disasm(InsnData insn, const char **fname, _Bool showDestNames) {
     const InsnTemplate *type = NULL;
     char *strp = &insn_as_string[0];
     uintptr_t target;
@@ -418,17 +426,15 @@ char *insn_disasm(InsnData insn, const char **fname) {
     _Bool unimpl = FALSE;
     char insn_name[10] = "";
 
-    *fname = NULL;
-
     bzero(insn_as_string, sizeof(insn_as_string));
     bzero(insn_name, sizeof(insn_name));
 
     if (insn.raw == 0) { // Trivial case.
-        strp += sprintf(strp, STR_COLOR_PREFIX"%s", sDisasmColors[DISASM_COLOR_NOP], "NOP");
+        strp += sprintf(strp, (STR_COLOR_PREFIX STR_NOP), sDisasmColors[DISASM_COLOR_NOP]);
     } else {
         type = get_insn_type(insn);
         if (type != NULL) {
-            strp += sprintf(strp, STR_COLOR_PREFIX"%-6s ", sDisasmColors[DISASM_COLOR_INSN_NAME], type->name);
+            strp += sprintf(strp, (STR_COLOR_PREFIX STR_INSN_NAME" "), sDisasmColors[DISASM_COLOR_INSN_NAME], type->name);
 
             const InsnParamType *paramType = &param_types[type->paramType];
 
@@ -572,12 +578,18 @@ char *insn_disasm(InsnData insn, const char **fname) {
                     break;
                 case PARAM_J:
                     target = (0x80000000 | ((insn.raw & BITMASK(25)) * DISASM_STEP));
+#ifdef INCLUDE_DEBUG_MAP
+                    if (showDestNames) {
+                        *fname = parse_map_exact(target);
+
+                        if (*fname != NULL) {
+                            break;
+                        }
+                    }
+#endif
                     strp += sprintf(strp, paramFormat,
                         sDisasmColors[DISASM_COLOR_ADDRESS  ], target
                     );
-#ifdef INCLUDE_DEBUG_MAP
-                    *fname = parse_map_exact(target);
-#endif
                     break;
                 case PARAM_FOS:
                     strp += sprintf(strp, paramFormat,
@@ -593,14 +605,14 @@ char *insn_disasm(InsnData insn, const char **fname) {
                     );
                     break;
                 case PARAM_FF:
-                    sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
+                    sprintf(insn_name, (STR_INSN_NAME"."STR_FORMAT), type->name, fmt_to_char(insn));
                     strp += sprintf(strp, paramFormat,
                         sDisasmColors[DISASM_COLOR_REG      ], insn.fd,
                                                                insn.fs
                     );
                     break;
                 case PARAM_FFF:
-                    sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
+                    sprintf(insn_name, (STR_INSN_NAME"."STR_FORMAT), type->name, fmt_to_char(insn));
                     strp += sprintf(strp, paramFormat,
                         sDisasmColors[DISASM_COLOR_REG      ], insn.fd,
                                                                insn.fs,
@@ -608,7 +620,7 @@ char *insn_disasm(InsnData insn, const char **fname) {
                     );
                     break;
                 case PARAM_CON:
-                    sprintf(insn_name, "%s.%s.%c", type->name, sFPUconditions[insn.function & BITMASK(4)], fmt_to_char(insn));
+                    sprintf(insn_name, (STR_INSN_NAME"."STR_CONDITION"."STR_FORMAT), type->name, sFPUconditions[insn.function & BITMASK(4)], fmt_to_char(insn));
                     strp += sprintf(strp, paramFormat,
                         sDisasmColors[DISASM_COLOR_REG      ], insn.fd,
                                                                insn.ft
@@ -624,7 +636,7 @@ char *insn_disasm(InsnData insn, const char **fname) {
         }
 
         if (unimpl) {
-            strp += sprintf(strp, ("%s "STR_HEX_WORD), "unimpl", insn.raw);
+            strp += sprintf(strp, (STR_UNIMPLEMENTED" "STR_HEX_WORD), insn.raw);
         }
     }
 

@@ -9,7 +9,8 @@
 #include "game/debug.h"
 #include "game/puppyprint.h"
 
-#ifdef PUPPYPRINT_DEBUG //! TODO: Scrollable
+
+#ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable
 void draw_crash_log(UNUSED OSThread *thread) {
     u32 i;
 

@@ -133,6 +133,6 @@ enum FormatCodes {
 extern const RGBA32 sDisasmColors[];
 
 
-s32 get_branch_offset(InsnData insn);
+s16 get_branch_offset(InsnData insn);
 uintptr_t get_branch_target_from_addr(uintptr_t addr);
-char *insn_disasm(InsnData insn, const char **fname);
+char *insn_disasm(InsnData insn, const char **fname, _Bool showDestNames);

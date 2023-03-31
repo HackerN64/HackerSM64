@@ -9,13 +9,14 @@
 #include "game/debug.h"
 #include "game/game_init.h"
 
+
 ALIGNED8 static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
 ALIGNED8 static struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
 static u32 sNumKnownFunctions = 0;
 static u32 sNumShownFunctions = STACK_SIZE;
 
 static _Bool sStackTraceSkipUnknowns = FALSE;
-static _Bool sShowFunctionNames = TRUE;
+static _Bool sStackTraceShowFunctionNames = TRUE;
 
 u32 gStackTraceIndex = 0;
 
@@ -24,10 +25,11 @@ const enum ControlTypes stackTracePageControls[] = {
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
     CONT_DESC_SCROLL_LIST,
-    CONT_DESC_TOGGLE_FUNCTIONS,
     CONT_DESC_TOGGLE_UNKNOWNS,
+    CONT_DESC_TOGGLE_FUNCTIONS,
     CONT_DESC_LIST_END,
 };
+
 
 #ifdef INCLUDE_DEBUG_MAP
 void fill_function_stack_trace(OSThread *thread) {
@@ -105,7 +107,7 @@ void draw_stack_trace(OSThread *thread) {
                 crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
                 // Print known function
-                if (sShowFunctionNames) {
+                if (sStackTraceShowFunctionNames) {
                     crash_screen_print_scroll(TEXT_X(9), y, (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
                 } else {
                     crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
@@ -132,31 +134,30 @@ void draw_stack_trace(OSThread *thread) {
 void crash_screen_input_stack_trace(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-        // Toggle whether to display function names.
-        sShowFunctionNames ^= TRUE;
-        gCrashScreenUpdateBuffer = TRUE;
-    }
-
-    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
         // Toggle whether entries without a name are skipped.
         sStackTraceSkipUnknowns ^= TRUE;
         sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
         gStackTraceIndex = 0;
-        gCrashScreenUpdateBuffer = TRUE;
+        gCrashScreenUpdateFramebuffer = TRUE;
+    }
+
+    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+        // Toggle whether to display function names.
+        toggle_display_var(&sStackTraceShowFunctionNames);
     }
 
     if (gCrashScreenDirectionFlags.held.up) {
         // Scroll up.
         if (gStackTraceIndex > 0) {
             gStackTraceIndex--;
-            gCrashScreenUpdateBuffer = TRUE;
+            gCrashScreenUpdateFramebuffer = TRUE;
         }
     }
     if (gCrashScreenDirectionFlags.held.down) {
         // Scroll down.
         if (gStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
             gStackTraceIndex++;
-            gCrashScreenUpdateBuffer = TRUE;
+            gCrashScreenUpdateFramebuffer = TRUE;
         }
     }
 #endif
