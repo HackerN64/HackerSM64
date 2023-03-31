@@ -18,7 +18,7 @@ struct MapEntry {
 
 
 void map_data_init(void);
-s32 is_in_code_segment(uintptr_t addr);
+_Bool is_in_code_segment(uintptr_t addr);
 char *parse_map(uintptr_t *addr);
 char *parse_map_exact(uintptr_t addr);
 char *find_function_in_stack(uintptr_t *sp);

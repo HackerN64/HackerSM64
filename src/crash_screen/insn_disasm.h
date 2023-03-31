@@ -125,6 +125,8 @@ enum FormatCodes {
 };
 
 
+#define DISASM_STEP (s32)sizeof(InsnData)
+
 #define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
 
 

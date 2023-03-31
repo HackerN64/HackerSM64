@@ -3,8 +3,8 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
-#include "crash_screen_draw.h"
-#include "crash_screen_print.h"
+#include "crash_draw.h"
+#include "crash_print.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/game_init.h"
@@ -57,7 +57,7 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
     if (alpha == 0x00) {
         return;
     }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
+    const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
     RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
@@ -77,12 +77,12 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
 }
 
 // Draws a triangle pointing upwards or downwards.
-void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
+void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
     }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
+    const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (w / 2.0f);
     f32 d = 0.0f;
@@ -112,12 +112,12 @@ void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, R
 }
 
 // Draws a triangle pointing left or right.
-void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
+void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
     }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
+    const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (h / 2.0f);
     const f32 t = ((f32) w / middle);
@@ -149,7 +149,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     if (alpha == 0x00) {
         return;
     }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
+    const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
     RGBA16 *dst;
@@ -181,7 +181,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32
     if (alpha == 0x00) {
         return;
     }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
+    const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const FontRow startBit = ((FontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
     FontRow bit;
@@ -221,7 +221,7 @@ void crash_screen_take_screenshot(RGBA16 *dst) {
     }
 }
 
-void crash_screen_reset_framebuffer(s32 drawBackground) {
+void crash_screen_reset_framebuffer(_Bool drawBackground) {
     if (drawBackground) {
         bcopy(gZBuffer, (void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
     } else {

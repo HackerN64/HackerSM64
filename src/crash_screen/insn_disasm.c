@@ -6,7 +6,7 @@
 #include "farcall.h"
 #include "color_presets.h"
 #include "crash_screen.h"
-#include "crash_screen_print.h"
+#include "crash_print.h"
 #include "insn_disasm.h"
 #include "map_parser.h"
 #include "engine/math_util.h"
@@ -415,8 +415,10 @@ char *insn_disasm(InsnData insn, const char **fname) {
     char *strp = &insn_as_string[0];
     uintptr_t target;
     s16 branchOffset;
-    u8 unimpl = FALSE;
+    _Bool unimpl = FALSE;
     char insn_name[10] = "";
+
+    *fname = NULL;
 
     bzero(insn_as_string, sizeof(insn_as_string));
     bzero(insn_name, sizeof(insn_name));

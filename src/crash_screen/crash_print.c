@@ -5,8 +5,8 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
-#include "crash_screen_draw.h"
-#include "crash_screen_print.h"
+#include "crash_draw.h"
+#include "crash_print.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "engine/colors.h"
@@ -16,10 +16,10 @@
 PrintBuffer gCrashScreenPrintBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCrashScreenScrollBuffer[CHAR_BUFFER_SIZE];
 
-s8 gCrashScreenWordWrap = TRUE;
+_Bool gCrashScreenWordWrap = TRUE;
 
 
-static s32 glyph_to_hex(char *dest, unsigned char glyph) {
+static _Bool glyph_to_hex(char *dest, unsigned char glyph) {
     if (IS_NUMERIC(glyph)) {
         *dest = ((glyph - CHAR_NUMERIC_START) & BITMASK(4));
     } else if (IS_UPPERCASE_HEX(glyph)) {
@@ -33,7 +33,7 @@ static s32 glyph_to_hex(char *dest, unsigned char glyph) {
     return TRUE;
 }
 
-static s32 read_str_to_bytes(u8 dest[], const char *buf, u32 index, size_t numBytes) {
+static _Bool read_str_to_bytes(u8 dest[], const char *buf, u32 index, size_t numBytes) {
     for (u32 byteIndex = 0; byteIndex < numBytes; byteIndex++) {
         u8 retByte = 0x00;
 
@@ -59,7 +59,7 @@ static s32 read_str_to_bytes(u8 dest[], const char *buf, u32 index, size_t numBy
     return TRUE;
 }
 
-static s32 is_special_char(unsigned char glyph) {
+static _Bool is_special_char(unsigned char glyph) {
     return (
         glyph == CHAR_ESCAPE  ||
         glyph == CHAR_NEWLINE ||
@@ -68,16 +68,16 @@ static s32 is_special_char(unsigned char glyph) {
     );
 }
 
-static u32 crash_screen_format_print_buffer(const char *buf, size_t totalSize) {
+static u32 format_print_buffer(const char *buf, size_t totalSize) {
     u32 bufferCount = 0;
     // uRGBA32 color = { .raw32 = COLOR_RGBA32_WHITE }; // Initial color
     RGBA32 color = COLOR_RGBA32_WHITE;
-    u8 escaped = FALSE;
+    _Bool escaped = FALSE;
 
     // Pass 1: control characters and formatting
     for (u32 index = 0; index < totalSize; index++) {
         PrintBuffer *data = &gCrashScreenPrintBuffer[bufferCount];
-        u8 print = FALSE;
+        _Bool print = FALSE;
         unsigned char glyph = buf[index];
 
         if (glyph == CHAR_NULL) {
@@ -114,6 +114,7 @@ static u32 crash_screen_format_print_buffer(const char *buf, size_t totalSize) {
                         break;
                     }
                     color = *(u32*)tempColor;
+                    // color = COLORRGBA_TO_RGBA16(tempColor);
                     index += 8;
                     break;
                 default:
@@ -151,14 +152,14 @@ static u32 get_next_word_length(PrintBuffer *buf, u32 index, size_t size) {
     return count;
 }
 
-static u32 crash_screen_print_from_buffer(size_t bufferCount, u32 x, u32 y) {
+static u32 print_from_buffer(size_t bufferCount, u32 x, u32 y) {
     u32 startX = x;
     u32 numLines = 1;
 
     // Pass 3: whitespace, newlines, and print
     for (u32 index = 0; index < bufferCount; index++) {
-        u8 print = FALSE;
-        u8 newline = FALSE;
+        _Bool print = FALSE;
+        _Bool newline = FALSE;
         PrintBuffer *data = &gCrashScreenPrintBuffer[index];
         unsigned char glyph = data->glyph;
 
@@ -202,11 +203,7 @@ static u32 crash_screen_print_from_buffer(size_t bufferCount, u32 x, u32 y) {
     return numLines;
 }
 
-static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return ((char *) memcpy(buffer, data, size) + size);
-}
-
-void scroll_buffer(u32 bufferCount, u32 charLimit) {
+static void scroll_buffer(u32 bufferCount, u32 charLimit) {
     bzero(&gCrashScreenScrollBuffer, sizeof(gCrashScreenScrollBuffer));
 
     u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
@@ -224,6 +221,10 @@ void scroll_buffer(u32 bufferCount, u32 charLimit) {
     gCrashScreenQueueFramebufferUpdate = TRUE;
 }
 
+static char *write_to_buf(char *buffer, const char *data, size_t size) {
+    return ((char *) memcpy(buffer, data, size) + size);
+}
+
 u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char *fmt, ...) {
     char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
@@ -237,14 +238,14 @@ u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char *fmt, ...) {
     if (totalSize > 0) {
         bzero(&gCrashScreenPrintBuffer, sizeof(gCrashScreenPrintBuffer));
 
-        size_t bufferCount = crash_screen_format_print_buffer(buf, totalSize);
+        size_t bufferCount = format_print_buffer(buf, totalSize);
 
         if (0 < charLimit && charLimit < bufferCount) {
             scroll_buffer(bufferCount, charLimit);
             bufferCount = charLimit;
         }
 
-        numLines = crash_screen_print_from_buffer(bufferCount, x, y);
+        numLines = print_from_buffer(bufferCount, x, y);
     }
 
     va_end(args);

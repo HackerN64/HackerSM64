@@ -53,13 +53,11 @@
 
 typedef struct PACKED {
     RGBA32 color;
-    u8 numScrollChars;
-    u8 doScroll;
-    u8 isEscaped;
+    _Bool isEscaped;
     char glyph;
 } PrintBuffer; /*0x08*/
 
-extern s8 gCrashScreenWordWrap;
+extern _Bool gCrashScreenWordWrap;
 
 u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char *fmt, ...);
 

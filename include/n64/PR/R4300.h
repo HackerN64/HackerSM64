@@ -208,16 +208,16 @@
 #define	EXC_CODE(x)	((x) << CAUSE_EXCSHIFT)
 
 /* Hardware exception codes */
-#define	EXC_INT		EXC_CODE(0)	/* interrupt */
-#define	EXC_MOD		EXC_CODE(1)	/* TLB mod */
-#define	EXC_RMISS	EXC_CODE(2)	/* Read TLB Miss */
-#define	EXC_WMISS	EXC_CODE(3)	/* Write TLB Miss */
-#define	EXC_RADE	EXC_CODE(4)	/* Read Address Error */
-#define	EXC_WADE	EXC_CODE(5)	/* Write Address Error */
-#define	EXC_IBE		EXC_CODE(6)	/* Instruction Bus Error */
-#define	EXC_DBE		EXC_CODE(7)	/* Data Bus Error */
-#define	EXC_SYSCALL	EXC_CODE(8)	/* SYSCALL */
-#define	EXC_BREAK	EXC_CODE(9)	/* BREAKpoint */
+#define	EXC_INT		EXC_CODE( 0)	/* interrupt */
+#define	EXC_MOD		EXC_CODE( 1)	/* TLB mod */
+#define	EXC_RMISS	EXC_CODE( 2)	/* Read TLB Miss */
+#define	EXC_WMISS	EXC_CODE( 3)	/* Write TLB Miss */
+#define	EXC_RADE	EXC_CODE( 4)	/* Read Address Error */
+#define	EXC_WADE	EXC_CODE( 5)	/* Write Address Error */
+#define	EXC_IBE		EXC_CODE( 6)	/* Instruction Bus Error */
+#define	EXC_DBE		EXC_CODE( 7)	/* Data Bus Error */
+#define	EXC_SYSCALL	EXC_CODE( 8)	/* SYSCALL */
+#define	EXC_BREAK	EXC_CODE( 9)	/* BREAKpoint */
 #define	EXC_II		EXC_CODE(10)	/* Illegal Instruction */
 #define	EXC_CPU		EXC_CODE(11)	/* CoProcessor Unusable */
 #define	EXC_OV		EXC_CODE(12)	/* OVerflow */
