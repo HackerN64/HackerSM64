@@ -2,11 +2,12 @@
 
 #include <ultra64.h>
 
+#include <stdarg.h>
 #include "types.h"
 
 
 // Maximum number of chars to print at once.
-#define CHAR_BUFFER_SIZE 0x100
+#define CHAR_BUFFER_SIZE 128
 
 // Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2
@@ -55,14 +56,14 @@
 #define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 
 typedef struct PACKED {
-    RGBA32 color;
+    RGBA32 color; //! TODO: RGBA16
     _Bool isEscaped;
     char glyph;
 } PrintBuffer; /*0x08*/
 
 extern _Bool gCrashScreenWordWrap;
 
-u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char *fmt, ...);
+u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char* fmt, ...);
 
 //! TODO: change these to ALWAYS_INLINE functions for proper syntax highlighting
 #define crash_screen_print(x, y, ...)                   crash_screen_print_impl((x), (y),           0, __VA_ARGS__)

@@ -5,4 +5,4 @@
 #include "types.h"
 
 
-void draw_crash_context(OSThread *thread);
+void draw_crash_context(OSThread* thread);

@@ -1,12 +1,9 @@
 #include <ultra64.h>
-#include <stdarg.h>
 #include <string.h>
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_screen.h"
 #include "disasm.h"
-#include "engine/colors.h"
-#include "game/debug.h"
 #include "game/game_init.h"
 
 
@@ -35,7 +32,7 @@ static u32 sNumBranchArrows = 0;
 static uintptr_t sBranchBufferCurrAddr = 0x00000000;
 
 
-void reset_branch_buffer(UNUSED const char *fname, uintptr_t funcAddr) {
+void reset_branch_buffer(UNUSED const char* fname, uintptr_t funcAddr) {
     bzero(sBranchArrows, sizeof(sBranchArrows));
     sNumBranchArrows = 0;
 
@@ -44,7 +41,7 @@ void reset_branch_buffer(UNUSED const char *fname, uintptr_t funcAddr) {
 
 //! TODO: Optimize this as much as possible
 //! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport)
-s32 crash_screen_fill_branch_buffer(const char *fname, uintptr_t funcAddr) {
+_Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
     if (fname == NULL) {
         return FALSE;
     }
@@ -84,7 +81,7 @@ s32 crash_screen_fill_branch_buffer(const char *fname, uintptr_t funcAddr) {
 
         // Get the offset for the current function;
         InsnData insn = (InsnData){ .raw = *(uintptr_t*)sBranchBufferCurrAddr };
-        s16 branchOffset = get_branch_offset(insn);
+        s16 branchOffset = check_for_branch_offset(insn);
 
         if (branchOffset != 0) { //! TODO: Verify ordering:
             curBranchX += DISASM_BRANCH_ARROW_SPACING;
@@ -106,7 +103,7 @@ s32 crash_screen_fill_branch_buffer(const char *fname, uintptr_t funcAddr) {
 
         sBranchBufferCurrAddr += DISASM_STEP;
 
-        // Took to long, so pause until next frame.
+        // Took to long, so continue on the next frame.
         if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) {
             return TRUE;
         }
@@ -154,7 +151,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, s32 p
 
 void disasm_draw_branch_arrows(s32 printLine) {
     // Draw branch arrows from the buffer.
-    struct BranchArrow *currArrow = &sBranchArrows[0];
+    struct BranchArrow* currArrow = &sBranchArrows[0];
 
     for (u32 i = 0; i < sNumBranchArrows; i++) {
         s32 startLine = (((s32)currArrow->startAddr - (s32)gScrollAddress) / DISASM_STEP);
@@ -168,7 +165,7 @@ void disasm_draw_branch_arrows(s32 printLine) {
     osWritebackDCacheAll();
 }
 
-void print_as_binary(s32 charX, s32 charY, u32 data) { //! TODO: make this a formatting char, maybe \%b?
+static void print_as_binary(const s32 charX, const s32 charY, const u32 data) { //! TODO: make this a formatting char, maybe \%b?
     s32 bitX = charX;
 
     for (u32 c = 0; c < 32; c++) {
@@ -176,7 +173,7 @@ void print_as_binary(s32 charX, s32 charY, u32 data) { //! TODO: make this a for
             bitX += TEXT_WIDTH(1);
         }
 
-        crash_screen_draw_glyph(bitX, charY, (((data >> (32 - c)) % 2) ? '1' : '0'), COLOR_RGBA32_WHITE);
+        crash_screen_draw_glyph(bitX, charY, (((data >> (32 - c)) & 0b1) ? '1' : '0'), COLOR_RGBA32_WHITE);
 
         bitX += TEXT_WIDTH(1);
     }
@@ -203,29 +200,37 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 
         if (is_in_code_segment(addr)) {
 #ifndef INCLUDE_DEBUG_MAP
-            s16 branchOffset = get_branch_offset(insn);
+            s16 branchOffset = check_for_branch_offset(insn);
             if (branchOffset != 0) {
                 s32 startLine = (((s32)addr - (s32)gScrollAddress) / DISASM_STEP);
                 s32 endLine = (startLine + branchOffset + 1);
                 draw_branch_arrow(startLine, endLine, DISASM_BRANCH_ARROW_OFFSET, COLOR_RGBA32_CRASH_FUNCTION_NAME_2, line);
             }
 #endif
-            const char *destFname = NULL;
-            const char *insnAsStr = insn_disasm(insn, &destFname, sDisasmShowDestFunctionNames);
+            const char* destFname = NULL;
+            const char* insnAsStr = insn_disasm(insn, &destFname, sDisasmShowDestFunctionNames);
+            // "[instruction name] [params]"
             crash_screen_print(charX, charY, "%s", insnAsStr);
             if (addr == pc) {
                 char crashStr[] = "<-- CRASH";
-                crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(strlen(crashStr))), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
+                // "<-- CRASH"
+                crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(sizeof(crashStr) - 1)), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
             }
 #ifdef INCLUDE_DEBUG_MAP
             if (sDisasmShowDestFunctionNames && destFname != NULL) {
-                crash_screen_print_scroll((charX + TEXT_WIDTH(7)), charY, (CRASH_SCREEN_NUM_CHARS_X - 7), STR_COLOR_PREFIX"%s", sDisasmColors[DISASM_COLOR_ADDRESS], destFname);
+                // "[function name]"
+                crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH + 1)), charY, (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH + 1)),
+                    STR_COLOR_PREFIX"%s",
+                    COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
+                );
             }
 #endif
         } else { // Outside of code segments:
             if (sDisasmShowDataAsBinary) {
+                // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
                 print_as_binary(charX, charY, insn.raw);
             } else {
+                // "[XXXXXXXX]"
                 crash_screen_print(charX, charY, STR_HEX_WORD, insn.raw);
             }
         }
@@ -238,11 +243,11 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 
 //! TODO: automatically check page change:
 // uintptr_t sCurrFuncAddr = 0x00000000;
-// const char *sCurrFuncName = NULL;
+// const char* sCurrFuncName = NULL;
 
-void draw_disasm(OSThread *thread) {
-    __OSThreadContext *tc = &thread->context;
-    const char *fname = NULL;
+void draw_disasm(OSThread* thread) {
+    __OSThreadContext* tc = &thread->context;
+    const char* fname = NULL;
     uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1));
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -270,18 +275,20 @@ void draw_disasm(OSThread *thread) {
 
     u32 line = 1;
 
-    line += crash_screen_print(TEXT_X(0), TEXT_Y(line),
-        (STR_COLOR_PREFIX"%s "STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
-        COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[PAGE_DISASM].name,
+    // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
+    line += crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
+        (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, alignedSelectedAddr, gScrollAddress, (gScrollAddress + DISASM_SHOWN_SECTION)
     );
-    crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (fname == NULL) {
+        // "NOT IN A FUNCTION"
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
-        line += crash_screen_print_scroll(TEXT_X(0), TEXT_Y(line),
-            (CRASH_SCREEN_NUM_CHARS_X - 3), "IN:"STR_COLOR_PREFIX"%s",
+        // "IN: [function name]"
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
+        line += crash_screen_print_scroll(TEXT_X(3), TEXT_Y(line),
+            (CRASH_SCREEN_NUM_CHARS_X - 3), STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
         );
     }

@@ -10,16 +10,13 @@
 #include "game/puppyprint.h"
 
 
-#ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable
-void draw_crash_log(UNUSED OSThread *thread) {
-    u32 i;
+#ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if it's long enough
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[PAGE_LOG].name);
-    crash_screen_draw_divider(DIVIDER_Y(2));
-
+void draw_crash_log(UNUSED OSThread* thread) {
     osWritebackDCacheAll();
 
-    for (i = 0; i < LOG_BUFFER_SIZE; i++) {
+    for (u32 i = 0; i < LOG_BUFFER_SIZE; i++) {
+        // "[log entry]"
         crash_screen_print(TEXT_X(0), TEXT_Y(1 + (LOG_BUFFER_SIZE - i)), consoleLogTable[i]);
     }
 }

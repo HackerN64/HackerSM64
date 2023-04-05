@@ -22,7 +22,7 @@ struct MapEntry {
 
 void map_data_init(void);
 _Bool is_in_code_segment(uintptr_t addr);
-char *parse_map(uintptr_t *addr);
-char *parse_map_exact(uintptr_t addr);
-char *find_function_in_stack(uintptr_t *sp);
+const char* parse_map(uintptr_t* addr);
+const char* parse_map_exact(uintptr_t addr);
+const char* find_function_in_stack(uintptr_t* sp);
 _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos);

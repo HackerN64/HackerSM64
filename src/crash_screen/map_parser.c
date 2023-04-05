@@ -1,7 +1,4 @@
 #include <ultra64.h>
-#include <PR/os_internal_error.h>
-#include <stdarg.h>
-#include <string.h>
 #include "segments.h"
 #include "crash_screen.h"
 #include "map_parser.h"
@@ -13,7 +10,7 @@ extern size_t gMapEntrySize;
 extern u8 _mapDataSegmentRomStart[];
 
 
-static void headless_dma(uintptr_t devAddr, void *dramAddr, size_t size) {
+static void headless_dma(uintptr_t devAddr, void* dramAddr, size_t size) {
     u32 stat = IO_READ(PI_STATUS_REG);
 
     while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) {
@@ -54,7 +51,8 @@ _Bool is_in_code_segment(uintptr_t addr) {
 }
 
 #ifdef INCLUDE_DEBUG_MAP
-char *parse_map(uintptr_t *addr) {
+// Changes 'addr' to the starting address of the function it's in and returns a pointer to the function name.
+const char* parse_map(uintptr_t* addr) {
     if (is_in_code_segment(*addr)) {
         for (u32 i = 0; i < gMapEntrySize; i++) {
             if (gMapEntries[i].addr >= *addr) {
@@ -72,7 +70,8 @@ char *parse_map(uintptr_t *addr) {
     return NULL;
 }
 
-char *parse_map_exact(uintptr_t addr) {
+// If 'addr' is the starting address of the function it's, returns a pointer to the function name.
+const char* parse_map_exact(uintptr_t addr) {
     if (is_in_code_segment(addr)) {
         for (u32 i = 0; i < gMapEntrySize; i++) {
             if (gMapEntries[i].addr == addr) {
@@ -84,19 +83,25 @@ char *parse_map_exact(uintptr_t addr) {
     return NULL;
 }
 
-char *find_function_in_stack(uintptr_t *sp) {
+// 
+const char* find_function_in_stack(uintptr_t* sp) {
+    const char* fname = NULL;
+
     for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        uintptr_t val = *(uintptr_t *)*sp;
+        uintptr_t val = *(uintptr_t*) *sp;
         *sp += sizeof(uintptr_t);
 
-        if (is_in_code_segment(val)) {
-            return parse_map(&val);
+        fname = parse_map(&val);
+
+        if (fname != NULL) {
+            return fname;
         }
     }
 
     return NULL;
 }
 
+// Check whether two addresses share the same function.
 _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
     if (oldPos == newPos) {
         return TRUE;
@@ -115,13 +120,13 @@ _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
     return (oldPos == newPos);
 }
 #else
-char *parse_map(UNUSED uintptr_t *addr) {
+const char* parse_map(UNUSED uintptr_t* addr) {
     return NULL;
 }
-char *parse_map_exact(UNUSED uintptr_t addr) {
+const char* parse_map_exact(UNUSED uintptr_t addr) {
     return NULL;
 }
-char *find_function_in_stack(UNUSED uintptr_t *sp) {
+const char* find_function_in_stack(UNUSED uintptr_t* sp) {
     return NULL;
 }
 

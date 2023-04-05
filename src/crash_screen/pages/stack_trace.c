@@ -1,19 +1,15 @@
 #include <ultra64.h>
-#include <stdarg.h>
-#include <string.h>
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_screen.h"
 #include "stack_trace.h"
-#include "engine/colors.h"
-#include "game/debug.h"
 #include "game/game_init.h"
 
 
-ALIGNED8 static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
-ALIGNED8 static struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
+ALIGNED8 static struct FunctionInStack sAllFunctionStack[STACK_TRACE_SIZE];
+ALIGNED8 static struct FunctionInStack sKnownFunctionStack[STACK_TRACE_SIZE];
 static u32 sNumKnownFunctions = 0;
-static u32 sNumShownFunctions = STACK_SIZE;
+static u32 sNumShownFunctions = STACK_TRACE_SIZE;
 
 static _Bool sStackTraceSkipUnknowns = FALSE;
 static _Bool sStackTraceShowFunctionNames = TRUE;
@@ -32,14 +28,14 @@ const enum ControlTypes stackTracePageControls[] = {
 
 
 #ifdef INCLUDE_DEBUG_MAP
-void fill_function_stack_trace(OSThread *thread) {
-    __OSThreadContext *tc = &thread->context;
+void fill_function_stack_trace(OSThread* thread) {
+    __OSThreadContext* tc = &thread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
-    struct FunctionInStack *function = NULL;
-    const char *fname;
+    struct FunctionInStack* function = NULL;
+    const char* fname;
 
     // Fill the stack buffer.
-    for (u32 i = 0; i < STACK_SIZE; i++) {
+    for (u32 i = 0; i < STACK_TRACE_SIZE; i++) {
         fname = find_function_in_stack(&temp_sp);
 
         function = &sAllFunctionStack[i];
@@ -57,23 +53,24 @@ void fill_function_stack_trace(OSThread *thread) {
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
-void draw_stack_trace(OSThread *thread) {
-    __OSThreadContext *tc = &thread->context;
+void draw_stack_trace(OSThread* thread) {
+    __OSThreadContext* tc = &thread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
 
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[PAGE_STACK_TRACE].name);
+    // "FROM: [XXXXXXXX]"
     line += crash_screen_print(TEXT_X(12), TEXT_Y(line), "%s "STR_HEX_WORD, "FROM", temp_sp);
-    crash_screen_draw_divider(DIVIDER_Y(line));
 
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_AT, "CURRFUNC");
     uintptr_t pc = tc->pc;
-    const char *fname = parse_map(&pc);
+    const char* fname = parse_map(&pc);
     if (fname == NULL) {
+        // "UNKNOWN"
         line += crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
+        // "[function name]"
         line += crash_screen_print_scroll(TEXT_X(9), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 
@@ -81,8 +78,8 @@ void draw_stack_trace(OSThread *thread) {
 
     osWritebackDCacheAll();
 
-    struct FunctionInStack *functionList = (sStackTraceSkipUnknowns ? sKnownFunctionStack : sAllFunctionStack);
-    struct FunctionInStack *function = NULL;
+    struct FunctionInStack* functionListStart = (sStackTraceSkipUnknowns ? sKnownFunctionStack : sAllFunctionStack);
+    struct FunctionInStack* function = NULL;
 
     // Print
     for (u32 i = 0; i < STACK_TRACE_NUM_ROWS; i++) {
@@ -94,22 +91,26 @@ void draw_stack_trace(OSThread *thread) {
             break;
         }
 
-        function = &functionList[currIndex];
+        function = &functionListStart[currIndex];
 
         if (function != NULL) {
             uintptr_t faddr = function->addr;
-            const char *fname = function->name;
+            const char* fname = function->name;
 
+            // "[XXXXXXXX]:"
             crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", faddr);
 
             if (!sStackTraceSkipUnknowns && (fname == NULL)) {
                 // Print unknown function
+                // "[XXXXXXXX]"
                 crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
                 // Print known function
                 if (sStackTraceShowFunctionNames) {
+                    // "[function name]"
                     crash_screen_print_scroll(TEXT_X(9), y, (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
                 } else {
+                    // "[XXXXXXXX]"
                     crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
                 }
             }
@@ -125,6 +126,7 @@ void draw_stack_trace(OSThread *thread) {
 #else
     osWritebackDCacheAll();
 
+    // "STACK TRACE DISABLED"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "STACK TRACE DISABLED");
 #endif
 
@@ -136,7 +138,7 @@ void crash_screen_input_stack_trace(void) {
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         // Toggle whether entries without a name are skipped.
         sStackTraceSkipUnknowns ^= TRUE;
-        sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
+        sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_TRACE_SIZE);
         gStackTraceIndex = 0;
         gCrashScreenUpdateFramebuffer = TRUE;
     }

@@ -1,20 +1,18 @@
 #include <ultra64.h>
-#include <stdarg.h>
 #include <string.h>
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_screen.h"
 #include "ram_viewer.h"
 #include "engine/colors.h"
-#include "game/debug.h"
 #include "game/game_init.h"
 
 
 static _Bool sRamViewShowAsAscii = FALSE;
 
 
-void draw_ram_viewer(OSThread *thread) {
-    __OSThreadContext *tc = &thread->context;
+void draw_ram_viewer(OSThread* thread) {
+    __OSThreadContext* tc = &thread->context;
 
     clamp_view_to_selection(RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 
@@ -22,9 +20,11 @@ void draw_ram_viewer(OSThread *thread) {
     u32 charX, charY;
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[PAGE_RAM_VIEWER].name);
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), (STR_HEX_WORD" %s "STR_HEX_WORD"-"STR_HEX_WORD), gSelectedAddress, "in", startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION));
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
+    line += crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
+        (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
+        COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION)
+    );
 
     charX = (TEXT_X(8) + 3);
 
@@ -33,6 +33,7 @@ void draw_ram_viewer(OSThread *thread) {
             charX += 2;
         }
 
+        // "[XX]"
         crash_screen_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_H1 : COLOR_RGBA32_CRASH_RAM_VIEW_H2), i);
 
         charX += (TEXT_WIDTH(2) + 1);
@@ -42,6 +43,7 @@ void draw_ram_viewer(OSThread *thread) {
 
     crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(line + RAM_VIEWER_NUM_ROWS - 1), COLOR_RGBA32_LIGHT_GRAY);
 
+    // "MEMORY"
     line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "%s", "MEMORY");
 
     charX = (TEXT_X(8) + 3);
@@ -49,13 +51,14 @@ void draw_ram_viewer(OSThread *thread) {
 
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
         uintptr_t rowAddr = startAddr + (y * RAM_VIEWER_STEP);
+        // "[XXXXXXXX]"
         crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD), ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr);
 
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
             uintptr_t currAddr = (rowAddr + x);
-            u8 byte = *((u8 *)currAddr);
+            u8 byte = *((u8*)currAddr);
 
             if ((x % 4) == 0) {
                 charX += 2;
@@ -74,6 +77,7 @@ void draw_ram_viewer(OSThread *thread) {
             if (sRamViewShowAsAscii) {
                 crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, color);
             } else {
+                // "XX"
                 crash_screen_print(charX, charY, (STR_COLOR_PREFIX STR_HEX_BYTE), color, byte);
             }
 

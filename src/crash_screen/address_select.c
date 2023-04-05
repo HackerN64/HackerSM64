@@ -1,19 +1,8 @@
 #include <ultra64.h>
-#include <PR/os_internal_error.h>
-#include <stdarg.h>
-#include <string.h>
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
-#include "audio/external.h"
-#include "engine/colors.h"
-#include "game/debug.h"
 #include "game/game_init.h"
-#include "game/game_init.h"
-#include "game/main.h"
-#include "game/printf.h"
-#include "game/puppyprint.h"
-#include "game/rumble_init.h"
 #include "pages/disasm.h"
 
 
@@ -29,8 +18,10 @@ void draw_address_select(void) {
         3
     );
 
+    // "GO TO:"
     crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(3)), JUMP_MENU_Y1, "%s:", "GO TO");
 
+    // Up arrow:
     crash_screen_draw_vertical_triangle(
         ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1),
         ((JUMP_MENU_Y1 + TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y),
@@ -38,6 +29,7 @@ void draw_address_select(void) {
         COLOR_RGBA32_CRASH_SELECT_ARROWS,
         FALSE
     );
+    // Down arrow:
     crash_screen_draw_vertical_triangle(
         ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1),
         ((JUMP_MENU_Y1 + TEXT_HEIGHT(3)) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
@@ -46,13 +38,17 @@ void draw_address_select(void) {
         TRUE
     );
 
+    // "0x[80XXXXXX]"
     crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)), (STR_HEX_PREFIX STR_HEX_WORD), sAddressSelectTarget);
 
+#ifdef INCLUDE_DEBUG_MAP
     uintptr_t checkAddr = sAddressSelectTarget;
-    const char *fname = parse_map(&checkAddr);
+    const char* fname = parse_map(&checkAddr);
     if (fname != NULL) {
+        // "[function name]"
         crash_screen_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
+#endif
 
     osWritebackDCacheAll();
 }

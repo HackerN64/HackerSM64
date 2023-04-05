@@ -33,9 +33,6 @@ enum CrashScreenPages {
     MAX_PAGES = 255U,
 };
 
-// The number of functions to save to the stack trace buffer.
-#define STACK_SIZE 256 // (s32)(THREAD2_STACK / sizeof(u64))
-
 struct CrashScreen {
     /*0x000*/ OSThread thread;
     /*0x1B0*/ u64 stack[THREAD2_STACK / sizeof(u64)];
@@ -44,10 +41,11 @@ struct CrashScreen {
 }; /*0x9CC*/
 
 struct CrashScreenPage {
-    /*0x00*/ void (*drawFunc)(OSThread *thread);
+    /*0x00*/ void (*drawFunc)(OSThread* thread);
     /*0x04*/ void (*inputFunc)(void);
     /*0x08*/ const enum ControlTypes *pageControlsList;//void (*controlsDrawFunc)(void);
-    /*0x10*/ const char *name;
+    /*0x10*/ const char* name;
+    /*0x14*/ _Bool printName;
 }; /*0x14*/
 
 
@@ -61,25 +59,25 @@ struct CrashScreenPage {
 #define CYCLES_TO_FRAMES(c) (((u64)(c) * FPS_COUNT) / OS_CPU_COUNTER)
 
 
+extern struct CrashScreenPage gCrashScreenPages[];
+extern enum CrashScreenPages gCrashPage;
+
 extern struct CrashScreen gCrashScreen;
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 extern struct CrashScreen gCrashScreen2;
 #endif
 
+extern _Bool gCrashScreenSwitchedPage;
 extern _Bool gDrawCrashScreen;
 extern _Bool gDrawBackground;
-extern _Bool gCrashScreenSwitchedPage;
 extern _Bool gCrashScreenUpdateFramebuffer;
 
-extern enum CrashScreenPages gCrashPage;
 extern uintptr_t gCrashAddress;
 extern uintptr_t gScrollAddress;
 extern uintptr_t gSelectedAddress;
 
-extern struct CrashScreenPage gCrashScreenPages[];
 
-
-void toggle_display_var(_Bool *var);
+void toggle_display_var(_Bool* var);
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color);
 void clamp_view_to_selection(const u32 numRows, const u32 step);
 void crash_screen_init(void);

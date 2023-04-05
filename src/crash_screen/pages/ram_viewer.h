@@ -18,5 +18,5 @@
 extern const enum ControlTypes ramViewerPageControls[];
 
 
-void draw_ram_viewer(OSThread *thread);
+void draw_ram_viewer(OSThread* thread);
 void crash_screen_input_ram_viewer(void);

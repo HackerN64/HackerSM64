@@ -40,8 +40,8 @@ enum ControlTypes {
 };
 
 struct ControlType {
-    /*0x00*/ const char *control;
-    /*0x04*/ const char *description;
+    /*0x00*/ const char* control;
+    /*0x04*/ const char* description;
 }; /*0x08*/
 
 

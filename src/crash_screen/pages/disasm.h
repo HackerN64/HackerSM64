@@ -12,6 +12,7 @@ struct BranchArrow {
     /*0x08*/ s32 xPos;
 }; /*0x10*/
 
+
 // Disasm constants
 #define DISASM_NUM_ROWS         19
 #define DISASM_SHOWN_SECTION    ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
@@ -19,7 +20,7 @@ struct BranchArrow {
 #define DISASM_SCROLL_MIN       RAM_START
 #define DISASM_SCROLL_MAX       (RAM_END - DISASM_SHOWN_SECTION)
 
-#define DISASM_BRANCH_ARROW_START_X         TEXT_X(23)
+#define DISASM_BRANCH_ARROW_START_X         TEXT_X(INSN_NAME_DISPLAY_WIDTH + 1 + 15)
 #define DISASM_BRANCH_ARROW_OFFSET          TEXT_WIDTH(1)
 #define DISASM_BRANCH_ARROW_SPACING         (TEXT_WIDTH(1) / 2)
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (1024 * DISASM_STEP)
@@ -33,5 +34,5 @@ extern _Bool gFillBranchBuffer;
 extern const enum ControlTypes disasmPageControls[];
 
 
-void draw_disasm(OSThread *thread);
+void draw_disasm(OSThread* thread);
 void crash_screen_input_disasm(void);

@@ -1,21 +1,8 @@
 #include <ultra64.h>
-#include <PR/os_internal_error.h>
-#include <stdarg.h>
-#include <string.h>
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
-#include "audio/external.h"
-#include "buffers/framebuffers.h"
-#include "buffers/zbuffer.h"
-#include "engine/colors.h"
-#include "game/debug.h"
 #include "game/game_init.h"
-#include "game/game_init.h"
-#include "game/main.h"
-#include "game/printf.h"
-#include "game/puppyprint.h"
-#include "game/rumble_init.h"
 #include "crash_controls.h"
 #include "pages/stack_trace.h"
 
@@ -40,17 +27,14 @@ static OSTime sCrashScreenInputTimeX = 0;
 #define STR_L       "L"
 #define STR_R       "R"
 
-//! TODO: Check if doing this actually saves memory space.
-const char moveCursor[] = "move cursor";
-
 const struct ControlType gCrashControlsDescriptions[] = {
     [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page"                          },
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls"              },
     [CONT_DESC_CYCLE_DRAW       ] = { .control = STR_Z,                                     .description = "cycle drawing overlay and background" },
     [CONT_DESC_SCROLL_LIST      ] = { .control = STR_UP"/"STR_DOWN,                         .description = "scroll list"                          },
-    [CONT_DESC_CURSOR           ] = { .control = STR_UP"/"STR_DOWN"/"STR_LEFT"/"STR_RIGHT,  .description = moveCursor                             },
-    [CONT_DESC_CURSOR_VERTICAL  ] = { .control = STR_UP"/"STR_DOWN,                         .description = moveCursor                             },
-    [CONT_DESC_CURSOR_HORIZONTAL] = { .control = STR_LEFT"/"STR_RIGHT,                      .description = moveCursor                             },
+    [CONT_DESC_CURSOR           ] = { .control = STR_UP"/"STR_DOWN"/"STR_LEFT"/"STR_RIGHT,  .description = "move cursor"                          },
+    [CONT_DESC_CURSOR_VERTICAL  ] = { .control = STR_UP"/"STR_DOWN,                         .description = "move cursor"                          },
+    [CONT_DESC_CURSOR_HORIZONTAL] = { .control = STR_LEFT"/"STR_RIGHT,                      .description = "move cursor"                          },
     [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = STR_A,                                     .description = "jump to specific address"             },
     [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii"         },
     [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = STR_A,                                     .description = "toggle unknowns in list"              },
@@ -203,15 +187,18 @@ void draw_controls_box(void) {
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         3
     );
+    // "[page name] PAGE CONTROLS"
     crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name, "PAGE CONTROLS");
 
-    const enum ControlTypes *list = gCrashScreenPages[gCrashPage].pageControlsList;
-    const struct ControlType *desc = NULL;
+    const enum ControlTypes* list = gCrashScreenPages[gCrashPage].pageControlsList;
+    const struct ControlType* desc = NULL;
 
     u32 line = 3;
 
     while (*list != CONT_DESC_LIST_END) {
         desc = &gCrashControlsDescriptions[*list++];
+        // [control]
+        // [description]
         line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS, desc->description);
     }
 
