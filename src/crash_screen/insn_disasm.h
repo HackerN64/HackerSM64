@@ -5,10 +5,10 @@
 #include "types.h"
 
 
-#define INSN_NAME_DISPLAY_WIDTH 8
+#define INSN_NAME_DISPLAY_WIDTH 10
 
 #define INSN_ID_1(a, b, c, d, e, f, t, n) \
-    { .insn = { .i_0 = (a), .i_1 = (b), .i_2 = (c), .i_3 = (d), .i_4 = (e), .i_5 = (f) }, .paramType = (t), .name = (n) },
+    { .insn = { .i_0 = (a), .i_1 = (b), .i_2 = (c), .i_3 = (d), .i_4 = (e), .i_5 = (f) }, .format = (t), .name = (n) },
 
 #ifdef DISASM_INCLUDE_ALL_INSTRUCTIONS
     #define INSN_ID_0(a, b, c, d, e, f, t, n) INSN_ID_1((a), (b), (c), (d), (e), (f), (t), (n))
@@ -16,7 +16,23 @@
     #define INSN_ID_0(a, b, c, d, e, f, t, n)
 #endif
 
-#define INSN_DB_END INSN_ID_1(-1, -1, -1, -1, -1, -1, PARAM_END, "")
+#define INSN_DB_END INSN_ID_1(-1, -1, -1, -1, -1, -1, "", "")
+
+#define CHAR_P_NULL     '\0'
+#define CHAR_P_NOP      '0'     // "NOP"
+#define CHAR_P_NAME     '\''    // "[name]%-6"
+#define CHAR_P_NAMEF    '\"'    // "[name].[fmt]%-6"
+#define CHAR_P_RS       's'     // "[rs reg]"
+#define CHAR_P_RT       't'     // "[rt reg]"
+#define CHAR_P_RD       'd'     // "[rd reg]"
+#define CHAR_P_IMM      'I'     // "0x[last 16 bits]"
+#define CHAR_P_SHIFT    'a'     // "[shift]""
+#define CHAR_P_BASE     '('     // "([rs reg])"
+#define CHAR_P_BRANCH   'B'     // "[+-][last 16 bits]" + draw branch arrow
+#define CHAR_P_FT       'T'     // "F[ft reg]"
+#define CHAR_P_FS       'S'     // "F[fs reg]"
+#define CHAR_P_FD       'D'     // "F[fd reg]"
+#define CHAR_P_FUNC     'J'     // "[function address]" or parse map
 
 enum Coprocessors {
     COP0, // Coprocessor-0 (System Control Coprocessor)
@@ -25,35 +41,14 @@ enum Coprocessors {
     COP3, // Coprocessor-3 (CP3)
 };
 
-enum AccesLengths {
-    BYTE,       // 1 byte (8 bits)
-    HALFWORD,   // 2 bytes (16 bits
-    TRIPLEBYTE, // 3 bytes (24 bits)
-    WORD,       // 4 bytes (32 bits
-    QUINTIBYTE, // 5 bytes (40 bits)
-    SEXTIBYTE,  // 6 bytes (48 bits)
-    SEPTIBYTE,  // 7 bytes (56 bits)
-    DOUBLEWORD, // 8 bytes (64 bits)
-};
+#define COP_FROM    (0 * BIT(2)) // 0b00000 (move from)
+#define COP_TO      (1 * BIT(2)) // 0b00100 (move to)
+#define FMT_FLT     COP_FROM // 0b00000 (floating-point)
+#define FMT_FIX     COP_TO   // 0b00100 (fixed-point)
+#define FMT_CTL     BIT(1)
 
-#define COP_FROM (0 * BIT(2)) // 0b00000 (move from)
-#define COP_TO   (1 * BIT(2)) // 0b00100 (move to)
-#define FMT_FLT COP_FROM // 0b00000 (floating-point)
-#define FMT_FIX COP_TO   // 0b00100 (fixed-point)
-#define FMT_CTL BIT(1)
-
-
-#define FMT_32b   (0 * BIT(0)) // 0b00000 (32-bit)
-#define FMT_64b   (1 * BIT(0)) // 0b00001 (64-bit)
-
-
-// 0b10101
-//   ^ ^ ^
-// 0b10000 = 1:format signifier
-// 0b00100 = 0:floating-point;1:fixed-point
-// 0b00001 = 0:32bit;1:64bit
-
-#define COP1_FMT BIT(4) // 0b10000 (part of COP sub opcode)
+#define FMT_32b     (0 * BIT(0)) // 0b00000 (32-bit)
+#define FMT_64b     (1 * BIT(0)) // 0b00001 (64-bit)
 
 // fmt_to_char
 enum COP1Formats {
@@ -359,40 +354,15 @@ enum RegImmOpCodes {
     OPR_TNEI    = 0b01110, // 14: Trap if Not Equal Immediate
 };
 
-enum InsnParamTypes {
-    PARAM_END = -1,
-    PARAM_N,   //
-    PARAM_SYS = PARAM_N, //
-    PARAM_SYN = PARAM_N, //
-    PARAM_S,   // rs
-    PARAM_T,   // rt
-    PARAM_D,   // rd
-    PARAM_ST,  // rs, rt
-    PARAM_ST2 = PARAM_ST, // rs, rt
-    PARAM_DS,  // rd, rs
-    PARAM_TD,  // rt, rd
-    PARAM_SD,  // rs, rd
-    PARAM_STD, // rs, rt, rd
-    PARAM_SDT, // rs, rd, rt
-    PARAM_DST, // rd, rs, rt
-    PARAM_DTS, // rd, rt, rs
-    PARAM_DTA, // rd, rt, shift
-    PARAM_SI,  // rs, 0xI
-    PARAM_TI,  // rt, 0xI
-    PARAM_STI, // rs, rt, 0xI
-    PARAM_TSI, // rt, rs, 0xI
-    PARAM_TOS, // rt, 0xI(rs)
-    PARAM_SB,  // rs, offset
-    PARAM_STB, // rs, rt, offset
-    PARAM_B,   // offset
-    PARAM_J,   // func
-    PARAM_FOS, // ft, 0xI(rs)
-    PARAM_TFS, // rt, fs
-    PARAM_FF,  // fd, fs
-    PARAM_FFF, // fd, fs, ft
-    PARAM_CON, // fs, ft
-    PARAM_BC1 = PARAM_B, // offset
-    PARAM_UNK, // unimpl
+enum PseudoInsns {
+    PSEUDO_NOP,
+    PSEUDO_MOVET,
+    PSEUDO_MOVES,
+    PSEUDO_B,
+    PSEUDO_BEQZ,
+    PSEUDO_BNEZ,
+    PSEUDO_BEQZL,
+    PSEUDO_BNEZL,
 };
 
 enum InsnType {
@@ -400,38 +370,16 @@ enum InsnType {
     INSN_TYPE_OPCODE,
     INSN_TYPE_FUNC,
     INSN_TYPE_REGIMM,
-    INSN_TYPE_COP,
+    INSN_TYPE_COP_FMT,
 };
-
-enum ParamParts {
-    P_NULL,     // '0' Print nothing
-    P_NAME,     // 'N' DISASM_COLOR_INSN_NAME + "[name]%-6"
-    P_NAME_FMT, // 'M' DISASM_COLOR_INSN_NAME + "[name].[fmt]%-6" as part of insn name
-    P_RS,       // 's' DISASM_COLOR_REG + "[rs reg]"
-    P_RT,       // 't' DISASM_COLOR_REG + "[rt reg]"
-    P_RD,       // 'd' DISASM_COLOR_REG + "[rd reg]"
-    P_SHIFT,    // 'h' DISASM_COLOR_IMMEDIATE + [shift]
-    P_BASE,     // 'b' DISASM_COLOR_BASE_REG + "([rs reg])"
-    P_IMM,      // 'I' DISASM_COLOR_IMMEDIATE + "0x[last 16 bits]"
-    P_BRANCH,   // 'B' DISASM_COLOR_OFFSET + "[+-][last 16 bits]" + draw branch arrow
-    P_FT,       // 'T' DISASM_COLOR_REG + "F[ft reg]"
-    P_FS,       // 'S' DISASM_COLOR_REG + "F[fs reg]"
-    P_FD,       // 'D' DISASM_COLOR_REG + "F[fd reg]"
-    P_FUNC,     // 'F' Parse map + DISASM_COLOR_ADDRESS + "[function address]"
-};
-
-typedef struct {
-    RGBA32 color;
-    const char* print;
-} InsnPrintFormatData;
 
 // Instruction data
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
 typedef union {
     struct PACKED {
         /*0x00*/ u32 opcode :  6;
-        /*0x00*/ u32 rs     :  5;
-        /*0x00*/ u32 rt     :  5;
+        /*0x00*/ u32 rs     :  5; // aka base
+        /*0x00*/ u32 rt     :  5; // aka regimm
         /*0x00*/ u32 rd     :  5;
         /*0x00*/ u32 sa     :  5;
         /*0x00*/ u32 func   :  6;
@@ -440,31 +388,29 @@ typedef union {
         /*0x00*/ u32        :  6;
         /*0x00*/ u32 base   :  5;
         /*0x00*/ u32        :  5;
-        /*0x00*/ u32 offset : 16;
+        /*0x00*/ u32 offset : 16; // aka immediate
     };
     struct PACKED {
-        /*0x00*/ u32 regimm        :  6;
-        /*0x00*/ u32               :  5;
-        /*0x00*/ u32 regimm_opcode :  5;
-        /*0x00*/ u32 immediate     : 16;
+        /*0x00*/ u32            : 11;
+        /*0x00*/ u32 regimm     :  5; // aka rt
+        /*0x00*/ u32 immediate  : 16; // aka offset
     };
     struct PACKED {
-        /*0x00*/ u32        :  6;
-        /*0x00*/ u32 fmt    :  5;
-        /*0x00*/ u32 ft     :  5;
+        /*0x00*/ u32        : 11;
+        /*0x00*/ u32 ft     :  5; // aka: branch condition
         /*0x00*/ u32 fs     :  5;
         /*0x00*/ u32 fd     :  5;
         /*0x00*/ u32        :  6;
     };
     struct PACKED {
-        /*0x00*/ u32 cop_opcode           :  4;
-        /*0x00*/ u32 cop_num              :  2;
-        /*0x00*/ u32 cop_bit              :  1; // 0: check the next 4 bits; 1: check the last 6 bits
-        /*0x00*/ u32 cop_sub_opcode       :  4;
-        /*0x00*/ u32 cop_branch_condition :  5; // 0b00010 = likely, 0b00001 = true
-        /*0x00*/ u32                      : 10;
-        /*0x00*/ u32 FC                   :  2;
-        /*0x00*/ u32 cond                 :  4;
+        /*0x00*/ u32 cop_opcode     :  4;
+        /*0x00*/ u32 cop_num        :  2;
+        /*0x00*/ u32 cop_subtype    :  2;
+        /*0x00*/ u32 fmt            :  3;
+        /*0x00*/ u32 cop_bcond      :  5; // 0b00010 = likely, 0b00001 = true
+        /*0x00*/ u32                : 10;
+        /*0x00*/ u32 FC             :  2;
+        /*0x00*/ u32 cond           :  4;
     };
     struct PACKED {
         /*0x00*/ u32             :  6;
@@ -484,7 +430,7 @@ typedef union {
 // Instruction database format
 typedef struct PACKED {
     /*0x00*/ InsnData insn;
-    /*0x04*/ s32 paramType;
+    /*0x04*/ char format[4];
     /*0x08*/ char name[8];
 } InsnTemplate; /*0x10*/
 

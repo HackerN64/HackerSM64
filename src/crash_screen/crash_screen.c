@@ -235,7 +235,7 @@ void thread20_crash_screen_crash_screen(UNUSED void* arg) {
 void crash_screen_crash_screen_init(void) {
     osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
     osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_crash_screen, NULL,
-                ((u8*) gCrashScreen2.stack + sizeof(gCrashScreen2.stack)),
+                ((u8*)gCrashScreen2.stack + sizeof(gCrashScreen2.stack)),
                 OS_PRIORITY_APPMAX);
     osStartThread(&gCrashScreen2.thread);
 }
@@ -300,7 +300,7 @@ void thread2_crash_screen(UNUSED void* arg) {
 void crash_screen_init(void) {
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
     osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
-                   ((u8*) gCrashScreen.stack + sizeof(gCrashScreen.stack)),
+                   ((u8*)gCrashScreen.stack + sizeof(gCrashScreen.stack)),
                    OS_PRIORITY_APPMAX);
     osStartThread(&gCrashScreen.thread);
 }

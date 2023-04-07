@@ -218,7 +218,7 @@ static void scroll_buffer(u32 bufferCount, u32 charLimit) {
 }
 
 static char* write_to_buf(char* buffer, const char* data, size_t size) {
-    return ((char*) memcpy(buffer, data, size) + size);
+    return ((char*)memcpy(buffer, data, size) + size);
 }
 
 u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char* fmt, ...) {

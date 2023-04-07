@@ -62,7 +62,7 @@ const char* parse_map(uintptr_t* addr) {
 
                 *addr = gMapEntries[i].addr;
 
-                return (char*) ((uintptr_t)gMapStrings + gMapEntries[i].name_offset);
+                return (char*)((uintptr_t)gMapStrings + gMapEntries[i].name_offset);
             }
         }
     }
@@ -75,7 +75,7 @@ const char* parse_map_exact(uintptr_t addr) {
     if (is_in_code_segment(addr)) {
         for (u32 i = 0; i < gMapEntrySize; i++) {
             if (gMapEntries[i].addr == addr) {
-                return (char*) ((uintptr_t)gMapStrings + gMapEntries[i].name_offset);
+                return (char*)((uintptr_t)gMapStrings + gMapEntries[i].name_offset);
             }
         }
     }
@@ -88,7 +88,7 @@ const char* find_function_in_stack(uintptr_t* sp) {
     const char* fname = NULL;
 
     for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        uintptr_t val = *(uintptr_t*) *sp;
+        uintptr_t val = *(uintptr_t*)*sp;
         *sp += sizeof(uintptr_t);
 
         fname = parse_map(&val);

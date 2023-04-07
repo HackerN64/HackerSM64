@@ -219,7 +219,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 #ifdef INCLUDE_DEBUG_MAP
             if (sDisasmShowDestFunctionNames && destFname != NULL) {
                 // "[function name]"
-                crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH + 1)), charY, (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH + 1)),
+                crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY, (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
                     STR_COLOR_PREFIX"%s",
                     COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
                 );

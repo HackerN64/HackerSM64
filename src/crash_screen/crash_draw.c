@@ -212,7 +212,7 @@ void crash_screen_take_screenshot(RGBA16* dst) {
 
 void crash_screen_reset_framebuffer(_Bool drawBackground) {
     if (drawBackground) {
-        bcopy(gZBuffer, (void*) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
+        bcopy(gZBuffer, (void*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
     } else {
         crash_screen_draw_dark_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 5);
     }
@@ -225,7 +225,7 @@ void crash_screen_update_framebuffer(void) {
 
     osViBlack(FALSE);
     osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
-    osViSwapBuffer((void*) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
+    osViSwapBuffer((void*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
     osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
 
     if (++sRenderingFramebuffer == 3) {
@@ -248,7 +248,7 @@ void draw_crashed_image_i4(void) {
     u8* segStart = _crash_screen_crash_screenSegmentRomStart;
     u8* segEnd = _crash_screen_crash_screenSegmentRomEnd;
     size_t size = (uintptr_t) (segEnd - segStart);
-    Texture* fb_u8 = (u8*) ((uintptr_t) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
+    Texture* fb_u8 = (u8*)((uintptr_t) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
 
     // Make sure the source image is the correct size.
     if (size != SRC_IMG_SIZE) {
