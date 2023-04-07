@@ -113,7 +113,7 @@ struct RippleAnimationPair {
  */
 struct PaintingImage {
     /// Texture data.
-    /*0x00*/ const Texture *const *textureArray;
+    /*0x00*/ const Texture* const* textureArray;
 
     /// How many textures the painting uses.
     /*0x04*/ const s32 imageCount;
@@ -157,7 +157,7 @@ struct PaintingNeighborTris {
 }; /*0x14*/
 
 
-Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
+Gfx* geo_painting_draw(s32 callContext, struct GraphNode* node, UNUSED void* context);
 
 void bhv_painting_init(void);
 void bhv_painting_loop(void);

@@ -51,11 +51,10 @@
  *      A CONTINUOUS painting will automatically reset to PAINTING_ACT_RIPPLING if its ripple magnitude becomes small enough.
  */
 
-
 /**
  * Array of pointers to painting image data structs.
  */
-const struct PaintingImage *sPaintings[] = {
+const struct PaintingImage* sPaintings[] = {
     [PAINTING_ID_NULL           ] = NULL,
     [PAINTING_ID_CASTLE_BOB     ] = &bob_painting,
     [PAINTING_ID_CASTLE_CCM     ] = &ccm_painting,
@@ -116,8 +115,8 @@ const struct RippleAnimationPair sRippleAnimations[] = {
  *
  * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
-void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh) {
-    const struct RippleAnimation *objRippleAnim = obj->oPaintingRippleAnimation;
+void painting_generate_mesh(struct Object* obj, const PaintingData* vtxData, PaintingData numVtx, struct PaintingMeshVertex* paintingMesh) {
+    const struct RippleAnimation* objRippleAnim = obj->oPaintingRippleAnimation;
     PaintingData i, tri;
 
     /// Controls the peaks of the ripple.
@@ -192,8 +191,8 @@ void painting_generate_mesh(struct Object *obj, const PaintingData *vtxData, Pai
  *
  * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(const PaintingData *triangleData, struct PaintingNeighborTris *neighborTris, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
-    struct PaintingNeighborTris *vtn = NULL;
+void painting_calculate_triangle_normals(const PaintingData *triangleData, struct PaintingNeighborTris* neighborTris, struct PaintingMeshVertex* paintingMesh, Vec3f* paintingTriNorms) {
+    struct PaintingNeighborTris* vtn = NULL;
     PaintingData i, j;
     PaintingData numTris = *triangleData++;
     Vec3f vp[3]; // Vertex positions
@@ -232,7 +231,7 @@ void painting_calculate_triangle_normals(const PaintingData *triangleData, struc
  *
  * The table used in game, painting_data_mesh_neighbor_tris, is in bin/segment2.c.
  */
-void painting_average_vertex_normals(struct PaintingNeighborTris *neighborTris, PaintingData numVtx, struct PaintingMeshVertex *paintingMesh, Vec3f *paintingTriNorms) {
+void painting_average_vertex_normals(struct PaintingNeighborTris* neighborTris, PaintingData numVtx, struct PaintingMeshVertex* paintingMesh, Vec3f* paintingTriNorms) {
     PaintingData tri;
     PaintingData i, j;
     PaintingData numNeighbors;
@@ -241,7 +240,7 @@ void painting_average_vertex_normals(struct PaintingNeighborTris *neighborTris, 
         Vec3f n = { 0.0f, 0.0f, 0.0f };
 
         // The first number of each entry is the number of adjacent tris.
-        struct PaintingNeighborTris *vtn = &neighborTris[i];
+        struct PaintingNeighborTris* vtn = &neighborTris[i];
         numNeighbors = vtn->numNeighbors;
 
         // Average the surface normals from each neighboring tri.
@@ -278,8 +277,8 @@ void painting_average_vertex_normals(struct PaintingNeighborTris *neighborTris, 
  *
  * TODO: Automatically create seams between segments based on the image count.
  */
-Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, struct PaintingMeshVertex *paintingMesh, const PaintingData *triangleMap, PaintingData numTris, Alpha alpha) {
-    struct PaintingMeshVertex *currVtx = NULL;
+Gfx* render_painting_segment(const Texture* img, s16 index, s16 imageCount, s16 tWidth, s16 tHeight, struct PaintingMeshVertex* paintingMesh, const PaintingData* triangleMap, PaintingData numTris, Alpha alpha) {
+    struct PaintingMeshVertex* currVtx = NULL;
     PaintingData group;
     PaintingData groupIndex;
     PaintingData map;
@@ -291,8 +290,8 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
     PaintingData remGroupTris = (numTris % TRI_PER_GRP);
     PaintingData numVtx       = (numTris * 3); // 3 verts per tri
 
-    Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
-    Gfx *dlist = alloc_display_list(
+    Vtx* verts = alloc_display_list(numVtx * sizeof(Vtx));
+    Gfx* dlist = alloc_display_list(
         SIZEOF_GFX_CMD(LoadBlockTexture(0,0,0,0)) +
         (triGroups * (
             SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
@@ -304,7 +303,7 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
         )) +
         SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfx = dlist;
+    Gfx* gfx = dlist;
 
     gLoadBlockTexture(gfx++, tWidth, tHeight, G_IM_FMT_RGBA, img);
 
@@ -393,15 +392,22 @@ Gfx *render_painting_segment(const Texture *img, s16 index, s16 imageCount, s16 
 /**
  * Gets the exponent of an integer by converting it into a float and extracting the exponent bits.
  */
-s32 get_exponent(s32 x) {
-    union { s32 i; f32 f; } b = { .f = x };
-    return (((b.i >> 23) & (u32)BITMASK(8)) - 127);
+static s32 get_exponent(s32 x) {
+    union {
+        struct PACKED {
+            u32 sign     :  1;
+            u32 exponent :  8;
+            u32 mantissa : 23;
+        };
+        f32 f;
+    } b = { .f = x };
+    return (b.exponent - 127);
 }
 
 /**
  * Set up the texture format in the display list.
  */
-void painting_setup_textures(Gfx **gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
+void painting_setup_textures(Gfx** gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
     s16 cm = isEnvMap ? (G_TX_WRAP | G_TX_NOMIRROR) : G_TX_CLAMP;
     u32 masks = get_exponent(tWidth);
     u32 maskt = get_exponent(tHeight);
@@ -421,15 +427,15 @@ void painting_setup_textures(Gfx **gfx, s16 tWidth, s16 tHeight, s32 isEnvMap) {
 /**
  * Ripple a painting that has 1 or more images that need to be mapped.
  */
-Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct PaintingMeshVertex *paintingMesh, const PaintingData *triangleMap) {
+Gfx* dl_painting_rippling(const struct PaintingImage* paintingImage, struct PaintingMeshVertex* paintingMesh, const PaintingData* triangleMap) {
     s16 i;
     s16 imageCount = paintingImage->imageCount;
     s16 tWidth = paintingImage->textureWidth;
     s16 tHeight = paintingImage->textureHeight;
-    const Texture **tArray = segmented_to_virtual(paintingImage->textureArray);
+    const Texture** tArray = segmented_to_virtual(paintingImage->textureArray);
     s32 isEnvMap = (paintingImage->imageType == PAINTING_IMAGE_TYPE_ENV_MAP);
 
-    Gfx *dlist = alloc_display_list(
+    Gfx* dlist = alloc_display_list(
         SIZEOF_GFX_CMD(SPMatrix(0,0)) +
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(DPSetTile(0,0,0,0,0,0,0,0,0,0,0,0)) +
@@ -441,13 +447,13 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
         SIZEOF_GFX_CMD(SPPopMatrix(0)) +
         SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfx = dlist;
+    Gfx* gfx = dlist;
 
     if (dlist == NULL) {
         return dlist;
     }
     // Scale
-    Mtx *scale = alloc_display_list(sizeof(Mtx));
+    Mtx* scale = alloc_display_list(sizeof(Mtx));
     guScale(
         scale,
         (1.0f / PAINTING_SIZE),
@@ -456,7 +462,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
     );
     gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
-    Gfx *beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
+    Gfx* beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
     gSPDisplayList(gfx++, beginDl);
 
     painting_setup_textures(&gfx, tWidth, tHeight, isEnvMap);
@@ -470,7 +476,7 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
         triangleMap += (numTris * 3);
     }
 
-    Gfx *endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_rippling_end);
+    Gfx* endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_rippling_end);
     gSPDisplayList(gfx++, endDl);
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     gSPEndDisplayList(gfx);
@@ -482,20 +488,20 @@ Gfx *dl_painting_rippling(const struct PaintingImage *paintingImage, struct Pain
  * Generates a mesh, calculates vertex normals for lighting, and renders a rippling painting.
  * The mesh and vertex normals are regenerated and freed every frame.
  */
-Gfx *display_painting_rippling(struct Object *obj) {
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
-    const PaintingData *vtxData = segmented_to_virtual(painting_data_vertices);
-    const PaintingData *triangleData = segmented_to_virtual(painting_data_triangles);
+Gfx* display_painting_rippling(struct Object* obj) {
+    const struct PaintingImage* paintingImage = obj->oPaintingImage;
+    const PaintingData* vtxData = segmented_to_virtual(painting_data_vertices);
+    const PaintingData* triangleData = segmented_to_virtual(painting_data_triangles);
     PaintingData numVtx = vtxData[0];
     PaintingData numTris = triangleData[0];
-    Gfx *dlist = NULL;
+    Gfx* dlist = NULL;
     // When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
     // This mesh only contains the vertex positions and normals.
     // Paintings use an additional array to map textures to the mesh.
     //! TODO: Find out why clearing this between frames causes flickering.
-    struct PaintingMeshVertex *paintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
+    struct PaintingMeshVertex* paintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingMeshVertex)));
     // A list of neighbor triangles for each vertes. This gets cleared each frame while 'paintingMesh' isn't.
-    struct PaintingNeighborTris *neighborTris = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingNeighborTris)));
+    struct PaintingNeighborTris* neighborTris = mem_pool_alloc(gEffectsMemoryPool, (numVtx * sizeof(struct PaintingNeighborTris)));
     bzero(neighborTris, (numVtx * sizeof(struct PaintingNeighborTris)));
     // The painting's surface normals, used to approximate each of the vertex normals (for gouraud shading).
     Vec3f *paintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
@@ -517,12 +523,12 @@ Gfx *display_painting_rippling(struct Object *obj) {
     return dlist;
 }
 
-Gfx *dl_painting_not_rippling(struct Object *obj) {
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
+Gfx* dl_painting_not_rippling(struct Object* obj) {
+    const struct PaintingImage* paintingImage = obj->oPaintingImage;
     Alpha alpha = paintingImage->alpha;
     s16 imageCount = paintingImage->imageCount;
     s32 shaded = paintingImage->shaded;
-    Gfx *dlist = alloc_display_list(
+    Gfx* dlist = alloc_display_list(
         SIZEOF_GFX_CMD(SPMatrix(0,0)) +
         SIZEOF_GFX_CMD(SPDisplayList(0)) +
         SIZEOF_GFX_CMD(SPVertex(0,0,0)) +
@@ -541,14 +547,14 @@ Gfx *dl_painting_not_rippling(struct Object *obj) {
         SIZEOF_GFX_CMD(SPPopMatrix(0)) +
         SIZEOF_GFX_CMD(SPEndDisplayList())
     );
-    Gfx *gfx = dlist;
+    Gfx* gfx = dlist;
 
     if (dlist == NULL) {
         return dlist;
     }
 
     // Scale
-    Mtx *scale = alloc_display_list(sizeof(Mtx));
+    Mtx* scale = alloc_display_list(sizeof(Mtx));
     guScale(
         scale,
         (1.0f / PAINTING_SIZE),
@@ -557,10 +563,10 @@ Gfx *dl_painting_not_rippling(struct Object *obj) {
     );
     gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
-    Vtx *verts = alloc_display_list((imageCount * 4) * sizeof(*verts));
+    Vtx* verts = alloc_display_list((imageCount * 4) * sizeof(*verts));
     Vec3c n;
 
-    const Texture **textures = segmented_to_virtual(paintingImage->textureArray);
+    const Texture** textures = segmented_to_virtual(paintingImage->textureArray);
 
     s32 isEnvMap = (paintingImage->imageType == PAINTING_IMAGE_TYPE_ENV_MAP);
 
@@ -624,7 +630,7 @@ Gfx *dl_painting_not_rippling(struct Object *obj) {
         );
     }
 
-    Gfx *endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_textured_end);
+    Gfx* endDl = (isEnvMap ? dl_paintings_env_mapped_end : dl_paintings_textured_end);
     gSPDisplayList(gfx++, endDl);
 
     if (!shaded) {
@@ -640,21 +646,21 @@ Gfx *dl_painting_not_rippling(struct Object *obj) {
 /**
  * Draw the painting.
  */
-Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct Object *obj = gCurGraphNodeObjectNode;
+Gfx* geo_painting_draw(s32 callContext, struct GraphNode* node, UNUSED void* context) {
+    struct Object* obj = gCurGraphNodeObjectNode;
 
     if (obj == NULL) {
         return NULL;
     }
 
     // Get the const painting image data.
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
+    const struct PaintingImage* paintingImage = obj->oPaintingImage;
 
     if (paintingImage == NULL) {
         return NULL;
     }
 
-    Gfx *paintingDlist = NULL;
+    Gfx* paintingDlist = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
         // Draw the painting.
@@ -687,7 +693,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 /**
  * Updates a painting object's room from a point in front of the center of the painting.
  */
-void painting_update_room(struct Object *obj) {
+void painting_update_room(struct Object* obj) {
     // The center of the painting, but with an offset since paintings are usually between floor triangle edges laterally.
     Vec3f distPos = {
         (obj->header.gfx.scale[0] * 0.5f),
@@ -712,12 +718,12 @@ void painting_update_room(struct Object *obj) {
 }
 
 void bhv_painting_init(void) {
-    struct Object *obj = o;
+    struct Object* obj = o;
 
     // Get the painting id from the first byte of the behavior params. The second byte is used for the warp node ID.
     s32 id = GET_BPARAM1(obj->oBehParams);
 
-    const struct PaintingImage *paintingImage = segmented_to_virtual(sPaintings[id]);
+    const struct PaintingImage* paintingImage = segmented_to_virtual(sPaintings[id]);
 
     // Set the object's painting image data pointer.
     obj->oPaintingImage = paintingImage;
@@ -735,8 +741,8 @@ void bhv_painting_init(void) {
 /**
  * Check for Mario entering the painting. Returns changed action.
  */
-s32 painting_update_mario_pos(struct Object *obj, Vec3f marioLocalPos) {
-    struct MarioState *m = gMarioState;
+s32 painting_update_mario_pos(struct Object* obj, Vec3f marioLocalPos) {
+    struct MarioState* m = gMarioState;
 
     // PAINTING_ACT_IDLE will not change the action.
     s32 newAction = PAINTING_ACT_IDLE;
@@ -795,8 +801,8 @@ s32 painting_update_mario_pos(struct Object *obj, Vec3f marioLocalPos) {
 /**
  * Returns a pointer to the RippleAnimationPair that best fits the painting type.
  */
-const struct RippleAnimationPair *painting_get_ripple_animation_type_info(struct Object *obj) {
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
+const struct RippleAnimationPair* painting_get_ripple_animation_type_info(struct Object* obj) {
+    const struct PaintingImage* paintingImage = obj->oPaintingImage;
     s8 rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
 
     if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
@@ -814,7 +820,7 @@ const struct RippleAnimationPair *painting_get_ripple_animation_type_info(struct
 /**
  * Set a painting's ripple animation and magnitude.
  */
-void painting_set_ripple_animation_type(struct Object *obj, const struct RippleAnimation *baseRippleAnim) {
+void painting_set_ripple_animation_type(struct Object* obj, const struct RippleAnimation* baseRippleAnim) {
     obj->oPaintingRippleAnimation = baseRippleAnim;
     obj->oPaintingCurrRippleMag = baseRippleAnim->mag;
 }
@@ -833,13 +839,17 @@ s32 gDDDPaintingNotMoved = FALSE;
  * When the painting reaches backPos, a save flag is set so that the painting will spawn at backPos
  * whenever it loads.
  */
-void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed) {
+void move_ddd_painting(struct Object* obj, f32 frontPos, f32 backPos, f32 speed) {
 #ifdef UNLOCK_ALL
     obj->oPosX = backPos;
     return;
 #endif
     // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected.
-    if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1) {
+    if (save_file_get_star_flags(
+            (gCurrSaveFileNum - 1),
+            COURSE_NUM_TO_INDEX(COURSE_DDD)
+        ) & STAR_FLAG_ACT_1
+    ) {
         // Check whether DDD has already moved back.
         if (gDDDPaintingNotMoved) {
             // If we've collected the star but not moved the painting back...
@@ -871,8 +881,8 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
  * @param ripplePosX,ripplePosY the position of the ripples.
  * @param shouldResetTimer if TRUE, set the timer to 0.
  */
-void painting_start_ripples(struct Object *obj, f32 ripplePosX, f32 ripplePosY, s32 shouldResetTimer) {
-    const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(obj);
+void painting_start_ripples(struct Object* obj, f32 ripplePosX, f32 ripplePosY, s32 shouldResetTimer) {
+    const struct RippleAnimationPair* rippleAnim = painting_get_ripple_animation_type_info(obj);
 
     // Use a different set of variables depending on the state
     switch (obj->oAction) {
@@ -903,14 +913,14 @@ void painting_start_ripples(struct Object *obj, f32 ripplePosX, f32 ripplePosY, 
 }
 
 void bhv_painting_loop(void) {
-    struct Object *obj = o;
-    const struct PaintingImage *paintingImage = obj->oPaintingImage;
+    struct Object* obj = o;
+    const struct PaintingImage* paintingImage = obj->oPaintingImage;
     Vec3f marioLocalPos;
 
     // Update the painting's next action based on Mario's relative position.
     s32 newAction = painting_update_mario_pos(obj, marioLocalPos);
 
-    const struct RippleAnimation *objRippleAnim = obj->oPaintingRippleAnimation;
+    const struct RippleAnimation* objRippleAnim = obj->oPaintingRippleAnimation;
 
     // Decay the ripple over time.
     if (objRippleAnim != NULL) {
@@ -941,7 +951,7 @@ void bhv_painting_loop(void) {
     } else if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // Continuous trigger type:
 
-        const struct RippleAnimationPair *rippleAnim = painting_get_ripple_animation_type_info(obj);
+        const struct RippleAnimationPair* rippleAnim = painting_get_ripple_animation_type_info(obj);
         // If the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple.
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
