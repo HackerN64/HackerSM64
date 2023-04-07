@@ -440,7 +440,7 @@ uintptr_t get_branch_target_from_addr(uintptr_t addr) {
 }
 
 static char cop1_fmt_to_char(InsnData insn) {
-    switch (insn.fmt & ~COP1_FMT) {
+    switch (insn.fmt) {
         case COP1_FMT_SINGLE: return 'S'; // Single
         case COP1_FMT_DOUBLE: return 'D'; // Double
         case COP1_FMT_WORD:   return 'W'; // Word
