@@ -26,9 +26,10 @@
 #define CHAR_P_RT       't'     // "[rt reg]"
 #define CHAR_P_RD       'd'     // "[rd reg]"
 #define CHAR_P_IMM      'I'     // "0x[last 16 bits]"
+#define CHAR_P_NIMM     'i'     // "[±]0x[[last 16 bits]]" (for SUBI pseudoinstruction)
 #define CHAR_P_SHIFT    'a'     // "[shift]""
 #define CHAR_P_BASE     '('     // "([rs reg])"
-#define CHAR_P_BRANCH   'B'     // "[+-][last 16 bits]" + draw branch arrow
+#define CHAR_P_BRANCH   'B'     // "[±]0x[last 16 bits]" + draw branch arrow
 #define CHAR_P_FT       'T'     // "F[ft reg]"
 #define CHAR_P_FS       'S'     // "F[fs reg]"
 #define CHAR_P_FD       'D'     // "F[fd reg]"
@@ -361,8 +362,10 @@ enum PseudoInsns {
     PSEUDO_B,
     PSEUDO_BEQZ,
     PSEUDO_BNEZ,
+    PSEUDO_SUBI,
     PSEUDO_BEQZL,
     PSEUDO_BNEZL,
+    PSEUDO_DSUBI,
 };
 
 enum InsnType {
@@ -429,7 +432,7 @@ typedef union {
 
 // Instruction database format
 typedef struct PACKED {
-    /*0x00*/ InsnData insn;
+    /*0x00*/ InsnData insn; //! TODO: Replace this with a single-byte identifier.
     /*0x04*/ char format[4];
     /*0x08*/ char name[8];
 } InsnTemplate; /*0x10*/

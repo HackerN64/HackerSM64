@@ -261,14 +261,16 @@ static const InsnTemplate* insn_db_cop_lists[] = {
 
 // Pseudo-instructions
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
-    [PSEUDO_NOP  ] = INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SLL, "0"   , "NOP"    ) // NOP (pseudo of SLL)
-    [PSEUDO_MOVET] = INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_ADD, "\'td", "MOVE"   ) // Move (pseudo of ADD)
-    [PSEUDO_MOVES] = INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_ADD, "\'sd", "MOVE"   ) // Move (pseudo of ADD)
-    [PSEUDO_B    ] = INSN_ID_1(OPC_BEQ , 0, 0, 0, 0, 0      , "\'B" , "B"      ) // Branch (pseudo of BEQ)
-    [PSEUDO_BEQZ ] = INSN_ID_1(OPC_BEQ , 0, 0, 0, 0, 0      , "\'sB", "BEQZ"   ) // Branch on Equal to Zero (pseudo of BEQ)
-    [PSEUDO_BNEZ ] = INSN_ID_1(OPC_BNE , 0, 0, 0, 0, 0      , "\'sB", "BNEZ"   ) // Branch on Not Equal to Zero (pseudo of BNE)
-    [PSEUDO_BEQZL] = INSN_ID_1(OPC_BEQL, 0, 0, 0, 0, 0      , "\'sB", "BEQZL"  ) // Branch on Equal to Zero Likely (pseudo of BEQL)
-    [PSEUDO_BNEZL] = INSN_ID_1(OPC_BNEL, 0, 0, 0, 0, 0      , "\'sB", "BNEZL"  ) // Branch on Not Equal to Zero Likely (pseudo of BNEL)
+    [PSEUDO_NOP  ] = INSN_ID_1(OPC_SPEC , 0, 0, 0, 0, OPS_SLL, "0"    , "NOP"    ) // NOP (pseudo of SLL)
+    [PSEUDO_MOVET] = INSN_ID_0(OPC_SPEC , 0, 0, 0, 0, OPS_ADD, "\'dt" , "MOVE"   ) // Move (pseudo of ADD and OR)
+    [PSEUDO_MOVES] = INSN_ID_0(OPC_SPEC , 0, 0, 0, 0, OPS_ADD, "\'ds" , "MOVE"   ) // Move (pseudo of ADD)
+    [PSEUDO_B    ] = INSN_ID_1(OPC_BEQ  , 0, 0, 0, 0, 0      , "\'B"  , "B"      ) // Branch (pseudo of BEQ)
+    [PSEUDO_BEQZ ] = INSN_ID_1(OPC_BEQ  , 0, 0, 0, 0, 0      , "\'sB" , "BEQZ"   ) // Branch on Equal to Zero (pseudo of BEQ)
+    [PSEUDO_BNEZ ] = INSN_ID_1(OPC_BNE  , 0, 0, 0, 0, 0      , "\'sB" , "BNEZ"   ) // Branch on Not Equal to Zero (pseudo of BNE)
+    [PSEUDO_SUBI ] = INSN_ID_1(OPC_ADDI , 0, 0, 0, 0, 0      , "\'tsi", "SUBI"   ) // Add Immediate Word
+    [PSEUDO_BEQZL] = INSN_ID_1(OPC_BEQL , 0, 0, 0, 0, 0      , "\'sB" , "BEQZL"  ) // Branch on Equal to Zero Likely (pseudo of BEQL)
+    [PSEUDO_BNEZL] = INSN_ID_1(OPC_BNEL , 0, 0, 0, 0, 0      , "\'sB" , "BNEZL"  ) // Branch on Not Equal to Zero Likely (pseudo of BNEL)
+    [PSEUDO_DSUBI] = INSN_ID_0(OPC_DADDI, 0, 0, 0, 0, 0      , "\'tsi", "DSUBI"  ) // Doubleword Add Immediate
 };
 
 static _Bool check_pseudo_insn(const InsnTemplate** type, enum PseudoInsns id, _Bool cond) {
@@ -296,6 +298,8 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
                     if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == 0))) return TRUE;
                     if (check_pseudo_insn(type, PSEUDO_MOVET, (insn.rs == 0))) return TRUE;
                     break;
+                case OPS_OR:
+                    if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == 0))) return TRUE;
             }
             break;
         case OPC_BEQ:
@@ -305,11 +309,17 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
         case OPC_BNE:
             if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == 0      ))) return TRUE;
             break;
+        case OPC_ADDI:
+            if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) return TRUE;
+            break;
         case OPC_BEQL:
             if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == 0      ))) return TRUE;
             break;
         case OPC_BNEL:
             if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == 0      ))) return TRUE;
+            break;
+        case OPC_DADDI:
+            if (check_pseudo_insn(type, PSEUDO_DSUBI, ((s16)insn.immediate < 0))) return TRUE;
             break;
     }
 
@@ -418,13 +428,11 @@ s16 check_for_branch_offset(InsnData insn) {
 }
 
 uintptr_t get_branch_target_from_addr(uintptr_t addr) {
-    uintptr_t* addrptr = (uintptr_t*)addr;
-
-    if (addrptr == NULL) {
+    if (!is_in_code_segment(addr)) {
         return addr;
     }
 
-    InsnData insn = { .raw = *addrptr };
+    InsnData insn = { .raw = *(uintptr_t*)addr };
 
     if (insn.opcode == OPC_J || insn.opcode == OPC_JAL) {
         return PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(uintptr_t));
@@ -469,7 +477,7 @@ static char insn_as_string[CHAR_BUFFER_SIZE] = "";
 
 #define STR_IREG            "%s"                           // Register
 #define STR_IMMEDIATE       STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
-#define STR_OFFSET          "%c"STR_IMMEDIATE               // +-Offset
+#define STR_OFFSET          "%c"STR_IMMEDIATE               // ±Offset
 #define STR_FUNCTION        STR_HEX_PREFIX STR_HEX_WORD     // Function address
 #define STR_IREG_OFFSET     "("STR_IREG")"                  // Offset register
 #define STR_FREG            "F%02d"                         // Float Register
@@ -493,6 +501,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                 break;
             }
 
+            //! TODO: commas between registers (check next byte?)
             switch (curCmd) {
                 case CHAR_P_NOP:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_NOP);
@@ -523,6 +532,10 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                 case CHAR_P_IMM:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);
                     strp += sprintf(strp, STR_IMMEDIATE, insn.immediate);
+                    break;
+                case CHAR_P_NIMM:
+                    check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);
+                    strp += sprintf(strp, STR_IMMEDIATE, (s16)-insn.immediate);
                     break;
                 case CHAR_P_SHIFT:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);

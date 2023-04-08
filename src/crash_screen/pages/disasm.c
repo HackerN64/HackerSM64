@@ -332,15 +332,19 @@ void crash_screen_input_disasm(void) {
 #endif
 
     // gSelectedAddress = ALIGN(gSelectedAddress, DISASM_STEP);
-    if ((gCrashScreenDirectionFlags.pressed.up)
-     && ((gSelectedAddress - DISASM_STEP) >= RAM_START)) {
+    if (
+        (gCrashScreenDirectionFlags.pressed.up) &&
+        ((gSelectedAddress - DISASM_STEP) >= RAM_START)
+    ) {
         // Scroll up.
         gSelectedAddress -= DISASM_STEP;
         gCrashScreenUpdateFramebuffer = TRUE;
     }
 
-    if ((gCrashScreenDirectionFlags.pressed.down)
-     && ((gSelectedAddress + DISASM_STEP) < RAM_END)) {
+    if (
+        (gCrashScreenDirectionFlags.pressed.down) &&
+        ((gSelectedAddress + DISASM_STEP) < RAM_END)
+    ) {
         // Scroll down.
         gSelectedAddress += DISASM_STEP;
         gCrashScreenUpdateFramebuffer = TRUE;
