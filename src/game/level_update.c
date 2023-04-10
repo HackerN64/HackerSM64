@@ -654,10 +654,10 @@ s8 gPaintingEjectSoundPlayed = FALSE;
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
-    struct Object *paintingObj = gMarioState->paintingObj;
+    struct Object* paintingObj = gMarioState->paintingObj;
 
     if (paintingObj != NULL) {
-        struct ObjectWarpNode *warpNode = area_get_warp_node(GET_BPARAM2(paintingObj->oBehParams));
+        struct ObjectWarpNode* warpNode = area_get_warp_node(GET_BPARAM2(paintingObj->oBehParams));
 
         if (warpNode != NULL) {
             if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
@@ -668,7 +668,7 @@ void initiate_painting_warp(void) {
                                gMarioState->marioObj->header.gfx.cameraToObject);
                 }
             } else {
-                struct WarpNode *node = &warpNode->node;
+                struct WarpNode* node = &warpNode->node;
 
                 if (!(node->destLevel & WARP_NO_CHECKPOINT)) {
                     sWarpCheckpointActive = check_warp_checkpoint(node);
