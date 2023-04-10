@@ -35,7 +35,7 @@ static const char* sFpcsrDesc[6] = {
     /*FPCSR_CI      */ "Inexact operation",
 };
 
-static const char* sRegNames[29] = { //! TODO: Combine this with sRegisterNames
+static const char* sRegNames[29] = { //! TODO: Combine this with sCPURegisterNames
     "AT", "V0", "V1",
     "A0", "A1", "A2",
     "A3", "T0", "T1",
@@ -66,7 +66,9 @@ void crash_screen_print_registers(__OSThreadContext* tc) {
     crash_screen_print_reg(TEXT_X(1 * 15), TEXT_Y( 3), "SR", tc->sr);
     crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y( 3), "VA", tc->badvaddr);
 
-    crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", *(uintptr_t*)tc->pc);
+    if (IS_IN_RDRAM(tc->pc)) {
+        crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", *(uintptr_t*)tc->pc); // The raw data of the asm code that crashed.
+    }
 
     osWritebackDCacheAll();
 

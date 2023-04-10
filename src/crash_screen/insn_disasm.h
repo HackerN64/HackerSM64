@@ -19,7 +19,7 @@
 #define INSN_DB_END INSN_ID_1(-1, -1, -1, -1, -1, -1, "", "")
 
 #define CHAR_P_NULL     '\0'
-#define CHAR_P_NOP      '0'     // "NOP"
+#define CHAR_P_NOP      '_'     // "NOP"
 #define CHAR_P_NAME     '\''    // "[name]%-6"
 #define CHAR_P_NAMEF    '\"'    // "[name].[fmt]%-6"
 #define CHAR_P_RS       's'     // "[rs reg]"
@@ -34,11 +34,13 @@
 #define CHAR_P_FS       'S'     // "F[fs reg]"
 #define CHAR_P_FD       'D'     // "F[fd reg]"
 #define CHAR_P_FUNC     'J'     // "[function address]" or parse map
+#define CHAR_P_COP0D    '0'     // "[rd reg]" COP0 Special register
 
 enum Coprocessors {
+    CPU = -1,
     COP0, // Coprocessor-0 (System Control Coprocessor)
     COP1, // Coprocessor-1 (Floating-Point Unit)
-    COP2, // Coprocessor-2 (Reality Co-Processor)
+    COP2, // Coprocessor-2 (Reality Co-Processor Vector Unit)
     COP3, // Coprocessor-3 (CP3)
 };
 
@@ -68,8 +70,8 @@ enum COP1Formats {
 
 // Regular opcodes
 enum InsnOpCodes {
-    OPC_SPEC    = 0b000000, //  0: Use function (last 6 bits) as opcode
-    OPC_REGI    = 0b000001, //  1: Use rt (skip 5 bits after opcode and the 5 bits after that) as opcode
+    OPC_SPECIAL = 0b000000, //  0: Use function (last 6 bits) as opcode
+    OPC_REGIMM  = 0b000001, //  1: Use rt (skip 5 bits after opcode and the 5 bits after that) as opcode
 
     OPC_J       = 0b000010, //  2: Jump
     OPC_JAL     = 0b000011, //  3: Jump and Link
@@ -90,7 +92,7 @@ enum InsnOpCodes {
 #define B_OPC_COP (COP_OPCODE << 2) // 0b010000
     OPC_COP0    = (B_OPC_COP | COP0), // 0b010000 (16): Coprocessor-0 (System Control Coprocessor)
     OPC_COP1    = (B_OPC_COP | COP1), // 0b010001 (17): Coprocessor-1 (Floating-Point Unit)
-    OPC_COP2    = (B_OPC_COP | COP2), // 0b010010 (18): Coprocessor-2 (Reality Co-Processor)
+    OPC_COP2    = (B_OPC_COP | COP2), // 0b010010 (18): Coprocessor-2 (Reality Co-Processor Vector Unit)
     OPC_COP3    = (B_OPC_COP | COP3), // 0b010011 (19): Coprocessor-3 (CP3)
 
     OPC_BEQL    = 0b010100, // 20: Branch on Equal Likely
@@ -131,23 +133,23 @@ enum InsnOpCodes {
     OPC_LL      = 0b110000, // 48: Load Linked Word
     B_OPC_LWC   = 0b100000,
     OPC_LWC1    = (B_OPC_LWC | OPC_COP1), // 0b110001 (49): Load Word to Coprocessor-1 (Floating-Point Unit)
-    OPC_LWC2    = (B_OPC_LWC | OPC_COP2), // 0b110010 (50): Load Word to Coprocessor-2 (Reality Co-Processor)
+    OPC_LWC2    = (B_OPC_LWC | OPC_COP2), // 0b110010 (50): Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit)
     OPC_LWC3    = (B_OPC_LWC | OPC_COP3), // 0b110011 (51): Load Word to Coprocessor-3 (COP3)
     OPC_LLD     = 0b110100, // 52: Load Linked Doubleword
 #define B_OPC_LDC 0b100100
     OPC_LDC1    = (B_OPC_LDC | OPC_COP1), // 0b110101 (53): Load Doubleword to Coprocessor-1 (Floating-Point Unit)
-    OPC_LDC2    = (B_OPC_LDC | OPC_COP2), // 0b110110 (54): Load Doubleword to Coprocessor-2 (Reality Co-Processor)
+    OPC_LDC2    = (B_OPC_LDC | OPC_COP2), // 0b110110 (54): Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit)
     OPC_LD      = 0b110111, // 55: Load Doubleword
 
     OPC_SC      = 0b111000, // 56: Store Conditional Word
 #define B_OPC_SWC 0b101000
     OPC_SWC1    = (B_OPC_SWC | OPC_COP1), // 0b111001 (57): Store Word to Coprocessor-1 (Floating-Point Unit)
-    OPC_SWC2    = (B_OPC_SWC | OPC_COP2), // 0b111010 (58): Store Word to Coprocessor-2 (Reality Co-Processor)
+    OPC_SWC2    = (B_OPC_SWC | OPC_COP2), // 0b111010 (58): Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit)
     OPC_SWC3    = (B_OPC_SWC | OPC_COP3), // 0b111011 (59): Store Word to Coprocessor-3 (COP3)
     OPC_SCD     = 0b111100, // 60: Store Conditional Doubleword
 #define B_OPC_SDC 0b101100
     OPC_SDC1    = (B_OPC_SDC | OPC_COP1), // 0b111101 (61): Store Doubleword to Coprocessor-1 (Floating-Point Unit)
-    OPC_SDC2    = (B_OPC_SDC | OPC_COP2), // 0b111110 (62): Store Doubleword to Coprocessor-2 (Reality Co-Processor)
+    OPC_SDC2    = (B_OPC_SDC | OPC_COP2), // 0b111110 (62): Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit)
     OPC_SD      = 0b111111, // 63: Store Doubleword
 };
 
@@ -362,6 +364,7 @@ enum PseudoInsns {
     PSEUDO_B,
     PSEUDO_BEQZ,
     PSEUDO_BNEZ,
+    PSEUDO_LI,
     PSEUDO_SUBI,
     PSEUDO_BEQZL,
     PSEUDO_BNEZL,
@@ -369,7 +372,7 @@ enum PseudoInsns {
 };
 
 enum InsnType {
-    INSN_TYPE_ERROR,
+    INSN_TYPE_ERROR = -1,
     INSN_TYPE_OPCODE,
     INSN_TYPE_FUNC,
     INSN_TYPE_REGIMM,

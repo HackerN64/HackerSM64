@@ -12,7 +12,6 @@
 #include "engine/math_util.h"
 
 
-
 /**
  * How to find instructions:
  * 
@@ -26,9 +25,9 @@
  *   - Otherwise:
  *    - skip the next 3 bits (fmt) and compare the 5 bits after that (ft) to the list
  * - otherwise, check first 6 bits (opcode)
- *  - if 0 (OPC_SPEC):
+ *  - if 0 (OPC_SPECIAL):
  *   - compare the last 6 bits (func) to insn_db_spec
- *  - otherwise, if 1 (OPC_REGI):
+ *  - otherwise, if 1 (OPC_REGIMM):
  *   - skip the next 5 bits and compare the 5 bits after that (regimm)
  *  - otherwise, compare the first 6 bits to insn_db
  */
@@ -38,8 +37,8 @@
 
 // Opcode instructions
 ALIGNED32 static const InsnTemplate insn_db[] = {
-    // OPC_SPEC (insn_db_spec)
-    // OPC_REGI (insn_db_regi)
+    // OPC_SPECIAL (insn_db_spec)
+    // OPC_REGIMM (insn_db_regi)
     INSN_ID_1(OPC_J     , 0, 0, 0, 0, 0, "\'J"  , "J"      ) // Jump
     INSN_ID_1(OPC_JAL   , 0, 0, 0, 0, 0, "\'J"  , "JAL"    ) // Jump and Link
     INSN_ID_1(OPC_BEQ   , 0, 0, 0, 0, 0, "\'stB", "BEQ"    ) // Branch on Equal
@@ -84,105 +83,105 @@ ALIGNED32 static const InsnTemplate insn_db[] = {
     INSN_ID_0(OPC_CACHE , 0, 0, 0, 0, 0, "\'tI(", "CACHE"  ) // https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html
     INSN_ID_0(OPC_LL    , 0, 0, 0, 0, 0, "\'tI(", "LL"     ) // Load Linked Word
     INSN_ID_1(OPC_LWC1  , 0, 0, 0, 0, 0, "\'TI(", "LWC1"   ) // Load Word to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_LWC2  , 0, 0, 0, 0, 0, "\'TI(", "LWC2"   ) // Load Word to Coprocessor-2 (Reality Co-Processor)
+    INSN_ID_0(OPC_LWC2  , 0, 0, 0, 0, 0, "\'TI(", "LWC2"   ) // Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit)
     INSN_ID_0(OPC_LWC3  , 0, 0, 0, 0, 0, "\'TI(", "LWC3"   ) // Load Word to Coprocessor-3 (COP3)
     INSN_ID_0(OPC_LLD   , 0, 0, 0, 0, 0, "\'tI(", "LLD"    ) // Load Linked Doubleword
     INSN_ID_1(OPC_LDC1  , 0, 0, 0, 0, 0, "\'tI(", "LDC1"   ) // Load Doubleword to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_LDC2  , 0, 0, 0, 0, 0, "\'tI(", "LDC2"   ) // Load Doubleword to Coprocessor-2 (Reality Co-Processor)
+    INSN_ID_0(OPC_LDC2  , 0, 0, 0, 0, 0, "\'tI(", "LDC2"   ) // Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit)
     INSN_ID_0(OPC_LD    , 0, 0, 0, 0, 0, "\'tI(", "LD"     ) // Load Doubleword
     INSN_ID_0(OPC_SC    , 0, 0, 0, 0, 0, "\'tI(", "SC"     ) // Store Conditional Word
     INSN_ID_1(OPC_SWC1  , 0, 0, 0, 0, 0, "\'TI(", "SWC1"   ) // Store Word to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_SWC2  , 0, 0, 0, 0, 0, "\'TI(", "SWC2"   ) // Store Word to Coprocessor-2 (Reality Co-Processor)
+    INSN_ID_0(OPC_SWC2  , 0, 0, 0, 0, 0, "\'TI(", "SWC2"   ) // Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit)
     INSN_ID_0(OPC_SWC3  , 0, 0, 0, 0, 0, "\'TI(", "SWC3"   ) // Store Word to Coprocessor-3 (COP3)
     INSN_ID_0(OPC_SCD   , 0, 0, 0, 0, 0, "\'tI(", "SCD"    ) // Store Conditional Doubleword
     INSN_ID_1(OPC_SDC1  , 0, 0, 0, 0, 0, "\'tI(", "SDC1"   ) // Store Doubleword to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_SDC2  , 0, 0, 0, 0, 0, "\'tI(", "SDC2"   ) // Store Doubleword to Coprocessor-2 (Reality Co-Processor)
+    INSN_ID_0(OPC_SDC2  , 0, 0, 0, 0, 0, "\'tI(", "SDC2"   ) // Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit)
     INSN_ID_0(OPC_SD    , 0, 0, 0, 0, 0, "\'tI(", "SD"     ) // Store Doubleword
     INSN_DB_END
 };
 
 // Special opcode instructions
 ALIGNED32 static const InsnTemplate insn_db_spec[] = {
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SLL    , "\'dta"  , "SLL"    ) // Shift Word Left Logical
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SRL    , "\'dta"  , "SRL"    ) // Shift Word Right Logical
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SRA    , "\'dta"  , "SRA"    ) // Shift Word Right Arithmetic
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SLLV   , "\'dts"  , "SLLV"   ) // Shift Word Left Logical Variable
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SRLV   , "\'dts"  , "SRLV"   ) // Shift Word Right Logical Variable
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SRAV   , "\'dts"  , "SRAV"   ) // Shift Word Right Arithmetic Variable
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_JR     , "\'s"    , "JR"     ) // Jump Register
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_JALR   , "\'ds"   , "JALR"   ) // Jump and Link Register
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SYSCALL, "\'"     , "SYSCALL") // System Call (assert)
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_BREAK  , "\'"     , "BREAK"  ) // Breakpoint
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_SYNC   , "\'"     , "SYNC"   ) // Synchronize Shared Memory
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_MFHI   , "\'d"    , "MFHI"   ) // Move From HI
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_MTHI   , "\'s"    , "MTHI"   ) // Move To HI
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_MFLO   , "\'d"    , "MFLO"   ) // Move From LO
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_MTLO   , "\'s"    , "MTLO"   ) // Move To LO
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSLLV  , "\'dts"  , "DSLLV"  ) // Doubleword Shift Left Logical Variable
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSRLV  , "\'dts"  , "DSRLV"  ) // Doubleword Shift Right Logical Variable
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSRAV  , "\'dts"  , "DSRAV"  ) // Doubleword Shift Right Arithmetic Variable
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_MULT   , "\'st"   , "MULT"   ) // Multiply Word (5cyc)
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_MULTU  , "\'st"   , "MULTU"  ) // Multiply Unsigned Word (5cyc)
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_DIV    , "\'st"   , "DIV"    ) // Divide Word (37cyc)
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_DIVU   , "\'st"   , "DIVU"   ) // Divide Unsigned Word (37cyc)
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DMULT  , "\'st"   , "DMULT"  ) // Doubleword Multiply (8cyc)
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DMULTU , "\'st"   , "DMULTU" ) // Doubleword Multiply Unsigned (8cyc)
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DDIV   , "\'st"   , "DDIV"   ) // Doubleword Divide (69cyc)
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DDIVU  , "\'st"   , "DDIVU"  ) // Doubleword Divide Unsigned (69cyc)
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_ADD    , "\'dst"  , "ADD"    ) // Add Word
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_ADDU   , "\'dst"  , "ADDU"   ) // Add Unsigned Word
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SUB    , "\'dst"  , "SUB"    ) // Subtract Word
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SUBU   , "\'dst"  , "SUBU"   ) // Subtract Unsigned Word
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_AND    , "\'dst"  , "AND"    ) // And
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_OR     , "\'dst"  , "OR"     ) // Or
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_XOR    , "\'dst"  , "XOR"    ) // Exclusive Or
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_NOR    , "\'dst"  , "NOR"    ) // Nor
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SLT    , "\'dst"  , "SLT"    ) // Set on Less Than
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_SLTU   , "\'dst"  , "SLTU"   ) // Set on Less Than Unsigned
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DADD   , "\'dst"  , "DADD"   ) // Doubleword Add
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DADDU  , "\'dst"  , "DADDU"  ) // Doubleword Add Unsigned
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSUB   , "\'dst"  , "DSUB"   ) // Doubleword Subtract
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSUBU  , "\'dst"  , "DSUBU"  ) // Doubleword Subtract Unsigned
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_TGE    , "\'st"   , "TGE"    ) // Trap if Greater Than or Equal
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_TGEU   , "\'st"   , "TGEU"   ) // Trap if Greater Than or Equal Unsigned
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_TLT    , "\'st"   , "TLT"    ) // Trap if Less Than
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_TLTU   , "\'st"   , "TLTU"   ) // Trap if Less Than Unsigned
-    INSN_ID_1(OPC_SPEC, 0, 0, 0, 0, OPS_TEQ    , "\'st"   , "TEQ"    ) // Trap if Equal
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_TNE    , "\'st"   , "TNE"    ) // Trap if Not Equal
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSLL   , "\'dta"  , "DSLL"   ) // Doubleword Shift Left Logical
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSRL   , "\'dta"  , "DSRL"   ) // Doubleword Shift Right Logical
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSRA   , "\'dta"  , "DSRA"   ) // Doubleword Shift Right Arithmetic
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSLL32 , "\'dta"  , "DSLL32" ) // Doubleword Shift Left Logical + 32
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSRL32 , "\'dta"  , "DSRL32" ) // Doubleword Shift Right Logical + 32
-    INSN_ID_0(OPC_SPEC, 0, 0, 0, 0, OPS_DSRA32 , "\'dta"  , "DSRA32" ) // Doubleword Shift Right Arithmetic + 32
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLL    , "\'dta"  , "SLL"    ) // Shift Word Left Logical
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRL    , "\'dta"  , "SRL"    ) // Shift Word Right Logical
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRA    , "\'dta"  , "SRA"    ) // Shift Word Right Arithmetic
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLLV   , "\'dts"  , "SLLV"   ) // Shift Word Left Logical Variable
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRLV   , "\'dts"  , "SRLV"   ) // Shift Word Right Logical Variable
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRAV   , "\'dts"  , "SRAV"   ) // Shift Word Right Arithmetic Variable
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_JR     , "\'s"    , "JR"     ) // Jump Register
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_JALR   , "\'ds"   , "JALR"   ) // Jump and Link Register
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SYSCALL, "\'"     , "SYSCALL") // System Call (assert)
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_BREAK  , "\'"     , "BREAK"  ) // Breakpoint
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_SYNC   , "\'"     , "SYNC"   ) // Synchronize Shared Memory
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MFHI   , "\'d"    , "MFHI"   ) // Move From HI
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MTHI   , "\'s"    , "MTHI"   ) // Move To HI
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MFLO   , "\'d"    , "MFLO"   ) // Move From LO
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MTLO   , "\'s"    , "MTLO"   ) // Move To LO
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSLLV  , "\'dts"  , "DSLLV"  ) // Doubleword Shift Left Logical Variable
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRLV  , "\'dts"  , "DSRLV"  ) // Doubleword Shift Right Logical Variable
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRAV  , "\'dts"  , "DSRAV"  ) // Doubleword Shift Right Arithmetic Variable
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MULT   , "\'st"   , "MULT"   ) // Multiply Word (5cyc)
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MULTU  , "\'st"   , "MULTU"  ) // Multiply Unsigned Word (5cyc)
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_DIV    , "\'st"   , "DIV"    ) // Divide Word (37cyc)
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_DIVU   , "\'st"   , "DIVU"   ) // Divide Unsigned Word (37cyc)
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DMULT  , "\'st"   , "DMULT"  ) // Doubleword Multiply (8cyc)
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DMULTU , "\'st"   , "DMULTU" ) // Doubleword Multiply Unsigned (8cyc)
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DDIV   , "\'st"   , "DDIV"   ) // Doubleword Divide (69cyc)
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DDIVU  , "\'st"   , "DDIVU"  ) // Doubleword Divide Unsigned (69cyc)
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADD    , "\'dst"  , "ADD"    ) // Add Word
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADDU   , "\'dst"  , "ADDU"   ) // Add Unsigned Word
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SUB    , "\'dst"  , "SUB"    ) // Subtract Word
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SUBU   , "\'dst"  , "SUBU"   ) // Subtract Unsigned Word
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_AND    , "\'dst"  , "AND"    ) // And
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_OR     , "\'dst"  , "OR"     ) // Or
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_XOR    , "\'dst"  , "XOR"    ) // Exclusive Or
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_NOR    , "\'dst"  , "NOR"    ) // Nor
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLT    , "\'dst"  , "SLT"    ) // Set on Less Than
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLTU   , "\'dst"  , "SLTU"   ) // Set on Less Than Unsigned
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DADD   , "\'dst"  , "DADD"   ) // Doubleword Add
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DADDU  , "\'dst"  , "DADDU"  ) // Doubleword Add Unsigned
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSUB   , "\'dst"  , "DSUB"   ) // Doubleword Subtract
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSUBU  , "\'dst"  , "DSUBU"  ) // Doubleword Subtract Unsigned
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TGE    , "\'st"   , "TGE"    ) // Trap if Greater Than or Equal
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TGEU   , "\'st"   , "TGEU"   ) // Trap if Greater Than or Equal Unsigned
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TLT    , "\'st"   , "TLT"    ) // Trap if Less Than
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TLTU   , "\'st"   , "TLTU"   ) // Trap if Less Than Unsigned
+    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_TEQ    , "\'st"   , "TEQ"    ) // Trap if Equal
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TNE    , "\'st"   , "TNE"    ) // Trap if Not Equal
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSLL   , "\'dta"  , "DSLL"   ) // Doubleword Shift Left Logical
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRL   , "\'dta"  , "DSRL"   ) // Doubleword Shift Right Logical
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRA   , "\'dta"  , "DSRA"   ) // Doubleword Shift Right Arithmetic
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSLL32 , "\'dta"  , "DSLL32" ) // Doubleword Shift Left Logical + 32
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRL32 , "\'dta"  , "DSRL32" ) // Doubleword Shift Right Logical + 32
+    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRA32 , "\'dta"  , "DSRA32" ) // Doubleword Shift Right Arithmetic + 32
     INSN_DB_END
 };
 
 // Register opcode instructions
 ALIGNED32 static const InsnTemplate insn_db_regi[] = {
-    INSN_ID_1(OPC_REGI, 0, OPR_BLTZ   , 0, 0, 0, "\'sB"  ,  "BLTZ"   ) // Branch on Less Than Zero
-    INSN_ID_1(OPC_REGI, 0, OPR_BGEZ   , 0, 0, 0, "\'sB"  ,  "BGEZ"   ) // Branch on Greater Than or Equal to Zero
-    INSN_ID_1(OPC_REGI, 0, OPR_BLTZL  , 0, 0, 0, "\'sB"  ,  "BLTZL"  ) // Branch on Less Than Zero Likely
-    INSN_ID_1(OPC_REGI, 0, OPR_BGEZL  , 0, 0, 0, "\'sB"  ,  "BGEZL"  ) // Branch on Greater Than or Equal to Zero Likely
-    INSN_ID_0(OPC_REGI, 0, OPR_BLTZAL , 0, 0, 0, "\'sB"  ,  "BLTZAL" ) // Branch on Less Than Zero and Link
-    INSN_ID_0(OPC_REGI, 0, OPR_BGEZAL , 0, 0, 0, "\'sB"  ,  "BGEZAL" ) // Branch on Greater Than or Equal to Zero and Link
-    INSN_ID_0(OPC_REGI, 0, OPR_BLTZALL, 0, 0, 0, "\'sB"  ,  "BLTZALL") // Branch on Less Than Zero and Link Likely
-    INSN_ID_0(OPC_REGI, 0, OPR_BGEZALL, 0, 0, 0, "\'sB"  ,  "BGEZALL") // Branch on Greater Than or Equal to Zero and Link Likely
-    INSN_ID_0(OPC_REGI, 0, OPR_TGEI   , 0, 0, 0, "\'sI"  ,  "TGEI"   ) // Trap if Greater Than or Equal Immediate
-    INSN_ID_0(OPC_REGI, 0, OPR_TGEIU  , 0, 0, 0, "\'sI"  ,  "TGEIU"  ) // Trap if Greater Than or Equal Unsigned Immediate
-    INSN_ID_0(OPC_REGI, 0, OPR_TLTI   , 0, 0, 0, "\'sI"  ,  "TLTI"   ) // Trap if Less Than Immediate
-    INSN_ID_0(OPC_REGI, 0, OPR_TLTIU  , 0, 0, 0, "\'sI"  ,  "TLTIU"  ) // Trap if Less Than Unsigned Immediate
-    INSN_ID_0(OPC_REGI, 0, OPR_TEQI   , 0, 0, 0, "\'sI"  ,  "TEQI"   ) // Trap if Equal Immediate
-    INSN_ID_0(OPC_REGI, 0, OPR_TNEI   , 0, 0, 0, "\'sI"  ,  "TNEI"   ) // Trap if Not Equal Immediate
+    INSN_ID_1(OPC_REGIMM, 0, OPR_BLTZ   , 0, 0, 0, "\'sB"  ,  "BLTZ"   ) // Branch on Less Than Zero
+    INSN_ID_1(OPC_REGIMM, 0, OPR_BGEZ   , 0, 0, 0, "\'sB"  ,  "BGEZ"   ) // Branch on Greater Than or Equal to Zero
+    INSN_ID_1(OPC_REGIMM, 0, OPR_BLTZL  , 0, 0, 0, "\'sB"  ,  "BLTZL"  ) // Branch on Less Than Zero Likely
+    INSN_ID_1(OPC_REGIMM, 0, OPR_BGEZL  , 0, 0, 0, "\'sB"  ,  "BGEZL"  ) // Branch on Greater Than or Equal to Zero Likely
+    INSN_ID_0(OPC_REGIMM, 0, OPR_BLTZAL , 0, 0, 0, "\'sB"  ,  "BLTZAL" ) // Branch on Less Than Zero and Link
+    INSN_ID_0(OPC_REGIMM, 0, OPR_BGEZAL , 0, 0, 0, "\'sB"  ,  "BGEZAL" ) // Branch on Greater Than or Equal to Zero and Link
+    INSN_ID_0(OPC_REGIMM, 0, OPR_BLTZALL, 0, 0, 0, "\'sB"  ,  "BLTZALL") // Branch on Less Than Zero and Link Likely
+    INSN_ID_0(OPC_REGIMM, 0, OPR_BGEZALL, 0, 0, 0, "\'sB"  ,  "BGEZALL") // Branch on Greater Than or Equal to Zero and Link Likely
+    INSN_ID_0(OPC_REGIMM, 0, OPR_TGEI   , 0, 0, 0, "\'sI"  ,  "TGEI"   ) // Trap if Greater Than or Equal Immediate
+    INSN_ID_0(OPC_REGIMM, 0, OPR_TGEIU  , 0, 0, 0, "\'sI"  ,  "TGEIU"  ) // Trap if Greater Than or Equal Unsigned Immediate
+    INSN_ID_0(OPC_REGIMM, 0, OPR_TLTI   , 0, 0, 0, "\'sI"  ,  "TLTI"   ) // Trap if Less Than Immediate
+    INSN_ID_0(OPC_REGIMM, 0, OPR_TLTIU  , 0, 0, 0, "\'sI"  ,  "TLTIU"  ) // Trap if Less Than Unsigned Immediate
+    INSN_ID_0(OPC_REGIMM, 0, OPR_TEQI   , 0, 0, 0, "\'sI"  ,  "TEQI"   ) // Trap if Equal Immediate
+    INSN_ID_0(OPC_REGIMM, 0, OPR_TNEI   , 0, 0, 0, "\'sI"  ,  "TNEI"   ) // Trap if Not Equal Immediate
     INSN_DB_END
 };
 
 // Coprocessor-0 (System Control Coprocessor)
 ALIGNED32 static const InsnTemplate insn_db_cop0[] = {
-    INSN_ID_0(OPC_COP0, COP0_MF , 0, 0, 0, 0             , "\'td", "MFC0"   ) // Move from System Control Coprocessor
-    INSN_ID_0(OPC_COP0, COP0_DMF, 0, 0, 0, 0             , "\'td", "DMFC0"  ) // Doubleword Move from System Control Coprocessor
-    INSN_ID_0(OPC_COP0, COP0_MT , 0, 0, 0, 0             , "\'td", "MTC0"   ) // Move to System Control Coprocessor
-    INSN_ID_0(OPC_COP0, COP0_DMT, 0, 0, 0, 0             , "\'td", "DMTC0"  ) // Doubleword Move to System Control Coprocessor
+    INSN_ID_0(OPC_COP0, COP0_MF , 0, 0, 0, 0             , "\'t0", "MFC0"   ) // Move from System Control Coprocessor
+    INSN_ID_0(OPC_COP0, COP0_DMF, 0, 0, 0, 0             , "\'t0", "DMFC0"  ) // Doubleword Move from System Control Coprocessor
+    INSN_ID_0(OPC_COP0, COP0_MT , 0, 0, 0, 0             , "\'t0", "MTC0"   ) // Move to System Control Coprocessor
+    INSN_ID_0(OPC_COP0, COP0_DMT, 0, 0, 0, 0             , "\'t0", "DMTC0"  ) // Doubleword Move to System Control Coprocessor
     INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBP , "\'"  , "TLBP"   ) // Searches for a TLB entry that matches the EntryHi register
     INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBR , "\'"  , "TLBR"   ) // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register
     INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBWI, "\'"  , "TLBWI"  ) // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register
@@ -242,7 +241,7 @@ ALIGNED32 static const InsnTemplate insn_db_cop1[] = {
     INSN_DB_END
 };
 
-// Coprocessor-2 (Reality Co-Processor)
+// Coprocessor-2 (Reality Co-Processor Vector Unit)
 ALIGNED32 static const InsnTemplate insn_db_cop2[] = {
     INSN_DB_END
 };
@@ -261,16 +260,17 @@ static const InsnTemplate* insn_db_cop_lists[] = {
 
 // Pseudo-instructions
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
-    [PSEUDO_NOP  ] = INSN_ID_1(OPC_SPEC , 0, 0, 0, 0, OPS_SLL, "0"    , "NOP"    ) // NOP (pseudo of SLL)
-    [PSEUDO_MOVET] = INSN_ID_0(OPC_SPEC , 0, 0, 0, 0, OPS_ADD, "\'dt" , "MOVE"   ) // Move (pseudo of ADD and OR)
-    [PSEUDO_MOVES] = INSN_ID_0(OPC_SPEC , 0, 0, 0, 0, OPS_ADD, "\'ds" , "MOVE"   ) // Move (pseudo of ADD)
-    [PSEUDO_B    ] = INSN_ID_1(OPC_BEQ  , 0, 0, 0, 0, 0      , "\'B"  , "B"      ) // Branch (pseudo of BEQ)
-    [PSEUDO_BEQZ ] = INSN_ID_1(OPC_BEQ  , 0, 0, 0, 0, 0      , "\'sB" , "BEQZ"   ) // Branch on Equal to Zero (pseudo of BEQ)
-    [PSEUDO_BNEZ ] = INSN_ID_1(OPC_BNE  , 0, 0, 0, 0, 0      , "\'sB" , "BNEZ"   ) // Branch on Not Equal to Zero (pseudo of BNE)
-    [PSEUDO_SUBI ] = INSN_ID_1(OPC_ADDI , 0, 0, 0, 0, 0      , "\'tsi", "SUBI"   ) // Add Immediate Word
-    [PSEUDO_BEQZL] = INSN_ID_1(OPC_BEQL , 0, 0, 0, 0, 0      , "\'sB" , "BEQZL"  ) // Branch on Equal to Zero Likely (pseudo of BEQL)
-    [PSEUDO_BNEZL] = INSN_ID_1(OPC_BNEL , 0, 0, 0, 0, 0      , "\'sB" , "BNEZL"  ) // Branch on Not Equal to Zero Likely (pseudo of BNEL)
-    [PSEUDO_DSUBI] = INSN_ID_0(OPC_DADDI, 0, 0, 0, 0, 0      , "\'tsi", "DSUBI"  ) // Doubleword Add Immediate
+    [PSEUDO_NOP  ] = INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLL, "_"    , "NOP"    ) // NOP (pseudo of SLL)
+    [PSEUDO_MOVET] = INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADD, "\'dt" , "MOVE"   ) // Move (pseudo of ADD and OR)
+    [PSEUDO_MOVES] = INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADD, "\'ds" , "MOVE"   ) // Move (pseudo of ADD)
+    [PSEUDO_B    ] = INSN_ID_1(OPC_BEQ    , 0, 0, 0, 0, 0      , "\'B"  , "B"      ) // Branch (pseudo of BEQ)
+    [PSEUDO_BEQZ ] = INSN_ID_1(OPC_BEQ    , 0, 0, 0, 0, 0      , "\'sB" , "BEQZ"   ) // Branch on Equal to Zero (pseudo of BEQ)
+    [PSEUDO_BNEZ ] = INSN_ID_1(OPC_BNE    , 0, 0, 0, 0, 0      , "\'sB" , "BNEZ"   ) // Branch on Not Equal to Zero (pseudo of BNE)
+    [PSEUDO_LI   ] = INSN_ID_1(OPC_ADDI   , 0, 0, 0, 0, 0      , "\'tI" , "LI"     ) // Load Immediate
+    [PSEUDO_SUBI ] = INSN_ID_1(OPC_ADDI   , 0, 0, 0, 0, 0      , "\'tsi", "SUBI"   ) // Add Immediate Word
+    [PSEUDO_BEQZL] = INSN_ID_1(OPC_BEQL   , 0, 0, 0, 0, 0      , "\'sB" , "BEQZL"  ) // Branch on Equal to Zero Likely (pseudo of BEQL)
+    [PSEUDO_BNEZL] = INSN_ID_1(OPC_BNEL   , 0, 0, 0, 0, 0      , "\'sB" , "BNEZL"  ) // Branch on Not Equal to Zero Likely (pseudo of BNEL)
+    [PSEUDO_DSUBI] = INSN_ID_1(OPC_DADDI  , 0, 0, 0, 0, 0      , "\'tsi", "DSUBI"  ) // Doubleword Add Immediate
 };
 
 static _Bool check_pseudo_insn(const InsnTemplate** type, enum PseudoInsns id, _Bool cond) {
@@ -292,7 +292,7 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
     }
 
     switch (insn.opcode) {
-        case OPC_SPEC:
+        case OPC_SPECIAL:
             switch (insn.func) {
                 case OPS_ADD:
                     if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == 0))) return TRUE;
@@ -310,7 +310,11 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
             if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == 0      ))) return TRUE;
             break;
         case OPC_ADDI:
+            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0      ))) return TRUE;
             if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) return TRUE;
+            break;
+        case OPC_ADDIU:
+            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0      ))) return TRUE;
             break;
         case OPC_BEQL:
             if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == 0      ))) return TRUE;
@@ -342,11 +346,11 @@ static enum InsnType get_insn_list(InsnData insn, const InsnTemplate** checkInsn
         }
     } else {
         switch (insn.opcode) {
-            case OPC_SPEC:
+            case OPC_SPECIAL:
                 *checkInsn = insn_db_spec;
                 insnType = INSN_TYPE_FUNC;
                 break;
-            case OPC_REGI:
+            case OPC_REGIMM:
                 *checkInsn = insn_db_regi;
                 insnType = INSN_TYPE_REGIMM;
                 break;
@@ -389,36 +393,65 @@ const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
 }
 
 // Registers
-static const char sRegisterNames[][3] = {
-    "R0",                                           // $zero
-    "AT",                                           // Assembler temporary value
-    "V0", "V1",                                     // Subroutine return value
-    "A0", "A1", "A2", "A3",                         // Subroutine arguments
-    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", // Temporary values
-    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", // Saved values
-    "T8", "T9",                                     // Temporary values
-    "K0", "K1",                                     // Reserved by kernel
-    "GP",                                           // Global pointer
-    "SP",                                           // Stack pointer
-    "FP",                                           // Saved value or frame pointer
-    "RA",                                           // Return address
+static const char sCPURegisterNames[][3] = {
+    "R0",                                           // $zero.
+    "AT",                                           // Assembler temporary value.
+    "V0", "V1",                                     // Subroutine return value.
+    "A0", "A1", "A2", "A3",                         // Subroutine arguments.
+    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", // Temporary values.
+    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", // Saved values.
+    "T8", "T9",                                     // Temporary values.
+    "K0", "K1",                                     // Reserved by kernel.
+    "GP",                                           // Global pointer.
+    "SP",                                           // Stack pointer.
+    "FP",                                           // Saved value or frame pointer.
+    "RA",                                           // Return address.
 }; //! TODO: Combine this with sRegNames
 
+static const char sCOP0RegisterNames[][10] = {
+    [ 0] = "Index",                        // Programmable pointer into TLB array.
+    [ 1] = "Random",                       // Pseudorandom pointer into TLB array (read only).
+    [ 2] = "EntryLo0", [3] = "EntryLo1",         // Low half of TLB entry for even/odd virtual address (VPN).
+    [ 4] = "Context",                      // Pointer to kernel virtual page table entry (PTE) in 32-bit mode.
+    [ 5] = "PageMask",                     // Page size specification.
+    [ 6] = "Wired",                        // Number of wired TLB entries.
+    [ 7] = "7",                            // Reserved for future use.
+    [ 8] = "BadVAddr",                     // Display of virtual address that occurred an error last.
+    [ 9] = "Count",                        // Timer Count.
+    [10] = "EntryHi",                      // High half of TLB entry (including ASID).
+    [11] = "Compare",                      // Timer Compare Value.
+    [12] = "Status",                       // Operation status setting.
+    [13] = "Cause",                        // Display of cause of last exception.
+    [14] = "EPC",                          // Exception Program Counter.
+    [15] = "PRId",                         // Processor Revision Identifier.
+    [16] = "Config",                       // Memory system mode setting.
+    [17] = "LLAddr",                       // Load Linked instruction address display.
+    [18] = "WatchLo", [19] = "WatchHi",           // Memory reference trap address low/high bits.
+    [20] = "XContext",                     // Pointer to Kernel virtual PTE table in 64-bit mode.
+    [21] = "21", "22", "23", "24", "25",   // Reserved for future use.
+    [26] = "ParityErr",                    // Cache parity bits.
+    [27] = "CacheErr",                     // Cache Error and Status register.
+    [28] = "TagLo", [29] = "TagHi",               // Cache Tag register low/high.
+    [30] = "ErrorEPC",                     // Error Exception Program Counter.
+    [31] = "31",                           // Reserved for future use.
+};
+
 // // FPU Registers
-// static const char sFloatRegisterNames[][3] = {
-//     "00", "02",                                     // Subroutine return value
-//     "04", "06", "08", "10",                         // Temporary values
-//     "12", "14",                                     // Subroutine arguments
-//     "16", "18",                                     // Temporary values
-//     "20", "22", "24", "26", "28", "30",             // Saved Values
+// static const char* sCOP1RegisterNames[] = {
+//     "F00", "F02",                               // Subroutine return value.
+//     "F04", "F06", "F08", "F10",                 // Temporary values.
+//     "F12", "F14",                               // Subroutine arguments.
+//     "F16", "F18",                               // Temporary values.
+//     "F20", "F22", "F24", "F26", "F28", "F30",   // Saved Values.
 // };
 
+// Checks an instruction for its branch offset. Returns 0 if there is no branch.
 s16 check_for_branch_offset(InsnData insn) {
-    const InsnTemplate* type = get_insn(insn);
+    const InsnTemplate* info = get_insn(insn);
 
-    if (type != NULL) {
+    if (info != NULL) {
         for (int i = 0; i < 4; i++) {
-            if (type->format[i] == CHAR_P_BRANCH) {
+            if (info->format[i] == CHAR_P_BRANCH) {
                 return insn.offset;
             }
         }
@@ -479,7 +512,7 @@ static char insn_as_string[CHAR_BUFFER_SIZE] = "";
 #define STR_IMMEDIATE       STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
 #define STR_OFFSET          "%c"STR_IMMEDIATE               // ±Offset
 #define STR_FUNCTION        STR_HEX_PREFIX STR_HEX_WORD     // Function address
-#define STR_IREG_OFFSET     "("STR_IREG")"                  // Offset register
+#define STR_IREG_BASE       "("STR_IREG")"                  // Base register
 #define STR_FREG            "F%02d"                         // Float Register
 
 char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
@@ -489,13 +522,13 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
 
     bzero(insn_as_string, sizeof(insn_as_string));
 
-    const InsnTemplate* type = get_insn(insn);
+    const InsnTemplate* info = get_insn(insn);
 
-    if (type != NULL) {
+    if (info != NULL) {
         RGBA32 color = COLOR_RGBA32_NONE;
 
         for (u8 cmdIndex = 0; cmdIndex < sizeof(u32); cmdIndex++) {
-            char curCmd = type->format[cmdIndex];
+            char curCmd = info->format[cmdIndex];
 
             if (unimpl || curCmd == CHAR_P_NULL) {
                 break;
@@ -505,29 +538,29 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
             switch (curCmd) {
                 case CHAR_P_NOP:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_NOP);
-                    strp += sprintf(strp, type->name);
+                    strp += sprintf(strp, info->name);
                     return insn_as_string;
                 case CHAR_P_NAME:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_INSN);
-                    strp += sprintf(strp, STR_INSN_NAME, type->name);
+                    strp += sprintf(strp, STR_INSN_NAME, info->name);
                     break;
                 case CHAR_P_NAMEF:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_INSN);
                     bzero(insn_name, sizeof(insn_name));
-                    sprintf(insn_name, STR_INSN_NAME_FORMAT, type->name, cop1_fmt_to_char(insn));
+                    sprintf(insn_name, STR_INSN_NAME_FORMAT, info->name, cop1_fmt_to_char(insn));
                     strp += sprintf(strp, STR_INSN_NAME, insn_name);
                     break;
                 case CHAR_P_RS:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sRegisterNames[insn.rs]);
+                    strp += sprintf(strp, STR_IREG" ", sCPURegisterNames[insn.rs]);
                     break;
                 case CHAR_P_RT:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sRegisterNames[insn.rt]);
+                    strp += sprintf(strp, STR_IREG" ", sCPURegisterNames[insn.rt]);
                     break;
                 case CHAR_P_RD:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sRegisterNames[insn.rd]);
+                    strp += sprintf(strp, STR_IREG" ", sCPURegisterNames[insn.rd]);
                     break;
                 case CHAR_P_IMM:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);
@@ -535,7 +568,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     break;
                 case CHAR_P_NIMM:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);
-                    strp += sprintf(strp, STR_IMMEDIATE, (s16)-insn.immediate);
+                    strp += sprintf(strp, STR_IMMEDIATE, -(s16)insn.immediate);
                     break;
                 case CHAR_P_SHIFT:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);
@@ -543,12 +576,16 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     break;
                 case CHAR_P_BASE:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_BASE_REG);
-                    strp += sprintf(strp, STR_IREG_OFFSET, sRegisterNames[insn.base]);
+                    strp += sprintf(strp, STR_IREG_BASE, sCPURegisterNames[insn.base]);
                     break;
                 case CHAR_P_BRANCH:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
                     s16 branchOffset = (insn.offset + 1);
                     strp += sprintf(strp, STR_OFFSET, ((branchOffset < 0) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '+' format specifier if possible.
+                    break;
+                case CHAR_P_COP0D:
+                    check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
+                    strp += sprintf(strp, STR_IREG" ", sCOP0RegisterNames[insn.rd]);
                     break;
                 case CHAR_P_FT:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
