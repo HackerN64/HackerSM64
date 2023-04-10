@@ -191,7 +191,7 @@ void painting_generate_mesh(struct Object* obj, const PaintingData* vtxData, Pai
  *
  * The mesh used in game, painting_data_vertices, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(const PaintingData *triangleData, struct PaintingNeighborTris* neighborTris, struct PaintingMeshVertex* paintingMesh, Vec3f* paintingTriNorms) {
+void painting_calculate_triangle_normals(const PaintingData* triangleData, struct PaintingNeighborTris* neighborTris, struct PaintingMeshVertex* paintingMesh, Vec3f* paintingTriNorms) {
     struct PaintingNeighborTris* vtn = NULL;
     PaintingData i, j;
     PaintingData numTris = *triangleData++;
