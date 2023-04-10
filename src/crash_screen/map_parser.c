@@ -32,22 +32,57 @@ void map_data_init(void) {
     while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 
-extern u8 _mainSegmentStart[];
-extern u8 _mainSegmentTextEnd[];
-extern u8 _engineSegmentStart[];
-extern u8 _engineSegmentTextEnd[];
-extern u8 _goddardSegmentStart[];
-extern u8 _goddardSegmentTextEnd[];
+static TextRegion sTextRegions[] = {
+TEXT_REGION_SEGMENT(boot)
+TEXT_REGION_SEGMENT(main)
+TEXT_REGION_SEGMENT(engine)
+TEXT_REGION_SEGMENT(behavior)
+TEXT_REGION_SEGMENT(goddard)
+TEXT_REGION_SEGMENT(libgoddard)
+TEXT_REGION_SEGMENT(intro)
+
+TEXT_REGION_GROUP(group0)
+TEXT_REGION_GROUP(group1)
+TEXT_REGION_GROUP(group2)
+TEXT_REGION_GROUP(group3)
+TEXT_REGION_GROUP(group4)
+TEXT_REGION_GROUP(group5)
+TEXT_REGION_GROUP(group6)
+TEXT_REGION_GROUP(group7)
+TEXT_REGION_GROUP(group8)
+TEXT_REGION_GROUP(group9)
+TEXT_REGION_GROUP(group10)
+TEXT_REGION_GROUP(group11)
+TEXT_REGION_GROUP(group12)
+TEXT_REGION_GROUP(group13)
+TEXT_REGION_GROUP(group14)
+TEXT_REGION_GROUP(group15)
+TEXT_REGION_GROUP(group16)
+TEXT_REGION_GROUP(group17)
+TEXT_REGION_GROUP(common0)
+TEXT_REGION_GROUP(common1)
+
+#define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
+#define DEFINE_LEVEL(_0, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) TEXT_REGION_LEVEL(folder)
+#include "levels/level_defines.h"
+#undef STUB_LEVEL
+#undef DEFINE_LEVEL
+};
+
 
 _Bool is_in_code_segment(uintptr_t addr) {
-    return (
-        IS_IN_RAM(addr) &&
-        (
-            IS_IN_SEGMENT(addr, main   ) ||
-            IS_IN_SEGMENT(addr, engine ) ||
-            IS_IN_SEGMENT(addr, goddard)
-        )
-    );
+    //! TODO: Allow reading memory outside RDRAM
+    if (!IS_IN_RDRAM(addr)) {
+        return FALSE;
+    }
+
+    for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
+        if (addr >= sTextRegions[i].start && addr <= sTextRegions[i].end) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -83,7 +118,7 @@ const char* parse_map_exact(uintptr_t addr) {
     return NULL;
 }
 
-// 
+//
 const char* find_function_in_stack(uintptr_t* sp) {
     const char* fname = NULL;
 

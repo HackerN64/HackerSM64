@@ -71,10 +71,10 @@ void crash_screen_select_address(void) {
     if (gCrashScreenDirectionFlags.pressed.up) {
         // Increment the selected digit.
         new = ((digit + 1) & BITMASK(4));
-        if (!IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+        if (!IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
             // Find the digit to wrap to
             for (new = 0x0; new < 0xF; new++) {
-                if (IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+                if (IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
                     break;
                 }
             }
@@ -83,10 +83,10 @@ void crash_screen_select_address(void) {
     if (gCrashScreenDirectionFlags.pressed.down) {
         // Decrement the selected digit.
         new = ((digit - 1) & BITMASK(4));
-        if (!IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+        if (!IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
             // Find the digit to wrap to
             for (new = 0xF; new > 0x0; new--) {
-                if (IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+                if (IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
                     break;
                 }
             }
@@ -96,7 +96,7 @@ void crash_screen_select_address(void) {
     if (new != digit) {
         nextSelectedAddress = SET_HEX_DIGIT(sAddressSelectTarget, new, shift);
 
-        if (IS_IN_RAM(nextSelectedAddress)) {
+        if (IS_IN_RDRAM(nextSelectedAddress)) {
             sAddressSelectTarget = nextSelectedAddress;
             gCrashScreenUpdateFramebuffer = TRUE;
         }

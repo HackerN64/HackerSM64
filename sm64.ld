@@ -54,10 +54,14 @@ OUTPUT_ARCH (mips)
    BEGIN_SEG(name, 0x0E000000) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
+      BEGIN_TEXT(name##script) \
       KEEP(BUILD_DIR/levels/name/script.o(.text*)); \
+      END_TEXT(name##script) \
       KEEP(BUILD_DIR/levels/name/script.o(.rodata*)); \
       KEEP(BUILD_DIR/levels/name/geo.o(.*data*)); \
+      BEGIN_TEXT(name##geo) \
       KEEP(BUILD_DIR/levels/name/geo.o(.text*)); \
+      END_TEXT(name##geo) \
       KEEP(BUILD_DIR/levels/name/geo.o(.rodata*)); \
    } \
    END_SEG(name) \
@@ -79,7 +83,9 @@ OUTPUT_ARCH (mips)
    { \
       KEEP(BUILD_DIR/actors/name##_geo.o(.*data*)); \
       KEEP(BUILD_DIR/actors/name##_geo.o(.rodata*)); \
+      BEGIN_TEXT(name##_geo) \
       KEEP(BUILD_DIR/actors/name##_geo.o(.text*)); \
+      END_TEXT(name##_geo) \
    } \
    END_SEG(name##_geo) \
    BEGIN_NOLOAD(name##_geo) \
@@ -90,14 +96,22 @@ OUTPUT_ARCH (mips)
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
+#define BEGIN_TEXT(name) \
+   _##name##SegmentTextStart = .;
+
+#define END_TEXT(name) \
+   _##name##SegmentTextEnd = .;
+
 SECTIONS
 {
    __romPos = 0;
 
    BEGIN_SEG(boot, 0x04000000)
    {
+      BEGIN_TEXT(boot)
       KEEP(BUILD_DIR/asm/rom_header.o(.text*));
       KEEP(BUILD_DIR/asm/boot.o(.text*));
+      END_TEXT(boot)
    }
    END_SEG(boot)
 
@@ -153,8 +167,9 @@ SECTIONS
    gMapStrings   = 0;
 #endif
 
-   BEGIN_SEG(main, .) SUBALIGN(16)
+   BEGIN_SEG(main, .)
    {
+      BEGIN_TEXT(main)
       KEEP(BUILD_DIR/asm/entry.o(.text*));
       KEEP(BUILD_DIR/asm/n64_assert.o(.text*));
 #ifdef EEP
@@ -180,7 +195,7 @@ SECTIONS
       BUILD_DIR/lib/aspMain.o(.text*);
       lib/PR/audio/n_aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text*);
-      _mainSegmentTextEnd = .;
+      END_TEXT(main)
       /* Overwrite a libultra function with its modified counterpart for GCN controller support */
       __osContGetInitData = __osContGetInitDataEx;
 
@@ -241,6 +256,7 @@ SECTIONS
 
    BEGIN_SEG(engine, .)
    {
+      BEGIN_TEXT(engine)
       BUILD_DIR/src/game*.o(.text*);
       BUILD_DIR/src/game/behavior_actions.o(.text*);
       BUILD_DIR/src/game/obj_behaviors_2.o(.text*);
@@ -252,7 +268,7 @@ SECTIONS
       BUILD_DIR/src/engine/surface_load.o(.text*);
       BUILD_DIR/src/engine/graph_node.o(.text*);
       BUILD_DIR/src/engine*.o(.text*);
-      _engineSegmentTextEnd = .;
+      END_TEXT(engine)
       /* data */
       BUILD_DIR/src/game*.o(.data*);
       BUILD_DIR/src/engine*.o(.data*);
@@ -338,7 +354,9 @@ SECTIONS
    {
       KEEP(BUILD_DIR/data/behavior_data.o(.data*));
       KEEP(BUILD_DIR/data/behavior_data.o(.rodata*));
+      BEGIN_TEXT(behavior)
       KEEP(BUILD_DIR/data/behavior_data.o(.text*));
+      END_TEXT(behavior)
    }
    END_SEG(behavior)
    BEGIN_NOLOAD(behavior)
@@ -351,12 +369,15 @@ SECTIONS
    /* 0x8016F000 21D7D0-255EC0 [386F0] */
    BEGIN_SEG(goddard, (RAM_END - GODDARD_SIZE))
    {
+      BEGIN_TEXT(goddard)
       KEEP(BUILD_DIR/src/menu*.o(.text*));
-      _goddardSegmentTextEnd = .;
+      END_TEXT(goddard)
       KEEP(BUILD_DIR/src/menu*.o(.data*));
       KEEP(BUILD_DIR/src/menu*.o(.rodata*));
 #ifdef KEEP_MARIO_HEAD
+      BEGIN_TEXT(libgoddard)
       KEEP(BUILD_DIR/libgoddard.a:*.o(.text*));
+      END_TEXT(libgoddard)
       KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.data*));
       KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.data*));
       KEEP(BUILD_DIR/libgoddard.a:objects.o(.data*));
@@ -405,7 +426,9 @@ SECTIONS
    {
       KEEP(BUILD_DIR/levels/intro/script.o(.*data));
       KEEP(BUILD_DIR/levels/intro/script.o(.rodata*));
+      BEGIN_TEXT(intro)
       KEEP(BUILD_DIR/levels/intro/script.o(.text*));
+      END_TEXT(intro)
       KEEP(BUILD_DIR/levels/intro/geo.o(.data*));
    }
    END_SEG(intro)
