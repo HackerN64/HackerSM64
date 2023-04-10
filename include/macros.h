@@ -36,6 +36,13 @@
 #define ALWAYS_INLINE inline
 #endif
 
+// Always inline a function.
+#ifdef __GNUC__
+#define NEVER_INLINE __attribute__((noinline))
+#else
+#define NEVER_INLINE
+#endif
+
 // Fall through a switch case.
 #ifdef __GNUC__
 #define FALL_THROUGH __attribute__((fallthrough))
@@ -118,18 +125,18 @@
 #define ALIGN64(val) ALIGN((val), 64)
 
 #ifndef NO_SEGMENTED_MEMORY
-// Convert a virtual address to physical.
-#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
-
 // Convert a physical address to virtual.
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr) | 0x80000000)
+
+// Convert a virtual address to physical.
+#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
 
 // Another way of converting virtual to physical.
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((u8 *)(addr) - 0x80000000U)
 #else // NO_SEGMENTED_MEMORY
 // No conversion needed other than cast.
-#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
+#define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif // NO_SEGMENTED_MEMORY
 
@@ -140,18 +147,52 @@
 #define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
-#define FORCE_CRASH do { *(vs8*)0 = 0; } while (0)
+typedef unsigned int u32;
+typedef u32 uintptr_t;
+uintptr_t _asm_getaddr(void);
+void _asm_setbits(uintptr_t bits);
 
+// Macros to trigger specific exceptions:
+#define EXCEPTION_INT()     //! TODO: do { ; } while (0) // Interrupt.
+#define EXCEPTION_MOD()     //! TODO: do { ; } while (0) // TLB modification exception.
+#define EXCEPTION_RMISS()   do { *(vs8*)0 = *(vs8*)0;                                           } while (0) // TLB exception on load or instruction fetch.
+#define EXCEPTION_WMISS()   do { *(vs8*)0 =        0;                                           } while (0) // TLB exception on store".
+#define EXCEPTION_RADE()    do { vs8 x; *(uintptr_t*)(x + 1) = *(uintptr_t*)(x + 1);            } while (0) // Address error on load or instruction fetch.
+#define EXCEPTION_WADE()    do { vs8 x; *(uintptr_t*)(x + 1) =                    0;            } while (0) // Address error on store.
+#define EXCEPTION_IBE()     //! TODO: do { ; } while (0) // Bus error on instruction fetch.
+#define EXCEPTION_DBE()     //! TODO: do { ; } while (0) // Bus error on data.
+#define EXCEPTION_SYSCALL() do { asm volatile("syscall");                                       } while (0) // System call exception.
+#define EXCEPTION_BREAK()   do { asm volatile("break");                                         } while (0) // Breakpoint exception.
+#define EXCEPTION_II()      do { _asm_setbits(0x00000001);                                      } while (0) // Reserved instruction exception.
+#define EXCEPTION_CPU()     //! TODO: do { ; } while (0) // Coprocessor unusable exception.
+#define EXCEPTION_OV()      //! TODO: do { ; } while (0) // Arithmetic overflow exception.
+#define EXCEPTION_TRAP()    do { __builtin_trap();                                              } while (0) // Trap exception. 
+#define EXCEPTION_VCEI()    //! TODO: do { ; } while (0) // Virtual coherency exception on intruction fetch.
+#define EXCEPTION_FPE()     //! TODO: do { ; } while (0) // Floating point exception (see fpcsr).
+#define EXCEPTION_WATCH()   //! TODO: do { ; } while (0) // Watchpoint exception.
+#define EXCEPTION_VCED()    //! TODO: do { ; } while (0) // Virtual coherency exception on data reference.
+// Trigger specific floating-point exceptions:
+#define EXCEPTION_CE()      do { vs32 x; asm volatile("add.s %0,%1,%2":"=f"(x):"f"(x),"f"(x));  } while (0) // Unimplemented operation.
+#define EXCEPTION_CV()      //! TODO: do { ; } while (0) // Invalid operation.
+#define EXCEPTION_CZ()      //! TODO: do { ; } while (0) // Division by zero.
+#define EXCEPTION_CO()      //! TODO: do { ; } while (0) // Overflow.
+#define EXCEPTION_CU()      //! TODO: do { ; } while (0) // Underflow.
+#define EXCEPTION_CI()      //! TODO: do { ; } while (0) // Inexact operation.
+
+#define FORCE_CRASH() EXCEPTION_TRAP()
+
+// Set where the program counter will be on crash.
 #define SET_CRASH_ADDR(ptr) \
 do { \
     extern uintptr_t gCrashAddress; \
     gCrashAddress = (uintptr_t)&(ptr); \
 } while (0)
 
+// Cause a crash at a specific location.
 #define FORCE_CRASH_AT_ADDR(ptr) \
 do { \
     SET_CRASH_ADDR(ptr); \
-    FORCE_CRASH; \
+    FORCE_CRASH(); \
 } while (0)
 
 #endif // MACROS_H
