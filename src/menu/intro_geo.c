@@ -432,7 +432,7 @@ static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
 };
 
 //! TODO: Use DEFINE_LANGUAGE_ARRAY after ASCII/multilang is merged.
-Texture *title_texture_rumble_pak_language_array[] = {
+Texture* title_texture_rumble_pak_language_array[] = {
     title_texture_rumble_pak_en,
  #if MULTILANG
   #ifdef ENABLE_FRENCH
@@ -450,10 +450,10 @@ Texture *title_texture_rumble_pak_language_array[] = {
  #endif // MULTILANG
 };
 
-Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
-    Gfx *dlIter;
-    Gfx *dl = NULL;
+Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSED void*context) {
+    struct GraphNodeGenerated* genNode = (struct GraphNodeGenerated*)node;
+    Gfx* dlIter;
+    Gfx* dl = NULL;
     s8 backgroundTileSix = 0;
 
     if (callContext != GEO_CONTEXT_RENDER) {

@@ -23,12 +23,12 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
-u8  gNumPlayers                     = 0;        // The number of controllers currently assigned to a player.
-u8  gControllerBits                 = 0b0000;   // Which ports have a controller connected to them (low to high).
-u8  gContStatusPolling              = FALSE;    // Whether controller status polling is enabled.
-u8  gContStatusPollingIsBootMode    = FALSE;    // Whether controller status polling was triggered on boot and should be invisible.
-u8  gContStatusPollingReadyForInput = TRUE;     // Whether all inputs have been released after starting status repolling.
-u32 gContStatusPollTimer            = 0;        // Time since controller status repolling has started.
+u8    gNumPlayers                     = 0;      // The number of controllers currently assigned to a player.
+u8    gControllerBits                 = 0b0000; // Which ports have a controller connected to them (low to high).
+_Bool gContStatusPolling              = FALSE;  // Whether controller status polling is enabled.
+_Bool gContStatusPollingIsBootMode    = FALSE;  // Whether controller status polling was triggered on boot and should be invisible.
+_Bool gContStatusPollingReadyForInput = TRUE;   // Whether all inputs have been released after starting status repolling.
+u32   gContStatusPollTimer            = 0;      // Time since controller status repolling has started.
 
 // Title Screen Demo Handler
 struct DemoInput* gCurrDemoInput = NULL;
@@ -220,7 +220,7 @@ void start_controller_status_polling(s32 isBootMode) {
  *
  * @param[in,out] pad The controller that stopped the polling.
  */
-void stop_controller_status_polling(OSContPadEx *pad) {
+void stop_controller_status_polling(OSContPadEx* pad) {
     if (gContStatusPollingIsBootMode) {
         gContStatusPollingIsBootMode = FALSE;
     } else {
@@ -247,11 +247,13 @@ void stop_controller_status_polling(OSContPadEx *pad) {
  * @param[in] deadzone The deadzone to compare with.
  * @returns s32 Boolean whether any input was detected.
  */
-static s32 detect_analog_stick_input(OSContPadEx *pad, const s8 deadzone) {
-    return (abss(pad->stick.x  ) > deadzone
-         || abss(pad->stick.y  ) > deadzone
-         || abss(pad->c_stick.x) > deadzone
-         || abss(pad->c_stick.y) > deadzone);
+static s32 detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
+    return (
+        abss(pad->stick.x  ) > deadzone ||
+        abss(pad->stick.y  ) > deadzone ||
+        abss(pad->c_stick.x) > deadzone ||
+        abss(pad->c_stick.y) > deadzone
+    );
 }
 
 /**
@@ -266,15 +268,21 @@ void read_controller_inputs_status_polling(void) {
         portInfo = &gPortInfo[port];
 
         if (portInfo->plugged) {
-            OSContPadEx *pad = &gControllerPads[port];
+            OSContPadEx* pad = &gControllerPads[port];
             u16 button = pad->button;
             totalInput |= button;
 
             if (gContStatusPollingReadyForInput) {
                 // If a button is pressed on an unassigned controller, assign it the current player number.
-                if (!portInfo->playerNum
-                 && (button
-                  || (gContStatusPollingIsBootMode && detect_analog_stick_input(pad, 20))) // Only check analog sticks in boot mode.
+                if (
+                    !portInfo->playerNum &&
+                    (
+                        button ||
+                        (
+                            gContStatusPollingIsBootMode &&
+                            detect_analog_stick_input(pad, 20)
+                        ) // Only check analog sticks in boot mode.
+                    )
                 ) {
                     portInfo->playerNum = ++gNumPlayers;
                 }
@@ -282,17 +290,20 @@ void read_controller_inputs_status_polling(void) {
                 u16 pressed = (~portInfo->statusPollButtons & button);
 
                 // If the combo is pressed, stop polling and assign the current controllers.
-                if (!gContStatusPollingIsBootMode
-                 && portInfo->playerNum
-                 && check_button_pressed_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+                if (
+                    !gContStatusPollingIsBootMode &&
+                    portInfo->playerNum &&
+                    check_button_pressed_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)
+                ) {
                     gContStatusPollingReadyForInput = FALSE;
                     stop_controller_status_polling(pad);
                     return;
                 }
 #endif
                 // If we've exceeded the number of controllers, stop polling and assign the current controllers.
-                if (gNumPlayers >= __builtin_popcount(gControllerBits)
-                 || gNumPlayers >= MAX_NUM_PLAYERS
+                if (
+                    gNumPlayers >= __builtin_popcount(gControllerBits) ||
+                    gNumPlayers >= MAX_NUM_PLAYERS
                 ) {
                     stop_controller_status_polling(pad);
                     return;

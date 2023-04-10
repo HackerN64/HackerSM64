@@ -34,17 +34,17 @@ extern struct Controller* const gPlayer4Controller;
 extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
 extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 
-extern u8  gNumPlayers;
-extern u8  gControllerBits;
-extern u8  gContStatusPolling;
-extern u8  gContStatusPollingIsBootMode;
-extern u8  gContStatusPollingReadyForInput;
-extern u32 gContStatusPollTimer;
+extern u8    gNumPlayers;
+extern u8    gControllerBits;
+extern _Bool gContStatusPolling;
+extern _Bool gContStatusPollingIsBootMode;
+extern _Bool gContStatusPollingReadyForInput;
+extern u32   gContStatusPollTimer;
 
 extern struct DemoInput* gCurrDemoInput;
 
 void start_controller_status_polling(s32 isBootMode);
-void stop_controller_status_polling(OSContPadEx *pad);
+void stop_controller_status_polling(OSContPadEx* pad);
 void handle_input(OSMesg* mesg);
 void init_controllers(void);
 
