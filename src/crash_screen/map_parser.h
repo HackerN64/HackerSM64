@@ -16,24 +16,27 @@ struct MapEntry {
 }; /*0x10*/
 
 typedef struct {
-    /*0x00*/ uintptr_t start;
-    /*0x04*/ uintptr_t end;
+    /*0x00*/ const uintptr_t start;
+    /*0x04*/ const uintptr_t end;
 } TextRegion; /*0x08*/
+
+#define EXTERN_TEXT_SYMBOL(name, side) \
+extern const u8 _##name##SegmentText##side[];
+
+#define EXTERN_TEXT_REGION(name) \
+EXTERN_TEXT_SYMBOL(name, Start) \
+EXTERN_TEXT_SYMBOL(name, End)
 
 
 #define EXTERN_SEGMENT_TEXT(name) \
-extern u8 _##name##SegmentTextStart[]; \
-extern u8 _##name##SegmentTextEnd[];
+EXTERN_TEXT_REGION(name)
 
 #define EXTERN_GROUP_TEXT(name) \
-extern u8 _##name##_geoSegmentTextStart[]; \
-extern u8 _##name##_geoSegmentTextEnd[];
+EXTERN_TEXT_REGION(name##_geo)
 
 #define EXTERN_LEVEL_TEXT(name) \
-extern u8 _##name##scriptSegmentTextStart[]; \
-extern u8 _##name##scriptSegmentTextEnd[]; \
-extern u8 _##name##geoSegmentTextStart[]; \
-extern u8 _##name##geoSegmentTextEnd[];
+EXTERN_TEXT_REGION(name##script) \
+EXTERN_TEXT_REGION(name##geo)
 
 EXTERN_SEGMENT_TEXT(boot)
 EXTERN_SEGMENT_TEXT(main)
@@ -72,18 +75,27 @@ EXTERN_GROUP_TEXT(common1)
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
+#define TEXT_REGION(name) \
+    { (const uintptr_t)_##name##SegmentTextStart, (const uintptr_t)_##name##SegmentTextEnd },
+
 #define TEXT_REGION_SEGMENT(name) \
-    { (uintptr_t)_##name##SegmentTextStart, (uintptr_t)_##name##SegmentTextEnd },
+    TEXT_REGION(name)
 
 #define TEXT_REGION_GROUP(name) \
-    { (uintptr_t)_##name##_geoSegmentTextStart, (uintptr_t)_##name##_geoSegmentTextEnd },
+    TEXT_REGION(name##_geo)
 
 #define TEXT_REGION_LEVEL(name) \
-    { (uintptr_t)_##name##scriptSegmentTextStart, (uintptr_t)_##name##scriptSegmentTextEnd }, \
-    { (uintptr_t)_##name##geoSegmentTextStart,    (uintptr_t)_##name##geoSegmentTextEnd    },
+    TEXT_REGION(name##script) \
+    TEXT_REGION(name##geo)
 
 
-#define IS_IN_RDRAM(addr)   (((addr) >= RAM_START) && ((addr) < RAM_END))
+#define IS_IN_RDRAM(addr) (((addr) >= RAM_START) && ((addr) < RAM_END))
+
+
+extern u8 gMapStrings[];
+extern struct MapEntry gMapEntries[];
+extern size_t gMapEntrySize;
+extern u8 _mapDataSegmentRomStart[];
 
 
 void map_data_init(void);

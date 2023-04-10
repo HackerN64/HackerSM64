@@ -132,12 +132,12 @@
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
 
 // Another way of converting virtual to physical.
-#define VIRTUAL_TO_PHYSICAL2(addr)  ((u8 *)(addr) - 0x80000000U)
+#define VIRTUAL_TO_PHYSICAL2(addr)  ((u8*)(addr) - 0x80000000U)
 #else // NO_SEGMENTED_MEMORY
 // No conversion needed other than cast.
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
-#define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
+#define VIRTUAL_TO_PHYSICAL2(addr)  ((void*)(addr))
 #endif // NO_SEGMENTED_MEMORY
 
 // Static (compile-time) assertions.

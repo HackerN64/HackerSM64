@@ -43,7 +43,7 @@ struct CrashScreen {
 struct CrashScreenPage {
     /*0x00*/ void (*drawFunc)(OSThread* thread);
     /*0x04*/ void (*inputFunc)(void);
-    /*0x08*/ const enum ControlTypes *pageControlsList;//void (*controlsDrawFunc)(void);
+    /*0x08*/ const enum ControlTypes* pageControlsList;
     /*0x10*/ const char* name;
     /*0x14*/ _Bool printName;
 }; /*0x14*/
