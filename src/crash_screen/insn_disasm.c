@@ -33,222 +33,222 @@
  */
 
 
-// MIPS III Instructions
+// MIPS III Instructions:
 
-// Opcode instructions
+// Opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db[] = {
     // OPC_SPECIAL (insn_db_spec)
     // OPC_REGIMM (insn_db_regi)
-    INSN_ID_1(OPC_J     , 0, 0, 0, 0, 0, "\'J"  , "J"      ) // Jump
-    INSN_ID_1(OPC_JAL   , 0, 0, 0, 0, 0, "\'J"  , "JAL"    ) // Jump and Link
-    INSN_ID_1(OPC_BEQ   , 0, 0, 0, 0, 0, "\'stB", "BEQ"    ) // Branch on Equal
-    INSN_ID_1(OPC_BNE   , 0, 0, 0, 0, 0, "\'stB", "BNE"    ) // Branch on Not Equal
-    INSN_ID_1(OPC_BLEZ  , 0, 0, 0, 0, 0, "\'sB" , "BLEZ"   ) // Branch on Less Than or Equal to Zero
-    INSN_ID_1(OPC_BGTZ  , 0, 0, 0, 0, 0, "\'sB" , "BGTZ"   ) // Branch on Greater Than Zero
-    INSN_ID_1(OPC_ADDI  , 0, 0, 0, 0, 0, "\'tsI", "ADDI"   ) // Add Immediate Word
-    INSN_ID_1(OPC_ADDIU , 0, 0, 0, 0, 0, "\'tsI", "ADDIU"  ) // Add Immediate Unsigned Word
-    INSN_ID_1(OPC_SLTI  , 0, 0, 0, 0, 0, "\'tsI", "SLTI"   ) // Set on Less Than Immediate
-    INSN_ID_1(OPC_SLTIU , 0, 0, 0, 0, 0, "\'tsI", "SLTIU"  ) // Set on Less Than Immediate Unsigned
-    INSN_ID_1(OPC_ANDI  , 0, 0, 0, 0, 0, "\'tsI", "ANDI"   ) // And Immediate
-    INSN_ID_1(OPC_ORI   , 0, 0, 0, 0, 0, "\'tsI", "ORI"    ) // Or Immediate
-    INSN_ID_1(OPC_XORI  , 0, 0, 0, 0, 0, "\'tsI", "XORI"   ) // Exclusive Or Immediate
-    INSN_ID_1(OPC_LUI   , 0, 0, 0, 0, 0, "\'tI" , "LUI"    ) // Load Upper Immediate
+    { .name = "J"     , .fmt = "\'J"  , .opcode = OPC_J      }, // Jump.
+    { .name = "JAL"   , .fmt = "\'J"  , .opcode = OPC_JAL    }, // Jump and Link.
+    { .name = "BEQ"   , .fmt = "\'stB", .opcode = OPC_BEQ    }, // Branch on Equal.
+    { .name = "BNE"   , .fmt = "\'stB", .opcode = OPC_BNE    }, // Branch on Not Equal.
+    { .name = "BLEZ"  , .fmt = "\'sB" , .opcode = OPC_BLEZ   }, // Branch on Less Than or Equal to Zero.
+    { .name = "BGTZ"  , .fmt = "\'sB" , .opcode = OPC_BGTZ   }, // Branch on Greater Than Zero.
+    { .name = "ADDI"  , .fmt = "\'tsI", .opcode = OPC_ADDI   }, // Add Immediate Word.
+    { .name = "ADDIU" , .fmt = "\'tsI", .opcode = OPC_ADDIU  }, // Add Immediate Unsigned Word.
+    { .name = "SLTI"  , .fmt = "\'tsI", .opcode = OPC_SLTI   }, // Set on Less Than Immediate.
+    { .name = "SLTIU" , .fmt = "\'tsI", .opcode = OPC_SLTIU  }, // Set on Less Than Immediate Unsigned.
+    { .name = "ANDI"  , .fmt = "\'tsI", .opcode = OPC_ANDI   }, // And Immediate.
+    { .name = "ORI"   , .fmt = "\'tsI", .opcode = OPC_ORI    }, // Or Immediate.
+    { .name = "XORI"  , .fmt = "\'tsI", .opcode = OPC_XORI   }, // Exclusive Or Immediate.
+    { .name = "LUI"   , .fmt = "\'tI" , .opcode = OPC_LUI    }, // Load Upper Immediate.
     // OPC_COP0 (insn_db_cop0)
     // OPC_COP1 (insn_db_cop1)
     // OPC_COP2 (insn_db_cop2)
     // OPC_COP3 (insn_db_cop3)
-    INSN_ID_1(OPC_BEQL  , 0, 0, 0, 0, 0, "\'stB", "BEQL"   ) // Branch on Equal Likely
-    INSN_ID_1(OPC_BNEL  , 0, 0, 0, 0, 0, "\'stB", "BNEL"   ) // Branch on Not Equal Likely
-    INSN_ID_1(OPC_BLEZL , 0, 0, 0, 0, 0, "\'sB" , "BLEZL"  ) // Branch on Less Than or Equal to Zero Likely
-    INSN_ID_1(OPC_BGTZL , 0, 0, 0, 0, 0, "\'sB" , "BGTZL"  ) // Branch on Greater Than Zero Likely
-    INSN_ID_0(OPC_DADDI , 0, 0, 0, 0, 0, "\'tsI", "DADDI"  ) // Doubleword Add Immediate
-    INSN_ID_0(OPC_DADDIU, 0, 0, 0, 0, 0, "\'tsI", "DADDIU" ) // Doubleword Add Immediate Unsigned
-    INSN_ID_0(OPC_LDL   , 0, 0, 0, 0, 0, "\'tI(", "LDL"    ) // Load Doubleword Left
-    INSN_ID_0(OPC_LDR   , 0, 0, 0, 0, 0, "\'tI(", "LDR"    ) // Load Doubleword Right
-    INSN_ID_1(OPC_LB    , 0, 0, 0, 0, 0, "\'tI(", "LB"     ) // Load Byte
-    INSN_ID_1(OPC_LH    , 0, 0, 0, 0, 0, "\'tI(", "LH"     ) // Load Halfword
-    INSN_ID_1(OPC_LWL   , 0, 0, 0, 0, 0, "\'tI(", "LWL"    ) // Load Word Left
-    INSN_ID_1(OPC_LW    , 0, 0, 0, 0, 0, "\'tI(", "LW"     ) // Load Word
-    INSN_ID_1(OPC_LBU   , 0, 0, 0, 0, 0, "\'tI(", "LBU"    ) // Load Byte Unsigned
-    INSN_ID_1(OPC_LHU   , 0, 0, 0, 0, 0, "\'tI(", "LHU"    ) // Load Halfword Unsigned
-    INSN_ID_1(OPC_LWR   , 0, 0, 0, 0, 0, "\'tI(", "LWR"    ) // Load Word Right
-    INSN_ID_0(OPC_LWU   , 0, 0, 0, 0, 0, "\'tI(", "LWU"    ) // Load Word Unsigned
-    INSN_ID_1(OPC_SB    , 0, 0, 0, 0, 0, "\'tI(", "SB"     ) // Store Byte
-    INSN_ID_1(OPC_SH    , 0, 0, 0, 0, 0, "\'tI(", "SH"     ) // Store Halfword
-    INSN_ID_0(OPC_SWL   , 0, 0, 0, 0, 0, "\'tI(", "SWL"    ) // Store Word Left
-    INSN_ID_1(OPC_SW    , 0, 0, 0, 0, 0, "\'tI(", "SW"     ) // Store Word
-    INSN_ID_0(OPC_SDL   , 0, 0, 0, 0, 0, "\'tI(", "SDL"    ) // Store Doubleword Left
-    INSN_ID_0(OPC_SDR   , 0, 0, 0, 0, 0, "\'tI(", "SDR"    ) // Store Doubleword Right
-    INSN_ID_0(OPC_SWR   , 0, 0, 0, 0, 0, "\'tI(", "SWR"    ) // Store Word Right
-    INSN_ID_0(OPC_CACHE , 0, 0, 0, 0, 0, "\'tI(", "CACHE"  ) // https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html
-    INSN_ID_0(OPC_LL    , 0, 0, 0, 0, 0, "\'tI(", "LL"     ) // Load Linked Word
-    INSN_ID_1(OPC_LWC1  , 0, 0, 0, 0, 0, "\'TI(", "LWC1"   ) // Load Word to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_LWC2  , 0, 0, 0, 0, 0, "\'TI(", "LWC2"   ) // Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit)
-    INSN_ID_0(OPC_LWC3  , 0, 0, 0, 0, 0, "\'TI(", "LWC3"   ) // Load Word to Coprocessor-3 (COP3)
-    INSN_ID_0(OPC_LLD   , 0, 0, 0, 0, 0, "\'tI(", "LLD"    ) // Load Linked Doubleword
-    INSN_ID_1(OPC_LDC1  , 0, 0, 0, 0, 0, "\'tI(", "LDC1"   ) // Load Doubleword to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_LDC2  , 0, 0, 0, 0, 0, "\'tI(", "LDC2"   ) // Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit)
-    INSN_ID_0(OPC_LD    , 0, 0, 0, 0, 0, "\'tI(", "LD"     ) // Load Doubleword
-    INSN_ID_0(OPC_SC    , 0, 0, 0, 0, 0, "\'tI(", "SC"     ) // Store Conditional Word
-    INSN_ID_1(OPC_SWC1  , 0, 0, 0, 0, 0, "\'TI(", "SWC1"   ) // Store Word to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_SWC2  , 0, 0, 0, 0, 0, "\'TI(", "SWC2"   ) // Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit)
-    INSN_ID_0(OPC_SWC3  , 0, 0, 0, 0, 0, "\'TI(", "SWC3"   ) // Store Word to Coprocessor-3 (COP3)
-    INSN_ID_0(OPC_SCD   , 0, 0, 0, 0, 0, "\'tI(", "SCD"    ) // Store Conditional Doubleword
-    INSN_ID_1(OPC_SDC1  , 0, 0, 0, 0, 0, "\'tI(", "SDC1"   ) // Store Doubleword to Coprocessor-1 (Floating-Point Unit)
-    INSN_ID_0(OPC_SDC2  , 0, 0, 0, 0, 0, "\'tI(", "SDC2"   ) // Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit)
-    INSN_ID_0(OPC_SD    , 0, 0, 0, 0, 0, "\'tI(", "SD"     ) // Store Doubleword
-    INSN_DB_END
+    { .name = "BEQL"  , .fmt = "\'stB", .opcode = OPC_BEQL   }, // Branch on Equal Likely.
+    { .name = "BNEL"  , .fmt = "\'stB", .opcode = OPC_BNEL   }, // Branch on Not Equal Likely.
+    { .name = "BLEZL" , .fmt = "\'sB" , .opcode = OPC_BLEZL  }, // Branch on Less Than or Equal to Zero Likely.
+    { .name = "BGTZL" , .fmt = "\'sB" , .opcode = OPC_BGTZL  }, // Branch on Greater Than Zero Likely.
+    { .name = "DADDI" , .fmt = "\'tsI", .opcode = OPC_DADDI  }, // Doubleword Add Immediate.
+    { .name = "DADDIU", .fmt = "\'tsI", .opcode = OPC_DADDIU }, // Doubleword Add Immediate Unsigned.
+    { .name = "LDL"   , .fmt = "\'tI(", .opcode = OPC_LDL    }, // Load Doubleword Left.
+    { .name = "LDR"   , .fmt = "\'tI(", .opcode = OPC_LDR    }, // Load Doubleword Right.
+    { .name = "LB"    , .fmt = "\'tI(", .opcode = OPC_LB     }, // Load Byte.
+    { .name = "LH"    , .fmt = "\'tI(", .opcode = OPC_LH     }, // Load Halfword.
+    { .name = "LWL"   , .fmt = "\'tI(", .opcode = OPC_LWL    }, // Load Word Left.
+    { .name = "LW"    , .fmt = "\'tI(", .opcode = OPC_LW     }, // Load Word.
+    { .name = "LBU"   , .fmt = "\'tI(", .opcode = OPC_LBU    }, // Load Byte Unsigned.
+    { .name = "LHU"   , .fmt = "\'tI(", .opcode = OPC_LHU    }, // Load Halfword Unsigned.
+    { .name = "LWR"   , .fmt = "\'tI(", .opcode = OPC_LWR    }, // Load Word Right.
+    { .name = "LWU"   , .fmt = "\'tI(", .opcode = OPC_LWU    }, // Load Word Unsigned.
+    { .name = "SB"    , .fmt = "\'tI(", .opcode = OPC_SB     }, // Store Byte.
+    { .name = "SH"    , .fmt = "\'tI(", .opcode = OPC_SH     }, // Store Halfword.
+    { .name = "SWL"   , .fmt = "\'tI(", .opcode = OPC_SWL    }, // Store Word Left.
+    { .name = "SW"    , .fmt = "\'tI(", .opcode = OPC_SW     }, // Store Word.
+    { .name = "SDL"   , .fmt = "\'tI(", .opcode = OPC_SDL    }, // Store Doubleword Left.
+    { .name = "SDR"   , .fmt = "\'tI(", .opcode = OPC_SDR    }, // Store Doubleword Right.
+    { .name = "SWR"   , .fmt = "\'tI(", .opcode = OPC_SWR    }, // Store Word Right.
+    { .name = "CACHE" , .fmt = "\'tI(", .opcode = OPC_CACHE  }, // https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
+    { .name = "LL"    , .fmt = "\'tI(", .opcode = OPC_LL     }, // Load Linked Word.
+    { .name = "LWC1"  , .fmt = "\'TI(", .opcode = OPC_LWC1   }, // Load Word to Coprocessor-1 (Floating-Point Unit).
+    { .name = "LWC2"  , .fmt = "\'TI(", .opcode = OPC_LWC2   }, // Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "LWC3"  , .fmt = "\'TI(", .opcode = OPC_LWC3   }, // Load Word to Coprocessor-3 (COP3).
+    { .name = "LLD"   , .fmt = "\'tI(", .opcode = OPC_LLD    }, // Load Linked Doubleword.
+    { .name = "LDC1"  , .fmt = "\'tI(", .opcode = OPC_LDC1   }, // Load Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .name = "LDC2"  , .fmt = "\'tI(", .opcode = OPC_LDC2   }, // Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "LD"    , .fmt = "\'tI(", .opcode = OPC_LD     }, // Load Doubleword.
+    { .name = "SC"    , .fmt = "\'tI(", .opcode = OPC_SC     }, // Store Conditional Word.
+    { .name = "SWC1"  , .fmt = "\'TI(", .opcode = OPC_SWC1   }, // Store Word to Coprocessor-1 (Floating-Point Unit).
+    { .name = "SWC2"  , .fmt = "\'TI(", .opcode = OPC_SWC2   }, // Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "SWC3"  , .fmt = "\'TI(", .opcode = OPC_SWC3   }, // Store Word to Coprocessor-3 (COP3).
+    { .name = "SCD"   , .fmt = "\'tI(", .opcode = OPC_SCD    }, // Store Conditional Doubleword.
+    { .name = "SDC1"  , .fmt = "\'tI(", .opcode = OPC_SDC1   }, // Store Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .name = "SDC2"  , .fmt = "\'tI(", .opcode = OPC_SDC2   }, // Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "SD"    , .fmt = "\'tI(", .opcode = OPC_SD     }, // Store Doubleword.
+    { .name = "." },
 };
 
-// Special opcode instructions
-ALIGNED32 static const InsnTemplate insn_db_spec[] = {
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLL    , "\'dta"  , "SLL"    ) // Shift Word Left Logical
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRL    , "\'dta"  , "SRL"    ) // Shift Word Right Logical
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRA    , "\'dta"  , "SRA"    ) // Shift Word Right Arithmetic
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLLV   , "\'dts"  , "SLLV"   ) // Shift Word Left Logical Variable
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRLV   , "\'dts"  , "SRLV"   ) // Shift Word Right Logical Variable
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SRAV   , "\'dts"  , "SRAV"   ) // Shift Word Right Arithmetic Variable
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_JR     , "\'s"    , "JR"     ) // Jump Register
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_JALR   , "\'ds"   , "JALR"   ) // Jump and Link Register
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SYSCALL, "\'"     , "SYSCALL") // System Call (assert)
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_BREAK  , "\'"     , "BREAK"  ) // Breakpoint
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_SYNC   , "\'"     , "SYNC"   ) // Synchronize Shared Memory
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MFHI   , "\'d"    , "MFHI"   ) // Move From HI
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MTHI   , "\'s"    , "MTHI"   ) // Move To HI
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MFLO   , "\'d"    , "MFLO"   ) // Move From LO
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MTLO   , "\'s"    , "MTLO"   ) // Move To LO
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSLLV  , "\'dts"  , "DSLLV"  ) // Doubleword Shift Left Logical Variable
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRLV  , "\'dts"  , "DSRLV"  ) // Doubleword Shift Right Logical Variable
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRAV  , "\'dts"  , "DSRAV"  ) // Doubleword Shift Right Arithmetic Variable
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MULT   , "\'st"   , "MULT"   ) // Multiply Word (5cyc)
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_MULTU  , "\'st"   , "MULTU"  ) // Multiply Unsigned Word (5cyc)
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_DIV    , "\'st"   , "DIV"    ) // Divide Word (37cyc)
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_DIVU   , "\'st"   , "DIVU"   ) // Divide Unsigned Word (37cyc)
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DMULT  , "\'st"   , "DMULT"  ) // Doubleword Multiply (8cyc)
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DMULTU , "\'st"   , "DMULTU" ) // Doubleword Multiply Unsigned (8cyc)
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DDIV   , "\'st"   , "DDIV"   ) // Doubleword Divide (69cyc)
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DDIVU  , "\'st"   , "DDIVU"  ) // Doubleword Divide Unsigned (69cyc)
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADD    , "\'dst"  , "ADD"    ) // Add Word
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADDU   , "\'dst"  , "ADDU"   ) // Add Unsigned Word
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SUB    , "\'dst"  , "SUB"    ) // Subtract Word
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SUBU   , "\'dst"  , "SUBU"   ) // Subtract Unsigned Word
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_AND    , "\'dst"  , "AND"    ) // And
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_OR     , "\'dst"  , "OR"     ) // Or
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_XOR    , "\'dst"  , "XOR"    ) // Exclusive Or
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_NOR    , "\'dst"  , "NOR"    ) // Nor
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLT    , "\'dst"  , "SLT"    ) // Set on Less Than
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLTU   , "\'dst"  , "SLTU"   ) // Set on Less Than Unsigned
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DADD   , "\'dst"  , "DADD"   ) // Doubleword Add
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DADDU  , "\'dst"  , "DADDU"  ) // Doubleword Add Unsigned
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSUB   , "\'dst"  , "DSUB"   ) // Doubleword Subtract
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSUBU  , "\'dst"  , "DSUBU"  ) // Doubleword Subtract Unsigned
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TGE    , "\'st"   , "TGE"    ) // Trap if Greater Than or Equal
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TGEU   , "\'st"   , "TGEU"   ) // Trap if Greater Than or Equal Unsigned
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TLT    , "\'st"   , "TLT"    ) // Trap if Less Than
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TLTU   , "\'st"   , "TLTU"   ) // Trap if Less Than Unsigned
-    INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_TEQ    , "\'st"   , "TEQ"    ) // Trap if Equal
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_TNE    , "\'st"   , "TNE"    ) // Trap if Not Equal
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSLL   , "\'dta"  , "DSLL"   ) // Doubleword Shift Left Logical
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRL   , "\'dta"  , "DSRL"   ) // Doubleword Shift Right Logical
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRA   , "\'dta"  , "DSRA"   ) // Doubleword Shift Right Arithmetic
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSLL32 , "\'dta"  , "DSLL32" ) // Doubleword Shift Left Logical + 32
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRL32 , "\'dta"  , "DSRL32" ) // Doubleword Shift Right Logical + 32
-    INSN_ID_0(OPC_SPECIAL, 0, 0, 0, 0, OPS_DSRA32 , "\'dta"  , "DSRA32" ) // Doubleword Shift Right Arithmetic + 32
-    INSN_DB_END
+// Special opcode instructions:
+ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL
+    { .name = "SLL"    , .fmt =  "\'dta", .opcode = OPS_SLL     }, // Shift Word Left Logical.
+    { .name = "SRL"    , .fmt =  "\'dta", .opcode = OPS_SRL     }, // Shift Word Right Logical.
+    { .name = "SRA"    , .fmt =  "\'dta", .opcode = OPS_SRA     }, // Shift Word Right Arithmetic.
+    { .name = "SLLV"   , .fmt =  "\'dts", .opcode = OPS_SLLV    }, // Shift Word Left Logical Variable.
+    { .name = "SRLV"   , .fmt =  "\'dts", .opcode = OPS_SRLV    }, // Shift Word Right Logical Variable.
+    { .name = "SRAV"   , .fmt =  "\'dts", .opcode = OPS_SRAV    }, // Shift Word Right Arithmetic Variable.
+    { .name = "JR"     , .fmt =  "\'s"  , .opcode = OPS_JR      }, // Jump Register.
+    { .name = "JALR"   , .fmt =  "\'ds" , .opcode = OPS_JALR    }, // Jump and Link Register.
+    { .name = "SYSCALL", .fmt =  "\'"   , .opcode = OPS_SYSCALL }, // System Call (assert).
+    { .name = "BREAK"  , .fmt =  "\'"   , .opcode = OPS_BREAK   }, // Breakpoint.
+    { .name = "SYNC"   , .fmt =  "\'"   , .opcode = OPS_SYNC    }, // Synchronize Shared Memory.
+    { .name = "MFHI"   , .fmt =  "\'d"  , .opcode = OPS_MFHI    }, // Move From HI.
+    { .name = "MTHI"   , .fmt =  "\'s"  , .opcode = OPS_MTHI    }, // Move To HI.
+    { .name = "MFLO"   , .fmt =  "\'d"  , .opcode = OPS_MFLO    }, // Move From LO.
+    { .name = "MTLO"   , .fmt =  "\'s"  , .opcode = OPS_MTLO    }, // Move To LO.
+    { .name = "DSLLV"  , .fmt =  "\'dts", .opcode = OPS_DSLLV   }, // Doubleword Shift Left Logical Variable.
+    { .name = "DSRLV"  , .fmt =  "\'dts", .opcode = OPS_DSRLV   }, // Doubleword Shift Right Logical Variable.
+    { .name = "DSRAV"  , .fmt =  "\'dts", .opcode = OPS_DSRAV   }, // Doubleword Shift Right Arithmetic Variable.
+    { .name = "MULT"   , .fmt =  "\'st" , .opcode = OPS_MULT    }, // Multiply Word (5cyc).
+    { .name = "MULTU"  , .fmt =  "\'st" , .opcode = OPS_MULTU   }, // Multiply Unsigned Word (5cyc).
+    { .name = "DIV"    , .fmt =  "\'st" , .opcode = OPS_DIV     }, // Divide Word (37cyc).
+    { .name = "DIVU"   , .fmt =  "\'st" , .opcode = OPS_DIVU    }, // Divide Unsigned Word (37cyc).
+    { .name = "DMULT"  , .fmt =  "\'st" , .opcode = OPS_DMULT   }, // Doubleword Multiply (8cyc).
+    { .name = "DMULTU" , .fmt =  "\'st" , .opcode = OPS_DMULTU  }, // Doubleword Multiply Unsigned (8cyc).
+    { .name = "DDIV"   , .fmt =  "\'st" , .opcode = OPS_DDIV    }, // Doubleword Divide (69cyc).
+    { .name = "DDIVU"  , .fmt =  "\'st" , .opcode = OPS_DDIVU   }, // Doubleword Divide Unsigned (69cyc).
+    { .name = "ADD"    , .fmt =  "\'dst", .opcode = OPS_ADD     }, // Add Word.
+    { .name = "ADDU"   , .fmt =  "\'dst", .opcode = OPS_ADDU    }, // Add Unsigned Word.
+    { .name = "SUB"    , .fmt =  "\'dst", .opcode = OPS_SUB     }, // Subtract Word.
+    { .name = "SUBU"   , .fmt =  "\'dst", .opcode = OPS_SUBU    }, // Subtract Unsigned Word.
+    { .name = "AND"    , .fmt =  "\'dst", .opcode = OPS_AND     }, // And.
+    { .name = "OR"     , .fmt =  "\'dst", .opcode = OPS_OR      }, // Or.
+    { .name = "XOR"    , .fmt =  "\'dst", .opcode = OPS_XOR     }, // Exclusive Or.
+    { .name = "NOR"    , .fmt =  "\'dst", .opcode = OPS_NOR     }, // Nor.
+    { .name = "SLT"    , .fmt =  "\'dst", .opcode = OPS_SLT     }, // Set on Less Than.
+    { .name = "SLTU"   , .fmt =  "\'dst", .opcode = OPS_SLTU    }, // Set on Less Than Unsigned.
+    { .name = "DADD"   , .fmt =  "\'dst", .opcode = OPS_DADD    }, // Doubleword Add.
+    { .name = "DADDU"  , .fmt =  "\'dst", .opcode = OPS_DADDU   }, // Doubleword Add Unsigned.
+    { .name = "DSUB"   , .fmt =  "\'dst", .opcode = OPS_DSUB    }, // Doubleword Subtract.
+    { .name = "DSUBU"  , .fmt =  "\'dst", .opcode = OPS_DSUBU   }, // Doubleword Subtract Unsigned.
+    { .name = "TGE"    , .fmt =  "\'st" , .opcode = OPS_TGE     }, // Trap if Greater Than or Equal.
+    { .name = "TGEU"   , .fmt =  "\'st" , .opcode = OPS_TGEU    }, // Trap if Greater Than or Equal Unsigned.
+    { .name = "TLT"    , .fmt =  "\'st" , .opcode = OPS_TLT     }, // Trap if Less Than.
+    { .name = "TLTU"   , .fmt =  "\'st" , .opcode = OPS_TLTU    }, // Trap if Less Than Unsigned.
+    { .name = "TEQ"    , .fmt =  "\'st" , .opcode = OPS_TEQ     }, // Trap if Equal.
+    { .name = "TNE"    , .fmt =  "\'st" , .opcode = OPS_TNE     }, // Trap if Not Equal.
+    { .name = "DSLL"   , .fmt =  "\'dta", .opcode = OPS_DSLL    }, // Doubleword Shift Left Logical.
+    { .name = "DSRL"   , .fmt =  "\'dta", .opcode = OPS_DSRL    }, // Doubleword Shift Right Logical.
+    { .name = "DSRA"   , .fmt =  "\'dta", .opcode = OPS_DSRA    }, // Doubleword Shift Right Arithmetic.
+    { .name = "DSLL32" , .fmt =  "\'dta", .opcode = OPS_DSLL32  }, // Doubleword Shift Left Logical + 32.
+    { .name = "DSRL32" , .fmt =  "\'dta", .opcode = OPS_DSRL32  }, // Doubleword Shift Right Logical + 32.
+    { .name = "DSRA32" , .fmt =  "\'dta", .opcode = OPS_DSRA32  }, // Doubleword Shift Right Arithmetic + 32.
+    { .name = "." },
 };
 
-// Register opcode instructions
-ALIGNED32 static const InsnTemplate insn_db_regi[] = {
-    INSN_ID_1(OPC_REGIMM, 0, OPR_BLTZ   , 0, 0, 0, "\'sB"  ,  "BLTZ"   ) // Branch on Less Than Zero
-    INSN_ID_1(OPC_REGIMM, 0, OPR_BGEZ   , 0, 0, 0, "\'sB"  ,  "BGEZ"   ) // Branch on Greater Than or Equal to Zero
-    INSN_ID_1(OPC_REGIMM, 0, OPR_BLTZL  , 0, 0, 0, "\'sB"  ,  "BLTZL"  ) // Branch on Less Than Zero Likely
-    INSN_ID_1(OPC_REGIMM, 0, OPR_BGEZL  , 0, 0, 0, "\'sB"  ,  "BGEZL"  ) // Branch on Greater Than or Equal to Zero Likely
-    INSN_ID_0(OPC_REGIMM, 0, OPR_BLTZAL , 0, 0, 0, "\'sB"  ,  "BLTZAL" ) // Branch on Less Than Zero and Link
-    INSN_ID_0(OPC_REGIMM, 0, OPR_BGEZAL , 0, 0, 0, "\'sB"  ,  "BGEZAL" ) // Branch on Greater Than or Equal to Zero and Link
-    INSN_ID_0(OPC_REGIMM, 0, OPR_BLTZALL, 0, 0, 0, "\'sB"  ,  "BLTZALL") // Branch on Less Than Zero and Link Likely
-    INSN_ID_0(OPC_REGIMM, 0, OPR_BGEZALL, 0, 0, 0, "\'sB"  ,  "BGEZALL") // Branch on Greater Than or Equal to Zero and Link Likely
-    INSN_ID_0(OPC_REGIMM, 0, OPR_TGEI   , 0, 0, 0, "\'sI"  ,  "TGEI"   ) // Trap if Greater Than or Equal Immediate
-    INSN_ID_0(OPC_REGIMM, 0, OPR_TGEIU  , 0, 0, 0, "\'sI"  ,  "TGEIU"  ) // Trap if Greater Than or Equal Unsigned Immediate
-    INSN_ID_0(OPC_REGIMM, 0, OPR_TLTI   , 0, 0, 0, "\'sI"  ,  "TLTI"   ) // Trap if Less Than Immediate
-    INSN_ID_0(OPC_REGIMM, 0, OPR_TLTIU  , 0, 0, 0, "\'sI"  ,  "TLTIU"  ) // Trap if Less Than Unsigned Immediate
-    INSN_ID_0(OPC_REGIMM, 0, OPR_TEQI   , 0, 0, 0, "\'sI"  ,  "TEQI"   ) // Trap if Equal Immediate
-    INSN_ID_0(OPC_REGIMM, 0, OPR_TNEI   , 0, 0, 0, "\'sI"  ,  "TNEI"   ) // Trap if Not Equal Immediate
-    INSN_DB_END
+// Register opcode instructions:
+ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM
+    { .name = "BLTZ"   , .fmt = "\'sB", .opcode = OPR_BLTZ    }, // Branch on Less Than Zero.
+    { .name = "BGEZ"   , .fmt = "\'sB", .opcode = OPR_BGEZ    }, // Branch on Greater Than or Equal to Zero.
+    { .name = "BLTZL"  , .fmt = "\'sB", .opcode = OPR_BLTZL   }, // Branch on Less Than Zero Likely.
+    { .name = "BGEZL"  , .fmt = "\'sB", .opcode = OPR_BGEZL   }, // Branch on Greater Than or Equal to Zero Likely.
+    { .name = "BLTZAL" , .fmt = "\'sB", .opcode = OPR_BLTZAL  }, // Branch on Less Than Zero and Link.
+    { .name = "BGEZAL" , .fmt = "\'sB", .opcode = OPR_BGEZAL  }, // Branch on Greater Than or Equal to Zero and Link.
+    { .name = "BLTZALL", .fmt = "\'sB", .opcode = OPR_BLTZALL }, // Branch on Less Than Zero and Link Likely.
+    { .name = "BGEZALL", .fmt = "\'sB", .opcode = OPR_BGEZALL }, // Branch on Greater Than or Equal to Zero and Link Likely.
+    { .name = "TGEI"   , .fmt = "\'sI", .opcode = OPR_TGEI    }, // Trap if Greater Than or Equal Immediate.
+    { .name = "TGEIU"  , .fmt = "\'sI", .opcode = OPR_TGEIU   }, // Trap if Greater Than or Equal Unsigned Immediate.
+    { .name = "TLTI"   , .fmt = "\'sI", .opcode = OPR_TLTI    }, // Trap if Less Than Immediate.
+    { .name = "TLTIU"  , .fmt = "\'sI", .opcode = OPR_TLTIU   }, // Trap if Less Than Unsigned Immediate.
+    { .name = "TEQI"   , .fmt = "\'sI", .opcode = OPR_TEQI    }, // Trap if Equal Immediate.
+    { .name = "TNEI"   , .fmt = "\'sI", .opcode = OPR_TNEI    }, // Trap if Not Equal Immediate.
+    { .name = "." },
 };
 
-// Coprocessor-0 (System Control Coprocessor)
+// Coprocessor-0 (System Control Coprocessor):
 ALIGNED32 static const InsnTemplate insn_db_cop0[] = {
-    INSN_ID_0(OPC_COP0, COP0_MF , 0, 0, 0, 0             , "\'t0", "MFC0"   ) // Move from System Control Coprocessor
-    INSN_ID_0(OPC_COP0, COP0_DMF, 0, 0, 0, 0             , "\'t0", "DMFC0"  ) // Doubleword Move from System Control Coprocessor
-    INSN_ID_0(OPC_COP0, COP0_MT , 0, 0, 0, 0             , "\'t0", "MTC0"   ) // Move to System Control Coprocessor
-    INSN_ID_0(OPC_COP0, COP0_DMT, 0, 0, 0, 0             , "\'t0", "DMTC0"  ) // Doubleword Move to System Control Coprocessor
-    INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBP , "\'"  , "TLBP"   ) // Searches for a TLB entry that matches the EntryHi register
-    INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBR , "\'"  , "TLBR"   ) // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register
-    INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBWI, "\'"  , "TLBWI"  ) // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register
-    INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_TLBWR, "\'"  , "TLBWR"  ) // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register
-    INSN_ID_0(OPC_COP0, 0b10000 , 0, 0, 0, OPC_COP0_ERET , "\'"  , "ERET"   ) // Return from interrupt, exception, or error exception
-    INSN_DB_END
+    /* sub:00 */ { .name = "MFC0" , .fmt = "\'t0", .opcode = COP0_MF        }, // Move from System Control Coprocessor.
+    /* sub:00 */ { .name = "DMFC0", .fmt = "\'t0", .opcode = COP0_DMF       }, // Doubleword Move from System Control Coprocessor.
+    /* sub:00 */ { .name = "MTC0" , .fmt = "\'t0", .opcode = COP0_MT        }, // Move to System Control Coprocessor.
+    /* sub:00 */ { .name = "DMTC0", .fmt = "\'t0", .opcode = COP0_DMT       }, // Doubleword Move to System Control Coprocessor.
+    /* sub:10 */ { .name = "TLBP" , .fmt = "\'"  , .opcode = OPC_COP0_TLBP  }, // Searches for a TLB entry that matches the EntryHi register.
+    /* sub:10 */ { .name = "TLBR" , .fmt = "\'"  , .opcode = OPC_COP0_TLBR  }, // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
+    /* sub:10 */ { .name = "TLBWI", .fmt = "\'"  , .opcode = OPC_COP0_TLBWI }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
+    /* sub:10 */ { .name = "TLBWR", .fmt = "\'"  , .opcode = OPC_COP0_TLBWR }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
+    /* sub:10 */ { .name = "ERET" , .fmt = "\'"  , .opcode = OPC_COP0_ERET  }, // Return from interrupt, exception, or error exception.
+    { .name = "." },
 };
 
-// Coprocessor-1 (Floating-Point Unit)
+// Coprocessor-1 (Floating-Point Unit):
 ALIGNED32 static const InsnTemplate insn_db_cop1[] = {
-    INSN_ID_1(OPC_COP1, COP1_FMT_SINGLE, 0             , 0, 0, 0            , "\'tS" , "MFC1"   ) // Move Word From Floating-Point
-    INSN_ID_0(OPC_COP1, COP1_FMT_DOUBLE, 0             , 0, 0, 0            , "\'tS" , "DMFC1"  ) // Doubleword Move From Floating-Point
-    INSN_ID_1(OPC_COP1, COP1_FMT_WORD  , 0             , 0, 0, 0            , "\'tS" , "MTC1"   ) // Move Word To Floating-Point
-    INSN_ID_0(OPC_COP1, COP1_FMT_LONG  , 0             , 0, 0, 0            , "\'tS" , "DMTC1"  ) // Doubleword Move To Floating-Point
-    INSN_ID_0(OPC_COP1, COP1_FMT_CTL_F , 0             , 0, 0, 0            , "\'tS" , "CFC1"   ) // Move Control Word From Floating-Point
-    INSN_ID_0(OPC_COP1, COP1_FMT_CTL_T , 0             , 0, 0, 0            , "\'tS" , "CTC1"   ) // Move Control Word To Floating-Point
-    INSN_ID_1(OPC_COP1, 0b01000        , OPT_COP1_BC1F , 0, 0, 0            , "\'B"  , "BC1F"   ) // Branch on FP False (1cyc*)
-    INSN_ID_1(OPC_COP1, 0b01000        , OPT_COP1_BC1T , 0, 0, 0            , "\'B"  , "BC1T"   ) // Branch on FP True (1cyc*)
-    INSN_ID_1(OPC_COP1, 0b01000        , OPT_COP1_BC1FL, 0, 0, 0            , "\'B"  , "BC1FL"  ) // Branch on FP False Likely (1cyc*)
-    INSN_ID_1(OPC_COP1, 0b01000        , OPT_COP1_BC1TL, 0, 0, 0            , "\'B"  , "BC1TL"  ) // Branch on FP True Likely (1cyc*)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_ADD_F    , "\"DST", "ADD"    ) // ADD.[FMT]     Floating-Point Add (3cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_SUB_F    , "\"DST", "SUB"    ) // SUB.[FMT]     Floating-Point Subtract (3cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_MUL_F    , "\"DST", "MUL"    ) // MUL.[FMT]     Floating-Point Multiply (S:5cyc; D:8cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_DIV_F    , "\"DST", "DIV"    ) // DIV.[FMT]     Floating-Point Divide (S:29cyc; D:58cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_SQRT_F   , "\"DS" , "SQRT"   ) // SQRT.[FMT]    Floating-Point Square Root (S:29cyc; D:58cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_ABS_F    , "\"DS" , "ABS"    ) // ABS.[FMT]     Floating-Point Absolute Value (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_MOV_F    , "\"DS" , "MOV"    ) // MOV.[FMT]     Floating-Point Move (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_NEG_F    , "\"DS" , "NEG"    ) // NEG.[FMT]     Floating-Point Negate (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_ROUND_L_F, "\"DS" , "ROUND.L") // ROUND.L.[FMT] Floating-Point Round to Long Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_TRUNC_L_F, "\"DS" , "TRUNC.L") // TRUNC.L.[FMT] Floating-Point Truncate to Long Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_CEIL_L_F , "\"DS" , "CEIL.L" ) // CEIL.L.[FMT]  Floating-Point Ceiling to Long Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_FLOOR_L_F, "\"DS" , "FLOOR.L") // FLOOR.L.[FMT] Floating-Point Floor to Long Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_ROUND_W_F, "\"DS" , "ROUND.W") // ROUND.W.[FMT] Floating-Point Round to Word Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_TRUNC_W_F, "\"DS" , "TRUNC.W") // TRUNC.W.[FMT] Floating-Point Truncate to Word Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_CEIL_W_F , "\"DS" , "CEIL.W" ) // CEIL.W.[FMT]  Floating-Point Ceiling to Word Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_FLOOR_W_F, "\"DS" , "FLOOR.W") // FLOOR.W.[FMT] Floating-Point Floor to Word Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_CVT_S_F  , "\"DS" , "CVT.S"  ) // CVT.S.[FMT]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_CVT_D_F  , "\"DS" , "CVT.D"  ) // CVT.D.[FMT]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_CVT_W_F  , "\"DS" , "CVT.W"  ) // CVT.W.[FMT]   Floating-Point Convert to Word Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_CVT_L_F  , "\"DS" , "CVT.L"  ) // CVT.L.[FMT]   Floating-Point Convert to Long Fixed-Point (5cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_F      , "\"ST" , "C.F"    ) // C.F.[FMT]     Floating-Point Compare (False) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_UN     , "\"ST" , "C.UN"   ) // C.UN.[FMT]    Floating-Point Compare (Unordered) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_EQ     , "\"ST" , "C.EQ"   ) // C.EQ.[FMT]    Floating-point Compare (Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_UEQ    , "\"ST" , "C.UEQ"  ) // C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_OLT    , "\"ST" , "C.OLT"  ) // C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_ULT    , "\"ST" , "C.ULT"  ) // C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_OLE    , "\"ST" , "C.OLE"  ) // C.OLE.[fmt]   Floating-point Compare (Ordered or Less Than or Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_ULE    , "\"ST" , "C.ULE"  ) // C.ULE.[fmt]   Floating-point Compare (Unordered or Less Than or Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_SF     , "\"ST" , "C.SF"   ) // C.SF.[fmt]    Floating-point Compare (Signaling False) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_NGLE   , "\"ST" , "C.NGLE" ) // C.NGLE.[fmt]  Floating-point Compare (Not Greater or Less Than or Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_SEQ    , "\"ST" , "C.SEQ"  ) // C.SEQ.[fmt]   Floating-point Compare (Signalling Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_NGL    , "\"ST" , "C.NGL"  ) // C.NGL.[fmt]   Floating-point Compare (Not Greater or Less Than) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_LT     , "\"ST" , "C.LT"   ) // C.LT.[fmt]    Floating-point Compare (Less Than) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_NGE    , "\"ST" , "C.NGE"  ) // C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_LE     , "\"ST" , "C.LE"   ) // C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc)
-    INSN_ID_1(OPC_COP1, 0b10000        , 0             , 0, 0, OPS_C_NGT    , "\"ST" , "C.NGT"  ) // C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc)
-    INSN_DB_END
+    /* sub:00 */ { .name = "MFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_SINGLE }, // Move Word From Floating-Point.
+    /* sub:00 */ { .name = "DMFC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_DOUBLE }, // Doubleword Move From Floating-Point.
+    /* sub:00 */ { .name = "MTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_WORD   }, // Move Word To Floating-Point.
+    /* sub:00 */ { .name = "DMTC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_LONG   }, // Doubleword Move To Floating-Point.
+    /* sub:00 */ { .name = "CFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_F  }, // Move Control Word From Floating-Point.
+    /* sub:00 */ { .name = "CTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_T  }, // Move Control Word To Floating-Point.
+    /* sub:01 */ { .name = "BC1F"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1F   }, // Branch on FP False (1cyc*).
+    /* sub:01 */ { .name = "BC1T"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1T   }, // Branch on FP True (1cyc*).
+    /* sub:01 */ { .name = "BC1FL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1FL  }, // Branch on FP False Likely (1cyc*).
+    /* sub:01 */ { .name = "BC1TL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1TL  }, // Branch on FP True Likely (1cyc*).
+    /* sub:10 */ { .name = "ADD"    , .fmt = "\"DST", .opcode = OPS_ADD_F       }, // ADD.[FMT]     Floating-Point Add (3cyc).
+    /* sub:10 */ { .name = "SUB"    , .fmt = "\"DST", .opcode = OPS_SUB_F       }, // SUB.[FMT]     Floating-Point Subtract (3cyc).
+    /* sub:10 */ { .name = "MUL"    , .fmt = "\"DST", .opcode = OPS_MUL_F       }, // MUL.[FMT]     Floating-Point Multiply (S:5cyc; D:8cyc).
+    /* sub:10 */ { .name = "DIV"    , .fmt = "\"DST", .opcode = OPS_DIV_F       }, // DIV.[FMT]     Floating-Point Divide (S:29cyc; D:58cyc).
+    /* sub:10 */ { .name = "SQRT"   , .fmt = "\"DS" , .opcode = OPS_SQRT_F      }, // SQRT.[FMT]    Floating-Point Square Root (S:29cyc; D:58cyc).
+    /* sub:10 */ { .name = "ABS"    , .fmt = "\"DS" , .opcode = OPS_ABS_F       }, // ABS.[FMT]     Floating-Point Absolute Value (1cyc).
+    /* sub:10 */ { .name = "MOV"    , .fmt = "\"DS" , .opcode = OPS_MOV_F       }, // MOV.[FMT]     Floating-Point Move (1cyc).
+    /* sub:10 */ { .name = "NEG"    , .fmt = "\"DS" , .opcode = OPS_NEG_F       }, // NEG.[FMT]     Floating-Point Negate (1cyc).
+    /* sub:10 */ { .name = "ROUND.L", .fmt = "\"DS" , .opcode = OPS_ROUND_L_F   }, // ROUND.L.[FMT] Floating-Point Round to Long Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "TRUNC.L", .fmt = "\"DS" , .opcode = OPS_TRUNC_L_F   }, // TRUNC.L.[FMT] Floating-Point Truncate to Long Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "CEIL.L" , .fmt = "\"DS" , .opcode = OPS_CEIL_L_F    }, // CEIL.L.[FMT]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "FLOOR.L", .fmt = "\"DS" , .opcode = OPS_FLOOR_L_F   }, // FLOOR.L.[FMT] Floating-Point Floor to Long Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "ROUND.W", .fmt = "\"DS" , .opcode = OPS_ROUND_W_F   }, // ROUND.W.[FMT] Floating-Point Round to Word Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "TRUNC.W", .fmt = "\"DS" , .opcode = OPS_TRUNC_W_F   }, // TRUNC.W.[FMT] Floating-Point Truncate to Word Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "CEIL.W" , .fmt = "\"DS" , .opcode = OPS_CEIL_W_F    }, // CEIL.W.[FMT]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "FLOOR.W", .fmt = "\"DS" , .opcode = OPS_FLOOR_W_F   }, // FLOOR.W.[FMT] Floating-Point Floor to Word Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "CVT.S"  , .fmt = "\"DS" , .opcode = OPS_CVT_S_F     }, // CVT.S.[FMT]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
+    /* sub:10 */ { .name = "CVT.D"  , .fmt = "\"DS" , .opcode = OPS_CVT_D_F     }, // CVT.D.[FMT]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
+    /* sub:10 */ { .name = "CVT.W"  , .fmt = "\"DS" , .opcode = OPS_CVT_W_F     }, // CVT.W.[FMT]   Floating-Point Convert to Word Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "CVT.L"  , .fmt = "\"DS" , .opcode = OPS_CVT_L_F     }, // CVT.L.[FMT]   Floating-Point Convert to Long Fixed-Point (5cyc).
+    /* sub:10 */ { .name = "C.F"    , .fmt = "\"ST" , .opcode = OPS_C_F         }, // C.F.[FMT]     Floating-Point Compare (False) (1cyc).
+    /* sub:10 */ { .name = "C.UN"   , .fmt = "\"ST" , .opcode = OPS_C_UN        }, // C.UN.[FMT]    Floating-Point Compare (Unordered) (1cyc).
+    /* sub:10 */ { .name = "C.EQ"   , .fmt = "\"ST" , .opcode = OPS_C_EQ        }, // C.EQ.[FMT]    Floating-point Compare (Equal) (1cyc).
+    /* sub:10 */ { .name = "C.UEQ"  , .fmt = "\"ST" , .opcode = OPS_C_UEQ       }, // C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc).
+    /* sub:10 */ { .name = "C.OLT"  , .fmt = "\"ST" , .opcode = OPS_C_OLT       }, // C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc).
+    /* sub:10 */ { .name = "C.ULT"  , .fmt = "\"ST" , .opcode = OPS_C_ULT       }, // C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc).
+    /* sub:10 */ { .name = "C.OLE"  , .fmt = "\"ST" , .opcode = OPS_C_OLE       }, // C.OLE.[fmt]   Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
+    /* sub:10 */ { .name = "C.ULE"  , .fmt = "\"ST" , .opcode = OPS_C_ULE       }, // C.ULE.[fmt]   Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
+    /* sub:10 */ { .name = "C.SF"   , .fmt = "\"ST" , .opcode = OPS_C_SF        }, // C.SF.[fmt]    Floating-point Compare (Signaling False) (1cyc).
+    /* sub:10 */ { .name = "C.NGLE" , .fmt = "\"ST" , .opcode = OPS_C_NGLE      }, // C.NGLE.[fmt]  Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
+    /* sub:10 */ { .name = "C.SEQ"  , .fmt = "\"ST" , .opcode = OPS_C_SEQ       }, // C.SEQ.[fmt]   Floating-point Compare (Signalling Equal) (1cyc).
+    /* sub:10 */ { .name = "C.NGL"  , .fmt = "\"ST" , .opcode = OPS_C_NGL       }, // C.NGL.[fmt]   Floating-point Compare (Not Greater or Less Than) (1cyc).
+    /* sub:10 */ { .name = "C.LT"   , .fmt = "\"ST" , .opcode = OPS_C_LT        }, // C.LT.[fmt]    Floating-point Compare (Less Than) (1cyc).
+    /* sub:10 */ { .name = "C.NGE"  , .fmt = "\"ST" , .opcode = OPS_C_NGE       }, // C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc).
+    /* sub:10 */ { .name = "C.LE"   , .fmt = "\"ST" , .opcode = OPS_C_LE        }, // C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc).
+    /* sub:10 */ { .name = "C.NGT"  , .fmt = "\"ST" , .opcode = OPS_C_NGT       }, // C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc).
+    { .name = "." },
 };
 
-// Coprocessor-2 (Reality Co-Processor Vector Unit)
+// Coprocessor-2 (Reality Co-Processor Vector Unit):
 ALIGNED32 static const InsnTemplate insn_db_cop2[] = {
-    INSN_DB_END
+    { .name = "." },
 };
 
-// Coprocessor-3 (CP3)
+// Coprocessor-3 (CP3):
 ALIGNED32 static const InsnTemplate insn_db_cop3[] = {
-    INSN_DB_END
+    { .name = "." },
 };
 
 static const InsnTemplate* insn_db_cop_lists[] = {
@@ -260,17 +260,17 @@ static const InsnTemplate* insn_db_cop_lists[] = {
 
 // Pseudo-instructions
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
-    [PSEUDO_NOP  ] = INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_SLL, "_"    , "NOP"    ) // NOP (pseudo of SLL)
-    [PSEUDO_MOVET] = INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADD, "\'dt" , "MOVE"   ) // Move (pseudo of ADD and OR)
-    [PSEUDO_MOVES] = INSN_ID_1(OPC_SPECIAL, 0, 0, 0, 0, OPS_ADD, "\'ds" , "MOVE"   ) // Move (pseudo of ADD)
-    [PSEUDO_B    ] = INSN_ID_1(OPC_BEQ    , 0, 0, 0, 0, 0      , "\'B"  , "B"      ) // Branch (pseudo of BEQ)
-    [PSEUDO_BEQZ ] = INSN_ID_1(OPC_BEQ    , 0, 0, 0, 0, 0      , "\'sB" , "BEQZ"   ) // Branch on Equal to Zero (pseudo of BEQ)
-    [PSEUDO_BNEZ ] = INSN_ID_1(OPC_BNE    , 0, 0, 0, 0, 0      , "\'sB" , "BNEZ"   ) // Branch on Not Equal to Zero (pseudo of BNE)
-    [PSEUDO_LI   ] = INSN_ID_1(OPC_ADDI   , 0, 0, 0, 0, 0      , "\'tI" , "LI"     ) // Load Immediate
-    [PSEUDO_SUBI ] = INSN_ID_1(OPC_ADDI   , 0, 0, 0, 0, 0      , "\'tsi", "SUBI"   ) // Add Immediate Word
-    [PSEUDO_BEQZL] = INSN_ID_1(OPC_BEQL   , 0, 0, 0, 0, 0      , "\'sB" , "BEQZL"  ) // Branch on Equal to Zero Likely (pseudo of BEQL)
-    [PSEUDO_BNEZL] = INSN_ID_1(OPC_BNEL   , 0, 0, 0, 0, 0      , "\'sB" , "BNEZL"  ) // Branch on Not Equal to Zero Likely (pseudo of BNEL)
-    [PSEUDO_DSUBI] = INSN_ID_1(OPC_DADDI  , 0, 0, 0, 0, 0      , "\'tsi", "DSUBI"  ) // Doubleword Add Immediate
+    [PSEUDO_NOP  ] = { .name = "NOP"  , .fmt = "_"    , .opcode = OPS_SLL   }, // NOP (pseudo of SLL).
+    [PSEUDO_MOVET] = { .name = "MOVE" , .fmt = "\'dt" , .opcode = OPS_ADD   }, // Move (pseudo of ADD and OR).
+    [PSEUDO_MOVES] = { .name = "MOVE" , .fmt = "\'ds" , .opcode = OPS_ADD   }, // Move (pseudo of ADD).
+    [PSEUDO_B    ] = { .name = "B"    , .fmt = "\'B"  , .opcode = OPC_BEQ   }, // Branch (pseudo of BEQ).
+    [PSEUDO_BEQZ ] = { .name = "BEQZ" , .fmt = "\'sB" , .opcode = OPC_BEQ   }, // Branch on Equal to Zero (pseudo of BEQ).
+    [PSEUDO_BNEZ ] = { .name = "BNEZ" , .fmt = "\'sB" , .opcode = OPC_BNE   }, // Branch on Not Equal to Zero (pseudo of BNE).
+    [PSEUDO_LI   ] = { .name = "LI"   , .fmt = "\'tI" , .opcode = OPC_ADDI  }, // Load Immediate (pseudo of ADDI and ADDIU).
+    [PSEUDO_SUBI ] = { .name = "SUBI" , .fmt = "\'tsi", .opcode = OPC_ADDI  }, // Subtract Immediate Word (pseudo of ADDI).
+    [PSEUDO_BEQZL] = { .name = "BEQZL", .fmt = "\'sB" , .opcode = OPC_BEQL  }, // Branch on Equal to Zero Likely (pseudo of BEQL).
+    [PSEUDO_BNEZL] = { .name = "BNEZL", .fmt = "\'sB" , .opcode = OPC_BNEL  }, // Branch on Not Equal to Zero Likely (pseudo of BNEL).
+    [PSEUDO_DSUBI] = { .name = "DSUBI", .fmt = "\'tsi", .opcode = OPC_DADDI }, // Doubleword Subtract Immediate (pseudo of DADDI).
 };
 
 static _Bool check_pseudo_insn(const InsnTemplate** type, enum PseudoInsns id, _Bool cond) {
@@ -304,23 +304,23 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
             break;
         case OPC_BEQ:
             if (check_pseudo_insn(type, PSEUDO_B,     (insn.rs == insn.rt))) return TRUE;
-            if (check_pseudo_insn(type, PSEUDO_BEQZ,  (insn.rt == 0      ))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BEQZ,  (insn.rt == 0))) return TRUE;
             break;
         case OPC_BNE:
-            if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == 0      ))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == 0))) return TRUE;
             break;
         case OPC_ADDI:
-            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0      ))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0))) return TRUE;
             if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) return TRUE;
             break;
         case OPC_ADDIU:
-            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0      ))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0))) return TRUE;
             break;
         case OPC_BEQL:
-            if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == 0      ))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == 0))) return TRUE;
             break;
         case OPC_BNEL:
-            if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == 0      ))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == 0))) return TRUE;
             break;
         case OPC_DADDI:
             if (check_pseudo_insn(type, PSEUDO_DSUBI, ((s16)insn.immediate < 0))) return TRUE;
@@ -330,8 +330,9 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
     return FALSE;
 }
 
-static enum InsnType get_insn_list(InsnData insn, const InsnTemplate** checkInsn) {
+static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** checkInsn) {
     enum InsnType insnType = INSN_TYPE_OPCODE;
+    *checkInsn = insn_db;
     
     if (insn.cop_opcode == COP_OPCODE) { // COPz
         if (insn.cop_num < ARRAY_COUNT(insn_db_cop_lists)) {
@@ -365,28 +366,30 @@ const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
 
     if (check_pseudo_instructions(&checkInsn, insn)) {
         return checkInsn;
-    } else {
-        checkInsn = insn_db;
-        enum InsnType insnType = get_insn_list(insn, &checkInsn);
-        _Bool check = FALSE;
+    }
 
-        if (insnType != INSN_TYPE_ERROR) {
-            while (checkInsn->insn.raw != (u32)-1) {
-                switch (insnType) {
-                    default:
-                    case INSN_TYPE_OPCODE:  check = (insn.opcode == checkInsn->insn.opcode); break; // First 6 bits
-                    case INSN_TYPE_FUNC:    check = (insn.func   == checkInsn->insn.func  ); break; // Last 6 bits
-                    case INSN_TYPE_REGIMM:  check = (insn.regimm == checkInsn->insn.regimm); break; // The 5 bits after the first 11
-                    case INSN_TYPE_COP_FMT: check = (insn.fmt    == checkInsn->insn.fmt   ); break; // The 3 bits after the first 8
-                }
+    enum InsnType insnType = get_insn_type_and_list(insn, &checkInsn);
 
-                if (check) {
-                    return checkInsn;
-                }
+    if (insnType == INSN_TYPE_ERROR) {
+        return NULL;
+    }
 
-                checkInsn++;
-            }
+    u8 check = 0;
+
+    while (checkInsn->name[0] != '.') {
+        switch (insnType) {
+            default:
+            case INSN_TYPE_OPCODE:  check = insn.opcode; break; // First 6 bits
+            case INSN_TYPE_FUNC:    check = insn.func;   break; // Last 6 bits
+            case INSN_TYPE_REGIMM:  check = insn.regimm; break; // The 5 bits after the first 11
+            case INSN_TYPE_COP_FMT: check = insn.fmt;    break; // The 3 bits after the first 8
         }
+
+        if (check == checkInsn->opcode) {
+            return checkInsn;
+        }
+
+        checkInsn++;
     }
 
     return NULL;
@@ -408,36 +411,39 @@ static const char sCPURegisterNames[][3] = {
     "RA",                                           // Return address.
 }; //! TODO: Combine this with sRegNames
 
-static const char sCOP0RegisterNames[][10] = {
-    [ 0] = "Index",                        // Programmable pointer into TLB array.
-    [ 1] = "Random",                       // Pseudorandom pointer into TLB array (read only).
-    [ 2] = "EntryLo0", [3] = "EntryLo1",         // Low half of TLB entry for even/odd virtual address (VPN).
-    [ 4] = "Context",                      // Pointer to kernel virtual page table entry (PTE) in 32-bit mode.
-    [ 5] = "PageMask",                     // Page size specification.
-    [ 6] = "Wired",                        // Number of wired TLB entries.
-    [ 7] = "7",                            // Reserved for future use.
-    [ 8] = "BadVAddr",                     // Display of virtual address that occurred an error last.
-    [ 9] = "Count",                        // Timer Count.
-    [10] = "EntryHi",                      // High half of TLB entry (including ASID).
-    [11] = "Compare",                      // Timer Compare Value.
-    [12] = "Status",                       // Operation status setting.
-    [13] = "Cause",                        // Display of cause of last exception.
-    [14] = "EPC",                          // Exception Program Counter.
-    [15] = "PRId",                         // Processor Revision Identifier.
-    [16] = "Config",                       // Memory system mode setting.
-    [17] = "LLAddr",                       // Load Linked instruction address display.
-    [18] = "WatchLo", [19] = "WatchHi",           // Memory reference trap address low/high bits.
-    [20] = "XContext",                     // Pointer to Kernel virtual PTE table in 64-bit mode.
-    [21] = "21", "22", "23", "24", "25",   // Reserved for future use.
-    [26] = "ParityErr",                    // Cache parity bits.
-    [27] = "CacheErr",                     // Cache Error and Status register.
-    [28] = "TagLo", [29] = "TagHi",               // Cache Tag register low/high.
-    [30] = "ErrorEPC",                     // Error Exception Program Counter.
-    [31] = "31",                           // Reserved for future use.
+static const char sCOP0RegisterNames[][9] = {
+    [ 0] = "Index",                         // Programmable pointer into TLB array.
+    [ 1] = "Random",                        // Pseudorandom pointer into TLB array (read only).
+    [ 2] = "EntryLo0",                      // Low half of TLB entry for even virtual addresses (VPN).
+    [ 3] = "EntryLo1",                      // Low half of TLB entry for odd virtual addresses (VPN).
+    [ 4] = "Context",                       // Pointer to kernel virtual page table entry (PTE) in 32-bit mode.
+    [ 5] = "PageMask",                      // Page size specification.
+    [ 6] = "Wired",                         // Number of wired TLB entries.
+    [ 7] = "7",                             // Reserved for future use.
+    [ 8] = "BadVAddr",                      // Display of virtual address that occurred an error last.
+    [ 9] = "Count",                         // Timer Count.
+    [10] = "EntryHi",                       // High half of TLB entry (including ASID).
+    [11] = "Compare",                       // Timer Compare Value.
+    [12] = "Status",                        // Operation status setting.
+    [13] = "Cause",                         // Display of cause of last exception.
+    [14] = "EPC",                           // Exception Program Counter.
+    [15] = "PRId",                          // Processor Revision Identifier.
+    [16] = "Config",                        // Memory system mode setting.
+    [17] = "LLAddr",                        // Load Linked instruction address display.
+    [18] = "WatchLo",                       // Memory reference trap address low bits.
+    [19] = "WatchHi",                       // Memory reference trap address high bits.
+    [20] = "XContext",                      // Pointer to Kernel virtual PTE table in 64-bit mode.
+    [21] = "21", "22", "23", "24", "25",    // Reserved for future use.
+    [26] = "ParityErr",                     // Cache parity bits.
+    [27] = "CacheErr",                      // Cache Error and Status register.
+    [28] = "TagLo",                         // Cache Tag register low.
+    [29] = "TagHi",                         // Cache Tag register high.
+    [30] = "ErrorEPC",                      // Error Exception Program Counter.
+    [31] = "31",                            // Reserved for future use.
 };
 
 // // FPU Registers
-// static const char* sCOP1RegisterNames[] = {
+// static const char sCOP1RegisterNames[][4] = {
 //     "F00", "F02",                               // Subroutine return value.
 //     "F04", "F06", "F08", "F10",                 // Temporary values.
 //     "F12", "F14",                               // Subroutine arguments.
@@ -449,15 +455,17 @@ static const char sCOP0RegisterNames[][10] = {
 s16 check_for_branch_offset(InsnData insn) {
     const InsnTemplate* info = get_insn(insn);
 
-    if (info != NULL) {
-        for (int i = 0; i < 4; i++) {
-            if (info->format[i] == CHAR_P_BRANCH) {
-                return insn.offset;
-            }
+    if (info == NULL) {
+        return 0x0000;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        if (info->fmt[i] == CHAR_P_BRANCH) {
+            return insn.offset;
         }
     }
 
-    return 0;
+    return 0x0000;
 }
 
 uintptr_t get_branch_target_from_addr(uintptr_t addr) {
@@ -528,7 +536,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
         RGBA32 color = COLOR_RGBA32_NONE;
 
         for (u8 cmdIndex = 0; cmdIndex < sizeof(u32); cmdIndex++) {
-            char curCmd = info->format[cmdIndex];
+            char curCmd = info->fmt[cmdIndex];
 
             if (unimpl || curCmd == CHAR_P_NULL) {
                 break;
@@ -581,7 +589,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                 case CHAR_P_BRANCH:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
                     s16 branchOffset = (insn.offset + 1);
-                    strp += sprintf(strp, STR_OFFSET, ((branchOffset < 0) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '+' format specifier if possible.
+                    strp += sprintf(strp, STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible.
                     break;
                 case CHAR_P_COP0D:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);

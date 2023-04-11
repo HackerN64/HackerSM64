@@ -134,10 +134,12 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
 
     while (index < size) {
         unsigned char glyph = buf[index].glyph;
-        if (glyph == CHAR_NULL
-         || glyph == CHAR_SPACE
-         || glyph == CHAR_NEWLINE
-         || glyph == CHAR_RETURN) {
+        if (
+            glyph == CHAR_NULL    ||
+            glyph == CHAR_SPACE   ||
+            glyph == CHAR_NEWLINE ||
+            glyph == CHAR_RETURN
+        ) {
             break;
         }
 

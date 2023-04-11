@@ -58,7 +58,6 @@ void draw_ram_viewer(OSThread* thread) {
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
             uintptr_t currAddr = (rowAddr + x);
-            u8 byte = *((u8*)currAddr);
 
             if ((x % 4) == 0) {
                 charX += 2;
@@ -73,6 +72,8 @@ void draw_ram_viewer(OSThread* thread) {
                 crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_WHITE);
                 color = COLOR_RGBA32_BLACK;
             }
+
+            u8 byte = *(u8*)currAddr;
 
             if (sRamViewShowAsAscii) {
                 crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, color);
@@ -90,7 +91,7 @@ void draw_ram_viewer(OSThread* thread) {
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (gScrollAddress - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE, (gScrollAddress - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     osWritebackDCacheAll();
 }
@@ -108,26 +109,34 @@ const enum ControlTypes ramViewerPageControls[] = {
 
 
 void crash_screen_input_ram_viewer(void) {
-    if ((gCrashScreenDirectionFlags.pressed.up)
-     && ((gSelectedAddress - RAM_VIEWER_STEP) >= RAM_START)) {
+    if (
+        gCrashScreenDirectionFlags.pressed.up &&
+        ((gSelectedAddress - RAM_VIEWER_STEP) >= VALID_RAM_START)
+    ) {
         // Scroll up.
         gSelectedAddress -= RAM_VIEWER_STEP;
         gCrashScreenUpdateFramebuffer = TRUE;
     }
-    if ((gCrashScreenDirectionFlags.pressed.down)
-     && ((gSelectedAddress + RAM_VIEWER_STEP) < RAM_END)) {
+    if (
+        gCrashScreenDirectionFlags.pressed.down &&
+        ((gSelectedAddress + RAM_VIEWER_STEP) < VALID_RAM_END)
+    ) {
         // Scroll down.
         gSelectedAddress += RAM_VIEWER_STEP;
         gCrashScreenUpdateFramebuffer = TRUE;
     }
 
-    if ((gCrashScreenDirectionFlags.pressed.left)
-     && (((gSelectedAddress - 1) & BITMASK(4)) != 0xF)) {
+    if (
+        gCrashScreenDirectionFlags.pressed.left &&
+        (((gSelectedAddress - 1) & BITMASK(4)) != 0xF) // Don't wrap.
+    ) {
         gSelectedAddress--;
         gCrashScreenUpdateFramebuffer = TRUE;
     }
-    if ((gCrashScreenDirectionFlags.pressed.right)
-     && (((gSelectedAddress + 1) & BITMASK(4)) != 0x0)) {
+    if (
+        gCrashScreenDirectionFlags.pressed.right &&
+        (((gSelectedAddress + 1) & BITMASK(4)) != 0x0) // Don't wrap.
+    ) {
         gSelectedAddress++;
         gCrashScreenUpdateFramebuffer = TRUE;
     }

@@ -102,11 +102,6 @@
 #define INCLUDE_DEBUG_MAP
 
 /**
- * Include all MIPS III instructions in the disassembler, rather than just the ones that can generate normally.
- */
-#define DISASM_INCLUDE_ALL_INSTRUCTIONS
-
-/**
  * Includes an image which displays when the crash screen crashes.
  * Uses 38.4 KB of rom space.
  */

@@ -12,6 +12,12 @@
 #include "address_select.h"
 
 
+//! TODO: Allow reading outside of 0x80000000-0x80800000 range.
+#define VALID_RAM_START RAM_START
+#define VALID_RAM_END   RAM_END
+#define VALID_RAM_SIZE  (u64)(VALID_RAM_END - VALID_RAM_START)
+
+
 enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_NONE,
     CRASH_SCREEN_MSG_CPU_BREAK,
@@ -46,7 +52,8 @@ struct CrashScreenPage {
     /*0x08*/ const enum ControlTypes* pageControlsList;
     /*0x10*/ const char* name;
     /*0x14*/ _Bool printName;
-}; /*0x14*/
+    /*0x15*/ _Bool skip;
+}; /*0x16*/
 
 
 // Time conversion macros
@@ -67,6 +74,7 @@ extern struct CrashScreen gCrashScreen;
 extern struct CrashScreen gCrashScreen2;
 #endif
 
+extern _Bool gGameCrashed;
 extern _Bool gCrashScreenSwitchedPage;
 extern _Bool gDrawCrashScreen;
 extern _Bool gDrawBackground;

@@ -65,6 +65,6 @@ extern _Bool gCrashScreenWordWrap;
 
 u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char* fmt, ...);
 
-//! TODO: change these to ALWAYS_INLINE functions for proper syntax highlighting
+//! TODO: change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?)
 #define crash_screen_print(x, y, ...)                   crash_screen_print_impl((x), (y),           0, __VA_ARGS__)
 #define crash_screen_print_scroll(x, y, charLimit, ...) crash_screen_print_impl((x), (y), (charLimit), __VA_ARGS__)

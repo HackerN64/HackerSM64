@@ -7,17 +7,6 @@
 
 #define INSN_NAME_DISPLAY_WIDTH 10
 
-#define INSN_ID_1(a, b, c, d, e, f, t, n) \
-    { .insn = { .i_0 = (a), .i_1 = (b), .i_2 = (c), .i_3 = (d), .i_4 = (e), .i_5 = (f) }, .format = (t), .name = (n) },
-
-#ifdef DISASM_INCLUDE_ALL_INSTRUCTIONS
-    #define INSN_ID_0(a, b, c, d, e, f, t, n) INSN_ID_1((a), (b), (c), (d), (e), (f), (t), (n))
-#else
-    #define INSN_ID_0(a, b, c, d, e, f, t, n)
-#endif
-
-#define INSN_DB_END INSN_ID_1(-1, -1, -1, -1, -1, -1, "", "")
-
 #define CHAR_P_NULL     '\0'
 #define CHAR_P_NOP      '_'     // "NOP"
 #define CHAR_P_NAME     '\''    // "[name]%-6"
@@ -397,47 +386,40 @@ typedef union {
         /*0x00*/ u32 offset : 16; // aka immediate
     };
     struct PACKED {
-        /*0x00*/ u32            : 11;
-        /*0x00*/ u32 regimm     :  5; // aka rt
-        /*0x00*/ u32 immediate  : 16; // aka offset
+        /*0x00*/ u32           : 11;
+        /*0x00*/ u32 regimm    :  5; // aka rt
+        /*0x00*/ u32 immediate : 16; // aka offset
     };
     struct PACKED {
-        /*0x00*/ u32        : 11;
-        /*0x00*/ u32 ft     :  5; // aka: branch condition
-        /*0x00*/ u32 fs     :  5;
-        /*0x00*/ u32 fd     :  5;
-        /*0x00*/ u32        :  6;
+        /*0x00*/ u32    : 11;
+        /*0x00*/ u32 ft :  5; // aka: branch condition
+        /*0x00*/ u32 fs :  5;
+        /*0x00*/ u32 fd :  5;
+        /*0x00*/ u32    :  6;
     };
     struct PACKED {
-        /*0x00*/ u32 cop_opcode     :  4;
-        /*0x00*/ u32 cop_num        :  2;
-        /*0x00*/ u32 cop_subtype    :  2;
-        /*0x00*/ u32 fmt            :  3;
-        /*0x00*/ u32 cop_bcond      :  5; // 0b00010 = likely, 0b00001 = true
-        /*0x00*/ u32                : 10;
-        /*0x00*/ u32 FC             :  2;
-        /*0x00*/ u32 cond           :  4;
+        /*0x00*/ u32 cop_opcode  :  4;
+        /*0x00*/ u32 cop_num     :  2;
+        /*0x00*/ u32 cop_subtype :  2;
+        /*0x00*/ u32 fmt         :  3;
+        /*0x00*/ u32 cop_bcond   :  5; // 0b00010 = likely, 0b00001 = true
+        /*0x00*/ u32             : 10;
+        /*0x00*/ u32 FC          :  2;
+        /*0x00*/ u32 cond        :  4;
     };
     struct PACKED {
         /*0x00*/ u32             :  6;
         /*0x00*/ u32 instr_index : 26;
-    };
-    struct PACKED {
-        /*0x00*/ u32 i_0 :  6;
-        /*0x00*/ u32 i_1 :  5;
-        /*0x00*/ u32 i_2 :  5;
-        /*0x00*/ u32 i_3 :  5;
-        /*0x00*/ u32 i_4 :  5;
-        /*0x00*/ u32 i_5 :  6;
     };
     u32 raw;
 } InsnData; /*0x04*/
 
 // Instruction database format
 typedef struct PACKED {
-    /*0x00*/ InsnData insn; //! TODO: Replace this with a single-byte identifier.
-    /*0x04*/ char format[4];
-    /*0x08*/ char name[8];
+    /*0x00*/ char name[8];
+    /*0x04*/ char fmt[4];
+    /*0x08*/ u8 pad[3];
+    /*0x0F*/ u8 opcode;
 } InsnTemplate; /*0x10*/
 
 typedef struct PACKED {

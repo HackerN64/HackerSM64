@@ -4,6 +4,7 @@
 #include "map_parser.h"
 
 
+//! TODO: replace this with nm -S mappings
 static const TextRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
@@ -71,7 +72,7 @@ static ALWAYS_INLINE const char* map_entry_to_name(struct MapEntry* entry) {
 }
 
 _Bool is_in_code_segment(uintptr_t addr) {
-    //! TODO: Allow reading .text memory outside RDRAM
+    //! TODO: Allow reading .text memory outside 0x80000000-0x80800000.
     if (!IS_IN_RDRAM(addr)) {
         return FALSE;
     }

@@ -5,6 +5,7 @@
 #include "types.h"
 #include "crash_screen.h"
 
+
 typedef union {
     struct PACKED {
         u8 up    : 1;
@@ -46,11 +47,8 @@ struct ControlType {
 
 
 extern _Bool gDrawControls;
-
 extern CrashScreenDirections gCrashScreenDirectionFlags;
-
 extern const struct ControlType gCrashControlsDescriptions[];
-
 extern const enum ControlTypes defaultPageControls[];
 
 

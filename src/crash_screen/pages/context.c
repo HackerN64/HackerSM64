@@ -105,20 +105,22 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 }
 
 // Print a floating-point register.
-void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, void* addr) {
+void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* addr) {
     // "[register name]:"
-    crash_screen_print(x, y, STR_COLOR_PREFIX"%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
+    crash_screen_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
 
-    uintptr_t bits = *(uintptr_t*) addr;
-    s32 exponent = (((bits >> 23) & (u32)BITMASK(8)) - 127);
+    IEEE754_f32 val = { .asF32 = *addr };
 
-    if ((exponent >= -0x7E && exponent <= 0x7F) || (bits == 0x0)) {
-        f32 val = *(f32*) addr;
-        // "[±][exponent]"
-        crash_screen_print((x + TEXT_WIDTH(4)), y, "%s%.3e", ((val < 0) ? "" : " "), val);
+    if (
+        (val.asU32 == 0)                         || // Zero
+        (val.exponent == 0x00)                   || // Denorm
+        (val.exponent == 0xFF && val.mantissa != 0) // ±Infinity
+    ) {
+        // "[XXXXXXXX]"
+        crash_screen_print((x + TEXT_WIDTH(4 + 1)), y, STR_HEX_WORD, val.asU32);
     } else {
-        // "[XXXXXXXX]D"
-        crash_screen_print((x + TEXT_WIDTH(4 + 1)), y, STR_HEX_WORD"D", bits);
+        // "[±][exponent]"
+        crash_screen_print((x + TEXT_WIDTH(4)), y, "% .3e", val.asF32);
     }
 }
 

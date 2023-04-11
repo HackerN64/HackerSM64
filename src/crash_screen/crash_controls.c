@@ -60,8 +60,12 @@ void update_crash_screen_direction_input(void) {
     _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  60));
 
     if (up ^ down) {
-        if (!(gCrashScreenDirectionFlags.held.up
-           || gCrashScreenDirectionFlags.held.down)) { // prev Y
+        if (
+            !(
+                gCrashScreenDirectionFlags.held.up ||
+                gCrashScreenDirectionFlags.held.down
+            )
+        ) { // prev Y
             // On press
             sCrashScreenInputTimeY = currTime;
             gCrashScreenDirectionFlags.pressed.up   = up;
@@ -77,8 +81,12 @@ void update_crash_screen_direction_input(void) {
     }
 
     if (left ^ right) {
-        if (!(gCrashScreenDirectionFlags.held.left
-           || gCrashScreenDirectionFlags.held.right)) { // prev X
+        if (
+            !(
+                gCrashScreenDirectionFlags.held.left ||
+                gCrashScreenDirectionFlags.held.right
+            )
+        ) { // prev X
             // On press
             sCrashScreenInputTimeX = currTime;
             gCrashScreenDirectionFlags.pressed.left  = left;
@@ -175,7 +183,7 @@ void update_crash_screen_input(void) {
         }
 
         // Run the page-specific input function.
-        if (gCrashScreenPages[gCrashPage].inputFunc != NULL) {
+        if (gCrashScreenPages[gCrashPage].inputFunc != NULL && !gCrashScreenPages->skip) {
             gCrashScreenPages[gCrashPage].inputFunc();
         }
     }

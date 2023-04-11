@@ -103,7 +103,7 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
 
         sBranchBufferCurrAddr += DISASM_STEP;
 
-        // Took to long, so continue on the next frame.
+        // Searching took to long, so continue from the same place on the next frame.
         if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) {
             return TRUE;
         }
@@ -165,7 +165,32 @@ void disasm_draw_branch_arrows(s32 printLine) {
     osWritebackDCacheAll();
 }
 
-static void print_as_binary(const s32 charX, const s32 charY, const u32 data) { //! TODO: make this a formatting char, maybe \%b?
+static void print_as_insn(const s32 charX, const s32 charY, const uintptr_t data) {
+    InsnData insn = { .raw = data };
+#ifndef INCLUDE_DEBUG_MAP
+    s16 branchOffset = check_for_branch_offset(insn);
+    if (branchOffset != 0) {
+        s32 startLine = (((s32)addr - (s32)gScrollAddress) / DISASM_STEP);
+        s32 endLine = (startLine + branchOffset + 1);
+        draw_branch_arrow(startLine, endLine, DISASM_BRANCH_ARROW_OFFSET, COLOR_RGBA32_CRASH_FUNCTION_NAME_2, line);
+    }
+#endif
+    const char* destFname = NULL;
+    const char* insnAsStr = insn_disasm(insn, &destFname, sDisasmShowDestFunctionNames);
+    // "[instruction name] [params]"
+    crash_screen_print(charX, charY, "%s", insnAsStr);
+#ifdef INCLUDE_DEBUG_MAP
+    if (sDisasmShowDestFunctionNames && destFname != NULL) {
+        // "[function name]"
+        crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY, (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
+            STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
+        );
+    }
+#endif
+}
+
+static void print_as_binary(const s32 charX, const s32 charY, const uintptr_t data) { //! TODO: make this a formatting char, maybe \%b?
     s32 bitX = charX;
 
     for (u32 c = 0; c < 32; c++) {
@@ -187,51 +212,31 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 
     for (u32 y = 0; y < DISASM_NUM_ROWS; y++) {
         uintptr_t addr = (gScrollAddress + (y * DISASM_STEP));
-        InsnData insn;
-        insn.raw = *(uintptr_t*)addr;
-
         charY = TEXT_Y(line + y);
 
+        // Draw crash and selection rectangles:
         if (addr == pc) {
+            // Draw a red selection rectangle.
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC);
+            // "<-- CRASH"
+            char crashStr[] = "<-- CRASH";
+            crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(sizeof(crashStr) - 1)), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
         } else if (addr == selectedAddr) {
+            // Draw a gray selection rectangle.
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_SELECT);
         }
 
+        uintptr_t data = *(uintptr_t*)addr;
+
         if (is_in_code_segment(addr)) {
-#ifndef INCLUDE_DEBUG_MAP
-            s16 branchOffset = check_for_branch_offset(insn);
-            if (branchOffset != 0) {
-                s32 startLine = (((s32)addr - (s32)gScrollAddress) / DISASM_STEP);
-                s32 endLine = (startLine + branchOffset + 1);
-                draw_branch_arrow(startLine, endLine, DISASM_BRANCH_ARROW_OFFSET, COLOR_RGBA32_CRASH_FUNCTION_NAME_2, line);
-            }
-#endif
-            const char* destFname = NULL;
-            const char* insnAsStr = insn_disasm(insn, &destFname, sDisasmShowDestFunctionNames);
-            // "[instruction name] [params]"
-            crash_screen_print(charX, charY, "%s", insnAsStr);
-            if (addr == pc) {
-                char crashStr[] = "<-- CRASH";
-                // "<-- CRASH"
-                crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(sizeof(crashStr) - 1)), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
-            }
-#ifdef INCLUDE_DEBUG_MAP
-            if (sDisasmShowDestFunctionNames && destFname != NULL) {
-                // "[function name]"
-                crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY, (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
-                    STR_COLOR_PREFIX"%s",
-                    COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
-                );
-            }
-#endif
+            print_as_insn(charX, charY, data);
         } else { // Outside of code segments:
             if (sDisasmShowDataAsBinary) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                print_as_binary(charX, charY, insn.raw);
+                print_as_binary(charX, charY, data);
             } else {
                 // "[XXXXXXXX]"
-                crash_screen_print(charX, charY, STR_HEX_WORD, insn.raw);
+                crash_screen_print(charX, charY, STR_HEX_WORD, data);
             }
         }
     }
@@ -308,10 +313,10 @@ void draw_disasm(OSThread* thread) {
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (gScrollAddress - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (gScrollAddress - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     // Scroll bar crash position marker
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
 
     osWritebackDCacheAll();
 }
@@ -333,8 +338,8 @@ void crash_screen_input_disasm(void) {
 
     // gSelectedAddress = ALIGN(gSelectedAddress, DISASM_STEP);
     if (
-        (gCrashScreenDirectionFlags.pressed.up) &&
-        ((gSelectedAddress - DISASM_STEP) >= RAM_START)
+        gCrashScreenDirectionFlags.pressed.up &&
+        ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)
     ) {
         // Scroll up.
         gSelectedAddress -= DISASM_STEP;
@@ -342,8 +347,8 @@ void crash_screen_input_disasm(void) {
     }
 
     if (
-        (gCrashScreenDirectionFlags.pressed.down) &&
-        ((gSelectedAddress + DISASM_STEP) < RAM_END)
+        gCrashScreenDirectionFlags.pressed.down &&
+        ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END)
     ) {
         // Scroll down.
         gSelectedAddress += DISASM_STEP;

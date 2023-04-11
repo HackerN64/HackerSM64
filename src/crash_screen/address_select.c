@@ -103,14 +103,14 @@ void crash_screen_select_address(void) {
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: Not if address select was just opened
-        gPlayer1Controller->buttonPressed &= A_BUTTON;
         // Jump to the address and close the popup.
         gAddressSelectMenuOpen = FALSE;
 #ifdef INCLUDE_DEBUG_MAP
-        if (gCrashPage == PAGE_DISASM) {
-            if (!is_in_same_function(gSelectedAddress, sAddressSelectTarget)) {
-                gFillBranchBuffer = TRUE;
-            }
+        if (
+            gCrashPage == PAGE_DISASM &&
+            !is_in_same_function(gSelectedAddress, sAddressSelectTarget)
+        ) {
+            gFillBranchBuffer = TRUE;
         }
 #endif
         gSelectedAddress = sAddressSelectTarget;
