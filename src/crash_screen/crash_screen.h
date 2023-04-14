@@ -6,6 +6,13 @@
 #include "game/main.h"
 
 
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+    #define MAX_RECURSIVE_CRASH_SCREENS 2
+#else
+    #define MAX_RECURSIVE_CRASH_SCREENS 1
+#endif
+
+
 //! TODO: Allow reading outside of 0x80000000-0x80800000 range.
 #define VALID_RAM_START RAM_START
 #define VALID_RAM_END   RAM_END
@@ -75,10 +82,7 @@ struct CrashScreenPage {
 extern struct CrashScreenPage gCrashScreenPages[];
 extern enum CrashScreenPages gCrashPage;
 
-extern struct CrashScreen gCrashScreen;
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-extern struct CrashScreen gCrashScreen2;
-#endif
+extern struct CrashScreen gCrashScreens[MAX_RECURSIVE_CRASH_SCREENS];
 
 extern _Bool gGameCrashed;
 extern _Bool gCrashScreenSwitchedPage;

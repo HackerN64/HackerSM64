@@ -11,6 +11,10 @@
 static _Bool sRamViewShowAsAscii = FALSE;
 
 
+void ram_viewer_init(void) {
+    sRamViewShowAsAscii = FALSE;
+}
+
 void draw_ram_viewer(OSThread* thread) {
     __OSThreadContext* tc = &thread->context;
 

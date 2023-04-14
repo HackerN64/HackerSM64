@@ -112,6 +112,14 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
 }
 #endif
 
+void disasm_init(void) {
+    sDisasmShowDestFunctionNames = TRUE;
+    sDisasmShowDataAsBinary = FALSE;
+    gFillBranchBuffer = FALSE;
+    sContinueFillBranchBuffer = FALSE;
+    reset_branch_buffer(0x00000000);
+}
+
 void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, s32 printLine) {
     // Check to see if arrow is fully away from the screen.
     if (

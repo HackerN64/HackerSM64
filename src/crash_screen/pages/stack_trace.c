@@ -53,6 +53,21 @@ void fill_function_stack_trace(OSThread* thread) {
 }
 #endif
 
+void stack_trace_init(void) {
+    bzero(&sAllFunctionStack, sizeof(sAllFunctionStack));
+    bzero(&sKnownFunctionStack, sizeof(sKnownFunctionStack));
+
+    sNumKnownFunctions = 0;
+    sNumShownFunctions = STACK_TRACE_SIZE;
+
+    sStackTraceSkipUnknowns = FALSE;
+    sStackTraceShowFunctionNames = TRUE;
+
+    gStackTraceIndex = 0;
+
+    fill_function_stack_trace(gCrashScreens[0].crashedThread);
+}
+
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void draw_stack_trace(OSThread* thread) {

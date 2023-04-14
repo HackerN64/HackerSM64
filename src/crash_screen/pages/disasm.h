@@ -34,5 +34,6 @@ extern _Bool gFillBranchBuffer;
 extern const enum ControlTypes disasmPageControls[];
 
 
+void disasm_init(void);
 void draw_disasm(OSThread* thread);
 void crash_screen_input_disasm(void);

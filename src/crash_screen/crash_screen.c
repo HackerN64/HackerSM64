@@ -14,7 +14,6 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 #include "game/game_init.h"
-#include "game/game_init.h"
 #include "game/main.h"
 #include "game/printf.h"
 #include "game/puppyprint.h"
@@ -29,22 +28,19 @@
 
 
 struct CrashScreenPage gCrashScreenPages[] = {
-    [PAGE_CONTEXT    ] = { .initFunc = NULL, .drawFunc = draw_crash_context, .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .skip = FALSE, .printName = FALSE, }, },
-    [PAGE_ASSERTS    ] = { .initFunc = NULL, .drawFunc = draw_assert,        .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = draw_crash_context, .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .skip = FALSE, .printName = FALSE, }, },
+    [PAGE_ASSERTS    ] = { .initFunc = NULL,             .drawFunc = draw_assert,        .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = { .initFunc = NULL, .drawFunc = draw_crash_log,     .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "LOG",         .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = draw_crash_log,     .inputFunc = NULL,                           .pageControlsList = defaultPageControls,    .name = "LOG",         .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
 #endif
-    [PAGE_STACK_TRACE] = { .initFunc = NULL, .drawFunc = draw_stack_trace,   .inputFunc = crash_screen_input_stack_trace, .pageControlsList = stackTracePageControls, .name = "STACK TRACE", .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
-    [PAGE_RAM_VIEWER ] = { .initFunc = NULL, .drawFunc = draw_ram_viewer,    .inputFunc = crash_screen_input_ram_viewer,  .pageControlsList = ramViewerPageControls,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
-    [PAGE_DISASM     ] = { .initFunc = NULL, .drawFunc = draw_disasm,        .inputFunc = crash_screen_input_disasm,      .pageControlsList = disasmPageControls,     .name = "DISASM",      .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = draw_stack_trace,   .inputFunc = crash_screen_input_stack_trace, .pageControlsList = stackTracePageControls, .name = "STACK TRACE", .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = draw_ram_viewer,    .inputFunc = crash_screen_input_ram_viewer,  .pageControlsList = ramViewerPageControls,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = draw_disasm,        .inputFunc = crash_screen_input_disasm,      .pageControlsList = disasmPageControls,     .name = "DISASM",      .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
 };
 
 enum CrashScreenPages gCrashPage = FIRST_PAGE;
 
-struct CrashScreen gCrashScreen;
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-struct CrashScreen gCrashScreen2;
-#endif
+struct CrashScreen gCrashScreens[MAX_RECURSIVE_CRASH_SCREENS];
 
 _Bool gGameCrashed                  = FALSE;
 _Bool gCrashScreenSwitchedPage      = FALSE;
@@ -52,9 +48,9 @@ _Bool gDrawCrashScreen              = TRUE;
 _Bool gDrawBackground               = TRUE;
 _Bool gCrashScreenUpdateFramebuffer = TRUE; // Sets the framebuffer to be updated.
 
-uintptr_t gCrashAddress        = 0x00000000;
-uintptr_t gScrollAddress       = 0x00000000;
-uintptr_t gSelectedAddress     = 0x00000000;
+uintptr_t gCrashAddress    = 0x00000000;
+uintptr_t gScrollAddress   = 0x00000000;
+uintptr_t gSelectedAddress = 0x00000000;
 
 
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
@@ -193,39 +189,48 @@ OSThread* get_crashed_thread(void) {
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 void thread20_crash_screen_crash_screen(UNUSED void* arg) {
+    struct CrashScreen* crashScreen = &gCrashScreens[1];
     OSMesg mesg;
-    OSThread* thread = NULL;
+    crashScreen->crashedThread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
 
     while (TRUE) {
-        if (thread == NULL) {
-            osRecvMesg(&gCrashScreen2.mesgQueue, &mesg, OS_MESG_BLOCK);
-            thread = get_crashed_thread();
+        if (crashScreen->crashedThread == NULL) {
+            // Wait for CPU break or fault.
+            osRecvMesg(&crashScreen->mesgQueue, &mesg, OS_MESG_BLOCK);
+            crashScreen->crashedThread = get_crashed_thread();
 
-            if (thread != NULL) {
- #ifdef FUNNY_CRASH_SOUND
-                play_crash_sound(&gCrashScreen2, SOUND_MARIO_MAMA_MIA);
- #endif
-                crash_screen_reset_framebuffer(FALSE);
-                draw_crashed_image_i4();
-                draw_crash_context(thread);
-
-                osWritebackDCacheAll();
-                osViBlack(FALSE);
-                osViSwapBuffer((void*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
+            if (crashScreen->crashedThread == NULL) {
+                continue;
             }
+
+#ifdef FUNNY_CRASH_SOUND
+            play_crash_sound(crashScreen, SOUND_MARIO_MAMA_MIA);
+#endif
+            crash_screen_reset_framebuffer(FALSE);
+            draw_crashed_image_i4();
+            draw_crash_context(crashScreen->crashedThread);
+
+            osWritebackDCacheAll();
+            osViBlack(FALSE);
+            osViSwapBuffer((void*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
         }
     }
 }
 
 void crash_screen_crash_screen_init(void) {
-    osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
-    osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_crash_screen, NULL,
-                ((u8*)gCrashScreen2.stack + sizeof(gCrashScreen2.stack)),
-                OS_PRIORITY_APPMAX);
-    osStartThread(&gCrashScreen2.thread);
+    struct CrashScreen* crashScreen = &gCrashScreens[1];
+
+    osCreateMesgQueue(&crashScreen->mesgQueue, &crashScreen->mesg, 1);
+    osCreateThread(
+        &crashScreen->thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN,
+        thread20_crash_screen_crash_screen, NULL,
+        ((u8*)crashScreen->stack + sizeof(crashScreen->stack)),
+        OS_PRIORITY_APPMAX
+    );
+    osStartThread(&crashScreen->thread);
 }
 #endif // CRASH_SCREEN_CRASH_SCREEN
 
@@ -252,19 +257,20 @@ void play_crash_sound(struct CrashScreen* crashScreen, s32 sound) {
 }
 #endif
 
-void crash_screen_loop(struct CrashScreen* crashScreen) {
+void crash_screen_loop(void) {
+    struct CrashScreen* crashScreen = &gCrashScreens[0];
     OSMesg mesg;
-    OSThread* thread = NULL;
+    crashScreen->crashedThread = NULL;
 
     osSetEventMesg(OS_EVENT_CPU_BREAK, &crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
     osSetEventMesg(OS_EVENT_FAULT,     &crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
 
     while (TRUE) {
-        if (thread == NULL) {
+        if (crashScreen->crashedThread == NULL) {
             // Wait for CPU break or fault.
             osRecvMesg(&crashScreen->mesgQueue, &mesg, OS_MESG_BLOCK);
-            thread = get_crashed_thread();
-            if (thread == NULL) {
+            crashScreen->crashedThread = get_crashed_thread();
+            if (crashScreen->crashedThread == NULL) {
                 continue;
             }
             gGameCrashed = TRUE;
@@ -274,7 +280,9 @@ void crash_screen_loop(struct CrashScreen* crashScreen) {
 #ifdef FUNNY_CRASH_SOUND
             play_crash_sound(crashScreen, SOUND_MARIO_WAAAOOOW);
 #endif
-            __OSThreadContext* tc = &thread->context;
+
+            __OSThreadContext* tc = &crashScreen->crashedThread->context;
+
             // Default to the assert page if the crash was caused by an assert.
             if (tc->cause == EXC_SYSCALL) {
                 gCrashPage = PAGE_ASSERTS;
@@ -289,7 +297,6 @@ void crash_screen_loop(struct CrashScreen* crashScreen) {
 
 #ifdef INCLUDE_DEBUG_MAP
             map_data_init();
-            fill_function_stack_trace(thread);
 #endif
             // Save a screenshot of the game to the Z buffer's memory space.
             crash_screen_take_screenshot(gZBuffer);
@@ -297,7 +304,7 @@ void crash_screen_loop(struct CrashScreen* crashScreen) {
             crash_screen_crash_screen_init();
 #endif
 
-            draw_crash_screen_main(&gCrashScreen);
+            draw_crash_screen_main(crashScreen);
         } else {
             if (gControllerBits) {
 #ifdef ENABLE_RUMBLE
@@ -305,22 +312,28 @@ void crash_screen_loop(struct CrashScreen* crashScreen) {
 #endif
                 osContStartReadDataEx(&gSIEventMesgQueue);
             }
+            extern void read_controller_inputs(s32 threadID);
             read_controller_inputs(THREAD_2_CRASH_SCREEN);
             update_crash_screen_input();
-            draw_crash_screen_main(&gCrashScreen);
+            draw_crash_screen_main(crashScreen);
             gCrashScreenSwitchedPage = FALSE;
         }
     }
 }
 
 void thread2_crash_screen(UNUSED void* arg) {
-    crash_screen_loop(&gCrashScreen);
+    crash_screen_loop();
 }
 
 void create_crash_screen_thread(void) {
-    osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
-    osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
-                   ((u8*)gCrashScreen.stack + sizeof(gCrashScreen.stack)),
-                   OS_PRIORITY_APPMAX);
-    osStartThread(&gCrashScreen.thread);
+    struct CrashScreen* crashScreen = &gCrashScreens[0];
+
+    osCreateMesgQueue(&crashScreen->mesgQueue, &crashScreen->mesg, 1);
+    osCreateThread(
+        &crashScreen->thread, THREAD_2_CRASH_SCREEN,
+        thread2_crash_screen, NULL,
+        ((u8*)crashScreen->stack + sizeof(crashScreen->stack)),
+        OS_PRIORITY_APPMAX
+    );
+    osStartThread(&crashScreen->thread);
 }

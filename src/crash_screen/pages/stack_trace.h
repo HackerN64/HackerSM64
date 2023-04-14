@@ -23,8 +23,6 @@ extern u32 gStackTraceIndex;
 extern const enum ControlTypes stackTracePageControls[];
 
 
-#ifdef INCLUDE_DEBUG_MAP
-void fill_function_stack_trace(OSThread* thread);
-#endif
+void stack_trace_init(void);
 void draw_stack_trace(OSThread* thread);
 void crash_screen_input_stack_trace(void);
