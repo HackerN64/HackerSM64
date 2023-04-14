@@ -12,7 +12,7 @@
 
 
 // Crash screen font. Each row of the image fits in one u32 pointer.
-ALIGNED32 static const FontRow gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS] = {
+ALIGNED32 static const Texture gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(FontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
@@ -180,7 +180,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32
     FontRow bit;
     FontRow rowMask;
 
-    const FontRow* src = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
+    const FontRow* src = &((FontRow*)gCrashScreenFont)[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
     RGBA16* dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
     for (u32 y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
