@@ -42,11 +42,13 @@ void fill_function_stack_trace(OSThread* thread) {
         function->addr = temp_sp;
         function->name = fname;
 
-        if (fname != NULL) {
-            function = &sKnownFunctionStack[sNumKnownFunctions++];
-            function->addr = temp_sp;
-            function->name = fname;
+        if (fname == NULL) {
+            continue;
         }
+
+        function = &sKnownFunctionStack[sNumKnownFunctions++];
+        function->addr = temp_sp;
+        function->name = fname;
     }
 }
 #endif
@@ -93,26 +95,28 @@ void draw_stack_trace(OSThread* thread) {
 
         function = &functionListStart[currIndex];
 
-        if (function != NULL) {
-            uintptr_t faddr = function->addr;
-            const char* fname = function->name;
+        if (function == NULL) {
+            continue;
+        }
 
-            // "[XXXXXXXX]:"
-            crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", faddr);
+        uintptr_t faddr = function->addr;
+        const char* fname = function->name;
 
-            if (!sStackTraceSkipUnknowns && (fname == NULL)) {
-                // Print unknown function
-                // "[XXXXXXXX]"
-                crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
+        // "[XXXXXXXX]:"
+        crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", faddr);
+
+        if (!sStackTraceSkipUnknowns && (fname == NULL)) {
+            // Print unknown function
+            // "[XXXXXXXX]"
+            crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
+        } else {
+            // Print known function
+            if (sStackTraceShowFunctionNames) {
+                // "[function name]"
+                crash_screen_print_scroll(TEXT_X(9), y, (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
             } else {
-                // Print known function
-                if (sStackTraceShowFunctionNames) {
-                    // "[function name]"
-                    crash_screen_print_scroll(TEXT_X(9), y, (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
-                } else {
-                    // "[XXXXXXXX]"
-                    crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
-                }
+                // "[XXXXXXXX]"
+                crash_screen_print(TEXT_X(9), y, (STR_COLOR_PREFIX STR_HEX_WORD), COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
             }
         }
     }

@@ -90,7 +90,7 @@ void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, R
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (w / 2.0f);
     f32 d = 0.0f;
-    f32 t = (middle / (f32) h);
+    f32 t = (middle / (f32)h);
     if (flip) {
         d = (middle - t);
         t = -t;
@@ -120,7 +120,7 @@ void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h,
     // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (h / 2.0f);
-    const f32 t = ((f32) w / middle);
+    const f32 t = ((f32)w / middle);
     f32 x1 = w;
 
     RGBA16* dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
@@ -220,13 +220,13 @@ void crash_screen_reset_framebuffer(_Bool drawBackground) {
     osWritebackDCacheAll();
 }
 
-void crash_screen_update_framebuffer(void) {
+void crash_screen_update_framebuffer(struct CrashScreen* crashScreen) {
     osWritebackDCacheAll();
 
     osViBlack(FALSE);
-    osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
+    osRecvMesg(&crashScreen->mesgQueue, &crashScreen->mesg, OS_MESG_BLOCK);
     osViSwapBuffer((void*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
-    osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
+    osRecvMesg(&crashScreen->mesgQueue, &crashScreen->mesg, OS_MESG_BLOCK);
 
     if (++sRenderingFramebuffer == 3) {
         sRenderingFramebuffer = 0;

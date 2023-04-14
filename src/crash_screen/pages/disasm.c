@@ -10,8 +10,6 @@
 static _Bool sDisasmShowDestFunctionNames = TRUE;
 static _Bool sDisasmShowDataAsBinary = FALSE;
 
-_Bool gFillBranchBuffer = FALSE;
-
 static const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_ORANGE,
     COLOR_RGBA32_LIME,
@@ -24,6 +22,7 @@ static const RGBA32 sBranchColors[] = {
 };
 
 #ifdef INCLUDE_DEBUG_MAP
+_Bool gFillBranchBuffer = FALSE;
 static _Bool sContinueFillBranchBuffer = FALSE;
 
 ALIGNED16 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
@@ -32,7 +31,7 @@ static u32 sNumBranchArrows = 0;
 static uintptr_t sBranchBufferCurrAddr = 0x00000000;
 
 
-void reset_branch_buffer(UNUSED const char* fname, uintptr_t funcAddr) {
+void reset_branch_buffer(uintptr_t funcAddr) {
     bzero(sBranchArrows, sizeof(sBranchArrows));
     sNumBranchArrows = 0;
 
@@ -266,7 +265,7 @@ void draw_disasm(OSThread* thread) {
 
     if (gFillBranchBuffer) {
         gFillBranchBuffer = FALSE;
-        reset_branch_buffer(fname, funcAddr);
+        reset_branch_buffer(funcAddr);
         sContinueFillBranchBuffer = TRUE;
     }
 

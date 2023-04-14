@@ -89,7 +89,7 @@ EXTERN_GROUP_TEXT(common1)
     TEXT_REGION(name##geo)
 
 
-#define IS_IN_RDRAM(addr) (((addr) >= RAM_START) && ((addr) < RAM_END))
+#define IS_IN_RDRAM(addr) (((addr) >= VALID_RAM_START) && ((addr) < VALID_RAM_END))
 
 
 extern u8 gMapStrings[];

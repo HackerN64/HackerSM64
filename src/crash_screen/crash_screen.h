@@ -4,12 +4,6 @@
 
 #include "types.h"
 #include "game/main.h"
-#include "crash_controls.h"
-#include "crash_draw.h"
-#include "crash_print.h"
-#include "insn_disasm.h"
-#include "map_parser.h"
-#include "address_select.h"
 
 
 //! TODO: Allow reading outside of 0x80000000-0x80800000 range.
@@ -44,16 +38,22 @@ struct CrashScreen {
     /*0x1B0*/ u64 stack[THREAD2_STACK / sizeof(u64)];
     /*0x9B0*/ OSMesgQueue mesgQueue;
     /*0x9C8*/ OSMesg mesg;
-}; /*0x9CC*/
+    /*0x9CC*/ OSThread* crashedThread;
+}; /*0x9D0*/
 
 struct CrashScreenPage {
-    /*0x00*/ void (*drawFunc)(OSThread* thread);
-    /*0x04*/ void (*inputFunc)(void);
-    /*0x08*/ const enum ControlTypes* pageControlsList;
+    /*0x00*/ void (*initFunc)(void);
+    /*0x04*/ void (*drawFunc)(OSThread* thread);
+    /*0x08*/ void (*inputFunc)(void);
+    /*0x0C*/ const enum ControlTypes* pageControlsList;
     /*0x10*/ const char* name;
-    /*0x14*/ _Bool printName;
-    /*0x15*/ _Bool skip;
-}; /*0x16*/
+    /*0x14*/ struct PACKED {
+                /*0x00*/ u32             : 29;
+                /*0x03*/ u32 printName   :  1;
+                /*0x03*/ u32 skip        :  1;
+                /*0x03*/ u32 initialized :  1;
+            } flags; /*0x04*/
+}; /*0x18*/
 
 
 // Time conversion macros
@@ -65,6 +65,12 @@ struct CrashScreenPage {
 #define USEC_TO_FRAMES(n)   (((u64)(n) * FPS_COUNT) / 1000000LL)
 #define CYCLES_TO_FRAMES(c) (((u64)(c) * FPS_COUNT) / OS_CPU_COUNTER)
 
+#include "crash_controls.h"
+#include "crash_draw.h"
+#include "crash_print.h"
+#include "insn_disasm.h"
+#include "map_parser.h"
+#include "address_select.h"
 
 extern struct CrashScreenPage gCrashScreenPages[];
 extern enum CrashScreenPages gCrashPage;
@@ -88,4 +94,4 @@ extern uintptr_t gSelectedAddress;
 void toggle_display_var(_Bool* var);
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color);
 void clamp_view_to_selection(const u32 numRows, const u32 step);
-void crash_screen_init(void);
+void create_crash_screen_thread(void);

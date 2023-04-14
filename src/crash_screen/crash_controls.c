@@ -126,25 +126,25 @@ _Bool update_crash_screen_page(void) {
         gCrashScreenUpdateFramebuffer = TRUE;
     }
 
-    if (gCrashPage != prevPage) {
-        // Wrap pages.
-        if (gCrashPage > MAX_PAGES) {
-            gCrashPage = (NUM_PAGES - 1);
-        }
-        if (gCrashPage >= NUM_PAGES) {
-            gCrashPage = FIRST_PAGE;
-        }
-        gCrashScreenUpdateFramebuffer = TRUE;
-
-        // Reset certain values when the page is changed.
-        gStackTraceIndex = 0;
-        gDrawControls = FALSE;
-        gCrashScreenSwitchedPage = TRUE;
-
-        return TRUE;
+    if (gCrashPage == prevPage) {
+        return FALSE;
     }
 
-    return FALSE;
+    // Wrap pages.
+    if (gCrashPage > MAX_PAGES) {
+        gCrashPage = (NUM_PAGES - 1);
+    }
+    if (gCrashPage >= NUM_PAGES) {
+        gCrashPage = FIRST_PAGE;
+    }
+    gCrashScreenUpdateFramebuffer = TRUE;
+
+    // Reset certain values when the page is changed.
+    gStackTraceIndex = 0;
+    gDrawControls = FALSE;
+    gCrashScreenSwitchedPage = TRUE;
+
+    return TRUE;
 }
 
 void update_crash_screen_input(void) {
@@ -166,26 +166,32 @@ void update_crash_screen_input(void) {
         gCrashScreenUpdateFramebuffer = TRUE;
     }
 
-    if (gDrawCrashScreen) {
-        update_crash_screen_direction_input();
+    if (!gDrawCrashScreen) {
+        return;
+    }
 
-        if (gDrawControls) {
-            return;
-        }
+    update_crash_screen_direction_input();
 
-        if (gAddressSelectMenuOpen) {
-            crash_screen_select_address();
-            return;
-        }
-        
-        if (update_crash_screen_page()) {
-            return;
-        }
+    if (gDrawControls) {
+        return;
+    }
 
-        // Run the page-specific input function.
-        if (gCrashScreenPages[gCrashPage].inputFunc != NULL && !gCrashScreenPages->skip) {
-            gCrashScreenPages[gCrashPage].inputFunc();
+    if (gAddressSelectMenuOpen) {
+        crash_screen_select_address();
+        return;
+    }
+    
+    if (update_crash_screen_page()) {
+        if (gCrashScreenPages[gCrashPage].initFunc != NULL && !gCrashScreenPages[gCrashPage].flags.initialized) {
+            gCrashScreenPages[gCrashPage].initFunc();
+            gCrashScreenPages[gCrashPage].flags.initialized = TRUE;
         }
+        return;
+    }
+
+    // Run the page-specific input function.
+    if (gCrashScreenPages[gCrashPage].inputFunc != NULL && !gCrashScreenPages[gCrashPage].flags.skip) {
+        gCrashScreenPages[gCrashPage].inputFunc();
     }
 }
 

@@ -30,6 +30,7 @@ enum ThreadID {
 #ifdef CRASH_SCREEN_CRASH_SCREEN
     THREAD_20_CRASH_SCREEN_CRASH_SCREEN,
 #endif
+    NUM_THREADS,
 };
 
 struct RumbleData {

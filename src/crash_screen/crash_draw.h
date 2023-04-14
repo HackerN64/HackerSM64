@@ -78,7 +78,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
 void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color);
 void crash_screen_take_screenshot(RGBA16* dst);
 void crash_screen_reset_framebuffer(_Bool gDrawBackground);
-void crash_screen_update_framebuffer(void);
+void crash_screen_update_framebuffer(struct CrashScreen* crashScreen);
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 void draw_crashed_image_i4(void);

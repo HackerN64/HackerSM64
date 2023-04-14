@@ -382,7 +382,7 @@ void thread3_main(UNUSED void *arg) {
     load_engine_code_segment();
     gIsVC = IS_VC();
 #ifndef UNF
-    crash_screen_init();
+    create_crash_screen_thread();
 #endif
 
 #ifdef UNF

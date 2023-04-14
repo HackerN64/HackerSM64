@@ -2,6 +2,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
+#include "address_select.h"
 #include "game/game_init.h"
 #include "pages/disasm.h"
 

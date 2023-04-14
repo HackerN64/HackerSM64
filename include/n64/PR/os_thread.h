@@ -106,6 +106,8 @@ typedef struct OSThread_s {
 #define	OS_PRIORITY_APPMAX	127
 #define OS_PRIORITY_IDLE	  0	/* Must be 0 */
 
+#define OS_PRIORITY_THREADTAIL -1
+
 /* for thread profiler */
 #define THPROF_IDMAX            64
 #define THPROF_STACKSIZE        256
