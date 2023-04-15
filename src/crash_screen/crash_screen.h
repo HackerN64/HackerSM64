@@ -6,11 +6,7 @@
 #include "game/main.h"
 
 
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-    #define NUM_CRASH_SCREEN_BUFFERS 2
-#else
-    #define NUM_CRASH_SCREEN_BUFFERS 1
-#endif
+#define NUM_CRASH_SCREEN_BUFFERS 3
 
 
 //! TODO: Allow reading outside of 0x80000000-0x80800000 range.
