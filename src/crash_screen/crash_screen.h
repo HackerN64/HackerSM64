@@ -7,9 +7,9 @@
 
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
-    #define MAX_RECURSIVE_CRASH_SCREENS 2
+    #define NUM_CRASH_SCREEN_BUFFERS 2
 #else
-    #define MAX_RECURSIVE_CRASH_SCREENS 1
+    #define NUM_CRASH_SCREEN_BUFFERS 1
 #endif
 
 
@@ -40,13 +40,13 @@ enum CrashScreenPages {
     MAX_PAGES = 255U,
 };
 
-struct CrashScreen {
-    /*0x000*/ OSThread thread;
-    /*0x1B0*/ u64 stack[THREAD2_STACK / sizeof(u64)];
-    /*0x9B0*/ OSMesgQueue mesgQueue;
-    /*0x9C8*/ OSMesg mesg;
-    /*0x9CC*/ OSThread* crashedThread;
-}; /*0x9D0*/
+struct CSThreadInfo {
+    /*0x000*/ OSThread thread; /*0x1B0*/
+    /*0x1B0*/ u64 stack[THREAD2_STACK / sizeof(u64)]; /*0x80*/
+    /*0x230*/ OSMesgQueue mesgQueue; /*0x18*/
+    /*0x248*/ OSMesg mesg; /*0x04*/
+    /*0x24C*/ OSThread* crashedThread; /*0x04*/
+}; /*0x250*/
 
 struct CrashScreenPage {
     /*0x00*/ void (*initFunc)(void);
@@ -82,20 +82,11 @@ struct CrashScreenPage {
 extern struct CrashScreenPage gCrashScreenPages[];
 extern enum CrashScreenPages gCrashPage;
 
-extern struct CrashScreen gCrashScreens[MAX_RECURSIVE_CRASH_SCREENS];
-
-extern _Bool gGameCrashed;
-extern _Bool gCrashScreenSwitchedPage;
-extern _Bool gDrawCrashScreen;
-extern _Bool gDrawBackground;
-extern _Bool gCrashScreenUpdateFramebuffer;
+extern struct CSThreadInfo* gActiveCSThreadInfo;
 
 extern uintptr_t gCrashAddress;
 extern uintptr_t gScrollAddress;
 extern uintptr_t gSelectedAddress;
 
 
-void toggle_display_var(_Bool* var);
-void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color);
-void clamp_view_to_selection(const u32 numRows, const u32 step);
 void create_crash_screen_thread(void);

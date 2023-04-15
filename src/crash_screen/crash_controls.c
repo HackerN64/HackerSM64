@@ -7,9 +7,11 @@
 #include "pages/stack_trace.h"
 
 
-_Bool gDrawControls = FALSE;
+_Bool gCrashScreenSwitchedPage = FALSE;
+_Bool gDrawControls            = FALSE;
 
 CrashScreenDirections gCrashScreenDirectionFlags;
+
 
 static OSTime sCrashScreenInputTimeY = 0;
 static OSTime sCrashScreenInputTimeX = 0;
@@ -107,6 +109,19 @@ void update_crash_screen_direction_input(void) {
     gCrashScreenDirectionFlags.held.right = right;
 }
 
+void toggle_display_var(_Bool* var) {
+    *var ^= TRUE;
+    gCrashScreenUpdateFramebuffer = TRUE;
+}
+
+void clamp_view_to_selection(const u32 numRows, const u32 step) {
+    const size_t size = (numRows * step);
+
+    gScrollAddress = CLAMP(gScrollAddress, (gSelectedAddress - (size - 1)), (gSelectedAddress - (step - 1)));
+    gScrollAddress = CLAMP(gScrollAddress, VALID_RAM_START, (VALID_RAM_END - size));
+    gScrollAddress = ALIGN(gScrollAddress, step);
+}
+
 const enum ControlTypes defaultPageControls[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -147,7 +162,17 @@ _Bool update_crash_screen_page(void) {
     return TRUE;
 }
 
+extern void read_controller_inputs(s32 threadID);
+
 void crash_screen_update_input(void) {
+    if (gControllerBits) {
+#ifdef ENABLE_RUMBLE
+        block_until_rumble_pak_free();
+#endif
+        osContStartReadDataEx(&gSIEventMesgQueue);
+    }
+    read_controller_inputs(THREAD_2_CRASH_SCREEN);
+
     // Global controls.
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         gDrawCrashScreen ^= TRUE;

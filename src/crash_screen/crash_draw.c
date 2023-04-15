@@ -11,6 +11,11 @@
 #include "game/game_init.h"
 
 
+_Bool gDrawCrashScreen              = TRUE;
+_Bool gDrawBackground               = TRUE;
+_Bool gCrashScreenUpdateFramebuffer = TRUE; // Sets the framebuffer to be updated.
+
+
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 static const Texture gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
@@ -220,13 +225,13 @@ void crash_screen_reset_framebuffer(_Bool drawBackground) {
     osWritebackDCacheAll();
 }
 
-void crash_screen_update_framebuffer(struct CrashScreen* crashScreen) {
+void crash_screen_update_framebuffer(void) {
     osWritebackDCacheAll();
 
     osViBlack(FALSE);
-    osRecvMesg(&crashScreen->mesgQueue, &crashScreen->mesg, OS_MESG_BLOCK);
+    osRecvMesg(&gActiveCSThreadInfo->mesgQueue, &gActiveCSThreadInfo->mesg, OS_MESG_BLOCK);
     osViSwapBuffer(FB_PTR_AS(void));
-    osRecvMesg(&crashScreen->mesgQueue, &crashScreen->mesg, OS_MESG_BLOCK);
+    osRecvMesg(&gActiveCSThreadInfo->mesgQueue, &gActiveCSThreadInfo->mesg, OS_MESG_BLOCK);
 
     if (++sRenderingFramebuffer == 3) {
         sRenderingFramebuffer = 0;
@@ -288,3 +293,102 @@ void draw_crashed_image_i4(void) {
     }
 }
 #endif // CRASH_SCREEN_CRASH_SCREEN
+
+void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
+    // Determine size of the scroll bar, starting on the pixel below the divider.
+    u32 totalHeight = (bottomY - (topY + 1));
+
+    u32 scrollBarHeight = (numVisibleEntries * ((f32)totalHeight / (f32)numTotalEntries));
+    scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
+
+    // Determine position of the scroll bar.
+    f32 scrollableHeight = (totalHeight - scrollBarHeight);
+    f32 numScrollableEntries = (numTotalEntries - numVisibleEntries);
+    u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
+
+    // Draw the scroll bar rectangle.
+    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color);
+}
+
+// Draw the header.
+void print_crash_screen_heaader(void) {
+    u32 line = 0;
+    // "HackerSM64 vX.X.X"
+    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"%s v%s",
+        COLOR_RGBA32_CRASH_HEADER,
+        "HackerSM64",
+        HACKERSM64_VERSION
+    );
+    // "START:controls"
+    _Bool start = (gPlayer1Controller->buttonDown & START_BUTTON);
+    crash_screen_print(TEXT_X(19), TEXT_Y(line),
+        STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX":%s",
+        start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, gCrashControlsDescriptions[CONT_DESC_SHOW_CONTROLS].control,
+        COLOR_RGBA32_CRASH_HEADER, "controls"
+    );
+
+    _Bool pageLeft  = (gPlayer1Controller->buttonDown & L_TRIG);
+    _Bool pageRight = (gPlayer1Controller->buttonDown & R_TRIG);
+    if (start || pageLeft || pageRight) {
+        gCrashScreenUpdateFramebuffer = TRUE;
+    }
+    // "<Page:X>"
+    line += crash_screen_print(TEXT_X(35), TEXT_Y(line),
+        STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
+        pageLeft ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '<',
+        COLOR_RGBA32_CRASH_HEADER,
+        "Page", (gCrashPage + 1),
+        pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '>'
+    );
+
+    crash_screen_draw_divider(DIVIDER_Y(line));
+
+    if (gCrashScreenPages[gCrashPage].flags.printName) {
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name);
+
+        crash_screen_draw_divider(DIVIDER_Y(line));
+    }
+
+    osWritebackDCacheAll();
+}
+
+void crash_screen_draw_main(void) {
+    if (gCrashScreenUpdateFramebuffer) {
+        gCrashScreenUpdateFramebuffer = FALSE;
+    } else {
+        return;
+    }
+
+    crash_screen_reset_framebuffer(gDrawBackground);
+
+    if (!gDrawCrashScreen) {
+        return;
+    }
+
+    if (gDrawBackground) {
+        // Draw the transparent background.
+        crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, CS_DARKEN_THREE_QUARTERS);
+    }
+
+    print_crash_screen_heaader();
+
+    // Run the page-specific draw function.
+    if (gCrashScreenPages[gCrashPage].drawFunc == NULL) {
+        crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE DOESN'T EXIST", COLOR_RGBA32_CRASH_PAGE_NAME);
+    } else if (gCrashScreenPages[gCrashPage].flags.skip) {
+        crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE HAS CRASHED", COLOR_RGBA32_CRASH_AT);
+    } else {
+        gCrashScreenPages[gCrashPage].drawFunc(gActiveCSThreadInfo->crashedThread);
+    }
+
+    if (gAddressSelectMenuOpen) {
+        draw_address_select();
+    }
+
+    if (gDrawControls) {
+        draw_controls_box();
+    }
+
+    crash_screen_update_framebuffer();
+}

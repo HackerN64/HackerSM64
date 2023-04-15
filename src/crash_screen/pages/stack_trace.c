@@ -65,7 +65,7 @@ void stack_trace_init(void) {
 
     gStackTraceIndex = 0;
 
-    fill_function_stack_trace(gCrashScreens[0].crashedThread);
+    fill_function_stack_trace(gActiveCSThreadInfo->crashedThread);
 }
 
 // prints any function pointers it finds in the stack format:
