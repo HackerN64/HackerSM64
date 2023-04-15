@@ -705,11 +705,8 @@ struct Note {
     /*0x84, 0x8C*/ struct VibratoState vibratoState;
     /*0x9C*/ s16 curVolLeft; // Q1.15, but will always be non-negative
     /*0x9E*/ s16 curVolRight; // Q1.15, but will always be non-negative
-    /*0xA0*/ s16 reverbVolShifted; // Q1.15
-    /*0xA2*/ s16 unused2; // never read, set to 0
-    /*0xA4, 0x00*/ struct AudioListItem listItem;
-    /*          */ u8 pad4[0xc];
-}; // size = 0xC0
+    /*0xA0, 0x00*/ struct AudioListItem listItem;
+}; // size = 0xB0
 #endif
 
 struct NoteSynthesisBuffers {

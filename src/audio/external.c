@@ -1269,7 +1269,7 @@ static void update_game_sound(void) {
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
                                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                        ((f32) sSoundMovingSpeed[bank] / 80.0f) + value;
+                                        (((f32) sSoundMovingSpeed[bank] / 80.0f) + value) * gConfig.audioFrequency;
 #endif
                                 } else {
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -1278,7 +1278,7 @@ static void update_game_sound(void) {
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
                                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                        ((f32) sSoundMovingSpeed[bank] / 400.0f) + value;
+                                        (((f32) sSoundMovingSpeed[bank] / 400.0f) + value) * gConfig.audioFrequency;
 #endif
                                 }
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -1301,7 +1301,7 @@ static void update_game_sound(void) {
 #else
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume = 1.0f;
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->pan = 0.5f;
-                            gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale = 1.0f;
+                            gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale = gConfig.audioFrequency;
 #endif
                             break;
                         case SOUND_BANK_ACTION:
@@ -1325,7 +1325,7 @@ static void update_game_sound(void) {
                                 get_sound_pan(*sSoundBanks[bank][soundIndex].x,
                                               *sSoundBanks[bank][soundIndex].z);
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                get_sound_freq_scale(bank, soundIndex);
+                                get_sound_freq_scale(bank, soundIndex) * gConfig.audioFrequency;
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->reverbVol =
                                 get_sound_reverb(bank, soundIndex, channelIndex);
 #endif
@@ -1357,7 +1357,7 @@ static void update_game_sound(void) {
                                 get_sound_pan(*sSoundBanks[bank][soundIndex].x,
                                               *sSoundBanks[bank][soundIndex].z);
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                get_sound_freq_scale(bank, soundIndex);
+                                get_sound_freq_scale(bank, soundIndex) * gConfig.audioFrequency;
 #endif
                             break;
                     }
@@ -1433,7 +1433,7 @@ static void update_game_sound(void) {
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
                                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                        ((f32) sSoundMovingSpeed[bank] / 80.0f) + value;
+                                        (((f32) sSoundMovingSpeed[bank] / 80.0f) + value) * gConfig.audioFrequency;
 #endif
                                 } else {
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -1444,7 +1444,7 @@ static void update_game_sound(void) {
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
                                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                        ((f32) sSoundMovingSpeed[bank] / 400.0f) + value;
+                                        (((f32) sSoundMovingSpeed[bank] / 400.0f) + value) * gConfig.audioFrequency;
 #endif
                                 }
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -1467,7 +1467,7 @@ static void update_game_sound(void) {
 #else
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume = 1.0f;
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->pan = 0.5f;
-                            gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale = 1.0f;
+                            gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale = gConfig.audioFrequency;
 #endif
                             break;
                         case SOUND_BANK_ACTION:
@@ -1491,7 +1491,7 @@ static void update_game_sound(void) {
                                 get_sound_pan(*sSoundBanks[bank][soundIndex].x,
                                               *sSoundBanks[bank][soundIndex].z);
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                get_sound_freq_scale(bank, soundIndex);
+                                get_sound_freq_scale(bank, soundIndex) * gConfig.audioFrequency;
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->reverbVol =
                                 get_sound_reverb(bank, soundIndex, channelIndex);
 #endif
@@ -1523,7 +1523,7 @@ static void update_game_sound(void) {
                                 get_sound_pan(*sSoundBanks[bank][soundIndex].x,
                                               *sSoundBanks[bank][soundIndex].z);
                             gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->freqScale =
-                                get_sound_freq_scale(bank, soundIndex);
+                                get_sound_freq_scale(bank, soundIndex) * gConfig.audioFrequency;
 #endif
                             break;
                     }
