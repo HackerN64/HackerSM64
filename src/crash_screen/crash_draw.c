@@ -280,7 +280,7 @@ void print_crash_screen_heaader(void) {
         gCrashScreenUpdateFramebuffer = TRUE;
     }
     // "<Page:X>"
-    line += crash_screen_print(TEXT_X(35), TEXT_Y(line),
+    crash_screen_print(TEXT_X(35), TEXT_Y(line),
         STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
         pageLeft ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '<',
         COLOR_RGBA32_CRASH_HEADER,
@@ -288,10 +288,14 @@ void print_crash_screen_heaader(void) {
         pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '>'
     );
 
+    line++;
+
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (gCrashScreenPages[gCrashPage].flags.printName) {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name);
+
+        line++;
 
         crash_screen_draw_divider(DIVIDER_Y(line));
     }

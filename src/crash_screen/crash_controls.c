@@ -238,7 +238,8 @@ void draw_controls_box(void) {
         desc = &gCrashControlsDescriptions[*list++];
         // [control]
         // [description]
-        line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS, desc->description);
+        crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS, desc->description);
+        line += 2;
     }
 
     osWritebackDCacheAll();

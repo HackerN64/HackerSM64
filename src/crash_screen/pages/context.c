@@ -157,9 +157,11 @@ void draw_crash_context(OSThread* thread) {
     u32 line = 1;
 
     // "THREAD:[thread id]"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", thread->id);
+    size_t threadPrintSize = crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", thread->id);
     // "([exception cause description])"
-    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
+    crash_screen_print(TEXT_X(threadPrintSize + 1), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
+
+    line++;
 
     osWritebackDCacheAll();
 

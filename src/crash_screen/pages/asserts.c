@@ -10,15 +10,19 @@ void draw_assert(UNUSED OSThread* thread) { //! TODO: Make this scrollable if th
 
     if (__n64Assert_Filename != NULL) {
         // "FILE: [file name]"
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%s", COLOR_RGBA32_CRASH_FILE_NAME, "FILE", __n64Assert_Filename);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%s", COLOR_RGBA32_CRASH_FILE_NAME, "FILE", __n64Assert_Filename);
+        line++;
         crash_screen_draw_divider(DIVIDER_Y(line));
         // "LINE: [line number]"
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_AT, "LINE", __n64Assert_LineNum);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_AT, "LINE", __n64Assert_LineNum);
+        line++;
         crash_screen_draw_divider(DIVIDER_Y(line));
         // "MESSAGE:"
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_HEADER, "MESSAGE");
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_HEADER, "MESSAGE");
+        line++;
         // "[assert message]"
-        line += crash_screen_print(TEXT_X(0), (TEXT_Y(line) + 5), "%s", __n64Assert_Message);
+        crash_screen_print(TEXT_X(0), (TEXT_Y(line) + 5), "%s", __n64Assert_Message);
+        line++;
     } else {
         // "No failed assert to report."
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "No failed assert to report.");

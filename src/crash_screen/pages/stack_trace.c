@@ -77,7 +77,9 @@ void draw_stack_trace(OSThread* thread) {
     u32 line = 1;
 
     // "FROM: [XXXXXXXX]"
-    line += crash_screen_print(TEXT_X(12), TEXT_Y(line), "%s "STR_HEX_WORD, "FROM", temp_sp);
+    crash_screen_print(TEXT_X(12), TEXT_Y(line), "%s "STR_HEX_WORD, "FROM", temp_sp);
+
+    line++;
 
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_AT, "CURRFUNC");
@@ -85,11 +87,13 @@ void draw_stack_trace(OSThread* thread) {
     const char* fname = parse_map(&pc);
     if (fname == NULL) {
         // "UNKNOWN"
-        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+        crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
         // "[function name]"
-        line += crash_screen_print_scroll(TEXT_X(9), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+        crash_screen_print_scroll(TEXT_X(9), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
+
+    line++;
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 

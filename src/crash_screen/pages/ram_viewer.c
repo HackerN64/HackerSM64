@@ -25,11 +25,12 @@ void draw_ram_viewer(OSThread* thread) {
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    line += crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
+    crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION)
     );
 
+    line++;
     charX = (TEXT_X(8) + 3);
 
     for (u32 i = 0; i < 16; i++) {
@@ -48,8 +49,9 @@ void draw_ram_viewer(OSThread* thread) {
     crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(line + RAM_VIEWER_NUM_ROWS - 1), COLOR_RGBA32_LIGHT_GRAY);
 
     // "MEMORY"
-    line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "%s", "MEMORY");
+    crash_screen_print(TEXT_X(1), TEXT_Y(line), "%s", "MEMORY");
 
+    line++;
     charX = (TEXT_X(8) + 3);
     charY = TEXT_Y(line);
 

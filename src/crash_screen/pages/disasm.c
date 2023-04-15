@@ -288,22 +288,26 @@ void draw_disasm(OSThread* thread) {
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    line += crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
+    crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, alignedSelectedAddr, gScrollAddress, (gScrollAddress + DISASM_SHOWN_SECTION)
     );
 
+    line++;
+
     if (fname == NULL) {
         // "NOT IN A FUNCTION"
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
         // "IN: [function name]"
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-        line += crash_screen_print_scroll(TEXT_X(3), TEXT_Y(line),
+        crash_screen_print_scroll(TEXT_X(3), TEXT_Y(line),
             (CRASH_SCREEN_NUM_CHARS_X - 3), STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
         );
     }
+
+    line++;
 
     osWritebackDCacheAll();
 

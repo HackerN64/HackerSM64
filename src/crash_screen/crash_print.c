@@ -150,12 +150,12 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
     return count;
 }
 
-static u32 print_from_buffer(size_t bufferCount, u32 x, u32 y) {
+static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
+    size_t numChars = 0;
     u32 startX = x;
-    u32 numLines = 1;
 
     // Pass 3: whitespace, newlines, and print
-    for (u32 index = 0; index < bufferCount; index++) {
+    for (size_t index = 0; index < bufferCount; index++) {
         _Bool print = FALSE;
         _Bool newline = FALSE;
         PrintBuffer* data = &gCrashScreenPrintBuffer[index];
@@ -192,22 +192,22 @@ static u32 print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         if (gCrashScreenWordWrap && newline) {
             x = startX;
             y += TEXT_HEIGHT(1);
-            numLines++;
         } else {
             x += TEXT_WIDTH(1);
+            numChars++;
         }
     }
 
-    return numLines;
+    return numChars;
 }
 
-static void scroll_buffer(u32 bufferCount, u32 charLimit) {
+static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     bzero(&gCrashScreenScrollBuffer, sizeof(gCrashScreenScrollBuffer));
 
-    u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
-    u32 size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
+    size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
+    size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
-    for (u32 index = 0; index < bufferCount; index++) {
+    for (size_t index = 0; index < bufferCount; index++) {
         gCrashScreenScrollBuffer[index] = gCrashScreenPrintBuffer[((index + offset) % size)];
         if (gCrashScreenScrollBuffer[index].glyph == CHAR_NULL) {
             gCrashScreenScrollBuffer[index].glyph = CHAR_SPACE;
@@ -223,7 +223,7 @@ static char* write_to_buf(char* buffer, const char* data, size_t size) {
     return ((char*)memcpy(buffer, data, size) + size);
 }
 
-u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char* fmt, ...) {
+size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
     char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
 
@@ -231,7 +231,7 @@ u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char* fmt, ...) {
     va_start(args, fmt);
 
     size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
-    u32 numLines = 0;
+    size_t numchars = 0;
 
     if (totalSize > 0) {
         bzero(&gCrashScreenPrintBuffer, sizeof(gCrashScreenPrintBuffer));
@@ -243,10 +243,10 @@ u32 crash_screen_print_impl(u32 x, u32 y, u32 charLimit, const char* fmt, ...) {
             bufferCount = charLimit;
         }
 
-        numLines = print_from_buffer(bufferCount, x, y);
+        numchars = print_from_buffer(bufferCount, x, y);
     }
 
     va_end(args);
 
-    return numLines;
+    return numchars;
 }
