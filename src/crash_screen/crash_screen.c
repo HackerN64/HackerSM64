@@ -125,7 +125,7 @@ void print_crash_screen_heaader(void) {
     osWritebackDCacheAll();
 }
 
-void draw_crash_screen_main(struct CrashScreen* crashScreen) {
+void crash_screen_draw_main(struct CrashScreen* crashScreen) {
     if (!gCrashScreenUpdateFramebuffer) {
         return;
     }
@@ -201,7 +201,6 @@ void thread20_crash_screen_crash_screen(UNUSED void* arg) {
             // Wait for CPU break or fault.
             osRecvMesg(&crashScreen->mesgQueue, &mesg, OS_MESG_BLOCK);
             crashScreen->crashedThread = get_crashed_thread();
-
             if (crashScreen->crashedThread == NULL) {
                 continue;
             }
@@ -273,6 +272,7 @@ void crash_screen_loop(void) {
             if (crashScreen->crashedThread == NULL) {
                 continue;
             }
+
             gGameCrashed = TRUE;
 
             osViSetEvent(&crashScreen->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
@@ -283,9 +283,10 @@ void crash_screen_loop(void) {
 
             __OSThreadContext* tc = &crashScreen->crashedThread->context;
 
-            // Default to the assert page if the crash was caused by an assert.
-            if (tc->cause == EXC_SYSCALL) {
-                gCrashPage = PAGE_ASSERTS;
+            // Default to certain pages depening on the crash type.
+            switch (tc->cause) {
+                case EXC_SYSCALL: gCrashPage = PAGE_ASSERTS; break;
+                case EXC_II:      gCrashPage = PAGE_DISASM;  break;
             }
             // If a position was specified, use that.
             if (gCrashAddress != 0x0) {
@@ -304,7 +305,7 @@ void crash_screen_loop(void) {
             crash_screen_crash_screen_init();
 #endif
 
-            draw_crash_screen_main(crashScreen);
+            crash_screen_draw_main(crashScreen);
         } else {
             if (gControllerBits) {
 #ifdef ENABLE_RUMBLE
@@ -314,8 +315,8 @@ void crash_screen_loop(void) {
             }
             extern void read_controller_inputs(s32 threadID);
             read_controller_inputs(THREAD_2_CRASH_SCREEN);
-            update_crash_screen_input();
-            draw_crash_screen_main(crashScreen);
+            crash_screen_update_input();
+            crash_screen_draw_main(crashScreen);
             gCrashScreenSwitchedPage = FALSE;
         }
     }

@@ -16,7 +16,7 @@ void draw_address_select(void) {
     crash_screen_draw_dark_rect(
         (JUMP_MENU_X1 -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y1 -  JUMP_MENU_MARGIN_Y     ),
         (JUMP_MENU_W  + (JUMP_MENU_MARGIN_X * 2)), (JUMP_MENU_H  + (JUMP_MENU_MARGIN_Y * 2)),
-        3
+        CS_DARKEN_SEVEN_EIGHTHS
     );
 
     // "GO TO:"

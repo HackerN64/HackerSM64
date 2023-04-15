@@ -147,7 +147,7 @@ _Bool update_crash_screen_page(void) {
     return TRUE;
 }
 
-void update_crash_screen_input(void) {
+void crash_screen_update_input(void) {
     // Global controls.
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         gDrawCrashScreen ^= TRUE;
@@ -199,7 +199,7 @@ void draw_controls_box(void) {
     crash_screen_draw_dark_rect(
         (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2)),
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
-        3
+        CS_DARKEN_SEVEN_EIGHTHS
     );
     // "[page name] PAGE CONTROLS"
     crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name, "PAGE CONTROLS");

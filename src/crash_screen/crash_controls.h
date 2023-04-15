@@ -52,5 +52,5 @@ extern const struct ControlType gCrashControlsDescriptions[];
 extern const enum ControlTypes defaultPageControls[];
 
 
-void update_crash_screen_input(void);
+void crash_screen_update_input(void);
 void draw_controls_box(void);

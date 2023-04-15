@@ -6,6 +6,10 @@
 #include "engine/colors.h"
 
 
+// The size of one row of the font image.
+typedef u32 CSFontRow;
+
+
 // Crash screen font image properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
@@ -63,11 +67,22 @@
 // Returns the Y coordinate between the Y position on the text grid, and the space above it.
 #define DIVIDER_Y(numChars) (TEXT_Y(numChars) - 2)
 
-// The size of one row of the font image.
-typedef u32 FontRow;
-
 // Size of the crashed crash screen image.
 #define SRC_IMG_SIZE (SCREEN_SIZE * sizeof(Texture) / sizeof(RGBA32))
+
+// Get a pointer to the framebuffer as a specific type:
+#define FB_PTR_AS(type) (type*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer])
+
+
+// For crash_screen_draw_dark_rect.
+enum CSDrawDarkRectDarken {
+    CS_DARKEN_NONE,
+    CS_DARKEN_HALF,
+    CS_DARKEN_THREE_QUARTERS,
+    CS_DARKEN_SEVEN_EIGHTHS,
+    CS_DARKEN_FIFTEEN_SIXTEENTHS,
+    CS_DARKEN_TO_BLACK,
+};
 
 
 void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken);
@@ -79,7 +94,6 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32
 void crash_screen_take_screenshot(RGBA16* dst);
 void crash_screen_reset_framebuffer(_Bool gDrawBackground);
 void crash_screen_update_framebuffer(struct CrashScreen* crashScreen);
-
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 void draw_crashed_image_i4(void);
 #endif
