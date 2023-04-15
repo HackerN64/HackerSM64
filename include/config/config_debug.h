@@ -102,12 +102,6 @@
 #define INCLUDE_DEBUG_MAP
 
 /**
- * Includes an image which displays when the crash screen crashes.
- * Uses 38.4 KB of rom space.
- */
-#define CRASH_SCREEN_CRASH_SCREEN
-
-/**
  * Plays a Mario "WAAAOOOW" sound effect when the game crashes.
  */
 // #define FUNNY_CRASH_SOUND

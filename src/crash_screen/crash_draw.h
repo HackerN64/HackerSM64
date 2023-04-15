@@ -67,9 +67,6 @@ typedef u32 CSFontRow;
 // Returns the Y coordinate between the Y position on the text grid, and the space above it.
 #define DIVIDER_Y(numChars) (TEXT_Y(numChars) - 2)
 
-// Size of the crashed crash screen image.
-#define SRC_IMG_SIZE (SCREEN_SIZE * sizeof(Texture) / sizeof(RGBA32))
-
 // Get a pointer to the framebuffer as a specific type:
 #define FB_PTR_AS(type) (type*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer])
 
@@ -97,9 +94,6 @@ void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h,
 void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
 void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color);
 void crash_screen_take_screenshot(RGBA16* dst);
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-void draw_crashed_image_i4(void);
-#endif
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color);
 void crash_screen_draw_main(void);
 

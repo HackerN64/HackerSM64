@@ -90,7 +90,6 @@
     #undef DEBUG_FORCE_CRASH_ON_L
     #undef ENABLE_DEBUG_ASSERTS
     #undef INCLUDE_DEBUG_MAP
-    #undef CRASH_SCREEN_CRASH_SCREEN
     #undef FUNNY_CRASH_SOUND
 #endif // DISABLE_ALL
 
