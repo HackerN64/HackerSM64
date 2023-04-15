@@ -171,7 +171,7 @@ void crash_screen_update_input(void) {
 #endif
         osContStartReadDataEx(&gSIEventMesgQueue);
     }
-    read_controller_inputs(THREAD_2_CRASH_SCREEN);
+    read_controller_inputs(gActiveCSThreadInfo->thread.id);
 
     // Global controls.
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {

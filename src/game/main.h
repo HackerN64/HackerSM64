@@ -19,7 +19,7 @@ enum VIModes {
 enum ThreadID {
     THREAD_0,
     THREAD_1_IDLE,
-    THREAD_2_CRASH_SCREEN,
+    THREAD_2,
     THREAD_3_MAIN,
     THREAD_4_SOUND,
     THREAD_5_GAME_LOOP,
@@ -27,10 +27,8 @@ enum ThreadID {
     THREAD_7_HVQM,
     THREAD_8_TIMEKEEPER,
     THREAD_9_DA_COUNTER,
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-    THREAD_20_CRASH_SCREEN_CRASH_SCREEN,
-#endif
     NUM_THREADS,
+    // Crash screen threads start here.
 };
 
 struct RumbleData {

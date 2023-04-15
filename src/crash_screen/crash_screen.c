@@ -40,13 +40,42 @@ struct CrashScreenPage gCrashScreenPages[] = {
 
 enum CrashScreenPages gCrashPage = FIRST_PAGE;
 
+s32 gNumCSThreads = 0;
 struct CSThreadInfo  gCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
 struct CSThreadInfo* gActiveCSThreadInfo = NULL;
 
-uintptr_t gCrashAddress    = 0x00000000;
-uintptr_t gScrollAddress   = 0x00000000;
-uintptr_t gSelectedAddress = 0x00000000;
+uintptr_t gCrashAddress    = 0x00000000; // Crashed thread PC.
+uintptr_t gScrollAddress   = 0x00000000; // Top of the viewport.
+uintptr_t gSelectedAddress = 0x00000000; // Selected address.
 
+
+static _Bool sFirstCrash = TRUE;
+
+
+void crash_screen_reinitialize(void) {
+    if (!sFirstCrash) {
+        gCrashScreenPages[gCrashPage].flags.skip = TRUE;
+    }
+
+    gCrashPage = FIRST_PAGE;
+
+    gCrashScreenSwitchedPage      = FALSE;
+    gDrawControls                 = FALSE;
+    gAddressSelectMenuOpen        = FALSE;
+    gDrawCrashScreen              = TRUE;
+    gDrawBackground               = TRUE;
+    gCrashScreenUpdateFramebuffer = TRUE;
+
+    gCrashAddress    = 0x00000000;
+    gScrollAddress   = 0x00000000;
+    gSelectedAddress = 0x00000000;
+
+    gCrashScreenDirectionFlags.raw = 0;
+
+    for (int i = 0; i < ARRAY_COUNT(gCrashScreenPages); i++) {
+        gCrashScreenPages[i].flags.initialized = FALSE;
+    }
+}
 
 /**
  * Iterates through the active thread queue for a user thread with either
@@ -71,49 +100,6 @@ OSThread* get_crashed_thread(void) {
     return NULL;
 }
 
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-void thread20_crash_screen_crash_screen(UNUSED void* arg) {
-    struct CSThreadInfo* threadInfo = &gCSThreadInfos[1];
-    threadInfo->crashedThread = NULL;
-
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
-
-    while (TRUE) {
-        // Wait for CPU break or fault.
-        osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
-        threadInfo->crashedThread = get_crashed_thread();
-        if (threadInfo->crashedThread == NULL) {
-            continue;
-        }
-
-#ifdef FUNNY_CRASH_SOUND
-        play_crash_sound(threadInfo, SOUND_MARIO_MAMA_MIA);
-#endif
-        break;
-    }
-
-    while (TRUE) {
-        crash_screen_update_input();
-        crash_screen_draw_main();
-        gCrashScreenSwitchedPage = FALSE;
-    }
-}
-
-void crash_screen_crash_screen_init(void) {
-    struct CSThreadInfo* threadInfo = &gCSThreadInfos[1];
-
-    osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
-    osCreateThread(
-        &threadInfo->thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN,
-        thread20_crash_screen_crash_screen, NULL,
-        ((u8*)threadInfo->stack + sizeof(threadInfo->stack)),
-        OS_PRIORITY_APPMAX
-    );
-    osStartThread(&threadInfo->thread);
-}
-#endif // CRASH_SCREEN_CRASH_SCREEN
-
 #ifdef FUNNY_CRASH_SOUND
 void crash_screen_sleep(u32 ms) {
     OSTime cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
@@ -137,28 +123,23 @@ void play_crash_sound(struct CSThreadInfo* threadInfo, s32 sound) {
 }
 #endif
 
-void crash_screen_thread_entry(UNUSED void* arg) {
-    struct CSThreadInfo* threadInfo = &gCSThreadInfos[0];
-    threadInfo->crashedThread = NULL;
+void on_crash(struct CSThreadInfo* threadInfo) {
+    // Set the active thread info pointer.
+    gActiveCSThreadInfo = threadInfo;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+    crash_screen_reinitialize();
 
-    while (TRUE) {
-        // Wait for CPU break or fault.
-        osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
-        threadInfo->crashedThread = get_crashed_thread();
-        if (threadInfo->crashedThread == NULL) {
-            continue;
-        }
-
-        osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
+    osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
 #ifdef FUNNY_CRASH_SOUND
-        play_crash_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
+    play_crash_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
 #endif
 
-        __OSThreadContext* tc = &threadInfo->crashedThread->context;
+    __OSThreadContext* tc = &threadInfo->crashedThread->context;
+
+    // Only on the first crash
+    if (sFirstCrash) {
+        sFirstCrash = FALSE;
 
         // Default to certain pages depening on the crash type.
         switch (tc->cause) {
@@ -171,16 +152,37 @@ void crash_screen_thread_entry(UNUSED void* arg) {
             tc->pc = gCrashAddress;
         }
 
-        gSelectedAddress = tc->pc;
+        // Use the Z buffer's memory space to save a screenshot of the game.
+        crash_screen_take_screenshot(gZBuffer);
 
 #ifdef INCLUDE_DEBUG_MAP
         map_data_init();
 #endif
-        // Save a screenshot of the game to the Z buffer's memory space.
-        crash_screen_take_screenshot(gZBuffer);
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-        crash_screen_crash_screen_init();
-#endif
+    }
+
+    gSelectedAddress = tc->pc;
+
+    create_crash_screen_thread();
+}
+
+void crash_screen_thread_entry(UNUSED void* arg) {
+    struct CSThreadInfo* threadInfo = &gCSThreadInfos[gNumCSThreads - 1];
+
+    gNumCSThreads = ((gNumCSThreads + 1) % NUM_CRASH_SCREEN_BUFFERS);
+
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+
+    while (TRUE) {
+        // Wait for CPU break or fault.
+        osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
+        threadInfo->crashedThread = get_crashed_thread();
+        if (threadInfo->crashedThread == NULL) {
+            continue;
+        }
+
+        // -- A thread has crashed --
+        on_crash(threadInfo);
         break;
     }
 
@@ -192,14 +194,15 @@ void crash_screen_thread_entry(UNUSED void* arg) {
 }
 
 void create_crash_screen_thread(void) {
-    struct CSThreadInfo* threadInfo = &gCSThreadInfos[0];
+    struct CSThreadInfo* threadInfo = &gCSThreadInfos[gNumCSThreads++];
+    bzero(threadInfo, sizeof(struct CSThreadInfo));
 
     osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
     osCreateThread(
-        &threadInfo->thread, THREAD_2_CRASH_SCREEN,
+        &threadInfo->thread, (NUM_THREADS + gNumCSThreads),
         crash_screen_thread_entry, NULL,
         ((u8*)threadInfo->stack + sizeof(threadInfo->stack)),
-        OS_PRIORITY_APPMAX
+        (OS_PRIORITY_APPMAX - gNumCSThreads)
     );
     osStartThread(&threadInfo->thread);
 }
