@@ -199,7 +199,7 @@ void create_crash_screen_thread(void) {
 
     osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
     osCreateThread(
-        &threadInfo->thread, (NUM_THREADS + gNumCSThreads),
+        &threadInfo->thread, (THREAD_1000_CRASH_SCREEN_0 + gNumCSThreads),
         crash_screen_thread_entry, NULL,
         ((u8*)threadInfo->stack + sizeof(threadInfo->stack)),
         (OS_PRIORITY_APPMAX - gNumCSThreads)

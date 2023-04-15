@@ -28,7 +28,10 @@ enum ThreadID {
     THREAD_8_TIMEKEEPER,
     THREAD_9_DA_COUNTER,
     NUM_THREADS,
-    // Crash screen threads start here.
+
+    THREAD_1000_CRASH_SCREEN_0 = 1000,
+    THREAD_1001_CRASH_SCREEN_1,
+    THREAD_1002_CRASH_SCREEN_2,
 };
 
 struct RumbleData {
