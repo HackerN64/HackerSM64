@@ -139,7 +139,7 @@ void crash_screen_draw_main(struct CrashScreen* crashScreen) {
 
     if (gDrawBackground) {
         // Draw the transparent background.
-        crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, 2);
+        crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, CS_DARKEN_THREE_QUARTERS);
     }
 
     print_crash_screen_heaader();
