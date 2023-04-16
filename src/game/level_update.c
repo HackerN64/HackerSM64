@@ -648,7 +648,7 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 #endif
 }
 
-s8 gPaintingEjectSoundPlayed = FALSE;
+_Bool gPaintingEjectSoundPlayed = FALSE;
 
 /**
  * Check is Mario has entered a painting, and if so, initiate a warp.
