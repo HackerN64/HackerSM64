@@ -5,7 +5,7 @@
 #include "asserts.h"
 
 
-void draw_assert(UNUSED OSThread* thread) { //! TODO: Make this scrollable if the message long enough.
+void assert_draw(UNUSED OSThread* thread) { //! TODO: Make this scrollable if the message long enough.
     u32 line = 2;
 
     if (__n64Assert_Filename != NULL) {

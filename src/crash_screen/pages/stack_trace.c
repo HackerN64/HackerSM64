@@ -3,7 +3,7 @@
 #include "sm64.h"
 #include "crash_screen/crash_screen.h"
 #include "stack_trace.h"
-#include "game/game_init.h"
+#include "game/game_input.h"
 
 
 ALIGNED8 static struct FunctionInStack sAllFunctionStack[STACK_TRACE_SIZE];
@@ -70,7 +70,7 @@ void stack_trace_init(void) {
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
-void draw_stack_trace(OSThread* thread) {
+void stack_trace_draw(OSThread* thread) {
     __OSThreadContext* tc = &thread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
 
@@ -156,14 +156,14 @@ void draw_stack_trace(OSThread* thread) {
     osWritebackDCacheAll();
 }
 
-void crash_screen_input_stack_trace(void) {
+void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         // Toggle whether entries without a name are skipped.
         sStackTraceSkipUnknowns ^= TRUE;
         sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_TRACE_SIZE);
         gStackTraceIndex = 0;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
@@ -171,18 +171,18 @@ void crash_screen_input_stack_trace(void) {
         toggle_display_var(&sStackTraceShowFunctionNames);
     }
 
-    if (gCrashScreenDirectionFlags.held.up) {
+    if (gCSDirectionFlags.held.up) {
         // Scroll up.
         if (gStackTraceIndex > 0) {
             gStackTraceIndex--;
-            gCrashScreenUpdateFramebuffer = TRUE;
+            gCSUpdateFB = TRUE;
         }
     }
-    if (gCrashScreenDirectionFlags.held.down) {
+    if (gCSDirectionFlags.held.down) {
         // Scroll down.
         if (gStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
             gStackTraceIndex++;
-            gCrashScreenUpdateFramebuffer = TRUE;
+            gCSUpdateFB = TRUE;
         }
     }
 #endif

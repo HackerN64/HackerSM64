@@ -52,9 +52,9 @@ static const char* sRegNames[29] = { //! TODO: Combine this with sCPURegisterNam
 // Print a fixed-point register.
 void crash_screen_print_reg(u32 x, u32 y, const char* name, uintptr_t addr) {
     // "[register name]:"
-    crash_screen_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_REGISTER, name);
+    crash_screen_print((x + TEXT_WIDTH(1)), y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_REGISTER, name);
     // "[XXXXXXXX]"
-    crash_screen_print((x + TEXT_WIDTH(3)), y, STR_HEX_WORD, addr);
+    crash_screen_print((x + TEXT_WIDTH(5)), y, STR_HEX_WORD, addr);
 }
 
 // Print important fixed-point registers.
@@ -120,7 +120,7 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* addr) {
         crash_screen_print((x + TEXT_WIDTH(4 + 1)), y, STR_HEX_WORD, val.asU32);
     } else {
         // "[±][exponent]"
-        crash_screen_print((x + TEXT_WIDTH(4)), y, "% .3e", val.asF32);
+        crash_screen_print((x + TEXT_WIDTH(4)), y, "% g", val.asF32);
     }
 }
 
@@ -146,7 +146,7 @@ void crash_screen_print_float_registers(__OSThreadContext* tc) {
     }
 }
 
-void draw_crash_context(OSThread* thread) {
+void crash_context_draw(OSThread* thread) {
     __OSThreadContext* tc = &thread->context;
 
     s32 cause = ((tc->cause >> CAUSE_EXCSHIFT) & BITMASK(5));

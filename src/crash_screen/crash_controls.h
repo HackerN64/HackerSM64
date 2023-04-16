@@ -46,10 +46,10 @@ struct ControlType {
 }; /*0x08*/
 
 
-extern _Bool gCrashScreenSwitchedPage;
-extern _Bool gDrawControls;
-extern CrashScreenDirections gCrashScreenDirectionFlags;
-extern const struct ControlType gCrashControlsDescriptions[];
+extern _Bool gCSSwitchedPage;
+extern _Bool gCSDrawControls;
+extern CrashScreenDirections gCSDirectionFlags;
+extern const struct ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultPageControls[];
 
 

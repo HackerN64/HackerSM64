@@ -44,7 +44,7 @@ struct CSThreadInfo {
     /*0x24C*/ OSThread* crashedThread; /*0x04*/
 }; /*0x250*/
 
-struct CrashScreenPage {
+struct CSPage {
     /*0x00*/ void (*initFunc)(void);
     /*0x04*/ void (*drawFunc)(OSThread* thread);
     /*0x08*/ void (*inputFunc)(void);
@@ -75,8 +75,8 @@ struct CrashScreenPage {
 #include "map_parser.h"
 #include "address_select.h"
 
-extern struct CrashScreenPage gCrashScreenPages[];
-extern enum CrashScreenPages gCrashPage;
+extern struct CSPage gCSPages[];
+extern enum CrashScreenPages gCSPageID;
 
 extern struct CSThreadInfo* gActiveCSThreadInfo;
 

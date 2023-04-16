@@ -11,13 +11,13 @@
 #include "game/game_init.h"
 
 
-_Bool gDrawCrashScreen              = TRUE;
-_Bool gDrawBackground               = TRUE;
-_Bool gCrashScreenUpdateFramebuffer = TRUE; // Sets the framebuffer to be updated.
+_Bool gCSDrawCrashScreen       = TRUE;
+_Bool gCSDrawSavedFBScreenshot = TRUE;
+_Bool gCSUpdateFB              = TRUE; // Sets the framebuffer to be updated.
 
 
 // Crash screen font. Each row of the image fits in one u32 pointer.
-ALIGNED32 static const Texture gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
+ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
@@ -185,7 +185,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32
     CSFontRow bit;
     CSFontRow rowMask;
 
-    const CSFontRow* src = &((CSFontRow*)gCrashScreenFont)[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
+    const CSFontRow* src = &((CSFontRow*)gCSFont)[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
     for (u32 y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
@@ -242,7 +242,7 @@ void crash_screen_update_framebuffer(void) {
 
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
     // Determine size of the scroll bar, starting on the pixel below the divider.
-    u32 totalHeight = (bottomY - (topY + 1));
+    u32 totalHeight = (bottomY - topY);
 
     u32 scrollBarHeight = (numVisibleEntries * ((f32)totalHeight / (f32)numTotalEntries));
     scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
@@ -270,21 +270,21 @@ void print_crash_screen_heaader(void) {
     _Bool start = (gPlayer1Controller->buttonDown & START_BUTTON);
     crash_screen_print(TEXT_X(19), TEXT_Y(line),
         STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX":%s",
-        start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, gCrashControlsDescriptions[CONT_DESC_SHOW_CONTROLS].control,
+        start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control,
         COLOR_RGBA32_CRASH_HEADER, "controls"
     );
 
     _Bool pageLeft  = (gPlayer1Controller->buttonDown & L_TRIG);
     _Bool pageRight = (gPlayer1Controller->buttonDown & R_TRIG);
     if (start || pageLeft || pageRight) {
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
     // "<Page:X>"
     crash_screen_print(TEXT_X(35), TEXT_Y(line),
         STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
         pageLeft ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '<',
         COLOR_RGBA32_CRASH_HEADER,
-        "Page", (gCrashPage + 1),
+        "Page", (gCSPageID + 1),
         pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '>'
     );
 
@@ -292,8 +292,8 @@ void print_crash_screen_heaader(void) {
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    if (gCrashScreenPages[gCrashPage].flags.printName) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name);
+    if (gCSPages[gCSPageID].flags.printName) {
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCSPages[gCSPageID].name);
 
         line++;
 
@@ -304,40 +304,38 @@ void print_crash_screen_heaader(void) {
 }
 
 void crash_screen_draw_main(void) {
-    if (gCrashScreenUpdateFramebuffer) {
-        gCrashScreenUpdateFramebuffer = FALSE;
+    if (gCSUpdateFB) {
+        gCSUpdateFB = FALSE;
     } else {
         return;
     }
 
-    crash_screen_reset_framebuffer(gDrawBackground);
+    crash_screen_reset_framebuffer(gCSDrawSavedFBScreenshot);
 
-    if (!gDrawCrashScreen) {
-        return;
-    }
+    if (gCSDrawCrashScreen) {
+        if (gCSDrawSavedFBScreenshot) {
+            // Draw the transparent background.
+            crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, CS_DARKEN_THREE_QUARTERS);
+        }
 
-    if (gDrawBackground) {
-        // Draw the transparent background.
-        crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, CS_DARKEN_THREE_QUARTERS);
-    }
+        print_crash_screen_heaader();
 
-    print_crash_screen_heaader();
+        // Run the page-specific draw function.
+        if (gCSPages[gCSPageID].drawFunc == NULL) {
+            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE DOESN'T EXIST", COLOR_RGBA32_CRASH_PAGE_NAME);
+        } else if (gCSPages[gCSPageID].flags.skip) {
+            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE HAS CRASHED", COLOR_RGBA32_CRASH_AT);
+        } else {
+            gCSPages[gCSPageID].drawFunc(gActiveCSThreadInfo->crashedThread);
+        }
 
-    // Run the page-specific draw function.
-    if (gCrashScreenPages[gCrashPage].drawFunc == NULL) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE DOESN'T EXIST", COLOR_RGBA32_CRASH_PAGE_NAME);
-    } else if (gCrashScreenPages[gCrashPage].flags.skip) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE HAS CRASHED", COLOR_RGBA32_CRASH_AT);
-    } else {
-        gCrashScreenPages[gCrashPage].drawFunc(gActiveCSThreadInfo->crashedThread);
-    }
+        if (gAddressSelectMenuOpen) {
+            draw_address_select();
+        }
 
-    if (gAddressSelectMenuOpen) {
-        draw_address_select();
-    }
-
-    if (gDrawControls) {
-        draw_controls_box();
+        if (gCSDrawControls) {
+            draw_controls_box();
+        }
     }
 
     crash_screen_update_framebuffer();

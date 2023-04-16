@@ -5,7 +5,7 @@
 #include "crash_screen/crash_screen.h"
 #include "ram_viewer.h"
 #include "engine/colors.h"
-#include "game/game_init.h"
+#include "game/game_input.h"
 
 
 static _Bool sRamViewShowAsAscii = FALSE;
@@ -15,7 +15,7 @@ void ram_viewer_init(void) {
     sRamViewShowAsAscii = FALSE;
 }
 
-void draw_ram_viewer(OSThread* thread) {
+void ram_viewer_draw(OSThread* thread) {
     __OSThreadContext* tc = &thread->context;
 
     clamp_view_to_selection(RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
@@ -25,7 +25,7 @@ void draw_ram_viewer(OSThread* thread) {
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
+    crash_screen_print(TEXT_X(strlen(gCSPages[gCSPageID].name) + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION)
     );
@@ -114,37 +114,37 @@ const enum ControlTypes ramViewerPageControls[] = {
 };
 
 
-void crash_screen_input_ram_viewer(void) {
+void ram_viewer_input(void) {
     if (
-        gCrashScreenDirectionFlags.pressed.up &&
+        gCSDirectionFlags.pressed.up &&
         ((gSelectedAddress - RAM_VIEWER_STEP) >= VALID_RAM_START)
     ) {
         // Scroll up.
         gSelectedAddress -= RAM_VIEWER_STEP;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
     if (
-        gCrashScreenDirectionFlags.pressed.down &&
+        gCSDirectionFlags.pressed.down &&
         ((gSelectedAddress + RAM_VIEWER_STEP) < VALID_RAM_END)
     ) {
         // Scroll down.
         gSelectedAddress += RAM_VIEWER_STEP;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     if (
-        gCrashScreenDirectionFlags.pressed.left &&
+        gCSDirectionFlags.pressed.left &&
         (((gSelectedAddress - 1) & BITMASK(4)) != 0xF) // Don't wrap.
     ) {
         gSelectedAddress--;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
     if (
-        gCrashScreenDirectionFlags.pressed.right &&
+        gCSDirectionFlags.pressed.right &&
         (((gSelectedAddress + 1) & BITMASK(4)) != 0x0) // Don't wrap.
     ) {
         gSelectedAddress++;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed

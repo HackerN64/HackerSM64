@@ -82,9 +82,9 @@ enum CSDrawDarkRectDarken {
 };
 
 
-extern _Bool gDrawCrashScreen;
-extern _Bool gDrawBackground;
-extern _Bool gCrashScreenUpdateFramebuffer;
+extern _Bool gCSDrawCrashScreen;
+extern _Bool gCSDrawSavedFBScreenshot;
+extern _Bool gCSUpdateFB;
 
 
 void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken);

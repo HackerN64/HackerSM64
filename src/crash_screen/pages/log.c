@@ -12,7 +12,7 @@
 
 #ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if it's long enough
 
-void draw_crash_log(UNUSED OSThread* thread) {
+void puppyprint_log_draw(UNUSED OSThread* thread) {
     osWritebackDCacheAll();
 
     for (u32 i = 0; i < LOG_BUFFER_SIZE; i++) {
@@ -20,4 +20,5 @@ void draw_crash_log(UNUSED OSThread* thread) {
         crash_screen_print(TEXT_X(0), TEXT_Y(1 + (LOG_BUFFER_SIZE - i)), consoleLogTable[i]);
     }
 }
+
 #endif

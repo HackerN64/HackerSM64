@@ -24,5 +24,5 @@ extern const enum ControlTypes stackTracePageControls[];
 
 
 void stack_trace_init(void);
-void draw_stack_trace(OSThread* thread);
-void crash_screen_input_stack_trace(void);
+void stack_trace_draw(OSThread* thread);
+void stack_trace_input(void);

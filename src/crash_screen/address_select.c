@@ -3,7 +3,7 @@
 #include "sm64.h"
 #include "crash_screen.h"
 #include "address_select.h"
-#include "game/game_init.h"
+#include "game/game_input.h"
 #include "pages/disasm.h"
 
 
@@ -55,13 +55,13 @@ void draw_address_select(void) {
 }
 
 void crash_screen_select_address(void) {
-    if (gCrashScreenDirectionFlags.pressed.left) {
+    if (gCSDirectionFlags.pressed.left) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex - 1) & 0x7); // % 8
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
-    if (gCrashScreenDirectionFlags.pressed.right) {
+    if (gCSDirectionFlags.pressed.right) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex + 1) & 0x7); // % 8
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     uintptr_t nextSelectedAddress = sAddressSelectTarget;
@@ -69,7 +69,7 @@ void crash_screen_select_address(void) {
     u8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
     s8 new = digit;
 
-    if (gCrashScreenDirectionFlags.pressed.up) {
+    if (gCSDirectionFlags.pressed.up) {
         // Increment the selected digit.
         new = ((digit + 1) & BITMASK(4));
         if (!IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
@@ -81,7 +81,7 @@ void crash_screen_select_address(void) {
             }
         }
     }
-    if (gCrashScreenDirectionFlags.pressed.down) {
+    if (gCSDirectionFlags.pressed.down) {
         // Decrement the selected digit.
         new = ((digit - 1) & BITMASK(4));
         if (!IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
@@ -99,7 +99,7 @@ void crash_screen_select_address(void) {
 
         if (IS_IN_RDRAM(nextSelectedAddress)) {
             sAddressSelectTarget = nextSelectedAddress;
-            gCrashScreenUpdateFramebuffer = TRUE;
+            gCSUpdateFB = TRUE;
         }
     }
 
@@ -108,20 +108,20 @@ void crash_screen_select_address(void) {
         gAddressSelectMenuOpen = FALSE;
 #ifdef INCLUDE_DEBUG_MAP
         if (
-            gCrashPage == PAGE_DISASM &&
+            gCSPageID == PAGE_DISASM &&
             !is_in_same_function(gSelectedAddress, sAddressSelectTarget)
         ) {
             gFillBranchBuffer = TRUE;
         }
 #endif
         gSelectedAddress = sAddressSelectTarget;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
         // Close the popup without jumping.
         gAddressSelectMenuOpen = FALSE;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 }
 
@@ -129,5 +129,5 @@ void crash_screen_select_address(void) {
 void open_address_select(uintptr_t dest) {
     gAddressSelectMenuOpen = TRUE;
     sAddressSelectTarget = dest;
-    gCrashScreenUpdateFramebuffer = TRUE;
+    gCSUpdateFB = TRUE;
 }

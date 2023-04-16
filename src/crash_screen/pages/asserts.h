@@ -5,4 +5,4 @@
 #include "types.h"
 
 
-void draw_assert(UNUSED OSThread* thread);
+void assert_draw(UNUSED OSThread* thread);

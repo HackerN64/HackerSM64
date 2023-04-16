@@ -61,7 +61,7 @@ typedef struct PACKED {
     char glyph;
 } PrintBuffer; /*0x08*/
 
-extern _Bool gCrashScreenWordWrap;
+extern _Bool gCSWordWrap;
 
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...);
 

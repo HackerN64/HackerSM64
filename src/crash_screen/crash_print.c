@@ -9,10 +9,10 @@
 #include "game/printf.h"
 
 
-PrintBuffer gCrashScreenPrintBuffer[CHAR_BUFFER_SIZE];
-PrintBuffer gCrashScreenScrollBuffer[CHAR_BUFFER_SIZE];
+PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
+PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
-_Bool gCrashScreenWordWrap = TRUE;
+_Bool gCSWordWrap = TRUE;
 
 
 static _Bool glyph_to_hex(char* dest, unsigned char glyph) {
@@ -72,7 +72,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
 
     // Pass 1: control characters and formatting
     for (u32 index = 0; index < totalSize; index++) {
-        PrintBuffer* data = &gCrashScreenPrintBuffer[bufferCount];
+        PrintBuffer* data = &gCSPrintBuffer[bufferCount];
         _Bool print = FALSE;
         unsigned char glyph = buf[index];
 
@@ -158,7 +158,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
     for (size_t index = 0; index < bufferCount; index++) {
         _Bool print = FALSE;
         _Bool newline = FALSE;
-        PrintBuffer* data = &gCrashScreenPrintBuffer[index];
+        PrintBuffer* data = &gCSPrintBuffer[index];
         unsigned char glyph = data->glyph;
 
         switch (glyph) {
@@ -181,7 +181,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         }
 
         if (print) {
-            if (gCrashScreenWordWrap && (x >= CRASH_SCREEN_TEXT_X2)) {
+            if (gCSWordWrap && (x >= CRASH_SCREEN_TEXT_X2)) {
                 newline = TRUE;
                 index--;
             } else {
@@ -189,7 +189,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
             }
         }
 
-        if (gCrashScreenWordWrap && newline) {
+        if (gCSWordWrap && newline) {
             x = startX;
             y += TEXT_HEIGHT(1);
         } else {
@@ -202,21 +202,21 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
 }
 
 static void scroll_buffer(size_t bufferCount, size_t charLimit) {
-    bzero(&gCrashScreenScrollBuffer, sizeof(gCrashScreenScrollBuffer));
+    bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
     size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
     size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
     for (size_t index = 0; index < bufferCount; index++) {
-        gCrashScreenScrollBuffer[index] = gCrashScreenPrintBuffer[((index + offset) % size)];
-        if (gCrashScreenScrollBuffer[index].glyph == CHAR_NULL) {
-            gCrashScreenScrollBuffer[index].glyph = CHAR_SPACE;
+        gCSScrollBuffer[index] = gCSPrintBuffer[((index + offset) % size)];
+        if (gCSScrollBuffer[index].glyph == CHAR_NULL) {
+            gCSScrollBuffer[index].glyph = CHAR_SPACE;
         }
     }
 
-    memcpy(&gCrashScreenPrintBuffer, &gCrashScreenScrollBuffer, (charLimit * sizeof(PrintBuffer)));
+    memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));
 
-    gCrashScreenUpdateFramebuffer = TRUE;
+    gCSUpdateFB = TRUE;
 }
 
 static char* write_to_buf(char* buffer, const char* data, size_t size) {
@@ -231,10 +231,10 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     va_start(args, fmt);
 
     size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
-    size_t numchars = 0;
+    size_t numChars = 0;
 
     if (totalSize > 0) {
-        bzero(&gCrashScreenPrintBuffer, sizeof(gCrashScreenPrintBuffer));
+        bzero(&gCSPrintBuffer, sizeof(gCSPrintBuffer));
 
         size_t bufferCount = format_print_buffer(buf, totalSize);
 
@@ -243,10 +243,10 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
             bufferCount = charLimit;
         }
 
-        numchars = print_from_buffer(bufferCount, x, y);
+        numChars = print_from_buffer(bufferCount, x, y);
     }
 
     va_end(args);
 
-    return numchars;
+    return numChars;
 }

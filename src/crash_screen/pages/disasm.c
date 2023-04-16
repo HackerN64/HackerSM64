@@ -4,7 +4,7 @@
 #include "sm64.h"
 #include "crash_screen/crash_screen.h"
 #include "disasm.h"
-#include "game/game_init.h"
+#include "game/game_input.h"
 
 
 static _Bool sDisasmShowDestFunctionNames = TRUE;
@@ -215,7 +215,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
 
-    gCrashScreenWordWrap = FALSE;
+    gCSWordWrap = FALSE;
 
     for (u32 y = 0; y < DISASM_NUM_ROWS; y++) {
         uintptr_t addr = (gScrollAddress + (y * DISASM_STEP));
@@ -248,7 +248,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
         }
     }
 
-    gCrashScreenWordWrap = TRUE;
+    gCSWordWrap = TRUE;
 
     osWritebackDCacheAll();
 }
@@ -257,7 +257,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 // uintptr_t sCurrFuncAddr = 0x00000000;
 // const char* sCurrFuncName = NULL;
 
-void draw_disasm(OSThread* thread) {
+void disasm_draw(OSThread* thread) {
     __OSThreadContext* tc = &thread->context;
     const char* fname = NULL;
     uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1));
@@ -267,7 +267,7 @@ void draw_disasm(OSThread* thread) {
     fname = parse_map(&funcAddr);
 
     //! TODO: Do this outside of the draw function:
-    if (gCrashScreenSwitchedPage) {
+    if (gCSSwitchedPage) {
         gFillBranchBuffer = TRUE;
     }
 
@@ -279,7 +279,7 @@ void draw_disasm(OSThread* thread) {
 
     if (sContinueFillBranchBuffer) {
         sContinueFillBranchBuffer = crash_screen_fill_branch_buffer(fname, funcAddr);
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 #endif
 
@@ -288,7 +288,7 @@ void draw_disasm(OSThread* thread) {
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    crash_screen_print(TEXT_X(strlen(gCrashScreenPages[gCrashPage].name) + 1), TEXT_Y(line),
+    crash_screen_print(TEXT_X(strlen(gCSPages[gCSPageID].name) + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, alignedSelectedAddr, gScrollAddress, (gScrollAddress + DISASM_SHOWN_SECTION)
     );
@@ -342,28 +342,28 @@ const enum ControlTypes disasmPageControls[] = {
     CONT_DESC_LIST_END,
 };
 
-void crash_screen_input_disasm(void) {
+void disasm_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     uintptr_t oldPos = gSelectedAddress;
 #endif
 
     // gSelectedAddress = ALIGN(gSelectedAddress, DISASM_STEP);
     if (
-        gCrashScreenDirectionFlags.pressed.up &&
+        gCSDirectionFlags.pressed.up &&
         ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)
     ) {
         // Scroll up.
         gSelectedAddress -= DISASM_STEP;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     if (
-        gCrashScreenDirectionFlags.pressed.down &&
+        gCSDirectionFlags.pressed.down &&
         ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END)
     ) {
         // Scroll down.
         gSelectedAddress += DISASM_STEP;
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed

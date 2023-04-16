@@ -2,19 +2,18 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
-#include "game/game_init.h"
+#include "game/game_input.h"
 #include "crash_controls.h"
 #include "pages/stack_trace.h"
 
 
-_Bool gCrashScreenSwitchedPage = FALSE;
-_Bool gDrawControls            = FALSE;
+_Bool gCSSwitchedPage = FALSE;
+_Bool gCSDrawControls = FALSE;
 
-CrashScreenDirections gCrashScreenDirectionFlags;
+CrashScreenDirections gCSDirectionFlags;
 
-
-static OSTime sCrashScreenInputTimeY = 0;
-static OSTime sCrashScreenInputTimeX = 0;
+static OSTime sCSInputTimeY = 0;
+static OSTime sCSInputTimeX = 0;
 
 
 // Input string defines:
@@ -29,7 +28,7 @@ static OSTime sCrashScreenInputTimeX = 0;
 #define STR_L       "L"
 #define STR_R       "R"
 
-const struct ControlType gCrashControlsDescriptions[] = {
+const struct ControlType gCSControlDescriptions[] = {
     [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page"                          },
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls"              },
     [CONT_DESC_CYCLE_DRAW       ] = { .control = STR_Z,                                     .description = "cycle drawing overlay and background" },
@@ -47,10 +46,10 @@ const struct ControlType gCrashControlsDescriptions[] = {
 void update_crash_screen_direction_input(void) {
     OSTime currTime = osGetTime();
 
-    gCrashScreenDirectionFlags.pressed.up    = FALSE;
-    gCrashScreenDirectionFlags.pressed.down  = FALSE;
-    gCrashScreenDirectionFlags.pressed.left  = FALSE;
-    gCrashScreenDirectionFlags.pressed.right = FALSE;
+    gCSDirectionFlags.pressed.up    = FALSE;
+    gCSDirectionFlags.pressed.down  = FALSE;
+    gCSDirectionFlags.pressed.left  = FALSE;
+    gCSDirectionFlags.pressed.right = FALSE;
 
     s16 rawStickX  = gPlayer1Controller->rawStickX;
     s16 rawStickY  = gPlayer1Controller->rawStickY;
@@ -64,20 +63,20 @@ void update_crash_screen_direction_input(void) {
     if (up ^ down) {
         if (
             !(
-                gCrashScreenDirectionFlags.held.up ||
-                gCrashScreenDirectionFlags.held.down
+                gCSDirectionFlags.held.up ||
+                gCSDirectionFlags.held.down
             )
         ) { // prev Y
             // On press
-            sCrashScreenInputTimeY = currTime;
-            gCrashScreenDirectionFlags.pressed.up   = up;
-            gCrashScreenDirectionFlags.pressed.down = down;
+            sCSInputTimeY = currTime;
+            gCSDirectionFlags.pressed.up   = up;
+            gCSDirectionFlags.pressed.down = down;
         } else {
             // held
-            OSTime diff = (currTime - sCrashScreenInputTimeY);
+            OSTime diff = (currTime - sCSInputTimeY);
             if (diff > FRAMES_TO_CYCLES(10)) {
-                gCrashScreenDirectionFlags.pressed.up   = up;
-                gCrashScreenDirectionFlags.pressed.down = down;
+                gCSDirectionFlags.pressed.up   = up;
+                gCSDirectionFlags.pressed.down = down;
             }
         }
     }
@@ -85,33 +84,33 @@ void update_crash_screen_direction_input(void) {
     if (left ^ right) {
         if (
             !(
-                gCrashScreenDirectionFlags.held.left ||
-                gCrashScreenDirectionFlags.held.right
+                gCSDirectionFlags.held.left ||
+                gCSDirectionFlags.held.right
             )
         ) { // prev X
             // On press
-            sCrashScreenInputTimeX = currTime;
-            gCrashScreenDirectionFlags.pressed.left  = left;
-            gCrashScreenDirectionFlags.pressed.right = right;
+            sCSInputTimeX = currTime;
+            gCSDirectionFlags.pressed.left  = left;
+            gCSDirectionFlags.pressed.right = right;
         } else {
             // held
-            OSTime diff = (currTime - sCrashScreenInputTimeX);
+            OSTime diff = (currTime - sCSInputTimeX);
             if (diff > FRAMES_TO_CYCLES(10)) {
-                gCrashScreenDirectionFlags.pressed.left  = left;
-                gCrashScreenDirectionFlags.pressed.right = right;
+                gCSDirectionFlags.pressed.left  = left;
+                gCSDirectionFlags.pressed.right = right;
             }
         }
     }
 
-    gCrashScreenDirectionFlags.held.up    = up;
-    gCrashScreenDirectionFlags.held.down  = down;
-    gCrashScreenDirectionFlags.held.left  = left;
-    gCrashScreenDirectionFlags.held.right = right;
+    gCSDirectionFlags.held.up    = up;
+    gCSDirectionFlags.held.down  = down;
+    gCSDirectionFlags.held.left  = left;
+    gCSDirectionFlags.held.right = right;
 }
 
 void toggle_display_var(_Bool* var) {
     *var ^= TRUE;
-    gCrashScreenUpdateFramebuffer = TRUE;
+    gCSUpdateFB = TRUE;
 }
 
 void clamp_view_to_selection(const u32 numRows, const u32 step) {
@@ -130,39 +129,39 @@ const enum ControlTypes defaultPageControls[] = {
 };
 
 _Bool update_crash_screen_page(void) {
-    enum CrashScreenPages prevPage = gCrashPage;
+    enum CrashScreenPages prevPage = gCSPageID;
+
+    gCSSwitchedPage = FALSE;
 
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
-        gCrashPage--; // Previous Page.
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSPageID--; // Previous Page.
+        gCSUpdateFB = TRUE;
     }
     if (gPlayer1Controller->buttonPressed & R_TRIG) {
-        gCrashPage++; // Next page.
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSPageID++; // Next page.
+        gCSUpdateFB = TRUE;
     }
 
-    if (gCrashPage == prevPage) {
+    if (gCSPageID == prevPage) {
         return FALSE;
     }
 
     // Wrap pages.
-    if (gCrashPage > MAX_PAGES) {
-        gCrashPage = (NUM_PAGES - 1);
+    if (gCSPageID > MAX_PAGES) {
+        gCSPageID = (NUM_PAGES - 1);
     }
-    if (gCrashPage >= NUM_PAGES) {
-        gCrashPage = FIRST_PAGE;
+    if (gCSPageID >= NUM_PAGES) {
+        gCSPageID = FIRST_PAGE;
     }
-    gCrashScreenUpdateFramebuffer = TRUE;
+    gCSUpdateFB = TRUE;
 
     // Reset certain values when the page is changed.
     gStackTraceIndex = 0;
-    gDrawControls = FALSE;
-    gCrashScreenSwitchedPage = TRUE;
+    gCSDrawControls = FALSE;
+    gCSSwitchedPage = TRUE;
 
     return TRUE;
 }
-
-extern void read_controller_inputs(s32 threadID);
 
 void crash_screen_update_input(void) {
     if (gControllerBits) {
@@ -171,33 +170,34 @@ void crash_screen_update_input(void) {
 #endif
         osContStartReadDataEx(&gSIEventMesgQueue);
     }
+    extern void read_controller_inputs(s32 threadID);
     read_controller_inputs(gActiveCSThreadInfo->thread.id);
 
     // Global controls.
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
-        gDrawCrashScreen ^= TRUE;
-        if (gDrawCrashScreen) {
-            gDrawBackground ^= TRUE;
-        } else if (!gDrawBackground) {
-            gDrawCrashScreen = TRUE;
-            gDrawBackground = TRUE;
-            gDrawControls = FALSE;
+        gCSDrawCrashScreen ^= TRUE;
+        if (gCSDrawCrashScreen) {
+            gCSDrawSavedFBScreenshot ^= TRUE;
+        } else if (!gCSDrawSavedFBScreenshot) {
+            gCSDrawCrashScreen = TRUE;
+            gCSDrawSavedFBScreenshot = TRUE;
+            gCSDrawControls = FALSE;
         }
-        gCrashScreenUpdateFramebuffer = TRUE;
+        gCSUpdateFB = TRUE;
     }
 
-    if (gDrawCrashScreen && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
-        gDrawControls ^= TRUE;
-        gCrashScreenUpdateFramebuffer = TRUE;
+    if (gCSDrawCrashScreen && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
+        gCSDrawControls ^= TRUE;
+        gCSUpdateFB = TRUE;
     }
 
-    if (!gDrawCrashScreen) {
+    if (!gCSDrawCrashScreen) {
         return;
     }
 
     update_crash_screen_direction_input();
 
-    if (gDrawControls) {
+    if (gCSDrawControls) {
         return;
     }
 
@@ -207,16 +207,16 @@ void crash_screen_update_input(void) {
     }
     
     if (update_crash_screen_page()) {
-        if (gCrashScreenPages[gCrashPage].initFunc != NULL && !gCrashScreenPages[gCrashPage].flags.initialized) {
-            gCrashScreenPages[gCrashPage].initFunc();
-            gCrashScreenPages[gCrashPage].flags.initialized = TRUE;
+        if (gCSPages[gCSPageID].initFunc != NULL && !gCSPages[gCSPageID].flags.initialized) {
+            gCSPages[gCSPageID].initFunc();
+            gCSPages[gCSPageID].flags.initialized = TRUE;
         }
         return;
     }
 
     // Run the page-specific input function.
-    if (gCrashScreenPages[gCrashPage].inputFunc != NULL && !gCrashScreenPages[gCrashPage].flags.skip) {
-        gCrashScreenPages[gCrashPage].inputFunc();
+    if (gCSPages[gCSPageID].inputFunc != NULL && !gCSPages[gCSPageID].flags.skip) {
+        gCSPages[gCSPageID].inputFunc();
     }
 }
 
@@ -227,15 +227,15 @@ void draw_controls_box(void) {
         CS_DARKEN_SEVEN_EIGHTHS
     );
     // "[page name] PAGE CONTROLS"
-    crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, gCrashScreenPages[gCrashPage].name, "PAGE CONTROLS");
+    crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, gCSPages[gCSPageID].name, "PAGE CONTROLS");
 
-    const enum ControlTypes* list = gCrashScreenPages[gCrashPage].pageControlsList;
+    const enum ControlTypes* list = gCSPages[gCSPageID].pageControlsList;
     const struct ControlType* desc = NULL;
 
     u32 line = 3;
 
     while (*list != CONT_DESC_LIST_END) {
-        desc = &gCrashControlsDescriptions[*list++];
+        desc = &gCSControlDescriptions[*list++];
         // [control]
         // [description]
         crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS, desc->description);
