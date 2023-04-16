@@ -43,7 +43,7 @@ extern u32   gContStatusPollTimer;
 
 extern struct DemoInput* gCurrDemoInput;
 
-void start_controller_status_polling(s32 isBootMode);
+void start_controller_status_polling(_Bool isBootMode);
 void stop_controller_status_polling(OSContPadEx* pad);
 void handle_input(OSMesg* mesg);
 void init_controllers(void);

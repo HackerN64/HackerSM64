@@ -18,7 +18,7 @@ OSMesgQueue gRumblePakSchedulerMesgQueue;
 OSMesg gRumbleThreadVIMesgBuf[1];
 OSMesgQueue gRumbleThreadVIMesgQueue;
 
-s32 sRumblePakThreadActive = FALSE; // Set to TRUE when the rumble thread starts.
+_Bool sRumblePakThreadActive = FALSE; // Set to TRUE when the rumble thread starts.
 
 struct RumbleInfo gRumbleInfos[MAXCONTROLLERS] = { 0 };
 
@@ -236,7 +236,7 @@ void queue_rumble_data(struct Controller* controller, s16 timer, s16 level, s16 
  * @param[in] controller A pointer to the controller to rumble.
  * @returns s32 Boolean, whether the controller is done rumbling.
  */
-s32 is_rumble_finished_and_queue_empty(struct Controller* controller) {
+_Bool is_rumble_finished_and_queue_empty(struct Controller* controller) {
     if (controller == NULL) {
         return FALSE;
     }

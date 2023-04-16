@@ -201,7 +201,7 @@ static void poll_controller_statuses(OSMesg* mesg) {
  * @param[in] isBootMode Boolean. Only used when MAX_SUPPORTED_CONTROLLERS is 1. Triggers a separate mode where the UI is
  *   invisible and the controller with the first detected input (including analog sticks) becomes player 1.
  */
-void start_controller_status_polling(s32 isBootMode) {
+void start_controller_status_polling(_Bool isBootMode) {
     if (isBootMode) {
         gContStatusPollingReadyForInput = TRUE;
     }
