@@ -54,7 +54,7 @@ void fill_function_stack_trace(OSThread* thread) {
 #endif
 
 void stack_trace_init(void) {
-    bzero(&sAllFunctionStack, sizeof(sAllFunctionStack));
+    bzero(&sAllFunctionStack,   sizeof(sAllFunctionStack)  );
     bzero(&sKnownFunctionStack, sizeof(sKnownFunctionStack));
 
     sNumKnownFunctions = 0;
@@ -65,13 +65,15 @@ void stack_trace_init(void) {
 
     gStackTraceIndex = 0;
 
+#ifdef INCLUDE_DEBUG_MAP
     fill_function_stack_trace(gActiveCSThreadInfo->crashedThread);
+#endif
 }
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
-void stack_trace_draw(OSThread* thread) {
-    __OSThreadContext* tc = &thread->context;
+void stack_trace_draw(void) {
+    __OSThreadContext* tc = &gActiveCSThreadInfo->crashedThread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
 
     u32 line = 1;

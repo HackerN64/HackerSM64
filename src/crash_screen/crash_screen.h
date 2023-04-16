@@ -46,7 +46,7 @@ struct CSThreadInfo {
 
 struct CSPage {
     /*0x00*/ void (*initFunc)(void);
-    /*0x04*/ void (*drawFunc)(OSThread* thread);
+    /*0x04*/ void (*drawFunc)(void);
     /*0x08*/ void (*inputFunc)(void);
     /*0x0C*/ const enum ControlTypes* pageControlsList;
     /*0x10*/ const char* name;

@@ -146,8 +146,9 @@ void crash_screen_print_float_registers(__OSThreadContext* tc) {
     }
 }
 
-void crash_context_draw(OSThread* thread) {
-    __OSThreadContext* tc = &thread->context;
+void crash_context_draw(void) {
+    OSThread* crashedThread = gActiveCSThreadInfo->crashedThread;
+    __OSThreadContext* tc = &crashedThread->context;
 
     s32 cause = ((tc->cause >> CAUSE_EXCSHIFT) & BITMASK(5));
     // Make the last two cause case indexes sequential for array access.
@@ -157,7 +158,7 @@ void crash_context_draw(OSThread* thread) {
     u32 line = 1;
 
     // "THREAD:[thread id]"
-    size_t threadPrintSize = crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", thread->id);
+    size_t threadPrintSize = crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:%d", COLOR_RGBA32_CRASH_THREAD, "THREAD", crashedThread->id);
     // "([exception cause description])"
     crash_screen_print(TEXT_X(threadPrintSize + 1), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
 

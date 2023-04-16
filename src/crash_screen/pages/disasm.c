@@ -257,8 +257,8 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 // uintptr_t sCurrFuncAddr = 0x00000000;
 // const char* sCurrFuncName = NULL;
 
-void disasm_draw(OSThread* thread) {
-    __OSThreadContext* tc = &thread->context;
+void disasm_draw(void) {
+    __OSThreadContext* tc = &gActiveCSThreadInfo->crashedThread->context;
     const char* fname = NULL;
     uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1));
 

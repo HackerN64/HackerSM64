@@ -15,8 +15,8 @@ void ram_viewer_init(void) {
     sRamViewShowAsAscii = FALSE;
 }
 
-void ram_viewer_draw(OSThread* thread) {
-    __OSThreadContext* tc = &thread->context;
+void ram_viewer_draw(void) {
+    __OSThreadContext* tc = &gActiveCSThreadInfo->crashedThread->context;
 
     clamp_view_to_selection(RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 

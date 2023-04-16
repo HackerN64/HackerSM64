@@ -12,7 +12,7 @@
 
 #ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if it's long enough
 
-void puppyprint_log_draw(UNUSED OSThread* thread) {
+void puppyprint_log_draw(void) {
     osWritebackDCacheAll();
 
     for (u32 i = 0; i < LOG_BUFFER_SIZE; i++) {

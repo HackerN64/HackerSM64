@@ -35,5 +35,5 @@ extern const enum ControlTypes disasmPageControls[];
 
 
 void disasm_init(void);
-void disasm_draw(OSThread* thread);
+void disasm_draw(void);
 void disasm_input(void);

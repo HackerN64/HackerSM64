@@ -228,10 +228,13 @@ void crash_screen_reset_framebuffer(_Bool drawBackground) {
 void crash_screen_update_framebuffer(void) {
     osWritebackDCacheAll();
 
+    OSMesgQueue* queue = &gActiveCSThreadInfo->mesgQueue;
+    OSMesg* mesg = &gActiveCSThreadInfo->mesg;
+
     osViBlack(FALSE);
-    osRecvMesg(&gActiveCSThreadInfo->mesgQueue, &gActiveCSThreadInfo->mesg, OS_MESG_BLOCK);
+    osRecvMesg(queue, mesg, OS_MESG_BLOCK);
     osViSwapBuffer(FB_PTR_AS(void));
-    osRecvMesg(&gActiveCSThreadInfo->mesgQueue, &gActiveCSThreadInfo->mesg, OS_MESG_BLOCK);
+    osRecvMesg(queue, mesg, OS_MESG_BLOCK);
 
     if (++sRenderingFramebuffer == 3) {
         sRenderingFramebuffer = 0;
@@ -326,7 +329,7 @@ void crash_screen_draw_main(void) {
         } else if (gCSPages[gCSPageID].flags.skip) {
             crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE HAS CRASHED", COLOR_RGBA32_CRASH_AT);
         } else {
-            gCSPages[gCSPageID].drawFunc(gActiveCSThreadInfo->crashedThread);
+            gCSPages[gCSPageID].drawFunc();
         }
 
         if (gAddressSelectMenuOpen) {

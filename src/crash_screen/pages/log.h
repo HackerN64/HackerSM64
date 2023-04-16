@@ -5,4 +5,4 @@
 #include "types.h"
 
 
-void puppyprint_log_draw(UNUSED OSThread* thread);
+void puppyprint_log_draw(void);

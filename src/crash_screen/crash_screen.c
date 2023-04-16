@@ -53,18 +53,19 @@ uintptr_t gSelectedAddress = 0x00000000; // Selected address.
 
 
 void crash_screen_reinitialize(void) {
+    // If the crash screen has crashed, disable the page that crashed.
     if (!sFirstCrash) {
         gCSPages[gCSPageID].flags.skip = TRUE;
     }
 
     gCSPageID = FIRST_PAGE;
 
-    gCSSwitchedPage      = FALSE;
-    gCSDrawControls                 = FALSE;
-    gAddressSelectMenuOpen        = FALSE;
-    gCSDrawCrashScreen              = TRUE;
-    gCSDrawSavedFBScreenshot               = TRUE;
-    gCSUpdateFB = TRUE;
+    gCSSwitchedPage          = FALSE;
+    gCSDrawControls          = FALSE;
+    gAddressSelectMenuOpen   = FALSE;
+    gCSDrawCrashScreen       = TRUE;
+    gCSDrawSavedFBScreenshot = TRUE;
+    gCSUpdateFB              = TRUE;
 
     gCrashAddress    = 0x00000000;
     gScrollAddress   = 0x00000000;
