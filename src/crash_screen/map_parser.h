@@ -92,15 +92,15 @@ EXTERN_GROUP_TEXT(common1)
 #define IS_IN_RDRAM(addr) (((addr) >= VALID_RAM_START) && ((addr) < VALID_RAM_END))
 
 
-extern u8 gMapStrings[];
-extern struct MapEntry gMapEntries[];
-extern size_t gMapEntrySize;
-extern u8 _mapDataSegmentRomStart[];
+extern const struct MapEntry gMapEntries[];
+extern const struct MapEntry gMapEntryEnd[];
+extern const u8 gMapStrings[];
+extern const u8 gMapStringEnd[];
+extern const u8 _mapDataSegmentRomStart[];
 
 
 void map_data_init(void);
 _Bool is_in_code_segment(uintptr_t addr);
 const char* parse_map(uintptr_t* addr);
-const char* parse_map_exact(uintptr_t addr);
 const char* find_function_in_stack(uintptr_t* sp);
 _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos);

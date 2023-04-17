@@ -610,7 +610,12 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     uintptr_t target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(uintptr_t));
 #ifdef INCLUDE_DEBUG_MAP
                     if (showDestNames) {
-                        *fname = parse_map_exact(target);
+                        uintptr_t tempTarget = target;
+                        *fname = parse_map(&tempTarget);
+                        // Only print as the function name if it's the exact starting address of the function.
+                        if (target != tempTarget) {
+                            *fname = NULL;
+                        }
 
                         if (*fname != NULL) {
                             break;

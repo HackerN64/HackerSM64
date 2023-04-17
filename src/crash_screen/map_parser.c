@@ -44,6 +44,8 @@ TEXT_REGION_GROUP(common1)
 #undef DEFINE_LEVEL
 };
 
+static size_t sNumMapEntries = 0;
+
 
 static void headless_dma(uintptr_t devAddr, void* dramAddr, size_t size) {
     u32 stat = IO_READ(PI_STATUS_REG);
@@ -62,15 +64,15 @@ static u32 headless_pi_status(void) {
 }
 
 void map_data_init(void) {
+    sNumMapEntries = (gMapEntryEnd - gMapEntries);
+
     headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), RAM_1MB);
 
     while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 
-static ALWAYS_INLINE const char* map_entry_to_name(struct MapEntry* entry) {
-    return (char*)((uintptr_t)gMapStrings + entry->name_offset);
-}
-
+// Check whether the address is in a .text segment.
+//! TODO: do INCLUDE_DEBUG_MAP inside this instead of on this whole file.
 _Bool is_in_code_segment(uintptr_t addr) {
     //! TODO: Allow reading .text memory outside 0x80000000-0x80800000.
     if (!IS_IN_RDRAM(addr)) {
@@ -93,37 +95,22 @@ const char* parse_map(uintptr_t* addr) {
         return NULL;
     }
 
-    for (u32 i = 0; i < gMapEntrySize; i++) {
-        if (gMapEntries[i].addr >= *addr) {
-            if (gMapEntries[i].addr > *addr) {
-                i--;
-            }
+    // The pointer starts at the end of the map entry data.
+    const struct MapEntry* entry = &gMapEntries[sNumMapEntries];
 
-            *addr = gMapEntries[i].addr;
-
-            return map_entry_to_name(&gMapEntries[i]);
+    // Loop backwards through the map entries until a map entry address is earlier than the given address.
+    while (entry > gMapEntries) {
+        entry--;
+        if (*addr >= entry->addr) {
+            *addr = entry->addr;
+            return (char*)((uintptr_t)gMapStrings + entry->name_offset);
         }
     }
 
     return NULL;
 }
 
-// If 'addr' is the starting address of the function it's, returns a pointer to the function name.
-const char* parse_map_exact(uintptr_t addr) {
-    if (!is_in_code_segment(addr)) {
-        return NULL;
-    }
-
-    for (u32 i = 0; i < gMapEntrySize; i++) {
-        if (gMapEntries[i].addr == addr) {
-            return map_entry_to_name(&gMapEntries[i]);
-        }
-    }
-
-    return NULL;
-}
-
-//
+//! TODO: description
 const char* find_function_in_stack(uintptr_t* sp) {
     const char* fname = NULL;
 
@@ -163,9 +150,7 @@ _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
 const char* parse_map(UNUSED uintptr_t* addr) {
     return NULL;
 }
-const char* parse_map_exact(UNUSED uintptr_t addr) {
-    return NULL;
-}
+
 const char* find_function_in_stack(UNUSED uintptr_t* sp) {
     return NULL;
 }
