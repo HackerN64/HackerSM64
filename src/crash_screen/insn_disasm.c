@@ -506,6 +506,7 @@ static void check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor) {
 }
 
 static char insn_as_string[CHAR_BUFFER_SIZE] = "";
+static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 
 #define STR_INSN_NAME_BASE      "%s"
 #define STR_FORMAT              "%c"
@@ -524,7 +525,6 @@ static char insn_as_string[CHAR_BUFFER_SIZE] = "";
 char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
     char* strp = &insn_as_string[0];
     _Bool unimpl = FALSE;
-    char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 
     bzero(insn_as_string, sizeof(insn_as_string));
 
@@ -532,6 +532,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
 
     if (info != NULL) {
         RGBA32 color = COLOR_RGBA32_NONE;
+        _Bool separator = FALSE;
 
         for (u8 cmdIndex = 0; cmdIndex < sizeof(u32); cmdIndex++) {
             char curCmd = info->fmt[cmdIndex];
@@ -540,7 +541,11 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                 break;
             }
 
-            //! TODO: commas between registers (check next byte?)
+            if (separator) {
+                separator = FALSE;
+                strp += sprintf(strp, ", ");
+            }
+
             switch (curCmd) {
                 case CHAR_P_NOP:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_NOP);
@@ -558,15 +563,18 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     break;
                 case CHAR_P_RS:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sCPURegisterNames[insn.rs]);
+                    strp += sprintf(strp, STR_IREG, sCPURegisterNames[insn.rs]);
+                    separator = TRUE;
                     break;
                 case CHAR_P_RT:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sCPURegisterNames[insn.rt]);
+                    strp += sprintf(strp, STR_IREG, sCPURegisterNames[insn.rt]);
+                    separator = TRUE;
                     break;
                 case CHAR_P_RD:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sCPURegisterNames[insn.rd]);
+                    strp += sprintf(strp, STR_IREG, sCPURegisterNames[insn.rd]);
+                    separator = TRUE;
                     break;
                 case CHAR_P_IMM:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_IMMEDIATE);
@@ -587,23 +595,27 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                 case CHAR_P_BRANCH:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
                     s16 branchOffset = (insn.offset + 1);
-                    strp += sprintf(strp, STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible.
+                    strp += sprintf(strp, STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
                     break;
                 case CHAR_P_COP0D:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_IREG" ", sCOP0RegisterNames[insn.rd]);
+                    strp += sprintf(strp, STR_IREG, sCOP0RegisterNames[insn.rd]);
+                    separator = TRUE;
                     break;
                 case CHAR_P_FT:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_FREG" ", insn.ft);
+                    strp += sprintf(strp, STR_FREG, insn.ft);
+                    separator = TRUE;
                     break;
                 case CHAR_P_FS:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_FREG" ", insn.fs);
+                    strp += sprintf(strp, STR_FREG, insn.fs);
+                    separator = TRUE;
                     break;
                 case CHAR_P_FD:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_REG);
-                    strp += sprintf(strp, STR_FREG" ", insn.fd);
+                    strp += sprintf(strp, STR_FREG, insn.fd);
+                    separator = TRUE;
                     break;
                 case CHAR_P_FUNC:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_FUNCTION_NAME);

@@ -51,7 +51,7 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
     if (sNumBranchArrows == 0) {
         // Start:
         curBranchColorIndex = 0;
-        curBranchX = DISASM_BRANCH_ARROW_OFFSET;
+        curBranchX = DISASM_BRANCH_ARROW_START_X;
     } else { //! TODO: Verify that this ordering is correct:
         // Continue:
         curBranchColorIndex = sBranchArrows[sNumBranchArrows - 1].colorIndex;
