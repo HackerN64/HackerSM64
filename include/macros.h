@@ -15,6 +15,9 @@
 #define TO_STRING(s)    #s
 #define TO_STRING2(s)   TO_STRING(s)
 
+#define STRLEN(s)           (sizeof(s) - 1)
+#define STR_LAST_CHAR(s)    (s)[STRLEN(s) - 1]
+
 // Avoid compiler warnings for unused variables.
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))

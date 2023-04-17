@@ -215,7 +215,7 @@ void crash_screen_update_input(void) {
     }
 
     // Run the page-specific input function.
-    if (gCSPages[gCSPageID].inputFunc != NULL && !gCSPages[gCSPageID].flags.skip) {
+    if (gCSPages[gCSPageID].inputFunc != NULL && !gCSPages[gCSPageID].flags.crashed) {
         gCSPages[gCSPageID].inputFunc();
     }
 }
@@ -229,7 +229,7 @@ void draw_controls_box(void) {
     // "[page name] PAGE CONTROLS"
     crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, gCSPages[gCSPageID].name, "PAGE CONTROLS");
 
-    const enum ControlTypes* list = gCSPages[gCSPageID].pageControlsList;
+    const enum ControlTypes* list = gCSPages[gCSPageID].contList;
     const struct ControlType* desc = NULL;
 
     u32 line = 3;

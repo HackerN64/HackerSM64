@@ -16,7 +16,7 @@ void ram_viewer_init(void) {
 }
 
 void ram_viewer_draw(void) {
-    __OSThreadContext* tc = &gActiveCSThreadInfo->crashedThread->context;
+    __OSThreadContext* tc = &gCrashedThread->context;
 
     clamp_view_to_selection(RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 
@@ -115,36 +115,36 @@ const enum ControlTypes ramViewerPageControls[] = {
 
 
 void ram_viewer_input(void) {
-    if (
-        gCSDirectionFlags.pressed.up &&
-        ((gSelectedAddress - RAM_VIEWER_STEP) >= VALID_RAM_START)
-    ) {
+    if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
-        gSelectedAddress -= RAM_VIEWER_STEP;
-        gCSUpdateFB = TRUE;
+        if ((gSelectedAddress - RAM_VIEWER_STEP) >= VALID_RAM_START) {
+            gSelectedAddress -= RAM_VIEWER_STEP;
+            gCSUpdateFB = TRUE;
+        }
     }
-    if (
-        gCSDirectionFlags.pressed.down &&
-        ((gSelectedAddress + RAM_VIEWER_STEP) < VALID_RAM_END)
-    ) {
+        
+    if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        gSelectedAddress += RAM_VIEWER_STEP;
-        gCSUpdateFB = TRUE;
+        if ((gSelectedAddress + RAM_VIEWER_STEP) < VALID_RAM_END) {
+            gSelectedAddress += RAM_VIEWER_STEP;
+            gCSUpdateFB = TRUE;
+        }
     }
 
-    if (
-        gCSDirectionFlags.pressed.left &&
-        (((gSelectedAddress - 1) & BITMASK(4)) != 0xF) // Don't wrap.
-    ) {
-        gSelectedAddress--;
-        gCSUpdateFB = TRUE;
+    if (gCSDirectionFlags.pressed.left) {
+        // Don't wrap.
+        if (((gSelectedAddress - 1) & BITMASK(4)) != 0xF) {
+            gSelectedAddress--;
+            gCSUpdateFB = TRUE;
+        }
     }
-    if (
-        gCSDirectionFlags.pressed.right &&
-        (((gSelectedAddress + 1) & BITMASK(4)) != 0x0) // Don't wrap.
-    ) {
-        gSelectedAddress++;
-        gCSUpdateFB = TRUE;
+
+    if (gCSDirectionFlags.pressed.right) {
+        // Don't wrap.
+        if (((gSelectedAddress + 1) & BITMASK(4)) != 0x0) {
+            gSelectedAddress++;
+            gCSUpdateFB = TRUE;
+        }
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed

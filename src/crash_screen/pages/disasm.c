@@ -114,10 +114,10 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
 
 void disasm_init(void) {
     sDisasmShowDestFunctionNames = TRUE;
-    sDisasmShowDataAsBinary = FALSE;
-    gFillBranchBuffer = FALSE;
-    sContinueFillBranchBuffer = FALSE;
-    reset_branch_buffer(0x00000000);
+    sDisasmShowDataAsBinary      = FALSE;
+    gFillBranchBuffer            = FALSE;
+    sContinueFillBranchBuffer    = FALSE;
+    reset_branch_buffer((uintptr_t)NULL);
 }
 
 void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, s32 printLine) {
@@ -227,7 +227,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC);
             // "<-- CRASH"
             char crashStr[] = "<-- CRASH";
-            crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(sizeof(crashStr) - 1)), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
+            crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN(crashStr))), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
         } else if (addr == selectedAddr) {
             // Draw a gray selection rectangle.
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_SELECT);
@@ -258,7 +258,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 // const char* sCurrFuncName = NULL;
 
 void disasm_draw(void) {
-    __OSThreadContext* tc = &gActiveCSThreadInfo->crashedThread->context;
+    __OSThreadContext* tc = &gCrashedThread->context;
     const char* fname = NULL;
     uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1));
 
@@ -348,22 +348,20 @@ void disasm_input(void) {
 #endif
 
     // gSelectedAddress = ALIGN(gSelectedAddress, DISASM_STEP);
-    if (
-        gCSDirectionFlags.pressed.up &&
-        ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)
-    ) {
+    if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
-        gSelectedAddress -= DISASM_STEP;
-        gCSUpdateFB = TRUE;
+        if ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)  {
+            gSelectedAddress -= DISASM_STEP;
+            gCSUpdateFB = TRUE;
+        }
     }
 
-    if (
-        gCSDirectionFlags.pressed.down &&
-        ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END)
-    ) {
+    if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        gSelectedAddress += DISASM_STEP;
-        gCSUpdateFB = TRUE;
+        if ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END) {
+            gSelectedAddress += DISASM_STEP;
+            gCSUpdateFB = TRUE;
+        }
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed

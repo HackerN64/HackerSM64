@@ -273,7 +273,7 @@ void print_crash_screen_heaader(void) {
     _Bool start = (gPlayer1Controller->buttonDown & START_BUTTON);
     crash_screen_print(TEXT_X(19), TEXT_Y(line),
         STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX":%s",
-        start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control,
+        (start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control,
         COLOR_RGBA32_CRASH_HEADER, "controls"
     );
 
@@ -282,13 +282,13 @@ void print_crash_screen_heaader(void) {
     if (start || pageLeft || pageRight) {
         gCSUpdateFB = TRUE;
     }
-    // "<Page:X>"
-    crash_screen_print(TEXT_X(35), TEXT_Y(line),
+    // "<Page:XX>"
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
         STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
-        pageLeft ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '<',
+        (pageLeft  ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '<',
         COLOR_RGBA32_CRASH_HEADER,
         "Page", (gCSPageID + 1),
-        pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER, '>'
+        (pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '>'
     );
 
     line++;
@@ -318,16 +318,24 @@ void crash_screen_draw_main(void) {
     if (gCSDrawCrashScreen) {
         if (gCSDrawSavedFBScreenshot) {
             // Draw the transparent background.
-            crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, CS_DARKEN_THREE_QUARTERS);
+            crash_screen_draw_dark_rect(
+                CRASH_SCREEN_X1, CRASH_SCREEN_Y1,
+                CRASH_SCREEN_W,  CRASH_SCREEN_H,
+                CS_DARKEN_THREE_QUARTERS
+            );
         }
 
         print_crash_screen_heaader();
 
         // Run the page-specific draw function.
         if (gCSPages[gCSPageID].drawFunc == NULL) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE DOESN'T EXIST", COLOR_RGBA32_CRASH_PAGE_NAME);
-        } else if (gCSPages[gCSPageID].flags.skip) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"THIS PAGE HAS CRASHED", COLOR_RGBA32_CRASH_AT);
+            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s", 
+                COLOR_RGBA32_CRASH_PAGE_NAME, "THIS PAGE DOESN'T EXIST"
+            );
+        } else if (gCSPages[gCSPageID].flags.crashed) {
+            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s",
+                COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED"
+            );
         } else {
             gCSPages[gCSPageID].drawFunc();
         }

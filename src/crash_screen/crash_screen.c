@@ -28,24 +28,25 @@
 #include "pages/disasm.h"
 
 
-struct CSPage gCSPages[] = {
-    [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = crash_context_draw,  .inputFunc = NULL,              .pageControlsList = defaultPageControls,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .skip = FALSE, .printName = FALSE, }, },
-    [PAGE_ASSERTS    ] = { .initFunc = NULL,             .drawFunc = assert_draw,         .inputFunc = NULL,              .pageControlsList = defaultPageControls,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+struct CSPage gCSPages[NUM_PAGES] = {
+    [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = crash_context_draw,  .inputFunc = NULL,              .contList = defaultPageControls,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
+    [PAGE_ASSERTS    ] = { .initFunc = NULL,             .drawFunc = assert_draw,         .inputFunc = NULL,              .contList = defaultPageControls,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = puppyprint_log_draw, .inputFunc = NULL,              .pageControlsList = defaultPageControls,    .name = "LOG",         .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = puppyprint_log_draw, .inputFunc = NULL,              .contList = defaultPageControls,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
-    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw,    .inputFunc = stack_trace_input, .pageControlsList = stackTracePageControls, .name = "STACK TRACE", .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
-    [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,     .inputFunc = ram_viewer_input,  .pageControlsList = ramViewerPageControls,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
-    [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,         .inputFunc = disasm_input,      .pageControlsList = disasmPageControls,     .name = "DISASM",      .flags = { .initialized = FALSE, .skip = FALSE, .printName = TRUE,  }, },
+    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw,    .inputFunc = stack_trace_input, .contList = stackTracePageControls, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,     .inputFunc = ram_viewer_input,  .contList = ramViewerPageControls,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,         .inputFunc = disasm_input,      .contList = disasmPageControls,     .name = "DISASM",      .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 };
 
 enum CrashScreenPages gCSPageID = FIRST_PAGE;
 
-static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
+ALIGNED8 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
 static s32 sCSThreadIndex = 0;
 static _Bool sFirstCrash = TRUE;
 
 struct CSThreadInfo* gActiveCSThreadInfo = NULL;
+OSThread* gCrashedThread = NULL;
 
 uintptr_t gCrashAddress    = 0x00000000; // Crashed thread PC.
 uintptr_t gScrollAddress   = 0x00000000; // Top of the viewport.
@@ -55,7 +56,7 @@ uintptr_t gSelectedAddress = 0x00000000; // Selected address.
 void crash_screen_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed.
     if (!sFirstCrash) {
-        gCSPages[gCSPageID].flags.skip = TRUE;
+        gCSPages[gCSPageID].flags.crashed = TRUE;
     }
 
     gCSPageID = FIRST_PAGE;
@@ -136,7 +137,7 @@ void on_crash(struct CSThreadInfo* threadInfo) {
     play_crash_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
 #endif
 
-    __OSThreadContext* tc = &threadInfo->crashedThread->context;
+    __OSThreadContext* tc = &gCrashedThread->context;
 
     // Only on the first crash
     if (sFirstCrash) {
@@ -167,7 +168,7 @@ void on_crash(struct CSThreadInfo* threadInfo) {
 void crash_screen_thread_entry(UNUSED void* arg) {
     struct CSThreadInfo* threadInfo = &sCSThreadInfos[sCSThreadIndex];
 
-    sCSThreadIndex = (sCSThreadIndex + 1) % ARRAY_COUNT(sCSThreadInfos);
+    sCSThreadIndex = ((sCSThreadIndex + 1) % ARRAY_COUNT(sCSThreadInfos));
 
     osSetEventMesg(OS_EVENT_CPU_BREAK, &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
     osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
@@ -175,8 +176,8 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     while (TRUE) {
         // Wait for CPU break or fault.
         osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
-        threadInfo->crashedThread = get_crashed_thread();
-        if (threadInfo->crashedThread == NULL) {
+        gCrashedThread = get_crashed_thread();
+        if (gCrashedThread == NULL) {
             continue;
         }
 
@@ -200,8 +201,8 @@ void create_crash_screen_thread(void) {
     osCreateThread(
         &threadInfo->thread, (THREAD_1000_CRASH_SCREEN_0 + sCSThreadIndex),
         crash_screen_thread_entry, NULL,
-        ((u8*)threadInfo->stack + sizeof(threadInfo->stack)),
-        ((OS_PRIORITY_APPMAX - 1) - sCSThreadIndex)
+        ((u8*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack
+        (OS_PRIORITY_APPMAX - 1) //! TODO: Why can't threads with OS_PRIORITY_APPMAX priority create threads?
     );
     osStartThread(&threadInfo->thread);
 }

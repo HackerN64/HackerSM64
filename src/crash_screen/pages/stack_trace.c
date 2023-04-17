@@ -28,8 +28,8 @@ const enum ControlTypes stackTracePageControls[] = {
 
 
 #ifdef INCLUDE_DEBUG_MAP
-void fill_function_stack_trace(OSThread* thread) {
-    __OSThreadContext* tc = &thread->context;
+void fill_function_stack_trace(void) {
+    __OSThreadContext* tc = &gCrashedThread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
     struct FunctionInStack* function = NULL;
     const char* fname;
@@ -66,14 +66,14 @@ void stack_trace_init(void) {
     gStackTraceIndex = 0;
 
 #ifdef INCLUDE_DEBUG_MAP
-    fill_function_stack_trace(gActiveCSThreadInfo->crashedThread);
+    fill_function_stack_trace();
 #endif
 }
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void stack_trace_draw(void) {
-    __OSThreadContext* tc = &gActiveCSThreadInfo->crashedThread->context;
+    __OSThreadContext* tc = &gCrashedThread->context;
     uintptr_t temp_sp = (tc->sp + 0x14); //! TODO: Explain why 0x14
 
     u32 line = 1;
