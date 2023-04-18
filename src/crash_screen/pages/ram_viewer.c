@@ -1,5 +1,4 @@
 #include <ultra64.h>
-#include <string.h>
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_screen.h"
@@ -15,6 +14,8 @@ void ram_viewer_init(void) {
     sRamViewShowAsAscii = FALSE;
 }
 
+const char gHex[0x10] = "0123456789ABCDEF";
+
 void ram_viewer_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
@@ -25,7 +26,7 @@ void ram_viewer_draw(void) {
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    crash_screen_print(TEXT_X(strlen(gCSPages[gCSPageID].name) + 1), TEXT_Y(line),
+    crash_screen_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION)
     );
@@ -46,17 +47,19 @@ void ram_viewer_draw(void) {
 
     crash_screen_draw_divider(DIVIDER_Y(3));
 
-    crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(line + RAM_VIEWER_NUM_ROWS - 1), COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT((line + RAM_VIEWER_NUM_ROWS) - 1), COLOR_RGBA32_LIGHT_GRAY);
 
     // "MEMORY"
-    crash_screen_print(TEXT_X(1), TEXT_Y(line), "%s", "MEMORY");
+    crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
 
     line++;
+
     charX = (TEXT_X(8) + 3);
     charY = TEXT_Y(line);
 
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
-        uintptr_t rowAddr = startAddr + (y * RAM_VIEWER_STEP);
+        uintptr_t rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
+
         // "[XXXXXXXX]"
         crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD), ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr);
 
@@ -71,21 +74,28 @@ void ram_viewer_draw(void) {
 
             RGBA32 color = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
 
-            if (currAddr == tc->pc) {
-                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_RED);
-            }
+            RGBA32 selectColor = COLOR_RGBA32_NONE;
+
             if (currAddr == gSelectedAddress) {
-                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_WHITE);
+                selectColor = COLOR_RGBA32_WHITE;
                 color = COLOR_RGBA32_BLACK;
+            } else if (currAddr == tc->pc) {
+                selectColor = COLOR_RGBA32_RED;
+            }
+
+            if (selectColor != COLOR_RGBA32_NONE) {
+                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
             }
 
             u8 byte = *(u8*)currAddr;
 
             if (sRamViewShowAsAscii) {
-                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, color);
+                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, byte, color);
             } else {
                 // "XX"
-                crash_screen_print(charX, charY, (STR_COLOR_PREFIX STR_HEX_BYTE), color, byte);
+                // Faster than doing crash_screen_print:
+                crash_screen_draw_glyph((charX + TEXT_WIDTH(0)), charY, gHex[byte >> 4], color);
+                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, gHex[byte & 0xF], color);
             }
 
             charX += (TEXT_WIDTH(2) + 1);
@@ -119,15 +129,13 @@ void ram_viewer_input(void) {
         // Scroll up.
         if ((gSelectedAddress - RAM_VIEWER_STEP) >= VALID_RAM_START) {
             gSelectedAddress -= RAM_VIEWER_STEP;
-            gCSUpdateFB = TRUE;
         }
     }
-        
+
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
         if ((gSelectedAddress + RAM_VIEWER_STEP) < VALID_RAM_END) {
             gSelectedAddress += RAM_VIEWER_STEP;
-            gCSUpdateFB = TRUE;
         }
     }
 
@@ -135,7 +143,6 @@ void ram_viewer_input(void) {
         // Don't wrap.
         if (((gSelectedAddress - 1) & BITMASK(4)) != 0xF) {
             gSelectedAddress--;
-            gCSUpdateFB = TRUE;
         }
     }
 
@@ -143,16 +150,17 @@ void ram_viewer_input(void) {
         // Don't wrap.
         if (((gSelectedAddress + 1) & BITMASK(4)) != 0x0) {
             gSelectedAddress++;
-            gCSUpdateFB = TRUE;
         }
     }
 
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed
+    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+
+    if (buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed
         open_address_select(gSelectedAddress);
     }
 
-    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+    if (buttonPressed & B_BUTTON) {
         // Toggle whether the memory is printed as hex values or as ASCII chars.
-        toggle_display_var(&sRamViewShowAsAscii);
+        sRamViewShowAsAscii ^= TRUE;
     }
 }
