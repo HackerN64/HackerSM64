@@ -89,20 +89,19 @@ void crash_screen_print_registers(__OSThreadContext* tc) {
 
 void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     u32 bit = BIT(17);
-    size_t charX = x;
 
     // "FPCSR:[XXXXXXXX]"
-    charX += crash_screen_print(x, y,
+    size_t fpcsrSize = crash_screen_print(x, y,
         STR_COLOR_PREFIX"%s:"STR_COLOR_PREFIX STR_HEX_WORD" ",
         COLOR_RGBA32_CRASH_REGISTER, "FPCSR",
         COLOR_RGBA32_WHITE, fpcsr
     );
-    x += TEXT_WIDTH(charX);
+    x += TEXT_WIDTH(fpcsrSize);
 
     for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
         if (fpcsr & bit) {
             // "([float exception description])"
-            crash_screen_print(TEXT_X(charX), y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
+            crash_screen_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
             return;
         }
 
