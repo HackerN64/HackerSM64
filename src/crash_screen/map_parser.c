@@ -110,24 +110,6 @@ const char* parse_map(uintptr_t* addr) {
     return NULL;
 }
 
-//! TODO: description
-const char* find_function_in_stack(uintptr_t* sp) {
-    const char* fname = NULL;
-
-    for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        uintptr_t val = *(uintptr_t*)*sp;
-        *sp += sizeof(uintptr_t);
-
-        fname = parse_map(&val);
-
-        if (fname != NULL) {
-            return fname;
-        }
-    }
-
-    return NULL;
-}
-
 // Check whether two addresses share the same function.
 _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
     if (oldPos == newPos) {
@@ -148,10 +130,6 @@ _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
 }
 #else
 const char* parse_map(UNUSED uintptr_t* addr) {
-    return NULL;
-}
-
-const char* find_function_in_stack(UNUSED uintptr_t* sp) {
     return NULL;
 }
 
