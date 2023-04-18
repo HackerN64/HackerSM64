@@ -108,11 +108,6 @@ void update_crash_screen_direction_input(void) {
     gCSDirectionFlags.held.right = right;
 }
 
-void toggle_display_var(_Bool* var) {
-    *var ^= TRUE;
-    gCSUpdateFB = TRUE;
-}
-
 void clamp_view_to_selection(const u32 numRows, const u32 step) {
     const size_t size = (numRows * step);
 
@@ -133,13 +128,13 @@ _Bool update_crash_screen_page(void) {
 
     gCSSwitchedPage = FALSE;
 
-    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+
+    if (buttonPressed & L_TRIG) {
         gCSPageID--; // Previous Page.
-        gCSUpdateFB = TRUE;
     }
-    if (gPlayer1Controller->buttonPressed & R_TRIG) {
+    if (buttonPressed & R_TRIG) {
         gCSPageID++; // Next page.
-        gCSUpdateFB = TRUE;
     }
 
     if (gCSPageID == prevPage) {
@@ -153,7 +148,6 @@ _Bool update_crash_screen_page(void) {
     if (gCSPageID >= NUM_PAGES) {
         gCSPageID = FIRST_PAGE;
     }
-    gCSUpdateFB = TRUE;
 
     // Reset certain values when the page is changed.
     gStackTraceIndex = 0;
@@ -173,22 +167,22 @@ void crash_screen_update_input(void) {
     extern void read_controller_inputs(s32 threadID);
     read_controller_inputs(gActiveCSThreadInfo->thread.id);
 
+    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+
     // Global controls.
-    if (gPlayer1Controller->buttonPressed & Z_TRIG) {
+    if (buttonPressed & Z_TRIG) {
         gCSDrawCrashScreen ^= TRUE;
         if (gCSDrawCrashScreen) {
-            gCSDrawSavedFBScreenshot ^= TRUE;
-        } else if (!gCSDrawSavedFBScreenshot) {
+            gCSDrawSavedScreenshot ^= TRUE;
+        } else if (!gCSDrawSavedScreenshot) {
             gCSDrawCrashScreen = TRUE;
-            gCSDrawSavedFBScreenshot = TRUE;
+            gCSDrawSavedScreenshot = TRUE;
             gCSDrawControls = FALSE;
         }
-        gCSUpdateFB = TRUE;
     }
 
-    if (gCSDrawCrashScreen && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
+    if (gCSDrawCrashScreen && (buttonPressed & START_BUTTON)) {
         gCSDrawControls ^= TRUE;
-        gCSUpdateFB = TRUE;
     }
 
     if (!gCSDrawCrashScreen) {
@@ -205,18 +199,21 @@ void crash_screen_update_input(void) {
         crash_screen_select_address();
         return;
     }
+
+    struct CSPage* page = &gCSPages[gCSPageID];
     
     if (update_crash_screen_page()) {
-        if (gCSPages[gCSPageID].initFunc != NULL && !gCSPages[gCSPageID].flags.initialized) {
-            gCSPages[gCSPageID].initFunc();
-            gCSPages[gCSPageID].flags.initialized = TRUE;
+        page = &gCSPages[gCSPageID];
+        if (page->initFunc != NULL && !page->flags.initialized) {
+            page->initFunc();
+            page->flags.initialized = TRUE;
         }
         return;
     }
 
     // Run the page-specific input function.
-    if (gCSPages[gCSPageID].inputFunc != NULL && !gCSPages[gCSPageID].flags.crashed) {
-        gCSPages[gCSPageID].inputFunc();
+    if (page->inputFunc != NULL && !page->flags.crashed) {
+        page->inputFunc();
     }
 }
 
@@ -226,10 +223,12 @@ void draw_controls_box(void) {
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         CS_DARKEN_SEVEN_EIGHTHS
     );
-    // "[page name] PAGE CONTROLS"
-    crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, gCSPages[gCSPageID].name, "PAGE CONTROLS");
+    struct CSPage* page = &gCSPages[gCSPageID];
 
-    const enum ControlTypes* list = gCSPages[gCSPageID].contList;
+    // "[page name] PAGE CONTROLS"
+    crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
+
+    const enum ControlTypes* list = page->contList;
     const struct ControlType* desc = NULL;
 
     u32 line = 3;

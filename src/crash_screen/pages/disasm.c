@@ -211,13 +211,11 @@ static void print_as_binary(const s32 charX, const s32 charY, const uintptr_t da
     }
 }
 
-void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
+void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uintptr_t pc) {
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
 
-    gCSWordWrap = FALSE;
-
-    for (u32 y = 0; y < DISASM_NUM_ROWS; y++) {
+    for (u32 y = 0; y < numLines; y++) {
         uintptr_t addr = (gScrollAddress + (y * DISASM_STEP));
         charY = TEXT_Y(line + y);
 
@@ -226,8 +224,7 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
             // Draw a red selection rectangle.
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC);
             // "<-- CRASH"
-            char crashStr[] = "<-- CRASH";
-            crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN(crashStr))), charY, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_AT, crashStr);
+            crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
         } else if (addr == selectedAddr) {
             // Draw a gray selection rectangle.
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_SELECT);
@@ -248,8 +245,6 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
         }
     }
 
-    gCSWordWrap = TRUE;
-
     osWritebackDCacheAll();
 }
 
@@ -260,13 +255,13 @@ void disasm_draw_asm_entries(u32 line, uintptr_t selectedAddr, uintptr_t pc) {
 void disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const char* fname = NULL;
-    uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1));
+    uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1)); // ALIGN4
 
 #ifdef INCLUDE_DEBUG_MAP
     uintptr_t funcAddr = alignedSelectedAddr;
     fname = parse_map(&funcAddr);
 
-    //! TODO: Do this outside of the draw function:
+    //! TODO: Why doesn't this work outside of the draw function?
     if (gCSSwitchedPage) {
         gFillBranchBuffer = TRUE;
     }
@@ -279,7 +274,6 @@ void disasm_draw(void) {
 
     if (sContinueFillBranchBuffer) {
         sContinueFillBranchBuffer = crash_screen_fill_branch_buffer(fname, funcAddr);
-        gCSUpdateFB = TRUE;
     }
 #endif
 
@@ -288,7 +282,7 @@ void disasm_draw(void) {
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    crash_screen_print(TEXT_X(strlen(gCSPages[gCSPageID].name) + 1), TEXT_Y(line),
+    crash_screen_print(TEXT_X(STRLEN("DISASM") + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, alignedSelectedAddr, gScrollAddress, (gScrollAddress + DISASM_SHOWN_SECTION)
     );
@@ -315,7 +309,7 @@ void disasm_draw(void) {
     disasm_draw_branch_arrows(line);
 #endif
 
-    disasm_draw_asm_entries(line, alignedSelectedAddr, tc->pc);
+    disasm_draw_asm_entries(line, DISASM_NUM_ROWS, alignedSelectedAddr, tc->pc);
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
@@ -352,7 +346,6 @@ void disasm_input(void) {
         // Scroll up.
         if ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)  {
             gSelectedAddress -= DISASM_STEP;
-            gCSUpdateFB = TRUE;
         }
     }
 
@@ -360,17 +353,18 @@ void disasm_input(void) {
         // Scroll down.
         if ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END) {
             gSelectedAddress += DISASM_STEP;
-            gCSUpdateFB = TRUE;
         }
     }
 
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed
+    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+
+    if (buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed
         open_address_select(get_branch_target_from_addr(gSelectedAddress));
     }
 
-    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-        toggle_display_var(&sDisasmShowDestFunctionNames);
-        toggle_display_var(&sDisasmShowDataAsBinary);
+    if (buttonPressed & B_BUTTON) {
+        sDisasmShowDestFunctionNames ^= TRUE;
+        sDisasmShowDataAsBinary ^= TRUE;
     }
 
 #ifdef INCLUDE_DEBUG_MAP

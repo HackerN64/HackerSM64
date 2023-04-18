@@ -41,7 +41,7 @@ struct CSPage gCSPages[NUM_PAGES] = {
 
 enum CrashScreenPages gCSPageID = FIRST_PAGE;
 
-ALIGNED8 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
+ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
 static s32 sCSThreadIndex = 0;
 static _Bool sFirstCrash = TRUE;
 
@@ -61,12 +61,11 @@ void crash_screen_reinitialize(void) {
 
     gCSPageID = FIRST_PAGE;
 
-    gCSSwitchedPage          = FALSE;
-    gCSDrawControls          = FALSE;
-    gAddressSelectMenuOpen   = FALSE;
-    gCSDrawCrashScreen       = TRUE;
-    gCSDrawSavedFBScreenshot = TRUE;
-    gCSUpdateFB              = TRUE;
+    gCSSwitchedPage        = FALSE;
+    gCSDrawControls        = FALSE;
+    gAddressSelectMenuOpen = FALSE;
+    gCSDrawCrashScreen     = TRUE;
+    gCSDrawSavedScreenshot = TRUE;
 
     gCrashAddress    = 0x00000000;
     gScrollAddress   = 0x00000000;

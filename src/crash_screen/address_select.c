@@ -20,7 +20,7 @@ void draw_address_select(void) {
     );
 
     // "GO TO:"
-    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(3)), JUMP_MENU_Y1, "%s:", "GO TO");
+    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(3)), JUMP_MENU_Y1, "GO TO:");
 
     // Up arrow:
     crash_screen_draw_vertical_triangle(
@@ -57,11 +57,9 @@ void draw_address_select(void) {
 void crash_screen_select_address(void) {
     if (gCSDirectionFlags.pressed.left) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex - 1) & 0x7); // % 8
-        gCSUpdateFB = TRUE;
     }
     if (gCSDirectionFlags.pressed.right) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex + 1) & 0x7); // % 8
-        gCSUpdateFB = TRUE;
     }
 
     uintptr_t nextSelectedAddress = sAddressSelectTarget;
@@ -99,11 +97,12 @@ void crash_screen_select_address(void) {
 
         if (IS_IN_RDRAM(nextSelectedAddress)) {
             sAddressSelectTarget = nextSelectedAddress;
-            gCSUpdateFB = TRUE;
         }
     }
 
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) { //! TODO: Not if address select was just opened
+    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+
+    if (buttonPressed & A_BUTTON) { //! TODO: Not if address select was just opened
         // Jump to the address and close the popup.
         gAddressSelectMenuOpen = FALSE;
 #ifdef INCLUDE_DEBUG_MAP
@@ -115,13 +114,11 @@ void crash_screen_select_address(void) {
         }
 #endif
         gSelectedAddress = sAddressSelectTarget;
-        gCSUpdateFB = TRUE;
     }
 
-    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+    if (buttonPressed & B_BUTTON) {
         // Close the popup without jumping.
         gAddressSelectMenuOpen = FALSE;
-        gCSUpdateFB = TRUE;
     }
 }
 
@@ -129,5 +126,4 @@ void crash_screen_select_address(void) {
 void open_address_select(uintptr_t dest) {
     gAddressSelectMenuOpen = TRUE;
     sAddressSelectTarget = dest;
-    gCSUpdateFB = TRUE;
 }

@@ -15,7 +15,7 @@ struct MapEntry {
 typedef struct {
     /*0x00*/ const uintptr_t start;
     /*0x04*/ const uintptr_t end;
-} TextRegion; /*0x08*/
+} MemoryRegion; /*0x08*/
 
 #define EXTERN_TEXT_SYMBOL(name, side) \
 extern const u8 _##name##SegmentText##side[];
@@ -72,8 +72,11 @@ EXTERN_GROUP_TEXT(common1)
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
+#define MEMORY_REGION(start, end) \
+    { (const uintptr_t)(start), (const uintptr_t)(end) },
+
 #define TEXT_REGION(name) \
-    { (const uintptr_t)_##name##SegmentTextStart, (const uintptr_t)_##name##SegmentTextEnd },
+    MEMORY_REGION(_##name##SegmentTextStart, _##name##SegmentTextEnd)
 
 #define TEXT_REGION_SEGMENT(name) \
     TEXT_REGION(name)

@@ -53,7 +53,6 @@ extern const struct ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultPageControls[];
 
 
-void toggle_display_var(_Bool* var);
 void clamp_view_to_selection(const u32 numRows, const u32 step);
 void crash_screen_update_input(void);
 void draw_controls_box(void);

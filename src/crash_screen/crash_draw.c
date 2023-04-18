@@ -11,9 +11,8 @@
 #include "game/game_init.h"
 
 
-_Bool gCSDrawCrashScreen       = TRUE;
-_Bool gCSDrawSavedFBScreenshot = TRUE;
-_Bool gCSUpdateFB              = TRUE; // Sets the framebuffer to be updated.
+_Bool gCSDrawCrashScreen     = TRUE;
+_Bool gCSDrawSavedScreenshot = TRUE;
 
 
 // Crash screen font. Each row of the image fits in one u32 pointer.
@@ -85,7 +84,7 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
     }
 }
 
-// Draws a triangle pointing upwards or downwards.
+// Draws a triangle pointing upwards or downwards. Flip: FALSE = point up, TRUE = point down.
 void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
@@ -181,7 +180,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32
     }
     // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    const CSFontRow startBit = ((CSFontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
+    CSFontRow startBit = ((CSFontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
     CSFontRow bit;
     CSFontRow rowMask;
 
@@ -260,7 +259,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
 }
 
 // Draw the header.
-void print_crash_screen_heaader(void) {
+void print_crash_screen_header(void) {
     u32 line = 0;
     // "HackerSM64 vX.X.X"
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
@@ -269,34 +268,33 @@ void print_crash_screen_heaader(void) {
         "HackerSM64",
         HACKERSM64_VERSION
     );
+
+    u16 buttonDown = gPlayer1Controller->buttonDown;
+
     // "START:controls"
-    _Bool start = (gPlayer1Controller->buttonDown & START_BUTTON);
     crash_screen_print(TEXT_X(19), TEXT_Y(line),
         STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX":%s",
-        (start ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control,
+        ((buttonDown & START_BUTTON) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control,
         COLOR_RGBA32_CRASH_HEADER, "controls"
     );
 
-    _Bool pageLeft  = (gPlayer1Controller->buttonDown & L_TRIG);
-    _Bool pageRight = (gPlayer1Controller->buttonDown & R_TRIG);
-    if (start || pageLeft || pageRight) {
-        gCSUpdateFB = TRUE;
-    }
     // "<Page:XX>"
     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
         STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
-        (pageLeft  ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '<',
+        ((buttonDown & L_TRIG) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '<',
         COLOR_RGBA32_CRASH_HEADER,
         "Page", (gCSPageID + 1),
-        (pageRight ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '>'
+        ((buttonDown & R_TRIG) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '>'
     );
 
     line++;
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    if (gCSPages[gCSPageID].flags.printName) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, gCSPages[gCSPageID].name);
+    struct CSPage* page = &gCSPages[gCSPageID];
+
+    if (page->flags.printName) {
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
         line++;
 
@@ -307,16 +305,10 @@ void print_crash_screen_heaader(void) {
 }
 
 void crash_screen_draw_main(void) {
-    if (gCSUpdateFB) {
-        gCSUpdateFB = FALSE;
-    } else {
-        return;
-    }
-
-    crash_screen_reset_framebuffer(gCSDrawSavedFBScreenshot);
+    crash_screen_reset_framebuffer(gCSDrawSavedScreenshot);
 
     if (gCSDrawCrashScreen) {
-        if (gCSDrawSavedFBScreenshot) {
+        if (gCSDrawSavedScreenshot) {
             // Draw the transparent background.
             crash_screen_draw_dark_rect(
                 CRASH_SCREEN_X1, CRASH_SCREEN_Y1,
@@ -325,19 +317,21 @@ void crash_screen_draw_main(void) {
             );
         }
 
-        print_crash_screen_heaader();
+        print_crash_screen_header();
+
+        struct CSPage* page = &gCSPages[gCSPageID];
 
         // Run the page-specific draw function.
-        if (gCSPages[gCSPageID].drawFunc == NULL) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s", 
+        if (page->drawFunc == NULL) {
+            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_PAGE_NAME, "THIS PAGE DOESN'T EXIST"
             );
-        } else if (gCSPages[gCSPageID].flags.crashed) {
+        } else if (page->flags.crashed) {
             crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED"
             );
         } else {
-            gCSPages[gCSPageID].drawFunc();
+            page->drawFunc();
         }
 
         if (gAddressSelectMenuOpen) {

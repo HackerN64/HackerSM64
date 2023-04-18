@@ -395,18 +395,18 @@ const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
 
 // Registers
 static const char sCPURegisterNames[][3] = {
-    "R0",                                           // $zero.
-    "AT",                                           // Assembler temporary value.
-    "V0", "V1",                                     // Subroutine return value.
-    "A0", "A1", "A2", "A3",                         // Subroutine arguments.
-    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", // Temporary values.
-    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", // Saved values.
+    "R0",                                           // $zero. Hardware enforced.
+    "AT",                                           // Assembler temporary value. Don't use unless you know it's safe.
+    "V0", "V1",                                     // Subroutine return value. V1 is used for 64 bit returns.
+    "A0", "A1", "A2", "A3",                         // Subroutine arguments. If more are needed, they are stored to sp+0x10 in the calling stack space.
+    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", // Temporary values. Not saved between functions.
+    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", // Saved values. Saved to stack before modifying and then restored before returning.
     "T8", "T9",                                     // Temporary values.
-    "K0", "K1",                                     // Reserved by kernel.
-    "GP",                                           // Global pointer.
-    "SP",                                           // Stack pointer.
-    "FP",                                           // Saved value or frame pointer.
-    "RA",                                           // Return address.
+    "K0", "K1",                                     // Reserved by kernel. Do not modify when using interrupts.
+    "GP",                                           // Global pointer. This can pointto 64kb of small misc variables.
+    "SP",                                           // Stack pointer. Subtract to allocate stack space and add back to deallocate.
+    "FP",                                           // Saved value 8 ("S8") or frame pointer ("FP"), depending on compiler.
+    "RA",                                           // Return address. Jump to this to return from a function. Hardware enforced.
 }; //! TODO: Combine this with sRegNames
 
 static const char sCOP0RegisterNames[][9] = {

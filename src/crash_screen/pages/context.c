@@ -92,8 +92,8 @@ void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
 
     // "FPCSR:[XXXXXXXX]"
     size_t fpcsrSize = crash_screen_print(x, y,
-        STR_COLOR_PREFIX"%s:"STR_COLOR_PREFIX STR_HEX_WORD" ",
-        COLOR_RGBA32_CRASH_REGISTER, "FPCSR",
+        STR_COLOR_PREFIX"FPCSR:"STR_COLOR_PREFIX STR_HEX_WORD" ",
+        COLOR_RGBA32_CRASH_REGISTER,
         COLOR_RGBA32_WHITE, fpcsr
     );
     x += TEXT_WIDTH(fpcsrSize);
@@ -170,8 +170,8 @@ void crash_context_draw(void) {
 
     // "THREAD:[thread id] ([exception cause description])"
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"%s:%d "STR_COLOR_PREFIX"(%s)",
-        COLOR_RGBA32_CRASH_THREAD, "THREAD", gCrashedThread->id,
+        STR_COLOR_PREFIX"THREAD:%d "STR_COLOR_PREFIX"(%s)",
+        COLOR_RGBA32_CRASH_THREAD, gCrashedThread->id,
         COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]
     );
 
@@ -184,12 +184,12 @@ void crash_context_draw(void) {
     const char* fname = parse_map(&pc);
     // "CRASH AT:"
     size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"%s: ",
-        COLOR_RGBA32_CRASH_AT, "CRASH AT"
+        STR_COLOR_PREFIX"CRASH AT: ",
+        COLOR_RGBA32_CRASH_AT
     );
     if (fname == NULL) {
         // "UNKNOWN"
-        crash_screen_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+        crash_screen_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
     } else {
         // "[function name]"
         crash_screen_print_scroll(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 10), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);

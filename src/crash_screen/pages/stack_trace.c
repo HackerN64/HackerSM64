@@ -136,17 +136,17 @@ void stack_trace_draw(void) {
     u32 line = 1;
 
     // "FROM: [XXXXXXXX]"
-    crash_screen_print(TEXT_X(12), TEXT_Y(line), "%s "STR_HEX_WORD, "FROM", temp_sp);
+    crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, temp_sp);
 
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_AT, "CURRFUNC");
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
     uintptr_t pc = tc->pc;
     const char* fname = parse_map(&pc);
     if (fname == NULL) {
         // "UNKNOWN"
-        crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+        crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
     } else {
         // "[function name]"
         crash_screen_print_scroll(TEXT_X(9), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
@@ -180,7 +180,7 @@ void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
         // Toggle whether to display function names.
-        toggle_display_var(&sStackTraceShowFunctionNames);
+        sStackTraceShowFunctionNames ^= TRUE;
     }
 
     if (sNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
@@ -188,14 +188,12 @@ void stack_trace_input(void) {
             // Scroll up.
             if (gStackTraceIndex > 0) {
                 gStackTraceIndex--;
-                gCSUpdateFB = TRUE;
             }
         }
         if (gCSDirectionFlags.held.down) {
             // Scroll down.
             if (gStackTraceIndex < (sNumFoundFunctions - STACK_TRACE_NUM_ROWS)) {
                 gStackTraceIndex++;
-                gCSUpdateFB = TRUE;
             }
         }
     }

@@ -5,7 +5,7 @@
 
 
 //! TODO: replace this with nm -S mappings
-static const TextRegion sTextRegions[] = {
+static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
 TEXT_REGION_SEGMENT(engine)

@@ -12,7 +12,7 @@
 PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
-_Bool gCSWordWrap = TRUE;
+_Bool gCSWordWrap = FALSE;
 
 
 static _Bool glyph_to_hex(char* dest, unsigned char glyph) {
@@ -171,7 +171,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 }
                 break;
             case CHAR_SPACE:
-                if ((x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount))) >= CRASH_SCREEN_TEXT_X2) {
+                if (gCSWordWrap && (x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount))) >= CRASH_SCREEN_TEXT_X2) {
                     newline = TRUE;
                 }
                 break;
@@ -215,8 +215,6 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     }
 
     memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));
-
-    gCSUpdateFB = TRUE;
 }
 
 static char* write_to_buf(char* buffer, const char* data, size_t size) {

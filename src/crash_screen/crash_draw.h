@@ -9,8 +9,8 @@
 // Crash screen font image properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
-#define CRASH_SCREEN_FONT_CHARS_PER_ROW  6
-#define CRASH_SCREEN_FONT_NUM_ROWS      43
+#define CRASH_SCREEN_FONT_CHARS_PER_ROW (32 / CRASH_SCREEN_FONT_CHAR_WIDTH) // 32 bits per row.
+#define CRASH_SCREEN_FONT_NUM_ROWS      ((255 / CRASH_SCREEN_FONT_CHARS_PER_ROW) + 1) // Round up.
 
 // Spacing between chars.
 #define CRASH_SCREEN_CHAR_SPACING_X      1
@@ -79,8 +79,7 @@ enum CSDrawDarkRectDarken {
 
 
 extern _Bool gCSDrawCrashScreen;
-extern _Bool gCSDrawSavedFBScreenshot;
-extern _Bool gCSUpdateFB;
+extern _Bool gCSDrawSavedScreenshot;
 
 
 void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken);
