@@ -20,8 +20,6 @@ struct FunctionInStack {
 }; /*0x10*/
 
 
-extern u32 gStackTraceIndex;
-
 extern const enum ControlTypes stackTracePageControls[];
 
 

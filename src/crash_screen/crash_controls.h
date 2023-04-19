@@ -35,7 +35,6 @@ enum ControlTypes {
     CONT_DESC_CURSOR_HORIZONTAL,
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_TOGGLE_ASCII,
-    CONT_DESC_TOGGLE_UNKNOWNS,
     CONT_DESC_TOGGLE_FUNCTIONS,
     NUM_CONT_DESC,
 };
@@ -53,6 +52,6 @@ extern const struct ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultPageControls[];
 
 
-void clamp_view_to_selection(const u32 numRows, const u32 step);
+u32 clamp_view_to_selection(u32 scrollAddr, u32 selectAddr, const u32 numRows, const u32 step);
 void crash_screen_update_input(void);
 void draw_controls_box(void);

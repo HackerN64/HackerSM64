@@ -7,21 +7,35 @@
 #include "game/game_input.h"
 
 
+static u32 sRamViewViewportIndex = 0x00000000;
+
 static _Bool sRamViewShowAsAscii = FALSE;
 
 
 void ram_viewer_init(void) {
+    sRamViewViewportIndex = gSelectedAddress;
     sRamViewShowAsAscii = FALSE;
 }
 
-const char gHex[0x10] = "0123456789ABCDEF";
+static const char gHex[0x10] = "0123456789ABCDEF";
+
+void print_byte(u32 x, u32 y, u8 byte, RGBA32 color) {
+    // "XX"
+    if (sRamViewShowAsAscii) {
+        crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
+    } else {
+        // Faster than doing crash_screen_print:
+        crash_screen_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> 4], color);
+        crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & 0xF], color);
+    }
+}
 
 void ram_viewer_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
-    clamp_view_to_selection(RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
+    sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 
-    uintptr_t startAddr = gScrollAddress;
+    uintptr_t startAddr = sRamViewViewportIndex;
     u32 charX, charY;
     u32 line = 1;
 
@@ -32,6 +46,7 @@ void ram_viewer_draw(void) {
     );
 
     line++;
+
     charX = (TEXT_X(8) + 3);
 
     for (u32 i = 0; i < 16; i++) {
@@ -61,7 +76,9 @@ void ram_viewer_draw(void) {
         uintptr_t rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
 
         // "[XXXXXXXX]"
-        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD), ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
+            ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr
+        );
 
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
@@ -72,13 +89,12 @@ void ram_viewer_draw(void) {
                 charX += 2;
             }
 
-            RGBA32 color = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
-
+            RGBA32 textColor = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
             RGBA32 selectColor = COLOR_RGBA32_NONE;
 
             if (currAddr == gSelectedAddress) {
                 selectColor = COLOR_RGBA32_WHITE;
-                color = COLOR_RGBA32_BLACK;
+                textColor = COLOR_RGBA32_BLACK;
             } else if (currAddr == tc->pc) {
                 selectColor = COLOR_RGBA32_RED;
             }
@@ -87,16 +103,7 @@ void ram_viewer_draw(void) {
                 crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
             }
 
-            u8 byte = *(u8*)currAddr;
-
-            if (sRamViewShowAsAscii) {
-                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, byte, color);
-            } else {
-                // "XX"
-                // Faster than doing crash_screen_print:
-                crash_screen_draw_glyph((charX + TEXT_WIDTH(0)), charY, gHex[byte >> 4], color);
-                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, gHex[byte & 0xF], color);
-            }
+            print_byte(charX, charY, *(vu8*)currAddr, textColor);
 
             charX += (TEXT_WIDTH(2) + 1);
         }
@@ -107,7 +114,7 @@ void ram_viewer_draw(void) {
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE, (gScrollAddress - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE, (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     osWritebackDCacheAll();
 }

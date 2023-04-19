@@ -105,14 +105,20 @@ void crash_screen_select_address(void) {
     if (buttonPressed & A_BUTTON) { //! TODO: Not if address select was just opened
         // Jump to the address and close the popup.
         gAddressSelectMenuOpen = FALSE;
+        switch (gCSPageID) {
+            case PAGE_STACK_TRACE:
+                gCSPageID = PAGE_DISASM;
+                break;
 #ifdef INCLUDE_DEBUG_MAP
-        if (
-            gCSPageID == PAGE_DISASM &&
-            !is_in_same_function(gSelectedAddress, sAddressSelectTarget)
-        ) {
-            gFillBranchBuffer = TRUE;
-        }
+            case PAGE_DISASM:
+                if (!is_in_same_function(gSelectedAddress, sAddressSelectTarget)) {
+                    gFillBranchBuffer = TRUE;
+                }
+                break;
 #endif
+            default:
+                break;
+        }
         gSelectedAddress = sAddressSelectTarget;
     }
 

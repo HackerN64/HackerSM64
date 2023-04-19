@@ -7,6 +7,8 @@
 #include "game/game_input.h"
 
 
+static u32 sDisasmViewportIndex = 0x00000000;
+
 static _Bool sDisasmShowDestFunctionNames = TRUE;
 static _Bool sDisasmShowDataAsBinary = FALSE;
 
@@ -113,6 +115,8 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
 #endif
 
 void disasm_init(void) {
+    sDisasmViewportIndex = gSelectedAddress;
+
     sDisasmShowDestFunctionNames = TRUE;
     sDisasmShowDataAsBinary      = FALSE;
     gFillBranchBuffer            = FALSE;
@@ -161,7 +165,7 @@ void disasm_draw_branch_arrows(s32 printLine) {
     struct BranchArrow* currArrow = &sBranchArrows[0];
 
     for (u32 i = 0; i < sNumBranchArrows; i++) {
-        s32 startLine = (((s32)currArrow->startAddr - (s32)gScrollAddress) / DISASM_STEP);
+        s32 startLine = (((s32)currArrow->startAddr - (s32)sDisasmViewportIndex) / DISASM_STEP);
         s32 endLine = (startLine + currArrow->branchOffset + 1);
 
         draw_branch_arrow(startLine, endLine, currArrow->xPos, sBranchColors[currArrow->colorIndex], printLine);
@@ -177,7 +181,7 @@ static void print_as_insn(const s32 charX, const s32 charY, const uintptr_t data
 #ifndef INCLUDE_DEBUG_MAP
     s16 branchOffset = check_for_branch_offset(insn);
     if (branchOffset != 0) {
-        s32 startLine = (((s32)addr - (s32)gScrollAddress) / DISASM_STEP);
+        s32 startLine = (((s32)addr - (s32)sDisasmViewportIndex) / DISASM_STEP);
         s32 endLine = (startLine + branchOffset + 1);
         draw_branch_arrow(startLine, endLine, DISASM_BRANCH_ARROW_OFFSET, COLOR_RGBA32_CRASH_FUNCTION_NAME_2, line);
     }
@@ -216,7 +220,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uin
     u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < numLines; y++) {
-        uintptr_t addr = (gScrollAddress + (y * DISASM_STEP));
+        uintptr_t addr = (sDisasmViewportIndex + (y * DISASM_STEP));
         charY = TEXT_Y(line + y);
 
         // Draw crash and selection rectangles:
@@ -256,35 +260,19 @@ void disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const char* fname = NULL;
     uintptr_t alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
-
 #ifdef INCLUDE_DEBUG_MAP
     uintptr_t funcAddr = alignedSelectedAddr;
     fname = parse_map(&funcAddr);
-
-    //! TODO: Why doesn't this work outside of the draw function?
-    if (gCSSwitchedPage) {
-        gFillBranchBuffer = TRUE;
-    }
-
-    if (gFillBranchBuffer) {
-        gFillBranchBuffer = FALSE;
-        reset_branch_buffer(funcAddr);
-        sContinueFillBranchBuffer = TRUE;
-    }
-
-    if (sContinueFillBranchBuffer) {
-        sContinueFillBranchBuffer = crash_screen_fill_branch_buffer(fname, funcAddr);
-    }
 #endif
 
-    clamp_view_to_selection(DISASM_NUM_ROWS, DISASM_STEP);
+    sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, DISASM_NUM_ROWS, DISASM_STEP);
 
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
     crash_screen_print(TEXT_X(STRLEN("DISASM") + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
-        COLOR_RGBA32_WHITE, alignedSelectedAddr, gScrollAddress, (gScrollAddress + DISASM_SHOWN_SECTION)
+        COLOR_RGBA32_WHITE, alignedSelectedAddr, sDisasmViewportIndex, (sDisasmViewportIndex + DISASM_SHOWN_SECTION)
     );
 
     line++;
@@ -318,7 +306,7 @@ void disasm_draw(void) {
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (gScrollAddress - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (sDisasmViewportIndex - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     // Scroll bar crash position marker
     crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
@@ -368,8 +356,21 @@ void disasm_input(void) {
     }
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (!is_in_same_function(oldPos, gSelectedAddress)) {
+    if (gCSSwitchedPage || !is_in_same_function(oldPos, gSelectedAddress)) {
         gFillBranchBuffer = TRUE;
+    }
+
+    uintptr_t funcAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+    const char* fname = parse_map(&funcAddr);
+
+    if (gFillBranchBuffer) {
+        gFillBranchBuffer = FALSE;
+        reset_branch_buffer(funcAddr);
+        sContinueFillBranchBuffer = TRUE;
+    }
+
+    if (sContinueFillBranchBuffer) {
+        sContinueFillBranchBuffer = crash_screen_fill_branch_buffer(fname, funcAddr);
     }
 #endif
 }

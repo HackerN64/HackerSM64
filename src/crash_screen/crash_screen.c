@@ -49,8 +49,7 @@ struct CSThreadInfo* gActiveCSThreadInfo = NULL;
 OSThread* gCrashedThread = NULL;
 
 uintptr_t gCrashAddress    = 0x00000000; // Crashed thread PC.
-uintptr_t gScrollAddress   = 0x00000000; // Top of the viewport.
-uintptr_t gSelectedAddress = 0x00000000; // Selected address.
+uintptr_t gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
 void crash_screen_reinitialize(void) {
@@ -68,7 +67,6 @@ void crash_screen_reinitialize(void) {
     gCSDrawSavedScreenshot = TRUE;
 
     gCrashAddress    = 0x00000000;
-    gScrollAddress   = 0x00000000;
     gSelectedAddress = 0x00000000;
 
     gCSDirectionFlags.raw = 0;

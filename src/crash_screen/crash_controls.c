@@ -38,7 +38,6 @@ const struct ControlType gCSControlDescriptions[] = {
     [CONT_DESC_CURSOR_HORIZONTAL] = { .control = STR_LEFT"/"STR_RIGHT,                      .description = "move cursor"                          },
     [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = STR_A,                                     .description = "jump to specific address"             },
     [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii"         },
-    [CONT_DESC_TOGGLE_UNKNOWNS  ] = { .control = STR_A,                                     .description = "toggle unknowns in list"              },
     [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names"                },
 };
 
@@ -108,12 +107,20 @@ void update_crash_screen_direction_input(void) {
     gCSDirectionFlags.held.right = right;
 }
 
-void clamp_view_to_selection(const u32 numRows, const u32 step) {
-    const size_t size = (numRows * step);
+u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step) {
+    const size_t size = ((numRows - 1) * step);
 
-    gScrollAddress = CLAMP(gScrollAddress, (gSelectedAddress - (size - 1)), (gSelectedAddress - (step - 1)));
-    gScrollAddress = CLAMP(gScrollAddress, VALID_RAM_START, (VALID_RAM_END - size));
-    gScrollAddress = ALIGN(gScrollAddress, step);
+    // Selection is past the end of the viewport.
+    if ((scrollIndex + size) < selectIndex) {
+        scrollIndex = (selectIndex - size);
+    }
+
+    // Selection is before the beginning of the viewport.
+    if (scrollIndex > selectIndex) {
+        scrollIndex = selectIndex;
+    }
+
+    return ALIGNFLOOR(scrollIndex, step);
 }
 
 const enum ControlTypes defaultPageControls[] = {
@@ -125,8 +132,6 @@ const enum ControlTypes defaultPageControls[] = {
 
 _Bool update_crash_screen_page(void) {
     enum CrashScreenPages prevPage = gCSPageID;
-
-    gCSSwitchedPage = FALSE;
 
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
@@ -150,7 +155,6 @@ _Bool update_crash_screen_page(void) {
     }
 
     // Reset certain values when the page is changed.
-    gStackTraceIndex = 0;
     gCSDrawControls = FALSE;
     gCSSwitchedPage = TRUE;
 
@@ -201,7 +205,7 @@ void crash_screen_update_input(void) {
     }
 
     struct CSPage* page = &gCSPages[gCSPageID];
-    
+
     if (update_crash_screen_page()) {
         page = &gCSPages[gCSPageID];
         if (page->initFunc != NULL && !page->flags.initialized) {
@@ -215,6 +219,8 @@ void crash_screen_update_input(void) {
     if (page->inputFunc != NULL && !page->flags.crashed) {
         page->inputFunc();
     }
+
+    gCSSwitchedPage = FALSE;
 }
 
 void draw_controls_box(void) {

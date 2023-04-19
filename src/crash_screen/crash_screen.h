@@ -41,7 +41,6 @@ extern struct CSThreadInfo* gActiveCSThreadInfo;
 extern OSThread* gCrashedThread;
 
 extern uintptr_t gCrashAddress;
-extern uintptr_t gScrollAddress;
 extern uintptr_t gSelectedAddress;
 
 
