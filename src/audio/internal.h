@@ -742,8 +742,8 @@ struct BetterReverbSettings {
     u8 reverbIndex;
     u32 *delaysL;
     u32 *delaysR;
-    s32 *reverbMultsL;
-    s32 *reverbMultsR;
+    u8 *reverbMultsL;
+    u8 *reverbMultsR;
 };
 #endif
 

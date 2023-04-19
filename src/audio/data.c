@@ -65,8 +65,7 @@ u32 delaysArr[][NUM_ALLPASS] = {
 };
 
 // Each entry represents an array of multipliers applied to the final output of each group of 3 filters.
-// These values are u8s in spirit, but are set as s32 values to slightly increase performance during calculations.
-s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
+u8 reverbMultsArr[][NUM_ALLPASS / 3] = {
     /* 0 */ {0x00, 0x00, 0x00, 0x00},
     /* 1 */ {0xD7, 0x6F, 0x36, 0x22},
     /* 2 */ {0xCF, 0x73, 0x38, 0x1F},
@@ -125,7 +124,7 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         .reverbMultsL = reverbMultsArr[1], // Ignored with lightweight settings
         .reverbMultsR = reverbMultsArr[2], // Ignored with lightweight settings
     },
-    { /* Preset 2 - Sample Emulator Configuration (RCVI Hack Only) */
+    { /* Preset 2 - Sample Emulator Configuration (RCVI Hack or Emulator CPU Overclocking Required!) */
         .useLightweightSettings = FALSE,
         .downsampleRate = 1,
         .isMono = FALSE,

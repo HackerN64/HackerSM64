@@ -1058,8 +1058,8 @@ void init_reverb_us(s32 presetId) {
     betterReverbWindowsSize = betterReverbPreset->windowSize;
     betterReverbRevIndex = betterReverbPreset->reverbIndex;
     betterReverbGainIndex = betterReverbPreset->gainIndex;
-    gReverbMultsL = betterReverbPreset->reverbMultsL;
-    gReverbMultsR = betterReverbPreset->reverbMultsR;
+    gReverbMults[SYNTH_CHANNEL_LEFT] = betterReverbPreset->reverbMultsL;
+    gReverbMults[SYNTH_CHANNEL_RIGHT] = betterReverbPreset->reverbMultsR;
 
     if (betterReverbDownsampleRate <= 0) {
         toggleBetterReverb = FALSE;
