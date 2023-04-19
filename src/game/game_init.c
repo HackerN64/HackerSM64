@@ -45,7 +45,7 @@ struct GfxPool *gGfxPool;
 OSContStatus gControllerStatuses[4];
 OSContPadEx gControllerPads[4];
 u8 gControllerBits;
-s8 gGamecubeControllerPort = -1; // HackerSM64: This is set to -1 if there's no GC controller, 0 if there's one in the first port and 1 if there's one in the second port.
+u8 gGamecubeControllerPortMask; // HackerSM64: Controller bitmask for which controllers are detected as GC controllers
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -493,7 +493,7 @@ UNUSED static void record_demo(void) {
  */
 void run_demo_inputs(void) {
     // Eliminate the unused bits.
-    gControllers[0].controllerData->button &= VALID_BUTTONS;
+    gPlayer1Controller->controllerData->button &= VALID_BUTTONS;
 
     // Check if a demo inputs list exists and if so,
     // run the active demo input list.
@@ -503,26 +503,26 @@ void run_demo_inputs(void) {
         // may have planned for there to be a demo where 2 players moved
         // around instead of just one, so clearing player 2's influence from
         // the demo had to have been necessary to perform this. Co-op mode, perhaps?
-        if (gControllers[1].controllerData != NULL) {
-            gControllers[1].controllerData->stick_x = 0;
-            gControllers[1].controllerData->stick_y = 0;
-            gControllers[1].controllerData->button = 0;
+        if (gPlayer2Controller->controllerData != NULL) {
+            gPlayer2Controller->controllerData->stick_x = 0;
+            gPlayer2Controller->controllerData->stick_y = 0;
+            gPlayer2Controller->controllerData->button = 0;
         }
 
         // The timer variable being 0 at the current input means the demo is over.
         // Set the button to the END_DEMO mask to end the demo.
         if (gCurrDemoInput->timer == 0) {
-            gControllers[0].controllerData->stick_x = 0;
-            gControllers[0].controllerData->stick_y = 0;
-            gControllers[0].controllerData->button = END_DEMO;
+            gPlayer1Controller->controllerData->stick_x = 0;
+            gPlayer1Controller->controllerData->stick_y = 0;
+            gPlayer1Controller->controllerData->button = END_DEMO;
         } else {
             // Backup the start button if it is pressed, since we don't want the
             // demo input to override the mask where start may have been pressed.
-            u16 startPushed = gControllers[0].controllerData->button & START_BUTTON;
+            u16 startPushed = gPlayer1Controller->controllerData->button & START_BUTTON;
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gControllers[0].controllerData->stick_x = gCurrDemoInput->rawStickX;
-            gControllers[0].controllerData->stick_y = gCurrDemoInput->rawStickY;
+            gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
+            gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
 
             // To assign the demo input, the button information is stored in
             // an 8-bit mask rather than a 16-bit mask. this is because only
@@ -531,11 +531,11 @@ void run_demo_inputs(void) {
             // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
             // match the correct input mask. We then add this to the masked
             // lower 4 bits to get the correct button mask.
-            gControllers[0].controllerData->button =
+            gPlayer1Controller->controllerData->button =
                 ((gCurrDemoInput->buttonMask & 0xF0) << 8) + ((gCurrDemoInput->buttonMask & 0xF));
 
             // If start was pushed, put it into the demo sequence being input to end the demo.
-            gControllers[0].controllerData->button |= startPushed;
+            gPlayer1Controller->controllerData->button |= startPushed;
 
             // Run the current demo input's timer down. if it hits 0, advance the demo input list.
             if (--gCurrDemoInput->timer == 0) {
@@ -610,12 +610,13 @@ void read_controller_inputs(s32 threadID) {
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && i == gGamecubeControllerPort) {
+            if (gIsConsole && gGamecubeControllerPortMask & (1 << i) && gCurrDemoInput == NULL) {
                 u32 oldButton = controller->controllerData->button;
                 u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
                 if (oldButton & Z_TRIG) {
                     newButton |= L_TRIG;
                 }
+                // NOTE: This falls under a gIsConsole check, but does it actually need to?
                 if (controller->controllerData->l_trig > 85) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
                     newButton |= Z_TRIG;
                 }
@@ -676,6 +677,8 @@ void init_controllers(void) {
     gSramProbe = nuPiInitSram();
 #endif
 
+    gGamecubeControllerPortMask = 0;
+
     // Loop over the 4 ports and link the controller structs to the appropriate
     // status and pad. Interestingly, although there are pointers to 3 controllers,
     // only 2 are connected here. The third seems to have been reserved for debug
@@ -691,18 +694,19 @@ void init_controllers(void) {
 #if ENABLE_RUMBLE
             gControllers[cont].port = port;
 #endif
+
+            if (__osControllerTypes[port] == CONT_TYPE_GCN) {
+                if (gIsConsole && gGamecubeControllerPortMask == 0) {
+                    // NOTE: This logic would need alteration for cases supporting more than 2 controllers
+                    gPlayer1Controller = &gControllers[cont];
+                    gPlayer2Controller = &gControllers[cont ^ 1];
+                }
+                gGamecubeControllerPortMask |= (1 << cont);
+            }
+
             gControllers[cont].statusData = &gControllerStatuses[port];
             gControllers[cont++].controllerData = &gControllerPads[port];
         }
-    }
-    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && (gIsConsole)) {
-        gGamecubeControllerPort = 1;
-        gPlayer1Controller = &gControllers[1];
-    } else {
-        if (__osControllerTypes[0] == CONT_TYPE_GCN) {
-            gGamecubeControllerPort = 0;
-        }
-        gPlayer1Controller = &gControllers[0];
     }
 }
 

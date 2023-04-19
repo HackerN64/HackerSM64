@@ -147,6 +147,8 @@ s32 intro_level_select(void) {
     gCurrSaveFileNum = 4;
     gCurrActNum = 6;
 
+    gDebugLevelSelect = TRUE;
+
     print_text_centered(160, 80, "SELECT STAGE");
     print_text_centered(160, 30, "PRESS START BUTTON");
     print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
@@ -171,6 +173,7 @@ s32 intro_level_select(void) {
  * Regular intro function that handles Mario's greeting voice and game start.
  */
 s32 intro_regular(void) {
+    s8 entryToDebugLevelSelect = FALSE;
     s32 level = LEVEL_NONE;
 
     // When the game stars, gGlobalTimer is less than 129 frames,
@@ -188,7 +191,7 @@ s32 intro_regular(void) {
     print_intro_text();
 #ifdef DEBUG_LEVEL_SELECT
     if (gPlayer3Controller->buttonDown & L_TRIG) {
-        gDebugLevelSelect = TRUE;
+        entryToDebugLevelSelect = TRUE;
     }
 #endif
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
@@ -200,7 +203,7 @@ s32 intro_regular(void) {
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
-        level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
+        level = (LEVEL_FILE_SELECT + (entryToDebugLevelSelect | gDebugLevelSelect));
         sPlayMarioGreeting = TRUE;
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
@@ -246,6 +249,7 @@ s32 intro_game_over(void) {
  * Plays the casual "It's a me mario" when the game stars.
  */
 s32 intro_play_its_a_me_mario(void) {
+    gDebugLevelSelect = FALSE;
     play_sound(SOUND_MENU_COIN_ITS_A_ME_MARIO, gGlobalSoundSource);
     return LEVEL_NONE + 1;
 }
@@ -255,6 +259,10 @@ s32 intro_play_its_a_me_mario(void) {
  * Returns a level ID after their criteria is met.
  */
 s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
+#if !defined(KEEP_MARIO_HEAD) && defined(DEBUG_LEVEL_SELECT)
+    s8 entryToDebugLevelSelect = FALSE;
+#endif
+
     switch (arg) {
         case LVL_INTRO_PLAY_ITS_A_ME_MARIO: return intro_play_its_a_me_mario();
 #ifdef KEEP_MARIO_HEAD
@@ -264,8 +272,9 @@ s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
         case LVL_INTRO_REGULAR:
 #ifdef DEBUG_LEVEL_SELECT
             if (gPlayer3Controller->buttonDown & L_TRIG) {
-                gDebugLevelSelect = TRUE;
+                entryToDebugLevelSelect = TRUE;
             }
+            return (LEVEL_FILE_SELECT + (entryToDebugLevelSelect | gDebugLevelSelect));
 #endif
             // fallthrough
         case LVL_INTRO_GAME_OVER:           return (LEVEL_FILE_SELECT + gDebugLevelSelect);
