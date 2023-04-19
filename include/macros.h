@@ -156,6 +156,12 @@
 #define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
+// Inline asm macros:
+#define ASM_SET_REG(dst, src) asm volatile("move "dst",%0"::"r"(src))
+#define ASM_GET_REG(dst, src) asm volatile("move %0,"src:"=r"(dst):)
+
+#define ASM_GET_RA(RAddr) ASM_GET_REG(RAddr, "$31")
+
 typedef unsigned int u32;
 typedef u32 uintptr_t;
 uintptr_t _asm_getaddr(void);

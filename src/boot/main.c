@@ -100,17 +100,17 @@ UNUSED void handle_debug_key_sequences(void) {
 
 NEVER_INLINE uintptr_t _asm_getaddr(void) {
     uintptr_t RAddr;
-    asm volatile("move %0,$31":"=r"(RAddr):);
+    ASM_GET_RA(RAddr);
     RAddr -= (2 * sizeof(uintptr_t));
     return RAddr;
 }
 
 NEVER_INLINE void _asm_setbits(uintptr_t bits) {
     uintptr_t RAddr;
-    asm volatile("move %0,$31":"=r"(RAddr):);
+    ASM_GET_RA(RAddr);
     RAddr -= (2 * sizeof(uintptr_t));
     *((uintptr_t*)RAddr + 0) = bits;
-    *((uintptr_t*)RAddr + 1) = 0; // NOP
+    *((uintptr_t*)RAddr + 1) = OPS_NOP;
     asm volatile("jr %0":"=r"(RAddr):);
 }
 
