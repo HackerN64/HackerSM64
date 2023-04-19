@@ -116,8 +116,8 @@ _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
         return TRUE;
     }
 
-    oldPos &= ~(sizeof(uintptr_t) - 1); // ALIGN4
-    newPos &= ~(sizeof(uintptr_t) - 1); // ALIGN4
+    oldPos = ALIGNFLOOR(oldPos, sizeof(uintptr_t));
+    newPos = ALIGNFLOOR(newPos, sizeof(uintptr_t));
 
     if (oldPos == newPos) {
         return TRUE;

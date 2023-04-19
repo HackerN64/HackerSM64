@@ -255,7 +255,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uin
 void disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const char* fname = NULL;
-    uintptr_t alignedSelectedAddr = (gSelectedAddress & ~(DISASM_STEP - 1)); // ALIGN4
+    uintptr_t alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
     uintptr_t funcAddr = alignedSelectedAddr;
