@@ -282,8 +282,12 @@
 .endm
 
 .macro chan_stereoheadseteffects a
+#ifndef DISABLE_HEADSET_STEREO_EFFECTS
     .byte 0xd0
     .byte \a
+#else
+    // Feel free to hijack this command for something else if it's not being used!
+#endif
 .endm
 
 .macro chan_setnoteallocationpolicy a

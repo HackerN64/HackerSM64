@@ -612,7 +612,9 @@ u16 gHeadsetPanQuantization[0x10] = {
     0x40, 0x40, 0x30, 0x30, 0x20, 0x20, 0x10, 0, 0, 0,
 };
 #elif !defined(VERSION_SH)
+#ifndef DISABLE_HEADSET_STEREO_EFFECTS
 u16 gHeadsetPanQuantization[10] = { 0x40, 0x30, 0x20, 0x10, 0, 0, 0, 0, 0, 0 };
+#endif
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -622,6 +624,7 @@ s16 euUnknownData_80301950[64] = {
 };
 #endif
 
+#ifndef DISABLE_HEADSET_STEREO_EFFECTS
 // Linearly interpolated between
 // f(0/2 * 127) = 1
 // f(1/2 * 127) = 1/sqrt(2)
@@ -667,6 +670,7 @@ f32 gStereoPanVolume[128] = {
     0.242161f, 0.253295f, 0.264429f, 0.275563f, 0.286697f, 0.297831f, 0.308965f, 0.320098f, 0.331232f,
     0.342366f, 0.3535f
 };
+#endif
 
 // gDefaultVolume[k] = cos(pi/2 * k / 127)
 f32 gDefaultPanVolume[128] = {

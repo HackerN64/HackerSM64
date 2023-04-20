@@ -21,6 +21,13 @@
  */
 // #define DISABLE_MARIO_PITCH_SHIFTING
 
+/** 
+ * Disables the funky sound processing that takes place with sound effects, that can sometimes cause sounds like the waterfall in castle grounds to sound more unpleasant than necessary.
+ * This is not the same thing as disabling stereo audio, but it does completely eliminate the sole differences between the Stereo and Headset sound options.
+ * Because of this, the Headset sound option will also not appear in the file select menu.
+ */
+#define DISABLE_HEADSET_STEREO_EFFECTS
+
 /**
  * Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
  * Note that this is REQUIRED in order to use the extended 0C audio bank. Do not disable this if you're planning on using it. 

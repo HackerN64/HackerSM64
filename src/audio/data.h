@@ -87,10 +87,14 @@ extern s16 euUnknownData_80301950[64];
 extern struct NoteSubEu gZeroNoteSub;
 extern struct NoteSubEu gDefaultNoteSub;
 #else
+#ifndef DISABLE_HEADSET_STEREO_EFFECTS
 extern u16 gHeadsetPanQuantization[10];
 #endif
+#endif
+#ifndef DISABLE_HEADSET_STEREO_EFFECTS
 extern f32 gHeadsetPanVolume[128];
 extern f32 gStereoPanVolume[128];
+#endif
 extern f32 gDefaultPanVolume[128];
 
 extern f32 gVolRampingLhs136[1 << VOL_RAMPING_EXPONENT];
