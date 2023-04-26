@@ -129,7 +129,7 @@ struct PaintingImage {
     /*0x0D*/ const s8 rippleTrigger;
 
     /// Whether the painting uses shading when not rippling. Only used for Snowman's Land in vanilla and makes the transition to/from rippling not seamless.
-    /*0x0E*/ const s8 shaded;
+    /*0x0E*/ const _Bool shaded;
 
     /// The painting's transparency (0..255). Determines the drawing layer of the painting.
     /*0x0F*/ const Alpha alpha;
