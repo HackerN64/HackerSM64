@@ -110,7 +110,7 @@ typedef struct {
 } OSContPad; /*0x05*/
 
 typedef struct PACKED {
-    /*0x00*/ s8 initialized;                /* Whether this controller's origins have been set. */
+    /*0x00*/ _Bool initialized;              /* Whether this controller's origins have been set. */
     /*0x01*/ Analog_u8 stick;                /* -80 <=   stick <=  80 */
     /*0x03*/ Analog_u8 c_stick;              /* -80 <= c_stick <=  80 */
     /*0x05*/ Analog_u8 trig;                 /*   0 <= trig    <= 255 */

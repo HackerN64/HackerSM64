@@ -846,7 +846,7 @@ typedef struct PACKED {
     /*0x00*/ u16 type;              // The SI identifier of the device plugged into this port.
     /*0x02*/ u16 accessory;         //! TODO: Accessory type in the controller plugged into in this port.
     /*0x04*/ u16 statusPollButtons; // Input, only used when status polling to save the previous frame's inputs.
-    /*0x06*/ u8 plugged;            // Whether a controller is plugged in to this port.
+    /*0x06*/ _Bool plugged;         // Whether a controller is plugged in to this port.
     /*0x07*/ u8 playerNum;          // The player number. [0, 4]. 0 = not assigned to a player.
     /*0x08*/ u8 gcRumble;           // Stored GCN Rumble byte.
 } OSPortInfo; /*0x09*/
