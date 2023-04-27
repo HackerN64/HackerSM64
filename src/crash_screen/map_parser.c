@@ -5,7 +5,7 @@
 
 
 //! TODO: replace this with nm -S mappings
-static const MemoryRegion sTextRegions[] = {
+ALIGNED8 static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
 TEXT_REGION_SEGMENT(engine)
@@ -66,7 +66,10 @@ static u32 headless_pi_status(void) {
 void map_data_init(void) {
     sNumMapEntries = (gMapEntryEnd - gMapEntries);
 
-    headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), RAM_1MB);
+    uintptr_t start = (uintptr_t)_mapDataSegmentRomStart;
+    uintptr_t end   = (uintptr_t)_mapDataSegmentRomEnd;
+
+    headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), (end - start));
 
     while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }

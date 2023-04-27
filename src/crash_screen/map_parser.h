@@ -97,6 +97,7 @@ extern const struct MapEntry gMapEntryEnd[];
 extern const u8 gMapStrings[];
 extern const u8 gMapStringEnd[];
 extern const u8 _mapDataSegmentRomStart[];
+extern const u8 _mapDataSegmentRomEnd[];
 
 
 void map_data_init(void);

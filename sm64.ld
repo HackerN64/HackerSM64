@@ -162,6 +162,7 @@ SECTIONS
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #if defined(INCLUDE_DEBUG_MAP) && defined(PRELIMINARY)
    _mapDataSegmentRomStart = 0;
+   _mapDataSegmentRomEnd   = 0;
    gMapEntries    = 0;
    gMapEntryEnd   = 0;
    gMapStrings    = 0;
