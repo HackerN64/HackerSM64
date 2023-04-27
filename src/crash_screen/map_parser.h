@@ -7,9 +7,9 @@
 
 struct MapEntry {
     /*0x00*/ uintptr_t addr;
-    /*0x04*/ uintptr_t name_offset;
-    /*0x08*/ size_t name_len;
-    /*0x0C*/ size_t pad;
+    /*0x04*/ size_t size;
+    /*0x08*/ uintptr_t name_offset;
+    /*0x0C*/ size_t name_len;
 }; /*0x10*/
 
 typedef struct {

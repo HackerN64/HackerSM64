@@ -76,7 +76,7 @@ _Bool is_in_code_segment(uintptr_t addr) {
     }
 
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
-        if (addr >= sTextRegions[i].start && addr <= sTextRegions[i].end) {
+        if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
             return TRUE;
         }
     }
@@ -84,23 +84,40 @@ _Bool is_in_code_segment(uintptr_t addr) {
     return FALSE;
 }
 
-#ifdef INCLUDE_DEBUG_MAP
+const char* get_map_entry_name(const struct MapEntry* entry) {
+    return (const char*)((uintptr_t)gMapStrings + entry->name_offset);
+}
+
+s32 get_map_entry_index(uintptr_t addr) {
+    const struct MapEntry* entry = &gMapEntries[0];
+
+    for (size_t i = 0; i < gNumMapEntries; i++) {
+        if ((addr >= entry->addr) && (addr < (entry->addr + entry->size))) {
+            return i;
+        }
+        entry++;
+    }
+
+    return -1;
+}
+
 // Changes 'addr' to the starting address of the function it's in and returns a pointer to the function name.
 const char* parse_map(uintptr_t* addr) {
+#ifndef INCLUDE_DEBUG_MAP
+    return NULL;
+#endif
+    *addr = ALIGNFLOOR(*addr, sizeof(uintptr_t));
+
     if (!is_in_code_segment(*addr)) {
         return NULL;
     }
 
-    // The pointer starts at the end of the map entry data.
-    const struct MapEntry* entry = &gMapEntries[gNumMapEntries];
+    s32 index = get_map_entry_index(*addr);
 
-    // Loop backwards through the map entries until a map entry address is earlier than the given address.
-    while (entry > gMapEntries) {
-        entry--;
-        if (*addr >= entry->addr) {
-            *addr = entry->addr;
-            return (char*)((uintptr_t)gMapStrings + entry->name_offset);
-        }
+    if (index != -1) {
+        const struct MapEntry* entry = &gMapEntries[index];
+        *addr = entry->addr;
+        return get_map_entry_name(entry);
     }
 
     return NULL;
@@ -124,12 +141,3 @@ _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
 
     return (oldPos == newPos);
 }
-#else
-const char* parse_map(UNUSED uintptr_t* addr) {
-    return NULL;
-}
-
-_Bool is_in_same_function(UNUSED uintptr_t oldPos, UNUSED uintptr_t newPos) {
-    return FALSE;
-}
-#endif
