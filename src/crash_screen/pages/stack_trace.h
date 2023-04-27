@@ -5,7 +5,7 @@
 #include "types.h"
 
 
-// Stack Trace constants:
+// Number of rows to print:
 #define STACK_TRACE_NUM_ROWS 19
 
 // The number of functions to save to the stack trace buffer.
@@ -20,7 +20,7 @@ struct FunctionInStack {
 }; /*0x10*/
 
 
-extern const enum ControlTypes stackTracePageControls[];
+extern const enum ControlTypes stackTraceContList[];
 
 
 void stack_trace_init(void);

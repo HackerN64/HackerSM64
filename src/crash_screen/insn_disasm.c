@@ -621,7 +621,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     uintptr_t target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(uintptr_t));
 #ifdef INCLUDE_DEBUG_MAP
-                    if (showDestNames) {
+                    if (showDestNames && is_in_code_segment(target)) {
                         uintptr_t tempTarget = target;
                         *fname = parse_map(&tempTarget);
                         // Only print as the function name if it's the exact starting address of the function.

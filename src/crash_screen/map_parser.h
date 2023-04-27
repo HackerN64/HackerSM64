@@ -105,5 +105,7 @@ extern size_t gNumMapEntries;
 
 void map_data_init(void);
 _Bool is_in_code_segment(uintptr_t addr);
+const char* get_map_entry_name(const struct MapEntry* entry);
+s32 get_map_entry_index(uintptr_t addr);
 const char* parse_map(uintptr_t* addr);
 _Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos);

@@ -15,7 +15,7 @@ static _Bool sStackTraceShowFunctionNames = TRUE;
 static u32 sStackTraceSelectedIndex = 0;
 static u32 sStackTraceViewportIndex = 0;
 
-const enum ControlTypes stackTracePageControls[] = {
+const enum ControlTypes stackTraceContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -32,28 +32,30 @@ void fill_function_stack_trace(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     struct FunctionInStack currInfo = {
         .stackAddr = 0,
-        .curAddr = 0,
-        .faddr = 0,
-        .fname = NULL,
+        .curAddr   = 0,
+        .faddr     = 0,
+        .fname     = NULL,
     };
 
     u64* sp = (u64*)(uintptr_t)tc->sp; // Stack pointer is already aligned, so get the lower bits.
 
-    // Fill the stack buffer.
+    // Loop through the stack buffer and find all the addresses that point to a function.
     while ((u8*)sp < _buffersSegmentBssEnd && sNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
         currInfo.curAddr = (uintptr_t)(*sp);
-        currInfo.faddr = currInfo.curAddr;
-        currInfo.fname = parse_map(&currInfo.faddr);
-        if (currInfo.fname != NULL) {
-            currInfo.curAddr -= (2 * sizeof(uintptr_t)); // Go back to the jump before the delay slot.
-            //! TODO: If JAL command uses a different function than the previous entrie's faddr, use the one in the JAL command?
-            //! TODO: handle duplicate entries caused by JALR RA, V0
-            currInfo.stackAddr = (uintptr_t)sp + sizeof(uintptr_t);
-            sFunctionStack[sNumFoundFunctions++] = currInfo;
-        }
 
-        if (currInfo.faddr == (uintptr_t)__osCleanupThread) {
-            break;
+        if (is_in_code_segment(currInfo.curAddr)) {
+            currInfo.faddr = currInfo.curAddr;
+            currInfo.fname = parse_map(&currInfo.faddr);
+            if (currInfo.fname != NULL) {
+                //! TODO: If JAL command uses a different function than the previous entry's faddr, replace it with the one in the JAL command?
+                //! TODO: handle duplicate entries caused by JALR RA, V0
+                currInfo.stackAddr = (uintptr_t)sp + sizeof(uintptr_t);
+                sFunctionStack[sNumFoundFunctions++] = currInfo;
+            }
+
+            if (currInfo.faddr == (uintptr_t)__osCleanupThread) {
+                break;
+            }
         }
 
         sp++;
@@ -79,7 +81,7 @@ void stack_trace_init(void) {
 void stack_trace_print_entries(u32 line, u32 numLines) {
     struct FunctionInStack* function = NULL;
 
-    sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
+    sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, numLines, 1);
 
     // Print
     for (u32 i = 0; i < numLines; i++) {
@@ -167,6 +169,7 @@ void stack_trace_draw(void) {
 
     stack_trace_print_entries(line, STACK_TRACE_NUM_ROWS);
 
+    // Draw the line after the entries so the selection box is behind it.
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar
@@ -186,7 +189,7 @@ void stack_trace_draw(void) {
 void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
-    
+
     if (buttonPressed & A_BUTTON) {
         open_address_select(sFunctionStack[sStackTraceSelectedIndex].curAddr);
     }
@@ -196,13 +199,13 @@ void stack_trace_input(void) {
         sStackTraceShowFunctionNames ^= TRUE;
     }
 
-    if (gCSDirectionFlags.held.up) {
+    if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
         if (sStackTraceSelectedIndex > 0) {
             sStackTraceSelectedIndex--;
         }
     }
-    if (gCSDirectionFlags.held.down) {
+    if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
         if (sStackTraceSelectedIndex < (sNumFoundFunctions - 1)) {
             sStackTraceSelectedIndex++;

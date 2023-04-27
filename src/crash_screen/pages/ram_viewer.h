@@ -15,7 +15,7 @@
 #define RAM_VIEWER_SCROLL_MAX       (VALID_RAM_END - RAM_VIEWER_SHOWN_SECTION)
 
 
-extern const enum ControlTypes ramViewerPageControls[];
+extern const enum ControlTypes ramViewerContList[];
 
 
 void ram_viewer_init(void);

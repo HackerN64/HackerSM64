@@ -123,7 +123,7 @@ u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows,
     return ALIGNFLOOR(scrollIndex, step);
 }
 
-const enum ControlTypes defaultPageControls[] = {
+const enum ControlTypes defaultContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,

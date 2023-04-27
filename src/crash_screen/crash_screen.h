@@ -4,6 +4,7 @@
 
 #include "crash_types.h"
 
+#include "address_select.h"
 #include "crash_controls.h"
 #include "crash_draw.h"
 #include "crash_print.h"
@@ -15,6 +16,7 @@
 enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_NONE,
     CRASH_SCREEN_MSG_CPU_BREAK,
+    CRASH_SCREEN_MSG_SP_BREAK,
     CRASH_SCREEN_MSG_FAULT,
     CRASH_SCREEN_MSG_VI_VBLANK,
 };

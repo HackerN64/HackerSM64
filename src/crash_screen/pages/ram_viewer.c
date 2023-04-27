@@ -19,7 +19,7 @@ void ram_viewer_init(void) {
 
 static const char gHex[0x10] = "0123456789ABCDEF";
 
-void print_byte(u32 x, u32 y, u8 byte, RGBA32 color) {
+static void print_byte(u32 x, u32 y, u8 byte, RGBA32 color) {
     // "XX"
     if (sRamViewShowAsAscii) {
         crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
@@ -120,7 +120,7 @@ void ram_viewer_draw(void) {
 }
 
 
-const enum ControlTypes ramViewerPageControls[] = {
+const enum ControlTypes ramViewerContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,

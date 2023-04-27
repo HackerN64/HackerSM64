@@ -31,7 +31,7 @@ struct BranchArrow {
 
 extern _Bool gFillBranchBuffer;
 
-extern const enum ControlTypes disasmPageControls[];
+extern const enum ControlTypes disasmContList[];
 
 
 void disasm_init(void);

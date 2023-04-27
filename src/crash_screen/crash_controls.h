@@ -49,7 +49,7 @@ extern _Bool gCSSwitchedPage;
 extern _Bool gCSDrawControls;
 extern CrashScreenDirections gCSDirectionFlags;
 extern const struct ControlType gCSControlDescriptions[];
-extern const enum ControlTypes defaultPageControls[];
+extern const enum ControlTypes defaultContList[];
 
 
 u32 clamp_view_to_selection(u32 scrollAddr, u32 selectAddr, const u32 numRows, const u32 step);

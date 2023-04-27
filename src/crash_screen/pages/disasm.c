@@ -76,7 +76,11 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
 
         // Left the function.
         uintptr_t checkAddr = sBranchBufferCurrAddr;
-        if (fname != parse_map(&checkAddr)) {
+        if (!is_in_code_segment(checkAddr)) {
+            return FALSE;
+        }
+        parse_map(&checkAddr);
+        if (funcAddr != checkAddr) {
             return FALSE;
         }
 
@@ -124,7 +128,7 @@ void disasm_init(void) {
     reset_branch_buffer((uintptr_t)NULL);
 }
 
-void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, s32 printLine) {
+void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 printLine) {
     // Check to see if arrow is fully away from the screen.
     if (
         ((startLine >= 0              ) || (endLine >= 0              )) &&
@@ -160,7 +164,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, s32 p
     }
 }
 
-void disasm_draw_branch_arrows(s32 printLine) {
+void disasm_draw_branch_arrows(u32 printLine) {
     // Draw branch arrows from the buffer.
     struct BranchArrow* currArrow = &sBranchArrows[0];
 
@@ -176,7 +180,7 @@ void disasm_draw_branch_arrows(s32 printLine) {
     osWritebackDCacheAll();
 }
 
-static void print_as_insn(const s32 charX, const s32 charY, const uintptr_t data) {
+static void print_as_insn(const u32 charX, const u32 charY, const uintptr_t data) {
     InsnData insn = { .raw = data };
 #ifndef INCLUDE_DEBUG_MAP
     s16 branchOffset = check_for_branch_offset(insn);
@@ -201,8 +205,8 @@ static void print_as_insn(const s32 charX, const s32 charY, const uintptr_t data
 #endif
 }
 
-static void print_as_binary(const s32 charX, const s32 charY, const uintptr_t data) { //! TODO: make this a formatting char, maybe \%b?
-    s32 bitX = charX;
+static void print_as_binary(const u32 charX, const u32 charY, const uintptr_t data) { //! TODO: make this a formatting char, maybe \%b?
+    u32 bitX = charX;
 
     for (u32 c = 0; c < 32; c++) {
         if ((c % 8) == 0) { // Space between each byte.
@@ -218,6 +222,8 @@ static void print_as_binary(const s32 charX, const s32 charY, const uintptr_t da
 void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uintptr_t pc) {
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
+
+    sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, numLines, DISASM_STEP);
 
     for (u32 y = 0; y < numLines; y++) {
         uintptr_t addr = (sDisasmViewportIndex + (y * DISASM_STEP));
@@ -265,8 +271,6 @@ void disasm_draw(void) {
     fname = parse_map(&funcAddr);
 #endif
 
-    sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, DISASM_NUM_ROWS, DISASM_STEP);
-
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
@@ -285,7 +289,7 @@ void disasm_draw(void) {
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
         crash_screen_print_scroll(TEXT_X(3), TEXT_Y(line),
             (CRASH_SCREEN_NUM_CHARS_X - 3), STR_COLOR_PREFIX"%s",
-            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
+            (is_in_code_segment(alignedSelectedAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
         );
     }
 
@@ -314,7 +318,7 @@ void disasm_draw(void) {
     osWritebackDCacheAll();
 }
 
-const enum ControlTypes disasmPageControls[] = {
+const enum ControlTypes disasmContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -329,8 +333,8 @@ void disasm_input(void) {
     uintptr_t oldPos = gSelectedAddress;
 #endif
 
-    // gSelectedAddress = ALIGN(gSelectedAddress, DISASM_STEP);
     if (gCSDirectionFlags.pressed.up) {
+        gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
         // Scroll up.
         if ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)  {
             gSelectedAddress -= DISASM_STEP;
@@ -338,6 +342,7 @@ void disasm_input(void) {
     }
 
     if (gCSDirectionFlags.pressed.down) {
+        gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
         // Scroll down.
         if ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END) {
             gSelectedAddress += DISASM_STEP;
