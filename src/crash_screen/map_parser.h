@@ -100,6 +100,9 @@ extern const u8 _mapDataSegmentRomStart[];
 extern const u8 _mapDataSegmentRomEnd[];
 
 
+extern size_t gNumMapEntries;
+
+
 void map_data_init(void);
 _Bool is_in_code_segment(uintptr_t addr);
 const char* parse_map(uintptr_t* addr);

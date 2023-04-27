@@ -44,34 +44,27 @@ TEXT_REGION_GROUP(common1)
 #undef DEFINE_LEVEL
 };
 
-static size_t sNumMapEntries = 0;
+
+size_t gNumMapEntries = 0;
 
 
 static void headless_dma(uintptr_t devAddr, void* dramAddr, size_t size) {
-    u32 stat = IO_READ(PI_STATUS_REG);
-
-    while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) {
-        stat = IO_READ(PI_STATUS_REG);
-    }
+    while (IO_READ(PI_STATUS_REG) & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY));
 
     IO_WRITE(PI_DRAM_ADDR_REG, K0_TO_PHYS(dramAddr));
     IO_WRITE(PI_CART_ADDR_REG, K1_TO_PHYS((uintptr_t)osRomBase | devAddr));
     IO_WRITE(PI_WR_LEN_REG, (size - 1));
-}
 
-static u32 headless_pi_status(void) {
-    return IO_READ(PI_STATUS_REG);
+    while (IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 
 void map_data_init(void) {
-    sNumMapEntries = (gMapEntryEnd - gMapEntries);
+    gNumMapEntries = (gMapEntryEnd - gMapEntries);
 
     uintptr_t start = (uintptr_t)_mapDataSegmentRomStart;
     uintptr_t end   = (uintptr_t)_mapDataSegmentRomEnd;
 
     headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), (end - start));
-
-    while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 
 // Check whether the address is in a .text segment.
@@ -99,7 +92,7 @@ const char* parse_map(uintptr_t* addr) {
     }
 
     // The pointer starts at the end of the map entry data.
-    const struct MapEntry* entry = &gMapEntries[sNumMapEntries];
+    const struct MapEntry* entry = &gMapEntries[gNumMapEntries];
 
     // Loop backwards through the map entries until a map entry address is earlier than the given address.
     while (entry > gMapEntries) {
