@@ -38,6 +38,9 @@
     aSetBuffer(pkt, 0, 0, c + DMEM_ADDR_WET_RIGHT_CH, d);                                              \
     aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
+#define VOLRAMPING_MASK (~(0x8000 | ((1 << (15 - VOL_RAMPING_EXPONENT)) - 1)))
+
+
 #ifdef BETTER_REVERB
 // Do not touch these values manually, unless you want potential for problems.
 u8 gBetterReverbPreset = 0;
@@ -1522,17 +1525,17 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
         // but with discretizations of targetVol, sourceVol and arg2.
         switch (nSamples) {
             case 128:
-                rampLeft = gVolRampingLhs128[vol->targetLeft >> 8] * gVolRampingRhs128[vol->sourceLeft >> 8];
-                rampRight = gVolRampingLhs128[vol->targetRight >> 8] * gVolRampingRhs128[vol->sourceRight >> 8];
+                rampLeft = gVolRampingLhs128[vol->targetLeft >> (15 - VOL_RAMPING_EXPONENT)] * gVolRampingRhs128[vol->sourceLeft >> (15 - VOL_RAMPING_EXPONENT)];
+                rampRight = gVolRampingLhs128[vol->targetRight >> (15 - VOL_RAMPING_EXPONENT)] * gVolRampingRhs128[vol->sourceRight >> (15 - VOL_RAMPING_EXPONENT)];
                 break;
             case 144:
-                rampLeft = gVolRampingLhs144[vol->targetLeft >> 8] * gVolRampingRhs144[vol->sourceLeft >> 8];
-                rampRight = gVolRampingLhs144[vol->targetRight >> 8] * gVolRampingRhs144[vol->sourceRight >> 8];
+                rampLeft = gVolRampingLhs144[vol->targetLeft >> (15 - VOL_RAMPING_EXPONENT)] * gVolRampingRhs144[vol->sourceLeft >> (15 - VOL_RAMPING_EXPONENT)];
+                rampRight = gVolRampingLhs144[vol->targetRight >> (15 - VOL_RAMPING_EXPONENT)] * gVolRampingRhs144[vol->sourceRight >> (15 - VOL_RAMPING_EXPONENT)];
                 break;
             case 136:
             default:
-                rampLeft = gVolRampingLhs136[vol->targetLeft >> 8] * gVolRampingRhs136[vol->sourceLeft >> 8];
-                rampRight = gVolRampingLhs136[vol->targetRight >> 8] * gVolRampingRhs136[vol->sourceRight >> 8];
+                rampLeft = gVolRampingLhs136[vol->targetLeft >> (15 - VOL_RAMPING_EXPONENT)] * gVolRampingRhs136[vol->sourceLeft >> (15 - VOL_RAMPING_EXPONENT)];
+                rampRight = gVolRampingLhs136[vol->targetRight >> (15 - VOL_RAMPING_EXPONENT)] * gVolRampingRhs136[vol->sourceRight >> (15 - VOL_RAMPING_EXPONENT)];
                 break;
         }
 #endif
@@ -1745,8 +1748,8 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
     if (velocity < 0) {
         velocity = 0;
     }
-    note->targetVolLeft = (u16)(s32)(velocity * volLeft) & ~0x80FF;
-    note->targetVolRight = (u16)(s32)(velocity * volRight) & ~0x80FF;
+    note->targetVolLeft = (u16)(s32)(velocity * volLeft) & VOLRAMPING_MASK;
+    note->targetVolRight = (u16)(s32)(velocity * volRight) & VOLRAMPING_MASK;
     if (note->targetVolLeft == 0) {
         note->targetVolLeft++;
     }
