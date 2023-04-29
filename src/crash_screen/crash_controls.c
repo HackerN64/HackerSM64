@@ -212,7 +212,6 @@ void crash_screen_update_input(void) {
             page->initFunc();
             page->flags.initialized = TRUE;
         }
-        return;
     }
 
     // Run the page-specific input function.
