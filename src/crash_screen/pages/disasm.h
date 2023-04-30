@@ -17,8 +17,8 @@ struct BranchArrow {
 #define DISASM_NUM_ROWS         19
 #define DISASM_SHOWN_SECTION    ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
 
-#define DISASM_SCROLL_MIN       VALID_RAM_START
-#define DISASM_SCROLL_MAX       (VALID_RAM_END - DISASM_SHOWN_SECTION)
+#define DISASM_SCROLL_MIN       VIRTUAL_RAM_START
+#define DISASM_SCROLL_MAX       (VIRTUAL_RAM_END - DISASM_SHOWN_SECTION)
 
 #define DISASM_BRANCH_ARROW_START_X         TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, +0x0000")) // The X position where branch arrows start.
 #define DISASM_BRANCH_ARROW_OFFSET          4 // The distance between the line and the arrow head.

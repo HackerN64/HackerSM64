@@ -240,9 +240,10 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_SELECT);
         }
 
-        Word data = *(Word*)addr;
-
-        if (is_in_code_segment(addr)) {
+        Word data = 0;
+        if (!read_data(&data, addr)) {
+            crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_RED);
+        } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, data);
         } else { // Outside of code segments:
             if (sDisasmShowDataAsBinary) {
@@ -315,7 +316,7 @@ void disasm_draw(void) {
     // Scroll bar:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        DISASM_SHOWN_SECTION, VALID_RAM_SIZE,
+        DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
         (sDisasmViewportIndex - DISASM_SCROLL_MIN),
         COLOR_RGBA32_LIGHT_GRAY, TRUE
     );
@@ -323,7 +324,7 @@ void disasm_draw(void) {
     // Scroll bar crash position marker:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        DISASM_SHOWN_SECTION, VALID_RAM_SIZE,
+        DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
         (tc->pc - DISASM_SCROLL_MIN),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
@@ -349,7 +350,7 @@ void disasm_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
         // Scroll up.
-        if (gSelectedAddress >= (VALID_RAM_START + DISASM_STEP))  {
+        if (gSelectedAddress >= (VIRTUAL_RAM_START + DISASM_STEP))  {
             gSelectedAddress -= DISASM_STEP;
         }
     }
@@ -357,7 +358,7 @@ void disasm_input(void) {
     if (gCSDirectionFlags.pressed.down) {
         gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
         // Scroll down.
-        if (gSelectedAddress <= (VALID_RAM_END - DISASM_STEP)) {
+        if (gSelectedAddress <= (VIRTUAL_RAM_END - DISASM_STEP)) {
             gSelectedAddress += DISASM_STEP;
         }
     }

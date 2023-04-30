@@ -48,16 +48,6 @@ TEXT_REGION_GROUP(common1)
 size_t gNumMapEntries = 0;
 
 
-static void headless_dma(Address devAddr, void* dramAddr, size_t size) {
-    while (IO_READ(PI_STATUS_REG) & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY));
-
-    IO_WRITE(PI_DRAM_ADDR_REG, K0_TO_PHYS(dramAddr));
-    IO_WRITE(PI_CART_ADDR_REG, K1_TO_PHYS((Address)osRomBase | devAddr));
-    IO_WRITE(PI_WR_LEN_REG, (size - 1));
-
-    while (IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
-}
-
 void map_data_init(void) {
     gNumMapEntries = (gMapEntryEnd - gMapEntries);
 
@@ -70,11 +60,6 @@ void map_data_init(void) {
 // Check whether the address is in a .text segment.
 //! TODO: do INCLUDE_DEBUG_MAP inside this instead of on this whole file.
 _Bool is_in_code_segment(Address addr) {
-    //! TODO: Allow reading .text memory outside 0x80000000-0x80800000.
-    if (!IS_IN_RDRAM(addr)) {
-        return FALSE;
-    }
-
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
         if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
             return TRUE;
@@ -109,7 +94,8 @@ const char* parse_map(Address* addr) {
 #endif
     *addr = ALIGNFLOOR(*addr, sizeof(Word));
 
-    if (!is_in_code_segment(*addr)) {
+    Word data = 0;
+    if (!read_data(&data, *addr)) {
         return NULL;
     }
 

@@ -10,6 +10,7 @@
 #include "crash_print.h"
 #include "insn_disasm.h"
 #include "map_parser.h"
+#include "memory_read.h"
 
 
 enum CrashScreenMessageIDs {

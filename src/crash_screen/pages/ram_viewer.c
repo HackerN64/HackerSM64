@@ -78,7 +78,12 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
             }
 
-            print_byte(charX, charY, *(Byte*)currAddr, textColor);
+            Byte byte = 0;
+            if (read_unaligned_byte(&byte, currAddr)) {
+                print_byte(charX, charY, byte, textColor);
+            } else {
+                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_RED);
+            }
 
             charX += (TEXT_WIDTH(2) + 1);
         }
@@ -136,7 +141,7 @@ void ram_viewer_draw(void) {
     // Scroll bar.
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE,
+        RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
         (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN),
         COLOR_RGBA32_LIGHT_GRAY, TRUE
     );
@@ -144,7 +149,7 @@ void ram_viewer_draw(void) {
     // Scroll bar crash position marker.
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE,
+        RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
         (tc->pc - RAM_VIEWER_SCROLL_MIN),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
@@ -155,14 +160,14 @@ void ram_viewer_draw(void) {
 void ram_viewer_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
-        if (gSelectedAddress >= (VALID_RAM_START + RAM_VIEWER_STEP)) {
+        if (gSelectedAddress >= (VIRTUAL_RAM_START + RAM_VIEWER_STEP)) {
             gSelectedAddress -= RAM_VIEWER_STEP;
         }
     }
 
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        if (gSelectedAddress <= (VALID_RAM_END - RAM_VIEWER_STEP)) {
+        if (gSelectedAddress <= (VIRTUAL_RAM_END - RAM_VIEWER_STEP)) {
             gSelectedAddress += RAM_VIEWER_STEP;
         }
     }

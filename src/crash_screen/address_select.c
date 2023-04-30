@@ -39,21 +39,25 @@ void draw_address_select(void) {
         TRUE
     );
 
+    Address addr = sAddressSelectTarget;
+    Word data = 0;
+    _Bool isValid = read_data(&data, addr);
+
     // "0x[80XXXXXX]"
     crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)),
-        (STR_HEX_PREFIX STR_HEX_WORD),
-        sAddressSelectTarget
+        (STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_WORD),
+        (isValid ? COLOR_RGBA32_LIGHT_GREEN : COLOR_RGBA32_LIGHT_RED), addr
     );
 
 #ifdef INCLUDE_DEBUG_MAP
-    Address checkAddr = sAddressSelectTarget;
-    const char* fname = parse_map(&checkAddr);
-    if (fname != NULL) {
-        // "[function name]"
-        crash_screen_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X,
-            STR_COLOR_PREFIX"%s",
-            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-        );
+    if (isValid) {
+        const char* fname = parse_map(&addr);
+        if (fname != NULL) {
+            // "[function name]"
+            crash_screen_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, STR_COLOR_PREFIX"%s",
+                (is_in_code_segment(addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
+            );
+        }
     }
 #endif
 
@@ -72,7 +76,6 @@ void crash_screen_select_address(void) {
 
     sAddressSelecCharIndex = ((sAddressSelecCharIndex + change) & 0x7); // % 8
 
-    Address nextSelectedAddress = sAddressSelectTarget;
     u32 shift = ((32 - 4) - (sAddressSelecCharIndex * 4));
     u8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
     u8 new = digit;
@@ -86,18 +89,14 @@ void crash_screen_select_address(void) {
     }
 
     if (change != 0) {
-        // Wrap to valid ram address.
+        // Wrap to virtual ram address.
         do {
             new = ((new + change) & BITMASK(4));
-        } while (!IS_IN_RDRAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift)));
+        } while (SET_HEX_DIGIT(sAddressSelectTarget, new, shift) < VIRTUAL_RAM_START);
     }
 
     if (new != digit) {
-        nextSelectedAddress = SET_HEX_DIGIT(sAddressSelectTarget, new, shift);
-
-        if (IS_IN_RDRAM(nextSelectedAddress)) {
-            sAddressSelectTarget = nextSelectedAddress;
-        }
+        sAddressSelectTarget = SET_HEX_DIGIT(sAddressSelectTarget, new, shift);
     }
 
     u16 buttonPressed = gPlayer1Controller->buttonPressed;

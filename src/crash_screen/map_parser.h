@@ -89,9 +89,6 @@ EXTERN_GROUP_TEXT(common1)
     TEXT_REGION(name##geo)
 
 
-#define IS_IN_RDRAM(addr) (((addr) >= VALID_RAM_START) && ((addr) < VALID_RAM_END))
-
-
 extern const struct MapEntry gMapEntries[];
 extern const struct MapEntry gMapEntryEnd[];
 extern const Byte gMapStrings[];

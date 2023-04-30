@@ -68,8 +68,9 @@ void crash_screen_print_registers(__OSThreadContext* tc) {
     crash_screen_print_reg(TEXT_X(1 * 15), TEXT_Y(3), "SR", tc->sr);
     crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(3), "VA", tc->badvaddr);
 
-    if (IS_IN_RDRAM(tc->pc)) {
-        crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", *(Word*)tc->pc); // The raw data of the asm code that crashed.
+    Word data = 0;
+    if (read_data(&data, tc->pc)) {
+        crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", data); // The raw data of the asm code that crashed.
     }
 
     osWritebackDCacheAll();
