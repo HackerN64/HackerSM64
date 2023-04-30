@@ -271,6 +271,8 @@ ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
     [PSEUDO_DSUBI] = { .name = "DSUBI", .fmt = "\'tsi", .opcode = OPC_DADDI }, // Doubleword Subtract Immediate (pseudo of DADDI).
 };
 
+_Bool gEnablePseudoinstructions = TRUE;
+
 static _Bool check_pseudo_insn(const InsnTemplate** type, enum PseudoInsns id, _Bool cond) {
     if (cond) {
         *type = &insn_db_pseudo[id];
@@ -362,7 +364,7 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
 const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
     const InsnTemplate* checkInsn = NULL;
 
-    if (check_pseudo_instructions(&checkInsn, insn)) {
+    if (gEnablePseudoinstructions && check_pseudo_instructions(&checkInsn, insn)) {
         return checkInsn;
     }
 
