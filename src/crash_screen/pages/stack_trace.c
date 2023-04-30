@@ -37,11 +37,11 @@ void fill_function_stack_trace(void) {
         .fname     = NULL,
     };
 
-    u64* sp = (u64*)(uintptr_t)tc->sp; // Stack pointer is already aligned, so get the lower bits.
+    Register* sp = (Register*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
 
     // Loop through the stack buffer and find all the addresses that point to a function.
-    while ((u8*)sp < _buffersSegmentBssEnd && sNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
-        currInfo.curAddr = (uintptr_t)(*sp);
+    while ((Byte*)sp < _buffersSegmentBssEnd && sNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
+        currInfo.curAddr = (Address)(*sp);
 
         if (is_in_code_segment(currInfo.curAddr)) {
             currInfo.faddr = currInfo.curAddr;
@@ -49,11 +49,11 @@ void fill_function_stack_trace(void) {
             if (currInfo.fname != NULL) {
                 //! TODO: If JAL command uses a different function than the previous entry's faddr, replace it with the one in the JAL command?
                 //! TODO: handle duplicate entries caused by JALR RA, V0
-                currInfo.stackAddr = (uintptr_t)sp + sizeof(uintptr_t);
+                currInfo.stackAddr = (Address)sp + sizeof(Address);
                 sFunctionStack[sNumFoundFunctions++] = currInfo;
             }
 
-            if (currInfo.faddr == (uintptr_t)__osCleanupThread) {
+            if (currInfo.faddr == (Address)__osCleanupThread) {
                 break;
             }
         }
@@ -149,13 +149,13 @@ void stack_trace_draw(void) {
     u32 line = 1;
 
     // "FROM: [XXXXXXXX]"
-    crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, (uintptr_t)tc->sp);
+    crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, (Address)tc->sp);
 
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
-    uintptr_t pc = tc->pc;
+    Address pc = tc->pc;
     const char* fname = parse_map(&pc);
     if (fname == NULL) {
         // "UNKNOWN"

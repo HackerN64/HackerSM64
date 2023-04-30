@@ -7,9 +7,20 @@
 #include "game/game_input.h"
 
 
-static u32 sRamViewViewportIndex = 0x00000000;
+static Address sRamViewViewportIndex = 0x00000000;
 
 static _Bool sRamViewShowAsAscii = FALSE;
+
+
+const enum ControlTypes ramViewerContList[] = {
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_CURSOR,
+    CONT_DESC_JUMP_TO_ADDRESS,
+    CONT_DESC_TOGGLE_ASCII,
+    CONT_DESC_LIST_END,
+};
 
 
 void ram_viewer_init(void) {
@@ -19,7 +30,7 @@ void ram_viewer_init(void) {
 
 static const char gHex[0x10] = "0123456789ABCDEF";
 
-static void print_byte(u32 x, u32 y, u8 byte, RGBA32 color) {
+static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
     // "XX"
     if (sRamViewShowAsAscii) {
         crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
@@ -35,8 +46,7 @@ void ram_viewer_draw(void) {
 
     sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 
-    uintptr_t startAddr = sRamViewViewportIndex;
-    u32 charX, charY;
+    Address startAddr = sRamViewViewportIndex;
     u32 line = 1;
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
@@ -47,8 +57,9 @@ void ram_viewer_draw(void) {
 
     line++;
 
-    charX = (TEXT_X(8) + 3);
+    u32 charX = (TEXT_X(8) + 3);
 
+    // Print column headers:
     for (u32 i = 0; i < 16; i++) {
         if ((i % 4) == 0) {
             charX += 2;
@@ -70,10 +81,10 @@ void ram_viewer_draw(void) {
     line++;
 
     charX = (TEXT_X(8) + 3);
-    charY = TEXT_Y(line);
+    u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
-        uintptr_t rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
+        Address rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
 
         // "[XXXXXXXX]"
         crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
@@ -83,7 +94,7 @@ void ram_viewer_draw(void) {
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
-            uintptr_t currAddr = (rowAddr + x);
+            Address currAddr = (rowAddr + x);
 
             if ((x % 4) == 0) {
                 charX += 2;
@@ -103,7 +114,7 @@ void ram_viewer_draw(void) {
                 crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
             }
 
-            print_byte(charX, charY, *(vu8*)currAddr, textColor);
+            print_byte(charX, charY, *(Byte*)currAddr, textColor);
 
             charX += (TEXT_WIDTH(2) + 1);
         }
@@ -118,18 +129,6 @@ void ram_viewer_draw(void) {
 
     osWritebackDCacheAll();
 }
-
-
-const enum ControlTypes ramViewerContList[] = {
-    CONT_DESC_SWITCH_PAGE,
-    CONT_DESC_SHOW_CONTROLS,
-    CONT_DESC_CYCLE_DRAW,
-    CONT_DESC_CURSOR,
-    CONT_DESC_JUMP_TO_ADDRESS,
-    CONT_DESC_TOGGLE_ASCII,
-    CONT_DESC_LIST_END,
-};
-
 
 void ram_viewer_input(void) {
     if (gCSDirectionFlags.pressed.up) {
@@ -147,14 +146,14 @@ void ram_viewer_input(void) {
     }
 
     if (gCSDirectionFlags.pressed.left) {
-        // Don't wrap.
+        // Prevent wrapping.
         if (((gSelectedAddress - 1) & BITMASK(4)) != 0xF) {
             gSelectedAddress--;
         }
     }
 
     if (gCSDirectionFlags.pressed.right) {
-        // Don't wrap.
+        // Prevent wrapping.
         if (((gSelectedAddress + 1) & BITMASK(4)) != 0x0) {
             gSelectedAddress++;
         }

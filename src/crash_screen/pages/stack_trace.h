@@ -13,9 +13,9 @@
 
 
 struct FunctionInStack {
-    /*0x00*/ uintptr_t stackAddr;
-    /*0x04*/ uintptr_t curAddr;
-    /*0x08*/ uintptr_t faddr;
+    /*0x00*/ Address stackAddr;
+    /*0x04*/ Address curAddr;
+    /*0x08*/ Address faddr;
     /*0x0C*/ const char* fname;
 }; /*0x10*/
 

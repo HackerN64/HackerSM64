@@ -50,7 +50,7 @@ static const char* sRegNames[29] = { //! TODO: Combine this with sCPURegisterNam
 
 
 // Print a fixed-point register.
-void crash_screen_print_reg(u32 x, u32 y, const char* name, uintptr_t addr) {
+void crash_screen_print_reg(u32 x, u32 y, const char* name, Address addr) {
     // "[register name]: [XXXXXXXX]"
     crash_screen_print(x, y,
         " "STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD,
@@ -62,14 +62,14 @@ void crash_screen_print_reg(u32 x, u32 y, const char* name, uintptr_t addr) {
 // Print important fixed-point registers.
 void crash_screen_print_registers(__OSThreadContext* tc) {
     u32 regNum = 0;
-    u64* reg = &tc->at;
+    Register* reg = &tc->at;
 
-    crash_screen_print_reg(TEXT_X(0 * 15), TEXT_Y( 3), "PC", tc->pc);
-    crash_screen_print_reg(TEXT_X(1 * 15), TEXT_Y( 3), "SR", tc->sr);
-    crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y( 3), "VA", tc->badvaddr);
+    crash_screen_print_reg(TEXT_X(0 * 15), TEXT_Y(3), "PC", tc->pc);
+    crash_screen_print_reg(TEXT_X(1 * 15), TEXT_Y(3), "SR", tc->sr);
+    crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(3), "VA", tc->badvaddr);
 
     if (IS_IN_RDRAM(tc->pc)) {
-        crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", *(uintptr_t*)tc->pc); // The raw data of the asm code that crashed.
+        crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", *(Word*)tc->pc); // The raw data of the asm code that crashed.
     }
 
     osWritebackDCacheAll();
@@ -110,12 +110,12 @@ void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
 }
 
 // Print a floating-point register.
-void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* addr) {
+void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     // "[register name]:"
     size_t charX = crash_screen_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
     x += TEXT_WIDTH(charX);
 
-    IEEE754_f32 val = { .asF32 = *addr };
+    IEEE754_f32 val = { .asF32 = *data };
 
     char prefix = '\0';
 
@@ -161,7 +161,7 @@ void crash_screen_print_float_registers(__OSThreadContext* tc) {
 void crash_context_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
-    s32 cause = ((tc->cause >> CAUSE_EXCSHIFT) & BITMASK(5));
+    u32 cause = ((tc->cause >> CAUSE_EXCSHIFT) & BITMASK(5));
     // Make the last two cause case indexes sequential for array access.
     if (cause == (EXC_WATCH >> CAUSE_EXCSHIFT)) cause = 16;
     if (cause == (EXC_VCED  >> CAUSE_EXCSHIFT)) cause = 17;
@@ -180,11 +180,11 @@ void crash_context_draw(void) {
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
-    uintptr_t pc = tc->pc;
+    Address pc = tc->pc;
     const char* fname = parse_map(&pc);
-    // "CRASH AT:"
+    // "CRASH IN:"
     size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"CRASH AT: ",
+        STR_COLOR_PREFIX"CRASH IN: ",
         COLOR_RGBA32_CRASH_AT
     );
     if (fname == NULL) {

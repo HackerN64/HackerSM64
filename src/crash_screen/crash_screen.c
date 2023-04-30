@@ -48,8 +48,8 @@ static _Bool sFirstCrash = TRUE;
 struct CSThreadInfo* gActiveCSThreadInfo = NULL;
 OSThread* gCrashedThread = NULL;
 
-uintptr_t gCrashAddress    = 0x00000000; // Crashed thread PC.
-uintptr_t gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
+Address gCrashAddress    = 0x00000000; // Crashed thread PC.
+Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
 void crash_screen_reinitialize(void) {

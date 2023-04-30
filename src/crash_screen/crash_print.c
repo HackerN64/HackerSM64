@@ -29,9 +29,9 @@ static _Bool glyph_to_hex(char* dest, unsigned char glyph) {
     return TRUE;
 }
 
-static _Bool read_str_to_bytes(u8 dest[], const char* buf, u32 index, size_t numBytes) {
+static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t numBytes) {
     for (u32 byteIndex = 0; byteIndex < numBytes; byteIndex++) {
-        u8 retByte = 0x00;
+        Byte retByte = 0x00;
 
         for (int digit = 0; digit < 2; digit++) {
             unsigned char glyph = buf[index];
@@ -57,10 +57,10 @@ static _Bool read_str_to_bytes(u8 dest[], const char* buf, u32 index, size_t num
 
 static _Bool is_special_char(unsigned char glyph) {
     return (
-        glyph == CHAR_ESCAPE  ||
-        glyph == CHAR_NEWLINE ||
-        glyph == CHAR_RETURN  ||
-        glyph == CHAR_COLOR
+        (glyph == CHAR_ESCAPE ) ||
+        (glyph == CHAR_NEWLINE) ||
+        (glyph == CHAR_RETURN ) ||
+        (glyph == CHAR_COLOR  )
     );
 }
 
@@ -135,10 +135,10 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
     while (index < size) {
         unsigned char glyph = buf[index].glyph;
         if (
-            glyph == CHAR_NULL    ||
-            glyph == CHAR_SPACE   ||
-            glyph == CHAR_NEWLINE ||
-            glyph == CHAR_RETURN
+            (glyph == CHAR_NULL   ) ||
+            (glyph == CHAR_SPACE  ) ||
+            (glyph == CHAR_NEWLINE) ||
+            (glyph == CHAR_RETURN )
         ) {
             break;
         }

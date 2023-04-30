@@ -6,19 +6,19 @@
 
 
 struct MapEntry {
-    /*0x00*/ uintptr_t addr;
+    /*0x00*/ Address addr;
     /*0x04*/ size_t size;
-    /*0x08*/ uintptr_t name_offset;
+    /*0x08*/ size_t name_offset;
     /*0x0C*/ size_t name_len;
 }; /*0x10*/
 
 typedef struct {
-    /*0x00*/ const uintptr_t start;
-    /*0x04*/ const uintptr_t end;
+    /*0x00*/ const Address start;
+    /*0x04*/ const Address end;
 } MemoryRegion; /*0x08*/
 
 #define EXTERN_TEXT_SYMBOL(name, side) \
-extern const u8 _##name##SegmentText##side[];
+extern const Byte _##name##SegmentText##side[];
 
 #define EXTERN_TEXT_REGION(name) \
 EXTERN_TEXT_SYMBOL(name, Start) \
@@ -73,7 +73,7 @@ EXTERN_GROUP_TEXT(common1)
 #undef DEFINE_LEVEL
 
 #define MEMORY_REGION(start, end) \
-    { (const uintptr_t)(start), (const uintptr_t)(end) },
+    { (const Address)(start), (const Address)(end) },
 
 #define TEXT_REGION(name) \
     MEMORY_REGION(_##name##SegmentTextStart, _##name##SegmentTextEnd)
@@ -94,18 +94,18 @@ EXTERN_GROUP_TEXT(common1)
 
 extern const struct MapEntry gMapEntries[];
 extern const struct MapEntry gMapEntryEnd[];
-extern const u8 gMapStrings[];
-extern const u8 gMapStringEnd[];
-extern const u8 _mapDataSegmentRomStart[];
-extern const u8 _mapDataSegmentRomEnd[];
+extern const Byte gMapStrings[];
+extern const Byte gMapStringEnd[];
+extern const Byte _mapDataSegmentRomStart[];
+extern const Byte _mapDataSegmentRomEnd[];
 
 
 extern size_t gNumMapEntries;
 
 
 void map_data_init(void);
-_Bool is_in_code_segment(uintptr_t addr);
+_Bool is_in_code_segment(Address addr);
 const char* get_map_entry_name(const struct MapEntry* entry);
-s32 get_map_entry_index(uintptr_t addr);
-const char* parse_map(uintptr_t* addr);
-_Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos);
+s32 get_map_entry_index(Address addr);
+const char* parse_map(Address* addr);
+_Bool is_in_same_function(Address addr1, Address addr2);

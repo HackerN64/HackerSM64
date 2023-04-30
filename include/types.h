@@ -69,8 +69,19 @@ struct Controller {
 #endif
 };
 
-// -- Booleans --
+// -- Memory --
+typedef u8  Byte;
+typedef u16 Halfword;
+typedef u32 Word;
+typedef u64 Doubleword;
 
+typedef uintptr_t Address; //! TODO: 64 bit addressing mode.
+typedef u64 Register; //! TODO: 32 bit mode.
+
+// -- String --
+typedef unsigned char* String;
+
+// -- Booleans --
 typedef u8  Bool8;
 typedef u16 Bool16;
 typedef u32 Bool32;

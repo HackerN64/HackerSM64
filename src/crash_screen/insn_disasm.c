@@ -12,7 +12,7 @@
 
 /**
  * How to find instructions:
- * 
+ *
  * - If first 4 bits (cop_opcode) == 0100 (COP_OPCODE):
  *  - The next 2 bits (cop_num) are coprocessor number, so use insn_db_cop(z)
  *  - If the next bit (cop_bit) is set:
@@ -331,7 +331,7 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
 static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** checkInsn) {
     enum InsnType insnType = INSN_TYPE_OPCODE;
     *checkInsn = insn_db;
-    
+
     if (insn.cop_opcode == COP_OPCODE) { // COPz
         if (insn.cop_num < ARRAY_COUNT(insn_db_cop_lists)) {
             *checkInsn = insn_db_cop_lists[insn.cop_num];
@@ -466,21 +466,21 @@ s16 check_for_branch_offset(InsnData insn) {
     return 0x0000;
 }
 
-uintptr_t get_branch_target_from_addr(uintptr_t addr) {
+Address get_branch_target_from_addr(Address addr) {
     if (!is_in_code_segment(addr)) {
         return addr;
     }
 
-    InsnData insn = { .raw = *(uintptr_t*)addr };
+    InsnData insn = { .raw = *(Word*)addr };
 
     if (insn.opcode == OPC_J || insn.opcode == OPC_JAL) {
-        return PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(uintptr_t));
+        return PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
     }
 
     s16 branchOffset = check_for_branch_offset(insn);
 
     if (branchOffset) {
-        return (addr + (((s16)branchOffset + 1) * sizeof(uintptr_t)));
+        return (addr + (((s16)branchOffset + 1) * sizeof(InsnData)));
     }
 
     return addr;
@@ -515,12 +515,12 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_INSN_NAME           "%-"TO_STRING2(INSN_NAME_DISPLAY_WIDTH)"s"
 #define STR_INSN_NAME_FORMAT    STR_INSN_NAME_BASE"."STR_FORMAT
 
-#define STR_IREG            "%s"                           // Register
-#define STR_IMMEDIATE       STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
-#define STR_OFFSET          "%c"STR_IMMEDIATE               // ±Offset
-#define STR_FUNCTION        STR_HEX_PREFIX STR_HEX_WORD     // Function address
-#define STR_IREG_BASE       "("STR_IREG")"                  // Base register
-#define STR_FREG            "F%02d"                         // Float Register
+#define STR_IREG                "%s"                            // Register
+#define STR_IMMEDIATE           STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
+#define STR_OFFSET              "%c"STR_IMMEDIATE               // ±Offset
+#define STR_FUNCTION            STR_HEX_PREFIX STR_HEX_WORD     // Function address
+#define STR_IREG_BASE           "("STR_IREG")"                  // Base register
+#define STR_FREG                "F%02d"                         // Float Register
 
 char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
     char* strp = &insn_as_string[0];
@@ -619,10 +619,10 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     break;
                 case CHAR_P_FUNC:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_FUNCTION_NAME);
-                    uintptr_t target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(uintptr_t));
+                    Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
                     if (showDestNames && is_in_code_segment(target)) {
-                        uintptr_t tempTarget = target;
+                        Address tempTarget = target;
                         *fname = parse_map(&tempTarget);
                         // Only print as the function name if it's the exact starting address of the function.
                         if (target != tempTarget) {

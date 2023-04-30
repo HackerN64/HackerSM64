@@ -31,4 +31,4 @@ extern _Bool gAddressSelectMenuOpen;
 
 void draw_address_select(void);
 void crash_screen_select_address(void);
-void open_address_select(uintptr_t dest);
+void open_address_select(Address dest);

@@ -30,10 +30,10 @@ static _Bool sContinueFillBranchBuffer = FALSE;
 ALIGNED16 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static u32 sNumBranchArrows = 0;
 
-static uintptr_t sBranchBufferCurrAddr = 0x00000000;
+static Address sBranchBufferCurrAddr = 0x00000000;
 
 
-void reset_branch_buffer(uintptr_t funcAddr) {
+void reset_branch_buffer(Address funcAddr) {
     bzero(sBranchArrows, sizeof(sBranchArrows));
     sNumBranchArrows = 0;
 
@@ -42,7 +42,7 @@ void reset_branch_buffer(uintptr_t funcAddr) {
 
 //! TODO: Optimize this as much as possible
 //! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport)
-_Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
+_Bool crash_screen_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {
         return FALSE;
     }
@@ -60,6 +60,7 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
         curBranchX          = sBranchArrows[sNumBranchArrows - 1].xPos;
     }
 
+    // Pick up where we left off.
     struct BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
 
     OSTime startTime = osGetTime();
@@ -75,7 +76,7 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
         }
 
         // Left the function.
-        uintptr_t checkAddr = sBranchBufferCurrAddr;
+        Address checkAddr = sBranchBufferCurrAddr;
         if (!is_in_code_segment(checkAddr)) {
             return FALSE;
         }
@@ -85,10 +86,10 @@ _Bool crash_screen_fill_branch_buffer(const char* fname, uintptr_t funcAddr) {
         }
 
         // Get the offset for the current function;
-        InsnData insn = (InsnData){ .raw = *(uintptr_t*)sBranchBufferCurrAddr };
+        InsnData insn = (InsnData){ .raw = *(Word*)sBranchBufferCurrAddr };
         s16 branchOffset = check_for_branch_offset(insn);
 
-        if (branchOffset != 0) { //! TODO: Verify ordering:
+        if (branchOffset != 0x0000) { //! TODO: Verify ordering:
             curBranchX += DISASM_BRANCH_ARROW_SPACING;
             curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
 
@@ -125,7 +126,7 @@ void disasm_init(void) {
     sDisasmShowDataAsBinary      = FALSE;
     gFillBranchBuffer            = FALSE;
     sContinueFillBranchBuffer    = FALSE;
-    reset_branch_buffer((uintptr_t)NULL);
+    reset_branch_buffer((Address)NULL);
 }
 
 void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 printLine) {
@@ -180,7 +181,7 @@ void disasm_draw_branch_arrows(u32 printLine) {
     osWritebackDCacheAll();
 }
 
-static void print_as_insn(const u32 charX, const u32 charY, const uintptr_t data) {
+static void print_as_insn(const u32 charX, const u32 charY, const Word data) {
     InsnData insn = { .raw = data };
 #ifndef INCLUDE_DEBUG_MAP
     s16 branchOffset = check_for_branch_offset(insn);
@@ -197,7 +198,8 @@ static void print_as_insn(const u32 charX, const u32 charY, const uintptr_t data
 #ifdef INCLUDE_DEBUG_MAP
     if (sDisasmShowDestFunctionNames && destFname != NULL) {
         // "[function name]"
-        crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY, (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
+        crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
+            (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
             STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
         );
@@ -205,7 +207,7 @@ static void print_as_insn(const u32 charX, const u32 charY, const uintptr_t data
 #endif
 }
 
-static void print_as_binary(const u32 charX, const u32 charY, const uintptr_t data) { //! TODO: make this a formatting char, maybe \%b?
+static void print_as_binary(const u32 charX, const u32 charY, const Word data) { //! TODO: make this a formatting char?, maybe \%b?
     u32 bitX = charX;
 
     for (u32 c = 0; c < 32; c++) {
@@ -219,14 +221,14 @@ static void print_as_binary(const u32 charX, const u32 charY, const uintptr_t da
     }
 }
 
-void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uintptr_t pc) {
+static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
 
     sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, numLines, DISASM_STEP);
 
     for (u32 y = 0; y < numLines; y++) {
-        uintptr_t addr = (sDisasmViewportIndex + (y * DISASM_STEP));
+        Address addr = (sDisasmViewportIndex + (y * DISASM_STEP));
         charY = TEXT_Y(line + y);
 
         // Draw crash and selection rectangles:
@@ -240,7 +242,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uin
             crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_SELECT);
         }
 
-        uintptr_t data = *(uintptr_t*)addr;
+        Word data = *(Word*)addr;
 
         if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, data);
@@ -258,16 +260,16 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, uintptr_t selectedAddr, uin
     osWritebackDCacheAll();
 }
 
-//! TODO: automatically check page change:
-// uintptr_t sCurrFuncAddr = 0x00000000;
+//! TODO: automatically check page/address change:
+// Address sCurrFuncAddr = 0x00000000;
 // const char* sCurrFuncName = NULL;
 
 void disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const char* fname = NULL;
-    uintptr_t alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+    Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 #ifdef INCLUDE_DEBUG_MAP
-    uintptr_t funcAddr = alignedSelectedAddr;
+    Address funcAddr = alignedSelectedAddr;
     fname = parse_map(&funcAddr);
 #endif
 
@@ -330,7 +332,7 @@ const enum ControlTypes disasmContList[] = {
 
 void disasm_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
-    uintptr_t oldPos = gSelectedAddress;
+    Address oldPos = gSelectedAddress;
 #endif
 
     if (gCSDirectionFlags.pressed.up) {
@@ -361,11 +363,12 @@ void disasm_input(void) {
     }
 
 #ifdef INCLUDE_DEBUG_MAP
+    //! TODO: don't reset branch buffer if switched page back into the same function.
     if (gCSSwitchedPage || !is_in_same_function(oldPos, gSelectedAddress)) {
         gFillBranchBuffer = TRUE;
     }
 
-    uintptr_t funcAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+    Address funcAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
     const char* fname = parse_map(&funcAddr);
 
     if (gFillBranchBuffer) {

@@ -15,12 +15,13 @@ typedef u32 CSFontRow;
 #define VALID_RAM_END   RAM_END
 #define VALID_RAM_SIZE  (u64)(VALID_RAM_END - VALID_RAM_START)
 
+
 #define NUM_CRASH_SCREEN_BUFFERS 3
 
 
 struct CSThreadInfo {
     /*0x000*/ OSThread thread; /*0x1B0*/
-    /*0x1B0*/ u64 stack[THREAD2_STACK / sizeof(u64)]; /*0x400*/
+    /*0x1B0*/ Register stack[THREAD2_STACK / sizeof(Register)]; /*0x400*/
     /*0x4B0*/ OSMesgQueue mesgQueue; /*0x18*/
     /*0x4C8*/ OSMesg mesg; /*0x04*/
 }; /*0x4CC*/
@@ -42,9 +43,9 @@ struct CSPage {
 
 // Time conversion macros
 #define FPS_COUNT 30
-#define FRAMES_TO_NESC(f)   (((u64)(f) * 1000000000LL) / FPS_COUNT)
-#define FRAMES_TO_UESC(f)   (((u64)(f) * 1000000LL) / FPS_COUNT)
-#define FRAMES_TO_CYCLES(f) (((u64)(f) * OS_CPU_COUNTER) / FPS_COUNT)
-#define NSEC_TO_FRAMES(n)   (((u64)(n) * FPS_COUNT) / 1000000000LL)
-#define USEC_TO_FRAMES(n)   (((u64)(n) * FPS_COUNT) / 1000000LL)
-#define CYCLES_TO_FRAMES(c) (((u64)(c) * FPS_COUNT) / OS_CPU_COUNTER)
+#define FRAMES_TO_NESC(f)   (((OSTime)(f) * 1000000000LL) / FPS_COUNT)
+#define FRAMES_TO_UESC(f)   (((OSTime)(f) * 1000000LL) / FPS_COUNT)
+#define FRAMES_TO_CYCLES(f) (((OSTime)(f) * OS_CPU_COUNTER) / FPS_COUNT)
+#define NSEC_TO_FRAMES(n)   (((OSTime)(n) * FPS_COUNT) / 1000000000LL)
+#define USEC_TO_FRAMES(n)   (((OSTime)(n) * FPS_COUNT) / 1000000LL)
+#define CYCLES_TO_FRAMES(c) (((OSTime)(c) * FPS_COUNT) / OS_CPU_COUNTER)

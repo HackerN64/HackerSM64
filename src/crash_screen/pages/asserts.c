@@ -29,7 +29,7 @@ void assert_draw(void) { //! TODO: Make this scrollable if the message long enou
         // "No failed assert to report."
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "No failed assert to report.");
     }
-    
+
     gCSWordWrap = FALSE;
 
     osWritebackDCacheAll();

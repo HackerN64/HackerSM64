@@ -6,7 +6,7 @@
 
 
 struct BranchArrow {
-    /*0x00*/ uintptr_t startAddr;
+    /*0x00*/ Address startAddr;
     /*0x02*/ s16 branchOffset;
     /*0x04*/ s16 colorIndex;
     /*0x08*/ s32 xPos;

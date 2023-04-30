@@ -10,15 +10,14 @@
 #include "crash_print.h"
 #include "insn_disasm.h"
 #include "map_parser.h"
-#include "address_select.h"
 
 
 enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_NONE,
-    CRASH_SCREEN_MSG_CPU_BREAK,
-    CRASH_SCREEN_MSG_SP_BREAK,
-    CRASH_SCREEN_MSG_FAULT,
     CRASH_SCREEN_MSG_VI_VBLANK,
+    CRASH_SCREEN_MSG_CPU_BREAK = OS_EVENT_CPU_BREAK,
+    CRASH_SCREEN_MSG_SP_BREAK  = OS_EVENT_SP_BREAK ,
+    CRASH_SCREEN_MSG_FAULT     = OS_EVENT_FAULT    ,
 };
 
 enum CrashScreenPages {
@@ -42,8 +41,8 @@ extern enum CrashScreenPages gCSPageID;
 extern struct CSThreadInfo* gActiveCSThreadInfo;
 extern OSThread* gCrashedThread;
 
-extern uintptr_t gCrashAddress;
-extern uintptr_t gSelectedAddress;
+extern Address gCrashAddress;
+extern Address gSelectedAddress;
 
 
 void create_crash_screen_thread(void);

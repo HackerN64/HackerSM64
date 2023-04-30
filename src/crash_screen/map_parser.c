@@ -48,11 +48,11 @@ TEXT_REGION_GROUP(common1)
 size_t gNumMapEntries = 0;
 
 
-static void headless_dma(uintptr_t devAddr, void* dramAddr, size_t size) {
+static void headless_dma(Address devAddr, void* dramAddr, size_t size) {
     while (IO_READ(PI_STATUS_REG) & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY));
 
     IO_WRITE(PI_DRAM_ADDR_REG, K0_TO_PHYS(dramAddr));
-    IO_WRITE(PI_CART_ADDR_REG, K1_TO_PHYS((uintptr_t)osRomBase | devAddr));
+    IO_WRITE(PI_CART_ADDR_REG, K1_TO_PHYS((Address)osRomBase | devAddr));
     IO_WRITE(PI_WR_LEN_REG, (size - 1));
 
     while (IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
@@ -61,15 +61,15 @@ static void headless_dma(uintptr_t devAddr, void* dramAddr, size_t size) {
 void map_data_init(void) {
     gNumMapEntries = (gMapEntryEnd - gMapEntries);
 
-    uintptr_t start = (uintptr_t)_mapDataSegmentRomStart;
-    uintptr_t end   = (uintptr_t)_mapDataSegmentRomEnd;
+    Address start = (Address)_mapDataSegmentRomStart;
+    Address end   = (Address)_mapDataSegmentRomEnd;
 
-    headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), (end - start));
+    headless_dma((Address)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), (end - start));
 }
 
 // Check whether the address is in a .text segment.
 //! TODO: do INCLUDE_DEBUG_MAP inside this instead of on this whole file.
-_Bool is_in_code_segment(uintptr_t addr) {
+_Bool is_in_code_segment(Address addr) {
     //! TODO: Allow reading .text memory outside 0x80000000-0x80800000.
     if (!IS_IN_RDRAM(addr)) {
         return FALSE;
@@ -85,16 +85,17 @@ _Bool is_in_code_segment(uintptr_t addr) {
 }
 
 const char* get_map_entry_name(const struct MapEntry* entry) {
-    return (const char*)((uintptr_t)gMapStrings + entry->name_offset);
+    return (const char*)((u32)gMapStrings + entry->name_offset);
 }
 
-s32 get_map_entry_index(uintptr_t addr) {
+s32 get_map_entry_index(Address addr) {
     const struct MapEntry* entry = &gMapEntries[0];
 
     for (size_t i = 0; i < gNumMapEntries; i++) {
         if ((addr >= entry->addr) && (addr < (entry->addr + entry->size))) {
             return i;
         }
+
         entry++;
     }
 
@@ -102,11 +103,11 @@ s32 get_map_entry_index(uintptr_t addr) {
 }
 
 // Changes 'addr' to the starting address of the function it's in and returns a pointer to the function name.
-const char* parse_map(uintptr_t* addr) {
+const char* parse_map(Address* addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
 #endif
-    *addr = ALIGNFLOOR(*addr, sizeof(uintptr_t));
+    *addr = ALIGNFLOOR(*addr, sizeof(Word));
 
     if (!is_in_code_segment(*addr)) {
         return NULL;
@@ -124,20 +125,20 @@ const char* parse_map(uintptr_t* addr) {
 }
 
 // Check whether two addresses share the same function.
-_Bool is_in_same_function(uintptr_t oldPos, uintptr_t newPos) {
-    if (oldPos == newPos) {
+_Bool is_in_same_function(Address addr1, Address addr2) {
+    if (addr1 == addr2) {
         return TRUE;
     }
 
-    oldPos = ALIGNFLOOR(oldPos, sizeof(uintptr_t));
-    newPos = ALIGNFLOOR(newPos, sizeof(uintptr_t));
+    addr1 = ALIGNFLOOR(addr1, sizeof(Word));
+    addr2 = ALIGNFLOOR(addr2, sizeof(Word));
 
-    if (oldPos == newPos) {
+    if (addr1 == addr2) {
         return TRUE;
     }
 
-    parse_map(&oldPos);
-    parse_map(&newPos);
+    parse_map(&addr1);
+    parse_map(&addr2);
 
-    return (oldPos == newPos);
+    return (addr1 == addr2);
 }
