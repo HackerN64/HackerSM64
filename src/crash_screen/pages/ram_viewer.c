@@ -124,7 +124,7 @@ void ram_viewer_draw(void) {
 
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
-    // Scroll bar
+    // Scroll bar:
     crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE, (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     osWritebackDCacheAll();
@@ -133,14 +133,14 @@ void ram_viewer_draw(void) {
 void ram_viewer_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
-        if ((gSelectedAddress - RAM_VIEWER_STEP) >= VALID_RAM_START) {
+        if (gSelectedAddress >= (VALID_RAM_START + RAM_VIEWER_STEP)) {
             gSelectedAddress -= RAM_VIEWER_STEP;
         }
     }
 
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        if ((gSelectedAddress + RAM_VIEWER_STEP) < VALID_RAM_END) {
+        if (gSelectedAddress <= (VALID_RAM_END - RAM_VIEWER_STEP)) {
             gSelectedAddress += RAM_VIEWER_STEP;
         }
     }

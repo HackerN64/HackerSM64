@@ -225,8 +225,6 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
 
-    sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, numLines, DISASM_STEP);
-
     for (u32 y = 0; y < numLines; y++) {
         Address addr = (sDisasmViewportIndex + (y * DISASM_STEP));
         charY = TEXT_Y(line + y);
@@ -297,7 +295,7 @@ void disasm_draw(void) {
 
     line++;
 
-    osWritebackDCacheAll();
+    sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, DISASM_NUM_ROWS, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
     disasm_draw_branch_arrows(line);
@@ -338,7 +336,7 @@ void disasm_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
         // Scroll up.
-        if ((gSelectedAddress - DISASM_STEP) >= VALID_RAM_START)  {
+        if (gSelectedAddress >= (VALID_RAM_START + DISASM_STEP))  {
             gSelectedAddress -= DISASM_STEP;
         }
     }
@@ -346,7 +344,7 @@ void disasm_input(void) {
     if (gCSDirectionFlags.pressed.down) {
         gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
         // Scroll down.
-        if ((gSelectedAddress + DISASM_STEP) < VALID_RAM_END) {
+        if (gSelectedAddress <= (VALID_RAM_END - DISASM_STEP)) {
             gSelectedAddress += DISASM_STEP;
         }
     }

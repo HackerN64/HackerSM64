@@ -79,28 +79,27 @@ void stack_trace_init(void) {
 }
 
 void stack_trace_print_entries(u32 line, u32 numLines) {
-    struct FunctionInStack* function = NULL;
-
-    sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, numLines, 1);
+    u32 currIndex = sStackTraceViewportIndex;
+    struct FunctionInStack* function = &sFunctionStack[currIndex];
 
     // Print
     for (u32 i = 0; i < numLines; i++) {
-        u32 y = TEXT_Y(line + i);
-
-        u32 currIndex = (sStackTraceViewportIndex + i);
-
         if (currIndex >= sNumFoundFunctions) {
             break;
         }
 
-        if (currIndex == sStackTraceSelectedIndex) {
-            crash_screen_draw_rect((TEXT_X(0) - 1), (y - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_SELECT);
+        if (function == NULL) {
+            break;
         }
 
-        function = &sFunctionStack[currIndex];
+        u32 y = TEXT_Y(line + i);
 
-        if (function == NULL) {
-            continue;
+        if (currIndex == sStackTraceSelectedIndex) {
+            crash_screen_draw_rect(
+                (TEXT_X(0) - 1), (y - 2),
+                (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
+                COLOR_RGBA32_CRASH_SELECT
+            );
         }
 
         // "[stack address]:"
@@ -136,6 +135,9 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                 );
             }
         }
+
+        currIndex++;
+        function++;
     }
 
     osWritebackDCacheAll();
@@ -166,6 +168,8 @@ void stack_trace_draw(void) {
     }
 
     line++;
+
+    sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 
     stack_trace_print_entries(line, STACK_TRACE_NUM_ROWS);
 

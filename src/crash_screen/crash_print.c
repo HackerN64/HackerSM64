@@ -207,11 +207,14 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
     size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
+    PrintBuffer* bufChar = &gCSScrollBuffer[0];
+
     for (size_t index = 0; index < bufferCount; index++) {
-        gCSScrollBuffer[index] = gCSPrintBuffer[((index + offset) % size)];
-        if (gCSScrollBuffer[index].glyph == CHAR_NULL) {
-            gCSScrollBuffer[index].glyph = CHAR_SPACE;
+        *bufChar = gCSPrintBuffer[(index + offset) % size];
+        if (bufChar->glyph == CHAR_NULL) {
+            bufChar->glyph = CHAR_SPACE;
         }
+        bufChar++;
     }
 
     memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));

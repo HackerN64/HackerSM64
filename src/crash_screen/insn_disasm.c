@@ -535,11 +535,10 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
     if (info != NULL) {
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
+        const char* curCmd = &info->fmt[0];
 
-        for (u8 cmdIndex = 0; cmdIndex < sizeof(u32); cmdIndex++) {
-            char curCmd = info->fmt[cmdIndex];
-
-            if (unimpl || curCmd == CHAR_P_NULL) {
+        for (u32 cmdIndex = 0; cmdIndex < sizeof(info->fmt); cmdIndex++) {
+            if (unimpl || *curCmd == CHAR_P_NULL) {
                 break;
             }
 
@@ -548,7 +547,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                 strp += sprintf(strp, ", ");
             }
 
-            switch (curCmd) {
+            switch (*curCmd) {
                 case CHAR_P_NOP:
                     check_color_change(&strp, &color, COLOR_RGBA32_CRASH_DISASM_NOP);
                     strp += sprintf(strp, info->name);
@@ -642,6 +641,8 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     unimpl = TRUE;
                     break;
             }
+
+            curCmd++;
         }
     } else {
         unimpl = TRUE;
