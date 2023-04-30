@@ -315,7 +315,7 @@ void disasm_draw(void) {
     // Scroll bar:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
+        DISASM_SHOWN_SECTION, VALID_RAM_SIZE,
         (sDisasmViewportIndex - DISASM_SCROLL_MIN),
         COLOR_RGBA32_LIGHT_GRAY, TRUE
     );
@@ -323,7 +323,7 @@ void disasm_draw(void) {
     // Scroll bar crash position marker:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
+        DISASM_SHOWN_SECTION, VALID_RAM_SIZE,
         (tc->pc - DISASM_SCROLL_MIN),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
