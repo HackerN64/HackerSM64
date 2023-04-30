@@ -309,11 +309,24 @@ void disasm_draw(void) {
 
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
-    // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (sDisasmViewportIndex - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    u32 scrollTop = (DIVIDER_Y(line) + 1);
+    u32 scrollBottom = DIVIDER_Y(line2);
 
-    // Scroll bar crash position marker
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, VALID_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
+    // Scroll bar:
+    crash_screen_draw_scroll_bar(
+        scrollTop, scrollBottom,
+        DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
+        (sDisasmViewportIndex - DISASM_SCROLL_MIN),
+        COLOR_RGBA32_LIGHT_GRAY, TRUE
+    );
+
+    // Scroll bar crash position marker:
+    crash_screen_draw_scroll_bar(
+        scrollTop, scrollBottom,
+        DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
+        (tc->pc - DISASM_SCROLL_MIN),
+        COLOR_RGBA32_CRASH_AT, FALSE
+    );
 
     osWritebackDCacheAll();
 }

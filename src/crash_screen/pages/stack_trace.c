@@ -178,7 +178,12 @@ void stack_trace_draw(void) {
 
     // Scroll Bar
     if (sNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
-        //! TODO: crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), STACK_TRACE_NUM_ROWS, sNumFoundFunctions, sStackTraceViewportIndex, 4, COLOR_RGBA32_LIGHT_GRAY);
+        crash_screen_draw_scroll_bar(
+            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), 
+            STACK_TRACE_NUM_ROWS, sNumFoundFunctions,
+            sStackTraceViewportIndex,
+            COLOR_RGBA32_LIGHT_GRAY, TRUE
+        );
 
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }

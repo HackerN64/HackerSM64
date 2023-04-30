@@ -41,6 +41,50 @@ static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
     }
 }
 
+static void ram_viewer_print_data(u32 line, Address startAddr) {
+    __OSThreadContext* tc = &gCrashedThread->context;
+    u32 charX = (TEXT_X(8) + 3);
+    u32 charY = TEXT_Y(line);
+
+    for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
+        Address rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
+
+        // Row header:
+        // "[XXXXXXXX]"
+        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
+            ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr
+        );
+
+        charX = (TEXT_X(8) + 3);
+        charY = TEXT_Y(line + y);
+        for (u32 x = 0; x < 16; x++) {
+            Address currAddr = (rowAddr + x);
+
+            if ((x % 4) == 0) {
+                charX += 2;
+            }
+
+            RGBA32 textColor = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            RGBA32 selectColor = COLOR_RGBA32_NONE;
+
+            if (currAddr == gSelectedAddress) {
+                selectColor = COLOR_RGBA32_WHITE;
+                textColor = COLOR_RGBA32_BLACK;
+            } else if (currAddr == tc->pc) {
+                selectColor = COLOR_RGBA32_RED;
+            }
+
+            if (selectColor != COLOR_RGBA32_NONE) {
+                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
+            }
+
+            print_byte(charX, charY, *(Byte*)currAddr, textColor);
+
+            charX += (TEXT_WIDTH(2) + 1);
+        }
+    }
+}
+
 void ram_viewer_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
@@ -80,52 +124,30 @@ void ram_viewer_draw(void) {
 
     line++;
 
-    charX = (TEXT_X(8) + 3);
-    u32 charY = TEXT_Y(line);
-
-    for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
-        Address rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
-
-        // "[XXXXXXXX]"
-        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
-            ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr
-        );
-
-        charX = (TEXT_X(8) + 3);
-        charY = TEXT_Y(line + y);
-        for (u32 x = 0; x < 16; x++) {
-            Address currAddr = (rowAddr + x);
-
-            if ((x % 4) == 0) {
-                charX += 2;
-            }
-
-            RGBA32 textColor = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
-            RGBA32 selectColor = COLOR_RGBA32_NONE;
-
-            if (currAddr == gSelectedAddress) {
-                selectColor = COLOR_RGBA32_WHITE;
-                textColor = COLOR_RGBA32_BLACK;
-            } else if (currAddr == tc->pc) {
-                selectColor = COLOR_RGBA32_RED;
-            }
-
-            if (selectColor != COLOR_RGBA32_NONE) {
-                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
-            }
-
-            print_byte(charX, charY, *(Byte*)currAddr, textColor);
-
-            charX += (TEXT_WIDTH(2) + 1);
-        }
-    }
+    ram_viewer_print_data(line, startAddr);
 
     u32 line2 = (line + RAM_VIEWER_NUM_ROWS);
 
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
-    // Scroll bar:
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE, (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    u32 scrollTop = (DIVIDER_Y(line) + 1);
+    u32 scrollBottom = DIVIDER_Y(line2);
+
+    // Scroll bar.
+    crash_screen_draw_scroll_bar(
+        scrollTop, scrollBottom,
+        RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE,
+        (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN),
+        COLOR_RGBA32_LIGHT_GRAY, TRUE
+    );
+
+    // Scroll bar crash position marker.
+    crash_screen_draw_scroll_bar(
+        scrollTop, scrollBottom,
+        RAM_VIEWER_SHOWN_SECTION, VALID_RAM_SIZE,
+        (tc->pc - RAM_VIEWER_SCROLL_MIN),
+        COLOR_RGBA32_CRASH_AT, FALSE
+    );
 
     osWritebackDCacheAll();
 }

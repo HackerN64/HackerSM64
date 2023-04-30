@@ -242,20 +242,29 @@ void crash_screen_update_framebuffer(void) {
     osWritebackDCacheAll();
 }
 
-void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
-    // Determine size of the scroll bar, starting on the pixel below the divider.
-    u32 totalHeight = (bottomY - topY);
+void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
+    const u32 x = (CRASH_SCREEN_X2 - 1);
 
-    u32 scrollBarHeight = (numVisibleEntries * ((f32)totalHeight / (f32)numTotalEntries));
-    scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
+    // The total height of the area the scroll bar can move.
+    u32 scrollableHeight = (bottomY - topY);
 
-    // Determine position of the scroll bar.
-    f32 scrollableHeight = (totalHeight - scrollBarHeight);
-    f32 numScrollableEntries = (numTotalEntries - numVisibleEntries);
-    u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
+    if (drawBg) {
+        // Draw the background scroll bar
+        const Alpha bgAlpha = (RGBA32_A(color) / 2);
+        crash_screen_draw_rect(x, topY, 1, scrollableHeight, ((color & ~0xFF) | bgAlpha));
+    }
 
-    // Draw the scroll bar rectangle.
-    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color);
+    u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);
+
+    u32 barTop    = (scrollableHeight * ((f32)   topVisibleEntry / (f32)numTotalEntries));
+    u32 barBottom = (scrollableHeight * ((f32)bottomVisibleEntry / (f32)numTotalEntries));
+
+    u32 barHeight = (barBottom - barTop);
+    if (barHeight < 1) {
+        barHeight = 1;
+    }
+
+    crash_screen_draw_rect(x, (topY + barTop), 1, barHeight, color);
 }
 
 // Draw the header.
