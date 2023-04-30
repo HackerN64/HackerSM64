@@ -11,8 +11,8 @@ typedef u32 CSFontRow;
 
 
 //! TODO: Allow reading outside of 0x80000000-0x80800000 range.
-#define VALID_RAM_START RAM_START
-#define VALID_RAM_END   RAM_END
+#define VALID_RAM_START (Address)RAM_START
+#define VALID_RAM_END   (Address)RAM_END
 #define VALID_RAM_SIZE  (u64)(VALID_RAM_END - VALID_RAM_START)
 
 
