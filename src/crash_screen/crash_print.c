@@ -15,7 +15,7 @@ PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 _Bool gCSWordWrap = FALSE;
 
 
-static _Bool glyph_to_hex(char* dest, unsigned char glyph) {
+static _Bool glyph_to_hex(char* dest, char glyph) {
     if (IS_NUMERIC(glyph)) {
         *dest = ((glyph - CHAR_NUMERIC_START) & BITMASK(4));
     } else if (IS_UPPERCASE_HEX(glyph)) {
@@ -34,7 +34,7 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
         Byte retByte = 0x00;
 
         for (int digit = 0; digit < 2; digit++) {
-            unsigned char glyph = buf[index];
+            char glyph = buf[index];
             char hex = 0x0;
 
             if (glyph == CHAR_NULL) {
@@ -55,7 +55,7 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
     return TRUE;
 }
 
-static _Bool is_special_char(unsigned char glyph) {
+static _Bool is_special_char(char glyph) {
     return (
         (glyph == CHAR_ESCAPE ) ||
         (glyph == CHAR_NEWLINE) ||
@@ -74,7 +74,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
     for (u32 index = 0; index < totalSize; index++) {
         PrintBuffer* data = &gCSPrintBuffer[bufferCount];
         _Bool print = FALSE;
-        unsigned char glyph = buf[index];
+        char glyph = buf[index];
 
         if (glyph == CHAR_NULL) {
             break;
@@ -133,7 +133,7 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
     u32 count = 0;
 
     while (index < size) {
-        unsigned char glyph = buf[index].glyph;
+        char glyph = buf[index].glyph;
         if (
             (glyph == CHAR_NULL   ) ||
             (glyph == CHAR_SPACE  ) ||
@@ -159,7 +159,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         _Bool print = FALSE;
         _Bool newline = FALSE;
         PrintBuffer* data = &gCSPrintBuffer[index];
-        unsigned char glyph = data->glyph;
+        char glyph = data->glyph;
 
         switch (glyph) {
             case CHAR_NEWLINE:

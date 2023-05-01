@@ -170,7 +170,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     }
 }
 
-void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color) {
+void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     if (glyph == CHAR_NULL) { // Null
         color = COLOR_RGBA32_GRAY;
     }

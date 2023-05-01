@@ -79,7 +79,7 @@ typedef uintptr_t Address; //! TODO: 64 bit addressing mode.
 typedef u64 Register; //! TODO: 32 bit mode.
 
 // -- String --
-typedef unsigned char* String;
+typedef char* String;
 
 // -- Booleans --
 typedef u8  Bool8;
