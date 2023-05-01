@@ -62,6 +62,8 @@ void draw_address_select(void) {
     osWritebackDCacheAll();
 }
 
+extern u32 sMapViewerSelectedIndex;
+
 void crash_screen_select_address(void) {
     s8 change = 0;
 
@@ -103,6 +105,15 @@ void crash_screen_select_address(void) {
         // Jump to the address and close the popup.
         gAddressSelectMenuOpen = FALSE;
         switch (gCSPageID) {
+            case PAGE_MAP_VIEWER:;
+                s32 targetIndex = get_map_entry_index(sAddressSelectTarget);
+                if (targetIndex != -1) {
+                    if (is_in_code_segment(gMapEntries[targetIndex].addr)) {
+                        gCSPageID = PAGE_DISASM;
+                    }
+                    sMapViewerSelectedIndex = targetIndex;
+                }
+                break;
             case PAGE_STACK_TRACE:
                 gCSPageID = PAGE_DISASM;
                 break;

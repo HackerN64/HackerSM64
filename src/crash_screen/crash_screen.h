@@ -28,9 +28,13 @@ enum CrashScreenPages {
 #ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
 #endif
+#ifdef INCLUDE_DEBUG_MAP
+    PAGE_MAP_VIEWER,
+#endif
     PAGE_STACK_TRACE,
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
+
     NUM_PAGES,
     MAX_PAGES = 255U,
 };

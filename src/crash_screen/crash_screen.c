@@ -23,6 +23,7 @@
 #include "pages/context.h"
 #include "pages/asserts.h"
 #include "pages/log.h"
+#include "pages/map_viewer.h"
 #include "pages/stack_trace.h"
 #include "pages/ram_viewer.h"
 #include "pages/disasm.h"
@@ -33,6 +34,9 @@ struct CSPage gCSPages[NUM_PAGES] = {
     [PAGE_ASSERTS    ] = { .initFunc = NULL,             .drawFunc = assert_draw,         .inputFunc = NULL,              .contList = defaultContList,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef PUPPYPRINT_DEBUG
     [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = puppyprint_log_draw, .inputFunc = NULL,              .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+#endif
+#ifdef INCLUDE_DEBUG_MAP
+    [PAGE_MAP_VIEWER ] = { .initFunc = map_viewer_init,  .drawFunc = map_viewer_draw,     .inputFunc = map_viewer_input,  .contList = mapViewerContList,  .name = "MAP VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
     [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw,    .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
     [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,     .inputFunc = ram_viewer_input,  .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
