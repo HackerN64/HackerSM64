@@ -117,9 +117,8 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             if (sStackTraceShowFunctionNames) {
                 // "[function name]"
                 const size_t offsetChars = STRLEN("+0000");
-                crash_screen_print_scroll(TEXT_X(addrStrSize), y,
+                crash_screen_print_map_name(TEXT_X(addrStrSize), y,
                     (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + offsetChars)),
-                    STR_COLOR_PREFIX"%s",
                     COLOR_RGBA32_CRASH_FUNCTION_NAME_2, function->fname
                 );
                 // "+[offset]"
@@ -159,13 +158,10 @@ void stack_trace_draw(void) {
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
     Address pc = tc->pc;
     const char* fname = parse_map(&pc);
-    if (fname == NULL) {
-        // "UNKNOWN"
-        crash_screen_print(TEXT_X(9), TEXT_Y(line), STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
-    } else {
-        // "[function name]"
-        crash_screen_print_scroll(TEXT_X(9), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 9), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
-    }
+    crash_screen_print_map_name(TEXT_X(9), TEXT_Y(line),
+        (CRASH_SCREEN_NUM_CHARS_X - 9),
+        COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
+    );
 
     line++;
 

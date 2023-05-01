@@ -52,12 +52,10 @@ void draw_address_select(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (isValid) {
         const char* fname = parse_map(&addr);
-        if (fname != NULL) {
-            // "[function name]"
-            crash_screen_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, STR_COLOR_PREFIX"%s",
-                (is_in_code_segment(addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
-            );
-        }
+        // "[mapped data name]"
+        crash_screen_print_map_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X,
+            (is_in_code_segment(addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
+        );
     }
 #endif
 

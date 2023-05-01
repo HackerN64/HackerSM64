@@ -198,9 +198,8 @@ static void print_as_insn(const u32 charX, const u32 charY, const Word data) {
 #ifdef INCLUDE_DEBUG_MAP
     if (sDisasmShowDestFunctionNames && destFname != NULL) {
         // "[function name]"
-        crash_screen_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
+        crash_screen_print_map_name((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
-            STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
         );
     }
@@ -282,17 +281,11 @@ void disasm_draw(void) {
 
     line++;
 
-    if (fname == NULL) {
-        // "NOT IN A FUNCTION"
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
-    } else {
-        // "IN: [function name]"
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-        crash_screen_print_scroll(TEXT_X(3), TEXT_Y(line),
-            (CRASH_SCREEN_NUM_CHARS_X - 3), STR_COLOR_PREFIX"%s",
-            (is_in_code_segment(alignedSelectedAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
-        );
-    }
+    size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
+    crash_screen_print_map_name(TEXT_X(charX), TEXT_Y(line),
+        (CRASH_SCREEN_NUM_CHARS_X - charX),
+        (is_in_code_segment(alignedSelectedAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
+    );
 
     line++;
 

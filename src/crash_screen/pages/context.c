@@ -188,13 +188,10 @@ void crash_context_draw(void) {
         STR_COLOR_PREFIX"CRASH IN: ",
         COLOR_RGBA32_CRASH_AT
     );
-    if (fname == NULL) {
-        // "UNKNOWN"
-        crash_screen_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
-    } else {
-        // "[function name]"
-        crash_screen_print_scroll(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - 10), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
-    }
+    crash_screen_print_map_name(TEXT_X(charX), TEXT_Y(line),
+        (CRASH_SCREEN_NUM_CHARS_X - charX),
+        COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
+    );
 #endif
 
     crash_screen_print_registers(tc);

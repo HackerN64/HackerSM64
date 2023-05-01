@@ -251,3 +251,16 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
 
     return numChars;
 }
+
+void crash_screen_print_map_name(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
+    if (fname == NULL) {
+        // "UNKNOWN"
+        crash_screen_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+    } else {
+        // "[name from map data]"
+        crash_screen_print_scroll(x, y, maxWidth,
+            STR_COLOR_PREFIX"%s",
+            color, fname
+        );
+    }
+}
