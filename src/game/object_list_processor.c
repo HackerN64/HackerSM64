@@ -617,6 +617,22 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
 }
 
 /**
+ * Clear all floors tied to dynamic collision, as they become invalid once the dynamic
+ * surfaces are cleared.
+ * 
+ * NOTE: Checking over the full object pool is slower than checking against the linked lists of active
+ * objects until the active object pool is around half capacity, after which, this is faster.
+ * Change this function to use a linked list instead if you add any additional logic here whatsoever.
+ */
+void clear_dynamic_surface_references(void) {
+    for (s32 i = 0; i < OBJECT_POOL_CAPACITY; i++) {
+        if (gObjectPool[i].oFloor && gObjectPool[i].oFloor->flags & SURFACE_FLAG_DYNAMIC) {
+            gObjectPool[i].oFloor = NULL;
+        }
+    }
+}
+
+/**
  * Update all objects. This includes script execution, object collision detection,
  * and object surface management.
  */

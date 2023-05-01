@@ -94,6 +94,7 @@ void clear_object_lists(struct ObjectNode *objLists) {
 void unload_object(struct Object *obj) {
     obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     obj->prevObj = NULL;
+    obj->oFloor = NULL;
 
     obj->header.gfx.throwMatrix = NULL;
     stop_sounds_from_source(obj->header.gfx.cameraToObject);
