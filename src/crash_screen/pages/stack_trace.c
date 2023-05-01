@@ -66,14 +66,26 @@ void fill_function_stack_trace(void) {
 void stack_trace_init(void) {
     bzero(&sFunctionStack, sizeof(sFunctionStack));
 
-    sNumFoundFunctions = 0;
-
     sStackTraceShowFunctionNames = TRUE;
 
     sStackTraceSelectedIndex = 0;
     sStackTraceViewportIndex = 0;
 
+    sNumFoundFunctions = 0;
+
 #ifdef INCLUDE_DEBUG_MAP
+    // Include the current function at the top:
+    __OSThreadContext* tc = &gCrashedThread->context;
+    Address pc = tc->pc;
+    const char* fname = parse_map(&pc);
+    struct FunctionInStack currFunc = {
+        .stackAddr = 0,
+        .curAddr   = tc->pc,
+        .faddr     = pc,
+        .fname     = fname,
+    };
+    sFunctionStack[sNumFoundFunctions++] = currFunc;
+
     fill_function_stack_trace();
 #endif
 }
@@ -102,8 +114,13 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             );
         }
 
+        const size_t addrStrSize = STRLEN("00000000:");
         // "[stack address]:"
-        const size_t addrStrSize = crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
+        if (currIndex == 0) {
+            crash_screen_print(TEXT_X(0), y, STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
+        } else {
+            crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
+        }
 
         if (function->fname == NULL) {
             // Print unknown function
@@ -113,16 +130,17 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                 COLOR_RGBA32_CRASH_UNKNOWN, function->curAddr
             );
         } else {
+            const RGBA32 nameColor = ((currIndex == 0) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
             // Print known function
             if (sStackTraceShowFunctionNames) {
                 // "[function name]"
-                const size_t offsetChars = STRLEN("+0000");
+                const size_t offsetStrSize = STRLEN("+0000");
                 crash_screen_print_map_name(TEXT_X(addrStrSize), y,
-                    (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + offsetChars)),
-                    COLOR_RGBA32_CRASH_FUNCTION_NAME_2, function->fname
+                    (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + offsetStrSize)),
+                    nameColor, function->fname
                 );
                 // "+[offset]"
-                crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetChars), y,
+                crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,
                     (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
                     COLOR_RGBA32_CRASH_FUNCTION_NAME_2, (function->curAddr - function->faddr)
                 );
@@ -130,7 +148,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                 // "[function address]"
                 crash_screen_print(TEXT_X(addrStrSize), y,
                     (STR_COLOR_PREFIX STR_HEX_WORD),
-                    COLOR_RGBA32_CRASH_FUNCTION_NAME_2, function->curAddr
+                    nameColor, function->curAddr
                 );
             }
         }
@@ -151,25 +169,16 @@ void stack_trace_draw(void) {
 
     // "FROM: [XXXXXXXX]"
     crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, (Address)tc->sp);
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
 
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
-    Address pc = tc->pc;
-    const char* fname = parse_map(&pc);
-    crash_screen_print_map_name(TEXT_X(9), TEXT_Y(line),
-        (CRASH_SCREEN_NUM_CHARS_X - 9),
-        COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-    );
-
-    line++;
-
     sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 
     stack_trace_print_entries(line, STACK_TRACE_NUM_ROWS);
 
-    // Draw the line after the entries so the selection box is behind it.
+    // Draw the top line after the entries so the selection rectangle is behind it.
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar

@@ -6,7 +6,7 @@
 
 
 // Number of rows to print:
-#define STACK_TRACE_NUM_ROWS 19
+#define STACK_TRACE_NUM_ROWS 20
 
 // The number of functions to save to the stack trace buffer.
 #define STACK_TRACE_BUFFER_SIZE 64
