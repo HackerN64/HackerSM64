@@ -10,12 +10,12 @@
 typedef u32 CSFontRow;
 
 
-//! TODO: Allow reading outside of 0x80000000-0x80800000 range.
+// Virtual RAM boundary defines.
 #define VIRTUAL_RAM_START (Address)RAM_START
 #define VIRTUAL_RAM_END   (Address)0xFFFFFFFF
 #define VIRTUAL_RAM_SIZE  (size_t)(VIRTUAL_RAM_END - VIRTUAL_RAM_START)
 
-
+// The number of crash screen threads that will be cycled through when the crash screen crashes. This should be at least 3.
 #define NUM_CRASH_SCREEN_BUFFERS 3
 
 

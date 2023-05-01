@@ -52,7 +52,7 @@ static _Bool sFirstCrash = TRUE;
 struct CSThreadInfo* gActiveCSThreadInfo = NULL;
 OSThread* gCrashedThread = NULL;
 
-Address gCrashAddress    = 0x00000000; // Crashed thread PC.
+Address gCrashAddress    = 0x00000000; // Used by SET_CRASH_ADDR to set the crashed thread PC.
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 

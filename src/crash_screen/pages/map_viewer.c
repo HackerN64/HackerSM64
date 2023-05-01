@@ -50,16 +50,16 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             );
         }
 
-        const size_t sizeChars = STRLEN("00000");
+        const size_t sizeStrSize = STRLEN("00000");
         // "[stack address]:"
         const size_t addrStrSize = crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", entry->addr);
         // "[name from map data]"
         crash_screen_print_map_name(TEXT_X(addrStrSize), y,
-            (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + sizeChars + 1)),
+            (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + sizeStrSize + 1)),
             (is_in_code_segment(entry->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), get_map_entry_name(entry)
         );
         // "[size]"
-        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeChars), y,
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), y,
             (STR_COLOR_PREFIX "%-X"),
             COLOR_RGBA32_CRASH_FUNCTION_NAME_2, entry->size
         );

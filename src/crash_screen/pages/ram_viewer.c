@@ -31,7 +31,7 @@ void ram_viewer_init(void) {
 static const char gHex[0x10] = "0123456789ABCDEF";
 
 static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
-    // "XX"
+    // "[XX]"
     if (sRamViewShowAsAscii) {
         crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
     } else {

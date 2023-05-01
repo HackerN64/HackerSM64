@@ -6,7 +6,7 @@
 
 
 // RAM Viewer constants
-#define RAM_VIEWER_STEP             (s32)(4 * sizeof(Word))
+#define RAM_VIEWER_STEP             (ssize_t)(4 * sizeof(Word))
 
 #define RAM_VIEWER_NUM_ROWS         19
 #define RAM_VIEWER_SHOWN_SECTION    ((RAM_VIEWER_NUM_ROWS - 1) * RAM_VIEWER_STEP)

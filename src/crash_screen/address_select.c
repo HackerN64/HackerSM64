@@ -9,7 +9,7 @@
 
 _Bool gAddressSelectMenuOpen = FALSE;
 static Address sAddressSelectTarget = 0x00000000;
-static s8 sAddressSelecCharIndex = 2;
+static s8 sAddressSelectCharIndex = 2;
 
 
 void draw_address_select(void) {
@@ -22,18 +22,20 @@ void draw_address_select(void) {
     // "GO TO:"
     crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(3)), JUMP_MENU_Y1, "GO TO:");
 
+    u32 triangleStartX = ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelectCharIndex * TEXT_WIDTH(1)) - 1);
+    u32 triangleStartY = ((JUMP_MENU_Y1 + TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
+
     // Up arrow:
     crash_screen_draw_vertical_triangle(
-        ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1),
-        ((JUMP_MENU_Y1 + TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y),
+        triangleStartX, triangleStartY,
         TEXT_WIDTH(1), TEXT_WIDTH(1),
         COLOR_RGBA32_CRASH_SELECT_ARROWS,
         FALSE
     );
+    triangleStartY = ((JUMP_MENU_Y1 + TEXT_HEIGHT(3)) - CRASH_SCREEN_CHAR_SPACING_Y + 1);
     // Down arrow:
     crash_screen_draw_vertical_triangle(
-        ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1),
-        ((JUMP_MENU_Y1 + TEXT_HEIGHT(3)) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
+        triangleStartX, triangleStartY,
         TEXT_WIDTH(1), TEXT_WIDTH(1),
         COLOR_RGBA32_CRASH_SELECT_ARROWS,
         TRUE
@@ -43,8 +45,11 @@ void draw_address_select(void) {
     Word data = 0;
     _Bool isValid = read_data(&data, addr);
 
-    // "0x[80XXXXXX]"
-    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2)), (JUMP_MENU_Y1 + TEXT_HEIGHT(2)),
+    u32 addressStartX = (SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2));
+    u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
+    // "0x[XXXXXXXX]"
+    crash_screen_print(
+        addressStartX, addressStartY,
         (STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_WORD),
         (isValid ? COLOR_RGBA32_LIGHT_GREEN : COLOR_RGBA32_LIGHT_RED), addr
     );
@@ -74,9 +79,9 @@ void crash_screen_select_address(void) {
         change = 1;
     }
 
-    sAddressSelecCharIndex = ((sAddressSelecCharIndex + change) & 0x7); // % 8
+    sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) & 0x7); // % 8
 
-    u32 shift = ((32 - 4) - (sAddressSelecCharIndex * 4));
+    u32 shift = ((32 - 4) - (sAddressSelectCharIndex * 4));
     u8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
     u8 new = digit;
     change = 0;

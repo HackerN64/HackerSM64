@@ -159,7 +159,7 @@ static _Bool is_unmapped(Address addr) {
     return (
         is_in_memory_region(addr, MEM_RCP_UNMAPPED_1) ||
         is_in_memory_region(addr, MEM_RCP_UNMAPPED_2) ||
-        is_in_memory_region(addr, MEM_UNMAPPED)
+        is_in_memory_region(addr, MEM_UNMAPPED      )
     );
 }
 
@@ -203,7 +203,7 @@ _Bool read_data(Word* dest, Address addr) {
         return FALSE;
     }
 
-    // Do a normal read if the address is in ram:
+    // Do a normal read if the address is in RDRAM:
     if (physAddr < TOTAL_RAM_SIZE) {
         *dest = *(Word*)addr;
 

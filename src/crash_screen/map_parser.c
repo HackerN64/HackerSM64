@@ -54,11 +54,10 @@ void map_data_init(void) {
     Address start = (Address)_mapDataSegmentRomStart;
     Address end   = (Address)_mapDataSegmentRomEnd;
 
-    headless_dma((Address)_mapDataSegmentRomStart, (size_t*)(RAM_END - RAM_1MB), (end - start));
+    headless_dma(start, (size_t*)(RAM_END - RAM_1MB), (end - start));
 }
 
 // Check whether the address is in a .text segment.
-//! TODO: do INCLUDE_DEBUG_MAP inside this instead of on this whole file.
 _Bool is_in_code_segment(Address addr) {
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
         if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
