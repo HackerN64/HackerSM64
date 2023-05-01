@@ -272,28 +272,21 @@ void print_crash_screen_header(void) {
     u32 line = 0;
     // "HackerSM64 vX.X.X"
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"%s v%s",
+        STR_COLOR_PREFIX"HackerSM64 v%s",
         COLOR_RGBA32_CRASH_HEADER,
-        "HackerSM64",
         HACKERSM64_VERSION
     );
 
-    u16 buttonDown = gPlayer1Controller->buttonDown;
-
     // "START:controls"
     crash_screen_print(TEXT_X(19), TEXT_Y(line),
-        STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX":%s",
-        ((buttonDown & START_BUTTON) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control,
-        COLOR_RGBA32_CRASH_HEADER, "controls"
+        STR_COLOR_PREFIX"%s:controls",
+        COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
     );
 
     // "<Page:XX>"
     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
-        STR_COLOR_PREFIX"%c"STR_COLOR_PREFIX"%s:%02d"STR_COLOR_PREFIX"%c",
-        ((buttonDown & L_TRIG) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '<',
-        COLOR_RGBA32_CRASH_HEADER,
-        "Page", (gCSPageID + 1),
-        ((buttonDown & R_TRIG) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_CRASH_HEADER), '>'
+        STR_COLOR_PREFIX"<Page:%02d"STR_COLOR_PREFIX">",
+        COLOR_RGBA32_CRASH_HEADER, (gCSPageID + 1)
     );
 
     line++;
