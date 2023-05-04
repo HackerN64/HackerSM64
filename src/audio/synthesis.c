@@ -986,7 +986,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                             s2 = 16;
                         }
 #else
-                        if (s2 == 0 && note->restart == FALSE) {
+                        if (s2 == 0 && note->restart == FALSE && flags != A_INIT) {
                             s2 = 16;
                         }
 #endif
