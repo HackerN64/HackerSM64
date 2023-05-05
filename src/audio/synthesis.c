@@ -986,7 +986,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                             s2 = 16;
                         }
 #else
-                        if (s2 == 0 && note->restart == FALSE && flags != A_INIT) {
+                        if (s2 == 0 && note->restart == FALSE) {
                             s2 = 16;
                         }
 #endif
@@ -1087,7 +1087,12 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 
                         switch (flags) {
                             case A_INIT: // = 1
-                                sp130 = 0;
+                                /**
+                                 * !NOTE: Removing this seems to produce a more accurate waveform, however I have no idea why Nintendo decided to add this originally.
+                                 * I can only speculate (and hope) that this was just an oversight on their part and this has no reason to exist, given my testing.
+                                 * I'm leaving it commented out here just in case though.
+                                 */
+                                // sp130 = 0;
                                 s5 = s0 * 2 + s5;
                                 break;
 
