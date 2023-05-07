@@ -26,10 +26,10 @@ enum ADSRActions {
 };
 
 enum ADSRDelays {
-    ADSR_DISABLE =  0,
     ADSR_HANG    = -1,
     ADSR_GOTO    = -2,
     ADSR_RESTART = -3,
+    ADSR_DISABLE = -4,
 };
 
 enum VibratoModes {

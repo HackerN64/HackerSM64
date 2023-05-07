@@ -428,8 +428,9 @@ s32 adsr_update(struct Note *note) {
                     adsr->target = adsr->target * adsr->target;
                     adsr->velocity = (adsr->target - adsr->current) / adsr->delay;
 #else // !(VERSION_EU || VERSION_SH)
-                    if (isInit && adsr->delay <= 1) {
-                        note->initFullVelocity = TRUE;
+                    if (adsr->delay <= 0) {
+                        adsr->delay = 1;
+                        note->initFullVelocity = isInit;
                     }
 
                     adsr->target = BSWAP16(adsr->envelope[adsr->envIndex].arg);
