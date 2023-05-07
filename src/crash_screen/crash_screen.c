@@ -52,11 +52,11 @@ static _Bool sFirstCrash = TRUE;
 struct CSThreadInfo* gActiveCSThreadInfo = NULL;
 OSThread* gCrashedThread = NULL;
 
-Address gCrashAddress    = 0x00000000; // Used by SET_CRASH_ADDR to set the crashed thread PC.
+Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_ADDR to set the crashed thread PC.
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
-void crash_screen_reinitialize(void) {
+static void crash_screen_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed.
     if (!sFirstCrash) {
         gCSPages[gCSPageID].flags.crashed = TRUE;
@@ -70,7 +70,7 @@ void crash_screen_reinitialize(void) {
     gCSDrawCrashScreen     = TRUE;
     gCSDrawSavedScreenshot = TRUE;
 
-    gCrashAddress    = 0x00000000;
+    gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;
 
     gCSDirectionFlags.raw = 0;
@@ -84,7 +84,7 @@ void crash_screen_reinitialize(void) {
  * Iterates through the active thread queue for a user thread with either
  * the CPU break or Fault flag set.
  */
-OSThread* get_crashed_thread(void) {
+static OSThread* get_crashed_thread(void) {
     OSThread* thread = __osGetCurrFaultedThread();
 
     // OS_PRIORITY_THREADTAIL indicates the end of the thread queue.
@@ -126,7 +126,7 @@ void play_crash_sound(struct CSThreadInfo* threadInfo, s32 sound) {
 }
 #endif
 
-void on_crash(struct CSThreadInfo* threadInfo) {
+static void on_crash(struct CSThreadInfo* threadInfo) {
     // Set the active thread info pointer.
     gActiveCSThreadInfo = threadInfo;
 
@@ -150,9 +150,9 @@ void on_crash(struct CSThreadInfo* threadInfo) {
             case EXC_II:      gCSPageID = PAGE_DISASM;  break;
         }
         // If a position was specified, use that.
-        if (gCrashAddress != 0x0) {
+        if (gSetCrashAddress != 0x0) {
             gCSPageID = PAGE_RAM_VIEWER;
-            tc->pc = gCrashAddress;
+            tc->pc = gSetCrashAddress;
         }
 
         // Use the Z buffer's memory space to save a screenshot of the game.

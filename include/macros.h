@@ -199,8 +199,8 @@ void _asm_setbits(uintptr_t bits);
 // Set where the program counter will be on crash.
 #define SET_CRASH_ADDR(ptr) \
 do { \
-    extern uintptr_t gCrashAddress; \
-    gCrashAddress = (uintptr_t)&(ptr); \
+    extern uintptr_t gSetCrashAddress; \
+    gSetCrashAddress = (uintptr_t)&(ptr); \
 } while (0)
 
 // Cause a crash at a specific location.
