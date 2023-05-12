@@ -267,31 +267,26 @@ static struct RenderPhase sRenderPhases[] = {
     [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = {
         .startLayer = LAYER_FIRST,
         .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
-        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
     [RENDER_PHASE_ZEX_SILHOUETTE]          = {
         .startLayer = LAYER_SILHOUETTE_FIRST,
         .endLayer   = LAYER_SILHOUETTE_LAST,
-        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
     [RENDER_PHASE_ZEX_NON_SILHOUETTE]      = {
         .startLayer = LAYER_SILHOUETTE_FIRST,
         .endLayer   = LAYER_SILHOUETTE_LAST,
-        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
     [RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE]  = {
         .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
         .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
-        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
     [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
         .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
         .endLayer   = LAYER_LAST,
-        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
  #else
