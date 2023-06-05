@@ -14,6 +14,7 @@
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "game/debug.h"
 
 #include "config.h"
 
@@ -273,6 +274,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
 
     f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
     // This will never need to be run for custom levels because Fast64 does this step before exporting.
+    // assert(mag >= NEAR_ZERO, "Denorm tri was found.");
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (mag < NEAR_ZERO) {
         return NULL;
