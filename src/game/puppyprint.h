@@ -21,6 +21,15 @@ void append_puppyprint_log(const char *str, ...);
 #define append_puppyprint_log(...)
 #endif
 
+
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    #define PP_CYCLE_CONV(x) (x)
+    #define PP_CYCLE_STRING " cycles"
+#else
+    #define PP_CYCLE_CONV(x) OS_CYCLES_TO_USEC(x)
+    #define PP_CYCLE_STRING "us"
+#endif
+
 struct PPTextFont {
     Texture *tex; // Pointer to the texture for the font
     u8 *kern; // Pointer to the kerning table
