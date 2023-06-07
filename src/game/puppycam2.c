@@ -493,9 +493,7 @@ static void create_puppycam1_nodes(void) {
             continue;
         if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume))) == NULL) {
             gPuppyError |= PUPPY_ERROR_POOL_FULL;
-        #if PUPPYPRINT_DEBUG
-                append_puppyprint_log("Puppycamera volume allocation failed.");
-        #endif
+            append_puppyprint_log("Puppycamera volume allocation failed.");
             return;
         }
         if ((tempAngle = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume))) == NULL)
