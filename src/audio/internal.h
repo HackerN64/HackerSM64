@@ -420,7 +420,7 @@ struct SequenceChannel {
     /*0x00, 0x00*/ u8 stopScript : 1;
     /*0x00, 0x00*/ u8 stopSomething2 : 1; // sets SequenceChannelLayer.stopSomething
     /*0x00, 0x00*/ u8 hasInstrument : 1;
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     /*0x00, 0x00*/ u8 stereoHeadsetEffects : 1;
 #else
     /*0x00, 0x00*/ u8 paddingBit : 1;
@@ -672,7 +672,7 @@ struct Note {
     /*0x00*/ u8 finished              : 1;
     /*0x00*/ u8 envMixerNeedsInit     : 1;
     /*0x00*/ u8 initFullVelocity      : 1;
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     /*0x00*/ u8 stereoHeadsetEffects  : 1;
     /*0x00*/ u8 usesHeadsetPanEffects : 1;
     /*0x01*/ u8 stereoStrongRight     : 1;
@@ -707,7 +707,7 @@ struct Note {
     /*0x9C*/ s16 curVolLeft; // Q1.15, but will always be non-negative
     /*0x9E*/ s16 curVolRight; // Q1.15, but will always be non-negative
     /*0xA0*/ s16 reverbVolShifted; // Q1.15
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     /*0xA2*/ u16 headsetPanRight;
     /*0xA4*/ u16 headsetPanLeft;
     /*0xA6*/ u16 prevHeadsetPanRight;

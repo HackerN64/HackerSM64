@@ -36,7 +36,7 @@ static u16 sCurrentCapMusic = MUSIC_NONE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 static u8 sPlayingInfiniteStairs = FALSE;
 #endif
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
 static s16 sSoundMenuModeToSoundMode[3] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
 #else
 static s16 sSoundMenuModeToSoundMode[2] = { SOUND_MODE_STEREO, SOUND_MODE_MONO };

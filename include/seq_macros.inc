@@ -282,7 +282,7 @@
 .endm
 
 .macro chan_stereoheadseteffects a
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     .byte 0xd0
     .byte \a
 #else

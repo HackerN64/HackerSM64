@@ -27,7 +27,7 @@
  * Because of this, the Headset sound option will also not appear in the file select menu with this disabled.
  * Leaving this disabled may also be slightly beneficial for CPU performance.
  */
-// #define ENABLE_HEADSET_STEREO_EFFECTS
+// #define ENABLE_STEREO_HEADSET_EFFECTS
 
 /**
  * Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).

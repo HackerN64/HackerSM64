@@ -612,7 +612,7 @@ u16 gHeadsetPanQuantization[0x10] = {
     0x40, 0x40, 0x30, 0x30, 0x20, 0x20, 0x10, 0, 0, 0,
 };
 #elif !defined(VERSION_SH)
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
 u16 gHeadsetPanQuantization[10] = { 0x40, 0x30, 0x20, 0x10, 0, 0, 0, 0, 0, 0 };
 #endif
 #endif
@@ -624,7 +624,7 @@ s16 euUnknownData_80301950[64] = {
 };
 #endif
 
-#ifdef ENABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
 // Linearly interpolated between
 // f(0/2 * 127) = 1
 // f(1/2 * 127) = 1/sqrt(2)
