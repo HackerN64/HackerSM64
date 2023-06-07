@@ -247,6 +247,12 @@
             [1, 32700],
             [32700, 29430],
             "hang"
+        ],
+        "envelope41": [
+            [2, 32700],
+            [187, 0],
+            [32700, 0],
+            "hang"
         ]
     },
     "instruments": {
@@ -567,12 +573,12 @@
             "envelope": "envelope37",
             "sound": "3E_monk_choir"
         },
-        "Low Cowbell": {
+        "Low Bell": {
             "release_rate": 10,
             "envelope": "envelope38",
             "sound": "3F"
         },
-        "High Cowbell": {
+        "High Bell": {
             "release_rate": 10,
             "envelope": "envelope39",
             "sound": "40_bell"
@@ -581,6 +587,15 @@
             "release_rate": 19,
             "envelope": "envelope40",
             "sound": "43_harmonica"
+        },
+        "Percussion Loop": {
+            "release_rate": 100,
+            "normal_range_lo": 55,
+            "normal_range_hi": 56,
+            "envelope": "envelope41",
+            "sound_lo": "2A",
+            "sound": "2B",
+            "sound_hi": "2C"
         },
         "percussion": [
             {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.210224}},
@@ -705,8 +720,9 @@
         "Trumpet",
         "Harpsichord",
         "Monk Choir",
-        "Low Cowbell",
-        "High Cowbell",
-        "Harmonica"
+        "Low Bell",
+        "High Bell",
+        "Harmonica",
+        "Percussion Loop"
     ]
 }
