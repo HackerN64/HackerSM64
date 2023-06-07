@@ -1512,8 +1512,36 @@ void print_animated_red_coin(s16 x, s16 y) {
 void render_pause_red_coins(void) {
     s8 x;
 
-    for (x = 0; x < gRedCoinsCollected; x++) {
-        print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
+    if (gRedCoinsCollected <= 9) {
+        for (x = 0; x < gRedCoinsCollected; x++) {
+            print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
+        }
+    }
+    else {
+        print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(108), 16);
+        Mtx *mtx;
+
+        mtx = alloc_display_list(sizeof(*mtx));
+        if (mtx == NULL) {
+            return;
+        }
+        guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
+
+        s8 redCoinCount = gRedCoinsCollected;
+        if (redCoinCount > 99) {
+            redCoinCount = 99;
+        }
+
+        add_glyph_texture(GLYPH_MULTIPLY);
+        render_textrect(GFX_DIMENSIONS_FROM_RIGHT_EDGE(100), 16, 0);
+        add_glyph_texture(char_to_glyph_index((char) (48 + (redCoinCount / 10))));
+        render_textrect(GFX_DIMENSIONS_FROM_RIGHT_EDGE(86), 16, 0);
+        add_glyph_texture(char_to_glyph_index((char) (48 + (redCoinCount % 10))));
+        render_textrect(GFX_DIMENSIONS_FROM_RIGHT_EDGE(86), 16, 1);
+
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
 }
 

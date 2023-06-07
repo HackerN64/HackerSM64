@@ -4581,6 +4581,7 @@ const BehaviorScript bhvRedCoin[] = {
 const BehaviorScript bhvBowserCourseRedCoinStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_bowser_course_red_coin_star_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bowser_course_red_coin_star_loop),
     END_LOOP(),
@@ -4862,7 +4863,6 @@ const BehaviorScript bhvOrangeNumber[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
-    SET_HOME(),
     CALL_NATIVE(bhv_orange_number_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_orange_number_loop),

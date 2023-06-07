@@ -2186,9 +2186,7 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
 
     // Abort if the queue is already full.
     if (sBackgroundMusicQueueSize >= MAX_BACKGROUND_MUSIC_QUEUE_SIZE) {
-#ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Sequence queue full, aborting.");
-#endif
         return;
     }
 
