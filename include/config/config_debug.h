@@ -46,7 +46,7 @@
 /**
  * Uses cycles instead of microseconds in Puppyprint debug output.
  */
-#define PUPPYPRINT_DEBUG_CYCLES
+// #define PUPPYPRINT_DEBUG_CYCLES
 
 /**
  * A vanilla style debug mode. It doesn't rely on a text engine, but it's much less powerful that PUPPYPRINT_DEBUG.
