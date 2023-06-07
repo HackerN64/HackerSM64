@@ -684,7 +684,7 @@
 // envelope commands
 
 .macro envelope_disable a
-    .byte 0x0, 0x0
+    .byte 0xff, 0xfc
     .byte \a >> 8, \a & 0xff
 .endm
 

@@ -86,7 +86,7 @@ s16 gTempoInternalToExternal;
 s8 gAudioUpdatesPerFrame;
 #endif
 
-s8 gSoundMode;
+s8 gSoundMode = SOUND_MODE_STEREO;
 
 #if defined(VERSION_EU)
 s8 gAudioUpdatesPerFrame;
@@ -855,7 +855,6 @@ void audio_init() {
     gAudioFrameCount = 0;
     gAudioTaskIndex = 0;
     gCurrAiBufferIndex = 0;
-    gSoundMode = 0;
     gAudioTask = NULL;
     gAudioTasks[0].task.t.data_size = 0;
     gAudioTasks[1].task.t.data_size = 0;

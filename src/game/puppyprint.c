@@ -289,7 +289,7 @@ static const char *audioPoolNames[NUM_AUDIO_POOLS] = {
     "Temporary Sequence Pool:\t  ",
     "Temporary Bank Pool:\t\t  ",
 #ifdef BETTER_REVERB
-    "Better Reverb Pool",
+    "Better Reverb Pool:\t\t  ",
 #endif
 };
 
@@ -1424,7 +1424,7 @@ void get_char_from_byte(s32 *textX, s32 *textPos, u8 letter, u8 *wideX, u8 *spac
     }
 }
 
-// Because we're using bcopy when both reading and writing to the text buffer, this doesn't care about alignment with the multi-bit types.
+// Because we're using bcopy when both reading and writing to the text buffer, this doesn't care about alignment with the multi-byte types.
 struct PuppyprintDeferredBufferHeader {
     u16 x;
     u16 y;

@@ -662,15 +662,17 @@ struct vNote {
 }; // size = 0xC0
 struct Note {
     /* U/J, EU  */
-    /*0x00*/ u8 enabled              : 1;
-    /*0x00*/ u8 needsInit            : 1;
-    /*0x00*/ u8 restart              : 1;
-    /*0x00*/ u8 finished             : 1;
-    /*0x00*/ u8 envMixerNeedsInit    : 1;
-    /*0x00*/ u8 stereoStrongRight    : 1;
-    /*0x00*/ u8 stereoStrongLeft     : 1;
-    /*0x00*/ u8 stereoHeadsetEffects : 1;
-    /*0x01*/ u8 usesHeadsetPanEffects;
+    /*0x00*/ u8 enabled               : 1;
+    /*0x00*/ u8 needsInit             : 1;
+    /*0x00*/ u8 restart               : 1;
+    /*0x00*/ u8 finished              : 1;
+    /*0x00*/ u8 envMixerNeedsInit     : 1;
+    /*0x00*/ u8 stereoStrongRight     : 1;
+    /*0x00*/ u8 stereoStrongLeft      : 1;
+    /*0x00*/ u8 stereoHeadsetEffects  : 1;
+    /*0x01*/ u8 usesHeadsetPanEffects : 1;
+    /*0x01*/ u8 initFullVelocity      : 1;
+    /*    */ u8 pad0                  : 6;
     /*0x02*/ u8 unk2;
     /*0x03*/ u8 sampleDmaIndex;
     /*0x04, 0x30*/ u8 priority;
@@ -732,6 +734,7 @@ struct NoteSynthesisBuffers {
 
 #ifdef BETTER_REVERB
 struct BetterReverbSettings {
+    u8 useLightweightSettings;
     s8 downsampleRate;
     u8 isMono;
     u8 filterCount;
@@ -741,8 +744,8 @@ struct BetterReverbSettings {
     u8 reverbIndex;
     u32 *delaysL;
     u32 *delaysR;
-    s32 *reverbMultsL;
-    s32 *reverbMultsR;
+    u8 *reverbMultsL;
+    u8 *reverbMultsR;
 };
 #endif
 

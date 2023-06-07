@@ -502,6 +502,7 @@ VADPCM_ENC            := $(TOOLS_DIR)/vadpcm_enc
 EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
 SKYCONV               := $(TOOLS_DIR)/skyconv
 FIXLIGHTS_PY          := $(TOOLS_DIR)/fixlights.py
+FLIPS                 := $(TOOLS_DIR)/flips
 ifeq ($(GZIPVER),std)
 GZIP                  := gzip
 else
@@ -586,6 +587,9 @@ unf: $(ROM) $(LOADER)
 	$(LOADER) -d -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
+
+patch: $(ROM)
+	$(FLIPS) --create --bps ./baserom.$(VERSION).z64 $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/boot.o:              $(IPL3_RAW_FILES)

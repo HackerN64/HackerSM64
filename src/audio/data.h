@@ -22,6 +22,10 @@
 #endif
 
 #ifdef EXPAND_AUDIO_HEAP
+// Vanilla US/JP uses 7; Vanilla EU opts for 10 here effectively, though that one gets generated at runtime and doesn't use this value.
+// Total memory usage is calculated by 24*(2^VOL_RAMPING_EXPONENT) bytes. This is not technically on the heap, but it's memory nonetheless.
+#define VOL_RAMPING_EXPONENT 9
+
 #define PERSISTENT_SEQ_MEM 0x8200
 #define PERSISTENT_BANK_MEM 0xDC00
 #define TEMPORARY_SEQ_MEM 0xE800
@@ -29,6 +33,8 @@
 #define MAX_NUM_SOUNDBANKS 0x100
 #define EXT_AUDIO_INIT_POOL_SIZE 0x2000
 #else
+#define VOL_RAMPING_EXPONENT 7
+
 #define PERSISTENT_SEQ_MEM 0x4100
 #define PERSISTENT_BANK_MEM 0x6E00
 #define TEMPORARY_SEQ_MEM 0x7400
@@ -87,12 +93,12 @@ extern f32 gHeadsetPanVolume[128];
 extern f32 gStereoPanVolume[128];
 extern f32 gDefaultPanVolume[128];
 
-extern f32 gVolRampingLhs136[128];
-extern f32 gVolRampingRhs136[128];
-extern f32 gVolRampingLhs144[128];
-extern f32 gVolRampingRhs144[128];
-extern f32 gVolRampingLhs128[128];
-extern f32 gVolRampingRhs128[128];
+extern f32 gVolRampingLhs136[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingRhs136[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingLhs144[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingRhs144[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingLhs128[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingRhs128[1 << VOL_RAMPING_EXPONENT];
 
 // non-constant .data
 extern s16 gTatumsPerBeat;

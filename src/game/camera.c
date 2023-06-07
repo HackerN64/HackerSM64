@@ -11025,7 +11025,9 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
             case CAM_FOV_APP_60:
                 approach_fov_60(marioState);
                 break;
-            //! No default case
+            default:
+                set_fov_45(marioState);
+                break;
         }
     }
 

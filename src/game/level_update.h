@@ -40,11 +40,12 @@ enum SpecialWarpDestinations {
     WARP_SPECIAL_NONE                =  0,
 };
 
-enum WarpDoorFlags {
+enum WarpFlags {
     WARP_FLAGS_NONE           = (0 << 0), // 0x00
     WARP_FLAG_DOOR_PULLED     = (1 << 0), // 0x01
     WARP_FLAG_DOOR_FLIP_MARIO = (1 << 1), // 0x02
     WARP_FLAG_DOOR_IS_WARP    = (1 << 2), // 0x04
+    WARP_FLAG_EXIT_COURSE     = (1 << 3), // 0x08
 };
 
 enum MarioSpawnType {

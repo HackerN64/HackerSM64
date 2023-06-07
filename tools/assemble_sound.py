@@ -341,10 +341,10 @@ def validate_bank(json, sample_bank):
                     last_fine = True
                 else:
                     validate_int_in_range(
-                        entry[0], 1, 2 ** 16 - 4, "envelope entry's first part"
+                        entry[0], 0, 2 ** 15 - 1, "envelope entry's first part"
                     )
                     validate_int_in_range(
-                        entry[1], 0, 2 ** 16 - 1, "envelope entry's second part"
+                        entry[1], 0, 2 ** 15 - 1, "envelope entry's second part"
                     )
                     last_fine = False
         validate(
@@ -589,7 +589,7 @@ def serialize_ctl(bank, base_ser, is_shindou):
         env_name_to_addr[name] = ser.size
         for entry in env:
             if entry == "stop":
-                entry = [0, 0]
+                entry = [2 ** 16 - 4, 0]
             elif entry == "hang":
                 entry = [2 ** 16 - 1, 0]
             elif entry == "restart":

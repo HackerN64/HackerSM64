@@ -650,7 +650,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 }
 
 f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor) {
-    gCollisionFlags |= (COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+    gCollisionFlags |= (COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+
     return find_floor(x, y, z, pfloor);
 }
 
@@ -660,11 +661,14 @@ f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor) {
 s32 get_room_at_pos(f32 x, f32 y, f32 z) {
     if (gCurrentArea->surfaceRooms != NULL) {
         struct Surface *floor;
+
         find_room_floor(x, y, z, &floor);
-        if (floor) {
+
+        if (floor != NULL) {
             return floor->room;
         }
     }
+
     return -1;
 }
 

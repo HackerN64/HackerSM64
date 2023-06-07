@@ -80,6 +80,16 @@
         
         
         /*==============================
+            debug_64drivebutton
+            Assigns a function to be executed when the 64drive button is pressed.
+            @param The function pointer to execute
+            @param Whether or not to execute the function only on pressing (ignore holding the button down)
+        ==============================*/
+        
+        extern void debug_64drivebutton(void(*execute)(), char onpress);
+
+
+        /*==============================
             debug_pollcommands
             Check the USB for incoming commands.
         ==============================*/
@@ -92,7 +102,7 @@
             Adds a command for the USB to read.
             @param The command name
             @param The command description
-            @param The function pointer to execute                                                                                  
+            @param The function pointer to execute
         ==============================*/
         
         extern void debug_addcommand(char* command, char* description, char*(*execute)());
@@ -136,14 +146,15 @@
         
         // Overwrite library functions with useless macros if debug mode is disabled
         #define debug_initialize() 
-        #define debug_printf(__VA_ARGS__) 
+        #define debug_printf
         #define debug_screenshot(a, b, c)
         #define debug_assert(a)
         #define debug_pollcommands()
         #define debug_addcommand(a, b, c)
-        #define debug_parsecommand() NULL
+        #define debug_parsecommand(a) NULL
         #define debug_sizecommand() 0
         #define debug_printcommands()
+        #define debug_64drivebutton(a, b)
         #define usb_initialize() 0
         #define usb_getcart() 0
         #define usb_write(a, b, c)

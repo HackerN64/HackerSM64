@@ -109,9 +109,22 @@ enum CollisionFlags {
 };
 
 extern s16 gCollisionFlags;
+
 extern TerrainData *gEnvironmentRegions;
 extern s32 gEnvironmentLevels[20];
-extern RoomData gDoorAdjacentRooms[60][2];
+
+/**
+ * The maximum number of door/transition rooms that load two rooms of objects at once.
+ */
+#define MAX_NUM_TRANSITION_ROOMS 60
+
+struct TransitionRoomData {
+    /*0x00*/ RoomData forwardRoom;
+    /*0x01*/ RoomData backwardRoom;
+}; /*0x02*/
+
+extern struct TransitionRoomData gDoorAdjacentRooms[MAX_NUM_TRANSITION_ROOMS];
+
 extern s16 gMarioCurrentRoom;
 extern s16 gTHIWaterDrained;
 extern s16 gTTCSpeedSetting;
@@ -128,6 +141,7 @@ void set_object_respawn_info_bits(struct Object *obj, u8 bits);
 void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex);
 void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo);
 void clear_objects(void);
+void clear_dynamic_surface_references(void);
 void update_objects(UNUSED s32 unused);
 
 

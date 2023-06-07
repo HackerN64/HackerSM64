@@ -21,9 +21,7 @@ const GeoLayout ending_geo_area_1[] = {
       GEO_OPEN_NODE(),
          GEO_NODE_ORTHO(100),
          GEO_OPEN_NODE(),
-#ifdef VERSION_EU
-            GEO_BACKGROUND_COLOR(0x0001),
-#endif
+            GEO_BACKGROUND_COLOR(GPACK_RGBA5551(0, 0, 0, 1)),
             GEO_ASM(0, geo_exec_cake_end_screen),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
@@ -37,4 +35,3 @@ const GeoLayout ending_geo_area_1[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
-
