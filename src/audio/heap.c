@@ -1437,12 +1437,10 @@ void audio_reset_session(void) {
         gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
     }
 #endif
-#ifdef PUPPYPRINT_DEBUG
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     append_puppyprint_log("Audio Initialised in %dc.", (s32)(osGetTime() - first));
 #else
     append_puppyprint_log("Audio Initialised in %dus.", (s32)OS_CYCLES_TO_USEC(osGetTime() - first));
-#endif
 #endif
 
     sAudioIsInitialized = TRUE;

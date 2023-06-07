@@ -13,10 +13,12 @@
 #define PUPPYPRINT_ADD_COUNTER(x) x++
 #define PUPPYPRINT_GET_SNAPSHOT() u32 first = osGetCount()
 #define PUPPYPRINT_GET_SNAPSHOT_TYPE(type) u32 first = profiler_get_delta(type)
+void append_puppyprint_log(const char *str, ...);
 #else
 #define PUPPYPRINT_ADD_COUNTER(x)
 #define PUPPYPRINT_GET_SNAPSHOT()
 #define PUPPYPRINT_GET_SNAPSHOT_TYPE(type)
+#define append_puppyprint_log(...)
 #endif
 
 struct PPTextFont {
@@ -130,7 +132,6 @@ extern void prepare_blank_box(void);
 extern void finish_blank_box(void);
 extern void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
 extern void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
-extern void append_puppyprint_log(const char *str, ...);
 extern char consoleLogTable[LOG_BUFFER_SIZE][255];
 extern void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
 extern void puppyprint_print_deferred(void);
