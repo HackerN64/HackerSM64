@@ -1437,7 +1437,6 @@ void note_init_all(void) {
         note->targetVolLeft = 0;
         note->targetVolRight = 0;
         note->frequency = 0.0f;
-        note->unused1 = 0x3f;
         note->vibratoState.activeFlags = VIBMODE_NONE;
 #endif
         note->attributes.velocity = 0.0f;

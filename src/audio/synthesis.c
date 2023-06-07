@@ -1664,7 +1664,6 @@ void note_init_volume(struct Note *note) {
     note->targetVolRight = 0;
     note->reverbVol = 0;
     note->reverbVolShifted = 0;
-    note->unused2 = 0;
     note->curVolLeft = 1;
     note->curVolRight = 1;
     note->frequency = 0.0f;
