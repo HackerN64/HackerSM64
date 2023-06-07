@@ -420,7 +420,7 @@ struct SequenceChannel {
     /*0x00, 0x00*/ u8 stopScript : 1;
     /*0x00, 0x00*/ u8 stopSomething2 : 1; // sets SequenceChannelLayer.stopSomething
     /*0x00, 0x00*/ u8 hasInstrument : 1;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     /*0x00, 0x00*/ u8 stereoHeadsetEffects : 1;
 #else
     /*0x00, 0x00*/ u8 paddingBit : 1;
@@ -672,7 +672,7 @@ struct Note {
     /*0x00*/ u8 finished              : 1;
     /*0x00*/ u8 envMixerNeedsInit     : 1;
     /*0x00*/ u8 initFullVelocity      : 1;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     /*0x00*/ u8 stereoHeadsetEffects  : 1;
     /*0x00*/ u8 usesHeadsetPanEffects : 1;
     /*0x01*/ u8 stereoStrongRight     : 1;
@@ -690,7 +690,7 @@ struct Note {
     /*0x07*/ u8 bankId; // in NoteSubEu on EU
     /*0x08*/ s16 adsrVolScale;
     /*    */ u8 pad1[2];
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     /*0x0C, 0xB3*/ u16 headsetPanRight;
     /*0x0E, 0xB4*/ u16 headsetPanLeft;
     /*0x10*/ u16 prevHeadsetPanRight;

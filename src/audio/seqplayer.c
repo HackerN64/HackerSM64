@@ -27,7 +27,7 @@ void sequence_channel_init(struct SequenceChannel *seqChannel) {
     seqChannel->stopScript = FALSE;
     seqChannel->stopSomething2 = FALSE;
     seqChannel->hasInstrument = FALSE;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     seqChannel->stereoHeadsetEffects = FALSE;
 #endif
     seqChannel->transposition = 0;
@@ -1869,10 +1869,10 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
 #endif
 
                     case 0xd0: // chan_stereoheadseteffects
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
                         seqChannel->stereoHeadsetEffects = m64_read_u8(state);
 #else
-                        // NOTE: Vanilla music does not use 0xd0, so this is safe to repurpose entirely when DISABLE_HEADSET_STEREO_EFFECTS is enabled.
+                        // NOTE: Vanilla music does not use 0xd0, so this is safe to repurpose entirely when ENABLE_HEADSET_STEREO_EFFECTS is disabled.
                         m64_read_u8(state);
 #endif
                         break;

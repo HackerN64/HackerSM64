@@ -78,7 +78,7 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struc
 #else
 u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd);
 u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad);
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings);
 u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf,
                             s32 headsetPanSettings, struct VolumeChange *vol);
@@ -845,7 +845,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
     s32 nSamplesToProcess;  // sp10c/a0, spE0
 #endif
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     s32 leftRight;
 #endif
     s32 s3;
@@ -1263,7 +1263,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
             aResample(cmd++, flags, resamplingRateFixedPoint, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->finalResampleState));
 #endif
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 #ifdef VERSION_EU
             if (noteSubEu->headsetPanRight != 0 || synthesisState->prevHeadsetPanRight != 0) {
                 leftRight = 1;
@@ -1356,7 +1356,7 @@ u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
 #endif
 
 #ifndef VERSION_EU
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings) {
 #else
 u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf) {
@@ -1374,14 +1374,14 @@ u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf) {
     vol.targetRight = note->targetVolRight;
     note->curVolLeft = vol.targetLeft;
     note->curVolRight = vol.targetRight;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     return process_envelope_inner(cmd, note, nSamples, inBuf, headsetPanSettings, &vol);
 #else
     return process_envelope_inner(cmd, note, nSamples, inBuf, &vol);
 #endif
 }
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf,
                             s32 headsetPanSettings, struct VolumeChange *vol) {
 #else
@@ -1418,7 +1418,7 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
     // in, dry left, count without A_AUX flag.
     // dry right, wet left, wet right with A_AUX flag.
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     if (note->usesHeadsetPanEffects) {
         aClearBuffer(cmd++, DMEM_ADDR_NOTE_PAN_TEMP, DEFAULT_LEN_1CH);
 
@@ -1513,7 +1513,7 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
 #endif
     }
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 #ifdef VERSION_EU
     if (gUseReverb && note->reverbVol != 0) {
         aEnvMixer(cmd++, mixerFlags | A_AUX,
@@ -1558,7 +1558,7 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
     return cmd;
 }
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 #ifdef VERSION_EU
 u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *note, s32 bufLen, s32 flags, s32 leftRight) {
 #else
@@ -1677,7 +1677,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
     if (gSoundMode == SOUND_MODE_MONO) {
         volLeft = 0.707f;
         volRight = 0.707f;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     } else if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_HEADSET) {
         s8 smallPanIndex;
         s8 temp = (s8)(pan * 10.0f);
@@ -1744,7 +1744,7 @@ void note_enable(struct Note *note) {
     note->needsInit = TRUE;
     note->restart = FALSE;
     note->finished = FALSE;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     note->stereoStrongRight = FALSE;
     note->stereoStrongLeft = FALSE;
     note->usesHeadsetPanEffects = FALSE;

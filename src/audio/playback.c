@@ -1156,7 +1156,7 @@ s32 note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer
     }
 
     note->bankId = seqLayer->seqChannel->bankId;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     note->stereoHeadsetEffects = seqLayer->seqChannel->stereoHeadsetEffects;
 #endif
     note->sound = seqLayer->sound;
@@ -1412,7 +1412,7 @@ void note_init_all(void) {
         note->noteSubEu = gZeroNoteSub;
 #else
         note->enabled = FALSE;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
         note->stereoStrongRight = FALSE;
         note->stereoStrongLeft = FALSE;
         note->stereoHeadsetEffects = FALSE;

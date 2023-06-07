@@ -119,7 +119,7 @@ unsigned char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
 
 unsigned char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
 
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
 unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
 #else
 unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO } };
@@ -792,7 +792,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
  * Render buttons for the sound mode menu.
  */
 void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     // Stereo option button
     sMainMenuButtons[MENU_BUTTON_STEREO] = spawn_object_rel_with_rot(
         soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton,  533, SOUND_BUTTON_Y, -100, 0x0, -0x8000, 0x0);
@@ -856,7 +856,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
             if (check_clicked_button(buttonX, buttonY, 22.0f) == TRUE) {
                 // If sound mode button clicked, select it and define sound mode
                 // The check will always be true because of the group configured above (In JP & US)
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
                 if (buttonID == MENU_BUTTON_STEREO || buttonID == MENU_BUTTON_MONO
                     || buttonID == MENU_BUTTON_HEADSET) {
 #else
@@ -1169,7 +1169,7 @@ void bhv_menu_button_manager_loop(void) {
         // exiting the Options menu, as a result they added a return button
         case MENU_BUTTON_STEREO:  return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_STEREO ]); break;
         case MENU_BUTTON_MONO:    return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_MONO   ]); break;
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
         case MENU_BUTTON_HEADSET: return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_HEADSET]); break;
 #endif
     }
@@ -1803,7 +1803,7 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     // Print sound mode names
-#ifndef DISABLE_HEADSET_STEREO_EFFECTS
+#ifdef ENABLE_HEADSET_STEREO_EFFECTS
     for (mode = 0, textX = 87; mode < ARRAY_COUNT(textSoundModes); textX += 74, mode++) {
 #else
     for (mode = 0, textX = 111; mode < ARRAY_COUNT(textSoundModes); textX += 99, mode++) {
