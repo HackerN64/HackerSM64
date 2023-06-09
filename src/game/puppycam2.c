@@ -693,12 +693,12 @@ static void puppycam_input_hold_preset3(f32 ivX) {
 
         // Handles continuous movement as normal, as long as the button's held.
         if (ABS(gPlayer1Controller->rawStickX) > DEADZONE) {
-            gPuppyCam.yawAcceleration += (gPuppyCam.options.sensitivityX / 5.0f) * stickMag[0];
+            gPuppyCam.yawAcceleration = gPlayer1Controller->rawStickX;
         } else {
             gPuppyCam.yawAcceleration = 0;
         }
         if (ABS(gPlayer1Controller->rawStickY) > DEADZONE) {
-            gPuppyCam.pitchAcceleration += stickMag[1];
+            gPuppyCam.pitchAcceleration = gPlayer1Controller->rawStickY * 2.0f;
         } else {
             gPuppyCam.pitchAcceleration = 0;
         }
