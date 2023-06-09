@@ -693,12 +693,12 @@ static void puppycam_input_hold_preset3(f32 ivX) {
 
         // Handles continuous movement as normal, as long as the button's held.
         if (ABS(gPlayer1Controller->rawStickX) > DEADZONE) {
-            gPuppyCam.yawAcceleration += (gPuppyCam.options.sensitivityX / 5.0f) * stickMag[0];
+            gPuppyCam.yawAcceleration = gPlayer1Controller->rawStickX;
         } else {
             gPuppyCam.yawAcceleration = 0;
         }
         if (ABS(gPlayer1Controller->rawStickY) > DEADZONE) {
-            gPuppyCam.pitchAcceleration += stickMag[1];
+            gPuppyCam.pitchAcceleration = gPlayer1Controller->rawStickY * 2.0f;
         } else {
             gPuppyCam.pitchAcceleration = 0;
         }
@@ -1260,10 +1260,17 @@ static void puppycam_projection(void) {
         }
 
         gPuppyCam.targetDist[1] = gPuppyCam.targetDist[0] + gPuppyCam.zoom+gPuppyCam.moveZoom;
+#ifdef ENABLE_DEBUG_FREE_MOVE
+        if (gMarioState->action == ACT_DEBUG_FREE_MOVE) gPuppyCam.targetDist[1] = MAX(gPuppyCam.targetDist[1] * 1.1f, 500);
+#endif
 
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_X_MOVEMENT) gPuppyCam.focus[0] = targetPos3[0] + gPuppyCam.shake[0] + (gPuppyCam.pan[0] * gPuppyCam.targetDist[1] / gPuppyCam.zoomPoints[2]) * panD;
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Y_MOVEMENT) gPuppyCam.focus[1] = targetPos3[1] + gPuppyCam.shake[1] + (gPuppyCam.pan[1] * gPuppyCam.targetDist[1] / gPuppyCam.zoomPoints[2]) + gPuppyCam.povHeight - gPuppyCam.floorY[0] + (gPuppyCam.swimPitch / 10);
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Z_MOVEMENT) gPuppyCam.focus[2] = targetPos3[2] + gPuppyCam.shake[2] + (gPuppyCam.pan[2] * gPuppyCam.targetDist[1] / gPuppyCam.zoomPoints[2]) * panD;
+
+#ifdef ENABLE_DEBUG_FREE_MOVE
+        if (gMarioState->action == ACT_DEBUG_FREE_MOVE) vec3_copy_y_off(gPuppyCam.focus, gMarioState->pos, 160.0f);
+#endif
 
         tempSin = LENSIN(gPuppyCam.targetDist[1], pitchTotal);
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_X_MOVEMENT) gPuppyCam.pos[0] = gPuppyCam.targetObj->oPosX + LENSIN(tempSin, gPuppyCam.yaw) + gPuppyCam.shake[0];
@@ -1342,58 +1349,79 @@ static void puppycam_script(void) {
 
 // Handles collision detection using ray casting.
 static void puppycam_collision(void) {
-    struct WallCollisionData wall0, wall1;
-    struct Surface *surf[2];
-    Vec3f camdir[2];
-    Vec3f hitpos[2];
-    Vec3f target[2];
-    s16 pitchTotal = CLAMP(gPuppyCam.pitch+(gPuppyCam.swimPitch * 10) + gPuppyCam.edgePitch + gPuppyCam.terrainPitch, 800, 0x7800);
-    s32 dist[2];
-
     if (gPuppyCam.targetObj == NULL) {
         return;
     }
+
+    struct Surface *surf[2] = {NULL, NULL};
+
+    Vec3f dirToCam;
+    Vec3f hitpos[2];
+    Vec3f target[2];
+    f32 dist[2] = {0};
+    // the distance from surface the camera should be. note: should NOT be greater than ~50 due to mario's hitbox
+    const f32 surfOffset = 15.0f;
+    // how far the raycast should extend, goes the current zoom dist plus the surfOffset (and a little bit more for safety)
+    f32 colCheckDist = gPuppyCam.zoom + (surfOffset * 2.0f);
+
     // The ray, starting from the top
-    vec3_copy_y_off(target[0], &gPuppyCam.targetObj->oPosVec, (gPuppyCam.povHeight) - CLAMP(gPuppyCam.targetObj->oPosY - gPuppyCam.targetFloorHeight, 0, 300));
+    vec3_copy_y_off(target[0], &gPuppyCam.targetObj->oPosVec, 120);
     // The ray, starting from the bottom
-    vec3_copy_y_off(target[1], &gPuppyCam.targetObj->oPosVec, (gPuppyCam.povHeight * 0.4f));
+    vec3_copy_y_off(target[1], &gPuppyCam.targetObj->oPosVec, 30);
 
-    camdir[0][0] = LENSIN(LENSIN(gPuppyCam.zoomTarget, pitchTotal), gPuppyCam.yaw) + gPuppyCam.shake[0];
-    camdir[0][1] = LENCOS(gPuppyCam.zoomTarget, pitchTotal) + gPuppyCam.shake[1];
-    camdir[0][2] = LENCOS(LENSIN(gPuppyCam.zoomTarget, pitchTotal), gPuppyCam.yaw) + gPuppyCam.shake[2];
+    // Get the direction from mario's head to the camera
+    vec3_diff(dirToCam, gPuppyCam.pos, target[0]);
+    vec3f_normalize(dirToCam);
+    // Get the vector from mario's head to the camera plus the extra check dist
+    Vec3f vecToCam;
+    vec3_prod_val(vecToCam, dirToCam, colCheckDist);
 
-    vec3_copy(camdir[1], camdir[0]);
+    dist[0] = find_surface_on_ray(target[0], vecToCam, &surf[0], hitpos[0], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
+    dist[1] = find_surface_on_ray(target[1], vecToCam, &surf[1], hitpos[1], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
 
-    find_surface_on_ray(target[0], camdir[0], &surf[0], hitpos[0], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
-    find_surface_on_ray(target[1], camdir[1], &surf[1], hitpos[1], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
-    resolve_and_return_wall_collisions(hitpos[0], 0.0f, 25.0f, &wall0);
-    resolve_and_return_wall_collisions(hitpos[1], 0.0f, 25.0f, &wall1);
-    dist[0] = ((target[0][0] - hitpos[0][0]) * (target[0][0] - hitpos[0][0]) + (target[0][1] - hitpos[0][1]) * (target[0][1] - hitpos[0][1]) + (target[0][2] - hitpos[0][2]) * (target[0][2] - hitpos[0][2]));
-    dist[1] = ((target[1][0] - hitpos[1][0]) * (target[1][0] - hitpos[1][0]) + (target[1][1] - hitpos[1][1]) * (target[1][1] - hitpos[1][1]) + (target[1][2] - hitpos[1][2]) * (target[1][2] - hitpos[1][2]));
+    // set collision distance to the current distance from mario to cam
+    gPuppyCam.collisionDistance = colCheckDist;
 
-    gPuppyCam.collisionDistance = gPuppyCam.zoomTarget;
+    if (surf[0] || surf[1]) {
+        // use the further distance between the two surfaces to be less aggressive
+        f32 closestDist = MAX(dist[0], dist[1]);
+        // Cap it at the zoom dist so it doesn't go further than necessary
+        closestDist = MIN(closestDist, gPuppyCam.zoom);
+        if (closestDist - surfOffset <= gPuppyCam.zoom) {
+            closestDist -= surfOffset;
+            // Allow the camera to ride right up next to the wall (mario's wall radius is 50u so this is safe)
+            closestDist = MAX(closestDist, 50);
+            vec3_mul_val(dirToCam, closestDist);
+            vec3_sum(gPuppyCam.pos, target[0], dirToCam);
 
-    if (surf[0] && surf[1]) {
-        gPuppyCam.collisionDistance = sqrtf(MAX(dist[0], dist[1]));
-        if (gPuppyCam.zoom > gPuppyCam.collisionDistance) {
-            gPuppyCam.zoom = MIN(gPuppyCam.collisionDistance, gPuppyCam.zoomTarget);
-            if (gPuppyCam.zoom - gPuppyCam.zoomTarget < 5) {
-                if (dist[0] >= dist[1]) {
-                    vec3_copy(gPuppyCam.pos, hitpos[0]);
-                } else {
-                    vec3_copy_y_off(gPuppyCam.pos, hitpos[1], (gPuppyCam.povHeight * 0.6f));
-                }
-            }
-            // If the camera is uncomfortably close to the wall, move it up a bit, then set the zoom to reverse the opacity.
-            if (gPuppyCam.zoom < 250 && gPuppyCam.pitch < 0x2000) {
-                gPuppyCam.pos[1] += (250.0f - gPuppyCam.zoom) * 1.25f;
-                gPuppyCam.zoom = 250 + ((250 - gPuppyCam.zoom) * 2);
+            // If the camera is uncomfortably close to the wall, move it up a bit
+            if (closestDist < 250 && gPuppyCam.pitch < 0x2000) {
+                // lerp from 0 to 250
+                gPuppyCam.pos[1] += remap(CLAMP(closestDist, 50, 255), 255, 50, 0, 250);
             }
         }
     }
-    #define START_DIST 500
-    #define END_DIST   250
-    gPuppyCam.opacity = CLAMP((f32)(((gPuppyCam.zoom - END_DIST) / 255.0f) * (START_DIST - END_DIST)), 0, 255);
+
+    // Transparency based on mario dist to cam
+    #define TRANS_START_DIST 200
+    #define TRANS_END_DIST   100
+    f32 goalOpa = 255;
+    // Get the new dist between cam and mario
+    vec3_diff(dirToCam, gPuppyCam.pos, target[0]);
+    f32 realDist = vec3_sumsq(dirToCam);
+    if (realDist < sqr(TRANS_START_DIST)) {
+        realDist = sqrtf(realDist);
+        // lerp from 127 to 0
+        goalOpa = CLAMP((f32)(((realDist - TRANS_END_DIST) / 255.0f) * (TRANS_START_DIST - TRANS_END_DIST)), 0, 127);
+    }
+    // approach fast if significant diff
+    f32 approachRate = absf(goalOpa - (f32)gPuppyCam.opacity) * 0.2f;
+    // give a min approach speed
+    approachRate = MAX(approachRate, 255/8);
+    // approach the new goal opacity
+    gPuppyCam.opacity = approach_f32_symmetric(gPuppyCam.opacity, goalOpa, approachRate);
+    #undef TRANS_START_DIST
+    #undef TRANS_END_DIST
 }
 
 extern Vec3f sOldPosition;
