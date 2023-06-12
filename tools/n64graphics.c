@@ -38,6 +38,39 @@ typedef struct
 // N64 RGBA/IA/I/CI -> internal RGBA/IA
 //---------------------------------------------------------
 
+void rotate_and_mirror_raw_img(uint8_t *raw, int width, int height, int depth) {
+   uint8_t *tmp_rotated;
+
+   if (depth == 32) {
+      tmp_rotated = malloc(width * height * 4);
+      if (!tmp_rotated) {
+         ERROR("Error allocating %d bytes\n", width * height * 4);
+         return;
+      }
+
+      // TODO:
+
+      free(tmp_rotated);
+      tmp_rotated = NULL;
+      return;
+   } else if (depth == 16) {
+      tmp_rotated = malloc(width * height * 2);
+      if (!tmp_rotated) {
+         ERROR("Error allocating %d bytes\n", width * height * 2);
+         return;
+      }
+
+      // TODO:
+
+      free(tmp_rotated);
+      tmp_rotated = NULL;
+      return;
+   } else {
+      ERROR("rotated raw image does not have a valid depth");
+      return;
+   }
+}
+
 rgba *raw2rgba(const uint8_t *raw, int width, int height, int depth)
 {
    rgba *img;
@@ -602,6 +635,7 @@ typedef struct
    int height;
    int bin_truncate;
    int pal_truncate;
+   int rotate_envmap;
 } graphics_config;
 
 static const graphics_config default_config =
@@ -619,6 +653,7 @@ static const graphics_config default_config =
    .height = 32,
    .bin_truncate = 1,
    .pal_truncate = 1,
+   .rotate_envmap = 0,
 };
 
 typedef struct
@@ -701,7 +736,7 @@ static int parse_encoding(write_encoding *encoding, const char *str)
 
 static void print_usage(void)
 {
-   ERROR("Usage: n64graphics -e/-i BIN_FILE -g IMG_FILE [-p PAL_FILE] [-o BIN_OFFSET] [-P PAL_OFFSET] [-f FORMAT] [-c CI_FORMAT] [-w WIDTH] [-h HEIGHT] [-V]\n"
+   ERROR("Usage: n64graphics -e/-i BIN_FILE -g IMG_FILE [-p PAL_FILE] [-o BIN_OFFSET] [-P PAL_OFFSET] [-f FORMAT] [-c CI_FORMAT] [-w WIDTH] [-h HEIGHT] [-r ROTATE] [-V]\n"
          "\n"
          "n64graphics v" N64GRAPHICS_VERSION ": N64 graphics manipulator\n"
          "\n"
@@ -715,6 +750,7 @@ static void print_usage(void)
          " -s SCHEME     output scheme: raw, u8 (hex), u64 (hex) (default: %s)\n"
          " -w WIDTH      export texture width (default: %d)\n"
          " -h HEIGHT     export texture height (default: %d)\n"
+         " -r ROTATE     rotate envmap texture for rgba16 extraction only (default: false)\n"
          "CI arguments:\n"
          " -c CI_FORMAT  CI palette format: rgba16, ia16 (default: %s)\n"
          " -p PAL_FILE   palette binary file to import/export from/to\n"
@@ -786,6 +822,14 @@ static int parse_arguments(int argc, char *argv[], graphics_config *config)
                if (++i >= argc) return 0;
                config->pal_offset = strtoul(argv[i], NULL, 0);
                config->pal_truncate = 0;
+               break;
+            case 'r':
+               if (++i >= argc) return 0;
+               if (!strcmp(argv[i], "true") || !strcmp(argv[i], "True") || strtoul(argv[i], NULL, 0) == 1) {
+                  config->rotate_envmap = 1;
+               } else {
+                  config->rotate_envmap = 0;
+               }
                break;
             case 's':
                if (++i >= argc) return 0;
@@ -1006,6 +1050,12 @@ int main(int argc, char *argv[])
       }
       switch (config.format.format) {
          case IMG_FORMAT_RGBA:
+            if (config.rotate_envmap) {
+               rotate_and_mirror_raw_img(raw, config.width, config.height, config.format.depth);
+               int tmp_height = config.height;
+               config.height = config.width;
+               config.width = tmp_height;
+            }
             imgr = raw2rgba(raw, config.width, config.height, config.format.depth);
             res = rgba2png(config.img_filename, imgr, config.width, config.height);
             break;
@@ -1047,6 +1097,12 @@ int main(int argc, char *argv[])
             switch (config.pal_format.format) {
                case IMG_FORMAT_RGBA:
                   INFO("Converting raw to RGBA16\n");
+                  if (config.rotate_envmap) {
+                     rotate_and_mirror_raw_img(raw_fmt, config.width, config.height, config.pal_format.depth);
+                     int tmp_height = config.height;
+                     config.height = config.width;
+                     config.width = tmp_height;
+                  }
                   imgr = raw2rgba(raw_fmt, config.width, config.height, config.pal_format.depth);
                   res = rgba2png(config.img_filename, imgr, config.width, config.height);
                   break;

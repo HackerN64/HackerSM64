@@ -3,6 +3,16 @@ import sys
 import os
 import json
 
+envmap_table = set([
+    "actors/mario/mario_metal.rgba16.png",
+    "actors/mario_cap/mario_cap_metal.rgba16.png",
+    "actors/star/star_surface.rgba16.png",
+    "actors/water_bubble/water_bubble.rgba16.png",
+    "actors/water_ring/water_ring.rgba16.png",
+    "levels/castle_inside/29.rgba16.png",
+    "levels/castle_inside/30.rgba16.png",
+    "levels/hmc/7.rgba16.png"
+])
 
 def read_asset_map():
     with open("assets.json") as f:
@@ -235,6 +245,9 @@ def main():
                             check=True,
                         )
                     else:
+                        rotate_envmap = "false"
+                        if asset in envmap_table:
+                            rotate_envmap = "true"
                         w, h = meta
                         fmt = asset.split(".")[-2]
                         subprocess.run(
@@ -250,6 +263,8 @@ def main():
                                 str(w),
                                 "-h",
                                 str(h),
+                                "-r",
+                                rotate_envmap,
                             ],
                             check=True,
                         )
