@@ -38,37 +38,42 @@ typedef struct
 // N64 RGBA/IA/I/CI -> internal RGBA/IA
 //---------------------------------------------------------
 
-void rotate_and_mirror_raw_img(uint8_t *raw, int width, int height, int depth) {
+void rotate_raw_img(uint8_t *raw, int width, int height, int depth) {
    uint8_t *tmp_rotated;
+   int bytes;
+   int size;
 
    if (depth == 32) {
-      tmp_rotated = malloc(width * height * 4);
-      if (!tmp_rotated) {
-         ERROR("Error allocating %d bytes\n", width * height * 4);
-         return;
-      }
-
-      // TODO:
-
-      free(tmp_rotated);
-      tmp_rotated = NULL;
-      return;
+      bytes = 4;
    } else if (depth == 16) {
-      tmp_rotated = malloc(width * height * 2);
-      if (!tmp_rotated) {
-         ERROR("Error allocating %d bytes\n", width * height * 2);
-         return;
-      }
-
-      // TODO:
-
-      free(tmp_rotated);
-      tmp_rotated = NULL;
-      return;
+      bytes = 2;
    } else {
       ERROR("rotated raw image does not have a valid depth");
       return;
    }
+
+   size = width * height * bytes;
+
+   tmp_rotated = malloc(size);
+   if (!tmp_rotated) {
+      ERROR("Error allocating %d bytes\n", size);
+      return;
+   }
+
+   int offset_src = 0;
+   for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+         int offset_dst = (((width - j - 1) * height) + i) * bytes;
+         for (int k = 0; k < bytes; k++) {
+            tmp_rotated[offset_dst + k] = raw[offset_src++];
+         }
+      }
+   }
+
+   bcopy(tmp_rotated, raw, size);
+
+   free(tmp_rotated);
+   tmp_rotated = NULL;
 }
 
 rgba *raw2rgba(const uint8_t *raw, int width, int height, int depth)
@@ -1051,7 +1056,7 @@ int main(int argc, char *argv[])
       switch (config.format.format) {
          case IMG_FORMAT_RGBA:
             if (config.rotate_envmap) {
-               rotate_and_mirror_raw_img(raw, config.width, config.height, config.format.depth);
+               rotate_raw_img(raw, config.width, config.height, config.format.depth);
                int tmp_height = config.height;
                config.height = config.width;
                config.width = tmp_height;
@@ -1097,12 +1102,6 @@ int main(int argc, char *argv[])
             switch (config.pal_format.format) {
                case IMG_FORMAT_RGBA:
                   INFO("Converting raw to RGBA16\n");
-                  if (config.rotate_envmap) {
-                     rotate_and_mirror_raw_img(raw_fmt, config.width, config.height, config.pal_format.depth);
-                     int tmp_height = config.height;
-                     config.height = config.width;
-                     config.width = tmp_height;
-                  }
                   imgr = raw2rgba(raw_fmt, config.width, config.height, config.pal_format.depth);
                   res = rgba2png(config.img_filename, imgr, config.width, config.height);
                   break;
