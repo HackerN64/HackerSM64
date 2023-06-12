@@ -38,6 +38,7 @@ typedef struct
 // N64 RGBA/IA/I/CI -> internal RGBA/IA
 //---------------------------------------------------------
 
+// Rotate raw image counterclockwise (width and height need swapped externally)
 void rotate_raw_img(uint8_t *raw, int width, int height, int depth) {
    uint8_t *tmp_rotated;
    int bytes;
@@ -755,7 +756,7 @@ static void print_usage(void)
          " -s SCHEME     output scheme: raw, u8 (hex), u64 (hex) (default: %s)\n"
          " -w WIDTH      export texture width (default: %d)\n"
          " -h HEIGHT     export texture height (default: %d)\n"
-         " -r ROTATE     rotate envmap texture for rgba16 extraction only (default: false)\n"
+         " -r ROTATE     rotate envmap texture for rgba extraction only (default: false)\n"
          "CI arguments:\n"
          " -c CI_FORMAT  CI palette format: rgba16, ia16 (default: %s)\n"
          " -p PAL_FILE   palette binary file to import/export from/to\n"
