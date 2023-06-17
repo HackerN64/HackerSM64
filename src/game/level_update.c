@@ -1038,7 +1038,6 @@ s32 play_mode_paused(void) {
             gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
             set_play_mode(PLAY_MODE_NORMAL);
             level_trigger_warp(gMarioState, WARP_OP_DEATH);
-            gSavedCourseNum = COURSE_NONE;
 #else
             initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAGS_NONE);
             fade_into_special_warp(WARP_SPECIAL_NONE, 0);
