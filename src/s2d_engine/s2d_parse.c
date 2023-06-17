@@ -27,7 +27,7 @@ static int s2d_snprint(int x, int y, int align, const char *str, uObjMtx *buf, i
 
 	if (*p == '\0') return 0;
 
-	if (IS_RUNNING_ON_EMULATOR) {
+	if (gIsEmulator) {
 		s2d_rdp_init();
 	} else {
 		f3d_rdp_init();
@@ -166,7 +166,7 @@ static int s2d_snprint(int x, int y, int align, const char *str, uObjMtx *buf, i
 				if (current_char != '\0' && current_char != CH_SEPARATOR) {
 					char *tbl = segmented_to_virtual(s2d_kerning_table);
 
-					if (IS_RUNNING_ON_EMULATOR) {
+					if (gIsEmulator) {
 						if (drop_shadow && mode == MODE_DRAW_DROPSHADOW) {
 							draw_s2d_dropshadow(current_char, x + drop_x, y + drop_y, (buf++));
 						} else if (mode == MODE_DRAW_NORMALTEXT) {

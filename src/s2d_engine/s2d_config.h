@@ -88,7 +88,7 @@ extern char *proutSprintf(char *dst, const char *src, size_t count);
 #define TEX_BITDEPTH 8
 
 #define seg2virt segmented_to_virtual
-#define IS_RUNNING_ON_EMULATOR (IO_READ(DPC_PIPEBUSY_REG) == 0)
+#define gIsEmulator (!gIsConsole)
 
 // Texture resolution (pixels on the texture per pixel on the framebuffer)
 #define TEX_RES 1
