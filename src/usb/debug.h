@@ -9,7 +9,7 @@
     #define DEBUG_MODE        1   // Enable/Disable debug mode
     #define DEBUG_INIT_MSG    1   // Print a message when debug mode has initialized
     #define USE_FAULTTHREAD   1   // Create a fault detection thread (libultra only)
-    #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf (libultra only)
+    // #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf (defined in makefile - libultra_rom does not have osSyncPrintf)
     #define MAX_COMMANDS      25  // The max amount of user defined commands possible
     
     // Fault thread definitions (libultra only)
@@ -46,7 +46,9 @@
         ==============================*/
         
         extern void debug_printf(const char* message, ...);
-        
+        #if OVERWRITE_OSPRINT == 0
+            #define osSyncPrintf debug_printf
+        #endif
         
         /*==============================
             debug_dumpbinary
@@ -78,6 +80,16 @@
         
         
         /*==============================
+            debug_64drivebutton
+            Assigns a function to be executed when the 64drive button is pressed.
+            @param The function pointer to execute
+            @param Whether or not to execute the function only on pressing (ignore holding the button down)
+        ==============================*/
+        
+        extern void debug_64drivebutton(void(*execute)(), char onpress);
+
+
+        /*==============================
             debug_pollcommands
             Check the USB for incoming commands.
         ==============================*/
@@ -90,7 +102,7 @@
             Adds a command for the USB to read.
             @param The command name
             @param The command description
-            @param The function pointer to execute                                                                                  
+            @param The function pointer to execute
         ==============================*/
         
         extern void debug_addcommand(char* command, char* description, char*(*execute)());
@@ -134,14 +146,15 @@
         
         // Overwrite library functions with useless macros if debug mode is disabled
         #define debug_initialize() 
-        #define debug_printf(__VA_ARGS__) 
+        #define debug_printf
         #define debug_screenshot(a, b, c)
         #define debug_assert(a)
         #define debug_pollcommands()
         #define debug_addcommand(a, b, c)
-        #define debug_parsecommand() NULL
+        #define debug_parsecommand(a) NULL
         #define debug_sizecommand() 0
         #define debug_printcommands()
+        #define debug_64drivebutton(a, b)
         #define usb_initialize() 0
         #define usb_getcart() 0
         #define usb_write(a, b, c)

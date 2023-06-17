@@ -50,7 +50,6 @@ enum GraphRenderFlags {
 #define GET_GRAPH_NODE_LAYER(flags)        ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
 #endif
 
-#ifdef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 // The discriminant for different types of geo nodes
 enum GraphNodeTypes {
     GRAPH_NODE_TYPE_ORTHO_PROJECTION,
@@ -76,38 +75,6 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_ROOT,
     GRAPH_NODE_TYPE_START,
 };
-#else
-// Whether the node type has a function pointer of type GraphNodeFunc
-#define GRAPH_NODE_TYPE_FUNCTIONAL          (1 << 8)
-
-// The discriminant for different types of geo nodes
-enum GraphNodeTypes {
-    GRAPH_NODE_TYPE_ROOT                 =  0x01,
-    GRAPH_NODE_TYPE_ORTHO_PROJECTION     =  0x02,
-    GRAPH_NODE_TYPE_PERSPECTIVE          = (0x03 | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_MASTER_LIST          =  0x04,
-    GRAPH_NODE_TYPE_START                =  0x0A,
-    GRAPH_NODE_TYPE_LEVEL_OF_DETAIL      =  0x0B,
-    GRAPH_NODE_TYPE_SWITCH_CASE          = (0x0C | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_CAMERA               = (0x14 | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_TRANSLATION_ROTATION =  0x15,
-    GRAPH_NODE_TYPE_TRANSLATION          =  0x16,
-    GRAPH_NODE_TYPE_ROTATION             =  0x17,
-    GRAPH_NODE_TYPE_OBJECT               =  0x18,
-    GRAPH_NODE_TYPE_ANIMATED_PART        =  0x19,
-    GRAPH_NODE_TYPE_BILLBOARD            =  0x1A,
-    GRAPH_NODE_TYPE_DISPLAY_LIST         =  0x1B,
-    GRAPH_NODE_TYPE_SCALE                =  0x1C,
-    GRAPH_NODE_TYPE_SHADOW               =  0x28,
-    GRAPH_NODE_TYPE_OBJECT_PARENT        =  0x29,
-    GRAPH_NODE_TYPE_GENERATED_LIST       = (0x2A | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_BACKGROUND           = (0x2C | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_HELD_OBJ             = (0x2E | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x2F,
-
-    GRAPH_NODE_TYPES_MASK                =  0xFF,
-};
-#endif
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
@@ -426,10 +393,8 @@ struct GraphNodeHeldObject          *init_graph_node_held_object         (struct
 struct GraphNode *geo_add_child       (struct GraphNode *parent, struct GraphNode *childNode);
 struct GraphNode *geo_remove_child    (struct GraphNode *graphNode);
 struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild);
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 callContext);
 void geo_call_global_function_nodes       (struct GraphNode *graphNode, s32 callContext);
-#endif
 void geo_reset_object_node(struct GraphNodeObject *graphNode);
 void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f pos, Vec3s angle);
 void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo *spawn);

@@ -7,20 +7,27 @@
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define SEQUENCE_PLAYERS 4
-#define SEQUENCE_CHANNELS 48
-#define SEQUENCE_LAYERS 64
 #else
 #define SEQUENCE_PLAYERS 3
-#define SEQUENCE_CHANNELS 32
-#ifdef VERSION_JP
-#define SEQUENCE_LAYERS 48
-#else
-#define SEQUENCE_LAYERS 52
-#endif
 #endif
 
 #define LAYERS_MAX       4
 #define CHANNELS_MAX     16
+
+#ifdef EXPAND_AUDIO_HEAP // Not technically on the heap but it's memory nonetheless...
+#define SEQUENCE_CHANNELS (SEQUENCE_PLAYERS * CHANNELS_MAX)
+#define SEQUENCE_LAYERS ((SEQUENCE_CHANNELS * LAYERS_MAX) / 2) // This should be more than plenty in nearly all circumstances.
+#else // EXPAND_AUDIO_HEAP
+#if defined(VERSION_EU) || defined(VERSION_SH)
+#define SEQUENCE_CHANNELS 48
+#define SEQUENCE_LAYERS 64
+#else
+#define SEQUENCE_CHANNELS 32
+#define SEQUENCE_LAYERS 52
+#endif
+#endif // EXPAND_AUDIO_HEAP
+
+#define VIBRATO_DISABLED_VALUE (0xFF * 8)
 
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
 
@@ -80,7 +87,7 @@ enum Codecs {
 #include "game/puppyprint.h"
 
 #ifdef VERSION_EU
-/*#if PUPPYPRINT_DEBUG
+/*#ifdef PUPPYPRINT_DEBUG
 #define eu_stubbed_printf_0(msg) append_puppyprint_log(msg)
 #define eu_stubbed_printf_1(msg, a) append_puppyprint_log(msg, a)
 #define eu_stubbed_printf_2(msg, a, b) append_puppyprint_log(msg, a, b)
@@ -134,7 +141,7 @@ struct VibratoState {
     /*    , 0x14*/ u8 active;
 #else
     /*0x08,     */ s8 *curve;
-    /*0x0C,     */ u8 active;
+    /*0x0C,     */ u8 activeFlags;
     /*0x0E,     */ u16 rate;
     /*0x10,     */ u16 extent;
 #endif
@@ -413,7 +420,11 @@ struct SequenceChannel {
     /*0x00, 0x00*/ u8 stopScript : 1;
     /*0x00, 0x00*/ u8 stopSomething2 : 1; // sets SequenceChannelLayer.stopSomething
     /*0x00, 0x00*/ u8 hasInstrument : 1;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     /*0x00, 0x00*/ u8 stereoHeadsetEffects : 1;
+#else
+    /*0x00, 0x00*/ u8 paddingBit : 1;
+#endif
     /*0x00, ????*/ u8 largeNotes : 1; // notes specify duration and velocity
     /*0x00, ????*/ u8 unused : 1; // never read, set to 0
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -655,54 +666,57 @@ struct vNote {
 }; // size = 0xC0
 struct Note {
     /* U/J, EU  */
-    /*0x00*/ u8 enabled              : 1;
-    /*0x00*/ u8 needsInit            : 1;
-    /*0x00*/ u8 restart              : 1;
-    /*0x00*/ u8 finished             : 1;
-    /*0x00*/ u8 envMixerNeedsInit    : 1;
-    /*0x00*/ u8 stereoStrongRight    : 1;
-    /*0x00*/ u8 stereoStrongLeft     : 1;
-    /*0x00*/ u8 stereoHeadsetEffects : 1;
-    /*0x01*/ u8 usesHeadsetPanEffects;
-    /*0x02*/ u8 unk2;
-    /*0x03*/ u8 sampleDmaIndex;
-    /*0x04, 0x30*/ u8 priority;
-    /*0x05*/ u8 sampleCount; // 0, 8, 16, 32 or 64
-    /*0x06*/ u8 instOrWave;
-    /*0x07*/ u8 bankId; // in NoteSubEu on EU
+    /*0x00*/ u8 enabled               : 1;
+    /*0x00*/ u8 needsInit             : 1;
+    /*0x00*/ u8 restart               : 1;
+    /*0x00*/ u8 finished              : 1;
+    /*0x00*/ u8 envMixerNeedsInit     : 1;
+    /*0x00*/ u8 initFullVelocity      : 1;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+    /*0x00*/ u8 stereoHeadsetEffects  : 1;
+    /*0x00*/ u8 usesHeadsetPanEffects : 1;
+    /*0x01*/ u8 stereoStrongRight     : 1;
+    /*0x01*/ u8 stereoStrongLeft      : 1;
+#else
+    /*    */ u8 pad0[0x01];
+#endif
+    /*0x02*/ u8 sampleDmaIndex;
+    /*0x03*/ u8 priority;
+    /*0x04*/ u8 sampleCount; // 0, 8, 16, 32 or 64
+    /*0x05*/ u8 instOrWave;
+    /*0x06*/ u8 bankId; // in NoteSubEu on EU
+    /*0x07*/ u8 reverbVol; // Q1.7
     /*0x08*/ s16 adsrVolScale;
-    /*    */ u8 pad1[2];
-    /*0x0C, 0xB3*/ u16 headsetPanRight;
-    /*0x0E, 0xB4*/ u16 headsetPanLeft;
-    /*0x10*/ u16 prevHeadsetPanRight;
-    /*0x12*/ u16 prevHeadsetPanLeft;
-    /*0x14*/ s32 samplePosInt;
-    /*0x18, 0x38*/ f32 portamentoFreqScale;
-    /*0x1C, 0x3C*/ f32 vibratoFreqScale;
-    /*0x20*/ u16 samplePosFrac;
-    /*    */ u8 pad2[2];
-    /*0x24*/ struct AudioBankSound *sound;
-    /*0x28, 0x40*/ struct SequenceChannelLayer *prevParentLayer;
-    /*0x2C, 0x44*/ struct SequenceChannelLayer *parentLayer;
-    /*0x30, 0x48*/ struct SequenceChannelLayer *wantedParentLayer;
-    /*0x34*/ struct NoteSynthesisBuffers *synthesisBuffers;
-    /*0x38*/ f32 frequency;
-    /*0x3C*/ u16 targetVolLeft; // Q1.15, but will always be non-negative
-    /*0x3E*/ u16 targetVolRight; // Q1.15, but will always be non-negative
-    /*0x40*/ u8 reverbVol; // Q1.7
-    /*0x41*/ u8 unused1; // never read, set to 0x3f
-    /*    */ u8 pad3[2];
-    /*0x44*/ struct NoteAttributes attributes;
-    /*0x54, 0x58*/ struct AdsrState adsr;
-    /*0x74, 0x7C*/ struct Portamento portamento;
-    /*0x84, 0x8C*/ struct VibratoState vibratoState;
+    /*0x0A*/ u16 samplePosFrac;
+    /*0x0C*/ s32 samplePosInt;
+    /*0x10*/ f32 portamentoFreqScale;
+    /*0x14*/ f32 vibratoFreqScale;
+    /*0x18*/ struct AudioBankSound *sound;
+    /*0x1C*/ struct SequenceChannelLayer *prevParentLayer;
+    /*0x20*/ struct SequenceChannelLayer *parentLayer;
+    /*0x24*/ struct SequenceChannelLayer *wantedParentLayer;
+    /*0x28*/ struct NoteSynthesisBuffers *synthesisBuffers;
+    /*0x2C*/ f32 frequency;
+    /*0x30*/ u16 targetVolLeft; // Q1.15, but will always be non-negative
+    /*0x32*/ u16 targetVolRight; // Q1.15, but will always be non-negative
+    /*0x34*/ struct NoteAttributes attributes;
+    /*0x44*/ struct AdsrState adsr;
+    /*0x64*/ struct Portamento portamento;
+    /*0x74*/ struct VibratoState vibratoState;
+    /*0x8C*/ struct AudioListItem listItem;
     /*0x9C*/ s16 curVolLeft; // Q1.15, but will always be non-negative
     /*0x9E*/ s16 curVolRight; // Q1.15, but will always be non-negative
     /*0xA0*/ s16 reverbVolShifted; // Q1.15
-    /*0xA2*/ s16 unused2; // never read, set to 0
-    /*0xA4, 0x00*/ struct AudioListItem listItem;
-    /*          */ u8 pad4[0xc];
-}; // size = 0xC0
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+    /*0xA2*/ u16 headsetPanRight;
+    /*0xA4*/ u16 headsetPanLeft;
+    /*0xA6*/ u16 prevHeadsetPanRight;
+    /*0xA8*/ u16 prevHeadsetPanLeft;
+    /*    */ u8 align16Padding[0x06];
+#else
+    /*    */ u8 align16Padding[0x0E];
+#endif
+}; // size = 0xB0
 #endif
 
 struct NoteSynthesisBuffers {
@@ -722,6 +736,23 @@ struct NoteSynthesisBuffers {
 #endif
 #endif
 };
+
+#ifdef BETTER_REVERB
+struct BetterReverbSettings {
+    u8 useLightweightSettings;
+    s8 downsampleRate;
+    u8 isMono;
+    u8 filterCount;
+    s16 windowSize;
+    s16 gain;
+    u8 gainIndex;
+    u8 reverbIndex;
+    u32 *delaysL;
+    u32 *delaysR;
+    u8 *reverbMultsL;
+    u8 *reverbMultsR;
+};
+#endif
 
 #ifdef VERSION_EU
 struct ReverbSettingsEU {
@@ -774,15 +805,12 @@ struct AudioSessionSettingsEU {
 struct AudioSessionSettings {
     /*0x00*/ u32 frequency;
     /*0x04*/ u8 maxSimultaneousNotes;
-    /*0x05*/ u8 reverbDownsampleRate; // always 1
-    /*0x06*/ u16 reverbWindowSize;
-    /*0x08*/ u16 reverbGain;
-    /*0x0A*/ u16 volume;
-    /*0x0C*/ u32 persistentSeqMem;
-    /*0x10*/ u32 persistentBankMem;
-    /*0x14*/ u32 temporarySeqMem;
-    /*0x18*/ u32 temporaryBankMem;
-}; // size = 0x1C
+    /*0x06*/ u16 volume;
+    /*0x08*/ u32 persistentSeqMem;
+    /*0x0C*/ u32 persistentBankMem;
+    /*0x10*/ u32 temporarySeqMem;
+    /*0x14*/ u32 temporaryBankMem;
+}; // size = 0x18
 
 struct AudioBufferParametersEU {
     /*0x00*/ s16 presetUnk4; // audio frames per vsync?

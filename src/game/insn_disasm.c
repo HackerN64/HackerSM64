@@ -22,13 +22,13 @@ enum ParamTypes {
 extern far char *parse_map(u32 pc);
 static char insn_as_string[100];
 
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     u16 rd        : 5;
     u16 shift_amt : 5;
     u16 function  : 6;
 } RTypeData;
 
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     u16 opcode : 6;
     u16 rs     : 5;
     u16 rt     : 5;
@@ -43,7 +43,7 @@ typedef union {
     u32  d;
 } InsnData;
 
-typedef struct __attribute__((packed)) {
+typedef struct PACKED {
     u32 type;
     u32 arbitraryParam;
     u16 opcode   : 6;

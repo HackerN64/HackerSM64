@@ -820,13 +820,11 @@ void cur_obj_update(void) {
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
-    if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
-        if (o->oRoom != -1 && gMarioCurrentRoom != 0 && !is_room_loaded()) {
-            cur_obj_disable_rendering();
-            o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
-            gNumRoomedObjectsNotInMarioRoom++;
-            return;
-        }
+    s32 inRoom = cur_obj_is_mario_in_room();
+
+    if (inRoom == MARIO_OUTSIDE_ROOM && (objFlags & OBJ_FLAG_ONLY_PROCESS_INSIDE_ROOM)) {
+        cur_obj_disable_rendering_in_room();
+        return;
     }
 
     // Calculate the distance from the object to Mario.
@@ -928,7 +926,20 @@ void cur_obj_update(void) {
     // Handle visibility of object
     if (o->oRoom != -1) {
         // If the object is in a room, only show it when Mario is in the room.
-        cur_obj_enable_rendering_if_mario_in_room();
+        if (
+            (objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
+            || distanceFromMario < o->oDrawingDistance
+        ) {
+            if (inRoom == MARIO_OUTSIDE_ROOM) {
+                cur_obj_disable_rendering_in_room();
+            } else if (inRoom == MARIO_INSIDE_ROOM) {
+                cur_obj_enable_rendering_in_room();
+            }
+            o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
+        } else {
+            o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+            o->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
+        }
     } else if (
         o->collisionData == NULL
         &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)

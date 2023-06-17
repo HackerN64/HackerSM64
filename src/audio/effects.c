@@ -189,23 +189,33 @@ s32 get_vibrato_pitch_change(struct VibratoState *vib) {
 #endif
 
 f32 get_vibrato_freq_scale(struct VibratoState *vib) {
+    s32 vibratoExtentTarget;
+
     if (vib->delay != 0) {
         vib->delay--;
         return 1;
     }
 
+    // This needs to be set locally because changing the original value to 0 overrides the whole channel,
+    // effectively negating the ability to disable vibrato and bypass this function in the first place.
+    // This function isn't huge but it otherwise would get called many thousands of times per second.
+    vibratoExtentTarget = vib->seqChannel->vibratoExtentTarget;
+    if (vibratoExtentTarget >= VIBRATO_DISABLED_VALUE) {
+        vibratoExtentTarget = 0;
+    }
+
     if (vib->extentChangeTimer) {
         if (vib->extentChangeTimer == 1) {
-            vib->extent = (s32) vib->seqChannel->vibratoExtentTarget;
+            vib->extent = vibratoExtentTarget;
         } else {
             vib->extent +=
-                ((s32) vib->seqChannel->vibratoExtentTarget - vib->extent) / (s32) vib->extentChangeTimer;
+                (vibratoExtentTarget - vib->extent) / (s32) vib->extentChangeTimer;
         }
 
         vib->extentChangeTimer--;
-    } else if (vib->seqChannel->vibratoExtentTarget != (s32) vib->extent) {
+    } else if (vibratoExtentTarget != (s32) vib->extent) {
         if ((vib->extentChangeTimer = vib->seqChannel->vibratoExtentChangeDelay) == 0) {
-            vib->extent = (s32) vib->seqChannel->vibratoExtentTarget;
+            vib->extent = vibratoExtentTarget;
         }
     }
 
@@ -246,11 +256,11 @@ void note_vibrato_update(struct Note *note) {
         note->vibratoFreqScale = get_vibrato_freq_scale(&note->vibratoState);
     }
 #else
-    if (note->vibratoState.active) {
+    if (note->vibratoState.activeFlags & VIBMODE_PORTAMENTO) {
         note->portamentoFreqScale = get_portamento_freq_scale(&note->portamento);
-        if (note->parentLayer != NO_LAYER) {
-            note->vibratoFreqScale = get_vibrato_freq_scale(&note->vibratoState);
-        }
+    }
+    if ((note->vibratoState.activeFlags & VIBMODE_VIBRATO) && note->parentLayer != NO_LAYER) {
+        note->vibratoFreqScale = get_vibrato_freq_scale(&note->vibratoState);
     }
 #endif
 }
@@ -265,18 +275,23 @@ void note_vibrato_init(struct Note *note) {
 
     struct VibratoState *vib = &note->vibratoState;
 
-/* This code was probably removed from EU and SH for a reason; probably because it's dumb and makes vibrato harder to use well.
 #if defined(VERSION_JP) || defined(VERSION_US)
-    if (note->parentLayer->seqChannel->vibratoExtentStart == 0
-        && note->parentLayer->seqChannel->vibratoExtentTarget == 0
-        && note->parentLayer->portamento.mode == 0) {
-        vib->active = FALSE;
+    vib->activeFlags = VIBMODE_NONE;
+    if (note->parentLayer->portamento.mode != 0) {
+        vib->activeFlags |= VIBMODE_PORTAMENTO;
+        note->portamento = note->parentLayer->portamento;
+    }
+
+    if (!(note->parentLayer->seqChannel->vibratoExtentStart == 0
+        && note->parentLayer->seqChannel->vibratoExtentTarget >= VIBRATO_DISABLED_VALUE)) {
+        vib->activeFlags |= VIBMODE_VIBRATO;
+    } else {
         return;
     }
-#endif
-*/
-
+#else
     vib->active = TRUE;
+#endif
+
     vib->time = 0;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -313,8 +328,6 @@ void note_vibrato_init(struct Note *note) {
         vib->rate = seqChannel->vibratoRateStart;
     }
     vib->delay = seqChannel->vibratoDelay;
-
-    note->portamento = note->parentLayer->portamento;
 #endif
 }
 
@@ -340,7 +353,9 @@ void adsr_init(struct AdsrState *adsr, struct AdsrEnvelope *envelope, UNUSED s16
 #if defined(VERSION_EU) || defined(VERSION_SH)
 f32 adsr_update(struct AdsrState *adsr) {
 #else
-s32 adsr_update(struct AdsrState *adsr) {
+s32 adsr_update(struct Note *note) {
+    struct AdsrState *adsr = &note->adsr;
+    u8 isInit = FALSE;
 #endif
     u8 action = adsr->action;
     u8 state = adsr->state;
@@ -349,6 +364,10 @@ s32 adsr_update(struct AdsrState *adsr) {
             return 0;
 
         case ADSR_STATE_INITIAL:
+            isInit = TRUE;
+            // fallthrough
+
+        case ADSR_STATE_RESTART:
 #if defined(VERSION_JP) || defined(VERSION_US)
             adsr->current = adsr->initial;
             adsr->target = adsr->initial;
@@ -388,7 +407,7 @@ s32 adsr_update(struct AdsrState *adsr) {
                     break;
 #endif
                 case ADSR_RESTART:
-                    adsr->state = ADSR_STATE_INITIAL;
+                    adsr->state = ADSR_STATE_RESTART;
                     break;
 
                 default:
@@ -409,6 +428,11 @@ s32 adsr_update(struct AdsrState *adsr) {
                     adsr->target = adsr->target * adsr->target;
                     adsr->velocity = (adsr->target - adsr->current) / adsr->delay;
 #else // !(VERSION_EU || VERSION_SH)
+                    if (adsr->delay <= 0) {
+                        adsr->delay = 1;
+                        note->initFullVelocity = isInit;
+                    }
+
                     adsr->target = BSWAP16(adsr->envelope[adsr->envIndex].arg);
                     adsr->velocity = ((adsr->target - adsr->current) << 0x10) / adsr->delay;
 #endif // !(VERSION_EU || VERSION_SH)

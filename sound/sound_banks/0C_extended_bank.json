@@ -205,6 +205,54 @@
             [1, 32700],
             [32700, 29430],
             "hang"
+        ],
+        "envelope34": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope35": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope36": [
+            [2, 32700],
+            [202, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope37": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope38": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope39": [
+            [2, 32700],
+            [145, 7597],
+            [343, 0],
+            "hang"
+        ],
+        "envelope40": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope41": [
+            [2, 32700],
+            [187, 0],
+            [32700, 0],
+            "hang"
         ]
     },
     "instruments": {
@@ -263,7 +311,7 @@
             "sound": "3C_acoustic_guitar",
             "sound_hi": "3D"
         },
-        "Jingles": {
+        "Sleigh Bells": {
             "release_rate": 208,
             "envelope": "envelope10",
             "sound": "2F_sleigh_bells"
@@ -334,7 +382,7 @@
             "sound": "46_pizzicato_strings_1",
             "sound_hi": "47_pizzicato_strings_2"
         },
-        "Cello": {
+        "Trombone": {
             "release_rate": 119,
             "envelope": "envelope18",
             "sound": "2D_trombone"
@@ -422,12 +470,12 @@
             "sound": "33_kick_drum_2",
             "sound_hi": {"sample": "32_metal_rimshot", "tuning": 2.828428}
         },
-        "Music Box": {
+        "Melodic Tom": {
             "release_rate": 119,
             "envelope": "envelope28",
             "sound": "1D"
         },
-        "Melodic Tom": {
+        "Melodic Tom 2": {
             "release_rate": 34,
             "envelope": "envelope0",
             "sound": "1D"
@@ -442,7 +490,7 @@
             "envelope": "envelope0",
             "sound": {"sample": "1D", "tuning": 0.793701}
         },
-        "Organ": {
+        "Accordion 2": {
             "release_rate": 208,
             "envelope": "envelope0",
             "sound": "2E_accordion"
@@ -452,7 +500,7 @@
             "envelope": "envelope1",
             "sound": "36_sawtooth_synth"
         },
-        "Saw Wave": {
+        "Square Synth": {
             "release_rate": 208,
             "envelope": "envelope2",
             "sound": "37_square_synth"
@@ -462,7 +510,7 @@
             "envelope": "envelope21",
             "sound": "29_orchestra_hit"
         },
-        "Trumpet": {
+        "Brass 2": {
             "release_rate": 208,
             "envelope": "envelope1",
             "sound": "19_brass"
@@ -472,36 +520,82 @@
             "envelope": "envelope30",
             "sound": "18_timpani"
         },
-        "Drump Sample 26": {
+        "Drum Sample 26": {
             "release_rate": 10,
             "normal_range_lo": 18,
             "envelope": "envelope31",
             "sound_lo": "12_snare_drum_1",
             "sound": "13_snare_drum_2"
         },
-        "Drump Sample 27": {
+        "Drum Sample 27": {
             "release_rate": 10,
             "normal_range_lo": 18,
             "envelope": "envelope32",
             "sound_lo": "12_snare_drum_1",
             "sound": "13_snare_drum_2"
         },
-        "Xylophone": {
+        "Music Box": {
             "release_rate": 119,
             "envelope": "envelope28",
             "sound": "3A_music_box"
         },
-        "Church Organ": {
+        "Synth Voice 2": {
             "release_rate": 19,
             "normal_range_hi": 50,
             "envelope": "envelope0",
             "sound": {"sample": "1B_organ_2", "tuning": 1.0},
             "sound_hi": "1B_organ_2"
         },
-        "Bells": {
+        "Sleigh Bells 2": {
             "release_rate": 208,
             "envelope": "envelope33",
             "sound": "2F_sleigh_bells"
+        },
+        "Strings Ensemble": {
+            "release_rate": 24,
+            "normal_range_lo": 42,
+            "envelope": "envelope34",
+            "sound_lo": "14_strings_5",
+            "sound": "15_strings_4"
+        },
+        "Trumpet": {
+            "release_rate": 67,
+            "envelope": "envelope35",
+            "sound": "17_trumpet"
+        },
+        "Harpsichord": {
+            "release_rate": 255,
+            "envelope": "envelope36",
+            "sound": "27_harpsichord"
+        },
+        "Monk Choir": {
+            "release_rate": 10,
+            "envelope": "envelope37",
+            "sound": "3E_monk_choir"
+        },
+        "Low Bell": {
+            "release_rate": 10,
+            "envelope": "envelope38",
+            "sound": "3F"
+        },
+        "High Bell": {
+            "release_rate": 10,
+            "envelope": "envelope39",
+            "sound": "40_bell"
+        },
+        "Harmonica": {
+            "release_rate": 19,
+            "envelope": "envelope40",
+            "sound": "43_harmonica"
+        },
+        "Percussion Loop": {
+            "release_rate": 100,
+            "normal_range_lo": 55,
+            "normal_range_hi": 56,
+            "envelope": "envelope41",
+            "sound_lo": "2A",
+            "sound": "2B",
+            "sound_hi": "2C"
         },
         "percussion": [
             {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.210224}},
@@ -580,7 +674,7 @@
         "Pan Flute",
         "Strings",
         "Acoustic Guitar",
-        "Jingles",
+        "Sleigh Bells",
         "Hi-Hat",
         "Crash Cymbal",
         "Triangle&Cabasa",
@@ -591,7 +685,7 @@
         "Acoustic Bass",
         "Snare Clap",
         "Pizzicato Strings",
-        "Cello",
+        "Trombone",
         "Choir Ooh",
         "Sitar Drone",
         "Sitar",
@@ -607,20 +701,28 @@
         "Orchestra Hit",
         "Recorder",
         "Drum Sample 18",
-        "Music Box",
         "Melodic Tom",
+        "Melodic Tom 2",
         "Steel Guitar",
         "Pah",
-        "Organ",
+        "Accordion 2",
         "Synth Bass",
-        "Saw Wave",
+        "Square Synth",
         "Orchestra Hit 2",
-        "Trumpet",
+        "Brass 2",
         "Timpani",
-        "Drump Sample 26",
-        "Drump Sample 27",
-        "Xylophone",
-        "Church Organ",
-        "Bells"
+        "Drum Sample 26",
+        "Drum Sample 27",
+        "Music Box",
+        "Synth Voice 2",
+        "Sleigh Bells 2",
+        "Strings Ensemble",
+        "Trumpet",
+        "Harpsichord",
+        "Monk Choir",
+        "Low Bell",
+        "High Bell",
+        "Harmonica",
+        "Percussion Loop"
     ]
 }
