@@ -97,7 +97,7 @@ SECTIONS
    BEGIN_SEG(boot, 0x04000000)
    {
       KEEP(BUILD_DIR/asm/rom_header.o(.text*));
-      KEEP(BUILD_DIR/asm/boot.o(.text*));
+      KEEP(BUILD_DIR/asm/ipl3.o(.text*));
    }
    END_SEG(boot)
 

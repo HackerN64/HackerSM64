@@ -582,7 +582,7 @@ unf: $(ROM) $(LOADER)
 libultra: $(BUILD_DIR)/libultra.a
 
 # Extra object file dependencies
-$(BUILD_DIR)/asm/boot.o:              $(IPL3_RAW_FILES)
+$(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
 $(BUILD_DIR)/src/game/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
