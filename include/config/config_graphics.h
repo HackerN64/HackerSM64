@@ -134,15 +134,15 @@
  */
 #define LEGACY_SHADOW_IDS
 
+
 /**
  * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
-*/
+ */
 //#define HORIZONTAL_CULLING_ON_EMULATOR
-
 
 /**
  * Makes objects bellow the screen be culled.
-*/
+ */
 #define VERTICAL_CULLING
 
 /**
