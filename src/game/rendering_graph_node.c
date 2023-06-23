@@ -1091,8 +1091,8 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     // when converting the transformation matrix to a fixed point matrix.
     f32 cameraToObjectDepth = node->cameraToObject[2];
 
-    #define VALID_DEPTH_MIDDLE -20100.f / 2.f
-    #define VALID_DEPTH_RANGE 19900 / 2.f
+    #define VALID_DEPTH_MIDDLE (-20100.f / 2.f)
+    #define VALID_DEPTH_RANGE (19900 / 2.f)
     if (absf(cameraToObjectDepth - VALID_DEPTH_MIDDLE) >= VALID_DEPTH_RANGE + cullingRadius) {
         return FALSE;
     }
