@@ -1113,7 +1113,6 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     if (absf(node->cameraToObject[0]) > hScreenEdge + cullingRadius) {
         return FALSE;
     }
-    
     return TRUE;
 }
 
