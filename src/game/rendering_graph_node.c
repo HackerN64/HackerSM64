@@ -571,7 +571,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
-        // The reason this is not divided as an intenger is to prevent an intenger division.
+        // The reason this is not divided as an integer is to prevent an integer division.
         f32 vHalfFov = ( (f32) ((node->fov * 4096) + 8192) ) / 45.f;
 
         // We need to account for aspect ratio changes by multiplying by the widescreen horizontal stretch 
