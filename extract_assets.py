@@ -3,6 +3,7 @@ import sys
 import os
 import json
 
+ROMS_DIR=os.path.expanduser("~/roms/")
 
 sha1_LUT = {
     "eu": "4ac5721683d0e0b6bbb561b58a71740845dceea9",
@@ -21,6 +22,9 @@ sha1_swapLUT = {
 def get_files():
     import subprocess
     fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
+    if os.path.exists(ROMS_DIR):
+        fileArray += [os.path.join(ROMS_DIR, f) for f in os.listdir(ROMS_DIR) if os.path.isfile(os.path.join(ROMS_DIR, f))]
+
     foundVersions = {}
 
     for f in fileArray:
