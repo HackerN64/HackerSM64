@@ -3,6 +3,12 @@ import sys
 import os
 import json
 
+sha1_LUT = {
+    "eu": "4ac5721683d0e0b6bbb561b58a71740845dceea9",
+    "jp": "8a20a5c83d6ceb0f0506cfc9fa20d8f438cafe51",
+    "sh": "3f319ae697533a255a1003d09202379d78d5a2e0",
+    "us": "9bef1128717f958171a4afac3ed78ee2bb4e86ce",
+}
 
 def read_asset_map():
     with open("assets.json") as f:
@@ -142,8 +148,7 @@ def main():
             print("Failed to open " + fname + "! " + str(e))
             sys.exit(1)
         sha1 = hashlib.sha1(roms[lang]).hexdigest()
-        with open("sm64." + lang + ".sha1", "r") as f:
-            expected_sha1 = f.read().split()[0]
+        expected_sha1 = sha1_LUT[lang]
         if sha1 != expected_sha1:
             print(
                 fname
