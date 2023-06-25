@@ -124,11 +124,12 @@ def main():
     # verify the correct rom
     for lang in langs:
         if lang not in fileLUT:
-            print("Error: '%s' was specified to the program, but no %s ROM exists in this folder."
-                % (lang, lang.upper())
+            print("[%s] Error: No %s ROM detected in this folder."
+                % (sys.argv[0], lang.upper())
             )
-            print()
-            print("Detected ROMS:")
+            if len(fileLUT.items()) > 0:
+                print()
+                print("Detected ROMS:")
             for k,v in fileLUT.items():
                 print("    %s ROM found at: %s" % (k.upper(), v))
             sys.exit(1)
