@@ -34,8 +34,16 @@ def get_files():
                 foundVersions[k] = f
 
         for k, v in sha1_swapLUT.items():
-            if v == sha1sum:
-                foundVersions[k] = f
+            if v == sha1sum: # the ROM is swapped!
+                subprocess.run(
+                    [
+                        "dd","conv=swab",
+                        "if=%s" % f,
+                        "of=/tmp/baserom.%s.swapped.z64" % k
+                    ],
+                    stderr=subprocess.PIPE,
+                )
+                foundVersions[k] = "/tmp/baserom.%s.swapped.z64" % k
     return foundVersions
 
 
@@ -113,11 +121,22 @@ def main():
         clean_assets(local_asset_file)
         sys.exit(0)
 
+    # verify the correct rom
+    for lang in langs:
+        if lang not in fileLUT:
+            print("Error: '%s' was specified to the program, but no %s ROM exists in this folder."
+                % (lang, lang.upper())
+            )
+            print("Detected ROMS:")
+            for k,v in fileLUT.items():
+                print("%s ROM found at: %s" % (k.upper(), v))
+            sys.exit(1)
+
     all_langs = ["jp", "us", "eu", "sh"]
     if not langs or not all(a in all_langs for a in langs):
         langs_str = " ".join("[" + lang + "]" for lang in all_langs)
         print("Usage: " + sys.argv[0] + " " + langs_str)
-        print("For each version, baserom.<version>.z64 must exist")
+        print("For each version, its ROM file must exist in this folder")
         sys.exit(1)
 
     asset_map = read_asset_map()
@@ -178,27 +197,9 @@ def main():
         except Exception as e:
             print("Failed to open " + fname + "! " + str(e))
             sys.exit(1)
-        sha1 = hashlib.sha1(roms[lang]).hexdigest()
-        expected_sha1 = sha1_LUT[lang]
-        swapped_sha1 = sha1_LUT[lang]
-        if sha1 != expected_sha1:
-            if sha1 == swapped_sha1:
-                subprocess.run(
-                    [
-                        "dd","conv=swab",
-                        "if=%s" % fname,
-                        "of=/tmp/hackersm64_swapped.z64"
-                    ]
-                )
-            else:
-                print(
-                    fname
-                    + " has the wrong hash! Found "
-                    + sha1
-                    + ", expected "
-                    + expected_sha1
-                )
-                sys.exit(1)
+        # There used to be an SHA1 check here,
+        # but it's unnecessary since we detect the
+        # presence of the correct roms automatically
 
     # Make sure tools exist
     subprocess.check_call(
@@ -211,14 +212,16 @@ def main():
 
     # Import new assets
     for key in keys:
+
         assets = todo[key]
         lang, mio0 = key
+        fname = fileLUT[lang]
         if mio0 == "@sound":
             rom = roms[lang]
             args = [
                 "python3",
                 "tools/disassemble_sound.py",
-                "baserom." + lang + ".z64",
+                fname,
             ]
             def append_args(key):
                 size, locs = asset_map["@sound " + key + " " + lang]
@@ -245,7 +248,7 @@ def main():
                     "-d",
                     "-o",
                     str(mio0),
-                    "baserom." + lang + ".z64",
+                    fname,
                     "-",
                 ],
                 check=True,
