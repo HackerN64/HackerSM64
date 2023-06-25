@@ -612,4 +612,6 @@ ALWAYS_INLINE f32 remap(f32 x, f32 fromA, f32 toA, f32 fromB, f32 toB) {
     return (x - fromA) / (toA - fromA) * (toB - fromB) + fromB;
 }
 
+f32 lerpf(f32 start_value, f32 end_value, f32 progress);
+
 #endif // MATH_UTIL_H

@@ -150,3 +150,13 @@
  * will be used instead.
  */
 #define DEFAULT_CULLING_RADIUS 300
+
+/**
+ * Eases the textured screen transitions to make them look smoother.
+ */
+#define EASE_IN_SCREEN_TRANSITIONS
+
+/**
+ * Makes use of the tex edge render mode to deliver smooth transition textures
+ */
+#define HD_TRANSITIONS

@@ -1537,3 +1537,7 @@ OPTIMIZE_OS void mtxf_to_mtx_fast(s16* dst, float* src) {
     //  to set the top half.
     dst[15] = 1;
 }
+
+f32 lerpf(f32 startValue, f32 endValue, f32 progress) {
+    return (startValue + (endValue - startValue) * progress);
+}

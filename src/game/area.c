@@ -347,22 +347,29 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         gWarpTransition.data.endTexX = SCREEN_CENTER_X;
         gWarpTransition.data.endTexY = SCREEN_CENTER_Y;
 
-        gWarpTransition.data.texTimer = 0;
+        gWarpTransition.data.angleSpeed = DEGREES(0);
+
+        s16 fullRadius = GFX_DIMENSIONS_FULL_RADIUS;
+
+        if (transType == WARP_TRANSITION_TYPE_BOWSER || transType == WARP_TRANSITION_FADE_INTO_BOWSER){
+            fullRadius *= 3;
+        }
+
+        if (transType == WARP_TRANSITION_FADE_FROM_MARIO || transType == WARP_TRANSITION_FADE_INTO_MARIO){
+            fullRadius *= 1.1f;
+        }
+
+        if (transType == WARP_TRANSITION_FADE_FROM_STAR || transType == WARP_TRANSITION_FADE_INTO_STAR){
+            fullRadius *= 1.2f;
+        }
 
         if (transType & WARP_TRANSITION_FADE_INTO) { // Is the image fading in?
-            gWarpTransition.data.startTexRadius = GFX_DIMENSIONS_FULL_RADIUS;
-            if (transType >= WARP_TRANSITION_FADES_INTO_LARGE) {
-                gWarpTransition.data.endTexRadius = 16;
-            } else {
-                gWarpTransition.data.endTexRadius = 0;
-            }
+            gWarpTransition.data.startTexRadius = fullRadius;
+            gWarpTransition.data.endTexRadius = 0;
+
         } else { // The image is fading out. (Reverses start & end circles)
-            if (transType >= WARP_TRANSITION_FADES_FROM_LARGE) {
-                gWarpTransition.data.startTexRadius = 16;
-            } else {
-                gWarpTransition.data.startTexRadius = 0;
-            }
-            gWarpTransition.data.endTexRadius = GFX_DIMENSIONS_FULL_RADIUS;
+            gWarpTransition.data.startTexRadius = 0;
+            gWarpTransition.data.endTexRadius = fullRadius;
         }
     }
 #endif
@@ -417,7 +424,7 @@ void render_game(void) {
 
         if (gWarpTransition.isActive) {
             if (gWarpTransDelay == 0) {
-                gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time,
+                gWarpTransition.isActive = !render_screen_transition(gWarpTransition.type, gWarpTransition.time,
                                                                      &gWarpTransition.data);
                 if (!gWarpTransition.isActive) {
                     if (gWarpTransition.type & WARP_TRANSITION_FADE_INTO) {
