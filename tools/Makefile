@@ -68,6 +68,10 @@ endif
 
 flips: CC := $(CXX)
 flips_SOURCES := Flips/Flips.cpp
+flips_CFLAGS := -Wall -Wextra -fopenmp -Os -flto -fuse-linker-plugin -fomit-frame-pointer -fmerge-all-constants \
+-fvisibility=hidden -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables \
+-ffunction-sections -fdata-sections -Wl,--gc-sections \
+-Wl,-z,relro,-z,now,--as-needed,--hash-style=gnu,--relax
 
 all-except-recomp: $(LIBAUDIOFILE) $(BUILD_PROGRAMS)
 
