@@ -127,9 +127,10 @@ def main():
             print("Error: '%s' was specified to the program, but no %s ROM exists in this folder."
                 % (lang, lang.upper())
             )
+            print()
             print("Detected ROMS:")
             for k,v in fileLUT.items():
-                print("%s ROM found at: %s" % (k.upper(), v))
+                print("    %s ROM found at: %s" % (k.upper(), v))
             sys.exit(1)
 
     all_langs = ["jp", "us", "eu", "sh"]
