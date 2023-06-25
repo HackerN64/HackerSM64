@@ -35,25 +35,25 @@ s32 set_and_reset_transition_fade_timer(u8 transTime) {
     return FALSE;
 }
 
-void make_tex_transition_vertex(Vtx *verts, s32 n, struct WarpTransitionData *transData, s16 centerTransX, s16 centerTransY,
-                   s16 vertX, s16 vertY, s16 tx, s16 ty) {
+void make_tex_transition_vertex(Vtx *verts, s32 n, struct WarpTransitionData *transData, f32 centerTransX, f32 centerTransY,
+                   f32 vertX, f32 vertY, s16 tx, s16 ty) {
     u8 r = transData->red;
     u8 g = transData->green;
     u8 b = transData->blue;
 
     // Rotate around the center
     s16 angle = sTransitionTextureAngle;
-    f32 centerX = vertX * coss(angle) - vertY * sins(angle) + centerTransX;
-    f32 centerY = vertX * sins(angle) + vertY * coss(angle) + centerTransY;
+    f32 x = vertX * coss(angle) - vertY * sins(angle) + centerTransX;
+    f32 y = vertX * sins(angle) + vertY * coss(angle) + centerTransY;
 
-    s16 x = roundf(centerX);
-    s16 y = roundf(centerY);
+    s16 roundedX = roundf(x);
+    s16 roundedY = roundf(y);
 
-    make_vertex(verts, n, x, y, -1, tx * 32, ty * 32, r, g, b, 255);
+    make_vertex(verts, n, roundedX, roundedY, -1, tx * 32, ty * 32, r, g, b, 255);
 }
 
-void make_tex_transition_vertices(Vtx *verts, struct WarpTransitionData *transData, s16 centerTransX, s16 centerTransY,
-                                u16 texTransRadius, s8 transTexType) {
+void make_tex_transition_vertices(Vtx *verts, struct WarpTransitionData *transData, f32 centerTransX, f32 centerTransY,
+                                f32 texTransRadius, s8 transTexType) {
     
     s16 leftUV, rightUV, downUV, upUV;
 
@@ -85,7 +85,7 @@ void make_tex_transition_vertices(Vtx *verts, struct WarpTransitionData *transDa
     make_tex_transition_vertex(verts, 7, transData, centerTransX, centerTransY, -solidColRadius, solidColRadius, 0, 0);
 }
 
-u16 calc_tex_transition_radius(s8 transTime, struct WarpTransitionData *transData) {
+f32 calc_tex_transition_radius(s8 transTime, struct WarpTransitionData *transData) {
     f32 progress = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
 
 #ifdef EASE_IN_SCREEN_TRANSITIONS
@@ -94,19 +94,19 @@ u16 calc_tex_transition_radius(s8 transTime, struct WarpTransitionData *transDat
     
     f32 result = lerpf(transData->startTexRadius, transData->endTexRadius, progress);
 
-    return roundf(result);
+    return result;
 }
 
-s16 center_tex_transition_x(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransDir) {
+f32 center_tex_transition_x(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransDir) {
     f32 x = transData->startTexX + coss(texTransDir) * texTransTime;
 
-    return roundf(x);
+    return x;
 }
 
-s16 center_tex_transition_y(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransDir) {
+f32 center_tex_transition_y(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransDir) {
     f32 y = transData->startTexY + sins(texTransDir) * texTransTime;
 
-    return roundf(y);
+    return y;
 }
 
 f32 calc_tex_transition_time(s8 transTime, struct WarpTransitionData *transData) {
@@ -137,10 +137,10 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
     u16 texTransDir = calc_tex_transition_direction(transData);
 
     f32 texTransTime = calc_tex_transition_time(transTime, transData);
-    s16 centerTransX = center_tex_transition_x(transData, texTransTime, texTransDir);
-    s16 centerTransY = center_tex_transition_y(transData, texTransTime, texTransDir);
+    f32 centerTransX = center_tex_transition_x(transData, texTransTime, texTransDir);
+    f32 centerTransY = center_tex_transition_y(transData, texTransTime, texTransDir);
 
-    u16 texTransRadius = calc_tex_transition_radius(transTime, transData);
+    f32 texTransRadius = calc_tex_transition_radius(transTime, transData);
     Vtx *verts = alloc_display_list(8 * sizeof(Vtx));
 
     if (verts != NULL) {
