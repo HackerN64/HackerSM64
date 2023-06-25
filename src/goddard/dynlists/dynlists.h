@@ -53,7 +53,7 @@ enum {
     DYNOBJ_MARIO_LEFT_EYE_TRI_GROUP              = 98,
     DYNOBJ_MARIO_LEFT_EYE_MTL_GROUP              = 99,
     DYNOBJ_MARIO_LEFT_EYE_SHAPE                  = 100,
-    DYNOMJ_MARIO_LEFT_EYE_JOINT_2                = 103,
+    DYNOBJ_MARIO_LEFT_EYE_JOINT_2                = 103,
     DYNOBJ_MARIO_LEFT_EYE_JOINT_1                = 106,
     DYNOBJ_MARIO_LEFT_EYE_ANIMDATA_GROUP         = 107,
     DYNOBJ_MARIO_LEFT_EYE_ANIMATOR               = 108,
