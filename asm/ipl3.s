@@ -16,8 +16,7 @@
 .set SP_DMEM_UNK0, 0x040004C0
 .set SP_DMEM_UNK1, 0x04000774
 
-// This value must fit in one instruction
-//  - Either use the top 16 bits or the low 16 bits, but not both
+// Used for documentation; changing these can and will break your ROM!
 .set INITIAL_DMA_LEN, 0x00100000
 .set INITIAL_DMA_ROMPOS, 0x1000
 
@@ -452,9 +451,7 @@ glabel ipl3_entry // 0xA4000040
     xor   $a3, $t6, $t3
     xor   $t8, $s0, $a2
     xor   $s0, $t8, $t4
-#ifdef SKIP_CHECKSUM
-    nop; nop; nop; nop; nop; nop; nop
-#else
+// verifies checksum
     lui   $t3, %hi(PHYS_TO_CART(CART_CHECKSUM0))
     lw    $t0, %lo(PHYS_TO_CART(CART_CHECKSUM0))($t3)
     bne   $a3, $t0, halt
@@ -462,10 +459,10 @@ glabel ipl3_entry // 0xA4000040
     lw    $t0, %lo(PHYS_TO_CART(CART_CHECKSUM1))($t3)
     bne   $s0, $t0, halt
      nop
-#endif // SKIP_CHECKSUM
     bal   func_A4000690
      nop
 
+// In a permanent loop that cannot be exited.
 halt:
     bal   halt
      nop
