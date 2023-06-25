@@ -152,7 +152,7 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gSPDisplayList(gDisplayListHead++, dl_transition_draw_filled_region);
         gDPPipeSync(gDisplayListHead++);
         gDPSetCombineMode(gDisplayListHead++, G_CC_SHADEDECALA, G_CC_SHADEDECALA);
-#ifdef HD_TRANSITIONS
+#ifdef SHARP_TRANSITION_TEXTURES
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
         s32 textureType = G_IM_FMT_I;
 #else

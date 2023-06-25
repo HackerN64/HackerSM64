@@ -159,4 +159,4 @@
 /**
  * Makes use of the tex edge render mode to deliver smooth transition textures
  */
-#define HD_TRANSITIONS
+#define SHARP_TRANSITION_TEXTURES
