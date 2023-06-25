@@ -619,7 +619,7 @@ struct DynList dynlist_mario_master[] = {
                 SetRotation(-6.873, 0.206, -97.461),
                 SetAttachOffset(0.0, 0.0, 0.0),
                 SetSkinWeight(429, 16.0),
-                MakeAttachedJoint(DYNOMJ_MARIO_LEFT_EYE_JOINT_2),  // What is this joint for?
+                MakeAttachedJoint(DYNOBJ_MARIO_LEFT_EYE_JOINT_2),  // What is this joint for?
                     SetScale(1.0, 1.0, 1.0),
                     SetRotation(0.0, 0.0, 0.0),
                     SetAttachOffset(329.8, 0.0, 0.0),
