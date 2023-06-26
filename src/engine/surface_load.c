@@ -699,13 +699,11 @@ static TerrainData sVertexData[600];
 void load_object_collision_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
-    f32 marioDist = o->oDistanceToMario;
 
-    // On an object's first frame, the distance is set to 19000.0f.
-    // If the distance hasn't been updated, update it now.
-    if (o->oDistanceToMario == 19000.0f) {
-        marioDist = dist_between_objects(o, gMarioObject);
-    }
+    f32 lateralMarioDist;
+    vec3f_get_lateral_dist(&o->oPosVec, &gMarioObject->oPosVec, &lateralMarioDist);
+
+    f32 verticalMarioDiff = gMarioObject->oPosY - o->oPosY;
 
 #ifdef AUTO_COLLISION_DISTANCE
     if (!(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
@@ -718,11 +716,17 @@ void load_object_collision_model(void) {
     if (o->oCollisionDistance > o->oDrawingDistance) {
         o->oDrawingDistance = o->oCollisionDistance;
     }
+    
+    s32 isLaterallyClose = (lateralMarioDist < o->oCollisionDistance);
+    s32 isNotBellow = (verticalMarioDiff > 0 || verticalMarioDiff > -o->oCollisionDistance);
+    s32 isNotAbove = (verticalMarioDiff < 0 || verticalMarioDiff < o->oCollisionDistance + 2000.f) ;
+
+    s32 inColRadius = isLaterallyClose && isNotAbove && isNotBellow;
 
     // Update if no Time Stop, in range, and in the current room.
     if (
         !(gTimeStopState & TIME_STOP_ACTIVE)
-        && (marioDist < o->oCollisionDistance)
+        && inColRadius
         && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
@@ -733,6 +737,15 @@ void load_object_collision_model(void) {
             load_object_surfaces(&collisionData, sVertexData, TRUE);
         }
     }
+
+    f32 marioDist = o->oDistanceToMario;
+
+    // On an object's first frame, the distance is set to 19000.0f.
+    // If the distance hasn't been updated, update it now.
+    if (o->oDistanceToMario == 19000.0f) {
+        marioDist = dist_between_objects(o, gMarioObject);
+    }
+
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
     profiler_collision_update(first);
 }

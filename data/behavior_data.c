@@ -92,7 +92,7 @@ enum BehaviorCommands {
     /*0x15*/ BHV_CMD_SET_RANDOM_INT,
     /*0x16*/ BHV_CMD_ADD_RANDOM_FLOAT,
     /*0x17*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
-    /*0x18*/ BHV_CMD_NOP_1,
+    /*0x18*/ BHV_CMD_OR_LONG,
     /*0x19*/ BHV_CMD_NOP_2,
     /*0x1A*/ BHV_CMD_NOP_3,
     /*0x1B*/ BHV_CMD_SET_MODEL,
@@ -236,10 +236,6 @@ enum BehaviorCommands {
     BC_H(rshift)
 
 // No operation. Unused.
-#define CMD_NOP_1(field) \
-    BC_BB(BHV_CMD_NOP_1, field)
-
-// No operation. Unused.
 #define CMD_NOP_2(field) \
     BC_BB(BHV_CMD_NOP_2, field)
 
@@ -300,7 +296,9 @@ enum BehaviorCommands {
 #define BEGIN_REPEAT_UNUSED(count) \
     BC_BB(BHV_CMD_BEGIN_REPEAT_UNUSED, count)
 
-#define OR_LONG(field, value) LOAD_ANIMATIONS(field, value)
+#define OR_LONG(field, value) \
+    BC_BB(BHV_CMD_OR_LONG, field), \
+    BC_W(value)
 
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \
