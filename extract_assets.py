@@ -69,25 +69,6 @@ def read_local_asset_list(f):
         ret.append(line.strip())
     return ret
 
-
-def asset_needs_update(asset, version):
-    if version <= 6 and asset in ["actors/king_bobomb/king_bob-omb_eyes.rgba16.png", "actors/king_bobomb/king_bob-omb_hand.rgba16.png"]:
-        return True
-    if version <= 5 and asset == "textures/spooky/bbh_textures.00800.rgba16.png":
-        return True
-    if version <= 4 and asset in ["textures/mountain/ttm_textures.01800.rgba16.png", "textures/mountain/ttm_textures.05800.rgba16.png"]:
-        return True
-    if version <= 3 and asset == "textures/cave/hmc_textures.01800.rgba16.png":
-        return True
-    if version <= 2 and asset == "textures/inside/inside_castle_textures.09000.rgba16.png":
-        return True
-    if version <= 1 and asset.endswith(".m64"):
-        return True
-    if version <= 0 and asset.endswith(".aiff"):
-        return True
-    return False
-
-
 def remove_file(fname):
     os.remove(fname)
     print("deleting", fname)
@@ -122,12 +103,31 @@ def main():
         local_asset_file = None
         local_version = -1
 
-    romLUT = get_rom_candidates()
-
     langs = sys.argv[1:]
     if langs == ["--clean"]:
         clean_assets(local_asset_file)
         sys.exit(0)
+
+    asset_map = read_asset_map()
+    all_assets = []
+    any_missing_assets = False
+    for asset, data in asset_map.items():
+        if asset.startswith("@"):
+            continue
+        if os.path.isfile(asset):
+            all_assets.append((asset, data, True))
+        else:
+            all_assets.append((asset, data, False))
+            if not any_missing_assets and any(lang in data[-1] for lang in langs):
+                any_missing_assets = True
+
+    if not any_missing_assets and local_version == new_version:
+        # Nothing to do, no need to read a ROM. For efficiency we don't check
+        # the list of old assets either.
+        return
+
+    romLUT = get_rom_candidates()
+
 
     # verify the correct rom
     for lang in langs:
@@ -149,24 +149,6 @@ def main():
         print("For each version, its ROM file must exist in this folder")
         sys.exit(1)
 
-    asset_map = read_asset_map()
-    all_assets = []
-    any_missing_assets = False
-    for asset, data in asset_map.items():
-        if asset.startswith("@"):
-            continue
-        if os.path.isfile(asset):
-            all_assets.append((asset, data, True))
-        else:
-            all_assets.append((asset, data, False))
-            if not any_missing_assets and any(lang in data[-1] for lang in langs):
-                any_missing_assets = True
-
-    if not any_missing_assets and local_version == new_version:
-        # Nothing to do, no need to read a ROM. For efficiency we don't check
-        # the list of old assets either.
-        return
-
     # Late imports (to optimize startup perf)
     import hashlib
     import tempfile
@@ -184,7 +166,7 @@ def main():
     todo = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
-        if exists and not asset_needs_update(asset, local_version):
+        if exists:
             continue
 
         meta = data[:-2]
