@@ -51,8 +51,8 @@ s8 betterReverbDownsampleRate;
 static s32        reverbMults[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS / 3] = {0};
 static s32         allpassIdx[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS] = {0};
 static s32 betterReverbDelays[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS] = {0};
-static s32        **delayBufs[SYNTH_CHANNEL_STEREO_COUNT];
 static s32     lastDelayLight[SYNTH_CHANNEL_STEREO_COUNT];
+static s16        **delayBufs[SYNTH_CHANNEL_STEREO_COUNT];
 u8 *gReverbMults[SYNTH_CHANNEL_STEREO_COUNT];
 s32 reverbLastFilterIndex;
 s32 reverbFilterCount;
@@ -99,7 +99,7 @@ u8 sAudioSynthesisPad[0x20];
 
 #ifdef BETTER_REVERB
 static void reverb_samples(s16 *start, s16 *end, s16 *downsampleBuffer, s32 channel) {
-    s32 *curDelaySample;
+    s16 *curDelaySample;
     s32 historySample;
     s32 tmpCarryover;
     s32 outSampleTotal;
@@ -108,10 +108,10 @@ static void reverb_samples(s16 *start, s16 *end, s16 *downsampleBuffer, s32 chan
     s32 k;
 
     s32 downsampleIncrement = gReverbDownsampleRate;
-    s32 **delayBufsLocal = delayBufs[channel];
     s32 *delaysLocal = betterReverbDelays[channel];
     s32 *reverbMultsLocal = reverbMults[channel];
     s32 *allpassIdxLocal = allpassIdx[channel];
+    s16 **delayBufsLocal = delayBufs[channel];
 
     s32 lastFilterIndex = reverbLastFilterIndex;
     s32 revIndex = betterReverbRevIndex;
@@ -133,12 +133,13 @@ static void reverb_samples(s16 *start, s16 *end, s16 *downsampleBuffer, s32 chan
             if (j == 2) {
                 j = -1;
                 outSampleTotal += ((historySample * reverbMultsLocal[k++]) >> 8);
-                *curDelaySample = tmpCarryover;
+                *curDelaySample = CLAMP_S16(tmpCarryover);
                 if (i != lastFilterIndex)
                     tmpCarryover = ((historySample * revIndex) >> 8)/* + *downsampleBuffer*/;
             } else {
-                *curDelaySample = ((historySample * (-gainIndex)) >> 8) + tmpCarryover;
-                tmpCarryover = ((*curDelaySample * gainIndex) >> 8) + historySample;
+                tmpCarryover += (historySample * (-gainIndex)) >> 8;
+                *curDelaySample = CLAMP_S16(tmpCarryover);
+                tmpCarryover = ((tmpCarryover * gainIndex) >> 8) + historySample;
             }
 
             if (++allpassIdxLocal[i] == delaysLocal[i]) allpassIdxLocal[i] = 0;
@@ -150,16 +151,16 @@ static void reverb_samples(s16 *start, s16 *end, s16 *downsampleBuffer, s32 chan
 
 #define FILTERS_MINUS_1 (BETTER_REVERB_FILTER_COUNT_LIGHT - 1)
 static void reverb_samples_light(s16 *start, s16 *end, s16 *downsampleBuffer, s32 channel) {
-    s32 *curDelaySample;
+    s16 *curDelaySample;
     s32 historySample;
     s32 tmpCarryover;
     s32 i;
 
     s32 downsampleIncrement = gReverbDownsampleRate;
-    s32 **delayBufsLocal = delayBufs[channel];
     s32 *delaysLocal = betterReverbDelays[channel];
     s32 *allpassIdxLocal = allpassIdx[channel];
     s32 lastDelayLightLocal = lastDelayLight[channel];
+    s16 **delayBufsLocal = delayBufs[channel];
 
     for (; start < end; start++, downsampleBuffer += downsampleIncrement) {
         tmpCarryover = (((delayBufsLocal[FILTERS_MINUS_1][allpassIdxLocal[FILTERS_MINUS_1]] * BETTER_REVERB_REVERB_INDEX_LIGHT) >> 8) + *downsampleBuffer);
@@ -169,15 +170,16 @@ static void reverb_samples_light(s16 *start, s16 *end, s16 *downsampleBuffer, s3
             curDelaySample = &delayBufsLocal[i][allpassIdxLocal[i]];
             historySample = *curDelaySample;
 
-            *curDelaySample = (((historySample * (-BETTER_REVERB_GAIN_INDEX_LIGHT)) >> 8) + tmpCarryover);
-            tmpCarryover = (((*curDelaySample * BETTER_REVERB_GAIN_INDEX_LIGHT) >> 8) + historySample);
+            tmpCarryover += ((historySample * (-BETTER_REVERB_GAIN_INDEX_LIGHT)) >> 8);
+            *curDelaySample = CLAMP_S16(tmpCarryover);
+            tmpCarryover = ((tmpCarryover * BETTER_REVERB_GAIN_INDEX_LIGHT) >> 8) + historySample;
 
             if (++allpassIdxLocal[i] == delaysLocal[i]) allpassIdxLocal[i] = 0;
         }
 
         curDelaySample = &delayBufsLocal[FILTERS_MINUS_1][allpassIdxLocal[FILTERS_MINUS_1]];
         historySample = ((*curDelaySample * BETTER_REVERB_MULTIPLE_LIGHT) >> 8); // outSampleTotal variable not needed, as there is no sample addition happening here. Not really a history sample though.
-        *curDelaySample = tmpCarryover;
+        *curDelaySample = CLAMP_S16(tmpCarryover);
 
         if (++allpassIdxLocal[FILTERS_MINUS_1] == lastDelayLightLocal) allpassIdxLocal[FILTERS_MINUS_1] = 0;
 
@@ -187,7 +189,7 @@ static void reverb_samples_light(s16 *start, s16 *end, s16 *downsampleBuffer, s3
 #undef FILTERS_MINUS_1
 
 void initialize_better_reverb_buffers(void) {
-    delayBufs[SYNTH_CHANNEL_LEFT] = (s32**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
+    delayBufs[SYNTH_CHANNEL_LEFT] = (s16**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
     delayBufs[SYNTH_CHANNEL_RIGHT] = &delayBufs[SYNTH_CHANNEL_LEFT][NUM_ALLPASS];
 }
 
@@ -199,7 +201,7 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
     if (betterReverbLightweight)
         filterCount = BETTER_REVERB_FILTER_COUNT_LIGHT;
 
-    gBetterReverbPool.cur = gBetterReverbPool.start + ALIGN16(BETTER_REVERB_PTR_SIZE); // Reset reverb data pool
+    gBetterReverbPool.cur = gBetterReverbPool.start + BETTER_REVERB_PTR_SIZE; // Reset reverb data pool
 
     // Don't bother setting any buffers if BETTER_REVERB is disabled
     if (!toggleBetterReverb)
@@ -210,13 +212,13 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
     for (i = 0; i < filterCount; ++i) {
         betterReverbDelays[SYNTH_CHANNEL_LEFT][i] = (s32) (inputDelaysL[i] / gReverbDownsampleRate);
         betterReverbDelays[SYNTH_CHANNEL_RIGHT][i] = (s32) (inputDelaysR[i] / gReverbDownsampleRate);
-        delayBufs[SYNTH_CHANNEL_LEFT][i] = soundAlloc(&gBetterReverbPool, betterReverbDelays[SYNTH_CHANNEL_LEFT][i] * sizeof(s32));
+        delayBufs[SYNTH_CHANNEL_LEFT][i] = soundAlloc(&gBetterReverbPool, betterReverbDelays[SYNTH_CHANNEL_LEFT][i] * sizeof(s16));
         bufOffset += betterReverbDelays[SYNTH_CHANNEL_LEFT][i];
-        delayBufs[SYNTH_CHANNEL_RIGHT][i] = soundAlloc(&gBetterReverbPool, betterReverbDelays[SYNTH_CHANNEL_RIGHT][i] * sizeof(s32));
+        delayBufs[SYNTH_CHANNEL_RIGHT][i] = soundAlloc(&gBetterReverbPool, betterReverbDelays[SYNTH_CHANNEL_RIGHT][i] * sizeof(s16));
         bufOffset += betterReverbDelays[SYNTH_CHANNEL_RIGHT][i];
     }
 
-    aggress(bufOffset * sizeof(s32) <= BETTER_REVERB_SIZE - ALIGN16(BETTER_REVERB_PTR_SIZE), "BETTER_REVERB_SIZE is too small for this preset!");
+    aggress(bufOffset * sizeof(s16) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
 
     lastDelayLight[SYNTH_CHANNEL_LEFT] = betterReverbDelays[SYNTH_CHANNEL_LEFT][filterCount-1];
     lastDelayLight[SYNTH_CHANNEL_RIGHT] = betterReverbDelays[SYNTH_CHANNEL_RIGHT][filterCount-1];
@@ -326,7 +328,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
         else if (toggleBetterReverb) {
             s32 loopCounts[2];
 
-            s16 *betterReverbDownampleBuffers[SYNTH_CHANNEL_STEREO_COUNT][ARRAY_COUNT(loopCounts)]; // StartA and StartB for both channels
+            s16 *betterReverbDownsampleBuffers[SYNTH_CHANNEL_STEREO_COUNT][ARRAY_COUNT(loopCounts)]; // StartA and StartB for both channels
             s16 *betterReverbSampleBuffers[SYNTH_CHANNEL_STEREO_COUNT][ARRAY_COUNT(loopCounts)]; // Output reverb buffers
             void (*reverbFunc)(s16*, s16*, s16*, s32) = betterReverbLightweight ? reverb_samples_light : reverb_samples; // Function pointers for both heavy and lightweight reverb functions
 
@@ -346,35 +348,35 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
             betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][0] = &gSynthesisReverb.ringBuffer.right[item->startPos];
             betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][1] = &gSynthesisReverb.ringBuffer.right[0];
             if (gReverbDownsampleRate > 1) {
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_LEFT][0] = &item->toDownsampleLeft[0];
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_LEFT][1] = &item->toDownsampleLeft[loopCounts[0] * gReverbDownsampleRate];
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_RIGHT][0] = &item->toDownsampleRight[0];
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_RIGHT][1] = &item->toDownsampleRight[loopCounts[0] * gReverbDownsampleRate];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][0] = &item->toDownsampleLeft[0];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][1] = &item->toDownsampleLeft[loopCounts[0] * gReverbDownsampleRate];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][0] = &item->toDownsampleRight[0];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][1] = &item->toDownsampleRight[loopCounts[0] * gReverbDownsampleRate];
             } else {
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_LEFT][0] = betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][0];
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_LEFT][1] = betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][1];
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_RIGHT][0] = betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][0];
-                betterReverbDownampleBuffers[SYNTH_CHANNEL_RIGHT][1] = betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][1];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][0] = betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][0];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][1] = betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][1];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][0] = betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][0];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][1] = betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][1];
             }
 
             if (gSoundMode == SOUND_MODE_MONO || monoReverb) {
                 for (srcPos = 0; srcPos < ARRAY_COUNT(loopCounts); srcPos++) { // LengthA and LengthB processing
-                    s16 *downsampleBufferL = betterReverbDownampleBuffers[SYNTH_CHANNEL_LEFT][srcPos];
-                    s16 *downsampleBufferR = betterReverbDownampleBuffers[SYNTH_CHANNEL_RIGHT][srcPos];
+                    s16 *downsampleBufferL = betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][srcPos];
+                    s16 *downsampleBufferR = betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][srcPos];
                     for (dstPos = 0; dstPos < loopCounts[srcPos]; dstPos += gReverbDownsampleRate) { // Individual sample processing
                         downsampleBufferL[dstPos] = ((s32) downsampleBufferL[dstPos] + (s32) downsampleBufferR[dstPos]) >> 1; // Merge stereo samples into left channel
                     }
                 }
                 for (srcPos = 0; srcPos < ARRAY_COUNT(loopCounts); srcPos++) { // LengthA and LengthB processing
                     // Call core reverb processing function, either reverb_samples() or reverb_samples_light()
-                    (*reverbFunc)(betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][srcPos], betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][srcPos] + loopCounts[srcPos], betterReverbDownampleBuffers[SYNTH_CHANNEL_LEFT][srcPos], SYNTH_CHANNEL_LEFT);
+                    (*reverbFunc)(betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][srcPos], betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][srcPos] + loopCounts[srcPos], betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][srcPos], SYNTH_CHANNEL_LEFT);
                     bcopy(betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][srcPos], betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][srcPos], loopCounts[srcPos] * sizeof(s16));
                 }
             } else {
                 for (dstPos = 0; dstPos < SYNTH_CHANNEL_STEREO_COUNT; dstPos++) { // left and right channels
                     for (srcPos = 0; srcPos < ARRAY_COUNT(loopCounts); srcPos++) { // LengthA and LengthB processing
                         // Call core reverb processing function, either reverb_samples() or reverb_samples_light()
-                        (*reverbFunc)(betterReverbSampleBuffers[dstPos][srcPos], betterReverbSampleBuffers[dstPos][srcPos] + loopCounts[srcPos], betterReverbDownampleBuffers[dstPos][srcPos], dstPos);
+                        (*reverbFunc)(betterReverbSampleBuffers[dstPos][srcPos], betterReverbSampleBuffers[dstPos][srcPos] + loopCounts[srcPos], betterReverbDownsampleBuffers[dstPos][srcPos], dstPos);
                     }
                 }
             }
