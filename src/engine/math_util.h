@@ -451,27 +451,13 @@ extern f32 gSineTable[];
 
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
 
-/// From Wiseguy
-ALWAYS_INLINE s32 roundf(f32 in) {
-    f32 tmp;
-    s32 out;
-    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
-    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
-    return out;
-}
+extern s32 roundf(f32);
 // backwards compatibility
 #define round_float(in) roundf(in)
 
-/// Absolute value
-ALWAYS_INLINE f32 absf(f32 in) {
-    f32 out;
-    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
-    return out;
-}
-ALWAYS_INLINE s32 absi(s32 in) {
-    return ABS(in);
-}
-#define abss absi
+#define absf ABS
+#define absi ABS
+#define abss ABS
 
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 

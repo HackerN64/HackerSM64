@@ -160,6 +160,7 @@ SECTIONS
 #ifdef EEP
       KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
 #endif
+      KEEP(BUILD_DIR/asm/round.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
