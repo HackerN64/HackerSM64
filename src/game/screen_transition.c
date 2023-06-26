@@ -35,12 +35,8 @@ s32 set_and_reset_transition_fade_timer(u8 transTime) {
     return FALSE;
 }
 
-void make_tex_transition_vertex(Vtx *verts, s32 n, struct WarpTransitionData *transData, f32 centerTransX, f32 centerTransY,
-                   f32 vertX, f32 vertY, s16 tx, s16 ty) {
-    u8 r = transData->red;
-    u8 g = transData->green;
-    u8 b = transData->blue;
-
+void make_tex_transition_vertex(Vtx *verts, s32 n, f32 centerTransX, f32 centerTransY,
+                                f32 vertX, f32 vertY, s16 tx, s16 ty) {
     // Rotate around the center
     s16 angle = sTransitionTextureAngle;
     f32 x = vertX * coss(angle) - vertY * sins(angle) + centerTransX;
@@ -49,11 +45,12 @@ void make_tex_transition_vertex(Vtx *verts, s32 n, struct WarpTransitionData *tr
     s16 roundedX = roundf(x);
     s16 roundedY = roundf(y);
 
-    make_vertex(verts, n, roundedX, roundedY, -1, tx * 32, ty * 32, r, g, b, 255);
+    make_simple_vertex(verts, n, roundedX, roundedY, -1, tx * 32, ty * 32);
 }
 
-void make_tex_transition_vertices(Vtx *verts, struct WarpTransitionData *transData, f32 centerTransX, f32 centerTransY,
-                                f32 texTransRadius, s8 transTexType) {
+#define SOLID_COL_RADIUS 2000
+void make_tex_transition_vertices(Vtx *verts, f32 centerTransX, f32 centerTransY, f32 texTransRadius, 
+                                  s8 transTexType) {
     
     s16 leftUV, rightUV, downUV, upUV;
 
@@ -71,45 +68,42 @@ void make_tex_transition_vertices(Vtx *verts, struct WarpTransitionData *transDa
     }
 
     // Shape texture
-    make_tex_transition_vertex(verts, 0, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, leftUV, upUV);
-    make_tex_transition_vertex(verts, 1, transData, centerTransX, centerTransY, texTransRadius, -texTransRadius, rightUV, upUV);
-    make_tex_transition_vertex(verts, 2, transData, centerTransX, centerTransY, texTransRadius, texTransRadius, rightUV, downUV);
-    make_tex_transition_vertex(verts, 3, transData, centerTransX, centerTransY, -texTransRadius, texTransRadius, leftUV, downUV);
+    make_tex_transition_vertex(verts, 0, centerTransX, centerTransY, -texTransRadius, -texTransRadius, leftUV, upUV);
+    make_tex_transition_vertex(verts, 1, centerTransX, centerTransY, texTransRadius, -texTransRadius, rightUV, upUV);
+    make_tex_transition_vertex(verts, 2, centerTransX, centerTransY, texTransRadius, texTransRadius, rightUV, downUV);
+    make_tex_transition_vertex(verts, 3, centerTransX, centerTransY, -texTransRadius, texTransRadius, leftUV, downUV);
 
     // Solid color
-    s16 solidColRadius = 2000;
-
-    make_tex_transition_vertex(verts, 4, transData, centerTransX, centerTransY, -solidColRadius, -solidColRadius, 0, 0);
-    make_tex_transition_vertex(verts, 5, transData, centerTransX, centerTransY, solidColRadius, -solidColRadius, 0, 0);
-    make_tex_transition_vertex(verts, 6, transData, centerTransX, centerTransY, solidColRadius, solidColRadius, 0, 0);
-    make_tex_transition_vertex(verts, 7, transData, centerTransX, centerTransY, -solidColRadius, solidColRadius, 0, 0);
+    make_tex_transition_vertex(verts, 4, centerTransX, centerTransY, -SOLID_COL_RADIUS, -SOLID_COL_RADIUS, 0, 0);
+    make_tex_transition_vertex(verts, 5, centerTransX, centerTransY, SOLID_COL_RADIUS, -SOLID_COL_RADIUS, 0, 0);
+    make_tex_transition_vertex(verts, 6, centerTransX, centerTransY, SOLID_COL_RADIUS, SOLID_COL_RADIUS, 0, 0);
+    make_tex_transition_vertex(verts, 7, centerTransX, centerTransY, -SOLID_COL_RADIUS, SOLID_COL_RADIUS, 0, 0);
 }
 
 f32 calc_tex_transition_radius(s8 transTime, struct WarpTransitionData *transData) {
     f32 progress = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
 
-#ifdef EASE_IN_SCREEN_TRANSITIONS
-    progress = 1.f - sqr(1.f - progress);
+#ifdef EASE_IN_OUT_TRANSITIONS
+    return smoothstep(transData->startTexRadius, transData->endTexRadius, progress);
+#else
+    return lerpf(transData->startTexRadius, transData->endTexRadius, progress);
 #endif
-    
-    f32 result = lerpf(transData->startTexRadius, transData->endTexRadius, progress);
 
-    return result;
 }
 
-f32 center_tex_transition_x(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransDir) {
-    f32 x = transData->startTexX + coss(texTransDir) * texTransTime;
+f32 center_tex_transition_x(struct WarpTransitionData *transData, f32 posDistance, u16 texTransDir) {
+    f32 x = transData->startTexX + coss(texTransDir) * posDistance;
 
     return x;
 }
 
-f32 center_tex_transition_y(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransDir) {
-    f32 y = transData->startTexY + sins(texTransDir) * texTransTime;
+f32 center_tex_transition_y(struct WarpTransitionData *transData, f32 posDistance, u16 texTransDir) {
+    f32 y = transData->startTexY + sins(texTransDir) * posDistance;
 
     return y;
 }
 
-f32 calc_tex_transition_time(s8 transTime, struct WarpTransitionData *transData) {
+f32 calc_tex_transition_pos_distance(s8 transTime, struct WarpTransitionData *transData) {
     f32 startX = transData->startTexX;
     f32 startY = transData->startTexY;
     f32 endX = transData->endTexX;
@@ -136,22 +130,33 @@ u16 calc_tex_transition_direction(struct WarpTransitionData *transData) {
 s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transData, s8 texID, s8 transTexType) {
     u16 texTransDir = calc_tex_transition_direction(transData);
 
-    f32 texTransTime = calc_tex_transition_time(transTime, transData);
-    f32 centerTransX = center_tex_transition_x(transData, texTransTime, texTransDir);
-    f32 centerTransY = center_tex_transition_y(transData, texTransTime, texTransDir);
+    f32 posDistance = calc_tex_transition_pos_distance(transTime, transData);
+    f32 centerTransX = center_tex_transition_x(transData, posDistance, texTransDir);
+    f32 centerTransY = center_tex_transition_y(transData, posDistance, texTransDir);
 
     f32 texTransRadius = calc_tex_transition_radius(transTime, transData);
     Vtx *verts = alloc_display_list(8 * sizeof(Vtx));
 
+
     if (verts != NULL) {
-        make_tex_transition_vertices(verts, transData, centerTransX, centerTransY, texTransRadius, transTexType);
+        make_tex_transition_vertices(verts, centerTransX, centerTransY, texTransRadius, transTexType);
         gSPDisplayList(gDisplayListHead++, dl_proj_mtx_fullscreen);
-        gDPSetCombineMode(gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
+
+        u8 r = transData->red;
+        u8 g = transData->green;
+        u8 b = transData->blue;
+        gDPSetPrimColor(gDisplayListHead++, 0, 0, r, g, b, 255);
+
+        gDPSetCombineMode(gDisplayListHead++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+
         gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts), 8, 0);
         gSPDisplayList(gDisplayListHead++, dl_transition_draw_filled_region);
         gDPPipeSync(gDisplayListHead++);
-        gDPSetCombineMode(gDisplayListHead++, G_CC_SHADEDECALA, G_CC_SHADEDECALA);
+
+        gDPSetCombineLERP(gDisplayListHead++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0, 
+                                              0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0);
+
 #ifdef SHARP_TRANSITION_TEXTURES
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
         s32 textureType = G_IM_FMT_I;
@@ -159,6 +164,7 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
         s32 textureType = G_IM_FMT_IA;
 #endif
+
         gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
 
         switch (transTexType) {
@@ -181,27 +187,29 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
     return set_and_reset_transition_fade_timer(transTime);
 }
 
-Vtx *vertex_transition_color(struct WarpTransitionData *transData, u8 alpha) {
+Vtx *vertex_transition_color() {
     Vtx *verts = alloc_display_list(4 * sizeof(Vtx));
-    u8 r = transData->red;
-    u8 g = transData->green;
-    u8 b = transData->blue;
 
     if (verts != NULL) {
-        make_vertex(verts, 0, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), 0, -1, 0, 0, r, g, b, alpha);
-        make_vertex(verts, 1, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), 0, -1, 0, 0, r, g, b, alpha);
-        make_vertex(verts, 2, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0, r, g, b, alpha);
-        make_vertex(verts, 3, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0, r, g, b, alpha);
+        make_simple_vertex(verts, 0, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), 0, -1, 0, 0);
+        make_simple_vertex(verts, 1, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), 0, -1, 0, 0);
+        make_simple_vertex(verts, 2, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0);
+        make_simple_vertex(verts, 3, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0);
     }
     return verts;
 }
 
 s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 alpha) {
-    Vtx *verts = vertex_transition_color(transData, alpha);
+    Vtx *verts = vertex_transition_color();
 
     if (verts != NULL) {
+        u8 r = transData->red;
+        u8 g = transData->green;
+        u8 b = transData->blue;
+        gDPSetPrimColor(gDisplayListHead++, 0, 0, r, g, b, alpha);
+
         gSPDisplayList(gDisplayListHead++, dl_proj_mtx_fullscreen);
-        gDPSetCombineMode(gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
+        gDPSetCombineMode(gDisplayListHead++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
         gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
         gSPDisplayList(gDisplayListHead++, dl_draw_quad_verts_0123);
@@ -294,21 +302,23 @@ Gfx *render_cannon_circle_base(void) {
     Gfx *g = dlist;
 
     if (verts != NULL && dlist != NULL) {
-        make_vertex(verts, 0,            0,             0, -1, -1152, 1824, 0, 0, 0, 255);
-        make_vertex(verts, 1, SCREEN_WIDTH,             0, -1,  1152, 1824, 0, 0, 0, 255);
-        make_vertex(verts, 2, SCREEN_WIDTH, SCREEN_HEIGHT, -1,  1152,  192, 0, 0, 0, 255);
-        make_vertex(verts, 3,            0, SCREEN_HEIGHT, -1, -1152,  192, 0, 0, 0, 255);
+        gDPSetPrimColor(gDisplayListHead++, 0, 0, 0, 0, 0, 255);
+
+        make_simple_vertex(verts, 0,            0,             0, -1, -1152, 1824);
+        make_simple_vertex(verts, 1, SCREEN_WIDTH,             0, -1,  1152, 1824);
+        make_simple_vertex(verts, 2, SCREEN_WIDTH, SCREEN_HEIGHT, -1,  1152,  192);
+        make_simple_vertex(verts, 3,            0, SCREEN_HEIGHT, -1, -1152,  192);
 
 #ifdef WIDESCREEN
         // Render black rectangles outside the 4:3 area.
-        make_vertex(verts, 4, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), 0, -1, 0, 0, 0, 0, 0, 255);
-        make_vertex(verts, 5, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), 0, -1, 0, 0, 0, 0, 0, 255);
-        make_vertex(verts, 6, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0, 0, 0, 0, 255);
-        make_vertex(verts, 7, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0, 0, 0, 0, 255);
+        make_simple_vertex(verts, 4, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), 0, -1, 0, 0, 0);
+        make_simple_vertex(verts, 5, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), 0, -1, 0, 0, 0);
+        make_simple_vertex(verts, 6, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0);
+        make_simple_vertex(verts, 7, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0);
 #endif
 
         gSPDisplayList(g++, dl_proj_mtx_fullscreen);
-        gDPSetCombineMode(g++, G_CC_MODULATEIDECALA, G_CC_MODULATEIDECALA);
+        gDPSetCombineMode(g++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
         gDPSetTextureFilter(g++, G_TF_BILERP);
         gDPLoadTextureBlock(g++, sTextureTransitionID[TEX_TRANS_CIRCLE], G_IM_FMT_IA, G_IM_SIZ_8b, 32, 64, 0,
             G_TX_WRAP | G_TX_MIRROR, G_TX_WRAP | G_TX_MIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD);

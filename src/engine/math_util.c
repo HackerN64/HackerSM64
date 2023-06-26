@@ -1538,6 +1538,28 @@ OPTIMIZE_OS void mtxf_to_mtx_fast(s16* dst, float* src) {
     dst[15] = 1;
 }
 
-f32 lerpf(f32 startValue, f32 endValue, f32 progress) {
-    return (startValue + (endValue - startValue) * progress);
+ALWAYS_INLINE f32 lerpf(f32 from, f32 to, f32 amount) {
+    return (from + (to - from) * amount);
+}
+
+ALWAYS_INLINE f32 to_smoothstop(f32 x) {
+    f32 sq = sqr(1.0f - x);
+    return 1.0f - sq;
+}
+
+// Commonly known as ease-in
+ALWAYS_INLINE f32 smoothstart(f32 from, f32 to, f32 amount) {
+    return lerpf(from, to, sqr(amount));
+}
+
+// Commonly known as ease-out
+ALWAYS_INLINE f32 smoothstop(f32 from, f32 to, f32 amount) {
+    return lerpf(from, to, to_smoothstop(amount));
+}
+
+// Commonly known as ease-in-out
+ALWAYS_INLINE f32 smoothstep(f32 from, f32 to, f32 amount) {
+    amount = sqr(amount) * (3.0f - 2.0f * amount);
+
+    return lerpf(from, to, amount);
 }

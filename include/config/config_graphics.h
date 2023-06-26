@@ -154,9 +154,9 @@
 /**
  * Eases the textured screen transitions to make them look smoother.
  */
-#define EASE_IN_SCREEN_TRANSITIONS
+#define EASE_IN_OUT_TRANSITIONS
 
 /**
  * Makes use of the tex edge render mode to deliver smooth transition textures
  */
-#define SHARP_TRANSITION_TEXTURES
+//#define SHARP_TRANSITION_TEXTURES
