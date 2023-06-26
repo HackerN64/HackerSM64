@@ -2,8 +2,9 @@
 import sys
 import os
 import json
+import subprocess
 
-ROMS_DIR=os.path.expanduser("~/roms/")
+ROMS_DIR=os.path.expanduser("~/baseroms/")
 
 sha1_LUT = {
     "eu": "4ac5721683d0e0b6bbb561b58a71740845dceea9",
@@ -19,7 +20,7 @@ sha1_swapLUT = {
     "us": "1002dd7b56aa0a59a9103f1fb3d57d6b161f8da7",
 }
 
-def get_files():
+def get_rom_candidates():
     import subprocess
     fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
     if os.path.exists(ROMS_DIR):
@@ -28,26 +29,29 @@ def get_files():
     foundVersions = {}
 
     for f in fileArray:
-        p = subprocess.Popen(
-            ["sha1sum", f],
-            stdout=subprocess.PIPE
-        )
-        sha1sum = p.communicate()[0].decode('ascii').split()[0]
-        for k, v in sha1_LUT.items():
-            if v == sha1sum:
-                foundVersions[k] = f
+        try:
+            p = subprocess.Popen(
+                ["sha1sum", f],
+                stdout=subprocess.PIPE
+            )
+            sha1sum = p.communicate()[0].decode('ascii').split()[0]
+            for k, v in sha1_LUT.items():
+                if v == sha1sum:
+                    foundVersions[k] = f
 
-        for k, v in sha1_swapLUT.items():
-            if v == sha1sum: # the ROM is swapped!
-                subprocess.run(
-                    [
-                        "dd","conv=swab",
-                        "if=%s" % f,
-                        "of=/tmp/baserom.%s.swapped.z64" % k
-                    ],
-                    stderr=subprocess.PIPE,
-                )
-                foundVersions[k] = "/tmp/baserom.%s.swapped.z64" % k
+            for k, v in sha1_swapLUT.items():
+                if v == sha1sum: # the ROM is swapped!
+                    subprocess.run(
+                        [
+                            "dd","conv=swab",
+                            "if=%s" % f,
+                            "of=/tmp/baserom.%s.swapped.z64" % k
+                        ],
+                        stderr=subprocess.PIPE,
+                    )
+                    foundVersions[k] = "/tmp/baserom.%s.swapped.z64" % k
+        except Exception as e:
+            continue
     return foundVersions
 
 
@@ -110,8 +114,6 @@ def main():
     # revision ID in the local asset file.
     new_version = 7
 
-    fileLUT = get_files()
-
     try:
         local_asset_file = open(".assets-local.txt")
         local_asset_file.readline()
@@ -120,6 +122,8 @@ def main():
         local_asset_file = None
         local_version = -1
 
+    romLUT = get_rom_candidates()
+
     langs = sys.argv[1:]
     if langs == ["--clean"]:
         clean_assets(local_asset_file)
@@ -127,14 +131,14 @@ def main():
 
     # verify the correct rom
     for lang in langs:
-        if lang not in fileLUT:
+        if lang not in romLUT:
             print("[%s] Error: No %s ROM detected in this folder."
                 % (sys.argv[0], lang.upper())
             )
-            if len(fileLUT.items()) > 0:
+            if len(romLUT.items()) > 0:
                 print()
                 print("Detected ROMS:")
-            for k,v in fileLUT.items():
+            for k,v in romLUT.items():
                 print("    %s ROM found at: %s" % (k.upper(), v))
             sys.exit(1)
 
@@ -164,7 +168,6 @@ def main():
         return
 
     # Late imports (to optimize startup perf)
-    import subprocess
     import hashlib
     import tempfile
     from collections import defaultdict
@@ -196,12 +199,12 @@ def main():
     # Load ROMs
     roms = {}
     for lang in langs:
-        fname = fileLUT[lang]
+        romname = romLUT[lang]
         try:
-            with open(fname, "rb") as f:
+            with open(romname, "rb") as f:
                 roms[lang] = f.read()
         except Exception as e:
-            print("Failed to open " + fname + "! " + str(e))
+            print("Failed to open " + romname + "! " + str(e))
             sys.exit(1)
         # There used to be an SHA1 check here,
         # but it's unnecessary since we detect the
@@ -221,13 +224,13 @@ def main():
 
         assets = todo[key]
         lang, mio0 = key
-        fname = fileLUT[lang]
+        romname = romLUT[lang]
         if mio0 == "@sound":
             rom = roms[lang]
             args = [
                 "python3",
                 "tools/disassemble_sound.py",
-                fname,
+                romname,
             ]
             def append_args(key):
                 size, locs = asset_map["@sound " + key + " " + lang]
@@ -254,7 +257,7 @@ def main():
                     "-d",
                     "-o",
                     str(mio0),
-                    fname,
+                    romname,
                     "-",
                 ],
                 check=True,
