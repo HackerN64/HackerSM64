@@ -700,8 +700,8 @@ void load_object_collision_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
 
-    f32 lateralMarioDist;
-    vec3f_get_lateral_dist(&o->oPosVec, &gMarioObject->oPosVec, &lateralMarioDist);
+    f32 sqrLateralDist;
+    vec3f_get_lateral_dist_squared(&o->oPosVec, &gMarioObject->oPosVec, &sqrLateralDist);
 
     f32 verticalMarioDiff = gMarioObject->oPosY - o->oPosY;
 
@@ -717,7 +717,7 @@ void load_object_collision_model(void) {
         o->oDrawingDistance = o->oCollisionDistance;
     }
     
-    s32 isLaterallyClose = (lateralMarioDist < o->oCollisionDistance);
+    s32 isLaterallyClose = (sqrLateralDist < sqr(o->oCollisionDistance));
     s32 isNotBellow = (verticalMarioDiff > 0 || verticalMarioDiff > -o->oCollisionDistance);
     s32 isNotAbove = (verticalMarioDiff < 0 || verticalMarioDiff < o->oCollisionDistance + 2000.f) ;
 
