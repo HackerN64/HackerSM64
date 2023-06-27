@@ -1050,7 +1050,15 @@ void init_reverb_us(s32 presetId) {
 #ifdef BETTER_REVERB
     struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPresetValue];
 
+#ifdef PUPPYPRINT_DEBUG
+    if ((s8) gBetterReverbPresetValue == -2) {
+        betterReverbPreset = &gDebugBetterReverbSettings[0];
+    } else if ((s8) gBetterReverbPresetValue == -1) {
+        betterReverbPreset = &gDebugBetterReverbSettings[1];
+    } else if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
+#else
     if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
+#endif
         aggress(gBetterReverbPresetCount > 0, "No BETTER_REVERB presets exist!");
 
         assert(gBetterReverbPresetValue < gBetterReverbPresetCount, "BETTER_REVERB preset value exceeds total number of available presets!");

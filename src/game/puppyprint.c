@@ -26,7 +26,9 @@ a modern game engine's developer's console.
 #include <ultra64.h>
 
 #include "config.h"
+#include "seq_ids.h"
 #include "game_init.h"
+#include "sound_init.h"
 #include "memory.h"
 #include "print.h"
 #include "string.h"
@@ -40,6 +42,7 @@ a modern game engine's developer's console.
 #include "object_list_processor.h"
 #include "engine/surface_load.h"
 #include "audio/data.h"
+#include "audio/external.h"
 #include "audio/heap.h"
 #include "hud.h"
 #include "debug_box.h"
@@ -599,6 +602,332 @@ void puppyprint_level_select_menu(void) {
     }
 }
 
+#ifdef BETTER_REVERB
+
+enum BetterReverbDebugFields {
+    PPREVERB_USE_LIGHTWEIGHT,
+    PPREVERB_DOWNSAMPLE_RATE,
+    PPREVERB_IS_MONO,
+    PPREVERB_FILTER_COUNT,
+    PPREVERB_WINDOW_SIZE,
+    PPREVERB_GAIN,
+    PPREVERB_GAIN_INDEX,
+    PPREVERB_REVERB_INDEX,
+    PPREVERB_DELAYS_L,
+    PPREVERB_DELAYS_R,
+    PPREVERB_REVERB_MULTS_L,
+    PPREVERB_REVERB_MULTS_R,
+    PPREVERB_AREA_ECHO,
+    PPREVERB_TOTAL,
+};
+
+struct BetterReverbDebugSizes {
+    u8  treatAsEntryCount;
+    u8  byteSize;
+    s32 entryMinimum;
+    s32 entryMaximum;
+};
+
+static struct BetterReverbDebugSizes maxReverbEntrySizes[PPREVERB_TOTAL] = {
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 1},           // useLightweightSettings
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =    -1, .entryMaximum = 3},           // downsampleRate
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 1},           // isMono
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     3, .entryMaximum = NUM_ALLPASS}, // filterCount
+    {.treatAsEntryCount = FALSE,  .byteSize = 2,  .entryMinimum =    -1, .entryMaximum = 0x7FFF},      // windowSize
+    {.treatAsEntryCount = FALSE,  .byteSize = 2,  .entryMinimum =     0, .entryMaximum = 0x7FFF},      // gain
+    {.treatAsEntryCount = FALSE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 0xFF},        // gainIndex
+    {.treatAsEntryCount = FALSE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 0xFF},        // reverbIndex
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 1},           // delaysL
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 1},           // delaysR
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 1},           // reverbMultsL
+    {.treatAsEntryCount =  TRUE,  .byteSize = 1,  .entryMinimum =     0, .entryMaximum = 1},           // reverbMultsR
+    {.treatAsEntryCount = FALSE,  .byteSize = 1,  .entryMinimum = -0x80, .entryMaximum = 0x7F},        // area echo (not part of struct)
+};
+
+static s8 ppAreaEchos[2] = {0};
+
+static s32 ppReverbSide = 0;
+static s32 ppReverbSelectY = 0;
+
+s32 better_reverb_get_or_set_field(u8 shouldSet, s32 xIndex, s32 yIndex, s32 valueToSet) {
+    s32 ret = 0;
+
+    if (shouldSet) {
+        if (valueToSet < maxReverbEntrySizes[yIndex].entryMinimum) {
+            valueToSet = maxReverbEntrySizes[yIndex].entryMinimum;
+        } else if (valueToSet > maxReverbEntrySizes[yIndex].entryMaximum) {
+            valueToSet = maxReverbEntrySizes[yIndex].entryMaximum;
+        }
+
+        switch(yIndex) {
+            case PPREVERB_USE_LIGHTWEIGHT:
+                gDebugBetterReverbSettings[xIndex].useLightweightSettings = valueToSet;
+                break;
+            case PPREVERB_DOWNSAMPLE_RATE:
+                gDebugBetterReverbSettings[xIndex].downsampleRate = valueToSet;
+                break;
+            case PPREVERB_IS_MONO:
+                gDebugBetterReverbSettings[xIndex].isMono = valueToSet;
+                break;
+            case PPREVERB_FILTER_COUNT:
+                gDebugBetterReverbSettings[xIndex].filterCount = valueToSet;
+                break;
+            case PPREVERB_WINDOW_SIZE:
+                gDebugBetterReverbSettings[xIndex].windowSize = valueToSet;
+                break;
+            case PPREVERB_GAIN:
+                gDebugBetterReverbSettings[xIndex].gain = valueToSet;
+                break;
+            case PPREVERB_GAIN_INDEX:
+                gDebugBetterReverbSettings[xIndex].gainIndex = valueToSet;
+                break;
+            case PPREVERB_REVERB_INDEX:
+                gDebugBetterReverbSettings[xIndex].reverbIndex = valueToSet;
+                break;
+            case PPREVERB_DELAYS_L:
+                gDebugBetterReverbSettings[xIndex].delaysL = sReverbDelaysArr[valueToSet];
+                break;
+            case PPREVERB_DELAYS_R:
+                gDebugBetterReverbSettings[xIndex].delaysR = sReverbDelaysArr[valueToSet];
+                break;
+            case PPREVERB_REVERB_MULTS_L:
+                gDebugBetterReverbSettings[xIndex].reverbMultsL = sReverbMultsArr[valueToSet];
+                break;
+            case PPREVERB_REVERB_MULTS_R:
+                gDebugBetterReverbSettings[xIndex].reverbMultsR = sReverbMultsArr[valueToSet];
+                break;
+            case PPREVERB_AREA_ECHO:
+                if (!gCurrentArea->useEchoOverride) {
+                    u8 level = (gCurrLevelNum > LEVEL_MAX ? LEVEL_MAX : gCurrLevelNum);
+                    u8 area = gCurrAreaIndex - 1;
+                    if (area > 2) {
+                        area = 2;
+                    }
+
+                    gCurrentArea->echoOverride = sLevelAreaReverbs[level][area];
+                    gCurrentArea->useEchoOverride = TRUE;
+
+                    for (u32 i = 0; i < ARRAY_COUNT(ppAreaEchos); i++) {
+                        ppAreaEchos[i] = gCurrentArea->echoOverride;
+                    }
+                }
+                ppAreaEchos[xIndex] = valueToSet;
+                break;
+
+            ret = valueToSet;
+        }
+    } else {
+        switch(yIndex) {
+            case PPREVERB_USE_LIGHTWEIGHT:
+                ret = gDebugBetterReverbSettings[xIndex].useLightweightSettings;
+                break;
+            case PPREVERB_DOWNSAMPLE_RATE:
+                ret = gDebugBetterReverbSettings[xIndex].downsampleRate;
+                break;
+            case PPREVERB_IS_MONO:
+                ret = gDebugBetterReverbSettings[xIndex].isMono;
+                break;
+            case PPREVERB_FILTER_COUNT:
+                ret = gDebugBetterReverbSettings[xIndex].filterCount;
+                break;
+            case PPREVERB_WINDOW_SIZE:
+                ret = gDebugBetterReverbSettings[xIndex].windowSize;
+                break;
+            case PPREVERB_GAIN:
+                ret = gDebugBetterReverbSettings[xIndex].gain;
+                break;
+            case PPREVERB_GAIN_INDEX:
+                ret = gDebugBetterReverbSettings[xIndex].gainIndex;
+                break;
+            case PPREVERB_REVERB_INDEX:
+                ret = gDebugBetterReverbSettings[xIndex].reverbIndex;
+                break;
+            case PPREVERB_DELAYS_L:
+                ret = (u32) ((u8*) gDebugBetterReverbSettings[xIndex].delaysL - (u8*) &sReverbDelaysArr[0][0]) / sizeof(sReverbDelaysArr[0]);
+                break;
+            case PPREVERB_DELAYS_R:
+                ret = (u32) ((u8*) gDebugBetterReverbSettings[xIndex].delaysR - (u8*) &sReverbDelaysArr[0][0]) / sizeof(sReverbDelaysArr[0]);
+                break;
+            case PPREVERB_REVERB_MULTS_L:
+                ret = (u32) ((u8*) gDebugBetterReverbSettings[xIndex].reverbMultsL - (u8*) &sReverbMultsArr[0][0]) / sizeof(sReverbMultsArr[0]);
+                break;
+            case PPREVERB_REVERB_MULTS_R:
+                ret = (u32) ((u8*) gDebugBetterReverbSettings[xIndex].reverbMultsR - (u8*) &sReverbMultsArr[0][0]) / sizeof(sReverbMultsArr[0]);
+                break;
+            case PPREVERB_AREA_ECHO:
+                if (!gCurrentArea->useEchoOverride) { 
+                    u8 level = (gCurrLevelNum > LEVEL_MAX ? LEVEL_MAX : gCurrLevelNum);
+                    u8 area = gCurrAreaIndex - 1;
+                    if (area > 2) {
+                        area = 2;
+                    }
+
+                    gCurrentArea->echoOverride = sLevelAreaReverbs[level][area];
+                    gCurrentArea->useEchoOverride = TRUE;
+
+                    for (u32 i = 0; i < ARRAY_COUNT(ppAreaEchos); i++) {
+                        ppAreaEchos[i] = gCurrentArea->echoOverride;
+                    }
+                }
+                ret = ppAreaEchos[xIndex];
+                break;
+        }
+
+        if (ret < maxReverbEntrySizes[yIndex].entryMinimum) {
+            ret = maxReverbEntrySizes[yIndex].entryMinimum;
+        } else if (ret > maxReverbEntrySizes[yIndex].entryMaximum) {
+            ret = maxReverbEntrySizes[yIndex].entryMaximum;
+        }
+    }
+
+    return ret;
+}
+
+void better_reverb_preset_menu(void) {
+    char textBytes[16];
+    s32 printValue;
+    s32 x;
+    s32 y;
+
+    prepare_blank_box();
+    render_blank_box_rounded(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 127);
+    finish_blank_box();
+
+    print_set_envcolour(63, 159, 127, 255),
+    print_small_text(SCREEN_WIDTH/2, SCREEN_HEIGHT - 48, "<COL_3FFF9FFF>D-Pad Up/Down:<COL_--------> Scroll, <COL_3FFF9FFF>Start:<COL_--------> Switch Preset A/B", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    print_set_envcolour(63, 159, 127, 255),
+    print_small_text(SCREEN_WIDTH/2, SCREEN_HEIGHT - 36, "<COL_3FFF9FFF>D-Pad L/R:<COL_--------> Fine Adjustment, <COL_3FFF9FFF>Z/R:<COL_--------> Coarse Adjustment", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    print_set_envcolour(63, 159, 127, 255),
+    print_small_text(SCREEN_WIDTH/2, SCREEN_HEIGHT - 24, "<COL_3FFF9FFF>A:<COL_--------> Preview Preset A, <COL_3FFF9FFF>B:<COL_--------> Preview Preset B", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+
+    x = 24;
+    y = 16;
+    for (s32 j = 0; j < PPREVERB_TOTAL; j++) {
+        y += 12;
+        if (j == ppReverbSelectY) {
+            print_set_envcolour(255, 255, 159, 255);
+        } else {
+            print_set_envcolour(191, 159, 191, 255);
+        }
+        switch(j) {
+            case PPREVERB_USE_LIGHTWEIGHT:
+                print_small_text_light(x, y, "Lightweight:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_DOWNSAMPLE_RATE:
+                print_small_text_light(x, y, "Downsample Rate:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_IS_MONO:
+                print_small_text_light(x, y, "Mono:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_FILTER_COUNT:
+                print_small_text_light(x, y, "Filter Count:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_WINDOW_SIZE:
+                print_small_text_light(x, y, "Window Size:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_GAIN:
+                print_small_text_light(x, y, "Gain:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_GAIN_INDEX:
+                print_small_text_light(x, y, "Gain Index:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_REVERB_INDEX:
+                print_small_text_light(x, y, "Reverb Index:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_DELAYS_L:
+                print_small_text_light(x, y, "Delays L:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_DELAYS_R:
+                print_small_text_light(x, y, "Delays R:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_REVERB_MULTS_L:
+                print_small_text_light(x, y, "Reverb Mults L:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_REVERB_MULTS_R:
+                print_small_text_light(x, y, "Reverb Mults R:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+            case PPREVERB_AREA_ECHO:
+                print_small_text_light(x, y, "Area Echo:", PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+                break;
+        }
+    }
+
+    for (s32 i = 0; i < 2; i++) {
+        s32 windowSize = better_reverb_get_or_set_field(FALSE, i, PPREVERB_WINDOW_SIZE, 0);
+        s32 downsampleRate = better_reverb_get_or_set_field(FALSE, i, PPREVERB_DOWNSAMPLE_RATE, 0);
+        s32 isLightweight = better_reverb_get_or_set_field(FALSE, i, PPREVERB_USE_LIGHTWEIGHT, 0);
+        x = (SCREEN_WIDTH/2) - 32 + (i * 96);
+        y = 12;
+        if (i == ppReverbSide) {
+            print_set_envcolour(255, 255, 159, 255);
+        } else {
+            print_set_envcolour(191, 159, 191, 255);
+        }
+        sprintf(textBytes, "PRESET %c", 'A' + i);
+        print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+        y += 4;
+        for (s32 j = 0; j < PPREVERB_TOTAL; j++) {
+            y += 12;
+            printValue = better_reverb_get_or_set_field(FALSE, i, j, 0);
+            if (i == ppReverbSide && j == ppReverbSelectY) {
+                print_set_envcolour(255, 159, 0, 255);
+            } else if (windowSize == 0) { // All reverb disabled
+                if (j == PPREVERB_WINDOW_SIZE) {
+                    print_set_envcolour(255, 255, 255, 255);
+                } else {
+                    print_set_envcolour(95, 95, 95, 255);
+                }
+            } else if (downsampleRate <= 0) { // Vanilla reverb
+                switch(j) {
+                    case PPREVERB_DOWNSAMPLE_RATE:
+                    case PPREVERB_WINDOW_SIZE:
+                    case PPREVERB_GAIN:
+                    case PPREVERB_AREA_ECHO:
+                        print_set_envcolour(255, 255, 255, 255);
+                        break;
+                    default:
+                        print_set_envcolour(95, 95, 95, 255);
+                        break;
+                }
+            }
+            else if (isLightweight) { // Lightweight reverb
+                switch(j) {
+                    case PPREVERB_FILTER_COUNT:
+                    case PPREVERB_GAIN_INDEX:
+                    case PPREVERB_REVERB_INDEX:
+                    case PPREVERB_REVERB_MULTS_L:
+                    case PPREVERB_REVERB_MULTS_R:
+                        print_set_envcolour(95, 95, 95, 255);
+                        break;
+                    default:
+                        print_set_envcolour(255, 255, 255, 255);
+                        break;
+
+                }
+            } else { // Standard reverb
+                print_set_envcolour(255, 255, 255, 255);
+            }
+
+            if (maxReverbEntrySizes[j].byteSize == 2) {
+                sprintf(textBytes, "0x%04X", (u16) printValue);
+            } else if (!maxReverbEntrySizes[j].treatAsEntryCount) {
+                sprintf(textBytes, "0x%02X", (u8) printValue);
+            } else if (j == PPREVERB_USE_LIGHTWEIGHT || j == PPREVERB_IS_MONO) {
+                if (printValue == 0) {
+                    sprintf(textBytes, "FALSE");
+                } else {
+                    sprintf(textBytes, "TRUE");
+                }
+            } else {
+                sprintf(textBytes, "%d", printValue);
+            }
+
+            print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+        }
+    }
+}
+#endif
+
 u8 gLastWarpID = 0;
 
 void puppyprint_render_general_vars(void) {
@@ -650,18 +979,21 @@ void puppyprint_render_general_vars(void) {
 
 struct PuppyPrintPage ppPages[] = {
 #ifdef USE_PROFILER
-    {&puppyprint_render_standard,       "Profiler"},
-    {&puppyprint_render_minimal,        "Minimal"},
+    [PUPPYPRINT_PAGE_PROFILER]      = {&puppyprint_render_standard,     "Profiler"},
+    [PUPPYPRINT_PAGE_MINIMAL]       = {&puppyprint_render_minimal,      "Minimal"},
 #endif
-    {&puppyprint_render_general_vars,   "General"},
-    {&print_audio_overview,             "Audio"},
-    {&print_ram_overview,               "Segments"},
-    {&puppyprint_render_collision,      "Collision"},
-    {&print_console_log,                "Log"},
-    {&puppyprint_level_select_menu,     "Level Select"},
-    {&render_coverage_map,              "Coverage"},
+    [PUPPYPRINT_PAGE_GENERAL]       = {&puppyprint_render_general_vars, "General"},
+    [PUPPYPRINT_PAGE_AUDIO]         = {&print_audio_overview,           "Audio"},
+    [PUPPYPRINT_PAGE_RAM]           = {&print_ram_overview,             "Segments"},
+    [PUPPYPRINT_PAGE_COLLISION]     = {&puppyprint_render_collision,    "Collision"},
+    [PUPPYPRINT_PAGE_LOG]           = {&print_console_log,              "Log"},
+    [PUPPYPRINT_PAGE_LEVEL_SELECT]  = {&puppyprint_level_select_menu,   "Level Select"},
+    [PUPPYPRINT_PAGE_COVERAGE]      = {&render_coverage_map,            "Coverage"},
 #ifdef PUPPYCAM
-    {&puppycamera_debug_view,           "Unlock Camera"},
+    [PUPPYPRINT_PAGE_CAMERA]        = {&puppycamera_debug_view,         "Unlock Camera"},
+#endif
+#ifdef BETTER_REVERB
+    [PUPPYPRINT_PAGE_BETTER_REVERB] = {&better_reverb_preset_menu,      "Reverb Config"},
 #endif
 };
 
@@ -810,6 +1142,107 @@ void puppyprint_profiler_process(void) {
                 gPPSegScroll += 4;
             }
         }
+#ifdef BETTER_REVERB
+        if (sPPDebugPage == PUPPYPRINT_PAGE_BETTER_REVERB)
+        {
+            s32 grabbedValue = better_reverb_get_or_set_field(FALSE, ppReverbSide, ppReverbSelectY, 0);
+
+            // These only need to be done once, but not really worth optimizing tbh
+            maxReverbEntrySizes[PPREVERB_DELAYS_L].entryMaximum = gReverbDelaysArrCount - 1;
+            maxReverbEntrySizes[PPREVERB_DELAYS_R].entryMaximum = gReverbDelaysArrCount - 1;
+            maxReverbEntrySizes[PPREVERB_REVERB_MULTS_L].entryMaximum = gReverbMultsArrCount - 1;
+            maxReverbEntrySizes[PPREVERB_REVERB_MULTS_R].entryMaximum = gReverbMultsArrCount - 1;
+
+            if (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON)) {
+                u8 betterReverbLastPreset = gBetterReverbPresetValue;
+
+                gCurrentArea->useEchoOverride = TRUE;
+                if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+                    gBetterReverbPresetValue = -2;
+                    gCurrentArea->echoOverride = ppAreaEchos[0];
+                } else {
+                    gBetterReverbPresetValue = -1;
+                    gCurrentArea->echoOverride = ppAreaEchos[1];
+                }
+
+                u16 activeSeq = get_current_background_music();
+                if ((activeSeq & SEQ_BASE_ID) >= SEQ_COUNT) {
+                    activeSeq = 0;
+                }
+                fadeout_music(0);
+                set_background_music(0, activeSeq, 0);
+
+                sPPDebugPage = 0;
+                gBetterReverbPresetValue = betterReverbLastPreset;
+            } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
+                if (ppReverbSelectY == PPREVERB_FILTER_COUNT) {
+                    grabbedValue -= 3;
+                } else if (ppReverbSelectY == PPREVERB_WINDOW_SIZE && grabbedValue > 0 && grabbedValue <= 0x80) {
+                    grabbedValue = 0;
+                } else {
+                    if (maxReverbEntrySizes[ppReverbSelectY].byteSize == 2) {
+                        grabbedValue -= 0x80;
+                    } else {
+                        grabbedValue -= 0x1;
+                    }
+                }
+
+                better_reverb_get_or_set_field(TRUE, ppReverbSide, ppReverbSelectY, grabbedValue);
+            } else if (gPlayer1Controller->buttonPressed & R_JPAD) {
+                if (ppReverbSelectY == PPREVERB_FILTER_COUNT) {
+                    grabbedValue += 3;
+                } else if (ppReverbSelectY == PPREVERB_WINDOW_SIZE && grabbedValue < 0) {
+                    grabbedValue = 0;
+                }  else {
+                    if (maxReverbEntrySizes[ppReverbSelectY].byteSize == 2) {
+                        grabbedValue += 0x80;
+                    } else {
+                        grabbedValue += 0x1;
+                    }
+                }
+
+                better_reverb_get_or_set_field(TRUE, ppReverbSide, ppReverbSelectY, grabbedValue);
+            } else if (gPlayer1Controller->buttonPressed & Z_TRIG) {
+                if (ppReverbSelectY == PPREVERB_FILTER_COUNT) {
+                    grabbedValue -= 3;
+                } else if (ppReverbSelectY == PPREVERB_WINDOW_SIZE && grabbedValue > 0 && grabbedValue <= 0x800) {
+                    grabbedValue = 0;
+                }  else {
+                    if (maxReverbEntrySizes[ppReverbSelectY].byteSize == 2) {
+                        grabbedValue -= 0x800;
+                    } else if (!maxReverbEntrySizes[ppReverbSelectY].treatAsEntryCount) {
+                        grabbedValue -= 0x10;
+                    } else {
+                        grabbedValue -= 0x1;
+                    }
+                }
+
+                better_reverb_get_or_set_field(TRUE, ppReverbSide, ppReverbSelectY, grabbedValue);
+            } else if (gPlayer1Controller->buttonPressed & R_TRIG) {
+                if (ppReverbSelectY == PPREVERB_FILTER_COUNT) {
+                    grabbedValue += 3;
+                } else if (ppReverbSelectY == PPREVERB_WINDOW_SIZE && grabbedValue < 0) {
+                    grabbedValue = 0;
+                }  else {
+                    if (maxReverbEntrySizes[ppReverbSelectY].byteSize == 2) {
+                        grabbedValue += 0x800;
+                    } else if (!maxReverbEntrySizes[ppReverbSelectY].treatAsEntryCount) {
+                        grabbedValue += 0x10;
+                    } else {
+                        grabbedValue += 0x1;
+                    }
+                }
+
+                better_reverb_get_or_set_field(TRUE, ppReverbSide, ppReverbSelectY, grabbedValue);
+            } else if (gPlayer1Controller->buttonPressed & D_JPAD) {
+                ppReverbSelectY = (ppReverbSelectY + 1) % PPREVERB_TOTAL;
+            } else if (gPlayer1Controller->buttonPressed & U_JPAD) {
+                ppReverbSelectY = (ppReverbSelectY + PPREVERB_TOTAL - 1) % PPREVERB_TOTAL;
+            } else if (gPlayer1Controller->buttonPressed & START_BUTTON) {
+                ppReverbSide = (ppReverbSide + 1) % 2;
+            }
+        }
+#endif
     }
     profiler_update(PROFILER_TIME_PUPPYPRINT2, osGetCount() - first);
 }
