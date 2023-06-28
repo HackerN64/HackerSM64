@@ -926,6 +926,9 @@ void better_reverb_preset_menu(void) {
         }
     }
 }
+
+#include "puppyprint_debug_sound_test.c.in"
+
 #endif
 
 u8 gLastWarpID = 0;
@@ -989,6 +992,7 @@ struct PuppyPrintPage ppPages[] = {
     [PUPPYPRINT_PAGE_LOG]           = {&print_console_log,              "Log"},
     [PUPPYPRINT_PAGE_LEVEL_SELECT]  = {&puppyprint_level_select_menu,   "Level Select"},
     [PUPPYPRINT_PAGE_COVERAGE]      = {&render_coverage_map,            "Coverage"},
+    [PUPPYPRINT_PAGE_SOUND_TEST]    = {&sound_test_menu,                "Sound Test"},
 #ifdef PUPPYCAM
     [PUPPYPRINT_PAGE_CAMERA]        = {&puppycamera_debug_view,         "Unlock Camera"},
 #endif

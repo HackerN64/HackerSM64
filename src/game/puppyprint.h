@@ -57,6 +57,11 @@ struct PuppyPrintPage{
     char name[32];
 };
 
+struct SoundPreview {
+    char *name;
+    u32 val;
+};
+
 enum Benchmark {
     BENCHMARK_NONE,
     BENCHMARK_GAME,
@@ -95,6 +100,7 @@ enum PPPages {
     PUPPYPRINT_PAGE_LOG,
     PUPPYPRINT_PAGE_LEVEL_SELECT,
     PUPPYPRINT_PAGE_COVERAGE,
+    PUPPYPRINT_PAGE_SOUND_TEST,
 #ifdef PUPPYCAM
     PUPPYPRINT_PAGE_CAMERA,
 #endif

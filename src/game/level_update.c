@@ -180,9 +180,9 @@ u32 pressed_pause(void) {
 
 #ifdef PUPPYPRINT_DEBUG
 #ifdef BETTER_REVERB
-    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM || sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT || sPPDebugPage == PUPPYPRINT_PAGE_BETTER_REVERB) {
+    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM || sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT || sPPDebugPage == PUPPYPRINT_PAGE_BETTER_REVERB || sPPDebugPage == PUPPYPRINT_PAGE_SOUND_TEST) {
 #else
-    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM || sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT) {
+    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM || sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT || sPPDebugPage == PUPPYPRINT_PAGE_SOUND_TEST) {
 #endif
         return FALSE;
     }
@@ -1019,7 +1019,7 @@ s32 play_mode_normal(void) {
 
 #ifdef PUPPYPRINT_DEBUG
 #ifdef BETTER_REVERB
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB) {
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB && sPPDebugPage != PUPPYPRINT_PAGE_SOUND_TEST) {
 #else
     if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
 #endif
@@ -1041,9 +1041,9 @@ s32 play_mode_normal(void) {
     if (gCurrentArea != NULL) {
 #ifdef PUPPYPRINT_DEBUG
 #ifdef BETTER_REVERB
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB) {
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB && sPPDebugPage != PUPPYPRINT_PAGE_SOUND_TEST) {
 #else
-    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_SOUND_TEST) {
 #endif
             update_camera(gCurrentArea->camera);
         }

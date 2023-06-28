@@ -1,0 +1,108 @@
+#pragma once
+#include "game_init.h"
+#include "puppyprint.h"
+#include "audio/external.h"
+
+#include "sound_previews.c.in"
+
+// this isn't specific to this implementation really, could be used for any type of scrolling list
+struct SoundOptScrollContext {
+    s16 numRendered;
+    s16 numOpts;
+    s16 selectedOpt;
+    s16 top;
+    s16 left;
+    s16 bottom;
+    s16 align;
+    u8 font;
+    s8 scrollDir;
+    s32 scrollCountDown;
+    s32 scrollTime;
+};
+struct SoundOptScrollContext sSoundScrollContext = {
+    .numRendered = 0,
+    .numOpts = (ARRAY_COUNT(gSoundPreviews)),
+    .selectedOpt = 0,
+    .top = 10,
+    .left = 10,
+    .bottom = SCREEN_HEIGHT - 20,
+    .align = PRINT_TEXT_ALIGN_LEFT,
+    .font = FONT_OUTLINE,
+    .scrollDir = 0,
+    .scrollCountDown = 0,
+    .scrollTime = 0,
+};
+
+s32 render_sound_option(struct SoundOptScrollContext *scrollContext, s32 opt, char *text) {
+    s32 line = scrollContext->selectedOpt > 8 ? scrollContext->selectedOpt - 8 : 0;
+    s32 posY = scrollContext->top + ((scrollContext->numRendered - line) * 10);
+
+    scrollContext->numRendered++;
+
+    if (posY < scrollContext->top) return FALSE;
+    if (posY >= scrollContext->bottom) return TRUE;
+
+    if ((s32)scrollContext->selectedOpt == opt) {
+        print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
+    } else {
+        print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
+    }
+    print_small_text_light(scrollContext->left, posY, text, scrollContext->align, PRINT_ALL, scrollContext->font);
+
+    return -1;
+}
+
+void sound_test_menu(void) {
+    const s32 countStart = 8;
+    const s32 countEndT = 30*4;
+    const s32 countEndSkipT = 30*8;
+
+    struct SoundOptScrollContext *ctx = &sSoundScrollContext;
+    s32 prevOpt = ctx->selectedOpt;
+
+    if (gPlayer1Controller->buttonPressed & (D_JPAD | U_JPAD)) {
+        ctx->scrollDir = (gPlayer1Controller->buttonPressed & D_JPAD) ? 1 : -1;
+        ctx->selectedOpt = CLAMP(ctx->selectedOpt + ctx->scrollDir, 0, ctx->numOpts - 1);
+        ctx->scrollCountDown = countStart;
+        ctx->scrollTime = 0;
+    }
+    else if (gPlayer1Controller->buttonDown & (D_JPAD | U_JPAD)) {
+        ctx->scrollTime += 1;
+        if (ctx->scrollTime > countEndSkipT) ctx->scrollTime = countEndSkipT;
+    }
+    else {
+        ctx->scrollTime = 0;
+        ctx->scrollCountDown = 0;
+    }
+
+    if (ctx->scrollTime) {
+        if (ctx->scrollCountDown == 0) {
+            ctx->selectedOpt = CLAMP(ctx->selectedOpt + ctx->scrollDir, 0, ctx->numOpts - 1);
+            if (ctx->scrollTime < countEndT) {
+                ctx->scrollCountDown = roundf(remap(CLAMP(ctx->scrollTime, 0, countEndT), 0, countEndT, countStart, 0));
+            } else {
+                s32 numExtra = ctx->scrollDir * roundf(remap(CLAMP(ctx->scrollTime, countEndT, countEndSkipT), countEndT, countEndSkipT, 0, 30));
+                ctx->selectedOpt = CLAMP(ctx->selectedOpt + numExtra, 0, ctx->numOpts - 1);
+            }
+        } else {
+            ctx->scrollCountDown--;
+        }
+    }
+
+    s32 isNew = ctx->selectedOpt != prevOpt;
+    if (gSoundPreviews[ctx->selectedOpt].val & SOUND_DISCRETE) {
+        if (isNew || gPlayer1Controller->buttonPressed & A_BUTTON) {
+            play_sound(gSoundPreviews[ctx->selectedOpt].val | (0xFF << SOUNDARGS_SHIFT_PRIORITY), gGlobalSoundSource);
+        }
+    } else {
+        if (isNew || gPlayer1Controller->buttonDown & A_BUTTON) {
+            play_sound(gSoundPreviews[ctx->selectedOpt].val | (0xFF << SOUNDARGS_SHIFT_PRIORITY), gGlobalSoundSource);
+        }
+    }
+
+
+    ctx->numRendered = 0;
+    for (int s = 0; s < ctx->numOpts; s++) {
+        render_sound_option(ctx, s, gSoundPreviews[s].name);
+    }
+}
