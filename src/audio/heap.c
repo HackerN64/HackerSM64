@@ -1051,10 +1051,8 @@ void init_reverb_us(s32 presetId) {
     struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPresetValue];
 
 #ifdef PUPPYPRINT_DEBUG
-    if ((s8) gBetterReverbPresetValue == -2) {
-        betterReverbPreset = &gDebugBetterReverbSettings[0];
-    } else if ((s8) gBetterReverbPresetValue == -1) {
-        betterReverbPreset = &gDebugBetterReverbSettings[1];
+    if ((s8) gBetterReverbPresetValue < 0 && (s8) gBetterReverbPresetValue >= -ARRAY_COUNT(gDebugBetterReverbSettings)) {
+        betterReverbPreset = &gDebugBetterReverbSettings[ARRAY_COUNT(gDebugBetterReverbSettings) + (s8) gBetterReverbPresetValue];
     } else if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
 #else
     if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
@@ -1085,9 +1083,10 @@ void init_reverb_us(s32 presetId) {
 
         if (betterReverbWindowsSize >= 0) {
             reverbWindowSize = betterReverbWindowsSize;
+            if (reverbWindowSize < (DEFAULT_LEN_2CH * 2) && betterReverbWindowsSize != 0) // Minimum window size to not overflow
+                reverbWindowSize = (DEFAULT_LEN_2CH * 2);
             reverbWindowSize /= gReverbDownsampleRate;
-            if (reverbWindowSize < DEFAULT_LEN_2CH && betterReverbWindowsSize != 0) // Minimum window size to not overflow
-                reverbWindowSize = DEFAULT_LEN_2CH;
+            reverbWindowSize = ALIGN16(reverbWindowSize);
         }
     }
 
@@ -1152,7 +1151,7 @@ void init_reverb_us(s32 presetId) {
     if (!gSynthesisReverb.useReverb)
         toggleBetterReverb = FALSE;
 
-    if (betterReverbPreset->gain > 0)
+    if (betterReverbPreset->gain >= 0)
         gSynthesisReverb.reverbGain = (u16) betterReverbPreset->gain;
 
     if (!sAudioIsInitialized)

@@ -74,11 +74,11 @@ u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
 /**
  * Format:
  * - useLightweightSettings (Reduce some runtime configurability options in favor of a slight speed boost during processing; Light configurability settings are found in synthesis.h)
- * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality)
+ * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality; number <= 0 signifies use of vanilla reverb)
  * - isMono                 (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
  * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
  * 
- * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound)
+ * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound; value of 0 disables all reverb)
  * - gain                   (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
  * - gainIndex              (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
  * - reverbIndex            (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
