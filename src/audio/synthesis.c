@@ -768,9 +768,9 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateLeft));
             aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_RIGHT_CH, DMEM_ADDR_RIGHT_CH, bufLen << 1);
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateRight));
-            aSetBuffer(cmd++, 0, 0, 0, DEFAULT_LEN_2CH);
-            aMix(cmd++, 0, /*gain*/ 0x8000 + gSynthesisReverb.reverbGain, /*in*/ DMEM_ADDR_LEFT_CH, /*out*/ DMEM_ADDR_LEFT_CH);
             aDMEMMove(cmd++, DMEM_ADDR_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
+            aSetBuffer(cmd++, 0, 0, 0, DEFAULT_LEN_2CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000 + gSynthesisReverb.reverbGain, /*in*/ DMEM_ADDR_WET_LEFT_CH, /*out*/ DMEM_ADDR_WET_LEFT_CH);
         }
 
         AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_ENVELOPE_REVERB, PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);

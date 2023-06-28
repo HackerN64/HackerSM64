@@ -115,7 +115,7 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         .filterCount = (NUM_ALLPASS - 9),   // Ignored with lightweight settings
 
         .windowSize = 0x0E00,
-        .gain = 0x43FF,
+        .gain = 0x2FFF,
         .gainIndex = 0xA0,                  // Ignored with lightweight settings
         .reverbIndex = 0x30,                // Ignored with lightweight settings
 
@@ -131,9 +131,9 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         .filterCount = NUM_ALLPASS,
 
         .windowSize = 0x0E00,
-        .gain = 0x28FF,
+        .gain = 0x2AFF,
         .gainIndex = 0xA0,
-        .reverbIndex = 0x60,
+        .reverbIndex = 0x40,
 
         .delaysL = sReverbDelaysArr[1],
         .delaysR = sReverbDelaysArr[2],
@@ -152,7 +152,7 @@ struct BetterReverbSettings gDebugBetterReverbSettings[2] = {
         .filterCount = (NUM_ALLPASS - 9),
 
         .windowSize = 0x0E00,
-        .gain = 0x43FF,
+        .gain = 0x2FFF,
         .gainIndex = 0xA0,
         .reverbIndex = 0x30,
 
@@ -168,7 +168,7 @@ struct BetterReverbSettings gDebugBetterReverbSettings[2] = {
         .filterCount = (NUM_ALLPASS - 9),
 
         .windowSize = 0x0E00,
-        .gain = 0x43FF,
+        .gain = 0x2FFF,
         .gainIndex = 0xA0,
         .reverbIndex = 0x30,
 
