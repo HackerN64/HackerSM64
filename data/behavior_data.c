@@ -243,7 +243,7 @@ enum BehaviorCommands {
 
 // No operation. Unused.
 #define CMD_NOP_1(field) \
-    BC_BB(BHV_CMD_NOP_2, field)
+    BC_BB(BHV_CMD_NOP_1, field)
 
 // No operation. Unused.
 #define CMD_NOP_2(field) \
