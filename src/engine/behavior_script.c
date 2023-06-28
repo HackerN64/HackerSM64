@@ -510,22 +510,9 @@ static s32 bhv_cmd_drop_to_floor(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x11: Performs a bitwise OR with the specified field and the given (32 bit) integer.
-// Used to set object's flags which use values above 16 bits.
-// Usage: OR_LONG(field, value)
-static s32 bhv_cmd_or_long(void) {
-    u8 field = BHV_CMD_GET_2ND_U8(0);
-    u32 value = BHV_CMD_GET_U32(1);
-
-    cur_obj_or_int(field, value);
-
-    gCurBhvCommand += 2;
-    return BHV_PROC_CONTINUE;
-}
-
-// Command 0x1A: No operation. Unused.
-// Usage: CMD_NOP_3(field)
-static s32 bhv_cmd_nop_3(void) {
+// Command 0x18: No operation. Unused.
+// Usage: CMD_NOP_1(field)
+static s32 bhv_cmd_nop_1(void) {
     UNUSED u8 field = BHV_CMD_GET_2ND_U8(0);
 
     gCurBhvCommand++;
@@ -538,6 +525,19 @@ static s32 bhv_cmd_nop_2(void) {
     UNUSED u8 field = BHV_CMD_GET_2ND_U8(0);
 
     gCurBhvCommand++;
+    return BHV_PROC_CONTINUE;
+}
+
+// Command 0x1A: Performs a bitwise OR with the specified field and the given (32 bit) integer.
+// Usually used to set an object's flags which use values above 16 bits.
+// Usage: OR_LONG(field, value)
+static s32 bhv_cmd_or_long(void) {
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    u32 value = BHV_CMD_GET_U32(1);
+
+    cur_obj_or_int(field, value);
+
+    gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
 }
 
@@ -783,9 +783,9 @@ static BhvCommandProc BehaviorCmdTable[] = {
     /*BHV_CMD_SET_RANDOM_INT        */ bhv_cmd_set_random_int,
     /*BHV_CMD_ADD_RANDOM_FLOAT      */ bhv_cmd_add_random_float,
     /*BHV_CMD_ADD_INT_RAND_RSHIFT   */ bhv_cmd_add_int_rand_rshift,
-    /*BHV_CMD_OR_LONG               */ bhv_cmd_or_long,
+    /*BHV_CMD_NOP_1                 */ bhv_cmd_nop_1,
     /*BHV_CMD_NOP_2                 */ bhv_cmd_nop_2,
-    /*BHV_CMD_NOP_3                 */ bhv_cmd_nop_3,
+    /*BHV_CMD_OR_LONG               */ bhv_cmd_or_long,
     /*BHV_CMD_SET_MODEL             */ bhv_cmd_set_model,
     /*BHV_CMD_SPAWN_CHILD           */ bhv_cmd_spawn_child,
     /*BHV_CMD_DEACTIVATE            */ bhv_cmd_deactivate,

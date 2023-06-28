@@ -717,11 +717,11 @@ void load_object_collision_model(void) {
         o->oDrawingDistance = o->oCollisionDistance;
     }
     
-    s32 isLaterallyClose = (sqrLateralDist < sqr(o->oCollisionDistance));
-    s32 isNotBellow = (verticalMarioDiff > 0 || verticalMarioDiff > -o->oCollisionDistance);
-    s32 isNotAbove = (verticalMarioDiff < 0 || verticalMarioDiff < o->oCollisionDistance + 2000.f) ;
-
-    s32 inColRadius = isLaterallyClose && isNotAbove && isNotBellow;
+    s32 inColRadius = (
+           (sqrLateralDist < sqr(o->oCollisionDistance))
+        && (verticalMarioDiff > 0 || verticalMarioDiff > -o->oCollisionDistance)
+        && (verticalMarioDiff < 0 || verticalMarioDiff < o->oCollisionDistance + 2000.f)
+    );
 
     // Update if no Time Stop, in range, and in the current room.
     if (
@@ -742,7 +742,7 @@ void load_object_collision_model(void) {
 
     // On an object's first frame, the distance is set to 19000.0f.
     // If the distance hasn't been updated, update it now.
-    if (o->oDistanceToMario == 19000.0f) {
+    if (marioDist == 19000.0f) {
         marioDist = dist_between_objects(o, gMarioObject);
     }
 
