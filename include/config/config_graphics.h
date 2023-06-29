@@ -138,7 +138,7 @@
 /**
  * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
  */
-//#define HORIZONTAL_CULLING_ON_EMULATOR
+// #define HORIZONTAL_CULLING_ON_EMULATOR
 
 /**
  * Makes objects bellow the screen be culled.
@@ -159,4 +159,4 @@
 /**
  * Makes use of the tex edge render mode to deliver smooth transition textures
  */
-//#define SHARP_TRANSITION_TEXTURES
+// #define SHARP_TRANSITION_TEXTURES

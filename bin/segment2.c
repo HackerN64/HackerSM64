@@ -2713,7 +2713,6 @@ const Texture texture_waterbox_water[] = {
 #include "textures/segment2/segment2.11C58.rgba16.inc.c"
 };
 
-
 const Texture texture_waterbox_jrb_water[] = {
 #include "textures/segment2/segment2.12458.rgba16.inc.c"
 };

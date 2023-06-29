@@ -351,16 +351,19 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
 
         s16 fullRadius = GFX_DIMENSIONS_FULL_RADIUS;
 
-        if (transType == WARP_TRANSITION_TYPE_BOWSER || transType == WARP_TRANSITION_FADE_INTO_BOWSER){
-            fullRadius *= 4;
-        }
+        switch (transType){
+            case WARP_TRANSITION_TYPE_BOWSER:
+            case WARP_TRANSITION_FADE_INTO_BOWSER:
+                fullRadius *= 4;
+            break;
 
-        if (transType == WARP_TRANSITION_FADE_FROM_MARIO || transType == WARP_TRANSITION_FADE_INTO_MARIO){
-            fullRadius *= 1.5f;
-        }
+            case WARP_TRANSITION_FADE_FROM_MARIO:
+            case WARP_TRANSITION_FADE_INTO_MARIO:
 
-        if (transType == WARP_TRANSITION_FADE_FROM_STAR || transType == WARP_TRANSITION_FADE_INTO_STAR){
-            fullRadius *= 1.5f;
+            case WARP_TRANSITION_FADE_FROM_STAR:
+            case WARP_TRANSITION_FADE_INTO_STAR:
+                fullRadius *= 1.5f;
+            break;
         }
 
         if (transType & WARP_TRANSITION_FADE_INTO) { // Is the image fading in?

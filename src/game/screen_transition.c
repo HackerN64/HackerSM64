@@ -81,12 +81,12 @@ void make_tex_transition_vertices(Vtx *verts, f32 centerTransX, f32 centerTransY
 }
 
 f32 calc_tex_transition_radius(s8 transTime, struct WarpTransitionData *transData) {
-    f32 progress = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
+    f32 amount = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
 
 #ifdef EASE_IN_OUT_TRANSITIONS
-    return smoothstep(transData->startTexRadius, transData->endTexRadius, progress);
+    return smoothstep(transData->startTexRadius, transData->endTexRadius, amount);
 #else
-    return lerpf(transData->startTexRadius, transData->endTexRadius, progress);
+    return lerpf(transData->startTexRadius, transData->endTexRadius, amount);
 #endif
 
 }
@@ -111,9 +111,9 @@ f32 calc_tex_transition_pos_distance(s8 transTime, struct WarpTransitionData *tr
 
     f32 distance = sqrtf(sqr(startX - endX) + sqr(startY - endY));
 
-    f32 progress = (f32) sTransitionFadeTimer / (f32)(transTime - 1);
+    f32 amount = (f32) sTransitionFadeTimer / (f32)(transTime - 1);
 
-    return distance * progress;
+    return distance * amount;
 }
 
 u16 calc_tex_transition_direction(struct WarpTransitionData *transData) {
@@ -220,13 +220,13 @@ s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 a
 
 u8 set_transition_color_fade_alpha(s8 fadeType, u8 transTime) {
     u8 time = 0;
-    f32 progress = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
+    f32 amount = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
     switch (fadeType) {
         case COLOR_TRANS_FADE_INTO_COLOR:
-            time = progress * 255.0f; // fade in
+            time = lerpf(0.f, 255.0f, amount);
             break;
         case COLOR_TRANS_FADE_FROM_COLOR:
-            time = (1.0f - progress) * 255.0f; // fade out
+            time = lerpf(255.0f, 0.f, amount);
             break;
     }
     return roundf(time);
