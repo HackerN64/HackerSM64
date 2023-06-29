@@ -351,6 +351,8 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
 
         s16 fullRadius = GFX_DIMENSIONS_FULL_RADIUS;
 
+        // HackerSM64: this fixes the pop-in with texture transition, comment out this switch
+        // statement if you want to restore the original full radius.
         switch (transType){
             case WARP_TRANSITION_TYPE_BOWSER:
             case WARP_TRANSITION_FADE_INTO_BOWSER:
