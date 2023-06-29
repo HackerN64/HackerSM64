@@ -86,15 +86,15 @@ enum BehaviorCommands {
     /*0x0F*/ BHV_CMD_ADD_INT,
     /*0x10*/ BHV_CMD_SET_INT,
     /*0x11*/ BHV_CMD_OR_INT,
-    /*0x12*/ BHV_CMD_BIT_CLEAR,
-    /*0x13*/ BHV_CMD_SET_INT_RAND_RSHIFT,
-    /*0x14*/ BHV_CMD_SET_RANDOM_FLOAT,
-    /*0x15*/ BHV_CMD_SET_RANDOM_INT,
-    /*0x16*/ BHV_CMD_ADD_RANDOM_FLOAT,
-    /*0x17*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
-    /*0x18*/ BHV_CMD_NOP_1,
-    /*0x19*/ BHV_CMD_NOP_2,
-    /*0x1A*/ BHV_CMD_OR_LONG,
+    /*0x12*/ BHV_CMD_OR_LONG,
+    /*0x13*/ BHV_CMD_BIT_CLEAR,
+    /*0x14*/ BHV_CMD_SET_INT_RAND_RSHIFT,
+    /*0x15*/ BHV_CMD_SET_RANDOM_FLOAT,
+    /*0x16*/ BHV_CMD_SET_RANDOM_INT,
+    /*0x17*/ BHV_CMD_ADD_RANDOM_FLOAT,
+    /*0x18*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
+    /*0x19*/ BHV_CMD_NOP_1,
+    /*0x1A*/ BHV_CMD_NOP_2,
     /*0x1B*/ BHV_CMD_SET_MODEL,
     /*0x1C*/ BHV_CMD_SPAWN_CHILD,
     /*0x1D*/ BHV_CMD_DEACTIVATE,
@@ -243,7 +243,7 @@ enum BehaviorCommands {
 
 // No operation. Unused.
 #define CMD_NOP_1(field) \
-    BC_BB(BHV_CMD_NOP_1, field)
+    BC_BB(BHV_CMD_NOP_2, field)
 
 // No operation. Unused.
 #define CMD_NOP_2(field) \
