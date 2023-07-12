@@ -797,6 +797,9 @@
 #define /*0x0F8*/ oRespawnerMinSpawnDist      OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oRespawnerBehaviorToRespawn OBJECT_FIELD_CVPTR(0x1D)
 
+/* Orange Number */
+#define /*0x110*/ oOrangeNumberOffset OBJECT_FIELD_S32(0x22)
+
 /* Openable Grill */
 #define /*0x088*/ oOpenableGrillIsOpen         OBJECT_FIELD_S32(0x00)
 #define /*0x0F4*/ oOpenableGrillFloorSwitchObj OBJECT_FIELD_OBJ(0x1B)
@@ -998,6 +1001,7 @@
 /* Hidden Star */
 // Secrets/Red Coins
 #define /*0x0F4*/ oHiddenStarTriggerCounter OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oHiddenStarTriggerTotal OBJECT_FIELD_S32(0x1C)
 
 /* Sealed Door Star */
 #define /*0x108*/ oUnlockDoorStarState  OBJECT_FIELD_U32(0x20)

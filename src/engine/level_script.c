@@ -731,9 +731,9 @@ static void level_cmd_set_menu_music(void) {
 #ifdef BETTER_REVERB
     // Must come before set_background_music()
     if (gIsConsole)
-        gBetterReverbPreset = CMD_GET(u8, 4);
+        gBetterReverbPresetValue = CMD_GET(u8, 4);
     else
-        gBetterReverbPreset = CMD_GET(u8, 5);
+        gBetterReverbPresetValue = CMD_GET(u8, 5);
 #endif
     set_background_music(0, CMD_GET(s16, 2), 0);
     sCurrentCmd = CMD_NEXT;
@@ -803,9 +803,7 @@ static void level_cmd_puppyvolume(void) {
     if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume))) == NULL) {
         sCurrentCmd = CMD_NEXT;
         gPuppyError |= PUPPY_ERROR_POOL_FULL;
-#ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppycamera volume allocation failed.");
-#endif
         return;
     }
 
@@ -853,9 +851,7 @@ static void level_cmd_puppylight_node(void) {
 #ifdef PUPPYLIGHTS
     gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight));
     if (gPuppyLights[gNumLights] == NULL) {
-#ifdef PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppylight allocation failed.");
-#endif
         sCurrentCmd = CMD_NEXT;
         return;
     }
@@ -882,6 +878,17 @@ static void level_cmd_puppylight_node(void) {
     gNumLights++;
 
 #endif
+    sCurrentCmd = CMD_NEXT;
+}
+
+static void level_cmd_set_echo(void) {
+    if (sCurrAreaIndex >= 0 && sCurrAreaIndex < AREA_COUNT) {
+        gAreaData[sCurrAreaIndex].useEchoOverride = TRUE;
+        if (gIsConsole)
+            gAreaData[sCurrAreaIndex].echoOverride = CMD_GET(s8, 2);
+        else
+            gAreaData[sCurrAreaIndex].echoOverride = CMD_GET(s8, 3);
+    }
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -951,6 +958,7 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_CHANGE_AREA_SKYBOX          */ level_cmd_change_area_skybox,
     /*LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT      */ level_cmd_puppylight_environment,
     /*LEVEL_CMD_PUPPYLIGHT_NODE             */ level_cmd_puppylight_node,
+    /*LEVEL_CMD_SET_ECHO                    */ level_cmd_set_echo,
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

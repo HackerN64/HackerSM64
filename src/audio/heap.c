@@ -1048,8 +1048,20 @@ void init_reverb_us(s32 presetId) {
     s32 reverbWindowSize = gReverbSettings[presetId].windowSize;
     gReverbDownsampleRate = gReverbSettings[presetId].downsampleRate;
 #ifdef BETTER_REVERB
-    // This will likely crash if given an invalid preset value. Adding a safety check here isn't worth the usability interference.
-    struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPreset];
+    struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPresetValue];
+
+#ifdef PUPPYPRINT_DEBUG
+    if ((s8) gBetterReverbPresetValue < 0 && (s8) gBetterReverbPresetValue >= -ARRAY_COUNT(gDebugBetterReverbSettings)) {
+        betterReverbPreset = &gDebugBetterReverbSettings[ARRAY_COUNT(gDebugBetterReverbSettings) + (s8) gBetterReverbPresetValue];
+    } else if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
+#else
+    if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
+#endif
+        aggress(gBetterReverbPresetCount > 0, "No BETTER_REVERB presets exist!");
+
+        assert(gBetterReverbPresetValue < gBetterReverbPresetCount, "BETTER_REVERB preset value exceeds total number of available presets!");
+        betterReverbPreset = &gBetterReverbSettings[0];
+    }
 
     betterReverbLightweight = betterReverbPreset->useLightweightSettings;
     betterReverbDownsampleRate = betterReverbPreset->downsampleRate;
@@ -1058,8 +1070,8 @@ void init_reverb_us(s32 presetId) {
     betterReverbWindowsSize = betterReverbPreset->windowSize;
     betterReverbRevIndex = betterReverbPreset->reverbIndex;
     betterReverbGainIndex = betterReverbPreset->gainIndex;
-    gReverbMultsL = betterReverbPreset->reverbMultsL;
-    gReverbMultsR = betterReverbPreset->reverbMultsR;
+    gReverbMults[SYNTH_CHANNEL_LEFT] = betterReverbPreset->reverbMultsL;
+    gReverbMults[SYNTH_CHANNEL_RIGHT] = betterReverbPreset->reverbMultsR;
 
     if (betterReverbDownsampleRate <= 0) {
         toggleBetterReverb = FALSE;
@@ -1071,9 +1083,10 @@ void init_reverb_us(s32 presetId) {
 
         if (betterReverbWindowsSize >= 0) {
             reverbWindowSize = betterReverbWindowsSize;
+            if (reverbWindowSize < (DEFAULT_LEN_2CH * 2) && betterReverbWindowsSize != 0) // Minimum window size to not overflow
+                reverbWindowSize = (DEFAULT_LEN_2CH * 2);
             reverbWindowSize /= gReverbDownsampleRate;
-            if (reverbWindowSize < DEFAULT_LEN_2CH && betterReverbWindowsSize != 0) // Minimum window size to not overflow
-                reverbWindowSize = DEFAULT_LEN_2CH;
+            reverbWindowSize = ALIGN16(reverbWindowSize);
         }
     }
 
@@ -1138,7 +1151,7 @@ void init_reverb_us(s32 presetId) {
     if (!gSynthesisReverb.useReverb)
         toggleBetterReverb = FALSE;
 
-    if (betterReverbPreset->gain > 0)
+    if (betterReverbPreset->gain >= 0)
         gSynthesisReverb.reverbGain = (u16) betterReverbPreset->gain;
 
     if (!sAudioIsInitialized)
@@ -1437,13 +1450,7 @@ void audio_reset_session(void) {
         gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
     }
 #endif
-#ifdef PUPPYPRINT_DEBUG
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-    append_puppyprint_log("Audio Initialised in %dc.", (s32)(osGetTime() - first));
-#else
-    append_puppyprint_log("Audio Initialised in %dus.", (s32)OS_CYCLES_TO_USEC(osGetTime() - first));
-#endif
-#endif
+    append_puppyprint_log("Audio Initialised in %d" PP_CYCLE_STRING ".", (s32)PP_CYCLE_CONV(osGetTime() - first));
 
     sAudioIsInitialized = TRUE;
 }

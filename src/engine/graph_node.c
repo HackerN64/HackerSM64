@@ -71,7 +71,7 @@ init_graph_node_ortho_projection(struct AllocOnlyPool *pool, struct GraphNodeOrt
 struct GraphNodePerspective *init_graph_node_perspective(struct AllocOnlyPool *pool,
                                                          struct GraphNodePerspective *graphNode,
                                                          f32 fov, u16 near, u16 far,
-                                                         GraphNodeFunc nodeFunc, s32 unused) {
+                                                         GraphNodeFunc nodeFunc) {
     if (pool != NULL) {
         graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodePerspective));
     }
@@ -83,7 +83,6 @@ struct GraphNodePerspective *init_graph_node_perspective(struct AllocOnlyPool *p
         graphNode->near = near;
         graphNode->far = far;
         graphNode->fnNode.func = nodeFunc;
-        graphNode->unused = unused;
 
         if (nodeFunc != NULL) {
             nodeFunc(GEO_CONTEXT_CREATE, &graphNode->fnNode.node, pool);

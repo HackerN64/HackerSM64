@@ -578,7 +578,7 @@ void process_notes(void) {
                 }
             }
 
-            adsr_update(&note->adsr);
+            adsr_update(note);
             note_vibrato_update(note);
             attributes = &note->attributes;
             if (note->priority == NOTE_PRIORITY_STOPPING) {
@@ -1156,7 +1156,9 @@ s32 note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer
     }
 
     note->bankId = seqLayer->seqChannel->bankId;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     note->stereoHeadsetEffects = seqLayer->seqChannel->stereoHeadsetEffects;
+#endif
     note->sound = seqLayer->sound;
     seqLayer->status = SOUND_LOAD_STATUS_DISCARDABLE; // "loaded"
     seqLayer->note = note;
@@ -1410,9 +1412,12 @@ void note_init_all(void) {
         note->noteSubEu = gZeroNoteSub;
 #else
         note->enabled = FALSE;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
         note->stereoStrongRight = FALSE;
         note->stereoStrongLeft = FALSE;
         note->stereoHeadsetEffects = FALSE;
+        note->usesHeadsetPanEffects = FALSE;
+#endif
 #endif
         note->priority = NOTE_PRIORITY_DISABLED;
 #ifdef VERSION_SH
@@ -1426,13 +1431,12 @@ void note_init_all(void) {
         note->vibratoState.active = FALSE;
 #else
         note->reverbVol = 0;
-        note->usesHeadsetPanEffects = FALSE;
+        note->initFullVelocity = FALSE;
         note->sampleCount = 0;
         note->instOrWave = 0;
         note->targetVolLeft = 0;
         note->targetVolRight = 0;
         note->frequency = 0.0f;
-        note->unused1 = 0x3f;
         note->vibratoState.activeFlags = VIBMODE_NONE;
 #endif
         note->attributes.velocity = 0.0f;
