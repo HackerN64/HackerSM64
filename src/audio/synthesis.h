@@ -17,6 +17,12 @@
 #define MAX_UPDATES_PER_FRAME 4
 #endif
 
+enum ChannelIndexes {
+    SYNTH_CHANNEL_LEFT,
+    SYNTH_CHANNEL_RIGHT,
+    SYNTH_CHANNEL_STEREO_COUNT,
+};
+
 #ifdef BETTER_REVERB
 
 #define REVERB_WINDOW_SIZE_MAX 0x2000
@@ -25,13 +31,13 @@
 /* ------------ BETTER REVERB GENERAL PARAMETERS ------------ */
 
 #define NUM_ALLPASS 12 // Maximum number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
-#define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
+#define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s16*) * SYNTH_CHANNEL_STEREO_COUNT) // Allocation space consumed by dynamically allocated pointers
 
-// Size determined by (all delaysL/R values * 8) / (2 ^ Minimum Downsample Factor).
+// Minimum size requirement determined by ((all delaysL and delaysR values) / (2 ^ (downsampleRate - 1)) * sizeof(s16) + BETTER_REVERB_PTR_SIZE).
 // The default value can be increased or decreased in conjunction with the values in delaysL/R.
 // This can be significantly decreased if a downsample rate of 1 is not being used or if filter count is less than NUM_ALLPASS,
 // as this default is configured to handle the emulator RCVI settings.
-#define BETTER_REVERB_SIZE ALIGN16(0x1E000 + BETTER_REVERB_PTR_SIZE)
+#define BETTER_REVERB_SIZE ALIGN16(0xEDE0 + BETTER_REVERB_PTR_SIZE)
 
 
 /* ------ BETTER REVERB LIGHTWEIGHT PARAMETER OVERRIDES ------ */
@@ -48,7 +54,7 @@
 /* ------------ BETTER REVERB EXTERNED VARIABLES ------------ */
 
 extern u8 toggleBetterReverb;
-extern u8 gBetterReverbPreset;
+extern u8 gBetterReverbPresetValue;
 extern u8 betterReverbLightweight;
 extern s8 betterReverbDownsampleRate;
 extern u8 monoReverb;
@@ -56,8 +62,7 @@ extern s32 reverbFilterCount;
 extern s32 betterReverbWindowsSize;
 extern s32 betterReverbRevIndex;
 extern s32 betterReverbGainIndex;
-extern s32 *gReverbMultsL;
-extern s32 *gReverbMultsR;
+extern u8 *gReverbMults[SYNTH_CHANNEL_STEREO_COUNT];
 
 
 /* ------------ BETTER REVERB EXTERNED FUNCTIONS ------------ */

@@ -47,12 +47,24 @@ void bhv_hidden_star_trigger_loop(void) {
     }
 }
 
+void bhv_bowser_course_red_coin_star_init(void) {
+    if (o->oBehParams2ndByte != 0) {
+        o->oHiddenStarTriggerTotal = o->oBehParams2ndByte;
+        o->oHiddenStarTriggerCounter = gRedCoinsCollected;
+    }
+    else {
+        s16 numRedCoinsRemaining = count_objects_with_behavior(bhvRedCoin);
+        o->oHiddenStarTriggerTotal = numRedCoinsRemaining + gRedCoinsCollected;
+        o->oHiddenStarTriggerCounter = o->oHiddenStarTriggerTotal - numRedCoinsRemaining;
+    }
+}
+
 void bhv_bowser_course_red_coin_star_loop(void) {
     gRedCoinsCollected = o->oHiddenStarTriggerCounter;
 
     switch (o->oAction) {
         case 0:
-            if (o->oHiddenStarTriggerCounter == 8) {
+            if (o->oHiddenStarTriggerCounter == o->oHiddenStarTriggerTotal) {
                 o->oAction = 1;
             }
             break;

@@ -7,7 +7,7 @@ CC           := gcc
 CXX          := g++
 CFLAGS       := -I. -O2 -s
 LDFLAGS      := -lm
-ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv patch_elf_32bit aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv
+ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv patch_elf_32bit aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
 LIBAUDIOFILE := audiofile/libaudiofile.a
 
 # Only build armips from tools if it is not found on the system
@@ -65,6 +65,13 @@ armips_LDFLAGS := -pthread
 ifeq ($(HOST_ENV),MinGW)
   armips_LDFLAGS += -municode
 endif
+
+flips: CC := $(CXX)
+flips_SOURCES := Flips/Flips.cpp
+flips_CFLAGS := -Wall -Wextra -fopenmp -Os -flto -fuse-linker-plugin -fomit-frame-pointer -fmerge-all-constants \
+-fvisibility=hidden -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables \
+-ffunction-sections -fdata-sections -Wl,--gc-sections \
+-Wl,-z,relro,-z,now,--as-needed,--hash-style=gnu,--relax
 
 all-except-recomp: $(LIBAUDIOFILE) $(BUILD_PROGRAMS)
 

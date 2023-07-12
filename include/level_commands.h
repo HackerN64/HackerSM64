@@ -73,6 +73,7 @@ enum LevelCommands {
     /*0x3E*/ LEVEL_CMD_CHANGE_AREA_SKYBOX,
     /*0x3F*/ LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT,
     /*0x40*/ LEVEL_CMD_PUPPYLIGHT_NODE,
+    /*0x41*/ LEVEL_CMD_SET_ECHO,
 };
 
 enum LevelActs {
@@ -447,6 +448,9 @@ enum GoddardScene {
 
 #define STOP_MUSIC(fadeOutTime) \
     CMD_BBH(LEVEL_CMD_FADEOUT_MUSIC, 0x04, fadeOutTime)
+
+#define SET_ECHO(console, emulator) \
+    CMD_BBBB(LEVEL_CMD_SET_ECHO, 0x04, console, emulator)
 
 #define MACRO_OBJECTS(objList) \
     CMD_BBH(LEVEL_CMD_SET_MACRO_OBJECTS, 0x08, 0x0000), \

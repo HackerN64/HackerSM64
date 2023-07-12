@@ -1,4 +1,6 @@
 #include <ultra64.h>
+#include "macros.h"
+#include <PR/gs2dex.h>
 
 #ifndef S2D_CONFIG_H
 #define S2D_CONFIG_H
@@ -25,8 +27,6 @@
  *****************************/
 
 // magic macros and font header inclusion
-#define GLUE(a, b) a##b
-#define GLUE2(a, b) GLUE(a, b)
 #define STR(x) #x
 #define STR2(x) STR(x)
 
@@ -88,7 +88,7 @@ extern char *proutSprintf(char *dst, const char *src, size_t count);
 #define TEX_BITDEPTH 8
 
 #define seg2virt segmented_to_virtual
-#define IS_RUNNING_ON_EMULATOR (IO_READ(DPC_PIPEBUSY_REG) == 0)
+#define gIsEmulator (!gIsConsole)
 
 // Texture resolution (pixels on the texture per pixel on the framebuffer)
 #define TEX_RES 1

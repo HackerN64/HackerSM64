@@ -20,14 +20,8 @@ ALIGNED8 u8 gThread5Stack[THREAD5_STACK];
 ALIGNED8 u8 gThread6Stack[THREAD6_STACK];
 #endif
 // 0x400 bytes
-#if UNF
-ALIGNED16 u8 gGfxSPTaskStack[SP_DRAM_STACK_SIZE8];
-ALIGNED16 u8 gGfxSPTaskYieldBuffer[OS_YIELD_DATA_SIZE];
-#else
-// 0xc00 bytes for f3dex, 0x900 otherwise
-ALIGNED8 u8 gGfxSPTaskStack[SP_DRAM_STACK_SIZE8];
-ALIGNED8 u8 gGfxSPTaskYieldBuffer[OS_YIELD_DATA_SIZE];
-#endif // UNF
+__attribute__((aligned(32))) u8 gGfxSPTaskStack[SP_DRAM_STACK_SIZE8];
+__attribute__((aligned(32))) u8 gGfxSPTaskYieldBuffer[OS_YIELD_DATA_SIZE];
 // 0x200 bytes
 ALIGNED8 struct SaveBuffer gSaveBuffer;
 // 0x190a0 bytes

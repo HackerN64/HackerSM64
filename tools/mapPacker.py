@@ -1,4 +1,4 @@
-import sys, struct
+import sys, struct, subprocess
 
 class MapEntry():
 	def __init__(self, nm, addr):
@@ -15,11 +15,19 @@ structDef = ">LLLL"
 
 symNames = []
 
-with open(sys.argv[1]) as f:
-	for line in f:
-		if "0x000000008" in line and "=" not in line and "." not in line and "*" not in line and "load address" not in line:
-			tokens = line.split()
-			symNames.append(MapEntry(tokens[1], int(tokens[0], 16)))
+
+proc = subprocess.Popen(["nm", "-S", sys.argv[1]], stdout=subprocess.PIPE)
+
+symbols = proc.communicate()[0].decode('ascii').split("\n")
+for line in symbols:
+	# format:
+	# 80153210 000000f8 T global_sym
+	# 80153210 t static_sym
+	tokens = line.split()
+	if len(tokens) >= 3 and len(tokens[-2]) == 1:
+		addr = int(tokens[0], 16)
+		if addr & 0x80000000 and tokens[-2].lower() == "t":
+			symNames.append(MapEntry(tokens[-1], addr))
 
 
 
