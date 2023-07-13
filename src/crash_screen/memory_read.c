@@ -16,10 +16,10 @@ enum BusDevices {
 
 UNUSED ALIGNED8 static const Address sBusDeviceBounds[] = {
     [BUS_RDRAM   ] = 0x00000000,
-    [BUS_RCP     ] = 0x04000000,
-    [BUS_PI_EXT_1] = 0x05000000,
-    [BUS_SI_EXT  ] = 0x1FC00000,
-    [BUS_PI_EXT_2] = 0x1FD00000,
+    [BUS_RCP     ] = SP_DMEM_START,
+    [BUS_PI_EXT_1] = PI_DOM2_ADDR1,
+    [BUS_SI_EXT  ] = PIF_ROM_START,
+    [BUS_PI_EXT_2] = PI_DOM1_ADDR3,
     [BUS_UNMAPPED] = VIRTUAL_RAM_START,
     [BUS_END     ] = 0xFFFFFFFF,
 };
@@ -104,14 +104,17 @@ ALIGNED4 static const Address sMemoryBounds[] = {
     [MEM_MEMORY_REGIONS_END       ] = 0xFFFFFFFF,
 };
 
+// Whether a PI DMA is in progress.
 static _Bool pi_is_busy(void) {
     return ((IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY)) != 0);
 }
 
+// Whether a PI DMA has finished.
 static _Bool pi_dma_is_unfinished(void) {
     return ((IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR)) != 0);
 }
 
+//! TODO: Description
 void headless_dma(Address devAddr, void* dramAddr, size_t size) {
     // Wait until DMA is finished and no IO is currently in progress.
     while (pi_is_busy());
@@ -124,10 +127,12 @@ void headless_dma(Address devAddr, void* dramAddr, size_t size) {
     while (pi_dma_is_unfinished());
 }
 
+//! TODO: Description
 ALWAYS_INLINE static _Bool is_in_memory_region(Address addr, enum MemoryRegions region) {
     return ((addr >= sMemoryBounds[region]) && (addr < sMemoryBounds[region + 1]));
 }
 
+// Whether the address is in RDRAM region.
 UNUSED static _Bool is_in_rdram(Address addr) {
     return (
         is_in_memory_region(addr, MEM_RDRAM_MEMORY             ) ||
@@ -136,6 +141,7 @@ UNUSED static _Bool is_in_rdram(Address addr) {
     );
 }
 
+// Whether the address is in RCP region.
 UNUSED static _Bool is_in_rcp(Address addr) {
     return (
         is_in_memory_region(addr, MEM_RCP_RSP_DMEM             ) ||
@@ -155,6 +161,7 @@ UNUSED static _Bool is_in_rcp(Address addr) {
     );
 }
 
+// Whether the address is in an unmapped region.
 static _Bool is_unmapped(Address addr) {
     return (
         is_in_memory_region(addr, MEM_RCP_UNMAPPED_1) ||
@@ -163,6 +170,7 @@ static _Bool is_unmapped(Address addr) {
     );
 }
 
+// Whether the address is in SP region.
 static _Bool is_in_sp(Address addr) {
     return (
         is_in_memory_region(addr, MEM_RCP_RSP_DMEM             ) ||
@@ -172,6 +180,7 @@ static _Bool is_in_sp(Address addr) {
     );
 }
 
+// Whether the address is in PIF region.
 static _Bool is_in_pif(Address addr) {
     return (
         is_in_memory_region(addr, MEM_SI_EXT_PIF_ROM) ||
@@ -179,6 +188,7 @@ static _Bool is_in_pif(Address addr) {
     );
 }
 
+// Whether the address is in PI region.
 static _Bool is_in_pi(Address addr) {
     return (
         is_in_memory_region(addr, MEM_PI_EXT_N64DD_REGISTERS) ||
@@ -193,12 +203,13 @@ static _Bool is_in_pi(Address addr) {
 extern s32 __osSiDeviceBusy(void);
 extern u32 __osSpDeviceBusy(void);
 
+// Try reading a 4-byte aligned word at 'addr' to 'dest'. Returns whether the read was successful.
 _Bool read_data(Word* dest, Address addr) {
     addr = ALIGNFLOOR(addr, sizeof(Word));
 
     Address physAddr = osVirtualToPhysical((void*)addr);
 
-    // Check whether the address is virtually mapped:
+    // Check whether the address is virtually mapped (would throw a TLB exception):
     if (physAddr == ((Address)-1)) {
         return FALSE;
     }
@@ -210,19 +221,22 @@ _Bool read_data(Word* dest, Address addr) {
         return TRUE;
     }
 
-    // Check whether the address is physically mapped:
+    // Check whether the address is physically mapped (would lock up the system):
     if (is_unmapped(physAddr)) {
         return FALSE;
     }
 
+    // Make sure the RSP is halted and there is no SP DMA:
     if (is_in_sp(physAddr) && __osSpDeviceBusy()) {
         return FALSE;
     }
 
+    // Make sure there is no SI DMA:
     if (is_in_pif(physAddr) && __osSiDeviceBusy()) {
         return FALSE;
     }
 
+    // Make sure that there is no PI DMA:
     if (is_in_pi(physAddr) && pi_is_busy()) {
         return FALSE;
     }

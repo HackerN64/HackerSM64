@@ -43,7 +43,7 @@ static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
 
 static void ram_viewer_print_data(u32 line, Address startAddr) {
     __OSThreadContext* tc = &gCrashedThread->context;
-    u32 charX = (TEXT_X(8) + 3);
+    u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
@@ -55,9 +55,9 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
             ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr
         );
 
-        charX = (TEXT_X(8) + 3);
+        charX = (TEXT_X(SIZEOF_HEX(Word)) + 3);
         charY = TEXT_Y(line + y);
-        for (u32 x = 0; x < 16; x++) {
+        for (u32 x = 0; x < (4 * sizeof(Word)); x++) {
             Address currAddr = (rowAddr + x);
 
             if ((x % 4) == 0) {
@@ -93,8 +93,6 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
 void ram_viewer_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
-    sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
-
     Address startAddr = sRamViewViewportIndex;
     u32 line = 1;
 
@@ -106,10 +104,10 @@ void ram_viewer_draw(void) {
 
     line++;
 
-    u32 charX = (TEXT_X(8) + 3);
+    u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
 
     // Print column headers:
-    for (u32 i = 0; i < 16; i++) {
+    for (u32 i = 0; i < (4 * sizeof(Word)); i++) {
         if ((i % 4) == 0) {
             charX += 2;
         }
@@ -122,7 +120,7 @@ void ram_viewer_draw(void) {
 
     crash_screen_draw_divider(DIVIDER_Y(3));
 
-    crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT((line + RAM_VIEWER_NUM_ROWS) - 1), COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT((line + RAM_VIEWER_NUM_ROWS) - 1), COLOR_RGBA32_LIGHT_GRAY);
 
     // "MEMORY"
     crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
@@ -188,7 +186,7 @@ void ram_viewer_input(void) {
 
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
-    if (buttonPressed & A_BUTTON) { //! TODO: not if address select was just closed
+    if (buttonPressed & A_BUTTON) {
         open_address_select(gSelectedAddress);
     }
 
@@ -196,4 +194,6 @@ void ram_viewer_input(void) {
         // Toggle whether the memory is printed as hex values or as ASCII chars.
         sRamViewShowAsAscii ^= TRUE;
     }
+
+    sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 }

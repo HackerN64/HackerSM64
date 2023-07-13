@@ -105,4 +105,3 @@ _Bool is_in_code_segment(Address addr);
 const char* get_map_entry_name(const struct MapEntry* entry);
 s32 get_map_entry_index(Address addr);
 const char* parse_map(Address* addr);
-_Bool is_in_same_function(Address addr1, Address addr2);

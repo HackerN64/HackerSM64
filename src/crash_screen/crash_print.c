@@ -17,11 +17,11 @@ _Bool gCSWordWrap = FALSE;
 
 static _Bool glyph_to_hex(char* dest, char glyph) {
     if (IS_NUMERIC(glyph)) {
-        *dest = ((glyph - CHAR_NUMERIC_START) & BITMASK(4));
+        *dest = ((glyph - CHAR_NUMERIC_START) & BITMASK(BITS_PER_HEX));
     } else if (IS_UPPERCASE_HEX(glyph)) {
-        *dest = (((glyph - CHAR_UPPERCASE_HEX_START) + 10) & BITMASK(4));
+        *dest = (((glyph - CHAR_UPPERCASE_HEX_START) + 10) & BITMASK(BITS_PER_HEX));
     } else if (IS_LOWERCASE_HEX(glyph)) {
-        *dest = (((glyph - CHAR_LOWERCASE_HEX_START) + 10) & BITMASK(4));
+        *dest = (((glyph - CHAR_LOWERCASE_HEX_START) + 10) & BITMASK(BITS_PER_HEX));
     } else {
         return FALSE;
     }
@@ -33,7 +33,7 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
     for (u32 byteIndex = 0; byteIndex < numBytes; byteIndex++) {
         Byte retByte = 0x00;
 
-        for (int digit = 0; digit < 2; digit++) {
+        for (size_t digit = 0; digit < SIZEOF_HEX(Byte); digit++) {
             char glyph = buf[index];
             char hex = 0x0;
 
@@ -45,7 +45,7 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
                 return FALSE;
             }
 
-            retByte |= (hex << ((1 - digit) * 4));
+            retByte |= (hex << ((1 - digit) * BITS_PER_HEX));
             index++;
         }
 
@@ -99,7 +99,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
                     escaped = TRUE;
                     break;
                 case CHAR_COLOR: // @RRGGBBAA
-                    if ((index + 8) >= totalSize) {
+                    if ((index + SIZEOF_HEX(RGBA32)) >= totalSize) {
                         print = TRUE;
                         break;
                     }
@@ -111,7 +111,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
                     }
                     color = *(u32*)tempColor;
                     // color = COLORRGBA_TO_RGBA16(tempColor);
-                    index += 8;
+                    index += SIZEOF_HEX(RGBA32);
                     break;
                 default:
                     print = TRUE;
@@ -150,6 +150,10 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
     return count;
 }
 
+static _Bool can_wrap(u32 x) {
+    return (gCSWordWrap && (x >= CRASH_SCREEN_TEXT_X2));
+}
+
 static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
     size_t numChars = 0;
     u32 startX = x;
@@ -171,7 +175,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 }
                 break;
             case CHAR_SPACE:
-                if (gCSWordWrap && (x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount))) >= CRASH_SCREEN_TEXT_X2) {
+                if (can_wrap(x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount)))) {
                     newline = TRUE;
                 }
                 break;
@@ -181,7 +185,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         }
 
         if (print) {
-            if (gCSWordWrap && (x >= CRASH_SCREEN_TEXT_X2)) {
+            if (can_wrap(x)) {
                 newline = TRUE;
                 index--;
             } else {
@@ -189,7 +193,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
             }
         }
 
-        if (gCSWordWrap && newline) {
+        if (newline) {
             x = startX;
             y += TEXT_HEIGHT(1);
         } else {

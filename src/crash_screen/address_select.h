@@ -22,8 +22,8 @@
 #define JUMP_MENU_MARGIN_Y 10
 
 // Macros used to modify individual digits in a hexadecimal value.
-#define GET_HEX_DIGIT(src, shift)       (((src) >> (shift)) & BITMASK(4))
-#define SET_HEX_DIGIT(dst, src, shift)  (((dst) & ~(BITMASK(4) << (shift))) | ((src) << (shift)))
+#define GET_HEX_DIGIT(src, shift)       (((src) >> (shift)) & BITMASK(BITS_PER_HEX))
+#define SET_HEX_DIGIT(dst, src, shift)  (((dst) & ~(BITMASK(BITS_PER_HEX) << (shift))) | ((src) << (shift)))
 
 
 extern _Bool gAddressSelectMenuOpen;

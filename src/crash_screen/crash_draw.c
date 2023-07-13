@@ -69,7 +69,6 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
     if (alpha == 0x00) {
         return;
     }
-    // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
@@ -90,7 +89,6 @@ void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, R
     if (alpha == 0x00) {
         return;
     }
-    // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (w / 2.0f);
     f32 d = 0.0f;
@@ -121,7 +119,6 @@ void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h,
     if (alpha == 0x00) {
         return;
     }
-    // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (h / 2.0f);
     const f32 t = ((f32)w / middle);
@@ -149,7 +146,6 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     if (alpha == 0x00) {
         return;
     }
-    // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
     RGBA16* dst;
@@ -178,9 +174,8 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) 
     if (alpha == 0x00) {
         return;
     }
-    // const _Bool opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    CSFontRow startBit = ((CSFontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
+    CSFontRow startBit = ((CSFontRow)BIT(SIZEOF_BITS(CSFontRow) - 1) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
     CSFontRow bit;
     CSFontRow rowMask;
 
@@ -207,7 +202,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) 
 void crash_screen_take_screenshot(RGBA16* dst) {
     u32* src = FB_PTR_AS(u32);
     u32* ptr = (u32*)dst;
-    const u32 mask = ((MSK_RGBA16_A << 16) | MSK_RGBA16_A);
+    const u32 mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
 
     for (size_t size = 0; size < FRAMEBUFFER_SIZE; size += sizeof(u32)) {
         *ptr++ = (*src++ | mask);
@@ -285,7 +280,7 @@ void print_crash_screen_header(void) {
 
     // "<Page:XX>"
     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
-        STR_COLOR_PREFIX"<Page:%02d"STR_COLOR_PREFIX">",
+        STR_COLOR_PREFIX"<Page:%02d>",
         COLOR_RGBA32_CRASH_HEADER, (gCSPageID + 1)
     );
 

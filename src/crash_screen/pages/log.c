@@ -10,7 +10,7 @@
 #include "game/puppyprint.h"
 
 
-#ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if it's long enough
+#ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if the log is long enough.
 
 void puppyprint_log_draw(void) {
     osWritebackDCacheAll();

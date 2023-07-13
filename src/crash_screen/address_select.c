@@ -9,7 +9,7 @@
 
 _Bool gAddressSelectMenuOpen = FALSE;
 static Address sAddressSelectTarget = 0x00000000;
-static s8 sAddressSelectCharIndex = 2;
+static s8 sAddressSelectCharIndex = 7;
 
 
 void draw_address_select(void) {
@@ -20,7 +20,7 @@ void draw_address_select(void) {
     );
 
     // "GO TO:"
-    crash_screen_print((SCREEN_CENTER_X - TEXT_WIDTH(3)), JUMP_MENU_Y1, "GO TO:");
+    crash_screen_print((SCREEN_CENTER_X - (TEXT_WIDTH(STRLEN("GO TO")) / 2)), JUMP_MENU_Y1, "GO TO:");
 
     u32 triangleStartX = ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelectCharIndex * TEXT_WIDTH(1)) - 1);
     u32 triangleStartY = ((JUMP_MENU_Y1 + TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
@@ -76,27 +76,27 @@ void crash_screen_select_address(void) {
         change = -1;
     }
     if (gCSDirectionFlags.pressed.right) {
-        change = 1;
+        change =  1;
     }
 
-    sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) & 0x7); // % 8
+    sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) % SIZEOF_HEX(Address));
 
-    u32 shift = ((32 - 4) - (sAddressSelectCharIndex * 4));
-    u8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
-    u8 new = digit;
+    const u32 shift = ((SIZEOF_BITS(Address) - BITS_PER_HEX) - (sAddressSelectCharIndex * BITS_PER_HEX));
+    const s8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
+    s8 new = digit;
     change = 0;
 
     if (gCSDirectionFlags.pressed.up) {
-        change = 1;
+        change =  1;
     }
     if (gCSDirectionFlags.pressed.down) {
         change = -1;
     }
 
     if (change != 0) {
-        // Wrap to virtual ram address.
+        // Wrap to virtual ram address:
         do {
-            new = ((new + change) & BITMASK(4));
+            new = ((new + change) & BITMASK(BITS_PER_HEX));
         } while (SET_HEX_DIGIT(sAddressSelectTarget, new, shift) < VIRTUAL_RAM_START);
     }
 
@@ -106,10 +106,12 @@ void crash_screen_select_address(void) {
 
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
-    if (buttonPressed & A_BUTTON) { //! TODO: Not if address select was just opened
+    if (buttonPressed & A_BUTTON) {
         // Jump to the address and close the popup.
         gAddressSelectMenuOpen = FALSE;
+
         switch (gCSPageID) {
+#ifdef INCLUDE_DEBUG_MAP
             case PAGE_MAP_VIEWER:;
                 s32 targetIndex = get_map_entry_index(sAddressSelectTarget);
                 if (targetIndex != -1) {
@@ -119,12 +121,13 @@ void crash_screen_select_address(void) {
                     sMapViewerSelectedIndex = targetIndex;
                 }
                 break;
+#endif
             case PAGE_STACK_TRACE:
                 gCSPageID = PAGE_DISASM;
                 break;
 #ifdef INCLUDE_DEBUG_MAP
             case PAGE_DISASM:
-                if (!is_in_same_function(gSelectedAddress, sAddressSelectTarget)) {
+                if (get_map_entry_index(gSelectedAddress) != get_map_entry_index(sAddressSelectTarget)) {
                     gFillBranchBuffer = TRUE;
                 }
                 break;
@@ -132,6 +135,7 @@ void crash_screen_select_address(void) {
             default:
                 break;
         }
+
         gSelectedAddress = sAddressSelectTarget;
     }
 

@@ -73,8 +73,6 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 
 void map_viewer_draw(void) {
     u32 line = 1;
-#ifdef INCLUDE_DEBUG_MAP
-    sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 
     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("SIZE")), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
 
@@ -91,12 +89,6 @@ void map_viewer_draw(void) {
 
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }
-#else
-    line++;
-
-    // "MAP VIEWER DISABLED"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "MAP VIEWER DISABLED");
-#endif
 
     osWritebackDCacheAll();
 }
@@ -120,4 +112,6 @@ void map_viewer_input(void) {
             sMapViewerSelectedIndex++;
         }
     }
+
+    sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }

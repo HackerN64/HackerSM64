@@ -9,6 +9,11 @@
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 
+#define BITS_PER_BYTE   8
+#define BITS_PER_HEX    4
+#define SIZEOF_BITS(t)  (sizeof(t) * BITS_PER_BYTE)
+#define SIZEOF_HEX(t)   (SIZEOF_BITS(t) / BITS_PER_HEX)
+
 #define GLUE(a, b) a ## b
 #define GLUE2(a, b) GLUE(a, b)
 

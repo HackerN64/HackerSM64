@@ -4,7 +4,9 @@
 #include "map_parser.h"
 
 
-//! TODO: replace this with nm -S mappings
+//! TODO: replace this functionality with nm -S mappings
+
+
 ALIGNED8 static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
@@ -107,23 +109,4 @@ const char* parse_map(Address* addr) {
     }
 
     return NULL;
-}
-
-// Check whether two addresses share the same function.
-_Bool is_in_same_function(Address addr1, Address addr2) {
-    if (addr1 == addr2) {
-        return TRUE;
-    }
-
-    addr1 = ALIGNFLOOR(addr1, sizeof(Word));
-    addr2 = ALIGNFLOOR(addr2, sizeof(Word));
-
-    if (addr1 == addr2) {
-        return TRUE;
-    }
-
-    parse_map(&addr1);
-    parse_map(&addr2);
-
-    return (addr1 == addr2);
 }

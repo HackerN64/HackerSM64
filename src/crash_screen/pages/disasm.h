@@ -14,7 +14,11 @@ struct BranchArrow {
 
 
 // Disasm constants
+#ifdef INCLUDE_DEBUG_MAP
 #define DISASM_NUM_ROWS         19
+#else
+#define DISASM_NUM_ROWS         20
+#endif
 #define DISASM_SHOWN_SECTION    ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
 
 #define DISASM_SCROLL_MIN       VIRTUAL_RAM_START
@@ -29,7 +33,9 @@ struct BranchArrow {
 #define DISASM_BRANCH_BUFFER_SIZE   0x100
 
 
+#ifdef INCLUDE_DEBUG_MAP
 extern _Bool gFillBranchBuffer;
+#endif
 
 extern const enum ControlTypes disasmContList[];
 

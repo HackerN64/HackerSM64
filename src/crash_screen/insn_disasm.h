@@ -7,7 +7,6 @@
 
 #define INSN_NAME_DISPLAY_WIDTH 10
 
-#define CHAR_P_NULL     '\0'
 #define CHAR_P_NOP      '_'     // "NOP"
 #define CHAR_P_NAME     '\''    // "[name]%-6"
 #define CHAR_P_NAMEF    '\"'    // "[name].[fmt]%-6"

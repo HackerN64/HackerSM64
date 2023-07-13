@@ -10,7 +10,13 @@
 ALIGNED16 static struct FunctionInStack sFunctionStack[STACK_TRACE_BUFFER_SIZE];
 static u32 sNumFoundFunctions = 0;
 
-static _Bool sStackTraceShowFunctionNames = TRUE;
+#ifdef INCLUDE_DEBUG_MAP
+    #define SHOW_FUNC_NAMES_DEFAULT TRUE
+#else
+    #define SHOW_FUNC_NAMES_DEFAULT FALSE
+#endif
+
+static _Bool sStackTraceShowFunctionNames = SHOW_FUNC_NAMES_DEFAULT;
 
 static u32 sStackTraceSelectedIndex = 0;
 static u32 sStackTraceViewportIndex = 0;
@@ -21,11 +27,12 @@ const enum ControlTypes stackTraceContList[] = {
     CONT_DESC_CYCLE_DRAW,
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_JUMP_TO_ADDRESS,
+#ifdef INCLUDE_DEBUG_MAP
     CONT_DESC_TOGGLE_FUNCTIONS,
+#endif
     CONT_DESC_LIST_END,
 };
 
-#ifdef INCLUDE_DEBUG_MAP
 extern void __osCleanupThread(void);
 
 void fill_function_stack_trace(void) {
@@ -41,12 +48,15 @@ void fill_function_stack_trace(void) {
 
     // Loop through the stack buffer and find all the addresses that point to a function.
     while ((Byte*)sp < _buffersSegmentBssEnd && sNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
-        currInfo.curAddr = (Address)(*sp);
+        currInfo.curAddr = (Address)(*sp); // Check the lower bits.
 
         if (is_in_code_segment(currInfo.curAddr)) {
             currInfo.faddr = currInfo.curAddr;
+#ifdef INCLUDE_DEBUG_MAP
             currInfo.fname = parse_map(&currInfo.faddr);
-            if (currInfo.fname != NULL) {
+            if (currInfo.fname != NULL)
+#endif
+            {
                 //! TODO: If JAL command uses a different function than the previous entry's faddr, replace it with the one in the JAL command?
                 //! TODO: handle duplicate entries caused by JALR RA, V0
                 currInfo.stackAddr = (Address)sp + sizeof(Address);
@@ -61,19 +71,17 @@ void fill_function_stack_trace(void) {
         sp++;
     }
 }
-#endif
 
 void stack_trace_init(void) {
     bzero(&sFunctionStack, sizeof(sFunctionStack));
 
-    sStackTraceShowFunctionNames = TRUE;
+    sStackTraceShowFunctionNames = SHOW_FUNC_NAMES_DEFAULT;
 
     sStackTraceSelectedIndex = 0;
     sStackTraceViewportIndex = 0;
 
     sNumFoundFunctions = 0;
 
-#ifdef INCLUDE_DEBUG_MAP
     // Include the current function at the top:
     __OSThreadContext* tc = &gCrashedThread->context;
     Address pc = tc->pc;
@@ -87,7 +95,6 @@ void stack_trace_init(void) {
     sFunctionStack[sNumFoundFunctions++] = currFunc;
 
     fill_function_stack_trace();
-#endif
 }
 
 void stack_trace_print_entries(u32 line, u32 numLines) {
@@ -122,6 +129,9 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
         }
 
+        const RGBA32 nameColor = ((currIndex == 0) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+
+#ifdef INCLUDE_DEBUG_MAP
         if (function->fname == NULL) {
             // Print unknown function
             // "[function address]"
@@ -130,7 +140,6 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                 COLOR_RGBA32_CRASH_UNKNOWN, function->curAddr
             );
         } else {
-            const RGBA32 nameColor = ((currIndex == 0) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
             // Print known function
             if (sStackTraceShowFunctionNames) {
                 // "[function name]"
@@ -152,6 +161,13 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                 );
             }
         }
+#else
+        // "[function address]"
+        crash_screen_print(TEXT_X(addrStrSize), y,
+            (STR_COLOR_PREFIX STR_HEX_WORD),
+            nameColor, function->curAddr
+        );
+#endif
 
         currIndex++;
         function++;
@@ -169,12 +185,13 @@ void stack_trace_draw(void) {
 
     // "FROM: [XXXXXXXX]"
     crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, (Address)tc->sp);
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
-
-    line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
+    // "OFFSET:"
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+#endif
+
+    line++;
 
     stack_trace_print_entries(line, STACK_TRACE_NUM_ROWS);
 
@@ -192,26 +209,23 @@ void stack_trace_draw(void) {
 
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }
-#else
-    // "STACK TRACE DISABLED"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "STACK TRACE DISABLED");
-#endif
 
     osWritebackDCacheAll();
 }
 
 void stack_trace_input(void) {
-#ifdef INCLUDE_DEBUG_MAP
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
         open_address_select(sFunctionStack[sStackTraceSelectedIndex].curAddr);
     }
 
+#ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
         // Toggle whether to display function names.
         sStackTraceShowFunctionNames ^= TRUE;
     }
+#endif
 
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
@@ -225,5 +239,6 @@ void stack_trace_input(void) {
             sStackTraceSelectedIndex++;
         }
     }
-#endif
+
+    sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
