@@ -10,8 +10,8 @@ struct MapEntry {
     /*0x04*/ size_t size;
     /*0x08*/ size_t name_offset;
     /*0x0C*/ u16 name_len;
-    /*0x0D*/ u8 pad;
-    /*0x0E*/ char type;
+    /*0x0D*/ uchar errc;
+    /*0x0E*/ uchar type;
 }; /*0x10*/
 
 typedef struct {

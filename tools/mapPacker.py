@@ -1,19 +1,20 @@
 import sys, struct, subprocess
 
 class MapEntry():
-	def __init__(self, addr, size, type, name):
+	def __init__(self, addr, size, type, name, errc):
 		self.addr = addr
 		self.size = size
+		self.errc = errc
 		self.type = type
 		self.name = name
 		self.strlen = (len(name) + 4) & (~3)
 	def __str__(self):
-		return "%s %d %s %hi %hi" % (self.addr, self.size, self.name, self.strlen, self.type)
+		return "%s %d %s %hi %c %c" % (self.addr, self.size, self.name, self.strlen, self.errc, self.type)
 	def __repr__(self):
-		return "%s %d %s %hi %hi" % (self.addr, self.size, self.name, self.strlen, self.type)
+		return "%s %d %s %hi %c %c" % (self.addr, self.size, self.name, self.strlen, self.errc, self.type)
 
 
-structDef = ">LLLHH"
+structDef = ">LLLHBB"
 
 symNames = []
 
@@ -27,12 +28,15 @@ for line in symbols:
 	tokens = line.split()
 	if len(tokens) >= 3 and len(tokens[-2]) == 1:
 		addr = int(tokens[0], 16)
+		errc = ord('\0')
 		if symNames:
 			prevEntry = symNames[-1]
 			if prevEntry.size == 0 and addr > prevEntry.addr:
 				newPrevSize = addr - prevEntry.addr
 				if newPrevSize < 0xFFFFF:
 					prevEntry.size = newPrevSize
+				else:
+					errc = ord('S')
 		if addr & 0x80000000:
 			name = tokens[-1]
 			type = ord(tokens[-2])
@@ -40,7 +44,7 @@ for line in symbols:
 				size = 0
 			else:
 				size = int(tokens[-3], 16)
-			symNames.append(MapEntry(addr, size, type, name))
+			symNames.append(MapEntry(addr, size, type, name, errc))
 
 
 f1 = open(sys.argv[2], "wb+") # addr
@@ -50,7 +54,7 @@ symNames.sort(key=lambda x: x.addr)
 
 off = 0
 for x in symNames:
-	f1.write(struct.pack(structDef, x.addr, x.size, off, len(x.name), x.type))
+	f1.write(struct.pack(structDef, x.addr, x.size, off, len(x.name), x.errc, x.type))
 	f2.write(struct.pack(">%ds" % x.strlen, bytes(x.name, encoding="ascii")))
 	off += x.strlen
 
