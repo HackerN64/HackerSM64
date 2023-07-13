@@ -178,6 +178,16 @@ u32 pressed_pause(void) {
     u32 dialogActive = get_dialog_id() >= 0;
     u32 intangible = (gMarioState->action & ACT_FLAG_INTANGIBLE) != 0;
 
+#ifdef PUPPYPRINT_DEBUG
+#ifdef BETTER_REVERB
+    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM || sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT || sPPDebugPage == PUPPYPRINT_PAGE_BETTER_REVERB) {
+#else
+    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM || sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT) {
+#endif
+        return FALSE;
+    }
+#endif
+
     if (!intangible && !dialogActive && !gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
         && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
         return TRUE;
@@ -397,7 +407,7 @@ void init_mario_after_warp(void) {
 
     if (gCurrDemoInput == NULL) {
 #ifdef BETTER_REVERB
-        gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+        gBetterReverbPresetValue = gCurrentArea->betterReverbPreset;
 #endif
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
 
@@ -428,9 +438,7 @@ void init_mario_after_warp(void) {
         }
 #endif
 #ifndef DISABLE_EXIT_COURSE
-       if (sWarpDest.levelNum == EXIT_COURSE_LEVEL && sWarpDest.areaIdx == EXIT_COURSE_AREA
-            && sWarpDest.nodeId == EXIT_COURSE_NODE
-        ) {
+       if (sWarpDest.arg == WARP_FLAG_EXIT_COURSE) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
         }
 #endif
@@ -511,7 +519,7 @@ void warp_credits(void) {
 
     if (gCurrCreditsEntry == NULL || gCurrCreditsEntry == sCreditsSequence) {
 #ifdef BETTER_REVERB
-        gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+        gBetterReverbPresetValue = gCurrentArea->betterReverbPreset;
 #endif
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
     }
@@ -607,6 +615,8 @@ s16 music_unchanged_through_warp(s16 arg) {
  */
 void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags) {
     if (destWarpNode >= WARP_NODE_CREDITS_MIN) {
+        sWarpDest.type = WARP_TYPE_CHANGE_LEVEL;
+    } else if (warpFlags == WARP_FLAG_EXIT_COURSE) {
         sWarpDest.type = WARP_TYPE_CHANGE_LEVEL;
     } else if (destLevel != gCurrLevelNum) {
         sWarpDest.type = WARP_TYPE_CHANGE_LEVEL;
@@ -1008,7 +1018,11 @@ s32 play_mode_normal(void) {
     check_instant_warp();
 
 #ifdef PUPPYPRINT_DEBUG
+#ifdef BETTER_REVERB
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB) {
+#else
     if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+#endif
         if (sTimerRunning && gHudDisplay.timer < 17999) {
             gHudDisplay.timer++;
         }
@@ -1026,7 +1040,11 @@ s32 play_mode_normal(void) {
 #endif
     if (gCurrentArea != NULL) {
 #ifdef PUPPYPRINT_DEBUG
-        if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+#ifdef BETTER_REVERB
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT && sPPDebugPage != PUPPYPRINT_PAGE_BETTER_REVERB) {
+#else
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+#endif
             update_camera(gCurrentArea->camera);
         }
 #else
@@ -1069,9 +1087,16 @@ s32 play_mode_paused(void) {
         if (gDebugLevelSelect) {
             fade_into_special_warp(WARP_SPECIAL_LEVEL_SELECT, 1);
         } else {
-            initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAGS_NONE);
+#ifdef DEATH_ON_EXIT_COURSE
+            raise_background_noise(1);
+            gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
+            set_play_mode(PLAY_MODE_NORMAL);
+            level_trigger_warp(gMarioState, WARP_OP_DEATH);
+#else
+            initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAG_EXIT_COURSE);
             fade_into_special_warp(WARP_SPECIAL_NONE, 0);
             gSavedCourseNum = COURSE_NONE;
+#endif
         }
 
         gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
@@ -1268,7 +1293,7 @@ s32 init_level(void) {
 
         if (gCurrDemoInput == NULL) {
 #ifdef BETTER_REVERB
-            gBetterReverbPreset = gCurrentArea->betterReverbPreset;
+            gBetterReverbPresetValue = gCurrentArea->betterReverbPreset;
 #endif
             set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
         }
@@ -1287,13 +1312,7 @@ s32 init_level(void) {
     puppylights_allocate();
 #endif
 
-#ifdef PUPPYPRINT_DEBUG
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-    append_puppyprint_log("Level loaded in %dc", (s32)(osGetTime() - first));
-#else
-    append_puppyprint_log("Level loaded in %dus", (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
-#endif
-#endif
+    append_puppyprint_log("Level loaded in %d" PP_CYCLE_STRING ".", (s32)(PP_CYCLE_CONV(osGetTime() - first)));
     return TRUE;
 }
 
