@@ -40,7 +40,7 @@ static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
 // 3  - darken by 7/8
 // 4  - darken by 15/16
 // 5+ - darken to black
-void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken) {
+void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken) {
     if (darken == CS_DARKEN_NONE) {
         return;
     }
@@ -53,8 +53,8 @@ void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darke
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = 0; x < w; x++) {
+    for (s32 y = 0; y < h; y++) {
+        for (s32 x = 0; x < w; x++) {
             *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
             dst++;
         }
@@ -64,7 +64,7 @@ void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darke
 }
 
 // Draws a rectangle.
-void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) {
+void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -73,8 +73,8 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = 0; x < w; x++) {
+    for (s32 y = 0; y < h; y++) {
+        for (s32 x = 0; x < w; x++) {
             apply_color(dst, newColor, alpha);
             dst++;
         }
@@ -83,8 +83,8 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
     }
 }
 
-// Draws a triangle pointing upwards or downwards. Flip: FALSE = point up, TRUE = point down.
-void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip) {
+// Draws a triangle pointing upwards or downwards depending on the sign of 'h'.
+void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -92,16 +92,21 @@ void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, R
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (w / 2.0f);
     f32 d = 0.0f;
-    f32 t = (middle / (f32)h);
+    f32 t;
+    _Bool flip = (h < 0);
     if (flip) {
+        h = -h;
+        t = (middle / (f32)h);
         d = (middle - t);
         t = -t;
+    } else {
+        t = (middle / (f32)h);
     }
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = 0; x < w; x++) {
+    for (s32 y = 0; y < h; y++) {
+        for (s32 x = 0; x < w; x++) {
             if (absf(middle - x) < d) {
                 apply_color(dst, newColor, alpha);
             }
@@ -114,28 +119,33 @@ void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, R
 }
 
 // Draws a triangle pointing left or right.
-void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip) {
+void crash_screen_draw_horizontal_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
     }
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (h / 2.0f);
+    _Bool flip = FALSE;
+    if (w < 0) {
+        w = -w;
+        flip = TRUE;
+    }
     const f32 t = ((f32)w / middle);
     f32 x1 = w;
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
     RGBA16* start = dst;
 
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = x1; x < w; x++) {
+    for (s32 y = 0; y < h; y++) {
+        for (s32 x = x1; x < w; x++) {
             apply_color(dst, newColor, alpha);
             dst++;
         }
         x1 -= (y < middle) ? t : -t;
-        dst = start + (SCREEN_WIDTH * y);
+        dst = (start + (SCREEN_WIDTH * y));
         if (flip) {
-            dst += (u32)x1;
+            dst += (s32)x1;
         }
     }
 }

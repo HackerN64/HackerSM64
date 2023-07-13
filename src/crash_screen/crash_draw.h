@@ -9,7 +9,7 @@
 // Crash screen font image properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
-#define CRASH_SCREEN_FONT_CHARS_PER_ROW (32 / CRASH_SCREEN_FONT_CHAR_WIDTH) // 32 bits per row.
+#define CRASH_SCREEN_FONT_CHARS_PER_ROW (SIZEOF_BITS(CSFontRow) / CRASH_SCREEN_FONT_CHAR_WIDTH) // 32 bits per row.
 #define CRASH_SCREEN_FONT_NUM_ROWS      ((255 / CRASH_SCREEN_FONT_CHARS_PER_ROW) + 1) // Round up.
 
 // Spacing between chars.
@@ -82,10 +82,10 @@ extern _Bool gCSDrawCrashScreen;
 extern _Bool gCSDrawSavedScreenshot;
 
 
-void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken);
-void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color);
-void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip);
-void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, _Bool flip);
+void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
+void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void crash_screen_draw_horizontal_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
 void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
 void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
 void crash_screen_take_screenshot(RGBA16* dst);

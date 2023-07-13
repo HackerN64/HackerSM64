@@ -22,36 +22,33 @@ void draw_address_select(void) {
     // "GO TO:"
     crash_screen_print((SCREEN_CENTER_X - (TEXT_WIDTH(STRLEN("GO TO")) / 2)), JUMP_MENU_Y1, "GO TO:");
 
-    u32 triangleStartX = ((SCREEN_CENTER_X - TEXT_WIDTH(4)) + (sAddressSelectCharIndex * TEXT_WIDTH(1)) - 1);
-    u32 triangleStartY = ((JUMP_MENU_Y1 + TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
-
-    // Up arrow:
-    crash_screen_draw_vertical_triangle(
-        triangleStartX, triangleStartY,
-        TEXT_WIDTH(1), TEXT_WIDTH(1),
-        COLOR_RGBA32_CRASH_SELECT_ARROWS,
-        FALSE
-    );
-    triangleStartY = ((JUMP_MENU_Y1 + TEXT_HEIGHT(3)) - CRASH_SCREEN_CHAR_SPACING_Y + 1);
-    // Down arrow:
-    crash_screen_draw_vertical_triangle(
-        triangleStartX, triangleStartY,
-        TEXT_WIDTH(1), TEXT_WIDTH(1),
-        COLOR_RGBA32_CRASH_SELECT_ARROWS,
-        TRUE
-    );
-
     Address addr = sAddressSelectTarget;
     Word data = 0;
     _Bool isValid = read_data(&data, addr);
 
-    u32 addressStartX = (SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2));
+    u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
     u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
-    // "0x[XXXXXXXX]"
+    // "[XXXXXXXX]"
     crash_screen_print(
         addressStartX, addressStartY,
-        (STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_WORD),
+        (STR_COLOR_PREFIX STR_HEX_WORD),
         (isValid ? COLOR_RGBA32_LIGHT_GREEN : COLOR_RGBA32_LIGHT_RED), addr
+    );
+
+    u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
+    u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
+    // Up arrow:
+    crash_screen_draw_vertical_triangle(
+        triangleStartX, triangleStartY,
+        TEXT_WIDTH(1), TEXT_WIDTH(1),
+        COLOR_RGBA32_CRASH_SELECT_ARROWS
+    );
+    triangleStartY += ((TEXT_WIDTH(1) + TEXT_HEIGHT(1)) - 1);
+    // Down arrow:
+    crash_screen_draw_vertical_triangle(
+        triangleStartX, triangleStartY,
+        TEXT_WIDTH(1), -TEXT_WIDTH(1),
+        COLOR_RGBA32_CRASH_SELECT_ARROWS
     );
 
 #ifdef INCLUDE_DEBUG_MAP

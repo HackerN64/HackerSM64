@@ -241,6 +241,7 @@ _Bool read_data(Word* dest, Address addr) {
         return FALSE;
     }
 
+    // Reading from this will automatically set it and will essentially block SP DMA:
     if (physAddr == SP_SEMAPHORE_REG) {
         return FALSE;
     }
