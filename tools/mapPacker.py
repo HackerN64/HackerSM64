@@ -1,68 +1,46 @@
 import sys, struct, subprocess
 
 class MapEntry():
-	def __init__(self, name, size, addr):
-		self.name = name
-		self.size = size
+	def __init__(self, addr, size, type, name):
 		self.addr = addr
+		self.size = size
+		self.type = type
+		self.name = name
 		self.strlen = (len(name) + 4) & (~3)
 	def __str__(self):
-		return "%s %d %s %d" % (self.addr, self.size, self.name, self.strlen)
+		return "%s %d %s %hi %hi" % (self.addr, self.size, self.name, self.strlen, self.type)
 	def __repr__(self):
-		return "%s %d %s %d" % (self.addr, self.size, self.name, self.strlen)
+		return "%s %d %s %hi %hi" % (self.addr, self.size, self.name, self.strlen, self.type)
 
 
-structDef = ">LLLL"
+structDef = ">LLLHH"
 
 symNames = []
 
-proc = subprocess.Popen(["nm", "-S", sys.argv[1]], stdout=subprocess.PIPE)
+proc = subprocess.Popen(["nm", "-S", "-v", sys.argv[1]], stdout=subprocess.PIPE)
 
 symbols = proc.communicate()[0].decode('ascii').split("\n")
 for line in symbols:
 	# format:
 	# 80153210 000000f8 T global_sym
-	# 80153210 t static_sym
+	# 80153210 T static_sym
 	tokens = line.split()
 	if len(tokens) >= 3 and len(tokens[-2]) == 1:
 		addr = int(tokens[0], 16)
-		if addr & 0x80000000 and tokens[-2].lower() == "t":
-			symNames.append(MapEntry(tokens[-1], int(tokens[-3], 16), addr))
-
-# def remove_prefix(text, prefix):
-#     return text[text.startswith(prefix) and len(prefix):]
-
-# with open(sys.argv[1]) as f: # sm64_prelim.map
-# 	for line in f:
-# 		if "0x000000008" in line and "=" not in line and "*" not in line and "load address" not in line:
-# 			if ".o" in line:
-# 				if "build/" in line or "lib/" in line:
-# 					# object file line:
-# 					tokens = line.split()
-# 					if ".bss" in line or ".text" in line or ".data" in line or ".rodata" in line:
-# 						filestartaddr = int(tokens[1], 16)
-# 						filesize = int(remove_prefix(tokens[2], "0x"), 16)
-# 					else:
-# 						filestartaddr = int(tokens[0], 16)
-# 						filesize = int(remove_prefix(tokens[1], "0x"), 16)
-# 			if "." not in line:
-# 				# address entry line:
-# 				tokens = line.split()
-# 				addr = int(tokens[0], 16)
-# 				# position of current entry in the current file
-# 				offsetinfile = (addr - filestartaddr)
-# 				# the size between here and the end of the file
-# 				size = (filesize - offsetinfile)
-# 				# if we're past the first entry:
-# 				if symNames:
-# 					prevEntry = symNames[-1]
-# 					prevAddr = prevEntry.addr
-# 					# if the previous entry is in the same file...
-# 					if (prevAddr >= filestartaddr):
-# 						# modify its size so it doesn't overlap the current entry.
-# 						prevEntry.size = (addr - prevAddr)
-# 				name = tokens[1]
-# 				prevEntry = symNames.append(MapEntry(name, size, addr))
+		if symNames:
+			prevEntry = symNames[-1]
+			if prevEntry.size == 0 and addr > prevEntry.addr:
+				newPrevSize = addr - prevEntry.addr
+				if newPrevSize < 0xFFFFF:
+					prevEntry.size = newPrevSize
+		if addr & 0x80000000:
+			name = tokens[-1]
+			type = ord(tokens[-2])
+			if len(tokens) < 4:
+				size = 0
+			else:
+				size = int(tokens[-3], 16)
+			symNames.append(MapEntry(addr, size, type, name))
 
 
 f1 = open(sys.argv[2], "wb+") # addr
@@ -72,7 +50,7 @@ symNames.sort(key=lambda x: x.addr)
 
 off = 0
 for x in symNames:
-	f1.write(struct.pack(structDef, x.addr, x.size, off, len(x.name)))
+	f1.write(struct.pack(structDef, x.addr, x.size, off, len(x.name), x.type))
 	f2.write(struct.pack(">%ds" % x.strlen, bytes(x.name, encoding="ascii")))
 	off += x.strlen
 

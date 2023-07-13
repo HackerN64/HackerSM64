@@ -60,6 +60,7 @@ void map_data_init(void) {
 }
 
 // Check whether the address is in a .text segment.
+//! TODO: Only use entry_is_text.
 _Bool is_in_code_segment(Address addr) {
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
         if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
@@ -68,6 +69,11 @@ _Bool is_in_code_segment(Address addr) {
     }
 
     return FALSE;
+}
+
+// Check whether a map entry is marked as .text.
+_Bool entry_is_text(const struct MapEntry* entry) {
+    return (entry->type == 'T' || entry->type == 't');
 }
 
 const char* get_map_entry_name(const struct MapEntry* entry) {

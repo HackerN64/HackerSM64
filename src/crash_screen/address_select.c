@@ -115,8 +115,10 @@ void crash_screen_select_address(void) {
             case PAGE_MAP_VIEWER:;
                 s32 targetIndex = get_map_entry_index(sAddressSelectTarget);
                 if (targetIndex != -1) {
-                    if (is_in_code_segment(gMapEntries[targetIndex].addr)) {
+                    if (entry_is_text(&gMapEntries[targetIndex])) {
                         gCSPageID = PAGE_DISASM;
+                    } else {
+                        gCSPageID = PAGE_RAM_VIEWER;
                     }
                     sMapViewerSelectedIndex = targetIndex;
                 }

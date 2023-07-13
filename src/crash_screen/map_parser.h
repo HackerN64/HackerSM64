@@ -9,7 +9,9 @@ struct MapEntry {
     /*0x00*/ Address addr;
     /*0x04*/ size_t size;
     /*0x08*/ size_t name_offset;
-    /*0x0C*/ size_t name_len;
+    /*0x0C*/ u16 name_len;
+    /*0x0D*/ u8 pad;
+    /*0x0E*/ char type;
 }; /*0x10*/
 
 typedef struct {
@@ -102,6 +104,7 @@ extern size_t gNumMapEntries;
 
 void map_data_init(void);
 _Bool is_in_code_segment(Address addr);
+_Bool entry_is_text(const struct MapEntry* entry);
 const char* get_map_entry_name(const struct MapEntry* entry);
 s32 get_map_entry_index(Address addr);
 const char* parse_map(Address* addr);

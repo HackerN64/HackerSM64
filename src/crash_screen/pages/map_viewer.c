@@ -56,8 +56,16 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         // "[name from map data]"
         crash_screen_print_map_name(TEXT_X(addrStrSize), y,
             (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + sizeStrSize + 1)),
-            (is_in_code_segment(entry->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), get_map_entry_name(entry)
+            (entry_is_text(entry) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), get_map_entry_name(entry)
         );
+
+        // "[type]"
+        //! TODO: Format this better
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (sizeStrSize + 1)), y,
+            (STR_COLOR_PREFIX "%c"),
+            COLOR_RGBA32_CRASH_DISASM_REG, entry->type
+        );
+
         // "[size]"
         crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), y,
             (STR_COLOR_PREFIX "%-X"),
