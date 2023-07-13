@@ -24,7 +24,7 @@ void draw_address_select(void) {
 
     Address addr = sAddressSelectTarget;
     Word data = 0;
-    _Bool isValid = read_data(&data, addr);
+    _Bool isValid = try_read_data(&data, addr);
 
     u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
     u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));

@@ -69,7 +69,7 @@ void crash_screen_print_registers(__OSThreadContext* tc) {
     crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(3), "VA", tc->badvaddr);
 
     Word data = 0;
-    if (read_data(&data, tc->pc)) {
+    if (try_read_data(&data, tc->pc)) {
         crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", data); // The raw data of the asm code that crashed.
     }
 

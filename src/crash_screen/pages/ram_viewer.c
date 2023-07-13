@@ -79,7 +79,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
             }
 
             Byte byte = 0;
-            if (read_unaligned_byte(&byte, currAddr)) {
+            if (try_read_byte(&byte, currAddr)) {
                 print_byte(charX, charY, byte, textColor);
             } else {
                 crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_RED);

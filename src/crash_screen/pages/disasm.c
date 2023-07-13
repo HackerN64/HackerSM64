@@ -236,7 +236,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         }
 
         Word data = 0;
-        if (!read_data(&data, addr)) {
+        if (!try_read_data(&data, addr)) {
             crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_RED);
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, data);

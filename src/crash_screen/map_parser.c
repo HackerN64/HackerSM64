@@ -102,7 +102,7 @@ const char* parse_map(Address* addr) {
     *addr = ALIGNFLOOR(*addr, sizeof(Word));
 
     Word data = 0;
-    if (!read_data(&data, *addr)) {
+    if (!try_read_data(&data, *addr)) {
         return NULL;
     }
 
