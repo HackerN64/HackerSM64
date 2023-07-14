@@ -1,6 +1,6 @@
 import sys, struct, subprocess
 
-class MapEntry():
+class MapSymbol():
 	def __init__(self, addr, size, type, name, errc):
 		self.addr = addr
 		self.size = size
@@ -24,7 +24,7 @@ symbols = proc.communicate()[0].decode('ascii').split("\n")
 for line in symbols:
 	# format:
 	# 80153210 000000f8 T global_sym
-	# 80153210 T static_sym
+	# 80153210 t static_sym
 	tokens = line.split()
 	if len(tokens) >= 3 and len(tokens[-2]) == 1:
 		addr = int(tokens[0], 16)
@@ -32,9 +32,9 @@ for line in symbols:
 		if symNames:
 			prevEntry = symNames[-1]
 			if prevEntry.size == 0 and addr > prevEntry.addr:
-				newPrevSize = addr - prevEntry.addr
-				if newPrevSize < 0xFFFFF:
-					prevEntry.size = newPrevSize
+				sizeToLastEntry = addr - prevEntry.addr
+				if sizeToLastEntry < 0xFFFFF:
+					prevEntry.size = sizeToLastEntry
 				else:
 					errc = ord('S')
 		if addr & 0x80000000:
@@ -44,7 +44,7 @@ for line in symbols:
 				size = 0
 			else:
 				size = int(tokens[-3], 16)
-			symNames.append(MapEntry(addr, size, type, name, errc))
+			symNames.append(MapSymbol(addr, size, type, name, errc))
 
 
 f1 = open(sys.argv[2], "wb+") # addr

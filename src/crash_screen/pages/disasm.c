@@ -54,6 +54,7 @@ void disasm_init(void) {
 
 //! TODO: Optimize this as much as possible
 //! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?)
+// @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {
         return FALSE;
@@ -87,14 +88,15 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
             return FALSE;
         }
 
-        // Left the function.
-        Address checkAddr = sBranchBufferCurrAddr;
-        if (!is_in_code_segment(checkAddr)) {
-            return FALSE;
-        }
-        parse_map(&checkAddr);
-        if (funcAddr != checkAddr) {
-            return FALSE;
+        // Check if we have left the function.
+        const struct MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_FORWARD);
+        if (symbol != NULL) {
+            if (!map_symbol_is_text(symbol)) {
+                return FALSE;
+            }
+            if (funcAddr != symbol->addr) {
+                return FALSE;
+            }
         }
 
         // Get the offset for the current function;
@@ -194,7 +196,7 @@ static void print_as_insn(const u32 charX, const u32 charY, const Word data) {
 #ifdef INCLUDE_DEBUG_MAP
     if (sDisasmShowDestFunctionNames && destFname != NULL) {
         // "[function name]"
-        crash_screen_print_map_name((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
+        crash_screen_print_symbol_name_impl((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
         );
@@ -273,14 +275,11 @@ void disasm_draw(void) {
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    Address funcAddr = alignedSelectedAddr;
-    const char* fname = parse_map(&funcAddr);
-
-    size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-    crash_screen_print_map_name(TEXT_X(charX), TEXT_Y(line),
-        (CRASH_SCREEN_NUM_CHARS_X - charX),
-        (is_in_code_segment(alignedSelectedAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
-    );
+    const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
+        crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+    }
 
     line++;
 
@@ -363,21 +362,29 @@ void disasm_input(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     //! TODO: don't reset branch buffer if switched page back into the same function.
-    if (gCSSwitchedPage || (get_map_entry_index(oldPos) != get_map_entry_index(gSelectedAddress))) {
+    if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
         gFillBranchBuffer = TRUE;
     }
 
-    Address funcAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
-    const char* fname = parse_map(&funcAddr);
+    Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
-    if (gFillBranchBuffer) {
+    const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
+    if (symbol != NULL) {
+        const char* fname = get_map_symbol_name(symbol);
+
+        if (gFillBranchBuffer) {
+            gFillBranchBuffer = FALSE;
+            reset_branch_buffer(symbol->addr);
+            sContinueFillBranchBuffer = TRUE;
+        }
+
+        if (sContinueFillBranchBuffer) {
+            sContinueFillBranchBuffer = disasm_fill_branch_buffer(fname, symbol->addr);
+        }
+    } else {
         gFillBranchBuffer = FALSE;
-        reset_branch_buffer(funcAddr);
-        sContinueFillBranchBuffer = TRUE;
-    }
-
-    if (sContinueFillBranchBuffer) {
-        sContinueFillBranchBuffer = disasm_fill_branch_buffer(fname, funcAddr);
+        reset_branch_buffer(alignedSelectedAddress);
+        sContinueFillBranchBuffer = FALSE;
     }
 #endif
 }

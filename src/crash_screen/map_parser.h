@@ -5,7 +5,12 @@
 #include "types.h"
 
 
-struct MapEntry {
+enum SymbolSearchDirections {
+    SYMBOL_SEARCH_FORWARD,
+    SYMBOL_SEARCH_BACKWARD,
+};
+
+struct MapSymbol {
     /*0x00*/ Address addr;
     /*0x04*/ size_t size;
     /*0x08*/ size_t name_offset;
@@ -91,20 +96,21 @@ EXTERN_GROUP_TEXT(common1)
     TEXT_REGION(name##geo)
 
 
-extern const struct MapEntry gMapEntries[];
-extern const struct MapEntry gMapEntryEnd[];
+extern const struct MapSymbol gMapSymbols[];
+extern const struct MapSymbol gMapSymbolsEnd[];
 extern const Byte gMapStrings[];
 extern const Byte gMapStringEnd[];
 extern const Byte _mapDataSegmentRomStart[];
 extern const Byte _mapDataSegmentRomEnd[];
 
 
-extern size_t gNumMapEntries;
+extern size_t gNumMapSymbols;
 
 
 void map_data_init(void);
 _Bool is_in_code_segment(Address addr);
-_Bool entry_is_text(const struct MapEntry* entry);
-const char* get_map_entry_name(const struct MapEntry* entry);
-s32 get_map_entry_index(Address addr);
-const char* parse_map(Address* addr);
+_Bool map_symbol_is_text(const struct MapSymbol* symbol);
+const char* get_map_symbol_name(const struct MapSymbol* symbol);
+s32 get_symbol_index_from_addr_forward(Address addr);
+s32 get_symbol_index_from_addr_backward(Address addr);
+const struct MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection);

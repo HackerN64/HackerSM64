@@ -4,8 +4,7 @@
 #include "map_parser.h"
 
 
-//! TODO: replace this functionality with nm -S mappings
-
+//! TODO: Use new map symbol data to get this info
 
 ALIGNED8 static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
@@ -47,11 +46,11 @@ TEXT_REGION_GROUP(common1)
 };
 
 
-size_t gNumMapEntries = 0;
+size_t gNumMapSymbols = 0;
 
 
 void map_data_init(void) {
-    gNumMapEntries = (gMapEntryEnd - gMapEntries);
+    gNumMapSymbols = (gMapSymbolsEnd - gMapSymbols);
 
     Address start = (Address)_mapDataSegmentRomStart;
     Address end   = (Address)_mapDataSegmentRomEnd;
@@ -60,7 +59,6 @@ void map_data_init(void) {
 }
 
 // Check whether the address is in a .text segment.
-//! TODO: Only use entry_is_text.
 _Bool is_in_code_segment(Address addr) {
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
         if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
@@ -71,47 +69,71 @@ _Bool is_in_code_segment(Address addr) {
     return FALSE;
 }
 
-// Check whether a map entry is marked as .text.
-_Bool entry_is_text(const struct MapEntry* entry) {
-    return (entry->type == 'T' || entry->type == 't');
+// Check whether a map symbol is marked as .text.
+_Bool map_symbol_is_text(const struct MapSymbol* symbol) {
+    if (symbol == NULL) {
+        return FALSE;
+    }
+
+    return (symbol->type == 'T' || symbol->type == 't');
 }
 
-const char* get_map_entry_name(const struct MapEntry* entry) {
-    return (const char*)((u32)gMapStrings + entry->name_offset);
+const char* get_map_symbol_name(const struct MapSymbol* symbol) {
+    if (symbol == NULL) {
+        return NULL;
+    }
+
+    return (const char*)((u32)gMapStrings + symbol->name_offset);
 }
 
-s32 get_map_entry_index(Address addr) {
-    const struct MapEntry* entry = &gMapEntries[0];
+s32 get_symbol_index_from_addr_forward(Address addr) {
+    const struct MapSymbol* symbol = &gMapSymbols[0];
 
-    for (size_t i = 0; i < gNumMapEntries; i++) {
-        if ((addr >= entry->addr) && (addr < (entry->addr + entry->size))) {
+    for (size_t i = 0; i < gNumMapSymbols; i++) {
+        if ((addr >= symbol->addr) && (addr < (symbol->addr + symbol->size))) {
             return i;
         }
 
-        entry++;
+        symbol++;
+    }
+
+    return -1;
+}
+
+s32 get_symbol_index_from_addr_backward(Address addr) {
+    const struct MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
+
+    for (size_t i = gNumMapSymbols; i-- > 0;) {
+        if ((addr >= symbol->addr) && (addr < (symbol->addr + symbol->size))) {
+            return i;
+        }
+
+        symbol--;
     }
 
     return -1;
 }
 
 // Changes 'addr' to the starting address of the function it's in and returns a pointer to the function name.
-const char* parse_map(Address* addr) {
+const struct MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
 #endif
-    *addr = ALIGNFLOOR(*addr, sizeof(Word));
+    addr = ALIGNFLOOR(addr, sizeof(Word));
 
     Word data = 0;
-    if (!try_read_data(&data, *addr)) {
+    if (!try_read_data(&data, addr)) {
         return NULL;
     }
 
-    s32 index = get_map_entry_index(*addr);
+    s32 index = -1;
+    switch (searchDirection) {
+        case SYMBOL_SEARCH_FORWARD:  index = get_symbol_index_from_addr_forward(addr);  break;
+        case SYMBOL_SEARCH_BACKWARD: index = get_symbol_index_from_addr_backward(addr); break;
+    }
 
     if (index != -1) {
-        const struct MapEntry* entry = &gMapEntries[index];
-        *addr = entry->addr;
-        return get_map_entry_name(entry);
+        return &gMapSymbols[index];
     }
 
     return NULL;

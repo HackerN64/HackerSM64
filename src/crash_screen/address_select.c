@@ -53,11 +53,11 @@ void draw_address_select(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (isValid) {
-        const char* fname = parse_map(&addr);
-        // "[mapped data name]"
-        crash_screen_print_map_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X,
-            (is_in_code_segment(addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), fname
-        );
+        const struct MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            // "[mapped data name]"
+            crash_screen_print_symbol_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, symbol);
+        }
     }
 #endif
 
@@ -110,12 +110,15 @@ void crash_screen_select_address(void) {
         switch (gCSPageID) {
 #ifdef INCLUDE_DEBUG_MAP
             case PAGE_MAP_VIEWER:;
-                s32 targetIndex = get_map_entry_index(sAddressSelectTarget);
+                s32 targetIndex = get_symbol_index_from_addr_backward(sAddressSelectTarget);
                 if (targetIndex != -1) {
-                    if (entry_is_text(&gMapEntries[targetIndex])) {
-                        gCSPageID = PAGE_DISASM;
-                    } else {
-                        gCSPageID = PAGE_RAM_VIEWER;
+                    if (sMapViewerSelectedIndex == (u32)targetIndex) {
+                        if (is_in_code_segment(gMapSymbols[targetIndex].addr)) {
+                            gCSPageID = PAGE_DISASM;
+                        } else {
+                            gCSPageID = PAGE_RAM_VIEWER;
+                        }
+                        gCSSwitchedPage = TRUE;
                     }
                     sMapViewerSelectedIndex = targetIndex;
                 }
@@ -126,7 +129,7 @@ void crash_screen_select_address(void) {
                 break;
 #ifdef INCLUDE_DEBUG_MAP
             case PAGE_DISASM:
-                if (get_map_entry_index(gSelectedAddress) != get_map_entry_index(sAddressSelectTarget)) {
+                if (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget)) {
                     gFillBranchBuffer = TRUE;
                 }
                 break;

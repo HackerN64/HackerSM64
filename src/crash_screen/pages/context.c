@@ -181,17 +181,13 @@ void crash_context_draw(void) {
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
-    Address pc = tc->pc;
-    const char* fname = parse_map(&pc);
+    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     // "CRASH IN:"
     size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"CRASH IN: ",
         COLOR_RGBA32_CRASH_AT
     );
-    crash_screen_print_map_name(TEXT_X(charX), TEXT_Y(line),
-        (CRASH_SCREEN_NUM_CHARS_X - charX),
-        COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-    );
+    crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
 #endif
 
     crash_screen_print_registers(tc);

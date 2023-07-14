@@ -53,7 +53,10 @@ void fill_function_stack_trace(void) {
         if (is_in_code_segment(currInfo.curAddr)) {
             currInfo.faddr = currInfo.curAddr;
 #ifdef INCLUDE_DEBUG_MAP
-            currInfo.fname = parse_map(&currInfo.faddr);
+            const struct MapSymbol* symbol = get_map_symbol(currInfo.faddr, SYMBOL_SEARCH_BACKWARD);
+            currInfo.faddr = symbol->addr;
+            currInfo.fname = get_map_symbol_name(symbol);
+
             if (currInfo.fname != NULL)
 #endif
             {
@@ -84,13 +87,12 @@ void stack_trace_init(void) {
 
     // Include the current function at the top:
     __OSThreadContext* tc = &gCrashedThread->context;
-    Address pc = tc->pc;
-    const char* fname = parse_map(&pc);
+    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     struct FunctionInStack currFunc = {
         .stackAddr = 0,
         .curAddr   = tc->pc,
-        .faddr     = pc,
-        .fname     = fname,
+        .faddr     = symbol->addr,
+        .fname     = get_map_symbol_name(symbol),
     };
     sFunctionStack[sNumFoundFunctions++] = currFunc;
 
@@ -144,7 +146,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             if (sStackTraceShowFunctionNames) {
                 // "[function name]"
                 const size_t offsetStrSize = STRLEN("+0000");
-                crash_screen_print_map_name(TEXT_X(addrStrSize), y,
+                crash_screen_print_symbol_name_impl(TEXT_X(addrStrSize), y,
                     (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + offsetStrSize)),
                     nameColor, function->fname
                 );

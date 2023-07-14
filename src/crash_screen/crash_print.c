@@ -256,7 +256,7 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     return numChars;
 }
 
-void crash_screen_print_map_name(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
+void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
     if (fname == NULL) {
         // "UNKNOWN"
         crash_screen_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
@@ -267,4 +267,10 @@ void crash_screen_print_map_name(u32 x, u32 y, u32 maxWidth, RGBA32 color, const
             color, fname
         );
     }
+}
+
+void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol) {
+    crash_screen_print_symbol_name_impl(x, y, maxWidth,
+        ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), get_map_symbol_name(symbol)
+    );
 }

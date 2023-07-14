@@ -22,21 +22,22 @@ const enum ControlTypes mapViewerContList[] = {
 
 
 void map_viewer_init(void) {
-    sMapViewerSelectedIndex = 0;
-    sMapViewerViewportIndex = 0;
+    s32 newIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
+    sMapViewerSelectedIndex = (newIndex != -1) ? newIndex : 0;
+    sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
 
 void map_viewer_print_entries(u32 line, u32 numLines) {
     u32 currIndex = sMapViewerViewportIndex;
-    const struct MapEntry* entry = &gMapEntries[currIndex];
+    const struct MapSymbol* symbol = &gMapSymbols[currIndex];
 
     // Print
     for (u32 i = 0; i < numLines; i++) {
-        if (currIndex >= gNumMapEntries) {
+        if (currIndex >= gNumMapSymbols) {
             break;
         }
 
-        if (entry == NULL) {
+        if (symbol == NULL) {
             break;
         }
 
@@ -52,37 +53,34 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 
         const size_t sizeStrSize = STRLEN("00000");
         // "[stack address]:"
-        const size_t addrStrSize = crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", entry->addr);
+        const size_t addrStrSize = crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", symbol->addr);
         // "[name from map data]"
-        crash_screen_print_map_name(TEXT_X(addrStrSize), y,
-            (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + sizeStrSize + 1)),
-            (entry_is_text(entry) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), get_map_entry_name(entry)
-        );
+        crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + sizeStrSize + 1 + 1)), symbol);
 
         // "[type]"
         //! TODO: Format this better
-        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (sizeStrSize + 1)), y,
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - 1), y,
             (STR_COLOR_PREFIX"%c"),
-            COLOR_RGBA32_CRASH_DISASM_REG, entry->type
+            COLOR_RGBA32_GRAY, symbol->type
         );
 
-        if (entry->errc == 'S') {
+        if (symbol->errc == 'S') {
             // Size too large
             // "?"
-            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), y,
+            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (sizeStrSize + 1 + 1)), y,
                 (STR_COLOR_PREFIX"%c"),
                 COLOR_RGBA32_CRASH_UNKNOWN, '?'
             );
         } else {
             // "[size]"
-            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), y,
+            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (sizeStrSize + 1 + 1)), y,
                 (STR_COLOR_PREFIX"%-X"),
-                COLOR_RGBA32_CRASH_FUNCTION_NAME_2, entry->size
+                COLOR_RGBA32_CRASH_FUNCTION_NAME_2, symbol->size
             );
         }
 
         currIndex++;
-        entry++;
+        symbol++;
     }
 
     osWritebackDCacheAll();
@@ -91,7 +89,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 void map_viewer_draw(void) {
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("SIZE")), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (STRLEN("SIZE:") + 1 + 1)), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
 
     line++;
 
@@ -101,8 +99,8 @@ void map_viewer_draw(void) {
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar
-    if (gNumMapEntries > MAP_VIEWER_NUM_ROWS) {
-        crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapEntries, sMapViewerViewportIndex, COLOR_RGBA32_LIGHT_GRAY, TRUE);
+    if (gNumMapSymbols > MAP_VIEWER_NUM_ROWS) {
+        crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_LIGHT_GRAY, TRUE);
 
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }
@@ -114,7 +112,7 @@ void map_viewer_input(void) {
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
-        open_address_select(gMapEntries[sMapViewerSelectedIndex].addr);
+        open_address_select(gMapSymbols[sMapViewerSelectedIndex].addr);
     }
 
     if (gCSDirectionFlags.pressed.up) {
@@ -125,7 +123,7 @@ void map_viewer_input(void) {
     }
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        if (sMapViewerSelectedIndex < (gNumMapEntries - 1)) {
+        if (sMapViewerSelectedIndex < (gNumMapSymbols - 1)) {
             sMapViewerSelectedIndex++;
         }
     }

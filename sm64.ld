@@ -163,8 +163,8 @@ SECTIONS
 #if defined(INCLUDE_DEBUG_MAP) && defined(PRELIMINARY)
    _mapDataSegmentRomStart = 0;
    _mapDataSegmentRomEnd   = 0;
-   gMapEntries    = 0;
-   gMapEntryEnd   = 0;
+   gMapSymbols    = 0;
+   gMapSymbolsEnd = 0;
    gMapStrings    = 0;
    gMapStringsEnd = 0;
 #endif
