@@ -2,7 +2,7 @@
 #include <string.h>
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen/crash_screen.h"
+#include "crash_screen/crash_main.h"
 #include "map_viewer.h"
 #include "game/game_input.h"
 

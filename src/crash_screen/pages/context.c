@@ -1,7 +1,7 @@
 #include <ultra64.h>
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen/crash_screen.h"
+#include "crash_screen/crash_main.h"
 #include "context.h"
 
 

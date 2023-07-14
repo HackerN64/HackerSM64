@@ -34,7 +34,7 @@ enum CrashScreenPages {
     PAGE_STACK_TRACE,
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
-
+    // PAGE_SETTINGS,
     NUM_PAGES,
     MAX_PAGES = 255U,
 };

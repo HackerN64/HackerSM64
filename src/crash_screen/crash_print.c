@@ -4,7 +4,7 @@
 #include <string.h>
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 #include "crash_print.h"
 #include "game/printf.h"
 

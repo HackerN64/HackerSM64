@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 #include "crash_draw.h"
 #include "crash_print.h"
 #include "buffers/framebuffers.h"

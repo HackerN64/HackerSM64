@@ -5,7 +5,7 @@
 #include "macros.h"
 #include "farcall.h"
 #include "color_presets.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 #include "insn_disasm.h"
 #include "engine/math_util.h"
 

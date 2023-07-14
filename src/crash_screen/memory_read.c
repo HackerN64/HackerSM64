@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "segments.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 #include "memory_read.h"
 
 

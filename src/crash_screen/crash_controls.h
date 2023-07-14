@@ -3,7 +3,7 @@
 #include <ultra64.h>
 
 #include "types.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 
 
 typedef union {

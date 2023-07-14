@@ -12,7 +12,7 @@
 #include "game/sound_init.h"
 #include "buffers/buffers.h"
 #include "segments.h"
-#include "crash_screen/crash_screen.h"
+#include "crash_screen/crash_main.h"
 #include "game/main.h"
 #include "game/rumble_init.h"
 #include "game/version.h"

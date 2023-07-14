@@ -1,7 +1,7 @@
 #include <ultra64.h>
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 #include "game/game_input.h"
 #include "crash_controls.h"
 #include "pages/stack_trace.h"

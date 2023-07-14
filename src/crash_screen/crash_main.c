@@ -4,7 +4,7 @@
 #include <string.h>
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen.h"
+#include "crash_main.h"
 #include "crash_controls.h"
 #include "insn_disasm.h"
 #include "map_parser.h"
