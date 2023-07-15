@@ -285,7 +285,6 @@ void bhv_menu_button_shrinking_to_main_menu(struct Object *button) {
     if (button->oMenuButtonTimer == 16) {
         button->oParentRelativePosX = button->oMenuButtonOrigPosX;
         button->oParentRelativePosY = button->oMenuButtonOrigPosY;
-        button->oParentRelativePosZ = button->oMenuButtonOrigPosZ;
         button->oMenuButtonState = MENU_BUTTON_STATE_DEFAULT;
         button->oMenuButtonTimer = 0;
     }
