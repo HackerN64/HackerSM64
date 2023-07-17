@@ -148,6 +148,10 @@ u8 g100CoinStarSpawned = FALSE;
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
 
+struct Controller* get_mario_controller(void) {
+    return (gMarioState ? gMarioState->controller : gPlayer1Controller);
+}
+
 u16 level_control_timer(s32 timerOp) {
     switch (timerOp) {
         case TIMER_CONTROL_SHOW:
@@ -1002,13 +1006,16 @@ void basic_update(void) {
 s32 play_mode_normal(void) {
 #ifndef DISABLE_DEMO
     if (gCurrDemoInput != NULL) {
+        gMarioState->controller = gDemoController;
         print_intro_text();
-        if (gPlayer1Controller->buttonPressed & END_DEMO) {
-            level_trigger_warp(gMarioState, gCurrLevelNum == LEVEL_PSS ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
+        if (gDemoController->buttonPressed & INPUT_END_DEMO) {
+            level_trigger_warp(gMarioState, ((gDemoInputListID == gDemoInputsBuf.dmaTable->count) ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT));
         } else if (!gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
                    && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
             level_trigger_warp(gMarioState, WARP_OP_DEMO_NEXT);
         }
+    } else {
+        gMarioState->controller = &gControllers[0];
     }
 #endif
 

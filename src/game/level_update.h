@@ -170,6 +170,7 @@ enum WarpNodes {
     WARP_NODE_CREDITS_END   = 0xFA
 };
 
+struct Controller* get_mario_controller(void);
 u16 level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 arg, u32 color);
 void load_level_init_text(u32 arg);

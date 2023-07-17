@@ -708,11 +708,11 @@ enum MarioActionFlags {
 
 /*
  this input mask is unused by the controller,
- but END_DEMO is used internally to signal
+ but INPUT_END_DEMO is used internally to signal
  the demo to end. This button cannot
  be pressed normally by a controller.
 */
-#define END_DEMO       (1 << 7)
+#define INPUT_END_DEMO  CONT_RESET
 
 #define VALID_BUTTONS (A_BUTTON   | B_BUTTON   | Z_TRIG     | START_BUTTON | \
                        U_JPAD     | D_JPAD     | L_JPAD     | R_JPAD       | \

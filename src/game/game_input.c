@@ -19,7 +19,7 @@ struct Controller* const gPlayer2Controller = &gControllers[1];
 struct Controller* const gPlayer3Controller = &gControllers[2];
 struct Controller* const gPlayer4Controller = &gControllers[3];
 
-// OS Controllers
+// OS Controllers.
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
@@ -30,33 +30,102 @@ _Bool gContStatusPollingIsBootMode    = FALSE;  // Whether controller status pol
 _Bool gContStatusPollingReadyForInput = TRUE;   // Whether all inputs have been released after starting status repolling.
 u32   gContStatusPollTimer            = 0;      // Time since controller status repolling has started.
 
-// Title Screen Demo Handler
+#ifndef DISABLE_DEMO
+// Title Screen Demo Handler.
 struct DemoInput* gCurrDemoInput = NULL;
+u16 gDemoInputListID = 0;
 
-#if (!defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD))
+// Demo controller.
+OSContStatus gDemoStatusData = {
+    .type = CONT_TYPE_NORMAL,
+};
+OSContPadEx gDemoControllerData;
+struct Controller gDemoControllers[1] = {
+    {
+        .statusData = &gDemoStatusData,
+        .controllerData = &gDemoControllerData,
+        .port = 0,
+    }
+};
+struct Controller* const gDemoController = &gDemoControllers[0];
+#endif
+
+/**
+ * @brief Takes the updated controller struct and calculate the new x, y, and distance floats.
+ *
+ * @param[in,out] controller The controller to operate on.
+ */
+static void adjust_analog_stick(struct Controller* controller) {
+    const s16 deadzone = (controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8;
+    const s16 offset = (deadzone - 2);
+    const f32 max_stick_mag = 64.0f;
+
+    // Reset the controller's x and y floats.
+    controller->stickX = 0.0f;
+    controller->stickY = 0.0f;
+
+    // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
+    if (controller->rawStickX <= -deadzone) controller->stickX = (controller->rawStickX + offset);
+    if (controller->rawStickX >=  deadzone) controller->stickX = (controller->rawStickX - offset);
+    if (controller->rawStickY <= -deadzone) controller->stickY = (controller->rawStickY + offset);
+    if (controller->rawStickY >=  deadzone) controller->stickY = (controller->rawStickY - offset);
+
+    // Calculate f32 magnitude from the center by vector length.
+    controller->stickMag = sqrtf(sqr(controller->stickX) + sqr(controller->stickY));
+
+    // Magnitude cannot exceed max_stick_mag (64.0f). If it does, modify the values
+    // appropriately to flatten the values down to the allowed maximum value.
+    if (controller->stickMag > max_stick_mag) {
+        controller->stickX *= (max_stick_mag / controller->stickMag);
+        controller->stickY *= (max_stick_mag / controller->stickMag);
+        controller->stickMag = max_stick_mag;
+    }
+}
+
+/**
+ * @brief Updates the controller struct.
+ * 
+ * @param[in,out] controller The controller to operate on.
+ */
+void process_controller_data(struct Controller* controller) {
+    OSContPadEx* controllerData = controller->controllerData;
+
+    controller->rawStickX = controllerData->stick.x;
+    controller->rawStickY = controllerData->stick.y;
+    // Lock buttons that were used in the combo to exit status polling until they are released.
+    controllerData->lockedButton &= controllerData->button;
+    u16 button = controllerData->button &= ~controllerData->lockedButton;
+    controller->buttonPressed  = (~controller->buttonDown & button);
+    controller->buttonReleased = (~button & controller->buttonDown);
+    // 0.5x A presses are a good meme.
+    controller->buttonDown = button;
+
+    adjust_analog_stick(controller);
+}
+
+#ifndef DISABLE_DEMO
 /**
  * @brief If a demo sequence exists, this will run the demo input list until it is complete.
  */
 void run_demo_inputs(void) {
+    struct Controller* controller = gDemoController;
+    OSContPadEx* controllerData = controller->controllerData;
+
     // Eliminate the unused bits.
-    gPlayer1Controller->controllerData->button &= VALID_BUTTONS;
+    controllerData->button &= VALID_BUTTONS;
 
     // Check if a demo inputs list exists and if so,
     // run the active demo input list.
     if (gCurrDemoInput != NULL) {
         // The timer variable being 0 at the current input means the demo is over.
-        // Set the button to the END_DEMO mask to end the demo.
+        // Set the button to the INPUT_END_DEMO mask to end the demo.
         if (gCurrDemoInput->timer == 0) {
-            gPlayer1Controller->controllerData->stick = (Analog_s8){ 0x00, 0x00 };
-            gPlayer1Controller->controllerData->button = END_DEMO;
+            controllerData->stick = (Analog_s8){ 0x00, 0x00 };
+            controllerData->button = INPUT_END_DEMO;
         } else {
-            // Backup the start button if it is pressed, since we don't want the
-            // demo input to override the mask where start may have been pressed.
-            u16 startPushed = (gPlayer1Controller->controllerData->button & START_BUTTON);
-
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gPlayer1Controller->controllerData->stick.x = gCurrDemoInput->rawStickX;
-            gPlayer1Controller->controllerData->stick.y = gCurrDemoInput->rawStickY;
+            controllerData->stick.x = gCurrDemoInput->rawStickX;
+            controllerData->stick.y = gCurrDemoInput->rawStickY;
 
             // To assign the demo input, the button information is stored in
             // an 8-bit mask rather than a 16-bit mask. this is because only
@@ -65,20 +134,22 @@ void run_demo_inputs(void) {
             // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
             // match the correct input mask. We then add this to the masked
             // lower 4 bits to get the correct button mask.
-            gPlayer1Controller->controllerData->button =
-                ((gCurrDemoInput->buttonMask & 0xF0) << 8) | ((gCurrDemoInput->buttonMask & 0x0F));
-
-            // If start was pushed, put it into the demo sequence being input to end the demo.
-            gPlayer1Controller->controllerData->button |= startPushed;
+            controllerData->button = (
+                ((gCurrDemoInput->buttonMask & 0xF0) << 8) |
+                ((gCurrDemoInput->buttonMask & 0x0F) << 0)
+            );
 
             // Run the current demo input's timer down. if it hits 0, advance the demo input list.
-            if (--gCurrDemoInput->timer == 0) {
+            gCurrDemoInput->timer--;
+            if (gCurrDemoInput->timer == 0) {
                 gCurrDemoInput++;
             }
         }
+
+        process_controller_data(controller);
     }
 }
-#endif // !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
+#endif // !DISABLE_DEMO
 
 /**
  * @brief Check if a combo has finished being pressed on this frame.
@@ -322,64 +393,16 @@ void read_controller_inputs_status_polling(void) {
     }
 }
 
-
-/**
- * @brief Takes the updated controller struct and calculate the new x, y, and distance floats.
- *
- * @param[in,out] controller The controller to operate on.
- */
-static void adjust_analog_stick(struct Controller* controller) {
-    const s16 deadzone = (controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8;
-    const s16 offset = (deadzone - 2);
-    const f32 max_stick_mag = 64.0f;
-
-    // Reset the controller's x and y floats.
-    controller->stickX = 0.0f;
-    controller->stickY = 0.0f;
-
-    // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -deadzone) controller->stickX = (controller->rawStickX + offset);
-    if (controller->rawStickX >=  deadzone) controller->stickX = (controller->rawStickX - offset);
-    if (controller->rawStickY <= -deadzone) controller->stickY = (controller->rawStickY + offset);
-    if (controller->rawStickY >=  deadzone) controller->stickY = (controller->rawStickY - offset);
-
-    // Calculate f32 magnitude from the center by vector length.
-    controller->stickMag = sqrtf(sqr(controller->stickX) + sqr(controller->stickY));
-
-    // Magnitude cannot exceed max_stick_mag (64.0f). If it does, modify the values
-    // appropriately to flatten the values down to the allowed maximum value.
-    if (controller->stickMag > max_stick_mag) {
-        controller->stickX *= (max_stick_mag / controller->stickMag);
-        controller->stickY *= (max_stick_mag / controller->stickMag);
-        controller->stickMag = max_stick_mag;
-    }
-}
-
 /**
  * @brief Updates the controller struct with available inputs if present.
  */
 void read_controller_inputs_normal(void) {
-    s32 cont;
-
-#if (!defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD))
-    run_demo_inputs();
-#endif
-
-    for (cont = 0; cont < MAX_NUM_PLAYERS; cont++) {
+    for (s32 cont = 0; cont < MAX_NUM_PLAYERS; cont++) {
         struct Controller* controller = &gControllers[cont];
-        OSContPadEx* controllerData = controller->controllerData;
+
         // If we're receiving inputs, update the controller struct with the new button info.
-        if (controllerData != NULL) {
-            controller->rawStickX = controllerData->stick.x;
-            controller->rawStickY = controllerData->stick.y;
-            // Lock buttons that were used in the combo to exit status polling until they are released.
-            controllerData->lockedButton &= controllerData->button;
-            u16 button = controllerData->button &= ~controllerData->lockedButton;
-            controller->buttonPressed  = (~controller->buttonDown & button);
-            controller->buttonReleased = (~button & controller->buttonDown);
-            // 0.5x A presses are a good meme
-            controller->buttonDown = button;
-            adjust_analog_stick(controller);
+        if (controller->controllerData != NULL) {
+            process_controller_data(controller);
 #ifdef ALLOW_STATUS_REPOLLING_COMBO
             if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
                 gContStatusPollingReadyForInput = FALSE;
@@ -417,7 +440,12 @@ void handle_input(OSMesg* mesg) {
             read_controller_inputs_status_polling();
         }
 
+#ifndef DISABLE_DEMO
+        run_demo_inputs();
+#endif
+
         // Check this separately so input can start on the same frame.
+        // This is not an else because 'gContStatusPolling' can get set in 'read_controller_inputs_status_polling'
         if (!gContStatusPolling) {
             // Input handling for normal gameplay.
             read_controller_inputs_normal();

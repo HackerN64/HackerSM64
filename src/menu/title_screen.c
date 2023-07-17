@@ -38,9 +38,9 @@ static char sLevelSelectStageNames[64][16] = {
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
  #ifndef DISABLE_DEMO
-static u16 sDemoCountdown   = 0;
-static u16 gDemoInputListID = 0;
+static u16 sDemoCountdown = 0;
 
+// Number of frames without input before the demo starts. Default is 800.
 #define PRESS_START_DEMO_TIMER 800
 
 /**
@@ -53,31 +53,34 @@ s32 run_level_id_or_demo(s32 level) {
 
     if (level == LEVEL_NONE) {
         if (!gPlayer1Controller->buttonDown && !gPlayer1Controller->stickMag) {
-            // start the demo. 800 frames has passed while
+            // Start the demo. 800 frames has passed while
             // player is idle on PRESS START screen.
-            if ((++sDemoCountdown) == PRESS_START_DEMO_TIMER) {
-
+            sDemoCountdown++;
+            if (sDemoCountdown == PRESS_START_DEMO_TIMER) {
                 // start the Mario demo animation for the demo list.
                 load_patchable_table(&gDemoInputsBuf, gDemoInputListID);
 
-                // if the next demo sequence ID is the count limit, reset it back to
+                // If the next demo sequence ID is the count limit, reset it back to
                 // the first sequence.
-                if (++gDemoInputListID == gDemoInputsBuf.dmaTable->count) {
+                gDemoInputListID++;
+                if (gDemoInputListID == gDemoInputsBuf.dmaTable->count) {
                     gDemoInputListID = 0;
                 }
 
-                // add 1 (+4) to the pointer to skip the first 4 bytes
+                // Add 1 (+4) to the pointer to skip the first 4 bytes
                 // Use the first 4 bytes to store level ID,
                 // then use the rest of the values for inputs
-                gCurrDemoInput = ((struct DemoInput *) gDemoInputsBuf.bufTarget) + 1;
-                level = (s8)((struct DemoInput *) gDemoInputsBuf.bufTarget)->timer;
+                struct DemoInput* bufTarget = (struct DemoInput*)gDemoInputsBuf.bufTarget;
+                gCurrDemoInput = bufTarget + 1;
+                level = (s8)bufTarget->timer;
                 gCurrSaveFileNum = SAVE_FILE_NUM_A;
                 gCurrActNum = ACT_1;
             }
-        } else { // activity was detected, so reset the demo countdown.
+        } else { // Activity was detected, so reset the demo countdown.
             sDemoCountdown = 0;
         }
     }
+
     return level;
 }
  #endif // !DISABLE_DEMO
@@ -152,7 +155,7 @@ s32 intro_level_select(void) {
     if (gCurrLevelNum > LEVEL_MAX) gCurrLevelNum = LEVEL_MIN; // exceeded max. set to min.
     if (gCurrLevelNum < LEVEL_MIN) gCurrLevelNum = LEVEL_MAX; // exceeded min. set to max.
 
-    // Use file 4 and last act as a test
+    // Use file 4 and last act as a test.
     gCurrSaveFileNum = SAVE_FILE_NUM_D;
     gCurrActNum = ACT_6;
 

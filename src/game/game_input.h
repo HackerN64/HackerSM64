@@ -41,7 +41,12 @@ extern _Bool gContStatusPollingIsBootMode;
 extern _Bool gContStatusPollingReadyForInput;
 extern u32   gContStatusPollTimer;
 
+#ifndef DISABLE_DEMO
 extern struct DemoInput* gCurrDemoInput;
+extern u16 gDemoInputListID;
+
+extern struct Controller* const gDemoController;
+#endif
 
 void start_controller_status_polling(_Bool isBootMode);
 void stop_controller_status_polling(OSContPadEx* pad);
