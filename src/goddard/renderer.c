@@ -2342,7 +2342,7 @@ void start_view_dl(struct ObjView *view) {
 /* 251014 -> 251A1C; orig name: func_801A2844 */
 void parse_p1_controller(void) {
     s32 i;
-    struct GdControl *gdctrl = &gGdCtrl;
+    struct GdControl* gdctrl = &gGdCtrl;
     u16 button, buttonPressed;
 
     if (gContStatusPolling
@@ -2407,10 +2407,11 @@ void parse_p1_controller(void) {
         gdctrl->newStartPress ^= TRUE;
     }
 
-    if (buttonPressed & Z_TRIG) {
-        sCurrDebugViewIndex++;
-        print_all_timers();
-    }
+    //! TODO: Why does this crash in 'sprint_val_withspecifiers()'?
+    // if (buttonPressed & Z_TRIG) {
+    //     sCurrDebugViewIndex++;
+    //     print_all_timers();
+    // }
 
     if (sCurrDebugViewIndex > sDebugViewsCount) {
         sCurrDebugViewIndex = 0;
