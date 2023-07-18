@@ -48,6 +48,12 @@
 #define CRASH_SCREEN_X2 (CRASH_SCREEN_X1 + CRASH_SCREEN_W) // 295
 #define CRASH_SCREEN_Y2 (CRASH_SCREEN_Y1 + CRASH_SCREEN_H) // 230
 
+// Default bounds for the scissor box.
+#define SCISSOR_BOX_DEFAULT_X1 CRASH_SCREEN_X1
+#define SCISSOR_BOX_DEFAULT_Y1 CRASH_SCREEN_Y1
+#define SCISSOR_BOX_DEFAULT_X2 (CRASH_SCREEN_X1 + CRASH_SCREEN_W)
+#define SCISSOR_BOX_DEFAULT_Y2 (CRASH_SCREEN_Y1 + CRASH_SCREEN_H)
+
 // Top left corner of the text grid.
 #define CRASH_SCREEN_TEXT_X1 (CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X + 0) // 28
 #define CRASH_SCREEN_TEXT_Y1 (CRASH_SCREEN_Y1 + CRASH_SCREEN_TEXT_MARGIN_Y + 1) // 10
@@ -78,10 +84,22 @@ enum CSDrawDarkRectDarken {
 };
 
 
+typedef struct {
+    s32 x1;
+    s32 y1;
+    s32 x2;
+    s32 y2;
+} CSScissorBox;
+
+extern CSScissorBox gCSScissorBox;
+
+
 extern _Bool gCSDrawCrashScreen;
 extern _Bool gCSDrawSavedScreenshot;
 
 
+void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
+void crash_screen_reset_scissor_box(void);
 void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
 void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
 void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);

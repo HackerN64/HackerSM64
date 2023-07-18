@@ -20,10 +20,48 @@ ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCR
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
+// The rectangular area that can be drawn in. Almost everything is culled outside of the box.
+CSScissorBox gCSScissorBox = {
+    .x1 = SCISSOR_BOX_DEFAULT_X1,
+    .y1 = SCISSOR_BOX_DEFAULT_Y1,
+    .x2 = SCISSOR_BOX_DEFAULT_X2,
+    .y2 = SCISSOR_BOX_DEFAULT_Y2,
+};
+
+// Sets the scissor box.
+void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2) {
+    gCSScissorBox.x1 = x1;
+    gCSScissorBox.y1 = y1;
+    gCSScissorBox.x2 = x2;
+    gCSScissorBox.y2 = y2;
+}
+
+// Resets the scissor box to the defaults.
+void crash_screen_reset_scissor_box(void) {
+    crash_screen_set_scissor_box(
+        SCISSOR_BOX_DEFAULT_X1,
+        SCISSOR_BOX_DEFAULT_Y1,
+        SCISSOR_BOX_DEFAULT_X2,
+        SCISSOR_BOX_DEFAULT_Y2
+    );
+}
+
+// Checks whether the pixel at the given screen coordinates are within the scissor box.
+static _Bool is_in_scissor_box(s32 x, s32 y) {
+    return (
+        (x >= gCSScissorBox.x1) &&
+        (y >= gCSScissorBox.y1) &&
+        (x <  gCSScissorBox.x2) &&
+        (y <  gCSScissorBox.y2)
+    );
+}
+
+// Get a pointer to the framebuffer pixel at the given screen coordinates.
 static RGBA16* get_rendering_fb_pixel(u32 x, u32 y) {
     return (FB_PTR_AS(RGBA16) + (SCREEN_WIDTH * y) + x);
 }
 
+// Apply color to a pixel with alpha blending.
 static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
     if (alpha == MSK_RGBA32_A) {
         *dst = newColor;
@@ -55,10 +93,11 @@ void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darke
 
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
-            *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
+            if (is_in_scissor_box((startX + x), (startY + y))) {
+                *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
+            }
             dst++;
         }
-
         dst += (SCREEN_WIDTH - w);
     }
 }
@@ -75,10 +114,11 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
 
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
-            apply_color(dst, newColor, alpha);
+            if (is_in_scissor_box((startX + x), (startY + y))) {
+                apply_color(dst, newColor, alpha);
+            }
             dst++;
         }
-
         dst += (SCREEN_WIDTH - w);
     }
 }
@@ -107,12 +147,11 @@ void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, R
 
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
-            if (absf(middle - x) < d) {
+            if (is_in_scissor_box((startX + x), (startY + y)) && (absf(middle - x) < d)) {
                 apply_color(dst, newColor, alpha);
             }
             dst++;
         }
-
         d += t;
         dst += (SCREEN_WIDTH - w);
     }
@@ -139,7 +178,9 @@ void crash_screen_draw_horizontal_triangle(s32 startX, s32 startY, s32 w, s32 h,
 
     for (s32 y = 0; y < h; y++) {
         for (s32 x = x1; x < w; x++) {
-            apply_color(dst, newColor, alpha);
+            if (is_in_scissor_box((startX + x), (startY + y))) {
+                apply_color(dst, newColor, alpha);
+            }
             dst++;
         }
         x1 -= (y < middle) ? t : -t;
@@ -170,8 +211,10 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     f32 y;
     while (x <= x2) {
         y = ((slope * (x - x1)) + y1);
-        dst = get_rendering_fb_pixel(x, y);
-        apply_color(dst, newColor, alpha);
+        if (is_in_scissor_box(x, y)) {
+            dst = get_rendering_fb_pixel(x, y);
+            apply_color(dst, newColor, alpha);
+        }
         x++;
     }
 }
@@ -197,7 +240,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) 
         rowMask = *src++;
 
         for (u32 x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
-            if (bit & rowMask) {
+            if ((bit & rowMask) && is_in_scissor_box((startX + x), (startY + y))) {
                 apply_color(dst, newColor, alpha);
             }
             dst++;
@@ -313,6 +356,7 @@ void print_crash_screen_header(void) {
 
 void crash_screen_draw_main(void) {
     crash_screen_reset_framebuffer(gCSDrawSavedScreenshot);
+    crash_screen_reset_scissor_box();
 
     if (gCSDrawCrashScreen) {
         if (gCSDrawSavedScreenshot) {
