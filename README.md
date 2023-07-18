@@ -27,9 +27,10 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **Kaze**: Graph node optimisations, automatic optimal collision distance
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
 - **CrashOveride**: creating the [ultrasm64](https://github.com/CrashOveride95/ultrasm64) repo
-- **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds
+- **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds, emulator detector
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
+- **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
@@ -83,6 +84,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Included `actors/group0.c` in `behavior_data.c`
 - The internal ROM name is now set with a define in `config/config_rom.h` to make it simpler
 - There is a `gIsConsole` variable that is 1 when running on console and 0 when running on emulator. This way you can wrap your code in a console check.
+- There is also a `gEmulator` variable to detect specific emulators and emulator versions
 - Expanded audio heap allows for a larger concurrent note count and the importing of more m64 sequences and sound banks (By ArcticJaguar725) *
 - You can set a test level in `config/config_debug.h` in order to boot straight into it, so you can quickly test the level you're working on. *
 - Allow all surfaces in the game to have a `force` parameter. Activating this doesn't REQUIRE you to set `force` for every surface: If you don't set, it will default to 0x0000 rather than crashing. Increases RAM usage of collision. *
