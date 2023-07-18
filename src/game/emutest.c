@@ -91,7 +91,7 @@ f32 round_double_to_float(f64 v) {
 }
 
 void detect_emulator() {
-    if (IO_READ(DPC_CLOCK_REG) != 0) {
+    if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
         gEmulator = EMU_CONSOLE;
         return;
     }
