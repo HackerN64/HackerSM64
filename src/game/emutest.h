@@ -24,7 +24,7 @@ extern void detect_emulator();
 
 /* gEmulator is an enum that identifies the current emulator.
  * The enum values work as a bitfield, so you can use the & and | operators
- * to test for multiple emulators or versions at once.
+ * to test for multiple emulators at once.
  * 
  * Examples:
  * 
@@ -32,7 +32,7 @@ extern void detect_emulator();
  * if (gEmulator & EMU_PROJECT64_ANY)
  * 
  * Test for only PJ64 < 3.0:
- * if (gEmulator & EMU_PROJECT64_1_OR_2)
+ * if (gEmulator == EMU_PROJECT64_1_OR_2) // don't use & with specific versions
  * 
  * Test for Console, Ares, or ParallelN64:
  * if (gEmulator & (EMU_CONSOLE | EMU_ARES | EMU_PARALLELN64))
