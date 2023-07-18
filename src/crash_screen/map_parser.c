@@ -88,7 +88,9 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
     const struct MapSymbol* symbol = &gMapSymbols[0];
 
     for (size_t i = 0; i < gNumMapSymbols; i++) {
-        check_addr_in_symbol(addr, symbol);
+        if (check_addr_in_symbol(addr, symbol)) {
+            return i;
+        }
 
         symbol++;
     }
@@ -103,7 +105,9 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
     const struct MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
     for (size_t i = gNumMapSymbols; i-- > 0;) {
-        check_addr_in_symbol(addr, symbol);
+        if (check_addr_in_symbol(addr, symbol)) {
+            return i;
+        }
 
         symbol--;
     }
