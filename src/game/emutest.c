@@ -22,17 +22,24 @@ extern void __osSiRelAccess(void);
 enum Emulator gEmulator = 0;
 
 __attribute__((aligned(8)))
-static const u32 check_count_factor[] = {
+static const u32 check_count_factor_asm[] = {
     0x40084800u, // MFC0 T0, COUNT
     0x40094800u, // MFC0 T1, COUNT
     0x03E00008u, // JR RA
     0x01281023u  // SUBU V0, T1, T0
 };
 
+static inline u32 check_count_factor() {
+    const u32 saved = __osDisableInt();
+    const u32 cf = ((u32 (*)(void))check_count_factor_asm)();
+    __osRestoreInt(saved);
+    return cf;
+}
+
 static inline enum Emulator get_pj64_version() {
     // PJ64 4.0 dynarec core screws up the COUNT register.
     // The 4.0 interpreter core is already handled and never calls into this function
-    if (((u32 (*)(void))check_count_factor)() == 0) {
+    if (check_count_factor() == 0) {
         return EMU_PROJECT64_4;
     }
 
