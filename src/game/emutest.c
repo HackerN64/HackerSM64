@@ -37,13 +37,17 @@ static inline u32 check_count_factor() {
 }
 
 static inline enum Emulator get_pj64_version() {
-    // PJ64 4.0 dynarec core screws up the COUNT register.
-    // The 4.0 interpreter core is already handled and never calls into this function
+    // When calling this function, we know that the emulator is some version of Project 64,
+    // and it isn't using the PJ64 4.0 interpreter core. Figure out which version it is.
+    
+    // PJ64 4.0 dynarec core doesn't update the COUNT register correctly within recompiled functions
     if (check_count_factor() == 0) {
         return EMU_PROJECT64_4;
     }
 
-    // PJ64 1.6 test
+    // Instead of implementing this PIF command correctly, PJ64 versions prior to 3.0 just have
+    // a set of hardcoded values for some requests. At least one of these hardcoded values has a
+    // typo in it, making it give an incorrect result.
     __osSiGetAccess();
     u32 *pifRam32 = (u32*)__osContPifRam;
     for (s32 i = 0; i < 15; i++) pifRam32[i] = 0;
@@ -66,6 +70,7 @@ static inline enum Emulator get_pj64_version() {
     const u8 pifCheck = __osContPifRam[54];
     __osSiRelAccess();
 
+    // check for the typo'd byte
     return (pifCheck == 0xB0) ? EMU_PROJECT64_1_OR_2 : EMU_PROJECT64_3;
 }
 
@@ -104,39 +109,59 @@ void detect_emulator() {
     gIsVC = FALSE;
     check_cache_emulation();
 
+    // Perform a read from unmapped PIF ram.
+    // On console and well behaved emulators, this echos back the lower half of
+    // the requested memory address, repeating it if a whole word is requested.
+    // So in this case, it should result in 0x01040104
     const u32 magic = *((volatile u32*)0xbfd00104u);
     if (magic == 0u) {
+        // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
         gEmulator = EMU_MUPEN_OLD;
         return;
     } else if (magic != 0x01040104u) {
+        // cen64 does... something. The result is consistent, but not what it should be
         gEmulator = EMU_CEN64;
         return;
     }
 
+    // Now do a halfword read instead.
     switch (*((volatile u16*)0xbfd00106u)) {
+        // This is the correct result (echo back the lower half of the requested address)
         case 0x0106: {
+            // If the cache is emulated, it's Ares
             if (gCacheEmulated) {
                 gEmulator = EMU_ARES;
                 return;
             }
 
+            // It's either ParallelN64 or Project 64 4.0 using the interpreter core
+            // Test to see if the libpl emulator extension is present.
             osPiWriteIo(0x1FFB0000u, 0u);
             if (*((volatile u32*)0xbffb0000u) == 0x00500000u) {
+                // libpl is supported. Must be ParallelN64
                 gEmulator = EMU_PARALLELN64;
                 return;
             }
 
-            gEmulator = EMU_PROJECT64_4; // interpreter core specifically
+            // No libpl, so its the Project64 4.0 interpreter core
+            gEmulator = EMU_PROJECT64_4;
             return;
         }
+        // This looks like it should be the expected result considering what we got when we
+        // requested the whole word, but that's actually wrong. Later versions of mupen
+        // (and the Simple64 fork of it) get this wrong.
         case 0x0104:
             gEmulator = gCacheEmulated ? EMU_SIMPLE64 : EMU_MUPEN64PLUS_NEXT;
             return;
+        // If reading a word gives the correct response, but reading a halfword always gives 0,
+        // then we are dealing with some version of Project 64. Call into this helper function
+        // to find out which version we're dealing with.
         case 0x0000:
             gEmulator = get_pj64_version();
             return;
+        // No known emulator gives any other value. If we somehow manage to get here, just return 0
         default:
-            gEmulator = 0; // Unknown. No tested emulator ever gets here
+            gEmulator = 0;
             return;
     }
 } 

@@ -19,7 +19,7 @@ enum Emulator {
     EMU_MASK = 0xFF00
 };
 
-// initializes gEmulator, gIsConsole, and gCacheEmulated
+// initializes gEmulator, gIsConsole, gIsVC, and gCacheEmulated
 extern void detect_emulator();
 
 extern enum Emulator gEmulator;
