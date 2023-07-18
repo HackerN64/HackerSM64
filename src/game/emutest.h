@@ -5,8 +5,8 @@ enum Emulator {
     EMU_WIIVC = 0x0100,
     EMU_PROJECT64_ANY = 0x0200,
         EMU_PROJECT64_1_OR_2 = 0x0201, // PJ64 1.6 or similar (up to 2.3)
-        EMU_PROJECT64_3 = 0x0203, // PJ64 3.X
-        EMU_PROJECT64_4 = 0x0204, // PJ64 4.0 or later
+        EMU_PROJECT64_3 = 0x0204, // PJ64 3.X
+        EMU_PROJECT64_4 = 0x0208, // PJ64 4.0 or later
     EMU_MUPEN_BASED = 0x0400, // mupen64plus or pre-2.12 paralleln64, but NOT simple64 or new paralleln64
         EMU_MUPEN_OLD = 0x0401, // 1964 and pre-2.12 paralleln64 will also get detected as this
         EMU_MUPEN64PLUS_NEXT = 0x0402,
@@ -22,6 +22,21 @@ enum Emulator {
 // initializes gEmulator, gIsConsole, gIsVC, and gCacheEmulated
 extern void detect_emulator();
 
+/* gEmulator is an enum that identifies the current emulator.
+ * The enum values work as a bitfield, so you can use the & and | operators
+ * to test for multiple emulators or versions at once.
+ * 
+ * Examples:
+ * 
+ * Test for any version of PJ64:
+ * if (gEmulator & EMU_PROJECT64_ANY)
+ * 
+ * Test for only PJ64 < 3.0:
+ * if (gEmulator & EMU_PROJECT64_1_OR_2)
+ * 
+ * Test for Console, Ares, or ParallelN64:
+ * if (gEmulator & (EMU_CONSOLE | EMU_ARES | EMU_PARALLELN64))
+ */
 extern enum Emulator gEmulator;
 
 #endif
