@@ -109,7 +109,6 @@ extern size_t gNumMapSymbols;
 
 void map_data_init(void);
 _Bool is_in_code_segment(Address addr);
-_Bool map_symbol_is_text(const struct MapSymbol* symbol);
 const char* get_map_symbol_name(const struct MapSymbol* symbol);
 s32 get_symbol_index_from_addr_forward(Address addr);
 s32 get_symbol_index_from_addr_backward(Address addr);

@@ -91,7 +91,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         // Check if we have left the function.
         const struct MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_FORWARD);
         if (symbol != NULL) {
-            if (!map_symbol_is_text(symbol)) {
+            if (symbol->type != 'T' && symbol->type != 't') {
                 return FALSE;
             }
             if (funcAddr != symbol->addr) {

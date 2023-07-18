@@ -5,9 +5,6 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_main.h"
-#include "crash_controls.h"
-#include "insn_disasm.h"
-#include "map_parser.h"
 #include "audio/external.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
@@ -35,10 +32,10 @@ struct CSPage gCSPages[NUM_PAGES] = {
 #ifdef PUPPYPRINT_DEBUG
     [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = puppyprint_log_draw, .inputFunc = NULL,              .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
+    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw,    .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef INCLUDE_DEBUG_MAP
     [PAGE_MAP_VIEWER ] = { .initFunc = map_viewer_init,  .drawFunc = map_viewer_draw,     .inputFunc = map_viewer_input,  .contList = mapViewerContList,  .name = "MAP VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
-    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw,    .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
     [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,     .inputFunc = ram_viewer_input,  .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
     [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,         .inputFunc = disasm_input,      .contList = disasmContList,     .name = "DISASM",      .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 };
@@ -140,18 +137,18 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
-    // Only on the first crash
+    // Only on the first crash:
     if (sFirstCrash) {
         sFirstCrash = FALSE;
 
         // Default to certain pages depening on the crash type.
         switch (tc->cause) {
-            case EXC_SYSCALL: gCSPageID = PAGE_ASSERTS; break;
-            case EXC_II:      gCSPageID = PAGE_DISASM;  break;
+            case EXC_SYSCALL: crash_screen_set_page(PAGE_ASSERTS); break;
+            case EXC_II:      crash_screen_set_page(PAGE_DISASM ); break;
         }
         // If a position was specified, use that.
         if (gSetCrashAddress != 0x0) {
-            gCSPageID = PAGE_RAM_VIEWER;
+            crash_screen_set_page(PAGE_RAM_VIEWER);
             tc->pc = gSetCrashAddress;
         }
 

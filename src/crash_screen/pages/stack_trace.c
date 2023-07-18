@@ -54,8 +54,10 @@ void fill_function_stack_trace(void) {
             currInfo.faddr = currInfo.curAddr;
 #ifdef INCLUDE_DEBUG_MAP
             const struct MapSymbol* symbol = get_map_symbol(currInfo.faddr, SYMBOL_SEARCH_BACKWARD);
-            currInfo.faddr = symbol->addr;
-            currInfo.fname = get_map_symbol_name(symbol);
+            if (symbol != NULL) {
+                currInfo.faddr = symbol->addr;
+                currInfo.fname = get_map_symbol_name(symbol);
+            }
 
             if (currInfo.fname != NULL)
 #endif
@@ -91,7 +93,7 @@ void stack_trace_init(void) {
     struct FunctionInStack currFunc = {
         .stackAddr = 0,
         .curAddr   = tc->pc,
-        .faddr     = symbol->addr,
+        .faddr     = (symbol ? symbol->addr : tc->pc),
         .fname     = get_map_symbol_name(symbol),
     };
     sFunctionStack[sNumFoundFunctions++] = currFunc;

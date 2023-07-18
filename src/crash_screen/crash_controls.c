@@ -42,6 +42,11 @@ const struct ControlType gCSControlDescriptions[] = {
 };
 
 
+void crash_screen_set_page(enum CrashScreenPages page) {
+    gCSPageID = page;
+    gCSSwitchedPage = TRUE;
+}
+
 void update_crash_screen_direction_input(void) {
     OSTime currTime = osGetTime();
 

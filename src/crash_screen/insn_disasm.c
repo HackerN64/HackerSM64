@@ -631,14 +631,16 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
 #ifdef INCLUDE_DEBUG_MAP
                     if (showDestNames && is_in_code_segment(target)) {
                         const struct MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
-                        *fname = get_map_symbol_name(symbol);
-                        // Only print as the function name if it's the exact starting address of the function.
-                        if (target != symbol->addr) {
-                            *fname = NULL;
-                        }
+                        if (symbol != NULL) {
+                            *fname = get_map_symbol_name(symbol);
+                            // Only print as the function name if it's the exact starting address of the function.
+                            if (target != symbol->addr) {
+                                *fname = NULL;
+                            }
 
-                        if (*fname != NULL) {
-                            break;
+                            if (*fname != NULL) {
+                                break;
+                            }
                         }
                     }
 #else

@@ -52,6 +52,7 @@ extern const struct ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultContList[];
 
 
+void crash_screen_set_page(enum CrashScreenPages page);
 u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
 void crash_screen_update_input(void);
 void draw_controls_box(void);

@@ -108,26 +108,23 @@ void crash_screen_select_address(void) {
         gAddressSelectMenuOpen = FALSE;
 
         switch (gCSPageID) {
+            case PAGE_STACK_TRACE:
+                crash_screen_set_page(PAGE_DISASM);
+                break;
 #ifdef INCLUDE_DEBUG_MAP
             case PAGE_MAP_VIEWER:;
                 s32 targetIndex = get_symbol_index_from_addr_backward(sAddressSelectTarget);
                 if (targetIndex != -1) {
                     if (sMapViewerSelectedIndex == (u32)targetIndex) {
                         if (is_in_code_segment(gMapSymbols[targetIndex].addr)) {
-                            gCSPageID = PAGE_DISASM;
+                            crash_screen_set_page(PAGE_DISASM);
                         } else {
-                            gCSPageID = PAGE_RAM_VIEWER;
+                            crash_screen_set_page(PAGE_RAM_VIEWER);
                         }
-                        gCSSwitchedPage = TRUE;
                     }
                     sMapViewerSelectedIndex = targetIndex;
                 }
                 break;
-#endif
-            case PAGE_STACK_TRACE:
-                gCSPageID = PAGE_DISASM;
-                break;
-#ifdef INCLUDE_DEBUG_MAP
             case PAGE_DISASM:
                 if (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget)) {
                     gFillBranchBuffer = TRUE;
