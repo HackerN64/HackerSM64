@@ -41,8 +41,8 @@ extern _Bool gContStatusPollingIsBootMode;
 extern _Bool gContStatusPollingReadyForInput;
 extern u32   gContStatusPollTimer;
 
-#ifndef DISABLE_DEMO
 extern struct DemoInput* gCurrDemoInput;
+#ifndef DISABLE_DEMO
 extern u16 gDemoInputListID;
 
 extern struct Controller* const gDemoController;

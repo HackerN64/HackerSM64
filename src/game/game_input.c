@@ -30,9 +30,9 @@ _Bool gContStatusPollingIsBootMode    = FALSE;  // Whether controller status pol
 _Bool gContStatusPollingReadyForInput = TRUE;   // Whether all inputs have been released after starting status repolling.
 u32   gContStatusPollTimer            = 0;      // Time since controller status repolling has started.
 
-#ifndef DISABLE_DEMO
 // Title Screen Demo Handler.
 struct DemoInput* gCurrDemoInput = NULL;
+#ifndef DISABLE_DEMO
 u16 gDemoInputListID = 0;
 
 // Demo controller.
