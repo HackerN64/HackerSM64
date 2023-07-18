@@ -14,6 +14,8 @@ PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
 _Bool gCSWordWrap = FALSE;
 
+u32 gCSNumLinesPrinted = 0;
+
 
 static _Bool glyph_to_hex(char* dest, char glyph) {
     if (IS_NUMERIC(glyph)) {
@@ -66,8 +68,7 @@ static _Bool is_special_char(char glyph) {
 
 static u32 format_print_buffer(const char* buf, size_t totalSize) {
     u32 bufferCount = 0;
-    // uRGBA32 color = { .raw32 = COLOR_RGBA32_WHITE }; // Initial color
-    RGBA32 color = COLOR_RGBA32_WHITE;
+    RGBA32 color = COLOR_RGBA32_WHITE; // Initial color.
     _Bool escaped = FALSE;
 
     // Pass 1: control characters and formatting
@@ -196,6 +197,10 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         if (newline) {
             x = startX;
             y += TEXT_HEIGHT(1);
+            if (y > (u32)gCSScissorBox.y2) {
+                break;
+            }
+            gCSNumLinesPrinted++;
         } else {
             x += TEXT_WIDTH(1);
             numChars++;
@@ -231,11 +236,13 @@ static char* write_to_buf(char* buffer, const char* data, size_t size) {
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
     char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
+    gCSNumLinesPrinted = 0;
 
     va_list args;
     va_start(args, fmt);
 
     size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
+    ASSERT((totalSize < CHAR_BUFFER_SIZE), "@FF0000FFCRASH SCREEN PRINT BUFFER EXCEEDED");
     size_t numChars = 0;
 
     if (totalSize > 0) {
@@ -271,6 +278,7 @@ void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 colo
 
 void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol) {
     crash_screen_print_symbol_name_impl(x, y, maxWidth,
-        ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN), get_map_symbol_name(symbol)
+        ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN),
+        get_map_symbol_name(symbol)
     );
 }

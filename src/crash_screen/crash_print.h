@@ -64,6 +64,8 @@ typedef struct PACKED {
 
 extern _Bool gCSWordWrap;
 
+extern u32 gCSNumLinesPrinted;
+
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...);
 
 //! TODO: change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?)

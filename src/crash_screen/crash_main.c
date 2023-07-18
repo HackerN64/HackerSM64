@@ -28,7 +28,7 @@
 
 struct CSPage gCSPages[NUM_PAGES] = {
     [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = crash_context_draw,  .inputFunc = NULL,              .contList = defaultContList,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
-    [PAGE_ASSERTS    ] = { .initFunc = NULL,             .drawFunc = assert_draw,         .inputFunc = NULL,              .contList = defaultContList,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_ASSERTS    ] = { .initFunc = assert_init,      .drawFunc = assert_draw,         .inputFunc = assert_input,      .contList = assertsContList,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef PUPPYPRINT_DEBUG
     [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = puppyprint_log_draw, .inputFunc = NULL,              .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
@@ -54,8 +54,8 @@ Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and di
 
 
 static void crash_screen_reinitialize(void) {
-    // If the crash screen has crashed, disable the page that crashed.
-    if (!sFirstCrash) {
+    // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
+    if (!sFirstCrash && gCrashedThread->context.cause != EXC_SYSCALL) {
         gCSPages[gCSPageID].flags.crashed = TRUE;
     }
 
@@ -137,15 +137,16 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
+    // Default to certain pages depening on the crash type.
+    switch (tc->cause) {
+        case EXC_SYSCALL: crash_screen_set_page(PAGE_ASSERTS); break;
+        case EXC_II:      crash_screen_set_page(PAGE_DISASM ); break;
+    }
+
     // Only on the first crash:
     if (sFirstCrash) {
         sFirstCrash = FALSE;
-
-        // Default to certain pages depening on the crash type.
-        switch (tc->cause) {
-            case EXC_SYSCALL: crash_screen_set_page(PAGE_ASSERTS); break;
-            case EXC_II:      crash_screen_set_page(PAGE_DISASM ); break;
-        }
+        
         // If a position was specified, use that.
         if (gSetCrashAddress != 0x0) {
             crash_screen_set_page(PAGE_RAM_VIEWER);
@@ -200,8 +201,8 @@ void create_crash_screen_thread(void) {
     osCreateThread(
         &threadInfo->thread, (THREAD_1000_CRASH_SCREEN_0 + sCSThreadIndex),
         crash_screen_thread_entry, NULL,
-        ((u8*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack
-        (OS_PRIORITY_APPMAX - 1) //! TODO: Why doesn't get_crashed_thread check for OS_PRIORITY_APPMAX threads?
+        ((u8*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
+        (OS_PRIORITY_APPMAX - 1) //! TODO: Why shouldn't get_crashed_thread check for OS_PRIORITY_APPMAX threads?
     );
     osStartThread(&threadInfo->thread);
 }
