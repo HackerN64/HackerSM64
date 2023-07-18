@@ -7,8 +7,8 @@
 #include "segment_symbols.h"
 
 
-ALIGNED16 static struct FunctionInStack sFunctionStack[STACK_TRACE_BUFFER_SIZE];
-static u32 sNumFoundFunctions = 0;
+ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
+static u32 sCSNumFoundFunctions = 0;
 
 #ifdef INCLUDE_DEBUG_MAP
     #define SHOW_FUNC_NAMES_DEFAULT TRUE
@@ -35,25 +35,35 @@ const enum ControlTypes stackTraceContList[] = {
 
 extern void __osCleanupThread(void);
 
+static void add_to_stack(struct FunctionInStack* func) {
+    sCSFunctionStackBuffer[sCSNumFoundFunctions++] = *func;
+}
+
 void fill_function_stack_trace(void) {
+    bzero(&sCSFunctionStackBuffer, sizeof(sCSFunctionStackBuffer));
+    sCSNumFoundFunctions = 0;
+
+    // Include the current function at the top:
     __OSThreadContext* tc = &gCrashedThread->context;
+    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     struct FunctionInStack currInfo = {
         .stackAddr = 0,
-        .curAddr   = 0,
-        .faddr     = 0,
-        .fname     = NULL,
+        .curAddr   = tc->pc,
+        .faddr     = (symbol ? symbol->addr : tc->pc),
+        .fname     = get_map_symbol_name(symbol),
     };
+    add_to_stack(&currInfo);
 
     Register* sp = (Register*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
 
     // Loop through the stack buffer and find all the addresses that point to a function.
-    while ((Byte*)sp < _buffersSegmentBssEnd && sNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
+    while (sCSNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
         currInfo.curAddr = (Address)(*sp); // Check the lower bits.
 
         if (is_in_code_segment(currInfo.curAddr)) {
             currInfo.faddr = currInfo.curAddr;
 #ifdef INCLUDE_DEBUG_MAP
-            const struct MapSymbol* symbol = get_map_symbol(currInfo.faddr, SYMBOL_SEARCH_BACKWARD);
+            symbol = get_map_symbol(currInfo.faddr, SYMBOL_SEARCH_BACKWARD);
             if (symbol != NULL) {
                 currInfo.faddr = symbol->addr;
                 currInfo.fname = get_map_symbol_name(symbol);
@@ -65,7 +75,7 @@ void fill_function_stack_trace(void) {
                 //! TODO: If JAL command uses a different function than the previous entry's faddr, replace it with the one in the JAL command?
                 //! TODO: handle duplicate entries caused by JALR RA, V0
                 currInfo.stackAddr = (Address)sp + sizeof(Address);
-                sFunctionStack[sNumFoundFunctions++] = currInfo;
+                add_to_stack(&currInfo);
             }
 
             if (currInfo.faddr == (Address)__osCleanupThread) {
@@ -78,36 +88,21 @@ void fill_function_stack_trace(void) {
 }
 
 void stack_trace_init(void) {
-    bzero(&sFunctionStack, sizeof(sFunctionStack));
-
     sStackTraceShowFunctionNames = SHOW_FUNC_NAMES_DEFAULT;
 
     sStackTraceSelectedIndex = 0;
     sStackTraceViewportIndex = 0;
-
-    sNumFoundFunctions = 0;
-
-    // Include the current function at the top:
-    __OSThreadContext* tc = &gCrashedThread->context;
-    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    struct FunctionInStack currFunc = {
-        .stackAddr = 0,
-        .curAddr   = tc->pc,
-        .faddr     = (symbol ? symbol->addr : tc->pc),
-        .fname     = get_map_symbol_name(symbol),
-    };
-    sFunctionStack[sNumFoundFunctions++] = currFunc;
 
     fill_function_stack_trace();
 }
 
 void stack_trace_print_entries(u32 line, u32 numLines) {
     u32 currIndex = sStackTraceViewportIndex;
-    struct FunctionInStack* function = &sFunctionStack[currIndex];
+    struct FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
 
     // Print
     for (u32 i = 0; i < numLines; i++) {
-        if (currIndex >= sNumFoundFunctions) {
+        if (currIndex >= sCSNumFoundFunctions) {
             break;
         }
 
@@ -192,7 +187,7 @@ void stack_trace_draw(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     // "OFFSET:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
 #endif
 
     line++;
@@ -203,10 +198,10 @@ void stack_trace_draw(void) {
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar
-    if (sNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
+    if (sCSNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
         crash_screen_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), 
-            STACK_TRACE_NUM_ROWS, sNumFoundFunctions,
+            STACK_TRACE_NUM_ROWS, sCSNumFoundFunctions,
             sStackTraceViewportIndex,
             COLOR_RGBA32_LIGHT_GRAY, TRUE
         );
@@ -221,7 +216,7 @@ void stack_trace_input(void) {
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
-        open_address_select(sFunctionStack[sStackTraceSelectedIndex].curAddr);
+        open_address_select(sCSFunctionStackBuffer[sStackTraceSelectedIndex].curAddr);
     }
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -239,7 +234,7 @@ void stack_trace_input(void) {
     }
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        if (sStackTraceSelectedIndex < (sNumFoundFunctions - 1)) {
+        if (sStackTraceSelectedIndex < (sCSNumFoundFunctions - 1)) {
             sStackTraceSelectedIndex++;
         }
     }
