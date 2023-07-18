@@ -109,9 +109,14 @@ void map_viewer_draw(void) {
 }
 
 void map_viewer_input(void) {
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    if (gCSSwitchedPage) {
+        s32 targetIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
+        if (targetIndex != -1) {
+            sMapViewerSelectedIndex = targetIndex;
+        }
+    }
 
-    if (buttonPressed & A_BUTTON) {
+    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         open_address_select(gMapSymbols[sMapViewerSelectedIndex].addr);
     }
 
