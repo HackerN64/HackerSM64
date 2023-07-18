@@ -81,10 +81,12 @@ void detect_emulator() {
     if (IO_READ(DPC_CLOCK_REG) != 0) {
         gIsConsole = TRUE;
         gIsVC = FALSE;
+        gCacheEmulated = TRUE;
         gEmulator = EMU_CONSOLE;
         return;
     }
 
+    gIsConsole = FALSE;
     if (IS_VC()) {
         gIsVC = TRUE;
         gCacheEmulated = FALSE;
