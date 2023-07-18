@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "macros.h"
 #include <PR/gs2dex.h>
+#include "game/emutest.h"
 
 #ifndef S2D_CONFIG_H
 #define S2D_CONFIG_H
@@ -88,7 +89,7 @@ extern char *proutSprintf(char *dst, const char *src, size_t count);
 #define TEX_BITDEPTH 8
 
 #define seg2virt segmented_to_virtual
-#define gIsEmulator (!gIsConsole)
+#define gIsEmulator (!(gEmulator & EMU_CONSOLE))
 
 // Texture resolution (pixels on the texture per pixel on the framebuffer)
 #define TEX_RES 1

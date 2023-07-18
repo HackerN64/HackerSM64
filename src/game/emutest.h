@@ -8,7 +8,7 @@ enum Emulator {
         EMU_PROJECT64_3 = 0x0008, // PJ64 3.X
         EMU_PROJECT64_4 = 0x0010, // PJ64 4.0 or later
     EMU_MUPEN_BASED = 0x0060, // mupen64plus or pre-2.12 paralleln64, but NOT simple64 or new paralleln64
-        EMU_MUPEN_OLD = 0x0020, // 1964 and pre-2.12 paralleln64 will also get detected as this
+        EMU_MUPEN_OLD = 0x0020, // Nemu64 and pre-2.12 paralleln64 will also get detected as this
         EMU_MUPEN64PLUS_NEXT = 0x040,
     EMU_CEN64 = 0x0080,
     EMU_SIMPLE64 = 0x0100,
@@ -17,7 +17,7 @@ enum Emulator {
     EMU_CONSOLE = 0x0800
 };
 
-// initializes gEmulator, gIsConsole, gIsVC, and gCacheEmulated
+// initializes gEmulator
 extern void detect_emulator();
 
 /* gEmulator is an enum that identifies the current emulator.

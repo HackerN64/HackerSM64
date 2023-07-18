@@ -7,11 +7,7 @@
 #include <PR/R4300.h>
 #include <ultra64.h>
 #include <string.h>
-#include "vc_check.h"
 #include "types.h"
-
-extern u8 gCacheEmulated;
-extern u8 gIsConsole;
 
 extern OSMesgQueue gSIEventMesgQueue;
 extern u8 __osContPifRam[];
@@ -19,7 +15,7 @@ extern u8 __osContLastCmd;
 extern void __osSiGetAccess(void);
 extern void __osSiRelAccess(void);
 
-enum Emulator gEmulator = 0;
+enum Emulator gEmulator = EMU_CONSOLE;
 
 __attribute__((aligned(8)))
 static const u32 check_count_factor_asm[] = {
@@ -74,7 +70,7 @@ static inline enum Emulator get_pj64_version() {
     return (pifCheck == 0xB0) ? EMU_PROJECT64_1_OR_2 : EMU_PROJECT64_3;
 }
 
-static void check_cache_emulation() {
+static u8 check_cache_emulation() {
     // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
     u32 saved = __osDisableInt();
     // Create a variable with an initial value of 1. This value will remain cached.
@@ -84,30 +80,35 @@ static void check_cache_emulation() {
     *(u8*)(K0_TO_K1(&sCachedValue)) = 0;
     // Read the variable back from dcache, if it's still 1 then cache is emulated correctly.
     // If it's zero, then dcache is not emulated correctly.
-    gCacheEmulated = sCachedValue;
+    const u8 cacheEmulated = sCachedValue;
     // Restore interrupts
     __osRestoreInt(saved);
+    return cacheEmulated;
+}
+
+f32 round_double_to_float(f64 v) {
+    return v;
 }
 
 void detect_emulator() {
     if (IO_READ(DPC_CLOCK_REG) != 0) {
-        gIsConsole = TRUE;
-        gIsVC = FALSE;
-        gCacheEmulated = TRUE;
         gEmulator = EMU_CONSOLE;
         return;
     }
-
-    gIsConsole = FALSE;
-    if (IS_VC()) {
-        gIsVC = TRUE;
-        gCacheEmulated = FALSE;
+    
+    /*
+     * This check forces RTZ bug on vc
+     * If console is N64/adequate Emu round-to-nearest (RTN) rounding mode is used
+     * If console is VC round-to-zero (RTZ) mode is used
+     *
+     * The double value 0.9999999999999999 used is 0x3FEFFFFFFFFFFFFF in binary
+     * Exponent=01111111110, Mantissa=1111111111111111111111111111111111111111111111111111
+     * RTZ will output not 1.0f, RTN will output exactly 1.0f
+    */
+    if (1.0f != round_double_to_float(0.9999999999999999)) {
         gEmulator = EMU_WIIVC;
         return;
     }
-
-    gIsVC = FALSE;
-    check_cache_emulation();
 
     // Perform a read from unmapped PIF ram.
     // On console and well behaved emulators, this echos back the lower half of
@@ -129,7 +130,7 @@ void detect_emulator() {
         // This is the correct result (echo back the lower half of the requested address)
         case 0x0106: {
             // If the cache is emulated, it's Ares
-            if (gCacheEmulated) {
+            if (check_cache_emulation()) {
                 gEmulator = EMU_ARES;
                 return;
             }
@@ -151,7 +152,7 @@ void detect_emulator() {
         // requested the whole word, but that's actually wrong. Later versions of mupen
         // (and the Simple64 fork of it) get this wrong.
         case 0x0104:
-            gEmulator = gCacheEmulated ? EMU_SIMPLE64 : EMU_MUPEN64PLUS_NEXT;
+            gEmulator = check_cache_emulation() ? EMU_SIMPLE64 : EMU_MUPEN64PLUS_NEXT;
             return;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function

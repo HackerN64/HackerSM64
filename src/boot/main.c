@@ -15,7 +15,6 @@
 #include "game/main.h"
 #include "game/rumble_init.h"
 #include "game/version.h"
-#include "game/vc_check.h"
 #ifdef UNF
 #include "usb/usb.h"
 #include "usb/debug.h"
@@ -23,8 +22,6 @@
 #include "game/puppyprint.h"
 #include "game/puppylights.h"
 #include "game/profiling.h"
-
-#include "game/vc_check.h"
 #include "game/emutest.h"
 
 // Message IDs
@@ -370,7 +367,7 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
 
-    if (!gIsConsole) {
+    if (!(gEmulator & EMU_CONSOLE)) {
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
 #ifdef RCVI_HACK
         VI.comRegs.vSync = 525*20;   
