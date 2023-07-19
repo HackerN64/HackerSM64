@@ -7,6 +7,7 @@
 #include <PR/R4300.h>
 #include <ultra64.h>
 #include <string.h>
+#include "emutest_vc.h"
 #include "types.h"
 
 extern OSMesgQueue gSIEventMesgQueue;
@@ -78,10 +79,6 @@ static u8 check_cache_emulation() {
     // Restore interrupts
     __osRestoreInt(saved);
     return cacheEmulated;
-}
-
-f32 round_double_to_float(f64 v) {
-    return v;
 }
 
 void detect_emulator() {
