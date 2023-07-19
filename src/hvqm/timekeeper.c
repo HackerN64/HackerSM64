@@ -3,6 +3,7 @@
 #include "hvqm.h"
 #include "audio/data.h"
 #include "buffers/framebuffers.h"
+#include "game/instant_input.h"
 
 /***********************************************************************
  * Timekeeper thread
@@ -327,6 +328,7 @@ static void timekeeperProc(void UNUSED*argument) {
 	    pushed_cfb_statP = videoRing[videoRingRead].statP;
 	    *pushed_cfb_statP |= CFB_SHOWING;
 	    osViSwapBuffer( pushed_cfb );
+	    if (USE_INSTANT_INPUT) __osViSwapContext();
 	    if ( ++videoRingRead == VIDEO_RING_SIZE ) videoRingRead = 0;
 	    --videoRingCount;
 	  }

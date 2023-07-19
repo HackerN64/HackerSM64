@@ -31,9 +31,7 @@
 #include "vc_ultra.h"
 #include "profiling.h"
 #include "emutest.h"
-
-// Emulators that the Instant Input patch should not be applied to
-#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+#include "instant_input.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -403,12 +401,7 @@ void render_init(void) {
     end_master_display_list();
     exec_display_list(&gGfxPool->spTask);
 
-    // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
-    // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    // Currently, Ares and Simple64 have issues with single buffering so disable it there as well.
-    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
-        sRenderingFramebuffer++;
-    }
+    sRenderingFramebuffer++;
     gGlobalTimer++;
 }
 
@@ -421,6 +414,10 @@ void select_gfx_pool(void) {
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
     gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
+}
+
+static inline void render_framebuffer_effects(UNUSED u16 *framebuffer) {
+    // If you want to manipulate the framebuffer, this is the place to do it
 }
 
 /**
@@ -436,16 +433,26 @@ void display_and_vsync(void) {
         gGoddardVblankCallback();
         gGoddardVblankCallback = NULL;
     }
+    render_framebuffer_effects((u16 *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
     exec_display_list(&gGfxPool->spTask);
-#ifndef UNLOCK_FPS
-    osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-#endif
+#ifdef UNLOCK_FPS
     osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
-#ifndef UNLOCK_FPS
+    if (USE_INSTANT_INPUT) __osViSwapContext();
+#else
+    if (USE_INSTANT_INPUT) {
+        osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
+        __osViSwapContext();
+        osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+    } else {
+        osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
+    }
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
-    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
+    if (USE_INSTANT_INPUT) {
+        sRenderedFramebuffer = !sRenderedFramebuffer;
+        sRenderingFramebuffer = !sRenderingFramebuffer;
+    } else {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }

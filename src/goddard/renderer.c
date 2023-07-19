@@ -18,6 +18,7 @@
 #include "shape_helper.h"
 #include "skin.h"
 #include "types.h"
+#include "game/instant_input.h"
 
 #define MAX_GD_DLS 1000
 #define OS_MESG_SI_COMPLETE 0x33333333
@@ -2019,6 +2020,7 @@ UNUSED static void func_801A01EC(void) {
 UNUSED static void func_801A025C(void) {
     gGdFrameBufNum ^= 1;
     osViSwapBuffer(sScreenView->parent->colourBufs[gGdFrameBufNum]);
+    if (USE_INSTANT_INPUT) __osViSwapContext();
 }
 
 /* 24EA88 -> 24EAF4 */

@@ -11,6 +11,7 @@
 #include "main.h"
 #include "debug.h"
 #include "rumble_init.h"
+#include "instant_input.h"
 
 #include "sm64.h"
 
@@ -372,6 +373,7 @@ void draw_crash_screen(OSThread *thread) {
         osWritebackDCacheAll();
         osViBlack(FALSE);
         osViSwapBuffer(gCrashScreen.framebuffer);
+        if (USE_INSTANT_INPUT) __osViSwapContext();
         updateBuffer = FALSE;
     }
 }

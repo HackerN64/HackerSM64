@@ -5,6 +5,7 @@
 #include <hvqm2dec.h>
 #include <adpcmdec.h>
 #include "hvqm.h"
+#include "game/instant_input.h"
 
 #define AUDIO_DMA_MSG_SIZE 1
 static OSIoMesg     audioDmaMesgBlock;
@@ -124,6 +125,7 @@ void hvqm_main_proc() {
 
     init_cfb();
     osViSwapBuffer( gFramebuffers[NUM_CFBs-1] );
+    if (USE_INSTANT_INPUT) __osViSwapContext();
 
     romcpy(hvqm_header, (void *)_capcomSegmentRomStart, sizeof(HVQM2Header), OS_MESG_PRI_NORMAL, &videoDmaMesgBlock, &videoDmaMessageQ);
 
