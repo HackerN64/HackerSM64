@@ -17,17 +17,11 @@ extern void __osSiRelAccess(void);
 
 enum Emulator gEmulator = EMU_CONSOLE;
 
-__attribute__((aligned(8)))
-static const u32 check_count_factor_asm[] = {
-    0x40084800u, // MFC0 T0, COUNT
-    0x40094800u, // MFC0 T1, COUNT
-    0x03E00008u, // JR RA
-    0x01281023u  // SUBU V0, T1, T0
-};
+u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
 
 static inline u32 check_count_factor() {
     const u32 saved = __osDisableInt();
-    const u32 cf = ((u32 (*)(void))check_count_factor_asm)();
+    const u32 cf = pj64_get_count_factor_asm();
     __osRestoreInt(saved);
     return cf;
 }
