@@ -120,13 +120,6 @@ void detect_emulator() {
     switch (*((volatile u16*)0xbfd00106u)) {
         // This is the correct result (echo back the lower half of the requested address)
         case 0x0106: {
-            // If the cache is emulated, it's Ares
-            if (check_cache_emulation()) {
-                gEmulator = EMU_ARES;
-                return;
-            }
-
-            // It's either ParallelN64 or Project 64 4.0 using the interpreter core
             // Test to see if the libpl emulator extension is present.
             osPiWriteIo(0x1FFB0000u, 0u);
             if (*((volatile u32*)0xbffb0000u) == 0x00500000u) {
@@ -134,8 +127,14 @@ void detect_emulator() {
                 gEmulator = EMU_PARALLELN64;
                 return;
             }
+            
+            // If the cache is emulated, it's Ares
+            if (check_cache_emulation()) {
+                gEmulator = EMU_ARES;
+                return;
+            }
 
-            // No libpl, so its the Project64 4.0 interpreter core
+            // its the Project64 4.0 interpreter core
             gEmulator = EMU_PROJECT64_4;
             return;
         }
