@@ -6,7 +6,7 @@
 .section .text, "ax"
 .set noreorder
 
-.balign 16
+.balign 32
 glabel pj64_get_count_factor_asm
 mfc0 $t0, $9 // $9 is the COUNT register
 mfc0 $t1, $9 
