@@ -83,7 +83,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Many general use defines for object struct members, meant for use in custom object behaviors. Check `include/object_fields.h` for more info on this. (By MrComit)
 - Included `actors/group0.c` in `behavior_data.c`
 - The internal ROM name is now set with a define in `config/config_rom.h` to make it simpler
-- There is also a `gEmulator` variable to detect console or specific emulators and emulator versions
+- There is a `gEmulator` variable to detect console or specific emulators and emulator versions
 - Expanded audio heap allows for a larger concurrent note count and the importing of more m64 sequences and sound banks (By ArcticJaguar725) *
 - You can set a test level in `config/config_debug.h` in order to boot straight into it, so you can quickly test the level you're working on. *
 - Allow all surfaces in the game to have a `force` parameter. Activating this doesn't REQUIRE you to set `force` for every surface: If you don't set, it will default to 0x0000 rather than crashing. Increases RAM usage of collision. *
