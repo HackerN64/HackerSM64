@@ -111,10 +111,11 @@ typedef struct {
 
 typedef struct PACKED {
     /*0x00*/ _Bool initialized;              /* Whether this controller's origins have been set. */
-    /*0x01*/ Analog_u8 stick;                /* -80 <=   stick <=  80 */
-    /*0x03*/ Analog_u8 c_stick;              /* -80 <= c_stick <=  80 */
-    /*0x05*/ Analog_u8 trig;                 /*   0 <= trig    <= 255 */
-} OSContOrigins; /*0x07*/
+    /*0x01*/ _Bool updateOrigins;
+    /*0x02*/ Analog_u8 stick;                /* -80 <=   stick <=  80 */
+    /*0x04*/ Analog_u8 c_stick;              /* -80 <= c_stick <=  80 */
+    /*0x06*/ Analog_u8 trig;                 /*   0 <= trig    <= 255 */
+} OSContOrigins; /*0x08*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
 typedef struct {
@@ -328,7 +329,7 @@ extern s32  osContInit(           OSMesgQueue* mq, u8* bitpattern, OSContStatus*
 extern s32  osContReset(          OSMesgQueue* mq,                 OSContStatus* status);
 extern s32  osContStartQuery(     OSMesgQueue* mq);
 extern s32  osContStartReadData(  OSMesgQueue* mq);
-extern s32  osContStartReadDataEx(OSMesgQueue* mq);
+extern s32  osStartRead_impl(     OSMesgQueue* mq, u8 cmdID);
 #ifndef _HW_VERSION_1
 extern s32  osContSetCh(u8 ch);
 #endif

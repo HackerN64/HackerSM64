@@ -17,25 +17,84 @@ void __osSiRelAccess(void);
 // contreaddata.c //
 ////////////////////
 
+// Default N64 Controller Input Poll command:
+static const __OSContReadFormat sN64WriteFormat = {
+    .size.tx            = sizeof(sN64WriteFormat.send),
+    .size.rx            = sizeof(sN64WriteFormat.recv),
+    .send.cmdID         = CONT_CMD_READ_BUTTON,
+    .recv.raw.u8        = { [0 ... (sizeof(sN64WriteFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
+};
+
+// Default GCN Controller Input Short Poll command:
+static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
+    .size.tx            = sizeof(sGCNWriteFormatShort.send),
+    .size.rx            = sizeof(sGCNWriteFormatShort.recv),
+    .send.cmdID         = CONT_CMD_GCN_SHORT_POLL,
+    .send.analog_mode   = GCN_MODE_3_220,
+    .send.rumble        = MOTOR_STOP,
+    .recv.raw.u8        = { [0 ... (sizeof(sGCNWriteFormatShort.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
+};
+
+// Default GCN Controller Read Origin command:
+static const __OSContGCNReadOriginFormat sGCNReadOriginFormat = {
+    .size.tx            = sizeof(sGCNReadOriginFormat.send),
+    .size.rx            = sizeof(sGCNReadOriginFormat.recv),
+    .send.cmdID         = CONT_CMD_GCN_READ_ORIGIN,
+    .recv.raw.u8        = { [0 ... (sizeof(sGCNReadOriginFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
+};
+
+// Default GCN Controller Input Calibrate command:
+static const __OSContGCNLongPollFormat sGCNCalibrateFormat = {
+    .size.tx            = sizeof(sGCNCalibrateFormat.send),
+    .size.rx            = sizeof(sGCNCalibrateFormat.recv),
+    .send.cmdID         = CONT_CMD_GCN_CALIBRATE,
+    .send.analog_mode   = GCN_MODE_3_220,
+    .send.rumble        = MOTOR_STOP,
+    .recv.raw.u8        = { [0 ... (sizeof(sGCNCalibrateFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
+};
+
+// Default GCN Controller Input Long Poll command:
+static const __OSContGCNLongPollFormat sGCNWriteFormatLong = {
+    .size.tx            = sizeof(sGCNWriteFormatLong.send),
+    .size.rx            = sizeof(sGCNWriteFormatLong.recv),
+    .send.cmdID         = CONT_CMD_GCN_LONG_POLL,
+    .send.analog_mode   = GCN_MODE_3_220,
+    .send.rumble        = MOTOR_STOP,
+    .recv.raw.u8        = { [0 ... (sizeof(sGCNWriteFormatLong.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
+};
+
 static void __osPackReadData(void);
+static void __osPackGCNReadOrigins(void);
+
+CommandPackFunc sCommandPackFuncs[] = {
+    { .cmdID = CONT_CMD_READ_BUTTON,     .packFunc = __osPackReadData       },
+    { .cmdID = CONT_CMD_GCN_SHORT_POLL,  .packFunc = __osPackReadData       },
+    { .cmdID = CONT_CMD_GCN_READ_ORIGIN, .packFunc = __osPackGCNReadOrigins },
+};
+
 
 /**
- * @brief Sets up PIF commands to poll controller inputs.
- * Unmodified from vanilla libultra, but __osPackReadData is modified.
- * Called by poll_controller_inputs.
+ * @brief Implementation for PIF pack handlers.
  *
  * @param[in] mq The SI event message queue.
+ * @param[in] cmdID The command ID to run (see sCommandPackFuncs);
  * @returns Error status: -1 = busy, 0 = success.
  */
-s32 osContStartReadDataEx(OSMesgQueue* mq) {
+s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
     s32 ret = 0;
 
     __osSiGetAccess();
 
     // If this was called twice in a row, there is no need to write the command again.
-    if (__osContLastCmd != CONT_CMD_READ_BUTTON) {
-        // Write the command to __osContPifRam.
-        __osPackReadData();
+    if (__osContLastCmd != cmdID) {
+        // Check for a valid command in the list.
+        for (int i = 0; i < ARRAY_COUNT(sCommandPackFuncs); i++) {
+            if (sCommandPackFuncs[i].cmdID == cmdID) {
+                // Write the command to __osContPifRam.
+                sCommandPackFuncs[i].packFunc();
+                break;
+            }
+        }
 
         // Write __osContPifRam to the PIF RAM.
         ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
@@ -47,11 +106,26 @@ s32 osContStartReadDataEx(OSMesgQueue* mq) {
     // Read the resulting __osContPifRam from the PIF RAM.
     ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
 
-    __osContLastCmd = CONT_CMD_READ_BUTTON;
+    __osContLastCmd = cmdID;
 
     __osSiRelAccess();
 
     return ret;
+}
+
+/**
+ * @brief Updates the analog origins data for a GCN controller pad.
+ *
+ * @param[in,out] origins The origins struct to modify.
+ * @param[in] stick   The raw GCN analog stick data.
+ * @param[in] c_stick The raw GCN C-stick data.
+ * @param[in] trig    The raw GCN analog triggers data.
+ */
+static void set_gcn_origins(OSContOrigins* origins, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
+    origins->initialized = TRUE;
+    origins->stick   = stick;
+    origins->c_stick = c_stick;
+    origins->trig    = trig;
 }
 
 /**
@@ -70,11 +144,12 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
 
     // The first time the controller is connected, store the origins for the controller's analog sticks.
     if (!origins->initialized) {
-        //! TODO: Repoll for origins (0x41) if gcn.standard.GET_ORIGIN is set.
-        origins->initialized = TRUE;
-        origins->stick   = stick;
-        origins->c_stick = c_stick;
-        origins->trig    = trig;
+        set_gcn_origins(origins, stick, c_stick, trig);
+    }
+
+    // If the GET_ORIGIN bit is set, that means the controller has new analog origins data and either CONT_CMD_GCN_READ_ORIGIN or CONT_CMD_GCN_CALIBRATE needs to be run to get the new data.
+    if (gcn.standard.GET_ORIGIN) {
+        origins->updateOrigins = TRUE;
     }
 
     // Write the analog data.
@@ -142,6 +217,8 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             return;
         }
 
+        OSContOrigins* origins = &pad->origins;
+
         // Handle different types of poll commands:
         switch (readformatptr->send.cmdID) {
             case CONT_CMD_READ_BUTTON:
@@ -160,10 +237,11 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             case CONT_CMD_GCN_SHORT_POLL:
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     gcnInput = (*(__OSContGCNShortPollFormat*)ptr).recv.input;
+                    u8 analog_mode = (*(__OSContGCNShortPollFormat*)ptr).send.analog_mode;
                     Analog_u8 c_stick, trig;
 
                     // The GameCube controller has various modes for returning the lower analog bits (4 bits per axis vs. 8 bits per axis).
-                    switch ((*(__OSContGCNShortPollFormat*)ptr).send.analog_mode) {
+                    switch (analog_mode) {
                         default: // GCN_MODE_0_211, GCN_MODE_5_211, GCN_MODE_6_211, GCN_MODE_7_211
                             c_stick = gcnInput.m0.c_stick;
                             trig    = ANALOG_U4_TO_U8(gcnInput.m0.trig);
@@ -188,10 +266,34 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 
                     __osContReadGCNInputData(pad, gcnInput.buttons, gcnInput.stick, c_stick, trig);
                 } else {
-                    pad->origins.initialized = FALSE;
+                    origins->initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNShortPollFormat);
+                break;
+
+            case CONT_CMD_GCN_READ_ORIGIN:
+                if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
+                    gcnInput = (*(__OSContGCNReadOriginFormat*)ptr).recv.origins;
+
+                    set_gcn_origins(origins, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
+                } else {
+                    origins->initialized = FALSE;
+                }
+
+                ptr += sizeof(__OSContGCNReadOriginFormat);
+                break;
+
+            case CONT_CMD_GCN_CALIBRATE:
+                if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
+                    gcnInput = (*(__OSContGCNCalibrateFormat*)ptr).recv.origins;
+
+                    set_gcn_origins(origins, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
+                } else {
+                    origins->initialized = FALSE;
+                }
+
+                ptr += sizeof(__OSContGCNCalibrateFormat);
                 break;
 
             case CONT_CMD_GCN_LONG_POLL:
@@ -201,7 +303,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     // Long poll returns 8 bits for all analog axes (equivalent to mode 3 but with 2 more bytes for the usually unused analog buttons (1 byte each)).
                     __osContReadGCNInputData(pad, gcnInput.buttons, gcnInput.stick, gcnInput.c_stick, gcnInput.trig);
                 } else {
-                    pad->origins.initialized = FALSE;
+                    origins->initialized = FALSE;
                 }
 
                 ptr += sizeof(__OSContGCNLongPollFormat);
@@ -216,28 +318,12 @@ void osContGetReadDataEx(OSContPadEx* pad) {
     }
 }
 
-// Default N64 Controller Input Poll command:
-static const __OSContReadFormat sN64WriteFormat = {
-    .size.tx            = sizeof(sN64WriteFormat.send),
-    .size.rx            = sizeof(sN64WriteFormat.recv),
-    .send.cmdID         = CONT_CMD_READ_BUTTON,
-    .recv.input.raw.u8  = { [0 ... (sizeof(sN64WriteFormat.recv.input.raw.u8) - 1)] = PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
-};
-
-// Default GCN Controller Input Short Poll command:
-static const __OSContGCNShortPollFormat sGCNWriteFormatShort = {
-    .size.tx            = sizeof(sGCNWriteFormatShort.send),
-    .size.rx            = sizeof(sGCNWriteFormatShort.recv),
-    .send.cmdID         = CONT_CMD_GCN_SHORT_POLL,
-    .send.analog_mode   = GCN_MODE_3_220,
-    .send.rumble        = MOTOR_STOP,
-    .recv.input.raw.u8  = { [0 ... (sizeof(sGCNWriteFormatShort.recv.input.raw.u8) - 1)] = PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
-};
+//! TODO: Combine the below two functions into one single impl function:
 
 /**
  * @brief Writes PIF commands to poll controller inputs.
  * Modified from vanilla libultra to handle GameCube controllers and skip empty/unassigned ports.
- * Called by osContStartReadData and osContStartReadDataEx.
+ * Called by osContStartReadData and osStartRead_impl.
  */
 static void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
@@ -262,6 +348,41 @@ static void __osPackReadData(void) {
 
                 ptr += sizeof(__OSContReadFormat);
             }
+        } else {
+            // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+            ptr++;
+        }
+    }
+
+    *ptr = PIF_CMD_END;
+}
+
+/**
+ * @brief Writes PIF commands to poll controller inputs.
+ * Called by osStartRead_impl.
+ */
+static void __osPackGCNReadOrigins(void) {
+    u8* ptr = (u8*)__osContPifRam.ramarray;
+    OSPortInfo* portInfo = NULL;
+    int port;
+
+    bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
+    __osContPifRam.pifstatus = PIF_STATUS_EXE;
+
+    for (port = 0; port < __osMaxControllers; port++) {
+        portInfo = &gPortInfo[port];
+
+        // Make sure this port has a GCN controller plugged in, and if not status repolling, only poll assigned ports.
+        if (
+            portInfo->plugged &&
+            (gContStatusPolling || portInfo->playerNum) &&
+            (portInfo->type & CONT_CONSOLE_GCN) &&
+            gControllerPads[port].origins.updateOrigins
+        ) {
+            gControllerPads[port].origins.updateOrigins = FALSE;
+            (*(__OSContGCNReadOriginFormat*)ptr) = sGCNReadOriginFormat;
+
+            ptr += sizeof(__OSContGCNReadOriginFormat);
         } else {
             // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
             ptr++;

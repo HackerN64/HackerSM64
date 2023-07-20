@@ -202,8 +202,8 @@ typedef union {
         /*0x02*/ Analog_u8 stick;       // The received analog stick position [-80, 80].
         union {                         // Lower bits:
             struct PACKED { // Default, same as mode 3.
-                /*0x00*/ Analog_u8  c_stick; // The received C-stick position [-80, 80].
-                /*0x02*/ Analog_u8  trig;    // The received trigger position [0, 255].
+                /*0x00*/ Analog_u8 c_stick;  // The received C-stick position [-80, 80].
+                /*0x02*/ Analog_u8 trig;     // The received trigger position [0, 255].
             }; /*0x04*/
             struct PACKED { // Mode 0, 5, 6, 7.
                 /*0x00*/ Analog_u8 c_stick;  // The received C-stick position [-80, 80].
@@ -343,8 +343,13 @@ typedef struct PACKED {
     /*0x02*/ struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_READ_BUTTON).
             } send; /*0x01*/
-    /*0x03*/ struct PACKED {
-                /*0x00*/ N64InputData input;    // The received input data.
+    /*0x03*/ union {
+                struct PACKED {
+                    /*0x00*/ N64InputData input;    // The received input data.
+                }; /*0x04*/
+                union {
+                    u8 u8[4];
+                } raw; /*0x04*/
             } recv; /*0x04*/
 } __OSContReadFormat; /*0x07*/
 
@@ -681,8 +686,13 @@ typedef struct PACKED {
                 /*0x01*/ u8 analog_mode;        // Analog mode (see OSGCNAnalogModes).
                 /*0x02*/ u8 rumble;             // Rumble byte.
             } send; /*0x03*/
-    /*0x05*/ struct PACKED {
-                /*0x00*/ GCNInputData input;    // The received input data.
+    /*0x05*/ union {
+                struct PACKED {
+                    /*0x00*/ GCNInputData input;    // The received input data.
+                }; /*0x08*/
+                union {
+                    u8 u8[8];
+                } raw; /*0x08*/
             } recv; /*0x08*/
 } __OSContGCNShortPollFormat; /*0x0D*/
 
@@ -693,8 +703,15 @@ typedef struct PACKED {
                 /*0x00*/ u8 cmdID;              // The ID of the command to run (CONT_CMD_GCN_READ_ORIGIN).
             } send; /*0x01*/
     /*0x0D*/ struct PACKED {
-                /*0x00*/ GCNInputData origins;  // Only the analog values are used.
-                /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers. Both always 0x02?
+                union {
+                    struct PACKED {
+                        /*0x00*/ GCNInputData origins;  // Only the analog values are used.
+                        /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers. Both always 0x02?
+                    }; /*0x0A*/
+                    union {
+                        u8 u8[10];
+                    } raw; /*0x0A*/
+                }; /*0x0A*/
             } recv; /*0x0A*/
 } __OSContGCNReadOriginFormat; /*0x0D*/
 
@@ -706,9 +723,14 @@ typedef struct PACKED {
                 /*0x01*/ u8 analog_mode;        // Ignored. Analog mode (see OSGCNAnalogModes).
                 /*0x02*/ u8 rumble;             // Ignored. Rumble byte.
             } send; /*0x03*/
-    /*0x0D*/ struct PACKED {
-                /*0x00*/ GCNInputData origins;  // Only the analog values are used.
-                /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers. Both always 0x02?
+    /*0x0D*/ union {
+                struct PACKED {
+                    /*0x00*/ GCNInputData origins;  // Only the analog values are used.
+                    /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers. Both always 0x02?
+                }; /*0x0A*/
+                union {
+                    u8 u8[10];
+                } raw; /*0x0A*/
             } recv; /*0x0A*/
 } __OSContGCNCalibrateFormat; /*0x0F*/
 
@@ -720,9 +742,14 @@ typedef struct PACKED {
                 /*0x01*/ u8 analog_mode;        // Ignored. Analog mode (see OSGCNAnalogModes).
                 /*0x02*/ u8 rumble;             // Rumble byte.
             } send; /*0x03*/
-    /*0x0D*/ struct PACKED {
-                /*0x00*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte C-stick and triggers) regardless of input command.
-                /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers.
+    /*0x0D*/ union {
+                struct PACKED {
+                    /*0x00*/ GCNInputData input;    // The received input data. Uses mode 3 (2-byte C-stick and triggers) regardless of input command.
+                    /*0x08*/ Analog_u8 buttons;     // Analog buttons used by some controllers.
+                }; /*0x0A*/
+                union {
+                    u8 u8[10];
+                } raw; /*0x0A*/
             } recv; /*0x0A*/
 } __OSContGCNLongPollFormat; /*0x0F*/
 
@@ -736,8 +763,13 @@ typedef struct PACKED {
                 /*0x01*/ u8 analog_mode;        // Ignored? Analog mode (see OSGCNAnalogModes).
                 /*0x02*/ u8 rumble;             // Ignored? Rumble byte.
             } send; /*0x0B*/
-    /*0x0D*/ struct PACKED {
-                /*0x00*/ GCNInputData input;    // The received input data.
+    /*0x0D*/ union {
+                struct PACKED {
+                    /*0x00*/ GCNInputData input;    // The received input data.
+                }; /*0x08*/
+                union {
+                    u8 u8[8];
+                } raw; /*0x08*/
             } recv; /*0x08*/
 } __OSContGCNReadKeyboardFormat; /*0x0D*/
 
@@ -843,6 +875,12 @@ enum PIFStatuses {
 //////////////////////////
 
 typedef struct PACKED {
+    /*0x00*/ u8 cmdID;                  // The ID of the command to write (see enum OSContCmds).
+    /*0x01*/ u8 pad[3];
+    /*0x04*/ void (*packFunc)(void);    // The function that writes to __osContPifRam.
+} CommandPackFunc; /*0x08*/
+
+typedef struct PACKED {
     /*0x00*/ u16 type;              // The SI identifier of the device plugged into this port.
     /*0x02*/ u16 accessory;         //! TODO: Accessory type in the controller plugged into in this port.
     /*0x04*/ u16 statusPollButtons; // Input, only used when status polling to save the previous frame's inputs.
@@ -857,8 +895,8 @@ typedef struct PACKED {
 
 // From vanilla libultra:
 extern OSPifRamEx __osContPifRam;       // A buffer for the PIF RAM.
-extern u8        __osMaxControllers;    // The last port to read controllers on.
-extern u8        __osContLastCmd;       // The ID of the last command that was executed.
+extern u8         __osMaxControllers;   // The last port to read controllers on.
+extern u8         __osContLastCmd;      // The ID of the last command that was executed.
 
 // From HackerSM64:
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];

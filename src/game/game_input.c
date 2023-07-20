@@ -84,7 +84,7 @@ static void adjust_analog_stick(struct Controller* controller) {
 
 /**
  * @brief Updates the controller struct.
- * 
+ *
  * @param[in,out] controller The controller to operate on.
  */
 void process_controller_data(struct Controller* controller) {
@@ -244,7 +244,7 @@ void assign_controllers_by_player_num(void) {
 static void poll_controller_inputs(OSMesg* mesg) {
     block_until_rumble_pak_free();
 
-    osContStartReadDataEx(&gSIEventMesgQueue);
+    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_READ_BUTTON);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetReadDataEx(gControllerPads);
 
@@ -268,6 +268,21 @@ static void poll_controller_statuses(OSMesg* mesg) {
 }
 
 /**
+ * @brief Reads GCN controller analog origins data.
+ *
+ * @param[in] mesg The SI message to wait for.
+ */
+static void poll_controller_gcn_origins(OSMesg* mesg) {
+    block_until_rumble_pak_free();
+
+    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
+    osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
+    osContGetReadDataEx(gControllerPads);
+
+    release_rumble_pak_control();
+}
+
+/**
  * @brief Starts polling for new controllers and open the UI.
  * @param[in] isBootMode Boolean. Only used when MAX_SUPPORTED_CONTROLLERS is 1. Triggers a separate mode where the UI is
  *   invisible and the controller with the first detected input (including analog sticks) becomes player 1.
@@ -276,13 +291,16 @@ void start_controller_status_polling(_Bool isBootMode) {
     if (isBootMode) {
         gContStatusPollingReadyForInput = TRUE;
     }
+
     gContStatusPollingIsBootMode = isBootMode;
     gContStatusPolling = TRUE;
     gContStatusPollTimer = 0;
     gNumPlayers = 0;
-    bzero(gPortInfo, sizeof(gPortInfo));
-    bzero(gControllers, sizeof(gControllers));
+
+    bzero(gPortInfo,           sizeof(gPortInfo          ));
+    bzero(gControllers,        sizeof(gControllers       ));
     bzero(gControllerStatuses, sizeof(gControllerStatuses));
+
     cancel_rumble();
 }
 
@@ -424,13 +442,40 @@ void read_controller_inputs_normal(void) {
 }
 
 /**
+ * @brief Checks whether to repoll for GCN analog origins data, and repolls if so.
+ *
+ * @param[in] mesg The SI message to wait for.
+ */
+void check_repoll_gcn_origins(OSMesg* mesg) {
+    _Bool updateOrigins = FALSE;
+
+    for (int port = 0; port < __osMaxControllers; port++) {
+        if (gControllerPads[port].origins.updateOrigins) {
+            updateOrigins = TRUE;
+            break;
+        }
+    }
+
+    if (updateOrigins) {
+        poll_controller_gcn_origins(mesg);
+    }
+}
+
+/**
  * @brief General input handling function.
  *
  * @param[in] mesg The SI message to wait for.
  */
 void handle_input(OSMesg* mesg) {
+#ifndef DISABLE_DEMO
+    run_demo_inputs();
+#endif
+
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
+        // Read GCN controller origins.
+        check_repoll_gcn_origins(mesg);
+
         // Read the raw input data from the controllers.
         poll_controller_inputs(mesg);
 
@@ -439,10 +484,6 @@ void handle_input(OSMesg* mesg) {
             // Input handling for status polling.
             read_controller_inputs_status_polling();
         }
-
-#ifndef DISABLE_DEMO
-        run_demo_inputs();
-#endif
 
         // Check this separately so input can start on the same frame.
         // This is not an else because 'gContStatusPolling' can get set in 'read_controller_inputs_status_polling'
