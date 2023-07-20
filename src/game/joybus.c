@@ -148,6 +148,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     }
 
     // If the GET_ORIGIN bit is set, that means the controller has new analog origins data and either CONT_CMD_GCN_READ_ORIGIN or CONT_CMD_GCN_CALIBRATE needs to be run to get the new data.
+    // The first frame after boot will use the above origins until the proper command runs later in the frame.
     if (gcn.standard.GET_ORIGIN) {
         origins->updateOrigins = TRUE;
     }
