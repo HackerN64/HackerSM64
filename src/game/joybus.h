@@ -885,7 +885,7 @@ typedef struct PACKED {
     /*0x04*/ u16 statusPollButtons; // Input, only used when status polling to save the previous frame's inputs.
     /*0x06*/ _Bool plugged;         // Whether a controller is plugged in to this port.
     /*0x07*/ u8 playerNum;          // The player number. [0, 4]. 0 = not assigned to a player.
-    /*0x08*/ u8 gcRumble;           // Stored GCN Rumble byte.
+    /*0x08*/ u8 gcnRumble;          // Stored GCN Rumble byte.
 } OSPortInfo; /*0x09*/
 
 /////////////
