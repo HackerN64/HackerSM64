@@ -53,4 +53,4 @@ void stop_controller_status_polling(OSContPadEx* pad);
 void handle_input(OSMesg* mesg);
 void init_controllers(void);
 
-#endif /* GAME_INPUT */
+#endif /* !GAME_INPUT_H */

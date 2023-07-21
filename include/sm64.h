@@ -706,12 +706,13 @@ enum MarioActionFlags {
 // group 0x1C0: custom actions
 // 0x1C0 - 0x1FF
 
-/*
- this input mask is unused by the controller,
- but INPUT_END_DEMO is used internally to signal
- the demo to end. This button cannot
- be pressed normally by a controller.
-*/
+
+/**
+ * This input mask is unused by the controller,
+ * but END_DEMO is used internally to signal
+ * the demo to end. This button cannot
+ * be pressed normally by a controller.
+ */
 #define INPUT_END_DEMO  CONT_RESET
 
 #define VALID_BUTTONS (A_BUTTON   | B_BUTTON   | Z_TRIG     | START_BUTTON | \

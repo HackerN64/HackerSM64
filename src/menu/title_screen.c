@@ -52,7 +52,7 @@ s32 run_level_id_or_demo(s32 level) {
     gCurrDemoInput = NULL;
 
     if (level == LEVEL_NONE) {
-        if (!gPlayer1Controller->buttonDown && !gPlayer1Controller->stickMag) {
+        if (!gPlayer1Controller->buttonDown && gPlayer1Controller->stickMag == 0.0f) {
             // Start the demo. 800 frames has passed while
             // player is idle on PRESS START screen.
             sDemoCountdown++;
@@ -72,7 +72,9 @@ s32 run_level_id_or_demo(s32 level) {
                 // then use the rest of the values for inputs
                 struct DemoInput* bufTarget = (struct DemoInput*)gDemoInputsBuf.bufTarget;
                 gCurrDemoInput = bufTarget + 1;
-                level = (s8)bufTarget->timer;
+                level = bufTarget->timer;
+
+                // Use the first save file and act.
                 gCurrSaveFileNum = SAVE_FILE_NUM_A;
                 gCurrActNum = ACT_1;
             }
