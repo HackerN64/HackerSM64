@@ -355,6 +355,7 @@ void print_crash_screen_header(void) {
 }
 
 void crash_screen_draw_main(void) {
+    crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_reset_framebuffer(gCSDrawSavedScreenshot);
     crash_screen_reset_scissor_box();
 
