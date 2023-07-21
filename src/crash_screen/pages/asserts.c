@@ -86,6 +86,4 @@ void assert_input(void) {
             }
         }
     }
-
-    // sAssertScrollIndex = clamp_view_to_selection(sAssertScrollIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
