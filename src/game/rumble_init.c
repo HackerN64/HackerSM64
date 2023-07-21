@@ -39,7 +39,8 @@ void release_rumble_pak_control(void) {
     osSendMesg(&gRumblePakSchedulerMesgQueue, (OSMesg)0, OS_MESG_NOBLOCK);
 }
 
-ALIGNED8 static const char *sPfsErrorDesc[] = {
+#ifdef UNF
+ALIGNED8 static const char* sPfsErrorDesc[] = {
     [PFS_ERR_SUCCESS     ] = "successful",                  /* no error                                     */
     [PFS_ERR_NOPACK      ] = "no pak",                      /* no memory card is plugged or                 */
     [PFS_ERR_NEW_PACK    ] = "changed pak",                 /* ram pack has been changed to a different one */
@@ -55,6 +56,7 @@ ALIGNED8 static const char *sPfsErrorDesc[] = {
     [PFS_ERR_NO_GBCART   ] = "no GB cart",                  /* no gb cartridge (64GB-PAK)                   */
     [PFS_ERR_NEW_GBCART  ] = "changed GB cart",             /* gb cartridge may be changed                  */
 };
+#endif // UNF
 
 /**
  * @brief Check the rumble pak status.
@@ -69,7 +71,9 @@ static void detect_rumble_pak(struct RumbleInfo* info, int channel) {
         if (info->error != PFS_ERR_SUCCESS) {
             info->pfs.status = PFS_STATUS_NONE;
             info->motorState = MOTOR_STOP;
+#ifdef UNF
             osSyncPrintf("Rumble Pak error (%d): %s\n", info->error, sPfsErrorDesc[info->error]);
+#endif // UNF
         }
     } else {
         if ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) == 0) { // Check the Rumble Pak status about once per second.

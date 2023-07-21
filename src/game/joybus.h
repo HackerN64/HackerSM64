@@ -1,5 +1,4 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#pragma once
 
 #include <PR/os_internal.h>
 #include "types.h"
@@ -900,5 +899,3 @@ extern u8         __osContLastCmd;      // The ID of the last command that was e
 
 // From HackerSM64:
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
-
-#endif /* CONTROLLER_H */

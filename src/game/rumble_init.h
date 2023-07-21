@@ -1,5 +1,4 @@
-#ifndef RUMBLE_INIT_H
-#define RUMBLE_INIT_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -39,9 +38,9 @@ struct RumbleInfo {
     /*0x6E*/ struct RumbleData current;                     // The current rumble command.
     /*0x76*/ struct RumbleData queue[RUMBLE_QUEUE_SIZE];    // The rumble command queue.
     /*0x8E*/ s32 motorState;                                // Current rumble motor state.
-    /*0x00*/ s32 breathTimer;                               // Only used to time the drowning warning rumble.
-    /*0x00*/ s32 error;                                     // The last error from a motor start/stop.
-};
+    /*0x92*/ s32 breathTimer;                               // Only used to time the drowning warning rumble.
+    /*0x96*/ s32 error;                                     // The last error from a motor start/stop.
+}; /*0x9A*/
 
 extern OSThread gRumblePakThread;
 
@@ -77,5 +76,3 @@ void rumble_thread_update_vi(void);
 #define rumble_thread_update_vi()
 
 #endif // !ENABLE_RUMBLE
-
-#endif // RUMBLE_INIT_H

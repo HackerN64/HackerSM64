@@ -252,6 +252,21 @@ static void poll_controller_inputs(OSMesg* mesg) {
 }
 
 /**
+ * @brief Reads GCN controller analog origins data.
+ *
+ * @param[in] mesg The SI message to wait for.
+ */
+static void poll_controller_gcn_origins(OSMesg* mesg) {
+    block_until_rumble_pak_free();
+
+    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
+    osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
+    osContGetReadDataEx(gControllerPads);
+
+    release_rumble_pak_control();
+}
+
+/**
  * @brief Checks for new controller data on all ports.
  *
  * @param[in] mesg The SI message to wait for.
@@ -263,21 +278,6 @@ static void poll_controller_statuses(OSMesg* mesg) {
     osContStartQuery(&gSIEventMesgQueue);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetQueryEx(&gControllerBits, gControllerStatuses);
-
-    release_rumble_pak_control();
-}
-
-/**
- * @brief Reads GCN controller analog origins data.
- *
- * @param[in] mesg The SI message to wait for.
- */
-static void poll_controller_gcn_origins(OSMesg* mesg) {
-    block_until_rumble_pak_free();
-
-    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
-    osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
-    osContGetReadDataEx(gControllerPads);
 
     release_rumble_pak_control();
 }
