@@ -4,7 +4,7 @@
 #include "crash_main.h"
 #include "game/game_input.h"
 #include "crash_controls.h"
-#include "pages/stack_trace.h"
+#include "pages/page_stack.h"
 
 
 _Bool gCSSwitchedPage = FALSE;

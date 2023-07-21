@@ -18,6 +18,6 @@
 extern const enum ControlTypes ramViewerContList[];
 
 
-void ram_viewer_init(void);
-void ram_viewer_draw(void);
-void ram_viewer_input(void);
+void ram_view_init(void);
+void ram_view_draw(void);
+void ram_view_input(void);

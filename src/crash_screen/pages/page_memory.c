@@ -2,7 +2,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "ram_viewer.h"
+#include "page_memory.h"
 #include "engine/colors.h"
 #include "game/game_input.h"
 
@@ -26,7 +26,7 @@ const enum ControlTypes ramViewerContList[] = {
 static const char gHex[0x10] = "0123456789ABCDEF";
 
 
-void ram_viewer_init(void) {
+void ram_view_init(void) {
     sRamViewViewportIndex = gSelectedAddress;
     sRamViewShowAsAscii = FALSE;
 }
@@ -91,7 +91,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
     }
 }
 
-void ram_viewer_draw(void) {
+void ram_view_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
     Address startAddr = sRamViewViewportIndex;
@@ -156,7 +156,7 @@ void ram_viewer_draw(void) {
     osWritebackDCacheAll();
 }
 
-void ram_viewer_input(void) {
+void ram_view_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
         if (gSelectedAddress >= (VIRTUAL_RAM_START + RAM_VIEWER_STEP)) {

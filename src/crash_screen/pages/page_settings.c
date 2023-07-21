@@ -3,7 +3,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "settings.h"
+#include "page_settings.h"
 #include "game/game_input.h"
 
 

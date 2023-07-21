@@ -3,7 +3,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "disasm.h"
+#include "page_disasm.h"
 #include "game/game_input.h"
 
 

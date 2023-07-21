@@ -4,7 +4,7 @@
 #include "crash_main.h"
 #include "address_select.h"
 #include "game/game_input.h"
-#include "pages/disasm.h"
+#include "pages/page_disasm.h"
 
 
 _Bool gAddressSelectMenuOpen = FALSE;

@@ -2,7 +2,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "asserts.h"
+#include "page_assert.h"
 #include <stdarg.h>
 #include <string.h>
 

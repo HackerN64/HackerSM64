@@ -17,13 +17,13 @@
 #include "game/puppyprint.h"
 #include "game/rumble_init.h"
 #include "game/vc_check.h"
-#include "pages/context.h"
-#include "pages/asserts.h"
-#include "pages/log.h"
-#include "pages/map_viewer.h"
-#include "pages/stack_trace.h"
-#include "pages/ram_viewer.h"
-#include "pages/disasm.h"
+#include "pages/page_context.h"
+#include "pages/page_assert.h"
+#include "pages/page_log.h"
+#include "pages/page_map.h"
+#include "pages/page_stack.h"
+#include "pages/page_memory.h"
+#include "pages/page_disasm.h"
 
 
 struct CSPage gCSPages[NUM_PAGES] = {
@@ -34,9 +34,9 @@ struct CSPage gCSPages[NUM_PAGES] = {
 #endif
     [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw, .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef INCLUDE_DEBUG_MAP
-    [PAGE_MAP_VIEWER ] = { .initFunc = map_viewer_init,  .drawFunc = map_viewer_draw,  .inputFunc = map_viewer_input,  .contList = mapViewerContList,  .name = "MAP VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_MAP_VIEWER ] = { .initFunc = map_view_init,    .drawFunc = map_view_draw,    .inputFunc = map_view_input,    .contList = mapViewerContList,  .name = "MAP VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
-    [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,  .inputFunc = ram_viewer_input,  .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_RAM_VIEWER ] = { .initFunc = ram_view_init,    .drawFunc = ram_view_draw,    .inputFunc = ram_view_input,    .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
     [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,      .inputFunc = disasm_input,      .contList = disasmContList,     .name = "DISASM",      .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 };
 

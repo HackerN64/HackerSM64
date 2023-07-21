@@ -3,7 +3,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "map_viewer.h"
+#include "page_map.h"
 #include "game/game_input.h"
 
 
@@ -21,7 +21,7 @@ const enum ControlTypes mapViewerContList[] = {
 };
 
 
-void map_viewer_init(void) {
+void map_view_init(void) {
     s32 newIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
     sMapViewerSelectedIndex = (newIndex != -1) ? newIndex : 0;
     sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
@@ -86,7 +86,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
     osWritebackDCacheAll();
 }
 
-void map_viewer_draw(void) {
+void map_view_draw(void) {
     u32 line = 1;
 
     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (STRLEN("SIZE:") + 1 + 1)), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
@@ -108,7 +108,7 @@ void map_viewer_draw(void) {
     osWritebackDCacheAll();
 }
 
-void map_viewer_input(void) {
+void map_view_input(void) {
     if (gCSSwitchedPage) {
         s32 targetIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
         if (targetIndex != -1) {

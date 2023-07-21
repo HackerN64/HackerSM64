@@ -4,7 +4,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "log.h"
+#include "page_log.h"
 #include "engine/colors.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"

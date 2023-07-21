@@ -2,7 +2,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
-#include "context.h"
+#include "page_context.h"
 
 
 static const char* sCauseDesc[18] = {

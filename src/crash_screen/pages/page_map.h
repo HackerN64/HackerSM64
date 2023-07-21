@@ -12,6 +12,6 @@
 extern const enum ControlTypes mapViewerContList[];
 
 
-void map_viewer_init(void);
-void map_viewer_draw(void);
-void map_viewer_input(void);
+void map_view_init(void);
+void map_view_draw(void);
+void map_view_input(void);
