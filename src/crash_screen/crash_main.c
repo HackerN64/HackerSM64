@@ -27,17 +27,17 @@
 
 
 struct CSPage gCSPages[NUM_PAGES] = {
-    [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = crash_context_draw,  .inputFunc = NULL,              .contList = defaultContList,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
-    [PAGE_ASSERTS    ] = { .initFunc = assert_init,      .drawFunc = assert_draw,         .inputFunc = assert_input,      .contList = assertsContList,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = context_draw,     .inputFunc = NULL,              .contList = defaultContList,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
+    [PAGE_ASSERTS    ] = { .initFunc = assert_init,      .drawFunc = assert_draw,      .inputFunc = assert_input,      .contList = assertsContList,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = puppyprint_log_draw, .inputFunc = NULL,              .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = log_draw,         .inputFunc = NULL,              .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
-    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw,    .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw, .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef INCLUDE_DEBUG_MAP
-    [PAGE_MAP_VIEWER ] = { .initFunc = map_viewer_init,  .drawFunc = map_viewer_draw,     .inputFunc = map_viewer_input,  .contList = mapViewerContList,  .name = "MAP VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_MAP_VIEWER ] = { .initFunc = map_viewer_init,  .drawFunc = map_viewer_draw,  .inputFunc = map_viewer_input,  .contList = mapViewerContList,  .name = "MAP VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
-    [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,     .inputFunc = ram_viewer_input,  .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
-    [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,         .inputFunc = disasm_input,      .contList = disasmContList,     .name = "DISASM",      .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_RAM_VIEWER ] = { .initFunc = ram_viewer_init,  .drawFunc = ram_viewer_draw,  .inputFunc = ram_viewer_input,  .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,      .inputFunc = disasm_input,      .contList = disasmContList,     .name = "DISASM",      .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 };
 
 enum CrashScreenPages gCSPageID = FIRST_PAGE;

@@ -159,7 +159,7 @@ void crash_screen_print_float_registers(__OSThreadContext* tc) {
     }
 }
 
-void crash_context_draw(void) {
+void context_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
     u32 cause = ((tc->cause >> CAUSE_EXCSHIFT) & BITMASK(5));

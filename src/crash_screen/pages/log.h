@@ -5,4 +5,7 @@
 #include "types.h"
 
 
-void puppyprint_log_draw(void);
+#define LOG_NUM_ROWS MIN(LOG_BUFFER_SIZE, 20)
+
+
+void log_draw(void);

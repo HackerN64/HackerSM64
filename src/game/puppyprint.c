@@ -418,14 +418,15 @@ static void print_audio_overview(void) {
     print_audio_ram_overview(x, textBytes);
 }
 
-char consoleLogTable[LOG_BUFFER_SIZE][255];
+char consoleLogTable[LOG_BUFFER_SIZE][LOG_MESSAGE_SIZE];
+u32 gConsoleLogLastIndex = 0;
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
 void append_puppyprint_log(const char *str, ...) {
-    char textBytes[255];
+    char textBytes[LOG_MESSAGE_SIZE];
 
     memset(textBytes, 0, sizeof(textBytes));
     va_list arguments;
@@ -438,9 +439,10 @@ void append_puppyprint_log(const char *str, ...) {
     osSyncPrintf(textBytes);
 #endif
     for (u8 i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
-        memcpy(consoleLogTable[i], consoleLogTable[i + 1], 255);
+        memcpy(consoleLogTable[i], consoleLogTable[i + 1], sizeof(consoleLogTable[0]));
     }
-    memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, 255);
+    memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, sizeof(consoleLogTable[0]));
+    gConsoleLogLastIndex++;
     va_end(arguments);
 }
 

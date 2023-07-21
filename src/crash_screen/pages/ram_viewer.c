@@ -23,12 +23,13 @@ const enum ControlTypes ramViewerContList[] = {
 };
 
 
+static const char gHex[0x10] = "0123456789ABCDEF";
+
+
 void ram_viewer_init(void) {
     sRamViewViewportIndex = gSelectedAddress;
     sRamViewShowAsAscii = FALSE;
 }
-
-static const char gHex[0x10] = "0123456789ABCDEF";
 
 static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
     // "[XX]"
