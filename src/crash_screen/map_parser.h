@@ -10,13 +10,14 @@ enum SymbolSearchDirections {
     SYMBOL_SEARCH_BACKWARD,
 };
 
+// See mapPacker.py.
 struct MapSymbol {
-    /*0x00*/ Address addr;
-    /*0x04*/ size_t size;
-    /*0x08*/ size_t name_offset;
-    /*0x0C*/ u16 name_len;
-    /*0x0D*/ uchar errc;
-    /*0x0E*/ uchar type;
+    /*0x00*/ Address addr;          // Symbol address.
+    /*0x04*/ size_t size;           // Symbol size.
+    /*0x08*/ size_t name_offset;    // Offset of symbol name in gMapStrings.
+    /*0x0C*/ u16 name_len;          // Symbol name length.
+    /*0x0D*/ uchar type;            // Symbol type.
+    /*0x0E*/ uchar errc;            // Error char: 'S' = unknown size.
 }; /*0x10*/
 
 typedef struct {
