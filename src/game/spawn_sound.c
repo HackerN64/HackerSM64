@@ -9,7 +9,7 @@
 #include "sm64.h"
 #include "level_update.h"
 #include "spawn_sound.h"
-#include "rumble_init.h"
+#include "input.h"
 
 /*
  * execute an object's current sound state with a provided array

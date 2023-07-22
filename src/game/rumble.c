@@ -4,10 +4,10 @@
 
 #include "buffers/buffers.h"
 #include "main.h"
-#include "rumble_init.h"
+#include "rumble.h"
 #include "level_update.h"
 #include "joybus.h"
-#include "game_input.h"
+#include "input.h"
 
 #ifdef ENABLE_RUMBLE
 
@@ -238,7 +238,7 @@ void queue_rumble_data(struct Controller* controller, s16 timer, s16 level, s16 
  * @brief Used after setting 'breathTimer' to check if any rumble commands are being executed or queued.
  *
  * @param[in] controller A pointer to the controller to rumble.
- * @returns s32 Boolean, whether the controller is done rumbling.
+ * @returns Boolean, whether the controller is done rumbling.
  */
 _Bool is_rumble_finished_and_queue_empty(struct Controller* controller) {
     if (controller == NULL) {

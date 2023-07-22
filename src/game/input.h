@@ -5,6 +5,7 @@
 
 #include "types.h"
 #include "config.h"
+#include "rumble.h"
 
 // Controller Status Polling:
 

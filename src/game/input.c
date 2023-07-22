@@ -5,8 +5,8 @@
 #include "engine/math_util.h"
 #include "main.h"
 #include "game_init.h"
-#include "rumble_init.h"
-#include "game_input.h"
+#include "rumble.h"
+#include "input.h"
 #include "profiling.h"
 #include "vc_check.h"
 #include "vc_ultra.h"
@@ -56,7 +56,7 @@ struct Controller* const gDemoController = &gDemoControllers[0];
  * @param[in,out] controller The controller to operate on.
  */
 static void adjust_analog_stick(struct Controller* controller) {
-    const s16 deadzone = (controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8;
+    const s16 deadzone = ((controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8);
     const s16 offset = (deadzone - 2);
     const f32 max_stick_mag = 64.0f;
 
@@ -95,7 +95,7 @@ void process_controller_data(struct Controller* controller) {
     // Lock buttons that were used in the combo to exit status polling until they are released.
     controllerData->lockedButton &= controllerData->button;
     u16 button = controllerData->button &= ~controllerData->lockedButton;
-    controller->buttonPressed  = (~controller->buttonDown & button);
+    controller->buttonPressed = (~controller->buttonDown & button);
     controller->buttonReleased = (~button & controller->buttonDown);
     // 0.5x A presses are a good meme.
     controller->buttonDown = button;
@@ -157,9 +157,9 @@ void run_demo_inputs(void) {
  * @param[in ] buttonDown    The buttons that are currently held down.
  * @param[in ] buttonPressed The buttons that are freshly pressed on this frame.
  * @param[out] combo         The button combo to check for.
- * @returns s32 Boolean whether the check is successful.
+ * @returns Boolean whether the check is successful.
  */
-ALWAYS_INLINE s32 check_button_pressed_combo(u16 buttonDown, u16 buttonPressed, u16 combo) {
+ALWAYS_INLINE _Bool check_button_pressed_combo(u16 buttonDown, u16 buttonPressed, u16 combo) {
     return (((buttonDown & combo) == combo) && (buttonPressed & combo));
 }
 
@@ -334,9 +334,9 @@ void stop_controller_status_polling(OSContPadEx* pad) {
  *
  * @param[in] pad      The controller pad to check.
  * @param[in] deadzone The deadzone to compare with.
- * @returns s32 Boolean whether any input was detected.
+ * @returns Boolean whether any input was detected.
  */
-static s32 detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
+static _Bool detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
     return (
         abss(pad->stick.x  ) > deadzone ||
         abss(pad->stick.y  ) > deadzone ||

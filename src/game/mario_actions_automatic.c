@@ -15,7 +15,7 @@
 #include "interaction.h"
 #include "camera.h"
 #include "level_table.h"
-#include "rumble_init.h"
+#include "input.h"
 
 #include "config.h"
 

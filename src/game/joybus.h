@@ -899,3 +899,5 @@ extern u8         __osContLastCmd;      // The ID of the last command that was e
 
 // From HackerSM64:
 extern OSPortInfo gPortInfo[MAXCONTROLLERS];
+
+void __osContGetInitDataEx(u8* pattern, OSContStatus* status);

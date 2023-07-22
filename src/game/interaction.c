@@ -22,7 +22,6 @@
 #include "seq_ids.h"
 #include "sm64.h"
 #include "sound_init.h"
-#include "rumble_init.h"
 #include "config.h"
 
 u8  sDelayInvincTimer;

@@ -5,8 +5,8 @@
 #include "joybus.h"
 #include "engine/math_util.h"
 #include "game_init.h"
-#include "game_input.h"
-#include "rumble_init.h"
+#include "input.h"
+#include "rumble.h"
 
 OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
 
@@ -68,7 +68,7 @@ static void __osPackRead_impl(u8 cmdID);
 /**
  * @brief Implementation for PIF pack handlers.
  *
- * @param[in] mq The SI event message queue.
+ * @param[in] mq    The SI event message queue.
  * @param[in] cmdID The command ID to run (see enum OSContCmds);
  * @returns Error status: -1 = busy, 0 = success.
  */
@@ -185,9 +185,9 @@ static void __osPackRead_impl(u8 cmdID) {
  * @brief Updates the analog origins data for a GCN controller pad.
  *
  * @param[in,out] origins The origins struct to modify.
- * @param[in] stick   The raw GCN analog stick data.
- * @param[in] c_stick The raw GCN C-stick data.
- * @param[in] trig    The raw GCN analog triggers data.
+ * @param[in    ] stick   The raw GCN analog stick data.
+ * @param[in    ] c_stick The raw GCN C-stick data.
+ * @param[in    ] trig    The raw GCN analog triggers data.
  */
 static void set_gcn_origins(OSContOrigins* origins, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     origins->initialized = TRUE;
@@ -391,7 +391,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 // contquery.c //
 /////////////////
 
-void __osContGetInitDataEx(u8* pattern, OSContStatus* data);
+void __osContGetInitDataEx(u8* pattern, OSContStatus* status);
 
 /**
  * @brief Read status query data written by osContStartQuery.
@@ -399,10 +399,10 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data);
  * Called by poll_controller_statuses.
  *
  * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
- * @param[out] data       A pointer to the 4 controller statuses.
+ * @param[out] status     A pointer to the 4 controller statuses.
  */
-void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
-    __osContGetInitDataEx(bitpattern, data);
+void osContGetQueryEx(u8* bitpattern, OSContStatus* status) {
+    __osContGetInitDataEx(bitpattern, status);
 }
 
 //////////////////
@@ -416,9 +416,9 @@ void osContGetQueryEx(u8* bitpattern, OSContStatus* data) {
  * Called by osContInit, osContGetQuery, osContGetQueryEx, and osContReset.
  *
  * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
- * @param[out] data       A pointer to the 4 controller statuses.
+ * @param[out] status     A pointer to the 4 controller statuses.
  */
-void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
+void __osContGetInitDataEx(u8* pattern, OSContStatus* status) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequestFormatAligned requestHeader;
     OSPortInfo* portInfo = NULL;
@@ -427,27 +427,27 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 
     for (port = 0; port < __osMaxControllers; port++) {
         requestHeader = *(__OSContRequestFormatAligned*)ptr;
-        data->error = CHNL_ERR(requestHeader.fmt.size);
+        status->error = CHNL_ERR(requestHeader.fmt.size);
 
-        if (data->error == (CHNL_ERR_SUCCESS >> 4)) {
+        if (status->error == (CHNL_ERR_SUCCESS >> 4)) {
             portInfo = &gPortInfo[port];
 
             // Byteswap the SI identifier. This is done in vanilla libultra.
-            data->type = ((requestHeader.fmt.recv.type.l << 8) | requestHeader.fmt.recv.type.h);
+            status->type = ((requestHeader.fmt.recv.type.l << 8) | requestHeader.fmt.recv.type.h);
 
             // Check the type of controller device connected to the port.
             // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type to N64 controller if so.
-            portInfo->type = ((s16)data->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : data->type;
+            portInfo->type = ((s16)status->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : status->type;
 
             // Set this port's status.
-            data->status = requestHeader.fmt.recv.status.raw;
+            status->status = requestHeader.fmt.recv.status.raw;
             portInfo->plugged = TRUE;
             bits |= (1 << port);
         }
 
         ptr += sizeof(requestHeader);
-        data++;
+        status++;
     }
 
     *pattern = bits;
@@ -572,10 +572,10 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
  * Modified from vanilla libultra to ignore GameCube controllers.
  * Called by thread6_rumble_loop and cancel_rumble.
  *
- * @param[in]  mq      The SI event message queue.
+ * @param[in ] mq      The SI event message queue.
  * @param[out] pfs     A pointer to a buffer for the controller pak (AKA rumble pak) file system.
- * @param[in]  channel The port ID to operate on.
- * @returns    PFS error status.
+ * @param[in ] channel The port ID to operate on.
+ * @returns PFS error status.
  */
 s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     s32 err = PFS_ERR_SUCCESS;

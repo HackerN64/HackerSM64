@@ -27,7 +27,6 @@
 #endif
 #include "level_table.h"
 #include "course_table.h"
-#include "rumble_init.h"
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "puppylights.h"

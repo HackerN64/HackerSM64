@@ -18,7 +18,6 @@
 #include "game/segment2.h"
 #include "game/segment7.h"
 #include "game/spawn_object.h"
-#include "game/rumble_init.h"
 #include "sm64.h"
 #include "text_strings.h"
 

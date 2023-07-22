@@ -13,7 +13,7 @@
 #include "interaction.h"
 #include "memory.h"
 #include "behavior_data.h"
-#include "rumble_init.h"
+#include "input.h"
 
 #include "config.h"
 

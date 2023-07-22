@@ -10,7 +10,7 @@
 #include "engine/level_script.h"
 #include "engine/math_util.h"
 #include "game_init.h"
-#include "game_input.h"
+#include "input.h"
 #include "main.h"
 #include "memory.h"
 #include "save_file.h"
@@ -19,7 +19,6 @@
 #include "print.h"
 #include "segment2.h"
 #include "segment_symbols.h"
-#include "rumble_init.h"
 #ifdef HVQM
 #include <hvqm/hvqm.h>
 #endif

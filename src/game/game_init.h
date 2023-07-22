@@ -8,7 +8,7 @@
 #include "types.h"
 #include "config.h"
 #include "memory.h"
-#include "game_input.h"
+#include "input.h"
 
 #define MARIO_ANIMS_POOL_SIZE 0x4000
 #define DEMO_INPUTS_POOL_SIZE 0x800
