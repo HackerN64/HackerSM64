@@ -21,7 +21,6 @@ sha1_swapLUT = {
 }
 
 def get_rom_candidates():
-    import subprocess
     fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
     if os.path.exists(ROMS_DIR):
         fileArray += [os.path.join(ROMS_DIR, f) for f in os.listdir(ROMS_DIR) if os.path.isfile(os.path.join(ROMS_DIR, f))]
