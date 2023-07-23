@@ -3,6 +3,16 @@
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
 #include "page_context.h"
+#include "game/game_input.h"
+
+
+const enum ControlTypes contextContList[] = {
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_CYCLE_FLOATS_MODE,
+    CONT_DESC_LIST_END,
+};
 
 
 static const char* sCauseDesc[18] = {
@@ -48,6 +58,10 @@ static const char* sRegNames[29] = { //! TODO: Combine this with sCPURegisterNam
     "S8", "RA",
 };
 
+
+void context_init(void) {
+
+}
 
 // Print a fixed-point register.
 void crash_screen_print_reg(u32 x, u32 y, const char* name, Address addr) {
@@ -128,12 +142,25 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         }
     }
 
-    if (prefix == '\0') {
-        // "[±][exponent]"
-        crash_screen_print(x, y, "% g", val.asF32);
-    } else {
-        // "[XXXXXXXX]"
+    if (prefix != '\0') {
+        // "[prefix][XXXXXXXX]"
         crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
+    } else {
+        switch (gCSSettings[CS_OPT_FLOATS_MODE].val) {
+            case FLOATS_MODE_HEX:
+                // "[XXXXXXXX]"
+                crash_screen_print(x, y, " "STR_HEX_WORD, val.asU32);
+                break;
+            default:
+            case FLOATS_MODE_DEC:
+                // "[±][exponent]"
+                crash_screen_print(x, y, "% g", val.asF32);
+                break;
+            case FLOATS_MODE_SCI:
+                // "[scientific notation]"
+                crash_screen_print(x, y, "% .3e", val.asF32);
+                break;
+        }
     }
 }
 
@@ -195,4 +222,17 @@ void context_draw(void) {
     osWritebackDCacheAll();
 
     crash_screen_print_float_registers(tc);
+}
+
+void context_input(void) {
+    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+        struct CSSettingsEntry* setting = &gCSSettings[CS_OPT_FLOATS_MODE];
+
+        // Cycle floats print mode.
+        setting->val++;
+
+        if (setting->val > setting->upperBound) {
+            setting->val = setting->lowerBound;
+        }
+    }
 }

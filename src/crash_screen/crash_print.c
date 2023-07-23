@@ -213,7 +213,7 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
 static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
-    size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
+    size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val));
     size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
     PrintBuffer* bufChar = &gCSScrollBuffer[0];
@@ -250,7 +250,7 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
 
         size_t bufferCount = format_print_buffer(buf, totalSize);
 
-        if (0 < charLimit && charLimit < bufferCount) {
+        if (0 < charLimit && charLimit < bufferCount && gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val > 0) {
             scroll_buffer(bufferCount, charLimit);
             bufferCount = charLimit;
         }

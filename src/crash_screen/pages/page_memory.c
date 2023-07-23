@@ -9,8 +9,6 @@
 
 static Address sRamViewViewportIndex = 0x00000000;
 
-static _Bool sRamViewShowAsAscii = FALSE;
-
 
 const enum ControlTypes ramViewerContList[] = {
     CONT_DESC_SWITCH_PAGE,
@@ -28,12 +26,11 @@ static const char gHex[0x10] = "0123456789ABCDEF";
 
 void ram_view_init(void) {
     sRamViewViewportIndex = gSelectedAddress;
-    sRamViewShowAsAscii = FALSE;
 }
 
 static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
     // "[XX]"
-    if (sRamViewShowAsAscii) {
+    if (gCSSettings[CS_OPT_MEMORY_AS_ASCII].val) {
         crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
     } else {
         // Faster than doing crash_screen_print:
@@ -65,7 +62,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 charX += 2;
             }
 
-            RGBA32 textColor = ((sRamViewShowAsAscii || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            RGBA32 textColor = ((gCSSettings[CS_OPT_MEMORY_AS_ASCII].val || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
             RGBA32 selectColor = COLOR_RGBA32_NONE;
 
             if (currAddr == gSelectedAddress) {
@@ -137,7 +134,7 @@ void ram_view_draw(void) {
     u32 scrollTop = (DIVIDER_Y(line) + 1);
     u32 scrollBottom = DIVIDER_Y(line2);
 
-    // Scroll bar.
+    // Scroll bar:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
         RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
@@ -145,7 +142,7 @@ void ram_view_draw(void) {
         COLOR_RGBA32_LIGHT_GRAY, TRUE
     );
 
-    // Scroll bar crash position marker.
+    // Scroll bar crash position marker:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
         RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
@@ -193,7 +190,7 @@ void ram_view_input(void) {
 
     if (buttonPressed & B_BUTTON) {
         // Toggle whether the memory is printed as hex values or as ASCII chars.
-        sRamViewShowAsAscii ^= TRUE;
+        gCSSettings[CS_OPT_MEMORY_AS_ASCII].val ^= TRUE;
     }
 
     sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);

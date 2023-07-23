@@ -94,10 +94,6 @@ typedef struct {
 extern CSScissorBox gCSScissorBox;
 
 
-extern _Bool gCSDrawCrashScreen;
-extern _Bool gCSDrawSavedScreenshot;
-
-
 void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
 void crash_screen_reset_scissor_box(void);
 void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);

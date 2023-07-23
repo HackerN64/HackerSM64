@@ -9,8 +9,6 @@
 
 static u32 sDisasmViewportIndex = 0x00000000;
 
-static _Bool sDisasmShowDestFunctionNames = TRUE;
-static _Bool sDisasmShowDataAsBinary = FALSE;
 
 #ifdef INCLUDE_DEBUG_MAP
 static const RGBA32 sBranchColors[] = {
@@ -43,8 +41,6 @@ void reset_branch_buffer(Address funcAddr) {
 void disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
 
-    sDisasmShowDestFunctionNames = TRUE;
-    sDisasmShowDataAsBinary      = FALSE;
 #ifdef INCLUDE_DEBUG_MAP
     gFillBranchBuffer            = FALSE;
     sContinueFillBranchBuffer    = FALSE;
@@ -54,6 +50,7 @@ void disasm_init(void) {
 
 //! TODO: Optimize this as much as possible
 //! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?)
+//! TODO: gCSSettings[CS_OPT_BRANCH_ARROW_MODE].val
 // @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {
@@ -157,14 +154,14 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else {
             u32 x = ((DISASM_BRANCH_ARROW_START_X + dist) - DISASM_BRANCH_ARROW_OFFSET);
             crash_screen_draw_rect((x + 0), (arrowEndHeight - 0), (DISASM_BRANCH_ARROW_OFFSET + 1), 1, color);
-            // Arrow head
+            // Arrow head.
             crash_screen_draw_rect((x + 1), (arrowEndHeight - 1), 1, 3, color);
             crash_screen_draw_rect((x + 2), (arrowEndHeight - 2), 1, 5, color);
         }
 
         s32 height = abss(arrowEndHeight - arrowStartHeight);
 
-        // Middle of arrow
+        // Middle of arrow.
         crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
     }
 }
@@ -190,11 +187,11 @@ void disasm_draw_branch_arrows(u32 printLine) {
 static void print_as_insn(const u32 charX, const u32 charY, const Word data) {
     InsnData insn = { .raw = data };
     const char* destFname = NULL;
-    const char* insnAsStr = insn_disasm(insn, &destFname, sDisasmShowDestFunctionNames);
+    const char* insnAsStr = insn_disasm(insn, &destFname, gCSSettings[CS_OPT_FUNCTION_NAMES].val);
     // "[instruction name] [params]"
     crash_screen_print(charX, charY, "%s", insnAsStr);
 #ifdef INCLUDE_DEBUG_MAP
-    if (sDisasmShowDestFunctionNames && destFname != NULL) {
+    if (gCSSettings[CS_OPT_FUNCTION_NAMES].val && destFname != NULL) {
         // "[function name]"
         crash_screen_print_symbol_name_impl((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
@@ -243,7 +240,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, data);
         } else { // Outside of code segments:
-            if (sDisasmShowDataAsBinary) {
+            if (gCSSettings[CS_OPT_DISASM_BINARY].val) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
                 print_as_binary(charX, charY, data);
             } else {
@@ -354,8 +351,7 @@ void disasm_input(void) {
     }
 
     if (buttonPressed & B_BUTTON) {
-        sDisasmShowDestFunctionNames ^= TRUE;
-        sDisasmShowDataAsBinary ^= TRUE;
+        gCSSettings[CS_OPT_FUNCTION_NAMES].val ^= TRUE;
     }
 
     sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, DISASM_NUM_ROWS, DISASM_STEP);

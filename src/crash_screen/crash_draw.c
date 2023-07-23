@@ -11,10 +11,6 @@
 #include "game/game_init.h"
 
 
-_Bool gCSDrawCrashScreen     = TRUE;
-_Bool gCSDrawSavedScreenshot = TRUE;
-
-
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
@@ -356,11 +352,11 @@ void print_crash_screen_header(void) {
 
 void crash_screen_draw_main(void) {
     crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    crash_screen_reset_framebuffer(gCSDrawSavedScreenshot);
+    crash_screen_reset_framebuffer(gCSSettings[CS_OPT_DRAW_SCREENSHOT].val);
     crash_screen_reset_scissor_box();
 
-    if (gCSDrawCrashScreen) {
-        if (gCSDrawSavedScreenshot) {
+    if (gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val) {
+        if (gCSSettings[CS_OPT_DRAW_SCREENSHOT].val) {
             // Draw the transparent background.
             crash_screen_draw_dark_rect(
                 CRASH_SCREEN_X1, CRASH_SCREEN_Y1,

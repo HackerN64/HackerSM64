@@ -31,7 +31,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
     u32 currIndex = sMapViewerViewportIndex;
     const struct MapSymbol* symbol = &gMapSymbols[currIndex];
 
-    // Print
+    // Print.
     for (u32 i = 0; i < numLines; i++) {
         if (currIndex >= gNumMapSymbols) {
             break;
@@ -51,29 +51,33 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             );
         }
 
+        const size_t typeStrSize = STRLEN("T ");
         const size_t sizeStrSize = STRLEN("00000");
         // "[stack address]:"
         const size_t addrStrSize = crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", symbol->addr);
         // "[name from map data]"
-        crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + sizeStrSize + 1 + 1)), symbol);
+        crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
 
         // "[type]"
         //! TODO: Format this better
-        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - 1), y,
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
             (STR_COLOR_PREFIX"%c"),
             COLOR_RGBA32_GRAY, symbol->type
         );
 
+        // Print size:
+        u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
+
         if (symbol->errc == 'S') {
             // Size too large
             // "?"
-            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (sizeStrSize + 1 + 1)), y,
+            crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%c"),
                 COLOR_RGBA32_CRASH_UNKNOWN, '?'
             );
         } else {
             // "[size]"
-            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (sizeStrSize + 1 + 1)), y,
+            crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%-X"),
                 COLOR_RGBA32_CRASH_FUNCTION_NAME_2, symbol->size
             );
@@ -89,7 +93,14 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 void map_view_draw(void) {
     u32 line = 1;
 
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (STRLEN("SIZE:") + 1 + 1)), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+    const size_t typeStrSize = STRLEN("TYPE:");
+    const size_t sizeStrSize = STRLEN("SIZE:");
+
+    // "SIZE:"
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_GRAY);
+
+    // "SIZE:"
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
 
     line++;
 
@@ -98,7 +109,7 @@ void map_view_draw(void) {
     // Draw the line after the entries so the selection box is behind it.
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    // Scroll Bar
+    // Scroll Bar:
     if (gNumMapSymbols > MAP_VIEWER_NUM_ROWS) {
         crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_LIGHT_GRAY, TRUE);
 
@@ -111,6 +122,7 @@ void map_view_draw(void) {
 void map_view_input(void) {
     if (gCSSwitchedPage) {
         s32 targetIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
+
         if (targetIndex != -1) {
             sMapViewerSelectedIndex = targetIndex;
         }

@@ -13,6 +13,15 @@
 #include "memory_read.h"
 
 
+#ifdef INCLUDE_DEBUG_MAP
+    #define SHOW_FUNC_NAMES_DEFAULT TRUE
+#else
+    #define SHOW_FUNC_NAMES_DEFAULT FALSE
+#endif
+
+
+extern struct CSSettingsEntry gCSSettings[NUM_CS_OPTS];
+
 extern struct CSPage gCSPages[NUM_PAGES];
 extern enum CrashScreenPages gCSPageID;
 

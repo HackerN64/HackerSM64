@@ -24,13 +24,43 @@
 #include "pages/page_stack.h"
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
+#include "pages/page_settings.h"
 
+
+const char* sValNames_bool[] = {
+    [FALSE] = "FALSE",
+    [TRUE ] = "TRUE",
+};
+
+const char* sValNames_floats_mode[] = {
+    [FLOATS_MODE_HEX] = "HEX",
+    [FLOATS_MODE_DEC] = "DECIMAL",
+    [FLOATS_MODE_SCI] = "SCIENTIFIC",
+};
+
+const char* sValNames_branch_arrow[] = {
+    [DISASM_ARROW_MODE_OFF      ] = "OFF",
+    [DISASM_ARROW_MODE_SELECTION] = "SELECTION",
+    [DISASM_ARROW_MODE_FUNCTION ] = "FUNCTION",
+    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN",
+};
+
+struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = {
+    [CS_OPT_DRAW_CRASH_SCREEN ] = { .name = "Draw crash screen",           .valNames = sValNames_bool,         .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_DRAW_SCREENSHOT   ] = { .name = "Draw screenshot",             .valNames = sValNames_bool,         .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_FUNCTION_NAMES    ] = { .name = "Show function names",         .valNames = sValNames_bool,         .val =    SHOW_FUNC_NAMES_DEFAULT, .defaultVal =    SHOW_FUNC_NAMES_DEFAULT, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_MEMORY_AS_ASCII   ] = { .name = "Memory as ascii",             .valNames = sValNames_bool,         .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_DISASM_BINARY     ] = { .name = "Unknown disasm as binary",    .valNames = sValNames_bool,         .val =                      FALSE, .defaultVal =                      FALSE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_PRINT_SCROLL_SPEED] = { .name = "Print overscan scroll speed", .valNames = NULL,                   .val =                          2, .defaultVal =                          2, .lowerBound =                     0, .upperBound =                          5, },
+    [CS_OPT_FLOATS_MODE       ] = { .name = "Floats mode",                 .valNames = sValNames_floats_mode,  .val =            FLOATS_MODE_DEC, .defaultVal =            FLOATS_MODE_DEC, .lowerBound =       FLOATS_MODE_HEX, .upperBound =            FLOATS_MODE_SCI, },
+    [CS_OPT_BRANCH_ARROW_MODE ] = { .name = "Disasm branch arrow mode",    .valNames = sValNames_branch_arrow, .val = DISASM_ARROW_MODE_FUNCTION, .defaultVal = DISASM_ARROW_MODE_FUNCTION, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, }, //! TODO: Implement this
+};
 
 struct CSPage gCSPages[NUM_PAGES] = {
-    [PAGE_CONTEXT    ] = { .initFunc = NULL,             .drawFunc = context_draw,     .inputFunc = NULL,              .contList = defaultContList,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
+    [PAGE_CONTEXT    ] = { .initFunc = context_init,     .drawFunc = context_draw,     .inputFunc = context_input,     .contList = contextContList,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
     [PAGE_ASSERTS    ] = { .initFunc = assert_init,      .drawFunc = assert_draw,      .inputFunc = assert_input,      .contList = assertsContList,    .name = "ASSERTS",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG        ] = { .initFunc = NULL,             .drawFunc = log_draw,         .inputFunc = NULL,              .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_LOG        ] = { .initFunc = log_init,         .drawFunc = log_draw,         .inputFunc = log_input,         .contList = defaultContList,    .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #endif
     [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw, .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 #ifdef INCLUDE_DEBUG_MAP
@@ -38,6 +68,7 @@ struct CSPage gCSPages[NUM_PAGES] = {
 #endif
     [PAGE_RAM_VIEWER ] = { .initFunc = ram_view_init,    .drawFunc = ram_view_draw,    .inputFunc = ram_view_input,    .contList = ramViewerContList,  .name = "RAM VIEW",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
     [PAGE_DISASM     ] = { .initFunc = disasm_init,      .drawFunc = disasm_draw,      .inputFunc = disasm_input,      .contList = disasmContList,     .name = "DISASM",      .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
+    [PAGE_SETTINGS   ] = { .initFunc = settings_init,    .drawFunc = settings_draw,    .inputFunc = settings_input,    .contList = settingsContList,   .name = "SETTINGS",    .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
 };
 
 enum CrashScreenPages gCSPageID = FIRST_PAGE;
@@ -53,6 +84,13 @@ Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_ADDR to set the cras
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
+void settings_reset_to_defaults(void) {
+    for (int i = 0; i < ARRAY_COUNT(gCSSettings); i++) {
+        struct CSSettingsEntry* setting = &gCSSettings[i];
+        setting->val = setting->defaultVal;
+    }
+}
+
 static void crash_screen_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
     if (!sFirstCrash && gCrashedThread->context.cause != EXC_SYSCALL) {
@@ -64,8 +102,8 @@ static void crash_screen_reinitialize(void) {
     gCSSwitchedPage        = FALSE;
     gCSDrawControls        = FALSE;
     gAddressSelectMenuOpen = FALSE;
-    gCSDrawCrashScreen     = TRUE;
-    gCSDrawSavedScreenshot = TRUE;
+
+    settings_reset_to_defaults();
 
     gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;

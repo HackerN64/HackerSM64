@@ -27,6 +27,7 @@ enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_FAULT     = OS_EVENT_FAULT,
 };
 
+//! TODO: Move this back into crash_main.h without causing build warnings.
 enum CrashScreenPages {
     FIRST_PAGE,
     PAGE_CONTEXT = FIRST_PAGE,
@@ -40,7 +41,7 @@ enum CrashScreenPages {
 #endif
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
-    // PAGE_SETTINGS,
+    PAGE_SETTINGS,
     NUM_PAGES,
     MAX_PAGES = 255U,
 };
@@ -66,6 +67,47 @@ struct CSPage {
                 /*0x03*/ u32 initialized :  1;
             } flags; /*0x04*/
 }; /*0x18*/
+
+
+typedef s32 SettingsType;
+
+
+#define VALUE_NAME_SIZE 10
+
+
+enum CSFloatsModes {
+    FLOATS_MODE_HEX, // 0xFFFFFFFF
+    FLOATS_MODE_DEC, // 0.0
+    FLOATS_MODE_SCI, // XeX
+};
+
+enum CSDisasmBranchArrowModes {
+    DISASM_ARROW_MODE_OFF,
+    DISASM_ARROW_MODE_SELECTION,
+    DISASM_ARROW_MODE_FUNCTION,
+    DISASM_ARROW_MODE_OVERSCAN,
+};
+
+struct CSSettingsEntry {
+    const char name[32];
+    const char** valNames;
+    SettingsType val;
+    SettingsType defaultVal;
+    SettingsType lowerBound;
+    SettingsType upperBound;
+};
+
+enum CSSettings {
+    CS_OPT_DRAW_CRASH_SCREEN,
+    CS_OPT_DRAW_SCREENSHOT,
+    CS_OPT_FUNCTION_NAMES,
+    CS_OPT_MEMORY_AS_ASCII,
+    CS_OPT_DISASM_BINARY,
+    CS_OPT_PRINT_SCROLL_SPEED,
+    CS_OPT_FLOATS_MODE,
+    CS_OPT_BRANCH_ARROW_MODE, //! TODO: Implement this
+    NUM_CS_OPTS,
+};
 
 
 // Time conversion macros

@@ -39,6 +39,7 @@ const struct ControlType gCSControlDescriptions[] = {
     [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = STR_A,                                     .description = "jump to specific address"             },
     [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii"         },
     [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names"                },
+    [CONT_DESC_CYCLE_FLOATS_MODE] = { .control = STR_B,                                     .description = "toggle floats mode"                   },
 };
 
 
@@ -180,23 +181,27 @@ void crash_screen_update_input(void) {
 
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
+    SettingsType drawCrashScreen = gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val;
+    SettingsType drawScreenshot  = gCSSettings[CS_OPT_DRAW_SCREENSHOT  ].val;
     // Global controls.
     if (buttonPressed & Z_TRIG) {
-        gCSDrawCrashScreen ^= TRUE;
-        if (gCSDrawCrashScreen) {
-            gCSDrawSavedScreenshot ^= TRUE;
-        } else if (!gCSDrawSavedScreenshot) {
-            gCSDrawCrashScreen = TRUE;
-            gCSDrawSavedScreenshot = TRUE;
+        drawCrashScreen ^= TRUE;
+        if (drawCrashScreen) {
+            drawScreenshot ^= TRUE;
+        } else if (!drawScreenshot) {
+            drawCrashScreen = TRUE;
+            drawScreenshot = TRUE;
             gCSDrawControls = FALSE;
         }
     }
+    gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val = drawCrashScreen;
+    gCSSettings[CS_OPT_DRAW_SCREENSHOT  ].val = drawScreenshot;
 
-    if (gCSDrawCrashScreen && (buttonPressed & START_BUTTON)) {
+    if (drawCrashScreen && (buttonPressed & START_BUTTON)) {
         gCSDrawControls ^= TRUE;
     }
 
-    if (!gCSDrawCrashScreen) {
+    if (!drawCrashScreen) {
         return;
     }
 

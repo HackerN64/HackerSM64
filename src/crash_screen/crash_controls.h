@@ -3,7 +3,7 @@
 #include <ultra64.h>
 
 #include "types.h"
-#include "crash_main.h"
+// #include "crash_main.h"
 
 
 typedef union {
@@ -36,6 +36,7 @@ enum ControlTypes {
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_TOGGLE_ASCII,
     CONT_DESC_TOGGLE_FUNCTIONS,
+    CONT_DESC_CYCLE_FLOATS_MODE,
     NUM_CONT_DESC,
 };
 
