@@ -250,8 +250,11 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
 
         size_t bufferCount = format_print_buffer(buf, totalSize);
 
-        if (0 < charLimit && charLimit < bufferCount && gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val > 0) {
-            scroll_buffer(bufferCount, charLimit);
+        if (0 < charLimit && charLimit < bufferCount) {
+            if (gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val > 0) {
+                scroll_buffer(bufferCount, charLimit);
+            }
+
             bufferCount = charLimit;
         }
 
