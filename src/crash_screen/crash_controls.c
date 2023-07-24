@@ -170,14 +170,7 @@ _Bool update_crash_screen_page(void) {
 }
 
 void crash_screen_update_input(void) {
-    if (gControllerBits) {
-#ifdef ENABLE_RUMBLE
-        block_until_rumble_pak_free();
-#endif
-        osContStartReadDataEx(&gSIEventMesgQueue);
-    }
-    extern void read_controller_inputs(s32 threadID);
-    read_controller_inputs(gActiveCSThreadInfo->thread.id);
+    handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
 
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
