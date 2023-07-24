@@ -271,7 +271,6 @@ ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
     [PSEUDO_DSUBI] = { .name = "DSUBI", .fmt = "\'tsi", .opcode = OPC_DADDI }, // Doubleword Subtract Immediate (pseudo of DADDI).
 };
 
-_Bool gEnablePseudoinstructions = TRUE;
 
 static _Bool check_pseudo_insn(const InsnTemplate** type, enum PseudoInsns id, _Bool cond) {
     if (cond) {
@@ -364,7 +363,7 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
 const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
     const InsnTemplate* checkInsn = NULL;
 
-    if (gEnablePseudoinstructions && check_pseudo_instructions(&checkInsn, insn)) {
+    if (gCSSettings[CS_OPT_DISASM_PSEUDOINSNS].val && check_pseudo_instructions(&checkInsn, insn)) {
         return checkInsn;
     }
 
@@ -587,15 +586,15 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     separator = TRUE;
                     break;
                 case CHAR_P_IMM:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_IMMEDIATE);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), insn.immediate);
                     break;
                 case CHAR_P_NIMM:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_IMMEDIATE);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), -(s16)insn.immediate);
                     break;
                 case CHAR_P_SHIFT:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_IMMEDIATE);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR(STR_IMMEDIATE, insn.sa);
                     break;
                 case CHAR_P_BASE:

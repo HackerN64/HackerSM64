@@ -68,7 +68,7 @@ void print_settings_list(u32 line, u32 numLines) {
             // "[setting value]"
             crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%-d"),
-                COLOR_RGBA32_CRASH_DISASM_REG, setting->val
+                COLOR_RGBA32_CRASH_DISASM_IMMEDIATE, setting->val
             );
         }
 

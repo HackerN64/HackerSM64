@@ -94,13 +94,13 @@ enum CSDisasmBranchArrowModes {
 };
 
 struct CSSettingsEntry {
-    const char name[32];
-    const char** valNames;
-    SettingsType val;
-    SettingsType defaultVal;
-    SettingsType lowerBound;
-    SettingsType upperBound;
-};
+    /*0x00*/ const char name[32];
+    /*0x20*/ const char** valNames;
+    /*0x24*/ SettingsType val;
+    /*0x28*/ SettingsType defaultVal;
+    /*0x2C*/ SettingsType lowerBound;
+    /*0x30*/ SettingsType upperBound;
+}; /*0x34*/
 
 enum CSSettings {
     CS_OPT_DRAW_CRASH_SCREEN,
@@ -110,6 +110,7 @@ enum CSSettings {
     CS_OPT_DISASM_BINARY,
     CS_OPT_PRINT_SCROLL_SPEED,
     CS_OPT_FLOATS_FMT,
+    CS_OPT_DISASM_PSEUDOINSNS,
     CS_OPT_DISASM_IMM_FMT,
     CS_OPT_BRANCH_ARROW_MODE, //! TODO: Implement this
     NUM_CS_OPTS,
