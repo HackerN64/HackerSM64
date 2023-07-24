@@ -32,10 +32,10 @@ const char* sValNames_bool[] = {
     [TRUE ] = "TRUE",
 };
 
-const char* sValNames_floats_mode[] = {
-    [FLOATS_MODE_HEX] = "HEX",
-    [FLOATS_MODE_DEC] = "DECIMAL",
-    [FLOATS_MODE_SCI] = "SCIENTIFIC",
+const char* sValNames_print_num_fmt[] = {
+    [PRINT_NUM_FMT_HEX] = "HEX",
+    [PRINT_NUM_FMT_DEC] = "DECIMAL",
+    [PRINT_NUM_FMT_SCI] = "SCIENTIFIC",
 };
 
 const char* sValNames_branch_arrow[] = {
@@ -46,14 +46,15 @@ const char* sValNames_branch_arrow[] = {
 };
 
 struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = {
-    [CS_OPT_DRAW_CRASH_SCREEN ] = { .name = "Draw crash screen",           .valNames = sValNames_bool,         .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
-    [CS_OPT_DRAW_SCREENSHOT   ] = { .name = "Draw screenshot",             .valNames = sValNames_bool,         .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
-    [CS_OPT_FUNCTION_NAMES    ] = { .name = "Show function names",         .valNames = sValNames_bool,         .val =    SHOW_FUNC_NAMES_DEFAULT, .defaultVal =    SHOW_FUNC_NAMES_DEFAULT, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
-    [CS_OPT_MEMORY_AS_ASCII   ] = { .name = "Memory as ascii",             .valNames = sValNames_bool,         .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
-    [CS_OPT_DISASM_BINARY     ] = { .name = "Unknown disasm as binary",    .valNames = sValNames_bool,         .val =                      FALSE, .defaultVal =                      FALSE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
-    [CS_OPT_PRINT_SCROLL_SPEED] = { .name = "Print overscan scroll speed", .valNames = NULL,                   .val =                          2, .defaultVal =                          2, .lowerBound =                     0, .upperBound =                          5, },
-    [CS_OPT_FLOATS_MODE       ] = { .name = "Floats mode",                 .valNames = sValNames_floats_mode,  .val =            FLOATS_MODE_DEC, .defaultVal =            FLOATS_MODE_DEC, .lowerBound =       FLOATS_MODE_HEX, .upperBound =            FLOATS_MODE_SCI, },
-    [CS_OPT_BRANCH_ARROW_MODE ] = { .name = "Disasm branch arrow mode",    .valNames = sValNames_branch_arrow, .val = DISASM_ARROW_MODE_FUNCTION, .defaultVal = DISASM_ARROW_MODE_FUNCTION, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, }, //! TODO: Implement this
+    [CS_OPT_DRAW_CRASH_SCREEN ] = { .name = "Draw crash screen",           .valNames = sValNames_bool,          .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_DRAW_SCREENSHOT   ] = { .name = "Draw screenshot",             .valNames = sValNames_bool,          .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_FUNCTION_NAMES    ] = { .name = "Show function names",         .valNames = sValNames_bool,          .val =    SHOW_FUNC_NAMES_DEFAULT, .defaultVal =    SHOW_FUNC_NAMES_DEFAULT, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_MEMORY_AS_ASCII   ] = { .name = "Memory as ascii",             .valNames = sValNames_bool,          .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_DISASM_BINARY     ] = { .name = "Unknown disasm as binary",    .valNames = sValNames_bool,          .val =                      FALSE, .defaultVal =                      FALSE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
+    [CS_OPT_PRINT_SCROLL_SPEED] = { .name = "Print overscan scroll speed", .valNames = NULL,                    .val =                          2, .defaultVal =                          2, .lowerBound =                     0, .upperBound =                          5, },
+    [CS_OPT_FLOATS_FMT        ] = { .name = "Floats format",               .valNames = sValNames_print_num_fmt, .val =          PRINT_NUM_FMT_DEC, .defaultVal =          PRINT_NUM_FMT_DEC, .lowerBound =     PRINT_NUM_FMT_HEX, .upperBound =          PRINT_NUM_FMT_SCI, },
+    [CS_OPT_DISASM_IMM_FMT    ] = { .name = "Disasm immediate format",     .valNames = sValNames_print_num_fmt, .val =          PRINT_NUM_FMT_HEX, .defaultVal =          PRINT_NUM_FMT_HEX, .lowerBound =     PRINT_NUM_FMT_HEX, .upperBound =          PRINT_NUM_FMT_DEC, },
+    [CS_OPT_BRANCH_ARROW_MODE ] = { .name = "Disasm branch arrow mode",    .valNames = sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_FUNCTION, .defaultVal = DISASM_ARROW_MODE_FUNCTION, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, }, //! TODO: Implement this
 };
 
 struct CSPage gCSPages[NUM_PAGES] = {
@@ -184,7 +185,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     // Only on the first crash:
     if (sFirstCrash) {
         sFirstCrash = FALSE;
-        
+
         // If a position was specified, use that.
         if (gSetCrashAddress != 0x0) {
             crash_screen_set_page(PAGE_RAM_VIEWER);

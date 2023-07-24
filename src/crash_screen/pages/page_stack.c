@@ -103,11 +103,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
         u32 y = TEXT_Y(line + i);
 
         if (currIndex == sStackTraceSelectedIndex) {
-            crash_screen_draw_rect(
-                (TEXT_X(0) - 1), (y - 2),
-                (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
-                COLOR_RGBA32_CRASH_SELECT
-            );
+            crash_screen_draw_row_selection_box(y);
         }
 
         const size_t addrStrSize = STRLEN("00000000:");
@@ -190,7 +186,7 @@ void stack_trace_draw(void) {
     // Scroll Bar:
     if (sCSNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
         crash_screen_draw_scroll_bar(
-            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), 
+            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             STACK_TRACE_NUM_ROWS, sCSNumFoundFunctions,
             sStackTraceViewportIndex,
             COLOR_RGBA32_LIGHT_GRAY, TRUE

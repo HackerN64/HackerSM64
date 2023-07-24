@@ -19,7 +19,6 @@ const enum ControlTypes settingsContList[] = {
     CONT_DESC_LIST_END,
 };
 
-
 void settings_init(void) {
     sSettingsSelectedIndex = 0;
     sSettingsViewportIndex = 0;
@@ -42,11 +41,7 @@ void print_settings_list(u32 line, u32 numLines) {
         u32 y = TEXT_Y(line + i);
 
         if (currIndex == sSettingsSelectedIndex) {
-            crash_screen_draw_rect(
-                (TEXT_X(0) - 1), (y - 2),
-                (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
-                COLOR_RGBA32_CRASH_SELECT
-            );
+            crash_screen_draw_row_selection_box(y);
         }
 
         // "[setting name]"
@@ -87,10 +82,13 @@ void settings_draw(void) {
 
     print_settings_list(2, SETTINGS_NUM_ROWS);
 
+    // Draw this line again so the selection box doesn't get drawn in front of it.
+    crash_screen_draw_divider(DIVIDER_Y(2));
+
     // Scroll Bar:
     if (NUM_CS_OPTS > SETTINGS_NUM_ROWS) {
         crash_screen_draw_scroll_bar(
-            (DIVIDER_Y(2) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), 
+            (DIVIDER_Y(2) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             SETTINGS_NUM_ROWS, NUM_CS_OPTS,
             sSettingsViewportIndex,
             COLOR_RGBA32_LIGHT_GRAY, TRUE

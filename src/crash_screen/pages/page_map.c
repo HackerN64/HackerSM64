@@ -44,11 +44,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         u32 y = TEXT_Y(line + i);
 
         if (currIndex == sMapViewerSelectedIndex) {
-            crash_screen_draw_rect(
-                (TEXT_X(0) - 1), (y - 2),
-                (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
-                COLOR_RGBA32_CRASH_SELECT
-            );
+            crash_screen_draw_row_selection_box(y);
         }
 
         const size_t typeStrSize = STRLEN("T ");
@@ -59,7 +55,6 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
 
         // "[type]"
-        //! TODO: Format this better
         crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
             (STR_COLOR_PREFIX"%c"),
             COLOR_RGBA32_GRAY, symbol->type

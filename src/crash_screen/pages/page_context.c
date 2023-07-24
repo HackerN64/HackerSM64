@@ -146,17 +146,17 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         // "[prefix][XXXXXXXX]"
         crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
-        switch (gCSSettings[CS_OPT_FLOATS_MODE].val) {
-            case FLOATS_MODE_HEX:
+        switch (gCSSettings[CS_OPT_FLOATS_FMT].val) {
+            case PRINT_NUM_FMT_HEX:
                 // "[XXXXXXXX]"
                 crash_screen_print(x, y, " "STR_HEX_WORD, val.asU32);
                 break;
             default:
-            case FLOATS_MODE_DEC:
+            case PRINT_NUM_FMT_DEC:
                 // "[±][exponent]"
                 crash_screen_print(x, y, "% g", val.asF32);
                 break;
-            case FLOATS_MODE_SCI:
+            case PRINT_NUM_FMT_SCI:
                 // "[scientific notation]"
                 crash_screen_print(x, y, "% .3e", val.asF32);
                 break;
@@ -226,7 +226,7 @@ void context_draw(void) {
 
 void context_input(void) {
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-        struct CSSettingsEntry* setting = &gCSSettings[CS_OPT_FLOATS_MODE];
+        struct CSSettingsEntry* setting = &gCSSettings[CS_OPT_FLOATS_FMT];
 
         // Cycle floats print mode.
         setting->val++;

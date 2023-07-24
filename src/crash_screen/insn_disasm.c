@@ -539,6 +539,8 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
 
     const InsnTemplate* info = get_insn(insn);
 
+    _Bool decImmediates = (gCSSettings[CS_OPT_DISASM_IMM_FMT].val == PRINT_NUM_FMT_DEC);
+
     if (info != NULL) {
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
@@ -586,11 +588,11 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     break;
                 case CHAR_P_IMM:
                     ADD_COLOR(COLOR_RGBA32_CRASH_IMMEDIATE);
-                    ADD_STR(STR_IMMEDIATE, insn.immediate);
+                    ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), insn.immediate);
                     break;
                 case CHAR_P_NIMM:
                     ADD_COLOR(COLOR_RGBA32_CRASH_IMMEDIATE);
-                    ADD_STR(STR_IMMEDIATE, -(s16)insn.immediate);
+                    ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), -(s16)insn.immediate);
                     break;
                 case CHAR_P_SHIFT:
                     ADD_COLOR(COLOR_RGBA32_CRASH_IMMEDIATE);

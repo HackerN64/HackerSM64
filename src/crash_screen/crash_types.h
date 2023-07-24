@@ -75,10 +75,15 @@ typedef s32 SettingsType;
 #define VALUE_NAME_SIZE 10
 
 
-enum CSFloatsModes {
-    FLOATS_MODE_HEX, // 0xFFFFFFFF
-    FLOATS_MODE_DEC, // 0.0
-    FLOATS_MODE_SCI, // XeX
+enum CSPrintNumberFormats {
+    PRINT_NUM_FMT_HEX, // 0xFFFFFFFF
+    PRINT_NUM_FMT_DEC, // 0.0
+    PRINT_NUM_FMT_SCI, // XeX
+};
+
+enum CSImmediateModes {
+    DISASM_IMM_MODE_HEX, // 0xFFFFFFFF
+    DISASM_IMM_MODE_DEC, // 0.0
 };
 
 enum CSDisasmBranchArrowModes {
@@ -104,7 +109,8 @@ enum CSSettings {
     CS_OPT_MEMORY_AS_ASCII,
     CS_OPT_DISASM_BINARY,
     CS_OPT_PRINT_SCROLL_SPEED,
-    CS_OPT_FLOATS_MODE,
+    CS_OPT_FLOATS_FMT,
+    CS_OPT_DISASM_IMM_FMT,
     CS_OPT_BRANCH_ARROW_MODE, //! TODO: Implement this
     NUM_CS_OPTS,
 };
