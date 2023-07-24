@@ -4,7 +4,7 @@
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
 #include "page_map.h"
-#include "game/game_input.h"
+#include "game/input.h"
 
 
 u32 sMapViewerSelectedIndex = 0;

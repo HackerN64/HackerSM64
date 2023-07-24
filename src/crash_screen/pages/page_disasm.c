@@ -4,7 +4,7 @@
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
 #include "page_disasm.h"
-#include "game/game_input.h"
+#include "game/input.h"
 
 
 static u32 sDisasmViewportIndex = 0x00000000;

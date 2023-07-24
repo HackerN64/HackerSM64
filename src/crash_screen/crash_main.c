@@ -11,7 +11,7 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 #include "game/game_init.h"
-#include "game/game_input.h"
+#include "game/input.h"
 #include "game/main.h"
 #include "game/printf.h"
 #include "game/puppyprint.h"

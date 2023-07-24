@@ -8,7 +8,7 @@
 #include "engine/colors.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"
-#include "game/game_input.h"
+#include "game/input.h"
 
 
 #ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if the log is long enough.

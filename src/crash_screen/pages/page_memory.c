@@ -4,7 +4,7 @@
 #include "crash_screen/crash_main.h"
 #include "page_memory.h"
 #include "engine/colors.h"
-#include "game/game_input.h"
+#include "game/input.h"
 
 
 static Address sRamViewViewportIndex = 0x00000000;

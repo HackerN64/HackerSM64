@@ -4,7 +4,7 @@
 #include "sm64.h"
 #include "crash_screen/crash_main.h"
 #include "page_settings.h"
-#include "game/game_input.h"
+#include "game/input.h"
 
 
 u32 sSettingsSelectedIndex = 0;

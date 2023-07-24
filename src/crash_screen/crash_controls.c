@@ -2,7 +2,7 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_main.h"
-#include "game/game_input.h"
+#include "game/input.h"
 #include "crash_controls.h"
 #include "pages/page_stack.h"
 

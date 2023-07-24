@@ -3,7 +3,7 @@
 #include "sm64.h"
 #include "crash_main.h"
 #include "address_select.h"
-#include "game/game_input.h"
+#include "game/input.h"
 #include "pages/page_disasm.h"
 
 
