@@ -42,9 +42,9 @@ OSContStatus gDemoStatusData = {
 OSContPadEx gDemoControllerData;
 struct Controller gDemoControllers[1] = {
     {
-        .statusData = &gDemoStatusData,
+        .statusData     = &gDemoStatusData,
         .controllerData = &gDemoControllerData,
-        .port = 0,
+        .port           = 0,
     }
 };
 struct Controller* const gDemoController = &gDemoControllers[0];
@@ -267,7 +267,7 @@ static void poll_controller_gcn_origins(OSMesg* mesg) {
 }
 
 /**
- * @brief Checks for new controller data on all ports.
+ * @brief Checks for new controller status data on all ports.
  *
  * @param[in] mesg The SI message to wait for.
  */
