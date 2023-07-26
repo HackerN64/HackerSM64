@@ -24,6 +24,8 @@ void settings_init(void) {
     sSettingsViewportIndex = 0;
 }
 
+extern const char* sValNames_bool[];
+
 void print_settings_list(u32 line, u32 numLines) {
     u32 currIndex = sSettingsViewportIndex;
     const struct CSSettingsEntry* setting = &gCSSettings[currIndex];
@@ -47,7 +49,7 @@ void print_settings_list(u32 line, u32 numLines) {
         // "[setting name]"
         crash_screen_print_scroll(TEXT_X(0), y, (CRASH_SCREEN_NUM_CHARS_X - VALUE_NAME_SIZE),
             STR_COLOR_PREFIX"%s",
-            COLOR_RGBA32_CRASH_HEADER, setting->name
+            COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
         );
 
         u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - VALUE_NAME_SIZE);
@@ -59,16 +61,22 @@ void print_settings_list(u32 line, u32 numLines) {
         }
 
         if (name != NULL) {
+            RGBA32 nameColor = COLOR_RGBA32_CRASH_SETTINGS_NAMED;
+
+            if (setting->valNames == sValNames_bool) {
+                nameColor = ((setting->val) ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
+            }
+
             // "[setting value]"
             crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%s"),
-                COLOR_RGBA32_CRASH_DISASM_REG, name
+                nameColor, name
             );
         } else {
             // "[setting value]"
             crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%-d"),
-                COLOR_RGBA32_CRASH_DISASM_IMMEDIATE, setting->val
+                COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val
             );
         }
 
@@ -91,7 +99,7 @@ void settings_draw(void) {
             (DIVIDER_Y(2) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             SETTINGS_NUM_ROWS, NUM_CS_OPTS,
             sSettingsViewportIndex,
-            COLOR_RGBA32_LIGHT_GRAY, TRUE
+            COLOR_RGBA32_CRASH_DIVIDER, TRUE
         );
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }

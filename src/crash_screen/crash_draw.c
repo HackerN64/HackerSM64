@@ -217,7 +217,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
 
 void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     if (glyph == CHAR_NULL) { // Null
-        color = COLOR_RGBA32_GRAY;
+        color = COLOR_RGBA32_CRASH_NULL_CHAR;
     }
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
@@ -295,7 +295,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
     if (drawBg) {
         // Draw the background scroll bar
         const Alpha bgAlpha = (RGBA32_A(color) / 2);
-        crash_screen_draw_rect(x, topY, 1, scrollableHeight, ((color & ~0xFF) | bgAlpha));
+        crash_screen_draw_rect(x, topY, 1, scrollableHeight, RGBA32_SET_ALPHA(color, bgAlpha));
     }
 
     u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);

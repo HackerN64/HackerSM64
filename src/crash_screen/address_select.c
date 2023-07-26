@@ -32,7 +32,7 @@ void draw_address_select(void) {
     crash_screen_print(
         addressStartX, addressStartY,
         (STR_COLOR_PREFIX STR_HEX_WORD),
-        (isValid ? COLOR_RGBA32_LIGHT_GREEN : COLOR_RGBA32_LIGHT_RED), addr
+        (isValid ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO), addr
     );
 
     u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
@@ -41,14 +41,14 @@ void draw_address_select(void) {
     crash_screen_draw_vertical_triangle(
         triangleStartX, triangleStartY,
         TEXT_WIDTH(1), TEXT_WIDTH(1),
-        COLOR_RGBA32_CRASH_SELECT_ARROWS
+        COLOR_RGBA32_CRASH_SELECT_ARROW
     );
     triangleStartY += ((TEXT_WIDTH(1) + TEXT_HEIGHT(1)) - 1);
     // Down arrow:
     crash_screen_draw_vertical_triangle(
         triangleStartX, triangleStartY,
         TEXT_WIDTH(1), -TEXT_WIDTH(1),
-        COLOR_RGBA32_CRASH_SELECT_ARROWS
+        COLOR_RGBA32_CRASH_SELECT_ARROW
     );
 
 #ifdef INCLUDE_DEBUG_MAP

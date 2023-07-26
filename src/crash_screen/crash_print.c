@@ -281,7 +281,7 @@ void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 colo
 
 void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol) {
     crash_screen_print_symbol_name_impl(x, y, maxWidth,
-        ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_VERY_LIGHT_CYAN),
+        ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
         get_map_symbol_name(symbol)
     );
 }

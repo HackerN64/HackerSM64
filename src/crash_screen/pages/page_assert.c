@@ -55,7 +55,7 @@ void assert_draw(void) {
         // If the assert message is long enough to scroll, draw the scroll bar and dividers.
         if (sAssertPrintSize > ASSERTS_NUM_ROWS) {
             crash_screen_draw_divider(DIVIDER_Y(line));
-            crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), ASSERTS_NUM_ROWS, sAssertPrintSize, sAssertScrollIndex, COLOR_RGBA32_LIGHT_GRAY, TRUE);
+            crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), ASSERTS_NUM_ROWS, sAssertPrintSize, sAssertScrollIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
             crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
         }
 

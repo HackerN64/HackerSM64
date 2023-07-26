@@ -50,7 +50,7 @@ void disasm_init(void) {
 
 //! TODO: Optimize this as much as possible
 //! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?)
-//! TODO: gCSSettings[CS_OPT_BRANCH_ARROW_MODE].val
+//! TODO: gCSSettings[CS_OPT_DISASM_ARROW_MODE].val
 // @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {
@@ -226,7 +226,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         // Draw crash and selection rectangles:
         if (addr == pc) {
             // Draw a red selection rectangle.
-            crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC);
+            crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
             // "<-- CRASH"
             crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
         } else if (addr == selectedAddr) {
@@ -236,7 +236,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
 
         Word data = 0;
         if (!try_read_data(&data, addr)) {
-            crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_RED);
+            crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, data);
         } else { // Outside of code segments:
@@ -299,7 +299,7 @@ void disasm_draw(void) {
         scrollTop, scrollBottom,
         DISASM_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
         (sDisasmViewportIndex - DISASM_SCROLL_MIN),
-        COLOR_RGBA32_LIGHT_GRAY, TRUE
+        COLOR_RGBA32_CRASH_DIVIDER, TRUE
     );
 
     // Scroll bar crash position marker:

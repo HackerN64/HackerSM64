@@ -57,7 +57,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         // "[type]"
         crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
             (STR_COLOR_PREFIX"%c"),
-            COLOR_RGBA32_GRAY, symbol->type
+            COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE, symbol->type
         );
 
         // Print size:
@@ -74,7 +74,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             // "[size]"
             crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%-X"),
-                COLOR_RGBA32_CRASH_FUNCTION_NAME_2, symbol->size
+                COLOR_RGBA32_CRASH_OFFSET, symbol->size
             );
         }
 
@@ -91,11 +91,11 @@ void map_view_draw(void) {
     const size_t typeStrSize = STRLEN("TYPE:");
     const size_t sizeStrSize = STRLEN("SIZE:");
 
-    // "SIZE:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_GRAY);
+    // "TYPE:"
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE);
 
     // "SIZE:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
 
     line++;
 
@@ -106,7 +106,7 @@ void map_view_draw(void) {
 
     // Scroll Bar:
     if (gNumMapSymbols > MAP_VIEWER_NUM_ROWS) {
-        crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_LIGHT_GRAY, TRUE);
+        crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
 
         crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }

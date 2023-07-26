@@ -50,7 +50,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
         // Row header:
         // "[XXXXXXXX]"
         crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
-            ((y % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr
+            ((y % 2) ? COLOR_RGBA32_CRASH_MEMORY_ROW1 : COLOR_RGBA32_CRASH_MEMORY_ROW2), rowAddr
         );
 
         charX = (TEXT_X(SIZEOF_HEX(Word)) + 3);
@@ -62,14 +62,14 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 charX += 2;
             }
 
-            RGBA32 textColor = ((gCSSettings[CS_OPT_MEMORY_AS_ASCII].val || (x % 2)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            RGBA32 textColor = ((gCSSettings[CS_OPT_MEMORY_AS_ASCII].val || (x % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
             RGBA32 selectColor = COLOR_RGBA32_NONE;
 
             if (currAddr == gSelectedAddress) {
-                selectColor = COLOR_RGBA32_WHITE;
-                textColor = COLOR_RGBA32_BLACK;
+                selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
+                textColor = RGBA32_INVERT(textColor);
             } else if (currAddr == tc->pc) {
-                selectColor = COLOR_RGBA32_RED;
+                selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
             }
 
             if (selectColor != COLOR_RGBA32_NONE) {
@@ -80,7 +80,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
             if (try_read_byte(&byte, currAddr)) {
                 print_byte(charX, charY, byte, textColor);
             } else {
-                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_RED);
+                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
             }
 
             charX += (TEXT_WIDTH(2) + 1);
@@ -111,14 +111,14 @@ void ram_view_draw(void) {
         }
 
         // "[XX]"
-        crash_screen_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_RAM_VIEW_H1 : COLOR_RGBA32_CRASH_RAM_VIEW_H2), i);
+        crash_screen_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_MEMORY_COL1 : COLOR_RGBA32_CRASH_MEMORY_COL2), i);
 
         charX += (TEXT_WIDTH(2) + 1);
     }
 
     crash_screen_draw_divider(DIVIDER_Y(3));
 
-    crash_screen_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT((line + RAM_VIEWER_NUM_ROWS) - 1), COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT((line + RAM_VIEWER_NUM_ROWS) - 1), COLOR_RGBA32_CRASH_DIVIDER);
 
     // "MEMORY"
     crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
@@ -139,7 +139,7 @@ void ram_view_draw(void) {
         scrollTop, scrollBottom,
         RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
         (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN),
-        COLOR_RGBA32_LIGHT_GRAY, TRUE
+        COLOR_RGBA32_CRASH_DIVIDER, TRUE
     );
 
     // Scroll bar crash position marker:

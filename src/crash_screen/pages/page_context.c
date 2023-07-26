@@ -64,12 +64,12 @@ void context_init(void) {
 }
 
 // Print a fixed-point register.
-void crash_screen_print_reg(u32 x, u32 y, const char* name, Address addr) {
+void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
     // "[register name]: [XXXXXXXX]"
     crash_screen_print(x, y,
         " "STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD,
-        COLOR_RGBA32_CRASH_REGISTER, name,
-        COLOR_RGBA32_WHITE, addr
+        COLOR_RGBA32_CRASH_VARIABLE, name,
+        COLOR_RGBA32_WHITE, val
     );
 }
 
@@ -108,7 +108,7 @@ void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     // "FPCSR:[XXXXXXXX]"
     size_t fpcsrSize = crash_screen_print(x, y,
         STR_COLOR_PREFIX"FPCSR:"STR_COLOR_PREFIX STR_HEX_WORD" ",
-        COLOR_RGBA32_CRASH_REGISTER,
+        COLOR_RGBA32_CRASH_VARIABLE,
         COLOR_RGBA32_WHITE, fpcsr
     );
     x += TEXT_WIDTH(fpcsrSize);
@@ -127,7 +127,7 @@ void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
 // Print a floating-point register.
 void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     // "[register name]:"
-    size_t charX = crash_screen_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
+    size_t charX = crash_screen_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_VARIABLE, regNum);
     x += TEXT_WIDTH(charX);
 
     IEEE754_f32 val = { .asF32 = *data };

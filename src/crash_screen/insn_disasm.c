@@ -571,17 +571,17 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     ADD_STR(STR_INSN_NAME, insn_name);
                     break;
                 case CHAR_P_RS:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCPURegisterNames[insn.rs]);
                     separator = TRUE;
                     break;
                 case CHAR_P_RT:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCPURegisterNames[insn.rt]);
                     separator = TRUE;
                     break;
                 case CHAR_P_RD:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCPURegisterNames[insn.rd]);
                     separator = TRUE;
                     break;
@@ -598,31 +598,32 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     ADD_STR(STR_IMMEDIATE, insn.sa);
                     break;
                 case CHAR_P_BASE:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_BASE_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG_BASE, sCPURegisterNames[insn.base]);
                     break;
                 case CHAR_P_BRANCH:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME_2);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
                     s16 branchOffset = (insn.offset + 1);
+                    //! TODO: Setting for branch offset vs. address
                     ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
                     break;
                 case CHAR_P_COP0D:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCOP0RegisterNames[insn.rd]);
                     separator = TRUE;
                     break;
                 case CHAR_P_FT:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_FREG, insn.ft);
                     separator = TRUE;
                     break;
                 case CHAR_P_FS:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_FREG, insn.fs);
                     separator = TRUE;
                     break;
                 case CHAR_P_FD:
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REG);
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_FREG, insn.fd);
                     separator = TRUE;
                     break;
