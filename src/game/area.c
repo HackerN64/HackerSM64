@@ -377,8 +377,8 @@ ALIGNED8 static const char* sN64ButtonNames[16] = {
     "D DOWN",  // D_JPAD
     "D LEFT",  // L_JPAD
     "D RIGHT", // R_JPAD
-    "X",       // X_BUTTON (The reset bit on a standard N64 controller).
-    "Y",       // Y_BUTTON (The unused bit on a standard N64 controller).
+    "X",       // X_BUTTON
+    "Y",       // Y_BUTTON
     "L",       // L_TRIG
     "R",       // R_TRIG
     "C UP",    // U_CBUTTONS

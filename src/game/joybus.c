@@ -208,7 +208,7 @@ static void set_gcn_origins(OSContOrigins* origins, Analog_u8 stick, Analog_u8 c
  */
 static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     OSContOrigins* origins = &pad->origins;
-    N64Buttons n64 = { .raw = 0x0 };
+    OSContButtons dest = { .raw = 0x0 };
 
     // The first time the controller is connected, store the origins for the controller's analog sticks.
     if (!origins->initialized) {
@@ -228,25 +228,31 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     pad->trig    = ANALOG_U8_CENTER(trig,    origins->trig);
 
     // Map GCN button bits to N64 button bits.
-    n64.standard.A       = gcn.standard.A;
-    n64.standard.B       = gcn.standard.B;
-    n64.standard.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
-    n64.standard.START   = gcn.standard.START;
-    n64.standard.D.UP    = gcn.standard.D.UP;
-    n64.standard.D.DOWN  = gcn.standard.D.DOWN;
-    n64.standard.D.LEFT  = gcn.standard.D.LEFT;
-    n64.standard.D.RIGHT = gcn.standard.D.RIGHT;
-    n64.standard.RESET   = gcn.standard.X; // This bit normally gets set when L+R+START is pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
-    n64.standard.unused  = gcn.standard.Y; // The N64 controller's unused bit.
-    n64.standard.L       = gcn.standard.Z; // Swap L and Z.
-    n64.standard.R       = gcn.standard.R;
-    n64.standard.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
-    n64.standard.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
-    n64.standard.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
+    dest.A       = gcn.standard.A;
+    dest.B       = gcn.standard.B;
+    dest.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
+    dest.START   = gcn.standard.START;
+    dest.D.UP    = gcn.standard.D.UP;
+    dest.D.DOWN  = gcn.standard.D.DOWN;
+    dest.D.LEFT  = gcn.standard.D.LEFT;
+    dest.D.RIGHT = gcn.standard.D.RIGHT;
+    dest.X       = gcn.standard.X; // This bit was previously set when L+R+START was pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
+    dest.Y       = gcn.standard.Y; // This bit was unused by the N64 controller.
+    dest.L       = gcn.standard.Z; // Swap L and Z.
+    dest.R       = gcn.standard.R;
+    dest.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
+    dest.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
+    dest.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
+    dest.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
     // Write the button data.
-    pad->button = n64.raw;
+    pad->button.raw                 = dest.raw;
+
+    // Write the non-button data.
+    pad->ex.gcn.standard.ERRSTAT    = gcn.standard.ERRSTAT;
+    pad->ex.gcn.standard.ERRLATCH   = gcn.standard.ERRLATCH;
+    pad->ex.gcn.standard.GET_ORIGIN = gcn.standard.GET_ORIGIN;
+    pad->ex.gcn.standard.USE_ORIGIN = gcn.standard.USE_ORIGIN;
 }
 
 /**
@@ -294,10 +300,17 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
 
-                    pad->button  = n64Input.buttons.raw;
-                    pad->stick   = n64Input.stick;
-                    pad->c_stick = (Analog_s8){ 0x00, 0x00 };
-                    pad->trig    = (Analog_u8){ 0x00, 0x00 };
+                    pad->button.raw = (n64Input.buttons.raw & ~(CONT_RESET | CONT_UNUSED)); // These two bits are repurposed to X and Y on the virtual controller, so make sure the game doesn't read an X button press when resetting.
+                    // Allow the game to read the start button press that happens when resetting the analog stick.
+                    if (n64Input.buttons.standard.RESET) {
+                        pad->button.START = TRUE;
+                    }
+                    // Move these two bits to the other struct.
+                    pad->ex.n64.standard.RESET  = n64Input.buttons.standard.RESET;
+                    pad->ex.n64.standard.unused = n64Input.buttons.standard.unused;
+                    pad->stick                  = n64Input.stick;
+                    pad->c_stick                = (Analog_s8){ 0x00, 0x00 };
+                    pad->trig                   = (Analog_u8){ 0x00, 0x00 };
                 }
 
                 ptr += sizeof(__OSContReadFormat);

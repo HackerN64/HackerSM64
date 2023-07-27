@@ -710,10 +710,10 @@ enum MarioActionFlags {
 /**
  * This input mask is unused by the controller,
  * but END_DEMO is used internally to signal
- * the demo to end. This button cannot
- * be pressed normally by a controller.
+ * the demo to end. This button cannot be
+ * pressed normally by an N64 controller.
  */
-#define INPUT_END_DEMO  CONT_RESET
+#define INPUT_END_DEMO  X_BUTTON
 
 #define VALID_BUTTONS (A_BUTTON   | B_BUTTON   | Z_TRIG     | START_BUTTON | \
                        U_JPAD     | D_JPAD     | L_JPAD     | R_JPAD       | \

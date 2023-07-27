@@ -93,8 +93,9 @@ void process_controller_data(struct Controller* controller) {
     controller->rawStickX = controllerData->stick.x;
     controller->rawStickY = controllerData->stick.y;
     // Lock buttons that were used in the combo to exit status polling until they are released.
-    controllerData->lockedButton &= controllerData->button;
-    u16 button = controllerData->button &= ~controllerData->lockedButton;
+    controllerData->lockedButton.raw &= controllerData->button.raw;
+    controllerData->button.raw &= ~controllerData->lockedButton.raw;
+    u16 button = controllerData->button.raw;
     controller->buttonPressed = (~controller->buttonDown & button);
     controller->buttonReleased = (~button & controller->buttonDown);
     // 0.5x A presses are a good meme.
@@ -357,7 +358,7 @@ void read_controller_inputs_status_polling(void) {
 
         if (portInfo->plugged) {
             OSContPadEx* pad = &gControllerPads[port];
-            u16 button = pad->button;
+            u16 button =  pad->button.raw;
             totalInput |= button;
 
             if (gContStatusPollingReadyForInput) {
