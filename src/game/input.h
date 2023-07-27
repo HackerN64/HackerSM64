@@ -11,8 +11,8 @@
 
 // This button combo should be standard, so don't change it unless you have a very good reason.
 #define TOGGLE_CONT_STATUS_POLLING_COMBO    (A_BUTTON | B_BUTTON | START_BUTTON)
-// How often to poll for controller status when status polling is on, in frames.
-// Default is 15.
+// How many extra frames to wait between controller status polls when status polling is on, in frames (0 = status poll every frame).
+// [0..], default is 15.
 #define CONT_STATUS_POLLING_TIME            15
 
 struct DemoInput {
@@ -30,7 +30,7 @@ extern struct Controller* const gPlayer2Controller;
 extern struct Controller* const gPlayer3Controller;
 extern struct Controller* const gPlayer4Controller;
 
-// OS Controllers
+// OS Controllers.
 extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
 extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 

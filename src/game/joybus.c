@@ -172,7 +172,7 @@ static void __osPackRead_impl(u8 cmdID) {
                 }
                 break;
             default:
-                osSyncPrintf("__osPackRead_impl error: Unknown input poll command: %.02X\n", cmdID);
+                osSyncPrintf("__osPackRead_impl error: Unknown input poll command: %.02X (port %d)\n", cmdID, port);
                 ptr++;
                 return;
         }
@@ -191,9 +191,9 @@ static void __osPackRead_impl(u8 cmdID) {
  */
 static void set_gcn_origins(OSContOrigins* origins, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     origins->initialized = TRUE;
-    origins->stick   = stick;
-    origins->c_stick = c_stick;
-    origins->trig    = trig;
+    origins->stick       = stick;
+    origins->c_stick     = c_stick;
+    origins->trig        = trig;
 }
 
 /**

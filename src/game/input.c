@@ -239,7 +239,6 @@ void assign_controllers_by_player_num(void) {
  * @brief Reads raw controller input data.
  *
  * @param[in] mesg The SI message to wait for.
- * Called by
  */
 static void poll_controller_inputs(OSMesg* mesg) {
     block_until_rumble_pak_free();
@@ -486,7 +485,7 @@ void handle_input(OSMesg* mesg) {
         }
 
         // Check this separately so input can start on the same frame.
-        // This is not an else because 'gContStatusPolling' can get set in 'read_controller_inputs_status_polling'
+        // This is not an else because 'gContStatusPolling' can get set in 'read_controller_inputs_status_polling'.
         if (!gContStatusPolling) {
             // Input handling for normal gameplay.
             read_controller_inputs_normal();
@@ -497,7 +496,7 @@ void handle_input(OSMesg* mesg) {
     }
 
     if (gContStatusPolling) {
-        // Only poll controller status about twice per second.
+        // Only poll controller status about twice per second (see CONT_STATUS_POLLING_TIME).
         if (gContStatusPollTimer == 0) {
             gContStatusPollTimer = CONT_STATUS_POLLING_TIME;
             poll_controller_statuses(mesg);
