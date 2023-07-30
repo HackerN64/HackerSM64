@@ -349,7 +349,7 @@ static void thread6_rumble_loop(UNUSED void* arg) {
         osRecvMesg(&gRumbleThreadVIMesgQueue, &msg, OS_MESG_BLOCK);
 
         for (int channel = 0; channel < __osMaxControllers; channel++) {
-            if (gPortInfo[channel].plugged) {
+            if (gControllerStatuses[channel].type != CONT_NONE) {
                 struct RumbleInfo* info = &gRumbleInfos[channel];
 
                 update_rumble_data_queue(info);

@@ -8,8 +8,6 @@
 #include "input.h"
 #include "rumble.h"
 
-OSPortInfo gPortInfo[MAXCONTROLLERS] = { 0 };
-
 void __osSiGetAccess(void);
 void __osSiRelAccess(void);
 
@@ -104,10 +102,10 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
     (dst) += sizeof(src);           \
 }
 
-#define WRITE_PIF_CMD_WITH_GCN_RUMBLE(dst, src) {               \
-    (*(typeof(src)*)(dst)) = (src);                             \
-    (*(typeof(src)*)(dst)).send.rumble = portInfo->gcnRumble;   \
-    (dst) += sizeof(src);                                       \
+#define WRITE_PIF_CMD_WITH_GCN_RUMBLE(dst, src) {           \
+    (*(typeof(src)*)(dst)) = (src);                         \
+    (*(typeof(src)*)(dst)).send.rumble = pad->gcnRumble;    \
+    (dst) += sizeof(src);                                   \
 }
 
 /**
@@ -118,21 +116,22 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
  */
 static void __osPackRead_impl(u8 cmdID) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    OSPortInfo* portInfo = NULL;
+    OSContPadEx* pad = NULL;
     int port;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
     for (port = 0; port < __osMaxControllers; port++) {
-        portInfo = &gPortInfo[port];
+        pad = &gControllerPads[port];
 
         // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
-        _Bool isEnabled = (portInfo->plugged && (gContStatusPolling || portInfo->playerNum));
-        _Bool isGCN = (portInfo->type & CONT_CONSOLE_GCN);
+        u16 type = gControllerStatuses[port].type;
+        _Bool isEnabled = ((type != CONT_NONE) && (gContStatusPolling || (gControllerPlayerNumbers[port] != 0)));
+        _Bool isGCN = (type & CONT_CONSOLE_GCN);
 
         switch (cmdID) {
-            case CONT_CMD_READ_BUTTON:
+            case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other per port depending on the connected controller type.
             case CONT_CMD_GCN_SHORT_POLL:
                 if (isEnabled) {
                     if (isGCN) {
@@ -434,8 +433,7 @@ void osContGetQueryEx(u8* bitpattern, OSContStatus* status) {
 void __osContGetInitDataEx(u8* pattern, OSContStatus* status) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContRequestFormatAligned requestHeader;
-    OSPortInfo* portInfo = NULL;
-    u8 bits = 0x0;
+    u8 bits = 0b0000;
     int port;
 
     for (port = 0; port < __osMaxControllers; port++) {
@@ -443,19 +441,18 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* status) {
         status->error = CHNL_ERR(requestHeader.fmt.size);
 
         if (status->error == (CHNL_ERR_SUCCESS >> 4)) {
-            portInfo = &gPortInfo[port];
-
             // Byteswap the SI identifier. This is done in vanilla libultra.
             status->type = ((requestHeader.fmt.recv.type.l << 8) | requestHeader.fmt.recv.type.h);
 
             // Check the type of controller device connected to the port.
             // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
             //   so check for that and set the input type to N64 controller if so.
-            portInfo->type = ((s16)status->type == (s16)CONT_TYPE_NULL) ? CONT_TYPE_NORMAL : status->type;
+            if ((s16)status->type == (s16)CONT_TYPE_NULL) {
+                status->type = CONT_TYPE_NORMAL;
+            }
 
-            // Set this port's status.
+            // Set this port's status byte.
             status->status = requestHeader.fmt.recv.status.raw;
-            portInfo->plugged = TRUE;
             bits |= (1 << port);
         }
 
@@ -492,8 +489,9 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
         return PFS_ERR_INVALID;
     }
 
-    if (gPortInfo[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
-        gPortInfo[channel].gcnRumble = motorState;
+    // Check whether the controller is a GCN controller.
+    if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
+        gControllerPads[channel].gcnRumble = motorState;
 
         // Change the last command ID so that input poll command (which includes rumble) gets written again.
         __osContLastCmd = PIF_CMD_END;
@@ -599,7 +597,8 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     pfs->channel    = channel;
     pfs->activebank = ACCESSORY_ID_NULL;
 
-    if (!(gPortInfo[channel].type & CONT_CONSOLE_GCN)) {
+    // Make sure the controller is not a GCN controller.
+    if (!(gControllerStatuses[channel].type & CONT_CONSOLE_GCN)) {
         // Write probe value (ensure Transfer Pak is turned off).
         err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
         if (err == PFS_ERR_NEW_PACK) {

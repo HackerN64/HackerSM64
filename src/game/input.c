@@ -22,6 +22,7 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 // OS Controllers.
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
+u8 gControllerPlayerNumbers[MAXCONTROLLERS]; // 0 = not assigned to a player.
 
 u8    gNumPlayers                     = 0;      // The number of controllers currently assigned to a player.
 u8    gControllerBits                 = 0b0000; // Which ports have a controller connected to them (low to high).
@@ -170,7 +171,7 @@ ALWAYS_INLINE _Bool check_button_pressed_combo(u16 buttonDown, u16 buttonPressed
  * @param[out] controller The controller to link.
  * @param[in ] port The port to get the data from.
  */
-void assign_controller_data(struct Controller* controller, int port) {
+void assign_controller_data_to_port(struct Controller* controller, int port) {
     controller->statusData = &gControllerStatuses[port];
     controller->controllerData = &gControllerPads[port];
     controller->port = port;
@@ -181,7 +182,6 @@ void assign_controller_data(struct Controller* controller, int port) {
  * Automatically assignins controller numbers based on port order.
  */
 void assign_controllers_by_port_order(void) {
-    OSPortInfo* portInfo = NULL;
     int port, cont = 0;
     int lastUsedPort = -1;
 
@@ -192,13 +192,11 @@ void assign_controllers_by_port_order(void) {
             break;
         }
 
-        portInfo = &gPortInfo[port];
+        // Is a controller plugged in?
+        if (gControllerStatuses[port].type != CONT_NONE) {
+            gControllerPlayerNumbers[port] = (cont + 1);
 
-        // Is the controller plugged in?
-        if (portInfo->plugged) {
-            portInfo->playerNum = (cont + 1);
-
-            assign_controller_data(&gControllers[cont], port);
+            assign_controller_data_to_port(&gControllers[cont], port);
 
             lastUsedPort = port;
 
@@ -215,18 +213,17 @@ void assign_controllers_by_port_order(void) {
  * Assigns controllers based on assigned data from status polling.
  */
 void assign_controllers_by_player_num(void) {
-    OSPortInfo* portInfo = NULL;
     int port;
     int lastUsedPort = -1;
 
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
     // The game allows you to have a controller plugged into any port in order to play the game.
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        portInfo = &gPortInfo[port];
+        u8 playerNum = gControllerPlayerNumbers[port];
 
-        // Is controller plugged in and assigned to a player?
-        if (portInfo->plugged && portInfo->playerNum) {
-            assign_controller_data(&gControllers[portInfo->playerNum - 1], port);
+        // Is a controller plugged in and assigned to a player?
+        if ((gControllerStatuses[port].type != CONT_NONE) && (playerNum != 0)) {
+            assign_controller_data_to_port(&gControllers[playerNum - 1], port);
 
             lastUsedPort = port;
         }
@@ -283,11 +280,32 @@ static void poll_controller_statuses(OSMesg* mesg) {
 }
 
 /**
+ * @brief Disconnects/resets all controller data.
+ */
+void reset_all_controller_data(void) {
+    gNumPlayers = 0;
+
+    bzero(gControllers,             sizeof(gControllers            ));
+    bzero(gControllerStatuses,      sizeof(gControllerStatuses     ));
+    bzero(gControllerPads,          sizeof(gControllerPads         ));
+    bzero(gControllerPlayerNumbers, sizeof(gControllerPlayerNumbers));
+
+    // for (int port = 0; port < MAXCONTROLLERS; port++) {
+    //     gControllerPads[port].statPollButton.raw = 0x0000;
+    //     gControllerPads[port].gcnRumble = 0;
+    // }
+
+    cancel_rumble();
+}
+
+/**
  * @brief Starts polling for new controllers and open the UI.
  * @param[in] isBootMode Boolean. Only used when MAX_SUPPORTED_CONTROLLERS is 1. Triggers a separate mode where the UI is
  *   invisible and the controller with the first detected input (including analog sticks) becomes player 1.
  */
 void start_controller_status_polling(_Bool isBootMode) {
+    reset_all_controller_data();
+
     if (isBootMode) {
         gContStatusPollingReadyForInput = TRUE;
     }
@@ -295,13 +313,6 @@ void start_controller_status_polling(_Bool isBootMode) {
     gContStatusPollingIsBootMode = isBootMode;
     gContStatusPolling = TRUE;
     gContStatusPollTimer = 0;
-    gNumPlayers = 0;
-
-    bzero(gPortInfo,           sizeof(gPortInfo          ));
-    bzero(gControllers,        sizeof(gControllers       ));
-    bzero(gControllerStatuses, sizeof(gControllerStatuses));
-
-    cancel_rumble();
 }
 
 /**
@@ -349,22 +360,21 @@ static _Bool detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
  * @brief Assign player numbers to controllers based on player input.
  */
 void read_controller_inputs_status_polling(void) {
-    OSPortInfo* portInfo = NULL;
     u16 totalInput = 0x0;
 
     // Read inputs from all four ports when status polling.
     for (int port = 0; port < MAXCONTROLLERS; port++) {
-        portInfo = &gPortInfo[port];
+        OSContPadEx* pad = &gControllerPads[port];
 
-        if (portInfo->plugged) {
-            OSContPadEx* pad = &gControllerPads[port];
+        // Check whether a controller is plugged in to this port.
+        if (gControllerStatuses[port].type != CONT_NONE) {
             u16 button =  pad->button.raw;
             totalInput |= button;
 
             if (gContStatusPollingReadyForInput) {
                 // If a button is pressed on an unassigned controller, assign it the current player number.
                 if (
-                    !portInfo->playerNum &&
+                    (gControllerPlayerNumbers[port] == 0) &&
                     (
                         button ||
                         (
@@ -373,15 +383,15 @@ void read_controller_inputs_status_polling(void) {
                         ) // Only check analog sticks in boot mode.
                     )
                 ) {
-                    portInfo->playerNum = ++gNumPlayers;
+                    gControllerPlayerNumbers[port] = ++gNumPlayers;
                 }
 #if (defined(ALLOW_STATUS_REPOLLING_COMBO) && (MAX_NUM_PLAYERS > 1))
-                u16 pressed = (~portInfo->statusPollButtons & button);
+                u16 pressed = (~pad->statPollButton.raw & button);
 
                 // If the combo is pressed, stop polling and assign the current controllers.
                 if (
                     !gContStatusPollingIsBootMode &&
-                    portInfo->playerNum &&
+                    (gControllerPlayerNumbers[port] != 0) &&
                     check_button_pressed_combo(button, pressed, TOGGLE_CONT_STATUS_POLLING_COMBO)
                 ) {
                     gContStatusPollingReadyForInput = FALSE;
@@ -398,10 +408,10 @@ void read_controller_inputs_status_polling(void) {
                     return;
                 }
 
-                portInfo->statusPollButtons = button;
+                pad->statPollButton.raw = button;
             }
         } else {
-            portInfo->statusPollButtons = 0x0000;
+            pad->statPollButton.raw = 0x0000;
         }
     }
 

@@ -316,7 +316,7 @@ typedef union {
     } raw; /*0x08*/
 } GCNInputData; /*0x08*/
 
-// -- Virtual Controller (OSContPadEx) buttons --
+// -- Virtual Controller buttons (used by OSContPadEx) --
 
 typedef union {
     struct PACKED {
@@ -340,8 +340,8 @@ typedef union {
  * Structure for controllers
  */
 
-typedef struct {
-    /*0x00*/ u16 type;                      /* Controller Type */
+typedef struct { //! TODO: Accessory type.
+    /*0x00*/ u16 type;                      /* Controller Type (SI identifier, byteswapped) */
     /*0x02*/ u8  status;                    /* Controller status */
     /*0x03*/ u8	 error;                     /* Error */
 } OSContStatus; /*0x04*/
@@ -365,17 +365,19 @@ typedef struct PACKED {
 typedef struct {
     /*0x00*/ OSContButtons button;          /* Button data */
     /*0x02*/ OSContButtons lockedButton;    /* Button data to ignore */
-    /*0x04*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
-    /*0x06*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
-    /*0x08*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
-    /*0x0A*/ OSContOrigins origins;         /* GCN analog origins */
-    /*0x12*/ union {                        /* Extra bits not set by controller buttons */
+    /*0x04*/ OSContButtons statPollButton;  /* Previous frame's inputs when status polling. */
+    /*0x06*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
+    /*0x08*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
+    /*0x0A*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
+    /*0x0C*/ OSContOrigins origins;         /* GCN analog origins */
+    /*0x14*/ union {                        /* Extra bits not set by controller buttons */
                 N64Buttons n64;
                 GCNButtons gcn;
                 u16 raw;
             } ex; /*0x02*/
-    /*0x14*/ u8	errno;                      /* Error number */
-} OSContPadEx; /*0x15*/
+    /*0x16*/ u8 gcnRumble;                  /* Stored GCN rumble byte */
+    /*0x17*/ u8	errno;                      /* Error number */
+} OSContPadEx; /*0x18*/
 
 typedef struct {
     /*0x00*/ void *address;                 /* Ram pad Address: 11 bits */

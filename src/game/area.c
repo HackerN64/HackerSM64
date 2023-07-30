@@ -455,7 +455,6 @@ void render_controllers_overlay(void) {
     const s32 texW = 32;
     const s32 texH = 32;
     Texture* texture_controller = texture_controller_unknown;
-    OSPortInfo* portInfo = NULL;
     char text_buffer[32] = "";
     int port;
 
@@ -478,11 +477,9 @@ void render_controllers_overlay(void) {
 
     // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        portInfo = &gPortInfo[port];
-
         // Loop through sControllerIcons to get the port's corresponding texture.
         for (int i = 0; i < ARRAY_COUNT(sControllerIcons); i++) {
-            if (portInfo->type == sControllerIcons[i].type) {
+            if (gControllerStatuses[port].type == sControllerIcons[i].type) {
                 texture_controller = sControllerIcons[i].texture;
                 break;
             }
@@ -531,10 +528,9 @@ void render_controllers_overlay(void) {
 
     // Print the assigned port numbers.
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        portInfo = &gPortInfo[port];
-
-        if (portInfo->plugged && portInfo->playerNum) {
-            sprintf(text_buffer, "P%d", portInfo->playerNum);
+        // Print if a controller is plugged in and assigned to a player.
+        if ((gControllerStatuses[port].type != CONT_NONE) && (gControllerPlayerNumbers[port] != 0)) {
+            sprintf(text_buffer, "P%d", gControllerPlayerNumbers[port]);
             drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
         }
     }
