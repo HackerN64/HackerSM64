@@ -664,8 +664,3 @@ typedef struct PACKED {
 extern OSPifRamEx __osContPifRam;       // A buffer for the PIF RAM.
 extern u8         __osMaxControllers;   // The last port to read controllers on.
 extern u8         __osContLastCmd;      // The ID of the last command that was executed.
-
-// From HackerSM64:
-// extern OSPortInfo gPortInfo[MAXCONTROLLERS];
-
-void __osContGetInitDataEx(u8* pattern, OSContStatus* status);

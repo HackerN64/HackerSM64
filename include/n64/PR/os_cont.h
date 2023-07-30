@@ -414,7 +414,7 @@ typedef struct {
 #define CONT_COLLISION_ERROR                (1 << 0) /* 0x1 */
 #endif /* _HW_VERSION_1 */
 
-/* Controller type bits (byteswapped due to __osContGetInitData/__osContGetInitDataEx) */
+/* Controller type bits (byteswapped due to __osContGetInitData) */
 
 #define CONT_NONE                           0x0000
 
@@ -447,7 +447,7 @@ typedef struct {
 #define CONT_GCN_WIRELESS_ID                (0xC <<  8) // 0x0C00
 #define CONT_GCN_WIRELESS_TYPE_ID           (CONT_GCN_WIRELESS_TYPE_MASK | CONT_GCN_WIRELESS_ID)
 
-/* Controller types (byteswapped due to __osContGetInitData/__osContGetInitDataEx) */
+/* Controller types (byteswapped due to __osContGetInitData) */
 
 #define CONT_TYPE_NULL          (0xFFFF)
 #define CONT_TYPE_UNKNOWN       (0x0000)

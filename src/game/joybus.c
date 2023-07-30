@@ -403,64 +403,18 @@ void osContGetReadDataEx(OSContPadEx* pad) {
 // contquery.c //
 /////////////////
 
-void __osContGetInitDataEx(u8* pattern, OSContStatus* status);
+void __osContGetInitData(u8* pattern, OSContStatus* status);
 
 /**
  * @brief Read status query data written by osContStartQuery.
- * odified from vanilla libultra to return bitpattern, similar to osContInit.
+ * odified from vanilla libultra to return the bitpattern returned by __osContGetInitData, similar to osContInit.
  * Called by poll_controller_statuses.
  *
  * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
  * @param[out] status     A pointer to the 4 controller statuses.
  */
 void osContGetQueryEx(u8* bitpattern, OSContStatus* status) {
-    __osContGetInitDataEx(bitpattern, status);
-}
-
-//////////////////
-// controller.c //
-//////////////////
-
-/**
- * @brief Reads PIF command result written by __osPackRequestData and converts it into OSContStatus data.
- * Linker script will resolve references to the original function with this one instead.
- * Modified from vanilla libultra to set gPortInfo type and plugged status.
- * Called by osContInit, osContGetQuery, osContGetQueryEx, and osContReset.
- *
- * @param[out] bitpattern The first 4 bits correspond to which 4 ports have controllers plugged in (low-high).
- * @param[out] status     A pointer to the 4 controller statuses.
- */
-void __osContGetInitDataEx(u8* pattern, OSContStatus* status) {
-    u8* ptr = (u8*)__osContPifRam.ramarray;
-    __OSContRequestFormatAligned requestHeader;
-    u8 bits = 0b0000;
-    int port;
-
-    for (port = 0; port < __osMaxControllers; port++) {
-        requestHeader = *(__OSContRequestFormatAligned*)ptr;
-        status->error = CHNL_ERR(requestHeader.fmt.size);
-
-        if (status->error == (CHNL_ERR_SUCCESS >> 4)) {
-            // Byteswap the SI identifier. This is done in vanilla libultra.
-            status->type = ((requestHeader.fmt.recv.type.l << 8) | requestHeader.fmt.recv.type.h);
-
-            // Check the type of controller device connected to the port.
-            // Some mupen cores seem to send back a controller type of CONT_TYPE_NULL (0xFFFF) if the core doesn't initialize the input plugin quickly enough,
-            //   so check for that and set the input type to N64 controller if so.
-            if ((s16)status->type == (s16)CONT_TYPE_NULL) {
-                status->type = CONT_TYPE_NORMAL;
-            }
-
-            // Set this port's status byte.
-            status->status = requestHeader.fmt.recv.status.raw;
-            bits |= (1 << port);
-        }
-
-        ptr += sizeof(requestHeader);
-        status++;
-    }
-
-    *pattern = bits;
+    __osContGetInitData(bitpattern, status);
 }
 
 /////////////
