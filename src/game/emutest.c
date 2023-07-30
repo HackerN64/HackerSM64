@@ -15,6 +15,8 @@ extern u8 __osContPifRam[];
 extern u8 __osContLastCmd;
 extern void __osSiGetAccess(void);
 extern void __osSiRelAccess(void);
+extern void __osPiGetAccess(void);
+extern void __osPiRelAccess(void);
 
 enum Emulator gEmulator = EMU_CONSOLE;
 
@@ -105,7 +107,8 @@ void detect_emulator() {
     // On console and well behaved emulators, this echos back the lower half of
     // the requested memory address, repeating it if a whole word is requested.
     // So in this case, it should result in 0x01040104
-    const u32 magic = *((volatile u32*)0xbfd00104u);
+    u32 magic;
+    osPiReadIo(0x1fd00104u, &magic);
     if (magic == 0u) {
         // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
         gEmulator = EMU_MUPEN_OLD;
@@ -115,14 +118,20 @@ void detect_emulator() {
         gEmulator = EMU_CEN64;
         return;
     }
+    
+    __osPiGetAccess();
+    while (IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY|PI_STATUS_IO_BUSY));
+    const u16 halfMagic = *((volatile u16*)0xbfd00106u);
+    __osPiRelAccess();
 
     // Now do a halfword read instead.
-    switch (*((volatile u16*)0xbfd00106u)) {
+    switch (halfMagic) {
         // This is the correct result (echo back the lower half of the requested address)
         case 0x0106: {
             // Test to see if the libpl emulator extension is present.
-            osPiWriteIo(0x1FFB0000u, 0u);
-            if (*((volatile u32*)0xbffb0000u) == 0x00500000u) {
+            osPiWriteIo(0x1ffb0000u, 0u);
+            osPiReadIo(0x1ffb0000u, &magic);
+            if (magic == 0x00500000u) {
                 // libpl is supported. Must be ParallelN64
                 gEmulator = EMU_PARALLELN64;
                 return;
