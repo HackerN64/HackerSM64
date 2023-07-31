@@ -92,6 +92,10 @@ typedef union {
     CLAMP_U8((s32)(stick).y - (center).y),              \
 })
 
+#define ANALOG_ZERO(type)   (type){ 0x00, 0x00 }
+#define ANALOG_S8_ZERO      ANALOG_ZERO(Analog_s8)
+#define ANALOG_U8_ZERO      ANALOG_ZERO(Analog_u8)
+
 ///////////////////
 // Input structs //
 ///////////////////
@@ -354,11 +358,11 @@ typedef struct {
 } OSContPad; /*0x05*/
 
 typedef struct PACKED {
-    /*0x00*/ _Bool initialized;              /* Whether this controller's origins have been set. */
-    /*0x01*/ _Bool updateOrigins;
-    /*0x02*/ Analog_u8 stick;                /* -80 <=   stick <=  80 */
-    /*0x04*/ Analog_u8 c_stick;              /* -80 <= c_stick <=  80 */
-    /*0x06*/ Analog_u8 trig;                 /*   0 <= trig    <= 255 */
+    /*0x00*/ _Bool initialized;             /* Whether this controller's origins have been set. */
+    /*0x01*/ _Bool updateOrigins;           //! combine this and initialized, fix which origins to use on the first frame after plugging in.
+    /*0x02*/ Analog_u8 stick;               /* -80 <=   stick <=  80 */
+    /*0x04*/ Analog_u8 c_stick;             /* -80 <= c_stick <=  80 */
+    /*0x06*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
 } OSContOrigins; /*0x08*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers

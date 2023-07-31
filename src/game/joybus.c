@@ -131,7 +131,7 @@ static void __osPackRead_impl(u8 cmdID) {
         _Bool isGCN = (type & CONT_CONSOLE_GCN);
 
         switch (cmdID) {
-            case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other per port depending on the connected controller type.
+            case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
             case CONT_CMD_GCN_SHORT_POLL:
                 if (isEnabled) {
                     if (isGCN) {
@@ -220,11 +220,21 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
         origins->updateOrigins = TRUE;
     }
 
+    // If the USE_ORIGIN bit is set, use the provided origins. Otherwise assume the origins are all zero.
+    Analog_u8 origins_stick   = ANALOG_U8_ZERO;
+    Analog_u8 origins_c_stick = ANALOG_U8_ZERO;
+    Analog_u8 origins_trig    = ANALOG_U8_ZERO;
+
+    if (gcn.standard.USE_ORIGIN) {
+        origins_stick   = origins->stick;
+        origins_c_stick = origins->c_stick;
+        origins_trig    = origins->trig;
+    }
+
     // Write the analog data.
-    //! TODO: gcn.standard.USE_ORIGIN behavior.
-    pad->stick   = ANALOG_S8_CENTER(stick,   origins->stick);
-    pad->c_stick = ANALOG_S8_CENTER(c_stick, origins->c_stick);
-    pad->trig    = ANALOG_U8_CENTER(trig,    origins->trig);
+    pad->stick   = ANALOG_S8_CENTER(stick,   origins_stick  );
+    pad->c_stick = ANALOG_S8_CENTER(c_stick, origins_c_stick);
+    pad->trig    = ANALOG_U8_CENTER(trig,    origins_trig   );
 
     // Map GCN button bits to N64 button bits.
     dest.A       = gcn.standard.A;
@@ -308,8 +318,8 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     pad->ex.n64.standard.RESET  = n64Input.buttons.standard.RESET;
                     pad->ex.n64.standard.unused = n64Input.buttons.standard.unused;
                     pad->stick                  = n64Input.stick;
-                    pad->c_stick                = (Analog_s8){ 0x00, 0x00 };
-                    pad->trig                   = (Analog_u8){ 0x00, 0x00 };
+                    pad->c_stick                = ANALOG_S8_ZERO;
+                    pad->trig                   = ANALOG_U8_ZERO;
                 }
 
                 ptr += sizeof(__OSContReadFormat);
@@ -341,7 +351,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                             break;
                         case GCN_MODE_4_202:
                             c_stick = gcnInput.m3.c_stick;
-                            trig    = (Analog_u8){ 0x00, 0x00 };
+                            trig    = ANALOG_U8_ZERO;
                             break;
                     }
 

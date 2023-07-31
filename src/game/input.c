@@ -122,7 +122,7 @@ void run_demo_inputs(void) {
         // The timer variable being 0 at the current input means the demo is over.
         // Set the button to the INPUT_END_DEMO mask to end the demo.
         if (gCurrDemoInput->timer == 0) {
-            controllerData->stick = (Analog_s8){ 0x00, 0x00 };
+            controllerData->stick  = ANALOG_S8_ZERO;
             controllerData->button = INPUT_END_DEMO;
         } else {
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
@@ -289,11 +289,6 @@ void reset_all_controller_data(void) {
     bzero(gControllerStatuses,      sizeof(gControllerStatuses     ));
     bzero(gControllerPads,          sizeof(gControllerPads         ));
     bzero(gControllerPlayerNumbers, sizeof(gControllerPlayerNumbers));
-
-    // for (int port = 0; port < MAXCONTROLLERS; port++) {
-    //     gControllerPads[port].statPollButton.raw = 0x0000;
-    //     gControllerPads[port].gcnRumble = 0;
-    // }
 
     cancel_rumble();
 }
