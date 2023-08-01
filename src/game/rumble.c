@@ -101,7 +101,7 @@ static void set_motor(struct RumbleInfo* info, s32 motorState) {
 
     // Don't run if motor state wouldn't change.
     // Bypass this once per second just to allow __osMotorAccessEx to run to check for errors (eg. the rumble pak being unplugged).
-    if (motorState == info->motorState && ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) != 0)) {
+    if ((motorState == info->motorState) && ((gNumVblanks % RUMBLE_PAK_CHECK_TIME) != 0)) {
         return;
     }
 
@@ -248,7 +248,7 @@ _Bool is_rumble_finished_and_queue_empty(struct Controller* controller) {
     struct RumbleInfo* info = &gRumbleInfos[controller->port];
 
     // Check whether currently rumbling.
-    if (info->start + info->current.timer >= RUMBLE_START_TIME) {
+    if ((info->start + info->current.timer) >= RUMBLE_START_TIME) {
         return FALSE;
     }
 
@@ -380,7 +380,7 @@ void cancel_rumble(void) {
 
         // Reset timers.
         info->current.timer = 0;
-        info->slip          = 0;
+        info->slip = 0;
 
         info->breathTimer = 0;
     }
