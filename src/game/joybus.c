@@ -144,16 +144,14 @@ static void __osPackRead_impl(u8 cmdID) {
                 }
                 break;
             case CONT_CMD_GCN_READ_ORIGIN:
-                if (isEnabled && isGCN && gControllerPads[port].origins.updateOrigins) {
-                    gControllerPads[port].origins.updateOrigins = FALSE;
+                if (isEnabled && isGCN && !pad->origins.initialized) {
                     WRITE_PIF_CMD(ptr, sGCNReadOriginFormat);
                 } else {
                     ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
                 }
                 break;
             case CONT_CMD_GCN_CALIBRATE:
-                if (isEnabled && isGCN && gControllerPads[port].origins.updateOrigins) {
-                    gControllerPads[port].origins.updateOrigins = FALSE;
+                if (isEnabled && isGCN && !pad->origins.initialized) {
                     WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat);
                 } else {
                     ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
@@ -207,24 +205,18 @@ static void set_gcn_origins(OSContOrigins* origins, Analog_u8 stick, Analog_u8 c
  */
 static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8 stick, Analog_u8 c_stick, Analog_u8 trig) {
     OSContOrigins* origins = &pad->origins;
-    OSContButtons dest = { .raw = 0x0 };
-
-    // The first time the controller is connected, store the origins for the controller's analog sticks.
-    if (!origins->initialized) {
-        set_gcn_origins(origins, stick, c_stick, trig);
-    }
-
-    // If the GET_ORIGIN bit is set, that means the controller has new analog origins data and either CONT_CMD_GCN_READ_ORIGIN or CONT_CMD_GCN_CALIBRATE needs to be run to get the new data.
-    // The first frame after boot will use the above origins until the proper command runs later in the frame.
-    if (gcn.standard.GET_ORIGIN) {
-        origins->updateOrigins = TRUE;
-    }
-
-    // If the USE_ORIGIN bit is set, use the provided origins. Otherwise assume the origins are all zero.
+    OSContButtons buttons = { .raw = 0x0000 };
     Analog_u8 origins_stick   = ANALOG_U8_ZERO;
     Analog_u8 origins_c_stick = ANALOG_U8_ZERO;
     Analog_u8 origins_trig    = ANALOG_U8_ZERO;
 
+    // If the GET_ORIGIN bit is set, that means the controller has new analog origins data and either CONT_CMD_GCN_READ_ORIGIN or CONT_CMD_GCN_CALIBRATE needs to be run to get the new data.
+    // The first frame after boot will use the above origins until the proper command runs later in the frame.
+    if (gcn.standard.GET_ORIGIN) {
+        origins->initialized = FALSE;
+    }
+
+    // If the USE_ORIGIN bit is set, use the provided origins. Otherwise assume the origins are all zero.
     if (gcn.standard.USE_ORIGIN) {
         origins_stick   = origins->stick;
         origins_c_stick = origins->c_stick;
@@ -237,25 +229,25 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     pad->trig    = ANALOG_U8_CENTER(trig,    origins_trig   );
 
     // Map GCN button bits to N64 button bits.
-    dest.A       = gcn.standard.A;
-    dest.B       = gcn.standard.B;
-    dest.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
-    dest.START   = gcn.standard.START;
-    dest.D.UP    = gcn.standard.D.UP;
-    dest.D.DOWN  = gcn.standard.D.DOWN;
-    dest.D.LEFT  = gcn.standard.D.LEFT;
-    dest.D.RIGHT = gcn.standard.D.RIGHT;
-    dest.X       = gcn.standard.X; // This bit was previously set when L+R+START was pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
-    dest.Y       = gcn.standard.Y; // This bit was unused by the N64 controller.
-    dest.L       = gcn.standard.Z; // Swap L and Z.
-    dest.R       = gcn.standard.R;
-    dest.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
-    dest.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
-    dest.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
-    dest.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
+    buttons.A       = gcn.standard.A;
+    buttons.B       = gcn.standard.B;
+    buttons.Z       = (gcn.standard.L || (trig.l > GCN_TRIGGER_THRESHOLD)); // Swap L and Z.
+    buttons.START   = gcn.standard.START;
+    buttons.D.UP    = gcn.standard.D.UP;
+    buttons.D.DOWN  = gcn.standard.D.DOWN;
+    buttons.D.LEFT  = gcn.standard.D.LEFT;
+    buttons.D.RIGHT = gcn.standard.D.RIGHT;
+    buttons.X       = gcn.standard.X; // This bit was previously set when L+R+START was pressed on a standard N64 controller to recalibrate the analog stick (which also unsets the START bit).
+    buttons.Y       = gcn.standard.Y; // This bit was unused by the N64 controller.
+    buttons.L       = gcn.standard.Z; // Swap L and Z.
+    buttons.R       = gcn.standard.R;
+    buttons.C.UP    = (pad->c_stick.y >  GCN_C_STICK_THRESHOLD);
+    buttons.C.DOWN  = (pad->c_stick.y < -GCN_C_STICK_THRESHOLD);
+    buttons.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
+    buttons.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
     // Write the button data.
-    pad->button.raw                 = dest.raw;
+    pad->button.raw                 = buttons.raw;
 
     // Write the non-button data.
     pad->ex.gcn.standard.ERRSTAT    = gcn.standard.ERRSTAT;

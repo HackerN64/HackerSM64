@@ -355,7 +355,7 @@ static _Bool detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
  * @brief Assign player numbers to controllers based on player input.
  */
 void read_controller_inputs_status_polling(void) {
-    u16 totalInput = 0x0;
+    u16 totalInput = 0x0000;
 
     // Read inputs from all four ports when status polling.
     for (int port = 0; port < MAXCONTROLLERS; port++) {
@@ -455,7 +455,7 @@ void check_repoll_gcn_origins(OSMesg* mesg) {
     _Bool updateOrigins = FALSE;
 
     for (int port = 0; port < __osMaxControllers; port++) {
-        if (gControllerPads[port].origins.updateOrigins) {
+        if (!gControllerPads[port].origins.initialized) {
             updateOrigins = TRUE;
             break;
         }

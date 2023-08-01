@@ -359,7 +359,7 @@ typedef struct {
 
 typedef struct PACKED {
     /*0x00*/ _Bool initialized;             /* Whether this controller's origins have been set. */
-    /*0x01*/ _Bool updateOrigins;           //! combine this and initialized, fix which origins to use on the first frame after plugging in.
+    /*0x01*/ u8 pad[1];
     /*0x02*/ Analog_u8 stick;               /* -80 <=   stick <=  80 */
     /*0x04*/ Analog_u8 c_stick;             /* -80 <= c_stick <=  80 */
     /*0x06*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
