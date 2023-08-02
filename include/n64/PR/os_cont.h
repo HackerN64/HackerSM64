@@ -379,7 +379,7 @@ typedef struct {
                 GCNButtons gcn;
                 u16 raw;
             } ex; /*0x02*/
-    /*0x16*/ u8 gcnRumble;                  /* Stored GCN rumble byte */
+    /*0x16*/ u8 playerNum;                  /* Player number (0 = not assigned) */
     /*0x17*/ u8	errno;                      /* Error number */
 } OSContPadEx; /*0x18*/
 

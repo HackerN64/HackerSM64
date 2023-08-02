@@ -528,9 +528,11 @@ void render_controllers_overlay(void) {
 
     // Print the assigned port numbers.
     for (port = 0; port < MAXCONTROLLERS; port++) {
+        u8 playerNum = gControllerPads[port].playerNum;
+
         // Print if a controller is plugged in and assigned to a player.
-        if ((gControllerStatuses[port].type != CONT_NONE) && (gControllerPlayerNumbers[port] != 0)) {
-            sprintf(text_buffer, "P%d", gControllerPlayerNumbers[port]);
+        if ((gControllerStatuses[port].type != CONT_NONE) && (playerNum != 0)) {
+            sprintf(text_buffer, "P%d", playerNum);
             drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
         }
     }

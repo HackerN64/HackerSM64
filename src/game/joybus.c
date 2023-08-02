@@ -102,10 +102,10 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
     (dst) += sizeof(src);           \
 }
 
-#define WRITE_PIF_CMD_WITH_GCN_RUMBLE(dst, src) {           \
-    (*(typeof(src)*)(dst)) = (src);                         \
-    (*(typeof(src)*)(dst)).send.rumble = pad->gcnRumble;    \
-    (dst) += sizeof(src);                                   \
+#define WRITE_PIF_CMD_WITH_GCN_RUMBLE(dst, src, port) {                 \
+    (*(typeof(src)*)(dst)) = (src);                                     \
+    (*(typeof(src)*)(dst)).send.rumble = gRumbleInfos[port].motorState; \
+    (dst) += sizeof(src);                                               \
 }
 
 /**
@@ -121,22 +121,23 @@ static void __osPackRead_impl(u8 cmdID) {
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
     for (int port = 0; port < __osMaxControllers; port++) {
+        OSContPadEx* pad = &gControllerPads[port];
         u16 type = gControllerStatuses[port].type;
 
         // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
-        if ((type != CONT_NONE) && (gContStatusPolling || (gControllerPlayerNumbers[port] != 0))) {
-            OSContPadEx* pad = &gControllerPads[port];
+        if ((type != CONT_NONE) && (gContStatusPolling || (pad->playerNum != 0))) {
             _Bool isGCN = (type & CONT_CONSOLE_GCN);
 
             switch (cmdID) {
                 case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
                 case CONT_CMD_GCN_SHORT_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort);
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort, port);
                     } else {
                         WRITE_PIF_CMD(ptr, sN64WriteFormat);
                     }
                     break;
+
                 case CONT_CMD_GCN_READ_ORIGIN:
                     if (isGCN && !pad->origins.initialized) {
                         WRITE_PIF_CMD(ptr, sGCNReadOriginFormat);
@@ -144,20 +145,23 @@ static void __osPackRead_impl(u8 cmdID) {
                         ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
                     }
                     break;
+
                 case CONT_CMD_GCN_CALIBRATE:
                     if (isGCN && !pad->origins.initialized) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat);
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat, port);
                     } else {
                         ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
                     }
                     break;
+
                 case CONT_CMD_GCN_LONG_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatLong);
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatLong, port);
                     } else {
                         WRITE_PIF_CMD(ptr, sN64WriteFormat);
                     }
                     break;
+
                 default:
                     osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmdID, port);
                     *ptr = PIF_CMD_END;
@@ -240,7 +244,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     buttons.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
     // Write the button data.
-    pad->button.raw                 = buttons.raw;
+    pad->button.raw = buttons.raw;
 
     // Write the non-button data.
     pad->ex.gcn.standard.ERRSTAT    = gcn.standard.ERRSTAT;
@@ -264,13 +268,18 @@ void osContGetReadDataEx(OSContPadEx* pad) {
     GCNInputData gcnInput;
 
     while (*ptr != PIF_CMD_END) {
-        if (*ptr == PIF_CMD_SKIP_CHNL || *ptr == PIF_CMD_RESET_CHNL) {
+        if (
+            *ptr == PIF_CMD_SKIP_CHNL ||
+            *ptr == PIF_CMD_RESET_CHNL
+        ) {
             // Skip empty channels/ports.
             pad++;
             ptr++;
             continue;
         }
-        if (*ptr == PIF_CMD_NOP) {
+        if (
+            *ptr == PIF_CMD_NOP
+        ) {
             // Skip bytes that are PIF_CMD_NOP (0xFF).
             ptr++;
             continue;
@@ -441,9 +450,9 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
 
     // Check whether the controller is a GCN controller.
     if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
-        gControllerPads[channel].gcnRumble = motorState;
+        // GCN rumble is set in the input poll command by motorState in gRumbleInfos.
 
-        // Change the last command ID so that input poll command (which includes rumble) gets written again.
+        // Change the last command ID so that input poll command (which includes the rumble byte) gets written again next frame.
         __osContLastCmd = PIF_CMD_END;
     } else { // N64 Controllers.
         // N64 rumble pak can only use MOTOR_STOP or MOTOR_START.

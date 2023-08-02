@@ -33,7 +33,6 @@ extern struct Controller* const gPlayer4Controller;
 // OS Controllers.
 extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
 extern OSContPadEx gControllerPads[MAXCONTROLLERS];
-extern u8 gControllerPlayerNumbers[MAXCONTROLLERS];
 
 extern u8    gNumPlayers;
 extern u8    gControllerBits;
