@@ -159,8 +159,8 @@ static void __osPackRead_impl(u8 cmdID) {
                     }
                     break;
                 default:
-                    osSyncPrintf("__osPackRead_impl error: Unknown input poll command: %.02X (port %d)\n", cmdID, port);
-                    ptr++;
+                    osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmdID, port);
+                    *ptr = PIF_CMD_END;
                     return;
             }
         } else {
@@ -387,7 +387,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 break;
 
             default:
-                osSyncPrintf("osContGetReadDataEx error: Unknown input poll command: %.02X\n", readformatptr->send.cmdID);
+                osSyncPrintf("osContGetReadDataEx error: Unimplemented input poll command: %.02X\n", readformatptr->send.cmdID);
                 return;
         }
 
