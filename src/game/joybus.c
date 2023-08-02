@@ -67,7 +67,7 @@ static void __osPackRead_impl(u8 cmdID);
  * @brief Implementation for PIF pack handlers.
  *
  * @param[in] mq    The SI event message queue.
- * @param[in] cmdID The command ID to run (see enum OSContCmds);
+ * @param[in] cmdID The command ID to run (see enum OSContCmds).
  * @returns Error status: -1 = busy, 0 = success.
  */
 s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
@@ -112,66 +112,59 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
  * @brief Writes PIF commands to poll controller inputs depending on the command.
  * Called by osContStartReadData and osStartRead_impl.
  *
- * @param[in] cmdID The command ID to run (see enum OSContCmds);
+ * @param[in] cmdID The command ID to run (see enum OSContCmds).
  */
 static void __osPackRead_impl(u8 cmdID) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
-    OSContPadEx* pad = NULL;
-    int port;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
     __osContPifRam.pifstatus = PIF_STATUS_EXE;
 
-    for (port = 0; port < __osMaxControllers; port++) {
-        pad = &gControllerPads[port];
+    for (int port = 0; port < __osMaxControllers; port++) {
+        u16 type = gControllerStatuses[port].type;
 
         // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
-        u16 type = gControllerStatuses[port].type;
-        _Bool isEnabled = ((type != CONT_NONE) && (gContStatusPolling || (gControllerPlayerNumbers[port] != 0)));
-        _Bool isGCN = (type & CONT_CONSOLE_GCN);
+        if ((type != CONT_NONE) && (gContStatusPolling || (gControllerPlayerNumbers[port] != 0))) {
+            OSContPadEx* pad = &gControllerPads[port];
+            _Bool isGCN = (type & CONT_CONSOLE_GCN);
 
-        switch (cmdID) {
-            case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
-            case CONT_CMD_GCN_SHORT_POLL:
-                if (isEnabled) {
+            switch (cmdID) {
+                case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
+                case CONT_CMD_GCN_SHORT_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort);     
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort);
                     } else {
                         WRITE_PIF_CMD(ptr, sN64WriteFormat);
                     }
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            case CONT_CMD_GCN_READ_ORIGIN:
-                if (isEnabled && isGCN && !pad->origins.initialized) {
-                    WRITE_PIF_CMD(ptr, sGCNReadOriginFormat);
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            case CONT_CMD_GCN_CALIBRATE:
-                if (isEnabled && isGCN && !pad->origins.initialized) {
-                    WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat);
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            case CONT_CMD_GCN_LONG_POLL:
-                if (isEnabled) {
+                    break;
+                case CONT_CMD_GCN_READ_ORIGIN:
+                    if (isGCN && !pad->origins.initialized) {
+                        WRITE_PIF_CMD(ptr, sGCNReadOriginFormat);
+                    } else {
+                        ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+                    }
+                    break;
+                case CONT_CMD_GCN_CALIBRATE:
+                    if (isGCN && !pad->origins.initialized) {
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat);
+                    } else {
+                        ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
+                    }
+                    break;
+                case CONT_CMD_GCN_LONG_POLL:
                     if (isGCN) {
                         WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatLong);
                     } else {
                         WRITE_PIF_CMD(ptr, sN64WriteFormat);
                     }
-                } else {
-                    ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
-                }
-                break;
-            default:
-                osSyncPrintf("__osPackRead_impl error: Unknown input poll command: %.02X (port %d)\n", cmdID, port);
-                ptr++;
-                return;
+                    break;
+                default:
+                    osSyncPrintf("__osPackRead_impl error: Unknown input poll command: %.02X (port %d)\n", cmdID, port);
+                    ptr++;
+                    return;
+            }
+        } else {
+            ptr++; // Empty channel/port, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
         }
     }
 
@@ -309,6 +302,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                     // Move these two bits to the other struct.
                     pad->ex.n64.standard.RESET  = n64Input.buttons.standard.RESET;
                     pad->ex.n64.standard.unused = n64Input.buttons.standard.unused;
+                    // Standard N64 controller only has one analog stick.
                     pad->stick                  = n64Input.stick;
                     pad->c_stick                = ANALOG_S8_ZERO;
                     pad->trig                   = ANALOG_U8_ZERO;
