@@ -454,6 +454,9 @@ void render_controllers_overlay(void) {
     const s32 y = (SCREEN_CENTER_Y - (h / 2));
     const s32 texW = 32;
     const s32 texH = 32;
+    const s32 spacing = 2;
+    const s32 spacedW = (w + spacing);
+    const s32 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
     Texture* texture_controller = texture_controller_unknown;
     char text_buffer[32] = "";
     int port;
@@ -485,7 +488,7 @@ void render_controllers_overlay(void) {
             }
         }
 
-        x = (SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port);
+        x = (iconStartX + (spacedW * port));
         gDPLoadTextureTile(dlHead++,
             texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
             texW, texH, 0, 0,
@@ -518,7 +521,7 @@ void render_controllers_overlay(void) {
             char comboStr[32] = "";
             size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
-            s32 xOffset = ((strlen("ORTOEXIT") + 1 + count) / 2) * 7; // Center the text based on char count.
+            s32 xOffset = ((strlen("OR%sTOEXIT") + count) / 2) * 7; // Center the text based on char count.
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
  #endif // (MAX_NUM_PLAYERS > 1)
         } else {
@@ -526,14 +529,15 @@ void render_controllers_overlay(void) {
         }
     }
 
-    // Print the assigned port numbers.
+    // Print the assigned player numbers.
     for (port = 0; port < MAXCONTROLLERS; port++) {
         u8 playerNum = gControllerPads[port].playerNum;
 
         // Print if a controller is plugged in and assigned to a player.
         if ((gControllerStatuses[port].type != CONT_NONE) && (playerNum != 0)) {
             sprintf(text_buffer, "P%d", playerNum);
-            drawSmallString(&dlHead, ((SCREEN_CENTER_X - (w * (MAXCONTROLLERS / 2))) + (w * port) + 8), (SCREEN_CENTER_Y + 16), text_buffer);
+            s32 playerNumX = ((iconStartX + 9) + (spacedW * port));
+            drawSmallString(&dlHead, playerNumX, (SCREEN_CENTER_Y + 16), text_buffer);
         }
     }
 
