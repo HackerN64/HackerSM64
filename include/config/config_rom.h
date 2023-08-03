@@ -37,7 +37,7 @@
 /**
  * Informs supported emulators to default to GameCube controller inputs.
  */
-// #define USE_GAMECUBE_CONTROLLER
+// #define EMU_DEFAULT_TO_GCN
 
 /**
  * RCVI hack. Increases performance on emulator, and does nothing on console.
