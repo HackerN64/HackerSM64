@@ -135,8 +135,14 @@ struct WarpTransition {
     /*0x04*/ struct WarpTransitionData data;
 };
 
+struct ButtonName {
+    /*0x00*/ u8 pad[2];
+    /*0x02*/ u16 mask;
+    /*0x04*/ const char* name;
+}; /*0x08*/
+
 struct ControllerIcon {
-    /*0x00*/ u16 align;
+    /*0x00*/ u8 pad[2];
     /*0x02*/ u16 type;
     /*0x04*/ Texture* texture;
 }; /*0x08*/

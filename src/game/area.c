@@ -368,23 +368,24 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 
 #ifdef ALLOW_STATUS_REPOLLING_COMBO
  #if (MAX_NUM_PLAYERS > 1)
-ALIGNED8 static const char* sN64ButtonNames[16] = {
-    "A",       // A_BUTTON
-    "B",       // B_BUTTON
-    "Z",       // Z_TRIG
-    "START",   // START_BUTTON
-    "D UP",    // U_JPAD
-    "D DOWN",  // D_JPAD
-    "D LEFT",  // L_JPAD
-    "D RIGHT", // R_JPAD
-    "X",       // X_BUTTON
-    "Y",       // Y_BUTTON
-    "L",       // L_TRIG
-    "R",       // R_TRIG
-    "C UP",    // U_CBUTTONS
-    "C DOWN",  // D_CBUTTONS
-    "C LEFT",  // L_CBUTTONS
-    "C RIGHT", // R_CBUTTONS
+// Button names, in print order.
+ALIGNED8 static const struct ButtonName sButtonNames[16] = {
+    { .mask = U_CBUTTONS,   .name = "C UP",    },
+    { .mask = D_CBUTTONS,   .name = "C DOWN",  },
+    { .mask = L_CBUTTONS,   .name = "C LEFT",  },
+    { .mask = R_CBUTTONS,   .name = "C RIGHT", },
+    { .mask = U_JPAD,       .name = "D UP",    },
+    { .mask = D_JPAD,       .name = "D DOWN",  },
+    { .mask = L_JPAD,       .name = "D LEFT",  },
+    { .mask = R_JPAD,       .name = "D RIGHT", },
+    { .mask = Z_TRIG,       .name = "Z",       },
+    { .mask = L_TRIG,       .name = "L",       },
+    { .mask = R_TRIG,       .name = "R",       },
+    { .mask = A_BUTTON,     .name = "A",       },
+    { .mask = B_BUTTON,     .name = "B",       },
+    { .mask = X_BUTTON,     .name = "X",       },
+    { .mask = Y_BUTTON,     .name = "Y",       },
+    { .mask = START_BUTTON, .name = "START",   },
 };
 
 /**
@@ -393,15 +394,19 @@ ALIGNED8 static const char* sN64ButtonNames[16] = {
 static size_t button_combo_to_string(char* strp, u16 buttons) {
     size_t count = 0;
 
-    for (int i = 0; i < ARRAY_COUNT(sN64ButtonNames); i++) {
-        if (buttons & ((1 << (ARRAY_COUNT(sN64ButtonNames) - 1)) >> i)) { // 0x8000 >> i
+    for (int i = 0; i < ARRAY_COUNT(sButtonNames); i++) {
+        struct ButtonName* buttonName = &sButtonNames[i];
+
+        if (buttons & buttonName->mask) {
+            buttons &= ~buttonName->mask;
+
             if (count) {
                 strcat(strp, "+");
                 count += strlen("+");
             }
 
-            strcat(strp, sN64ButtonNames[i]);
-            count += strlen(sN64ButtonNames[i]);
+            strcat(strp, buttonName->name);
+            count += strlen(buttonName->name);
         }
     }
 
@@ -409,6 +414,7 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 }
  #endif // (MAX_NUM_PLAYERS > 1)
 
+// Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
     { .type = CONT_NONE,                .texture = texture_controller_port         },
     { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
@@ -446,6 +452,7 @@ static const Gfx dl_controller_icons_end[] = {
 
 /**
  * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
+ * TODO: Fix this not rendering during transitions.
  */
 void render_controllers_overlay(void) {
     const s32 w = 32;

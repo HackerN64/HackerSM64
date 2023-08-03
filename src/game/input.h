@@ -10,7 +10,7 @@
 // Controller Status Polling:
 
 // This button combo should be standard, so don't change it unless you have a very good reason.
-#define TOGGLE_CONT_STATUS_POLLING_COMBO    (A_BUTTON | B_BUTTON | START_BUTTON)
+#define TOGGLE_CONT_STATUS_POLLING_COMBO    (Z_TRIG | R_TRIG | A_BUTTON | START_BUTTON)
 // How many extra frames to wait between controller status polls when status polling is on, in frames (0 = status poll every frame).
 // [0..], default is 15.
 #define CONT_STATUS_POLLING_TIME            15
