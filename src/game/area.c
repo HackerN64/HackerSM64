@@ -395,7 +395,7 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
     size_t count = 0;
 
     for (int i = 0; i < ARRAY_COUNT(sButtonNames); i++) {
-        struct ButtonName* buttonName = &sButtonNames[i];
+        const struct ButtonName* buttonName = &sButtonNames[i];
 
         if (buttons & buttonName->mask) {
             buttons &= ~buttonName->mask;
@@ -450,17 +450,20 @@ static const Gfx dl_controller_icons_end[] = {
     gsSPEndDisplayList(),
 };
 
+#define CONT_ICON_W 32
+#define CONT_ICON_H 32
+
 /**
  * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
  * TODO: Fix this not rendering during transitions.
  */
 void render_controllers_overlay(void) {
-    const s32 w = 32;
-    const s32 h = 32;
+    const s32 w = CONT_ICON_W;
+    const s32 h = CONT_ICON_H;
     s32 x = SCREEN_CENTER_X;
     const s32 y = (SCREEN_CENTER_Y - (h / 2));
-    const s32 texW = 32;
-    const s32 texH = 32;
+    const s32 texW = CONT_ICON_W;
+    const s32 texH = CONT_ICON_H;
     const s32 spacing = 2;
     const s32 spacedW = (w + spacing);
     const s32 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
@@ -544,7 +547,7 @@ void render_controllers_overlay(void) {
         if ((gControllerStatuses[port].type != CONT_NONE) && (playerNum != 0)) {
             sprintf(text_buffer, "P%d", playerNum);
             s32 playerNumX = ((iconStartX + 9) + (spacedW * port));
-            drawSmallString(&dlHead, playerNumX, (SCREEN_CENTER_Y + 16), text_buffer);
+            drawSmallString(&dlHead, playerNumX, (SCREEN_CENTER_Y + (CONT_ICON_H / 2)), text_buffer);
         }
     }
 
