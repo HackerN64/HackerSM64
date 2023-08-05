@@ -218,13 +218,13 @@ typedef union {
     struct PACKED {
         /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
         /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-        /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
+        /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Analog origins changed: Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
         /*0x0*/ u16 START           : 1; // CONT_GCN_START
         /*0x0*/ u16 Y               : 1; // CONT_GCN_Y
         /*0x0*/ u16 X               : 1; // CONT_GCN_X
         /*0x0*/ u16 B               : 1; // CONT_GCN_B
         /*0x0*/ u16 A               : 1; // CONT_GCN_A
-        /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
+        /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | Use analog origins: 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
         /*0x1*/ u16 L               : 1; // CONT_GCN_L
         /*0x1*/ u16 R               : 1; // CONT_GCN_R
         /*0x1*/ u16 Z               : 1; // CONT_GCN_Z
@@ -238,13 +238,13 @@ typedef union {
 typedef struct PACKED {
     /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
     /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
+    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Analog origins changed: Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
     /*0x0*/ u16 START           : 1; // CONT_GCN_START
     /*0x0*/ u16 LEFT_TOP        : 1;
     /*0x0*/ u16 RIGHT_TOP       : 1;
     /*0x0*/ u16 LEFT_BOTTOM     : 1;
     /*0x0*/ u16 RIGHT_BOTTOM    : 1;
-    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
+    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | Use analog origins: 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
     /*0x1*/ u16                 : 7;
 } GCNDKBongosButtons; /*0x02*/
 
@@ -370,18 +370,19 @@ typedef struct {
     /*0x00*/ OSContButtons button;          /* Button data */
     /*0x02*/ OSContButtons lockedButton;    /* Button data to ignore */
     /*0x04*/ OSContButtons statPollButton;  /* Previous frame's inputs when status polling. */
-    /*0x06*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
-    /*0x08*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
-    /*0x0A*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
-    /*0x0C*/ OSContOrigins origins;         /* GCN analog origins */
-    /*0x14*/ union {                        /* Extra bits not set by controller buttons */
+    /*0x06*/ u16 rawContButtons;            /* Raw button data from the controller */ //! Replace ex?
+    /*0x08*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
+    /*0x0A*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
+    /*0x0C*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
+    /*0x0E*/ OSContOrigins origins;         /* GCN analog origins */
+    /*0x16*/ union {                        /* Extra bits not set by controller buttons */
                 N64Buttons n64;
                 GCNButtons gcn;
                 u16 raw;
             } ex; /*0x02*/
-    /*0x16*/ u8 playerNum;                  /* Player number (0 = not assigned) */
-    /*0x17*/ u8	errno;                      /* Error number */
-} OSContPadEx; /*0x18*/
+    /*0x18*/ u8 playerNum;                  /* Player number (0 = not assigned) */
+    /*0x19*/ u8	errno;                      /* Error number */
+} OSContPadEx; /*0x20*/
 
 typedef struct {
     /*0x00*/ void *address;                 /* Ram pad Address: 11 bits */
@@ -487,60 +488,60 @@ typedef struct {
 
 /* N64 Buttons */
 
-#define CONT_A                  (1 << 15) // 0x8000
-#define CONT_B                  (1 << 14) // 0x4000
-#define CONT_G                  (1 << 13) // 0x2000
-#define CONT_START              (1 << 12) // 0x1000
-#define CONT_UP                 (1 << 11) // 0x0800
-#define CONT_DOWN               (1 << 10) // 0x0400
-#define CONT_LEFT               (1 <<  9) // 0x0200
-#define CONT_RIGHT              (1 <<  8) // 0x0100
-#define CONT_RESET              (1 <<  7) // 0x0080
-#define CONT_UNUSED             (1 <<  6) // 0x0040
-#define CONT_L                  (1 <<  5) // 0x0020
-#define CONT_R                  (1 <<  4) // 0x0010
-#define CONT_E                  (1 <<  3) // 0x0008
-#define CONT_D                  (1 <<  2) // 0x0004
-#define CONT_C                  (1 <<  1) // 0x0002
-#define CONT_F                  (1 <<  0) // 0x0001
+#define CONT_A                  (1 << 15) // 0x8000 | A
+#define CONT_B                  (1 << 14) // 0x4000 | B
+#define CONT_G                  (1 << 13) // 0x2000 | Z
+#define CONT_START              (1 << 12) // 0x1000 | START
+#define CONT_UP                 (1 << 11) // 0x0800 | D-Up
+#define CONT_DOWN               (1 << 10) // 0x0400 | D-Down
+#define CONT_LEFT               (1 <<  9) // 0x0200 | D-Left
+#define CONT_RIGHT              (1 <<  8) // 0x0100 | D-Right
+#define CONT_RESET              (1 <<  7) // 0x0080 | Reset analog (L+R+START)
+#define CONT_UNUSED             (1 <<  6) // 0x0040 | Unused
+#define CONT_L                  (1 <<  5) // 0x0020 | L
+#define CONT_R                  (1 <<  4) // 0x0010 | R
+#define CONT_E                  (1 <<  3) // 0x0008 | C-Up
+#define CONT_D                  (1 <<  2) // 0x0004 | C-Down
+#define CONT_C                  (1 <<  1) // 0x0002 | C-Left
+#define CONT_F                  (1 <<  0) // 0x0001 | C-Right
+
+/* Gamecube controller buttons */
+
+#define CONT_GCN_ERRSTAT        (1 << 15) // 0x8000 | Error status: Whether there was an error on last transfer.
+#define CONT_GCN_ERRLATCH       (1 << 14) // 0x4000 | Error Latched: Check SISR (GCN console register).
+#define CONT_GCN_GET_ORIGIN     (1 << 13) // 0x2000 | Analog origins changed: Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
+#define CONT_GCN_START          (1 << 12) // 0x1000 | START/PAUSE
+#define CONT_GCN_Y              (1 << 11) // 0x0800 | Y
+#define CONT_GCN_X              (1 << 10) // 0x0400 | X
+#define CONT_GCN_B              (1 <<  9) // 0x0200 | B
+#define CONT_GCN_A              (1 <<  8) // 0x0100 | A
+#define CONT_GCN_USE_ORIGIN     (1 <<  7) // 0x0080 | Use analog origins: 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
+#define CONT_GCN_L              (1 <<  6) // 0x0040 | L
+#define CONT_GCN_R              (1 <<  5) // 0x0020 | R
+#define CONT_GCN_Z              (1 <<  4) // 0x0010 | Z
+#define CONT_GCN_UP             (1 <<  3) // 0x0008 | D-Up
+#define CONT_GCN_DOWN           (1 <<  2) // 0x0004 | D-Down
+#define CONT_GCN_RIGHT          (1 <<  1) // 0x0002 | D-Right
+#define CONT_GCN_LEFT           (1 <<  0) // 0x0001 | D-Left
 
 /* Nintendo's official button names */
 
 #define A_BUTTON                CONT_A      // 0x8000
 #define B_BUTTON                CONT_B      // 0x4000
+#define Z_TRIG                  CONT_G      // 0x2000
+#define START_BUTTON            CONT_START  // 0x1000
+#define U_JPAD                  CONT_UP     // 0x0800
+#define D_JPAD                  CONT_DOWN   // 0x0400
+#define L_JPAD                  CONT_LEFT   // 0x0200
+#define R_JPAD                  CONT_RIGHT  // 0x0100
 #define X_BUTTON                CONT_RESET  // 0x0080
 #define Y_BUTTON                CONT_UNUSED // 0x0040
 #define L_TRIG                  CONT_L      // 0x0020
 #define R_TRIG                  CONT_R      // 0x0010
-#define Z_TRIG                  CONT_G      // 0x2000
-#define START_BUTTON            CONT_START  // 0x1000
-#define U_JPAD                  CONT_UP     // 0x0800
-#define L_JPAD                  CONT_LEFT   // 0x0200
-#define R_JPAD                  CONT_RIGHT  // 0x0100
-#define D_JPAD                  CONT_DOWN   // 0x0400
 #define U_CBUTTONS              CONT_E      // 0x0008
+#define D_CBUTTONS              CONT_D      // 0x0004
 #define L_CBUTTONS              CONT_C      // 0x0002
 #define R_CBUTTONS              CONT_F      // 0x0001
-#define D_CBUTTONS              CONT_D      // 0x0004
-
-/* Gamecube controller buttons */
-
-#define CONT_GCN_ERRSTAT        (1 << 15) // 0x8000
-#define CONT_GCN_ERRLATCH       (1 << 14) // 0x4000
-#define CONT_GCN_GET_ORIGIN     (1 << 13) // 0x2000
-#define CONT_GCN_START          (1 << 12) // 0x1000
-#define CONT_GCN_Y              (1 << 11) // 0x0800
-#define CONT_GCN_X              (1 << 10) // 0x0400
-#define CONT_GCN_B              (1 <<  9) // 0x0200
-#define CONT_GCN_A              (1 <<  8) // 0x0100
-#define CONT_GCN_USE_ORIGIN     (1 <<  7) // 0x0080
-#define CONT_GCN_L              (1 <<  6) // 0x0040
-#define CONT_GCN_R              (1 <<  5) // 0x0020
-#define CONT_GCN_Z              (1 <<  4) // 0x0010
-#define CONT_GCN_UP             (1 <<  3) // 0x0008
-#define CONT_GCN_DOWN           (1 <<  2) // 0x0004
-#define CONT_GCN_RIGHT          (1 <<  1) // 0x0002
-#define CONT_GCN_LEFT           (1 <<  0) // 0x0001
 
 /* Controller error number */
 

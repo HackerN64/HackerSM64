@@ -174,6 +174,8 @@ void assign_controller_data_to_port(struct Controller* controller, int port) {
     controller->statusData = &gControllerStatuses[port];
     controller->controllerData = &gControllerPads[port];
     controller->port = port;
+
+    osSyncPrintf("Player %d assigned to port %d.\n", controller->controllerData->playerNum, (port + 1));
 }
 
 /**
@@ -284,9 +286,9 @@ static void poll_controller_statuses(OSMesg* mesg) {
 void reset_all_controller_data(void) {
     gNumPlayers = 0;
 
-    bzero(gControllers,             sizeof(gControllers            ));
-    bzero(gControllerStatuses,      sizeof(gControllerStatuses     ));
-    bzero(gControllerPads,          sizeof(gControllerPads         ));
+    bzero(gControllers,        sizeof(gControllers       ));
+    bzero(gControllerStatuses, sizeof(gControllerStatuses));
+    bzero(gControllerPads,     sizeof(gControllerPads    ));
 
     cancel_rumble();
 }
@@ -306,6 +308,8 @@ void start_controller_status_polling(_Bool isBootMode) {
     gContStatusPollingIsBootMode = isBootMode;
     gContStatusPolling = TRUE;
     gContStatusPollTimer = 0;
+
+    osSyncPrintf("Status polling started%s.\n", (isBootMode ? " (boot mode)" : ""));
 }
 
 /**
@@ -331,6 +335,8 @@ void stop_controller_status_polling(OSContPadEx* pad) {
                  : osEepromProbe  (&gSIEventMesgQueue);
 #endif
     cancel_rumble();
+
+    osSyncPrintf("Status polling stopped.\n");
 }
 
 /**
@@ -446,6 +452,7 @@ void read_controller_inputs_normal(void) {
 
 /**
  * @brief Checks whether to repoll for GCN analog origins data, and repolls if so.
+ * TODO: Either check GET_ORIGIN bit directly or replace this check with a global variable.
  *
  * @param[in] mesg The SI message to wait for.
  */

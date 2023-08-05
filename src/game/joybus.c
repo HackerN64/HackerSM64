@@ -245,6 +245,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
 
     // Write the button data.
     pad->button.raw = buttons.raw;
+    pad->rawContButtons = gcn.raw;
 
     // Write the non-button data.
     pad->ex.gcn.standard.ERRSTAT    = gcn.standard.ERRSTAT;
@@ -302,6 +303,8 @@ void osContGetReadDataEx(OSContPadEx* pad) {
             case CONT_CMD_READ_BUTTON:
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
+
+                    pad->rawContButtons = n64Input.buttons.raw;
 
                     pad->button.raw = (n64Input.buttons.raw & ~(CONT_RESET | CONT_UNUSED)); // These two bits are repurposed to X and Y on the virtual controller, so make sure the game doesn't read an X button press when resetting.
                     // Allow the game to read the start button press that happens when resetting the analog stick.
