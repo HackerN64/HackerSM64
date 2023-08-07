@@ -2964,6 +2964,7 @@ const Gfx dl_ia8_up_arrow_end[] = {
 };
 
 // 0x02014958 - 0x02014960
+#ifdef ENABLE_STATUS_REPOLLING_GUI
 ALIGNED8 const Texture texture_controller_port[] = {
 #include "textures/segment2/controller_port.rgba16.inc.c"
 };
@@ -3003,6 +3004,7 @@ ALIGNED8 const Texture texture_controller_gcn_keyboard[] = {
 ALIGNED8 const Texture texture_controller_gcn_dancepad[] = {
 #include "textures/segment2/controller_gcn_dancepad.rgba16.inc.c"
 };
+#endif // ENABLE_STATUS_REPOLLING_GUI
 
 #ifdef ENABLE_RUMBLE
 //! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.

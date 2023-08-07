@@ -384,7 +384,7 @@ void read_controller_inputs_status_polling(void) {
                 ) {
                     pad->playerNum = ++gNumPlayers;
                 }
-#if (defined(ALLOW_STATUS_REPOLLING_COMBO) && (MAX_NUM_PLAYERS > 1))
+#if (defined(ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY) && (MAX_NUM_PLAYERS > 1))
                 u16 pressed = (~pad->statPollButton.raw & button);
 
                 // If the combo is pressed, stop polling and assign the current controllers.
@@ -430,7 +430,7 @@ void read_controller_inputs_normal(void) {
         // If we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             process_controller_data(controller);
-#ifdef ALLOW_STATUS_REPOLLING_COMBO
+#ifdef ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY
             if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
                 gContStatusPollingReadyForInput = FALSE;
                 start_controller_status_polling(FALSE);

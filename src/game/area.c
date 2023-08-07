@@ -29,6 +29,7 @@
 #include "joybus.h"
 #include "profiling.h"
 #include "fasttext.h"
+#include "segment2.h"
 #ifdef S2DEX_TEXT_ENGINE
 #include "s2d_engine/init.h"
 #endif
@@ -366,7 +367,7 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
-#ifdef ALLOW_STATUS_REPOLLING_COMBO
+#ifdef ENABLE_STATUS_REPOLLING_GUI
  #if (MAX_NUM_PLAYERS > 1)
 // Button names, in print order.
 ALIGNED8 static const struct ButtonName sButtonNames[16] = {
@@ -416,19 +417,36 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 
 // Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
-    { .type = CONT_NONE,                .texture = texture_controller_port         },
-    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal   },
-    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse    },
-    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice    },
-    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard },
-    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba          },
-    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal   },
-    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver },
-    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird },
-    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel    },
-    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard },
-    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad },
+    { .type = CONT_NONE,                .texture = texture_controller_port,         },
+    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal,   },
+    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse,    },
+    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice,    },
+    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard, },
+    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba,          },
+    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal,   },
+    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver, },
+    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird, },
+    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel,    },
+    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard, },
+    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad, },
+    { .type = (u16)-1,                  .texture = texture_controller_unknown,      },
 };
+
+// Loop through sControllerIcons to get the port's corresponding texture.
+__attribute__((noinline)) const struct ControllerIcon* get_controller_icon(int port) {
+    const struct ControllerIcon* icon = &sControllerIcons[0];
+    u16 type = gControllerStatuses[port].type;
+
+    while (icon->type != (u16)-1) {
+        if (icon->type == type) {
+            break;
+        }
+
+        icon++;
+    }
+
+    return icon;
+}
 
 static const Gfx dl_controller_icons_begin[] = {
     gsDPPipeSync(),
@@ -467,7 +485,6 @@ void render_controllers_overlay(void) {
     const s32 spacing = 2;
     const s32 spacedW = (w + spacing);
     const s32 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
-    Texture* texture_controller = texture_controller_unknown;
     char text_buffer[32] = "";
     int port;
 
@@ -490,17 +507,15 @@ void render_controllers_overlay(void) {
 
     // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        // Loop through sControllerIcons to get the port's corresponding texture.
-        for (int i = 0; i < ARRAY_COUNT(sControllerIcons); i++) {
-            if (gControllerStatuses[port].type == sControllerIcons[i].type) {
-                texture_controller = sControllerIcons[i].texture;
-                break;
-            }
+        const struct ControllerIcon* icon = get_controller_icon(port);
+
+        if (icon == NULL) {
+            continue;
         }
 
         x = (iconStartX + (spacedW * port));
         gDPLoadTextureTile(dlHead++,
-            texture_controller, G_IM_FMT_RGBA, G_IM_SIZ_16b,
+            icon->texture, G_IM_FMT_RGBA, G_IM_SIZ_16b,
             texW, texH, 0, 0,
             (texW - 1), (texH - 1), 0,
             (G_TX_NOMIRROR | G_TX_CLAMP),
@@ -531,7 +546,7 @@ void render_controllers_overlay(void) {
             char comboStr[32] = "";
             size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
-            s32 xOffset = ((strlen("OR%sTOEXIT") + count) / 2) * 7; // Center the text based on char count.
+            s32 xOffset = (((strlen("OR%sTOEXIT") + count) / 2) * 7); // Center the text based on char count.
             drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
  #endif // (MAX_NUM_PLAYERS > 1)
         } else {
@@ -558,7 +573,7 @@ void render_controllers_overlay(void) {
 
     gDisplayListHead = dlHead;
 }
-#endif // ALLOW_STATUS_REPOLLING_COMBO
+#endif // ENABLE_STATUS_REPOLLING_GUI
 
 void render_game(void) {
     PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
@@ -635,7 +650,7 @@ void render_game(void) {
     gViewportOverride = NULL;
     gViewportClip     = NULL;
 
-#ifdef ALLOW_STATUS_REPOLLING_COMBO
+#ifdef ENABLE_STATUS_REPOLLING_GUI
     render_controllers_overlay();
 #endif
 

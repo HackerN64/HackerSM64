@@ -26,13 +26,21 @@
  * The maximum number of supported players/controllers. 1-4.
  * This will save performance if the player has extra unused controllers plugged in.
  * NOTE: Default is 1, maximum is 4.
+ * NOTE: If this is 1, the first controller with input after boot will become player 1. Otherwise, player numbers are automatically assigned via port order.
+ * NOTE: It is highly recommended to enable ENABLE_STATUS_REPOLLING_GUI if this is greater than 1.
  */
 #define MAX_NUM_PLAYERS 1
 
 /**
- * Allows the player to use a button combo (defined in input.h) to toggle the ability to plug/unplug controllers and change the controller order.
+ * Enables a GUI that, while opem, allows plugging/unplugging controllers and changing the controller order.
+ * Triggered by unplugging any active controller.
  */
-#define ALLOW_STATUS_REPOLLING_COMBO
+#define ENABLE_STATUS_REPOLLING_GUI
+
+/**
+ * Allows the player to use the button combo defined in input.h to trigger status repolling at any time during gameplay.
+ */
+#define ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY
 
 /**
  * Informs supported emulators to default to GameCube controller inputs.
