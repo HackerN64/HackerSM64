@@ -418,21 +418,179 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 #define CONT_ICON_W 32
 #define CONT_ICON_H 32
 
+#ifdef CONTROLLERS_INPUT_DISPLAY
+
+// This is 4 32x32 RGBA16 textures, 2048 bytes each, 8192 bytes total.
+ALIGNED8 RGBA16 sInputOverlayTextures[MAXCONTROLLERS][CONT_ICON_W * CONT_ICON_H];
+
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_n64_normal[] = {
+    { .mask = CONT_A,           .x = 22, .y = 13, .w = 2, .h = 2, },
+    { .mask = CONT_B,           .x = 20, .y = 11, .w = 2, .h = 2, },
+    { .mask = CONT_L,           .x =  6, .y =  5, .w = 4, .h = 1, },
+    { .mask = CONT_R,           .x = 22, .y =  5, .w = 4, .h = 1, },
+    { .mask = CONT_G,           .x = 15, .y =  7, .w = 2, .h = 3, },
+    { .mask = CONT_START,       .x = 15, .y = 11, .w = 2, .h = 2, },
+    { .mask = CONT_UP,          .x =  7, .y =  8, .w = 2, .h = 2, },
+    { .mask = CONT_DOWN,        .x =  7, .y = 12, .w = 2, .h = 2, },
+    { .mask = CONT_LEFT,        .x =  5, .y = 10, .w = 2, .h = 2, },
+    { .mask = CONT_RIGHT,       .x =  9, .y = 10, .w = 2, .h = 2, },
+    { .mask = CONT_E,           .x = 24, .y =  7, .w = 2, .h = 2, },
+    { .mask = CONT_D,           .x = 24, .y = 11, .w = 2, .h = 2, },
+    { .mask = CONT_C,           .x = 22, .y =  9, .w = 2, .h = 2, },
+    { .mask = CONT_F,           .x = 26, .y =  9, .w = 2, .h = 2, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_n64_mouse[] = {
+    { .mask = CONT_A,           .x = 10, .y =  8, .w = 5, .h = 5, },
+    { .mask = CONT_B,           .x = 17, .y =  8, .w = 5, .h = 5, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_gba[] = {
+    { .mask = CONT_A,           .x = 27, .y = 13, .w = 2, .h = 2, },
+    { .mask = CONT_B,           .x = 24, .y = 14, .w = 2, .h = 2, },
+    { .mask = CONT_L,           .x =  3, .y =  9, .w = 3, .h = 1, },
+    { .mask = CONT_R,           .x = 26, .y =  9, .w = 3, .h = 1, },
+    { .mask = CONT_G,           .x =  7, .y = 20, .w = 1, .h = 1, },
+    { .mask = CONT_START,       .x =  7, .y = 10, .w = 1, .h = 1, },
+    { .mask = CONT_UP,          .x =  5, .y = 13, .w = 1, .h = 1, },
+    { .mask = CONT_DOWN,        .x =  5, .y = 15, .w = 1, .h = 1, },
+    { .mask = CONT_LEFT,        .x =  4, .y = 14, .w = 1, .h = 1, },
+    { .mask = CONT_RIGHT,       .x =  6, .y = 14, .w = 1, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_normal[] = {
+    { .mask = CONT_GCN_START,   .x = 15, .y = 12, .w = 2, .h = 2, },
+    { .mask = CONT_GCN_Y,       .x = 21, .y =  9, .w = 2, .h = 2, },
+    { .mask = CONT_GCN_X,       .x = 25, .y = 10, .w = 2, .h = 2, },
+    { .mask = CONT_GCN_B,       .x = 20, .y = 14, .w = 2, .h = 2, },
+    { .mask = CONT_GCN_A,       .x = 22, .y = 11, .w = 3, .h = 3, },
+    { .mask = CONT_GCN_L,       .x =  7, .y =  6, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_R,       .x = 22, .y =  6, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_Z,       .x = 22, .y =  7, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_UP,      .x = 11, .y = 17, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_DOWN,    .x = 11, .y = 19, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_LEFT,    .x = 10, .y = 18, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_RIGHT,   .x = 12, .y = 18, .w = 1, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_wheel[] = {
+    { .mask = CONT_GCN_START,   .x = 15, .y = 22, .w = 2, .h = 2, },
+    { .mask = CONT_GCN_Y,       .x = 21, .y = 15, .w = 1, .h = 2, },
+    { .mask = CONT_GCN_X,       .x = 22, .y = 14, .w = 2, .h = 1, },
+    { .mask = CONT_GCN_B,       .x = 23, .y = 17, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_A,       .x = 22, .y = 15, .w = 2, .h = 2, },
+    { .mask = CONT_GCN_L,       .x =  8, .y = 18, .w = 3, .h = 2, },
+    { .mask = CONT_GCN_R,       .x = 21, .y = 18, .w = 3, .h = 2, },
+    { .mask = CONT_GCN_Z,       .x =  9, .y = 14, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_UP,      .x =  9, .y = 14, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_DOWN,    .x =  9, .y = 17, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_LEFT,    .x =  8, .y = 16, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_RIGHT,   .x = 10, .y = 16, .w = 1, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_keyboard[] = {
+    { .mask = CONT_GCN_START,   .x =  7, .y = 14, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_Y,       .x = 27, .y = 13, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_X,       .x = 28, .y = 14, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_B,       .x = 26, .y = 15, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_A,       .x = 27, .y = 14, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_L,       .x =  3, .y = 11, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_R,       .x = 26, .y = 11, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_Z,       .x = 25, .y = 12, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_UP,      .x =  6, .y = 16, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_DOWN,    .x =  6, .y = 18, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_LEFT,    .x =  5, .y = 17, .w = 1, .h = 1, },
+    { .mask = CONT_GCN_RIGHT,   .x =  7, .y = 17, .w = 1, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_dancepad[] = {
+    { .mask = CONT_GCN_START,   .x = 21, .y =  5, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_Y,       .x =  8, .y = 22, .w = 3, .h = 3, },
+    { .mask = CONT_GCN_X,       .x = 21, .y = 22, .w = 3, .h = 3, },
+    { .mask = CONT_GCN_B,       .x =  8, .y =  9, .w = 3, .h = 3, },
+    { .mask = CONT_GCN_A,       .x = 21, .y =  9, .w = 3, .h = 3, },
+    { .mask = CONT_GCN_Z,       .x =  8, .y =  5, .w = 3, .h = 1, },
+    { .mask = CONT_GCN_UP,      .x = 13, .y =  8, .w = 6, .h = 5, },
+    { .mask = CONT_GCN_DOWN,    .x = 13, .y = 21, .w = 6, .h = 5, },
+    { .mask = CONT_GCN_LEFT,    .x =  7, .y = 14, .w = 5, .h = 6, },
+    { .mask = CONT_GCN_RIGHT,   .x = 20, .y = 14, .w = 5, .h = 6, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight buttons_display_controller_null[] = {
+    { .mask = (u16)-1, },
+};
+
+/**
+ * @brief Draws a red rectangle on sInputOverlayTextures using the ButtonHighlight data.
+ *
+ * @param port The port index to use when writing to sInputOverlayTextures.
+ * @param buttonHighlight The ButtonHighlight data.
+ */
+void apply_to_overlay_texture(int port, const ButtonHighlight* buttonHighlight) {
+    int startX = buttonHighlight->x;
+    int startY = buttonHighlight->y;
+    int w = buttonHighlight->w;
+    int h = buttonHighlight->h;
+
+    RGBA16* dst = (sInputOverlayTextures[port] + (CONT_ICON_W * startY) + startX);
+
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            *dst++ = RGBA16_COMPOSITE(31, 0, 0, 1);
+        }
+
+        dst += (CONT_ICON_W - w);
+    }
+}
+
+/**
+ * @brief Loop through a ButtonHighlight list and apply all active highlights for a given port based on controller input.
+ * 
+ * @param port The port to use input from and the port index to use when writing to sInputOverlayTextures.
+ * @param buttonHighlightList Pointer to a list of ButtonHighlight data.
+ */
+void set_overlay_texture(int port, const ButtonHighlight (*buttonHighlightList)[]) {
+    const ButtonHighlight* buttonHighlight = *buttonHighlightList;
+    u16 buttons = gControllerPads[port].rawContButtons;
+
+    while (buttonHighlight->mask != (u16)-1) {
+        if ((buttons & buttonHighlight->mask) != 0) {
+            apply_to_overlay_texture(port, buttonHighlight);
+        }
+
+        buttonHighlight++;
+    }
+}
+
+#define CONT_BUTTON_LIST(type) .buttonHighlightList = &buttons_display_controller_##type
+#else // !CONTROLLERS_INPUT_DISPLAY
+#define CONT_BUTTON_LIST(type)
+#endif // !CONTROLLERS_INPUT_DISPLAY
+#define CONT_TEXTURE(type) .texture = texture_controller_##type
+
 // Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
-    { .type = CONT_NONE,                .texture = texture_controller_port,         },
-    { .type = CONT_TYPE_NORMAL,         .texture = texture_controller_n64_normal,   },
-    { .type = CONT_TYPE_MOUSE,          .texture = texture_controller_n64_mouse,    },
-    { .type = CONT_TYPE_VOICE,          .texture = texture_controller_n64_voice,    },
-    { .type = CONT_TYPE_KEYBOARD,       .texture = texture_controller_n64_keyboard, },
-    { .type = CONT_TYPE_GBA,            .texture = texture_controller_gba,          },
-    { .type = CONT_TYPE_GCN_NORMAL,     .texture = texture_controller_gcn_normal,   },
-    { .type = CONT_TYPE_GCN_RECEIVER,   .texture = texture_controller_gcn_receiver, },
-    { .type = CONT_TYPE_GCN_WAVEBIRD,   .texture = texture_controller_gcn_wavebird, },
-    { .type = CONT_TYPE_GCN_WHEEL,      .texture = texture_controller_gcn_wheel,    },
-    { .type = CONT_TYPE_GCN_KEYBOARD,   .texture = texture_controller_gcn_keyboard, },
-    { .type = CONT_TYPE_GCN_DANCEPAD,   .texture = texture_controller_gcn_dancepad, },
-    { .type = (u16)-1,                  .texture = texture_controller_unknown,      },
+    { .type = CONT_NONE,              CONT_TEXTURE(port        ), CONT_BUTTON_LIST(null        ), },
+    { .type = CONT_TYPE_NORMAL,       CONT_TEXTURE(n64_normal  ), CONT_BUTTON_LIST(n64_normal  ), },
+    { .type = CONT_TYPE_MOUSE,        CONT_TEXTURE(n64_mouse   ), CONT_BUTTON_LIST(n64_mouse   ), },
+    { .type = CONT_TYPE_VOICE,        CONT_TEXTURE(n64_voice   ), CONT_BUTTON_LIST(null        ), },
+    { .type = CONT_TYPE_KEYBOARD,     CONT_TEXTURE(n64_keyboard), CONT_BUTTON_LIST(null        ), },
+    { .type = CONT_TYPE_GBA,          CONT_TEXTURE(gba         ), CONT_BUTTON_LIST(gba         ), },
+    { .type = CONT_TYPE_GCN_NORMAL,   CONT_TEXTURE(gcn_normal  ), CONT_BUTTON_LIST(gcn_normal  ), },
+    { .type = CONT_TYPE_GCN_RECEIVER, CONT_TEXTURE(gcn_receiver), CONT_BUTTON_LIST(null        ), },
+    { .type = CONT_TYPE_GCN_WAVEBIRD, CONT_TEXTURE(gcn_wavebird), CONT_BUTTON_LIST(gcn_normal  ), },
+    { .type = CONT_TYPE_GCN_WHEEL,    CONT_TEXTURE(gcn_wheel   ), CONT_BUTTON_LIST(gcn_wheel   ), },
+    { .type = CONT_TYPE_GCN_KEYBOARD, CONT_TEXTURE(gcn_keyboard), CONT_BUTTON_LIST(gcn_keyboard), },
+    { .type = CONT_TYPE_GCN_DANCEPAD, CONT_TEXTURE(gcn_dancepad), CONT_BUTTON_LIST(gcn_dancepad), },
+    { .type = (u16)-1,                CONT_TEXTURE(unknown     ), CONT_BUTTON_LIST(null        ), },
 };
 
 /**
@@ -503,6 +661,10 @@ void render_controllers_overlay(void) {
     // Darken the screen while polling controller status, similar to pausing the game.
     shade_screen();
 
+ #ifdef CONTROLLERS_INPUT_DISPLAY
+    bzero(sInputOverlayTextures, sizeof(sInputOverlayTextures));
+ #endif // CONTROLLERS_INPUT_DISPLAY
+
     Gfx* dlHead = gDisplayListHead;
 
     // Allow drawing outside the screen borders.
@@ -531,6 +693,27 @@ void render_controllers_overlay(void) {
             G_TX_RENDERTILE, 0, 0,
             (4 << 10), (1 << 10)
         );
+
+ #ifdef CONTROLLERS_INPUT_DISPLAY
+        const ButtonHighlight (*buttonHighlightList)[] = icon->buttonHighlightList;
+        set_overlay_texture(port, buttonHighlightList);
+        gDPLoadTextureTile(dlHead++,
+            sInputOverlayTextures[port], G_IM_FMT_RGBA, G_IM_SIZ_16b,
+            texW, texH, 0, 0,
+            (texW - 1), (texH - 1), 0,
+            (G_TX_NOMIRROR | G_TX_CLAMP),
+            (G_TX_NOMIRROR | G_TX_CLAMP),
+            G_TX_NOMASK, G_TX_NOMASK,
+            G_TX_NOLOD,  G_TX_NOLOD
+        );
+        gSPTextureRectangle(dlHead++,
+            (x << 2), (y << 2),
+            (((x + w) - 1) << 2),
+            (((y + h) - 1) << 2),
+            G_TX_RENDERTILE, 0, 0,
+            (4 << 10), (1 << 10)
+        );
+ #endif // CONTROLLERS_INPUT_DISPLAY
     }
 
     gSPDisplayList(dlHead++, dl_controller_icons_end);
