@@ -47,12 +47,24 @@ void print_settings_list(u32 line, u32 numLines) {
         }
 
         // "[setting name]"
-        crash_screen_print_scroll(TEXT_X(0), y, (CRASH_SCREEN_NUM_CHARS_X - VALUE_NAME_SIZE),
+        u32 settingDescEndCharX = (CRASH_SCREEN_NUM_CHARS_X - (VALUE_NAME_SIZE + 1));
+        crash_screen_print_scroll(TEXT_X(0), y, settingDescEndCharX,
             STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
         );
 
-        u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - VALUE_NAME_SIZE);
+        // Left arrow.
+        crash_screen_print(TEXT_X(settingDescEndCharX), y,
+            (STR_COLOR_PREFIX"%c"),
+            COLOR_RGBA32_CRASH_SELECT_ARROW, '<'
+        );
+        // Right arrow.
+        crash_screen_print(TEXT_X(settingDescEndCharX + VALUE_NAME_SIZE), y,
+            (STR_COLOR_PREFIX"%c"),
+            COLOR_RGBA32_CRASH_SELECT_ARROW, '>'
+        );
+
+        u32 x = TEXT_X(settingDescEndCharX + 1);
 
         const char* name = NULL;
 
@@ -67,13 +79,13 @@ void print_settings_list(u32 line, u32 numLines) {
                 nameColor = ((setting->val) ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
             }
 
-            // "[setting value]"
+            // "[setting value (string)]"
             crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%s"),
                 nameColor, name
             );
         } else {
-            // "[setting value]"
+            // "[setting value (number)]"
             crash_screen_print(x, y,
                 (STR_COLOR_PREFIX"%-d"),
                 COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val

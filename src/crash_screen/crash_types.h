@@ -94,7 +94,7 @@ enum CSDisasmBranchArrowModes {
 };
 
 struct CSSettingsEntry {
-    /*0x00*/ const char name[32];
+    /*0x00*/ const char* name;
     /*0x20*/ const char** valNames;
     /*0x24*/ SettingsType val;
     /*0x28*/ SettingsType defaultVal;
