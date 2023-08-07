@@ -7,6 +7,7 @@
 #include "crash_main.h"
 #include "crash_print.h"
 #include "game/printf.h"
+#include "color_presets.h"
 
 
 PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
@@ -68,7 +69,7 @@ static _Bool is_special_char(char glyph) {
 
 static u32 format_print_buffer(const char* buf, size_t totalSize) {
     u32 bufferCount = 0;
-    RGBA32 color = COLOR_RGBA32_WHITE; // Initial color.
+    ColorRGBA32 textColor = { .rgba32 = COLOR_RGBA32_WHITE };
     _Bool escaped = FALSE;
 
     // Pass 1: control characters and formatting
@@ -104,14 +105,13 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
                         print = TRUE;
                         break;
                     }
-                    //! TODO: ColorRGBA/u32 union
-                    ColorRGBA tempColor; // Only set 'color' if 'read_str_to_bytes' is successful.
-                    if (!read_str_to_bytes(tempColor, buf, (index + 1), sizeof(color))) {
+                    // Only set 'color' if 'read_str_to_bytes' is successful.
+                    ColorRGBA32 tempColor = { .rgba32 = COLOR_RGBA32_WHITE };
+                    if (!read_str_to_bytes(tempColor.raw.asU8, buf, (index + 1), sizeof(tempColor.raw.asU8))) {
                         print = TRUE;
                         break;
                     }
-                    color = *(u32*)tempColor;
-                    // color = COLORRGBA_TO_RGBA16(tempColor);
+                    textColor.rgba32 = tempColor.rgba32;
                     index += SIZEOF_HEX(RGBA32);
                     break;
                 default:
@@ -121,7 +121,10 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
         }
 
         if (print) {
-            data->color = color;
+            data->red   = C32_TO_C16(textColor.red  );
+            data->green = C32_TO_C16(textColor.green);
+            data->blue  = C32_TO_C16(textColor.blue );
+            data->alpha = textColor.alpha;
             data->glyph = glyph;
             bufferCount++;
         }
@@ -190,7 +193,15 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 newline = TRUE;
                 index--;
             } else {
-                crash_screen_draw_glyph(x, y, data->glyph, data->color);
+                crash_screen_draw_glyph(x, y,
+                    data->glyph,
+                    RGBA_TO_RGBA32(
+                        C16_TO_C32(data->red  ),
+                        C16_TO_C32(data->green),
+                        C16_TO_C32(data->blue ),
+                        data->alpha
+                    )
+                );
             }
         }
 

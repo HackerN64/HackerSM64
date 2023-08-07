@@ -131,12 +131,30 @@
 
 #define RGBA32_TO_COLORRGBA(src)                        { RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src) }
 
-// GPACK_RGBA5551 but slightly faster in some cases.
-#define RGBA_TO_RGBA16(r, g, b, a)                              \
-    ((((r) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) << IDX_RGBA16_R) | \
-     (((g) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) << IDX_RGBA16_G) | \
-     (((b) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) << IDX_RGBA16_B) | \
-     (((a) >> (SIZ_RGBA32_A - SIZ_RGBA16_A)) << IDX_RGBA16_A))
+// [0..255] to [0..31]
+#define C32_TO_C16(c) ((((c) & MSK_RGBA32_C) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) & MSK_RGBA16_C)
+// [0..255] to [0..1]
+#define A32_TO_A16(c) ((((c) & MSK_RGBA32_A) >> (SIZ_RGBA32_A - SIZ_RGBA16_A)) & MSK_RGBA16_A)
+// [0..31] to [0..255]
+#define C16_TO_C32(c) ((((c) & MSK_RGBA16_C) << (SIZ_RGBA32_C - SIZ_RGBA16_C)) & MSK_RGBA32_C)
+// [0..1] to [0..255]
+#define A16_TO_A32(c) ((((c) & MSK_RGBA16_A) << (SIZ_RGBA32_A - SIZ_RGBA16_A)) & MSK_RGBA32_A)
+
+// Similar to GPACK_RGBA5551 but for RGBA32 instead of RGBA16.
+#define RGBA_TO_RGBA32(r, g, b, a) (    \
+    ((r) << IDX_RGBA32_R) |             \
+    ((g) << IDX_RGBA32_G) |             \
+    ((b) << IDX_RGBA32_B) |             \
+    ((a) << IDX_RGBA32_A)               \
+)
+
+// GPACK_RGBA5551 but converts from [0..255] component values.
+#define RGBA_TO_RGBA16(r, g, b, a) (    \
+    (C32_TO_C16(r) << IDX_RGBA16_R) |   \
+    (C32_TO_C16(g) << IDX_RGBA16_G) |   \
+    (C32_TO_C16(b) << IDX_RGBA16_B) |   \
+    (A32_TO_A16(a) << IDX_RGBA16_A)     \
+)
 
 #define COLORRGBA_TO_RGBA16(src)                        RGBA_TO_RGBA16((src)[0], (src)[1], (src)[2], (src)[3])
 #define RGBA32_TO_RGBA16(src)                           RGBA_TO_RGBA16(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
@@ -198,10 +216,9 @@
 #define COLOR_IA16_WHITE                        0b1111111111111111 // 1111 1111 1111 1111 | 0xFFFF | 255 255
 
 
-// Color RGB(A) Arrays:
+// RGBA32 (RGB[0..255], A[0..255])
 
-
-// RGBA [0..255]
+// Grayscale
 #define COLOR_RGBA32_NONE                       0x00000000 //   0   0   0   0
 #define COLOR_RGBA32_BLACK                      0x000000FF //   0   0   0 255
 #define COLOR_RGBA32_DARK_GRAY                  0x3F3F3FFF //  63  63  63 255
@@ -391,7 +408,7 @@
 #define COLOR_RGBF_YELLOW                       { 1.0f, 1.0f, 1.0f } // 0xFF 0xFF 0xFF | 255 255 255
 
 
-// RGBA32 (RGB[0..255], A[0..255])
+// RGBA [0..255]
 
 // Grayscale
 #define COLOR_RGBA_NONE                         RGBA32_TO_COLORRGBA(COLOR_RGBA32_NONE)

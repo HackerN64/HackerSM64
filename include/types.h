@@ -209,6 +209,22 @@ typedef u8  CutsceneID;
 
 typedef u8 uchar;
 
+typedef union {
+    struct PACKED {
+        Color red;
+        Color green;
+        Color blue;
+        Color alpha;
+    };
+    RGBA32 rgba32;
+    Color arr[4];
+    union {
+        u32 asU32[1];
+        u16 asU16[2];
+        u8 asU8[4];
+    } raw;
+} ColorRGBA32;
+
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,
     SPTASK_STATE_RUNNING,
