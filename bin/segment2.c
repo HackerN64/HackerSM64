@@ -6,6 +6,7 @@
 #include "types.h"
 #include "game/ingame_menu.h"
 #include "game/puppyprint.h"
+#include "game/segment2.h"
 
 #include "make_const_nonconst.h"
 
@@ -2669,7 +2670,7 @@ ALIGNED8 static const Texture texture_shadow_quarter_square[] = {
 };
 #endif
 
-UNUSED ALIGNED8 static const Texture texture_radial_light[] = {
+UNUSED ALIGNED8 const Texture texture_radial_light[] = {
 #include "textures/segment2/light_quarter_circle.ia16.inc.c"
 };
 
