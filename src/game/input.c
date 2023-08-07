@@ -158,7 +158,7 @@ void run_demo_inputs(void) {
  * @param[in ] buttonDown    The buttons that are currently held down.
  * @param[in ] buttonPressed The buttons that are freshly pressed on this frame.
  * @param[out] combo         The button combo to check for.
- * @returns Boolean whether the check is successful.
+ * @return _Bool whether the check is successful.
  */
 ALWAYS_INLINE _Bool check_button_pressed_combo(u16 buttonDown, u16 buttonPressed, u16 combo) {
     return (((buttonDown & combo) == combo) && (buttonPressed & combo));
@@ -344,7 +344,7 @@ void stop_controller_status_polling(OSContPadEx* pad) {
  *
  * @param[in] pad      The controller pad to check.
  * @param[in] deadzone The deadzone to compare with.
- * @returns Boolean whether any input was detected.
+ * @return _Bool whether any input was detected.
  */
 static _Bool detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
     return (

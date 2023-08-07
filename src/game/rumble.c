@@ -238,7 +238,7 @@ void queue_rumble_data(struct Controller* controller, s16 timer, s16 level, s16 
  * @brief Used after setting 'breathTimer' to check if any rumble commands are being executed or queued.
  *
  * @param[in] controller A pointer to the controller to rumble.
- * @returns Boolean whether the controller is done rumbling.
+ * @return _Bool whether the controller is done rumbling.
  */
 _Bool is_rumble_finished_and_queue_empty(struct Controller* controller) {
     if (controller == NULL) {

@@ -68,7 +68,7 @@ static void __osPackRead_impl(u8 cmdID);
  *
  * @param[in] mq    The SI event message queue.
  * @param[in] cmdID The command ID to run (see enum OSContCmds).
- * @returns Error status: -1 = busy, 0 = success.
+ * @return s32 Error status: -1 = busy, 0 = success.
  */
 s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
     s32 ret = 0;
@@ -439,7 +439,7 @@ ALIGNED64 static OSPifRamEx __MotorDataBuf[MAXCONTROLLERS];
  *
  * @param[in] pfs        A pointer to a buffer for the controller pak (AKA rumble pak) file system.
  * @param[in] motorState MOTOR_STOP = stop motor, MOTOR_START = start motor, MOTOR_STOP_HARD (GCN only) = motor brake.
- * @returns PIF error status.
+ * @return s32 PIF error status.
  */
 s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     s32 err = PFS_ERR_SUCCESS;
@@ -548,7 +548,7 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
  * @param[in ] mq      The SI event message queue.
  * @param[out] pfs     A pointer to a buffer for the controller pak (AKA rumble pak) file system.
  * @param[in ] channel The port ID to operate on.
- * @returns PFS error status.
+ * @return s32 PFS error status.
  */
 s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     s32 err = PFS_ERR_SUCCESS;

@@ -415,6 +415,9 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 }
  #endif // (MAX_NUM_PLAYERS > 1)
 
+#define CONT_ICON_W 32
+#define CONT_ICON_H 32
+
 // Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
     { .type = CONT_NONE,                .texture = texture_controller_port,         },
@@ -432,8 +435,13 @@ ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
     { .type = (u16)-1,                  .texture = texture_controller_unknown,      },
 };
 
-// Loop through sControllerIcons to get the port's corresponding texture.
-__attribute__((noinline)) const struct ControllerIcon* get_controller_icon(int port) {
+/**
+ * @brief Loop through sControllerIcons to get the port's controller's corresponding texture.
+ *
+ * @param[in] port The port with the controller to check.
+ * @return const struct ControllerIcon* A pointer to the icon data in sControllerIcons.
+ */
+const struct ControllerIcon* get_controller_icon(int port) {
     const struct ControllerIcon* icon = &sControllerIcons[0];
     u16 type = gControllerStatuses[port].type;
 
@@ -468,12 +476,9 @@ static const Gfx dl_controller_icons_end[] = {
     gsSPEndDisplayList(),
 };
 
-#define CONT_ICON_W 32
-#define CONT_ICON_H 32
-
 /**
  * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
- * TODO: Fix this not rendering during transitions.
+ * TODO: Fix this not rendering/updating during transitions.
  */
 void render_controllers_overlay(void) {
     const s32 w = CONT_ICON_W;
@@ -508,12 +513,8 @@ void render_controllers_overlay(void) {
     // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
         const struct ControllerIcon* icon = get_controller_icon(port);
-
-        if (icon == NULL) {
-            continue;
-        }
-
         x = (iconStartX + (spacedW * port));
+
         gDPLoadTextureTile(dlHead++,
             icon->texture, G_IM_FMT_RGBA, G_IM_SIZ_16b,
             texW, texH, 0, 0,
