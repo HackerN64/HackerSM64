@@ -355,7 +355,7 @@ void crash_screen_draw_main(void) {
     crash_screen_reset_framebuffer(gCSSettings[CS_OPT_DRAW_SCREENSHOT].val);
     crash_screen_reset_scissor_box();
 
-    if (gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val) {
+    if (!(gPlayer1Controller->buttonDown & Z_TRIG)) {
         if (gCSSettings[CS_OPT_DRAW_SCREENSHOT].val) {
             // Draw the transparent background.
             crash_screen_draw_dark_rect(

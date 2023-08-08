@@ -73,7 +73,7 @@ void crash_screen_select_address(void) {
         change = -1;
     }
     if (gCSDirectionFlags.pressed.right) {
-        change =  1;
+        change = +1;
     }
 
     sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) % SIZEOF_HEX(Address));
@@ -84,7 +84,7 @@ void crash_screen_select_address(void) {
     change = 0;
 
     if (gCSDirectionFlags.pressed.up) {
-        change =  1;
+        change = +1;
     }
     if (gCSDirectionFlags.pressed.down) {
         change = -1;

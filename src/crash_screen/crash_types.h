@@ -95,7 +95,7 @@ enum CSDisasmBranchArrowModes {
 
 struct CSSettingsEntry {
     /*0x00*/ const char* name;
-    /*0x20*/ const char** valNames;
+    /*0x20*/ const char* (*valNames)[];
     /*0x24*/ SettingsType val;
     /*0x28*/ SettingsType defaultVal;
     /*0x2C*/ SettingsType lowerBound;
@@ -103,7 +103,7 @@ struct CSSettingsEntry {
 }; /*0x34*/
 
 enum CSSettings {
-    CS_OPT_DRAW_CRASH_SCREEN,
+    CS_OPT_RESET_TO_DEFAULTS,
     CS_OPT_DRAW_SCREENSHOT,
     CS_OPT_FUNCTION_NAMES,
     CS_OPT_PRINT_SCROLL_SPEED,

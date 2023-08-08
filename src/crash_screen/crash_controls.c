@@ -29,17 +29,18 @@ static OSTime sCSInputTimeX = 0;
 #define STR_R       "R"
 
 const struct ControlType gCSControlDescriptions[] = {
-    [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page"                          },
-    [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls"              },
-    [CONT_DESC_CYCLE_DRAW       ] = { .control = STR_Z,                                     .description = "cycle drawing overlay and background" },
-    [CONT_DESC_SCROLL_LIST      ] = { .control = STR_UP"/"STR_DOWN,                         .description = "scroll list"                          },
-    [CONT_DESC_CURSOR           ] = { .control = STR_UP"/"STR_DOWN"/"STR_LEFT"/"STR_RIGHT,  .description = "move cursor"                          },
-    [CONT_DESC_CURSOR_VERTICAL  ] = { .control = STR_UP"/"STR_DOWN,                         .description = "move cursor"                          },
-    [CONT_DESC_CURSOR_HORIZONTAL] = { .control = STR_LEFT"/"STR_RIGHT,                      .description = "move cursor"                          },
-    [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = STR_A,                                     .description = "jump to specific address"             },
-    [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii"         },
-    [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names"                },
-    [CONT_DESC_CYCLE_FLOATS_MODE] = { .control = STR_B,                                     .description = "toggle floats mode"                   },
+    [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                  },
+    [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls",      },
+    [CONT_DESC_CYCLE_DRAW       ] = { .control = STR_Z,                                     .description = "hide crash screen",            },
+    [CONT_DESC_SCROLL_LIST      ] = { .control = STR_UP"/"STR_DOWN,                         .description = "scroll list",                  },
+    [CONT_DESC_CURSOR           ] = { .control = STR_UP"/"STR_DOWN"/"STR_LEFT"/"STR_RIGHT,  .description = "move cursor",                  },
+    [CONT_DESC_CURSOR_VERTICAL  ] = { .control = STR_UP"/"STR_DOWN,                         .description = "move cursor",                  },
+    [CONT_DESC_CURSOR_HORIZONTAL] = { .control = STR_LEFT"/"STR_RIGHT,                      .description = "move cursor",                  },
+    [CONT_DESC_JUMP_TO_ADDRESS  ] = { .control = STR_A,                                     .description = "jump to specific address",     },
+    [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii", },
+    [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names",        },
+    [CONT_DESC_CYCLE_FLOATS_MODE] = { .control = STR_B,                                     .description = "toggle floats mode",           },
+    [CONT_DESC_CHANGE_SETTING   ] = { .control = STR_A"/"STR_B"/"STR_LEFT"/"STR_RIGHT,      .description = "change selected setting",      },
 };
 
 
@@ -169,33 +170,12 @@ _Bool update_crash_screen_page(void) {
     return TRUE;
 }
 
+// Global controls.
 void crash_screen_update_input(void) {
     handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
 
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
-
-    SettingsType drawCrashScreen = gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val;
-    SettingsType drawScreenshot  = gCSSettings[CS_OPT_DRAW_SCREENSHOT  ].val;
-    // Global controls.
-    if (buttonPressed & Z_TRIG) {
-        drawCrashScreen ^= TRUE;
-        if (drawCrashScreen) {
-            drawScreenshot ^= TRUE;
-        } else if (!drawScreenshot) {
-            drawCrashScreen = TRUE;
-            drawScreenshot = TRUE;
-            gCSDrawControls = FALSE;
-        }
-    }
-    gCSSettings[CS_OPT_DRAW_CRASH_SCREEN].val = drawCrashScreen;
-    gCSSettings[CS_OPT_DRAW_SCREENSHOT  ].val = drawScreenshot;
-
-    if (drawCrashScreen && (buttonPressed & START_BUTTON)) {
+    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         gCSDrawControls ^= TRUE;
-    }
-
-    if (!drawCrashScreen) {
-        return;
     }
 
     update_crash_screen_direction_input();

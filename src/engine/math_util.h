@@ -65,7 +65,8 @@ extern f32 gSineTable[];
 
 // #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
 // #define max(a, b) MAX((a), (b)) // ((a) > (b) ? (a) : (b))
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low ) : (x)))
+#define WRAP(x, low, high)   (((x) > (high)) ? (low ) : (((x) < (low)) ? (high) : (x)))
 
 // from limits.h
 #define S8_MAX __SCHAR_MAX__
