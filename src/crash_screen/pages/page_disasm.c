@@ -8,7 +8,7 @@
 
 
 static u32 sDisasmViewportIndex = 0x00000000;
-
+static u32 sDisasmBranchStartX = 0; // The X position where branch arrows start.
 
 #ifdef INCLUDE_DEBUG_MAP
 static const RGBA32 sBranchColors[] = {
@@ -63,7 +63,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (sNumBranchArrows == 0) {
         // Start:
         curBranchColorIndex = 0;
-        curBranchX = DISASM_BRANCH_ARROW_START_X;
+        curBranchX = sDisasmBranchStartX;
     } else { //! TODO: Verify that this ordering is correct:
         // Continue:
         curBranchColorIndex = sBranchArrows[sNumBranchArrows - 1].colorIndex;
@@ -105,7 +105,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
             curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
 
             // Wrap around if extended past end of screen.
-            if ((DISASM_BRANCH_ARROW_START_X + curBranchX) > CRASH_SCREEN_TEXT_X2) {
+            if ((sDisasmBranchStartX + curBranchX) > CRASH_SCREEN_TEXT_X2) {
                 curBranchX = DISASM_BRANCH_ARROW_OFFSET;
             }
 
@@ -144,7 +144,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else if (startLine >= DISASM_NUM_ROWS) {
             arrowStartHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 2);
         } else {
-            crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), arrowStartHeight, dist, 1, color);
+            crash_screen_draw_rect((sDisasmBranchStartX + 1), arrowStartHeight, dist, 1, color);
         }
 
         if (endLine < 0) {
@@ -152,7 +152,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else if (endLine >= DISASM_NUM_ROWS) {
             arrowEndHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 2);
         } else {
-            u32 x = ((DISASM_BRANCH_ARROW_START_X + dist) - DISASM_BRANCH_ARROW_OFFSET);
+            u32 x = ((sDisasmBranchStartX + dist) - DISASM_BRANCH_ARROW_OFFSET);
             crash_screen_draw_rect((x + 0), (arrowEndHeight - 0), (DISASM_BRANCH_ARROW_OFFSET + 1), 1, color);
             // Arrow head.
             crash_screen_draw_rect((x + 1), (arrowEndHeight - 1), 1, 3, color);
@@ -162,7 +162,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         s32 height = abss(arrowEndHeight - arrowStartHeight);
 
         // Middle of arrow.
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
+        crash_screen_draw_rect((sDisasmBranchStartX + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
     }
 }
 
@@ -184,10 +184,10 @@ void disasm_draw_branch_arrows(u32 printLine) {
 }
 #endif
 
-static void print_as_insn(const u32 charX, const u32 charY, const Word data) {
+static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
     InsnData insn = { .raw = data };
     const char* destFname = NULL;
-    const char* insnAsStr = insn_disasm(insn, &destFname, gCSSettings[CS_OPT_FUNCTION_NAMES].val);
+    const char* insnAsStr = insn_disasm(addr, insn, &destFname);
     // "[instruction name] [params]"
     crash_screen_print(charX, charY, "%s", insnAsStr);
 #ifdef INCLUDE_DEBUG_MAP
@@ -238,7 +238,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         if (!try_read_data(&data, addr)) {
             crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else if (is_in_code_segment(addr)) {
-            print_as_insn(charX, charY, data);
+            print_as_insn(charX, charY, addr, data);
         } else { // Outside of code segments:
             if (gCSSettings[CS_OPT_DISASM_BINARY].val) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
@@ -260,6 +260,10 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
 void disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+
+    sDisasmBranchStartX = gCSSettings[CS_OPT_DISASM_OFFSET_ADDR].val
+                        ? TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, 0x80000000"))
+                        : TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, +0x0000"));
 
     u32 line = 1;
 

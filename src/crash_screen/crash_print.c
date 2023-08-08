@@ -126,6 +126,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
             data->blue  = C32_TO_C16(textColor.blue );
             data->alpha = textColor.alpha;
             data->glyph = glyph;
+
             bufferCount++;
         }
     }
@@ -138,6 +139,7 @@ static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
 
     while (index < size) {
         char glyph = buf[index].glyph;
+
         if (
             (glyph == CHAR_NULL   ) ||
             (glyph == CHAR_SPACE  ) ||
@@ -164,10 +166,10 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
 
     // Pass 3: whitespace, newlines, and print
     for (size_t index = 0; index < bufferCount; index++) {
-        _Bool print = FALSE;
-        _Bool newline = FALSE;
         PrintBuffer* data = &gCSPrintBuffer[index];
         char glyph = data->glyph;
+        _Bool print = FALSE;
+        _Bool newline = FALSE;
 
         switch (glyph) {
             case CHAR_NEWLINE:
@@ -231,9 +233,11 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
 
     for (size_t index = 0; index < bufferCount; index++) {
         *bufChar = gCSPrintBuffer[(index + offset) % size];
+
         if (bufChar->glyph == CHAR_NULL) {
             bufChar->glyph = CHAR_SPACE;
         }
+
         bufChar++;
     }
 

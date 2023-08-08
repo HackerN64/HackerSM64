@@ -55,6 +55,7 @@ struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = {
     [CS_OPT_DISASM_BINARY     ] = { .name = "DISASM: Unknown as binary",    .valNames = sValNames_bool,          .val =                      FALSE, .defaultVal =                      FALSE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
     [CS_OPT_DISASM_PSEUDOINSNS] = { .name = "DISASM: Pseudoinstructions",   .valNames = sValNames_bool,          .val =                       TRUE, .defaultVal =                       TRUE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
     [CS_OPT_DISASM_IMM_FMT    ] = { .name = "DISASM: Immediates format",    .valNames = sValNames_print_num_fmt, .val =          PRINT_NUM_FMT_HEX, .defaultVal =          PRINT_NUM_FMT_HEX, .lowerBound =     PRINT_NUM_FMT_HEX, .upperBound =          PRINT_NUM_FMT_DEC, },
+    [CS_OPT_DISASM_OFFSET_ADDR] = { .name = "DISASM: Offsets as addresses", .valNames = sValNames_bool,          .val =                      FALSE, .defaultVal =                      FALSE, .lowerBound =                 FALSE, .upperBound =                       TRUE, },
     [CS_OPT_DISASM_ARROW_MODE ] = { .name = "DISASM: Branch arrow mode",    .valNames = sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_FUNCTION, .defaultVal = DISASM_ARROW_MODE_FUNCTION, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, }, //! TODO: Implement this
 };
 
@@ -88,8 +89,7 @@ Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and di
 
 void settings_reset_to_defaults(void) {
     for (int i = 0; i < ARRAY_COUNT(gCSSettings); i++) {
-        struct CSSettingsEntry* setting = &gCSSettings[i];
-        setting->val = setting->defaultVal;
+        gCSSettings[i].val = gCSSettings[i].defaultVal;
     }
 }
 
@@ -210,8 +210,8 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     sCSThreadIndex = ((sCSThreadIndex + 1) % ARRAY_COUNT(sCSThreadInfos));
 
     osSetEventMesg(OS_EVENT_CPU_BREAK, &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_SP_BREAK,  &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_SP_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
+    osSetEventMesg(OS_EVENT_SP_BREAK,  &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_SP_BREAK );
+    osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT    );
 
     while (TRUE) {
         // Wait for CPU break or fault.

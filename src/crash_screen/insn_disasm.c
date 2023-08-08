@@ -530,7 +530,7 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define ADD_STR(...) strp += sprintf(strp, __VA_ARGS__);
 
 
-char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
+char* insn_disasm(Address addr, InsnData insn, const char** fname) {
     char* strp = &insn_as_string[0];
     _Bool unimpl = FALSE;
 
@@ -544,6 +544,7 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
         const char* curCmd = &info->fmt[0];
+        const _Bool showDestNames = gCSSettings[CS_OPT_FUNCTION_NAMES].val;
 
         for (u32 cmdIndex = 0; cmdIndex < sizeof(info->fmt); cmdIndex++) {
             if (unimpl || *curCmd == CHAR_NULL) {
@@ -603,9 +604,12 @@ char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames) {
                     break;
                 case CHAR_P_BRANCH:
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
-                    s16 branchOffset = (insn.offset + 1);
-                    //! TODO: Setting for branch offset vs. address
-                    ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
+                    if (gCSSettings[CS_OPT_DISASM_OFFSET_ADDR].val) {
+                        ADD_STR(STR_FUNCTION, get_branch_target_from_addr(addr));
+                    } else {
+                        s16 branchOffset = (insn.offset + 1);
+                        ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
+                    }
                     break;
                 case CHAR_P_COP0D:
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);

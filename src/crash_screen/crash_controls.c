@@ -246,7 +246,7 @@ void draw_controls_box(void) {
     while (*list != CONT_DESC_LIST_END) {
         desc = &gCSControlDescriptions[*list++];
         // [control]
-        // [description]
+        //   [description]
         crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS_DESCRIPTION, desc->description);
         line += 2;
     }

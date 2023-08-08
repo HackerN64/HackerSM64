@@ -434,4 +434,4 @@ typedef struct PACKED {
 
 s16 check_for_branch_offset(InsnData insn);
 Address get_branch_target_from_addr(Address addr);
-char* insn_disasm(InsnData insn, const char** fname, _Bool showDestNames);
+char* insn_disasm(Address addr, InsnData insn, const char** fname);
