@@ -99,7 +99,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         }
 
         // Get the offset for the current function;
-        InsnData insn = (InsnData){ .raw = *(Word*)sBranchBufferCurrAddr };
+        InsnData insn = { .raw = *(Word*)sBranchBufferCurrAddr }; //! TODO: Is this an unsafe read?
         s16 branchOffset = check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) { //! TODO: Verify ordering:
@@ -190,8 +190,10 @@ static void print_as_insn(const u32 charX, const u32 charY, const Address addr, 
     InsnData insn = { .raw = data };
     const char* destFname = NULL;
     const char* insnAsStr = insn_disasm(addr, insn, &destFname);
+
     // "[instruction name] [params]"
     crash_screen_print(charX, charY, "%s", insnAsStr);
+
 #ifdef INCLUDE_DEBUG_MAP
     if (gCSSettings[CS_OPT_FUNCTION_NAMES].val && destFname != NULL) {
         // "[function name]"
@@ -241,6 +243,15 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, addr, data);
+            
+            if ((addr == selectedAddr) && (gCSSettings[CS_OPT_DISASM_ARROW_MODE].val == DISASM_ARROW_MODE_SELECTION)) {
+                InsnData insn = { .raw = data };
+                s16 branchOffset = check_for_branch_offset(insn);
+
+                if (branchOffset != 0x0000) {
+                    draw_branch_arrow(y, (y + branchOffset + 1), DISASM_BRANCH_ARROW_OFFSET, sBranchColors[0], line);
+                }
+            }
         } else { // Outside of code segments:
             if (gCSSettings[CS_OPT_DISASM_BINARY].val) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
@@ -286,7 +297,9 @@ void disasm_draw(void) {
 
     line++;
 
-    disasm_draw_branch_arrows(line);
+    if (gCSSettings[CS_OPT_DISASM_ARROW_MODE].val == DISASM_ARROW_MODE_FUNCTION) {
+        disasm_draw_branch_arrows(line);
+    }
 #endif
 
     disasm_draw_asm_entries(line, DISASM_NUM_ROWS, alignedSelectedAddr, tc->pc);
@@ -365,30 +378,32 @@ void disasm_input(void) {
         crash_screen_inc_setting(CS_OPT_FUNCTION_NAMES, TRUE);
     }
 
-    //! TODO: don't reset branch buffer if switched page back into the same function.
-    if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
-        gFillBranchBuffer = TRUE;
-    }
+    if (gCSSettings[CS_OPT_DISASM_ARROW_MODE].val == DISASM_ARROW_MODE_FUNCTION) {
+        //! TODO: don't reset branch buffer if switched page back into the same function.
+        if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
+            gFillBranchBuffer = TRUE;
+        }
 
-    Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+        Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
-    const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
-    if (symbol != NULL) {
-        const char* fname = get_map_symbol_name(symbol);
+        const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
+        if (symbol != NULL) {
+            const char* fname = get_map_symbol_name(symbol);
 
-        if (gFillBranchBuffer) {
+            if (gFillBranchBuffer) {
+                gFillBranchBuffer = FALSE;
+                reset_branch_buffer(symbol->addr);
+                sContinueFillBranchBuffer = TRUE;
+            }
+
+            if (sContinueFillBranchBuffer) {
+                sContinueFillBranchBuffer = disasm_fill_branch_buffer(fname, symbol->addr);
+            }
+        } else {
             gFillBranchBuffer = FALSE;
-            reset_branch_buffer(symbol->addr);
-            sContinueFillBranchBuffer = TRUE;
+            reset_branch_buffer(alignedSelectedAddress);
+            sContinueFillBranchBuffer = FALSE;
         }
-
-        if (sContinueFillBranchBuffer) {
-            sContinueFillBranchBuffer = disasm_fill_branch_buffer(fname, symbol->addr);
-        }
-    } else {
-        gFillBranchBuffer = FALSE;
-        reset_branch_buffer(alignedSelectedAddress);
-        sContinueFillBranchBuffer = FALSE;
     }
 #endif
 }
