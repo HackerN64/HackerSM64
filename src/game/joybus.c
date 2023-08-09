@@ -19,7 +19,7 @@ void __osSiRelAccess(void);
 static __OSContReadFormat sN64WriteFormat = {
     .size.tx            = sizeof(sN64WriteFormat.send),
     .size.rx            = sizeof(sN64WriteFormat.recv),
-    .send.cmdID         = CONT_CMD_READ_BUTTON,
+    .send.cmd           = CONT_CMD_READ_BUTTON,
     .recv.raw.u8        = { [0 ... (sizeof(sN64WriteFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
 };
 
@@ -27,7 +27,7 @@ static __OSContReadFormat sN64WriteFormat = {
 static __OSContGCNShortPollFormat sGCNWriteFormatShort = {
     .size.tx            = sizeof(sGCNWriteFormatShort.send),
     .size.rx            = sizeof(sGCNWriteFormatShort.recv),
-    .send.cmdID         = CONT_CMD_GCN_SHORT_POLL,
+    .send.cmd           = CONT_CMD_GCN_SHORT_POLL,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
     .recv.raw.u8        = { [0 ... (sizeof(sGCNWriteFormatShort.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
@@ -37,7 +37,7 @@ static __OSContGCNShortPollFormat sGCNWriteFormatShort = {
 static __OSContGCNReadOriginFormat sGCNReadOriginFormat = {
     .size.tx            = sizeof(sGCNReadOriginFormat.send),
     .size.rx            = sizeof(sGCNReadOriginFormat.recv),
-    .send.cmdID         = CONT_CMD_GCN_READ_ORIGIN,
+    .send.cmd           = CONT_CMD_GCN_READ_ORIGIN,
     .recv.raw.u8        = { [0 ... (sizeof(sGCNReadOriginFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
@@ -45,7 +45,7 @@ static __OSContGCNReadOriginFormat sGCNReadOriginFormat = {
 static __OSContGCNCalibrateFormat sGCNCalibrateFormat = {
     .size.tx            = sizeof(sGCNCalibrateFormat.send),
     .size.rx            = sizeof(sGCNCalibrateFormat.recv),
-    .send.cmdID         = CONT_CMD_GCN_CALIBRATE,
+    .send.cmd           = CONT_CMD_GCN_CALIBRATE,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
     .recv.raw.u8        = { [0 ... (sizeof(sGCNCalibrateFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
@@ -55,30 +55,30 @@ static __OSContGCNCalibrateFormat sGCNCalibrateFormat = {
 static __OSContGCNLongPollFormat sGCNWriteFormatLong = {
     .size.tx            = sizeof(sGCNWriteFormatLong.send),
     .size.rx            = sizeof(sGCNWriteFormatLong.recv),
-    .send.cmdID         = CONT_CMD_GCN_LONG_POLL,
+    .send.cmd           = CONT_CMD_GCN_LONG_POLL,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
     .recv.raw.u8        = { [0 ... (sizeof(sGCNWriteFormatLong.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
-static void __osPackRead_impl(u8 cmdID);
+static void __osPackRead_impl(u8 cmd);
 
 /**
  * @brief Implementation for PIF pack handlers.
  *
- * @param[in] mq    The SI event message queue.
- * @param[in] cmdID The command ID to run (see enum OSContCmds).
+ * @param[in] mq  The SI event message queue.
+ * @param[in] cmd The command ID to run (see enum OSContCmds).
  * @return s32 Error status: -1 = busy, 0 = success.
  */
-s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
+s32 osStartRead_impl(OSMesgQueue* mq, u8 cmd) {
     s32 ret = 0;
 
     __osSiGetAccess();
 
     // If this was called twice in a row, there is no need to write the command again.
-    if (__osContLastCmd != cmdID) {
+    if (__osContLastCmd != cmd) {
         // Run the pack command.
-        __osPackRead_impl(cmdID);
+        __osPackRead_impl(cmd);
 
         // Write __osContPifRam to the PIF RAM.
         ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
@@ -90,7 +90,7 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
     // Read the resulting __osContPifRam from the PIF RAM.
     ret = __osSiRawStartDma(OS_READ, &__osContPifRam);
 
-    __osContLastCmd = cmdID;
+    __osContLastCmd = cmd;
 
     __osSiRelAccess();
 
@@ -112,9 +112,9 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmdID) {
  * @brief Writes PIF commands to poll controller inputs depending on the command.
  * Called by osContStartReadData and osStartRead_impl.
  *
- * @param[in] cmdID The command ID to run (see enum OSContCmds).
+ * @param[in] cmd The command ID to run (see enum OSContCmds).
  */
-static void __osPackRead_impl(u8 cmdID) {
+static void __osPackRead_impl(u8 cmd) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
@@ -128,7 +128,7 @@ static void __osPackRead_impl(u8 cmdID) {
         if ((type != CONT_NONE) && (gContStatusPolling || (pad->playerNum != 0))) {
             _Bool isGCN = (type & CONT_CONSOLE_GCN);
 
-            switch (cmdID) {
+            switch (cmd) {
                 case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
                 case CONT_CMD_GCN_SHORT_POLL:
                     if (isGCN) {
@@ -163,7 +163,7 @@ static void __osPackRead_impl(u8 cmdID) {
                     break;
 
                 default:
-                    osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmdID, port);
+                    osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmd, port);
                     *ptr = PIF_CMD_END;
                     return;
             }
@@ -299,7 +299,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
         OSContOrigins* origins = &pad->origins;
 
         // Handle different types of poll commands:
-        switch (readformatptr->send.cmdID) {
+        switch (readformatptr->send.cmd) {
             case CONT_CMD_READ_BUTTON:
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
@@ -399,7 +399,7 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 break;
 
             default:
-                osSyncPrintf("osContGetReadDataEx error: Unimplemented input poll command: %.02X\n", readformatptr->send.cmdID);
+                osSyncPrintf("osContGetReadDataEx error: Unimplemented input poll command: %.02X\n", readformatptr->send.cmd);
                 return;
         }
 
@@ -524,7 +524,7 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
     ramwriteformat.align0          = PIF_CMD_NOP;
     ramwriteformat.fmt.size.tx     = sizeof(ramwriteformat.fmt.send);
     ramwriteformat.fmt.size.rx     = sizeof(ramwriteformat.fmt.recv);
-    ramwriteformat.fmt.send.cmdID  = CONT_CMD_WRITE_MEMPAK;
+    ramwriteformat.fmt.send.cmd    = CONT_CMD_WRITE_MEMPAK;
     ramwriteformat.fmt.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
     ramwriteformat.fmt.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 

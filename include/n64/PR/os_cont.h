@@ -585,7 +585,7 @@ extern s32  osContInit(           OSMesgQueue* mq, u8* bitpattern, OSContStatus*
 extern s32  osContReset(          OSMesgQueue* mq,                 OSContStatus* status);
 extern s32  osContStartQuery(     OSMesgQueue* mq);
 extern s32  osContStartReadData(  OSMesgQueue* mq);
-extern s32  osStartRead_impl(     OSMesgQueue* mq, u8 cmdID);
+extern s32  osStartRead_impl(     OSMesgQueue* mq, u8 cmd);
 #ifndef _HW_VERSION_1
 extern s32  osContSetCh(u8 ch);
 #endif
