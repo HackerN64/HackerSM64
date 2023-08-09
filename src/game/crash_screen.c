@@ -217,7 +217,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(30, 110, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
     crash_screen_print(30, 120, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
     crash_screen_print(30, 130, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(30, 140, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+    crash_screen_print(30, 140, "S8:%08XH   RA:%08XH   MM:%08XH", (u32) tc->s8, (u32) tc->ra, (u32)*(u32*)(u32)tc->pc);
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
@@ -340,21 +340,23 @@ void draw_crash_screen(OSThread *thread) {
         cause = 17;
     }
 
-    if (gPlayer1Controller->buttonPressed & R_TRIG) {
-        crashPage++;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonPressed & (L_TRIG | Z_TRIG)) {
-        crashPage--;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
-        sProgramPosition += 4;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
-        sProgramPosition -= 4;
-        updateBuffer = TRUE;
+    for (int i = 0; i < MAXCONTROLLERS; i++) {
+        if (gControllers[i].buttonPressed & R_TRIG) {
+            crashPage++;
+            updateBuffer = TRUE;
+        }
+        if (gControllers[i].buttonPressed & (L_TRIG | Z_TRIG)) {
+            crashPage--;
+            updateBuffer = TRUE;
+        }
+        if (gControllers[i].buttonDown & D_CBUTTONS) {
+            sProgramPosition += 4;
+            updateBuffer = TRUE;
+        }
+        if (gControllers[i].buttonDown & U_CBUTTONS) {
+            sProgramPosition -= 4;
+            updateBuffer = TRUE;
+        }
     }
 
     if ((crashPage >= PAGE_COUNT) && (crashPage != 255)) {
@@ -430,7 +432,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 crash_screen_sleep(200);
             }
         } else {
-            handle_input(&mesg);
+            handle_input_simple(&mesg);
             draw_crash_screen(thread);
         }
     }

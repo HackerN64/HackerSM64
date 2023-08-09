@@ -35,6 +35,7 @@ extern OSContStatus gControllerStatuses[MAXCONTROLLERS];
 extern OSContPadEx gControllerPads[MAXCONTROLLERS];
 
 extern u8    gNumPlayers;
+extern u8    gMaxNumPlayers;
 extern u8    gControllerBits;
 extern _Bool gContStatusPolling;
 extern _Bool gContStatusPollingIsBootMode;
@@ -51,4 +52,5 @@ extern struct Controller* const gDemoController;
 void start_controller_status_polling(_Bool isBootMode);
 void stop_controller_status_polling(OSContPadEx* pad);
 void handle_input(OSMesg* mesg);
+void handle_input_simple(OSMesg* mesg);
 void init_controllers(void);

@@ -23,12 +23,19 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
-u8    gNumPlayers                     = 0;      // The number of controllers currently assigned to a player.
-u8    gControllerBits                 = 0b0000; // Which ports have a controller connected to them (low to high).
-_Bool gContStatusPolling              = FALSE;  // Whether controller status polling is enabled.
-_Bool gContStatusPollingIsBootMode    = FALSE;  // Whether controller status polling was triggered on boot and should be invisible.
-_Bool gContStatusPollingReadyForInput = TRUE;   // Whether all inputs have been released after starting status repolling.
-u32   gContStatusPollTimer            = 0;      // Time since controller status repolling has started.
+u8    gNumPlayers                     = 0;                  // The number of controllers currently assigned to a player.
+u8    gMaxNumPlayers                  = MAX_NUM_PLAYERS;    // The maximum number of player controllers that can be read [0..MAXCONTROLLERS]. This is only different from MAX_NUM_PLAYERS in handle_input_simple().
+u8    gControllerBits                 = 0b0000;             // Which ports have a controller connected to them (low to high).
+_Bool gContStatusPolling              = FALSE;              // Whether controller status polling is enabled.
+_Bool gContStatusPollingIsBootMode    = FALSE;              // Whether controller status polling was triggered on boot and should be invisible.
+_Bool gContStatusPollingReadyForInput = TRUE;               // Whether all inputs have been released after starting status repolling.
+u32   gContStatusPollTimer            = 0;                  // Time since controller status repolling has started.
+
+#ifdef ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY
+static _Bool sEnableContStatusCombo = TRUE;
+#else
+static _Bool sEnableContStatusCombo = FALSE;
+#endif
 
 // Title Screen Demo Handler.
 struct DemoInput* gCurrDemoInput = NULL;
@@ -189,7 +196,7 @@ void assign_controllers_by_port_order(void) {
     // Loop over the 4 ports and link the controller structs to the appropriate status and pad.
     // The game allows you to have a controller plugged into any port in order to play the game.
     for (port = 0; port < MAXCONTROLLERS; port++) {
-        if (cont >= MAX_NUM_PLAYERS) {
+        if (cont >= gMaxNumPlayers) {
             break;
         }
 
@@ -384,7 +391,7 @@ void read_controller_inputs_status_polling(void) {
                 ) {
                     pad->playerNum = ++gNumPlayers;
                 }
-#if (defined(ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY) && (MAX_NUM_PLAYERS > 1))
+#if (MAX_NUM_PLAYERS > 1)
                 u16 pressed = (~pad->statPollButton.raw & button);
 
                 // If the combo is pressed, stop polling and assign the current controllers.
@@ -401,7 +408,7 @@ void read_controller_inputs_status_polling(void) {
                 // If we've exceeded the number of controllers, stop polling and assign the current controllers.
                 if (
                     gNumPlayers >= __builtin_popcount(gControllerBits) ||
-                    gNumPlayers >= MAX_NUM_PLAYERS
+                    gNumPlayers >= gMaxNumPlayers
                 ) {
                     stop_controller_status_polling(pad);
                     return;
@@ -424,14 +431,16 @@ void read_controller_inputs_status_polling(void) {
  * @brief Updates the controller struct with available inputs if present.
  */
 void read_controller_inputs_normal(void) {
-    for (s32 cont = 0; cont < MAX_NUM_PLAYERS; cont++) {
+    for (s32 cont = 0; cont < gMaxNumPlayers; cont++) {
         struct Controller* controller = &gControllers[cont];
 
         // If we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             process_controller_data(controller);
+
 #ifdef ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY
-            if (check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
+            // Check whether the combo to enable status polling was pressed.
+            if (sEnableContStatusCombo && check_button_pressed_combo(controller->buttonDown, controller->buttonPressed, TOGGLE_CONT_STATUS_POLLING_COMBO)) {
                 gContStatusPollingReadyForInput = FALSE;
                 start_controller_status_polling(FALSE);
             }
@@ -477,6 +486,8 @@ void check_repoll_gcn_origins(OSMesg* mesg) {
  * @param[in] mesg The SI message to wait for.
  */
 void handle_input(OSMesg* mesg) {
+    gMaxNumPlayers = MAX_NUM_PLAYERS;
+
 #ifndef DISABLE_DEMO
     run_demo_inputs();
 #endif
@@ -515,6 +526,32 @@ void handle_input(OSMesg* mesg) {
             gContStatusPollTimer--;
         }
     }
+}
+
+/**
+ * @brief Simple version of the general input handling function, polls on all 4 ports every frame no matter what.
+ * Used by the crash screen.
+ *
+ * @param[in] mesg The SI message to wait for.
+ */
+void handle_input_simple(OSMesg* mesg) {
+    sEnableContStatusCombo = FALSE;
+    gMaxNumPlayers = MAXCONTROLLERS;
+
+    // Check for controller status changes.
+    poll_controller_statuses(mesg);
+
+    // Assign controller data.
+    assign_controllers_by_port_order();
+
+    // Read GCN controller origins.
+    check_repoll_gcn_origins(mesg);
+
+    // Read the raw input data from the controllers.
+    poll_controller_inputs(mesg);
+
+    // Input handling for normal gameplay.
+    read_controller_inputs_normal();
 }
 
 /**
