@@ -225,7 +225,7 @@ void context_draw(void) {
 }
 
 void context_input(void) {
-    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+    if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
         crash_screen_inc_setting(CS_OPT_FLOATS_FMT, 1);
     }

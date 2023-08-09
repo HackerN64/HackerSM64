@@ -53,6 +53,7 @@ struct ControlType {
 extern _Bool gCSSwitchedPage;
 extern _Bool gCSDrawControls;
 extern CrashScreenDirections gCSDirectionFlags;
+extern struct CSController* const gCSCompositeController;
 extern const struct ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultContList[];
 

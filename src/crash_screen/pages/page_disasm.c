@@ -365,7 +365,7 @@ void disasm_input(void) {
         }
     }
 
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
         open_address_select(get_branch_target_from_addr(gSelectedAddress));

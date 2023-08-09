@@ -15,6 +15,9 @@ CrashScreenDirections gCSDirectionFlags;
 static OSTime sCSInputTimeY = 0;
 static OSTime sCSInputTimeX = 0;
 
+struct CSController gCSCompositeControllers[1]; 
+struct CSController* const gCSCompositeController = &gCSCompositeControllers[0];
+
 
 // Input string defines:
 #define STR_A       "A"
@@ -62,9 +65,9 @@ void update_crash_screen_direction_input(void) {
     gCSDirectionFlags.pressed.left  = FALSE;
     gCSDirectionFlags.pressed.right = FALSE;
 
-    s16 rawStickX  = gPlayer1Controller->rawStickX;
-    s16 rawStickY  = gPlayer1Controller->rawStickY;
-    u16 buttonDown = gPlayer1Controller->buttonDown;
+    s16 rawStickX  = gCSCompositeController->rawStickX;
+    s16 rawStickY  = gCSCompositeController->rawStickY;
+    u16 buttonDown = gCSCompositeController->buttonDown;
 
     _Bool up    = ((buttonDown & (U_CBUTTONS | U_JPAD)) || (rawStickY >  60));
     _Bool down  = ((buttonDown & (D_CBUTTONS | D_JPAD)) || (rawStickY < -60));
@@ -145,7 +148,7 @@ const enum ControlTypes defaultContList[] = {
 _Bool update_crash_screen_page(void) {
     enum CrashScreenPages prevPage = gCSPageID;
 
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & L_TRIG) {
         gCSPageID--; // Previous Page.
@@ -177,7 +180,24 @@ _Bool update_crash_screen_page(void) {
 void crash_screen_update_input(void) {
     handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
 
-    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
+    bzero(&gCSCompositeControllers, sizeof(gCSCompositeControllers));
+
+    for (int port = 0; port < ARRAY_COUNT(gControllers); port++) { //! TODO: < MAXCONTROLLERS when input PR is merged.
+        s16 rawStickX = gControllers[port].rawStickX;
+        s16 rawStickY = gControllers[port].rawStickY;
+
+        if (abss(gCSCompositeController->rawStickX) < abss(rawStickX)) {
+            gCSCompositeController->rawStickX = rawStickX;
+        }
+        if (abss(gCSCompositeController->rawStickY) < abss(rawStickY)) {
+            gCSCompositeController->rawStickY = rawStickY;
+        }
+        gCSCompositeController->buttonDown     |= gControllers[port].buttonDown;
+        gCSCompositeController->buttonPressed  |= gControllers[port].buttonPressed;
+        gCSCompositeController->buttonReleased |= gControllers[port].buttonReleased;
+    }
+
+    if (gCSCompositeController->buttonPressed & START_BUTTON) {
         gCSDrawControls ^= TRUE;
     }
 

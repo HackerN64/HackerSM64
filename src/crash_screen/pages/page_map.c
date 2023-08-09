@@ -123,7 +123,7 @@ void map_view_input(void) {
         }
     }
 
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+    if (gCSCompositeController->buttonPressed & A_BUTTON) {
         open_address_select(gMapSymbols[sMapViewerSelectedIndex].addr);
     }
 

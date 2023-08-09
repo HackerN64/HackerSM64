@@ -182,7 +182,7 @@ void ram_view_input(void) {
         }
     }
 
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
         open_address_select(gSelectedAddress);

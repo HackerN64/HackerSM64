@@ -197,7 +197,7 @@ void stack_trace_draw(void) {
 }
 
 void stack_trace_input(void) {
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
         open_address_select(sCSFunctionStackBuffer[sStackTraceSelectedIndex].curAddr);

@@ -122,6 +122,15 @@ enum CSSettings {
 };
 
 
+struct CSController {
+    /*0x00*/ s16 rawStickX;
+    /*0x02*/ s16 rawStickY;
+    /*0x04*/ u16 buttonDown;
+    /*0x06*/ u16 buttonPressed;
+    /*0x08*/ u16 buttonReleased;
+};
+
+
 // Time conversion macros
 #define FPS_COUNT 30
 #define FRAMES_TO_NESC(f)   (((OSTime)(f) * 1000000000LL) / FPS_COUNT)

@@ -101,7 +101,7 @@ void crash_screen_select_address(void) {
         sAddressSelectTarget = SET_HEX_DIGIT(sAddressSelectTarget, new, shift);
     }
 
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
         // Jump to the address and close the popup.

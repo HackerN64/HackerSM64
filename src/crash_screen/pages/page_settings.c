@@ -143,7 +143,7 @@ void settings_draw(void) {
 
 void settings_input(void) {
     u32 currIndex = sSettingsSelectedIndex;
-    u16 buttonPressed = gPlayer1Controller->buttonPressed;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     // Handle the reset to defaults entry differently.
     if (currIndex == CS_OPT_RESET_TO_DEFAULTS) {
@@ -151,7 +151,7 @@ void settings_input(void) {
             crash_screen_reset_all_settings();
         }
     } else {
-        if ((gPlayer1Controller->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) {
+        if ((gCSCompositeController->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) {
             crash_screen_reset_setting(currIndex);
         } else {
             if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) {
