@@ -544,7 +544,7 @@ void apply_to_overlay_texture(int port, const ButtonHighlight* buttonHighlight) 
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            *dst++ = RGBA16_COMPOSITE(31, 0, 0, 1);
+            *dst++ = GPACK_RGBA5551(255, 0, 0, 255);
         }
 
         dst += (CONT_ICON_W - w);

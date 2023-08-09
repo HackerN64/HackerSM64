@@ -4,9 +4,9 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-extern void *puppyprint_font_lut[];
-extern void *puppyprint_kerning_lut[][82];
-extern const struct PPTextFont *const gPuppyPrintFontTable[];
+extern Texture *puppyprint_font_lut[];
+extern u8 *puppyprint_kerning_lut[][82];
+extern const struct PPTextFont *gPuppyPrintFontTable[];
 
 extern u8 *seg2_course_name_table[];
 extern u8 *seg2_act_name_table[];
