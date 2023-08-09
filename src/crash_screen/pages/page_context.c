@@ -226,13 +226,7 @@ void context_draw(void) {
 
 void context_input(void) {
     if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-        struct CSSettingsEntry* setting = &gCSSettings[CS_OPT_FLOATS_FMT];
-
         // Cycle floats print mode.
-        setting->val++;
-
-        if (setting->val > setting->upperBound) {
-            setting->val = setting->lowerBound;
-        }
+        crash_screen_inc_setting(CS_OPT_FLOATS_FMT, 1);
     }
 }

@@ -31,5 +31,7 @@ extern OSThread* gCrashedThread;
 extern Address gSelectedAddress;
 
 
-void crash_screen_reset_settings_to_defaults(void);
+void crash_screen_inc_setting(enum CSSettings settingID, SettingsType inc);
+void crash_screen_reset_setting(enum CSSettings settingID);
+void crash_screen_reset_all_settings(void);
 void create_crash_screen_thread(void);

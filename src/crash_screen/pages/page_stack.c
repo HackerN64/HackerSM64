@@ -206,7 +206,7 @@ void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
         // Toggle whether to display function names.
-        gCSSettings[CS_OPT_FUNCTION_NAMES].val ^= TRUE;
+        crash_screen_inc_setting(CS_OPT_FUNCTION_NAMES, TRUE);
     }
 #endif
 

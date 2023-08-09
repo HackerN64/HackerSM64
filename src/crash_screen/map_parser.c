@@ -70,6 +70,9 @@ _Bool is_in_code_segment(Address addr) {
 }
 
 const char* get_map_symbol_name(const struct MapSymbol* symbol) {
+#ifndef INCLUDE_DEBUG_MAP
+    return NULL;
+#endif
     if (symbol == NULL) {
         return NULL;
     }

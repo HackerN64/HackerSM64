@@ -190,7 +190,7 @@ void ram_view_input(void) {
 
     if (buttonPressed & B_BUTTON) {
         // Toggle whether the memory is printed as hex values or as ASCII chars.
-        gCSSettings[CS_OPT_MEMORY_AS_ASCII].val ^= TRUE;
+        crash_screen_inc_setting(CS_OPT_MEMORY_AS_ASCII, TRUE);
     }
 
     sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);

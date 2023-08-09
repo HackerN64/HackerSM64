@@ -37,6 +37,7 @@ void reset_branch_buffer(Address funcAddr) {
 
     sBranchBufferCurrAddr = funcAddr;
 }
+#endif
 
 void disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
@@ -48,6 +49,7 @@ void disasm_init(void) {
 #endif
 }
 
+#ifdef INCLUDE_DEBUG_MAP
 //! TODO: Optimize this as much as possible
 //! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?)
 //! TODO: gCSSettings[CS_OPT_DISASM_ARROW_MODE].val
@@ -323,7 +325,9 @@ const enum ControlTypes disasmContList[] = {
     CONT_DESC_CYCLE_DRAW,
     CONT_DESC_CURSOR_VERTICAL,
     CONT_DESC_JUMP_TO_ADDRESS,
+#ifdef INCLUDE_DEBUG_MAP
     CONT_DESC_TOGGLE_FUNCTIONS,
+#endif
     CONT_DESC_LIST_END,
 };
 
@@ -354,13 +358,13 @@ void disasm_input(void) {
         open_address_select(get_branch_target_from_addr(gSelectedAddress));
     }
 
-    if (buttonPressed & B_BUTTON) {
-        gCSSettings[CS_OPT_FUNCTION_NAMES].val ^= TRUE;
-    }
-
     sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, DISASM_NUM_ROWS, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
+    if (buttonPressed & B_BUTTON) {
+        crash_screen_inc_setting(CS_OPT_FUNCTION_NAMES, TRUE);
+    }
+
     //! TODO: don't reset branch buffer if switched page back into the same function.
     if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
         gFillBranchBuffer = TRUE;

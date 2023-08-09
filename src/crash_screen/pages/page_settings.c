@@ -17,6 +17,7 @@ const enum ControlTypes settingsContList[] = {
     CONT_DESC_CYCLE_DRAW,
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_CHANGE_SETTING,
+    CONT_DESC_RESET_SETTING,
     CONT_DESC_LIST_END,
 };
 
@@ -54,12 +55,21 @@ void print_settings_list(u32 line, u32 numLines) {
         _Bool isResetToDefaults = (currIndex == CS_OPT_RESET_TO_DEFAULTS);
 
         // "[setting name]"
-        crash_screen_print_scroll(TEXT_X(isResetToDefaults ? ((CRASH_SCREEN_NUM_CHARS_X / 2) - (STRLEN("[RESET TO DEFAULTS]") / 2)) : 0), y, charX,
-            STR_COLOR_PREFIX"%s",
-            (isResetToDefaults ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION), setting->name
-        );
+        if (isResetToDefaults) {
+            crash_screen_print_scroll(
+                TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (STRLEN("<RESET ALL TO DEFAULTS>") / 2)), y, charX,
+                STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",
+                COLOR_RGBA32_CRASH_SELECT_ARROW,
+                COLOR_RGBA32_CRASH_NO, setting->name,
+                COLOR_RGBA32_CRASH_SELECT_ARROW
+            );
+        } else {
+            crash_screen_print_scroll(
+                TEXT_X(0), y, charX,
+                STR_COLOR_PREFIX"%s",
+                COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
+            );
 
-        if (!isResetToDefaults) {
             // Print an asterisk if the setting has been changed from the default value.
             if (setting->val != setting->defaultVal) {
                 // "*"
@@ -72,8 +82,8 @@ void print_settings_list(u32 line, u32 numLines) {
 
             // "<"
             charX += crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX"%c"),
-                COLOR_RGBA32_CRASH_SELECT_ARROW, '<'
+                (STR_COLOR_PREFIX"<"),
+                COLOR_RGBA32_CRASH_SELECT_ARROW
             );
 
             // Print the current setting.
@@ -101,8 +111,8 @@ void print_settings_list(u32 line, u32 numLines) {
 
             // ">"
             crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX"%c"),
-                COLOR_RGBA32_CRASH_SELECT_ARROW, '>'
+                (STR_COLOR_PREFIX">"),
+                COLOR_RGBA32_CRASH_SELECT_ARROW
             );
         }
 
@@ -131,29 +141,27 @@ void settings_draw(void) {
     }
 }
 
-// Increment/wrap value.
-void setting_change(struct CSSettingsEntry* setting, SettingsType inc) {
-    setting->val = WRAP((setting->val + inc), setting->lowerBound, setting->upperBound);
-}
-
 void settings_input(void) {
     u32 currIndex = sSettingsSelectedIndex;
-    struct CSSettingsEntry* setting = &gCSSettings[currIndex];
     u16 buttonPressed = gPlayer1Controller->buttonPressed;
 
     // Handle the reset to defaults entry differently.
     if (currIndex == CS_OPT_RESET_TO_DEFAULTS) {
         if (buttonPressed & (A_BUTTON | B_BUTTON)) {
-            crash_screen_reset_settings_to_defaults();
+            crash_screen_reset_all_settings();
         }
     } else {
-        if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) {
-            // Decrement + wrap.
-            setting_change(setting, -1);
-        }
-        if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) {
-            // Increment + wrap.
-            setting_change(setting, +1);
+        if ((gPlayer1Controller->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) {
+            crash_screen_reset_setting(currIndex);
+        } else {
+            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) {
+                // Decrement + wrap.
+                crash_screen_inc_setting(currIndex, -1);
+            }
+            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) {
+                // Increment + wrap.
+                crash_screen_inc_setting(currIndex, +1);
+            }
         }
     }
 

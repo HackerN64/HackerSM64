@@ -541,10 +541,9 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
     _Bool decImmediates = (gCSSettings[CS_OPT_DISASM_IMM_FMT].val == PRINT_NUM_FMT_DEC);
 
     if (info != NULL) {
+        const char* curCmd = &info->fmt[0];
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
-        const char* curCmd = &info->fmt[0];
-        const _Bool showDestNames = gCSSettings[CS_OPT_FUNCTION_NAMES].val;
 
         for (u32 cmdIndex = 0; cmdIndex < sizeof(info->fmt); cmdIndex++) {
             if (unimpl || *curCmd == CHAR_NULL) {
@@ -635,7 +634,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
-                    if (showDestNames && is_in_code_segment(target)) {
+                    if (gCSSettings[CS_OPT_FUNCTION_NAMES].val && is_in_code_segment(target)) {
                         const struct MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
                         if (symbol != NULL) {
                             *fname = get_map_symbol_name(symbol);
@@ -650,9 +649,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                         }
                     }
 #else
-                    if (showDestNames) { //! TODO: Better prevent unused warnings
-                        *fname = NULL;
-                    }
+                    *fname = NULL;
 #endif
                     ADD_STR(STR_FUNCTION, target);
                     break;
