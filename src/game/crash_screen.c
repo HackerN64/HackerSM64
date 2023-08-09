@@ -340,20 +340,20 @@ void draw_crash_screen(OSThread *thread) {
         cause = 17;
     }
 
-    for (int i = 0; i < MAXCONTROLLERS; i++) {
-        if (gControllers[i].buttonPressed & R_TRIG) {
+    for (int port = 0; port < MAXCONTROLLERS; port++) {
+        if (gControllers[port].buttonPressed & R_TRIG) {
             crashPage++;
             updateBuffer = TRUE;
         }
-        if (gControllers[i].buttonPressed & (L_TRIG | Z_TRIG)) {
+        if (gControllers[port].buttonPressed & (L_TRIG | Z_TRIG)) {
             crashPage--;
             updateBuffer = TRUE;
         }
-        if (gControllers[i].buttonDown & D_CBUTTONS) {
+        if (gControllers[port].buttonDown & D_CBUTTONS) {
             sProgramPosition += 4;
             updateBuffer = TRUE;
         }
-        if (gControllers[i].buttonDown & U_CBUTTONS) {
+        if (gControllers[port].buttonDown & U_CBUTTONS) {
             sProgramPosition -= 4;
             updateBuffer = TRUE;
         }
