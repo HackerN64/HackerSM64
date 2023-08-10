@@ -2407,11 +2407,9 @@ void parse_p1_controller(void) {
         gdctrl->newStartPress ^= TRUE;
     }
 
-    //! TODO: Why does this crash in 'sprint_val_withspecifiers()'?
-    // if (buttonPressed & Z_TRIG) {
-    //     sCurrDebugViewIndex++;
-    //     print_all_timers();
-    // }
+    if (buttonPressed & Z_TRIG) {
+        sCurrDebugViewIndex++;
+    }
 
     if (sCurrDebugViewIndex > sDebugViewsCount) {
         sCurrDebugViewIndex = 0;

@@ -344,7 +344,7 @@ typedef union {
  * Structure for controllers
  */
 
-typedef struct { //! TODO: Accessory type.
+typedef struct { //! TODO: Accessory type/detection.
     /*0x00*/ u16 type;                      /* Controller Type (SI identifier, byteswapped) */
     /*0x02*/ u8  status;                    /* Controller status */
     /*0x03*/ u8	 error;                     /* Error */

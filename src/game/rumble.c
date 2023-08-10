@@ -145,7 +145,7 @@ static void update_rumble_pak(struct RumbleInfo* info) {
         }
 
         // Rumble event type.
-        if (current->event == RUMBLE_EVENT_CONSTON) {
+        if (current->event == RUMBLE_EVENT_CONSTON) { //! TODO: Would (current->level > 70) be better here? (see queue_rumble_data).
             // Constant rumble for the duration of the timer phase.
             set_motor(info, MOTOR_START);
         } else { // RUMBLE_EVENT_LEVELON

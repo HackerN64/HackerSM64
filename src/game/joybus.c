@@ -16,21 +16,21 @@ void __osSiRelAccess(void);
 ////////////////////
 
 // Default N64 Controller Input Poll command:
-static __OSContReadFormat sN64WriteFormat = {
-    .size.tx            = sizeof(sN64WriteFormat.send),
-    .size.rx            = sizeof(sN64WriteFormat.recv),
+static __OSContReadFormat sN64ContReadFormat = {
+    .size.tx            = sizeof(sN64ContReadFormat.send),
+    .size.rx            = sizeof(sN64ContReadFormat.recv),
     .send.cmd           = CONT_CMD_READ_BUTTON,
-    .recv.raw.u8        = { [0 ... (sizeof(sN64WriteFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
+    .recv.raw           = { [0 ... (sizeof(sN64ContReadFormat.recv.raw) - 1)] = PIF_CMD_NOP }, // 4 bytes of PIF_CMD_NOP (0xFF).
 };
 
 // Default GCN Controller Input Short Poll command:
-static __OSContGCNShortPollFormat sGCNWriteFormatShort = {
-    .size.tx            = sizeof(sGCNWriteFormatShort.send),
-    .size.rx            = sizeof(sGCNWriteFormatShort.recv),
+static __OSContGCNShortPollFormat sGCNContShortPollFormatShort = {
+    .size.tx            = sizeof(sGCNContShortPollFormatShort.send),
+    .size.rx            = sizeof(sGCNContShortPollFormatShort.recv),
     .send.cmd           = CONT_CMD_GCN_SHORT_POLL,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
-    .recv.raw.u8        = { [0 ... (sizeof(sGCNWriteFormatShort.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
+    .recv.raw           = { [0 ... (sizeof(sGCNContShortPollFormatShort.recv.raw) - 1)] = PIF_CMD_NOP }, // 8 bytes of PIF_CMD_NOP (0xFF).
 };
 
 // Default GCN Controller Read Origin command:
@@ -38,7 +38,7 @@ static __OSContGCNReadOriginFormat sGCNReadOriginFormat = {
     .size.tx            = sizeof(sGCNReadOriginFormat.send),
     .size.rx            = sizeof(sGCNReadOriginFormat.recv),
     .send.cmd           = CONT_CMD_GCN_READ_ORIGIN,
-    .recv.raw.u8        = { [0 ... (sizeof(sGCNReadOriginFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
+    .recv.raw           = { [0 ... (sizeof(sGCNReadOriginFormat.recv.raw) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
 // Default GCN Controller Input Calibrate command:
@@ -48,17 +48,17 @@ static __OSContGCNCalibrateFormat sGCNCalibrateFormat = {
     .send.cmd           = CONT_CMD_GCN_CALIBRATE,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
-    .recv.raw.u8        = { [0 ... (sizeof(sGCNCalibrateFormat.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
+    .recv.raw           = { [0 ... (sizeof(sGCNCalibrateFormat.recv.raw) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
 // Default GCN Controller Input Long Poll command:
-static __OSContGCNLongPollFormat sGCNWriteFormatLong = {
-    .size.tx            = sizeof(sGCNWriteFormatLong.send),
-    .size.rx            = sizeof(sGCNWriteFormatLong.recv),
+static __OSContGCNLongPollFormat sGCNLongPollFormatLong = {
+    .size.tx            = sizeof(sGCNLongPollFormatLong.send),
+    .size.rx            = sizeof(sGCNLongPollFormatLong.recv),
     .send.cmd           = CONT_CMD_GCN_LONG_POLL,
     .send.analog_mode   = GCN_MODE_3_220,
     .send.rumble        = MOTOR_STOP,
-    .recv.raw.u8        = { [0 ... (sizeof(sGCNWriteFormatLong.recv.raw.u8) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
+    .recv.raw           = { [0 ... (sizeof(sGCNLongPollFormatLong.recv.raw) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
 static void __osPackRead_impl(u8 cmd);
@@ -132,9 +132,9 @@ static void __osPackRead_impl(u8 cmd) {
                 case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
                 case CONT_CMD_GCN_SHORT_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatShort, port);
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNContShortPollFormatShort, port);
                     } else {
-                        WRITE_PIF_CMD(ptr, sN64WriteFormat);
+                        WRITE_PIF_CMD(ptr, sN64ContReadFormat);
                     }
                     break;
 
@@ -156,9 +156,9 @@ static void __osPackRead_impl(u8 cmd) {
 
                 case CONT_CMD_GCN_LONG_POLL:
                     if (isGCN) {
-                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNWriteFormatLong, port);
+                        WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNLongPollFormatLong, port);
                     } else {
-                        WRITE_PIF_CMD(ptr, sN64WriteFormat);
+                        WRITE_PIF_CMD(ptr, sN64ContReadFormat);
                     }
                     break;
 
