@@ -207,6 +207,9 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     Analog_u8 origins_c_stick = ANALOG_U8_ZERO;
     Analog_u8 origins_trig    = ANALOG_U8_ZERO;
 
+    // Store the raw received button data.
+    pad->physButton.asPhysical.gcn.raw = gcn.raw;
+
     // If the GET_ORIGIN bit is set, that means the controller has new analog origins data and either CONT_CMD_GCN_READ_ORIGIN or CONT_CMD_GCN_CALIBRATE needs to be run to get the new data.
     // The first frame after boot will use the above origins until the proper command runs later in the frame.
     if (gcn.standard.GET_ORIGIN) {
@@ -243,15 +246,8 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
     buttons.C.LEFT  = (pad->c_stick.x < -GCN_C_STICK_THRESHOLD);
     buttons.C.RIGHT = (pad->c_stick.x >  GCN_C_STICK_THRESHOLD);
 
-    // Write the button data.
+    // Write the converted button data to the virtual controller.
     pad->button.raw = buttons.raw;
-    pad->rawContButtons = gcn.raw;
-
-    // Write the non-button data.
-    pad->ex.gcn.standard.ERRSTAT    = gcn.standard.ERRSTAT;
-    pad->ex.gcn.standard.ERRLATCH   = gcn.standard.ERRLATCH;
-    pad->ex.gcn.standard.GET_ORIGIN = gcn.standard.GET_ORIGIN;
-    pad->ex.gcn.standard.USE_ORIGIN = gcn.standard.USE_ORIGIN;
 }
 
 /**
@@ -304,16 +300,15 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 if (pad->errno == (CHNL_ERR_SUCCESS >> 4)) {
                     n64Input = (*(__OSContReadFormat*)ptr).recv.input;
 
-                    pad->rawContButtons = n64Input.buttons.raw;
+                    // Store the raw received button data.
+                    pad->physButton.asPhysical.n64.raw = n64Input.buttons.raw;
 
-                    pad->button.raw = (n64Input.buttons.raw & ~(CONT_RESET | CONT_UNUSED)); // These two bits are repurposed to X and Y on the virtual controller, so make sure the game doesn't read an X button press when resetting.
-                    // Allow the game to read the start button press that happens when resetting the analog stick.
+                    // The CONT_RESET and CONT_UNUSED bits are repurposed to X and Y on the virtual controller, so make sure the game doesn't read an X button press when resetting the analog stick on an N64 controller.
+                    pad->button.raw = (n64Input.buttons.raw & ~(CONT_RESET | CONT_UNUSED));
+                    // Allow the game to read the start button press that happens when resetting the analog stick on an N64 controller.
                     if (n64Input.buttons.standard.RESET) {
                         pad->button.START = TRUE;
                     }
-                    // Move these two bits to the other struct.
-                    pad->ex.n64.standard.RESET  = n64Input.buttons.standard.RESET;
-                    pad->ex.n64.standard.unused = n64Input.buttons.standard.unused;
                     // Standard N64 controller only has one analog stick.
                     pad->stick                  = n64Input.stick;
                     pad->c_stick                = ANALOG_S8_ZERO;

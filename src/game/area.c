@@ -553,13 +553,13 @@ void apply_to_overlay_texture(int port, const ButtonHighlight* buttonHighlight) 
 
 /**
  * @brief Loop through a ButtonHighlight list and apply all active highlights for a given port based on controller input.
- * 
+ *
  * @param port The port to use input from and the port index to use when writing to sInputOverlayTextures.
  * @param buttonHighlightList Pointer to a list of ButtonHighlight data.
  */
 void set_overlay_texture(int port, const ButtonHighlight (*buttonHighlightList)[]) {
     const ButtonHighlight* buttonHighlight = *buttonHighlightList;
-    u16 buttons = gControllerPads[port].rawContButtons;
+    u16 buttons = gControllerPads[port].physButton.raw;
 
     while (buttonHighlight->mask != (u16)-1) {
         if ((buttons & buttonHighlight->mask) != 0) {

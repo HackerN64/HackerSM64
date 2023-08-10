@@ -82,11 +82,13 @@ typedef union {
     ((src).b << 4),                         \
 })
 
+//! TODO: CLAMP_S8 is from math_util.h. Should it be included in this file?
 #define ANALOG_S8_CENTER(stick, center) ((Analog_s8){   \
     CLAMP_S8((s32)(stick).x - (center).x),              \
     CLAMP_S8((s32)(stick).y - (center).y),              \
 })
 
+//! TODO: CLAMP_U8 is from math_util.h. Should it be included in this file?
 #define ANALOG_U8_CENTER(stick, center) ((Analog_u8){   \
     CLAMP_U8((s32)(stick).x - (center).x),              \
     CLAMP_U8((s32)(stick).y - (center).y),              \
@@ -134,32 +136,39 @@ typedef union {
     }; /*0x02*/
     N64Buttons_D D;
     N64Buttons_C C;
+    u16 raw;
 } N64StandardButtons; /*0x02*/
 
 // -- Mouse buttons --
 
-typedef struct PACKED {
-    /*0x0*/ u16 CLICK_LEFT      :  1;
-    /*0x0*/ u16 CLICK_RIGHT     :  1;
-    /*0x0*/ u16                 : 14;
+typedef union {
+    struct PACKED {
+        /*0x0*/ u16 CLICK_LEFT      :  1;
+        /*0x0*/ u16 CLICK_RIGHT     :  1;
+        /*0x0*/ u16                 : 14;
+    }; /*0x02*/
+    u16 raw;
 } N64MouseButtons; /*0x02*/
 
 // -- Train Controller buttons --
 
-typedef struct PACKED {
-    /*0x0*/ u16 B               : 1;
-    /*0x0*/ u16 A               : 1;
-    /*0x0*/ u16 ACC1            : 1;
-    /*0x0*/ u16 START           : 1;
-    /*0x0*/ u16 ACC2            : 1;
-    /*0x0*/ u16 EX1             : 1;
-    /*0x0*/ u16 EX2             : 1;
-    /*0x0*/ u16 ACC3            : 1;
-    /*0x1*/ u16 EX3             : 1;
-    /*0x1*/ u16 EX4             : 1;
-    /*0x1*/ u16 C               : 1;
-    /*0x1*/ u16 SELECT          : 1;
-    /*0x1*/ u16 BRAKE           : 4;
+typedef union {
+    struct PACKED {
+        /*0x0*/ u16 B               : 1;
+        /*0x0*/ u16 A               : 1;
+        /*0x0*/ u16 ACC1            : 1;
+        /*0x0*/ u16 START           : 1;
+        /*0x0*/ u16 ACC2            : 1;
+        /*0x0*/ u16 EX1             : 1;
+        /*0x0*/ u16 EX2             : 1;
+        /*0x0*/ u16 ACC3            : 1;
+        /*0x1*/ u16 EX3             : 1;
+        /*0x1*/ u16 EX4             : 1;
+        /*0x1*/ u16 C               : 1;
+        /*0x1*/ u16 SELECT          : 1;
+        /*0x1*/ u16 BRAKE           : 4;
+    }; /*0x02*/
+    u16 raw;
 } N64TrainButtons; /*0x02*/
 
 // -- Fishing Rod buttons --
@@ -178,6 +187,7 @@ typedef union {
         /*0x1*/ u16                 : 4; // N64Buttons_C
     };
     N64Buttons_C C;
+    u16 raw;
 } N64FishingRodButtons; /*0x02*/
 
 // -- N64 buttons union --
@@ -231,21 +241,25 @@ typedef union {
         /*0x1*/ u16                 : 4; // GCNButtons_D
     }; /*0x02*/
     GCNButtons_D D;
+    u16 raw;
 } GCNStandardButtons; /*0x02*/
 
 // -- GCN DK Bongos buttons --
 
-typedef struct PACKED {
-    /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
-    /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
-    /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Analog origins changed: Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
-    /*0x0*/ u16 START           : 1; // CONT_GCN_START
-    /*0x0*/ u16 LEFT_TOP        : 1;
-    /*0x0*/ u16 RIGHT_TOP       : 1;
-    /*0x0*/ u16 LEFT_BOTTOM     : 1;
-    /*0x0*/ u16 RIGHT_BOTTOM    : 1;
-    /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | Use analog origins: 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
-    /*0x1*/ u16                 : 7;
+typedef union {
+    struct PACKED {
+        /*0x0*/ u16 ERRSTAT         : 1; // CONT_GCN_ERRSTAT    | Error status: Whether there was an error on last transfer.
+        /*0x0*/ u16 ERRLATCH        : 1; // CONT_GCN_ERRLATCH   | Error Latched: Check SISR (GCN console register).
+        /*0x0*/ u16 GET_ORIGIN      : 1; // CONT_GCN_GET_ORIGIN | Analog origins changed: Indicates that the controller's analog origins need to be updated console-side after an X+Y+START recalibration.
+        /*0x0*/ u16 START           : 1; // CONT_GCN_START
+        /*0x0*/ u16 LEFT_TOP        : 1;
+        /*0x0*/ u16 RIGHT_TOP       : 1;
+        /*0x0*/ u16 LEFT_BOTTOM     : 1;
+        /*0x0*/ u16 RIGHT_BOTTOM    : 1;
+        /*0x1*/ u16 USE_ORIGIN      : 1; // CONT_GCN_USE_ORIGIN | Use analog origins: 1 = standard controller, 0 = wavebird or bongos (used to detect bongos)?
+        /*0x1*/ u16                 : 7;
+    }; /*0x02*/
+    u16 raw;
 } GCNDKBongosButtons; /*0x02*/
 
 // -- GCN buttons union --
@@ -337,6 +351,10 @@ typedef union {
     }; /*0x02*/
     N64Buttons_D D;
     N64Buttons_C C;
+    union {
+        N64Buttons n64;
+        GCNButtons gcn;
+    } asPhysical;
     u16 raw;
 } OSContButtons; /*0x02*/
 
@@ -358,8 +376,8 @@ typedef struct {
 } OSContPad; /*0x05*/
 
 typedef struct PACKED {
-    /*0x00*/ _Bool initialized;             /* Whether this controller's origins have been set. */
-    /*0x01*/ u8 pad[1];
+    /*0x00*/ u8 pad[1];
+    /*0x01*/ _Bool initialized;             /* Whether this controller's origins have been set. */
     /*0x02*/ Analog_u8 stick;               /* -80 <=   stick <=  80 */
     /*0x04*/ Analog_u8 c_stick;             /* -80 <= c_stick <=  80 */
     /*0x06*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
@@ -370,19 +388,14 @@ typedef struct {
     /*0x00*/ OSContButtons button;          /* Button data */
     /*0x02*/ OSContButtons lockedButton;    /* Button data to ignore */
     /*0x04*/ OSContButtons statPollButton;  /* Previous frame's inputs when status polling. */
-    /*0x06*/ u16 rawContButtons;            /* Raw button data from the controller */ //! Replace ex?
+    /*0x06*/ OSContButtons physButton;      /* Raw physical button data received from the controller */
     /*0x08*/ Analog_s8 stick;               /* -80 <=   stick <=  80 */
     /*0x0A*/ Analog_s8 c_stick;             /* -80 <= c_stick <=  80 */
     /*0x0C*/ Analog_u8 trig;                /*   0 <= trig    <= 255 */
     /*0x0E*/ OSContOrigins origins;         /* GCN analog origins */
-    /*0x16*/ union {                        /* Extra bits not set by controller buttons */
-                N64Buttons n64;
-                GCNButtons gcn;
-                u16 raw;
-            } ex; /*0x02*/
-    /*0x18*/ u8 playerNum;                  /* Player number (0 = not assigned) */
-    /*0x19*/ u8	errno;                      /* Error number */
-} OSContPadEx; /*0x20*/
+    /*0x16*/ u8 playerNum;                  /* Player number (0 = not assigned) */
+    /*0x17*/ u8	errno;                      /* Error number */
+} OSContPadEx; /*0x18*/
 
 typedef struct {
     /*0x00*/ void *address;                 /* Ram pad Address: 11 bits */
