@@ -11,21 +11,21 @@
 #include "vc_check.h"
 #include "vc_ultra.h"
 
-// Player Controllers.
+// Player Controllers (players).
 struct Controller gControllers[MAXCONTROLLERS];
-// Defined controller slots. Anything above MAX_NUM_PLAYERS will be unused.
+// Defined player slots. Anything above MAX_NUM_PLAYERS should not be used.
 struct Controller* const gPlayer1Controller = &gControllers[0];
 struct Controller* const gPlayer2Controller = &gControllers[1];
 struct Controller* const gPlayer3Controller = &gControllers[2];
 struct Controller* const gPlayer4Controller = &gControllers[3];
 
-// OS Controllers.
+// OS Controllers (ports).
 OSContStatus gControllerStatuses[MAXCONTROLLERS];
 OSContPadEx gControllerPads[MAXCONTROLLERS];
 
 u8    gNumPlayers                     = 0;                  // The number of controllers currently assigned to a player.
 u8    gMaxNumPlayers                  = MAX_NUM_PLAYERS;    // The maximum number of player controllers that can be read [0..MAXCONTROLLERS]. This is only different from MAX_NUM_PLAYERS in handle_input_simple().
-u8    gControllerBits                 = 0b0000;             // Which ports have a controller connected to them (low to high).
+u8    gControllerBits                 = 0b0000;             // Which ports have a controller connected to them (lowest bit == leftmost port).
 _Bool gContStatusPolling              = FALSE;              // Whether controller status polling is enabled.
 _Bool gContStatusPollingIsBootMode    = FALSE;              // Whether controller status polling was triggered on boot and should be invisible.
 _Bool gContStatusPollingReadyForInput = TRUE;               // Whether all inputs have been released after starting status repolling.
@@ -42,7 +42,7 @@ struct DemoInput* gCurrDemoInput = NULL;
 #ifndef DISABLE_DEMO
 u16 gDemoInputListID = 0;
 
-// Demo controller.
+// Virtual demo controller.
 OSContStatus gDemoStatusData = {
     .type = CONT_TYPE_NORMAL,
 };

@@ -4,7 +4,8 @@
 extern const Gfx dl_fasttext_begin[];
 extern const Gfx dl_fasttext_end[];
 
-void drawSmallString_impl(Gfx**, int, int, const char*, int, int , int);
+int fasttext_get_str_width(const char* string);
+void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int g, int b);
 
 static inline void drawSmallString(Gfx **dl, int x, int y, const char* string) {
     drawSmallString_impl(dl, x, y, string, 255, 255, 255);

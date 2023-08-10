@@ -23,7 +23,7 @@ __asm__(
 extern Texture fast_font[];
 
 int computeS(unsigned char letter) {
-    int idx = letter;  
+    int idx = letter;
     if (letter > 'z') {
         idx -= (3 + 2 + 3 + 1 + 3);
     } else if (letter > '^') {
@@ -45,8 +45,28 @@ static const u8 fast_text_font_kerning[] = {
     /*@*/ 0, /*A*/ 7, /*B*/ 7, /*C*/ 7, /*D*/ 7, /*E*/ 7, /*F*/ 7, /*G*/ 7, /*H*/ 7, /*I*/ 6, /*J*/ 7, /*K*/ 7, /*L*/ 7, /*M*/ 7, /*N*/ 7, /*O*/ 7,
     /*P*/ 7, /*Q*/ 7, /*R*/ 7, /*S*/ 7, /*T*/ 7, /*U*/ 7, /*V*/ 7, /*W*/ 7, /*X*/ 7, /*Y*/ 7, /*Z*/ 7, /*[*/ 0, /*\*/ 0, /*]*/ 0, /*^*/ 6, /*_*/ 0,
     /*`*/ 0, /*a*/ 6, /*b*/ 6, /*c*/ 6, /*d*/ 6, /*e*/ 6, /*f*/ 6, /*g*/ 6, /*h*/ 6, /*i*/ 2, /*j*/ 6, /*k*/ 5, /*l*/ 3, /*m*/ 6, /*n*/ 6, /*o*/ 6,
-    /*p*/ 6, /*q*/ 6, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 6, /*w*/ 6, /*x*/ 6, /*y*/ 6, /*z*/ 6, /*{*/ 0, /*|*/ 0, /*}*/ 0, /*~*/ 7,     
+    /*p*/ 6, /*q*/ 6, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 6, /*w*/ 6, /*x*/ 6, /*y*/ 6, /*z*/ 6, /*{*/ 0, /*|*/ 0, /*}*/ 0, /*~*/ 7,
 };
+
+int fasttext_get_str_width(const char* string) {
+    int i = 0;
+    int width = 0;
+
+    while (string[i] != '\0') {
+        unsigned int cur_char = string[i];
+
+        if (
+            cur_char != '\n' &&
+            cur_char != '\t'
+        ) {
+            width += fast_text_font_kerning[cur_char - ' '];
+        }
+
+        i++;
+    }
+
+    return width;
+}
 
 void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int g, int b) {
     int i = 0;

@@ -366,20 +366,35 @@ void render_controllers_overlay(void) {
 
     drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);
 
-    // Instructions:
+    // Instructions (centered text):
     if (gControllerBits) {
         if (gContStatusPollingReadyForInput) {
             sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", (gNumPlayers + 1));
-            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 77), (SCREEN_CENTER_Y - 28), text_buffer, col, col, col);
+            drawSmallStringCol(&dlHead,
+                (SCREEN_CENTER_X - (fasttext_get_str_width(text_buffer) / 2)),
+                (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + 12)),
+                text_buffer,
+                col, col, col
+            );
  #if (MAX_NUM_PLAYERS > 1)
             char comboStr[32] = "";
-            size_t count = button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
+            button_combo_to_string(comboStr, TOGGLE_CONT_STATUS_POLLING_COMBO);
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
-            s32 xOffset = (((strlen("OR%sTOEXIT") + count) / 2) * 7); // Center the text based on char count.
-            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - xOffset), (SCREEN_CENTER_Y + 28), text_buffer, col, col, col);
+            drawSmallStringCol(&dlHead,
+                (SCREEN_CENTER_X - (fasttext_get_str_width(text_buffer) / 2)),
+                (SCREEN_CENTER_Y + ((CONT_ICON_H / 2) + 12)),
+                text_buffer,
+                col, col, col
+            );
  #endif // (MAX_NUM_PLAYERS > 1)
         } else {
-            drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 84), (SCREEN_CENTER_Y - 28), "RELEASE ALL INPUTS TO START", col, col, col);
+            sprintf(text_buffer, "RELEASE ALL INPUTS TO CONTINUE");
+            drawSmallStringCol(&dlHead,
+                (SCREEN_CENTER_X - (fasttext_get_str_width(text_buffer) / 2)),
+                (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + 12)),
+                text_buffer,
+                col, col, col
+            );
         }
     }
 
