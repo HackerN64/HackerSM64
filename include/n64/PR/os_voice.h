@@ -8,7 +8,7 @@
  *---------------------------------------------------------------------*/
 
 #ifndef _OS_VOICE_H_
-#define	_OS_VOICE_H_
+#define _OS_VOICE_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -52,10 +52,10 @@ typedef struct { /* Voice Recognition System */
 
 /* definition for Voice Recognition System */
 
-#define	VOICE_WARN_TOO_SMALL  (1 << 10) // 0x0400
-#define	VOICE_WARN_TOO_LARGE  (1 << 11) // 0x0800
-#define	VOICE_WARN_NOT_FIT    (1 << 14) // 0x4000
-#define	VOICE_WARN_TOO_NOISY  (1 << 15) // 0x8000
+#define VOICE_WARN_TOO_SMALL  (1 << 10) // 0x0400
+#define VOICE_WARN_TOO_LARGE  (1 << 11) // 0x0800
+#define VOICE_WARN_NOT_FIT    (1 << 14) // 0x4000
+#define VOICE_WARN_TOO_NOISY  (1 << 15) // 0x8000
 
 enum OSVoiceStatus {
     VOICE_STATUS_READY  = 0,
