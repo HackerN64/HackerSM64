@@ -70,7 +70,7 @@ static void __osPackRead_impl(u8 cmd);
  * @param[in] cmd The command ID to run (see enum OSContCmds).
  * @return s32 Error status: -1 = busy, 0 = success.
  */
-s32 osStartRead_impl(OSMesgQueue* mq, u8 cmd) {
+s32 osContStartReadDataEx(OSMesgQueue* mq, u8 cmd) {
     s32 ret = 0;
 
     __osSiGetAccess();
@@ -110,7 +110,7 @@ s32 osStartRead_impl(OSMesgQueue* mq, u8 cmd) {
 
 /**
  * @brief Writes PIF commands to poll controller inputs depending on the command.
- * Called by osContStartReadData and osStartRead_impl.
+ * Called by osContStartReadData and osContStartReadDataEx.
  *
  * @param[in] cmd The command ID to run (see enum OSContCmds).
  */

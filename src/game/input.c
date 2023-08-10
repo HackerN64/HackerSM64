@@ -249,7 +249,7 @@ void assign_controllers_by_player_num(void) {
 static void poll_controller_inputs(OSMesg* mesg) {
     block_until_rumble_pak_free();
 
-    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_READ_BUTTON);
+    osContStartReadDataEx(&gSIEventMesgQueue, CONT_CMD_READ_BUTTON);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetReadDataEx(gControllerPads);
 
@@ -264,7 +264,7 @@ static void poll_controller_inputs(OSMesg* mesg) {
 static void poll_controller_gcn_origins(OSMesg* mesg) {
     block_until_rumble_pak_free();
 
-    osStartRead_impl(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
+    osContStartReadDataEx(&gSIEventMesgQueue, CONT_CMD_GCN_READ_ORIGIN);
     osRecvMesg(&gSIEventMesgQueue, mesg, OS_MESG_BLOCK);
     osContGetReadDataEx(gControllerPads);
 
