@@ -73,8 +73,10 @@ struct Area {
     /*0x34*/ u8 dialog[2]; // Level start dialog number (set by level script cmd 0x30)
     /*0x36*/ u16 musicParam;
     /*0x38*/ u16 musicParam2;
+    /*0x3A*/ u8 useEchoOverride; // Should area echo be overridden using echoOverride?
+    /*0x3B*/ s8 echoOverride; // Value used to override the area echo values defined in level_defines.h
 #ifdef BETTER_REVERB
-    /*0x3A*/ u8 betterReverbPreset;
+    /*0x3C*/ u8 betterReverbPreset;
 #endif
 };
 

@@ -133,3 +133,20 @@
  * NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
  */
 #define LEGACY_SHADOW_IDS
+
+
+/**
+ * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
+ */
+//#define HORIZONTAL_CULLING_ON_EMULATOR
+
+/**
+ * Makes objects bellow the screen be culled.
+ */
+#define VERTICAL_CULLING
+
+/**
+ * If the first command of an object´s geolayout is not GEO_CULLING_RADIUS, DEFAULT_CULLING_RADIUS
+ * will be used instead.
+ */
+#define DEFAULT_CULLING_RADIUS 300

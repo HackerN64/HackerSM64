@@ -259,7 +259,7 @@ void profiler_print_times() {
 
         // audio time is removed from the main thread profiling, so add it back here
         u32 total_cpu = microseconds[PROFILER_TIME_TOTAL] + microseconds[PROFILER_TIME_AUDIO] * 2;
-        u32 total_rsp = microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO];
+        u32 total_rsp = microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO] * 2;
         u32 max_rdp = MAX(MAX(microseconds[PROFILER_TIME_TMEM], microseconds[PROFILER_TIME_CMD]), microseconds[PROFILER_TIME_PIPE]);
 
         sprintf(text_buffer,
@@ -309,7 +309,7 @@ void profiler_print_times() {
             microseconds[PROFILER_TIME_PIPE],
             total_rsp, total_rsp / 333,
             microseconds[PROFILER_TIME_RSP_GFX],
-            microseconds[PROFILER_TIME_RSP_AUDIO]
+            microseconds[PROFILER_TIME_RSP_AUDIO] * 2
         );
 
         Gfx* dlHead = gDisplayListHead;

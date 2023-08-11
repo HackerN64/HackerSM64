@@ -3,7 +3,7 @@
 #include <PR/gu.h>
 #include <stdarg.h>
 
-#include "config.h"
+#include "s2d_config.h"
 
 #include "s2d_draw.h"
 #include "s2d_print.h"
@@ -18,16 +18,16 @@ enum S2DPrintModes {
 };
 
 static int s2d_snprint(int x, int y, int align, const char *str, uObjMtx *buf, int len, int mode) {
-	char *p = str;
+	char *p = (char*) str;
 	int tmp_len = 0;
 	int orig_x = x;
 	int orig_y = y;
 	int line = 0;
 	char button = '\0';
 
-	if (*p == '\0') return;
+	if (*p == '\0') return 0;
 
-	if (IS_RUNNING_ON_EMULATOR) {
+	if (gIsEmulator) {
 		s2d_rdp_init();
 	} else {
 		f3d_rdp_init();
@@ -166,7 +166,7 @@ static int s2d_snprint(int x, int y, int align, const char *str, uObjMtx *buf, i
 				if (current_char != '\0' && current_char != CH_SEPARATOR) {
 					char *tbl = segmented_to_virtual(s2d_kerning_table);
 
-					if (IS_RUNNING_ON_EMULATOR) {
+					if (gIsEmulator) {
 						if (drop_shadow && mode == MODE_DRAW_DROPSHADOW) {
 							draw_s2d_dropshadow(current_char, x + drop_x, y + drop_y, (buf++));
 						} else if (mode == MODE_DRAW_NORMALTEXT) {
@@ -196,7 +196,7 @@ static int s2d_snprint(int x, int y, int align, const char *str, uObjMtx *buf, i
 }
 
 static int s2d_string_has_dropshadow(const char *str) {
-	char *p = str;
+	char *p = (char *) str;
 
 	int result = FALSE;
 
@@ -208,19 +208,19 @@ static int s2d_string_has_dropshadow(const char *str) {
 // deprecated
 void s2d_print(int x, int y, int align, const char *str, uObjMtx *buf) {
 	if (s2d_check_align(align) != 0) return;
-	if (s2d_check_str(str)     != 0) return;
+	if (s2d_check_str((char *)str)     != 0) return;
 
-	s2d_snprint(x, y, align, str, buf, s2d_strlen(str), MODE_DRAW_DROPSHADOW);
-	s2d_snprint(x, y, align, str, buf, s2d_strlen(str), MODE_DRAW_NORMALTEXT);
+	s2d_snprint(x, y, align, str, buf, s2d_strlen((char *)str), MODE_DRAW_DROPSHADOW);
+	s2d_snprint(x, y, align, str, buf, s2d_strlen((char *)str), MODE_DRAW_NORMALTEXT);
 }
 
 void s2d_print_alloc(int x, int y, int align, const char *str) {
 	int len;
 
 	if (s2d_check_align(align) != 0) return;
-	if (s2d_check_str(str)     != 0) return;
+	if (s2d_check_str((char *)str)     != 0) return;
 
-	len = s2d_strlen(str);
+	len = s2d_strlen((char *)str);
 
 	if (s2d_string_has_dropshadow(str)) {
 		uObjMtx *b = alloc(sizeof(uObjMtx) * len);
@@ -236,9 +236,9 @@ void s2d_type_print(int x, int y, int align, const char *str, uObjMtx *buf, int 
 	int len;
 
 	if (s2d_check_align(align) != 0) return;
-	if (s2d_check_str(str)     != 0) return;
+	if (s2d_check_str((char *)str)     != 0) return;
 	
-	len = s2d_strlen(str);
+	len = s2d_strlen((char *)str);
 
 	s2d_snprint(x, y, align, str, buf, *pos, MODE_DRAW_DROPSHADOW);
 
@@ -254,9 +254,9 @@ void s2d_type_print_alloc(int x, int y, int align, const char *str, int *pos) {
 	int len;
 
 	if (s2d_check_align(align) != 0) return;
-	if (s2d_check_str(str)     != 0) return;
+	if (s2d_check_str((char *)str)     != 0) return;
 
-	len = s2d_strlen(str);
+	len = s2d_strlen((char *)str);
 
 	uObjMtx *b = alloc(sizeof(uObjMtx) * (*pos));
 
@@ -273,13 +273,14 @@ void s2d_type_print_alloc(int x, int y, int align, const char *str, int *pos) {
 	}
 }
 
-// broken atm
 static int s2d_width(const char *str, int line, int len) {
-	char *p = str;
+	char *p = (char *) str;
 	int tmp_len = 0;
 	int curLine = 0;
 	int width = 0;
 	int scale = 1;
+
+	u8 *ktable = seg2virt(s2d_kerning_table);
 
 	if (*p == '\0') return width;
 
@@ -328,7 +329,7 @@ static int s2d_width(const char *str, int line, int len) {
 				break;
 			default:
 				if (current_char != '\0' && curLine == line)
-					width += s2d_kerning_table[(int) current_char] * scale;
+					width += ktable[(int) current_char] * scale;
 		}
 		if (*p == '\0') break;
 		p++;
@@ -340,7 +341,7 @@ static int s2d_width(const char *str, int line, int len) {
 // void s2d_vsprint(int x, int y, int align, uObjMtx *buf, const char *str, ...) {
 // 	int last_chr;
 // 	va_list args;
-// 	char *dst = alloc(s2d_strlen(str) * 2);
+// 	char *dst = alloc(s2d_strlen((char *)str) * 2);
 // 	va_start(args, str);
 // 	last_chr = vsprintf(dst, str, str, args);
 // 	if (last_chr >= 0) {

@@ -508,7 +508,7 @@ const Collision wdw_seg7_area_1_collision[] = {
     COL_VERTEX(-3839, 1300, 1249),
     COL_VERTEX(3103, 1428, 3681),
     COL_VERTEX(3681, 1428, 3681),
-    COL_TRI_INIT(SURFACE_DEFAULT, 583),
+    COL_TRI_INIT(SURFACE_DEFAULT, 582),
     COL_TRI(161, 193, 194),
     COL_TRI(165, 195, 193),
     COL_TRI(165, 193, 161),
@@ -784,7 +784,8 @@ const Collision wdw_seg7_area_1_collision[] = {
     COL_TRI(288, 320, 445),
     COL_TRI(288, 59, 62),
     COL_TRI(286, 320, 288),
-    COL_TRI(190, 189, 192),
+    // HackerSM64: denorm removed
+    // COL_TRI(190, 189, 192),
     COL_TRI(289, 188, 190),
     COL_TRI(290, 291, 451),
     COL_TRI(291, 447, 144),

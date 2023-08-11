@@ -21,6 +21,15 @@
  */
 // #define DISABLE_MARIO_PITCH_SHIFTING
 
+/** 
+ * Enables the additional spacial processing that takes place with sound effects in vanilla.
+ * SM64's implementation of this isn't the best, which causes some sounds like the waterfall in castle grounds to sound more unpleasant than necessary.
+ * This is not the same thing as enabling stereo audio, but it does represent the sole differences between the Stereo and Headset sound options.
+ * Because of this, the Headset sound option will also not appear in the file select menu with this disabled.
+ * Leaving this disabled may also be slightly beneficial for CPU performance.
+ */
+// #define ENABLE_STEREO_HEADSET_EFFECTS
+
 /**
  * Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
  * Note that this is REQUIRED in order to use the extended 0C audio bank. Do not disable this if you're planning on using it. 

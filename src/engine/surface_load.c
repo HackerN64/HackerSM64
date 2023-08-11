@@ -14,6 +14,7 @@
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "game/debug.h"
 
 #include "config.h"
 
@@ -119,6 +120,7 @@ static void clear_static_surfaces(void) {
  */
 static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surface *surface) {
     struct SurfaceNode *list;
+    s32 priority;
     s32 sortDir = 1; // highest to lowest, then insertion order (water and floors)
     s32 listIndex;
 
@@ -134,6 +136,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         sortDir = 0; // insertion order
     }
 
+    s32 surfacePriority = surface->upperY * sortDir;
 
     struct SurfaceNode *newNode = alloc_surface_node(dynamic);
     newNode->surface = surface;
@@ -155,18 +158,14 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
     }
 
     // Loop until we find the appropriate place for the surface in the list.
-    if (listIndex == SPATIAL_PARTITION_WATER) {
-        s32 surfacePriority = surface->upperY * sortDir;
-        s32 priority;
-        while (list->next != NULL) {
-            priority = list->next->surface->upperY * sortDir;
+    while (list->next != NULL) {
+        priority = list->next->surface->upperY * sortDir;
 
-            if (surfacePriority > priority) {
-                break;
-            }
-
-            list = list->next;
+        if (surfacePriority > priority) {
+            break;
         }
+
+        list = list->next;
     }
 
     newNode->next = list->next;
@@ -273,6 +272,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
 
     f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
     // This will never need to be run for custom levels because Fast64 does this step before exporting.
+    // assert(mag >= NEAR_ZERO, "Denorm tri was found.");
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (mag < NEAR_ZERO) {
         return NULL;
@@ -568,6 +568,8 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 void clear_dynamic_surfaces(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
+        clear_dynamic_surface_references();
+
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
@@ -697,13 +699,11 @@ static TerrainData sVertexData[600];
 void load_object_collision_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
-    f32 marioDist = o->oDistanceToMario;
 
-    // On an object's first frame, the distance is set to 19000.0f.
-    // If the distance hasn't been updated, update it now.
-    if (o->oDistanceToMario == 19000.0f) {
-        marioDist = dist_between_objects(o, gMarioObject);
-    }
+    f32 sqrLateralDist;
+    vec3f_get_lateral_dist_squared(&o->oPosVec, &gMarioObject->oPosVec, &sqrLateralDist);
+
+    f32 verticalMarioDiff = gMarioObject->oPosY - o->oPosY;
 
 #ifdef AUTO_COLLISION_DISTANCE
     if (!(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
@@ -716,11 +716,17 @@ void load_object_collision_model(void) {
     if (o->oCollisionDistance > o->oDrawingDistance) {
         o->oDrawingDistance = o->oCollisionDistance;
     }
+    
+    s32 inColRadius = (
+           (sqrLateralDist < sqr(o->oCollisionDistance))
+        && (verticalMarioDiff > 0 || verticalMarioDiff > -o->oCollisionDistance)
+        && (verticalMarioDiff < 0 || verticalMarioDiff < o->oCollisionDistance + 2000.f)
+    );
 
     // Update if no Time Stop, in range, and in the current room.
     if (
         !(gTimeStopState & TIME_STOP_ACTIVE)
-        && (marioDist < o->oCollisionDistance)
+        && inColRadius
         && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
@@ -731,6 +737,15 @@ void load_object_collision_model(void) {
             load_object_surfaces(&collisionData, sVertexData, TRUE);
         }
     }
+
+    f32 marioDist = o->oDistanceToMario;
+
+    // On an object's first frame, the distance is set to 19000.0f.
+    // If the distance hasn't been updated, update it now.
+    if (marioDist == 19000.0f) {
+        marioDist = dist_between_objects(o, gMarioObject);
+    }
+
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
     profiler_collision_update(first);
 }

@@ -1,0 +1,24 @@
+flips5.cpp:2771: warning: "error" redefined
+ 2771 | #define error(which) do { err = which; goto error; } while(0)
+      | 
+flips5.cpp:2021: note: this is the location of the previous definition
+ 2021 | #define error(why) do { ret.error=why; return ret; } while(0)
+      | 
+flips5.cpp:3454: warning: "error" redefined
+ 3454 | #define error(which) do { error=which; goto exit; } while(0)
+      | 
+flips5.cpp:2771: note: this is the location of the previous definition
+ 2771 | #define error(which) do { err = which; goto error; } while(0)
+      | 
+flips5.cpp:3455: warning: "assert_sum" redefined
+ 3455 | #define assert_sum(a,b) do { if (SIZE_MAX-(a)<(b)) error(ups_too_big); } while(0)
+      | 
+flips5.cpp:1675: note: this is the location of the previous definition
+ 1675 | #define assert_sum(a,b) do { if (SIZE_MAX-(a)<(b)) error(bps_too_big); } while(0)
+      | 
+flips5.cpp:3456: warning: "assert_shift" redefined
+ 3456 | #define assert_shift(a,b) do { if (SIZE_MAX>>(b)<(a)) error(ups_too_big); } while(0)
+      | 
+flips5.cpp:1676: note: this is the location of the previous definition
+ 1676 | #define assert_shift(a,b) do { if (SIZE_MAX>>(b)<(a)) error(bps_too_big); } while(0)
+      | 
