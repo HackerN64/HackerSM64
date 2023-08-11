@@ -61,7 +61,7 @@ static __OSContGCNLongPollFormat sGCNLongPollFormatLong = {
     .recv.raw           = { [0 ... (sizeof(sGCNLongPollFormatLong.recv.raw) - 1)] = PIF_CMD_NOP }, // 10 bytes of PIF_CMD_NOP (0xFF).
 };
 
-static void __osPackRead_impl(u8 cmd);
+static void __osPackReadEx(u8 cmd);
 
 /**
  * @brief Implementation for PIF pack handlers.
@@ -78,7 +78,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq, u8 cmd) {
     // If this was called twice in a row, there is no need to write the command again.
     if (__osContLastCmd != cmd) {
         // Run the pack command.
-        __osPackRead_impl(cmd);
+        __osPackReadEx(cmd);
 
         // Write __osContPifRam to the PIF RAM.
         ret = __osSiRawStartDma(OS_WRITE, &__osContPifRam);
@@ -114,7 +114,7 @@ s32 osContStartReadDataEx(OSMesgQueue* mq, u8 cmd) {
  *
  * @param[in] cmd The command ID to run (see enum OSContCmds).
  */
-static void __osPackRead_impl(u8 cmd) {
+static void __osPackReadEx(u8 cmd) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
 
     bzero(__osContPifRam.ramarray, sizeof(__osContPifRam.ramarray));
@@ -163,7 +163,7 @@ static void __osPackRead_impl(u8 cmd) {
                     break;
 
                 default:
-                    osSyncPrintf("__osPackRead_impl error: Unimplemented input poll command: %.02X (port %d)\n", cmd, port);
+                    osSyncPrintf("__osPackReadEx error: Unimplemented input poll command: %.02X (port %d)\n", cmd, port);
                     *ptr = PIF_CMD_END;
                     return;
             }
@@ -251,7 +251,7 @@ static void __osContReadGCNInputData(OSContPadEx* pad, GCNButtons gcn, Analog_u8
 }
 
 /**
- * @brief Reads PIF command result written by __osPackRead_impl and converts it into OSContPadEx data.
+ * @brief Reads PIF command result written by __osPackReadEx and converts it into OSContPadEx data.
  * Modified from vanilla libultra to handle GameCube controllers, skip empty/unassigned ports,
  *   and trigger status polling if an active controller is unplugged.
  * Called by poll_controller_inputs.

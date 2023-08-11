@@ -468,7 +468,7 @@ void read_controller_inputs_normal(void) {
 void check_repoll_gcn_origins(OSMesg* mesg) {
     for (int port = 0; port < __osMaxControllers; port++) {
         // If any plugged in GCN controller with readable input needs its origins updated, run the GCN read origins command.
-        //! TODO: This is the same check as done later when writing the packed command in __osPackRead_impl, but also done here because origins.initialized is 0 for non-GCN controllers and empty ports. Otherwise the read origins command would be run every frame if there are any ports without a GCN controller. Is it possible to combine these checks?
+        //! TODO: This is the same check as done later when writing the packed command in __osPackReadEx, but also done here because origins.initialized is 0 for non-GCN controllers and empty ports. Otherwise the read origins command would be run every frame if there are any ports without a GCN controller. Is it possible to combine these checks?
         if (
             (gControllerStatuses[port].type & CONT_CONSOLE_GCN) &&
             (gContStatusPolling || (gControllerPads[port].playerNum != 0)) &&
