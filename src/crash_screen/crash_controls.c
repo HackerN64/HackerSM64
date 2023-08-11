@@ -69,10 +69,12 @@ void update_crash_screen_direction_input(void) {
     s16 rawStickY  = gCSCompositeController->rawStickY;
     u16 buttonDown = gCSCompositeController->buttonDown;
 
-    _Bool up    = ((buttonDown & (U_CBUTTONS | U_JPAD)) || (rawStickY >  60));
-    _Bool down  = ((buttonDown & (D_CBUTTONS | D_JPAD)) || (rawStickY < -60));
-    _Bool left  = ((buttonDown & (L_CBUTTONS | L_JPAD)) || (rawStickX < -60));
-    _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  60));
+    s16 deadzone = gCSSettings[CS_OPT_ANALOG_DEADZONE].val;
+
+    _Bool up    = ((buttonDown & (U_CBUTTONS | U_JPAD)) || (rawStickY >  deadzone));
+    _Bool down  = ((buttonDown & (D_CBUTTONS | D_JPAD)) || (rawStickY < -deadzone));
+    _Bool left  = ((buttonDown & (L_CBUTTONS | L_JPAD)) || (rawStickX < -deadzone));
+    _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  deadzone));
 
     if (up ^ down) {
         if (
@@ -88,7 +90,7 @@ void update_crash_screen_direction_input(void) {
         } else {
             // held
             OSTime diff = (currTime - sCSInputTimeY);
-            if (diff > FRAMES_TO_CYCLES(10)) {
+            if (diff > FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val)) {
                 gCSDirectionFlags.pressed.up   = up;
                 gCSDirectionFlags.pressed.down = down;
             }
@@ -109,7 +111,7 @@ void update_crash_screen_direction_input(void) {
         } else {
             // held
             OSTime diff = (currTime - sCSInputTimeX);
-            if (diff > FRAMES_TO_CYCLES(10)) {
+            if (diff > FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val)) {
                 gCSDirectionFlags.pressed.left  = left;
                 gCSDirectionFlags.pressed.right = right;
             }
