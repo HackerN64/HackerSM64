@@ -65,12 +65,30 @@ void context_init(void) {
 
 // Print a fixed-point register.
 void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
-    // "[register name]: [XXXXXXXX]"
-    crash_screen_print(x, y,
-        " "STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD,
-        COLOR_RGBA32_CRASH_VARIABLE, name,
-        COLOR_RGBA32_WHITE, val
+    const struct MapSymbol* symbol = NULL;
+
+    // "[register name]:"
+    size_t charX = crash_screen_print(x, y,
+        " "STR_COLOR_PREFIX"%s:",
+        COLOR_RGBA32_CRASH_VARIABLE, name
     );
+
+#ifdef INCLUDE_DEBUG_MAP
+    if (gCSSettings[CS_OPT_CONTEXT_PARSE_REG].val) {
+        symbol = get_map_symbol(val, SYMBOL_SEARCH_BACKWARD);
+    }
+#endif
+
+    if (symbol != NULL) {
+        // "[symbol name]"
+        crash_screen_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol);
+    } else {
+        // "[XXXXXXXX]"
+        crash_screen_print((x + TEXT_WIDTH(charX + 1)), y,
+            STR_COLOR_PREFIX STR_HEX_WORD,
+            COLOR_RGBA32_WHITE, val
+        );
+    }
 }
 
 // Print important fixed-point registers.
@@ -146,7 +164,7 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         // "[prefix][XXXXXXXX]"
         crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
-        switch (gCSSettings[CS_OPT_FLOATS_FMT].val) {
+        switch (gCSSettings[CS_OPT_CONTEXT_FLOATS_FMT].val) {
             case PRINT_NUM_FMT_HEX:
                 // "[XXXXXXXX]"
                 crash_screen_print(x, y, " "STR_HEX_WORD, val.asU32);
@@ -227,6 +245,6 @@ void context_draw(void) {
 void context_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
-        crash_screen_inc_setting(CS_OPT_FLOATS_FMT, 1);
+        crash_screen_inc_setting(CS_OPT_CONTEXT_FLOATS_FMT, 1);
     }
 }

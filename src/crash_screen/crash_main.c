@@ -54,19 +54,22 @@ const char* sValNames_branch_arrow[] = {
 #endif
 
 struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions.
-    [CS_OPT_RESET_TO_DEFAULTS ] = { .name = "reset all to defaults",        .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DRAW_SCREENSHOT   ] = { .name = "Show screenshot background",   .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_RESET_TO_DEFAULTS ] = { .name = "reset all to defaults",            .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DRAW_SCREENSHOT   ] = { .name = "Show screenshot background",       .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_FUNCTION_NAMES    ] = { .name = "Print function names",         .valNames = &sValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_FUNCTION_NAMES    ] = { .name = "Print function names",             .valNames = &sValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
-    [CS_OPT_PRINT_SCROLL_SPEED] = { .name = "Print overscan scroll speed",  .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
-    [CS_OPT_FLOATS_FMT        ] = { .name = "CONTEXT: Floats print format", .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
-    [CS_OPT_MEMORY_AS_ASCII   ] = { .name = "RAM VIEW: As ascii",           .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_BINARY     ] = { .name = "DISASM: Unknown as binary",    .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_PSEUDOINSNS] = { .name = "DISASM: Pseudoinstructions",   .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_IMM_FMT    ] = { .name = "DISASM: Immediates format",    .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
-    [CS_OPT_DISASM_OFFSET_ADDR] = { .name = "DISASM: Offsets as addresses", .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_ARROW_MODE ] = { .name = "DISASM: Branch arrow mode",    .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
+    [CS_OPT_PRINT_SCROLL_SPEED] = { .name = "Print overscan scroll speed",      .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_CONTEXT_PARSE_REG ] = { .name = "CONTEXT: Parse reg addr names",    .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif
+    [CS_OPT_CONTEXT_FLOATS_FMT] = { .name = "CONTEXT: Floats print format",     .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
+    [CS_OPT_MEMORY_AS_ASCII   ] = { .name = "RAM VIEW: As ascii",               .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_BINARY     ] = { .name = "DISASM: Unknown as binary",        .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_PSEUDOINSNS] = { .name = "DISASM: Pseudoinstructions",       .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_IMM_FMT    ] = { .name = "DISASM: Immediates format",        .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
+    [CS_OPT_DISASM_OFFSET_ADDR] = { .name = "DISASM: Offsets as addresses",     .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_ARROW_MODE ] = { .name = "DISASM: Branch arrow mode",        .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
 };
 
 struct CSPage gCSPages[NUM_PAGES] = {
