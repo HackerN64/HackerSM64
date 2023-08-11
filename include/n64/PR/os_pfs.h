@@ -28,7 +28,7 @@
  *---------------------------------------------------------------------*/
 
 #ifndef _OS_PFS_H_
-#define	_OS_PFS_H_
+#define _OS_PFS_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -83,9 +83,9 @@ typedef struct {
  */
 
 /* File System size */
-#define	OS_PFS_VERSION      0x0200
-#define	OS_PFS_VERSION_HI   (OS_PFS_VERSION >> 8)   // 0x0002
-#define	OS_PFS_VERSION_LO   (OS_PFS_VERSION & 0xFF) // 0x0000
+#define OS_PFS_VERSION      0x0200
+#define OS_PFS_VERSION_HI   (OS_PFS_VERSION >> 8)   // 0x0002
+#define OS_PFS_VERSION_LO   (OS_PFS_VERSION & 0xFF) // 0x0000
 
 #define PFS_FILE_NAME_LEN   sizeof(((OSPfsState*)0)->game_name) // 16
 #define PFS_FILE_EXT_LEN    sizeof(((OSPfsState*)0)->ext_name ) //  4
@@ -102,11 +102,11 @@ enum OSPfsFlag {
 
 /* File System status */
 #define PFS_STATUS_NONE         0x00
-#define PFS_INITIALIZED         (0b1 << 0) // 0x01
-#define PFS_CORRUPTED           (0b1 << 1) // 0x02 /* File system was corrupted */
-#define PFS_ID_BROKEN           (0b1 << 2) // 0x04
-#define PFS_MOTOR_INITIALIZED   (0b1 << 3) // 0x08
-#define	PFS_GBPAK_INITIALIZED   (0b1 << 4) // 0x10
+#define PFS_INITIALIZED         (1 << 0) // 0x01
+#define PFS_CORRUPTED           (1 << 1) // 0x02 /* File system was corrupted */
+#define PFS_ID_BROKEN           (1 << 2) // 0x04
+#define PFS_MOTOR_INITIALIZED   (1 << 3) // 0x08
+#define PFS_GBPAK_INITIALIZED   (1 << 4) // 0x10
 
 /* File System error number */
 enum OSPfsError {
