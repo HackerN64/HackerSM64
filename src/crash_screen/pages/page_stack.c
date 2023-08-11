@@ -39,7 +39,7 @@ void fill_function_stack_trace(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     struct FunctionInStack currInfo = {
-        .stackAddr = 0,
+        .stackAddr = tc->sp,
         .curAddr   = tc->pc,
         .faddr     = (symbol ? symbol->addr : tc->pc),
         .fname     = get_map_symbol_name(symbol),
@@ -108,11 +108,10 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 
         const size_t addrStrSize = STRLEN("00000000:");
         // "[stack address]:"
-        if (currIndex == 0) {
-            crash_screen_print(TEXT_X(0), y, STR_COLOR_PREFIX STR_HEX_WORD":", COLOR_RGBA32_CRASH_AT, (Address)gCrashedThread->context.sp);
-        } else {
-            crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
-        }
+        crash_screen_print(TEXT_X(0), y,
+            STR_COLOR_PREFIX STR_HEX_WORD":",
+            ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE), function->stackAddr
+        );
 
 #ifdef INCLUDE_DEBUG_MAP
         if (function->fname == NULL) {
