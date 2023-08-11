@@ -29,15 +29,15 @@ struct RumbleData {
 }; /*0x08*/
 
 struct RumbleSettings {
-    s16 event;      // The type of rumble command. see RumbleEvents enum.
-    s16 level;      // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
-    s16 timer;      // How many frames the main portion of the rumble lasts.
-    s16 decay;      // How much 'level' decreases each frame during the 'timer' phase.
-    s16 count;      // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
-    s16 start;      // The time to initially rumble for before the 'timer' phase.
-    s16 slip;       // A second timer independent from 'timer', for after 'timer' runs out. Decrements regardless.
-    s16 vibrate;    // How often to rumble when 'timer' is 0 and 'slip' is between [2, 5).
-};
+    /*0x00*/ s16 event;     // The type of rumble command. see RumbleEvents enum.
+    /*0x02*/ s16 level;     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    /*0x04*/ s16 timer;     // How many frames the main portion of the rumble lasts.
+    /*0x06*/ s16 decay;     // How much 'level' decreases each frame during the 'timer' phase.
+    /*0x08*/ s16 count;     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
+    /*0x0A*/ s16 start;     // The time to initially rumble for before the 'timer' phase.
+    /*0x0C*/ s16 slip;      // A second timer independent from 'timer', for after 'timer' runs out. Decrements regardless.
+    /*0x0E*/ s16 vibrate;   // How often to rumble when 'timer' is 0 and 'slip' is between [2, 5).
+}; /*0x10*/
 
 extern OSThread gRumblePakThread;
 
@@ -55,11 +55,11 @@ extern s32 gRumblePakTimer;
 
 void block_until_rumble_pak_free(void);
 void release_rumble_pak_control(void);
-void queue_rumble_data(struct Controller *controller, s16 timer, s16 level, s16 decay);
-u32 is_rumble_finished_and_queue_empty(struct Controller *controller);
-void reset_rumble_timers_slip(struct Controller *controller);
-void reset_rumble_timers_vibrate(struct Controller *controller, s32 level);
-void queue_rumble_submerged(struct Controller *controller);
+void queue_rumble_data(struct Controller* controller, s16 timer, s16 level, s16 decay);
+_Bool is_rumble_finished_and_queue_empty(struct Controller* controller);
+void reset_rumble_timers_slip(struct Controller* controller);
+void reset_rumble_timers_vibrate(struct Controller* controller, s32 level);
+void queue_rumble_submerged(struct Controller* controller);
 void cancel_rumble(void);
 void create_thread_6_rumble(void);
 void rumble_thread_update_vi(void);

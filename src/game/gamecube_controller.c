@@ -9,8 +9,6 @@
 
 #define CHNL_ERR(format) (((format).rxsize & CHNL_ERR_MASK) >> 4)
 
-#define CHNL_ERR_MASK		0xC0	/* Bit 6-7: channel errors */
-
 typedef struct
 {
     /* 0x00 */ u32 ramarray[16 - 1];
@@ -87,6 +85,16 @@ extern u8 __osMaxControllers;
 #define CONT_BLOCK_GB_POWER  CONT_BLOCKS(CONT_ADDR_GB_POWER)
 #define CONT_BLOCK_GB_BANK   CONT_BLOCKS(CONT_ADDR_GB_BANK)
 #define CONT_BLOCK_GB_STATUS CONT_BLOCKS(CONT_ADDR_GB_STATUS)
+
+// Controller accessory probe IDs:
+#define ACCESSORY_ID_NULL           0xFF
+#define ACCESSORY_ID_RUMBLE         0x80
+#define ACCESSORY_ID_BIO_PULSE      0x81
+#define ACCESSORY_ID_UNKNOWN_82     0x82
+#define ACCESSORY_ID_64GB           0x83
+#define ACCESSORY_ID_TRANSFER_ON    0x84
+#define ACCESSORY_ID_PRINTER        0x85
+#define ACCESSORY_ID_TRANSFER_OFF   0xFE
 
 // Joybus commands
 //from: http://en64.shoutwiki.com/wiki/SI_Registers_Detailed#CONT_CMD_Usage
@@ -416,6 +424,7 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
 // motor.c //
 /////////////
 
+// A buffer to hold separate rumble commands for each port.
 ALIGNED64 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 /**
@@ -425,7 +434,7 @@ ALIGNED64 static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
  *
  * @param[in] pfs        A pointer to a buffer for the controller pak (AKA rumble pak) file system.
  * @param[in] motorState MOTOR_STOP = stop motor, MOTOR_START = start motor, MOTOR_STOP_HARD (GCN only) = motor brake.
- * @returns PIF error status.
+ * @return s32 PIF error status.
  */
 s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     s32 err = PFS_ERR_SUCCESS;
@@ -437,6 +446,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
         return PFS_ERR_INVALID;
     }
 
+    // Check whether the controller is a GCN controller.
     if (__osControllerTypes[channel] == CONT_TYPE_GCN) { // GCN Controllers.
         __osGamecubeRumbleEnabled[channel] = motorState;
 
@@ -471,7 +481,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
 
         // Check for errors.
         err = (readformat->rxsize & CHNL_ERR_MASK);
-        if (err == 0) {
+        if (err == (CHNL_ERR_SUCCESS >> 4)) {
             if (motorState == MOTOR_STOP) {
                 if (readformat->datacrc != 0x00) { // 0xFF = Disconnected.
                     err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
@@ -490,8 +500,8 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
 }
 
 u8 __osContAddressCrc(u16 addr);
-s32 __osPfsSelectBank(OSPfs *pfs, u8 bank);
-s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+s32 __osPfsSelectBank(OSPfs* pfs, u8 bank);
+s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer);
 
 /**
  * @brief Writes PIF commands to control the rumble pak.
@@ -501,18 +511,18 @@ s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
  * @param[in] channel The port ID to operate on.
  * @param[in] mdata   A pointer to a buffer for the PIF RAM command data.
  */
-static void _MakeMotorData(int channel, OSPifRam *mdata) {
-    u8 *ptr = (u8 *)mdata->ramarray;
-    __OSContRamReadFormat ramreadformat;
+static void _MakeMotorData(int channel, OSPifRam* mdata) {
+    u8* ptr = (u8*)mdata->ramarray;
+    __OSContRamReadFormat ramwriteformat;
     int i;
 
-    ramreadformat.dummy  = CONT_CMD_NOP;
-    ramreadformat.txsize = CONT_CMD_WRITE_PAK_TX;
-    ramreadformat.rxsize = CONT_CMD_WRITE_PAK_RX;
-    ramreadformat.cmd    = CONT_CMD_WRITE_PAK;
-    ramreadformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
-    ramreadformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
-    
+    ramwriteformat.dummy  = CONT_CMD_NOP;
+    ramwriteformat.txsize = CONT_CMD_WRITE_PAK_TX;
+    ramwriteformat.rxsize = CONT_CMD_WRITE_PAK_RX;
+    ramwriteformat.cmd    = CONT_CMD_WRITE_PAK;
+    ramwriteformat.addrh  = (CONT_BLOCK_RUMBLE >> 3);
+    ramwriteformat.addrl  = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+
     // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
     if (channel != 0) {
         for (i = 0; i < channel; i++) {
@@ -520,7 +530,7 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
         }
     }
 
-    *(__OSContRamReadFormat*)ptr = ramreadformat;
+    *(__OSContRamReadFormat*)ptr = ramwriteformat;
     ptr += sizeof(__OSContRamReadFormat);
     *ptr = CONT_CMD_END;
 }
@@ -530,26 +540,27 @@ static void _MakeMotorData(int channel, OSPifRam *mdata) {
  * Modified from vanilla libultra to ignore GameCube controllers.
  * Called by thread6_rumble_loop and cancel_rumble.
  *
- * @param[in]  mq      The SI event message queue.
+ * @param[in ] mq      The SI event message queue.
  * @param[out] pfs     A pointer to a buffer for the controller pak (AKA rumble pak) file system.
- * @param[in]  channel The port ID to operate on.
- * @returns    PFS error status.
+ * @param[in ] channel The port ID to operate on.
+ * @return s32 PFS error status.
  */
-s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
-    s32 err;
+s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
+    s32 err = PFS_ERR_SUCCESS;
     u8 data[BLOCKSIZE];
 
     pfs->status     = PFS_STATUS_NONE;
     pfs->queue      = mq;
     pfs->channel    = channel;
-    pfs->activebank = 0xFF;
+    pfs->activebank = ACCESSORY_ID_NULL;
 
+    // Make sure the controller is not a GCN controller.
     if (__osControllerTypes[channel] != CONT_TYPE_GCN) {
         // Write probe value (ensure Transfer Pak is turned off).
-        err = __osPfsSelectBank(pfs, 0xFE);
+        err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
         if (err == PFS_ERR_NEW_PACK) {
             // Write probe value (Rumble bank).
-            err = __osPfsSelectBank(pfs, 0x80);
+            err = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         }
         if (err != PFS_ERR_SUCCESS) {
             return err;
@@ -565,12 +576,12 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
         }
 
         // Ensure the accessory is not a turned off Transfer Pak.
-        if (data[BLOCKSIZE - 1] == 0xFE) {
+        if (data[BLOCKSIZE - 1] == ACCESSORY_ID_TRANSFER_OFF) {
             return PFS_ERR_DEVICE; // Wrong device.
         }
 
         // Write probe value (Rumble bank).
-        err = __osPfsSelectBank(pfs, 0x80);
+        err = __osPfsSelectBank(pfs, ACCESSORY_ID_RUMBLE);
         if (err == PFS_ERR_NEW_PACK) {
             err = PFS_ERR_CONTRFAIL; // "Controller pack communication error"
         }
@@ -588,7 +599,7 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel) {
         }
 
         // Ensure the accessory is a Rumble Pak.
-        if (data[BLOCKSIZE - 1] != 0x80) {
+        if (data[BLOCKSIZE - 1] != ACCESSORY_ID_RUMBLE) {
             return PFS_ERR_DEVICE; // Wrong device.
         }
 

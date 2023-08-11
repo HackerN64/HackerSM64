@@ -8,7 +8,7 @@
  *---------------------------------------------------------------------*/
 
 #ifndef _OS_MOTOR_H_
-#define	_OS_MOTOR_H_
+#define _OS_MOTOR_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -70,9 +70,9 @@ enum OSMotorOP {
     MOTOR_START,
     MOTOR_STOP_HARD, // GCN only.
 };
-#define	osMotorStopHard(x)  __osMotorAccessEx((x), MOTOR_STOP_HARD)
-#define	osMotorStart(x)     __osMotorAccessEx((x), MOTOR_START)
-#define	osMotorStop(x)      __osMotorAccessEx((x), MOTOR_STOP)
+#define osMotorStopHard(x)  __osMotorAccessEx((x), MOTOR_STOP_HARD)
+#define osMotorStart(x)     __osMotorAccessEx((x), MOTOR_START)
+#define osMotorStop(x)      __osMotorAccessEx((x), MOTOR_STOP)
 extern s32 __osMotorAccess(  OSPfs *pfs, s32 flag);
 extern s32 __osMotorAccessEx(OSPfs *pfs, s32 flag);
 
