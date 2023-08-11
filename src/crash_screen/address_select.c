@@ -69,12 +69,8 @@ extern u32 sMapViewerSelectedIndex;
 void crash_screen_select_address(void) {
     s8 change = 0;
 
-    if (gCSDirectionFlags.pressed.left) {
-        change = -1;
-    }
-    if (gCSDirectionFlags.pressed.right) {
-        change = +1;
-    }
+    if (gCSDirectionFlags.pressed.left ) change = -1;
+    if (gCSDirectionFlags.pressed.right) change = +1;
 
     sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) % SIZEOF_HEX(Address));
 
@@ -83,12 +79,8 @@ void crash_screen_select_address(void) {
     s8 new = digit;
     change = 0;
 
-    if (gCSDirectionFlags.pressed.up) {
-        change = +1;
-    }
-    if (gCSDirectionFlags.pressed.down) {
-        change = -1;
-    }
+    if (gCSDirectionFlags.pressed.up  ) change = +1;
+    if (gCSDirectionFlags.pressed.down) change = -1;
 
     if (change != 0) {
         // Wrap to virtual ram address:

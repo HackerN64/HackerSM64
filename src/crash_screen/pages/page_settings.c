@@ -154,29 +154,15 @@ void settings_input(void) {
         if ((gCSCompositeController->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) {
             crash_screen_reset_setting(currIndex);
         } else {
-            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) {
-                // Decrement + wrap.
-                crash_screen_inc_setting(currIndex, -1);
-            }
-            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) {
-                // Increment + wrap.
-                crash_screen_inc_setting(currIndex, +1);
-            }
+            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) crash_screen_inc_setting(currIndex, -1); // Decrement + wrap.
+            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) crash_screen_inc_setting(currIndex, +1); // Increment + wrap.
         }
     }
 
-    if (gCSDirectionFlags.pressed.up) {
-        // Scroll up.
-        if (sSettingsSelectedIndex > 0) {
-            sSettingsSelectedIndex--;
-        }
-    }
-    if (gCSDirectionFlags.pressed.down) {
-        // Scroll down.
-        if (sSettingsSelectedIndex < (NUM_CS_OPTS - 1)) {
-            sSettingsSelectedIndex++;
-        }
-    }
+    s32 change = 0;
+    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
+    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    sSettingsSelectedIndex = WRAP(((s32)sSettingsSelectedIndex + change), 0, (NUM_CS_OPTS - 1));
 
     sSettingsViewportIndex = clamp_view_to_selection(sSettingsViewportIndex, sSettingsSelectedIndex, SETTINGS_NUM_ROWS, 1);
 }

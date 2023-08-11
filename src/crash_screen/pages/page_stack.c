@@ -109,7 +109,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
         const size_t addrStrSize = STRLEN("00000000:");
         // "[stack address]:"
         if (currIndex == 0) {
-            crash_screen_print(TEXT_X(0), y, STR_COLOR_PREFIX"CURRFUNC:", COLOR_RGBA32_CRASH_AT);
+            crash_screen_print(TEXT_X(0), y, STR_COLOR_PREFIX STR_HEX_WORD":", COLOR_RGBA32_CRASH_AT, (Address)gCrashedThread->context.sp);
         } else {
             crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", function->stackAddr);
         }
@@ -162,12 +162,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void stack_trace_draw(void) {
-    __OSThreadContext* tc = &gCrashedThread->context;
-
     u32 line = 1;
-
-    // "FROM: [XXXXXXXX]"
-    crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM "STR_HEX_WORD, (Address)tc->sp);
 
 #ifdef INCLUDE_DEBUG_MAP
     // "OFFSET:"
@@ -210,18 +205,10 @@ void stack_trace_input(void) {
     }
 #endif
 
-    if (gCSDirectionFlags.pressed.up) {
-        // Scroll up.
-        if (sStackTraceSelectedIndex > 0) {
-            sStackTraceSelectedIndex--;
-        }
-    }
-    if (gCSDirectionFlags.pressed.down) {
-        // Scroll down.
-        if (sStackTraceSelectedIndex < (sCSNumFoundFunctions - 1)) {
-            sStackTraceSelectedIndex++;
-        }
-    }
+    s32 change = 0;
+    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
+    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    sStackTraceSelectedIndex = WRAP(((s32)sStackTraceSelectedIndex + change), 0, (s32)(sCSNumFoundFunctions - 1));
 
     sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
