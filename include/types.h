@@ -41,8 +41,8 @@ struct Config {
 }; /*0x07*/
 
 struct Controller {
-    /*0x00*/ s16 rawStickX;               // Analog stick [-80, 80] positive is right. Used for menus.
-    /*0x02*/ s16 rawStickY;               // Analog stick [-80, 80] positive is up. Used for menus.
+    /*0x00*/ s16 rawStickX;               // Analog stick [-128, 128] positive is right. Used for menus.
+    /*0x02*/ s16 rawStickY;               // Analog stick [-128, 128] positive is up. Used for menus.
     /*0x04*/ f32 stickX;                  // Analog stick [-64, 64] positive is right. Used for gameplay.
     /*0x08*/ f32 stickY;                  // Analog stick [-64, 64] positive is up. Used for gameplay.
     /*0x0C*/ f32 stickMag;                // Analog stick distance from center [0, 64]. Used for gameplay.
