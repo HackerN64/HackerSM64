@@ -1,5 +1,4 @@
-#ifndef RUMBLE_INIT_H
-#define RUMBLE_INIT_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -79,5 +78,3 @@ void rumble_thread_update_vi(void);
 #define rumble_thread_update_vi()
 
 #endif // !ENABLE_RUMBLE
-
-#endif // RUMBLE_INIT_H

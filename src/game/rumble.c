@@ -4,7 +4,7 @@
 
 #include "buffers/buffers.h"
 #include "main.h"
-#include "rumble_init.h"
+#include "rumble.h"
 
 #ifdef ENABLE_RUMBLE
 

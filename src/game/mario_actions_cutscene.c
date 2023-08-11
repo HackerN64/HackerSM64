@@ -26,7 +26,7 @@
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sound_init.h"
-#include "rumble_init.h"
+#include "rumble.h"
 
 static struct Object *sIntroWarpPipeObj;
 static struct Object *sEndPeachObj;

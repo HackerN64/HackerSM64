@@ -10,7 +10,7 @@
 #include "game/print.h"
 #include "game/save_file.h"
 #include "game/sound_init.h"
-#include "game/rumble_init.h"
+#include "game/rumble.h"
 #include "level_table.h"
 #include "seq_ids.h"
 #include "sm64.h"

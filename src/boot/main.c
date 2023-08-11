@@ -13,7 +13,7 @@
 #include "buffers/buffers.h"
 #include "segments.h"
 #include "game/main.h"
-#include "game/rumble_init.h"
+#include "game/rumble.h"
 #include "game/version.h"
 #include "game/vc_check.h"
 #ifdef UNF

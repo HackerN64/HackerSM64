@@ -31,7 +31,7 @@
 #include "print.h"
 #include "save_file.h"
 #include "sound_init.h"
-#include "rumble_init.h"
+#include "rumble.h"
 
 
 /**************************************************

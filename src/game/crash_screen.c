@@ -10,7 +10,7 @@
 #include "game_init.h"
 #include "main.h"
 #include "debug.h"
-#include "rumble_init.h"
+#include "rumble.h"
 
 #include "sm64.h"
 

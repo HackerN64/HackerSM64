@@ -18,7 +18,7 @@
 #include "print.h"
 #include "segment2.h"
 #include "segment_symbols.h"
-#include "rumble_init.h"
+#include "rumble.h"
 #ifdef HVQM
 #include <hvqm/hvqm.h>
 #endif

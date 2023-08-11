@@ -15,7 +15,7 @@
 #include "game/save_file.h"
 #include "game/segment2.h"
 #include "game/segment7.h"
-#include "game/rumble_init.h"
+#include "game/rumble.h"
 #include "sm64.h"
 #include "star_select.h"
 #include "text_strings.h"
