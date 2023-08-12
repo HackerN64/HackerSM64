@@ -24,7 +24,10 @@ extern OSThread* gCrashedThread;
 extern Address gSelectedAddress;
 
 
+_Bool crash_screen_setting_is_header(enum CSSettings settingID);
 void crash_screen_inc_setting(enum CSSettings settingID, SettingsType inc);
 void crash_screen_reset_setting(enum CSSettings settingID);
+void crash_screen_reset_settings_section(enum CSSettings settingID);
 void crash_screen_reset_all_settings(void);
+_Bool crash_screen_check_for_changed_settings(void);
 void create_crash_screen_thread(void);
