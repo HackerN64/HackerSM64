@@ -1,10 +1,16 @@
 #include <ultra64.h>
+
 #include <string.h>
+
 #include "types.h"
 #include "sm64.h"
-#include "crash_screen/crash_main.h"
+
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
+#include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
+
 #include "page_settings.h"
-#include "game/input.h"
 
 
 u32 sSettingsSelectedIndex = 0;

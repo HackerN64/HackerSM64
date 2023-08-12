@@ -1,12 +1,18 @@
-#include <PR/ultratypes.h>
+#include <ultra64.h>
+
 #include <string.h>
 
+#include "types.h"
 #include "sm64.h"
-#include "macros.h"
-#include "farcall.h"
-#include "color_presets.h"
+
+#include "crash_draw.h"
 #include "crash_main.h"
+#include "crash_print.h"
+#include "crash_settings.h"
+#include "map_parser.h"
+
 #include "insn_disasm.h"
+
 #include "engine/math_util.h"
 
 

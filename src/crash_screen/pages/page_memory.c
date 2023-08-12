@@ -1,10 +1,17 @@
 #include <ultra64.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_screen/address_select.h"
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
+#include "crash_screen/memory_read.h"
+
 #include "page_memory.h"
-#include "engine/colors.h"
-#include "game/input.h"
 
 
 static Address sRamViewViewportIndex = 0x00000000;

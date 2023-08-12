@@ -1,9 +1,17 @@
 #include <ultra64.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_controls.h"
+#include "crash_draw.h"
 #include "crash_main.h"
+#include "crash_pages.h"
+#include "crash_print.h"
+#include "memory_read.h"
+
 #include "address_select.h"
-#include "game/input.h"
+
 #include "pages/page_disasm.h"
 
 

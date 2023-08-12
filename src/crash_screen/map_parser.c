@@ -1,10 +1,13 @@
 #include <ultra64.h>
-#include "segments.h"
-#include "crash_main.h"
+
+#include "memory_read.h"
+
 #include "map_parser.h"
 
+#include "segments.h"
 
-//! TODO: Use new map symbol data to get this info
+
+//! TODO: Use new map symbol data to get this info?
 
 ALIGNED8 static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)

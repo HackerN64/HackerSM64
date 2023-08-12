@@ -1,9 +1,17 @@
 #include <ultra64.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "address_select.h"
+#include "crash_draw.h"
 #include "crash_main.h"
-#include "game/input.h"
+#include "crash_pages.h"
+#include "crash_print.h"
+#include "crash_settings.h"
+
 #include "crash_controls.h"
+
 #include "pages/page_stack.h"
 
 
@@ -49,13 +57,6 @@ const struct ControlType gCSControlDescriptions[] = {
     [CONT_DESC_RESET_SETTING    ] = { .control = STR_A"+"STR_B,                             .description = "reset selected setting to default", },
 };
 
-
-void crash_screen_set_page(enum CrashScreenPages page) {
-    if (!gCSPages[gCSPageID].flags.crashed) {
-        gCSPageID = page;
-        gCSSwitchedPage = TRUE;
-    }
-}
 
 void update_crash_screen_direction_input(void) {
     OSTime currTime = osGetTime();

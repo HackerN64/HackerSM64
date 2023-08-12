@@ -1,14 +1,20 @@
 #include <ultra64.h>
+
 #include <stdarg.h>
 #include <string.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_print.h"
+
 #include "page_log.h"
-#include "engine/colors.h"
+
 #include "game/debug.h"
 #include "game/puppyprint.h"
-#include "game/input.h"
 
 
 #ifdef PUPPYPRINT_DEBUG //! TODO: Make this scrollable if the log is long enough.

@@ -2,7 +2,11 @@
 
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_main.h"
+
 #include "crash_settings.h"
+
 #include "engine/math_util.h"
 
 

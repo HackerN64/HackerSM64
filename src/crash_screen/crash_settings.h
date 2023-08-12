@@ -4,8 +4,6 @@
 
 #include "types.h"
 
-#include "crash_types.h"
-
 
 typedef s32 SettingsType;
 

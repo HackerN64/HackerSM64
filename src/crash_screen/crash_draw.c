@@ -1,11 +1,19 @@
 #include <ultra64.h>
+
 #include <string.h>
 
 #include "types.h"
 #include "sm64.h"
+
+#include "address_select.h"
+#include "crash_controls.h"
 #include "crash_main.h"
-#include "crash_draw.h"
+#include "crash_pages.h"
 #include "crash_print.h"
+#include "crash_settings.h"
+
+#include "crash_draw.h"
+
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/game_init.h"

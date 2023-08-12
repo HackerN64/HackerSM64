@@ -1,6 +1,8 @@
 #pragma once
 
 #include "game_init.h"
+#include "main.h"
+#include "crash_screen/crash_main.h"
 
 
 extern void read_controller_inputs(s32 threadID);

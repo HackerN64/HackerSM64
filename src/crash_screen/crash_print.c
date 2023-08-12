@@ -2,12 +2,17 @@
 
 #include <stdarg.h>
 #include <string.h>
+
 #include "types.h"
 #include "sm64.h"
+
+#include "crash_draw.h"
 #include "crash_main.h"
+#include "crash_settings.h"
+
 #include "crash_print.h"
+
 #include "game/printf.h"
-#include "color_presets.h"
 
 
 PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];

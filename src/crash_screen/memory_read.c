@@ -1,7 +1,8 @@
 #include <ultra64.h>
-#include "segments.h"
-#include "crash_main.h"
+
 #include "memory_read.h"
+
+#include "segments.h"
 
 
 enum BusDevices {
