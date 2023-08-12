@@ -6,10 +6,6 @@
 #include "game/main.h"
 
 
-// The size of one row of the font image.
-typedef u32 CSFontRow;
-
-
 // Virtual RAM boundary defines.
 #define VIRTUAL_RAM_START (Address)RAM_START
 #define VIRTUAL_RAM_END   (Address)0xFFFFFFFF
@@ -67,83 +63,6 @@ struct CSPage {
                 /*0x03*/ u32 initialized :  1;
             } flags; /*0x04*/
 }; /*0x18*/
-
-
-typedef s32 SettingsType;
-
-
-#define VALUE_NAME_SIZE 10
-
-
-enum CSPrintNumberFormats {
-    PRINT_NUM_FMT_HEX, // 0xFFFFFFFF
-    PRINT_NUM_FMT_DEC, // 0.0
-    PRINT_NUM_FMT_SCI, // XeX
-};
-
-enum CSImmediateModes {
-    DISASM_IMM_MODE_HEX, // 0xFFFFFFFF
-    DISASM_IMM_MODE_DEC, // 0.0
-};
-
-enum CSDisasmBranchArrowModes {
-    DISASM_ARROW_MODE_OFF,
-    DISASM_ARROW_MODE_SELECTION,
-#ifdef INCLUDE_DEBUG_MAP
-    DISASM_ARROW_MODE_FUNCTION,
-#endif
-    DISASM_ARROW_MODE_OVERSCAN,
-};
-
-struct CSSettingsEntry {
-    /*0x00*/ const char* name;
-    /*0x20*/ const char* (*valNames)[];
-    /*0x24*/ SettingsType val;
-    /*0x28*/ SettingsType defaultVal;
-    /*0x2C*/ SettingsType lowerBound;
-    /*0x30*/ SettingsType upperBound;
-}; /*0x34*/
-
-enum CSSettings {
-    CS_OPT_RESET_TO_DEFAULTS,
-    // GLOBAL:
-    CS_OPT_HEADER_GLOBAL,
-    CS_OPT_DRAW_SCREENSHOT,
-#ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_FUNCTION_NAMES,
-#endif
-    // CONTROLS:
-    CS_OPT_HEADER_CONTROLS,
-    CS_OPT_PRINT_SCROLL_SPEED,
-    CS_OPT_CURSOR_WAIT_FRAMES,
-    CS_OPT_ANALOG_DEADZONE,
-    // CONTEXT:
-    CS_OPT_HEADER_PAGE_CONTEXT,
-#ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_CONTEXT_PARSE_REG,
-#endif
-    CS_OPT_CONTEXT_FLOATS_FMT,
-    // RAM VIEW:
-    CS_OPT_HEADER_PAGE_MEMORY,
-    CS_OPT_MEMORY_AS_ASCII,
-    // DISASM:
-    CS_OPT_HEADER_PAGE_DISASM,
-    CS_OPT_DISASM_BINARY,
-    CS_OPT_DISASM_PSEUDOINSNS,
-    CS_OPT_DISASM_IMM_FMT,
-    CS_OPT_DISASM_OFFSET_ADDR,
-    CS_OPT_DISASM_ARROW_MODE, //! TODO: Implement this
-    NUM_CS_OPTS,
-};
-
-
-struct CSController {
-    /*0x00*/ s16 rawStickX;
-    /*0x02*/ s16 rawStickY;
-    /*0x04*/ u16 buttonDown;
-    /*0x06*/ u16 buttonPressed;
-    /*0x08*/ u16 buttonReleased;
-};
 
 
 // Time conversion macros

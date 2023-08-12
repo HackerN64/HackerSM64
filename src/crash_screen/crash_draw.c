@@ -119,32 +119,6 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
     }
 }
 
-// // Draws a rectangle.
-// void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
-//     const Alpha alpha = RGBA32_A(color);
-//     if (alpha == 0x00) {
-//         return;
-//     }
-//     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-
-//     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
-
-//     s32 middleX = (w / 2.0f);
-//     s32 middleY = (h / 2.0f);
-
-//     for (s32 y = 0; y < h; y++) {
-//         for (s32 x = 0; x < w; x++) {
-//             if (absi(middle - x) < dist_between_objects) {
-//                 if (is_in_scissor_box((startX + x), (startY + y))) {
-//                     apply_color(dst, newColor, alpha);
-//                 }
-//             }
-//             dst++;
-//         }
-//         dst += (SCREEN_WIDTH - w);
-//     }
-// }
-
 // Draws a triangle pointing upwards or downwards depending on the sign of 'h'.
 void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);

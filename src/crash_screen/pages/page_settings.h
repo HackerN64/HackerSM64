@@ -7,6 +7,8 @@
 
 #define SETTINGS_NUM_ROWS 20
 
+#define VALUE_NAME_SIZE 10
+
 
 extern const enum ControlTypes settingsContList[];
 

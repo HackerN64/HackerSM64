@@ -6,6 +6,10 @@
 #include "engine/colors.h"
 
 
+// The size of one row of the font image.
+typedef u32 CSFontRow;
+
+
 // Crash screen font image properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7

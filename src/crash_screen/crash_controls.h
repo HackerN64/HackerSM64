@@ -3,7 +3,15 @@
 #include <ultra64.h>
 
 #include "types.h"
-// #include "crash_main.h"
+
+
+struct CSController {
+    /*0x00*/ s16 rawStickX;
+    /*0x02*/ s16 rawStickY;
+    /*0x04*/ u16 buttonDown;
+    /*0x06*/ u16 buttonPressed;
+    /*0x08*/ u16 buttonReleased;
+}; /*0x0A*/
 
 
 typedef union {
