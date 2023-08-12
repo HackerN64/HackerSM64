@@ -21,11 +21,13 @@ const enum ControlTypes settingsContList[] = {
     CONT_DESC_LIST_END,
 };
 
+
 void settings_init(void) {
     sSettingsSelectedIndex = 0;
     sSettingsViewportIndex = 0;
 }
 
+extern const char* sSettingHeader[];
 extern const char* sValNames_bool[];
 
 void print_settings_list(u32 line, u32 numLines) {
@@ -52,10 +54,8 @@ void print_settings_list(u32 line, u32 numLines) {
         u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
 
         // Print the "RESET TO DEFAULTS" option differently
-        _Bool isResetToDefaults = (currIndex == CS_OPT_RESET_TO_DEFAULTS);
-
-        // "[setting name]"
-        if (isResetToDefaults) {
+        if (currIndex == CS_OPT_RESET_TO_DEFAULTS) {
+            // "[setting name]"
             crash_screen_print_scroll(
                 TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (STRLEN("<RESET ALL TO DEFAULTS>") / 2)), y, charX,
                 STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",
@@ -64,56 +64,64 @@ void print_settings_list(u32 line, u32 numLines) {
                 COLOR_RGBA32_CRASH_SELECT_ARROW
             );
         } else {
+            _Bool isHeader = (setting->valNames == &sSettingHeader);
+
             crash_screen_print_scroll(
                 TEXT_X(0), y, charX,
                 STR_COLOR_PREFIX"%s",
-                COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
+                (isHeader ? COLOR_RGBA32_CRASH_PAGE_NAME : COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION), setting->name
             );
 
-            // Print an asterisk if the setting has been changed from the default value.
-            if (setting->val != setting->defaultVal) {
-                // "*"
-                crash_screen_print(TEXT_X(charX), y,
-                    (STR_COLOR_PREFIX"%c"),
-                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, '*'
-                );
-            }
-            charX += STRLEN("*");
-
-            // "<"
-            charX += crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX"<"),
-                COLOR_RGBA32_CRASH_SELECT_ARROW
-            );
-
-            // Print the current setting.
-            if (setting->valNames != NULL) {
-                RGBA32 nameColor = COLOR_RGBA32_CRASH_SETTINGS_NAMED;
-
-                // Booleans color.
-                if (setting->valNames == &sValNames_bool) {
-                    nameColor = (setting->val ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
-                }
-
-                // "[setting value (string)]"
-                crash_screen_print(TEXT_X(charX), y,
-                    (STR_COLOR_PREFIX"%s"),
-                    nameColor, (*setting->valNames)[setting->val]
-                );
+            if (isHeader) {
+                // Translucent dividers
+                // crash_screen_draw_rect(CRASH_SCREEN_X1, DIVIDER_Y(line + i + 0), CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+                crash_screen_draw_rect(CRASH_SCREEN_X1, DIVIDER_Y(line + i + 1), CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
             } else {
-                // "[setting value (number)]"
+                // Print an asterisk if the setting has been changed from the default value.
+                if (setting->val != setting->defaultVal) {
+                    // "*"
+                    crash_screen_print(TEXT_X(charX), y,
+                        (STR_COLOR_PREFIX"%c"),
+                        COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, '*'
+                    );
+                }
+                charX += STRLEN("*");
+
+                // "<"
+                charX += crash_screen_print(TEXT_X(charX), y,
+                    (STR_COLOR_PREFIX"<"),
+                    COLOR_RGBA32_CRASH_SELECT_ARROW
+                );
+
+                // Print the current setting.
+                if (setting->valNames != NULL) {
+                    RGBA32 nameColor = COLOR_RGBA32_CRASH_SETTINGS_NAMED;
+
+                    // Booleans color.
+                    if (setting->valNames == &sValNames_bool) {
+                        nameColor = (setting->val ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
+                    }
+
+                    // "[setting value (string)]"
+                    crash_screen_print(TEXT_X(charX), y,
+                        (STR_COLOR_PREFIX"%s"),
+                        nameColor, (*setting->valNames)[setting->val]
+                    );
+                } else {
+                    // "[setting value (number)]"
+                    crash_screen_print(TEXT_X(charX), y,
+                        (STR_COLOR_PREFIX"%-d"),
+                        COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val
+                    );
+                }
+                charX += VALUE_NAME_SIZE;
+
+                // ">"
                 crash_screen_print(TEXT_X(charX), y,
-                    (STR_COLOR_PREFIX"%-d"),
-                    COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val
+                    (STR_COLOR_PREFIX">"),
+                    COLOR_RGBA32_CRASH_SELECT_ARROW
                 );
             }
-            charX += VALUE_NAME_SIZE;
-
-            // ">"
-            crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX">"),
-                COLOR_RGBA32_CRASH_SELECT_ARROW
-            );
         }
 
         currIndex++;
