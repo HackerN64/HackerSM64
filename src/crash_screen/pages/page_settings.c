@@ -94,7 +94,7 @@ void print_settings_list(u32 line, u32 numLines) {
         }
 
         // Print the "RESET TO DEFAULTS" and header options differently:
-        if (currViewIndex == CS_OPT_RESET_TO_DEFAULTS) {
+        if (currViewIndex == CS_OPT_RESET_TO_DEFAULTS) { // Reset all to defaults entry.
             s32 centeredDefaultsStartX = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (STRLEN("<RESET ALL TO DEFAULTS>") / 2));
             // "<[setting name]>"
             if (crash_screen_check_for_changed_settings()) {
@@ -112,7 +112,7 @@ void print_settings_list(u32 line, u32 numLines) {
                     COLOR_RGBA32_GRAY, setting->name
                 );
             }
-        } else if (crash_screen_setting_is_header(currIndex)) {
+        } else if (crash_screen_setting_is_header(currIndex)) { // Header entry.
             if (setting->val) {
                 crash_screen_draw_vertical_triangle(TEXT_X(0), y, TEXT_WIDTH(1), -TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME);
             } else {
@@ -125,7 +125,16 @@ void print_settings_list(u32 line, u32 numLines) {
             );
             // Translucent divider.
             crash_screen_draw_rect(CRASH_SCREEN_X1, DIVIDER_Y((line + i) + 1), CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
-        } else {
+        } else { // Setting entry.
+            // Print an asterisk if the setting has been changed from the default value.
+            if (setting->val != setting->defaultVal) {
+                // "*"
+                crash_screen_print(TEXT_X(0), y,
+                    (STR_COLOR_PREFIX"*"),
+                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
+                );
+            }
+
             // Maximum description print size.
             u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
 
@@ -134,16 +143,6 @@ void print_settings_list(u32 line, u32 numLines) {
                 STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
             );
-
-            // Print an asterisk if the setting has been changed from the default value.
-            if (setting->val != setting->defaultVal) {
-                // "*"
-                crash_screen_print(TEXT_X(charX), y,
-                    (STR_COLOR_PREFIX"%c"),
-                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, '*'
-                );
-            }
-            charX += STRLEN("*");
 
             // "<"
             charX += crash_screen_print(TEXT_X(charX), y,
