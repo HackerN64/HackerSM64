@@ -18,6 +18,19 @@
 #include "page_disasm.h"
 
 
+const enum ControlTypes disasmContList[] = {
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_CURSOR_VERTICAL,
+    CONT_DESC_JUMP_TO_ADDRESS,
+#ifdef INCLUDE_DEBUG_MAP
+    CONT_DESC_TOGGLE_FUNCTIONS,
+#endif
+    CONT_DESC_LIST_END,
+};
+
+
 static u32 sDisasmViewportIndex = 0x00000000;
 static u32 sDisasmBranchStartX = 0; // The X position where branch arrows start.
 
@@ -342,18 +355,6 @@ void disasm_draw(void) {
 
     osWritebackDCacheAll();
 }
-
-const enum ControlTypes disasmContList[] = {
-    CONT_DESC_SWITCH_PAGE,
-    CONT_DESC_SHOW_CONTROLS,
-    CONT_DESC_CYCLE_DRAW,
-    CONT_DESC_CURSOR_VERTICAL,
-    CONT_DESC_JUMP_TO_ADDRESS,
-#ifdef INCLUDE_DEBUG_MAP
-    CONT_DESC_TOGGLE_FUNCTIONS,
-#endif
-    CONT_DESC_LIST_END,
-};
 
 void disasm_input(void) {
 #ifdef INCLUDE_DEBUG_MAP

@@ -15,10 +15,6 @@
 #include "page_map.h"
 
 
-u32 sMapViewerSelectedIndex = 0;
-static u32 sMapViewerViewportIndex = 0;
-
-
 const enum ControlTypes mapViewerContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -27,6 +23,10 @@ const enum ControlTypes mapViewerContList[] = {
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_LIST_END,
 };
+
+
+u32 sMapViewerSelectedIndex = 0;
+static u32 sMapViewerViewportIndex = 0;
 
 
 void map_view_init(void) {

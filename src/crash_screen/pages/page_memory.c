@@ -14,9 +14,6 @@
 #include "page_memory.h"
 
 
-static Address sRamViewViewportIndex = 0x00000000;
-
-
 const enum ControlTypes ramViewerContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -27,6 +24,8 @@ const enum ControlTypes ramViewerContList[] = {
     CONT_DESC_LIST_END,
 };
 
+
+static Address sRamViewViewportIndex = 0x00000000;
 
 static const char gHex[0x10] = "0123456789ABCDEF";
 

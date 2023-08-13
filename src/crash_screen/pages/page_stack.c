@@ -16,12 +16,6 @@
 #include "segment_symbols.h"
 
 
-ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
-static u32 sCSNumFoundFunctions = 0;
-
-static u32 sStackTraceSelectedIndex = 0;
-static u32 sStackTraceViewportIndex = 0;
-
 const enum ControlTypes stackTraceContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -33,6 +27,13 @@ const enum ControlTypes stackTraceContList[] = {
 #endif
     CONT_DESC_LIST_END,
 };
+
+
+ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
+static u32 sCSNumFoundFunctions = 0;
+
+static u32 sStackTraceSelectedIndex = 0;
+static u32 sStackTraceViewportIndex = 0;
 
 static void add_to_stack(struct FunctionInStack* func) {
     sCSFunctionStackBuffer[sCSNumFoundFunctions++] = *func;

@@ -13,11 +13,6 @@
 #include "page_settings.h"
 
 
-u32 sSettingsSelectedIndex = 0;
-static u32 sSettingsViewportIndex = 0;
-static u32 sSettngsTotalShownAmount = NUM_CS_OPTS;
-
-
 const enum ControlTypes settingsContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -28,32 +23,33 @@ const enum ControlTypes settingsContList[] = {
     CONT_DESC_LIST_END,
 };
 
-extern const char* sIsSettingHeader[];
 
-enum CSSettings gCSDisplayedSettings[NUM_CS_OPTS];
+u32 sSettingsSelectedIndex = 0;
+static u32 sSettingsViewportIndex = 0;
+static u32 sSettngsTotalShownAmount = NUM_CS_OPTS;
+
+enum CSSettings gCSDisplayedSettingIDs[NUM_CS_OPTS];
 
 
 void update_displayed_settings(void) {
-    bzero(&gCSDisplayedSettings, sizeof(gCSDisplayedSettings));
+    bzero(&gCSDisplayedSettingIDs, sizeof(gCSDisplayedSettingIDs));
 
     int dstSettingIndex = 0;
-    _Bool shownSection = TRUE;
+    _Bool sectionShown = TRUE;
 
     for (int srcSettingIndex = 0; srcSettingIndex < NUM_CS_OPTS; srcSettingIndex++) {
-        const struct CSSettingsEntry* srcSetting = &gCSSettings[srcSettingIndex];
-
-        _Bool show = shownSection;
+        _Bool show = sectionShown;
 
         // Header entry:
         if (crash_screen_setting_is_header(srcSettingIndex)) {
             // Set whether the next section is shown:
-            shownSection = srcSetting->val;
+            sectionShown = gCSSettings[srcSettingIndex].val;
             show = TRUE;
         }
 
         // If section is not collapsed:
         if (show) {
-            gCSDisplayedSettings[dstSettingIndex] = srcSettingIndex;
+            gCSDisplayedSettingIDs[dstSettingIndex] = srcSettingIndex;
             dstSettingIndex++;
         }
     }
@@ -76,7 +72,7 @@ void print_settings_list(u32 line, u32 numLines) {
 
     // Print
     for (u32 i = 0; i < numLines; i++) {
-        u32 currIndex = gCSDisplayedSettings[currViewIndex];
+        u32 currIndex = gCSDisplayedSettingIDs[currViewIndex];
         const struct CSSettingsEntry* setting = &gCSSettings[currIndex];
 
         if (currViewIndex >= sSettngsTotalShownAmount) {
@@ -109,7 +105,7 @@ void print_settings_list(u32 line, u32 numLines) {
                 crash_screen_print(
                     centeredDefaultsStartX, y,
                     STR_COLOR_PREFIX"<%s>",
-                    COLOR_RGBA32_GRAY, setting->name
+                    COLOR_RGBA32_CRASH_SETTINGS_DISABLED, setting->name
                 );
             }
         } else if (crash_screen_setting_is_header(currIndex)) { // Header entry.
@@ -205,7 +201,7 @@ void settings_draw(void) {
 }
 
 void settings_input(void) {
-    u32 currIndex = gCSDisplayedSettings[sSettingsSelectedIndex];
+    u32 currIndex = gCSDisplayedSettingIDs[sSettingsSelectedIndex];
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     // Handle the reset to defaults entry differently.

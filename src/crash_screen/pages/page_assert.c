@@ -14,10 +14,6 @@
 #include "page_assert.h"
 
 
-static u32 sAssertScrollIndex = 0;
-static size_t sAssertPrintSize = 0;
-
-
 const enum ControlTypes assertsContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -25,6 +21,10 @@ const enum ControlTypes assertsContList[] = {
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_LIST_END,
 };
+
+
+static u32 sAssertScrollIndex = 0;
+static size_t sAssertPrintSize = 0;
 
 
 void assert_init(void) {
