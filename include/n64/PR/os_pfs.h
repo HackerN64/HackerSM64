@@ -63,7 +63,7 @@ typedef struct {
     /*0x60*/ int inode_start_page;  /* page # */
     /*0x64*/ u8  banks;
     /*0x65*/ u8  activebank;
-} OSPfs; /*0x66*/
+} OSPfs; /*0x68*/
 
 typedef struct {
     /*0x00*/ u32  file_size; /* bytes */
@@ -71,7 +71,7 @@ typedef struct {
     /*0x08*/ u16  company_code;
     /*0x0A*/ char ext_name[4];
     /*0x0E*/ char game_name[16];
-} OSPfsState; /*0x1E*/
+} OSPfsState; /*0x20*/
 
 
 #endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
