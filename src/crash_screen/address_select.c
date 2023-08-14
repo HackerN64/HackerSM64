@@ -46,17 +46,19 @@ void draw_address_select(void) {
     u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
     u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
     // Up arrow:
-    crash_screen_draw_vertical_triangle(
+    crash_screen_draw_triangle(
         triangleStartX, triangleStartY,
         TEXT_WIDTH(1), TEXT_WIDTH(1),
-        COLOR_RGBA32_CRASH_SELECT_ARROW
+        COLOR_RGBA32_CRASH_SELECT_ARROW,
+        CS_TRI_UP
     );
     triangleStartY += ((TEXT_WIDTH(1) + TEXT_HEIGHT(1)) - 1);
     // Down arrow:
-    crash_screen_draw_vertical_triangle(
+    crash_screen_draw_triangle(
         triangleStartX, triangleStartY,
-        TEXT_WIDTH(1), -TEXT_WIDTH(1),
-        COLOR_RGBA32_CRASH_SELECT_ARROW
+        TEXT_WIDTH(1), TEXT_WIDTH(1),
+        COLOR_RGBA32_CRASH_SELECT_ARROW,
+        CS_TRI_DOWN
     );
 
 #ifdef INCLUDE_DEBUG_MAP

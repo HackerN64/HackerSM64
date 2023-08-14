@@ -109,11 +109,7 @@ void print_settings_list(u32 line, u32 numLines) {
                 );
             }
         } else if (crash_screen_setting_is_header(currIndex)) { // Header entry.
-            if (setting->val) {
-                crash_screen_draw_vertical_triangle(TEXT_X(0), y, TEXT_WIDTH(1), -TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME);
-            } else {
-                crash_screen_draw_horizontal_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME);
-            }
+            crash_screen_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
             crash_screen_print(
                 TEXT_X(section_indent), y,
                 STR_COLOR_PREFIX"%s",

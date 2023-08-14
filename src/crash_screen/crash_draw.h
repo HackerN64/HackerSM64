@@ -59,8 +59,8 @@ typedef u32 CSFontRow;
 #define SCISSOR_BOX_DEFAULT_Y2 (CRASH_SCREEN_Y1 + CRASH_SCREEN_H)
 
 // Top left corner of the text grid.
-#define CRASH_SCREEN_TEXT_X1 (CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X + 0) // 28
-#define CRASH_SCREEN_TEXT_Y1 (CRASH_SCREEN_Y1 + CRASH_SCREEN_TEXT_MARGIN_Y + 1) // 10
+#define CRASH_SCREEN_TEXT_X1 ((CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X) + 0) // 28
+#define CRASH_SCREEN_TEXT_Y1 ((CRASH_SCREEN_Y1 + CRASH_SCREEN_TEXT_MARGIN_Y) + 1) // 10
 
 // Bottom right corner of the text grid.
 #define CRASH_SCREEN_TEXT_X2 (CRASH_SCREEN_TEXT_X1 + CRASH_SCREEN_TEXT_W) // 292
@@ -87,6 +87,14 @@ enum CSDrawDarkRectDarken {
     CS_DARKEN_TO_BLACK,
 };
 
+// For crash_screen_draw_triangle.
+enum CSDrawTriangleDirection {
+    CS_TRI_UP,
+    CS_TRI_DOWN,
+    CS_TRI_LEFT,
+    CS_TRI_RIGHT,
+};
+
 
 typedef struct {
     s32 x1;
@@ -102,8 +110,8 @@ void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
 void crash_screen_reset_scissor_box(void);
 void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
 void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void crash_screen_draw_horizontal_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
 void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
 void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
 void crash_screen_take_screenshot(RGBA16* dst);

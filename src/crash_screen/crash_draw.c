@@ -127,72 +127,49 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
     }
 }
 
-// Draws a triangle pointing upwards or downwards depending on the sign of 'h'.
-void crash_screen_draw_vertical_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+// Draws a diamond shape.
+void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
     }
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    const f32 middle = (w / 2.0f);
-    f32 d = 0.0f;
-    f32 t;
-    _Bool flip = (h < 0);
-    if (flip) {
-        h = -h;
-        t = (middle / (f32)h);
-        d = (middle - t);
-        t = -t;
-    } else {
-        t = (middle / (f32)h);
-    }
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
+    s32 middleX = (w / 2.0f);
+    s32 middleY = (h / 2.0f);
+
+    f32 dx = ((f32)w / (f32)h);
+    f32 d = 0.0f;
+
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
-            if (is_in_scissor_box((startX + x), (startY + y)) && (absf(middle - x) < d)) {
-                apply_color(dst, newColor, alpha);
+            if (absi(x - middleX) < d) {
+                if (is_in_scissor_box((startX + x), (startY + y))) {
+                    apply_color(dst, newColor, alpha);
+                }
             }
             dst++;
         }
-        d += t;
+        d += ((y < middleY) ? dx : -dx);
         dst += (SCREEN_WIDTH - w);
     }
 }
 
-// Draws a triangle pointing left or right.
-void crash_screen_draw_horizontal_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    const f32 middle = (h / 2.0f);
-    _Bool flip = FALSE;
-    if (w < 0) {
-        w = -w;
-        flip = TRUE;
-    }
-    const f32 t = ((f32)w / middle);
-    f32 x1 = w;
+void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
+    CSScissorBox temp = gCSScissorBox;
 
-    RGBA16* dst = get_rendering_fb_pixel(startX, startY);
-    RGBA16* start = dst;
+    crash_screen_set_scissor_box(startX, startY, (startX + w), (startY + h));
 
-    for (s32 y = 0; y < h; y++) {
-        for (s32 x = x1; x < w; x++) {
-            if (is_in_scissor_box((startX + x), (startY + y))) {
-                apply_color(dst, newColor, alpha);
-            }
-            dst++;
-        }
-        x1 -= (y < middle) ? t : -t;
-        dst = (start + (SCREEN_WIDTH * y));
-        if (flip) {
-            dst += (s32)x1;
-        }
+    switch (direction) {
+        case CS_TRI_UP:    crash_screen_draw_diamond(startX,             startY,             w,       (h * 2), color); break;
+        case CS_TRI_DOWN:  crash_screen_draw_diamond(startX,             ((startY - h) - 1), w,       (h * 2), color); break;
+        case CS_TRI_LEFT:  crash_screen_draw_diamond(startX,             startY,             (w * 2), h,       color); break;
+        case CS_TRI_RIGHT: crash_screen_draw_diamond(((startX - w) - 1), startY,             (w * 2), h,       color); break;
     }
+
+    gCSScissorBox = temp;
 }
 
 // Draws a line from one point on the screen to another.
