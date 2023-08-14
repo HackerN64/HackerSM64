@@ -72,8 +72,8 @@ void print_settings_list(u32 line, u32 numLines) {
 
     // Print
     for (u32 i = 0; i < numLines; i++) {
-        u32 currIndex = gCSDisplayedSettingIDs[currViewIndex];
-        const struct CSSettingsEntry* setting = &gCSSettings[currIndex];
+        u32 currSettingIndex = gCSDisplayedSettingIDs[currViewIndex];
+        const struct CSSettingsEntry* setting = &gCSSettings[currSettingIndex];
 
         if (currViewIndex >= sSettngsTotalShownAmount) {
             break;
@@ -108,7 +108,7 @@ void print_settings_list(u32 line, u32 numLines) {
                     COLOR_RGBA32_CRASH_SETTINGS_DISABLED, setting->name
                 );
             }
-        } else if (crash_screen_setting_is_header(currIndex)) { // Header entry.
+        } else if (crash_screen_setting_is_header(currSettingIndex)) { // Header entry.
             crash_screen_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
             crash_screen_print(
                 TEXT_X(section_indent), y,
@@ -179,15 +179,17 @@ void print_settings_list(u32 line, u32 numLines) {
 void settings_draw(void) {
     osWritebackDCacheAll();
 
-    print_settings_list(2, SETTINGS_NUM_ROWS);
+    u32 line = 2;
+
+    print_settings_list(line, SETTINGS_NUM_ROWS);
 
     // Draw this line again so the selection box doesn't get drawn in front of it.
-    crash_screen_draw_divider(DIVIDER_Y(2));
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
     if (sSettngsTotalShownAmount > SETTINGS_NUM_ROWS) {
         crash_screen_draw_scroll_bar(
-            (DIVIDER_Y(2) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
+            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             SETTINGS_NUM_ROWS, sSettngsTotalShownAmount,
             sSettingsViewportIndex,
             COLOR_RGBA32_CRASH_DIVIDER, TRUE
@@ -197,25 +199,25 @@ void settings_draw(void) {
 }
 
 void settings_input(void) {
-    u32 currIndex = gCSDisplayedSettingIDs[sSettingsSelectedIndex];
+    u32 selectedSettingIndex = gCSDisplayedSettingIDs[sSettingsSelectedIndex];
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     // Handle the reset to defaults entry differently.
-    if (currIndex == CS_OPT_RESET_TO_DEFAULTS) {
+    if (selectedSettingIndex == CS_OPT_RESET_TO_DEFAULTS) {
         if (buttonPressed & (A_BUTTON | B_BUTTON)) {
             crash_screen_reset_all_settings();
         }
     } else {
         if ((gCSCompositeController->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) {
-            if (crash_screen_setting_is_header(currIndex)) {
+            if (crash_screen_setting_is_header(selectedSettingIndex)) {
                 // Resetting a header resets the whole section.
-                crash_screen_reset_settings_section(currIndex);
+                crash_screen_reset_settings_section(selectedSettingIndex);
             } else {
-                crash_screen_reset_setting(currIndex);
+                crash_screen_reset_setting(selectedSettingIndex);
             }
         } else {
-            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) crash_screen_inc_setting(currIndex, -1); // Decrement + wrap.
-            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) crash_screen_inc_setting(currIndex, +1); // Increment + wrap.
+            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) crash_screen_inc_setting(selectedSettingIndex, -1); // Decrement + wrap.
+            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) crash_screen_inc_setting(selectedSettingIndex, +1); // Increment + wrap.
         }
     }
 
@@ -227,4 +229,9 @@ void settings_input(void) {
     sSettingsSelectedIndex = WRAP(((s32)sSettingsSelectedIndex + change), 0, ((s32)sSettngsTotalShownAmount - 1));
 
     sSettingsViewportIndex = clamp_view_to_selection(sSettingsViewportIndex, sSettingsSelectedIndex, SETTINGS_NUM_ROWS, 1);
+
+    u32 lastViewportIndex = MAX(((s32)sSettngsTotalShownAmount - SETTINGS_NUM_ROWS), 0);
+    if (sSettingsViewportIndex > lastViewportIndex) {
+        sSettingsViewportIndex = lastViewportIndex;
+    }
 }
