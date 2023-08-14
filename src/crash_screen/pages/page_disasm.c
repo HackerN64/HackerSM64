@@ -128,12 +128,12 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         s16 branchOffset = check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) { //! TODO: Verify ordering:
-            curBranchX += DISASM_BRANCH_ARROW_SPACING;
+            curBranchX += (DISASM_BRANCH_ARROW_SPACING + 1);
             curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
 
             // Wrap around if extended past end of screen.
             if ((sDisasmBranchStartX + curBranchX) > CRASH_SCREEN_TEXT_X2) {
-                curBranchX = DISASM_BRANCH_ARROW_OFFSET;
+                curBranchX = DISASM_BRANCH_ARROW_HEAD_OFFSET;
             }
 
             currArrow->startAddr    = sBranchBufferCurrAddr;
@@ -181,12 +181,18 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else if (endLine >= numShownRows) {
             arrowEndHeight = (TEXT_Y(printLine + numShownRows) - 2);
         } else {
-            //! TODO: crash_screen_draw_triangle.
-            u32 x = ((sDisasmBranchStartX + dist) - DISASM_BRANCH_ARROW_OFFSET);
-            crash_screen_draw_rect((x + 0), (arrowEndHeight - 0), (DISASM_BRANCH_ARROW_OFFSET + 1), 1, color);
-            // Arrow head.
-            crash_screen_draw_rect((x + 1), (arrowEndHeight - 1), 1, 3, color);
-            crash_screen_draw_rect((x + 2), (arrowEndHeight - 2), 1, 5, color);
+            const u32 startX = ((sDisasmBranchStartX + dist) - DISASM_BRANCH_ARROW_HEAD_OFFSET);
+
+            crash_screen_draw_triangle(
+                (startX - DISASM_BRNACH_ARROW_HEAD_SIZE), (arrowEndHeight - DISASM_BRNACH_ARROW_HEAD_SIZE),
+                DISASM_BRNACH_ARROW_HEAD_SIZE, (DISASM_BRNACH_ARROW_HEAD_SIZE * 2),
+                color, CS_TRI_LEFT
+            );
+            crash_screen_draw_rect(
+                startX, arrowEndHeight,
+                (DISASM_BRANCH_ARROW_HEAD_OFFSET + 1), 1,
+                color
+            );
         }
 
         s32 height = abss(arrowEndHeight - arrowStartHeight);
@@ -277,7 +283,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
                 s16 branchOffset = check_for_branch_offset(insn);
 
                 if (branchOffset != 0x0000) {
-                    draw_branch_arrow(y, (y + branchOffset + 1), DISASM_BRANCH_ARROW_OFFSET, sBranchColors[0], line);
+                    draw_branch_arrow(y, (y + branchOffset + 1), DISASM_BRANCH_ARROW_HEAD_OFFSET, sBranchColors[0], line);
                 }
             }
         } else { // Outside of code segments:
