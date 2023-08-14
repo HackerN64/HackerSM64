@@ -381,7 +381,7 @@ typedef struct {
 #else
     /*0x04*/ u8  err_no;                    /* Error number */
 #endif
-} OSContPad; /*0x05*/
+} OSContPad; /*0x08*/
 
 typedef struct PACKED {
     /*0x00*/ u8 pad[1];

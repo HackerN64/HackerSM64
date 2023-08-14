@@ -373,7 +373,7 @@ typedef struct {
     /*0x02*/ s8  stick_x;                   /* -80 <= stick_x <=  80 */
     /*0x03*/ s8  stick_y;                   /* -80 <= stick_y <=  80 */
     /*0x04*/ u8  error;                     /* Error */
-} OSContPad; /*0x05*/
+} OSContPad; /*0x08*/
 
 typedef struct PACKED {
     /*0x00*/ u8 pad[1];
