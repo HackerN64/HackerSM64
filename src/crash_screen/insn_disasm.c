@@ -640,7 +640,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
-                    if (gCSSettings[CS_OPT_FUNCTION_NAMES].val && is_in_code_segment(target)) {
+                    if (gCSSettings[CS_OPT_SYMBOL_NAMES].val && is_in_code_segment(target)) {
                         const struct MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
                         if (symbol != NULL) {
                             *fname = get_map_symbol_name(symbol);

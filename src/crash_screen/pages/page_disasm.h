@@ -13,17 +13,7 @@ struct BranchArrow {
 }; /*0x10*/
 
 
-// Disasm constants
-#ifdef INCLUDE_DEBUG_MAP
-#define DISASM_NUM_ROWS         19
-#else
-#define DISASM_NUM_ROWS         20
-#endif
-#define DISASM_SHOWN_SECTION    ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
-
-#define DISASM_SCROLL_MIN       VIRTUAL_RAM_START
-#define DISASM_SCROLL_MAX       (VIRTUAL_RAM_END - DISASM_SHOWN_SECTION)
-
+// Disasm constants.
 #define DISASM_BRANCH_ARROW_OFFSET          4 // The distance between the line and the arrow head.
 #define DISASM_BRANCH_ARROW_SPACING         3 // The spacing between each arrow's line.
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (1024 * DISASM_STEP) // The max number of instructions to search for branches within a function.

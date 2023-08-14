@@ -7,7 +7,7 @@
 #include "segments.h"
 
 
-//! TODO: Use new map symbol data to get this info?
+//! TODO: Use nm map symbol data to get this info?
 
 ALIGNED8 static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)

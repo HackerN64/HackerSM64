@@ -48,7 +48,7 @@ struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions
     [CS_OPT_HEADER_GLOBAL       ] = { .name = "GLOBAL",                     .valNames = &sIsSettingHeader,        .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DRAW_SCREENSHOT     ] = { .name = "Show screenshot background", .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_FUNCTION_NAMES      ] = { .name = "Print function names",       .valNames = &sValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_SYMBOL_NAMES        ] = { .name = "Print symbol names",         .valNames = &sValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
 
     [CS_OPT_HEADER_CONTROLS     ] = { .name = "CONTROLS",                   .valNames = &sIsSettingHeader,        .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -64,6 +64,9 @@ struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .name = "RAM VIEW",                   .valNames = &sIsSettingHeader,        .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_AS_ASCII     ] = { .name = "Show data as ascii",         .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_HEADER_PAGE_DISASM  ] = { .name = "DISASM",                     .valNames = &sIsSettingHeader,        .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_DISASM_SHOW_SYMBOL  ] = { .name = "Show current symbol name",   .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif
     [CS_OPT_DISASM_BINARY       ] = { .name = "Unknown as binary",          .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_PSEUDOINSNS  ] = { .name = "Pseudoinstructions",         .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT      ] = { .name = "Immediates format",          .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },

@@ -133,7 +133,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             );
         } else {
             // Print known function.
-            if (gCSSettings[CS_OPT_FUNCTION_NAMES].val) {
+            if (gCSSettings[CS_OPT_SYMBOL_NAMES].val) {
                 // "[function name]"
                 const size_t offsetStrSize = STRLEN("+0000");
                 crash_screen_print_symbol_name_impl(TEXT_X(addrStrSize), y,
@@ -210,7 +210,7 @@ void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
         // Toggle whether to display function names.
-        crash_screen_inc_setting(CS_OPT_FUNCTION_NAMES, TRUE);
+        crash_screen_inc_setting(CS_OPT_SYMBOL_NAMES, TRUE);
     }
 #endif
 
