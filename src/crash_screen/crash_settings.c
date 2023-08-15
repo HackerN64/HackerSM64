@@ -64,6 +64,9 @@ struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions
     [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .name = "Floats print format",        .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
     // RAM VIEW:
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .name = "RAM VIEW",                   .valNames = &sIsSettingHeader,        .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_MEMORY_SHOW_SYMBOL  ] = { .name = "Show current symbol name",   .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif
     [CS_OPT_MEMORY_AS_ASCII     ] = { .name = "Show data as ascii",         .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     // DISASM:
     [CS_OPT_HEADER_PAGE_DISASM  ] = { .name = "DISASM",                     .valNames = &sIsSettingHeader,        .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },

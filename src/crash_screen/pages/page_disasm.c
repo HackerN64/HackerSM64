@@ -308,12 +308,12 @@ void disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
+#ifdef INCLUDE_DEBUG_MAP
+    sDisasmNumShownRows = (20 - gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val);
+#endif
     sDisasmBranchStartX = gCSSettings[CS_OPT_DISASM_OFFSET_ADDR].val
                         ? TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, 0x80000000"))
                         : TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, +0x0000"));
-#ifdef INCLUDE_DEBUG_MAP
-    sDisasmNumShownRows = gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val ? 19 : 20;
-#endif
 
     u32 line = 1;
 
@@ -331,7 +331,9 @@ void disasm_draw(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val) {
         const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
+
         if (symbol != NULL) {
+            // "IN:[symbol]"
             size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
             crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
         }

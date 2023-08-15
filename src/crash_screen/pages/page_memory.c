@@ -26,6 +26,7 @@ const enum ControlTypes ramViewerContList[] = {
 
 
 static Address sRamViewViewportIndex = 0x00000000;
+static u32 sRamViewNumShownRows = 19;
 
 static const char gHex[0x10] = "0123456789ABCDEF";
 
@@ -50,7 +51,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
 
-    for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
+    for (u32 y = 0; y < sRamViewNumShownRows; y++) {
         Address rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
 
         // Row header:
@@ -97,16 +98,38 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
 void ram_view_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
-    Address startAddr = sRamViewViewportIndex;
+#ifdef INCLUDE_DEBUG_MAP
+    sRamViewNumShownRows = (19 - gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val);
+#endif
+
     u32 line = 1;
+
+    Address startAddr = sRamViewViewportIndex;
+    Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * RAM_VIEWER_STEP);
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
     crash_screen_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
-        COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION)
+        COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, endAddr
     );
 
     line++;
+
+#ifdef INCLUDE_DEBUG_MAP
+    if (gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val) {
+        const struct MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
+
+        if (symbol != NULL) {
+            // "IN:[symbol]"
+            size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
+            crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+        }
+
+        line++;
+
+        crash_screen_draw_divider(DIVIDER_Y(line));
+    }
+#endif
 
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
 
@@ -122,37 +145,40 @@ void ram_view_draw(void) {
         charX += (TEXT_WIDTH(2) + 1);
     }
 
-    crash_screen_draw_divider(DIVIDER_Y(3));
-
-    crash_screen_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT((line + RAM_VIEWER_NUM_ROWS) - 1), COLOR_RGBA32_CRASH_DIVIDER);
+    // Veertical divider
+    crash_screen_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(sRamViewNumShownRows + 1), COLOR_RGBA32_CRASH_DIVIDER);
 
     // "MEMORY"
     crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
 
     line++;
 
+    crash_screen_draw_divider(DIVIDER_Y(line));
+
     ram_viewer_print_data(line, startAddr);
 
-    u32 line2 = (line + RAM_VIEWER_NUM_ROWS);
+    u32 line2 = (line + sRamViewNumShownRows);
 
     crash_screen_draw_divider(DIVIDER_Y(line2));
 
     u32 scrollTop = (DIVIDER_Y(line) + 1);
     u32 scrollBottom = DIVIDER_Y(line2);
 
+    const size_t shownSection = ((sRamViewNumShownRows - 1) * RAM_VIEWER_STEP);
+
     // Scroll bar:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
-        (sRamViewViewportIndex - RAM_VIEWER_SCROLL_MIN),
+        shownSection, VIRTUAL_RAM_SIZE,
+        (sRamViewViewportIndex - VIRTUAL_RAM_START),
         COLOR_RGBA32_CRASH_DIVIDER, TRUE
     );
 
     // Scroll bar crash position marker:
     crash_screen_draw_scroll_bar(
         scrollTop, scrollBottom,
-        RAM_VIEWER_SHOWN_SECTION, VIRTUAL_RAM_SIZE,
-        (tc->pc - RAM_VIEWER_SCROLL_MIN),
+        shownSection, VIRTUAL_RAM_SIZE,
+        (tc->pc - VIRTUAL_RAM_START),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
 
@@ -199,5 +225,5 @@ void ram_view_input(void) {
         crash_screen_inc_setting(CS_OPT_MEMORY_AS_ASCII, TRUE);
     }
 
-    sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
+    sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
 }
