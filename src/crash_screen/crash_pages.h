@@ -8,10 +8,7 @@
 enum CrashScreenPages {
     FIRST_PAGE,
     PAGE_CONTEXT = FIRST_PAGE,
-    PAGE_ASSERTS,
-#ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
-#endif
     PAGE_STACK_TRACE,
 #ifdef INCLUDE_DEBUG_MAP
     PAGE_MAP_VIEWER,

@@ -5,7 +5,10 @@
 #include "types.h"
 
 
-#define LOG_NUM_ROWS MIN(LOG_BUFFER_SIZE, 20)
+// #define ASSERTS_NUM_ROWS 16
+
+
+extern const enum ControlTypes logContList[];
 
 
 void log_init(void);

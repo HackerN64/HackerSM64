@@ -126,8 +126,8 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     // Default to certain pages depening on the crash type.
     switch (tc->cause) {
-        case EXC_SYSCALL: crash_screen_set_page(PAGE_ASSERTS); break;
-        case EXC_II:      crash_screen_set_page(PAGE_DISASM ); break;
+        case EXC_SYSCALL: crash_screen_set_page(PAGE_LOG   ); break;
+        case EXC_II:      crash_screen_set_page(PAGE_DISASM); break;
     }
 
     // Only on the first crash:

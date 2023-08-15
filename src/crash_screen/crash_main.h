@@ -3,15 +3,6 @@
 #include <ultra64.h>
 
 #include "game/main.h"
-// #include "address_select.h"
-// #include "crash_controls.h"
-// #include "crash_draw.h"
-// #include "crash_pages.h"
-// #include "crash_print.h"
-// #include "crash_settings.h"
-// #include "insn_disasm.h"
-// #include "map_parser.h"
-// #include "memory_read.h"
 
 
 // Time conversion macros (from os_convert.h)
