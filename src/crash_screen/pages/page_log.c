@@ -40,26 +40,42 @@ void log_init(void) {
 }
 
 u32 print_assert_section(u32 line) {
+    u32 charX = 0;
+
     // "MESSAGE:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
     line++;
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    size_t lineStrSize = (CRASH_SCREEN_NUM_CHARS_X - STRLEN("LINE:0000"));
+    size_t lineStrStart = (CRASH_SCREEN_NUM_CHARS_X - STRLEN("LINE:0000"));
     // "FILE: [file name]"
-    crash_screen_print_scroll(TEXT_X(0), TEXT_Y(line), lineStrSize,
-        STR_COLOR_PREFIX"FILE:%s",
+    charX += crash_screen_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"FILE:",
+        COLOR_RGBA32_CRASH_HEADER
+    );
+    charX += crash_screen_print_scroll(TEXT_X(charX), TEXT_Y(line), (lineStrStart - charX),
+        STR_COLOR_PREFIX"%s",
         COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
     );
     // "LINE: [line number]"
-    crash_screen_print(TEXT_X(lineStrSize), TEXT_Y(line),
-        STR_COLOR_PREFIX"LINE:%d",
-        COLOR_RGBA32_CRASH_AT, __n64Assert_LineNum
+    crash_screen_print(TEXT_X(lineStrStart), TEXT_Y(line),
+        STR_COLOR_PREFIX"LINE:"STR_COLOR_PREFIX"%d",
+        COLOR_RGBA32_CRASH_HEADER,
+        COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_LineNum
     );
     line++;
 
+    // "COND: [condition]"
     if (__n64Assert_Condition != NULL) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"EXPR:%s", COLOR_RGBA32_CRASH_HEADER, __n64Assert_Condition);
+        charX = 0;
+        charX += crash_screen_print(TEXT_X(charX), TEXT_Y(line),
+            STR_COLOR_PREFIX"COND:", COLOR_RGBA32_CRASH_HEADER
+        );
+        charX += crash_screen_print_scroll(TEXT_X(charX), TEXT_Y(line),
+            (CRASH_SCREEN_NUM_CHARS_X - charX),
+            STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_AT, __n64Assert_Condition
+        );
         line++;
     }
 
