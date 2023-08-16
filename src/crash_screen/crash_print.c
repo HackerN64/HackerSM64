@@ -287,7 +287,7 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     va_start(args, fmt);
 
     size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
-    ASSERT((totalSize < (CHAR_BUFFER_SIZE - 1)), "@FF0000FFCRASH SCREEN PRINT BUFFER EXCEEDED");
+    ASSERTF((totalSize < (CHAR_BUFFER_SIZE - 1)), STR_COLOR_PREFIX"CRASH SCREEN PRINT BUFFER EXCEEDED", COLOR_RGBA32_RED);
     size_t numChars = 0;
 
     if (totalSize > 0) {
