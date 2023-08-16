@@ -66,9 +66,20 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
 static _Bool is_special_char(char glyph) {
     return (
         (glyph == CHAR_ESCAPE ) ||
+        (glyph == CHAR_TAB    ) ||
         (glyph == CHAR_NEWLINE) ||
         (glyph == CHAR_RETURN ) ||
         (glyph == CHAR_COLOR  )
+    );
+}
+
+static _Bool is_space_char(char glyph) {
+    return (
+        (glyph == CHAR_NULL   ) ||
+        (glyph == CHAR_TAB    ) ||
+        (glyph == CHAR_NEWLINE) ||
+        (glyph == CHAR_RETURN ) ||
+        (glyph == CHAR_SPACE  )
     );
 }
 
@@ -125,6 +136,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
             }
         }
 
+        // Write the print data for this char.
         if (print) {
             data->red   = C32_TO_C16(textColor.red  );
             data->green = C32_TO_C16(textColor.green);
@@ -139,18 +151,13 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
     return bufferCount;
 }
 
-static u32 get_next_word_length(PrintBuffer* buf, u32 index, size_t size) {
-    u32 count = 0;
+static size_t get_next_word_length(PrintBuffer* buf, u32 index, size_t bufferCount) {
+    size_t count = 0;
 
-    while (index < size) {
+    while (index < bufferCount) {
         char glyph = buf[index].glyph;
 
-        if (
-            (glyph == CHAR_NULL   ) ||
-            (glyph == CHAR_SPACE  ) ||
-            (glyph == CHAR_NEWLINE) ||
-            (glyph == CHAR_RETURN )
-        ) {
+        if (is_space_char(glyph)) {
             break;
         }
 
@@ -175,8 +182,18 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         char glyph = data->glyph;
         _Bool print = FALSE;
         _Bool newline = FALSE;
+        _Bool space = FALSE;
+        _Bool tab = FALSE;
 
         switch (glyph) {
+            case CHAR_TAB:
+                if (data->isEscaped) {
+                    print = TRUE;
+                } else {
+                    space = TRUE;
+                    tab = TRUE;
+                }
+                break;
             case CHAR_NEWLINE:
             case CHAR_RETURN:
                 if (data->isEscaped) {
@@ -186,16 +203,21 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 }
                 break;
             case CHAR_SPACE:
-                if (can_wrap(x + TEXT_WIDTH(get_next_word_length(data, index, bufferCount)))) {
-                    newline = TRUE;
-                }
+                space = TRUE;
                 break;
             default:
                 print = TRUE;
                 break;
         }
 
-        if (print) {
+        if (space && index < (bufferCount - 1)) {
+            size_t nextWordLength = get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
+
+            if (can_wrap(x + TEXT_WIDTH(nextWordLength))) {
+                newline = TRUE;
+                tab = FALSE;
+            }
+        } else if (print) {
             if (can_wrap(x)) {
                 newline = TRUE;
                 index--;
@@ -219,6 +241,10 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
                 break;
             }
             gCSNumLinesPrinted++;
+        } else if (tab) {
+            int tabCount = (((x - startX) + TAB_WIDTH) / TAB_WIDTH);
+            numChars += (tabCount * TAB_WIDTH) - x;
+            x = (tabCount * TAB_WIDTH) + startX;
         } else {
             x += TEXT_WIDTH(1);
             numChars++;

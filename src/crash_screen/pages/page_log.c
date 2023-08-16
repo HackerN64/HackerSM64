@@ -51,7 +51,7 @@ u32 print_assert_section(u32 line) {
     crash_screen_print(TEXT_X(lineStrSize), TEXT_Y(line), STR_COLOR_PREFIX"LINE:%d", COLOR_RGBA32_CRASH_AT, __n64Assert_LineNum);
     line++;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "%s", __n64Assert_Message);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_VERY_LIGHT_GRAY, __n64Assert_Message);
     line += gCSNumLinesPrinted;
 
     osWritebackDCacheAll();
@@ -64,7 +64,6 @@ void draw_log_section(u32 line, u32 numLines) {
     // "PUPPYPRINT LOG:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
     line++;
-    crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Print entries:
     for (u32 y = 0; y < numLines; y++) {
@@ -81,8 +80,10 @@ void draw_log_section(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(charY);
         }
 
-        crash_screen_print(TEXT_X(0), charY, "%i:\t\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
+        crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
     }
+
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (sLogTotalRows > sLogNumShownRows) {
         crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), sLogNumShownRows, sLogTotalRows, sLogViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);

@@ -13,8 +13,12 @@
 // Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2
 
+// Tab size.
+#define TAB_WIDTH   TEXT_WIDTH(4)
+
 // Char macros:
 #define CHAR_NULL                   '\0'
+#define CHAR_TAB                    '\t'
 #define CHAR_NEWLINE                '\n'
 #define CHAR_RETURN                 '\r'
 #define CHAR_SPACE                  ' '
