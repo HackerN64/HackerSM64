@@ -5,9 +5,6 @@
 #include "types.h"
 
 
-// #define ASSERTS_NUM_ROWS 16
-
-
 extern const enum ControlTypes logContList[];
 
 

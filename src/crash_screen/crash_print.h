@@ -69,8 +69,11 @@ typedef struct PACKED {
     /*0x03*/ char glyph;
 } PrintBuffer; /*0x04*/
 
+// Input:
 extern _Bool gCSWordWrap;
+extern RGBA32 gCSDefaultPrintColor;
 
+// Output:
 extern u32 gCSNumLinesPrinted;
 
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...);

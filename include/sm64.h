@@ -14,6 +14,7 @@
 #include "surface_terrains.h"
 #include "macros.h"
 #include "segments.h"
+#include "game/assert.h"
 
 extern char *__n64Assert_Filename;
 extern u32   __n64Assert_LineNum;

@@ -122,6 +122,10 @@ ALWAYS_INLINE void crash_screen_draw_divider(u32 y) {
     crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_CRASH_DIVIDER);
 }
 
+ALWAYS_INLINE void crash_screen_draw_divider_translucent(u32 y) {
+    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+}
+
 ALWAYS_INLINE void crash_screen_draw_row_selection_box(s32 y) {
     crash_screen_draw_rect(
         (TEXT_X(0) - 1), (y - 2),

@@ -13,6 +13,7 @@
 
 #include "page_log.h"
 
+#include "game/assert.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"
 
@@ -38,6 +39,30 @@ void log_init(void) {
     sLogTotalRows    = LOG_BUFFER_SIZE;
 }
 
+u32 print_assert_args(u32 line, _Bool isFloats) {
+    u32 x = 0;
+    const int count = (isFloats ? gAssertArgCount_float : gAssertArgsCount);
+    const char* prefix = (isFloats ? "FLOATS" : "ARGS");
+
+    x += crash_screen_print(TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"%s: ", COLOR_RGBA32_CRASH_HEADER, prefix);
+
+    for (int i = 0; i < count; i++) {
+        if (isFloats) {
+            x += crash_screen_print(TEXT_X(x), TEXT_Y(line), gAssertArgs_float[i].fmt, gAssertArgs_float[i].val);
+        } else {
+            x += crash_screen_print(TEXT_X(x), TEXT_Y(line), gAssertArgs[i].fmt, gAssertArgs[i].val);
+        }
+
+        if (i < (count - 1)) {
+            x += crash_screen_print(TEXT_X(x), TEXT_Y(line), ", ");
+        }
+
+        line += gCSNumLinesPrinted;
+    }
+
+    return (line + 1);
+}
+
 u32 print_assert_section(u32 line) {
     // "MESSAGE:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
@@ -46,12 +71,25 @@ u32 print_assert_section(u32 line) {
 
     size_t lineStrSize = (CRASH_SCREEN_NUM_CHARS_X - STRLEN("LINE:0000"));
     // "FILE: [file name]"
-    crash_screen_print_scroll(TEXT_X(0), TEXT_Y(line), lineStrSize, STR_COLOR_PREFIX"FILE:%s", COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename);
+    crash_screen_print_scroll(TEXT_X(0), TEXT_Y(line), lineStrSize,
+        STR_COLOR_PREFIX"FILE:%s",
+        COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
+    );
     // "LINE: [line number]"
-    crash_screen_print(TEXT_X(lineStrSize), TEXT_Y(line), STR_COLOR_PREFIX"LINE:%d", COLOR_RGBA32_CRASH_AT, __n64Assert_LineNum);
+    crash_screen_print(TEXT_X(lineStrSize), TEXT_Y(line),
+        STR_COLOR_PREFIX"LINE:%d",
+        COLOR_RGBA32_CRASH_AT, __n64Assert_LineNum
+    );
     line++;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_VERY_LIGHT_GRAY, __n64Assert_Message);
+    line = print_assert_args(line, FALSE);
+    line = print_assert_args(line, TRUE);
+
+    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"MESSAGE: "STR_COLOR_PREFIX"%s",
+        COLOR_RGBA32_CRASH_HEADER,
+        gCSDefaultPrintColor, __n64Assert_Message
+    );
     line += gCSNumLinesPrinted;
 
     osWritebackDCacheAll();

@@ -116,7 +116,7 @@ void print_settings_list(u32 line, u32 numLines) {
                 COLOR_RGBA32_CRASH_PAGE_NAME, setting->name
             );
             // Translucent divider.
-            crash_screen_draw_rect(CRASH_SCREEN_X1, DIVIDER_Y((line + i) + 1), CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+            crash_screen_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
         } else { // Setting entry.
             // Print an asterisk if the setting has been changed from the default value.
             if (setting->val != setting->defaultVal) {
