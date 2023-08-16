@@ -39,30 +39,6 @@ void log_init(void) {
     sLogTotalRows    = LOG_BUFFER_SIZE;
 }
 
-u32 print_assert_args(u32 line, _Bool isFloats) {
-    u32 x = 0;
-    const int count = (isFloats ? gAssertArgCount_float : gAssertArgsCount);
-    const char* prefix = (isFloats ? "FLOATS" : "ARGS");
-
-    x += crash_screen_print(TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"%s: ", COLOR_RGBA32_CRASH_HEADER, prefix);
-
-    for (int i = 0; i < count; i++) {
-        if (isFloats) {
-            x += crash_screen_print(TEXT_X(x), TEXT_Y(line), gAssertArgs_float[i].fmt, gAssertArgs_float[i].val);
-        } else {
-            x += crash_screen_print(TEXT_X(x), TEXT_Y(line), gAssertArgs[i].fmt, gAssertArgs[i].val);
-        }
-
-        if (i < (count - 1)) {
-            x += crash_screen_print(TEXT_X(x), TEXT_Y(line), ", ");
-        }
-
-        line += gCSNumLinesPrinted;
-    }
-
-    return (line + 1);
-}
-
 u32 print_assert_section(u32 line) {
     // "MESSAGE:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
@@ -82,11 +58,13 @@ u32 print_assert_section(u32 line) {
     );
     line++;
 
-    line = print_assert_args(line, FALSE);
-    line = print_assert_args(line, TRUE);
+    if (__n64Assert_Condition != NULL) {
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"EXPR:%s", COLOR_RGBA32_CRASH_HEADER, __n64Assert_Condition);
+        line++;
+    }
 
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"MESSAGE: "STR_COLOR_PREFIX"%s",
+        STR_COLOR_PREFIX"MESSAGE:"STR_COLOR_PREFIX"%s",
         COLOR_RGBA32_CRASH_HEADER,
         gCSDefaultPrintColor, __n64Assert_Message
     );
@@ -137,24 +115,22 @@ void log_draw(void) {
 
     gCSWordWrap = TRUE;
 
-    if (__n64Assert_Filename != NULL) {
+    if (__n64Assert_Message != NULL) {
         line = print_assert_section(line);
+#ifdef PUPPYPRINT_DEBUG
+        line++;
+        crash_screen_draw_divider(DIVIDER_Y(line));
+#else
+    } else {
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "No log or assert data.");
+#endif
     }
 
 #ifdef PUPPYPRINT_DEBUG
-    if (__n64Assert_Filename != NULL) {
-        line++;
-        crash_screen_draw_divider(DIVIDER_Y(line));
-    }
-
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
     sLogTotalRows = MIN(gConsoleLogLastIndex, LOG_BUFFER_SIZE);
 
     draw_log_section(line, sLogNumShownRows);
-#else
-    if (__n64Assert_Filename == NULL) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "No log data assert data.");
-    }
 #endif
 
     gCSWordWrap = FALSE;

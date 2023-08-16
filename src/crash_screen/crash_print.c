@@ -278,10 +278,6 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));
 }
 
-static char* write_to_buf(char* buffer, const char* data, size_t size) {
-    return ((char*)memcpy(buffer, data, size) + size);
-}
-
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
     char buf[CHAR_BUFFER_SIZE] = "";
     bzero(&buf, sizeof(buf));
@@ -291,7 +287,7 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     va_start(args, fmt);
 
     size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
-    ASSERT((totalSize < CHAR_BUFFER_SIZE), "@FF0000FFCRASH SCREEN PRINT BUFFER EXCEEDED");
+    ASSERT((totalSize < (CHAR_BUFFER_SIZE - 1)), "@FF0000FFCRASH SCREEN PRINT BUFFER EXCEEDED");
     size_t numChars = 0;
 
     if (totalSize > 0) {

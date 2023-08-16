@@ -421,10 +421,6 @@ static void print_audio_overview(void) {
 char consoleLogTable[LOG_BUFFER_SIZE][LOG_MESSAGE_SIZE];
 u32 gConsoleLogLastIndex = 0;
 
-static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return (char *) memcpy(buffer, data, size) + size;
-}
-
 void append_puppyprint_log(const char *str, ...) {
     char textBytes[LOG_MESSAGE_SIZE];
 

@@ -154,6 +154,9 @@
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void*)(addr))
 #endif // NO_SEGMENTED_MEMORY
 
+
+//! TODO: Move everything below here to assert.h?:
+
 // Static (compile-time) assertions.
 #ifdef __GNUC__
 #define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
