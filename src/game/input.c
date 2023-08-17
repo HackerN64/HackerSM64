@@ -385,7 +385,7 @@ void read_controller_inputs_status_polling(void) {
                         button ||
                         (
                             gContStatusPollingIsBootMode &&
-                            detect_analog_stick_input(pad, 20)
+                            detect_analog_stick_input(pad, ANALOG_DEADZONE_STATUS_POLLING)
                         ) // Only check analog sticks in boot mode.
                     )
                 ) {

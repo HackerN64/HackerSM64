@@ -136,6 +136,8 @@ Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA 
 
 void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s);
 
+// texrect_rgba32
+
 extern const Gfx dl_texrect_rgba32_begin[];
 extern const Gfx dl_texrect_rgba32_end[];
 

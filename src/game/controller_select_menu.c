@@ -88,9 +88,19 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_n64_normal[] = {
     { .mask = (u16)-1, },
 };
 
+ALIGNED4 const ButtonHighlight analog_display_controller_n64_normal[] = {
+    { .mask = ANALOG_STICK,     .x = 15, .y = 17, .w = 2, .h = 2, },
+    { .mask = (u16)-1, },
+};
+
 ALIGNED4 const ButtonHighlight buttons_display_controller_n64_mouse[] = {
     { .mask = CONT_A,           .x = 10, .y =  8, .w = 5, .h = 5, },
     { .mask = CONT_B,           .x = 17, .y =  8, .w = 5, .h = 5, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight analog_display_controller_n64_mouse[] = {
+    { .mask = ANALOG_STICK,     .x = 15, .y = 17, .w = 2, .h = 2, },
     { .mask = (u16)-1, },
 };
 
@@ -105,6 +115,11 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gba[] = {
     { .mask = CONT_DOWN,        .x =  5, .y = 15, .w = 1, .h = 1, },
     { .mask = CONT_LEFT,        .x =  4, .y = 14, .w = 1, .h = 1, },
     { .mask = CONT_RIGHT,       .x =  6, .y = 14, .w = 1, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight analog_display_controller_gba[] = {
+    { .mask = ANALOG_STICK,     .x =  4, .y = 13, .w = 3, .h = 3, },
     { .mask = (u16)-1, },
 };
 
@@ -124,6 +139,14 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_normal[] = {
     { .mask = (u16)-1, },
 };
 
+ALIGNED4 const ButtonHighlight analog_display_controller_gcn_normal[] = {
+    { .mask = ANALOG_STICK,     .x =  7, .y = 11, .w = 3, .h = 3, },
+    { .mask = ANALOG_C_STICK,   .x = 19, .y = 17, .w = 3, .h = 3, },
+    { .mask = ANALOG_TRIG_L,    .x =  7, .y =  5, .w = 3, .h = 1, },
+    { .mask = ANALOG_TRIG_R,    .x = 22, .y =  5, .w = 3, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
 ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_wheel[] = {
     { .mask = CONT_GCN_START,   .x = 15, .y = 22, .w = 2, .h = 2, },
     { .mask = CONT_GCN_Y,       .x = 21, .y = 15, .w = 1, .h = 2, },
@@ -137,6 +160,13 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_wheel[] = {
     { .mask = CONT_GCN_DOWN,    .x =  9, .y = 17, .w = 1, .h = 1, },
     { .mask = CONT_GCN_LEFT,    .x =  8, .y = 16, .w = 1, .h = 1, },
     { .mask = CONT_GCN_RIGHT,   .x = 10, .y = 16, .w = 1, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight analog_display_controller_gcn_wheel[] = {
+    { .mask = ANALOG_STICK,     .x = 15, .y = 15, .w = 2, .h = 2, },
+    { .mask = ANALOG_TRIG_L,    .x =  8, .y = 13, .w = 2, .h = 2, },
+    { .mask = ANALOG_TRIG_R,    .x = 21, .y = 13, .w = 2, .h = 2, },
     { .mask = (u16)-1, },
 };
 
@@ -156,6 +186,14 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_keyboard[] = {
     { .mask = (u16)-1, },
 };
 
+ALIGNED4 const ButtonHighlight analog_display_controller_gcn_keyboard[] = {
+    { .mask = ANALOG_STICK,     .x =  4, .y = 14, .w = 1, .h = 1, },
+    { .mask = ANALOG_C_STICK,   .x = 25, .y = 16, .w = 1, .h = 1, },
+    { .mask = ANALOG_TRIG_L,    .x =  3, .y = 10, .w = 2, .h = 1, },
+    { .mask = ANALOG_TRIG_R,    .x = 26, .y = 10, .w = 2, .h = 1, },
+    { .mask = (u16)-1, },
+};
+
 ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_dancepad[] = {
     { .mask = CONT_GCN_START,   .x = 21, .y =  5, .w = 3, .h = 1, },
     { .mask = CONT_GCN_Y,       .x =  8, .y = 22, .w = 3, .h = 3, },
@@ -170,7 +208,16 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_dancepad[] = {
     { .mask = (u16)-1, },
 };
 
+ALIGNED4 const ButtonHighlight analog_display_controller_gcn_dancepad[] = {
+    { .mask = ANALOG_STICK,     .x = 14, .y = 15, .w = 4, .h = 4, },
+    { .mask = (u16)-1, },
+};
+
 ALIGNED4 const ButtonHighlight buttons_display_controller_null[] = {
+    { .mask = (u16)-1, },
+};
+
+ALIGNED4 const ButtonHighlight analog_display_controller_null[] = {
     { .mask = (u16)-1, },
 };
 
@@ -198,13 +245,12 @@ void apply_to_overlay_texture(int port, const ButtonHighlight* buttonHighlight) 
 }
 
 /**
- * @brief Loop through a ButtonHighlight list and apply all active highlights for a given port based on controller input.
+ * @brief Loops through a ButtonHighlight list and apply all active highlights for a given port based on controller button input.
  *
  * @param port The port to use input from and the port index to use when writing to sInputOverlayTextures.
  * @param buttonHighlightList Pointer to a list of ButtonHighlight data.
  */
-void set_overlay_texture(int port, const ButtonHighlight (*buttonHighlightList)[]) {
-    const ButtonHighlight* buttonHighlight = *buttonHighlightList;
+static void overlay_texture_buttons(int port, const ButtonHighlight* buttonHighlight) {
     u16 buttons = gControllerPads[port].physButton.raw;
 
     while (buttonHighlight->mask != (u16)-1) {
@@ -216,31 +262,72 @@ void set_overlay_texture(int port, const ButtonHighlight (*buttonHighlightList)[
     }
 }
 
+/**
+ * @brief Loops through a ButtonHighlight list and apply all active highlights for a given port based on controller analog input.
+ *
+ * @param port The port to use input from and the port index to use when writing to sInputOverlayTextures.
+ * @param analogHighlight Pointer to a list of ButtonHighlight data.
+ */
+static void overlay_texture_analog(int port, const ButtonHighlight* analogHighlight) {
+    OSContPadEx* pad = &gControllerPads[port];
+    const s8 deadzone = ANALOG_DEADZONE_STATUS_POLLING;
+
+    while (analogHighlight->mask != (u16)-1) {
+        _Bool active = FALSE;
+
+        switch (analogHighlight->mask) {
+            case ANALOG_STICK:   active = ((abss(pad->stick.x  ) > deadzone) || (abss(pad->stick.y  ) > deadzone)); break;
+            case ANALOG_C_STICK: active = ((abss(pad->c_stick.x) > deadzone) || (abss(pad->c_stick.y) > deadzone)); break;
+            case ANALOG_TRIG_L:  active = (pad->trig.l > deadzone); break;
+            case ANALOG_TRIG_R:  active = (pad->trig.r > deadzone); break;
+        }
+
+        if (active) {
+            apply_to_overlay_texture(port, analogHighlight);
+        }
+
+        analogHighlight++;
+    }
+}
+
+/**
+ * @brief Applies highlights for buttons and analog inputs.
+ *
+ * @param port The port to use input from and the port index to use when writing to sInputOverlayTextures.
+ * @param icon The controller icon data.
+ */
+static void set_overlay_texture(int port, const struct ControllerIcon* icon) {
+    overlay_texture_buttons(port, *(icon->buttonHighlightList));
+    overlay_texture_analog( port, *(icon->analogHighlightList));
+}
+
 #define CONT_BUTTON_LIST(type) .buttonHighlightList = &buttons_display_controller_##type
+#define CONT_ANALOG_LIST(type) .analogHighlightList = &analog_display_controller_##type
 #else // !CONTROLLERS_INPUT_DISPLAY
 #define CONT_BUTTON_LIST(type)
+#define CONT_ANALOG_LIST(type)
 #endif // !CONTROLLERS_INPUT_DISPLAY
 #define CONT_TEXTURE(type) .texture = texture_controller_##type
 
 // Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
-    { .type = CONT_NONE,              CONT_TEXTURE(port        ), CONT_BUTTON_LIST(null        ), },
-    { .type = CONT_TYPE_NORMAL,       CONT_TEXTURE(n64_normal  ), CONT_BUTTON_LIST(n64_normal  ), },
-    { .type = CONT_TYPE_MOUSE,        CONT_TEXTURE(n64_mouse   ), CONT_BUTTON_LIST(n64_mouse   ), },
-    { .type = CONT_TYPE_VOICE,        CONT_TEXTURE(n64_voice   ), CONT_BUTTON_LIST(null        ), },
-    { .type = CONT_TYPE_KEYBOARD,     CONT_TEXTURE(n64_keyboard), CONT_BUTTON_LIST(null        ), },
-    { .type = CONT_TYPE_GBA,          CONT_TEXTURE(gba         ), CONT_BUTTON_LIST(gba         ), },
-    { .type = CONT_TYPE_GCN_NORMAL,   CONT_TEXTURE(gcn_normal  ), CONT_BUTTON_LIST(gcn_normal  ), },
-    { .type = CONT_TYPE_GCN_RECEIVER, CONT_TEXTURE(gcn_receiver), CONT_BUTTON_LIST(null        ), },
-    { .type = CONT_TYPE_GCN_WAVEBIRD, CONT_TEXTURE(gcn_wavebird), CONT_BUTTON_LIST(gcn_normal  ), },
-    { .type = CONT_TYPE_GCN_WHEEL,    CONT_TEXTURE(gcn_wheel   ), CONT_BUTTON_LIST(gcn_wheel   ), },
-    { .type = CONT_TYPE_GCN_KEYBOARD, CONT_TEXTURE(gcn_keyboard), CONT_BUTTON_LIST(gcn_keyboard), },
-    { .type = CONT_TYPE_GCN_DANCEPAD, CONT_TEXTURE(gcn_dancepad), CONT_BUTTON_LIST(gcn_dancepad), },
-    { .type = (u16)-1,                CONT_TEXTURE(unknown     ), CONT_BUTTON_LIST(null        ), },
+    { .type = CONT_NONE,              CONT_TEXTURE(port        ), CONT_BUTTON_LIST(null        ), CONT_ANALOG_LIST(null        ), },
+    { .type = CONT_TYPE_NORMAL,       CONT_TEXTURE(n64_normal  ), CONT_BUTTON_LIST(n64_normal  ), CONT_ANALOG_LIST(n64_normal  ), },
+    { .type = CONT_TYPE_MOUSE,        CONT_TEXTURE(n64_mouse   ), CONT_BUTTON_LIST(n64_mouse   ), CONT_ANALOG_LIST(n64_mouse   ), },
+    { .type = CONT_TYPE_VOICE,        CONT_TEXTURE(n64_voice   ), CONT_BUTTON_LIST(null        ), CONT_ANALOG_LIST(null        ), },
+    { .type = CONT_TYPE_KEYBOARD,     CONT_TEXTURE(n64_keyboard), CONT_BUTTON_LIST(null        ), CONT_ANALOG_LIST(null        ), },
+    { .type = CONT_TYPE_GBA,          CONT_TEXTURE(gba         ), CONT_BUTTON_LIST(gba         ), CONT_ANALOG_LIST(gba         ), },
+    { .type = CONT_TYPE_GCN_NORMAL,   CONT_TEXTURE(gcn_normal  ), CONT_BUTTON_LIST(gcn_normal  ), CONT_ANALOG_LIST(gcn_normal  ), },
+    { .type = CONT_TYPE_GCN_RECEIVER, CONT_TEXTURE(gcn_receiver), CONT_BUTTON_LIST(null        ), CONT_ANALOG_LIST(null        ), },
+    { .type = CONT_TYPE_GCN_WAVEBIRD, CONT_TEXTURE(gcn_wavebird), CONT_BUTTON_LIST(gcn_normal  ), CONT_ANALOG_LIST(gcn_normal  ), },
+    { .type = CONT_TYPE_GCN_WHEEL,    CONT_TEXTURE(gcn_wheel   ), CONT_BUTTON_LIST(gcn_wheel   ), CONT_ANALOG_LIST(gcn_wheel   ), },
+    { .type = CONT_TYPE_GCN_KEYBOARD, CONT_TEXTURE(gcn_keyboard), CONT_BUTTON_LIST(gcn_keyboard), CONT_ANALOG_LIST(gcn_keyboard), },
+    { .type = CONT_TYPE_GCN_DANCEPAD, CONT_TEXTURE(gcn_dancepad), CONT_BUTTON_LIST(gcn_dancepad), CONT_ANALOG_LIST(null        ), },
+    { .type = (u16)-1,                CONT_TEXTURE(unknown     ), CONT_BUTTON_LIST(null        ), CONT_ANALOG_LIST(null        ), },
 };
 
 /**
- * @brief Loop through sControllerIcons to get the port's controller's corresponding texture.
+ * @brief Loops through sControllerIcons to get the port's controller's corresponding texture.
  *
  * @param[in] port The port with the controller to check.
  * @return const struct ControllerIcon* A pointer to the icon data in sControllerIcons.
@@ -306,8 +393,7 @@ void render_controllers_overlay(void) {
         texrect_rgba32(&dlHead, icon->texture, texW, texH, x, y, w, h);
 
  #ifdef CONTROLLERS_INPUT_DISPLAY
-        const ButtonHighlight (*buttonHighlightList)[] = icon->buttonHighlightList;
-        set_overlay_texture(port, buttonHighlightList);
+        set_overlay_texture(port, icon);
 
         texrect_rgba32(&dlHead, (Texture*)sInputOverlayTextures[port], texW, texH, x, y, w, h);
  #endif // CONTROLLERS_INPUT_DISPLAY

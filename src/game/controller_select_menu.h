@@ -5,6 +5,13 @@
 #include "types.h"
 
 
+enum AnalogIndex {
+    ANALOG_STICK,
+    ANALOG_C_STICK,
+    ANALOG_TRIG_L,
+    ANALOG_TRIG_R,
+};
+
 struct ButtonName {
     /*0x00*/ u8 pad[2];
     /*0x02*/ u16 mask;              // Button mask.
@@ -13,7 +20,7 @@ struct ButtonName {
 
 typedef union {
     struct PACKED {
-        /*0x00*/ u16 mask;          // Button mask.
+        /*0x00*/ u16 mask;          // Button mask or analog index.
         /*0x02*/ u8 x : 5, w : 3;   // [0..31], [0..7]
         /*0x03*/ u8 y : 5, h : 3;   // [0..31], [0..7]
     }; /*0x04*/
@@ -26,8 +33,9 @@ struct ControllerIcon {
     /*0x04*/ Texture* texture;      // Pointer to the controller texture for the above type.
 #ifdef CONTROLLERS_INPUT_DISPLAY
     /*0x08*/ const ButtonHighlight (*buttonHighlightList)[];  // Pointer to the list of button highlights for the above texture.
+    /*0x0C*/ const ButtonHighlight (*analogHighlightList)[];  // Pointer to the list of button highlights for the above texture.
 #endif // CONTROLLERS_INPUT_DISPLAY
-}; /*0x0C*/
+}; /*0x10*/
 
 
 #ifdef ENABLE_STATUS_REPOLLING_GUI
