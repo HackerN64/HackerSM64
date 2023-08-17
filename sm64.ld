@@ -6,6 +6,12 @@ OUTPUT_ARCH (mips)
 #include "config.h"
 #undef LINKER
 
+#define BEGIN_TEXT(name) \
+   _##name##SegmentTextStart = .;
+
+#define END_TEXT(name) \
+   _##name##SegmentTextEnd = .;
+
 #define BEGIN_SEG(name, addr) \
     _##name##SegmentStart = ADDR(.name); \
     _##name##SegmentRomStart = __romPos; \
@@ -95,12 +101,6 @@ OUTPUT_ARCH (mips)
    END_NOLOAD(name##_geo) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
-
-#define BEGIN_TEXT(name) \
-   _##name##SegmentTextStart = .;
-
-#define END_TEXT(name) \
-   _##name##SegmentTextEnd = .;
 
 SECTIONS
 {

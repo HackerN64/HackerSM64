@@ -19,7 +19,8 @@ PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
 // Input:
-_Bool gCSWordWrap = FALSE;
+_Bool  gCSWordWrap          = FALSE;
+u32    gCSWordWrapXLimit    = CRASH_SCREEN_TEXT_X2;
 RGBA32 gCSDefaultPrintColor = COLOR_RGBA32_WHITE;
 
 // Output:
@@ -172,7 +173,7 @@ static size_t get_next_word_length(PrintBuffer* buf, u32 index, size_t bufferCou
 }
 
 static _Bool can_wrap(u32 x) {
-    return (gCSWordWrap && (x >= CRASH_SCREEN_TEXT_X2));
+    return (gCSWordWrap && (x >= gCSWordWrapXLimit));
 }
 
 static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {

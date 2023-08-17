@@ -197,28 +197,27 @@
 #define	CAUSE_SW2	0x00000200	/* Software level 2 pending */
 #define	CAUSE_SW1	0x00000100	/* Software level 1 pending */
 
-#define	CAUSE_IPMASK	0x0000FF00	/* Pending interrupt mask */
 #define	CAUSE_IPSHIFT	8
-
-#define	CAUSE_EXCMASK	0x0000007C	/* Cause code bits */
+#define	CAUSE_IPMASK	(0xFF << CAUSE_IPSHIFT)	/* Pending interrupt mask */
 
 #define	CAUSE_EXCSHIFT	2
+#define	CAUSE_EXCMASK	(0x1F << CAUSE_EXCSHIFT)	/* Cause code bits */
 
 /* Cause register exception codes */
 
-#define	EXC_CODE(x)	((x)<<2)
+#define	EXC_CODE(x)	((x) << CAUSE_EXCSHIFT)
 
 /* Hardware exception codes */
-#define	EXC_INT		EXC_CODE(0)	/* interrupt */
-#define	EXC_MOD		EXC_CODE(1)	/* TLB mod */
-#define	EXC_RMISS	EXC_CODE(2)	/* Read TLB Miss */
-#define	EXC_WMISS	EXC_CODE(3)	/* Write TLB Miss */
-#define	EXC_RADE	EXC_CODE(4)	/* Read Address Error */
-#define	EXC_WADE	EXC_CODE(5)	/* Write Address Error */
-#define	EXC_IBE		EXC_CODE(6)	/* Instruction Bus Error */
-#define	EXC_DBE		EXC_CODE(7)	/* Data Bus Error */
-#define	EXC_SYSCALL	EXC_CODE(8)	/* SYSCALL */
-#define	EXC_BREAK	EXC_CODE(9)	/* BREAKpoint */
+#define	EXC_INT		EXC_CODE( 0)	/* interrupt */
+#define	EXC_MOD		EXC_CODE( 1)	/* TLB mod */
+#define	EXC_RMISS	EXC_CODE( 2)	/* Read TLB Miss */
+#define	EXC_WMISS	EXC_CODE( 3)	/* Write TLB Miss */
+#define	EXC_RADE	EXC_CODE( 4)	/* Read Address Error */
+#define	EXC_WADE	EXC_CODE( 5)	/* Write Address Error */
+#define	EXC_IBE		EXC_CODE( 6)	/* Instruction Bus Error */
+#define	EXC_DBE		EXC_CODE( 7)	/* Data Bus Error */
+#define	EXC_SYSCALL	EXC_CODE( 8)	/* SYSCALL */
+#define	EXC_BREAK	EXC_CODE( 9)	/* BREAKpoint */
 #define	EXC_II		EXC_CODE(10)	/* Illegal Instruction */
 #define	EXC_CPU		EXC_CODE(11)	/* CoProcessor Unusable */
 #define	EXC_OV		EXC_CODE(12)	/* OVerflow */

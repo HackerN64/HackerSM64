@@ -70,7 +70,8 @@ typedef struct PACKED {
 } PrintBuffer; /*0x04*/
 
 // Input:
-extern _Bool gCSWordWrap;
+extern _Bool  gCSWordWrap;
+extern u32    gCSWordWrapXLimit;
 extern RGBA32 gCSDefaultPrintColor;
 
 // Output:

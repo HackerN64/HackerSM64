@@ -157,6 +157,7 @@ void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 colo
     }
 }
 
+// Draws a diamond then crops it using gCSScissorBox so that it looks like a triangle.
 void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
     CSScissorBox temp = gCSScissorBox;
 
@@ -172,7 +173,7 @@ void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 col
     gCSScissorBox = temp;
 }
 
-// Draws a line from one point on the screen to another.
+// Draws a line between any two points.
 void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
@@ -200,6 +201,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     }
 }
 
+// Draw a single character from gCSFont to the framebuffer.
 void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     if (glyph == CHAR_NULL) { // Null
         color = COLOR_RGBA32_CRASH_NULL_CHAR;
@@ -243,6 +245,7 @@ void crash_screen_take_screenshot(RGBA16* dst) {
     }
 }
 
+// Set the entire framebuffer either to the saved screenshot or to black.
 void crash_screen_reset_framebuffer(_Bool drawBackground) {
     if (drawBackground) {
         bcopy(gZBuffer, FB_PTR_AS(void), FRAMEBUFFER_SIZE);
@@ -253,6 +256,7 @@ void crash_screen_reset_framebuffer(_Bool drawBackground) {
     osWritebackDCacheAll();
 }
 
+// Cycle through the 3 framebuffers.
 void crash_screen_update_framebuffer(void) {
     osWritebackDCacheAll();
 
@@ -271,6 +275,7 @@ void crash_screen_update_framebuffer(void) {
     osWritebackDCacheAll();
 }
 
+// Draw a scroll bar at the right edge of the crash screen.
 void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
     const u32 x = (CRASH_SCREEN_X2 - 1);
 
@@ -335,6 +340,7 @@ void print_crash_screen_header(void) {
     osWritebackDCacheAll();
 }
 
+// Main draw function for the crash screen.
 void crash_screen_draw_main(void) {
     crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_reset_framebuffer(gCSSettings[CS_OPT_DRAW_SCREENSHOT].val);
