@@ -193,6 +193,7 @@ const Gfx dl_texrect_rgba32_end[] = {
     gsSPEndDisplayList(),
 };
 
+// Must be used with the above display lists.
 void texrect_rgba32(Gfx** dlIter, Texture* texture, s16 texW, s16 texH, s16 x, s16 y, s16 w, s16 h) {
     gDPLoadTextureTile((*dlIter)++,
         texture,

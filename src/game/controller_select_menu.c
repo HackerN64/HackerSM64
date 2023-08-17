@@ -61,15 +61,13 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
 }
  #endif // (MAX_NUM_PLAYERS > 1)
 
-#define CONT_ICON_W 32
-#define CONT_ICON_H 32
-
 #ifdef CONTROLLERS_INPUT_DISPLAY
 
 // This is 4 32x32 RGBA16 textures, 2048 bytes each, 8192 bytes total.
 ALIGNED8 RGBA16 sInputOverlayTextures[MAXCONTROLLERS][CONT_ICON_W * CONT_ICON_H];
 
 
+// N64 Normal:
 ALIGNED4 const ButtonHighlight buttons_display_controller_n64_normal[] = {
     { .mask = CONT_A,           .x = 22, .y = 13, .w = 2, .h = 2, },
     { .mask = CONT_B,           .x = 20, .y = 11, .w = 2, .h = 2, },
@@ -87,23 +85,23 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_n64_normal[] = {
     { .mask = CONT_F,           .x = 26, .y =  9, .w = 2, .h = 2, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_n64_normal[] = {
     { .mask = ANALOG_STICK,     .x = 15, .y = 17, .w = 2, .h = 2, },
     { .mask = (u16)-1, },
 };
 
+// N64 Mouse:
 ALIGNED4 const ButtonHighlight buttons_display_controller_n64_mouse[] = {
     { .mask = CONT_A,           .x = 10, .y =  8, .w = 5, .h = 5, },
     { .mask = CONT_B,           .x = 17, .y =  8, .w = 5, .h = 5, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_n64_mouse[] = {
     { .mask = ANALOG_STICK,     .x = 15, .y = 17, .w = 2, .h = 2, },
     { .mask = (u16)-1, },
 };
 
+// GBA:
 ALIGNED4 const ButtonHighlight buttons_display_controller_gba[] = {
     { .mask = CONT_A,           .x = 27, .y = 13, .w = 2, .h = 2, },
     { .mask = CONT_B,           .x = 24, .y = 14, .w = 2, .h = 2, },
@@ -117,12 +115,12 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gba[] = {
     { .mask = CONT_RIGHT,       .x =  6, .y = 14, .w = 1, .h = 1, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_gba[] = {
     { .mask = ANALOG_STICK,     .x =  4, .y = 13, .w = 3, .h = 3, },
     { .mask = (u16)-1, },
 };
 
+// GCN Normal:
 ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_normal[] = {
     { .mask = CONT_GCN_START,   .x = 15, .y = 12, .w = 2, .h = 2, },
     { .mask = CONT_GCN_Y,       .x = 21, .y =  9, .w = 2, .h = 2, },
@@ -138,7 +136,6 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_normal[] = {
     { .mask = CONT_GCN_RIGHT,   .x = 12, .y = 18, .w = 1, .h = 1, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_gcn_normal[] = {
     { .mask = ANALOG_STICK,     .x =  7, .y = 11, .w = 3, .h = 3, },
     { .mask = ANALOG_C_STICK,   .x = 19, .y = 17, .w = 3, .h = 3, },
@@ -147,6 +144,7 @@ ALIGNED4 const ButtonHighlight analog_display_controller_gcn_normal[] = {
     { .mask = (u16)-1, },
 };
 
+// GCN Wheel:
 ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_wheel[] = {
     { .mask = CONT_GCN_START,   .x = 15, .y = 22, .w = 2, .h = 2, },
     { .mask = CONT_GCN_Y,       .x = 21, .y = 15, .w = 1, .h = 2, },
@@ -162,7 +160,6 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_wheel[] = {
     { .mask = CONT_GCN_RIGHT,   .x = 10, .y = 16, .w = 1, .h = 1, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_gcn_wheel[] = {
     { .mask = ANALOG_STICK,     .x = 15, .y = 15, .w = 2, .h = 2, },
     { .mask = ANALOG_TRIG_L,    .x =  8, .y = 13, .w = 2, .h = 2, },
@@ -170,6 +167,7 @@ ALIGNED4 const ButtonHighlight analog_display_controller_gcn_wheel[] = {
     { .mask = (u16)-1, },
 };
 
+// GCN Keyboard:
 ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_keyboard[] = {
     { .mask = CONT_GCN_START,   .x =  7, .y = 14, .w = 1, .h = 1, },
     { .mask = CONT_GCN_Y,       .x = 27, .y = 13, .w = 1, .h = 1, },
@@ -185,7 +183,6 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_keyboard[] = {
     { .mask = CONT_GCN_RIGHT,   .x =  7, .y = 17, .w = 1, .h = 1, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_gcn_keyboard[] = {
     { .mask = ANALOG_STICK,     .x =  4, .y = 14, .w = 1, .h = 1, },
     { .mask = ANALOG_C_STICK,   .x = 25, .y = 16, .w = 1, .h = 1, },
@@ -194,6 +191,7 @@ ALIGNED4 const ButtonHighlight analog_display_controller_gcn_keyboard[] = {
     { .mask = (u16)-1, },
 };
 
+// GCN Dancepad:
 ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_dancepad[] = {
     { .mask = CONT_GCN_START,   .x = 21, .y =  5, .w = 3, .h = 1, },
     { .mask = CONT_GCN_Y,       .x =  8, .y = 22, .w = 3, .h = 3, },
@@ -207,16 +205,15 @@ ALIGNED4 const ButtonHighlight buttons_display_controller_gcn_dancepad[] = {
     { .mask = CONT_GCN_RIGHT,   .x = 20, .y = 14, .w = 5, .h = 6, },
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_gcn_dancepad[] = {
     { .mask = ANALOG_STICK,     .x = 14, .y = 15, .w = 4, .h = 4, },
     { .mask = (u16)-1, },
 };
 
+// NULL:
 ALIGNED4 const ButtonHighlight buttons_display_controller_null[] = {
     { .mask = (u16)-1, },
 };
-
 ALIGNED4 const ButtonHighlight analog_display_controller_null[] = {
     { .mask = (u16)-1, },
 };
@@ -280,6 +277,7 @@ static void overlay_texture_analog(int port, const ButtonHighlight* analogHighli
             case ANALOG_C_STICK: active = ((abss(pad->c_stick.x) > deadzone) || (abss(pad->c_stick.y) > deadzone)); break;
             case ANALOG_TRIG_L:  active = (pad->trig.l > deadzone); break;
             case ANALOG_TRIG_R:  active = (pad->trig.r > deadzone); break;
+            default: break;
         }
 
         if (active) {
@@ -301,13 +299,13 @@ static void set_overlay_texture(int port, const struct ControllerIcon* icon) {
     overlay_texture_analog( port, *(icon->analogHighlightList));
 }
 
-#define CONT_BUTTON_LIST(type) .buttonHighlightList = &buttons_display_controller_##type
-#define CONT_ANALOG_LIST(type) .analogHighlightList = &analog_display_controller_##type
+ #define CONT_BUTTON_LIST(type) .buttonHighlightList = &buttons_display_controller_##type
+ #define CONT_ANALOG_LIST(type) .analogHighlightList = &analog_display_controller_##type
 #else // !CONTROLLERS_INPUT_DISPLAY
-#define CONT_BUTTON_LIST(type)
-#define CONT_ANALOG_LIST(type)
+ #define CONT_BUTTON_LIST(type)
+ #define CONT_ANALOG_LIST(type)
 #endif // !CONTROLLERS_INPUT_DISPLAY
-#define CONT_TEXTURE(type) .texture = texture_controller_##type
+ #define CONT_TEXTURE(type) .texture = texture_controller_##type
 
 // Controller icons (see segment2.c).
 ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
@@ -352,15 +350,15 @@ const struct ControllerIcon* get_controller_icon(int port) {
  * TODO: Fix this not rendering/updating during transitions.
  */
 void render_controllers_overlay(void) {
-    const s32 w = CONT_ICON_W;
-    const s32 h = CONT_ICON_H;
-    s32 x = SCREEN_CENTER_X;
-    const s32 y = (SCREEN_CENTER_Y - (h / 2));
-    const s32 texW = CONT_ICON_W;
-    const s32 texH = CONT_ICON_H;
-    const s32 spacing = 2;
-    const s32 spacedW = (w + spacing);
-    const s32 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
+    const s16 texW = CONT_ICON_W;
+    const s16 texH = CONT_ICON_H;
+    const s16 w = CONT_ICON_W;
+    const s16 h = CONT_ICON_H;
+    s16 x = SCREEN_CENTER_X;
+    const s16 y = (SCREEN_CENTER_Y - (h / 2));
+    const s16 spacing = 2;
+    const s16 spacedW = (w + spacing);
+    const s16 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
     char text_buffer[32] = "";
     int port;
 

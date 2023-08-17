@@ -5,12 +5,17 @@
 #include "types.h"
 
 
+#define CONT_ICON_W 32
+#define CONT_ICON_H 32
+
+
 enum AnalogIndex {
     ANALOG_STICK,
     ANALOG_C_STICK,
     ANALOG_TRIG_L,
     ANALOG_TRIG_R,
 };
+
 
 struct ButtonName {
     /*0x00*/ u8 pad[2];
