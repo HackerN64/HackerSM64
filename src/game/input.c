@@ -63,7 +63,7 @@ struct Controller* const gDemoController = &gDemoControllers[0];
  * @param[in,out] controller The controller to operate on.
  */
 static void adjust_analog_stick(struct Controller* controller) {
-    const s16 deadzone = ((controller->statusData->type & CONT_CONSOLE_GCN) ? 12 : 8);
+    const s16 deadzone = ((controller->statusData->type & CONT_CONSOLE_GCN) ? ANALOG_DEADZONE_GCN : ANALOG_DEADZONE_N64);
     const s16 offset = (deadzone - 2);
     const f32 max_stick_mag = 64.0f;
 

@@ -29,7 +29,7 @@ typedef struct { /* Voice Recognition System */
     /*0x04*/ int __channel;     /* Controller Port # */
     /*0x08*/ s32 __mode;
     /*0x0C*/ u8  cmd_status;    /* Command Status */
-} OSVoiceHandle; /*0x0D*/
+} OSVoiceHandle; /*0x10*/
 
 typedef struct { /* Voice Recognition System */
     /*0x00*/ u16 warning;
@@ -39,7 +39,7 @@ typedef struct { /* Voice Recognition System */
     /*0x08*/ u16 voice_time;
     /*0x0A*/ u16 answer[5];
     /*0x14*/ u16 distance[5];
-} OSVoiceData; /*0x1E*/
+} OSVoiceData; /*0x20*/
 
 
 #endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

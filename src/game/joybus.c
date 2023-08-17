@@ -147,7 +147,7 @@ static void __osPackReadEx(u8 cmd) {
                     break;
 
                 case CONT_CMD_GCN_CALIBRATE:
-                    if (isGCN && !pad->origins.initialized) {
+                    if (isGCN) {
                         WRITE_PIF_CMD_WITH_GCN_RUMBLE(ptr, sGCNCalibrateFormat, port);
                     } else {
                         ptr++; // Not a GCN controller, or doesn't need origins updated, so leave a PIF_CMD_SKIP_CHNL (0x00) byte to tell the PIF to skip it.
@@ -310,9 +310,9 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                         pad->button.START = TRUE;
                     }
                     // Standard N64 controller only has one analog stick.
-                    pad->stick                  = n64Input.stick;
-                    pad->c_stick                = ANALOG_S8_ZERO;
-                    pad->trig                   = ANALOG_U8_ZERO;
+                    pad->stick   = n64Input.stick;
+                    pad->c_stick = ANALOG_S8_ZERO;
+                    pad->trig    = ANALOG_U8_ZERO;
                 }
 
                 ptr += sizeof(__OSContReadFormat);

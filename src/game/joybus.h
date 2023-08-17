@@ -757,16 +757,6 @@ enum PIFStatuses {
     PIF_STATUS_EXE,  // Set PIF RAM status byte to this to do a command.
 };
 
-//////////////////////////
-// HackerSM64 additions //
-//////////////////////////
-
-typedef struct PACKED {
-    /*0x00*/ u8 cmd;                    // The ID of the command to write (see enum OSContCmds).
-    /*0x01*/ u8 pad[3];
-    /*0x04*/ void (*packFunc)(void);    // The function that writes to __osContPifRam.
-} CommandPackFunc; /*0x08*/
-
 /////////////
 // externs //
 /////////////
