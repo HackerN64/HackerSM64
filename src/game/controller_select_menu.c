@@ -5,6 +5,7 @@
 #include "controller_select_menu.h"
 #include "sm64.h"
 #include "engine/math_util.h"
+#include "engine/colors.h"
 #include "game_init.h"
 #include "ingame_menu.h"
 #include "input.h"
@@ -259,26 +260,6 @@ const struct ControllerIcon* get_controller_icon(int port) {
     return icon;
 }
 
-static const Gfx dl_controller_icons_begin[] = {
-    gsDPPipeSync(),
-    gsDPSetCycleType(G_CYC_COPY),
-    gsDPSetTexturePersp(G_TP_NONE),
-    gsDPSetTextureFilter(G_TF_POINT),
-    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
-    gsDPSetAlphaCompare(G_AC_THRESHOLD),
-    gsSPEndDisplayList(),
-};
-
-static const Gfx dl_controller_icons_end[] = {
-    gsDPPipeSync(),
-    gsDPSetCycleType(G_CYC_1CYCLE),
-    gsDPSetTexturePersp(G_TP_PERSP),
-    gsDPSetTextureFilter(G_TF_BILERP),
-    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
-    gsDPSetAlphaCompare(G_AC_NONE),
-    gsSPEndDisplayList(),
-};
-
 /**
  * @brief Displays controller info (eg. type and player number) while polling for controller statuses.
  * TODO: Fix this not rendering/updating during transitions.
@@ -315,53 +296,24 @@ void render_controllers_overlay(void) {
     // Allow drawing outside the screen borders.
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    gSPDisplayList(dlHead++, dl_controller_icons_begin);
+    gSPDisplayList(dlHead++, dl_texrect_rgba32_begin);
 
     // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
         const struct ControllerIcon* icon = get_controller_icon(port);
         x = (iconStartX + (spacedW * port));
 
-        gDPLoadTextureTile(dlHead++,
-            icon->texture, G_IM_FMT_RGBA, G_IM_SIZ_16b,
-            texW, texH, 0, 0,
-            (texW - 1), (texH - 1), 0,
-            (G_TX_NOMIRROR | G_TX_CLAMP),
-            (G_TX_NOMIRROR | G_TX_CLAMP),
-            G_TX_NOMASK, G_TX_NOMASK,
-            G_TX_NOLOD,  G_TX_NOLOD
-        );
-        gSPTextureRectangle(dlHead++,
-            (x << 2), (y << 2),
-            (((x + w) - 1) << 2),
-            (((y + h) - 1) << 2),
-            G_TX_RENDERTILE, 0, 0,
-            (4 << 10), (1 << 10)
-        );
+        texrect_rgba32(&dlHead, icon->texture, texW, texH, x, y, w, h);
 
  #ifdef CONTROLLERS_INPUT_DISPLAY
         const ButtonHighlight (*buttonHighlightList)[] = icon->buttonHighlightList;
         set_overlay_texture(port, buttonHighlightList);
-        gDPLoadTextureTile(dlHead++,
-            sInputOverlayTextures[port], G_IM_FMT_RGBA, G_IM_SIZ_16b,
-            texW, texH, 0, 0,
-            (texW - 1), (texH - 1), 0,
-            (G_TX_NOMIRROR | G_TX_CLAMP),
-            (G_TX_NOMIRROR | G_TX_CLAMP),
-            G_TX_NOMASK, G_TX_NOMASK,
-            G_TX_NOLOD,  G_TX_NOLOD
-        );
-        gSPTextureRectangle(dlHead++,
-            (x << 2), (y << 2),
-            (((x + w) - 1) << 2),
-            (((y + h) - 1) << 2),
-            G_TX_RENDERTILE, 0, 0,
-            (4 << 10), (1 << 10)
-        );
+
+        texrect_rgba32(&dlHead, (Texture*)sInputOverlayTextures[port], texW, texH, x, y, w, h);
  #endif // CONTROLLERS_INPUT_DISPLAY
     }
 
-    gSPDisplayList(dlHead++, dl_controller_icons_end);
+    gSPDisplayList(dlHead++, dl_texrect_rgba32_end);
     gSPDisplayList(dlHead++, dl_fasttext_begin);
 
     drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);

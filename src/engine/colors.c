@@ -170,3 +170,46 @@ void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s) {
         case 5: color[0] = 0xFF; color[1] =   pv; color[2] =   qv; break;
     }
 }
+
+const Gfx dl_texrect_rgba32_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_COPY),
+    gsDPSetTexturePersp(G_TP_NONE),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
+    gsDPSetAlphaCompare(G_AC_THRESHOLD),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_texrect_rgba32_end[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetAlphaCompare(G_AC_NONE),
+    gsSPEndDisplayList(),
+};
+
+void texrect_rgba32(Gfx** dlIter, Texture* texture, s16 texW, s16 texH, s16 x, s16 y, s16 w, s16 h) {
+    gDPLoadTextureTile((*dlIter)++,
+        texture,
+        G_IM_FMT_RGBA, G_IM_SIZ_16b,
+        texW, texH,
+        0, 0,
+        (texW - 1), (texH - 1),
+        0,
+        (G_TX_NOMIRROR | G_TX_CLAMP),
+        (G_TX_NOMIRROR | G_TX_CLAMP),
+        G_TX_NOMASK, G_TX_NOMASK,
+        G_TX_NOLOD,  G_TX_NOLOD
+    );
+    gSPTextureRectangle((*dlIter)++,
+        (x << 2), (y << 2),
+        (((x + w) - 1) << 2),
+        (((y + h) - 1) << 2),
+        G_TX_RENDERTILE,
+        0, 0,
+        (4 << 10), (1 << 10)
+    );
+}
