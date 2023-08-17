@@ -39,10 +39,24 @@ void log_init(void) {
     sLogTotalRows    = LOG_BUFFER_SIZE;
 }
 
+// Draws the red background for the assert section.
+static void draw_assert_highlight(u32 line) {
+    //! Prints the assert message early, but with 0 alpha (skips framebuffer writes).
+    //   This is a hacky way to get the amount of lines the wrapped assert text will be.
+    //   This can't be done after the normal print because it would show up in front of the text.
+    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"MESSAGE:%s",
+        COLOR_RGBA32_NONE, __n64Assert_Message
+    );
+    crash_screen_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(4 + gCSNumLinesPrinted), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x7F));
+}
+
 u32 print_assert_section(u32 line) {
     u32 charX = 0;
 
-    // "MESSAGE:"
+    draw_assert_highlight(line);
+
+    // "ASSERT:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
     line++;
     crash_screen_draw_divider(DIVIDER_Y(line));
@@ -57,7 +71,7 @@ u32 print_assert_section(u32 line) {
         STR_COLOR_PREFIX"%s",
         COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
     );
-    // "LINE: [line number]"
+    // "LINE:[line number]"
     crash_screen_print(TEXT_X(lineStrStart), TEXT_Y(line),
         STR_COLOR_PREFIX"LINE:"STR_COLOR_PREFIX"%d",
         COLOR_RGBA32_CRASH_HEADER,
@@ -65,7 +79,7 @@ u32 print_assert_section(u32 line) {
     );
     line++;
 
-    // "COND: [condition]"
+    // "COND:[condition]"
     if (__n64Assert_Condition != NULL) {
         charX = 0;
         charX += crash_screen_print(TEXT_X(charX), TEXT_Y(line),
@@ -79,6 +93,7 @@ u32 print_assert_section(u32 line) {
         line++;
     }
 
+    // "MESSAGE:[message]"
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"MESSAGE:"STR_COLOR_PREFIX"%s",
         COLOR_RGBA32_CRASH_HEADER,
