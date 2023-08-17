@@ -71,6 +71,7 @@ extern Texture title_texture_rumble_pak_jp[];
 extern Texture title_texture_rumble_pak_es[];
   #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
  #endif // MULTILANG
+extern Texture title_texture_rumble_pak_controller[];
 #endif // ENABLE_RUMBLE
 extern Gfx dl_paintings_draw_ripples[];
 extern Gfx dl_paintings_rippling_begin[];

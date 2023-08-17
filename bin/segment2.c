@@ -3034,6 +3034,9 @@ ALIGNED8 const Texture title_texture_rumble_pak_es[] = {
 };
   #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
  #endif // MULTILANG
+ALIGNED8 const Texture title_texture_rumble_pak_controller[] = {
+#include "textures/segment2/rumble_pak_controller.rgba16.inc.c"
+};
 #endif // ENABLE_RUMBLE
 
 // 0x02014970 - 0x020149A8

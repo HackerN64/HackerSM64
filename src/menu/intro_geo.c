@@ -406,11 +406,6 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 #ifdef ENABLE_RUMBLE
 //! TODO: Move rumble pak graphic textures here once build order is fixed.
 
-#define RUMBLE_X 220
-#define RUMBLE_Y 200
-#define RUMBLE_W 80
-#define RUMBLE_H 24
-
 static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_COPY),
@@ -422,7 +417,6 @@ static const Gfx title_screen_bg_dl_rumble_pak_begin[] = {
 };
 
 static const Gfx title_screen_bg_dl_rumble_pak_end[] = {
-    gsSPTextureRectangle((RUMBLE_X << 2), (RUMBLE_Y << 2), ((RUMBLE_X + RUMBLE_W - 1) << 2), ((RUMBLE_Y + RUMBLE_H - 1) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10)),
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
     gsDPSetTexturePersp(G_TP_PERSP),
@@ -450,6 +444,29 @@ Texture* title_texture_rumble_pak_language_array[] = {
  #endif // MULTILANG
 };
 
+static void rumble_graphic_texrect(Gfx** dlIter, Texture* texture, s16 x, s16 y, s16 w, s16 h) {
+    gDPLoadTextureTile((*dlIter)++,
+        texture,
+        G_IM_FMT_RGBA, G_IM_SIZ_16b,
+        w, h,
+        0, 0,
+        (w - 1), (h - 1),
+        0,
+        (G_TX_NOMIRROR | G_TX_CLAMP),
+        (G_TX_NOMIRROR | G_TX_CLAMP),
+        G_TX_NOMASK, G_TX_NOMASK,
+        G_TX_NOLOD,  G_TX_NOLOD
+    );
+    gSPTextureRectangle((*dlIter)++,
+        (x << 2), (y << 2),
+        (((x + w) - 1) << 2),
+        (((y + h) - 1) << 2),
+        G_TX_RENDERTILE,
+        0, 0,
+        (4 << 10), (1 << 10)
+    );
+}
+
 Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSED void*context) {
     struct GraphNodeGenerated* genNode = (struct GraphNodeGenerated*)node;
     Gfx* dlIter;
@@ -470,6 +487,9 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
             dl = alloc_display_list(
                 sizeof((Gfx[]){gsSPDisplayList(0)}) +
                 sizeof((Gfx[]){gsDPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)}) +
+                sizeof((Gfx[]){gsSPTextureRectangle(0,0,0,0,0,0,0,0,0)}) +
+                sizeof((Gfx[]){gsDPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)}) +
+                sizeof((Gfx[]){gsSPTextureRectangle(0,0,0,0,0,0,0,0,0)}) +
                 sizeof((Gfx[]){gsSPDisplayList(0)}) +
                 sizeof((Gfx[]){gsSPEndDisplayList()})
             );
@@ -477,20 +497,8 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
             if (dl != NULL) {
                 dlIter = dl;
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_begin);
-                gDPLoadTextureTile(dlIter++,
-                    title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH],
-                    G_IM_FMT_RGBA, G_IM_SIZ_16b,
-                    RUMBLE_W,
-                    RUMBLE_H,
-                    0, 0,
-                    (RUMBLE_W - 1),
-                    (RUMBLE_H - 1),
-                    0,
-                    (G_TX_NOMIRROR | G_TX_CLAMP),
-                    (G_TX_NOMIRROR | G_TX_CLAMP),
-                    G_TX_NOMASK, G_TX_NOMASK,
-                    G_TX_NOLOD,  G_TX_NOLOD
-                );
+                rumble_graphic_texrect(&dlIter, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], RUMBLE_TEXT_X, RUMBLE_TEXT_Y, RUMBLE_TEXT_W, RUMBLE_TEXT_H);
+                rumble_graphic_texrect(&dlIter, title_texture_rumble_pak_controller,                       RUMBLE_CONT_X, RUMBLE_CONT_Y, RUMBLE_CONT_W, RUMBLE_CONT_H);
                 gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak_end);
                 gSPEndDisplayList(dlIter);
             }
@@ -498,6 +506,7 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
             dl = NULL;
         }
     }
+
     return dl;
 }
 #endif // ENABLE_RUMBLE
