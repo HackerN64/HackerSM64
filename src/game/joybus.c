@@ -448,7 +448,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
 
     // Check whether the controller is a GCN controller.
     if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
-        // GCN rumble is set in the input poll command by motorState in gRumbleInfos.
+        // GCN rumble is set in the input poll command, using motorState in gRumbleInfos.
 
         // Change the last command ID so that input poll command (which includes the rumble byte) gets written again next frame.
         __osContLastCmd = PIF_CMD_END;
