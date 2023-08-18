@@ -171,9 +171,9 @@ void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s) {
     }
 }
 
-// texrect_rgba32
+// texrect_rgba16
 
-const Gfx dl_texrect_rgba32_begin[] = {
+const Gfx dl_texrect_rgba16_begin[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_COPY),
     gsDPSetTexturePersp(G_TP_NONE),
@@ -183,7 +183,7 @@ const Gfx dl_texrect_rgba32_begin[] = {
     gsSPEndDisplayList(),
 };
 
-const Gfx dl_texrect_rgba32_end[] = {
+const Gfx dl_texrect_rgba16_end[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
     gsDPSetTexturePersp(G_TP_PERSP),
@@ -194,7 +194,7 @@ const Gfx dl_texrect_rgba32_end[] = {
 };
 
 // Must be used with the above display lists.
-void texrect_rgba32(Gfx** dlIter, Texture* texture, s16 texW, s16 texH, s16 x, s16 y, s16 w, s16 h) {
+void texrect_rgba16(Gfx** dlIter, Texture* texture, s16 texW, s16 texH, s16 x, s16 y, s16 w, s16 h) {
     gDPLoadTextureTile((*dlIter)++,
         texture,
         G_IM_FMT_RGBA, G_IM_SIZ_16b,

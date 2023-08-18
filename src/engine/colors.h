@@ -136,13 +136,13 @@ Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA 
 
 void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s);
 
-// texrect_rgba32
+// texrect_rgba16
 
-extern const Gfx dl_texrect_rgba32_begin[];
-extern const Gfx dl_texrect_rgba32_end[];
+extern const Gfx dl_texrect_rgba16_begin[];
+extern const Gfx dl_texrect_rgba16_end[];
 
 #define SIZEOF_GFX_TEXRECT_RGBA32 ( \
     sizeof((Gfx[]){gsDPLoadTextureTile(0,0,G_IM_SIZ_16b,0,0,0,0,0,0,0,0,0,0,0,0,0)}) + \
     sizeof((Gfx[]){gsSPTextureRectangle(0,0,0,0,0,0,0,0,0)}) \
 )
-void texrect_rgba32(Gfx** dlIter, Texture* texture, s16 texW, s16 texH, s16 x, s16 y, s16 w, s16 h);
+void texrect_rgba16(Gfx** dlIter, Texture* texture, s16 texW, s16 texH, s16 x, s16 y, s16 w, s16 h);

@@ -452,10 +452,10 @@ Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSE
 
             if (dl != NULL) {
                 dlIter = dl;
-                gSPDisplayList(dlIter++, &dl_texrect_rgba32_begin);
-                texrect_rgba32(&dlIter, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], RUMBLE_TEXT_W, RUMBLE_TEXT_H, RUMBLE_TEXT_X, RUMBLE_TEXT_Y, RUMBLE_TEXT_W, RUMBLE_TEXT_H);
-                texrect_rgba32(&dlIter, title_texture_rumble_pak_controller,                       RUMBLE_CONT_W, RUMBLE_CONT_H, RUMBLE_CONT_X, RUMBLE_CONT_Y, RUMBLE_CONT_W, RUMBLE_CONT_H);
-                gSPDisplayList(dlIter++, &dl_texrect_rgba32_end);
+                gSPDisplayList(dlIter++, &dl_texrect_rgba16_begin);
+                texrect_rgba16(&dlIter, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], RUMBLE_TEXT_W, RUMBLE_TEXT_H, RUMBLE_TEXT_X, RUMBLE_TEXT_Y, RUMBLE_TEXT_W, RUMBLE_TEXT_H);
+                texrect_rgba16(&dlIter, title_texture_rumble_pak_controller,                       RUMBLE_CONT_W, RUMBLE_CONT_H, RUMBLE_CONT_X, RUMBLE_CONT_Y, RUMBLE_CONT_W, RUMBLE_CONT_H);
+                gSPDisplayList(dlIter++, &dl_texrect_rgba16_end);
                 gSPEndDisplayList(dlIter);
             }
         } else {

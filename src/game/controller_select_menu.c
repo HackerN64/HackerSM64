@@ -381,23 +381,23 @@ void render_controllers_overlay(void) {
     // Allow drawing outside the screen borders.
     gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    gSPDisplayList(dlHead++, dl_texrect_rgba32_begin);
+    gSPDisplayList(dlHead++, dl_texrect_rgba16_begin);
 
     // Draw the port icons:
     for (port = 0; port < MAXCONTROLLERS; port++) {
         const struct ControllerIcon* icon = get_controller_icon(port);
         x = (iconStartX + (spacedW * port));
 
-        texrect_rgba32(&dlHead, icon->texture, texW, texH, x, y, w, h);
+        texrect_rgba16(&dlHead, icon->texture, texW, texH, x, y, w, h);
 
  #ifdef CONTROLLERS_INPUT_DISPLAY
         set_overlay_texture(port, icon);
 
-        texrect_rgba32(&dlHead, (Texture*)sInputOverlayTextures[port], texW, texH, x, y, w, h);
+        texrect_rgba16(&dlHead, (Texture*)sInputOverlayTextures[port], texW, texH, x, y, w, h);
  #endif // CONTROLLERS_INPUT_DISPLAY
     }
 
-    gSPDisplayList(dlHead++, dl_texrect_rgba32_end);
+    gSPDisplayList(dlHead++, dl_texrect_rgba16_end);
     gSPDisplayList(dlHead++, dl_fasttext_begin);
 
     drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);
