@@ -13,6 +13,7 @@
 #include "fasttext.h"
 #include "segment2.h"
 
+
 #ifdef ENABLE_STATUS_REPOLLING_GUI
  #if (MAX_NUM_PLAYERS > 1)
 // Button names, in print order.
@@ -38,7 +39,7 @@ ALIGNED8 static const struct ButtonName sButtonNames[16] = {
 /**
  * @brief Creates a string from a combination of buttons and adds it to 'strp'.
  */
-static size_t button_combo_to_string(char* strp, u16 buttons) {
+static void button_combo_to_string(char* strp, u16 buttons) {
     size_t count = 0;
 
     for (int i = 0; i < ARRAY_COUNT(sButtonNames); i++) {
@@ -48,16 +49,14 @@ static size_t button_combo_to_string(char* strp, u16 buttons) {
             buttons &= ~buttonName->mask;
 
             if (count) {
-                strcat(strp, "+");
-                count += strlen("+");
+                strp += sprintf(strp, "+");
             }
 
-            strcat(strp, buttonName->name);
-            count += strlen(buttonName->name);
+            strp += sprintf(strp, buttonName->name);
+
+            count++;
         }
     }
-
-    return count;
 }
  #endif // (MAX_NUM_PLAYERS > 1)
 
@@ -288,17 +287,6 @@ static void overlay_texture_analog(int port, const ButtonHighlight* analogHighli
     }
 }
 
-/**
- * @brief Applies highlights for buttons and analog inputs.
- *
- * @param port The port to use input from and the port index to use when writing to sInputOverlayTextures.
- * @param icon The controller icon data.
- */
-static void set_overlay_texture(int port, const struct ControllerIcon* icon) {
-    overlay_texture_buttons(port, *(icon->buttonHighlightList));
-    overlay_texture_analog( port, *(icon->analogHighlightList));
-}
-
  #define CONT_BUTTON_LIST(type) .buttonHighlightList = &buttons_display_controller_##type
  #define CONT_ANALOG_LIST(type) .analogHighlightList = &analog_display_controller_##type
 #else // !CONTROLLERS_INPUT_DISPLAY
@@ -320,7 +308,7 @@ ALIGNED8 static const struct ControllerIcon sControllerIcons[] = {
     { .type = CONT_TYPE_GCN_WAVEBIRD, CONT_TEXTURE(gcn_wavebird), CONT_BUTTON_LIST(gcn_normal  ), CONT_ANALOG_LIST(gcn_normal  ), },
     { .type = CONT_TYPE_GCN_WHEEL,    CONT_TEXTURE(gcn_wheel   ), CONT_BUTTON_LIST(gcn_wheel   ), CONT_ANALOG_LIST(gcn_wheel   ), },
     { .type = CONT_TYPE_GCN_KEYBOARD, CONT_TEXTURE(gcn_keyboard), CONT_BUTTON_LIST(gcn_keyboard), CONT_ANALOG_LIST(gcn_keyboard), },
-    { .type = CONT_TYPE_GCN_DANCEPAD, CONT_TEXTURE(gcn_dancepad), CONT_BUTTON_LIST(gcn_dancepad), CONT_ANALOG_LIST(null        ), },
+    { .type = CONT_TYPE_GCN_DANCEPAD, CONT_TEXTURE(gcn_dancepad), CONT_BUTTON_LIST(gcn_dancepad), CONT_ANALOG_LIST(gcn_dancepad), },
     { .type = (u16)-1,                CONT_TEXTURE(unknown     ), CONT_BUTTON_LIST(null        ), CONT_ANALOG_LIST(null        ), },
 };
 
@@ -391,7 +379,8 @@ void render_controllers_overlay(void) {
         texrect_rgba16(&dlHead, icon->texture, texW, texH, x, y, w, h);
 
  #ifdef CONTROLLERS_INPUT_DISPLAY
-        set_overlay_texture(port, icon);
+        overlay_texture_buttons(port, *(icon->buttonHighlightList));
+        overlay_texture_analog( port, *(icon->analogHighlightList));
 
         texrect_rgba16(&dlHead, (Texture*)sInputOverlayTextures[port], texW, texH, x, y, w, h);
  #endif // CONTROLLERS_INPUT_DISPLAY
