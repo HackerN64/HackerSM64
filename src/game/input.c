@@ -52,7 +52,7 @@ struct Controller gDemoControllers[1] = {
         .statusData     = &gDemoStatusData,
         .controllerData = &gDemoControllerData,
         .port           = 0,
-    }
+    },
 };
 struct Controller* const gDemoController = &gDemoControllers[0];
 #endif
@@ -342,7 +342,7 @@ void stop_controller_status_polling(OSContPadEx* pad) {
     gEepromProbe = gIsVC
                  ? osEepromProbeVC(&gSIEventMesgQueue)
                  : osEepromProbe  (&gSIEventMesgQueue);
-#endif
+#endif // EEP
     cancel_rumble();
 #ifdef UNF
     osSyncPrintf("Status polling stopped.\n");
