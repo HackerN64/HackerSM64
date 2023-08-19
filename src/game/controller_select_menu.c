@@ -344,9 +344,10 @@ void render_controllers_overlay(void) {
     const s16 h = CONT_ICON_H;
     s16 x = SCREEN_CENTER_X;
     const s16 y = (SCREEN_CENTER_Y - (h / 2));
-    const s16 spacing = 2;
-    const s16 spacedW = (w + spacing);
-    const s16 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - spacing) / 2));
+    const s16 iconSpacing = 2;
+    const s16 spacedW = (w + iconSpacing);
+    const s16 iconStartX = (SCREEN_CENTER_X - (((spacedW * MAXCONTROLLERS) - iconSpacing) / 2));
+    const s16 textYSpacing = 12;
     char text_buffer[32] = "";
     int port;
 
@@ -389,7 +390,13 @@ void render_controllers_overlay(void) {
     gSPDisplayList(dlHead++, dl_texrect_rgba16_end);
     gSPDisplayList(dlHead++, dl_fasttext_begin);
 
-    drawSmallStringCol(&dlHead, (SCREEN_CENTER_X - 79), (SCREEN_CENTER_Y - 40), "WAITING FOR CONTROLLERS...", col, col, col);
+    sprintf(text_buffer, "WAITING FOR CONTROLLERS...");
+    drawSmallStringCol(&dlHead,
+        (fasttext_get_str_width(text_buffer) / 2),
+        (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + (textYSpacing * 2))),
+        text_buffer,
+        col, col, col
+    );
 
     // Instructions (centered text):
     if (gControllerBits) {
@@ -397,7 +404,7 @@ void render_controllers_overlay(void) {
             sprintf(text_buffer, "PRESS BUTTON TO ASSIGN P%d", (gNumPlayers + 1));
             drawSmallStringCol(&dlHead,
                 (SCREEN_CENTER_X - (fasttext_get_str_width(text_buffer) / 2)),
-                (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + 12)),
+                (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + (textYSpacing * 1))),
                 text_buffer,
                 col, col, col
             );
@@ -407,7 +414,7 @@ void render_controllers_overlay(void) {
             sprintf(text_buffer, "OR %s TO EXIT", comboStr);
             drawSmallStringCol(&dlHead,
                 (SCREEN_CENTER_X - (fasttext_get_str_width(text_buffer) / 2)),
-                (SCREEN_CENTER_Y + ((CONT_ICON_H / 2) + 12)),
+                (SCREEN_CENTER_Y + ((CONT_ICON_H / 2) + (textYSpacing * 1))),
                 text_buffer,
                 col, col, col
             );
@@ -416,7 +423,7 @@ void render_controllers_overlay(void) {
             sprintf(text_buffer, "RELEASE ALL INPUTS TO CONTINUE");
             drawSmallStringCol(&dlHead,
                 (SCREEN_CENTER_X - (fasttext_get_str_width(text_buffer) / 2)),
-                (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + 12)),
+                (SCREEN_CENTER_Y - ((CONT_ICON_H / 2) + (textYSpacing * 1))),
                 text_buffer,
                 col, col, col
             );
@@ -430,7 +437,8 @@ void render_controllers_overlay(void) {
         // Print if a controller is plugged in and assigned to a player.
         if ((gControllerStatuses[port].type != CONT_NONE) && (playerNum != 0)) {
             sprintf(text_buffer, "P%d", playerNum);
-            s32 playerNumX = ((iconStartX + 9) + (spacedW * port));
+            s32 playerNumOffset = ((CONT_ICON_H - fasttext_get_str_width(text_buffer)) / 2);
+            s32 playerNumX = ((iconStartX + playerNumOffset) + (spacedW * port));
             drawSmallString(&dlHead, playerNumX, (SCREEN_CENTER_Y + (CONT_ICON_H / 2)), text_buffer);
         }
     }
