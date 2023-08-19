@@ -181,8 +181,9 @@ void assign_controller_data_to_port(struct Controller* controller, int port) {
     controller->statusData = &gControllerStatuses[port];
     controller->controllerData = &gControllerPads[port];
     controller->port = port;
-
+#ifdef UNF
     osSyncPrintf("Player %d assigned to port %d.\n", controller->controllerData->playerNum, (port + 1));
+#endif // UNF
 }
 
 /**
@@ -315,8 +316,9 @@ void start_controller_status_polling(_Bool isBootMode) {
     gContStatusPollingIsBootMode = isBootMode;
     gContStatusPolling = TRUE;
     gContStatusPollTimer = 0;
-
+#ifdef UNF
     osSyncPrintf("Status polling started%s.\n", (isBootMode ? " (boot mode)" : ""));
+#endif // UNF
 }
 
 /**
@@ -342,8 +344,9 @@ void stop_controller_status_polling(OSContPadEx* pad) {
                  : osEepromProbe  (&gSIEventMesgQueue);
 #endif
     cancel_rumble();
-
+#ifdef UNF
     osSyncPrintf("Status polling stopped.\n");
+#endif // UNF
 }
 
 /**

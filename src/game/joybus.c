@@ -163,7 +163,9 @@ static void __osPackReadEx(u8 cmd) {
                     break;
 
                 default:
+#ifdef UNF
                     osSyncPrintf("__osPackReadEx error: Unimplemented input poll command: %.02X (port %d)\n", cmd, port);
+#endif // UNF
                     *ptr = PIF_CMD_END;
                     return;
             }
@@ -394,7 +396,9 @@ void osContGetReadDataEx(OSContPadEx* pad) {
                 break;
 
             default:
+#ifdef UNF
                 osSyncPrintf("osContGetReadDataEx error: Unimplemented input poll command: %.02X\n", readformatptr->send.cmd);
+#endif // UNF
                 return;
         }
 
