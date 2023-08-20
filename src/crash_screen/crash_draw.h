@@ -3,6 +3,7 @@
 #include <ultra64.h>
 
 #include "types.h"
+
 #include "engine/colors.h"
 
 

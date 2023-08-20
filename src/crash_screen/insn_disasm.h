@@ -371,44 +371,44 @@ enum InsnType {
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
 typedef union {
     struct PACKED {
-        /*0x00*/ Word opcode :  6;
-        /*0x00*/ Word rs     :  5; // aka base
-        /*0x00*/ Word rt     :  5; // aka regimm
-        /*0x00*/ Word rd     :  5;
-        /*0x00*/ Word sa     :  5;
-        /*0x00*/ Word func   :  6;
+        /*0x00*/ Word opcode        :  6;
+        /*0x00*/ Word rs            :  5; // aka base
+        /*0x00*/ Word rt            :  5; // aka regimm
+        /*0x00*/ Word rd            :  5;
+        /*0x00*/ Word sa            :  5;
+        /*0x00*/ Word func          :  6;
     };
     struct PACKED {
-        /*0x00*/ Word        :  6;
-        /*0x00*/ Word base   :  5;
-        /*0x00*/ Word        :  5;
-        /*0x00*/ Word offset : 16; // aka immediate
+        /*0x00*/ Word               :  6;
+        /*0x00*/ Word base          :  5;
+        /*0x00*/ Word               :  5;
+        /*0x00*/ Word offset        : 16; // aka immediate
     };
     struct PACKED {
-        /*0x00*/ Word           : 11;
-        /*0x00*/ Word regimm    :  5; // aka rt
-        /*0x00*/ Word immediate : 16; // aka offset
+        /*0x00*/ Word               : 11;
+        /*0x00*/ Word regimm        :  5; // aka rt
+        /*0x00*/ Word immediate     : 16; // aka offset
     };
     struct PACKED {
-        /*0x00*/ Word    : 11;
-        /*0x00*/ Word ft :  5; // aka: branch condition
-        /*0x00*/ Word fs :  5;
-        /*0x00*/ Word fd :  5;
-        /*0x00*/ Word    :  6;
+        /*0x00*/ Word               : 11;
+        /*0x00*/ Word ft            :  5; // aka: branch condition
+        /*0x00*/ Word fs            :  5;
+        /*0x00*/ Word fd            :  5;
+        /*0x00*/ Word               :  6;
     };
     struct PACKED {
-        /*0x00*/ Word cop_opcode  :  4;
-        /*0x00*/ Word cop_num     :  2;
-        /*0x00*/ Word cop_subtype :  2;
-        /*0x00*/ Word fmt         :  3;
-        /*0x00*/ Word cop_bcond   :  5; // 0b00010 = likely, 0b00001 = true
-        /*0x00*/ Word             : 10;
-        /*0x00*/ Word FC          :  2;
-        /*0x00*/ Word cond        :  4;
+        /*0x00*/ Word cop_opcode    :  4;
+        /*0x00*/ Word cop_num       :  2;
+        /*0x00*/ Word cop_subtype   :  2;
+        /*0x00*/ Word fmt           :  3;
+        /*0x00*/ Word cop_bcond     :  5; // 0b00010 = likely, 0b00001 = true
+        /*0x00*/ Word               : 10;
+        /*0x00*/ Word FC            :  2;
+        /*0x00*/ Word cond          :  4;
     };
     struct PACKED {
-        /*0x00*/ Word             :  6;
-        /*0x00*/ Word instr_index : 26;
+        /*0x00*/ Word               :  6;
+        /*0x00*/ Word instr_index   : 26;
     };
     Word raw;
 } InsnData; /*0x04*/
@@ -416,8 +416,8 @@ typedef union {
 // Instruction database format
 typedef struct PACKED {
     /*0x00*/ char name[8];
-    /*0x04*/ char fmt[4];
-    /*0x08*/ u8 pad[3];
+    /*0x08*/ char fmt[5];
+    /*0x0D*/ u8 pad[2];
     /*0x0F*/ u8 opcode;
 } InsnTemplate; /*0x10*/
 

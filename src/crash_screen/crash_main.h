@@ -2,6 +2,8 @@
 
 #include <ultra64.h>
 
+#include "types.h"
+
 #include "game/main.h"
 
 

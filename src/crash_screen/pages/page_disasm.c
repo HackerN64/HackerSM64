@@ -283,7 +283,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
                 s16 branchOffset = check_for_branch_offset(insn);
 
                 if (branchOffset != 0x0000) {
-                    draw_branch_arrow(y, (y + branchOffset + 1), DISASM_BRANCH_ARROW_HEAD_OFFSET, sBranchColors[0], line);
+                    draw_branch_arrow(y, (y + branchOffset + 1), (DISASM_BRNACH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET), sBranchColors[0], line);
                 }
             }
         } else { // Outside of code segments:

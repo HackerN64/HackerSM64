@@ -2,8 +2,8 @@
 
 #include <ultra64.h>
 
-#include <stdarg.h>
 #include "types.h"
+
 #include "map_parser.h"
 
 
@@ -60,13 +60,16 @@
 
 #define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 
-typedef struct PACKED {
-    /*0x00*/ RGBA16 red    : 5;
-    /*0x00*/ RGBA16 green  : 5;
-    /*0x01*/ RGBA16 blue   : 5;
-    /*0x01*/ u16 isEscaped : 1; // Repurpose the alpha bit of RGBA32 color as a boolean.
-    /*0x02*/ Alpha alpha;
-    /*0x03*/ char glyph;
+typedef union {
+    struct PACKED {
+        /*0x00*/ RGBA16 red    : 5;
+        /*0x00*/ RGBA16 green  : 5;
+        /*0x01*/ RGBA16 blue   : 5;
+        /*0x01*/ u16 isEscaped : 1; // Repurpose the alpha bit of RGBA32 color as a boolean.
+        /*0x02*/ Alpha alpha;
+        /*0x03*/ char glyph;
+    }; /*0x04*/
+    u32 raw;
 } PrintBuffer; /*0x04*/
 
 // Input:
