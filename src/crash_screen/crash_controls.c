@@ -23,7 +23,7 @@ CrashScreenDirections gCSDirectionFlags;
 static OSTime sCSInputTimeY = 0;
 static OSTime sCSInputTimeX = 0;
 
-struct CSController gCSCompositeControllers[1]; 
+struct CSController gCSCompositeControllers[1];
 struct CSController* const gCSCompositeController = &gCSCompositeControllers[0];
 
 
@@ -83,13 +83,13 @@ void update_crash_screen_direction_input(void) {
                 gCSDirectionFlags.held.up ||
                 gCSDirectionFlags.held.down
             )
-        ) { // prev Y
-            // On press
+        ) { // Prev Y:
+            // On press:
             sCSInputTimeY = currTime;
             gCSDirectionFlags.pressed.up   = up;
             gCSDirectionFlags.pressed.down = down;
         } else {
-            // held
+            // Held:
             OSTime diff = (currTime - sCSInputTimeY);
             if (diff > FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val)) {
                 gCSDirectionFlags.pressed.up   = up;
@@ -104,13 +104,13 @@ void update_crash_screen_direction_input(void) {
                 gCSDirectionFlags.held.left ||
                 gCSDirectionFlags.held.right
             )
-        ) { // prev X
-            // On press
+        ) { // Prev X:
+            // On press:
             sCSInputTimeX = currTime;
             gCSDirectionFlags.pressed.left  = left;
             gCSDirectionFlags.pressed.right = right;
         } else {
-            // held
+            // Held:
             OSTime diff = (currTime - sCSInputTimeX);
             if (diff > FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val)) {
                 gCSDirectionFlags.pressed.left  = left;
@@ -176,8 +176,10 @@ void crash_screen_update_input(void) {
     bzero(&gCSCompositeControllers, sizeof(gCSCompositeControllers));
 
     for (int port = 0; port < ARRAY_COUNT(gControllers); port++) { //! TODO: < MAXCONTROLLERS when input PR is merged.
-        s16 rawStickX = gControllers[port].rawStickX;
-        s16 rawStickY = gControllers[port].rawStickY;
+        struct Controller* controller = &gControllers[port];
+
+        s16 rawStickX = controller->rawStickX;
+        s16 rawStickY = controller->rawStickY;
 
         if (abss(gCSCompositeController->rawStickX) < abss(rawStickX)) {
             gCSCompositeController->rawStickX = rawStickX;
@@ -185,9 +187,9 @@ void crash_screen_update_input(void) {
         if (abss(gCSCompositeController->rawStickY) < abss(rawStickY)) {
             gCSCompositeController->rawStickY = rawStickY;
         }
-        gCSCompositeController->buttonDown     |= gControllers[port].buttonDown;
-        gCSCompositeController->buttonPressed  |= gControllers[port].buttonPressed;
-        gCSCompositeController->buttonReleased |= gControllers[port].buttonReleased;
+        gCSCompositeController->buttonDown     |= controller->buttonDown;
+        gCSCompositeController->buttonPressed  |= controller->buttonPressed;
+        gCSCompositeController->buttonReleased |= controller->buttonReleased;
     }
 
     if (gCSCompositeController->buttonPressed & START_BUTTON) {
@@ -208,7 +210,8 @@ void crash_screen_update_input(void) {
     struct CSPage* page = &gCSPages[gCSPageID];
 
     if (update_crash_screen_page()) {
-        page = &gCSPages[gCSPageID];
+        page = &gCSPages[gCSPageID]; // gCSPageID may have changed.
+
         if (page->initFunc != NULL && !page->flags.initialized) {
             page->initFunc();
             page->flags.initialized = TRUE;
