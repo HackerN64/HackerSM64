@@ -153,23 +153,13 @@ _Bool update_crash_screen_page(void) {
 
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
-    if (buttonPressed & L_TRIG) {
-        gCSPageID--; // Previous Page.
-    }
-    if (buttonPressed & R_TRIG) {
-        gCSPageID++; // Next page.
-    }
+    s8 change = 0;
+    if (buttonPressed & L_TRIG) change = -1; // Previous Page.
+    if (buttonPressed & R_TRIG) change = +1; // Next page.
+    gCSPageID = WRAP(((s32)gCSPageID + change), FIRST_PAGE, (NUM_PAGES - 1));
 
     if (gCSPageID == prevPage) {
         return FALSE;
-    }
-
-    // Wrap pages.
-    if (gCSPageID > MAX_PAGES) {
-        gCSPageID = (NUM_PAGES - 1);
-    }
-    if (gCSPageID >= NUM_PAGES) {
-        gCSPageID = FIRST_PAGE;
     }
 
     // Reset certain values when the page is changed.
