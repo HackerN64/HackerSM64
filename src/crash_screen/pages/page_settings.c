@@ -118,15 +118,6 @@ void print_settings_list(u32 line, u32 numLines) {
             // Translucent divider.
             crash_screen_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
         } else { // Setting entry.
-            // Print an asterisk if the setting has been changed from the default value.
-            if (setting->val != setting->defaultVal) {
-                // "*"
-                crash_screen_print(TEXT_X(0), y,
-                    (STR_COLOR_PREFIX"*"),
-                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
-                );
-            }
-
             // Maximum description print size.
             u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
 
@@ -166,10 +157,19 @@ void print_settings_list(u32 line, u32 numLines) {
             charX += VALUE_NAME_SIZE;
 
             // ">"
-            crash_screen_print(TEXT_X(charX), y,
+            charX += crash_screen_print(TEXT_X(charX), y,
                 (STR_COLOR_PREFIX">"),
                 COLOR_RGBA32_CRASH_SELECT_ARROW
             );
+
+            // Print an asterisk if the setting has been changed from the default value.
+            if (setting->val != setting->defaultVal) {
+                // "*"
+                crash_screen_print(TEXT_X(charX), y,
+                    (STR_COLOR_PREFIX"*"),
+                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
+                );
+            }
         }
 
         currViewIndex++;
