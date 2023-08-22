@@ -15,6 +15,7 @@
 #include "game/printf.h"
 
 
+static char sCSCharBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
 PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 
@@ -280,21 +281,20 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
 }
 
 size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
-    char buf[CHAR_BUFFER_SIZE] = "";
-    bzero(&buf, sizeof(buf));
+    bzero(&sCSCharBuffer, sizeof(sCSCharBuffer));
     gCSNumLinesPrinted = 0;
 
     va_list args;
     va_start(args, fmt);
 
-    size_t totalSize = _Printf(write_to_buf, buf, fmt, args);
+    size_t totalSize = _Printf(write_to_buf, sCSCharBuffer, fmt, args);
     ASSERTF((totalSize < (CHAR_BUFFER_SIZE - 1)), STR_COLOR_PREFIX"CRASH SCREEN PRINT BUFFER EXCEEDED", COLOR_RGBA32_RED);
     size_t numChars = 0;
 
     if (totalSize > 0) {
         bzero(&gCSPrintBuffer, sizeof(gCSPrintBuffer));
 
-        size_t bufferCount = format_print_buffer(buf, totalSize);
+        size_t bufferCount = format_print_buffer(sCSCharBuffer, totalSize);
 
         if (0 < charLimit && charLimit < bufferCount) {
             if (gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val > 0) {
