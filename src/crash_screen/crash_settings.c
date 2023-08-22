@@ -70,6 +70,10 @@ struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions
     // LOG:
     [CS_OPT_HEADER_PAGE_LOG     ] = { .name = "LOG",                        .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_LOG_INDEX_NUMBERS   ] = { .name = "Show index numbers",         .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    // STACK TRACE:
+    [CS_OPT_HEADER_PAGE_STACK   ] = { .name = "STACK TRACE",                .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_STACK_SHOW_ADDRESS  ] = { .name = "Show addresses",             .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_STACK_SHOW_OFFSET   ] = { .name = "Show offsets",               .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     // RAM VIEW:
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .name = "RAM VIEW",                   .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP

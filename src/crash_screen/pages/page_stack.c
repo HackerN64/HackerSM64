@@ -116,38 +116,44 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(y);
         }
 
-        const size_t addrStrSize = STRLEN("00000000:");
-        // "[stack address]:"
-        crash_screen_print(TEXT_X(0), y,
-            STR_COLOR_PREFIX STR_HEX_WORD":",
-            ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE), function->stackAddr
-        );
+        size_t charX = 0;
+
+        if (gCSSettings[CS_OPT_STACK_SHOW_ADDRESS].val) {
+            // "[stack address]:"
+            charX += crash_screen_print(TEXT_X(charX), y,
+                STR_COLOR_PREFIX STR_HEX_WORD":",
+                ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE), function->stackAddr
+            );
+        }
 
 #ifdef INCLUDE_DEBUG_MAP
         if (function->fname == NULL) {
             // Print unknown function.
             // "[function address]"
-            crash_screen_print(TEXT_X(addrStrSize), y,
+            crash_screen_print(TEXT_X(charX), y,
                 (STR_COLOR_PREFIX STR_HEX_WORD),
                 COLOR_RGBA32_CRASH_UNKNOWN, function->curAddr
             );
         } else {
             // Print known function.
             if (gCSSettings[CS_OPT_SYMBOL_NAMES].val) {
+                size_t offsetStrSize = 0;
+                if (gCSSettings[CS_OPT_STACK_SHOW_OFFSET].val) {
+                    offsetStrSize = STRLEN("+0000");
+                    // "+[offset]"
+                    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,
+                        (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
+                        COLOR_RGBA32_CRASH_OFFSET, (function->curAddr - function->faddr)
+                    );
+                }
                 // "[function name]"
-                const size_t offsetStrSize = STRLEN("+0000");
-                crash_screen_print_symbol_name_impl(TEXT_X(addrStrSize), y,
-                    (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + offsetStrSize)),
+                crash_screen_print_symbol_name_impl(TEXT_X(charX), y,
+                    (CRASH_SCREEN_NUM_CHARS_X - (charX + offsetStrSize)),
                     COLOR_RGBA32_CRASH_FUNCTION_NAME, function->fname
-                );
-                // "+[offset]"
-                crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,
-                    (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
-                    COLOR_RGBA32_CRASH_OFFSET, (function->curAddr - function->faddr)
                 );
             } else {
                 // "[function address]"
-                crash_screen_print(TEXT_X(addrStrSize), y,
+                crash_screen_print(TEXT_X(charX), y,
                     (STR_COLOR_PREFIX STR_HEX_WORD),
                     COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
                 );
@@ -155,7 +161,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
         }
 #else
         // "[function address]"
-        crash_screen_print(TEXT_X(addrStrSize), y,
+        crash_screen_print(TEXT_X(charX), y,
             (STR_COLOR_PREFIX STR_HEX_WORD),
             COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
         );
@@ -174,8 +180,10 @@ void stack_trace_draw(void) {
     u32 line = 1;
 
 #ifdef INCLUDE_DEBUG_MAP
-    // "OFFSET:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
+    if (gCSSettings[CS_OPT_STACK_SHOW_OFFSET].val) {
+        // "OFFSET:"
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
+    }
 #endif
 
     line++;
