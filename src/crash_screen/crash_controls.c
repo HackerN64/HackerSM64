@@ -210,7 +210,7 @@ void crash_screen_update_input(void) {
     struct CSPage* page = &gCSPages[gCSPageID];
 
     if (update_crash_screen_page()) {
-        page = &gCSPages[gCSPageID]; // gCSPageID may have changed.
+        page = &gCSPages[gCSPageID]; // gCSPageID may have changed in update_crash_screen_page.
 
         if (page->initFunc != NULL && !page->flags.initialized) {
             page->initFunc();

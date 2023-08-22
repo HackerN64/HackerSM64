@@ -43,154 +43,154 @@
 ALIGNED32 static const InsnTemplate insn_db[] = {
     // OPC_SPECIAL (insn_db_spec)
     // OPC_REGIMM (insn_db_regi)
-    { .name = "J"     , .fmt = "\'J"  , .opcode = OPC_J      }, // Jump.
-    { .name = "JAL"   , .fmt = "\'J"  , .opcode = OPC_JAL    }, // Jump and Link.
-    { .name = "BEQ"   , .fmt = "\'stB", .opcode = OPC_BEQ    }, // Branch on Equal.
-    { .name = "BNE"   , .fmt = "\'stB", .opcode = OPC_BNE    }, // Branch on Not Equal.
-    { .name = "BLEZ"  , .fmt = "\'sB" , .opcode = OPC_BLEZ   }, // Branch on Less Than or Equal to Zero.
-    { .name = "BGTZ"  , .fmt = "\'sB" , .opcode = OPC_BGTZ   }, // Branch on Greater Than Zero.
-    { .name = "ADDI"  , .fmt = "\'tsI", .opcode = OPC_ADDI   }, // Add Immediate Word.
-    { .name = "ADDIU" , .fmt = "\'tsI", .opcode = OPC_ADDIU  }, // Add Immediate Unsigned Word.
-    { .name = "SLTI"  , .fmt = "\'tsI", .opcode = OPC_SLTI   }, // Set on Less Than Immediate.
-    { .name = "SLTIU" , .fmt = "\'tsI", .opcode = OPC_SLTIU  }, // Set on Less Than Immediate Unsigned.
-    { .name = "ANDI"  , .fmt = "\'tsI", .opcode = OPC_ANDI   }, // And Immediate.
-    { .name = "ORI"   , .fmt = "\'tsI", .opcode = OPC_ORI    }, // Or Immediate.
-    { .name = "XORI"  , .fmt = "\'tsI", .opcode = OPC_XORI   }, // Exclusive Or Immediate.
-    { .name = "LUI"   , .fmt = "\'tI" , .opcode = OPC_LUI    }, // Load Upper Immediate.
+    { .name = "J"      , .fmt = "\'J"  , .opcode = OPC_J           }, // Jump.
+    { .name = "JAL"    , .fmt = "\'J"  , .opcode = OPC_JAL         }, // Jump and Link.
+    { .name = "BEQ"    , .fmt = "\'stB", .opcode = OPC_BEQ         }, // Branch on Equal.
+    { .name = "BNE"    , .fmt = "\'stB", .opcode = OPC_BNE         }, // Branch on Not Equal.
+    { .name = "BLEZ"   , .fmt = "\'sB" , .opcode = OPC_BLEZ        }, // Branch on Less Than or Equal to Zero.
+    { .name = "BGTZ"   , .fmt = "\'sB" , .opcode = OPC_BGTZ        }, // Branch on Greater Than Zero.
+    { .name = "ADDI"   , .fmt = "\'tsI", .opcode = OPC_ADDI        }, // Add Immediate Word.
+    { .name = "ADDIU"  , .fmt = "\'tsI", .opcode = OPC_ADDIU       }, // Add Immediate Unsigned Word.
+    { .name = "SLTI"   , .fmt = "\'tsI", .opcode = OPC_SLTI        }, // Set on Less Than Immediate.
+    { .name = "SLTIU"  , .fmt = "\'tsI", .opcode = OPC_SLTIU       }, // Set on Less Than Immediate Unsigned.
+    { .name = "ANDI"   , .fmt = "\'tsI", .opcode = OPC_ANDI        }, // And Immediate.
+    { .name = "ORI"    , .fmt = "\'tsI", .opcode = OPC_ORI         }, // Or Immediate.
+    { .name = "XORI"   , .fmt = "\'tsI", .opcode = OPC_XORI        }, // Exclusive Or Immediate.
+    { .name = "LUI"    , .fmt = "\'tI" , .opcode = OPC_LUI         }, // Load Upper Immediate.
     // OPC_COP0 (insn_db_cop0)
     // OPC_COP1 (insn_db_cop1)
     // OPC_COP2 (insn_db_cop2)
     // OPC_COP3 (insn_db_cop3)
-    { .name = "BEQL"  , .fmt = "\'stB", .opcode = OPC_BEQL   }, // Branch on Equal Likely.
-    { .name = "BNEL"  , .fmt = "\'stB", .opcode = OPC_BNEL   }, // Branch on Not Equal Likely.
-    { .name = "BLEZL" , .fmt = "\'sB" , .opcode = OPC_BLEZL  }, // Branch on Less Than or Equal to Zero Likely.
-    { .name = "BGTZL" , .fmt = "\'sB" , .opcode = OPC_BGTZL  }, // Branch on Greater Than Zero Likely.
-    { .name = "DADDI" , .fmt = "\'tsI", .opcode = OPC_DADDI  }, // Doubleword Add Immediate.
-    { .name = "DADDIU", .fmt = "\'tsI", .opcode = OPC_DADDIU }, // Doubleword Add Immediate Unsigned.
-    { .name = "LDL"   , .fmt = "\'tI(", .opcode = OPC_LDL    }, // Load Doubleword Left.
-    { .name = "LDR"   , .fmt = "\'tI(", .opcode = OPC_LDR    }, // Load Doubleword Right.
-    { .name = "LB"    , .fmt = "\'tI(", .opcode = OPC_LB     }, // Load Byte.
-    { .name = "LH"    , .fmt = "\'tI(", .opcode = OPC_LH     }, // Load Halfword.
-    { .name = "LWL"   , .fmt = "\'tI(", .opcode = OPC_LWL    }, // Load Word Left.
-    { .name = "LW"    , .fmt = "\'tI(", .opcode = OPC_LW     }, // Load Word.
-    { .name = "LBU"   , .fmt = "\'tI(", .opcode = OPC_LBU    }, // Load Byte Unsigned.
-    { .name = "LHU"   , .fmt = "\'tI(", .opcode = OPC_LHU    }, // Load Halfword Unsigned.
-    { .name = "LWR"   , .fmt = "\'tI(", .opcode = OPC_LWR    }, // Load Word Right.
-    { .name = "LWU"   , .fmt = "\'tI(", .opcode = OPC_LWU    }, // Load Word Unsigned.
-    { .name = "SB"    , .fmt = "\'tI(", .opcode = OPC_SB     }, // Store Byte.
-    { .name = "SH"    , .fmt = "\'tI(", .opcode = OPC_SH     }, // Store Halfword.
-    { .name = "SWL"   , .fmt = "\'tI(", .opcode = OPC_SWL    }, // Store Word Left.
-    { .name = "SW"    , .fmt = "\'tI(", .opcode = OPC_SW     }, // Store Word.
-    { .name = "SDL"   , .fmt = "\'tI(", .opcode = OPC_SDL    }, // Store Doubleword Left.
-    { .name = "SDR"   , .fmt = "\'tI(", .opcode = OPC_SDR    }, // Store Doubleword Right.
-    { .name = "SWR"   , .fmt = "\'tI(", .opcode = OPC_SWR    }, // Store Word Right.
-    { .name = "CACHE" , .fmt = "\'tI(", .opcode = OPC_CACHE  }, // https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
-    { .name = "LL"    , .fmt = "\'tI(", .opcode = OPC_LL     }, // Load Linked Word.
-    { .name = "LWC1"  , .fmt = "\'TI(", .opcode = OPC_LWC1   }, // Load Word to Coprocessor-1 (Floating-Point Unit).
-    { .name = "LWC2"  , .fmt = "\'TI(", .opcode = OPC_LWC2   }, // Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .name = "LWC3"  , .fmt = "\'TI(", .opcode = OPC_LWC3   }, // Load Word to Coprocessor-3 (COP3).
-    { .name = "LLD"   , .fmt = "\'tI(", .opcode = OPC_LLD    }, // Load Linked Doubleword.
-    { .name = "LDC1"  , .fmt = "\'tI(", .opcode = OPC_LDC1   }, // Load Doubleword to Coprocessor-1 (Floating-Point Unit).
-    { .name = "LDC2"  , .fmt = "\'tI(", .opcode = OPC_LDC2   }, // Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .name = "LD"    , .fmt = "\'tI(", .opcode = OPC_LD     }, // Load Doubleword.
-    { .name = "SC"    , .fmt = "\'tI(", .opcode = OPC_SC     }, // Store Conditional Word.
-    { .name = "SWC1"  , .fmt = "\'TI(", .opcode = OPC_SWC1   }, // Store Word to Coprocessor-1 (Floating-Point Unit).
-    { .name = "SWC2"  , .fmt = "\'TI(", .opcode = OPC_SWC2   }, // Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .name = "SWC3"  , .fmt = "\'TI(", .opcode = OPC_SWC3   }, // Store Word to Coprocessor-3 (COP3).
-    { .name = "SCD"   , .fmt = "\'tI(", .opcode = OPC_SCD    }, // Store Conditional Doubleword.
-    { .name = "SDC1"  , .fmt = "\'tI(", .opcode = OPC_SDC1   }, // Store Doubleword to Coprocessor-1 (Floating-Point Unit).
-    { .name = "SDC2"  , .fmt = "\'tI(", .opcode = OPC_SDC2   }, // Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .name = "SD"    , .fmt = "\'tI(", .opcode = OPC_SD     }, // Store Doubleword.
+    { .name = "BEQL"   , .fmt = "\'stB", .opcode = OPC_BEQL        }, // Branch on Equal Likely.
+    { .name = "BNEL"   , .fmt = "\'stB", .opcode = OPC_BNEL        }, // Branch on Not Equal Likely.
+    { .name = "BLEZL"  , .fmt = "\'sB" , .opcode = OPC_BLEZL       }, // Branch on Less Than or Equal to Zero Likely.
+    { .name = "BGTZL"  , .fmt = "\'sB" , .opcode = OPC_BGTZL       }, // Branch on Greater Than Zero Likely.
+    { .name = "DADDI"  , .fmt = "\'tsI", .opcode = OPC_DADDI       }, // Doubleword Add Immediate.
+    { .name = "DADDIU" , .fmt = "\'tsI", .opcode = OPC_DADDIU      }, // Doubleword Add Immediate Unsigned.
+    { .name = "LDL"    , .fmt = "\'tI(", .opcode = OPC_LDL         }, // Load Doubleword Left.
+    { .name = "LDR"    , .fmt = "\'tI(", .opcode = OPC_LDR         }, // Load Doubleword Right.
+    { .name = "LB"     , .fmt = "\'tI(", .opcode = OPC_LB          }, // Load Byte.
+    { .name = "LH"     , .fmt = "\'tI(", .opcode = OPC_LH          }, // Load Halfword.
+    { .name = "LWL"    , .fmt = "\'tI(", .opcode = OPC_LWL         }, // Load Word Left.
+    { .name = "LW"     , .fmt = "\'tI(", .opcode = OPC_LW          }, // Load Word.
+    { .name = "LBU"    , .fmt = "\'tI(", .opcode = OPC_LBU         }, // Load Byte Unsigned.
+    { .name = "LHU"    , .fmt = "\'tI(", .opcode = OPC_LHU         }, // Load Halfword Unsigned.
+    { .name = "LWR"    , .fmt = "\'tI(", .opcode = OPC_LWR         }, // Load Word Right.
+    { .name = "LWU"    , .fmt = "\'tI(", .opcode = OPC_LWU         }, // Load Word Unsigned.
+    { .name = "SB"     , .fmt = "\'tI(", .opcode = OPC_SB          }, // Store Byte.
+    { .name = "SH"     , .fmt = "\'tI(", .opcode = OPC_SH          }, // Store Halfword.
+    { .name = "SWL"    , .fmt = "\'tI(", .opcode = OPC_SWL         }, // Store Word Left.
+    { .name = "SW"     , .fmt = "\'tI(", .opcode = OPC_SW          }, // Store Word.
+    { .name = "SDL"    , .fmt = "\'tI(", .opcode = OPC_SDL         }, // Store Doubleword Left.
+    { .name = "SDR"    , .fmt = "\'tI(", .opcode = OPC_SDR         }, // Store Doubleword Right.
+    { .name = "SWR"    , .fmt = "\'tI(", .opcode = OPC_SWR         }, // Store Word Right.
+    { .name = "CACHE"  , .fmt = "\'tI(", .opcode = OPC_CACHE       }, // https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
+    { .name = "LL"     , .fmt = "\'tI(", .opcode = OPC_LL          }, // Load Linked Word.
+    { .name = "LWC1"   , .fmt = "\'TI(", .opcode = OPC_LWC1        }, // Load Word to Coprocessor-1 (Floating-Point Unit).
+    { .name = "LWC2"   , .fmt = "\'TI(", .opcode = OPC_LWC2        }, // Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "LWC3"   , .fmt = "\'TI(", .opcode = OPC_LWC3        }, // Load Word to Coprocessor-3 (COP3).
+    { .name = "LLD"    , .fmt = "\'tI(", .opcode = OPC_LLD         }, // Load Linked Doubleword.
+    { .name = "LDC1"   , .fmt = "\'tI(", .opcode = OPC_LDC1        }, // Load Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .name = "LDC2"   , .fmt = "\'tI(", .opcode = OPC_LDC2        }, // Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "LD"     , .fmt = "\'tI(", .opcode = OPC_LD          }, // Load Doubleword.
+    { .name = "SC"     , .fmt = "\'tI(", .opcode = OPC_SC          }, // Store Conditional Word.
+    { .name = "SWC1"   , .fmt = "\'TI(", .opcode = OPC_SWC1        }, // Store Word to Coprocessor-1 (Floating-Point Unit).
+    { .name = "SWC2"   , .fmt = "\'TI(", .opcode = OPC_SWC2        }, // Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "SWC3"   , .fmt = "\'TI(", .opcode = OPC_SWC3        }, // Store Word to Coprocessor-3 (COP3).
+    { .name = "SCD"    , .fmt = "\'tI(", .opcode = OPC_SCD         }, // Store Conditional Doubleword.
+    { .name = "SDC1"   , .fmt = "\'tI(", .opcode = OPC_SDC1        }, // Store Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .name = "SDC2"   , .fmt = "\'tI(", .opcode = OPC_SDC2        }, // Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .name = "SD"     , .fmt = "\'tI(", .opcode = OPC_SD          }, // Store Doubleword.
     { .name = "." },
 };
 
 // Special opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL
-    { .name = "SLL"    , .fmt =  "\'dta", .opcode = OPS_SLL     }, // Shift Word Left Logical.
-    { .name = "SRL"    , .fmt =  "\'dta", .opcode = OPS_SRL     }, // Shift Word Right Logical.
-    { .name = "SRA"    , .fmt =  "\'dta", .opcode = OPS_SRA     }, // Shift Word Right Arithmetic.
-    { .name = "SLLV"   , .fmt =  "\'dts", .opcode = OPS_SLLV    }, // Shift Word Left Logical Variable.
-    { .name = "SRLV"   , .fmt =  "\'dts", .opcode = OPS_SRLV    }, // Shift Word Right Logical Variable.
-    { .name = "SRAV"   , .fmt =  "\'dts", .opcode = OPS_SRAV    }, // Shift Word Right Arithmetic Variable.
-    { .name = "JR"     , .fmt =  "\'s"  , .opcode = OPS_JR      }, // Jump Register.
-    { .name = "JALR"   , .fmt =  "\'ds" , .opcode = OPS_JALR    }, // Jump and Link Register.
-    { .name = "SYSCALL", .fmt =  "\'"   , .opcode = OPS_SYSCALL }, // System Call (assert).
-    { .name = "BREAK"  , .fmt =  "\'"   , .opcode = OPS_BREAK   }, // Breakpoint.
-    { .name = "SYNC"   , .fmt =  "\'"   , .opcode = OPS_SYNC    }, // Synchronize Shared Memory.
-    { .name = "MFHI"   , .fmt =  "\'d"  , .opcode = OPS_MFHI    }, // Move From HI.
-    { .name = "MTHI"   , .fmt =  "\'s"  , .opcode = OPS_MTHI    }, // Move To HI.
-    { .name = "MFLO"   , .fmt =  "\'d"  , .opcode = OPS_MFLO    }, // Move From LO.
-    { .name = "MTLO"   , .fmt =  "\'s"  , .opcode = OPS_MTLO    }, // Move To LO.
-    { .name = "DSLLV"  , .fmt =  "\'dts", .opcode = OPS_DSLLV   }, // Doubleword Shift Left Logical Variable.
-    { .name = "DSRLV"  , .fmt =  "\'dts", .opcode = OPS_DSRLV   }, // Doubleword Shift Right Logical Variable.
-    { .name = "DSRAV"  , .fmt =  "\'dts", .opcode = OPS_DSRAV   }, // Doubleword Shift Right Arithmetic Variable.
-    { .name = "MULT"   , .fmt =  "\'st" , .opcode = OPS_MULT    }, // Multiply Word (5cyc).
-    { .name = "MULTU"  , .fmt =  "\'st" , .opcode = OPS_MULTU   }, // Multiply Unsigned Word (5cyc).
-    { .name = "DIV"    , .fmt =  "\'st" , .opcode = OPS_DIV     }, // Divide Word (37cyc).
-    { .name = "DIVU"   , .fmt =  "\'st" , .opcode = OPS_DIVU    }, // Divide Unsigned Word (37cyc).
-    { .name = "DMULT"  , .fmt =  "\'st" , .opcode = OPS_DMULT   }, // Doubleword Multiply (8cyc).
-    { .name = "DMULTU" , .fmt =  "\'st" , .opcode = OPS_DMULTU  }, // Doubleword Multiply Unsigned (8cyc).
-    { .name = "DDIV"   , .fmt =  "\'st" , .opcode = OPS_DDIV    }, // Doubleword Divide (69cyc).
-    { .name = "DDIVU"  , .fmt =  "\'st" , .opcode = OPS_DDIVU   }, // Doubleword Divide Unsigned (69cyc).
-    { .name = "ADD"    , .fmt =  "\'dst", .opcode = OPS_ADD     }, // Add Word.
-    { .name = "ADDU"   , .fmt =  "\'dst", .opcode = OPS_ADDU    }, // Add Unsigned Word.
-    { .name = "SUB"    , .fmt =  "\'dst", .opcode = OPS_SUB     }, // Subtract Word.
-    { .name = "SUBU"   , .fmt =  "\'dst", .opcode = OPS_SUBU    }, // Subtract Unsigned Word.
-    { .name = "AND"    , .fmt =  "\'dst", .opcode = OPS_AND     }, // And.
-    { .name = "OR"     , .fmt =  "\'dst", .opcode = OPS_OR      }, // Or.
-    { .name = "XOR"    , .fmt =  "\'dst", .opcode = OPS_XOR     }, // Exclusive Or.
-    { .name = "NOR"    , .fmt =  "\'dst", .opcode = OPS_NOR     }, // Nor.
-    { .name = "SLT"    , .fmt =  "\'dst", .opcode = OPS_SLT     }, // Set on Less Than.
-    { .name = "SLTU"   , .fmt =  "\'dst", .opcode = OPS_SLTU    }, // Set on Less Than Unsigned.
-    { .name = "DADD"   , .fmt =  "\'dst", .opcode = OPS_DADD    }, // Doubleword Add.
-    { .name = "DADDU"  , .fmt =  "\'dst", .opcode = OPS_DADDU   }, // Doubleword Add Unsigned.
-    { .name = "DSUB"   , .fmt =  "\'dst", .opcode = OPS_DSUB    }, // Doubleword Subtract.
-    { .name = "DSUBU"  , .fmt =  "\'dst", .opcode = OPS_DSUBU   }, // Doubleword Subtract Unsigned.
-    { .name = "TGE"    , .fmt =  "\'st" , .opcode = OPS_TGE     }, // Trap if Greater Than or Equal.
-    { .name = "TGEU"   , .fmt =  "\'st" , .opcode = OPS_TGEU    }, // Trap if Greater Than or Equal Unsigned.
-    { .name = "TLT"    , .fmt =  "\'st" , .opcode = OPS_TLT     }, // Trap if Less Than.
-    { .name = "TLTU"   , .fmt =  "\'st" , .opcode = OPS_TLTU    }, // Trap if Less Than Unsigned.
-    { .name = "TEQ"    , .fmt =  "\'st" , .opcode = OPS_TEQ     }, // Trap if Equal.
-    { .name = "TNE"    , .fmt =  "\'st" , .opcode = OPS_TNE     }, // Trap if Not Equal.
-    { .name = "DSLL"   , .fmt =  "\'dta", .opcode = OPS_DSLL    }, // Doubleword Shift Left Logical.
-    { .name = "DSRL"   , .fmt =  "\'dta", .opcode = OPS_DSRL    }, // Doubleword Shift Right Logical.
-    { .name = "DSRA"   , .fmt =  "\'dta", .opcode = OPS_DSRA    }, // Doubleword Shift Right Arithmetic.
-    { .name = "DSLL32" , .fmt =  "\'dta", .opcode = OPS_DSLL32  }, // Doubleword Shift Left Logical + 32.
-    { .name = "DSRL32" , .fmt =  "\'dta", .opcode = OPS_DSRL32  }, // Doubleword Shift Right Logical + 32.
-    { .name = "DSRA32" , .fmt =  "\'dta", .opcode = OPS_DSRA32  }, // Doubleword Shift Right Arithmetic + 32.
+    { .name = "SLL"    , .fmt = "\'dta", .opcode = OPS_SLL         }, // Shift Word Left Logical.
+    { .name = "SRL"    , .fmt = "\'dta", .opcode = OPS_SRL         }, // Shift Word Right Logical.
+    { .name = "SRA"    , .fmt = "\'dta", .opcode = OPS_SRA         }, // Shift Word Right Arithmetic.
+    { .name = "SLLV"   , .fmt = "\'dts", .opcode = OPS_SLLV        }, // Shift Word Left Logical Variable.
+    { .name = "SRLV"   , .fmt = "\'dts", .opcode = OPS_SRLV        }, // Shift Word Right Logical Variable.
+    { .name = "SRAV"   , .fmt = "\'dts", .opcode = OPS_SRAV        }, // Shift Word Right Arithmetic Variable.
+    { .name = "JR"     , .fmt = "\'s"  , .opcode = OPS_JR          }, // Jump Register.
+    { .name = "JALR"   , .fmt = "\'ds" , .opcode = OPS_JALR        }, // Jump and Link Register.
+    { .name = "SYSCALL", .fmt = "\'"   , .opcode = OPS_SYSCALL     }, // System Call (assert).
+    { .name = "BREAK"  , .fmt = "\'"   , .opcode = OPS_BREAK       }, // Breakpoint.
+    { .name = "SYNC"   , .fmt = "\'"   , .opcode = OPS_SYNC        }, // Synchronize Shared Memory.
+    { .name = "MFHI"   , .fmt = "\'d"  , .opcode = OPS_MFHI        }, // Move From HI.
+    { .name = "MTHI"   , .fmt = "\'s"  , .opcode = OPS_MTHI        }, // Move To HI.
+    { .name = "MFLO"   , .fmt = "\'d"  , .opcode = OPS_MFLO        }, // Move From LO.
+    { .name = "MTLO"   , .fmt = "\'s"  , .opcode = OPS_MTLO        }, // Move To LO.
+    { .name = "DSLLV"  , .fmt = "\'dts", .opcode = OPS_DSLLV       }, // Doubleword Shift Left Logical Variable.
+    { .name = "DSRLV"  , .fmt = "\'dts", .opcode = OPS_DSRLV       }, // Doubleword Shift Right Logical Variable.
+    { .name = "DSRAV"  , .fmt = "\'dts", .opcode = OPS_DSRAV       }, // Doubleword Shift Right Arithmetic Variable.
+    { .name = "MULT"   , .fmt = "\'st" , .opcode = OPS_MULT        }, // Multiply Word (5cyc).
+    { .name = "MULTU"  , .fmt = "\'st" , .opcode = OPS_MULTU       }, // Multiply Unsigned Word (5cyc).
+    { .name = "DIV"    , .fmt = "\'st" , .opcode = OPS_DIV         }, // Divide Word (37cyc).
+    { .name = "DIVU"   , .fmt = "\'st" , .opcode = OPS_DIVU        }, // Divide Unsigned Word (37cyc).
+    { .name = "DMULT"  , .fmt = "\'st" , .opcode = OPS_DMULT       }, // Doubleword Multiply (8cyc).
+    { .name = "DMULTU" , .fmt = "\'st" , .opcode = OPS_DMULTU      }, // Doubleword Multiply Unsigned (8cyc).
+    { .name = "DDIV"   , .fmt = "\'st" , .opcode = OPS_DDIV        }, // Doubleword Divide (69cyc).
+    { .name = "DDIVU"  , .fmt = "\'st" , .opcode = OPS_DDIVU       }, // Doubleword Divide Unsigned (69cyc).
+    { .name = "ADD"    , .fmt = "\'dst", .opcode = OPS_ADD         }, // Add Word.
+    { .name = "ADDU"   , .fmt = "\'dst", .opcode = OPS_ADDU        }, // Add Unsigned Word.
+    { .name = "SUB"    , .fmt = "\'dst", .opcode = OPS_SUB         }, // Subtract Word.
+    { .name = "SUBU"   , .fmt = "\'dst", .opcode = OPS_SUBU        }, // Subtract Unsigned Word.
+    { .name = "AND"    , .fmt = "\'dst", .opcode = OPS_AND         }, // And.
+    { .name = "OR"     , .fmt = "\'dst", .opcode = OPS_OR          }, // Or.
+    { .name = "XOR"    , .fmt = "\'dst", .opcode = OPS_XOR         }, // Exclusive Or.
+    { .name = "NOR"    , .fmt = "\'dst", .opcode = OPS_NOR         }, // Nor.
+    { .name = "SLT"    , .fmt = "\'dst", .opcode = OPS_SLT         }, // Set on Less Than.
+    { .name = "SLTU"   , .fmt = "\'dst", .opcode = OPS_SLTU        }, // Set on Less Than Unsigned.
+    { .name = "DADD"   , .fmt = "\'dst", .opcode = OPS_DADD        }, // Doubleword Add.
+    { .name = "DADDU"  , .fmt = "\'dst", .opcode = OPS_DADDU       }, // Doubleword Add Unsigned.
+    { .name = "DSUB"   , .fmt = "\'dst", .opcode = OPS_DSUB        }, // Doubleword Subtract.
+    { .name = "DSUBU"  , .fmt = "\'dst", .opcode = OPS_DSUBU       }, // Doubleword Subtract Unsigned.
+    { .name = "TGE"    , .fmt = "\'st" , .opcode = OPS_TGE         }, // Trap if Greater Than or Equal.
+    { .name = "TGEU"   , .fmt = "\'st" , .opcode = OPS_TGEU        }, // Trap if Greater Than or Equal Unsigned.
+    { .name = "TLT"    , .fmt = "\'st" , .opcode = OPS_TLT         }, // Trap if Less Than.
+    { .name = "TLTU"   , .fmt = "\'st" , .opcode = OPS_TLTU        }, // Trap if Less Than Unsigned.
+    { .name = "TEQ"    , .fmt = "\'st" , .opcode = OPS_TEQ         }, // Trap if Equal.
+    { .name = "TNE"    , .fmt = "\'st" , .opcode = OPS_TNE         }, // Trap if Not Equal.
+    { .name = "DSLL"   , .fmt = "\'dta", .opcode = OPS_DSLL        }, // Doubleword Shift Left Logical.
+    { .name = "DSRL"   , .fmt = "\'dta", .opcode = OPS_DSRL        }, // Doubleword Shift Right Logical.
+    { .name = "DSRA"   , .fmt = "\'dta", .opcode = OPS_DSRA        }, // Doubleword Shift Right Arithmetic.
+    { .name = "DSLL32" , .fmt = "\'dta", .opcode = OPS_DSLL32      }, // Doubleword Shift Left Logical + 32.
+    { .name = "DSRL32" , .fmt = "\'dta", .opcode = OPS_DSRL32      }, // Doubleword Shift Right Logical + 32.
+    { .name = "DSRA32" , .fmt = "\'dta", .opcode = OPS_DSRA32      }, // Doubleword Shift Right Arithmetic + 32.
     { .name = "." },
 };
 
 // Register opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM
-    { .name = "BLTZ"   , .fmt = "\'sB", .opcode = OPR_BLTZ    }, // Branch on Less Than Zero.
-    { .name = "BGEZ"   , .fmt = "\'sB", .opcode = OPR_BGEZ    }, // Branch on Greater Than or Equal to Zero.
-    { .name = "BLTZL"  , .fmt = "\'sB", .opcode = OPR_BLTZL   }, // Branch on Less Than Zero Likely.
-    { .name = "BGEZL"  , .fmt = "\'sB", .opcode = OPR_BGEZL   }, // Branch on Greater Than or Equal to Zero Likely.
-    { .name = "BLTZAL" , .fmt = "\'sB", .opcode = OPR_BLTZAL  }, // Branch on Less Than Zero and Link.
-    { .name = "BGEZAL" , .fmt = "\'sB", .opcode = OPR_BGEZAL  }, // Branch on Greater Than or Equal to Zero and Link.
-    { .name = "BLTZALL", .fmt = "\'sB", .opcode = OPR_BLTZALL }, // Branch on Less Than Zero and Link Likely.
-    { .name = "BGEZALL", .fmt = "\'sB", .opcode = OPR_BGEZALL }, // Branch on Greater Than or Equal to Zero and Link Likely.
-    { .name = "TGEI"   , .fmt = "\'sI", .opcode = OPR_TGEI    }, // Trap if Greater Than or Equal Immediate.
-    { .name = "TGEIU"  , .fmt = "\'sI", .opcode = OPR_TGEIU   }, // Trap if Greater Than or Equal Unsigned Immediate.
-    { .name = "TLTI"   , .fmt = "\'sI", .opcode = OPR_TLTI    }, // Trap if Less Than Immediate.
-    { .name = "TLTIU"  , .fmt = "\'sI", .opcode = OPR_TLTIU   }, // Trap if Less Than Unsigned Immediate.
-    { .name = "TEQI"   , .fmt = "\'sI", .opcode = OPR_TEQI    }, // Trap if Equal Immediate.
-    { .name = "TNEI"   , .fmt = "\'sI", .opcode = OPR_TNEI    }, // Trap if Not Equal Immediate.
+    { .name = "BLTZ"   , .fmt = "\'sB" , .opcode = OPR_BLTZ        }, // Branch on Less Than Zero.
+    { .name = "BGEZ"   , .fmt = "\'sB" , .opcode = OPR_BGEZ        }, // Branch on Greater Than or Equal to Zero.
+    { .name = "BLTZL"  , .fmt = "\'sB" , .opcode = OPR_BLTZL       }, // Branch on Less Than Zero Likely.
+    { .name = "BGEZL"  , .fmt = "\'sB" , .opcode = OPR_BGEZL       }, // Branch on Greater Than or Equal to Zero Likely.
+    { .name = "BLTZAL" , .fmt = "\'sB" , .opcode = OPR_BLTZAL      }, // Branch on Less Than Zero and Link.
+    { .name = "BGEZAL" , .fmt = "\'sB" , .opcode = OPR_BGEZAL      }, // Branch on Greater Than or Equal to Zero and Link.
+    { .name = "BLTZALL", .fmt = "\'sB" , .opcode = OPR_BLTZALL     }, // Branch on Less Than Zero and Link Likely.
+    { .name = "BGEZALL", .fmt = "\'sB" , .opcode = OPR_BGEZALL     }, // Branch on Greater Than or Equal to Zero and Link Likely.
+    { .name = "TGEI"   , .fmt = "\'sI" , .opcode = OPR_TGEI        }, // Trap if Greater Than or Equal Immediate.
+    { .name = "TGEIU"  , .fmt = "\'sI" , .opcode = OPR_TGEIU       }, // Trap if Greater Than or Equal Unsigned Immediate.
+    { .name = "TLTI"   , .fmt = "\'sI" , .opcode = OPR_TLTI        }, // Trap if Less Than Immediate.
+    { .name = "TLTIU"  , .fmt = "\'sI" , .opcode = OPR_TLTIU       }, // Trap if Less Than Unsigned Immediate.
+    { .name = "TEQI"   , .fmt = "\'sI" , .opcode = OPR_TEQI        }, // Trap if Equal Immediate.
+    { .name = "TNEI"   , .fmt = "\'sI" , .opcode = OPR_TNEI        }, // Trap if Not Equal Immediate.
     { .name = "." },
 };
 
 // Coprocessor-0 (System Control Coprocessor):
 ALIGNED32 static const InsnTemplate insn_db_cop0[] = {
-    /* sub:00 */ { .name = "MFC0" , .fmt = "\'t0", .opcode = COP0_MF        }, // Move from System Control Coprocessor.
-    /* sub:00 */ { .name = "DMFC0", .fmt = "\'t0", .opcode = COP0_DMF       }, // Doubleword Move from System Control Coprocessor.
-    /* sub:00 */ { .name = "MTC0" , .fmt = "\'t0", .opcode = COP0_MT        }, // Move to System Control Coprocessor.
-    /* sub:00 */ { .name = "DMTC0", .fmt = "\'t0", .opcode = COP0_DMT       }, // Doubleword Move to System Control Coprocessor.
-    /* sub:10 */ { .name = "TLBP" , .fmt = "\'"  , .opcode = OPC_COP0_TLBP  }, // Searches for a TLB entry that matches the EntryHi register.
-    /* sub:10 */ { .name = "TLBR" , .fmt = "\'"  , .opcode = OPC_COP0_TLBR  }, // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
-    /* sub:10 */ { .name = "TLBWI", .fmt = "\'"  , .opcode = OPC_COP0_TLBWI }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
-    /* sub:10 */ { .name = "TLBWR", .fmt = "\'"  , .opcode = OPC_COP0_TLBWR }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
-    /* sub:10 */ { .name = "ERET" , .fmt = "\'"  , .opcode = OPC_COP0_ERET  }, // Return from interrupt, exception, or error exception.
+    /* sub:00 */ { .name = "MFC0"   , .fmt = "\'t0" , .opcode = COP0_MF         }, // Move from System Control Coprocessor.
+    /* sub:00 */ { .name = "DMFC0"  , .fmt = "\'t0" , .opcode = COP0_DMF        }, // Doubleword Move from System Control Coprocessor.
+    /* sub:00 */ { .name = "MTC0"   , .fmt = "\'t0" , .opcode = COP0_MT         }, // Move to System Control Coprocessor.
+    /* sub:00 */ { .name = "DMTC0"  , .fmt = "\'t0" , .opcode = COP0_DMT        }, // Doubleword Move to System Control Coprocessor.
+    /* sub:10 */ { .name = "TLBP"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBP   }, // Searches for a TLB entry that matches the EntryHi register.
+    /* sub:10 */ { .name = "TLBR"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBR   }, // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
+    /* sub:10 */ { .name = "TLBWI"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWI  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
+    /* sub:10 */ { .name = "TLBWR"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWR  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
+    /* sub:10 */ { .name = "ERET"   , .fmt = "\'"   , .opcode = OPC_COP0_ERET   }, // Return from interrupt, exception, or error exception.
     { .name = "." },
 };
 
@@ -345,7 +345,7 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
             switch (insn.cop_subtype) {
                 case 0b00: insnType = INSN_TYPE_COP_FMT; break;
                 case 0b01: insnType = INSN_TYPE_REGIMM;  break;
-                default:   insnType = INSN_TYPE_FUNC;    break;
+                default:   insnType = INSN_TYPE_FUNC;    break; // 0b10 || 0b11
             }
         } else {
             return INSN_TYPE_ERROR;
@@ -359,6 +359,8 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
             case OPC_REGIMM:
                 *checkInsn = insn_db_regi;
                 insnType = INSN_TYPE_REGIMM;
+                break;
+            default:
                 break;
         }
     }
@@ -480,7 +482,10 @@ Address get_branch_target_from_addr(Address addr) {
 
     InsnData insn = { .raw = *(Word*)addr };
 
-    if (insn.opcode == OPC_J || insn.opcode == OPC_JAL) {
+    if (
+        (insn.opcode == OPC_J  ) ||
+        (insn.opcode == OPC_JAL)
+    ) {
         return PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
     }
 

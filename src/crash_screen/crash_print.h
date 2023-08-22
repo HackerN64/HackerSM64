@@ -14,7 +14,7 @@
 #define TEXT_SCROLL_NUM_SPACES 2
 
 // Tab size.
-#define TAB_WIDTH   TEXT_WIDTH(4)
+#define TAB_WIDTH TEXT_WIDTH(4)
 
 // Char macros:
 #define CHAR_NULL                   '\0'
