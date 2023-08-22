@@ -118,7 +118,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 
         size_t charX = 0;
 
-        if (gCSSettings[CS_OPT_STACK_SHOW_ADDRESS].val) {
+        if (gCSSettings[CS_OPT_STACK_SHOW_ADDRESSES].val) {
             // "[stack address]:"
             charX += crash_screen_print(TEXT_X(charX), y,
                 STR_COLOR_PREFIX STR_HEX_WORD":",
@@ -138,7 +138,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             // Print known function.
             if (gCSSettings[CS_OPT_SYMBOL_NAMES].val) {
                 size_t offsetStrSize = 0;
-                if (gCSSettings[CS_OPT_STACK_SHOW_OFFSET].val) {
+                if (gCSSettings[CS_OPT_STACK_SHOW_OFFSETS].val) {
                     offsetStrSize = STRLEN("+0000");
                     // "+[offset]"
                     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,
@@ -180,7 +180,7 @@ void stack_trace_draw(void) {
     u32 line = 1;
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_STACK_SHOW_OFFSET].val) {
+    if (gCSSettings[CS_OPT_STACK_SHOW_OFFSETS].val) {
         // "OFFSET:"
         crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
     }

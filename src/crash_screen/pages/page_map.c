@@ -10,6 +10,7 @@
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
 #include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
 
 #include "page_map.h"
@@ -55,36 +56,48 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(y);
         }
 
-        const size_t typeStrSize = STRLEN("T ");
-        const size_t sizeStrSize = STRLEN("00000");
-        // "[stack address]:"
-        const size_t addrStrSize = crash_screen_print(TEXT_X(0), y, STR_HEX_WORD":", symbol->addr);
-        // "[name from map data]"
-        crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
+        // 
+        size_t addrStrSize = 0;
+        if (gCSSettings[CS_OPT_MAP_SHOW_ADDRESSES].val) {
+            // "[stack address]:"
+            addrStrSize += crash_screen_print(TEXT_X(addrStrSize), y, STR_HEX_WORD":", symbol->addr);
+        }
 
-        // "[type]"
-        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
-            (STR_COLOR_PREFIX"%c"),
-            COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE, symbol->type
-        );
+        size_t sizeStrSize = 0;
+        if (gCSSettings[CS_OPT_MAP_SHOW_SIZES].val) {
+            sizeStrSize = STRLEN("00000");
 
-        // Print size:
-        u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
+            // Print size:
+            u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
 
-        if (symbol->errc == 'S') {
-            // Size too large
-            // "?"
-            crash_screen_print(x, y,
+            if (symbol->errc == 'S') {
+                // Size too large
+                // "?"
+                crash_screen_print(x, y,
+                    (STR_COLOR_PREFIX"%c"),
+                    COLOR_RGBA32_CRASH_UNKNOWN, '?'
+                );
+            } else {
+                // "[size]"
+                crash_screen_print(x, y,
+                    (STR_COLOR_PREFIX"%-X"),
+                    COLOR_RGBA32_CRASH_OFFSET, symbol->size
+                );
+            }
+        }
+
+        size_t typeStrSize = 0;
+        if (gCSSettings[CS_OPT_MAP_SHOW_TYPES].val) {
+            typeStrSize = STRLEN("T") + gCSSettings[CS_OPT_MAP_SHOW_SIZES].val; // Add a space if both types and sizes are shown
+            // "[type]"
+            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
                 (STR_COLOR_PREFIX"%c"),
-                COLOR_RGBA32_CRASH_UNKNOWN, '?'
-            );
-        } else {
-            // "[size]"
-            crash_screen_print(x, y,
-                (STR_COLOR_PREFIX"%-X"),
-                COLOR_RGBA32_CRASH_OFFSET, symbol->size
+                COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE, symbol->type
             );
         }
+        
+        // "[name from map data]"
+        crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
 
         currIndex++;
         symbol++;
@@ -96,14 +109,19 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 void map_view_draw(void) {
     u32 line = 1;
 
-    const size_t typeStrSize = STRLEN("TYPE:");
-    const size_t sizeStrSize = STRLEN("SIZE:");
-
-    // "TYPE:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE);
-
-    // "SIZE:"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
+    size_t sizeStrSize = 0;
+    if (gCSSettings[CS_OPT_MAP_SHOW_SIZES].val) {
+        sizeStrSize = STRLEN("SIZE:");
+        // "SIZE:"
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
+    }
+    
+    size_t typeStrSize = 0;
+    if (gCSSettings[CS_OPT_MAP_SHOW_TYPES].val) {
+        typeStrSize = STRLEN("TYPE:");
+        // "TYPE:"
+        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE);
+    }
 
     line++;
 
