@@ -43,12 +43,14 @@ const char* sValNames_branch_arrow[] = {
     #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_SELECTION
 #endif
 
-#define SECTION_EXPANDED_DEFAULT TRUE
+#define SECTION_EXPANDED_DEFAULT FALSE
 
 struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions. //! TODO: Collapsible(?) page name non-setting entries (A+B to reset only that page to default)
+    [CS_OPT_EXPAND_ALL          ] = { .name = "expand all",                 .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_COLLAPSE_ALL        ] = { .name = "collapse all",               .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_RESET_TO_DEFAULTS   ] = { .name = "reset all to defaults",      .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     // GLOBAL:
-    [CS_OPT_HEADER_GLOBAL       ] = { .name = "GLOBAL",                     .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT, .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_HEADER_GLOBAL       ] = { .name = "GLOBAL",                     .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DRAW_SCREENSHOT     ] = { .name = "Show screenshot background", .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_SYMBOL_NAMES        ] = { .name = "Print symbol names",         .valNames = &sValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -132,4 +134,22 @@ _Bool crash_screen_check_for_changed_settings(void) {
     }
 
     return FALSE;
+}
+
+_Bool crash_screen_settings_check_for_header_state(_Bool expand) {
+    for (enum CSSettings settingID = 0; settingID < ARRAY_COUNT(gCSSettings); settingID++) {
+        if (crash_screen_setting_is_header(settingID) && gCSSettings[settingID].val == expand) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+void crash_screen_settings_set_all_headers(_Bool expand) {
+    for (enum CSSettings settingID = 0; settingID < ARRAY_COUNT(gCSSettings); settingID++) {
+        if (crash_screen_setting_is_header(settingID)) {
+            gCSSettings[settingID].val = expand;
+        }
+    }
 }

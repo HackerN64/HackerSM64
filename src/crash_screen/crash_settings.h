@@ -28,17 +28,9 @@ enum CSDisasmBranchArrowModes {
     DISASM_ARROW_MODE_OVERSCAN,
 };
 
-//! TODO: shown flag + enabled flag + callback func(old, new)
-struct CSSettingsEntry {
-    /*0x00*/ const char* name;
-    /*0x20*/ const char* (*valNames)[];
-    /*0x24*/ SettingsType val;
-    /*0x28*/ SettingsType defaultVal;
-    /*0x2C*/ SettingsType lowerBound;
-    /*0x30*/ SettingsType upperBound;
-}; /*0x34*/
-
 enum CSSettings {
+    CS_OPT_EXPAND_ALL,
+    CS_OPT_COLLAPSE_ALL,
     CS_OPT_RESET_TO_DEFAULTS,
     // GLOBAL:
     CS_OPT_HEADER_GLOBAL,
@@ -77,6 +69,17 @@ enum CSSettings {
 };
 
 
+//! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt)
+struct CSSettingsEntry {
+    /*0x00*/ const char* name;
+    /*0x20*/ const char* (*valNames)[];
+    /*0x24*/ SettingsType val;
+    /*0x28*/ SettingsType defaultVal;
+    /*0x2C*/ SettingsType lowerBound;
+    /*0x30*/ SettingsType upperBound;
+}; /*0x40*/
+
+
 extern struct CSSettingsEntry gCSSettings[NUM_CS_OPTS];
 
 
@@ -86,3 +89,5 @@ void crash_screen_reset_setting(enum CSSettings settingID);
 void crash_screen_reset_settings_section(enum CSSettings settingID);
 void crash_screen_reset_all_settings(void);
 _Bool crash_screen_check_for_changed_settings(void);
+_Bool crash_screen_settings_check_for_header_state(_Bool expand);
+void crash_screen_settings_set_all_headers(_Bool expand);
