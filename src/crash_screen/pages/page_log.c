@@ -10,6 +10,7 @@
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
 #include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
 
 #include "page_log.h"
 
@@ -127,7 +128,11 @@ void draw_log_section(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(charY);
         }
 
-        crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
+        if (gCSSettings[CS_OPT_LOG_INDEX_NUMBERS].val) {
+            crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
+        } else {
+            crash_screen_print(TEXT_X(0), charY, "%s", entry);
+        }
     }
 
     crash_screen_draw_divider(DIVIDER_Y(line));

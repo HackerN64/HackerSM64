@@ -4,6 +4,7 @@
 #include "sm64.h"
 
 #include "crash_main.h"
+#include "crash_pages.h"
 
 #include "crash_settings.h"
 
@@ -66,6 +67,9 @@ struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions
     [CS_OPT_CONTEXT_PARSE_REG   ] = { .name = "Parse register addr names",  .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
     [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .name = "Floats print format",        .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
+    // LOG:
+    [CS_OPT_HEADER_PAGE_LOG     ] = { .name = "LOG",                        .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_LOG_INDEX_NUMBERS   ] = { .name = "Show index numbers",         .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     // RAM VIEW:
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .name = "RAM VIEW",                   .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
