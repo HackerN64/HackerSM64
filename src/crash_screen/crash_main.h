@@ -30,15 +30,15 @@ enum CrashScreenMessageIDs {
 };
 
 
-struct CSThreadInfo {
+typedef struct CSThreadInfo {
     /*0x000*/ OSThread thread; /*0x1B0*/
     /*0x1B0*/ Register stack[THREAD2_STACK / sizeof(Register)]; /*0x400*/
     /*0x4B0*/ OSMesgQueue mesgQueue; /*0x18*/
     /*0x4C8*/ OSMesg mesg; /*0x04*/
-}; /*0x4CC*/
+} CSThreadInfo; /*0x4CC*/
 
 
-extern struct CSThreadInfo* gActiveCSThreadInfo;
+extern CSThreadInfo* gActiveCSThreadInfo;
 extern OSThread* gCrashedThread;
 
 extern Address gSelectedAddress;

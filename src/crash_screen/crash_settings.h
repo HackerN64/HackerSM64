@@ -84,17 +84,17 @@ enum CSSettings {
 
 
 //! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt)
-struct CSSettingsEntry {
+typedef struct CSSettingsEntry {
     /*0x00*/ const char* name;
     /*0x20*/ const char* (*valNames)[];
     /*0x24*/ SettingsType val;
     /*0x28*/ SettingsType defaultVal;
     /*0x2C*/ SettingsType lowerBound;
     /*0x30*/ SettingsType upperBound;
-}; /*0x40*/
+} CSSettingsEntry; /*0x40*/
 
 
-extern struct CSSettingsEntry gCSSettings[NUM_CS_OPTS];
+extern CSSettingsEntry gCSSettings[NUM_CS_OPTS];
 
 
 _Bool crash_screen_setting_is_header(enum CSSettings settingID);

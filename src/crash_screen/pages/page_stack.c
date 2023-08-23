@@ -29,13 +29,13 @@ const enum ControlTypes stackTraceContList[] = {
 };
 
 
-ALIGNED16 static struct FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
+ALIGNED16 static FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
 static u32 sCSNumFoundFunctions = 0;
 
 static u32 sStackTraceSelectedIndex = 0;
 static u32 sStackTraceViewportIndex = 0;
 
-static void add_to_stack(struct FunctionInStack* func) {
+static void add_to_stack(FunctionInStack* func) {
     sCSFunctionStackBuffer[sCSNumFoundFunctions++] = *func;
 }
 
@@ -47,8 +47,8 @@ void fill_function_stack_trace(void) {
 
     // Include the current function at the top:
     __OSThreadContext* tc = &gCrashedThread->context;
-    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    struct FunctionInStack currInfo = {
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    FunctionInStack currInfo = {
         .stackAddr = tc->sp,
         .curAddr   = tc->pc,
         .faddr     = (symbol ? symbol->addr : tc->pc),
@@ -98,7 +98,7 @@ void stack_trace_init(void) {
 
 void stack_trace_print_entries(u32 line, u32 numLines) {
     u32 currIndex = sStackTraceViewportIndex;
-    struct FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
+    FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
 
     // Print
     for (u32 i = 0; i < numLines; i++) {

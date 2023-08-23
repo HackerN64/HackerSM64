@@ -73,7 +73,7 @@ void context_init(void) {
 
 // Print a fixed-point register.
 void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
-    const struct MapSymbol* symbol = NULL;
+    const MapSymbol* symbol = NULL;
 
     // "[register name]:"
     size_t charX = crash_screen_print(x, y,
@@ -234,7 +234,7 @@ void context_draw(void) {
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
-    const struct MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     // "CRASH IN:"
     size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"CRASH IN: ",

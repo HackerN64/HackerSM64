@@ -73,7 +73,7 @@ void print_settings_list(u32 line, u32 numLines) {
     // Print
     for (u32 i = 0; i < numLines; i++, currViewIndex++) {
         u32 currSettingIndex = gCSDisplayedSettingIDs[currViewIndex];
-        const struct CSSettingsEntry* setting = &gCSSettings[currSettingIndex];
+        const CSSettingsEntry* setting = &gCSSettings[currSettingIndex];
 
         if (currViewIndex >= sSettngsTotalShownAmount) {
             break;

@@ -38,7 +38,7 @@ void map_view_init(void) {
 
 void map_viewer_print_entries(u32 line, u32 numLines) {
     u32 currIndex = sMapViewerViewportIndex;
-    const struct MapSymbol* symbol = &gMapSymbols[currIndex];
+    const MapSymbol* symbol = &gMapSymbols[currIndex];
 
     // Print.
     for (u32 i = 0; i < numLines; i++) {

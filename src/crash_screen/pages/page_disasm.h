@@ -5,12 +5,12 @@
 #include "types.h"
 
 
-struct BranchArrow {
+typedef struct BranchArrow {
     /*0x00*/ Address startAddr;
     /*0x02*/ s16 branchOffset;
     /*0x04*/ s16 colorIndex;
     /*0x08*/ s32 xPos;
-}; /*0x10*/
+} BranchArrow; /*0x10*/
 
 
 // Disasm constants.

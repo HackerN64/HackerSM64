@@ -646,7 +646,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
                     if (gCSSettings[CS_OPT_SYMBOL_NAMES].val && is_in_code_segment(target)) {
-                        const struct MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
+                        const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
                         if (symbol != NULL) {
                             *fname = get_map_symbol_name(symbol);
                             // Only print as the function name if it's the exact starting address of the function.

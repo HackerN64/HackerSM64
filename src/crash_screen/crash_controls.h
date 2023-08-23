@@ -7,13 +7,13 @@
 #include "game/input.h"
 
 
-struct CSController {
+typedef struct CSController {
     /*0x00*/ s16 rawStickX;
     /*0x02*/ s16 rawStickY;
     /*0x04*/ u16 buttonDown;
     /*0x06*/ u16 buttonPressed;
     /*0x08*/ u16 buttonReleased;
-}; /*0x0A*/
+} CSController; /*0x0A*/
 
 
 typedef union {
@@ -54,17 +54,17 @@ enum ControlTypes {
     NUM_CONT_DESC,
 };
 
-struct ControlType {
+typedef struct ControlType {
     /*0x00*/ const char* control;
     /*0x04*/ const char* description;
-}; /*0x08*/
+} ControlType; /*0x08*/
 
 
 extern _Bool gCSSwitchedPage;
 extern _Bool gCSDrawControls;
 extern CrashScreenDirections gCSDirectionFlags;
-extern struct CSController* const gCSCompositeController;
-extern const struct ControlType gCSControlDescriptions[];
+extern CSController* const gCSCompositeController;
+extern const ControlType gCSControlDescriptions[];
 extern const enum ControlTypes defaultContList[];
 
 

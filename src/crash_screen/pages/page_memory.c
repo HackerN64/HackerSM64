@@ -117,7 +117,7 @@ void ram_view_draw(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val) {
-        const struct MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
+        const MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {
             // "IN:[symbol]"

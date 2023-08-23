@@ -72,7 +72,7 @@ _Bool is_in_code_segment(Address addr) {
     return FALSE;
 }
 
-const char* get_map_symbol_name(const struct MapSymbol* symbol) {
+const char* get_map_symbol_name(const MapSymbol* symbol) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
 #endif
@@ -83,7 +83,7 @@ const char* get_map_symbol_name(const struct MapSymbol* symbol) {
     return (const char*)((u32)gMapStrings + symbol->name_offset);
 }
 
-static _Bool check_addr_in_symbol(Address addr, const struct MapSymbol* symbol) {
+static _Bool check_addr_in_symbol(Address addr, const MapSymbol* symbol) {
     return ((symbol != NULL) && (addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
 }
 
@@ -91,7 +91,7 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
 #endif
-    const struct MapSymbol* symbol = &gMapSymbols[0];
+    const MapSymbol* symbol = &gMapSymbols[0];
 
     for (size_t i = 0; i < gNumMapSymbols; i++) {
         if (check_addr_in_symbol(addr, symbol)) {
@@ -108,7 +108,7 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
 #endif
-    const struct MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
+    const MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
     for (size_t i = gNumMapSymbols; i-- > 0;) {
         if (check_addr_in_symbol(addr, symbol)) {
@@ -122,7 +122,7 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
 }
 
 // Changes 'addr' to the starting address of the function it's in and returns a pointer to the function name.
-const struct MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
+const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
 #endif

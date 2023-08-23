@@ -50,7 +50,7 @@ static const RGBA32 sBranchColors[] = {
 _Bool gFillBranchBuffer = FALSE;
 static _Bool sContinueFillBranchBuffer = FALSE;
 
-ALIGNED16 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
+ALIGNED16 static BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static u32 sNumBranchArrows = 0;
 
 static Address sBranchBufferCurrAddr = 0x00000000;
@@ -98,7 +98,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     }
 
     // Pick up where we left off.
-    struct BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
+    BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
 
     OSTime startTime = osGetTime();
     while (TRUE) {
@@ -113,7 +113,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         }
 
         // Check if we have left the function.
-        const struct MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_FORWARD);
+        const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_FORWARD);
         if (symbol != NULL) {
             if (!is_in_code_segment(symbol->addr)) {
                 return FALSE;
@@ -205,7 +205,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
 #ifdef INCLUDE_DEBUG_MAP
 void disasm_draw_branch_arrows(u32 printLine) {
     // Draw branch arrows from the buffer.
-    struct BranchArrow* currArrow = &sBranchArrows[0];
+    BranchArrow* currArrow = &sBranchArrows[0];
 
     for (u32 i = 0; i < sNumBranchArrows; i++) {
         s32 startLine = (((s32)currArrow->startAddr - (s32)sDisasmViewportIndex) / DISASM_STEP);
@@ -332,7 +332,7 @@ void disasm_draw(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val) {
-        const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
+        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {
             // "IN:[symbol]"
@@ -430,7 +430,7 @@ void disasm_input(void) {
 
         Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
-        const struct MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
+        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
         if (symbol != NULL) {
             const char* fname = get_map_symbol_name(symbol);
 

@@ -33,7 +33,7 @@ ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
 static s32 sCSThreadIndex = 0;
 static _Bool sFirstCrash = TRUE;
 
-struct CSThreadInfo* gActiveCSThreadInfo = NULL;
+CSThreadInfo* gActiveCSThreadInfo = NULL;
 OSThread* gCrashedThread = NULL;
 
 Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_ADDR to set the crashed thread PC.

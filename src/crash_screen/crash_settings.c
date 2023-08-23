@@ -46,7 +46,7 @@ const char* sValNames_branch_arrow[] = {
 
 #define SECTION_EXPANDED_DEFAULT FALSE
 
-struct CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions. //! TODO: Collapsible(?) page name non-setting entries (A+B to reset only that page to default)
+CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions. //! TODO: Collapsible(?) page name non-setting entries (A+B to reset only that page to default)
     [CS_OPT_EXPAND_ALL          ] = { .name = "expand all",                     .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_COLLAPSE_ALL        ] = { .name = "collapse all",                   .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_RESET_TO_DEFAULTS   ] = { .name = "reset all settings to defaults", .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -106,14 +106,14 @@ _Bool crash_screen_setting_is_header(enum CSSettings settingID) {
 
 // Increment/wrap value.
 void crash_screen_inc_setting(enum CSSettings settingID, SettingsType inc) {
-    struct CSSettingsEntry* setting = &gCSSettings[settingID];
+    CSSettingsEntry* setting = &gCSSettings[settingID];
 
     setting->val = WRAP((setting->val + inc), setting->lowerBound, setting->upperBound);
 }
 
 // Reset a specific setting to its default.
 void crash_screen_reset_setting(enum CSSettings settingID) {
-    struct CSSettingsEntry* setting = &gCSSettings[settingID];
+    CSSettingsEntry* setting = &gCSSettings[settingID];
 
     setting->val = setting->defaultVal;
 }
@@ -141,7 +141,7 @@ void crash_screen_reset_all_settings(void) {
 // Returns whether any settings in gCSSettings have been changed from their default value.
 _Bool crash_screen_check_for_changed_settings(void) {
     for (enum CSSettings settingID = 0; settingID < NUM_CS_OPTS; settingID++) {
-        struct CSSettingsEntry* setting = &gCSSettings[settingID];
+        CSSettingsEntry* setting = &gCSSettings[settingID];
 
         if ((setting->val != setting->defaultVal) && !crash_screen_setting_is_header(settingID)) {
             return TRUE;

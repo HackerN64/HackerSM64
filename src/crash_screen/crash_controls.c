@@ -23,8 +23,8 @@ CrashScreenDirections gCSDirectionFlags;
 static OSTime sCSInputTimeY = 0;
 static OSTime sCSInputTimeX = 0;
 
-struct CSController gCSCompositeControllers[1];
-struct CSController* const gCSCompositeController = &gCSCompositeControllers[0];
+CSController gCSCompositeControllers[1];
+CSController* const gCSCompositeController = &gCSCompositeControllers[0];
 
 
 // Input string defines:
@@ -39,7 +39,7 @@ struct CSController* const gCSCompositeController = &gCSCompositeControllers[0];
 #define STR_L       "L"
 #define STR_R       "R"
 
-const struct ControlType gCSControlDescriptions[] = {
+const ControlType gCSControlDescriptions[] = {
     [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                       },
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls",           },
     [CONT_DESC_CYCLE_DRAW       ] = { .control = STR_Z,                                     .description = "hide crash screen",                 },
@@ -207,7 +207,7 @@ void crash_screen_update_input(void) {
         return;
     }
 
-    struct CSPage* page = &gCSPages[gCSPageID];
+    CSPage* page = &gCSPages[gCSPageID];
 
     if (update_crash_screen_page()) {
         page = &gCSPages[gCSPageID]; // gCSPageID may have changed in update_crash_screen_page.
@@ -232,13 +232,13 @@ void draw_controls_box(void) {
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         CS_DARKEN_SEVEN_EIGHTHS
     );
-    struct CSPage* page = &gCSPages[gCSPageID];
+    CSPage* page = &gCSPages[gCSPageID];
 
     // "[page name] PAGE CONTROLS"
     crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
     const enum ControlTypes* list = page->contList;
-    const struct ControlType* desc = NULL;
+    const ControlType* desc = NULL;
 
     u32 line = 3;
 

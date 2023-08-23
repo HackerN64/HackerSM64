@@ -87,4 +87,4 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
 #define crash_screen_print_scroll(x, y, charLimit, fmt, ...) crash_screen_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
 
 void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
-void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const struct MapSymbol* symbol);
+void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);

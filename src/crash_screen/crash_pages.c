@@ -16,7 +16,7 @@
 #include "pages/page_settings.h"
 
 
-struct CSPage gCSPages[NUM_PAGES] = {
+CSPage gCSPages[NUM_PAGES] = {
     [PAGE_CONTEXT    ] = { .initFunc = context_init,     .drawFunc = context_draw,     .inputFunc = context_input,     .contList = contextContList,    .name = "CONTEXT",     .flags = { .initialized = FALSE, .crashed = FALSE, .printName = FALSE, }, },
     [PAGE_LOG        ] = { .initFunc = log_init,         .drawFunc = log_draw,         .inputFunc = log_input,         .contList = logContList,        .name = "LOG",         .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },
     [PAGE_STACK_TRACE] = { .initFunc = stack_trace_init, .drawFunc = stack_trace_draw, .inputFunc = stack_trace_input, .contList = stackTraceContList, .name = "STACK TRACE", .flags = { .initialized = FALSE, .crashed = FALSE, .printName = TRUE,  }, },

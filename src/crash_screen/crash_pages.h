@@ -20,7 +20,7 @@ enum CrashScreenPages {
     MAX_PAGES = 255U,
 };
 
-struct CSPage {
+typedef struct CSPage {
     /*0x00*/ void (*initFunc)(void);
     /*0x04*/ void (*drawFunc)(void);
     /*0x08*/ void (*inputFunc)(void);
@@ -32,10 +32,10 @@ struct CSPage {
                 /*0x03*/ u32 crashed     :  1;
                 /*0x03*/ u32 initialized :  1;
             } flags; /*0x04*/
-}; /*0x18*/
+} CSPage; /*0x18*/
 
 
-extern struct CSPage gCSPages[NUM_PAGES];
+extern CSPage gCSPages[NUM_PAGES];
 extern enum CrashScreenPages gCSPageID;
 
 

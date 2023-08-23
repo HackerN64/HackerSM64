@@ -11,16 +11,16 @@ enum SymbolSearchDirections {
 };
 
 // See mapPacker.py.
-struct MapSymbol {
+typedef struct MapSymbol {
     /*0x00*/ Address addr;          // Symbol address.
     /*0x04*/ size_t size;           // Symbol size.
     /*0x08*/ size_t name_offset;    // Offset of symbol name in gMapStrings.
     /*0x0C*/ u16 name_len;          // Symbol name length.
     /*0x0D*/ uchar type;            // Symbol type.
     /*0x0E*/ uchar errc;            // Error char: 'S' = unknown size.
-}; /*0x10*/
+} MapSymbol; /*0x10*/
 
-typedef struct {
+typedef struct MemoryRegion {
     /*0x00*/ const Address start;
     /*0x04*/ const Address end;
 } MemoryRegion; /*0x08*/
@@ -97,8 +97,8 @@ EXTERN_GROUP_TEXT(common1)
     TEXT_REGION(name##geo)
 
 
-extern const struct MapSymbol gMapSymbols[];
-extern const struct MapSymbol gMapSymbolsEnd[];
+extern const MapSymbol gMapSymbols[];
+extern const MapSymbol gMapSymbolsEnd[];
 extern const Byte gMapStrings[];
 extern const Byte gMapStringEnd[];
 extern const Byte _mapDataSegmentRomStart[];
@@ -110,7 +110,7 @@ extern size_t gNumMapSymbols;
 
 void map_data_init(void);
 _Bool is_in_code_segment(Address addr);
-const char* get_map_symbol_name(const struct MapSymbol* symbol);
+const char* get_map_symbol_name(const MapSymbol* symbol);
 s32 get_symbol_index_from_addr_forward(Address addr);
 s32 get_symbol_index_from_addr_backward(Address addr);
-const struct MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection);
+const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection);
