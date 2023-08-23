@@ -455,3 +455,16 @@ void disasm_input(void) {
     }
 #endif
 }
+
+CSPage gCSPage_disasm = {
+    .name      = "DISASM",
+    .initFunc  = disasm_init,
+    .drawFunc  = disasm_draw,
+    .inputFunc = disasm_input,
+    .contList  = disasmContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

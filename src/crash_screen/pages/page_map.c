@@ -172,3 +172,16 @@ void map_view_input(void) {
 
     sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
+
+CSPage gCSPage_map = {
+    .name      = "MAP VIEW",
+    .initFunc  = map_view_init,
+    .drawFunc  = map_view_draw,
+    .inputFunc = map_view_input,
+    .contList  = mapViewerContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

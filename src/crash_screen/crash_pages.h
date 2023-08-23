@@ -39,7 +39,7 @@ typedef struct CSPage {
 } CSPage; /*0x18*/
 
 
-extern struct CSPage gCSPages[NUM_PAGES];
+extern struct CSPage* gCSPages[NUM_PAGES];
 extern enum CSPages gCSPageID;
 
 

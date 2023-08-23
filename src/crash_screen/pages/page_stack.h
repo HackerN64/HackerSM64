@@ -20,9 +20,4 @@ typedef struct FunctionInStack {
 } FunctionInStack; /*0x10*/
 
 
-extern const enum ControlTypes stackTraceContList[];
-
-
-void stack_trace_init(void);
-void stack_trace_draw(void);
-void stack_trace_input(void);
+extern CSPage gCSPage_stack;

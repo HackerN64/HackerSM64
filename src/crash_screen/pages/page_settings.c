@@ -261,3 +261,16 @@ void settings_input(void) {
         sSettingsViewportIndex = lastViewportIndex;
     }
 }
+
+CSPage gCSPage_settings = {
+    .name      = "SETTINGS",
+    .initFunc  = settings_init,
+    .drawFunc  = settings_draw,
+    .inputFunc = settings_input,
+    .contList  = settingsContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

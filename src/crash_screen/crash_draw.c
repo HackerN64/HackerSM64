@@ -327,7 +327,7 @@ u32 print_crash_screen_header(void) {
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    CSPage* page = &gCSPages[gCSPageID];
+    CSPage* page = gCSPages[gCSPageID];
 
     if (page->flags.printName) {
         crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
@@ -362,7 +362,7 @@ void crash_screen_draw_main(void) {
 
         u32 line = print_crash_screen_header();
 
-        CSPage* page = &gCSPages[gCSPageID];
+        CSPage* page = gCSPages[gCSPageID];
 
         // Run the page-specific draw function.
         if (page->drawFunc == NULL) {

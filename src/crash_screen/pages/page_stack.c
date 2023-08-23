@@ -235,3 +235,16 @@ void stack_trace_input(void) {
 
     sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
+
+CSPage gCSPage_stack = {
+    .name      = "STACK TRACE",
+    .initFunc  = stack_trace_init,
+    .drawFunc  = stack_trace_draw,
+    .inputFunc = stack_trace_input,
+    .contList  = stackTraceContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

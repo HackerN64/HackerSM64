@@ -195,3 +195,16 @@ void log_input(void) {
         sLogViewportIndex = clamp_view_to_selection(sLogViewportIndex, sLogSelectedIndex, sLogNumShownRows, 1);
     }
 }
+
+CSPage gCSPage_log = {
+    .name      = "LOG",
+    .initFunc  = log_init,
+    .drawFunc  = log_draw,
+    .inputFunc = log_input,
+    .contList  = logContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

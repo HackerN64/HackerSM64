@@ -43,7 +43,7 @@ Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and di
 static void crash_screen_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
     if (!sFirstCrash && gCrashedThread->context.cause != EXC_SYSCALL) {
-        gCSPages[gCSPageID].flags.crashed = TRUE;
+        gCSPages[gCSPageID]->flags.crashed = TRUE;
     }
 
     gCSPageID = FIRST_PAGE;
@@ -59,8 +59,8 @@ static void crash_screen_reinitialize(void) {
 
     gCSDirectionFlags.raw = 0;
 
-    for (int i = 0; i < ARRAY_COUNT(gCSPages); i++) {
-        gCSPages[i].flags.initialized = FALSE;
+    for (int pageID = 0; pageID < ARRAY_COUNT(gCSPages); pageID++) {
+        gCSPages[pageID]->flags.initialized = FALSE;
     }
 }
 

@@ -27,9 +27,5 @@ typedef struct BranchArrow {
 extern _Bool gFillBranchBuffer;
 #endif
 
-extern const enum ControlTypes disasmContList[];
 
-
-void disasm_init(void);
-void disasm_draw(void);
-void disasm_input(void);
+extern CSPage gCSPage_disasm;

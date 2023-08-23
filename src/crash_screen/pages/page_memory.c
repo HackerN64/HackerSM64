@@ -230,3 +230,16 @@ void ram_view_input(void) {
 
     sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
 }
+
+CSPage gCSPage_memory = {
+    .name      = "RAM VIEW",
+    .initFunc  = ram_view_init,
+    .drawFunc  = ram_view_draw,
+    .inputFunc = ram_view_input,
+    .contList  = ramViewerContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE,
+        .printName   = TRUE,
+    },
+};

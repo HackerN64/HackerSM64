@@ -209,10 +209,10 @@ void crash_screen_update_input(void) {
         return;
     }
 
-    CSPage* page = &gCSPages[gCSPageID];
+    CSPage* page = gCSPages[gCSPageID];
 
     if (update_crash_screen_page()) {
-        page = &gCSPages[gCSPageID]; // gCSPageID may have changed in update_crash_screen_page.
+        page = gCSPages[gCSPageID]; // gCSPageID may have changed in update_crash_screen_page.
 
         if (page->initFunc != NULL && !page->flags.initialized) {
             page->initFunc();
@@ -234,7 +234,7 @@ void draw_controls_box(void) {
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         CS_DARKEN_SEVEN_EIGHTHS
     );
-    CSPage* page = &gCSPages[gCSPageID];
+    CSPage* page = gCSPages[gCSPageID];
 
     // "[page name] PAGE CONTROLS"
     crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);

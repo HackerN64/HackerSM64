@@ -259,3 +259,16 @@ void context_input(void) {
         crash_screen_inc_setting(CS_OPT_CONTEXT_FLOATS_FMT, 1);
     }
 }
+
+CSPage gCSPage_context ={
+    .name      = "CONTEXT",
+    .initFunc  = context_init,
+    .drawFunc  = context_draw,
+    .inputFunc = context_input,
+    .contList  = contextContList,
+    .flags = {
+        .initialized = FALSE,
+        .crashed     = FALSE, 
+        .printName   = FALSE,
+    },
+};
