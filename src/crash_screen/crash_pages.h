@@ -21,11 +21,11 @@ enum CrashScreenPages {
 };
 
 typedef struct CSPage {
-    /*0x00*/ void (*initFunc)(void);
-    /*0x04*/ void (*drawFunc)(void);
-    /*0x08*/ void (*inputFunc)(void);
-    /*0x0C*/ const enum ControlTypes* contList;
-    /*0x10*/ const char* name;
+    /*0x00*/ const char* name;
+    /*0x04*/ void (*initFunc)(void);
+    /*0x08*/ void (*drawFunc)(void);
+    /*0x0C*/ void (*inputFunc)(void);
+    /*0x10*/ const enum ControlTypes* contList;
     /*0x14*/ struct PACKED {
                 /*0x00*/ u32             : 29;
                 /*0x03*/ u32 printName   :  1;
