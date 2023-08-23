@@ -77,7 +77,7 @@ void disasm_init(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
 //! TODO: Optimize this as much as possible.
-//! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?).
+//! TODO: Version that checks for branches relative to viewport (overscan).
 // @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {

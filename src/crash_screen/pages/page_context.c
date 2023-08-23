@@ -174,6 +174,7 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
         const enum CSPrintNumberFormats floatsFormat = gCSSettings[CS_OPT_CONTEXT_FLOATS_FMT].val;
+
         switch (floatsFormat) {
             case PRINT_NUM_FMT_HEX:
                 // "[XXXXXXXX]"
