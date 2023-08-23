@@ -7,11 +7,14 @@
 
 #include "crash_draw.h"
 #include "crash_main.h"
-#include "crash_print.h"
 #include "crash_settings.h"
+#include "crash_pages.h"
+#include "crash_print.h"
 #include "map_parser.h"
 
 #include "insn_disasm.h"
+
+#include "pages/page_disasm.h"
 
 #include "engine/math_util.h"
 

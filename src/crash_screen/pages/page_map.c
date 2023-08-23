@@ -9,6 +9,7 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
@@ -37,6 +38,9 @@ void map_view_init(void) {
 }
 
 void map_viewer_print_entries(u32 line, u32 numLines) {
+    _Bool showAddresses = gCSSettings[CS_OPT_MAP_SHOW_ADDRESSES].val;
+    _Bool showTypes     = gCSSettings[CS_OPT_MAP_SHOW_TYPES    ].val;
+    _Bool showSizes     = gCSSettings[CS_OPT_MAP_SHOW_SIZES    ].val;
     u32 currIndex = sMapViewerViewportIndex;
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
@@ -58,13 +62,13 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 
         // 
         size_t addrStrSize = 0;
-        if (gCSSettings[CS_OPT_MAP_SHOW_ADDRESSES].val) {
+        if (showAddresses) {
             // "[stack address]:"
             addrStrSize += crash_screen_print(TEXT_X(addrStrSize), y, STR_HEX_WORD":", symbol->addr);
         }
 
         size_t sizeStrSize = 0;
-        if (gCSSettings[CS_OPT_MAP_SHOW_SIZES].val) {
+        if (showSizes) {
             sizeStrSize = STRLEN("00000");
 
             // Print size:
@@ -87,8 +91,8 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         }
 
         size_t typeStrSize = 0;
-        if (gCSSettings[CS_OPT_MAP_SHOW_TYPES].val) {
-            typeStrSize = STRLEN("T") + gCSSettings[CS_OPT_MAP_SHOW_SIZES].val; // Add a space if both types and sizes are shown
+        if (showTypes) {
+            typeStrSize = STRLEN("T") + showSizes; // Add a space if both types and sizes are shown
             // "[type]"
             crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
                 (STR_COLOR_PREFIX"%c"),

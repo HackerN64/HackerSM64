@@ -5,18 +5,13 @@
 #include "types.h"
 
 
-typedef s32 SettingsType;
+typedef s16 SettingsType;
 
 
 enum CSPrintNumberFormats {
     PRINT_NUM_FMT_HEX, // 0xFFFFFFFF
     PRINT_NUM_FMT_DEC, // 0.0
     PRINT_NUM_FMT_SCI, // XeX
-};
-
-enum CSImmediateModes {
-    DISASM_IMM_MODE_HEX, // 0xFFFFFFFF
-    DISASM_IMM_MODE_DEC, // 0.0
 };
 
 enum CSDisasmBranchArrowModes {

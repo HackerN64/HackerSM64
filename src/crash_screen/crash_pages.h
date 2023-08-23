@@ -5,7 +5,7 @@
 #include "types.h"
 
 
-enum CrashScreenPages {
+enum CSPages {
     FIRST_PAGE,
     PAGE_CONTEXT = FIRST_PAGE,
     PAGE_LOG,
@@ -20,23 +20,27 @@ enum CrashScreenPages {
     MAX_PAGES = 255U,
 };
 
+
 typedef struct CSPage {
     /*0x00*/ const char* name;
     /*0x04*/ void (*initFunc)(void);
     /*0x08*/ void (*drawFunc)(void);
     /*0x0C*/ void (*inputFunc)(void);
     /*0x10*/ const enum ControlTypes* contList;
-    /*0x14*/ struct PACKED {
-                /*0x00*/ u32             : 29;
-                /*0x03*/ u32 printName   :  1;
-                /*0x03*/ u32 crashed     :  1;
-                /*0x03*/ u32 initialized :  1;
+    /*0x14*/ union {
+                struct PACKED {
+                    /*0x00*/ u32             : 29;
+                    /*0x03*/ u32 printName   :  1;
+                    /*0x03*/ u32 crashed     :  1;
+                    /*0x03*/ u32 initialized :  1;
+                }; /*0x04*/
+                u32 raw;
             } flags; /*0x04*/
 } CSPage; /*0x18*/
 
 
-extern CSPage gCSPages[NUM_PAGES];
-extern enum CrashScreenPages gCSPageID;
+extern struct CSPage gCSPages[NUM_PAGES];
+extern enum CSPages gCSPageID;
 
 
-void crash_screen_set_page(enum CrashScreenPages page);
+void crash_screen_set_page(enum CSPages page);

@@ -262,8 +262,9 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
 static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
-    size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val));
-    size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
+    const SettingsType scrollSpeed = gCSSettings[CS_OPT_PRINT_SCROLL_SPEED].val;
+    const size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - scrollSpeed));
+    const size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
     PrintBuffer* bufChar = &gCSScrollBuffer[0];
 

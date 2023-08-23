@@ -77,6 +77,8 @@ void update_crash_screen_direction_input(void) {
     _Bool left  = ((buttonDown & (L_CBUTTONS | L_JPAD)) || (rawStickX < -deadzone));
     _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  deadzone));
 
+    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val);
+
     if (up ^ down) {
         if (
             !(
@@ -91,7 +93,7 @@ void update_crash_screen_direction_input(void) {
         } else {
             // Held:
             OSTime diff = (currTime - sCSInputTimeY);
-            if (diff > FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val)) {
+            if (diff > cursorWaitCycles) {
                 gCSDirectionFlags.pressed.up   = up;
                 gCSDirectionFlags.pressed.down = down;
             }
@@ -112,7 +114,7 @@ void update_crash_screen_direction_input(void) {
         } else {
             // Held:
             OSTime diff = (currTime - sCSInputTimeX);
-            if (diff > FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val)) {
+            if (diff > cursorWaitCycles) {
                 gCSDirectionFlags.pressed.left  = left;
                 gCSDirectionFlags.pressed.right = right;
             }
@@ -149,7 +151,7 @@ const enum ControlTypes defaultContList[] = {
 };
 
 _Bool update_crash_screen_page(void) {
-    enum CrashScreenPages prevPage = gCSPageID;
+    enum CSPages prevPage = gCSPageID;
 
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
@@ -238,16 +240,19 @@ void draw_controls_box(void) {
     crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
     const enum ControlTypes* list = page->contList;
-    const ControlType* desc = NULL;
 
-    u32 line = 3;
+    if (list != NULL) {
+        const ControlType* desc = NULL;
 
-    while (*list != CONT_DESC_LIST_END) {
-        desc = &gCSControlDescriptions[*list++];
-        // [control]
-        //   [description]
-        crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS_DESCRIPTION, desc->description);
-        line += 2;
+        u32 line = 3;
+
+        while (*list != CONT_DESC_LIST_END) {
+            desc = &gCSControlDescriptions[*list++];
+            // [control]
+            //   [description]
+            crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS_DESCRIPTION, desc->description);
+            line += 2;
+        }
     }
 
     osWritebackDCacheAll();

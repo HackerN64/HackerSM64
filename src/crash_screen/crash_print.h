@@ -60,7 +60,7 @@
 
 #define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 
-typedef union {
+typedef union PrintBuffer {
     struct PACKED {
         /*0x00*/ RGBA16 red    : 5;
         /*0x00*/ RGBA16 green  : 5;

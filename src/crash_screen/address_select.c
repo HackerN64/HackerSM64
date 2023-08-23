@@ -8,6 +8,7 @@
 #include "crash_main.h"
 #include "crash_pages.h"
 #include "crash_print.h"
+#include "crash_settings.h"
 #include "memory_read.h"
 
 #include "address_select.h"

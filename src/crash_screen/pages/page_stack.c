@@ -7,6 +7,7 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
@@ -97,6 +98,11 @@ void stack_trace_init(void) {
 }
 
 void stack_trace_print_entries(u32 line, u32 numLines) {
+    const _Bool showAddressess   = gCSSettings[CS_OPT_STACK_SHOW_ADDRESSES].val;
+#ifdef INCLUDE_DEBUG_MAP
+    const _Bool showOffsets      = gCSSettings[CS_OPT_STACK_SHOW_OFFSETS  ].val;
+    const _Bool parseSymbolNames = gCSSettings[CS_OPT_SYMBOL_NAMES        ].val;
+#endif
     u32 currIndex = sStackTraceViewportIndex;
     FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
 
@@ -118,7 +124,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 
         size_t charX = 0;
 
-        if (gCSSettings[CS_OPT_STACK_SHOW_ADDRESSES].val) {
+        if (showAddressess) {
             // "[stack address]:"
             charX += crash_screen_print(TEXT_X(charX), y,
                 STR_COLOR_PREFIX STR_HEX_WORD":",
@@ -136,9 +142,9 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             );
         } else {
             // Print known function.
-            if (gCSSettings[CS_OPT_SYMBOL_NAMES].val) {
+            if (parseSymbolNames) {
                 size_t offsetStrSize = 0;
-                if (gCSSettings[CS_OPT_STACK_SHOW_OFFSETS].val) {
+                if (showOffsets) {
                     offsetStrSize = STRLEN("+0000");
                     // "+[offset]"
                     crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,

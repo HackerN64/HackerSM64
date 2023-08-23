@@ -7,6 +7,7 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/memory_read.h"
@@ -47,6 +48,7 @@ static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
 }
 
 static void ram_viewer_print_data(u32 line, Address startAddr) {
+    const _Bool memoryAsASCII = gCSSettings[CS_OPT_MEMORY_AS_ASCII].val;
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
@@ -69,7 +71,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 charX += 2;
             }
 
-            RGBA32 textColor = ((gCSSettings[CS_OPT_MEMORY_AS_ASCII].val || (x % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
+            RGBA32 textColor = ((memoryAsASCII || (x % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
             RGBA32 selectColor = COLOR_RGBA32_NONE;
 
             if (currAddr == gSelectedAddress) {
@@ -99,7 +101,8 @@ void ram_view_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
 #ifdef INCLUDE_DEBUG_MAP
-    sRamViewNumShownRows = (19 - gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val);
+    const _Bool showCurrentSymbol = gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val;
+    sRamViewNumShownRows = (19 - showCurrentSymbol);
 #endif
 
     u32 line = 1;
@@ -116,7 +119,7 @@ void ram_view_draw(void) {
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_MEMORY_SHOW_SYMBOL].val) {
+    if (showCurrentSymbol) {
         const MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {

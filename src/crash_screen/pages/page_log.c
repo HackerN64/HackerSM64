@@ -9,6 +9,7 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 
@@ -109,6 +110,8 @@ u32 print_assert_section(u32 line) {
 
 #ifdef PUPPYPRINT_DEBUG
 void draw_log_section(u32 line, u32 numLines) {
+    const _Bool showIndexNumbers = gCSSettings[CS_OPT_LOG_INDEX_NUMBERS].val;
+
     // "PUPPYPRINT LOG:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
     line++;
@@ -128,7 +131,7 @@ void draw_log_section(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(charY);
         }
 
-        if (gCSSettings[CS_OPT_LOG_INDEX_NUMBERS].val) {
+        if (showIndexNumbers) {
             crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
         } else {
             crash_screen_print(TEXT_X(0), charY, "%s", entry);

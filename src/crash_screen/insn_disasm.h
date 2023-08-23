@@ -369,7 +369,7 @@ enum InsnType {
 
 // Instruction data
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
-typedef union {
+typedef union InsnData {
     struct PACKED {
         /*0x00*/ Word opcode        :  6;
         /*0x00*/ Word rs            :  5; // aka base
@@ -414,14 +414,14 @@ typedef union {
 } InsnData; /*0x04*/
 
 // Instruction database format
-typedef struct PACKED {
+typedef struct PACKED InsnTemplate {
     /*0x00*/ char name[8];
     /*0x08*/ char fmt[5];
     /*0x0D*/ u8 pad[2];
     /*0x0F*/ u8 opcode;
 } InsnTemplate; /*0x10*/
 
-typedef struct PACKED {
+typedef struct PACKED InsnParamType {
     /*0x00*/ InsnData mask; // A bitmask for the bits used to identify the instruction. Anything not in the mask is params.
     /*0x04*/ const char* paramStr;
 } InsnParamType; /*0x08*/

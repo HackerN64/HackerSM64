@@ -6,6 +6,7 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
@@ -172,7 +173,8 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         // "[prefix][XXXXXXXX]"
         crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
-        switch (gCSSettings[CS_OPT_CONTEXT_FLOATS_FMT].val) {
+        const enum CSPrintNumberFormats floatsFormat = gCSSettings[CS_OPT_CONTEXT_FLOATS_FMT].val;
+        switch (floatsFormat) {
             case PRINT_NUM_FMT_HEX:
                 // "[XXXXXXXX]"
                 crash_screen_print(x, y, " "STR_HEX_WORD, val.asU32);

@@ -3,9 +3,11 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_pages.h"
 #include "crash_main.h"
 #include "crash_controls.h"
+#include "crash_settings.h"
+
+#include "crash_pages.h"
 
 #include "pages/page_context.h"
 #include "pages/page_log.h"
@@ -29,11 +31,11 @@ CSPage gCSPages[NUM_PAGES] = {
 };
 
 
-enum CrashScreenPages gCSPageID = FIRST_PAGE;
+enum CSPages gCSPageID = FIRST_PAGE;
 
 
 // Change the current page.
-void crash_screen_set_page(enum CrashScreenPages page) {
+void crash_screen_set_page(enum CSPages page) {
     if (!gCSPages[gCSPageID].flags.crashed) {
         gCSPageID = page;
         gCSSwitchedPage = TRUE;

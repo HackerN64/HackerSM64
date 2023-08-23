@@ -9,8 +9,9 @@
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
-#include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
+#include "crash_screen/crash_pages.h"
+#include "crash_screen/crash_print.h"
 #include "crash_screen/insn_disasm.h"
 #include "crash_screen/map_parser.h"
 #include "crash_screen/memory_read.h"
@@ -75,9 +76,8 @@ void disasm_init(void) {
 }
 
 #ifdef INCLUDE_DEBUG_MAP
-//! TODO: Optimize this as much as possible
-//! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?)
-//! TODO: gCSSettings[CS_OPT_DISASM_ARROW_MODE].val
+//! TODO: Optimize this as much as possible.
+//! TODO: Version that works without INCLUDE_DEBUG_MAP (check for branches relative to viewport, or selected insn only?).
 // @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {
@@ -254,6 +254,9 @@ static void print_as_binary(const u32 charX, const u32 charY, const Word data) {
 }
 
 static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
+    const enum CSDisasmBranchArrowModes branchArrowMode = gCSSettings[CS_OPT_DISASM_ARROW_MODE].val;
+    const _Bool unkAsBinary = gCSSettings[CS_OPT_DISASM_BINARY].val;
+
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
 
@@ -278,7 +281,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, addr, data);
 
-            if ((addr == selectedAddr) && (gCSSettings[CS_OPT_DISASM_ARROW_MODE].val == DISASM_ARROW_MODE_SELECTION)) {
+            if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
                 InsnData insn = { .raw = data };
                 s16 branchOffset = check_for_branch_offset(insn);
 
@@ -287,7 +290,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
                 }
             }
         } else { // Outside of code segments:
-            if (gCSSettings[CS_OPT_DISASM_BINARY].val) {
+            if (unkAsBinary) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
                 print_as_binary(charX, charY, data);
             } else {
@@ -309,7 +312,8 @@ void disasm_draw(void) {
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
-    sDisasmNumShownRows = (20 - gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val);
+    const _Bool showCurrentSymbol = gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val;
+    sDisasmNumShownRows = (20 - showCurrentSymbol);
 #endif
 
     sDisasmBranchStartX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET) +
@@ -331,7 +335,7 @@ void disasm_draw(void) {
     line++;
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val) {
+    if (showCurrentSymbol) {
         const MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {

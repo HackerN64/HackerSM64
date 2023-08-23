@@ -302,7 +302,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
 }
 
 // Draw the header.
-void print_crash_screen_header(void) {
+u32 print_crash_screen_header(void) {
     u32 line = 0;
     // "HackerSM64 vX.X.X"
     crash_screen_print(TEXT_X(0), TEXT_Y(line),
@@ -338,16 +338,20 @@ void print_crash_screen_header(void) {
     }
 
     osWritebackDCacheAll();
+
+    return line;
 }
 
 // Main draw function for the crash screen.
 void crash_screen_draw_main(void) {
+    const _Bool drawScreenshot = gCSSettings[CS_OPT_DRAW_SCREENSHOT].val;
+
     crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    crash_screen_reset_framebuffer(gCSSettings[CS_OPT_DRAW_SCREENSHOT].val);
+    crash_screen_reset_framebuffer(drawScreenshot);
     crash_screen_reset_scissor_box();
 
     if (!(gCSCompositeController->buttonDown & Z_TRIG)) {
-        if (gCSSettings[CS_OPT_DRAW_SCREENSHOT].val) {
+        if (drawScreenshot) {
             // Draw the transparent background.
             crash_screen_draw_dark_rect(
                 CRASH_SCREEN_X1, CRASH_SCREEN_Y1,
@@ -356,17 +360,17 @@ void crash_screen_draw_main(void) {
             );
         }
 
-        print_crash_screen_header();
+        u32 line = print_crash_screen_header();
 
         CSPage* page = &gCSPages[gCSPageID];
 
         // Run the page-specific draw function.
         if (page->drawFunc == NULL) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s",
+            crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_PAGE_NAME, "THIS PAGE DOESN'T EXIST"
             );
         } else if (page->flags.crashed) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(2), STR_COLOR_PREFIX"%s",
+            crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED"
             );
         } else {

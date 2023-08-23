@@ -7,6 +7,7 @@
 
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 

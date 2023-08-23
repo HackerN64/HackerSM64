@@ -16,7 +16,7 @@ typedef struct CSController {
 } CSController; /*0x0A*/
 
 
-typedef union {
+typedef union CrashScreenDirections {
     struct PACKED {
         u8 up    : 1;
         u8 down  : 1;
