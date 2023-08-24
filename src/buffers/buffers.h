@@ -10,8 +10,6 @@
 #include "config.h"
 #include "audio/data.h"
 
-extern u8 gDecompressionHeap[];
-
 extern u8 gAudioHeap[DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE)];
 
 extern u8 gIdleThreadStack[THREAD1_STACK];
