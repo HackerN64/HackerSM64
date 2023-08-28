@@ -37,7 +37,7 @@ extern void detect_emulator();
  */
 extern enum Emulator gEmulator;
 
-// Included for backwards compatibility when upgrading from 2.0
+// Included for backwards compatibility when upgrading from HackerSM64 2.0
 #define gIsConsole ((gEmulator & EMU_CONSOLE) != 0)
 
 #endif
