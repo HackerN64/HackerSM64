@@ -451,7 +451,7 @@ void print_console_log(void) {
     finish_blank_box();
 
     for (u8 i = 0; i < LOG_BUFFER_SIZE; i++) {
-        if (consoleLogTable[i] == NULL) {
+        if (consoleLogTable[i][0] == '\0') {
             continue;
         }
         print_small_text_light(16, (LINE_HEIGHT - (i * 12)), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
