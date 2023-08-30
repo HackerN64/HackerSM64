@@ -141,9 +141,10 @@
 // #define HORIZONTAL_CULLING_ON_EMULATOR
 
 /**
- * Makes objects bellow the screen be culled.
+ * Makes objects bellow the screen be culled. 
+ * NOTE: Vanilla objects do not account for vertical culling.
  */
-#define VERTICAL_CULLING
+// #define VERTICAL_CULLING
 
 /**
  * If the first command of an object´s geolayout is not GEO_CULLING_RADIUS, DEFAULT_CULLING_RADIUS

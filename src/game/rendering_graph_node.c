@@ -567,26 +567,14 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
-        // The reason this is not divided as an integer is to prevent an integer division.
-        f32 vHalfFov = ( (f32) ((node->fov * 4096) + 8192) ) / 45.f;
+        f32 vHalfFov = ( ((node->fov * 4096.f) + 8192.f) ) / 45.f;
 
         // We need to account for aspect ratio changes by multiplying by the widescreen horizontal stretch 
         // (normally 1.775).
-        f32 hHalfFov = vHalfFov * sAspectRatio;
-
-        node->halfFovHorizontal = tans(hHalfFov);
+        node->halfFovHorizontal = tans(vHalfFov * sAspectRatio);
 
 #ifdef VERTICAL_CULLING
         node->halfFovVertical = tans(vHalfFov);
-#endif
-
-#ifndef HORIZONTAL_CULLING_ON_EMULATOR
-        // If an emulator is detected, use a large value for the half fov 
-        // horizontal value to account for viewport widescreen hacks.
-
-        if(!(gEmulator & EMU_CONSOLE)){
-            node->halfFovHorizontal = 9999.0f;
-        }
 #endif
     
         guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
@@ -1092,6 +1080,14 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     if (absf(cameraToObjectDepth - VALID_DEPTH_MIDDLE) >= VALID_DEPTH_RANGE + cullingRadius) {
         return FALSE;
     }
+
+#ifndef HORIZONTAL_CULLING_ON_EMULATOR
+    // If an emulator is detected, skip any other culling.
+
+    if(!(gEmulator & EMU_CONSOLE)){
+        return TRUE;
+    }
+#endif
 
 #ifdef VERTICAL_CULLING
     f32 vScreenEdge = -cameraToObjectDepth * gCurGraphNodeCamFrustum->halfFovVertical;
