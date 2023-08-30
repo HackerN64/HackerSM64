@@ -35,7 +35,7 @@ void bhv_hidden_blue_coin_loop(void) {
             }
 
 #ifdef BLUE_COIN_SWITCH_PREVIEW
-            if (blueCoinSwitch->oAction == BLUE_COIN_SWITCH_ACT_PREVIEWING) {
+            if (gMarioObject->platform == blueCoinSwitch) {
                 cur_obj_enable_rendering();
             } else {
                 cur_obj_disable_rendering();
@@ -81,9 +81,6 @@ void bhv_blue_coin_switch_loop(void) {
 
     switch (o->oAction) {
         case BLUE_COIN_SWITCH_ACT_IDLE:
-#ifdef BLUE_COIN_SWITCH_PREVIEW
-        case BLUE_COIN_SWITCH_ACT_PREVIEWING:
-#endif
             // If Mario is on the switch and has ground-pounded,
             // recede and get ready to start ticking.
             if (gMarioObject->platform == o) {
@@ -102,21 +99,7 @@ void bhv_blue_coin_switch_loop(void) {
 
                     cur_obj_play_sound_2(SOUND_GENERAL_SWITCH_DOOR_OPEN);
                 }
-#ifdef BLUE_COIN_SWITCH_PREVIEW
-                else {
-                    // If Mario is just on the switch and not ground pounding,
-                    // then have the preview coins appear
-                    o->oAction = BLUE_COIN_SWITCH_ACT_PREVIEWING;
-                }
-#endif
             }
-#ifdef BLUE_COIN_SWITCH_PREVIEW
-            else {
-                // If Mario is not on the switch,
-                // go back to being idle
-                o->oAction = BLUE_COIN_SWITCH_ACT_IDLE;
-            }
-#endif
 
             // Have collision
             load_object_collision_model();
