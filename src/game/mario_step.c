@@ -242,7 +242,7 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     mario_set_forward_vel(m, 0.0f);
     m->vel[1] = 0.0f;
 
-    // HackerSM64 2.1: This check fixes the ledgegrab downwarp from being pushed off.
+    // HackerSM64 2.1: This check fixes the ledgegrab downwarp after being pushed off a ledge.
     if (m->pos[1] <= m->floorHeight + 160.0f) {
         m->pos[1] = m->floorHeight;
     }
