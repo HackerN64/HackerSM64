@@ -117,13 +117,6 @@
 // #define PUPPYLIGHTS
 
 /**
- * Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
- * It is sideways in vanilla, and since vanilla's environment map textures are sideways too, those will appear as sideways in-game if this is enabled.
- * Make sure your custom environment map textures are the correct orientation.
- */
-// #define FIX_REFLECT_MTX
-
-/**
  * Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
  */
 // #define DISABLE_SHADOWS

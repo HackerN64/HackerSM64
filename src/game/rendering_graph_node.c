@@ -673,21 +673,17 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     // As a result, environment mapping is broken on Fast3DEX2 without the
     // changes below.
     Mat4* cameraMatrix = &gCameraTransform;
- #ifdef FIX_REFLECT_MTX
+    /**
+    * HackerSM64 2.1: Now uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
+    * It was originally sideways in vanilla, with vanilla's environment map textures sideways to accommodate, but those
+    * textures are now rotated automatically on extraction to allow for this to be fixed.
+    */
     gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
     gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
     gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
     gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * -(*cameraMatrix)[0][1]);
     gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * -(*cameraMatrix)[1][1]);
     gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * -(*cameraMatrix)[2][1]);
- #else
-    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
-    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
-    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
-    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][1]);
-    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][1]);
-    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][1]);
- #endif
 #endif // F3DEX_GBI_2
 
     // Make a copy of the view matrix and scale its translation based on WORLD_SCALE
