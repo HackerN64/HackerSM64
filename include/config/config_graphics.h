@@ -136,12 +136,13 @@
 
 
 /**
- * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
+ * May break viewport widescreen hacks.
+ * When this is disabled,the culling will only be skipped according to the NO_CULLING_EMULATOR_BLACKLIST
  */
 // #define CULLING_ON_EMULATOR
 
 /**
- * Makes objects bellow the screen be culled. 
+ * Makes objects below the screen be culled. 
  * NOTE: Vanilla objects do not account for vertical culling.
  */
 // #define VERTICAL_CULLING
