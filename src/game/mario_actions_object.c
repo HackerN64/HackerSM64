@@ -349,7 +349,12 @@ s32 act_holding_bowser(struct MarioState *m) {
         if (m->angleVel[1] <= -0xE00 || m->angleVel[1] >= 0xE00) {
             play_sound(SOUND_MARIO_SO_LONGA_BOWSER, m->marioObj->header.gfx.cameraToObject);
         } else {
-            play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    if (Character == 0){    
+                play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    }
+    if (Character == 1){    
+                play_sound(SOUND_LUIGI_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    }
         }
         return set_mario_action(m, ACT_RELEASING_BOWSER, 0);
     }

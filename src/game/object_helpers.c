@@ -2351,3 +2351,43 @@ void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 o
     spawn_default_star(targetX, targetY, targetZ);
     o->oPosY = objectPosY;
 }
+
+static void cur_obj_update_resolve_wall_collisions(s16 steepSlopeDegrees) {
+
+    if (o->activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+        o->oMoveFlags &= ~(OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER);
+
+        if (o->oPosY > o->oFloorHeight) {
+            o->oMoveFlags |= OBJ_MOVE_IN_AIR;
+        }
+    } else {
+        o->oMoveFlags &= ~OBJ_MOVE_HIT_WALL;
+        if (cur_obj_resolve_wall_collisions()) {
+            o->oMoveFlags |= OBJ_MOVE_HIT_WALL;
+        }
+
+        if (o->oPosY > o->oFloorHeight) {
+            o->oMoveFlags |= OBJ_MOVE_IN_AIR;
+        }
+
+        if (cur_obj_detect_steep_floor(steepSlopeDegrees)) {
+            o->oMoveFlags |= OBJ_MOVE_HIT_WALL;
+        }
+    }
+}
+
+
+void cur_obj_update_walls2(void) {
+    cur_obj_update_resolve_wall_collisions(60);
+}
+
+void cur_obj_unrender_and_reset_state(s32 sp18, s32 sp1C) {
+    cur_obj_become_intangible();
+    cur_obj_disable_rendering();
+
+    if (sp18 >= 0) {
+        cur_obj_init_animation_with_sound(sp18);
+    }
+
+    o->oAction = sp1C;
+}

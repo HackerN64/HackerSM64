@@ -196,6 +196,7 @@ extern const Gfx leaves_seg3_dl_0301CDE0[];
 extern const GeoLayout marios_cap_geo[];
 extern const GeoLayout marios_metal_cap_geo[];
 extern const GeoLayout marios_wing_cap_geo[];
+extern const GeoLayout marios_gold_cap_geo[];
 extern const GeoLayout marios_winged_metal_cap_geo[];
 extern const Gfx mario_cap_seg3_dl_03022B30[];
 extern const Gfx mario_cap_seg3_dl_03022B68[];
@@ -211,6 +212,8 @@ extern const Gfx mario_cap_seg3_dl_030230B0[];
 extern const Gfx mario_cap_seg3_dl_03023108[];
 extern const Gfx mario_cap_seg3_dl_03023160[];
 extern const Gfx mario_cap_seg3_dl_03023298[];
+extern const Gfx mario_cap_seg3_dl_gold[];
+extern const Gfx mario_cap_seg3_dl_gold_2[];
 
 // mist
 extern const GeoLayout mist_geo[];

@@ -1254,6 +1254,12 @@
 #define /*0x0FC*/ oYoshiChosenHome OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
 
+/* Beta Trampoline */
+#define /*0x110*/ oBetaTrampolineMarioOnTrampoline OBJECT_FIELD_S32(0x22)
+#define /*0x111*/ oBetaTrampolineAdditiveYVel      OBJECT_FIELD_F32(0x23)
+
+/*Luigi*/
+#define /*0x0F8*/ oLuigiHasTalkedToMario OBJECT_FIELD_S32(0x1C)
 
 /*Custom general defines:
 

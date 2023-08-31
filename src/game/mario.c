@@ -33,6 +33,10 @@
 #include "sound_init.h"
 #include "rumble_init.h"
 
+int Character;
+int SAVE_FLAG_COLLECTED_LUIGI_KEY   = 1;
+int SAVE_FLAG_COLLECTED_WARIO_KEY    =  0;
+int SAVE_FLAG_COLLECTED_WALUIGI_KEY  =  0;
 
 /**************************************************
  *                    ANIMATIONS                  *
@@ -240,12 +244,13 @@ void play_sound_if_no_flag(struct MarioState *m, u32 soundBits, u32 flags) {
         m->flags |= flags;
     }
 }
-
 /**
+ * 
  * Plays a jump sound if one has not been played since the last action change.
  */
 void play_mario_jump_sound(struct MarioState *m) {
     if (!(m->flags & MARIO_MARIO_SOUND_PLAYED)) {
+    if (Character == 0){    
         if (m->action == ACT_TRIPLE_JUMP) {
             play_sound(SOUND_MARIO_YAHOO_WAHA_YIPPEE + ((gAudioRandom % 5) << 16),
                        m->marioObj->header.gfx.cameraToObject);
@@ -253,6 +258,16 @@ void play_mario_jump_sound(struct MarioState *m) {
             play_sound(SOUND_MARIO_YAH_WAH_HOO + ((gAudioRandom % 3) << 16),
                        m->marioObj->header.gfx.cameraToObject);
         }
+    }
+    if (Character == 1){    
+        if (m->action == ACT_TRIPLE_JUMP) {
+            play_sound(SOUND_LUIGI_YAH_WAH_HOO + ((gAudioRandom % 3) << 16),
+                       m->marioObj->header.gfx.cameraToObject);
+        } else {
+            play_sound(SOUND_LUIGI_YAH_WAH_HOO + ((gAudioRandom % 3) << 16),
+                       m->marioObj->header.gfx.cameraToObject);
+        }
+    }
         m->flags |= MARIO_MARIO_SOUND_PLAYED;
     }
 }
@@ -1221,6 +1236,62 @@ void update_mario_button_inputs(struct MarioState *m) {
         if (m->controller->buttonPressed & Z_TRIG  ) m->input |= INPUT_Z_PRESSED;
     }
 
+    if (Character == 0) {
+        m->marioObj->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MARIO];
+    }    
+
+if (SAVE_FLAG_COLLECTED_LUIGI_KEY == 1){
+
+    if (Character == 1) {
+        m->marioObj->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_LUIGI]; 
+    } 
+
+    if (m->controller->buttonPressed & L_TRIG) {
+        play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
+        m->particleFlags |= PARTICLE_MIST_CIRCLE;
+        if (Character == 0) {
+            Character = 1;
+        } else {
+            Character = 0;
+        }
+    }
+}
+
+if (SAVE_FLAG_COLLECTED_WARIO_KEY == 1){
+    if (Character == 2) {
+        m->marioObj->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_WARIO]; 
+    }    
+
+    if (m->controller->buttonPressed & L_JPAD) {
+        play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
+        m->particleFlags |= PARTICLE_MIST_CIRCLE;
+        if (Character == 0) {
+            Character = 2;
+        } else {
+            Character = 0;
+        }
+    } 
+}
+
+if (SAVE_FLAG_COLLECTED_WALUIGI_KEY == 1){
+
+    if (Character == 3) {
+        m->marioObj->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_WALUIGI]; 
+    }    
+
+
+    if (m->controller->buttonPressed & R_JPAD) {
+        play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
+        m->particleFlags |= PARTICLE_MIST_CIRCLE;
+        if (Character == 0) {
+            Character = 3;
+        } else {
+            Character = 0;
+        }
+    }
+    
+}
+
     if (m->input & INPUT_A_PRESSED) {
         m->framesSinceA = 0;
     } else if (m->framesSinceA < 0xFF) {
@@ -1619,6 +1690,12 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     if (flags & (MARIO_METAL_CAP | MARIO_METAL_SHOCK)) {
         bodyState->modelState |= MODEL_STATE_METAL;
     }
+
+    if (flags & MARIO_GOLD_CAP) {
+        bodyState->modelState = MODEL_STATE_GOLD;
+        m->particleFlags |= PARTICLE_SPARKLES;
+    }
+
 
     //! (Pause buffered hitstun) Since the global timer increments while paused,
     //  this can be paused through to give continual invisibility. This leads to

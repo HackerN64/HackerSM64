@@ -773,6 +773,7 @@ static void treat_far_home_as_mario(f32 threshold) {
 #include "behaviors/rotating_octagonal_plat.inc.c"
 #include "behaviors/animated_floor_switch.inc.c"
 #include "behaviors/activated_bf_plat.inc.c"
+#include "behaviors/blargg.inc.c"
 #include "behaviors/recovery_heart.inc.c"
 #include "behaviors/water_bomb_cannon.inc.c"
 #include "behaviors/unagi.inc.c"

@@ -1794,6 +1794,16 @@ enum animIDsSwoop {
     #define UKIKI_CAGE_ACT_FALL                             0x2
     #define UKIKI_CAGE_ACT_HIDE                             0x3
 
+	/* Blargg */
+	/* Animations */
+#define UNBABA_ANIM_SWIM 0
+#define UNBABA_ANIM_ATTACK 1	
+
+/* oAction */
+#define UNBABA_ACT_IDLE 0
+#define UNBABA_ACT_SWIM 1
+#define UNBABA_ACT_ATTACK 2
+
 /* Piranha Plant */
     /* oAction */
     #define PIRANHA_PLANT_ACT_IDLE                          0x0
@@ -2710,6 +2720,26 @@ enum gCutsceneObjSpawns {
     CUTSCENE_OBJ_7_END_BIRDS_1,
     CUTSCENE_OBJ_5_END_BIRDS_2,
     CUTSCENE_OBJ_2_END_BIRDS_1
+};
+
+
+enum oLuigiHasTalkedToMarioStates {
+    LUIGI_HAS_NOT_TALKED,
+    LUIGI_TALKED_STATE_UNUSED,
+    LUIGI_BUDDY_HAS_TALKED
+};
+
+/* Toad */
+enum animIDsLuigi {
+    LUIGI_IDLE, // 1 frame
+};
+
+
+enum oActionsLuigi {
+    LUIGI_ACT_IDLE,
+    LUIGI_ACT_1,
+    LUIGI_ACT_TURN_TO_TALK,
+    LUIGI_ACT_TALK
 };
 
 #endif // OBJECT_CONSTANTS_H

@@ -62,7 +62,7 @@ YAY0_OBJ_FILES := $(YAY0_FILES:.szp=.szp.o)
 KOOPA_DIRS       := koopa_flag poundable_pole koopa piranha_plant whomp chain_ball chain_chomp
 CAPSWITCH_DIRS   := capswitch springboard
 CHILLYCHIEF_DIRS := chillychief moneybag
-BULLY_DIRS       := bully blargg
+BULLY_DIRS       := bully blargg motos
 SPINDRIFT_DIRS   := spindrift penguin snowman
 KING_BOBOMB_DIRS := king_bobomb water_bubble
 BOO_DIRS         := bookend book chair small_key mad_piano boo haunted_cage

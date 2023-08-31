@@ -9,6 +9,7 @@
 #include "game_init.h"
 #include "interaction.h"
 #include "mario_step.h"
+#include "object_list_processor.h"
 
 #include "config.h"
 
@@ -43,6 +44,9 @@ f32 get_additive_y_vel_for_jumps(void) {
     return 0.0f;
 }
 
+static struct Object *sTrampoline;
+
+
 /**
  * Does nothing, but takes in a MarioState. This is only ever
  * called by update_mario_inputs, which is called as part of Mario's
@@ -63,6 +67,7 @@ void stub_mario_step_1(UNUSED struct MarioState *x) {
  * or to set a variable with its intended additive Y vel.
  */
 void stub_mario_step_2(void) {
+    sTrampoline = gCurrentObject;
 }
 
 void transfer_bully_speed(struct BullyCollisionData *obj1, struct BullyCollisionData *obj2) {

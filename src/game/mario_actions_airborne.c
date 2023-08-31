@@ -54,7 +54,12 @@ s32 lava_boost_on_wall(struct MarioState *m) {
         m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
     }
 
+    if (Character == 0){
     play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
+    }
+    if (Character == 1){
+    play_sound(SOUND_LUIGI_ON_FIRE, m->marioObj->header.gfx.cameraToObject);;
+    }
     update_mario_sound_and_camera(m);
     return drop_and_set_mario_action(m, ACT_LAVA_BOOST, 1);
 }
@@ -465,7 +470,12 @@ s32 act_double_jump(struct MarioState *m) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
+    if (Character == 0){    
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_HOOHOO);
+    }
+    if (Character == 1){    
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_LUIGI_YAHOO);
+    }
     common_air_action_step(m, ACT_DOUBLE_JUMP_LAND, animation,
                            AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG);
     return FALSE;
@@ -628,7 +638,14 @@ s32 act_long_jump(struct MarioState *m) {
         animation = MARIO_ANIM_SLOW_LONGJUMP;
     }
 
+if (Character == 0){
+
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO);
+}
+if (Character == 1){
+
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_LUIGI_YAHOO);
+}
 
     if (m->floor->type == SURFACE_VERTICAL_WIND && m->actionState == 0) {
         play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
@@ -1466,7 +1483,12 @@ s32 act_lava_boost(struct MarioState *m) {
 #if ENABLE_RUMBLE
     if (!(m->flags & MARIO_MARIO_SOUND_PLAYED)) {
 #endif
+    if (Character == 0){
         play_sound_if_no_flag(m, SOUND_MARIO_ON_FIRE, MARIO_MARIO_SOUND_PLAYED);
+    }
+    if (Character == 1){
+        play_sound_if_no_flag(m, SOUND_LUIGI_ON_FIRE, MARIO_MARIO_SOUND_PLAYED);
+    }
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
     }

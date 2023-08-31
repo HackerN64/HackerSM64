@@ -28,4 +28,10 @@ extern const Gfx bully_seg5_dl_05003F80[];
 extern const Gfx bully_seg5_dl_05003FC8[];
 extern const struct Animation *const bully_seg5_anims_0500470C[];
 
+#include "blargg/geo_header.h"
+
+#include "motos/geo_header.h"
+
+#include "motos/anim_header.h"
+
 #endif

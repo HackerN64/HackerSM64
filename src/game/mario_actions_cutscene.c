@@ -611,9 +611,13 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
                 break;
 
             case 42:
+    if (Character == 0){    
                 play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
-                break;
-
+    }
+    if (Character == 1){    
+                play_sound(SOUND_LUIGI_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    }
+    break;
             case 80:
                 if (!(m->actionArg & 1)) {
                     level_trigger_warp(m, WARP_OP_STAR_EXIT);
@@ -2366,7 +2370,12 @@ static void end_peach_cutscene_star_dance(struct MarioState *m) {
         cutscene_put_cap_on(m);
     }
     if (animFrame == 88) {
-        play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    if (Character == 0){    
+                play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    }
+    if (Character == 1){    
+                play_sound(SOUND_LUIGI_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
+    }
     }
     if (animFrame >= 98) {
         m->marioBodyState->handState = MARIO_HAND_PEACE_SIGN;

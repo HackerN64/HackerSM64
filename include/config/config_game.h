@@ -12,7 +12,7 @@
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
 // Disables lives and hides the lives counter.
-#define DISABLE_LIVES
+//#define DISABLE_LIVES
 
 // Saves the number of lives to the save file (Does nothing if DISABLE_LIVES is enabled).
 #define SAVE_NUM_LIVES

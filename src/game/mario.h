@@ -52,5 +52,9 @@ s32 set_water_plunge_action(struct MarioState *m);
 s32 execute_mario_action(UNUSED struct Object *obj);
 void init_mario(void);
 void init_mario_from_save_file(void);
+extern int SAVE_FLAG_COLLECTED_LUIGI_KEY;
+extern int SAVE_FLAG_COLLECTED_WARIO_KEY;
+extern int SAVE_FLAG_COLLECTED_WALUIGI_KE;
+extern int Character;
 
 #endif // MARIO_H

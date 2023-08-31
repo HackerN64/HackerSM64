@@ -2097,3 +2097,10 @@ Arrgghh!\n\
 Anyone entering this cave\n\
 without permission will\n\
 meet certain disaster."))
+
+DEFINE_DIALOG(DIALOG_170, 1, 4, 30, 200, _("\
+Hi Mario!\n\
+\n\
+\n\
+Arent the stars amazing!\n\
+Give it a look!"))

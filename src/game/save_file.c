@@ -508,7 +508,7 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
 
 #ifdef COMPLETE_SAVE_FILE
 s32 save_file_get_course_star_count(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
-    return 7;
+    return 4;
 }
 #else
 s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
@@ -585,7 +585,7 @@ u32 save_file_get_flags(void) {
  */
 #ifdef COMPLETE_SAVE_FILE
 u32 save_file_get_star_flags(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
-    return 0x7F;
+    return 0x2F;
 }
 #else
 u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {

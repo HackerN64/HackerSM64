@@ -36,7 +36,7 @@
  */
 
 // Set this to the extended bounds mode you want, then do "make clean".
-#define EXTENDED_BOUNDS_MODE 1
+#define EXTENDED_BOUNDS_MODE 3
 
 // Don't touch the stuff past this point unless you know what you're doing!
 

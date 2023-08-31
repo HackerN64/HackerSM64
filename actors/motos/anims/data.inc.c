@@ -1,0 +1,7 @@
+#include "anim_tpose.inc.c"
+#include "anim_motos_carry_run.inc.c"
+#include "anim_motos_carry_start.inc.c"
+#include "anim_motos_down_recover.inc.c"
+#include "anim_motos_mario_carry.inc.c"
+#include "anim_motos_pitch.inc.c"
+#include "anim_motos_walk.inc.c"

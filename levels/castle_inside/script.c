@@ -16,7 +16,11 @@
 #include "make_const_nonconst.h"
 #include "levels/castle_inside/header.h"
 
-static const LevelScript script_func_local_1[] = {
+static const LevelScript script_func_local_1[] = { 
+    PAINTING_WARP_NODE(0x68, LEVEL_PPF, 0x01, 0x0A, WARP_NO_CHECKPOINT),
+    PAINTING_WARP_NODE(0x69, LEVEL_PPF, 0x01, 0x0A, WARP_NO_CHECKPOINT),
+    PAINTING_WARP_NODE(0x70, LEVEL_PPF, 0x01, 0x0A, WARP_NO_CHECKPOINT),
+    WARP_NODE(0x71, LEVEL_PPF, 0x01, 0x0A, WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x02, /*destLevel*/ LEVEL_CASTLE_COURTYARD, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
@@ -33,9 +37,9 @@ static const LevelScript script_func_local_1[] = {
     PAINTING_WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_BOB, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
     PAINTING_WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_BOB, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
     PAINTING_WARP_NODE(/*id*/ 0x02, /*destLevel*/ LEVEL_BOB, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
-    PAINTING_WARP_NODE(/*id*/ 0x03, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
-    PAINTING_WARP_NODE(/*id*/ 0x04, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
-    PAINTING_WARP_NODE(/*id*/ 0x05, /*destLevel*/ LEVEL_CCM, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
+    PAINTING_WARP_NODE(/*id*/ 0x03, /*destLevel*/ LEVEL_PPF, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
+    PAINTING_WARP_NODE(/*id*/ 0x04, /*destLevel*/ LEVEL_PPF, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
+    PAINTING_WARP_NODE(/*id*/ 0x05, /*destLevel*/ LEVEL_PPF, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
     PAINTING_WARP_NODE(/*id*/ 0x06, /*destLevel*/ LEVEL_WF, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
     PAINTING_WARP_NODE(/*id*/ 0x07, /*destLevel*/ LEVEL_WF, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
     PAINTING_WARP_NODE(/*id*/ 0x08, /*destLevel*/ LEVEL_WF, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
@@ -87,6 +91,8 @@ static const LevelScript script_func_local_1[] = {
     WARP_NODE(/*id*/ 0x65, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x65, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x66, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x66, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x67, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x67, /*flags*/ WARP_NO_CHECKPOINT),
+	OBJECT( MODEL_NONE, -2343, 1404, -4769, 0, -134, 0,   (0x68 << 16), bhvPaintingDeathWarp),
+	OBJECT( MODEL_NONE, -2343, 1404, -4769, 0, -134, 0,   (0x69 << 16), bhvPaintingStarCollectWarp),
     RETURN(),
 };
 
@@ -180,6 +186,7 @@ static const LevelScript script_func_local_3[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  4147, -1280,  1997, /*angle*/ 0,   0, 0, /*behParam*/ 0x0F180000, /*beh*/ bhvWarp),
     WARP_NODE(/*id*/ 0x18, /*destLevel*/ LEVEL_BITFS, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -1382,  -819, -4150, /*angle*/ 0, 180, 0, /*behParam*/ 0x00320000, /*beh*/ bhvPaintingStarCollectWarp),
+		OBJECT(MODEL_WARIOHEAD, 4740, -507, 2011, 0, 180, 0,   0x00670000, bhvStaticObject),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2918,  -870,  -875, /*angle*/ 0,   0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvPaintingStarCollectWarp),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  2483, -1688, -2662, /*angle*/ 0, 270, 0, /*behParam*/ 0x00340000, /*beh*/ bhvLaunchStarCollectWarp),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  2381,  -500,  2011, /*angle*/ 0,  90, 0, /*behParam*/ 0x00350000, /*beh*/ bhvAirborneStarCollectWarp),
@@ -221,6 +228,7 @@ static const LevelScript script_func_local_4[] = {
 
 const LevelScript level_castle_inside_entry[] = {
     INIT_LEVEL(),
+    LOAD_YAY0(        /*seg*/ 0x0A, _bbh_skybox_yay0SegmentRomStart, _bbh_skybox_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x07, _castle_inside_segment_7SegmentRomStart, _castle_inside_segment_7SegmentRomEnd),
     LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _inside_yay0SegmentRomStart, _inside_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x06, _group15_yay0SegmentRomStart, _group15_yay0SegmentRomEnd),
@@ -242,6 +250,7 @@ const LevelScript level_castle_inside_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_CASTLE_DOOR_1_STAR,        castle_door_1_star_geo),
     LOAD_MODEL_FROM_GEO(MODEL_CASTLE_DOOR_3_STARS,       castle_door_3_stars_geo),
     LOAD_MODEL_FROM_GEO(MODEL_CASTLE_KEY_DOOR,           key_door_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_WARP_PIPE,    warp_pipe_geo),
     // The different sets of star doors all use different model IDs, despite them all loading the same geo layout.
     // It is possible that star doors were originally going to have numbers on them, similar to the other locked doors.
     LOAD_MODEL_FROM_GEO(MODEL_CASTLE_STAR_DOOR_30_STARS, castle_geo_000F00),
@@ -263,13 +272,16 @@ const LevelScript level_castle_inside_entry[] = {
         JUMP_LINK(script_func_local_1),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_1_collision),
-        ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_1_rooms),
         MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_1_macro_objs),
+        ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_1_rooms),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 
+
     AREA(/*index*/ 2, castle_geo_001858),
+		WARP_NODE(0x02, LEVEL_CASTLE, 0x05, 0x0A, WARP_NO_CHECKPOINT),
+		WARP_NODE(0x04, LEVEL_CASTLE, 0x05, 0x0B, WARP_NO_CHECKPOINT),
         OBJECT(/*model*/ MODEL_CASTLE_CLOCK_MINUTE_HAND, /*pos*/  -205, 2918, 7222, /*angle*/ 0, 180, 0, /*behParam*/ 0x00000000, /*beh*/ bhvClockMinuteHand),
         OBJECT(/*model*/ MODEL_CASTLE_CLOCK_HOUR_HAND,   /*pos*/  -205, 2918, 7222, /*angle*/ 0, 180, 0, /*behParam*/ 0x00000000, /*beh*/ bhvClockHourHand),
         OBJECT(/*model*/ MODEL_CASTLE_CLOCK_PENDULUM,    /*pos*/  -205, 2611, 7140, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDecorativePendulum),
@@ -277,6 +289,8 @@ const LevelScript level_castle_inside_entry[] = {
         OBJECT(/*model*/ MODEL_TOAD,                     /*pos*/  -977, 1203, 2569, /*angle*/ 0,   0, 0, /*behParam*/ DIALOG_076 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,                     /*pos*/ -1584, 2253, 7157, /*angle*/ 0, 136, 0, /*behParam*/ DIALOG_083 << 24, /*beh*/ bhvToadMessage),
         OBJECT(/*model*/ MODEL_TOAD,                     /*pos*/   837, 1203, 3020, /*angle*/ 0, 180, 0, /*behParam*/ DIALOG_137 << 24, /*beh*/ bhvToadMessage),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, -271, 5018, -3819, 0, 0, 0,   0x00030000, bhvDoorWarp),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, -117, 5018, -3819, 0, -180, 0,   0x00040000, bhvDoorWarp),
         JUMP_LINK(script_func_local_2),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_2_collision),
@@ -288,6 +302,10 @@ const LevelScript level_castle_inside_entry[] = {
     END_AREA(),
 
     AREA(/*index*/ 3, castle_geo_001C10),
+		WARP_NODE(0x1B, LEVEL_CASTLE, 0x04, 0x0A, WARP_NO_CHECKPOINT),
+		WARP_NODE(0x2B, LEVEL_CASTLE, 0x04, 0x0B, WARP_NO_CHECKPOINT),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, 3150, -1734, 8560, 0, -180, 0, (0x2B << 16), bhvDoorWarp),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, 2996, -1734, 8560, 0, 0, 0, (0x1B << 16), bhvDoorWarp),
         OBJECT(/*model*/ MODEL_CASTLE_WATER_LEVEL_PILLAR, /*pos*/  7066, -1178,  -819, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWaterLevelPillar),
         OBJECT(/*model*/ MODEL_CASTLE_WATER_LEVEL_PILLAR, /*pos*/  7066, -1178,  -205, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWaterLevelPillar),
         OBJECT(/*model*/ MODEL_NONE,                      /*pos*/     0,     0,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvDddWarp),
@@ -303,6 +321,46 @@ const LevelScript level_castle_inside_entry[] = {
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
+
+	AREA(4, castle_inside_area_4),
+		WARP_NODE(0x0A, LEVEL_CASTLE, 0x03, 0X2B, WARP_NO_CHECKPOINT),
+		WARP_NODE(0x0B, LEVEL_CASTLE, 0x03, 0x1B, WARP_NO_CHECKPOINT),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, -12850, -613, 1890, 0, -90, 0, (0x0A << 16), bhvDoorWarp),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, -12850, -613, 2044, 0, 90, 0, (0x0B << 16), bhvDoorWarp),
+		TERRAIN(castle_inside_area_4_collision),
+		MACRO_OBJECTS(castle_inside_area_4_macro_objs),
+		SET_BACKGROUND_MUSIC(0x00, SEQ_2B),
+		TERRAIN_TYPE(TERRAIN_STONE),
+		/* Fast64 begin persistent block [area commands] */
+		/* Fast64 end persistent block [area commands] */
+	END_AREA(),
+
+	AREA(5, castle_inside_area_5),
+		WARP_NODE(0x0A, LEVEL_CASTLE, 0x02, 0x02, WARP_NO_CHECKPOINT),
+		WARP_NODE(0x0B, LEVEL_CASTLE, 0x02, 0x04, WARP_NO_CHECKPOINT),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, 62, -456, 8455, 0, 180, 0, (0x0B << 16), bhvDoorWarp),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, -92, -456, 8455, 0, 0, 0, (0x0A << 16), bhvDoorWarp),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, 62, -456, 3060, 0, 180, 0,   0x00010000, bhvDoor),
+		OBJECT( MODEL_CASTLE_KEY_DOOR, -92, -456, 3060, 0, 0, 0,   0x00000000, bhvDoor),
+		OBJECT(MODEL_TOAD, -202, -288, -2524, 0, 33, 0, DIALOG_170 << 24, bhvToadMessage),
+		OBJECT(MODEL_BOO_CASTLE, -1052, -417, 4168, 0, 90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_CASTLE_DOOR_0_STARS, -1007, -457, 24, 0, -90, 0,   0x00000000, bhvDoor),
+		OBJECT(MODEL_CASTLE_DOOR_0_STARS, 999, -457, 24, 0, 90, 0,   0x00000000, bhvDoor),
+		OBJECT(MODEL_BOO_CASTLE, -328, -417, 4168, 0, 90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_BOO_CASTLE, 327, -417, 4168, 0, 90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_BOO_CASTLE, 1088, -417, 4170, 0, 90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_BOO_CASTLE, 1070, -417, 7463, 0, -90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_BOO_CASTLE, 346, -417, 7463, 0, -90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_BOO_CASTLE, -309, -417, 7463, 0, -90, 0,   0x00010000, bhvBoo),
+		OBJECT(MODEL_BOO_CASTLE, -1070, -417, 7461, 0, -90, 0,   0x00010000, bhvBoo),
+		TERRAIN(castle_inside_area_5_collision),
+		MACRO_OBJECTS(castle_inside_area_5_macro_objs),
+		SET_BACKGROUND_MUSIC(0x00, SEQ_STREAMED_4TH_FLOOR),
+		TERRAIN_TYPE(TERRAIN_STONE),
+		/* Fast64 begin persistent block [area commands] */
+		/* Fast64 end persistent block [area commands] */
+	END_AREA(),
+
 
     FREE_LEVEL_POOL(),
     MARIO_POS(/*area*/ 1, /*yaw*/ 180, /*pos*/ -1023, 0, 1152),

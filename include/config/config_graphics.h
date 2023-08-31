@@ -34,10 +34,10 @@
 // #define DISABLE_AA
 
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
-#define IA8_COINS
+//#define IA8_COINS
 
 // Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti).
-#define IA8_30FPS_COINS
+//#define IA8_30FPS_COINS
 
 // Use .rej microcode for certain objects (experimental - only should be used when F3DEX_GBI_2 is defined).
 // For advanced users only. Does not work perfectly out the box, best used when exported actor models are
@@ -64,7 +64,7 @@
 #define BURN_SMOKE_FIX
 
 // Disables the fix to Koopa's unshelled model.
-#define KOOPA_KEEP_PINK_SHORTS
+//#define KOOPA_KEEP_PINK_SHORTS
 
 // Uses the star object's model in the star dance cutscene.
 // This has a side effect of making the star dance star also transparent when Mario collects a transparent star.
