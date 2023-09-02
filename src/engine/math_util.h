@@ -450,7 +450,7 @@ extern f32 gSineTable[];
 }
 
 // Float lerp.
-// Return the value between [a, to] based on f's value between [0.0, 1.0].
+// Return the value between [from, to] based on f's value between [0.0, 1.0].
 ALWAYS_INLINE f32 lerpf(f32 from, f32 to, f32 f) {
     return (from + (f * (to - from)));
 }
