@@ -40,7 +40,7 @@ struct Config {
     /*0x06*/ u8 tvType;
 }; /*0x07*/
 
-struct Controller {
+typedef struct Controller {
     /*0x00*/ s16 rawStickX;               // Analog stick [-128, 128] positive is right. Used for menus.
     /*0x02*/ s16 rawStickY;               // Analog stick [-128, 128] positive is up. Used for menus.
     /*0x04*/ f32 stickX;                  // Analog stick [-64, 64] positive is right. Used for gameplay.
@@ -52,7 +52,7 @@ struct Controller {
     /*0x18*/ OSContStatus* statusData;    // Pointer to the controller status data in gControllerStatuses.
     /*0x1C*/ OSContPadEx* controllerData; // Pointer to the raw input data in gControllerPads.
     /*0x20*/ s32 port;                    // The port index this controller is plugged into [0, 3].
-}; /*0x24*/
+} Controller; /*0x24*/
 
 // -- Booleans --
 

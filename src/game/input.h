@@ -24,12 +24,12 @@
 #define ANALOG_DEADZONE_STATUS_POLLING 20
 
 
-struct DemoInput {
+typedef struct DemoInput {
     /*0x00*/ u8 timer; // Time until next input. If this value is 0, it means the demo is over
     /*0x01*/ s8 rawStickX;
     /*0x02*/ s8 rawStickY;
     /*0x03*/ u8 buttonMask;
-}; /*0x04*/
+} DemoInput; /*0x04*/
 
 
 // Player Controllers.

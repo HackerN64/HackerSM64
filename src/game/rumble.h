@@ -21,15 +21,15 @@ enum RumbleEvents {
 };
 
 // A rumble command.
-struct RumbleData {
+typedef struct RumbleData {
     /*0x00*/ s16 event; // The type of rumble command. see RumbleEvents enum.
     /*0x02*/ s16 level; // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
     /*0x04*/ s16 timer; // How many frames the main portion of the rumble lasts.
     /*0x06*/ s16 decay; // How much 'level' decreases each frame during the 'timer' phase.
-}; /*0x08*/
+} RumbleData; /*0x08*/
 
 // Rumble Info for each port.
-struct RumbleInfo {
+typedef struct RumbleInfo {
     /*0x00*/ OSPfs pfs;                                     // Rumble Pak file system data.
     /*0x66*/ s16 count;                                     // Used to modulate rumble when 'event' is RUMBLE_EVENT_LEVELON.
     /*0x68*/ s16 start;                                     // The time to initially rumble for before the 'timer' phase.
@@ -40,7 +40,7 @@ struct RumbleInfo {
     /*0x8E*/ s32 motorState;                                // Current rumble motor state.
     /*0x92*/ s32 breathTimer;                               // Only used to time the drowning warning rumble.
     /*0x96*/ s32 error;                                     // The last error from a motor start/stop.
-}; /*0x9A*/
+} RumbleInfo; /*0x9A*/
 
 extern OSThread gRumblePakThread;
 

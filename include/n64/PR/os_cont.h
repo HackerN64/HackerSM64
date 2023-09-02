@@ -104,7 +104,7 @@ typedef union {
 
 // -- N64 Standard Controller buttons --
 
-typedef struct PACKED {
+typedef struct PACKED N64Buttons_D {
     /*0x0*/ u16       : 4;
     /*0x0*/ u16 UP    : 1; // U_JPAD | CONT_UP
     /*0x0*/ u16 DOWN  : 1; // D_JPAD | CONT_DOWN
@@ -113,7 +113,7 @@ typedef struct PACKED {
     /*0x1*/ u16       : 8;
 } N64Buttons_D; /*0x02*/
 
-typedef struct PACKED {
+typedef struct PACKED N64Buttons_C {
     /*0x0*/ u16       : 12;
     /*0x1*/ u16 UP    : 1; // U_CBUTTONS | CONT_E
     /*0x1*/ u16 DOWN  : 1; // D_CBUTTONS | CONT_D
@@ -216,7 +216,7 @@ typedef union {
 
 // -- GCN Controller buttons --
 
-typedef struct PACKED {
+typedef struct PACKED GCNButtons_D {
     /*0x0*/ u16       : 12;
     /*0x1*/ u16 UP    : 1; // CONT_GCN_UP
     /*0x1*/ u16 DOWN  : 1; // CONT_GCN_DOWN
@@ -362,20 +362,20 @@ typedef union {
  * Structure for controllers
  */
 
-typedef struct { //! TODO: Accessory type/detection.
+typedef struct OSContStatus { //! TODO: Accessory type/detection.
     /*0x00*/ u16 type;                      /* Controller Type (SI identifier, byteswapped) */
     /*0x02*/ u8  status;                    /* Controller status */
     /*0x03*/ u8  error;                     /* Error */
 } OSContStatus; /*0x04*/
 
-typedef struct {
+typedef struct OSContPad {
     /*0x00*/ u16 button;                    /* Button data */
     /*0x02*/ s8  stick_x;                   /* -80 <= stick_x <=  80 */
     /*0x03*/ s8  stick_y;                   /* -80 <= stick_y <=  80 */
     /*0x04*/ u8  error;                     /* Error */
 } OSContPad; /*0x08*/
 
-typedef struct PACKED {
+typedef struct PACKED OSContOrigins {
     /*0x00*/ u8 pad[1];
     /*0x01*/ _Bool initialized;             /* Whether this controller's origins have been set. */
     /*0x02*/ Analog_u8 stick;               /* -80 <=   stick <=  80 */
@@ -384,7 +384,7 @@ typedef struct PACKED {
 } OSContOrigins; /*0x08*/
 
 // Custom extended controller pad struct that contains fields for gamecube controllers
-typedef struct {
+typedef struct OSContPadEx {
     /*0x00*/ OSContButtons button;          /* Button data */
     /*0x02*/ OSContButtons lockedButton;    /* Button data to ignore */
     /*0x04*/ OSContButtons statPollButton;  /* Previous frame's inputs when status polling. */
@@ -397,7 +397,7 @@ typedef struct {
     /*0x17*/ u8 errno;                      /* Error number */
 } OSContPadEx; /*0x18*/
 
-typedef struct {
+typedef struct OSContRamIo {
     /*0x00*/ void *address;                 /* Ram pad Address: 11 bits */
     /*0x04*/ u8   databuffer[BLOCKSIZE];    /* address of the data buffer */
     /*0x05*/ u8   addressCrc;               /* CRC code for address */

@@ -39,19 +39,19 @@
  *         pifstatus
  */
 // PIF RAM format used by vanilla libultra functions, pifstatus uses/overwrites the last 4 bytes.
-typedef struct PACKED {
+typedef struct PACKED OSPifRam {
     /*0x00*/ u32 ramarray[(PIF_RAM_SIZE / 4) - 1];  // The command data.
     /*0x3C*/ u32 pifstatus;                         // Set this to PIF_STATUS_EXE to run the commands in ramarray.
 } OSPifRam; /*0x40*/
 
 //; PIF RAM format, pifstatus only uses the last byte and frees up the previous 3 bytes for commands that only use this format.
-typedef struct PACKED {
+typedef struct PACKED OSPifRamEx {
     /*0x00*/ u8 ramarray[PIF_RAM_SIZE - 1];         // The command data.
     /*0x3F*/ u8 pifstatus;                          // Set this to PIF_STATUS_EXE to run the commands in ramarray.
 } OSPifRamEx; /*0x40*/
 
 // Send/receive data that signifies the start of a SI command.
-typedef struct PACKED {
+typedef struct PACKED OSContCmdSize {
     /*0x00*/ u8 tx; // The number of bytes of data to transmit.
     /*0x01*/ u8 rx; // The number of bytes of data to receive.
 } OSContCmdSize; /*0x02*/
@@ -61,7 +61,7 @@ typedef struct PACKED {
 /////////////////////////////////////
 
 // Generic command format for reading fields common to all formats.
-typedef struct PACKED {
+typedef struct PACKED __OSContGenericFormat {
     /*0x01*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -79,7 +79,7 @@ typedef struct PACKED {
 // -- Standard for all devices --
 
 // 0x00: CONT_CMD_REQUEST_STATUS, 0xFF: CONT_CMD_RESET
-typedef struct PACKED {
+typedef struct PACKED __OSContRequestFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -117,7 +117,7 @@ typedef struct PACKED {
             } recv; /*0x03*/
 } __OSContRequestFormat; /*0x06*/
 
-typedef struct PACKED {
+typedef struct PACKED __OSContRequestFormatAligned {
     /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ __OSContRequestFormat fmt;
     /*0x07*/ u8 align1;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
@@ -126,7 +126,7 @@ typedef struct PACKED {
 // -- Standard N64 input poll --
 
 // 0x01: CONT_CMD_READ_BUTTON
-typedef struct PACKED {
+typedef struct PACKED __OSContReadFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -145,7 +145,7 @@ typedef struct PACKED {
 // -- Controller Pak Read/Write --
 
 // 0x02: CONT_CMD_READ_MEMPAK, CONT_CMD_READ_64GB, CONT_CMD_READ_GBA
-typedef struct PACKED {
+typedef struct PACKED __OSContRamReadFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -163,13 +163,13 @@ typedef struct PACKED {
             } recv; /*0x21*/
 } __OSContRamReadFormat; /*0x26*/
 
-typedef struct PACKED {
+typedef struct PACKED __OSContRamReadFormatAligned {
     /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ __OSContRamReadFormat fmt;
 } __OSContRamReadFormatAligned; /*0x27*/
 
 // 0x03: CONT_CMD_WRITE_MEMPAK, CONT_CMD_WRITE_64GB, CONT_CMD_WRITE_GBA
-typedef struct PACKED {
+typedef struct PACKED __OSContRamWriteFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -187,7 +187,7 @@ typedef struct PACKED {
             } recv; /*0x01*/
 } __OSContRamWriteFormat; /*0x26*/
 
-typedef struct PACKED {
+typedef struct PACKED __OSContRamWriteFormatAligned {
     /*0x00*/ u8 align0;             // For 4-byte alignment. Always PIF_CMD_NOP (0xFF). Only needed for compatibility with vanilla libultra.
     /*0x01*/ __OSContRamWriteFormat fmt;
 } __OSContRamWriteFormatAligned; /*0x27*/
@@ -195,7 +195,7 @@ typedef struct PACKED {
 // -- EEPROM Read/Write --
 
 // 0x04: CONT_CMD_READ_EEPROM
-typedef struct PACKED {
+typedef struct PACKED __OSContReadEEPROMFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -213,7 +213,7 @@ typedef struct PACKED {
 } __OSContReadEEPROMFormat; /*0x0C*/
 
 // 0x05: CONT_CMD_WRITE_EEPROM
-typedef struct PACKED {
+typedef struct PACKED __OSContWriteEEPROMFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -246,7 +246,7 @@ typedef union {
 } RTCStatus; /*0x01*/
 
 // 0x06: CONT_CMD_READ_RTC_STATUS
-typedef struct PACKED {
+typedef struct PACKED __OSContReadRTCStatusFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -306,7 +306,7 @@ typedef union {
 } RTCBlockData; /*0x08*/
 
 // 0x07: CONT_CMD_READ_RTC_BLOCK
-typedef struct PACKED {
+typedef struct PACKED __OSContReadRTCBlockFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -325,7 +325,7 @@ typedef struct PACKED {
 } __OSContReadRTCBlockFormat; /*0x0D*/
 
 // 0x08: CONT_CMD_WRITE_RTC_BLOCK
-typedef struct PACKED {
+typedef struct PACKED __OSContRWriteRTCBlockFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -354,7 +354,7 @@ typedef union {
 } VRUAddrCRC; /*0x02*/
 
 // 0x09: CONT_CMD_READ_VOICE
-typedef struct PACKED {
+typedef struct PACKED __OSContRead36VoiceFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -373,7 +373,7 @@ typedef struct PACKED {
 } __OSContRead36VoiceFormat; /*0x29*/
 
 // 0x0A: CONT_CMD_WRITE_VOICE
-typedef struct PACKED {
+typedef struct PACKED __OSContWrite20VoiceFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -403,7 +403,7 @@ typedef union {
 } VRUStatus; /*0x02*/
 
 // 0x0B: CONT_CMD_READ_VOICE_STATUS
-typedef struct PACKED {
+typedef struct PACKED __OSContRead2VoiceFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -422,7 +422,7 @@ typedef struct PACKED {
 } __OSContRead2VoiceFormat; /*0x08*/
 
 // 0x0C: CONT_CMD_WRITE_VOICE_STATUS
-typedef struct PACKED {
+typedef struct PACKED __OSContWrite4VoiceFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -442,7 +442,7 @@ typedef struct PACKED {
 } __OSContWrite4VoiceFormat; /*0x0A*/
 
 // 0x0D: CONT_CMD_RESET_VOICE
-typedef struct PACKED {
+typedef struct PACKED __OSContSWriteVoiceFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -462,7 +462,7 @@ typedef struct PACKED {
 // -- Randnet Keyboard input poll --
 
 // 0x13: CONT_CMD_READ_KEYBOARD
-typedef struct PACKED {
+typedef struct PACKED __OSContReadKeyboardFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -499,7 +499,7 @@ typedef struct PACKED {
 // -- Send Game ID to controller --
 
 // 0x1D: CONT_CMD_WRITE_GAME_ID
-typedef struct PACKED {
+typedef struct PACKED __OSContWriteGameIDFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -522,7 +522,7 @@ typedef struct PACKED {
 // -- GCN Wheel Feedback --
 
 // 0x30: CONT_CMD_GCN_WHEEL_FEEDBACK
-typedef struct PACKED {
+typedef struct PACKED __OSContGCNWheelForceFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -561,7 +561,7 @@ typedef struct PACKED {
 // -- GCN Controller Input poll & calibration --
 
 // 0x40: CONT_CMD_GCN_SHORT_POLL
-typedef struct PACKED {
+typedef struct PACKED __OSContGCNShortPollFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -580,7 +580,7 @@ typedef struct PACKED {
 } __OSContGCNShortPollFormat; /*0x0D*/
 
 // 0x41: CONT_CMD_GCN_READ_ORIGIN
-typedef struct PACKED {
+typedef struct PACKED __OSContGCNReadOriginFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -600,7 +600,7 @@ typedef struct PACKED {
 } __OSContGCNReadOriginFormat; /*0x0D*/
 
 // 0x42: CONT_CMD_GCN_CALIBRATE
-typedef struct PACKED {
+typedef struct PACKED __OSContGCNCalibrateFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -620,7 +620,7 @@ typedef struct PACKED {
 } __OSContGCNCalibrateFormat; /*0x0F*/
 
 // 0x43: CONT_CMD_GCN_LONG_POLL
-typedef struct PACKED {
+typedef struct PACKED __OSContGCNLongPollFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {
@@ -642,7 +642,7 @@ typedef struct PACKED {
 // -- GCN Keyboard input poll --
 
 // 0x54: CONT_CMD_GCN_READ_KEYBOARD
-typedef struct PACKED {
+typedef struct PACKED __OSContGCNReadKeyboardFormat {
     /*0x00*/ OSContCmdSize size;    // The TX/RX sizes.
     /*0x02*/ union {
                 struct PACKED {

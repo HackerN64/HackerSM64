@@ -17,11 +17,11 @@ enum AnalogIndex {
 };
 
 
-struct ButtonName {
+typedef struct ButtonName {
     /*0x00*/ u8 pad[2];
     /*0x02*/ u16 mask;              // Button mask.
     /*0x04*/ const char* name;      // Button name string.
-}; /*0x08*/
+} ButtonName; /*0x08*/
 
 typedef union {
     struct PACKED {
@@ -32,7 +32,7 @@ typedef union {
     u32 raw;
 } ButtonHighlight; /*0x04*/
 
-struct ControllerIcon {
+typedef struct ControllerIcon {
     /*0x00*/ u8 pad[2];
     /*0x02*/ u16 type;              // Controller type.
     /*0x04*/ Texture* texture;      // Pointer to the controller texture for the above type.
@@ -40,11 +40,11 @@ struct ControllerIcon {
     /*0x08*/ const ButtonHighlight (*buttonHighlightList)[];  // Pointer to the list of button highlights for the above texture.
     /*0x0C*/ const ButtonHighlight (*analogHighlightList)[];  // Pointer to the list of button highlights for the above texture.
 #endif // CONTROLLERS_INPUT_DISPLAY
-}; /*0x10*/
+} ControllerIcon; /*0x10*/
 
 
 #ifdef ENABLE_STATUS_REPOLLING_GUI
 void render_controllers_overlay(void);
 #else
-#define render_controllers_overlay()
+ #define render_controllers_overlay()
 #endif
