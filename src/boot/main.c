@@ -365,12 +365,12 @@ void thread3_main(UNUSED void *arg) {
     alloc_pool();
     load_engine_code_segment();
     detect_emulator();
-#ifndef UNF
-    create_crash_screen_thread();
-#endif
 
+    // Only one crash handler can be used at a time.
 #ifdef UNF
     debug_initialize();
+#else
+    create_crash_screen_thread();
 #endif
 
 #ifdef DEBUG
