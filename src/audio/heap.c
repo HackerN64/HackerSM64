@@ -6,9 +6,8 @@
 #include "synthesis.h"
 #include "seqplayer.h"
 #include "effects.h"
-#include "game/game_init.h"
+#include "game/emutest.h"
 #include "game/puppyprint.h"
-#include "game/vc_check.h"
 #include "game/debug.h"
 #include "string.h"
 
@@ -1171,7 +1170,7 @@ void audio_reset_session(s32 reverbPresetId) {
         if (gAudioLoadLock != AUDIO_LOCK_UNINITIALIZED) {
             gAudioLoadLock = AUDIO_LOCK_LOADING;
 
-            if (!gIsVC) {
+            if (!(gEmulator & EMU_WIIVC)) {
                 gAudioFrameCount = 0;
                 while (gAudioFrameCount < 1) {
                     // spin
@@ -1325,7 +1324,7 @@ void audio_reset_session(void) {
     gAudioBufferParameters.minAiBufferLength *= gAudioBufferParameters.presetUnk4;
     gAudioBufferParameters.updatesPerFrame *= gAudioBufferParameters.presetUnk4;
 
-    if (gIsConsole)
+    if (gEmulator & EMU_CONSOLE)
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_CONSOLE;
     else
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;
@@ -1352,7 +1351,7 @@ void audio_reset_session(void) {
     gMinAiBufferLength = gSamplesPerFrameTarget - 0x10;
     gAudioUpdatesPerFrame = updatesPerFrame = gSamplesPerFrameTarget / 160 + 1;
 
-    if (gIsConsole)
+    if (gEmulator & EMU_CONSOLE)
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_CONSOLE;
     else
         gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;

@@ -13,6 +13,7 @@
 #include "level_commands.h"
 #include "rumble_init.h"
 #include "config.h"
+#include "emutest.h"
 #ifdef SRAM
 #include "sram.h"
 #endif
@@ -55,7 +56,6 @@ s8 gLevelToCourseNumTable[] = {
 STATIC_ASSERT(ARRAY_COUNT(gLevelToCourseNumTable) == LEVEL_COUNT - 1,
               "change this array if you are adding levels");
 #ifdef EEP
-#include "vc_check.h"
 #include "vc_ultra.h"
 
 /**
@@ -76,7 +76,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = gIsVC
+            status = (gEmulator & EMU_WIIVC)
                    ? osEepromLongReadVC(&gSIEventMesgQueue, offset, buffer, size)
                    : osEepromLongRead  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
@@ -106,7 +106,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = gIsVC
+            status = (gEmulator & EMU_WIIVC)
                    ? osEepromLongWriteVC(&gSIEventMesgQueue, offset, buffer, size)
                    : osEepromLongWrite  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
