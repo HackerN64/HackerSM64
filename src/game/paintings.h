@@ -93,25 +93,25 @@ enum oActionsPainting {
 /**
  * A list of preset constants for the ripple animations.
  */
-struct RippleAnimation {
+typedef struct RippleAnimation {
     /*0x00*/ const f32 mag;         /// Controls how high the peaks of the ripple are when the animation starts.
     /*0x04*/ const f32 decay;       /// Multiplier that controls how fast the ripple regresses to the IDLE state.
     /*0x08*/ const f32 rate;        /// Controls the ripple's frequency.
     /*0x0C*/ const f32 dispersion;  /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple.
-}; /*0x10*/
+} RippleAnimation; /*0x10*/
 
 /**
  * A ripple animation pair.
  */
-struct RippleAnimationPair {
+typedef struct RippleAnimationPair {
     /*0x00*/ const struct RippleAnimation passive;  /// The ripple when the painting is continuously rippling or is lightly touched.
     /*0x10*/ const struct RippleAnimation entry;    /// The ripple when the painting is entered.
-}; /*0x20*/
+} RippleAnimationPair; /*0x20*/
 
 /**
  * Painting info struct.
  */
-struct PaintingImage {
+typedef struct PaintingImage {
     /// Texture data.
     /*0x00*/ const Texture* const* textureArray;
 
@@ -137,24 +137,24 @@ struct PaintingImage {
     /// By default a painting is 614.0f x 614.0f (PAINTING_SIZE).
     /*0x10*/ const f32 sizeX;
     /*0x14*/ const f32 sizeY;
-}; /*0x18*/
+} PaintingImage; /*0x18*/
 
 /**
  * Contains the position and normal of a vertex in the painting's generated mesh.
  */
-struct PaintingMeshVertex {
+typedef struct PaintingMeshVertex {
     /*0x00*/ Vec3s pos;
     /*0x06*/ Vec3c norm;
-}; /*0x0C*/
+} PaintingMeshVertex; /*0x0C*/
 
 /**
  * Lists the neighboring triangles for each vertex in the mesh.
  * Used when applying gouraud shading to the generated ripple mesh.
  */
-struct PaintingNeighborTris {
+typedef struct PaintingNeighborTris {
     /*0x00*/ s16 numNeighbors;
     /*0x02*/ s16 neighborTris[9];
-}; /*0x14*/
+} PaintingNeighborTris; /*0x14*/
 
 
 Gfx* geo_painting_draw(s32 callContext, struct GraphNode* node, UNUSED void* context);
