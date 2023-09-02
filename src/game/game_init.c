@@ -28,9 +28,12 @@
 #include "puppyprint.h"
 #include "puppycam2.h"
 #include "debug_box.h"
-#include "vc_check.h"
 #include "vc_ultra.h"
 #include "profiling.h"
+#include "emutest.h"
+
+// Emulators that the Instant Input patch should not be applied to
+#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -38,8 +41,6 @@ Gfx *gDisplayListHead;
 u8 *gGfxPoolEnd;
 struct GfxPool *gGfxPool;
 
-u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
-u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
@@ -386,8 +387,8 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    // Currently, Ares passes the cache emulation test and has issues with single buffering so disable it there as well.
-    if (gIsConsole || gIsVC || gCacheEmulated) {
+    // Currently, Ares and Simple64 have issues with single buffering so disable it there as well.
+    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -426,7 +427,7 @@ void display_and_vsync(void) {
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
     // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
-    if (gIsConsole || gIsVC || gCacheEmulated) {
+    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
@@ -480,7 +481,7 @@ void thread5_game_loop(UNUSED void *arg) {
     init_controllers();
 #ifdef EEP
     // EEPROM probe for save data.
-    gEepromProbe = gIsVC
+    gEepromProbe = (gEmulator & EMU_WIIVC)
                  ? osEepromProbeVC(&gSIEventMesgQueue)
                  : osEepromProbe  (&gSIEventMesgQueue);
 #endif

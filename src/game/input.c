@@ -7,9 +7,9 @@
 #include "game_init.h"
 #include "rumble.h"
 #include "input.h"
-#include "profiling.h"
-#include "vc_check.h"
 #include "vc_ultra.h"
+#include "profiling.h"
+#include "emutest.h"
 
 // Player Controllers (players).
 struct Controller gControllers[MAXCONTROLLERS];
@@ -339,7 +339,7 @@ void stop_controller_status_polling(OSContPadEx* pad) {
     assign_controllers_by_player_num();
 #ifdef EEP
     // EEPROM probe for save data.
-    gEepromProbe = gIsVC
+    gEepromProbe = (gEmulator & EMU_WIIVC)
                  ? osEepromProbeVC(&gSIEventMesgQueue)
                  : osEepromProbe  (&gSIEventMesgQueue);
 #endif // EEP

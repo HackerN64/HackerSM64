@@ -17,6 +17,7 @@
 #include "behavior_data.h"
 #include "string.h"
 #include "color_presets.h"
+#include "emutest.h"
 
 #include "config.h"
 #include "config/config_world.h"
@@ -314,7 +315,7 @@ void switch_ucode(s32 ucode) {
             break;
         case GRAPH_NODE_UCODE_REJ:
             // Use .rej Microcode, skip sub-pixel processing on console
-            if (gIsConsole) {
+            if (gEmulator & EMU_CONSOLE) {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
             } else {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
@@ -583,7 +584,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         // If an emulator is detected, use a large value for the half fov 
         // horizontal value to account for viewport widescreen hacks.
 
-        if(!gIsConsole){
+        if(!(gEmulator & EMU_CONSOLE)){
             node->halfFovHorizontal = 9999.0f;
         }
 #endif
@@ -614,7 +615,7 @@ static f32 get_dist_from_camera(Vec3f pos) {
  */
 void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #ifdef AUTO_LOD
-    f32 distanceFromCam = gIsConsole ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : 50.0f;
+    f32 distanceFromCam = (gEmulator & EMU_CONSOLE) ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : 50.0f;
 #else
     f32 distanceFromCam = get_dist_from_camera(gMatStack[gMatStackIndex][3]);
 #endif
