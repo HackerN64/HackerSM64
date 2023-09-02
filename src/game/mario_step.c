@@ -242,8 +242,10 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     mario_set_forward_vel(m, 0.0f);
     m->vel[1] = 0.0f;
 
-    //! This is responsible for some downwarps.
-    m->pos[1] = m->floorHeight;
+    // HackerSM64 2.1: This check fixes the ledgegrab downwarp after being pushed off a ledge.
+    if (m->pos[1] <= m->floorHeight + 160.0f) {
+        m->pos[1] = m->floorHeight;
+    }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
@@ -259,9 +261,10 @@ s32 stationary_ground_step(struct MarioState *m) {
     if (takeStep) {
         stepResult = perform_ground_step(m);
     } else {
-        //! TODO - This is responsible for many stationary downwarps but is
-        // important for stuff like catching Bowser in midair, figure out a good way to fix
-        m->pos[1] = m->floorHeight;
+        // HackerSM64 2.1: This check prevents the downwarps that plagued stationary actions.
+        if (m->pos[1] <= m->floorHeight + 160.0f) {
+            m->pos[1] = m->floorHeight;
+        }
 
         vec3f_copy(marioObj->header.gfx.pos, m->pos);
         vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);

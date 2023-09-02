@@ -42,7 +42,7 @@
 /**
  * When this option is enabled, LODs will ONLY work on console.
  * When this option is disabled, LODs will work regardless of whether console or emulator is used.
- * Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
+ * Regardless of whether this setting is enabled or not, you can use gEmulator to wrap your own code in a console check.
  */
 #define AUTO_LOD
 
@@ -138,7 +138,7 @@
 /**
  * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
  */
-//#define HORIZONTAL_CULLING_ON_EMULATOR
+// #define HORIZONTAL_CULLING_ON_EMULATOR
 
 /**
  * Makes objects bellow the screen be culled.
@@ -150,3 +150,13 @@
  * will be used instead.
  */
 #define DEFAULT_CULLING_RADIUS 300
+
+/**
+ * Eases the textured screen transitions to make them look smoother.
+ */
+#define EASE_IN_OUT_TRANSITIONS
+
+/**
+ * Makes use of the tex edge render mode to deliver smooth transition textures
+ */
+// #define SHARP_TRANSITION_TEXTURES
