@@ -389,10 +389,10 @@ const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
     while (checkInsn->name[0] != '.') {
         switch (insnType) {
             default:
-            case INSN_TYPE_OPCODE:  check = insn.opcode; break; // First 6 bits
-            case INSN_TYPE_FUNC:    check = insn.func;   break; // Last 6 bits
-            case INSN_TYPE_REGIMM:  check = insn.regimm; break; // The 5 bits after the first 11
-            case INSN_TYPE_COP_FMT: check = insn.fmt;    break; // The 3 bits after the first 8
+            case INSN_TYPE_OPCODE:  check = insn.opcode; break; // First 6 bits.
+            case INSN_TYPE_FUNC:    check = insn.func;   break; // Last 6 bits.
+            case INSN_TYPE_REGIMM:  check = insn.regimm; break; // The 5 bits after the first 11.
+            case INSN_TYPE_COP_FMT: check = insn.fmt;    break; // The 3 bits after the first 8.
         }
 
         if (check == checkInsn->opcode) {
@@ -469,7 +469,7 @@ s16 check_for_branch_offset(InsnData insn) {
         return 0x0000;
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < STRLEN(info->fmt); i++) {
         if (info->fmt[i] == CHAR_P_BRANCH) {
             return insn.offset;
         }

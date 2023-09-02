@@ -111,6 +111,9 @@ void play_crash_sound(struct CSThreadInfo* threadInfo, s32 sound) {
 #endif
 
 static void on_crash(struct CSThreadInfo* threadInfo) {
+    // Create another crash screen thread in case the current one crashes.
+    create_crash_screen_thread();
+
     // Set the active thread info pointer.
     gActiveCSThreadInfo = threadInfo;
 
@@ -160,20 +163,19 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     osSetEventMesg(OS_EVENT_SP_BREAK,  &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_SP_BREAK );
     osSetEventMesg(OS_EVENT_FAULT,     &threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT    );
 
+    // Wait for CPU break or fault.
     while (TRUE) {
-        // Wait for CPU break or fault.
         osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
         gCrashedThread = get_crashed_thread();
-        if (gCrashedThread == NULL) {
-            continue;
+        if (gCrashedThread != NULL) {
+            break;
         }
-
-        // -- A thread has crashed --
-        on_crash(threadInfo);
-        create_crash_screen_thread();
-        break;
     }
 
+    // -- A thread has crashed --
+    on_crash(threadInfo);
+
+    // Crash screen open.
     while (TRUE) {
         crash_screen_update_input();
         crash_screen_draw_main();

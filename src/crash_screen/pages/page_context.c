@@ -268,7 +268,7 @@ CSPage gCSPage_context ={
     .contList  = contextContList,
     .flags = {
         .initialized = FALSE,
-        .crashed     = FALSE, 
+        .crashed     = FALSE,
         .printName   = FALSE,
     },
 };
