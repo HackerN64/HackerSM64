@@ -342,20 +342,20 @@ void alert_rcp_hung_up(void) {
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
-    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.")
+    DEBUG_ASSERT(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.")
     gThread3Stack[0]++;
     gThread3Stack[THREAD3_STACK - 1]++;
-    assert(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.")
+    DEBUG_ASSERT(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.")
     gThread4Stack[0]++;
     gThread4Stack[THREAD4_STACK - 1]++;
-    assert(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.")
+    DEBUG_ASSERT(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.")
     gThread5Stack[0]++;
     gThread5Stack[THREAD5_STACK - 1]++;
-    assert(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    DEBUG_ASSERT(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
 #if ENABLE_RUMBLE
     gThread6Stack[0]++;
     gThread6Stack[THREAD6_STACK - 1]++;
-    assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
+    DEBUG_ASSERT(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
 #endif
 }
 #endif

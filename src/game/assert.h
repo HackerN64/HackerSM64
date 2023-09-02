@@ -52,3 +52,17 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
     #define DEBUG_ASSERT(condition, message)
     #define DEBUG_ASSERTF(condition, message, ...)
 #endif
+
+// Case sensitivity:
+#define error           ERROR
+#define errorf          ERRORF
+#define assert          ASSERT
+#define assertf         ASSERTF
+#define debug_error     DEBUG_ERROR
+#define debug_errorf    DEBUG_ERRORF
+#define debug_assert    DEBUG_ASSERT
+#define debug_assertf   DEBUG_ASSERTF
+
+// Backwards compatibility:
+#define aggress         assert
+#define aggressf        assertf

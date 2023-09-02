@@ -218,7 +218,7 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
         bufOffset += betterReverbDelays[SYNTH_CHANNEL_RIGHT][i];
     }
 
-    aggress(bufOffset * sizeof(s16) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
+    ASSERT(bufOffset * sizeof(s16) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
 
     lastDelayLight[SYNTH_CHANNEL_LEFT] = betterReverbDelays[SYNTH_CHANNEL_LEFT][filterCount-1];
     lastDelayLight[SYNTH_CHANNEL_RIGHT] = betterReverbDelays[SYNTH_CHANNEL_RIGHT][filterCount-1];
