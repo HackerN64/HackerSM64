@@ -469,7 +469,7 @@ s16 check_for_branch_offset(InsnData insn) {
         return 0x0000;
     }
 
-    for (int i = 0; i < STRLEN(info->fmt); i++) {
+    for (u32 i = 0; i < STRLEN(info->fmt); i++) {
         if (info->fmt[i] == CHAR_P_BRANCH) {
             return insn.offset;
         }

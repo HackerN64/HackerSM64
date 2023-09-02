@@ -31,7 +31,7 @@ CSPage* gCSPages[NUM_PAGES] = {
 };
 
 
-enum CSPages gCSPageID = FIRST_PAGE;
+enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE;
 
 
 // Change the current page.

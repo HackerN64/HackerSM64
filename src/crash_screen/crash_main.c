@@ -45,7 +45,7 @@ static void crash_screen_reinitialize(void) {
         gCSPages[gCSPageID]->flags.crashed = TRUE;
     }
 
-    gCSPageID = FIRST_PAGE;
+    gCSPageID = CRASH_SCREEN_START_PAGE;
 
     gCSSwitchedPage        = FALSE;
     gCSDrawControls        = FALSE;

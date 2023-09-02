@@ -5,6 +5,9 @@
 #include "types.h"
 
 
+#define CRASH_SCREEN_START_PAGE PAGE_SETTINGS
+
+
 enum CSPages {
     FIRST_PAGE,
     PAGE_CONTEXT = FIRST_PAGE,
