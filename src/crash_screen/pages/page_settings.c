@@ -90,105 +90,107 @@ void print_settings_list(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(y);
         }
 
-        s32 centeredDefaultsStartX = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - ((STRLEN("<") + strlen(setting->name) + STRLEN(">")) / 2));
+        _Bool isButton = FALSE;
+        RGBA32 buttonColor = COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION;
+        _Bool buttonCond = FALSE;
 
-        // Print certain header options differently:
+        // Print button options differently:
         switch (currViewIndex) {
             case CS_OPT_RESET_TO_DEFAULTS:
-                // "<[setting name]>"
-                if (crash_screen_check_for_changed_settings()) {
-                    crash_screen_print(
-                        centeredDefaultsStartX, y,
-                        STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",
-                        COLOR_RGBA32_CRASH_SELECT_ARROW,
-                        COLOR_RGBA32_CRASH_NO, setting->name,
-                        COLOR_RGBA32_CRASH_SELECT_ARROW
-                    );
-                } else {
-                    crash_screen_print(
-                        centeredDefaultsStartX, y,
-                        STR_COLOR_PREFIX"<%s>",
-                        COLOR_RGBA32_CRASH_SETTINGS_DISABLED, setting->name
-                    );
-                }
-                continue;
+                isButton = TRUE;
+                buttonColor = COLOR_RGBA32_CRASH_NO;
+                buttonCond = crash_screen_check_for_changed_settings();
+                break;
             case CS_OPT_EXPAND_ALL:
             case CS_OPT_COLLAPSE_ALL:
+                isButton = TRUE;
+                buttonCond = crash_screen_settings_check_for_header_state(currViewIndex == CS_OPT_COLLAPSE_ALL);
+                break;
+            default:
+                break;
+        }
+
+        if (isButton) {
+            s32 centeredDefaultsStartX = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - ((STRLEN("<") + strlen(setting->name) + STRLEN(">")) / 2));
+
+            // "<[button name]>"
+            if (buttonCond) {
+                crash_screen_print(
+                    centeredDefaultsStartX, y,
+                    STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",
+                    COLOR_RGBA32_CRASH_SELECT_ARROW,
+                    buttonColor, setting->name,
+                    COLOR_RGBA32_CRASH_SELECT_ARROW
+                );
+            } else {
                 crash_screen_print(
                     centeredDefaultsStartX, y,
                     STR_COLOR_PREFIX"<%s>",
-                    (crash_screen_settings_check_for_header_state(currViewIndex == CS_OPT_COLLAPSE_ALL) ? COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION : COLOR_RGBA32_CRASH_SETTINGS_DISABLED), setting->name
+                    COLOR_RGBA32_CRASH_SETTINGS_DISABLED, setting->name
                 );
-                continue;
-            default:
-                if (crash_screen_setting_is_header(currSettingIndex)) { // Header entry.
-                    crash_screen_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
-                    crash_screen_print(
-                        TEXT_X(section_indent), y,
-                        STR_COLOR_PREFIX"%s",
-                        COLOR_RGBA32_CRASH_PAGE_NAME, setting->name
-                    );
-                    // Translucent divider.
-                    crash_screen_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
-                    continue;
-                } else { // Normal Setting entry.
-                    break;
-                }
-        }
-
-        // Normal setting
-
-        // Maximum description print size.
-        u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
-
-        crash_screen_print_scroll(
-            TEXT_X(section_indent), y, (charX - section_indent),
-            STR_COLOR_PREFIX"%s",
-            COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
-        );
-
-        // "<"
-        charX += crash_screen_print(TEXT_X(charX), y,
-            (STR_COLOR_PREFIX"<"),
-            COLOR_RGBA32_CRASH_SELECT_ARROW
-        );
-
-        // Print the current setting.
-        if (setting->valNames != NULL) {
-            RGBA32 nameColor = COLOR_RGBA32_CRASH_SETTINGS_NAMED;
-
-            // Booleans color.
-            if (setting->valNames == &sValNames_bool) {
-                nameColor = (setting->val ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
             }
-
-            // "[setting value (string)]"
-            crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX"%s"),
-                nameColor, (*setting->valNames)[setting->val]
+        } else if (crash_screen_setting_is_header(currSettingIndex)) { // Header entry.
+            crash_screen_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
+            crash_screen_print(
+                TEXT_X(section_indent), y,
+                STR_COLOR_PREFIX"%s",
+                COLOR_RGBA32_CRASH_PAGE_NAME, setting->name
             );
-        } else {
-            // "[setting value (number)]"
-            crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX"%-d"),
-                COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val
-            );
-        }
-        charX += VALUE_NAME_SIZE;
+            // Translucent divider.
+            crash_screen_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
+        } else { // Normal setting
+            // Maximum description print size.
+            u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
 
-        // ">"
-        charX += crash_screen_print(TEXT_X(charX), y,
-            (STR_COLOR_PREFIX">"),
-            COLOR_RGBA32_CRASH_SELECT_ARROW
-        );
-
-        // Print an asterisk if the setting has been changed from the default value.
-        if (setting->val != setting->defaultVal) {
-            // "*"
-            crash_screen_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX"*"),
-                COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
+            crash_screen_print_scroll(
+                TEXT_X(section_indent), y, (charX - section_indent),
+                STR_COLOR_PREFIX"%s",
+                COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
             );
+
+            // "<"
+            charX += crash_screen_print(TEXT_X(charX), y,
+                (STR_COLOR_PREFIX"<"),
+                COLOR_RGBA32_CRASH_SELECT_ARROW
+            );
+
+            // Print the current setting.
+            if (setting->valNames != NULL) {
+                RGBA32 nameColor = COLOR_RGBA32_CRASH_SETTINGS_NAMED;
+
+                // Booleans color.
+                if (setting->valNames == &sValNames_bool) {
+                    nameColor = (setting->val ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
+                }
+
+                // "[setting value (string)]"
+                crash_screen_print(TEXT_X(charX), y,
+                    (STR_COLOR_PREFIX"%s"),
+                    nameColor, (*setting->valNames)[setting->val]
+                );
+            } else {
+                // "[setting value (number)]"
+                crash_screen_print(TEXT_X(charX), y,
+                    (STR_COLOR_PREFIX"%-d"),
+                    COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val
+                );
+            }
+            charX += VALUE_NAME_SIZE;
+
+            // ">"
+            charX += crash_screen_print(TEXT_X(charX), y,
+                (STR_COLOR_PREFIX">"),
+                COLOR_RGBA32_CRASH_SELECT_ARROW
+            );
+
+            // Print an asterisk if the setting has been changed from the default value.
+            if (setting->val != setting->defaultVal) {
+                // "*"
+                crash_screen_print(TEXT_X(charX), y,
+                    (STR_COLOR_PREFIX"*"),
+                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
+                );
+            }
         }
     }
 }
