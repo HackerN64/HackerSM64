@@ -30,6 +30,8 @@ def read_local_asset_list(f):
 
 
 def asset_needs_update(asset, version):
+    if version <= 7 and asset in envmap_table:
+        return True
     if version <= 6 and asset in ["actors/king_bobomb/king_bob-omb_eyes.rgba16.png", "actors/king_bobomb/king_bob-omb_hand.rgba16.png"]:
         return True
     if version <= 5 and asset == "textures/spooky/bbh_textures.00800.rgba16.png":
@@ -71,7 +73,7 @@ def clean_assets(local_asset_file):
 def main():
     # In case we ever need to change formats of generated files, we keep a
     # revision ID in the local asset file.
-    new_version = 7
+    new_version = 8
 
     try:
         local_asset_file = open(".assets-local.txt")
