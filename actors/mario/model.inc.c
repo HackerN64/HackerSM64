@@ -3249,7 +3249,7 @@ const Gfx mario_metal_medium_poly_butt[] = {
     gsDPPipeSync(),
     gsSPSetGeometryMode(G_TEXTURE_GEN),
     gsDPSetCombineMode(G_CC_DECALFADE, G_CC_DECALFADE),
-    gsDPLoadTextureBlock(mario_texture_metal, G_IM_FMT_RGBA, G_IM_SIZ_16b, 64, 32, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_WRAP | G_TX_NOMIRROR, 6, 5, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPLoadTextureBlock(mario_texture_metal, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 64, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_WRAP | G_TX_NOMIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
     gsSPTexture(0x07C0, 0x0F80, 0, G_TX_RENDERTILE, G_ON),
     gsSPLightColor(LIGHT_1, 0xffffffff),
     gsSPLightColor(LIGHT_2, 0x7f7f7fff),
