@@ -1867,7 +1867,6 @@ const BehaviorScript bhvUnusedPoundablePlatform[] = {
 const BehaviorScript bhvBetaTrampolineTop[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    LOAD_COLLISION_DATA(springboard_collision_05001A28),
     SET_HOME(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_beta_trampoline_top_loop),

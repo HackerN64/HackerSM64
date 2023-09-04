@@ -1754,13 +1754,13 @@ struct Painting thi_huge_painting = {
 
 // 0x07023620 - 0x07023698
 struct Painting ppf_painting = {
-    /* id */ 0x000E,
+    /* id */ 14,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
     /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
     /* Ripple Status */ 0x00,
     /* Rotation */    0, -43,
-    /* Position */-2587, 1232, -4781,
+    /* Position */-2399, 1283, -5305,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
     /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
@@ -1776,5 +1776,5 @@ struct Painting ppf_painting = {
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
-    /* Size */  445.0f,
+    /* Size */  471.0f,
 };

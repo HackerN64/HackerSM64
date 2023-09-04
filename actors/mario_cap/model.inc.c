@@ -25,7 +25,7 @@ ALIGNED8 static const Texture mario_cap_seg3_texture_0301CF50[] = {
 
 Gfx mario_mario_gold_rgba16_aligner[] = {gsSPEndDisplayList()};
 u8 mario_mario_gold_rgba16[] = {
-	#include "actors/mario/mario_gold.rgba16.inc.c"
+	#include "actors/mario_cap/mario_cap_gold.rgba16.inc.c"
 };
 
 // 0x0301DF50
