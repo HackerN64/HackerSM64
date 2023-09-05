@@ -4,6 +4,31 @@
 
 #include "types.h"
 
+#include "crash_screen/crash_settings.h"
+
+
+enum CSDisasmBranchArrowModes {
+    DISASM_ARROW_MODE_OFF,
+    DISASM_ARROW_MODE_SELECTION,
+#ifdef INCLUDE_DEBUG_MAP
+    DISASM_ARROW_MODE_FUNCTION,
+#endif
+    DISASM_ARROW_MODE_OVERSCAN,
+};
+
+enum CSSettingsGroup_page_disasm {
+    CS_OPT_HEADER_PAGE_DISASM,
+#ifdef INCLUDE_DEBUG_MAP
+    CS_OPT_DISASM_SHOW_SYMBOL,
+#endif
+    CS_OPT_DISASM_BINARY,
+    CS_OPT_DISASM_PSEUDOINSNS,
+    CS_OPT_DISASM_IMM_FMT,
+    CS_OPT_DISASM_OFFSET_ADDR,
+    CS_OPT_DISASM_ARROW_MODE, //! TODO: Implement overscan.
+    CS_OPT_END_DISASM,
+};
+
 
 typedef struct BranchArrow {
     /*0x00*/ Address startAddr;
@@ -28,4 +53,5 @@ extern _Bool gFillBranchBuffer;
 #endif
 
 
-extern CSPage gCSPage_disasm;
+extern struct CSSetting cs_settings_group_page_disasm[];
+extern struct CSPage gCSPage_disasm;

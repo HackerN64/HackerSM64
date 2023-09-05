@@ -6,6 +6,16 @@
 
 #include "game/input.h"
 
+#include "crash_screen/crash_settings.h"
+
+
+enum CSSettingsGroup_controls {
+    CS_OPT_HEADER_CONTROLS,
+    CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES,
+    CS_OPT_CONTROLS_ANALOG_DEADZONE,
+    CS_OPT_END_CONTROLS,
+};
+
 
 typedef struct CSController {
     /*0x00*/ s16 rawStickX;
@@ -60,12 +70,13 @@ typedef struct ControlType {
 } ControlType; /*0x08*/
 
 
+extern struct CSSetting cs_settings_group_controls[];
+extern const enum ControlTypes defaultContList[];
 extern _Bool gCSSwitchedPage;
 extern _Bool gCSDrawControls;
 extern CrashScreenDirections gCSDirectionFlags;
 extern CSController* const gCSCompositeController;
 extern const ControlType gCSControlDescriptions[];
-extern const enum ControlTypes defaultContList[];
 
 
 u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);

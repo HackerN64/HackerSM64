@@ -19,6 +19,35 @@
 #include "page_disasm.h"
 
 
+const char* sValNames_branch_arrow[] = {
+    [DISASM_ARROW_MODE_OFF      ] = "OFF",
+    [DISASM_ARROW_MODE_SELECTION] = "SELECTION",
+#ifdef INCLUDE_DEBUG_MAP
+    [DISASM_ARROW_MODE_FUNCTION ] = "FUNCTION",
+#endif
+    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this in page_disasm.c.
+};
+
+#ifdef INCLUDE_DEBUG_MAP
+    #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_FUNCTION
+#else
+    #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_SELECTION
+#endif
+
+struct CSSetting cs_settings_group_page_disasm[] = {
+    [CS_OPT_HEADER_PAGE_DISASM  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASM",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_DISASM_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif
+    [CS_OPT_DISASM_BINARY       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknown as binary",              .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_PSEUDOINSNS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudoinstructions",             .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_IMM_FMT      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
+    [CS_OPT_DISASM_OFFSET_ADDR  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Offsets as addresses",           .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_ARROW_MODE   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Branch arrow mode",              .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
+    [CS_OPT_END_DISASM          ] = { .type = CS_OPT_TYPE_END },
+};
+
+
 const enum ControlTypes disasmContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -229,7 +258,7 @@ static void print_as_insn(const u32 charX, const u32 charY, const Address addr, 
     crash_screen_print(charX, charY, "%s", insnAsStr);
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_SYMBOL_NAMES].val && destFname != NULL) {
+    if (get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
         // "[function name]"
         crash_screen_print_symbol_name_impl((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
@@ -254,8 +283,8 @@ static void print_as_binary(const u32 charX, const u32 charY, const Word data) {
 }
 
 static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
-    const enum CSDisasmBranchArrowModes branchArrowMode = gCSSettings[CS_OPT_DISASM_ARROW_MODE].val;
-    const _Bool unkAsBinary = gCSSettings[CS_OPT_DISASM_BINARY].val;
+    const enum CSDisasmBranchArrowModes branchArrowMode = get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
+    const _Bool unkAsBinary = get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
 
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
@@ -312,12 +341,12 @@ void disasm_draw(void) {
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
-    const _Bool showCurrentSymbol = gCSSettings[CS_OPT_DISASM_SHOW_SYMBOL].val;
+    const _Bool showCurrentSymbol = get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
     sDisasmNumShownRows = (20 - showCurrentSymbol);
 #endif
 
     sDisasmBranchStartX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET) +
-                        gCSSettings[CS_OPT_DISASM_OFFSET_ADDR].val
+                        get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)
                         ? TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, 0x80000000"))
                         : TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, +0x0000"));
 
@@ -347,7 +376,7 @@ void disasm_draw(void) {
         line++;
     }
 
-    if (gCSSettings[CS_OPT_DISASM_ARROW_MODE].val == DISASM_ARROW_MODE_FUNCTION) {
+    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         disasm_draw_branch_arrows(line);
     }
 #endif
@@ -423,10 +452,10 @@ void disasm_input(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
-        crash_screen_inc_setting(CS_OPT_SYMBOL_NAMES, TRUE);
+        crash_screen_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
     }
 
-    if (gCSSettings[CS_OPT_DISASM_ARROW_MODE].val == DISASM_ARROW_MODE_FUNCTION) {
+    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         //! TODO: don't reset branch buffer if switched page back into the same function.
         if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
             gFillBranchBuffer = TRUE;
@@ -456,12 +485,13 @@ void disasm_input(void) {
 #endif
 }
 
-CSPage gCSPage_disasm = {
-    .name      = "DISASM",
-    .initFunc  = disasm_init,
-    .drawFunc  = disasm_draw,
-    .inputFunc = disasm_input,
-    .contList  = disasmContList,
+struct CSPage gCSPage_disasm = {
+    .name         = "DISASM",
+    .initFunc     = disasm_init,
+    .drawFunc     = disasm_draw,
+    .inputFunc    = disasm_input,
+    .contList     = disasmContList,
+    .settingsList = cs_settings_group_page_disasm,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,

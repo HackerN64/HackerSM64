@@ -344,7 +344,7 @@ u32 print_crash_screen_header(void) {
 
 // Main draw function for the crash screen.
 void crash_screen_draw_main(void) {
-    const _Bool drawScreenshot = gCSSettings[CS_OPT_DRAW_SCREENSHOT].val;
+    const _Bool drawScreenshot = get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_SCREENSHOT);
 
     crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_reset_framebuffer(drawScreenshot);

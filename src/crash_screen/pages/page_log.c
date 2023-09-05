@@ -20,6 +20,13 @@
 #include "game/puppyprint.h"
 
 
+struct CSSetting cs_settings_group_page_log[] = {
+    [CS_OPT_HEADER_PAGE_LOG     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "LOG",                            .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_LOG_INDEX_NUMBERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show index numbers",             .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_LOG             ] = { .type = CS_OPT_TYPE_END },
+};
+
+
 const enum ControlTypes logContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -27,6 +34,7 @@ const enum ControlTypes logContList[] = {
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_LIST_END,
 };
+
 
 static u32 sLogSelectedIndex = 0;
 static u32 sLogViewportIndex = 0;
@@ -110,7 +118,7 @@ u32 print_assert_section(u32 line) {
 
 #ifdef PUPPYPRINT_DEBUG
 void draw_log_section(u32 line, u32 numLines) {
-    const _Bool showIndexNumbers = gCSSettings[CS_OPT_LOG_INDEX_NUMBERS].val;
+    const _Bool showIndexNumbers = get_setting_val(CS_OPT_GROUP_PAGE_LOG, CS_OPT_LOG_INDEX_NUMBERS);
 
     // "PUPPYPRINT LOG:"
     crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
@@ -196,12 +204,13 @@ void log_input(void) {
     }
 }
 
-CSPage gCSPage_log = {
-    .name      = "LOG",
-    .initFunc  = log_init,
-    .drawFunc  = log_draw,
-    .inputFunc = log_input,
-    .contList  = logContList,
+struct CSPage gCSPage_log = {
+    .name         = "LOG",
+    .initFunc     = log_init,
+    .drawFunc     = log_draw,
+    .inputFunc    = log_input,
+    .contList     = logContList,
+    .settingsList = cs_settings_group_page_log,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,

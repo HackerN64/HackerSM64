@@ -4,6 +4,16 @@
 
 #include "types.h"
 
+#include "crash_screen/crash_settings.h"
+
+
+enum CSSettingsGroup_page_stack {
+    CS_OPT_HEADER_PAGE_STACK,
+    CS_OPT_STACK_SHOW_ADDRESSES,
+    CS_OPT_STACK_SHOW_OFFSETS,
+    CS_OPT_END_STACK,
+};
+
 
 // Number of rows to print:
 #define STACK_TRACE_NUM_ROWS 20
@@ -20,4 +30,5 @@ typedef struct FunctionInStack {
 } FunctionInStack; /*0x10*/
 
 
-extern CSPage gCSPage_stack;
+extern struct CSSetting cs_settings_group_page_stack[];
+extern struct CSPage gCSPage_stack;

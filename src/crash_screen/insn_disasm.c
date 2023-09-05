@@ -374,7 +374,7 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
 const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
     const InsnTemplate* checkInsn = NULL;
 
-    if (gCSSettings[CS_OPT_DISASM_PSEUDOINSNS].val && check_pseudo_instructions(&checkInsn, insn)) {
+    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) && check_pseudo_instructions(&checkInsn, insn)) {
         return checkInsn;
     }
 
@@ -552,7 +552,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
 
     const InsnTemplate* info = get_insn(insn);
 
-    _Bool decImmediates = (gCSSettings[CS_OPT_DISASM_IMM_FMT].val == PRINT_NUM_FMT_DEC);
+    _Bool decImmediates = (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
 
     if (info != NULL) {
         const char* curCmd = &info->fmt[0];
@@ -617,7 +617,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     break;
                 case CHAR_P_BRANCH:
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
-                    if (gCSSettings[CS_OPT_DISASM_OFFSET_ADDR].val) {
+                    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)) {
                         ADD_STR(STR_FUNCTION, get_branch_target_from_addr(addr));
                     } else {
                         s16 branchOffset = (insn.offset + 1);
@@ -648,7 +648,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
-                    if (gCSSettings[CS_OPT_SYMBOL_NAMES].val && is_in_code_segment(target)) {
+                    if (get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && is_in_code_segment(target)) {
                         const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
                         if (symbol != NULL) {
                             *fname = get_map_symbol_name(symbol);

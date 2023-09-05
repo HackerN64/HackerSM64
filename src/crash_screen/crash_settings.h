@@ -5,7 +5,13 @@
 #include "types.h"
 
 
+#define SECTION_EXPANDED_DEFAULT FALSE
+#define MAX_OPTS_PER_GROUP 8
+#define GROUP_HEADER_INDEX 0
+
+
 typedef s16 SettingsType;
+typedef _Bool (*CSSettingsFunc)(int groupID, int settingID);
 
 
 enum CSPrintNumberFormats {
@@ -14,89 +20,71 @@ enum CSPrintNumberFormats {
     PRINT_NUM_FMT_SCI, // XeX
 };
 
-enum CSDisasmBranchArrowModes {
-    DISASM_ARROW_MODE_OFF,
-    DISASM_ARROW_MODE_SELECTION,
+enum CSSettingsGroups {
+    CS_OPT_GROUP_BUTTONS,
+    CS_OPT_GROUP_GLOBAL,
+    CS_OPT_GROUP_CONTROLS,
+    CS_OPT_GROUP_PAGE_CONTEXT,
+    CS_OPT_GROUP_PAGE_LOG,
+    CS_OPT_GROUP_PAGE_STACK,
 #ifdef INCLUDE_DEBUG_MAP
-    DISASM_ARROW_MODE_FUNCTION,
+    CS_OPT_GROUP_PAGE_MAP,
 #endif
-    DISASM_ARROW_MODE_OVERSCAN,
+    CS_OPT_GROUP_PAGE_MEMORY,
+    CS_OPT_GROUP_PAGE_DISASM,
+    NUM_CS_OPT_GROUPS,
 };
 
-enum CSSettings {
-    CS_OPT_EXPAND_ALL,
-    CS_OPT_COLLAPSE_ALL,
-    CS_OPT_RESET_TO_DEFAULTS,
-    // GLOBAL:
+enum CSSettingsGroup_global {
     CS_OPT_HEADER_GLOBAL,
-    CS_OPT_DRAW_SCREENSHOT,
+    CS_OPT_GLOBAL_DRAW_SCREENSHOT,
 #ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_SYMBOL_NAMES,
+    CS_OPT_GLOBAL_SYMBOL_NAMES,
 #endif
-    // CONTROLS:
-    CS_OPT_HEADER_CONTROLS,
-    CS_OPT_PRINT_SCROLL_SPEED,
-    CS_OPT_CURSOR_WAIT_FRAMES,
-    CS_OPT_ANALOG_DEADZONE,
-    // CONTEXT:
-    CS_OPT_HEADER_PAGE_CONTEXT,
-#ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_CONTEXT_PARSE_REG,
-#endif
-    CS_OPT_CONTEXT_FLOATS_FMT,
-    // LOG:
-    CS_OPT_HEADER_PAGE_LOG,
-    CS_OPT_LOG_INDEX_NUMBERS,
-    // STACK TRACE:
-    CS_OPT_HEADER_PAGE_STACK,
-    CS_OPT_STACK_SHOW_ADDRESSES,
-    CS_OPT_STACK_SHOW_OFFSETS,
-#ifdef INCLUDE_DEBUG_MAP
-    // MAP VIEW:
-    CS_OPT_HEADER_PAGE_MAP,
-    CS_OPT_MAP_SHOW_ADDRESSES,
-    CS_OPT_MAP_SHOW_TYPES,
-    CS_OPT_MAP_SHOW_SIZES,
-#endif
-    // RAM VIEW:
-    CS_OPT_HEADER_PAGE_MEMORY,
-#ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_MEMORY_SHOW_SYMBOL,
-#endif
-    CS_OPT_MEMORY_AS_ASCII,
-    // DISASM:
-    CS_OPT_HEADER_PAGE_DISASM,
-#ifdef INCLUDE_DEBUG_MAP
-    CS_OPT_DISASM_SHOW_SYMBOL,
-#endif
-    CS_OPT_DISASM_BINARY,
-    CS_OPT_DISASM_PSEUDOINSNS,
-    CS_OPT_DISASM_IMM_FMT,
-    CS_OPT_DISASM_OFFSET_ADDR,
-    CS_OPT_DISASM_ARROW_MODE, //! TODO: Implement this
-    NUM_CS_OPTS,
+    CS_OPT_GLOBAL_PRINT_SCROLL_SPEED,
+    CS_OPT_END_GLOBAL,
 };
 
+enum CSSettingsEntryType {
+    CS_OPT_TYPE_END,
+    CS_OPT_TYPE_SETTING,
+    CS_OPT_TYPE_HEADER,
+    CS_OPT_TYPE_BUTTON,
+};
+
+
+typedef struct CSSettingsGroup {
+    /*0x00*/ const char* name;
+    /*0x04*/ struct CSSetting* list;
+} CSSettingsGroup; /*0x08*/
 
 //! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt)
-typedef struct CSSettingsEntry {
-    /*0x00*/ const char* name;
-    /*0x20*/ const char* (*valNames)[];
-    /*0x24*/ SettingsType val;
-    /*0x28*/ SettingsType defaultVal;
-    /*0x2C*/ SettingsType lowerBound;
-    /*0x30*/ SettingsType upperBound;
-} CSSettingsEntry; /*0x40*/
+typedef struct CSSetting {
+    /*0x00*/ enum CSSettingsEntryType type;
+    /*0x04*/ const char* name;
+    /*0x08*/ const char* (*valNames)[];
+    /*0x0C*/ SettingsType val;
+    /*0x0E*/ SettingsType defaultVal;
+    /*0x10*/ SettingsType lowerBound;
+    /*0x12*/ SettingsType upperBound;
+} CSSetting; /*0x14*/
 
 
-extern CSSettingsEntry gCSSettings[NUM_CS_OPTS];
+extern const char* gValNames_bool[];
+extern const char* gValNames_print_num_fmt[];
 
 
-_Bool crash_screen_setting_is_header(enum CSSettings settingID);
-void crash_screen_inc_setting(enum CSSettings settingID, SettingsType inc);
-void crash_screen_reset_setting(enum CSSettings settingID);
-void crash_screen_reset_settings_section(enum CSSettings settingID);
-void crash_screen_reset_all_settings(void);
-_Bool crash_screen_check_for_changed_settings(void);
+CSSettingsGroup* get_settings_group(int groupID);
+CSSetting* get_setting(int groupID, int settingID);
+SettingsType get_setting_val(int groupID, int settingID);
+void crash_screen_inc_setting(int groupID, int settingID, SettingsType inc);
+_Bool group_has_header(int groupID);
+
+_Bool settings_func_reset(int groupID, int settingID);
+_Bool settings_func_is_non_default(int groupID, int settingID);
+
 _Bool crash_screen_settings_check_for_header_state(_Bool expand);
 void crash_screen_settings_set_all_headers(_Bool expand);
+
+_Bool crash_screen_settings_apply_to_all_in_group(CSSettingsFunc func, int groupID);
+_Bool crash_screen_settings_apply_to_all(CSSettingsFunc func);

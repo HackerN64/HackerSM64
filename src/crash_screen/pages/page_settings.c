@@ -14,6 +14,14 @@
 #include "page_settings.h"
 
 
+struct CSSetting cs_settings_group_buttons[] = {
+    [CS_OPT_BUTTON_EXPAND_ALL           ] = { .type = CS_OPT_TYPE_SETTING, .name = "expand all",                     .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_BUTTON_COLLAPSE_ALL         ] = { .type = CS_OPT_TYPE_SETTING, .name = "collapse all",                   .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_BUTTON_RESET_TO_DEFAULTS    ] = { .type = CS_OPT_TYPE_SETTING, .name = "reset all settings to defaults", .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_BUTTON                  ] = { .type = CS_OPT_TYPE_END },
+};
+
+
 const enum ControlTypes settingsContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -27,35 +35,52 @@ const enum ControlTypes settingsContList[] = {
 
 u32 sSettingsSelectedIndex = 0;
 static u32 sSettingsViewportIndex = 0;
-static u32 sSettngsTotalShownAmount = NUM_CS_OPTS;
 
-enum CSSettings gCSDisplayedSettingIDs[NUM_CS_OPTS];
+CSSettingDisplay gCSDisplayedSettings[NUM_CS_OPT_GROUPS * MAX_OPTS_PER_GROUP];
+static u32 sNumDisplayedSettings = 0;
 
+
+static void append_to_displayed_settings(int groupID, int settingID) {
+    gCSDisplayedSettings[sNumDisplayedSettings++] = (CSSettingDisplay){
+        .groupID   = groupID,
+        .settingID = settingID,
+    };
+}
 
 void update_displayed_settings(void) {
-    bzero(&gCSDisplayedSettingIDs, sizeof(gCSDisplayedSettingIDs));
+    bzero(&gCSDisplayedSettings, sizeof(gCSDisplayedSettings));
 
-    int dstSettingIndex = 0;
+    sNumDisplayedSettings = 0;
     _Bool sectionShown = TRUE;
 
-    for (int srcSettingIndex = 0; srcSettingIndex < NUM_CS_OPTS; srcSettingIndex++) {
-        _Bool show = sectionShown;
+    // Loop through all groups and add their contents to gCSDisplayedSettings.
+    for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
+        int settingID = 0;
 
-        // Header entry:
-        if (crash_screen_setting_is_header(srcSettingIndex)) {
-            // Set whether the next section is shown:
-            sectionShown = gCSSettings[srcSettingIndex].val;
-            show = TRUE;
+        // Header.
+        if (group_has_header(groupID)) {
+            CSSettingsGroup* group = get_settings_group(groupID);
+
+            sectionShown = group->list[settingID].val;
+
+            append_to_displayed_settings(groupID, settingID);
+
+            settingID++;
         }
 
-        // If section is not collapsed:
-        if (show) {
-            gCSDisplayedSettingIDs[dstSettingIndex] = srcSettingIndex;
-            dstSettingIndex++;
+        // Settings entries.
+        while (sectionShown) {
+            CSSetting* setting = get_setting(groupID, settingID);
+
+            if ((setting == NULL) || (setting->type == CS_OPT_TYPE_END)) {
+                break;
+            }
+
+            append_to_displayed_settings(groupID, settingID);
+
+            settingID++;
         }
     }
-
-    sSettngsTotalShownAmount = dstSettingIndex;
 }
 
 void settings_init(void) {
@@ -65,7 +90,7 @@ void settings_init(void) {
     update_displayed_settings();
 }
 
-extern const char* sValNames_bool[];
+extern const char* gValNames_bool[];
 
 void print_settings_list(u32 line, u32 numLines) {
     u32 currViewIndex = sSettingsViewportIndex;
@@ -73,10 +98,12 @@ void print_settings_list(u32 line, u32 numLines) {
 
     // Print
     for (u32 i = 0; i < numLines; i++, currViewIndex++) {
-        u32 currSettingIndex = gCSDisplayedSettingIDs[currViewIndex];
-        const CSSettingsEntry* setting = &gCSSettings[currSettingIndex];
+        CSSettingDisplay* settingDisplay = &gCSDisplayedSettings[currViewIndex];
+        s16 groupID   = settingDisplay->groupID;
+        s16 settingID = settingDisplay->settingID;
+        const CSSetting* setting = get_setting(groupID, settingID);
 
-        if (currViewIndex >= sSettngsTotalShownAmount) {
+        if (currViewIndex >= sNumDisplayedSettings) {
             break;
         }
 
@@ -90,27 +117,24 @@ void print_settings_list(u32 line, u32 numLines) {
             crash_screen_draw_row_selection_box(y);
         }
 
-        _Bool isButton = FALSE;
-        RGBA32 buttonColor = COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION;
-        _Bool buttonCond = FALSE;
-
         // Print button options differently:
-        switch (currViewIndex) {
-            case CS_OPT_RESET_TO_DEFAULTS:
-                isButton = TRUE;
-                buttonColor = COLOR_RGBA32_CRASH_NO;
-                buttonCond = crash_screen_check_for_changed_settings();
-                break;
-            case CS_OPT_EXPAND_ALL:
-            case CS_OPT_COLLAPSE_ALL:
-                isButton = TRUE;
-                buttonCond = crash_screen_settings_check_for_header_state(currViewIndex == CS_OPT_COLLAPSE_ALL);
-                break;
-            default:
-                break;
-        }
+        if (groupID == CS_OPT_GROUP_BUTTONS) {
+            RGBA32 buttonColor = COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION;
+            _Bool buttonCond = FALSE;
 
-        if (isButton) {
+            switch (currViewIndex) {
+                case CS_OPT_BUTTON_RESET_TO_DEFAULTS:
+                    buttonColor = COLOR_RGBA32_CRASH_NO;
+                    buttonCond = crash_screen_settings_apply_to_all(settings_func_is_non_default);
+                    break;
+                case CS_OPT_BUTTON_EXPAND_ALL:
+                case CS_OPT_BUTTON_COLLAPSE_ALL:
+                    buttonCond = crash_screen_settings_check_for_header_state(currViewIndex == CS_OPT_BUTTON_COLLAPSE_ALL);
+                    break;
+                default:
+                    break;
+            }
+
             s32 centeredDefaultsStartX = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - ((STRLEN("<") + strlen(setting->name) + STRLEN(">")) / 2));
 
             // "<[button name]>"
@@ -129,7 +153,7 @@ void print_settings_list(u32 line, u32 numLines) {
                     COLOR_RGBA32_CRASH_SETTINGS_DISABLED, setting->name
                 );
             }
-        } else if (crash_screen_setting_is_header(currSettingIndex)) { // Header entry.
+        } else if (setting->type == CS_OPT_TYPE_HEADER) { // Header entry.
             crash_screen_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
             crash_screen_print(
                 TEXT_X(section_indent), y,
@@ -159,7 +183,7 @@ void print_settings_list(u32 line, u32 numLines) {
                 RGBA32 nameColor = COLOR_RGBA32_CRASH_SETTINGS_NAMED;
 
                 // Booleans color.
-                if (setting->valNames == &sValNames_bool) {
+                if (setting->valNames == &gValNames_bool) {
                     nameColor = (setting->val ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO);
                 }
 
@@ -206,10 +230,10 @@ void settings_draw(void) {
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
-    if (sSettngsTotalShownAmount > SETTINGS_NUM_ROWS) {
+    if (sNumDisplayedSettings > SETTINGS_NUM_ROWS) {
         crash_screen_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
-            SETTINGS_NUM_ROWS, sSettngsTotalShownAmount,
+            SETTINGS_NUM_ROWS, sNumDisplayedSettings,
             sSettingsViewportIndex,
             COLOR_RGBA32_CRASH_DIVIDER, TRUE
         );
@@ -218,35 +242,41 @@ void settings_draw(void) {
 }
 
 void settings_input(void) {
-    u32 selectedSettingIndex = gCSDisplayedSettingIDs[sSettingsSelectedIndex];
+    CSSettingDisplay* settingDisplay = &gCSDisplayedSettings[sSettingsSelectedIndex];
+    s16 groupID   = settingDisplay->groupID;
+    s16 settingID = settingDisplay->settingID;
+    CSSetting* setting = get_setting(groupID, settingID);
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
-    // Handle the reset to defaults entry differently.
-    switch (selectedSettingIndex) {
-        case CS_OPT_RESET_TO_DEFAULTS:
-            if (buttonPressed & (A_BUTTON | B_BUTTON)) {
-                crash_screen_reset_all_settings();
-            }
-            break;
-        case CS_OPT_EXPAND_ALL:
-        case CS_OPT_COLLAPSE_ALL:
-            if (buttonPressed & (A_BUTTON | B_BUTTON)) {
-                crash_screen_settings_set_all_headers(selectedSettingIndex == CS_OPT_EXPAND_ALL);
-            }
-            break;
-        default:
-            if ((gCSCompositeController->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) { // Reset combo
-                if (crash_screen_setting_is_header(selectedSettingIndex)) {
-                    // Resetting a header resets the whole section.
-                    crash_screen_reset_settings_section(selectedSettingIndex);
-                } else {
-                    crash_screen_reset_setting(selectedSettingIndex);
+    // Handle buttons group differently.
+    if (groupID == CS_OPT_GROUP_BUTTONS) {
+        switch (settingID) {
+            case CS_OPT_BUTTON_RESET_TO_DEFAULTS:
+                if (buttonPressed & (A_BUTTON | B_BUTTON)) {
+                    crash_screen_settings_apply_to_all(settings_func_reset);
                 }
+                break;
+            case CS_OPT_BUTTON_EXPAND_ALL:
+            case CS_OPT_BUTTON_COLLAPSE_ALL:
+                if (buttonPressed & (A_BUTTON | B_BUTTON)) {
+                    crash_screen_settings_set_all_headers(settingID == CS_OPT_BUTTON_EXPAND_ALL);
+                }
+                break;
+            default:
+                break;
+        }
+    } else {
+        if ((gCSCompositeController->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) { // Reset combo
+            if (setting->type == CS_OPT_TYPE_HEADER) {
+                // Resetting a header resets the whole section.
+                crash_screen_settings_apply_to_all_in_group(settings_func_reset, groupID);
             } else {
-                if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) crash_screen_inc_setting(selectedSettingIndex, -1); // Decrement + wrap.
-                if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) crash_screen_inc_setting(selectedSettingIndex, +1); // Increment + wrap.
+                settings_func_reset(groupID, settingID);
             }
-            break;
+        } else {
+            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) crash_screen_inc_setting(groupID, settingID, -1); // Decrement + wrap.
+            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) crash_screen_inc_setting(groupID, settingID, +1); // Increment + wrap.
+        }
     }
 
     update_displayed_settings();
@@ -254,22 +284,23 @@ void settings_input(void) {
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    sSettingsSelectedIndex = WRAP(((s32)sSettingsSelectedIndex + change), 0, ((s32)sSettngsTotalShownAmount - 1));
+    sSettingsSelectedIndex = WRAP(((s32)sSettingsSelectedIndex + change), 0, ((s32)sNumDisplayedSettings - 1));
 
     sSettingsViewportIndex = clamp_view_to_selection(sSettingsViewportIndex, sSettingsSelectedIndex, SETTINGS_NUM_ROWS, 1);
 
-    u32 lastViewportIndex = MAX(((s32)sSettngsTotalShownAmount - SETTINGS_NUM_ROWS), 0);
+    u32 lastViewportIndex = MAX(((s32)sNumDisplayedSettings - SETTINGS_NUM_ROWS), 0);
     if (sSettingsViewportIndex > lastViewportIndex) {
         sSettingsViewportIndex = lastViewportIndex;
     }
 }
 
-CSPage gCSPage_settings = {
-    .name      = "SETTINGS",
-    .initFunc  = settings_init,
-    .drawFunc  = settings_draw,
-    .inputFunc = settings_input,
-    .contList  = settingsContList,
+struct CSPage gCSPage_settings = {
+    .name         = "SETTINGS",
+    .initFunc     = settings_init,
+    .drawFunc     = settings_draw,
+    .inputFunc    = settings_input,
+    .contList     = settingsContList,
+    .settingsList = NULL,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,

@@ -4,6 +4,14 @@
 
 #include "types.h"
 
+#include "pages/page_context.h"
+#include "pages/page_log.h"
+#include "pages/page_stack.h"
+#include "pages/page_map.h"
+#include "pages/page_memory.h"
+#include "pages/page_disasm.h"
+#include "pages/page_settings.h"
+
 
 #define CRASH_SCREEN_START_PAGE PAGE_CONTEXT
 
@@ -30,7 +38,8 @@ typedef struct CSPage {
     /*0x08*/ void (*drawFunc)(void);
     /*0x0C*/ void (*inputFunc)(void);
     /*0x10*/ const enum ControlTypes* contList;
-    /*0x14*/ union {
+    /*0x14*/ struct CSSetting* settingsList; //! TODO: Allow page settings to be changed on the page via help popup.
+    /*0x18*/ union {
                 struct PACKED {
                     /*0x00*/ u32             : 29;
                     /*0x03*/ u32 printName   :  1;
@@ -39,7 +48,7 @@ typedef struct CSPage {
                 }; /*0x04*/
                 u32 raw;
             } flags; /*0x04*/
-} CSPage; /*0x18*/
+} CSPage; /*0x1C*/
 
 
 extern struct CSPage* gCSPages[NUM_PAGES];

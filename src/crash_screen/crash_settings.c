@@ -3,6 +3,7 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "crash_controls.h"
 #include "crash_main.h"
 #include "crash_pages.h"
 
@@ -11,139 +12,129 @@
 #include "engine/math_util.h"
 
 
-const char* sIsSettingHeader[] = {
-    [FALSE] = "HIDDEN",
-    [TRUE ] = "SHOWN",
-};
-
-const char* sValNames_bool[] = {
+const char* gValNames_bool[] = {
     [FALSE] = "FALSE",
     [TRUE ] = "TRUE",
 };
 
-const char* sValNames_print_num_fmt[] = {
+const char* gValNames_print_num_fmt[] = {
     [PRINT_NUM_FMT_HEX] = "HEX",
     [PRINT_NUM_FMT_DEC] = "DECIMAL",
     [PRINT_NUM_FMT_SCI] = "SCIENTIFIC",
 };
 
-const char* sValNames_branch_arrow[] = {
-    [DISASM_ARROW_MODE_OFF      ] = "OFF",
-    [DISASM_ARROW_MODE_SELECTION] = "SELECTION",
+#define SHOW_FUNC_NAMES_DEFAULT TRUE
+
+CSSetting cs_settings_group_global[] = {
+    [CS_OPT_HEADER_GLOBAL               ] = { .type = CS_OPT_TYPE_HEADER,  .name = "GLOBAL",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_GLOBAL_DRAW_SCREENSHOT      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show screenshot background",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
-    [DISASM_ARROW_MODE_FUNCTION ] = "FUNCTION",
+    [CS_OPT_GLOBAL_SYMBOL_NAMES         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Print symbol names",             .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
-    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this in page_disasm.c.
+    [CS_OPT_GLOBAL_PRINT_SCROLL_SPEED   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Text scroll speed",              .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
+    [CS_OPT_END_GLOBAL                  ] = { .type = CS_OPT_TYPE_END },
 };
 
+// Groups:
+CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
+    [CS_OPT_GROUP_BUTTONS     ] = { .name = "BUTTONS",  .list = cs_settings_group_buttons,     },
+    [CS_OPT_GROUP_GLOBAL      ] = { .name = "GLOBAL",   .list = cs_settings_group_global,      },
+    [CS_OPT_GROUP_CONTROLS    ] = { .name = "CONTROLS", .list = cs_settings_group_controls,    },
+    [CS_OPT_GROUP_PAGE_CONTEXT] = { .name = "CONTEXT",  .list = cs_settings_group_page_context,},
+    [CS_OPT_GROUP_PAGE_LOG    ] = { .name = "LOG",      .list = cs_settings_group_page_log,    },
+    [CS_OPT_GROUP_PAGE_STACK  ] = { .name = "STACK",    .list = cs_settings_group_page_stack,  },
 #ifdef INCLUDE_DEBUG_MAP
-    #define SHOW_FUNC_NAMES_DEFAULT     TRUE
-    #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_FUNCTION
-#else
-    #define SHOW_FUNC_NAMES_DEFAULT     FALSE
-    #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_SELECTION
+    [CS_OPT_GROUP_PAGE_MAP    ] = { .name = "MAP",      .list = cs_settings_group_page_map,    },
 #endif
-
-#define SECTION_EXPANDED_DEFAULT FALSE
-
-CSSettingsEntry gCSSettings[NUM_CS_OPTS] = { //! TODO: Callback functions. //! TODO: Collapsible(?) page name non-setting entries (A+B to reset only that page to default)
-    [CS_OPT_EXPAND_ALL          ] = { .name = "expand all",                     .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_COLLAPSE_ALL        ] = { .name = "collapse all",                   .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_RESET_TO_DEFAULTS   ] = { .name = "reset all settings to defaults", .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    // GLOBAL:
-    [CS_OPT_HEADER_GLOBAL       ] = { .name = "GLOBAL",                         .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DRAW_SCREENSHOT     ] = { .name = "Show screenshot background",     .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_SYMBOL_NAMES        ] = { .name = "Print symbol names",             .valNames = &sValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
-    // CONTROLS:
-    [CS_OPT_HEADER_CONTROLS     ] = { .name = "CONTROLS",                       .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_PRINT_SCROLL_SPEED  ] = { .name = "Text scroll speed",              .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
-    [CS_OPT_CURSOR_WAIT_FRAMES  ] = { .name = "Hold direction wait frames",     .valNames = NULL,                     .val = 10,                        .defaultVal = 10,                        .lowerBound = 0,                     .upperBound = 1000,                       },
-    [CS_OPT_ANALOG_DEADZONE     ] = { .name = "Analog deadzone",                .valNames = NULL,                     .val = 60,                        .defaultVal = 60,                        .lowerBound = 0,                     .upperBound = 128,                        },
-    // CONTEXT:
-    [CS_OPT_HEADER_PAGE_CONTEXT ] = { .name = "CONTEXT",                        .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_CONTEXT_PARSE_REG   ] = { .name = "Parse register addr names",      .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
-    [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .name = "Floats print format",            .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
-    // LOG:
-    [CS_OPT_HEADER_PAGE_LOG     ] = { .name = "LOG",                            .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_LOG_INDEX_NUMBERS   ] = { .name = "Show index numbers",             .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    // STACK TRACE:
-    [CS_OPT_HEADER_PAGE_STACK   ] = { .name = "STACK TRACE",                    .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_STACK_SHOW_ADDRESSES] = { .name = "Show addresses",                 .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_STACK_SHOW_OFFSETS  ] = { .name = "Show offsets",                   .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
-    // MAP VIEW:
-    [CS_OPT_HEADER_PAGE_MAP     ] = { .name = "MAP VIEW",                       .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_MAP_SHOW_ADDRESSES  ] = { .name = "Show addresses",                 .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_MAP_SHOW_TYPES      ] = { .name = "Show types",                     .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_MAP_SHOW_SIZES      ] = { .name = "Show sizes",                     .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
-    // RAM VIEW:
-    [CS_OPT_HEADER_PAGE_MEMORY  ] = { .name = "RAM VIEW",                       .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_MEMORY_SHOW_SYMBOL  ] = { .name = "Show current symbol name",       .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
-    [CS_OPT_MEMORY_AS_ASCII     ] = { .name = "Show data as ascii",             .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    // DISASM:
-    [CS_OPT_HEADER_PAGE_DISASM  ] = { .name = "DISASM",                         .valNames = &sIsSettingHeader,        .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_DISASM_SHOW_SYMBOL  ] = { .name = "Show current symbol name",       .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
-    [CS_OPT_DISASM_BINARY       ] = { .name = "Unknown as binary",              .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_PSEUDOINSNS  ] = { .name = "Pseudoinstructions",             .valNames = &sValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_IMM_FMT      ] = { .name = "Immediates format",              .valNames = &sValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
-    [CS_OPT_DISASM_OFFSET_ADDR  ] = { .name = "Offsets as addresses",           .valNames = &sValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_ARROW_MODE   ] = { .name = "Branch arrow mode",              .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
+    [CS_OPT_GROUP_PAGE_MEMORY ] = { .name = "RAM VIEW", .list = cs_settings_group_page_memory, },
+    [CS_OPT_GROUP_PAGE_DISASM ] = { .name = "DISASM",   .list = cs_settings_group_page_disasm, },
 };
 
-// Check whether 'settingID' is a header entry.
-_Bool crash_screen_setting_is_header(enum CSSettings settingID) {
-    return (gCSSettings[settingID].valNames == &sIsSettingHeader);
+CSSettingsGroup* get_settings_group(int groupID) {
+    return &gCSSettingsGroups[groupID];
+}
+
+CSSetting* get_setting(int groupID, int settingID) {
+    CSSettingsGroup* group = get_settings_group(groupID);
+
+    return &group->list[settingID];
+}
+
+SettingsType get_setting_val(int groupID, int settingID) {
+    CSSetting* setting = get_setting(groupID, settingID);
+
+    return ((setting != NULL) ? setting->val : 0);
 }
 
 // Increment/wrap value.
-void crash_screen_inc_setting(enum CSSettings settingID, SettingsType inc) {
-    CSSettingsEntry* setting = &gCSSettings[settingID];
+void crash_screen_inc_setting(int groupID, int settingID, SettingsType inc) {
+    CSSetting* setting = get_setting(groupID, settingID);
 
-    setting->val = WRAP((setting->val + inc), setting->lowerBound, setting->upperBound);
+    if (
+        (setting != NULL) &&
+        (
+            (setting->type == CS_OPT_TYPE_HEADER ) ||
+            (setting->type == CS_OPT_TYPE_SETTING)
+        )
+    ) {
+        setting->val = WRAP((setting->val + inc), setting->lowerBound, setting->upperBound);
+    }
 }
+
+_Bool group_has_header(int groupID) {
+    CSSettingsGroup* group = get_settings_group(groupID);
+
+    return ((group != NULL) && (group->list != NULL) && (group->list[GROUP_HEADER_INDEX].type == CS_OPT_TYPE_HEADER));
+}
+
+// -- Settings functions --
 
 // Reset a specific setting to its default.
-void crash_screen_reset_setting(enum CSSettings settingID) {
-    CSSettingsEntry* setting = &gCSSettings[settingID];
+_Bool settings_func_reset(int groupID, int settingID) {
+    CSSetting* setting = get_setting(groupID, settingID);
 
-    setting->val = setting->defaultVal;
+    if ((setting != NULL) && (setting->type == CS_OPT_TYPE_SETTING)) {
+        setting->val = setting->defaultVal;
+    }
+
+    return FALSE;
 }
 
-// Reset a whole section to defaults.
-void crash_screen_reset_settings_section(enum CSSettings settingID) {
-    for (settingID++; settingID < ARRAY_COUNT(gCSSettings); settingID++) {
-        if (crash_screen_setting_is_header(settingID)) {
+_Bool settings_func_is_non_default(int groupID, int settingID) {
+    CSSetting* setting = get_setting(groupID, settingID);
+
+    if ((setting != NULL) && (setting->type == CS_OPT_TYPE_SETTING)) {
+        return (setting->val != setting->defaultVal);
+    }
+
+    return FALSE;
+}
+
+_Bool crash_screen_settings_apply_to_all_in_group(CSSettingsFunc func, int groupID) {
+    int settingID = group_has_header(groupID); // Skip header.
+
+    while (TRUE) {
+        CSSetting* setting = get_setting(groupID, settingID);
+
+        if ((setting == NULL) || (setting->type == CS_OPT_TYPE_END)) {
             break;
         }
 
-        crash_screen_reset_setting(settingID);
-    }
-}
-
-// Reset all settings to their defaults.
-void crash_screen_reset_all_settings(void) {
-    for (enum CSSettings settingID = 0; settingID < ARRAY_COUNT(gCSSettings); settingID++) {
-        if (!crash_screen_setting_is_header(settingID)) {
-            crash_screen_reset_setting(settingID);
+        if (setting->type == CS_OPT_TYPE_SETTING) {
+            if (func(groupID, settingID)) {
+                return TRUE;
+            }
         }
+
+        settingID++;
     }
+
+    return FALSE;
 }
 
-// Returns whether any settings in gCSSettings have been changed from their default value.
-_Bool crash_screen_check_for_changed_settings(void) {
-    for (enum CSSettings settingID = 0; settingID < NUM_CS_OPTS; settingID++) {
-        CSSettingsEntry* setting = &gCSSettings[settingID];
-
-        if ((setting->val != setting->defaultVal) && !crash_screen_setting_is_header(settingID)) {
+_Bool crash_screen_settings_apply_to_all(CSSettingsFunc func) {
+    for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
+        if (crash_screen_settings_apply_to_all_in_group(func, groupID)) {
             return TRUE;
         }
     }
@@ -152,8 +143,8 @@ _Bool crash_screen_check_for_changed_settings(void) {
 }
 
 _Bool crash_screen_settings_check_for_header_state(_Bool expand) {
-    for (enum CSSettings settingID = 0; settingID < ARRAY_COUNT(gCSSettings); settingID++) {
-        if (crash_screen_setting_is_header(settingID) && gCSSettings[settingID].val == expand) {
+    for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
+        if (group_has_header(groupID) && (get_setting_val(groupID, GROUP_HEADER_INDEX) == expand)) {
             return TRUE;
         }
     }
@@ -162,9 +153,11 @@ _Bool crash_screen_settings_check_for_header_state(_Bool expand) {
 }
 
 void crash_screen_settings_set_all_headers(_Bool expand) {
-    for (enum CSSettings settingID = 0; settingID < ARRAY_COUNT(gCSSettings); settingID++) {
-        if (crash_screen_setting_is_header(settingID)) {
-            gCSSettings[settingID].val = expand;
+    for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
+        if (group_has_header(groupID)) {
+            CSSetting* setting = get_setting(groupID, GROUP_HEADER_INDEX);
+
+            setting->val = expand;
         }
     }
 }

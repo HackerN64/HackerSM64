@@ -35,9 +35,9 @@ enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE;
 
 
 // Change the current page.
-void crash_screen_set_page(enum CSPages page) {
-    if (!gCSPages[gCSPageID]->flags.crashed) {
-        gCSPageID = page;
+void crash_screen_set_page(enum CSPages pageID) {
+    if (!gCSPages[pageID]->flags.crashed) {
+        gCSPageID = pageID;
         gCSSwitchedPage = TRUE;
     }
 }

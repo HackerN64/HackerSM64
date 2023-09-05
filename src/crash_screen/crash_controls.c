@@ -15,6 +15,22 @@
 #include "pages/page_stack.h"
 
 
+struct CSSetting cs_settings_group_controls[] = {
+    [CS_OPT_HEADER_CONTROLS             ] = { .type = CS_OPT_TYPE_HEADER,  .name = "CONTROLS",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES ] = { .type = CS_OPT_TYPE_SETTING, .name = "Hold direction wait frames",     .valNames = NULL,                     .val = 10,                        .defaultVal = 10,                        .lowerBound = 0,                     .upperBound = 1000,                       },
+    [CS_OPT_CONTROLS_ANALOG_DEADZONE    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Analog deadzone",                .valNames = NULL,                     .val = 60,                        .defaultVal = 60,                        .lowerBound = 0,                     .upperBound = 128,                        },
+    [CS_OPT_END_CONTROLS                ] = { .type = CS_OPT_TYPE_END },
+};
+
+
+const enum ControlTypes defaultContList[] = {
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_LIST_END,
+};
+
+
 _Bool gCSSwitchedPage = FALSE;
 _Bool gCSDrawControls = FALSE;
 
@@ -70,14 +86,14 @@ void update_crash_screen_direction_input(void) {
     s16 rawStickY  = gCSCompositeController->rawStickY;
     u16 buttonDown = gCSCompositeController->buttonDown;
 
-    s16 deadzone = gCSSettings[CS_OPT_ANALOG_DEADZONE].val;
+    s16 deadzone = get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_ANALOG_DEADZONE);
 
     _Bool up    = ((buttonDown & (U_CBUTTONS | U_JPAD)) || (rawStickY >  deadzone));
     _Bool down  = ((buttonDown & (D_CBUTTONS | D_JPAD)) || (rawStickY < -deadzone));
     _Bool left  = ((buttonDown & (L_CBUTTONS | L_JPAD)) || (rawStickX < -deadzone));
     _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  deadzone));
 
-    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(gCSSettings[CS_OPT_CURSOR_WAIT_FRAMES].val);
+    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES));
 
     if (up ^ down) {
         if (
@@ -142,13 +158,6 @@ u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows,
 
     return ALIGNFLOOR(scrollIndex, step);
 }
-
-const enum ControlTypes defaultContList[] = {
-    CONT_DESC_SWITCH_PAGE,
-    CONT_DESC_SHOW_CONTROLS,
-    CONT_DESC_CYCLE_DRAW,
-    CONT_DESC_LIST_END,
-};
 
 _Bool update_crash_screen_page(void) {
     enum CSPages prevPage = gCSPageID;

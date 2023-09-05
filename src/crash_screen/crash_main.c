@@ -51,7 +51,8 @@ static void crash_screen_reinitialize(void) {
     gCSDrawControls        = FALSE;
     gAddressSelectMenuOpen = FALSE;
 
-    crash_screen_reset_all_settings();
+    crash_screen_settings_apply_to_all(settings_func_reset);
+    crash_screen_settings_set_all_headers(FALSE);
 
     gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;

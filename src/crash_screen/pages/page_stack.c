@@ -17,6 +17,14 @@
 #include "segment_symbols.h"
 
 
+struct CSSetting cs_settings_group_page_stack[] = {
+    [CS_OPT_HEADER_PAGE_STACK   ] = { .type = CS_OPT_TYPE_HEADER,  .name = "STACK TRACE",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_STACK_SHOW_ADDRESSES] = { .type = CS_OPT_TYPE_SETTING, .name = "Show addresses",                 .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_STACK_SHOW_OFFSETS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show offsets",                   .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_STACK           ] = { .type = CS_OPT_TYPE_END },
+};
+
+
 const enum ControlTypes stackTraceContList[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
@@ -98,10 +106,10 @@ void stack_trace_init(void) {
 }
 
 void stack_trace_print_entries(u32 line, u32 numLines) {
-    const _Bool showAddressess   = gCSSettings[CS_OPT_STACK_SHOW_ADDRESSES].val;
+    const _Bool showAddressess   = get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES);
 #ifdef INCLUDE_DEBUG_MAP
-    const _Bool showOffsets      = gCSSettings[CS_OPT_STACK_SHOW_OFFSETS  ].val;
-    const _Bool parseSymbolNames = gCSSettings[CS_OPT_SYMBOL_NAMES        ].val;
+    const _Bool showOffsets      = get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS  );
+    const _Bool parseSymbolNames = get_setting_val(CS_OPT_GROUP_GLOBAL,     CS_OPT_GLOBAL_SYMBOL_NAMES        );
 #endif
     u32 currIndex = sStackTraceViewportIndex;
     FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
@@ -186,7 +194,7 @@ void stack_trace_draw(void) {
     u32 line = 1;
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (gCSSettings[CS_OPT_STACK_SHOW_OFFSETS].val) {
+    if (get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS)) {
         // "OFFSET:"
         crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
     }
@@ -224,7 +232,7 @@ void stack_trace_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
         // Toggle whether to display function names.
-        crash_screen_inc_setting(CS_OPT_SYMBOL_NAMES, TRUE);
+        crash_screen_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
     }
 #endif
 
@@ -236,12 +244,13 @@ void stack_trace_input(void) {
     sStackTraceViewportIndex = clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
 
-CSPage gCSPage_stack = {
-    .name      = "STACK TRACE",
-    .initFunc  = stack_trace_init,
-    .drawFunc  = stack_trace_draw,
-    .inputFunc = stack_trace_input,
-    .contList  = stackTraceContList,
+struct CSPage gCSPage_stack = {
+    .name         = "STACK TRACE",
+    .initFunc     = stack_trace_init,
+    .drawFunc     = stack_trace_draw,
+    .inputFunc    = stack_trace_input,
+    .contList     = stackTraceContList,
+    .settingsList = cs_settings_group_page_stack,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
