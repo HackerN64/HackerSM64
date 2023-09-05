@@ -20,12 +20,7 @@
 #include "audio/external.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
-#include "game/debug.h"
-#include "game/game_init.h"
 #include "game/main.h"
-#include "game/printf.h"
-#include "game/puppyprint.h"
-#include "game/rumble_init.h"
 
 
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS];
