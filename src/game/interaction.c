@@ -418,6 +418,8 @@ u32 mario_check_object_grab(struct MarioState *m) {
             if (facingDYaw >= -0x5555 && facingDYaw <= 0x5555) {
                 m->faceAngle[1] = m->interactObj->oMoveAngleYaw;
                 m->usedObj = m->interactObj;
+                m->pos[1] = m->floorHeight;
+                m->vel[1] = 0.0f;
                 result = set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
             }
         } else {

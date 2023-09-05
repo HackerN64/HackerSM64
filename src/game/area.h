@@ -93,7 +93,7 @@ struct WarpTransitionData {
     /*0x0C*/ s16 endTexX;
     /*0x0E*/ s16 endTexY;
 
-    /*0x10*/ s16 texTimer; // always 0, does seems to affect transition when disabled
+    /*0x10*/ s16 angleSpeed;
 };
 
 enum WarpTransitionFadeDirections {
