@@ -27,12 +27,12 @@ extern FloatExceptionBits fcr_get_enabled_exceptions(void);
 
 // Set the Enable bits in FCR31 to the given bitset
 // NOTE: Ares is currently the only emulator to actually respect the Enable bits.
-//       Exceptions other than INVALID_OPERATION will still not occur on other emulators.
+//       Floating point exceptions will still not occur on other emulators.
 extern void fcr_set_enabled_exceptions(FloatExceptionBits);
 
 // Set the Enable bits to 1 for the given exception(s). Do not change any other exceptions.
 // NOTE: Ares is currently the only emulator to actually respect the Enable bits.
-//       Exceptions other than INVALID_OPERATION will still not occur on other emulators.
+//       Floating point exceptions will still not occur on other emulators.
 extern void fcr_enable_exceptions(FloatExceptionBits);
 
 // Set the Enable bits to 0 for the given exception(s). Do not change any other exceptions.
