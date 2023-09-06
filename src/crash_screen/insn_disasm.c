@@ -374,7 +374,7 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
 const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
     const InsnTemplate* checkInsn = NULL;
 
-    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) && check_pseudo_instructions(&checkInsn, insn)) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) && check_pseudo_instructions(&checkInsn, insn)) {
         return checkInsn;
     }
 
@@ -462,7 +462,7 @@ static const char sCOP0RegisterNames[][9] = {
 // };
 
 // Checks an instruction for its branch offset. Returns 0 if there is no branch.
-s16 check_for_branch_offset(InsnData insn) {
+s16 insn_check_for_branch_offset(InsnData insn) {
     const InsnTemplate* info = get_insn(insn);
 
     if (info == NULL) {
@@ -478,7 +478,7 @@ s16 check_for_branch_offset(InsnData insn) {
     return 0x0000;
 }
 
-Address get_branch_target_from_addr(Address addr) {
+Address get_insn_branch_target_from_addr(Address addr) {
     if (!is_in_code_segment(addr)) {
         return addr;
     }
@@ -492,7 +492,7 @@ Address get_branch_target_from_addr(Address addr) {
         return PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
     }
 
-    s16 branchOffset = check_for_branch_offset(insn);
+    s16 branchOffset = insn_check_for_branch_offset(insn);
 
     if (branchOffset) {
         return (addr + (((s16)branchOffset + 1) * sizeof(InsnData)));
@@ -513,7 +513,7 @@ static char cop1_fmt_to_char(InsnData insn) {
 }
 
 // Print color code if the color has changed.
-static void check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor) {
+static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor) {
     if (*oldColor != newColor) {
         *oldColor = newColor;
         *strp += sprintf(*strp, STR_COLOR_PREFIX, newColor);
@@ -540,11 +540,11 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_FREG                "F%02d"                         // Float Register
 
 
-#define ADD_COLOR(c) check_color_change(&strp, &color, (c))
+#define ADD_COLOR(c) cs_insn_param_check_color_change(&strp, &color, (c))
 #define ADD_STR(...) strp += sprintf(strp, __VA_ARGS__);
 
 
-char* insn_disasm(Address addr, InsnData insn, const char** fname) {
+char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
     char* strp = &insn_as_string[0];
     _Bool unimpl = FALSE;
 
@@ -552,7 +552,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
 
     const InsnTemplate* info = get_insn(insn);
 
-    _Bool decImmediates = (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
+    _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
 
     if (info != NULL) {
         const char* curCmd = &info->fmt[0];
@@ -617,8 +617,8 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     break;
                 case CHAR_P_BRANCH:
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
-                    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)) {
-                        ADD_STR(STR_FUNCTION, get_branch_target_from_addr(addr));
+                    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)) {
+                        ADD_STR(STR_FUNCTION, get_insn_branch_target_from_addr(addr));
                     } else {
                         s16 branchOffset = (insn.offset + 1);
                         ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
@@ -648,7 +648,7 @@ char* insn_disasm(Address addr, InsnData insn, const char** fname) {
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
-                    if (get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && is_in_code_segment(target)) {
+                    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && is_in_code_segment(target)) {
                         const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
                         if (symbol != NULL) {
                             *fname = get_map_symbol_name(symbol);

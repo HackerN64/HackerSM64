@@ -80,11 +80,11 @@ extern RGBA32 gCSDefaultPrintColor;
 // Output:
 extern u32 gCSNumLinesPrinted;
 
-size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
+size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 
 //! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?)
-#define crash_screen_print(x, y, fmt, ...)                   crash_screen_print_impl((x), (y),           0, (fmt), ##__VA_ARGS__)
-#define crash_screen_print_scroll(x, y, charLimit, fmt, ...) crash_screen_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
+#define cs_print(x, y, fmt, ...)                   cs_print_impl((x), (y),           0, (fmt), ##__VA_ARGS__)
+#define cs_print_scroll(x, y, charLimit, fmt, ...) cs_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
 
-void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
-void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);
+void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
+void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);

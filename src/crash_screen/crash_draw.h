@@ -78,7 +78,7 @@ typedef u32 CSFontRow;
 #define FB_PTR_AS(type) (type*)PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer])
 
 
-// For crash_screen_draw_dark_rect.
+// For cs_draw_dark_rect.
 enum CSDrawDarkRectDarken {
     CS_DARKEN_NONE,
     CS_DARKEN_HALF,
@@ -88,7 +88,7 @@ enum CSDrawDarkRectDarken {
     CS_DARKEN_TO_BLACK,
 };
 
-// For crash_screen_draw_triangle.
+// For cs_draw_triangle.
 enum CSDrawTriangleDirection {
     CS_TRI_UP,
     CS_TRI_DOWN,
@@ -107,28 +107,28 @@ typedef struct CSScissorBox {
 extern struct CSScissorBox gCSScissorBox;
 
 
-void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
-void crash_screen_reset_scissor_box(void);
-void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
-void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
-void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
-void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
-void crash_screen_take_screenshot(RGBA16* dst);
-void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
-void crash_screen_draw_main(void);
+void cs_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
+void cs_reset_scissor_box(void);
+void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
+void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
+void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
+void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
+void cs_take_screenshot_of_game(RGBA16* dst);
+void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
+void cs_draw_main(void);
 
-ALWAYS_INLINE void crash_screen_draw_divider(u32 y) {
-    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_CRASH_DIVIDER);
+ALWAYS_INLINE void cs_draw_divider(u32 y) {
+    cs_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_CRASH_DIVIDER);
 }
 
-ALWAYS_INLINE void crash_screen_draw_divider_translucent(u32 y) {
-    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+ALWAYS_INLINE void cs_draw_divider_translucent(u32 y) {
+    cs_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
 }
 
-ALWAYS_INLINE void crash_screen_draw_row_selection_box(s32 y) {
-    crash_screen_draw_rect(
+ALWAYS_INLINE void cs_draw_row_selection_box(s32 y) {
+    cs_draw_rect(
         (TEXT_X(0) - 1), (y - 2),
         (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
         COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT

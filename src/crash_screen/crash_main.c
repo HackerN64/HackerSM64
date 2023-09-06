@@ -34,9 +34,9 @@ Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_ADDR to set the cras
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
-static void crash_screen_reinitialize(void) {
+static void cs_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
-    if (!sFirstCrash && gCrashedThread->context.cause != EXC_SYSCALL) {
+    if (!sFirstCrash && (gCrashedThread->context.cause != EXC_SYSCALL)) {
         gCSPages[gCSPageID]->flags.crashed = TRUE;
     }
 
@@ -46,8 +46,8 @@ static void crash_screen_reinitialize(void) {
     gCSDrawControls        = FALSE;
     gAddressSelectMenuOpen = FALSE;
 
-    crash_screen_settings_apply_to_all(settings_func_reset);
-    crash_screen_settings_set_all_headers(FALSE);
+    cs_settings_apply_func_to_all(cs_setting_func_reset);
+    cs_settings_set_all_headers(FALSE);
 
     gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;
@@ -67,10 +67,10 @@ static OSThread* get_crashed_thread(void) {
     OSThread* thread = __osGetCurrFaultedThread();
 
     // OS_PRIORITY_THREADTAIL indicates the end of the thread queue.
-    while (thread != NULL && thread->priority != OS_PRIORITY_THREADTAIL) {
+    while ((thread != NULL) && (thread->priority != OS_PRIORITY_THREADTAIL)) {
         if (
-            thread->priority > OS_PRIORITY_IDLE   &&
-            thread->priority < OS_PRIORITY_APPMAX &&
+            (thread->priority > OS_PRIORITY_IDLE  ) &&
+            (thread->priority < OS_PRIORITY_APPMAX) &&
             (thread->flags & (OS_FLAG_CPU_BREAK | OS_FLAG_FAULT))
         ) {
             return thread;
@@ -83,7 +83,7 @@ static OSThread* get_crashed_thread(void) {
 }
 
 #ifdef FUNNY_CRASH_SOUND
-void crash_screen_sleep(u32 ms) {
+void cs_sleep(u32 ms) {
     OSTime cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
     osSetTime(0);
     while (osGetTime() < cycles) {}
@@ -93,15 +93,15 @@ extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 extern void audio_signal_game_loop_tick(void);
 extern void stop_sounds_in_continuous_banks(void);
 
-void play_crash_sound(struct CSThreadInfo* threadInfo, s32 sound) {
+void cs_play_sound(struct CSThreadInfo* threadInfo, s32 sound) {
     threadInfo->thread.priority = 15;
     stop_sounds_in_continuous_banks();
     stop_background_music(sBackgroundMusicQueue[0].seqId);
     audio_signal_game_loop_tick();
-    crash_screen_sleep(200);
+    cs_sleep(200);
     play_sound(sound, gGlobalSoundSource);
     audio_signal_game_loop_tick();
-    crash_screen_sleep(200);
+    cs_sleep(200);
 }
 #endif
 
@@ -112,20 +112,20 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     // Set the active thread info pointer.
     gActiveCSThreadInfo = threadInfo;
 
-    crash_screen_reinitialize();
+    cs_reinitialize();
 
     osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
 #ifdef FUNNY_CRASH_SOUND
-    play_crash_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
+    cs_play_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
 #endif
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
     // Default to certain pages depening on the crash type.
     switch (tc->cause) {
-        case EXC_SYSCALL: crash_screen_set_page(PAGE_LOG   ); break;
-        case EXC_II:      crash_screen_set_page(PAGE_DISASM); break;
+        case EXC_SYSCALL: cs_set_page(PAGE_LOG   ); break;
+        case EXC_II:      cs_set_page(PAGE_DISASM); break;
     }
 
     // Only on the first crash:
@@ -134,12 +134,12 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
         // If a position was specified, use that.
         if (gSetCrashAddress != 0x0) {
-            crash_screen_set_page(PAGE_RAM_VIEWER);
+            cs_set_page(PAGE_RAM_VIEWER);
             tc->pc = gSetCrashAddress;
         }
 
         // Use the Z buffer's memory space to save a screenshot of the game.
-        crash_screen_take_screenshot(gZBuffer);
+        cs_take_screenshot_of_game(gZBuffer);
 
 #ifdef INCLUDE_DEBUG_MAP
         map_data_init();
@@ -172,8 +172,8 @@ void crash_screen_thread_entry(UNUSED void* arg) {
 
     // Crash screen open.
     while (TRUE) {
-        crash_screen_update_input();
-        crash_screen_draw_main();
+        cs_update_input();
+        cs_draw_main();
     }
 }
 

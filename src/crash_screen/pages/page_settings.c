@@ -58,8 +58,8 @@ void update_displayed_settings(void) {
         int settingID = 0;
 
         // Header.
-        if (group_has_header(groupID)) {
-            CSSettingsGroup* group = get_settings_group(groupID);
+        if (cs_settings_group_has_header(groupID)) {
+            CSSettingsGroup* group = cs_get_settings_group(groupID);
 
             sectionShown = group->list[settingID].val;
 
@@ -70,7 +70,7 @@ void update_displayed_settings(void) {
 
         // Settings entries.
         while (sectionShown) {
-            CSSetting* setting = get_setting(groupID, settingID);
+            CSSetting* setting = cs_get_setting(groupID, settingID);
 
             if ((setting == NULL) || (setting->type == CS_OPT_TYPE_END)) {
                 break;
@@ -101,7 +101,7 @@ void print_settings_list(u32 line, u32 numLines) {
         CSSettingDisplay* settingDisplay = &gCSDisplayedSettings[currViewIndex];
         s16 groupID   = settingDisplay->groupID;
         s16 settingID = settingDisplay->settingID;
-        const CSSetting* setting = get_setting(groupID, settingID);
+        const CSSetting* setting = cs_get_setting(groupID, settingID);
 
         if (currViewIndex >= sNumDisplayedSettings) {
             break;
@@ -114,7 +114,7 @@ void print_settings_list(u32 line, u32 numLines) {
         u32 y = TEXT_Y(line + i);
 
         if (currViewIndex == sSettingsSelectedIndex) {
-            crash_screen_draw_row_selection_box(y);
+            cs_draw_row_selection_box(y);
         }
 
         // Print button options differently:
@@ -125,11 +125,11 @@ void print_settings_list(u32 line, u32 numLines) {
             switch (currViewIndex) {
                 case CS_OPT_BUTTON_RESET_TO_DEFAULTS:
                     buttonColor = COLOR_RGBA32_CRASH_NO;
-                    buttonCond = crash_screen_settings_apply_to_all(settings_func_is_non_default);
+                    buttonCond = cs_settings_apply_func_to_all(cs_setting_func_is_non_default);
                     break;
                 case CS_OPT_BUTTON_EXPAND_ALL:
                 case CS_OPT_BUTTON_COLLAPSE_ALL:
-                    buttonCond = crash_screen_settings_check_for_header_state(currViewIndex == CS_OPT_BUTTON_COLLAPSE_ALL);
+                    buttonCond = cs_settings_check_for_header_state(currViewIndex == CS_OPT_BUTTON_COLLAPSE_ALL);
                     break;
                 default:
                     break;
@@ -139,7 +139,7 @@ void print_settings_list(u32 line, u32 numLines) {
 
             // "<[button name]>"
             if (buttonCond) {
-                crash_screen_print(
+                cs_print(
                     centeredDefaultsStartX, y,
                     STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",
                     COLOR_RGBA32_CRASH_SELECT_ARROW,
@@ -147,33 +147,33 @@ void print_settings_list(u32 line, u32 numLines) {
                     COLOR_RGBA32_CRASH_SELECT_ARROW
                 );
             } else {
-                crash_screen_print(
+                cs_print(
                     centeredDefaultsStartX, y,
                     STR_COLOR_PREFIX"<%s>",
                     COLOR_RGBA32_CRASH_SETTINGS_DISABLED, setting->name
                 );
             }
         } else if (setting->type == CS_OPT_TYPE_HEADER) { // Header entry.
-            crash_screen_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
-            crash_screen_print(
+            cs_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), COLOR_RGBA32_CRASH_PAGE_NAME, (setting->val ? CS_TRI_DOWN : CS_TRI_RIGHT));
+            cs_print(
                 TEXT_X(section_indent), y,
                 STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_PAGE_NAME, setting->name
             );
             // Translucent divider.
-            crash_screen_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
+            cs_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
         } else { // Normal setting
             // Maximum description print size.
             u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
 
-            crash_screen_print_scroll(
+            cs_print_scroll(
                 TEXT_X(section_indent), y, (charX - section_indent),
                 STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, setting->name
             );
 
             // "<"
-            charX += crash_screen_print(TEXT_X(charX), y,
+            charX += cs_print(TEXT_X(charX), y,
                 (STR_COLOR_PREFIX"<"),
                 COLOR_RGBA32_CRASH_SELECT_ARROW
             );
@@ -188,13 +188,13 @@ void print_settings_list(u32 line, u32 numLines) {
                 }
 
                 // "[setting value (string)]"
-                crash_screen_print(TEXT_X(charX), y,
+                cs_print(TEXT_X(charX), y,
                     (STR_COLOR_PREFIX"%s"),
                     nameColor, (*setting->valNames)[setting->val]
                 );
             } else {
                 // "[setting value (number)]"
-                crash_screen_print(TEXT_X(charX), y,
+                cs_print(TEXT_X(charX), y,
                     (STR_COLOR_PREFIX"%-d"),
                     COLOR_RGBA32_CRASH_SETTINGS_NUMERIC, setting->val
                 );
@@ -202,7 +202,7 @@ void print_settings_list(u32 line, u32 numLines) {
             charX += VALUE_NAME_SIZE;
 
             // ">"
-            charX += crash_screen_print(TEXT_X(charX), y,
+            charX += cs_print(TEXT_X(charX), y,
                 (STR_COLOR_PREFIX">"),
                 COLOR_RGBA32_CRASH_SELECT_ARROW
             );
@@ -210,7 +210,7 @@ void print_settings_list(u32 line, u32 numLines) {
             // Print an asterisk if the setting has been changed from the default value.
             if (setting->val != setting->defaultVal) {
                 // "*"
-                crash_screen_print(TEXT_X(charX), y,
+                cs_print(TEXT_X(charX), y,
                     (STR_COLOR_PREFIX"*"),
                     COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
                 );
@@ -227,17 +227,17 @@ void settings_draw(void) {
     print_settings_list(line, SETTINGS_NUM_ROWS);
 
     // Draw this line again so the selection box doesn't get drawn in front of it.
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
     if (sNumDisplayedSettings > SETTINGS_NUM_ROWS) {
-        crash_screen_draw_scroll_bar(
+        cs_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             SETTINGS_NUM_ROWS, sNumDisplayedSettings,
             sSettingsViewportIndex,
             COLOR_RGBA32_CRASH_DIVIDER, TRUE
         );
-        crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
+        cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }
 }
 
@@ -245,7 +245,7 @@ void settings_input(void) {
     CSSettingDisplay* settingDisplay = &gCSDisplayedSettings[sSettingsSelectedIndex];
     s16 groupID   = settingDisplay->groupID;
     s16 settingID = settingDisplay->settingID;
-    CSSetting* setting = get_setting(groupID, settingID);
+    CSSetting* setting = cs_get_setting(groupID, settingID);
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     // Handle buttons group differently.
@@ -253,13 +253,13 @@ void settings_input(void) {
         switch (settingID) {
             case CS_OPT_BUTTON_RESET_TO_DEFAULTS:
                 if (buttonPressed & (A_BUTTON | B_BUTTON)) {
-                    crash_screen_settings_apply_to_all(settings_func_reset);
+                    cs_settings_apply_func_to_all(cs_setting_func_reset);
                 }
                 break;
             case CS_OPT_BUTTON_EXPAND_ALL:
             case CS_OPT_BUTTON_COLLAPSE_ALL:
                 if (buttonPressed & (A_BUTTON | B_BUTTON)) {
-                    crash_screen_settings_set_all_headers(settingID == CS_OPT_BUTTON_EXPAND_ALL);
+                    cs_settings_set_all_headers(settingID == CS_OPT_BUTTON_EXPAND_ALL);
                 }
                 break;
             default:
@@ -269,13 +269,13 @@ void settings_input(void) {
         if ((gCSCompositeController->buttonDown & (A_BUTTON | B_BUTTON)) == (A_BUTTON | B_BUTTON)) { // Reset combo
             if (setting->type == CS_OPT_TYPE_HEADER) {
                 // Resetting a header resets the whole section.
-                crash_screen_settings_apply_to_all_in_group(settings_func_reset, groupID);
+                cs_settings_apply_func_to_all_in_group(cs_setting_func_reset, groupID);
             } else {
-                settings_func_reset(groupID, settingID);
+                cs_setting_func_reset(groupID, settingID);
             }
         } else {
-            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) crash_screen_inc_setting(groupID, settingID, -1); // Decrement + wrap.
-            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) crash_screen_inc_setting(groupID, settingID, +1); // Increment + wrap.
+            if (gCSDirectionFlags.pressed.left  || (buttonPressed & B_BUTTON)) cs_inc_setting(groupID, settingID, -1); // Decrement + wrap.
+            if (gCSDirectionFlags.pressed.right || (buttonPressed & A_BUTTON)) cs_inc_setting(groupID, settingID, +1); // Increment + wrap.
         }
     }
 
@@ -286,7 +286,7 @@ void settings_input(void) {
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
     sSettingsSelectedIndex = WRAP(((s32)sSettingsSelectedIndex + change), 0, ((s32)sNumDisplayedSettings - 1));
 
-    sSettingsViewportIndex = clamp_view_to_selection(sSettingsViewportIndex, sSettingsSelectedIndex, SETTINGS_NUM_ROWS, 1);
+    sSettingsViewportIndex = cs_clamp_view_to_selection(sSettingsViewportIndex, sSettingsSelectedIndex, SETTINGS_NUM_ROWS, 1);
 
     u32 lastViewportIndex = MAX(((s32)sNumDisplayedSettings - SETTINGS_NUM_ROWS), 0);
     if (sSettingsViewportIndex > lastViewportIndex) {

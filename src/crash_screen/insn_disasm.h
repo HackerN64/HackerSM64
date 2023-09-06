@@ -432,6 +432,6 @@ typedef struct PACKED InsnParamType {
 #define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
 
 
-s16 check_for_branch_offset(InsnData insn);
-Address get_branch_target_from_addr(Address addr);
-char* insn_disasm(Address addr, InsnData insn, const char** fname);
+s16 insn_check_for_branch_offset(InsnData insn);
+Address get_insn_branch_target_from_addr(Address addr);
+char* cs_insn_to_string(Address addr, InsnData insn, const char** fname);

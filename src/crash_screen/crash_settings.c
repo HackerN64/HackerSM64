@@ -50,25 +50,25 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_PAGE_DISASM ] = { .name = "DISASM",   .list = cs_settings_group_page_disasm, },
 };
 
-CSSettingsGroup* get_settings_group(int groupID) {
+CSSettingsGroup* cs_get_settings_group(int groupID) {
     return &gCSSettingsGroups[groupID];
 }
 
-CSSetting* get_setting(int groupID, int settingID) {
-    CSSettingsGroup* group = get_settings_group(groupID);
+CSSetting* cs_get_setting(int groupID, int settingID) {
+    CSSettingsGroup* group = cs_get_settings_group(groupID);
 
     return &group->list[settingID];
 }
 
-SettingsType get_setting_val(int groupID, int settingID) {
-    CSSetting* setting = get_setting(groupID, settingID);
+SettingsType cs_get_setting_val(int groupID, int settingID) {
+    CSSetting* setting = cs_get_setting(groupID, settingID);
 
     return ((setting != NULL) ? setting->val : 0);
 }
 
 // Increment/wrap value.
-void crash_screen_inc_setting(int groupID, int settingID, SettingsType inc) {
-    CSSetting* setting = get_setting(groupID, settingID);
+void cs_inc_setting(int groupID, int settingID, SettingsType inc) {
+    CSSetting* setting = cs_get_setting(groupID, settingID);
 
     if (
         (setting != NULL) &&
@@ -81,17 +81,17 @@ void crash_screen_inc_setting(int groupID, int settingID, SettingsType inc) {
     }
 }
 
-_Bool group_has_header(int groupID) {
-    CSSettingsGroup* group = get_settings_group(groupID);
+_Bool cs_settings_group_has_header(int groupID) {
+    CSSettingsGroup* group = cs_get_settings_group(groupID);
 
     return ((group != NULL) && (group->list != NULL) && (group->list[GROUP_HEADER_INDEX].type == CS_OPT_TYPE_HEADER));
 }
 
-// -- Settings functions --
+// -- CSSettingsFunc --
 
 // Reset a specific setting to its default.
-_Bool settings_func_reset(int groupID, int settingID) {
-    CSSetting* setting = get_setting(groupID, settingID);
+_Bool cs_setting_func_reset(int groupID, int settingID) {
+    CSSetting* setting = cs_get_setting(groupID, settingID);
 
     if ((setting != NULL) && (setting->type == CS_OPT_TYPE_SETTING)) {
         setting->val = setting->defaultVal;
@@ -100,8 +100,8 @@ _Bool settings_func_reset(int groupID, int settingID) {
     return FALSE;
 }
 
-_Bool settings_func_is_non_default(int groupID, int settingID) {
-    CSSetting* setting = get_setting(groupID, settingID);
+_Bool cs_setting_func_is_non_default(int groupID, int settingID) {
+    CSSetting* setting = cs_get_setting(groupID, settingID);
 
     if ((setting != NULL) && (setting->type == CS_OPT_TYPE_SETTING)) {
         return (setting->val != setting->defaultVal);
@@ -110,11 +110,13 @@ _Bool settings_func_is_non_default(int groupID, int settingID) {
     return FALSE;
 }
 
-_Bool crash_screen_settings_apply_to_all_in_group(CSSettingsFunc func, int groupID) {
-    int settingID = group_has_header(groupID); // Skip header.
+// -- End CSSettingsFunc --
+
+_Bool cs_settings_apply_func_to_all_in_group(CSSettingsFunc func, int groupID) {
+    int settingID = cs_settings_group_has_header(groupID); // Skip header.
 
     while (TRUE) {
-        CSSetting* setting = get_setting(groupID, settingID);
+        CSSetting* setting = cs_get_setting(groupID, settingID);
 
         if ((setting == NULL) || (setting->type == CS_OPT_TYPE_END)) {
             break;
@@ -132,9 +134,9 @@ _Bool crash_screen_settings_apply_to_all_in_group(CSSettingsFunc func, int group
     return FALSE;
 }
 
-_Bool crash_screen_settings_apply_to_all(CSSettingsFunc func) {
+_Bool cs_settings_apply_func_to_all(CSSettingsFunc func) {
     for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
-        if (crash_screen_settings_apply_to_all_in_group(func, groupID)) {
+        if (cs_settings_apply_func_to_all_in_group(func, groupID)) {
             return TRUE;
         }
     }
@@ -142,9 +144,9 @@ _Bool crash_screen_settings_apply_to_all(CSSettingsFunc func) {
     return FALSE;
 }
 
-_Bool crash_screen_settings_check_for_header_state(_Bool expand) {
+_Bool cs_settings_check_for_header_state(_Bool expand) {
     for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
-        if (group_has_header(groupID) && (get_setting_val(groupID, GROUP_HEADER_INDEX) == expand)) {
+        if (cs_settings_group_has_header(groupID) && (cs_get_setting_val(groupID, GROUP_HEADER_INDEX) == expand)) {
             return TRUE;
         }
     }
@@ -152,10 +154,10 @@ _Bool crash_screen_settings_check_for_header_state(_Bool expand) {
     return FALSE;
 }
 
-void crash_screen_settings_set_all_headers(_Bool expand) {
+void cs_settings_set_all_headers(_Bool expand) {
     for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
-        if (group_has_header(groupID)) {
-            CSSetting* setting = get_setting(groupID, GROUP_HEADER_INDEX);
+        if (cs_settings_group_has_header(groupID)) {
+            CSSetting* setting = cs_get_setting(groupID, GROUP_HEADER_INDEX);
 
             setting->val = expand;
         }

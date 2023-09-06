@@ -55,4 +55,4 @@ extern struct CSPage* gCSPages[NUM_PAGES];
 extern enum CSPages gCSPageID;
 
 
-void crash_screen_set_page(enum CSPages page);
+void cs_set_page(enum CSPages page);

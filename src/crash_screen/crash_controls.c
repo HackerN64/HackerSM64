@@ -74,7 +74,8 @@ const ControlType gCSControlDescriptions[] = {
 };
 
 
-void update_crash_screen_direction_input(void) {
+// Updates gCSDirectionFlags with directional inputs. Analog stick, D-pad, or C-buttons.
+void cs_update_direction_input(void) {
     OSTime currTime = osGetTime();
 
     gCSDirectionFlags.pressed.up    = FALSE;
@@ -86,14 +87,15 @@ void update_crash_screen_direction_input(void) {
     s16 rawStickY  = gCSCompositeController->rawStickY;
     u16 buttonDown = gCSCompositeController->buttonDown;
 
-    s16 deadzone = get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_ANALOG_DEADZONE);
+    s16 deadzone = cs_get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_ANALOG_DEADZONE);
 
     _Bool up    = ((buttonDown & (U_CBUTTONS | U_JPAD)) || (rawStickY >  deadzone));
     _Bool down  = ((buttonDown & (D_CBUTTONS | D_JPAD)) || (rawStickY < -deadzone));
     _Bool left  = ((buttonDown & (L_CBUTTONS | L_JPAD)) || (rawStickX < -deadzone));
     _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  deadzone));
 
-    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES));
+    // How long to wait when holding a direction before it becomes continuous.
+    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(cs_get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES));
 
     if (up ^ down) {
         if (
@@ -143,7 +145,8 @@ void update_crash_screen_direction_input(void) {
     gCSDirectionFlags.held.right = right;
 }
 
-u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step) {
+// Moves the viewport in a scrollable list to contain the selection cursor.
+u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step) {
     const size_t size = ((numRows - 1) * step);
 
     // Selection is past the end of the viewport.
@@ -159,7 +162,8 @@ u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows,
     return ALIGNFLOOR(scrollIndex, step);
 }
 
-_Bool update_crash_screen_page(void) {
+// Check for a page switch input (L or R).
+_Bool cs_check_switch_page_input(void) {
     enum CSPages prevPage = gCSPageID;
 
     u16 buttonPressed = gCSCompositeController->buttonPressed;
@@ -180,8 +184,8 @@ _Bool update_crash_screen_page(void) {
     return TRUE;
 }
 
-// Global controls.
-void crash_screen_update_input(void) {
+// Global crash screen input function.
+void cs_update_input(void) {
     handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
 
     bzero(&gCSCompositeControllers, sizeof(gCSCompositeControllers));
@@ -207,38 +211,40 @@ void crash_screen_update_input(void) {
         gCSDrawControls ^= TRUE;
     }
 
-    update_crash_screen_direction_input();
+    cs_update_direction_input();
 
     if (gCSDrawControls) {
         return;
     }
 
     if (gAddressSelectMenuOpen) {
-        crash_screen_select_address();
+        cs_address_select_input();
         return;
     }
 
     CSPage* page = gCSPages[gCSPageID];
 
-    if (update_crash_screen_page()) {
-        page = gCSPages[gCSPageID]; // gCSPageID may have changed in update_crash_screen_page.
+    if (cs_check_switch_page_input()) {
+        page = gCSPages[gCSPageID]; // gCSPageID may have changed in cs_check_switch_page_input.
 
-        if (page->initFunc != NULL && !page->flags.initialized) {
+        if ((page->initFunc != NULL) && !page->flags.initialized) {
             page->initFunc();
             page->flags.initialized = TRUE;
         }
     }
 
     // Run the page-specific input function.
-    if (page->inputFunc != NULL && !page->flags.crashed) {
+    if ((page->inputFunc != NULL) && !page->flags.crashed) {
         page->inputFunc();
     }
 
     gCSSwitchedPage = FALSE;
 }
 
-void draw_controls_box(void) {
-    crash_screen_draw_dark_rect(
+// Controls popup box draw function.
+//! TODO: Allow changing page-specific settings from here.
+void cs_controls_box_draw(void) {
+    cs_draw_dark_rect(
         (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2)),
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         CS_DARKEN_SEVEN_EIGHTHS
@@ -246,7 +252,7 @@ void draw_controls_box(void) {
     CSPage* page = gCSPages[gCSPageID];
 
     // "[page name] PAGE CONTROLS"
-    crash_screen_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
+    cs_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
     const enum ControlTypes* list = page->contList;
 
@@ -259,7 +265,7 @@ void draw_controls_box(void) {
             desc = &gCSControlDescriptions[*list++];
             // [control]
             //   [description]
-            crash_screen_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS_DESCRIPTION, desc->description);
+            cs_print(TEXT_X(2), TEXT_Y(line), "%s:\n "STR_COLOR_PREFIX"%s", desc->control, COLOR_RGBA32_CRASH_CONTROLS_DESCRIPTION, desc->description);
             line += 2;
         }
     }

@@ -52,6 +52,7 @@ TEXT_REGION_GROUP(common1)
 size_t gNumMapSymbols = 0;
 
 
+// Initialize map data by running a headless DMA.
 void map_data_init(void) {
     gNumMapSymbols = (gMapSymbolsEnd - gMapSymbols);
 
@@ -72,6 +73,7 @@ _Bool is_in_code_segment(Address addr) {
     return FALSE;
 }
 
+// Returns a pointer to the string of the symbol's name.
 const char* get_map_symbol_name(const MapSymbol* symbol) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
@@ -83,10 +85,12 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
     return (const char*)((u32)gMapStrings + symbol->name_offset);
 }
 
-static _Bool check_addr_in_symbol(Address addr, const MapSymbol* symbol) {
+// Checks whether an address is within a symbol's range.
+static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
     return ((symbol != NULL) && (addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
 }
 
+// Search for a symbol index starting from the beginning. Some symbol ranges overlap.
 s32 get_symbol_index_from_addr_forward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
@@ -94,7 +98,7 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
     const MapSymbol* symbol = &gMapSymbols[0];
 
     for (size_t i = 0; i < gNumMapSymbols; i++) {
-        if (check_addr_in_symbol(addr, symbol)) {
+        if (addr_is_in_symbol(addr, symbol)) {
             return i;
         }
 
@@ -104,6 +108,7 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
     return -1;
 }
 
+// Search for a symbol index starting from the end. Some symbol ranges overlap.
 s32 get_symbol_index_from_addr_backward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
@@ -111,7 +116,7 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
     const MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
     for (size_t i = gNumMapSymbols; i-- > 0;) {
-        if (check_addr_in_symbol(addr, symbol)) {
+        if (addr_is_in_symbol(addr, symbol)) {
             return i;
         }
 

@@ -204,7 +204,13 @@ static _Bool is_in_pi(Address addr) {
 extern s32 __osSiDeviceBusy(void);
 extern u32 __osSpDeviceBusy(void);
 
-// Try reading a 4-byte aligned word at 'addr' to 'dest'. Returns whether the read was successful.
+/**
+ * @brief Try reading a 4-byte aligned word at 'addr' to 'dest'.
+ * 
+ * @param[out] dest 4-byte pointer to the location to write to.
+ * @param[in ] addr The 4-byte aligned address
+ * @return _Bool Whether the read was successful.
+ */
 _Bool try_read_data(Word* dest, Address addr) {
     addr = ALIGNFLOOR(addr, sizeof(Word));
 

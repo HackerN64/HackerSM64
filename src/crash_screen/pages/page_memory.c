@@ -48,17 +48,17 @@ void ram_view_init(void) {
 
 static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
     // "[XX]"
-    if (get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII)) {
-        crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII)) {
+        cs_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
     } else {
-        // Faster than doing crash_screen_print:
-        crash_screen_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> 4], color);
-        crash_screen_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & 0xF], color);
+        // Faster than doing cs_print:
+        cs_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> 4], color);
+        cs_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & 0xF], color);
     }
 }
 
 static void ram_viewer_print_data(u32 line, Address startAddr) {
-    const _Bool memoryAsASCII = get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII);
+    const _Bool memoryAsASCII = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII);
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
@@ -68,7 +68,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
 
         // Row header:
         // "[XXXXXXXX]"
-        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
+        cs_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
             ((y % 2) ? COLOR_RGBA32_CRASH_MEMORY_ROW1 : COLOR_RGBA32_CRASH_MEMORY_ROW2), rowAddr
         );
 
@@ -92,14 +92,14 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
             }
 
             if (selectColor != COLOR_RGBA32_NONE) {
-                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
+                cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
             }
 
             Byte byte = 0;
             if (try_read_byte(&byte, currAddr)) {
                 print_byte(charX, charY, byte, textColor);
             } else {
-                crash_screen_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
+                cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
             }
 
             charX += (TEXT_WIDTH(2) + 1);
@@ -111,7 +111,7 @@ void ram_view_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
 #ifdef INCLUDE_DEBUG_MAP
-    const _Bool showCurrentSymbol = get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
+    const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
     sRamViewNumShownRows = (19 - showCurrentSymbol);
 #endif
 
@@ -121,7 +121,7 @@ void ram_view_draw(void) {
     Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * RAM_VIEWER_STEP);
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    crash_screen_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
+    cs_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, endAddr
     );
@@ -134,13 +134,13 @@ void ram_view_draw(void) {
 
         if (symbol != NULL) {
             // "IN:[symbol]"
-            size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-            crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+            size_t charX = cs_print(TEXT_X(0), TEXT_Y(line), "IN:");
+            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
         }
 
         line++;
 
-        crash_screen_draw_divider(DIVIDER_Y(line));
+        cs_draw_divider(DIVIDER_Y(line));
     }
 #endif
 
@@ -153,26 +153,26 @@ void ram_view_draw(void) {
         }
 
         // "[XX]"
-        crash_screen_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_MEMORY_COL1 : COLOR_RGBA32_CRASH_MEMORY_COL2), i);
+        cs_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_MEMORY_COL1 : COLOR_RGBA32_CRASH_MEMORY_COL2), i);
 
         charX += (TEXT_WIDTH(2) + 1);
     }
 
     // Veertical divider
-    crash_screen_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(sRamViewNumShownRows + 1), COLOR_RGBA32_CRASH_DIVIDER);
+    cs_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(sRamViewNumShownRows + 1), COLOR_RGBA32_CRASH_DIVIDER);
 
     // "MEMORY"
-    crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
+    cs_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
 
     line++;
 
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     ram_viewer_print_data(line, startAddr);
 
     u32 line2 = (line + sRamViewNumShownRows);
 
-    crash_screen_draw_divider(DIVIDER_Y(line2));
+    cs_draw_divider(DIVIDER_Y(line2));
 
     u32 scrollTop = (DIVIDER_Y(line) + 1);
     u32 scrollBottom = DIVIDER_Y(line2);
@@ -180,7 +180,7 @@ void ram_view_draw(void) {
     const size_t shownSection = ((sRamViewNumShownRows - 1) * RAM_VIEWER_STEP);
 
     // Scroll bar:
-    crash_screen_draw_scroll_bar(
+    cs_draw_scroll_bar(
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
         (sRamViewViewportIndex - VIRTUAL_RAM_START),
@@ -188,7 +188,7 @@ void ram_view_draw(void) {
     );
 
     // Scroll bar crash position marker:
-    crash_screen_draw_scroll_bar(
+    cs_draw_scroll_bar(
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
         (tc->pc - VIRTUAL_RAM_START),
@@ -235,10 +235,10 @@ void ram_view_input(void) {
 
     if (buttonPressed & B_BUTTON) {
         // Toggle whether the memory is printed as hex values or as ASCII chars.
-        crash_screen_inc_setting(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII, TRUE);
+        cs_inc_setting(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII, TRUE);
     }
 
-    sRamViewViewportIndex = clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
+    sRamViewViewportIndex = cs_clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
 }
 
 struct CSPage gCSPage_memory = {

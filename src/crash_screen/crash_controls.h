@@ -79,6 +79,6 @@ extern CSController* const gCSCompositeController;
 extern const ControlType gCSControlDescriptions[];
 
 
-u32 clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
-void crash_screen_update_input(void);
-void draw_controls_box(void);
+u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
+void cs_update_input(void);
+void cs_controls_box_draw(void);

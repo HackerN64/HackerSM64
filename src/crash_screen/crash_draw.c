@@ -33,7 +33,7 @@ CSScissorBox gCSScissorBox = {
 };
 
 // Sets the scissor box.
-void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2) {
+void cs_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2) {
     gCSScissorBox.x1 = x1;
     gCSScissorBox.y1 = y1;
     gCSScissorBox.x2 = x2;
@@ -41,8 +41,8 @@ void crash_screen_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2) {
 }
 
 // Resets the scissor box to the defaults.
-void crash_screen_reset_scissor_box(void) {
-    crash_screen_set_scissor_box(
+void cs_reset_scissor_box(void) {
+    cs_set_scissor_box(
         SCISSOR_BOX_DEFAULT_X1,
         SCISSOR_BOX_DEFAULT_Y1,
         SCISSOR_BOX_DEFAULT_X2,
@@ -51,7 +51,7 @@ void crash_screen_reset_scissor_box(void) {
 }
 
 // Checks whether the pixel at the given screen coordinates are within the scissor box.
-static _Bool is_in_scissor_box(s32 x, s32 y) {
+static _Bool cs_is_in_scissor_box(s32 x, s32 y) {
     return (
         (x >= gCSScissorBox.x1) &&
         (y >= gCSScissorBox.y1) &&
@@ -65,7 +65,7 @@ static RGBA16* get_rendering_fb_pixel(u32 x, u32 y) {
     return (FB_PTR_AS(RGBA16) + (SCREEN_WIDTH * y) + x);
 }
 
-// Apply color to a pixel with alpha blending.
+// Apply color to an RGBA16 pixel with alpha blending.
 static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
     if (alpha == MSK_RGBA32_A) {
         *dst = newColor;
@@ -75,14 +75,14 @@ static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
 }
 
 // Darkens a rectangular area. This is faster than the color blending done by
-// crash_screen_draw_rect, so it's used for the large background rectangle.
+// cs_draw_rect, so it's used for the large background rectangle.
 // 0  - does nothing
 // 1  - darken by 1/2
 // 2  - darken by 3/4
 // 3  - darken by 7/8
 // 4  - darken by 15/16
 // 5+ - darken to black
-void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken) {
+void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken) {
     if (darken == CS_DARKEN_NONE) {
         return;
     }
@@ -97,7 +97,7 @@ void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darke
 
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
-            if (is_in_scissor_box((startX + x), (startY + y))) {
+            if (cs_is_in_scissor_box((startX + x), (startY + y))) {
                 *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
             }
             dst++;
@@ -107,7 +107,7 @@ void crash_screen_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darke
 }
 
 // Draws a rectangle.
-void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -118,7 +118,7 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
 
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
-            if (is_in_scissor_box((startX + x), (startY + y))) {
+            if (cs_is_in_scissor_box((startX + x), (startY + y))) {
                 apply_color(dst, newColor, alpha);
             }
             dst++;
@@ -128,7 +128,7 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
 }
 
 // Draws a diamond shape.
-void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -146,7 +146,7 @@ void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 colo
     for (s32 y = 0; y < h; y++) {
         for (s32 x = 0; x < w; x++) {
             if (absi(x - middleX) < d) {
-                if (is_in_scissor_box((startX + x), (startY + y))) {
+                if (cs_is_in_scissor_box((startX + x), (startY + y))) {
                     apply_color(dst, newColor, alpha);
                 }
             }
@@ -158,23 +158,23 @@ void crash_screen_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 colo
 }
 
 // Draws a diamond then crops it using gCSScissorBox so that it looks like a triangle.
-void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
+void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
     CSScissorBox temp = gCSScissorBox;
 
-    crash_screen_set_scissor_box(startX, startY, (startX + w), (startY + h));
+    cs_set_scissor_box(startX, startY, (startX + w), (startY + h));
 
     switch (direction) {
-        case CS_TRI_UP:    crash_screen_draw_diamond(startX,             startY,             w,       (h * 2), color); break;
-        case CS_TRI_DOWN:  crash_screen_draw_diamond(startX,             ((startY - h) - 1), w,       (h * 2), color); break;
-        case CS_TRI_LEFT:  crash_screen_draw_diamond(startX,             startY,             (w * 2), h,       color); break;
-        case CS_TRI_RIGHT: crash_screen_draw_diamond(((startX - w) - 1), startY,             (w * 2), h,       color); break;
+        case CS_TRI_UP:    cs_draw_diamond(startX,             startY,             w,       (h * 2), color); break;
+        case CS_TRI_DOWN:  cs_draw_diamond(startX,             ((startY - h) - 1), w,       (h * 2), color); break;
+        case CS_TRI_LEFT:  cs_draw_diamond(startX,             startY,             (w * 2), h,       color); break;
+        case CS_TRI_RIGHT: cs_draw_diamond(((startX - w) - 1), startY,             (w * 2), h,       color); break;
     }
 
     gCSScissorBox = temp;
 }
 
 // Draws a line between any two points.
-void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
+void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -193,7 +193,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     f32 y;
     while (x <= x2) {
         y = ((slope * (x - x1)) + y1);
-        if (is_in_scissor_box(x, y)) {
+        if (cs_is_in_scissor_box(x, y)) {
             dst = get_rendering_fb_pixel(x, y);
             apply_color(dst, newColor, alpha);
         }
@@ -202,7 +202,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
 }
 
 // Draw a single character from gCSFont to the framebuffer.
-void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
+void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     if (glyph == CHAR_NULL) { // Null
         color = COLOR_RGBA32_CRASH_NULL_CHAR;
     }
@@ -223,7 +223,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) 
         rowMask = *src++;
 
         for (u32 x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
-            if ((bit & rowMask) && is_in_scissor_box((startX + x), (startY + y))) {
+            if ((bit & rowMask) && cs_is_in_scissor_box((startX + x), (startY + y))) {
                 apply_color(dst, newColor, alpha);
             }
             dst++;
@@ -235,7 +235,7 @@ void crash_screen_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) 
 }
 
 // Copy the framebuffer data from gFramebuffers one frame at a time, forcing alpha to true to turn off broken anti-aliasing.
-void crash_screen_take_screenshot(RGBA16* dst) {
+void cs_take_screenshot_of_game(RGBA16* dst) {
     u32* src = FB_PTR_AS(u32);
     u32* ptr = (u32*)dst;
     const u32 mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
@@ -246,18 +246,18 @@ void crash_screen_take_screenshot(RGBA16* dst) {
 }
 
 // Set the entire framebuffer either to the saved screenshot or to black.
-void crash_screen_reset_framebuffer(_Bool drawBackground) {
+void cs_reset_framebuffer(_Bool drawBackground) {
     if (drawBackground) {
         bcopy(gZBuffer, FB_PTR_AS(void), FRAMEBUFFER_SIZE);
     } else {
-        crash_screen_draw_dark_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CS_DARKEN_TO_BLACK);
+        cs_draw_dark_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CS_DARKEN_TO_BLACK);
     }
 
     osWritebackDCacheAll();
 }
 
 // Cycle through the 3 framebuffers.
-void crash_screen_update_framebuffer(void) {
+void cs_update_framebuffer(void) {
     osWritebackDCacheAll();
 
     OSMesgQueue* queue = &gActiveCSThreadInfo->mesgQueue;
@@ -276,7 +276,7 @@ void crash_screen_update_framebuffer(void) {
 }
 
 // Draw a scroll bar at the right edge of the crash screen.
-void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
+void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
     const u32 x = (CRASH_SCREEN_X2 - 1);
 
     // The total height of the area the scroll bar can move.
@@ -285,7 +285,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
     if (drawBg) {
         // Draw the background scroll bar
         const Alpha bgAlpha = (RGBA32_A(color) / 2);
-        crash_screen_draw_rect(x, topY, 1, scrollableHeight, RGBA32_SET_ALPHA(color, bgAlpha));
+        cs_draw_rect(x, topY, 1, scrollableHeight, RGBA32_SET_ALPHA(color, bgAlpha));
     }
 
     u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);
@@ -298,43 +298,43 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
         barHeight = 1;
     }
 
-    crash_screen_draw_rect(x, (topY + barTop), 1, barHeight, color);
+    cs_draw_rect(x, (topY + barTop), 1, barHeight, color);
 }
 
-// Draw the header.
-u32 print_crash_screen_header(void) {
+// Page header draw function.
+u32 cs_page_header_draw(void) {
     u32 line = 0;
     // "HackerSM64 vX.X.X"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+    cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"HackerSM64 v%s",
         COLOR_RGBA32_CRASH_HEADER,
         HACKERSM64_VERSION
     );
 
     // "START:controls"
-    crash_screen_print(TEXT_X(19), TEXT_Y(line),
+    cs_print(TEXT_X(19), TEXT_Y(line),
         STR_COLOR_PREFIX"%s:controls",
         COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
     );
 
     // "<Page:XX>"
-    crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
+    cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
         STR_COLOR_PREFIX"<Page:%02d>",
         COLOR_RGBA32_CRASH_HEADER, (gCSPageID + 1)
     );
 
     line++;
 
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     CSPage* page = gCSPages[gCSPageID];
 
     if (page->flags.printName) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
+        cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
         line++;
 
-        crash_screen_draw_divider(DIVIDER_Y(line));
+        cs_draw_divider(DIVIDER_Y(line));
     }
 
     osWritebackDCacheAll();
@@ -342,35 +342,35 @@ u32 print_crash_screen_header(void) {
     return line;
 }
 
-// Main draw function for the crash screen.
-void crash_screen_draw_main(void) {
-    const _Bool drawScreenshot = get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_SCREENSHOT);
+// Crash screen main draw function.
+void cs_draw_main(void) {
+    const _Bool drawScreenshot = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_SCREENSHOT);
 
-    crash_screen_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    crash_screen_reset_framebuffer(drawScreenshot);
-    crash_screen_reset_scissor_box();
+    cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    cs_reset_framebuffer(drawScreenshot);
+    cs_reset_scissor_box();
 
     if (!(gCSCompositeController->buttonDown & Z_TRIG)) {
         if (drawScreenshot) {
             // Draw the transparent background.
-            crash_screen_draw_dark_rect(
+            cs_draw_dark_rect(
                 CRASH_SCREEN_X1, CRASH_SCREEN_Y1,
                 CRASH_SCREEN_W,  CRASH_SCREEN_H,
                 CS_DARKEN_THREE_QUARTERS
             );
         }
 
-        u32 line = print_crash_screen_header();
+        u32 line = cs_page_header_draw();
 
         CSPage* page = gCSPages[gCSPageID];
 
         // Run the page-specific draw function.
         if (page->drawFunc == NULL) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
+            cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_PAGE_NAME, "THIS PAGE DOESN'T EXIST"
             );
         } else if (page->flags.crashed) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
+            cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED"
             );
         } else {
@@ -378,13 +378,13 @@ void crash_screen_draw_main(void) {
         }
 
         if (gAddressSelectMenuOpen) {
-            draw_address_select();
+            address_select_draw();
         }
 
         if (gCSDrawControls) {
-            draw_controls_box();
+            cs_controls_box_draw();
         }
     }
 
-    crash_screen_update_framebuffer();
+    cs_update_framebuffer();
 }

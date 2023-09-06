@@ -43,13 +43,13 @@ static u32 sMapViewerViewportIndex = 0;
 void map_view_init(void) {
     s32 newIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
     sMapViewerSelectedIndex = (newIndex != -1) ? newIndex : 0;
-    sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
+    sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
 
 void map_viewer_print_entries(u32 line, u32 numLines) {
-    _Bool showAddresses = get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
-    _Bool showTypes     = get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES    );
-    _Bool showSizes     = get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES    );
+    _Bool showAddresses = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
+    _Bool showTypes     = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES    );
+    _Bool showSizes     = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES    );
     u32 currIndex = sMapViewerViewportIndex;
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
@@ -66,14 +66,14 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         u32 y = TEXT_Y(line + i);
 
         if (currIndex == sMapViewerSelectedIndex) {
-            crash_screen_draw_row_selection_box(y);
+            cs_draw_row_selection_box(y);
         }
 
         // 
         size_t addrStrSize = 0;
         if (showAddresses) {
             // "[stack address]:"
-            addrStrSize += crash_screen_print(TEXT_X(addrStrSize), y, STR_HEX_WORD":", symbol->addr);
+            addrStrSize += cs_print(TEXT_X(addrStrSize), y, STR_HEX_WORD":", symbol->addr);
         }
 
         size_t sizeStrSize = 0;
@@ -86,13 +86,13 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             if (symbol->errc == 'S') {
                 // Size too large
                 // "?"
-                crash_screen_print(x, y,
+                cs_print(x, y,
                     (STR_COLOR_PREFIX"%c"),
                     COLOR_RGBA32_CRASH_UNKNOWN, '?'
                 );
             } else {
                 // "[size]"
-                crash_screen_print(x, y,
+                cs_print(x, y,
                     (STR_COLOR_PREFIX"%-X"),
                     COLOR_RGBA32_CRASH_OFFSET, symbol->size
                 );
@@ -103,14 +103,14 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         if (showTypes) {
             typeStrSize = STRLEN("T") + showSizes; // Add a space if both types and sizes are shown
             // "[type]"
-            crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
+            cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
                 (STR_COLOR_PREFIX"%c"),
                 COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE, symbol->type
             );
         }
         
         // "[name from map data]"
-        crash_screen_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
+        cs_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
 
         currIndex++;
         symbol++;
@@ -123,17 +123,17 @@ void map_view_draw(void) {
     u32 line = 1;
 
     size_t sizeStrSize = 0;
-    if (get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES)) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES)) {
         sizeStrSize = STRLEN("SIZE:");
         // "SIZE:"
-        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
+        cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
     }
     
     size_t typeStrSize = 0;
-    if (get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES)) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES)) {
         typeStrSize = STRLEN("TYPE:");
         // "TYPE:"
-        crash_screen_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE);
+        cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE);
     }
 
     line++;
@@ -141,13 +141,13 @@ void map_view_draw(void) {
     map_viewer_print_entries(line, MAP_VIEWER_NUM_ROWS);
 
     // Draw the line after the entries so the selection box is behind it.
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
     if (gNumMapSymbols > MAP_VIEWER_NUM_ROWS) {
-        crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
+        cs_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
 
-        crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
+        cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }
 
     osWritebackDCacheAll();
@@ -179,7 +179,7 @@ void map_view_input(void) {
         }
     }
 
-    sMapViewerViewportIndex = clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
+    sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
 
 struct CSPage gCSPage_map = {

@@ -154,7 +154,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
 
         // Get the offset for the current function;
         InsnData insn = { .raw = *(Word*)sBranchBufferCurrAddr }; //! TODO: Is this an unsafe read?
-        s16 branchOffset = check_for_branch_offset(insn);
+        s16 branchOffset = insn_check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) { //! TODO: Verify ordering:
             curBranchX += (DISASM_BRANCH_ARROW_SPACING + 1);
@@ -202,7 +202,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else if (startLine >= numShownRows) {
             arrowStartHeight = (TEXT_Y(printLine + numShownRows) - 2);
         } else {
-            crash_screen_draw_rect((sDisasmBranchStartX + 1), arrowStartHeight, dist, 1, color);
+            cs_draw_rect((sDisasmBranchStartX + 1), arrowStartHeight, dist, 1, color);
         }
 
         if (endLine < 0) {
@@ -212,12 +212,12 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else {
             const u32 startX = ((sDisasmBranchStartX + dist) - DISASM_BRANCH_ARROW_HEAD_OFFSET);
 
-            crash_screen_draw_triangle(
+            cs_draw_triangle(
                 (startX - DISASM_BRANCH_ARROW_HEAD_SIZE), (arrowEndHeight - DISASM_BRANCH_ARROW_HEAD_SIZE),
                 DISASM_BRANCH_ARROW_HEAD_SIZE, (DISASM_BRANCH_ARROW_HEAD_SIZE * 2),
                 color, CS_TRI_LEFT
             );
-            crash_screen_draw_rect(
+            cs_draw_rect(
                 startX, arrowEndHeight,
                 (DISASM_BRANCH_ARROW_HEAD_OFFSET + 1), 1,
                 color
@@ -227,7 +227,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         s32 height = abss(arrowEndHeight - arrowStartHeight);
 
         // Middle of arrow.
-        crash_screen_draw_rect((sDisasmBranchStartX + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
+        cs_draw_rect((sDisasmBranchStartX + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
     }
 }
 
@@ -252,15 +252,15 @@ void disasm_draw_branch_arrows(u32 printLine) {
 static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
     InsnData insn = { .raw = data };
     const char* destFname = NULL;
-    const char* insnAsStr = insn_disasm(addr, insn, &destFname);
+    const char* insnAsStr = cs_insn_to_string(addr, insn, &destFname);
 
     // "[instruction name] [params]"
-    crash_screen_print(charX, charY, "%s", insnAsStr);
+    cs_print(charX, charY, "%s", insnAsStr);
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
+    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
         // "[function name]"
-        crash_screen_print_symbol_name_impl((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
+        cs_print_symbol_name_impl((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
         );
@@ -276,15 +276,15 @@ static void print_as_binary(const u32 charX, const u32 charY, const Word data) {
             bitCharX += TEXT_WIDTH(1);
         }
 
-        crash_screen_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), COLOR_RGBA32_WHITE);
+        cs_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), COLOR_RGBA32_WHITE);
 
         bitCharX += TEXT_WIDTH(1);
     }
 }
 
 static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
-    const enum CSDisasmBranchArrowModes branchArrowMode = get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
-    const _Bool unkAsBinary = get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
+    const enum CSDisasmBranchArrowModes branchArrowMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
+    const _Bool unkAsBinary = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
 
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
@@ -296,23 +296,23 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         // Draw crash and selection rectangles:
         if (addr == pc) {
             // Draw a red selection rectangle.
-            crash_screen_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
+            cs_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
             // "<-- CRASH"
-            crash_screen_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
+            cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
         } else if (addr == selectedAddr) {
             // Draw a gray selection rectangle.
-            crash_screen_draw_row_selection_box(charY);
+            cs_draw_row_selection_box(charY);
         }
 
         Word data = 0;
         if (!try_read_data(&data, addr)) {
-            crash_screen_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
+            cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, addr, data);
 
             if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
                 InsnData insn = { .raw = data };
-                s16 branchOffset = check_for_branch_offset(insn);
+                s16 branchOffset = insn_check_for_branch_offset(insn);
 
                 if (branchOffset != 0x0000) {
                     draw_branch_arrow(y, (y + branchOffset + 1), (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET), sBranchColors[0], line);
@@ -324,7 +324,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
                 print_as_binary(charX, charY, data);
             } else {
                 // "[XXXXXXXX]"
-                crash_screen_print(charX, charY, STR_HEX_WORD, data);
+                cs_print(charX, charY, STR_HEX_WORD, data);
             }
         }
     }
@@ -341,12 +341,12 @@ void disasm_draw(void) {
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
-    const _Bool showCurrentSymbol = get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
+    const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
     sDisasmNumShownRows = (20 - showCurrentSymbol);
 #endif
 
     sDisasmBranchStartX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET) +
-                        get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)
+                        cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)
                         ? TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, 0x80000000"))
                         : TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, +0x0000"));
 
@@ -356,7 +356,7 @@ void disasm_draw(void) {
     Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * DISASM_STEP));
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    crash_screen_print(TEXT_X(STRLEN("DISASM") + 1), TEXT_Y(line),
+    cs_print(TEXT_X(STRLEN("DISASM") + 1), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, alignedSelectedAddr, startAddr, endAddr
     );
@@ -369,25 +369,25 @@ void disasm_draw(void) {
 
         if (symbol != NULL) {
             // "IN:[symbol]"
-            size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-            crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+            size_t charX = cs_print(TEXT_X(0), TEXT_Y(line), "IN:");
+            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
         }
 
         line++;
     }
 
-    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         disasm_draw_branch_arrows(line);
     }
 #endif
 
     disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, tc->pc);
 
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     u32 line2 = (line + sDisasmNumShownRows);
 
-    crash_screen_draw_divider(DIVIDER_Y(line2));
+    cs_draw_divider(DIVIDER_Y(line2));
 
     u32 scrollTop = (DIVIDER_Y(line) + 1);
     u32 scrollBottom = DIVIDER_Y(line2);
@@ -395,7 +395,7 @@ void disasm_draw(void) {
     const size_t shownSection = ((sDisasmNumShownRows - 1) * DISASM_STEP);
 
     // Scroll bar:
-    crash_screen_draw_scroll_bar(
+    cs_draw_scroll_bar(
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
         (sDisasmViewportIndex - VIRTUAL_RAM_START),
@@ -403,7 +403,7 @@ void disasm_draw(void) {
     );
 
     // Scroll bar crash position marker:
-    crash_screen_draw_scroll_bar(
+    cs_draw_scroll_bar(
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
         (tc->pc - VIRTUAL_RAM_START),
@@ -445,17 +445,17 @@ void disasm_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
-        open_address_select(get_branch_target_from_addr(gSelectedAddress));
+        open_address_select(get_insn_branch_target_from_addr(gSelectedAddress));
     }
 
-    sDisasmViewportIndex = clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, DISASM_STEP);
+    sDisasmViewportIndex = cs_clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
-        crash_screen_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
+        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
     }
 
-    if (get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         //! TODO: don't reset branch buffer if switched page back into the same function.
         if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
             gFillBranchBuffer = TRUE;

@@ -54,11 +54,11 @@ static void draw_assert_highlight(u32 line) {
     //! Prints the assert message early, but with 0 alpha (skips framebuffer writes).
     //   This is a hacky way to get the amount of lines the wrapped assert text will be.
     //   This can't be done after the normal print because it would show up in front of the text.
-    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+    cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"MESSAGE:%s",
         COLOR_RGBA32_NONE, __n64Assert_Message
     );
-    crash_screen_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(4 + gCSNumLinesPrinted), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x7F));
+    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(4 + gCSNumLinesPrinted), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x7F));
 }
 
 u32 print_assert_section(u32 line) {
@@ -67,22 +67,22 @@ u32 print_assert_section(u32 line) {
     draw_assert_highlight(line);
 
     // "ASSERT:"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
+    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
     line++;
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     size_t lineStrStart = (CRASH_SCREEN_NUM_CHARS_X - STRLEN("LINE:0000"));
     // "FILE: [file name]"
-    charX += crash_screen_print(TEXT_X(0), TEXT_Y(line),
+    charX += cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"FILE:",
         COLOR_RGBA32_CRASH_HEADER
     );
-    charX += crash_screen_print_scroll(TEXT_X(charX), TEXT_Y(line), (lineStrStart - charX),
+    charX += cs_print_scroll(TEXT_X(charX), TEXT_Y(line), (lineStrStart - charX),
         STR_COLOR_PREFIX"%s",
         COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
     );
     // "LINE:[line number]"
-    crash_screen_print(TEXT_X(lineStrStart), TEXT_Y(line),
+    cs_print(TEXT_X(lineStrStart), TEXT_Y(line),
         STR_COLOR_PREFIX"LINE:"STR_COLOR_PREFIX"%d",
         COLOR_RGBA32_CRASH_HEADER,
         COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_LineNum
@@ -92,10 +92,10 @@ u32 print_assert_section(u32 line) {
     // "COND:[condition]"
     if (__n64Assert_Condition != NULL) {
         charX = 0;
-        charX += crash_screen_print(TEXT_X(charX), TEXT_Y(line),
+        charX += cs_print(TEXT_X(charX), TEXT_Y(line),
             STR_COLOR_PREFIX"COND:", COLOR_RGBA32_CRASH_HEADER
         );
-        charX += crash_screen_print_scroll(TEXT_X(charX), TEXT_Y(line),
+        charX += cs_print_scroll(TEXT_X(charX), TEXT_Y(line),
             (CRASH_SCREEN_NUM_CHARS_X - charX),
             STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_AT, __n64Assert_Condition
@@ -104,7 +104,7 @@ u32 print_assert_section(u32 line) {
     }
 
     // "MESSAGE:[message]"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+    cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"MESSAGE:"STR_COLOR_PREFIX"%s",
         COLOR_RGBA32_CRASH_HEADER,
         gCSDefaultPrintColor, __n64Assert_Message
@@ -118,10 +118,10 @@ u32 print_assert_section(u32 line) {
 
 #ifdef PUPPYPRINT_DEBUG
 void draw_log_section(u32 line, u32 numLines) {
-    const _Bool showIndexNumbers = get_setting_val(CS_OPT_GROUP_PAGE_LOG, CS_OPT_LOG_INDEX_NUMBERS);
+    const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOG, CS_OPT_LOG_INDEX_NUMBERS);
 
     // "PUPPYPRINT LOG:"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
+    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
     line++;
 
     // Print entries:
@@ -136,21 +136,21 @@ void draw_log_section(u32 line, u32 numLines) {
         u32 charY = TEXT_Y(line + y);
 
         if (printIndex == sLogSelectedIndex) {
-            crash_screen_draw_row_selection_box(charY);
+            cs_draw_row_selection_box(charY);
         }
 
         if (showIndexNumbers) {
-            crash_screen_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
+            cs_print(TEXT_X(0), charY, "%i:\t%s", ((gConsoleLogLastIndex - 1) - printIndex), entry);
         } else {
-            crash_screen_print(TEXT_X(0), charY, "%s", entry);
+            cs_print(TEXT_X(0), charY, "%s", entry);
         }
     }
 
-    crash_screen_draw_divider(DIVIDER_Y(line));
+    cs_draw_divider(DIVIDER_Y(line));
 
     if (sLogTotalRows > sLogNumShownRows) {
-        crash_screen_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), sLogNumShownRows, sLogTotalRows, sLogViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
-        crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
+        cs_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), sLogNumShownRows, sLogTotalRows, sLogViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
+        cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }
 
     osWritebackDCacheAll();
@@ -166,10 +166,10 @@ void log_draw(void) {
         line = print_assert_section(line);
 #ifdef PUPPYPRINT_DEBUG
         line++;
-        crash_screen_draw_divider(DIVIDER_Y(line));
+        cs_draw_divider(DIVIDER_Y(line));
 #else
     } else {
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "No log or assert data.");
+        cs_print(TEXT_X(0), TEXT_Y(line), "No log or assert data.");
 #endif
     }
 
@@ -200,7 +200,7 @@ void log_input(void) {
     }
 
     if (sLogTotalRows > sLogNumShownRows) {
-        sLogViewportIndex = clamp_view_to_selection(sLogViewportIndex, sLogSelectedIndex, sLogNumShownRows, 1);
+        sLogViewportIndex = cs_clamp_view_to_selection(sLogViewportIndex, sLogSelectedIndex, sLogNumShownRows, 1);
     }
 }
 

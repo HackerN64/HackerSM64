@@ -74,17 +74,17 @@ extern const char* gValNames_bool[];
 extern const char* gValNames_print_num_fmt[];
 
 
-CSSettingsGroup* get_settings_group(int groupID);
-CSSetting* get_setting(int groupID, int settingID);
-SettingsType get_setting_val(int groupID, int settingID);
-void crash_screen_inc_setting(int groupID, int settingID, SettingsType inc);
-_Bool group_has_header(int groupID);
+CSSettingsGroup* cs_get_settings_group(int groupID);
+CSSetting* cs_get_setting(int groupID, int settingID);
+SettingsType cs_get_setting_val(int groupID, int settingID);
+void cs_inc_setting(int groupID, int settingID, SettingsType inc);
+_Bool cs_settings_group_has_header(int groupID);
 
-_Bool settings_func_reset(int groupID, int settingID);
-_Bool settings_func_is_non_default(int groupID, int settingID);
+_Bool cs_setting_func_reset(int groupID, int settingID);
+_Bool cs_setting_func_is_non_default(int groupID, int settingID);
 
-_Bool crash_screen_settings_check_for_header_state(_Bool expand);
-void crash_screen_settings_set_all_headers(_Bool expand);
+_Bool cs_settings_check_for_header_state(_Bool expand);
+void cs_settings_set_all_headers(_Bool expand);
 
-_Bool crash_screen_settings_apply_to_all_in_group(CSSettingsFunc func, int groupID);
-_Bool crash_screen_settings_apply_to_all(CSSettingsFunc func);
+_Bool cs_settings_apply_func_to_all_in_group(CSSettingsFunc func, int groupID);
+_Bool cs_settings_apply_func_to_all(CSSettingsFunc func);

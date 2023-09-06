@@ -83,27 +83,27 @@ void context_init(void) {
 }
 
 // Print a fixed-point register.
-void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
+void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
     const MapSymbol* symbol = NULL;
 
     // "[register name]:"
-    size_t charX = crash_screen_print(x, y,
+    size_t charX = cs_print(x, y,
         " "STR_COLOR_PREFIX"%s:",
         COLOR_RGBA32_CRASH_VARIABLE, name
     );
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_PARSE_REG)) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_PARSE_REG)) {
         symbol = get_map_symbol(val, SYMBOL_SEARCH_BACKWARD);
     }
 #endif
 
     if (symbol != NULL) {
         // "[symbol name]"
-        crash_screen_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol);
+        cs_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol);
     } else {
         // "[XXXXXXXX]"
-        crash_screen_print((x + TEXT_WIDTH(charX + 1)), y,
+        cs_print((x + TEXT_WIDTH(charX + 1)), y,
             STR_COLOR_PREFIX STR_HEX_WORD,
             COLOR_RGBA32_WHITE, val
         );
@@ -111,17 +111,17 @@ void crash_screen_print_reg(u32 x, u32 y, const char* name, Word val) {
 }
 
 // Print important fixed-point registers.
-void crash_screen_print_registers(__OSThreadContext* tc) {
+void cs_context_print_registers(__OSThreadContext* tc) {
     u32 regNum = 0;
     Register* reg = &tc->at;
 
-    crash_screen_print_reg(TEXT_X(0 * 15), TEXT_Y(3), "PC", tc->pc);
-    crash_screen_print_reg(TEXT_X(1 * 15), TEXT_Y(3), "SR", tc->sr);
-    crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(3), "VA", tc->badvaddr);
+    cs_context_print_reg(TEXT_X(0 * 15), TEXT_Y(3), "PC", tc->pc);
+    cs_context_print_reg(TEXT_X(1 * 15), TEXT_Y(3), "SR", tc->sr);
+    cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(3), "VA", tc->badvaddr);
 
     Word data = 0;
     if (try_read_data(&data, tc->pc)) {
-        crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", data); // The raw data of the asm code that crashed.
+        cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", data); // The raw data of the asm code that crashed.
     }
 
     osWritebackDCacheAll();
@@ -132,18 +132,18 @@ void crash_screen_print_registers(__OSThreadContext* tc) {
                 return;
             }
 
-            crash_screen_print_reg(TEXT_X(x * 15), TEXT_Y(4 + y), sRegNames[regNum], *(reg + regNum));
+            cs_context_print_reg(TEXT_X(x * 15), TEXT_Y(4 + y), sRegNames[regNum], *(reg + regNum));
 
             regNum++;
         }
     }
 }
 
-void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
+void cs_context_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     u32 bit = BIT(17);
 
     // "FPCSR:[XXXXXXXX]"
-    size_t fpcsrSize = crash_screen_print(x, y,
+    size_t fpcsrSize = cs_print(x, y,
         STR_COLOR_PREFIX"FPCSR:"STR_COLOR_PREFIX STR_HEX_WORD" ",
         COLOR_RGBA32_CRASH_VARIABLE,
         COLOR_RGBA32_WHITE, fpcsr
@@ -153,7 +153,7 @@ void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
         if (fpcsr & bit) {
             // "([float exception description])"
-            crash_screen_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
+            cs_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
             return;
         }
 
@@ -162,9 +162,9 @@ void crash_screen_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
 }
 
 // Print a floating-point register.
-void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
+void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     // "[register name]:"
-    size_t charX = crash_screen_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_VARIABLE, regNum);
+    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_VARIABLE, regNum);
     x += TEXT_WIDTH(charX);
 
     IEEE754_f32 val = { .asF32 = *data };
@@ -181,33 +181,33 @@ void crash_screen_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
 
     if (prefix != '\0') {
         // "[prefix][XXXXXXXX]"
-        crash_screen_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
+        cs_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
-        const enum CSPrintNumberFormats floatsFormat = get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT);
+        const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT);
 
         switch (floatsFormat) {
             case PRINT_NUM_FMT_HEX:
                 // "[XXXXXXXX]"
-                crash_screen_print(x, y, " "STR_HEX_WORD, val.asU32);
+                cs_print(x, y, " "STR_HEX_WORD, val.asU32);
                 break;
             default:
             case PRINT_NUM_FMT_DEC:
                 // "[±][exponent]"
-                crash_screen_print(x, y, "% g", val.asF32);
+                cs_print(x, y, "% g", val.asF32);
                 break;
             case PRINT_NUM_FMT_SCI:
                 // "[scientific notation]"
-                crash_screen_print(x, y, "% .3e", val.asF32);
+                cs_print(x, y, "% .3e", val.asF32);
                 break;
         }
     }
 }
 
-void crash_screen_print_float_registers(__OSThreadContext* tc) {
+void cs_context_print_float_registers(__OSThreadContext* tc) {
     u32 regNum = 0;
     __OSfp* osfp = &tc->fp0;
 
-    crash_screen_print_fpcsr(TEXT_X(0), (TEXT_Y(14) + 5), tc->fpcsr);
+    cs_context_print_fpcsr(TEXT_X(0), (TEXT_Y(14) + 5), tc->fpcsr);
 
     osWritebackDCacheAll();
 
@@ -217,7 +217,7 @@ void crash_screen_print_float_registers(__OSThreadContext* tc) {
                 return;
             }
 
-            crash_screen_print_float_reg(TEXT_X(x * 15), TEXT_Y(16 + y), regNum, &osfp->f.f_even);
+            cs_context_print_float_reg(TEXT_X(x * 15), TEXT_Y(16 + y), regNum, &osfp->f.f_even);
 
             osfp++;
             regNum += 2;
@@ -236,7 +236,7 @@ void context_draw(void) {
     u32 line = 1;
 
     // "THREAD:[thread id] ([exception cause description])"
-    crash_screen_print(TEXT_X(0), TEXT_Y(line),
+    cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"THREAD:%d "STR_COLOR_PREFIX"(%s)",
         COLOR_RGBA32_CRASH_THREAD, gCrashedThread->id,
         COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]
@@ -249,24 +249,24 @@ void context_draw(void) {
 #ifdef INCLUDE_DEBUG_MAP
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     // "CRASH IN:"
-    size_t charX = crash_screen_print(TEXT_X(0), TEXT_Y(line),
+    size_t charX = cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"CRASH IN: ",
         COLOR_RGBA32_CRASH_AT
     );
-    crash_screen_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+    cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
 #endif
 
-    crash_screen_print_registers(tc);
+    cs_context_print_registers(tc);
 
     osWritebackDCacheAll();
 
-    crash_screen_print_float_registers(tc);
+    cs_context_print_float_registers(tc);
 }
 
 void context_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
-        crash_screen_inc_setting(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT, 1);
+        cs_inc_setting(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT, 1);
     }
 }
 

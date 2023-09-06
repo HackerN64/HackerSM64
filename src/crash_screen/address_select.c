@@ -21,15 +21,16 @@ static Address sAddressSelectTarget = 0x00000000;
 static s8 sAddressSelectCharIndex = 7;
 
 
-void draw_address_select(void) {
-    crash_screen_draw_dark_rect(
+// Address select draw function.
+void address_select_draw(void) {
+    cs_draw_dark_rect(
         (JUMP_MENU_X1 -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y1 -  JUMP_MENU_MARGIN_Y     ),
         (JUMP_MENU_W  + (JUMP_MENU_MARGIN_X * 2)), (JUMP_MENU_H  + (JUMP_MENU_MARGIN_Y * 2)),
         CS_DARKEN_SEVEN_EIGHTHS
     );
 
     // "GO TO:"
-    crash_screen_print((SCREEN_CENTER_X - (TEXT_WIDTH(STRLEN("GO TO")) / 2)), JUMP_MENU_Y1, "GO TO:");
+    cs_print((SCREEN_CENTER_X - (TEXT_WIDTH(STRLEN("GO TO")) / 2)), JUMP_MENU_Y1, "GO TO:");
 
     Address addr = sAddressSelectTarget;
     Word data = 0;
@@ -38,7 +39,7 @@ void draw_address_select(void) {
     u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
     u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
     // "[XXXXXXXX]"
-    crash_screen_print(
+    cs_print(
         addressStartX, addressStartY,
         (STR_COLOR_PREFIX STR_HEX_WORD),
         (isValid ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO), addr
@@ -47,7 +48,7 @@ void draw_address_select(void) {
     u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
     u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
     // Up arrow:
-    crash_screen_draw_triangle(
+    cs_draw_triangle(
         triangleStartX, triangleStartY,
         TEXT_WIDTH(1), TEXT_WIDTH(1),
         COLOR_RGBA32_CRASH_SELECT_ARROW,
@@ -55,7 +56,7 @@ void draw_address_select(void) {
     );
     triangleStartY += ((TEXT_WIDTH(1) + TEXT_HEIGHT(1)) - 1);
     // Down arrow:
-    crash_screen_draw_triangle(
+    cs_draw_triangle(
         triangleStartX, triangleStartY,
         TEXT_WIDTH(1), TEXT_WIDTH(1),
         COLOR_RGBA32_CRASH_SELECT_ARROW,
@@ -67,7 +68,7 @@ void draw_address_select(void) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             // "[mapped data name]"
-            crash_screen_print_symbol_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, symbol);
+            cs_print_symbol_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, symbol);
         }
     }
 #endif
@@ -77,7 +78,8 @@ void draw_address_select(void) {
 
 extern u32 sMapViewerSelectedIndex;
 
-void crash_screen_select_address(void) {
+// Address select input functiom.
+void cs_address_select_input(void) {
     s8 change = 0;
 
     if (gCSDirectionFlags.pressed.left ) change = -1;
@@ -112,7 +114,7 @@ void crash_screen_select_address(void) {
 
         switch (gCSPageID) {
             case PAGE_STACK_TRACE:
-                crash_screen_set_page(PAGE_DISASM);
+                cs_set_page(PAGE_DISASM);
                 break;
 #ifdef INCLUDE_DEBUG_MAP
             case PAGE_MAP_VIEWER:;
@@ -120,9 +122,9 @@ void crash_screen_select_address(void) {
                 if (targetIndex != -1) {
                     if (sMapViewerSelectedIndex == (u32)targetIndex) {
                         if (is_in_code_segment(gMapSymbols[targetIndex].addr)) {
-                            crash_screen_set_page(PAGE_DISASM);
+                            cs_set_page(PAGE_DISASM);
                         } else {
-                            crash_screen_set_page(PAGE_RAM_VIEWER);
+                            cs_set_page(PAGE_RAM_VIEWER);
                         }
                     }
                     sMapViewerSelectedIndex = targetIndex;
@@ -147,7 +149,7 @@ void crash_screen_select_address(void) {
     }
 }
 
-// Open the jump to address popup.
+// Open the address select (jump to address) popup box.
 void open_address_select(Address dest) {
     gAddressSelectMenuOpen = TRUE;
     sAddressSelectTarget = dest;

@@ -88,7 +88,7 @@ static _Bool is_space_char(char glyph) {
     );
 }
 
-static u32 format_print_buffer(const char* buf, size_t totalSize) {
+static u32 cs_format_print_buffer(const char* buf, size_t totalSize) {
     u32 bufferCount = 0;
     ColorRGBA32 textColor = { .rgba32 = gCSDefaultPrintColor };
     _Bool escaped = FALSE;
@@ -156,7 +156,7 @@ static u32 format_print_buffer(const char* buf, size_t totalSize) {
     return bufferCount;
 }
 
-static size_t get_next_word_length(PrintBuffer* buf, u32 index, size_t bufferCount) {
+static size_t cs_get_next_word_length(PrintBuffer* buf, u32 index, size_t bufferCount) {
     size_t count = 0;
 
     while (index < bufferCount) {
@@ -173,11 +173,11 @@ static size_t get_next_word_length(PrintBuffer* buf, u32 index, size_t bufferCou
     return count;
 }
 
-static _Bool can_wrap(u32 x) {
+static _Bool cs_can_wrap(u32 x) {
     return (gCSWordWrap && (x >= gCSWordWrapXLimit));
 }
 
-static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
+static size_t cs_print_from_buffer(size_t bufferCount, u32 x, u32 y) {
     size_t numChars = 0;
     u32 startX = x;
 
@@ -216,18 +216,18 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
         }
 
         if (space && index < (bufferCount - 1)) {
-            size_t nextWordLength = get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
+            size_t nextWordLength = cs_get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
 
-            if (can_wrap(x + TEXT_WIDTH(nextWordLength))) {
+            if (cs_can_wrap(x + TEXT_WIDTH(nextWordLength))) {
                 newline = TRUE;
                 tab = FALSE;
             }
         } else if (print) {
-            if (can_wrap(x)) {
+            if (cs_can_wrap(x)) {
                 newline = TRUE;
                 index--;
             } else {
-                crash_screen_draw_glyph(x, y,
+                cs_draw_glyph(x, y,
                     data->glyph,
                     RGBA_TO_RGBA32(
                         C16_TO_C32(data->red  ),
@@ -259,10 +259,10 @@ static size_t print_from_buffer(size_t bufferCount, u32 x, u32 y) {
     return numChars;
 }
 
-static void scroll_buffer(size_t bufferCount, size_t charLimit) {
+static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
-    const SettingsType scrollSpeed = get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
+    const SettingsType scrollSpeed = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
     const size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - scrollSpeed));
     const size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
@@ -281,7 +281,7 @@ static void scroll_buffer(size_t bufferCount, size_t charLimit) {
     memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));
 }
 
-size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
+size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
     bzero(&sCSCharBuffer, sizeof(sCSCharBuffer));
     gCSNumLinesPrinted = 0;
 
@@ -295,17 +295,17 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     if (totalSize > 0) {
         bzero(&gCSPrintBuffer, sizeof(gCSPrintBuffer));
 
-        size_t bufferCount = format_print_buffer(sCSCharBuffer, totalSize);
+        size_t bufferCount = cs_format_print_buffer(sCSCharBuffer, totalSize);
 
         if (0 < charLimit && charLimit < bufferCount) {
-            if (get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) > 0) {
-                scroll_buffer(bufferCount, charLimit);
+            if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) > 0) {
+                cs_scroll_buffer(bufferCount, charLimit);
             }
 
             bufferCount = charLimit;
         }
 
-        numChars = print_from_buffer(bufferCount, x, y);
+        numChars = cs_print_from_buffer(bufferCount, x, y);
     }
 
     va_end(args);
@@ -313,22 +313,22 @@ size_t crash_screen_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, 
     return numChars;
 }
 
-void crash_screen_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
+void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
     if (fname == NULL) {
         // "UNKNOWN"
-        crash_screen_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+        cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
     } else {
         // "[name from map data]"
-        crash_screen_print_scroll(x, y, maxWidth,
+        cs_print_scroll(x, y, maxWidth,
             STR_COLOR_PREFIX"%s",
             color, fname
         );
     }
 }
 
-void crash_screen_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
-    crash_screen_print_symbol_name_impl(x, y, maxWidth,
-        ((symbol != NULL && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
+void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
+    cs_print_symbol_name_impl(x, y, maxWidth,
+        (((symbol != NULL) && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
         get_map_symbol_name(symbol)
     );
 }
