@@ -4,7 +4,8 @@ import os
 import json
 import subprocess
 
-ROMS_DIR=os.path.expanduser("~/baseroms/")
+XDG_DATA_DIR=os.environ.get("XDG_DATA_HOME") or "~/.local/share"
+ROMS_DIR=os.path.expanduser(os.path.join(XDG_DATA_DIR, "HackerSM64"))
 
 sha1_LUT = {
     "eu": "4ac5721683d0e0b6bbb561b58a71740845dceea9",
