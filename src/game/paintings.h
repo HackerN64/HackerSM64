@@ -122,10 +122,10 @@ typedef struct PaintingImage {
     /*0x08*/ const s16 textureWidth;
     /*0x0A*/ const s16 textureHeight;
 
-    /// Controls how the painting image is displayed. PAINTING_IMAGE_TYPE_INVISIBLE, PAINTING_IMAGE_TYPE_TEXTURE, or PAINTING_IMAGE_TYPE_ENV_MAP.
+    /// Controls how the painting image is displayed. enum PaintingType.
     /*0x0C*/ const s8 imageType;
 
-    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS, or RIPPLE_TRIGGER_PROXIMITY.
+    /// Controls when a passive ripple starts. enum RippleTriggers.
     /*0x0D*/ const s8 rippleTrigger;
 
     /// Whether the painting uses shading when not rippling. Only used for Snowman's Land in vanilla and makes the transition to/from rippling not seamless.

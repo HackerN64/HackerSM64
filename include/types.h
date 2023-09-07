@@ -24,6 +24,28 @@
 #define SCREEN_CENTER_X (SCREEN_WIDTH  / 2)
 #define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
 
+typedef union {
+    struct PACKED {
+        /*0x00*/ u32 sign     :  1;
+        /*0x00*/ u32 exponent :  8;
+        /*0x01*/ u32 mantissa : 23;
+    }; /*0x04*/
+    s32 asS32;
+    u32 asU32;
+    f32 asF32;
+} IEEE754_f32; /*0x04*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ u64 sign     :  1;
+        /*0x00*/ u64 exponent : 11;
+        /*0x01*/ u64 mantissa : 52;
+    }; /*0x08*/
+    s64 asS64;
+    u64 asU64;
+    f64 asF64;
+} IEEE754_f64; /*0x08*/
+
 struct Config {
     f32 audioFrequency;
 #ifdef WIDE

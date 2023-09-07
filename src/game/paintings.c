@@ -391,24 +391,18 @@ Gfx* render_painting_segment(const Texture* img, s16 index, s16 imageCount, s16 
 
 /**
  * Gets the exponent of an integer by converting it into a float and extracting the exponent bits.
+ * Equivalent to log2(x) or __builtin_ctz(x) but faster.
  */
 static s32 get_exponent(s32 x) {
-    union {
-        struct PACKED {
-            u32 sign     :  1;
-            u32 exponent :  8;
-            u32 mantissa : 23;
-        };
-        f32 f;
-    } b = { .f = x };
-    return (b.exponent - 127);
+    IEEE754_f32 val = { .asF32 = x };
+    return (val.exponent - 127);
 }
 
 /**
  * Set up the texture format in the display list.
  */
 void painting_setup_textures(Gfx** gfx, s16 tWidth, s16 tHeight, _Bool isEnvMap) {
-    s16 cm = isEnvMap ? (G_TX_WRAP | G_TX_NOMIRROR) : G_TX_CLAMP;
+    s16 cm = (isEnvMap ? (G_TX_WRAP | G_TX_NOMIRROR) : G_TX_CLAMP);
     u32 masks = get_exponent(tWidth);
     u32 maskt = get_exponent(tHeight);
 
@@ -664,12 +658,12 @@ Gfx* geo_painting_draw(s32 callContext, struct GraphNode* node, UNUSED void* con
     if (callContext == GEO_CONTEXT_RENDER) {
         // Draw the painting.
         if (
-            paintingImage->textureArray != NULL &&
-            paintingImage->imageCount    > 0    &&
-            paintingImage->textureWidth  > 0    &&
-            paintingImage->textureHeight > 0    &&
-            paintingImage->imageType != PAINTING_IMAGE_TYPE_INVISIBLE &&
-            paintingImage->alpha > 0x00
+            (paintingImage->textureArray != NULL) &&
+            (paintingImage->imageCount    > 0)    &&
+            (paintingImage->textureWidth  > 0)    &&
+            (paintingImage->textureHeight > 0)    &&
+            (paintingImage->imageType != PAINTING_IMAGE_TYPE_INVISIBLE) &&
+            (paintingImage->alpha > 0x00)
         ) {
             // Determine whether the painting is opaque or transparent.
             if (paintingImage->alpha == 0xFF) {
@@ -718,11 +712,14 @@ void painting_update_room(struct Object* obj) {
     );
 }
 
+/**
+ * @brief Initializes a painting object.
+ */
 void bhv_painting_init(void) {
     struct Object* obj = o;
 
     // Get the painting id from the first byte of the behavior params. The second byte is used for the warp node ID.
-    s32 id = GET_BPARAM1(obj->oBehParams);
+    enum PaintingImageIDs id = GET_BPARAM1(obj->oBehParams);
 
     const struct PaintingImage* paintingImage = segmented_to_virtual(sPaintings[id]);
 
@@ -762,10 +759,10 @@ enum oActionsPainting painting_update_mario_pos(struct Object* obj, Vec3f marioL
 
     // Check if Mario is within the painting bounds laterally in local space.
     if (
-        marioLocalPos[0] > -PAINTING_EDGE_MARGIN &&
-        marioLocalPos[0] < (obj->header.gfx.scale[0] + PAINTING_EDGE_MARGIN) &&
-        marioLocalPos[1] > -PAINTING_EDGE_MARGIN &&
-        marioLocalPos[1] < (obj->header.gfx.scale[1] + PAINTING_EDGE_MARGIN)
+        (marioLocalPos[0] > -PAINTING_EDGE_MARGIN) &&
+        (marioLocalPos[0] < (obj->header.gfx.scale[0] + PAINTING_EDGE_MARGIN)) &&
+        (marioLocalPos[1] > -PAINTING_EDGE_MARGIN) &&
+        (marioLocalPos[1] < (obj->header.gfx.scale[1] + PAINTING_EDGE_MARGIN))
     ) {
         if (marioLocalPos[2] > PAINTING_WOBBLE_WARP_THRESHOLD) {
             // In front of the painting, check whether Mario is inside the wobble zone.
@@ -806,14 +803,14 @@ enum oActionsPainting painting_update_mario_pos(struct Object* obj, Vec3f marioL
  */
 const struct RippleAnimationPair* painting_get_ripple_animation_type_info(struct Object* obj) {
     const struct PaintingImage* paintingImage = obj->oPaintingImage;
-    s8 rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
+    enum PaintingRippleAnimations rippleAnimationType = RIPPLE_ANIM_CONTINUOUS;
 
     if (paintingImage->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         rippleAnimationType = RIPPLE_ANIM_PROXIMITY;
 
         if (
-            obj->header.gfx.scale[0] >= PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD ||
-            obj->header.gfx.scale[1] >= PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD
+            (obj->header.gfx.scale[0] >= PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD) ||
+            (obj->header.gfx.scale[1] >= PAINTING_SCALE_LARGE_RIPPLE_THRESHOLD)
         ) {
             rippleAnimationType = RIPPLE_ANIM_PROXIMITY_LARGE;
         }
@@ -837,12 +834,12 @@ _Bool gDDDPaintingNotMoved = FALSE;
 /**
  * Controls the x coordinate of the DDD painting.
  *
- * Before Mario gets the "Board Bowser's Sub" star in DDD, the painting spawns at frontPos.
+ * Before Mario gets the "Board Bowser's Sub" star in DDD, the painting spawns at frontPos, and set gDDDPaintingNotMoved to TRUE.
  *
- * If Mario just got the star, the painting's x coordinate moves to backPos at a rate of `speed` units.
- *
- * When the painting reaches backPos, a save flag is set so that the painting will spawn at backPos
- * whenever it loads.
+ * If Mario has the star, and the painting was last seen at frontPos (gDDDPaintingNotMoved == TRUE), the painting's x coordinate moves to backPos at a rate of `speed` units.
+ * When the painting reaches backPos, gDDDPaintingNotMoved is set to FALSE.
+ * 
+ * If Mario has the star, and the painting was never seen at frontPos or it has already moved (gDDDPaintingNotMoved == FALSE), the painting will spawn at backPos.
  */
 void move_ddd_painting(struct Object* obj, f32 frontPos, f32 backPos, f32 speed) {
 #ifdef UNLOCK_ALL
@@ -950,7 +947,7 @@ void bhv_painting_loop(void) {
         if (newAction == PAINTING_ACT_ENTERED) {
             obj->oAction = newAction;
             painting_start_ripples(obj, marioLocalPos[0], marioLocalPos[1], TRUE); // Start entering
-        } else if (obj->oAction != PAINTING_ACT_ENTERED && (newAction == PAINTING_ACT_RIPPLING)) {
+        } else if ((obj->oAction != PAINTING_ACT_ENTERED) && (newAction == PAINTING_ACT_RIPPLING)) {
             obj->oAction = newAction;
             painting_start_ripples(obj, marioLocalPos[0], marioLocalPos[1], TRUE); // Start wobbling
         }
