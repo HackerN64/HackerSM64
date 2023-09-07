@@ -219,7 +219,7 @@ def main():
     todo = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
-        if exists and not asset_needs_update(asset, local_version):
+        if exists and not (local_version == new_version or asset_needs_update(asset, local_version)):
             continue
 
         meta = data[:-2]
