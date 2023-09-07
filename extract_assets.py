@@ -102,6 +102,26 @@ def read_local_asset_list(f):
         ret.append(line.strip())
     return ret
 
+def asset_needs_update(asset, version):
+    if version <= 7 and asset in envmap_table:
+        return True
+    if version <= 6 and asset in ["actors/king_bobomb/king_bob-omb_eyes.rgba16.png", "actors/king_bobomb/king_bob-omb_hand.rgba16.png"]:
+        return True
+    if version <= 5 and asset == "textures/spooky/bbh_textures.00800.rgba16.png":
+        return True
+    if version <= 4 and asset in ["textures/mountain/ttm_textures.01800.rgba16.png", "textures/mountain/ttm_textures.05800.rgba16.png"]:
+        return True
+    if version <= 3 and asset == "textures/cave/hmc_textures.01800.rgba16.png":
+        return True
+    if version <= 2 and asset == "textures/inside/inside_castle_textures.09000.rgba16.png":
+        return True
+    if version <= 1 and asset.endswith(".m64"):
+        return True
+    if version <= 0 and asset.endswith(".aiff"):
+        return True
+    return False
+
+
 def remove_file(fname):
     os.remove(fname)
     print("deleting", fname)
@@ -199,7 +219,7 @@ def main():
     todo = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
-        if exists:
+        if exists and not asset_needs_update(asset, local_version):
             continue
 
         meta = data[:-2]
