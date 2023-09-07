@@ -86,15 +86,15 @@ enum BehaviorCommands {
     /*0x0F*/ BHV_CMD_ADD_INT,
     /*0x10*/ BHV_CMD_SET_INT,
     /*0x11*/ BHV_CMD_OR_INT,
-    /*0x12*/ BHV_CMD_BIT_CLEAR,
-    /*0x13*/ BHV_CMD_SET_INT_RAND_RSHIFT,
-    /*0x14*/ BHV_CMD_SET_RANDOM_FLOAT,
-    /*0x15*/ BHV_CMD_SET_RANDOM_INT,
-    /*0x16*/ BHV_CMD_ADD_RANDOM_FLOAT,
-    /*0x17*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
-    /*0x18*/ BHV_CMD_NOP_1,
-    /*0x19*/ BHV_CMD_NOP_2,
-    /*0x1A*/ BHV_CMD_NOP_3,
+    /*0x12*/ BHV_CMD_OR_LONG,
+    /*0x13*/ BHV_CMD_BIT_CLEAR,
+    /*0x14*/ BHV_CMD_SET_INT_RAND_RSHIFT,
+    /*0x15*/ BHV_CMD_SET_RANDOM_FLOAT,
+    /*0x16*/ BHV_CMD_SET_RANDOM_INT,
+    /*0x17*/ BHV_CMD_ADD_RANDOM_FLOAT,
+    /*0x18*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
+    /*0x19*/ BHV_CMD_NOP_1,
+    /*0x1A*/ BHV_CMD_NOP_2,
     /*0x1B*/ BHV_CMD_SET_MODEL,
     /*0x1C*/ BHV_CMD_SPAWN_CHILD,
     /*0x1D*/ BHV_CMD_DEACTIVATE,
@@ -204,6 +204,12 @@ enum BehaviorCommands {
 #define OR_INT(field, value) \
     BC_BBH(BHV_CMD_OR_INT, field, value)
 
+// Performs a bitwise OR with the specified field and the given (32 bit) integer.
+// Usually used to set an object's flags which use values above 16 bits.
+#define OR_LONG(field, value) \
+    BC_BB(BHV_CMD_OR_LONG, field), \
+    BC_W(value)
+
 // Performs a bit clear with the specified short. Unused in favor of the 32-bit version.
 #define BIT_CLEAR(field, value) \
     BC_BBH(BHV_CMD_BIT_CLEAR, field, value)
@@ -242,10 +248,6 @@ enum BehaviorCommands {
 // No operation. Unused.
 #define CMD_NOP_2(field) \
     BC_BB(BHV_CMD_NOP_2, field)
-
-// No operation. Unused.
-#define CMD_NOP_3(field) \
-    BC_BB(BHV_CMD_NOP_3, field)
 
 // Sets the current model ID of the object.
 #define SET_MODEL(modelID) \
@@ -299,8 +301,6 @@ enum BehaviorCommands {
 // Uses a u8 as the argument, instead of a s16 like the other version does.
 #define BEGIN_REPEAT_UNUSED(count) \
     BC_BB(BHV_CMD_BEGIN_REPEAT_UNUSED, count)
-
-#define OR_LONG(field, value) LOAD_ANIMATIONS(field, value)
 
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \

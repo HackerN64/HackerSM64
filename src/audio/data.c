@@ -43,7 +43,7 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 
 #ifdef BETTER_REVERB
 // Each entry represents an array of variable audio buffer sizes / delays for each respective filter.
-u32 delaysArr[][NUM_ALLPASS] = {
+u32 sReverbDelaysArr[][NUM_ALLPASS] = {
     { /* 0 */ 
         4, 4, 4,
         4, 4, 4,
@@ -65,7 +65,7 @@ u32 delaysArr[][NUM_ALLPASS] = {
 };
 
 // Each entry represents an array of multipliers applied to the final output of each group of 3 filters.
-u8 reverbMultsArr[][NUM_ALLPASS / 3] = {
+u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
     /* 0 */ {0x00, 0x00, 0x00, 0x00},
     /* 1 */ {0xD7, 0x6F, 0x36, 0x22},
     /* 2 */ {0xCF, 0x73, 0x38, 0x1F},
@@ -74,11 +74,11 @@ u8 reverbMultsArr[][NUM_ALLPASS / 3] = {
 /**
  * Format:
  * - useLightweightSettings (Reduce some runtime configurability options in favor of a slight speed boost during processing; Light configurability settings are found in synthesis.h)
- * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality)
+ * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality; number <= 0 signifies use of vanilla reverb)
  * - isMono                 (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
  * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
  * 
- * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound)
+ * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound; value of 0 disables all reverb)
  * - gain                   (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
  * - gainIndex              (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
  * - reverbIndex            (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
@@ -93,36 +93,36 @@ u8 reverbMultsArr[][NUM_ALLPASS / 3] = {
  */
 struct BetterReverbSettings gBetterReverbSettings[] = {
     { /* Preset 0 - Vanilla Reverb [Default Preset] */
-        .useLightweightSettings = FALSE,   // Ignored with vanilla reverb
-        .downsampleRate = -1,              // Signifies use of vanilla reverb
-        .isMono = FALSE,                   // Ignored with vanilla reverb
-        .filterCount = NUM_ALLPASS,        // Ignored with vanilla reverb
+        .useLightweightSettings = FALSE,    // Ignored with vanilla reverb
+        .downsampleRate = -1,               // Signifies use of vanilla reverb
+        .isMono = FALSE,                    // Ignored with vanilla reverb
+        .filterCount = NUM_ALLPASS,         // Ignored with vanilla reverb
 
-        .windowSize = -1,                  // Use vanilla preset window size
-        .gain = -1,                        // Use vanilla preset gain value
-        .gainIndex = 0x00,                 // Ignored with vanilla reverb
-        .reverbIndex = 0x00,               // Ignored with vanilla reverb
+        .windowSize = -1,                   // Use vanilla preset window size
+        .gain = -1,                         // Use vanilla preset gain value
+        .gainIndex = 0x00,                  // Ignored with vanilla reverb
+        .reverbIndex = 0x00,                // Ignored with vanilla reverb
 
-        .delaysL = delaysArr[0],           // Ignored with vanilla reverb
-        .delaysR = delaysArr[0],           // Ignored with vanilla reverb
-        .reverbMultsL = reverbMultsArr[0], // Ignored with vanilla reverb
-        .reverbMultsR = reverbMultsArr[0], // Ignored with vanilla reverb
+        .delaysL = sReverbDelaysArr[0],     // Ignored with vanilla reverb
+        .delaysR = sReverbDelaysArr[0],     // Ignored with vanilla reverb
+        .reverbMultsL = sReverbMultsArr[0], // Ignored with vanilla reverb
+        .reverbMultsR = sReverbMultsArr[0], // Ignored with vanilla reverb
     },
     { /* Preset 1 - Sample Console Configuration */
         .useLightweightSettings = TRUE,
         .downsampleRate = 2,
         .isMono = FALSE,
-        .filterCount = (NUM_ALLPASS - 9),  // Ignored with lightweight settings
+        .filterCount = (NUM_ALLPASS - 9),   // Ignored with lightweight settings
 
         .windowSize = 0x0E00,
-        .gain = 0x43FF,
-        .gainIndex = 0xA0,                 // Ignored with lightweight settings
-        .reverbIndex = 0x30,               // Ignored with lightweight settings
+        .gain = 0x2FFF,
+        .gainIndex = 0xA0,                  // Ignored with lightweight settings
+        .reverbIndex = 0x30,                // Ignored with lightweight settings
 
-        .delaysL = delaysArr[1],
-        .delaysR = delaysArr[2],
-        .reverbMultsL = reverbMultsArr[1], // Ignored with lightweight settings
-        .reverbMultsR = reverbMultsArr[2], // Ignored with lightweight settings
+        .delaysL = sReverbDelaysArr[1],
+        .delaysR = sReverbDelaysArr[2],
+        .reverbMultsL = sReverbMultsArr[1], // Ignored with lightweight settings
+        .reverbMultsR = sReverbMultsArr[2], // Ignored with lightweight settings
     },
     { /* Preset 2 - Sample Emulator Configuration (RCVI Hack or Emulator CPU Overclocking Required!) */
         .useLightweightSettings = FALSE,
@@ -131,17 +131,60 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         .filterCount = NUM_ALLPASS,
 
         .windowSize = 0x0E00,
-        .gain = 0x28FF,
+        .gain = 0x2AFF,
         .gainIndex = 0xA0,
-        .reverbIndex = 0x60,
+        .reverbIndex = 0x40,
 
-        .delaysL = delaysArr[1],
-        .delaysR = delaysArr[2],
-        .reverbMultsL = reverbMultsArr[1],
-        .reverbMultsR = reverbMultsArr[2],
+        .delaysL = sReverbDelaysArr[1],
+        .delaysR = sReverbDelaysArr[2],
+        .reverbMultsL = sReverbMultsArr[1],
+        .reverbMultsR = sReverbMultsArr[2],
     },
 };
-#endif
+
+#ifdef PUPPYPRINT_DEBUG
+// Used for A/B comparisons and preset configuration debugging alongside Puppyprint Debug
+struct BetterReverbSettings gDebugBetterReverbSettings[2] = {
+    { /* Preset A */
+        .useLightweightSettings = FALSE,
+        .downsampleRate = 2,
+        .isMono = FALSE,
+        .filterCount = (NUM_ALLPASS - 9),
+
+        .windowSize = 0x0E00,
+        .gain = 0x2FFF,
+        .gainIndex = 0xA0,
+        .reverbIndex = 0x30,
+
+        .delaysL = sReverbDelaysArr[1],
+        .delaysR = sReverbDelaysArr[2],
+        .reverbMultsL = sReverbMultsArr[1],
+        .reverbMultsR = sReverbMultsArr[2],
+    },
+    { /* Preset B */
+        .useLightweightSettings = FALSE,
+        .downsampleRate = 2,
+        .isMono = FALSE,
+        .filterCount = (NUM_ALLPASS - 9),
+
+        .windowSize = 0x0E00,
+        .gain = 0x2FFF,
+        .gainIndex = 0xA0,
+        .reverbIndex = 0x30,
+
+        .delaysL = sReverbDelaysArr[1],
+        .delaysR = sReverbDelaysArr[2],
+        .reverbMultsL = sReverbMultsArr[1],
+        .reverbMultsR = sReverbMultsArr[2],
+    },
+};
+#endif // PUPPYPRINT_DEBUG
+
+STATIC_ASSERT(ARRAY_COUNT(gBetterReverbSettings) > 0, "gBetterReverbSettings must contain presets!");
+STATIC_ASSERT(ARRAY_COUNT(sReverbDelaysArr) > 0, "sReverbDelaysArr must not be empty!");
+STATIC_ASSERT(ARRAY_COUNT(sReverbMultsArr) > 0, "sReverbMultsArr must not be empty!");
+
+#endif // BETTER_REVERB
 
 // Format:
 // - frequency
@@ -912,6 +955,14 @@ ALIGNED8 s16 *gAiBuffers[NUMAIBUFFERS];
 s16 gAiBufferLengths[NUMAIBUFFERS];
 
 u32 gAudioRandom;
+
+#ifdef BETTER_REVERB
+u8 gBetterReverbPresetCount = ARRAY_COUNT(gBetterReverbSettings);
+#ifdef PUPPYPRINT_DEBUG
+u8 gReverbDelaysArrCount = ARRAY_COUNT(sReverbDelaysArr);
+u8 gReverbMultsArrCount = ARRAY_COUNT(sReverbMultsArr);
+#endif // PUPPYPRINT_DEBUG
+#endif // BETTER_REVERB
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 s32 gAudioErrorFlags;

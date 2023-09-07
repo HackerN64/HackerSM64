@@ -17,6 +17,7 @@
 #include "behavior_data.h"
 #include "string.h"
 #include "color_presets.h"
+#include "emutest.h"
 
 #include "config.h"
 #include "config/config_world.h"
@@ -314,7 +315,7 @@ void switch_ucode(s32 ucode) {
             break;
         case GRAPH_NODE_UCODE_REJ:
             // Use .rej Microcode, skip sub-pixel processing on console
-            if (gIsConsole) {
+            if (gEmulator & EMU_CONSOLE) {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
             } else {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
@@ -566,6 +567,28 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
+        // The reason this is not divided as an integer is to prevent an integer division.
+        f32 vHalfFov = ( (f32) ((node->fov * 4096) + 8192) ) / 45.f;
+
+        // We need to account for aspect ratio changes by multiplying by the widescreen horizontal stretch 
+        // (normally 1.775).
+        f32 hHalfFov = vHalfFov * sAspectRatio;
+
+        node->halfFovHorizontal = tans(hHalfFov);
+
+#ifdef VERTICAL_CULLING
+        node->halfFovVertical = tans(vHalfFov);
+#endif
+
+#ifndef HORIZONTAL_CULLING_ON_EMULATOR
+        // If an emulator is detected, use a large value for the half fov 
+        // horizontal value to account for viewport widescreen hacks.
+
+        if(!(gEmulator & EMU_CONSOLE)){
+            node->halfFovHorizontal = 9999.0f;
+        }
+#endif
+    
         guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, perspNorm);
 
@@ -592,7 +615,7 @@ static f32 get_dist_from_camera(Vec3f pos) {
  */
 void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #ifdef AUTO_LOD
-    f32 distanceFromCam = gIsConsole ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : 50.0f;
+    f32 distanceFromCam = (gEmulator & EMU_CONSOLE) ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : 50.0f;
 #else
     f32 distanceFromCam = get_dist_from_camera(gMatStack[gMatStackIndex][3]);
 #endif
@@ -1011,23 +1034,24 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
 }
 
 /**
- * Check whether an object is in view to determine whether it should be drawn.
+ * Check whether an object is in view to determine whether if it should be drawn.
  * This is known as frustum culling.
- * It checks whether the object is far away, very close / behind the camera,
- * or horizontally out of view. It does not check whether it is vertically
- * out of view. It assumes a sphere of 300 units around the object's position
- * unless the object has a culling radius node that specifies otherwise.
- *
+ * It checks whether the object is far away, very close or behind the camera and 
+ * vertically or horizontally out of view. 
+ * The radius used is specified in DEFAULT_CULLING_RADIUS unless the object 
+ * has a culling radius node that specifies another value.
+ * 
  * The matrix parameter should be the top of the matrix stack, which is the
  * object's transformation matrix times the camera 'look-at' matrix. The math
  * is counter-intuitive, but it checks column 3 (translation vector) of this
  * matrix to determine where the origin (0,0,0) in object space will be once
  * transformed to camera space (x+ = right, y+ = up, z = 'coming out the screen').
+ * 
  * In 3D graphics, you typically model the world as being moved in front of a
  * static camera instead of a moving camera through a static world, which in
  * this case simplifies calculations. Note that the perspective matrix is not
  * on the matrix stack, so there are still calculations with the fov to compute
- * the slope of the lines of the frustum.
+ * the slope of the lines of the frustum, these are done once during geo_process_perspective.
  *
  *        z-
  *
@@ -1042,10 +1066,6 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
 s32 obj_is_in_view(struct GraphNodeObject *node) {
-    if (node->node.flags & GRAPH_RENDER_INVISIBLE) {
-        return FALSE;
-    }
-
     struct GraphNode *geo = node->sharedChild;
 
     s16 cullingRadius;
@@ -1053,43 +1073,38 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     if (geo != NULL && geo->type == GRAPH_NODE_TYPE_CULLING_RADIUS) {
         cullingRadius = ((struct GraphNodeCullingRadius *) geo)->cullingRadius;
     } else {
-        cullingRadius = 300;
+        cullingRadius = DEFAULT_CULLING_RADIUS;
     }
 
-    // Don't render if the object is close to or behind the camera
-    if (node->cameraToObject[2] > -100.0f + cullingRadius) {
+    // Check whether the object is not too far away or too close / behind the camera.
+    // This makes the HOLP not update when the camera is far away, and it
+    // makes PU travel safe when the camera is locked on the main map.
+    // If Mario were rendered with a depth over 65536 it would cause overflow
+    // when converting the transformation matrix to a fixed point matrix.
+    f32 cameraToObjectDepth = node->cameraToObject[2];
+
+    #define VALID_DEPTH_MIDDLE (-20100.f / 2.f)
+    #define VALID_DEPTH_RANGE (19900 / 2.f)
+    if (absf(cameraToObjectDepth - VALID_DEPTH_MIDDLE) >= VALID_DEPTH_RANGE + cullingRadius) {
         return FALSE;
     }
 
-    //! This makes the HOLP not update when the camera is far away, and it
-    //  makes PU travel safe when the camera is locked on the main map.
-    //  If Mario were rendered with a depth over 65536 it would cause overflow
-    //  when converting the transformation matrix to a fixed point matrix.
-    if (node->cameraToObject[2] < -20000.0f - cullingRadius) {
+#ifdef VERTICAL_CULLING
+    f32 vScreenEdge = -cameraToObjectDepth * gCurGraphNodeCamFrustum->halfFovVertical;
+
+    // Unlike with horizontal culling, we only check if the object is bellow the screen
+    // to prevent shadows from being culled.
+    if (node->cameraToObject[1] < -vScreenEdge - cullingRadius) {
         return FALSE;
     }
 
-    // half of the fov in in-game angle units instead of degrees
-    s16 halfFov = (((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f;
+#endif
+    
+    f32 hScreenEdge = -cameraToObjectDepth * gCurGraphNodeCamFrustum->halfFovHorizontal;
 
-    f32 hScreenEdge = -node->cameraToObject[2] * tans(halfFov);
-    // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
-    // the amount of units between the center of the screen and the horizontal edge
-    // given the distance from the object to the camera.
-
-    // This multiplication should really be performed on 4:3 as well,
-    // but the issue will be more apparent on widescreen.
-    // HackerSM64: This multiplication is done regardless of aspect ratio to fix object pop-in on the edges of the screen (which happens at 4:3 too)
-    // hScreenEdge *= GFX_DIMENSIONS_ASPECT_RATIO;
-
-    // Check whether the object is horizontally in view
-    if (node->cameraToObject[0] > hScreenEdge + cullingRadius) {
+    if (absf(node->cameraToObject[0]) > hScreenEdge + cullingRadius) {
         return FALSE;
     }
-    if (node->cameraToObject[0] < -hScreenEdge - cullingRadius) {
-        return FALSE;
-    }
-
     return TRUE;
 }
 
@@ -1128,14 +1143,25 @@ void visualise_object_hitbox(struct Object *node) {
  */
 void geo_process_object(struct Object *node) {
     if (node->header.gfx.areaIndex == gCurGraphNodeRoot->areaIndex) {
-        if (node->header.gfx.throwMatrix != NULL) {
-            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix, node->header.gfx.scale);
-        } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
-            mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
-                           node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
-        } else {
-            mtxf_rotate_zxy_and_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos, node->header.gfx.angle);
-            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
+        s32 isInvisible = (node->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE);
+        s32 noThrowMatrix = (node->header.gfx.throwMatrix == NULL);
+
+        // If the throw matrix is null and the object is invisible, there is no need
+        // to update billboarding, scale, rotation, etc. 
+        // This still updates translation since it is needed for sound.
+        if (isInvisible && noThrowMatrix) {
+            mtxf_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos);
+        }
+        else{
+            if (!noThrowMatrix) {
+                mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix, node->header.gfx.scale);
+            } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
+                mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
+                            node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
+            } else {
+                mtxf_rotate_zxy_and_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos, node->header.gfx.angle);
+                mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
+            }
         }
 
         node->header.gfx.throwMatrix = &gMatStack[++gMatStackIndex];
@@ -1145,7 +1171,8 @@ void geo_process_object(struct Object *node) {
         if (node->header.gfx.animInfo.curAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
         }
-        if (obj_is_in_view(&node->header.gfx)) {
+
+        if (!isInvisible && obj_is_in_view(&node->header.gfx)) {
             gMatStackIndex--;
             inc_mat_stack();
 

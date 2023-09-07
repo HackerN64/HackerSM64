@@ -42,7 +42,7 @@
 /**
  * When this option is enabled, LODs will ONLY work on console.
  * When this option is disabled, LODs will work regardless of whether console or emulator is used.
- * Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
+ * Regardless of whether this setting is enabled or not, you can use gEmulator to wrap your own code in a console check.
  */
 #define AUTO_LOD
 
@@ -126,3 +126,30 @@
  * NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
  */
 #define LEGACY_SHADOW_IDS
+
+
+/**
+ * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
+ */
+// #define HORIZONTAL_CULLING_ON_EMULATOR
+
+/**
+ * Makes objects bellow the screen be culled.
+ */
+#define VERTICAL_CULLING
+
+/**
+ * If the first command of an object´s geolayout is not GEO_CULLING_RADIUS, DEFAULT_CULLING_RADIUS
+ * will be used instead.
+ */
+#define DEFAULT_CULLING_RADIUS 300
+
+/**
+ * Eases the textured screen transitions to make them look smoother.
+ */
+#define EASE_IN_OUT_TRANSITIONS
+
+/**
+ * Makes use of the tex edge render mode to deliver smooth transition textures
+ */
+// #define SHARP_TRANSITION_TEXTURES

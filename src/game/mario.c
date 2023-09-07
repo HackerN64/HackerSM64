@@ -32,6 +32,7 @@
 #include "save_file.h"
 #include "sound_init.h"
 #include "rumble_init.h"
+#include "emutest.h"
 
 
 /**************************************************
@@ -1874,7 +1875,7 @@ void init_mario_from_save_file(void) {
     gMarioState->statusForCamera = &gPlayerCameraState[0];
     gMarioState->marioBodyState = &gBodyStates[0];
     gMarioState->animList = &gMarioAnimsBuf;
-    if (gIsConsole && __osControllerTypes[1] == CONT_TYPE_GCN) {
+    if ((gEmulator & EMU_CONSOLE) && __osControllerTypes[1] == CONT_TYPE_GCN) {
         gMarioState->controller = &gControllers[1];
     } else {
         gMarioState->controller = &gControllers[0];

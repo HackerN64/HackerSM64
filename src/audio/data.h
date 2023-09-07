@@ -54,8 +54,16 @@ extern struct AudioSessionSettings gAudioSessionSettings;
 extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
 #ifdef BETTER_REVERB
+extern u8 gBetterReverbPresetCount;
 extern struct BetterReverbSettings gBetterReverbSettings[];
-#endif
+#ifdef PUPPYPRINT_DEBUG
+extern struct BetterReverbSettings gDebugBetterReverbSettings[2];
+extern u32 sReverbDelaysArr[][NUM_ALLPASS];
+extern u8 sReverbMultsArr[][NUM_ALLPASS / 3];
+extern u8 gReverbDelaysArrCount;
+extern u8 gReverbMultsArrCount;
+#endif // PUPPYPRINT_DEBUG
+#endif // BETTER_REVERB
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern f32 gPitchBendFrequencyScale[256];

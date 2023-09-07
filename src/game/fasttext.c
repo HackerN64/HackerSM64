@@ -10,6 +10,7 @@
 
 __asm__(
  ".section \".rodata\", \"a\", @progbits\n"
+ ".balign 16\n"
  ".global fast_font\n"
  "fast_font:\n"
  ".incbin \"src/game/newfont2_swapped.bin\"\n"

@@ -124,6 +124,12 @@ endif
 TEXT_ENGINE := none
 $(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
 
+ifeq ($(TEXT_ENGINE), s2dex_text_engine)
+  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  SRC_DIRS += src/s2d_engine
+endif
+# add more text engines here
+
 #==============================================================================#
 # Optimization flags                                                           #
 #==============================================================================#
@@ -415,14 +421,6 @@ endif
 
 LIBRARIES := nustd hvqm2 z goddard
 
-# Text engine
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  LIBRARIES += s2d_engine
-  DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
-endif
-# add more text engines here
-
 LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 export LD_LIBRARY_PATH=./tools
@@ -490,7 +488,6 @@ CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
 YAY0TOOL              := $(TOOLS_DIR)/slienc
 MIO0TOOL              := $(TOOLS_DIR)/mio0
 RNCPACK               := $(TOOLS_DIR)/rncpack
-ROMALIGN              := $(TOOLS_DIR)/romalign
 FILESIZER             := $(TOOLS_DIR)/filesizer
 N64CKSUM              := $(TOOLS_DIR)/n64cksum
 N64GRAPHICS           := $(TOOLS_DIR)/n64graphics
@@ -514,7 +511,6 @@ ifneq (,$(call find-command,armips))
 else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
-ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
 EMULATOR = mupen64plus
 EMU_FLAGS =
 
@@ -560,7 +556,6 @@ all: $(ROM)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-	make -C src/s2d_engine clean
 
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
@@ -592,7 +587,7 @@ patch: $(ROM)
 	$(FLIPS) --create --bps ./baserom.$(VERSION).z64 $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
 
 # Extra object file dependencies
-$(BUILD_DIR)/asm/boot.o:              $(IPL3_RAW_FILES)
+$(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
 $(BUILD_DIR)/src/game/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
@@ -739,17 +734,9 @@ $(BUILD_DIR)/%.aifc: $(BUILD_DIR)/%.table %.aiff
 	$(call print,Encoding ADPCM:,$(word 2,$^),$@)
 	$(V)$(VADPCM_ENC) -c $^ $@
 
-$(ENDIAN_BITWIDTH): $(TOOLS_DIR)/determine-endian-bitwidth.c
-	@$(PRINT) "$(GREEN)Generating endian-bitwidth $(NO_COL)\n"
-	$(V)$(CC) -c $(CFLAGS) -o $@.dummy2 $< 2>$@.dummy1; true
-	$(V)grep -o 'msgbegin --endian .* --bitwidth .* msgend' $@.dummy1 > $@.dummy2
-	$(V)head -n1 <$@.dummy2 | cut -d' ' -f2-5 > $@
-	$(V)$(RM) $@.dummy1
-	$(V)$(RM) $@.dummy2
-
-$(SOUND_BIN_DIR)/sound_data.ctl: sound/sound_banks/ $(SOUND_BANK_FILES) $(SOUND_SAMPLE_AIFCS) $(ENDIAN_BITWIDTH)
+$(SOUND_BIN_DIR)/sound_data.ctl: sound/sound_banks/ $(SOUND_BANK_FILES) $(SOUND_SAMPLE_AIFCS)
 	@$(PRINT) "$(GREEN)Generating:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(PYTHON) $(TOOLS_DIR)/assemble_sound.py $(BUILD_DIR)/sound/samples/ sound/sound_banks/ $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/ctl_header $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/tbl_header $(C_DEFINES) $$(cat $(ENDIAN_BITWIDTH))
+	$(V)$(PYTHON) $(TOOLS_DIR)/assemble_sound.py $(BUILD_DIR)/sound/samples/ sound/sound_banks/ $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/ctl_header $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/tbl_header $(C_DEFINES)
 
 $(SOUND_BIN_DIR)/sound_data.tbl: $(SOUND_BIN_DIR)/sound_data.ctl
 	@true
@@ -760,9 +747,9 @@ $(SOUND_BIN_DIR)/ctl_header: $(SOUND_BIN_DIR)/sound_data.ctl
 $(SOUND_BIN_DIR)/tbl_header: $(SOUND_BIN_DIR)/sound_data.ctl
 	@true
 
-$(SOUND_BIN_DIR)/sequences.bin: $(SOUND_BANK_FILES) sound/sequences.json $(SOUND_SEQUENCE_DIRS) $(SOUND_SEQUENCE_FILES) $(ENDIAN_BITWIDTH)
+$(SOUND_BIN_DIR)/sequences.bin: $(SOUND_BANK_FILES) sound/sequences.json $(SOUND_SEQUENCE_DIRS) $(SOUND_SEQUENCE_FILES)
 	@$(PRINT) "$(GREEN)Generating:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(PYTHON) $(TOOLS_DIR)/assemble_sound.py --sequences $@ $(SOUND_BIN_DIR)/sequences_header $(SOUND_BIN_DIR)/bank_sets sound/sound_banks/ sound/sequences.json $(SOUND_SEQUENCE_FILES) $(C_DEFINES) $$(cat $(ENDIAN_BITWIDTH))
+	$(V)$(PYTHON) $(TOOLS_DIR)/assemble_sound.py --sequences $@ $(SOUND_BIN_DIR)/sequences_header $(SOUND_BIN_DIR)/bank_sets sound/sound_banks/ sound/sequences.json $(SOUND_SEQUENCE_FILES) $(C_DEFINES)
 
 $(SOUND_BIN_DIR)/bank_sets: $(SOUND_BIN_DIR)/sequences.bin
 	@true
@@ -868,7 +855,7 @@ $(BUILD_DIR)/sm64_prelim.ld: sm64.ld $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $
 
 $(BUILD_DIR)/sm64_prelim.elf: $(BUILD_DIR)/sm64_prelim.ld
 	@$(PRINT) "$(GREEN)Linking Preliminary ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $< -Map $(BUILD_DIR)/sm64_prelim.map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
+	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $< -Map $(BUILD_DIR)/sm64_prelim.map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
 
 $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Getting Goddard size...)
@@ -876,13 +863,13 @@ $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 
 $(BUILD_DIR)/asm/debug/map.o: asm/debug/map.s $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Assembling:,$<,$@)
-	$(V)python3 tools/mapPacker.py $(BUILD_DIR)/sm64_prelim.map $(BUILD_DIR)/bin/addr.bin $(BUILD_DIR)/bin/name.bin
+	$(V)python3 tools/mapPacker.py $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/bin/addr.bin $(BUILD_DIR)/bin/name.bin
 	$(V)$(CROSS)gcc -c $(ASMFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Link SM64 ELF file
-$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) undefined_syms.txt $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
+$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
+	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 
 # Build ROM
 ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))

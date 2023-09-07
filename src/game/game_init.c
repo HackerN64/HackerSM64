@@ -28,9 +28,12 @@
 #include "puppyprint.h"
 #include "puppycam2.h"
 #include "debug_box.h"
-#include "vc_check.h"
 #include "vc_ultra.h"
 #include "profiling.h"
+#include "emutest.h"
+
+// Emulators that the Instant Input patch should not be applied to
+#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -46,8 +49,6 @@ OSContStatus gControllerStatuses[4];
 OSContPadEx gControllerPads[4];
 u8 gControllerBits;
 s8 gGamecubeControllerPort = -1; // HackerSM64: This is set to -1 if there's no GC controller, 0 if there's one in the first port and 1 if there's one in the second port.
-u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
-u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
@@ -404,8 +405,8 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    // Currently, Ares passes the cache emulation test and has issues with single buffering so disable it there as well.
-    if (gIsConsole || gIsVC || gCacheEmulated) {
+    // Currently, Ares and Simple64 have issues with single buffering so disable it there as well.
+    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -444,7 +445,7 @@ void display_and_vsync(void) {
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
     // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
-    if (gIsConsole || gIsVC || gCacheEmulated) {
+    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
@@ -610,7 +611,7 @@ void read_controller_inputs(s32 threadID) {
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && i == gGamecubeControllerPort) {
+            if ((gEmulator & EMU_CONSOLE) && i == gGamecubeControllerPort) {
                 u32 oldButton = controller->controllerData->button;
                 u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
                 if (oldButton & Z_TRIG) {
@@ -668,7 +669,7 @@ void init_controllers(void) {
 #ifdef EEP
     // strangely enough, the EEPROM probe for save data is done in this function.
     // save pak detection?
-    gEepromProbe = gIsVC
+    gEepromProbe = (gEmulator & EMU_WIIVC)
                  ? osEepromProbeVC(&gSIEventMesgQueue)
                  : osEepromProbe  (&gSIEventMesgQueue);
 #endif
@@ -695,7 +696,7 @@ void init_controllers(void) {
             gControllers[cont++].controllerData = &gControllerPads[port];
         }
     }
-    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && (gIsConsole)) {
+    if ((__osControllerTypes[1] == CONT_TYPE_GCN) && (gEmulator & EMU_CONSOLE)) {
         gGamecubeControllerPort = 1;
         gPlayer1Controller = &gControllers[1];
     } else {
