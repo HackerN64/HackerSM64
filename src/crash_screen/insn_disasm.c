@@ -36,14 +36,14 @@
  *   - compare the last 6 bits (func) to insn_db_spec
  *  - otherwise, if 1 (OPC_REGIMM):
  *   - skip the next 5 bits and compare the 5 bits after that (regimm)
- *  - otherwise, compare the first 6 bits to insn_db
+ *  - otherwise, compare the first 6 bits to insn_db_standard
  */
 
 
 // MIPS III Instructions:
 
 // Opcode instructions:
-ALIGNED32 static const InsnTemplate insn_db[] = {
+ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
     // OPC_SPECIAL (insn_db_spec)
     // OPC_REGIMM (insn_db_regi)
     { .name = "J"      , .fmt = "\'J"  , .opcode = OPC_J           }, // Jump.
@@ -108,7 +108,7 @@ ALIGNED32 static const InsnTemplate insn_db[] = {
 };
 
 // Special opcode instructions:
-ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL
+ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE_FUNC
     { .name = "SLL"    , .fmt = "\'dta", .opcode = OPS_SLL         }, // Shift Word Left Logical.
     { .name = "SRL"    , .fmt = "\'dta", .opcode = OPS_SRL         }, // Shift Word Right Logical.
     { .name = "SRA"    , .fmt = "\'dta", .opcode = OPS_SRA         }, // Shift Word Right Arithmetic.
@@ -165,7 +165,7 @@ ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL
 };
 
 // Register opcode instructions:
-ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM
+ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM, INSN_TYPE_REGIMM
     { .name = "BLTZ"   , .fmt = "\'sB" , .opcode = OPR_BLTZ        }, // Branch on Less Than Zero.
     { .name = "BGEZ"   , .fmt = "\'sB" , .opcode = OPR_BGEZ        }, // Branch on Greater Than or Equal to Zero.
     { .name = "BLTZL"  , .fmt = "\'sB" , .opcode = OPR_BLTZL       }, // Branch on Less Than Zero Likely.
@@ -184,85 +184,85 @@ ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM
 };
 
 // Coprocessor-0 (System Control Coprocessor):
-ALIGNED32 static const InsnTemplate insn_db_cop0[] = {
-    /* sub:00 */ { .name = "MFC0"   , .fmt = "\'t0" , .opcode = COP0_MF         }, // Move from System Control Coprocessor.
-    /* sub:00 */ { .name = "DMFC0"  , .fmt = "\'t0" , .opcode = COP0_DMF        }, // Doubleword Move from System Control Coprocessor.
-    /* sub:00 */ { .name = "MTC0"   , .fmt = "\'t0" , .opcode = COP0_MT         }, // Move to System Control Coprocessor.
-    /* sub:00 */ { .name = "DMTC0"  , .fmt = "\'t0" , .opcode = COP0_DMT        }, // Doubleword Move to System Control Coprocessor.
-    /* sub:10 */ { .name = "TLBP"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBP   }, // Searches for a TLB entry that matches the EntryHi register.
-    /* sub:10 */ { .name = "TLBR"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBR   }, // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
-    /* sub:10 */ { .name = "TLBWI"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWI  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
-    /* sub:10 */ { .name = "TLBWR"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWR  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
-    /* sub:10 */ { .name = "ERET"   , .fmt = "\'"   , .opcode = OPC_COP0_ERET   }, // Return from interrupt, exception, or error exception.
+ALIGNED32 static const InsnTemplate insn_db_cop0_sub00[] = { // OPC_COP0, INSN_TYPE_COP_FMT
+    { .name = "MFC0"   , .fmt = "\'t0" , .opcode = COP0_MF         }, // Move from System Control Coprocessor.
+    { .name = "DMFC0"  , .fmt = "\'t0" , .opcode = COP0_DMF        }, // Doubleword Move from System Control Coprocessor.
+    { .name = "MTC0"   , .fmt = "\'t0" , .opcode = COP0_MT         }, // Move to System Control Coprocessor.
+    { .name = "DMTC0"  , .fmt = "\'t0" , .opcode = COP0_DMT        }, // Doubleword Move to System Control Coprocessor.
+    { .name = "." },
+};
+ALIGNED32 static const InsnTemplate insn_db_cop0_sub10[] = { // OPC_COP0, INSN_TYPE_FUNC
+    { .name = "TLBP"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBP   }, // Searches for a TLB entry that matches the EntryHi register.
+    { .name = "TLBR"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBR   }, // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
+    { .name = "TLBWI"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWI  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
+    { .name = "TLBWR"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWR  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
+    { .name = "ERET"   , .fmt = "\'"   , .opcode = OPC_COP0_ERET   }, // Return from interrupt, exception, or error exception.
     { .name = "." },
 };
 
 // Coprocessor-1 (Floating-Point Unit):
-ALIGNED32 static const InsnTemplate insn_db_cop1[] = {
-    /* sub:00 */ { .name = "MFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_SINGLE }, // Move Word From Floating-Point.
-    /* sub:00 */ { .name = "DMFC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_DOUBLE }, // Doubleword Move From Floating-Point.
-    /* sub:00 */ { .name = "MTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_WORD   }, // Move Word To Floating-Point.
-    /* sub:00 */ { .name = "DMTC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_LONG   }, // Doubleword Move To Floating-Point.
-    /* sub:00 */ { .name = "CFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_F  }, // Move Control Word From Floating-Point.
-    /* sub:00 */ { .name = "CTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_T  }, // Move Control Word To Floating-Point.
-    /* sub:01 */ { .name = "BC1F"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1F   }, // Branch on FP False (1cyc*).
-    /* sub:01 */ { .name = "BC1T"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1T   }, // Branch on FP True (1cyc*).
-    /* sub:01 */ { .name = "BC1FL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1FL  }, // Branch on FP False Likely (1cyc*).
-    /* sub:01 */ { .name = "BC1TL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1TL  }, // Branch on FP True Likely (1cyc*).
-    /* sub:10 */ { .name = "ADD"    , .fmt = "\"DST", .opcode = OPS_ADD_F       }, // ADD.[FMT]     Floating-Point Add (3cyc).
-    /* sub:10 */ { .name = "SUB"    , .fmt = "\"DST", .opcode = OPS_SUB_F       }, // SUB.[FMT]     Floating-Point Subtract (3cyc).
-    /* sub:10 */ { .name = "MUL"    , .fmt = "\"DST", .opcode = OPS_MUL_F       }, // MUL.[FMT]     Floating-Point Multiply (S:5cyc; D:8cyc).
-    /* sub:10 */ { .name = "DIV"    , .fmt = "\"DST", .opcode = OPS_DIV_F       }, // DIV.[FMT]     Floating-Point Divide (S:29cyc; D:58cyc).
-    /* sub:10 */ { .name = "SQRT"   , .fmt = "\"DS" , .opcode = OPS_SQRT_F      }, // SQRT.[FMT]    Floating-Point Square Root (S:29cyc; D:58cyc).
-    /* sub:10 */ { .name = "ABS"    , .fmt = "\"DS" , .opcode = OPS_ABS_F       }, // ABS.[FMT]     Floating-Point Absolute Value (1cyc).
-    /* sub:10 */ { .name = "MOV"    , .fmt = "\"DS" , .opcode = OPS_MOV_F       }, // MOV.[FMT]     Floating-Point Move (1cyc).
-    /* sub:10 */ { .name = "NEG"    , .fmt = "\"DS" , .opcode = OPS_NEG_F       }, // NEG.[FMT]     Floating-Point Negate (1cyc).
-    /* sub:10 */ { .name = "ROUND.L", .fmt = "\"DS" , .opcode = OPS_ROUND_L_F   }, // ROUND.L.[FMT] Floating-Point Round to Long Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "TRUNC.L", .fmt = "\"DS" , .opcode = OPS_TRUNC_L_F   }, // TRUNC.L.[FMT] Floating-Point Truncate to Long Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "CEIL.L" , .fmt = "\"DS" , .opcode = OPS_CEIL_L_F    }, // CEIL.L.[FMT]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "FLOOR.L", .fmt = "\"DS" , .opcode = OPS_FLOOR_L_F   }, // FLOOR.L.[FMT] Floating-Point Floor to Long Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "ROUND.W", .fmt = "\"DS" , .opcode = OPS_ROUND_W_F   }, // ROUND.W.[FMT] Floating-Point Round to Word Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "TRUNC.W", .fmt = "\"DS" , .opcode = OPS_TRUNC_W_F   }, // TRUNC.W.[FMT] Floating-Point Truncate to Word Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "CEIL.W" , .fmt = "\"DS" , .opcode = OPS_CEIL_W_F    }, // CEIL.W.[FMT]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "FLOOR.W", .fmt = "\"DS" , .opcode = OPS_FLOOR_W_F   }, // FLOOR.W.[FMT] Floating-Point Floor to Word Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "CVT.S"  , .fmt = "\"DS" , .opcode = OPS_CVT_S_F     }, // CVT.S.[FMT]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
-    /* sub:10 */ { .name = "CVT.D"  , .fmt = "\"DS" , .opcode = OPS_CVT_D_F     }, // CVT.D.[FMT]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
-    /* sub:10 */ { .name = "CVT.W"  , .fmt = "\"DS" , .opcode = OPS_CVT_W_F     }, // CVT.W.[FMT]   Floating-Point Convert to Word Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "CVT.L"  , .fmt = "\"DS" , .opcode = OPS_CVT_L_F     }, // CVT.L.[FMT]   Floating-Point Convert to Long Fixed-Point (5cyc).
-    /* sub:10 */ { .name = "C.F"    , .fmt = "\"ST" , .opcode = OPS_C_F         }, // C.F.[FMT]     Floating-Point Compare (False) (1cyc).
-    /* sub:10 */ { .name = "C.UN"   , .fmt = "\"ST" , .opcode = OPS_C_UN        }, // C.UN.[FMT]    Floating-Point Compare (Unordered) (1cyc).
-    /* sub:10 */ { .name = "C.EQ"   , .fmt = "\"ST" , .opcode = OPS_C_EQ        }, // C.EQ.[FMT]    Floating-point Compare (Equal) (1cyc).
-    /* sub:10 */ { .name = "C.UEQ"  , .fmt = "\"ST" , .opcode = OPS_C_UEQ       }, // C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc).
-    /* sub:10 */ { .name = "C.OLT"  , .fmt = "\"ST" , .opcode = OPS_C_OLT       }, // C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc).
-    /* sub:10 */ { .name = "C.ULT"  , .fmt = "\"ST" , .opcode = OPS_C_ULT       }, // C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc).
-    /* sub:10 */ { .name = "C.OLE"  , .fmt = "\"ST" , .opcode = OPS_C_OLE       }, // C.OLE.[fmt]   Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
-    /* sub:10 */ { .name = "C.ULE"  , .fmt = "\"ST" , .opcode = OPS_C_ULE       }, // C.ULE.[fmt]   Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
-    /* sub:10 */ { .name = "C.SF"   , .fmt = "\"ST" , .opcode = OPS_C_SF        }, // C.SF.[fmt]    Floating-point Compare (Signaling False) (1cyc).
-    /* sub:10 */ { .name = "C.NGLE" , .fmt = "\"ST" , .opcode = OPS_C_NGLE      }, // C.NGLE.[fmt]  Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
-    /* sub:10 */ { .name = "C.SEQ"  , .fmt = "\"ST" , .opcode = OPS_C_SEQ       }, // C.SEQ.[fmt]   Floating-point Compare (Signalling Equal) (1cyc).
-    /* sub:10 */ { .name = "C.NGL"  , .fmt = "\"ST" , .opcode = OPS_C_NGL       }, // C.NGL.[fmt]   Floating-point Compare (Not Greater or Less Than) (1cyc).
-    /* sub:10 */ { .name = "C.LT"   , .fmt = "\"ST" , .opcode = OPS_C_LT        }, // C.LT.[fmt]    Floating-point Compare (Less Than) (1cyc).
-    /* sub:10 */ { .name = "C.NGE"  , .fmt = "\"ST" , .opcode = OPS_C_NGE       }, // C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc).
-    /* sub:10 */ { .name = "C.LE"   , .fmt = "\"ST" , .opcode = OPS_C_LE        }, // C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc).
-    /* sub:10 */ { .name = "C.NGT"  , .fmt = "\"ST" , .opcode = OPS_C_NGT       }, // C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc).
+ALIGNED32 static const InsnTemplate insn_db_cop1_sub00[] = { // OPC_COP1, INSN_TYPE_COP_FMT
+    { .name = "MFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_SINGLE }, // Move Word From Floating-Point.
+    { .name = "DMFC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_DOUBLE }, // Doubleword Move From Floating-Point.
+    { .name = "MTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_WORD   }, // Move Word To Floating-Point.
+    { .name = "DMTC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_LONG   }, // Doubleword Move To Floating-Point.
+    { .name = "CFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_F  }, // Move Control Word From Floating-Point.
+    { .name = "CTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_T  }, // Move Control Word To Floating-Point.
+    { .name = "." },
+};
+ALIGNED32 static const InsnTemplate insn_db_cop1_sub01[] = { // OPC_COP1, INSN_TYPE_REGIMM
+    { .name = "BC1F"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1F   }, // Branch on FP False (1cyc*).
+    { .name = "BC1T"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1T   }, // Branch on FP True (1cyc*).
+    { .name = "BC1FL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1FL  }, // Branch on FP False Likely (1cyc*).
+    { .name = "BC1TL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1TL  }, // Branch on FP True Likely (1cyc*).
+    { .name = "." },
+};
+ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_TYPE_FUNC
+    { .name = "ADD"    , .fmt = "\"DST", .opcode = OPS_ADD_F       }, // ADD.[FMT]     Floating-Point Add (3cyc).
+    { .name = "SUB"    , .fmt = "\"DST", .opcode = OPS_SUB_F       }, // SUB.[FMT]     Floating-Point Subtract (3cyc).
+    { .name = "MUL"    , .fmt = "\"DST", .opcode = OPS_MUL_F       }, // MUL.[FMT]     Floating-Point Multiply (S:5cyc; D:8cyc).
+    { .name = "DIV"    , .fmt = "\"DST", .opcode = OPS_DIV_F       }, // DIV.[FMT]     Floating-Point Divide (S:29cyc; D:58cyc).
+    { .name = "SQRT"   , .fmt = "\"DS" , .opcode = OPS_SQRT_F      }, // SQRT.[FMT]    Floating-Point Square Root (S:29cyc; D:58cyc).
+    { .name = "ABS"    , .fmt = "\"DS" , .opcode = OPS_ABS_F       }, // ABS.[FMT]     Floating-Point Absolute Value (1cyc).
+    { .name = "MOV"    , .fmt = "\"DS" , .opcode = OPS_MOV_F       }, // MOV.[FMT]     Floating-Point Move (1cyc).
+    { .name = "NEG"    , .fmt = "\"DS" , .opcode = OPS_NEG_F       }, // NEG.[FMT]     Floating-Point Negate (1cyc).
+    { .name = "ROUND.L", .fmt = "\"DS" , .opcode = OPS_ROUND_L_F   }, // ROUND.L.[FMT] Floating-Point Round to Long Fixed-Point (5cyc).
+    { .name = "TRUNC.L", .fmt = "\"DS" , .opcode = OPS_TRUNC_L_F   }, // TRUNC.L.[FMT] Floating-Point Truncate to Long Fixed-Point (5cyc).
+    { .name = "CEIL.L" , .fmt = "\"DS" , .opcode = OPS_CEIL_L_F    }, // CEIL.L.[FMT]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
+    { .name = "FLOOR.L", .fmt = "\"DS" , .opcode = OPS_FLOOR_L_F   }, // FLOOR.L.[FMT] Floating-Point Floor to Long Fixed-Point (5cyc).
+    { .name = "ROUND.W", .fmt = "\"DS" , .opcode = OPS_ROUND_W_F   }, // ROUND.W.[FMT] Floating-Point Round to Word Fixed-Point (5cyc).
+    { .name = "TRUNC.W", .fmt = "\"DS" , .opcode = OPS_TRUNC_W_F   }, // TRUNC.W.[FMT] Floating-Point Truncate to Word Fixed-Point (5cyc).
+    { .name = "CEIL.W" , .fmt = "\"DS" , .opcode = OPS_CEIL_W_F    }, // CEIL.W.[FMT]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
+    { .name = "FLOOR.W", .fmt = "\"DS" , .opcode = OPS_FLOOR_W_F   }, // FLOOR.W.[FMT] Floating-Point Floor to Word Fixed-Point (5cyc).
+    { .name = "CVT.S"  , .fmt = "\"DS" , .opcode = OPS_CVT_S_F     }, // CVT.S.[FMT]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
+    { .name = "CVT.D"  , .fmt = "\"DS" , .opcode = OPS_CVT_D_F     }, // CVT.D.[FMT]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
+    { .name = "CVT.W"  , .fmt = "\"DS" , .opcode = OPS_CVT_W_F     }, // CVT.W.[FMT]   Floating-Point Convert to Word Fixed-Point (5cyc).
+    { .name = "CVT.L"  , .fmt = "\"DS" , .opcode = OPS_CVT_L_F     }, // CVT.L.[FMT]   Floating-Point Convert to Long Fixed-Point (5cyc).
+    { .name = "C.F"    , .fmt = "\"ST" , .opcode = OPS_C_F         }, // C.F.[FMT]     Floating-Point Compare (False) (1cyc).
+    { .name = "C.UN"   , .fmt = "\"ST" , .opcode = OPS_C_UN        }, // C.UN.[FMT]    Floating-Point Compare (Unordered) (1cyc).
+    { .name = "C.EQ"   , .fmt = "\"ST" , .opcode = OPS_C_EQ        }, // C.EQ.[FMT]    Floating-point Compare (Equal) (1cyc).
+    { .name = "C.UEQ"  , .fmt = "\"ST" , .opcode = OPS_C_UEQ       }, // C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc).
+    { .name = "C.OLT"  , .fmt = "\"ST" , .opcode = OPS_C_OLT       }, // C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc).
+    { .name = "C.ULT"  , .fmt = "\"ST" , .opcode = OPS_C_ULT       }, // C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc).
+    { .name = "C.OLE"  , .fmt = "\"ST" , .opcode = OPS_C_OLE       }, // C.OLE.[fmt]   Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
+    { .name = "C.ULE"  , .fmt = "\"ST" , .opcode = OPS_C_ULE       }, // C.ULE.[fmt]   Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
+    { .name = "C.SF"   , .fmt = "\"ST" , .opcode = OPS_C_SF        }, // C.SF.[fmt]    Floating-point Compare (Signaling False) (1cyc).
+    { .name = "C.NGLE" , .fmt = "\"ST" , .opcode = OPS_C_NGLE      }, // C.NGLE.[fmt]  Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
+    { .name = "C.SEQ"  , .fmt = "\"ST" , .opcode = OPS_C_SEQ       }, // C.SEQ.[fmt]   Floating-point Compare (Signalling Equal) (1cyc).
+    { .name = "C.NGL"  , .fmt = "\"ST" , .opcode = OPS_C_NGL       }, // C.NGL.[fmt]   Floating-point Compare (Not Greater or Less Than) (1cyc).
+    { .name = "C.LT"   , .fmt = "\"ST" , .opcode = OPS_C_LT        }, // C.LT.[fmt]    Floating-point Compare (Less Than) (1cyc).
+    { .name = "C.NGE"  , .fmt = "\"ST" , .opcode = OPS_C_NGE       }, // C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc).
+    { .name = "C.LE"   , .fmt = "\"ST" , .opcode = OPS_C_LE        }, // C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc).
+    { .name = "C.NGT"  , .fmt = "\"ST" , .opcode = OPS_C_NGT       }, // C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc).
     { .name = "." },
 };
 
-// Coprocessor-2 (Reality Co-Processor Vector Unit):
-ALIGNED32 static const InsnTemplate insn_db_cop2[] = {
-    { .name = "." },
-};
-
-// Coprocessor-3 (CP3):
-ALIGNED32 static const InsnTemplate insn_db_cop3[] = {
-    { .name = "." },
-};
-
-static const InsnTemplate* insn_db_cop_lists[] = {
-    [COP0] = insn_db_cop0,
-    [COP1] = insn_db_cop1,
-    [COP2] = insn_db_cop2,
-    [COP3] = insn_db_cop3,
+// Coprocessor subtype lists.
+static const InsnTemplate* insn_db_cop_lists[][0b11] = {
+    [COP0] = { [INSN_TYPE_COP_FMT] = insn_db_cop0_sub00, [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = insn_db_cop0_sub10, }, // Coprocessor-0 (System Control Coprocessor).
+    [COP1] = { [INSN_TYPE_COP_FMT] = insn_db_cop1_sub00, [INSN_TYPE_REGIMM] = insn_db_cop1_sub01, [INSN_TYPE_FUNC] = insn_db_cop1_sub10, }, // Coprocessor-1 (Floating-Point Unit).
+    [COP2] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               }, // Coprocessor-2 (Reality Co-Processor Vector Unit).
+    [COP3] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               }, // Coprocessor-3 (CP3).
 };
 
 // Pseudo-instructions
@@ -281,17 +281,32 @@ ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
 };
 
 
-static _Bool check_pseudo_insn(const InsnTemplate** type, enum PseudoInsns id, _Bool cond) {
+/**
+ * @brief Use a specific pseudoinstruction if 'cond' is TRUE.
+ * 
+ * @param[out] checkInsn A pointer to the InsnTemplate data in insn_db_pseudo matching the given instruction data.
+ * @param[in ] id        The index in insn_db_pseudo of the pseudoinstruction template data.
+ * @param[in ] cond      Whether to convert the instruction to the pseudoinstruction.
+ * @return _Bool Whether the instruction has been converted.
+ */
+static _Bool check_pseudo_insn(const InsnTemplate** checkInsn, enum PseudoInsns id, _Bool cond) {
     if (cond) {
-        *type = &insn_db_pseudo[id];
+        *checkInsn = &insn_db_pseudo[id];
         return TRUE;
     }
 
     return FALSE;
 }
 
+/**
+ * @brief 
+ * 
+ * @param[out] checkInsn A pointer to the InsnTemplate data in insn_db_pseudo matching the given instruction data.
+ * @param[in ] insn      The instruction data that is being read.
+ * @return _Bool Whether the instruction has been converted.
+ */
 static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn) {
-    // NOP (trivial case)
+    // NOP (trivial case).
     if (check_pseudo_insn(type, PSEUDO_NOP, (insn.raw == 0))) return TRUE;
 
     // There are no known one-line Coprocessor pseudoinstructions.
@@ -338,32 +353,36 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
     return FALSE;
 }
 
-static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** checkInsn) {
+/**
+ * @brief Gets the instruction type and a pointer to the list to check.
+ * 
+ * @param[in ] insn      The instruction data that is being read.
+ * @param[out] insnList A pointer to the list to check through.
+ * @return enum InsnType Type of instruction.
+ */
+static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** insnList) {
     enum InsnType insnType = INSN_TYPE_OPCODE;
-    *checkInsn = insn_db;
 
-    if (insn.cop_opcode == COP_OPCODE) { // COPz
-        if (insn.cop_num < ARRAY_COUNT(insn_db_cop_lists)) {
-            *checkInsn = insn_db_cop_lists[insn.cop_num];
-            switch (insn.cop_subtype) {
-                case 0b00: insnType = INSN_TYPE_COP_FMT; break;
-                case 0b01: insnType = INSN_TYPE_REGIMM;  break;
-                default:   insnType = INSN_TYPE_FUNC;    break; // 0b10 || 0b11
-            }
+    if (insn.cop_opcode == COP_OPCODE) { // COPz opcode.
+        if (insn.cop_num < ARRAY_COUNT(insn_db_cop_lists)) { // Bounds check.
+            insnType  = insn.cop_subtype;
+            *insnList = insn_db_cop_lists[insn.cop_num][insnType]; // Use COPz lists.
         } else {
-            return INSN_TYPE_ERROR;
+            insnType = INSN_TYPE_ERROR;
         }
     } else {
         switch (insn.opcode) {
             case OPC_SPECIAL:
-                *checkInsn = insn_db_spec;
-                insnType = INSN_TYPE_FUNC;
+                insnType  = INSN_TYPE_FUNC;
+                *insnList = insn_db_spec;
                 break;
             case OPC_REGIMM:
-                *checkInsn = insn_db_regi;
-                insnType = INSN_TYPE_REGIMM;
+                insnType  = INSN_TYPE_REGIMM;
+                *insnList = insn_db_regi;
                 break;
             default:
+                insnType  = INSN_TYPE_OPCODE;
+                *insnList = insn_db_standard;
                 break;
         }
     }
@@ -371,7 +390,13 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
     return insnType;
 }
 
-const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
+/**
+ * @brief Gets a pointer to the InsnTemplate data matching the given instruction data.
+ * 
+ * @param[in] insn The instruction data that is being read.
+ * @return const InsnTemplate* A pointer to the InsnTemplate data matching the given instruction data.
+ */
+const InsnTemplate* get_insn(InsnData insn) {
     const InsnTemplate* checkInsn = NULL;
 
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) && check_pseudo_instructions(&checkInsn, insn)) {
@@ -380,7 +405,7 @@ const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
 
     enum InsnType insnType = get_insn_type_and_list(insn, &checkInsn);
 
-    if (insnType == INSN_TYPE_ERROR) {
+    if ((checkInsn == NULL) || (insnType == INSN_TYPE_ERROR)) {
         return NULL;
     }
 
@@ -405,7 +430,8 @@ const InsnTemplate* get_insn(InsnData insn) { //! TODO: Optimize this
     return NULL;
 }
 
-// Registers
+// CPU register names.
+//! TODO: Combine this with sRegNames in page_context.c.
 static const char sCPURegisterNames[][3] = {
     "R0",                                           // $zero. Hardware enforced.
     "AT",                                           // Assembler temporary value. Don't use unless you know it's safe.
@@ -419,8 +445,9 @@ static const char sCPURegisterNames[][3] = {
     "SP",                                           // Stack pointer. Subtract to allocate stack space and add back to deallocate.
     "FP",                                           // Saved value 8 ("S8") or frame pointer ("FP"), depending on compiler.
     "RA",                                           // Return address. Jump to this to return from a function. Hardware enforced.
-}; //! TODO: Combine this with sRegNames
+};
 
+// Coprocessor-0 (System Control Coprocessor) register names.
 static const char sCOP0RegisterNames[][9] = {
     [ 0] = "Index",                         // Programmable pointer into TLB array.
     [ 1] = "Random",                        // Pseudorandom pointer into TLB array (read only).
@@ -452,7 +479,7 @@ static const char sCOP0RegisterNames[][9] = {
     [31] = "31",                            // Reserved for future use.
 };
 
-// // FPU Registers
+// // Coprocessor-1 (Floating-Point Unit) register names.
 // static const char sCOP1RegisterNames[][4] = {
 //     "F00", "F02",                               // Subroutine return value.
 //     "F04", "F06", "F08", "F10",                 // Temporary values.
@@ -461,7 +488,12 @@ static const char sCOP0RegisterNames[][9] = {
 //     "F20", "F22", "F24", "F26", "F28", "F30",   // Saved Values.
 // };
 
-// Checks an instruction for its branch offset. Returns 0 if there is no branch.
+/**
+ * @brief Checks an instruction for its branch offset.
+ * 
+ * @param[in] insn The instruction data that is being read.
+ * @return s16 The branch offset. 0 if there is no branch.
+ */
 s16 insn_check_for_branch_offset(InsnData insn) {
     const InsnTemplate* info = get_insn(insn);
 
@@ -478,6 +510,12 @@ s16 insn_check_for_branch_offset(InsnData insn) {
     return 0x0000;
 }
 
+/**
+ * @brief Gets the target address of the instruction at 'addr'.
+ * 
+ * @param[in] addr The address of the instruction that is being read.
+ * @return Address The target address of the instruction. 'addr' if there is no branch instruction.
+ */
 Address get_insn_branch_target_from_addr(Address addr) {
     if (!is_in_code_segment(addr)) {
         return addr;
@@ -501,6 +539,12 @@ Address get_insn_branch_target_from_addr(Address addr) {
     return addr;
 }
 
+/**
+ * @brief Gets the corresponding character to print for a Coprocessor-1 (Floating-Point Unit) instruction's format.
+ * 
+ * @param[in] insn The instruction data that is being read.
+ * @return char The char value that represents the format in the instruction name.
+ */
 static char cop1_fmt_to_char(InsnData insn) {
     switch (insn.fmt) {
         case COP1_FMT_SINGLE: return 'S'; // Single
@@ -512,7 +556,13 @@ static char cop1_fmt_to_char(InsnData insn) {
     return 'X'; // Unknown
 }
 
-// Print color code if the color has changed.
+/**
+ * @brief Prints the new color code if the color has changed.
+ * 
+ * @param[out   ] strp     Pointer to the string.
+ * @param[in,out] oldColor The previous color. Gets set to 'newColor' if they are different.
+ * @param[in    ] newColor The new color to add to the string.
+ */
 static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor) {
     if (*oldColor != newColor) {
         *oldColor = newColor;
@@ -544,6 +594,14 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define ADD_STR(...) strp += sprintf(strp, __VA_ARGS__);
 
 
+/**
+ * @brief Converts MIPS instruction data into a formatted string.
+ * 
+ * @param[in ] addr  The address of the instruction. Used to calculate the target of branches and jumps.
+ * @param[in ] insn  The instruction data that is being read.
+ * @param[out] fname If the instruction points 
+ * @return char* The formatted string in insn_as_string.
+ */
 char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
     char* strp = &insn_as_string[0];
     _Bool unimpl = FALSE;
@@ -552,6 +610,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
 
     const InsnTemplate* info = get_insn(insn);
 
+    // Whether to print immediates as decimal values rather than hexadecimal.
     _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
 
     if (info != NULL) {
@@ -559,6 +618,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
 
+        // Loop through the chars in the 'fmt' member of 'info' and print the insn data accordingly.
         for (u32 cmdIndex = 0; cmdIndex < sizeof(info->fmt); cmdIndex++) {
             if (unimpl || *curCmd == CHAR_NULL) {
                 break;
@@ -570,52 +630,52 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
             }
 
             switch (*curCmd) {
-                case CHAR_P_NOP:
+                case CHAR_P_NOP: // NOP.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_NOP);
                     ADD_STR(info->name);
                     return insn_as_string;
-                case CHAR_P_NAME:
+                case CHAR_P_NAME: // Instruction name.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_INSN);
                     ADD_STR(STR_INSN_NAME, info->name);
                     break;
-                case CHAR_P_NAMEF:
+                case CHAR_P_NAMEF: // Instruction name with format.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_INSN);
                     bzero(insn_name, sizeof(insn_name));
                     sprintf(insn_name, STR_INSN_NAME_FORMAT, info->name, cop1_fmt_to_char(insn));
                     ADD_STR(STR_INSN_NAME, insn_name);
                     break;
-                case CHAR_P_RS:
+                case CHAR_P_RS: // CPU 'RS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCPURegisterNames[insn.rs]);
                     separator = TRUE;
                     break;
-                case CHAR_P_RT:
+                case CHAR_P_RT: // CPU 'RT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCPURegisterNames[insn.rt]);
                     separator = TRUE;
                     break;
-                case CHAR_P_RD:
+                case CHAR_P_RD: // CPU 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCPURegisterNames[insn.rd]);
                     separator = TRUE;
                     break;
-                case CHAR_P_IMM:
+                case CHAR_P_IMM: // Immediate.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), insn.immediate);
                     break;
-                case CHAR_P_NIMM:
+                case CHAR_P_NIMM: // Negative Immediate.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), -(s16)insn.immediate);
                     break;
-                case CHAR_P_SHIFT:
+                case CHAR_P_SHIFT: // Shift amount.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR(STR_IMMEDIATE, insn.sa);
                     break;
-                case CHAR_P_BASE:
+                case CHAR_P_BASE: // Register offset base.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG_BASE, sCPURegisterNames[insn.base]);
                     break;
-                case CHAR_P_BRANCH:
+                case CHAR_P_BRANCH: // Branch offset.
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
                     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)) {
                         ADD_STR(STR_FUNCTION, get_insn_branch_target_from_addr(addr));
@@ -624,27 +684,27 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
                         ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
                     }
                     break;
-                case CHAR_P_COP0D:
+                case CHAR_P_COP0D: // COP0 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_IREG, sCOP0RegisterNames[insn.rd]);
                     separator = TRUE;
                     break;
-                case CHAR_P_FT:
+                case CHAR_P_FT: // COP1 'FT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_FREG, insn.ft);
                     separator = TRUE;
                     break;
-                case CHAR_P_FS:
+                case CHAR_P_FS: // COP1 'FS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_FREG, insn.fs);
                     separator = TRUE;
                     break;
-                case CHAR_P_FD:
+                case CHAR_P_FD: // COP1 'FD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_STR(STR_FREG, insn.fd);
                     separator = TRUE;
                     break;
-                case CHAR_P_FUNC:
+                case CHAR_P_FUNC: // Jump function.
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
@@ -667,7 +727,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
 #endif
                     ADD_STR(STR_FUNCTION, target);
                     break;
-                default:
+                default: // Unknown parameter.
                     unimpl = TRUE;
                     break;
             }
@@ -678,7 +738,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
         unimpl = TRUE;
     }
 
-    if (unimpl) { //! TODO: binary mode for these
+    if (unimpl) { //! TODO: binary mode for these.
         ADD_STR(("unimpl "STR_HEX_WORD), insn.raw);
     }
 

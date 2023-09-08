@@ -250,9 +250,8 @@ void disasm_draw_branch_arrows(u32 printLine) {
 #endif
 
 static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
-    InsnData insn = { .raw = data };
     const char* destFname = NULL;
-    const char* insnAsStr = cs_insn_to_string(addr, insn, &destFname);
+    const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname);
 
     // "[instruction name] [params]"
     cs_print(charX, charY, "%s", insnAsStr);

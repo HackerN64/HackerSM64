@@ -64,7 +64,9 @@ static const char* sFpcsrDesc[6] = {
     /*FPCSR_CI      */ "Inexact operation",
 };
 
-static const char* sRegNames[29] = { //! TODO: Combine this with sCPURegisterNames
+// CPU register names.
+//! TODO: Combine this with sCPURegisterNames in insn_disasm.c.
+static const char* sRegNames[29] = {
     "AT", "V0", "V1",
     "A0", "A1", "A2",
     "A3", "T0", "T1",
