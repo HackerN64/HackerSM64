@@ -366,9 +366,10 @@ enum PseudoInsns {
 enum InsnType {
     INSN_TYPE_ERROR = -1,
     INSN_TYPE_COP_FMT = 0b00, // "R-Type"?
-    INSN_TYPE_REGIMM  = 0b01, // "I-Type" and "J-Type"
-    INSN_TYPE_FUNC    = 0b10, // "R-Type"
-    INSN_TYPE_OPCODE, // "R-Type"
+    INSN_TYPE_REGIMM  = 0b01, // "I-Type" and "J-Type".
+    INSN_TYPE_FUNC    = 0b10, // "R-Type".
+    INSN_TYPE_UNKNOWN = 0b11, // Unknown type.
+    INSN_TYPE_OPCODE, // "R-Type".
 };
 
 // Instruction data

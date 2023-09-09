@@ -258,11 +258,11 @@ ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_T
 };
 
 // Coprocessor subtype lists.
-static const InsnTemplate* insn_db_cop_lists[][0b11] = {
-    [COP0] = { [INSN_TYPE_COP_FMT] = insn_db_cop0_sub00, [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = insn_db_cop0_sub10, }, // Coprocessor-0 (System Control Coprocessor).
-    [COP1] = { [INSN_TYPE_COP_FMT] = insn_db_cop1_sub00, [INSN_TYPE_REGIMM] = insn_db_cop1_sub01, [INSN_TYPE_FUNC] = insn_db_cop1_sub10, }, // Coprocessor-1 (Floating-Point Unit).
-    [COP2] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               }, // Coprocessor-2 (Reality Co-Processor Vector Unit).
-    [COP3] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               }, // Coprocessor-3 (CP3).
+static const InsnTemplate* insn_db_cop_lists[][0b11 + 1] = {
+    [COP0] = { [INSN_TYPE_COP_FMT] = insn_db_cop0_sub00, [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = insn_db_cop0_sub10, [INSN_TYPE_UNKNOWN] = NULL, }, // Coprocessor-0 (System Control Coprocessor).
+    [COP1] = { [INSN_TYPE_COP_FMT] = insn_db_cop1_sub00, [INSN_TYPE_REGIMM] = insn_db_cop1_sub01, [INSN_TYPE_FUNC] = insn_db_cop1_sub10, [INSN_TYPE_UNKNOWN] = NULL, }, // Coprocessor-1 (Floating-Point Unit).
+    [COP2] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               [INSN_TYPE_UNKNOWN] = NULL, }, // Coprocessor-2 (Reality Co-Processor Vector Unit).
+    [COP3] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               [INSN_TYPE_UNKNOWN] = NULL, }, // Coprocessor-3 (CP3).
 };
 
 // Pseudo-instructions
@@ -363,28 +363,26 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
 static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** insnList) {
     enum InsnType insnType = INSN_TYPE_OPCODE;
 
-    if (insn.cop_opcode == COP_OPCODE) { // COPz opcode.
-        if (insn.cop_num < ARRAY_COUNT(insn_db_cop_lists)) { // Bounds check.
+    switch (insn.opcode) {
+        case OPC_COP0:
+        case OPC_COP1:
+        case OPC_COP2:
+        case OPC_COP3:
             insnType  = insn.cop_subtype;
             *insnList = insn_db_cop_lists[insn.cop_num][insnType]; // Use COPz lists.
-        } else {
-            insnType = INSN_TYPE_ERROR;
-        }
-    } else {
-        switch (insn.opcode) {
-            case OPC_SPECIAL:
-                insnType  = INSN_TYPE_FUNC;
-                *insnList = insn_db_spec;
-                break;
-            case OPC_REGIMM:
-                insnType  = INSN_TYPE_REGIMM;
-                *insnList = insn_db_regi;
-                break;
-            default:
-                insnType  = INSN_TYPE_OPCODE;
-                *insnList = insn_db_standard;
-                break;
-        }
+            break;
+        case OPC_SPECIAL:
+            insnType  = INSN_TYPE_FUNC;
+            *insnList = insn_db_spec;
+            break;
+        case OPC_REGIMM:
+            insnType  = INSN_TYPE_REGIMM;
+            *insnList = insn_db_regi;
+            break;
+        default:
+            insnType  = INSN_TYPE_OPCODE;
+            *insnList = insn_db_standard;
+            break;
     }
 
     return insnType;
