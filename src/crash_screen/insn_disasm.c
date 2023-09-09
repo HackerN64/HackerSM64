@@ -361,31 +361,23 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
  * @return enum InsnType Type of instruction.
  */
 static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** insnList) {
-    enum InsnType insnType = INSN_TYPE_OPCODE;
-
     switch (insn.opcode) {
         case OPC_COP0:
         case OPC_COP1:
         case OPC_COP2:
         case OPC_COP3:
-            insnType  = insn.cop_subtype;
-            *insnList = insn_db_cop_lists[insn.cop_num][insnType]; // Use COPz lists.
-            break;
+            *insnList = insn_db_cop_lists[insn.cop_num][insn.cop_subtype]; // Use COPz lists.
+            return insn.cop_subtype;
         case OPC_SPECIAL:
-            insnType  = INSN_TYPE_FUNC;
             *insnList = insn_db_spec;
-            break;
+            return INSN_TYPE_FUNC;
         case OPC_REGIMM:
-            insnType  = INSN_TYPE_REGIMM;
             *insnList = insn_db_regi;
-            break;
+            return INSN_TYPE_REGIMM;
         default:
-            insnType  = INSN_TYPE_OPCODE;
             *insnList = insn_db_standard;
-            break;
+            return INSN_TYPE_OPCODE;
     }
-
-    return insnType;
 }
 
 /**
@@ -403,7 +395,7 @@ const InsnTemplate* get_insn(InsnData insn) {
 
     enum InsnType insnType = get_insn_type_and_list(insn, &checkInsn);
 
-    if ((checkInsn == NULL) || (insnType == INSN_TYPE_ERROR)) {
+    if (checkInsn == NULL) {
         return NULL;
     }
 

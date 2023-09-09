@@ -364,12 +364,11 @@ enum PseudoInsns {
 // Types of instructions.
 // For COPz instructions, equivalent to cop_subtype.
 enum InsnType {
-    INSN_TYPE_ERROR = -1,
-    INSN_TYPE_COP_FMT = 0b00, // "R-Type"?
-    INSN_TYPE_REGIMM  = 0b01, // "I-Type" and "J-Type".
-    INSN_TYPE_FUNC    = 0b10, // "R-Type".
-    INSN_TYPE_UNKNOWN = 0b11, // Unknown type.
-    INSN_TYPE_OPCODE, // "R-Type".
+    INSN_TYPE_COP_FMT = 0b00, // Use 'fmt' as opcode.
+    INSN_TYPE_REGIMM  = 0b01, // Use 'regimm' as opcode.
+    INSN_TYPE_FUNC    = 0b10, // Use 'func' as opcode.
+    INSN_TYPE_UNKNOWN = 0b11, // Unknown.
+    INSN_TYPE_OPCODE, // Use 'opcode' as opcode.
 };
 
 // Instruction data
