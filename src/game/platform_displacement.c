@@ -181,9 +181,35 @@ static u8 sInertiaFirstFrame = FALSE;
 static void apply_mario_inertia(void) {
     // On the first frame of leaving the ground, boost Mario's y velocity
     if (sInertiaFirstFrame) {
+
+// Vertical Inertia
+#if ((MARIO_INERTIA & INERTIA_UPWARD) && (MARIO_INERTIA & INERTIA_DOWNWARD))
         gMarioState->vel[1] += sMarioAmountDisplaced[1];
+#elif (MARIO_INERTIA & INERTIA_UPWARD)
+        if (sMarioAmountDisplaced[1] > 0.0f) {
+            gMarioState->vel[1] += sMarioAmountDisplaced[1];
+        }
+#elif (MARIO_INERTIA & INERTIA_DOWNWARD)
+        if (sMarioAmountDisplaced[1] < 0.0f) {
+            gMarioState->vel[1] += sMarioAmountDisplaced[1];
+        }
+#endif
+
+// Horizontal Inertia
+#if (!((MARIO_INERTIA & INERTIA_LEFT_RIGHT) || (MARIO_INERTIA & INERTIA_FORWARD_BACKWARD)))
+        sMarioAmountDisplaced[0] = 0.0f;
+        sMarioAmountDisplaced[2] = 0.0f;
+#elif (!(MARIO_INERTIA & INERTIA_LEFT_RIGHT))
+        sMarioAmountDisplaced[0] *= ABS(sins(gMarioState->faceAngle[1]));
+        sMarioAmountDisplaced[2] *= ABS(coss(gMarioState->faceAngle[1]));
+#elif (!(MARIO_INERTIA & INERTIA_FORWARD_BACKWARD))
+        sMarioAmountDisplaced[2] *= ABS(sins(gMarioState->faceAngle[1]));
+        sMarioAmountDisplaced[0] *= ABS(coss(gMarioState->faceAngle[1]));
+#endif
     }
 
+// Apply Horizontal Inertia
+#if ((MARIO_INERTIA & INERTIA_LEFT_RIGHT) || (MARIO_INERTIA & INERTIA_FORWARD_BACKWARD))
     // Apply sideways inertia
     gMarioState->pos[0] += sMarioAmountDisplaced[0];
     gMarioState->pos[2] += sMarioAmountDisplaced[2];
@@ -191,6 +217,7 @@ static void apply_mario_inertia(void) {
     // Drag
     sMarioAmountDisplaced[0] *= 0.97f;
     sMarioAmountDisplaced[2] *= 0.97f;
+#endif
 
     // Stop applying inertia once Mario has landed, or when ground pounding
     if (!(gMarioState->action & ACT_FLAG_AIR) || (gMarioState->action == ACT_GROUND_POUND)) {
