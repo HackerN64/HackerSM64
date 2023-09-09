@@ -26,7 +26,7 @@ struct CSSetting cs_settings_group_page_map[] = {
 };
 
 
-const enum ControlTypes mapViewerContList[] = {
+const enum ControlTypes cs_cont_list_map[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -182,12 +182,13 @@ void map_view_input(void) {
     sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
 
+
 struct CSPage gCSPage_map = {
     .name         = "MAP VIEW",
     .initFunc     = map_view_init,
     .drawFunc     = map_view_draw,
     .inputFunc    = map_view_input,
-    .contList     = mapViewerContList,
+    .contList     = cs_cont_list_map,
     .settingsList = cs_settings_group_page_map,
     .flags = {
         .initialized = FALSE,

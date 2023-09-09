@@ -25,7 +25,7 @@ struct CSSetting cs_settings_group_page_context[] = {
 };
 
 
-const enum ControlTypes contextContList[] = {
+const enum ControlTypes cs_cont_list_context[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -188,19 +188,10 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT);
 
         switch (floatsFormat) {
-            case PRINT_NUM_FMT_HEX:
-                // "[XXXXXXXX]"
-                cs_print(x, y, " "STR_HEX_WORD, val.asU32);
-                break;
+            case PRINT_NUM_FMT_HEX: cs_print(x, y, " "STR_HEX_WORD, val.asU32); break; // "[XXXXXXXX]"
             default:
-            case PRINT_NUM_FMT_DEC:
-                // "[±][exponent]"
-                cs_print(x, y, "% g", val.asF32);
-                break;
-            case PRINT_NUM_FMT_SCI:
-                // "[scientific notation]"
-                cs_print(x, y, "% .3e", val.asF32);
-                break;
+            case PRINT_NUM_FMT_DEC: cs_print(x, y, "% g",           val.asF32); break; // "[±][exponent]" 
+            case PRINT_NUM_FMT_SCI: cs_print(x, y, "% .3e",         val.asF32); break; // "[scientific notation]"
         }
     }
 }
@@ -272,12 +263,13 @@ void context_input(void) {
     }
 }
 
+
 struct CSPage gCSPage_context ={
     .name         = "CONTEXT",
     .initFunc     = context_init,
     .drawFunc     = context_draw,
     .inputFunc    = context_input,
-    .contList     = contextContList,
+    .contList     = cs_cont_list_context,
     .settingsList = cs_settings_group_page_context,
     .flags = {
         .initialized = FALSE,

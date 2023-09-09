@@ -71,7 +71,7 @@ typedef struct ControlType {
 
 
 extern struct CSSetting cs_settings_group_controls[];
-extern const enum ControlTypes defaultContList[];
+extern const enum ControlTypes cs_cont_list_default[];
 extern _Bool gCSSwitchedPage;
 extern _Bool gCSDrawControls;
 extern CrashScreenDirections gCSDirectionFlags;

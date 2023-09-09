@@ -22,7 +22,7 @@ struct CSSetting cs_settings_group_buttons[] = {
 };
 
 
-const enum ControlTypes settingsContList[] = {
+const enum ControlTypes cs_cont_list_settings[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -294,12 +294,13 @@ void settings_input(void) {
     }
 }
 
+
 struct CSPage gCSPage_settings = {
     .name         = "SETTINGS",
     .initFunc     = settings_init,
     .drawFunc     = settings_draw,
     .inputFunc    = settings_input,
-    .contList     = settingsContList,
+    .contList     = cs_cont_list_settings,
     .settingsList = NULL,
     .flags = {
         .initialized = FALSE,

@@ -25,7 +25,7 @@ const char* sValNames_branch_arrow[] = {
 #ifdef INCLUDE_DEBUG_MAP
     [DISASM_ARROW_MODE_FUNCTION ] = "FUNCTION",
 #endif
-    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this in page_disasm.c.
+    [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this mode.
 };
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -48,7 +48,7 @@ struct CSSetting cs_settings_group_page_disasm[] = {
 };
 
 
-const enum ControlTypes disasmContList[] = {
+const enum ControlTypes cs_cont_list_disasm[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -484,12 +484,13 @@ void disasm_input(void) {
 #endif
 }
 
+
 struct CSPage gCSPage_disasm = {
     .name         = "DISASM",
     .initFunc     = disasm_init,
     .drawFunc     = disasm_draw,
     .inputFunc    = disasm_input,
-    .contList     = disasmContList,
+    .contList     = cs_cont_list_disasm,
     .settingsList = cs_settings_group_page_disasm,
     .flags = {
         .initialized = FALSE,

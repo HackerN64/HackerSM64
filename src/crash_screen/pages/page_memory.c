@@ -25,7 +25,7 @@ struct CSSetting cs_settings_group_page_memory[] = {
 };
 
 
-const enum ControlTypes ramViewerContList[] = {
+const enum ControlTypes cs_cont_list_memory[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -241,12 +241,13 @@ void ram_view_input(void) {
     sRamViewViewportIndex = cs_clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
 }
 
+
 struct CSPage gCSPage_memory = {
     .name         = "RAM VIEW",
     .initFunc     = ram_view_init,
     .drawFunc     = ram_view_draw,
     .inputFunc    = ram_view_input,
-    .contList     = ramViewerContList,
+    .contList     = cs_cont_list_memory,
     .settingsList = cs_settings_group_page_memory,
     .flags = {
         .initialized = FALSE,

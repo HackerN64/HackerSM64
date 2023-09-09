@@ -27,7 +27,7 @@ struct CSSetting cs_settings_group_page_log[] = {
 };
 
 
-const enum ControlTypes logContList[] = {
+const enum ControlTypes cs_cont_list_log[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -204,12 +204,13 @@ void log_input(void) {
     }
 }
 
+
 struct CSPage gCSPage_log = {
     .name         = "LOG",
     .initFunc     = log_init,
     .drawFunc     = log_draw,
     .inputFunc    = log_input,
-    .contList     = logContList,
+    .contList     = cs_cont_list_log,
     .settingsList = cs_settings_group_page_log,
     .flags = {
         .initialized = FALSE,

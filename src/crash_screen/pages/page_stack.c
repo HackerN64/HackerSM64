@@ -25,7 +25,7 @@ struct CSSetting cs_settings_group_page_stack[] = {
 };
 
 
-const enum ControlTypes stackTraceContList[] = {
+const enum ControlTypes cs_cont_list_stack[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -109,7 +109,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
     const _Bool showAddressess   = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES);
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showOffsets      = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS  );
-    const _Bool parseSymbolNames = cs_get_setting_val(CS_OPT_GROUP_GLOBAL,     CS_OPT_GLOBAL_SYMBOL_NAMES        );
+    const _Bool parseSymbolNames = cs_get_setting_val(CS_OPT_GROUP_GLOBAL,     CS_OPT_GLOBAL_SYMBOL_NAMES );
 #endif
     u32 currIndex = sStackTraceViewportIndex;
     FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
@@ -244,12 +244,13 @@ void stack_trace_input(void) {
     sStackTraceViewportIndex = cs_clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
 
+
 struct CSPage gCSPage_stack = {
     .name         = "STACK TRACE",
     .initFunc     = stack_trace_init,
     .drawFunc     = stack_trace_draw,
     .inputFunc    = stack_trace_input,
-    .contList     = stackTraceContList,
+    .contList     = cs_cont_list_stack,
     .settingsList = cs_settings_group_page_stack,
     .flags = {
         .initialized = FALSE,

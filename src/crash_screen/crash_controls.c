@@ -23,7 +23,7 @@ struct CSSetting cs_settings_group_controls[] = {
 };
 
 
-const enum ControlTypes defaultContList[] = {
+const enum ControlTypes cs_cont_list_default[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
