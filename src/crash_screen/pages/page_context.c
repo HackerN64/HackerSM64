@@ -80,6 +80,34 @@ static const char* sRegNames[29] = {
 };
 
 
+static const char* get_cause_desc(u32 cause) {
+    cause = ((cause >> CAUSE_EXCSHIFT) & BITMASK(5));
+
+    // Make the last two cause case indexes sequential for array access.
+    if (cause == (EXC_WATCH >> CAUSE_EXCSHIFT)) cause = 16;
+    if (cause == (EXC_VCED  >> CAUSE_EXCSHIFT)) cause = 17;
+
+    if (cause < ARRAY_COUNT(sCauseDesc)) {
+        return sCauseDesc[cause];
+    }
+
+    return NULL;
+}
+
+static const char* get_fpcsr_desc(u32 fpcsr) {
+    u32 bit = BIT(17);
+
+    for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
+        if (fpcsr & bit) {
+            return sFpcsrDesc[i];
+        }
+
+        bit >>= 1;
+    }
+
+    return NULL;
+}
+
 void context_init(void) {
 
 }
@@ -142,8 +170,6 @@ void cs_context_print_registers(__OSThreadContext* tc) {
 }
 
 void cs_context_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
-    u32 bit = BIT(17);
-
     // "FPCSR:[XXXXXXXX]"
     size_t fpcsrSize = cs_print(x, y,
         STR_COLOR_PREFIX"FPCSR:"STR_COLOR_PREFIX STR_HEX_WORD" ",
@@ -152,14 +178,10 @@ void cs_context_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     );
     x += TEXT_WIDTH(fpcsrSize);
 
-    for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
-        if (fpcsr & bit) {
-            // "([float exception description])"
-            cs_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
-            return;
-        }
-
-        bit >>= 1;
+    const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
+    if (fpcsrDesc != NULL) {
+        // "([float exception description])"
+        cs_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);
     }
 }
 
@@ -190,7 +212,7 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         switch (floatsFormat) {
             case PRINT_NUM_FMT_HEX: cs_print(x, y, " "STR_HEX_WORD, val.asU32); break; // "[XXXXXXXX]"
             default:
-            case PRINT_NUM_FMT_DEC: cs_print(x, y, "% g",           val.asF32); break; // "[±][exponent]" 
+            case PRINT_NUM_FMT_DEC: cs_print(x, y, "% g",           val.asF32); break; // "[±][exponent]"
             case PRINT_NUM_FMT_SCI: cs_print(x, y, "% .3e",         val.asF32); break; // "[scientific notation]"
         }
     }
@@ -220,20 +242,17 @@ void cs_context_print_float_registers(__OSThreadContext* tc) {
 
 void context_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
-
-    u32 cause = ((tc->cause >> CAUSE_EXCSHIFT) & BITMASK(5));
-    // Make the last two cause case indexes sequential for array access.
-    if (cause == (EXC_WATCH >> CAUSE_EXCSHIFT)) cause = 16;
-    if (cause == (EXC_VCED  >> CAUSE_EXCSHIFT)) cause = 17;
-
     u32 line = 1;
 
-    // "THREAD:[thread id] ([exception cause description])"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"THREAD:%d "STR_COLOR_PREFIX"(%s)",
-        COLOR_RGBA32_CRASH_THREAD, gCrashedThread->id,
-        COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]
-    );
+    const char* desc = get_cause_desc(tc->cause);
+    if (desc != NULL) {
+        // "THREAD:[thread id] ([exception cause description])"
+        cs_print(TEXT_X(0), TEXT_Y(line),
+            STR_COLOR_PREFIX"THREAD:%d "STR_COLOR_PREFIX"(%s)",
+            COLOR_RGBA32_CRASH_THREAD, gCrashedThread->id,
+            COLOR_RGBA32_CRASH_DESCRIPTION, desc
+        );
+    }
 
     line++;
 
