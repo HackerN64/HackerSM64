@@ -354,33 +354,6 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
 }
 
 /**
- * @brief Gets the instruction type and a pointer to the list to check.
- * 
- * @param[in ] insn      The instruction data that is being read.
- * @param[out] insnList A pointer to the list to check through.
- * @return enum InsnType Type of instruction.
- */
-static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** insnList) {
-    switch (insn.opcode) {
-        case OPC_COP0:
-        case OPC_COP1:
-        case OPC_COP2:
-        case OPC_COP3:
-            *insnList = insn_db_cop_lists[insn.cop_num][insn.cop_subtype]; // Use COPz lists.
-            return insn.cop_subtype;
-        case OPC_SPECIAL:
-            *insnList = insn_db_spec;
-            return INSN_TYPE_FUNC;
-        case OPC_REGIMM:
-            *insnList = insn_db_regi;
-            return INSN_TYPE_REGIMM;
-        default:
-            *insnList = insn_db_standard;
-            return INSN_TYPE_OPCODE;
-    }
-}
-
-/**
  * @brief Gets a pointer to the InsnTemplate data matching the given instruction data.
  * 
  * @param[in] insn The instruction data that is being read.
@@ -388,6 +361,7 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
  */
 const InsnTemplate* get_insn(InsnData insn) {
     const InsnTemplate* checkInsn = NULL;
+    u8 opcode = insn.opcode; // First 6 bits.
 
     if (
         cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) &&
@@ -395,25 +369,41 @@ const InsnTemplate* get_insn(InsnData insn) {
     ) {
         return checkInsn;
     }
-
-    enum InsnType insnType = get_insn_type_and_list(insn, &checkInsn);
+    
+    switch (insn.opcode) {
+        case OPC_COP0:
+        case OPC_COP1:
+        case OPC_COP2:
+        case OPC_COP3:
+            checkInsn = insn_db_cop_lists[insn.cop_num][insn.cop_subtype]; // Use COPz lists.
+            switch (insn.cop_subtype) {
+                case INSN_TYPE_COP_FMT: opcode = insn.fmt;    break; // The 3 bits after the first 8.
+                case INSN_TYPE_REGIMM:  opcode = insn.regimm; break; // The 5 bits after the first 11.
+                case INSN_TYPE_FUNC:    opcode = insn.func;   break; // Last 6 bits.
+                default:                break; // 0b11 subtype is unknown.
+            }
+            break;
+        case OPC_SPECIAL:
+            checkInsn = insn_db_spec;
+            opcode    = insn.func;
+            break;
+        case OPC_REGIMM:
+            checkInsn = insn_db_regi;
+            opcode    = insn.regimm;
+            break;
+        default:
+            checkInsn = insn_db_standard;
+            opcode    = insn.opcode;
+            break;
+    }
 
     if (checkInsn == NULL) {
         return NULL;
     }
 
-    u8 check = 0;
-
-    switch (insnType) {
-        default:
-        case INSN_TYPE_OPCODE:  check = insn.opcode; break; // First 6 bits.
-        case INSN_TYPE_FUNC:    check = insn.func;   break; // Last 6 bits.
-        case INSN_TYPE_REGIMM:  check = insn.regimm; break; // The 5 bits after the first 11.
-        case INSN_TYPE_COP_FMT: check = insn.fmt;    break; // The 3 bits after the first 8.
-    }
-
+    // Loop through the given list.
     while (checkInsn->name[0] != '.') {
-        if (check == checkInsn->opcode) {
+        if (checkInsn->opcode == opcode) {
             return checkInsn;
         }
 
