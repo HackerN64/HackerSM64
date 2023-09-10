@@ -389,7 +389,10 @@ static enum InsnType get_insn_type_and_list(InsnData insn, const InsnTemplate** 
 const InsnTemplate* get_insn(InsnData insn) {
     const InsnTemplate* checkInsn = NULL;
 
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) && check_pseudo_instructions(&checkInsn, insn)) {
+    if (
+        cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) &&
+        check_pseudo_instructions(&checkInsn, insn)
+    ) {
         return checkInsn;
     }
 
@@ -401,15 +404,15 @@ const InsnTemplate* get_insn(InsnData insn) {
 
     u8 check = 0;
 
-    while (checkInsn->name[0] != '.') {
-        switch (insnType) {
-            default:
-            case INSN_TYPE_OPCODE:  check = insn.opcode; break; // First 6 bits.
-            case INSN_TYPE_FUNC:    check = insn.func;   break; // Last 6 bits.
-            case INSN_TYPE_REGIMM:  check = insn.regimm; break; // The 5 bits after the first 11.
-            case INSN_TYPE_COP_FMT: check = insn.fmt;    break; // The 3 bits after the first 8.
-        }
+    switch (insnType) {
+        default:
+        case INSN_TYPE_OPCODE:  check = insn.opcode; break; // First 6 bits.
+        case INSN_TYPE_FUNC:    check = insn.func;   break; // Last 6 bits.
+        case INSN_TYPE_REGIMM:  check = insn.regimm; break; // The 5 bits after the first 11.
+        case INSN_TYPE_COP_FMT: check = insn.fmt;    break; // The 3 bits after the first 8.
+    }
 
+    while (checkInsn->name[0] != '.') {
         if (check == checkInsn->opcode) {
             return checkInsn;
         }
@@ -491,8 +494,8 @@ s16 insn_check_for_branch_offset(InsnData insn) {
         return 0x0000;
     }
 
-    for (u32 i = 0; i < STRLEN(info->fmt); i++) {
-        if (info->fmt[i] == CHAR_P_BRANCH) {
+    for (u32 cmdIndex = 0; cmdIndex < STRLEN(info->fmt); cmdIndex++) {
+        if (info->fmt[cmdIndex] == CHAR_P_BRANCH) {
             return insn.offset;
         }
     }

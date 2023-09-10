@@ -375,12 +375,12 @@ enum InsnType {
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
 typedef union InsnData {
     struct PACKED {
-        /*0x00*/ Word opcode        :  6;
+        /*0x00*/ Word opcode        :  6; // opcode.
         /*0x00*/ Word rs            :  5; // AKA: base.
         /*0x00*/ Word rt            :  5; // AKA: regimm.
         /*0x00*/ Word rd            :  5;
         /*0x00*/ Word sa            :  5;
-        /*0x00*/ Word func          :  6;
+        /*0x00*/ Word func          :  6; // INSN_TYPE_FUNC opcode.
     };
     struct PACKED {
         /*0x00*/ Word               :  6;
@@ -390,7 +390,7 @@ typedef union InsnData {
     };
     struct PACKED {
         /*0x00*/ Word               : 11;
-        /*0x00*/ Word regimm        :  5; // AKA: rt.
+        /*0x00*/ Word regimm        :  5; // INSN_TYPE_REGIMM opcode. AKA: rt.
         /*0x00*/ Word immediate     : 16; // AKA: offset.
     };
     struct PACKED {
@@ -402,9 +402,9 @@ typedef union InsnData {
     };
     struct PACKED {
         /*0x00*/ Word cop_opcode    :  4;
-        /*0x00*/ Word cop_num       :  2;
+        /*0x00*/ Word cop_num       :  2; // Coprocessor number.
         /*0x00*/ Word cop_subtype   :  2;
-        /*0x00*/ Word fmt           :  3;
+        /*0x00*/ Word fmt           :  3; // INSN_TYPE_COP_FMT opcode.
         /*0x00*/ Word cop_bcond     :  5; // 0b00010 = likely, 0b00001 = true.
         /*0x00*/ Word               : 10;
         /*0x00*/ Word FC            :  2;
