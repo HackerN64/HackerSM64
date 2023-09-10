@@ -298,7 +298,8 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             cs_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
             // "<-- CRASH"
             cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
-        } else if (addr == selectedAddr) {
+        }
+        if (addr == selectedAddr) {
             // Draw a gray selection rectangle.
             cs_draw_row_selection_box(charY);
         }
