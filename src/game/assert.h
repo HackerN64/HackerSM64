@@ -8,10 +8,10 @@
 #define ASSERTF_BUFFER_SIZE 255
 
 
-extern char* __n64Assert_Condition;
-extern char* __n64Assert_Filename;
-extern u32   __n64Assert_LineNum;
-extern char* __n64Assert_Message;
+extern const char* __n64Assert_Condition;
+extern const char* __n64Assert_Filename;
+extern int         __n64Assert_LineNum;
+extern const char* __n64Assert_Message;
 
 
 extern void __n64Assert(char* condition, char* fileName, u32 lineNum, char* message);
@@ -60,7 +60,8 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 #define assertf         ASSERTF
 #define debug_error     DEBUG_ERROR
 #define debug_errorf    DEBUG_ERRORF
-#define debug_assert    DEBUG_ASSERT
+//! TODO: Fix conflict with UNF debug_assert.
+// #define debug_assert    DEBUG_ASSERT
 #define debug_assertf   DEBUG_ASSERTF
 
 // Backwards compatibility:

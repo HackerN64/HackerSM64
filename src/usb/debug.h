@@ -8,7 +8,7 @@
     // Settings
     #define DEBUG_MODE        1   // Enable/Disable debug mode
     #define DEBUG_INIT_MSG    1   // Print a message when debug mode has initialized
-    #define USE_FAULTTHREAD   1   // Create a fault detection thread (libultra only)
+    #define USE_FAULTTHREAD   0   // Create a fault detection thread (libultra only) (not compatible with other crash handlers)
     // #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf (defined in makefile - libultra_rom does not have osSyncPrintf)
     #define MAX_COMMANDS      25  // The max amount of user defined commands possible
     
@@ -134,7 +134,14 @@
         ==============================*/
         
         extern void debug_printcommands();
-
+        
+        
+        /*==============================
+            debug_printcontext
+            Prints various thread info to the developer's command prompt.
+        ==============================*/
+        extern void debug_printcontext(void* threadPtr);
+        
         
         // Ignore this, use the macro instead
         extern void _debug_assert(const char* expression, const char* file, int line);

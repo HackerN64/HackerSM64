@@ -21,6 +21,9 @@
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/main.h"
+#ifdef UNF
+#include "usb/debug.h"
+#endif
 
 
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS]; // Crash screen threads.
@@ -119,7 +122,7 @@ void cs_play_sound(struct CSThreadInfo* threadInfo, s32 sound) {
     audio_signal_game_loop_tick();
     cs_sleep(200);
 }
-#endif
+#endif // FUNNY_CRASH_SOUND
 
 /**
  * @brief Runs once on every crash.
@@ -140,7 +143,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
 #ifdef FUNNY_CRASH_SOUND
     cs_play_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
-#endif
+#endif // FUNNY_CRASH_SOUND
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
@@ -165,16 +168,26 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
 #ifdef INCLUDE_DEBUG_MAP
         map_data_init();
-#endif
+#endif // INCLUDE_DEBUG_MAP
     }
 
     gSelectedAddress = tc->pc;
+
+#ifdef UNF
+ #ifdef INCLUDE_DEBUG_MAP
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        osSyncPrintf("func name\t%s\n", get_map_symbol_name(symbol)); //! TODO: only the name itself is printed.
+    }
+ #endif // INCLUDE_DEBUG_MAP
+    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Issue with UNFLoader itself?
+#endif // UNF
 }
 
 /**
  * @brief Crash screen tread function. Waits for a crash then loops the crash screen.
  *
- * @param[in] arg Unused.
+ * @param[in] arg Unused arg.
  */
 void crash_screen_thread_entry(UNUSED void* arg) {
     struct CSThreadInfo* threadInfo = &sCSThreadInfos[sCSThreadIndex];

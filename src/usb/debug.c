@@ -150,9 +150,22 @@ https://github.com/buu342/N64-UNFLoader
     static char* debug_command_error = NULL;
     
     // Assertion globals
+#ifndef LIBDRAGON
+extern const char* __n64Assert_Condition;
+extern const char* __n64Assert_Filename;
+extern int         __n64Assert_LineNum;
+extern const char* __n64Assert_Message;
+
+    #define assert_cond __n64Assert_Condition
+    #define assert_line __n64Assert_LineNum
+    #define assert_file __n64Assert_Filename
+    #define assert_expr __n64Assert_Message
+#else
+    static const char* assert_cond = NULL;
     static int         assert_line = 0;
     static const char* assert_file = NULL;
     static const char* assert_expr = NULL;
+#endif
     
     // 64Drive button functions
     static void  (*debug_64dbut_func)() = NULL;
@@ -936,32 +949,76 @@ https://github.com/buu342/N64-UNFLoader
             
         #endif 
         
-        #if USE_FAULTTHREAD
-            
-            /*==============================
-                debug_printreg
-                Prints info about a register
-                @param The value of the register
-                @param The name of the register
-                @param The registry description to use
-            ==============================*/
-            
-            static void debug_printreg(u32 value, char *name, regDesc *desc)
+        /*==============================
+            debug_printreg
+            Prints info about a register
+            @param The value of the register
+            @param The name of the register
+            @param The registry description to use
+        ==============================*/
+        
+        static void debug_printreg(u32 value, char *name, regDesc *desc)
+        {
+            char first = 1;
+            debug_printf("%s\t\t0x%08x <", name, value);
+            while (desc->mask != 0) 
             {
-                char first = 1;
-                debug_printf("%s\t\t0x%08x <", name, value);
-                while (desc->mask != 0) 
+                if ((value & desc->mask) == desc->value) 
                 {
-                    if ((value & desc->mask) == desc->value) 
-                    {
-                        (first) ? (first = 0) : ((void)debug_printf(","));
-                        debug_printf("%s", desc->string);
-                    }
-                    desc++;
+                    (first) ? (first = 0) : ((void)debug_printf(","));
+                    debug_printf("%s", desc->string);
                 }
-                debug_printf(">\n");
+                desc++;
             }
+            debug_printf(">\n");
+        }
+
+        void debug_printcontext(void* threadPtr) {
+            OSThread* thread = (OSThread*)threadPtr;
+            __OSThreadContext* context = &thread->context;
             
+            // Print the basic info
+            debug_printf("Fault in thread: %d\n\n", thread->id);
+            debug_printf("pc\t\t0x%08x\n", context->pc);
+            if (assert_expr != NULL) {
+                debug_printf("cause\t\tAssertion failed in file '%s', line %d.\n", assert_file, assert_line);
+                if (assert_cond != NULL) {
+                    debug_printf("cond\t\t%s\n", assert_cond);
+                }
+                debug_printf("message\t\t'%s'\n", assert_expr);
+            } else {
+                debug_printreg(context->cause, "cause", causeDesc);
+            }
+            debug_printreg(context->sr, "sr", srDesc);
+            debug_printf("badvaddr\t0x%08x\n\n", context->badvaddr);
+            
+            // Print the registers
+            debug_printf("at 0x%016llx v0 0x%016llx v1 0x%016llx\n", context->at, context->v0, context->v1);
+            debug_printf("a0 0x%016llx a1 0x%016llx a2 0x%016llx\n", context->a0, context->a1, context->a2);
+            debug_printf("a3 0x%016llx t0 0x%016llx t1 0x%016llx\n", context->a3, context->t0, context->t1);
+            debug_printf("t2 0x%016llx t3 0x%016llx t4 0x%016llx\n", context->t2, context->t3, context->t4);
+            debug_printf("t5 0x%016llx t6 0x%016llx t7 0x%016llx\n", context->t5, context->t6, context->t7);
+            debug_printf("s0 0x%016llx s1 0x%016llx s2 0x%016llx\n", context->s0, context->s1, context->s2);
+            debug_printf("s3 0x%016llx s4 0x%016llx s5 0x%016llx\n", context->s3, context->s4, context->s5);
+            debug_printf("s6 0x%016llx s7 0x%016llx t8 0x%016llx\n", context->s6, context->s7, context->t8);
+            debug_printf("t9 0x%016llx gp 0x%016llx sp 0x%016llx\n", context->t9, context->gp, context->sp);
+            debug_printf("s8 0x%016llx ra 0x%016llx mm 0x%016llx\n", context->s8, context->ra, (u64)*(u32*)(u32)context->sp);
+            debug_printf("\n");
+            
+            // Print the floating point registers
+            debug_printreg(context->fpcsr, "fpcsr", fpcsrDesc);
+            debug_printf("\n");
+            debug_printf("d0  %.15e\td2  %.15e\n", context->fp0.d,  context->fp2.d);
+            debug_printf("d4  %.15e\td6  %.15e\n", context->fp4.d,  context->fp6.d);
+            debug_printf("d8  %.15e\td10 %.15e\n", context->fp8.d,  context->fp10.d);
+            debug_printf("d12 %.15e\td14 %.15e\n", context->fp12.d, context->fp14.d);
+            debug_printf("d16 %.15e\td18 %.15e\n", context->fp16.d, context->fp18.d);
+            debug_printf("d20 %.15e\td22 %.15e\n", context->fp20.d, context->fp22.d);
+            debug_printf("d24 %.15e\td26 %.15e\n", context->fp24.d, context->fp26.d);
+            debug_printf("d28 %.15e\td30 %.15e\n", context->fp28.d, context->fp30.d);
+        }
+        
+        #if USE_FAULTTHREAD
             
             /*==============================
                 debug_thread_fault
@@ -988,41 +1045,7 @@ https://github.com/buu342/N64-UNFLoader
                     curr = (OSThread *)__osGetCurrFaultedThread();
                     if (curr != NULL) 
                     {
-                        __OSThreadContext* context = &curr->context;
-                        
-                        // Print the basic info
-                        debug_printf("Fault in thread: %d\n\n", curr->id);
-                        debug_printf("pc\t\t0x%08x\n", context->pc);
-                        if (assert_file == NULL)
-                            debug_printreg(context->cause, "cause", causeDesc);
-                        else
-                            debug_printf("cause\t\tAssertion failed in file '%s', line %d.\n", assert_file, assert_line);
-                        debug_printreg(context->sr, "sr", srDesc);
-                        debug_printf("badvaddr\t0x%08x\n\n", context->badvaddr);
-                        
-                        // Print the registers
-                        debug_printf("at 0x%016llx v0 0x%016llx v1 0x%016llx\n", context->at, context->v0, context->v1);
-                        debug_printf("a0 0x%016llx a1 0x%016llx a2 0x%016llx\n", context->a0, context->a1, context->a2);
-                        debug_printf("a3 0x%016llx t0 0x%016llx t1 0x%016llx\n", context->a3, context->t0, context->t1);
-                        debug_printf("t2 0x%016llx t3 0x%016llx t4 0x%016llx\n", context->t2, context->t3, context->t4);
-                        debug_printf("t5 0x%016llx t6 0x%016llx t7 0x%016llx\n", context->t5, context->t6, context->t7);
-                        debug_printf("s0 0x%016llx s1 0x%016llx s2 0x%016llx\n", context->s0, context->s1, context->s2);
-                        debug_printf("s3 0x%016llx s4 0x%016llx s5 0x%016llx\n", context->s3, context->s4, context->s5);
-                        debug_printf("s6 0x%016llx s7 0x%016llx t8 0x%016llx\n", context->s6, context->s7, context->t8);
-                        debug_printf("t9 0x%016llx gp 0x%016llx sp 0x%016llx\n", context->t9, context->gp, context->sp);
-                        debug_printf("s8 0x%016llx ra 0x%016llx\n\n",            context->s8, context->ra);
-                        
-                        // Print the floating point registers
-                        debug_printreg(context->fpcsr, "fpcsr", fpcsrDesc);
-                        debug_printf("\n");
-                        debug_printf("d0  %.15e\td2  %.15e\n", context->fp0.d,  context->fp2.d);
-                        debug_printf("d4  %.15e\td6  %.15e\n", context->fp4.d,  context->fp6.d);
-                        debug_printf("d8  %.15e\td10 %.15e\n", context->fp8.d,  context->fp10.d);
-                        debug_printf("d12 %.15e\td14 %.15e\n", context->fp12.d, context->fp14.d);
-                        debug_printf("d16 %.15e\td18 %.15e\n", context->fp16.d, context->fp18.d);
-                        debug_printf("d20 %.15e\td22 %.15e\n", context->fp20.d, context->fp22.d);
-                        debug_printf("d24 %.15e\td26 %.15e\n", context->fp24.d, context->fp26.d);
-                        debug_printf("d28 %.15e\td30 %.15e\n", context->fp28.d, context->fp30.d);
+                        debug_printcontext(curr);
                     }
                 }
             }
