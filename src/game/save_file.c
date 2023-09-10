@@ -717,6 +717,10 @@ void save_file_set_widescreen_mode(u8 mode) {
 #endif
 
 u32 save_file_get_sound_mode(void) {
+    if (gSaveBuffer.menuData.soundMode >= gNumSoundModes) {
+        return 0;
+    }
+
     return gSaveBuffer.menuData.soundMode;
 }
 

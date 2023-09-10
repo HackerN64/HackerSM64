@@ -23,6 +23,8 @@ enum SoundMenuMode {
     SOUND_MENU_MODE_HEADSET
 };
 
+extern const u8 gNumSoundModes;
+
 void reset_volume(void);
 void raise_background_noise(s32 a);
 void lower_background_noise(s32 a);

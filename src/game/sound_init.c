@@ -82,6 +82,8 @@ static u32 sMenuSoundsExtra[] = {
 };
 static s8 sPaintingEjectSoundPlayed = FALSE;
 
+const u8 gNumSoundModes = ARRAY_COUNT(sSoundMenuModeToSoundMode);
+
 void play_menu_sounds_extra(s32 a, void *b);
 
 /**
@@ -147,7 +149,7 @@ void enable_background_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void set_sound_mode(u16 soundMode) {
-    if (soundMode < ARRAY_COUNT(sSoundMenuModeToSoundMode)) {
+    if (soundMode < gNumSoundModes) {
         gSoundMode = sSoundMenuModeToSoundMode[soundMode];
     }
 }
