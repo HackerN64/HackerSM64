@@ -52,7 +52,9 @@ TEXT_REGION_GROUP(common1)
 size_t gNumMapSymbols = 0;
 
 
-// Initialize map data by running a headless DMA.
+/**
+ * @brief Initialize the map data by running a headless DMA.
+ */
 void map_data_init(void) {
     gNumMapSymbols = (gMapSymbolsEnd - gMapSymbols);
 
@@ -62,7 +64,12 @@ void map_data_init(void) {
     headless_dma(start, (size_t*)(RAM_END - RAM_1MB), (end - start));
 }
 
-// Check whether the address is in a .text segment.
+/**
+ * @brief Check whether the address is in a .text segment.
+ *
+ * @param[in] addr Address to check.
+ * @return _Bool Whether the address is in a .text segment.
+ */
 _Bool is_in_code_segment(Address addr) {
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
         if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
@@ -73,7 +80,12 @@ _Bool is_in_code_segment(Address addr) {
     return FALSE;
 }
 
-// Returns a pointer to the string of the symbol's name.
+/**
+ * @brief Get the name of a map symbol.
+ *
+ * @param[in] symbol MapSymbol data to use for the range.
+ * @return const char* Pointer to the string of the symbol's name.
+ */
 const char* get_map_symbol_name(const MapSymbol* symbol) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
@@ -85,12 +97,24 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
     return (const char*)((u32)gMapStrings + symbol->name_offset);
 }
 
-// Checks whether an address is within a symbol's range.
+/**
+ * @brief Check whether an address is within a map symbol's range.
+ *
+ * @param[in] addr   The address to check.
+ * @param[in] symbol The MapSymbol to check.
+ * @return _Bool Whether the address is within the symbol's range.
+ */
 static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
     return ((symbol != NULL) && (addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
 }
 
-// Search for a symbol index starting from the beginning. Some symbol ranges overlap.
+/**
+ * @brief Search for a symbol index starting from the beginning.
+ * Some symbol ranges overlap. Use this
+ *
+ * @param[in] addr Address to check.
+ * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
+ */
 s32 get_symbol_index_from_addr_forward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
@@ -108,7 +132,13 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
     return -1;
 }
 
-// Search for a symbol index starting from the end. Some symbol ranges overlap.
+/**
+ * @brief Search for a symbol index starting from the end.
+ * Some symbol ranges overlap.
+ *
+ * @param[in] addr Address to check.
+ * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
+ */
 s32 get_symbol_index_from_addr_backward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
@@ -126,7 +156,13 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
     return -1;
 }
 
-// Changes 'addr' to the starting address of the function it's in and returns a pointer to the function name.
+/**
+ * @brief Get the MapSymbol data that the given address is in.
+ *
+ * @param[in] addr            Address to check.
+ * @param[in] searchDirection The direction to search in. TODO: Explanation for this.
+ * @return const MapSymbol* Pointer to the MapSymbol data that was found. NULL if none were found.
+ */
 const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;

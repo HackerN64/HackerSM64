@@ -39,6 +39,7 @@ for line in symbols:
 		if (addr & 0x80000000):
 			# If this is not the first entry...
 			if symNames:
+				# Get the previous entry.
 				prevEntry = symNames[-1]
 				# If the previous entry does not have a defined size...
 				if (prevEntry.size == 0) and (addr > prevEntry.addr):
@@ -56,10 +57,10 @@ for line in symbols:
 			type = ord(tokens[-2])
 			# Check for size data.
 			if (len(tokens) < 4):
-				# No size data, assume 0.
+				# No size data, so assume 0. It may be set by the next entry.
 				size = 0
 			else:
-				# Size data.
+				# Get the size data.
 				size = int(tokens[-3], 16)
 			# Append the symbol to the list.
 			symNames.append(MapSymbol(addr, size, name, type, errc))

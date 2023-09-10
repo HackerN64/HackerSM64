@@ -284,8 +284,8 @@ ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
 
 
 /**
- * @brief Use a specific pseudoinstruction if 'cond' is TRUE.
- * 
+ * @brief Use a specific pseudoinstruction from insn_db_pseudo if 'cond' is TRUE.
+ *
  * @param[out] checkInsn A pointer to the InsnTemplate data in insn_db_pseudo matching the given instruction data.
  * @param[in ] id        The index in insn_db_pseudo of the pseudoinstruction template data.
  * @param[in ] cond      Whether to convert the instruction to the pseudoinstruction.
@@ -301,8 +301,8 @@ static _Bool check_pseudo_insn(const InsnTemplate** checkInsn, enum PseudoInsns 
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param[out] checkInsn A pointer to the InsnTemplate data in insn_db_pseudo matching the given instruction data.
  * @param[in ] insn      The instruction data that is being read.
  * @return _Bool Whether the instruction has been converted.
@@ -357,7 +357,7 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
 
 /**
  * @brief Gets a pointer to the InsnTemplate data matching the given instruction data.
- * 
+ *
  * @param[in] insn The instruction data that is being read.
  * @return const InsnTemplate* A pointer to the InsnTemplate data matching the given instruction data.
  */
@@ -365,6 +365,7 @@ const InsnTemplate* get_insn(InsnData insn) {
     const InsnTemplate* checkInsn = NULL;
     u8 opcode = insn.opcode; // First 6 bits.
 
+    // Check for pseudoinstructions.
     if (
         cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) &&
         check_pseudo_instructions(&checkInsn, insn)
@@ -383,7 +384,7 @@ const InsnTemplate* get_insn(InsnData insn) {
                 case INSN_TYPE_COP_FMT: opcode = insn.fmt;    break; // The 3 bits after the first 8.
                 case INSN_TYPE_REGIMM:  opcode = insn.regimm; break; // The 5 bits after the first 11.
                 case INSN_TYPE_FUNC:    opcode = insn.func;   break; // Last 6 bits.
-                default:                break; // 0b11 subtype is unknown.
+                default:                                      break; // 0b11 subtype is unknown and the lists in insn_db_cop_lists are NULL.
             }
             break;
         case OPC_SPECIAL:
@@ -476,7 +477,7 @@ static const char sCOP0RegisterNames[][9] = {
 
 /**
  * @brief Checks an instruction for its branch offset.
- * 
+ *
  * @param[in] insn The instruction data that is being read.
  * @return s16 The branch offset. 0 if there is no branch.
  */
@@ -498,7 +499,7 @@ s16 insn_check_for_branch_offset(InsnData insn) {
 
 /**
  * @brief Gets the target address of the instruction at 'addr'.
- * 
+ *
  * @param[in] addr The address of the instruction that is being read.
  * @return Address The target address of the instruction. 'addr' if there is no branch instruction.
  */
@@ -527,7 +528,7 @@ Address get_insn_branch_target_from_addr(Address addr) {
 
 /**
  * @brief Gets the corresponding character to print for a Coprocessor-1 (Floating-Point Unit) instruction's format.
- * 
+ *
  * @param[in] insn The instruction data that is being read.
  * @return char The char value that represents the format in the instruction name.
  */
@@ -544,7 +545,7 @@ static char cop1_fmt_to_char(InsnData insn) {
 
 /**
  * @brief Prints the new color code if the color has changed.
- * 
+ *
  * @param[out   ] strp     Pointer to the string.
  * @param[in,out] oldColor The previous color. Gets set to 'newColor' if they are different.
  * @param[in    ] newColor The new color to add to the string.
@@ -582,10 +583,10 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 
 /**
  * @brief Converts MIPS instruction data into a formatted string.
- * 
+ *
  * @param[in ] addr  The address of the instruction. Used to calculate the target of branches and jumps.
  * @param[in ] insn  The instruction data that is being read.
- * @param[out] fname If the instruction points 
+ * @param[out] fname If the instruction points
  * @return char* The formatted string in insn_as_string.
  */
 char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
@@ -605,8 +606,8 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
         _Bool separator = FALSE;
 
         // Loop through the chars in the 'fmt' member of 'info' and print the insn data accordingly.
-        for (u32 cmdIndex = 0; cmdIndex < sizeof(info->fmt); cmdIndex++) {
-            if (unimpl || *curCmd == CHAR_NULL) {
+        for (size_t cmdIndex = 0; cmdIndex < sizeof(info->fmt); cmdIndex++) {
+            if (unimpl || (*curCmd == CHAR_NULL)) {
                 break;
             }
 

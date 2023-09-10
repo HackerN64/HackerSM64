@@ -98,8 +98,8 @@ void disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
 
 #ifdef INCLUDE_DEBUG_MAP
-    gFillBranchBuffer            = FALSE;
-    sContinueFillBranchBuffer    = FALSE;
+    gFillBranchBuffer         = FALSE;
+    sContinueFillBranchBuffer = FALSE;
     reset_branch_buffer((Address)NULL);
 #endif
 }
@@ -224,7 +224,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
             );
         }
 
-        s32 height = abss(arrowEndHeight - arrowStartHeight);
+        s32 height = absi(arrowEndHeight - arrowStartHeight);
 
         // Middle of arrow.
         cs_draw_rect((sDisasmBranchStartX + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
@@ -267,7 +267,7 @@ static void print_as_insn(const u32 charX, const u32 charY, const Address addr, 
 #endif
 }
 
-static void print_as_binary(const u32 charX, const u32 charY, const Word data) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+static void print_as_binary(const u32 charX, const u32 charY, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
     u32 bitCharX = charX;
 
     for (u32 c = 0; c < SIZEOF_BITS(Word); c++) {
@@ -275,7 +275,7 @@ static void print_as_binary(const u32 charX, const u32 charY, const Word data) {
             bitCharX += TEXT_WIDTH(1);
         }
 
-        cs_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), COLOR_RGBA32_WHITE);
+        cs_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), color);
 
         bitCharX += TEXT_WIDTH(1);
     }
@@ -321,7 +321,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         } else { // Outside of code segments:
             if (unkAsBinary) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                print_as_binary(charX, charY, data);
+                print_as_binary(charX, charY, data, COLOR_RGBA32_WHITE);
             } else {
                 // "[XXXXXXXX]"
                 cs_print(charX, charY, STR_HEX_WORD, data);

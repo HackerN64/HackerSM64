@@ -257,6 +257,7 @@ void cs_reset_framebuffer(_Bool drawBackground) {
 }
 
 // Cycle through the 3 framebuffers.
+//! TODO: Instant input?
 void cs_update_framebuffer(void) {
     osWritebackDCacheAll();
 

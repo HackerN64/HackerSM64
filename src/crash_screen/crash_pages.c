@@ -34,10 +34,14 @@ CSPage* gCSPages[NUM_PAGES] = {
 enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE;
 
 
-// Changes the current page.
+/**
+ * @brief Change the current page.
+ *
+ * @param[in] pageID The page to switch to.
+ */
 void cs_set_page(enum CSPages pageID) {
     if (!gCSPages[pageID]->flags.crashed) {
-        gCSPageID = pageID;
+        gCSPageID       = pageID;
         gCSSwitchedPage = TRUE;
     }
 }

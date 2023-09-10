@@ -49,7 +49,6 @@ enum CSSettingsEntryType {
     CS_OPT_TYPE_END,
     CS_OPT_TYPE_SETTING,
     CS_OPT_TYPE_HEADER,
-    CS_OPT_TYPE_BUTTON,
 };
 
 
