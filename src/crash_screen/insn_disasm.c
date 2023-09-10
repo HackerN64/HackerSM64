@@ -23,14 +23,16 @@
  * How to find instructions:
  *
  * - If first 4 bits (cop_opcode) == 0100 (COP_OPCODE):
- *  - The next 2 bits (cop_num) are coprocessor number, so use insn_db_cop(z)
- *  - If the next bit (cop_bit) is set:
- *   - Compare the last 6 bits (func) to the list
- *  - Otherwise:
- *   - If the bit after is set:
- *    - Compare the next 3 bits (fmt) to the list
- *   - Otherwise:
+ *  - The next 2 bits (cop_num) are coprocessor number, so use insn_db_cop_lists
+ *  - compare the next 2 bits (cop_subtype):
+ *   - if 0:
+ *    - compare the next 3 bits (fmt) to the list
+ *   - otherwise, if 1:
  *    - skip the next 3 bits (fmt) and compare the 5 bits after that (ft) to the list
+ *   - otherwise, if 2:
+ *    - compare the last 6 bits (func) to the list
+ *   - otherwise, if 3:
+ *    - invalid/unknown instruction.
  * - otherwise, check first 6 bits (opcode)
  *  - if 0 (OPC_SPECIAL):
  *   - compare the last 6 bits (func) to insn_db_spec
@@ -104,7 +106,7 @@ ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
     { .name = "SDC1"   , .fmt = "\'tI(", .opcode = OPC_SDC1        }, // Store Doubleword to Coprocessor-1 (Floating-Point Unit).
     { .name = "SDC2"   , .fmt = "\'tI(", .opcode = OPC_SDC2        }, // Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
     { .name = "SD"     , .fmt = "\'tI(", .opcode = OPC_SD          }, // Store Doubleword.
-    { .name = "." },
+    {}, // NULL terminator.
 };
 
 // Special opcode instructions:
@@ -161,7 +163,7 @@ ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE
     { .name = "DSLL32" , .fmt = "\'dta", .opcode = OPS_DSLL32      }, // Doubleword Shift Left Logical + 32.
     { .name = "DSRL32" , .fmt = "\'dta", .opcode = OPS_DSRL32      }, // Doubleword Shift Right Logical + 32.
     { .name = "DSRA32" , .fmt = "\'dta", .opcode = OPS_DSRA32      }, // Doubleword Shift Right Arithmetic + 32.
-    { .name = "." },
+    {}, // NULL terminator.
 };
 
 // Register opcode instructions:
@@ -180,7 +182,7 @@ ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM, INSN_TYPE_
     { .name = "TLTIU"  , .fmt = "\'sI" , .opcode = OPR_TLTIU       }, // Trap if Less Than Unsigned Immediate.
     { .name = "TEQI"   , .fmt = "\'sI" , .opcode = OPR_TEQI        }, // Trap if Equal Immediate.
     { .name = "TNEI"   , .fmt = "\'sI" , .opcode = OPR_TNEI        }, // Trap if Not Equal Immediate.
-    { .name = "." },
+    {}, // NULL terminator.
 };
 
 // Coprocessor-0 (System Control Coprocessor):
@@ -189,7 +191,7 @@ ALIGNED32 static const InsnTemplate insn_db_cop0_sub00[] = { // OPC_COP0, INSN_T
     { .name = "DMFC0"  , .fmt = "\'t0" , .opcode = COP0_DMF        }, // Doubleword Move from System Control Coprocessor.
     { .name = "MTC0"   , .fmt = "\'t0" , .opcode = COP0_MT         }, // Move to System Control Coprocessor.
     { .name = "DMTC0"  , .fmt = "\'t0" , .opcode = COP0_DMT        }, // Doubleword Move to System Control Coprocessor.
-    { .name = "." },
+    {}, // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop0_sub10[] = { // OPC_COP0, INSN_TYPE_FUNC
     { .name = "TLBP"   , .fmt = "\'"   , .opcode = OPC_COP0_TLBP   }, // Searches for a TLB entry that matches the EntryHi register.
@@ -197,7 +199,7 @@ ALIGNED32 static const InsnTemplate insn_db_cop0_sub10[] = { // OPC_COP0, INSN_T
     { .name = "TLBWI"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWI  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
     { .name = "TLBWR"  , .fmt = "\'"   , .opcode = OPC_COP0_TLBWR  }, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
     { .name = "ERET"   , .fmt = "\'"   , .opcode = OPC_COP0_ERET   }, // Return from interrupt, exception, or error exception.
-    { .name = "." },
+    {}, // NULL terminator.
 };
 
 // Coprocessor-1 (Floating-Point Unit):
@@ -208,14 +210,14 @@ ALIGNED32 static const InsnTemplate insn_db_cop1_sub00[] = { // OPC_COP1, INSN_T
     { .name = "DMTC1"  , .fmt = "\'tS" , .opcode = COP1_FMT_LONG   }, // Doubleword Move To Floating-Point.
     { .name = "CFC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_F  }, // Move Control Word From Floating-Point.
     { .name = "CTC1"   , .fmt = "\'tS" , .opcode = COP1_FMT_CTL_T  }, // Move Control Word To Floating-Point.
-    { .name = "." },
+    {}, // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub01[] = { // OPC_COP1, INSN_TYPE_REGIMM
     { .name = "BC1F"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1F   }, // Branch on FP False (1cyc*).
     { .name = "BC1T"   , .fmt = "\'B"  , .opcode = OPT_COP1_BC1T   }, // Branch on FP True (1cyc*).
     { .name = "BC1FL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1FL  }, // Branch on FP False Likely (1cyc*).
     { .name = "BC1TL"  , .fmt = "\'B"  , .opcode = OPT_COP1_BC1TL  }, // Branch on FP True Likely (1cyc*).
-    { .name = "." },
+    {}, // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_TYPE_FUNC
     { .name = "ADD"    , .fmt = "\"DST", .opcode = OPS_ADD_F       }, // ADD.[FMT]     Floating-Point Add (3cyc).
@@ -254,7 +256,7 @@ ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_T
     { .name = "C.NGE"  , .fmt = "\"ST" , .opcode = OPS_C_NGE       }, // C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc).
     { .name = "C.LE"   , .fmt = "\"ST" , .opcode = OPS_C_LE        }, // C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc).
     { .name = "C.NGT"  , .fmt = "\"ST" , .opcode = OPS_C_NGT       }, // C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc).
-    { .name = "." },
+    {}, // NULL terminator.
 };
 
 // Coprocessor subtype lists.
@@ -369,7 +371,8 @@ const InsnTemplate* get_insn(InsnData insn) {
     ) {
         return checkInsn;
     }
-    
+
+    // Get the instruction list and opcode to compare.
     switch (insn.opcode) {
         case OPC_COP0:
         case OPC_COP1:
@@ -402,7 +405,7 @@ const InsnTemplate* get_insn(InsnData insn) {
     }
 
     // Loop through the given list.
-    while (checkInsn->name[0] != '.') {
+    while (checkInsn->name != NULL) {
         if (checkInsn->opcode == opcode) {
             return checkInsn;
         }
