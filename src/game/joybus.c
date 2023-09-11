@@ -520,12 +520,12 @@ static void _MakeMotorData(int channel, OSPifRamEx* mdata) {
     __OSContRamWriteFormatAligned ramwriteformat;
     int i;
 
-    ramwriteformat.align0          = PIF_CMD_NOP;
-    ramwriteformat.fmt.size.tx     = sizeof(ramwriteformat.fmt.send);
-    ramwriteformat.fmt.size.rx     = sizeof(ramwriteformat.fmt.recv);
-    ramwriteformat.fmt.send.cmd    = CONT_CMD_WRITE_MEMPAK;
-    ramwriteformat.fmt.send.addr.h = (CONT_BLOCK_RUMBLE >> 3);
-    ramwriteformat.fmt.send.addr.l = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
+    ramwriteformat.align0           = PIF_CMD_NOP;
+    ramwriteformat.fmt.size.tx      = sizeof(ramwriteformat.fmt.send);
+    ramwriteformat.fmt.size.rx      = sizeof(ramwriteformat.fmt.recv);
+    ramwriteformat.fmt.send.cmd     = CONT_CMD_WRITE_MEMPAK;
+    ramwriteformat.fmt.send.addr.hi = (CONT_BLOCK_RUMBLE >> 3);
+    ramwriteformat.fmt.send.addr.lo = (u8)(__osContAddressCrc(CONT_BLOCK_RUMBLE) | (CONT_BLOCK_RUMBLE << 5));
 
     // Leave a PIF_CMD_SKIP_CHNL (0x00) byte in mdata->ramarray for each skipped channel.
     if (channel != 0) {
