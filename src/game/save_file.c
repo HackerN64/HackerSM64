@@ -3,6 +3,7 @@
 #include "sm64.h"
 #include "game_init.h"
 #include "main.h"
+#include "audio/external.h"
 #include "engine/math_util.h"
 #include "area.h"
 #include "level_update.h"
@@ -717,6 +718,10 @@ void save_file_set_widescreen_mode(u8 mode) {
 #endif
 
 u32 save_file_get_sound_mode(void) {
+    if (gSaveBuffer.menuData.soundMode >= SOUND_MODE_COUNT) {
+        return 0;
+    }
+
     return gSaveBuffer.menuData.soundMode;
 }
 
