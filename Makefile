@@ -557,6 +557,10 @@ all: $(ROM)
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
 
+rebuildtools:
+	$(MAKE) -C tools distclean
+	$(MAKE) -C tools
+
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
 	$(MAKE) -C $(TOOLS_DIR) clean
@@ -894,7 +898,7 @@ endif
 $(BUILD_DIR)/$(TARGET).objdump: $(ELF)
 	$(OBJDUMP) -D $< > $@
 
-.PHONY: all clean distclean default test load
+.PHONY: all clean distclean default test load rebuildtools
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
 .SECONDARY:
 
