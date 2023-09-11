@@ -36,11 +36,6 @@ static u16 sCurrentCapMusic = MUSIC_NONE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 static u8 sPlayingInfiniteStairs = FALSE;
 #endif
-#ifdef ENABLE_STEREO_HEADSET_EFFECTS
-static s16 sSoundMenuModeToSoundMode[3] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
-#else
-static s16 sSoundMenuModeToSoundMode[2] = { SOUND_MODE_STEREO, SOUND_MODE_MONO };
-#endif
 // Only the 20th array element is used.
 static u32 sMenuSoundsExtra[] = {
     SOUND_MOVING_TERRAIN_SLIDE + (0 << 16),
@@ -147,8 +142,8 @@ void enable_background_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void set_sound_mode(u16 soundMode) {
-    if (soundMode < ARRAY_COUNT(sSoundMenuModeToSoundMode)) {
-        gSoundMode = sSoundMenuModeToSoundMode[soundMode];
+    if (soundMode < SOUND_MODE_COUNT) {
+        gSoundMode = soundMode;
     }
 }
 
