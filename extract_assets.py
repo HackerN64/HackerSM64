@@ -63,29 +63,7 @@ envmap_table = set([
     "levels/castle_inside/30.rgba16.png",
     "levels/hmc/7.rgba16.png",
     "levels/castle_inside/16.ia16.png",
-    "levels/cotmc/2.rgba16.png",
-    "textures/intro_raw/mario_face_shine.ia8.png",
-    "textures/intro_raw/red_star_0.rgba16.png",
-    "textures/intro_raw/red_star_1.rgba16.png",
-    "textures/intro_raw/red_star_2.rgba16.png",
-    "textures/intro_raw/red_star_3.rgba16.png",
-    "textures/intro_raw/red_star_4.rgba16.png",
-    "textures/intro_raw/red_star_5.rgba16.png",
-    "textures/intro_raw/red_star_6.rgba16.png",
-    "textures/intro_raw/red_star_7.rgba16.png",
-    "textures/intro_raw/sparkle_0.rgba16.png",
-    "textures/intro_raw/sparkle_1.rgba16.png",
-    "textures/intro_raw/sparkle_2.rgba16.png",
-    "textures/intro_raw/sparkle_3.rgba16.png",
-    "textures/intro_raw/sparkle_4.rgba16.png",
-    "textures/intro_raw/white_star_0.rgba16.png",
-    "textures/intro_raw/white_star_1.rgba16.png",
-    "textures/intro_raw/white_star_2.rgba16.png",
-    "textures/intro_raw/white_star_3.rgba16.png",
-    "textures/intro_raw/white_star_4.rgba16.png",
-    "textures/intro_raw/white_star_5.rgba16.png",
-    "textures/intro_raw/white_star_6.rgba16.png",
-    "textures/intro_raw/white_star_7.rgba16.png"
+    "levels/cotmc/2.rgba16.png"
 ])
 
 def read_asset_map():
