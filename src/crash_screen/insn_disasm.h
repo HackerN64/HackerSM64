@@ -14,7 +14,7 @@
 #define CHAR_P_RT       't'     // "[rt reg]".
 #define CHAR_P_RD       'd'     // "[rd reg]".
 #define CHAR_P_IMM      'I'     // "0x[last 16 bits]".
-#define CHAR_P_NIMM     'i'     // "[±]0x[[last 16 bits]]" (for SUBI pseudoinstruction).
+#define CHAR_P_NIMM     'i'     // "[±]0x[[last 16 bits]]" (for SUBI pseudo-instruction).
 #define CHAR_P_SHIFT    'a'     // "[shift]"".
 #define CHAR_P_BASE     '('     // "([rs reg])".
 #define CHAR_P_BRANCH   'B'     // "[±]0x[last 16 bits]" + draw branch arrow.
@@ -48,8 +48,8 @@ enum COP1Formats {
     COP1_FMT_DOUBLE = (FMT_FLT | FMT_64b), // 0b00001 (17): 64-bit floating-point.
     COP1_FMT_WORD   = (FMT_FIX | FMT_32b), // 0b00100 (20): 32-bit fixed-point.
     COP1_FMT_LONG   = (FMT_FIX | FMT_64b), // 0b00101 (21): 64-bit fixed-point.
-    COP1_FMT_CTL_F  = (COP_FROM | FMT_CTL | FMT_32b), // 0b00010  (2):
-    COP1_FMT_CTL_T  = (COP_TO   | FMT_CTL | FMT_32b), // 0b00110  (6):
+    COP1_FMT_CTL_F  = (COP_FROM | FMT_CTL | FMT_32b), // 0b00010  (2): Control Word From.
+    COP1_FMT_CTL_T  = (COP_TO   | FMT_CTL | FMT_32b), // 0b00110  (6): Control Word To.
 };
 
 #define FMT_SIGNED   (0 * BIT(0))
@@ -140,112 +140,6 @@ enum InsnDB_base_Opcodes {
     OPC_SDC1    = (B_OPC_SDC | OPC_COP1), // 0b111101 (61): Store Doubleword to Coprocessor-1 (Floating-Point Unit).
     OPC_SDC2    = (B_OPC_SDC | OPC_COP2), // 0b111110 (62): Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
     OPC_SD      = 0b111111, // 63: Store Doubleword.
-};
-
-// Coprocessor-0 (System Control Coprocessor) move formats.
-enum COP0MoveFormats {
-    COP0_MF  = (COP_FROM | FMT_32b), // 0b00000 (16): 32-bit floating-point.
-    COP0_DMF = (COP_FROM | FMT_64b), // 0b00001 (17): 64-bit floating-point.
-    COP0_MT  = (COP_TO   | FMT_32b), // 0b00100 (20): 32-bit fixed-point.
-    COP0_DMT = (COP_TO   | FMT_64b), // 0b00101 (21): 64-bit fixed-point.
-};
-
-// insn_db_cop0_sub10 opcodes.
-enum InsnDB_COP0_sub10_Opcodes {
-    // OPC_COP0_MOVE  = 0b000000, //  0:
-
-    OPC_COP0_TLBP  = 0b001000, //  8: Searches for a TLB entry that matches the EntryHi register.
-    OPC_COP0_TLBR  = 0b000001, //  1: Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
-    OPC_COP0_TLBWI = 0b000010, //  2: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
-    OPC_COP0_TLBWR = 0b000110, //  6: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
-
-    OPC_COP0_ERET  = 0b011000, // 24: Return from interrupt, exception, or error exception.
-};
-
-// insn_db_cop1_sub01 opcodes.
-enum InsnDB_COP1_sub01_Opcodes {
-    OPT_COP1_BC1F  = (0b00000 | FALSE), // 0b00000  (0):
-    OPT_COP1_BC1T  = (0b00000 | TRUE ), // 0b00001  (1):
-#define B_OPT_COP1_LIKELY 0b00010
-    OPT_COP1_BC1FL = (B_OPT_COP1_LIKELY | FALSE), // 0b00010  (2):
-    OPT_COP1_BC1TL = (B_OPT_COP1_LIKELY | TRUE ), // 0b00011  (3):
-};
-
-// Coprocessor-1 (Floating-Point Unit) functions.
-enum COP1Funcs {
-    COP1_ROUND,
-    COP1_TRUNC,
-    COP1_CEIL,
-    COP1_FLOOR,
-};
-
-// Coprocessor-1 (Floating-Point Unit) conditions.
-enum COP1FPUConditions {
-    COP0_COND_F,    // False.
-    COP0_COND_UN,   // Unordered.
-    COP0_COND_EQ,   // Equal.
-    COP0_COND_UEQ,  // Unordered or Equal.
-    COP0_COND_OLT,  // Ordered Less Than.
-    COP0_COND_ULT,  // Unordered or Less Than.
-    COP0_COND_OLE,  // Ordered or Less Than or Equal.
-    COP0_COND_ULE,  // Unordered or Less Than or Equal.
-    COP0_COND_SF,   // Signaling False.
-    COP0_COND_NGLE, // Not Greater or Less Than or Equal.
-    COP0_COND_SEQ,  // Signalling Equal.
-    COP0_COND_NGL,  // Not Greater or Less Than.
-    COP0_COND_LT,   // Less Than.
-    COP0_COND_NGE,  // Not Greater Than or Equal.
-    COP0_COND_LE,   // Less Than or Equal.
-    COP0_COND_NGT,  // Not Greater Than.
-};
-
-// insn_db_cop1_sub10 opcodes.
-enum InsnDB_COP1_sub10_Opcodes {
-    OPS_ADD_F       = 0b000000, //  0: ADD.[fmt] Floating-Point Add (3cyc).
-    OPS_SUB_F       = 0b000001, //  1: SUB.[fmt] Floating-Point Subtract (3cyc).
-    OPS_MUL_F       = 0b000010, //  2: MUL.[fmt] Floating-Point Multiply (S:5cyc; D:8cyc).
-    OPS_DIV_F       = 0b000011, //  3: DIV.[fmt] Floating-Point Divide (S:29cyc; D:58cyc).
-
-    OPS_SQRT_F      = 0b000100, //  4: SQRT.[fmt] Floating-Point Square Root (S:29cyc; D:58cyc).
-    OPS_ABS_F       = 0b000101, //  5: ABS.[fmt]  Floating-Point Absolute Value (1cyc).
-    OPS_MOV_F       = 0b000110, //  6: MOV.[fmt]  Floating-Point Move (1cyc).
-    OPS_NEG_F       = 0b000111, //  7: NEG.[fmt]  Floating-Point Negate (1cyc).
-
-#define B_OPS_TOFIXED_L 0b001000
-    OPS_ROUND_L_F   = (B_OPS_TOFIXED_L | COP1_ROUND), // 0b001000 ( 8): ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
-    OPS_TRUNC_L_F   = (B_OPS_TOFIXED_L | COP1_TRUNC), // 0b001001 ( 9): TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
-    OPS_CEIL_L_F    = (B_OPS_TOFIXED_L | COP1_CEIL ), // 0b001010 (10): CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
-    OPS_FLOOR_L_F   = (B_OPS_TOFIXED_L | COP1_FLOOR), // 0b001011 (11): FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
-
-#define B_OPS_TOFIXED_W 0b001100
-    OPS_ROUND_W_F   = (B_OPS_TOFIXED_W | COP1_ROUND), // 0b001100 (12): ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
-    OPS_TRUNC_W_F   = (B_OPS_TOFIXED_W | COP1_TRUNC), // 0b001101 (13): TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
-    OPS_CEIL_W_F    = (B_OPS_TOFIXED_W | COP1_CEIL ), // 0b001110 (14): CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
-    OPS_FLOOR_W_F   = (B_OPS_TOFIXED_W | COP1_FLOOR), // 0b001111 (15): FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
-
-#define B_OPS_CVT_F_F 0b100000
-    OPS_CVT_S_F     = (B_OPS_CVT_F_F | COP1_FMT_SINGLE), // 0b100000 (32):  CVT.S.[fmt] Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
-    OPS_CVT_D_F     = (B_OPS_CVT_F_F | COP1_FMT_DOUBLE), // 0b100001 (33):  CVT.D.[fmt] Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
-    OPS_CVT_W_F     = (B_OPS_CVT_F_F | COP1_FMT_WORD  ), // 0b100100 (36):  CVT.W.[fmt] Floating-Point Convert to Word Fixed-Point (5cyc).
-    OPS_CVT_L_F     = (B_OPS_CVT_F_F | COP1_FMT_LONG  ), // 0b100101 (37):  CVT.L.[fmt] Floating-Point Convert to Long Fixed-Point (5cyc).
-
-#define B_OPS_C_F 0b110000 // Last 4 bits are format
-    OPS_C_F         = (B_OPS_C_F | COP0_COND_F   ), // 0b110000 (48): C.F.[fmt]    Floating-Point Compare (False) (1cyc).
-    OPS_C_UN        = (B_OPS_C_F | COP0_COND_UN  ), // 0b110001 (49): C.UN.[fmt]   Floating-Point Compare (Unordered) (1cyc).
-    OPS_C_EQ        = (B_OPS_C_F | COP0_COND_EQ  ), // 0b110010 (50): C.EQ.[fmt]   Floating-point Compare (Equal) (1cyc).
-    OPS_C_UEQ       = (B_OPS_C_F | COP0_COND_UEQ ), // 0b110011 (51): C.UEQ.[fmt]  Floating-point Compare (Unordered or Equal) (1cyc).
-    OPS_C_OLT       = (B_OPS_C_F | COP0_COND_OLT ), // 0b110100 (52): C.OLT.[fmt]  Floating-point Compare (Ordered Less Than) (1cyc).
-    OPS_C_ULT       = (B_OPS_C_F | COP0_COND_ULT ), // 0b110101 (53): C.ULT.[fmt]  Floating-point Compare (Unordered or Less Than) (1cyc).
-    OPS_C_OLE       = (B_OPS_C_F | COP0_COND_OLE ), // 0b110110 (54): C.OLE.[fmt]  Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
-    OPS_C_ULE       = (B_OPS_C_F | COP0_COND_ULE ), // 0b110111 (55): C.ULE.[fmt]  Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
-    OPS_C_SF        = (B_OPS_C_F | COP0_COND_SF  ), // 0b111000 (56): C.SF.[fmt]   Floating-point Compare (Signaling False) (1cyc).
-    OPS_C_NGLE      = (B_OPS_C_F | COP0_COND_NGLE), // 0b111001 (57): C.NGLE.[fmt] Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
-    OPS_C_SEQ       = (B_OPS_C_F | COP0_COND_SEQ ), // 0b111010 (58): C.SEQ.[fmt]  Floating-point Compare (Signalling Equal) (1cyc).
-    OPS_C_NGL       = (B_OPS_C_F | COP0_COND_NGL ), // 0b111011 (59): C.NGL.[fmt]  Floating-point Compare (Not Greater or Less Than) (1cyc).
-    OPS_C_LT        = (B_OPS_C_F | COP0_COND_LT  ), // 0b111100 (60): C.LT.[fmt]   Floating-point Compare (Less Than) (1cyc).
-    OPS_C_NGE       = (B_OPS_C_F | COP0_COND_NGE ), // 0b111101 (61): C.NGE.[fmt]  Floating-point Compare (Not Greater Than or Equal) (1cyc).
-    OPS_C_LE        = (B_OPS_C_F | COP0_COND_LE  ), // 0b111110 (62): C.LE.[fmt]   Floating-point Compare (Less Than or Equal) (1cyc).
-    OPS_C_NGT       = (B_OPS_C_F | COP0_COND_NGT ), // 0b111111 (63): C.NGT.[fmt]  Floating-point Compare (Not Greater Than) (1cyc).
 };
 
 // insn_db_spec opcodes.
@@ -346,7 +240,113 @@ enum InsnDB_regi_Opcodes {
     OPR_TNEI    = 0b01110, // 14: Trap if Not Equal Immediate.
 };
 
-// Pseudo instruction IDs.
+// Coprocessor-0 (System Control Coprocessor) move formats.
+enum COP0MoveFormats {
+    COP0_MF  = (COP_FROM | FMT_32b), // 0b00000 (16): 32-bit floating-point.
+    COP0_DMF = (COP_FROM | FMT_64b), // 0b00001 (17): 64-bit floating-point.
+    COP0_MT  = (COP_TO   | FMT_32b), // 0b00100 (20): 32-bit fixed-point.
+    COP0_DMT = (COP_TO   | FMT_64b), // 0b00101 (21): 64-bit fixed-point.
+};
+
+// insn_db_cop0_sub10 opcodes.
+enum InsnDB_COP0_sub10_Opcodes {
+    // OPC_COP0_MOVE  = 0b000000, //  0:
+
+    OPC_COP0_TLBP  = 0b001000, //  8: Searches for a TLB entry that matches the EntryHi register.
+    OPC_COP0_TLBR  = 0b000001, //  1: Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
+    OPC_COP0_TLBWI = 0b000010, //  2: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
+    OPC_COP0_TLBWR = 0b000110, //  6: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
+
+    OPC_COP0_ERET  = 0b011000, // 24: Return from interrupt, exception, or error exception.
+};
+
+// insn_db_cop1_sub01 opcodes.
+enum InsnDB_COP1_sub01_Opcodes {
+    OPT_COP1_BC1F  = (0b00000 | FALSE), // 0b00000  (0): Branch on FP False (1cyc*).
+    OPT_COP1_BC1T  = (0b00000 | TRUE ), // 0b00001  (1): Branch on FP True (1cyc*).
+#define B_OPT_COP1_LIKELY 0b00010
+    OPT_COP1_BC1FL = (B_OPT_COP1_LIKELY | FALSE), // 0b00010  (2): Branch on FP False Likely (1cyc*).
+    OPT_COP1_BC1TL = (B_OPT_COP1_LIKELY | TRUE ), // 0b00011  (3): Branch on FP True Likely (1cyc*).
+};
+
+// Coprocessor-1 (Floating-Point Unit) functions.
+enum COP1Funcs {
+    COP1_ROUND,
+    COP1_TRUNC,
+    COP1_CEIL,
+    COP1_FLOOR,
+};
+
+// Coprocessor-1 (Floating-Point Unit) conditions.
+enum COP1FPUConditions {
+    COP0_COND_F,    // False.
+    COP0_COND_UN,   // Unordered.
+    COP0_COND_EQ,   // Equal.
+    COP0_COND_UEQ,  // Unordered or Equal.
+    COP0_COND_OLT,  // Ordered Less Than.
+    COP0_COND_ULT,  // Unordered or Less Than.
+    COP0_COND_OLE,  // Ordered or Less Than or Equal.
+    COP0_COND_ULE,  // Unordered or Less Than or Equal.
+    COP0_COND_SF,   // Signaling False.
+    COP0_COND_NGLE, // Not Greater or Less Than or Equal.
+    COP0_COND_SEQ,  // Signalling Equal.
+    COP0_COND_NGL,  // Not Greater or Less Than.
+    COP0_COND_LT,   // Less Than.
+    COP0_COND_NGE,  // Not Greater Than or Equal.
+    COP0_COND_LE,   // Less Than or Equal.
+    COP0_COND_NGT,  // Not Greater Than.
+};
+
+// insn_db_cop1_sub10 opcodes.
+enum InsnDB_COP1_sub10_Opcodes {
+    OPS_ADD_F       = 0b000000, //  0: ADD.[fmt] Floating-Point Add (3cyc).
+    OPS_SUB_F       = 0b000001, //  1: SUB.[fmt] Floating-Point Subtract (3cyc).
+    OPS_MUL_F       = 0b000010, //  2: MUL.[fmt] Floating-Point Multiply (S:5cyc; D:8cyc).
+    OPS_DIV_F       = 0b000011, //  3: DIV.[fmt] Floating-Point Divide (S:29cyc; D:58cyc).
+
+    OPS_SQRT_F      = 0b000100, //  4: SQRT.[fmt] Floating-Point Square Root (S:29cyc; D:58cyc).
+    OPS_ABS_F       = 0b000101, //  5: ABS.[fmt]  Floating-Point Absolute Value (1cyc).
+    OPS_MOV_F       = 0b000110, //  6: MOV.[fmt]  Floating-Point Move (1cyc).
+    OPS_NEG_F       = 0b000111, //  7: NEG.[fmt]  Floating-Point Negate (1cyc).
+
+#define B_OPS_TOFIXED_L 0b001000
+    OPS_ROUND_L_F   = (B_OPS_TOFIXED_L | COP1_ROUND), // 0b001000 ( 8): ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
+    OPS_TRUNC_L_F   = (B_OPS_TOFIXED_L | COP1_TRUNC), // 0b001001 ( 9): TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
+    OPS_CEIL_L_F    = (B_OPS_TOFIXED_L | COP1_CEIL ), // 0b001010 (10): CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
+    OPS_FLOOR_L_F   = (B_OPS_TOFIXED_L | COP1_FLOOR), // 0b001011 (11): FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
+
+#define B_OPS_TOFIXED_W 0b001100
+    OPS_ROUND_W_F   = (B_OPS_TOFIXED_W | COP1_ROUND), // 0b001100 (12): ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
+    OPS_TRUNC_W_F   = (B_OPS_TOFIXED_W | COP1_TRUNC), // 0b001101 (13): TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
+    OPS_CEIL_W_F    = (B_OPS_TOFIXED_W | COP1_CEIL ), // 0b001110 (14): CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
+    OPS_FLOOR_W_F   = (B_OPS_TOFIXED_W | COP1_FLOOR), // 0b001111 (15): FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
+
+#define B_OPS_CVT_F_F 0b100000
+    OPS_CVT_S_F     = (B_OPS_CVT_F_F | COP1_FMT_SINGLE), // 0b100000 (32):  CVT.S.[fmt] Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
+    OPS_CVT_D_F     = (B_OPS_CVT_F_F | COP1_FMT_DOUBLE), // 0b100001 (33):  CVT.D.[fmt] Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
+    OPS_CVT_W_F     = (B_OPS_CVT_F_F | COP1_FMT_WORD  ), // 0b100100 (36):  CVT.W.[fmt] Floating-Point Convert to Word Fixed-Point (5cyc).
+    OPS_CVT_L_F     = (B_OPS_CVT_F_F | COP1_FMT_LONG  ), // 0b100101 (37):  CVT.L.[fmt] Floating-Point Convert to Long Fixed-Point (5cyc).
+
+#define B_OPS_C_F 0b110000 // Last 4 bits are format
+    OPS_C_F         = (B_OPS_C_F | COP0_COND_F   ), // 0b110000 (48): C.F.[fmt]    Floating-Point Compare (False) (1cyc).
+    OPS_C_UN        = (B_OPS_C_F | COP0_COND_UN  ), // 0b110001 (49): C.UN.[fmt]   Floating-Point Compare (Unordered) (1cyc).
+    OPS_C_EQ        = (B_OPS_C_F | COP0_COND_EQ  ), // 0b110010 (50): C.EQ.[fmt]   Floating-point Compare (Equal) (1cyc).
+    OPS_C_UEQ       = (B_OPS_C_F | COP0_COND_UEQ ), // 0b110011 (51): C.UEQ.[fmt]  Floating-point Compare (Unordered or Equal) (1cyc).
+    OPS_C_OLT       = (B_OPS_C_F | COP0_COND_OLT ), // 0b110100 (52): C.OLT.[fmt]  Floating-point Compare (Ordered Less Than) (1cyc).
+    OPS_C_ULT       = (B_OPS_C_F | COP0_COND_ULT ), // 0b110101 (53): C.ULT.[fmt]  Floating-point Compare (Unordered or Less Than) (1cyc).
+    OPS_C_OLE       = (B_OPS_C_F | COP0_COND_OLE ), // 0b110110 (54): C.OLE.[fmt]  Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
+    OPS_C_ULE       = (B_OPS_C_F | COP0_COND_ULE ), // 0b110111 (55): C.ULE.[fmt]  Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
+    OPS_C_SF        = (B_OPS_C_F | COP0_COND_SF  ), // 0b111000 (56): C.SF.[fmt]   Floating-point Compare (Signaling False) (1cyc).
+    OPS_C_NGLE      = (B_OPS_C_F | COP0_COND_NGLE), // 0b111001 (57): C.NGLE.[fmt] Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
+    OPS_C_SEQ       = (B_OPS_C_F | COP0_COND_SEQ ), // 0b111010 (58): C.SEQ.[fmt]  Floating-point Compare (Signalling Equal) (1cyc).
+    OPS_C_NGL       = (B_OPS_C_F | COP0_COND_NGL ), // 0b111011 (59): C.NGL.[fmt]  Floating-point Compare (Not Greater or Less Than) (1cyc).
+    OPS_C_LT        = (B_OPS_C_F | COP0_COND_LT  ), // 0b111100 (60): C.LT.[fmt]   Floating-point Compare (Less Than) (1cyc).
+    OPS_C_NGE       = (B_OPS_C_F | COP0_COND_NGE ), // 0b111101 (61): C.NGE.[fmt]  Floating-point Compare (Not Greater Than or Equal) (1cyc).
+    OPS_C_LE        = (B_OPS_C_F | COP0_COND_LE  ), // 0b111110 (62): C.LE.[fmt]   Floating-point Compare (Less Than or Equal) (1cyc).
+    OPS_C_NGT       = (B_OPS_C_F | COP0_COND_NGT ), // 0b111111 (63): C.NGT.[fmt]  Floating-point Compare (Not Greater Than) (1cyc).
+};
+
+// Pseudo-instruction IDs for insn_db_pseudo.
 enum PseudoInsns {
     PSEUDO_NOP,
     PSEUDO_MOVET,
@@ -424,11 +424,6 @@ typedef struct PACKED InsnTemplate {
     /*0x0D*/ u8 pad[2];
     /*0x0F*/ u8 opcode;
 } InsnTemplate; /*0x10*/
-
-typedef struct PACKED InsnParamType {
-    /*0x00*/ InsnData mask; // A bitmask for the bits used to identify the instruction. Anything not in the mask is params.
-    /*0x04*/ const char* paramStr;
-} InsnParamType; /*0x08*/
 
 
 #define DISASM_STEP (ssize_t)sizeof(InsnData)
