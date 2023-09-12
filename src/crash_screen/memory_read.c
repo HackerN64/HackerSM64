@@ -268,10 +268,15 @@ _Bool try_read_data(Word* dest, Address addr) {
 _Bool try_read_byte(Byte* dest, Address addr) {
     Address alignedAddr = ALIGNFLOOR(addr, sizeof(Word));
     size_t offset = (addr - alignedAddr); // 0-3
-    Word data = 0;
+    union {
+        Byte byte[4];
+        Word word;
+    } data = {
+        .word = 0,
+    };
 
-    if (try_read_data(&data, alignedAddr)) {
-        *dest = (Byte)(data >> (((sizeof(Word) - 1) - offset) * SIZEOF_BITS(Byte))); // (data >> (((4 - 1) - offset) * 8))
+    if (try_read_data(&data.word, alignedAddr)) {
+        *dest = data.byte[offset];
 
         return TRUE;
     }
@@ -294,8 +299,10 @@ _Bool try_read_halfword(Halfword* dest, Address addr) {
         try_read_byte(&hi, (addr + (0 * sizeof(Byte)))) &&
         try_read_byte(&lo, (addr + (1 * sizeof(Byte))))
     ) {
-        // *dest = (((Halfword)hi << SIZEOF_BITS(Byte)) | (Halfword)lo);
-        *dest = (HiLo16){ .hi = hi, .lo = lo, }.raw;
+        *dest = (HiLo16){
+            .hi = hi,
+            .lo = lo,
+        }.raw;
 
         return TRUE;
     }
@@ -318,8 +325,10 @@ _Bool try_read_word(Word* dest, Address addr) {
         try_read_halfword(&hi, (addr + (0 * sizeof(Halfword)))) &&
         try_read_halfword(&lo, (addr + (1 * sizeof(Halfword))))
     ) {
-        // *dest = (((Word)hi << SIZEOF_BITS(Halfword)) | (Word)lo);
-        *dest = (HiLo32){ .hi = hi, .lo = lo, }.raw;
+        *dest = (HiLo32){
+            .hi = hi,
+            .lo = lo,
+        }.raw;
 
         return TRUE;
     }
@@ -342,8 +351,10 @@ _Bool try_read_doubleword(Doubleword* dest, Address addr) {
         try_read_word(&hi, (addr + (0 * sizeof(Word)))) &&
         try_read_word(&lo, (addr + (1 * sizeof(Word))))
     ) {
-        // *dest = (((Doubleword)hi << SIZEOF_BITS(Word)) | (Doubleword)lo);
-        *dest = (HiLo64){ .hi = hi, .lo = lo, }.raw;
+        *dest = (HiLo64){
+            .hi = hi,
+            .lo = lo,
+        }.raw;
 
         return TRUE;
     }
