@@ -179,37 +179,17 @@ static u8 sInertiaFirstFrame = FALSE;
  * Apply inertia based on Mario's last platform.
  */
 static void apply_mario_inertia(void) {
+#ifdef MARIO_INERTIA_UPWARD
+    // Vertical Inertia
     // On the first frame of leaving the ground, boost Mario's y velocity
     if (sInertiaFirstFrame) {
-
-// Vertical Inertia
-#if ((MARIO_INERTIA & INERTIA_UPWARD) && (MARIO_INERTIA & INERTIA_DOWNWARD))
-        gMarioState->vel[1] += sMarioAmountDisplaced[1];
-#elif (MARIO_INERTIA & INERTIA_UPWARD)
         if (sMarioAmountDisplaced[1] > 0.0f) {
             gMarioState->vel[1] += sMarioAmountDisplaced[1];
         }
-#elif (MARIO_INERTIA & INERTIA_DOWNWARD)
-        if (sMarioAmountDisplaced[1] < 0.0f) {
-            gMarioState->vel[1] += sMarioAmountDisplaced[1];
-        }
-#endif
-
-// Horizontal Inertia
-#if (!((MARIO_INERTIA & INERTIA_LEFT_RIGHT) || (MARIO_INERTIA & INERTIA_FORWARD_BACKWARD)))
-        sMarioAmountDisplaced[0] = 0.0f;
-        sMarioAmountDisplaced[2] = 0.0f;
-#elif (!(MARIO_INERTIA & INERTIA_LEFT_RIGHT))
-        sMarioAmountDisplaced[0] *= ABS(sins(gMarioState->faceAngle[1]));
-        sMarioAmountDisplaced[2] *= ABS(coss(gMarioState->faceAngle[1]));
-#elif (!(MARIO_INERTIA & INERTIA_FORWARD_BACKWARD))
-        sMarioAmountDisplaced[2] *= ABS(sins(gMarioState->faceAngle[1]));
-        sMarioAmountDisplaced[0] *= ABS(coss(gMarioState->faceAngle[1]));
-#endif
     }
+#endif
 
-// Apply Horizontal Inertia
-#if ((MARIO_INERTIA & INERTIA_LEFT_RIGHT) || (MARIO_INERTIA & INERTIA_FORWARD_BACKWARD))
+#ifdef MARIO_INERTIA_LATERAL
     // Apply sideways inertia
     gMarioState->pos[0] += sMarioAmountDisplaced[0];
     gMarioState->pos[2] += sMarioAmountDisplaced[2];

@@ -181,18 +181,6 @@
 
 
 /*****************
- * config_movement.h
- */
-
-#ifndef PLATFORM_DISPLACEMENT_2
-    #undef MARIO_INERTIA
-#endif
-#ifndef MARIO_INERTIA
-    #define MARIO_INERTIA (INERTIA_NONE)
-#endif
-
-
-/*****************
  * config_objects.h
  */
 

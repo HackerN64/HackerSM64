@@ -136,14 +136,9 @@
  */
 #define PLATFORM_DISPLACEMENT_2
 
-#define INERTIA_NONE             0
-#define INERTIA_UPWARD           (1 << 0)
-#define INERTIA_DOWNWARD         (1 << 1)
-#define INERTIA_LEFT_RIGHT       (1 << 2)
-#define INERTIA_FORWARD_BACKWARD (1 << 3)
-
 /**
- * Makes Mario keep momemtum when leaving moving platforms. Requires PLATFORM_DISPLACEMENT_2 to be enabled.
+ * Momentum defines; allow Mario to preserve his momemtum when leaving moving platforms.
+ * Requires PLATFORM_DISPLACEMENT_2 to be enabled.
  */
-#define MARIO_INERTIA (INERTIA_UPWARD | INERTIA_FORWARD_BACKWARD)
-
+#define MARIO_INERTIA_UPWARD
+// #define MARIO_INERTIA_LATERAL
