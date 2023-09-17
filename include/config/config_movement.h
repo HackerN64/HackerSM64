@@ -132,13 +132,13 @@
 // #define BUGFIX_DIALOG_TIME_STOP
 
 /**
- * Enables Platform Displacement 2 // TODO: add more decription here
+ * Enables Platform Displacement 2, an upgrade to the physics involving moving platforms and how Mario interacts with them.
  */
 #define PLATFORM_DISPLACEMENT_2
 
 /**
  * Momentum defines; allow Mario to preserve his momemtum when leaving moving platforms.
- * Requires PLATFORM_DISPLACEMENT_2 to be enabled.
+ * These require Platform Displacement 2 to be enabled.
  */
 #define MARIO_INERTIA_UPWARD
 // #define MARIO_INERTIA_LATERAL
