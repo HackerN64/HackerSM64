@@ -137,7 +137,7 @@
 #define PLATFORM_DISPLACEMENT_2
 
 /**
- * Momentum defines; allow Mario to preserve his momemtum when leaving moving platforms.
+ * Inertia defines; allow Mario to preserve his momemtum when leaving moving platforms.
  * These require Platform Displacement 2 to be enabled.
  */
 #define MARIO_INERTIA_UPWARD

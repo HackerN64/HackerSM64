@@ -180,7 +180,6 @@ static u8 sInertiaFirstFrame = FALSE;
  */
 static void apply_mario_inertia(void) {
 #ifdef MARIO_INERTIA_UPWARD
-    // Vertical Inertia
     // On the first frame of leaving the ground, boost Mario's y velocity
     if (sInertiaFirstFrame) {
         if (sMarioAmountDisplaced[1] > 0.0f) {
