@@ -1437,7 +1437,7 @@ f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec
     f32 t_max_x = ABS((p_x + MAX(stp_x, 0.0f) - start_cell_coord_x) * rdinv_x);
     f32 t_max_z = ABS((p_z + MAX(stp_z, 0.0f) - start_cell_coord_z) * rdinv_z);
 
-    while (1) {
+    while (TRUE) {
         find_surface_on_ray_cell((s32)p_x, (s32)p_z, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
         f32 t_next = MIN(t_max_x, t_max_z);
         if (t_next > 1.0f) {
