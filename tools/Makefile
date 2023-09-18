@@ -80,6 +80,8 @@ clean:
 	$(RM) UNFLoader*
 	$(MAKE) -C audiofile clean
 
+distclean: clean
+
 define COMPILE
 $(1): $($1_SOURCES)
 	$$(CC) $(CFLAGS) $($1_CFLAGS) $$^ -o $$@ $($1_LDFLAGS) $(LDFLAGS)
@@ -90,4 +92,4 @@ $(foreach p,$(BUILD_PROGRAMS),$(eval $(call COMPILE,$(p))))
 $(LIBAUDIOFILE):
 	@$(MAKE) -C audiofile
 
-.PHONY: all all-except-recomp clean default
+.PHONY: all all-except-recomp clean distclean default
