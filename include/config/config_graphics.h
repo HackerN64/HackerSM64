@@ -137,7 +137,7 @@
 
 /**
  * May break viewport widescreen hacks.
- * When this is disabled,the culling will only be skipped according to the NO_CULLING_EMULATOR_BLACKLIST
+ * When this is disabled, the culling will only be skipped according to the NO_CULLING_EMULATOR_BLACKLIST.
  */
 // #define CULLING_ON_EMULATOR
 
