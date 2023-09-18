@@ -808,7 +808,7 @@ $(BUILD_DIR)/include/level_headers.h: levels/level_headers.h.in
 # Generate version_data.h
 $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 	@$(PRINT) "$(GREEN)Generating:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)tools/make_version.sh $(CROSS) > $@
+	$(V)sh tools/make_version.sh $(CROSS) > $@
 
 #==============================================================================#
 # Compilation Recipes                                                          #
@@ -817,8 +817,8 @@ $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 # Compile C code
 ifeq ($(FIXLIGHTS),1)
 # This must not be run multiple times at once, so we run it ahead of time rather than in a rule
-DUMMY != $(FIXLIGHTS_PY) actors
-DUMMY != $(FIXLIGHTS_PY) levels
+DUMMY != $(PYTHON) $(FIXLIGHTS_PY) actors
+DUMMY != $(PYTHON) $(FIXLIGHTS_PY) levels
 endif
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
