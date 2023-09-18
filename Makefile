@@ -305,23 +305,23 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
   # Make sure assets exist
   NOEXTRACT ?= 0
   ifeq ($(NOEXTRACT),0)
-    DUMMY != $(PYTHON) extract_assets.py $(VERSION) >&2 || echo FAIL
+    DUMMY != $(PYTHON) extract_assets.py us >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
       $(error Failed to extract assets from US ROM)
     endif
-    ifneq (,$(wildcard baserom.jp.z64))
+    ifneq (,$(shell python3 tools/detect_baseroms.py jp))
       DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
       ifeq ($(DUMMY),FAIL)
         $(error Failed to extract assets from JP ROM)
       endif
     endif
-    ifneq (,$(wildcard baserom.eu.z64))
+    ifneq (,$(shell python3 tools/detect_baseroms.py eu))
       DUMMY != $(PYTHON) extract_assets.py eu >&2 || echo FAIL
       ifeq ($(DUMMY),FAIL)
         $(error Failed to extract assets from EU ROM)
       endif
     endif
-    ifneq (,$(wildcard baserom.sh.z64))
+    ifneq (,$(shell python3 tools/detect_baseroms.py sh))
       DUMMY != $(PYTHON) extract_assets.py sh >&2 || echo FAIL
       ifeq ($(DUMMY),FAIL)
         $(error Failed to extract assets from SH ROM)
@@ -557,6 +557,10 @@ all: $(ROM)
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
 
+rebuildtools:
+	$(MAKE) -C tools distclean
+	$(MAKE) -C tools
+
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
 	$(MAKE) -C $(TOOLS_DIR) clean
@@ -584,7 +588,7 @@ unf: $(ROM) $(LOADER)
 libultra: $(BUILD_DIR)/libultra.a
 
 patch: $(ROM)
-	$(FLIPS) --create --bps ./baserom.$(VERSION).z64 $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
+	$(FLIPS) --create --bps $(shell python3 tools/detect_baseroms.py $(VERSION)) $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
@@ -894,7 +898,7 @@ endif
 $(BUILD_DIR)/$(TARGET).objdump: $(ELF)
 	$(OBJDUMP) -D $< > $@
 
-.PHONY: all clean distclean default test load
+.PHONY: all clean distclean default test load rebuildtools
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
 .SECONDARY:
 

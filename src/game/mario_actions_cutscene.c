@@ -1457,6 +1457,7 @@ s32 act_teleport_fade_in(struct MarioState *m) {
         }
     }
 
+    m->pos[1] = m->floorHeight;
     stop_and_set_height_to_floor(m);
 
     return FALSE;
