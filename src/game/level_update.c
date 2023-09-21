@@ -1238,6 +1238,16 @@ s32 init_level(void) {
 
     g100CoinStarSpawned = FALSE;
 
+    // NOTE: gStarModelLastCollected reset here as a safety to prevent possible UB if assigned a model used
+    // in a non-global group. This checked can be removed as needed.
+    if (gStarModelLastCollected != MODEL_BOWSER_KEY
+#ifdef STAR_DANCE_USES_STARS_MODEL
+         || gStarModelLastCollected != MODEL_TRANSPARENT_STAR
+#endif
+    ) {
+        gStarModelLastCollected = MODEL_STAR;
+    }
+
     if (gCurrCreditsEntry == NULL) {
         gHudDisplay.flags = HUD_DISPLAY_DEFAULT;
     } else {
