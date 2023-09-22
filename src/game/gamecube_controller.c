@@ -221,7 +221,7 @@ void osContGetReadDataEx(OSContPadEx* data) {
     int i;
 
     for (i = 0; i < __osMaxControllers; i++, data++) {
-        if (gControllerStatuses[i].type & CONT_CONSOLE_GCN) {
+        if ((gControllerStatuses[i].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) {
             s32 stick_x, stick_y, c_stick_x, c_stick_y;
             readformatgcn = *(__OSContGCNShortPollFormat*)ptr;
             data->errno = CHNL_ERR(readformatgcn);
@@ -295,7 +295,7 @@ static void __osPackReadData(void) {
     readformatgcn.stick_y = -1;
 
     for (i = 0; i < __osMaxControllers; i++) {
-        if (gControllerStatuses[i].type & CONT_CONSOLE_GCN) {
+        if ((gControllerStatuses[i].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) {
             readformatgcn.rumble = __osGamecubeRumbleEnabled[i];
             *(__OSContGCNShortPollFormat*)ptr = readformatgcn;
             ptr += sizeof(__OSContGCNShortPollFormat);
@@ -413,7 +413,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     }
 
     // Check whether the controller is a GCN controller.
-    if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) { // GCN Controllers.
+    if ((gControllerStatuses[channel].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) { // GCN Controllers.
         __osGamecubeRumbleEnabled[channel] = motorState;
 
         // Change the last command ID so that input poll command (which includes rumble) gets written again.
@@ -521,7 +521,7 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     pfs->activebank = ACCESSORY_ID_NULL;
 
     // Make sure the controller is not a GCN controller.
-    if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
+    if ((gControllerStatuses[channel].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_N64) {
         // Write probe value (ensure Transfer Pak is turned off).
         err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
         if (err == PFS_ERR_NEW_PACK) {

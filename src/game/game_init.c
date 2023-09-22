@@ -592,7 +592,7 @@ void read_controller_inputs(void) {
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (controller->statusData->type & CONT_CONSOLE_GCN) {
+            if ((controller->statusData->type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) {
                 u32 oldButton = controllerData->button;
                 u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
                 if (oldButton & Z_TRIG) {
@@ -684,8 +684,8 @@ void init_controllers(void) {
     if (
         (gEmulator & EMU_CONSOLE) &&
         ((gControllerBits & 0b11) == 0b11) && // Only swap if the first two ports both have controllers plugged in.
-        ((gControllerStatuses[0].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_N64) && // If the first port's controller is N64.
-        ((gControllerStatuses[1].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN)    // If the second port's controller is GCN.
+        ((gControllerStatuses[0].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_N64) && // If the 1st port's controller is N64.
+        ((gControllerStatuses[1].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN)    // If the 2nd port's controller is GCN.
     ) {
         struct Controller temp = gControllers[0];
         gControllers[0] = gControllers[1];
