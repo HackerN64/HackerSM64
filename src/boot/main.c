@@ -307,14 +307,14 @@ OSTimerEx RCPHangTimer;
 int osSetTimer_log(OSTimer* t, OSTime countdown, OSTime interval, OSMesgQueue* mq, OSMesg msg);
 void start_rcp_hang_timer(void) {
     if (RCPHangTimer.started == FALSE) {
-        osSetTimer(&RCPHangTimer.t, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
+        osSetTimer(&RCPHangTimer.timer, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
         RCPHangTimer.started = TRUE;
     }
 }
 
 void osStopTimer_log(OSTimer *);
 void stop_rcp_hang_timer(void) {
-    osStopTimer(&RCPHangTimer.t);
+    osStopTimer(&RCPHangTimer.timer);
     RCPHangTimer.started = FALSE;
 }
 

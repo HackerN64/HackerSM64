@@ -104,7 +104,7 @@ extern s8 gShowDebugText;
 //  causing a particularly messy crash.
 typedef struct {
     u8 started;
-    OSTimer t;
+    OSTimer timer;
 } OSTimerEx;
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
