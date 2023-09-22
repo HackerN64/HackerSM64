@@ -567,26 +567,14 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
-        // The reason this is not divided as an integer is to prevent an integer division.
-        f32 vHalfFov = ( (f32) ((node->fov * 4096) + 8192) ) / 45.f;
+        f32 vHalfFov = ( ((node->fov * 4096.f) + 8192.f) ) / 45.f;
 
         // We need to account for aspect ratio changes by multiplying by the widescreen horizontal stretch 
         // (normally 1.775).
-        f32 hHalfFov = vHalfFov * sAspectRatio;
-
-        node->halfFovHorizontal = tans(hHalfFov);
+        node->halfFovHorizontal = tans(vHalfFov * sAspectRatio);
 
 #ifdef VERTICAL_CULLING
         node->halfFovVertical = tans(vHalfFov);
-#endif
-
-#ifndef HORIZONTAL_CULLING_ON_EMULATOR
-        // If an emulator is detected, use a large value for the half fov 
-        // horizontal value to account for viewport widescreen hacks.
-
-        if(!(gEmulator & EMU_CONSOLE)){
-            node->halfFovHorizontal = 9999.0f;
-        }
 #endif
     
         guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
@@ -696,21 +684,17 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     // As a result, environment mapping is broken on Fast3DEX2 without the
     // changes below.
     Mat4* cameraMatrix = &gCameraTransform;
- #ifdef FIX_REFLECT_MTX
+    /**
+    * HackerSM64 2.1: Now uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
+    * It was originally sideways in vanilla, with vanilla's environment map textures sideways to accommodate, but those
+    * textures are now rotated automatically on extraction to allow for this to be fixed.
+    */
     gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
     gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
     gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
     gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * -(*cameraMatrix)[0][1]);
     gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * -(*cameraMatrix)[1][1]);
     gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * -(*cameraMatrix)[2][1]);
- #else
-    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
-    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
-    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
-    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][1]);
-    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][1]);
-    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][1]);
- #endif
 #endif // F3DEX_GBI_2
 
     // Make a copy of the view matrix and scale its translation based on WORLD_SCALE
@@ -1069,6 +1053,9 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  *
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
+
+#define NO_CULLING_EMULATOR_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+
 s32 obj_is_in_view(struct GraphNodeObject *node) {
     struct GraphNode *geo = node->sharedChild;
 
@@ -1092,6 +1079,13 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     if (absf(cameraToObjectDepth - VALID_DEPTH_MIDDLE) >= VALID_DEPTH_RANGE + cullingRadius) {
         return FALSE;
     }
+
+#ifndef CULLING_ON_EMULATOR
+    // If an emulator is detected, skip any other culling.
+    if(!(gEmulator & NO_CULLING_EMULATOR_BLACKLIST)){
+        return TRUE;
+    }
+#endif
 
 #ifdef VERTICAL_CULLING
     f32 vScreenEdge = -cameraToObjectDepth * gCurGraphNodeCamFrustum->halfFovVertical;

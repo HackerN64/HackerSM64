@@ -117,13 +117,6 @@
 // #define PUPPYLIGHTS
 
 /**
- * Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
- * It is sideways in vanilla, and since vanilla's environment map textures are sideways too, those will appear as sideways in-game if this is enabled.
- * Make sure your custom environment map textures are the correct orientation.
- */
-// #define FIX_REFLECT_MTX
-
-/**
  * Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
  */
 // #define DISABLE_SHADOWS
@@ -136,14 +129,16 @@
 
 
 /**
- * Limits the horizontal fov on emulator like on console. May break viewport widescreen hacks.
+ * May break viewport widescreen hacks.
+ * When this is disabled, the culling will only be skipped according to the NO_CULLING_EMULATOR_BLACKLIST.
  */
-// #define HORIZONTAL_CULLING_ON_EMULATOR
+// #define CULLING_ON_EMULATOR
 
 /**
- * Makes objects bellow the screen be culled.
+ * Makes objects below the screen be culled. 
+ * NOTE: Vanilla objects do not account for vertical culling.
  */
-#define VERTICAL_CULLING
+// #define VERTICAL_CULLING
 
 /**
  * If the first command of an object´s geolayout is not GEO_CULLING_RADIUS, DEFAULT_CULLING_RADIUS
@@ -160,3 +155,10 @@
  * Makes use of the tex edge render mode to deliver smooth transition textures
  */
 // #define SHARP_TRANSITION_TEXTURES
+
+/**
+ * Uses frustratio of 2 instead of 1.
+ * Can improve performance in some circumstances, though it can also cause large tris to warp if cut off from the camera.
+ * Only use this if you can test the difference of your hack with and without this change on console.
+ */
+// #define USE_FRUSTRATIO2

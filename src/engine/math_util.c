@@ -1277,8 +1277,6 @@ s32 anim_spline_poll(Vec3f result) {
  *                    RAYCASTING                  *
  **************************************************/
 
-#define RAY_STEPS      4 /* How many steps to do when casting rays, default to quartersteps.  */
-
 /**
  * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
  *
@@ -1399,8 +1397,6 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
 
 f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
     Vec3f normalized_dir;
-    f32 step;
-    s32 i;
     const f32 invcell = 1.0f / CELL_SIZE;
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_raycast);
 
@@ -1414,46 +1410,47 @@ f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec
     vec3f_copy(normalized_dir, dir);
     vec3f_normalize(normalized_dir);
 
-    // Get our cell coordinate
-    f32 fCellX    = (orig[0] + LEVEL_BOUNDARY_MAX) * invcell;
-    f32 fCellZ    = (orig[2] + LEVEL_BOUNDARY_MAX) * invcell;
-    s32 cellX     = fCellX;
-    s32 cellZ     = fCellZ;
-    s32 cellPrevX = cellX;
-    s32 cellPrevZ = cellZ;
+    // Get the start and end coords converted to cell-space
+    f32 start_cell_coord_x = (orig[0] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 start_cell_coord_z = (orig[2] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 end_cell_coord_x   = (orig[0] + dir[0] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 end_cell_coord_z   = (orig[2] + dir[2] + LEVEL_BOUNDARY_MAX) * invcell;
 
-    // Don't do DDA if straight down
+    // Don't do grid traversal if straight down
     if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
-        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        find_surface_on_ray_cell((s32)start_cell_coord_x, (s32)start_cell_coord_z, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
         return max_length;
     }
 
-    // Get cells we cross using DDA
-    f32 absDir0 = absf(dir[0]);
-    f32 absDir2 = absf(dir[2]);
-    if (absDir0 >= absDir2) {
-        step = (RAY_STEPS * absDir0) * invcell;
-    } else {
-        step = (RAY_STEPS * absDir2) * invcell;
-    }
+    // "A Fast Voxel Traversal Algorithm for Ray Tracing" - John Amanatides & Andrew Woo
+    // Adapted from implementation at https://www.shadertoy.com/view/XddcWn
+    f32 rd_x = end_cell_coord_x - start_cell_coord_x;
+    f32 rd_z = end_cell_coord_z - start_cell_coord_z;
+    f32 p_x = (s32)start_cell_coord_x;
+    f32 p_z = (s32)start_cell_coord_z;
+    f32 rdinv_x = 1.0f / rd_x;
+    f32 rdinv_z = 1.0f / rd_z;
+    f32 stp_x = signum_positive(rd_x);
+    f32 stp_z = signum_positive(rd_z);
+    f32 delta_x = MIN(rdinv_x * stp_x, 1.0f);
+    f32 delta_z = MIN(rdinv_z * stp_z, 1.0f);
+    f32 t_max_x = ABS((p_x + MAX(stp_x, 0.0f) - start_cell_coord_x) * rdinv_x);
+    f32 t_max_z = ABS((p_z + MAX(stp_z, 0.0f) - start_cell_coord_z) * rdinv_z);
 
-    f32 dx = (dir[0] / step) * invcell;
-    f32 dz = (dir[2] / step) * invcell;
+    while (TRUE) {
+        find_surface_on_ray_cell((s32)p_x, (s32)p_z, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        f32 t_next = MIN(t_max_x, t_max_z);
+        if (t_next > 1.0f) {
+            break;
+        }
 
-    for (i = 0; i < step && *hit_surface == NULL; i++) {
-        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
-
-        // Move cell coordinate
-        fCellX   += dx;
-        fCellZ   += dz;
-        cellPrevX = cellX;
-        cellPrevZ = cellZ;
-        cellX     = fCellX;
-        cellZ     = fCellZ;
-
-        if ((cellPrevX != cellX) && (cellPrevZ != cellZ)) {
-            find_surface_on_ray_cell(cellX, cellPrevZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
-            find_surface_on_ray_cell(cellPrevX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        if (t_max_x < t_max_z) {
+            t_max_x += delta_x;
+            p_x += stp_x;
+        }
+        else {
+            t_max_z += delta_z;
+            p_z += stp_z;
         }
     }
     return max_length;

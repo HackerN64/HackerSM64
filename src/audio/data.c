@@ -83,10 +83,10 @@ u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
  * - gainIndex              (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
  * - reverbIndex            (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
  * 
- * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel]; overridden when using light settings)
- * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel]; overridden when using light settings)
- * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel])
- * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel])
+ * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel])
+ * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel])
+ * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; overridden when using light settings)
+ * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; overridden when using light settings)
  * 
  * NOTE: The first entry will always be used by default when not using the level commands to specify a preset.
  * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.

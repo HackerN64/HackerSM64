@@ -24,9 +24,17 @@
 // #define ENABLE_RUMBLE (1 || VERSION_SH)
 
 /**
- * Informs supported emulators to default to gamecube controller inputs.
+ * The maximum number of supported players/controllers. 1-4.
+ * This will save performance if the player has extra unused controllers plugged in.
+ * NOTE: Default is 2, maximum is 4.
+ * NOTE: This needs to be at least 2 for now for gamecube controller swap to work.
  */
-// #define USE_GAMECUBE_CONTROLLER
+#define MAX_NUM_PLAYERS 2
+
+/**
+ * Informs supported emulators to default to GameCube controller inputs.
+ */
+// #define EMU_DEFAULT_TO_GCN
 
 /**
  * RCVI hack. Increases performance on emulator, and does nothing on console.

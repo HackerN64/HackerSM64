@@ -177,8 +177,10 @@ SECTIONS
 #ifdef EEP
       KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
 #endif
+      KEEP(BUILD_DIR/asm/emux.o(.text*));
       KEEP(BUILD_DIR/asm/pj64_get_count_factor_asm.o(.text*));
       KEEP(BUILD_DIR/asm/round.o(.text*));
+      KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
       BUILD_DIR/src/crash_screen*.o(.text*);
@@ -200,8 +202,6 @@ SECTIONS
       lib/PR/audio/n_aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text*);
       END_TEXT(main)
-      /* Overwrite a libultra function with its modified counterpart for GCN controller support */
-      __osContGetInitData = __osContGetInitDataEx;
 
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
