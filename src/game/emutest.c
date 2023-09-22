@@ -21,6 +21,7 @@ extern void __osPiRelAccess(void);
 enum Emulator gEmulator = EMU_CONSOLE;
 
 u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
+u32 emux_detect(void); // defined in asm/emux.s
 
 static inline u32 check_count_factor() {
     const u32 saved = __osDisableInt();
@@ -85,7 +86,7 @@ static u8 check_cache_emulation() {
 
 void detect_emulator() {
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
-        gEmulator = EMU_CONSOLE;
+        gEmulator = emux_detect() ? EMU_ARES : EMU_CONSOLE;
         return;
     }
     
