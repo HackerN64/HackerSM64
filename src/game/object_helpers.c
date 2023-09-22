@@ -129,10 +129,10 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
             gMarioObject->oPosZ
         );
 
-        gMarioCurrentRoom = room;
         print_debug_top_down_objectinfo("areainfo %d", room);
 
         if (room > 0) {
+            gMarioCurrentRoom = room;
             switchCase->selectedCase = (room - 1);
         }
     } else {
