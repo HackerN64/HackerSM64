@@ -448,6 +448,13 @@ AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
 OBJCOPY   := $(CROSS)objcopy
 
+ifeq ($(LD), tools/mips64-elf-ld)
+  ifeq ($(shell ls -la tools/mips64-elf-ld | awk '{print $1}' | grep x),)
+    $(warning [ERROR]: A required file in this repository is no longer executable.)
+    $(error *    Please run: 'chmod +x tools/mips64-elf-ld', then run `make` again)
+  endif
+endif
+
 ifeq ($(TARGET_N64),1)
   TARGET_CFLAGS := -nostdinc -DTARGET_N64 -D_LANGUAGE_C
   CC_CFLAGS := -fno-builtin
