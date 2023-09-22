@@ -304,7 +304,6 @@ void handle_dp_complete(void) {
 }
 
 OSTimerEx RCPHangTimer;
-int osSetTimer_log(OSTimer* t, OSTime countdown, OSTime interval, OSMesgQueue* mq, OSMesg msg);
 void start_rcp_hang_timer(void) {
     if (RCPHangTimer.started == FALSE) {
         osSetTimer(&RCPHangTimer.timer, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
@@ -312,7 +311,6 @@ void start_rcp_hang_timer(void) {
     }
 }
 
-void osStopTimer_log(OSTimer *);
 void stop_rcp_hang_timer(void) {
     osStopTimer(&RCPHangTimer.timer);
     RCPHangTimer.started = FALSE;
