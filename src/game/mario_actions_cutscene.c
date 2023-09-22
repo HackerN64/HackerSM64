@@ -35,6 +35,7 @@ static struct Object *sEndLeftToadObj;
 static struct Object *sEndJumboStarObj;
 static s16 sEndPeachAnimation;
 static s16 sEndToadAnims[2];
+ModelID32 gStarModelLastCollected = MODEL_STAR;
 
 Vp sEndCutsceneVp = {
     {
@@ -589,10 +590,10 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
             case 1:
                 celebStar = spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
 #ifdef STAR_DANCE_USES_STARS_MODEL
-                celebStar->header.gfx.sharedChild = m->interactObj->header.gfx.sharedChild;
+                obj_set_model(celebStar, gStarModelLastCollected);
 #else
-                if (obj_has_model(m->interactObj, MODEL_BOWSER_KEY)) {
-                    obj_set_model(celebStar, MODEL_BOWSER_KEY);
+                if (gStarModelLastCollected == MODEL_BOWSER_KEY) {
+                    obj_set_model(celebStar, gStarModelLastCollected);
                 }
 #endif
                 disable_background_sound();

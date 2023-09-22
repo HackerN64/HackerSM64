@@ -127,6 +127,8 @@ enum EndToadAnimIndex {
     END_TOAD_INDEX_EAST,
 };
 
+extern ModelID32 gStarModelLastCollected;
+
 void print_displaying_credits_entry(void);
 void bhv_end_peach_loop(void);
 void bhv_end_toad_loop(void);

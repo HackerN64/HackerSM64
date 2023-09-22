@@ -11,9 +11,29 @@
 #define INTERNAL_ROM_NAME "HackerSM64          "
 
 /**
+ * Force the game to delete any existing save data originating from a different hack. This requires INTERNAL_ROM_NAME to be unique to work properly.
+ * It is recommended to enable this if any significant changes to the save file are made that could cause issues with this or other hacks.
+ * NOTE: Using save editors with this define will likely just end up wiping your save, since SM64 specific save editors most likely use hardcoded save magic.
+ */
+// #define UNIQUE_SAVE_DATA
+
+/**
  * Enables Rumble Pak Support.
  */
 #define ENABLE_RUMBLE
+
+/**
+ * The maximum number of supported players/controllers. 1-4.
+ * This will save performance if the player has extra unused controllers plugged in.
+ * NOTE: Default is 2, maximum is 4.
+ * NOTE: This needs to be at least 2 for now for gamecube controller swap to work.
+ */
+#define MAX_NUM_PLAYERS 2
+
+/**
+ * Informs supported emulators to default to GameCube controller inputs.
+ */
+// #define EMU_DEFAULT_TO_GCN
 
 /**
  * Screen Size Defines.
@@ -27,18 +47,6 @@
  */
 #define BORDER_HEIGHT_CONSOLE  0
 #define BORDER_HEIGHT_EMULATOR 0
-
-/**
- * Force the game to delete any existing save data originating from a different hack. This requires INTERNAL_ROM_NAME to be unique to work properly.
- * It is recommended to enable this if any significant changes to the save file are made that could cause issues with this or other hacks.
- * NOTE: Using save editors with this define will likely just end up wiping your save, since SM64 specific save editors most likely use hardcoded save magic.
- */
-// #define UNIQUE_SAVE_DATA
-
-/**
- * Informs supported emulators to default to gamecube controller inputs.
- */
-// #define USE_GAMECUBE_CONTROLLER
 
 /**
  * RCVI hack. Increases performance on emulator, and does nothing on console.

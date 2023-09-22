@@ -6,6 +6,19 @@ import subprocess
 
 from tools.detect_baseroms import get_rom_candidates
 
+envmap_table = set([
+    "actors/mario/mario_metal.rgba16.png",
+    "actors/mario_cap/mario_cap_metal.rgba16.png",
+    "actors/star/star_surface.rgba16.png",
+    "actors/water_bubble/water_bubble.rgba16.png",
+    "actors/water_ring/water_ring.rgba16.png",
+    "levels/castle_inside/29.rgba16.png",
+    "levels/castle_inside/30.rgba16.png",
+    "levels/hmc/7.rgba16.png",
+    "levels/castle_inside/16.ia16.png",
+    "levels/cotmc/2.rgba16.png"
+])
+
 def read_asset_map():
     with open("assets.json") as f:
         ret = json.load(f)
@@ -19,6 +32,26 @@ def read_local_asset_list(f):
     for line in f:
         ret.append(line.strip())
     return ret
+
+def asset_needs_update(asset, version):
+    if version <= 7 and asset in envmap_table:
+        return True
+    if version <= 6 and asset in ["actors/king_bobomb/king_bob-omb_eyes.rgba16.png", "actors/king_bobomb/king_bob-omb_hand.rgba16.png"]:
+        return True
+    if version <= 5 and asset == "textures/spooky/bbh_textures.00800.rgba16.png":
+        return True
+    if version <= 4 and asset in ["textures/mountain/ttm_textures.01800.rgba16.png", "textures/mountain/ttm_textures.05800.rgba16.png"]:
+        return True
+    if version <= 3 and asset == "textures/cave/hmc_textures.01800.rgba16.png":
+        return True
+    if version <= 2 and asset == "textures/inside/inside_castle_textures.09000.rgba16.png":
+        return True
+    if version <= 1 and asset.endswith(".m64"):
+        return True
+    if version <= 0 and asset.endswith(".aiff"):
+        return True
+    return False
+
 
 def remove_file(fname):
     os.remove(fname)
@@ -44,7 +77,7 @@ def clean_assets(local_asset_file):
 def main():
     # In case we ever need to change formats of generated files, we keep a
     # revision ID in the local asset file.
-    new_version = 7
+    new_version = 8
 
     try:
         local_asset_file = open(".assets-local.txt")
@@ -117,7 +150,7 @@ def main():
     todo = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
-        if exists:
+        if exists and not (local_version == new_version or asset_needs_update(asset, local_version)):
             continue
 
         meta = data[:-2]
@@ -226,6 +259,9 @@ def main():
                             check=True,
                         )
                     else:
+                        rotate_envmap = "false"
+                        if asset in envmap_table:
+                            rotate_envmap = "true"
                         w, h = meta
                         fmt = asset.split(".")[-2]
                         subprocess.run(
@@ -241,6 +277,8 @@ def main():
                                 str(w),
                                 "-h",
                                 str(h),
+                                "-r",
+                                rotate_envmap,
                             ],
                             check=True,
                         )
