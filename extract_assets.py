@@ -4,55 +4,20 @@ import os
 import json
 import subprocess
 
-ROMS_DIR=os.path.expanduser("~/baseroms/")
+from tools.detect_baseroms import get_rom_candidates
 
-sha1_LUT = {
-    "eu": "4ac5721683d0e0b6bbb561b58a71740845dceea9",
-    "jp": "8a20a5c83d6ceb0f0506cfc9fa20d8f438cafe51",
-    "sh": "3f319ae697533a255a1003d09202379d78d5a2e0",
-    "us": "9bef1128717f958171a4afac3ed78ee2bb4e86ce",
-}
-
-sha1_swapLUT = {
-    "eu": "d80ee9eeb6454d53a96ceb6ed0aca3ffde045091",
-    "jp": "1d2579dd5fb1d8263a4bcc063a651a64acc88921",
-    "sh": "2a2b85e94581545ca3c05b8f864b488b141a8a1f",
-    "us": "1002dd7b56aa0a59a9103f1fb3d57d6b161f8da7",
-}
-
-def get_rom_candidates():
-    fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
-    if os.path.exists(ROMS_DIR):
-        fileArray += [os.path.join(ROMS_DIR, f) for f in os.listdir(ROMS_DIR) if os.path.isfile(os.path.join(ROMS_DIR, f))]
-
-    foundVersions = {}
-
-    for f in fileArray:
-        try:
-            p = subprocess.Popen(
-                ["sha1sum", f],
-                stdout=subprocess.PIPE
-            )
-            sha1sum = p.communicate()[0].decode('ascii').split()[0]
-            for k, v in sha1_LUT.items():
-                if v == sha1sum:
-                    foundVersions[k] = f
-
-            for k, v in sha1_swapLUT.items():
-                if v == sha1sum: # the ROM is swapped!
-                    subprocess.run(
-                        [
-                            "dd","conv=swab",
-                            "if=%s" % f,
-                            "of=/tmp/baserom.%s.swapped.z64" % k
-                        ],
-                        stderr=subprocess.PIPE,
-                    )
-                    foundVersions[k] = "/tmp/baserom.%s.swapped.z64" % k
-        except Exception as e:
-            continue
-    return foundVersions
-
+envmap_table = set([
+    "actors/mario/mario_metal.rgba16.png",
+    "actors/mario_cap/mario_cap_metal.rgba16.png",
+    "actors/star/star_surface.rgba16.png",
+    "actors/water_bubble/water_bubble.rgba16.png",
+    "actors/water_ring/water_ring.rgba16.png",
+    "levels/castle_inside/29.rgba16.png",
+    "levels/castle_inside/30.rgba16.png",
+    "levels/hmc/7.rgba16.png",
+    "levels/castle_inside/16.ia16.png",
+    "levels/cotmc/2.rgba16.png"
+])
 
 def read_asset_map():
     with open("assets.json") as f:
@@ -67,6 +32,26 @@ def read_local_asset_list(f):
     for line in f:
         ret.append(line.strip())
     return ret
+
+def asset_needs_update(asset, version):
+    if version <= 7 and asset in envmap_table:
+        return True
+    if version <= 6 and asset in ["actors/king_bobomb/king_bob-omb_eyes.rgba16.png", "actors/king_bobomb/king_bob-omb_hand.rgba16.png"]:
+        return True
+    if version <= 5 and asset == "textures/spooky/bbh_textures.00800.rgba16.png":
+        return True
+    if version <= 4 and asset in ["textures/mountain/ttm_textures.01800.rgba16.png", "textures/mountain/ttm_textures.05800.rgba16.png"]:
+        return True
+    if version <= 3 and asset == "textures/cave/hmc_textures.01800.rgba16.png":
+        return True
+    if version <= 2 and asset == "textures/inside/inside_castle_textures.09000.rgba16.png":
+        return True
+    if version <= 1 and asset.endswith(".m64"):
+        return True
+    if version <= 0 and asset.endswith(".aiff"):
+        return True
+    return False
+
 
 def remove_file(fname):
     os.remove(fname)
@@ -92,7 +77,7 @@ def clean_assets(local_asset_file):
 def main():
     # In case we ever need to change formats of generated files, we keep a
     # revision ID in the local asset file.
-    new_version = 7
+    new_version = 8
 
     try:
         local_asset_file = open(".assets-local.txt")
@@ -165,7 +150,7 @@ def main():
     todo = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
-        if exists:
+        if exists and not (local_version == new_version or asset_needs_update(asset, local_version)):
             continue
 
         meta = data[:-2]
@@ -274,6 +259,9 @@ def main():
                             check=True,
                         )
                     else:
+                        rotate_envmap = "false"
+                        if asset in envmap_table:
+                            rotate_envmap = "true"
                         w, h = meta
                         fmt = asset.split(".")[-2]
                         subprocess.run(
@@ -289,6 +277,8 @@ def main():
                                 str(w),
                                 "-h",
                                 str(h),
+                                "-r",
+                                rotate_envmap,
                             ],
                             check=True,
                         )

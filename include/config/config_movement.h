@@ -74,11 +74,6 @@
 // #define PREVENT_CAP_LOSS
 
 /**
- * Enables Platform Displacement 2, also known as momentum patch. Makes Mario keep the momemtum from moving platforms.
- */
-#define PLATFORM_DISPLACEMENT_2
-
-/**
  * Uses Shindou's pole behavior.
  */
 // #define SHINDOU_POLES
@@ -136,3 +131,14 @@
  */
 // #define BUGFIX_DIALOG_TIME_STOP
 
+/**
+ * Enables Platform Displacement 2, an upgrade to the physics involving moving platforms and how Mario interacts with them.
+ */
+#define PLATFORM_DISPLACEMENT_2
+
+/**
+ * Inertia defines; allow Mario to preserve his momemtum when leaving moving platforms.
+ * These require Platform Displacement 2 to be enabled.
+ */
+#define MARIO_INERTIA_UPWARD
+// #define MARIO_INERTIA_LATERAL

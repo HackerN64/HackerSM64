@@ -8,6 +8,7 @@
 #include <ultra64.h>
 #include <string.h>
 #include "emutest_vc.h"
+#include "float.h"
 #include "types.h"
 
 extern OSMesgQueue gSIEventMesgQueue;
@@ -21,6 +22,7 @@ extern void __osPiRelAccess(void);
 enum Emulator gEmulator = EMU_CONSOLE;
 
 u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
+u32 emux_detect(void); // defined in asm/emux.s
 
 static inline u32 check_count_factor() {
     const u32 saved = __osDisableInt();
@@ -85,23 +87,27 @@ static u8 check_cache_emulation() {
 
 void detect_emulator() {
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
-        gEmulator = EMU_CONSOLE;
+        gEmulator = emux_detect() ? EMU_ARES : EMU_CONSOLE;
         return;
     }
     
     /*
-     * This check forces RTZ bug on vc
-     * If console is N64/adequate Emu round-to-nearest (RTN) rounding mode is used
-     * If console is VC round-to-zero (RTZ) mode is used
+     * This check forces RZ bug on vc
+     * If console is N64/adequate Emu, the current rounding mode, which is initialized to round-to-nearest (RN), is used
+     * If console is VC round-to-zero (RZ) mode is always used
      *
      * The double value 0.9999999999999999 used is 0x3FEFFFFFFFFFFFFF in binary
      * Exponent=01111111110, Mantissa=1111111111111111111111111111111111111111111111111111
-     * RTZ will output not 1.0f, RTN will output exactly 1.0f
+     * RZ will output not 1.0f, RN will output exactly 1.0f
     */
+    const FloatRoundingMode roundingMode = fcr_get_rounding_mode();
+    fcr_set_rounding_mode(FRC_RM_ROUND_TO_NEAREST);
     if (1.0f != round_double_to_float(0.9999999999999999)) {
         gEmulator = EMU_WIIVC;
+        fcr_set_rounding_mode(roundingMode);
         return;
     }
+    fcr_set_rounding_mode(roundingMode);
 
     // Perform a read from unmapped PIF ram.
     // On console and well behaved emulators, this echos back the lower half of

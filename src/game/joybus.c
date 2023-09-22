@@ -126,7 +126,7 @@ static void __osPackReadEx(u8 cmd) {
 
         // Make sure this port has a controller plugged in, and if not status repolling, only poll assigned ports.
         if ((type != CONT_NONE) && (gContStatusPolling || (pad->playerNum != 0))) {
-            _Bool isGCN = (type & CONT_CONSOLE_GCN);
+            _Bool isGCN = ((type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN);
 
             switch (cmd) {
                 case CONT_CMD_READ_BUTTON: // Instead of running these commands separately, run one or the other depending on the connected controller type for each port.
@@ -451,7 +451,7 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 motorState) {
     }
 
     // Check whether the controller is a GCN controller.
-    if (gControllerStatuses[channel].type & CONT_CONSOLE_GCN) {
+    if ((gControllerStatuses[channel].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) {
         // GCN rumble is set in the input poll command, using motorState in gRumbleInfos.
 
         // Change the last command ID so that input poll command (which includes the rumble byte) gets written again next frame.
@@ -559,7 +559,7 @@ s32 osMotorInitEx(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     pfs->activebank = ACCESSORY_ID_NULL;
 
     // Make sure the controller is not a GCN controller.
-    if (!(gControllerStatuses[channel].type & CONT_CONSOLE_GCN)) {
+    if ((gControllerStatuses[channel].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_N64) {
         // Write probe value (ensure Transfer Pak is turned off).
         err = __osPfsSelectBank(pfs, ACCESSORY_ID_TRANSFER_OFF);
         if (err == PFS_ERR_NEW_PACK) {

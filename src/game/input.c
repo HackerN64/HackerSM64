@@ -63,7 +63,7 @@ struct Controller* const gDemoController = &gDemoControllers[0];
  * @param[in,out] controller The controller to operate on.
  */
 static void adjust_analog_stick(struct Controller* controller) {
-    const s16 deadzone = ((controller->statusData->type & CONT_CONSOLE_GCN) ? ANALOG_DEADZONE_GCN : ANALOG_DEADZONE_N64);
+    const s16 deadzone = (((controller->statusData->type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) ? ANALOG_DEADZONE_GCN : ANALOG_DEADZONE_N64);
     const s16 offset = (deadzone - 2);
     const f32 max_stick_mag = 64.0f;
 
@@ -473,7 +473,7 @@ void check_repoll_gcn_origins(OSMesg* mesg) {
         // If any plugged in GCN controller with readable input needs its origins updated, run the GCN read origins command.
         //! TODO: This is the same check as done later when writing the packed command in __osPackReadEx, but also done here because origins.initialized is 0 for non-GCN controllers and empty ports. Otherwise the read origins command would be run every frame if there are any ports without a GCN controller. Is it possible to combine these checks?
         if (
-            (gControllerStatuses[port].type & CONT_CONSOLE_GCN) &&
+            ((gControllerStatuses[port].type & CONT_CONSOLE_MASK) == CONT_CONSOLE_GCN) &&
             (gContStatusPolling || (gControllerPads[port].playerNum != 0)) &&
             !gControllerPads[port].origins.initialized
         ) {

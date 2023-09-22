@@ -1999,7 +1999,9 @@ static const Gfx ccm_seg7_dl_0701C5C8[] = {
 // 0x0701CC40 - 0x0701CE30
 static const Gfx ccm_seg7_dl_0701CC40[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snow_09001000),
+#ifdef USE_FRUSTRATIO2
     gsSPClipRatio(FRUSTRATIO_1),
+#endif
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPVertex(ccm_seg7_vertex_0701AB50, 16, 0),
@@ -2036,7 +2038,9 @@ static const Gfx ccm_seg7_dl_0701CC40[] = {
     gsSPVertex(ccm_seg7_vertex_0701B040, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  7,  8,  9, 0x0),
+#ifdef USE_FRUSTRATIO2
     gsSPClipRatio(FRUSTRATIO_2),
+#endif
     gsSPEndDisplayList(),
 };
 

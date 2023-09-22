@@ -301,13 +301,17 @@ void handle_dp_complete(void) {
     sCurrentDisplaySPTask = NULL;
 }
 
-OSTimer RCPHangTimer;
+OSTimerEx RCPHangTimer;
 void start_rcp_hang_timer(void) {
-    osSetTimer(&RCPHangTimer, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
+    if (RCPHangTimer.started == FALSE) {
+        osSetTimer(&RCPHangTimer.timer, OS_USEC_TO_CYCLES(3000000), (OSTime) 0, &gIntrMesgQueue, (OSMesg) MESG_RCP_HUNG);
+        RCPHangTimer.started = TRUE;
+    }
 }
 
 void stop_rcp_hang_timer(void) {
-    osStopTimer(&RCPHangTimer);
+    osStopTimer(&RCPHangTimer.timer);
+    RCPHangTimer.started = FALSE;
 }
 
 void alert_rcp_hung_up(void) {
