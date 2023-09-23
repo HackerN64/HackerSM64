@@ -30,6 +30,9 @@
 // Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad.
 #define PARALLEL_LAKITU_CAM
 
+// Set the way that the camera/lakitu ui in the bottom right is shown, 0 == default big, 1 == minimal, 2 == none.
+#define CAMERA_HUD_TYPE = 1
+
 // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM
 

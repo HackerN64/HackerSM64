@@ -484,18 +484,51 @@ void set_hud_camera_status(s16 status) {
     sCameraHUD.status = status;
 }
 
+void render_hud_camera_minimal_status(void) {
+    if (sCameraHUD.status == CAM_STATUS_NONE) {
+        return;
+    }
+
+    Texture *(*cameraLUT)[6] = segmented_to_virtual(&main_hud_camera_lut);
+    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_CAMERA_X) + 16;
+    s32 y = 205;
+
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
+    render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_CAMERA]);
+
+    switch (sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
+        case CAM_STATUS_MARIO:
+            render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
+            break;
+        case CAM_STATUS_FIXED:
+            render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_FIXED]);
+            break;
+    }
+
+    switch (sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
+        case CAM_STATUS_C_DOWN:
+            render_hud_small_tex_lut(x + 4, y + 16, (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
+            break;
+        case CAM_STATUS_C_UP:
+            render_hud_small_tex_lut(x + 4, y - 8, (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
+            break;
+    }
+
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
+}
+
 /**
  * Renders camera HUD glyphs using a table list, depending of
  * the camera status called, a defined glyph is rendered.
  */
 void render_hud_camera_status(void) {
-    Texture *(*cameraLUT)[6] = segmented_to_virtual(&main_hud_camera_lut);
-    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_CAMERA_X);
-    s32 y = 205;
-
     if (sCameraHUD.status == CAM_STATUS_NONE) {
         return;
     }
+
+    Texture *(*cameraLUT)[6] = segmented_to_virtual(&main_hud_camera_lut);
+    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_CAMERA_X);
+    s32 y = 205;
 
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
     render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_CAMERA]);
@@ -589,8 +622,14 @@ void render_hud(void) {
 #ifdef PUPPYCAM
             if (!gPuppyCam.enabled) {
 #endif
-            render_hud_camera_status();
+#if CAMERA_HUD_TYPE == 0
+                render_hud_camera_status();
+#endif
+#if CAMERA_HUD_TYPE == 1
+                render_hud_camera_minimal_status();
+#endif
 #ifdef PUPPYCAM
+            
             }
 #endif
         }
