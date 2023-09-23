@@ -13,6 +13,12 @@
 #include "segment2.h"
 #include "sm64.h"
 
+#ifdef SHARP_TRANSITION_TEXTURES
+#define TRANSITION_TEXTURE_TYPE G_IM_FMT_I
+#else
+#define TRANSITION_TEXTURE_TYPE G_IM_FMT_IA
+#endif
+
 u8 sTransitionFadeTimer = 0;
 u16 sTransitionTextureAngle = 0;
 
@@ -22,12 +28,6 @@ void *sTextureTransitionID[] = {
     texture_transition_mario,
     texture_transition_bowser_half,
 };
-
-#ifdef SHARP_TRANSITION_TEXTURES
-#define TRANSITION_TEXTURE_TYPE G_IM_FMT_I
-#else
-#define TRANSITION_TEXTURE_TYPE G_IM_FMT_IA
-#endif
 
 
 s32 set_and_reset_transition_fade_timer(u8 transTime) {
