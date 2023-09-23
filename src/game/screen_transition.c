@@ -299,10 +299,10 @@ s32 render_screen_transition(s8 transType, u8 transTime, struct WarpTransitionDa
 Gfx *render_cannon_circle_base(void) {
 #ifdef WIDESCREEN
     Vtx *verts = alloc_display_list(8 * sizeof(Vtx));
-    Gfx *dlist = alloc_display_list(20 * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(21 * sizeof(Gfx));
 #else
     Vtx *verts = alloc_display_list(4 * sizeof(Vtx));
-    Gfx *dlist = alloc_display_list(16 * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(17 * sizeof(Gfx));
 #endif
     Gfx *g = dlist;
 
@@ -324,6 +324,11 @@ Gfx *render_cannon_circle_base(void) {
 
         gSPDisplayList(g++, dl_proj_mtx_fullscreen);
         gDPSetCombineMode(g++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
+#ifdef SHARP_TRANSITION_TEXTURES
+        gDPSetRenderMode(g++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
+#else
+        gDPSetRenderMode(g++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+#endif
         gDPSetTextureFilter(g++, G_TF_BILERP);
         gDPLoadTextureBlock(g++, sTextureTransitionID[TEX_TRANS_CIRCLE], TRANSITION_TEXTURE_TYPE, G_IM_SIZ_8b, 32, 64, 0,
             G_TX_WRAP | G_TX_MIRROR, G_TX_WRAP | G_TX_MIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD);
