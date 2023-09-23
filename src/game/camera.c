@@ -4776,6 +4776,9 @@ void start_cutscene(struct Camera *c, u8 cutscene) {
  * @return the victory cutscene to use
  */
 s32 determine_dance_cutscene(UNUSED struct Camera *c) {
+#ifdef NON_STOP_STARS
+    return CUTSCENE_DANCE_DEFAULT;
+#else
     u8 cutscene = CUTSCENE_NONE;
     u8 cutsceneIndex = 0;
     u8 starIndex = (gLastCompletedStarNum - 1) / 2;
@@ -4798,6 +4801,7 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
     }
     cutscene = sDanceCutsceneTable[cutsceneIndex];
     return cutscene;
+#endif
 }
 
 /**
@@ -4914,21 +4918,12 @@ u8 get_cutscene_from_mario_status(struct Camera *c) {
             case ACT_ELECTROCUTION:
                 cutscene = CUTSCENE_STANDING_DEATH;
                 break;
-#ifdef NON_STOP_STARS
-            case ACT_STAR_DANCE_EXIT:
-                cutscene = CUTSCENE_DANCE_DEFAULT;
-                break;
-            case ACT_STAR_DANCE_WATER:
-                cutscene = CUTSCENE_DANCE_DEFAULT;
-                break;
-#else
             case ACT_STAR_DANCE_EXIT:
                 cutscene = determine_dance_cutscene(c);
                 break;
             case ACT_STAR_DANCE_WATER:
                 cutscene = determine_dance_cutscene(c);
                 break;
-#endif
             case ACT_STAR_DANCE_NO_EXIT:
                 cutscene = CUTSCENE_DANCE_DEFAULT;
                 break;
