@@ -158,6 +158,7 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gDPSetCombineLERP(gDisplayListHead++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0, 
                                               0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0);
 
+        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
         gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
 
         switch (transTexType) {
@@ -287,10 +288,10 @@ s32 render_screen_transition(s8 transType, u8 transTime, struct WarpTransitionDa
 Gfx *render_cannon_circle_base(void) {
 #ifdef WIDESCREEN
     Vtx *verts = alloc_display_list(8 * sizeof(Vtx));
-    Gfx *dlist = alloc_display_list(21 * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(20 * sizeof(Gfx));
 #else
     Vtx *verts = alloc_display_list(4 * sizeof(Vtx));
-    Gfx *dlist = alloc_display_list(17 * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(16 * sizeof(Gfx));
 #endif
     Gfx *g = dlist;
 
