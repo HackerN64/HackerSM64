@@ -2673,25 +2673,6 @@ UNUSED ALIGNED8 static const Texture texture_radial_light[] = {
 #include "textures/segment2/light_quarter_circle.ia16.inc.c"
 };
 
-#ifdef SHARP_TRANSITION_TEXTURES
-const Texture texture_transition_star_half[] = {
-#include "textures/segment2/transition_star_half.i8.inc.c"
-};
-
-const Texture texture_transition_circle_half[] = {
-#include "textures/segment2/transition_circle_half.i8.inc.c"
-};
-
-const Texture texture_transition_mario[] = {
-#include "textures/segment2/transition_mario.i8.inc.c"
-};
-
-const Texture texture_transition_bowser_half[] = {
-#include "textures/segment2/transition_bowser_half.i8.inc.c"
-};
-
-#else
-
 const Texture texture_transition_star_half[] = {
 #include "textures/segment2/segment2.0F458.ia8.inc.c"
 };
@@ -2707,7 +2688,6 @@ const Texture texture_transition_mario[] = {
 const Texture texture_transition_bowser_half[] = {
 #include "textures/segment2/segment2.11458.ia8.inc.c"
 };
-#endif
 
 const Texture texture_waterbox_water[] = {
 #include "textures/segment2/segment2.11C58.rgba16.inc.c"

@@ -13,12 +13,6 @@
 #include "segment2.h"
 #include "sm64.h"
 
-#ifdef SHARP_TRANSITION_TEXTURES
-#define TRANSITION_TEXTURE_TYPE G_IM_FMT_I
-#else
-#define TRANSITION_TEXTURE_TYPE G_IM_FMT_IA
-#endif
-
 u8 sTransitionFadeTimer = 0;
 u16 sTransitionTextureAngle = 0;
 
@@ -164,21 +158,15 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gDPSetCombineLERP(gDisplayListHead++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0, 
                                               0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0);
 
-#ifdef SHARP_TRANSITION_TEXTURES
-        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
-#else
-        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-#endif
-
         gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
 
         switch (transTexType) {
             case TRANS_TYPE_MIRROR:
-                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], TRANSITION_TEXTURE_TYPE, G_IM_SIZ_8b, 32, 64, 0,
+                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 32, 64, 0,
                     G_TX_WRAP | G_TX_MIRROR, G_TX_WRAP | G_TX_MIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD);
                 break;
             case TRANS_TYPE_CLAMP:
-                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], TRANSITION_TEXTURE_TYPE, G_IM_SIZ_8b, 64, 64, 0,
+                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0,
                     G_TX_CLAMP, G_TX_CLAMP, 6, 6, G_TX_NOLOD, G_TX_NOLOD);
                 break;
         }
@@ -324,13 +312,8 @@ Gfx *render_cannon_circle_base(void) {
 
         gSPDisplayList(g++, dl_proj_mtx_fullscreen);
         gDPSetCombineMode(g++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
-#ifdef SHARP_TRANSITION_TEXTURES
-        gDPSetRenderMode(g++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
-#else
-        gDPSetRenderMode(g++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-#endif
         gDPSetTextureFilter(g++, G_TF_BILERP);
-        gDPLoadTextureBlock(g++, sTextureTransitionID[TEX_TRANS_CIRCLE], TRANSITION_TEXTURE_TYPE, G_IM_SIZ_8b, 32, 64, 0,
+        gDPLoadTextureBlock(g++, sTextureTransitionID[TEX_TRANS_CIRCLE], G_IM_FMT_IA, G_IM_SIZ_8b, 32, 64, 0,
             G_TX_WRAP | G_TX_MIRROR, G_TX_WRAP | G_TX_MIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD);
         gSPTexture(g++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
         gSPVertex(g++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
