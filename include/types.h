@@ -479,6 +479,9 @@ struct MarioState {
 #ifdef PREVENT_DEATH_LOOP
              u8  isDead : 1;
 #endif
+#if JUMP_INPUT_BUFFER > 0
+             u8  isJumpBuffered : 1;
+#endif
            Vec3f lastSafePos;
            Vec3f prevPos;
              f32 lateralSpeed;
