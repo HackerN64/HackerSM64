@@ -958,6 +958,10 @@ u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
     m->actionState = 0;
     m->actionTimer = 0;
 
+    if (m->flags & MARIO_JUMPING) {
+        m->isJumpBuffered = FALSE;
+    }
+
     return TRUE;
 }
 
@@ -1210,8 +1214,6 @@ void debug_print_speed_action_normal(struct MarioState *m) {
  * Update the button inputs for Mario.
  */
 void update_mario_button_inputs(struct MarioState *m) {
-    if (m->controller->buttonPressed & A_BUTTON) m->input |= INPUT_A_PRESSED;
-    if (m->controller->buttonDown    & A_BUTTON) m->input |= INPUT_A_DOWN;
 
     // Don't update for these buttons if squished.
     if (m->squishTimer == 0) {
@@ -1221,10 +1223,15 @@ void update_mario_button_inputs(struct MarioState *m) {
         if (m->controller->buttonPressed & Z_TRIG  ) m->input |= INPUT_Z_PRESSED;
     }
 
-    if (m->input & INPUT_A_PRESSED) {
+    if (m->controller->buttonDown    & A_BUTTON) m->input |= INPUT_A_DOWN;
+    if (m->controller->buttonPressed & A_BUTTON) {
+        m->input |= INPUT_A_PRESSED;
+        m->isJumpBuffered = TRUE;
         m->framesSinceA = 0;
     } else if (m->framesSinceA < 0xFF) {
         m->framesSinceA++;
+        if (m->framesSinceA <= JUMP_INPUT_BUFFER)
+            m->input |= INPUT_A_PRESSED;
     }
 
     if (m->input & INPUT_B_PRESSED) {
