@@ -104,9 +104,6 @@ typedef Collision TerrainData;
 typedef Collision Vec3t[3];
 typedef Collision SurfaceType;
 
-typedef f32       Normal;
-typedef Normal    Vec3n[3];
-
 // -- Colors/Textures --
 
 // 0.0f to 1.0f
