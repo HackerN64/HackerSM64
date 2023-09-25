@@ -111,12 +111,6 @@
 // #define STAR_DANCE_USES_STARS_MODEL
 
 /**
- * Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
- * NOTE: Still breaks occasionally, and PUPPYLIGHT_NODE might not work in areas that aren't area 1.
- */
-// #define PUPPYLIGHTS
-
-/**
  * Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
  */
 // #define DISABLE_SHADOWS
@@ -150,11 +144,6 @@
  * Eases the textured screen transitions to make them look smoother.
  */
 #define EASE_IN_OUT_TRANSITIONS
-
-/**
- * Makes use of the tex edge render mode to deliver smooth transition textures
- */
-// #define SHARP_TRANSITION_TEXTURES
 
 /**
  * Uses frustratio of 2 instead of 1.
