@@ -23,6 +23,7 @@ void *sTextureTransitionID[] = {
     texture_transition_bowser_half,
 };
 
+
 s32 set_and_reset_transition_fade_timer(u8 transTime) {
     sTransitionFadeTimer++;
 
@@ -157,23 +158,16 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gDPSetCombineLERP(gDisplayListHead++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0, 
                                               0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0);
 
-#ifdef SHARP_TRANSITION_TEXTURES
-        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
-        s32 textureType = G_IM_FMT_I;
-#else
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-        s32 textureType = G_IM_FMT_IA;
-#endif
-
         gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
 
         switch (transTexType) {
             case TRANS_TYPE_MIRROR:
-                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], textureType, G_IM_SIZ_8b, 32, 64, 0,
+                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 32, 64, 0,
                     G_TX_WRAP | G_TX_MIRROR, G_TX_WRAP | G_TX_MIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD);
                 break;
             case TRANS_TYPE_CLAMP:
-                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], textureType, G_IM_SIZ_8b, 64, 64, 0,
+                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0,
                     G_TX_CLAMP, G_TX_CLAMP, 6, 6, G_TX_NOLOD, G_TX_NOLOD);
                 break;
         }
