@@ -101,7 +101,7 @@ void detect_emulator() {
      * RZ will output not 1.0f, RN will output exactly 1.0f
     */
     const FloatRoundingMode roundingMode = fcr_get_rounding_mode();
-    fcr_set_rounding_mode(FRC_RM_ROUND_TO_NEAREST);
+    fcr_set_rounding_mode(FCR_RM_ROUND_TO_NEAREST);
     if (1.0f != round_double_to_float(0.9999999999999999)) {
         gEmulator = EMU_WIIVC;
         fcr_set_rounding_mode(roundingMode);
