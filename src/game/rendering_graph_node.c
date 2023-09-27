@@ -47,7 +47,7 @@
  *
  */
 
-s16 gMatStackIndex;
+s16 gMatStackIndex = 0;
 ALIGNED16 Mat4 gMatStack[32];
 ALIGNED16 Mtx *gMatStackFixed[32];
 f32 sAspectRatio;
@@ -722,7 +722,6 @@ void geo_process_camera(struct GraphNodeCamera *node) {
         geo_process_node_and_siblings(node->fnNode.node.children);
         gCurGraphNodeCamera = NULL;
     }
-    gMatStackIndex--;
 }
 
 /**
