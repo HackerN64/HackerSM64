@@ -31,9 +31,6 @@ const enum ControlTypes cs_cont_list_default[] = {
 };
 
 
-_Bool gCSSwitchedPage = FALSE;
-_Bool gCSDrawControls = FALSE;
-
 CrashScreenDirections gCSDirectionFlags;
 
 static OSTime sCSInputTimeY = 0;
@@ -178,14 +175,17 @@ _Bool cs_check_switch_page_input(void) {
     }
 
     // Reset certain values when the page is changed.
-    gCSDrawControls = FALSE;
-    gCSSwitchedPage = TRUE;
+    gCSSwitchedPage  = TRUE;
+    gCSPopupID       = CS_POPUP_NONE;
+    gCSSwitchedPopup = TRUE;
 
     return TRUE;
 }
 
 // Global crash screen input function.
 void cs_update_input(void) {
+    CSPage* page = gCSPages[gCSPageID];
+
     handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
 
     bzero(&gCSCompositeControllers, sizeof(gCSCompositeControllers));
@@ -207,22 +207,27 @@ void cs_update_input(void) {
         gCSCompositeController->buttonReleased |= controller->buttonReleased;
     }
 
-    if (gCSCompositeController->buttonPressed & START_BUTTON) {
-        gCSDrawControls ^= TRUE;
-    }
-
     cs_update_direction_input();
 
-    if (gCSDrawControls) {
+    if ((gCSPopupID == CS_POPUP_NONE) && !gCSSwitchedPopup) {
+        if (gCSCompositeController->buttonPressed & START_BUTTON) {
+            cs_open_popup(CS_POPUP_CONTROLS);
+        }
+    }
+    // Popup is open
+    if (gCSPopupID != CS_POPUP_NONE) {
+        if (gCSSwitchedPopup) {
+            gCSSwitchedPopup = FALSE;
+            if (gCSPopups[gCSPopupID]->initFunc != NULL) {
+                gCSPopups[gCSPopupID]->initFunc();
+            }
+        } else {
+            if (gCSPopups[gCSPopupID]->inputFunc != NULL) {
+                gCSPopups[gCSPopupID]->inputFunc();
+            }
+        }
         return;
     }
-
-    if (gAddressSelectMenuOpen) {
-        cs_address_select_input();
-        return;
-    }
-
-    CSPage* page = gCSPages[gCSPageID];
 
     if (cs_check_switch_page_input()) {
         page = gCSPages[gCSPageID]; // gCSPageID may have changed in cs_check_switch_page_input.
@@ -238,12 +243,13 @@ void cs_update_input(void) {
         page->inputFunc();
     }
 
-    gCSSwitchedPage = FALSE;
+    gCSSwitchedPage  = FALSE;
+    gCSSwitchedPopup = FALSE;
 }
 
 // Controls popup box draw function.
 //! TODO: Allow changing page-specific settings from here.
-void cs_controls_box_draw(void) {
+void cs_popup_controls_draw(void) {
     cs_draw_dark_rect(
         (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2)),
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
@@ -272,3 +278,19 @@ void cs_controls_box_draw(void) {
 
     osWritebackDCacheAll();
 }
+
+void cs_popup_controls_input(void) { //! TODO: Scrolling if list is too long.
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
+
+    if (buttonPressed & (A_BUTTON | B_BUTTON | START_BUTTON)) {
+        // Close the popup without jumping.
+        cs_open_popup(CS_POPUP_NONE);
+    }
+}
+
+struct CSPopup gCSPopup_controls = {
+    .name      = "CONTROLS",
+    .initFunc  = NULL,
+    .drawFunc  = cs_popup_controls_draw,
+    .inputFunc = cs_popup_controls_input,
+};

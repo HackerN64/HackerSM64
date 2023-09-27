@@ -53,6 +53,26 @@ typedef struct CSPage {
 
 extern struct CSPage* gCSPages[NUM_PAGES];
 extern enum CSPages gCSPageID;
+extern _Bool gCSSwitchedPage;
 
+
+enum CSPopups {
+    CS_POPUP_NONE,
+    CS_POPUP_CONTROLS,
+    CS_POPUP_ADDRESS_SELECT,
+    NUM_CS_POPUPS,
+};
+
+typedef struct CSPopup {
+    /*0x00*/ const char* name;
+    /*0x04*/ void (*initFunc)(void);
+    /*0x08*/ void (*drawFunc)(void);
+    /*0x0C*/ void (*inputFunc)(void);
+} CSPopup; /*0x10*/
+
+extern struct CSPopup* gCSPopups[NUM_CS_POPUPS];
+extern enum CSPopups gCSPopupID;
+extern _Bool gCSSwitchedPopup;
 
 void cs_set_page(enum CSPages page);
+void cs_open_popup(enum CSPopups popupID);

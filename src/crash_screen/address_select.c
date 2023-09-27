@@ -16,13 +16,12 @@
 #include "pages/page_disasm.h"
 
 
-_Bool gAddressSelectMenuOpen = FALSE;
 static Address sAddressSelectTarget = 0x00000000;
 static s8 sAddressSelectCharIndex = 7;
 
 
 // Address select draw function.
-void address_select_draw(void) {
+void cs_address_select_draw(void) {
     cs_draw_dark_rect(
         (JUMP_MENU_X1 -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y1 -  JUMP_MENU_MARGIN_Y     ),
         (JUMP_MENU_W  + (JUMP_MENU_MARGIN_X * 2)), (JUMP_MENU_H  + (JUMP_MENU_MARGIN_Y * 2)),
@@ -81,10 +80,8 @@ extern u32 sMapViewerSelectedIndex;
 // Address select input functiom.
 void cs_address_select_input(void) {
     s8 change = 0;
-
     if (gCSDirectionFlags.pressed.left ) change = -1;
     if (gCSDirectionFlags.pressed.right) change = +1;
-
     sAddressSelectCharIndex = ((sAddressSelectCharIndex + change) % SIZEOF_HEX(Address));
 
     const u32 shift = ((SIZEOF_BITS(Address) - BITS_PER_HEX) - (sAddressSelectCharIndex * BITS_PER_HEX));
@@ -110,7 +107,7 @@ void cs_address_select_input(void) {
 
     if (buttonPressed & A_BUTTON) {
         // Jump to the address and close the popup.
-        gAddressSelectMenuOpen = FALSE;
+        cs_open_popup(CS_POPUP_NONE);
 
         switch (gCSPageID) {
             case PAGE_STACK_TRACE:
@@ -145,12 +142,19 @@ void cs_address_select_input(void) {
 
     if (buttonPressed & B_BUTTON) {
         // Close the popup without jumping.
-        gAddressSelectMenuOpen = FALSE;
+        cs_open_popup(CS_POPUP_NONE);
     }
 }
 
 // Open the address select (jump to address) popup box.
 void open_address_select(Address dest) {
-    gAddressSelectMenuOpen = TRUE;
+    cs_open_popup(CS_POPUP_ADDRESS_SELECT);
     sAddressSelectTarget = dest;
 }
+
+struct CSPopup gCSPopup_address_select = {
+    .name      = "ADDRESS SELECT",
+    .initFunc  = NULL,
+    .drawFunc  = cs_address_select_draw,
+    .inputFunc = cs_address_select_input,
+};

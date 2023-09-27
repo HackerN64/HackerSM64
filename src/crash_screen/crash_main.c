@@ -46,11 +46,10 @@ static void cs_reinitialize(void) {
         gCSPages[gCSPageID]->flags.crashed = TRUE;
     }
 
-    gCSPageID = CRASH_SCREEN_START_PAGE;
-
-    gCSSwitchedPage        = FALSE;
-    gCSDrawControls        = FALSE;
-    gAddressSelectMenuOpen = FALSE;
+    gCSPageID        = CRASH_SCREEN_START_PAGE;
+    gCSSwitchedPage  = FALSE;
+    gCSPopupID       = CS_POPUP_NONE;
+    gCSSwitchedPopup = FALSE;
 
     cs_settings_apply_func_to_all(cs_setting_func_reset);
     cs_settings_set_all_headers(FALSE);

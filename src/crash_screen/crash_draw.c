@@ -381,12 +381,8 @@ void cs_draw_main(void) {
             page->drawFunc();
         }
 
-        if (gAddressSelectMenuOpen) {
-            address_select_draw();
-        }
-
-        if (gCSDrawControls) {
-            cs_controls_box_draw();
+        if (gCSPopups[gCSPopupID]->drawFunc != NULL) {
+            gCSPopups[gCSPopupID]->drawFunc();
         }
     }
 

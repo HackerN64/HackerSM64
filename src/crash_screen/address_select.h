@@ -26,9 +26,7 @@
 #define SET_HEX_DIGIT(dst, src, shift)  (((dst) & ~(BITMASK(BITS_PER_HEX) << (shift))) | ((src) << (shift)))
 
 
-extern _Bool gAddressSelectMenuOpen;
+extern struct CSPopup gCSPopup_address_select;
 
 
-void address_select_draw(void);
-void cs_address_select_input(void);
 void open_address_select(Address dest);

@@ -72,13 +72,13 @@ typedef struct ControlType {
 
 extern struct CSSetting cs_settings_group_controls[];
 extern const enum ControlTypes cs_cont_list_default[];
-extern _Bool gCSSwitchedPage;
-extern _Bool gCSDrawControls;
+
 extern CrashScreenDirections gCSDirectionFlags;
 extern CSController* const gCSCompositeController;
 extern const ControlType gCSControlDescriptions[];
 
+extern struct CSPopup gCSPopup_controls;
+
 
 u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
 void cs_update_input(void);
-void cs_controls_box_draw(void);
