@@ -765,11 +765,11 @@ void disable_warp_checkpoint(void) {
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
     if (warpNode->destLevel & WARP_CHECKPOINT) {
         // Overwrite the warp checkpoint variables.
-        gWarpCheckpoint.actNum = gCurrActNum;
+        gWarpCheckpoint.actNum    = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
-        gWarpCheckpoint.levelID = (warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK);
-        gWarpCheckpoint.areaNum = warpNode->destArea;
-        gWarpCheckpoint.warpNode = warpNode->destNode;
+        gWarpCheckpoint.levelID   = (warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK);
+        gWarpCheckpoint.areaNum   = warpNode->destArea;
+        gWarpCheckpoint.warpNode  = warpNode->destNode;
     }
 }
 
@@ -783,11 +783,14 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK) - 1];
 
     // gSavedCourseNum is only used in this function.
-    if (gWarpCheckpoint.courseNum != COURSE_NONE && gSavedCourseNum == currCourseNum
-        && gWarpCheckpoint.actNum == gCurrActNum) {
-        warpNode->destLevel = gWarpCheckpoint.levelID;
-        warpNode->destArea = gWarpCheckpoint.areaNum;
-        warpNode->destNode = gWarpCheckpoint.warpNode;
+    if (
+        (gWarpCheckpoint.courseNum != COURSE_NONE) &&
+        (gSavedCourseNum == currCourseNum) &&
+        (gWarpCheckpoint.actNum == gCurrActNum)
+    ) {
+        warpNode->destLevel  = gWarpCheckpoint.levelID;
+        warpNode->destArea   = gWarpCheckpoint.areaNum;
+        warpNode->destNode   = gWarpCheckpoint.warpNode;
         warpCheckpointActive = TRUE;
     } else {
         // Disable the warp checkpoint just in case the other 2 conditions failed?

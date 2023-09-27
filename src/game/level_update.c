@@ -680,7 +680,7 @@ void initiate_painting_warp(void) {
             } else {
                 struct WarpNode* node = &warpNode->node;
 
-                if (!(node->destLevel & WARP_NO_CHECKPOINT)) {
+                if (!(node->destLevel & WARP_CHECKPOINT)) {
                     sWarpCheckpointActive = check_warp_checkpoint(node);
                 }
 
@@ -762,8 +762,8 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_WARP_FLOOR:
-                if ((m->floor) && (m->floor->force & 0xFF)) {
-                    sSourceWarpNodeId = m->floor->force & 0xFF;
+                if (m->floor && (m->floor->force & 0xFF)) {
+                    sSourceWarpNodeId = (m->floor->force & 0xFF);
                 } else {
                     sSourceWarpNodeId = WARP_NODE_WARP_FLOOR;
                     if (area_get_warp_node(sSourceWarpNodeId) == NULL) {
