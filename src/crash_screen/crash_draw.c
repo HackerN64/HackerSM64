@@ -19,13 +19,16 @@
 #include "game/game_init.h"
 
 
+// Include the version number from VERSION.txt. Includes a newline at the end.
+INCBIN(char, HackerSM64_version, "VERSION.txt", 4);
+
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
 // The rectangular area that can be drawn in. Almost everything is culled outside of the box.
-CSScissorBox gCSScissorBox = {
+ALIGNED16 CSScissorBox gCSScissorBox = {
     .x1 = SCISSOR_BOX_DEFAULT_X1,
     .y1 = SCISSOR_BOX_DEFAULT_Y1,
     .x2 = SCISSOR_BOX_DEFAULT_X2,
@@ -305,11 +308,11 @@ void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTot
 // Page header draw function.
 u32 cs_page_header_draw(void) {
     u32 line = 0;
-    // "HackerSM64 vX.X.X"
+    // "HackerSM64 [vX.X.X]"
     cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"HackerSM64 v%s",
+        STR_COLOR_PREFIX"HackerSM64 %s",
         COLOR_RGBA32_CRASH_HEADER,
-        HACKERSM64_VERSION
+        HackerSM64_version
     );
 
     // "START:controls"
