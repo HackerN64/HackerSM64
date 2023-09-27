@@ -6,10 +6,6 @@
  */
 
 
-// HackerSM64 version number. DO NOT CHANGE THIS UNLESS YOU ARE A HACKERSM64 DEVELOPER.
-#define HACKERSM64_VERSION "2.1.1"
-
-
 #include "config/config_audio.h"
 #include "config/config_benchmark.h"
 #include "config/config_camera.h"
