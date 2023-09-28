@@ -2969,81 +2969,8 @@ const Gfx dl_ia8_up_arrow_end[] = {
     gsSPEndDisplayList(),
 };
 
-// 0x02014958 - 0x02014960
-#ifdef ENABLE_STATUS_REPOLLING_GUI
-ALIGNED8 const Texture texture_controller_port[] = {
-#include "textures/segment2/controller_port.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_unknown[] = {
-#include "textures/segment2/controller_unknown.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_n64_normal[] = {
-#include "textures/segment2/controller_n64_normal.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_n64_mouse[] = {
-#include "textures/segment2/controller_n64_mouse.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_n64_voice[] = {
-#include "textures/segment2/controller_n64_voice.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_n64_keyboard[] = {
-#include "textures/segment2/controller_n64_keyboard.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gba[] = {
-#include "textures/segment2/controller_gba.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gcn_normal[] = {
-#include "textures/segment2/controller_gcn_normal.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gcn_receiver[] = {
-#include "textures/segment2/controller_gcn_receiver.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gcn_wavebird[] = {
-#include "textures/segment2/controller_gcn_wavebird.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gcn_wheel[] = {
-#include "textures/segment2/controller_gcn_wheel.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gcn_keyboard[] = {
-#include "textures/segment2/controller_gcn_keyboard.rgba16.inc.c"
-};
-ALIGNED8 const Texture texture_controller_gcn_dancepad[] = {
-#include "textures/segment2/controller_gcn_dancepad.rgba16.inc.c"
-};
-#endif // ENABLE_STATUS_REPOLLING_GUI
-
-#ifdef ENABLE_RUMBLE
-//! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
-ALIGNED8 const Texture title_texture_rumble_pak_en[] = {
-#include "textures/segment2/rumble_pak_en.rgba16.inc.c"
-};
-//! TODO: Use these after ASCII/multilang is merged.
- #if MULTILANG
-  #ifdef ENABLE_FRENCH
-ALIGNED8 const Texture title_texture_rumble_pak_fr[] = {
-#include "textures/segment2/rumble_pak_fr.rgba16.inc.c"
-};
-  #endif // ENABLE_FRENCH
-  #ifdef ENABLE_GERMAN
-ALIGNED8 const Texture title_texture_rumble_pak_de[] = {
-#include "textures/segment2/rumble_pak_de.rgba16.inc.c"
-};
-  #endif // ENABLE_GERMAN
-  #ifdef ENABLE_JAPANESE
-ALIGNED8 const Texture title_texture_rumble_pak_jp[] = {
-#include "textures/segment2/rumble_pak_jp.rgba16.inc.c"
-};
-  #endif // ENABLE_JAPANESE
-  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
-ALIGNED8 const Texture title_texture_rumble_pak_es[] = {
-#include "textures/segment2/rumble_pak_es.rgba16.inc.c"
-};
-  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
- #endif // MULTILANG
-ALIGNED8 const Texture title_texture_rumble_pak_controller[] = {
-#include "textures/segment2/rumble_pak_controller.rgba16.inc.c"
-};
-#endif // ENABLE_RUMBLE
+#include "segment2/controllers.c.in"
+#include "segment2/rumble_pak.c.in"
 
 // 0x02014970 - 0x020149A8
 const Gfx dl_paintings_rippling_begin[] = {
