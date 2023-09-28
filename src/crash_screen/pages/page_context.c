@@ -21,7 +21,7 @@ struct CSSetting cs_settings_group_page_context[] = {
     [CS_OPT_CONTEXT_PARSE_REG   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
     [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
-    [CS_OPT_END_CONTEXT         ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_CONTEXT         ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

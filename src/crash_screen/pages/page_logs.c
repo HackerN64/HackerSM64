@@ -23,7 +23,7 @@
 struct CSSetting cs_settings_group_page_logs[] = {
     [CS_OPT_HEADER_PAGE_LOG     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "LOGS",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_LOG_INDEX_NUMBERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show index numbers",             .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_LOG             ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_LOG             ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

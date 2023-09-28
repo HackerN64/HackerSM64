@@ -21,7 +21,7 @@ struct CSSetting cs_settings_group_page_stack[] = {
     [CS_OPT_HEADER_PAGE_STACK   ] = { .type = CS_OPT_TYPE_HEADER,  .name = "STACK TRACE",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_STACK_SHOW_ADDRESSES] = { .type = CS_OPT_TYPE_SETTING, .name = "Show addresses",                 .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_STACK_SHOW_OFFSETS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show offsets",                   .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_STACK           ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_STACK           ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

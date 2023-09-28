@@ -32,7 +32,7 @@ CSSetting cs_settings_group_global[] = {
     [CS_OPT_GLOBAL_SYMBOL_NAMES         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Print symbol names",             .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
     [CS_OPT_GLOBAL_PRINT_SCROLL_SPEED   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Text scroll speed",              .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
-    [CS_OPT_END_GLOBAL                  ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_GLOBAL                  ] = { .type = CS_OPT_TYPE_END, },
 };
 
 // Groups:

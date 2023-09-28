@@ -22,7 +22,7 @@ struct CSSetting cs_settings_group_page_map[] = {
     [CS_OPT_MAP_SHOW_ADDRESSES  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show addresses",                 .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MAP_SHOW_TYPES      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show types",                     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MAP_SHOW_SIZES      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show sizes",                     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_MAP             ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_MAP             ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

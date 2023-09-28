@@ -21,7 +21,7 @@ struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_MEMORY_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif
     [CS_OPT_MEMORY_AS_ASCII     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show data as ascii",             .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_MEMORY          ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_MEMORY          ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

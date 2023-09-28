@@ -18,7 +18,7 @@ struct CSSetting cs_settings_group_buttons[] = {
     [CS_OPT_BUTTON_EXPAND_ALL           ] = { .type = CS_OPT_TYPE_SETTING, .name = "expand all",                     .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_BUTTON_COLLAPSE_ALL         ] = { .type = CS_OPT_TYPE_SETTING, .name = "collapse all",                   .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_BUTTON_RESET_TO_DEFAULTS    ] = { .type = CS_OPT_TYPE_SETTING, .name = "reset all settings to defaults", .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_BUTTON                  ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_BUTTON                  ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

@@ -44,7 +44,7 @@ struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_DISASM_IMM_FMT      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
     [CS_OPT_DISASM_OFFSET_ADDR  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Offsets as addresses",           .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_ARROW_MODE   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Branch arrow mode",              .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
-    [CS_OPT_END_DISASM          ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_DISASM          ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

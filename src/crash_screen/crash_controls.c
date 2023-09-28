@@ -19,7 +19,7 @@ struct CSSetting cs_settings_group_controls[] = {
     [CS_OPT_HEADER_CONTROLS             ] = { .type = CS_OPT_TYPE_HEADER,  .name = "CONTROLS",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES ] = { .type = CS_OPT_TYPE_SETTING, .name = "Hold direction wait frames",     .valNames = NULL,                     .val = 10,                        .defaultVal = 10,                        .lowerBound = 0,                     .upperBound = 1000,                       },
     [CS_OPT_CONTROLS_ANALOG_DEADZONE    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Analog deadzone",                .valNames = NULL,                     .val = 60,                        .defaultVal = 60,                        .lowerBound = 0,                     .upperBound = 128,                        },
-    [CS_OPT_END_CONTROLS                ] = { .type = CS_OPT_TYPE_END },
+    [CS_OPT_END_CONTROLS                ] = { .type = CS_OPT_TYPE_END, },
 };
 
 

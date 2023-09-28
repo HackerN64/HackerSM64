@@ -57,7 +57,7 @@ static void cs_reinitialize(void) {
     gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;
 
-    gCSDirectionFlags.raw = 0;
+    gCSDirectionFlags.raw = 0b00000000;
 
     for (int pageID = 0; pageID < ARRAY_COUNT(gCSPages); pageID++) {
         gCSPages[pageID]->flags.initialized = FALSE;
@@ -73,8 +73,10 @@ static void cs_reinitialize(void) {
 static OSThread* get_crashed_thread(void) {
     OSThread* thread = __osGetCurrFaultedThread();
 
-    // OS_PRIORITY_THREADTAIL indicates the end of the thread queue.
-    while ((thread != NULL) && (thread->priority != OS_PRIORITY_THREADTAIL)) {
+    while (
+        (thread != NULL) &&
+        (thread->priority != OS_PRIORITY_THREADTAIL) // OS_PRIORITY_THREADTAIL indicates the end of the thread queue.
+    ) {
         if (
             (thread->priority > OS_PRIORITY_IDLE  ) &&
             (thread->priority < OS_PRIORITY_APPMAX) && //! TODO: Why doesn't this include OS_PRIORITY_APPMAX threads?
