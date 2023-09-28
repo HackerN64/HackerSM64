@@ -37,17 +37,17 @@ CSSetting cs_settings_group_global[] = {
 
 // Groups:
 CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
-    [CS_OPT_GROUP_BUTTONS     ] = { .name = "BUTTONS",  .list = cs_settings_group_buttons,     },
-    [CS_OPT_GROUP_GLOBAL      ] = { .name = "GLOBAL",   .list = cs_settings_group_global,      },
-    [CS_OPT_GROUP_CONTROLS    ] = { .name = "CONTROLS", .list = cs_settings_group_controls,    },
-    [CS_OPT_GROUP_PAGE_CONTEXT] = { .name = "CONTEXT",  .list = cs_settings_group_page_context,},
-    [CS_OPT_GROUP_PAGE_LOG    ] = { .name = "LOG",      .list = cs_settings_group_page_log,    },
-    [CS_OPT_GROUP_PAGE_STACK  ] = { .name = "STACK",    .list = cs_settings_group_page_stack,  },
+    [CS_OPT_GROUP_BUTTONS     ] = { .name = "BUTTONS",  .list = cs_settings_group_buttons,      },
+    [CS_OPT_GROUP_GLOBAL      ] = { .name = "GLOBAL",   .list = cs_settings_group_global,       },
+    [CS_OPT_GROUP_CONTROLS    ] = { .name = "CONTROLS", .list = cs_settings_group_controls,     },
+    [CS_OPT_GROUP_PAGE_CONTEXT] = { .name = "CONTEXT",  .list = cs_settings_group_page_context, },
+    [CS_OPT_GROUP_PAGE_LOG    ] = { .name = "LOG",      .list = cs_settings_group_page_log,     },
+    [CS_OPT_GROUP_PAGE_STACK  ] = { .name = "STACK",    .list = cs_settings_group_page_stack,   },
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_GROUP_PAGE_MAP    ] = { .name = "MAP",      .list = cs_settings_group_page_map,    },
+    [CS_OPT_GROUP_PAGE_MAP    ] = { .name = "MAP",      .list = cs_settings_group_page_map,     },
 #endif
-    [CS_OPT_GROUP_PAGE_MEMORY ] = { .name = "RAM VIEW", .list = cs_settings_group_page_memory, },
-    [CS_OPT_GROUP_PAGE_DISASM ] = { .name = "DISASM",   .list = cs_settings_group_page_disasm, },
+    [CS_OPT_GROUP_PAGE_MEMORY ] = { .name = "RAM VIEW", .list = cs_settings_group_page_memory,  },
+    [CS_OPT_GROUP_PAGE_DISASM ] = { .name = "DISASM",   .list = cs_settings_group_page_disasm,  },
 };
 
 CSSettingsGroup* cs_get_settings_group(int groupID) {

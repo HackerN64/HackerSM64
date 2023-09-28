@@ -216,14 +216,16 @@ void cs_update_input(void) {
     }
     // Popup is open
     if (gCSPopupID != CS_POPUP_NONE) {
+        CSPopup* popup = gCSPopups[gCSPopupID];
+
         if (gCSSwitchedPopup) {
             gCSSwitchedPopup = FALSE;
-            if (gCSPopups[gCSPopupID]->initFunc != NULL) {
-                gCSPopups[gCSPopupID]->initFunc();
+            if (popup->initFunc != NULL) {
+                popup->initFunc();
             }
         } else {
-            if (gCSPopups[gCSPopupID]->inputFunc != NULL) {
-                gCSPopups[gCSPopupID]->inputFunc();
+            if (popup->inputFunc != NULL) {
+                popup->inputFunc();
             }
         }
         return;
