@@ -94,7 +94,7 @@ void reset_branch_buffer(Address funcAddr) {
 }
 #endif
 
-void disasm_init(void) {
+void page_disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -174,7 +174,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
             sNumBranchArrows++;
         }
 
-        sBranchBufferCurrAddr += DISASM_STEP;
+        sBranchBufferCurrAddr += PAGE_DISASM_STEP;
 
         // Searching took to long, so continue from the same place on the next frame.
         if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) { //! TODO: better version of this if possible
@@ -237,7 +237,7 @@ void disasm_draw_branch_arrows(u32 printLine) {
     BranchArrow* currArrow = &sBranchArrows[0];
 
     for (u32 i = 0; i < sNumBranchArrows; i++) {
-        s32 startLine = (((s32)currArrow->startAddr - (s32)sDisasmViewportIndex) / DISASM_STEP);
+        s32 startLine = (((s32)currArrow->startAddr - (s32)sDisasmViewportIndex) / PAGE_DISASM_STEP);
         s32 endLine = (startLine + currArrow->branchOffset + 1);
 
         draw_branch_arrow(startLine, endLine, currArrow->xPos, sBranchColors[currArrow->colorIndex], printLine);
@@ -289,7 +289,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
     u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < numLines; y++) {
-        Address addr = (sDisasmViewportIndex + (y * DISASM_STEP));
+        Address addr = (sDisasmViewportIndex + (y * PAGE_DISASM_STEP));
         charY = TEXT_Y(line + y);
 
         // Draw crash and selection rectangles:
@@ -336,9 +336,9 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
 // Address sCurrFuncAddr = 0x00000000;
 // const char* sCurrFuncName = NULL;
 
-void disasm_draw(void) {
+void page_disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
-    Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+    Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
@@ -353,7 +353,7 @@ void disasm_draw(void) {
     u32 line = 1;
 
     Address startAddr = sDisasmViewportIndex;
-    Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * DISASM_STEP));
+    Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
     cs_print(TEXT_X(STRLEN("DISASM") + 1), TEXT_Y(line),
@@ -392,7 +392,7 @@ void disasm_draw(void) {
     u32 scrollTop = (DIVIDER_Y(line) + 1);
     u32 scrollBottom = DIVIDER_Y(line2);
 
-    const size_t shownSection = ((sDisasmNumShownRows - 1) * DISASM_STEP);
+    const size_t shownSection = ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP);
 
     // Scroll bar:
     cs_draw_scroll_bar(
@@ -414,22 +414,22 @@ void disasm_draw(void) {
 }
 
 static void disasm_move_up(void) {
-    gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+    gSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
     // Scroll up.
-    if (gSelectedAddress >= (VIRTUAL_RAM_START + DISASM_STEP))  {
-        gSelectedAddress -= DISASM_STEP;
+    if (gSelectedAddress >= (VIRTUAL_RAM_START + PAGE_DISASM_STEP))  {
+        gSelectedAddress -= PAGE_DISASM_STEP;
     }
 }
 
 static void disasm_move_down(void) {
-    gSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+    gSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
     // Scroll down.
-    if (gSelectedAddress <= (VIRTUAL_RAM_END - DISASM_STEP)) {
-        gSelectedAddress += DISASM_STEP;
+    if (gSelectedAddress <= (VIRTUAL_RAM_END - PAGE_DISASM_STEP)) {
+        gSelectedAddress += PAGE_DISASM_STEP;
     }
 }
 
-void disasm_input(void) {
+void page_disasm_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     Address oldPos = gSelectedAddress;
 #endif
@@ -448,7 +448,7 @@ void disasm_input(void) {
         open_address_select(get_insn_branch_target_from_addr(gSelectedAddress));
     }
 
-    sDisasmViewportIndex = cs_clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, DISASM_STEP);
+    sDisasmViewportIndex = cs_clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, PAGE_DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
     if (buttonPressed & B_BUTTON) {
@@ -461,7 +461,7 @@ void disasm_input(void) {
             gFillBranchBuffer = TRUE;
         }
 
-        Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, DISASM_STEP);
+        Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
 
         const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
         if (symbol != NULL) {
@@ -488,9 +488,9 @@ void disasm_input(void) {
 
 struct CSPage gCSPage_disasm = {
     .name         = "DISASM",
-    .initFunc     = disasm_init,
-    .drawFunc     = disasm_draw,
-    .inputFunc    = disasm_input,
+    .initFunc     = page_disasm_init,
+    .drawFunc     = page_disasm_draw,
+    .inputFunc    = page_disasm_input,
     .contList     = cs_cont_list_disasm,
     .settingsList = cs_settings_group_page_disasm,
     .flags = {

@@ -13,21 +13,21 @@
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 
-#include "page_log.h"
+#include "page_logs.h"
 
 #include "game/assert.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"
 
 
-struct CSSetting cs_settings_group_page_log[] = {
-    [CS_OPT_HEADER_PAGE_LOG     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "LOG",                            .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+struct CSSetting cs_settings_group_page_logs[] = {
+    [CS_OPT_HEADER_PAGE_LOG     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "LOGS",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_LOG_INDEX_NUMBERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show index numbers",             .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_END_LOG             ] = { .type = CS_OPT_TYPE_END },
 };
 
 
-const enum ControlTypes cs_cont_list_log[] = {
+const enum ControlTypes cs_cont_list_logs[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
@@ -41,7 +41,7 @@ static u32 sLogViewportIndex = 0;
 static u32 sLogNumShownRows = LOG_BUFFER_SIZE;
 static u32 sLogTotalRows    = LOG_BUFFER_SIZE;
 
-void log_init(void) {
+void page_logs_init(void) {
     sLogSelectedIndex = 0;
     sLogViewportIndex = 0;
 
@@ -117,8 +117,8 @@ u32 print_assert_section(u32 line) {
 }
 
 #ifdef PUPPYPRINT_DEBUG
-void draw_log_section(u32 line, u32 numLines) {
-    const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOG, CS_OPT_LOG_INDEX_NUMBERS);
+void draw_logs_section(u32 line, u32 numLines) {
+    const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOGS, CS_OPT_LOG_INDEX_NUMBERS);
 
     // "PUPPYPRINT LOG:"
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
@@ -157,7 +157,7 @@ void draw_log_section(u32 line, u32 numLines) {
 }
 #endif
 
-void log_draw(void) {
+void page_logs_draw(void) {
     u32 line = 2;
 
     gCSWordWrap = TRUE;
@@ -177,7 +177,7 @@ void log_draw(void) {
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
     sLogTotalRows = MIN(gConsoleLogLastIndex, LOG_BUFFER_SIZE);
 
-    draw_log_section(line, sLogNumShownRows);
+    draw_logs_section(line, sLogNumShownRows);
 #endif
 
     gCSWordWrap = FALSE;
@@ -185,7 +185,7 @@ void log_draw(void) {
     osWritebackDCacheAll();
 }
 
-void log_input(void) {
+void page_logs_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
         if (sLogSelectedIndex > 0) {
@@ -205,13 +205,13 @@ void log_input(void) {
 }
 
 
-struct CSPage gCSPage_log = {
-    .name         = "LOG",
-    .initFunc     = log_init,
-    .drawFunc     = log_draw,
-    .inputFunc    = log_input,
-    .contList     = cs_cont_list_log,
-    .settingsList = cs_settings_group_page_log,
+struct CSPage gCSPage_logs = {
+    .name         = "LOGS",
+    .initFunc     = page_logs_init,
+    .drawFunc     = page_logs_draw,
+    .inputFunc    = page_logs_input,
+    .contList     = cs_cont_list_logs,
+    .settingsList = cs_settings_group_page_logs,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,

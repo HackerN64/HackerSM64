@@ -83,7 +83,7 @@ void update_displayed_settings(void) {
     }
 }
 
-void settings_init(void) {
+void page_settings_init(void) {
     sSettingsSelectedIndex = 0;
     sSettingsViewportIndex = 0;
 
@@ -219,7 +219,7 @@ void print_settings_list(u32 line, u32 numLines) {
     }
 }
 
-void settings_draw(void) {
+void page_settings_draw(void) {
     osWritebackDCacheAll();
 
     u32 line = 2;
@@ -241,7 +241,7 @@ void settings_draw(void) {
     }
 }
 
-void settings_input(void) {
+void page_settings_input(void) {
     CSSettingDisplay* settingDisplay = &gCSDisplayedSettings[sSettingsSelectedIndex];
     s16 groupID   = settingDisplay->groupID;
     s16 settingID = settingDisplay->settingID;
@@ -297,9 +297,9 @@ void settings_input(void) {
 
 struct CSPage gCSPage_settings = {
     .name         = "SETTINGS",
-    .initFunc     = settings_init,
-    .drawFunc     = settings_draw,
-    .inputFunc    = settings_input,
+    .initFunc     = page_settings_init,
+    .drawFunc     = page_settings_draw,
+    .inputFunc    = page_settings_input,
     .contList     = cs_cont_list_settings,
     .settingsList = NULL,
     .flags = {

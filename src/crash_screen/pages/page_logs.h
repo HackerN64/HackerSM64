@@ -14,5 +14,5 @@ enum CSSettingsGroup_page_log {
 };
 
 
-extern struct CSSetting cs_settings_group_page_log[];
-extern struct CSPage gCSPage_log;
+extern struct CSSetting cs_settings_group_page_logs[];
+extern struct CSPage gCSPage_logs;

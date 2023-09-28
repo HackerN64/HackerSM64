@@ -40,7 +40,7 @@ u32 sMapViewerSelectedIndex = 0;
 static u32 sMapViewerViewportIndex = 0;
 
 
-void map_view_init(void) {
+void page_map_init(void) {
     s32 newIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
     sMapViewerSelectedIndex = (newIndex != -1) ? newIndex : 0;
     sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
@@ -119,7 +119,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
     osWritebackDCacheAll();
 }
 
-void map_view_draw(void) {
+void page_map_draw(void) {
     u32 line = 1;
 
     size_t sizeStrSize = 0;
@@ -153,7 +153,7 @@ void map_view_draw(void) {
     osWritebackDCacheAll();
 }
 
-void map_view_input(void) {
+void page_map_input(void) {
     if (gCSSwitchedPage) {
         s32 targetIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
 
@@ -185,9 +185,9 @@ void map_view_input(void) {
 
 struct CSPage gCSPage_map = {
     .name         = "MAP VIEW",
-    .initFunc     = map_view_init,
-    .drawFunc     = map_view_draw,
-    .inputFunc    = map_view_input,
+    .initFunc     = page_map_init,
+    .drawFunc     = page_map_draw,
+    .inputFunc    = page_map_input,
     .contList     = cs_cont_list_map,
     .settingsList = cs_settings_group_page_map,
     .flags = {

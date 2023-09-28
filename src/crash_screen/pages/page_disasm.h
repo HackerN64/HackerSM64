@@ -38,14 +38,17 @@ typedef struct BranchArrow {
 } BranchArrow; /*0x10*/
 
 
+#define PAGE_DISASM_STEP (ssize_t)sizeof(InsnData)
+
+
 // Disasm constants.
 #define DISASM_BRANCH_ARROW_HEAD_SIZE       4 // The size of the branch arrow head.
 #define DISASM_BRANCH_ARROW_HEAD_OFFSET     1 // The distance between the line and the arrow head.
 #define DISASM_BRANCH_ARROW_SPACING         2 // The spacing between each arrow's line, inclusive.
-#define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (1024 * DISASM_STEP) // The max number of instructions to search for branches within a function.
+#define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (1024 * PAGE_DISASM_STEP) // The max number of instructions to search for branches within a function.
 
 // The number of branch arrows that can be stored per-function.
-#define DISASM_BRANCH_BUFFER_SIZE   0x100
+#define DISASM_BRANCH_BUFFER_SIZE           0x100
 
 
 #ifdef INCLUDE_DEBUG_MAP

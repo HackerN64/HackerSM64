@@ -18,7 +18,7 @@ enum CSSettingsGroup_page_memory {
 
 
 // RAM Viewer constants
-#define RAM_VIEWER_STEP (ssize_t)(4 * sizeof(Word))
+#define PAGE_MEMORY_STEP (ssize_t)(4 * sizeof(Word))
 
 
 extern struct CSSetting cs_settings_group_page_memory[];

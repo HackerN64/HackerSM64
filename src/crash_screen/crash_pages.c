@@ -11,7 +11,7 @@
 #include "crash_pages.h"
 
 #include "pages/page_context.h"
-#include "pages/page_log.h"
+#include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #include "pages/page_map.h"
 #include "pages/page_memory.h"
@@ -23,7 +23,7 @@
 
 CSPage* gCSPages[NUM_PAGES] = {
     [PAGE_CONTEXT    ] = &gCSPage_context,
-    [PAGE_LOG        ] = &gCSPage_log,
+    [PAGE_LOG        ] = &gCSPage_logs,
     [PAGE_STACK_TRACE] = &gCSPage_stack,
 #ifdef INCLUDE_DEBUG_MAP
     [PAGE_MAP_VIEWER ] = &gCSPage_map,

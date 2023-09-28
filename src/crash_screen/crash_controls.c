@@ -214,7 +214,7 @@ void cs_update_input(void) {
             cs_open_popup(CS_POPUP_CONTROLS);
         }
     }
-    // Popup is open
+    // Popup is open.
     if (gCSPopupID != CS_POPUP_NONE) {
         CSPopup* popup = gCSPopups[gCSPopupID];
 

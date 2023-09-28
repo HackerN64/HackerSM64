@@ -176,33 +176,33 @@ void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum C
     gCSScissorBox = temp;
 }
 
-// Draws a line between any two points.
-void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+// // Draws a line between any two points.
+// void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
+//     const Alpha alpha = RGBA32_A(color);
+//     if (alpha == 0x00) {
+//         return;
+//     }
+//     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
-    RGBA16* dst;
+//     RGBA16* dst;
 
-    // Swap the points so that the second point is after the first.
-    if (x1 > x2) SWAP(x1, x2);
-    if (y1 > y2) SWAP(y1, y2);
+//     // Swap the points so that the second point is after the first.
+//     if (x1 > x2) SWAP(x1, x2);
+//     if (y1 > y2) SWAP(y1, y2);
 
-    const f32 slope = (f32)(y2 - y1) / (x2 - x1);
+//     const f32 slope = (f32)(y2 - y1) / (x2 - x1);
 
-    f32 x = x1;
-    f32 y;
-    while (x <= x2) {
-        y = ((slope * (x - x1)) + y1);
-        if (cs_is_in_scissor_box(x, y)) {
-            dst = get_rendering_fb_pixel(x, y);
-            apply_color(dst, newColor, alpha);
-        }
-        x++;
-    }
-}
+//     f32 x = x1;
+//     f32 y;
+//     while (x <= x2) {
+//         y = ((slope * (x - x1)) + y1);
+//         if (cs_is_in_scissor_box(x, y)) {
+//             dst = get_rendering_fb_pixel(x, y);
+//             apply_color(dst, newColor, alpha);
+//         }
+//         x++;
+//     }
+// }
 
 // Draw a single character from gCSFont to the framebuffer.
 void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {

@@ -42,7 +42,7 @@ static u32 sRamViewNumShownRows = 19;
 static const char gHex[0x10] = "0123456789ABCDEF";
 
 
-void ram_view_init(void) {
+void page_memory_init(void) {
     sRamViewViewportIndex = gSelectedAddress;
 }
 
@@ -64,7 +64,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
     u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < sRamViewNumShownRows; y++) {
-        Address rowAddr = (startAddr + (y * RAM_VIEWER_STEP));
+        Address rowAddr = (startAddr + (y * PAGE_MEMORY_STEP));
 
         // Row header:
         // "[XXXXXXXX]"
@@ -107,7 +107,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
     }
 }
 
-void ram_view_draw(void) {
+void page_memory_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -118,7 +118,7 @@ void ram_view_draw(void) {
     u32 line = 1;
 
     Address startAddr = sRamViewViewportIndex;
-    Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * RAM_VIEWER_STEP);
+    Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP);
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
     cs_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
@@ -177,7 +177,7 @@ void ram_view_draw(void) {
     u32 scrollTop = (DIVIDER_Y(line) + 1);
     u32 scrollBottom = DIVIDER_Y(line2);
 
-    const size_t shownSection = ((sRamViewNumShownRows - 1) * RAM_VIEWER_STEP);
+    const size_t shownSection = ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP);
 
     // Scroll bar:
     cs_draw_scroll_bar(
@@ -198,18 +198,18 @@ void ram_view_draw(void) {
     osWritebackDCacheAll();
 }
 
-void ram_view_input(void) {
+void page_memory_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
-        if (gSelectedAddress >= (VIRTUAL_RAM_START + RAM_VIEWER_STEP)) {
-            gSelectedAddress -= RAM_VIEWER_STEP;
+        if (gSelectedAddress >= (VIRTUAL_RAM_START + PAGE_MEMORY_STEP)) {
+            gSelectedAddress -= PAGE_MEMORY_STEP;
         }
     }
 
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        if (gSelectedAddress <= (VIRTUAL_RAM_END - RAM_VIEWER_STEP)) {
-            gSelectedAddress += RAM_VIEWER_STEP;
+        if (gSelectedAddress <= (VIRTUAL_RAM_END - PAGE_MEMORY_STEP)) {
+            gSelectedAddress += PAGE_MEMORY_STEP;
         }
     }
 
@@ -238,15 +238,15 @@ void ram_view_input(void) {
         cs_inc_setting(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII, TRUE);
     }
 
-    sRamViewViewportIndex = cs_clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, RAM_VIEWER_STEP);
+    sRamViewViewportIndex = cs_clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, PAGE_MEMORY_STEP);
 }
 
 
 struct CSPage gCSPage_memory = {
     .name         = "RAM VIEW",
-    .initFunc     = ram_view_init,
-    .drawFunc     = ram_view_draw,
-    .inputFunc    = ram_view_input,
+    .initFunc     = page_memory_init,
+    .drawFunc     = page_memory_draw,
+    .inputFunc    = page_memory_input,
     .contList     = cs_cont_list_memory,
     .settingsList = cs_settings_group_page_memory,
     .flags = {

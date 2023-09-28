@@ -108,7 +108,7 @@ static const char* get_fpcsr_desc(u32 fpcsr) {
     return NULL;
 }
 
-void context_init(void) {
+void page_context_init(void) {
 
 }
 
@@ -240,7 +240,7 @@ void cs_context_print_float_registers(__OSThreadContext* tc) {
     }
 }
 
-void context_draw(void) {
+void page_context_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 line = 1;
 
@@ -275,7 +275,7 @@ void context_draw(void) {
     cs_context_print_float_registers(tc);
 }
 
-void context_input(void) {
+void page_context_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
         cs_inc_setting(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT, 1);
@@ -285,9 +285,9 @@ void context_input(void) {
 
 struct CSPage gCSPage_context ={
     .name         = "CONTEXT",
-    .initFunc     = context_init,
-    .drawFunc     = context_draw,
-    .inputFunc    = context_input,
+    .initFunc     = page_context_init,
+    .drawFunc     = page_context_draw,
+    .inputFunc    = page_context_input,
     .contList     = cs_cont_list_context,
     .settingsList = cs_settings_group_page_context,
     .flags = {

@@ -41,7 +41,7 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_GLOBAL      ] = { .name = "GLOBAL",   .list = cs_settings_group_global,       },
     [CS_OPT_GROUP_CONTROLS    ] = { .name = "CONTROLS", .list = cs_settings_group_controls,     },
     [CS_OPT_GROUP_PAGE_CONTEXT] = { .name = "CONTEXT",  .list = cs_settings_group_page_context, },
-    [CS_OPT_GROUP_PAGE_LOG    ] = { .name = "LOG",      .list = cs_settings_group_page_log,     },
+    [CS_OPT_GROUP_PAGE_LOGS   ] = { .name = "LOGS",     .list = cs_settings_group_page_logs,    },
     [CS_OPT_GROUP_PAGE_STACK  ] = { .name = "STACK",    .list = cs_settings_group_page_stack,   },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_MAP    ] = { .name = "MAP",      .list = cs_settings_group_page_map,     },

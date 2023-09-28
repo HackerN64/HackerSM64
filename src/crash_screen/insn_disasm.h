@@ -426,8 +426,6 @@ typedef struct PACKED InsnTemplate {
 } InsnTemplate; /*0x10*/
 
 
-#define DISASM_STEP (ssize_t)sizeof(InsnData)
-
 #define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
 
 

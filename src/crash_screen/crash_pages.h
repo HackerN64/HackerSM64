@@ -5,7 +5,7 @@
 #include "types.h"
 
 #include "pages/page_context.h"
-#include "pages/page_log.h"
+#include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #include "pages/page_map.h"
 #include "pages/page_memory.h"

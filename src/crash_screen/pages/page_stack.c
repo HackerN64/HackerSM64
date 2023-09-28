@@ -98,7 +98,7 @@ void fill_function_stack_trace(void) {
     }
 }
 
-void stack_trace_init(void) {
+void page_stack_init(void) {
     sStackTraceSelectedIndex = 0;
     sStackTraceViewportIndex = 0;
 
@@ -190,7 +190,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 
 // prints any function pointers it finds in the stack format:
 // SP address: function name
-void stack_trace_draw(void) {
+void page_stack_draw(void) {
     u32 line = 1;
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -222,7 +222,7 @@ void stack_trace_draw(void) {
     osWritebackDCacheAll();
 }
 
-void stack_trace_input(void) {
+void page_stack_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
@@ -247,9 +247,9 @@ void stack_trace_input(void) {
 
 struct CSPage gCSPage_stack = {
     .name         = "STACK TRACE",
-    .initFunc     = stack_trace_init,
-    .drawFunc     = stack_trace_draw,
-    .inputFunc    = stack_trace_input,
+    .initFunc     = page_stack_init,
+    .drawFunc     = page_stack_draw,
+    .inputFunc    = page_stack_input,
     .contList     = cs_cont_list_stack,
     .settingsList = cs_settings_group_page_stack,
     .flags = {
