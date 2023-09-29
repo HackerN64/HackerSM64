@@ -94,6 +94,8 @@ struct RenderModeContainer renderModeTable_1Cycle[2] = {
         [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF,
         [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE,
 #endif
+        [LAYER_CIRCLE_SHADOW] = G_RM_CLD_SURF,
+        [LAYER_CIRCLE_SHADOW_TRANSPARENT] = G_RM_CLD_SURF,
         [LAYER_TRANSPARENT_DECAL] = G_RM_AA_XLU_SURF,
         [LAYER_TRANSPARENT] = G_RM_AA_XLU_SURF,
         [LAYER_TRANSPARENT_INTER] = G_RM_AA_XLU_SURF,
@@ -111,6 +113,8 @@ struct RenderModeContainer renderModeTable_1Cycle[2] = {
         [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
         [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
 #endif
+        [LAYER_CIRCLE_SHADOW] = G_RM_AA_ZB_XLU_DECAL,
+        [LAYER_CIRCLE_SHADOW_TRANSPARENT] = G_RM_ZB_CLD_SURF,
         [LAYER_TRANSPARENT_DECAL] = G_RM_AA_ZB_XLU_DECAL,
         [LAYER_TRANSPARENT] = G_RM_AA_ZB_XLU_SURF,
         [LAYER_TRANSPARENT_INTER] = G_RM_AA_ZB_XLU_INTER,
@@ -131,6 +135,8 @@ struct RenderModeContainer renderModeTable_2Cycle[2] = {
         [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF2,
         [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE2,
 #endif
+        [LAYER_CIRCLE_SHADOW] = G_RM_CLD_SURF2,
+        [LAYER_CIRCLE_SHADOW_TRANSPARENT] = G_RM_CLD_SURF2,
         [LAYER_TRANSPARENT_DECAL] = G_RM_AA_XLU_SURF2,
         [LAYER_TRANSPARENT] = G_RM_AA_XLU_SURF2,
         [LAYER_TRANSPARENT_INTER] = G_RM_AA_XLU_SURF2,
@@ -148,6 +154,8 @@ struct RenderModeContainer renderModeTable_2Cycle[2] = {
         [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
         [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
 #endif
+        [LAYER_CIRCLE_SHADOW] = G_RM_AA_ZB_XLU_DECAL2,              // LAYER_CIRCLE_SHADOW
+        [LAYER_CIRCLE_SHADOW_TRANSPARENT] = G_RM_ZB_CLD_SURF2,              // LAYER_CIRCLE_SHADOW_TRANSPARENT
         [LAYER_TRANSPARENT_DECAL] = G_RM_AA_ZB_XLU_DECAL2,
         [LAYER_TRANSPARENT] = G_RM_AA_ZB_XLU_SURF2,
         [LAYER_TRANSPARENT_INTER] = G_RM_AA_ZB_XLU_INTER2,
@@ -380,6 +388,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             gDPPipeSync(gDisplayListHead++);
             gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
         }
+
         // Iterate through the layers on the current render phase.
         for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
             // Set 'currList' to the first DisplayListNode on the current layer.
@@ -400,6 +409,11 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
                                                      mode2List->modes[currLayer]);
             }
 #endif
+
+            if (currLayer == LAYER_CIRCLE_SHADOW) {
+                gSPDisplayList(gDisplayListHead++, dl_shadow_circle);
+            }
+
             // Iterate through all the displaylists on the current layer.
             while (currList != NULL) {
                 // Add the display list's transformation to the master list.
@@ -421,6 +435,12 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #endif
                 // Move to the next DisplayListNode.
                 currList = currList->next;
+            }
+
+            if (currLayer == LAYER_CIRCLE_SHADOW_TRANSPARENT) {
+                gSPTexture(gDisplayListHead++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
+                gSPSetGeometryMode(gDisplayListHead++, G_LIGHTING | G_CULL_BACK);
+                gDPSetCombineMode(gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
             }
         }
     }
@@ -1013,9 +1033,17 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                 gCurrShadow.floorNormal, shadowPos, gCurrShadow.scale, gCurGraphNodeObject->angle[1]);
 
             inc_mat_stack();
+
+            s32 layer;
+            if (node->shadowType == SHADOW_CIRCLE) {
+                layer = gCurrShadow.isDecal ? LAYER_CIRCLE_SHADOW : LAYER_CIRCLE_SHADOW_TRANSPARENT;
+            } else {
+                layer = gCurrShadow.isDecal ? LAYER_TRANSPARENT_DECAL : LAYER_TRANSPARENT;
+            }
+
             geo_append_display_list(
                 (void *) VIRTUAL_TO_PHYSICAL(shadowList),
-                gCurrShadow.isDecal ? LAYER_TRANSPARENT_DECAL : LAYER_TRANSPARENT
+                layer
             );
 
             gMatStackIndex--;
