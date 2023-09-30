@@ -243,7 +243,7 @@ void cs_take_screenshot_of_game(RGBA16* dst) {
     u32* ptr = (u32*)dst;
     const u32 mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
 
-    for (size_t size = 0; size < FRAMEBUFFER_SIZE; size += sizeof(u32)) {
+    for (size_t size = 0; size < sizeof(gFramebuffers[0]); size += sizeof(u32)) {
         *ptr++ = (*src++ | mask);
     }
 }
@@ -251,7 +251,7 @@ void cs_take_screenshot_of_game(RGBA16* dst) {
 // Set the entire framebuffer either to the saved screenshot or to black.
 void cs_reset_framebuffer(_Bool drawBackground) {
     if (drawBackground) {
-        bcopy(gZBuffer, FB_PTR_AS(void), FRAMEBUFFER_SIZE);
+        bcopy(gZBuffer, FB_PTR_AS(void), sizeof(gZBuffer));
     } else {
         cs_draw_dark_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CS_DARKEN_TO_BLACK);
     }

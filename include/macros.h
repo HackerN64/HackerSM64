@@ -214,7 +214,7 @@ void _asm_setbits(uintptr_t bits);
 #define EXCEPTION_CU()      //! TODO: do { ; } while (0) // Underflow.
 #define EXCEPTION_CI()      //! TODO: do { ; } while (0) // Inexact operation.
 
-#define FORCE_CRASH() EXCEPTION_TRAP()
+#define FORCE_CRASH() EXCEPTION_RMISS() //! TODO: This should be EXCEPTION_TRAP() to save 8 bytes, but that freezes most emulators instead of doing a proper crash.
 
 // Set where the program counter will be on crash.
 #define SET_CRASH_ADDR(ptr) \
