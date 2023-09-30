@@ -80,7 +80,8 @@ static OSThread* get_crashed_thread(void) {
         if (
             (thread->priority > OS_PRIORITY_IDLE  ) &&
             (thread->priority < OS_PRIORITY_APPMAX) && //! TODO: Why doesn't this include OS_PRIORITY_APPMAX threads?
-            (thread->flags & (OS_FLAG_CPU_BREAK | OS_FLAG_FAULT))
+            (thread->flags & (OS_FLAG_CPU_BREAK | OS_FLAG_FAULT)) &&
+            (thread != gCrashedThread)
         ) {
             return thread;
         }
@@ -150,8 +151,14 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     // Default to certain pages depening on the crash type.
     switch (tc->cause) {
-        case EXC_SYSCALL: cs_set_page(PAGE_LOG   ); break;
-        case EXC_II:      cs_set_page(PAGE_DISASM); break;
+        case EXC_SYSCALL:
+            if (__n64Assert_Message != NULL) {
+                cs_set_page(PAGE_LOG);
+            }
+            break;
+        case EXC_II:
+            cs_set_page(PAGE_DISASM);
+            break;
     }
 
     // Only on the first crash:
@@ -165,7 +172,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
         }
 
         // Use the Z buffer's memory space to save a screenshot of the game.
-        cs_take_screenshot_of_game(gZBuffer);
+        cs_take_screenshot_of_game(gZBuffer, sizeof(gZBuffer));
 
 #ifdef INCLUDE_DEBUG_MAP
         map_data_init();
@@ -192,6 +199,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
  */
 void crash_screen_thread_entry(UNUSED void* arg) {
     struct CSThreadInfo* threadInfo = &sCSThreadInfos[sCSThreadIndex];
+    OSThread* crashedThread = NULL;
 
     // Increment the current thread index.
     sCSThreadIndex = ((sCSThreadIndex + 1) % ARRAY_COUNT(sCSThreadInfos));
@@ -204,11 +212,13 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     // Wait for one of the above types of break or fault to occur.
     while (TRUE) {
         osRecvMesg(&threadInfo->mesgQueue, &threadInfo->mesg, OS_MESG_BLOCK);
-        gCrashedThread = get_crashed_thread();
-        if (gCrashedThread != NULL) {
+        crashedThread = get_crashed_thread();
+        if (crashedThread != NULL) {
             break;
         }
     }
+
+    gCrashedThread = crashedThread;
 
     // -- A thread has crashed --
     on_crash(threadInfo);

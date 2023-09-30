@@ -115,7 +115,7 @@ void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
 void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
 // void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
 void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
-void cs_take_screenshot_of_game(RGBA16* dst);
+void cs_take_screenshot_of_game(RGBA16* dst, size_t size);
 void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
 void cs_draw_main(void);
 

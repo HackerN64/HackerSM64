@@ -81,11 +81,12 @@ static const char* sRegNames[29] = {
 
 
 static const char* get_cause_desc(u32 cause) {
-    cause = ((cause >> CAUSE_EXCSHIFT) & BITMASK(5));
-
     // Make the last two cause case indexes sequential for array access.
-    if (cause == (EXC_WATCH >> CAUSE_EXCSHIFT)) cause = 16;
-    if (cause == (EXC_VCED  >> CAUSE_EXCSHIFT)) cause = 17;
+    switch (cause) {
+        case EXC_WATCH: cause = 16; break;
+        case EXC_VCED:  cause = 17; break;
+        default:        cause = ((cause >> CAUSE_EXCSHIFT) & BITMASK(5)); break;
+    }
 
     if (cause < ARRAY_COUNT(sCauseDesc)) {
         return sCauseDesc[cause];
@@ -197,9 +198,9 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
 
     if (val.mantissa != 0) {
         if (val.exponent == 0x00) {
-            prefix = 'D'; // Denormalized value
+            prefix = 'D'; // Denormalized value.
         } else if (val.exponent == 0xFF) {
-            prefix = 'N'; // NaN
+            prefix = 'N'; // NaN.
         }
     }
 

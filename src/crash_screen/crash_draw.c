@@ -238,12 +238,12 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
 }
 
 // Copy the framebuffer data from gFramebuffers one frame at a time, forcing alpha to true to turn off broken anti-aliasing.
-void cs_take_screenshot_of_game(RGBA16* dst) {
+void cs_take_screenshot_of_game(RGBA16* dst, size_t size) {
     u32* src = FB_PTR_AS(u32);
     u32* ptr = (u32*)dst;
     const u32 mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
 
-    for (size_t size = 0; size < sizeof(gFramebuffers[0]); size += sizeof(u32)) {
+    for (size_t s = 0; s < size; s += sizeof(u32)) {
         *ptr++ = (*src++ | mask);
     }
 }
