@@ -263,10 +263,9 @@ void iterate_surfaces_envbox(Vtx *verts) {
 }
 
 // VERTCOUNT = The highest number divisible by 6, which is less than the maximum vertex buffer divided by 2.
-// The vertex buffer is 64 if OBJECTS_REJ is enabled, 32 otherwise.
 #define VERTCOUNT 30
 
-void visual_surface_display(Vtx *verts, s32 iteration) {
+void visual_surface_display(Gfx **gfx, Vtx *verts, s32 iteration) {
     s32 vts = (iteration ? gVisualOffset : gVisualSurfaceCount);
     s32 vtl = 0;
     s32 count = VERTCOUNT;
@@ -275,13 +274,13 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
     while (vts > 0) {
         if (count == VERTCOUNT) {
             ntx = MIN(VERTCOUNT, vts);
-            gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
+            gSPVertex((*gfx)++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
             count = 0;
             vtl   = VERTCOUNT;
         }
 
         if (vtl >= 6) {
-            gSP2Triangles(gDisplayListHead++, (count + 0),
+            gSP2Triangles((*gfx)++, (count + 0),
                                               (count + 1),
                                               (count + 2), 0x0,
                                               (count + 3),
@@ -291,7 +290,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
             vtl   -= 6;
             count += 6;
         } else if (vtl >= 3) {
-            gSP1Triangle(gDisplayListHead++, (count + 0),
+            gSP1Triangle((*gfx)++, (count + 0),
                                              (count + 1),
                                              (count + 2), 0x0);
             vts   -= 3;
@@ -357,13 +356,14 @@ void visual_surface_loop(Gfx **gfx) {
 
     iterate_surfaces_visual(gMarioState->pos[0], gMarioState->pos[2], verts);
 
-    visual_surface_display(verts, 0);
+    visual_surface_display(gfx, verts, 0);
 
+    gDPPipeSync((*gfx)++);
     iterate_surfaces_envbox(verts);
 
     gDPSetRenderMode((*gfx)++, G_RM_ZB_XLU_SURF, G_RM_NOOP2);
 
-    visual_surface_display(verts, 1);
+    visual_surface_display(gfx, verts, 1);
 
     gSPDisplayList((*gfx)++, dl_debug_box_end);
 }

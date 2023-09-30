@@ -334,10 +334,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         gDPPipeSync(gfx++);
         gSPClearGeometryMode(gfx++, G_ZBUFFER);
 #ifdef VISUAL_DEBUG
-        render_debug_boxes(&gfx);
         // Load the world scale identity matrix
         gSPMatrix(gfx++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         if (surfaceView) visual_surface_loop(&gfx);
+        render_debug_boxes(&gfx);
 #endif
     }
     gDisplayListHead = gfx;
