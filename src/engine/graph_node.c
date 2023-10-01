@@ -1,6 +1,8 @@
 #include <ultra64.h>
 #include "sm64.h"
 
+#include <point_lights.h>
+
 #include "game/level_update.h"
 #include "math_util.h"
 #include "game/memory.h"
@@ -516,6 +518,43 @@ struct GraphNodeHeldObject *init_graph_node_held_object(struct AllocOnlyPool *po
 
         if (nodeFunc != NULL) {
             nodeFunc(GEO_CONTEXT_CREATE, &graphNode->fnNode.node, pool);
+        }
+    }
+
+    return graphNode;
+}
+
+/**
+ * Advanced lighting engine
+ * Allocates and returns a newly created scene light node
+ */
+struct GraphNodeSceneLight *init_graph_node_scene_light(struct AllocOnlyPool *pool,
+                                                        struct GraphNodeSceneLight *graphNode,
+                                                        u8 lightType, u8 color[],
+                                                        u8 a, u8 b, u8 c)
+{
+    if (pool != NULL) {
+        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeSceneLight));
+    }
+
+    if (graphNode != NULL) {
+        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_SCENE_LIGHT);
+        graphNode->lightType = lightType;
+        graphNode->color[0] = color[0];
+        graphNode->color[1] = color[1];
+        graphNode->color[2] = color[2];
+        graphNode->a = a;
+        graphNode->b = b;
+        graphNode->c = c;
+        if (lightType == LIGHT_TYPE_POINT || lightType == LIGHT_TYPE_POINT_OCCLUDE)
+        {
+            // Set this node's light pointer (used during rendering to set the position of the light)
+            graphNode->light = &gPointLights[gAreaPointLightCount];
+            if (lightType == LIGHT_TYPE_POINT_OCCLUDE)
+            {
+                gPointLights[gAreaPointLightCount].flags |= LIGHT_FLAG_OCCLUDE;
+            }
+            gAreaPointLightCount++;
         }
     }
 

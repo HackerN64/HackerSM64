@@ -380,6 +380,11 @@
 #define G_TEXTURE_GEN		0x00040000
 #define G_TEXTURE_GEN_LINEAR	0x00080000
 #define G_LOD			0x00100000	/* NOT IMPLEMENTED */
+#if (defined(F3DZEX_GBI_2)||defined(F3DZEX_NON_GBI_2)||defined(L3DZEX_GBI))
+# define G_POINT_LIGHTING 0x00400000
+#else
+# define G_POINT_LIGHTING 0x00000000
+#endif
 #if	(defined(F3DEX_GBI)||defined(F3DLP_GBI))
 # define G_CLIPPING		0x00800000
 #else
@@ -1501,6 +1506,15 @@ typedef struct {
 } Light_t;
 
 typedef struct {
+  unsigned char	col[3];		/* diffuse light value (rgba) */
+  char 		constant_attenuation;
+  unsigned char	colc[3];	/* copy of diffuse light value (rgba) */
+  char 		linear_attenuation;
+  signed short	pos[3];		/* direction of light (normalized) */
+  char 		quadratic_attenuation;
+} PointLight_t;
+
+typedef struct {
   unsigned char	col[3];		/* ambient light value (rgba) */
   char 		pad1;
   unsigned char	colc[3];	/* copy of ambient light value (rgba) */
@@ -1513,6 +1527,7 @@ typedef struct {
 
 typedef union {
     Light_t	l;
+	PointLight_t pl;
     long long int	force_structure_alignment[2];
 } Light;
 
