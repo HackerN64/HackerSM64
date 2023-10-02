@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 #define /*0x0F4*/ oBowserKeyScale OBJECT_FIELD_F32(0x1B)
 // bowser_key_cutscene.inc.c

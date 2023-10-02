@@ -1,8 +1,12 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
-// animated_floor_switch.inc.c
+#include "levels/bitdw/header.h"
+#include "levels/bits/header.h"
+#include "levels/rr/header.h"
+
+#include "behavior_data.h"
 
 struct FloorSwitchTriggeredAnimationFrame {
     const Collision *collision;

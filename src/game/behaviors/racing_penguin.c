@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 #define /*0x0F4*/ oRacingPenguinInitTextCooldown       OBJECT_FIELD_S32(0x1B)
 #define /*0x110*/ oRacingPenguinWeightedNewTargetSpeed OBJECT_FIELD_F32(0x22)

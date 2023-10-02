@@ -7,14 +7,14 @@
 #include "macros.h"
 #include "types.h"
 
-enum ObjCollisionFlags {
-    OBJ_COL_FLAGS_NONE      = (0 << 0),
-    OBJ_COL_FLAG_GROUNDED   = (1 << 0),
-    OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
-    OBJ_COL_FLAG_UNDERWATER = (1 << 2),
-    OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
-    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
-};
+// enum ObjCollisionFlags {
+//     OBJ_COL_FLAGS_NONE      = (0 << 0),
+//     OBJ_COL_FLAG_GROUNDED   = (1 << 0),
+//     OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
+//     OBJ_COL_FLAG_UNDERWATER = (1 << 2),
+//     OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
+//     OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+// };
 
 // init functions that must be global
 void bhv_moving_yellow_coin_init(void);

@@ -1,6 +1,10 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
+#include "game/object_helpers.h"
+#include "audio/external.h"
 
 
 /**

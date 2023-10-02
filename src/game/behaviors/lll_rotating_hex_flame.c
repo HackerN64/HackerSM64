@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 #define /*0x0F4*/ O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_INDEX   0x1B
 #define /*0x0F4*/ O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_X_INDEX (O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_INDEX + 0) // 0x1B

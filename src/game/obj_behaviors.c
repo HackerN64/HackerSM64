@@ -43,7 +43,7 @@
 /**
  * Current object floor as defined in object_step.
  */
-static struct Surface *sObjFloor;
+struct Surface *sObjFloor;
 
 /**
  * Set to false when an object close to the floor should not be oriented in reference
@@ -727,59 +727,3 @@ UNUSED s32 debug_sequence_tracker(s16 debugInputSequence[]) {
     return FALSE;
 }
 
-#include "behaviors/moving_coin.inc.c"
-#include "behaviors/seaweed.inc.c"
-#include "behaviors/bobomb.inc.c"
-#include "behaviors/cannon_door.inc.c"
-#include "behaviors/whirlpool.inc.c"
-#include "behaviors/amp.inc.c"
-#include "behaviors/butterfly.inc.c"
-#include "behaviors/hoot.inc.c"
-#include "behaviors/beta_holdable_object.inc.c"
-#include "behaviors/bubble.inc.c"
-#include "behaviors/water_wave.inc.c"
-#include "behaviors/explosion.inc.c"
-#include "behaviors/respawner.inc.c"
-#include "behaviors/bully.inc.c"
-#include "behaviors/water_ring.inc.c"
-#include "behaviors/bowser_bomb.inc.c"
-#include "behaviors/celebration_star.inc.c"
-#include "behaviors/drawbridge.inc.c"
-#include "behaviors/bomp.inc.c"
-#include "behaviors/sliding_platform.inc.c"
-#include "behaviors/moneybag.inc.c"
-#include "behaviors/bowling_ball.inc.c"
-#include "behaviors/cruiser.inc.c"
-#include "behaviors/spindel.inc.c"
-#include "behaviors/pyramid_wall.inc.c"
-#include "behaviors/pyramid_elevator.inc.c"
-#include "behaviors/pyramid_top.inc.c"
-#include "behaviors/sound_waterfall.inc.c"
-#include "behaviors/sound_volcano.inc.c"
-#include "behaviors/castle_flag.inc.c"
-#include "behaviors/sound_birds.inc.c"
-#include "behaviors/sound_ambient.inc.c"
-#include "behaviors/sound_sand.inc.c"
-#include "behaviors/castle_cannon_grate.inc.c"
-#include "behaviors/snowman.inc.c"
-#include "behaviors/boulder.inc.c"
-#include "behaviors/cap.inc.c"
-#include "behaviors/koopa_shell.inc.c"
-#include "behaviors/spawn_star.inc.c"
-#include "behaviors/red_coin.inc.c"
-#include "behaviors/hidden_star.inc.c"
-#include "behaviors/rolling_log.inc.c"
-#include "behaviors/mushroom_1up.inc.c"
-#include "behaviors/controllable_platform.inc.c"
-#include "behaviors/breakable_box_small.inc.c"
-#include "behaviors/snow_mound.inc.c"
-#include "behaviors/floating_platform.inc.c"
-#include "behaviors/arrow_lift.inc.c"
-#include "behaviors/orange_number.inc.c"
-#include "behaviors/manta_ray.inc.c"
-#include "behaviors/falling_pillar.inc.c"
-#include "behaviors/floating_box.inc.c"
-#include "behaviors/decorative_pendulum.inc.c"
-#include "behaviors/treasure_chest.inc.c"
-#include "behaviors/mips.inc.c"
-#include "behaviors/yoshi.inc.c"

@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 // water_mist_particle.inc.c
 // TODO: Is this really "mist"?

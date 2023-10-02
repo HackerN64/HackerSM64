@@ -1,7 +1,8 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
-
+#include "game/object_helpers.h"
+#include "levels/bitfs/header.h"
+#include "levels/bits/header.h"
 
 /**
  * Behavior for bhvActivatedBackAndForthPlatform.

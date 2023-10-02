@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 #define /*0x0F4*/ O_MANTA_TARGET_ANGLE_INDEX 0x1B
 #define /*0x0F4*/ O_MANTA_TARGET_PITCH_INDEX (O_MANTA_TARGET_ANGLE_INDEX + 0) // 0x1B

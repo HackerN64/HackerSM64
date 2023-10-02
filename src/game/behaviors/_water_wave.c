@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 // water_wave.inc.c
 // TODO: Rename to avoid confusion with water_splashes_and_waves

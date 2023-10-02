@@ -49,12 +49,6 @@
 
 //! TODO: remove static
 
-enum ObjPositionOperation {
-    POS_OP_SAVE_POSITION,
-    POS_OP_COMPUTE_VELOCITY,
-    POS_OP_RESTORE_POSITION
-};
-
 Vec3f sObjSavedPos;
 
 void wiggler_jumped_on_attack_handler(void);
@@ -743,43 +737,14 @@ static void treat_far_home_as_mario(f32 threshold) {
     }
 }
 
-#include "behaviors/koopa.inc.c" // TODO: Text arg field name
-#include "behaviors/pokey.inc.c"
-#include "behaviors/swoop.inc.c"
-#include "behaviors/fly_guy.inc.c"
-#include "behaviors/goomba.inc.c"
-#include "behaviors/chain_chomp.inc.c" // TODO: chain_chomp_sub_act_lunge documentation
-#include "behaviors/wiggler.inc.c"     // TODO
-#include "behaviors/spiny.inc.c"
-#include "behaviors/enemy_lakitu.inc.c" // TODO
-#include "behaviors/cloud.inc.c"
-#include "behaviors/camera_lakitu.inc.c" // TODO: 104 label, follow cam documentation
-#include "behaviors/monty_mole.inc.c"    // TODO
-#include "behaviors/platform_on_track.inc.c"
-#include "behaviors/seesaw_platform.inc.c"
-#include "behaviors/ferris_wheel.inc.c"
-#include "behaviors/water_bomb.inc.c" // TODO: Shadow position
-#include "behaviors/ttc_rotating_solid.inc.c"
-#include "behaviors/ttc_pendulum.inc.c"
-#include "behaviors/ttc_treadmill.inc.c" // TODO
-#include "behaviors/ttc_moving_bar.inc.c"
-#include "behaviors/ttc_cog.inc.c"
-#include "behaviors/ttc_pit_block.inc.c"
-#include "behaviors/ttc_elevator.inc.c"
-#include "behaviors/ttc_2d_rotator.inc.c"
-#include "behaviors/ttc_spinner.inc.c"
-#include "behaviors/mr_blizzard.inc.c"
-#include "behaviors/sliding_platform_2.inc.c"
-#include "behaviors/rotating_octagonal_plat.inc.c"
-#include "behaviors/animated_floor_switch.inc.c"
-#include "behaviors/activated_bf_plat.inc.c"
-#include "behaviors/recovery_heart.inc.c"
-#include "behaviors/water_bomb_cannon.inc.c"
-#include "behaviors/unagi.inc.c"
-#include "behaviors/dorrie.inc.c"
-#include "behaviors/haunted_chair.inc.c"
-#include "behaviors/mad_piano.inc.c"
-#include "behaviors/flying_bookend_switch.inc.c"
+// TODO koopa : Text arg field name
+// TODO chain_chomp : chain_chomp_sub_act_lunge documentation
+// TODO wiggler
+// TODO enemy_lakitu
+// TODO camera_lakitu : 104 label, follow cam documentation
+// TODO monty_mole
+// TODO water_bomb : Shadow position
+// TODO ttc_treadmill
 
 /**
  * Used by bowser, fly guy, piranha plant, and fire spitters.
@@ -796,22 +761,3 @@ void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 sca
         obj->oMoveAnglePitch = movePitch;
     }
 }
-
-#include "behaviors/fire_piranha_plant.inc.c"
-#include "behaviors/fire_spitter.inc.c"
-#include "behaviors/flame.inc.c"
-#include "behaviors/snufit.inc.c"
-#include "behaviors/horizontal_grindel.inc.c"
-#include "behaviors/eyerok.inc.c"
-#include "behaviors/klepto.inc.c"
-#include "behaviors/bird.inc.c"
-#include "behaviors/racing_penguin.inc.c"
-#include "behaviors/coffin.inc.c"
-#include "behaviors/clam.inc.c"
-#include "behaviors/skeeter.inc.c"
-#include "behaviors/swing_platform.inc.c"
-#include "behaviors/donut_platform.inc.c"
-#include "behaviors/ddd_pole.inc.c"
-#include "behaviors/reds_star_marker.inc.c"
-#include "behaviors/triplet_butterfly.inc.c"
-#include "behaviors/bubba.inc.c"

@@ -5,6 +5,25 @@
 
 #include "macros.h"
 #include "types.h"
+#include "object_list_processor.h"
+
+extern struct Surface *sObjFloor;
+
+// enums for obj_perform_position_op
+enum ObjPositionOperation {
+    POS_OP_SAVE_POSITION,
+    POS_OP_COMPUTE_VELOCITY,
+    POS_OP_RESTORE_POSITION
+};
+
+enum ObjCollisionFlags {
+    OBJ_COL_FLAGS_NONE      = (0 << 0),
+    OBJ_COL_FLAG_GROUNDED   = (1 << 0),
+    OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
+    OBJ_COL_FLAG_UNDERWATER = (1 << 2),
+    OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
+    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+};
 
 // used for chain chomp and wiggler
 struct ChainSegment {
@@ -50,6 +69,18 @@ struct SpawnParticlesInfo {
     /*0x09*/ s8 dragStrength;
     /*0x0C*/ f32 sizeBase;
     /*0x10*/ f32 sizeRange;
+};
+
+enum AttackHandler {
+    ATTACK_HANDLER_NOP,
+    ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE,
+    ATTACK_HANDLER_KNOCKBACK,
+    ATTACK_HANDLER_SQUISHED,
+    ATTACK_HANDLER_SPECIAL_KOOPA_LOSE_SHELL,
+    ATTACK_HANDLER_SET_SPEED_TO_ZERO,
+    ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON,
+    ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
+    ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN
 };
 
 enum GeoUpdateLayerTransparencyModes {
@@ -200,6 +231,10 @@ void obj_translate_xz_random(struct Object *obj, f32 rangeLength);
 void cur_obj_set_pos_via_transform(void);
 void cur_obj_spawn_particles(struct SpawnParticlesInfo *info);
 s32 cur_obj_reflect_move_angle_off_wall(void);
+void shelled_koopa_attack_handler(s32 attackType);
+void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 scale, ModelID32 model,
+                   f32 startSpeed, f32 endSpeed, s16 movePitch);
+void obj_set_speed_to_zero(void);
 
 #define WAYPOINT_FLAGS_END -1
 #define WAYPOINT_FLAGS_NONE 0

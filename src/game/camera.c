@@ -11120,9 +11120,3 @@ void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16
     obj->oMoveAnglePitch = approach_s16_asymptotic(obj->oMoveAnglePitch, pitchOff - pitch, pitchDiv);
     obj->oMoveAngleYaw = approach_s16_asymptotic(obj->oMoveAngleYaw, yaw + yawOff, yawDiv);
 }
-
-#include "behaviors/intro_peach.inc.c"
-#include "behaviors/intro_lakitu.inc.c"
-#include "behaviors/end_birds_1.inc.c"
-#include "behaviors/end_birds_2.inc.c"
-#include "behaviors/intro_scene.inc.c"

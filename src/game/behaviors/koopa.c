@@ -1,6 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
-#include "object_helpers.h"
+#include "game/object_helpers.h"
 
 #define /*0x0F4*/ oKoopaAgility                     OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oKoopaMovementType                OBJECT_FIELD_S32(0x1C)
