@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // tuxie.inc.c
 
 void play_penguin_walking_sound(s32 walk) {

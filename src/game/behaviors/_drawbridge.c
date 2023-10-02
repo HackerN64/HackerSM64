@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // drawbridge.inc.c
 
 void bhv_lll_drawbridge_spawner_loop(void) {

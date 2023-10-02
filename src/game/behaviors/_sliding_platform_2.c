@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // sliding_platform_2.inc.c
 
 static Collision const *sSlidingPlatformsCollisionData[] = {

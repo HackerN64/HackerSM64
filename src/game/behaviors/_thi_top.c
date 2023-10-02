@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // thi_top.inc.c
 
 static struct SpawnParticlesInfo sThiTopPuffs = {

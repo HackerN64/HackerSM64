@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // sl_snowman_wind.inc.c
 
 void bhv_sl_snowman_wind_loop(void) {

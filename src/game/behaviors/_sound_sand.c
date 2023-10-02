@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // sound_sand.inc.c
 
 void bhv_sand_sound_loop(void) {

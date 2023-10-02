@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // lll_sinking_rectangle.inc.c
 
 void sinking_rectangular_plat_actions(f32 a0, s32 a1) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // breakable_wall.inc.c
 
 void bhv_wf_breakable_wall_loop(void) {

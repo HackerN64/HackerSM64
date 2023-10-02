@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // end_birds_2.inc.c
 
 void bhv_end_birds_2_loop(void) {

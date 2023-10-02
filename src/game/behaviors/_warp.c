@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // warp.inc.c
 
 void bhv_warp_loop(void) {

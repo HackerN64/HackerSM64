@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // tower_door.inc.c
 
 void bhv_tower_door_loop(void) {

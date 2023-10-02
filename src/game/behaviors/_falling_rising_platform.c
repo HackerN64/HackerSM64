@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // falling_rising_platform.inc.c
 
 void bhv_squishable_platform_loop(void) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // king_bobomb.inc.c
 
 // Copy of geo_update_projectile_pos_from_parent

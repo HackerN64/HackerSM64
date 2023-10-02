@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // castle_cannon_grate.inc.c
 
 void bhv_castle_cannon_grate_init(void) {

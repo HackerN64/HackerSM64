@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // bub.inc.c
 
 // NOTE: These first set of functions spawn a school of bub depending on oCheepCheepSpawnerSpawnAmount's

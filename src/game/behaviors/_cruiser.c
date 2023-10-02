@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // cruiser.inc.c
 
 void bhv_rr_cruiser_wing_init(void) {

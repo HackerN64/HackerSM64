@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // lll_sinking_rock_block.inc.c
 
 void bhv_lll_sinking_rock_block_loop(void) {

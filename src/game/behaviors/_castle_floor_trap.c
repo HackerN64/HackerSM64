@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // castle_floor_trap.inc.c
 
 void bhv_floor_trap_in_castle_loop(void) {

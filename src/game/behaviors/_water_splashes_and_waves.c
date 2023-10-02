@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // water_splashes_and_waves.inc.c
 
 // Water droplets from Mario jumping in a pool of water.

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // tree_particles.inc.c
 
 void bhv_tree_snow_or_leaf_loop(void) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // square_platform_cycle.inc.c
 
 s32 square_plat_set_yaw_until_timer(u16 yaw, s32 a) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // white_puff.inc.c
 
 void bhv_white_puff_1_loop(void) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // flame_mario.inc.c
 
 void bhv_black_smoke_upward_loop(void) {

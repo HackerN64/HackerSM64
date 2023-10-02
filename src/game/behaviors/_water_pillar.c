@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // water_pillar.inc.c
 
 void water_level_pillar_undrained(void) {

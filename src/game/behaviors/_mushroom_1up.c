@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // mushroom_1up.inc.c
 
 void bhv_1up_interact(void) {

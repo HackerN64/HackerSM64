@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // pole_base.inc.c
 
 void bhv_pole_base_loop(void) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // snow_mound.inc.c
 
 void bhv_sliding_snow_mound_loop(void) {

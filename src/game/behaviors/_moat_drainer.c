@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // moat_drainer.inc.c
 
 void bhv_invisible_objects_under_bridge_init(void) {

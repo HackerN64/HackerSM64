@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // koopa_shell.inc.c
 
 struct ObjectHitbox sKoopaShellHitbox = {

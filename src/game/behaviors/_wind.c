@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // wind.inc.c
 
 void spawn_wind_particles(s16 pitch, s16 yaw) {

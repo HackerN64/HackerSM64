@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // static_checkered_platform.inc.c
 
 void bhv_static_checkered_platform_loop(void) {

@@ -1,3 +1,7 @@
+#include <ultra64.h>
+#include "global_object_fields.h"
+#include "object_helpers.h"
+
 // water_mist.inc.c
 // TODO: there is confusion with the earlier mist file. Clarify?
 
