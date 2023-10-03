@@ -1,9 +1,13 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Flamethrower */
 #define /*0x110*/ oFlameThowerTimeRemaining OBJECT_FIELD_S32(0x22)
-// flamethrower.inc.c
 
 void bhv_flamethrower_flame_loop(void) {
     f32 scale;

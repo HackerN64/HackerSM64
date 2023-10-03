@@ -1,11 +1,14 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
 
+/* Treasure Chest */
 #define /*0x0F4*/ oTreasureChestNumOpenedChests OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oTreasureChestDoCloseChests   OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oTreasureChestAboveWater      OBJECT_FIELD_S32(0x1D)
-// treasure_chest.inc.c
 
 /**
  * Hitbox for treasure chest bottom.

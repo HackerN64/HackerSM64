@@ -1772,29 +1772,6 @@ void bhv_dust_smoke_loop(void) {
     o->oSmokeTimer++;
 }
 
-s32 cur_obj_set_direction_table(s8 *pattern) {
-    o->oToxBoxMovementPattern = pattern;
-    o->oToxBoxMovementStep = 0;
-
-    return *(s8 *) o->oToxBoxMovementPattern;
-}
-
-s32 cur_obj_progress_direction_table(void) {
-    s8 action;
-    s8 *pattern  = o->oToxBoxMovementPattern;
-    s32 nextStep = o->oToxBoxMovementStep + 1;
-
-    if (pattern[nextStep] != -1) {
-        action = pattern[nextStep];
-        o->oToxBoxMovementStep++;
-    } else {
-        action = pattern[0];
-        o->oToxBoxMovementStep = 0;
-    }
-
-    return action;
-}
-
 void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end) {
     f32 scale = ((end - start) * ((f32) o->oTimer / times)) + start;
 

@@ -1,16 +1,9 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oBirdSpeed                OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ O_BIRD_TARGET_ANGLE_INDEX 0x1C
-#define /*0x0F8*/ O_BIRD_TARGET_PITCH_INDEX (O_BIRD_TARGET_ANGLE_INDEX + 0) // 0x1C
-#define /*0x0FC*/ O_BIRD_TARGET_YAW_INDEX   (O_BIRD_TARGET_ANGLE_INDEX + 1) // 0x1D
-#define /*0x100*/ O_BIRD_TARGET_ROLL_INDEX  (O_BIRD_TARGET_ANGLE_INDEX + 2) // 0x1E
-#define /*0x0F8*/ oBirdTargetAngleVec       OBJECT_FIELD_S32(O_BIRD_TARGET_ANGLE_INDEX)
-#define /*0x0F8*/ oBirdTargetPitch          OBJECT_FIELD_S32(O_BIRD_TARGET_PITCH_INDEX)
-#define /*0x0FC*/ oBirdTargetYaw            OBJECT_FIELD_S32(O_BIRD_TARGET_YAW_INDEX)
-#define /*0x100*/ oBirdTargetRoll           OBJECT_FIELD_S32(O_BIRD_TARGET_ROLL_INDEX) // unused
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvBird. These are the birds in the castle grounds
@@ -21,6 +14,17 @@
  * Spawned birds are only spawned by a spawner bird, and start flying
  * immediately after spawning.
  */
+
+/* Bird */
+#define /*0x0F4*/ oBirdSpeed                OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ O_BIRD_TARGET_ANGLE_INDEX 0x1C
+#define /*0x0F8*/ O_BIRD_TARGET_PITCH_INDEX (O_BIRD_TARGET_ANGLE_INDEX + 0) // 0x1C
+#define /*0x0FC*/ O_BIRD_TARGET_YAW_INDEX   (O_BIRD_TARGET_ANGLE_INDEX + 1) // 0x1D
+#define /*0x100*/ O_BIRD_TARGET_ROLL_INDEX  (O_BIRD_TARGET_ANGLE_INDEX + 2) // 0x1E
+#define /*0x0F8*/ oBirdTargetAngleVec       OBJECT_FIELD_S32(O_BIRD_TARGET_ANGLE_INDEX)
+#define /*0x0F8*/ oBirdTargetPitch          OBJECT_FIELD_S32(O_BIRD_TARGET_PITCH_INDEX)
+#define /*0x0FC*/ oBirdTargetYaw            OBJECT_FIELD_S32(O_BIRD_TARGET_YAW_INDEX)
+#define /*0x100*/ oBirdTargetRoll           OBJECT_FIELD_S32(O_BIRD_TARGET_ROLL_INDEX) // unused
 
 /**
  * If the object is a spawned bird, start flying; if it's a spawner bird,

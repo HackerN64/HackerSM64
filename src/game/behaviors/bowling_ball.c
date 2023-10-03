@@ -1,9 +1,22 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "level_misc_macros.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
+#include "levels/bob/header.h"
+#include "levels/ttm/header.h"
 
+/* Bowling Ball */
 #define /*0x0F4*/ oBowlingBallTargetYaw OBJECT_FIELD_S32(0x1B)
-// bowling_ball.inc.c
+// 0x1D-0x21 reserved for pathing
+
+/* Bowling Ball Spawner (Generic) */
+#define /*0x0F4*/ oBBallSpawnerMaxSpawnDist OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oBBallSpawnerSpawnOdds    OBJECT_FIELD_F32(0x1C)
+#define /*0x0FC*/ oBBallSpawnerPeriodMinus1 OBJECT_FIELD_S32(0x1D)
 
 static struct ObjectHitbox sBowlingBallHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,

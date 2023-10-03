@@ -2,9 +2,9 @@
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
 
+/* Tox Box */
 #define /*0x1AC*/ oToxBoxMovementPattern OBJECT_FIELD_VPTR(0x49)
 #define /*0x1B0*/ oToxBoxMovementStep    OBJECT_FIELD_S32(0x4A)
-// tox_box.inc.c
 
 s8 sToxBoxDirectionPattern1[] = { 4, 1, 4, 1, 6, 1, 6, 1, 5, 1, 5, 1, 6, 1, 6, 1, 5, 1, 2, 4, 1, 4, 1, 4, 1, 2,
                                   5, 1, 5, 1, 7, 1, 7, 1, 4, 1, 4, 1, 7, 1, 7, 1, 5, 1, 5, 1, 5, 1, 2, 4, 1, -1 };
@@ -17,6 +17,29 @@ s8 *sToxBoxDirectionPatterns[] = {
     sToxBoxDirectionPattern2,
     sToxBoxDirectionPattern3
 };
+
+s32 tox_box_set_direction_table(s8 *pattern) {
+    o->oToxBoxMovementPattern = pattern;
+    o->oToxBoxMovementStep = 0;
+
+    return *(s8 *) o->oToxBoxMovementPattern;
+}
+
+s32 tox_box_progress_direction_table(void) {
+    s8 action;
+    s8 *pattern  = o->oToxBoxMovementPattern;
+    s32 nextStep = o->oToxBoxMovementStep + 1;
+
+    if (pattern[nextStep] != -1) {
+        action = pattern[nextStep];
+        o->oToxBoxMovementStep++;
+    } else {
+        action = pattern[0];
+        o->oToxBoxMovementStep = 0;
+    }
+
+    return action;
+}
 
 void tox_box_shake_screen(void) {
     if (o->oDistanceToMario < 3000.0f) {
@@ -38,7 +61,7 @@ void tox_box_move(f32 forwardVel, f32 leftVel, s16 deltaPitch, s16 deltaRoll) {
     cur_obj_set_pos_via_transform();
 
     if (o->oTimer == 7) {
-        o->oAction = cur_obj_progress_direction_table();
+        o->oAction = tox_box_progress_direction_table();
         cur_obj_play_sound_2(SOUND_GENERAL_TOX_BOX_MOVE);
     }
 }
@@ -69,25 +92,25 @@ void tox_box_act_1(void) {
     o->oPosY = o->oHomeY + 3.0f;
 
     if (o->oTimer == 20) {
-        o->oAction = cur_obj_progress_direction_table();
+        o->oAction = tox_box_progress_direction_table();
     }
 }
 
 void tox_box_act_2(void) {
     if (o->oTimer == 20) {
-        o->oAction = cur_obj_progress_direction_table();
+        o->oAction = tox_box_progress_direction_table();
     }
 }
 
 void tox_box_act_3(void) {
     if (o->oTimer == 20) {
-        o->oAction = cur_obj_progress_direction_table();
+        o->oAction = tox_box_progress_direction_table();
     }
 }
 
 void tox_box_act_0(void) {
     s8 *pattern = sToxBoxDirectionPatterns[o->oBehParams2ndByte];
-    o->oAction = cur_obj_set_direction_table(pattern);
+    o->oAction = tox_box_set_direction_table(pattern);
 }
 
 ObjActionFunc sToxBoxActions[] = {

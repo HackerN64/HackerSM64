@@ -1,11 +1,14 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Cannon */
 #define /*0x0F4*/ oCannonAngle              OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oCannonTimeSinceActivated OBJECT_FIELD_S32(0x1C)
 #define /*0x10C*/ oCannonIsActive           OBJECT_FIELD_S32(0x21)
-// cannon.inc.c
 
 void bhv_cannon_base_unused_loop(void) {
     o->oPosY += o->oVelY;

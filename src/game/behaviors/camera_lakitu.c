@@ -1,7 +1,21 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
+#include "seq_ids.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/**
+ * Behavior for bhvCameraLakitu. This includes both the intro lakitu and the
+ * lakitu visible in the mirror room.
+ * TODO: Processing order relative to bhvCloud
+ */
+
+/* Camera Lakitu */
 #define /*0x0F4*/ oCameraLakituBlinkTimer     OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oCameraLakituSpeed          OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oCameraLakituCircleRadius   OBJECT_FIELD_F32(0x1D)
@@ -9,12 +23,6 @@
 #define /*0x104*/ oCameraLakituIntroMusicPlayed OBJECT_FIELD_S32(0x1F)
 #define /*0x1AC*/ oCameraLakituPitchVel       OBJECT_FIELD_S16(0x49, 0)
 #define /*0x1AE*/ oCameraLakituYawVel         OBJECT_FIELD_S16(0x49, 1)
-
-/**
- * Behavior for bhvCameraLakitu. This includes both the intro lakitu and the
- * lakitu visible in the mirror room.
- * TODO: Processing order relative to bhvCloud
- */
 
 /**
  * Init function for camera lakitu.

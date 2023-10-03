@@ -1,11 +1,22 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/surface_load.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
+#include "game/save_file.h"
 
+/* Exclamation Box */
 #define /*0x0F4*/ oExclamationBoxHorizontalScale OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oExclamationBoxVerticalScale   OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oExclamationBoxScaleAngle      OBJECT_FIELD_S32(0x1D)
-// exclamation_box.inc.c
+
+static s32 sCapSaveFlags[] = {
+    SAVE_FLAG_HAVE_WING_CAP,
+    SAVE_FLAG_HAVE_METAL_CAP,
+    SAVE_FLAG_HAVE_VANISH_CAP
+};
 
 struct ObjectHitbox sExclamationBoxHitbox = {
     .interactType      = INTERACT_BREAKABLE,

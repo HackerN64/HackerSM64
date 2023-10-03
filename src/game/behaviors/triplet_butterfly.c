@@ -1,7 +1,11 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
 
+/* Triplet Butterfly */
 #define /*0x0F4*/ oTripletButterflyScale             OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oTripletButterflySpeed             OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oTripletButterflyBaseYaw           OBJECT_FIELD_F32(0x1D)
@@ -11,7 +15,6 @@
 #define /*0x10C*/ oTripletButterflyModel             OBJECT_FIELD_S32(0x21)
 #define /*0x110*/ oTripletButterflySelectedButterfly OBJECT_FIELD_S32(0x22)
 #define /*0x1AC*/ oTripletButterflyScalePhase        OBJECT_FIELD_S32(0x49)
-// triplet_butterfly.inc.c
 
 struct TripletButterflyActivationData {
     ModelID32 model;

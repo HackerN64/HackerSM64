@@ -1,15 +1,23 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "seq_ids.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oPiranhaPlantSleepMusicState OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oPiranhaPlantScale           OBJECT_FIELD_F32(0x1C)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvPiranhaPlant.
  * This controls Piranha Plants, which alternate between sleeping, attacking,
  * and dying, primarily depending on Mario's proximity and interaction state.
  */
+
+/* Piranha Plant */
+#define /*0x0F4*/ oPiranhaPlantSleepMusicState OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oPiranhaPlantScale           OBJECT_FIELD_F32(0x1C)
 
 /**
  * Reset the Piranha Plant back to a sleeping animation, no matter what state

@@ -1,9 +1,12 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Grand Star */
 #define /*0x108*/ oGrandStarArcTime OBJECT_FIELD_S32(0x20)
-// grand_star.inc.c
 
 s32 arc_to_goal_pos(Vec3f a0, Vec3f a1, f32 yVel, f32 gravity) {
     f32 dx = a0[0] - a1[0];

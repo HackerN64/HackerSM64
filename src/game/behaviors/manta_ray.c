@@ -1,7 +1,13 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "level_misc_macros.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Manta Ray */
 #define /*0x0F4*/ O_MANTA_TARGET_ANGLE_INDEX 0x1B
 #define /*0x0F4*/ O_MANTA_TARGET_PITCH_INDEX (O_MANTA_TARGET_ANGLE_INDEX + 0) // 0x1B
 #define /*0x0F8*/ O_MANTA_TARGET_YAW_INDEX   (O_MANTA_TARGET_ANGLE_INDEX + 1) // 0x1C

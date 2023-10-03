@@ -106,59 +106,6 @@ s16 sCreditsPlayer2Yaw;
  */
 u8 sFramesPaused;
 
-extern struct CameraFOVStatus sFOVState;
-extern struct TransitionInfo sModeTransition;
-extern struct PlayerGeometry sMarioGeometry;
-extern s16 sAvoidYawVel;
-extern s16 sCameraYawAfterDoorCutscene;
-extern struct HandheldShakePoint sHandheldShakeSpline[4];
-extern s16 sHandheldShakeMag;
-extern f32 sHandheldShakeTimer;
-extern f32 sHandheldShakeInc;
-extern s16 sHandheldShakePitch;
-extern s16 sHandheldShakeYaw;
-extern s16 sHandheldShakeRoll;
-extern s16 sSelectionFlags;
-extern s16 s2ndRotateFlags;
-extern s16 sCameraSoundFlags;
-extern u16 sCButtonsPressed;
-extern s16 sCutsceneDialogID;
-extern struct LakituState gLakituState;
-extern s16 sAreaYaw;
-extern s16 sAreaYawChange;
-extern s16 sLakituDist;
-extern s16 sLakituPitch;
-extern f32 sZoomAmount;
-extern s16 sCSideButtonYaw;
-extern s16 sBehindMarioSoundTimer;
-extern f32 sZeroZoomDist;
-extern s16 sCUpCameraPitch;
-extern s16 sModeOffsetYaw;
-extern s16 sSpiralStairsYawOffset;
-extern s16 s8DirModeBaseYaw;
-extern s16 s8DirModeYawOffset;
-extern f32 sPanDistance;
-extern f32 sCannonYOffset;
-extern struct ModeTransitionInfo sModeInfo;
-extern Vec3f sCastleEntranceOffset;
-extern u32 sParTrackIndex;
-extern struct ParallelTrackingPoint *sParTrackPath;
-extern struct CameraStoredInfo sParTrackTransOff;
-extern struct CameraStoredInfo sCameraStoreCUp;
-extern struct CameraStoredInfo sCameraStoreCutscene;
-extern s16 gCameraMovementFlags;
-extern s16 sStatusFlags;
-extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
-extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
-extern s16 sCutsceneSplineSegment;
-extern f32 sCutsceneSplineSegmentProgress;
-extern s16 sCutsceneShot;
-extern s16 gCutsceneTimer;
-extern struct CutsceneVariable sCutsceneVars[10];
-extern s32 gObjCutsceneDone;
-extern u32 gCutsceneObjSpawn;
-extern struct Camera *gCamera;
-
 /**
  * Lakitu's position and focus.
  * @see LakituState
@@ -9278,35 +9225,6 @@ void cutscene_end_waving_start(UNUSED struct Camera *c) {
 }
 
 // 3rd part of data
-struct CutsceneSplinePoint gIntroLakituStartToPipeFocus[] = {
-    { 0, 32, { 58, -250, 346 } },    { 1, 50, { -159, -382, 224 } }, { 2, 37, { 0, -277, 237 } },
-    { 3, 15, { 1, -44, 245 } },      { 4, 35, { 0, -89, 228 } },     { 5, 15, { 28, 3, 259 } },
-    { 6, 25, { -38, -201, 371 } },   { 7, 20, { -642, 118, 652 } },  { 8, 25, { 103, -90, 861 } },
-    { 9, 25, { 294, 145, 579 } },    { 10, 30, { 220, -42, 500 } },  { 11, 20, { 10, -134, 200 } },
-    { 12, 20, { -143, -145, 351 } }, { 13, 14, { -256, -65, 528 } }, { 14, 20, { -251, -52, 459 } },
-    { 15, 25, { -382, 520, 395 } },  { 16, 25, { -341, 240, 653 } }, { 17, 5, { -262, 700, 143 } },
-    { 18, 15, { -760, 32, 27 } },    { 19, 20, { -756, -6, -26 } },  { 20, 20, { -613, 5, 424 } },
-    { 21, 20, { -22, -100, 312 } },  { 22, 25, { 212, 80, 61 } },    { 23, 20, { 230, -28, 230 } },
-    { 24, 35, { -83, -51, 303 } },   { 25, 17, { 126, 90, 640 } },   { 26, 9, { 158, 95, 763 } },
-    { 27, 8, { 113, -25, 1033 } },   { 28, 20, { 57, -53, 1291 } },  { 29, 15, { 73, -34, 1350 } },
-    { 30, 7, { 0, 96, 1400 } },      { 31, 8, { -59, 269, 1450 } },  { 32, 15, { 57, 1705, 1500 } },
-    { 0, 15, { -227, 511, 1550 } },  { -1, 15, { -227, 511, 1600 } }
-};
-
-struct CutsceneSplinePoint gIntroLakituStartToPipeOffsetFromCamera[] = {
-    { 0, 0, { -46, 87, -15 } },   { 1, 0, { -38, 91, -11 } },  { 2, 0, { -31, 93, -13 } },
-    { 3, 0, { -50, 84, -16 } },   { 4, 0, { -52, 83, -17 } },  { 5, 0, { -10, 99, 3 } },
-    { 6, 0, { -54, 83, -10 } },   { 7, 0, { -31, 85, -40 } },  { 8, 0, { -34, 91, 19 } },
-    { 9, 0, { -9, 95, 28 } },     { 10, 0, { 17, 72, 66 } },   { 11, 0, { 88, -7, 45 } },
-    { 12, 0, { 96, -6, -26 } },   { 13, 0, { 56, -1, -82 } },  { 14, 0, { 40, 65, -63 } },
-    { 15, 0, { -26, -3, -96 } },  { 16, 0, { 92, 82, 19 } },   { 17, 0, { 92, 32, 19 } },
-    { 18, 0, { 92, 32, 19 } },    { 19, 0, { 92, 102, 19 } },  { 20, 0, { -69, 59, -70 } },
-    { 21, 0, { -77, 109, -61 } }, { 22, 0, { -87, 59, -46 } }, { 23, 0, { -99, -3, 11 } },
-    { 24, 0, { -99, -11, 5 } },   { 25, 0, { -97, -6, 19 } },  { 26, 0, { -97, 22, -7 } },
-    { 27, 0, { -98, -11, -13 } }, { 28, 0, { -97, -11, 19 } }, { 29, 0, { -91, -11, 38 } },
-    { 30, 0, { -76, -11, 63 } },  { 31, 0, { -13, 33, 93 } },  { 32, 0, { 51, -11, 84 } },
-    { 33, 0, { 51, -11, 84 } },   { -1, 0, { 51, -11, 84 } }
-};
 
 struct CutsceneSplinePoint gEndWavingPos[] = {
     { 0, 0, { -5, 975, -917 } },    { 0, 0, { -5, 975, -917 } },    { 0, 0, { -5, 975, -917 } },

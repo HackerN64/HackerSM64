@@ -1,61 +1,30 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/save_file.h"
+#include "game/spawn_sound.h"
 
+/* Yoshi */
 #define /*0x0F4*/ oYoshiBlinkTimer OBJECT_FIELD_S32(0x1B)
 #define /*0x0FC*/ oYoshiChosenHome OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
-/*Custom general defines:
-s16 variables are also supported, and using them effectly can double the number of available members. The full list of s16 defines is:
-#define /*0x0F4*/ oF4                                           OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oF8                                           OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oFC                                           OBJECT_FIELD_S32(0x1D)
-#define /*0x100*/ o100                                          OBJECT_FIELD_S32(0x1E)
-#define /*0x104*/ o104                                          OBJECT_FIELD_S32(0x1F)
-#define /*0x108*/ o108                                          OBJECT_FIELD_S32(0x20)
-#define /*0x10C*/ o10C                                          OBJECT_FIELD_S32(0x21)
-#define /*0x110*/ o110                                          OBJECT_FIELD_S32(0x22)
-#define /*0x0F4*/ oFloatF4                                      OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oFloatF8                                      OBJECT_FIELD_F32(0x1C)
-#define /*0x0FC*/ oFloatFC                                      OBJECT_FIELD_F32(0x1D)
-#define /*0x100*/ oFloat100                                     OBJECT_FIELD_F32(0x1E)
-#define /*0x104*/ oFloat104                                     OBJECT_FIELD_F32(0x1F)
-#define /*0x108*/ oFloat108                                     OBJECT_FIELD_F32(0x20)
-#define /*0x10C*/ oFloat10C                                     OBJECT_FIELD_F32(0x21)
-#define /*0x110*/ oFloat110                                     OBJECT_FIELD_F32(0x22)
-#define /*0x0F4*/ oObjF4                                        OBJECT_FIELD_OBJ(0x1B)
-#define /*0x0F8*/ oObjF8                                        OBJECT_FIELD_OBJ(0x1C)
-#define /*0x0FC*/ oObjFC                                        OBJECT_FIELD_OBJ(0x1D)
-#define /*0x100*/ oObj100                                       OBJECT_FIELD_OBJ(0x1E)
-#define /*0x104*/ oObj104                                       OBJECT_FIELD_OBJ(0x1F)
-#define /*0x108*/ oObj108                                       OBJECT_FIELD_OBJ(0x20)
-#define /*0x10C*/ oObj10C                                       OBJECT_FIELD_OBJ(0x21)
-#define /*0x110*/ oObj110                                       OBJECT_FIELD_OBJ(0x22)
-#define /*0x0F4*/ oSurfF4                                   OBJECT_FIELD_SURFACE(0x1B)
-#define /*0x0F8*/ oSurfF8                                   OBJECT_FIELD_SURFACE(0x1C)
-#define /*0x0FC*/ oSurfFC                                   OBJECT_FIELD_SURFACE(0x1D)
-#define /*0x100*/ oSurf100                                  OBJECT_FIELD_SURFACE(0x1E)
-#define /*0x104*/ oSurf104                                  OBJECT_FIELD_SURFACE(0x1F)
-#define /*0x108*/ oSurf108                                  OBJECT_FIELD_SURFACE(0x20)
-#define /*0x10C*/ oSurf10C                                  OBJECT_FIELD_SURFACE(0x21)
-#define /*0x110*/ oSurf110                                  OBJECT_FIELD_SURFACE(0x22)
-#define /*0x0F4*/ os16F4                                        OBJECT_FIELD_S16(0x1B, 0)
-#define /*0x0F6*/ os16F6                                        OBJECT_FIELD_S16(0x1B, 1)
-#define /*0x0F8*/ os16F8                                        OBJECT_FIELD_S16(0x1C, 0)
-#define /*0x0FA*/ os16FA                                        OBJECT_FIELD_S16(0x1C, 1)
-#define /*0x0FC*/ os16FC                                        OBJECT_FIELD_S16(0x1D, 0)
-#define /*0x0FE*/ os16FE                                        OBJECT_FIELD_S16(0x1D, 1)
-#define /*0x100*/ os16100                                       OBJECT_FIELD_S16(0x1E, 0)
-#define /*0x102*/ os16102                                       OBJECT_FIELD_S16(0x1E, 1)
-#define /*0x104*/ os16104                                       OBJECT_FIELD_S16(0x1F, 0)
-#define /*0x106*/ os16106                                       OBJECT_FIELD_S16(0x1F, 1)
-#define /*0x108*/ os16108                                       OBJECT_FIELD_S16(0x20, 0)
-#define /*0x10A*/ os1610A                                       OBJECT_FIELD_S16(0x20, 1)
-#define /*0x10C*/ os1610C                                       OBJECT_FIELD_S16(0x21, 0)
-#define /*0x10E*/ os1610E                                       OBJECT_FIELD_S16(0x21, 1)
-#define /*0x110*/ os16110                                       OBJECT_FIELD_S16(0x22, 0)
-#define /*0x112*/ os16112                                       OBJECT_FIELD_S16(0x22, 1)
-// yoshi.inc.c
+
+/**
+ * Tracks whether or not Yoshi has walked/jumped off the roof.
+ */
+static s8 sYoshiDead = FALSE;
+/**
+ * Resets yoshi as spawned/despawned upon new file select.
+ * Possibly a function with stubbed code.
+ */
+void set_yoshi_as_not_dead(void) {
+    sYoshiDead = FALSE;
+}
 
 // X/Z coordinates of Yoshi's homes that he switches between.
 // Note that this doesn't contain the Y coordinate since the castle roof is flat,

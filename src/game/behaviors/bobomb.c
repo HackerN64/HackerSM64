@@ -6,10 +6,12 @@
 #include "object_constants.h"
 #include "sounds.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/ingame_menu.h"
 #include "game/interaction.h"
 #include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Bob-omb */
 #define /*0x0F4*/ oBobombBlinkTimer OBJECT_FIELD_S32(0x1B)

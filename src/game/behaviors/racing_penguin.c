@@ -1,14 +1,21 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "game/ingame_menu.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
+#include "levels/ccm/header.h"
 
+/* Racing Penguin */
 #define /*0x0F4*/ oRacingPenguinInitTextCooldown       OBJECT_FIELD_S32(0x1B)
+// 0x1D-0x21 reserved for pathing
 #define /*0x110*/ oRacingPenguinWeightedNewTargetSpeed OBJECT_FIELD_F32(0x22)
 #define /*0x1AC*/ oRacingPenguinFinalTextbox           OBJECT_FIELD_S16(0x49, 0)
 #define /*0x1AE*/ oRacingPenguinMarioWon               OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oRacingPenguinReachedBottom          OBJECT_FIELD_S16(0x4A, 0)
 #define /*0x1B2*/ oRacingPenguinMarioCheated           OBJECT_FIELD_S16(0x4A, 1)
-// racing_penguin.inc.c
 
 struct RacingPenguinData {
     s16 text;

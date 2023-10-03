@@ -1,14 +1,16 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTumblingBridgeRollAccel OBJECT_FIELD_S32(0x1B)
-// tumbling_bridge.inc.c
-
+#include "game/spawn_sound.h"
 #include "levels/wf/header.h"
 #include "levels/bbh/header.h"
 #include "levels/lll/header.h"
 #include "levels/bitfs/header.h"
+
+/* Tumbling Bridge */
+#define /*0x0F4*/ oTumblingBridgeRollAccel OBJECT_FIELD_S32(0x1B)
 
 struct TumblingBridgeParams {
     s16 numBridgeSections;

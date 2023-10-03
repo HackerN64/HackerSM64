@@ -1,10 +1,12 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/save_file.h"
 
+/* Cap */
 #define /*0x0F4*/ oCapDoScaleVertically OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oCapScaleAngle        OBJECT_FIELD_S32(0x1C)
-// cap.inc.c
 
 static struct ObjectHitbox sCapHitbox = {
     /* interactType:      */ INTERACT_CAP,

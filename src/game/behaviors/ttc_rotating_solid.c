@@ -1,17 +1,20 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTCRotatingSolidNumTurns      OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oTTCRotatingSolidNumSides      OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oTTCRotatingSolidRotationDelay OBJECT_FIELD_S32(0x1D)
-#define /*0x100*/ oTTCRotatingSolidVelY          OBJECT_FIELD_F32(0x1E)
-#define /*0x104*/ oTTCRotatingSolidSoundTimer    OBJECT_FIELD_S32(0x1F)
+#include "game/spawn_sound.h"
+#include "levels/ttc/header.h"
 
 /**
  * Behavior for bhvTTCRotatingSolid, which are the rotating cube and triangular
  * prism.
  */
+
+/* TTC Rotating Solid */
+#define /*0x0F4*/ oTTCRotatingSolidNumTurns      OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oTTCRotatingSolidNumSides      OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oTTCRotatingSolidRotationDelay OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oTTCRotatingSolidVelY          OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oTTCRotatingSolidSoundTimer    OBJECT_FIELD_S32(0x1F)
 
 /**
  * The collision models for cube and triangular prism, respectively.

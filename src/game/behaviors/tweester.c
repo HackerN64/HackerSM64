@@ -1,9 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/debug.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTweesterScaleTimer OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oTweesterUnused     OBJECT_FIELD_S32(0x1C)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior file for bhvTweester and bhvTweesterSandParticle
@@ -11,6 +14,10 @@
  * Mario action, and an action that hides it. At certain times the
  * Tweester spawns the sand particles also in this file.
  */
+
+/* Tweester */
+#define /*0x0F4*/ oTweesterScaleTimer OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oTweesterUnused     OBJECT_FIELD_S32(0x1C)
 
 struct ObjectHitbox sTweesterHitbox = {
     /* interactType:      */ INTERACT_TORNADO,

@@ -1,11 +1,10 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F8*/ oWaterBombVerticalStretch OBJECT_FIELD_F32(0x1C)
-#define /*0x0FC*/ oWaterBombStretchSpeed    OBJECT_FIELD_F32(0x1D)
-#define /*0x100*/ oWaterBombOnGround        OBJECT_FIELD_S32(0x1E)
-#define /*0x104*/ oWaterBombNumBounces      OBJECT_FIELD_F32(0x1F)
+#include "game/spawn_sound.h"
 
 /**
  * Behaviors for bhvWaterBombSpawner, bhvWaterBomb, and bhvWaterBombShadow.
@@ -15,6 +14,16 @@
  * WATER_BOMB_ACT_SHOT_FROM_CANNON action.
  * The water bomb shadow is only spawned by water bomb spawners.
  */
+
+/* Water Bomb */
+#define /*0x0F8*/ oWaterBombVerticalStretch OBJECT_FIELD_F32(0x1C)
+#define /*0x0FC*/ oWaterBombStretchSpeed    OBJECT_FIELD_F32(0x1D)
+#define /*0x100*/ oWaterBombOnGround        OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oWaterBombNumBounces      OBJECT_FIELD_F32(0x1F)
+
+/* Water Bomb Spawner */
+#define /*0x0F4*/ oWaterBombSpawnerBombActive  OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oWaterBombSpawnerTimeToSpawn OBJECT_FIELD_S32(0x1C)
 
 /**
  * Hitbox for water bombs that are spawned by a water bomb spawner. The water

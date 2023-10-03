@@ -1,7 +1,23 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/game_init.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/**
+ * Behavior for bhvChainChomp, bhvChainChompChainPart, bhvWoodenPost, and bhvChainChompGate.
+ * bhvChainChomp spawns its bhvWoodenPost in its behavior script. It spawns 5 chain
+ * parts. Part 0 is the "pivot", which is positioned at the wooden post while
+ * the chomp is chained up. Parts 1-4 are the other parts, starting from the
+ * chain chomp and moving toward the pivot.
+ * Processing order is bhvWoodenPost, bhvChainChompGate, bhvChainChomp, bhvChainChompChainPart.
+ * The chain parts are processed starting at the post and ending at the chomp.
+ */
+
+/* Chain Chomp */
 #define /*0x0F4*/ oChainChompSegments                     OBJECT_FIELD_CHAIN_SEGMENT(0x1B)
 #define /*0x0F8*/ oChainChompMaxDistFromPivotPerChainPart OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oChainChompMaxDistBetweenChainParts     OBJECT_FIELD_F32(0x1D)
@@ -13,15 +29,12 @@
 #define /*0x1AC*/ oChainChompReleaseStatus                OBJECT_FIELD_S32(0x49)
 #define /*0x1B0*/ oChainChompHitGate                      OBJECT_FIELD_S32(0x4A)
 
-/**
- * Behavior for bhvChainChomp, bhvChainChompChainPart, bhvWoodenPost, and bhvChainChompGate.
- * bhvChainChomp spawns its bhvWoodenPost in its behavior script. It spawns 5 chain
- * parts. Part 0 is the "pivot", which is positioned at the wooden post while
- * the chomp is chained up. Parts 1-4 are the other parts, starting from the
- * chain chomp and moving toward the pivot.
- * Processing order is bhvWoodenPost, bhvChainChompGate, bhvChainChomp, bhvChainChompChainPart.
- * The chain parts are processed starting at the post and ending at the chomp.
- */
+/* Wooden Post */
+#define /*0x0F4*/ oWoodenPostTotalMarioAngle  OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oWoodenPostPrevAngleToMario OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oWoodenPostSpeedY           OBJECT_FIELD_F32(0x1D)
+#define /*0x100*/ oWoodenPostMarioPounding    OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oWoodenPostOffsetY          OBJECT_FIELD_F32(0x1F)
 
 #define CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS 180.0f
 

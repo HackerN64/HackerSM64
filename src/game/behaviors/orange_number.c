@@ -1,9 +1,10 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
 
+/* Orange Number */
 #define /*0x110*/ oOrangeNumberOffset OBJECT_FIELD_S32(0x22)
-// orange_number.inc.c
 
 void bhv_orange_number_init(void) {
     o->oAnimState = o->oBehParams2ndByte;

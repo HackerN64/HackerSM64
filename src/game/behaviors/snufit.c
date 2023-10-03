@@ -1,14 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/game_init.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oSnufitRecoil          OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oSnufitScale           OBJECT_FIELD_F32(0x1C)
-#define /*0x100*/ oSnufitCircularPeriod  OBJECT_FIELD_S32(0x1E)
-#define /*0x104*/ oSnufitBodyScalePeriod OBJECT_FIELD_S32(0x1F)
-#define /*0x108*/ oSnufitBodyBaseScale   OBJECT_FIELD_S32(0x20)
-#define /*0x10C*/ oSnufitBullets         OBJECT_FIELD_S32(0x21)
-#define /*0x1AC*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x49, 0)
+#include "game/rendering_graph_node.h"
+#include "game/spawn_sound.h"
 
 /**
  * Behavior file for bhvSnufit and bhvSnufitBalls.
@@ -16,6 +14,16 @@
  * like enemies that shoot bullets. The balls are the little pellets
  * the snufit shoots at Mario.
  */
+
+/* Snufit */
+#define /*0x0F4*/ oSnufitRecoil          OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oSnufitScale           OBJECT_FIELD_F32(0x1C)
+// 0x1D
+#define /*0x100*/ oSnufitCircularPeriod  OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oSnufitBodyScalePeriod OBJECT_FIELD_S32(0x1F)
+#define /*0x108*/ oSnufitBodyBaseScale   OBJECT_FIELD_S32(0x20)
+#define /*0x10C*/ oSnufitBullets         OBJECT_FIELD_S32(0x21)
+#define /*0x1AC*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x49, 0)
 
 struct ObjectHitbox sSnufitHitbox = {
     /* interactType:      */ INTERACT_HIT_FROM_BELOW,

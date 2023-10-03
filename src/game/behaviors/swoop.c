@@ -1,7 +1,16 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/game_init.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/**
+ * Behavior for bhvSwoop.
+ * Has a native room.
+ */
+
+/* Swoop */
 #define /*0x0F4*/ oSwoopBonkCountdown OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ O_SWOOP_TARGET_ANGLE_INDEX                    0x1C
 #define /*0x0F8*/ O_SWOOP_TARGET_PITCH_INDEX                    (O_SWOOP_TARGET_ANGLE_INDEX + 0) // 0x1C
@@ -11,11 +20,6 @@
 #define /*0x0F8*/ oSwoopTargetPitch   OBJECT_FIELD_S32(O_SWOOP_TARGET_PITCH_INDEX)
 #define /*0x0FC*/ oSwoopTargetYaw     OBJECT_FIELD_S32(O_SWOOP_TARGET_YAW_INDEX)
 #define /*0x100*/ oSwoopTargetRoll    OBJECT_FIELD_S32(O_SWOOP_TARGET_ROLL_INDEX) // unused
-
-/**
- * Behavior for bhvSwoop.
- * Has a native room.
- */
 
 /**
  * Hitbox for swoop.

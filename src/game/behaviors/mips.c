@@ -1,14 +1,23 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oMipsStarStatus         OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oMipsStartWaypointIndex OBJECT_FIELD_S32(0x1C)
-#define /*0x1AC*/ oMipsForwardVelocity    OBJECT_FIELD_F32(0x49)
+#include "game/save_file.h"
+#include "game/spawn_sound.h"
+#include "levels/castle_inside/header.h"
 
 /**
  * Behavior for MIPS (everyone's favorite yellow rabbit).
  */
+
+/* Mips */
+#define /*0x0F4*/ oMipsStarStatus         OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oMipsStartWaypointIndex OBJECT_FIELD_S32(0x1C)
+// 0x1D-0x21 reserved for pathing
+#define /*0x1AC*/ oMipsForwardVelocity    OBJECT_FIELD_F32(0x49)
 
 /**
  * Initializes MIPS' physics parameters and checks if he should be active,

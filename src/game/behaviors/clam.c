@@ -1,9 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Clam */
 #define /*0x0F4*/ oClamShakeTimer OBJECT_FIELD_S32(0x1B)
-// clam.inc.c
 
 struct ObjectHitbox sClamShellHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,

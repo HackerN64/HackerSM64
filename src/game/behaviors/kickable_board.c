@@ -2,24 +2,9 @@
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
 
+/* Kickable Board */
 #define /*0x0F4*/ oKickableBoardRockingAngleAmount OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oKickableBoardRockingTimer       OBJECT_FIELD_S32(0x1C)
-// kickable_board.inc.c
-
-s32 check_mario_attacking(void) {
-    if (obj_check_if_collided_with_object(o, gMarioObject)) {
-        if (abs_angle_diff(o->oMoveAngleYaw, gMarioObject->oMoveAngleYaw) > 0x6000) {
-            if (gMarioStates[0].action == ACT_SLIDE_KICK      ) return WF_ATTACK_GROUND;
-            if (gMarioStates[0].action == ACT_PUNCHING        ) return WF_ATTACK_GROUND;
-            if (gMarioStates[0].action == ACT_MOVE_PUNCHING   ) return WF_ATTACK_GROUND;
-            if (gMarioStates[0].action == ACT_SLIDE_KICK_SLIDE) return WF_ATTACK_GROUND;
-            if (gMarioStates[0].action == ACT_JUMP_KICK       ) return WF_ATTACK_AIR;
-            if (gMarioStates[0].action == ACT_WALL_KICK_AIR   ) return WF_ATTACK_AIR;
-        }
-    }
-
-    return 0;
-}
 
 void init_kickable_board_rock(void) {
     o->oKickableBoardRockingTimer = 1600;

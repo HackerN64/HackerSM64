@@ -1,16 +1,22 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "actors/group11.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oSpinyTimeUntilTurn       OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oSpinyTargetYaw           OBJECT_FIELD_S32(0x1C)
-#define /*0x100*/ oSpinyTurningAwayFromWall OBJECT_FIELD_S32(0x1E)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvSpiny.
  * When spawned by lakitu, its parent object is the lakitu.
  * Lakitu comes before it spawned spinies in processing order.
  */
+
+/* Spiny */
+#define /*0x0F4*/ oSpinyTimeUntilTurn       OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oSpinyTargetYaw           OBJECT_FIELD_S32(0x1C)
+#define /*0x100*/ oSpinyTurningAwayFromWall OBJECT_FIELD_S32(0x1E)
 
 /**
  * Hitbox for spiny both while thrown and walking. The interaction type is

@@ -1,7 +1,13 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/debug.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
 
+/* Boo */
 #define /*0x088*/ oBooDeathStatus           OBJECT_FIELD_S32(0x00)
 #define /*0x0F4*/ oBooTargetOpacity         OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oBooBaseScale             OBJECT_FIELD_F32(0x1C)
@@ -12,7 +18,15 @@
 #define /*0x10C*/ oBooNegatedAggressiveness OBJECT_FIELD_F32(0x21)
 #define /*0x110*/ oBooInitialMoveYaw        OBJECT_FIELD_S32(0x22)
 #define /*0x1B0*/ oBooTurningSpeed          OBJECT_FIELD_S16(0x4A, 0)
-// boo.inc.c
+
+/* Merry-Go-Round */
+#define /*0x088*/ oMerryGoRoundStopped         OBJECT_FIELD_S32(0x00)
+#define /*0x0F8*/ oMerryGoRoundMusicShouldPlay OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oMerryGoRoundMarioIsOutside  OBJECT_FIELD_S32(0x1D)
+
+/* Merry-Go-Round Boo Manager */
+#define /*0x088*/ oMerryGoRoundBooManagerNumBoosKilled  OBJECT_FIELD_S32(0x00)
+#define /*0x0FC*/ oMerryGoRoundBooManagerNumBoosSpawned OBJECT_FIELD_S32(0x1D)
 
 #define SPAWN_CASTLE_BOO_STAR_REQUIREMENT 12
 

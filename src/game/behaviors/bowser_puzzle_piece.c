@@ -1,7 +1,14 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Bowser Puzzle */
+#define /*0x0F4*/ oBowserPuzzleCompletionFlags OBJECT_FIELD_S32(0x1B)
+
+/* Bowser Puzzle Piece */
 #define /*0x0FC*/ O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX         0x1D
 #define /*0x0FC*/ O_BOWSER_PUZZLE_PIECE_OFFSET_X_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 0) // 0x1D
 #define /*0x100*/ O_BOWSER_PUZZLE_PIECE_OFFSET_Y_INDEX       (O_BOWSER_PUZZLE_PIECE_OFFSET_INDEX + 1) // 0x1E

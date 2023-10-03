@@ -1,14 +1,16 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTCElevatorDir      OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oTTCElevatorPeakY    OBJECT_FIELD_F32(0x1C)
-#define /*0x0FC*/ oTTCElevatorMoveTime OBJECT_FIELD_S32(0x1D)
 
 /**
  * Behavior for bhvTTCElevator.
  */
+
+/* TTC Elevator */
+#define /*0x0F4*/ oTTCElevatorDir      OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oTTCElevatorPeakY    OBJECT_FIELD_F32(0x1C)
+#define /*0x0FC*/ oTTCElevatorMoveTime OBJECT_FIELD_S32(0x1D)
 
 /**
  * The speed on each setting.

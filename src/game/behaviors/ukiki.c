@@ -1,14 +1,19 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "level_misc_macros.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/debug.h"
+#include "game/game_init.h"
+#include "game/ingame_menu.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oUkikiTauntCounter   OBJECT_FIELD_S16(0x1B, 0)
-#define /*0x0F6*/ oUkikiTauntsToBeDone OBJECT_FIELD_S16(0x1B, 1)
-#define /*0x110*/ oUkikiChaseFleeRange OBJECT_FIELD_F32(0x22)
-#define /*0x1AC*/ oUkikiTextState      OBJECT_FIELD_S16(0x49, 0)
-#define /*0x1AE*/ oUkikiTextboxTimer   OBJECT_FIELD_S16(0x49, 1)
-#define /*0x1B0*/ oUkikiCageSpinTimer  OBJECT_FIELD_S16(0x4A, 0)
-#define /*0x1B2*/ oUkikiHasCap         OBJECT_FIELD_S16(0x4A, 1)
+#include "game/rendering_graph_node.h"
+#include "game/save_file.h"
+#include "game/spawn_sound.h"
 
 /**
  * @file Contains behavior for the ukiki objects.
@@ -16,6 +21,16 @@
  * Cap ukiki is the ukiki that steals Mario's cap.
  * Cage ukiki is the ukiki that triggers the cage star.
  */
+
+/* Ukiki */
+#define /*0x0F4*/ oUkikiTauntCounter   OBJECT_FIELD_S16(0x1B, 0)
+#define /*0x0F6*/ oUkikiTauntsToBeDone OBJECT_FIELD_S16(0x1B, 1)
+// 0x1D-0x21 reserved for pathing
+#define /*0x110*/ oUkikiChaseFleeRange OBJECT_FIELD_F32(0x22)
+#define /*0x1AC*/ oUkikiTextState      OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oUkikiTextboxTimer   OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1B0*/ oUkikiCageSpinTimer  OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oUkikiHasCap         OBJECT_FIELD_S16(0x4A, 1)
 
 /**
  * Sets the cap ukiki to its home if Mario is far away

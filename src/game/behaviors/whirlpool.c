@@ -1,10 +1,13 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/envfx_bubbles.h"
+#include "game/spawn_sound.h"
 
+/* Whirlpool */
 #define /*0x0F4*/ oWhirlpoolInitFacePitch OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oWhirlpoolInitFaceRoll  OBJECT_FIELD_S32(0x1C)
-// whirlpool.inc.c
 
 static struct ObjectHitbox sWhirlpoolHitbox = {
     /* interactType:      */ INTERACT_WHIRLPOOL,

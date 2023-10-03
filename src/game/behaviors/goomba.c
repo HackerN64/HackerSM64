@@ -1,7 +1,18 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "engine/math_util.h"
 #include "global_object_fields.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/**
+ * Behavior for bhvGoomba and bhvGoombaTripletSpawner,
+ * Goombas can either be spawned individually, or spawned by a triplet spawner.
+ * The triplet spawner comes before its spawned goombas in processing order.
+ */
+
+/* Goomba */
 #define /*0x0F4*/ oGoombaSize                OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oGoombaScale               OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oGoombaWalkTimer           OBJECT_FIELD_S32(0x1D)
@@ -12,12 +23,6 @@
 #define /*0x110*/ oIsFloomba OBJECT_FIELD_S32(0x22)
 #define /*0x1AC*/ oZoomCounter OBJECT_FIELD_U32(0x49)
 #define /*0x1B0*/ oZoomPosZ    OBJECT_FIELD_F32(0x4A)
-
-/**
- * Behavior for bhvGoomba and bhvGoombaTripletSpawner,
- * Goombas can either be spawned individually, or spawned by a triplet spawner.
- * The triplet spawner comes before its spawned goombas in processing order.
- */
 
 /**
  * Hitbox for goomba.

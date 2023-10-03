@@ -1,8 +1,8 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/mario_step.h"
 #include "game/object_helpers.h"
-
-#define /*0x110*/ oBetaTrampolineMarioOnTrampoline OBJECT_FIELD_S32(0x22)
 
 /**
  * Behavior for bhvBetaTrampolineTop and bhvBetaTrampolineSpring.
@@ -11,6 +11,9 @@
  * in its development. The trampoline consists of 3 objects: the top,
  * the spring, and the base. The base is a static object with no behavior.
  */
+
+/* Beta Trampoline */
+#define /*0x110*/ oBetaTrampolineMarioOnTrampoline OBJECT_FIELD_S32(0x22)
 
 /**
  * Update function for bhvBetaTrampolineSpring.

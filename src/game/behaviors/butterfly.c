@@ -1,9 +1,11 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
 #include "game/object_helpers.h"
 
+/* Butterfly */
 #define /*0x0F4*/ oButterflyYPhase                              OBJECT_FIELD_S32(0x1B)
-// butterfly.inc.c
 
 void bhv_butterfly_init(void) {
     cur_obj_init_animation(BUTTERFLY_ANIM_RESTING);

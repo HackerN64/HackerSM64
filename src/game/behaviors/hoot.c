@@ -1,10 +1,17 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Hoot */
 #define /*0x0F4*/ oHootAvailability     OBJECT_FIELD_S32(0x1B)
 #define /*0x110*/ oHootMarioReleaseTime OBJECT_FIELD_S32(0x22)
-// hoot.inc.c
 
 void bhv_hoot_init(void) {
     cur_obj_init_animation(HOOT_ANIM_DEFAULT);

@@ -1,15 +1,18 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oBlueFishRandomVel   OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oBlueFishRandomTime  OBJECT_FIELD_S32(0x1C)
-#define /*0x100*/ oBlueFishRandomAngle OBJECT_FIELD_F32(0x1E)
 
 /**
  * @file blue_fish.inc.c
  * Implements behaviour and spawning for bhvBlueFish located in the castle aquarium outside of SA.
  */
+
+/* Blue Fish */
+#define /*0x0F4*/ oBlueFishRandomVel   OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oBlueFishRandomTime  OBJECT_FIELD_S32(0x1C)
+#define /*0x100*/ oBlueFishRandomAngle OBJECT_FIELD_F32(0x1E)
 
 /**
  * Determines fish movement.

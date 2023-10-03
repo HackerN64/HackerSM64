@@ -1,9 +1,10 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/rendering_graph_node.h"
 
+/* Bowser Key Cutscene */
 #define /*0x0F4*/ oBowserKeyScale OBJECT_FIELD_F32(0x1B)
-// bowser_key_cutscene.inc.c
 
 Gfx *geo_scale_bowser_key(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {

@@ -1,9 +1,9 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/interaction.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oAmpRadiusOfRotation OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oAmpYPhase           OBJECT_FIELD_S32(0x1C)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvHomingAmp and bhvCirclingAmp.
@@ -11,6 +11,14 @@
  * while the other circles around a fixed location with a radius
  * of 200, 300, 400, or 0 (stationary).
  */
+
+/* Amp */
+#define /*0x0F4*/ oAmpRadiusOfRotation OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oAmpYPhase           OBJECT_FIELD_S32(0x1C)
+
+/* Homing Amp */
+#define /*0x0F4*/ oHomingAmpLockedOn OBJECT_FIELD_S32(0x1B)
+#define /*0x0FC*/ oHomingAmpAvgY     OBJECT_FIELD_F32(0x1D)
 
 static struct ObjectHitbox sAmpHitbox = {
     /* interactType:      */ INTERACT_SHOCK,

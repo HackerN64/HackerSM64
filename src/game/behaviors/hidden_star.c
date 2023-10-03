@@ -1,10 +1,13 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
+#include "game/ingame_menu.h"
 #include "game/object_helpers.h"
 
+/* Hidden Star */
 #define /*0x0F4*/ oHiddenStarTriggerCounter OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oHiddenStarTriggerTotal OBJECT_FIELD_S32(0x1C)
-// hidden_star.inc.c
 
 void bhv_hidden_star_init(void) {
     s16 remainingTriggers = count_objects_with_behavior(bhvHiddenStarTrigger);

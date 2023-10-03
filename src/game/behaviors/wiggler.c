@@ -1,7 +1,24 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
+#include "seq_ids.h"
 #include "global_object_fields.h"
+#include "actors/group11.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/**
+ * Behavior for bhvWigglerHead and bhvWigglerBody.
+ * The bhvWigglerHead object controls the wiggler's behavior, and physically manifests
+ * as the wiggler's head. The bhvWigglerBody objects represent the 3 tail body
+ * parts, numbered 1 closest to the head, and 3 at the end of the tail.
+ * Processing order is bhvWigglerHead, then bhvWigglerBody 1, 2, then 3.
+ */
+
+/* Wiggler */
 #define /*0x0F4*/ oWigglerFallThroughFloorsHeight OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oWigglerSegments                OBJECT_FIELD_CHAIN_SEGMENT(0x1C)
 #define /*0x0FC*/ oWigglerWalkAnimSpeed           OBJECT_FIELD_F32(0x1D)
@@ -11,14 +28,6 @@
 #define /*0x110*/ oWigglerWalkAwayFromWallTimer   OBJECT_FIELD_S32(0x22)
 #define /*0x1AC*/ oWigglerUnused                  OBJECT_FIELD_S16(0x49, 0)
 #define /*0x1AE*/ oWigglerTextStatus              OBJECT_FIELD_S16(0x49, 1)
-
-/**
- * Behavior for bhvWigglerHead and bhvWigglerBody.
- * The bhvWigglerHead object controls the wiggler's behavior, and physically manifests
- * as the wiggler's head. The bhvWigglerBody objects represent the 3 tail body
- * parts, numbered 1 closest to the head, and 3 at the end of the tail.
- * Processing order is bhvWigglerHead, then bhvWigglerBody 1, 2, then 3.
- */
 
 /**
  * Hitbox for wiggler's non-head body parts.

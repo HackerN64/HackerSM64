@@ -1,15 +1,18 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTCPitBlockPeakY    OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oTTCPitBlockDir      OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oTTCPitBlockWaitTime OBJECT_FIELD_S32(0x1D)
+#include "levels/ttc/header.h"
 
 /**
  * Behavior for bhvTTCPitBlock. This is the block that moves up and down near the
  * Pit and the Pendulum star.
  */
+
+/* TTC Pit Block */
+#define /*0x0F4*/ oTTCPitBlockPeakY    OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oTTCPitBlockDir      OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oTTCPitBlockWaitTime OBJECT_FIELD_S32(0x1D)
 
 /**
  * Collision models. The second one is unused.

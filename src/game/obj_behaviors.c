@@ -57,21 +57,8 @@ static s8 sOrientObjWithFloor = TRUE;
  */
 s16 sPrevCheckMarioRoom = 0;
 
-/**
- * Tracks whether or not Yoshi has walked/jumped off the roof.
- */
-s8 sYoshiDead = FALSE;
-
 extern void *ccm_seg7_trajectory_snowman;
 extern void *inside_castle_seg7_trajectory_mips;
-
-/**
- * Resets yoshi as spawned/despawned upon new file select.
- * Possibly a function with stubbed code.
- */
-void set_yoshi_as_not_dead(void) {
-    sYoshiDead = FALSE;
-}
 
 /**
  * An unused geo function. Bears strong similarity to geo_bits_bowser_coloring, and relates something

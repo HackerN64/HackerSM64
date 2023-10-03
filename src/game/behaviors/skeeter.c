@@ -1,13 +1,17 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/game_init.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Skeeter */
 #define /*0x0F4*/ oSkeeterTargetAngle         OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oSkeeterTurningAwayFromWall OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oSkeeterTargetForwardVel    OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oSkeeterWaitTime            OBJECT_FIELD_S32(0x1E)
 #define /*0x1AC*/ oSkeeterAngleVel            OBJECT_FIELD_S16(0x49, 0)
-// skeeter.inc.c
 
 struct SkeeterRelPos {
     s16 relPosX;

@@ -1,14 +1,20 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "levels/jrb/header.h"
+#include "game/spawn_sound.h"
 
+/* Unagi */
 #define /*0x0F4*/ oUnagiDistFromHome         OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oUnagiNextForwardVel       OBJECT_FIELD_F32(0x1C)
+// 0x1D-0x21 reserved for pathing
 #define /*0x110*/ oUnagiTargetNextForwardVel OBJECT_FIELD_F32(0x22)
 #define /*0x1AC*/ oUnagiDistanceToMario      OBJECT_FIELD_F32(0x49)
 #define /*0x1B0*/ oUnagiInitMoveYaw          OBJECT_FIELD_S16(0x4A, 0)
 #define /*0x1B2*/ oUnagiHasStar              OBJECT_FIELD_S16(0x4A, 1)
-// unagi.inc.c
 
 struct ObjectHitbox sUnagiHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,

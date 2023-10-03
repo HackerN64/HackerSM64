@@ -1,12 +1,14 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Elevator */
 #define /*0x0F4*/ oElevatorMinY OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oElevatorMaxY OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oElevatorMidY OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oElevatorType OBJECT_FIELD_S32(0x1E)
-// elevator.inc.c
 
 static s16 sElevatorHeights[] = {
       -51,    0, 0,

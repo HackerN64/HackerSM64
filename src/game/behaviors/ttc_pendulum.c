@@ -1,18 +1,20 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
 
+/**
+ * Behavior for bhvTTCPendulum. This is not the pendulum inside the clock in the
+ * castle, but rather the one in TTC itself.
+ */
+
+/* TTC Pendulum */
 #define /*0x0F4*/ oTTCPendulumAccelDir   OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oTTCPendulumAngle      OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oTTCPendulumAngleVel   OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oTTCPendulumAngleAccel OBJECT_FIELD_F32(0x1E)
 #define /*0x104*/ oTTCPendulumDelay      OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oTTCPendulumSoundTimer OBJECT_FIELD_S32(0x20)
-
-/**
- * Behavior for bhvTTCPendulum. This is not the pendulum inside the clock in the
- * castle, but rather the one in TTC itself.
- */
 
 /**
  * Initial angle acceleration.

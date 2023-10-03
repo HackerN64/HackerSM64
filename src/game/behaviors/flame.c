@@ -1,12 +1,21 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
 
-#define /*0x0F4*/ oFlameScale            OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oFlameSpeedTimerOffset OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oFlameUnusedRand       OBJECT_FIELD_F32(0x1D)
-#define /*0x100*/ oFlameBowser           OBJECT_FIELD_OBJ(0x1E)
-// flame.inc.c
+struct ObjectHitbox sPiranhaPlantFireHitbox = {
+    /* interactType:      */ INTERACT_FLAME,
+    /* downOffset:        */ 10,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
+    /* radius:            */ 10,
+    /* height:            */ 20,
+    /* hurtboxRadius:     */ 10,
+    /* hurtboxHeight:     */ 20,
+};
 
 void bhv_moving_flame_loop(void) {
     if (GET_BPARAM2(o->oBehParams) == MOVING_FLAME_BP_1FRAME) {

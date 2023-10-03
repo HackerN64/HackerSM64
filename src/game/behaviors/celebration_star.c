@@ -1,10 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
 
+/* Celebration Star */
 #define /*0x0F4*/ oCelebStarIsBowserKey        OBJECT_FIELD_S32(0x1B)
 #define /*0x108*/ oCelebStarDiameterOfRotation OBJECT_FIELD_S32(0x20)
-// celebration_star.inc.c
 
 void bhv_celebration_star_init(void) {
     o->oHomeX = gMarioObject->header.gfx.pos[0];

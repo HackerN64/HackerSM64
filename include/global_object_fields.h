@@ -185,6 +185,173 @@
 #define /*0x10C*/ oMacroUnk10C OBJECT_FIELD_F32(0x21)
 #define /*0x110*/ oMacroUnk110 OBJECT_FIELD_F32(0x22)
 
+/**
+ * These are object-specific but used globally in code
+ **/
+
+/* Mario */
+#define /*0x0F4*/ oMarioParticleFlags    OBJECT_FIELD_S32(0x1B)
+#define /*0x108*/ oMarioReadingSignDYaw  OBJECT_FIELD_S32(0x20)
+#define /*0x10C*/ oMarioCannonObjectYaw  OBJECT_FIELD_S32(0x21)
+#define /*0x10C*/ oMarioTornadoYawVel    OBJECT_FIELD_S32(0x21)
+#define /*0x10C*/ oMarioReadingSignDPosX OBJECT_FIELD_F32(0x21)
+#define /*0x110*/ oMarioReadingSignDPosZ OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oMarioPolePos          OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oMarioCannonInputYaw   OBJECT_FIELD_S32(0x22)
+#define /*0x110*/ oMarioTornadoPosY      OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oMarioWhirlpoolPosY    OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oMarioJumboStarCutscenePosZ OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oMarioBurnTimer        OBJECT_FIELD_S32(0x22)
+#define /*0x110*/ oMarioLongJumpIsSlow   OBJECT_FIELD_S32(0x22)
+#define /*0x110*/ oMarioSteepJumpYaw     OBJECT_FIELD_S32(0x22)
+#define /*0x110*/ oMarioWalkingPitch     OBJECT_FIELD_S32(0x22)
+
+/* Bowser */
+#define /*0x088*/ oBowserCamAct          OBJECT_FIELD_S32(0x00)
+#define /*0x0F4*/ oBowserStatus          OBJECT_FIELD_S32(0x1B)
+
+/* Hoot */
+#define /*0x110*/ oHootMarioReleaseTime OBJECT_FIELD_S32(0x22)
+
+/* Sealed Door Star */
+#define /*0x108*/ oUnlockDoorStarState  OBJECT_FIELD_U32(0x20)
+#define /*0x10C*/ oUnlockDoorStarTimer  OBJECT_FIELD_S32(0x21)
+#define /*0x110*/ oUnlockDoorStarYawVel OBJECT_FIELD_S32(0x22)
+
+/* Toad Message */
+#define /*0x108*/ oToadMessageDialogId       OBJECT_FIELD_U32(0x20)
+#define /*0x10C*/ oToadMessageRecentlyTalked OBJECT_FIELD_S32(0x21)
+#define /*0x110*/ oToadMessageState          OBJECT_FIELD_S32(0x22)
+
+/* Orange Number */
+#define /*0x110*/ oOrangeNumberOffset OBJECT_FIELD_S32(0x22)
+
+/* Coin */
+#define /*0x110*/ oCoinBaseYVel     OBJECT_FIELD_F32(0x22)
+
+/* Smoke */
+#define /*0x0F4*/ oSmokeTimer OBJECT_FIELD_S32(0x1B)
+
+/* Platform on Tracks */
+#define /*0x1B0*/ oPlatformOnTrackType                   OBJECT_FIELD_S16(0x4A, 0)
+
+/* Sound Effect */
+#define /*0x0F4*/ oSoundEffectBits      OBJECT_FIELD_S32(0x1B)
+
+/* Boo */
+#define /*0x088*/ oBooDeathStatus           OBJECT_FIELD_S32(0x00)
+
+/* Hidden Object */
+#define /*0x0F4*/ oHiddenObjectSwitchObj OBJECT_FIELD_OBJ(0x1B)
+
+/* Flame */
+#define /*0x0F4*/ oFlameScale            OBJECT_FIELD_F32(0x1B)
+
+/* Hidden Star */
+// Secrets/Red Coins
+#define /*0x0F4*/ oHiddenStarTriggerCounter OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oHiddenStarTriggerTotal OBJECT_FIELD_S32(0x1C)
+
+/* SL Walking Penguin */
+#define /*0x100*/ oSLWalkingPenguinWindCollisionXPos OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oSLWalkingPenguinWindCollisionZPos OBJECT_FIELD_F32(0x1F)
+
+/* Water Ring Spawner (Jet Stream Ring Spawner and Manta Ray) */
+#define /*0x1AC*/ oWaterRingSpawnerRingsCollected OBJECT_FIELD_S32(0x49)
+
+/* Water Objects */
+#define /*0x0F4*/ oWaterObjScaleXAngle    OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oWaterObjScaleYAngle    OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oWaterObjScaleXAngleVel OBJECT_FIELD_S32(0x1D)
+
+/* Water Ring Manager (Jet Stream Ring Spawner and Manta Ray Ring Manager) */
+#define /*0x0F4*/ oWaterRingMgrNextRingIndex     OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oWaterRingMgrLastRingCollected OBJECT_FIELD_S32(0x1C)
+
+/* Flame */
+#define /*0x0F4*/ oFlameScale            OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oFlameSpeedTimerOffset OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oFlameUnusedRand       OBJECT_FIELD_F32(0x1D)
+
+/* Water Ring */
+#define /*0x110*/ oWaterRingIndex                  OBJECT_FIELD_S32(0x22)
+
+/* Evil Lakitu */
+#define /*0x0F4*/ oEnemyLakituNumSpinies           OBJECT_FIELD_S32(0x1B)
+
+/* Ukiki Cage*/
+#define /*0x088*/ oUkikiCageNextAction OBJECT_FIELD_S32(0x00)
+
+/**
+ * These are object-specific but are used globally in behavior_data.c
+ **/
+
+/* Bird Chirp Chirp */
+#define /*0x0F4*/ oCheepCheepSpawnerSpawnAmount OBJECT_FIELD_S32(0x1B)
+
+/* Big Boo */
+#define /*0x1AC*/ oBigBooNumMinionBoosKilled OBJECT_FIELD_S32(0x49)
+
+/* Bob-omb Buddy */
+#define /*0x0FC*/ oBobombBuddyRole             OBJECT_FIELD_S32(0x1D)
+
+/* Wooden Post */
+#define /*0x0F4*/ oWoodenPostTotalMarioAngle  OBJECT_FIELD_S32(0x1B)
+
+/* Bully (all variants) */
+#define /*0x0F4*/ oBullySubtype                   OBJECT_FIELD_S32(0x1B)
+
+/* Bowling Ball Spawner (Generic) */
+#define /*0x0FC*/ oBBallSpawnerPeriodMinus1 OBJECT_FIELD_S32(0x1D)
+
+/* Floating Platform */
+#define /*0x0FC*/ oFloatingPlatformHeightOffset             OBJECT_FIELD_F32(0x1D)
+
+/* Koopa */
+#define /*0x0F4*/ oKoopaAgility                     OBJECT_FIELD_F32(0x1B)
+
+#ifdef FLOOMBAS
+#define /*0x110*/ oIsFloomba OBJECT_FIELD_S32(0x22)
+#endif
+
+/* Wiggler */
+#define /*0x0F4*/ oWigglerFallThroughFloorsHeight OBJECT_FIELD_F32(0x1B)
+
+/* TTC Rotating Solid */
+#define /*0x0F4*/ oTTCRotatingSolidNumTurns      OBJECT_FIELD_S32(0x1B)
+
+/* TTC Pendulum */
+#define /*0x0F4*/ oTTCPendulumAccelDir   OBJECT_FIELD_F32(0x1B)
+
+/* TTC Elevator */
+#define /*0x0F4*/ oTTCElevatorDir      OBJECT_FIELD_F32(0x1B)
+
+/* Mr. Blizzard */
+#define /*0x0F4*/ oMrBlizzardScale             OBJECT_FIELD_F32(0x1B)
+
+/* Snufit */
+#define /*0x0F4*/ oSnufitRecoil          OBJECT_FIELD_S32(0x1B)
+
+/* DDD Pole */
+#define /*0x0F4*/ oDDDPoleVel       OBJECT_FIELD_F32(0x1B)
+
+/* Triplet Butterfly */
+#define /*0x0F4*/ oTripletButterflyScale             OBJECT_FIELD_F32(0x1B)
+
+/**
+ * These are just wrong
+ **/
+
+/* TODO: Not Small Piranha Flame */
+#define /*0x0F4*/ oSmallPiranhaFlameStartSpeed     OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oSmallPiranhaFlameEndSpeed       OBJECT_FIELD_F32(0x1C)
+#define /*0x0FC*/ oSmallPiranhaFlameModel          OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oSmallPiranhaFlameNextFlameTimer OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oSmallPiranhaFlameSpeed          OBJECT_FIELD_F32(0x1F)
+
+/* TODO: Not King Bob-omb */
+#define /*0x088*/ oKingBobombHoldingMarioState        OBJECT_FIELD_S32(0x00)
+
 /*Custom general defines:
 
 For general s32 ints, use o->oF4, oF8, oFC, o100, o104, o108, o10C, and o110

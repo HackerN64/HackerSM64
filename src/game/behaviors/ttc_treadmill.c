@@ -1,12 +1,9 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTCTreadmillBigSurface      OBJECT_FIELD_S16P(0x1B)
-#define /*0x0F8*/ oTTCTreadmillSmallSurface    OBJECT_FIELD_S16P(0x1C)
-#define /*0x0FC*/ oTTCTreadmillSpeed           OBJECT_FIELD_F32(0x1D)
-#define /*0x100*/ oTTCTreadmillTargetSpeed     OBJECT_FIELD_F32(0x1E)
-#define /*0x104*/ oTTCTreadmillTimeUntilSwitch OBJECT_FIELD_S32(0x1F)
+#include "game/spawn_sound.h"
+#include "levels/ttc/header.h"
 
 /**
  * Behavior for bhvTTCTreadmill.
@@ -14,6 +11,13 @@
  * responsible for playing sounds and calling RNG to control all the other
  * treadmills.
  */
+
+/* TTC Treadmill */
+#define /*0x0F4*/ oTTCTreadmillBigSurface      OBJECT_FIELD_S16P(0x1B)
+#define /*0x0F8*/ oTTCTreadmillSmallSurface    OBJECT_FIELD_S16P(0x1C)
+#define /*0x0FC*/ oTTCTreadmillSpeed           OBJECT_FIELD_F32(0x1D)
+#define /*0x100*/ oTTCTreadmillTargetSpeed     OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oTTCTreadmillTimeUntilSwitch OBJECT_FIELD_S32(0x1F)
 
 /**
  * Collision models for the different sized treadmills.

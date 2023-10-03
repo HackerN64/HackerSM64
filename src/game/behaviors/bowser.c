@@ -1,9 +1,20 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "actors/group12.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/debug.h"
+#include "game/game_init.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/platform_displacement.h"
+#include "game/rendering_graph_node.h"
+#include "game/spawn_sound.h"
 
-#define /*0x088*/ oBowserCamAct          OBJECT_FIELD_S32(0x00)
-#define /*0x0F4*/ oBowserStatus          OBJECT_FIELD_S32(0x1B)
+/* Bowser */
 #define /*0x0F8*/ oBowserTimer           OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oBowserDistToCenter    OBJECT_FIELD_F32(0x1D)
 #define /*0x106*/ oBowserBitsJustJump    OBJECT_FIELD_S16(0x1F, 1)
@@ -17,7 +28,6 @@
 #define /*0x1AE*/ oBowserEyesTimer       OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oBowserEyesShut        OBJECT_FIELD_S16(0x4A, 0)
 #define /*0x1B2*/ oBowserRainbowLight    OBJECT_FIELD_S16(0x4A, 1)
-// bowser.inc.c
 
 /**
  * Behavior for Bowser and it's actions (Tail, Flame, Body)

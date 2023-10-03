@@ -1,16 +1,18 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
 
+/**
+ * Behavior for bhvTTCMovingBar.
+ */
+
+/* TTC Moving Bar */
 #define /*0x0F4*/ oTTCMovingBarDelay        OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oTTCMovingBarStoppedTimer OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oTTCMovingBarOffset       OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oTTCMovingBarSpeed        OBJECT_FIELD_F32(0x1E)
 #define /*0x104*/ oTTCMovingBarStartOffset  OBJECT_FIELD_F32(0x1F)
-
-/**
- * Behavior for bhvTTCMovingBar.
- */
 
 /**
  * The delay before each cycle on each setting. On random setting, this is

@@ -1,15 +1,18 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTCCogDir       OBJECT_FIELD_F32(0x1B)
-#define /*0x0F8*/ oTTCCogSpeed     OBJECT_FIELD_F32(0x1C)
-#define /*0x0FC*/ oTTCCogTargetVel OBJECT_FIELD_F32(0x1D)
+#include "levels/ttc/header.h"
 
 /**
  * Behavior for bhvTTCCog. This includes both the hexagonal cogs and the
  * triangular prisms that rotate around the y axis.
  */
+
+/* TTC Cog */
+#define /*0x0F4*/ oTTCCogDir       OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oTTCCogSpeed     OBJECT_FIELD_F32(0x1C)
+#define /*0x0FC*/ oTTCCogTargetVel OBJECT_FIELD_F32(0x1D)
 
 /**
  * Collision model for hexagon and triangle, respectively.

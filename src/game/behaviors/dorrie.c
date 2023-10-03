@@ -1,7 +1,12 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "actors/group17.h"
+#include "engine/math_util.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Dorrie */
 #define /*0x0F4*/ oDorrieDistToHome         OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oDorrieOffsetY            OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oDorrieVelY               OBJECT_FIELD_F32(0x1D)
@@ -12,7 +17,6 @@
 #define /*0x1AE*/ oDorrieAngleToHome        OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oDorrieNeckAngle          OBJECT_FIELD_S16(0x4A, 0)
 #define /*0x1B2*/ oDorrieHeadRaiseSpeed     OBJECT_FIELD_S16(0x4A, 1)
-// dorrie.inc.c
 
 void dorrie_raise_head(void) {
     s16 startAngle = o->oDorrieNeckAngle;

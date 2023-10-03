@@ -1,13 +1,15 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTCSpinnerDir     OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oTTCChangeDirTimer OBJECT_FIELD_S32(0x1C)
 
 /**
  * Behavior for TTC spinner.
  */
+
+/* TTC Spinner */
+#define /*0x0F4*/ oTTCSpinnerDir     OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oTTCChangeDirTimer OBJECT_FIELD_S32(0x1C)
 
 /**
  * Spinner speeds on each setting.

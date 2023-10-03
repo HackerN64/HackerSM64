@@ -1,7 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Bubba */
 #define /*0x0F4*/ oBubbaMovePitch                  OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oBubbaRandomTimer                OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oBubbaHitWall                    OBJECT_FIELD_S32(0x1D)
@@ -13,7 +18,6 @@
 #define /*0x1AE*/ oBubbaTargetYaw                  OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oBubbaPitchVel                   OBJECT_FIELD_S16(0x4A, 0)
 #define /*0x1B2*/ oBubbaYawVel                     OBJECT_FIELD_S16(0x4A, 1)
-// bubba.inc.c
 
 static struct ObjectHitbox sBubbaHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,

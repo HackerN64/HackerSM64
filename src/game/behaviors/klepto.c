@@ -1,7 +1,14 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/save_file.h"
+#include "game/spawn_sound.h"
 
+/* Klepto */
 #define /*0x0F4*/ oKleptoDistanceToTarget      OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oKleptoHomeYOffset           OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oKleptoHalfLateralDistToHome OBJECT_FIELD_F32(0x1D)
@@ -19,7 +26,6 @@
 #define /*0x1AE*/ oKleptoDiveTimer             OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oKleptoPitchToTarget         OBJECT_FIELD_S16(0x4A, 0)
 #define /*0x1B2*/ oKleptoYawToTarget           OBJECT_FIELD_S16(0x4A, 1)
-// klepto.inc.c
 
 static struct ObjectHitbox sKleptoHitbox = {
     /* interactType:      */ INTERACT_HIT_FROM_BELOW,

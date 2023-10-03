@@ -1,13 +1,17 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/game_init.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Haunted Chair */
 #define /*0x0F4*/ oHauntedChairSpinTimer          OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oHauntedChairPitchVel           OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oHauntedChairRollVel            OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oHauntedChairFallFromPianoAngle OBJECT_FIELD_S32P(0x1E)
 #define /*0x104*/ oHauntedChairFallTargetAngle    OBJECT_FIELD_S32(0x1F)
-// haunted_chair.inc.c
 
 struct ObjectHitbox sHauntedChairHitbox = {
     /* interactType:      */ INTERACT_MR_BLIZZARD,

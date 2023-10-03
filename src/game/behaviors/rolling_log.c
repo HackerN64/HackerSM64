@@ -1,11 +1,16 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Rolling Log */
 #define /*0x0F4*/ oRollingLogMaxDist OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oRollingLogX       OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oRollingLogZ       OBJECT_FIELD_F32(0x1D)
-// rolling_log.inc.c
+
+/* Volcano Trap */
+#define /*0x0F4*/ oVolcanoTrapPitchVel OBJECT_FIELD_F32(0x1B)
 
 // why are the falling platforms and rolling logs grouped
 // together? seems strange, but it also cooresponds to the

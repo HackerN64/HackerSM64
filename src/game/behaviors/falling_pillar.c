@@ -1,8 +1,10 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oFallingPillarPitchAcceleration OBJECT_FIELD_F32(0x1B)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for the falling pillars inside the underwater cave area of
@@ -10,6 +12,9 @@
  *
  * Also includes behavior for the invisible hitboxes they spawn.
  */
+
+/* Falling Pillar */
+#define /*0x0F4*/ oFallingPillarPitchAcceleration OBJECT_FIELD_F32(0x1B)
 
 static struct ObjectHitbox sFallingPillarHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,

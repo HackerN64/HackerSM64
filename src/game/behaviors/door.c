@@ -1,12 +1,17 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/surface_collision.h"
+#include "engine/surface_load.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Door */
 #define /*0x088*/ oDoorIsRendering  OBJECT_FIELD_S32(0x00)
 #define /*0x0F8*/ oDoorSelfRoom     OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oDoorForwardRoom  OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oDoorBackwardRoom OBJECT_FIELD_S32(0x1E)
-// door.inc.c
 
 struct DoorAction {
     u32 flag;

@@ -1,9 +1,16 @@
 #include <ultra64.h>
+#include "dialog_ids.h"
+#include "seq_ids.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "engine/surface_load.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Whomp */
 #define /*0x0F8*/ oWhompShakeVal OBJECT_FIELD_S32(0x1C)
-// whomp.inc.c
 
 void whomp_play_sfx_from_pound_animation(void) {
     s32 playSound = FALSE;

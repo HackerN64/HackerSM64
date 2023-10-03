@@ -1,7 +1,14 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/**
+ * Behavior for bhvFlyGuy.
+ */
+
+/* Fly Guy */
 #define /*0x0F4*/ oFlyGuyIdleTimer        OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oFlyGuyOscTimer         OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oFlyGuyUnusedJitter     OBJECT_FIELD_S32(0x1D)
@@ -9,10 +16,6 @@
 #define /*0x104*/ oFlyGuyLungeTargetPitch OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oFlyGuyTargetRoll       OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oFlyGuyScaleVel         OBJECT_FIELD_F32(0x21)
-
-/**
- * Behavior for bhvFlyGuy.
- */
 
 /**
  * Hitbox for fly guy.

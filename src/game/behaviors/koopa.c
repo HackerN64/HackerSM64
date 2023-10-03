@@ -1,7 +1,27 @@
 #include <ultra64.h>
+#include "behavior_data.h"
+#include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "seq_ids.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "game/ingame_menu.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
+#include "levels/bob/header.h"
+#include "levels/thi/header.h"
 
+/**
+ * Behavior for bhvKoopa and bhvKoopaRaceEndpoint.
+ * bhvKoopa includes normal, unshelled, tiny, and Koopa the Quick.
+ * When the race begins, koopa the quick sets his parent to bhvKoopaRaceEndpoint
+ * which assists in determining the state of the race. It is positioned at the
+ * flag.
+ */
+
+/* Koopa */
 #define /*0x0F4*/ oKoopaAgility                     OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oKoopaMovementType                OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oKoopaTargetYaw                   OBJECT_FIELD_S32(0x1D)
@@ -13,14 +33,14 @@
 #define /*0x1AC*/ oKoopaCountdown                   OBJECT_FIELD_S16(0x49, 0)
 #define /*0x1AE*/ oKoopaTheQuickRaceIndex           OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oKoopaTheQuickInitTextboxCooldown OBJECT_FIELD_S16(0x4A, 0)
+// 0x1D-0x21 for koopa the quick reserved for pathing
 
-/**
- * Behavior for bhvKoopa and bhvKoopaRaceEndpoint.
- * bhvKoopa includes normal, unshelled, tiny, and Koopa the Quick.
- * When the race begins, koopa the quick sets his parent to bhvKoopaRaceEndpoint
- * which assists in determining the state of the race. It is positioned at the
- * flag.
- */
+/* Koopa Race Endpoint */
+#define /*0x0F4*/ oKoopaRaceEndpointRaceBegun     OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oKoopaRaceEndpointKoopaFinished OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oKoopaRaceEndpointRaceStatus    OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oKoopaRaceEndpointDialog        OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oKoopaRaceEndpointRaceEnded     OBJECT_FIELD_S32(0x1F)
 
 /**
  * Hitbox for koopa - this is used for every form except Koopa the Quick, which

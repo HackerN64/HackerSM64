@@ -1,7 +1,10 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/surface_load.h"
 #include "game/object_helpers.h"
 
+/* Lll Rotating Hex Flame */
 #define /*0x0F4*/ O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_INDEX   0x1B
 #define /*0x0F4*/ O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_X_INDEX (O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_INDEX + 0) // 0x1B
 #define /*0x0F8*/ O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_Y_INDEX (O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_INDEX + 1) // 0x1C
@@ -10,7 +13,6 @@
 #define /*0x0F4*/ oLllRotatingHexFlameRelativePosX              OBJECT_FIELD_F32(O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_X_INDEX)
 #define /*0x0F8*/ oLllRotatingHexFlameRelativePosY              OBJECT_FIELD_F32(O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_Y_INDEX)
 #define /*0x0FC*/ oLllRotatingHexFlameRelativePosZ              OBJECT_FIELD_F32(O_LLL_ROTATING_HEX_FLAME_RELATIVE_POS_Z_INDEX)
-// lll_rotating_hex_flame.inc.c
 
 void bhv_lll_rotating_hex_flame_loop(void) {
     cur_obj_set_pos_relative(o->parentObj, o->oLllRotatingHexFlameRelativePosX, o->oLllRotatingHexFlameRelativePosY, o->oLllRotatingHexFlameRelativePosZ);

@@ -1,9 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
 
+/* Bouncing FireBall */
 #define /*0x0F4*/ oBouncingFireBallSpawnerRandomCooldown OBJECT_FIELD_S32(0x1B)
-// bouncing_fireball.inc.c
 
 void bhv_bouncing_fireball_flame_loop(void) {
     o->activeFlags |= ACTIVE_FLAG_IGNORE_ENV_BOXES;

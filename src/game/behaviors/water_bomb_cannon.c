@@ -1,12 +1,17 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Water Bomb Cannon */
 #define /*0x0F4*/ oWaterCannonIdleTimer       OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oWaterCannonRotationTimer   OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oWaterCannonTargetMovePitch OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oWaterCannonTargetFaceYaw   OBJECT_FIELD_S32(0x1E)
-// water_bomb_cannon.inc.c
+
+/* Cannon Barrel Bubbles */
+#define /*0x0F4*/ oCannonBarrelBubblesForwardVelCheck OBJECT_FIELD_F32(0x1B)
 
 void bhv_bubble_cannon_barrel_loop(void) {
     if (o->parentObj->oAction == 2) {

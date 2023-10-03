@@ -1,9 +1,12 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Bullet Bill */
 #define /*0x0F8*/ oBulletBillInitialMoveYaw OBJECT_FIELD_S32(0x1C)
-// bullet_bill.inc.c
 
 void bhv_white_puff_smoke_init(void) {
     cur_obj_scale(random_float() * 2 + 2.0);

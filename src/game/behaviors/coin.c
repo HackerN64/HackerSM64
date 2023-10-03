@@ -1,12 +1,17 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Coin */
 #define /*0x0F4*/ oCoinRespawnBits  OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oCoinSnapToGround OBJECT_FIELD_S32(0x1C)
 #define /*0x110*/ oCoinBaseYVel     OBJECT_FIELD_F32(0x22)
 #define /*0x1B0*/ oCoinBounceTimer  OBJECT_FIELD_S32(0x4A)
-// coin.inc.c
 
 struct ObjectHitbox sYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,

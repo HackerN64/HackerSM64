@@ -1,12 +1,17 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/debug.h"
+#include "game/interaction.h"
+#include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Chuckya */
 #define /*0x088*/ oCommonAnchorAction            OBJECT_FIELD_S32(0x00)
 #define /*0x0F8*/ oChuckyaUnused                 OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oChuckyaSubActionTimer         OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oChuckyaNumPlayerEscapeActions OBJECT_FIELD_S32(0x1E)
-// chuckya.inc.c
 
 void common_anchor_mario_behavior(f32 forwardVel, f32 yVel, s32 flag) {
     switch (o->parentObj->oCommonAnchorAction) {

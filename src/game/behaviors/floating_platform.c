@@ -1,12 +1,13 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/surface_collision.h"
 #include "game/object_helpers.h"
 
+/* Floating Platform */
 #define /*0x0F4*/ oFloatingPlatformIsOnFloor                OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oFloatingPlatformMarioWeightWobbleOffset  OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oFloatingPlatformHeightOffset             OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oFloatingPlatformWaterSurfaceWobbleOffset OBJECT_FIELD_S32(0x1E)
-// floating_platform.inc.c
 
 f32 floating_platform_find_home_y(void) {
     struct Surface *floor;

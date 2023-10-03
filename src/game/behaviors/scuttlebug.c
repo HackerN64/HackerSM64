@@ -1,11 +1,19 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Scuttlebug */
 #define /*0x0F4*/ oScuttlebugHasNoLootCoins OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oScuttlebugIsAtttacking   OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oScuttlebugTimer          OBJECT_FIELD_S32(0x1D)
-// scuttlebug.inc.c
+
+/* Scuttlebug Spawner */
+#define /*0x088*/ oScuttlebugSpawnerIsDeactivated        OBJECT_FIELD_S32(0x00)
+#define /*0x0F4*/ oScuttlebugSpawnerSpawnWithNoLootCoins OBJECT_FIELD_S32(0x1B)
 
 struct ObjectHitbox sScuttlebugHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,

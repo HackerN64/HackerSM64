@@ -1,6 +1,10 @@
 #include <ultra64.h>
+#include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "engine/surface_load.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 #define /*0x0F8*/ oCheckerBoardPlatformRotateAction OBJECT_FIELD_S32(0x1C) // oAction like
 #define /*0x0FC*/ oCheckerBoardPlatformHeight       OBJECT_FIELD_S32(0x1D)

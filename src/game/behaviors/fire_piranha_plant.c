@@ -1,13 +1,15 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Fire Piranha Plant */
 #define /*0x0F4*/ oFirePiranhaPlantNeutralScale   OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oFirePiranhaPlantScale          OBJECT_FIELD_F32(0x1C) // Shared with above obj? Coincidence?
 #define /*0x0FC*/ oFirePiranhaPlantActive         OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oFirePiranhaPlantDeathSpinTimer OBJECT_FIELD_S32(0x1E)
 #define /*0x104*/ oFirePiranhaPlantDeathSpinVel   OBJECT_FIELD_F32(0x1F)
-// fire_piranha_plant.inc.c
 
 struct ObjectHitbox sFirePiranhaPlantHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
@@ -19,18 +21,6 @@ struct ObjectHitbox sFirePiranhaPlantHitbox = {
     /* height:            */ 160,
     /* hurtboxRadius:     */ 50,
     /* hurtboxHeight:     */ 150,
-};
-
-struct ObjectHitbox sPiranhaPlantFireHitbox = {
-    /* interactType:      */ INTERACT_FLAME,
-    /* downOffset:        */ 10,
-    /* damageOrCoinValue: */ 0,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
-    /* radius:            */ 10,
-    /* height:            */ 20,
-    /* hurtboxRadius:     */ 10,
-    /* hurtboxHeight:     */ 20,
 };
 
 s32 sNumActiveFirePiranhaPlants;

@@ -1,12 +1,21 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oSeesawPlatformPitchVel OBJECT_FIELD_F32(0x1B)
+#include "game/spawn_sound.h"
+#include "levels/bitdw/header.h"
+#include "levels/bitfs/header.h"
+#include "levels/bits/header.h"
+#include "levels/bob/header.h"
+#include "levels/rr/header.h"
+#include "levels/vcutm/header.h"
 
 /**
  * Behavior for bhvSeesawPlatform.
  */
+
+/* Seesaw Platform */
+#define /*0x0F4*/ oSeesawPlatformPitchVel OBJECT_FIELD_F32(0x1B)
 
 /**
  * Collision models for the different seesaw platforms.

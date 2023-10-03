@@ -1,12 +1,13 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "game/debug.h"
 #include "game/object_helpers.h"
 
+/* SL Walking Penguin */
 #define /*0x100*/ oSLWalkingPenguinWindCollisionXPos OBJECT_FIELD_F32(0x1E)
 #define /*0x104*/ oSLWalkingPenguinWindCollisionZPos OBJECT_FIELD_F32(0x1F)
 #define /*0x10C*/ oSLWalkingPenguinCurStep           OBJECT_FIELD_S32(0x21)
 #define /*0x110*/ oSLWalkingPenguinCurStepTimer      OBJECT_FIELD_S32(0x22)
-// sl_walking_penguin.inc.c
 
 struct SLWalkingPenguinStep {
     s32 stepLength;
