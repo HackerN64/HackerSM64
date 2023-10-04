@@ -31,7 +31,6 @@
 #include "mario_actions_cutscene.h"
 #include "mario_step.h"
 #include "obj_behaviors.h"
-#include "obj_behaviors_2.h"
 #include "object_constants.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"

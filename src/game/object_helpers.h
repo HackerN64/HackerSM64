@@ -6,6 +6,7 @@
 #include "macros.h"
 #include "types.h"
 #include "object_list_processor.h"
+#include "obj_behaviors.h"
 
 extern struct Surface *sObjFloor;
 
