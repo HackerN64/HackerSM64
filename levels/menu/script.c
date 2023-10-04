@@ -6,6 +6,8 @@
 #include "segment_symbols.h"
 #include "level_commands.h"
 
+#include "config/config_cutscenes.h"
+
 #include "game/area.h"
 #include "game/level_update.h"
 #include "menu/file_select.h"
@@ -42,6 +44,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     END_AREA(),
 
     FREE_LEVEL_POOL(),
+#ifndef SKIP_FILE_SELECT
     LOAD_AREA(/*area*/ 1),
     SET_MENU_MUSIC(/*seq*/ SEQ_MENU_FILE_SELECT),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
@@ -51,6 +54,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     STOP_MUSIC(/*fadeOutTime*/ 0x00BE),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
     SLEEP(/*frames*/ 16),
+#endif // SKIP_FILE_SELECT
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     SET_REG(/*value*/ START_LEVEL),
