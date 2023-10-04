@@ -21,6 +21,7 @@
 #include "levels/menu/header.h"
 
 const LevelScript level_main_menu_entry_file_select[] = {
+#ifndef SKIP_FILE_SELECT
     INIT_LEVEL(),
     LOAD_GODDARD(),
     LOAD_LEVEL_DATA(menu),
@@ -44,7 +45,6 @@ const LevelScript level_main_menu_entry_file_select[] = {
     END_AREA(),
 
     FREE_LEVEL_POOL(),
-#ifndef SKIP_FILE_SELECT
     LOAD_AREA(/*area*/ 1),
     SET_MENU_MUSIC(/*seq*/ SEQ_MENU_FILE_SELECT),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
@@ -54,9 +54,9 @@ const LevelScript level_main_menu_entry_file_select[] = {
     STOP_MUSIC(/*fadeOutTime*/ 0x00BE),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
     SLEEP(/*frames*/ 16),
-#endif // SKIP_FILE_SELECT
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
+#endif // SKIP_FILE_SELECT
     SET_REG(/*value*/ START_LEVEL),
     EXIT_AND_EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
 };
