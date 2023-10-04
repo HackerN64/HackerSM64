@@ -5,7 +5,7 @@
 
 #include "types.h"
 #include "config.h"
-#include "object_fields.h"
+#include "global_object_fields.h"
 #include "object_constants.h"
 #include "sounds.h"
 #include "model_ids.h"

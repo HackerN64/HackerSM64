@@ -38,6 +38,20 @@ extern void *languageTable[][3];
  * special menu messages and phases, button states and button clicked checks.
  */
 
+/* Main Menu Button Object Fields */
+#define /*0x0F4*/ oMenuButtonState       OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oMenuButtonTimer       OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ O_MENU_BUTTON_ORIG_POS_INDEX   0x1D
+#define /*0x0FC*/ O_MENU_BUTTON_ORIG_POS_X_INDEX (O_MENU_BUTTON_ORIG_POS_INDEX + 0) // 0x1D
+#define /*0x100*/ O_MENU_BUTTON_ORIG_POS_Y_INDEX (O_MENU_BUTTON_ORIG_POS_INDEX + 1) // 0x1E
+#define /*0x104*/ O_MENU_BUTTON_ORIG_POS_Z_INDEX (O_MENU_BUTTON_ORIG_POS_INDEX + 2) // 0x1F
+#define /*0x0FC*/ oMenuButtonOrigPosVec  OBJECT_FIELD_F32(O_MENU_BUTTON_ORIG_POS_INDEX)
+#define /*0x0FC*/ oMenuButtonOrigPosX    OBJECT_FIELD_F32(O_MENU_BUTTON_ORIG_POS_X_INDEX)
+#define /*0x100*/ oMenuButtonOrigPosY    OBJECT_FIELD_F32(O_MENU_BUTTON_ORIG_POS_Y_INDEX)
+#define /*0x104*/ oMenuButtonOrigPosZ    OBJECT_FIELD_F32(O_MENU_BUTTON_ORIG_POS_Z_INDEX)
+#define /*0x108*/ oMenuButtonScale       OBJECT_FIELD_F32(0x20)
+#define /*0x10C*/ oMenuButtonActionPhase OBJECT_FIELD_S32(0x21)
+
 // The current sound mode is automatically centered on US and Shindou.
 s16 sSoundTextX;
 

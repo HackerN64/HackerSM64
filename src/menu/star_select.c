@@ -28,6 +28,11 @@
  * strings, act values, and star selector model rendering if a star is collected or not.
  */
 
+/* Star Selector Object Fields */
+#define /*0x0F4*/ oStarSelectorType  OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oStarSelectorTimer OBJECT_FIELD_S32(0x1C)
+#define /*0x108*/ oStarSelectorSize  OBJECT_FIELD_F32(0x20)
+
 // Star Selector count models printed in the act selector menu.
 static struct Object *sStarSelectorModels[8];
 
