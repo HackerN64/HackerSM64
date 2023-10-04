@@ -26,7 +26,7 @@ shaped and rotated correctly, for accurate representation of their properties.
 #include "area.h"
 #include "engine/math_util.h"
 #include "string.h"
-#include "object_fields.h"
+#include "global_object_fields.h"
 #include "object_constants.h"
 #include "camera.h"
 #include "memory.h"

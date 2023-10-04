@@ -25,7 +25,7 @@
 #include "mario_misc.h"
 #include "mario_step.h"
 #include "memory.h"
-#include "object_fields.h"
+#include "global_object_fields.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"
 #include "print.h"
