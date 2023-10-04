@@ -13,6 +13,9 @@
 #define MARIO_ANIMS_POOL_SIZE 0x4000
 #define DEMO_INPUTS_POOL_SIZE 0x800
 
+#define ACQUIRE_DISPLAYLIST(dlPtr) ((dlPtr) = gDisplayListHead)
+#define RELEASE_DISPLAYLIST(dlPtr) (gDisplayListHead = (dlPtr))
+
 struct GfxPool {
     Gfx buffer[GFX_POOL_SIZE];
     struct SPTask spTask;
