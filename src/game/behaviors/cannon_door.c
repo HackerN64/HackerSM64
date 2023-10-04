@@ -2,6 +2,8 @@
 #include "behavior_data.h"
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/save_file.h"
+#include "game/spawn_sound.h"
 
 void bhv_cannon_closed_init(void) {
     if (save_file_is_cannon_unlocked() == TRUE) {

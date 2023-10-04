@@ -3,6 +3,7 @@
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
 #include "game/save_file.h"
+#include "game/spawn_sound.h"
 
 static s32 sCapSaveFlags[] = {
     SAVE_FLAG_HAVE_WING_CAP,

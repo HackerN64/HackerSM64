@@ -1,9 +1,10 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Fire Spitter */
 #define /*0x0F4*/ oFireSpitterScaleVel OBJECT_FIELD_F32(0x1B)
-// fire_spitter.inc.c
 
 static void fire_spitter_act_idle(void) {
     approach_f32_ptr(&o->header.gfx.scale[0], 0.2f, 0.002f);

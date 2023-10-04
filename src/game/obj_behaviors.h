@@ -71,9 +71,16 @@ s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction);
 s32 obj_move_for_one_second(s32 endAction);
 
 // declared in individual behavior files
-// TODO: move into behavior specific headers
+// TODO: move into behavior specific headers or into one of the object helpers
 extern s32 mario_is_far_below_object(f32 min); // king_bobomb.c
 extern void set_yoshi_as_not_dead(void); // yoshi.c
 void create_respawner(ModelID32 model, const BehaviorScript *behToSpawn, s32 minSpawnDist); // respawner.c
+void set_rolling_sphere_hitbox(void); // snowman.c
+void adjust_rolling_face_pitch(f32 f12); // snowman.c
+void curr_obj_random_blink(s32 *blinkTimer); // bobomb.c
+void coin_collected(void); // moving_coin.c
+s32 obj_begin_race(s32 noTimer); // koopa.c
+void spawn_no_exit_star(f32 x, f32 y, f32 z); // spawn_star.c
+void spawn_red_coin_cutscene_star(f32 x, f32 y, f32 z); // spawn_star.c
 
 #endif // OBJ_BEHAVIORS_H

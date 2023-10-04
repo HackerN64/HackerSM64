@@ -1,7 +1,9 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/camera.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Intro Cutscene Lakitu - End Birds */
 #define /*0x108*/ O_INTRO_LAKITU_END_BIRDS_DEST_INDEX   0x20

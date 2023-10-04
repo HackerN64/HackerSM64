@@ -1,6 +1,8 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Bomp (Small) */
 #define /*0x100*/ oSmallBompInitX OBJECT_FIELD_F32(0x1E)

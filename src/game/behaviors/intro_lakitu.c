@@ -4,6 +4,7 @@
 #include "engine/math_util.h"
 #include "game/camera.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /**
  * @file intro_lakitu.inc.c

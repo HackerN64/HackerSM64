@@ -1,9 +1,9 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
-
-// boulder.inc.c
+#include "game/spawn_sound.h"
 
 void bhv_big_boulder_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);

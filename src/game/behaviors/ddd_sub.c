@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/surface_load.h"
 #include "game/object_helpers.h"
 
 void bhv_bowsers_sub_init(void) {

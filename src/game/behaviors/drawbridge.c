@@ -2,6 +2,7 @@
 #include "behavior_data.h"
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 void bhv_lll_drawbridge_spawner_loop(void) {
     struct Object *drawbridge1, *drawbridge2;

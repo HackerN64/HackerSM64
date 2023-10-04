@@ -1,11 +1,12 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
+/* Horizontal Grindel */
 #define /*0x0F4*/ oHorizontalGrindelTargetYaw  OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oHorizontalGrindelDistToHome OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oHorizontalGrindelOnGround   OBJECT_FIELD_S32(0x1D)
-// horizontal_grindel.inc.c
 
 void bhv_horizontal_grindel_init(void) {
     o->oHorizontalGrindelTargetYaw = o->oMoveAngleYaw;

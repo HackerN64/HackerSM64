@@ -11,6 +11,7 @@
 #include "game/interaction.h"
 #include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/save_file.h"
 #include "game/spawn_sound.h"
 
 /* Bob-omb */

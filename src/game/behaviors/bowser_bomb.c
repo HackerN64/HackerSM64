@@ -1,8 +1,10 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 void bhv_bowser_bomb_loop(void) {
     if (obj_check_if_collided_with_object(o, gMarioObject) == TRUE) {

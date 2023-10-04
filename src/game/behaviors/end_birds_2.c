@@ -1,7 +1,9 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/camera.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 void bhv_end_birds_2_loop(void) {
     Vec3f pos;

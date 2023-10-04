@@ -1,11 +1,13 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
+#include "engine/math_util.h"
+#include "engine/surface_load.h"
 #include "game/interaction.h"
 #include "game/level_update.h"
 #include "game/object_helpers.h"
-#include "audio/external.h"
-
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvHiddenBlueCoin and bhvBlueCoinSwitch.

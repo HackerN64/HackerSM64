@@ -1,8 +1,10 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Breakable Box Small (Small Cork Box) */
 #define /*0x0F4*/ oBreakableBoxSmallReleased            OBJECT_FIELD_S32(0x1B)

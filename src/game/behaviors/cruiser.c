@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* RR Cruiser Wing */
 #define /*0x0F4*/ oRRCruiserWingInitYaw   OBJECT_FIELD_S32(0x1B)

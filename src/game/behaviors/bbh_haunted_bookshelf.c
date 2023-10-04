@@ -1,15 +1,16 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "game/object_helpers.h"
-
-/* Haunted Bookshelf */
-#define /*0x088*/ oHauntedBookshelfShouldOpen OBJECT_FIELD_S32(0x00)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvHauntedBookshelf.
  * This is the bookshelf that recedes after solving the puzzle of the haunted books.
  * Its sole purpose is to recede when its action is set to 1 by a bhvHauntedBookshelfManager.
  */
+
+/* Haunted Bookshelf */
+#define /*0x088*/ oHauntedBookshelfShouldOpen OBJECT_FIELD_S32(0x00)
 
 /**
  * Update function for bhvHauntedBookshelf.

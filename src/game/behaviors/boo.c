@@ -2,10 +2,12 @@
 #include "behavior_data.h"
 #include "dialog_ids.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
 #include "engine/math_util.h"
 #include "game/debug.h"
 #include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Boo */
 #define /*0x088*/ oBooDeathStatus           OBJECT_FIELD_S32(0x00)

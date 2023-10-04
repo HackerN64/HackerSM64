@@ -6,7 +6,9 @@
 #include "macros.h"
 #include "types.h"
 #include "object_list_processor.h"
+// TODO: remove dependency on these
 #include "obj_behaviors.h"
+#include "behavior_actions.h"
 
 extern struct Surface *sObjFloor;
 

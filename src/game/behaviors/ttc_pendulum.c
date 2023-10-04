@@ -2,6 +2,7 @@
 #include "global_object_fields.h"
 #include "engine/math_util.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvTTCPendulum. This is not the pendulum inside the clock in the

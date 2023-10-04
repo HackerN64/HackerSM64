@@ -1,6 +1,9 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/surface_load.h"
+#include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Kickable Board */
 #define /*0x0F4*/ oKickableBoardRockingAngleAmount OBJECT_FIELD_S32(0x1B)

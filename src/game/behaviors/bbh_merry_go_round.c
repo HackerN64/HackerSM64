@@ -1,9 +1,10 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
 #include "seq_ids.h"
+#include "audio/external.h"
 #include "game/level_update.h"
 #include "game/object_helpers.h"
-#include "audio/external.h"
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvMerryGoRound.

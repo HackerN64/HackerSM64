@@ -1,6 +1,8 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/surface_load.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /* Tox Box */
 #define /*0x1AC*/ oToxBoxMovementPattern OBJECT_FIELD_VPTR(0x49)

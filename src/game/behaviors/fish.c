@@ -6,6 +6,7 @@
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 /**
  * @file fish.inc.c

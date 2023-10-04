@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/math_util.h"
 #include "game/object_helpers.h"
 #include "game/spawn_sound.h"
 

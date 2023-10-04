@@ -1,18 +1,22 @@
 #include <ultra64.h>
 #include "global_object_fields.h"
+#include "engine/math_util.h"
+#include "engine/surface_load.h"
 #include "game/object_helpers.h"
-
-#define /*0x0F4*/ oTTC2DRotatorMinTimeUntilNextTurn OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oTTC2DRotatorTargetYaw            OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oTTC2DRotatorIncrement            OBJECT_FIELD_S32(0x1D)
-#define /*0x104*/ oTTC2DRotatorRandomDirTimer       OBJECT_FIELD_S32(0x1F)
-#define /*0x108*/ oTTC2DRotatorSpeed                OBJECT_FIELD_S32(0x20)
+#include "game/spawn_sound.h"
 
 /**
  * Behavior for bhvTTC2DRotator.
  * This includes the hand (in TTC, not the clock in the castle), as well as the
  * purely visual 2D cogs in TTC.
  */
+
+/* TTC 2D Rotator */
+#define /*0x0F4*/ oTTC2DRotatorMinTimeUntilNextTurn OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oTTC2DRotatorTargetYaw            OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oTTC2DRotatorIncrement            OBJECT_FIELD_S32(0x1D)
+#define /*0x104*/ oTTC2DRotatorRandomDirTimer       OBJECT_FIELD_S32(0x1F)
+#define /*0x108*/ oTTC2DRotatorSpeed                OBJECT_FIELD_S32(0x20)
 
 /**
  * Speeds for the hand and the 2D cog, respectively. Negative because clockwise.

@@ -3,6 +3,7 @@
 #include "global_object_fields.h"
 #include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 struct ObjectHitbox sBowserKeyHitbox = {
     /* interactType:      */ INTERACT_STAR_OR_KEY,

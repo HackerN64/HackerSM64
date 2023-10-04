@@ -1,8 +1,10 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "engine/surface_load.h"
 #include "game/interaction.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 #include "levels/wdw/header.h"
 
 struct ObjectHitbox sBreakableBoxHitbox = {

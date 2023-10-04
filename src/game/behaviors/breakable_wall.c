@@ -1,9 +1,11 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "audio/external.h"
 #include "game/interaction.h"
 #include "game/level_update.h"
 #include "game/object_helpers.h"
+#include "game/spawn_sound.h"
 
 void bhv_wf_breakable_wall_loop(void) {
     if (gMarioState->action == ACT_SHOT_FROM_CANNON) {

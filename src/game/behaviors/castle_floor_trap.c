@@ -4,7 +4,7 @@
 #include "game/interaction.h"
 #include "game/level_update.h"
 #include "game/object_helpers.h"
-
+#include "game/spawn_sound.h"
 
 void bhv_floor_trap_in_castle_loop(void) {
     if (gMarioObject->platform == o) {

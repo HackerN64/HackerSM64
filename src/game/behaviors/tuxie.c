@@ -8,6 +8,7 @@
 #include "game/interaction.h"
 #include "game/object_helpers.h"
 #include "game/rendering_graph_node.h"
+#include "game/spawn_sound.h"
 
 /* Small Penguin */
 #define /*0x088*/ oSmallPenguinReturnedToMother    OBJECT_FIELD_S32(0x00)
