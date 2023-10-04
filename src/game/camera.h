@@ -360,6 +360,9 @@ enum AvoidStatus {
     AVOID_STATUS_WALL_COVERING_MARIO,
 };
 
+// Forward declare struct Camera.
+struct Camera;
+
 /**
  * A copy of player information that is relevant to the camera.
  */
