@@ -94,8 +94,7 @@ void *virtual_to_segmented(u32 segment, const void *addr) {
 }
 
 void move_segment_table_to_dmem(void) {
-    Gfx *tmpDL;
-    ACQUIRE_DISPLAYLIST(tmpDL);
+    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
 
     for (s32 i = 0; i < 16; i++) {
         gSPSegment(tmpDL++, i, sSegmentTable[i]);
