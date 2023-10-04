@@ -1,6 +1,7 @@
 #include <ultra64.h>
 #include "behavior_data.h"
 #include "global_object_fields.h"
+#include "game/debug.h"
 #include "engine/surface_collision.h"
 #include "engine/surface_load.h"
 #include "game/interaction.h"
@@ -146,6 +147,18 @@ void bhv_door_rendering_loop(void) {
         transitionRoom->backwardRoom == o->oDoorForwardRoom  || // The transition room's backward room is in the same room as this door's  forward room.
         transitionRoom->backwardRoom == o->oDoorBackwardRoom    // The transition room's backward room is in the same room as this door's backward room.
     );
+
+    if ( gMarioCurrentRoom            == o->oDoorForwardRoom) {
+        assert(o->oDoorIsRendering, "HOW ARE U NOT");
+    }
+
+    osSyncPrintf("CURR ROOM: %d", gMarioCurrentRoom);
+    osSyncPrintf("SELF ROOM: %d", o->oDoorSelfRoom);
+    osSyncPrintf("FWD ROOM: %d", o->oDoorForwardRoom);
+    osSyncPrintf("BCK ROOM: %d", o->oDoorBackwardRoom);
+
+    osSyncPrintf("T FWD ROOM: %d", transitionRoom->forwardRoom);
+    osSyncPrintf("T BCK ROOM: %d", transitionRoom->backwardRoom);
 
     COND_BIT(o->oDoorIsRendering, o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 }
