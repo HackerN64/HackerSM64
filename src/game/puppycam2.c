@@ -288,19 +288,23 @@ static void puppycam_process_cutscene(void) {
 #define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
 
 static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
-    gDPSetCombineMode(gDisplayListHead++, BLANK, BLANK);
-    gDPSetCycleType(  gDisplayListHead++, G_CYC_1CYCLE);
+    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+
+    gDPSetCombineMode(tmpDL++, BLANK, BLANK);
+    gDPSetCycleType(  tmpDL++, G_CYC_1CYCLE);
     if (a !=255) {
-        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+        gDPSetRenderMode(tmpDL++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     } else {
-        gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF);
+        gDPSetRenderMode(tmpDL++, G_RM_OPA_SURF, G_RM_OPA_SURF);
     }
-    gDPSetEnvColor(   gDisplayListHead++, r, g, b, a);
-    gDPFillRectangle( gDisplayListHead++, x1, y1, x2, y2);
-    gDPPipeSync(      gDisplayListHead++);
-    gDPSetEnvColor(   gDisplayListHead++, 255, 255, 255, 255);
-    gDPSetCycleType(  gDisplayListHead++, G_CYC_1CYCLE);
-    gSPDisplayList(   gDisplayListHead++,dl_hud_img_end);
+    gDPSetEnvColor(   tmpDL++, r, g, b, a);
+    gDPFillRectangle( tmpDL++, x1, y1, x2, y2);
+    gDPPipeSync(      tmpDL++);
+    gDPSetEnvColor(   tmpDL++, 255, 255, 255, 255);
+    gDPSetCycleType(  tmpDL++, G_CYC_1CYCLE);
+    gSPDisplayList(   tmpDL++,dl_hud_img_end);
+
+    RELEASE_DISPLAYLIST(tmpDL);
 }
 
 //I actually took the time to redo this, properly. Lmao. Please don't bully me over this anymore :(

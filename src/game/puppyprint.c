@@ -522,12 +522,16 @@ void puppyprint_render_minimal(void) {
 }
 
 void render_coverage_map(void) {
-    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
-    gDPSetBlendColor(gDisplayListHead++, 0xFF, 0xFF, 0xFF, 0xFF);
-    gDPSetPrimDepth(gDisplayListHead++, 0xFFFF, 0xFFFF);
-    gDPSetDepthSource(gDisplayListHead++, G_ZS_PRIM);
-    gDPSetRenderMode(gDisplayListHead++, G_RM_VISCVG, G_RM_VISCVG2);
-    gDPFillRectangle(gDisplayListHead++, 0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
+    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+
+    gDPSetCycleType(tmpDL++, G_CYC_1CYCLE);
+    gDPSetBlendColor(tmpDL++, 0xFF, 0xFF, 0xFF, 0xFF);
+    gDPSetPrimDepth(tmpDL++, 0xFFFF, 0xFFFF);
+    gDPSetDepthSource(tmpDL++, G_ZS_PRIM);
+    gDPSetRenderMode(tmpDL++, G_RM_VISCVG, G_RM_VISCVG2);
+    gDPFillRectangle(tmpDL++, 0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
+
+    RELEASE_DISPLAYLIST(tmpDL);
 }
 
 void puppycamera_debug_view(void) {

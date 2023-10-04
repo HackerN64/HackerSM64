@@ -140,43 +140,47 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
 
 
     if (verts != NULL) {
+        Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+
         make_tex_transition_vertices(verts, centerTransX, centerTransY, texTransRadius, transTexType);
-        gSPDisplayList(gDisplayListHead++, dl_proj_mtx_fullscreen);
+        gSPDisplayList(tmpDL++, dl_proj_mtx_fullscreen);
 
         u8 r = transData->red;
         u8 g = transData->green;
         u8 b = transData->blue;
-        gDPSetPrimColor(gDisplayListHead++, 0, 0, r, g, b, 255);
+        gDPSetPrimColor(tmpDL++, 0, 0, r, g, b, 255);
 
-        gDPSetCombineMode(gDisplayListHead++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+        gDPSetCombineMode(tmpDL++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
+        gDPSetRenderMode(tmpDL++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
 
-        gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts), 8, 0);
-        gSPDisplayList(gDisplayListHead++, dl_transition_draw_filled_region);
-        gDPPipeSync(gDisplayListHead++);
+        gSPVertex(tmpDL++, VIRTUAL_TO_PHYSICAL(verts), 8, 0);
+        gSPDisplayList(tmpDL++, dl_transition_draw_filled_region);
+        gDPPipeSync(tmpDL++);
 
-        gDPSetCombineLERP(gDisplayListHead++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0, 
+        gDPSetCombineLERP(tmpDL++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0, 
                                               0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0);
 
-        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-        gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
+        gDPSetRenderMode(tmpDL++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+        gDPSetTextureFilter(tmpDL++, G_TF_BILERP);
 
         switch (transTexType) {
             case TRANS_TYPE_MIRROR:
-                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 32, 64, 0,
+                gDPLoadTextureBlock(tmpDL++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 32, 64, 0,
                     G_TX_WRAP | G_TX_MIRROR, G_TX_WRAP | G_TX_MIRROR, 5, 6, G_TX_NOLOD, G_TX_NOLOD);
                 break;
             case TRANS_TYPE_CLAMP:
-                gDPLoadTextureBlock(gDisplayListHead++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0,
+                gDPLoadTextureBlock(tmpDL++, sTextureTransitionID[texID], G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0,
                     G_TX_CLAMP, G_TX_CLAMP, 6, 6, G_TX_NOLOD, G_TX_NOLOD);
                 break;
         }
-        gSPTexture(gDisplayListHead++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
-        gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
-        gSPDisplayList(gDisplayListHead++, dl_draw_quad_verts_0123);
-        gSPTexture(gDisplayListHead++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
-        gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
+        gSPTexture(tmpDL++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
+        gSPVertex(tmpDL++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
+        gSPDisplayList(tmpDL++, dl_draw_quad_verts_0123);
+        gSPTexture(tmpDL++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
+        gSPDisplayList(tmpDL++, dl_screen_transition_end);
         sTransitionTextureAngle += transData->angleSpeed;
+
+        RELEASE_DISPLAYLIST(tmpDL);
     }
     return set_and_reset_transition_fade_timer(transTime);
 }
@@ -197,17 +201,21 @@ s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 a
     Vtx *verts = vertex_transition_color();
 
     if (verts != NULL) {
+        Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+
         u8 r = transData->red;
         u8 g = transData->green;
         u8 b = transData->blue;
-        gDPSetPrimColor(gDisplayListHead++, 0, 0, r, g, b, alpha);
+        gDPSetPrimColor(tmpDL++, 0, 0, r, g, b, alpha);
 
-        gSPDisplayList(gDisplayListHead++, dl_proj_mtx_fullscreen);
-        gDPSetCombineMode(gDisplayListHead++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-        gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
-        gSPDisplayList(gDisplayListHead++, dl_draw_quad_verts_0123);
-        gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
+        gSPDisplayList(tmpDL++, dl_proj_mtx_fullscreen);
+        gDPSetCombineMode(tmpDL++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
+        gDPSetRenderMode(tmpDL++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+        gSPVertex(tmpDL++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
+        gSPDisplayList(tmpDL++, dl_draw_quad_verts_0123);
+        gSPDisplayList(tmpDL++, dl_screen_transition_end);
+
+        RELEASE_DISPLAYLIST(tmpDL);
     }
     return set_and_reset_transition_fade_timer(transTime);
 }
