@@ -7,15 +7,6 @@
 #include "macros.h"
 #include "types.h"
 
-// enum ObjCollisionFlags {
-//     OBJ_COL_FLAGS_NONE      = (0 << 0),
-//     OBJ_COL_FLAG_GROUNDED   = (1 << 0),
-//     OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
-//     OBJ_COL_FLAG_UNDERWATER = (1 << 2),
-//     OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
-//     OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
-// };
-
 // init functions that must be global
 void bhv_moving_yellow_coin_init(void);
 void bhv_moving_blue_coin_init(void);
@@ -128,11 +119,6 @@ void bhv_rr_cruiser_wing_loop(void);
 // void bobomb_buddy_actions(void);
 // void cannon_door_act_opening(void);
 // void whirlpool_set_hitbox(void);
-// void butterfly_step(s32 speed);
-// void butterfly_calculate_angle(void);
-// void butterfly_act_rest(void);
-// void butterfly_act_follow_mario(void);
-// void butterfly_act_return_home(void);
 // f32 hoot_find_next_floor(f32 dist);
 // void hoot_floor_bounce(void);
 // void hoot_free_step(s16 fastOscY, s32 speed);
