@@ -23,7 +23,7 @@
 
 CSPage* gCSPages[NUM_PAGES] = {
     [PAGE_CONTEXT    ] = &gCSPage_context,
-    [PAGE_LOG        ] = &gCSPage_logs,
+    [PAGE_LOGS       ] = &gCSPage_logs,
     [PAGE_STACK_TRACE] = &gCSPage_stack,
 #ifdef INCLUDE_DEBUG_MAP
     [PAGE_MAP_VIEWER ] = &gCSPage_map,

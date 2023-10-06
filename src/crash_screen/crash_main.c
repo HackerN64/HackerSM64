@@ -153,7 +153,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     switch (tc->cause) {
         case EXC_SYSCALL:
             if (__n64Assert_Message != NULL) {
-                cs_set_page(PAGE_LOG);
+                cs_set_page(PAGE_LOGS);
             }
             break;
         case EXC_II:
