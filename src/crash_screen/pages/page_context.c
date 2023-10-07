@@ -34,6 +34,20 @@ const enum ControlTypes cs_cont_list_context[] = {
 };
 
 
+static const char* sThreadNames[NUM_THREADS] = {
+    [THREAD_0           ] = "0",
+    [THREAD_1_IDLE      ] = "idle",
+    [THREAD_2           ] = "2",
+    [THREAD_3_MAIN      ] = "main",
+    [THREAD_4_SOUND     ] = "sound",
+    [THREAD_5_GAME_LOOP ] = "game loop",
+    [THREAD_6_RUMBLE    ] = "rumble",
+    [THREAD_7_HVQM      ] = "HVQM",
+    [THREAD_8_TIMEKEEPER] = "timekeeper",
+    [THREAD_9_DA_COUNTER] = "DA counter",
+    //! TODO: Crash screen threads 1000-1002.
+};
+
 static const char* sCauseDesc[18] = {
     /*EXC_INT       */ "Interrupt",
     /*EXC_MOD       */ "TLB modification",
@@ -134,7 +148,7 @@ void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
         cs_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol);
     } else {
         // "[XXXXXXXX]"
-        cs_print((x + TEXT_WIDTH(charX + 1)), y,
+        cs_print((x + TEXT_WIDTH(charX + STRLEN(" "))), y,
             STR_COLOR_PREFIX STR_HEX_WORD,
             COLOR_RGBA32_WHITE, val
         );
@@ -146,13 +160,15 @@ void cs_context_print_registers(__OSThreadContext* tc) {
     u32 regNum = 0;
     Register* reg = &tc->at;
 
-    cs_context_print_reg(TEXT_X(0 * 15), TEXT_Y(3), "PC", tc->pc);
-    cs_context_print_reg(TEXT_X(1 * 15), TEXT_Y(3), "SR", tc->sr);
-    cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(3), "VA", tc->badvaddr);
+    u32 line = 4;
+
+    cs_context_print_reg(TEXT_X(0 * 15), TEXT_Y(line), "PC", tc->pc);
+    cs_context_print_reg(TEXT_X(1 * 15), TEXT_Y(line), "SR", tc->sr);
+    cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(line), "VA", tc->badvaddr);
 
     Word data = 0;
     if (try_read_data(&data, tc->pc)) {
-        cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", data); // The raw data of the asm code that crashed.
+        cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(line + 10), "MM", data); // The raw data of the asm code that crashed.
     }
 
     osWritebackDCacheAll();
@@ -163,7 +179,7 @@ void cs_context_print_registers(__OSThreadContext* tc) {
                 return;
             }
 
-            cs_context_print_reg(TEXT_X(x * 15), TEXT_Y(4 + y), sRegNames[regNum], *(reg + regNum));
+            cs_context_print_reg(TEXT_X(x * 15), TEXT_Y(line + 1 + y), sRegNames[regNum], *(reg + regNum));
 
             regNum++;
         }
@@ -223,7 +239,7 @@ void cs_context_print_float_registers(__OSThreadContext* tc) {
     u32 regNum = 0;
     __OSfp* osfp = &tc->fp0;
 
-    cs_context_print_fpcsr(TEXT_X(0), (TEXT_Y(14) + 5), tc->fpcsr);
+    cs_context_print_fpcsr(TEXT_X(0), TEXT_Y(15), tc->fpcsr);
 
     osWritebackDCacheAll();
 
@@ -244,26 +260,42 @@ void cs_context_print_float_registers(__OSThreadContext* tc) {
 void page_context_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 line = 1;
+    size_t charX = 0;
 
     const char* desc = get_cause_desc(tc->cause);
     if (desc != NULL) {
-        // "THREAD:[thread id] ([exception cause description])"
+        // "CAUSE: ([exception cause description])"
         cs_print(TEXT_X(0), TEXT_Y(line),
-            STR_COLOR_PREFIX"THREAD:%d "STR_COLOR_PREFIX"(%s)",
-            COLOR_RGBA32_CRASH_THREAD, gCrashedThread->id,
+            STR_COLOR_PREFIX"CAUSE:\t%s",
             COLOR_RGBA32_CRASH_DESCRIPTION, desc
         );
     }
 
     line++;
 
+    // "THREAD: [thread id]"
+    enum ThreadID threadID = gCrashedThread->id;
+    charX = cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"THREAD:\t%d",
+        COLOR_RGBA32_CRASH_THREAD, threadID
+    );
+    if (threadID < NUM_THREADS) {
+        const char* threadName = sThreadNames[threadID];
+        if (threadName != NULL) {
+            // "(thread name)"
+            cs_print(TEXT_X(charX + STRLEN(" ")), TEXT_Y(line), STR_COLOR_PREFIX"(%s)",
+                COLOR_RGBA32_CRASH_THREAD, threadName
+            );
+        }
+    }
+    line++;
+
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    // "CRASH IN:"
-    size_t charX = cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"CRASH IN: ",
+    // "IN FUNC:"
+    charX = cs_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"FUNC:\t",
         COLOR_RGBA32_CRASH_AT
     );
     cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
