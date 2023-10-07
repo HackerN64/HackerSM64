@@ -247,9 +247,10 @@ static size_t cs_print_from_buffer(size_t bufferCount, u32 x, u32 y) {
             }
             gCSNumLinesPrinted++;
         } else if (tab) {
-            int tabCount = (((x - startX) + TAB_WIDTH) / TAB_WIDTH);
-            numChars += (tabCount * TAB_WIDTH) - x;
+            u32 tempX = x;
+            u32 tabCount = (((x - startX) + TAB_WIDTH) / TAB_WIDTH);
             x = (tabCount * TAB_WIDTH) + startX;
+            numChars += ((x - tempX) / TEXT_WIDTH(1));
         } else {
             x += TEXT_WIDTH(1);
             numChars++;
