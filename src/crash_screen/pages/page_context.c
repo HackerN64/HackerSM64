@@ -34,18 +34,20 @@ const enum ControlTypes cs_cont_list_context[] = {
 };
 
 
-static const char* sThreadNames[NUM_THREADS] = {
-    [THREAD_0           ] = "0",
-    [THREAD_1_IDLE      ] = "idle",
-    [THREAD_2           ] = "2",
-    [THREAD_3_MAIN      ] = "main",
-    [THREAD_4_SOUND     ] = "sound",
-    [THREAD_5_GAME_LOOP ] = "game loop",
-    [THREAD_6_RUMBLE    ] = "rumble",
-    [THREAD_7_HVQM      ] = "HVQM",
-    [THREAD_8_TIMEKEEPER] = "timekeeper",
-    [THREAD_9_DA_COUNTER] = "DA counter",
-    //! TODO: Crash screen threads 1000-1002.
+static const ThreadIDName sThreadIDNames[] = {
+    { .threadID = THREAD_0,                   .name = "0",              },
+    { .threadID = THREAD_1_IDLE,              .name = "idle",           },
+    { .threadID = THREAD_2,                   .name = "2",              },
+    { .threadID = THREAD_3_MAIN,              .name = "main",           },
+    { .threadID = THREAD_4_SOUND,             .name = "sound",          },
+    { .threadID = THREAD_5_GAME_LOOP,         .name = "game loop",      },
+    { .threadID = THREAD_6_RUMBLE,            .name = "rumble",         },
+    { .threadID = THREAD_7_HVQM,              .name = "HVQM",           },
+    { .threadID = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
+    { .threadID = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
+    { .threadID = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
+    { .threadID = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
+    { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
 };
 
 static const char* sCauseDesc[18] = {
@@ -94,6 +96,7 @@ static const char* sRegNames[29] = {
 };
 
 
+// Returns a CAUSE description from 'sCauseDesc'.
 static const char* get_cause_desc(u32 cause) {
     // Make the last two cause case indexes sequential for array access.
     switch (cause) {
@@ -109,6 +112,7 @@ static const char* get_cause_desc(u32 cause) {
     return NULL;
 }
 
+// Returns a FPCSR description from 'sFpcsrDesc'.
 static const char* get_fpcsr_desc(u32 fpcsr) {
     u32 bit = BIT(17);
 
@@ -118,6 +122,21 @@ static const char* get_fpcsr_desc(u32 fpcsr) {
         }
 
         bit >>= 1;
+    }
+
+    return NULL;
+}
+
+// Returns a thread name from 'sThreadIDNames'.
+static const char* get_thread_name_from_id(enum ThreadID threadID) {
+    const ThreadIDName* threadIDName = &sThreadIDNames[0];
+
+    for (int i = 0; i < ARRAY_COUNT(sThreadIDNames); i++) {
+        if (threadIDName->threadID == threadID) {
+            return threadIDName->name;
+        }
+
+        threadIDName++;
     }
 
     return NULL;
@@ -279,7 +298,8 @@ void page_context_draw(void) {
         COLOR_RGBA32_CRASH_THREAD, threadID
     );
     if (threadID < NUM_THREADS) {
-        const char* threadName = sThreadNames[threadID];
+        const char* threadName = get_thread_name_from_id(threadID);
+
         if (threadName != NULL) {
             // "(thread name)"
             cs_print(TEXT_X(charX + STRLEN(" ")), TEXT_Y(line), STR_COLOR_PREFIX"(%s)",
