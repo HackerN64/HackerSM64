@@ -7,7 +7,9 @@
 #include "pages/page_context.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
+#ifdef INCLUDE_DEBUG_MAP
 #include "pages/page_map.h"
+#endif
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
 #include "pages/page_settings.h"

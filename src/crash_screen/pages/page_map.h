@@ -7,6 +7,8 @@
 #include "crash_screen/crash_settings.h"
 
 
+#ifdef INCLUDE_DEBUG_MAP
+
 enum CSSettingsGroup_page_map {
     CS_OPT_HEADER_PAGE_MAP,
     CS_OPT_MAP_SHOW_ADDRESSES,
@@ -22,3 +24,5 @@ enum CSSettingsGroup_page_map {
 
 extern struct CSSetting cs_settings_group_page_map[];
 extern struct CSPage gCSPage_map;
+
+#endif

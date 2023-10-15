@@ -17,6 +17,8 @@
 #include "page_map.h"
 
 
+#ifdef INCLUDE_DEBUG_MAP
+
 struct CSSetting cs_settings_group_page_map[] = {
     [CS_OPT_HEADER_PAGE_MAP     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MAP VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MAP_SHOW_ADDRESSES  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show addresses",                 .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -196,3 +198,5 @@ struct CSPage gCSPage_map = {
         .printName   = TRUE,
     },
 };
+
+#endif
