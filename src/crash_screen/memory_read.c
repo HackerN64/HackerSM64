@@ -5,16 +5,6 @@
 #include "segments.h"
 
 
-enum BusDevices {
-    BUS_RDRAM,
-    BUS_RCP,
-    BUS_PI_EXT_1,
-    BUS_SI_EXT,
-    BUS_PI_EXT_2,
-    BUS_UNMAPPED,
-    BUS_END,
-};
-
 UNUSED ALIGNED8 static const Address sBusDeviceBounds[] = {
     [BUS_RDRAM   ] = 0x00000000,
     [BUS_RCP     ] = SP_DMEM_START,
@@ -25,15 +15,6 @@ UNUSED ALIGNED8 static const Address sBusDeviceBounds[] = {
     [BUS_END     ] = 0xFFFFFFFF,
 };
 
-enum KernelSegments {
-    KUSEG,
-    KSEG0,
-    KSEG1,
-    KSSEG,
-    KSEG3,
-    K_END,
-};
-
 UNUSED ALIGNED8 static const Address sKernelSegmentBounds[] = {
     [KUSEG] = 0x00000000,
     [KSEG0] = VIRTUAL_RAM_START,
@@ -41,37 +22,6 @@ UNUSED ALIGNED8 static const Address sKernelSegmentBounds[] = {
     [KSSEG] = 0xC0000000,
     [KSEG3] = 0xE0000000,
     [K_END] = 0xFFFFFFFF,
-};
-
-enum MemoryRegions {
-    MEM_RDRAM_MEMORY,
-    MEM_RDRAM_REGISTERS,
-    MEM_RDRAM_REGISTERS_BROADCAST,
-    MEM_RCP_RSP_DMEM,
-    MEM_RCP_RSP_IMEM,
-    MEM_RCP_RSP_DMEM_IMEM_MIRRORS,
-    MEM_RCP_RSP_REGISTERS,
-    MEM_RCP_UNMAPPED_1,
-    MEM_RCP_RDP_COMMAND_REGISTERS,
-    MEM_RCP_RDP_SPAN_REGISTERS,
-    MEM_RCP_MI,
-    MEM_RCP_VI,
-    MEM_RCP_AI,
-    MEM_RCP_PI,
-    MEM_RCP_RI,
-    MEM_RCP_SI,
-    MEM_RCP_UNMAPPED_2,
-    MEM_PI_EXT_N64DD_REGISTERS,
-    MEM_PI_EXT_N64DD_IPL_ROM,
-    MEM_PI_EXT_CARTRIDGE_SRAM,
-    MEM_PI_EXT_CARTRIDGE_ROM,
-    MEM_SI_EXT_PIF_ROM,
-    MEM_SI_EXT_PIF_RAM,
-    MEM_SI_EXT_RESERVED,
-    MEM_PI_EXT_UNUSED1,
-    MEM_PI_EXT_UNUSED2,
-    MEM_UNMAPPED,
-    MEM_MEMORY_REGIONS_END,
 };
 
 ALIGNED4 static const Address sMemoryBounds[] = {
@@ -106,12 +56,12 @@ ALIGNED4 static const Address sMemoryBounds[] = {
 };
 
 // Whether a PI DMA is in progress.
-static _Bool pi_is_busy(void) {
+ALWAYS_INLINE static _Bool pi_is_busy(void) {
     return ((IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY)) != 0);
 }
 
 // Whether a PI DMA has finished.
-static _Bool pi_dma_is_unfinished(void) {
+ALWAYS_INLINE static _Bool pi_dma_is_unfinished(void) {
     return ((IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR)) != 0);
 }
 
@@ -267,7 +217,7 @@ _Bool try_read_data(Word* dest, Address addr) {
  */
 _Bool try_read_byte(Byte* dest, Address addr) {
     Address alignedAddr = ALIGNFLOOR(addr, sizeof(Word));
-    size_t offset = (addr - alignedAddr); // 0-3
+    size_t offset = (addr - alignedAddr); // 0-3.
     union {
         Byte byte[4];
         Word word;
