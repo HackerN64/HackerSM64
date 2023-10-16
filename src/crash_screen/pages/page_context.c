@@ -175,40 +175,44 @@ void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
 }
 
 // Print important fixed-point registers.
-void cs_context_print_registers(__OSThreadContext* tc) {
+u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
+    const u32 columns = 3;
+    const u32 rows = 10;
+
     u32 regNum = 0;
     Register* reg = &tc->at;
-
-    u32 line = 4;
 
     cs_context_print_reg(TEXT_X(0 * 15), TEXT_Y(line), "PC", tc->pc);
     cs_context_print_reg(TEXT_X(1 * 15), TEXT_Y(line), "SR", tc->sr);
     cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(line), "VA", tc->badvaddr);
+    line++;
 
     Word data = 0;
     if (try_read_data(&data, tc->pc)) {
-        cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(line + 10), "MM", data); // The raw data of the asm code that crashed.
+        cs_context_print_reg(TEXT_X((columns - 1) * 15), TEXT_Y(line + (rows - 1)), "MM", data); // The raw data of the asm code that crashed.
     }
 
     osWritebackDCacheAll();
 
-    for (u32 y = 0; y < 10; y++) {
+    for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < 3; x++) {
             if (regNum >= ARRAY_COUNT(sRegNames)) {
-                return;
+                return (line + y);
             }
 
-            cs_context_print_reg(TEXT_X(x * 15), TEXT_Y(line + 1 + y), sRegNames[regNum], *(reg + regNum));
+            cs_context_print_reg(TEXT_X(x * 15), TEXT_Y(line + y), sRegNames[regNum], *(reg + regNum));
 
             regNum++;
         }
     }
+
+    return (line + rows);
 }
 
 void cs_context_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     // "FPCSR:[XXXXXXXX]"
     size_t fpcsrSize = cs_print(x, y,
-        STR_COLOR_PREFIX"FPCSR:"STR_COLOR_PREFIX STR_HEX_WORD" ",
+        STR_COLOR_PREFIX"FPCSR: "STR_COLOR_PREFIX STR_HEX_WORD" ",
         COLOR_RGBA32_CRASH_VARIABLE,
         COLOR_RGBA32_WHITE, fpcsr
     );
@@ -254,11 +258,12 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     }
 }
 
-void cs_context_print_float_registers(__OSThreadContext* tc) {
+void cs_context_print_float_registers(u32 line, __OSThreadContext* tc) {
     u32 regNum = 0;
     __OSfp* osfp = &tc->fp0;
 
-    cs_context_print_fpcsr(TEXT_X(0), TEXT_Y(15), tc->fpcsr);
+    cs_context_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
+    line++;
 
     osWritebackDCacheAll();
 
@@ -268,7 +273,7 @@ void cs_context_print_float_registers(__OSThreadContext* tc) {
                 return;
             }
 
-            cs_context_print_float_reg(TEXT_X(x * 15), TEXT_Y(16 + y), regNum, &osfp->f.f_even);
+            cs_context_print_float_reg(TEXT_X(x * 15), TEXT_Y(line + y), regNum, &osfp->f.f_even);
 
             osfp++;
             regNum += 2;
@@ -319,13 +324,15 @@ void page_context_draw(void) {
         COLOR_RGBA32_CRASH_AT
     );
     cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+    line++;
 #endif
 
-    cs_context_print_registers(tc);
+    line = cs_context_print_registers(line, tc);
+    line++;
 
     osWritebackDCacheAll();
 
-    cs_context_print_float_registers(tc);
+    cs_context_print_float_registers(line, tc);
 }
 
 void page_context_input(void) {
