@@ -218,10 +218,7 @@ _Bool try_read_data(Word* dest, Address addr) {
 _Bool try_read_byte(Byte* dest, Address addr) {
     Address alignedAddr = ALIGNFLOOR(addr, sizeof(Word));
     size_t offset = (addr - alignedAddr); // 0-3.
-    union {
-        Byte byte[4];
-        Word word;
-    } data = {
+    Word_4Bytes data = {
         .word = 0,
     };
 

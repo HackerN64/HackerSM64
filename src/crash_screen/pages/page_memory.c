@@ -74,35 +74,41 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
 
         charX = (TEXT_X(SIZEOF_HEX(Word)) + 3);
         charY = TEXT_Y(line + y);
-        for (u32 x = 0; x < (4 * sizeof(Word)); x++) {
-            Address currAddr = (rowAddr + x);
 
-            if ((x % 4) == 0) {
-                charX += 2;
+        for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
+            Word_4Bytes data = {
+                .word = 0x00000000,
+            };
+            Address currAddrAligned = (rowAddr + (wordOffset * sizeof(Word)));
+            _Bool valid = try_read_data(&data.word, currAddrAligned);
+
+            charX += 2;
+
+            for (u32 byteOffset = 0; byteOffset < sizeof(Word); byteOffset++) {
+                Address currAddr = (currAddrAligned + byteOffset);
+
+                RGBA32 textColor = ((memoryAsASCII || (byteOffset % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
+                RGBA32 selectColor = COLOR_RGBA32_NONE;
+
+                if (currAddr == gSelectedAddress) {
+                    selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
+                    textColor = RGBA32_INVERT(textColor);
+                } else if (currAddr == tc->pc) {
+                    selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
+                }
+
+                if (selectColor != COLOR_RGBA32_NONE) {
+                    cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
+                }
+
+                if (valid) {
+                    print_byte(charX, charY, data.byte[byteOffset], textColor);
+                } else {
+                    cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
+                }
+
+                charX += (TEXT_WIDTH(2) + 1);
             }
-
-            RGBA32 textColor = ((memoryAsASCII || (x % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
-            RGBA32 selectColor = COLOR_RGBA32_NONE;
-
-            if (currAddr == gSelectedAddress) {
-                selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
-                textColor = RGBA32_INVERT(textColor);
-            } else if (currAddr == tc->pc) {
-                selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
-            }
-
-            if (selectColor != COLOR_RGBA32_NONE) {
-                cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
-            }
-
-            Byte byte = 0;
-            if (try_read_byte(&byte, currAddr)) {
-                print_byte(charX, charY, byte, textColor);
-            } else {
-                cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
-            }
-
-            charX += (TEXT_WIDTH(2) + 1);
         }
     }
 }
