@@ -71,7 +71,6 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             cs_draw_row_selection_box(y);
         }
 
-        // 
         size_t addrStrSize = 0;
         if (showAddresses) {
             // "[stack address]:"
@@ -86,7 +85,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
 
             if (symbol->errc == 'S') {
-                // Size too large
+                // Size too large.
                 // "?"
                 cs_print(x, y,
                     (STR_COLOR_PREFIX"%c"),
@@ -103,14 +102,14 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 
         size_t typeStrSize = 0;
         if (showTypes) {
-            typeStrSize = STRLEN("T") + showSizes; // Add a space if both types and sizes are shown
+            typeStrSize = STRLEN("T") + showSizes; // Add a space if both types and sizes are shown.
             // "[type]"
             cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), y,
                 (STR_COLOR_PREFIX"%c"),
                 COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE, symbol->type
             );
         }
-        
+
         // "[name from map data]"
         cs_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
 
@@ -130,7 +129,7 @@ void page_map_draw(void) {
         // "SIZE:"
         cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
     }
-    
+
     size_t typeStrSize = 0;
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES)) {
         typeStrSize = STRLEN("TYPE:");

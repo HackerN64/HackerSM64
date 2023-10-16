@@ -82,7 +82,7 @@ extern u32 gCSNumLinesPrinted;
 
 size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 
-//! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?)
+//! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?).
 #define cs_print(x, y, fmt, ...)                   cs_print_impl((x), (y),           0, (fmt), ##__VA_ARGS__)
 #define cs_print_scroll(x, y, charLimit, fmt, ...) cs_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
 

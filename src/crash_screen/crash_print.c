@@ -90,7 +90,9 @@ static _Bool is_space_char(char glyph) {
 
 static u32 cs_format_print_buffer(const char* buf, size_t totalSize) {
     u32 bufferCount = 0;
-    ColorRGBA32 textColor = { .rgba32 = gCSDefaultPrintColor };
+    ColorRGBA32 textColor = {
+        .rgba32 = gCSDefaultPrintColor,
+    };
     _Bool escaped = FALSE;
 
     // Pass 1: control characters and formatting
@@ -127,7 +129,9 @@ static u32 cs_format_print_buffer(const char* buf, size_t totalSize) {
                         break;
                     }
                     // Only set 'color' if 'read_str_to_bytes' is successful.
-                    ColorRGBA32 tempColor = { .rgba32 = gCSDefaultPrintColor };
+                    ColorRGBA32 tempColor = {
+                        .rgba32 = gCSDefaultPrintColor,
+                    };
                     if (!read_str_to_bytes(tempColor.raw.asU8, buf, (index + 1), sizeof(tempColor.raw.asU8))) {
                         print = TRUE;
                         break;

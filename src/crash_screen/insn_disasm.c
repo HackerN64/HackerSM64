@@ -498,7 +498,9 @@ Address get_insn_branch_target_from_addr(Address addr) {
         return addr;
     }
 
-    InsnData insn = { .raw = *(Word*)addr };
+    InsnData insn = {
+        .raw = *(Word*)addr,
+    };
 
     if (
         (insn.opcode == OPC_J  ) ||

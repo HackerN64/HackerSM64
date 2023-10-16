@@ -176,31 +176,32 @@ void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
 
 // Print important fixed-point registers.
 u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
+    const u32 rows    = 10;
     const u32 columns = 3;
-    const u32 rows = 10;
+    const size_t columnWidth = 15;
 
     u32 regNum = 0;
     Register* reg = &tc->at;
 
-    cs_context_print_reg(TEXT_X(0 * 15), TEXT_Y(line), "PC", tc->pc);
-    cs_context_print_reg(TEXT_X(1 * 15), TEXT_Y(line), "SR", tc->sr);
-    cs_context_print_reg(TEXT_X(2 * 15), TEXT_Y(line), "VA", tc->badvaddr);
+    cs_context_print_reg(TEXT_X(0 * columnWidth), TEXT_Y(line), "PC", tc->pc);
+    cs_context_print_reg(TEXT_X(1 * columnWidth), TEXT_Y(line), "SR", tc->sr);
+    cs_context_print_reg(TEXT_X(2 * columnWidth), TEXT_Y(line), "VA", tc->badvaddr);
     line++;
 
     Word data = 0;
     if (try_read_data(&data, tc->pc)) {
-        cs_context_print_reg(TEXT_X((columns - 1) * 15), TEXT_Y(line + (rows - 1)), "MM", data); // The raw data of the asm code that crashed.
+        cs_context_print_reg(TEXT_X((columns - 1) * columnWidth), TEXT_Y(line + (rows - 1)), "MM", data); // The raw data of the asm code that crashed.
     }
 
     osWritebackDCacheAll();
 
     for (u32 y = 0; y < rows; y++) {
-        for (u32 x = 0; x < 3; x++) {
+        for (u32 x = 0; x < columns; x++) {
             if (regNum >= ARRAY_COUNT(sRegNames)) {
                 return (line + y);
             }
 
-            cs_context_print_reg(TEXT_X(x * 15), TEXT_Y(line + y), sRegNames[regNum], *(reg + regNum));
+            cs_context_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), sRegNames[regNum], *(reg + regNum));
 
             regNum++;
         }
@@ -231,7 +232,9 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     size_t charX = cs_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_VARIABLE, regNum);
     x += TEXT_WIDTH(charX);
 
-    IEEE754_f32 val = { .asF32 = *data };
+    IEEE754_f32 val = {
+        .asF32 = *data,
+    };
 
     char prefix = '\0';
 
@@ -259,6 +262,7 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
 }
 
 void cs_context_print_float_registers(u32 line, __OSThreadContext* tc) {
+    const size_t columnWidth = 15;
     u32 regNum = 0;
     __OSfp* osfp = &tc->fp0;
 
@@ -273,7 +277,7 @@ void cs_context_print_float_registers(u32 line, __OSThreadContext* tc) {
                 return;
             }
 
-            cs_context_print_float_reg(TEXT_X(x * 15), TEXT_Y(line + y), regNum, &osfp->f.f_even);
+            cs_context_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum, &osfp->f.f_even);
 
             osfp++;
             regNum += 2;

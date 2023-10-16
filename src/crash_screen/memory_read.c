@@ -65,7 +65,7 @@ ALWAYS_INLINE static _Bool pi_dma_is_unfinished(void) {
     return ((IO_READ(PI_STATUS_REG) & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR)) != 0);
 }
 
-//! TODO: Description
+//! TODO: Description.
 void headless_dma(Address devAddr, void* dramAddr, size_t size) {
     // Wait until DMA is finished and no IO is currently in progress.
     while (pi_is_busy());
@@ -78,7 +78,7 @@ void headless_dma(Address devAddr, void* dramAddr, size_t size) {
     while (pi_dma_is_unfinished());
 }
 
-//! TODO: Description
+// Whether the address is in a specific memory region (see 'enum MemoryRegions' and 'sMemoryBounds').
 ALWAYS_INLINE static _Bool is_in_memory_region(Address addr, enum MemoryRegions region) {
     return ((addr >= sMemoryBounds[region]) && (addr < sMemoryBounds[region + 1]));
 }
@@ -219,7 +219,7 @@ _Bool try_read_byte(Byte* dest, Address addr) {
     Address alignedAddr = ALIGNFLOOR(addr, sizeof(Word));
     size_t offset = (addr - alignedAddr); // 0-3.
     Word_4Bytes data = {
-        .word = 0,
+        .word = 0x00000000,
     };
 
     if (try_read_data(&data.word, alignedAddr)) {

@@ -153,7 +153,9 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         }
 
         // Get the offset for the current function;
-        InsnData insn = { .raw = *(Word*)sBranchBufferCurrAddr }; //! TODO: Is this an unsafe read?
+        InsnData insn = {
+            .raw = *(Word*)sBranchBufferCurrAddr, //! TODO: Is this an unsafe read?
+        };
         s16 branchOffset = insn_check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) { //! TODO: Verify ordering:
@@ -311,7 +313,9 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             print_as_insn(charX, charY, addr, data);
 
             if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
-                InsnData insn = { .raw = data };
+                InsnData insn = {
+                    .raw = data,
+                };
                 s16 branchOffset = insn_check_for_branch_offset(insn);
 
                 if (branchOffset != 0x0000) {

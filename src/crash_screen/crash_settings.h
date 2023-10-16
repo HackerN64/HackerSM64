@@ -57,7 +57,7 @@ typedef struct CSSettingsGroup {
     /*0x04*/ struct CSSetting* list;
 } CSSettingsGroup; /*0x08*/
 
-//! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt)
+//! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt).
 typedef struct CSSetting {
     /*0x00*/ enum CSSettingsEntryType type;
     /*0x04*/ const char* name;
