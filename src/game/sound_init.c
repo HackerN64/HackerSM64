@@ -75,7 +75,6 @@ static u32 sMenuSoundsExtra[] = {
     SOUND_AIR_BLOW_FIRE,
     SOUND_ENV_ELEVATOR4,
 };
-static s8 sPaintingEjectSoundPlayed = FALSE;
 
 void play_menu_sounds_extra(s32 a, void *b);
 
@@ -179,24 +178,6 @@ void play_menu_sounds(s16 soundMenuFlags) {
         queue_rumble_data(10, 60);
     }
 #endif
-}
-
-/**
- * Plays the painting eject sound effect if it has not already been played
- *
- * Called from threads: thread5_game_loop
- */
-void play_painting_eject_sound(void) {
-    if (gRipplingPainting != NULL && gRipplingPainting->state == PAINTING_ENTERED) {
-        // ripple when Mario enters painting
-        if (!sPaintingEjectSoundPlayed) {
-            play_sound(SOUND_GENERAL_PAINTING_EJECT,
-                       gMarioStates[0].marioObj->header.gfx.cameraToObject);
-        }
-        sPaintingEjectSoundPlayed = TRUE;
-    } else {
-        sPaintingEjectSoundPlayed = FALSE;
-    }
 }
 
 /**

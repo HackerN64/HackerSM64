@@ -586,7 +586,6 @@ u32 save_file_get_flags(void) {
             SAVE_FLAG_HAVE_VANISH_CAP        |
             SAVE_FLAG_UNLOCKED_BASEMENT_DOOR |
             SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR |
-            SAVE_FLAG_DDD_MOVED_BACK         |
             SAVE_FLAG_MOAT_DRAINED           |
             SAVE_FLAG_UNLOCKED_PSS_DOOR      |
             SAVE_FLAG_UNLOCKED_WF_DOOR       |
@@ -766,11 +765,11 @@ void disable_warp_checkpoint(void) {
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
     if (warpNode->destLevel & WARP_CHECKPOINT) {
         // Overwrite the warp checkpoint variables.
-        gWarpCheckpoint.actNum = gCurrActNum;
+        gWarpCheckpoint.actNum    = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
-        gWarpCheckpoint.levelID = warpNode->destLevel & 0x7F;
-        gWarpCheckpoint.areaNum = warpNode->destArea;
-        gWarpCheckpoint.warpNode = warpNode->destNode;
+        gWarpCheckpoint.levelID   = (warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK);
+        gWarpCheckpoint.areaNum   = warpNode->destArea;
+        gWarpCheckpoint.warpNode  = warpNode->destNode;
     }
 }
 
@@ -781,14 +780,17 @@ void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
  */
 s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     s16 warpCheckpointActive = FALSE;
-    s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & 0x7F) - 1];
+    s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & WARP_DEST_LEVEL_NUM_MASK) - 1];
 
     // gSavedCourseNum is only used in this function.
-    if (gWarpCheckpoint.courseNum != COURSE_NONE && gSavedCourseNum == currCourseNum
-        && gWarpCheckpoint.actNum == gCurrActNum) {
-        warpNode->destLevel = gWarpCheckpoint.levelID;
-        warpNode->destArea = gWarpCheckpoint.areaNum;
-        warpNode->destNode = gWarpCheckpoint.warpNode;
+    if (
+        (gWarpCheckpoint.courseNum != COURSE_NONE) &&
+        (gSavedCourseNum == currCourseNum) &&
+        (gWarpCheckpoint.actNum == gCurrActNum)
+    ) {
+        warpNode->destLevel  = gWarpCheckpoint.levelID;
+        warpNode->destArea   = gWarpCheckpoint.areaNum;
+        warpNode->destNode   = gWarpCheckpoint.warpNode;
         warpCheckpointActive = TRUE;
     } else {
         // Disable the warp checkpoint just in case the other 2 conditions failed?
