@@ -13,5 +13,5 @@ RUN mkdir /hackersm64
 WORKDIR /hackersm64
 ENV PATH="/hackersm64/tools:${PATH}"
 
-CMD echo 'Usage: docker run --rm --mount type=bind,source="$(pwd)",destination=/hackersm64 hackersm64 make VERSION=us -j4\n' \
+CMD echo 'Usage: docker run --rm -v ${PWD}:/hackersm64 hackersm64 make VERSION=us -j4\n' \
          'See https://github.com/HackerN64/HackerSM64/blob/master/README.md for more information'
