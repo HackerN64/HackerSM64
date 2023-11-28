@@ -79,7 +79,6 @@ extern s16 gDebugInfoOverwrite[][8];
 
 extern u32 gTimeStopState;
 extern struct Object gObjectPool[];
-extern struct Object gMacroObjectDefaultParent;
 extern struct ObjectNode *gObjectLists;
 extern struct ObjectNode gFreeObjectList;
 

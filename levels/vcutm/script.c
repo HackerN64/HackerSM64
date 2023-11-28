@@ -16,10 +16,46 @@
 #include "make_const_nonconst.h"
 #include "levels/vcutm/header.h"
 
-static const LevelScript script_func_local_1[] = {
+
+static const LevelScript script_vcutm_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/ -3434,  2951, -3076, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_1UP_WALKING << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_1UP,             /*pos*/ -4711,  1594, -2532, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    OBJECT(/*model*/ MODEL_1UP,             /*pos*/ -5952,  -393, -1141, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/  3980,   300, -6220, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_VANISH_CAP  << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/  4200,     0, -4940, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/  4740,     0, -4940, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/  4740,     0, -4400, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_1UP,             /*pos*/  4460,     0, -4700, /*angle*/ 0,   0, 0, /*behParam*/ (3 << 16), /*beh*/ bhvHidden1up),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN,     /*pos*/  4200,     0, -4940, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN,     /*pos*/  4740,     0, -4940, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN,     /*pos*/  4740,     0, -4400, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/ -2100, -3276,    20, /*angle*/ 0,   0, 0, /*behParam*/ ((COIN_FORMATION_FLAG_NONE) << 16), /*beh*/ bhvCoinFormation),
+    OBJECT(/*model*/ MODEL_AMP,             /*pos*/ -2100, -2800, -3866, /*angle*/ 0,   0, 0, /*behParam*/ (1 << 16), /*beh*/ bhvCirclingAmp),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/ -2145, -2160, -5963, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_COINS_3     << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -5920,  4575, -4618, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -4740,  3581, -3854, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -4727,  -227, -1161, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -3418,  -559,  -836, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  -600, -1400, -6300, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/   900, -1400, -6300, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  2750,  -800, -6300, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  4509,     0, -5527, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -1740, -3240,  1580, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -2400, -3240,   600, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -1740, -3240,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -2400, -3240, -1079, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -2920, -3240,   880, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -4000, -3240,  1600, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/ -6020, -2976,  1240, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_VANISH_CAP  << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -2100, -2840, -3866, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    OBJECT(/*model*/ MODEL_BOWLING_BALL,    /*pos*/ -4600,  5760, -6140, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFireSpitter),
+    RETURN(),
+};
+
+static const LevelScript script_vcutm_objects_1[] = {
     OBJECT(/*model*/ MODEL_VCUTM_SEESAW_PLATFORM, /*pos*/   154, -1919, -6256, /*angle*/ 0, 270, 0, /*behParam*/ 0x00070000, /*beh*/ bhvSeesawPlatform),
     OBJECT(/*model*/ MODEL_VCUTM_SEESAW_PLATFORM, /*pos*/ -2047, -3378, -2047, /*angle*/ 0,   0, 0, /*behParam*/ 0x00070000, /*beh*/ bhvSeesawPlatform),
-    //! @bug invalid model IDs - model ID 0x37 isn't loaded
     OBJECT(/*model*/ MODEL_NONE,           /*pos*/  3251, -1082, -6256, /*angle*/ 0, 270, 0, /*behParam*/ 0x014B0000, /*beh*/ bhvCheckerboardElevatorGroup),
     OBJECT(/*model*/ MODEL_NONE,           /*pos*/  2355, -1901, -6256, /*angle*/ 0, 270, 0, /*behParam*/ 0x014B0000, /*beh*/ bhvCheckerboardElevatorGroup),
     OBJECT(/*model*/ MODEL_NONE,           /*pos*/  1459, -1594, -6256, /*angle*/ 0,  90, 0, /*behParam*/ 0x014B0000, /*beh*/ bhvCheckerboardElevatorGroup),
@@ -27,12 +63,12 @@ static const LevelScript script_func_local_1[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_vcutm_objects_2[] = {
     OBJECT(/*model*/ MODEL_CAP_SWITCH, /*pos*/ 4506,  26, -6246, /*angle*/ 0, 0, 0, /*behParam*/ 0x00020000, /*beh*/ bhvCapSwitch),
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_vcutm_objects_3[] = {
     OBJECT(/*model*/ MODEL_NONE,       /*pos*/ 4600, 250, -4500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenRedCoinStar),
     RETURN(),
 };
@@ -58,11 +94,11 @@ const LevelScript level_vcutm_entry[] = {
         WARP_NODE(/*id*/ 0xF3, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x07, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x08, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x06, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_3),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_vcutm_objects_1),
+        JUMP_LINK(script_vcutm_objects_2),
+        JUMP_LINK(script_vcutm_objects_3),
         TERRAIN(/*terrainData*/ vcutm_seg7_collision),
-        MACRO_OBJECTS(/*objList*/ vcutm_seg7_macro_objs),
+        JUMP_LINK(script_vcutm_macro_objects),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_129),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_SLIDE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),

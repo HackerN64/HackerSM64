@@ -7,7 +7,6 @@
 #include "behavior_data.h"
 #include "game/memory.h"
 #include "game/object_helpers.h"
-#include "game/macro_special_objects.h"
 #include "surface_collision.h"
 #include "math_util.h"
 #include "game/mario.h"
@@ -460,10 +459,6 @@ u32 get_area_terrain_size(TerrainData *data) {
                 data += 3 * numVertices;
                 break;
 
-            case TERRAIN_LOAD_OBJECTS:
-                data += get_special_objects_size(data);
-                break;
-
             case TERRAIN_LOAD_ENVIRONMENT:
                 numRegions = *data++;
                 data += 6 * numRegions;
@@ -497,7 +492,7 @@ u32 get_area_terrain_size(TerrainData *data) {
  * Process the level file, loading in vertices, surfaces, some objects, and environmental
  * boxes (water, gas, JRB fog).
  */
-void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
+void load_area_terrain(TerrainData *data, RoomData *surfaceRooms) {
     PUPPYPRINT_GET_SNAPSHOT();
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
@@ -527,8 +522,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
             load_static_surfaces(&data, vertexData, terrainLoadType, &surfaceRooms);
         } else if (terrainLoadType == TERRAIN_LOAD_VERTICES) {
             vertexData = read_vertex_data(&data);
-        } else if (terrainLoadType == TERRAIN_LOAD_OBJECTS) {
-            spawn_special_objects(index, &data);
         } else if (terrainLoadType == TERRAIN_LOAD_ENVIRONMENT) {
             load_environmental_regions(&data);
         } else if (terrainLoadType == TERRAIN_LOAD_CONTINUE) {
@@ -538,18 +531,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
         } else if (TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH(terrainLoadType)) {
             load_static_surfaces(&data, vertexData, terrainLoadType, &surfaceRooms);
             continue;
-        }
-    }
-
-    if (macroObjects != NULL && *macroObjects != -1) {
-        // If the first macro object presetID is within the range [0, 29].
-        // Generally an early spawning method, every object is in BBH (the first level).
-        if (0 <= *macroObjects && *macroObjects < 30) {
-            spawn_macro_objects_hardcoded(index, macroObjects);
-        }
-        // A more general version that can spawn more objects.
-        else {
-            spawn_macro_objects(index, macroObjects);
         }
     }
 

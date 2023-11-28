@@ -39,7 +39,6 @@ extern const Gfx jrb_seg7_dl_0700AC68[];
 extern const Gfx jrb_seg7_dl_0700AE48[];
 extern const Gfx jrb_seg7_dl_0700AFB0[];
 extern const Collision jrb_seg7_area_1_collision[];
-extern const MacroObject jrb_seg7_area_1_macro_objs[];
 extern const Collision jrb_seg7_collision_rock_solid[];
 extern const Collision jrb_seg7_collision_floating_platform[];
 extern const Collision jrb_seg7_collision_floating_box[];
@@ -57,7 +56,6 @@ extern const Gfx jrb_seg7_dl_0700EF00[];
 extern const Gfx jrb_seg7_dl_0700FE48[];
 extern const Gfx jrb_seg7_dl_07010548[];
 extern const Collision jrb_seg7_area_2_collision[];
-extern const MacroObject jrb_seg7_area_2_macro_objs[];
 extern const struct MovtexQuadCollection jrb_movtex_sunken_ship_water[];
 
 // script

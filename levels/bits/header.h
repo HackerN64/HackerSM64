@@ -71,7 +71,6 @@ extern const Gfx bits_seg7_dl_07016300[];
 extern const Gfx bits_seg7_dl_07016AA0[];
 extern const Gfx bits_seg7_dl_07016DA0[];
 extern const Collision bits_seg7_collision_level[];
-extern const MacroObject bits_seg7_macro_objs[];
 extern const Collision bits_seg7_collision_0701A9A0[];
 extern const Collision bits_seg7_collision_0701AA0C[];
 extern const Collision bits_seg7_collision_0701AA84[];

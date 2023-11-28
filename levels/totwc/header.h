@@ -13,7 +13,6 @@ extern const Gfx totwc_seg7_dl_07007048[];
 extern const Gfx totwc_seg7_dl_070078B8[];
 extern const Gfx totwc_seg7_dl_070079A8[];
 extern const Collision totwc_seg7_collision[];
-extern const MacroObject totwc_seg7_macro_objs[];
 
 // script
 extern const LevelScript level_totwc_entry[];

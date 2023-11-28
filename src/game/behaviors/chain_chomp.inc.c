@@ -455,7 +455,7 @@ void bhv_wooden_post_update(void) {
 
     if (o->oWoodenPostOffsetY != 0.0f) {
         o->oPosY = o->oHomeY + o->oWoodenPostOffsetY;
-    } else if (!GET_BPARAM3(o->oBehParams)) { // Whether the post has coins or not
+    } else if (!(o->respawnInfo & RESPAWN_INFO_NO_COINS)) { // Whether the post has coins or not
         // Reset the timer once mario is far enough
         if (o->oDistanceToMario > 400.0f) {
             o->oTimer = o->oWoodenPostTotalMarioAngle = 0;
@@ -465,7 +465,7 @@ void bhv_wooden_post_update(void) {
             o->oWoodenPostTotalMarioAngle += (s16)(o->oAngleToMario - o->oWoodenPostPrevAngleToMario);
             if (absi(o->oWoodenPostTotalMarioAngle) > 0x30000 && o->oTimer < 200) {
                 obj_spawn_loot_yellow_coins(o, 5, 20.0f);
-                set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);
+                set_object_respawn_info_bits(o, RESPAWN_INFO_NO_COINS);
             }
         }
 

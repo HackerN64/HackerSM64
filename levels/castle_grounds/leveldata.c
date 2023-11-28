@@ -2,11 +2,7 @@
 #include "sm64.h"
 #include "surface_terrains.h"
 #include "moving_texture_macros.h"
-#include "level_misc_macros.h"
-#include "macro_preset_names.h"
-#include "special_preset_names.h"
 #include "textures.h"
-#include "dialog_ids.h"
 
 #include "make_const_nonconst.h"
 #include "levels/castle_grounds/texture.inc.c"
@@ -27,7 +23,6 @@
 #include "levels/castle_grounds/areas/1/13/model.inc.c" // Peach signature
 #endif
 #include "levels/castle_grounds/areas/1/collision.inc.c"
-#include "levels/castle_grounds/areas/1/macro.inc.c"
 #include "levels/castle_grounds/areas/1/7/collision.inc.c"
 #include "levels/castle_grounds/areas/1/8/collision.inc.c"
 #include "levels/castle_grounds/areas/1/movtext.inc.c"
