@@ -20,9 +20,9 @@ void bhv_bobomb_init(void) {
 }
 
 void bobomb_spawn_coin(void) {
-    if (!(o->respawnInfo & 1)) {
+    if (!(o->respawnInfo & RESPAWN_INFO_NO_COINS)) {
         obj_spawn_yellow_coins(o, 1);
-        set_object_respawn_info_bits(o, 1);
+        set_object_respawn_info_bits(o, RESPAWN_INFO_NO_COINS);
     }
 }
 

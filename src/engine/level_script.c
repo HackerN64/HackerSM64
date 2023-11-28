@@ -471,7 +471,7 @@ static void level_cmd_init_mario(void) {
 
     gMarioSpawnInfo->activeAreaIndex = -1;
     gMarioSpawnInfo->areaIndex = 0;
-    gMarioSpawnInfo->respawnInfo = 0;
+    gMarioSpawnInfo->respawnInfo = RESPAWN_INFO_NONE;
     gMarioSpawnInfo->behaviorArg = CMD_GET(u32, 4);
     gMarioSpawnInfo->behaviorScript = CMD_GET(void *, 8);
     gMarioSpawnInfo->model = gLoadedGraphNodes[CMD_GET(ModelID16, 0x2)]; // u8, 3?
@@ -498,7 +498,7 @@ static void level_cmd_place_object(void) {
 
         spawnInfo->areaIndex = sCurrAreaIndex;
         spawnInfo->activeAreaIndex = sCurrAreaIndex;
-        spawnInfo->respawnInfo = 0;
+        spawnInfo->respawnInfo = RESPAWN_INFO_NONE;
 
         spawnInfo->behaviorArg = CMD_GET(u32, 16);
         spawnInfo->behaviorScript = CMD_GET(void *, 20);

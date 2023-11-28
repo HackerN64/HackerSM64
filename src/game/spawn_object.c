@@ -181,7 +181,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
 
     mtxf_identity(obj->transform);
 
-    obj->respawnInfo = 0;
+    obj->respawnInfo = RESPAWN_INFO_NONE;
     obj->respawnInfoPointer = NULL;
 
     obj->oDistanceToMario = 19000.0f;
