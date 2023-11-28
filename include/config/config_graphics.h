@@ -42,7 +42,7 @@
 /**
  * When this option is enabled, LODs will ONLY work on console.
  * When this option is disabled, LODs will work regardless of whether console or emulator is used.
- * Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
+ * Regardless of whether this setting is enabled or not, you can use gEmulator to wrap your own code in a console check.
  */
 #define AUTO_LOD
 
@@ -111,24 +111,6 @@
 // #define STAR_DANCE_USES_STARS_MODEL
 
 /**
- * Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
- * NOTE: Still breaks occasionally, and PUPPYLIGHT_NODE might not work in areas that aren't area 1.
- */
-// #define PUPPYLIGHTS
-
-/**
- * Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
- * It is sideways in vanilla, and since vanilla's environment map textures are sideways too, those will appear as sideways in-game if this is enabled.
- * Make sure your custom environment map textures are the correct orientation.
- */
-// #define FIX_REFLECT_MTX
-
-/**
- * This improves performance a bit, and does not seem to break anything.
- */
-#define DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
-
-/**
  * Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
  */
 // #define DISABLE_SHADOWS
@@ -138,3 +120,34 @@
  * NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
  */
 #define LEGACY_SHADOW_IDS
+
+
+/**
+ * May break viewport widescreen hacks.
+ * When this is disabled, the culling will only be skipped according to the NO_CULLING_EMULATOR_BLACKLIST.
+ */
+// #define CULLING_ON_EMULATOR
+
+/**
+ * Makes objects below the screen be culled. 
+ * NOTE: Vanilla objects do not account for vertical culling.
+ */
+// #define VERTICAL_CULLING
+
+/**
+ * If the first command of an object´s geolayout is not GEO_CULLING_RADIUS, DEFAULT_CULLING_RADIUS
+ * will be used instead.
+ */
+#define DEFAULT_CULLING_RADIUS 300
+
+/**
+ * Eases the textured screen transitions to make them look smoother.
+ */
+#define EASE_IN_OUT_TRANSITIONS
+
+/**
+ * Uses frustratio of 2 instead of 1.
+ * Can improve performance in some circumstances, though it can also cause large tris to warp if cut off from the camera.
+ * Only use this if you can test the difference of your hack with and without this change on console.
+ */
+// #define USE_FRUSTRATIO2

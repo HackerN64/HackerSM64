@@ -1711,7 +1711,10 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
 
     if (gMarioState->action) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
-        if (gPlayer1Controller->buttonDown & U_JPAD && !(gPlayer1Controller->buttonDown & L_TRIG)) {
+        if (
+            (gMarioState->controller->buttonDown & U_JPAD) &&
+            !(gMarioState->controller->buttonDown & L_TRIG)
+        ) {
             set_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
             set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
         }
@@ -1873,12 +1876,8 @@ void init_mario_from_save_file(void) {
     gMarioState->spawnInfo = &gPlayerSpawnInfos[0];
     gMarioState->statusForCamera = &gPlayerCameraState[0];
     gMarioState->marioBodyState = &gBodyStates[0];
+    gMarioState->controller = &gControllers[0];
     gMarioState->animList = &gMarioAnimsBuf;
-    if (gIsConsole && __osControllerTypes[1] == CONT_TYPE_GCN) {
-        gMarioState->controller = &gControllers[1];
-    } else {
-        gMarioState->controller = &gControllers[0];
-    }
 
     gMarioState->numCoins = 0;
     gMarioState->numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);

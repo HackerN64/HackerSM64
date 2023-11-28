@@ -22,11 +22,6 @@
 #include "game/puppyprint.h"
 
 
-// round up to the next multiple
-#define ALIGN4(val) (((val) + 0x3) & ~0x3)
-#define ALIGN8(val) (((val) + 0x7) & ~0x7)
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 struct MainPoolState {
     u32 freeSpace;
     struct MainPoolBlock *listHeadL;
@@ -134,7 +129,7 @@ void main_pool_init(void *start, void *end) {
     sPoolListHeadL->next = NULL;
     sPoolListHeadR->prev = NULL;
     sPoolListHeadR->next = NULL;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     mempool = sPoolFreeSpace;
 #endif
 }
@@ -339,8 +334,9 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
             set_segment_base_addr(segment, addr);
         }
     }
-#if PUPPYPRINT_DEBUG
-    ramsizeSegment[(segment + nameTable) - 2] = ((s32)srcEnd - (s32)srcStart);
+#ifdef PUPPYPRINT_DEBUG
+    u32 ppSize = ALIGN16(srcEnd - srcStart) + 16;
+    set_segment_memory_printout(segment, ppSize);
 #endif
     return addr;
 }
@@ -416,46 +412,11 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
             main_pool_free(compressed);
         }
     }
-#if PUPPYPRINT_DEBUG
-    ramsizeSegment[(segment + nameTable) - 2] = (s32)srcEnd - (s32)srcStart;
+#ifdef PUPPYPRINT_DEBUG
+    u32 ppSize = ALIGN16((u32)*size) + 16;
+    set_segment_memory_printout(segment, ppSize);
 #endif
     return dest;
-}
-
-void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
-    UNUSED void *dest = NULL;
-
-#ifdef GZIP
-    u32 compSize = (srcEnd - 4 - srcStart);
-#else
-    u32 compSize = ALIGN16(srcEnd - srcStart);
-#endif
-    u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
-#ifdef GZIP
-    // Decompressed size from end of gzip
-    u32 *size = (u32 *) (compressed + compSize);
-#endif
-    if (compressed != NULL) {
-#ifdef UNCOMPRESSED
-        dma_read(gDecompressionHeap, srcStart, srcEnd);
-#else
-        dma_read(compressed, srcStart, srcEnd);
-#endif
-#ifdef GZIP
-        expand_gzip(compressed, gDecompressionHeap, compSize, (u32)size);
-#elif RNC1
-        Propack_UnpackM1(compressed, gDecompressionHeap);
-#elif RNC2
-        Propack_UnpackM2(compressed, gDecompressionHeap);
-#elif YAY0
-        slidstart(compressed, gDecompressionHeap);
-#elif MIO0
-        decompress(compressed, gDecompressionHeap);
-#endif
-        set_segment_base_addr(segment, gDecompressionHeap);
-        main_pool_free(compressed);
-    }
-    return gDecompressionHeap;
 }
 
 void load_engine_code_segment(void) {
@@ -548,6 +509,9 @@ struct MemoryPool *mem_pool_init(u32 size, u32 side) {
         block->next = NULL;
         block->size = pool->totalSpace;
     }
+#ifdef PUPPYPRINT_DEBUG
+    gPoolMem += ALIGN16(size) + 16;
+#endif
     return pool;
 }
 

@@ -21,15 +21,16 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **Fazana**: PuppyLib, ucode swapping, audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
 - **Reonu**: Starting the project/repo, widescreen, reonucam, various defines for hacker QoL
 - **JoshDuMan**: Decomp guy, general assistance
-- **Arceveti**: Silhouette, shadow optimisation, better hanging, breath meter
+- **Arceveti**: Silhouette, shadow optimisation, better hanging, breath meter, 4 controller support
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
 - **Wiseguy**:  World scale reimplementation, silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
 - **Kaze**: Graph node optimisations, automatic optimal collision distance
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
 - **CrashOveride**: creating the [ultrasm64](https://github.com/CrashOveride95/ultrasm64) repo
-- **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds
+- **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds, emulator detector
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
+- **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
@@ -82,7 +83,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Many general use defines for object struct members, meant for use in custom object behaviors. Check `include/object_fields.h` for more info on this. (By MrComit)
 - Included `actors/group0.c` in `behavior_data.c`
 - The internal ROM name is now set with a define in `config/config_rom.h` to make it simpler
-- There is a `gIsConsole` variable that is 1 when running on console and 0 when running on emulator. This way you can wrap your code in a console check.
+- There is a `gEmulator` variable to detect console or specific emulators and emulator versions
 - Expanded audio heap allows for a larger concurrent note count and the importing of more m64 sequences and sound banks (By ArcticJaguar725) *
 - You can set a test level in `config/config_debug.h` in order to boot straight into it, so you can quickly test the level you're working on. *
 - Allow all surfaces in the game to have a `force` parameter. Activating this doesn't REQUIRE you to set `force` for every surface: If you don't set, it will default to 0x0000 rather than crashing. Increases RAM usage of collision. *
@@ -105,7 +106,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
 **Neat Misc. Changes:**
 - Instant Input patch by Wiseguy (Removes all input lag caused by plugins supporting framebuffer)
-  - This means that you'll have to do your framebuffer effects on buffer 0 for emulator, but NOT for console. You can use the `gIsConsole` variable to check for console when doing your framebuffer effects.
+  - This means that you'll have to do your framebuffer effects on buffer 0 for emulator, but NOT for console. You can use the `gEmulator` variable to check for console when doing your framebuffer effects.
 - Widescreen (16:9) support toggleable by pressing `L` in the pause menu. *
 - S2DEX engine by someone2639! To use it, compile with `make TEXT_ENGINE=s2dex_text_engine` or just set `TEXT_ENGINE` to `s2dex_text_engine` in the makefile.
 - ia8 (64x64) coins, the vanilla coin texture is upgraded to accomodate. *
@@ -121,7 +122,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
   - Use `render_multi_image` to draw large texture rectangles consisting of multiple images on the screen.
   - More info in `puppyprint.c`
 - Wiseguy's Farcall TLB mapping allows to store executable code inside uncompressed segments, that can be loaded and ran as needed, instead of it having to be loaded at all times. See `farcall.h` in the include folder for instructions and details.
-
+- Red Coin Stars now support up to 99 red coins! In addition, multi-area red coin missions can now be created by setting the 2nd behavior paramater of the red coin star to the number of reds required for the star to spawn.
 # UltraSM64
 
 - This repo contains a full decompilation of Super Mario 64 (J), (U), (E), and (SH).
@@ -135,7 +136,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - It has been patched with someone2639's shiftable segments patch
 - Wiseguy's instant input patch has been added to allow for less input lag on emulation (Does not affect console)
   This does mean that any framebuffer effects will have to be done on buffer 0 if targeting emulators
-- Automatic console and emulator detection: Use the `gIsConsole` variable to wrap your code in an emulator check.
+- Automatic console and emulator detection: Use the `gEmulator` variable to wrap your code in an emulator check.
 - Separate defines for emulator and console black border height.
 - Getting HVQM FMV support to work with the game is WIP.
 

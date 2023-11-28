@@ -451,27 +451,13 @@ extern f32 gSineTable[];
 
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
 
-/// From Wiseguy
-ALWAYS_INLINE s32 roundf(f32 in) {
-    f32 tmp;
-    s32 out;
-    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
-    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
-    return out;
-}
+extern s32 roundf(f32);
 // backwards compatibility
 #define round_float(in) roundf(in)
 
-/// Absolute value
-ALWAYS_INLINE f32 absf(f32 in) {
-    f32 out;
-    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
-    return out;
-}
-ALWAYS_INLINE s32 absi(s32 in) {
-    return ABS(in);
-}
-#define abss absi
+#define absf ABS
+#define absi ABS
+#define abss ABS
 
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
@@ -606,6 +592,36 @@ f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);
-void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
+f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
+
+ALWAYS_INLINE f32 remap(f32 x, f32 fromA, f32 toA, f32 fromB, f32 toB) {
+    return (x - fromA) / (toA - fromA) * (toB - fromB) + fromB;
+}
+
+ALWAYS_INLINE f32 lerpf(f32 from, f32 to, f32 amount) {
+    return (from + (to - from) * amount);
+}
+
+ALWAYS_INLINE f32 to_smoothstop(f32 x) {
+    f32 sq = sqr(1.0f - x);
+    return 1.0f - sq;
+}
+
+// Commonly known as ease-in
+ALWAYS_INLINE f32 smoothstart(f32 from, f32 to, f32 amount) {
+    return lerpf(from, to, sqr(amount));
+}
+
+// Commonly known as ease-out
+ALWAYS_INLINE f32 smoothstop(f32 from, f32 to, f32 amount) {
+    return lerpf(from, to, to_smoothstop(amount));
+}
+
+// Commonly known as ease-in-out
+ALWAYS_INLINE f32 smoothstep(f32 from, f32 to, f32 amount) {
+    amount = sqr(amount) * (3.0f - 2.0f * amount);
+
+    return lerpf(from, to, amount);
+}
 
 #endif // MATH_UTIL_H

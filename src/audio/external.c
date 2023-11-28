@@ -232,7 +232,7 @@ struct MusicDynamic sMusicDynamics[8] = {
 #define STUB_LEVEL(_0, _1, _2, _3, echo1, echo2, echo3, _7, _8) { echo1, echo2, echo3 },
 #define DEFINE_LEVEL(_0, _1, _2, _3, _4, _5, echo1, echo2, echo3, _9, _10) { echo1, echo2, echo3 },
 
-u8 sLevelAreaReverbs[LEVEL_COUNT][3] = {
+s8 sLevelAreaReverbs[LEVEL_COUNT][3] = {
     { 0x00, 0x00, 0x00 }, // LEVEL_NONE
 #include "levels/level_defines.h"
 };
@@ -326,7 +326,6 @@ u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
 u8 sSoundBankDisabled[16] = { 0 };
-u8 D_80332108 = 0;
 u8 sHasStartedFadeOut = FALSE;
 u16 sSoundBanksThatLowerBackgroundMusic = 0;
 u8 sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
@@ -689,6 +688,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     task->yield_data_size = 0;
 
     decrease_sample_dma_ttls();
+
     return gAudioTask;
 }
 #endif
@@ -1138,7 +1138,8 @@ static f32 get_sound_freq_scale(u8 bank, u8 item) {
 static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelIndex) {
     u8 area;
     u8 level;
-    u8 reverb;
+    s8 areaEcho;
+    s16 reverb;
 
     // Disable level reverb if NO_ECHO is set
     if (sSoundBanks[bank][soundIndex].soundBits & SOUND_NO_ECHO) {
@@ -1152,18 +1153,27 @@ static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelInde
         }
     }
 
-    // reverb = reverb adjustment + level reverb + a volume-dependent value
+    areaEcho = sLevelAreaReverbs[level][area];
+
+    if (gAreaData[gCurrAreaIndex].useEchoOverride && !(sSoundBanks[bank][soundIndex].soundBits & SOUND_NO_ECHO)) {
+        areaEcho = gAreaData[gCurrAreaIndex].echoOverride;
+    }
+
+    // reverb = reverb adjustment + level reverb (or level script override value) + a volume-dependent value
     // The volume-dependent value is 0 when volume is at maximum, and raises to
     // LOW_VOLUME_REVERB when the volume is 0
-    reverb = (u8)(u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]
-                  + sLevelAreaReverbs[level][area]
-                  + ((1.0f - gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume)
-                        * LOW_VOLUME_REVERB);
+    reverb = (s16) ((u8) gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[5]) + areaEcho;
 
-    if (reverb > 0x7f) {
+    // NOTE: In some cases, it may be better to apply this after ensuring reverb is non-negative so the result doesn't end up sounding way too dry.
+    // This has been left as-is however because in most cases where negative reverb is even used, this is probably desirable anyway.
+    reverb += (s16) ((1.0f - gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->volume) * LOW_VOLUME_REVERB);
+
+    if (reverb < 0 || areaEcho <= -0x80) {
+        reverb = 0;
+    } else if (reverb > 0x7f) {
         reverb = 0x7f;
     }
-    return reverb;
+    return (u8) reverb;
 }
 
 /**
@@ -1985,7 +1995,6 @@ void sound_init(void) {
     sLowerBackgroundMusicVolume = FALSE;
     sSoundBanksThatLowerBackgroundMusic = 0;
     sCurrentBackgroundMusicSeqId = 0xff;
-    gSoundMode = SOUND_MODE_STEREO;
     sBackgroundMusicQueueSize = 0;
     sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_UNSET;
     D_80332120 = 0;
@@ -2187,9 +2196,7 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
 
     // Abort if the queue is already full.
     if (sBackgroundMusicQueueSize >= MAX_BACKGROUND_MUSIC_QUEUE_SIZE) {
-#if PUPPYPRINT_DEBUG
         append_puppyprint_log("Sequence queue full, aborting.");
-#endif
         return;
     }
 
@@ -2505,9 +2512,9 @@ void play_toads_jingle(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void sound_reset(u8 presetId) {
-    if (presetId >= 8) {
-        presetId = 0;
+void sound_reset(u8 reverbPresetId) {
+    if (reverbPresetId >= ARRAY_COUNT(gReverbSettings)) {
+        reverbPresetId = 0;
     }
     sGameLoopTicked = 0;
     disable_all_sequence_players();
@@ -2516,26 +2523,16 @@ void sound_reset(u8 presetId) {
     func_802ad74c(0xF2000000, 0);
 #endif
 #if defined(VERSION_JP) || defined(VERSION_US)
-    audio_reset_session(&gAudioSessionPresets[0], presetId);
+    audio_reset_session(reverbPresetId);
 #else
-    audio_reset_session_eu(presetId);
+    audio_reset_session_eu(reverbPresetId);
 #endif
     osWritebackDCacheAll();
-    if (presetId != 7) {
+    if (reverbPresetId != 7) {
         preload_sequence(SEQ_EVENT_SOLVE_PUZZLE, PRELOAD_BANKS | PRELOAD_SEQUENCE);
         preload_sequence(SEQ_EVENT_PEACH_MESSAGE, PRELOAD_BANKS | PRELOAD_SEQUENCE);
         preload_sequence(SEQ_EVENT_CUTSCENE_STAR_SPAWN, PRELOAD_BANKS | PRELOAD_SEQUENCE);
     }
     seq_player_play_sequence(SEQ_PLAYER_SFX, SEQ_SOUND_PLAYER, 0);
-    D_80332108 = (D_80332108 & 0xf0) + presetId;
-    gSoundMode = D_80332108 >> 4;
     sHasStartedFadeOut = FALSE;
-}
-
-/**
- * Called from threads: thread5_game_loop
- */
-void audio_set_sound_mode(u8 soundMode) {
-    D_80332108 = (D_80332108 & 0xf) + (soundMode << 4);
-    gSoundMode = soundMode;
 }

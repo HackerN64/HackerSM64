@@ -50,7 +50,6 @@ enum GraphRenderFlags {
 #define GET_GRAPH_NODE_LAYER(flags)        ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
 #endif
 
-#ifdef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 // The discriminant for different types of geo nodes
 enum GraphNodeTypes {
     GRAPH_NODE_TYPE_ORTHO_PROJECTION,
@@ -76,38 +75,6 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_ROOT,
     GRAPH_NODE_TYPE_START,
 };
-#else
-// Whether the node type has a function pointer of type GraphNodeFunc
-#define GRAPH_NODE_TYPE_FUNCTIONAL          (1 << 8)
-
-// The discriminant for different types of geo nodes
-enum GraphNodeTypes {
-    GRAPH_NODE_TYPE_ROOT                 =  0x01,
-    GRAPH_NODE_TYPE_ORTHO_PROJECTION     =  0x02,
-    GRAPH_NODE_TYPE_PERSPECTIVE          = (0x03 | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_MASTER_LIST          =  0x04,
-    GRAPH_NODE_TYPE_START                =  0x0A,
-    GRAPH_NODE_TYPE_LEVEL_OF_DETAIL      =  0x0B,
-    GRAPH_NODE_TYPE_SWITCH_CASE          = (0x0C | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_CAMERA               = (0x14 | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_TRANSLATION_ROTATION =  0x15,
-    GRAPH_NODE_TYPE_TRANSLATION          =  0x16,
-    GRAPH_NODE_TYPE_ROTATION             =  0x17,
-    GRAPH_NODE_TYPE_OBJECT               =  0x18,
-    GRAPH_NODE_TYPE_ANIMATED_PART        =  0x19,
-    GRAPH_NODE_TYPE_BILLBOARD            =  0x1A,
-    GRAPH_NODE_TYPE_DISPLAY_LIST         =  0x1B,
-    GRAPH_NODE_TYPE_SCALE                =  0x1C,
-    GRAPH_NODE_TYPE_SHADOW               =  0x28,
-    GRAPH_NODE_TYPE_OBJECT_PARENT        =  0x29,
-    GRAPH_NODE_TYPE_GENERATED_LIST       = (0x2A | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_BACKGROUND           = (0x2C | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_HELD_OBJ             = (0x2E | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x2F,
-
-    GRAPH_NODE_TYPES_MASK                =  0xFF,
-};
-#endif
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
@@ -164,10 +131,13 @@ struct GraphNodeOrthoProjection {
  */
 struct GraphNodePerspective {
     /*0x00*/ struct FnGraphNode fnNode;
-    /*0x18*/ s32 unused;
-    /*0x1C*/ f32 fov;   // horizontal field of view in degrees
-    /*0x20*/ u16 near;  // near clipping plane
-    /*0x22*/ u16 far;   // far clipping plane
+    /*0x18*/ f32 fov;   // horizontal field of view in degrees
+    /*0x1C*/ u16 near;  // near clipping plane
+    /*0x1E*/ u16 far;   // far clipping plane
+    /*0x20*/ f32 halfFovHorizontal;
+#ifdef VERTICAL_CULLING
+    /*0x24*/ f32 halfFovVertical;
+#endif
 };
 
 /** An entry in the master list. It is a linked list of display lists
@@ -402,7 +372,7 @@ void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type);
 
 struct GraphNodeRoot                *init_graph_node_root                (struct AllocOnlyPool *pool, struct GraphNodeRoot                *graphNode, s16 areaIndex, s16 x, s16 y, s16 width, s16 height);
 struct GraphNodeOrthoProjection     *init_graph_node_ortho_projection    (struct AllocOnlyPool *pool, struct GraphNodeOrthoProjection     *graphNode, f32 scale);
-struct GraphNodePerspective         *init_graph_node_perspective         (struct AllocOnlyPool *pool, struct GraphNodePerspective         *graphNode, f32 fov, u16 near, u16 far, GraphNodeFunc nodeFunc, s32 unused);
+struct GraphNodePerspective         *init_graph_node_perspective         (struct AllocOnlyPool *pool, struct GraphNodePerspective         *graphNode, f32 fov, u16 near, u16 far, GraphNodeFunc nodeFunc);
 struct GraphNodeStart               *init_graph_node_start               (struct AllocOnlyPool *pool, struct GraphNodeStart               *graphNode);
 struct GraphNodeMasterList          *init_graph_node_master_list         (struct AllocOnlyPool *pool, struct GraphNodeMasterList          *graphNode, s16 on);
 struct GraphNodeLevelOfDetail       *init_graph_node_render_range        (struct AllocOnlyPool *pool, struct GraphNodeLevelOfDetail       *graphNode, s16 minDistance, s16 maxDistance);
@@ -426,10 +396,8 @@ struct GraphNodeHeldObject          *init_graph_node_held_object         (struct
 struct GraphNode *geo_add_child       (struct GraphNode *parent, struct GraphNode *childNode);
 struct GraphNode *geo_remove_child    (struct GraphNode *graphNode);
 struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild);
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 callContext);
 void geo_call_global_function_nodes       (struct GraphNode *graphNode, s32 callContext);
-#endif
 void geo_reset_object_node(struct GraphNodeObject *graphNode);
 void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f pos, Vec3s angle);
 void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo *spawn);

@@ -1,4 +1,4 @@
-#include "config.h"
+#include "s2d_config.h"
 #include <ultra64.h>
 #include "mtx.h"
 #include "debug.h"

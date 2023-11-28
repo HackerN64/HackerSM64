@@ -418,6 +418,8 @@ u32 mario_check_object_grab(struct MarioState *m) {
             if (facingDYaw >= -0x5555 && facingDYaw <= 0x5555) {
                 m->faceAngle[1] = m->interactObj->oMoveAngleYaw;
                 m->usedObj = m->interactObj;
+                m->pos[1] = m->floorHeight;
+                m->vel[1] = 0.0f;
                 result = set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
             }
         } else {
@@ -822,6 +824,8 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         obj->oInteractStatus = INT_STATUS_INTERACTED;
         m->interactObj       = obj;
         m->usedObj           = obj;
+
+        gStarModelLastCollected = obj_get_model_id(obj);
 
 #ifdef GLOBAL_STAR_IDS
         starIndex = (obj->oBehParams >> 24) & 0xFF;
@@ -1707,11 +1711,14 @@ u32 check_read_sign(struct MarioState *m, struct Object *obj) {
         && abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= SIGN_RANGE
     ) {
 #ifdef DIALOG_INDICATOR
+        struct Object *orangeNumber;
         if (obj->behavior == segmented_to_virtual(bhvSignOnWall)) {
-            spawn_object_relative(ORANGE_NUMBER_A, 0, 180, 32, obj, MODEL_NUMBER, bhvOrangeNumber);
+            orangeNumber = spawn_object_relative(ORANGE_NUMBER_A, 0, 180, 32, obj, MODEL_NUMBER, bhvOrangeNumber);
         } else {
-            spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  8, obj, MODEL_NUMBER, bhvOrangeNumber);
+            orangeNumber = spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  8, obj, MODEL_NUMBER, bhvOrangeNumber);
         }
+        orangeNumber->oHomeX = orangeNumber->oPosX;
+        orangeNumber->oHomeZ = orangeNumber->oPosZ;
 #endif
         if (m->input & READ_MASK) {
 #else
@@ -1742,11 +1749,14 @@ u32 check_npc_talk(struct MarioState *m, struct Object *obj) {
         && abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= SIGN_RANGE
     ) {
 #ifdef DIALOG_INDICATOR
+        struct Object *orangeNumber;
         if (obj->behavior == segmented_to_virtual(bhvYoshi)) {
-            spawn_object_relative(ORANGE_NUMBER_A, 0, 256, 64, obj, MODEL_NUMBER, bhvOrangeNumber);
+            orangeNumber = spawn_object_relative(ORANGE_NUMBER_A, 0, 256, 64, obj, MODEL_NUMBER, bhvOrangeNumber);
         } else {
-            spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  0, obj, MODEL_NUMBER, bhvOrangeNumber);
+            orangeNumber = spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  0, obj, MODEL_NUMBER, bhvOrangeNumber);
         }
+        orangeNumber->oHomeX = orangeNumber->oPosX;
+        orangeNumber->oHomeZ = orangeNumber->oPosZ;
 #endif
         if (m->input & READ_MASK) {
 #else

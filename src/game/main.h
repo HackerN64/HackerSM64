@@ -3,6 +3,19 @@
 
 #include "config.h"
 
+enum VIModes {
+    MODE_NTSC,
+    MODE_MPAL,
+    MODE_PAL,
+};
+
+#define THREAD1_STACK 0x100
+#define THREAD2_STACK 0x800
+#define THREAD3_STACK 0x200
+#define THREAD4_STACK 0x2000
+#define THREAD5_STACK 0x2000
+#define THREAD6_STACK 0x400
+
 enum ThreadID {
     THREAD_0,
     THREAD_1_IDLE,
@@ -84,8 +97,19 @@ extern s8 gDebugLevelSelect;
 extern s8 gShowDebugText;
 #endif
 
+// Special struct that keeps track of whether its timer has been set.
+//  Without this check, there is a bug at high CPU loads in which
+//  the RCP timer gets set twice and the game tries to
+//  insert __osBaseTimer into a ring buffer that only contains itself,
+//  causing a particularly messy crash.
+typedef struct {
+    u8 started;
+    OSTimer timer;
+} OSTimerEx;
+
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
 void dispatch_audio_sptask(struct SPTask *spTask);
 void exec_display_list(struct SPTask *spTask);
+void change_vi(OSViMode *mode, int width, int height);
 
 #endif // MAIN_H
