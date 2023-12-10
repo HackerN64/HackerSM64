@@ -1,4 +1,36 @@
-// Parameters: dialog enum ID, voice sound, lines per box, left offset, width
+/**
+ * DEFINE_DIALOG macro
+ *    - Dialog enum ID (see dialog_ids.h)
+ *    - Voice Sound (see sounds.h)
+ *    - Lines per box
+ *    - Left offset (Distance from left edge of the screen to dialog box)
+ *    - Bottom offset (Distance from bottom of the screen to the top of the dialog box, SCREEN_HEIGHT would be the top)
+ *    - Text
+ * 
+ * 
+ * Control characters:
+ *   Special text commands are supported, for functions such as custom text color.
+ *   See "dialog_control.h" for more details.
+ * 
+ * 
+ * Special Characters:
+ *   Here are some special characters you can use:
+ *      Ⓐ
+ *      Ⓑ
+ *      Ⓒ
+ *      Ⓩ
+ *      Ⓡ
+ *      “ and ” (left and right quotes)
+ *      ◀▶▼▲
+ *      ★ ✪
+ *
+ * 
+ * See segment2.c LUTs for more info:
+ *    - main_font_lut
+ *    - main_hud_utf8_2byte_lut
+ *    - main_hud_utf8_3byte_lut
+ *    - main_hud_utf8_4byte_lut
+ */
 
 DEFINE_DIALOG(DIALOG_000, NO_SOUND, 6, 30, 200, "\
 Wow! You're smack in the\n\

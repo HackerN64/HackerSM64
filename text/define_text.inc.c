@@ -1,6 +1,9 @@
 // == dialog ==
 // (defines en_dialog_table etc.)
 
+#include "dialog_control.h"
+
+#undef DEFINE_DIALOG
 #define DEFINE_DIALOG(id, _1, _2, _3, _4, str) \
     static const char dialog_text_ ## id[] = { str };
 

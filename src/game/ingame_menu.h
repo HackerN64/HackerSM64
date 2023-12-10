@@ -3,6 +3,7 @@
 
 #include <PR/ultratypes.h>
 #include "types.h"
+#include "dialog_control.h"
 
 enum MenuMtxPushOp {
     MENU_MTX_NONE,
@@ -53,10 +54,6 @@ struct AsciiCharLUTEntry {
 
 // Macro to quickly get the kerning of the space character from an ASCII LUT.
 #define SPACE_KERNING(lut) (((struct AsciiCharLUTEntry *)(lut))[ASCII_LUT_INDEX(' ')].kerning)
-
-// The character used to indicate a color code in a generic string.
-// As of now, must be an ASCII character.
-#define CHAR_COLOR_CODE '@'
 
 struct Utf8CharLUTEntry {
     u32 codepoint;
