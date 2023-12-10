@@ -26,27 +26,27 @@
 
 
 /**
- * TXTCOL_RGB("XXXXXX"), TXTCOL_RGBA("XXXXXXXX")
+ * COL_RGB("XXXXXX"), COL_RGBA("XXXXXXXX")
  *
  * Set color of text to an RGB value.
- * e.g. TXTCOL_RGB("00FF00") will set the color to green.
+ * e.g. COL_RGB("00FF00") will set the color to green.
  * Will use gDialogTextAlpha as the alpha value if alpha is not specified.
  * 
- * Example: "normal text " TXTCOL_RGBA("FF00007F") "transparent red text"
+ * Example: "normal text " COL_RGBA("FF00007F") "transparent red text"
  */
-#define TXTCOL_RGB(color) \
+#define COL_RGB(color) \
     HEX_STR(CONTROL_CHAR_COL) color CHAR_VALUE_IGNORE CHAR_VALUE_IGNORE
-#define TXTCOL_RGBA(color) \
+#define COL_RGBA(color) \
     HEX_STR(CONTROL_CHAR_COL) color
 
 /**
- * TXTCOL_CLR
+ * COL_RESET
  *
- * Clear the text color back to using its default text color.
+ * Reset the text color back to its default text color.
  * 
- * Example: "colored text " TXTCOL_CLR "normal text"
+ * Example: "colored text " COL_RESET "normal text"
  */
-#define TXTCOL_CLR \
+#define COL_RESET \
     HEX_STR(CONTROL_CHAR_RESET)
 
 

@@ -349,8 +349,6 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
                     continue;
                 case HEX(CONTROL_CHAR_RESET):
                     continue;
-                default:
-                    break;
             }
         }
 
