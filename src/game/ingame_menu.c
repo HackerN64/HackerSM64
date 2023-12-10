@@ -341,22 +341,19 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
             switch (c) {
                 case '\t':
                     width += 4 * SPACE_KERNING(asciiLut);
-                    break;
+                    continue;
                 case HEX(CONTROL_CHAR_COL):
                     if (is_color_code_valid(str, strPos + 1)) {
                         strPos += sizeof(gDialogCarryoverColor) * 2;
                     }
-                    break;
+                    continue;
                 case HEX(CONTROL_CHAR_RESET):
-                    break;
+                    continue;
                 default:
-                    goto standard_character;
+                    break;
             }
-
-            continue;
         }
 
-standard_character:
         if (c & 0x80) {
             width += utf8_lookup(utf8LUT, str, &strPos)->kerning;
         } else {
@@ -529,16 +526,13 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
 #endif
 
 static void reset_dialog_color(ColorRGBA color) {
-    switch (gDialogBoxType) {
-        case DIALOG_TYPE_ROTATE:
-            color[0] = color[1] = color[2] = 255;
-            break;
-        case DIALOG_TYPE_ZOOM:
-        default:
-            color[0] = color[1] = color[2] = 0;
-            break;
+    Color value = 255;
+
+    if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
+        value = 0;
     }
 
+    color[0] = color[1] = color[2] = value;
     color[3] = (Color) gDialogTextAlpha;
 }
 
@@ -554,7 +548,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
     char c;
     s8 kerning = 0;
     u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
-    u32 i;
+    u8 validColor;
     s32 strPos = 0;
     s32 lineNum = 1;
     s32 alignmentXOffset = get_alignment_x_offset(str, sGenericFontLineAlignment, main_font_lut, &main_font_utf8_lut);
@@ -633,7 +627,9 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
 
             // Color set control character
             case HEX(CONTROL_CHAR_COL): // '\033'
-                for (i = 0; i < sizeof(color); i++) {
+                validColor = TRUE;
+
+                for (u32 i = 0; i < sizeof(color); i++) {
                     if (i == sizeof(ColorRGB)) { // check if alpha should be ignored (if alpha is "--")
                         if (str[strPos + i * 2 + 1] == CHAR_VALUE_IGNORE[0] && str[strPos + i * 2 + 2] == CHAR_VALUE_IGNORE[0]) {
                             color[i] = (u8) gDialogTextAlpha;
@@ -645,13 +641,14 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                     // NOTE: Invalid color combinations can also cause color rendering issues, but those are considered user error.
                     s32 val = hex_pair_to_value(str, strPos + i * 2 + 1);
                     if (val == -1) {
+                        validColor = FALSE;
                         break;
                     }
 
                     color[i] = val;
                 }
 
-                if (i == sizeof(color)) {
+                if (validColor) {
                     gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                     strPos += sizeof(color) * 2;
                 }

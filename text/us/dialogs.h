@@ -10,7 +10,7 @@
  * 
  * Control characters:
  *   Special text commands are supported, for functions such as custom text color.
- *   See "dialog_control.h" for more details.
+ *   See "ingame_menu.h" for more details.
  * 
  * 
  * Special Characters:

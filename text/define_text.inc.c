@@ -1,7 +1,7 @@
 // == dialog ==
 // (defines en_dialog_table etc.)
 
-#include "dialog_control.h"
+#include "game/ingame_menu.h"
 
 #undef DEFINE_DIALOG
 #define DEFINE_DIALOG(id, _1, _2, _3, _4, str) \
