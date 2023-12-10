@@ -116,22 +116,25 @@ enum DialogBoxType {
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
 
 s8 gDialogBoxState = DIALOG_STATE_OPENING;
-f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
-f32 gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE;
-s16 gDialogScrollOffsetY = 0;
 s8 gDialogBoxType = DIALOG_TYPE_ROTATE;
-s16 gDialogID = DIALOG_NONE;
-s16 gLastDialogPageStrPos = 0;
-s16 gDialogTextPos = 0;
 s8 gDialogLineNum = 1;
 s8 gDialogHasResponse = FALSE;
 u8 gMenuHoldKeyIndex = 0;
 u8 gMenuHoldKeyTimer = 0;
+s16 gDialogScrollOffsetY = 0;
+s16 gDialogID = DIALOG_NONE;
+s16 gLastDialogPageStrPos = 0;
+s16 gDialogTextPos = 0;
+f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
+f32 gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE;
 s32 gDialogResponse = DIALOG_RESPONSE_NONE;
+ColorRGBA gDialogColorByEnd;
+ColorRGBA gDialogCarryoverColor;
+
+static ColorRGBA sActiveTextColor;
 
 static u8 sGenericFontLineHeight = 0;
 static u8 sGenericFontLineAlignment = TEXT_ALIGN_LEFT;
-
 
 void create_dl_identity_matrix(void) {
     Mtx *matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
@@ -293,50 +296,81 @@ static s32 hex_char_to_value(char c) {
 }
 
 /**
- * Determine if the characters following an @ sign are a valid hex color code.
+ * Convert two hexadecimal text characters into an integer. Returns -1 if either of the two characters
+ * aren't hexadecimal values.
+ */
+static s32 hex_pair_to_value(char *str, s32 strPos) {
+    s32 firstDigit = hex_char_to_value(str[strPos]);
+    s32 secondDigit = hex_char_to_value(str[strPos + 1]);
+
+    if (firstDigit == -1 || secondDigit == -1) {
+        return -1;
+    }
+
+    return (firstDigit << 4) | secondDigit;
+}
+
+/**
+ * Determine if the characters following a color command are a valid hex color code.
  */
 static s32 is_color_code_valid(char *str, s32 strPos) {
-    for (s32 i = 0; i < 6; i++) {
+    for (u32 i = 0; i < sizeof(gDialogCarryoverColor) * 2; i++) {
         if (hex_char_to_value(str[strPos + i]) == -1) {
-            return FALSE;
+            if (i < sizeof(ColorRGB) * 2) return FALSE;
+            // allow alpha ignore
+            if (str[strPos + i] != CHAR_VALUE_IGNORE[0]) return FALSE;
         }
     }
     return TRUE;
 }
 
 /**
+ * Set text color for string to print, needed for color reset commands to function properly.
+ * This should always be called instead of gDPSetEnvColor prior to any print_generic_string call or variant.
+ */
+void set_text_color(u32 r, u32 g, u32 b) {
+    gDPSetEnvColor(gDisplayListHead++, r, g, b, gDialogTextAlpha);
+
+    sActiveTextColor[0] = r;
+    sActiveTextColor[1] = g;
+    sActiveTextColor[2] = b;
+    sActiveTextColor[3] = gDialogTextAlpha;
+}
+
+/**
  * Get the exact width of the line of a string of any font in pixels, using the given ASCII and UTF-8 tables.
  */
 s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
+    char c;
     s32 width = 0;
     s32 maxWidth = 0;
-    s32 strPos = 0;
-    char c;
+    s32 strPos = -1;
 
     s32 isGenericFont = (asciiLut == main_font_lut);
-
     asciiLut = segmented_to_virtual(asciiLut);
 
-    while ((c = str[strPos]) != '\0' && c != '\n') {
+    while ((c = str[++strPos]) != '\0' && c != '\n') {
         // Handle color codes and tabs if using generic font
         if (isGenericFont) {
-            if (c == CHAR_COLOR_CODE) {
-                if (is_color_code_valid(str, strPos + 1)) {
-                    strPos += 7;
+            switch (c) {
+                case '\t':
+                    width += 4 * SPACE_KERNING(asciiLut);
                     continue;
-                }
-            } else if (c == '\t') {
-                width += 4 * SPACE_KERNING(asciiLut);
-                strPos++;
-                continue;
+                case HEX(CONTROL_CHAR_COL):
+                    if (is_color_code_valid(str, strPos + 1)) {
+                        strPos += sizeof(gDialogCarryoverColor) * 2;
+                    }
+                    continue;
+                case HEX(CONTROL_CHAR_RESET):
+                    continue;
             }
         }
+
         if (c & 0x80) {
             width += utf8_lookup(utf8LUT, str, &strPos)->kerning;
         } else {
             width += asciiLut[ASCII_LUT_INDEX(c)].kerning;
         }
-        strPos++;
     }
 
     return MAX(width, maxWidth);
@@ -512,13 +546,16 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
  * to control printing.
  */
 static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
-    s32 strPos = 0;
     char c;
-    s32 lineNum = 1;
     s8 kerning = 0;
     u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
-    u8 color[3];
+    u8 validColor;
+    s32 strPos = 0;
+    s32 lineNum = 1;
     s32 alignmentXOffset = get_alignment_x_offset(str, sGenericFontLineAlignment, main_font_lut, &main_font_utf8_lut);
+
+    ColorRGBA color;
+    bcopy(gDialogCarryoverColor, color, sizeof(color));
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
@@ -533,8 +570,12 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             case '\n':
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 if (lineNum == maxLines) {
+                    if (gDialogBoxState == DIALOG_STATE_VERTICAL) {
+                        bcopy(color, gDialogColorByEnd, sizeof(gDialogColorByEnd));
+                    }
                     return strPos + 1;
                 }
+
                 create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * sGenericFontLineHeight), 0.0f);
                 lineNum++;
                 // Can skip any queued spaces
@@ -553,14 +594,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 queuedSpaces += 4;
                 break;
 
-            // Backslash / escape character: Force the following character to print normally.
-            // Note that you will have to type '\\' to use this so that the compiler doesn't
-            // interpret it as a real escape character. To render one backslash, use '\\\\'.
-            case '\\':
-                strPos++;
-                goto render_character;
-
-            // %d or %s: Display value of dialog variable,
+            // %d or %s: Display value of dialog variable
             case '%':
                 // Resolve queued spaces
                 if (queuedSpaces != 0) {
@@ -592,24 +626,39 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 // If the character following the % is not 'd' or 's', print the % as a normal character.
                 goto render_character;
 
-            // @XXXXXX: Set color of text to an RGB value.
-            // E.g. @FF0000 will set the color to red.
-            // Will use gDialogTextAlpha as the alpha value.
+            // Color set control character
+            case HEX(CONTROL_CHAR_COL): // '\033'
+                validColor = TRUE;
 
-            // Note: multiple color codes may be needed in dialog as
-            // earlier color codes will not function if they scroll offscreen.
-            case CHAR_COLOR_CODE: // '@'
-                for (u32 i = 0; i < 3; i++) {
-                    s32 firstDigit = hex_char_to_value(str[strPos + i * 2 + 1]);
-                    s32 secondDigit = hex_char_to_value(str[strPos + i * 2 + 2]);
-                    // If the sequence following the @ is not a valid RGBA32 color, interpret it as normal text.
-                    if (firstDigit == -1 || secondDigit == -1) {
-                        goto render_character;
+                for (u32 i = 0; i < sizeof(color); i++) {
+                    if (i == sizeof(ColorRGB)) { // check if alpha should be ignored (if alpha is "--")
+                        if (str[strPos + i * 2 + 1] == CHAR_VALUE_IGNORE[0] && str[strPos + i * 2 + 2] == CHAR_VALUE_IGNORE[0]) {
+                            color[i] = (u8) gDialogTextAlpha;
+                            continue;
+                        }
                     }
-                    color[i] = (firstDigit << 4) | secondDigit;
+
+                    // If the sequence following the control char is not a valid RGBA32 color, interpret it as normal text.
+                    // NOTE: Invalid color combinations can also cause color rendering issues, but those are considered user error.
+                    s32 val = hex_pair_to_value(str, strPos + i * 2 + 1);
+                    if (val == -1) {
+                        validColor = FALSE;
+                        break;
+                    }
+
+                    color[i] = val;
                 }
-                strPos += 6;
-                gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], gDialogTextAlpha);
+
+                if (validColor) {
+                    gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
+                    strPos += sizeof(color) * 2;
+                }
+                break;
+            
+            // Color reset control character
+            case HEX(CONTROL_CHAR_RESET): // '\034'
+                bcopy(sActiveTextColor, color, sizeof(color));
+                gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                 break;
 
             // Normal character rendering
@@ -1028,13 +1077,18 @@ static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     gDialogTextAlpha = 255;
-    switch (gDialogBoxType) {
-        case DIALOG_TYPE_ROTATE:
-            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-            break;
-        case DIALOG_TYPE_ZOOM:
-            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
-            break;
+    if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
+        set_text_color(0, 0, 0);
+    } else {
+        set_text_color(255, 255, 255);
+    }
+
+    if (gDialogBoxState == DIALOG_STATE_OPENING) {
+        bcopy(sActiveTextColor, gDialogCarryoverColor, sizeof(gDialogCarryoverColor));
+    } else {
+        // Deliberately not using set_text_color here, as gDialogCarryoverColor isn't
+        // representative of the text color at the start of the dialog prompt
+        gDPSetEnvColor(gDisplayListHead++, gDialogCarryoverColor[0], gDialogCarryoverColor[1], gDialogCarryoverColor[2], gDialogCarryoverColor[3]);
     }
 
     sGenericFontLineHeight = DIALOG_LINE_HEIGHT;
@@ -1275,6 +1329,8 @@ void render_dialog_entries(void) {
                 gDialogTextPos = gLastDialogPageStrPos;
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 gDialogScrollOffsetY = 0;
+
+                bcopy(gDialogColorByEnd, gDialogCarryoverColor, sizeof(gDialogCarryoverColor));
             }
             break;
 
@@ -1365,7 +1421,7 @@ void do_cutscene_handler(void) {
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDialogTextAlpha = gCutsceneMsgFade;
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
 
     print_generic_string_aligned(SCREEN_CENTER_X, 13, LANG_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
@@ -1414,8 +1470,8 @@ void print_peach_letter_message(void) {
     gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_dl_0700EA58);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gDialogTextAlpha);
 
+    set_text_color(20, 20, 20);
     print_generic_string(38, 142, str);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -1568,7 +1624,7 @@ LangArray textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
 #if defined(WIDE) && !defined(PUPPYCAM)
 void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
     if (!gConfig.widescreen) {
         print_generic_string(10, 24, LANG_ARRAY(textCurrRatio43));
     } else {
@@ -1625,7 +1681,7 @@ void render_pause_my_score_coins(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
 
     char *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
@@ -1692,8 +1748,8 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, index, 1, 2);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     print_generic_string_aligned(x + 54,  y,      LANG_ARRAY(textLakituMario),   TEXT_ALIGN_CENTER);
     print_generic_string_aligned(x + 54,  y - 15, LANG_ARRAY(textNormalUpClose), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(x + 160, y,      LANG_ARRAY(textLakituStop),    TEXT_ALIGN_CENTER);
@@ -1743,8 +1799,8 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     print_generic_string(x, y,      LANG_ARRAY(textContinue));
     print_generic_string(x, y - 15, LANG_ARRAY(textExitCourse));
 
@@ -1912,8 +1968,8 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         print_generic_string(x - 50, y + 35, courseName);
@@ -2019,8 +2075,9 @@ s32 render_pause_courses_and_castle(void) {
 #if defined(WIDE) && !defined(PUPPYCAM)
         render_widescreen_setting();
 #endif
-    if (gDialogTextAlpha < 250) {
-        gDialogTextAlpha += 25;
+    gDialogTextAlpha += 25;
+    if (gDialogTextAlpha > 250) {
+        gDialogTextAlpha = 250;
     }
 #ifdef PUPPYCAM
     } else {
@@ -2157,10 +2214,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
         format_int_to_string(courseNumText, gLastCompletedCourseNum);
         sprintf(str, LANG_ARRAY(textCourseX), courseNumText);
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+        set_text_color(0, 0, 0);
         print_generic_string(COURSE_COMPLETE_COURSE_X + 2,  COURSE_COMPLETE_COURSE_Y - 2, str);
 
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+        set_text_color(255, 255, 255);
         print_generic_string(COURSE_COMPLETE_COURSE_X,      COURSE_COMPLETE_COURSE_Y, str);
 
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2171,10 +2228,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         // Print course name and clear text
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+        set_text_color(0, 0, 0);
         print_generic_string(CONGRATULATIONS_COURSE_X + 2, CONGRATULATIONS_COURSE_Y - 2, name);
         print_generic_string(clearX                   + 2, CONGRATULATIONS_COURSE_Y - 2, LANG_ARRAY(textClear));
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+        set_text_color(255, 255, 255);
         print_generic_string(CONGRATULATIONS_COURSE_X,     CONGRATULATIONS_COURSE_Y,     name);
         print_generic_string(clearX,                       CONGRATULATIONS_COURSE_Y,     LANG_ARRAY(textClear));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2201,10 +2258,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     // Print act name and catch text
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-    gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+    set_text_color(0, 0, 0);
     print_generic_string(COURSE_COMPLETE_ACT_X + 2, COURSE_COMPLETE_ACT_Y - 2, name);
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
     print_generic_string(COURSE_COMPLETE_ACT_X,     COURSE_COMPLETE_ACT_Y,     name);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2238,8 +2295,8 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     print_generic_string(x + 12, y,      LANG_ARRAY(textSaveAndContinue));
     print_generic_string(x + 12, y - 20, LANG_ARRAY(textSaveAndQuit));
     print_generic_string(x + 12, y - 40, LANG_ARRAY(textContinueWithoutSave));
@@ -2296,8 +2353,9 @@ s32 render_course_complete_screen(void) {
             break;
     }
 
-    if (gDialogTextAlpha < 250) {
-        gDialogTextAlpha += 25;
+    gDialogTextAlpha += 25;
+    if (gDialogTextAlpha > 250) {
+        gDialogTextAlpha = 250;
     }
 
     gCourseDoneMenuTimer++;

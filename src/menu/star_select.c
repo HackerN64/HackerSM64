@@ -288,7 +288,7 @@ void print_act_selector_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+    set_text_color(0, 0, 0);
     // Print the "MY SCORE" text if the coin score is more than 0
     if (save_file_get_course_coin_score(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum)) != 0) {
         print_generic_string_aligned(145, 118, LANG_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);

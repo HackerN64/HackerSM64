@@ -1,9 +1,12 @@
+#undef COURSE_ACTS
 #define COURSE_ACTS(id, name, a,b,c,d,e,f) \
     static const char GLUE2(COURSE_NAME_TABLE, _ ## id)[] = { name };
 
+#undef SECRET_STAR
 #define SECRET_STAR(id, name) \
     static const char GLUE2(COURSE_NAME_TABLE, _ ## id)[] = { name };
 
+#undef CASTLE_SECRET_STARS
 #define CASTLE_SECRET_STARS(str) \
     static const char GLUE2(COURSE_NAME_TABLE, _castle_secret_stars)[] = { str };
 

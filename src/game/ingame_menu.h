@@ -3,6 +3,55 @@
 
 #include <PR/ultratypes.h>
 #include "types.h"
+#include "dialog_ids.h"
+#include "course_table.h"
+
+// General string macros
+#define HEX(s)       GLUE2(0x, s)
+#define HEX_STR(s)   STRING2(GLUE2(\x, s))
+
+// Control characters (Must be hexadecimal without the
+// '0x' prefix, possible values range from 00-1F)
+#define CONTROL_CHAR_TERMINATOR 00 // '\0' (RESERVED!)
+#define CONTROL_CHAR_TAB        09 // '\t' (RESERVED!)
+#define CONTROL_CHAR_NEWLINE    0A // '\n' (RESERVED!)
+#define CONTROL_CHAR_COL        1B // '\033'
+#define CONTROL_CHAR_RESET      1C // '\034'
+
+// Additional control macros
+#define CHAR_VALUE_IGNORE "-"
+
+
+/********************************** BEGIN USER DIALOG CONTROL **********************************/
+
+
+/**
+ * COL_RGB("XXXXXX"), COL_RGBA("XXXXXXXX")
+ *
+ * Set color of text to an RGB value.
+ * e.g. COL_RGB("00FF00") will set the color to green.
+ * Will use gDialogTextAlpha as the alpha value if alpha is not specified.
+ * 
+ * Example: "normal text " COL_RGBA("FF00007F") "transparent red text"
+ */
+#define COL_RGB(color) \
+    HEX_STR(CONTROL_CHAR_COL) color CHAR_VALUE_IGNORE CHAR_VALUE_IGNORE
+#define COL_RGBA(color) \
+    HEX_STR(CONTROL_CHAR_COL) color
+
+/**
+ * COL_RESET
+ *
+ * Reset the text color back to its default text color.
+ * 
+ * Example: "colored text " COL_RESET "normal text"
+ */
+#define COL_RESET \
+    HEX_STR(CONTROL_CHAR_RESET)
+
+
+/*********************************** END USER DIALOG CONTROL ***********************************/
+
 
 enum MenuMtxPushOp {
     MENU_MTX_NONE,
@@ -53,10 +102,6 @@ struct AsciiCharLUTEntry {
 
 // Macro to quickly get the kerning of the space character from an ASCII LUT.
 #define SPACE_KERNING(lut) (((struct AsciiCharLUTEntry *)(lut))[ASCII_LUT_INDEX(' ')].kerning)
-
-// The character used to indicate a color code in a generic string.
-// As of now, must be an ASCII character.
-#define CHAR_COLOR_CODE '@'
 
 struct Utf8CharLUTEntry {
     u32 codepoint;
@@ -200,6 +245,22 @@ typedef char * LangArray;
 
 #endif
 
+//! NOTE: These are just to assist with VSCode autocomplete and should not be considered functional.
+#undef DEFINE_DIALOG
+#define DEFINE_DIALOG(id, voice, linesPerBox, leftOffset, bottomOffset, dialogText)
+
+#undef COURSE_ACTS
+#define COURSE_ACTS(id, name, a, b, c, d, e, f)
+
+#undef SECRET_STAR
+#define SECRET_STAR(id, name)
+
+#undef CASTLE_SECRET_STARS
+#define CASTLE_SECRET_STARS(str)
+
+#undef EXTRA_TEXT
+#define EXTRA_TEXT(id, str)
+
 typedef union {
     s32 asInt;
     char *asStr;
@@ -217,6 +278,7 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 void create_dl_ortho_matrix(void);
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 
+void set_text_color(u32 r, u32 g, u32 b);
 s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT);
 void format_int_to_string(char *buf, s32 value);
 void print_generic_string(s16 x, s16 y, char *str);
