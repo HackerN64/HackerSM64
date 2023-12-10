@@ -278,6 +278,7 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 void create_dl_ortho_matrix(void);
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 
+void set_text_color(u32 r, u32 g, u32 b);
 s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT);
 void format_int_to_string(char *buf, s32 value);
 void print_generic_string(s16 x, s16 y, char *str);

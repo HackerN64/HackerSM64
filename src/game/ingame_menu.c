@@ -131,9 +131,10 @@ s32 gDialogResponse = DIALOG_RESPONSE_NONE;
 ColorRGBA gDialogColorByEnd;
 ColorRGBA gDialogCarryoverColor;
 
+static ColorRGBA sActiveTextColor;
+
 static u8 sGenericFontLineHeight = 0;
 static u8 sGenericFontLineAlignment = TEXT_ALIGN_LEFT;
-
 
 void create_dl_identity_matrix(void) {
     Mtx *matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
@@ -321,6 +322,19 @@ static s32 is_color_code_valid(char *str, s32 strPos) {
         }
     }
     return TRUE;
+}
+
+/**
+ * Set text color for string to print, needed for color reset commands to function properly.
+ * This should always be called instead of gDPSetEnvColor prior to any print_generic_string call or variant.
+ */
+void set_text_color(u32 r, u32 g, u32 b) {
+    gDPSetEnvColor(gDisplayListHead++, r, g, b, gDialogTextAlpha);
+
+    sActiveTextColor[0] = r;
+    sActiveTextColor[1] = g;
+    sActiveTextColor[2] = b;
+    sActiveTextColor[3] = gDialogTextAlpha;
 }
 
 /**
@@ -523,17 +537,6 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
 #define BOX_SCALE   BOX_SCALE_EN
 #endif
 
-static void reset_dialog_color(ColorRGBA color) {
-    Color value = 255;
-
-    if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
-        value = 0;
-    }
-
-    color[0] = color[1] = color[2] = value;
-    color[3] = (Color) gDialogTextAlpha;
-}
-
 /**
  * Prints a generic white string. Used for both dialog entries and regular prints.
  * Only prints a total of maxLines lines of text. If maxLines is -1, it will print
@@ -654,7 +657,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             
             // Color reset control character
             case HEX(CONTROL_CHAR_RESET): // '\034'
-                reset_dialog_color(color);
+                bcopy(sActiveTextColor, color, sizeof(color));
                 gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                 break;
 
@@ -1074,10 +1077,19 @@ static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     gDialogTextAlpha = 255;
-    if (gDialogBoxState == DIALOG_STATE_OPENING) {
-        reset_dialog_color(gDialogCarryoverColor);
+    if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
+        set_text_color(0, 0, 0);
+    } else {
+        set_text_color(255, 255, 255);
     }
-    gDPSetEnvColor(gDisplayListHead++, gDialogCarryoverColor[0], gDialogCarryoverColor[1], gDialogCarryoverColor[2], gDialogCarryoverColor[3]);
+
+    if (gDialogBoxState == DIALOG_STATE_OPENING) {
+        bcopy(sActiveTextColor, gDialogCarryoverColor, sizeof(gDialogCarryoverColor));
+    } else {
+        // Deliberately not using set_text_color here, as gDialogCarryoverColor isn't
+        // representative of the text color at the start of the dialog prompt
+        gDPSetEnvColor(gDisplayListHead++, gDialogCarryoverColor[0], gDialogCarryoverColor[1], gDialogCarryoverColor[2], gDialogCarryoverColor[3]);
+    }
 
     sGenericFontLineHeight = DIALOG_LINE_HEIGHT;
     sGenericFontLineAlignment = TEXT_ALIGN_LEFT;
@@ -1409,7 +1421,7 @@ void do_cutscene_handler(void) {
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDialogTextAlpha = gCutsceneMsgFade;
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
 
     print_generic_string_aligned(SCREEN_CENTER_X, 13, LANG_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
@@ -1458,8 +1470,8 @@ void print_peach_letter_message(void) {
     gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_dl_0700EA58);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gDialogTextAlpha);
 
+    set_text_color(20, 20, 20);
     print_generic_string(38, 142, str);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -1612,7 +1624,7 @@ LangArray textCurrRatio169 = DEFINE_LANGUAGE_ARRAY(
 #if defined(WIDE) && !defined(PUPPYCAM)
 void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
     if (!gConfig.widescreen) {
         print_generic_string(10, 24, LANG_ARRAY(textCurrRatio43));
     } else {
@@ -1669,7 +1681,7 @@ void render_pause_my_score_coins(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
 
     char *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
@@ -1736,8 +1748,8 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, index, 1, 2);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     print_generic_string_aligned(x + 54,  y,      LANG_ARRAY(textLakituMario),   TEXT_ALIGN_CENTER);
     print_generic_string_aligned(x + 54,  y - 15, LANG_ARRAY(textNormalUpClose), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(x + 160, y,      LANG_ARRAY(textLakituStop),    TEXT_ALIGN_CENTER);
@@ -1787,8 +1799,8 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     print_generic_string(x, y,      LANG_ARRAY(textContinue));
     print_generic_string(x, y - 15, LANG_ARRAY(textExitCourse));
 
@@ -1956,8 +1968,8 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         print_generic_string(x - 50, y + 35, courseName);
@@ -2202,10 +2214,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
         format_int_to_string(courseNumText, gLastCompletedCourseNum);
         sprintf(str, LANG_ARRAY(textCourseX), courseNumText);
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+        set_text_color(0, 0, 0);
         print_generic_string(COURSE_COMPLETE_COURSE_X + 2,  COURSE_COMPLETE_COURSE_Y - 2, str);
 
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+        set_text_color(255, 255, 255);
         print_generic_string(COURSE_COMPLETE_COURSE_X,      COURSE_COMPLETE_COURSE_Y, str);
 
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2216,10 +2228,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         // Print course name and clear text
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+        set_text_color(0, 0, 0);
         print_generic_string(CONGRATULATIONS_COURSE_X + 2, CONGRATULATIONS_COURSE_Y - 2, name);
         print_generic_string(clearX                   + 2, CONGRATULATIONS_COURSE_Y - 2, LANG_ARRAY(textClear));
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+        set_text_color(255, 255, 255);
         print_generic_string(CONGRATULATIONS_COURSE_X,     CONGRATULATIONS_COURSE_Y,     name);
         print_generic_string(clearX,                       CONGRATULATIONS_COURSE_Y,     LANG_ARRAY(textClear));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2246,10 +2258,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     // Print act name and catch text
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-    gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+    set_text_color(0, 0, 0);
     print_generic_string(COURSE_COMPLETE_ACT_X + 2, COURSE_COMPLETE_ACT_Y - 2, name);
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    set_text_color(255, 255, 255);
     print_generic_string(COURSE_COMPLETE_ACT_X,     COURSE_COMPLETE_ACT_Y,     name);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2283,8 +2295,8 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
+    set_text_color(255, 255, 255);
     print_generic_string(x + 12, y,      LANG_ARRAY(textSaveAndContinue));
     print_generic_string(x + 12, y - 20, LANG_ARRAY(textSaveAndQuit));
     print_generic_string(x + 12, y - 40, LANG_ARRAY(textContinueWithoutSave));
