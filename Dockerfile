@@ -5,6 +5,7 @@ RUN apt-get update && \
         binutils-mips-linux-gnu \
         bsdextrautils \
         build-essential \
+        gcc-mips-linux-gnu \
         libcapstone-dev \
         pkgconf \
         python3
