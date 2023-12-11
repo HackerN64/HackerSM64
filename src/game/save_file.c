@@ -3,6 +3,7 @@
 #include "sm64.h"
 #include "game_init.h"
 #include "main.h"
+#include "audio/external.h"
 #include "engine/math_util.h"
 #include "area.h"
 #include "level_update.h"
@@ -13,15 +14,19 @@
 #include "level_commands.h"
 #include "rumble_init.h"
 #include "config.h"
+#include "emutest.h"
 #ifdef SRAM
 #include "sram.h"
 #endif
 #include "puppycam2.h"
 
-#define ALIGN4(val) (((val) + 0x3) & ~0x3)
-
+#ifdef UNIQUE_SAVE_DATA
+u16 MENU_DATA_MAGIC = 0x4849;
+u16 SAVE_FILE_MAGIC = 0x4441;
+#else
 #define MENU_DATA_MAGIC 0x4849
 #define SAVE_FILE_MAGIC 0x4441
+#endif
 
 //STATIC_ASSERT(sizeof(struct SaveBuffer) == EEPROM_SIZE, "eeprom buffer size must match");
 
@@ -52,7 +57,6 @@ s8 gLevelToCourseNumTable[] = {
 STATIC_ASSERT(ARRAY_COUNT(gLevelToCourseNumTable) == LEVEL_COUNT - 1,
               "change this array if you are adding levels");
 #ifdef EEP
-#include "vc_check.h"
 #include "vc_ultra.h"
 
 /**
@@ -73,7 +77,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = gIsVC
+            status = (gEmulator & EMU_WIIVC)
                    ? osEepromLongReadVC(&gSIEventMesgQueue, offset, buffer, size)
                    : osEepromLongRead  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
@@ -103,7 +107,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = gIsVC
+            status = (gEmulator & EMU_WIIVC)
                    ? osEepromLongWriteVC(&gSIEventMesgQueue, offset, buffer, size)
                    : osEepromLongWrite  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
@@ -334,9 +338,27 @@ void save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
     save_file_do_save(destFileIndex);
 }
 
+#ifdef UNIQUE_SAVE_DATA
+// This should only be called once on boot and never again.
+static void calculate_unique_save_magic(void) {
+    u16 checksum = 0;
+
+    for (s32 i = 0; i < 20; i++) {
+        checksum += (u16) INTERNAL_ROM_NAME[i] << (i & 0x07);
+    }
+
+    MENU_DATA_MAGIC += checksum;
+    SAVE_FILE_MAGIC += checksum;
+}
+#endif
+
 void save_file_load_all(void) {
     s32 file;
     s32 validSlots;
+
+#ifdef UNIQUE_SAVE_DATA
+    calculate_unique_save_magic(); // This should only be called once on boot and never again.
+#endif
 
     gMainMenuDataModified = FALSE;
     gSaveFileModified = FALSE;
@@ -696,6 +718,10 @@ void save_file_set_widescreen_mode(u8 mode) {
 #endif
 
 u32 save_file_get_sound_mode(void) {
+    if (gSaveBuffer.menuData.soundMode >= SOUND_MODE_COUNT) {
+        return 0;
+    }
+
     return gSaveBuffer.menuData.soundMode;
 }
 

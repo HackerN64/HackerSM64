@@ -32,21 +32,19 @@ struct Config {
     u8 tvType;
 };
 
-struct Controller {
-  /*0x00*/ s16 rawStickX;       //
-  /*0x02*/ s16 rawStickY;       //
-  /*0x04*/ f32 stickX;          // [-64, 64] positive is right
-  /*0x08*/ f32 stickY;          // [-64, 64] positive is up
-  /*0x0C*/ f32 stickMag;        // distance from center [0, 64]
-  /*0x10*/ u16 buttonDown;
-  /*0x12*/ u16 buttonPressed;
-  /*0x14*/ u16 buttonReleased;
-  /*0x18*/ OSContStatus *statusData;
-  /*0x1C*/ OSContPadEx *controllerData;
-#if ENABLE_RUMBLE
-  /*0x20*/ s32 port;
-#endif
-};
+typedef struct Controller {
+    /*0x00*/ s16 rawStickX;               // Analog stick [-128, 128] positive is right. Used for menus.
+    /*0x02*/ s16 rawStickY;               // Analog stick [-128, 128] positive is up. Used for menus.
+    /*0x04*/ f32 stickX;                  // Analog stick [-64, 64] positive is right. Used for gameplay.
+    /*0x08*/ f32 stickY;                  // Analog stick [-64, 64] positive is up. Used for gameplay.
+    /*0x0C*/ f32 stickMag;                // Analog stick distance from center [0, 64]. Used for gameplay.
+    /*0x10*/ u16 buttonDown;              // Buttons held down on the current frame.
+    /*0x12*/ u16 buttonPressed;           // Buttons pressed on the current frame but not held on the previous frame.
+    /*0x14*/ u16 buttonReleased;          // Burrons released on the current frame and held on the previous frame.
+    /*0x18*/ OSContStatus* statusData;    // Pointer to the controller status data in gControllerStatuses.
+    /*0x1C*/ OSContPadEx* controllerData; // Pointer to the raw input data in gControllerPads.
+    /*0x20*/ s32 port;                    // The port index this controller is plugged into [0, 3].
+} Controller; /*0x24*/
 
 // -- Booleans --
 
@@ -105,9 +103,6 @@ typedef COLLISION_DATA_TYPE Collision; // Collision is by default an s16, but it
 typedef Collision TerrainData;
 typedef Collision Vec3t[3];
 typedef Collision SurfaceType;
-
-typedef f32       Normal;
-typedef Normal    Vec3n[3];
 
 // -- Colors/Textures --
 

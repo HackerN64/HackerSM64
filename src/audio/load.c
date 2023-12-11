@@ -9,8 +9,6 @@
 #include "seqplayer.h"
 #include "game/puppyprint.h"
 
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 struct SharedDma {
     /*0x0*/ u8 *buffer;       // target, points to pre-allocated buffer
     /*0x4*/ uintptr_t source; // device address
@@ -88,7 +86,7 @@ s16 gTempoInternalToExternal;
 s8 gAudioUpdatesPerFrame;
 #endif
 
-s8 gSoundMode;
+s8 gSoundMode = SOUND_MODE_STEREO;
 
 #if defined(VERSION_EU)
 s8 gAudioUpdatesPerFrame;
@@ -857,7 +855,6 @@ void audio_init() {
     gAudioFrameCount = 0;
     gAudioTaskIndex = 0;
     gCurrAiBufferIndex = 0;
-    gSoundMode = 0;
     gAudioTask = NULL;
     gAudioTasks[0].task.t.data_size = 0;
     gAudioTasks[1].task.t.data_size = 0;
@@ -879,7 +876,7 @@ void audio_init() {
     gAudioResetStatus = 1;
     audio_shut_down_and_reset_step();
 #else
-    audio_reset_session(&gAudioSessionPresets[0], 0);
+    audio_reset_session(0);
 #endif
 
     // Not sure about these prints
@@ -919,8 +916,8 @@ void audio_init() {
     alSeqFileNew(gAlTbl, gSoundDataRaw);
 
     // Load bank sets for each sequence
-    gAlBankSets = soundAlloc(&gAudioInitPool, BANK_SETS_ALLOC);
-    audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, BANK_SETS_ALLOC);
+    gAlBankSets = soundAlloc(&gAudioInitPool, MAX_NUM_SOUNDBANKS * sizeof(s32));
+    audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, MAX_NUM_SOUNDBANKS * sizeof(s32));
 
     init_sequence_players();
     gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;

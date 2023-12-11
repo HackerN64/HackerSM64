@@ -4,6 +4,7 @@
 #include <PR/ultratypes.h>
 
 #include "types.h"
+#include "game/puppyprint.h"
 
 #define NEAR_ZERO   __FLT_EPSILON__
 #define NEAR_ONE    (1.0f - __FLT_EPSILON__)
@@ -477,6 +478,7 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 
 // Transform the vector 'srcV' by the matrix 'mtx' and store the result in 'dstV'. Ignores translation.
 #define linear_mtxf_mul_vec3(mtx, dstV, srcV) {                                                         \
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);                                                   \
     __auto_type _x = ((mtx)[0][0] * (srcV)[0]) + ((mtx)[1][0] * (srcV)[1]) + ((mtx)[2][0] * (srcV)[2]); \
     __auto_type _y = ((mtx)[0][1] * (srcV)[0]) + ((mtx)[1][1] * (srcV)[1]) + ((mtx)[2][1] * (srcV)[2]); \
     __auto_type _z = ((mtx)[0][2] * (srcV)[0]) + ((mtx)[1][2] * (srcV)[1]) + ((mtx)[2][2] * (srcV)[2]); \
@@ -495,6 +497,7 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 // and store the result in 'dstV'. Ignores translation.
 // For most transformation matrices, this will apply the inverse of the transformation.
 #define linear_mtxf_transpose_mul_vec3(mtx, dstV, srcV) { \
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);     \
     __auto_type _x = vec3_dot((mtx)[0], (srcV));          \
     __auto_type _y = vec3_dot((mtx)[1], (srcV));          \
     __auto_type _z = vec3_dot((mtx)[2], (srcV));          \
@@ -617,7 +620,6 @@ ALWAYS_INLINE s32 roundf(f32 in) {
     ((u32 *)(mtx))[15] = FLOAT_ONE;             \
 }
 
-
 u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
@@ -671,6 +673,36 @@ f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);
-void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
+f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
+
+ALWAYS_INLINE f32 remap(f32 x, f32 fromA, f32 toA, f32 fromB, f32 toB) {
+    return (x - fromA) / (toA - fromA) * (toB - fromB) + fromB;
+}
+
+ALWAYS_INLINE f32 lerpf(f32 from, f32 to, f32 amount) {
+    return (from + (to - from) * amount);
+}
+
+ALWAYS_INLINE f32 to_smoothstop(f32 x) {
+    f32 sq = sqr(1.0f - x);
+    return 1.0f - sq;
+}
+
+// Commonly known as ease-in
+ALWAYS_INLINE f32 smoothstart(f32 from, f32 to, f32 amount) {
+    return lerpf(from, to, sqr(amount));
+}
+
+// Commonly known as ease-out
+ALWAYS_INLINE f32 smoothstop(f32 from, f32 to, f32 amount) {
+    return lerpf(from, to, to_smoothstop(amount));
+}
+
+// Commonly known as ease-in-out
+ALWAYS_INLINE f32 smoothstep(f32 from, f32 to, f32 amount) {
+    amount = sqr(amount) * (3.0f - 2.0f * amount);
+
+    return lerpf(from, to, amount);
+}
 
 #endif // MATH_UTIL_H

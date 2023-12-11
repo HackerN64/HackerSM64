@@ -1,4 +1,4 @@
-#include "config.h"
+#include "s2d_config.h"
 #include "s2d_error.h"
 #include "s2d_print.h"
 
@@ -19,7 +19,7 @@ void s2d_reset_defer_index(void) {
 // TODO: these DO NOT work
 // pls debug :)
 void s2d_print_deferred(int x, int y, const char *str) {
-	s2d_charBuffer[s2d_charBuffer_index] = str;
+	s2d_charBuffer[s2d_charBuffer_index] = (char *) str;
 	s2d_positions[s2d_charBuffer_index].x = x;
 	s2d_positions[s2d_charBuffer_index].y = y;
 

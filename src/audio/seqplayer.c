@@ -27,7 +27,9 @@ void sequence_channel_init(struct SequenceChannel *seqChannel) {
     seqChannel->stopScript = FALSE;
     seqChannel->stopSomething2 = FALSE;
     seqChannel->hasInstrument = FALSE;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     seqChannel->stereoHeadsetEffects = FALSE;
+#endif
     seqChannel->transposition = 0;
     seqChannel->largeNotes = FALSE;
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -64,7 +66,7 @@ void sequence_channel_init(struct SequenceChannel *seqChannel) {
 #endif
     seqChannel->vibratoRateTarget = 0x800;
     seqChannel->vibratoRateStart = 0x800;
-    seqChannel->vibratoExtentTarget = 0;
+    seqChannel->vibratoExtentTarget = VIBRATO_DISABLED_VALUE;
     seqChannel->vibratoExtentStart = 0;
     seqChannel->vibratoRateChangeDelay = 0;
     seqChannel->vibratoExtentChangeDelay = 0;
@@ -1867,7 +1869,12 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
 #endif
 
                     case 0xd0: // chan_stereoheadseteffects
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
                         seqChannel->stereoHeadsetEffects = m64_read_u8(state);
+#else
+                        // NOTE: Vanilla music does not use 0xd0, so this is safe to repurpose entirely when ENABLE_STEREO_HEADSET_EFFECTS is disabled.
+                        m64_read_u8(state);
+#endif
                         break;
 
                     case 0xd1: // chan_setnoteallocationpolicy
@@ -1942,7 +1949,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
                     case 0xec:
-                        seqChannel->vibratoExtentTarget = 0;
+                        seqChannel->vibratoExtentTarget = VIBRATO_DISABLED_VALUE;
                         seqChannel->vibratoExtentStart = 0;
                         seqChannel->vibratoExtentChangeDelay = 0;
                         seqChannel->vibratoRateTarget = 0;
@@ -2682,8 +2689,10 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 // This runs 240 times per second.
 void process_sequences(UNUSED s32 iterationsRemaining) {
     s32 i;
+
     for (i = 0; i < SEQUENCE_PLAYERS; i++) {
         if (gSequencePlayers[i].enabled == TRUE) {
+
 #if defined(VERSION_EU) || defined(VERSION_SH)
             sequence_player_process_sequence(&gSequencePlayers[i]);
             sequence_player_process_sound(&gSequencePlayers[i]);
@@ -2693,8 +2702,13 @@ void process_sequences(UNUSED s32 iterationsRemaining) {
 #endif
         }
     }
+
 #if defined(VERSION_JP) || defined(VERSION_US)
+    AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SEQUENCES_SCRIPT, PROFILER_TIME_SUB_AUDIO_SEQUENCES_RECLAIM);
     reclaim_notes();
+    AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SEQUENCES_RECLAIM, PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING);
+#else
+    AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SEQUENCES_SCRIPT, PROFILER_TIME_SUB_AUDIO_SEQUENCES_PROCESSING);
 #endif
     process_notes();
 }

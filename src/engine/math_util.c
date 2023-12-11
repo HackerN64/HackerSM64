@@ -91,7 +91,9 @@ void mtxf_copy(Mat4 dest, Mat4 src) {
 }
 
 /// Set mtx to the identity matrix.
+
 void mtxf_identity(Mat4 mtx) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 i;
     f32 *dest;
     for (dest = ((f32 *) mtx + 1), i = 0; i < 14; dest++, i++) {
@@ -104,6 +106,7 @@ void mtxf_identity(Mat4 mtx) {
 
 /// Set dest to a translation matrix of vector b.
 void mtxf_translate(Mat4 dest, Vec3f b) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 i;
     f32 *pen;
     for (pen = ((f32 *) dest + 1), i = 0; i < 12; pen++, i++) {
@@ -117,6 +120,7 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates.
 void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     f32 sx   = sins(rot[0]);
     f32 cx   = coss(rot[0]);
     f32 sy   = sins(rot[1]);
@@ -142,6 +146,7 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates.
 UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     f32 sx   = sins(rot[0]);
     f32 cx   = coss(rot[0]);
     f32 sy   = sins(rot[1]);
@@ -167,6 +172,7 @@ UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates and multiplies.
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     f32 sx = sins(rot[0]);
     f32 cx = coss(rot[0]);
     f32 sy = sins(rot[1]);
@@ -197,6 +203,7 @@ void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates and multiplies.
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     f32 sx = sins(rot[0]);
     f32 cx = coss(rot[0]);
     f32 sy = sins(rot[1]);
@@ -232,6 +239,7 @@ void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
  * angle allows a bank rotation of the camera.
  */
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     Vec3f colX, colY, colZ;
     f32 dx = (to[0] - from[0]);
     f32 dz = (to[2] - from[2]);
@@ -272,6 +280,7 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
  * 'angle' rotates the object while still facing the camera.
  */
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 i;
     f32 sx = scale[0];
     f32 sy = scale[1];
@@ -319,6 +328,7 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle)
  * 'yaw' is the angle which it should face
  */
 void mtxf_shadow(Mat4 dest, Vec3f upDir, Vec3f pos, Vec3f scale, s16 yaw) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -344,6 +354,7 @@ void mtxf_shadow(Mat4 dest, Vec3f upDir, Vec3f pos, Vec3f scale, s16 yaw) {
  * 'pos' is the object's position in the world
  */
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -369,6 +380,7 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw) {
  * 'radius' is the distance from each triangle vertex to the center
  */
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     struct Surface *floor;
     Vec3f point0, point1, point2;
     Vec3f forward;
@@ -419,6 +431,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
  * then a.
  */
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     Vec3f entry;
     f32 *temp  = (f32 *)a;
     f32 *temp2 = (f32 *)dest;
@@ -445,6 +458,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
  * Set matrix 'dest' to 'mtx' scaled by vector s
  */
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     f32 *temp  = (f32 *)dest;
     f32 *temp2 = (f32 *)mtx;
     s32 i;
@@ -466,6 +480,7 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s) {
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
 void mtxf_rotate_xy(Mtx *mtx, s16 angle) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 i = (coss(angle) * 0x10000);
     s32 j = (sins(angle) * 0x10000);
     f32 *temp = (f32 *)mtx;
@@ -806,12 +821,9 @@ s32 anim_spline_poll(Vec3f result) {
  *                    RAYCASTING                  *
  **************************************************/
 
-#define RAY_OFFSET 30.0f /* How many units to extrapolate surfaces when testing for a raycast */
-#define RAY_STEPS      4 /* How many steps to do when casting rays, default to quartersteps.  */
-
 /**
  * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
- * 
+ *
  * @param orig is the starting point of the ray.
  * @param dir is the normalized ray direction.
  * @param dir_length is the length of the ray.
@@ -828,14 +840,6 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     vec3s_to_vec3f(v0, surface->vertex1);
     vec3s_to_vec3f(v1, surface->vertex2);
     vec3s_to_vec3f(v2, surface->vertex3);
-    // Get surface normal and extend it by RAY_OFFSET.
-    Vec3f norm;
-    surface_normal_to_vec3f(norm, surface);
-    vec3_scale(norm, RAY_OFFSET);
-    // Move the face forward by RAY_OFFSET.
-    vec3f_add(v0, norm);
-    vec3f_add(v1, norm);
-    vec3f_add(v2, norm);
     // Make 'e1' (edge 1) the vector from vertex 0 to vertex 1.
     Vec3f e1;
     vec3f_diff(e1, v1, v0);
@@ -859,7 +863,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     f32 u = f * vec3f_dot(s, h);
     // Check if 'u' is within bounds.
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
-    // Make 'q' the cross product of 's' and edge 1. 
+    // Make 'q' the cross product of 's' and edge 1.
     Vec3f q;
     vec3f_cross(q, s, e1);
     // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
@@ -885,6 +889,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     f32 length;
     Vec3f chk_hit_pos;
     f32 top, bottom;
+    PUPPYPRINT_GET_SNAPSHOT();
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
         // Ray is upwards.
@@ -908,6 +913,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
             *max_length = length;
         }
     }
+    profiler_collision_update(first);
 }
 
 void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
@@ -933,11 +939,10 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
     }
 }
 
-void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
+f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
     Vec3f normalized_dir;
-    f32 step;
-    s32 i;
     const f32 invcell = 1.0f / CELL_SIZE;
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_raycast);
 
     // Set that no surface has been hit
     *hit_surface = NULL;
@@ -949,48 +954,50 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     vec3f_copy(normalized_dir, dir);
     vec3f_normalize(normalized_dir);
 
-    // Get our cell coordinate
-    f32 fCellX    = (orig[0] + LEVEL_BOUNDARY_MAX) * invcell;
-    f32 fCellZ    = (orig[2] + LEVEL_BOUNDARY_MAX) * invcell;
-    s32 cellX     = fCellX;
-    s32 cellZ     = fCellZ;
-    s32 cellPrevX = cellX;
-    s32 cellPrevZ = cellZ;
+    // Get the start and end coords converted to cell-space
+    f32 start_cell_coord_x = (orig[0] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 start_cell_coord_z = (orig[2] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 end_cell_coord_x   = (orig[0] + dir[0] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 end_cell_coord_z   = (orig[2] + dir[2] + LEVEL_BOUNDARY_MAX) * invcell;
 
-    // Don't do DDA if straight down
+    // Don't do grid traversal if straight down
     if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
-        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
-        return;
+        find_surface_on_ray_cell((s32)start_cell_coord_x, (s32)start_cell_coord_z, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        return max_length;
     }
 
-    // Get cells we cross using DDA
-    f32 absDir0 = absf(dir[0]);
-    f32 absDir2 = absf(dir[2]);
-    if (absDir0 >= absDir2) {
-        step = (RAY_STEPS * absDir0) * invcell;
-    } else {
-        step = (RAY_STEPS * absDir2) * invcell;
-    }
+    // "A Fast Voxel Traversal Algorithm for Ray Tracing" - John Amanatides & Andrew Woo
+    // Adapted from implementation at https://www.shadertoy.com/view/XddcWn
+    f32 rd_x = end_cell_coord_x - start_cell_coord_x;
+    f32 rd_z = end_cell_coord_z - start_cell_coord_z;
+    f32 p_x = (s32)start_cell_coord_x;
+    f32 p_z = (s32)start_cell_coord_z;
+    f32 rdinv_x = 1.0f / rd_x;
+    f32 rdinv_z = 1.0f / rd_z;
+    f32 stp_x = signum_positive(rd_x);
+    f32 stp_z = signum_positive(rd_z);
+    f32 delta_x = MIN(rdinv_x * stp_x, 1.0f);
+    f32 delta_z = MIN(rdinv_z * stp_z, 1.0f);
+    f32 t_max_x = ABS((p_x + MAX(stp_x, 0.0f) - start_cell_coord_x) * rdinv_x);
+    f32 t_max_z = ABS((p_z + MAX(stp_z, 0.0f) - start_cell_coord_z) * rdinv_z);
 
-    f32 dx = (dir[0] / step) * invcell;
-    f32 dz = (dir[2] / step) * invcell;
+    while (TRUE) {
+        find_surface_on_ray_cell((s32)p_x, (s32)p_z, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        f32 t_next = MIN(t_max_x, t_max_z);
+        if (t_next > 1.0f) {
+            break;
+        }
 
-    for (i = 0; i < step && *hit_surface == NULL; i++) {
-        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
-
-        // Move cell coordinate
-        fCellX   += dx;
-        fCellZ   += dz;
-        cellPrevX = cellX;
-        cellPrevZ = cellZ;
-        cellX     = fCellX;
-        cellZ     = fCellZ;
-
-        if ((cellPrevX != cellX) && (cellPrevZ != cellZ)) {
-            find_surface_on_ray_cell(cellX, cellPrevZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
-            find_surface_on_ray_cell(cellPrevX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        if (t_max_x < t_max_z) {
+            t_max_x += delta_x;
+            p_x += stp_x;
+        }
+        else {
+            t_max_z += delta_z;
+            p_z += stp_z;
         }
     }
+    return max_length;
 }
 
 // Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
@@ -1034,9 +1041,8 @@ static ALWAYS_INLINE float construct_float(const float f)
 
 // Converts a floating point matrix to a fixed point matrix
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
-__attribute__((optimize("Os")))
-void mtxf_to_mtx_fast(s16* dst, float* src)
-{
+OPTIMIZE_OS void mtxf_to_mtx_fast(s16* dst, float* src) {
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     float scale = construct_float(65536.0f / WORLD_SCALE);
     // Iterate over pairs of values in the input matrix
     for (int i = 0; i < 8; i++)

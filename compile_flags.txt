@@ -1,0 +1,25 @@
+-Iinclude/n64
+-Iinclude
+-Itextures
+-Ibuild/us_n64
+-Isrc
+
+
+-include include/types.h
+-include include/n64/ultra64.h
+-include include/sm64.h
+-include include/config.h
+-include include/make_const_nonconst.h
+-include include/geo_commands.h
+-include include/level_commands.h
+-include include/segment_symbols.h
+-include include/command_macros_base.h
+-include include/object_constants.h
+
+
+-DTARGET_N64=1
+-DVERSION_US=1
+-DF3DEX_GBI_2=1
+-DF3DZEX_NON_GBI_2=1
+-DF3DEX_GBI_SHARED=1
+-D_LANGUAGE_C=1
