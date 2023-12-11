@@ -279,7 +279,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     }
 #endif
     mag = 1.0f / sqrtf(mag);
-    vec3_mul_val(n, mag);
+    vec3_scale(n, mag);
 
     struct Surface *surface = alloc_surface(dynamic);
 
@@ -700,8 +700,9 @@ void load_object_collision_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
 
-    f32 sqrLateralDist;
-    vec3f_get_lateral_dist_squared(&o->oPosVec, &gMarioObject->oPosVec, &sqrLateralDist);
+    Vec3f dist;
+    vec3_diff(dist, &o->oPosVec, &gMarioObject->oPosVec);
+    f32 sqrLateralDist = sqr(dist[0]) + sqr(dist[2]);
 
     f32 verticalMarioDiff = gMarioObject->oPosY - o->oPosY;
 

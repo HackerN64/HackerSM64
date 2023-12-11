@@ -1391,7 +1391,7 @@ static void puppycam_collision(void) {
             closestDist -= surfOffset;
             // Allow the camera to ride right up next to the wall (mario's wall radius is 50u so this is safe)
             closestDist = MAX(closestDist, 50);
-            vec3_mul_val(dirToCam, closestDist);
+            vec3_scale(dirToCam, closestDist);
             vec3_sum(gPuppyCam.pos, target[0], dirToCam);
 
             // If the camera is uncomfortably close to the wall, move it up a bit
