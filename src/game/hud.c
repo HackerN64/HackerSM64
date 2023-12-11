@@ -117,7 +117,7 @@ static struct CameraHUD sCameraHUD = { CAM_STATUS_NONE };
  * Renders a rgba16 16x16 glyph texture from a table list.
  */
 void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
     gDPSetTextureImage(tmpDL++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
@@ -125,14 +125,14 @@ void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
     gSPTextureRectangle(tmpDL++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2,
                         G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
  * Renders a rgba16 8x8 glyph texture from a table list.
  */
 void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPSetTile(tmpDL++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
@@ -147,7 +147,7 @@ void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
     gSPTextureRectangle(tmpDL++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE,
                         0, 0, 4 << 10, 1 << 10);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
@@ -155,7 +155,7 @@ void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
  */
 void render_power_meter_health_segment(s16 numHealthWedges) {
     Texture *(*healthLUT)[] = segmented_to_virtual(&power_meter_health_segments_lut);
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
     gDPSetTextureImage(tmpDL++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1,
@@ -165,7 +165,7 @@ void render_power_meter_health_segment(s16 numHealthWedges) {
     gSP1Triangle(tmpDL++, 0, 1, 2, 0);
     gSP1Triangle(tmpDL++, 0, 2, 3, 0);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
@@ -304,7 +304,7 @@ void render_hud_power_meter(void) {
 void render_breath_meter_segment(s16 numBreathWedges) {
     Texture *(*breathLUT)[];
     breathLUT = segmented_to_virtual(&breath_meter_segments_lut);
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
     gDPSetTextureImage(tmpDL++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, (*breathLUT)[numBreathWedges - 1]);
@@ -313,7 +313,7 @@ void render_breath_meter_segment(s16 numBreathWedges) {
     gSP1Triangle(tmpDL++, 0, 1, 2, 0);
     gSP1Triangle(tmpDL++, 0, 2, 3, 0);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**

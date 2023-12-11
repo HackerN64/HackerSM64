@@ -140,7 +140,7 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
 
 
     if (verts != NULL) {
-        Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+        Gfx *tmpDL = gDisplayListHead;
 
         make_tex_transition_vertices(verts, centerTransX, centerTransY, texTransRadius, transTexType);
         gSPDisplayList(tmpDL++, dl_proj_mtx_fullscreen);
@@ -180,7 +180,7 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gSPDisplayList(tmpDL++, dl_screen_transition_end);
         sTransitionTextureAngle += transData->angleSpeed;
 
-        RELEASE_DISPLAYLIST(tmpDL);
+        gDisplayListHead = tmpDL;
     }
     return set_and_reset_transition_fade_timer(transTime);
 }
@@ -201,7 +201,7 @@ s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 a
     Vtx *verts = vertex_transition_color();
 
     if (verts != NULL) {
-        Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+        Gfx *tmpDL = gDisplayListHead;
 
         u8 r = transData->red;
         u8 g = transData->green;
@@ -215,7 +215,7 @@ s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 a
         gSPDisplayList(tmpDL++, dl_draw_quad_verts_0123);
         gSPDisplayList(tmpDL++, dl_screen_transition_end);
 
-        RELEASE_DISPLAYLIST(tmpDL);
+        gDisplayListHead = tmpDL;
     }
     return set_and_reset_transition_fade_timer(transTime);
 }

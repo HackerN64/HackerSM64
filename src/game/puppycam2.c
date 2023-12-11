@@ -288,7 +288,7 @@ static void puppycam_process_cutscene(void) {
 #define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
 
 static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPSetCombineMode(tmpDL++, BLANK, BLANK);
     gDPSetCycleType(  tmpDL++, G_CYC_1CYCLE);
@@ -304,7 +304,7 @@ static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 
     gDPSetCycleType(  tmpDL++, G_CYC_1CYCLE);
     gSPDisplayList(   tmpDL++,dl_hud_img_end);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 //I actually took the time to redo this, properly. Lmao. Please don't bully me over this anymore :(

@@ -156,7 +156,7 @@ void my_rsp_init(void) {
  * Initialize the z buffer for the current frame.
  */
 void init_z_buffer(s32 resetZB) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
 
@@ -172,14 +172,14 @@ void init_z_buffer(s32 resetZB) {
     gDPFillRectangle(tmpDL++, 0, gBorderHeight, SCREEN_WIDTH - 1,
                      SCREEN_HEIGHT - 1 - gBorderHeight);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
  * Tells the RDP which of the three framebuffers it shall draw to.
  */
 void select_framebuffer(void) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
 
@@ -189,7 +189,7 @@ void select_framebuffer(void) {
     gDPSetScissor(tmpDL++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
                   SCREEN_HEIGHT - gBorderHeight);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
@@ -197,7 +197,7 @@ void select_framebuffer(void) {
  * Information about the color argument: https://jrra.zone/n64/doc/n64man/gdp/gDPSetFillColor.htm
  */
 void clear_framebuffer(s32 color) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
 
@@ -213,7 +213,7 @@ void clear_framebuffer(s32 color) {
 
     gDPSetCycleType(tmpDL++, G_CYC_1CYCLE);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
@@ -230,7 +230,7 @@ void clear_viewport(Vp *viewport, s32 color) {
     vpLrx = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(SCREEN_WIDTH - vpLrx);
 #endif
 
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
 
@@ -244,14 +244,14 @@ void clear_viewport(Vp *viewport, s32 color) {
 
     gDPSetCycleType(tmpDL++, G_CYC_1CYCLE);
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**
  * Draw the horizontal screen borders.
  */
 void draw_screen_borders(void) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     gDPPipeSync(tmpDL++);
 
@@ -269,7 +269,7 @@ void draw_screen_borders(void) {
                         GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - 1);
     }
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 /**

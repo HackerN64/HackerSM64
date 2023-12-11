@@ -277,7 +277,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
     s32 count = VERTCOUNT;
     s32 ntx = 0;
 
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tmpDL = gDisplayListHead;
 
     while (vts > 0) {
         if (count == VERTCOUNT) {
@@ -307,7 +307,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
         }
     }
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    gDisplayListHead = tmpDL;
 }
 
 s32 iterate_surface_count(s32 x, s32 z) {
