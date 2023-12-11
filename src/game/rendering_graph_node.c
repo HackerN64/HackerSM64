@@ -305,7 +305,7 @@ extern const Gfx init_rsp[];
 
 #ifdef OBJECTS_REJ
 void switch_ucode(s32 ucode) {
-    Gfx *tempGfxHead = ACQUIRE_DISPLAYLIST();
+    Gfx *tempGfxHead = gDisplayListHead;
 
     // Set the ucode and RCP settings
     switch (ucode) {
@@ -328,8 +328,6 @@ void switch_ucode(s32 ucode) {
             gSPClipRatio(tempGfxHead++, FRUSTRATIO_2);
             break;
     }
-
-    RELEASE_DISPLAYLIST(tempGfxHead);
 }
 #endif
 

@@ -522,7 +522,7 @@ void puppyprint_render_minimal(void) {
 }
 
 void render_coverage_map(void) {
-    Gfx *tempGfxHead = ACQUIRE_DISPLAYLIST();
+    Gfx *tempGfxHead = gDisplayListHead;
 
     gDPSetCycleType(tempGfxHead++, G_CYC_1CYCLE);
     gDPSetBlendColor(tempGfxHead++, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -530,8 +530,6 @@ void render_coverage_map(void) {
     gDPSetDepthSource(tempGfxHead++, G_ZS_PRIM);
     gDPSetRenderMode(tempGfxHead++, G_RM_VISCVG, G_RM_VISCVG2);
     gDPFillRectangle(tempGfxHead++, 0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
-
-    RELEASE_DISPLAYLIST(tempGfxHead);
 }
 
 void puppycamera_debug_view(void) {
