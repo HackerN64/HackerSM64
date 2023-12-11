@@ -305,31 +305,31 @@ extern const Gfx init_rsp[];
 
 #ifdef OBJECTS_REJ
 void switch_ucode(s32 ucode) {
-    Gfx *tmpDL = ACQUIRE_DISPLAYLIST();
+    Gfx *tempGfxHead = ACQUIRE_DISPLAYLIST();
 
     // Set the ucode and RCP settings
     switch (ucode) {
         default: // GRAPH_NODE_UCODE_DEFAULT
         case GRAPH_NODE_UCODE_DEFAULT:
-            gSPLoadUcodeL(tmpDL++, gspF3DZEX2_NoN_PosLight_fifo); // F3DZEX2_PosLight
+            gSPLoadUcodeL(tempGfxHead++, gspF3DZEX2_NoN_PosLight_fifo); // F3DZEX2_PosLight
             // Reload the necessary RSP settings
-            gSPDisplayList(tmpDL++, init_rsp);
+            gSPDisplayList(tempGfxHead++, init_rsp);
             break;
         case GRAPH_NODE_UCODE_REJ:
             // Use .rej Microcode, skip sub-pixel processing on console
             if (gEmulator & EMU_CONSOLE) {
-                gSPLoadUcodeL(tmpDL++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
+                gSPLoadUcodeL(tempGfxHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
             } else {
-                gSPLoadUcodeL(tmpDL++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
+                gSPLoadUcodeL(tempGfxHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
             }
             // Reload the necessary RSP settings
-            gSPDisplayList(tmpDL++, init_rsp);
+            gSPDisplayList(tempGfxHead++, init_rsp);
             // Set the clip ratio (see init_rsp)
-            gSPClipRatio(tmpDL++, FRUSTRATIO_2);
+            gSPClipRatio(tempGfxHead++, FRUSTRATIO_2);
             break;
     }
 
-    RELEASE_DISPLAYLIST(tmpDL);
+    RELEASE_DISPLAYLIST(tempGfxHead);
 }
 #endif
 

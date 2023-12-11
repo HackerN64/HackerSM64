@@ -277,18 +277,18 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
     s32 count = VERTCOUNT;
     s32 ntx = 0;
 
-    Gfx *tmpDL = gDisplayListHead;
+    Gfx *tempGfxHead = gDisplayListHead;
 
     while (vts > 0) {
         if (count == VERTCOUNT) {
             ntx = MIN(VERTCOUNT, vts);
-            gSPVertex(tmpDL++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
+            gSPVertex(tempGfxHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
             count = 0;
             vtl   = VERTCOUNT;
         }
 
         if (vtl >= 6) {
-            gSP2Triangles(tmpDL++, (count + 0),
+            gSP2Triangles(tempGfxHead++, (count + 0),
                                               (count + 1),
                                               (count + 2), 0x0,
                                               (count + 3),
@@ -298,7 +298,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
             vtl   -= 6;
             count += 6;
         } else if (vtl >= 3) {
-            gSP1Triangle(tmpDL++, (count + 0),
+            gSP1Triangle(tempGfxHead++, (count + 0),
                                              (count + 1),
                                              (count + 2), 0x0);
             vts   -= 3;
@@ -307,7 +307,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
         }
     }
 
-    gDisplayListHead = tmpDL;
+    gDisplayListHead = tempGfxHead;
 }
 
 s32 iterate_surface_count(s32 x, s32 z) {
