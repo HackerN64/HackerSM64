@@ -530,6 +530,8 @@ void render_coverage_map(void) {
     gDPSetDepthSource(tempGfxHead++, G_ZS_PRIM);
     gDPSetRenderMode(tempGfxHead++, G_RM_VISCVG, G_RM_VISCVG2);
     gDPFillRectangle(tempGfxHead++, 0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
+
+    gDisplayListHead = tempGfxHead;
 }
 
 void puppycamera_debug_view(void) {

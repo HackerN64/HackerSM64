@@ -328,6 +328,8 @@ void switch_ucode(s32 ucode) {
             gSPClipRatio(tempGfxHead++, FRUSTRATIO_2);
             break;
     }
+
+    gDisplayListHead = tempGfxHead;
 }
 #endif
 
