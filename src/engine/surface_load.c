@@ -187,13 +187,6 @@ static s32 lower_cell_index(s32 coord) {
     // [0, NUM_CELLS)
     s32 index = coord / CELL_SIZE;
 
-    // Include extra cell if close to boundary
-    //! Some wall checks are larger than the buffer, meaning wall checks can
-    //  miss walls that are near a cell border.
-    if (coord % CELL_SIZE < 50) {
-        index--;
-    }
-
     // Potentially > NUM_CELLS - 1, but since the upper index is <= NUM_CELLS - 1, not exploitable
     return MAX(0, index);
 }
@@ -212,13 +205,6 @@ static s32 upper_cell_index(s32 coord) {
 
     // [0, NUM_CELLS)
     s32 index = coord / CELL_SIZE;
-
-    // Include extra cell if close to boundary
-    //! Some wall checks are larger than the buffer, meaning wall checks can
-    //  miss walls that are near a cell border.
-    if (coord % CELL_SIZE > CELL_SIZE - 50) {
-        index++;
-    }
 
     // Potentially < 0, but since lower index is >= 0, not exploitable
     return MIN((NUM_CELLS - 1), index);
