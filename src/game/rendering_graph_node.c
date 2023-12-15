@@ -199,7 +199,6 @@ struct RenderPhase {
 
 static struct RenderPhase sRenderPhases[] = {
 #if SILHOUETTE
-    // Silhouette, no .rej
     [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = {
         .startLayer = LAYER_FIRST,
         .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
@@ -225,7 +224,6 @@ static struct RenderPhase sRenderPhases[] = {
         .endLayer   = LAYER_LAST,
     },
 #else
-    // No silhouette, no .rej
     [RENDER_PHASE_ZEX_ALL]                 = {
         .startLayer = LAYER_FIRST,
         .endLayer   = LAYER_LAST,

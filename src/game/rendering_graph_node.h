@@ -45,7 +45,6 @@ struct RenderModeContainer {
 };
 
 #if SILHOUETTE
-    // Silhouette, no .rej
     enum RenderPhases {
         RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
         RENDER_PHASE_ZEX_SILHOUETTE,
@@ -57,7 +56,6 @@ struct RenderModeContainer {
     #define RENDER_PHASE_SILHOUETTE RENDER_PHASE_ZEX_SILHOUETTE
     #define RENDER_PHASE_NON_SILHOUETTE RENDER_PHASE_ZEX_NON_SILHOUETTE
 #else
-    // No silhouette, no .rej
     enum RenderPhases {
         RENDER_PHASE_ZEX_ALL,
         RENDER_PHASE_END,
