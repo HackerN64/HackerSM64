@@ -49,26 +49,6 @@
     #undef BETTER_REVERB
 #endif
 
-
-/*****************
- * config_graphics.h
- */
-
-#ifndef F3DEX_GBI_2
-    #undef OBJECTS_REJ // OBJECTS_REJ requires f3dex2.
-#endif // !F3DEX_GBI_2
-
-#ifndef F3DEX_GBI_SHARED
-    #undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
-#endif // !F3DEX_GBI_SHARED
-
-#ifdef OBJECTS_REJ
-    // Enable required ucodes.
-    #define F3DEX2_REJ_GBI
-    #define F3DLX2_REJ_GBI
-#endif // OBJECTS_REJ
-
-
 /*****************
  * config_debug.h
  */
