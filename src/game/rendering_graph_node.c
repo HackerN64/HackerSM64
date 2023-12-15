@@ -266,7 +266,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     s32 finalPhase    = enableZBuffer ? RENDER_PHASE_END : 1;
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
-    Gfx *gfx = gDisplayListHead;
+    Gfx *tempGfxHead = gDisplayListHead;
 
     // Loop through the render phases
     for (phaseIndex = RENDER_PHASE_FIRST; phaseIndex < finalPhase; phaseIndex++) {
@@ -276,8 +276,8 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             startLayer  = renderPhase->startLayer;
             endLayer    = renderPhase->endLayer;
             // Enable z buffer.
-            gDPPipeSync(gfx++);
-            gSPSetGeometryMode(gfx++, G_ZBUFFER);
+            gDPPipeSync(tempGfxHead++);
+            gSPSetGeometryMode(tempGfxHead++, G_ZBUFFER);
         } else {
             startLayer = LAYER_FORCE;
             endLayer = LAYER_TRANSPARENT;
@@ -288,38 +288,38 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             currList = node->listHeads[currLayer];
 #if defined(DISABLE_AA) || !SILHOUETTE
             // Set the render mode for the current layer.
-            gDPSetRenderMode(gfx++, mode1List->modes[currLayer],
+            gDPSetRenderMode(tempGfxHead++, mode1List->modes[currLayer],
                                                  mode2List->modes[currLayer]);
 #else
             if (phaseIndex == RENDER_PHASE_NON_SILHOUETTE) {
                 // To properly cover the silhouette, disable AA.
                 // The silhouette model does not have AA due to the hack used to prevent triangle overlap.
-                gDPSetRenderMode(gfx++, (mode1List->modes[currLayer] & ~IM_RD),
+                gDPSetRenderMode(tempGfxHead++, (mode1List->modes[currLayer] & ~IM_RD),
                                                      (mode2List->modes[currLayer] & ~IM_RD));
             } else {
                 // Set the render mode for the current dl.
-                gDPSetRenderMode(gfx++, mode1List->modes[currLayer],
+                gDPSetRenderMode(tempGfxHead++, mode1List->modes[currLayer],
                                                      mode2List->modes[currLayer]);
             }
 #endif
             // Iterate through all the displaylists on the current layer.
             while (currList != NULL) {
                 // Add the display list's transformation to the master list.
-                gSPMatrix(gfx++, VIRTUAL_TO_PHYSICAL(currList->transform),
+                gSPMatrix(tempGfxHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 #if SILHOUETTE
                 if (phaseIndex == RENDER_PHASE_SILHOUETTE) {
                     // Add the current display list to the master list, with silhouette F3D.
-                    gSPDisplayList(gfx++, dl_silhouette_begin);
-                    gSPDisplayList(gfx++, currList->displayList);
-                    gSPDisplayList(gfx++, dl_silhouette_end);
+                    gSPDisplayList(tempGfxHead++, dl_silhouette_begin);
+                    gSPDisplayList(tempGfxHead++, currList->displayList);
+                    gSPDisplayList(tempGfxHead++, dl_silhouette_end);
                 } else {
                     // Add the current display list to the master list.
-                    gSPDisplayList(gfx++, currList->displayList);
+                    gSPDisplayList(tempGfxHead++, currList->displayList);
                 }
 #else
                 // Add the current display list to the master list.
-                gSPDisplayList(gfx++, currList->displayList);
+                gSPDisplayList(tempGfxHead++, currList->displayList);
 #endif
                 // Move to the next DisplayListNode.
                 currList = currList->next;
@@ -329,16 +329,17 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 
     if (enableZBuffer) {
         // Disable z buffer.
-        gDPPipeSync(gfx++);
-        gSPClearGeometryMode(gfx++, G_ZBUFFER);
+        gDPPipeSync(tempGfxHead++);
+        gSPClearGeometryMode(tempGfxHead++, G_ZBUFFER);
 #ifdef VISUAL_DEBUG
         // Load the world scale identity matrix
-        gSPMatrix(gfx++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-        if (surfaceView) visual_surface_loop(&gfx);
-        render_debug_boxes(&gfx);
+        gSPMatrix(tempGfxHead++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        if (surfaceView) visual_surface_loop(&tempGfxHead);
+        render_debug_boxes(&tempGfxHead);
 #endif
     }
-    gDisplayListHead = gfx;
+
+    gDisplayListHead = tempGfxHead;
 }
 
 /**
