@@ -127,12 +127,15 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 
 // Integer limits and clamping
 
-#define S8_MAX 127
-#define S8_MIN -128
-#define U8_MAX 255
-#define S16_MAX 32767
+#define S8_MAX   127
+#define S8_MIN  -128
+#define U8_MAX   255
+#define S16_MAX  32767
 #define S16_MIN -32768
-#define U16_MAX 65535
+#define U16_MAX  65535
+#define S32_MAX  2147483647
+#define S32_MIN -2147483648
+#define U32_MAX  4294967295
 
 // Clamp a value inbetween a range
 #define CLAMP(x, low, high)  MIN(MAX((x), (low)), (high))
