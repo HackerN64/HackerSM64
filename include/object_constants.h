@@ -49,8 +49,6 @@ enum ObjFlags {
     OBJ_FLAG_PERSISTENT_RESPAWN                = (1 << 14), // 0x00004000
     OBJ_FLAG_VELOCITY_PLATFORM                 = (1 << 15), // 0x00008000
     OBJ_FLAG_DONT_CALC_COLL_DIST               = (1 << 16), // 0x00010000
-    OBJ_FLAG_UCODE_SMALL                       = (1 << 17), // 0x00020000
-    OBJ_FLAG_UCODE_LARGE                       = (1 << 18), // 0x00040000
     OBJ_FLAG_SILHOUETTE                        = (1 << 19), // 0x00080000
     OBJ_FLAG_OCCLUDE_SILHOUETTE                = (1 << 20), // 0x00100000
     OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = (1 << 21), // 0x00200000

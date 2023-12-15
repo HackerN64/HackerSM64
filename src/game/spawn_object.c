@@ -188,9 +188,6 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->oRoom = -1;
 
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-#ifdef OBJECTS_REJ
-    obj->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-#endif
     vec3_same(obj->header.gfx.pos, -10000.0f);
     obj->header.gfx.throwMatrix = NULL;
 #ifdef PUPPYLIGHTS
