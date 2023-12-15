@@ -50,11 +50,6 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 #define OBJ_OPACITY_LENGTH 512.0f
 void obj_set_opacity_from_cam_dist(struct Object *obj) {
     s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - OBJ_OPACITY_NEAR) * (256.0f / OBJ_OPACITY_LENGTH));
-#ifdef OBJECTS_REJ
-    if (opacityDist > 0) {
-        obj->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-    }
-#endif
     obj->oOpacity = CLAMP(opacityDist, 0x00, 0xFF);
 }
 #undef OBJ_OPACITY_NEAR
@@ -908,14 +903,6 @@ void cur_obj_update(void) {
 #if SILHOUETTE
     COND_BIT((objFlags & OBJ_FLAG_SILHOUETTE        ), o->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
     COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
-#endif
-
-#ifdef OBJECTS_REJ
-    if ((objFlags & OBJ_FLAG_SILHOUETTE) || (objFlags & OBJ_FLAG_UCODE_SMALL)) {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-    } else {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
-    }
 #endif
 
 #ifdef OBJ_OPACITY_BY_CAM_DIST
