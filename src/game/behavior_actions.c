@@ -43,7 +43,7 @@
 #include "sm64.h"
 #include "spawn_object.h"
 #include "spawn_sound.h"
-#include "rumble_init.h"
+#include "rumble.h"
 #include "puppylights.h"
 
 #include "behaviors/star_door.inc.c"

@@ -31,7 +31,7 @@
 #include "print.h"
 #include "save_file.h"
 #include "sound_init.h"
-#include "rumble_init.h"
+#include "rumble.h"
 
 
 /**************************************************
@@ -1468,18 +1468,18 @@ void update_mario_health(struct MarioState *m) {
         // Play a noise to alert the player when Mario is close to drowning.
         if (((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) && (m->health < 0x300)) {
             play_sound(SOUND_MOVING_ALMOST_DROWNING, gGlobalSoundSource);
-#if ENABLE_RUMBLE
+ #ifdef ENABLE_RUMBLE
             if (gRumblePakTimer == 0) {
                 gRumblePakTimer = 36;
-                if (is_rumble_finished_and_queue_empty()) {
-                    queue_rumble_data(3, 30);
+                if (is_rumble_finished_and_queue_empty(m->controller)) {
+                    queue_rumble_data(m->controller, 3, 30, 0);
                 }
             }
         } else {
             gRumblePakTimer = 0;
-#endif
+ #endif // ENABLE_RUMBLE
         }
-#endif
+#endif // !BREATH_METER
     }
 }
 
@@ -1491,16 +1491,16 @@ void update_mario_breath(struct MarioState *m) {
             if (m->breath < 0x300) {
                 // Play a noise to alert the player when Mario is close to drowning.
                 play_sound(SOUND_MOVING_ALMOST_DROWNING, gGlobalSoundSource);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                 if (gRumblePakTimer == 0) {
                     gRumblePakTimer = 36;
-                    if (is_rumble_finished_and_queue_empty()) {
-                        queue_rumble_data(3, 30);
+                    if (is_rumble_finished_and_queue_empty(m->controller)) {
+                        queue_rumble_data(m->controller, 3, 30, 0);
                     }
                 }
             } else {
                 gRumblePakTimer = 0;
-#endif
+#endif // ENABLE_RUMBLE
             }
         } else if (!(m->input & INPUT_IN_POISON_GAS)) {
             m->breath += 0x1A;
@@ -1517,7 +1517,7 @@ void update_mario_breath(struct MarioState *m) {
         }
     }
 }
-#endif
+#endif // BREATH_METER
 
 /**
  * Updates some basic info for camera usage.
@@ -1684,17 +1684,17 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
     }
 }
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
 void queue_rumble_particles(struct MarioState *m) {
     if (m->particleFlags & PARTICLE_HORIZONTAL_STAR) {
-        queue_rumble_data(5, 80);
+        queue_rumble_data(m->controller, 5, 80, 0);
     } else if (m->particleFlags & PARTICLE_VERTICAL_STAR) {
-        queue_rumble_data(5, 80);
+        queue_rumble_data(m->controller, 5, 80, 0);
     } else if (m->particleFlags & PARTICLE_TRIANGLE) {
-        queue_rumble_data(5, 80);
+        queue_rumble_data(m->controller, 5, 80, 0);
     }
     if (m->heldObj && m->heldObj->behavior == segmented_to_virtual(bhvBobomb)) {
-        reset_rumble_timers_slip();
+        reset_rumble_timers_slip(m->controller);
     }
 }
 #endif
@@ -1785,7 +1785,7 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
 
         play_infinite_stairs_music();
         gMarioState->marioObj->oInteractStatus = INT_STATUS_NONE;
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
         queue_rumble_particles(gMarioState);
 #endif
 

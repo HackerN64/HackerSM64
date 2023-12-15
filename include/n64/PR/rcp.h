@@ -134,24 +134,29 @@ The Indy development board use cartridge domain 1:
  *	1FC00000	+-------+-----------------+-----+
  *
  */
+#define PIF_ROM_SIZE		0x07C0
 #define PIF_ROM_START		0x1FC00000
-#define PIF_ROM_END		0x1FC007BF
-#define PIF_RAM_START		0x1FC007C0
-#define PIF_RAM_END		0x1FC007FF
+#define PIF_ROM_END		(PIF_ROM_START + PIF_ROM_SIZE - 1) /* 0x1FC007BF */
+
+#define PIF_RAM_SIZE		0x0040
+#define PIF_RAM_START		(PIF_ROM_END   + 1               ) /* 0x1FC007C0 */
+#define PIF_RAM_END		(PIF_RAM_START + PIF_RAM_SIZE - 1) /* 0x1FC007FF */
 
 
 /*************************************************************************
- * Controller channel 
+ * Controller channel
  * Each game controller channel has 4 error bits that are defined in bit 6-7 of
  * the Rx and Tx data size area bytes. Programmers need to clear these bits
  * when setting the Tx/Rx size area values for a channel
  */
-#define CHNL_ERR_NORESP		0x80	/* Bit 7 (Rx): No response error */
-#define CHNL_ERR_OVERRUN	0x40	/* Bit 6 (Rx): Overrun error */
-#define CHNL_ERR_FRAME		0x80	/* Bit 7 (Tx): Frame error */
-#define CHNL_ERR_COLLISION	0x40	/* Bit 6 (Tx): Collision error */
+#define CHNL_ERR_SUCCESS	0x00
 
-#define CHNL_ERR_MASK		0xC0	/* Bit 6-7: channel errors */
+#define CHNL_ERR_NORESP		(0b1 << 7)	/* 0x80: Bit 7 (Rx): No response error */
+#define CHNL_ERR_OVERRUN	(0b1 << 6)	/* 0x40: Bit 6 (Rx): Overrun error     */
+#define CHNL_ERR_FRAME		(0b1 << 7)	/* 0x80: Bit 7 (Tx): Frame error       */
+#define CHNL_ERR_COLLISION	(0b1 << 6)	/* 0x40: Bit 6 (Tx): Collision error   */
+
+#define CHNL_ERR_MASK		(0b11 << 6)	/* 0xC0: Bit 6-7: channel errors       */
 
 
 /*************************************************************************

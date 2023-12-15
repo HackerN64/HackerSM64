@@ -10,7 +10,7 @@
 #include "game/print.h"
 #include "game/save_file.h"
 #include "game/sound_init.h"
-#include "game/rumble_init.h"
+#include "game/rumble.h"
 #include "level_table.h"
 #include "seq_ids.h"
 #include "sm64.h"
@@ -193,10 +193,8 @@ s32 intro_regular(void) {
 #endif
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#if ENABLE_RUMBLE
-        queue_rumble_data(60, 70);
-        queue_rumble_decay(1);
-#endif
+        queue_rumble_data(gPlayer1Controller, 60, 70, 1);
+
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
@@ -225,11 +223,9 @@ s32 intro_game_over(void) {
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#if ENABLE_RUMBLE
-        queue_rumble_data(60, 70);
-        queue_rumble_decay(1);
-#endif
-        // same criteria as intro_regular
+        queue_rumble_data(gPlayer1Controller, 60, 70, 1);
+
+        // Same criteria as intro_regular
         level = LEVEL_FILE_SELECT + gDebugLevelSelect;
         sPlayMarioGameOver = TRUE;
     }

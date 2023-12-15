@@ -263,9 +263,6 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     return dl;
 }
 
-#if defined(VERSION_SH)
-extern Gfx title_screen_bg_dl_rumble_pak[];
-#endif
 #ifdef GODDARD_EASTER_EGG
 extern Gfx title_screen_bg_dl_face_easter_egg_begin[];
 extern Gfx title_screen_bg_dl_face_easter_egg_end[];
@@ -405,7 +402,9 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 }
 #endif
 
-#if defined(VERSION_SH)
+#ifdef ENABLE_RUMBLE
+extern Gfx title_screen_bg_dl_rumble_pak[];
+
 Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;
@@ -433,7 +432,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
             dl = NULL;
         }
     }
+
     return dl;
 }
-
 #endif
