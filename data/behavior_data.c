@@ -66,6 +66,7 @@
 #define BC_HH(a, b) (_SHIFTL(a, 16, 16) | _SHIFTL(b, 0, 16))
 #define BC_W(a) ((uintptr_t)(u32)(a))
 #define BC_PTR(a) ((uintptr_t)(a))
+#define BC_BPTR(a, b) (_SHIFTL(a, 24, 8) + OS_K0_TO_PHYSICAL(b))
 
 enum BehaviorCommands {
     /*0x00*/ BHV_CMD_BEGIN,
@@ -180,8 +181,7 @@ enum BehaviorCommands {
 
 // Executes a native game function.
 #define CALL_NATIVE(func) \
-    BC_B(BHV_CMD_CALL_NATIVE), \
-    BC_PTR(func)
+    BC_BPTR(BHV_CMD_CALL_NATIVE, func)
 
 // Adds a float to the specified field.
 #define ADD_FLOAT(field, value) \
@@ -386,8 +386,7 @@ enum BehaviorCommands {
 
 // Spawns a water droplet with the given parameters.
 #define SPAWN_WATER_DROPLET(dropletParams) \
-    BC_B(BHV_CMD_SPAWN_WATER_DROPLET), \
-    BC_PTR(dropletParams)
+    BC_BPTR(BHV_CMD_SPAWN_WATER_DROPLET, dropletParams)
 
 
 const BehaviorScript bhvStarDoor[] = {
@@ -5873,7 +5872,7 @@ const BehaviorScript bhvRacingPenguin[] = {
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, penguin_seg5_anims_05008B74),
     ANIMATE(PENGUIN_ANIM_IDLE),
-    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 300, /*Gravity*/ -800, /*Bounciness*/ -5, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 0, /*Unused*/ 0, 0),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 200, /*Gravity*/ -800, /*Bounciness*/ -5, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 0, /*Unused*/ 0, 0),
     SCALE(/*Unused*/ 0, /*Field*/ 400),
     CALL_NATIVE(bhv_racing_penguin_init),
     BEGIN_LOOP(),

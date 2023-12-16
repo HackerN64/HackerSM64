@@ -1353,9 +1353,6 @@ void tilt_body_butt_slide(struct MarioState *m) {
 }
 
 void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32 animation) {
-    Vec3f pos;
-
-    vec3f_copy(pos, m->pos);
     play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
 
 #if ENABLE_RUMBLE

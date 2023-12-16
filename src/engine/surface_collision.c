@@ -63,11 +63,6 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     TerrainData type = SURFACE_DEFAULT;
     s32 numCols = 0;
 
-    // Max collision radius = 200
-    if (radius > 200) {
-        radius = 200;
-    }
-
     f32 margin_radius = radius - 1.0f;
 
     // Stay in this loop until out of walls.
@@ -216,18 +211,24 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     }
 
     // World (level) consists of a 16x16 grid. Find where the collision is on the grid (round toward -inf)
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 minCellX = GET_CELL_COORD(x - colData->radius);
+    s32 minCellZ = GET_CELL_COORD(z - colData->radius);
+    s32 maxCellX = GET_CELL_COORD(x + colData->radius);
+    s32 maxCellZ = GET_CELL_COORD(z + colData->radius);
 
-    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
-        // Check for surfaces belonging to objects.
-        node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
-        numCollisions += find_wall_collisions_from_list(node, colData);
+    for (s32 cellX = minCellX; cellX <= maxCellX; cellX++) {
+        for (s32 cellZ = minCellZ; cellZ <= maxCellZ; cellZ++) {
+            if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
+                // Check for surfaces belonging to objects.
+                node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+                numCollisions += find_wall_collisions_from_list(node, colData);
+            }
+
+            // Check for surfaces that are a part of level geometry.
+            node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+            numCollisions += find_wall_collisions_from_list(node, colData);
+        }
     }
-
-    // Check for surfaces that are a part of level geometry.
-    node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
-    numCollisions += find_wall_collisions_from_list(node, colData);
 
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 #ifdef VANILLA_DEBUG

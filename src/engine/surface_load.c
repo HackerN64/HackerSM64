@@ -187,13 +187,6 @@ static s32 lower_cell_index(s32 coord) {
     // [0, NUM_CELLS)
     s32 index = coord / CELL_SIZE;
 
-    // Include extra cell if close to boundary
-    //! Some wall checks are larger than the buffer, meaning wall checks can
-    //  miss walls that are near a cell border.
-    if (coord % CELL_SIZE < 50) {
-        index--;
-    }
-
     // Potentially > NUM_CELLS - 1, but since the upper index is <= NUM_CELLS - 1, not exploitable
     return MAX(0, index);
 }
@@ -212,13 +205,6 @@ static s32 upper_cell_index(s32 coord) {
 
     // [0, NUM_CELLS)
     s32 index = coord / CELL_SIZE;
-
-    // Include extra cell if close to boundary
-    //! Some wall checks are larger than the buffer, meaning wall checks can
-    //  miss walls that are near a cell border.
-    if (coord % CELL_SIZE > CELL_SIZE - 50) {
-        index++;
-    }
 
     // Potentially < 0, but since lower index is >= 0, not exploitable
     return MIN((NUM_CELLS - 1), index);
@@ -262,7 +248,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     Vec3t offset;
     s16 min, max;
 
-    vec3_prod_val(offset, (*vertexIndices), 3);
+    vec3_scale_dest(offset, (*vertexIndices), 3);
 
     vec3s_copy(v[0], (vertexData + offset[0]));
     vec3s_copy(v[1], (vertexData + offset[1]));
@@ -279,7 +265,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     }
 #endif
     mag = 1.0f / sqrtf(mag);
-    vec3_mul_val(n, mag);
+    vec3_scale(n, mag);
 
     struct Surface *surface = alloc_surface(dynamic);
 
@@ -700,8 +686,9 @@ void load_object_collision_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
 
-    f32 sqrLateralDist;
-    vec3f_get_lateral_dist_squared(&o->oPosVec, &gMarioObject->oPosVec, &sqrLateralDist);
+    Vec3f dist;
+    vec3_diff(dist, &o->oPosVec, &gMarioObject->oPosVec);
+    f32 sqrLateralDist = sqr(dist[0]) + sqr(dist[2]);
 
     f32 verticalMarioDiff = gMarioObject->oPosY - o->oPosY;
 
