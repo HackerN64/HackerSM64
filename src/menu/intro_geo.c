@@ -334,7 +334,7 @@ RGBA16Return32 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s
     ColorRGBf color;
     s32 iy, ix, sy, sx;
     s32 idy, idx, sdy;
-    RGBA16 *fb = gFramebuffers[sRenderingFramebuffer];
+    RGBA16 *fb = getFramebuffer(sRenderingFramebuffer);
     RGBA16 *image = alloc_display_list((imageW * imageH) * sizeof(RGBA16));
 
     if (image == NULL) {

@@ -215,10 +215,10 @@ static void main_pool_sort_up(int from) {
 #undef COMPARE_BREAK
 #endif
 
-extern u8 _framebuffersSegmentBssStart[];
-// extern u8 _framebuffersSegmentBssEnd[];
-// extern u8 _zbufferSegmentBssStart[];
+extern u8 _zbufferSegmentBssStart[];
 extern u8 _zbufferSegmentBssEnd[];
+extern u8 _framebuffer1SegmentBssStart[];
+extern u8 _framebuffer2SegmentBssEnd[];
 extern u8 _goddardSegmentStart[];
 
 /**
@@ -227,18 +227,16 @@ extern u8 _goddardSegmentStart[];
  * freeing the object that was most recently allocated from a side.
  */
 void main_pool_init() {
+    sMainPool.regions[0].start = (u8 *) ALIGN4((uintptr_t)_engineSegmentBssEnd);
+    sMainPool.regions[0].size = (u8 *) DOWN4((uintptr_t)_zbufferSegmentBssStart) - sMainPool.regions[0].start;
 #ifdef USE_EXT_RAM
-    sMainPool.regions[0].start = (u8 *) 0x80600000;
-    sMainPool.regions[0].size = (u8 *) DOWN4(_goddardSegmentStart) - sMainPool.regions[0].start;
-    sMainPool.regions[1].start = (u8 *) ALIGN4((uintptr_t)_engineSegmentBssEnd);
-    sMainPool.regions[1].size = (u8 *) DOWN4((uintptr_t)_framebuffersSegmentBssStart) - sMainPool.regions[1].start;
-    sMainPool.regions[2].start = (u8 *) ALIGN4((uintptr_t)_zbufferSegmentBssEnd);
-    sMainPool.regions[2].size = (u8*) 0x80600000 - sMainPool.regions[2].start;
+    sMainPool.regions[1].start = (u8 *) ALIGN4((uintptr_t)_zbufferSegmentBssEnd);
+    sMainPool.regions[1].size = (u8 *) DOWN4(_framebuffer1SegmentBssStart) - sMainPool.regions[1].start;
+    sMainPool.regions[2].start = (u8 *) ALIGN4((uintptr_t)_framebuffer2SegmentBssEnd);
+    sMainPool.regions[2].size = (u8 *) DOWN4(_goddardSegmentStart) - sMainPool.regions[2].start;
 #else
-    sMainPool.regions[0].start = (u8 *) ALIGN4((uintptr_t)_zbufferSegmentBssEnd);
-    sMainPool.regions[0].size = (u8*) DOWN4(_goddardSegmentStart) - sMainPool.regions[0].start;
-    sMainPool.regions[1].start = (u8 *) ALIGN4((uintptr_t)_engineSegmentBssEnd);
-    sMainPool.regions[1].size = (u8 *) DOWN4((uintptr_t)_framebuffersSegmentBssStart) - sMainPool.regions[1].start;
+    sMainPool.regions[1].start = (u8 *) ALIGN4((uintptr_t)_framebuffer2SegmentBssEnd);
+    sMainPool.regions[1].size = (u8*) DOWN4(_goddardSegmentStart) - sMainPool.regions[1].start;
 #endif
 
 #ifdef MAIN_POOL_USE_BEST_FIT
