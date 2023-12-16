@@ -5,19 +5,7 @@
 
 #include "types.h"
 
-enum MemoryPoolSide {
-    MEMORY_POOL_LEFT,
-    MEMORY_POOL_RIGHT
-};
-
 #define NUM_TLB_SEGMENTS 32
-
-struct AllocOnlyPool {
-    s32 totalSpace;
-    s32 usedSpace;
-    u8 *startPtr;
-    u8 *freePtr;
-};
 
 struct MemoryPool;
 
@@ -48,16 +36,19 @@ void *segmented_to_virtual(const void *addr);
 void *virtual_to_segmented(u32 segment, const void *addr);
 void move_segment_table_to_dmem(void);
 
-void main_pool_init(void *start, void *end);
-void *main_pool_alloc(u32 size, u32 side);
-u32 main_pool_free(void *addr);
-void *main_pool_realloc(void *addr, u32 size);
+void main_pool_init(void);
+void *main_pool_alloc(u32 size);
+void *main_pool_alloc_aligned(u32 size, u32 alignment);
+void *main_pool_alloc_freeable(u32 size);
+void *main_pool_alloc_aligned_freeable(u32 size, u32 alignment);
+void main_pool_free(void *addr);
+void main_pool_push_state(void);
+void main_pool_pop_state(void);
+// !!! Do not use this for anything other than debugging !!!
 u32 main_pool_available(void);
-u32 main_pool_push_state(void);
-u32 main_pool_pop_state(void);
 
 #ifndef NO_SEGMENTED_MEMORY
-void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart, u8 *bssEnd);
+void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u8 *bssStart, u8 *bssEnd);
 void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd);
 void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd);
 void load_engine_code_segment(void);
@@ -68,11 +59,7 @@ void load_engine_code_segment(void);
 #define load_engine_code_segment(...)
 #endif
 
-struct AllocOnlyPool *alloc_only_pool_init(u32 size, u32 side);
-void *alloc_only_pool_alloc(struct AllocOnlyPool *pool, s32 size);
-struct AllocOnlyPool *alloc_only_pool_resize(struct AllocOnlyPool *pool, u32 size);
-
-struct MemoryPool *mem_pool_init(u32 size, u32 side);
+struct MemoryPool *mem_pool_init(u32 size);
 void *mem_pool_alloc(struct MemoryPool *pool, u32 size);
 void mem_pool_free(struct MemoryPool *pool, void *addr);
 

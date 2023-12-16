@@ -110,14 +110,12 @@ void setup_mesg_queues(void) {
 }
 
 void alloc_pool(void) {
-    void *start = (void *) SEG_POOL_START;
-    void *end = (void *) (SEG_POOL_START + POOL_SIZE);
-
-    main_pool_init(start, end);
-    gEffectsMemoryPool = mem_pool_init(EFFECTS_MEMORY_POOL, MEMORY_POOL_LEFT);
+    main_pool_init();
+    gEffectsMemoryPool = mem_pool_init(EFFECTS_MEMORY_POOL);
 #ifdef PUPPYLIGHTS
-    gLightsPool = mem_pool_init(PUPPYLIGHTS_POOL, MEMORY_POOL_LEFT);
+    gLightsPool = mem_pool_init(PUPPYLIGHTS_POOL);
 #endif
+
 }
 
 void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri) {

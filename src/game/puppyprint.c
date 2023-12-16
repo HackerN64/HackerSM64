@@ -144,7 +144,7 @@ void puppyprint_calculate_ram_usage(void) {
     ramsizeSegment[RAM_ZBUFFER] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
     ramsizeSegment[RAM_GODDARD] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
     ramsizeSegment[RAM_POOLS] = gPoolMem;
-    ramsizeSegment[RAM_COLLISION] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
+    ramsizeSegment[RAM_COLLISION] = ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
     ramsizeSegment[RAM_MISC] = gMiscMem;
     ramsizeSegment[RAM_AUDIO] = gAudioHeapSize;
 }
