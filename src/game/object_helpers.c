@@ -26,7 +26,6 @@
 #include "rendering_graph_node.h"
 #include "spawn_object.h"
 #include "spawn_sound.h"
-#include "puppylights.h"
 
 static s32 clear_move_flag(u32 *bitSet, s32 flag);
 
@@ -878,9 +877,6 @@ s32 cur_obj_clear_interact_status_flag(s32 flag) {
  * Mark an object to be unloaded at the end of the frame.
  */
 void obj_mark_for_deletion(struct Object *obj) {
-#ifdef PUPPYLIGHTS
-    obj_disable_light(obj);
-#endif
     //! This clears all activeFlags. Since some of these flags disable behavior,
     //  setting it to 0 could potentially enable unexpected behavior. After an
     //  object is marked for deletion, it still updates on that frame (I think),
