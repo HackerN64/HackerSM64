@@ -102,6 +102,14 @@ SECTIONS
    END_SEG(boot)
 
    . = (RAM_START + 0x400);
+#if 0 == MEMORY_FRAGMENTATION_LEVEL
+   BEGIN_NOLOAD(zbuffer)
+   {
+      BUILD_DIR/src/buffers/zbuffer.o(.bss*);
+   }
+   END_NOLOAD(zbuffer)
+#endif
+
    BEGIN_NOLOAD(buffers)
    {
       BUILD_DIR/src/buffers/buffers.o(.bss*);
@@ -269,52 +277,53 @@ SECTIONS
 
    . = _engineSegmentBssEnd;
 
-#ifndef USE_EXT_RAM
-   . = 0x80300000 - 0x25800;
-#else
-   . = 0x80500000 - 0x25800;
-#endif
-   BEGIN_NOLOAD(zbuffer)
-   {
-      BUILD_DIR/src/buffers/zbuffer.o(.bss*);
-   }
-   END_NOLOAD(zbuffer)
-
-#ifndef USE_EXT_RAM
-   . = 0x80300000;
-#else
-   . = 0x80500000;
-#endif
+#if 0 == MEMORY_FRAGMENTATION_LEVEL
    BEGIN_NOLOAD(framebuffer0)
    {
       BUILD_DIR/src/buffers/framebuffer0.o(.bss*);
    }
    END_NOLOAD(framebuffer0)
 
-#ifndef USE_EXT_RAM
-   . = 0x80300000 + 0x25800;
-#else
-   . = 0x80700000 - 0x25800;
-#endif
    BEGIN_NOLOAD(framebuffer1)
    {
       BUILD_DIR/src/buffers/framebuffer1.o(.bss*);
    }
    END_NOLOAD(framebuffer1)
 
-#ifndef USE_EXT_RAM
-   . = 0x80300000 + 0x25800 * 2;
-#else
-   . = 0x80700000;
-#endif
    BEGIN_NOLOAD(framebuffer2)
    {
       BUILD_DIR/src/buffers/framebuffer2.o(.bss*);
    }
    END_NOLOAD(framebuffer2)
+#else
+   . = ZBUFFER_LOCATION;
+   BEGIN_NOLOAD(zbuffer)
+   {
+      BUILD_DIR/src/buffers/zbuffer.o(.bss*);
+   }
+   END_NOLOAD(zbuffer)
 
-   __mainPoolStart = .;
-   __mainPoolSize  = (RAM_END - .);
+   . = FRAMEBUFFER0_LOCATION;
+   BEGIN_NOLOAD(framebuffer0)
+   {
+      BUILD_DIR/src/buffers/framebuffer0.o(.bss*);
+   }
+   END_NOLOAD(framebuffer0)
+
+   . = FRAMEBUFFER1_LOCATION;
+   BEGIN_NOLOAD(framebuffer1)
+   {
+      BUILD_DIR/src/buffers/framebuffer1.o(.bss*);
+   }
+   END_NOLOAD(framebuffer1)
+
+   . = FRAMEBUFFER2_LOCATION;
+   BEGIN_NOLOAD(framebuffer2)
+   {
+      BUILD_DIR/src/buffers/framebuffer2.o(.bss*);
+   }
+   END_NOLOAD(framebuffer2)
+#endif
 
    __expansionRamStart = (RAM_START + (RAM_1MB * 4));
 #ifndef USE_EXT_RAM

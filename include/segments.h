@@ -16,13 +16,14 @@
  * linker script syntax.
 */
 
+#include "config/config_memory_private.h"
+
 // Starting address of RAM
 #define RAM_START   0x80000000
 
 // 1MB of RAM
 #define RAM_1MB     0x00100000
 
-#define USE_EXT_RAM
 // Calculate total amount of RAM
 #ifndef USE_EXT_RAM
 #define TOTAL_RAM_SIZE  (RAM_1MB * 4)

@@ -21,11 +21,7 @@
 #endif
 #include "game/puppyprint.h"
 
-// Uses alternative algorithm for allocating from main pool. Instead of first fit, it uses best fit
-// It is not recommended to use because it tends to choose slower memory compared to the default order
-// which is ordered from fastest to slowest memory.
-// On the other hand, in theory it is possible to fill memory better with this algorithm, in reality it does not matter 
-// #define MAIN_POOL_USE_BEST_FIT
+#include "config/config_memory_private.h"
 
 #ifdef MAIN_POOL_USE_BEST_FIT
 // For developing purposes, check if the size of the region is corrupted
@@ -57,10 +53,42 @@ struct MainPoolRegion {
     u32 size;
 };
 
-#ifdef USE_EXT_RAM
-#define MAIN_POOL_REGIONS_COUNT 3
-#else
+#if 0 == MEMORY_FRAGMENTATION_LEVEL
+// One giant region encompassing all of the ram. Memory layout follows vanilla implementation
+// -zbuffer-|-game/engine data-|-framebuffers-|-main pool region-
+#define MAIN_POOL_REGIONS_COUNT 1
+#endif
+
+#if 10 == MEMORY_FRAGMENTATION_LEVEL
+// Region before zbuffer and region after the framebuffer2
+// -game/engine data-|-main pool region 0-|-zbuffer-|-framebuffers-|-main pool region 1-
+//                                                  ^
+//                                       0x80300000 or 0x80700000
 #define MAIN_POOL_REGIONS_COUNT 2
+#endif
+
+#if 11 == MEMORY_FRAGMENTATION_LEVEL
+// Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
+// -game/engine data-|-main pool region 0-|-zbuffer-|-main pool region 2-|-framebuffers-|-main pool region 1-
+//                                        ^                              ^
+//                                   0x80600000                     0x80700000
+#define MAIN_POOL_REGIONS_COUNT 3
+#endif
+
+#if 20 == MEMORY_FRAGMENTATION_LEVEL
+// Region before zbuffer, between fb0/fb1, after fb2
+// -game/engine data-|-main pool region 0-|-zb-|-fb0-|-main pool region 1-|-fb1-|-fb2-|-main pool region 2-
+//                                             ^                                ^
+//                                        0x80500000                       0x80700000
+#define MAIN_POOL_REGIONS_COUNT 3
+#endif
+
+#if 21 == MEMORY_FRAGMENTATION_LEVEL
+// Region before zbuffer, between zb/fb0, between fb0/1, between fb1/2, after fb2
+// -game/engine data-|-main pool region 0-|-zb-|-main pool region 1-|-fb0-|-main pool region 2-|-fb1-|-main pool region 3-|-fb2-|-main pool region 4-
+//                                        ^                         ^                          ^                          ^
+//                                   0x80400000                0x80500000                 0x80600000                 0x80700000
+#define MAIN_POOL_REGIONS_COUNT 5
 #endif
 
 struct MainPoolContext {
@@ -215,9 +243,6 @@ static void main_pool_sort_up(int from) {
 #undef COMPARE_BREAK
 #endif
 
-extern u8 _zbufferSegmentBssStart[];
-extern u8 _zbufferSegmentBssEnd[];
-extern u8 _framebuffer1SegmentBssStart[];
 extern u8 _framebuffer2SegmentBssEnd[];
 extern u8 _goddardSegmentStart[];
 
@@ -227,24 +252,50 @@ extern u8 _goddardSegmentStart[];
  * freeing the object that was most recently allocated from a side.
  */
 void main_pool_init() {
-    sMainPool.regions[0].start = (u8 *) ALIGN4((uintptr_t)_engineSegmentBssEnd);
-    sMainPool.regions[0].size = (u8 *) DOWN4((uintptr_t)_zbufferSegmentBssStart) - sMainPool.regions[0].start;
-#ifdef USE_EXT_RAM
-    sMainPool.regions[1].start = (u8 *) ALIGN4((uintptr_t)_zbufferSegmentBssEnd);
-    sMainPool.regions[1].size = (u8 *) DOWN4(_framebuffer1SegmentBssStart) - sMainPool.regions[1].start;
-    sMainPool.regions[2].start = (u8 *) ALIGN4((uintptr_t)_framebuffer2SegmentBssEnd);
-    sMainPool.regions[2].size = (u8 *) DOWN4(_goddardSegmentStart) - sMainPool.regions[2].start;
-#else
-    sMainPool.regions[1].start = (u8 *) ALIGN4((uintptr_t)_framebuffer2SegmentBssEnd);
-    sMainPool.regions[1].size = (u8*) DOWN4(_goddardSegmentStart) - sMainPool.regions[1].start;
+#define SET_REGION(id, bufStart, bufEnd) \
+    sMainPool.regions[id].start = (u8 *) ALIGN4((uintptr_t)(bufStart)); \
+    sMainPool.regions[id].size = (u8 *) DOWN4((uintptr_t)(bufEnd)) - sMainPool.regions[id].start;
+
+#if 0 == MEMORY_FRAGMENTATION_LEVEL
+    // One giant region encompassing all of the ram
+    SET_REGION(0, _framebuffer2SegmentBssEnd, _goddardSegmentStart);
 #endif
 
-#ifdef MAIN_POOL_USE_BEST_FIT
-    sMainPool.regionIds[1] = 1;
-    sMainPool.regionIds[0] = 0;
-#ifdef USE_EXT_RAM
-    sMainPool.regionIds[2] = 2;
+#if 10 == MEMORY_FRAGMENTATION_LEVEL
+    // Region before zbuffer and region after the framebuffer2
+    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
 #endif
+
+#if 11 == MEMORY_FRAGMENTATION_LEVEL
+    // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
+    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
+    SET_REGION(2, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
+#endif
+
+#if 20 == MEMORY_FRAGMENTATION_LEVEL
+    // Region before zbuffer, between fb0/fb1, after fb2
+    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(1, FRAMEBUFFER0_END, FRAMEBUFFER1_LOCATION);
+    SET_REGION(2, FRAMEBUFFER2_END, _goddardSegmentStart);
+#endif
+
+#if 21 == MEMORY_FRAGMENTATION_LEVEL
+    // Region before zbuffer, between zb/fb0, between fb0/1, between fb1/2, after fb2
+    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(1, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
+    SET_REGION(2, FRAMEBUFFER0_END, FRAMEBUFFER1_LOCATION);
+    SET_REGION(3, FRAMEBUFFER1_END, FRAMEBUFFER2_LOCATION);
+    SET_REGION(4, FRAMEBUFFER2_END, _goddardSegmentStart);
+#endif
+
+#undef SET_REGION
+
+#ifdef MAIN_POOL_USE_BEST_FIT
+    for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++)
+        sMainPool.regionIds[i] = i;
+
     main_pool_sort();
 #endif
 
