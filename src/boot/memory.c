@@ -75,6 +75,14 @@ struct MainPoolRegion {
 #define MAIN_POOL_REGIONS_COUNT 3
 #endif
 
+#if 15 == MEMORY_FRAGMENTATION_LEVEL
+// Region after 0x80600000, before zbuffer, after the framebuffer2
+// -game/engine data-|-main pool region 1-|-zbuffer-|-framebuffers-|-main pool region 1-|-main pool region 0-
+//                                                  ^                                   ^
+//                                             0x80500000                          0x80600000
+#define MAIN_POOL_REGIONS_COUNT 3
+#endif
+
 #if 20 == MEMORY_FRAGMENTATION_LEVEL
 // Region before zbuffer, between fb0/fb1, after fb2
 // -game/engine data-|-main pool region 0-|-zb-|-fb0-|-main pool region 1-|-fb1-|-fb2-|-main pool region 2-
@@ -272,6 +280,13 @@ void main_pool_init() {
     SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
     SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
     SET_REGION(2, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
+#endif
+
+#if 15 == MEMORY_FRAGMENTATION_LEVEL
+    // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
+    SET_REGION(0, 0x80600000, _goddardSegmentStart);
+    SET_REGION(1, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(2, FRAMEBUFFER2_END, 0x80600000);
 #endif
 
 #if 20 == MEMORY_FRAGMENTATION_LEVEL
