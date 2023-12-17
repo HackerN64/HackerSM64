@@ -5,6 +5,7 @@
 #include "math_util.h"
 #include "game/memory.h"
 #include "graph_node.h"
+#include "game/debug.h"
 
 typedef void (*GeoLayoutCommandProc)(void);
 
@@ -769,6 +770,16 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
 
     gGeoLayoutStack[0] = 0;
     gGeoLayoutStack[1] = 0;
+
+    // Make sure the initial command is valid to start a geo layout.
+    assert((gGeoLayoutCommand[0x00] == GEO_CMD_NODE_ROOT) ||
+           (gGeoLayoutCommand[0x00] == GEO_CMD_NODE_START) ||
+           (gGeoLayoutCommand[0x00] == GEO_CMD_NODE_SWITCH_CASE) ||
+           (gGeoLayoutCommand[0x00] == GEO_CMD_NODE_TRANSLATION) ||
+           (gGeoLayoutCommand[0x00] == GEO_CMD_NODE_SHADOW) ||
+           (gGeoLayoutCommand[0x00] == GEO_CMD_NODE_SCALE) ||
+           (gGeoLayoutCommand[0x00] == GEO_CMD_NODE_CULLING_RADIUS),
+           "Tried to load an invalid geo layout.");
 
     while (gGeoLayoutCommand != NULL) {
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
