@@ -24,7 +24,7 @@ void *sTextureTransitionID[] = {
 };
 
 
-s32 set_and_reset_transition_fade_timer(u8 transTime) {
+s32 set_and_reset_transition_timers(u8 transTime) {
     sTransitionFadeTimer++;
 
     if (sTransitionFadeTimer >= transTime) {
@@ -81,10 +81,10 @@ void make_tex_transition_vertices(Vtx *verts, f32 centerTransX, f32 centerTransY
     make_tex_transition_vertex(verts, 7, centerTransX, centerTransY, -SOLID_COL_RADIUS, SOLID_COL_RADIUS, 0, 0);
 }
 
-f32 calc_tex_transition_radius(s8 transTime, struct WarpTransitionData *transData) {
+f32 calc_tex_transition_radius(u8 transTime, struct WarpTransitionData *transData) {
     f32 amount = (f32) sTransitionFadeTimer / (f32) (transTime - 1);
 
-#ifdef EASE_IN_OUT_TRANSITIONS
+#ifdef POLISHED_TRANSITIONS
     return smoothstep(transData->startTexRadius, transData->endTexRadius, amount);
 #else
     return lerpf(transData->startTexRadius, transData->endTexRadius, amount);
@@ -128,7 +128,7 @@ u16 calc_tex_transition_direction(struct WarpTransitionData *transData) {
  * Called during render_screen_transition.
  * Handles shape transitions (such as the star, circle and Mario and bowser´s heads).
  */
-s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transData, s8 texID, s8 transTexType) {
+s32 render_textured_transition(u8 transTime, struct WarpTransitionData *transData, s8 texID, s8 transTexType) {
     u16 texTransDir = calc_tex_transition_direction(transData);
 
     f32 posDistance = calc_tex_transition_pos_distance(transTime, transData);
@@ -137,7 +137,6 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
 
     f32 texTransRadius = calc_tex_transition_radius(transTime, transData);
     Vtx *verts = alloc_display_list(8 * sizeof(Vtx));
-
 
     if (verts != NULL) {
         make_tex_transition_vertices(verts, centerTransX, centerTransY, texTransRadius, transTexType);
@@ -178,7 +177,7 @@ s32 render_textured_transition(s8 transTime, struct WarpTransitionData *transDat
         gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
         sTransitionTextureAngle += transData->angleSpeed;
     }
-    return set_and_reset_transition_fade_timer(transTime);
+    return set_and_reset_transition_timers(transTime);
 }
 
 Vtx *vertex_transition_color() {
@@ -209,7 +208,7 @@ s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 a
         gSPDisplayList(gDisplayListHead++, dl_draw_quad_verts_0123);
         gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
     }
-    return set_and_reset_transition_fade_timer(transTime);
+    return set_and_reset_transition_timers(transTime);
 }
 
 u8 set_transition_color_fade_alpha(s8 fadeType, u8 transTime) {
@@ -253,29 +252,21 @@ s32 render_screen_transition(s8 transType, u8 transTime, struct WarpTransitionDa
             break;
         
         case WARP_TRANSITION_FADE_FROM_STAR:
-            return render_textured_transition(transTime, transData, TEX_TRANS_STAR, TRANS_TYPE_MIRROR);
-            break;
         case WARP_TRANSITION_FADE_INTO_STAR:
             return render_textured_transition(transTime, transData, TEX_TRANS_STAR, TRANS_TYPE_MIRROR);
             break;
         
         case WARP_TRANSITION_FADE_FROM_CIRCLE:
-            return render_textured_transition(transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR);
-            break;
         case WARP_TRANSITION_FADE_INTO_CIRCLE:
             return render_textured_transition(transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR);
             break;
         
         case WARP_TRANSITION_FADE_FROM_MARIO:
-            return render_textured_transition(transTime, transData, TEX_TRANS_MARIO, TRANS_TYPE_CLAMP);
-            break;
         case WARP_TRANSITION_FADE_INTO_MARIO:
             return render_textured_transition(transTime, transData, TEX_TRANS_MARIO, TRANS_TYPE_CLAMP);
             break;
         
         case WARP_TRANSITION_FADE_FROM_BOWSER:
-            return render_textured_transition(transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
-            break;
         case WARP_TRANSITION_FADE_INTO_BOWSER:
             return render_textured_transition(transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
             break;
