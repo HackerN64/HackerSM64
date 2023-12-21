@@ -24,7 +24,7 @@ void *sTextureTransitionID[] = {
 };
 
 
-s32 set_and_reset_transition_timers(u8 transTime) {
+s32 set_and_reset_transition_fade_timer(u8 transTime) {
     sTransitionFadeTimer++;
 
     if (sTransitionFadeTimer >= transTime) {
@@ -177,7 +177,7 @@ s32 render_textured_transition(u8 transTime, struct WarpTransitionData *transDat
         gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
         sTransitionTextureAngle += transData->angleSpeed;
     }
-    return set_and_reset_transition_timers(transTime);
+    return set_and_reset_transition_fade_timer(transTime);
 }
 
 Vtx *vertex_transition_color() {
@@ -208,7 +208,7 @@ s32 dl_transition_color(u8 transTime, struct WarpTransitionData *transData, u8 a
         gSPDisplayList(gDisplayListHead++, dl_draw_quad_verts_0123);
         gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
     }
-    return set_and_reset_transition_timers(transTime);
+    return set_and_reset_transition_fade_timer(transTime);
 }
 
 u8 set_transition_color_fade_alpha(s8 fadeType, u8 transTime) {

@@ -336,7 +336,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue = blue;
     } else { // if transition is textured
-        set_and_reset_transition_timers(0); // Reset transition timers by passing in 0 for time
+        set_and_reset_transition_fade_timer(0); // Reset transition timers by passing in 0 for time
 
         gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
