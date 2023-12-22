@@ -27,7 +27,7 @@
 /**
  * Allow previewing blue coin locations from a blue coin switch when Mario is standing on the blue coin switch.
  */
-#define BLUE_COIN_SWITCH_PREVIEW
+// #define BLUE_COIN_SWITCH_PREVIEW
 
 /****************
  * -- GOOMBA --
