@@ -4,6 +4,7 @@
 #include <PR/ultratypes.h>
 
 #include "types.h"
+#include "game/puppyprint.h"
 
 #define NEAR_ZERO   __FLT_EPSILON__
 #define NEAR_ONE    (1.0f - __FLT_EPSILON__)
@@ -22,26 +23,18 @@ extern Vec3i gVec3iZero;
 extern Vec3f gVec3fOne;
 extern Vec3s gVec3sOne;
 
+
+// Angles
+
 /**
  * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
  * This should be used mainly to make camera code clearer at first glance.
  */
 // #define DEGREES(x) ((x) * 0x10000 / 360)
 #define DEGREES(x) ((x) * 0x2000 / 45)
-// #define DEGREES(x) (((x) << 13) / 45)
 
-/*
- * The sine and cosine tables overlap, but "#define gCosineTable (gSineTable +
- * 0x400)" doesn't give expected codegen; gSineTable and gCosineTable need to
- * be different symbols for code to match. Most likely the tables were placed
- * adjacent to each other, and gSineTable cut short, such that reads overflow
- * into gCosineTable.
- *
- * These kinds of out of bounds reads are undefined behavior, and break on
- * e.g. GCC (which doesn't place the tables next to each other, and probably
- * exploits array sizes for range analysis-based optimizations as well).
- * Thus, for non-IDO compilers we use the standard-compliant version.
- */
+// Trig functions
+
 extern f32 gSineTable[];
 #define gCosineTable (gSineTable + 0x400)
 
@@ -50,6 +43,8 @@ extern f32 gSineTable[];
 #define tans(x) (sins(x) / coss(x))
 #define cots(x) (coss(x) / sins(x))
 #define atans(x) gArctanTable[(s32)((((x) * 1024) + 0.5f))] // is this correct? used for atan2_lookup
+
+// Angle conversion macros
 
 #define RAD_PER_DEG (M_PI / 180.0f)
 #define DEG_PER_RAD (180.0f / M_PI)
@@ -61,90 +56,121 @@ extern f32 gSineTable[];
 #define degrees_to_radians(x) (f32)( (f32)(x) * RAD_PER_DEG       )
 #define radians_to_degrees(x) (f32)( (f32)(x) * DEG_PER_RAD       )
 
-#define signum_positive(x) ((x < 0) ? -1 : 1)
 
-// #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
-// #define max(a, b) MAX((a), (b)) // ((a) > (b) ? (a) : (b))
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+// Various basic helper macros
 
-// from limits.h
-#define S8_MAX __SCHAR_MAX__
-#define S8_MIN (-S8_MAX - 1)
-#define U8_MAX (S8_MAX * 2 + 1)
-#define S16_MAX __SHRT_MAX__
-#define S16_MIN (-S16_MAX - 1)
-#define U16_MAX (S16_MAX * 2 + 1)
-#define S32_MAX __INT_MAX__
-#define S32_MIN (-S32_MAX - 1)
-#define U32_MAX (S32_MAX * 2U + 1U)
-#define S64_MAX __LONG_LONG_MAX__
-#define S64_MIN (-S64_MAX - 1LL)
-#define U64_MAX (S64_MAX * 2ULL + 1ULL)
-#define F32_MAX __FLT_MAX__
-#define F32_MIN __FLT_MIN__
-#define F64_MAX __DBL_MAX__
-#define F64_MIN __DBL_MIN__
+// Get the square of a number
+#define sqr(x) ({         \
+    __auto_type _x = (x); \
+    _x * _x; })
 
-#define CLAMP_U8( x)        CLAMP((x),     0x0,  U8_MAX)
+// Get the sign of a number
+#define signum_positive(x) (((x) < 0) ? -1 : 1)
+
+// Absolute value
+#define ABS(x) ({         \
+    __auto_type _x = (x); \
+    _x > 0 ? _x : -_x; })
+#define absi ABS
+#define abss ABS
+
+// Absolute value of a float (faster than using the above macro)
+ALWAYS_INLINE f32 absf(f32 in) {
+    f32 out;
+    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
+    return out;
+}
+
+// Get the minimum / maximum of a set of numbers
+#undef MIN
+#define MIN(a, b) ({      \
+    __auto_type _a = (a); \
+    __auto_type _b = (b); \
+    _a < _b ? _a : _b; })
+
+#undef MAX
+#define MAX(a, b) ({      \
+    __auto_type _a = (a); \
+    __auto_type _b = (b); \
+    _a > _b ? _a : _b; })
+
+#define min_3(a, b, c) MIN(MIN(a, b), c)
+
+#define max_3(a, b, c) MAX(MAX(a, b), c)
+
+#define min_3f min_3
+#define min_3i min_3
+#define min_3s min_3
+
+#define max_3f max_3
+#define max_3i max_3
+#define max_3s max_3
+
+void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
+void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
+void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
+
+// From Wiseguy
+// Round a float to the nearest integer
+ALWAYS_INLINE s32 roundf(f32 in) {
+    f32 tmp;
+    s32 out;
+    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
+    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
+    return out;
+}
+
+#define round_float roundf
+
+#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
+
+
+// Integer limits and clamping
+
+#define S8_MAX   127
+#define S8_MIN  -128
+#define U8_MAX   255
+#define S16_MAX  32767
+#define S16_MIN -32768
+#define U16_MAX  65535
+#define S32_MAX  2147483647
+#define S32_MIN -2147483648
+#define U32_MAX  4294967295
+
+// Clamp a value inbetween a range
+#define CLAMP(x, low, high)  MIN(MAX((x), (low)), (high))
+
+// Clamp a value to the range of a specific data type
+#define CLAMP_U8( x)        CLAMP((x),       0,  U8_MAX)
 #define CLAMP_S8( x)        CLAMP((x),  S8_MIN,  S8_MAX)
-#define CLAMP_U16(x)        CLAMP((x),     0x0, U16_MAX)
+#define CLAMP_U16(x)        CLAMP((x),       0, U16_MAX)
 #define CLAMP_S16(x)        CLAMP((x), S16_MIN, S16_MAX)
-#define CLAMP_U32(x)        CLAMP((x),     0x0, U32_MAX)
-#define CLAMP_S32(x)        CLAMP((x), S32_MIN, S32_MAX)
-#define CLAMP_U64(x)        CLAMP((x),     0x0, U64_MAX)
-#define CLAMP_S64(x)        CLAMP((x), S64_MIN, S64_MAX)
-#define CLAMP_F32(x)        CLAMP((x), F32_MIN, F32_MAX)
-#define CLAMP_F64(x)        CLAMP((x), F64_MIN, F64_MAX)
 
-#define SWAP(a, b)          { ((a) ^= (b)); ((b) ^= (a)); ((a) ^= (b)); }
 
-#define sqr(x)              (    (x) * (x))
-#define cube(x)             ( sqr(x) * (x))
-#define quad(x)             (cube(x) * (x))
+// Vector operations
 
-#define average_2(a, b      )   (((a) + (b)            ) / 2.0f)
-#define average_3(a, b, c   )   (((a) + (b) + (c)      ) / 3.0f)
-#define average_4(a, b, c, d)   (((a) + (b) + (c) + (d)) / 4.0f)
-
+// Set all elements of a vector to the same constant
 #define vec2_same(v, s)     (((v)[0]) = ((v)[1])                       = (s))
 #define vec3_same(v, s)     (((v)[0]) = ((v)[1]) = ((v)[2])            = (s))
 #define vec4_same(v, s)     (((v)[0]) = ((v)[1]) = ((v)[2]) = ((v)[3]) = (s))
 
+// Set all elements of a vector to zero
 #define vec2_zero(v)        (vec2_same((v), 0))
 #define vec3_zero(v)        (vec3_same((v), 0))
 #define vec4_zero(v)        (vec4_same((v), 0))
 
-#define vec2_c(v)           (   (v)[0] + (v)[1])
-#define vec3_c(v)           (vec2_c(v) + (v)[2])
-#define vec4_c(v)           (vec3_c(v) + (v)[3])
+// Sum of the squares of all elements of a vector
+#define vec2_sumsq(v)       (sqr((v)[0]) + sqr((v)[1]))
+#define vec3_sumsq(v)       (sqr((v)[0]) + sqr((v)[1]) + sqr((v)[2]))
+#define vec4_sumsq(v)       (sqr((v)[0]) + sqr((v)[1]) + sqr((v)[2]) + sqr((v)[3]))
 
-#define vec2_average(v)     (vec2_c(v) / 2.0f)
-#define vec3_average(v)     (vec3_c(v) / 3.0f)
-#define vec4_average(v)     (vec4_c(v) / 4.0f)
-
-#define vec2_sumsq(v)       (  sqr((v)[0]) + sqr((v)[1]))
-#define vec3_sumsq(v)       (vec2_sumsq(v) + sqr((v)[2]))
-#define vec4_sumsq(v)       (vec3_sumsq(v) + sqr((v)[3]))
-
+// Calculate the magnitude of a vector
 #define vec2_mag(v)         (sqrtf(vec2_sumsq(v)))
 #define vec3_mag(v)         (sqrtf(vec3_sumsq(v)))
 #define vec4_mag(v)         (sqrtf(vec4_sumsq(v)))
 
-#define vec3_yaw(from, to)  (atan2s(((to)[2] - (from)[2]), ((to)[0] - (from)[0])))
-
-#define vec2_dot(a, b)       (((a)[0] * (b)[0]) + ((a)[1] * (b)[1]))
-#define vec3_dot(a, b)      (vec2_dot((a), (b)) + ((a)[2] * (b)[2]))
-#define vec4_dot(a, b)      (vec3_dot((a), (b)) + ((a)[3] * (b)[3]))
-
-/// Make vector 'dest' the cross product of vectors a and b.
-#define vec3_cross(dst, a, b) {                         \
-    (dst)[0] = (((a)[1] * (b)[2]) - ((a)[2] * (b)[1])); \
-    (dst)[1] = (((a)[2] * (b)[0]) - ((a)[0] * (b)[2])); \
-    (dst)[2] = (((a)[0] * (b)[1]) - ((a)[1] * (b)[0])); \
-}
-
 /**
- * Set 'dest' the normal vector of a triangle with vertices a, b and c.
+ * Set 'dest' to the normal vector of a triangle with vertices a, b and c.
  * Equivalent to cross((c-b), (c-a)).
  */
 #define find_vector_perpendicular_to_plane(dest, a, b, c) {                                     \
@@ -153,247 +179,413 @@ extern f32 gSineTable[];
     (dest)[2] = ((b)[0] - (a)[0]) * ((c)[1] - (b)[1]) - ((c)[0] - (b)[0]) * ((b)[1] - (a)[1]);  \
 }
 
-/**
- * | ? ? ? 0 |
- * | ? ? ? 0 |
- * | ? ? ? 0 |
- * | 0 0 0 1 |
- * i.e. a matrix representing a linear transformation over 3 space.
- */
-// Multiply a vector by a matrix of the form
-#define linear_mtxf_mul_vec3(mtx, dstV, srcV) {                                                     \
-    (dstV)[0] = (((mtx)[0][0] * (srcV)[0]) + ((mtx)[1][0] * (srcV)[1]) + ((mtx)[2][0] * (srcV)[2]));\
-    (dstV)[1] = (((mtx)[0][1] * (srcV)[0]) + ((mtx)[1][1] * (srcV)[1]) + ((mtx)[2][1] * (srcV)[2]));\
-    (dstV)[2] = (((mtx)[0][2] * (srcV)[0]) + ((mtx)[1][2] * (srcV)[1]) + ((mtx)[2][2] * (srcV)[2]));\
-}
-
-#define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) {   \
-    linear_mtxf_mul_vec3((mtx), (dstV), (srcV));                \
-    vec3_add((dstV), (mtx)[3]);                                 \
-}
-
-// Multiply a vector by the transpose of a matrix of the form
-#define linear_mtxf_transpose_mul_vec3(mtx, dstV, srcV) {   \
-    (dstV)[0] = vec3_dot((mtx)[0], (srcV));                 \
-    (dstV)[1] = vec3_dot((mtx)[1], (srcV));                 \
-    (dstV)[2] = vec3_dot((mtx)[2], (srcV));                 \
-}
-
+// Set the elements of vector 'dst' to the given values
 #define vec2_set(dst, x, y) {           \
     (dst)[0] = (x);                     \
     (dst)[1] = (y);                     \
 }
 #define vec3_set(dst, x, y, z) {        \
-    vec2_set((dst), (x), (y));          \
+    (dst)[0] = (x);                     \
+    (dst)[1] = (y);                     \
     (dst)[2] = (z);                     \
 }
 #define vec4_set(dst, x, y, z, w) {     \
-    vec3_set((dst), (x), (y), (z));     \
+    (dst)[0] = (x);                     \
+    (dst)[1] = (y);                     \
+    (dst)[2] = (z);                     \
     (dst)[3] = (w);                     \
 }
 
+#define vec3f_set vec3_set
+#define vec3i_set vec3_set
+#define vec3s_set vec3_set
+
+// Copy vector 'src' to vector 'dst'
 #define vec2_copy(dst, src) {           \
-    (dst)[0] = (src)[0];                \
-    (dst)[1] = (src)[1];                \
+    __auto_type _x = (src)[0];          \
+    __auto_type _y = (src)[1];          \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
 }
 #define vec3_copy(dst, src) {           \
-    vec2_copy((dst), (src));            \
-    (dst)[2] = (src)[2];                \
+    __auto_type _x = (src)[0];          \
+    __auto_type _y = (src)[1];          \
+    __auto_type _z = (src)[2];          \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
+    (dst)[2] = _z;                      \
 }
 #define vec4_copy(dst, src) {           \
-    vec3_copy((dst), (src));            \
-    (dst)[3] = (src)[3];                \
+    __auto_type _x = (src)[0];          \
+    __auto_type _y = (src)[1];          \
+    __auto_type _z = (src)[2];          \
+    __auto_type _w = (src)[3];          \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
+    (dst)[2] = _z;                      \
+    (dst)[3] = _w;                      \
 }
 
+#define vec3f_copy vec3_copy
+#define vec3i_copy vec3_copy
+#define vec3s_copy vec3_copy
+#define vec3s_to_vec3i vec3_copy
+#define vec3s_to_vec3f vec3_copy
+#define vec3i_to_vec3s vec3_copy
+#define vec3i_to_vec3f vec3_copy
+#define vec3f_to_vec3s vec3_copy
+#define vec3f_to_vec3i vec3_copy
+
+#define surface_normal_to_vec3f(dst, surf) vec3f_copy((dst), &((surf)->normal.x))
+
+// Copy vector 'src' to vector 'dst' and add a scalar to the y component
 #define vec3_copy_y_off(dst, src, y) {  \
-    (dst)[0] =  (src)[0];               \
-    (dst)[1] = ((src)[1] + (y));        \
-    (dst)[2] =  (src)[2];               \
+    __auto_type _x = (src)[0];          \
+    __auto_type _y = (src)[1] + (y);    \
+    __auto_type _z = (src)[2];          \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
+    (dst)[2] = _z;                      \
 }
 
-#define vec2_copy_roundf(dst, src) {    \
-    (dst)[0] = roundf((src)[0]);        \
-    (dst)[1] = roundf((src)[1]);        \
+#define vec3f_copy_y_off vec3_copy_y_off
+
+// Set vector 'dst' to the sum of vectors 'src1' and 'src2'
+#define vec2_sum(dst, src1, src2) {         \
+    __auto_type _x = (src1)[0] + (src2)[0]; \
+    __auto_type _y = (src1)[1] + (src2)[1]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
 }
-#define vec3_copy_roundf(dst, src) {    \
-    vec2_copy_roundf((dst), (src));     \
-    (dst)[2] = roundf((src)[2]);        \
+#define vec3_sum(dst, src1, src2) {         \
+    __auto_type _x = (src1)[0] + (src2)[0]; \
+    __auto_type _y = (src1)[1] + (src2)[1]; \
+    __auto_type _z = (src1)[2] + (src2)[2]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
 }
-#define vec4_copy_roundf(dst, src) {    \
-    vec3_copy_roundf((dst), (src));     \
-    (dst)[3] = roundf((src)[3]);        \
+#define vec4_sum(dst, src1, src2) {         \
+    __auto_type _x = (src1)[0] + (src2)[0]; \
+    __auto_type _y = (src1)[1] + (src2)[1]; \
+    __auto_type _z = (src1)[2] + (src2)[2]; \
+    __auto_type _w = (src1)[3] + (src2)[3]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
+    (dst)[3] = _w;                          \
 }
 
-#define vec2_copy_inverse(dst, src) {   \
-    (dst)[0] = (src)[1];                \
-    (dst)[1] = (src)[0];                \
-}
-#define vec3_copy_inverse(dst, src) {   \
-    (dst)[0] = (src)[2];                \
-    (dst)[1] = (src)[1];                \
-    (dst)[2] = (src)[0];                \
-}
-#define vec4_copy_inverse(dst, src) {   \
-    (dst)[0] = (src)[3];                \
-    (dst)[1] = (src)[2];                \
-    (dst)[2] = (src)[1];                \
-    (dst)[3] = (src)[0];                \
-}
+#define vec3f_sum vec3_sum
+#define vec3i_sum vec3_sum
+#define vec3s_sum vec3_sum
 
-#define vec3_copy_offset_m1(dst, src) { \
-    (dst)[0] = (src)[1];                \
-    (dst)[1] = (src)[2];                \
-    (dst)[2] = (src)[0];                \
-}
-
-#define vec2_copy_negative(dst, src) {  \
-    (dst)[0] = -(src)[0];               \
-    (dst)[1] = -(src)[1];               \
-}
-#define vec3_copy_negative(dst, src) {  \
-    vec2_copy_negative((dst), (src));   \
-    (dst)[2] = -(src)[2];               \
-}
-#define vec4_copy_negative(dst, src) {  \
-    vec3_copy_negative((dst), (src));   \
-    (dst)[3] = -(src)[3];               \
-}
-
-#define vec2_sum(dst, src1, src2) {     \
-    (dst)[0] = ((src1)[0] + (src2)[0]); \
-    (dst)[1] = ((src1)[1] + (src2)[1]); \
-}
-#define vec3_sum(dst, src1, src2) {     \
-    vec2_sum((dst), (src1), (src2));    \
-    (dst)[2] = ((src1)[2] + (src2)[2]); \
-}
-#define vec4_sum(dst, src1, src2) {     \
-    vec3_sum((dst), (src1), (src2));    \
-    (dst)[3] = ((src1)[3] + (src2)[3]); \
-}
-
+// Add the vector 'src' to vector 'dst'
 #define vec2_add(dst, src) vec2_sum((dst), (dst), (src))
 #define vec3_add(dst, src) vec3_sum((dst), (dst), (src))
 #define vec4_add(dst, src) vec4_sum((dst), (dst), (src))
 
-#define vec2_sum_val(dst, src, x) {     \
-    (dst)[0] = ((src)[0] + (x));        \
-    (dst)[1] = ((src)[1] + (x));        \
+#define vec3f_add vec3_add
+#define vec3i_add vec3_add
+#define vec3s_add vec3_add
+
+// Set vector 'dst' to the difference of vectors 'src1' and 'src2'
+#define vec2_diff(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] - (src2)[0]; \
+    __auto_type _y = (src1)[1] - (src2)[1]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
 }
-#define vec3_sum_val(dst, src, x) {     \
-    vec2_sum_val((dst), (src), (x));    \
-    (dst)[2] = ((src)[2] + (x));        \
+#define vec3_diff(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] - (src2)[0]; \
+    __auto_type _y = (src1)[1] - (src2)[1]; \
+    __auto_type _z = (src1)[2] - (src2)[2]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
 }
-#define vec4_sum_val(dst, src, x) {     \
-    vec3_sum_val((dst), (src), (x));    \
-    (dst)[3] = ((src)[2] + (x));        \
+#define vec4_diff(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] - (src2)[0]; \
+    __auto_type _y = (src1)[1] - (src2)[1]; \
+    __auto_type _z = (src1)[2] - (src2)[2]; \
+    __auto_type _w = (src1)[3] - (src2)[3]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
+    (dst)[3] = _w;                          \
 }
 
-#define vec2_add_val(dst, x) vec2_sum_val((dst), (dst), (x))
-#define vec3_add_val(dst, x) vec3_sum_val((dst), (dst), (x))
-#define vec4_add_val(dst, x) vec4_sum_val((dst), (dst), (x))
+#define vec3f_diff vec3_diff
+#define vec3i_diff vec3_diff
+#define vec3s_diff vec3_diff
 
-#define vec2_diff(dst, src1, src2) {    \
-    (dst)[0] = ((src1)[0] - (src2)[0]); \
-    (dst)[1] = ((src1)[1] - (src2)[1]); \
-}
-#define vec3_diff(dst, src1, src2) {    \
-    vec2_diff((dst), (src1), (src2));   \
-    (dst)[2] = ((src1)[2] - (src2)[2]); \
-}
-#define vec4_diff(dst, src1, src2) {    \
-    vec3_diff((dst), (src1), (src2));   \
-    (dst)[3] = ((src1)[3] - (src2)[3]); \
-}
-
+// Subtract the vector 'src' from vector 'dst'
 #define vec2_sub(dst, src) vec2_diff((dst), (dst), (src))
 #define vec3_sub(dst, src) vec3_diff((dst), (dst), (src))
 #define vec4_sub(dst, src) vec4_diff((dst), (dst), (src))
 
-#define vec2_diff_val(dst, src, x) {    \
-    (dst)[0] = ((src)[0] - (x));        \
-    (dst)[1] = ((src)[1] - (x));        \
+#define vec3f_sub vec3_sub
+#define vec3i_sub vec3_sub
+#define vec3s_sub vec3_sub
+
+// Set vector 'dst' to the product of vectors 'src1' and 'src2'
+#define vec2_prod(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] * (src2)[0]; \
+    __auto_type _y = (src1)[1] * (src2)[1]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
 }
-#define vec3_diff_val(dst, src, x) {    \
-    vec2_diff_val((dst), (src), (x));   \
-    (dst)[2] = ((src)[2] - (x));        \
+#define vec3_prod(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] * (src2)[0]; \
+    __auto_type _y = (src1)[1] * (src2)[1]; \
+    __auto_type _z = (src1)[2] * (src2)[2]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
 }
-#define vec4_diff_val(dst, src, x) {    \
-    vec3_diff_val((dst), (src), (x));   \
-    (dst)[3] = ((src)[3] - (x));        \
+#define vec4_prod(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] * (src2)[0]; \
+    __auto_type _y = (src1)[1] * (src2)[1]; \
+    __auto_type _z = (src1)[2] * (src2)[2]; \
+    __auto_type _w = (src1)[3] * (src2)[3]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
+    (dst)[3] = _w;                          \
 }
 
-#define vec2_sub_val(dst, x) vec2_diff_val((dst), (dst), (x))
-#define vec3_sub_val(dst, x) vec3_diff_val((dst), (dst), (x))
-#define vec4_sub_val(dst, x) vec4_diff_val((dst), (dst), (x))
+#define vec3f_prod vec3_prod
+#define vec3i_prod vec3_prod
+#define vec3s_prod vec3_prod
 
-#define vec2_prod(dst, src1, src2) {    \
-    (dst)[0] = ((src1)[0] * (src2)[0]); \
-    (dst)[1] = ((src1)[1] * (src2)[1]); \
-}
-#define vec3_prod(dst, src1, src2) {    \
-    vec2_prod((dst), (src1), (src2));   \
-    (dst)[2] = ((src1)[2] * (src2)[2]); \
-}
-#define vec4_prod(dst, src1, src2) {    \
-    vec3_prod((dst), (src1), (src2));   \
-    (dst)[3] = ((src1)[3] * (src2)[3]); \
-}
-
+// Multiply vector 'dst' by vector 'src'
 #define vec2_mul(dst, src) vec2_prod((dst), (dst), (src))
 #define vec3_mul(dst, src) vec3_prod((dst), (dst), (src))
 #define vec4_mul(dst, src) vec4_prod((dst), (dst), (src))
 
-#define vec2_prod_val(dst, src, x) {    \
-    (dst)[0] = ((src)[0] * (x));        \
-    (dst)[1] = ((src)[1] * (x));        \
+#define vec3f_mul vec3_mul
+#define vec3i_mul vec3_mul
+#define vec3s_mul vec3_mul
+
+// Set vector 'dst' to vector 'src' scaled by the scalar 'x'
+#define vec2_scale_dest(dst, src, x) {  \
+    __auto_type _x = (src)[0] * (x);    \
+    __auto_type _y = (src)[1] * (x);    \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
 }
-#define vec3_prod_val(dst, src, x) {    \
-    vec2_prod_val((dst), (src), (x));   \
-    (dst)[2] = ((src)[2] * (x));        \
+#define vec3_scale_dest(dst, src, x) {  \
+    __auto_type _x = (src)[0] * (x);    \
+    __auto_type _y = (src)[1] * (x);    \
+    __auto_type _z = (src)[2] * (x);    \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
+    (dst)[2] = _z;                      \
 }
-#define vec4_prod_val(dst, src, x) {    \
-    vec3_prod_val((dst), (src), (x));   \
-    (dst)[3] = ((src)[3] * (x));        \
+#define vec4_scale_dest(dst, src, x) {  \
+    __auto_type _x = (src)[0] * (x);    \
+    __auto_type _y = (src)[1] * (x);    \
+    __auto_type _z = (src)[2] * (x);    \
+    __auto_type _w = (src)[3] * (x);    \
+    (dst)[0] = _x;                      \
+    (dst)[1] = _y;                      \
+    (dst)[2] = _z;                      \
+    (dst)[3] = _w;                      \
 }
 
-#define vec2_mul_val(dst, x) vec2_prod_val(dst, dst, x)
-#define vec3_mul_val(dst, x) vec3_prod_val(dst, dst, x)
-#define vec4_mul_val(dst, x) vec4_prod_val(dst, dst, x)
+// Scale vector 'dst' by the scalar 'x'
+#define vec2_scale(dst, x) vec2_scale_dest(dst, dst, x)
+#define vec3_scale(dst, x) vec3_scale_dest(dst, dst, x)
+#define vec4_scale(dst, x) vec4_scale_dest(dst, dst, x)
 
-#define vec2_quot(dst, src1, src2) {    \
-    (dst)[0] = ((src1)[0] / (src2)[0]); \
-    (dst)[1] = ((src1)[1] / (src2)[1]); \
+// Set vector 'dst' to vector 'src1' divided by vector 'src2'
+#define vec2_quot(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] / (src2)[0]; \
+    __auto_type _y = (src1)[1] / (src2)[1]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
 }
-#define vec3_quot(dst, src1, src2) {    \
-    vec2_quot((dst), (src1), (src2));   \
-    (dst)[2] = ((src1)[2] / (src2)[2]); \
+#define vec3_quot(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] / (src2)[0]; \
+    __auto_type _y = (src1)[1] / (src2)[1]; \
+    __auto_type _z = (src1)[2] / (src2)[2]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
 }
-#define vec4_quot(dst, src1, src2) {    \
-    vec3_quot((dst), (src1), (src2));   \
-    (dst)[3] = ((src1)[3] / (src2)[3]); \
+#define vec4_quot(dst, src1, src2) {        \
+    __auto_type _x = (src1)[0] / (src2)[0]; \
+    __auto_type _y = (src1)[1] / (src2)[1]; \
+    __auto_type _z = (src1)[2] / (src2)[2]; \
+    __auto_type _w = (src1)[3] / (src2)[3]; \
+    (dst)[0] = _x;                          \
+    (dst)[1] = _y;                          \
+    (dst)[2] = _z;                          \
+    (dst)[3] = _w;                          \
 }
 
+#define vec3f_quot vec3_quot
+#define vec3i_quot vec3_quot
+#define vec3s_quot vec3_quot
+
+// Divide vector 'dst' by vector 'src'
 #define vec2_div(dst, src) vec2_quot((dst), (dst), (src))
 #define vec3_div(dst, src) vec3_quot((dst), (dst), (src))
 #define vec4_div(dst, src) vec4_quot((dst), (dst), (src))
 
-#define vec2_quot_val(dst, src, x) {    \
-    (dst)[0] = ((src)[0] / (x));        \
-    (dst)[1] = ((src)[1] / (x));        \
-}
-#define vec3_quot_val(dst, src, x) {    \
-    vec2_quot_val((dst), (src), (x));   \
-    (dst)[2] = ((src)[2] / (x));        \
-}
-#define vec4_quot_val(dst, src, x) {    \
-    vec3_quot_val((dst), (src), (x));   \
-    (dst)[3] = ((src)[3] / (x));        \
+#define vec3f_div vec3_div
+#define vec3i_div vec3_div
+#define vec3s_div vec3_div
+
+// The yaw between two points in 3D space
+#define vec3_yaw(from, to)  (atan2s(((to)[2] - (from)[2]), ((to)[0] - (from)[0])))
+
+// Calculate the dot product of two vectors
+#define vec2_dot(a, b)       (((a)[0] * (b)[0]) + ((a)[1] * (b)[1]))
+#define vec3_dot(a, b)      (vec2_dot((a), (b)) + ((a)[2] * (b)[2]))
+#define vec4_dot(a, b)      (vec3_dot((a), (b)) + ((a)[3] * (b)[3]))
+
+#define vec3f_dot vec3_dot
+
+// Make vector 'dest' the cross product of vectors a and b.
+#define vec3_cross(dst, a, b) {                             \
+    __auto_type _x = ((a)[1] * (b)[2]) - ((a)[2] * (b)[1]); \
+    __auto_type _y = ((a)[2] * (b)[0]) - ((a)[0] * (b)[2]); \
+    __auto_type _z = ((a)[0] * (b)[1]) - ((a)[1] * (b)[0]); \
+    (dst)[0] = _x;                                          \
+    (dst)[1] = _y;                                          \
+    (dst)[2] = _z;                                          \
 }
 
-#define vec2_div_val(dst, x) vec2_quot_val((dst), (dst), (x))
-#define vec3_div_val(dst, x) vec3_quot_val((dst), (dst), (x))
-#define vec4_div_val(dst, x) vec4_quot_val((dst), (dst), (x))
+#define vec3f_cross vec3_cross
+
+// Scale vector 'v' so it has length 1
+#define vec3_normalize(v) {                       \
+    f32 _v_invmag = vec3_mag((v));                 \
+    _v_invmag = (1.0f / MAX(_v_invmag, NEAR_ZERO)); \
+    vec3_scale((v), _v_invmag);                    \
+}
+
+#define vec3f_normalize vec3_normalize
+
+// If the magnitude of vector 'v' is greater than 'max', scale it down to 'max'
+#define vec3_set_max_dist(v, max) { \
+    f32 _v_mag = vec3_mag(v);        \
+    f32 _max = max;                 \
+    _v_mag = MAX(_v_mag, NEAR_ZERO);  \
+    if (_v_mag > _max) {             \
+        _v_mag = (_max / _v_mag);     \
+        vec3_scale(v, _v_mag);       \
+    }                               \
+}
+
+// Transform the vector 'srcV' by the matrix 'mtx' and store the result in 'dstV'. Ignores translation.
+#define linear_mtxf_mul_vec3(mtx, dstV, srcV) {                                                         \
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);                                                   \
+    __auto_type _x = ((mtx)[0][0] * (srcV)[0]) + ((mtx)[1][0] * (srcV)[1]) + ((mtx)[2][0] * (srcV)[2]); \
+    __auto_type _y = ((mtx)[0][1] * (srcV)[0]) + ((mtx)[1][1] * (srcV)[1]) + ((mtx)[2][1] * (srcV)[2]); \
+    __auto_type _z = ((mtx)[0][2] * (srcV)[0]) + ((mtx)[1][2] * (srcV)[1]) + ((mtx)[2][2] * (srcV)[2]); \
+    (dstV)[0] = _x;                                                                                     \
+    (dstV)[1] = _y;                                                                                     \
+    (dstV)[2] = _z;                                                                                     \
+}
+
+// Transform the vector 'srcV' by the matrix 'mtx' including translation, and store the result in 'dstV'
+#define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) { \
+    linear_mtxf_mul_vec3((mtx), (dstV), (srcV));              \
+    vec3_add((dstV), (mtx)[3]);                               \
+}
+
+// Transform the vector 'srcV' by the transpose of the matrix 'mtx'
+// and store the result in 'dstV'. Ignores translation.
+// For most transformation matrices, this will apply the inverse of the transformation.
+#define linear_mtxf_transpose_mul_vec3(mtx, dstV, srcV) { \
+    PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);     \
+    __auto_type _x = vec3_dot((mtx)[0], (srcV));          \
+    __auto_type _y = vec3_dot((mtx)[1], (srcV));          \
+    __auto_type _z = vec3_dot((mtx)[2], (srcV));          \
+    (dstV)[0] = _x;                                       \
+    (dstV)[1] = _y;                                       \
+    (dstV)[2] = _z;                                       \
+}
+
+#define linear_mtxf_mul_vec3f linear_mtxf_mul_vec3
+#define linear_mtxf_mul_vec3f_and_translate linear_mtxf_mul_vec3_and_translate
+#define linear_mtxf_transpose_mul_vec3f linear_mtxf_transpose_mul_vec3
+
+
+// Angles and distances between vectors
+
+/// Finds the distance between two vectors
+#define vec3_get_dist(from, to, dist) { \
+    Vec3f _d;                           \
+    vec3_diff(_d, (to), (from));        \
+    *(dist) = vec3_mag((_d));           \
+}
+
+#define vec3f_get_dist vec3_get_dist
+#define vec3s_get_dist vec3_get_dist
+
+/// Finds the horizontal distance between two vectors
+#define vec3_get_lateral_dist(from, to, lateralDist) { \
+    Vec3f _d;                                          \
+    vec3_diff(_d, (to), (from));                       \
+    *(lateralDist) = sqrtf(sqr(_d[0]) + sqr(_d[2]));   \
+}
+
+#define vec3f_get_lateral_dist vec3_get_lateral_dist
+#define vec3s_get_lateral_dist vec3_get_lateral_dist
+
+/// Finds the pitch between two vectors
+#define vec3_get_pitch(from, to, pitch) {                     \
+    Vec3f _d;                                                 \
+    vec3_diff(_d, (to), (from));                              \
+    *(pitch) = atan2s(sqrtf(sqr(_d[0]) + sqr(_d[2])), _d[1]); \
+}
+
+#define vec3f_get_pitch vec3_get_pitch
+#define vec3s_get_pitch vec3_get_pitch
+
+/// Finds the yaw between two vectors
+#define vec3_get_yaw(from, to, yaw) { \
+    f32 _dx = ((to)[0] - (from)[0]);  \
+    f32 _dz = ((to)[2] - (from)[2]);  \
+    *(yaw) = atan2s(_dz, _dx);        \
+}
+
+#define vec3f_get_yaw vec3_get_yaw
+#define vec3s_get_yaw vec3_get_yaw
+
+// Finds the distance, pitch, and yaw between two vectors
+#define vec3_get_dist_and_angle(from, to, dist, pitch, yaw) { \
+    Vec3f _d;                                                 \
+    vec3f_diff(_d, (to), (from));                             \
+    f32 _xz = (sqr(_d[0]) + sqr(_d[2]));                      \
+    *(dist)  = sqrtf(_xz + sqr(_d[1]));                         \
+    *(pitch) = atan2s(sqrtf(_xz), _d[1]);                       \
+    *(yaw)   = atan2s(_d[2], _d[0]);                            \
+}
+
+#define vec3f_get_dist_and_angle vec3_get_dist_and_angle
+#define vec3s_get_dist_and_angle vec3_get_dist_and_angle
+
+// Constructs the 'to' point which is distance 'dist' away from the 'from' position,
+// and has the angles pitch and yaw.
+#define vec3_set_dist_and_angle(from, to, dist, pitch, yaw) { \
+    f32 _dcos = ((dist) * coss(pitch));                         \
+    __auto_type _x = ((from)[0] + (_dcos  * sins(yaw)));       \
+    __auto_type _y = ((from)[1] + ((dist) * sins(pitch)));     \
+    __auto_type _z = ((from)[2] + (_dcos  * coss(yaw)));       \
+    (to)[0] = _x;                                             \
+    (to)[1] = _y;                                             \
+    (to)[2] = _z;                                             \
+}
+
+#define vec3f_set_dist_and_angle vec3_set_dist_and_angle
+#define vec3s_set_dist_and_angle vec3_set_dist_and_angle
+
+
+// Matrices
 
 #define MAT4_VEC_DOT_PROD(R, A, B, row, col) {              \
     (R)[(row)][(col)]  = ((A)[(row)][0] * (B)[0][(col)]);   \
@@ -431,96 +623,10 @@ extern f32 gSineTable[];
     ((u32 *)(mtx))[15] = FLOAT_ONE;             \
 }
 
-#define NAME_INVMAG(v) v##_invmag
-
-/// Scale vector 'v' so it has length 1
-#define vec3_normalize(v) {                                     \
-    register f32 NAME_INVMAG(v) = vec3_mag((v));                \
-    NAME_INVMAG(v) = (1.0f / MAX(NAME_INVMAG(v), NEAR_ZERO));   \
-    vec3_mul_val((v), NAME_INVMAG(v));                          \
-}
-
-#define vec3_normalize_max(v, max) {    \
-    register f32 v##_mag = vec3_mag(v); \
-    v##_mag = MAX(v##_mag, NEAR_ZERO);  \
-    if (v##_mag > max) {                \
-        v##_mag = (max / v##_mag);      \
-        vec3_mul_val(v, v##_mag);       \
-    }                                   \
-}
-
-#define ABS(x)  (((x) > 0) ? (x) : -(x))
-
-extern s32 roundf(f32);
-// backwards compatibility
-#define round_float(in) roundf(in)
-
-#define absf ABS
-#define absi ABS
-#define abss ABS
-
-#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
-
 u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 
-f32  min_3f(   f32 a, f32 b, f32 c);
-s32  min_3i(   s32 a, s32 b, s32 c);
-s32  min_3s(   s16 a, s16 b, s16 c);
-f32  max_3f(   f32 a, f32 b, f32 c);
-s32  max_3i(   s32 a, s32 b, s32 c);
-s32  max_3s(   s16 a, s16 b, s16 c);
-void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
-void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
-void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
-
-void vec3f_copy    (Vec3f dest, const Vec3f src);
-void vec3i_copy    (Vec3i dest, const Vec3i src);
-void vec3s_copy    (Vec3s dest, const Vec3s src);
-void vec3s_to_vec3i(Vec3i dest, const Vec3s src);
-void vec3s_to_vec3f(Vec3f dest, const Vec3s src);
-void vec3i_to_vec3s(Vec3s dest, const Vec3i src);
-void vec3i_to_vec3f(Vec3f dest, const Vec3i src);
-void vec3f_to_vec3s(Vec3s dest, const Vec3f src);
-void vec3f_to_vec3i(Vec3i dest, const Vec3f src);
-
-void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff);
-
-void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf);
-
-void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z);
-void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z);
-void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z);
-
-void vec3f_add (Vec3f dest, const Vec3f a               );
-void vec3i_add (Vec3i dest, const Vec3i a               );
-void vec3s_add (Vec3s dest, const Vec3s a               );
-void vec3f_sum (Vec3f dest, const Vec3f a, const Vec3f b);
-void vec3i_sum (Vec3i dest, const Vec3i a, const Vec3i b);
-void vec3s_sum (Vec3s dest, const Vec3s a, const Vec3s b);
-void vec3f_sub (Vec3f dest, const Vec3f a               );
-void vec3i_sub (Vec3i dest, const Vec3i a               );
-void vec3s_sub (Vec3s dest, const Vec3s a               );
-void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b);
-void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b);
-void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b);
-void vec3f_mul (Vec3f dest, const Vec3f a               );
-void vec3i_mul (Vec3i dest, const Vec3i a               );
-void vec3s_mul (Vec3s dest, const Vec3s a               );
-void vec3f_prod(Vec3f dest, const Vec3f a, const Vec3f b);
-void vec3i_prod(Vec3i dest, const Vec3i a, const Vec3i b);
-void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b);
-void vec3f_div (Vec3f dest, const Vec3f a               );
-void vec3i_div (Vec3i dest, const Vec3i a               );
-void vec3s_div (Vec3s dest, const Vec3s a               );
-void vec3f_quot(Vec3f dest, const Vec3f a, const Vec3f b);
-void vec3i_quot(Vec3i dest, const Vec3i a, const Vec3i b);
-void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b);
-
-f32  vec3f_dot(              const Vec3f a, const Vec3f b);
-void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b);
-void vec3f_normalize(Vec3f dest);
 void mtxf_copy(Mat4 dest, Mat4 src);
 void mtxf_identity(Mat4 mtx);
 void mtxf_translate(Mat4 dest, Vec3f b);
@@ -537,41 +643,17 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b);
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s);
 void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
 
-extern void mtxf_to_mtx_fast(register s16 *dest, register float *src);
-ALWAYS_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
+extern void mtxf_to_mtx_fast(s16 *dest, float *src);
+ALWAYS_INLINE void mtxf_to_mtx(void *dest, void *src) {
     mtxf_to_mtx_fast((s16*)dest, (float*)src);
     // guMtxF2L(src, dest);
 }
 
 void mtxf_rotate_xy(Mtx *mtx, s16 angle);
-void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
-void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v);
-void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 
-void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                      );
-void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                      );
-void vec3f_get_lateral_dist_squared(           Vec3f from, Vec3f to,            f32 *lateralDist                      );
-void vec3f_get_dist(                           Vec3f from, Vec3f to, f32 *dist                                        );
-void vec3f_get_dist_squared(                   Vec3f from, Vec3f to, f32 *dist                                        );
-void vec3f_get_dist_and_yaw(                   Vec3f from, Vec3f to, f32 *dist,                               s16 *yaw);
-void vec3f_get_pitch(                          Vec3f from, Vec3f to,                              s16 *pitch          );
-void vec3f_get_yaw(                            Vec3f from, Vec3f to,                                          s16 *yaw);
-void vec3f_get_angle(                          Vec3f from, Vec3f to,                              s16 *pitch, s16 *yaw);
-void vec3f_get_lateral_dist_and_pitch(         Vec3f from, Vec3f to,            f32 *lateralDist, s16 *pitch          );
-void vec3f_get_lateral_dist_and_yaw(           Vec3f from, Vec3f to,            f32 *lateralDist,             s16 *yaw);
-void vec3f_get_lateral_dist_and_angle(         Vec3f from, Vec3f to,            f32 *lateralDist, s16 *pitch, s16 *yaw);
-void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, s16 *pitch, s16 *yaw);
-void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist,                   s16 *pitch, s16 *yaw);
-void vec3s_get_dist_and_angle(                 Vec3s from, Vec3s to, s16 *dist,                   s16 *pitch, s16 *yaw);
-void vec3f_to_vec3s_get_dist_and_angle(        Vec3f from, Vec3s to, f32 *dist,                   s16 *pitch, s16 *yaw);
-void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   s16  pitch, s16  yaw);
-void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   s16  pitch, s16  yaw);
-
-s16 approach_angle(s16 current, s16 target, s16 inc);
 s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec);
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec);
 f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec);
-Bool32 approach_angle_bool(s16 *current, s16 target, s16 inc);
 Bool32 approach_s16_bool(s16 *current, s16 target, s16 inc, s16 dec);
 Bool32 approach_s32_bool(s32 *current, s32 target, s32 inc, s32 dec);
 Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec);
@@ -581,6 +663,8 @@ Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec);
 #define approach_s16_symmetric_bool(current, target, inc) approach_s16_bool((current), (target), (inc), (inc))
 #define approach_s32_symmetric_bool(current, target, inc) approach_s32_bool((current), (target), (inc), (inc))
 #define approach_f32_symmetric_bool(current, target, inc) approach_f32_bool((current), (target), (inc), (inc))
+#define approach_angle approach_s16_symmetric
+#define approach_angle_bool approach_s16_symmetric_bool
 s32 approach_f32_signed(f32 *current, f32 target, f32 inc);
 s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
 f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
