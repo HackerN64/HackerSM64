@@ -331,11 +331,13 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         red = gWarpTransRed, green = gWarpTransGreen, blue = gWarpTransBlue;
     }
 
-    if (transType < WARP_TRANSITION_TYPE_STAR) { // if transition is WARP_TRANSITION_TYPE_COLOR
+    if (transType & WARP_TRANSITION_TYPE_COLOR) {
         gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue = blue;
     } else { // if transition is textured
+        set_and_reset_transition_fade_timer(0); // Reset transition timers by passing in 0 for time
+
         gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue = blue;
@@ -353,8 +355,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
 
         s16 fullRadius = GFX_DIMENSIONS_FULL_RADIUS;
 
-        // HackerSM64: this fixes the pop-in with texture transition, comment out this switch
-        // statement if you want to restore the original full radius.
+#ifdef POLISHED_TRANSITIONS
         switch (transType){
             case WARP_TRANSITION_TYPE_BOWSER:
             case WARP_TRANSITION_FADE_INTO_BOWSER:
@@ -369,6 +370,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
                 fullRadius *= 1.5f;
             break;
         }
+#endif
 
         if (transType & WARP_TRANSITION_FADE_INTO) { // Is the image fading in?
             gWarpTransition.data.startTexRadius = fullRadius;
