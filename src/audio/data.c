@@ -73,7 +73,7 @@ u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
 
 /**
  * Format:
- * - useLightweightSettings (Reduce some runtime configurability options in favor of a slight speed boost during processing; Light configurability settings are found in synthesis.h)
+ * - useLightweightSettings (Reduce some runtime configurability options in favor of a significant speed boost during processing; Light configurability settings are found in synthesis.h)
  * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality; number <= 0 signifies use of vanilla reverb)
  * - isMono                 (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
  * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
@@ -85,8 +85,8 @@ u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
  * 
  * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel])
  * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel])
- * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; overridden when using light settings)
- * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; overridden when using light settings)
+ * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; unused when using light settings)
+ * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; unused when using light settings)
  * 
  * NOTE: The first entry will always be used by default when not using the level commands to specify a preset.
  * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.
