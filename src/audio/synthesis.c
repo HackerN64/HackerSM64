@@ -47,11 +47,11 @@ u8 toggleBetterReverb = FALSE;
 u8 betterReverbLightweight = FALSE;
 u8 monoReverb;
 s8 betterReverbDownsampleRate;
-static s32        reverbMults[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS / 3] = {0};
-static s32         allpassIdx[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS] = {0};
-static s32 betterReverbDelays[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS] = {0};
-static s32     lastDelayLight[SYNTH_CHANNEL_STEREO_COUNT];
-static s16        **delayBufs[SYNTH_CHANNEL_STEREO_COUNT];
+static s32         reverbMults[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS / 3] = {0};
+static s32          allpassIdx[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS] = {0};
+static s32  betterReverbDelays[SYNTH_CHANNEL_STEREO_COUNT][NUM_ALLPASS] = {0};
+static s32 historySamplesLight[SYNTH_CHANNEL_STEREO_COUNT];
+static s16         **delayBufs[SYNTH_CHANNEL_STEREO_COUNT];
 u8 *gReverbMults[SYNTH_CHANNEL_STEREO_COUNT];
 s32 reverbLastFilterIndex;
 s32 reverbFilterCount;
@@ -106,6 +106,7 @@ static void reverb_samples(s16 *start, s16 *end, s16 *downsampleBuffer, s32 chan
     j = 0;
 
     for (; start < end; start++, downsampleBuffer += downsampleIncrement) {
+        // Mix the very last filter output with new incoming sample
         tmpCarryover = ((delayBufsLocal[lastFilterIndex][allpassIdxLocal[lastFilterIndex]] * revIndex) >> 8) + *downsampleBuffer;
         outSampleTotal = 0;
         i = 0;
@@ -134,7 +135,6 @@ static void reverb_samples(s16 *start, s16 *end, s16 *downsampleBuffer, s32 chan
     }
 }
 
-#define FILTERS_MINUS_1 (BETTER_REVERB_FILTER_COUNT_LIGHT - 1)
 static void reverb_samples_light(s16 *start, s16 *end, s16 *downsampleBuffer, s32 channel) {
     s16 *curDelaySample;
     s32 historySample;
@@ -144,14 +144,16 @@ static void reverb_samples_light(s16 *start, s16 *end, s16 *downsampleBuffer, s3
     s32 downsampleIncrement = gReverbDownsampleRate;
     s32 *delaysLocal = betterReverbDelays[channel];
     s32 *allpassIdxLocal = allpassIdx[channel];
-    s32 lastDelayLightLocal = lastDelayLight[channel];
     s16 **delayBufsLocal = delayBufs[channel];
 
-    for (; start < end; start++, downsampleBuffer += downsampleIncrement) {
-        tmpCarryover = (((delayBufsLocal[FILTERS_MINUS_1][allpassIdxLocal[FILTERS_MINUS_1]] * BETTER_REVERB_REVERB_INDEX_LIGHT) >> 8) + *downsampleBuffer);
-        i = 0;
+    // Get history sample from last processing tick
+    tmpCarryover = historySamplesLight[channel];
 
-        for (; i < FILTERS_MINUS_1; ++i) {
+    for (; start < end; start++, downsampleBuffer += downsampleIncrement) {
+        // Mix previous sample with new incoming sample
+        tmpCarryover = ((tmpCarryover * BETTER_REVERB_REVERB_INDEX_LIGHT) >> 8) + *downsampleBuffer;
+
+        for (i = 0; i < BETTER_REVERB_FILTER_COUNT_LIGHT; ++i) {
             curDelaySample = &delayBufsLocal[i][allpassIdxLocal[i]];
             historySample = *curDelaySample;
 
@@ -162,16 +164,13 @@ static void reverb_samples_light(s16 *start, s16 *end, s16 *downsampleBuffer, s3
             if (++allpassIdxLocal[i] == delaysLocal[i]) allpassIdxLocal[i] = 0;
         }
 
-        curDelaySample = &delayBufsLocal[FILTERS_MINUS_1][allpassIdxLocal[FILTERS_MINUS_1]];
-        historySample = ((*curDelaySample * BETTER_REVERB_MULTIPLE_LIGHT) >> 8); // outSampleTotal variable not needed, as there is no sample addition happening here. Not really a history sample though.
-        *curDelaySample = CLAMP_S16(tmpCarryover);
-
-        if (++allpassIdxLocal[FILTERS_MINUS_1] == lastDelayLightLocal) allpassIdxLocal[FILTERS_MINUS_1] = 0;
-
-        *start = CLAMP_S16(historySample);
+        // Lightweight does not use the final filter type at all, unlike standard reverb processing
+        *start = CLAMP_S16(tmpCarryover);
     }
+    
+    // Copy history sample to temporary buffer for processing next tick
+    historySamplesLight[channel] = tmpCarryover;
 }
-#undef FILTERS_MINUS_1
 
 void initialize_better_reverb_buffers(void) {
     delayBufs[SYNTH_CHANNEL_LEFT] = (s16**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
@@ -180,8 +179,11 @@ void initialize_better_reverb_buffers(void) {
 
 void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
     s32 bufOffset = 0;
-    s32 i;
     s32 filterCount = reverbFilterCount;
+    u32 *inputDelayPtrs[SYNTH_CHANNEL_STEREO_COUNT] = {
+        [SYNTH_CHANNEL_LEFT]  = inputDelaysL,
+        [SYNTH_CHANNEL_RIGHT] = inputDelaysR,
+    };
 
     if (betterReverbLightweight)
         filterCount = BETTER_REVERB_FILTER_COUNT_LIGHT;
@@ -194,19 +196,16 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
 
     // NOTE: Using filterCount over NUM_ALLPASS will report less memory usage with fewer filters, but poses an additional
     // risk to anybody testing on console with performance compromises, as emulator can be easily overlooked.
-    for (i = 0; i < filterCount; ++i) {
-        betterReverbDelays[SYNTH_CHANNEL_LEFT][i] = (s32) (inputDelaysL[i] / gReverbDownsampleRate);
-        betterReverbDelays[SYNTH_CHANNEL_RIGHT][i] = (s32) (inputDelaysR[i] / gReverbDownsampleRate);
-        delayBufs[SYNTH_CHANNEL_LEFT][i] = soundAlloc(&gBetterReverbPool, betterReverbDelays[SYNTH_CHANNEL_LEFT][i] * sizeof(s16));
-        bufOffset += betterReverbDelays[SYNTH_CHANNEL_LEFT][i];
-        delayBufs[SYNTH_CHANNEL_RIGHT][i] = soundAlloc(&gBetterReverbPool, betterReverbDelays[SYNTH_CHANNEL_RIGHT][i] * sizeof(s16));
-        bufOffset += betterReverbDelays[SYNTH_CHANNEL_RIGHT][i];
+    for (s32 channel = 0; channel < SYNTH_CHANNEL_STEREO_COUNT; channel++) {
+        historySamplesLight[channel] = 0;
+        for (s32 filter = 0; filter < filterCount; filter++) {
+            betterReverbDelays[channel][filter] = (s32) (inputDelayPtrs[channel][filter] / gReverbDownsampleRate);
+            delayBufs[channel][filter] = soundAlloc(&gBetterReverbPool, betterReverbDelays[channel][filter] * sizeof(s16));
+            bufOffset += betterReverbDelays[channel][filter];
+        }
     }
 
     aggress(bufOffset * sizeof(s16) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
-
-    lastDelayLight[SYNTH_CHANNEL_LEFT] = betterReverbDelays[SYNTH_CHANNEL_LEFT][filterCount-1];
-    lastDelayLight[SYNTH_CHANNEL_RIGHT] = betterReverbDelays[SYNTH_CHANNEL_RIGHT][filterCount-1];
 
     bzero(allpassIdx, sizeof(allpassIdx));
 }
