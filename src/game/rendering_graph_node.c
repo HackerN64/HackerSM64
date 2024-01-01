@@ -286,7 +286,7 @@ static struct RenderPhase sRenderPhases[] = {
     },
 
     [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
-        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .startLayer = LAYER_NON_ZB_FIRST,
         .endLayer   = LAYER_LAST,
     },
 
