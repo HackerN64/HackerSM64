@@ -55,19 +55,26 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
 }
 #else
 static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
-    s32 i;
+    s32 hasProcessedChannel = FALSE;
+    f32 channelVolume;
+    f32 panFromChannel;
+    f32 panLayerWeight;
 
-    f32 channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
-    if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
-        channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
-    }
-
-    f32 panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
-    f32 panLayerWeight = 1.0f - seqChannel->panChannelWeight;
-
-    for (i = 0; i < 4; i++) {
+    for (s32 i = 0; i < LAYERS_MAX; i++) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
         if (layer != NULL && layer->enabled && layer->note != NULL) {
+            if (!hasProcessedChannel) {
+                hasProcessedChannel = TRUE;
+
+                channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
+                if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
+                    channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
+                }
+
+                panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
+                panLayerWeight = 1.0f - seqChannel->panChannelWeight;
+            }
+
             layer->noteFreqScale = layer->freqScale * seqChannel->freqScale;
             layer->noteVelocity = layer->velocitySquare * channelVolume;
             layer->notePan = (layer->pan * panLayerWeight) + panFromChannel;
