@@ -703,7 +703,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, u32 bufLen, u64 *cmd) {
                             aClearBuffer(cmd++, DMEM_ADDR_UNCOMPRESSED_NOTE + s5,
                                          (samplesLenAdjusted - nAdpcmSamplesProcessed) * 2);
                             note->samplePosInt = 0;
-                            note->finished = 1;
+                            note->finished = TRUE;
                             ((struct vNote *)note)->enabled = 0;
                             break;
                         }
@@ -728,7 +728,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, u32 bufLen, u64 *cmd) {
                                     aResample(cmd++, A_INIT, 0xff60, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->dummyResampleState));
                                     resampledTempLen = samplesLenAdjusted + 4;
                                     noteSamplesDmemAddrBeforeResampling = DMEM_ADDR_RESAMPLED + 4;
-                                    if (note->finished != FALSE) {
+                                    if (note->finished) {
                                         aClearBuffer(cmd++, DMEM_ADDR_RESAMPLED + resampledTempLen, samplesLenAdjusted + 16);
                                     }
                                     break;
@@ -747,7 +747,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, u32 bufLen, u64 *cmd) {
                             }
                     }
 
-                    if (note->finished != FALSE) {
+                    if (note->finished) {
                         break;
                     }
                 }
