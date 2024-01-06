@@ -114,6 +114,11 @@
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
+ * Number of frames of lag before you're allowed to jump off of a slope when buttsliding. (Set to 0 if you want no lag, and -1 if you want to disable jumping on slopes (why))
+ */
+#define SLOPE_LAG_FRAMES 5
+
+/**
  * Disables BLJs and crushes SimpleFlips's dreams.
  */
 // #define DISABLE_BLJ
