@@ -104,11 +104,6 @@
 #define HANGING_FIX
 
 /**
- * Buffers an A input if you jump off a slope during the landing lag
- */
-#define SLOPE_FIX
-
-/**
  * The maximum angle the player can wall kick, in degrees. 0..90. To allow 45 degree wall kicks, you must supply `46` to allow 45 and under.
  */
 #define WALL_KICK_DEGREES 45
@@ -118,7 +113,10 @@
  */
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
-
+/**
+ * Buffers an A input if you jump off a slope during the landing lag
+ */
+//#define SLOPE_BUFFER
 
 /**
  * Disables BLJs and crushes SimpleFlips's dreams.
