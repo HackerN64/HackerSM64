@@ -116,7 +116,7 @@
 /**
  * Buffers an A input if you jump off a slope during the landing lag
  */
-//#define SLOPE_BUFFER
+// #define SLOPE_BUFFER
 
 /**
  * Disables BLJs and crushes SimpleFlips's dreams.
