@@ -21,7 +21,7 @@
 #endif
 #include "game/puppyprint.h"
 
-#include "config/config_memory_private.h"
+#include "memory_layout.h"
 
 #define	DOWN(s, align)	(((u32)(s)) & ~((align)-1))
 #define DOWN4(s) DOWN(s, 4)
@@ -31,13 +31,13 @@ struct MainPoolRegion {
     u32 size;
 };
 
-#if 0 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
 // One giant region encompassing all of the ram. Memory layout follows vanilla implementation
 // -zbuffer-|-game/engine data-|-framebuffers-|-main pool region-
 #define MAIN_POOL_REGIONS_COUNT 1
 #endif
 
-#if 10 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS == MEMORY_FRAGMENTATION_LEVEL
 // Region before zbuffer and region after the framebuffer2
 // -game/engine data-|-main pool region 0-|-zbuffer-|-framebuffers-|-main pool region 1-
 //                                                  ^
@@ -45,7 +45,7 @@ struct MainPoolRegion {
 #define MAIN_POOL_REGIONS_COUNT 2
 #endif
 
-#if 11 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
 // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
 // -game/engine data-|-main pool region 0-|-zbuffer-|-main pool region 2-|-framebuffers-|-main pool region 1-
 //                                        ^                              ^
@@ -53,7 +53,7 @@ struct MainPoolRegion {
 #define MAIN_POOL_REGIONS_COUNT 3
 #endif
 
-#if 15 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_SPLIT == MEMORY_FRAGMENTATION_LEVEL
 // Region after 0x80600000, before zbuffer, after the framebuffer2
 // -game/engine data-|-main pool region 1-|-zbuffer-|-framebuffers-|-main pool region 1-|-main pool region 0-
 //                                                  ^                                   ^
@@ -61,7 +61,7 @@ struct MainPoolRegion {
 #define MAIN_POOL_REGIONS_COUNT 3
 #endif
 
-#if 20 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER == MEMORY_FRAGMENTATION_LEVEL
 // Region before zbuffer, between fb0/fb1, after fb2
 // -game/engine data-|-main pool region 0-|-zb-|-fb0-|-main pool region 1-|-fb1-|-fb2-|-main pool region 2-
 //                                             ^                                ^
@@ -69,7 +69,7 @@ struct MainPoolRegion {
 #define MAIN_POOL_REGIONS_COUNT 3
 #endif
 
-#if 21 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
 // Region before zbuffer, between zb/fb0, between fb0/1, between fb1/2, after fb2
 // -game/engine data-|-main pool region 0-|-zb-|-main pool region 1-|-fb0-|-main pool region 2-|-fb1-|-main pool region 3-|-fb2-|-main pool region 4-
 //                                        ^                         ^                          ^                          ^
@@ -188,39 +188,39 @@ void main_pool_init() {
     sMainPool.regions[id].start = (u8 *) ALIGN4((uintptr_t)(bufStart)); \
     sMainPool.regions[id].size = (u8 *) DOWN4((uintptr_t)(bufEnd)) - sMainPool.regions[id].start;
 
-#if 0 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
     // One giant region encompassing all of the ram
     SET_REGION(0, _framebuffer2SegmentBssEnd, _goddardSegmentStart);
 #endif
 
-#if 10 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS == MEMORY_FRAGMENTATION_LEVEL
     // Region before zbuffer and region after the framebuffer2
     SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
     SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
 #endif
 
-#if 11 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
     // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
     SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
     SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
     SET_REGION(2, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
 #endif
 
-#if 15 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_SPLIT == MEMORY_FRAGMENTATION_LEVEL
     // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
     SET_REGION(0, 0x80600000, _goddardSegmentStart);
     SET_REGION(1, _engineSegmentBssEnd, ZBUFFER_LOCATION);
     SET_REGION(2, FRAMEBUFFER2_END, 0x80600000);
 #endif
 
-#if 20 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER == MEMORY_FRAGMENTATION_LEVEL
     // Region before zbuffer, between fb0/fb1, after fb2
     SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
     SET_REGION(1, FRAMEBUFFER0_END, FRAMEBUFFER1_LOCATION);
     SET_REGION(2, FRAMEBUFFER2_END, _goddardSegmentStart);
 #endif
 
-#if 21 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
     // Region before zbuffer, between zb/fb0, between fb0/1, between fb1/2, after fb2
     SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
     SET_REGION(1, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
@@ -507,7 +507,7 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u8 *bssStart, u8 *bssE
         }
     }
 #ifdef PUPPYPRINT_DEBUG
-    u32 ppSize = ALIGN16(srcEnd - srcStart) + 16;
+    u32 ppSize = ALIGN16(srcEnd - srcStart);
     set_segment_memory_printout(segment, ppSize);
 #endif
     return addr;
@@ -587,7 +587,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         }
     }
 #ifdef PUPPYPRINT_DEBUG
-    u32 ppSize = ALIGN16((u32)*size) + 16;
+    u32 ppSize = ALIGN16((u32)*size);
     set_segment_memory_printout(segment, ppSize);
 #endif
     return dest;

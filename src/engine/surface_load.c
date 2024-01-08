@@ -730,6 +730,9 @@ void load_object_collision_model(void) {
 
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
     profiler_collision_update(first);
+#ifdef PUPPYPRINT_DEBUG
+    puppyprint_calculate_ram_usage_dynamic();
+#endif
 }
 
 /**
@@ -755,4 +758,7 @@ void load_object_static_model(void) {
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
     profiler_collision_update(first);
+#ifdef PUPPYPRINT_DEBUG
+    puppyprint_calculate_ram_usage_dynamic();
+#endif
 }

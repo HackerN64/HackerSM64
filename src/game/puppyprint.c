@@ -142,8 +142,8 @@ extern u8 _framebuffer1SegmentBssStart[];
 extern u8 _framebuffer1SegmentBssEnd[];
 extern u8 _framebuffer2SegmentBssStart[];
 extern u8 _framebuffer2SegmentBssEnd[];
-\
-void puppyprint_calculate_ram_usage(void) {
+
+void puppyprint_calculate_ram_usage_static(void) {
     ramsizeSegment[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - gAudioHeapSize;
     ramsizeSegment[RAM_MAIN] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
     ramsizeSegment[RAM_ENGINE] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
@@ -152,8 +152,11 @@ void puppyprint_calculate_ram_usage(void) {
                                      + ((u32)&_framebuffer2SegmentBssEnd - (u32)&_framebuffer2SegmentBssStart);
     ramsizeSegment[RAM_ZBUFFER] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
     ramsizeSegment[RAM_GODDARD] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
+}
+
+void puppyprint_calculate_ram_usage_dynamic(void) {
     ramsizeSegment[RAM_POOLS] = gPoolMem;
-    ramsizeSegment[RAM_COLLISION] = ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
+    ramsizeSegment[RAM_COLLISION] = ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool) + gTotalStaticSurfaceData;
     ramsizeSegment[RAM_MISC] = gMiscMem;
     ramsizeSegment[RAM_AUDIO] = gAudioHeapSize;
 }

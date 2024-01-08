@@ -102,7 +102,7 @@ SECTIONS
    END_SEG(boot)
 
    . = (RAM_START + 0x400);
-#if 0 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
    BEGIN_NOLOAD(zbuffer)
    {
       BUILD_DIR/src/buffers/zbuffer.o(.bss*);
@@ -277,7 +277,7 @@ SECTIONS
 
    . = _engineSegmentBssEnd;
 
-#if 0 == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
    BEGIN_NOLOAD(framebuffer0)
    {
       BUILD_DIR/src/buffers/framebuffer0.o(.bss*);

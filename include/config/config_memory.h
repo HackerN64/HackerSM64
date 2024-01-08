@@ -13,15 +13,27 @@
 
 /**
  * Defines amount of allowed main pool memory fragmentation due to zbuffer/framebuffer relocations. The more fragmented the level, the better alignment of framebuffers but worse contig memory allocation.
- * 0  - no fragmentation allowed. This allows for roughly 5.5MB max contig alloc 
- * 10 - all framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank in the end of the RAM around the 'pivot' point. This allows for roughly 5MB max contig alloc
- * 11 - all framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank in the end of the RAM at the start of the bank. This allows for roughly 4MB max contig alloc
- * 15 - all framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank around the 'pivot' point at 0x80500000. Main pool first region starts at 0x80600000. This allows for roughly 2MB+3MB max contig alloc and gives nicer memory use.
- * 20 - each framebuffer and zbuffer are moved to separate 1MB banks around 2 pivot points 0x80700000 and 0x80500000. This allows for roughly 3MB max contig alloc
- * 21 - each framebuffer and zbuffer are moved to separate 1MB banks and put at the start of the bank. This allows for roughly 2MB max contig alloc
+ * Larger values refer to a more fragmented memory layout but potentially better performance.
+ * If you want to try it out, I suggest using options MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS, MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_SPLIT and MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER.
  */
+// no fragmentation allowed. This allows for roughly 5.5MB max contig alloc
+#define MEMORY_FRAGMENTATION_NO_FRAGMENTATION 0
 
-#define MEMORY_FRAGMENTATION_LEVEL 10
+// 'MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_*' puts zbuffer and 3 framebuffers in 2 separate memory banks with various memory layouts:
+// All framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank in the end of the RAM around the 'pivot' point. This allows for roughly 5MB max contig alloc
+#define MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS 10
+// All framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank in the end of the RAM at the start of the bank. This allows for roughly 4MB max contig alloc
+#define MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_ALIGNED 11
+// All framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank around the 'pivot' point at 0x80500000. Main pool first region starts at 0x80600000. This allows for roughly 2MB+3MB max contig alloc and gives nicer memory use.
+#define MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_SPLIT 15
+
+// 'MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER*' puts zbuffer and each framebuffer in 4 separate memory banks.
+// Each framebuffer and zbuffer are moved to separate 1MB banks around 2 pivot points 0x80700000 and 0x80500000. This allows for roughly 3MB max contig alloc
+#define MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER 20
+// Each framebuffer and zbuffer are moved to separate 1MB banks and put at the start of the bank. This allows for roughly 2MB max contig alloc
+#define MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER_ALIGNED 21
+
+#define MEMORY_FRAGMENTATION_LEVEL MEMORY_FRAGMENTATION_NO_FRAGMENTATION
 
 // For nerds here are the results of measurements
 
