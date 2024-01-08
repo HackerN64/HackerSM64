@@ -12,14 +12,6 @@
 #define USE_EXT_RAM
 
 /**
- * Uses alternative algorithm for allocating from main pool. Instead of first fit, it uses best fit
- * It is not recommended to use because it tends to choose slower memory compared to the default order
- * which is ordered from fastest to slowest memory.
- * On the other hand, in theory it is possible to fill memory better with this algorithm, in reality it does not matter 
- */
-// #define MAIN_POOL_USE_BEST_FIT
-
-/**
  * Defines amount of allowed main pool memory fragmentation due to zbuffer/framebuffer relocations. The more fragmented the level, the better alignment of framebuffers but worse contig memory allocation.
  * 0  - no fragmentation allowed. This allows for roughly 5.5MB max contig alloc 
  * 10 - all framebuffers & zbuffer are moved to separate 1MB banks using 2 separate bank in the end of the RAM around the 'pivot' point. This allows for roughly 5MB max contig alloc

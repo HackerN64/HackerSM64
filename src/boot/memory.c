@@ -23,28 +23,6 @@
 
 #include "config/config_memory_private.h"
 
-#ifdef MAIN_POOL_USE_BEST_FIT
-// For developing purposes, check if the size of the region is corrupted
-// #define MAIN_POOL_DEBUG_CORRUPTION_SIZE
-
-#ifdef MAIN_POOL_DEBUG_CORRUPTION_SIZE
-#define MAIN_POOL_CORRUPTED() main_pool_corrupted(__LINE__, __func__)
-
-__attribute__ ((noinline)) static void main_pool_corrupted(int line, const char* fn) {
-    (void) line; (void) fn;
-#ifdef CRASH_SCREEN_INCLUDED
-    do { if (!(exp)) _n64_assert(fn, line, "Main Pool is corrupted", 1); } while (0)
-#else
-    while (1) {}
-#endif
-}
-
-#define MAIN_POOL_DEBUG_CORRUPTION_SIZE_CHECK(reg) do{ if ((reg)->size > 0x800000) MAIN_POOL_CORRUPTED(); } while(0)
-#else
-#define MAIN_POOL_DEBUG_CORRUPTION_SIZE_CHECK(reg)
-#endif
-#endif
-
 #define	DOWN(s, align)	(((u32)(s)) & ~((align)-1))
 #define DOWN4(s) DOWN(s, 4)
 
@@ -102,9 +80,6 @@ struct MainPoolRegion {
 struct MainPoolContext {
     struct MainPoolRegion regions[MAIN_POOL_REGIONS_COUNT];
     u32 freeSpace;
-#ifdef MAIN_POOL_USE_BEST_FIT
-    u8 regionIds[MAIN_POOL_REGIONS_COUNT];
-#endif
 };
 
 struct MainPoolState {
@@ -200,57 +175,6 @@ static void main_pool_calculate_size(void) {
     }
 }
 
-#ifdef MAIN_POOL_USE_BEST_FIT
-static void main_pool_region_swap(struct MainPoolRegion* r1, struct MainPoolRegion* r2) {
-    struct MainPoolRegion tmp = *r1;
-    *r1 = *r2;
-    *r2 = tmp;
-}
-
-static void u8_swap(u8* r1, u8* r2) {
-    u8 tmp = *r1;
-    *r1 = *r2;
-    *r2 = tmp;
-}
-
-// sort the 'sMainPool.regions' by size - from lowest size to biggest
-#define COMPARE(l, r) do{ \
-    if (sMainPool.regions[l].size > sMainPool.regions[r].size) { \
-        main_pool_region_swap(&sMainPool.regions[l], &sMainPool.regions[r]); \
-        u8_swap(&sMainPool.regionIds[l], &sMainPool.regionIds[r]); \
-    } \
-} while(0)
-
-#define COMPARE_BREAK(l, r) do{ \
-    if (sMainPool.regions[l].size > sMainPool.regions[r].size) { \
-        main_pool_region_swap(&sMainPool.regions[l], &sMainPool.regions[r]); \
-        u8_swap(&sMainPool.regionIds[l], &sMainPool.regionIds[r]); \
-    } else { \
-        break; \
-    } \
-} while(0)
-
-static void main_pool_sort() {
-    COMPARE(0, 1);
-    COMPARE(1, 2);
-    COMPARE(0, 1);
-}
-
-static void main_pool_sort_down(int from) {
-    // If 'from' region was changed, we just need to bubble sort it to the bottom
-    // Whenever the first time condition for 'COMPARE' fails, break away as all other conditions will fail
-    for (int i = from; i > 0; i--)
-        COMPARE_BREAK(i - 1, i);
-}
-
-static void main_pool_sort_up(int from) {
-    for (int i = from + 1; i < MAIN_POOL_REGIONS_COUNT; i++)
-        COMPARE_BREAK(i - 1, i);
-}
-#undef COMPARE
-#undef COMPARE_BREAK
-#endif
-
 extern u8 _framebuffer2SegmentBssEnd[];
 extern u8 _goddardSegmentStart[];
 
@@ -306,13 +230,6 @@ void main_pool_init() {
 #endif
 
 #undef SET_REGION
-
-#ifdef MAIN_POOL_USE_BEST_FIT
-    for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++)
-        sMainPool.regionIds[i] = i;
-
-    main_pool_sort();
-#endif
 
     main_pool_calculate_size();
 
@@ -394,15 +311,6 @@ void *main_pool_alloc(u32 size) {
         if (!ret)
             continue;
 
-#ifdef MAIN_POOL_USE_BEST_FIT
-        // There is only a point in re-sorting if 2 conditions occur
-        // 1) It is not the first region, it is already the smallest
-        // 2) Final region size is smaller than size. If this is not true,
-        //    'regions[i-1]->size < size <= regions[i]->size' satisfies
-        if (i && region->size < size)
-            main_pool_sort_down(i);
-#endif
-
         return ret;
     }
 
@@ -421,12 +329,6 @@ void *main_pool_alloc_aligned(u32 size, u32 alignment) {
         if (!ret)
             continue;
 
-#ifdef MAIN_POOL_USE_BEST_FIT
-        // Performing +(2 * alignment) check here to give some flexibility to ALIGN that could have caused some changes
-        if (i && region->size < size + 2 * alignment)
-            main_pool_sort_down(i);
-#endif
-
         return ret;
     }
 
@@ -438,19 +340,9 @@ void *main_pool_alloc_freeable(u32 size) {
     size = ALIGN4(size) + sizeof(struct MainPoolFreeableHeader);
     for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
         struct MainPoolRegion* region = &sMainPool.regions[i];
-#ifdef MAIN_POOL_USE_BEST_FIT
-        u8 regionId = sMainPool.regionIds[i];
-#else
-        u8 regionId = (u8) i;
-#endif
-        void* ret = main_pool_region_try_alloc_from_end_freeable(region, regionId, size);
+        void* ret = main_pool_region_try_alloc_from_end_freeable(region, i, size);
         if (!ret)
             continue;
-
-#ifdef MAIN_POOL_USE_BEST_FIT
-        if (i && region->size < size)
-            main_pool_sort_down(i);
-#endif
 
         return ret;
     }
@@ -466,19 +358,9 @@ void *main_pool_alloc_aligned_freeable(u32 size, u32 alignment) {
     size = ALIGN4(size);
     for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
         struct MainPoolRegion* region = &sMainPool.regions[i];
-#ifdef MAIN_POOL_USE_BEST_FIT
-        u8 regionId = sMainPool.regionIds[i];
-#else
-        u8 regionId = (u8) i;
-#endif
-        void* ret = main_pool_region_try_alloc_from_end_aligned_freeable(region, regionId, size, alignment);
+        void* ret = main_pool_region_try_alloc_from_end_aligned_freeable(region, i, size, alignment);
         if (!ret)
             continue;
-
-#ifdef MAIN_POOL_USE_BEST_FIT
-        if (i && region->size < size + sizeof(struct MainPoolFreeableHeader) + 2 * alignment)
-            main_pool_sort_down(i);
-#endif
 
         return ret;
     }
@@ -495,20 +377,8 @@ void *main_pool_alloc_aligned_freeable(u32 size, u32 alignment) {
 void main_pool_free(void *addr) {
     const struct MainPoolFreeableHeader* header = (struct MainPoolFreeableHeader*) ((u8*) addr - sizeof(struct MainPoolFreeableHeader));
     if (header->magic == MAIN_POOL_FREEABLE_HEADER_MAGIC_RIGHT) {
-#ifdef MAIN_POOL_USE_BEST_FIT
-        for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
-            if (header->id == sMainPool.regionIds[i]) {
-                struct MainPoolRegion* region = &sMainPool.regions[i];
-                region->size = header->ptr - region->start;
-                MAIN_POOL_DEBUG_CORRUPTION_SIZE_CHECK(region);
-                main_pool_sort_up(i);
-                break;
-            }
-        }
-#else
-    struct MainPoolRegion* region = &sMainPool.regions[header->id];
-    region->size = header->ptr - region->start;
-#endif
+        struct MainPoolRegion* region = &sMainPool.regions[header->id];
+        region->size = header->ptr - region->start;
     } else {
         DEBUG_ASSERT("Incorrect magic for free");
     }

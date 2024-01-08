@@ -36,15 +36,67 @@ void *segmented_to_virtual(const void *addr);
 void *virtual_to_segmented(u32 segment, const void *addr);
 void move_segment_table_to_dmem(void);
 
+/*
+ Main Pool is a trivial allocator that is managing multiple 'regions' of memory.
+ 'Region' is a contiguous block of memory available for main pool use.
+ For example, whe MEMORY_FRAGMENTATION_LEVEL 10 is used, there are 2 'regions':
+ from engine end to zbuffer start and after framebuffer end to RAM end.
+ It behaves similarly to an array of AllocOnly pools from vanilla SM64 by
+ "cutting" the start of the "region" when an allocation is made and returning the
+ pointer to the start of the initial "region".
+
+ Here is a simple visual example of how the memory is laid out in the main pool:
+
+ Main pool initial state is a multiple regions of memory:
+ |-------|   |----|  |-------------------|
+ If alloc(sizeof(+++++)), first region is used and the state becomes:
+ |+++++--|   |----|  |-------------------|
+  ^
+  returned pointer, no extra memory overhead
+ If afterwards alloc(sizeof(+++)) is used, it does not fit in region 1, so region 2 is used:
+ |+++++--|   |+++-|  |-------------------|
+              ^
+  returned pointer
+ */
 void main_pool_init(void);
+
+/*
+ When 'main_pool_alloc' is used, regions are iterated till a region is found that
+ can supply the necessary memory. Compared to vanilla SM64 main pool allocator,
+ there is no extra cost in using 'main_pool_alloc' - it is has 0 bytes overhead.
+ The only way to free memory returned by 'alloc' is to use 'main_pool_pop_state'.
+ */
 void *main_pool_alloc(u32 size);
 void *main_pool_alloc_aligned(u32 size, u32 alignment);
+
+/*
+ Main pool also provides a way to free the latest allocated memory for temporary memory use.
+ In vanilla SM64, 'right side' alloc is used for it. This implementation abstracts it to 'main_pool_alloc_freeable'
+ that behaves very similarly. Notice that 'main_pool_alloc_freeable' has overhead so
+ it is recommended to use it only when necessary. Common usecase is a
+ temporary buffer that is allocated, used and freed in the same function.
+*/
+
 void *main_pool_alloc_freeable(u32 size);
 void *main_pool_alloc_aligned_freeable(u32 size, u32 alignment);
 void main_pool_free(void *addr);
+
+/*
+ Main pool provides an ability to push/pop the current state of the allocator.
+ For example, it is used by SM64 to allocate data bank buffers.
+ Common usecase in levelscript is
+ 1) Push the state using 'main_pool_push_state'
+ 2) Use 'main_pool_alloc' to allocate data bank buffers
+ 3) When unnecessary, free all the data bank buffers at once using 'main_pool_pop_state'
+ */
 void main_pool_push_state(void);
 void main_pool_pop_state(void);
-// !!! Do not use this for anything other than debugging !!!
+
+/*
+ Main pool provides an ability to get the current available memory.
+ This is useful for debugging purposes. Please do not attempt to use this
+ to predict the memory layout as regions in main pool might not be contiguous.
+ */
 u32 main_pool_available(void);
 
 #ifndef NO_SEGMENTED_MEMORY
