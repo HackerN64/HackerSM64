@@ -3,6 +3,7 @@
 
 #include <PR/ultratypes.h>
 
+#include "memory_layout.h"
 #include "types.h"
 
 #define NUM_TLB_SEGMENTS 32
@@ -36,6 +37,32 @@ void *segmented_to_virtual(const void *addr);
 void *virtual_to_segmented(u32 segment, const void *addr);
 void move_segment_table_to_dmem(void);
 
+struct MainPoolRegion {
+    u8* start;
+    u8* end;
+};
+
+#ifndef MAIN_POOL_SINGLE_REGION
+extern struct MainPoolRegion* gMainPoolCurrentRegion;
+#else
+extern struct MainPoolContext sMainPool;
+// There is only 1 region which is the first region
+#define gMainPoolCurrentRegion ((struct MainPoolRegion*) &sMainPool)
+#endif
+
+// takes the first 'size' bytes from 'region'
+static inline void* main_pool_region_try_alloc_from_start(struct MainPoolRegion* region, u32 size) {
+    u8* buf = region->start;
+    u8* newStart = buf + size;
+#ifndef MAIN_POOL_SINGLE_REGION
+    if (__builtin_expect(newStart > region->end, 0))
+        return NULL;
+#endif
+
+    region->start = newStart;
+    return buf;
+}
+
 /*
  Main Pool is a trivial allocator that is managing multiple 'regions' of memory.
  'Region' is a contiguous block of memory available for main pool use.
@@ -66,9 +93,23 @@ void main_pool_init(void);
  there is no extra cost in using 'main_pool_alloc' - it is has 0 bytes overhead.
  The only way to free memory returned by 'alloc' is to use 'main_pool_pop_state'.
  */
-void *_main_pool_alloc(u32 size);
-#define main_pool_alloc(size) _main_pool_alloc(ALIGN4(size))
+void *main_pool_alloc_slow(u32 size);
+static inline void *main_pool_alloc(u32 size) {
+#ifndef MAIN_POOL_SINGLE_REGION
+    size = ALIGN4(size);
+    if (size < MAIN_POOL_SMALL_ALLOC_LIMIT) {
+        void *buf = main_pool_region_try_alloc_from_start(gMainPoolCurrentRegion, size);
+        if (__builtin_expect(!!buf, 1))
+            return buf;
+    }
+
+    return main_pool_alloc_slow(size);
+#else
+    return main_pool_region_try_alloc_from_start(gMainPoolCurrentRegion, size);
+#endif
+}
 void *main_pool_alloc_aligned(u32 size, u32 alignment);
+
 
 /*
  Main pool also provides a way to free the latest allocated memory for temporary memory use.
