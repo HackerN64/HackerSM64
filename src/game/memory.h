@@ -66,7 +66,8 @@ void main_pool_init(void);
  there is no extra cost in using 'main_pool_alloc' - it is has 0 bytes overhead.
  The only way to free memory returned by 'alloc' is to use 'main_pool_pop_state'.
  */
-void *main_pool_alloc(u32 size);
+void *_main_pool_alloc(u32 size);
+#define main_pool_alloc(size) _main_pool_alloc(ALIGN4(size))
 void *main_pool_alloc_aligned(u32 size, u32 alignment);
 
 /*

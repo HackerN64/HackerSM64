@@ -28,7 +28,7 @@
 
 struct MainPoolRegion {
     u8* start;
-    u32 size;
+    u8* end;
 };
 
 #if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
@@ -171,7 +171,7 @@ void move_segment_table_to_dmem(void) {
 static void main_pool_calculate_size(void) {
     sMainPool.freeSpace = 0;
     for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
-        sMainPool.freeSpace += sMainPool.regions[i].size;
+        sMainPool.freeSpace += sMainPool.regions[i].end - sMainPool.regions[i].start;
     }
 }
 
@@ -186,7 +186,7 @@ extern u8 _goddardSegmentStart[];
 void main_pool_init() {
 #define SET_REGION(id, bufStart, bufEnd) \
     sMainPool.regions[id].start = (u8 *) ALIGN4((uintptr_t)(bufStart)); \
-    sMainPool.regions[id].size = (u8 *) DOWN4((uintptr_t)(bufEnd)) - sMainPool.regions[id].start;
+    sMainPool.regions[id].end = (u8 *) DOWN4((uintptr_t)(bufEnd));
 
 #if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
     // One giant region encompassing all of the ram
@@ -242,50 +242,50 @@ void main_pool_init() {
 
 // takes the first 'size' bytes from 'region'
 static void* main_pool_region_try_alloc_from_start(struct MainPoolRegion* region, u32 size) {
-    if (region->size < size)
+    u8* buf = region->start;
+    u8* newStart = buf + size;
+    if (__builtin_expect(newStart > region->end, 0))
         return NULL;
 
-    void* ret = region->start;
-    region->start += size;
-    region->size -= size;
+    region->start = newStart;
     sMainPool.freeSpace -= size;
-    return ret;
+    return buf;
 }
 
 // takes the at least first 'size' bytes from 'region' and return pointer aligned on 'alignment'
 static void* main_pool_region_try_alloc_from_start_aligned(struct MainPoolRegion* region, u32 size, u32 alignment) {
     u8* ret = (u8*) ALIGN(region->start, alignment);
     u8* newStart = ret + size;
-    u8* regionEnd = region->start + region->size;
+    u8* regionEnd = region->end;
     if (newStart > regionEnd)
         return NULL;
 
     size = newStart - region->start;
     region->start = newStart;
-    region->size -= size;
     sMainPool.freeSpace -= size;
     return ret;
 }
 
 static void* main_pool_region_try_alloc_from_end_freeable(struct MainPoolRegion* region, u8 id, u32 sizeWithHeader) {
-    if (region->size < sizeWithHeader)
+    u32 size = region->end - region->start;
+    if (size < sizeWithHeader)
         return NULL;
 
-    u8* regionEnd = region->start + region->size;
+    u8* regionEnd = region->end;
 
     struct MainPoolFreeableHeader* header = (struct MainPoolFreeableHeader*) (regionEnd - sizeWithHeader);
     header->magic = MAIN_POOL_FREEABLE_HEADER_MAGIC_RIGHT;
     header->id = id;
     header->ptr = regionEnd;
 
-    region->size -= sizeWithHeader;
+    region->end -= sizeWithHeader;
     sMainPool.freeSpace -= sizeWithHeader;
 
     return header->data;
 }
 
 static void* main_pool_region_try_alloc_from_end_aligned_freeable(struct MainPoolRegion* region, u8 id, u32 size, u32 alignment) {
-    u8* region_end = region->start + region->size;
+    u8* region_end = region->end;
     u8* new_end = (u8*) DOWN(region_end - size, alignment) - sizeof(struct MainPoolFreeableHeader);
     if (new_end < region->start)
         return NULL;
@@ -297,18 +297,17 @@ static void* main_pool_region_try_alloc_from_end_aligned_freeable(struct MainPoo
     header->id = id;
     header->ptr = region_end;
 
-    region->size -= size;
+    region->end -= size;
     sMainPool.freeSpace -= size;
 
     return header->data;
 }
 
-void *main_pool_alloc(u32 size) {
-    size = ALIGN4(size);
+void *_main_pool_alloc(u32 size) {
     for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
         struct MainPoolRegion* region = &sMainPool.regions[i];
         void* ret = main_pool_region_try_alloc_from_start(region, size);
-        if (!ret)
+        if (__builtin_expect(!ret, 0))
             continue;
 
         return ret;
@@ -378,7 +377,7 @@ void main_pool_free(void *addr) {
     const struct MainPoolFreeableHeader* header = (struct MainPoolFreeableHeader*) ((u8*) addr - sizeof(struct MainPoolFreeableHeader));
     if (header->magic == MAIN_POOL_FREEABLE_HEADER_MAGIC_RIGHT) {
         struct MainPoolRegion* region = &sMainPool.regions[header->id];
-        region->size = header->ptr - region->start;
+        region->end = header->ptr;
     } else {
         DEBUG_ASSERT("Incorrect magic for free");
     }
