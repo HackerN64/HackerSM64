@@ -88,12 +88,18 @@ static inline void* main_pool_region_try_alloc_from_start(struct MainPoolRegion*
 void main_pool_init(void);
 
 /*
- When 'main_pool_alloc' is used, regions are iterated till a region is found that
+ When 'main_pool_alloc_slow' is used, regions are iterated till a region is found that
  can supply the necessary memory. Compared to vanilla SM64 main pool allocator,
  there is no extra cost in using 'main_pool_alloc' - it is has 0 bytes overhead.
  The only way to free memory returned by 'alloc' is to use 'main_pool_pop_state'.
  */
 void *main_pool_alloc_slow(u32 size);
+
+/*
+ 'main_pool_alloc' is a faster version of 'main_pool_alloc_slow' that can be inlined for small allocations.
+ Its fast path for small size basically looks like "(return *ptr += size)" making it
+ very quick for common tiny allocs used, for example, in surface code.
+ */
 static inline void *main_pool_alloc(u32 size) {
 #ifndef MAIN_POOL_SINGLE_REGION
     size = ALIGN4(size);
