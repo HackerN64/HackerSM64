@@ -32,20 +32,12 @@
 #define MAIN_POOL_REGIONS_COUNT 1
 #endif
 
-#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS == MEMORY_FRAGMENTATION_LEVEL || MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_CONTIGUOUS == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS == MEMORY_FRAGMENTATION_LEVEL
 // Region before zbuffer and region after the framebuffer2
 // -game/engine data-|-main pool region 0-|-zbuffer-|-framebuffers-|-main pool region 1-
 //                                                  ^
 //                                       0x80300000 or 0x80700000
 #define MAIN_POOL_REGIONS_COUNT 2
-#endif
-
-#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
-// Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
-// -game/engine data-|-main pool region 0-|-zbuffer-|-main pool region 2-|-framebuffers-|-main pool region 1-
-//                                        ^                              ^
-//                                   0x80600000                     0x80700000
-#define MAIN_POOL_REGIONS_COUNT 3
 #endif
 
 #if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_SPLIT == MEMORY_FRAGMENTATION_LEVEL
@@ -62,14 +54,6 @@
 //                                             ^                                ^
 //                                        0x80500000                       0x80700000
 #define MAIN_POOL_REGIONS_COUNT 3
-#endif
-
-#if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
-// Region before zbuffer, between zb/fb0, between fb0/1, between fb1/2, after fb2
-// -game/engine data-|-main pool region 0-|-zb-|-main pool region 1-|-fb0-|-main pool region 2-|-fb1-|-main pool region 3-|-fb2-|-main pool region 4-
-//                                        ^                         ^                          ^                          ^
-//                                   0x80400000                0x80500000                 0x80600000                 0x80700000
-#define MAIN_POOL_REGIONS_COUNT 5
 #endif
 
 struct MainPoolContext {
@@ -170,6 +154,11 @@ void move_segment_table_to_dmem(void) {
 extern u8 _framebuffer2SegmentBssEnd[];
 extern u8 _goddardSegmentStart[];
 
+#define ZBUFFER_END ZBUFFER_START + RENDER_BUFFER_BUFFER_SIZE
+#define FRAMEBUFFER0_END FRAMEBUFFER0_START + RENDER_BUFFER_BUFFER_SIZE
+#define FRAMEBUFFER1_END FRAMEBUFFER1_START + RENDER_BUFFER_BUFFER_SIZE
+#define FRAMEBUFFER2_END FRAMEBUFFER2_START + RENDER_BUFFER_BUFFER_SIZE
+
 /**
  * Initialize the main memory pool. This pool is conceptually regions
  * that grow inward from the left and right. It therefore only supports
@@ -185,40 +174,24 @@ void main_pool_init() {
     SET_REGION(0, _framebuffer2SegmentBssEnd, _goddardSegmentStart);
 #endif
 
-#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS == MEMORY_FRAGMENTATION_LEVEL || MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_CONTIGUOUS == MEMORY_FRAGMENTATION_LEVEL
+#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS == MEMORY_FRAGMENTATION_LEVEL
     // Region before zbuffer and region after the framebuffer2
-    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_START);
     SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
-#endif
-
-#if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
-    // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
-    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
-    SET_REGION(1, FRAMEBUFFER2_END, _goddardSegmentStart);
-    SET_REGION(2, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
 #endif
 
 #if MEMORY_FRAGMENTATION_ZBUFFER_AND_FRAMEBUFFERS_SPLIT == MEMORY_FRAGMENTATION_LEVEL
     // Regions before zbuffer, after the framebuffer2, between zbuffer and framebuffer0
     SET_REGION(0, 0x80600000, _goddardSegmentStart);
-    SET_REGION(1, _engineSegmentBssEnd, ZBUFFER_LOCATION);
+    SET_REGION(1, _engineSegmentBssEnd, ZBUFFER_START);
     SET_REGION(2, FRAMEBUFFER2_END, 0x80600000);
 #endif
 
 #if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER == MEMORY_FRAGMENTATION_LEVEL
     // Region before zbuffer, between fb0/fb1, after fb2
-    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
-    SET_REGION(1, FRAMEBUFFER0_END, FRAMEBUFFER1_LOCATION);
+    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_START);
+    SET_REGION(1, FRAMEBUFFER0_END, FRAMEBUFFER1_START);
     SET_REGION(2, FRAMEBUFFER2_END, _goddardSegmentStart);
-#endif
-
-#if MEMORY_FRAGMENTATION_ZBUFFER_AND_EACH_FRAMEBUFFER_ALIGNED == MEMORY_FRAGMENTATION_LEVEL
-    // Region before zbuffer, between zb/fb0, between fb0/1, between fb1/2, after fb2
-    SET_REGION(0, _engineSegmentBssEnd, ZBUFFER_LOCATION);
-    SET_REGION(1, ZBUFFER_END, FRAMEBUFFER0_LOCATION);
-    SET_REGION(2, FRAMEBUFFER0_END, FRAMEBUFFER1_LOCATION);
-    SET_REGION(3, FRAMEBUFFER1_END, FRAMEBUFFER2_LOCATION);
-    SET_REGION(4, FRAMEBUFFER2_END, _goddardSegmentStart);
 #endif
 
 #undef SET_REGION

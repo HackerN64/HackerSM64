@@ -296,28 +296,28 @@ SECTIONS
    }
    END_NOLOAD(framebuffer2)
 #else
-   . = ZBUFFER_LOCATION;
+   . = ZBUFFER_START;
    BEGIN_NOLOAD(zbuffer)
    {
       BUILD_DIR/src/buffers/zbuffer.o(.bss*);
    }
    END_NOLOAD(zbuffer)
 
-   . = FRAMEBUFFER0_LOCATION;
+   . = FRAMEBUFFER0_START;
    BEGIN_NOLOAD(framebuffer0)
    {
       BUILD_DIR/src/buffers/framebuffer0.o(.bss*);
    }
    END_NOLOAD(framebuffer0)
 
-   . = FRAMEBUFFER1_LOCATION;
+   . = FRAMEBUFFER1_START;
    BEGIN_NOLOAD(framebuffer1)
    {
       BUILD_DIR/src/buffers/framebuffer1.o(.bss*);
    }
    END_NOLOAD(framebuffer1)
 
-   . = FRAMEBUFFER2_LOCATION;
+   . = FRAMEBUFFER2_START;
    BEGIN_NOLOAD(framebuffer2)
    {
       BUILD_DIR/src/buffers/framebuffer2.o(.bss*);
