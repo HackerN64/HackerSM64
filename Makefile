@@ -221,7 +221,7 @@ ifeq ($(UNF),1)
   SRC_DIRS += src/usb
 endif
 
-LIBCART ?= 1
+LIBCART ?= 0
 $(eval $(call validate-option,LIBCART,0 1))
 ifeq ($(LIBCART),1)
   LIBCART_SRC += src/libcart/ff src/libcart/src
