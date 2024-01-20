@@ -50,3 +50,4 @@ STUB_LEVEL(  "",               LEVEL_UNKNOWN_35,       COURSE_NONE,             
 DEFINE_LEVEL("COURSE 12 TTM",  LEVEL_TTM,              COURSE_TTM,      ttm,              mountain, 15000, 0x08, 0x08, 0x08, _,         _)
 STUB_LEVEL(  "",               LEVEL_UNKNOWN_37,       COURSE_NONE,                                 20000, 0x00, 0x00, 0x00, _,         _)
 STUB_LEVEL(  "",               LEVEL_UNKNOWN_38,       COURSE_NONE,                                 20000, 0x00, 0x00, 0x00, sDynUnk38, _)
+DEFINE_LEVEL("LE DEMO",        LEVEL_LIGHTING_ENGINE_DEMO, COURSE_NONE, lighting_engine_demo, generic, 20000, 0x00, 0x00, 0x00, _, sCamLightingEngineDemo)
