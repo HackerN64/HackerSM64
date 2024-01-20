@@ -222,7 +222,7 @@ ifeq ($(UNF),1)
 endif
 
 # libcart - Flashcart SD Card Interfacing (Compatible with select emulators)
-#  TO CONTRIBUTORS: -Run `git subrepo pull src/libcart` to update.
+#  TO CONTRIBUTORS: -Run `git subrepo pull --force src/libcart` to update.
 #                   -Delete sdcrc16.c and cartbuf.c upon update
 LIBCART ?= 0
 $(eval $(call validate-option,LIBCART,0 1))
