@@ -221,6 +221,9 @@ ifeq ($(UNF),1)
   SRC_DIRS += src/usb
 endif
 
+# libcart - Flashcart SD Card Interfacing (Compatible with select emulators)
+#  TO CONTRIBUTORS: -Run `git subrepo pull src/libcart` to update.
+#                   -Delete sdcrc16.c and cartbuf.c upon update
 LIBCART ?= 0
 $(eval $(call validate-option,LIBCART,0 1))
 ifeq ($(LIBCART),1)
