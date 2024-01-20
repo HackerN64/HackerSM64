@@ -53,6 +53,11 @@
  * config_debug.h
  */
 
+#ifdef LIGHTING_ENGINE_DEMO
+    #undef TEST_LEVEL
+    #define TEST_LEVEL LEVEL_LIGHTING_ENGINE_DEMO
+#endif
+
 #ifdef DISABLE_ALL
     #undef DEBUG_ALL
     #undef USE_PROFILER

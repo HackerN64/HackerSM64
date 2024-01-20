@@ -125,6 +125,8 @@ enum BehaviorCommands {
     /*0x35*/ BHV_CMD_DISABLE_RENDERING,
     /*0x36*/ BHV_CMD_SET_INT_UNUSED,
     /*0x37*/ BHV_CMD_SPAWN_WATER_DROPLET,
+    /*0x38*/ BHV_CMD_SET_LIGHT_COLOR,
+    /*0x39*/ BHV_CMD_SET_LIGHT_FALLOFF,
 };
 
 // Defines the start of the behavior script as well as the object list the object belongs to.
@@ -388,6 +390,16 @@ enum BehaviorCommands {
 #define SPAWN_WATER_DROPLET(dropletParams) \
     BC_BPTR(BHV_CMD_SPAWN_WATER_DROPLET, dropletParams)
 
+// Advanced lighting Engine
+// Sets an object's light color
+#define SET_LIGHT_COLOR(r, g, b) \
+    BC_BBBB(BHV_CMD_SET_LIGHT_COLOR, r, g, b)
+    
+// Advanced lighting Engine
+// Sets an object's light falloff
+#define SET_LIGHT_FALLOFF(constant, linear, quadratic) \
+    BC_B0H(BHV_CMD_SET_LIGHT_FALLOFF, constant), \
+    BC_HH(linear, quadratic)
 
 const BehaviorScript bhvStarDoor[] = {
     BEGIN(OBJ_LIST_SURFACE),
@@ -4783,7 +4795,13 @@ const BehaviorScript bhvControllablePlatformSub[] = {
 
 const BehaviorScript bhvBreakableBoxSmall[] = {
     BEGIN(OBJ_LIST_DESTRUCTIVE),
+#ifdef LIGHTING_ENGINE_DEMO
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
+    SET_LIGHT_COLOR(0, 255, 255),
+    SET_LIGHT_FALLOFF(0, 0, 10),
+#else
     OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+#endif
     DROP_TO_FLOOR(),
     SET_HOME(),
     CALL_NATIVE(bhv_breakable_box_small_init),

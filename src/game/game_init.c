@@ -1,6 +1,7 @@
 #include <ultra64.h>
 
 #include "sm64.h"
+#include <point_lights.h>
 #include "gfx_dimensions.h"
 #include "audio/external.h"
 #include "buffers/buffers.h"
@@ -758,6 +759,8 @@ void setup_game_memory(void) {
     load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }
 
+void setup_global_light();
+
 /**
  * Main game loop thread. Runs forever as long as the game continues.
  */
@@ -811,7 +814,12 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
+        setup_global_light();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+        // Reset the point light count before running the level script
+        // This is because the level script is responsible for calling the function
+        // that updates objects, which is where objects that emit light create their point lights
+        gPointLightCount = gAreaPointLightCount;
         profiler_update(PROFILER_TIME_CONTROLLERS, 0);
         profiler_collision_reset();
         addr = level_script_execute(addr);

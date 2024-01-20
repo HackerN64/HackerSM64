@@ -63,6 +63,7 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_BACKGROUND,
     GRAPH_NODE_TYPE_HELD_OBJ,
     GRAPH_NODE_TYPE_CULLING_RADIUS,
+    GRAPH_NODE_TYPE_SCENE_LIGHT,
     GRAPH_NODE_TYPE_ROOT,
     GRAPH_NODE_TYPE_START,
 };
@@ -347,6 +348,20 @@ struct GraphNodeCullingRadius {
     // u8 filler[2];
 };
 
+/** Advanced Lighting Engine
+ *  A node that sets up a scene light in the area's GeoLayout.
+ */
+struct GraphNodeSceneLight
+{
+    /*0x00*/ struct GraphNode node;
+    /*0x14*/ u8 lightType; // Type of light (0 is regular, 1 is point)
+    /*0x15*/ u8 color[3]; // Array of R,G,B colors of light
+    /*0x18*/ u8 a; // Dir x (directional light) or Inverse square falloff (point light)
+    /*0x19*/ u8 b; // Dir y (directional light) or Inverse linear falloff (point light)
+    /*0x1A*/ u8 c; // Dir z (directional light) or unused (point light)
+    /*0x1B*/ struct SceneLight* light; // Pointer to this light's scene light struct
+};
+
 extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
 extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
 extern struct GraphNodeCamera      *gCurGraphNodeCamera;
@@ -383,6 +398,8 @@ struct GraphNodeObjectParent        *init_graph_node_object_parent       (struct
 struct GraphNodeGenerated           *init_graph_node_generated           (struct AllocOnlyPool *pool, struct GraphNodeGenerated           *graphNode, GraphNodeFunc gfxFunc, s32 parameter);
 struct GraphNodeBackground          *init_graph_node_background          (struct AllocOnlyPool *pool, struct GraphNodeBackground          *graphNode, u16 background, GraphNodeFunc backgroundFunc, s32 zero);
 struct GraphNodeHeldObject          *init_graph_node_held_object         (struct AllocOnlyPool *pool, struct GraphNodeHeldObject          *graphNode, struct Object *objNode, Vec3s translation, GraphNodeFunc nodeFunc, s32 playerIndex);
+// Advanced lighting engine
+struct GraphNodeSceneLight          *init_graph_node_scene_light         (struct AllocOnlyPool *pool, struct GraphNodeSceneLight          *graphNode, u8 lightType, u8 color[], u8 quadraticFalloff, u8 linearFalloff, u8 unused);
 
 struct GraphNode *geo_add_child       (struct GraphNode *parent, struct GraphNode *childNode);
 struct GraphNode *geo_remove_child    (struct GraphNode *graphNode);

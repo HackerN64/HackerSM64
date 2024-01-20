@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <point_lights.h>
 
 #include "sm64.h"
 #include "behavior_data.h"
@@ -14,6 +15,7 @@
 #include "math_util.h"
 #include "graph_node.h"
 #include "surface_collision.h"
+#include "game/level_update.h"
 
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)     (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
@@ -752,6 +754,34 @@ static s32 bhv_cmd_animate_texture(void) {
     return BHV_PROC_CONTINUE;
 }
 
+// Advanced lighting engine
+// Command 0x38: Sets an object's light color
+// Usage: SET_LIGHT_COLOR(red, green, blue)
+static s32 bhv_cmd_set_light_color(void) {
+    u32 color = BHV_CMD_GET_U32(0) << 8;
+
+    gCurrentObject->oLightColor = color;
+
+    gCurBhvCommand++;
+    return BHV_PROC_CONTINUE;
+}
+
+// Advanced lighting engine
+// Command 0x39: Sets an object's light falloff
+// Usage: SET_LIGHT_FALLOFF(constant, linear, quadratic)
+static s32 bhv_cmd_set_light_falloff(void) {
+    s32 constantFalloff = BHV_CMD_GET_2ND_S16(0);
+    s32 linearFalloff = BHV_CMD_GET_1ST_S16(1);
+    s32 quadraticFalloff = BHV_CMD_GET_2ND_S16(1);
+
+    gCurrentObject->oLightQuadraticFalloff = quadraticFalloff;
+    gCurrentObject->oLightLinearFalloff = linearFalloff;
+    gCurrentObject->oLightConstantFalloff = constantFalloff;
+
+    gCurBhvCommand += 2;
+    return BHV_PROC_CONTINUE;
+}
+
 typedef s32 (*BhvCommandProc)(void);
 static BhvCommandProc BehaviorCmdTable[] = {
     /*BHV_CMD_BEGIN                 */ bhv_cmd_begin,
@@ -810,6 +840,8 @@ static BhvCommandProc BehaviorCmdTable[] = {
     /*BHV_CMD_DISABLE_RENDERING     */ bhv_cmd_disable_rendering,
     /*BHV_CMD_SET_INT_UNUSED        */ bhv_cmd_set_int_unused,
     /*BHV_CMD_SPAWN_WATER_DROPLET   */ bhv_cmd_spawn_water_droplet,
+    /*BHV_CMD_SET_LIGHT_COLOR       */ bhv_cmd_set_light_color,
+    /*BHV_CMD_SET_LIGHT_FALLOFF     */ bhv_cmd_set_light_falloff
 };
 
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
@@ -941,6 +973,47 @@ void cur_obj_update(void) {
             // In render distance (and not being held), show the object.
             o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
             o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
+        }
+    }
+
+    // Advanced lighting engine
+    // If this object emits light, is active, is visible, and there are still scene point light slots available,
+    // create a point light at this object
+    if ((objFlags & OBJ_FLAG_EMIT_LIGHT) && gPointLightCount < MAX_POINT_LIGHTS)
+    {
+        s32 red   = (gCurrentObject->oLightColor >> 24) & 0xFF;
+        s32 green = (gCurrentObject->oLightColor >> 16) & 0xFF;
+        s32 blue  = (gCurrentObject->oLightColor >>  8) & 0xFF;
+        f32 yOffset;
+
+        if (gCurrentObject->oFlags & OBJ_FLAG_HITBOX_WAS_SET)
+        {
+            // Use the center of the hitbox as an offset so the light is approximately centered to the object
+            yOffset = (MIN(gCurrentObject->hitboxHeight, gCurrentObject->hurtboxHeight) / 2.0f) - gCurrentObject->hitboxDownOffset;
+        }
+        else
+        {
+            // Unknown size, set to origin
+            yOffset = 0.0f;
+        }
+
+        if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
+        {   
+            emit_light(gCurrentObject->header.gfx.pos,
+                       red, green, blue,
+                       gCurrentObject->oLightQuadraticFalloff,
+                       gCurrentObject->oLightLinearFalloff,
+                       gCurrentObject->oLightConstantFalloff,
+                       yOffset);
+        }
+        else if (gMarioState->heldObj == gCurrentObject)
+        {
+            emit_light(gMarioState->marioBodyState->heldObjLastPosition,
+                       red, green, blue,
+                       gCurrentObject->oLightQuadraticFalloff,
+                       gCurrentObject->oLightLinearFalloff,
+                       gCurrentObject->oLightConstantFalloff,
+                       yOffset);
         }
     }
 }

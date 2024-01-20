@@ -5,6 +5,11 @@
  ******************/
 
 /**
+ * Enables the lighting engine demo. breakable box will emit light, and the start level will be the lighting_demo level
+ */
+#define LIGHTING_ENGINE_DEMO
+
+/**
  * Enables most debug options, including PUPPYPRINT_DEBUG.
  */
 // #define DEBUG_ALL

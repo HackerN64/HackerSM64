@@ -18,9 +18,12 @@
 #include "string.h"
 #include "color_presets.h"
 #include "emutest.h"
+#include "object_list_processor.h"
 
 #include "config.h"
 #include "config/config_world.h"
+
+#include <point_lights.h>
 
 /**
  * This file contains the code that processes the scene graph for rendering.
@@ -528,31 +531,276 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
     }
 }
 
+struct SceneLight gPointLights[MAX_POINT_LIGHTS];
+s8 gLightDir[3] = {0x28, 0x28, 0x28};
+u8 gOverrideDirectionalLight = FALSE;
+u8 gOverrideAmbientLight = FALSE;
+u8 gPointLightCount = 0;
+u8 gAreaPointLightCount = 0;
+
+Lights1* gCurDirectionalLight;
+
+/**
+ * Gets the square of the distance between two vectors
+ * The first vector is of floats, the second is of s16
+ * All math operations are done on integers
+ */
+u32 vec3f_vec3s_dist_sq(Vec3f p1, Vec3s p2)
+{
+    s32 dx = p2[0] - (s32)p1[0];
+    s32 dy = p2[1] - (s32)p1[1];
+    s32 dz = p2[2] - (s32)p1[2];
+    return (u32)(dx * dx) + (u32)(dy * dy) + (u32)(dz * dz);
+}
+
+#include "src/engine/surface_collision.h"
+
+int gPointLightCompatibilityMode = 0;
+Mat4 *viewMat;
+
+/**
+ * Creates a displaylist to set the active point lights closest to a given location
+ */
+Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
+{
+    Gfx *pointLightsDl, *pointLightsDlHead;
+
+    // The lights to be used for this object
+    struct SceneLight *lights[MAX_POINT_LIGHTS_ACTIVE];
+
+    // The number of lights selected to be active for this object
+    s32 numLightsPicked = 0;
+
+    // The square of the distances to each point light
+    u32 distancesSq[MAX_POINT_LIGHTS_ACTIVE];
+
+    // The distance of the furthest light selected
+    u32 maxDistanceSq;
+
+    // The index of the furthest away light from this object
+    // i.e. if index 1 in lights is the furthest light from this object, then this is 1
+    u32 maxIndex = 0;
+
+    // The square of the distance to the current light being checked
+    u32 curDistSq;
+
+    // The index of a point light being added (its position in Light *lights[])
+    s32 newIndex;
+
+    // Iterator variables
+    s32 i,j;
+    
+    // Raycast variables
+    Vec3f dir, hit;
+    struct Surface* surf;
+
+    if (gPointLightCount)
+    {
+        // Probe higher by the given offset (used since most objects have their origin at the bottom)
+        pos[1] += yOffset;
+    }
+
+    // Find the closest lights
+    for (i = 0; i < gPointLightCount; i++)
+    {
+        // Reset newIndex so we can use it to check if the current light was added
+        newIndex = -1;
+
+        // Get the distance to the current light from the object
+        curDistSq = vec3f_vec3s_dist_sq(pos, gPointLights[i].worldPos);
+
+        // Skip this point light if it is too far away to matter
+        if (curDistSq > MAX_POINT_LIGHT_DIST * MAX_POINT_LIGHT_DIST) continue;
+
+        // Skip this point light if it is set to occlude and is occluded
+        // If the object and the light are at the same position, skip the raycast
+        if (curDistSq != 0 && gPointLights[i].flags & LIGHT_FLAG_OCCLUDE)
+        {
+            dir[0] = gPointLights[i].worldPos[0] - pos[0];
+            dir[1] = gPointLights[i].worldPos[1] - pos[1];
+            dir[2] = gPointLights[i].worldPos[2] - pos[2];
+
+            find_surface_on_ray(pos, dir, &surf, hit, RAYCAST_FIND_CEIL | RAYCAST_FIND_FLOOR | RAYCAST_FIND_WALL);
+            if (surf)
+            {
+                continue;
+            }
+        }
+
+        // If we haven't filled all the active light slots, just add this one
+        if (numLightsPicked < MAX_POINT_LIGHTS_ACTIVE)
+        {
+            // Record the index this light was placed into and update the picked light count
+            newIndex = numLightsPicked;
+            numLightsPicked++;
+        }
+        // Otherwise, we need to check if this one is closer than any of the ones picked thus far
+        else
+        {
+            // Check if this light is closer than the furthest away one to be used
+            // If it is, then we remove the furthest light and add this one
+            if (curDistSq < distancesSq[maxIndex])
+            {
+                newIndex = maxIndex;
+            }
+        }
+
+        // If this light was added, add it to the lights array, update its distance,
+        // and update the distance order of the other lights
+        if (newIndex != -1)
+        {
+            // Place this light in the lights array
+            lights[newIndex] = &gPointLights[i];
+
+            // Update the distance to this light
+            distancesSq[newIndex] = curDistSq;
+
+            // Set this light to the be furthest one away
+            // This will get updated in the following loop
+            maxDistanceSq = curDistSq;
+            maxIndex = newIndex;
+
+            // Iterate over every light, checking to see if it is further than the current furthest
+            // If it is, then set it to be the furthest light instead
+            for (j = 0; j < MAX_POINT_LIGHTS_ACTIVE; j++)
+            {
+                // Skip checking the current light, since we assumed it was the furthest already
+                if (j == newIndex) continue;
+
+                // Check if the light being checked is further than current furthest
+                if (maxDistanceSq < distancesSq[j])
+                {
+                    maxDistanceSq = distancesSq[j];
+                    maxIndex = j;
+                }
+            }
+        }
+    }
+    
+    // Allocate a displaylist with room for each gSPLight and the gSPEndDisplayList
+    pointLightsDlHead = pointLightsDl = alloc_display_list(sizeof(Gfx) * (numLightsPicked + 4));
+
+    gSPNumLights(pointLightsDl++, NUMLIGHTS_1 + numLightsPicked);
+    
+    gSPLight(pointLightsDl++, &gCurDirectionalLight->l, LIGHT_1);
+
+    // Add the gSPLights to the display list
+    for (i = 0; i < numLightsPicked; i++)
+    {
+        if (gPointLightCompatibilityMode)
+        {
+            Light *curLight = alloc_display_list(sizeof(Light));
+            u8 color[3];
+            f32 lightDist;
+            f32 lightScale;
+
+            bzero(curLight, sizeof(Light));
+
+            color[0] = lights[i]->l.pl.col[0];
+            color[1] = lights[i]->l.pl.col[1];
+            color[2] = lights[i]->l.pl.col[2];
+
+            dir[0] = lights[i]->worldPos[0] - pos[0];
+            dir[1] = lights[i]->worldPos[1] - pos[1];
+            dir[2] = lights[i]->worldPos[2] - pos[2];
+
+            lightDist = sqrtf(distancesSq[i]);
+            lightScale = 1.0f / ((1.0f / 65536.0f) * (
+                0.25f * lights[i]->l.pl.constant_attenuation +
+                2.0f * lightDist * lights[i]->l.pl.linear_attenuation +
+                0.3f * lightDist * lightDist * lights[i]->l.pl.quadratic_attenuation) + 1.0f);
+
+            curLight->l.col[0] = curLight->l.colc[0] = (u8)(color[0] * lightScale + 0.5f);
+            curLight->l.col[1] = curLight->l.colc[1] = (u8)(color[1] * lightScale + 0.5f);
+            curLight->l.col[2] = curLight->l.colc[2] = (u8)(color[2] * lightScale + 0.5f);
+            
+            dir[0] *= 120.0f / (lightDist);
+            dir[1] *= 120.0f / (lightDist);
+            dir[2] *= 120.0f / (lightDist);
+
+            curLight->l.dir[0] = (s8)(dir[0]);
+            curLight->l.dir[1] = (s8)(dir[1]);
+            curLight->l.dir[2] = (s8)(dir[2]);
+
+            gSPLight(pointLightsDl++, curLight, LIGHT_2 + i);
+        }
+        else
+        {
+            gSPLight(pointLightsDl++, &lights[i]->l, LIGHT_2 + i);
+        }
+    }
+
+    if (gPointLightCount)
+    {
+        // Restore the original position
+        pos[1] -= yOffset;
+    }
+
+    gSPLight(pointLightsDl++, &gCurDirectionalLight->a, LIGHT_2 + numLightsPicked);
+
+    // Terminate the display list
+    gSPEndDisplayList(pointLightsDl);
+
+    // Return the head of the created display list
+    return pointLightsDlHead;
+}
+
+// Sets the scene's directional light, overrides whatever may be set in the area's geolayout
+void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue)
+{
+    Vec3f directionNormalized;
+    vec3f_copy(directionNormalized, direction);
+    vec3f_normalize(directionNormalized);
+    gLightDir[0] = (s8)(s32)(directionNormalized[0] * 0x40);
+    gLightDir[1] = (s8)(s32)(directionNormalized[1] * 0x40);
+    gLightDir[2] = (s8)(s32)(directionNormalized[2] * 0x40);
+    gCurDirectionalLight->l[0].l.colc[0] = gCurDirectionalLight->l[0].l.col[0] = red;
+    gCurDirectionalLight->l[0].l.colc[1] = gCurDirectionalLight->l[0].l.col[1] = green;
+    gCurDirectionalLight->l[0].l.colc[2] = gCurDirectionalLight->l[0].l.col[2] = blue;
+    gOverrideDirectionalLight = TRUE;
+}
+
+// Sets the scene's ambient light, overrides whatever may be set in the area's geolayout
+void set_ambient_light(s32 red, s32 green, s32 blue)
+{
+    gCurDirectionalLight->a.l.colc[0] = gCurDirectionalLight->a.l.col[0] = red;
+    gCurDirectionalLight->a.l.colc[1] = gCurDirectionalLight->a.l.col[1] = green;
+    gCurDirectionalLight->a.l.colc[2] = gCurDirectionalLight->a.l.col[2] = blue;
+    gOverrideAmbientLight = TRUE;
+}
+
+// Emits a point light with the given parameters
+void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff, f32 yOffset)
+{
+    gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = red;
+    gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = green;
+    gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = blue;
+    gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 8 : constantFalloff;
+    gPointLights[gPointLightCount].l.pl.linear_attenuation = linearFalloff;
+    gPointLights[gPointLightCount].l.pl.quadratic_attenuation = quadraticFalloff;
+    gPointLights[gPointLightCount].worldPos[0] = pos[0];
+    gPointLights[gPointLightCount].worldPos[1] = pos[1] + yOffset;
+    gPointLights[gPointLightCount].worldPos[2] = pos[2];
+    gPointLightCount++;
+}
+
 Mat4 gCameraTransform;
 
 Lights1 defaultLight = gdSPDefLights1(
     0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
 );
 
-Vec3f globalLightDirection = { 0x28, 0x28, 0x28 };
-
 void setup_global_light() {
-    Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
-    bcopy(&defaultLight, curLight, sizeof(Lights1));
+    gCurDirectionalLight = (Lights1*)alloc_display_list(sizeof(Lights1));
+    bcopy(&defaultLight, gCurDirectionalLight, sizeof(Lights1));
+    gSPSetLights1(gDisplayListHead++, (*gCurDirectionalLight));
+}
 
-#ifdef WORLDSPACE_LIGHTING
-    curLight->l->l.dir[0] = (s8)(globalLightDirection[0]);
-    curLight->l->l.dir[1] = (s8)(globalLightDirection[1]);
-    curLight->l->l.dir[2] = (s8)(globalLightDirection[2]);
-#else
-    Vec3f transformedLightDirection;
-    linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
-    curLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
-    curLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
-    curLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
-#endif
-
-    gSPSetLights1(gDisplayListHead++, (*curLight));
+void set_global_light_direction() {
+    // Set the light direction
+    gCurDirectionalLight->l->l.dir[0] = gLightDir[0];
+    gCurDirectionalLight->l->l.dir[1] = gLightDir[1];
+    gCurDirectionalLight->l->l.dir[2] = gLightDir[2];
 }
 
 /**
@@ -560,6 +808,10 @@ void setup_global_light() {
  */
 void geo_process_camera(struct GraphNodeCamera *node) {
     Mtx *rollMtx = alloc_display_list(sizeof(*rollMtx));
+    Gfx *setLightsDL = alloc_display_list(sizeof(Gfx) * 3);
+    Gfx *levelLightsDL;
+    Vec3f probePos;
+    s32 i;
     Mtx *viewMtx = alloc_display_list(sizeof(Mtx));
 
     if (node->fnNode.func != NULL) {
@@ -568,6 +820,7 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     mtxf_rotate_xy(rollMtx, node->rollScreen);
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    geo_append_display_list(setLightsDL, LAYER_OPAQUE);
 
     mtxf_lookat(gCameraTransform, node->pos, node->focus, node->roll);
 
@@ -612,6 +865,45 @@ void geo_process_camera(struct GraphNodeCamera *node) {
         geo_process_node_and_siblings(node->fnNode.node.children);
         gCurGraphNodeCamera = NULL;
     }
+
+    // Copy the light's position into the light struct and account for WORLD_SCALE
+    for (i = 0; i < gPointLightCount; i++)
+    {
+        gPointLights[i].l.pl.pos[0] = gPointLights[i].worldPos[0] / WORLD_SCALE;
+        gPointLights[i].l.pl.pos[1] = gPointLights[i].worldPos[1] / WORLD_SCALE;
+        gPointLights[i].l.pl.pos[2] = gPointLights[i].worldPos[2] / WORLD_SCALE;
+    }
+
+    set_global_light_direction();
+    gOverrideAmbientLight = FALSE;
+    gOverrideDirectionalLight = FALSE;
+    
+    // Set up the light display list
+    // This has to be done after the area's GeoLayout is processed, as
+    // some point lights may be defined there instead of by objects
+    if (gPointLightCount > 0)
+    {
+        // Enable point lighting
+        gSPSetGeometryMode(setLightsDL++, G_POINT_LIGHTING);
+    }
+    else
+    {
+        // Disable point lighting (may not be required, but doesn't hurt)
+        gSPClearGeometryMode(setLightsDL++, G_POINT_LIGHTING);
+    }
+
+    // Enable the lights closes to the given probe position as the level's lighting
+    if (gMarioObject) {
+        vec3f_copy(probePos, gMarioState->pos);
+    } else {
+        vec3f_copy(probePos, node->pos);
+    }
+
+    levelLightsDL = createPointLightsDl(probePos, 300.0f);
+    gSPDisplayList(setLightsDL++, levelLightsDL);
+
+    // Terminate the point lighting DL
+    gSPEndDisplayList(setLightsDL++);
 }
 
 /**
@@ -1069,6 +1361,16 @@ void geo_process_object(struct Object *node) {
         }
 
         if (!isInvisible && obj_is_in_view(&node->header.gfx)) {
+            // Create the displaylist to set the active point lights
+            Gfx* pointLightsDl = createPointLightsDl(&node->oPosX, 80.0f);
+
+            // Put the lights on every layer, this can be optimized in the future
+            // It will require some geolayout command to specify which layers this object uses
+            // Maybe this can be implemented in a GEO_ASM call, where the parameter is a layer mask
+            for (s32 i = LAYER_FORCE; i <= LAYER_TRANSPARENT_INTER; i++)
+            {
+                geo_append_display_list(pointLightsDl, i);
+            }
             gMatStackIndex--;
             inc_mat_stack();
 
@@ -1168,6 +1470,63 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
 }
 
 /**
+ * Advanced lighting engine
+ * Processes a scene light, setting its position and other properties
+ */
+void geo_process_scene_light(struct GraphNodeSceneLight *node)
+{    
+    switch (node->lightType)
+    {
+        case LIGHT_TYPE_DIRECTIONAL:
+            if (!gOverrideDirectionalLight)
+            {
+                // Set the directional light color
+                gCurDirectionalLight->l->l.colc[0] = gCurDirectionalLight->l->l.col[0] = node->color[0];
+                gCurDirectionalLight->l->l.colc[1] = gCurDirectionalLight->l->l.col[1] = node->color[1];
+                gCurDirectionalLight->l->l.colc[2] = gCurDirectionalLight->l->l.col[2] = node->color[2];
+
+                // Set the pre transformed light direction
+                gLightDir[0] = node->a;
+                gLightDir[1] = node->b;
+                gLightDir[2] = node->c;
+            }
+            break;
+        case LIGHT_TYPE_POINT:
+        case LIGHT_TYPE_POINT_OCCLUDE:
+            // Set the given point light's color
+            node->light->l.pl.colc[0] = node->light->l.pl.col[0] = node->color[0];
+            node->light->l.pl.colc[1] = node->light->l.pl.col[1] = node->color[1];
+            node->light->l.pl.colc[2] = node->light->l.pl.col[2] = node->color[2];
+
+            // Truncates, but is faster
+            node->light->worldPos[0] = (s16)(s32)gMatStack[gMatStackIndex][3][0];
+            node->light->worldPos[1] = (s16)(s32)gMatStack[gMatStackIndex][3][1];
+            node->light->worldPos[2] = (s16)(s32)gMatStack[gMatStackIndex][3][2];
+
+            // More accurate (rounding instead of flooring), but more costly
+            //vec3f_to_vec3s(node->light->worldPos, pos);
+
+            node->light->l.pl.quadratic_attenuation = node->a;
+            node->light->l.pl.linear_attenuation = node->b;
+            node->light->l.pl.constant_attenuation = (node->c == 0) ? 8 : node->c;
+            break;
+        case LIGHT_TYPE_AMBIENT:
+            if (!gOverrideAmbientLight)
+            {
+                // Set the ambient light color
+                gCurDirectionalLight->a.l.colc[0] = gCurDirectionalLight->a.l.col[0] = node->color[0];
+                gCurDirectionalLight->a.l.colc[1] = gCurDirectionalLight->a.l.col[1] = node->color[1];
+                gCurDirectionalLight->a.l.colc[2] = gCurDirectionalLight->a.l.col[2] = node->color[2];
+            }
+            break;
+    }
+
+    if (node->node.children != NULL) {
+        geo_process_node_and_siblings(node->node.children);
+    }
+}
+
+/**
  * Processes the children of the given GraphNode if it has any
  */
 void geo_try_process_children(struct GraphNode *node) {
@@ -1199,6 +1558,7 @@ static GeoProcessFunc GeoProcessJumpTable[] = {
     [GRAPH_NODE_TYPE_GENERATED_LIST      ] = geo_process_generated_list,
     [GRAPH_NODE_TYPE_BACKGROUND          ] = geo_process_background,
     [GRAPH_NODE_TYPE_HELD_OBJ            ] = geo_process_held_object,
+    [GRAPH_NODE_TYPE_SCENE_LIGHT         ] = geo_process_scene_light,
     [GRAPH_NODE_TYPE_CULLING_RADIUS      ] = geo_try_process_children,
     [GRAPH_NODE_TYPE_ROOT                ] = geo_try_process_children,
     [GRAPH_NODE_TYPE_START               ] = geo_try_process_children,
