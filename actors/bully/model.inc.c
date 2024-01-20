@@ -44,8 +44,7 @@ const Gfx bully_seg5_dl_050002E0[] = {
 // 0x05000398 - 0x05000408
 const Gfx bully_seg5_dl_05000398[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_DECALRGB, G_CC_DECALRGB),
-    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(G_CC_MODULATEI, G_CC_MODULATEI),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsDPTileSync(),
@@ -55,7 +54,6 @@ const Gfx bully_seg5_dl_05000398[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 
@@ -296,9 +294,10 @@ static const Vtx bully_seg5_vertex_05003608[] = {
 
 // 0x05003708 - 0x050037A0
 const Gfx bully_seg5_dl_05003708[] = {
-    gsSPLightColor(LIGHT_1, 0xe300ff),
-    gsSPLightColor(LIGHT_2, 0x3800ff),
     gsSPVertex(bully_seg5_vertex_05002C68, 14, 0),
+    gsDPPipeSync(),
+    gsDPSetPrimColor(0, 0, 0, 227, 00, 255),
+    gsDPSetCombineLERP(PRIMITIVE, 0, SHADE, 0, 0, 0, 0, 1, PRIMITIVE, 0, SHADE, 0, 0, 0, 0, 1),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSP2Triangles( 2,  3,  4, 0x0,  1,  5,  6, 0x0),
     gsSP2Triangles( 1,  6,  7, 0x0,  0,  5,  1, 0x0),
@@ -312,8 +311,6 @@ const Gfx bully_seg5_dl_05003708[] = {
 
 // 0x050037A0 - 0x05003838
 const Gfx bully_seg5_dl_050037A0[] = {
-    gsSPLightColor(LIGHT_1, 0xff00ff),
-    gsSPLightColor(LIGHT_2, 0x3f00ff),
     gsSPVertex(bully_seg5_vertex_05002D88, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  1, 0x0),
     gsSP2Triangles( 3,  1,  0, 0x0,  5,  6,  7, 0x0),
@@ -328,8 +325,6 @@ const Gfx bully_seg5_dl_050037A0[] = {
 
 // 0x05003878 - 0x05003C50
 const Gfx bully_seg5_dl_05003878[] = {
-    gsSPLightColor(LIGHT_1, 0xff),
-    gsSPLightColor(LIGHT_2, 0xff),
     gsSPVertex(bully_seg5_vertex_05002F08, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  0,  3, 0x0),
     gsSP2Triangles( 1,  3,  4, 0x0,  4,  3,  5, 0x0),
@@ -436,8 +431,7 @@ const Gfx bully_seg5_dl_05003D08[] = {
 // 0x05003D40 - 0x05003DB8
 const Gfx bully_seg5_dl_05003D40[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
-    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsDPTileSync(),
@@ -448,7 +442,6 @@ const Gfx bully_seg5_dl_05003D40[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 
@@ -491,8 +484,7 @@ const Gfx bully_seg5_dl_05003E70[] = {
 // 0x05003EA8 - 0x05003F20
 const Gfx bully_seg5_dl_05003EA8[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
-    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsDPTileSync(),
@@ -503,7 +495,6 @@ const Gfx bully_seg5_dl_05003EA8[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };
 
@@ -531,8 +522,7 @@ const Gfx bully_seg5_dl_05003F80[] = {
 // 0x05003FC8 - 0x05004038
 const Gfx bully_seg5_dl_05003FC8[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
-    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsDPTileSync(),
@@ -542,6 +532,5 @@ const Gfx bully_seg5_dl_05003FC8[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
 };

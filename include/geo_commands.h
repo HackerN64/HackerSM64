@@ -58,6 +58,7 @@ enum GeoLayoutCommands {
     /*0x1E*/ GEO_CMD_NOP_1E,
     /*0x1F*/ GEO_CMD_NOP_1F,
     /*0x20*/ GEO_CMD_NODE_CULLING_RADIUS,
+    /*0x21*/ GEO_CMD_SCENE_LIGHT,
 
     GEO_CMD_COUNT,
 };
@@ -468,5 +469,22 @@ enum GeoLayoutCommands {
  */
 #define GEO_CULLING_RADIUS(cullingRadius) \
     CMD_BBH(GEO_CMD_NODE_CULLING_RADIUS, 0x00, cullingRadius)
+
+/**
+ * Advanced lighting engine
+ * GEO_CMD_SCENE_LIGHT: Create a scene light node. Can be a regular light, point light, or ambient light.
+ *   0x01: u8 lightType (0 is ambient, 1 is directional, 2 is point, 3 is occluded point)
+ *   0x02: u8 red
+ *   0x03: u8 green
+ *   0x04: u8 blue
+ *   0x05: u8 x direction (directional light) or quadratic falloff (point light)
+ *   0x06: u8 y direction (directional light) or linear falloff (point light)
+ *   0x07: u8 z direction (directional light) or constant falloff (point light)
+ */
+#include "point_lights.h"
+
+#define GEO_SCENE_LIGHT(lightType, red, green, blue, a, b, c) \
+    CMD_BBBB(GEO_CMD_SCENE_LIGHT, lightType, red, green), \
+    CMD_BBBB(blue, a, b, c)
 
 #endif // GEO_COMMANDS_H

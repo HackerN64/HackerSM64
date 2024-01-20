@@ -44,8 +44,6 @@ static const Vtx breakable_box_seg8_vertex[] = {
 
 // 0x08012C30 - 0x08012CD8
 const Gfx breakable_box_seg8_sub_dl_end[] = {
-    gsSPLightColor(LIGHT_1, 0xffffffff),
-    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(breakable_box_seg8_vertex, 26, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),

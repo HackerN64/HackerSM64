@@ -3,6 +3,8 @@
 #include <string.h>
 #endif
 
+#include <point_lights.h>
+
 #include "sm64.h"
 #include "audio/external.h"
 #include "audio/synthesis.h"
@@ -401,6 +403,8 @@ static void level_cmd_free_level_pool(void) {
 static void level_cmd_begin_area(void) {
     u8 areaIndex = CMD_GET(u8, 2);
     void *geoLayoutAddr = CMD_GET(void *, 4);
+
+    gAreaPointLightCount = 0;
 
     if (areaIndex < AREA_COUNT) {
         struct GraphNodeRoot *screenArea =
