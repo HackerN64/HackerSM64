@@ -168,6 +168,8 @@ SECTIONS
       BUILD_DIR/src/boot*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
+      BUILD_DIR/src/libcart/ff*.o(.text*);
+      BUILD_DIR/src/libcart/src*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.text*);
@@ -188,6 +190,8 @@ SECTIONS
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
+      BUILD_DIR/src/libcart/ff*.o(.*data*);
+      BUILD_DIR/src/libcart/src*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
@@ -204,6 +208,8 @@ SECTIONS
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
+      BUILD_DIR/src/libcart/ff*.o(.rodata*);
+      BUILD_DIR/src/libcart/src*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.rodata*);
@@ -221,6 +227,8 @@ SECTIONS
       BUILD_DIR/src/boot*.o(.*bss*);
       BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
+      BUILD_DIR/src/libcart/ff*.o(.*bss*);
+      BUILD_DIR/src/libcart/src*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*bss*);
