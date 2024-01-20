@@ -7,6 +7,6 @@
 	remote = https://github.com/devwizard64/libcart
 	branch = main
 	commit = 948358b8320f49e75b4a9e3b4e792ccaec866e0b
-	parent = dd08b7fffbda649983556c0a6f2045636f4f5316
+	parent = 799a81194c131bd387527f313809f195a950b46d
 	method = merge
 	cmdver = 0.4.6
