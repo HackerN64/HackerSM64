@@ -132,6 +132,11 @@
     #define UNLOCK_ALL
 #endif // COMPLETE_SAVE_FILE
 
+#ifdef DEBUG
+    #undef DEBUG_ASSERTIONS
+    #define DEBUG_ASSERTIONS
+#endif // DEBUG
+
 
 /*****************
  * config_camera.h
