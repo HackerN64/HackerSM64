@@ -253,6 +253,16 @@ ifeq ($(HVQM),1)
   SRC_DIRS += src/hvqm
 endif
 
+# LIBPL - whether to include libpl library for interfacing with Parallel Launcher
+#   1 - includes code in ROM
+#   0 - does not
+LIBPL ?= 0
+$(eval $(call validate-option,LIBPL,0 1))
+ifeq ($(LIBPL),1)
+  DEFINES += LIBPL=1
+  SRC_DIRS += lib/libpl
+endif
+
 BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
