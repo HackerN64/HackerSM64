@@ -1,6 +1,8 @@
 #ifndef EMUTEST_H
 #define EMUTEST_H
 
+#include "types.h"
+
 enum Emulator {
     EMU_WIIVC = 0x0001,
     EMU_PROJECT64_ANY = 0x001E,
@@ -36,6 +38,9 @@ extern void detect_emulator();
  * if (gEmulator & (EMU_CONSOLE | EMU_ARES | EMU_PARALLELN64))
  */
 extern enum Emulator gEmulator;
+
+// determines whether libpl is safe to use
+extern u8 gSupportsLibpl;
 
 // Included for backwards compatibility when upgrading from HackerSM64 2.0
 #define gIsConsole ((gEmulator & EMU_CONSOLE) != 0)
