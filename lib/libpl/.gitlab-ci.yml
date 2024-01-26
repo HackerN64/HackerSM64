@@ -1,0 +1,11 @@
+image: ubuntu:rolling
+
+pages:
+  script:
+  - apt update && apt install doxygen -y
+  - doxygen
+  artifacts:
+    paths:
+    - public
+  only:
+  - main
