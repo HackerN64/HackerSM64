@@ -1402,6 +1402,20 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
 
 s32 common_slide_action_with_jump(struct MarioState *m, u32 stopAction, u32 jumpAction, u32 airAction,
                                   s32 animation) {
+#ifdef SLOPE_BUFFER
+    if (m->input & INPUT_A_PRESSED) {
+        m->actionState = 1;
+    } else if (!(m->input & INPUT_A_DOWN)) {
+        m->actionState = 0;
+    }
+    if (m->actionTimer == 5) {
+        if (m->actionState == 1) {
+            return set_jumping_action(m, jumpAction, 0);
+        }
+    } else {
+        m->actionTimer++;
+    }
+#else
     if (m->actionTimer == 5) {
         if (m->input & INPUT_A_PRESSED) {
             return set_jumping_action(m, jumpAction, 0);
@@ -1409,6 +1423,7 @@ s32 common_slide_action_with_jump(struct MarioState *m, u32 stopAction, u32 jump
     } else {
         m->actionTimer++;
     }
+#endif
 
     if (update_sliding(m, 4.0f)) {
         return set_mario_action(m, stopAction, 0);
