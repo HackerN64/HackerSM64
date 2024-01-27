@@ -58,6 +58,8 @@ enum GeoLayoutCommands {
     /*0x1E*/ GEO_CMD_NOP_1E,
     /*0x1F*/ GEO_CMD_NOP_1F,
     /*0x20*/ GEO_CMD_NODE_CULLING_RADIUS,
+
+    GEO_CMD_COUNT,
 };
 
 // geo layout macros
