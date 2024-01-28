@@ -150,19 +150,11 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
     p->cur += p->speed;
     u32 v0 = (u32) p->cur;
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
     if (v0 > 127) {
-#else
-    if (v0 >= 127) {
-#endif
         v0 = 127;
     }
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
     return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 128] - 1.0f)));
-#else
-    return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 127] - 1.0f)));
-#endif
 }
 
 s32 get_vibrato_pitch_change(struct VibratoState *vib) {
@@ -249,11 +241,7 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
     s32 pitchChange = get_vibrato_pitch_change(vib);
     f32 extent = (f32) vib->extent / 4096.0f;
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
     return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f);
-#else
-    return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f);
-#endif
 }
 
 void note_vibrato_update(struct Note *note) {
