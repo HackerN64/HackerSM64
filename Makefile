@@ -261,6 +261,7 @@ $(eval $(call validate-option,LIBPL,0 1))
 ifeq ($(LIBPL),1)
   DEFINES += LIBPL=1
   SRC_DIRS += lib/libpl
+  INCLUDE_DIRS += lib/libpl
 endif
 
 BUILD_DIR_BASE := build
