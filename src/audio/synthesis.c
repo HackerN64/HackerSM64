@@ -770,9 +770,18 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateLeft));
             aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_RIGHT_CH, DMEM_ADDR_RIGHT_CH, bufLen << 1);
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateRight));
+#ifdef BETTER_REVERB
+            // NOTE: Technically using an if/else here means using BETTER_REVERB vanilla presets with downsampling won't match 1-to-1 in volume with BETTER_REVERB being disabled.
+            // This chunk is actually preferable to what vanilla uses, but was mainly ifdef'd here as a means of documenting BETTER_REVERB changes for other non-HackerSM64 repos.
+            // Please use this chunk over the latter if matching BETTER_REVERB behavior ever becomes a future priority.
             aDMEMMove(cmd++, DMEM_ADDR_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
             aSetBuffer(cmd++, 0, 0, 0, DEFAULT_LEN_2CH);
             aMix(cmd++, 0, /*gain*/ 0x8000 + gSynthesisReverb.reverbGain, /*in*/ DMEM_ADDR_WET_LEFT_CH, /*out*/ DMEM_ADDR_WET_LEFT_CH);
+#else
+            aSetBuffer(cmd++, 0, 0, 0, DEFAULT_LEN_2CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000 + gSynthesisReverb.reverbGain, /*in*/ DMEM_ADDR_LEFT_CH, /*out*/ DMEM_ADDR_LEFT_CH);
+            aDMEMMove(cmd++, DMEM_ADDR_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
+#endif
         }
 
         AUDIO_PROFILER_SWITCH(PROFILER_TIME_SUB_AUDIO_SYNTHESIS_ENVELOPE_REVERB, PROFILER_TIME_SUB_AUDIO_SYNTHESIS_PROCESSING);
