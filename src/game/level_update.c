@@ -381,10 +381,8 @@ void init_mario_after_warp(void) {
     sDelayedWarpOp = WARP_OP_NONE;
 
     switch (marioSpawnType) {
-        case MARIO_SPAWN_PIPE:
-            play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0x00, 0x00, 0x00);
-            break;
         case MARIO_SPAWN_DOOR_WARP:
+        case MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE:
             play_transition(WARP_TRANSITION_FADE_FROM_CIRCLE, 0x10, 0x00, 0x00, 0x00);
             break;
         case MARIO_SPAWN_TELEPORT:
@@ -392,9 +390,6 @@ void init_mario_after_warp(void) {
             break;
         case MARIO_SPAWN_SPIN_AIRBORNE:
             play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x1A, 0xFF, 0xFF, 0xFF);
-            break;
-        case MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE:
-            play_transition(WARP_TRANSITION_FADE_FROM_CIRCLE, 0x10, 0x00, 0x00, 0x00);
             break;
         case MARIO_SPAWN_FADE_FROM_BLACK:
             play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x10, 0x00, 0x00, 0x00);

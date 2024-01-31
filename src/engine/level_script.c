@@ -9,6 +9,7 @@
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/area.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/mario.h"
 #include "game/memory.h"
@@ -430,6 +431,7 @@ static void level_cmd_load_model_from_dl(void) {
     s16 layer = CMD_GET(u16, 0x8);
     void *dl_ptr = CMD_GET(void *, 4);
 
+    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
     if (model < MODEL_ID_COUNT) {
         gLoadedGraphNodes[model] =
             (struct GraphNode *) init_graph_node_display_list(sLevelPool, 0, layer, dl_ptr);
@@ -442,6 +444,7 @@ static void level_cmd_load_model_from_geo(void) {
     ModelID16 model = CMD_GET(ModelID16, 2);
     void *geo = CMD_GET(void *, 4);
 
+    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
     if (model < MODEL_ID_COUNT) {
         gLoadedGraphNodes[model] = process_geo_layout(sLevelPool, geo);
     }
@@ -455,6 +458,7 @@ static void level_cmd_23(void) {
     void *dl  = CMD_GET(void *, 4);
     s32 scale = CMD_GET(s32, 8);
 
+    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
     if (model < MODEL_ID_COUNT) {
         // GraphNodeScale has a GraphNode at the top. This
         // is being stored to the array, so cast the pointer.
