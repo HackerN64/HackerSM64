@@ -149,7 +149,7 @@ void puppycam_boot(void) {
     gPuppyCam.stick2[1]     = 0;
     gPuppyCam.stickN[0]     = 0;
     gPuppyCam.stickN[1]     = 0;
-    gPuppyMemoryPool        = mem_pool_init(MAX_PUPPYCAM_VOLUMES * sizeof(struct sPuppyVolume), MEMORY_POOL_LEFT);
+    gPuppyMemoryPool        = mem_pool_init(MAX_PUPPYCAM_VOLUMES * sizeof(struct sPuppyVolume));
     gPuppyVolumeCount       = 0;
     gPuppyCam.enabled       = TRUE;
 

@@ -409,7 +409,7 @@ void thread2_crash_screen(UNUSED void *arg) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
             thread = get_crashed_thread();
-            gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
+            gCrashScreen.framebuffer = (RGBA16 *) getFramebuffer(sRenderedFramebuffer);
             if (thread) {
                 if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
                     map_data_init();
@@ -438,7 +438,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
+    gCrashScreen.framebuffer = (RGBA16 *) getFramebuffer(sRenderedFramebuffer);
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);

@@ -16,13 +16,14 @@
  * linker script syntax.
 */
 
+#include "memory_layout.h"
+
 // Starting address of RAM
 #define RAM_START   0x80000000
 
 // 1MB of RAM
 #define RAM_1MB     0x00100000
 
-#define USE_EXT_RAM
 // Calculate total amount of RAM
 #ifndef USE_EXT_RAM
 #define TOTAL_RAM_SIZE  (RAM_1MB * 4)
@@ -32,14 +33,6 @@
 
 // Ending address of RAM
 #define RAM_END (RAM_START + TOTAL_RAM_SIZE)
-
-/*
- * Workaround for running out of pool space due to
- * importing large custom content.
- */
-
-#define SEG_POOL_START   _framebuffersSegmentBssEnd // 0x0165000 in size
-#define POOL_SIZE        RAM_END - SEG_POOL_START
 
 #define MAP_PARSER_ADDRESS 0x80345678
 

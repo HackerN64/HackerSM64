@@ -586,7 +586,7 @@ Gfx *geo_render_mirror_mario(s32 callContext, struct GraphNode *node, UNUSED Mat
 
     switch (callContext) {
         case GEO_CONTEXT_CREATE:
-            init_graph_node_object(NULL, &gMirrorMario, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
+            init_graph_node_object(FALSE, &gMirrorMario, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
             break;
         case GEO_CONTEXT_AREA_LOAD:
             geo_add_child(node, &gMirrorMario.node);

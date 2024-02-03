@@ -102,13 +102,14 @@ SECTIONS
    END_SEG(boot)
 
    . = (RAM_START + 0x400);
+#if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
    BEGIN_NOLOAD(zbuffer)
    {
       BUILD_DIR/src/buffers/zbuffer.o(.bss*);
    }
    END_NOLOAD(zbuffer)
+#endif
 
-   . = _zbufferSegmentBssEnd;
    BEGIN_NOLOAD(buffers)
    {
       BUILD_DIR/src/buffers/buffers.o(.bss*);
@@ -275,14 +276,54 @@ SECTIONS
    END_NOLOAD(engine)
 
    . = _engineSegmentBssEnd;
-   BEGIN_NOLOAD(framebuffers)
-   {
-      BUILD_DIR/src/buffers/framebuffers.o(.bss*);
-   }
-   END_NOLOAD(framebuffers)
 
-   __mainPoolStart = .;
-   __mainPoolSize  = (RAM_END - .);
+#if MEMORY_FRAGMENTATION_NO_FRAGMENTATION == MEMORY_FRAGMENTATION_LEVEL
+   BEGIN_NOLOAD(framebuffer0)
+   {
+      BUILD_DIR/src/buffers/framebuffer0.o(.bss*);
+   }
+   END_NOLOAD(framebuffer0)
+
+   BEGIN_NOLOAD(framebuffer1)
+   {
+      BUILD_DIR/src/buffers/framebuffer1.o(.bss*);
+   }
+   END_NOLOAD(framebuffer1)
+
+   BEGIN_NOLOAD(framebuffer2)
+   {
+      BUILD_DIR/src/buffers/framebuffer2.o(.bss*);
+   }
+   END_NOLOAD(framebuffer2)
+#else
+   . = ZBUFFER_START;
+   BEGIN_NOLOAD(zbuffer)
+   {
+      BUILD_DIR/src/buffers/zbuffer.o(.bss*);
+   }
+   END_NOLOAD(zbuffer)
+
+   . = FRAMEBUFFER0_START;
+   BEGIN_NOLOAD(framebuffer0)
+   {
+      BUILD_DIR/src/buffers/framebuffer0.o(.bss*);
+   }
+   END_NOLOAD(framebuffer0)
+
+   . = FRAMEBUFFER1_START;
+   BEGIN_NOLOAD(framebuffer1)
+   {
+      BUILD_DIR/src/buffers/framebuffer1.o(.bss*);
+   }
+   END_NOLOAD(framebuffer1)
+
+   . = FRAMEBUFFER2_START;
+   BEGIN_NOLOAD(framebuffer2)
+   {
+      BUILD_DIR/src/buffers/framebuffer2.o(.bss*);
+   }
+   END_NOLOAD(framebuffer2)
+#endif
 
    __expansionRamStart = (RAM_START + (RAM_1MB * 4));
 #ifndef USE_EXT_RAM
@@ -395,7 +436,6 @@ SECTIONS
 #ifdef PRELIMINARY
       GODDARD_SIZE = SIZEOF(.goddard) + SIZEOF(.goddard.noload);
 #else
-      ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
 #endif
 
    /* 0x268020 0x268020-0 [0] */
