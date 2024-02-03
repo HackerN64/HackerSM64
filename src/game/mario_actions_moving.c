@@ -678,35 +678,34 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
     if (m->forwardVel > 6.0f) {
         mario_set_forward_vel(m, 6.0f);
     }
-
-    if (m->forwardVel > 0.0f) {
-        if (m->wall != NULL) {
-            wallAngle = m->wallYaw;
-            dWallAngle = wallAngle - m->faceAngle[1];
-        }
-
-        if (m->wall == NULL || dWallAngle <= -DEGREES(160) || dWallAngle >= DEGREES(160)) {
-            m->flags |= MARIO_PUSHING;
-            set_mario_animation(m, MARIO_ANIM_PUSHING);
-            play_step_sound(m, 6, 18);
-        } else {
-            if (dWallAngle < 0) {
-                set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_RIGHT, animSpeed);
-            } else {
-                set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_LEFT, animSpeed);
-            }
-
-            if (m->marioObj->header.gfx.animInfo.animFrame < 20) {
-                play_sound((SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend), m->marioObj->header.gfx.cameraToObject);
-                m->particleFlags |= PARTICLE_DUST;
-            }
-
-            m->actionState = ACT_STATE_PUSH_OR_SIDLE_WALL_SIDLING;
-            m->actionArg = wallAngle + 0x8000;
-            m->marioObj->header.gfx.angle[1] = wallAngle + 0x8000;
-            m->marioObj->header.gfx.angle[2] = find_floor_slope(m, 0x4000);
-        }
+    
+    if (m->wall != NULL) {
+        wallAngle = m->wallYaw;
+        dWallAngle = wallAngle - m->faceAngle[1];
     }
+
+    if (m->wall == NULL || dWallAngle <= -DEGREES(160) || dWallAngle >= DEGREES(160)) {
+        m->flags |= MARIO_PUSHING;
+        set_mario_animation(m, MARIO_ANIM_PUSHING);
+        play_step_sound(m, 6, 18);
+    } else {
+        if (dWallAngle < 0) {
+            set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_RIGHT, animSpeed);
+        } else {
+            set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_LEFT, animSpeed);
+        }
+
+        if (m->marioObj->header.gfx.animInfo.animFrame < 20) {
+            play_sound((SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend), m->marioObj->header.gfx.cameraToObject);
+            m->particleFlags |= PARTICLE_DUST;
+        }
+
+        m->actionState = ACT_STATE_PUSH_OR_SIDLE_WALL_SIDLING;
+        m->actionArg = wallAngle + 0x8000;
+        m->marioObj->header.gfx.angle[1] = wallAngle + 0x8000;
+        m->marioObj->header.gfx.angle[2] = find_floor_slope(m, 0x4000);
+    }
+    
 }
 
 void tilt_body_walking(struct MarioState *m, s16 startYaw) {
