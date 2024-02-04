@@ -1,3 +1,9 @@
+/*
+ * PRIMARY MICROCODES
+ * These are the default microcode options that that majority of the game
+ * will render with by default.
+ */
+
 #ifndef F3DEX_GBI_SHARED
 #if SUPER3D_GBI == 1
       lib/PR/super3d/fifo/gspSuper3D.o(.data);
@@ -5,7 +11,6 @@
 #else /* Use one of the Fast3DEX series grucodes. */
     #ifndef F3DZEX_GBI_2
         #if F3DEX_GBI_3 == 1
-            #warning "reached ex3!"
             lib/PR/f3dex3/fifo/gspF3DEX3.fifo.o(.data);
         #elif F3DEX2PL_GBI == 1
             BUILD_DIR/lib/gspF3DEX2_PosLight.fifo.o(.data);
@@ -20,8 +25,9 @@
 #endif
 
 /*
- * LESS COMMON MICROCODES
- * These are setup to be loaded by G_LOAD_UCODE
+ * SECONDARY MICROCODES
+ * These are secondary microcodes intended to be setup and loaded
+ * by the G_LOAD_UCODE (gSPLoadUCode/gSPLoadUCodeL) command.
  */
 
 /* Fast3DEX NoN Data */
