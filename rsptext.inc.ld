@@ -1,24 +1,33 @@
+/*
+ * PRIMARY MICROCODES
+ * These are the default microcode options that that majority of the game
+ * will render with by default.
+ */
+
 #ifndef F3DEX_GBI_SHARED
 #if SUPER3D_GBI == 1
       lib/PR/super3d/fifo/gspSuper3D.o(.text);
 #endif
 #else /* Use one of the Fast3DEX series grucodes. */
     #ifndef F3DZEX_GBI_2
-    #if F3DEX2PL_GBI == 1
-      BUILD_DIR/lib/gspF3DEX2_PosLight.fifo.o(.text);
-    #elif F3DEX_GBI_2 == 1
-      lib/PR/f3dex2/fifo/gspF3DEX2.fifo.o(.text);
-    #elif F3DEX_GBI == 1
-      lib/PR/f3dex/fifo/gspF3DEX.fifo.o(.text);
+       #if F3DEX_GBI_3 == 1
+            lib/PR/f3dex3/fifo/gspF3DEX3.fifo.o(.text*);
+        #elif F3DEX2PL_GBI == 1
+            BUILD_DIR/lib/gspF3DEX2_PosLight.fifo.o(.text);
+        #elif F3DEX_GBI_2 == 1
+            lib/PR/f3dex2/fifo/gspF3DEX2.fifo.o(.text);
+        #elif F3DEX_GBI == 1
+            lib/PR/f3dex/fifo/gspF3DEX.fifo.o(.text);
     #endif
     #else /* Fast3DZEX */
-      BUILD_DIR/lib/gspF3DZEX2_PosLight.fifo.o(.text);
+        BUILD_DIR/lib/gspF3DZEX2_PosLight.fifo.o(.text);
     #endif
 #endif
 
 /*
- * LESS COMMON MICROCODES
- * These are setup to be loaded by G_LOAD_UCODE
+ * SECONDARY MICROCODES
+ * These are secondary microcodes intended to be setup and loaded
+ * by the G_LOAD_UCODE (gSPLoadUCode/gSPLoadUCodeL) command.
  */
 
 /* Fast3DEX NoN Text */

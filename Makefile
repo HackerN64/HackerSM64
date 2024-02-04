@@ -96,13 +96,14 @@ TARGET := sm64
 
 
 # GRUCODE - selects which RSP microcode to use.
-#   f3dex   -
-#   f3dex2  -
-#   l3dex2  - F3DEX2 version that only renders in wireframe
-#   f3dzex  - newer, experimental microcode used in Animal Crossing
-#   super3d - extremely experimental version of Fast3D lacking many features for speed
-GRUCODE ?= f3dzex
-$(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2))
+#   f3dex   - Upgraded Fast3D. Offers worse performance than Fast3DEX2, but has a more precise z-buffer.
+#   f3dex2  - Upgraded Fast3DEX. Good performance and widely supported across almost all emulators.
+#   l3dex2  - Fast3DEX2 version that only renders in wireframe.
+#   f3dzex  - Newer, experimental microcode based on Fast3DEX2 used in Animal Crossing and Zelda 64.
+#   f3dex3  - Upgraded Fast3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
+#   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
+GRUCODE ?= f3dex3
+$(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2 f3dex3))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
@@ -117,6 +118,9 @@ else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.08J / Animal Forest - Dōbutsu no M
 else ifeq ($(GRUCODE),super3d) # Super3D
   $(warning Super3D is experimental. Try at your own risk.)
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
+else ifeq ($(GRUCODE),f3dex3) # Fast3DEX3
+  DEFINES += F3DEX_GBI_3=1 F3DEX_GBI_SHARED=1
+  $(warning Fast3DEX3 is experimental. Try at your own risk.)
 endif
 
 # TEXT ENGINES

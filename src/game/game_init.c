@@ -302,6 +302,11 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_PosLight_fifoDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX2_PosLight_fifoTextEnd - (u8 *) gspF3DEX2_PosLight_fifoTextStart);
     gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_PosLight_fifoDataEnd - (u8 *) gspF3DEX2_PosLight_fifoDataStart);
+#elif   F3DEX_GBI_3
+    gGfxSPTask->task.t.ucode = gspF3DEX3_fifoTextStart;
+    gGfxSPTask->task.t.ucode_data = gspF3DEX3_fifoDataStart;
+    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX3_fifoTextEnd - (u8 *) gspF3DEX3_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX3_fifoDataEnd - (u8 *) gspF3DEX3_fifoDataStart);
 #elif   F3DEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_fifoDataStart;

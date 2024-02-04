@@ -18,6 +18,9 @@
 #elif   F3DEX2PL_GBI
     #define zex_text gspF3DEX2_PosLight_fifoTextStart
     #define zex_data gspF3DEX2_PosLight_fifoDataStart
+#elif   F3DEX_GBI_3
+    #define zex_text gspF3DEX3_fifoTextStart
+    #define zex_data gspF3DEX3_fifoDataStart
 #elif   F3DEX_GBI_2
     #define zex_text gspF3DEX2_fifoTextStart
     #define zex_data gspF3DEX2_fifoDataStart
