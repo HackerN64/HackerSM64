@@ -1236,6 +1236,7 @@ static void update_game_sound(void) {
                     // Begin playing the sound
                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[4] = soundId;
                     gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->soundScriptIO[0] = 1;
+                    gSequencePlayers[SEQ_PLAYER_SFX].channels[channelIndex]->stopScript = FALSE;
 
                     switch (bank) {
                         case SOUND_BANK_MOVING:
