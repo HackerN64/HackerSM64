@@ -120,7 +120,7 @@ else ifeq ($(GRUCODE),super3d) # Super3D
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
 else ifeq ($(GRUCODE),f3dex3) # Fast3DEX3
   DEFINES += F3DEX_GBI_3=1 F3DEX_GBI_SHARED=1
-  $(warning Fast3DEX3 is experimental. Try at your own risk.)
+  $(warning Fast3DEX3 is experimental and as of February 4th, 2024 only fully works with LLE emulation (i.e. NOT PROJECT64 1.6). Try at your own risk and please inform your audience to avoid compatibility problems.)
 endif
 
 # TEXT ENGINES
