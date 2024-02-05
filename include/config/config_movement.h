@@ -142,3 +142,10 @@
  */
 #define MARIO_INERTIA_UPWARD
 // #define MARIO_INERTIA_LATERAL
+
+
+/**
+ * Fixes Mario's walk speed on frame 1 being inconsistent due to controllers inputting low magnitude.
+ * This define makes accelerating from idle more consistent. 
+ */
+#define FIX_WALK_SPEED_POLLING
