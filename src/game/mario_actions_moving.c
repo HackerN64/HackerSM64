@@ -415,11 +415,6 @@ s32 update_decelerating_speed(struct MarioState *m) {
     return stopped;
 }
 
-#ifdef FIX_WALK_SPEED_POLLING
-// Velocity Mario gets when starting a walk frame 1.
-#define START_WALK_VELOCITY 8.f
-#endif
-
 void update_walking_speed(struct MarioState *m) {
     f32 maxTargetSpeed;
     f32 targetSpeed;
@@ -440,14 +435,14 @@ void update_walking_speed(struct MarioState *m) {
         // Slow down if moving backwards
         m->forwardVel += 1.1f;
     } else if (m->forwardVel <= targetSpeed) {
-#ifdef FIX_WALK_SPEED_POLLING
+        
         // When starting a walk, make a few checks and set Mario's speed to 8 on the first frame.
-        // This ensures Mario's speed is set consistently.
-        if (m->forwardVel <= START_WALK_VELOCITY && m->prevAction == ACT_IDLE
+        // This ensures Mario's speed is set consistently when starting a walk from ACT_IDLE.
+        if (m->forwardVel <= 8.f && m->prevAction == ACT_IDLE
             && !mario_floor_is_steep(m)) {
-            m->forwardVel = MIN(m->intendedMag, START_WALK_VELOCITY); // same fix as melee dashback
+            m->forwardVel = MIN(m->intendedMag, 8.f); // same fix as melee dashback
         }
-#endif
+
         // If accelerating
         m->forwardVel += 1.1f - m->forwardVel / 43.0f;
     } else if (m->floor->normal.y >= 0.95f) {
