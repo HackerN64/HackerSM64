@@ -73,6 +73,16 @@ s8  gResetTimer        = 0;
 s8  gNmiResetBarsTimer = 0;
 s8  gDebugLevelSelect  = FALSE;
 
+#if defined(F3DEX_GBI_3)
+volatile u32 gRSPGfxRDPWaitCycles;
+volatile u16 gRSPGfxCommandsSampledGclkActive;
+volatile u16 gRSPGfxCommandCount;
+volatile u16 gRSPGfxVertexCount;
+volatile u16 gRSPGfxTriDrawCount;
+volatile u32 gRSPGfxTriRequestCount;
+volatile u16 gRSPGfxRectCount;
+#endif
+
 #ifdef VANILLA_DEBUG
 s8 gShowDebugText = FALSE;
 
@@ -92,6 +102,46 @@ UNUSED void handle_debug_key_sequences(void) {
             sDebugTextKey = 0;
         }
     }
+}
+#endif
+
+#ifdef F3DEX_GBI_3
+#ifdef F3DEX_GBI_3_DEBUG
+static void display_rsp_counters(void) {
+        char buf[24];
+        sprintf(buf, "RDP CYC %u",  gRSPGfxRDPWaitCycles);
+        print_text(32, 32, buf);
+        sprintf(buf, "RDP GCLK %u", gRSPGfxCommandsSampledGclkActive);
+        print_text(32, 48, buf);
+        sprintf(buf, "RSP CMD %u",  gRSPGfxCommandCount);
+        print_text(32, 64, buf);
+        sprintf(buf, "RSP VTX %u",  gRSPGfxVertexCount);
+        print_text(32, 80, buf);
+        sprintf(buf, "RDP TRI %u",  gRSPGfxTriDrawCount);
+        print_text(32, 96, buf);
+        sprintf(buf, "RSP TRI %u",  gRSPGfxTriRequestCount);
+        print_text(32, 112, buf);
+        sprintf(buf, "RDP RCT %u",  gRSPGfxRectCount);
+        print_text(32, 128, buf);
+
+        sprintf(buf, "DMA: %s", osPiReadIo(SP_IMEM_START, NULL));
+        print_text(32, 144, buf);
+}
+#endif
+
+static void collect_rsp_counters(void) {
+    F3DEX3YieldDataFooter* footer = (F3DEX3YieldDataFooter*)((u8*)gGfxSPTaskYieldBuffer + OS_YIELD_DATA_SIZE - sizeof(F3DEX3YieldDataFooter));
+    osInvalDCache(footer, sizeof(F3DEX3YieldDataFooter));
+    gRSPGfxRDPWaitCycles = footer->rdpWaitCycles;
+    gRSPGfxCommandsSampledGclkActive = footer->commandsSampledGclkActive;
+    gRSPGfxCommandCount = footer->commandCount;
+    gRSPGfxVertexCount = footer->vertexCount;
+    gRSPGfxTriDrawCount = footer->triDrawCount;
+    gRSPGfxTriRequestCount = footer->triRequestCount;
+    gRSPGfxRectCount = footer->rectCount;
+#ifdef F3DEX_GBI_3_DEBUG
+    display_rsp_counters();
+#endif
 }
 #endif
 
@@ -290,6 +340,9 @@ void handle_sp_complete(void) {
             // that needs to arrive before we can consider the task completely finished and
             // null out sCurrentDisplaySPTask. That happens in handle_dp_complete.
             profiler_rsp_completed(PROFILER_RSP_GFX);
+#ifdef F3DEX_GBI_3
+            collect_rsp_counters();
+#endif
         }
     }
 }

@@ -112,4 +112,26 @@ void dispatch_audio_sptask(struct SPTask *spTask);
 void exec_display_list(struct SPTask *spTask);
 void change_vi(OSViMode *mode, int width, int height);
 
+#ifdef F3DEX_GBI_3
+typedef struct {
+    u32 rdpWaitCycles;
+    u16 commandsSampledGclkActive;
+    u16 commandCount;
+    u16 vertexCount;
+    u16 triDrawCount;
+    u32 triRequestCount:18;
+    u32 rectCount:14;
+    u32 taskdataptr; /* Not a perf counter */
+    u32 ucode; /* Not a perf counter */
+} F3DEX3YieldDataFooter;
+
+extern volatile u32 gRSPGfxRDPWaitCycles;
+extern volatile u16 gRSPGfxCommandsSampledGclkActive;
+extern volatile u16 gRSPGfxCommandCount;
+extern volatile u16 gRSPGfxVertexCount;
+extern volatile u16 gRSPGfxTriDrawCount;
+extern volatile u32 gRSPGfxTriRequestCount;
+extern volatile u16 gRSPGfxRectCount;
+#endif
+
 #endif // MAIN_H
