@@ -3096,12 +3096,12 @@ _DW({                                               \
  */
 #define gSPLightColor(pkt, n, col)                  \
 _DW({                                               \
-    gMoveWd(pkt, G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 0, ((col) & 0xFFFFFF00));   \
-    gMoveWd(pkt, G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 4, ((col) & 0xFFFFFF00));   \
+    gMoveWd(pkt, G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 0), ((col) & 0xFFFFFF00));   \
+    gMoveWd(pkt, G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 4), ((col) & 0xFFFFFF00));   \
 })
 #define gsSPLightColor(n, col)                      \
-    gsMoveWd(G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 0, ((col) & 0xFFFFFF00)),       \
-    gsMoveWd(G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 4, ((col) & 0xFFFFFF00))
+    gsMoveWd(G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 0), ((col) & 0xFFFFFF00)),       \
+    gsMoveWd(G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 4), ((col) & 0xFFFFFF00))
 /*
  * Version for point lights. (col1 & 0xFF) must be set to the point light constant
  * factor (must be nonzero), and (col2 & 0xFF) must be set to the point light
@@ -3110,12 +3110,12 @@ _DW({                                               \
  */
 #define _gSPLightColor2(pkt, n, col1, col2) \
 _DW({\
-  gMoveWd(pkt, G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 0, col1); \
-  gMoveWd(pkt, G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 4, col2); \
+  gMoveWd(pkt, G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 0), col1); \
+  gMoveWd(pkt, G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 4), col2); \
 })
 #define _gsSPLightColor2(n, col1, col2) \
-  gsMoveWd(G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 0, col1), \
-  gsMoveWd(G_MW_LIGHTCOL, (((n) - 1) * 0x10) + 4, col2)
+  gsMoveWd(G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 0), col1), \
+  gsMoveWd(G_MW_LIGHTCOL, ((((n) - 1) * 0x10) + 4), col2)
 
 
 /*
