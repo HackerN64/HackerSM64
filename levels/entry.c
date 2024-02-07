@@ -19,7 +19,7 @@ const LevelScript level_script_entry[] = {
     EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, /*script*/ _scriptsSegmentRomStart, /*scriptEnd*/ _scriptsSegmentRomEnd, /*entry*/ level_main_scripts_entry),
 #else
     SET_REG(/*value*/ 0),
-    EXECUTE(/*seg*/ SEGMENT_MENU_INTRO, /*script*/ _introSegmentRomStart, /*scriptEnd*/ _introSegmentRomEnd, /*entry*/ level_intro_splash_screen),
+    EXECUTE(/*seg*/ SEGMENT_MENU_INTRO, /*script*/ _introSegmentRomStart, /*scriptEnd*/ _introSegmentRomEnd, /*entry*/ level_intro_f3dex3_warning),
 #endif
     JUMP(/*target*/ level_script_entry),
 };

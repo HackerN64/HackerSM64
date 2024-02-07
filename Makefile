@@ -102,7 +102,7 @@ TARGET := sm64
 #   f3dzex  - Newer, experimental microcode based on Fast3DEX2 used in Animal Crossing and Zelda 64.
 #   f3dex3  - Upgraded Fast3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 #   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
-GRUCODE ?= f3dex3
+GRUCODE ?= f3dzex
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2 f3dex3))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
@@ -528,7 +528,7 @@ ifneq (,$(call find-command,armips))
 else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
-EMULATOR = mupen64plus
+EMULATOR = parallel-launcher
 EMU_FLAGS =
 
 ifneq (,$(call find-command,wslview))
