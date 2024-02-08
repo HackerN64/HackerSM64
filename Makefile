@@ -94,14 +94,14 @@ DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
 TARGET := sm64
 
-
 # GRUCODE - selects which RSP microcode to use.
-#   f3dex   - Upgraded Fast3D. Offers worse performance than Fast3DEX2, but has a more precise z-buffer.
-#   f3dex2  - Upgraded Fast3DEX. Good performance and widely supported across almost all emulators.
-#   l3dex2  - Fast3DEX2 version that only renders in wireframe.
-#   f3dzex  - Newer, experimental microcode based on Fast3DEX2 used in Animal Crossing and Zelda 64.
-#   f3dex3  - Upgraded Fast3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
+#   f3dex   - Upgraded Fast3D. Offers worse performance than F3DEX2, but has a more precise z-buffer.
+#   f3dex2  - Upgraded F3DEX. Good performance and widely supported across almost all emulators.
+#   l3dex2  - F3DEX2 version that only renders in wireframe.
+#   f3dzex  - Newer, experimental microcode based on F3DEX2 used in Animal Crossing and Zelda 64. This is the HackerSM64 default.
+#   f3dex3  - Upgraded F3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 #   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
+
 GRUCODE ?= f3dzex
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2 f3dex3))
 
@@ -120,7 +120,8 @@ else ifeq ($(GRUCODE),super3d) # Super3D
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
 else ifeq ($(GRUCODE),f3dex3) # Fast3DEX3
   DEFINES += F3DEX_GBI_3=1 F3DEX_GBI_SHARED=1
-  $(warning Fast3DEX3 is experimental and as of February 4th, 2024 only fully works with LLE emulation (i.e. NOT PROJECT64 1.6). Try at your own risk and please inform your audience to avoid compatibility problems.)
+  $(warning F3DEX3 is experimental, and as of February 4th, 2024, only fully works on a real Nintendo 64 or with low level emulation (LLE) (i.e. NOT PROJECT64 1.6). Try at your own risk and please inform your audience to avoid compatibility problems.)
+  $(warning Failure to change emulator settings CAN CAUSE YOUR GAME TO CRASH!)
 endif
 
 # TEXT ENGINES
