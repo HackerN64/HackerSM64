@@ -123,9 +123,6 @@ static void display_rsp_counters(void) {
         print_text(32, 112, buf);
         sprintf(buf, "RDP RCT %u",  gRSPGfxRectCount);
         print_text(32, 128, buf);
-
-        sprintf(buf, "DMA: %s", osPiReadIo(SP_IMEM_START, NULL));
-        print_text(32, 144, buf);
 }
 #endif
 
