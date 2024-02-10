@@ -1040,6 +1040,14 @@ static void cur_obj_move_update_ground_air_flags(UNUSED f32 gravity, f32 bouncin
         }
     }
 
+    o->oMoveFlags &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER);
+    if (o->oFloorType == SURFACE_BURNING) {
+        o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
+    } else if ((o->oFloorType == SURFACE_DEATH_PLANE) || (o->oFloorType == SURFACE_VERTICAL_WIND)) {
+        //! This maybe misses SURFACE_WARP
+        o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
+    }
+
     o->oMoveFlags &= ~OBJ_MOVE_MASK_IN_WATER;
 }
 
@@ -1368,13 +1376,6 @@ static void cur_obj_update_floor(void) {
 
     if (floor != NULL) {
         SurfaceType floorType = floor->type;
-        if (floorType == SURFACE_BURNING) {
-            o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
-        } else if ((floorType == SURFACE_DEATH_PLANE) || (floorType == SURFACE_VERTICAL_WIND)) {
-            //! This maybe misses SURFACE_WARP
-            o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
-        }
-
         o->oFloorType = floorType;
         o->oFloorRoom = floor->room;
     } else {
@@ -1384,8 +1385,6 @@ static void cur_obj_update_floor(void) {
 }
 
 static void cur_obj_update_floor_and_resolve_wall_collisions(s16 steepSlopeDegrees) {
-    o->oMoveFlags &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER);
-
     if (o->activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         cur_obj_update_floor();
         o->oMoveFlags &= ~(OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER);
