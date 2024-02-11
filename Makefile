@@ -102,23 +102,23 @@ TARGET := sm64
 #   f3dex3  - Upgraded F3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 #   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
 
-GRUCODE ?= f3dzex
-$(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2 f3dex3))
+GRUCODE ?= f3dex3
+$(eval $(call validate-option,GRUCODE,f3dex f3dex2 l3dex2 f3dex2pl f3dzex super3d f3dex3))
 
-ifeq ($(GRUCODE),f3dex) # Fast3DEX
+ifeq ($(GRUCODE),f3dex) # F3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dex2) # Fast3DEX2
+else ifeq ($(GRUCODE),f3dex2) # F3DEX2
   DEFINES += F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),l3dex2) # Line3DEX2
+else ifeq ($(GRUCODE),l3dex2) # L3DEX2
   DEFINES += L3DEX2_GBI=1 L3DEX2_ALONE=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dex2pl) # Fast3DEX2_PosLight
+else ifeq ($(GRUCODE),f3dex2pl) # F3DEX2_PosLight
   DEFINES += F3DEX2PL_GBI=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
+else ifeq ($(GRUCODE),f3dzex) # F3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
   DEFINES += F3DZEX_NON_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),super3d) # Super3D
   $(warning Super3D is experimental. Try at your own risk.)
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
-else ifeq ($(GRUCODE),f3dex3) # Fast3DEX3
+else ifeq ($(GRUCODE),f3dex3) # F3DEX3
   DEFINES += F3DEX_GBI_3=1 F3DEX_GBI_SHARED=1
   $(warning F3DEX3 is experimental, and as of February 4th, 2024, only fully works on a real Nintendo 64 or with low level emulation (LLE) (i.e. NOT PROJECT64 1.6). Try at your own risk and please inform your audience to avoid compatibility problems.)
   $(warning Failure to change emulator settings CAN CAUSE YOUR GAME TO CRASH!)
