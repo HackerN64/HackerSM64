@@ -106,7 +106,7 @@ UNUSED void handle_debug_key_sequences(void) {
 #endif
 
 #ifdef F3DEX_GBI_3
-#ifdef F3DEX_GBI_3_DEBUG
+#if F3DEX_GBI_3 > 1
 static void display_rsp_counters(void) {
         char buf[24];
         sprintf(buf, "RDP CYC %u",  gRSPGfxRDPWaitCycles);
@@ -136,7 +136,7 @@ static void collect_rsp_counters(void) {
     gRSPGfxTriDrawCount = footer->triDrawCount;
     gRSPGfxTriRequestCount = footer->triRequestCount;
     gRSPGfxRectCount = footer->rectCount;
-#ifdef F3DEX_GBI_3_DEBUG
+#if F3DEX_GBI_3 > 1
     display_rsp_counters();
 #endif
 }

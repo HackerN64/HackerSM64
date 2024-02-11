@@ -10,22 +10,20 @@
 #endif
 #else /* Use one of the Fast3DEX series grucodes. */
     #ifndef F3DZEX_GBI_2
-        #if F3DEX_GBI_3 == 1
-            #if F3DEX_GBI_3_DEBUG == 1      // Debug w/ GLCK profiling
-                lib/PR/f3dex3/fifo/gspF3DEX3.glck.fifo.o(.data);
-            #elif F3DEX_GBI_3_DEBUG == 2    // Debug w/ GLCK profiling and normals
-                lib/PR/f3dex3/fifo/gspF3DEX3.debug.fifo.o(.data);
-            #else                           // Default
-                lib/PR/f3dex3/fifo/gspF3DEX3.fifo.o(.data);
-            #endif
-        #elif F3DEX2PL_GBI == 1
-            BUILD_DIR/lib/gspF3DEX2_PosLight.fifo.o(.data);
-        #elif F3DEX_GBI_2 == 1
-            lib/PR/f3dex2/fifo/gspF3DEX2.fifo.o(.data);
-        #elif F3DEX_GBI == 1
-            lib/PR/f3dex/fifo/gspF3DEX.fifo.o(.data);
-        #endif
-    #else /* Fast3DZEX */
+      #if F3DEX_GBI_3 == 1
+            lib/PR/f3dex3/fifo/gspF3DEX3.fifo.o(.data);
+      #elif F3DEX_GBI_3 == 2
+            lib/PR/f3dex3/fifo/gspF3DEX3.glck.fifo.o(.data);      /* GLCK profiling */
+      #elif F3DEX_GBI_3 == 3
+            lib/PR/f3dex3/fifo/gspF3DEX3.debug.fifo.o(.data);     /* Normals debugger + GLCK profiling */
+      #elif F3DEX2PL_GBI == 1
+          BUILD_DIR/lib/gspF3DEX2_PosLight.fifo.o(.data);
+      #elif F3DEX_GBI_2 == 1
+          lib/PR/f3dex2/fifo/gspF3DEX2.fifo.o(.data);
+      #elif F3DEX_GBI == 1
+          lib/PR/f3dex/fifo/gspF3DEX.fifo.o(.data);
+      #endif
+    #else                                                         /* F3DZEX */
         BUILD_DIR/lib/gspF3DZEX2_PosLight.fifo.o(.data);
     #endif
 #endif
