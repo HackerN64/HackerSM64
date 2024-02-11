@@ -9,19 +9,19 @@
 #ifdef  L3DEX2_ALONE
     #define zex_text gspL3DEX2_fifoTextStart
     #define zex_data gspL3DEX2_fifoDataStart
-#elif  F3DZEX_GBI_2
+#elif  defined(F3DZEX_GBI_2)
     #define zex_text gspF3DZEX2_PosLight_fifoTextStart
     #define zex_data gspF3DZEX2_PosLight_fifoDataStart
 #elif  F3DZEX_NON_GBI_2
     #define zex_text gspF3DZEX2_NoN_PosLight_fifoTextStart
     #define zex_data gspF3DZEX2_NoN_PosLight_fifoDataStart
-#elif   F3DEX2PL_GBI
+#elif   defined(F3DEX2PL_GBI)
     #define zex_text gspF3DEX2_PosLight_fifoTextStart
     #define zex_data gspF3DEX2_PosLight_fifoDataStart
-#elif   F3DEX_GBI_3
+#elif   defined(F3DEX_GBI_3)
     #define zex_text gspF3DEX3_fifoTextStart
     #define zex_data gspF3DEX3_fifoDataStart
-#elif   F3DEX_GBI_2
+#elif   defined(F3DEX_GBI_2)
     #define zex_text gspF3DEX2_fifoTextStart
     #define zex_data gspF3DEX2_fifoDataStart
 #else
