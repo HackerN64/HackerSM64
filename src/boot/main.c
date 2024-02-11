@@ -106,6 +106,9 @@ UNUSED void handle_debug_key_sequences(void) {
 #endif
 
 #if F3DEX_GBI_3 > 1
+
+#include "game/print.h"
+
 static void display_rsp_counters(void) {
         char buf[24];
         sprintf(buf, "RDP CYC %u",  gRSPGfxRDPWaitCycles);
