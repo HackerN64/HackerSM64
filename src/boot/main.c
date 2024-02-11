@@ -105,7 +105,6 @@ UNUSED void handle_debug_key_sequences(void) {
 }
 #endif
 
-#ifdef F3DEX_GBI_3
 #if F3DEX_GBI_3 > 1
 static void display_rsp_counters(void) {
         char buf[24];
@@ -126,6 +125,7 @@ static void display_rsp_counters(void) {
 }
 #endif
 
+#ifdef F3DEX_GBI_3
 static void collect_rsp_counters(void) {
     F3DEX3YieldDataFooter* footer = (F3DEX3YieldDataFooter*)((u8*)gGfxSPTaskYieldBuffer + OS_YIELD_DATA_SIZE - sizeof(F3DEX3YieldDataFooter));
     osInvalDCache(footer, sizeof(F3DEX3YieldDataFooter));
