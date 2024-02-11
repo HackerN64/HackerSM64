@@ -6,7 +6,6 @@
 #define F3DEX3_H
 
 #define F3DEX_GBI_2 1
-#define F3DEX_GBI_3 1
 
 #ifdef REQUIRE_SEMICOLONS_AFTER_GBI_COMMANDS
 /* OoT style, semicolons required after using macros, cleaner code. If modding
