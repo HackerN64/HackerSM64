@@ -73,7 +73,7 @@ s8  gResetTimer        = 0;
 s8  gNmiResetBarsTimer = 0;
 s8  gDebugLevelSelect  = FALSE;
 
-#if defined(F3DEX_GBI_3)
+#ifdef F3DEX_GBI_3
 volatile u32 gRSPGfxRDPWaitCycles;
 volatile u16 gRSPGfxCommandsSampledGclkActive;
 volatile u16 gRSPGfxCommandCount;
@@ -106,7 +106,6 @@ UNUSED void handle_debug_key_sequences(void) {
 #endif
 
 #if F3DEX_GBI_3 > 1
-
 #include "game/print.h"
 
 static void display_rsp_counters(void) {
