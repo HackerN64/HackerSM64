@@ -37,7 +37,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
 **F3DEX3 by Sauraen**
-- F3DEX3 adds several upgrades to the original F3DEX2 microcode. You can enable it by setting `grucode` equal to `f3dex3`. In code, this can be detected by checking for F3DEX_GBI_3 during build. Variants of the F3DEX3 microcode can be enabled by defining `F3DEX_GBI_3`'s value as `2` or `3` (via ccflag in the makefile) for increased profiling capability, or increased profiling capability and a normals debugging tool respectively. Please read the [F3DEX3 README.md](https://github.com/HackerN64/F3DEX3/blob/main/README.md) before using.
+- F3DEX3 adds several upgrades to the original F3DEX2 microcode. You can enable it by setting the `GRUCODE` equal to `f3dex3`. In code, this can be detected by checking for F3DEX_GBI_3 during build. Variants of the F3DEX3 microcode can be enabled by defining `F3DEX_GBI_3`'s value as `2` or `3` (via the ccflag set for `GRUCODE=f3dex3` in the makefile) for increased profiling capability, or increased profiling capability and a normals debugging tool respectively. Please read the [F3DEX3 README.md](https://github.com/HackerN64/F3DEX3/blob/main/README.md) before using.
 
 **Lighting Engine by Wiseguy**
 - Lighting Engine is available on a separate branch ([base/lighting-engine](https://github.com/Reonu/HackerSM64/tree/base/lighting-engine)). Instructions on how to use it are in the readme of that branch.
