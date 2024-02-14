@@ -42,13 +42,13 @@ enum ChannelIndexes {
 
 /* ------ BETTER REVERB LIGHTWEIGHT PARAMETER OVERRIDES ------ */
 
-// Filter count works differently than normal when used with light settings and can support numbers that are not multiples of 3, though 3 is generally recommended.
-// This can be reduced to 2 to save a third of runtime overhead, but substantially reduces reverb saturation.
-// Similarly this can be increased from 3, but likely won't have beneficial outcomes worth the runtime expense compared to the modification of other parameters without using light settings.
-#define BETTER_REVERB_FILTER_COUNT_LIGHT 3
-#define BETTER_REVERB_GAIN_INDEX_LIGHT 0xA0 // Advanced parameter; used to tune the outputs of every filter except for the final one
-#define BETTER_REVERB_REVERB_INDEX_LIGHT 0x30 // Advanced parameter; used to tune the incoming output of the final filter
-#define BETTER_REVERB_MULTIPLE_LIGHT 0xD0 // Advanced parameter; multiplier applied to the final output signal for both the left and right channels (divided by 256)
+// Filter count works differently than normal when used with light settings and can support numbers that are not multiples of 3.
+// A value of 2 is generally recommended for most similar behavior to non-lightweight reverb.
+// This can be reduced to 1 to save additional runtime overhead, but will reduce some reverb saturation as consequence.
+// Similarly this can be increased from 2, but likely won't have beneficial outcomes worth the runtime expense compared to the modification of other parameters without using light settings.
+#define BETTER_REVERB_FILTER_COUNT_LIGHT 2
+#define BETTER_REVERB_GAIN_INDEX_LIGHT 0xA0 // Advanced parameter; used to tune the outputs of every filter except for the final one (multiples of 0x10 will compile more efficiently)
+#define BETTER_REVERB_REVERB_INDEX_LIGHT 0x30 // Advanced parameter; used to tune the reuse of the previously processed output sample (multiples of 0x10 will compile more efficiently)
 
 
 /* ------------ BETTER REVERB EXTERNED VARIABLES ------------ */
@@ -74,7 +74,7 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR);
 /* -------------- BETTER REVERB STATIC ASSERTS -------------- */
 
 STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
-STATIC_ASSERT(BETTER_REVERB_FILTER_COUNT_LIGHT >= 2, "BETTER_REVERB_FILTER_COUNT_LIGHT should be no less than 2!");
+STATIC_ASSERT(BETTER_REVERB_FILTER_COUNT_LIGHT > 0, "BETTER_REVERB_FILTER_COUNT_LIGHT must be greater than 0!");
 STATIC_ASSERT(BETTER_REVERB_FILTER_COUNT_LIGHT <= NUM_ALLPASS, "BETTER_REVERB_FILTER_COUNT_LIGHT cannot be larger than NUM_ALLPASS!");
 
 #else

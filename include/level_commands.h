@@ -5,7 +5,6 @@
 
 #include "level_table.h"
 #include "config.h"
-#include "game/puppylights.h"
 
 enum LevelCommands {
     /*0x00*/ LEVEL_CMD_LOAD_AND_EXECUTE,
@@ -71,9 +70,7 @@ enum LevelCommands {
     /*0x3C*/ LEVEL_CMD_GET_OR_SET_VAR,
     /*0x3D*/ LEVEL_CMD_PUPPYVOLUME,
     /*0x3E*/ LEVEL_CMD_CHANGE_AREA_SKYBOX,
-    /*0x3F*/ LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT,
-    /*0x40*/ LEVEL_CMD_PUPPYLIGHT_NODE,
-    /*0x41*/ LEVEL_CMD_SET_ECHO,
+    /*0x3F*/ LEVEL_CMD_SET_ECHO,
 };
 
 enum LevelActs {

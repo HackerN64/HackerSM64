@@ -220,7 +220,7 @@ static struct RenderPhase sRenderPhases[] = {
     },
 
     [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
-        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .startLayer = LAYER_NON_ZB_FIRST,
         .endLayer   = LAYER_LAST,
     },
 #else
@@ -1123,7 +1123,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
     }
     if (node->objNode != NULL && node->objNode->header.gfx.sharedChild != NULL) {
-        vec3_prod_val(translation, node->translation, 0.25f);
+        vec3_scale_dest(translation, node->translation, 0.25f);
 
         mtxf_translate(mat, translation);
         mtxf_copy(gMatStack[gMatStackIndex + 1], *gCurGraphNodeObject->throwMatrix);

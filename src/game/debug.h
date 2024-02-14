@@ -62,7 +62,7 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *message);
 /**
  * Will cause a crash if cond is not true, and DEBUG is defined (allows for quick removal of littered asserts)
  */
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
 #define assert(cond, message) do {\
     if ((cond) == FALSE) { \
         error(message); \

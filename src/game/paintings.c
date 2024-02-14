@@ -249,13 +249,17 @@ void painting_average_vertex_normals(struct PaintingNeighborTris* neighborTris, 
             vec3f_add(n, paintingTriNorms[tri]);
         }
 
-        vec3_div_val(n, numNeighbors);
+        n[0] /= numNeighbors;
+        n[1] /= numNeighbors;
+        n[2] /= numNeighbors;
 
         f32 nlen = vec3_sumsq(n);
 
         if (FLT_IS_NONZERO(nlen)) {
             nlen = (127.0f / sqrtf(nlen));
-            vec3_prod_val(paintingMesh[i].norm, n, nlen);
+            paintingMesh[i].norm[0] = (n[0] * nlen);
+            paintingMesh[i].norm[1] = (n[1] * nlen);
+            paintingMesh[i].norm[2] = (n[2] * nlen);
         } else {
             vec3_zero(paintingMesh[i].norm);
         }
