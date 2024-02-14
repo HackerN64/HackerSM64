@@ -98,7 +98,7 @@ TARGET := sm64
 #   f3dex   - Upgraded Fast3D. Offers worse performance than F3DEX2, but has a more precise z-buffer.
 #   f3dex2  - Upgraded F3DEX. Good performance and widely supported across almost all emulators.
 #   l3dex2  - F3DEX2 version that only renders in wireframe.
-#   f3dzex  - Newer, experimental microcode based on F3DEX2 used in Animal Crossing and Zelda 64. This is the HackerSM64 default.
+#   f3dzex  - Newer microcode based on F3DEX2 used in Animal Crossing and Zelda 64. This is the HackerSM64 default.
 #   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
 #   f3dex3  - Upgraded F3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 
