@@ -25,7 +25,7 @@
 #define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
 
 typedef union {
-    struct PACKED {
+    struct {
         /*0x00*/ u8 hi; // HI byte.
         /*0x01*/ u8 lo; // LO byte.
     }; /*0x02*/
@@ -33,7 +33,7 @@ typedef union {
 } HiLo16; /*0x02*/
 
 typedef union {
-    struct PACKED {
+    struct {
         /*0x00*/ u16 hi; // HI byte.
         /*0x01*/ u16 lo; // LO byte.
     }; /*0x02*/
@@ -41,7 +41,7 @@ typedef union {
 } HiLo32; /*0x02*/
 
 typedef union {
-    struct PACKED {
+    struct {
         /*0x00*/ u32 hi; // HI byte.
         /*0x01*/ u32 lo; // LO byte.
     }; /*0x02*/
@@ -49,12 +49,12 @@ typedef union {
 } HiLo64; /*0x02*/
 
 struct Config {
-    /*0x00*/ f32 audioFrequency;
+    f32 audioFrequency;
 #ifdef WIDE
-    /*0x04*/ s16 widescreen;
+    s16 widescreen;
 #endif
-    /*0x06*/ u8 tvType;
-}; /*0x07*/
+    u8 tvType;
+};
 
 typedef struct Controller {
     /*0x00*/ s16 rawStickX;               // Analog stick [-128, 128] positive is right. Used for menus.
