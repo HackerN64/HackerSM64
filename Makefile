@@ -99,11 +99,11 @@ TARGET := sm64
 #   f3dex2  - Upgraded F3DEX. Good performance and widely supported across almost all emulators.
 #   l3dex2  - F3DEX2 version that only renders in wireframe.
 #   f3dzex  - Newer, experimental microcode based on F3DEX2 used in Animal Crossing and Zelda 64. This is the HackerSM64 default.
-#   f3dex3  - Upgraded F3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 #   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
+#   f3dex3  - Upgraded F3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 
 GRUCODE ?= f3dzex
-$(eval $(call validate-option,GRUCODE,f3dex f3dex2 l3dex2 f3dex2pl f3dzex f3dex3 super3d))
+$(eval $(call validate-option,GRUCODE,f3dex f3dex2 l3dex2 f3dex2pl f3dzex super3d f3dex3))
 
 ifeq ($(GRUCODE),f3dex) # F3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
