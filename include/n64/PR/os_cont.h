@@ -77,23 +77,6 @@ typedef union {
     u16 raw;
 } Analog_u8; /*0x02*/
 
-#define ANALOG_U4_TO_U8(src) ((Analog_u8){  \
-    ((src).a << 4),                         \
-    ((src).b << 4),                         \
-})
-
-//! TODO: CLAMP_S8 is from math_util.h. Should it be included in this file?
-#define ANALOG_S8_CENTER(stick, center) ((Analog_s8){   \
-    CLAMP_S8((s32)(stick).x - (center).x),              \
-    CLAMP_S8((s32)(stick).y - (center).y),              \
-})
-
-//! TODO: CLAMP_U8 is from math_util.h. Should it be included in this file?
-#define ANALOG_U8_CENTER(stick, center) ((Analog_u8){   \
-    CLAMP_U8((s32)(stick).x - (center).x),              \
-    CLAMP_U8((s32)(stick).y - (center).y),              \
-})
-
 #define ANALOG_ZERO(type)   (type){ 0x00, 0x00 }
 #define ANALOG_S8_ZERO      ANALOG_ZERO(Analog_s8)
 #define ANALOG_U8_ZERO      ANALOG_ZERO(Analog_u8)

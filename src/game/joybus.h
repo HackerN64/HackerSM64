@@ -2,6 +2,7 @@
 
 #include <PR/os_internal.h>
 #include "types.h"
+#include "engine/math_util.h"
 
 ////////////
 // Config //
@@ -20,6 +21,26 @@
 
 #define CHNL_ERR(format) (((format).rx & CHNL_ERR_MASK) >> 4)
 
+////////////
+// Macros //
+////////////
+
+#define ANALOG_U4_TO_U8(src) ((Analog_u8){  \
+    ((src).a << 4),                         \
+    ((src).b << 4),                         \
+})
+
+//! TODO: CLAMP_S8 is from math_util.h. Should it be included in this file?
+#define ANALOG_S8_CENTER(stick, center) ((Analog_s8){   \
+    CLAMP_S8((s32)(stick).x - (center).x),              \
+    CLAMP_S8((s32)(stick).y - (center).y),              \
+})
+
+//! TODO: CLAMP_U8 is from math_util.h. Should it be included in this file?
+#define ANALOG_U8_CENTER(stick, center) ((Analog_u8){   \
+    CLAMP_U8((s32)(stick).x - (center).x),              \
+    CLAMP_U8((s32)(stick).y - (center).y),              \
+})
 
 ////////////////////////////
 // PIF RAM format structs //
