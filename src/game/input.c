@@ -358,10 +358,10 @@ void stop_controller_status_polling(OSContPadEx* pad) {
  */
 static _Bool detect_analog_stick_input(OSContPadEx* pad, const s8 deadzone) {
     return (
-        abss(pad->stick.x  ) > deadzone ||
-        abss(pad->stick.y  ) > deadzone ||
-        abss(pad->c_stick.x) > deadzone ||
-        abss(pad->c_stick.y) > deadzone
+        ABS2(pad->stick.x  ) > deadzone ||
+        ABS2(pad->stick.y  ) > deadzone ||
+        ABS2(pad->c_stick.x) > deadzone ||
+        ABS2(pad->c_stick.y) > deadzone
     );
 }
 

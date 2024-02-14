@@ -581,19 +581,11 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     u8 index = 0b00;
 
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
-        if ((gPlayer1Controller->rawStickY >  60) || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))) {
-            index |= 0b01; // Up
-        }
-        if ((gPlayer1Controller->rawStickY < -60) || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))) {
-            index |= 0b10; // Down
-        }
+        if (gPlayer1Controller->rawStickY >  60) index |= 0b01; // Up
+        if (gPlayer1Controller->rawStickY < -60) index |= 0b10; // Down
     } else if (scrollDirection == MENU_SCROLL_HORIZONTAL) {
-        if ((gPlayer1Controller->rawStickX >  60) || (gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))) {
-            index |= 0b10; // Right
-        }
-        if ((gPlayer1Controller->rawStickX < -60) || (gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))) {
-            index |= 0b01; // Left
-        }
+        if (gPlayer1Controller->rawStickX >  60) index |= 0b10; // Right
+        if (gPlayer1Controller->rawStickX < -60) index |= 0b01; // Left
     }
 
     // Only increase/decrese if not holding that direction on the previous frame:
@@ -1944,7 +1936,7 @@ s32 render_pause_courses_and_castle(void) {
             render_pause_castle_menu_box(160, 143);
             render_pause_castle_main_strings(104, 60);
 
-            if (gPlayer1Controller->buttonPressed & (A_BUTTON | START_BUTTON | Z_TRIG)) {
+            if (gPlayer1Controller->buttonPressed & (A_BUTTON | START_BUTTON)) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;

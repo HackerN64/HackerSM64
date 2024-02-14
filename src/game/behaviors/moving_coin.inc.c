@@ -93,9 +93,6 @@ void bhv_moving_yellow_coin_loop(void) {
             break;
     }
 
-#ifdef COIN_LAVA_FLICKER
-    if (o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) moving_coin_flicker();
-#endif
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         coin_collected();
         o->oInteractStatus = INT_STATUS_NONE;

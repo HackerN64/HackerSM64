@@ -73,13 +73,11 @@ chan_jump .main_loop_023589
 
 // Main loop for standard, non-continuous sound effects
 .main_loop_023589:
-chan_delay1
+chan_hang
 chan_ioreadval 0
 chan_bltz .main_loop_023589
 .start_playing_023589:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_setval 0
 chan_iowriteval 5
 chan_ioreadval 4
@@ -93,13 +91,11 @@ chan_bltz .skip_023589 // if we have a signal:
   chan_beqz .force_stop_023589 // told to stop
   chan_jump .start_playing_023589 // told to play something else
 .skip_023589:
-chan_testlayerfinished 0
-chan_beqz .poll_023589 // if layer 0 hasn't finished, keep polling
+chan_testlayersfinished
+chan_beqz .poll_023589 // if all layers haven't finished, keep polling
 chan_jump .main_loop_023589 // otherwise go back to the main loop
 .force_stop_023589:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_jump .main_loop_023589
 
 .channel1:
@@ -140,13 +136,11 @@ chan_jump .main_loop_146
 
 // Main loop for moving, env and air sound effects, which play continuously
 .main_loop_146:
-chan_delay1
+chan_hang
 chan_ioreadval 0
 chan_bltz .main_loop_146
 .start_playing_146:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_setvolscale 127
 chan_setval 0
 chan_iowriteval 5
@@ -161,9 +155,7 @@ chan_bltz .poll_146
 chan_beqz .force_stop_146
 chan_jump .start_playing_146
 .force_stop_146:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_jump .main_loop_146
 
 .channel7:
@@ -177,13 +169,11 @@ chan_setdyntable .channel7_table
 
 // Loop for menu sound effects
 .main_loop_7:
-chan_delay1
+chan_hang
 chan_ioreadval 0
 chan_bltz .main_loop_7
 .start_playing_7:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_setval 0
 chan_iowriteval 5
 chan_setreverb 0
@@ -201,14 +191,12 @@ chan_bltz .skip_7 // if we have a signal:
   chan_unreservenotes
   chan_jump .start_playing_7 // told to play something else
 .skip_7:
-chan_testlayerfinished 0
-chan_beqz .poll_7 // if layer 0 hasn't finished, keep polling
+chan_testlayersfinished
+chan_beqz .poll_7 // if all layers haven't finished, keep polling
 chan_unreservenotes
 chan_jump .main_loop_7 // otherwise go back to the main loop
 .force_stop_7:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_unreservenotes
 chan_jump .main_loop_7
 

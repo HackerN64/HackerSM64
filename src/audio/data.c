@@ -73,7 +73,7 @@ u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
 
 /**
  * Format:
- * - useLightweightSettings (Reduce some runtime configurability options in favor of a slight speed boost during processing; Light configurability settings are found in synthesis.h)
+ * - useLightweightSettings (Reduce some runtime configurability options in favor of a significant speed boost during processing; Light configurability settings are found in synthesis.h)
  * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality; number <= 0 signifies use of vanilla reverb)
  * - isMono                 (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
  * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
@@ -85,8 +85,8 @@ u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
  * 
  * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel])
  * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel])
- * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; overridden when using light settings)
- * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; overridden when using light settings)
+ * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; unused when using light settings)
+ * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; unused when using light settings)
  * 
  * NOTE: The first entry will always be used by default when not using the level commands to specify a preset.
  * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.
@@ -244,41 +244,36 @@ u16 gAudioCosineTable[128] = {
 // between -1 and +1 octave.
 // gPitchBendFrequencyScale[k] = (0.5 * 2^(k/127))
 #ifndef VERSION_SH
-#if defined(VERSION_EU)
 f32 gPitchBendFrequencyScale[256] = {
-    0.5f,
-#else
-f32 gPitchBendFrequencyScale[255] = {
-#endif
-    0.500000f, 0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f, 0.522315f,
-    0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f, 0.548612f,
-    0.551614f, 0.554633f, 0.557669f, 0.560721f, 0.563789f, 0.566875f, 0.569977f, 0.573097f, 0.576233f,
-    0.579387f, 0.582558f, 0.585746f, 0.588951f, 0.592175f, 0.595415f, 0.598674f, 0.601950f, 0.605245f,
-    0.608557f, 0.611888f, 0.615236f, 0.618603f, 0.621989f, 0.625393f, 0.628815f, 0.632257f, 0.635717f,
-    0.639196f, 0.642694f, 0.646212f, 0.649748f, 0.653304f, 0.656880f, 0.660475f, 0.664089f, 0.667724f,
-    0.671378f, 0.675052f, 0.678747f, 0.682461f, 0.686196f, 0.689952f, 0.693727f, 0.697524f, 0.701341f,
-    0.705180f, 0.709039f, 0.712919f, 0.716821f, 0.720744f, 0.724689f, 0.728655f, 0.732642f, 0.736652f,
-    0.740684f, 0.744737f, 0.748813f, 0.752911f, 0.757031f, 0.761175f, 0.765340f, 0.769529f, 0.773740f,
-    0.777975f, 0.782232f, 0.786513f, 0.790818f, 0.795146f, 0.799497f, 0.803873f, 0.808272f, 0.812696f,
-    0.817144f, 0.821616f, 0.826112f, 0.830633f, 0.835179f, 0.839750f, 0.844346f, 0.848966f, 0.853613f,
-    0.858284f, 0.862982f, 0.867704f, 0.872453f, 0.877228f, 0.882029f, 0.886856f, 0.891709f, 0.896590f,
-    0.901496f, 0.906430f, 0.911391f, 0.916379f, 0.921394f, 0.926436f, 0.931507f, 0.936604f, 0.941730f,
-    0.946884f, 0.952066f, 0.957277f, 0.962516f, 0.967783f, 0.973080f, 0.978405f, 0.983760f, 0.989144f,
-    0.994557f, 1.000000f, 1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f, 1.038944f,
-    1.044630f, 1.050347f, 1.056095f, 1.061875f, 1.067687f, 1.073530f, 1.079405f, 1.085312f, 1.091252f,
-    1.097224f, 1.103229f, 1.109267f, 1.115337f, 1.121441f, 1.127579f, 1.133750f, 1.139955f, 1.146193f,
-    1.152466f, 1.158773f, 1.165115f, 1.171491f, 1.177903f, 1.184349f, 1.190831f, 1.197348f, 1.203901f,
-    1.210489f, 1.217114f, 1.223775f, 1.230473f, 1.237207f, 1.243978f, 1.250786f, 1.257631f, 1.264514f,
-    1.271434f, 1.278392f, 1.285389f, 1.292423f, 1.299497f, 1.306608f, 1.313759f, 1.320949f, 1.328178f,
-    1.335447f, 1.342756f, 1.350104f, 1.357493f, 1.364922f, 1.372392f, 1.379903f, 1.387455f, 1.395048f,
-    1.402683f, 1.410360f, 1.418078f, 1.425839f, 1.433642f, 1.441488f, 1.449377f, 1.457309f, 1.465285f,
-    1.473304f, 1.481367f, 1.489474f, 1.497626f, 1.505822f, 1.514063f, 1.522349f, 1.530681f, 1.539058f,
-    1.547481f, 1.555950f, 1.564465f, 1.573027f, 1.581636f, 1.590292f, 1.598995f, 1.607746f, 1.616545f,
-    1.625392f, 1.634287f, 1.643231f, 1.652224f, 1.661266f, 1.670358f, 1.679500f, 1.688691f, 1.697933f,
-    1.707225f, 1.716569f, 1.725963f, 1.735409f, 1.744906f, 1.754456f, 1.764058f, 1.773712f, 1.783419f,
-    1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f, 1.873209f,
-    1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f, 1.967520f,
-    1.978287f, 1.989114f, 2.000000f
+    0.500000f, 0.500000f, 0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f,
+    0.522315f, 0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f,
+    0.548612f, 0.551614f, 0.554633f, 0.557669f, 0.560721f, 0.563789f, 0.566875f, 0.569977f, 0.573097f,
+    0.576233f, 0.579387f, 0.582558f, 0.585746f, 0.588951f, 0.592175f, 0.595415f, 0.598674f, 0.601950f,
+    0.605245f, 0.608557f, 0.611888f, 0.615236f, 0.618603f, 0.621989f, 0.625393f, 0.628815f, 0.632257f,
+    0.635717f, 0.639196f, 0.642694f, 0.646212f, 0.649748f, 0.653304f, 0.656880f, 0.660475f, 0.664089f,
+    0.667724f, 0.671378f, 0.675052f, 0.678747f, 0.682461f, 0.686196f, 0.689952f, 0.693727f, 0.697524f,
+    0.701341f, 0.705180f, 0.709039f, 0.712919f, 0.716821f, 0.720744f, 0.724689f, 0.728655f, 0.732642f,
+    0.736652f, 0.740684f, 0.744737f, 0.748813f, 0.752911f, 0.757031f, 0.761175f, 0.765340f, 0.769529f,
+    0.773740f, 0.777975f, 0.782232f, 0.786513f, 0.790818f, 0.795146f, 0.799497f, 0.803873f, 0.808272f,
+    0.812696f, 0.817144f, 0.821616f, 0.826112f, 0.830633f, 0.835179f, 0.839750f, 0.844346f, 0.848966f,
+    0.853613f, 0.858284f, 0.862982f, 0.867704f, 0.872453f, 0.877228f, 0.882029f, 0.886856f, 0.891709f,
+    0.896590f, 0.901496f, 0.906430f, 0.911391f, 0.916379f, 0.921394f, 0.926436f, 0.931507f, 0.936604f,
+    0.941730f, 0.946884f, 0.952066f, 0.957277f, 0.962516f, 0.967783f, 0.973080f, 0.978405f, 0.983760f,
+    0.989144f, 0.994557f, 1.000000f, 1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f,
+    1.038944f, 1.044630f, 1.050347f, 1.056095f, 1.061875f, 1.067687f, 1.073530f, 1.079405f, 1.085312f,
+    1.091252f, 1.097224f, 1.103229f, 1.109267f, 1.115337f, 1.121441f, 1.127579f, 1.133750f, 1.139955f,
+    1.146193f, 1.152466f, 1.158773f, 1.165115f, 1.171491f, 1.177903f, 1.184349f, 1.190831f, 1.197348f,
+    1.203901f, 1.210489f, 1.217114f, 1.223775f, 1.230473f, 1.237207f, 1.243978f, 1.250786f, 1.257631f,
+    1.264514f, 1.271434f, 1.278392f, 1.285389f, 1.292423f, 1.299497f, 1.306608f, 1.313759f, 1.320949f,
+    1.328178f, 1.335447f, 1.342756f, 1.350104f, 1.357493f, 1.364922f, 1.372392f, 1.379903f, 1.387455f,
+    1.395048f, 1.402683f, 1.410360f, 1.418078f, 1.425839f, 1.433642f, 1.441488f, 1.449377f, 1.457309f,
+    1.465285f, 1.473304f, 1.481367f, 1.489474f, 1.497626f, 1.505822f, 1.514063f, 1.522349f, 1.530681f,
+    1.539058f, 1.547481f, 1.555950f, 1.564465f, 1.573027f, 1.581636f, 1.590292f, 1.598995f, 1.607746f,
+    1.616545f, 1.625392f, 1.634287f, 1.643231f, 1.652224f, 1.661266f, 1.670358f, 1.679500f, 1.688691f,
+    1.697933f, 1.707225f, 1.716569f, 1.725963f, 1.735409f, 1.744906f, 1.754456f, 1.764058f, 1.773712f,
+    1.783419f, 1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f,
+    1.873209f, 1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f,
+    1.967520f, 1.978287f, 1.989114f, 2.000000f
 };
 
 // Frequencies for notes using the standard twelve-tone equal temperament scale.

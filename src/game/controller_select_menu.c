@@ -272,8 +272,8 @@ static void overlay_texture_analog(int port, const ButtonHighlight* analogHighli
         _Bool active = FALSE;
 
         switch (analogHighlight->mask) {
-            case ANALOG_STICK:   active = ((abss(pad->stick.x  ) > deadzone) || (abss(pad->stick.y  ) > deadzone)); break;
-            case ANALOG_C_STICK: active = ((abss(pad->c_stick.x) > deadzone) || (abss(pad->c_stick.y) > deadzone)); break;
+            case ANALOG_STICK:   active = ((ABS2(pad->stick.x  ) > deadzone) || (ABS2(pad->stick.y  ) > deadzone)); break;
+            case ANALOG_C_STICK: active = ((ABS2(pad->c_stick.x) > deadzone) || (ABS2(pad->c_stick.y) > deadzone)); break;
             case ANALOG_TRIG_L:  active = (pad->trig.l > deadzone); break;
             case ANALOG_TRIG_R:  active = (pad->trig.r > deadzone); break;
             default: break;

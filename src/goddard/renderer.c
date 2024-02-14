@@ -17,9 +17,6 @@
 #include "shape_helper.h"
 #include "skin.h"
 #include "types.h"
-#include "engine/math_util.h"
-#include "game/game_init.h"
-#include "game/area.h"
 
 #define MAX_GD_DLS 1000
 #define OS_MESG_SI_COMPLETE 0x33333333
@@ -711,6 +708,10 @@ static Gfx gd_dl_sprite_start_tex_block[] = {
     gsDPSetTexturePersp(G_TP_NONE),
     gsSPEndDisplayList(),
 };
+
+#include "engine/math_util.h"
+#include "game/game_init.h"
+#include "game/area.h"
 
 // linker (ROM addresses)
 extern u8 _gd_dynlistsSegmentRomStart[];
