@@ -103,7 +103,7 @@ TARGET := sm64
 #   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
 
 GRUCODE ?= f3dzex
-$(eval $(call validate-option,GRUCODE,f3dex f3dex2 l3dex2 f3dex2pl f3dzex super3d f3dex3))
+$(eval $(call validate-option,GRUCODE,f3dex f3dex2 l3dex2 f3dex2pl f3dzex f3dex3 super3d))
 
 ifeq ($(GRUCODE),f3dex) # F3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
