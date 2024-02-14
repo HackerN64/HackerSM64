@@ -160,13 +160,15 @@
 #define RGBA32_TO_RGBA16(src)                           RGBA_TO_RGBA16(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
 
 
-// -- Color modification macros color --
+// -- Color modification macros --
+
+#define STATIC_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low ) : (x)))
 
 
 #define RGBA32_SHADE(src, amt) (RGBA32)( \
-    R_RGBA32(CLAMP((RGBA32_R((RGBA32)(src)) + (amt)), 0, MSK_RGBA32_A)) | \
-    G_RGBA32(CLAMP((RGBA32_G((RGBA32)(src)) + (amt)), 0, MSK_RGBA32_A)) | \
-    B_RGBA32(CLAMP((RGBA32_B((RGBA32)(src)) + (amt)), 0, MSK_RGBA32_A)) | \
+    R_RGBA32(STATIC_CLAMP((RGBA32_R((RGBA32)(src)) + (amt)), 0, MSK_RGBA32_A)) | \
+    G_RGBA32(STATIC_CLAMP((RGBA32_G((RGBA32)(src)) + (amt)), 0, MSK_RGBA32_A)) | \
+    B_RGBA32(STATIC_CLAMP((RGBA32_B((RGBA32)(src)) + (amt)), 0, MSK_RGBA32_A)) | \
     RGBA32_A((RGBA32)(src)) \
 )
 

@@ -194,7 +194,8 @@ void hoot_action_loop(void) {
 
 void hoot_turn_to_home(void) {
     s16 pitchToHome, yawToHome;
-    vec3f_get_angle(&o->oPosVec, &o->oHomeVec, &pitchToHome, &yawToHome);
+    f32 distToHome;
+    vec3f_get_dist_and_angle(&o->oPosVec, &o->oHomeVec, &distToHome, &pitchToHome, &yawToHome);
 
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, yawToHome, 0x140);
     o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, -pitchToHome, 0x140);

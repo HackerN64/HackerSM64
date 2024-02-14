@@ -39,9 +39,9 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 } while (0)
 
 /**
- * Will cause a crash if condition is not true, and ENABLE_DEBUG_ASSERTS is defined (allows for quick removal of littered asserts).
+ * Will cause a crash if condition is not true, and DEBUG_ASSERTIONS is defined (allows for quick removal of littered asserts).
  */
-#ifdef ENABLE_DEBUG_ASSERTS
+#ifdef DEBUG_ASSERTIONS
     #define DEBUG_ERROR(message)                    ERROR(message)
     #define DEBUG_ERRORF(message, ...)              ERRORF((message), ##__VA_ARGS__)
     #define DEBUG_ASSERT(condition, message)        ASSERT(condition, (message))

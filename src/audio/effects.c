@@ -3,7 +3,9 @@
 #include "effects.h"
 #include "load.h"
 #include "data.h"
+#include "external.h"
 #include "seqplayer.h"
+#include "game/game_init.h"
 #include "game/main.h"
 #include "engine/math_util.h"
 
@@ -53,20 +55,27 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
 }
 #else
 static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
-    s32 i;
+    s32 hasProcessedChannel = FALSE;
+    f32 channelVolume;
+    f32 panFromChannel;
+    f32 panLayerWeight;
 
-    f32 channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
-    if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
-        channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
-    }
-
-    f32 panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
-    f32 panLayerWeight = 1.0f - seqChannel->panChannelWeight;
-
-    for (i = 0; i < 4; i++) {
+    for (s32 i = 0; i < LAYERS_MAX; i++) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
         if (layer != NULL && layer->enabled && layer->note != NULL) {
-            layer->noteFreqScale = layer->freqScale * seqChannel->freqScale * gConfig.audioFrequency;
+            if (!hasProcessedChannel) {
+                hasProcessedChannel = TRUE;
+
+                channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
+                if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
+                    channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
+                }
+
+                panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
+                panLayerWeight = 1.0f - seqChannel->panChannelWeight;
+            }
+
+            layer->noteFreqScale = layer->freqScale * seqChannel->freqScale;
             layer->noteVelocity = layer->velocitySquare * channelVolume;
             layer->notePan = (layer->pan * panLayerWeight) + panFromChannel;
         }
@@ -141,19 +150,11 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
     p->cur += p->speed;
     u32 v0 = (u32) p->cur;
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
     if (v0 > 127) {
-#else
-    if (v0 >= 127) {
-#endif
         v0 = 127;
     }
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
     return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 128] - 1.0f)));
-#else
-    return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 127] - 1.0f)));
-#endif
 }
 
 s32 get_vibrato_pitch_change(struct VibratoState *vib) {
@@ -240,11 +241,7 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
     s32 pitchChange = get_vibrato_pitch_change(vib);
     f32 extent = (f32) vib->extent / 4096.0f;
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
     return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f);
-#else
-    return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f);
-#endif
 }
 
 void note_vibrato_update(struct Note *note) {

@@ -10,10 +10,10 @@
 
 // Direct format conversion macros:
 
-#define COLORRGB_TO_COLORRGBF(  dst, src) vec3_quot_val((dst), (src), 255.0f)
-#define COLORRGBF_TO_COLORRGB(  dst, src) vec3_prod_val((dst), (src), 255.0f)
-#define COLORRGBA_TO_COLORRGBAF(dst, src) vec4_quot_val((dst), (src), 255.0f)
-#define COLORRGBAF_TO_COLORRGBA(dst, src) vec4_prod_val((dst), (src), 255.0f)
+#define COLORRGB_TO_COLORRGBF(  dst, src) vec3_scale_dest((dst), (src), 1/255.0f)
+#define COLORRGBF_TO_COLORRGB(  dst, src) vec3_scale_dest((dst), (src), 255.0f)
+#define COLORRGBA_TO_COLORRGBAF(dst, src) vec4_scale_dest((dst), (src), 1/255.0f)
+#define COLORRGBAF_TO_COLORRGBA(dst, src) vec4_scale_dest((dst), (src), 255.0f)
 
 #define colorRGB_set(    dst, r, g, b) vec3_set( (dst), (r), (g), (b))
 #define colorRGB_copy(   dst, src    ) vec3_copy((dst), (src)        )

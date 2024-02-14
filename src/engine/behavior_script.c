@@ -14,7 +14,6 @@
 #include "math_util.h"
 #include "graph_node.h"
 #include "surface_collision.h"
-#include "game/puppylights.h"
 
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)     (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
@@ -909,10 +908,6 @@ void cur_obj_update(void) {
     if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
         obj_set_opacity_from_cam_dist(o);
     }
-#endif
-
-#ifdef PUPPYLIGHTS
-    puppylights_object_emit(o);
 #endif
 
     // Handle visibility of object

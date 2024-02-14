@@ -175,7 +175,7 @@ void page_logs_draw(void) {
 
 #ifdef PUPPYPRINT_DEBUG
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
-    sLogTotalRows = MIN(gConsoleLogLastIndex, LOG_BUFFER_SIZE);
+    sLogTotalRows = MIN(gConsoleLogLastIndex, (u32)LOG_BUFFER_SIZE);
 
     draw_logs_section(line, sLogNumShownRows);
 #endif

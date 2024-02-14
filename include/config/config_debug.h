@@ -14,6 +14,10 @@
  */
 // #define DISABLE_ALL
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 /**
  * Enables a comprehensive standalone profiler. Automatically enabled by PUPPYPRINT_DEBUG.
  * If not using PUPPYPRINT_DEBUG, press L + D-Pad Up to toggle the profiler.
@@ -82,6 +86,7 @@
 // #define VANILLA_DEBUG
 
 /**
- * Enables the DEBUG_ASSERT macro.
+ * Intentionally crash the game whenever a runtime assertion fails (also invoked by the DEBUG define in the Makefile).
+ * Enables ASSERT and ERROR macros with a "DEBUG_" prefix (see src/game/assert.h).
  */
-#define ENABLE_DEBUG_ASSERTS
+#define DEBUG_ASSERTIONS

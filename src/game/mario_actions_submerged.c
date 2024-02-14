@@ -137,7 +137,7 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
         if (whirlpool != NULL) {
             strength = 0.0f;
 
-            vec3f_to_vec3s_get_dist_and_angle(m->pos, whirlpool->pos, &distance, &pitchToWhirlpool, &yawToWhirlpool);
+            vec3_get_dist_and_angle(m->pos, whirlpool->pos, &distance, &pitchToWhirlpool, &yawToWhirlpool);
 
             yawToWhirlpool -= (s16)(0x2000 * 1000.0f / (distance + 1000.0f));
 

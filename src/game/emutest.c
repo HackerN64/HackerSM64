@@ -9,7 +9,10 @@
 #include <string.h>
 #include "emutest_vc.h"
 #include "float.h"
-#include "types.h"
+
+#ifdef LIBPL
+#include "lib/libpl/libpl-emu.h"
+#endif
 
 extern OSMesgQueue gSIEventMesgQueue;
 extern u8 __osContPifRam[];
@@ -20,6 +23,7 @@ extern void __osPiGetAccess(void);
 extern void __osPiRelAccess(void);
 
 enum Emulator gEmulator = EMU_CONSOLE;
+u8 gSupportsLibpl = FALSE;
 
 u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
 u32 emux_detect(void); // defined in asm/emux.s
@@ -140,6 +144,9 @@ void detect_emulator() {
             if (magic == 0x00500000u) {
                 // libpl is supported. Must be ParallelN64
                 gEmulator = EMU_PARALLELN64;
+#ifdef LIBPL
+                gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
+#endif
                 return;
             }
             
