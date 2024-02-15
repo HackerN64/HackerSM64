@@ -33,7 +33,7 @@ static _Bool sFirstCrash    = TRUE; // Used to make certain things only happen o
 CSThreadInfo* gActiveCSThreadInfo = NULL; // Pointer to the current crash screen thread info.
 OSThread*     gCrashedThread      = NULL; // Pointer to the most recently crashed thread.
 
-Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_ADDR to set the crashed thread PC.
+Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_PTR to set the crashed thread PC.
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
@@ -54,7 +54,6 @@ static void cs_reinitialize(void) {
     cs_settings_apply_func_to_all(cs_setting_func_reset);
     cs_settings_set_all_headers(FALSE);
 
-    gSetCrashAddress = 0x00000000;
     gSelectedAddress = 0x00000000;
 
     gCSDirectionFlags.raw = 0b00000000;
@@ -167,8 +166,9 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
         // If a position was specified, use that.
         if (gSetCrashAddress != 0x0) {
-            cs_set_page(PAGE_RAM_VIEWER);
             tc->pc = gSetCrashAddress;
+            gSetCrashAddress = 0x00000000;
+            cs_set_page(PAGE_RAM_VIEWER);
         }
 
         // Use the Z buffer's memory space to save a screenshot of the game.

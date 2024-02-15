@@ -216,17 +216,17 @@ void _asm_setbits(uintptr_t bits);
 
 #define FORCE_CRASH() EXCEPTION_RMISS() //! TODO: This should be EXCEPTION_TRAP() to save 8 bytes, but that freezes most emulators instead of doing a proper crash.
 
-// Set where the program counter will be on crash.
-#define SET_CRASH_ADDR(ptr) \
+// Set where the program counter will be on the next crash.
+#define SET_CRASH_PTR(ptr) \
 do { \
     extern uintptr_t gSetCrashAddress; \
     gSetCrashAddress = (uintptr_t)&(ptr); \
 } while (0)
 
-// Cause a crash at a specific location.
-#define FORCE_CRASH_AT_ADDR(ptr) \
+// Cause a crash with the program counter at a specific location.
+#define FORCE_CRASH_AT_PTR(ptr) \
 do { \
-    SET_CRASH_ADDR(ptr); \
+    SET_CRASH_PTR(ptr); \
     FORCE_CRASH(); \
 } while (0)
 

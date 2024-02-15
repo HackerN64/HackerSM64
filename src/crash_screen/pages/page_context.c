@@ -100,8 +100,8 @@ static const char* sRegNames[29] = {
 static const char* get_cause_desc(u32 cause) {
     // Make the last two cause case indexes sequential for array access.
     switch (cause) {
-        case EXC_WATCH: cause = 16; break;
-        case EXC_VCED:  cause = 17; break;
+        case EXC_WATCH: cause = 16; break; // 23 -> 16
+        case EXC_VCED:  cause = 17; break; // 31 -> 17
         default:        cause = ((cause >> CAUSE_EXCSHIFT) & BITMASK(5)); break;
     }
 
