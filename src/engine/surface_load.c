@@ -134,6 +134,12 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
     } else {
         listIndex = SPATIAL_PARTITION_WALLS;
         sortDir = 0; // insertion order
+
+#ifndef ROUNDED_WALL_CORNERS
+        if (surface->normal.x < -COS45 || surface->normal.x > COS45) {
+            surface->flags |= SURFACE_FLAG_X_PROJECTION;
+        }
+#endif
     }
 
     s32 surfacePriority = surface->upperY * sortDir;

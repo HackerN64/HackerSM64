@@ -114,6 +114,11 @@
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
+ * General collision improvements. See "src/engine/surface_load.h" to toggle specific changes.
+ */
+#define COLLISION_IMPROVEMENTS
+
+/**
  * Buffers an A input if you jump off a slope during the landing lag
  */
 // #define SLOPE_BUFFER

@@ -10,27 +10,32 @@
 #include "surface_load.h"
 #include "game/puppyprint.h"
 
+
 /**************************************************
  *                      WALLS                     *
  **************************************************/
 
-static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
+#ifdef ROUNDED_WALL_CORNERS
+
+static s32 check_wall_triangle_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
     f32 v = ((d11 * d20) - (d01 * d21)) * invDenom;
     if (v < 0.0f || v > 1.0f) {
         return TRUE;
     }
 
     f32 w = ((d00 * d21) - (d01 * d20)) * invDenom;
-    if (w < 0.0f || w > 1.0f || v + w > 1.0f) {
+    if (w < 0.0f || w > 1.0f || (v + w) > 1.0f) {
         return TRUE;
     }
 
     return FALSE;
 }
 
-s32 check_wall_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32 *offset, f32 margin_radius) {
-    if (FLT_IS_NONZERO(vert[1])) {
-        f32 v = (v2[1] / vert[1]);
+s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32 *offset, f32 margin_radius) {
+    f32 y = vert[1];
+
+    if (FLT_IS_NONZERO(y)) {
+        f32 v = (v2[1] / y);
         if (v < 0.0f || v > 1.0f) {
             return TRUE;
         }
@@ -46,24 +51,35 @@ s32 check_wall_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32
     return TRUE;
 }
 
+#endif
+
 /**
  * Iterate through the list of walls until all walls are checked and
  * have given their wall push.
  */
 static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struct WallCollisionData *data) {
-    const f32 corner_threshold = -0.9f;
-    struct Surface *surf;
-    f32 offset;
+    struct Surface *surf = NULL;
     f32 radius = data->radius;
-
     Vec3f pos = { data->x, data->y + data->offsetY, data->z };
-    Vec3f v0, v1, v2;
-    f32 d00, d01, d11, d20, d21;
-    f32 invDenom;
     TerrainData type = SURFACE_DEFAULT;
     s32 numCols = 0;
-
+#ifdef ROUNDED_WALL_CORNERS
+    const f32 corner_threshold = -0.9f;
     f32 margin_radius = radius - 1.0f;
+#endif
+
+    s32 checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
+    s32 returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
+
+    // Check whether the object will be able to pass through certain walls.
+    struct Object* obj = o;
+    s32 passVanishWalls = (
+        (obj != NULL) && (
+            (obj->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) ||
+            (obj == gMarioObject && (gMarioState->flags & MARIO_VANISH_CAP))
+        )
+    );
+
 
     // Stay in this loop until out of walls.
     while (surfaceNode != NULL) {
@@ -75,59 +91,54 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         if (pos[1] < surf->lowerY || pos[1] > surf->upperY) continue;
 
         // Determine if checking for the camera or not.
-        if (gCollisionFlags & COLLISION_FLAG_CAMERA) {
+        if (checkingForCamera) {
             if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
         } else {
             // Ignore camera only surfaces.
             if (type == SURFACE_CAMERA_BOUNDARY) continue;
 
             // If an object can pass through a vanish cap wall, pass through.
-            if (type == SURFACE_VANISH_CAP_WALLS && o != NULL) {
-                // If an object can pass through a vanish cap wall, pass through.
-                if (o->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) continue;
-                // If Mario has a vanish cap, pass through the vanish cap wall.
-                if (o == gMarioObject && gMarioState->flags & MARIO_VANISH_CAP) continue;
-            }
+            if (passVanishWalls && (type == SURFACE_VANISH_CAP_WALLS)) continue;
         }
 
         // Dot of normal and pos, + origin offset
-        offset = (surf->normal.x * pos[0])
-               + (surf->normal.y * pos[1])
-               + (surf->normal.z * pos[2])
-               + surf->originOffset;
+        f32 offset = (surf->normal.x * pos[0]) +
+                     (surf->normal.y * pos[1]) +
+                     (surf->normal.z * pos[2]) +
+                     surf->originOffset;
 
         // Exclude surfaces outside of the radius.
         if (offset < -radius || offset > radius) continue;
 
+#ifdef ROUNDED_WALL_CORNERS
+        Vec3f v0, v1, v2;
         vec3_diff(v0, surf->vertex2, surf->vertex1);
         vec3_diff(v1, surf->vertex3, surf->vertex1);
         vec3_diff(v2, pos,           surf->vertex1);
 
         // Face
-        d00 = vec3_dot(v0, v0);
-        d01 = vec3_dot(v0, v1);
-        d11 = vec3_dot(v1, v1);
-        d20 = vec3_dot(v2, v0);
-        d21 = vec3_dot(v2, v1);
+        f32 d00 = vec3_dot(v0, v0);
+        f32 d01 = vec3_dot(v0, v1);
+        f32 d11 = vec3_dot(v1, v1);
+        f32 d20 = vec3_dot(v2, v0);
+        f32 d21 = vec3_dot(v2, v1);
 
-        invDenom = (d00 * d11) - (d01 * d01);
+        f32 invDenom = (d00 * d11) - (d01 * d01);
         if (FLT_IS_NONZERO(invDenom)) {
             invDenom = 1.0f / invDenom;
         }
 
-        if (check_wall_vw(d00, d01, d11, d20, d21, invDenom)) {
-            if (offset < 0) {
-                continue;
-            }
+        if (check_wall_triangle_vw(d00, d01, d11, d20, d21, invDenom)) {
+            if (offset < 0) continue;
 
             // Edge 1-2
-            if (check_wall_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+            if (check_wall_triangle_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                 // Edge 1-3
-                if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                if (check_wall_triangle_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                     vec3_diff(v1, surf->vertex3, surf->vertex2);
                     vec3_diff(v2, pos, surf->vertex2);
                     // Edge 2-3
-                    if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                    if (check_wall_triangle_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                         continue;
                     }
                 }
@@ -151,6 +162,56 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             pos[0] += surf->normal.x * (radius - offset);
             pos[2] += surf->normal.z * (radius - offset);
         }
+#else
+        f32 x = pos[0];
+        f32 y = pos[1];
+        f32 z = pos[2];
+        f32 w1, w2, w3;
+        f32 y1, y2, y3;
+
+        //! (Quantum Tunneling) Due to issues with the vertices walls choose and
+        //  the fact they are floating point, certain floating point positions
+        //  along the seam of two walls may collide with neither wall or both walls.
+        if (surf->flags & SURFACE_FLAG_X_PROJECTION) {
+            w1 = -surf->vertex1[2]; w2 = -surf->vertex2[2]; w3 = -surf->vertex3[2];
+            y1 =  surf->vertex1[1]; y2 =  surf->vertex2[1]; y3 =  surf->vertex3[1];
+
+            if (surf->normal.x > 0.0f) {
+                if (
+                    ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) > 0.0f) ||
+                    ((((y2 - y) * (w3 - w2)) - ((w2 - -z) * (y3 - y2))) > 0.0f) ||
+                    ((((y3 - y) * (w1 - w3)) - ((w3 - -z) * (y1 - y3))) > 0.0f)
+                ) continue;
+            } else {
+                if (
+                    ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) < 0.0f) ||
+                    ((((y2 - y) * (w3 - w2)) - ((w2 - -z) * (y3 - y2))) < 0.0f) ||
+                    ((((y3 - y) * (w1 - w3)) - ((w3 - -z) * (y1 - y3))) < 0.0f)
+                ) continue;
+            }
+        } else {
+            w1 = surf->vertex1[0]; w2 = surf->vertex2[0]; w3 = surf->vertex3[0];
+            y1 = surf->vertex1[1]; y2 = surf->vertex2[1]; y3 = surf->vertex3[1];
+
+            if (surf->normal.z > 0.0f) {
+                if (
+                    ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) > 0.0f) ||
+                    ((((y2 - y) * (w3 - w2)) - ((w2 - x) * (y3 - y2))) > 0.0f) ||
+                    ((((y3 - y) * (w1 - w3)) - ((w3 - x) * (y1 - y3))) > 0.0f)
+                ) continue;
+            } else {
+                if (
+                    ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) < 0.0f) ||
+                    ((((y2 - y) * (w3 - w2)) - ((w2 - x) * (y3 - y2))) < 0.0f) ||
+                    ((((y3 - y) * (w1 - w3)) - ((w3 - x) * (y1 - y3))) < 0.0f)
+                ) continue;
+            }
+        }
+
+        // Update pos
+        pos[0] += surf->normal.x * (radius - offset);
+        pos[2] += surf->normal.z * (radius - offset);
+#endif
 
         // Has collision
         if (data->numWalls < MAX_REFERENCED_WALLS) {
@@ -158,13 +219,14 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         }
         numCols++;
 
-        if (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST) {
+        if (returnFirst) {
             break;
         }
     }
 
     data->x = pos[0];
     data->z = pos[2];
+
     return numCols;
 }
 
@@ -211,10 +273,11 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     }
 
     // World (level) consists of a 16x16 grid. Find where the collision is on the grid (round toward -inf)
-    s32 minCellX = GET_CELL_COORD(x - colData->radius);
-    s32 minCellZ = GET_CELL_COORD(z - colData->radius);
-    s32 maxCellX = GET_CELL_COORD(x + colData->radius);
-    s32 maxCellZ = GET_CELL_COORD(z + colData->radius);
+    s32 radius = colData->radius;
+    s32 minCellX = GET_CELL_COORD(x - radius);
+    s32 minCellZ = GET_CELL_COORD(z - radius);
+    s32 maxCellX = GET_CELL_COORD(x + radius);
+    s32 maxCellZ = GET_CELL_COORD(z + radius);
 
     for (s32 cellX = minCellX; cellX <= maxCellX; cellX++) {
         for (s32 cellZ = minCellZ; cellZ <= maxCellZ; cellZ++) {
@@ -262,16 +325,19 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
  **************************************************/
 
 void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
-    register f32 diff_x = target1[0] - *x + target2[0] - *x;
-    register f32 diff_z = target1[2] - *z + target2[2] - *z;
-    register f32 invDenom = margin / sqrtf(sqr(diff_x) + sqr(diff_z));
+#ifndef ADD_CEILING_MARGINS
+    return;
+#endif
+    f32 diff_x = (target1[0] - *x) + (target2[0] - *x);
+    f32 diff_z = (target1[2] - *z) + (target2[2] - *z);
+    f32 invDenom = margin / sqrtf(sqr(diff_x) + sqr(diff_z));
 
     *x += diff_x * invDenom;
     *z += diff_z * invDenom;
 }
 
 static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, f32 margin) {
-    s32 addMargin = surf->type != SURFACE_HANGABLE && !FLT_IS_NONZERO(margin);
+    s32 addMargin = ((surf->type != SURFACE_HANGABLE) && !FLT_IS_NONZERO(margin));
     Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];

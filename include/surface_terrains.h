@@ -257,6 +257,7 @@ enum SurfaceFlags {
     SURFACE_FLAGS_NONE            = (0 << 0), // 0x0000
     SURFACE_FLAG_DYNAMIC          = (1 << 0), // 0x0001
     SURFACE_FLAG_NO_CAM_COLLISION = (1 << 1), // 0x0002
+    SURFACE_FLAG_X_PROJECTION     = (1 << 3), // 0x0008
 };
 
 // These are effectively unique "surface" types like those defined higher

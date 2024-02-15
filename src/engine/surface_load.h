@@ -6,6 +6,21 @@
 #include "surface_collision.h"
 #include "types.h"
 
+
+#ifdef COLLISION_IMPROVEMENTS
+    // Improves the handling of convex wall corners by rounding the seams.
+    #define ROUNDED_WALL_CORNERS
+    // Improves the handling of concave wall corners by properly handling simultaneous collision with multiple walls.
+    #define SIMULTANEOUS_WALL_COLLISIONS //! TODO:
+    // When finding a floor surface under the source height, get the highest floor instead of just the first floor in the list.
+    #define SLOPE_FIX //! TODO:
+    //  Makes the area above ceilings without a floor not count as OOB.
+    #define EXPOSED_CEILINGS_FIX //! TODO:
+    // Adds a margin to ceilings
+    #define ADD_CEILING_MARGINS
+#endif
+
+
 #define SURFACE_VERTICAL_BUFFER 5
 
 #define NORMAL_FLOOR_THRESHOLD 0.01f
