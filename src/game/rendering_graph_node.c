@@ -1372,15 +1372,9 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
 
 #ifdef F3DEX_GBI_3
         camWorld = alloc_display_list(sizeof(PlainVtx));
-        if (gCurGraphNodeCamera != NULL) {
-            camWorld->c.pos[0] = gCurGraphNodeCamera->pos[0];
-            camWorld->c.pos[1] = gCurGraphNodeCamera->pos[1];
-            camWorld->c.pos[2] = gCurGraphNodeCamera->pos[2];
-        } else {
-            camWorld->c.pos[0] = 0;
-            camWorld->c.pos[1] = 0;
-            camWorld->c.pos[2] = 0;
-        }
+        camWorld->c.pos[0] = gLakituState.pos[0];
+        camWorld->c.pos[1] = gLakituState.pos[1];
+        camWorld->c.pos[2] = gLakituState.pos[2];
 #endif
 
         gMatStackIndex = 0;
