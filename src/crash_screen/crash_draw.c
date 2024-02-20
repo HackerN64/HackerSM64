@@ -20,7 +20,7 @@
 
 
 // Include the version number from VERSION.txt. Includes a newline at the end.
-INCBIN(char, HackerSM64_version, "VERSION.txt", 4);
+INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
 
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
@@ -312,7 +312,7 @@ u32 cs_page_header_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"HackerSM64 %s",
         COLOR_RGBA32_CRASH_HEADER,
-        HackerSM64_version
+        HackerSM64_version_txt
     );
 
     // "START:controls"
