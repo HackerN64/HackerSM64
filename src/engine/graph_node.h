@@ -9,15 +9,6 @@
 #include "geo_commands.h"
 #include "game/memory.h"
 
-// UCode indices for listHeads & listTails
-enum GraphNodeUCodes {
-    GRAPH_NODE_UCODE_DEFAULT,
-#ifdef OBJECTS_REJ
-    GRAPH_NODE_UCODE_REJ,
-#endif
-    GRAPH_NODE_NUM_UCODES,
-};
-
 enum GraphRenderFlags {
     GRAPH_RENDER_ACTIVE             = (1 << 0), // 0x0001
     GRAPH_RENDER_CHILDREN_FIRST     = (1 << 1), // 0x0002
@@ -156,8 +147,8 @@ struct DisplayListNode {
  */
 struct GraphNodeMasterList {
     /*0x00*/ struct GraphNode node;
-    /*0x14*/ struct DisplayListNode *listHeads[GRAPH_NODE_NUM_UCODES][LAYER_COUNT];
-    /*0x34*/ struct DisplayListNode *listTails[GRAPH_NODE_NUM_UCODES][LAYER_COUNT];
+    /*0x14*/ struct DisplayListNode *listHeads[LAYER_COUNT];
+    /*0x34*/ struct DisplayListNode *listTails[LAYER_COUNT];
 };
 
 /** Simply used as a parent to group multiple children.

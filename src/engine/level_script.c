@@ -29,7 +29,6 @@
 #include "string.h"
 #include "game/puppycam2.h"
 #include "game/puppyprint.h"
-#include "game/puppylights.h"
 #include "game/emutest.h"
 
 #include "config.h"
@@ -863,52 +862,6 @@ static void level_cmd_puppyvolume(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_puppylight_environment(void) {
-#ifdef PUPPYLIGHTS
-    Lights1 temp = gdSPDefLights1(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4),
-                                  CMD_GET(u8, 5), CMD_GET(u8, 6), CMD_GET(u8, 7),
-                                  CMD_GET(u8, 8), CMD_GET(u8, 9), CMD_GET(u8, 10));
-
-    memcpy(&gLevelLight, &temp, sizeof(Lights1));
-    levelAmbient = TRUE;
-#endif
-    sCurrentCmd = CMD_NEXT;
-}
-
-static void level_cmd_puppylight_node(void) {
-#ifdef PUPPYLIGHTS
-    gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight));
-    if (gPuppyLights[gNumLights] == NULL) {
-        append_puppyprint_log("Puppylight allocation failed.");
-        sCurrentCmd = CMD_NEXT;
-        return;
-    }
-
-    vec4_set(gPuppyLights[gNumLights]->rgba, CMD_GET(u8,   2),
-                                             CMD_GET(u8,   3),
-                                             CMD_GET(u8,   4),
-                                             CMD_GET(u8,   5));
-
-    vec3s_set(gPuppyLights[gNumLights]->pos[0], CMD_GET(s16,  6),
-                                                CMD_GET(s16,  8),
-                                                CMD_GET(s16, 10));
-
-    vec3s_set(gPuppyLights[gNumLights]->pos[1], CMD_GET(s16, 12),
-                                                CMD_GET(s16, 14),
-                                                CMD_GET(s16, 16));
-    gPuppyLights[gNumLights]->yaw       = CMD_GET(s16, 18);
-    gPuppyLights[gNumLights]->epicentre = CMD_GET(u8,  20);
-    gPuppyLights[gNumLights]->flags     = CMD_GET(u8,  21);
-    gPuppyLights[gNumLights]->active    = TRUE;
-    gPuppyLights[gNumLights]->area      = sCurrAreaIndex;
-    gPuppyLights[gNumLights]->room      = CMD_GET(s16, 22);
-
-    gNumLights++;
-
-#endif
-    sCurrentCmd = CMD_NEXT;
-}
-
 static void level_cmd_set_echo(void) {
     if (sCurrAreaIndex >= 0 && sCurrAreaIndex < AREA_COUNT) {
         gAreaData[sCurrAreaIndex].useEchoOverride = TRUE;
@@ -984,8 +937,6 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_GET_OR_SET_VAR              */ level_cmd_get_or_set_var,
     /*LEVEL_CMD_PUPPYVOLUME                 */ level_cmd_puppyvolume,
     /*LEVEL_CMD_CHANGE_AREA_SKYBOX          */ level_cmd_change_area_skybox,
-    /*LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT      */ level_cmd_puppylight_environment,
-    /*LEVEL_CMD_PUPPYLIGHT_NODE             */ level_cmd_puppylight_node,
     /*LEVEL_CMD_SET_ECHO                    */ level_cmd_set_echo,
 };
 
