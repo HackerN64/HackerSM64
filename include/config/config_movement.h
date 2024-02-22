@@ -114,7 +114,7 @@
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
- * General collision improvements. See "src/engine/surface_load.h" to toggle specific changes.
+ * General collision improvements. See "src/engine/surface_load.h" to toggle specific changes. Disable this to use vanilla collision handling.
  */
 #define COLLISION_IMPROVEMENTS
 
