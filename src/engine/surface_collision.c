@@ -495,7 +495,6 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     struct Surface *surf, *floor = NULL;
     SurfaceType type = SURFACE_DEFAULT;
     f32 height;
-    s32 bufferY = y + FIND_FLOOR_BUFFER;
 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
@@ -524,7 +523,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         }
 
         // Exclude all floors above the point.
-        if (bufferY < surf->lowerY) continue;
+        if (y < surf->lowerY) continue;
 
         // Check that the point is within the triangle bounds.
         if (!check_within_floor_triangle_bounds(x, z, surf)) continue;
@@ -536,7 +535,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         if (height <= *pheight) continue;
 
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
-        if (bufferY < height) continue;
+        if (y < height) continue;
 
         // Use the current floor
         *pheight = height;
@@ -544,7 +543,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 
         // Exit the loop if it's not possible for another floor to be closer
         // to the original point, or if COLLISION_FLAG_RETURN_FIRST.
-        if (height == bufferY) break;
+        if (height == y) break;
 #ifdef SLOPE_FIX
         if (returnFirst) break;
 #else
@@ -565,7 +564,7 @@ ALWAYS_INLINE static s32 check_within_bounds_y_norm(s32 x, s32 z, struct Surface
  * Iterate through the list of water floors and find the first water floor under a given point.
  */
 struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
-    register struct Surface *surf;
+    struct Surface *surf;
     struct Surface *floor = NULL;
     struct SurfaceNode *topSurfaceNode = surfaceNode;
     struct SurfaceNode *bottomSurfaceNode = surfaceNode;
@@ -637,7 +636,7 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
 
     // Would normally cause PUs, but dynamic floors unload at that range.
     s32 x = xPos;
-    s32 y = yPos;
+    s32 y = yPos + FIND_FLOOR_BUFFER;
     s32 z = zPos;
 
     // Each level is split into cells to limit load, find the appropriate cell.
@@ -661,11 +660,11 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     f32 height        = FLOOR_LOWER_LIMIT;
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
-    //! (Parallel Universes) Because position is casted to an s16, reaching higher
+    //! (Parallel Universes) Because position is casted to an s32, reaching higher
     //  float locations can return floors despite them not existing there.
     //  (Dynamic floors will unload due to the range.)
     s32 x = xPos;
-    s32 y = yPos;
+    s32 y = yPos + FIND_FLOOR_BUFFER;
     s32 z = zPos;
 
     *pfloor = NULL;
