@@ -399,7 +399,7 @@ s16 object_step(void) {
 
     obj_update_pos_vel_xz();
 
-    if ((o->oPosY >= floorY) && (o->oPosY < floorY + 37)) {
+    if (sObjFloor && (o->oPosY >= floorY) && (o->oPosY < floorY + 37)) {
         obj_orient_graph(o, sObjFloor->normal.x, sObjFloor->normal.y, sObjFloor->normal.z);
     }
 
