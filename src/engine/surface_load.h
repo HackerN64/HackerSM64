@@ -10,12 +10,12 @@
 #ifdef COLLISION_IMPROVEMENTS
     // Improves the handling of convex wall corners by rounding the seams.
     #define ROUNDED_WALL_CORNERS
-    // Improves the handling of concave wall corners by properly handling simultaneous collision with multiple walls.
-    #define SIMULTANEOUS_WALL_COLLISIONS //! TODO:
+    //! TODO: Improves the handling of concave wall corners by properly handling simultaneous collision with multiple walls.
+    #define SIMULTANEOUS_WALL_COLLISIONS
     // When finding a floor surface under the source height, get the highest floor instead of just the first floor in the list.
     #define SLOPE_FIX
-    // Makes the area above ceilings without a floor not count as OOB.
-    #define EXPOSED_CEILINGS_FIX //! TODO:
+    //! TODO: Makes the area above ceilings without a floor not count as OOB.
+    #define EXPOSED_CEILINGS_FIX
 #endif
 
 

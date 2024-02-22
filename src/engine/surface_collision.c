@@ -356,39 +356,37 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
 
-    // Stay in this loop until out of ceilings.
+    // Iterate through the list of ceilings until there are no more ceilings.
     while (surfaceNode != NULL) {
         surf        = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
         type        = surf->type;
 
-        // Exclude all ceilings below the point
-        if (y > surf->upperY) continue;
-
-        // Determine if checking for the camera or not
+        // Determine if checking for the camera or not.
         if (checkingForCamera) {
             if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
                 continue;
             }
         } else if (type == SURFACE_CAMERA_BOUNDARY) {
-            // Ignore camera only surfaces
-            continue;
+            continue; // If we are not checking for the camera, ignore camera only ceilings.
         }
 
-        // Check that the point is within the triangle bounds
+        // Exclude all ceilings below the point.
+        if (y > surf->upperY) continue;
+
+        // Check that the point is within the triangle bounds.
         if (!check_within_ceil_triangle_bounds(x, z, surf)) continue;
 
-        // Find the height of the ceil at the given location
+        // Find the height of the ceiling above the current location.
         height = get_surface_height_at_location(x, z, surf);
 
-        // Exclude ceilings above the previous lowest ceiling
+        // Exclude ceilings above the previous lowest ceiling.
         if (height > *pheight) continue;
 
-        // Checks for ceiling interaction
+        // Checks for ceiling interaction.
         if (y > height) continue;
 
-
-        // Use the current ceiling
+        // Use the current ceiling.
         *pheight = height;
         ceil = surf;
 
@@ -407,13 +405,16 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
  * Find the lowest ceiling above a given position and return the height.
  */
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
-    f32 height        = CELL_HEIGHT_LIMIT;
-    f32 dynamicHeight = CELL_HEIGHT_LIMIT;
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.collision_ceil);
     PUPPYPRINT_GET_SNAPSHOT();
+
+    f32 height        = CELL_HEIGHT_LIMIT;
+    f32 dynamicHeight = CELL_HEIGHT_LIMIT;
+
     s32 x = posX;
     s32 y = posY;
     s32 z = posZ;
+
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
@@ -537,7 +538,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
         if (y < height) continue;
 
-        // Use the current floor
+        // Use the current floor.
         *pheight = height;
         floor = surf;
 
@@ -660,9 +661,6 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     f32 height        = FLOOR_LOWER_LIMIT;
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
-    //! (Parallel Universes) Because position is casted to an s32, reaching higher
-    //  float locations can return floors despite them not existing there.
-    //  (Dynamic floors will unload due to the range.)
     s32 x = xPos;
     s32 y = yPos + FIND_FLOOR_BUFFER;
     s32 z = zPos;
@@ -673,6 +671,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
         profiler_collision_update(first);
         return height;
     }
+
     // Each level is split into cells to limit load, find the appropriate cell.
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
