@@ -397,6 +397,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         // to the original point.
         if (height == y) break;
 
+        // If we're only looking for the closest ceiling, exit the loop.
         if (returnFirst) break;
     }
 
@@ -416,7 +417,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
 
     s32 x = posX;
-    s32 y = posY;
+    s32 y = posY - FIND_FLOOR_BUFFER;
     s32 z = posZ;
 
     *pceil = NULL;
@@ -460,6 +461,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
 
     // Return the ceiling.
     *pceil = ceil;
+
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.ceil++;
@@ -543,7 +545,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         // Exclude floors lower than the previous highest floor.
         if (height <= highest) continue;
 
-        // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
+        // Checks for floor interaction.
         if (height > y) continue;
 
         // Use the current floor.
@@ -554,6 +556,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         // to the original point.
         if (height == y) break;
 
+        // If we're only looking for the closest floor, exit the loop.
         if (returnFirst) break;
     }
 
@@ -710,14 +713,15 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 
     // To prevent accidentally leaving the floor tangible, stop checking for it.
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+
+    // Return the floor.
+    *pfloor = floor;
+
+#ifdef VANILLA_DEBUG
     // If a floor was missed, increment the debug counter.
     if (floor == NULL) {
         gNumFindFloorMisses++;
     }
-
-    // Return the floor.
-    *pfloor = floor;
-#ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.floor++;
 #endif
