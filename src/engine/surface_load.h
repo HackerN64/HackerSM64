@@ -14,7 +14,7 @@
      */
     #define ROUNDED_WALL_CORNERS
     /**
-     * TODO: Pproperly handles simultaneous collision with multiple walls (eg. concave wall corners or narrow tunnels).
+     * Properly handles simultaneous collision with multiple walls (eg. concave wall corners or narrow tunnels).
      */
     #define SIMULTANEOUS_WALL_COLLISIONS
     /**
