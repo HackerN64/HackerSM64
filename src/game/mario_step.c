@@ -511,12 +511,16 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         if (m->vel[1] >= 0.0f) {
             m->vel[1] = 0.0f;
 
+            if (
+                (ceil != NULL) &&
+                (ceil->type == SURFACE_HANGABLE) &&
 #ifdef HANGING_FIX
-            // Grab ceiling unless they just were grabbing a ceiling
-            if (!(m->prevAction & ACT_FLAG_HANGING) && ceil != NULL && ceil->type == SURFACE_HANGABLE) {
+                // Grab ceiling unless they just were grabbing a ceiling.
+                !(m->prevAction & ACT_FLAG_HANGING)
 #else
-            if ((stepArg & AIR_STEP_CHECK_HANG) && ceil != NULL && ceil->type == SURFACE_HANGABLE) {
+                (stepArg & AIR_STEP_CHECK_HANG)
 #endif
+            ) {
                 return AIR_STEP_GRABBED_CEILING;
             }
 
@@ -530,7 +534,11 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         }
 
         m->pos[1] = nextPos[1];
+#ifdef DISABLE_CEILING_BONKS
         return AIR_STEP_HIT_CEILING;
+#else
+        return AIR_STEP_HIT_WALL;
+#endif
     }
 
     //! When the wall is not completely vertical or there is a slight wall

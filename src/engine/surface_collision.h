@@ -6,6 +6,7 @@
 #include "types.h"
 
 #include "config/config_world.h"
+#include "surface_load.h"
 
 // The y coord is moved upward by this amount when finding floors.
 // Vanilla value is 78.
@@ -49,7 +50,11 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil);
 
 // Finds the ceiling from a vec3f and a minimum height (with 3 unit vertical buffer).
 ALWAYS_INLINE f32 find_mario_ceil(Vec3f pos, f32 height, struct Surface **ceil) {
+#ifdef EXPOSED_CEILINGS_FIX
     return find_ceil(pos[0], MAX(height, pos[1]) + 3.0f, pos[2], ceil);
+#else
+    return find_ceil(pos[0], (height + 3.0f), pos[2], ceil);
+#endif
 }
 
 f32 find_floor_height(f32 x, f32 y, f32 z);
