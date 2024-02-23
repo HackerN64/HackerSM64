@@ -417,7 +417,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
 
     s32 x = posX;
-    s32 y = posY - FIND_FLOOR_BUFFER;
+    s32 y = posY;
     s32 z = posZ;
 
     *pceil = NULL;
