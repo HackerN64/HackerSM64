@@ -11,12 +11,9 @@
 #ifdef COLLISION_IMPROVEMENTS
     /**
      * Improves the handling of convex wall corners by rounding wall collision at triangle edges to close the seams.
+     * Also properly handles simultaneous collisions with multiple walls (eg. concave wall corners or narrow tunnels).
      */
     #define ROUNDED_WALL_CORNERS
-    /**
-     * Properly handles simultaneous collision with multiple walls (eg. concave wall corners or narrow tunnels).
-     */
-    #define SIMULTANEOUS_WALL_COLLISIONS
     /**
      * Uses the surface closest to the source height when searching for a floor or ceiling, instead of just using the first applicable surface in the list.
      */
