@@ -24,7 +24,7 @@
      * Fixes an issue where entering any area above a ceiling without an intermediate floor would count as hitting a ceiling.
      * NOTE: This causes Mario to potentially clip through the vertical part of the rocking JRB ship at cettain angles.
      */
-    #define EXPOSED_CEILINGS_FIX
+    #define FIX_EXPOSED_CEILINGS
     /**
      * Disables bonking on sloped ceilings by separating the handling of ceiling interactions and wall interactions.
      */
