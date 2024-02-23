@@ -525,6 +525,7 @@ s32 act_debug_free_move(struct MarioState *m) {
         set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
     }
 
+    m->squishTimer = 0;
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
 
