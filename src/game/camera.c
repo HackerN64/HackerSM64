@@ -710,6 +710,8 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
         }
 
         approach_camera_height(c, goalHeight, 5.f);
+    } else if (sMarioCamState->action == ACT_DEBUG_FREE_MOVE) {
+        c->pos[1] = goalHeight;
     } else {
         camFloorHeight = find_floor(c->pos[0], c->pos[1] + 100.f, c->pos[2], &surface) + baseOff;
         marioFloorHeight = baseOff + sMarioGeometry.currFloorHeight;
@@ -1135,7 +1137,7 @@ void mode_8_directions_camera(struct Camera *c) {
     }
 #ifdef PARALLEL_LAKITU_CAM
     // extra functionality
-    else if (gPlayer1Controller->buttonPressed & U_JPAD) {
+    else if ((gPlayer1Controller->buttonPressed & U_JPAD) && (gMarioState->action != ACT_DEBUG_FREE_MOVE)) {
         s8DirModeYawOffset = 0;
         s8DirModeYawOffset = gMarioState->faceAngle[1] - 0x8000;
     }
