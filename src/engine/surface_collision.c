@@ -71,7 +71,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
 
-#ifdef SIMULTANEOUS_WALL_COLLISIONS
+#ifndef SIMULTANEOUS_WALL_COLLISIONS
     returnFirst = TRUE;
 #endif
 
