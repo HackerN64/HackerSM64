@@ -8,16 +8,16 @@
 
 
 #ifdef COLLISION_IMPROVEMENTS
-    // Improves the handling of convex wall corners by rounding collision at the edges to close the seams.
+    // Improves the handling of convex wall corners by rounding wall collision at triangle edges to close the seams.
     #define ROUNDED_WALL_CORNERS
-    //! TODO: Improves the handling of concave wall corners by properly handling simultaneous collision with multiple walls (eg. concave wall corners or narrow tunnels).
+    //! TODO: Pproperly handles simultaneous collision with multiple walls (eg. concave wall corners or narrow tunnels).
     #define SIMULTANEOUS_WALL_COLLISIONS
-    // When finding a floor surface under the source height, get the highest floor instead of just the first floor in the list.
+    // Uses the surface closest to the source height when searching for a floor or ceiling, instead of just using the first applicable surface in the list.
     #define SLOPE_FIX
-    // Fixes a bug where entering any area above a ceiling without an intermediate floor would count as hitting a ceiling.
+    // Fixes an issue where entering any area above a ceiling without an intermediate floor would count as hitting a ceiling.
     // NOTE: This causes Mario to potentially clip through the vertical part of the rocking JRB ship at cettain angles.
     #define EXPOSED_CEILINGS_FIX
-    // Makes ceilings interaction separate than wall interaction so that Mario doesn't bonk on ceilings.
+    // Disables bonking on sloped ceilings by separating the handling of ceiling interactions and wall interactions.
     #define DISABLE_CEILING_BONKS
 #endif
 
