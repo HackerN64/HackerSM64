@@ -349,12 +349,15 @@ static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf)
  */
 static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
     struct Surface *surf, *ceil = NULL;
-    f32 height;
     SurfaceType type = SURFACE_DEFAULT;
-    *pheight = CELL_HEIGHT_LIMIT;
+    f32 height, highest = *pheight;
 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
+
+#ifndef SLOPE_FIX
+    returnFirst = TRUE;
+#endif
 
     // Iterate through the list of ceilings until there are no more ceilings.
     while (surfaceNode != NULL) {
@@ -381,22 +384,23 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         height = get_surface_height_at_location(x, z, surf);
 
         // Exclude ceilings above the previous lowest ceiling.
-        if (height > *pheight) continue;
+        if (height > highest) continue;
 
         // Checks for ceiling interaction.
-        if (y > height) continue;
+        if (height < y) continue;
 
         // Use the current ceiling.
-        *pheight = height;
+        highest = height;
         ceil = surf;
 
         // Exit the loop if it's not possible for another ceiling to be closer
-        // to the original point, or if COLLISION_FLAG_RETURN_FIRST.
+        // to the original point.
         if (height == y) break;
-#ifdef SLOPE_FIX
+
         if (returnFirst) break;
-#endif
     }
+
+    *pheight = highest;
 
     return ceil;
 }
@@ -495,11 +499,15 @@ static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf
 static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
     struct Surface *surf, *floor = NULL;
     SurfaceType type = SURFACE_DEFAULT;
-    f32 height;
+    f32 height, highest = *pheight;
 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
     _Bool skipIntangible = !(gCollisionFlags & COLLISION_FLAG_INCLUDE_INTANGIBLE);
+
+#ifndef SLOPE_FIX
+    returnFirst = TRUE;
+#endif
 
     // Iterate through the list of floors until there are no more floors.
     while (surfaceNode != NULL) {
@@ -533,24 +541,23 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         height = get_surface_height_at_location(x, z, surf);
 
         // Exclude floors lower than the previous highest floor.
-        if (height <= *pheight) continue;
+        if (height <= highest) continue;
 
         // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
-        if (y < height) continue;
+        if (height > y) continue;
 
         // Use the current floor.
-        *pheight = height;
+        highest = height;
         floor = surf;
 
         // Exit the loop if it's not possible for another floor to be closer
-        // to the original point, or if COLLISION_FLAG_RETURN_FIRST.
+        // to the original point.
         if (height == y) break;
-#ifdef SLOPE_FIX
+
         if (returnFirst) break;
-#else
-        break;
-#endif
     }
+
+    *pheight = highest;
 
     return floor;
 }
