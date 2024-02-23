@@ -7,6 +7,7 @@
 #include "types.h"
 
 
+// See include/config/config_movement.h
 #ifdef COLLISION_IMPROVEMENTS
     /**
      * Improves the handling of convex wall corners by rounding wall collision at triangle edges to close the seams.
@@ -25,10 +26,6 @@
      * NOTE: This causes Mario to potentially clip through the vertical part of the rocking JRB ship at cettain angles.
      */
     #define FIX_EXPOSED_CEILINGS
-    /**
-     * Disables bonking on sloped ceilings by separating the handling of ceiling interactions and wall interactions.
-     */
-    #define DISABLE_CEILING_BONKS
 #endif
 
 

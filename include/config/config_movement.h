@@ -114,9 +114,14 @@
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
- * General collision improvements. See "src/engine/surface_load.h" to toggle specific changes. Disable this to use vanilla collision handling.
+ * General collision improvements. See "src/engine/surface_load.h" to toggle specific changes. Disable this to use close to vanilla collision handling.
  */
 #define COLLISION_IMPROVEMENTS
+
+/**
+ * Disables bonking on sloped ceilings by separating the handling of ceiling interactions and wall interactions.
+ */
+#define DISABLE_CEILING_BONKS
 
 /**
  * Buffers an A input if you jump off a slope during the landing lag
