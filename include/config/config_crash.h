@@ -16,6 +16,7 @@
 
 /**
  * Includes function map data in the ROM.
+ * In default HackerSM64, this takes up around 181KB of the ROM.
  */
 #define INCLUDE_DEBUG_MAP
 
