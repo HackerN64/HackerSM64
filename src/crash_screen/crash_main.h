@@ -32,7 +32,7 @@ enum CrashScreenMessageIDs {
 
 typedef struct CSThreadInfo {
     /*0x000*/ OSThread thread; /*0x1B0*/
-    /*0x1B0*/ Register stack[THREAD2_STACK / sizeof(Register)]; /*0x400*/
+    /*0x1B0*/ Register stack[THREAD1000_STACK / sizeof(Register)]; /*0x400*/
     /*0x4B0*/ OSMesgQueue mesgQueue; /*0x18*/
     /*0x4C8*/ OSMesg mesg; /*0x04*/
 } CSThreadInfo; /*0x4CC*/

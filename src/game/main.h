@@ -10,11 +10,13 @@ enum VIModes {
 };
 
 #define THREAD1_STACK 0x0100
-#define THREAD2_STACK 0x0400
+#define THREAD2_STACK 0x0000
 #define THREAD3_STACK 0x0200
 #define THREAD4_STACK 0x2000
 #define THREAD5_STACK 0x2000
 #define THREAD6_STACK 0x0400
+
+#define THREAD1000_STACK 0x0400
 
 enum ThreadID {
     THREAD_0,
