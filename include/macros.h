@@ -56,7 +56,7 @@
 #define ALWAYS_INLINE inline
 #endif
 
-// Always inline a function.
+// Never inline a function.
 #ifdef __GNUC__
 #define NEVER_INLINE __attribute__((noinline))
 #else

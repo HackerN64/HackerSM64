@@ -128,7 +128,7 @@
  */
 // #define WATER_PLUNGE_UPWARP
 
-/**
+/** 
  * This bug allows mario to move when initiating a dialog,
  * just as long as mario doesn't enter an action that can
  * be interrupted with text
