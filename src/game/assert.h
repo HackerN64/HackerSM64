@@ -60,7 +60,7 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 #define assertf         ASSERTF
 #define debug_error     DEBUG_ERROR
 #define debug_errorf    DEBUG_ERRORF
-//! TODO: Fix conflict with UNF debug_assert.
+//! TODO: This name conflicts with UNF debug_assert:
 // #define debug_assert    DEBUG_ASSERT
 #define debug_assertf   DEBUG_ASSERTF
 
