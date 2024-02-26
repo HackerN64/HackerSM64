@@ -34,7 +34,7 @@ CSPage* gCSPages[NUM_PAGES] = {
     [PAGE_DISASM     ] = &gCSPage_disasm,
     [PAGE_SETTINGS   ] = &gCSPage_settings,
 };
-enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE;
+enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE; // Current page ID.
 _Bool gCSSwitchedPage = FALSE;
 
 
@@ -65,7 +65,7 @@ CSPopup* gCSPopups[NUM_CS_POPUPS] = {
     [CS_POPUP_CONTROLS      ] = &gCSPopup_controls,
     [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address_select,
 };
-enum CSPopups gCSPopupID = CS_POPUP_NONE;
+enum CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
 _Bool gCSSwitchedPopup = FALSE;
 
 

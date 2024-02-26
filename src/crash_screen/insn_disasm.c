@@ -502,6 +502,7 @@ Address get_insn_branch_target_from_addr(Address addr) {
         .raw = *(Word*)addr,
     };
 
+    // Jump instructions are handled differently than branch instructions.
     if (
         (insn.opcode == OPC_J  ) ||
         (insn.opcode == OPC_JAL)

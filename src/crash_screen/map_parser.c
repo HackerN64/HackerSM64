@@ -49,7 +49,7 @@ TEXT_REGION_GROUP(common1)
 };
 
 
-size_t gNumMapSymbols = 0;
+size_t gNumMapSymbols = 0; // The total number of map symbols.
 
 
 /**

@@ -50,23 +50,27 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_PAGE_DISASM ] = { .name = "DISASM",   .list = cs_settings_group_page_disasm,  },
 };
 
+
+// Gets the settings group pointer from a groupID.
 CSSettingsGroup* cs_get_settings_group(int groupID) {
     return &gCSSettingsGroups[groupID];
 }
 
+// Gets the setting pointer from a groupID and settingID.
 CSSetting* cs_get_setting(int groupID, int settingID) {
     CSSettingsGroup* group = cs_get_settings_group(groupID);
 
     return &group->list[settingID];
 }
 
+// Gets the value of a setting from a groupID and settingID.
 SettingsType cs_get_setting_val(int groupID, int settingID) {
     CSSetting* setting = cs_get_setting(groupID, settingID);
 
     return ((setting != NULL) ? setting->val : 0);
 }
 
-// Increment/wrap value.
+// Increment/wrap the value of a setting by 'inc'.
 void cs_inc_setting(int groupID, int settingID, SettingsType inc) {
     CSSetting* setting = cs_get_setting(groupID, settingID);
 
@@ -81,6 +85,7 @@ void cs_inc_setting(int groupID, int settingID, SettingsType inc) {
     }
 }
 
+// Checks whether a specific settings group has a header.
 _Bool cs_settings_group_has_header(int groupID) {
     CSSettingsGroup* group = cs_get_settings_group(groupID);
 
@@ -89,7 +94,7 @@ _Bool cs_settings_group_has_header(int groupID) {
 
 // -- CSSettingsFunc --
 
-// Reset a specific setting to its default.
+// Resets a specific setting to its default value.
 _Bool cs_setting_func_reset(int groupID, int settingID) {
     CSSetting* setting = cs_get_setting(groupID, settingID);
 
@@ -100,6 +105,7 @@ _Bool cs_setting_func_reset(int groupID, int settingID) {
     return FALSE;
 }
 
+// Checks whether a specific setting has been changed from its default value.
 _Bool cs_setting_func_is_non_default(int groupID, int settingID) {
     CSSetting* setting = cs_get_setting(groupID, settingID);
 
@@ -112,6 +118,7 @@ _Bool cs_setting_func_is_non_default(int groupID, int settingID) {
 
 // -- End CSSettingsFunc --
 
+// Applies a function to all settings in a specific group.
 _Bool cs_settings_apply_func_to_all_in_group(CSSettingsFunc func, int groupID) {
     int settingID = cs_settings_group_has_header(groupID); // Skip header.
 
@@ -134,6 +141,7 @@ _Bool cs_settings_apply_func_to_all_in_group(CSSettingsFunc func, int groupID) {
     return FALSE;
 }
 
+// Applies a function to all settings.
 _Bool cs_settings_apply_func_to_all(CSSettingsFunc func) {
     for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
         if (cs_settings_apply_func_to_all_in_group(func, groupID)) {
@@ -144,6 +152,7 @@ _Bool cs_settings_apply_func_to_all(CSSettingsFunc func) {
     return FALSE;
 }
 
+// Check all settings headers for a specific expand state.
 _Bool cs_settings_check_for_header_state(_Bool expand) {
     for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
         if (cs_settings_group_has_header(groupID) && (cs_get_setting_val(groupID, GROUP_HEADER_INDEX) == expand)) {
@@ -154,6 +163,7 @@ _Bool cs_settings_check_for_header_state(_Bool expand) {
     return FALSE;
 }
 
+// Sets the expand state of all settings headers.
 void cs_settings_set_all_headers(_Bool expand) {
     for (int groupID = 0; groupID < NUM_CS_OPT_GROUPS; groupID++) {
         if (cs_settings_group_has_header(groupID)) {
