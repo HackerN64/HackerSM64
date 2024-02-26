@@ -7,7 +7,7 @@
 /**
  * Enables most debug options, including PUPPYPRINT_DEBUG.
  */
-// #define DEBUG_ALL
+#define DEBUG_ALL
 
 /**
  * Disables all debug options (except PUPPYPRINT).

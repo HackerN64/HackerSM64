@@ -442,7 +442,11 @@ void update_walking_speed(struct MarioState *m) {
         // We use m->actionArg here since it's a global variable that gets initalized to 0 elsewhere.
         if (m->forwardVel <= 8.f && !m->actionArg
             && !mario_floor_is_steep(m)) {
-            m->forwardVel = MIN(m->intendedMag, 8.f); // same fix as melee dashback
+            if (m->heldObj != NULL) {
+                m->forwardVel = MIN(m->intendedMag, 4.f); // Half as much when holding object, 5.0 forwardVel on first frame
+            } else {
+                m->forwardVel = MIN(m->intendedMag, 8.f); // same fix as melee dashback, 8.9 forwardVel on first frame
+            }
         }
 
         // If accelerating
