@@ -418,7 +418,7 @@ s32 update_decelerating_speed(struct MarioState *m) {
 void update_walking_speed(struct MarioState *m) {
     f32 maxTargetSpeed;
     f32 targetSpeed;
-    u8 firstFrame;
+
 
     if (m->floor != NULL && m->floor->type == SURFACE_SLOW) {
         maxTargetSpeed = 24.0f;
@@ -438,8 +438,9 @@ void update_walking_speed(struct MarioState *m) {
     } else if (m->forwardVel <= targetSpeed) {
         
         // When starting a walk, make a few checks and set Mario's speed to 8 on the first frame.
-        // This ensures Mario's speed is set consistently when starting a walk on the first frame.
-        if (m->forwardVel <= 8.f && !firstFrame
+        // This ensures Mario's speed is set consistently when starting a walk.
+        // We use m->actionArg here since it's a global variable that gets initalized to 0 elsewhere.
+        if (m->forwardVel <= 8.f && !m->actionArg
             && !mario_floor_is_steep(m)) {
             m->forwardVel = MIN(m->intendedMag, 8.f); // same fix as melee dashback
         }
@@ -474,7 +475,7 @@ void update_walking_speed(struct MarioState *m) {
     m->faceAngle[1] =
         m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
 #endif
-    firstFrame = 1; // Increment this so speed is only set to 8 on first frame of walking.
+    m->actionArg = 1; // Increment this so speed is only set to 8 on first frame of walking.
     apply_slope_accel(m);
 }
 
