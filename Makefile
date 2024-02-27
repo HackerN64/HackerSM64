@@ -350,7 +350,7 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
 
   # Clone any needed submodules
   ifeq ($(LIBPL),1)
-    ifeq ($(wildcard $(LIBPL_DIR)),)
+    ifeq ($(wildcard $(LIBPL_DIR)/*.h),)
       $(info Cloning libpl submodule...)
       DUMMY != git submodule update --init $(LIBPL_DIR) > /dev/null || echo FAIL
       ifeq ($(DUMMY),FAIL)
