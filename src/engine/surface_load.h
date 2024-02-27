@@ -23,6 +23,11 @@
      * NOTE: This causes Mario to potentially clip through the vertical part of the rocking JRB ship at cettain angles.
      */
     #define FIX_EXPOSED_CEILINGS
+    /**
+     * Fixes false ledge grabs by making the "start ledge grab" check the same as the "stay in ledge grab" check.
+     * TODO: implement
+     */
+    #define FIX_FALSE_LEDGE_GRABS
 #endif
 
 
