@@ -172,39 +172,33 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         //! (Quantum Tunneling) Due to issues with the vertices walls choose and
         //  the fact they are floating point, certain floating point positions
         //  along the seam of two walls may collide with neither wall or both walls.
-        if (surf->flags & SURFACE_FLAG_X_PROJECTION) {
-            w1 = -surf->vertex1[2]; w2 = -surf->vertex2[2]; w3 = -surf->vertex3[2];
-            y1 =  surf->vertex1[1]; y2 =  surf->vertex2[1]; y3 =  surf->vertex3[1];
+        if (surf->flags & SURFACE_FLAG_X_PROJECTION) { // ((surface->normal.x < -COS45) || (surface->normal.x > COS45))
+            // Raycast along X axis. (y, -z)
+            w1 = -surf->vertex1[2]; w2 = -surf->vertex2[2]; w3 = -surf->vertex3[2]; // -v1z -v2z -v3z
+            y1 =  surf->vertex1[1]; y2 =  surf->vertex2[1]; y3 =  surf->vertex3[1]; //  v1y  v2y  v3y
 
             if (surf->normal.x > 0.0f) {
-                if (
-                    ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) > 0.0f) ||
-                    ((((y2 - y) * (w3 - w2)) - ((w2 - -z) * (y3 - y2))) > 0.0f) ||
-                    ((((y3 - y) * (w1 - w3)) - ((w3 - -z) * (y1 - y3))) > 0.0f)
-                ) continue;
+                if ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) > 0.0f) continue;
+                if ((((y2 - y) * (w3 - w2)) - ((w2 - -z) * (y3 - y2))) > 0.0f) continue;
+                if ((((y3 - y) * (w1 - w3)) - ((w3 - -z) * (y1 - y3))) > 0.0f) continue;
             } else {
-                if (
-                    ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) < 0.0f) ||
-                    ((((y2 - y) * (w3 - w2)) - ((w2 - -z) * (y3 - y2))) < 0.0f) ||
-                    ((((y3 - y) * (w1 - w3)) - ((w3 - -z) * (y1 - y3))) < 0.0f)
-                ) continue;
+                if ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) < 0.0f) continue;
+                if ((((y2 - y) * (w3 - w2)) - ((w2 - -z) * (y3 - y2))) < 0.0f) continue;
+                if ((((y3 - y) * (w1 - w3)) - ((w3 - -z) * (y1 - y3))) < 0.0f) continue;
             }
         } else {
-            w1 = surf->vertex1[0]; w2 = surf->vertex2[0]; w3 = surf->vertex3[0];
-            y1 = surf->vertex1[1]; y2 = surf->vertex2[1]; y3 = surf->vertex3[1];
+            // Raycast along Z axis. (y, x)
+            w1 =  surf->vertex1[0]; w2 =  surf->vertex2[0]; w3 =  surf->vertex3[0]; //  v1x  v2x  v3x
+            y1 =  surf->vertex1[1]; y2 =  surf->vertex2[1]; y3 =  surf->vertex3[1]; //  v1y  v2y  v3y
 
             if (surf->normal.z > 0.0f) {
-                if (
-                    ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) > 0.0f) ||
-                    ((((y2 - y) * (w3 - w2)) - ((w2 - x) * (y3 - y2))) > 0.0f) ||
-                    ((((y3 - y) * (w1 - w3)) - ((w3 - x) * (y1 - y3))) > 0.0f)
-                ) continue;
+                if ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) > 0.0f) continue;
+                if ((((y2 - y) * (w3 - w2)) - ((w2 - x) * (y3 - y2))) > 0.0f) continue;
+                if ((((y3 - y) * (w1 - w3)) - ((w3 - x) * (y1 - y3))) > 0.0f) continue;
             } else {
-                if (
-                    ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) < 0.0f) ||
-                    ((((y2 - y) * (w3 - w2)) - ((w2 - x) * (y3 - y2))) < 0.0f) ||
-                    ((((y3 - y) * (w1 - w3)) - ((w3 - x) * (y1 - y3))) < 0.0f)
-                ) continue;
+                if ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) < 0.0f) continue;
+                if ((((y2 - y) * (w3 - w2)) - ((w2 - x) * (y3 - y2))) < 0.0f) continue;
+                if ((((y3 - y) * (w1 - w3)) - ((w3 - x) * (y1 - y3))) < 0.0f) continue;
             }
         }
 
@@ -324,6 +318,7 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
  *                     CEILINGS                   *
  **************************************************/
 
+// Upward raycast along Y axis.
 static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
     Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
@@ -475,6 +470,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
  *                     FLOORS                     *
  **************************************************/
 
+// Downward raycast along Y axis.
 static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
     Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
