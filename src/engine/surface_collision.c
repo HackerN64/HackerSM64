@@ -59,14 +59,17 @@ s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invD
  */
 static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struct WallCollisionData *data) {
     struct Surface *surf = NULL;
-    f32 radius = data->radius;
-    Vec3f pos = { data->x, data->y + data->offsetY, data->z };
-    TerrainData type = SURFACE_DEFAULT;
-    s32 numCols = 0;
+    const f32 radius = data->radius;
 #ifdef ROUNDED_WALL_CORNERS
     const f32 corner_threshold = -0.9f;
     f32 margin_radius = radius - 1.0f;
 #endif
+    Vec3f pos = {
+        data->x,
+        data->y + data->offsetY,
+        data->z
+    };
+    s32 numCols = 0;
 
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
@@ -85,7 +88,6 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     while (surfaceNode != NULL) {
         surf        = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
-        type        = surf->type;
 
         // Exclude a large number of walls immediately to optimize.
         if (pos[1] < surf->lowerY || pos[1] > surf->upperY) continue;
@@ -94,6 +96,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         if (checkingForCamera) {
             if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
         } else {
+            TerrainData type = surf->type;
+
             // Ignore camera only surfaces.
             if (type == SURFACE_CAMERA_BOUNDARY) continue;
 
@@ -166,16 +170,14 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         f32 x = pos[0];
         f32 y = pos[1];
         f32 z = pos[2];
-        f32 w1, w2, w3;
-        f32 y1, y2, y3;
 
         //! (Quantum Tunneling) Due to issues with the vertices walls choose and
         //  the fact they are floating point, certain floating point positions
         //  along the seam of two walls may collide with neither wall or both walls.
         if (surf->flags & SURFACE_FLAG_X_PROJECTION) { // ((surface->normal.x < -COS45) || (surface->normal.x > COS45))
             // Raycast along X axis. (y, -z)
-            w1 = -surf->vertex1[2]; w2 = -surf->vertex2[2]; w3 = -surf->vertex3[2]; // -v1z -v2z -v3z
-            y1 =  surf->vertex1[1]; y2 =  surf->vertex2[1]; y3 =  surf->vertex3[1]; //  v1y  v2y  v3y
+            f32 w1 = -surf->vertex1[2], w2 = -surf->vertex2[2], w3 = -surf->vertex3[2]; // -v1z -v2z -v3z
+            f32 y1 =  surf->vertex1[1], y2 =  surf->vertex2[1], y3 =  surf->vertex3[1]; //  v1y  v2y  v3y
 
             if (surf->normal.x > 0.0f) {
                 if ((((y1 - y) * (w2 - w1)) - ((w1 - -z) * (y2 - y1))) > 0.0f) continue;
@@ -188,8 +190,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             }
         } else {
             // Raycast along Z axis. (y, x)
-            w1 =  surf->vertex1[0]; w2 =  surf->vertex2[0]; w3 =  surf->vertex3[0]; //  v1x  v2x  v3x
-            y1 =  surf->vertex1[1]; y2 =  surf->vertex2[1]; y3 =  surf->vertex3[1]; //  v1y  v2y  v3y
+            f32 w1 =  surf->vertex1[0], w2 =  surf->vertex2[0], w3 =  surf->vertex3[0]; //  v1x  v2x  v3x
+            f32 y1 =  surf->vertex1[1], y2 =  surf->vertex2[1], y3 =  surf->vertex3[1]; //  v1y  v2y  v3y
 
             if (surf->normal.z > 0.0f) {
                 if ((((y1 - y) * (w2 - w1)) - ((w1 - x) * (y2 - y1))) > 0.0f) continue;
@@ -344,8 +346,7 @@ static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf)
  */
 static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
     struct Surface *surf, *ceil = NULL;
-    SurfaceType type = SURFACE_DEFAULT;
-    f32 height, highest = *pheight;
+    f32 highest = *pheight;
 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
@@ -358,14 +359,13 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
     while (surfaceNode != NULL) {
         surf        = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
-        type        = surf->type;
 
         // Determine if checking for the camera or not.
         if (checkingForCamera) {
             if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
                 continue;
             }
-        } else if (type == SURFACE_CAMERA_BOUNDARY) {
+        } else if (surf->type == SURFACE_CAMERA_BOUNDARY) {
             continue; // If we are not checking for the camera, ignore camera only ceilings.
         }
 
@@ -376,7 +376,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         if (!check_within_ceil_triangle_bounds(x, z, surf)) continue;
 
         // Find the height of the ceiling above the current location.
-        height = get_surface_height_at_location(x, z, surf);
+        f32 height = get_surface_height_at_location(x, z, surf);
 
         // Exclude ceilings above the previous lowest ceiling.
         if (height > highest) continue;
@@ -385,15 +385,15 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         if (height < y) continue;
 
         // Use the current ceiling.
-        highest = height;
         ceil = surf;
+        highest = height;
+
+        // If we're only looking for the closest ceiling, exit the loop.
+        if (returnFirst) break;
 
         // Exit the loop if it's not possible for another ceiling to be closer
         // to the original point.
         if (height == y) break;
-
-        // If we're only looking for the closest ceiling, exit the loop.
-        if (returnFirst) break;
     }
 
     *pheight = highest;
@@ -496,8 +496,7 @@ static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf
  */
 static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
     struct Surface *surf, *floor = NULL;
-    SurfaceType type = SURFACE_DEFAULT;
-    f32 height, highest = *pheight;
+    f32 highest = *pheight;
 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
@@ -511,7 +510,8 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     while (surfaceNode != NULL) {
         surf        = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
-        type        = surf->type;
+
+        TerrainData type = surf->type;
 
         // To prevent the Merry-Go-Round room from loading when Mario passes above the hole that leads
         // there, SURFACE_INTANGIBLE is used. This prevent the wrong room from loading, but can also allow
@@ -536,7 +536,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         if (!check_within_floor_triangle_bounds(x, z, surf)) continue;
 
         // Get the height of the floor under the current location.
-        height = get_surface_height_at_location(x, z, surf);
+        f32 height = get_surface_height_at_location(x, z, surf);
 
         // Exclude floors lower than the previous highest floor.
         if (height <= highest) continue;
@@ -545,15 +545,15 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         if (height > y) continue;
 
         // Use the current floor.
-        highest = height;
         floor = surf;
+        highest = height;
+
+        // If we're only looking for the closest floor, exit the loop.
+        if (returnFirst) break;
 
         // Exit the loop if it's not possible for another floor to be closer
         // to the original point.
         if (height == y) break;
-
-        // If we're only looking for the closest floor, exit the loop.
-        if (returnFirst) break;
     }
 
     *pheight = highest;

@@ -20,7 +20,7 @@
     #define SLOPE_FIX
     /**
      * Fixes an issue where entering any area above a ceiling without an intermediate floor would count as hitting a ceiling.
-     * NOTE: This causes Mario to potentially clip through the vertical part of the rocking JRB ship at cettain angles.
+     * NOTE: This may allow Mario to clip through the wall on the deck of the the rocking JRB ship.
      */
     #define FIX_EXPOSED_CEILINGS
     /**
