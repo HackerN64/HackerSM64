@@ -189,6 +189,7 @@ struct CSPage gCSPage_map = {
     .initFunc     = page_map_init,
     .drawFunc     = page_map_draw,
     .inputFunc    = page_map_input,
+    .printFunc    = NULL,
     .contList     = cs_cont_list_map,
     .settingsList = cs_settings_group_page_map,
     .flags = {

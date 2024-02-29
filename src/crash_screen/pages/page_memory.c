@@ -253,6 +253,7 @@ struct CSPage gCSPage_memory = {
     .initFunc     = page_memory_init,
     .drawFunc     = page_memory_draw,
     .inputFunc    = page_memory_input,
+    .printFunc    = NULL,
     .contList     = cs_cont_list_memory,
     .settingsList = cs_settings_group_page_memory,
     .flags = {

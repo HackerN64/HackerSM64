@@ -495,6 +495,7 @@ struct CSPage gCSPage_disasm = {
     .initFunc     = page_disasm_init,
     .drawFunc     = page_disasm_draw,
     .inputFunc    = page_disasm_input,
+    .printFunc    = NULL,
     .contList     = cs_cont_list_disasm,
     .settingsList = cs_settings_group_page_disasm,
     .flags = {

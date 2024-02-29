@@ -300,6 +300,7 @@ struct CSPage gCSPage_settings = {
     .initFunc     = page_settings_init,
     .drawFunc     = page_settings_draw,
     .inputFunc    = page_settings_input,
+    .printFunc    = NULL,
     .contList     = cs_cont_list_settings,
     .settingsList = NULL,
     .flags = {

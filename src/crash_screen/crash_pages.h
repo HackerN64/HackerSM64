@@ -39,9 +39,10 @@ typedef struct CSPage {
     /*0x04*/ void (*initFunc)(void);
     /*0x08*/ void (*drawFunc)(void);
     /*0x0C*/ void (*inputFunc)(void);
-    /*0x10*/ const enum ControlTypes* contList;
-    /*0x14*/ struct CSSetting* settingsList; //! TODO: Allow page settings to be changed on the page via help popup.
-    /*0x18*/ union {
+    /*0x10*/ void (*printFunc)(void);
+    /*0x14*/ const enum ControlTypes* contList;
+    /*0x18*/ struct CSSetting* settingsList; //! TODO: Allow page settings to be changed on the page via help popup.
+    /*0x1C*/ union {
                 struct PACKED {
                     /*0x00*/ u32             : 29;
                     /*0x03*/ u32 printName   :  1;
@@ -50,7 +51,7 @@ typedef struct CSPage {
                 }; /*0x04*/
                 u32 raw;
             } flags; /*0x04*/
-} CSPage; /*0x1C*/
+} CSPage; /*0x20*/
 
 
 extern struct CSPage* gCSPages[NUM_PAGES];

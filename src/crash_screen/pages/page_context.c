@@ -13,6 +13,9 @@
 #include "crash_screen/memory_read.h"
 
 #include "page_context.h"
+#ifdef UNF
+#include "usb/debug.h"
+#endif
 
 
 struct CSSetting cs_settings_group_page_context[] = {
@@ -346,12 +349,25 @@ void page_context_input(void) {
     }
 }
 
+void page_context_print(void) {
+#ifdef UNF
+ #ifdef INCLUDE_DEBUG_MAP
+    __OSThreadContext* tc = &gCrashedThread->context;
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        osSyncPrintf("func name\t%s\n", get_map_symbol_name(symbol)); //! TODO: only the name itself is printed.
+    }
+ #endif // INCLUDE_DEBUG_MAP
+    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Issue with UNFLoader itself?
+#endif
+}
 
 struct CSPage gCSPage_context ={
     .name         = "CONTEXT",
     .initFunc     = page_context_init,
     .drawFunc     = page_context_draw,
     .inputFunc    = page_context_input,
+    .printFunc    = page_context_print,
     .contList     = cs_cont_list_context,
     .settingsList = cs_settings_group_page_context,
     .flags = {

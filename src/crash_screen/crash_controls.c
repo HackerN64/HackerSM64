@@ -209,6 +209,16 @@ void cs_update_input(void) {
 
     cs_update_direction_input();
 
+#ifdef UNF
+    if (
+        (gCSCompositeController->buttonDown & Z_TRIG) &&
+        (gCSCompositeController->buttonPressed & START_BUTTON) &&
+        (page->printFunc != NULL)
+    ) {
+        page->printFunc();
+    }
+#endif
+
     if ((gCSPopupID == CS_POPUP_NONE) && !gCSSwitchedPopup) {
         if (gCSCompositeController->buttonPressed & START_BUTTON) {
             cs_open_popup(CS_POPUP_CONTROLS);

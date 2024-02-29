@@ -182,13 +182,9 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     gSelectedAddress = tc->pc;
 
 #ifdef UNF
- #ifdef INCLUDE_DEBUG_MAP
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        osSyncPrintf("func name\t%s\n", get_map_symbol_name(symbol)); //! TODO: only the name itself is printed.
+    if (gCSPages[gCSPageID]->printFunc != NULL) {
+        gCSPages[gCSPageID]->printFunc();
     }
- #endif // INCLUDE_DEBUG_MAP
-    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Issue with UNFLoader itself?
 #endif // UNF
 }
 

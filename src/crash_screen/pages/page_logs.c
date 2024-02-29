@@ -210,6 +210,7 @@ struct CSPage gCSPage_logs = {
     .initFunc     = page_logs_init,
     .drawFunc     = page_logs_draw,
     .inputFunc    = page_logs_input,
+    .printFunc    = NULL,
     .contList     = cs_cont_list_logs,
     .settingsList = cs_settings_group_page_logs,
     .flags = {

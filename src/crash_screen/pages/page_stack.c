@@ -250,6 +250,7 @@ struct CSPage gCSPage_stack = {
     .initFunc     = page_stack_init,
     .drawFunc     = page_stack_draw,
     .inputFunc    = page_stack_input,
+    .printFunc    = NULL,
     .contList     = cs_cont_list_stack,
     .settingsList = cs_settings_group_page_stack,
     .flags = {
