@@ -193,12 +193,12 @@ void print_page_unf(CSPage* page) {
 #ifndef UNF
     return;
 #endif
+    // debug_printf("---------------\n");
+    // const char* name = page->name;
+    // if (name != NULL) {
+    //     debug_printf("%s:", page->name);
+    // }
     if (page->printFunc != NULL) {
-        // debug_printf("---------------\n");
-        // const char* name = page->name;
-        // if (name != NULL) {
-        //     debug_printf("%s:", page->name);
-        // }
         page->printFunc();
     } else {
         debug_printf("This page has no UNF print function.\n");

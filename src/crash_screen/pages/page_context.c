@@ -354,6 +354,7 @@ void page_context_input(void) {
 }
 
 void page_context_print(void) {
+    // debug_printf("---------------\n");
 #ifdef UNF
  #ifdef INCLUDE_DEBUG_MAP
     __OSThreadContext* tc = &gCrashedThread->context;
