@@ -189,10 +189,11 @@ _Bool cs_check_switch_page_input(void) {
     return TRUE;
 }
 
-void print_page_unf(CSPage* page) {
+// Prints a page's data to the developer console.
+void cs_os_print_page(CSPage* page) {
 #ifndef UNF
     return;
-#endif
+#endif // UNF
     // debug_printf("---------------\n");
     // const char* name = page->name;
     // if (name != NULL) {
@@ -201,7 +202,7 @@ void print_page_unf(CSPage* page) {
     if (page->printFunc != NULL) {
         page->printFunc();
     } else {
-        debug_printf("This page has no UNF print function.\n");
+        debug_printf("%s has no print function.\n", page->name);
     }
 }
 
@@ -238,7 +239,7 @@ void cs_update_input(void) {
         (gCSCompositeController->buttonPressed & START_BUTTON)
     ) {
         gCSCompositeController->buttonPressed &= ~START_BUTTON;
-        print_page_unf(page);
+        cs_os_print_page(page);
     }
 #endif
 

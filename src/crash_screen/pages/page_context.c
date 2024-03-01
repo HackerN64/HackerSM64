@@ -360,11 +360,14 @@ void page_context_print(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     if (symbol != NULL) {
-        osSyncPrintf("func name\t%s\n", get_map_symbol_name(symbol)); //! TODO: only the name itself is printed.
+        const char* fname = get_map_symbol_name(symbol);
+        if (fname != NULL) {
+            osSyncPrintf("func: %s\n", fname); //! TODO: only the name itself is printed.
+        }
     }
  #endif // INCLUDE_DEBUG_MAP
-    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Issue with UNFLoader itself?
-#endif
+    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Or is this an issue with UNF itself?
+#endif // UNF
 }
 
 struct CSPage gCSPage_context ={

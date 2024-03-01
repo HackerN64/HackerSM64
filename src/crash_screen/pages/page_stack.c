@@ -252,6 +252,7 @@ void page_stack_input(void) {
 }
 
 void page_stack_print(void) {
+#ifdef UNF
     debug_printf("---------------\n");
     debug_printf("%s:\n", gCSPages[gCSPageID]->name);
 
@@ -263,13 +264,14 @@ void page_stack_print(void) {
         }
 
         debug_printf("%08X: %08X +%04X", function->stackAddr, function->faddr, (function->curAddr - function->faddr));
-#ifdef INCLUDE_DEBUG_MAP
+ #ifdef INCLUDE_DEBUG_MAP
         if (function->fname != NULL) {
             debug_printf(" %s", function->fname);
         }
-#endif
+ #endif // INCLUDE_DEBUG_MAP
         debug_printf("\n");
     }
+#endif // UNF
 }
 
 

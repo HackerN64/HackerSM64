@@ -14,6 +14,10 @@
 
 #include "page_memory.h"
 
+#ifdef UNF
+#include "usb/debug.h"
+#endif
+
 
 struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "RAM VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -43,6 +47,9 @@ static Address sRamViewViewportIndex = 0x00000000;
 static u32 sRamViewNumShownRows = 19;
 
 static const char gHex[0x10] = "0123456789ABCDEF";
+#ifdef UNF
+static u32 sMemoryViewData[20][4];
+#endif
 
 
 void page_memory_init(void) {
@@ -66,6 +73,10 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
 
+#ifdef UNF
+    bzero(&sMemoryViewData, sizeof(sMemoryViewData));
+#endif // UNF
+
     for (u32 y = 0; y < sRamViewNumShownRows; y++) {
         Address rowAddr = (startAddr + (y * PAGE_MEMORY_STEP));
 
@@ -84,6 +95,12 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
             };
             Address currAddrAligned = (rowAddr + (wordOffset * sizeof(Word)));
             _Bool valid = try_read_data(&data.word, currAddrAligned);
+
+#ifdef UNF
+            if (valid) {
+                sMemoryViewData[y][wordOffset] = data.word;
+            }
+#endif // UNF
 
             charX += 2;
 
@@ -250,13 +267,33 @@ void page_memory_input(void) {
     sRamViewViewportIndex = cs_clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, PAGE_MEMORY_STEP);
 }
 
+void page_memory_print(void) {
+#ifdef UNF
+    debug_printf("---------------\n");
+    debug_printf("%s:\n", gCSPages[gCSPageID]->name);
+
+    Address startAddr = sRamViewViewportIndex;
+    Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP);
+
+    debug_printf("(%08X-%08X):\n", startAddr, endAddr);
+
+    for (u32 row = 0; row < sRamViewNumShownRows; row++) {
+        debug_printf("%08X:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
+        for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
+            debug_printf(" %08X", sMemoryViewData[row][wordOffset]);
+        }
+        debug_printf("\n");
+    }
+#endif // UNF
+}
+
 
 struct CSPage gCSPage_memory = {
     .name         = "RAM VIEW",
     .initFunc     = page_memory_init,
     .drawFunc     = page_memory_draw,
     .inputFunc    = page_memory_input,
-    .printFunc    = NULL,
+    .printFunc    = page_memory_print,
     .contList     = cs_cont_list_memory,
     .settingsList = cs_settings_group_page_memory,
     .flags = {

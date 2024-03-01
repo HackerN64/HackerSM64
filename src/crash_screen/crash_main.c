@@ -182,7 +182,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     gSelectedAddress = tc->pc;
 
 #ifdef UNF
-    print_page_unf(gCSPages[gCSPageID]);
+    cs_os_print_page(gCSPages[gCSPageID]);
 #endif // UNF
 }
 
