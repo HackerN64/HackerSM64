@@ -13,6 +13,10 @@
 
 #include "page_settings.h"
 
+#ifdef UNF
+#include "usb/debug.h"
+#endif // UNF
+
 
 struct CSSetting cs_settings_group_buttons[] = {
     [CS_OPT_BUTTON_EXPAND_ALL           ] = { .type = CS_OPT_TYPE_SETTING, .name = "expand all",                     .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -28,7 +32,7 @@ const enum ControlTypes cs_cont_list_settings[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_CHANGE_SETTING,
     CONT_DESC_RESET_SETTING,

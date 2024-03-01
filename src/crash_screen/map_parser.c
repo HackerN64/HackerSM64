@@ -17,7 +17,7 @@ TEXT_REGION_SEGMENT(behavior)
 TEXT_REGION_SEGMENT(goddard)
 #ifdef KEEP_MARIO_HEAD
 TEXT_REGION_SEGMENT(libgoddard)
-#endif
+#endif // KEEP_MARIO_HEAD
 TEXT_REGION_SEGMENT(intro)
 
 TEXT_REGION_GROUP(group0)
@@ -89,7 +89,7 @@ _Bool is_in_code_segment(Address addr) {
 const char* get_map_symbol_name(const MapSymbol* symbol) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
-#endif
+#endif // INCLUDE_DEBUG_MAP
     if (symbol == NULL) {
         return NULL;
     }
@@ -118,7 +118,7 @@ static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
 s32 get_symbol_index_from_addr_forward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
-#endif
+#endif // INCLUDE_DEBUG_MAP
     const MapSymbol* symbol = &gMapSymbols[0];
 
     for (size_t i = 0; i < gNumMapSymbols; i++) {
@@ -142,7 +142,7 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
 s32 get_symbol_index_from_addr_backward(Address addr) {
 #ifndef INCLUDE_DEBUG_MAP
     return -1;
-#endif
+#endif // INCLUDE_DEBUG_MAP
     const MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
     for (size_t i = gNumMapSymbols; i-- > 0;) {
@@ -166,7 +166,7 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
 const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
-#endif
+#endif // INCLUDE_DEBUG_MAP
     Word data = 0;
     if (!try_read_data(&data, addr)) {
         return NULL;

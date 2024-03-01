@@ -15,7 +15,7 @@
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
 #include "pages/page_map.h"
-#endif
+#endif // INCLUDE_DEBUG_MAP
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
 #include "pages/page_settings.h"
@@ -29,7 +29,7 @@ CSPage* gCSPages[NUM_PAGES] = {
     [PAGE_STACK_TRACE] = &gCSPage_stack,
 #ifdef INCLUDE_DEBUG_MAP
     [PAGE_MAP_VIEWER ] = &gCSPage_map,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [PAGE_RAM_VIEWER ] = &gCSPage_memory,
     [PAGE_DISASM     ] = &gCSPage_disasm,
     [PAGE_SETTINGS   ] = &gCSPage_settings,

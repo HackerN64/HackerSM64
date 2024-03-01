@@ -70,7 +70,7 @@ void cs_address_select_draw(void) {
             cs_print_symbol_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, symbol);
         }
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     osWritebackDCacheAll();
 }
@@ -132,7 +132,7 @@ void cs_address_select_input(void) {
                     gFillBranchBuffer = TRUE;
                 }
                 break;
-#endif
+#endif // INCLUDE_DEBUG_MAP
             default:
                 break;
         }

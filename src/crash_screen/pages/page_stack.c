@@ -18,7 +18,7 @@
 
 #ifdef UNF
 #include "usb/debug.h"
-#endif
+#endif // UNF
 
 
 struct CSSetting cs_settings_group_page_stack[] = {
@@ -35,12 +35,12 @@ const enum ControlTypes cs_cont_list_stack[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_JUMP_TO_ADDRESS,
 #ifdef INCLUDE_DEBUG_MAP
     CONT_DESC_TOGGLE_FUNCTIONS,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     CONT_DESC_LIST_END,
 };
 
@@ -117,7 +117,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showOffsets      = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS  );
     const _Bool parseSymbolNames = cs_get_setting_val(CS_OPT_GROUP_GLOBAL,     CS_OPT_GLOBAL_SYMBOL_NAMES );
-#endif
+#endif // INCLUDE_DEBUG_MAP
     u32 currIndex = sStackTraceViewportIndex;
     FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
 
@@ -180,13 +180,13 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                 );
             }
         }
-#else
+#else // !INCLUDE_DEBUG_MAP
         // "[function address]"
         cs_print(TEXT_X(charX), y,
             (STR_COLOR_PREFIX STR_HEX_WORD),
             COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
         );
-#endif
+#endif // !INCLUDE_DEBUG_MAP
 
         currIndex++;
         function++;
@@ -205,7 +205,7 @@ void page_stack_draw(void) {
         // "OFFSET:"
         cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     line++;
 
@@ -241,7 +241,7 @@ void page_stack_input(void) {
         // Toggle whether to display function names.
         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.

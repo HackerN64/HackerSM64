@@ -23,7 +23,7 @@
 #include "game/main.h"
 #ifdef UNF
 #include "usb/debug.h"
-#endif
+#endif // UNF
 
 
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS]; // Crash screen threads.

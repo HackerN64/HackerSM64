@@ -18,27 +18,31 @@
 
 #include "page_disasm.h"
 
+#ifdef UNF
+#include "usb/debug.h"
+#endif // UNF
+
 
 const char* sValNames_branch_arrow[] = {
     [DISASM_ARROW_MODE_OFF      ] = "OFF",
     [DISASM_ARROW_MODE_SELECTION] = "SELECTION",
 #ifdef INCLUDE_DEBUG_MAP
     [DISASM_ARROW_MODE_FUNCTION ] = "FUNCTION",
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [DISASM_ARROW_MODE_OVERSCAN ] = "OVERSCAN", //! TODO: Implement this mode.
 };
 
 #ifdef INCLUDE_DEBUG_MAP
     #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_FUNCTION
-#else
+#else // !INCLUDE_DEBUG_MAP
     #define DISASM_ARROW_MODE_DEFAULT   DISASM_ARROW_MODE_SELECTION
-#endif
+#endif // !INCLUDE_DEBUG_MAP
 
 struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_HEADER_PAGE_DISASM  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASM",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_BINARY       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknown as binary",              .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_PSEUDOINSNS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
@@ -54,12 +58,12 @@ const enum ControlTypes cs_cont_list_disasm[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_CURSOR_VERTICAL,
     CONT_DESC_JUMP_TO_ADDRESS,
 #ifdef INCLUDE_DEBUG_MAP
     CONT_DESC_TOGGLE_FUNCTIONS,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     CONT_DESC_LIST_END,
 };
 
@@ -95,7 +99,7 @@ void reset_branch_buffer(Address funcAddr) {
 
     sBranchBufferCurrAddr = funcAddr;
 }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
 void page_disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
@@ -104,7 +108,7 @@ void page_disasm_init(void) {
     gFillBranchBuffer         = FALSE;
     sContinueFillBranchBuffer = FALSE;
     reset_branch_buffer((Address)NULL);
-#endif
+#endif // INCLUDE_DEBUG_MAP
 }
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -189,7 +193,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
 
     return FALSE;
 }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
 void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 printLine) {
     s32 numShownRows = sDisasmNumShownRows;
@@ -252,7 +256,7 @@ void disasm_draw_branch_arrows(u32 printLine) {
 
     osWritebackDCacheAll();
 }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
 static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
     const char* destFname = NULL;
@@ -269,7 +273,7 @@ static void print_as_insn(const u32 charX, const u32 charY, const Address addr, 
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
         );
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 }
 
 static void print_as_binary(const u32 charX, const u32 charY, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
@@ -350,7 +354,7 @@ void page_disasm_draw(void) {
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
     sDisasmNumShownRows = (20 - showCurrentSymbol);
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     sDisasmBranchStartX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET) +
                         cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)
@@ -386,7 +390,7 @@ void page_disasm_draw(void) {
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         disasm_draw_branch_arrows(line);
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, tc->pc);
 
@@ -439,7 +443,7 @@ static void disasm_move_down(void) {
 void page_disasm_input(void) {
 #ifdef INCLUDE_DEBUG_MAP
     Address oldPos = gSelectedAddress;
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     if (gCSDirectionFlags.pressed.up) {
         disasm_move_up();
@@ -489,7 +493,7 @@ void page_disasm_input(void) {
             sContinueFillBranchBuffer = FALSE;
         }
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 }
 
 

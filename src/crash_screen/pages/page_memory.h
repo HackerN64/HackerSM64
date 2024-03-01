@@ -11,7 +11,7 @@ enum CSSettingsGroup_page_memory {
     CS_OPT_HEADER_PAGE_MEMORY,
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_MEMORY_SHOW_SYMBOL,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     CS_OPT_MEMORY_AS_ASCII,
     CS_OPT_END_MEMORY,
 };

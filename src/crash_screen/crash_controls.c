@@ -16,7 +16,7 @@
 
 #ifdef UNF
 #include "usb/debug.h"
-#endif
+#endif // UNF
 
 
 struct CSSetting cs_settings_group_controls[] = {
@@ -68,13 +68,13 @@ const ControlType gCSControlDescriptions[] = {
     [CONT_DESC_TOGGLE_ASCII     ] = { .control = STR_B,                                     .description = "toggle bytes as hex or ascii",      },
 #ifdef INCLUDE_DEBUG_MAP
     [CONT_DESC_TOGGLE_FUNCTIONS ] = { .control = STR_B,                                     .description = "toggle function names",             },
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [CONT_DESC_CYCLE_FLOATS_MODE] = { .control = STR_B,                                     .description = "toggle floats mode",                },
     [CONT_DESC_CHANGE_SETTING   ] = { .control = STR_A"/"STR_B"/"STR_LEFT"/"STR_RIGHT,      .description = "change selected setting",           },
     [CONT_DESC_RESET_SETTING    ] = { .control = STR_A"+"STR_B,                             .description = "reset selected setting to default", },
 #ifdef UNF
     [CONT_DESC_OS_PRINT         ] = { .control = STR_Z"+"STR_START,                         .description = "print page to developer console",   },
-#endif
+#endif // UNF
 };
 
 
@@ -240,7 +240,7 @@ void cs_update_input(void) {
         gCSCompositeController->buttonPressed &= ~START_BUTTON;
         cs_os_print_page(page);
     }
-#endif
+#endif // UNF
 
     if ((gCSPopupID == CS_POPUP_NONE) && !gCSSwitchedPopup) {
         if (

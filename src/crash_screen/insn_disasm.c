@@ -702,9 +702,9 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
                             }
                         }
                     }
-#else
+#else // !INCLUDE_DEBUG_MAP
                     *fname = NULL;
-#endif
+#endif // !INCLUDE_DEBUG_MAP
                     ADD_STR(STR_FUNCTION, target);
                     break;
                 default: // Unknown parameter.

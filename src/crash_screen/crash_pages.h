@@ -9,7 +9,7 @@
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
 #include "pages/page_map.h"
-#endif
+#endif // INCLUDE_DEBUG_MAP
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
 #include "pages/page_settings.h"
@@ -25,7 +25,7 @@ enum CSPages {
     PAGE_STACK_TRACE,
 #ifdef INCLUDE_DEBUG_MAP
     PAGE_MAP_VIEWER,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
     PAGE_SETTINGS,

@@ -11,7 +11,7 @@ enum CSSettingsGroup_page_context {
     CS_OPT_HEADER_PAGE_CONTEXT,
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_CONTEXT_PARSE_REG,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     CS_OPT_CONTEXT_FLOATS_FMT,
     CS_OPT_END_CONTEXT,
 };

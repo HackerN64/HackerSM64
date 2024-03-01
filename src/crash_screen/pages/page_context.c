@@ -16,14 +16,14 @@
 
 #ifdef UNF
 #include "usb/debug.h"
-#endif
+#endif // UNF
 
 
 struct CSSetting cs_settings_group_page_context[] = {
     [CS_OPT_HEADER_PAGE_CONTEXT ] = { .type = CS_OPT_TYPE_HEADER,  .name = "CONTEXT",                        .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_CONTEXT_PARSE_REG   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
     [CS_OPT_END_CONTEXT         ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -35,7 +35,7 @@ const enum ControlTypes cs_cont_list_context[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_CYCLE_FLOATS_MODE,
     CONT_DESC_LIST_END,
 };
@@ -167,7 +167,7 @@ void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_PARSE_REG)) {
         symbol = get_map_symbol(val, SYMBOL_SEARCH_BACKWARD);
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     if (symbol != NULL) {
         // "[symbol name]"
@@ -336,7 +336,7 @@ void page_context_draw(void) {
     );
     cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
     line++;
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     line = cs_context_print_registers(line, tc);
     line++;

@@ -30,7 +30,7 @@ CSSetting cs_settings_group_global[] = {
     [CS_OPT_GLOBAL_DRAW_SCREENSHOT      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show screenshot background",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GLOBAL_SYMBOL_NAMES         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Print symbol names",             .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_GLOBAL_PRINT_SCROLL_SPEED   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Text scroll speed",              .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
     [CS_OPT_END_GLOBAL                  ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -45,7 +45,7 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_PAGE_STACK  ] = { .name = "STACK",    .list = cs_settings_group_page_stack,   },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_MAP    ] = { .name = "MAP",      .list = cs_settings_group_page_map,     },
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_MEMORY ] = { .name = "RAM VIEW", .list = cs_settings_group_page_memory,  },
     [CS_OPT_GROUP_PAGE_DISASM ] = { .name = "DISASM",   .list = cs_settings_group_page_disasm,  },
 };

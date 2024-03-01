@@ -16,6 +16,10 @@
 
 #include "page_map.h"
 
+#ifdef UNF
+#include "usb/debug.h"
+#endif // UNF
+
 
 #ifdef INCLUDE_DEBUG_MAP
 
@@ -34,7 +38,7 @@ const enum ControlTypes cs_cont_list_map[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_LIST_END,
@@ -186,13 +190,39 @@ void page_map_input(void) {
     sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
 
+void page_map_print(void) {
+    debug_printf("\n");
+    debug_printf("SECTION:\n");
+
+    u32 currIndex = sMapViewerViewportIndex;
+    const MapSymbol* symbol = &gMapSymbols[currIndex];
+
+    for (u32 i = 0; i < MAP_VIEWER_NUM_ROWS; i++) {
+        if (currIndex >= gNumMapSymbols) {
+            break;
+        }
+
+        if (symbol == NULL) {
+            break;
+        }
+
+        const char* name = get_map_symbol_name(symbol);
+        if (name != NULL) {
+            debug_printf("- [%08X]: %s [TYPE: %c] (SIZE: 0x%X)\n", symbol->addr, name, symbol->type, symbol->size);
+        }
+
+        currIndex++;
+        symbol++;
+    }
+}
+
 
 struct CSPage gCSPage_map = {
     .name         = "MAP VIEW",
     .initFunc     = page_map_init,
     .drawFunc     = page_map_draw,
     .inputFunc    = page_map_input,
-    .printFunc    = NULL,
+    .printFunc    = page_map_print,
     .contList     = cs_cont_list_map,
     .settingsList = cs_settings_group_page_map,
     .flags = {

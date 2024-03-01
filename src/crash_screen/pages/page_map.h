@@ -25,4 +25,4 @@ enum CSSettingsGroup_page_map {
 extern struct CSSetting cs_settings_group_page_map[];
 extern struct CSPage gCSPage_map;
 
-#endif
+#endif // INCLUDE_DEBUG_MAP

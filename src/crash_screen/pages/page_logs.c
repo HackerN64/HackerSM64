@@ -20,7 +20,7 @@
 #include "game/puppyprint.h"
 #ifdef UNF
 #include "usb/debug.h"
-#endif
+#endif // UNF
 
 
 struct CSSetting cs_settings_group_page_logs[] = {
@@ -36,7 +36,7 @@ const enum ControlTypes cs_cont_list_logs[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_LIST_END,
 };
@@ -165,7 +165,7 @@ void draw_logs_section(u32 line, u32 numLines) {
 
     osWritebackDCacheAll();
 }
-#endif
+#endif // PUPPYPRINT_DEBUG
 
 void page_logs_draw(void) {
     u32 line = 2;

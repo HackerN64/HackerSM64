@@ -12,7 +12,7 @@ enum CSDisasmBranchArrowModes {
     DISASM_ARROW_MODE_SELECTION,
 #ifdef INCLUDE_DEBUG_MAP
     DISASM_ARROW_MODE_FUNCTION,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     DISASM_ARROW_MODE_OVERSCAN,
 };
 
@@ -20,7 +20,7 @@ enum CSSettingsGroup_page_disasm {
     CS_OPT_HEADER_PAGE_DISASM,
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_DISASM_SHOW_SYMBOL,
-#endif
+#endif // INCLUDE_DEBUG_MAP
     CS_OPT_DISASM_BINARY,
     CS_OPT_DISASM_PSEUDOINSNS,
     CS_OPT_DISASM_IMM_FMT,
@@ -53,7 +53,7 @@ typedef struct BranchArrow {
 
 #ifdef INCLUDE_DEBUG_MAP
 extern _Bool gFillBranchBuffer;
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
 
 extern struct CSSetting cs_settings_group_page_disasm[];

@@ -16,14 +16,14 @@
 
 #ifdef UNF
 #include "usb/debug.h"
-#endif
+#endif // UNF
 
 
 struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "RAM VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_AS_ASCII     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show data as ascii",             .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_END_MEMORY          ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -35,7 +35,7 @@ const enum ControlTypes cs_cont_list_memory[] = {
     CONT_DESC_CYCLE_DRAW,
 #ifdef UNF
     CONT_DESC_OS_PRINT,
-#endif
+#endif // UNF
     CONT_DESC_CURSOR,
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_TOGGLE_ASCII,
@@ -49,7 +49,7 @@ static u32 sRamViewNumShownRows = 19;
 static const char gHex[0x10] = "0123456789ABCDEF";
 #ifdef UNF
 static u32 sMemoryViewData[20][4];
-#endif
+#endif // UNF
 
 
 void page_memory_init(void) {
@@ -139,7 +139,7 @@ void page_memory_draw(void) {
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
     sRamViewNumShownRows = (19 - showCurrentSymbol);
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     u32 line = 1;
 
@@ -168,7 +168,7 @@ void page_memory_draw(void) {
 
         cs_draw_divider(DIVIDER_Y(line));
     }
-#endif
+#endif // INCLUDE_DEBUG_MAP
 
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
 
@@ -274,7 +274,7 @@ void page_memory_print(void) {
     Address startAddr = sRamViewViewportIndex;
     Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
-    debug_printf("- (%08X-%08X):\n", startAddr, endAddr);
+    debug_printf("- SECTION: [%08X-%08X]\n", startAddr, endAddr);
 
     for (u32 row = 0; row < sRamViewNumShownRows; row++) {
         debug_printf("- [%08X]:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
