@@ -435,9 +435,9 @@ void append_puppyprint_log(const char *str, ...) {
     osSyncPrintf(textBytes);
 #endif
     for (u8 i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
-        memcpy(consoleLogTable[i], consoleLogTable[i + 1], sizeof(consoleLogTable[0]));
+        memcpy(consoleLogTable[i], consoleLogTable[i + 1], LOG_MESSAGE_SIZE);
     }
-    memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, sizeof(consoleLogTable[0]));
+    memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, LOG_MESSAGE_SIZE);
     gConsoleLogLastIndex++;
     va_end(arguments);
 }
