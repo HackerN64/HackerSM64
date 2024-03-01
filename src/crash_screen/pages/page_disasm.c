@@ -260,7 +260,7 @@ void disasm_draw_branch_arrows(u32 printLine) {
 
 static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
     const char* destFname = NULL;
-    const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname);
+    const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, TRUE);
 
     // "[instruction name] [params]"
     cs_print(charX, charY, "%s", insnAsStr);
@@ -313,7 +313,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             cs_draw_row_selection_box(charY);
         }
 
-        Word data = 0;
+        Word data = 0x00000000;
         if (!try_read_data(&data, addr)) {
             cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else if (is_in_code_segment(addr)) {
@@ -496,13 +496,50 @@ void page_disasm_input(void) {
 #endif // INCLUDE_DEBUG_MAP
 }
 
+void page_disasm_print(void) {
+#ifdef UNF
+    debug_printf("\n");
+
+    Address startAddr = sDisasmViewportIndex;
+    Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
+
+    debug_printf("SECTION: [%08X-%08X]\n", startAddr, endAddr);
+
+    for (u32 y = 0; y < sDisasmNumShownRows; y++) {
+        Address addr = (startAddr + (y * PAGE_DISASM_STEP));
+        debug_printf("- [%08X]: ", addr);
+        Word data = 0x00000000;
+        if (!try_read_data(&data, addr)) {
+            debug_printf("*");
+        } else if (is_in_code_segment(addr)) {
+            const char* destFname = NULL;
+            const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, FALSE);
+
+            debug_printf("%s", insnAsStr);
+ #ifdef INCLUDE_DEBUG_MAP
+            if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
+                debug_printf("%s", destFname);
+            }
+ #endif // INCLUDE_DEBUG_MAP
+            if (addr == gCrashedThread->context.pc) {
+                debug_printf("<-- CRASH");
+            }
+        } else { // Outside of code segments:
+            debug_printf(STR_HEX_WORD, data);
+        }
+
+        debug_printf("\n");
+    }
+#endif // UNF
+}
+
 
 struct CSPage gCSPage_disasm = {
     .name         = "DISASM",
     .initFunc     = page_disasm_init,
     .drawFunc     = page_disasm_draw,
     .inputFunc    = page_disasm_input,
-    .printFunc    = NULL,
+    .printFunc    = page_disasm_print,
     .contList     = cs_cont_list_disasm,
     .settingsList = cs_settings_group_page_disasm,
     .flags = {

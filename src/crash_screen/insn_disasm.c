@@ -543,8 +543,8 @@ static char cop1_fmt_to_char(InsnData insn) {
  * @param[in,out] oldColor The previous color. Gets set to 'newColor' if they are different.
  * @param[in    ] newColor The new color to add to the string.
  */
-static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor) {
-    if (*oldColor != newColor) {
+static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor, _Bool format) {
+    if (format && (*oldColor != newColor)) {
         *oldColor = newColor;
         *strp += sprintf(*strp, STR_COLOR_PREFIX, newColor);
     }
@@ -570,7 +570,7 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_FREG                "F%02d"                         // Float Register
 
 
-#define ADD_COLOR(c) cs_insn_param_check_color_change(&strp, &color, (c))
+#define ADD_COLOR(c) cs_insn_param_check_color_change(&strp, &color, (c), format);
 #define ADD_STR(...) strp += sprintf(strp, __VA_ARGS__);
 
 
@@ -582,7 +582,7 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
  * @param[out] fname If the instruction points
  * @return char* The formatted string in insn_as_string.
  */
-char* cs_insn_to_string(Address addr, InsnData insn, const char** fname) {
+char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool format) {
     char* strp = &insn_as_string[0];
     _Bool unimpl = FALSE;
 

@@ -208,7 +208,7 @@ void page_map_print(void) {
 
         const char* name = get_map_symbol_name(symbol);
         if (name != NULL) {
-            debug_printf("- [%08X]: %s [TYPE: %c] (SIZE: 0x%X)\n", symbol->addr, name, symbol->type, symbol->size);
+            debug_printf("- [%08X]: %s [TYPE: \'%c\'] (SIZE: 0x%X)\n", symbol->addr, name, symbol->type, symbol->size);
         }
 
         currIndex++;
