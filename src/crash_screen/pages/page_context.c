@@ -13,6 +13,7 @@
 #include "crash_screen/memory_read.h"
 
 #include "page_context.h"
+
 #ifdef UNF
 #include "usb/debug.h"
 #endif
@@ -32,6 +33,9 @@ const enum ControlTypes cs_cont_list_context[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif
     CONT_DESC_CYCLE_FLOATS_MODE,
     CONT_DESC_LIST_END,
 };

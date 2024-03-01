@@ -16,6 +16,10 @@
 
 #include "segment_symbols.h"
 
+#ifdef UNF
+#include "usb/debug.h"
+#endif
+
 
 struct CSSetting cs_settings_group_page_stack[] = {
     [CS_OPT_HEADER_PAGE_STACK   ] = { .type = CS_OPT_TYPE_HEADER,  .name = "STACK TRACE",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -29,6 +33,9 @@ const enum ControlTypes cs_cont_list_stack[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_JUMP_TO_ADDRESS,
 #ifdef INCLUDE_DEBUG_MAP
@@ -244,13 +251,20 @@ void page_stack_input(void) {
     sStackTraceViewportIndex = cs_clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
 
+void page_stack_print(void) {
+    for (u32 i = 0; i < sCSNumFoundFunctions; i++) {
+        FunctionInStack* function = &sCSFunctionStackBuffer[i];
+        debug_printf("%08X +%04X %s\n", function->curAddr, (function->curAddr - function->faddr), function->fname);
+    }
+}
+
 
 struct CSPage gCSPage_stack = {
     .name         = "STACK TRACE",
     .initFunc     = page_stack_init,
     .drawFunc     = page_stack_draw,
     .inputFunc    = page_stack_input,
-    .printFunc    = NULL,
+    .printFunc    = page_stack_print,
     .contList     = cs_cont_list_stack,
     .settingsList = cs_settings_group_page_stack,
     .flags = {

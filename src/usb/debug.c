@@ -973,7 +973,7 @@ extern const char* __n64Assert_Message;
             debug_printf(">\n");
         }
 
-        void debug_printcontext(void* threadPtr) {
+        void debug_printcontext(void* threadPtr) { // Used for crash screen context page.
             OSThread* thread = (OSThread*)threadPtr;
             __OSThreadContext* context = &thread->context;
             

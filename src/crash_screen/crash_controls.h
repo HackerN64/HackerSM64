@@ -6,6 +6,7 @@
 
 #include "game/input.h"
 
+#include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_settings.h"
 
 
@@ -61,6 +62,9 @@ enum ControlTypes {
     CONT_DESC_CYCLE_FLOATS_MODE,
     CONT_DESC_CHANGE_SETTING,
     CONT_DESC_RESET_SETTING,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif
     NUM_CONT_DESC,
 };
 
@@ -81,4 +85,5 @@ extern struct CSPopup gCSPopup_controls;
 
 
 u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
+void print_page_unf(CSPage* page);
 void cs_update_input(void);

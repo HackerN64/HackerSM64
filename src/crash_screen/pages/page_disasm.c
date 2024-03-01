@@ -52,6 +52,9 @@ const enum ControlTypes cs_cont_list_disasm[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif
     CONT_DESC_CURSOR_VERTICAL,
     CONT_DESC_JUMP_TO_ADDRESS,
 #ifdef INCLUDE_DEBUG_MAP

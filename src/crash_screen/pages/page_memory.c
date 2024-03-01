@@ -29,6 +29,9 @@ const enum ControlTypes cs_cont_list_memory[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_CYCLE_DRAW,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif
     CONT_DESC_CURSOR,
     CONT_DESC_JUMP_TO_ADDRESS,
     CONT_DESC_TOGGLE_ASCII,

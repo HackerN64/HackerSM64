@@ -14,6 +14,10 @@
 
 #include "pages/page_stack.h"
 
+#ifdef UNF
+#include "usb/debug.h"
+#endif
+
 
 struct CSSetting cs_settings_group_controls[] = {
     [CS_OPT_HEADER_CONTROLS             ] = { .type = CS_OPT_TYPE_HEADER,  .name = "CONTROLS",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -68,6 +72,9 @@ const ControlType gCSControlDescriptions[] = {
     [CONT_DESC_CYCLE_FLOATS_MODE] = { .control = STR_B,                                     .description = "toggle floats mode",                },
     [CONT_DESC_CHANGE_SETTING   ] = { .control = STR_A"/"STR_B"/"STR_LEFT"/"STR_RIGHT,      .description = "change selected setting",           },
     [CONT_DESC_RESET_SETTING    ] = { .control = STR_A"+"STR_B,                             .description = "reset selected setting to default", },
+#ifdef UNF
+    [CONT_DESC_OS_PRINT         ] = { .control = STR_Z"+"STR_START,                         .description = "print page to developer console",   },
+#endif
 };
 
 
@@ -182,6 +189,22 @@ _Bool cs_check_switch_page_input(void) {
     return TRUE;
 }
 
+void print_page_unf(CSPage* page) {
+#ifndef UNF
+    return;
+#endif
+    if (page->printFunc != NULL) {
+        // debug_printf("---------------\n");
+        // const char* name = page->name;
+        // if (name != NULL) {
+        //     debug_printf("%s:", page->name);
+        // }
+        page->printFunc();
+    } else {
+        debug_printf("This page has no UNF print function.\n");
+    }
+}
+
 // Global crash screen input function.
 void cs_update_input(void) {
     CSPage* page = gCSPages[gCSPageID];
@@ -212,15 +235,18 @@ void cs_update_input(void) {
 #ifdef UNF
     if (
         (gCSCompositeController->buttonDown & Z_TRIG) &&
-        (gCSCompositeController->buttonPressed & START_BUTTON) &&
-        (page->printFunc != NULL)
+        (gCSCompositeController->buttonPressed & START_BUTTON)
     ) {
-        page->printFunc();
+        gCSCompositeController->buttonPressed &= ~START_BUTTON;
+        print_page_unf(page);
     }
 #endif
 
     if ((gCSPopupID == CS_POPUP_NONE) && !gCSSwitchedPopup) {
-        if (gCSCompositeController->buttonPressed & START_BUTTON) {
+        if (
+            !(gCSCompositeController->buttonDown & Z_TRIG) &&
+            (gCSCompositeController->buttonPressed & START_BUTTON)
+        ) {
             cs_open_popup(CS_POPUP_CONTROLS);
         }
     }
