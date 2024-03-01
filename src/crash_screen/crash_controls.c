@@ -189,22 +189,21 @@ _Bool cs_check_switch_page_input(void) {
     return TRUE;
 }
 
+#ifdef UNF
 // Prints a page's data to the developer console.
 void cs_os_print_page(CSPage* page) {
-#ifndef UNF
-    return;
-#endif // UNF
-    // debug_printf("---------------\n");
-    // const char* name = page->name;
-    // if (name != NULL) {
-    //     debug_printf("%s:", page->name);
-    // }
     if (page->printFunc != NULL) {
+        debug_printf("---\n");
+        const char* name = page->name;
+        if (name != NULL) {
+            debug_printf("%s:\n", page->name);
+        }
         page->printFunc();
     } else {
         debug_printf("%s has no print function.\n", page->name);
     }
 }
+#endif // UNF
 
 // Global crash screen input function.
 void cs_update_input(void) {

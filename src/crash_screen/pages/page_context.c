@@ -329,7 +329,7 @@ void page_context_draw(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    // "IN FUNC:"
+    // "FUNC: [function name]"
     charX = cs_print(TEXT_X(0), TEXT_Y(line),
         STR_COLOR_PREFIX"FUNC:\t",
         COLOR_RGBA32_CRASH_AT
@@ -354,19 +354,33 @@ void page_context_input(void) {
 }
 
 void page_context_print(void) {
-    // debug_printf("---------------\n");
 #ifdef UNF
- #ifdef INCLUDE_DEBUG_MAP
+    debug_printf("\n");
     __OSThreadContext* tc = &gCrashedThread->context;
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        const char* fname = get_map_symbol_name(symbol);
-        if (fname != NULL) {
-            osSyncPrintf("func: %s\n", fname); //! TODO: only the name itself is printed.
+    const char* desc = get_cause_desc(tc->cause);
+    if (desc != NULL) {
+        debug_printf("- CAUSE: %s\n", desc);
+    }
+    enum ThreadID threadID = gCrashedThread->id;
+    debug_printf("- THREAD: %d", threadID);
+    if (threadID < NUM_THREADS) {
+        const char* threadName = get_thread_name_from_id(threadID);
+
+        if (threadName != NULL) {
+            // "(thread name)"
+            debug_printf(" (%s)", threadName);
         }
     }
+    debug_printf("\n");
+ #ifdef INCLUDE_DEBUG_MAP
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        debug_printf("- FUNC: %s\n", get_map_symbol_name(symbol));
+    }
  #endif // INCLUDE_DEBUG_MAP
-    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Or is this an issue with UNF itself?
+    //! TODO: registers
+    //! TODO: fpcsr
+    //! TODO: float registers
 #endif // UNF
 }
 

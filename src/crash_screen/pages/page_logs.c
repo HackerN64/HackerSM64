@@ -18,6 +18,9 @@
 #include "game/assert.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"
+#ifdef UNF
+#include "usb/debug.h"
+#endif
 
 
 struct CSSetting cs_settings_group_page_logs[] = {
@@ -49,7 +52,11 @@ void page_logs_init(void) {
     sLogViewportIndex = 0;
 
     sLogNumShownRows = LOG_BUFFER_SIZE;
-    sLogTotalRows    = LOG_BUFFER_SIZE;
+#ifdef PUPPYPRINT_DEBUG
+    sLogTotalRows = MIN(gConsoleLogLastIndex, (u32)LOG_BUFFER_SIZE);
+#else // !PUPPYPRINT_DEBUG
+    sLogTotalRows = LOG_BUFFER_SIZE;
+#endif // !PUPPYPRINT_DEBUG
 }
 
 // Draws the red background for the assert section.
@@ -170,18 +177,17 @@ void page_logs_draw(void) {
 #ifdef PUPPYPRINT_DEBUG
         line++;
         cs_draw_divider(DIVIDER_Y(line));
-#else
+#else // !PUPPYPRINT_DEBUG
     } else {
         cs_print(TEXT_X(0), TEXT_Y(line), "No log or assert data.");
-#endif
+#endif // !PUPPYPRINT_DEBUG
     }
 
 #ifdef PUPPYPRINT_DEBUG
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
-    sLogTotalRows = MIN(gConsoleLogLastIndex, (u32)LOG_BUFFER_SIZE);
 
     draw_logs_section(line, sLogNumShownRows);
-#endif
+#endif // PUPPYPRINT_DEBUG
 
     gCSWordWrap = FALSE;
 
@@ -207,13 +213,42 @@ void page_logs_input(void) {
     }
 }
 
+void page_logs_print(void) {
+    debug_printf("\n");
+    if (__n64Assert_Message != NULL) {
+        debug_printf(
+            "- ASSERT: \n-- FILE: %s in LINE: %d\n-- CONDITION: %s\n-- MESSAGE: \"%s\"\n",
+            __n64Assert_Filename,
+            __n64Assert_LineNum,
+            __n64Assert_Condition,
+            __n64Assert_Message
+        );
+    }
+#ifdef PUPPYPRINT_DEBUG
+    debug_printf("- PUPPYPRINT LOG:\n");
+    for (u32 i = 0; i < sLogTotalRows; i++) {
+        char* entry = consoleLogTable[(LOG_BUFFER_SIZE - 1) - i];
+
+        if (entry[0] == CHAR_NULL) {
+            break;
+        }
+
+        debug_printf("-- %i: %s\n", ((gConsoleLogLastIndex - 1) - i), entry);
+    }
+#else // !PUPPYPRINT_DEBUG
+    else {
+        debug_printf("- No log or assert data.\n");
+    }
+#endif // !PUPPYPRINT_DEBUG
+}
+
 
 struct CSPage gCSPage_logs = {
     .name         = "LOGS",
     .initFunc     = page_logs_init,
     .drawFunc     = page_logs_draw,
     .inputFunc    = page_logs_input,
-    .printFunc    = NULL,
+    .printFunc    = page_logs_print,
     .contList     = cs_cont_list_logs,
     .settingsList = cs_settings_group_page_logs,
     .flags = {

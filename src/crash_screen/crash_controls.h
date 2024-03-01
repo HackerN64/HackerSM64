@@ -85,5 +85,9 @@ extern struct CSPopup gCSPopup_controls;
 
 
 u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRows, const u32 step);
+#ifdef UNF
 void cs_os_print_page(CSPage* page);
+#else // !UNF
+#define cs_os_print_page(page)
+#endif // !UNF
 void cs_update_input(void);

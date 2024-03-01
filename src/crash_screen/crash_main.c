@@ -182,7 +182,17 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     gSelectedAddress = tc->pc;
 
 #ifdef UNF
-    cs_os_print_page(gCSPages[gCSPageID]);
+ #ifdef INCLUDE_DEBUG_MAP
+    // __OSThreadContext* tc = &gCrashedThread->context;
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        const char* fname = get_map_symbol_name(symbol);
+        if (fname != NULL) {
+            osSyncPrintf("func: %s\n", fname); //! TODO: only the name itself is printed.
+        }
+    }
+ #endif // INCLUDE_DEBUG_MAP
+    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Or is this an issue with UNF itself?
 #endif // UNF
 }
 

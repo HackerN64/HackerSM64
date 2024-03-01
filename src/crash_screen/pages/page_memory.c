@@ -144,7 +144,7 @@ void page_memory_draw(void) {
     u32 line = 1;
 
     Address startAddr = sRamViewViewportIndex;
-    Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP);
+    Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
     cs_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
@@ -269,19 +269,20 @@ void page_memory_input(void) {
 
 void page_memory_print(void) {
 #ifdef UNF
-    debug_printf("---------------\n");
-    debug_printf("%s:\n", gCSPages[gCSPageID]->name);
+    debug_printf("\n");
 
     Address startAddr = sRamViewViewportIndex;
-    Address endAddr = startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP);
+    Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
-    debug_printf("(%08X-%08X):\n", startAddr, endAddr);
+    debug_printf("- (%08X-%08X):\n", startAddr, endAddr);
 
     for (u32 row = 0; row < sRamViewNumShownRows; row++) {
-        debug_printf("%08X:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
+        debug_printf("- [%08X]:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
+
         for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
             debug_printf(" %08X", sMemoryViewData[row][wordOffset]);
         }
+
         debug_printf("\n");
     }
 #endif // UNF

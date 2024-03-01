@@ -253,8 +253,7 @@ void page_stack_input(void) {
 
 void page_stack_print(void) {
 #ifdef UNF
-    debug_printf("---------------\n");
-    debug_printf("%s:\n", gCSPages[gCSPageID]->name);
+    debug_printf("\n");
 
     for (u32 i = 0; i < sCSNumFoundFunctions; i++) {
         FunctionInStack* function = &sCSFunctionStackBuffer[i];
@@ -263,10 +262,10 @@ void page_stack_print(void) {
             break;
         }
 
-        debug_printf("%08X: %08X +%04X", function->stackAddr, function->faddr, (function->curAddr - function->faddr));
+        debug_printf("- [%08X]: %08X +%04X", function->stackAddr, function->faddr, (function->curAddr - function->faddr));
  #ifdef INCLUDE_DEBUG_MAP
         if (function->fname != NULL) {
-            debug_printf(" %s", function->fname);
+            debug_printf(" - %s", function->fname);
         }
  #endif // INCLUDE_DEBUG_MAP
         debug_printf("\n");
