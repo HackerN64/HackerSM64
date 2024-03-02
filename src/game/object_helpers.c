@@ -26,7 +26,6 @@
 #include "rendering_graph_node.h"
 #include "spawn_object.h"
 #include "spawn_sound.h"
-#include "puppylights.h"
 
 static s32 clear_move_flag(u32 *bitSet, s32 flag);
 
@@ -469,16 +468,16 @@ void obj_set_gfx_pos_from_pos(struct Object *obj) {
 }
 
 void obj_init_animation(struct Object *obj, s32 animIndex) {
-    struct Animation **anims = o->oAnimations;
+    struct Animation **anims = obj->oAnimations;
     geo_obj_init_animation(&obj->header.gfx, &anims[animIndex]);
 }
 
 void obj_apply_scale_to_transform(struct Object *obj) {
     Vec3f scale;
     vec3f_copy(scale, obj->header.gfx.scale);
-    vec3_mul_val(obj->transform[0], scale[0]);
-    vec3_mul_val(obj->transform[1], scale[1]);
-    vec3_mul_val(obj->transform[2], scale[2]);
+    vec3_scale(obj->transform[0], scale[0]);
+    vec3_scale(obj->transform[1], scale[1]);
+    vec3_scale(obj->transform[2], scale[2]);
 }
 
 void obj_copy_scale(struct Object *dst, struct Object *src) {
@@ -878,9 +877,6 @@ s32 cur_obj_clear_interact_status_flag(s32 flag) {
  * Mark an object to be unloaded at the end of the frame.
  */
 void obj_mark_for_deletion(struct Object *obj) {
-#ifdef PUPPYLIGHTS
-    obj_disable_light(obj);
-#endif
     //! This clears all activeFlags. Since some of these flags disable behavior,
     //  setting it to 0 could potentially enable unexpected behavior. After an
     //  object is marked for deletion, it still updates on that frame (I think),
@@ -1042,6 +1038,14 @@ static void cur_obj_move_update_ground_air_flags(UNUSED f32 gravity, f32 bouncin
         if (clear_move_flag(&o->oMoveFlags, OBJ_MOVE_ON_GROUND)) {
             o->oMoveFlags |= OBJ_MOVE_LEFT_GROUND;
         }
+    }
+
+    o->oMoveFlags &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER);
+    if (o->oFloorType == SURFACE_BURNING) {
+        o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
+    } else if ((o->oFloorType == SURFACE_DEATH_PLANE) || (o->oFloorType == SURFACE_VERTICAL_WIND)) {
+        //! This maybe misses SURFACE_WARP
+        o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
     }
 
     o->oMoveFlags &= ~OBJ_MOVE_MASK_IN_WATER;
@@ -1372,13 +1376,6 @@ static void cur_obj_update_floor(void) {
 
     if (floor != NULL) {
         SurfaceType floorType = floor->type;
-        if (floorType == SURFACE_BURNING) {
-            o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
-        } else if ((floorType == SURFACE_DEATH_PLANE) || (floorType == SURFACE_VERTICAL_WIND)) {
-            //! This maybe misses SURFACE_WARP
-            o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
-        }
-
         o->oFloorType = floorType;
         o->oFloorRoom = floor->room;
     } else {
@@ -1388,8 +1385,6 @@ static void cur_obj_update_floor(void) {
 }
 
 static void cur_obj_update_floor_and_resolve_wall_collisions(s16 steepSlopeDegrees) {
-    o->oMoveFlags &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER);
-
     if (o->activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         cur_obj_update_floor();
         o->oMoveFlags &= ~(OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER);

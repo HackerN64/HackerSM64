@@ -104,12 +104,12 @@ static void chain_chomp_update_chain_segments(void) {
         // Cap distance to previous chain part (so that the tail follows the chomp)
         Vec3f offset;
         vec3f_diff(offset, segment->pos, prevSegment->pos);
-        vec3_normalize_max(offset, o->oChainChompMaxDistBetweenChainParts);
+        vec3_set_max_dist(offset, o->oChainChompMaxDistBetweenChainParts);
 
         // Cap distance to pivot (so that it stretches when the chomp moves far from the wooden post)
         vec3f_add(offset, prevSegment->pos);
         f32 maxTotalDist = o->oChainChompMaxDistFromPivotPerChainPart * (CHAIN_CHOMP_NUM_SEGMENTS - i);
-        vec3_normalize_max(offset, maxTotalDist);
+        vec3_set_max_dist(offset, maxTotalDist);
 
         vec3f_copy(segment->pos, offset);
     }
@@ -365,7 +365,7 @@ static void chain_chomp_act_move(void) {
             f32 ratio = maxDistToPivot / o->oChainChompDistToPivot;
             o->oChainChompDistToPivot = maxDistToPivot;
 
-            vec3_mul_val(o->oChainChompSegments[0].pos, ratio);
+            vec3_scale(o->oChainChompSegments[0].pos, ratio);
 
             if (o->oChainChompReleaseStatus == CHAIN_CHOMP_NOT_RELEASED) {
                 // Restrict chain chomp position
