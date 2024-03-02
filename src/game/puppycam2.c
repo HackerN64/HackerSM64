@@ -223,7 +223,6 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
     f32 tempProgress[2] = {0.0f, 0.0f};
     f32 progChange = 0.0f;
     s32 i;
-    Vec3f prevPos;
 
     if (gPuppyCam.splineIndex == 65000) {
         gPuppyCam.splineIndex = index;
@@ -236,7 +235,6 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
             return TRUE;
         }
     }
-    vec3f_set(prevPos, gPuppyCam.pos[0], gPuppyCam.pos[1], gPuppyCam.pos[2]);
 
     for (i = 0; i < 4; i++) {
         vec3f_set(tempPoints[i], splinePos[gPuppyCam.splineIndex + i].pos[0], splinePos[gPuppyCam.splineIndex + i].pos[1], splinePos[gPuppyCam.splineIndex + i].pos[2]);
@@ -288,19 +286,23 @@ static void puppycam_process_cutscene(void) {
 #define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
 
 static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
-    gDPSetCombineMode(gDisplayListHead++, BLANK, BLANK);
-    gDPSetCycleType(  gDisplayListHead++, G_CYC_1CYCLE);
+    Gfx *tempGfxHead = gDisplayListHead;
+
+    gDPSetCombineMode(tempGfxHead++, BLANK, BLANK);
+    gDPSetCycleType(  tempGfxHead++, G_CYC_1CYCLE);
     if (a !=255) {
-        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+        gDPSetRenderMode(tempGfxHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     } else {
-        gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF);
+        gDPSetRenderMode(tempGfxHead++, G_RM_OPA_SURF, G_RM_OPA_SURF);
     }
-    gDPSetEnvColor(   gDisplayListHead++, r, g, b, a);
-    gDPFillRectangle( gDisplayListHead++, x1, y1, x2, y2);
-    gDPPipeSync(      gDisplayListHead++);
-    gDPSetEnvColor(   gDisplayListHead++, 255, 255, 255, 255);
-    gDPSetCycleType(  gDisplayListHead++, G_CYC_1CYCLE);
-    gSPDisplayList(   gDisplayListHead++,dl_hud_img_end);
+    gDPSetEnvColor(   tempGfxHead++, r, g, b, a);
+    gDPFillRectangle( tempGfxHead++, x1, y1, x2, y2);
+    gDPPipeSync(      tempGfxHead++);
+    gDPSetEnvColor(   tempGfxHead++, 255, 255, 255, 255);
+    gDPSetCycleType(  tempGfxHead++, G_CYC_1CYCLE);
+    gSPDisplayList(   tempGfxHead++,dl_hud_img_end);
+
+    gDisplayListHead = tempGfxHead;
 }
 
 //I actually took the time to redo this, properly. Lmao. Please don't bully me over this anymore :(
@@ -680,7 +682,6 @@ static void puppycam_input_hold_preset2(f32 ivX) {
 
 // Another alternative control scheme. This one aims to mimic the parallel camera scheme down to the last bit from the original game.
 static void puppycam_input_hold_preset3(f32 ivX) {
-    f32 stickMag[2] = {gPlayer1Controller->rawStickX*0.65f, gPlayer1Controller->rawStickY*0.2f};
     // Just in case it happens to be nonzero.
     gPuppyCam.yawAcceleration = 0;
 
@@ -1374,7 +1375,7 @@ static void puppycam_collision(void) {
     vec3f_normalize(dirToCam);
     // Get the vector from mario's head to the camera plus the extra check dist
     Vec3f vecToCam;
-    vec3_prod_val(vecToCam, dirToCam, colCheckDist);
+    vec3_scale_dest(vecToCam, dirToCam, colCheckDist);
 
     dist[0] = find_surface_on_ray(target[0], vecToCam, &surf[0], hitpos[0], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
     dist[1] = find_surface_on_ray(target[1], vecToCam, &surf[1], hitpos[1], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
@@ -1391,7 +1392,7 @@ static void puppycam_collision(void) {
             closestDist -= surfOffset;
             // Allow the camera to ride right up next to the wall (mario's wall radius is 50u so this is safe)
             closestDist = MAX(closestDist, 50);
-            vec3_mul_val(dirToCam, closestDist);
+            vec3_scale(dirToCam, closestDist);
             vec3_sum(gPuppyCam.pos, target[0], dirToCam);
 
             // If the camera is uncomfortably close to the wall, move it up a bit

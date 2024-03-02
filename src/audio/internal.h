@@ -706,17 +706,14 @@ struct Note {
     /*0x8C*/ struct AudioListItem listItem;
     /*0x9C*/ s16 curVolLeft; // Q1.15, but will always be non-negative
     /*0x9E*/ s16 curVolRight; // Q1.15, but will always be non-negative
-    /*0xA0*/ s16 reverbVolShifted; // Q1.15
 #ifdef ENABLE_STEREO_HEADSET_EFFECTS
-    /*0xA2*/ u16 headsetPanRight;
-    /*0xA4*/ u16 headsetPanLeft;
-    /*0xA6*/ u16 prevHeadsetPanRight;
-    /*0xA8*/ u16 prevHeadsetPanLeft;
-    /*    */ u8 align16Padding[0x06];
-#else
-    /*    */ u8 align16Padding[0x0E];
+    /*0xA0*/ u16 headsetPanRight;
+    /*0xA2*/ u16 headsetPanLeft;
+    /*0xA4*/ u16 prevHeadsetPanRight;
+    /*0xA6*/ u16 prevHeadsetPanLeft;
+    /*    */ u8 align16Padding[0x08];
 #endif
-}; // size = 0xB0
+}; // size = 0xA0, 0xB0
 #endif
 
 struct NoteSynthesisBuffers {

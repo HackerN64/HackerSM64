@@ -59,7 +59,7 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
 
     while (string[i] != '\0') {
         unsigned int cur_char = string[i];
-        s32 goddamnJMeasure = string[i] == 'j' ? -1 : 0;
+        s32 goddamnJMeasure;
 
         if (cur_char == '\n') {
             xPos = x;
@@ -75,7 +75,8 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
         } else {
             if (cur_char != ' ') {
                 s = computeS(cur_char);
-                gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, (s << 5) - goddamnJMeasure, 0, 1 << 10, 1 << 10);
+                goddamnJMeasure = (s == 512) ? 1 : 0;
+                gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, (s << 5) + goddamnJMeasure, 0, 1 << 10, 1 << 10);
             }
             xPos += fast_text_font_kerning[cur_char - ' '];
         }
