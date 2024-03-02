@@ -17,9 +17,9 @@
     /**
      * Uses the surface closest to the source height when searching for a floor or ceiling, instead of just using the first applicable surface in the list.
      */
-    #define SLOPE_FIX
+    #define FIX_SURFACE_CUCKING
     /**
-     * Fixes an issue where entering any area above a ceiling without an intermediate floor would count as hitting a ceiling.
+     * Fixes an issue where entering an area above a ceiling without an intermediate floor would count as hitting a ceiling.
      * NOTE: This may allow Mario to clip through the wall on the deck of the the rocking JRB ship.
      */
     #define FIX_EXPOSED_CEILINGS

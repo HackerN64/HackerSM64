@@ -351,7 +351,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
     _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
 
-#ifndef SLOPE_FIX
+#ifndef FIX_SURFACE_CUCKING
     returnFirst = TRUE;
 #endif
 
@@ -502,7 +502,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
     _Bool skipIntangible = !(gCollisionFlags & COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
-#ifndef SLOPE_FIX
+#ifndef FIX_SURFACE_CUCKING
     returnFirst = TRUE;
 #endif
 
