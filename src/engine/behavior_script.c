@@ -14,19 +14,19 @@
 #include "math_util.h"
 #include "graph_node.h"
 #include "surface_collision.h"
-#include "game/puppylights.h"
 
 // Macros for retrieving arguments from behavior scripts.
-#define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
-#define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
-#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >> 8) & 0xFF)
-#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index]) & 0xFF)
+#define BHV_CMD_GET_1ST_U8(index)     (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
+#define BHV_CMD_GET_2ND_U8(index)     (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
+#define BHV_CMD_GET_3RD_U8(index)     (u8)((gCurBhvCommand[index] >> 8) & 0xFF)
+#define BHV_CMD_GET_4TH_U8(index)     (u8)((gCurBhvCommand[index]) & 0xFF)
 
-#define BHV_CMD_GET_1ST_S16(index) (s16)(gCurBhvCommand[index] >> 16)
-#define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & 0xFFFF)
+#define BHV_CMD_GET_1ST_S16(index)    (s16)(gCurBhvCommand[index] >> 16)
+#define BHV_CMD_GET_2ND_S16(index)    (s16)(gCurBhvCommand[index] & 0xFFFF)
 
-#define BHV_CMD_GET_U32(index)     (u32)(gCurBhvCommand[index])
-#define BHV_CMD_GET_VPTR(index)    (void *)(gCurBhvCommand[index])
+#define BHV_CMD_GET_U32(index)        (u32)(gCurBhvCommand[index])
+#define BHV_CMD_GET_VPTR(index)       (void *)(gCurBhvCommand[index])
+#define BHV_CMD_GET_VPTR_SMALL(index) (void *)(OS_PHYSICAL_TO_K0(gCurBhvCommand[index] & 0xFFFFFF))
 
 #define BHV_CMD_GET_ADDR_OF_CMD(index) (uintptr_t)(&gCurBhvCommand[index])
 
@@ -49,11 +49,6 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 #define OBJ_OPACITY_LENGTH 512.0f
 void obj_set_opacity_from_cam_dist(struct Object *obj) {
     s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - OBJ_OPACITY_NEAR) * (256.0f / OBJ_OPACITY_LENGTH));
-#ifdef OBJECTS_REJ
-    if (opacityDist > 0) {
-        obj->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-    }
-#endif
     obj->oOpacity = CLAMP(opacityDist, 0x00, 0xFF);
 }
 #undef OBJ_OPACITY_NEAR
@@ -316,11 +311,11 @@ static s32 bhv_cmd_end_loop(void) {
 // Usage: CALL_NATIVE(func)
 typedef void (*NativeBhvFunc)(void);
 static s32 bhv_cmd_call_native(void) {
-    NativeBhvFunc behaviorFunc = BHV_CMD_GET_VPTR(1);
+    NativeBhvFunc behaviorFunc = BHV_CMD_GET_VPTR_SMALL(0);
 
     behaviorFunc();
 
-    gCurBhvCommand += 2;
+    gCurBhvCommand++;
     return BHV_PROC_CONTINUE;
 }
 
@@ -734,11 +729,11 @@ static s32 bhv_cmd_parent_bit_clear(void) {
 // Command 0x37: Spawns a water droplet with the given parameters.
 // Usage: SPAWN_WATER_DROPLET(dropletParams)
 static s32 bhv_cmd_spawn_water_droplet(void) {
-    struct WaterDropletParams *dropletParams = BHV_CMD_GET_VPTR(1);
+    struct WaterDropletParams *dropletParams = BHV_CMD_GET_VPTR_SMALL(0);
 
     spawn_water_droplet(gCurrentObject, dropletParams);
 
-    gCurBhvCommand += 2;
+    gCurBhvCommand++;
     return BHV_PROC_CONTINUE;
 }
 
@@ -909,22 +904,10 @@ void cur_obj_update(void) {
     COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
 #endif
 
-#ifdef OBJECTS_REJ
-    if ((objFlags & OBJ_FLAG_SILHOUETTE) || (objFlags & OBJ_FLAG_UCODE_SMALL)) {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-    } else {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
-    }
-#endif
-
 #ifdef OBJ_OPACITY_BY_CAM_DIST
     if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
         obj_set_opacity_from_cam_dist(o);
     }
-#endif
-
-#ifdef PUPPYLIGHTS
-    puppylights_object_emit(o);
 #endif
 
     // Handle visibility of object

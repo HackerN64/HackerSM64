@@ -15,6 +15,9 @@ extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
 extern u16 gAreaUpdateCounter;
 extern Vec3f globalLightDirection;
 
+#define GRAPH_ROOT_PERSP 0
+#define GRAPH_ROOT_ORTHO 1
+
 enum AnimType {
     // after processing an object, the type is reset to this
     ANIM_TYPE_NONE,
@@ -41,34 +44,7 @@ struct RenderModeContainer {
     u32 modes[LAYER_COUNT];
 };
 
-#ifdef OBJECTS_REJ
- #if SILHOUETTE
-    // Silhouette, .rej
-    enum RenderPhases {
-        RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
-        RENDER_PHASE_REJ_ZB,
-        RENDER_PHASE_REJ_SILHOUETTE,
-        RENDER_PHASE_REJ_NON_SILHOUETTE,
-        RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE,
-        RENDER_PHASE_ZEX_AFTER_SILHOUETTE,
-        RENDER_PHASE_REJ_NON_ZB,
-        RENDER_PHASE_END,
-    };
-    #define RENDER_PHASE_SILHOUETTE RENDER_PHASE_REJ_SILHOUETTE
-    #define RENDER_PHASE_NON_SILHOUETTE RENDER_PHASE_REJ_NON_SILHOUETTE
- #else
-    // No silhouette, .rej
-    enum RenderPhases {
-        RENDER_PHASE_ZEX_BG,
-        RENDER_PHASE_REJ_ZB,
-        RENDER_PHASE_ZEX_ALL,
-        RENDER_PHASE_REJ_NON_ZB,
-        RENDER_PHASE_END,
-    };
- #endif
-#else
- #if SILHOUETTE
-    // Silhouette, no .rej
+#if SILHOUETTE
     enum RenderPhases {
         RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
         RENDER_PHASE_ZEX_SILHOUETTE,
@@ -79,13 +55,11 @@ struct RenderModeContainer {
     };
     #define RENDER_PHASE_SILHOUETTE RENDER_PHASE_ZEX_SILHOUETTE
     #define RENDER_PHASE_NON_SILHOUETTE RENDER_PHASE_ZEX_NON_SILHOUETTE
- #else
-    // No silhouette, no .rej
+#else
     enum RenderPhases {
         RENDER_PHASE_ZEX_ALL,
         RENDER_PHASE_END,
     };
- #endif
 #endif
 
 #if SILHOUETTE

@@ -6,6 +6,8 @@
 #include "segment_symbols.h"
 #include "level_commands.h"
 
+#include "config/config_cutscenes.h"
+
 #include "game/area.h"
 #include "game/level_update.h"
 #include "menu/file_select.h"
@@ -19,6 +21,7 @@
 #include "levels/menu/header.h"
 
 const LevelScript level_main_menu_entry_file_select[] = {
+#ifndef SKIP_FILE_SELECT
     INIT_LEVEL(),
     LOAD_GODDARD(),
     LOAD_LEVEL_DATA(menu),
@@ -53,6 +56,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     SLEEP(/*frames*/ 16),
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
+#endif // SKIP_FILE_SELECT
     SET_REG(/*value*/ START_LEVEL),
     EXIT_AND_EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
 };

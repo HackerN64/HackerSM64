@@ -135,7 +135,7 @@ endif
 #==============================================================================#
 
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS = -Ofast
+DEFAULT_OPT_FLAGS = -Ofast -falign-functions=32
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # TODO: Figure out how to allow -fassociative-math to be enabled
@@ -253,6 +253,18 @@ ifeq ($(HVQM),1)
   SRC_DIRS += src/hvqm
 endif
 
+# LIBPL - whether to include libpl library for interfacing with Parallel Launcher
+# (library will be pulled into repo after building with this enabled for the first time)
+#   1 - includes code in ROM
+#   0 - does not
+LIBPL ?= 0
+LIBPL_DIR := lib/libpl
+$(eval $(call validate-option,LIBPL,0 1))
+ifeq ($(LIBPL),1)
+  DEFINES += LIBPL=1
+  SRC_DIRS += $(LIBPL_DIR)
+endif
+
 BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
@@ -335,6 +347,18 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
     ifeq ($(DUMMY),FAIL)
       $(error Failed to build tools)
     endif
+
+  # Clone any needed submodules
+  ifeq ($(LIBPL),1)
+    ifeq ($(wildcard $(LIBPL_DIR)/*.h),)
+      $(info Cloning libpl submodule...)
+      DUMMY != git submodule update --init $(LIBPL_DIR) > /dev/null || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to clone libpl submodule)
+      endif
+    endif
+  endif
+
   $(info Building ROM...)
 
 endif

@@ -248,9 +248,6 @@ struct GraphNodeObject {
     /*0x4C*/ struct SpawnInfo *spawnInfo;
     /*0x50*/ Mat4 *throwMatrix; // matrix ptr
     /*0x54*/ Vec3f cameraToObject;
-#ifdef OBJECTS_REJ
-    u16 ucode;
-#endif
 };
 
 struct ObjectNode {
@@ -259,27 +256,9 @@ struct ObjectNode {
     struct ObjectNode *prev;
 };
 
-#ifdef PUPPYLIGHTS
-struct PuppyLight {
-    Vec3t pos[2];   // The location of the light. First index is the absolute position, second index are offsets.
-    s16 yaw;        // Used by cubes. Allows epic rotating of the volume.
-    RoomData room;  // Which room to use. -1 is visible from all rooms.
-    s8 epicentre;   // What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
-    u8 flags;       // Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
-    ColorRGBA rgba; // Colour. Go on, take even the tiniest guess as to what this entails.
-    u8 area;        // Which section of the level this light is stored in.
-    u8 active: 1;   // Whether the light will actually work. Mostly intended to be used for objects.
-};
-#endif
-
 // NOTE: Since ObjectNode is the first member of Object, it is difficult to determine
 // whether some of these pointers point to ObjectNode or Object.
-
-#ifdef PUPPYLIGHTS
-#define MAX_OBJECT_FIELDS 0x51
-#else
 #define MAX_OBJECT_FIELDS 0x50
-#endif
 
 struct Object {
     /*0x000*/ struct ObjectNode header;
@@ -338,9 +317,6 @@ struct Object {
     /*0x218*/ void *collisionData;
     /*0x21C*/ Mat4 transform;
     /*0x25C*/ void *respawnInfo;
-#ifdef PUPPYLIGHTS
-    struct PuppyLight puppylight;
-#endif
 };
 
 struct ObjectHitbox {
