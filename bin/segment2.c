@@ -2653,7 +2653,7 @@ const Gfx dl_billboard_num_F[] = {
 
 #ifdef HD_SHADOWS
 ALIGNED8 static const Texture texture_shadow_quarter_circle_64[] = {
-#include "textures/segment2/shadow_quarter_circle_64.ia8.inc.c"
+#include "textures/segment2/shadow_cozies.i8.inc.c"
 };
 
 ALIGNED8 static const Texture texture_shadow_quarter_square_64[] = {
@@ -2762,7 +2762,12 @@ const Gfx dl_draw_quad_verts_4567[] = {
 const Gfx dl_shadow_begin[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK),
-    gsDPSetCombineMode(G_CC_MODULATEIFADEA, G_CC_MODULATEIFADEA),
+    gsDPSetCombineLERP(
+        0, 0, 0, 0,
+        TEXEL0, 0, ENVIRONMENT, 0,
+        0, 0, 0, 0,
+        TEXEL0, 0, ENVIRONMENT, 0
+    ),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsSPEndDisplayList(),
 };
@@ -2770,7 +2775,7 @@ const Gfx dl_shadow_begin[] = {
 #ifdef HD_SHADOWS
 const Gfx dl_shadow_circle[] = {
     gsSPDisplayList(dl_shadow_begin),
-    gsDPLoadTextureBlock(texture_shadow_quarter_circle_64, G_IM_FMT_IA, G_IM_SIZ_8b, 64, 64, 0, (G_TX_WRAP | G_TX_MIRROR), (G_TX_WRAP | G_TX_MIRROR), 6, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPLoadTextureBlock(texture_shadow_quarter_circle_64, G_IM_FMT_I, G_IM_SIZ_8b, 64, 64, 0, (G_TX_WRAP | G_TX_MIRROR), (G_TX_WRAP | G_TX_MIRROR), 6, 6, G_TX_NOLOD, G_TX_NOLOD),
     gsSPEndDisplayList(),
 };
 
@@ -2805,6 +2810,13 @@ static const Vtx vertex_shadow[] = {
     {{{    -1,      0,      1}, 0, {  -512,    512}, {0xff, 0xff, 0xff, 0xff}}},
     {{{     1,      0,      1}, 0, {   512,    512}, {0xff, 0xff, 0xff, 0xff}}},
 #endif
+};
+
+const Gfx dl_shadow_circle_tris[] = {
+    gsSPVertex(vertex_shadow, 4, 0),
+    gsSP2Triangles( 0,  2,  1, 0x0,  1,  2,  3, 0x0),
+    gsDPPipeSync(),
+    gsSPEndDisplayList(),
 };
 
 // 0x02014638 - 0x02014660
