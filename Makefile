@@ -88,10 +88,6 @@ else ifeq ($(VERSION),sh)
 endif
 
 
-# TARGET -
-TARGET := sm64
-
-
 # FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
 FIXLIGHTS ?= 1
 
@@ -934,7 +930,7 @@ else ifeq ($(CONSOLE),bb)
 endif
 	$(V)$(N64CKSUM) $@
 
-$(BUILD_DIR)/$(TARGET).objdump: $(ELF)
+$(BUILD_DIR)/$(TARGET_STRING).objdump: $(ELF)
 	$(OBJDUMP) -D $< > $@
 
 .PHONY: all clean distclean default test load rebuildtools
