@@ -16,7 +16,6 @@
  **************************************************/
 
 #ifdef ROUNDED_WALL_CORNERS
-
 static s32 check_wall_triangle_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
     f32 v = ((d11 * d20) - (d01 * d21)) * invDenom;
     if (v < 0.0f || v > 1.0f) {
@@ -50,8 +49,7 @@ s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invD
 
     return TRUE;
 }
-
-#endif
+#endif // ROUNDED_WALL_CORNERS
 
 /**
  * Iterate through the list of walls until all walls are checked and
@@ -63,7 +61,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
 #ifdef ROUNDED_WALL_CORNERS
     const f32 corner_threshold = -0.9f;
     f32 margin_radius = radius - 1.0f;
-#endif
+#endif // ROUNDED_WALL_CORNERS
     Vec3f pos = {
         data->x,
         data->y + data->offsetY,
@@ -72,7 +70,6 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     s32 numCols = 0;
 
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
-    _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
 
     // Check whether the object will be able to pass through certain walls.
     struct Object* obj = o;
@@ -166,7 +163,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             pos[0] += surf->normal.x * (radius - offset);
             pos[2] += surf->normal.z * (radius - offset);
         }
-#else
+#else // !ROUNDED_WALL_CORNERS
         f32 x = pos[0];
         f32 y = pos[1];
         f32 z = pos[2];
@@ -207,17 +204,13 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         // Update pos
         pos[0] += surf->normal.x * (radius - offset);
         pos[2] += surf->normal.z * (radius - offset);
-#endif
+#endif // !ROUNDED_WALL_CORNERS
 
         // Has collision
         if (data->numWalls < MAX_REFERENCED_WALLS) {
             data->walls[data->numWalls++] = surf;
         }
         numCols++;
-
-        if (returnFirst) {
-            break;
-        }
     }
 
     data->x = pos[0];
@@ -289,7 +282,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
         }
     }
 
-    gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+    gCollisionFlags &= ~(COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.wall++;
@@ -321,19 +314,19 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
  **************************************************/
 
 // Upward raycast along Y axis.
-static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
+static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *ceil) {
     Vec3i vx, vz;
-    vx[0] = surf->vertex1[0];
-    vz[0] = surf->vertex1[2];
-    vx[1] = surf->vertex2[0];
-    vz[1] = surf->vertex2[2];
+    vx[0] = ceil->vertex1[0];
+    vz[0] = ceil->vertex1[2];
+    vx[1] = ceil->vertex2[0];
+    vz[1] = ceil->vertex2[2];
 
     // Checking if point is in bounds of the triangle laterally.
     if (((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0])) > 0) return FALSE;
 
     // Slight optimization by checking these later.
-    vx[2] = surf->vertex3[0];
-    vz[2] = surf->vertex3[2];
+    vx[2] = ceil->vertex3[0];
+    vz[2] = ceil->vertex3[2];
 
     if (((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1])) > 0) return FALSE;
     if (((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2])) > 0) return FALSE;
@@ -345,60 +338,52 @@ static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf)
  * Iterate through the list of ceilings and find the first ceiling over a given point.
  */
 static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
-    struct Surface *surf, *ceil = NULL;
-    f32 highest = *pheight;
+    struct Surface *ceil = NULL;
+    struct Surface *lowestCeil = NULL;
+    f32 lowestCeilHeight = *pheight;
 
-    _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
-
-#ifndef FIX_SURFACE_CUCKING
-    returnFirst = TRUE;
-#endif
 
     // Iterate through the list of ceilings until there are no more ceilings.
     while (surfaceNode != NULL) {
-        surf        = surfaceNode->surface;
+        ceil        = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
 
         // Determine if checking for the camera or not.
         if (checkingForCamera) {
-            if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
+            if (ceil->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
                 continue;
             }
-        } else if (surf->type == SURFACE_CAMERA_BOUNDARY) {
+        } else if (ceil->type == SURFACE_CAMERA_BOUNDARY) {
             continue; // If we are not checking for the camera, ignore camera only ceilings.
         }
 
-        // Exclude all ceilings below the point.
-        if (y > surf->upperY) continue;
+        // Exclude all ceilings below the check height.
+        if (y > ceil->upperY) continue;
 
         // Check that the point is within the triangle bounds.
-        if (!check_within_ceil_triangle_bounds(x, z, surf)) continue;
+        if (!check_within_ceil_triangle_bounds(x, z, ceil)) continue;
 
         // Find the height of the ceiling above the current location.
-        f32 height = get_surface_height_at_location(x, z, surf);
+        f32 ceilHeight = get_surface_height_at_location(x, z, ceil);
 
-        // Exclude ceilings above the previous lowest ceiling.
-        if (height > highest) continue;
+        // Exclude ceiling heights that are:
+        if (
+            (ceilHeight < y)                 || // Lower than the check height.
+            (ceilHeight >= lowestCeilHeight)    // Higher than the previous lowest ceiling.
+        ) continue;
 
-        // Checks for ceiling interaction.
-        if (height < y) continue;
+        // Update the lowest found ceiling.
+        lowestCeil       = ceil;
+        lowestCeilHeight = ceilHeight;
 
-        // Use the current ceiling.
-        ceil = surf;
-        highest = height;
-
-        // If we're only looking for the closest ceiling, exit the loop.
-        if (returnFirst) break;
-
-        // Exit the loop if it's not possible for another ceiling to be closer
-        // to the original point.
-        if (height == y) break;
+        // Exit the loop if it's not possible for another ceiling to be closer to the check height.
+        if (ceilHeight == y) break;
     }
 
-    *pheight = highest;
+    *pheight = lowestCeilHeight;
 
-    return ceil;
+    return lowestCeil;
 }
 
 /**
@@ -452,7 +437,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     }
 
     // To prevent accidentally leaving the floor tangible, stop checking for it.
-    gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+    gCollisionFlags &= ~(COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
     // Return the ceiling.
     *pceil = ceil;
@@ -471,19 +456,19 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
  **************************************************/
 
 // Downward raycast along Y axis.
-static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
+static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *floor) {
     Vec3i vx, vz;
-    vx[0] = surf->vertex1[0];
-    vz[0] = surf->vertex1[2];
-    vx[1] = surf->vertex2[0];
-    vz[1] = surf->vertex2[2];
+    vx[0] = floor->vertex1[0];
+    vz[0] = floor->vertex1[2];
+    vx[1] = floor->vertex2[0];
+    vz[1] = floor->vertex2[2];
 
     // Checking if point is in bounds of the triangle laterally.
     if (((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0])) < 0) return FALSE;
 
     // Slight optimization by checking these later.
-    vx[2] = surf->vertex3[0];
-    vz[2] = surf->vertex3[2];
+    vx[2] = floor->vertex3[0];
+    vz[2] = floor->vertex3[2];
 
     if (((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1])) < 0) return FALSE;
     if (((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2])) < 0) return FALSE;
@@ -495,70 +480,61 @@ static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf
  * Iterate through the list of floors and find the first floor under a given point.
  */
 static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
-    struct Surface *surf, *floor = NULL;
-    f32 highest = *pheight;
+    struct Surface *floor = NULL;
+    struct Surface *highestFloor = NULL;
+    f32 highestFloorHeight = *pheight;
 
-    _Bool returnFirst = (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST);
     _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
     _Bool skipIntangible = !(gCollisionFlags & COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
-#ifndef FIX_SURFACE_CUCKING
-    returnFirst = TRUE;
-#endif
-
     // Iterate through the list of floors until there are no more floors.
     while (surfaceNode != NULL) {
-        surf        = surfaceNode->surface;
+        floor       = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
 
-        TerrainData type = surf->type;
+        TerrainData type = floor->type;
 
-        // To prevent the Merry-Go-Round room from loading when Mario passes above the hole that leads
-        // there, SURFACE_INTANGIBLE is used. This prevent the wrong room from loading, but can also allow
-        // Mario to pass through.
+        // To prevent the Merry-Go-Round room from loading when Mario is above the hole that leads there, SURFACE_INTANGIBLE is used.
+        // This prevents the wrong room from loading, but can also allow Mario to pass through.
         if (skipIntangible && (type == SURFACE_INTANGIBLE)) {
             continue;
         }
 
         // Determine if we are checking for the camera or not.
         if (checkingForCamera) {
-            if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
+            if (floor->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
                 continue;
             }
         } else if (type == SURFACE_CAMERA_BOUNDARY) {
             continue; // If we are not checking for the camera, ignore camera only floors.
         }
 
-        // Exclude all floors above the point.
-        if (y < surf->lowerY) continue;
+        // Exclude all floors above the check height.
+        if (y < floor->lowerY) continue;
 
         // Check that the point is within the triangle bounds.
-        if (!check_within_floor_triangle_bounds(x, z, surf)) continue;
+        if (!check_within_floor_triangle_bounds(x, z, floor)) continue;
 
         // Get the height of the floor under the current location.
-        f32 height = get_surface_height_at_location(x, z, surf);
+        f32 floorHeight = get_surface_height_at_location(x, z, floor);
 
-        // Exclude floors lower than the previous highest floor.
-        if (height <= highest) continue;
+        // Exclude floor heights that are:
+        if (
+            (floorHeight > y)                   || // Higher than the check height.
+            (floorHeight <= highestFloorHeight)    // Lower than the previous highest floor.
+        ) continue;
 
-        // Checks for floor interaction.
-        if (height > y) continue;
+        // Update the highest found floor.
+        highestFloor       = floor;
+        highestFloorHeight = floorHeight;
 
-        // Use the current floor.
-        floor = surf;
-        highest = height;
-
-        // If we're only looking for the closest floor, exit the loop.
-        if (returnFirst) break;
-
-        // Exit the loop if it's not possible for another floor to be closer
-        // to the original point.
-        if (height == y) break;
+        // Exit the loop if it's not possible for another floor to be closer to the check height (eg. standing on a floor).
+        if (floorHeight == y) break;
     }
 
-    *pheight = highest;
+    *pheight = highestFloorHeight;
 
-    return floor;
+    return highestFloor;
 }
 
 // Generic triangle bounds func
@@ -708,7 +684,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     }
 
     // To prevent accidentally leaving the floor tangible, stop checking for it.
-    gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
+    gCollisionFlags &= ~(COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
     // Return the floor.
     *pfloor = floor;

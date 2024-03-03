@@ -139,7 +139,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         if (surface->normal.x < -COS45 || surface->normal.x > COS45) {
             surface->flags |= SURFACE_FLAG_X_PROJECTION;
         }
-#endif
+#endif // !ROUNDED_WALL_CORNERS
     }
 
     s32 surfacePriority = surface->upperY * sortDir;

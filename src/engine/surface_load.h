@@ -15,19 +15,10 @@
      */
     #define ROUNDED_WALL_CORNERS
     /**
-     * Uses the surface closest to the source height when searching for a floor or ceiling, instead of just using the first applicable surface in the list.
-     */
-    #define FIX_SURFACE_CUCKING
-    /**
      * Fixes an issue where entering an area above a ceiling without an intermediate floor would count as hitting a ceiling.
      * NOTE: This may allow Mario to clip through the wall on the deck of the the rocking JRB ship.
      */
     #define FIX_EXPOSED_CEILINGS
-    /**
-     * Fixes false ledge grabs by making the "start ledge grab" check the same as the "stay in ledge grab" check.
-     * TODO: implement
-     */
-    #define FIX_FALSE_LEDGE_GRABS
 #endif
 
 

@@ -536,9 +536,9 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         m->pos[1] = nextPos[1];
 #ifdef DISABLE_CEILING_BONKS
         return AIR_STEP_HIT_CEILING;
-#else
+#else // !DISABLE_CEILING_BONKS
         return AIR_STEP_HIT_WALL;
-#endif
+#endif // !DISABLE_CEILING_BONKS
     }
 
     //! When the wall is not completely vertical or there is a slight wall
