@@ -351,11 +351,10 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 
         // Determine if checking for the camera or not.
         if (checkingForCamera) {
-            if (ceil->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
-                continue;
-            }
-        } else if (ceil->type == SURFACE_CAMERA_BOUNDARY) {
-            continue; // If we are not checking for the camera, ignore camera only ceilings.
+            if (ceil->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
+        } else {
+            // If we are not checking for the camera, ignore camera only ceilings.
+            if (ceil->type == SURFACE_CAMERA_BOUNDARY) continue;
         }
 
         // Exclude all ceilings below the check height.
@@ -496,17 +495,14 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 
         // To prevent the Merry-Go-Round room from loading when Mario is above the hole that leads there, SURFACE_INTANGIBLE is used.
         // This prevents the wrong room from loading, but can also allow Mario to pass through.
-        if (skipIntangible && (type == SURFACE_INTANGIBLE)) {
-            continue;
-        }
+        if (skipIntangible && (type == SURFACE_INTANGIBLE)) continue;
 
         // Determine if we are checking for the camera or not.
         if (checkingForCamera) {
-            if (floor->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
-                continue;
-            }
-        } else if (type == SURFACE_CAMERA_BOUNDARY) {
-            continue; // If we are not checking for the camera, ignore camera only floors.
+            if (floor->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
+        } else {
+            // If we are not checking for the camera, ignore camera only floors.
+            if (type == SURFACE_CAMERA_BOUNDARY) continue;
         }
 
         // Exclude all floors above the check height.

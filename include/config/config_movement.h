@@ -114,11 +114,6 @@
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
- * General collision improvements. See "src/engine/surface_load.h" to toggle specific changes. Disable this to use close to vanilla collision handling.
- */
-#define COLLISION_IMPROVEMENTS
-
-/**
  * Disables bonking on sloped ceilings by separating the handling of ceiling interactions and wall interactions.
  */
 #define DISABLE_CEILING_BONKS
@@ -138,7 +133,7 @@
  */
 // #define WATER_PLUNGE_UPWARP
 
-/** 
+/**
  * This bug allows mario to move when initiating a dialog,
  * just as long as mario doesn't enter an action that can
  * be interrupted with text
@@ -157,3 +152,14 @@
  */
 #define MARIO_INERTIA_UPWARD
 // #define MARIO_INERTIA_LATERAL
+
+/**
+ * Improves the handling of convex wall corners by rounding wall collision at triangle edges to close the seams.
+ * Also properly handles simultaneous collisions with multiple walls (eg. concave wall corners or narrow tunnels).
+ */
+#define ROUNDED_WALL_CORNERS
+/**
+ * Fixes an issue where entering an area above a ceiling without an intermediate floor would count as hitting a ceiling.
+ * NOTE: This may allow Mario to clip through the wall on the deck of the the rocking JRB ship.
+ */
+#define FIX_EXPOSED_CEILINGS
