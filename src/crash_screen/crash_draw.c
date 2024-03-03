@@ -346,14 +346,45 @@ u32 cs_page_header_draw(void) {
     return line;
 }
 
+// Draws the 'L' and 'R' triangles.
+void cs_draw_page_LR_triangles(void) {
+    cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    const s32 triWidth = 14; // Width of the triangles.
+    const s32 triHeight = (triWidth * 2); // Height of the triangles.
+
+    const s32 yPos = SCREEN_CENTER_Y; // Height of the triangles.
+
+    const s32 triSeparation = 2; // Separation between the edge of the triangle and the edge of the crash screen.
+    const s32 txtSeparation = 1; // Separation between the edge of the text and the edge of the triangle.
+
+    const s32 triY = (yPos - (triHeight / 2)); // Center triangles vertically.
+    const s32 txtY = ((yPos - (TEXT_HEIGHT(1) / 2)) + 2); // Center text vertically
+
+    u16 buttonDown = gCSCompositeController->buttonDown;
+
+    // 'L' triangle:
+    const s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - (BITFLAG_BOOL(buttonDown, L_TRIG) * 2)); // Edge of the 'L' triangle.
+    cs_draw_triangle((L_edge - triWidth), triY, triWidth, triHeight, COLOR_RGBA32_CRASH_BACKGROUND, CS_TRI_LEFT);
+    cs_draw_glyph(((L_edge - TEXT_WIDTH(1)) - txtSeparation), txtY, (STR_L)[0], COLOR_RGBA32_CRASH_HEADER);
+    // 'R' triangle:
+    const s32 R_edge = ((CRASH_SCREEN_X2 + triSeparation) + (BITFLAG_BOOL(buttonDown, R_TRIG) * 2)); // Edge of the 'R' triangle.
+    cs_draw_triangle(R_edge, triY, triWidth, triHeight, COLOR_RGBA32_CRASH_BACKGROUND, CS_TRI_RIGHT);
+    cs_draw_glyph(((R_edge + 1) + txtSeparation), txtY, (STR_R)[0], COLOR_RGBA32_CRASH_HEADER);
+
+    cs_reset_scissor_box();
+}
+
 // Crash screen main draw function.
 void cs_draw_main(void) {
     const _Bool drawScreenshot = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_SCREENSHOT);
 
+    // Draw the background screenshot of the game.
     cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     cs_reset_framebuffer(drawScreenshot);
     cs_reset_scissor_box();
 
+    // If Z is not held, draw the crash screen.
     if (!(gCSCompositeController->buttonDown & Z_TRIG)) {
         if (drawScreenshot) {
             // Draw the transparent background.
@@ -364,6 +395,10 @@ void cs_draw_main(void) {
             );
         }
 
+        // Draw the L/R triangles.
+        cs_draw_page_LR_triangles();
+
+        // Draw the page header.
         u32 line = cs_page_header_draw();
 
         CSPage* page = gCSPages[gCSPageID];

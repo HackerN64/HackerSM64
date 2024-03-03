@@ -191,6 +191,7 @@ void page_map_input(void) {
 }
 
 void page_map_print(void) {
+#ifdef UNF
     debug_printf("\n");
     debug_printf("SECTION:\n");
 
@@ -214,6 +215,7 @@ void page_map_print(void) {
         currIndex++;
         symbol++;
     }
+#endif // UNF
 }
 
 

@@ -44,18 +44,6 @@ CSController gCSCompositeControllers[1];
 CSController* const gCSCompositeController = &gCSCompositeControllers[0];
 
 
-// Input string defines:
-#define STR_A       "A"
-#define STR_B       "B"
-#define STR_Z       "Z"
-#define STR_START   "START"
-#define STR_UP      "UP"
-#define STR_DOWN    "DOWN"
-#define STR_LEFT    "LEFT"
-#define STR_RIGHT   "RIGHT"
-#define STR_L       "L"
-#define STR_R       "R"
-
 const ControlType gCSControlDescriptions[] = {
     [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                       },
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls",           },

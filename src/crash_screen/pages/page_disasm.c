@@ -185,8 +185,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
 
         sBranchBufferCurrAddr += PAGE_DISASM_STEP;
 
-        // Searching took to long, so continue from the same place on the next frame.
-        if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) { //! TODO: better version of this if possible
+        // If branch mapping takes longer than a frame, so continue from the same place on the next frame.
+        if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) { // Is there a better way to do this?
             return TRUE;
         }
     }

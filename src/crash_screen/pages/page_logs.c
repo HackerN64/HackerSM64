@@ -214,6 +214,7 @@ void page_logs_input(void) {
 }
 
 void page_logs_print(void) {
+#ifdef UNF
     debug_printf("\n");
     if (__n64Assert_Message != NULL) {
         debug_printf(
@@ -224,7 +225,7 @@ void page_logs_print(void) {
             __n64Assert_Message
         );
     }
-#ifdef PUPPYPRINT_DEBUG
+ #ifdef PUPPYPRINT_DEBUG
     debug_printf("- PUPPYPRINT LOG:\n");
     for (u32 i = 0; i < sLogTotalRows; i++) {
         char* entry = consoleLogTable[(LOG_BUFFER_SIZE - 1) - i];
@@ -235,11 +236,12 @@ void page_logs_print(void) {
 
         debug_printf("-- %i: %s\n", ((gConsoleLogLastIndex - 1) - i), entry);
     }
-#else // !PUPPYPRINT_DEBUG
+ #else // !PUPPYPRINT_DEBUG
     else {
         debug_printf("- No log or assert data.\n");
     }
-#endif // !PUPPYPRINT_DEBUG
+ #endif // !PUPPYPRINT_DEBUG
+#endif // UNF
 }
 
 
