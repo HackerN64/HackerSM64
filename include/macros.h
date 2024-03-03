@@ -7,6 +7,10 @@
 #define GLOBAL_ASM(...)
 #endif
 
+#define member(T, m) ((T*)0)->m
+#define sizeof_member(T, m) sizeof(member(T, m))
+#define typeof_member(T, m)	typeof(member(T, m))
+
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 
 #define BITS_PER_BYTE   8

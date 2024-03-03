@@ -54,9 +54,11 @@
 // Preset strings:
 #define STR_HEX_PREFIX      "0x"
 
-#define STR_HEX_WORD        "%08X"
-#define STR_HEX_HALFWORD    "%04X"
 #define STR_HEX_BYTE        "%02X"
+#define STR_HEX_HALFWORD    "%04X"
+#define STR_HEX_WORD        "%08X"
+#define STR_HEX_LONG        "%016llX"
+#define STR_HEX_DECIMAL     "%.15e"
 
 #define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 

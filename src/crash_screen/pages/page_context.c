@@ -87,19 +87,29 @@ static const char* sFpcsrDesc[6] = {
     /*FPCSR_CI      */ "Inexact operation",
 };
 
-// CPU register names.
-//! TODO: Combine this with sCPURegisterNames in insn_disasm.c.
-static const char* sRegNames[29] = {
-    "AT", "V0", "V1",
-    "A0", "A1", "A2",
-    "A3", "T0", "T1",
-    "T2", "T3", "T4",
-    "T5", "T6", "T7",
-    "S0", "S1", "S2",
-    "S3", "S4", "S5",
-    "S6", "S7", "T8",
-    "T9", "GP", "SP",
-    "S8", "RA",
+// Main list of registers to print.
+#define LIST_REG(field, regName) {                          \
+    .offset = __builtin_offsetof(__OSThreadContext, field), \
+    .size = sizeof_member(__OSThreadContext, field),        \
+    .name = (regName),                                      \
+}
+static const OSThreadContextRegister sRegList[32 + 1] = {
+    LIST_REG(pc, "PC"), LIST_REG(sr, "SR"), LIST_REG(badvaddr, "VA"),
+    LIST_REG(at, "AT"), LIST_REG(v0, "V0"), LIST_REG(v1, "V1"),
+    LIST_REG(a0, "A0"), LIST_REG(a1, "A1"), LIST_REG(a2, "A2"),
+    LIST_REG(a3, "A3"), LIST_REG(t0, "T0"), LIST_REG(t1, "T1"),
+    LIST_REG(t2, "T2"), LIST_REG(t3, "T3"), LIST_REG(t4, "T4"),
+    LIST_REG(t5, "T5"), LIST_REG(t6, "T6"), LIST_REG(t7, "T7"),
+    LIST_REG(s0, "S0"), LIST_REG(s1, "S1"), LIST_REG(s2, "S2"),
+    LIST_REG(s3, "S3"), LIST_REG(s4, "S4"), LIST_REG(s5, "S5"),
+    LIST_REG(s6, "S6"), LIST_REG(s7, "S7"), LIST_REG(t8, "T8"),
+    LIST_REG(t9, "T9"), LIST_REG(gp, "GP"), LIST_REG(sp, "SP"),
+    LIST_REG(s8, "S8"), LIST_REG(ra, "RA"),
+    {
+        .offset = (Address)-1, 
+        .size = sizeof(Address),
+        .name = "MM",
+    },
 };
 
 
@@ -181,36 +191,30 @@ void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
     }
 }
 
-// Print important fixed-point registers.
-u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
-    const u32 rows    = 10;
-    const u32 columns = 3;
-    const size_t columnWidth = 15;
+// Gets the value of a OSThreadContextRegister register.
+u64 get_thread_register_val(__OSThreadContext* tc, const OSThreadContextRegister* reg) {
+    Address addr = ((Address)tc + reg->offset);
 
-    u32 regNum = 0;
-    Register* reg = &tc->at;
-
-    cs_context_print_reg(TEXT_X(0 * columnWidth), TEXT_Y(line), "PC", tc->pc);
-    cs_context_print_reg(TEXT_X(1 * columnWidth), TEXT_Y(line), "SR", tc->sr);
-    cs_context_print_reg(TEXT_X(2 * columnWidth), TEXT_Y(line), "VA", tc->badvaddr);
-    line++;
-
-    Word data = 0;
-    if (try_read_data(&data, tc->pc)) {
-        cs_context_print_reg(TEXT_X((columns - 1) * columnWidth), TEXT_Y(line + (rows - 1)), "MM", data); // The raw data of the asm code that crashed.
+    // Special case for "MM".
+    if (reg->offset == (Address)-1) {
+        addr = tc->pc;
     }
 
-    osWritebackDCacheAll();
+    return ((reg->size == sizeof(u64)) ? *(u64*)addr : *(u32*)addr);
+}
+
+// Print important fixed-point registers.
+u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
+    const size_t columnWidth = 15;
+    const u32 columns = 3;
+    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
+    const OSThreadContextRegister* reg = sRegList;
 
     for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < columns; x++) {
-            if (regNum >= ARRAY_COUNT(sRegNames)) {
-                return (line + y);
-            }
+            cs_context_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), reg->name, (u32)get_thread_register_val(tc, reg));
 
-            cs_context_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), sRegNames[regNum], *(reg + regNum));
-
-            regNum++;
+            reg++;
         }
     }
 
@@ -339,7 +343,6 @@ void page_context_draw(void) {
 #endif // INCLUDE_DEBUG_MAP
 
     line = cs_context_print_registers(line, tc);
-    line++;
 
     osWritebackDCacheAll();
 
@@ -356,11 +359,16 @@ void page_context_input(void) {
 void page_context_print(void) {
 #ifdef UNF
     debug_printf("\n");
+
     __OSThreadContext* tc = &gCrashedThread->context;
+
+    // CAUSE:
     const char* desc = get_cause_desc(tc->cause);
     if (desc != NULL) {
-        debug_printf("- CAUSE: %s\n", desc);
+        debug_printf("- CAUSE: (%s)\n", desc);
     }
+
+    // THREAD:
     enum ThreadID threadID = gCrashedThread->id;
     debug_printf("- THREAD: %d", threadID);
     if (threadID < NUM_THREADS) {
@@ -372,15 +380,50 @@ void page_context_print(void) {
         }
     }
     debug_printf("\n");
+
  #ifdef INCLUDE_DEBUG_MAP
+    // FUNCTION:
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     if (symbol != NULL) {
         debug_printf("- FUNC: %s\n", get_map_symbol_name(symbol));
     }
  #endif // INCLUDE_DEBUG_MAP
-    //! TODO: registers
-    //! TODO: fpcsr
-    //! TODO: float registers
+
+    // Thread registers:
+    const u32 columns = 3;
+    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
+    const OSThreadContextRegister* reg = sRegList;
+    for (u32 y = 0; y < rows; y++) {
+        debug_printf("- ");
+        for (u32 x = 0; x < columns; x++) {
+            debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", reg->name, get_thread_register_val(tc, reg));
+            reg++;
+        }
+        debug_printf("\n");
+    }
+
+    // FPCSR:
+    u32 fpcsr = tc->fpcsr;
+    debug_printf("- FPCSR: "STR_HEX_WORD, fpcsr);
+    const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
+    if (fpcsrDesc != NULL) {
+        debug_printf(" (%s)", fpcsrDesc);
+    }
+    debug_printf("\n");
+
+    // Float registers:
+    u32 regNum = 0;
+    __OSfp* osfp = &tc->fp0;
+    for (u32 i = 0; i < 8; i++) {
+        debug_printf("- ");
+        for (u32 j = 0; j < 2; j++) {
+            if (regNum > 30) break;
+            debug_printf("d%02d "STR_HEX_DECIMAL"\t", regNum, osfp->f.f_even);
+            regNum += 2;
+            osfp++;
+        }
+        debug_printf("\n");
+    }
 #endif // UNF
 }
 

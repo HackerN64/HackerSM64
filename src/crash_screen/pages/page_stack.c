@@ -262,7 +262,7 @@ void page_stack_print(void) {
             break;
         }
 
-        debug_printf("- [%08X]: %08X +%04X", function->stackAddr, function->faddr, (function->curAddr - function->faddr));
+        debug_printf("- ["STR_HEX_WORD"]: "STR_HEX_WORD" +"STR_HEX_HALFWORD, function->stackAddr, function->faddr, (function->curAddr - function->faddr));
  #ifdef INCLUDE_DEBUG_MAP
         if (function->fname != NULL) {
             debug_printf(" - %s", function->fname);

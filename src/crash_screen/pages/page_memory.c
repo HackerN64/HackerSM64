@@ -274,13 +274,13 @@ void page_memory_print(void) {
     Address startAddr = sRamViewViewportIndex;
     Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
-    debug_printf("- SECTION: [%08X-%08X]\n", startAddr, endAddr);
+    debug_printf("- SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
 
     for (u32 row = 0; row < sRamViewNumShownRows; row++) {
-        debug_printf("- [%08X]:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
+        debug_printf("- ["STR_HEX_WORD"]:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
 
         for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
-            debug_printf(" %08X", sMemoryViewData[row][wordOffset]);
+            debug_printf(" "STR_HEX_WORD, sMemoryViewData[row][wordOffset]);
         }
 
         debug_printf("\n");

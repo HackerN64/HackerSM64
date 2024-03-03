@@ -20,7 +20,13 @@ enum CSSettingsGroup_page_context {
 typedef struct ThreadIDName {
     /*0x00*/ enum ThreadID threadID;
     /*0x04*/ const char* name;
-} ThreadIDName;
+} ThreadIDName; /*0x08*/
+
+typedef struct {
+    /*0x00*/ const Address offset;
+    /*0x04*/ const u8 size;
+    /*0x05*/ const char name[3];
+} OSThreadContextRegister; /*0x08*/
 
 
 extern struct CSSetting cs_settings_group_page_context[];

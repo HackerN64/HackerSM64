@@ -503,11 +503,11 @@ void page_disasm_print(void) {
     Address startAddr = sDisasmViewportIndex;
     Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
 
-    debug_printf("SECTION: [%08X-%08X]\n", startAddr, endAddr);
+    debug_printf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
 
     for (u32 y = 0; y < sDisasmNumShownRows; y++) {
         Address addr = (startAddr + (y * PAGE_DISASM_STEP));
-        debug_printf("- [%08X]: ", addr);
+        debug_printf("- ["STR_HEX_WORD"]: ", addr);
         Word data = 0x00000000;
         if (!try_read_data(&data, addr)) {
             debug_printf("*");

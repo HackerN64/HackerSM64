@@ -78,7 +78,7 @@ static OSThread* get_crashed_thread(void) {
     ) {
         if (
             (thread->priority > OS_PRIORITY_IDLE  ) &&
-            (thread->priority < OS_PRIORITY_APPMAX) && //! TODO: Why doesn't this include OS_PRIORITY_APPMAX threads?
+            (thread->priority < OS_PRIORITY_APPMAX) && //! TODO: Should this include OS_PRIORITY_APPMAX threads? Official N64 games don't.
             (thread->flags & (OS_FLAG_CPU_BREAK | OS_FLAG_FAULT)) &&
             (thread != gCrashedThread)
         ) {
@@ -182,17 +182,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     gSelectedAddress = tc->pc;
 
 #ifdef UNF
- #ifdef INCLUDE_DEBUG_MAP
-    // __OSThreadContext* tc = &gCrashedThread->context;
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        const char* fname = get_map_symbol_name(symbol);
-        if (fname != NULL) {
-            osSyncPrintf("func: %s\n", fname); //! TODO: only the name itself is printed.
-        }
-    }
- #endif // INCLUDE_DEBUG_MAP
-    debug_printcontext(gCrashedThread); //! TODO: fix line breaks and debug_printreg in usb/debug.c. Or is this an issue with UNF itself?
+    cs_os_print_page(gCSPages[gCSPageID]);
 #endif // UNF
 }
 
