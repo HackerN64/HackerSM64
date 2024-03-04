@@ -28,6 +28,7 @@ const char* gValNames_print_num_fmt[] = {
 CSSetting cs_settings_group_global[] = {
     [CS_OPT_HEADER_GLOBAL               ] = { .type = CS_OPT_TYPE_HEADER,  .name = "GLOBAL",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_GLOBAL_DRAW_SCREENSHOT      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show screenshot background",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_GLOBAL_DRAW_LR_ARROWS       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show L/R arrows",                .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GLOBAL_SYMBOL_NAMES         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Print symbol names",             .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP

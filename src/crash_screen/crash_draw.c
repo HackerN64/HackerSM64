@@ -347,7 +347,7 @@ u32 cs_page_header_draw(void) {
 }
 
 // Draws the 'L' and 'R' triangles.
-void cs_draw_page_LR_triangles(void) {
+void cs_draw_LR_triangles(void) {
     cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     const s32 triWidth = 14; // Width of the triangles.
@@ -396,7 +396,9 @@ void cs_draw_main(void) {
         }
 
         // Draw the L/R triangles.
-        cs_draw_page_LR_triangles();
+        if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_LR_ARROWS)) {
+            cs_draw_LR_triangles();
+        }
 
         // Draw the page header.
         u32 line = cs_page_header_draw();
