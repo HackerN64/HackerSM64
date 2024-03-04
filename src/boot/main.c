@@ -350,7 +350,11 @@ void thread3_main(UNUSED void *arg) {
     detect_emulator();
     create_crash_screen_thread();
 #ifdef UNF
-    debug_initialize();
+    // Emulators do not handle UNF properly.
+    //! TODO: Update this for emulators that add proper support.
+    if (gEmulator & (EMU_CONSOLE)) {
+        debug_initialize();
+    }
 #endif // UNF
 
 #ifdef DEBUG
