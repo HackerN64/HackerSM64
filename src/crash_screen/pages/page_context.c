@@ -380,6 +380,12 @@ void page_context_print(void) {
     }
  #endif // INCLUDE_DEBUG_MAP
 
+    // CAUSE:
+    const char* desc = get_cause_desc(tc->cause);
+    if (desc != NULL) {
+        debug_printf("- CAUSE: (%s)\n", desc);
+    }
+
     // Thread registers:
     const u32 columns = 3;
     const u32 rows = (ARRAY_COUNT(sRegList) / columns);
