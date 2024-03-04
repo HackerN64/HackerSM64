@@ -301,17 +301,6 @@ void page_context_draw(void) {
     u32 line = 1;
     size_t charX = 0;
 
-    const char* desc = get_cause_desc(tc->cause);
-    if (desc != NULL) {
-        // "CAUSE: ([exception cause description])"
-        cs_print(TEXT_X(0), TEXT_Y(line),
-            STR_COLOR_PREFIX"CAUSE:\t%s",
-            COLOR_RGBA32_CRASH_DESCRIPTION, desc
-        );
-    }
-
-    line++;
-
     // "THREAD: [thread id]"
     enum ThreadID threadID = gCrashedThread->id;
     charX = cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"THREAD:\t%d",
@@ -329,8 +318,6 @@ void page_context_draw(void) {
     }
     line++;
 
-    osWritebackDCacheAll();
-
 #ifdef INCLUDE_DEBUG_MAP
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     // "FUNC: [function name]"
@@ -341,6 +328,16 @@ void page_context_draw(void) {
     cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
     line++;
 #endif // INCLUDE_DEBUG_MAP
+
+    const char* desc = get_cause_desc(tc->cause);
+    if (desc != NULL) {
+        // "CAUSE: ([exception cause description])"
+        cs_print(TEXT_X(0), TEXT_Y(line),
+            STR_COLOR_PREFIX"CAUSE:\t%s",
+            COLOR_RGBA32_CRASH_DESCRIPTION, desc
+        );
+    }
+    line++;
 
     line = cs_context_print_registers(line, tc);
 
@@ -361,12 +358,6 @@ void page_context_print(void) {
     debug_printf("\n");
 
     __OSThreadContext* tc = &gCrashedThread->context;
-
-    // CAUSE:
-    const char* desc = get_cause_desc(tc->cause);
-    if (desc != NULL) {
-        debug_printf("- CAUSE: (%s)\n", desc);
-    }
 
     // THREAD:
     enum ThreadID threadID = gCrashedThread->id;
