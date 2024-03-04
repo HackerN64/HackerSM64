@@ -19,22 +19,44 @@
 
 /**
  * Enables Rumble Pak Support.
- * Currently not recommended, as it may cause random crashes.
  */
-// #define ENABLE_RUMBLE (1 || VERSION_SH)
+#define ENABLE_RUMBLE
 
 /**
  * The maximum number of supported players/controllers. 1-4.
  * This will save performance if the player has extra unused controllers plugged in.
- * NOTE: Default is 2, maximum is 4.
- * NOTE: This needs to be at least 2 for now for gamecube controller swap to work.
+ * NOTE: Default is 1, maximum is 4.
+ * NOTE: If this is 1, the first controller with input after boot will become player 1. Otherwise, player numbers are automatically assigned via port order.
+ * NOTE: It is highly recommended to enable ENABLE_STATUS_REPOLLING_GUI if this is greater than 1.
  */
-#define MAX_NUM_PLAYERS 2
+#define MAX_NUM_PLAYERS 1
+
+/**
+ * Enables a GUI that, while opem, allows plugging/unplugging controllers and changing the controller order.
+ * Triggered by unplugging any active controller.
+ */
+#define ENABLE_STATUS_REPOLLING_GUI
+
+/**
+ * Allows the player to use the button combo defined in input.h to trigger status repolling at any time during gameplay.
+ */
+#define ENABLE_STATUS_REPOLLING_COMBO_IN_GAMEPLAY
+
+/**
+ * Highlights the currently pressed buttons on controllers in the status repolling GUI.
+ */
+#define CONTROLLERS_INPUT_DISPLAY
 
 /**
  * Informs supported emulators to default to GameCube controller inputs.
  */
 // #define EMU_DEFAULT_TO_GCN
+
+/**
+ * RCVI hack. Increases performance on emulator, and does nothing on console.
+ * Might break on some emulators. Use at your own risk, and don't use it unless you actually need the extra performance.
+ */
+// #define RCVI_HACK
 
 /**
  * Screen Size Defines.
@@ -48,9 +70,3 @@
  */
 #define BORDER_HEIGHT_CONSOLE  0
 #define BORDER_HEIGHT_EMULATOR 0
-
-/**
- * RCVI hack. Increases performance on emulator, and does nothing on console.
- * Might break on some emulators. Use at your own risk, and don't use it unless you actually need the extra performance.
- */
-// #define RCVI_HACK

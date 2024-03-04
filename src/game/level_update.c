@@ -27,7 +27,6 @@
 #endif
 #include "level_table.h"
 #include "course_table.h"
-#include "rumble_init.h"
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "level_commands.h"
@@ -146,6 +145,10 @@ u8 g100CoinStarSpawned = FALSE;
 
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
+
+struct Controller* get_mario_controller(void) {
+    return (gMarioState ? gMarioState->controller : gPlayer1Controller);
+}
 
 u16 level_control_timer(s32 timerOp) {
     switch (timerOp) {
@@ -689,10 +692,8 @@ void initiate_painting_warp(void) {
 
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 fadeout_music(398);
-#if ENABLE_RUMBLE
-                queue_rumble_data(80, 70);
-                queue_rumble_decay(1);
-#endif
+
+                queue_rumble_data(gMarioState->controller, 80, 70, 1);
             }
         }
     }
@@ -981,13 +982,16 @@ void basic_update(void) {
 s32 play_mode_normal(void) {
 #ifndef DISABLE_DEMO
     if (gCurrDemoInput != NULL) {
+        gMarioState->controller = gDemoController;
         print_intro_text();
-        if (gPlayer1Controller->buttonPressed & END_DEMO) {
-            level_trigger_warp(gMarioState, gCurrLevelNum == LEVEL_PSS ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
+        if (gDemoController->buttonPressed & INPUT_END_DEMO) {
+            level_trigger_warp(gMarioState, ((gDemoInputListID == gDemoInputsBuf.dmaTable->count) ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT));
         } else if (!gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
                    && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
             level_trigger_warp(gMarioState, WARP_OP_DEMO_NEXT);
         }
+    } else {
+        gMarioState->controller = &gControllers[0];
     }
 #endif
 
@@ -1038,9 +1042,7 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_CHANGE_AREA);
         } else if (pressed_pause()) {
             lower_background_noise(1);
-#if ENABLE_RUMBLE
             cancel_rumble();
-#endif
             gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN;
             set_play_mode(PLAY_MODE_PAUSED);
         }
@@ -1282,11 +1284,10 @@ s32 init_level(void) {
             set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
         }
     }
-#if ENABLE_RUMBLE
+
     if (gCurrDemoInput == NULL) {
         cancel_rumble();
     }
-#endif
 
     if (gMarioState->action == ACT_INTRO_CUTSCENE) {
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);

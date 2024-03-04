@@ -14,7 +14,7 @@
 #include "seq_ids.h"
 #include "sm64.h"
 #include "sound_init.h"
-#include "rumble_init.h"
+#include "input.h"
 #include "puppyprint.h"
 #include "profiling.h"
 
@@ -174,11 +174,10 @@ void play_menu_sounds(s16 soundMenuFlags) {
     if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
-#if ENABLE_RUMBLE
+
     if (soundMenuFlags & SOUND_MENU_FLAG_LETGOMARIOFACE) {
-        queue_rumble_data(10, 60);
+        queue_rumble_data(gPlayer1Controller, 10, 60, 0);
     }
-#endif
 }
 
 /**

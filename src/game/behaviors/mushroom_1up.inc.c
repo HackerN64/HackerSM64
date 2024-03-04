@@ -3,19 +3,17 @@
 void bhv_1up_interact(void) {
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
+        queue_rumble_data(gMarioState->controller, 5, 80, 0);
 #ifdef MUSHROOMS_HEAL
         gMarioState->healCounter   = 31;
-#ifdef BREATH_METER
+ #ifdef BREATH_METER
         gMarioState->breathCounter = 31;
-#endif
-#endif
+ #endif // BREATH_METER
+#endif // MUSHROOMS_HEAL
 #ifdef ENABLE_LIVES
         gMarioState->numLives++;
-#endif
+#endif // ENABLE_LIVES
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-#if ENABLE_RUMBLE
-        queue_rumble_data(5, 80);
-#endif
     }
 }
 

@@ -30,7 +30,6 @@
 #include "save_file.h"
 #include "spawn_object.h"
 #include "spawn_sound.h"
-#include "rumble_init.h"
 
 /**
  * @file obj_behaviors.c

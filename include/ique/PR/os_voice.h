@@ -1,18 +1,18 @@
 
 /*---------------------------------------------------------------------*
         Copyright (C) 1998 Nintendo.
-        
+
         $RCSfile: os_voice.h,v $
         $Revision: 1.1.1.2 $
         $Date: 2002/10/29 08:06:34 $
  *---------------------------------------------------------------------*/
 
 #ifndef _OS_VOICE_H_
-#define	_OS_VOICE_H_
+#define _OS_VOICE_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
-#endif
+#endif /* _LANGUAGE_C_PLUS_PLUS */
 
 #include <PR/ultratypes.h>
 
@@ -24,23 +24,23 @@ extern "C" {
  *
  */
 
-typedef struct {		/* Voice Recognition System */
-  OSMesgQueue	*__mq;		/* SI Message Queue */
-  int		__channel;	/* Controller Port # */
-  s32		__mode;
-  u8		cmd_status;	/* Command Status */
-} OSVoiceHandle;
+typedef struct { /* Voice Recognition System */
+    /*0x00*/ OSMesgQueue *__mq; /* SI Message Queue */
+    /*0x04*/ int __channel;     /* Controller Port # */
+    /*0x08*/ s32 __mode;
+    /*0x0C*/ u8  cmd_status;    /* Command Status */
+} OSVoiceHandle; /*0x10*/
 
-typedef struct {		/* Voice Recognition System */
-  u16	warning;
-  u16	answer_num;		/* 0...5 */
-  u16	voice_level;
-  u16	voice_sn;
-  u16	voice_time;
-  u16	answer[5];
-  u16	distance[5];
-} OSVoiceData;
-	
+typedef struct { /* Voice Recognition System */
+    /*0x00*/ u16 warning;
+    /*0x02*/ u16 answer_num; /* 0...5 */
+    /*0x04*/ u16 voice_level;
+    /*0x06*/ u16 voice_sn;
+    /*0x08*/ u16 voice_time;
+    /*0x0A*/ u16 answer[5];
+    /*0x14*/ u16 distance[5];
+} OSVoiceData; /*0x20*/
+
 
 #endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
 
@@ -52,16 +52,18 @@ typedef struct {		/* Voice Recognition System */
 
 /* definition for Voice Recognition System */
 
-#define	VOICE_WARN_TOO_SMALL	0x0400
-#define	VOICE_WARN_TOO_LARGE	0x0800
-#define	VOICE_WARN_NOT_FIT	0x4000
-#define	VOICE_WARN_TOO_NOISY	0x8000
+#define VOICE_WARN_TOO_SMALL  (1 << 10) // 0x0400
+#define VOICE_WARN_TOO_LARGE  (1 << 11) // 0x0800
+#define VOICE_WARN_NOT_FIT    (1 << 14) // 0x4000
+#define VOICE_WARN_TOO_NOISY  (1 << 15) // 0x8000
 
-#define	VOICE_STATUS_READY	0
-#define	VOICE_STATUS_START	1
-#define	VOICE_STATUS_CANCEL	3
-#define	VOICE_STATUS_BUSY	5
-#define	VOICE_STATUS_END	7
+enum OSVoiceStatus {
+    VOICE_STATUS_READY  = 0,
+    VOICE_STATUS_START  = 1,
+    VOICE_STATUS_CANCEL = 3,
+    VOICE_STATUS_BUSY   = 5,
+    VOICE_STATUS_END    = 7,
+};
 
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
@@ -99,10 +101,10 @@ extern s32 osVoiceMaskDictionary( OSVoiceHandle *hd, u8 *maskpattern, int size);
 extern void osVoiceCountSyllables(u8 *word, u32 *syllable);
 
 
-#endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
+#endif /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
-#endif
+#endif /* _LANGUAGE_C_PLUS_PLUS */
 
 #endif /* !_OS_VOICE_H_ */

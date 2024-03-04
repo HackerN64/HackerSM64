@@ -60,7 +60,26 @@ f32 random_float(void) {
 
 // Return either -1 or 1 with a 50:50 chance.
 s32 random_sign(void) {
-    return ((random_u16() >= 0x7FFF) ? 1 : -1);
+    return ((random_u16() & 0x2) - 1);
+}
+
+/**
+ * @brief Get a value that cycles over time (in seconds).
+ *
+ * @param cycleLength f32: Time in seconds to complete a cycle.
+ * @param cycleOffset f32: Where the cycle should begin when timer is 0, 0.5 would be halfways through the cycle.
+ * @param timer u32: The timer source that should increment once per frame (e.g. gGlobalTimer).
+ * @return f32: A number between [-1, 1], cycling over time.
+ */
+f32 get_cycle(f32 cycleLength, f32 cycleOffset, u32 timer) {
+    if (cycleLength == 0.0f) {
+        return cycleOffset;
+    }
+
+    f32 rate = (f32)DEGREES(360 / 30) * (1.0f / cycleLength);
+    f32 offset = (f32)DEGREES(360) * cycleOffset;
+
+    return sins(roundf((rate * (f32)timer) + offset));
 }
 
 // Get the maximum and minimum of three numbers at the same time.

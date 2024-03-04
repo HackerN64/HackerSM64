@@ -2274,16 +2274,16 @@ s32 cur_obj_check_grabbed_mario(void) {
 s32 sPlayerGrabReleaseState;
 
 s32 player_performed_grab_escape_action(void) {
-    if (gPlayer1Controller->stickMag < 30.0f) {
+    if (gMarioState->controller->stickMag < 30.0f) {
         sPlayerGrabReleaseState = FALSE;
     }
 
-    if (sPlayerGrabReleaseState && (gPlayer1Controller->stickMag > 40.0f)) {
+    if (sPlayerGrabReleaseState && (gMarioState->controller->stickMag > 40.0f)) {
         sPlayerGrabReleaseState = TRUE;
         return TRUE;
     }
 
-    if (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG)) {
+    if (gMarioState->controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG)) {
         return TRUE;
     }
 

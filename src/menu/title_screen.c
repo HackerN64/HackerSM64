@@ -4,17 +4,18 @@
 #include "engine/math_util.h"
 #include "game/area.h"
 #include "game/game_init.h"
+#include "game/input.h"
 #include "game/level_update.h"
 #include "game/main.h"
 #include "game/memory.h"
 #include "game/print.h"
 #include "game/save_file.h"
 #include "game/sound_init.h"
-#include "game/rumble_init.h"
 #include "level_table.h"
 #include "seq_ids.h"
 #include "sm64.h"
 #include "title_screen.h"
+#include "level_commands.h"
 
 /**
  * @file title_screen.c
@@ -33,13 +34,12 @@ static char sLevelSelectStageNames[64][16] = {
 #undef DEFINE_LEVEL
 
 #ifdef KEEP_MARIO_HEAD
-#ifndef DISABLE_DEMO
-static u16 sDemoCountdown = 0;
-#endif
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
+ #ifndef DISABLE_DEMO
+static u16 sDemoCountdown = 0;
 
-#ifndef DISABLE_DEMO
+// Number of frames without input before the demo starts. Default is 800.
 #define PRESS_START_DEMO_TIMER 800
 
 /**
@@ -51,36 +51,41 @@ s32 run_level_id_or_demo(s32 level) {
     gCurrDemoInput = NULL;
 
     if (level == LEVEL_NONE) {
-        if (!gPlayer1Controller->buttonDown && !gPlayer1Controller->stickMag) {
-            // start the demo. 800 frames has passed while
+        if (!gPlayer1Controller->buttonDown && gPlayer1Controller->stickMag == 0.0f) {
+            // Start the demo. 800 frames has passed while
             // player is idle on PRESS START screen.
-            if ((++sDemoCountdown) == PRESS_START_DEMO_TIMER) {
-
+            sDemoCountdown++;
+            if (sDemoCountdown == PRESS_START_DEMO_TIMER) {
                 // start the Mario demo animation for the demo list.
                 load_patchable_table(&gDemoInputsBuf, gDemoInputListID);
 
-                // if the next demo sequence ID is the count limit, reset it back to
+                // If the next demo sequence ID is the count limit, reset it back to
                 // the first sequence.
-                if (++gDemoInputListID == gDemoInputsBuf.dmaTable->count) {
+                gDemoInputListID++;
+                if (gDemoInputListID == gDemoInputsBuf.dmaTable->count) {
                     gDemoInputListID = 0;
                 }
 
-                // add 1 (+4) to the pointer to skip the first 4 bytes
+                // Add 1 (+4) to the pointer to skip the first 4 bytes
                 // Use the first 4 bytes to store level ID,
                 // then use the rest of the values for inputs
-                gCurrDemoInput = ((struct DemoInput *) gDemoInputsBuf.bufTarget) + 1;
-                level = (s8)((struct DemoInput *) gDemoInputsBuf.bufTarget)->timer;
-                gCurrSaveFileNum = 1;
-                gCurrActNum = 1;
+                struct DemoInput* bufTarget = (struct DemoInput*)gDemoInputsBuf.bufTarget;
+                gCurrDemoInput = bufTarget + 1;
+                level = bufTarget->timer;
+
+                // Use the first save file and act.
+                gCurrSaveFileNum = SAVE_FILE_NUM_A;
+                gCurrActNum = ACT_1;
             }
-        } else { // activity was detected, so reset the demo countdown.
+        } else { // Activity was detected, so reset the demo countdown.
             sDemoCountdown = 0;
         }
     }
+
     return level;
 }
-#endif
-#endif
+ #endif // !DISABLE_DEMO
+#endif // KEEP_MARIO_HEAD
 
 
 u8 gLevelSelectHoldKeyIndex = 0;
@@ -94,20 +99,22 @@ u8 gLevelSelectHoldKeyTimer = 0;
 s32 intro_level_select(void) {
     u32 index = 0;
     if (gPlayer1Controller->rawStickY < -60
-        || gPlayer1Controller->rawStickX < -60
-        || gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD)
+     || gPlayer1Controller->rawStickX < -60
+     || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD))
     ) {
-            index++;
+        index |= 0b01; // Left
     }
 
     if (gPlayer1Controller->rawStickY > 60
-        || gPlayer1Controller->rawStickX > 60
-        || gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD)
+     || gPlayer1Controller->rawStickX > 60
+     || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD))
     ) {
-            index += 2;
+        index |= 0b10; // Right
     }
 
-    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 2) {
+    // Only increase/decrese if not holding that direction on the previous frame:
+
+    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 0b10) {
         if (gCurrLevelNum > LEVEL_MAX) {
             gCurrLevelNum = LEVEL_MIN;
         } else if (gPlayer1Controller->buttonDown & B_BUTTON) {
@@ -119,7 +126,7 @@ s32 intro_level_select(void) {
         }
     }
 
-    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 1) {
+    if (((index ^ gLevelSelectHoldKeyIndex) & index) == 0b01) {
         if (gCurrLevelNum < LEVEL_MIN) {
             // Same applies to here as above
             gCurrLevelNum = LEVEL_MAX;
@@ -132,20 +139,26 @@ s32 intro_level_select(void) {
         }
     }
 
+    // If there has been input for 10 frames, set the timer to 8 and set gLevelSelectHoldKeyIndex to 0 so the above becomes true.
     if (gLevelSelectHoldKeyTimer == 10) {
         gLevelSelectHoldKeyTimer = 8;
-        gLevelSelectHoldKeyIndex = 0;
-    } else {
+        gLevelSelectHoldKeyIndex = 0b00;
+    } else { // Otherwise, increment the timer while there is input.
         gLevelSelectHoldKeyTimer++;
         gLevelSelectHoldKeyIndex = index;
     }
 
-    if ((index & 0x3) == 0) gLevelSelectHoldKeyTimer = 0;
+    // If no input, keep timer at 0.
+    if (index == 0) {
+        gLevelSelectHoldKeyTimer = 0;
+    }
+
     if (gCurrLevelNum > LEVEL_MAX) gCurrLevelNum = LEVEL_MIN; // exceeded max. set to min.
     if (gCurrLevelNum < LEVEL_MIN) gCurrLevelNum = LEVEL_MAX; // exceeded min. set to max.
-    // Use file 4 and last act as a test
-    gCurrSaveFileNum = 4;
-    gCurrActNum = 6;
+
+    // Use file 4 and last act as a test.
+    gCurrSaveFileNum = SAVE_FILE_NUM_D;
+    gCurrActNum = ACT_6;
 
     print_text_centered(160, 80, "SELECT STAGE");
     print_text_centered(160, 30, "PRESS START BUTTON");
@@ -163,6 +176,7 @@ s32 intro_level_select(void) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
         return gCurrLevelNum;
     }
+
     return LEVEL_NONE;
 }
 
@@ -185,18 +199,18 @@ s32 intro_regular(void) {
         }
         sPlayMarioGreeting = FALSE;
     }
+
     print_intro_text();
-#ifdef DEBUG_LEVEL_SELECT
-    if (gPlayer1Controller->buttonDown & L_TRIG) {
-        gDebugLevelSelect = TRUE;
-    }
-#endif
+
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
-        play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#if ENABLE_RUMBLE
-        queue_rumble_data(60, 70);
-        queue_rumble_decay(1);
+#ifdef DEBUG_LEVEL_SELECT
+        if (gPlayer1Controller->buttonDown & L_TRIG) {
+            gDebugLevelSelect = TRUE;
+        }
 #endif
+        play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
+        queue_rumble_data(gPlayer1Controller, 60, 70, 1);
+
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
@@ -225,10 +239,8 @@ s32 intro_game_over(void) {
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-#if ENABLE_RUMBLE
-        queue_rumble_data(60, 70);
-        queue_rumble_decay(1);
-#endif
+        queue_rumble_data(gPlayer1Controller, 60, 70, 1);
+
         // same criteria as intro_regular
         level = LEVEL_FILE_SELECT + gDebugLevelSelect;
         sPlayMarioGameOver = TRUE;
@@ -239,7 +251,6 @@ s32 intro_game_over(void) {
     return level;
 #endif
 }
-
 #endif
 
 /**
@@ -271,6 +282,6 @@ s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
         case LVL_INTRO_GAME_OVER:           return (LEVEL_FILE_SELECT + gDebugLevelSelect);
 #endif
         case LVL_INTRO_LEVEL_SELECT:        return intro_level_select();
-        default: return LEVEL_NONE;
+        default:                            return LEVEL_NONE;
     }
 }

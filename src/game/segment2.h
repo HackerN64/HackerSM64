@@ -4,12 +4,12 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-extern void *puppyprint_font_lut[];
-extern void *puppyprint_kerning_lut[][82];
-extern const struct PPTextFont *const gPuppyPrintFontTable[];
+extern Texture *puppyprint_font_lut[];
+extern u8 *puppyprint_kerning_lut[][82];
+extern const struct PPTextFont *gPuppyPrintFontTable[];
 
-extern u8 seg2_course_name_table[];
-extern u8 seg2_act_name_table[];
+extern u8 *seg2_course_name_table[];
+extern u8 *seg2_act_name_table[];
 extern Gfx dl_rgba16_text_begin[];
 extern Gfx dl_rgba16_text_end[];
 extern Gfx dl_ia_text_begin[];
@@ -38,6 +38,41 @@ extern Gfx dl_skybox_end[];
 extern Gfx dl_waterbox_ia16_begin[];
 extern Gfx dl_waterbox_rgba16_begin[];
 extern Gfx dl_waterbox_end[];
+#ifdef ENABLE_STATUS_REPOLLING_GUI
+extern Texture texture_controller_port[];
+extern Texture texture_controller_unknown[];
+extern Texture texture_controller_n64_normal[];
+extern Texture texture_controller_n64_mouse[];
+extern Texture texture_controller_n64_voice[];
+extern Texture texture_controller_n64_keyboard[];
+extern Texture texture_controller_gba[];
+extern Texture texture_controller_gcn_normal[];
+extern Texture texture_controller_gcn_receiver[];
+extern Texture texture_controller_gcn_wavebird[];
+extern Texture texture_controller_gcn_wheel[];
+extern Texture texture_controller_gcn_keyboard[];
+extern Texture texture_controller_gcn_dancepad[];
+#endif // ENABLE_STATUS_REPOLLING_GUI
+#ifdef ENABLE_RUMBLE
+//! TODO: Move rumble pak graphic textures to src/menu/intro_geo.c once build order is fixed.
+extern Texture title_texture_rumble_pak_en[];
+//! TODO: Use these after ASCII/multilang is merged.
+ #if MULTILANG
+  #ifdef ENABLE_FRENCH
+extern Texture title_texture_rumble_pak_fr[];
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
+extern Texture title_texture_rumble_pak_de[];
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
+extern Texture title_texture_rumble_pak_jp[];
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
+extern Texture title_texture_rumble_pak_es[];
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
+ #endif // MULTILANG
+extern Texture title_texture_rumble_pak_controller[];
+#endif // ENABLE_RUMBLE
 extern Gfx dl_paintings_draw_ripples[];
 extern Gfx dl_paintings_rippling_begin[];
 extern Gfx dl_paintings_rippling_end[];
@@ -45,20 +80,20 @@ extern Gfx dl_paintings_env_mapped_begin[];
 extern Gfx dl_paintings_env_mapped_end[];
 extern s16 seg2_painting_triangle_mesh[];
 extern s16 seg2_painting_mesh_neighbor_tris[];
-extern Texture *main_hud_lut[58];
+extern Texture *main_hud_lut[59];
 extern Gfx dl_hud_img_load_tex_block[];
 extern Gfx dl_hud_img_begin[];
 extern Gfx dl_hud_img_end[];
-extern void *main_font_lut[];
+extern Texture *main_font_lut[];
 extern Gfx dl_ia_text_tex_settings[];
 extern Gfx dl_rgba16_load_tex_block[];
-extern void *main_credits_font_lut[];
+extern Texture *main_credits_font_lut[];
 extern Texture *main_hud_camera_lut[6];
 extern Gfx dl_shade_screen_begin[];
 extern Gfx dl_shade_screen_end[];
 extern Gfx dl_draw_text_bg_box[];
 extern Gfx dl_draw_triangle[];
-extern void *seg2_dialog_table[];
+extern struct DialogEntry *seg2_dialog_table[];
 extern Gfx dl_billboard_num_0[];
 extern Gfx dl_billboard_num_1[];
 extern Gfx dl_billboard_num_2[];

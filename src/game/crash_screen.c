@@ -8,13 +8,20 @@
 #include "audio/external.h"
 #include "farcall.h"
 #include "game_init.h"
+#include "input.h"
 #include "main.h"
 #include "debug.h"
-#include "rumble_init.h"
 
 #include "sm64.h"
 
 #include "printf.h"
+
+enum CrashScreenMessageIDs {
+    CRASH_SCREEN_MSG_NONE,
+    CRASH_SCREEN_MSG_CPU_BREAK,
+    CRASH_SCREEN_MSG_FAULT,
+    CRASH_SCREEN_MSG_VI_VBLANK,
+};
 
 enum crashPages {
     PAGE_CONTEXT,
@@ -214,7 +221,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(30, 110, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
     crash_screen_print(30, 120, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
     crash_screen_print(30, 130, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(30, 140, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+    crash_screen_print(30, 140, "S8:%08XH   RA:%08XH   MM:%08XH", (u32) tc->s8, (u32) tc->ra, (u32)*(u32*)(u32)tc->pc);
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
@@ -337,21 +344,23 @@ void draw_crash_screen(OSThread *thread) {
         cause = 17;
     }
 
-    if (gPlayer1Controller->buttonPressed & R_TRIG) {
-        crashPage++;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonPressed & (L_TRIG | Z_TRIG)) {
-        crashPage--;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
-        sProgramPosition += 4;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
-        sProgramPosition -= 4;
-        updateBuffer = TRUE;
+    for (int port = 0; port < MAXCONTROLLERS; port++) {
+        if (gControllers[port].buttonPressed & R_TRIG) {
+            crashPage++;
+            updateBuffer = TRUE;
+        }
+        if (gControllers[port].buttonPressed & (L_TRIG | Z_TRIG)) {
+            crashPage--;
+            updateBuffer = TRUE;
+        }
+        if (gControllers[port].buttonDown & D_CBUTTONS) {
+            sProgramPosition += 4;
+            updateBuffer = TRUE;
+        }
+        if (gControllers[port].buttonDown & U_CBUTTONS) {
+            sProgramPosition -= 4;
+            updateBuffer = TRUE;
+        }
     }
 
     if ((crashPage >= PAGE_COUNT) && (crashPage != 255)) {
@@ -394,20 +403,23 @@ OSThread *get_crashed_thread(void) {
 }
 
 extern u16 sRenderedFramebuffer;
-extern void audio_signal_game_loop_tick(void);
-extern void stop_sounds_in_continuous_banks(void);
-extern void read_controller_inputs(s32 threadID);
 extern struct SequenceQueueItem sBackgroundMusicQueue[6];
+void audio_signal_game_loop_tick(void);
+void stop_sounds_in_continuous_banks(void);
 
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) 1);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) CRASH_SCREEN_MSG_FAULT);
+
     while (TRUE) {
         if (thread == NULL) {
-            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
+            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
+
+            osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
+
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {
@@ -422,16 +434,9 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
-                continue;
             }
         } else {
-            if (gControllerBits) {
-#if ENABLE_RUMBLE
-                block_until_rumble_pak_free();
-#endif
-                osContStartReadDataEx(&gSIEventMesgQueue);
-            }
-            read_controller_inputs(THREAD_2_CRASH_SCREEN);
+            handle_input_simple(&mesg);
             draw_crash_screen(thread);
         }
     }
@@ -448,4 +453,3 @@ void crash_screen_init(void) {
                   );
     osStartThread(&gCrashScreen.thread);
 }
-

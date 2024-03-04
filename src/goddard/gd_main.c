@@ -45,7 +45,6 @@ u32 __main__(void) {
     make_scene();  // make_scene does nothing, though
     imout();
 
-    gd_init_controllers();
     print_all_memtrackers();
 
     start_timer("dlgen");

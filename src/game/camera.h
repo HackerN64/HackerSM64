@@ -20,10 +20,6 @@
  * @see camera.c
  */
 
-#ifndef ABS2
-#define ABS2(x) ((x) >= 0.f ? (x) : -(x))
-#endif
-
 #define LEVEL_AREA_INDEX(levelNum, areaNum) (((levelNum) << 4) + (areaNum))
 
 /**

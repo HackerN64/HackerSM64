@@ -73,6 +73,7 @@ extern f32 gSineTable[];
     _x > 0 ? _x : -_x; })
 #define absi ABS
 #define abss ABS
+#define ABS2(x) (((x) > 0) ? (x) : -(x))
 
 // Absolute value of a float (faster than using the above macro)
 ALWAYS_INLINE f32 absf(f32 in) {
@@ -627,6 +628,8 @@ u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 
+f32 get_cycle(f32 cycleLength, f32 cycleOffset, u32 timer);
+
 void mtxf_copy(Mat4 dest, Mat4 src);
 void mtxf_identity(Mat4 mtx);
 void mtxf_translate(Mat4 dest, Vec3f b);
@@ -678,32 +681,52 @@ void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);
 f32 find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 
-ALWAYS_INLINE f32 remap(f32 x, f32 fromA, f32 toA, f32 fromB, f32 toB) {
-    return (x - fromA) / (toA - fromA) * (toB - fromB) + fromB;
+// Remaps a number from one range to another.
+// Return the value between [fromB, toB] based on X's value between [fromA, toA].
+// Equivalent to lerp but with a custom range for f.
+ALWAYS_INLINE f32 remap(f32 f, f32 fromA, f32 toA, f32 fromB, f32 toB) {
+    return ((((f - fromA) / (toA - fromA)) * (toB - fromB)) + fromB);
 }
 
-ALWAYS_INLINE f32 lerpf(f32 from, f32 to, f32 amount) {
-    return (from + (to - from) * amount);
+// Float lerp.
+// Return the value between [from, to] based on f's value between [0.0, 1.0].
+ALWAYS_INLINE f32 lerpf(f32 from, f32 to, f32 f) {
+    return (from + (f * (to - from)));
 }
 
+// Precise float lerp.
+// Return the value between [from, to] based on f's value between [0.0, 1.0].
+// Sloer but more precise than the regular float lerp.
+ALWAYS_INLINE f32 lerpf_precise(f32 from, f32 to, f32 f) {
+    return ((from * (1.0f - f)) + (to * f));
+}
+
+// Integer lerp.
+// Return the value between [from, to] based on f's value between [0, 256].
+// Faster than float lerps.
+ALWAYS_INLINE s32 lerpi(s32 from, s32 to, u32 f) {
+    return (((f * (to - from)) >> 8) + from);
+}
+
+// Helper function for smoothstop.
 ALWAYS_INLINE f32 to_smoothstop(f32 x) {
     f32 sq = sqr(1.0f - x);
-    return 1.0f - sq;
+    return (1.0f - sq);
 }
 
-// Commonly known as ease-in
+// Commonly known as ease-in.
 ALWAYS_INLINE f32 smoothstart(f32 from, f32 to, f32 amount) {
     return lerpf(from, to, sqr(amount));
 }
 
-// Commonly known as ease-out
+// Commonly known as ease-out.
 ALWAYS_INLINE f32 smoothstop(f32 from, f32 to, f32 amount) {
     return lerpf(from, to, to_smoothstop(amount));
 }
 
-// Commonly known as ease-in-out
+// Commonly known as ease-in-out.
 ALWAYS_INLINE f32 smoothstep(f32 from, f32 to, f32 amount) {
-    amount = sqr(amount) * (3.0f - 2.0f * amount);
+    amount = sqr(amount) * (3.0f - (2.0f * amount));
 
     return lerpf(from, to, amount);
 }

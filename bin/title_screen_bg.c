@@ -121,8 +121,6 @@ const Texture *const game_over_texture_table[] = {
     title_texture_game_over_0, title_texture_game_over_1, title_texture_game_over_2, title_texture_game_over_3,
 };
 
-UNUSED static const u64 title_screen_bg_unused_0 = 0;
-
 #ifdef GODDARD_EASTER_EGG
 const Gfx title_screen_bg_dl_face_easter_egg_begin[] = {
     gsDPPipeSync(),
@@ -134,30 +132,6 @@ const Gfx title_screen_bg_dl_face_easter_egg_begin[] = {
 };
 
 const Gfx title_screen_bg_dl_face_easter_egg_end[] = {
-    gsDPPipeSync(),
-    gsDPSetCycleType(G_CYC_1CYCLE),
-    gsDPSetTexturePersp(G_TP_PERSP),
-    gsDPSetTextureFilter(G_TF_BILERP),
-    gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
-    gsSPEndDisplayList(),
-};
-#endif
-
-// Not part of segment2, but define still covers same use case
-#if (defined(COMPLETE_EN_US_SEGMENT2) && ENABLE_RUMBLE)
-ALIGNED8 static const Texture title_texture_rumble_pak[] = {
-#include "textures/title_screen_bg/title_screen_bg.06648.rgba16.inc.c"
-};
-
-const Gfx title_screen_bg_dl_rumble_pak[] = {
-    gsDPPipeSync(),
-    gsDPSetCycleType(G_CYC_COPY),
-    gsDPSetTexturePersp(G_TP_NONE),
-    gsDPSetTextureFilter(G_TF_POINT),
-    gsDPSetRenderMode(G_RM_NOOP, G_RM_NOOP2),
-    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, 319, 239),
-    gsDPLoadTextureTile(title_texture_rumble_pak, G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 0, 0, 0, 79, 23, 0, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 7, 5, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPTextureRectangle(220 << 2, 200 << 2, 299 << 2, 223 << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
     gsDPSetTexturePersp(G_TP_PERSP),

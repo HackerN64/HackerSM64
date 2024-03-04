@@ -312,15 +312,7 @@ void profiler_print_times() {
             microseconds[PROFILER_TIME_RSP_AUDIO] * 2
         );
 
-        Gfx* dlHead = gDisplayListHead;
-        gDPPipeSync(dlHead++);
-        gDPSetCycleType(dlHead++, G_CYC_1CYCLE);
-        gDPSetRenderMode(dlHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
-        gDPSetTexturePersp(dlHead++, G_TP_NONE);
-        gDPSetTextureFilter(dlHead++, G_TF_POINT);
-        gDPSetTextureLUT(dlHead++, G_TT_NONE);
-        drawSmallStringCol(&dlHead, 10, 8, text_buffer, 255, 255, 255);
-        gDisplayListHead = dlHead;
+        drawSmallStringDL(10, 8, text_buffer);
     }
 }
 

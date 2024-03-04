@@ -6,6 +6,7 @@
 #include "types.h"
 #include "game/ingame_menu.h"
 #include "game/puppyprint.h"
+#include "game/segment2.h"
 
 #include "make_const_nonconst.h"
 
@@ -2669,7 +2670,7 @@ ALIGNED8 static const Texture texture_shadow_quarter_square[] = {
 };
 #endif
 
-UNUSED ALIGNED8 static const Texture texture_radial_light[] = {
+UNUSED ALIGNED8 const Texture texture_radial_light[] = {
 #include "textures/segment2/light_quarter_circle.ia16.inc.c"
 };
 
@@ -2968,7 +2969,8 @@ const Gfx dl_ia8_up_arrow_end[] = {
     gsSPEndDisplayList(),
 };
 
-// 0x02014958 - 0x02014960
+#include "segment2/controllers.c.in"
+#include "segment2/rumble_pak.c.in"
 
 // 0x02014970 - 0x020149A8
 const Gfx dl_paintings_rippling_begin[] = {

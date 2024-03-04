@@ -12,7 +12,6 @@
 #include "level_table.h"
 #include "course_table.h"
 #include "level_commands.h"
-#include "rumble_init.h"
 #include "config.h"
 #include "emutest.h"
 #ifdef SRAM
@@ -73,16 +72,14 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
         u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) / 8;
 
         do {
-#if ENABLE_RUMBLE
             block_until_rumble_pak_free();
-#endif
+
             triesLeft--;
             status = (gEmulator & EMU_WIIVC)
                    ? osEepromLongReadVC(&gSIEventMesgQueue, offset, buffer, size)
                    : osEepromLongRead  (&gSIEventMesgQueue, offset, buffer, size);
-#if ENABLE_RUMBLE
+
             release_rumble_pak_control();
-#endif
         } while (triesLeft > 0 && status != 0);
     }
 
@@ -103,16 +100,14 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
         u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3;
 
         do {
-#if ENABLE_RUMBLE
             block_until_rumble_pak_free();
-#endif
+
             triesLeft--;
             status = (gEmulator & EMU_WIIVC)
                    ? osEepromLongWriteVC(&gSIEventMesgQueue, offset, buffer, size)
                    : osEepromLongWrite  (&gSIEventMesgQueue, offset, buffer, size);
-#if ENABLE_RUMBLE
+
             release_rumble_pak_control();
-#endif
         } while (triesLeft > 0 && status != 0);
     }
 
@@ -134,14 +129,12 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
         u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer);
 
         do {
-#if ENABLE_RUMBLE
             block_until_rumble_pak_free();
-#endif
+
             triesLeft--;
             status = nuPiReadSram(offset, buffer, ALIGN4(size));
-#if ENABLE_RUMBLE
+
             release_rumble_pak_control();
-#endif
         } while (triesLeft > 0 && status != 0);
     }
 
@@ -162,14 +155,12 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
         u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer);
 
         do {
-#if ENABLE_RUMBLE
             block_until_rumble_pak_free();
-#endif
+
             triesLeft--;
             status = nuPiWriteSram(offset, buffer, ALIGN4(size));
-#if ENABLE_RUMBLE
+
             release_rumble_pak_control();
-#endif
         } while (triesLeft > 0 && status != 0);
     }
 

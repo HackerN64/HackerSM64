@@ -11,11 +11,12 @@
 #include "types.h"
 #include "buffers/framebuffers.h"
 #include "game/game_init.h"
+#include "game/save_file.h" //! TODO: Change this to "game/ingame_menu.h" after ASCII/multilang is merged.
 #include "audio/external.h"
 
 // frame counts for the zoom in, hold, and zoom out of title model
-#define INTRO_STEPS_ZOOM_IN 20
-#define INTRO_STEPS_HOLD_1 75
+#define INTRO_STEPS_ZOOM_IN  20
+#define INTRO_STEPS_HOLD_1   75
 #define INTRO_STEPS_ZOOM_OUT 91
 
 // background types
@@ -263,9 +264,6 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     return dl;
 }
 
-#if (defined(COMPLETE_EN_US_SEGMENT2) && ENABLE_RUMBLE)
-extern Gfx title_screen_bg_dl_rumble_pak[];
-#endif
 #ifdef GODDARD_EASTER_EGG
 extern Gfx title_screen_bg_dl_face_easter_egg_begin[];
 extern Gfx title_screen_bg_dl_face_easter_egg_end[];
@@ -405,35 +403,66 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 }
 #endif
 
-#if (defined(COMPLETE_EN_US_SEGMENT2) && ENABLE_RUMBLE)
-Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
-    Gfx *dlIter;
-    Gfx *dl = NULL;
+#ifdef ENABLE_RUMBLE
+//! TODO: Move rumble pak graphic textures here once build order is fixed.
+
+//! TODO: Use DEFINE_LANGUAGE_ARRAY after ASCII/multilang is merged.
+Texture* title_texture_rumble_pak_language_array[] = {
+    title_texture_rumble_pak_en,
+ #if MULTILANG
+  #ifdef ENABLE_FRENCH
+    title_texture_rumble_pak_fr,
+  #endif // ENABLE_FRENCH
+  #ifdef ENABLE_GERMAN
+    title_texture_rumble_pak_de,
+  #endif // ENABLE_GERMAN
+  #ifdef ENABLE_JAPANESE
+    title_texture_rumble_pak_jp,
+  #endif // ENABLE_JAPANESE
+  #if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
+    title_texture_rumble_pak_es,
+  #endif // (ENABLE_SPANISH_SPAIN || ENABLE_SPANISH_LATIN_AMERICA)
+ #endif // MULTILANG
+};
+
+Gfx* geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode* node, UNUSED void*context) {
+    struct GraphNodeGenerated* genNode = (struct GraphNodeGenerated*)node;
+    Gfx* dlIter;
+    Gfx* dl = NULL;
     s8 backgroundTileSix = 0;
 
     if (callContext != GEO_CONTEXT_RENDER) {
         dl = NULL;
     } else if (callContext == GEO_CONTEXT_RENDER) {
         SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
-        s32 introContext = genNode->parameter & 0xFF;
+        s32 introContext = (genNode->parameter & 0xFF);
         if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];
         } else if (introContext == INTRO_CONTEXT_GAME_OVER) {
             backgroundTileSix = gameOverBackgroundTable[6];
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {
-            dl = alloc_display_list(3 * sizeof(*dl));
+            dl = alloc_display_list(
+                sizeof((Gfx[]){gsSPDisplayList(0)}) +
+                SIZEOF_GFX_TEXRECT_RGBA16 +
+                SIZEOF_GFX_TEXRECT_RGBA16 +
+                sizeof((Gfx[]){gsSPDisplayList(0)}) +
+                sizeof((Gfx[]){gsSPEndDisplayList()})
+            );
+
             if (dl != NULL) {
                 dlIter = dl;
-                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak);
+                gSPDisplayList(dlIter++, &dl_texrect_rgba16_begin);
+                texrect_rgba16(&dlIter, title_texture_rumble_pak_language_array[LANGUAGE_ENGLISH], RUMBLE_TEXT_W, RUMBLE_TEXT_H, RUMBLE_TEXT_X, RUMBLE_TEXT_Y, RUMBLE_TEXT_W, RUMBLE_TEXT_H);
+                texrect_rgba16(&dlIter, title_texture_rumble_pak_controller,                       RUMBLE_CONT_W, RUMBLE_CONT_H, RUMBLE_CONT_X, RUMBLE_CONT_Y, RUMBLE_CONT_W, RUMBLE_CONT_H);
+                gSPDisplayList(dlIter++, &dl_texrect_rgba16_end);
                 gSPEndDisplayList(dlIter);
             }
         } else {
             dl = NULL;
         }
     }
+
     return dl;
 }
-
-#endif
+#endif // ENABLE_RUMBLE
