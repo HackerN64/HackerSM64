@@ -38,6 +38,8 @@ typedef struct CSThreadInfo {
 } CSThreadInfo; /*0x4CC*/
 
 
+extern char HackerSM64_version_txt[];
+
 extern CSThreadInfo* gActiveCSThreadInfo;
 extern OSThread* gCrashedThread;
 

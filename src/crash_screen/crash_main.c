@@ -26,6 +26,9 @@
 #endif // UNF
 
 
+// Include the version number from VERSION.txt. Includes a newline at the end.
+INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
+
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS]; // Crash screen threads.
 static s32   sCSThreadIndex = 0;    // Crash screen thread index.
 static _Bool sFirstCrash    = TRUE; // Used to make certain things only happen on the first crash.

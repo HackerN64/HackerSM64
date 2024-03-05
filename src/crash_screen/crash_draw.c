@@ -19,9 +19,6 @@
 #include "game/game_init.h"
 
 
-// Include the version number from VERSION.txt. Includes a newline at the end.
-INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
-
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 static const Texture gCSFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS * sizeof(CSFontRow)] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
