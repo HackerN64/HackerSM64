@@ -159,7 +159,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
             }
         }
 
-        // Get the offset for the current function;
+        // Get the offset for the current function.
         InsnData insn = {
             .raw = *(Word*)sBranchBufferCurrAddr, //! TODO: Is this an unsafe read?
         };

@@ -18,6 +18,7 @@
 
 #include "config/config_world.h"
 #include "game/emutest.h"
+#include "game/version.h"
 #ifdef UNF
 #include "usb/debug.h"
 #endif // UNF
@@ -39,20 +40,7 @@ const enum ControlTypes cs_cont_list_about[] = {
 };
 
 
-static const EmulatorName sEmulatorStrings[] = {
-    { .bits = EMU_WIIVC,            .name = "Wii VC",           },
-    { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
-    { .bits = EMU_PROJECT64_3,      .name = "pj64 3",           },
-    { .bits = EMU_PROJECT64_4,      .name = "pj64 4",           },
-    { .bits = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
-    { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
-    { .bits = EMU_CEN64,            .name = "cen64",            },
-    { .bits = EMU_SIMPLE64,         .name = "simple64",         },
-    { .bits = EMU_PARALLELN64,      .name = "ParallelN64",      },
-    { .bits = EMU_ARES,             .name = "ares",             },
-    { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
-};
-
+// Region string:
 #define DEF_REGION_NAME(name) static const char region_name[3] = TO_STRING2(name);
 #ifdef VERSION_JP
 DEF_REGION_NAME(JP);
@@ -62,10 +50,20 @@ DEF_REGION_NAME(US);
 DEF_REGION_NAME(EU);
 #elif VERSION_SH
 DEF_REGION_NAME(SH);
+#elif BBPLAYER
+DEF_REGION_NAME(BB);
 #else
 DEF_REGION_NAME(XX);
 #endif
 
+// osTvType strings:
+static const char osTvTypeStrings[][5] = {
+    [OS_TV_PAL ] = "pal",
+    [OS_TV_NTSC] = "ntsc",
+    [OS_TV_MPAL] = "mpal",
+};
+
+// Microcode string:
 #define DEF_UCODE_NAME(name) static const char* ucode_name = TO_STRING2(name);
 #ifdef L3DEX2_ALONE
 DEF_UCODE_NAME(L3DEX2_alone);
@@ -85,6 +83,7 @@ DEF_UCODE_NAME(Super3D);
 DEF_UCODE_NAME(Fast3D);
 #endif
 
+// Save type string:
 #define DEF_SAVETYPE_NAME(name) static const char savetype_name[8] = TO_STRING2(name);
 #ifdef EEP4K
 DEF_SAVETYPE_NAME(eep4k);
@@ -96,6 +95,7 @@ DEF_SAVETYPE_NAME(sram);
 DEF_SAVETYPE_NAME(unknown);
 #endif
 
+// Compression type string:
 #define DEF_COMPRESSION_NAME(name) static const char compression_name[5] = TO_STRING2(name);
 #ifdef GZIP
 DEF_COMPRESSION_NAME(gzip);
@@ -113,10 +113,19 @@ DEF_COMPRESSION_NAME(none);
 DEF_COMPRESSION_NAME(unk);
 #endif
 
-static const char osTvTypeStrings[][5] = {
-    [OS_TV_PAL ] = "PAL",
-    [OS_TV_NTSC] = "NTSC",
-    [OS_TV_MPAL] = "MPAL",
+// Emulator strings:
+static const EmulatorName sEmulatorStrings[] = {
+    { .bits = EMU_WIIVC,            .name = "Wii VC",           },
+    { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
+    { .bits = EMU_PROJECT64_3,      .name = "pj64 3",           },
+    { .bits = EMU_PROJECT64_4,      .name = "pj64 4",           },
+    { .bits = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
+    { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
+    { .bits = EMU_CEN64,            .name = "cen64",            },
+    { .bits = EMU_SIMPLE64,         .name = "simple64",         },
+    { .bits = EMU_PARALLELN64,      .name = "ParallelN64",      },
+    { .bits = EMU_ARES,             .name = "ares",             },
+    { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
 };
 
 const char* get_emulator_name(enum Emulator emu) {
@@ -138,37 +147,36 @@ extern const char* gValNames_bool[];
 void page_about_draw(void) {
     _Bool debug_mode = FALSE;
     _Bool rcvi_hack = FALSE;
-    _Bool enable_rumble = FALSE;
 #ifdef DEBUG
     debug_mode = TRUE;
 #endif // DEBUG
 #ifdef RCVI_HACK
     rcvi_hack = TRUE;
 #endif // RCVI_HACK
-#if ENABLE_RUMBLE
-    enable_rumble = TRUE;
-#endif // ENABLE_RUMBLE
 
     u32 line = (1 + gCSPage_about.flags.printName);
+
+    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
+    cs_print(TEXT_X(centerX - ((STRLEN("HackerSM64 ") + strlen(HackerSM64_version_txt) + 0) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"HackerSM64 %s", COLOR_RGBA32_CRASH_PAGE_NAME, HackerSM64_version_txt);
+    cs_print(TEXT_X(centerX - ((STRLEN("Crash Screen ") + strlen(crash_screen_version) + 1) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"Crash Screen %s", COLOR_RGBA32_CRASH_PAGE_NAME, crash_screen_version);
     const RGBA32 valColor = COLOR_RGBA32_LIGHT_GRAY;
-
-    cs_print(TEXT_X(0), TEXT_Y(line++), "HackerSM64 %s", HackerSM64_version_txt);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "Crash Screen %s", crash_screen_version);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPILER:\n  "STR_COLOR_PREFIX"%s",                valColor, __compiler__);
     line++;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EMULATOR:\t\t"STR_COLOR_PREFIX"%s",              valColor, get_emulator_name(gEmulator));
-    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM NAME:\t\t"STR_COLOR_PREFIX"%s",              valColor, INTERNAL_ROM_NAME);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t"STR_COLOR_PREFIX"%s (patch %i)",   valColor, OS_MAJOR_VERSION, OS_MINOR_VERSION);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "UCODE:\t\t\t"STR_COLOR_PREFIX"%s",               valColor, ucode_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "REGION:\t\t\t"STR_COLOR_PREFIX"%s (%s)",         valColor, region_name, osTvTypeStrings[osTvType]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t"STR_COLOR_PREFIX"%s",            valColor, gValNames_bool[debug_mode]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "UNF:\t\t\t"STR_COLOR_PREFIX"%s",                 valColor, gValNames_bool[debug_is_initialized()]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "SAVE TYPE:\t\t"STR_COLOR_PREFIX"%s",             valColor, savetype_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPRESSION:\t"STR_COLOR_PREFIX"%s",             valColor, compression_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EXT RAM:\t\t"STR_COLOR_PREFIX"%s",               valColor, gValNames_bool[TOTAL_RAM_SIZE == (RAM_1MB * 8)]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EXT BOUNDS:\t\t"STR_COLOR_PREFIX"%d",            valColor, EXTENDED_BOUNDS_MODE);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t"STR_COLOR_PREFIX"%s",             valColor, gValNames_bool[rcvi_hack]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "RUMBLE:\t\t\t"STR_COLOR_PREFIX"%s",              valColor, gValNames_bool[enable_rumble]);
-
+    cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",                  valColor, __linker__);
+    line++;
+    line++;
+    cs_print(TEXT_X(0), TEXT_Y(line++), "EMULATOR:\t\t\t"STR_COLOR_PREFIX"%s",              valColor, get_emulator_name(gEmulator));
+    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM NAME:\t\t\t"STR_COLOR_PREFIX"%s",              valColor, INTERNAL_ROM_NAME);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t\t"STR_COLOR_PREFIX"%s (patch %i)",   valColor, OS_MAJOR_VERSION, OS_MINOR_VERSION);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "MICROCODE:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, ucode_name);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "REGION:\t\t\t\t"STR_COLOR_PREFIX"%s (%s)",         valColor, region_name, osTvTypeStrings[osTvType]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "SAVE TYPE:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, savetype_name);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPRESSION:\t\t"STR_COLOR_PREFIX"%s",             valColor, compression_name);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t\t"STR_COLOR_PREFIX"%s",            valColor, gValNames_bool[debug_mode]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "UNF:\t\t\t\t"STR_COLOR_PREFIX"%s",                 valColor, gValNames_bool[debug_is_initialized()]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "EXT RAM:\t\t\t"STR_COLOR_PREFIX"%s",               valColor, gValNames_bool[TOTAL_RAM_SIZE == (RAM_1MB * 8)]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "EXT BOUNDS MODE:\t"STR_COLOR_PREFIX"%d",           valColor, EXTENDED_BOUNDS_MODE);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, gValNames_bool[rcvi_hack]);
 }
 
 void page_about_input(void) {
@@ -177,13 +185,33 @@ void page_about_input(void) {
 
 void page_about_print(void) {
 #ifdef UNF
-    debug_printf("- HackerSM64 %s", HackerSM64_version_txt);
-    debug_printf("- Crash screen %s\n", crash_screen_version);
     debug_printf("\n");
-    debug_printf("- ROM NAME:\t%s\n", INTERNAL_ROM_NAME);
-    debug_printf("- EMULATOR:\t%s\n", get_emulator_name(gEmulator));
-    debug_printf("- UCODE:\t%s\n", ucode_name);
-    debug_printf("- LIBULTRA:\t%s (patch %i)\n", OS_MAJOR_VERSION, OS_MINOR_VERSION);
+
+    _Bool debug_mode = FALSE;
+    _Bool rcvi_hack = FALSE;
+#ifdef DEBUG
+    debug_mode = TRUE;
+#endif // DEBUG
+#ifdef RCVI_HACK
+    rcvi_hack = TRUE;
+#endif // RCVI_HACK
+
+    debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
+    debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
+    debug_printf("- COMPILER:\t\t%s\n",             __compiler__);
+    debug_printf("- LINKER:\t\t%s\n",               __linker__);
+    debug_printf("- EMULATOR:\t\t%s\n",             get_emulator_name(gEmulator));
+    debug_printf("- ROM NAME:\t\t%s\n",             INTERNAL_ROM_NAME);
+    debug_printf("- LIBULTRA:\t\t%s (patch %i)\n",  OS_MAJOR_VERSION, OS_MINOR_VERSION);
+    debug_printf("- MICROCODE:\t\t%s\n",            ucode_name);
+    debug_printf("- REGION:\t\t%s (%s)\n",          region_name, osTvTypeStrings[osTvType]);
+    debug_printf("- SAVE TYPE:\t\t%s\n",            savetype_name);
+    debug_printf("- COMPRESSION:\t\t%s\n",          compression_name);
+    debug_printf("- DEBUG MODE:\t\t%s\n",           gValNames_bool[debug_mode]);
+    debug_printf("- UNF:\t\t\t%s\n",                gValNames_bool[debug_is_initialized()]);
+    debug_printf("- EXT RAM:\t\t%s\n",              gValNames_bool[TOTAL_RAM_SIZE == (RAM_1MB * 8)]);
+    debug_printf("- EXT BOUNDS MODE:\t%d\n",        EXTENDED_BOUNDS_MODE);
+    debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_bool[rcvi_hack]);
 #endif // UNF
 }
 

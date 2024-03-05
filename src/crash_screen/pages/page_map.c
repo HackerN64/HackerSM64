@@ -193,9 +193,9 @@ void page_map_input(void) {
 void page_map_print(void) {
 #ifdef UNF
     debug_printf("\n");
-    debug_printf("SECTION:\n");
 
     u32 currIndex = sMapViewerViewportIndex;
+    debug_printf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", gMapSymbols[currIndex].addr, gMapSymbols[currIndex + (MAP_VIEWER_NUM_ROWS - 1)].addr);
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
     for (u32 i = 0; i < MAP_VIEWER_NUM_ROWS; i++) {

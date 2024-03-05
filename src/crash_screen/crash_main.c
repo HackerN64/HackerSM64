@@ -28,6 +28,7 @@
 
 // Include the version number from VERSION.txt. Includes a newline at the end.
 INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
+
 const char crash_screen_version[] = "v2.0";
 
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS]; // Crash screen threads.
