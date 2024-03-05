@@ -18,6 +18,7 @@
 #endif // INCLUDE_DEBUG_MAP
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
+#include "pages/page_about.h"
 #include "pages/page_settings.h"
 
 
@@ -32,6 +33,7 @@ CSPage* gCSPages[NUM_PAGES] = {
 #endif // INCLUDE_DEBUG_MAP
     [PAGE_RAM_VIEWER ] = &gCSPage_memory,
     [PAGE_DISASM     ] = &gCSPage_disasm,
+    [PAGE_ABOUT      ] = &gCSPage_about,
     [PAGE_SETTINGS   ] = &gCSPage_settings,
 };
 enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE; // Current page ID.

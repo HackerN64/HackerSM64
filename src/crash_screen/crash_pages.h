@@ -28,6 +28,7 @@ enum CSPages {
 #endif // INCLUDE_DEBUG_MAP
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
+    PAGE_ABOUT,
     PAGE_SETTINGS,
     NUM_PAGES,
     MAX_PAGES = 255U,

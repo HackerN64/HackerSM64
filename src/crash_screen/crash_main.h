@@ -39,6 +39,7 @@ typedef struct CSThreadInfo {
 
 
 extern char HackerSM64_version_txt[];
+extern const char crash_screen_version[];
 
 extern CSThreadInfo* gActiveCSThreadInfo;
 extern OSThread* gCrashedThread;
