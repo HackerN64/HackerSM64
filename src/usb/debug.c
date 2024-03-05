@@ -354,6 +354,11 @@ extern const char* __n64Assert_Message;
     
     void debug_printf(const char* message, ...)
     {
+        // Ensure debug mode is initialized
+        if (!debug_initialized) {
+            return;
+        }
+
         int len = 0;
         usbMesg msg;
         va_list args;
@@ -368,8 +373,9 @@ extern const char* __n64Assert_Message;
         va_end(args);
         
         // Attach the '\0' if necessary
-        if (0 <= len)
+        if (0 <= len) {
             debug_buffer[len] = '\0';
+        }
         
         // Send the printf to the usb thread
         msg.msgtype = MSG_WRITE;
