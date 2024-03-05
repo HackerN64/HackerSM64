@@ -326,6 +326,14 @@ extern const char* __n64Assert_Message;
         #endif
     }
     
+    /*==============================
+            debug_is_initialized
+            Checks Whether the debug and USB library is initialized.
+            @return Whether the debug and USB library is initialized.
+    ==============================*/
+    int debug_is_initialized(void) {
+        return debug_initialized;
+    }
     
     #ifndef LIBDRAGON
         /*==============================

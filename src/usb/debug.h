@@ -35,6 +35,13 @@
         ==============================*/
         
         extern void debug_initialize();
+
+        /*==============================
+            debug_is_initialized
+            Checks Whether the debug and USB library is initialized.
+            @return Whether the debug and USB library is initialized.
+        ==============================*/
+        extern int debug_is_initialized();
         
         
         /*==============================
