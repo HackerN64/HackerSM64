@@ -147,7 +147,7 @@ void page_memory_draw(void) {
     Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    cs_print(TEXT_X(STRLEN("RAM VIEW") + 1), TEXT_Y(line),
+    cs_print(TEXT_X(0), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, endAddr
     );
@@ -159,9 +159,8 @@ void page_memory_draw(void) {
         const MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {
-            // "IN:[symbol]"
-            size_t charX = cs_print(TEXT_X(0), TEXT_Y(line), "IN:");
-            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+            // "[symbol]"
+            cs_print_symbol_name(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, symbol);
         }
 
         line++;
@@ -300,6 +299,5 @@ struct CSPage gCSPage_memory = {
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };

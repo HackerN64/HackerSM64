@@ -23,6 +23,7 @@
 #include "usb/debug.h"
 #endif // UNF
 
+
 struct CSSetting cs_settings_group_page_about[] = {
     [CS_OPT_HEADER_PAGE_CONTEXT ] = { .type = CS_OPT_TYPE_HEADER,  .name = "ABOUT",                          .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_END_ABOUT           ] = { .type = CS_OPT_TYPE_END, },
@@ -154,7 +155,7 @@ void page_about_draw(void) {
     rcvi_hack = TRUE;
 #endif // RCVI_HACK
 
-    u32 line = (1 + gCSPage_about.flags.printName);
+    u32 line = 1;
 
     const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
     cs_print(TEXT_X(centerX - ((STRLEN("HackerSM64 ") + strlen(HackerSM64_version_txt) + 0) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"HackerSM64 %s", COLOR_RGBA32_CRASH_PAGE_NAME, HackerSM64_version_txt);
@@ -227,6 +228,5 @@ struct CSPage gCSPage_about ={
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };

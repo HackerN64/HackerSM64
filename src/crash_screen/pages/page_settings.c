@@ -229,7 +229,7 @@ void print_settings_list(u32 line, u32 numLines) {
 void page_settings_draw(void) {
     osWritebackDCacheAll();
 
-    u32 line = 2;
+    u32 line = 1;
 
     print_settings_list(line, SETTINGS_NUM_ROWS);
 
@@ -313,6 +313,5 @@ struct CSPage gCSPage_settings = {
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };

@@ -367,7 +367,7 @@ void page_disasm_draw(void) {
     Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
 
     // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    cs_print(TEXT_X(STRLEN("DISASM") + 1), TEXT_Y(line),
+    cs_print(TEXT_X(0), TEXT_Y(line),
         (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
         COLOR_RGBA32_WHITE, alignedSelectedAddr, startAddr, endAddr
     );
@@ -379,9 +379,8 @@ void page_disasm_draw(void) {
         const MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
 
         if (symbol != NULL) {
-            // "IN:[symbol]"
-            size_t charX = cs_print(TEXT_X(0), TEXT_Y(line), "IN:");
-            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+            // "[symbol]"
+            cs_print_symbol_name(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, symbol);
         }
 
         line++;
@@ -545,6 +544,5 @@ struct CSPage gCSPage_disasm = {
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };

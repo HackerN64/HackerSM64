@@ -129,16 +129,26 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 
 void page_map_draw(void) {
     u32 line = 1;
+    _Bool showAddr = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
+    _Bool showType = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES);
+    _Bool showSize = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES);
+
+    if (showAddr) {
+        // "ADDRESS:"
+        cs_print(TEXT_X(0), TEXT_Y(line), "ADDRESS:");
+    }
+
+    cs_print(TEXT_X(STRLEN("00000000:")), TEXT_Y(line), STR_COLOR_PREFIX"NAME:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
 
     size_t sizeStrSize = 0;
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES)) {
+    if (showSize) {
         sizeStrSize = STRLEN("SIZE:");
         // "SIZE:"
         cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
     }
 
     size_t typeStrSize = 0;
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES)) {
+    if (showType) {
         typeStrSize = STRLEN("TYPE:");
         // "TYPE:"
         cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - (typeStrSize + sizeStrSize)), TEXT_Y(line), STR_COLOR_PREFIX"TYPE:", COLOR_RGBA32_CRASH_MAP_SYMBOL_TYPE);
@@ -230,8 +240,7 @@ struct CSPage gCSPage_map = {
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };
 
-#endif
+#endif // INCLUDE_DEBUG_MAP

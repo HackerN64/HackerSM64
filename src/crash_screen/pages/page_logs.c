@@ -59,73 +59,6 @@ void page_logs_init(void) {
 #endif // !PUPPYPRINT_DEBUG
 }
 
-// Draws the red background for the assert section.
-static void draw_assert_highlight(u32 line) {
-    //! Prints the assert message early, but with 0 alpha (skips framebuffer writes).
-    //   This is a hacky way to get the amount of lines the wrapped assert text will be.
-    //   This can't be done after the normal print because it would show up in front of the text.
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"MESSAGE:%s",
-        COLOR_RGBA32_NONE, __n64Assert_Message
-    );
-    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(4 + gCSNumLinesPrinted), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x7F));
-}
-
-u32 print_assert_section(u32 line) {
-    u32 charX = 0;
-
-    draw_assert_highlight(line);
-
-    // "ASSERT:"
-    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
-    line++;
-    cs_draw_divider(DIVIDER_Y(line));
-
-    size_t lineStrStart = (CRASH_SCREEN_NUM_CHARS_X - STRLEN("LINE:0000"));
-    // "FILE: [file name]"
-    charX += cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"FILE:",
-        COLOR_RGBA32_CRASH_HEADER
-    );
-    charX += cs_print_scroll(TEXT_X(charX), TEXT_Y(line), (lineStrStart - charX),
-        STR_COLOR_PREFIX"%s",
-        COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
-    );
-    // "LINE:[line number]"
-    cs_print(TEXT_X(lineStrStart), TEXT_Y(line),
-        STR_COLOR_PREFIX"LINE:"STR_COLOR_PREFIX"%d",
-        COLOR_RGBA32_CRASH_HEADER,
-        COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_LineNum
-    );
-    line++;
-
-    // "COND:[condition]"
-    if (__n64Assert_Condition != NULL) {
-        charX = 0;
-        charX += cs_print(TEXT_X(charX), TEXT_Y(line),
-            STR_COLOR_PREFIX"COND:", COLOR_RGBA32_CRASH_HEADER
-        );
-        charX += cs_print_scroll(TEXT_X(charX), TEXT_Y(line),
-            (CRASH_SCREEN_NUM_CHARS_X - charX),
-            STR_COLOR_PREFIX"%s",
-            COLOR_RGBA32_CRASH_AT, __n64Assert_Condition
-        );
-        line++;
-    }
-
-    // "MESSAGE:[message]"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"MESSAGE:"STR_COLOR_PREFIX"%s",
-        COLOR_RGBA32_CRASH_HEADER,
-        gCSDefaultPrintColor, __n64Assert_Message
-    );
-    line += gCSNumLinesPrinted;
-
-    osWritebackDCacheAll();
-
-    return line;
-}
-
 #ifdef PUPPYPRINT_DEBUG
 void draw_logs_section(u32 line, u32 numLines) {
     const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOGS, CS_OPT_LOG_INDEX_NUMBERS);
@@ -168,28 +101,16 @@ void draw_logs_section(u32 line, u32 numLines) {
 #endif // PUPPYPRINT_DEBUG
 
 void page_logs_draw(void) {
-    u32 line = 2;
-
-    gCSWordWrap = TRUE;
-
-    if (__n64Assert_Message != NULL) {
-        line = print_assert_section(line);
-#ifdef PUPPYPRINT_DEBUG
-        line++;
-        cs_draw_divider(DIVIDER_Y(line));
-#else // !PUPPYPRINT_DEBUG
-    } else {
-        cs_print(TEXT_X(0), TEXT_Y(line), "No log or assert data.");
-#endif // !PUPPYPRINT_DEBUG
-    }
+    u32 line = 1;
 
 #ifdef PUPPYPRINT_DEBUG
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
-
+    gCSWordWrap = TRUE;
     draw_logs_section(line, sLogNumShownRows);
-#endif // PUPPYPRINT_DEBUG
-
     gCSWordWrap = FALSE;
+#else // !PUPPYPRINT_DEBUG
+    cs_print(TEXT_X(0), TEXT_Y(line), "No log data.");
+#endif // !PUPPYPRINT_DEBUG
 
     osWritebackDCacheAll();
 }
@@ -216,15 +137,7 @@ void page_logs_input(void) {
 void page_logs_print(void) {
 #ifdef UNF
     debug_printf("\n");
-    if (__n64Assert_Message != NULL) {
-        debug_printf(
-            "- ASSERT: \n-- FILE: %s in LINE: %d\n-- CONDITION: %s\n-- MESSAGE: \"%s\"\n",
-            __n64Assert_Filename,
-            __n64Assert_LineNum,
-            __n64Assert_Condition,
-            __n64Assert_Message
-        );
-    }
+
  #ifdef PUPPYPRINT_DEBUG
     debug_printf("- PUPPYPRINT LOG:\n");
     for (u32 i = 0; i < sLogTotalRows; i++) {
@@ -256,6 +169,5 @@ struct CSPage gCSPage_logs = {
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };

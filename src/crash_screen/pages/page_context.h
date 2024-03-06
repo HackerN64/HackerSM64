@@ -17,11 +17,6 @@ enum CSSettingsGroup_page_context {
 };
 
 
-typedef struct ThreadIDName {
-    /*0x00*/ enum ThreadID threadID;
-    /*0x04*/ const char* name;
-} ThreadIDName; /*0x08*/
-
 typedef struct {
     /*0x00*/ const Address offset;
     /*0x04*/ const u8 size;

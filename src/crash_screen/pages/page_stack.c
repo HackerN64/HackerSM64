@@ -200,8 +200,17 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 void page_stack_draw(void) {
     u32 line = 1;
 
+    cs_print(TEXT_X(0), TEXT_Y(line), "IN STACK:");
+
+    u32 charX = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES) ? STRLEN("00000000:") : 0;
+
+    cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"FUNCTION:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
+
 #ifdef INCLUDE_DEBUG_MAP
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS)) {
+    if (
+        cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) &&
+        cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS)
+    ) {
         // "OFFSET:"
         cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("OFFSET:")), TEXT_Y(line), STR_COLOR_PREFIX"OFFSET:", COLOR_RGBA32_CRASH_OFFSET);
     }
@@ -285,6 +294,5 @@ struct CSPage gCSPage_stack = {
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,
-        .printName   = TRUE,
     },
 };

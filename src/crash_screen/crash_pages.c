@@ -10,6 +10,7 @@
 
 #include "crash_pages.h"
 
+#include "pages/page_home.h"
 #include "pages/page_context.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
@@ -18,13 +19,14 @@
 #endif // INCLUDE_DEBUG_MAP
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
-#include "pages/page_about.h"
 #include "pages/page_settings.h"
+#include "pages/page_about.h"
 
 
 // -- Pages --
 
 CSPage* gCSPages[NUM_PAGES] = {
+    [PAGE_HOME       ] = &gCSPage_home,
     [PAGE_CONTEXT    ] = &gCSPage_context,
     [PAGE_LOGS       ] = &gCSPage_logs,
     [PAGE_STACK_TRACE] = &gCSPage_stack,
@@ -33,8 +35,8 @@ CSPage* gCSPages[NUM_PAGES] = {
 #endif // INCLUDE_DEBUG_MAP
     [PAGE_RAM_VIEWER ] = &gCSPage_memory,
     [PAGE_DISASM     ] = &gCSPage_disasm,
-    [PAGE_ABOUT      ] = &gCSPage_about,
     [PAGE_SETTINGS   ] = &gCSPage_settings,
+    [PAGE_ABOUT      ] = &gCSPage_about,
 };
 enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE; // Current page ID.
 _Bool gCSSwitchedPage = FALSE;

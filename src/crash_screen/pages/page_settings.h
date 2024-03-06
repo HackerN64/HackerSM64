@@ -7,7 +7,7 @@
 #include "crash_screen/crash_settings.h"
 
 
-#define SETTINGS_NUM_ROWS 20
+#define SETTINGS_NUM_ROWS 21
 
 #define VALUE_NAME_SIZE 10
 

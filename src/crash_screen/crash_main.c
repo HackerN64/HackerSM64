@@ -29,7 +29,8 @@
 // Include the version number from VERSION.txt. Includes a newline at the end.
 INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
 
-const char crash_screen_version[] = "v2.0";
+// Crash screen version.
+const char crash_screen_version[] = "v2.0 (dev)"; //! TODO: Change this on release.
 
 ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS]; // Crash screen threads.
 static s32   sCSThreadIndex = 0;    // Crash screen thread index.
@@ -153,16 +154,9 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
-    // Default to certain pages depening on the crash type.
-    switch (tc->cause) {
-        case EXC_SYSCALL:
-            if (__n64Assert_Message != NULL) {
-                cs_set_page(PAGE_LOGS);
-            }
-            break;
-        case EXC_II:
-            cs_set_page(PAGE_DISASM);
-            break;
+    // Default to disasm page if the crash was caused by an Illegal Instruction.
+    if (tc->cause == EXC_II) {
+        cs_set_page(PAGE_DISASM);
     }
 
     // Only on the first crash:
@@ -182,13 +176,13 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 #ifdef INCLUDE_DEBUG_MAP
         map_data_init();
 #endif // INCLUDE_DEBUG_MAP
+
+#ifdef UNF
+        cs_os_print_page(gCSPages[gCSPageID]);
+#endif // UNF
     }
 
     gSelectedAddress = tc->pc;
-
-#ifdef UNF
-    cs_os_print_page(gCSPages[gCSPageID]);
-#endif // UNF
 }
 
 /**

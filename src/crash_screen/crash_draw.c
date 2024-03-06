@@ -305,18 +305,9 @@ void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTot
 // Page header draw function.
 u32 cs_page_header_draw(void) {
     u32 line = 0;
-    // "HackerSM64 [vX.X.X]"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"HackerSM64 %s",
-        COLOR_RGBA32_CRASH_HEADER,
-        HackerSM64_version_txt
-    );
 
-    // "START:controls"
-    cs_print(TEXT_X(19), TEXT_Y(line),
-        STR_COLOR_PREFIX"%s:controls",
-        COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
-    );
+    CSPage* page = gCSPages[gCSPageID];
+    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
     // "<Page:XX>"
     cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
@@ -327,16 +318,6 @@ u32 cs_page_header_draw(void) {
     line++;
 
     cs_draw_divider(DIVIDER_Y(line));
-
-    CSPage* page = gCSPages[gCSPageID];
-
-    if (page->flags.printName) {
-        cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
-
-        line++;
-
-        cs_draw_divider(DIVIDER_Y(line));
-    }
 
     osWritebackDCacheAll();
 
