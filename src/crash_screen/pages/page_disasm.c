@@ -40,6 +40,7 @@ const char* sValNames_branch_arrow[] = {
 
 struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_HEADER_PAGE_DISASM  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASM",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_SHOW_RANGE   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
@@ -68,9 +69,11 @@ const enum ControlTypes cs_cont_list_disasm[] = {
 };
 
 
+#define DISASM_NUM_SHOWN_ROWS 21
+
 static u32 sDisasmViewportIndex = 0x00000000;
 static u32 sDisasmBranchStartX = 0; // The X position where branch arrows start.
-static u32 sDisasmNumShownRows = 20;
+static u32 sDisasmNumShownRows = DISASM_NUM_SHOWN_ROWS;
 
 #ifdef INCLUDE_DEBUG_MAP
 static const RGBA32 sBranchColors[] = {
@@ -351,9 +354,12 @@ void page_disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
 
+    sDisasmNumShownRows = DISASM_NUM_SHOWN_ROWS;
+    const _Bool showCurrentRange  = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_RANGE);
+    sDisasmNumShownRows -= showCurrentRange;
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
-    sDisasmNumShownRows = (20 - showCurrentSymbol);
+    sDisasmNumShownRows -= showCurrentSymbol;
 #endif // INCLUDE_DEBUG_MAP
 
     sDisasmBranchStartX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET) +
@@ -366,13 +372,15 @@ void page_disasm_draw(void) {
     Address startAddr = sDisasmViewportIndex;
     Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
 
-    // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
-        COLOR_RGBA32_WHITE, alignedSelectedAddr, startAddr, endAddr
-    );
+    if (showCurrentRange) {
+        // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
+        cs_print(TEXT_X(0), TEXT_Y(line),
+            (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
+            COLOR_RGBA32_WHITE, alignedSelectedAddr, startAddr, endAddr
+        );
 
-    line++;
+        line++;
+    }
 
 #ifdef INCLUDE_DEBUG_MAP
     if (showCurrentSymbol) {
@@ -393,7 +401,14 @@ void page_disasm_draw(void) {
 
     disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, tc->pc);
 
-    cs_draw_divider(DIVIDER_Y(line));
+    if (
+        showCurrentRange
+#ifdef INCLUDE_DEBUG_MAP
+        || showCurrentSymbol
+#endif // INCLUDE_DEBUG_MAP
+    ) {
+        cs_draw_divider(DIVIDER_Y(line));
+    }
 
     u32 line2 = (line + sDisasmNumShownRows);
 

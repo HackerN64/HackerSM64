@@ -296,7 +296,7 @@ void page_home_draw(void) {
         COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
     );
     line++;
-    
+
     cs_draw_divider(DIVIDER_Y(line));
     line++;
 
@@ -314,7 +314,7 @@ void page_home_draw(void) {
     cs_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
     line++;
     line++;
-    
+
     if (__n64Assert_Message != NULL) {
         line++;
         cs_draw_divider(DIVIDER_Y(line));

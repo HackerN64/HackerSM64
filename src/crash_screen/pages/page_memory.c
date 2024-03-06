@@ -21,6 +21,7 @@
 
 struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_HEADER_PAGE_MEMORY  ] = { .type = CS_OPT_TYPE_HEADER,  .name = "RAM VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_MEMORY_SHOW_RANGE   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_SHOW_SYMBOL  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
@@ -43,8 +44,11 @@ const enum ControlTypes cs_cont_list_memory[] = {
 };
 
 
+#define MEMORY_NUM_SHOWN_ROWS 20
+
+
 static Address sRamViewViewportIndex = 0x00000000;
-static u32 sRamViewNumShownRows = 19;
+static u32 sRamViewNumShownRows = MEMORY_NUM_SHOWN_ROWS;
 
 static const char gHex[0x10] = "0123456789ABCDEF";
 #ifdef UNF
@@ -136,9 +140,12 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
 void page_memory_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
 
+    sRamViewNumShownRows = MEMORY_NUM_SHOWN_ROWS;
+    const _Bool showCurrentRange  = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_RANGE);
+    sRamViewNumShownRows -= showCurrentRange;
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
-    sRamViewNumShownRows = (19 - showCurrentSymbol);
+    sRamViewNumShownRows -= showCurrentSymbol;
 #endif // INCLUDE_DEBUG_MAP
 
     u32 line = 1;
@@ -146,13 +153,15 @@ void page_memory_draw(void) {
     Address startAddr = sRamViewViewportIndex;
     Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
-    // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
-        COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, endAddr
-    );
+    if (showCurrentRange) {
+        // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
+        cs_print(TEXT_X(0), TEXT_Y(line),
+            (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
+            COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, endAddr
+        );
 
-    line++;
+        line++;
+    }
 
 #ifdef INCLUDE_DEBUG_MAP
     if (showCurrentSymbol) {
@@ -165,9 +174,17 @@ void page_memory_draw(void) {
 
         line++;
 
-        cs_draw_divider(DIVIDER_Y(line));
     }
 #endif // INCLUDE_DEBUG_MAP
+
+    if (
+        showCurrentRange
+#ifdef INCLUDE_DEBUG_MAP
+        || showCurrentSymbol
+#endif // INCLUDE_DEBUG_MAP
+    ) {
+        cs_draw_divider(DIVIDER_Y(line));
+    }
 
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
 

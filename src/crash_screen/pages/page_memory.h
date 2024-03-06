@@ -9,6 +9,7 @@
 
 enum CSSettingsGroup_page_memory {
     CS_OPT_HEADER_PAGE_MEMORY,
+    CS_OPT_MEMORY_SHOW_RANGE,
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_MEMORY_SHOW_SYMBOL,
 #endif // INCLUDE_DEBUG_MAP

@@ -18,6 +18,7 @@ enum CSDisasmBranchArrowModes {
 
 enum CSSettingsGroup_page_disasm {
     CS_OPT_HEADER_PAGE_DISASM,
+    CS_OPT_DISASM_SHOW_RANGE,
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_DISASM_SHOW_SYMBOL,
 #endif // INCLUDE_DEBUG_MAP

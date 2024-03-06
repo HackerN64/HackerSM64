@@ -63,10 +63,6 @@ void page_logs_init(void) {
 void draw_logs_section(u32 line, u32 numLines) {
     const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOGS, CS_OPT_LOG_INDEX_NUMBERS);
 
-    // "PUPPYPRINT LOG:"
-    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"PUPPYPRINT LOG:", COLOR_RGBA32_CRASH_HEADER);
-    line++;
-
     // Print entries:
     for (u32 y = 0; y < numLines; y++) {
         u32 printIndex = (sLogViewportIndex + y);
