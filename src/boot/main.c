@@ -292,6 +292,7 @@ void handle_sp_complete(void) {
 }
 
 void handle_dp_complete(void) {
+    DEBUG_ASSERT((sCurrentDisplaySPTask != NULL), "NULL SP task in handle_dp_complete.");
     // Gfx SP task is completely done.
     if (sCurrentDisplaySPTask->msgqueue != NULL) {
         osSendMesg(sCurrentDisplaySPTask->msgqueue, sCurrentDisplaySPTask->msg, OS_MESG_NOBLOCK);
