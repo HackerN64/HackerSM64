@@ -167,6 +167,47 @@ static void draw_assert_highlight(u32 line) {
     cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y - line), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
 }
 
+void cs_print_crashed_thread(u32 x, u32 y) {
+    // "THREAD: [thread id]"
+    enum ThreadID threadID = gCrashedThread->id;
+    size_t charX = cs_print(TEXT_X(x), TEXT_Y(y), STR_COLOR_PREFIX"THREAD:\t%d",
+        COLOR_RGBA32_CRASH_THREAD, threadID
+    );
+    if (threadID < NUM_THREADS) {
+        const char* threadName = get_thread_name_from_id(threadID);
+
+        if (threadName != NULL) {
+            // "(thread name)"
+            cs_print(TEXT_X(charX + STRLEN(" ")), TEXT_Y(y), STR_COLOR_PREFIX"(%s)",
+                COLOR_RGBA32_CRASH_THREAD, threadName
+            );
+        }
+    }
+}
+
+#ifdef INCLUDE_DEBUG_MAP
+void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
+    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    // "FUNC: [function name]"
+    size_t charX = cs_print(TEXT_X(x), TEXT_Y(y),
+        STR_COLOR_PREFIX"FUNC:\t",
+        COLOR_RGBA32_CRASH_AT
+    );
+    cs_print_symbol_name(TEXT_X(charX), TEXT_Y(y), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+}
+#endif // INCLUDE_DEBUG_MAP
+
+void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
+    const char* desc = get_cause_desc(tc->cause);
+    if (desc != NULL) {
+        // "CAUSE: ([exception cause description])"
+        cs_print(TEXT_X(x), TEXT_Y(y),
+            STR_COLOR_PREFIX"CAUSE:\t%s",
+            COLOR_RGBA32_CRASH_DESCRIPTION, desc
+        );
+    }
+}
+
 u32 print_assert_section(u32 line) {
     u32 charX = 0;
 
@@ -243,47 +284,6 @@ u32 print_assert_section(u32 line) {
     osWritebackDCacheAll();
 
     return line;
-}
-
-void cs_print_crashed_thread(u32 x, u32 y) {
-    // "THREAD: [thread id]"
-    enum ThreadID threadID = gCrashedThread->id;
-    size_t charX = cs_print(TEXT_X(x), TEXT_Y(y), STR_COLOR_PREFIX"THREAD:\t%d",
-        COLOR_RGBA32_CRASH_THREAD, threadID
-    );
-    if (threadID < NUM_THREADS) {
-        const char* threadName = get_thread_name_from_id(threadID);
-
-        if (threadName != NULL) {
-            // "(thread name)"
-            cs_print(TEXT_X(charX + STRLEN(" ")), TEXT_Y(y), STR_COLOR_PREFIX"(%s)",
-                COLOR_RGBA32_CRASH_THREAD, threadName
-            );
-        }
-    }
-}
-
-#ifdef INCLUDE_DEBUG_MAP
-void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
-    // "FUNC: [function name]"
-    size_t charX = cs_print(TEXT_X(x), TEXT_Y(y),
-        STR_COLOR_PREFIX"FUNC:\t",
-        COLOR_RGBA32_CRASH_AT
-    );
-    cs_print_symbol_name(TEXT_X(charX), TEXT_Y(y), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
-}
-#endif // INCLUDE_DEBUG_MAP
-
-void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
-    const char* desc = get_cause_desc(tc->cause);
-    if (desc != NULL) {
-        // "CAUSE: ([exception cause description])"
-        cs_print(TEXT_X(x), TEXT_Y(y),
-            STR_COLOR_PREFIX"CAUSE:\t%s",
-            COLOR_RGBA32_CRASH_DESCRIPTION, desc
-        );
-    }
 }
 
 void page_home_draw(void) {
