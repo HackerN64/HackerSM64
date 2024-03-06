@@ -414,7 +414,7 @@ const InsnTemplate* get_insn(InsnData insn) {
 }
 
 // CPU register names.
-//! TODO: Combine this with sRegNames in page_context.c.
+//! TODO: Combine this with sRegNames in page_registers.c.
 static const char sCPURegisterNames[][3] = {
     "R0",                                           // $zero. Hardware enforced.
     "AT",                                           // Assembler temporary value. Don't use unless you know it's safe.

@@ -12,24 +12,24 @@
 #include "crash_screen/map_parser.h"
 #include "crash_screen/memory_read.h"
 
-#include "page_context.h"
+#include "page_registers.h"
 
 #ifdef UNF
 #include "usb/debug.h"
 #endif // UNF
 
 
-struct CSSetting cs_settings_group_page_context[] = {
-    [CS_OPT_HEADER_PAGE_CONTEXT ] = { .type = CS_OPT_TYPE_HEADER,  .name = "CONTEXT",                        .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+struct CSSetting cs_settings_group_page_registers[] = {
+    [CS_OPT_HEADER_PAGE_REGISTERS   ] = { .type = CS_OPT_TYPE_HEADER,  .name = "REGISTERS",                        .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_CONTEXT_PARSE_REG   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_REGISTERS_PARSE_REG     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
-    [CS_OPT_CONTEXT_FLOATS_FMT  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
-    [CS_OPT_END_CONTEXT         ] = { .type = CS_OPT_TYPE_END, },
+    [CS_OPT_REGISTERS_FLOATS_FMT    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
+    [CS_OPT_END_REGISTERS           ] = { .type = CS_OPT_TYPE_END, },
 };
 
 
-const enum ControlTypes cs_cont_list_context[] = {
+const enum ControlTypes cs_cont_list_registers[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_HIDE_CRASH_SCREEN,
@@ -67,12 +67,12 @@ static const OSThreadContextRegister sRegList[32 + 1] = {
 };
 
 
-void page_context_init(void) {
+void page_registers_init(void) {
 
 }
 
 // Print a fixed-point register.
-void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
+void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
     const MapSymbol* symbol = NULL;
 
     // "[register name]:"
@@ -82,7 +82,7 @@ void cs_context_print_reg(u32 x, u32 y, const char* name, Word val) {
     );
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_PARSE_REG)) {
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_PARSE_REG)) {
         symbol = get_map_symbol(val, SYMBOL_SEARCH_BACKWARD);
     }
 #endif // INCLUDE_DEBUG_MAP
@@ -112,7 +112,7 @@ u64 get_thread_register_val(__OSThreadContext* tc, const OSThreadContextRegister
 }
 
 // Print important fixed-point registers.
-u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
+u32 cs_registers_print_registers(u32 line, __OSThreadContext* tc) {
     const size_t columnWidth = 15;
     const u32 columns = 3;
     const u32 rows = (ARRAY_COUNT(sRegList) / columns);
@@ -120,7 +120,7 @@ u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
 
     for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < columns; x++) {
-            cs_context_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), reg->name, (u32)get_thread_register_val(tc, reg));
+            cs_registers_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), reg->name, (u32)get_thread_register_val(tc, reg));
 
             reg++;
         }
@@ -130,7 +130,7 @@ u32 cs_context_print_registers(u32 line, __OSThreadContext* tc) {
 }
 
 // Print a floating-point register.
-void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
+void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     // "[register name]:"
     size_t charX = cs_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_VARIABLE, regNum);
     x += TEXT_WIDTH(charX);
@@ -153,7 +153,7 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
         // "[prefix][XXXXXXXX]"
         cs_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
     } else {
-        const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT);
+        const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_FLOATS_FMT);
 
         switch (floatsFormat) {
             case PRINT_NUM_FMT_HEX: cs_print(x, y, " "STR_HEX_WORD, val.asU32); break; // "[XXXXXXXX]"
@@ -164,12 +164,12 @@ void cs_context_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
     }
 }
 
-void cs_context_print_float_registers(u32 line, __OSThreadContext* tc) {
+void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
     const size_t columnWidth = 15;
     u32 regNum = 0;
     __OSfp* osfp = &tc->fp0;
 
-    // cs_context_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
+    // cs_registers_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
     line++;
 
     osWritebackDCacheAll();
@@ -180,7 +180,7 @@ void cs_context_print_float_registers(u32 line, __OSThreadContext* tc) {
                 return;
             }
 
-            cs_context_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum, &osfp->f.f_even);
+            cs_registers_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum, &osfp->f.f_even);
 
             osfp++;
             regNum += 2;
@@ -188,28 +188,28 @@ void cs_context_print_float_registers(u32 line, __OSThreadContext* tc) {
     }
 }
 
-void page_context_draw(void) {
+void page_registers_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 line = 1;
     line++;
 
-    line = cs_context_print_registers(line, tc);
+    line = cs_registers_print_registers(line, tc);
 
     line++;
 
     osWritebackDCacheAll();
 
-    cs_context_print_float_registers(line, tc);
+    cs_registers_print_float_registers(line, tc);
 }
 
-void page_context_input(void) {
+void page_registers_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
-        cs_inc_setting(CS_OPT_GROUP_PAGE_CONTEXT, CS_OPT_CONTEXT_FLOATS_FMT, 1);
+        cs_inc_setting(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_FLOATS_FMT, 1);
     }
 }
 
-void page_context_print(void) {
+void page_registers_print(void) {
 #ifdef UNF
     debug_printf("\n");
 
@@ -244,14 +244,14 @@ void page_context_print(void) {
 #endif // UNF
 }
 
-struct CSPage gCSPage_context ={
+struct CSPage gCSPage_registers ={
     .name         = "REGISTERS",
-    .initFunc     = page_context_init,
-    .drawFunc     = page_context_draw,
-    .inputFunc    = page_context_input,
-    .printFunc    = page_context_print,
-    .contList     = cs_cont_list_context,
-    .settingsList = cs_settings_group_page_context,
+    .initFunc     = page_registers_init,
+    .drawFunc     = page_registers_draw,
+    .inputFunc    = page_registers_input,
+    .printFunc    = page_registers_print,
+    .contList     = cs_cont_list_registers,
+    .settingsList = cs_settings_group_page_registers,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,

@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include "pages/page_context.h"
+#include "pages/page_registers.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
@@ -21,7 +21,7 @@
 enum CSPages {
     FIRST_PAGE,
     PAGE_HOME = FIRST_PAGE,
-    PAGE_CONTEXT,
+    PAGE_REGISTERS,
     PAGE_LOGS,
     PAGE_STACK_TRACE,
 #ifdef INCLUDE_DEBUG_MAP

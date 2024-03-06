@@ -23,8 +23,8 @@
 
 
 struct CSSetting cs_settings_group_page_home[] = {
-    [CS_OPT_HEADER_PAGE_HOME    ] = { .type = CS_OPT_TYPE_HEADER,  .name = "HOME",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_HOME            ] = { .type = CS_OPT_TYPE_END, },
+    [CS_OPT_HEADER_PAGE_HOME        ] = { .type = CS_OPT_TYPE_HEADER,  .name = "HOME",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_HOME                ] = { .type = CS_OPT_TYPE_END, },
 };
 
 
