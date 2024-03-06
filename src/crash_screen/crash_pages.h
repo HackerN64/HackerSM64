@@ -72,11 +72,20 @@ typedef struct CSPopup {
     /*0x04*/ void (*initFunc)(void);
     /*0x08*/ void (*drawFunc)(void);
     /*0x0C*/ void (*inputFunc)(void);
-} CSPopup; /*0x10*/
+    /*0x10*/ union {
+                struct PACKED {
+                    /*0x00*/ u32           : 32;
+                    /*0x03*/ u32 allowPage : 1;
+                };
+                u32 raw;
+            } flags; /*0x04*/
+} CSPopup; /*0x1C*/
 
 extern struct CSPopup* gCSPopups[NUM_CS_POPUPS];
 extern enum CSPopups gCSPopupID;
 extern _Bool gCSSwitchedPopup;
 
 void cs_set_page(enum CSPages page);
+CSPage* cs_get_current_page(void);
 void cs_open_popup(enum CSPopups popupID);
+CSPopup* cs_get_current_popup(void);

@@ -306,7 +306,7 @@ void page_memory_print(void) {
 
 
 struct CSPage gCSPage_memory = {
-    .name         = "RAM VIEW",
+    .name         = "MEMORY VIEW",
     .initFunc     = page_memory_init,
     .drawFunc     = page_memory_draw,
     .inputFunc    = page_memory_input,

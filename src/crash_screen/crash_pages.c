@@ -54,18 +54,20 @@ void cs_set_page(enum CSPages pageID) {
     }
 }
 
+/**
+ * @brief Gets a pointer to the current page's info.
+ *
+ * @return CSPage* A pointer to the current page's info.
+ */
+ CSPage* cs_get_current_page(void) {
+    return gCSPages[gCSPageID];
+ }
+
 
 // -- Popups --
 
-struct CSPopup gCSPopup_none = {
-    .name      = "",
-    .initFunc  = NULL,
-    .drawFunc  = NULL,
-    .inputFunc = NULL,
-};
-
 CSPopup* gCSPopups[NUM_CS_POPUPS] = {
-    [CS_POPUP_NONE          ] = &gCSPopup_none,
+    [CS_POPUP_NONE          ] = NULL,
     [CS_POPUP_CONTROLS      ] = &gCSPopup_controls,
     [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address_select,
 };
@@ -83,4 +85,13 @@ void cs_open_popup(enum CSPopups popupID) {
         gCSPopupID = popupID;
         gCSSwitchedPopup = TRUE;
     }
+}
+
+/**
+ * @brief Gets a pointer to the current popup's info.
+ * 
+ * @return CSPopup* A pointer to the current popup's info.
+ */
+CSPopup* cs_get_current_popup(void) {
+    return gCSPopups[gCSPopupID];
 }

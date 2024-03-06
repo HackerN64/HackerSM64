@@ -154,6 +154,12 @@ u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRo
     return ALIGNFLOOR(scrollIndex, step);
 }
 
+// Whether L/R can be used to switch the page.
+_Bool can_switch_page(void) {
+    CSPopup* popup = cs_get_current_popup();
+    return ((popup == NULL) || popup->flags.allowPage);
+}
+
 // Check for a page switch input (L or R).
 _Bool cs_check_switch_page_input(void) {
     enum CSPages prevPage = gCSPageID;
@@ -171,8 +177,6 @@ _Bool cs_check_switch_page_input(void) {
 
     // Reset certain values when the page is changed.
     gCSSwitchedPage  = TRUE;
-    gCSPopupID       = CS_POPUP_NONE;
-    gCSSwitchedPopup = TRUE;
 
     return TRUE;
 }
@@ -195,7 +199,7 @@ void cs_os_print_page(CSPage* page) {
 
 // Global crash screen input function.
 void cs_update_input(void) {
-    CSPage* page = gCSPages[gCSPageID];
+    CSPage* page = cs_get_current_page();
 
     handle_input(&gActiveCSThreadInfo->mesg); //! TODO: Make controller switching not weird when the crash screen is open.
 
@@ -230,7 +234,9 @@ void cs_update_input(void) {
     }
 #endif // UNF
 
-    if ((gCSPopupID == CS_POPUP_NONE) && !gCSSwitchedPopup) {
+    CSPopup* popup = cs_get_current_popup();
+
+    if ((popup == NULL) && !gCSSwitchedPopup) {
         if (
             !(gCSCompositeController->buttonDown & Z_TRIG) &&
             (gCSCompositeController->buttonPressed & START_BUTTON)
@@ -238,10 +244,9 @@ void cs_update_input(void) {
             cs_open_popup(CS_POPUP_CONTROLS);
         }
     }
-    // Popup is open.
-    if (gCSPopupID != CS_POPUP_NONE) {
-        CSPopup* popup = gCSPopups[gCSPopupID];
 
+    // Popup is open.
+    if (popup != NULL) {
         if (gCSSwitchedPopup) {
             gCSSwitchedPopup = FALSE;
             if (popup->initFunc != NULL) {
@@ -252,16 +257,20 @@ void cs_update_input(void) {
                 popup->inputFunc();
             }
         }
-        return;
+
     }
 
-    if (cs_check_switch_page_input()) {
-        page = gCSPages[gCSPageID]; // gCSPageID may have changed in cs_check_switch_page_input.
+    if (can_switch_page() && cs_check_switch_page_input()) {
+        page = cs_get_current_page(); // Page may have changed in cs_check_switch_page_input.
 
         if ((page->initFunc != NULL) && !page->flags.initialized) {
             page->initFunc();
             page->flags.initialized = TRUE;
         }
+    }
+
+    if (popup != NULL) {
+        return;
     }
 
     // Run the page-specific input function.
@@ -281,7 +290,7 @@ void cs_popup_controls_draw(void) {
         (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
         CS_DARKEN_SEVEN_EIGHTHS
     );
-    CSPage* page = gCSPages[gCSPageID];
+    CSPage* page = cs_get_current_page();
 
     // "[page name] PAGE CONTROLS"
     cs_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
@@ -319,4 +328,7 @@ struct CSPopup gCSPopup_controls = {
     .initFunc  = NULL,
     .drawFunc  = cs_popup_controls_draw,
     .inputFunc = cs_popup_controls_input,
+    .flags = {
+        .allowPage = TRUE,
+    },
 };

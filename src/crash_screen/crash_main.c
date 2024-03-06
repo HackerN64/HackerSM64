@@ -49,7 +49,7 @@ Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and di
 static void cs_reinitialize(void) {
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
     if (!sFirstCrash && (gCrashedThread->context.cause != EXC_SYSCALL)) {
-        gCSPages[gCSPageID]->flags.crashed = TRUE;
+        cs_get_current_page()->flags.crashed = TRUE;
     }
 
     gCSPageID        = CRASH_SCREEN_START_PAGE;
@@ -178,7 +178,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 #endif // INCLUDE_DEBUG_MAP
 
 #ifdef UNF
-        cs_os_print_page(gCSPages[gCSPageID]);
+        cs_os_print_page(cs_get_current_page());
 #endif // UNF
     }
 

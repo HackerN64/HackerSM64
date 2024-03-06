@@ -306,11 +306,11 @@ void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTot
 u32 cs_page_header_draw(void) {
     u32 line = 0;
 
-    CSPage* page = gCSPages[gCSPageID];
+    CSPage* page = cs_get_current_page();
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
 
-    // "<Page:XX>"
-    cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:XX>")), TEXT_Y(line),
+    // "<Page:##>"
+    cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:##>")), TEXT_Y(line),
         STR_COLOR_PREFIX"<Page:%02d>",
         COLOR_RGBA32_CRASH_HEADER, (gCSPageID + 1)
     );
@@ -339,14 +339,18 @@ void cs_draw_LR_triangles(void) {
     const s32 triY = (yPos - (triHeight / 2)); // Center triangles vertically.
     const s32 txtY = ((yPos - (TEXT_HEIGHT(1) / 2)) + 2); // Center text vertically
 
-    u16 buttonDown = gCSCompositeController->buttonDown;
+    u16 buttonDown    = gCSCompositeController->buttonDown;
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
+
+    s32 L_shift = ((BITFLAG_BOOL(buttonDown, L_TRIG) + BITFLAG_BOOL(buttonPressed, L_TRIG)));
+    s32 R_shift = ((BITFLAG_BOOL(buttonDown, R_TRIG) + BITFLAG_BOOL(buttonPressed, R_TRIG)));
 
     // 'L' triangle:
-    const s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - (BITFLAG_BOOL(buttonDown, L_TRIG) * 2)); // Edge of the 'L' triangle.
+    const s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - L_shift); // Edge of the 'L' triangle.
     cs_draw_triangle((L_edge - triWidth), triY, triWidth, triHeight, COLOR_RGBA32_CRASH_BACKGROUND, CS_TRI_LEFT);
     cs_draw_glyph(((L_edge - TEXT_WIDTH(1)) - txtSeparation), txtY, (STR_L)[0], COLOR_RGBA32_CRASH_HEADER);
     // 'R' triangle:
-    const s32 R_edge = ((CRASH_SCREEN_X2 + triSeparation) + (BITFLAG_BOOL(buttonDown, R_TRIG) * 2)); // Edge of the 'R' triangle.
+    const s32 R_edge = ((CRASH_SCREEN_X2 + triSeparation) + R_shift); // Edge of the 'R' triangle.
     cs_draw_triangle(R_edge, triY, triWidth, triHeight, COLOR_RGBA32_CRASH_BACKGROUND, CS_TRI_RIGHT);
     cs_draw_glyph(((R_edge + 1) + txtSeparation), txtY, (STR_R)[0], COLOR_RGBA32_CRASH_HEADER);
 
@@ -374,14 +378,14 @@ void cs_draw_main(void) {
         }
 
         // Draw the L/R triangles.
-        if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_LR_ARROWS)) {
+        if (can_switch_page() && cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_LR_ARROWS)) {
             cs_draw_LR_triangles();
         }
 
         // Draw the page header.
         u32 line = cs_page_header_draw();
 
-        CSPage* page = gCSPages[gCSPageID];
+        CSPage* page = cs_get_current_page();
 
         // Run the page-specific draw function.
         if (page->drawFunc == NULL) {
@@ -396,8 +400,11 @@ void cs_draw_main(void) {
             page->drawFunc();
         }
 
-        if (gCSPopups[gCSPopupID]->drawFunc != NULL) {
-            gCSPopups[gCSPopupID]->drawFunc();
+        CSPopup* popup = cs_get_current_popup();
+        if (popup != NULL) {
+            if (popup->drawFunc != NULL) {
+                popup->drawFunc();
+            }
         }
     }
 
