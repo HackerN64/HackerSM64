@@ -178,7 +178,11 @@ void page_about_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line++), "SAVE TYPE:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, savetype_name);
     cs_print(TEXT_X(0), TEXT_Y(line++), "COMPRESSION:\t\t"STR_COLOR_PREFIX"%s",             valColor, compression_name);
     cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t\t"STR_COLOR_PREFIX"%s",            valColor, gValNames_bool[debug_mode]);
+#ifdef UNF
     cs_print(TEXT_X(0), TEXT_Y(line++), "UNF:\t\t\t\t"STR_COLOR_PREFIX"%s",                 valColor, gValNames_bool[debug_is_initialized()]);
+#else // !UNF
+    cs_print(TEXT_X(0), TEXT_Y(line++), "UNF:\t\t\t\t"STR_COLOR_PREFIX"%s",                 valColor, gValNames_bool[FALSE]);
+#endif // !UNF
     cs_print(TEXT_X(0), TEXT_Y(line++), "EXT RAM:\t\t\t"STR_COLOR_PREFIX"%s",               valColor, gValNames_bool[TOTAL_RAM_SIZE == (RAM_1MB * 8)]);
     cs_print(TEXT_X(0), TEXT_Y(line++), "EXT BOUNDS MODE:\t"STR_COLOR_PREFIX"%d",           valColor, EXTENDED_BOUNDS_MODE);
     cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, gValNames_bool[rcvi_hack]);
