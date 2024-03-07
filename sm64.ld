@@ -601,4 +601,6 @@ SECTIONS
    {
       *(*);
    }
+
+   gRomSize = __romPos;
 }

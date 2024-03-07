@@ -143,17 +143,18 @@ void page_about_init(void) {
 
 }
 
-extern const char* gValNames_bool[];
+const char gValNames_no_yes[][4] = {
+    [FALSE] = "NO",
+    [TRUE ] = "YES",
+};
+
+extern const u8 gRomSize[];
 
 void page_about_draw(void) {
     _Bool debug_mode = FALSE;
-    _Bool rcvi_hack = FALSE;
 #ifdef DEBUG
     debug_mode = TRUE;
 #endif // DEBUG
-#ifdef RCVI_HACK
-    rcvi_hack = TRUE;
-#endif // RCVI_HACK
 
     u32 line = 2;
 
@@ -161,33 +162,29 @@ void page_about_draw(void) {
     cs_print(TEXT_X(centerX - ((STRLEN("HackerSM64 ") + strlen(HackerSM64_version_txt) + 0) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"HackerSM64 %s", COLOR_RGBA32_CRASH_PAGE_NAME, HackerSM64_version_txt);
     cs_print(TEXT_X(centerX - ((STRLEN("Crash Screen ") + strlen(crash_screen_version) + 1) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"Crash Screen %s", COLOR_RGBA32_CRASH_PAGE_NAME, crash_screen_version);
     const RGBA32 valColor = COLOR_RGBA32_LIGHT_GRAY;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPILER:\n  "STR_COLOR_PREFIX"%s",                valColor, __compiler__);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPILER:\n  "STR_COLOR_PREFIX"%s",            valColor, __compiler__);
     line++;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",                  valColor, __linker__);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",              valColor, __linker__);
     line++;
 
     line++;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM NAME:\t\t\t"STR_COLOR_PREFIX"%s",              valColor, INTERNAL_ROM_NAME);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM NAME:\t\t"STR_COLOR_PREFIX"%s",            valColor, INTERNAL_ROM_NAME);
 #ifdef LIBDRAGON
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t\t"STR_COLOR_PREFIX"%s",              valColor, "LIBDRAGON");
+    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t"STR_COLOR_PREFIX"%s",            valColor, "LIBDRAGON");
 #else // !LIBDRAGON
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t\t"STR_COLOR_PREFIX"%s (patch %i)",   valColor, OS_MAJOR_VERSION, OS_MINOR_VERSION);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t"STR_COLOR_PREFIX"%s (patch %i)", valColor, OS_MAJOR_VERSION, OS_MINOR_VERSION);
 #endif // !LIBDRAGON
-    cs_print(TEXT_X(0), TEXT_Y(line++), "MICROCODE:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, ucode_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "REGION:\t\t\t\t"STR_COLOR_PREFIX"%s (%s)",         valColor, region_name, osTvTypeStrings[osTvType]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "SAVE TYPE:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, savetype_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPRESSION:\t\t"STR_COLOR_PREFIX"%s",             valColor, compression_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t\t"STR_COLOR_PREFIX"%s",            valColor, gValNames_bool[debug_mode]);
-#ifdef UNF
-    cs_print(TEXT_X(0), TEXT_Y(line++), "UNF:\t\t\t\t"STR_COLOR_PREFIX"%s",                 valColor, gValNames_bool[debug_is_initialized()]);
-#else // !UNF
-    cs_print(TEXT_X(0), TEXT_Y(line++), "UNF:\t\t\t\t"STR_COLOR_PREFIX"%s",                 valColor, gValNames_bool[FALSE]);
-#endif // !UNF
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EXT RAM:\t\t\t"STR_COLOR_PREFIX"%s",               valColor, gValNames_bool[TOTAL_RAM_SIZE == (RAM_1MB * 8)]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EXT BOUNDS MODE:\t"STR_COLOR_PREFIX"%d",           valColor, EXTENDED_BOUNDS_MODE);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t\t"STR_COLOR_PREFIX"%s",             valColor, gValNames_bool[rcvi_hack]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "MICROCODE:\t\t"STR_COLOR_PREFIX"%s",           valColor, ucode_name);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "REGION:\t\t\t"STR_COLOR_PREFIX"%s (%s)",       valColor, region_name, osTvTypeStrings[osTvType]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "SAVE TYPE:\t\t"STR_COLOR_PREFIX"%s",           valColor, savetype_name);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPRESSION:\t"STR_COLOR_PREFIX"%s",           valColor, compression_name);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM SIZE:\t\t"STR_COLOR_PREFIX"%i bytes",      valColor, (size_t)gRomSize);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "RAM SIZE:\t\t"STR_COLOR_PREFIX"%imb",          valColor, (TOTAL_RAM_SIZE / RAM_1MB));
+    cs_print(TEXT_X(0), TEXT_Y(line++), "EXTBOUNDS MODE:\t"STR_COLOR_PREFIX"%d",        valColor, EXTENDED_BOUNDS_MODE);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t"STR_COLOR_PREFIX"%s",           valColor, gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t"STR_COLOR_PREFIX"%s%s",        valColor, gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +unf" : ""));
     line++;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EMULATOR:\t\t\t"STR_COLOR_PREFIX"%s",              valColor, get_emulator_name(gEmulator));
+    cs_print(TEXT_X(0), TEXT_Y(line++), "EMULATOR:\t\t"STR_COLOR_PREFIX"%s",            valColor, get_emulator_name(gEmulator));
 }
 
 void page_about_input(void) {
@@ -199,13 +196,9 @@ void page_about_print(void) {
     debug_printf("\n");
 
     _Bool debug_mode = FALSE;
-    _Bool rcvi_hack = FALSE;
  #ifdef DEBUG
     debug_mode = TRUE;
  #endif // DEBUG
- #ifdef RCVI_HACK
-    rcvi_hack = TRUE;
- #endif // RCVI_HACK
 
     debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
     debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
@@ -221,11 +214,11 @@ void page_about_print(void) {
     debug_printf("- REGION:\t\t%s (%s)\n",          region_name, osTvTypeStrings[osTvType]);
     debug_printf("- SAVE TYPE:\t\t%s\n",            savetype_name);
     debug_printf("- COMPRESSION:\t\t%s\n",          compression_name);
-    debug_printf("- DEBUG MODE:\t\t%s\n",           gValNames_bool[debug_mode]);
-    debug_printf("- UNF:\t\t\t%s\n",                gValNames_bool[debug_is_initialized()]);
-    debug_printf("- EXT RAM:\t\t%s\n",              gValNames_bool[TOTAL_RAM_SIZE == (RAM_1MB * 8)]);
-    debug_printf("- EXT BOUNDS MODE:\t%d\n",        EXTENDED_BOUNDS_MODE);
-    debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_bool[rcvi_hack]);
+    debug_printf("- ROM SIZE:\t\t%s\n",             (size_t)gRomSize);
+    debug_printf("- RAM SIZE:\t\t%s\n",             (TOTAL_RAM_SIZE / RAM_1MB));
+    debug_printf("- EXTBOUNDS MODE:\t%d\n",         EXTENDED_BOUNDS_MODE);
+    debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
+    debug_printf("- DEBUG MODE:\t\t%s%s\n",         gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +unf" : ""));
     debug_printf("- EMULATOR:\t\t%s\n",             get_emulator_name(gEmulator));
 #endif // UNF
 }

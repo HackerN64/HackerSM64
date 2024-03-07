@@ -159,7 +159,8 @@
     #else
         
         // Overwrite library functions with useless macros if debug mode is disabled
-        #define debug_initialize() 
+        #define debug_initialize()
+        #define debug_is_initialized() 0
         #define debug_printf
         #define debug_screenshot(a, b, c)
         #define debug_assert(a)

@@ -292,7 +292,7 @@ void page_home_draw(void) {
 
     // "START:controls"
     cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"press %s for page controls",
+        STR_COLOR_PREFIX"Press %s for page controls",
         COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
     );
     line++;

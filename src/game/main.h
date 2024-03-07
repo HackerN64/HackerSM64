@@ -21,7 +21,7 @@ enum VIModes {
 enum ThreadID {
     THREAD_0,
     THREAD_1_IDLE,
-    THREAD_2,
+    THREAD_2, // Unused
     THREAD_3_MAIN,
     THREAD_4_SOUND,
     THREAD_5_GAME_LOOP,
@@ -31,6 +31,7 @@ enum ThreadID {
     THREAD_9_DA_COUNTER,
     NUM_THREADS,
 
+    // Crash screen threads:
     THREAD_1000_CRASH_SCREEN_0 = 1000,
     THREAD_1001_CRASH_SCREEN_1,
     THREAD_1002_CRASH_SCREEN_2,
@@ -53,6 +54,8 @@ struct RumbleSettings {
     s16 vibrate;
     s16 decay;
 };
+
+extern OSViMode VI;
 
 extern struct Config gConfig;
 
