@@ -214,11 +214,11 @@ void page_about_print(void) {
     debug_printf("- REGION:\t\t%s (%s)\n",          region_name, osTvTypeStrings[osTvType]);
     debug_printf("- SAVE TYPE:\t\t%s\n",            savetype_name);
     debug_printf("- COMPRESSION:\t\t%s\n",          compression_name);
-    debug_printf("- ROM SIZE:\t\t%s\n",             (size_t)gRomSize);
-    debug_printf("- RAM SIZE:\t\t%s\n",             (TOTAL_RAM_SIZE / RAM_1MB));
+    debug_printf("- ROM SIZE:\t\t%i bytes\n",       (size_t)gRomSize);
+    debug_printf("- RAM SIZE:\t\t%imb\n",           (TOTAL_RAM_SIZE / RAM_1MB));
     debug_printf("- EXTBOUNDS MODE:\t%d\n",         EXTENDED_BOUNDS_MODE);
     debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
-    debug_printf("- DEBUG MODE:\t\t%s%s\n",         gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +unf" : ""));
+    debug_printf("- DEBUG MODE:\t\t%s%s\n",         gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +UNF" : ""));
     debug_printf("- EMULATOR:\t\t%s\n",             get_emulator_name(gEmulator));
 #endif // UNF
 }

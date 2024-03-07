@@ -164,13 +164,13 @@ static void draw_assert_highlight(u32 line) {
     //     COLOR_RGBA32_NONE, __n64Assert_Message
     // );
     // cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(5 + gCSNumLinesPrinted), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
-    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y - line), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
+    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, (TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y - line) + 1), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
 }
 
 void cs_print_crashed_thread(u32 x, u32 y) {
     // "THREAD: [thread id]"
     enum ThreadID threadID = gCrashedThread->id;
-    size_t charX = cs_print(TEXT_X(x), TEXT_Y(y), STR_COLOR_PREFIX"THREAD:\t%d",
+    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
         COLOR_RGBA32_CRASH_THREAD, threadID
     );
     if (threadID < NUM_THREADS) {
@@ -178,7 +178,7 @@ void cs_print_crashed_thread(u32 x, u32 y) {
 
         if (threadName != NULL) {
             // "(thread name)"
-            cs_print(TEXT_X(charX + STRLEN(" ")), TEXT_Y(y), STR_COLOR_PREFIX"(%s)",
+            cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
                 COLOR_RGBA32_CRASH_THREAD, threadName
             );
         }
@@ -189,11 +189,11 @@ void cs_print_crashed_thread(u32 x, u32 y) {
 void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     // "FUNC: [function name]"
-    size_t charX = cs_print(TEXT_X(x), TEXT_Y(y),
+    size_t charX = cs_print(x, y,
         STR_COLOR_PREFIX"FUNC:\t",
         COLOR_RGBA32_CRASH_AT
     );
-    cs_print_symbol_name(TEXT_X(charX), TEXT_Y(y), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+    cs_print_symbol_name(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
 }
 #endif // INCLUDE_DEBUG_MAP
 
@@ -201,14 +201,14 @@ void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
     const char* desc = get_cause_desc(tc->cause);
     if (desc != NULL) {
         // "CAUSE: ([exception cause description])"
-        cs_print(TEXT_X(x), TEXT_Y(y),
+        cs_print(x, y,
             STR_COLOR_PREFIX"CAUSE:\t%s",
             COLOR_RGBA32_CRASH_DESCRIPTION, desc
         );
     }
 }
 
-u32 print_assert_section(u32 line) {
+u32 cs_draw_assert(u32 line) {
     u32 charX = 0;
 
     gCSWordWrap = TRUE;
@@ -305,22 +305,19 @@ void page_home_draw(void) {
     cs_print(TEXT_X(centerX - (len / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"CRASH AT:", COLOR_RGBA32_RED);
     line++;
 
-    cs_print_crashed_thread(0, line++);
+    cs_print_crashed_thread(TEXT_X(0), TEXT_Y(line++));
 #ifdef INCLUDE_DEBUG_MAP
-    cs_print_func(0, line++, tc);
+    cs_print_func(TEXT_X(0), TEXT_Y(line++), tc);
 #endif // INCLUDE_DEBUG_MAP
-    cs_print_cause(0, line++, tc);
+    cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
 
-    cs_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
-    line++;
+    cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
     line++;
 
-    if (__n64Assert_Message != NULL) {
+    if (tc->cause == EXC_SYSCALL) {
         line++;
         cs_draw_divider(DIVIDER_Y(line));
-        line = print_assert_section(line);
-        // line++;
-        // cs_draw_divider(DIVIDER_Y(line));
+        line = cs_draw_assert(line);
     }
 
 }
@@ -371,7 +368,7 @@ void page_home_print(void) {
     }
     debug_printf("\n");
 
-    if (__n64Assert_Message != NULL) {
+    if (tc->cause == EXC_SYSCALL) {
         debug_printf(
             "- ASSERT: \n-- FILE: %s in LINE: %d\n-- CONDITION: %s\n-- MESSAGE: \"%s\"\n",
             __n64Assert_Filename,
