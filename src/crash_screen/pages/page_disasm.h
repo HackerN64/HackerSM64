@@ -59,3 +59,5 @@ extern _Bool gFillBranchBuffer;
 
 extern struct CSSetting cs_settings_group_page_disasm[];
 extern struct CSPage gCSPage_disasm;
+
+void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data);

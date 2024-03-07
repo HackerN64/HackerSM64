@@ -13,8 +13,11 @@
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
+#include "crash_screen/memory_read.h"
 
 #include "page_home.h"
+
+#include "page_disasm.h"
 
 #include "game/asm.h"
 #ifdef UNF
@@ -153,20 +156,6 @@ void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     }
 }
 
-
-// Draws the red background for the assert section.
-static void draw_assert_highlight(u32 line) {
-    // //! Prints the assert message early, but with 0 alpha (skips framebuffer writes).
-    // //   This is a hacky way to get the amount of lines the wrapped assert text will be.
-    // //   This can't be done after the normal print because it would show up in front of the text.
-    // cs_print(TEXT_X(0), TEXT_Y(line),
-    //     STR_COLOR_PREFIX"MESSAGE:%s",
-    //     COLOR_RGBA32_NONE, __n64Assert_Message
-    // );
-    // cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, TEXT_HEIGHT(5 + gCSNumLinesPrinted), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
-    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, (TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y - line) + 1), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
-}
-
 void cs_print_crashed_thread(u32 x, u32 y) {
     // "THREAD: [thread id]"
     enum ThreadID threadID = gCrashedThread->id;
@@ -208,12 +197,14 @@ void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
     }
 }
 
+// Draw the assert info.
+//! TODO: Scrollable long asserts.
 u32 cs_draw_assert(u32 line) {
     u32 charX = 0;
 
     gCSWordWrap = TRUE;
 
-    draw_assert_highlight(line);
+    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, (TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y - line) + 1), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
 
     // "ASSERT:"
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
@@ -307,15 +298,34 @@ void page_home_draw(void) {
 #endif // INCLUDE_DEBUG_MAP
     cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
 
-    cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
+    line++;
     line++;
 
-    if (tc->cause == EXC_SYSCALL) {
-        line++;
-        cs_draw_divider(DIVIDER_Y(line));
-        line = cs_draw_assert(line);
+    switch (tc->cause) {
+        case EXC_SYSCALL:
+            // ASSERT:
+            cs_draw_divider(DIVIDER_Y(line));
+            line = cs_draw_assert(line);
+            break;
+        case EXC_FPE:
+            cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
+            break;
+        default:;
+            Address addr = tc->pc;
+            Word data = 0x00000000;
+            if (try_read_data(&data, addr)) {
+                if (is_in_code_segment(addr)) {
+                    // Draw a red selection rectangle.
+                    cs_draw_rect((TEXT_X(0) - 1), (TEXT_Y(line) - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
+                    // "<-- CRASH"
+                    cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), TEXT_Y(line), STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
+                    cs_draw_divider(DIVIDER_Y(line));
+                    print_as_insn(TEXT_X(0), TEXT_Y(line++), addr, data);
+                    cs_draw_divider(DIVIDER_Y(line));
+                }
+            }
+            break;
     }
-
 }
 
 void page_home_input(void) {

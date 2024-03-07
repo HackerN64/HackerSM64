@@ -261,7 +261,7 @@ void disasm_draw_branch_arrows(u32 printLine) {
 }
 #endif // INCLUDE_DEBUG_MAP
 
-static void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
+void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
     const char* destFname = NULL;
     const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, TRUE);
 
