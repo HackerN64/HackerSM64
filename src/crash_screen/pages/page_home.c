@@ -239,23 +239,19 @@ u32 cs_draw_assert(u32 line) {
     line++;
 
     //! TODO: print the function that called __n64Assert.
-// #ifdef INCLUDE_DEBUG_MAP
-//     Address RAddr = 0;
-//     ASM_GET_RA(RAddr);
-//     const MapSymbol* symbol = get_map_symbol(RAddr, SYMBOL_SEARCH_BACKWARD);
-//     if (symbol != NULL) {
-//         const char* name = get_map_symbol_name(symbol);
-//         if (name != NULL) {
-//             // "FUNC:[function name]"
-//             cs_print(TEXT_X(0), TEXT_Y(line),
-//                 STR_COLOR_PREFIX"FUNC:"STR_COLOR_PREFIX"%s",
-//                 COLOR_RGBA32_CRASH_HEADER,
-//                 COLOR_RGBA32_CRASH_FUNCTION_NAME, name
-//             );
-//             line++;
-//         }
-//     }
-// #endif // INCLUDE_DEBUG_MAP
+#ifdef INCLUDE_DEBUG_MAP
+    if (__assert_address) {
+        const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
+        // "FUNC:[function name]"
+        size_t charX = cs_print(
+            TEXT_X(0), TEXT_Y(line),
+            STR_COLOR_PREFIX"FUNC:",
+            COLOR_RGBA32_CRASH_HEADER
+        );
+        cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+        line++;
+    }
+#endif // INCLUDE_DEBUG_MAP
 
     // "COND:[condition]"
     if (__n64Assert_Condition != NULL) {
@@ -369,13 +365,28 @@ void page_home_print(void) {
     debug_printf("\n");
 
     if (tc->cause == EXC_SYSCALL) {
-        debug_printf(
-            "- ASSERT: \n-- FILE: %s in LINE: %d\n-- CONDITION: %s\n-- MESSAGE: \"%s\"\n",
-            __n64Assert_Filename,
-            __n64Assert_LineNum,
-            __n64Assert_Condition,
-            __n64Assert_Message
-        );
+        debug_printf("- ASSERT:\n");
+        if (__n64Assert_Filename  != NULL) {
+            debug_printf("-- FILE: %s in LINE: %d:\n", __n64Assert_Filename,__n64Assert_LineNum);
+        }
+ #ifdef INCLUDE_DEBUG_MAP
+        if (__assert_address) {
+            const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
+            if (symbol != NULL) {
+                const char* name = get_map_symbol_name(symbol);
+                if (name != NULL) {
+                    debug_printf("-- FUNC: %s\n", name);
+                }
+            }
+
+        }
+ #endif // INCLUDE_DEBUG_MAP
+        if (__n64Assert_Condition != NULL) {
+            debug_printf("-- CONDITION: %s\n", __n64Assert_Condition);
+        }
+        if (__n64Assert_Message   != NULL) {
+            debug_printf("-- MESSAGE: %s\n", __n64Assert_Message);
+        }
     }
 #endif // UNF
 }

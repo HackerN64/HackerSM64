@@ -10,8 +10,10 @@
 
 #define ASM_GET_RA(RAddr) ASM_GET_REG(RAddr, "$31")
 
+
 uintptr_t _asm_getaddr(void);
 void _asm_setbits(uintptr_t bits);
+
 
 // Macros to trigger specific exceptions:
 #define EXCEPTION_INT()     //! TODO: do { ; } while (0) // Interrupt.

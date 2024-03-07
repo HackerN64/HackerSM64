@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#include "asm.h"
+
 
 #define ASSERTF_BUFFER_SIZE 255
 
@@ -14,6 +16,9 @@ extern int         __n64Assert_LineNum;
 extern const char* __n64Assert_Message;
 
 
+extern int __assert_address;
+
+
 extern void __n64Assert(char* condition, char* fileName, u32 lineNum, char* message);
 extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* message, ...) __attribute__((format(printf, 4, 5)));
 
@@ -21,19 +26,29 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 /**
  * Will always cause a crash with your message of choice.
  */
-#define ERROR(message)          __n64Assert(NULL, __FILE__, __LINE__, (message))
-#define ERRORF(message, ...)    __n64Assertf(NULL, __FILE__, __LINE__, (message), ##__VA_ARGS__)
+#define ERROR(message) do {                                                     \
+    __assert_address = _asm_getaddr();                                          \
+    __n64Assert(NULL, __FILE__, __LINE__, (message));                           \
+} while (0)
+
+#define ERRORF(message, ...) do {                                               \
+    __assert_address = _asm_getaddr();                                          \
+    __n64Assertf(NULL, __FILE__, __LINE__, (message), ##__VA_ARGS__);           \
+} while (0)
+
 
 /**
  * Will always cause a crash if cond is not true (handle with care).
  */
 #define ASSERT(condition, message) do {                                         \
     if (!(condition)) {                                                         \
+        __assert_address = _asm_getaddr();                                      \
         __n64Assert(#condition, __FILE__, __LINE__, (message));                 \
     }                                                                           \
 } while (0)
 #define ASSERTF(condition, message, ...) do {                                   \
     if (!(condition)) {                                                         \
+        __assert_address = _asm_getaddr();                                      \
         __n64Assertf(#condition, __FILE__, __LINE__, (message), ##__VA_ARGS__); \
     }                                                                           \
 } while (0)

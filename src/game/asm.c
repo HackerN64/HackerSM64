@@ -1,5 +1,9 @@
 #include <ultra64.h>
 
+#include "config.h"
+#include "types.h"
+#include "asm.h"
+
 #include "crash_screen/insn_disasm.h"
 
 
