@@ -98,7 +98,7 @@ static const char* get_cause_desc(__OSThreadContext* tc) {
     switch (cause) {
         case EXC_WATCH: cause = 16; break; // 23 -> 16
         case EXC_VCED:  cause = 17; break; // 31 -> 17
-        default:        cause = ((cause >> CAUSE_EXCSHIFT) & BITMASK(5)); break;
+        default:        cause = ((cause & CAUSE_EXCMASK) >> CAUSE_EXCSHIFT); break;
     }
 
     if (cause < ARRAY_COUNT(sCauseDesc)) {

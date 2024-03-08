@@ -16,7 +16,7 @@
 #define SSHIFTL(src, shift) (((shift) < 0) ? ((src) >> -(shift)) : ((src) << (shift)))
 #define SSHIFTR(src, shift) (((shift) < 0) ? ((src) << -(shift)) : ((src) >> (shift)))
 
-// Equivalent to (([bitfield] & [flag]) != 0) but avoids branching. Only works if [flag] is a single bit.
+// Equivalent to (([bitfield] & [flag]) != 0) but avoids branching. If [flag] is not a single bit, OR the result with 0x1 afterward.
 #define BITFLAG_BOOL(bitfield, flag) (((bitfield) & (flag)) >> __builtin_ctz(flag))
 
 // #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
