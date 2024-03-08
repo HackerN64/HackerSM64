@@ -154,6 +154,10 @@ extern const u8 gRomSize[];
     #define debug_is_initialized() FALSE
 #endif // !UNF
 
+#ifndef LPL_ABI_VERSION_CURRENT
+#define LPL_ABI_VERSION_CURRENT 0
+#endif // !LPL_ABI_VERSION_CURRENT
+
 void page_about_draw(void) {
     _Bool debug_mode = FALSE;
 #ifdef DEBUG
@@ -187,7 +191,7 @@ void page_about_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line++), "EXTBOUNDS MODE:\t"STR_COLOR_PREFIX"%d",        valColor, EXTENDED_BOUNDS_MODE);
     cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t"STR_COLOR_PREFIX"%s",           valColor, gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
     cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t"STR_COLOR_PREFIX"%s%s",        valColor, gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +unf" : ""));
-    cs_print(TEXT_X(0), TEXT_Y(line), "EMULATOR:\t\t"STR_COLOR_PREFIX"%s",              valColor, get_emulator_name(gEmulator));
+    size_t charX = cs_print(TEXT_X(0), TEXT_Y(line), "EMULATOR:\t\t"STR_COLOR_PREFIX"%s", valColor, get_emulator_name(gEmulator));
 #ifdef LIBPL
     if (gSupportsLibpl) {
         cs_print(TEXT_X(charX), TEXT_Y(line++), STR_COLOR_PREFIX"+ libpl v%d",          valColor, LPL_ABI_VERSION_CURRENT);
