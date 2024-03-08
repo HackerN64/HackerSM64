@@ -150,6 +150,10 @@ const char gValNames_no_yes[][4] = {
 
 extern const u8 gRomSize[];
 
+#ifndef UNF
+    #define debug_is_initialized() FALSE
+#endif // !UNF
+
 void page_about_draw(void) {
     _Bool debug_mode = FALSE;
 #ifdef DEBUG
