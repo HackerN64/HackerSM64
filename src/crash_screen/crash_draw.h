@@ -86,6 +86,7 @@ enum CSDrawDarkRectDarken {
     CS_DARKEN_SEVEN_EIGHTHS,
     CS_DARKEN_FIFTEEN_SIXTEENTHS,
     CS_DARKEN_TO_BLACK,
+    CS_DARKEN_LIMIT,
 };
 
 // For cs_draw_triangle.

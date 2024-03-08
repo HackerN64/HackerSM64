@@ -9,6 +9,8 @@
 
 #include "crash_settings.h"
 
+#include "crash_draw.h"
+
 #include "engine/math_util.h"
 
 
@@ -33,6 +35,7 @@ CSSetting cs_settings_group_global[] = {
     [CS_OPT_GLOBAL_SYMBOL_NAMES         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Print symbol names",             .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
     [CS_OPT_GLOBAL_PRINT_SCROLL_SPEED   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Text scroll speed",              .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
+    [CS_OPT_GLOBAL_BG_OPACITY           ] = { .type = CS_OPT_TYPE_SETTING, .name = "Background opacity",             .valNames = NULL,                     .val = CS_DARKEN_SEVEN_EIGHTHS,   .defaultVal = CS_DARKEN_SEVEN_EIGHTHS,   .lowerBound = CS_DARKEN_NONE,        .upperBound = CS_DARKEN_TO_BLACK,         },
     [CS_OPT_END_GLOBAL                  ] = { .type = CS_OPT_TYPE_END, },
 };
 

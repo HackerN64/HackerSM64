@@ -324,6 +324,15 @@ u32 cs_page_header_draw(void) {
     return line;
 }
 
+static const Alpha sCSBackgroundAlphas[CS_DARKEN_LIMIT] = {
+    [CS_DARKEN_NONE              ] = 0x00,
+    [CS_DARKEN_HALF              ] = 0x7F,
+    [CS_DARKEN_THREE_QUARTERS    ] = 0xBF,
+    [CS_DARKEN_SEVEN_EIGHTHS     ] = 0xDF,
+    [CS_DARKEN_FIFTEEN_SIXTEENTHS] = 0xEF,
+    [CS_DARKEN_TO_BLACK          ] = 0xFF,
+};
+
 // Draws the 'L' and 'R' triangles.
 void cs_draw_LR_triangles(void) {
     cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -345,13 +354,15 @@ void cs_draw_LR_triangles(void) {
     s32 L_shift = ((BITFLAG_BOOL(buttonDown, L_TRIG) + BITFLAG_BOOL(buttonPressed, L_TRIG)));
     s32 R_shift = ((BITFLAG_BOOL(buttonDown, R_TRIG) + BITFLAG_BOOL(buttonPressed, R_TRIG)));
 
+    const RGBA32 bgColor = RGBA32_SET_ALPHA(COLOR_RGBA32_NONE, sCSBackgroundAlphas[cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)]);
+
     // 'L' triangle:
     const s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - L_shift); // Edge of the 'L' triangle.
-    cs_draw_triangle((L_edge - triWidth), triY, triWidth, triHeight, COLOR_RGBA32_CRASH_BACKGROUND, CS_TRI_LEFT);
+    cs_draw_triangle((L_edge - triWidth), triY, triWidth, triHeight, bgColor, CS_TRI_LEFT);
     cs_draw_glyph(((L_edge - TEXT_WIDTH(1)) - txtSeparation), txtY, (STR_L)[0], COLOR_RGBA32_CRASH_HEADER);
     // 'R' triangle:
     const s32 R_edge = ((CRASH_SCREEN_X2 + triSeparation) + R_shift); // Edge of the 'R' triangle.
-    cs_draw_triangle(R_edge, triY, triWidth, triHeight, COLOR_RGBA32_CRASH_BACKGROUND, CS_TRI_RIGHT);
+    cs_draw_triangle(R_edge, triY, triWidth, triHeight, bgColor, CS_TRI_RIGHT);
     cs_draw_glyph(((R_edge + 1) + txtSeparation), txtY, (STR_R)[0], COLOR_RGBA32_CRASH_HEADER);
 
     cs_reset_scissor_box();
@@ -373,7 +384,7 @@ void cs_draw_main(void) {
             cs_draw_dark_rect(
                 CRASH_SCREEN_X1, CRASH_SCREEN_Y1,
                 CRASH_SCREEN_W,  CRASH_SCREEN_H,
-                CS_DARKEN_THREE_QUARTERS
+                cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)
             );
         }
 
