@@ -11,6 +11,7 @@
 #include "crash_pages.h"
 #include "crash_print.h"
 #include "map_parser.h"
+#include "registers.h"
 
 #include "insn_disasm.h"
 
@@ -413,64 +414,6 @@ const InsnTemplate* get_insn(InsnData insn) {
     return NULL;
 }
 
-// CPU register names.
-//! TODO: Combine this with sRegNames in page_registers.c.
-static const char sCPURegisterNames[][3] = {
-    "R0",                                           // $zero. Hardware enforced.
-    "AT",                                           // Assembler temporary value. Don't use unless you know it's safe.
-    "V0", "V1",                                     // Subroutine return value. V1 is used for 64 bit returns.
-    "A0", "A1", "A2", "A3",                         // Subroutine arguments. If more are needed, they are stored to sp+0x10 in the calling stack space.
-    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", // Temporary values. Not saved between functions.
-    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", // Saved values. Saved to stack before modifying and then restored before returning.
-    "T8", "T9",                                     // Temporary values.
-    "K0", "K1",                                     // Reserved by kernel. Do not modify when using interrupts.
-    "GP",                                           // Global pointer. This can pointto 64kb of small misc variables.
-    "SP",                                           // Stack pointer. Subtract to allocate stack space and add back to deallocate.
-    "FP",                                           // Saved value 8 ("S8") or frame pointer ("FP"), depending on compiler.
-    "RA",                                           // Return address. Jump to this to return from a function. Hardware enforced.
-};
-
-// Coprocessor-0 (System Control Coprocessor) register names.
-static const char sCOP0RegisterNames[][9] = {
-    [ 0] = "Index",                         // Programmable pointer into TLB array.
-    [ 1] = "Random",                        // Pseudorandom pointer into TLB array (read only).
-    [ 2] = "EntryLo0",                      // Low half of TLB entry for even virtual addresses (VPN).
-    [ 3] = "EntryLo1",                      // Low half of TLB entry for odd virtual addresses (VPN).
-    [ 4] = "Context",                       // Pointer to kernel virtual page table entry (PTE) in 32-bit mode.
-    [ 5] = "PageMask",                      // Page size specification.
-    [ 6] = "Wired",                         // Number of wired TLB entries.
-    [ 7] = "7",                             // Reserved for future use.
-    [ 8] = "BadVAddr",                      // Display of virtual address that occurred an error last.
-    [ 9] = "Count",                         // Timer Count.
-    [10] = "EntryHi",                       // High half of TLB entry (including ASID).
-    [11] = "Compare",                       // Timer Compare Value.
-    [12] = "Status",                        // Operation status setting.
-    [13] = "Cause",                         // Display of cause of last exception.
-    [14] = "EPC",                           // Exception Program Counter.
-    [15] = "PRId",                          // Processor Revision Identifier.
-    [16] = "Config",                        // Memory system mode setting.
-    [17] = "LLAddr",                        // Load Linked instruction address display.
-    [18] = "WatchLo",                       // Memory reference trap address low bits.
-    [19] = "WatchHi",                       // Memory reference trap address high bits.
-    [20] = "XContext",                      // Pointer to Kernel virtual PTE table in 64-bit mode.
-    [21] = "21", "22", "23", "24", "25",    // Reserved for future use.
-    [26] = "ParityErr",                     // Cache parity bits.
-    [27] = "CacheErr",                      // Cache Error and Status register.
-    [28] = "TagLo",                         // Cache Tag register low.
-    [29] = "TagHi",                         // Cache Tag register high.
-    [30] = "ErrorEPC",                      // Error Exception Program Counter.
-    [31] = "31",                            // Reserved for future use.
-};
-
-// // Coprocessor-1 (Floating-Point Unit) register names.
-// static const char sCOP1RegisterNames[][4] = {
-//     "F00", "F02",                               // Subroutine return value.
-//     "F04", "F06", "F08", "F10",                 // Temporary values.
-//     "F12", "F14",                               // Subroutine arguments.
-//     "F16", "F18",                               // Temporary values.
-//     "F20", "F22", "F24", "F26", "F28", "F30",   // Saved Values.
-// };
-
 /**
  * @brief Checks an instruction for its branch offset.
  *
@@ -572,6 +515,11 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 
 #define ADD_COLOR(c) cs_insn_param_check_color_change(&strp, &color, (c), format);
 #define ADD_STR(...) strp += sprintf(strp, __VA_ARGS__);
+#define ADD_REG(fmt, cop, reg) { \
+    regInfo = get_reg_info(cop, reg); \
+    ADD_STR(fmt, regInfo->name); \
+    append_reg_to_buffer(regInfo); \
+}
 
 
 /**
@@ -590,13 +538,16 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
 
     const InsnTemplate* info = get_insn(insn);
 
-    // Whether to print immediates as decimal values rather than hexadecimal.
-    _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
-
     if (info != NULL) {
         const char* curCmd = &info->fmt[0];
+        const RegisterInfo* regInfo = NULL;
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
+
+        clear_saved_reg_buffer();
+
+        // Whether to print immediates as decimal values rather than hexadecimal.
+        _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
 
         // Loop through the chars in the 'fmt' member of 'info' and print the insn data accordingly.
         for (size_t cmdIndex = 0; cmdIndex < STRLEN(info->fmt); cmdIndex++) {
@@ -626,17 +577,17 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_RS: // CPU 'RS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_IREG, sCPURegisterNames[insn.rs]);
+                    ADD_REG(STR_IREG, CPU, insn.rs);
                     separator = TRUE;
                     break;
                 case CHAR_P_RT: // CPU 'RT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_IREG, sCPURegisterNames[insn.rt]);
+                    ADD_REG(STR_IREG, CPU, insn.rt);
                     separator = TRUE;
                     break;
                 case CHAR_P_RD: // CPU 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_IREG, sCPURegisterNames[insn.rd]);
+                    ADD_REG(STR_IREG, CPU, insn.rd);
                     separator = TRUE;
                     break;
                 case CHAR_P_IMM: // Immediate.
@@ -653,7 +604,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_BASE: // Register offset base.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_IREG_BASE, sCPURegisterNames[insn.base]);
+                    ADD_REG(STR_IREG_BASE, CPU, insn.base);
                     break;
                 case CHAR_P_BRANCH: // Branch offset.
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
@@ -666,22 +617,22 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_COP0D: // COP0 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_IREG, sCOP0RegisterNames[insn.rd]);
+                    ADD_REG(STR_IREG, COP0, insn.rd);
                     separator = TRUE;
                     break;
                 case CHAR_P_FT: // COP1 'FT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_FREG, insn.ft);
+                    ADD_REG(STR_IREG, COP1, insn.ft);
                     separator = TRUE;
                     break;
                 case CHAR_P_FS: // COP1 'FS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_FREG, insn.fs);
+                    ADD_REG(STR_IREG, COP1, insn.fs);
                     separator = TRUE;
                     break;
                 case CHAR_P_FD: // COP1 'FD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_STR(STR_FREG, insn.fd);
+                    ADD_REG(STR_IREG, COP1, insn.fd);
                     separator = TRUE;
                     break;
                 case CHAR_P_FUNC: // Jump function.

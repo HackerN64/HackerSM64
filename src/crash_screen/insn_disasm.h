@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#include "registers.h"
+
 
 #define INSN_NAME_DISPLAY_WIDTH 10
 
@@ -24,14 +26,6 @@
 #define CHAR_P_FUNC     'J'     // "[function address]" or parse map.
 #define CHAR_P_COP0D    '0'     // "[rd reg]" COP0 Special register.
 
-// Coprocessors.
-enum Coprocessors {
-    CPU = -1,
-    COP0, // Coprocessor-0 (System Control Coprocessor).
-    COP1, // Coprocessor-1 (Floating-Point Unit).
-    COP2, // Coprocessor-2 (Reality Co-Processor Vector Unit).
-    COP3, // Coprocessor-3 (CP3).
-};
 
 #define COP_FROM    (0 * BIT(2)) // 0b00000 (move from).
 #define COP_TO      (1 * BIT(2)) // 0b00100 (move to).

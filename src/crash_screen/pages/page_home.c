@@ -12,8 +12,10 @@
 #include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
+#include "crash_screen/insn_disasm.h"
 #include "crash_screen/map_parser.h"
 #include "crash_screen/memory_read.h"
+#include "crash_screen/registers.h"
 
 #include "page_home.h"
 
@@ -90,7 +92,8 @@ static const char* sFpcsrDesc[6] = {
 
 
 // Returns a CAUSE description from 'sCauseDesc'.
-static const char* get_cause_desc(u32 cause) {
+static const char* get_cause_desc(__OSThreadContext* tc) {
+    u32 cause = tc->cause;
     // Make the last two cause case indexes sequential for array access.
     switch (cause) {
         case EXC_WATCH: cause = 16; break; // 23 -> 16
@@ -187,7 +190,7 @@ void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
 #endif // INCLUDE_DEBUG_MAP
 
 void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
-    const char* desc = get_cause_desc(tc->cause);
+    const char* desc = get_cause_desc(tc);
     if (desc != NULL) {
         // "CAUSE: ([exception cause description])"
         cs_print(x, y,
@@ -204,7 +207,7 @@ u32 cs_draw_assert(u32 line) {
 
     gCSWordWrap = TRUE;
 
-    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, (TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y - line) + 1), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
+    cs_draw_rect(CRASH_SCREEN_X1, (DIVIDER_Y(line) + 1), CRASH_SCREEN_W, (TEXT_HEIGHT((CRASH_SCREEN_NUM_CHARS_Y - 2) - line) - 1), RGBA32_SET_ALPHA(COLOR_RGBA32_RED, 0x3F));
 
     // "ASSERT:"
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ASSERT:", COLOR_RGBA32_CRASH_HEADER);
@@ -273,18 +276,41 @@ u32 cs_draw_assert(u32 line) {
     return line;
 }
 
+void cs_draw_register_info_long(u32 x, u32 line, UNUSED __OSThreadContext* tc, const RegisterInfo* reg) {
+    Word data = get_reg_val_from_info(reg);
+    size_t charX = x + cs_print(TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD" ",
+        COLOR_RGBA32_CRASH_VARIABLE, reg->shortName,
+        COLOR_RGBA32_WHITE, data
+    );
+#ifdef INCLUDE_DEBUG_MAP
+    const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        size_t offsetStrSize = STRLEN("+0000");
+        size_t endX = CRASH_SCREEN_NUM_CHARS_X;
+        cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
+        cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
+            (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
+            COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
+        );
+    }
+#endif // INCLUDE_DEBUG_MAP
+}
+
+void draw_relevant_registers(u32 x, u32 line, __OSThreadContext* tc) {
+    for (int i = 0; i < REG_BUFFER_SIZE; i++) {
+        const RegisterInfo* reg = gSavedRegBuf[i];
+        if (reg == NULL) {
+            break;
+        }
+
+        cs_draw_register_info_long(x, line++, tc, reg);
+    }
+}
+
 void page_home_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 line = 1;
 
-    // "START:controls"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"Press %s for page controls",
-        COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
-    );
-    line++;
-
-    cs_draw_divider(DIVIDER_Y(line));
     line++;
 
     const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
@@ -299,6 +325,7 @@ void page_home_draw(void) {
     cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
 
     line++;
+    // cs_draw_divider(DIVIDER_Y(line));
     line++;
 
     switch (tc->cause) {
@@ -313,19 +340,39 @@ void page_home_draw(void) {
         default:;
             Address addr = tc->pc;
             Word data = 0x00000000;
-            if (try_read_data(&data, addr)) {
-                if (is_in_code_segment(addr)) {
-                    // Draw a red selection rectangle.
-                    cs_draw_rect((TEXT_X(0) - 1), (TEXT_Y(line) - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
-                    // "<-- CRASH"
-                    cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), TEXT_Y(line), STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
-                    cs_draw_divider(DIVIDER_Y(line));
-                    print_as_insn(TEXT_X(0), TEXT_Y(line++), addr, data);
-                    cs_draw_divider(DIVIDER_Y(line));
-                }
+            if (try_read_data(&data, addr) && is_in_code_segment(addr)) {
+                cs_print(TEXT_X(0), TEXT_Y(line++),
+                    STR_COLOR_PREFIX"crash location:",
+                    COLOR_RGBA32_CRASH_PAGE_NAME
+                );
+
+                cs_draw_register_info_long(1, line++, tc, get_reg_info(COP0, REG_COP0_EPC));
+                // line++;
+
+                cs_print(TEXT_X(0), TEXT_Y(line++),
+                    STR_COLOR_PREFIX"asm at crash:",
+                    COLOR_RGBA32_CRASH_PAGE_NAME
+                );
+
+                // // Draw a red selection rectangle.
+                // cs_draw_rect((TEXT_X(0) - 1), (TEXT_Y(line) - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
+                // // "<-- CRASH"
+                // cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), TEXT_Y(line), STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
+
+                // cs_draw_divider(DIVIDER_Y(line));
+                print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
+                // cs_draw_divider(DIVIDER_Y(line));
+
+                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"values before instruction:", COLOR_RGBA32_CRASH_PAGE_NAME);
+                draw_relevant_registers(1, line, tc);
+
             }
             break;
     }
+    
+    line = (CRASH_SCREEN_NUM_CHARS_Y - 2);
+    cs_draw_divider(DIVIDER_Y(line));
+    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls", COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control);
 }
 
 void page_home_input(void) {
@@ -360,7 +407,7 @@ void page_home_print(void) {
  #endif // INCLUDE_DEBUG_MAP
 
     // CAUSE:
-    const char* desc = get_cause_desc(tc->cause);
+    const char* desc = get_cause_desc(tc);
     if (desc != NULL) {
         debug_printf("- CAUSE: (%s)\n", desc);
     }
@@ -398,6 +445,7 @@ void page_home_print(void) {
             debug_printf("-- MESSAGE: %s\n", __n64Assert_Message);
         }
     }
+    //! TODO: Disasm and registers.
 #endif // UNF
 }
 

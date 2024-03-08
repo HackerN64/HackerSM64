@@ -11,6 +11,7 @@
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/map_parser.h"
 #include "crash_screen/memory_read.h"
+#include "crash_screen/registers.h"
 
 #include "page_registers.h"
 
@@ -41,30 +42,21 @@ const enum ControlTypes cs_cont_list_registers[] = {
 };
 
 
-// Main list of registers to print.
-#define LIST_REG(field, regName) {                          \
-    .offset = __builtin_offsetof(__OSThreadContext, field), \
-    .size = sizeof_member(__OSThreadContext, field),        \
-    .name = (regName),                                      \
-}
-static const OSThreadContextRegister sRegList[32 + 1] = {
-    LIST_REG(pc, "PC"), LIST_REG(sr, "SR"), LIST_REG(badvaddr, "VA"),
-    LIST_REG(at, "AT"), LIST_REG(v0, "V0"), LIST_REG(v1, "V1"),
-    LIST_REG(a0, "A0"), LIST_REG(a1, "A1"), LIST_REG(a2, "A2"),
-    LIST_REG(a3, "A3"), LIST_REG(t0, "T0"), LIST_REG(t1, "T1"),
-    LIST_REG(t2, "T2"), LIST_REG(t3, "T3"), LIST_REG(t4, "T4"),
-    LIST_REG(t5, "T5"), LIST_REG(t6, "T6"), LIST_REG(t7, "T7"),
-    LIST_REG(s0, "S0"), LIST_REG(s1, "S1"), LIST_REG(s2, "S2"),
-    LIST_REG(s3, "S3"), LIST_REG(s4, "S4"), LIST_REG(s5, "S5"),
-    LIST_REG(s6, "S6"), LIST_REG(s7, "S7"), LIST_REG(t8, "T8"),
-    LIST_REG(t9, "T9"), LIST_REG(gp, "GP"), LIST_REG(sp, "SP"),
-    LIST_REG(s8, "S8"), LIST_REG(ra, "RA"),
-    {
-        .offset = (Address)-1,
-        .size = sizeof(Address),
-        .name = "MM",
-    },
+#define LIST_REG(_cop, _reg) { .cop = _cop, .reg = _reg, }
+static const Register sRegList[32] = {
+    LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
+    LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
+    LIST_REG(CPU, REG_CPU_A0), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
+    LIST_REG(CPU, REG_CPU_A3), LIST_REG(CPU, REG_CPU_T0), LIST_REG(CPU, REG_CPU_T1),
+    LIST_REG(CPU, REG_CPU_T2), LIST_REG(CPU, REG_CPU_T3), LIST_REG(CPU, REG_CPU_T4),
+    LIST_REG(CPU, REG_CPU_T5), LIST_REG(CPU, REG_CPU_T6), LIST_REG(CPU, REG_CPU_T7),
+    LIST_REG(CPU, REG_CPU_S0), LIST_REG(CPU, REG_CPU_S1), LIST_REG(CPU, REG_CPU_S2),
+    LIST_REG(CPU, REG_CPU_S3), LIST_REG(CPU, REG_CPU_S4), LIST_REG(CPU, REG_CPU_S5),
+    LIST_REG(CPU, REG_CPU_S6), LIST_REG(CPU, REG_CPU_S7), LIST_REG(CPU, REG_CPU_T8),
+    LIST_REG(CPU, REG_CPU_T9), LIST_REG(CPU, REG_CPU_GP), LIST_REG(CPU, REG_CPU_SP),
+    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA), //! TODO: Re-add "MM"?
 };
+
 
 
 void page_registers_init(void) {
@@ -112,15 +104,18 @@ u64 get_thread_register_val(__OSThreadContext* tc, const OSThreadContextRegister
 }
 
 // Print important fixed-point registers.
-u32 cs_registers_print_registers(u32 line, __OSThreadContext* tc) {
+u32 cs_registers_print_registers(u32 line, UNUSED __OSThreadContext* tc) {
     const size_t columnWidth = 15;
     const u32 columns = 3;
     const u32 rows = (ARRAY_COUNT(sRegList) / columns);
-    const OSThreadContextRegister* reg = sRegList;
+    const Register* reg = sRegList;
 
     for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < columns; x++) {
-            cs_registers_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), reg->name, (u32)get_thread_register_val(tc, reg));
+            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->reg);
+            u32 val = get_reg_val_from_info(regInfo);
+
+            cs_registers_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regInfo->shortName, val);
 
             reg++;
         }
@@ -193,6 +188,8 @@ void page_registers_draw(void) {
     u32 line = 1;
     line++;
 
+    //! TODO: thread
+
     line = cs_registers_print_registers(line, tc);
 
     line++;
@@ -218,11 +215,13 @@ void page_registers_print(void) {
     // Thread registers:
     const u32 columns = 3;
     const u32 rows = (ARRAY_COUNT(sRegList) / columns);
-    const OSThreadContextRegister* reg = sRegList;
+    const Register* reg = sRegList;
     for (u32 y = 0; y < rows; y++) {
         debug_printf("- ");
         for (u32 x = 0; x < columns; x++) {
-            debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", reg->name, get_thread_register_val(tc, reg));
+            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->reg);
+            
+            debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", reg->shortName, get_reg_val_from_info(regInfo));
             reg++;
         }
         debug_printf("\n");

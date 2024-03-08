@@ -103,7 +103,6 @@ typedef u32 Word;
 typedef u64 Doubleword;
 
 typedef uintptr_t Address; //! TODO: 64 bit addressing mode.
-typedef u64 Register; //! TODO: 32 bit mode.
 
 typedef union {
     Byte byte[4];

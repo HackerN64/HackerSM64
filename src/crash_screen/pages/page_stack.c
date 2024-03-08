@@ -72,7 +72,7 @@ void fill_function_stack_trace(void) {
     };
     add_to_stack(&currInfo);
 
-    Register* sp = (Register*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
+    u64* sp = (u64*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
 
     // Loop through the stack buffer and find all the addresses that point to a function.
     while (sCSNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
