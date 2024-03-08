@@ -128,6 +128,10 @@ ALWAYS_INLINE void cs_draw_divider_translucent(u32 y) {
     cs_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
 }
 
+ALWAYS_INLINE void cs_draw_divider_translucent_popup(u32 y) { //! TODO: start and width args, make the other version the "full width" version
+    cs_draw_rect((CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), y, (CRASH_SCREEN_W - TEXT_WIDTH(1)), 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+}
+
 ALWAYS_INLINE void cs_draw_row_selection_box(s32 y) {
     cs_draw_rect(
         (TEXT_X(0) - 1), (y - 2),

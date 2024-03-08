@@ -94,6 +94,7 @@ extern CrashScreenDirections gCSDirectionFlags;
 extern CSController* const gCSCompositeController;
 extern const ControlType gCSControlDescriptions[];
 
+extern struct CSPopup gCSPopup_pages;
 extern struct CSPopup gCSPopup_controls;
 
 

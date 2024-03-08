@@ -63,6 +63,7 @@ extern _Bool gCSSwitchedPage;
 enum CSPopups {
     CS_POPUP_NONE,
     CS_POPUP_CONTROLS,
+    CS_POPUP_PAGES,
     CS_POPUP_ADDRESS_SELECT,
     NUM_CS_POPUPS,
 };

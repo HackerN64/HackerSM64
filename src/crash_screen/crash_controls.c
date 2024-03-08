@@ -45,7 +45,7 @@ CSController* const gCSCompositeController = &gCSCompositeControllers[0];
 
 
 const ControlType gCSControlDescriptions[] = {
-    [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                       },
+    [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                       }, //! TODO: explain press L+R to open page select menu.
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls",           },
     [CONT_DESC_HIDE_CRASH_SCREEN] = { .control = STR_Z,                                     .description = "hide crash screen",                 },
     [CONT_DESC_SCROLL_LIST      ] = { .control = STR_UP"/"STR_DOWN,                         .description = "scroll list",                       },
@@ -164,6 +164,12 @@ _Bool can_switch_page(void) {
 _Bool cs_check_switch_page_input(void) {
     enum CSPages prevPage = gCSPageID;
 
+    u16 buttonDown = gCSCompositeController->buttonDown;
+    if ((buttonDown & (L_TRIG | R_TRIG)) == (L_TRIG | R_TRIG)) {
+        cs_open_popup(CS_POPUP_PAGES);
+        return FALSE;
+    }
+
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     s8 change = 0;
@@ -176,7 +182,7 @@ _Bool cs_check_switch_page_input(void) {
     }
 
     // Reset certain values when the page is changed.
-    gCSSwitchedPage  = TRUE;
+    gCSSwitchedPage = TRUE;
 
     return TRUE;
 }
@@ -260,7 +266,7 @@ void cs_update_input(void) {
 
     }
 
-    if (can_switch_page() && cs_check_switch_page_input()) {
+    if ((can_switch_page() && cs_check_switch_page_input()) || gCSSwitchedPage) {
         page = cs_get_current_page(); // Page may have changed in cs_check_switch_page_input.
 
         if ((page->initFunc != NULL) && !page->flags.initialized) {
@@ -281,6 +287,75 @@ void cs_update_input(void) {
     gCSSwitchedPage  = FALSE;
     gCSSwitchedPopup = FALSE;
 }
+
+// Page select popup box draw function.
+void cs_popup_pages_draw(void) {
+    cs_draw_dark_rect(
+        (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2)),
+        (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
+        CS_DARKEN_SEVEN_EIGHTHS
+    );
+
+    CSPopup* currPopup = cs_get_current_popup();
+
+    // "PAGE SELECT:"
+    cs_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, currPopup->name);
+
+    u32 line = 3;
+    //! TODO: Scrollable if list is long enough.
+    for (enum CSPages pageID = 0; pageID < NUM_PAGES; pageID++) {
+        CSPage* page = gCSPages[pageID];
+
+        if ((page == NULL) || (page->name == NULL)) {
+            break;
+        }
+
+        if (pageID == gCSPageID) {
+            cs_draw_row_selection_box(TEXT_Y(3 + pageID));
+        }
+
+        cs_draw_divider_translucent_popup(DIVIDER_Y(line));
+        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"<%d>: %s", COLOR_RGBA32_CRASH_PAGE_NAME, pageID, page->name);
+
+        line++;
+    }
+
+    cs_draw_divider_translucent_popup(DIVIDER_Y(line));
+
+    osWritebackDCacheAll();
+}
+
+void cs_popup_pages_input(void) {
+    enum CSPages prevPage = gCSPageID;
+
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
+
+    if (buttonPressed & (A_BUTTON | B_BUTTON | START_BUTTON)) {
+        // Close the popup without jumping.
+        cs_open_popup(CS_POPUP_NONE);
+        return;
+    }
+
+    s32 change = 0;
+    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
+    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    gCSPageID = WRAP(((s32)gCSPageID + change), FIRST_PAGE, (NUM_PAGES - 1)); //! TODO: combine with normal L/R functionality
+
+    if (gCSPageID != prevPage) {
+        // Reset certain values when the page is changed.
+        gCSSwitchedPage = TRUE;
+    }
+}
+
+struct CSPopup gCSPopup_pages = {
+    .name      = "PAGE SELECT",
+    .initFunc  = NULL,
+    .drawFunc  = cs_popup_pages_draw,
+    .inputFunc = cs_popup_pages_input,
+    .flags = {
+        .allowPage = TRUE,
+    },
+};
 
 // Controls popup box draw function.
 //! TODO: Allow changing page-specific settings from here.

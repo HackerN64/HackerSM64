@@ -69,6 +69,7 @@ void cs_set_page(enum CSPages pageID) {
 CSPopup* gCSPopups[NUM_CS_POPUPS] = {
     [CS_POPUP_NONE          ] = NULL,
     [CS_POPUP_CONTROLS      ] = &gCSPopup_controls,
+    [CS_POPUP_PAGES         ] = &gCSPopup_pages,
     [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address_select,
 };
 enum CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
