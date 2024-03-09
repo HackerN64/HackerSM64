@@ -18,6 +18,7 @@
 #include "page_about.h"
 
 #include "config/config_world.h"
+#include "engine/surface_load.h"
 #include "game/emutest.h"
 #include "game/version.h"
 #ifdef UNF
@@ -41,11 +42,12 @@ const enum ControlTypes cs_cont_list_about[] = {
 #ifdef UNF
     CONT_DESC_OS_PRINT,
 #endif // UNF
+    CONT_DESC_CURSOR_VERTICAL,
     CONT_DESC_LIST_END,
 };
 
 
-static u32 sAboutNumEntries = 0;
+static u32 sAboutNumTotalEntries = 0;
 
 static u32 sAboutSelectedIndex = 0;
 static u32 sAboutViewportIndex = 0;
@@ -125,6 +127,7 @@ DEF_COMPRESSION_NAME(unk);
 #endif
 
 // Emulator strings:
+#define EMULATOR_STRING(_bits, _name)  { .bits = _bits, .name = _name, }
 static const EmulatorName sEmulatorStrings[] = {
     { .bits = EMU_WIIVC,            .name = "Wii VC",           },
     { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
@@ -173,6 +176,11 @@ const _Bool sDebugMode = FALSE;
 
 #define ABOUT_ENTRY_FUNC(_name, fmt, ...) void about_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
 
+ABOUT_ENTRY_FUNC(empty,          "")
+ABOUT_ENTRY_FUNC(hackersm64_v,   HackerSM64_version_txt)
+ABOUT_ENTRY_FUNC(crash_screen_v, crash_screen_version)
+ABOUT_ENTRY_FUNC(compiler,       __compiler__)
+ABOUT_ENTRY_FUNC(linker,         __linker__)
 ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
 ABOUT_ENTRY_FUNC(microcode,      ucode_name)
@@ -186,7 +194,7 @@ ABOUT_ENTRY_FUNC(compression,    compression_name)
 ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
 ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
 ABOUT_ENTRY_FUNC(gfx_pool_size,  STR_HEX_PREFIX"%X", GFX_POOL_SIZE)
-//! TODO: DYNAMIC_SURFACE_POOL_SIZE
+ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X", DYNAMIC_SURFACE_POOL_SIZE)
 ABOUT_ENTRY_FUNC(level_bounds,   STR_HEX_PREFIX"%04X (%dx)", LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
 ABOUT_ENTRY_FUNC(cell_size,      STR_HEX_PREFIX"%03X (%dx%d)", CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
 ABOUT_ENTRY_FUNC(world_scale,    "%dx", WORLD_SCALE)
@@ -212,73 +220,79 @@ ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT
 ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 #endif // !LIBPL
 
-
-#define ABOUT_ENTRY(_name, _desc) { .desc = _desc, .func = about_##_name, .info = "", }
+#define ABOUT_ENTRY_GAP()                { .desc = "",    .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
+#define ABOUT_ENTRY_TITLE(_name, _desc)  { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
+#define ABOUT_ENTRY_TITLE(_name, _desc)  { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
+#define ABOUT_ENTRY_SINGLE(_name, _desc) { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
+#define ABOUT_ENTRY_LONG1(_name, _desc)  { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
+#define ABOUT_ENTRY_LONG2(_name, _desc)  { .desc = "",    .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
 AboutEntry sAboutEntries[] = {
-    [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY(rom_name,       "ROM NAME"      ),
-    [ABOUT_ENTRY_LIBULTRA      ] = ABOUT_ENTRY(libultra,       "LIBULTRA"      ),
-    [ABOUT_ENTRY_MICROCODE     ] = ABOUT_ENTRY(microcode,      "MICROCODE"     ),
-    [ABOUT_ENTRY_REGION        ] = ABOUT_ENTRY(region,         "REGION"        ),
-    [ABOUT_ENTRY_SAVE_TYPE     ] = ABOUT_ENTRY(save_type,      "SAVE TYPE"     ),
-    [ABOUT_ENTRY_COMPRESSION   ] = ABOUT_ENTRY(compression,    "COMPRESSION"   ),
-    [ABOUT_ENTRY_ROM_SIZE      ] = ABOUT_ENTRY(rom_size,       "ROM SIZE"      ),
-    [ABOUT_ENTRY_RAM_SIZE      ] = ABOUT_ENTRY(ram_size,       "RAM SIZE"      ),
-    [ABOUT_ENTRY_GFX_POOL_SIZE ] = ABOUT_ENTRY(gfx_pool_size,  "GFX POOL SIZE" ),
-    [ABOUT_ENTRY_LEVEL_BOUNDS  ] = ABOUT_ENTRY(level_bounds,   "LEVEL BOUNDS"  ),
-    [ABOUT_ENTRY_CELL_SIZE     ] = ABOUT_ENTRY(cell_size,      "CELL SIZE"     ),
-    [ABOUT_ENTRY_WORLD_SCALE   ] = ABOUT_ENTRY(world_scale,    "WORLD SCALE"   ),
-    [ABOUT_ENTRY_RCVI_HACK     ] = ABOUT_ENTRY(rcvi_hack,      "RCVI HACK"     ),
-    [ABOUT_ENTRY_GODDARD       ] = ABOUT_ENTRY(goddard,        "GODDARD"       ),
-    [ABOUT_ENTRY_DEBUG_MODE    ] = ABOUT_ENTRY(debug_mode,     "DEBUG MODE"    ),
-    [ABOUT_ENTRY_EMULATOR      ] = ABOUT_ENTRY(emulator,       "EMULATOR"      ),
+    [ABOUT_ENTRY_GAP_1         ] = ABOUT_ENTRY_GAP(),
+    [ABOUT_ENTRY_HACKERSM64    ] = ABOUT_ENTRY_TITLE(hackersm64_v,    "HackerSM64"    ),
+    [ABOUT_ENTRY_CRASH_SCREEN  ] = ABOUT_ENTRY_TITLE(crash_screen_v,  "Crash Screen"  ),
+    [ABOUT_ENTRY_COMPILER_1    ] = ABOUT_ENTRY_LONG1(compiler,        "COMPILER"      ),
+    [ABOUT_ENTRY_COMPILER_2    ] = ABOUT_ENTRY_LONG2(compiler,        "COMPILER"      ),
+    [ABOUT_ENTRY_LINKER_1      ] = ABOUT_ENTRY_LONG1(linker,          "LINKER"        ),
+    [ABOUT_ENTRY_LINKER_2      ] = ABOUT_ENTRY_LONG2(linker,          "LINKER"        ),
+    // [ABOUT_ENTRY_GAP_2         ] = ABOUT_ENTRY_GAP(),
+    [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY_SINGLE(rom_name,       "ROM NAME"      ),
+    [ABOUT_ENTRY_LIBULTRA      ] = ABOUT_ENTRY_SINGLE(libultra,       "LIBULTRA"      ),
+    [ABOUT_ENTRY_MICROCODE     ] = ABOUT_ENTRY_SINGLE(microcode,      "MICROCODE"     ),
+    [ABOUT_ENTRY_REGION        ] = ABOUT_ENTRY_SINGLE(region,         "REGION"        ),
+    [ABOUT_ENTRY_SAVE_TYPE     ] = ABOUT_ENTRY_SINGLE(save_type,      "SAVE TYPE"     ),
+    [ABOUT_ENTRY_COMPRESSION   ] = ABOUT_ENTRY_SINGLE(compression,    "COMPRESSION"   ),
+    [ABOUT_ENTRY_ROM_SIZE      ] = ABOUT_ENTRY_SINGLE(rom_size,       "ROM SIZE"      ),
+    [ABOUT_ENTRY_RAM_SIZE      ] = ABOUT_ENTRY_SINGLE(ram_size,       "RAM SIZE"      ),
+    [ABOUT_ENTRY_GFX_POOL_SIZE ] = ABOUT_ENTRY_SINGLE(gfx_pool_size,  "GFX POOL SIZE" ),
+    [ABOUT_ENTRY_DYN_SURF_POOL ] = ABOUT_ENTRY_SINGLE(dyn_surf_pool,  "DYN SURF POOL" ),
+    [ABOUT_ENTRY_LEVEL_BOUNDS  ] = ABOUT_ENTRY_SINGLE(level_bounds,   "LEVEL BOUNDS"  ),
+    [ABOUT_ENTRY_CELL_SIZE     ] = ABOUT_ENTRY_SINGLE(cell_size,      "CELL SIZE"     ),
+    [ABOUT_ENTRY_WORLD_SCALE   ] = ABOUT_ENTRY_SINGLE(world_scale,    "WORLD SCALE"   ),
+    [ABOUT_ENTRY_RCVI_HACK     ] = ABOUT_ENTRY_SINGLE(rcvi_hack,      "RCVI HACK"     ),
+    [ABOUT_ENTRY_GODDARD       ] = ABOUT_ENTRY_SINGLE(goddard,        "GODDARD"       ),
+    [ABOUT_ENTRY_DEBUG_MODE    ] = ABOUT_ENTRY_SINGLE(debug_mode,     "DEBUG MODE"    ),
+    [ABOUT_ENTRY_EMULATOR      ] = ABOUT_ENTRY_SINGLE(emulator,       "EMULATOR"      ),
 #ifdef LIBPL
-    [ABOUT_ENTRY_GFX_PLUGIN    ] = ABOUT_ENTRY(gfx_plugin,     "GFX PLUGIN"    ),
-    [ABOUT_ENTRY_LAUNCHER      ] = ABOUT_ENTRY(launcher,       "LAUNCHER"      ),
-    [ABOUT_ENTRY_LIBPL_VERSION ] = ABOUT_ENTRY(libpl_version,  "LIBPL VERSION" ),
+    [ABOUT_ENTRY_GFX_PLUGIN    ] = ABOUT_ENTRY_SINGLE(gfx_plugin,     "GFX PLUGIN"    ),
+    [ABOUT_ENTRY_LAUNCHER      ] = ABOUT_ENTRY_SINGLE(launcher,       "LAUNCHER"      ),
+    [ABOUT_ENTRY_LIBPL_VERSION ] = ABOUT_ENTRY_SINGLE(libpl_version,  "LIBPL VERSION" ),
 #endif // LIBPL
 };
 
 void page_about_init(void) {
 #ifdef LIBPL
-    sAboutNumEntries = (gSupportsLibpl ? NUM_ABOUT_ENTRIES : (ABOUT_ENTRY_EMULATOR + 1));
+    sAboutNumTotalEntries = (gSupportsLibpl ? NUM_ABOUT_ENTRIES : (ABOUT_ENTRY_EMULATOR + 1));
 #else // !LIBPL
-    sAboutNumEntries = NUM_ABOUT_ENTRIES;
+    sAboutNumTotalEntries = NUM_ABOUT_ENTRIES;
 #endif // !LIBPL
 
 
-    for (u32 i = 0; i < sAboutNumEntries; i++) {
+    for (u32 i = 0; i < sAboutNumTotalEntries; i++) {
         AboutEntry* entry = &sAboutEntries[sAboutViewportIndex + i];
 
 #ifdef LIBPL
-        if (!gSupportsLibpl && i == FIRST_LIBPL_ENTRY) {
+        if (!gSupportsLibpl && (i == FIRST_LIBPL_ENTRY)) {
             break;
         }
 #endif // LIBPL
 
-        entry->func(entry->info);
+        if (entry->func != NULL) {
+            entry->func(entry->info);
+        }
     }
 }
 
 void page_about_draw(void) {
-    u32 line = 2;
+    u32 line = 1;
 
     const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
-    cs_print(TEXT_X(centerX - ((STRLEN("HackerSM64 ") + strlen(HackerSM64_version_txt) + 0) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"HackerSM64 %s", COLOR_RGBA32_CRASH_PAGE_NAME, HackerSM64_version_txt);
-    cs_print(TEXT_X(centerX - ((STRLEN("Crash Screen ") + strlen(crash_screen_version) + 1) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"Crash Screen %s", COLOR_RGBA32_CRASH_PAGE_NAME, crash_screen_version);
-
-    const RGBA32 valColor = COLOR_RGBA32_LIGHT_GRAY;
-
-    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPILER:\n  "STR_COLOR_PREFIX"%s",            valColor, __compiler__);
-    line++;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",              valColor, __linker__);
-    line += 2;
 
     u32 currIndex = sAboutViewportIndex;
 
     AboutEntry* entry = &sAboutEntries[currIndex];
 
     for (u32 i = 0; i < ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES; i++) {
-        if (currIndex > sAboutNumEntries) {
+        if (currIndex > sAboutNumTotalEntries) {
             break;
         }
 
@@ -294,21 +308,47 @@ void page_about_draw(void) {
         }
 #endif // LIBPL
 
-        cs_print(TEXT_X(0), y, "%s:", entry->desc);
-        if (entry->info != NULL) {
-            cs_print(TEXT_X(16), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
+        switch (entry->type) {
+            case ABOUT_ENTRY_TYPE_NONE:
+                break;
+            case ABOUT_ENTRY_TYPE_TITLE:
+                if ((entry->desc != NULL) && (entry->info != NULL)) {
+                    cs_print(TEXT_X(centerX - (((strlen(entry->desc) + STRLEN(" ") + strlen(entry->info)) / 2))), y,
+                        STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, entry->desc, entry->info
+                    );
+                }
+                break;
+            case ABOUT_ENTRY_TYPE_SUBTITLE:
+                if (entry->desc != NULL) {
+                    cs_print(TEXT_X(0), y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, entry->desc);
+                }
+                break;
+            case ABOUT_ENTRY_TYPE_SINGLE:
+                if (entry->desc != NULL) {
+                    cs_print(TEXT_X(0), y, "%s:", entry->desc);
+                }
+                if (entry->info != NULL) {
+                    cs_print(TEXT_X(16), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
+                }
+                break;
+            case ABOUT_ENTRY_TYPE_LONG:
+                if (entry->info != NULL) {
+                    cs_print(TEXT_X(2), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
+                }
+                break;
         }
+
         entry++;
         currIndex++;
     }
 
     // Scroll Bar:
-    if (sAboutNumEntries > ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES) {
-        cs_draw_divider(DIVIDER_Y(line));
+    if (sAboutNumTotalEntries > ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES) {
+        // cs_draw_divider(DIVIDER_Y(line));
 
         cs_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
-            ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, sAboutNumEntries,
+            ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, sAboutNumTotalEntries,
             sAboutViewportIndex,
             COLOR_RGBA32_CRASH_DIVIDER, TRUE
         );
@@ -323,7 +363,7 @@ void page_about_input(void) {
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    sAboutSelectedIndex = WRAP(((s32)sAboutSelectedIndex + change), 0, (s32)(sAboutNumEntries - 1));
+    sAboutSelectedIndex = WRAP(((s32)sAboutSelectedIndex + change), 0, (s32)(sAboutNumTotalEntries - 1));
 
     sAboutViewportIndex = cs_clamp_view_to_selection(sAboutViewportIndex, sAboutSelectedIndex, ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, 1);
 }
@@ -339,26 +379,44 @@ void page_about_print(void) {
 
     //! TODO: use sAboutEntries
 
-    debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
-    debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
-    debug_printf("- COMPILER:\t\t%s\n",             __compiler__);
-    debug_printf("- LINKER:\t\t%s\n",               __linker__);
-    debug_printf("- ROM NAME:\t\t%s\n",             INTERNAL_ROM_NAME);
-#ifdef LIBDRAGON
-    debug_printf("- LIBULTRA:\t\t%s\n",             "LIBDRAGON");
-#else // !LIBDRAGON
-    debug_printf("- LIBULTRA:\t\t%s (patch %i)\n",  OS_MAJOR_VERSION, OS_MINOR_VERSION);
-#endif // !LIBDRAGON
-    debug_printf("- MICROCODE:\t\t%s\n",            ucode_name);
-    debug_printf("- REGION:\t\t%s (%s)\n",          region_name, osTvTypeStrings[osTvType]);
-    debug_printf("- SAVE TYPE:\t\t%s\n",            savetype_name);
-    debug_printf("- COMPRESSION:\t\t%s\n",          compression_name);
-    debug_printf("- ROM SIZE:\t\t%i bytes\n",       (size_t)gRomSize);
-    debug_printf("- RAM SIZE:\t\t%imb\n",           (TOTAL_RAM_SIZE / RAM_1MB));
-    debug_printf("- EXTBOUNDS MODE:\t%d\n",         EXTENDED_BOUNDS_MODE);
-    debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
-    debug_printf("- DEBUG MODE:\t\t%s%s\n",         gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +UNF" : ""));
-    debug_printf("- EMULATOR:\t\t%s\n",             get_emulator_name(gEmulator));
+    for (u32 i = 0; i < sAboutNumTotalEntries; i++) {
+        AboutEntry* entry = &sAboutEntries[sAboutViewportIndex + i];
+
+#ifdef LIBPL
+        if (!gSupportsLibpl && (i == FIRST_LIBPL_ENTRY)) {
+            break;
+        }
+#endif // LIBPL
+
+        if (entry->desc != NULL) {
+            debug_printf("- %s", entry->desc);
+        }
+        if (entry->info != NULL) {
+            debug_printf("\t\t%s", entry->info);
+        }
+        debug_printf("\n");
+    }
+
+//     debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
+//     debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
+//     debug_printf("- COMPILER:\t\t%s\n",             __compiler__);
+//     debug_printf("- LINKER:\t\t%s\n",               __linker__);
+//     debug_printf("- ROM NAME:\t\t%s\n",             INTERNAL_ROM_NAME);
+// #ifdef LIBDRAGON
+//     debug_printf("- LIBULTRA:\t\t%s\n",             "LIBDRAGON");
+// #else // !LIBDRAGON
+//     debug_printf("- LIBULTRA:\t\t%s (patch %i)\n",  OS_MAJOR_VERSION, OS_MINOR_VERSION);
+// #endif // !LIBDRAGON
+//     debug_printf("- MICROCODE:\t\t%s\n",            ucode_name);
+//     debug_printf("- REGION:\t\t%s (%s)\n",          region_name, osTvTypeStrings[osTvType]);
+//     debug_printf("- SAVE TYPE:\t\t%s\n",            savetype_name);
+//     debug_printf("- COMPRESSION:\t\t%s\n",          compression_name);
+//     debug_printf("- ROM SIZE:\t\t%i bytes\n",       (size_t)gRomSize);
+//     debug_printf("- RAM SIZE:\t\t%imb\n",           (TOTAL_RAM_SIZE / RAM_1MB));
+//     debug_printf("- EXTBOUNDS MODE:\t%d\n",         EXTENDED_BOUNDS_MODE);
+//     debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
+//     debug_printf("- DEBUG MODE:\t\t%s%s\n",         gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +UNF" : ""));
+//     debug_printf("- EMULATOR:\t\t%s\n",             get_emulator_name(gEmulator));
 #endif // UNF
 }
 
