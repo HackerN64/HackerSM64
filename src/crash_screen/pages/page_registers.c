@@ -221,7 +221,7 @@ void page_registers_print(void) {
         for (u32 x = 0; x < columns; x++) {
             const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->reg);
             
-            debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", reg->shortName, get_reg_val_from_info(regInfo));
+            debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val_from_info(regInfo));
             reg++;
         }
         debug_printf("\n");

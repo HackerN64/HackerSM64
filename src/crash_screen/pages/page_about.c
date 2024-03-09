@@ -220,12 +220,12 @@ ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT
 ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 #endif // !LIBPL
 
-#define ABOUT_ENTRY_GAP()                { .desc = "",    .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
-#define ABOUT_ENTRY_TITLE(_name, _desc)  { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
-#define ABOUT_ENTRY_TITLE(_name, _desc)  { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
-#define ABOUT_ENTRY_SINGLE(_name, _desc) { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
-#define ABOUT_ENTRY_LONG1(_name, _desc)  { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
-#define ABOUT_ENTRY_LONG2(_name, _desc)  { .desc = "",    .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
+#define ABOUT_ENTRY_GAP()                  { .desc = "",    .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
+#define ABOUT_ENTRY_TITLE(_name, _desc)    { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
+#define ABOUT_ENTRY_SUBTITLE(_name, _desc) { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
+#define ABOUT_ENTRY_SINGLE(_name, _desc)   { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
+#define ABOUT_ENTRY_LONG1(_name, _desc)    { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
+#define ABOUT_ENTRY_LONG2(_name, _desc)    { .desc = "",    .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
 AboutEntry sAboutEntries[] = {
     [ABOUT_ENTRY_GAP_1         ] = ABOUT_ENTRY_GAP(),
     [ABOUT_ENTRY_HACKERSM64    ] = ABOUT_ENTRY_TITLE(hackersm64_v,    "HackerSM64"    ),
@@ -235,7 +235,7 @@ AboutEntry sAboutEntries[] = {
     [ABOUT_ENTRY_LINKER_1      ] = ABOUT_ENTRY_LONG1(linker,          "LINKER"        ),
     [ABOUT_ENTRY_LINKER_2      ] = ABOUT_ENTRY_LONG2(linker,          "LINKER"        ),
     // [ABOUT_ENTRY_GAP_2         ] = ABOUT_ENTRY_GAP(),
-    [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY_SINGLE(rom_name,       "ROM NAME"      ),
+    [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY_SINGLE(rom_name,       "ROM NAME"      ), //! TODO: Fix this
     [ABOUT_ENTRY_LIBULTRA      ] = ABOUT_ENTRY_SINGLE(libultra,       "LIBULTRA"      ),
     [ABOUT_ENTRY_MICROCODE     ] = ABOUT_ENTRY_SINGLE(microcode,      "MICROCODE"     ),
     [ABOUT_ENTRY_REGION        ] = ABOUT_ENTRY_SINGLE(region,         "REGION"        ),
@@ -284,11 +284,7 @@ void page_about_init(void) {
 
 void page_about_draw(void) {
     u32 line = 1;
-
-    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
-
     u32 currIndex = sAboutViewportIndex;
-
     AboutEntry* entry = &sAboutEntries[currIndex];
 
     for (u32 i = 0; i < ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES; i++) {
@@ -313,7 +309,7 @@ void page_about_draw(void) {
                 break;
             case ABOUT_ENTRY_TYPE_TITLE:
                 if ((entry->desc != NULL) && (entry->info != NULL)) {
-                    cs_print(TEXT_X(centerX - (((strlen(entry->desc) + STRLEN(" ") + strlen(entry->info)) / 2))), y,
+                    cs_print(TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (((strlen(entry->desc) + STRLEN(" ") + strlen(entry->info)) / 2))), y,
                         STR_COLOR_PREFIX"%s %s", COLOR_RGBA32_CRASH_PAGE_NAME, entry->desc, entry->info
                     );
                 }
@@ -344,8 +340,6 @@ void page_about_draw(void) {
 
     // Scroll Bar:
     if (sAboutNumTotalEntries > ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES) {
-        // cs_draw_divider(DIVIDER_Y(line));
-
         cs_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, sAboutNumTotalEntries,
@@ -372,13 +366,6 @@ void page_about_print(void) {
 #ifdef UNF
     debug_printf("\n");
 
-    _Bool debug_mode = FALSE;
- #ifdef DEBUG
-    debug_mode = TRUE;
- #endif // DEBUG
-
-    //! TODO: use sAboutEntries
-
     for (u32 i = 0; i < sAboutNumTotalEntries; i++) {
         AboutEntry* entry = &sAboutEntries[sAboutViewportIndex + i];
 
@@ -392,7 +379,7 @@ void page_about_print(void) {
             debug_printf("- %s", entry->desc);
         }
         if (entry->info != NULL) {
-            debug_printf("\t\t%s", entry->info);
+            debug_printf(" %s", entry->info);
         }
         debug_printf("\n");
     }
