@@ -22,6 +22,9 @@
 #ifdef UNF
 #include "usb/debug.h"
 #endif // UNF
+#ifdef LIBPL
+#include "lib/libpl/libpl.h"
+#endif // LIBPL
 
 
 struct CSSetting cs_settings_group_page_about[] = {
