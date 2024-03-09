@@ -44,6 +44,11 @@ const enum ControlTypes cs_cont_list_about[] = {
     CONT_DESC_LIST_END,
 };
 
+static u32 sAboutNumEntries = 0;
+
+static u32 sAboutSelectedIndex = 0;
+static u32 sAboutViewportIndex = 0;
+
 
 // Region string:
 #define DEF_REGION_NAME(name) static const char region_name[3] = TO_STRING2(name);
