@@ -179,7 +179,7 @@ ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)
 ABOUT_ENTRY_FUNC(debug_mode,     "%s%s", gValNames_no_yes[sDebugMode], (debug_is_initialized() ? " +unf" : ""))
 ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 #ifdef LIBPL
-ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
+ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0)); // about_libpl_version
 #endif // LIBPL
 
 
@@ -209,8 +209,16 @@ AboutEntry sAboutEntries[] = {
 };
 
 void page_about_init(void) {
-    for (int i = 0; i < ARRAY_COUNT(sAboutEntries); i++) {
+    sAboutNumEntries = ARRAY_COUNT(sAboutEntries);
+
+    for (int i = 0; i < sAboutNumEntries; i++) {
         AboutEntry* entry = &sAboutEntries[i];
+
+#ifdef LIBPL
+        if (!gSupportsLibpl && (entry->func == about_libpl_version)) {
+            break;
+        }
+#endif // LIBPL
 
         entry->func(entry->info);
     }
@@ -230,8 +238,14 @@ void page_about_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",              valColor, __linker__);
     line += 2;
 
-    for (int i = 0; i < ARRAY_COUNT(sAboutEntries); i++) {
+    for (int i = 0; i < sAboutNumEntries; i++) {
         AboutEntry* entry = &sAboutEntries[i];
+
+#ifdef LIBPL
+        if (!gSupportsLibpl && (entry->func == about_libpl_version)) {
+            break;
+        }
+#endif // LIBPL
 
         cs_print(TEXT_X(0), TEXT_Y(line), "%s:", entry->desc);
         if (entry->info != NULL) {
