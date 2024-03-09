@@ -315,7 +315,7 @@ void cs_popup_pages_draw(void) {
         }
 
         cs_draw_divider_translucent_popup(DIVIDER_Y(line));
-        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"<%d>: %s", COLOR_RGBA32_CRASH_PAGE_NAME, pageID, page->name);
+        cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"<%02d>: %s", COLOR_RGBA32_CRASH_PAGE_NAME, pageID, page->name);
 
         line++;
     }

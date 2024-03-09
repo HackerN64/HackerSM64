@@ -16,7 +16,7 @@ enum CSSettingsGroup_page_about {
 
 
 typedef struct EmulatorName {
-    /*0x00*/ enum Emulator bits;
+    /*0x00*/ const enum Emulator bits;
     /*0x04*/ const char* name;
 } EmulatorName; /*0x08*/
 

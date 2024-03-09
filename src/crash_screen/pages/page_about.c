@@ -1,5 +1,6 @@
 #include <ultra64.h>
 
+#include <stdarg.h>
 #include <string.h>
 
 #include "types.h"
@@ -68,7 +69,7 @@ static const char osTvTypeStrings[][5] = {
 };
 
 // Microcode string:
-#define DEF_UCODE_NAME(name) static const char* ucode_name = TO_STRING2(name);
+#define DEF_UCODE_NAME(name) static const char ucode_name[32] = TO_STRING2(name);
 #ifdef L3DEX2_ALONE
 DEF_UCODE_NAME(L3DEX2_alone);
 #elif F3DZEX_GBI_2
@@ -142,10 +143,6 @@ const char* get_emulator_name(enum Emulator emu) {
     return NULL;
 }
 
-void page_about_init(void) {
-
-}
-
 const char gValNames_no_yes[][4] = {
     [FALSE] = "NO",
     [TRUE ] = "YES",
@@ -153,53 +150,96 @@ const char gValNames_no_yes[][4] = {
 
 extern const u8 gRomSize[];
 
+#ifdef DEBUG
+const _Bool sDebugMode = TRUE;
+#else // !DEBUG
+const _Bool sDebugMode = FALSE;
+#endif // !DEBUG
 #ifndef UNF
     #define debug_is_initialized() FALSE
 #endif // !UNF
 
-#ifndef LPL_ABI_VERSION_CURRENT
-#define LPL_ABI_VERSION_CURRENT 0
-#endif // !LPL_ABI_VERSION_CURRENT
+
+#define ABOUT_ENTRY_FUNC(_name, fmt, ...) void about_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
+
+ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
+ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
+ABOUT_ENTRY_FUNC(microcode,      ucode_name)
+#ifdef LIBDRAGON
+ABOUT_ENTRY_FUNC(region,         "LIBDRAGON") //! TODO: Libdragon version
+#else // !LIBDRAGON
+ABOUT_ENTRY_FUNC(region,         "%s (%s)", region_name, osTvTypeStrings[osTvType])
+#endif //! LIBDRAGON
+ABOUT_ENTRY_FUNC(save_type,      savetype_name)
+ABOUT_ENTRY_FUNC(compression,    compression_name)
+ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
+ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
+ABOUT_ENTRY_FUNC(extbounds_mode, "%d", EXTENDED_BOUNDS_MODE)
+ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)])
+ABOUT_ENTRY_FUNC(debug_mode,     "%s%s", gValNames_no_yes[sDebugMode], (debug_is_initialized() ? " +unf" : ""))
+ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
+#ifdef LIBPL
+ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
+#endif // LIBPL
+
+
+typedef struct {
+    /*0x00*/ const char* desc;
+    /*0x04*/ void (*func)(char* buf);
+    /*0x08*/ char info[32];
+} AboutEntry; /*0x28*/
+
+#define ABOUT_ENTRY(_name, _desc) { .desc = _desc, .func = about_##_name, .info = "", }
+AboutEntry sAboutEntries[] = {
+    ABOUT_ENTRY(rom_name,       "ROM NAME"),
+    ABOUT_ENTRY(libultra,       "LIBULTRA"),
+    ABOUT_ENTRY(microcode,      "MICROCODE"),
+    ABOUT_ENTRY(region,         "REGION"),
+    ABOUT_ENTRY(save_type,      "SAVE TYPE"),
+    ABOUT_ENTRY(compression,    "COMPRESSION"),
+    ABOUT_ENTRY(rom_size,       "ROM SIZE"),
+    ABOUT_ENTRY(ram_size,       "RAM SIZE"),
+    ABOUT_ENTRY(extbounds_mode, "EXTBOUNDS MODE"),
+    ABOUT_ENTRY(rcvi_hack,      "RCVI HACK"),
+    ABOUT_ENTRY(debug_mode,     "DEBUG MODE"),
+    ABOUT_ENTRY(emulator,       "EMULATOR"),
+#ifdef LIBPL
+    ABOUT_ENTRY(libpl,          "LIBPL VERSION"),
+#endif
+};
+
+void page_about_init(void) {
+    for (int i = 0; i < ARRAY_COUNT(sAboutEntries); i++) {
+        AboutEntry* entry = &sAboutEntries[i];
+
+        entry->func(entry->info);
+    }
+}
 
 void page_about_draw(void) {
-    _Bool debug_mode = FALSE;
-#ifdef DEBUG
-    debug_mode = TRUE;
-#endif // DEBUG
-
     u32 line = 2;
 
     const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
     cs_print(TEXT_X(centerX - ((STRLEN("HackerSM64 ") + strlen(HackerSM64_version_txt) + 0) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"HackerSM64 %s", COLOR_RGBA32_CRASH_PAGE_NAME, HackerSM64_version_txt);
     cs_print(TEXT_X(centerX - ((STRLEN("Crash Screen ") + strlen(crash_screen_version) + 1) / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"Crash Screen %s", COLOR_RGBA32_CRASH_PAGE_NAME, crash_screen_version);
+
     const RGBA32 valColor = COLOR_RGBA32_LIGHT_GRAY;
+
     cs_print(TEXT_X(0), TEXT_Y(line++), "COMPILER:\n  "STR_COLOR_PREFIX"%s",            valColor, __compiler__);
     line++;
     cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",              valColor, __linker__);
     line++;
 
     line++;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM NAME:\t\t"STR_COLOR_PREFIX"%s",            valColor, INTERNAL_ROM_NAME);
-#ifdef LIBDRAGON
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t"STR_COLOR_PREFIX"%s",            valColor, "LIBDRAGON");
-#else // !LIBDRAGON
-    cs_print(TEXT_X(0), TEXT_Y(line++), "LIBULTRA:\t\t"STR_COLOR_PREFIX"%s (patch %i)", valColor, OS_MAJOR_VERSION, OS_MINOR_VERSION);
-#endif // !LIBDRAGON
-    cs_print(TEXT_X(0), TEXT_Y(line++), "MICROCODE:\t\t"STR_COLOR_PREFIX"%s",           valColor, ucode_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "REGION:\t\t\t"STR_COLOR_PREFIX"%s (%s)",       valColor, region_name, osTvTypeStrings[osTvType]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "SAVE TYPE:\t\t"STR_COLOR_PREFIX"%s",           valColor, savetype_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "COMPRESSION:\t"STR_COLOR_PREFIX"%s",           valColor, compression_name);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "ROM SIZE:\t\t"STR_COLOR_PREFIX"%i bytes",      valColor, (size_t)gRomSize);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "RAM SIZE:\t\t"STR_COLOR_PREFIX"%imb",          valColor, (TOTAL_RAM_SIZE / RAM_1MB));
-    cs_print(TEXT_X(0), TEXT_Y(line++), "EXTBOUNDS MODE:\t"STR_COLOR_PREFIX"%d",        valColor, EXTENDED_BOUNDS_MODE);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "RCVI HACK:\t\t"STR_COLOR_PREFIX"%s",           valColor, gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
-    cs_print(TEXT_X(0), TEXT_Y(line++), "DEBUG MODE:\t\t"STR_COLOR_PREFIX"%s%s",        valColor, gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +unf" : ""));
-    size_t charX = cs_print(TEXT_X(0), TEXT_Y(line), "EMULATOR:\t\t"STR_COLOR_PREFIX"%s", valColor, get_emulator_name(gEmulator));
-#ifdef LIBPL
-    if (gSupportsLibpl) {
-        cs_print(TEXT_X(charX), TEXT_Y(line++), STR_COLOR_PREFIX"+ libpl v%d",          valColor, LPL_ABI_VERSION_CURRENT);
+    for (int i = 0; i < ARRAY_COUNT(sAboutEntries); i++) {
+        AboutEntry* entry = &sAboutEntries[i];
+
+        cs_print(TEXT_X(0), TEXT_Y(line), "%s:", entry->desc);
+        if (entry->info != NULL) {
+            cs_print(TEXT_X(16), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
+        }
+        line++;
     }
-#endif // LIBPL
 }
 
 void page_about_input(void) {
