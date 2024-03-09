@@ -156,6 +156,11 @@ const char gValNames_no_yes[][4] = {
 
 extern const u8 gRomSize[];
 
+#ifdef KEEP_MARIO_HEAD //! TODO: use this
+const _Bool sGoddardIncluded = TRUE;
+#else // !KEEP_MARIO_HEAD
+const _Bool sGoddardIncluded = FALSE;
+#endif // !KEEP_MARIO_HEAD
 #ifdef DEBUG
 const _Bool sDebugMode = TRUE;
 #else // !DEBUG
@@ -180,8 +185,13 @@ ABOUT_ENTRY_FUNC(save_type,      savetype_name)
 ABOUT_ENTRY_FUNC(compression,    compression_name)
 ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
 ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
-ABOUT_ENTRY_FUNC(extbounds_mode, "%d", EXTENDED_BOUNDS_MODE)
+ABOUT_ENTRY_FUNC(gfx_pool_size,  STR_HEX_PREFIX"%X", GFX_POOL_SIZE)
+//! TODO: DYNAMIC_SURFACE_POOL_SIZE
+ABOUT_ENTRY_FUNC(level_bounds,   STR_HEX_PREFIX"%04X (%dx)", LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
+ABOUT_ENTRY_FUNC(cell_size,      STR_HEX_PREFIX"%03X (%dx%d)", CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
+ABOUT_ENTRY_FUNC(world_scale,    "%dx", WORLD_SCALE)
 ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)])
+ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[sGoddardIncluded])
 ABOUT_ENTRY_FUNC(debug_mode,     "%s%s", gValNames_no_yes[sDebugMode], (debug_is_initialized() ? " +unf" : ""))
 #ifdef LIBPL
 void about_emulator(char* buf) {
@@ -213,8 +223,12 @@ AboutEntry sAboutEntries[] = {
     [ABOUT_ENTRY_COMPRESSION   ] = ABOUT_ENTRY(compression,    "COMPRESSION"   ),
     [ABOUT_ENTRY_ROM_SIZE      ] = ABOUT_ENTRY(rom_size,       "ROM SIZE"      ),
     [ABOUT_ENTRY_RAM_SIZE      ] = ABOUT_ENTRY(ram_size,       "RAM SIZE"      ),
-    [ABOUT_ENTRY_EXTBOUNDS_MODE] = ABOUT_ENTRY(extbounds_mode, "EXTBOUNDS MODE"),
+    [ABOUT_ENTRY_GFX_POOL_SIZE ] = ABOUT_ENTRY(gfx_pool_size,  "GFX POOL SIZE" ),
+    [ABOUT_ENTRY_LEVEL_BOUNDS  ] = ABOUT_ENTRY(level_bounds,   "LEVEL BOUNDS"  ),
+    [ABOUT_ENTRY_CELL_SIZE     ] = ABOUT_ENTRY(cell_size,      "CELL SIZE"     ),
+    [ABOUT_ENTRY_WORLD_SCALE   ] = ABOUT_ENTRY(world_scale,    "WORLD SCALE"   ),
     [ABOUT_ENTRY_RCVI_HACK     ] = ABOUT_ENTRY(rcvi_hack,      "RCVI HACK"     ),
+    [ABOUT_ENTRY_GODDARD       ] = ABOUT_ENTRY(goddard,        "GODDARD"       ),
     [ABOUT_ENTRY_DEBUG_MODE    ] = ABOUT_ENTRY(debug_mode,     "DEBUG MODE"    ),
     [ABOUT_ENTRY_EMULATOR      ] = ABOUT_ENTRY(emulator,       "EMULATOR"      ),
 #ifdef LIBPL
