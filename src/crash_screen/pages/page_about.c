@@ -204,7 +204,7 @@ AboutEntry sAboutEntries[] = {
     ABOUT_ENTRY(debug_mode,     "DEBUG MODE"),
     ABOUT_ENTRY(emulator,       "EMULATOR"),
 #ifdef LIBPL
-    ABOUT_ENTRY(libpl,          "LIBPL VERSION"),
+    ABOUT_ENTRY(libpl_version,  "LIBPL VERSION"),
 #endif
 };
 
@@ -228,9 +228,8 @@ void page_about_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line++), "COMPILER:\n  "STR_COLOR_PREFIX"%s",            valColor, __compiler__);
     line++;
     cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",              valColor, __linker__);
-    line++;
+    line += 2;
 
-    line++;
     for (int i = 0; i < ARRAY_COUNT(sAboutEntries); i++) {
         AboutEntry* entry = &sAboutEntries[i];
 
@@ -254,6 +253,8 @@ void page_about_print(void) {
  #ifdef DEBUG
     debug_mode = TRUE;
  #endif // DEBUG
+
+    //! TODO: use sAboutEntries
 
     debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
     debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
