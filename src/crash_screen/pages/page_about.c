@@ -44,6 +44,7 @@ const enum ControlTypes cs_cont_list_about[] = {
     CONT_DESC_LIST_END,
 };
 
+
 static u32 sAboutNumEntries = 0;
 
 static u32 sAboutSelectedIndex = 0;
@@ -133,7 +134,7 @@ static const EmulatorName sEmulatorStrings[] = {
     { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
     { .bits = EMU_CEN64,            .name = "cen64",            },
     { .bits = EMU_SIMPLE64,         .name = "simple64",         },
-    { .bits = EMU_PARALLELN64,      .name = "ParallelN64",      },
+    { .bits = EMU_PARALLELN64,      .name = "ParaLLEl N64",     },
     { .bits = EMU_ARES,             .name = "ares",             },
     { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
 };
@@ -182,45 +183,60 @@ ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
 ABOUT_ENTRY_FUNC(extbounds_mode, "%d", EXTENDED_BOUNDS_MODE)
 ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)])
 ABOUT_ENTRY_FUNC(debug_mode,     "%s%s", gValNames_no_yes[sDebugMode], (debug_is_initialized() ? " +unf" : ""))
-ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 #ifdef LIBPL
-ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0)); // about_libpl_version
-#endif // LIBPL
+void about_emulator(char* buf) {
+    if (gSupportsLibpl) {
+        const lpl_version* v = libpl_get_core_version();
+        sprintf(buf, "%s v%d.%d.%d", get_emulator_name(gEmulator), v->major, v->minor, v->patch);
+    } else {
+        sprintf(buf, "%s", get_emulator_name(gEmulator));
+    }
+}
+ABOUT_ENTRY_FUNC(gfx_plugin,     libpl_get_graphics_plugin()->name);
+void about_launcher(char* buf) {
+    const lpl_version* v = libpl_get_launcher_version();
+    sprintf(buf, "v%d.%d.%d", v->major, v->minor, v->patch);
+}
+ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
+#else // !LIBPL
+ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
+#endif // !LIBPL
 
-
-typedef struct {
-    /*0x00*/ const char* desc;
-    /*0x04*/ void (*func)(char* buf);
-    /*0x08*/ char info[32];
-} AboutEntry; /*0x28*/
 
 #define ABOUT_ENTRY(_name, _desc) { .desc = _desc, .func = about_##_name, .info = "", }
 AboutEntry sAboutEntries[] = {
-    ABOUT_ENTRY(rom_name,       "ROM NAME"),
-    ABOUT_ENTRY(libultra,       "LIBULTRA"),
-    ABOUT_ENTRY(microcode,      "MICROCODE"),
-    ABOUT_ENTRY(region,         "REGION"),
-    ABOUT_ENTRY(save_type,      "SAVE TYPE"),
-    ABOUT_ENTRY(compression,    "COMPRESSION"),
-    ABOUT_ENTRY(rom_size,       "ROM SIZE"),
-    ABOUT_ENTRY(ram_size,       "RAM SIZE"),
-    ABOUT_ENTRY(extbounds_mode, "EXTBOUNDS MODE"),
-    ABOUT_ENTRY(rcvi_hack,      "RCVI HACK"),
-    ABOUT_ENTRY(debug_mode,     "DEBUG MODE"),
-    ABOUT_ENTRY(emulator,       "EMULATOR"),
+    [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY(rom_name,       "ROM NAME"      ),
+    [ABOUT_ENTRY_LIBULTRA      ] = ABOUT_ENTRY(libultra,       "LIBULTRA"      ),
+    [ABOUT_ENTRY_MICROCODE     ] = ABOUT_ENTRY(microcode,      "MICROCODE"     ),
+    [ABOUT_ENTRY_REGION        ] = ABOUT_ENTRY(region,         "REGION"        ),
+    [ABOUT_ENTRY_SAVE_TYPE     ] = ABOUT_ENTRY(save_type,      "SAVE TYPE"     ),
+    [ABOUT_ENTRY_COMPRESSION   ] = ABOUT_ENTRY(compression,    "COMPRESSION"   ),
+    [ABOUT_ENTRY_ROM_SIZE      ] = ABOUT_ENTRY(rom_size,       "ROM SIZE"      ),
+    [ABOUT_ENTRY_RAM_SIZE      ] = ABOUT_ENTRY(ram_size,       "RAM SIZE"      ),
+    [ABOUT_ENTRY_EXTBOUNDS_MODE] = ABOUT_ENTRY(extbounds_mode, "EXTBOUNDS MODE"),
+    [ABOUT_ENTRY_RCVI_HACK     ] = ABOUT_ENTRY(rcvi_hack,      "RCVI HACK"     ),
+    [ABOUT_ENTRY_DEBUG_MODE    ] = ABOUT_ENTRY(debug_mode,     "DEBUG MODE"    ),
+    [ABOUT_ENTRY_EMULATOR      ] = ABOUT_ENTRY(emulator,       "EMULATOR"      ),
 #ifdef LIBPL
-    ABOUT_ENTRY(libpl_version,  "LIBPL VERSION"),
-#endif
+    [ABOUT_ENTRY_GFX_PLUGIN    ] = ABOUT_ENTRY(gfx_plugin,     "GFX PLUGIN"    ),
+    [ABOUT_ENTRY_LAUNCHER      ] = ABOUT_ENTRY(launcher,       "LAUNCHER"      ),
+    [ABOUT_ENTRY_LIBPL_VERSION ] = ABOUT_ENTRY(libpl_version,  "LIBPL VERSION" ),
+#endif // LIBPL
 };
 
 void page_about_init(void) {
-    sAboutNumEntries = ARRAY_COUNT(sAboutEntries);
+#ifdef LIBPL
+    sAboutNumEntries = (gSupportsLibpl ? NUM_ABOUT_ENTRIES : (ABOUT_ENTRY_EMULATOR + 1));
+#else // !LIBPL
+    sAboutNumEntries = NUM_ABOUT_ENTRIES;
+#endif // !LIBPL
 
-    for (int i = 0; i < sAboutNumEntries; i++) {
-        AboutEntry* entry = &sAboutEntries[i];
+
+    for (u32 i = 0; i < sAboutNumEntries; i++) {
+        AboutEntry* entry = &sAboutEntries[sAboutViewportIndex + i];
 
 #ifdef LIBPL
-        if (!gSupportsLibpl && (entry->func == about_libpl_version)) {
+        if (!gSupportsLibpl && i == FIRST_LIBPL_ENTRY) {
             break;
         }
 #endif // LIBPL
@@ -243,25 +259,59 @@ void page_about_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line++), "LINKER:\n  "STR_COLOR_PREFIX"%s",              valColor, __linker__);
     line += 2;
 
-    for (int i = 0; i < sAboutNumEntries; i++) {
-        AboutEntry* entry = &sAboutEntries[i];
+    u32 currIndex = sAboutViewportIndex;
+
+    AboutEntry* entry = &sAboutEntries[currIndex];
+
+    for (u32 i = 0; i < ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES; i++) {
+        if (currIndex > sAboutNumEntries) {
+            break;
+        }
+
+        u32 y = TEXT_Y(line + i);
+
+        if (currIndex == sAboutSelectedIndex) {
+            cs_draw_row_selection_box(y);
+        }
 
 #ifdef LIBPL
-        if (!gSupportsLibpl && (entry->func == about_libpl_version)) {
+        if (!gSupportsLibpl && (currIndex == FIRST_LIBPL_ENTRY)) {
             break;
         }
 #endif // LIBPL
 
-        cs_print(TEXT_X(0), TEXT_Y(line), "%s:", entry->desc);
+        cs_print(TEXT_X(0), y, "%s:", entry->desc);
         if (entry->info != NULL) {
-            cs_print(TEXT_X(16), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
+            cs_print(TEXT_X(16), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
         }
-        line++;
+        entry++;
+        currIndex++;
     }
+
+    // Scroll Bar:
+    if (sAboutNumEntries > ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES) {
+        cs_draw_divider(DIVIDER_Y(line));
+
+        cs_draw_scroll_bar(
+            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
+            ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, sAboutNumEntries,
+            sAboutViewportIndex,
+            COLOR_RGBA32_CRASH_DIVIDER, TRUE
+        );
+
+        cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
+    }
+
+    osWritebackDCacheAll();
 }
 
 void page_about_input(void) {
+    s32 change = 0;
+    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
+    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    sAboutSelectedIndex = WRAP(((s32)sAboutSelectedIndex + change), 0, (s32)(sAboutNumEntries - 1));
 
+    sAboutViewportIndex = cs_clamp_view_to_selection(sAboutViewportIndex, sAboutSelectedIndex, ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, 1);
 }
 
 void page_about_print(void) {
