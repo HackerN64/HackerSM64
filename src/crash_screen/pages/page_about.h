@@ -49,6 +49,7 @@ enum AboutEntries {
     ABOUT_ENTRY_LEVEL_BOUNDS,
     ABOUT_ENTRY_CELL_SIZE,
     ABOUT_ENTRY_WORLD_SCALE,
+    ABOUT_ENTRY_ST_SURF_POOL,
     ABOUT_ENTRY_DYN_SURF_POOL,
 
     ABOUT_ENTRY_SUB_MISC,
@@ -81,6 +82,9 @@ typedef struct {
     /*0x27*/ s8 type;
 } AboutEntry; /*0x28*/
 
+
+#define NUM_LONG_INFO_BUFFERS 2
+#define LONG_INFO_BUFFER_LENGTH 40
 
 #define ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES 21
 

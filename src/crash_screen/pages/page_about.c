@@ -152,11 +152,6 @@ const char* get_emulator_name(enum Emulator emu) {
     return NULL;
 }
 
-// Extra long buffer for long entries to save space in sAboutEntries.
-#define NUM_LONG_INFO_BUFFERS 2
-char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][40];
-u32 gLongInfoBufferIndex = 0;
-
 const char gValNames_no_yes[][4] = {
     [FALSE] = "NO",
     [TRUE ] = "YES",
@@ -164,11 +159,6 @@ const char gValNames_no_yes[][4] = {
 
 extern const u8 gRomSize[];
 
-#ifdef KEEP_MARIO_HEAD
-const _Bool sGoddardIncluded = TRUE;
-#else // !KEEP_MARIO_HEAD
-const _Bool sGoddardIncluded = FALSE;
-#endif // !KEEP_MARIO_HEAD
 #ifdef DEBUG
 const _Bool sDebugMode = TRUE;
 #else // !DEBUG
@@ -199,12 +189,22 @@ ABOUT_ENTRY_FUNC(compression,    compression_name)
 ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
 ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
 ABOUT_ENTRY_FUNC(gfx_pool_size,  STR_HEX_PREFIX"%X", GFX_POOL_SIZE)
-ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X", (uintptr_t)DYNAMIC_SURFACE_POOL_SIZE)
+ABOUT_ENTRY_FUNC(st_surf_pool,   STR_HEX_PREFIX"%X", ((u32)gCurrStaticSurfacePoolEnd - (u32)gCurrStaticSurfacePool))
+ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X", ((u32)gDynamicSurfacePoolEnd - (u32)gDynamicSurfacePool), (uintptr_t)DYNAMIC_SURFACE_POOL_SIZE)
 ABOUT_ENTRY_FUNC(level_bounds,   STR_HEX_PREFIX"%04X (%dx)", LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
 ABOUT_ENTRY_FUNC(cell_size,      STR_HEX_PREFIX"%03X (%dx%d)", CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
-ABOUT_ENTRY_FUNC(world_scale,    "%dx", WORLD_SCALE)
+ABOUT_ENTRY_FUNC(world_scale,    "(%dx)", WORLD_SCALE)
 ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)])
-ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[sGoddardIncluded])
+#ifdef KEEP_MARIO_HEAD
+ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[TRUE])
+#else // !KEEP_MARIO_HEAD
+ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[FALSE])
+#endif // !KEEP_MARIO_HEAD
+#if ENABLE_RUMBLE
+ABOUT_ENTRY_FUNC(rumble_thread,  "%s%s", gValNames_no_yes[sRumblePakThreadActive], (sRumblePakActive ? " +pack" : ""))
+#else // !ENABLE_RUMBLE
+ABOUT_ENTRY_FUNC(rumble,         gValNames_no_yes[FALSE])
+#endif // !ENABLE_RUMBLE
 ABOUT_ENTRY_FUNC(debug_mode,     "%s%s", gValNames_no_yes[sDebugMode], (debug_is_initialized() ? " +unf" : ""))
 #ifdef LIBPL
 void about_emulator(char* buf) {
@@ -224,6 +224,12 @@ ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT
 #else // !LIBPL
 ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 #endif // !LIBPL
+
+
+// Extra long string buffer for long entries to save space in sAboutEntries.
+char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][LONG_INFO_BUFFER_LENGTH];
+u32 gLongInfoBufferIndex = 0;
+
 
 #define ABOUT_ENTRY_GAP()                  { .desc = "",    .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
 #define ABOUT_ENTRY_TITLE(_name, _desc)    { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
@@ -257,6 +263,7 @@ AboutEntry sAboutEntries[] = {
     [ABOUT_ENTRY_LEVEL_BOUNDS  ] = ABOUT_ENTRY_SINGLE(level_bounds,   "LEVEL BOUNDS"  ),
     [ABOUT_ENTRY_CELL_SIZE     ] = ABOUT_ENTRY_SINGLE(cell_size,      "CELL SIZE"     ),
     [ABOUT_ENTRY_WORLD_SCALE   ] = ABOUT_ENTRY_SINGLE(world_scale,    "WORLD SCALE"   ),
+    [ABOUT_ENTRY_ST_SURF_POOL  ] = ABOUT_ENTRY_SINGLE(st_surf_pool,   "ST SURF POOL"  ),
     [ABOUT_ENTRY_DYN_SURF_POOL ] = ABOUT_ENTRY_SINGLE(dyn_surf_pool,  "DYN SURF POOL" ),
 
     [ABOUT_ENTRY_SUB_MISC      ] = ABOUT_ENTRY_SUBTITLE("misc info"),
