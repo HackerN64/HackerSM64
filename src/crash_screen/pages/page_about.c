@@ -152,6 +152,11 @@ const char* get_emulator_name(enum Emulator emu) {
     return NULL;
 }
 
+// Extra long buffer for long entries to save space in sAboutEntries.
+#define NUM_LONG_INFO_BUFFERS 2
+char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][40];
+u32 gLongInfoBufferIndex = 0;
+
 const char gValNames_no_yes[][4] = {
     [FALSE] = "NO",
     [TRUE ] = "YES",
@@ -159,7 +164,7 @@ const char gValNames_no_yes[][4] = {
 
 extern const u8 gRomSize[];
 
-#ifdef KEEP_MARIO_HEAD //! TODO: use this
+#ifdef KEEP_MARIO_HEAD
 const _Bool sGoddardIncluded = TRUE;
 #else // !KEEP_MARIO_HEAD
 const _Bool sGoddardIncluded = FALSE;
@@ -194,7 +199,7 @@ ABOUT_ENTRY_FUNC(compression,    compression_name)
 ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
 ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
 ABOUT_ENTRY_FUNC(gfx_pool_size,  STR_HEX_PREFIX"%X", GFX_POOL_SIZE)
-ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X", DYNAMIC_SURFACE_POOL_SIZE)
+ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X", (uintptr_t)DYNAMIC_SURFACE_POOL_SIZE)
 ABOUT_ENTRY_FUNC(level_bounds,   STR_HEX_PREFIX"%04X (%dx)", LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
 ABOUT_ENTRY_FUNC(cell_size,      STR_HEX_PREFIX"%03X (%dx%d)", CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
 ABOUT_ENTRY_FUNC(world_scale,    "%dx", WORLD_SCALE)
@@ -222,19 +227,23 @@ ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 
 #define ABOUT_ENTRY_GAP()                  { .desc = "",    .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
 #define ABOUT_ENTRY_TITLE(_name, _desc)    { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
-#define ABOUT_ENTRY_SUBTITLE(_name, _desc) { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
+#define ABOUT_ENTRY_SUBTITLE(_desc)        { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
 #define ABOUT_ENTRY_SINGLE(_name, _desc)   { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
 #define ABOUT_ENTRY_LONG1(_name, _desc)    { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
 #define ABOUT_ENTRY_LONG2(_name, _desc)    { .desc = "",    .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
 AboutEntry sAboutEntries[] = {
-    [ABOUT_ENTRY_GAP_1         ] = ABOUT_ENTRY_GAP(),
+    // [ABOUT_ENTRY_GAP_1         ] = ABOUT_ENTRY_GAP(),
     [ABOUT_ENTRY_HACKERSM64    ] = ABOUT_ENTRY_TITLE(hackersm64_v,    "HackerSM64"    ),
     [ABOUT_ENTRY_CRASH_SCREEN  ] = ABOUT_ENTRY_TITLE(crash_screen_v,  "Crash Screen"  ),
+
+    [ABOUT_ENTRY_SUB_COMPILER  ] = ABOUT_ENTRY_SUBTITLE("compiler info"),
     [ABOUT_ENTRY_COMPILER_1    ] = ABOUT_ENTRY_LONG1(compiler,        "COMPILER"      ),
     [ABOUT_ENTRY_COMPILER_2    ] = ABOUT_ENTRY_LONG2(compiler,        "COMPILER"      ),
     [ABOUT_ENTRY_LINKER_1      ] = ABOUT_ENTRY_LONG1(linker,          "LINKER"        ),
     [ABOUT_ENTRY_LINKER_2      ] = ABOUT_ENTRY_LONG2(linker,          "LINKER"        ),
     // [ABOUT_ENTRY_GAP_2         ] = ABOUT_ENTRY_GAP(),
+
+    [ABOUT_ENTRY_SUB_ROM       ] = ABOUT_ENTRY_SUBTITLE("rom info"),
     [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY_SINGLE(rom_name,       "ROM NAME"      ), //! TODO: Fix this
     [ABOUT_ENTRY_LIBULTRA      ] = ABOUT_ENTRY_SINGLE(libultra,       "LIBULTRA"      ),
     [ABOUT_ENTRY_MICROCODE     ] = ABOUT_ENTRY_SINGLE(microcode,      "MICROCODE"     ),
@@ -243,14 +252,20 @@ AboutEntry sAboutEntries[] = {
     [ABOUT_ENTRY_COMPRESSION   ] = ABOUT_ENTRY_SINGLE(compression,    "COMPRESSION"   ),
     [ABOUT_ENTRY_ROM_SIZE      ] = ABOUT_ENTRY_SINGLE(rom_size,       "ROM SIZE"      ),
     [ABOUT_ENTRY_RAM_SIZE      ] = ABOUT_ENTRY_SINGLE(ram_size,       "RAM SIZE"      ),
-    [ABOUT_ENTRY_GFX_POOL_SIZE ] = ABOUT_ENTRY_SINGLE(gfx_pool_size,  "GFX POOL SIZE" ),
-    [ABOUT_ENTRY_DYN_SURF_POOL ] = ABOUT_ENTRY_SINGLE(dyn_surf_pool,  "DYN SURF POOL" ),
+
+    [ABOUT_ENTRY_SUB_COLLISION ] = ABOUT_ENTRY_SUBTITLE("collision info"),
     [ABOUT_ENTRY_LEVEL_BOUNDS  ] = ABOUT_ENTRY_SINGLE(level_bounds,   "LEVEL BOUNDS"  ),
     [ABOUT_ENTRY_CELL_SIZE     ] = ABOUT_ENTRY_SINGLE(cell_size,      "CELL SIZE"     ),
     [ABOUT_ENTRY_WORLD_SCALE   ] = ABOUT_ENTRY_SINGLE(world_scale,    "WORLD SCALE"   ),
+    [ABOUT_ENTRY_DYN_SURF_POOL ] = ABOUT_ENTRY_SINGLE(dyn_surf_pool,  "DYN SURF POOL" ),
+
+    [ABOUT_ENTRY_SUB_MISC      ] = ABOUT_ENTRY_SUBTITLE("misc info"),
+    [ABOUT_ENTRY_GFX_POOL_SIZE ] = ABOUT_ENTRY_SINGLE(gfx_pool_size,  "GFX POOL SIZE" ),
     [ABOUT_ENTRY_RCVI_HACK     ] = ABOUT_ENTRY_SINGLE(rcvi_hack,      "RCVI HACK"     ),
     [ABOUT_ENTRY_GODDARD       ] = ABOUT_ENTRY_SINGLE(goddard,        "GODDARD"       ),
     [ABOUT_ENTRY_DEBUG_MODE    ] = ABOUT_ENTRY_SINGLE(debug_mode,     "DEBUG MODE"    ),
+
+    [ABOUT_ENTRY_SUB_EMULATOR  ] = ABOUT_ENTRY_SUBTITLE("emulation info"),
     [ABOUT_ENTRY_EMULATOR      ] = ABOUT_ENTRY_SINGLE(emulator,       "EMULATOR"      ),
 #ifdef LIBPL
     [ABOUT_ENTRY_GFX_PLUGIN    ] = ABOUT_ENTRY_SINGLE(gfx_plugin,     "GFX PLUGIN"    ),
@@ -268,7 +283,7 @@ void page_about_init(void) {
 
 
     for (u32 i = 0; i < sAboutNumTotalEntries; i++) {
-        AboutEntry* entry = &sAboutEntries[sAboutViewportIndex + i];
+        AboutEntry* entry = &sAboutEntries[i];
 
 #ifdef LIBPL
         if (!gSupportsLibpl && (i == FIRST_LIBPL_ENTRY)) {
@@ -276,8 +291,10 @@ void page_about_init(void) {
         }
 #endif // LIBPL
 
+        char* buf = (entry->type == ABOUT_ENTRY_TYPE_LONG) ? gLongInfoBuffer[gLongInfoBufferIndex++] : entry->info;
+
         if (entry->func != NULL) {
-            entry->func(entry->info);
+            entry->func(buf);
         }
     }
 }
@@ -286,6 +303,7 @@ void page_about_draw(void) {
     u32 line = 1;
     u32 currIndex = sAboutViewportIndex;
     AboutEntry* entry = &sAboutEntries[currIndex];
+    u32 longBufferIndex = 0;
 
     for (u32 i = 0; i < ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES; i++) {
         if (currIndex > sAboutNumTotalEntries) {
@@ -321,7 +339,7 @@ void page_about_draw(void) {
                 break;
             case ABOUT_ENTRY_TYPE_SINGLE:
                 if (entry->desc != NULL) {
-                    cs_print(TEXT_X(0), y, "%s:", entry->desc);
+                    cs_print(TEXT_X(1), y, "%s:", entry->desc);
                 }
                 if (entry->info != NULL) {
                     cs_print(TEXT_X(16), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
@@ -329,7 +347,7 @@ void page_about_draw(void) {
                 break;
             case ABOUT_ENTRY_TYPE_LONG:
                 if (entry->info != NULL) {
-                    cs_print(TEXT_X(2), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, entry->info);
+                    cs_print(TEXT_X(2), y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, gLongInfoBuffer[longBufferIndex++]);
                 }
                 break;
         }
@@ -337,6 +355,9 @@ void page_about_draw(void) {
         entry++;
         currIndex++;
     }
+
+    // Draw this line again so the selection box doesn't get drawn in front of it.
+    cs_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
     if (sAboutNumTotalEntries > ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES) {
@@ -366,8 +387,10 @@ void page_about_print(void) {
 #ifdef UNF
     debug_printf("\n");
 
+    u32 longBufferIndex = 0;
+
     for (u32 i = 0; i < sAboutNumTotalEntries; i++) {
-        AboutEntry* entry = &sAboutEntries[sAboutViewportIndex + i];
+        AboutEntry* entry = &sAboutEntries[i];
 
 #ifdef LIBPL
         if (!gSupportsLibpl && (i == FIRST_LIBPL_ENTRY)) {
@@ -376,10 +399,11 @@ void page_about_print(void) {
 #endif // LIBPL
 
         if (entry->desc != NULL) {
-            debug_printf("- %s", entry->desc);
+            debug_printf("- %s:", entry->desc);
         }
-        if (entry->info != NULL) {
-            debug_printf(" %s", entry->info);
+        const char* info = (entry->type == ABOUT_ENTRY_TYPE_LONG) ? entry->info : gLongInfoBuffer[longBufferIndex++];
+        if (info != NULL) {
+            debug_printf("\t\t%s", info);
         }
         debug_printf("\n");
     }
