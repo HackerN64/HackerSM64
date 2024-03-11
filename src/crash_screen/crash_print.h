@@ -62,6 +62,11 @@
 
 #define STR_COLOR_PREFIX    "@"STR_HEX_WORD //! TODO: use CHAR_COLOR here
 
+#define CHAR_FLT_PREFIX_NULL    '\0'
+#define CHAR_FLT_PREFIX_DENORM  'D'
+#define CHAR_FLT_PREFIX_NAN     'N'
+
+
 typedef union PrintBuffer {
     struct PACKED {
         /*0x00*/ RGBA16 red    : 5;
@@ -90,3 +95,13 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __att
 
 void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);
+
+typedef struct {
+    /*0x00*/ Color r;
+    /*0x01*/ Color g;
+    /*0x02*/ Color b;
+    /*0x03*/ char prefixChar;
+    /*0x04*/ char* suffix;
+} FloatPrefix; /*0x08*/
+
+size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix);

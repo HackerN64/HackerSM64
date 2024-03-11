@@ -36,8 +36,10 @@ ALIGNED32 static const RegisterInfo sRegisters_CPU[CPU_NUM_REGISTERS] = {
 uint64_t get_cpu_reg_val(enum CPURegisters idx) {
     uint64_t val = 0;
     switch (idx) {
-        CASE_CPU_REG(REG_CPU_R0, zero); //! TODO: This sometimes comes out as 0x0000FFFF.
-        CASE_CPU_REG(REG_CPU_AT, at); //! TODO: .set noat
+        CASE_CPU_REG(REG_CPU_R0, zero);
+        //! TODO: Directly accessing $at requires ".set noat".
+        // CASE_CPU_REG(REG_CPU_AT, at);
+        case REG_CPU_AT: return gCrashedThread->context.at;
         CASE_CPU_REG(REG_CPU_V0, v0); CASE_CPU_REG(REG_CPU_V1, v1);
         CASE_CPU_REG(REG_CPU_A0, a0); CASE_CPU_REG(REG_CPU_A1, a1); CASE_CPU_REG(REG_CPU_A2, a2); CASE_CPU_REG(REG_CPU_A3, a3);
         CASE_CPU_REG(REG_CPU_T0, t0); CASE_CPU_REG(REG_CPU_T1, t1); CASE_CPU_REG(REG_CPU_T2, t2); CASE_CPU_REG(REG_CPU_T3, t3); CASE_CPU_REG(REG_CPU_T4, t4); CASE_CPU_REG(REG_CPU_T5, t5); CASE_CPU_REG(REG_CPU_T6, t6); CASE_CPU_REG(REG_CPU_T7, t7);
@@ -137,11 +139,11 @@ uint64_t get_cop0_reg_val(enum COP0Registers idx) {
 
 //! TODO: Better name format
 ALIGNED32 static const RegisterInfo sRegisters_COP1[COP1_NUM_REGISTERS] = {
-    [REG_COP1_F00] = DEF_COP1_TREG(0,  "00"), [REG_COP1_F02] = DEF_COP1_TREG(2,  "02"),
-    [REG_COP1_F04] = DEF_COP1_TREG(4,  "04"), [REG_COP1_F06] = DEF_COP1_TREG(6,  "06"), [REG_COP1_F08] = DEF_COP1_TREG(8,  "08"), [REG_COP1_F10] = DEF_COP1_TREG(10, "10"),
-    [REG_COP1_F12] = DEF_COP1_TREG(12, "12"), [REG_COP1_F14] = DEF_COP1_TREG(14, "14"),
-    [REG_COP1_F16] = DEF_COP1_TREG(16, "16"), [REG_COP1_F18] = DEF_COP1_TREG(18, "18"),
-    [REG_COP1_F20] = DEF_COP1_TREG(20, "20"), [REG_COP1_F22] = DEF_COP1_TREG(22, "22"), [REG_COP1_F24] = DEF_COP1_TREG(24, "24"), [REG_COP1_F26] = DEF_COP1_TREG(26, "26"), [REG_COP1_F28] = DEF_COP1_TREG(28, "28"), [REG_COP1_F30] = DEF_COP1_TREG(30, "30"),
+    [REG_COP1_F00] = DEF_COP1_TREG_EVEN(0,  "00"), [REG_COP1_F02] = DEF_COP1_TREG_EVEN(2,  "02"),
+    [REG_COP1_F04] = DEF_COP1_TREG_EVEN(4,  "04"), [REG_COP1_F06] = DEF_COP1_TREG_EVEN(6,  "06"), [REG_COP1_F08] = DEF_COP1_TREG_EVEN(8,  "08"), [REG_COP1_F10] = DEF_COP1_TREG_EVEN(10, "10"),
+    [REG_COP1_F12] = DEF_COP1_TREG_EVEN(12, "12"), [REG_COP1_F14] = DEF_COP1_TREG_EVEN(14, "14"),
+    [REG_COP1_F16] = DEF_COP1_TREG_EVEN(16, "16"), [REG_COP1_F18] = DEF_COP1_TREG_EVEN(18, "18"),
+    [REG_COP1_F20] = DEF_COP1_TREG_EVEN(20, "20"), [REG_COP1_F22] = DEF_COP1_TREG_EVEN(22, "22"), [REG_COP1_F24] = DEF_COP1_TREG_EVEN(24, "24"), [REG_COP1_F26] = DEF_COP1_TREG_EVEN(26, "26"), [REG_COP1_F28] = DEF_COP1_TREG_EVEN(28, "28"), [REG_COP1_F30] = DEF_COP1_TREG_EVEN(30, "30"),
 };
 
 #define CASE_COP1_REG(_idx, _reg) CASE_REG(COP1, _idx, _reg)
@@ -185,18 +187,18 @@ uint64_t get_direct_reg_val(enum Coprocessors cop, int idx) {
     }
 }
 
-u64 get_reg_val(enum Coprocessors cop, int idx) {
+uint64_t get_reg_val(enum Coprocessors cop, int idx) {
     const RegisterInfo* info = get_reg_info(cop, idx);
 
     if (info == NULL) {
         return 0;
     }
 
-    if (info->offset != (u16)-1) { // If register exists in __OSThreadContext, use the data from the crashed thread.
+    if (info->offset != OSTHREAD_NULL_OFFSET) { // If register exists in __OSThreadContext, use the data from the crashed thread.
         __OSThreadContext* tc = &gCrashedThread->context;
         Address addr = ((Address)tc + info->offset);
 
-        if (info->size == sizeof(u64)) {
+        if (info->size == sizeof(uint64_t)) {
             Doubleword data = 0;
             if (try_read_doubleword(&data, addr)) {
                 return data;
@@ -223,4 +225,16 @@ void append_reg_to_buffer(s16 cop, s16 idx) {
     if (gSavedRegBufSize < ARRAY_COUNT(gSavedRegBuf)) {
         gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){ .cop = cop, .idx = idx, };
     }
+}
+
+enum FloatError validate_float(IEEE754_f32 val) {
+    if (val.mantissa != 0) {
+        if (val.exponent == 0x00) {
+            return FLT_ERR_DENORM; // Denormalized value.
+        } else if (val.exponent == 0xFF) {
+            return FLT_ERR_NAN; // NaN.
+        }
+    }
+
+    return FLT_ERR_NONE;
 }

@@ -69,7 +69,41 @@ enum COP0Registers {
     COP0_NUM_REGISTERS,
 };
 
+// tc->cause register.
+typedef union {
+    struct PACKED {
+        u32 delaySlot :  1; // Exception triggered in delay slot.
+        u32 cop_num   :  2; // Coprocessor_exception.
+        u32           : 24;
+        u32 exc_code  :  5; // Exception Code.
+    };
+    u32 raw;
+} Reg_CauseT;
 
+// $Status register.
+typedef union {
+    struct PACKED {
+        u32 ie  : 1; //  0   : Global interrupt enable         - Should interrupts be handled?
+        u32 exl : 1; //  1   : Exception level                 - Are we currently handling an exception?
+        u32 erl : 1; //  2   : Error level                     - Are we currently handling an error?
+        u32 ksu : 2; //  3- 4: Execution mode                  - (00 = kernel, 01 = supervisor, 10 = user)
+        u32 ux  : 1; //  5   : 64 bit addressing enabled in user mode.
+        u32 sx  : 1; //  6   : 64 bit addressing enabled in supervisor mode.
+        u32 kx  : 1; //  7   : 64 bit addressing enabled in kernel mode.
+        u32 im  : 8; //  8-15: Interrupt mask                  - &’d against interrupt pending in $Cause
+        u32 ds  : 9; // 16-24: Diagnostic status               - TODO: description
+        u32 re  : 1; // 25   : Reverse endianness              - (0 = big endian, 1 = little endian)
+        u32 fr  : 1; // 26   : Enables additional fp registers - (0 = 16 regs, 1 = 32 regs)
+        u32 rp  : 1; // 27   : Enable low power mode           - Run the CPU at 1/4th clock speed)
+        u32 cu0 : 1; // 28   : Coprocessor 0 enabled           - This bit is ignored by the N64, COP0 is always enabled!
+        u32 cu1 : 1; // 29   : Coprocessor 1 enabled           - If this bit is 0, all COP1 instructions throw exceptions
+        u32 cu2 : 1; // 30   : Coprocessor 2 enabled           - This bit is ignored by the N64, there is no COP2!
+        u32 cu3 : 1; // 31   : Coprocessor 3 enabled           - This bit is ignored by the N64, there is no COP3!
+    };
+    u32 raw;
+} Reg_Status;
+
+// $Cause register.
 typedef union {
     struct PACKED {
         u32             :  2; //  0- 1: Unused            - Always zero.
@@ -84,36 +118,71 @@ typedef union {
     u32 raw;
 } Reg_Cause;
 
+// tc->fpcsr register.
 typedef union {
     struct PACKED {
-        u32 ie  : 1; //  0   : Global interrupt enable         - Should interrupts be handled?
-        u32 exl : 1; //  1   : Exception level                 - Are we currently handling an exception?
-        u32 erl : 1; //  2   : Error level                     - Are we currently handling an error?
-        u32 ksu : 2; //  3- 4: Execution mode                  - (00 = kernel, 01 = supervisor, 10 = user)
-        u32 ux  : 1; //  5   : 64 bit addressing enabled in user mode
-        u32 sx  : 1; //  6   : 64 bit addressing enabled in supervisor mode
-        u32 kx  : 1; //  7   : 64 bit addressing enabled in kernel mode
-        u32 im  : 8; //  8-15: Interrupt mask                  - &’d against interrupt pending in $Cause
-        u32 ds  : 9; // 16-24: Diagnostic status               - TODO: description
-        u32 re  : 1; // 25   : Reverse endianness              - (0 = big endian, 1 = little endian)
-        u32 fr  : 1; // 26   : Enables additional fp registers - (0 = 16 regs, 1 = 32 regs)
-        u32 rp  : 1; // 27   : Enable low power mode           - Run the CPU at 1/4th clock speed)
-        u32 cu0 : 1; // 28   : Coprocessor 0 enabled           - This bit is ignored by the N64, COP0 is always enabled!
-        u32 cu1 : 1; // 29   : Coprocessor 1 enabled           - If this bit is 0, all COP1 instructions throw exceptions
-        u32 cu2 : 1; // 30   : Coprocessor 2 enabled           - This bit is ignored by the N64, there is no COP2!
-        u32 cu3 : 1; // 31   : Coprocessor 3 enabled           - This bit is ignored by the N64, there is no COP3!
+        u32                   :  7;
+        u32 flushDenormToZero :  1; // Flush denorm to zero.
+        u32 cond              :  1; // Condition bit.
+        u32                   :  5;
+        u32 cause_bits        :  6; // See Reg_FPCSR.cause.
+        u32 enable_bits       :  5; // See Reg_FPCSR.enable.
+        u32 flag_bits         :  5; // See Reg_FPCSR.flag.
+        u32 rounding_mode     :  2; // Round to: (1:zero, 2:+inf, 3:-inf).
     };
+    struct PACKED {
+        u32               : 14;
+        u32 unimplemented :  1; // cause: unimplemented operation
+        u32 invalid       :  1; // cause: invalid operation
+        u32 div0          :  1; // cause: division by zero
+        u32 overflow      :  1; // cause: overflow
+        u32 underflow     :  1; // cause: underflow
+        u32 inexact       :  1; // cause: inexact operation
+        u32               : 12;
+    } cause;
+    struct PACKED {
+        u32               : 20;
+        u32 invalid       :  1; // enable: invalid operation
+        u32 div0          :  1; // enable: division by zero
+        u32 overflow      :  1; // enable: overflow
+        u32 underflow     :  1; // enable: underflow
+        u32 inexact       :  1; // enable: inexact operation
+        u32               :  7;
+    } enable;
+    struct PACKED {
+        u32               : 25;
+        u32 invalid       :  1; // flag: invalid operation
+        u32 div0          :  1; // flag: division by zero
+        u32 overflow      :  1; // flag: overflow
+        u32 underflow     :  1; // flag: underflow
+        u32 inexact       :  1; // flag: inexact operation
+        u32               :  2;
+    } flag;
     u32 raw;
-} Reg_Status;
+} Reg_FPCSR;
 
 
+// enum COP1Registers {
+//     REG_COP1_F00, REG_COP1_F02,                                                         // Subroutine return value.
+//     REG_COP1_F04, REG_COP1_F06, REG_COP1_F08, REG_COP1_F10,                             // Temporary values.
+//     REG_COP1_F12, REG_COP1_F14,                                                         // Subroutine arguments.
+//     REG_COP1_F16, REG_COP1_F18,                                                         // Temporary values.
+//     REG_COP1_F20, REG_COP1_F22, REG_COP1_F24, REG_COP1_F26, REG_COP1_F28, REG_COP1_F30, // Saved Values.
+//     COP1_NUM_REGISTERS,
+// };
 enum COP1Registers {
-    REG_COP1_F00, REG_COP1_F02,                                                         // Subroutine return value.
-    REG_COP1_F04, REG_COP1_F06, REG_COP1_F08, REG_COP1_F10,                             // Temporary values.
-    REG_COP1_F12, REG_COP1_F14,                                                         // Subroutine arguments.
-    REG_COP1_F16, REG_COP1_F18,                                                         // Temporary values.
-    REG_COP1_F20, REG_COP1_F22, REG_COP1_F24, REG_COP1_F26, REG_COP1_F28, REG_COP1_F30, // Saved Values.
+    REG_COP1_F00, REG_COP1_F01, REG_COP1_F02, REG_COP1_F03,                                                                                                                 // Subroutine return value.
+    REG_COP1_F04, REG_COP1_F05, REG_COP1_F06, REG_COP1_F07, REG_COP1_F08, REG_COP1_F09, REG_COP1_F10,  REG_COP1_F11,                                                        // Temporary values.
+    REG_COP1_F12, REG_COP1_F13, REG_COP1_F14, REG_COP1_F15,                                                                                                                 // Subroutine arguments.
+    REG_COP1_F16, REG_COP1_F17, REG_COP1_F18, REG_COP1_F19,                                                                                                                 // Temporary values.
+    REG_COP1_F20, REG_COP1_F21, REG_COP1_F22, REG_COP1_F23, REG_COP1_F24, REG_COP1_F25, REG_COP1_F26, REG_COP1_F27, REG_COP1_F28, REG_COP1_F29, REG_COP1_F30, REG_COP1_F31, // Saved Values.
     COP1_NUM_REGISTERS,
+};
+
+enum FloatError {
+    FLT_ERR_NONE,
+    FLT_ERR_DENORM,
+    FLT_ERR_NAN,
 };
 
 
@@ -133,14 +202,17 @@ typedef struct {
 } RegisterInfo; /*0x10*/
 
 
-#define DEF_SREG(_size, _name, _shortName) {  \
-    .offset    = (u16)-1,                           \
-    .size      = _size,                             \
-    .name      = _name,                             \
-    .shortName = _shortName,                        \
+#define OSTHREAD_NULL_OFFSET (u16)-1
+
+
+#define DEF_SREG(_size, _name, _shortName) {    \
+    .offset    = OSTHREAD_NULL_OFFSET,          \
+    .size      = _size,                         \
+    .name      = _name,                         \
+    .shortName = _shortName,                    \
 }
 
-#define DEF_TREG(_field, _size, _name, _shortName) {      \
+#define DEF_TREG(_field, _size, _name, _shortName) {            \
     .offset    = __builtin_offsetof(__OSThreadContext, _field), \
     .size      = sizeof_member(__OSThreadContext, _field),      \
     .name      = _name,                                         \
@@ -154,7 +226,8 @@ typedef struct {
 #define DEF_COP0_TREG(_reg, _size, _field, _name, _shortName) DEF_TREG(_field, _size, _name, _shortName)
 
 #define DEF_COP1_SREG(_reg, _name) DEF_SREG(                   sizeof(f32), "F"_name, _name)
-#define DEF_COP1_TREG(_reg, _name) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
+#define DEF_COP1_TREG_EVEN(_reg, _name) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
+#define DEF_COP1_TREG_ODD(_reg, _name) DEF_TREG(fp##_reg.f.f_odd, sizeof(f32), "F"_name, _name)
 
 #define REG_BUFFER_SIZE 3
 
@@ -162,7 +235,10 @@ extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);
-u64 get_reg_val(enum Coprocessors cop, int idx);
+uint64_t get_direct_reg_val(enum Coprocessors cop, int idx);
+uint64_t get_reg_val(enum Coprocessors cop, int idx);
 
 void clear_saved_reg_buffer(void);
 void append_reg_to_buffer(s16 cop, s16 idx);
+
+enum FloatError validate_float(IEEE754_f32 val);

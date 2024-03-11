@@ -13,11 +13,5 @@ enum CSSettingsGroup_page_home {
 };
 
 
-typedef struct ThreadIDName {
-    /*0x00*/ enum ThreadID threadID;
-    /*0x04*/ const char* name;
-} ThreadIDName; /*0x08*/
-
-
 extern struct CSSetting cs_settings_group_page_home[];
 extern struct CSPage gCSPage_home;

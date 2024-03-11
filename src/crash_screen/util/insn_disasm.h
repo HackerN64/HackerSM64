@@ -414,7 +414,7 @@ typedef union InsnData {
 // Instruction database format.
 typedef struct PACKED InsnTemplate {
     /*0x00*/ char name[8];
-    /*0x08*/ char fmt[5];
+    /*0x08*/ char fmt[4 + 1]; // 4 chars + null terminator (see CHAR_P_* defines).
     /*0x0D*/ u8 pad[2];
     /*0x0F*/ u8 opcode;
 } InsnTemplate; /*0x10*/

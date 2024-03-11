@@ -12,7 +12,6 @@ enum CSSettingsGroup_page_registers {
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_REGISTERS_PARSE_REG,
 #endif // INCLUDE_DEBUG_MAP
-    CS_OPT_REGISTERS_FLOATS_FMT,
     CS_OPT_END_REGISTERS,
 };
 

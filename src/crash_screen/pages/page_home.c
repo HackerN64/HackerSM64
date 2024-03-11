@@ -10,6 +10,7 @@
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/util/registers.h"
 #include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_descriptions.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
 #include "crash_screen/crash_pages.h"
@@ -44,160 +45,22 @@ const enum ControlTypes cs_cont_list_home[] = {
 };
 
 
-static const ThreadIDName sThreadIDNames[] = {
-    { .threadID = THREAD_0,                   .name = "0",              },
-    { .threadID = THREAD_1_IDLE,              .name = "idle",           },
-    { .threadID = THREAD_2,                   .name = "2",              },
-    { .threadID = THREAD_3_MAIN,              .name = "main",           },
-    { .threadID = THREAD_4_SOUND,             .name = "sound",          },
-    { .threadID = THREAD_5_GAME_LOOP,         .name = "game loop",      },
-    { .threadID = THREAD_6_RUMBLE,            .name = "rumble",         },
-    { .threadID = THREAD_7_HVQM,              .name = "HVQM",           },
-    { .threadID = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
-    { .threadID = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
-    { .threadID = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
-    { .threadID = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
-    { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
-};
-
-static const char* sCauseDesc[18] = {
-    /*EXC_INT       */ "Interrupt",
-    /*EXC_MOD       */ "TLB modification",
-    /*EXC_RMISS     */ "TLB exception on load or inst.",
-    /*EXC_WMISS     */ "TLB exception on store",
-    /*EXC_RADE      */ "Address error on load or inst.",
-    /*EXC_WADE      */ "Address error on store",
-    /*EXC_IBE       */ "Bus error on inst.",
-    /*EXC_DBE       */ "Bus error on data",
-    /*EXC_SYSCALL   */ "Failed Assert: See below",
-    /*EXC_BREAK     */ "Breakpoint exception",
-    /*EXC_II        */ "Reserved instruction",
-    /*EXC_CPU       */ "Coprocessor unusable",
-    /*EXC_OV        */ "Arithmetic overflow",
-    /*EXC_TRAP      */ "Trap exception",
-    /*EXC_VCEI      */ "Virtual coherency on inst.",
-    /*EXC_FPE       */ "Floating point exception",
-    /*EXC_WATCH     */ "Watchpoint exception",
-    /*EXC_VCED      */ "Virtual coherency on data",
-};
-
-static const char* sFpcsrDesc[6] = {
-    /*FPCSR_CE      */ "Unimplemented operation",
-    /*FPCSR_CV      */ "Invalid operation",
-    /*FPCSR_CZ      */ "Division by zero",
-    /*FPCSR_CO      */ "Overflow",
-    /*FPCSR_CU      */ "Underflow",
-    /*FPCSR_CI      */ "Inexact operation",
-};
-
-
-// Returns a CAUSE description from 'sCauseDesc'.
-static const char* get_cause_desc(__OSThreadContext* tc) {
-    uint64_t badvaddr = tc->badvaddr;
-    uint32_t epc = tc->pc + ((tc->cause & 0x80000000) ? 4 : 0); //! TODO: Is this correct?
-    u32 cause = (tc->cause & CAUSE_EXCMASK);
-
-    switch (cause) {
-        // Heuristics from libdragon.
-        case EXC_RMISS:
-            if (epc == (u32)badvaddr) {
-                return "Invalid program counter address";
-            } else if (badvaddr < 128) {
-                // This is probably a NULL pointer dereference, though it can go through a structure or an array,
-                // so leave some margin to the actual faulting address.
-                return "NULL pointer dereference (read)";
-            } else {
-                return "Read from invalid memory address";
-            }
-            break;
-        case EXC_WMISS:
-            if (badvaddr < 128) {
-                return "NULL pointer dereference (write)";
-            } else {
-                return "Write to invalid memory address";
-            }
-        case EXC_MOD:
-            return "Write to read-only memory";
-        case EXC_RADE:
-            if (epc == (uint32_t)badvaddr) {
-                if (is_unmapped_kx64(badvaddr)) {
-                    return "Program counter in invalid 64-bit address";
-                } else {
-                    return "Misaligned program counter address";
-                }
-            } else {
-                if (is_unmapped_kx64(badvaddr)) {
-                    return "Read from invalid 64-bit address";
-                } else {
-                    return "Misaligned read from memory";
-                }
-            }
-            break;
-        case EXC_WADE:
-            return "Misaligned write to memory";
-
-        // Make the last two cause case indexes sequential for array access.
-        case EXC_WATCH: cause = EXC_CODE(16); break; // 23 -> 16
-        case EXC_VCED:  cause = EXC_CODE(17); break; // 31 -> 17
-        // default:         break;
-    }
-
-    cause >>= CAUSE_EXCSHIFT;
-    if (cause < ARRAY_COUNT(sCauseDesc)) {
-        return sCauseDesc[cause];
-    }
-
-    return NULL;
-}
-
-// Returns a FPCSR description from 'sFpcsrDesc'.
-static const char* get_fpcsr_desc(u32 fpcsr) {
-    u32 bit = BIT(17);
-
-    for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
-        if (fpcsr & bit) {
-            return sFpcsrDesc[i];
-        }
-
-        bit >>= 1;
-    }
-
-    return NULL;
-}
-
-// Returns a thread name from 'sThreadIDNames'.
-static const char* get_thread_name_from_id(enum ThreadID threadID) {
-    const ThreadIDName* threadIDName = &sThreadIDNames[0];
-
-    for (int i = 0; i < ARRAY_COUNT(sThreadIDNames); i++) {
-        if (threadIDName->threadID == threadID) {
-            return threadIDName->name;
-        }
-
-        threadIDName++;
-    }
-
-    return NULL;
-}
-
-
 void page_home_init(void) {
 
 }
 
-void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
-    // "FPCSR:[XXXXXXXX]"
-    size_t fpcsrSize = cs_print(x, y,
-        STR_COLOR_PREFIX"FPCSR: "STR_COLOR_PREFIX STR_HEX_WORD" ",
-        COLOR_RGBA32_CRASH_VARIABLE,
-        COLOR_RGBA32_WHITE, fpcsr
+void cs_print_fpe_cause(u32 x, u32 y, u32 fpcsr) {
+    // "FPE:"
+    size_t charX = cs_print(x, y,
+        STR_COLOR_PREFIX"FPE:\t",
+        COLOR_RGBA32_CRASH_DESCRIPTION
     );
-    x += TEXT_WIDTH(fpcsrSize);
+    x += TEXT_WIDTH(charX);
 
     const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
     if (fpcsrDesc != NULL) {
         // "([float exception description])"
-        cs_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);
+        cs_print(x, y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);
     }
 }
 
@@ -318,26 +181,32 @@ u32 cs_draw_assert(u32 line) {
     return line;
 }
 
-void cs_draw_register_info_long(u32 x, u32 line, RegisterId reg) {
+void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
     const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
     Word data = get_reg_val(reg.cop, reg.idx);
+    _Bool isCOP1 = (reg.cop == COP1);
 
-    size_t charX = x + cs_print(TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD" ",
-        COLOR_RGBA32_CRASH_VARIABLE, ((reg.cop == COP1) ? regInfo->name : regInfo->shortName),
-        COLOR_RGBA32_WHITE, data
+    charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
+        COLOR_RGBA32_CRASH_VARIABLE, (isCOP1 ? regInfo->name : regInfo->shortName)
     );
+    if (isCOP1) { // Float.
+        charX += cs_print_f32(TEXT_X(charX), TEXT_Y(line), (IEEE754_f32){ .asU32 = data, }, TRUE);
+    } else {
+        charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_HEX_WORD" ", data);
+
 #ifdef INCLUDE_DEBUG_MAP
-    const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        size_t offsetStrSize = STRLEN("+0000");
-        size_t endX = CRASH_SCREEN_NUM_CHARS_X;
-        cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
-        cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
-            (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
-            COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
-        );
-    }
+        const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            size_t offsetStrSize = STRLEN("+0000");
+            size_t endX = CRASH_SCREEN_NUM_CHARS_X;
+            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
+            cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
+                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
+                COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
+            );
+        }
 #endif // INCLUDE_DEBUG_MAP
+    }
 }
 
 void page_home_draw(void) {
@@ -359,7 +228,7 @@ void page_home_draw(void) {
 
     u32 cause = (tc->cause & CAUSE_EXCMASK);
     if (cause == EXC_FPE) {
-        cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
+        cs_print_fpe_cause(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
     }
 
     line++;
@@ -423,7 +292,7 @@ void page_home_print(void) {
 
     // THREAD:
     enum ThreadID threadID = gCrashedThread->id;
-    debug_printf("- THREAD: %d", threadID);
+    debug_printf("- THREAD:\t%d", threadID);
     if (threadID < NUM_THREADS) {
         const char* threadName = get_thread_name_from_id(threadID);
 

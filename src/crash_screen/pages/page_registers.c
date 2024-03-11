@@ -8,6 +8,7 @@
 #include "crash_screen/util/registers.h"
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
+#include "crash_screen/crash_descriptions.h"
 #include "crash_screen/crash_main.h"
 #include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
@@ -25,7 +26,6 @@ struct CSSetting cs_settings_group_page_registers[] = {
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_REGISTERS_PARSE_REG     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
-    [CS_OPT_REGISTERS_FLOATS_FMT    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
     [CS_OPT_END_REGISTERS           ] = { .type = CS_OPT_TYPE_END, },
 };
 
@@ -43,8 +43,9 @@ const enum ControlTypes cs_cont_list_registers[] = {
 };
 
 
+//! TODO: Re-add "MM"?
 #define LIST_REG(_cop, _idx) { .cop = _cop, .idx = _idx, }
-static const RegisterId sRegList[32] = {
+static const RegisterId sRegList[32 +2] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
     LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
     LIST_REG(CPU, REG_CPU_A0), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
@@ -55,7 +56,7 @@ static const RegisterId sRegList[32] = {
     LIST_REG(CPU, REG_CPU_S3), LIST_REG(CPU, REG_CPU_S4), LIST_REG(CPU, REG_CPU_S5),
     LIST_REG(CPU, REG_CPU_S6), LIST_REG(CPU, REG_CPU_S7), LIST_REG(CPU, REG_CPU_T8),
     LIST_REG(CPU, REG_CPU_T9), LIST_REG(CPU, REG_CPU_GP), LIST_REG(CPU, REG_CPU_SP),
-    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA), //! TODO: Re-add "MM"?
+    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA), LIST_REG(CPU, REG_CPU_K0), LIST_REG(CPU, REG_CPU_K1),
 };
 
 
@@ -70,7 +71,7 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 
     // "[register name]:"
     size_t charX = cs_print(x, y,
-        " "STR_COLOR_PREFIX"%s:",
+        (" "STR_COLOR_PREFIX"%s:"),
         COLOR_RGBA32_CRASH_VARIABLE, name
     );
 
@@ -113,6 +114,22 @@ u32 cs_registers_print_registers(u32 line) {
     return (line + rows);
 }
 
+void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
+    // "FPCSR:[XXXXXXXX]"
+    size_t fpcsrSize = cs_print(x, y,
+        STR_COLOR_PREFIX"FPCSR: "STR_COLOR_PREFIX STR_HEX_WORD" ",
+        COLOR_RGBA32_CRASH_VARIABLE,
+        COLOR_RGBA32_WHITE, fpcsr
+    );
+    x += TEXT_WIDTH(fpcsrSize);
+
+    const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
+    if (fpcsrDesc != NULL) {
+        // "([float exception description])"
+        cs_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);
+    }
+}
+
 // Print a floating-point register.
 void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
     const RegisterInfo* regInfo = get_reg_info(COP1, regNum);
@@ -129,29 +146,7 @@ void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
         .asU32 = (u32)get_reg_val(COP1, regNum),
     };
 
-    char prefix = '\0';
-
-    if (val.mantissa != 0) {
-        if (val.exponent == 0x00) {
-            prefix = 'D'; // Denormalized value.
-        } else if (val.exponent == 0xFF) {
-            prefix = 'N'; // NaN.
-        }
-    }
-
-    if (prefix != '\0') {
-        // "[prefix][XXXXXXXX]"
-        cs_print(x, y, "%c"STR_HEX_WORD, prefix, val.asU32);
-    } else {
-        const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_FLOATS_FMT);
-
-        switch (floatsFormat) {
-            case PRINT_NUM_FMT_HEX: cs_print(x, y, " "STR_HEX_WORD, val.asU32); break; // "[XXXXXXXX]"
-            default:
-            case PRINT_NUM_FMT_DEC: cs_print(x, y, "% g",           val.asF32); break; // "[±][exponent]"
-            case PRINT_NUM_FMT_SCI: cs_print(x, y, "% .3e",         val.asF32); break; // "[scientific notation]"
-        }
-    }
+    cs_print_f32(x, y, val, FALSE);
 }
 
 void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
@@ -160,7 +155,7 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
     __OSfp* osfp = &tc->fp0;
 
     // cs_registers_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
-    line++;
+    cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
 
     osWritebackDCacheAll();
 
@@ -170,8 +165,9 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
                 return;
             }
 
-            cs_registers_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum++);
+            cs_registers_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum);
 
+            regNum += 2;
             osfp++;
         }
     }
@@ -197,7 +193,7 @@ void page_registers_draw(void) {
 void page_registers_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
-        cs_inc_setting(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_FLOATS_FMT, 1);
+        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
     }
 }
 

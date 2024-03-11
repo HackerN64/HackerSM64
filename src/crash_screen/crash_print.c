@@ -6,6 +6,7 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "util/registers.h"
 #include "crash_draw.h"
 #include "crash_main.h"
 #include "crash_settings.h"
@@ -426,4 +427,36 @@ void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
         (((symbol != NULL) && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
         get_map_symbol_name(symbol)
     );
+}
+
+static const FloatPrefix sFltErrFmt[] = {
+    [FLT_ERR_NONE  ] = { .r = 0xFF, .g = 0xFF, .b = 0xFF, .prefixChar = CHAR_FLT_PREFIX_NULL,   .suffix = "",             },
+    [FLT_ERR_DENORM] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_DENORM, .suffix = "denormalized", },
+    [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x00, .b = 0x00, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
+};
+
+size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
+    const enum FloatError fltErr = validate_float(val);
+    size_t numChars = 0;
+
+    if (fltErr != FLT_ERR_NONE) {
+        const FloatPrefix* p = &sFltErrFmt[fltErr];
+        RGBA32 color = RGBA_TO_RGBA32(p->r, p->g, p->b, MSK_RGBA32_A);
+        // "[prefix][XXXXXXXX]"
+        numChars += cs_print(x, y, STR_COLOR_PREFIX"%c"STR_HEX_WORD, color, p->prefixChar, val.asU32);
+        if (includeSuffix) {
+            numChars += cs_print((x + TEXT_WIDTH(numChars)), y, STR_COLOR_PREFIX" (%s)", color, p->suffix);
+        }
+    } else {
+        const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT);
+
+        switch (floatsFormat) {
+            case PRINT_NUM_FMT_HEX: numChars += cs_print(x, y, " "STR_HEX_WORD, val.asU32); break; // "[XXXXXXXX]"
+            default:
+            case PRINT_NUM_FMT_DEC: numChars += cs_print(x, y, "% g",           val.asF32); break; // "[±][exponent]"
+            case PRINT_NUM_FMT_SCI: numChars += cs_print(x, y, "% .3e",         val.asF32); break; // "[scientific notation]"
+        }
+    }
+
+    return numChars;
 }
