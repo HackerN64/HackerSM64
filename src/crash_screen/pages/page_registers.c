@@ -43,7 +43,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
 
 
 #define LIST_REG(_cop, _idx) { .cop = _cop, .idx = _idx, }
-static const Register sRegList[32] = {
+static const RegisterId sRegList[32] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
     LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
     LIST_REG(CPU, REG_CPU_A0), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
@@ -92,11 +92,11 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 }
 
 // Print important fixed-point registers.
-u32 cs_registers_print_registers(u32 line, UNUSED __OSThreadContext* tc) {
+u32 cs_registers_print_registers(u32 line) {
     const size_t columnWidth = 15;
     const u32 columns = 3;
     const u32 rows = (ARRAY_COUNT(sRegList) / columns);
-    const Register* reg = sRegList;
+    const RegisterId* reg = sRegList;
 
     for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < columns; x++) {
@@ -113,13 +113,19 @@ u32 cs_registers_print_registers(u32 line, UNUSED __OSThreadContext* tc) {
 }
 
 // Print a floating-point register.
-void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum, f32* data) {
+void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
+    const RegisterInfo* regInfo = get_reg_info(COP1, regNum);
+
+    if (regInfo == NULL) {
+        return;
+    }
+
     // "[register name]:"
-    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"F%02d:", COLOR_RGBA32_CRASH_VARIABLE, regNum);
+    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     x += TEXT_WIDTH(charX);
 
     IEEE754_f32 val = {
-        .asF32 = *data,
+        .asU32 = (u32)get_reg_val(COP1, regNum),
     };
 
     char prefix = '\0';
@@ -159,14 +165,13 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
 
     for (u32 y = 0; y < 6; y++) {
         for (u32 x = 0; x < 3; x++) {
-            if (regNum > 30) {
+            if (regNum >= COP1_NUM_REGISTERS) {
                 return;
             }
 
-            cs_registers_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum, &osfp->f.f_even);
+            cs_registers_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum++);
 
             osfp++;
-            regNum += 2;
         }
     }
 }
@@ -179,7 +184,7 @@ void page_registers_draw(void) {
 
     //! TODO: thread
 
-    line = cs_registers_print_registers(line, tc);
+    line = cs_registers_print_registers(line);
 
     line++;
 
@@ -204,7 +209,7 @@ void page_registers_print(void) {
     // Thread registers:
     const u32 columns = 3;
     const u32 rows = (ARRAY_COUNT(sRegList) / columns);
-    const Register* reg = sRegList;
+    const RegisterId* reg = sRegList;
     for (u32 y = 0; y < rows; y++) {
         debug_printf("- ");
         for (u32 x = 0; x < columns; x++) {

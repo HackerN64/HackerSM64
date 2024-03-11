@@ -276,7 +276,7 @@ u32 cs_draw_assert(u32 line) {
     return line;
 }
 
-void cs_draw_register_info_long(u32 x, u32 line, Register reg) {
+void cs_draw_register_info_long(u32 x, u32 line, RegisterId reg) {
     const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
     Word data = get_reg_val(reg.cop, reg.idx);
 
@@ -337,7 +337,7 @@ void page_home_draw(void) {
                     COLOR_RGBA32_CRASH_PAGE_NAME
                 );
 
-                cs_draw_register_info_long(1, line++, (Register){ .cop = COP0, .idx = REG_COP0_EPC });
+                cs_draw_register_info_long(1, line++, (RegisterId){ .cop = COP0, .idx = REG_COP0_EPC, });
                 // line++;
 
                 cs_print(TEXT_X(0), TEXT_Y(line++),

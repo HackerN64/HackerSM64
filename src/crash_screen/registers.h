@@ -30,6 +30,7 @@ enum CPURegisters {
     REG_CPU_SP,                                                                                     // Stack pointer. Subtract to allocate stack space and add back to deallocate.
     REG_CPU_FP,                                                                                     // Saved value 8 ("S8") or frame pointer ("FP"), depending on compiler.
     REG_CPU_RA,                                                                                     // Return address. Jump to this to return from a function. Hardware enforced.
+    CPU_NUM_REGISTERS,
 };
 
 enum COP0Registers {
@@ -65,6 +66,7 @@ enum COP0Registers {
     REG_COP0_TAGHI     = C0_TAGHI,       // Cache Tag register high.
     REG_COP0_ERROR_EPC = C0_ERROR_EPC,   // Error Exception Program Counter.
     REG_COP0_31        = 31,             // Reserved for future use.
+    COP0_NUM_REGISTERS,
 };
 
 
@@ -111,6 +113,7 @@ enum COP1Registers {
     REG_COP1_F12, REG_COP1_F14,                                                         // Subroutine arguments.
     REG_COP1_F16, REG_COP1_F18,                                                         // Temporary values.
     REG_COP1_F20, REG_COP1_F22, REG_COP1_F24, REG_COP1_F26, REG_COP1_F28, REG_COP1_F30, // Saved Values.
+    COP1_NUM_REGISTERS,
 };
 
 
@@ -120,7 +123,7 @@ typedef union {
         /*0x02*/ s16 idx;
     }; /*0x04*/
     /*0x04*/ u32 raw;
-} Register; /*0x04*/
+} RegisterId; /*0x04*/
 
 typedef struct {
     /*0x00*/ const char* asmReg; /*0x04*/
@@ -165,7 +168,7 @@ typedef struct {
 
 #define REG_BUFFER_SIZE 3
 
-extern Register gSavedRegBuf[REG_BUFFER_SIZE];
+extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);

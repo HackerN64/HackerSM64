@@ -21,7 +21,7 @@
 
 // -- CPU Register info --
 
-ALIGNED32 static const RegisterInfo sRegisters_CPU[32] = {
+ALIGNED32 static const RegisterInfo sRegisters_CPU[CPU_NUM_REGISTERS] = {
     [REG_CPU_R0] = DEF_CPU_SREG(zero, "R0"),
     [REG_CPU_AT] = DEF_CPU_TREG(at, "AT"),
     [REG_CPU_V0] = DEF_CPU_TREG(v0, "V0"), [REG_CPU_V1] = DEF_CPU_TREG(v1, "V1"),
@@ -37,10 +37,10 @@ ALIGNED32 static const RegisterInfo sRegisters_CPU[32] = {
 };
 
 #define CASE_CPU_REG(_idx, _reg) CASE_REG(CPU, _idx, _reg)
-u64 get_cpu_reg_val(enum CPURegisters regID) {
+uint64_t get_cpu_reg_val(enum CPURegisters idx) {
     //! TODO: .set noat
-    u64 val = 0;
-    switch (regID) {
+    uint64_t val = 0;
+    switch (idx) {
         CASE_CPU_REG(REG_CPU_R0, zero);
         CASE_CPU_REG(REG_CPU_AT, at);
         CASE_CPU_REG(REG_CPU_V0, v0); CASE_CPU_REG(REG_CPU_V1, v1);
@@ -53,6 +53,7 @@ u64 get_cpu_reg_val(enum CPURegisters regID) {
         CASE_CPU_REG(REG_CPU_SP, sp);
         CASE_CPU_REG(REG_CPU_FP, fp);
         CASE_CPU_REG(REG_CPU_RA, ra);
+        default: break;
     }
     return val;
 }
@@ -60,7 +61,7 @@ u64 get_cpu_reg_val(enum CPURegisters regID) {
 
 // -- COP0 Register info --
 
-ALIGNED32 static const RegisterInfo sRegisters_COP0[32] = {
+ALIGNED32 static const RegisterInfo sRegisters_COP0[COP0_NUM_REGISTERS] = {
     [REG_COP0_INX      ] = DEF_COP0_SREG(C0_INX,       sizeof(u32),           "Index",     "IX"),
     [REG_COP0_RAND     ] = DEF_COP0_SREG(C0_RAND,      sizeof(u32),           "Random",    "RN"),
     [REG_COP0_ENTRYLO0 ] = DEF_COP0_SREG(C0_ENTRYLO0,  sizeof(u64),           "EntryLo0",  "L0"),
@@ -96,9 +97,9 @@ ALIGNED32 static const RegisterInfo sRegisters_COP0[32] = {
 };
 
 #define CASE_COP0_REG(_idx, _reg) CASE_REG(COP0, _idx, _reg)
-u64 get_cop0_reg_val(enum COP0Registers regID) {
-    u64 val = 0;
-    switch (regID) {
+uint64_t get_cop0_reg_val(enum COP0Registers idx) {
+    uint64_t val = 0;
+    switch (idx) {
         CASE_COP0_REG(REG_COP0_INX,       C0_INX      );
         CASE_COP0_REG(REG_COP0_RAND,      C0_RAND     );
         CASE_COP0_REG(REG_COP0_ENTRYLO0,  C0_ENTRYLO0 );
@@ -131,6 +132,7 @@ u64 get_cop0_reg_val(enum COP0Registers regID) {
         CASE_COP0_REG(REG_COP0_TAGHI,     C0_TAGHI    );
         CASE_COP0_REG(REG_COP0_ERROR_EPC, C0_ERROR_EPC);
         CASE_COP0_REG(REG_COP0_31,        31          );
+        default: break;
     }
     return val;
 }
@@ -139,7 +141,7 @@ u64 get_cop0_reg_val(enum COP0Registers regID) {
 // -- COP1 Register info --
 
 //! TODO: Better name format
-ALIGNED32 static const RegisterInfo sRegisters_COP1[32] = {
+ALIGNED32 static const RegisterInfo sRegisters_COP1[COP1_NUM_REGISTERS] = {
     [REG_COP1_F00] = DEF_COP1_TREG(0,  "00"), [REG_COP1_F02] = DEF_COP1_TREG(2,  "02"),
     [REG_COP1_F04] = DEF_COP1_TREG(4,  "04"), [REG_COP1_F06] = DEF_COP1_TREG(6,  "06"), [REG_COP1_F08] = DEF_COP1_TREG(8,  "08"), [REG_COP1_F10] = DEF_COP1_TREG(10, "10"),
     [REG_COP1_F12] = DEF_COP1_TREG(12, "12"), [REG_COP1_F14] = DEF_COP1_TREG(14, "14"),
@@ -148,14 +150,15 @@ ALIGNED32 static const RegisterInfo sRegisters_COP1[32] = {
 };
 
 #define CASE_COP1_REG(_idx, _reg) CASE_REG(COP1, _idx, _reg)
-u64 get_cop1_reg_val(enum COP1Registers regId) {
-    u64 val = 0;
-    switch (regId) {
+uint64_t get_cop1_reg_val(enum COP1Registers idx) {
+    uint64_t val = 0;
+    switch (idx) {
         CASE_COP1_REG(REG_COP1_F00, f0 ); CASE_COP1_REG(REG_COP1_F02, f2 );
         CASE_COP1_REG(REG_COP1_F04, f4 ); CASE_COP1_REG(REG_COP1_F06, f6 ); CASE_COP1_REG(REG_COP1_F08, f8 ); CASE_COP1_REG(REG_COP1_F10, f10);
         CASE_COP1_REG(REG_COP1_F12, f12); CASE_COP1_REG(REG_COP1_F14, f14);
         CASE_COP1_REG(REG_COP1_F16, f16); CASE_COP1_REG(REG_COP1_F18, f18);
         CASE_COP1_REG(REG_COP1_F20, f20); CASE_COP1_REG(REG_COP1_F22, f22); CASE_COP1_REG(REG_COP1_F24, f24); CASE_COP1_REG(REG_COP1_F26, f26); CASE_COP1_REG(REG_COP1_F28, f28); CASE_COP1_REG(REG_COP1_F30, f30);
+        default: break;
     }
     return val;
 }
@@ -170,7 +173,7 @@ static const RegisterInfo* sRegisters[] = {
 };
 
 
-Register gSavedRegBuf[REG_BUFFER_SIZE];
+RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 int gSavedRegBufSize = 0;
 
 
@@ -178,7 +181,7 @@ const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx) {
     return &sRegisters[cop + 1][idx];
 }
 
-u64 get_direct_reg_val(enum Coprocessors cop, int idx) {
+uint64_t get_direct_reg_val(enum Coprocessors cop, int idx) {
     switch (cop) {
         case CPU:  return get_cpu_reg_val(idx);  break;
         case COP0: return get_cop0_reg_val(idx); break;
@@ -223,6 +226,6 @@ void clear_saved_reg_buffer(void) {
 
 void append_reg_to_buffer(s16 cop, s16 idx) {
     if (gSavedRegBufSize < ARRAY_COUNT(gSavedRegBuf)) {
-        gSavedRegBuf[gSavedRegBufSize++] = (Register){ .cop = cop, .idx = idx, };
+        gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){ .cop = cop, .idx = idx, };
     }
 }
