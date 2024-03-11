@@ -436,11 +436,11 @@ static const FloatPrefix sFltErrFmt[] = {
 };
 
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
-    const enum FloatError fltErr = validate_float(val);
+    const enum FloatErrorType fltErrType = validate_float(val);
     size_t numChars = 0;
 
-    if (fltErr != FLT_ERR_NONE) {
-        const FloatPrefix* p = &sFltErrFmt[fltErr];
+    if (fltErrType != FLT_ERR_NONE) {
+        const FloatPrefix* p = &sFltErrFmt[fltErrType];
         RGBA32 color = RGBA_TO_RGBA32(p->r, p->g, p->b, MSK_RGBA32_A);
         // "[prefix][XXXXXXXX]"
         numChars += cs_print(x, y, STR_COLOR_PREFIX"%c"STR_HEX_WORD, color, p->prefixChar, val.asU32);

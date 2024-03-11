@@ -179,7 +179,7 @@ enum COP1Registers {
     COP1_NUM_REGISTERS,
 };
 
-enum FloatError {
+enum FloatErrorType {
     FLT_ERR_NONE,
     FLT_ERR_DENORM,
     FLT_ERR_NAN,
@@ -241,4 +241,4 @@ uint64_t get_reg_val(enum Coprocessors cop, int idx);
 void clear_saved_reg_buffer(void);
 void append_reg_to_buffer(s16 cop, s16 idx);
 
-enum FloatError validate_float(IEEE754_f32 val);
+enum FloatErrorType validate_float(IEEE754_f32 val);

@@ -227,7 +227,7 @@ void append_reg_to_buffer(s16 cop, s16 idx) {
     }
 }
 
-enum FloatError validate_float(IEEE754_f32 val) {
+enum FloatErrorType validate_float(IEEE754_f32 val) {
     if (val.mantissa != 0) {
         if (val.exponent == 0x00) {
             return FLT_ERR_DENORM; // Denormalized value.
