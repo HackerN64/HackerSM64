@@ -3,7 +3,6 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "address_select.h"
 #include "crash_main.h"
 #include "crash_controls.h"
 #include "crash_settings.h"
@@ -21,6 +20,10 @@
 #include "pages/page_disasm.h"
 #include "pages/page_settings.h"
 #include "pages/page_about.h"
+
+#include "popups/popup_address_select.h"
+#include "popups/popup_page_controls.h"
+#include "popups/popup_page_select.h"
 
 
 // -- Pages --

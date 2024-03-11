@@ -6,7 +6,6 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_screen/address_select.h"
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"

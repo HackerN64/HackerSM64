@@ -3,17 +3,17 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_controls.h"
-#include "crash_draw.h"
-#include "crash_main.h"
-#include "crash_print.h"
-#include "crash_settings.h"
-#include "crash_pages.h"
-#include "memory_read.h"
+#include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_draw.h"
+#include "crash_screen/crash_main.h"
+#include "crash_screen/crash_print.h"
+#include "crash_screen/crash_settings.h"
+#include "crash_screen/crash_pages.h"
+#include "crash_screen/memory_read.h"
 
-#include "address_select.h"
+#include "popup_address_select.h"
 
-#include "pages/page_disasm.h"
+#include "crash_screen/pages/page_disasm.h" // For gFillBranchBuffer.
 
 
 static Address sAddressSelectTarget = 0x00000000;

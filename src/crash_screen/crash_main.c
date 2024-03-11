@@ -8,7 +8,6 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "address_select.h"
 #include "crash_controls.h"
 #include "crash_draw.h"
 #include "crash_pages.h"
