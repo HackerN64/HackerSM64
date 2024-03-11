@@ -295,19 +295,30 @@ void cs_update_input(void) {
 
 // Page select popup box draw function.
 void cs_popup_pages_draw(void) {
+    const s32 w = 32;//TEXT_WIDTH(32);
+    const s32 h = 16;//TEXT_HEIGHT(16);
+    const s32 startX = ((CRASH_SCREEN_NUM_CHARS_X / 2) - (w / 2));
+    const s32 startY = ((CRASH_SCREEN_NUM_CHARS_Y / 2) - (h / 2));
+    const s32 bgStartX = (TEXT_X(startX) - (TEXT_WIDTH(1) / 2));
+    const s32 bgStartY = (TEXT_Y(startY) - (TEXT_HEIGHT(1) / 2));
+    const s32 bgW = (TEXT_WIDTH(w) + TEXT_WIDTH(1));
+    const s32 bgH = (TEXT_HEIGHT(h) + (TEXT_HEIGHT(1)));
     cs_draw_dark_rect(
-        (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2)),
-        (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
+        bgStartX, bgStartY,
+        bgW, bgH,
         CS_DARKEN_SEVEN_EIGHTHS
     );
 
     CSPopup* currPopup = cs_get_current_popup();
 
     // "PAGE SELECT:"
-    cs_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, currPopup->name);
+    cs_print(TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (STRLEN("PAGE SELECT:") / 2)), TEXT_Y(startY),
+        STR_COLOR_PREFIX"%s:",
+        COLOR_RGBA32_CRASH_PAGE_NAME, currPopup->name
+    );
 
-    u32 line = 3;
-    //! TODO: Scrollable if list is long enough.
+    u32 line = (startY + 2);
+    //! TODO: Scrollable if the list is long enough.
     for (enum CSPages pageID = 0; pageID < NUM_PAGES; pageID++) {
         CSPage* page = gCSPages[pageID];
 
@@ -316,16 +327,18 @@ void cs_popup_pages_draw(void) {
         }
 
         if (pageID == gCSPageID) {
-            cs_draw_row_selection_box(TEXT_Y(3 + pageID));
+            cs_draw_row_selection_box_impl(bgStartX, bgW, TEXT_Y((startY + 2) + pageID));
         }
 
-        cs_draw_divider_translucent_popup(DIVIDER_Y(line));
-        cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"<%02d>: %s", COLOR_RGBA32_CRASH_PAGE_NAME, pageID, page->name);
+        cs_draw_divider_translucent_impl(bgStartX, bgW, DIVIDER_Y(line));
+        cs_print(TEXT_X(startX + 1), TEXT_Y(line), STR_COLOR_PREFIX"<%02d>: %s", COLOR_RGBA32_CRASH_PAGE_NAME, (pageID + 1), page->name);
 
         line++;
     }
 
-    cs_draw_divider_translucent_popup(DIVIDER_Y(line));
+    cs_draw_divider_translucent_impl(bgStartX, bgW, DIVIDER_Y(line));
+
+    cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 
     osWritebackDCacheAll();
 }
@@ -365,9 +378,13 @@ struct CSPopup gCSPopup_pages = {
 // Controls popup box draw function.
 //! TODO: Allow changing page-specific settings from here.
 void cs_popup_controls_draw(void) {
+    const s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
+    const s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
+    const s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
+    const s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
     cs_draw_dark_rect(
-        (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2)),
-        (CRASH_SCREEN_W  -  TEXT_WIDTH(1)     ), (CRASH_SCREEN_H  -  TEXT_HEIGHT(1)     ),
+        bgStartX, bgStartY,
+        bgW, bgH,
         CS_DARKEN_SEVEN_EIGHTHS
     );
     CSPage* page = cs_get_current_page();
@@ -390,6 +407,8 @@ void cs_popup_controls_draw(void) {
             line += 2;
         }
     }
+
+    cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 
     osWritebackDCacheAll();
 }

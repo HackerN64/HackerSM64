@@ -112,6 +112,7 @@ void cs_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
 void cs_reset_scissor_box(void);
 void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
 void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
+void cs_draw_outline(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
 void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
 void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
 // void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
@@ -120,22 +121,31 @@ void cs_take_screenshot_of_game(RGBA16* dst, size_t size);
 void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
 void cs_draw_main(void);
 
-ALWAYS_INLINE void cs_draw_divider(u32 y) {
-    cs_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_CRASH_DIVIDER);
+
+ALWAYS_INLINE void cs_draw_divider_impl(s32 startX, s32 width, u32 line, RGBA32 color) {
+    cs_draw_rect(startX, line, width, 1, color);
 }
 
-ALWAYS_INLINE void cs_draw_divider_translucent(u32 y) {
-    cs_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+ALWAYS_INLINE void cs_draw_divider(u32 line) {
+    cs_draw_divider_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, line, COLOR_RGBA32_CRASH_DIVIDER);
 }
 
-ALWAYS_INLINE void cs_draw_divider_translucent_popup(u32 y) { //! TODO: start and width args, make the other version the "full width" version
-    cs_draw_rect((CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2)), y, (CRASH_SCREEN_W - TEXT_WIDTH(1)), 1, RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_DIVIDER, 0x7F));
+ALWAYS_INLINE void cs_draw_divider_translucent_impl(s32 x, s32 w, u32 line) {
+    cs_draw_divider_impl(x, w, line, COLOR_RGBA32_CRASH_DIVIDER_TRANSLUCENT);
 }
 
-ALWAYS_INLINE void cs_draw_row_selection_box(s32 y) {
+ALWAYS_INLINE void cs_draw_divider_translucent(u32 line) {
+    cs_draw_divider_translucent_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, line);
+}
+
+ALWAYS_INLINE void cs_draw_row_selection_box_impl(s32 x, s32 w, s32 line) {
     cs_draw_rect(
-        (TEXT_X(0) - 1), (y - 2),
-        (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1),
+        x, (line - 2),
+        w, (TEXT_HEIGHT(1) + 1),
         COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
     );
+}
+
+ALWAYS_INLINE void cs_draw_row_selection_box(u32 line) {
+    cs_draw_row_selection_box_impl((TEXT_X(0) - 1), (CRASH_SCREEN_TEXT_W + 1), line);
 }

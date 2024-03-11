@@ -127,6 +127,30 @@ void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     }
 }
 
+// Draws an empty box.
+void cs_draw_outline(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+    const Alpha alpha = RGBA32_A(color);
+    if (alpha == 0x00) {
+        return;
+    }
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+
+    RGBA16* dst = get_rendering_fb_pixel(startX, startY);
+
+    for (s32 y = 0; y < h; y++) {
+        for (s32 x = 0; x < w; x++) {
+            if (
+                cs_is_in_scissor_box((startX + x), (startY + y)) &&
+                ((y == 0) || (y == (h - 1)) || (x == 0) || (x == (w - 1)))
+            ) {
+                apply_color(dst, newColor, alpha);
+            }
+            dst++;
+        }
+        dst += (SCREEN_WIDTH - w);
+    }
+}
+
 // Draws a diamond shape.
 void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
@@ -233,6 +257,14 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
         dst += (SCREEN_WIDTH - CRASH_SCREEN_FONT_CHAR_WIDTH);
     }
 }
+
+// void cs_draw_texture(u32 startX, u32 startY, u32 w, u32 h, RGBA16* texture) {
+//     for (u32 y = 0; y < h; y++) {
+//         for (u32 x = 0; x < w; x++) {
+
+//         }
+//     }
+// }
 
 // Copy the framebuffer data from gFramebuffers one frame at a time, forcing alpha to true to turn off broken anti-aliasing.
 void cs_take_screenshot_of_game(RGBA16* dst, size_t size) {

@@ -22,9 +22,13 @@ static s8 sAddressSelectCharIndex = 7;
 
 // Address select draw function.
 void cs_address_select_draw(void) {
+    const s32 bgStartX = (JUMP_MENU_X1 - JUMP_MENU_MARGIN_X);
+    const s32 bgStartY = (JUMP_MENU_Y1 - JUMP_MENU_MARGIN_Y);
+    const s32 bgW = (JUMP_MENU_W + (JUMP_MENU_MARGIN_X * 2));
+    const s32 bgH = (JUMP_MENU_H + (JUMP_MENU_MARGIN_Y * 2));
     cs_draw_dark_rect(
-        (JUMP_MENU_X1 -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y1 -  JUMP_MENU_MARGIN_Y     ),
-        (JUMP_MENU_W  + (JUMP_MENU_MARGIN_X * 2)), (JUMP_MENU_H  + (JUMP_MENU_MARGIN_Y * 2)),
+        bgStartX, bgStartY,
+        bgW, bgH,
         CS_DARKEN_SEVEN_EIGHTHS
     );
 
@@ -71,6 +75,8 @@ void cs_address_select_draw(void) {
         }
     }
 #endif // INCLUDE_DEBUG_MAP
+
+    cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 
     osWritebackDCacheAll();
 }
