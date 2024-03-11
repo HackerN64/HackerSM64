@@ -5,6 +5,8 @@
 #include "types.h"
 
 
+#define STR_REG_PREFIX "$"
+
 
 // Coprocessors.
 enum Coprocessors {
@@ -111,52 +113,63 @@ enum COP1Registers {
     REG_COP1_F20, REG_COP1_F22, REG_COP1_F24, REG_COP1_F26, REG_COP1_F28, REG_COP1_F30, // Saved Values.
 };
 
-// enum COP2Registers {
 
-// };
+typedef union {
+    struct {
+        /*0x00*/ s16 cop;
+        /*0x02*/ s16 idx;
+    }; /*0x04*/
+    /*0x04*/ u32 raw;
+} Register; /*0x04*/
 
-//! TODO: Better format.
 typedef struct {
-    /*0x00*/ const Address addr; /*0x04*/ // Is offset if isThread is TRUE.
-    /*0x04*/ const u16 size; /*0x02*/
-    /*0x06*/ const u8 isThread; /*0x01*/
+    /*0x00*/ const char* asmReg; /*0x04*/
+    /*0x04*/ const u16 offset; /*0x01*/
+    /*0x06*/ const u8 size;
     /*0x07*/ const char shortName[3]; /*0x03*/
     /*0x0A*/ const char name[10]; /*0x0A*/
 } RegisterInfo; /*0x14*/
 
-typedef struct {
-    /*0x00*/ enum Coprocessors cop;
-    /*0x04*/ int reg;
-} Register; /*0x08*/
-
-#define DEF_REG(_addr, _size, _isThread, _name, _shortName) { \
-    .addr      = _addr,      \
-    .size      = _size,      \
-    .isThread  = _isThread,  \
-    .name      = _name,      \
-    .shortName = _shortName, \
+#define DEF_REG(_asmReg, _size, _offset, _name, _shortName) { \
+    .asmReg    = _asmReg,       \
+    .offset    = _offset,       \
+    .size      = _size,         \
+    .name      = _name,         \
+    .shortName = _shortName,    \
 }
 
-#define DEF_THREAD_REG(field, _name, _shortName) DEF_REG( \
-    __builtin_offsetof(__OSThreadContext, field), \
-    sizeof_member(__OSThreadContext, field), \
-    TRUE, _name, _shortName \
-)
-#define DEF_CPU_REG(field, name) DEF_THREAD_REG(field, name, name)
-#define DEF_FLT_REG(num, _name, _shortName) DEF_THREAD_REG(fp##num.f.f_even, _name, _shortName)
+#define DEF_SREG(_reg, _size, _name, _shortName) {  \
+    .asmReg    = TO_STRING2(_reg),                  \
+    .offset    = (u16)-1,                           \
+    .size      = _size,                             \
+    .name      = _name,                             \
+    .shortName = _shortName,                        \
+}
 
+#define DEF_TREG(_reg, _field, _size, _name, _shortName) {      \
+    .asmReg    = TO_STRING2(_reg),                              \
+    .offset    = __builtin_offsetof(__OSThreadContext, _field), \
+    .size      = sizeof_member(__OSThreadContext, _field),      \
+    .name      = _name,                                         \
+    .shortName = _shortName,                                    \
+}
+
+#define DEF_CPU_SREG(_reg, _name) DEF_SREG(_reg, sizeof(u64), _name, _name)
+#define DEF_CPU_TREG(_reg, _name) DEF_TREG(_reg, _reg, sizeof(u64), _name, _name)
+
+#define DEF_COP0_SREG(_reg, _size,         _name, _shortName) DEF_SREG(_reg,         _size, _name, _shortName)
+#define DEF_COP0_TREG(_reg, _size, _field, _name, _shortName) DEF_TREG(_reg, _field, _size, _name, _shortName)
+
+#define DEF_COP1_SREG(_reg, _name) DEF_SREG(_reg,                    sizeof(f32), "F"_name, _name)
+#define DEF_COP1_TREG(_reg, _name) DEF_TREG(_reg, fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
 
 #define REG_BUFFER_SIZE 3
 
-extern const RegisterInfo* gSavedRegBuf[REG_BUFFER_SIZE];
+extern Register gSavedRegBuf[REG_BUFFER_SIZE];
+extern int gSavedRegBufSize;
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);
-u64 get_reg_val_from_info(const RegisterInfo* info);
-
-static ALWAYS_INLINE u64 get_reg_val(enum Coprocessors cop, int idx) {
-    const RegisterInfo* info = get_reg_info(cop, idx);
-    return get_reg_val_from_info(info);
-}
+u64 get_reg_val(enum Coprocessors cop, int idx);
 
 void clear_saved_reg_buffer(void);
-void append_reg_to_buffer(const RegisterInfo* reg);
+void append_reg_to_buffer(s16 cop, s16 idx);

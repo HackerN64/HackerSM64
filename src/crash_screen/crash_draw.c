@@ -317,8 +317,6 @@ u32 cs_page_header_draw(void) {
 
     line++;
 
-    cs_draw_divider(DIVIDER_Y(line));
-
     osWritebackDCacheAll();
 
     return line;
@@ -410,6 +408,8 @@ void cs_draw_main(void) {
         } else {
             page->drawFunc();
         }
+
+        cs_draw_divider(DIVIDER_Y(line));
 
         CSPopup* popup = cs_get_current_popup();
         if (popup != NULL) {

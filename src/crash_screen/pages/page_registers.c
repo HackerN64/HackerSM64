@@ -42,7 +42,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
 };
 
 
-#define LIST_REG(_cop, _reg) { .cop = _cop, .reg = _reg, }
+#define LIST_REG(_cop, _idx) { .cop = _cop, .idx = _idx, }
 static const Register sRegList[32] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
     LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
@@ -91,18 +91,6 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
     }
 }
 
-// Gets the value of a OSThreadContextRegister register.
-u64 get_thread_register_val(__OSThreadContext* tc, const OSThreadContextRegister* reg) {
-    Address addr = ((Address)tc + reg->offset);
-
-    // Special case for "MM".
-    if (reg->offset == (Address)-1) {
-        addr = tc->pc;
-    }
-
-    return ((reg->size == sizeof(u64)) ? *(u64*)addr : *(u32*)addr);
-}
-
 // Print important fixed-point registers.
 u32 cs_registers_print_registers(u32 line, UNUSED __OSThreadContext* tc) {
     const size_t columnWidth = 15;
@@ -112,10 +100,10 @@ u32 cs_registers_print_registers(u32 line, UNUSED __OSThreadContext* tc) {
 
     for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < columns; x++) {
-            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->reg);
-            u32 val = get_reg_val_from_info(regInfo);
-
-            cs_registers_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regInfo->shortName, val);
+            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
+            if (regInfo != NULL) {
+                cs_registers_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regInfo->shortName, get_reg_val(reg->cop, reg->idx));
+            }
 
             reg++;
         }
@@ -187,6 +175,7 @@ void page_registers_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     u32 line = 1;
     line++;
+    line++;
 
     //! TODO: thread
 
@@ -219,9 +208,10 @@ void page_registers_print(void) {
     for (u32 y = 0; y < rows; y++) {
         debug_printf("- ");
         for (u32 x = 0; x < columns; x++) {
-            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->reg);
-            
-            debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val_from_info(regInfo));
+            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
+            if (regInfo != NULL) {
+                debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));   
+            }
             reg++;
         }
         debug_printf("\n");

@@ -5,10 +5,14 @@
 
 
 // Inline asm macros:
-#define ASM_SET_REG(dst, src) asm volatile("move "dst",%0"::"r"(src))
-#define ASM_GET_REG(dst, src) asm volatile("move %0,"src:"=r"(dst):)
+#define ASM_SET_REG_CPU(dst, src) asm volatile("move "dst",%0"::"r"(src))
+#define ASM_GET_REG_CPU(dst, src) asm volatile("move %0,"src:"=r"(dst):)
 
-#define ASM_GET_RA(RAddr) ASM_GET_REG(RAddr, "$31")
+#define ASM_SET_REG_COP0(dst, src) asm volatile("mtc0 "dst",%0"::"r"(src))
+#define ASM_GET_REG_COP0(dst, src) asm volatile("mfc0 %0,"src:"=r"(dst):)
+
+#define ASM_SET_REG_COP1(dst, src) asm volatile("mtc1 "dst",%0"::"r"(src))
+#define ASM_GET_REG_COP1(dst, src) asm volatile("mfc1 %0,"src:"=r"(dst):)
 
 
 uintptr_t _asm_getaddr(void);

@@ -276,10 +276,12 @@ u32 cs_draw_assert(u32 line) {
     return line;
 }
 
-void cs_draw_register_info_long(u32 x, u32 line, UNUSED __OSThreadContext* tc, const RegisterInfo* reg) {
-    Word data = get_reg_val_from_info(reg);
+void cs_draw_register_info_long(u32 x, u32 line, Register reg) {
+    const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
+    Word data = get_reg_val(reg.cop, reg.idx);
+
     size_t charX = x + cs_print(TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD" ",
-        COLOR_RGBA32_CRASH_VARIABLE, reg->shortName,
+        COLOR_RGBA32_CRASH_VARIABLE, regInfo->shortName,
         COLOR_RGBA32_WHITE, data
     );
 #ifdef INCLUDE_DEBUG_MAP
@@ -294,17 +296,6 @@ void cs_draw_register_info_long(u32 x, u32 line, UNUSED __OSThreadContext* tc, c
         );
     }
 #endif // INCLUDE_DEBUG_MAP
-}
-
-void draw_relevant_registers(u32 x, u32 line, __OSThreadContext* tc) {
-    for (int i = 0; i < REG_BUFFER_SIZE; i++) {
-        const RegisterInfo* reg = gSavedRegBuf[i];
-        if (reg == NULL) {
-            break;
-        }
-
-        cs_draw_register_info_long(x, line++, tc, reg);
-    }
 }
 
 void page_home_draw(void) {
@@ -346,11 +337,11 @@ void page_home_draw(void) {
                     COLOR_RGBA32_CRASH_PAGE_NAME
                 );
 
-                cs_draw_register_info_long(1, line++, tc, get_reg_info(COP0, REG_COP0_EPC));
+                cs_draw_register_info_long(1, line++, (Register){ .cop = COP0, .idx = REG_COP0_EPC });
                 // line++;
 
                 cs_print(TEXT_X(0), TEXT_Y(line++),
-                    STR_COLOR_PREFIX"asm at crash:",
+                    STR_COLOR_PREFIX"instruction at crash:",
                     COLOR_RGBA32_CRASH_PAGE_NAME
                 );
 
@@ -364,12 +355,14 @@ void page_home_draw(void) {
                 // cs_draw_divider(DIVIDER_Y(line));
 
                 cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"values before instruction:", COLOR_RGBA32_CRASH_PAGE_NAME);
-                draw_relevant_registers(1, line, tc);
+                for (int i = 0; i < gSavedRegBufSize; i++) {
+                    cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
+                }
 
             }
             break;
     }
-    
+
     line = (CRASH_SCREEN_NUM_CHARS_Y - 2);
     cs_draw_divider(DIVIDER_Y(line));
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls", COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control);

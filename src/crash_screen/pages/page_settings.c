@@ -233,9 +233,6 @@ void page_settings_draw(void) {
 
     print_settings_list(line, SETTINGS_NUM_ROWS);
 
-    // Draw this line again so the selection box doesn't get drawn in front of it.
-    cs_draw_divider(DIVIDER_Y(line));
-
     // Scroll Bar:
     if (sNumDisplayedSettings > SETTINGS_NUM_ROWS) {
         cs_draw_scroll_bar(

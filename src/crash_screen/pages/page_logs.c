@@ -85,8 +85,6 @@ void draw_logs_section(u32 line, u32 numLines) {
         }
     }
 
-    cs_draw_divider(DIVIDER_Y(line));
-
     if (sLogTotalRows > sLogNumShownRows) {
         cs_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), sLogNumShownRows, sLogTotalRows, sLogViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
         cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
