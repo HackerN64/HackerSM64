@@ -257,11 +257,23 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     }
 }
 
-// void cs_draw_texture(u32 startX, u32 startY, u32 w, u32 h, RGBA16* texture) {
-//     for (u32 y = 0; y < h; y++) {
-//         for (u32 x = 0; x < w; x++) {
+// void cs_draw_texture(s32 startX, s32 startY, s32 w, s32 h, RGBA16* texture) {
+//     if (texture == NULL) {
+//         return;
+//     }
 
+//     RGBA16* src = texture;
+//     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
+
+//     for (s32 y = 0; y < h; y++) {
+//         for (s32 x = 0; x < w; x++) {
+//             if (cs_is_in_scissor_box((startX + x), (startY + y))) {
+//                 apply_color(dst, *src, MSK_RGBA32_A);
+//             }
+//             src++;
+//             dst++;
 //         }
+//         dst += (SCREEN_WIDTH - w);
 //     }
 // }
 

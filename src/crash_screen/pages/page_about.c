@@ -188,20 +188,25 @@ ABOUT_ENTRY_FUNC(save_type,      savetype_name)
 ABOUT_ENTRY_FUNC(compression,    compression_name)
 ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
 ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
-ABOUT_ENTRY_FUNC(gfx_pool_size,  STR_HEX_PREFIX"%X", GFX_POOL_SIZE)
+ABOUT_ENTRY_FUNC(gfx_pool,       STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X", (((u32)gDisplayListHead - ((u32)gGfxPool->buffer)) / sizeof(u32)), GFX_POOL_SIZE)
 ABOUT_ENTRY_FUNC(st_surf_pool,   STR_HEX_PREFIX"%X", ((u32)gCurrStaticSurfacePoolEnd - (u32)gCurrStaticSurfacePool))
 ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X", ((u32)gDynamicSurfacePoolEnd - (u32)gDynamicSurfacePool), (uintptr_t)DYNAMIC_SURFACE_POOL_SIZE)
 ABOUT_ENTRY_FUNC(level_bounds,   STR_HEX_PREFIX"%04X (%dx)", LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
 ABOUT_ENTRY_FUNC(cell_size,      STR_HEX_PREFIX"%03X (%dx%d)", CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
 ABOUT_ENTRY_FUNC(world_scale,    "(%dx)", WORLD_SCALE)
 ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)])
+#ifdef SILHOUETTE
+ABOUT_ENTRY_FUNC(silhouette,     "%d", SILHOUETTE)
+#else // !SILHOUETTE
+ABOUT_ENTRY_FUNC(silhouette,     gValNames_no_yes[FALSE])
+#endif // !SILHOUETTE
 #ifdef KEEP_MARIO_HEAD
 ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[TRUE])
 #else // !KEEP_MARIO_HEAD
 ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[FALSE])
 #endif // !KEEP_MARIO_HEAD
-#if ENABLE_RUMBLE
-ABOUT_ENTRY_FUNC(rumble_thread,  "%s%s", gValNames_no_yes[sRumblePakThreadActive], (sRumblePakActive ? " +pack" : ""))
+#if ENABLE_RUMBLE //! TODO: Update this when Input PR is merged.
+ABOUT_ENTRY_FUNC(rumble,         "%s%s", gValNames_no_yes[sRumblePakThreadActive], (sRumblePakActive ? " +pack" : ""))
 #else // !ENABLE_RUMBLE
 ABOUT_ENTRY_FUNC(rumble,         gValNames_no_yes[FALSE])
 #endif // !ENABLE_RUMBLE
@@ -221,6 +226,17 @@ void about_launcher(char* buf) {
     sprintf(buf, "v%d.%d.%d", v->major, v->minor, v->patch);
 }
 ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
+void about_cheat_flags(char* buf) {
+    lpl_cheat_flags cheatFlags = libpl_get_cheat_flags();
+    sprintf(buf, "%s%s%s%s%s",
+        (cheatFlags & LPL_USED_CHEATS       ) ? "[gs]" : "",
+        (cheatFlags & LPL_USED_SAVESTATES   ) ? "[ss]" : "",
+        (cheatFlags & LPL_USED_SLOWDOWN     ) ? "[sl]" : "",
+        (cheatFlags & LPL_USED_FRAME_ADVANCE) ? "[fa]" : "",
+        (cheatFlags & LPL_USED_SPEEDUP      ) ? "[sp]" : ""
+    );
+}
+ABOUT_ENTRY_FUNC(rhdc,           "%s", libpl_get_my_rhdc_username());
 #else // !LIBPL
 ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 #endif // !LIBPL
@@ -238,48 +254,53 @@ u32 gLongInfoBufferIndex = 0;
 #define ABOUT_ENTRY_LONG1(_name, _desc)    { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
 #define ABOUT_ENTRY_LONG2(_name, _desc)    { .desc = "",    .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
 AboutEntry sAboutEntries[] = {
-    // [ABOUT_ENTRY_GAP_1         ] = ABOUT_ENTRY_GAP(),
-    [ABOUT_ENTRY_HACKERSM64    ] = ABOUT_ENTRY_TITLE(hackersm64_v,    "HackerSM64"    ),
-    [ABOUT_ENTRY_CRASH_SCREEN  ] = ABOUT_ENTRY_TITLE(crash_screen_v,  "Crash Screen"  ),
+    // [ABOUT_ENTRY_GAP_1        ] = ABOUT_ENTRY_GAP(),
+    [ABOUT_ENTRY_HACKERSM64   ] = ABOUT_ENTRY_TITLE(hackersm64_v,   "HackerSM64"    ),
+    [ABOUT_ENTRY_CRASH_SCREEN ] = ABOUT_ENTRY_TITLE(crash_screen_v, "Crash Screen"  ),
 
-    [ABOUT_ENTRY_SUB_COMPILER  ] = ABOUT_ENTRY_SUBTITLE("compiler info"),
-    [ABOUT_ENTRY_COMPILER_1    ] = ABOUT_ENTRY_LONG1(compiler,        "COMPILER"      ),
-    [ABOUT_ENTRY_COMPILER_2    ] = ABOUT_ENTRY_LONG2(compiler,        "COMPILER"      ),
-    [ABOUT_ENTRY_LINKER_1      ] = ABOUT_ENTRY_LONG1(linker,          "LINKER"        ),
-    [ABOUT_ENTRY_LINKER_2      ] = ABOUT_ENTRY_LONG2(linker,          "LINKER"        ),
-    // [ABOUT_ENTRY_GAP_2         ] = ABOUT_ENTRY_GAP(),
+    [ABOUT_ENTRY_SUB_COMPILER ] = ABOUT_ENTRY_SUBTITLE("compiler info"),
+    [ABOUT_ENTRY_COMPILER_1   ] = ABOUT_ENTRY_LONG1(compiler,       "COMPILER"      ),
+    [ABOUT_ENTRY_COMPILER_2   ] = ABOUT_ENTRY_LONG2(compiler,       "COMPILER"      ),
+    [ABOUT_ENTRY_LINKER_1     ] = ABOUT_ENTRY_LONG1(linker,         "LINKER"        ),
+    [ABOUT_ENTRY_LINKER_2     ] = ABOUT_ENTRY_LONG2(linker,         "LINKER"        ),
+    // [ABOUT_ENTRY_GAP_2        ] = ABOUT_ENTRY_GAP(),
 
-    [ABOUT_ENTRY_SUB_ROM       ] = ABOUT_ENTRY_SUBTITLE("rom info"),
-    [ABOUT_ENTRY_ROM_NAME      ] = ABOUT_ENTRY_SINGLE(rom_name,       "ROM NAME"      ), //! TODO: Fix this
-    [ABOUT_ENTRY_LIBULTRA      ] = ABOUT_ENTRY_SINGLE(libultra,       "LIBULTRA"      ),
-    [ABOUT_ENTRY_MICROCODE     ] = ABOUT_ENTRY_SINGLE(microcode,      "MICROCODE"     ),
-    [ABOUT_ENTRY_REGION        ] = ABOUT_ENTRY_SINGLE(region,         "REGION"        ),
-    [ABOUT_ENTRY_SAVE_TYPE     ] = ABOUT_ENTRY_SINGLE(save_type,      "SAVE TYPE"     ),
-    [ABOUT_ENTRY_COMPRESSION   ] = ABOUT_ENTRY_SINGLE(compression,    "COMPRESSION"   ),
-    [ABOUT_ENTRY_ROM_SIZE      ] = ABOUT_ENTRY_SINGLE(rom_size,       "ROM SIZE"      ),
-    [ABOUT_ENTRY_RAM_SIZE      ] = ABOUT_ENTRY_SINGLE(ram_size,       "RAM SIZE"      ),
+    [ABOUT_ENTRY_SUB_ROM      ] = ABOUT_ENTRY_SUBTITLE("rom info"),
+    [ABOUT_ENTRY_ROM_NAME     ] = ABOUT_ENTRY_SINGLE(rom_name,      "ROM NAME"      ), //! TODO: Fix this
+    [ABOUT_ENTRY_LIBULTRA     ] = ABOUT_ENTRY_SINGLE(libultra,      "LIBULTRA"      ),
+    [ABOUT_ENTRY_MICROCODE    ] = ABOUT_ENTRY_SINGLE(microcode,     "MICROCODE"     ),
+    [ABOUT_ENTRY_REGION       ] = ABOUT_ENTRY_SINGLE(region,        "REGION"        ),
+    [ABOUT_ENTRY_SAVE_TYPE    ] = ABOUT_ENTRY_SINGLE(save_type,     "SAVE TYPE"     ),
+    [ABOUT_ENTRY_COMPRESSION  ] = ABOUT_ENTRY_SINGLE(compression,   "COMPRESSION"   ),
+    [ABOUT_ENTRY_ROM_SIZE     ] = ABOUT_ENTRY_SINGLE(rom_size,      "ROM SIZE"      ),
+    [ABOUT_ENTRY_RAM_SIZE     ] = ABOUT_ENTRY_SINGLE(ram_size,      "RAM SIZE"      ),
 
-    [ABOUT_ENTRY_SUB_COLLISION ] = ABOUT_ENTRY_SUBTITLE("collision info"),
-    [ABOUT_ENTRY_LEVEL_BOUNDS  ] = ABOUT_ENTRY_SINGLE(level_bounds,   "LEVEL BOUNDS"  ),
-    [ABOUT_ENTRY_CELL_SIZE     ] = ABOUT_ENTRY_SINGLE(cell_size,      "CELL SIZE"     ),
-    [ABOUT_ENTRY_WORLD_SCALE   ] = ABOUT_ENTRY_SINGLE(world_scale,    "WORLD SCALE"   ),
-    [ABOUT_ENTRY_ST_SURF_POOL  ] = ABOUT_ENTRY_SINGLE(st_surf_pool,   "ST SURF POOL"  ),
-    [ABOUT_ENTRY_DYN_SURF_POOL ] = ABOUT_ENTRY_SINGLE(dyn_surf_pool,  "DYN SURF POOL" ),
+    [ABOUT_ENTRY_SUB_COLLISION] = ABOUT_ENTRY_SUBTITLE("collision info"),
+    [ABOUT_ENTRY_LEVEL_BOUNDS ] = ABOUT_ENTRY_SINGLE(level_bounds,  "LEVEL BOUNDS"  ),
+    [ABOUT_ENTRY_CELL_SIZE    ] = ABOUT_ENTRY_SINGLE(cell_size,     "CELL SIZE"     ),
+    [ABOUT_ENTRY_WORLD_SCALE  ] = ABOUT_ENTRY_SINGLE(world_scale,   "WORLD SCALE"   ),
+    [ABOUT_ENTRY_ST_SURF_POOL ] = ABOUT_ENTRY_SINGLE(st_surf_pool,  "ST SURF POOL"  ),
+    [ABOUT_ENTRY_DYN_SURF_POOL] = ABOUT_ENTRY_SINGLE(dyn_surf_pool, "DYN SURF POOL" ),
 
-    [ABOUT_ENTRY_SUB_MISC      ] = ABOUT_ENTRY_SUBTITLE("misc info"),
-    [ABOUT_ENTRY_GFX_POOL_SIZE ] = ABOUT_ENTRY_SINGLE(gfx_pool_size,  "GFX POOL SIZE" ),
-    [ABOUT_ENTRY_RCVI_HACK     ] = ABOUT_ENTRY_SINGLE(rcvi_hack,      "RCVI HACK"     ),
-    [ABOUT_ENTRY_GODDARD       ] = ABOUT_ENTRY_SINGLE(goddard,        "GODDARD"       ),
-    [ABOUT_ENTRY_DEBUG_MODE    ] = ABOUT_ENTRY_SINGLE(debug_mode,     "DEBUG MODE"    ),
+    [ABOUT_ENTRY_SUB_MISC     ] = ABOUT_ENTRY_SUBTITLE("misc info"),
+    [ABOUT_ENTRY_GFX_POOL     ] = ABOUT_ENTRY_SINGLE(gfx_pool,      "GFX POOL"      ),
+    [ABOUT_ENTRY_RCVI_HACK    ] = ABOUT_ENTRY_SINGLE(rcvi_hack,     "RCVI HACK"     ),
+    [ABOUT_ENTRY_SILHOUETTE   ] = ABOUT_ENTRY_SINGLE(silhouette,    "SILHOUETTE"    ),
+    [ABOUT_ENTRY_GODDARD      ] = ABOUT_ENTRY_SINGLE(goddard,       "GODDARD"       ),
+    [ABOUT_ENTRY_RUMBLE       ] = ABOUT_ENTRY_SINGLE(rumble,        "RUMBLE"        ),
+    [ABOUT_ENTRY_DEBUG_MODE   ] = ABOUT_ENTRY_SINGLE(debug_mode,    "DEBUG MODE"    ),
 
-    [ABOUT_ENTRY_SUB_EMULATOR  ] = ABOUT_ENTRY_SUBTITLE("emulation info"),
-    [ABOUT_ENTRY_EMULATOR      ] = ABOUT_ENTRY_SINGLE(emulator,       "EMULATOR"      ),
+    [ABOUT_ENTRY_SUB_EMULATOR ] = ABOUT_ENTRY_SUBTITLE("emulation info"),
+    [ABOUT_ENTRY_EMULATOR     ] = ABOUT_ENTRY_SINGLE(emulator,       "EMULATOR"      ),
 #ifdef LIBPL
-    [ABOUT_ENTRY_GFX_PLUGIN    ] = ABOUT_ENTRY_SINGLE(gfx_plugin,     "GFX PLUGIN"    ),
-    [ABOUT_ENTRY_LAUNCHER      ] = ABOUT_ENTRY_SINGLE(launcher,       "LAUNCHER"      ),
-    [ABOUT_ENTRY_LIBPL_VERSION ] = ABOUT_ENTRY_SINGLE(libpl_version,  "LIBPL VERSION" ),
+    [ABOUT_ENTRY_GFX_PLUGIN   ] = ABOUT_ENTRY_SINGLE(gfx_plugin,    "GFX PLUGIN"    ),
+    [ABOUT_ENTRY_LAUNCHER     ] = ABOUT_ENTRY_SINGLE(launcher,      "LAUNCHER"      ),
+    [ABOUT_ENTRY_LIBPL_VERSION] = ABOUT_ENTRY_SINGLE(libpl_version, "LIBPL VERSION" ),
+    [ABOUT_ENTRY_CHEAT_FLAGS  ] = ABOUT_ENTRY_SINGLE(cheat_flags,   "CHEAT FLAGS"   ),
+    [ABOUT_ENTRY_RHDC         ] = ABOUT_ENTRY_SINGLE(rhdc,          "RHDC"          ),
 #endif // LIBPL
 };
+
 
 void page_about_init(void) {
 #ifdef LIBPL
@@ -411,7 +432,7 @@ void page_about_print(void) {
         }
         debug_printf("\n");
     }
-
+    //! TODO: Fix UNF print
 //     debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
 //     debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
 //     debug_printf("- COMPILER:\t\t%s\n",             __compiler__);
