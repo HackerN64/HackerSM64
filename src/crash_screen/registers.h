@@ -126,45 +126,35 @@ typedef union {
 } RegisterId; /*0x04*/
 
 typedef struct {
-    /*0x00*/ const char* asmReg; /*0x04*/
-    /*0x04*/ const u16 offset; /*0x01*/
-    /*0x06*/ const u8 size;
-    /*0x07*/ const char shortName[3]; /*0x03*/
-    /*0x0A*/ const char name[10]; /*0x0A*/
-} RegisterInfo; /*0x14*/
+    /*0x00*/ const u16 offset;
+    /*0x02*/ const u8 size;
+    /*0x03*/ const char shortName[3];
+    /*0x06*/ const char name[10];
+} RegisterInfo; /*0x10*/
 
-#define DEF_REG(_asmReg, _size, _offset, _name, _shortName) { \
-    .asmReg    = _asmReg,       \
-    .offset    = _offset,       \
-    .size      = _size,         \
-    .name      = _name,         \
-    .shortName = _shortName,    \
-}
 
-#define DEF_SREG(_reg, _size, _name, _shortName) {  \
-    .asmReg    = TO_STRING2(_reg),                  \
+#define DEF_SREG(_size, _name, _shortName) {  \
     .offset    = (u16)-1,                           \
     .size      = _size,                             \
     .name      = _name,                             \
     .shortName = _shortName,                        \
 }
 
-#define DEF_TREG(_reg, _field, _size, _name, _shortName) {      \
-    .asmReg    = TO_STRING2(_reg),                              \
+#define DEF_TREG(_field, _size, _name, _shortName) {      \
     .offset    = __builtin_offsetof(__OSThreadContext, _field), \
     .size      = sizeof_member(__OSThreadContext, _field),      \
     .name      = _name,                                         \
     .shortName = _shortName,                                    \
 }
 
-#define DEF_CPU_SREG(_reg, _name) DEF_SREG(_reg, sizeof(u64), _name, _name)
-#define DEF_CPU_TREG(_reg, _name) DEF_TREG(_reg, _reg, sizeof(u64), _name, _name)
+#define DEF_CPU_SREG(_reg, _name) DEF_SREG(      sizeof(u64), _name, _name)
+#define DEF_CPU_TREG(_reg, _name) DEF_TREG(_reg, sizeof(u64), _name, _name)
 
-#define DEF_COP0_SREG(_reg, _size,         _name, _shortName) DEF_SREG(_reg,         _size, _name, _shortName)
-#define DEF_COP0_TREG(_reg, _size, _field, _name, _shortName) DEF_TREG(_reg, _field, _size, _name, _shortName)
+#define DEF_COP0_SREG(_reg, _size,         _name, _shortName) DEF_SREG(        _size, _name, _shortName)
+#define DEF_COP0_TREG(_reg, _size, _field, _name, _shortName) DEF_TREG(_field, _size, _name, _shortName)
 
-#define DEF_COP1_SREG(_reg, _name) DEF_SREG(_reg,                    sizeof(f32), "F"_name, _name)
-#define DEF_COP1_TREG(_reg, _name) DEF_TREG(_reg, fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
+#define DEF_COP1_SREG(_reg, _name) DEF_SREG(                   sizeof(f32), "F"_name, _name)
+#define DEF_COP1_TREG(_reg, _name) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
 
 #define REG_BUFFER_SIZE 3
 

@@ -38,11 +38,10 @@ ALIGNED32 static const RegisterInfo sRegisters_CPU[CPU_NUM_REGISTERS] = {
 
 #define CASE_CPU_REG(_idx, _reg) CASE_REG(CPU, _idx, _reg)
 uint64_t get_cpu_reg_val(enum CPURegisters idx) {
-    //! TODO: .set noat
     uint64_t val = 0;
     switch (idx) {
-        CASE_CPU_REG(REG_CPU_R0, zero);
-        CASE_CPU_REG(REG_CPU_AT, at);
+        CASE_CPU_REG(REG_CPU_R0, zero); //! TODO: This sometimes comes out as 0x0000FFFF.
+        CASE_CPU_REG(REG_CPU_AT, at); //! TODO: .set noat
         CASE_CPU_REG(REG_CPU_V0, v0); CASE_CPU_REG(REG_CPU_V1, v1);
         CASE_CPU_REG(REG_CPU_A0, a0); CASE_CPU_REG(REG_CPU_A1, a1); CASE_CPU_REG(REG_CPU_A2, a2); CASE_CPU_REG(REG_CPU_A3, a3);
         CASE_CPU_REG(REG_CPU_T0, t0); CASE_CPU_REG(REG_CPU_T1, t1); CASE_CPU_REG(REG_CPU_T2, t2); CASE_CPU_REG(REG_CPU_T3, t3); CASE_CPU_REG(REG_CPU_T4, t4); CASE_CPU_REG(REG_CPU_T5, t5); CASE_CPU_REG(REG_CPU_T6, t6); CASE_CPU_REG(REG_CPU_T7, t7);
@@ -75,7 +74,7 @@ ALIGNED32 static const RegisterInfo sRegisters_COP0[COP0_NUM_REGISTERS] = {
     [REG_COP0_ENTRYHI  ] = DEF_COP0_SREG(C0_ENTRYHI,   sizeof(u64),           "EntryHi",   "EH"),
     [REG_COP0_COMPARE  ] = DEF_COP0_SREG(C0_COMPARE,   sizeof(u32),           "Compare",   "CP"),
     [REG_COP0_SR       ] = DEF_COP0_TREG(C0_SR,        sizeof(u32), sr,       "Status",    "SR"),
-    [REG_COP0_CAUSE    ] = DEF_COP0_TREG(C0_CAUSE,     sizeof(u32), cause,    "Cause",     "CS"),
+    [REG_COP0_CAUSE    ] = DEF_COP0_TREG(C0_CAUSE,     sizeof(u32), cause,    "Cause",     "CS"), //! TODO: Is this the same as tc->cause?
     [REG_COP0_EPC      ] = DEF_COP0_TREG(C0_EPC,       sizeof(u64), pc,       "EPC",       "PC"), //! TODO: Are pc and epc the same? They seem to be different sizes.
     [REG_COP0_PRID     ] = DEF_COP0_SREG(C0_PRID,      sizeof(u32),           "PRId",      "PR"),
     [REG_COP0_CONFIG   ] = DEF_COP0_SREG(C0_CONFIG,    sizeof(u32),           "Config",    "CF"),
