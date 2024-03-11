@@ -94,14 +94,56 @@ static const char* sFpcsrDesc[6] = {
 
 // Returns a CAUSE description from 'sCauseDesc'.
 static const char* get_cause_desc(__OSThreadContext* tc) {
-    u32 cause = tc->cause;
-    // Make the last two cause case indexes sequential for array access.
+    uint64_t badvaddr = tc->badvaddr;
+    uint32_t epc = tc->pc + ((tc->cause & 0x80000000) ? 4 : 0); //! TODO: Is this correct?
+    u32 cause = (tc->cause & CAUSE_EXCMASK);
+
     switch (cause) {
-        case EXC_WATCH: cause = 16; break; // 23 -> 16
-        case EXC_VCED:  cause = 17; break; // 31 -> 17
-        default:        cause = ((cause & CAUSE_EXCMASK) >> CAUSE_EXCSHIFT); break;
+        // Heuristics from libdragon.
+        case EXC_RMISS:
+            if (epc == (u32)badvaddr) {
+                return "Invalid program counter address";
+            } else if (badvaddr < 128) {
+                // This is probably a NULL pointer dereference, though it can go through a structure or an array,
+                // so leave some margin to the actual faulting address.
+                return "NULL pointer dereference (read)";
+            } else {
+                return "Read from invalid memory address";
+            }
+            break;
+        case EXC_WMISS:
+            if (badvaddr < 128) {
+                return "NULL pointer dereference (write)";
+            } else {
+                return "Write to invalid memory address";
+            }
+        case EXC_MOD:
+            return "Write to read-only memory";
+        case EXC_RADE:
+            if (epc == (uint32_t)badvaddr) {
+                if (is_unmapped_kx64(badvaddr)) {
+                    return "Program counter in invalid 64-bit address";
+                } else {
+                    return "Misaligned program counter address";
+                }
+            } else {
+                if (is_unmapped_kx64(badvaddr)) {
+                    return "Read from invalid 64-bit address";
+                } else {
+                    return "Misaligned read from memory";
+                }
+            }
+            break;
+        case EXC_WADE:
+            return "Misaligned write to memory";
+
+        // Make the last two cause case indexes sequential for array access.
+        case EXC_WATCH: cause = EXC_CODE(16); break; // 23 -> 16
+        case EXC_VCED:  cause = EXC_CODE(17); break; // 31 -> 17
+        // default:         break;
     }
 
+    cause >>= CAUSE_EXCSHIFT;
     if (cause < ARRAY_COUNT(sCauseDesc)) {
         return sCauseDesc[cause];
     }
@@ -282,7 +324,7 @@ void cs_draw_register_info_long(u32 x, u32 line, RegisterId reg) {
     Word data = get_reg_val(reg.cop, reg.idx);
 
     size_t charX = x + cs_print(TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"%s: "STR_COLOR_PREFIX STR_HEX_WORD" ",
-        COLOR_RGBA32_CRASH_VARIABLE, regInfo->shortName,
+        COLOR_RGBA32_CRASH_VARIABLE, ((reg.cop == COP1) ? regInfo->name : regInfo->shortName),
         COLOR_RGBA32_WHITE, data
     );
 #ifdef INCLUDE_DEBUG_MAP
@@ -316,57 +358,58 @@ void page_home_draw(void) {
 #endif // INCLUDE_DEBUG_MAP
     cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
 
+    u32 cause = (tc->cause & CAUSE_EXCMASK);
+    if (cause == EXC_FPE) {
+        cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
+    }
+
     line++;
     // cs_draw_divider(DIVIDER_Y(line));
     line++;
 
-    switch (tc->cause) {
-        case EXC_SYSCALL:
-            // ASSERT:
-            cs_draw_divider(DIVIDER_Y(line));
-            line = cs_draw_assert(line);
-            break;
-        case EXC_FPE:
-            cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
-            break;
-        default:;
-            Address addr = tc->pc;
-            Word data = 0x00000000;
-            if (try_read_data(&data, addr) && is_in_code_segment(addr)) {
-                cs_print(TEXT_X(0), TEXT_Y(line++),
-                    STR_COLOR_PREFIX"crash location:",
-                    COLOR_RGBA32_CRASH_PAGE_NAME
-                );
+    if (cause == EXC_SYSCALL) {
+        // ASSERT:
+        cs_draw_divider(DIVIDER_Y(line));
+        line = cs_draw_assert(line);
+    } else {
+        Address addr = tc->pc;
+        Word data = 0x00000000;
+        if (try_read_data(&data, addr) && is_in_code_segment(addr)) {
+            cs_print(TEXT_X(0), TEXT_Y(line++),
+                STR_COLOR_PREFIX"crash location:",
+                COLOR_RGBA32_CRASH_PAGE_NAME
+            );
 
-                cs_draw_register_info_long(1, line++, (RegisterId){ .cop = COP0, .idx = REG_COP0_EPC, });
-                // line++;
+            cs_draw_register_info_long(1, line++, (RegisterId){ .cop = COP0, .idx = REG_COP0_EPC, });
+            // line++;
 
-                cs_print(TEXT_X(0), TEXT_Y(line++),
-                    STR_COLOR_PREFIX"instruction at crash:",
-                    COLOR_RGBA32_CRASH_PAGE_NAME
-                );
+            cs_print(TEXT_X(0), TEXT_Y(line++),
+                STR_COLOR_PREFIX"instruction at crash:",
+                COLOR_RGBA32_CRASH_PAGE_NAME
+            );
 
-                // // Draw a red selection rectangle.
-                // cs_draw_rect((TEXT_X(0) - 1), (TEXT_Y(line) - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
-                // // "<-- CRASH"
-                // cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), TEXT_Y(line), STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
+            // // Draw a red selection rectangle.
+            // cs_draw_rect((TEXT_X(0) - 1), (TEXT_Y(line) - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
+            // // "<-- CRASH"
+            // cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), TEXT_Y(line), STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
 
-                // cs_draw_divider(DIVIDER_Y(line));
-                print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
-                // cs_draw_divider(DIVIDER_Y(line));
+            // cs_draw_divider(DIVIDER_Y(line));
+            print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
+            // cs_draw_divider(DIVIDER_Y(line));
 
-                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"values before instruction:", COLOR_RGBA32_CRASH_PAGE_NAME);
-                for (int i = 0; i < gSavedRegBufSize; i++) {
-                    cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
-                }
-
+            cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"values before instruction:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            for (int i = 0; i < gSavedRegBufSize; i++) {
+                cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
             }
-            break;
+        }
     }
 
-    line = (CRASH_SCREEN_NUM_CHARS_Y - 2);
-    cs_draw_divider(DIVIDER_Y(line));
-    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls", COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control);
+    u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
+    cs_draw_divider(DIVIDER_Y(endLine));
+    cs_print(TEXT_X(0), TEXT_Y(endLine),
+        STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls",
+        COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
+    );
 }
 
 void page_home_input(void) {

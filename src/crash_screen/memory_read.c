@@ -308,3 +308,36 @@ _Bool try_read_doubleword(Doubleword* dest, Address addr) {
 
     return FALSE;
 }
+
+/**
+ * @brief Return TRUE if the specified address is unmapped in 64-bit kernel space.
+ */
+_Bool is_unmapped_kx64(uint64_t vaddr) {
+    if (vaddr <= 0x000000ffffffffffull) return FALSE;
+    if (vaddr <= 0x3fffffffffffffffull) return TRUE;
+    if (vaddr <= 0x400000ffffffffffull) return FALSE;
+    if (vaddr <= 0x7fffffffffffffffull) return TRUE;
+    if (vaddr <= 0x80000000ffffffffull) return FALSE;
+    if (vaddr <= 0x87ffffffffffffffull) return TRUE;
+    if (vaddr <= 0x88000000ffffffffull) return FALSE;
+    if (vaddr <= 0x8fffffffffffffffull) return TRUE;
+    if (vaddr <= 0x90000000ffffffffull) return FALSE;
+    if (vaddr <= 0x97ffffffffffffffull) return TRUE;
+    if (vaddr <= 0x98000000ffffffffull) return FALSE;
+    if (vaddr <= 0x9fffffffffffffffull) return TRUE;
+    if (vaddr <= 0xa0000000ffffffffull) return FALSE;
+    if (vaddr <= 0xa7ffffffffffffffull) return TRUE;
+    if (vaddr <= 0xa8000000ffffffffull) return FALSE;
+    if (vaddr <= 0xafffffffffffffffull) return TRUE;
+    if (vaddr <= 0xb0000000ffffffffull) return FALSE;
+    if (vaddr <= 0xb7ffffffffffffffull) return TRUE;
+    if (vaddr <= 0xb8000000ffffffffull) return FALSE;
+    if (vaddr <= 0xbfffffffffffffffull) return TRUE;
+    if (vaddr <= 0xc00000ff7fffffffull) return FALSE;
+    if (vaddr <= 0xffffffff7fffffffull) return TRUE;
+    if (vaddr <= 0xffffffff9fffffffull) return FALSE;
+    if (vaddr <= 0xffffffffbfffffffull) return FALSE;
+    if (vaddr <= 0xffffffffdfffffffull) return FALSE;
+    if (vaddr <= 0xffffffffffffffffull) return FALSE;
+    __builtin_unreachable();
+}
