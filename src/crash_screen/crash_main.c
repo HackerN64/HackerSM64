@@ -8,11 +8,11 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "util/map_parser.h"
 #include "crash_controls.h"
 #include "crash_draw.h"
 #include "crash_pages.h"
 #include "crash_settings.h"
-#include "map_parser.h"
 
 #include "crash_main.h"
 

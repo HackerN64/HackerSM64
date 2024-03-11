@@ -5,17 +5,17 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_draw.h"
-#include "crash_main.h"
-#include "crash_settings.h"
-#include "crash_pages.h"
-#include "crash_print.h"
+#include "crash_screen/crash_draw.h"
+#include "crash_screen/crash_main.h"
+#include "crash_screen/crash_settings.h"
+#include "crash_screen/crash_pages.h"
+#include "crash_screen/crash_print.h"
 #include "map_parser.h"
 #include "registers.h"
 
 #include "insn_disasm.h"
 
-#include "pages/page_disasm.h"
+#include "crash_screen/pages/page_disasm.h"
 
 #include "engine/math_util.h"
 

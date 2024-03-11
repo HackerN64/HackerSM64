@@ -5,15 +5,15 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "crash_screen/util/insn_disasm.h"
+#include "crash_screen/util/map_parser.h"
+#include "crash_screen/util/memory_read.h"
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
 #include "crash_screen/crash_settings.h"
 #include "crash_screen/crash_pages.h"
 #include "crash_screen/crash_print.h"
-#include "crash_screen/insn_disasm.h"
-#include "crash_screen/map_parser.h"
-#include "crash_screen/memory_read.h"
 
 #include "crash_screen/popups/popup_address_select.h"
 

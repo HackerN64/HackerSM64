@@ -4,7 +4,7 @@
 #include "types.h"
 #include "asm.h"
 
-#include "crash_screen/insn_disasm.h"
+#include "crash_screen/util/insn_disasm.h"
 
 
 // Returns the address of its own call instruction.

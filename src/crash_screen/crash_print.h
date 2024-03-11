@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include "map_parser.h"
+#include "util/map_parser.h"
 
 
 // Maximum number of chars to print at once.
