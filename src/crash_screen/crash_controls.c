@@ -29,8 +29,12 @@ struct CSSetting cs_settings_group_controls[] = {
 
 const enum ControlTypes cs_cont_list_default[] = {
     CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_PAGE_SELECT,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_HIDE_CRASH_SCREEN,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif // UNF
     CONT_DESC_LIST_END,
 };
 
@@ -45,9 +49,13 @@ CSController* const gCSCompositeController = &gCSCompositeControllers[0];
 
 
 const ControlType gCSControlDescriptions[] = {
-    [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                       }, //! TODO: explain press L+R to open page select menu.
+    [CONT_DESC_SWITCH_PAGE      ] = { .control = STR_L"/"STR_R,                             .description = "switch page",                       },
+    [CONT_DESC_PAGE_SELECT      ] = { .control = STR_L"+"STR_R,                             .description = "open page select",                  },
     [CONT_DESC_SHOW_CONTROLS    ] = { .control = STR_START,                                 .description = "show/hide page controls",           },
     [CONT_DESC_HIDE_CRASH_SCREEN] = { .control = STR_Z,                                     .description = "hide crash screen",                 },
+#ifdef UNF
+    [CONT_DESC_OS_PRINT         ] = { .control = STR_Z"+"STR_START,                         .description = "print page to developer console",   },
+#endif // UNF
     [CONT_DESC_SCROLL_LIST      ] = { .control = STR_UP"/"STR_DOWN,                         .description = "scroll list",                       },
     [CONT_DESC_CURSOR           ] = { .control = STR_UP"/"STR_DOWN"/"STR_LEFT"/"STR_RIGHT,  .description = "move cursor",                       },
     [CONT_DESC_CURSOR_VERTICAL  ] = { .control = STR_UP"/"STR_DOWN,                         .description = "move cursor",                       },
@@ -60,9 +68,6 @@ const ControlType gCSControlDescriptions[] = {
     [CONT_DESC_CYCLE_FLOATS_MODE] = { .control = STR_B,                                     .description = "toggle floats mode",                },
     [CONT_DESC_CHANGE_SETTING   ] = { .control = STR_A"/"STR_B"/"STR_LEFT"/"STR_RIGHT,      .description = "change selected setting",           },
     [CONT_DESC_RESET_SETTING    ] = { .control = STR_A"+"STR_B,                             .description = "reset selected setting to default", },
-#ifdef UNF
-    [CONT_DESC_OS_PRINT         ] = { .control = STR_Z"+"STR_START,                         .description = "print page to developer console",   },
-#endif // UNF
 };
 
 

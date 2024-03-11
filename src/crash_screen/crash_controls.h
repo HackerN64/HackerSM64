@@ -61,8 +61,12 @@ typedef union CrashScreenDirections {
 enum ControlTypes {
     CONT_DESC_LIST_END = -1,
     CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_PAGE_SELECT,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_HIDE_CRASH_SCREEN,
+#ifdef UNF
+    CONT_DESC_OS_PRINT,
+#endif // UNF
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_CURSOR,
     CONT_DESC_CURSOR_VERTICAL,
@@ -75,9 +79,6 @@ enum ControlTypes {
     CONT_DESC_CYCLE_FLOATS_MODE,
     CONT_DESC_CHANGE_SETTING,
     CONT_DESC_RESET_SETTING,
-#ifdef UNF
-    CONT_DESC_OS_PRINT,
-#endif // UNF
     NUM_CONT_DESC,
 };
 

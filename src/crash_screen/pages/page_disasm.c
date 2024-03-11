@@ -55,6 +55,7 @@ struct CSSetting cs_settings_group_page_disasm[] = {
 
 const enum ControlTypes cs_cont_list_disasm[] = {
     CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_PAGE_SELECT,
     CONT_DESC_SHOW_CONTROLS,
     CONT_DESC_HIDE_CRASH_SCREEN,
 #ifdef UNF
