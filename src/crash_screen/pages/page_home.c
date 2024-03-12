@@ -41,6 +41,7 @@ const enum ControlTypes cs_cont_list_home[] = {
 #ifdef UNF
     CONT_DESC_OS_PRINT,
 #endif // UNF
+    CONT_DESC_CYCLE_FLOATS_MODE,
     CONT_DESC_LIST_END,
 };
 
@@ -57,7 +58,7 @@ void cs_print_fpe_cause(u32 x, u32 y, u32 fpcsr) {
     );
     x += TEXT_WIDTH(charX);
 
-    const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
+    const char* fpcsrDesc = get_fpcsr_desc(fpcsr, TRUE);
     if (fpcsrDesc != NULL) {
         // "([float exception description])"
         cs_print(x, y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);
@@ -197,11 +198,11 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
 #ifdef INCLUDE_DEBUG_MAP
         const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            size_t offsetStrSize = STRLEN("+0000");
+            size_t offsetStrSize = STRLEN("+0000 ");
             size_t endX = CRASH_SCREEN_NUM_CHARS_X;
             cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
             cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
-                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
+                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
                 COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
             );
         }
@@ -211,29 +212,8 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
 
 void page_home_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
-    u32 line = 1;
-
-    line++;
-
-    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
-    size_t len = STRLEN("CRASH AT:");
-    cs_print(TEXT_X(centerX - (len / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"CRASH AT:", COLOR_RGBA32_RED);
-    line++;
-
-    cs_print_crashed_thread(TEXT_X(0), TEXT_Y(line++));
-#ifdef INCLUDE_DEBUG_MAP
-    cs_print_func(TEXT_X(0), TEXT_Y(line++), tc);
-#endif // INCLUDE_DEBUG_MAP
-    cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
-
     u32 cause = (tc->cause & CAUSE_EXCMASK);
-    if (cause == EXC_FPE) {
-        cs_print_fpe_cause(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
-    }
-
-    line++;
-    // cs_draw_divider(DIVIDER_Y(line));
-    line++;
+    u32 line = 9;
 
     if (cause == EXC_SYSCALL) {
         // ASSERT:
@@ -272,6 +252,23 @@ void page_home_draw(void) {
         }
     }
 
+    line = 2;
+
+    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
+    size_t len = STRLEN("CRASH AT:");
+    cs_print(TEXT_X(centerX - (len / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"CRASH AT:", COLOR_RGBA32_RED);
+    line++;
+
+    cs_print_crashed_thread(TEXT_X(0), TEXT_Y(line++));
+#ifdef INCLUDE_DEBUG_MAP
+    cs_print_func(TEXT_X(0), TEXT_Y(line++), tc);
+#endif // INCLUDE_DEBUG_MAP
+    cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
+
+    if (cause == EXC_FPE) {
+        cs_print_fpe_cause(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
+    }
+
     u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
     cs_draw_divider(DIVIDER_Y(endLine));
     cs_print(TEXT_X(0), TEXT_Y(endLine),
@@ -281,7 +278,10 @@ void page_home_draw(void) {
 }
 
 void page_home_input(void) {
-
+    if (gCSCompositeController->buttonPressed & B_BUTTON) {
+        // Cycle floats print mode.
+        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
+    }
 }
 
 void page_home_print(void) {
@@ -320,7 +320,7 @@ void page_home_print(void) {
     // FPCSR:
     u32 fpcsr = tc->fpcsr;
     debug_printf("- FPCSR: "STR_HEX_WORD, fpcsr);
-    const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
+    const char* fpcsrDesc = get_fpcsr_desc(fpcsr, FALSE);
     if (fpcsrDesc != NULL) {
         debug_printf(" (%s)", fpcsrDesc);
     }

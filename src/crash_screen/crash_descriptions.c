@@ -29,7 +29,7 @@ static const ThreadIDName sThreadIDNames[] = {
     { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
 };
 
-static const char* sCauseDesc[18] = {
+static const char* sCauseDesc[NUM_CAUSE_DESC] = {
     [CAUSE_DESC_INT    ] = "Interrupt",
     [CAUSE_DESC_MOD    ] = "TLB modification",
     [CAUSE_DESC_RMISS  ] = "TLB exception on load or inst.",
@@ -50,7 +50,7 @@ static const char* sCauseDesc[18] = {
     [CAUSE_DESC_VCED   ] = "Virtual coherency on data",
 };
 
-static const char* sFpcsrDesc[6] = {
+static const char* sFpcsrDesc[NUM_FPCSR_DESC] = {
     [FPCSR_DESC_CE] = "Unimplemented operation",
     [FPCSR_DESC_CV] = "Invalid operation",
     [FPCSR_DESC_CZ] = "Division by zero",
@@ -59,6 +59,11 @@ static const char* sFpcsrDesc[6] = {
     [FPCSR_DESC_CI] = "Inexact operation",
 };
 
+static const char* sFltErrDesc[NUM_FLT_ERR] = {
+    [FLT_ERR_NONE  ] = "",
+    [FLT_ERR_DENORM] = "Denormalized float",
+    [FLT_ERR_NAN   ] = "NaN float",
+};
 
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc) {
@@ -106,8 +111,8 @@ const char* get_cause_desc(__OSThreadContext* tc) {
             return "Misaligned write to memory";
 
         // Make the last two "cause" case indexes sequential for array access.
-        case EXC_WATCH: cause = EXC_CODE(16); break; // 23 -> 16
-        case EXC_VCED:  cause = EXC_CODE(17); break; // 31 -> 17
+        case EXC_WATCH: cause = EXC_CODE(CAUSE_DESC_WATCH); break; // 23 -> 16
+        case EXC_VCED:  cause = EXC_CODE(CAUSE_DESC_VCED ); break; // 31 -> 17
     }
 
     cause >>= CAUSE_EXCSHIFT;
@@ -119,32 +124,41 @@ const char* get_cause_desc(__OSThreadContext* tc) {
     return NULL;
 }
 
-_Bool check_for_denorms(void) {
-    for (int j = 0; j < gSavedRegBufSize; j++) {
-        RegisterId reg = gSavedRegBuf[j];
+//! TODO: NaN floats aren't detected here even though validate_float does, and this works with denorms.
+enum FloatErrorType validate_floats_in_reg_buffer(void) {
+    enum FloatErrorType fltErrType = FLT_ERR_NONE;
+
+    for (int i = 0; i < gSavedRegBufSize; i++) {
+        RegisterId reg = gSavedRegBuf[i];
 
         if (reg.cop == COP1) {
             IEEE754_f32 val = {
                 .asU32 = get_reg_val(reg.cop, reg.idx)
             };
+            fltErrType = validate_float(val);
 
-            if (validate_float(val) == FLT_ERR_DENORM) {
-                return TRUE;
+            if (fltErrType != FLT_ERR_NONE) {
+                break;
             }
         }
     }
 
-    return FALSE;
+    return fltErrType;
 }
 
 // Returns a FPCSR description from 'sFpcsrDesc'.
-const char* get_fpcsr_desc(u32 fpcsr) {
+// Only use 'checkSpecial' if disasm has just been run.
+const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial) {
     u32 bit = BIT(FPCSR_SHIFT);
 
-    for (u32 i = 0; i < ARRAY_COUNT(sFpcsrDesc); i++) {
+    for (u32 i = 0; i < NUM_FPCSR_DESC; i++) {
         if (fpcsr & bit) {
-            if ((i == FPCSR_DESC_CE) && check_for_denorms()) {
-                return "Denormalized float";
+            if (checkSpecial && (i == FPCSR_DESC_CE)) {
+                enum FloatErrorType fltErrType = validate_floats_in_reg_buffer();
+
+                if (fltErrType != FLT_ERR_NONE) {
+                    return sFltErrDesc[fltErrType];
+                }
             }
 
             return sFpcsrDesc[i];

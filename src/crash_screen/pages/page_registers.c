@@ -123,7 +123,7 @@ void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
     );
     x += TEXT_WIDTH(fpcsrSize);
 
-    const char* fpcsrDesc = get_fpcsr_desc(fpcsr);
+    const char* fpcsrDesc = get_fpcsr_desc(fpcsr, FALSE);
     if (fpcsrDesc != NULL) {
         // "([float exception description])"
         cs_print(x, y, STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);

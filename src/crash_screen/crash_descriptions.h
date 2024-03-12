@@ -27,6 +27,7 @@ enum CauseDescriptions {
     CAUSE_DESC_FPE     = (EXC_FPE     >> CAUSE_EXCSHIFT),
     CAUSE_DESC_WATCH   = 16, // (EXC_WATCH   >> CAUSE_EXCSHIFT),
     CAUSE_DESC_VCED    = 17, // (EXC_VCED    >> CAUSE_EXCSHIFT),
+    NUM_CAUSE_DESC,
 };
 
 #define FPCSR_SHIFT 17
@@ -40,6 +41,7 @@ enum FPCSRDescriptions {
     FPCSR_DESC_CO = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CO >> FPCSR_SHIFT_2)), // Overflow.
     FPCSR_DESC_CU = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CU >> FPCSR_SHIFT_2)), // Underflow.
     FPCSR_DESC_CI = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CI >> FPCSR_SHIFT_2)), // Inexact operation.
+    NUM_FPCSR_DESC,
 };
 
 
@@ -51,4 +53,4 @@ typedef struct ThreadIDName {
 
 const char* get_cause_desc(__OSThreadContext* tc);
 const char* get_thread_name_from_id(enum ThreadID threadID);
-const char* get_fpcsr_desc(u32 fpcsr);
+const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial);

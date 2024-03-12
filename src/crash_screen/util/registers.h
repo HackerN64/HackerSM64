@@ -69,16 +69,6 @@ enum COP0Registers {
     COP0_NUM_REGISTERS,
 };
 
-// tc->cause register.
-typedef union {
-    struct PACKED {
-        u32 delaySlot :  1; // Exception triggered in delay slot.
-        u32 cop_num   :  2; // Coprocessor_exception.
-        u32           : 24;
-        u32 exc_code  :  5; // Exception Code.
-    };
-    u32 raw;
-} Reg_CauseT;
 
 // $Status register.
 typedef union {
@@ -117,6 +107,17 @@ typedef union {
     };
     u32 raw;
 } Reg_Cause;
+
+// tc->cause register.
+typedef union {
+    struct PACKED {
+        u32 delaySlot :  1; // Exception triggered in delay slot.
+        u32 cop_num   :  2; // Coprocessor_exception.
+        u32           : 24;
+        u32 exc_code  :  5; // Exception Code.
+    };
+    u32 raw;
+} Reg_CauseT;
 
 // tc->fpcsr register.
 typedef union {
@@ -183,6 +184,7 @@ enum FloatErrorType {
     FLT_ERR_NONE,
     FLT_ERR_DENORM,
     FLT_ERR_NAN,
+    NUM_FLT_ERR,
 };
 
 

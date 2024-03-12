@@ -431,8 +431,8 @@ void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
 
 static const FloatPrefix sFltErrFmt[] = {
     [FLT_ERR_NONE  ] = { .r = 0xFF, .g = 0xFF, .b = 0xFF, .prefixChar = CHAR_FLT_PREFIX_NULL,   .suffix = "",             },
-    [FLT_ERR_DENORM] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_DENORM, .suffix = "denormalized", },
-    [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x00, .b = 0x00, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
+    [FLT_ERR_DENORM] = { .r = 0xFF, .g = 0xBF, .b = 0xBF, .prefixChar = CHAR_FLT_PREFIX_DENORM, .suffix = "denormalized", },
+    [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
 };
 
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {

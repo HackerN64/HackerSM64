@@ -170,7 +170,7 @@ static const RegisterInfo* sRegisters[] = {
 };
 
 
-RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
+RegisterId gSavedRegBuf[REG_BUFFER_SIZE]; // The 3 registers from the last cs_insn_to_string().
 int gSavedRegBufSize = 0;
 
 
