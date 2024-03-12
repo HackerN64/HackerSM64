@@ -415,7 +415,8 @@ typedef union InsnData {
 typedef struct PACKED InsnTemplate {
     /*0x00*/ char name[8];
     /*0x08*/ char fmt[4 + 1]; // 4 chars + null terminator (see CHAR_P_* defines).
-    /*0x0D*/ u8 pad[2];
+    /*0x0D*/ u8 out; // Output register index in fmt. 0 = no output (first char is always insn name format). 8 = HiLo (TODO). 9 = Link Register
+    /*0x0E*/ u8 pad[1];
     /*0x0F*/ u8 opcode;
 } InsnTemplate; /*0x10*/
 
