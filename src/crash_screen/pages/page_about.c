@@ -153,8 +153,8 @@ const char* get_emulator_name(enum Emulator emu) {
 }
 
 const char gValNames_no_yes[][4] = {
-    [FALSE] = "NO",
-    [TRUE ] = "YES",
+    [FALSE] = "no",
+    [TRUE ] = "yes",
 };
 
 extern const u8 gRomSize[];
@@ -169,7 +169,7 @@ const _Bool sDebugMode = FALSE;
 #endif // !UNF
 
 
-#define ABOUT_ENTRY_FUNC(_name, fmt, ...) void about_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
+#define ABOUT_ENTRY_FUNC(_name, fmt, ...) void cs_about_func_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
 
 ABOUT_ENTRY_FUNC(empty,          "")
 ABOUT_ENTRY_FUNC(hackersm64_v,   HackerSM64_version_txt)
@@ -186,7 +186,17 @@ ABOUT_ENTRY_FUNC(region,         "%s (%s)", region_name, osTvTypeStrings[osTvTyp
 #endif //! LIBDRAGON
 ABOUT_ENTRY_FUNC(save_type,      savetype_name)
 ABOUT_ENTRY_FUNC(compression,    compression_name)
-ABOUT_ENTRY_FUNC(rom_size,       "%i bytes", (size_t)gRomSize)
+void cs_about_func_symbols(char* buf) {
+#ifdef INCLUDE_DEBUG_MAP
+    size_t numSymbols = (gMapSymbolsEnd - gMapSymbols);
+    size_t numBytes = ((Address)_mapDataSegmentRomEnd - (Address)_mapDataSegmentRomStart);
+    size_t percentOfRom = (size_t)gRomSize / numBytes;
+    sprintf(buf, "%i (%ib %i%%rom)", numSymbols, numBytes, percentOfRom);
+#else  // !INCLUDE_DEBUG_MAP
+    sprintf(buf, "NOT INCLUDED");
+#endif // !INCLUDE_DEBUG_MAP
+}
+ABOUT_ENTRY_FUNC(rom_size,       "%ib", (size_t)gRomSize)
 ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
 ABOUT_ENTRY_FUNC(gfx_pool,       STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X", (((u32)gDisplayListHead - ((u32)gGfxPool->buffer)) / sizeof(u32)), GFX_POOL_SIZE)
 ABOUT_ENTRY_FUNC(st_surf_pool,   STR_HEX_PREFIX"%X", ((u32)gCurrStaticSurfacePoolEnd - (u32)gCurrStaticSurfacePool))
@@ -210,9 +220,19 @@ ABOUT_ENTRY_FUNC(rumble,         "%s%s", gValNames_no_yes[sRumblePakThreadActive
 #else // !ENABLE_RUMBLE
 ABOUT_ENTRY_FUNC(rumble,         gValNames_no_yes[FALSE])
 #endif // !ENABLE_RUMBLE
-ABOUT_ENTRY_FUNC(debug_mode,     "%s%s", gValNames_no_yes[sDebugMode], (debug_is_initialized() ? " +unf" : ""))
+void cs_about_func_debug_mode(char* buf) {
+    sprintf(buf, "%s%s%s",
+        gValNames_no_yes[sDebugMode],
+#ifdef PUPPYPRINT_DEBUG
+        " +ppdebug",
+#else // !PUPPYPRINT_DEBUG
+        "",
+#endif // !PUPPYPRINT_DEBUG
+        (debug_is_initialized() ? " +unf" : "")
+    );
+}
 #ifdef LIBPL
-void about_emulator(char* buf) {
+void cs_about_func_emulator(char* buf) {
     if (gSupportsLibpl) {
         const lpl_version* v = libpl_get_core_version();
         sprintf(buf, "%s v%d.%d.%d", get_emulator_name(gEmulator), v->major, v->minor, v->patch);
@@ -221,12 +241,12 @@ void about_emulator(char* buf) {
     }
 }
 ABOUT_ENTRY_FUNC(gfx_plugin,     libpl_get_graphics_plugin()->name);
-void about_launcher(char* buf) {
+void cs_about_func_launcher(char* buf) {
     const lpl_version* v = libpl_get_launcher_version();
     sprintf(buf, "v%d.%d.%d", v->major, v->minor, v->patch);
 }
 ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
-void about_cheat_flags(char* buf) {
+void cs_about_func_cheat_flags(char* buf) {
     lpl_cheat_flags cheatFlags = libpl_get_cheat_flags();
     sprintf(buf, "%s%s%s%s%s",
         (cheatFlags & LPL_USED_CHEATS       ) ? "[gs]" : "",
@@ -247,12 +267,12 @@ char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][LONG_INFO_BUFFER_LENGTH];
 u32 gLongInfoBufferIndex = 0;
 
 
-#define ABOUT_ENTRY_GAP()                  { .desc = "",    .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
-#define ABOUT_ENTRY_TITLE(_name, _desc)    { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
-#define ABOUT_ENTRY_SUBTITLE(_desc)        { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
-#define ABOUT_ENTRY_SINGLE(_name, _desc)   { .desc = _desc, .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
-#define ABOUT_ENTRY_LONG1(_name, _desc)    { .desc = _desc, .func = NULL,          .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
-#define ABOUT_ENTRY_LONG2(_name, _desc)    { .desc = "",    .func = about_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
+#define ABOUT_ENTRY_GAP()                  { .desc = "",    .func = NULL,                  .info = "", .type = ABOUT_ENTRY_TYPE_NONE,     }
+#define ABOUT_ENTRY_TITLE(_name, _desc)    { .desc = _desc, .func = cs_about_func_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_TITLE,    }
+#define ABOUT_ENTRY_SUBTITLE(_desc)        { .desc = _desc, .func = NULL,                  .info = "", .type = ABOUT_ENTRY_TYPE_SUBTITLE, }
+#define ABOUT_ENTRY_SINGLE(_name, _desc)   { .desc = _desc, .func = cs_about_func_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
+#define ABOUT_ENTRY_LONG1(_name, _desc)    { .desc = _desc, .func = NULL,                  .info = "", .type = ABOUT_ENTRY_TYPE_SINGLE,   }
+#define ABOUT_ENTRY_LONG2(_name, _desc)    { .desc = "",    .func = cs_about_func_##_name, .info = "", .type = ABOUT_ENTRY_TYPE_LONG,     }
 AboutEntry sAboutEntries[] = {
     // [ABOUT_ENTRY_GAP_1        ] = ABOUT_ENTRY_GAP(),
     [ABOUT_ENTRY_HACKERSM64   ] = ABOUT_ENTRY_TITLE(hackersm64_v,   "HackerSM64"    ),
@@ -266,12 +286,13 @@ AboutEntry sAboutEntries[] = {
     // [ABOUT_ENTRY_GAP_2        ] = ABOUT_ENTRY_GAP(),
 
     [ABOUT_ENTRY_SUB_ROM      ] = ABOUT_ENTRY_SUBTITLE("rom info"),
-    [ABOUT_ENTRY_ROM_NAME     ] = ABOUT_ENTRY_SINGLE(rom_name,      "ROM NAME"      ), //! TODO: Fix this
+    [ABOUT_ENTRY_ROM_NAME     ] = ABOUT_ENTRY_SINGLE(rom_name,      "ROM NAME"      ),
     [ABOUT_ENTRY_LIBULTRA     ] = ABOUT_ENTRY_SINGLE(libultra,      "LIBULTRA"      ),
     [ABOUT_ENTRY_MICROCODE    ] = ABOUT_ENTRY_SINGLE(microcode,     "MICROCODE"     ),
     [ABOUT_ENTRY_REGION       ] = ABOUT_ENTRY_SINGLE(region,        "REGION"        ),
     [ABOUT_ENTRY_SAVE_TYPE    ] = ABOUT_ENTRY_SINGLE(save_type,     "SAVE TYPE"     ),
     [ABOUT_ENTRY_COMPRESSION  ] = ABOUT_ENTRY_SINGLE(compression,   "COMPRESSION"   ),
+    [ABOUT_ENTRY_SYMBOLS      ] = ABOUT_ENTRY_SINGLE(symbols,       "MAP SYMBOLS"   ),
     [ABOUT_ENTRY_ROM_SIZE     ] = ABOUT_ENTRY_SINGLE(rom_size,      "ROM SIZE"      ),
     [ABOUT_ENTRY_RAM_SIZE     ] = ABOUT_ENTRY_SINGLE(ram_size,      "RAM SIZE"      ),
 

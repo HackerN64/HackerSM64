@@ -1,5 +1,7 @@
 import sys, struct, subprocess
 
+onlyRDRAM = True
+
 class MapSymbol():
 	def __init__(self, addr, size, name, type, errc):
 		self.addr = addr # Symbol address (32 bits).
@@ -35,8 +37,8 @@ for line in symbols:
 		addr = int(tokens[0], 16)
 		# Error char.
 		errc = ord('\0')
-		# Skip non-RDRAM addresses.
-		if (addr & 0x80000000):
+		# Skip non-RDRAM addresses if onlyRDRAM is True.
+		if (not onlyRDRAM or (addr & 0x80000000)):
 			# If this is not the first entry...
 			if symNames:
 				# Get the previous entry.
