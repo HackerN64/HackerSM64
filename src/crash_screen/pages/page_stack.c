@@ -201,10 +201,12 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 // SP address: function name
 void page_stack_draw(void) {
     u32 line = 1;
+    u32 charX = 0;
 
-    cs_print(TEXT_X(0), TEXT_Y(line), "IN STACK:");
-
-    u32 charX = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES) ? STRLEN("00000000:") : 0;
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES)) {
+        cs_print(TEXT_X(0), TEXT_Y(line), "IN STACK:");
+        charX = STRLEN("00000000:");
+    }
 
     cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"FUNCTION:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
 

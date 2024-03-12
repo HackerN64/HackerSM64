@@ -131,6 +131,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 
 void page_map_draw(void) {
     u32 line = 1;
+    u32 charX = 0;
     _Bool showAddr = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
     _Bool showType = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES);
     _Bool showSize = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES);
@@ -138,9 +139,10 @@ void page_map_draw(void) {
     if (showAddr) {
         // "ADDRESS:"
         cs_print(TEXT_X(0), TEXT_Y(line), "ADDRESS:");
+        charX = STRLEN("00000000:");
     }
 
-    cs_print(TEXT_X(STRLEN("00000000:")), TEXT_Y(line), STR_COLOR_PREFIX"NAME:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
+    cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"NAME:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
 
     size_t sizeStrSize = 0;
     if (showSize) {

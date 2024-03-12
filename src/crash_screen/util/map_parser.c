@@ -8,7 +8,7 @@
 
 
 //! TODO: Use nm map symbol data to get this info?
-
+//! TODO: Get this to work with stuff like bhv names.
 ALIGNED8 static const MemoryRegion sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)

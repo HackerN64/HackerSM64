@@ -26,7 +26,7 @@ void cs_popup_pages_draw(void) {
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
-        CS_DARKEN_SEVEN_EIGHTHS
+        cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_POPUP_OPACITY)
     );
 
     CSPopup* currPopup = cs_get_current_popup();
