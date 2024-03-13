@@ -246,7 +246,7 @@ void page_home_draw(void) {
             print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
             // cs_draw_divider(DIVIDER_Y(line));
 
-            cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"values before instruction:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction input values:", COLOR_RGBA32_CRASH_PAGE_NAME);
             for (int i = 0; i < gSavedRegBufSize; i++) {
                 cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
             }
@@ -350,8 +350,9 @@ void page_home_print(void) {
         if (__n64Assert_Message   != NULL) {
             debug_printf("-- MESSAGE: %s\n", __n64Assert_Message);
         }
+    } else {
+        //! TODO: Disasm and registers.
     }
-    //! TODO: Disasm and registers.
 #endif // UNF
 }
 

@@ -44,9 +44,11 @@ const enum ControlTypes cs_cont_list_registers[] = {
 };
 
 
-//! TODO: Re-add "MM"?
+#define REG_LIST_TERMINATOR (u32)-1
+
 #define LIST_REG(_cop, _idx) { .cop = _cop, .idx = _idx, }
-static const RegisterId sRegList[32] = {
+#define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
+static const RegisterId sRegList[32 + 1] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
     LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
     LIST_REG(CPU, REG_CPU_A0), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
@@ -57,7 +59,7 @@ static const RegisterId sRegList[32] = {
     LIST_REG(CPU, REG_CPU_S3), LIST_REG(CPU, REG_CPU_S4), LIST_REG(CPU, REG_CPU_S5),
     LIST_REG(CPU, REG_CPU_S6), LIST_REG(CPU, REG_CPU_S7), LIST_REG(CPU, REG_CPU_T8),
     LIST_REG(CPU, REG_CPU_T9), LIST_REG(CPU, REG_CPU_GP), LIST_REG(CPU, REG_CPU_SP),
-    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA),
+    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA), LIST_REG_END(),
 };
 
 
@@ -98,12 +100,17 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 u32 cs_registers_print_registers(u32 line) {
     const size_t columnWidth = 15;
     const u32 columns = 3;
-    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
+    const u32 rows = ((ARRAY_COUNT(sRegList) / columns) + 1);
     const RegisterId* reg = sRegList;
 
     for (u32 y = 0; y < rows; y++) {
         for (u32 x = 0; x < columns; x++) {
+            if (reg->raw == REG_LIST_TERMINATOR) {
+                break;
+            }
+
             const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
+
             if (regInfo != NULL) {
                 cs_registers_print_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regInfo->shortName, get_reg_val(reg->cop, reg->idx));
             }
@@ -206,15 +213,21 @@ void page_registers_print(void) {
 
     // Thread registers:
     const u32 columns = 3;
-    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
+    const u32 rows = ((ARRAY_COUNT(sRegList) / columns) + 1);
     const RegisterId* reg = sRegList;
     for (u32 y = 0; y < rows; y++) {
         debug_printf("- ");
         for (u32 x = 0; x < columns; x++) {
+            if (reg->raw == REG_LIST_TERMINATOR) {
+                break;
+            }
+
             const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
+
             if (regInfo != NULL) {
                 debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));   
             }
+
             reg++;
         }
         debug_printf("\n");

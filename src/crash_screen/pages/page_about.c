@@ -414,7 +414,7 @@ void cs_print_about_entry(u32 y, s16 groupID, s16 entryID) {
                     cs_print(x, y,
                         STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",
                         COLOR_RGBA32_CRASH_SELECT_ARROW,
-                        COLOR_RGBA32_WHITE, entry->desc,
+                        COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION, entry->desc,
                         COLOR_RGBA32_CRASH_SELECT_ARROW
                     );
                 } else {
