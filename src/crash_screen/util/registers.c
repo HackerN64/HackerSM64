@@ -170,7 +170,8 @@ static const RegisterInfo* sRegisters[] = {
 };
 
 
-RegisterId gSavedRegBuf[REG_BUFFER_SIZE]; // The 3 registers from the last cs_insn_to_string().
+// A buffer to save registers to. Used by cs_insn_to_string().
+RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 int gSavedRegBufSize = 0;
 
 

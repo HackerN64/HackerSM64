@@ -272,16 +272,16 @@ static const InsnTemplate* insn_db_cop_lists[][0b11 + 1] = {
 // Pseudo-instructions
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
     [PSEUDO_NOP  ] = { .name = "NOP"  , .fmt = "_"    , .out = 0, .opcode = OPS_SLL   }, // NOP (pseudo of SLL).
-    [PSEUDO_MOVET] = { .name = "MOVE" , .fmt = "\'dt" , .out = 0, .opcode = OPS_ADD   }, // Move (pseudo of ADD and OR).
-    [PSEUDO_MOVES] = { .name = "MOVE" , .fmt = "\'ds" , .out = 0, .opcode = OPS_ADD   }, // Move (pseudo of ADD).
+    [PSEUDO_MOVET] = { .name = "MOVE" , .fmt = "\'dt" , .out = 1, .opcode = OPS_ADD   }, // Move (pseudo of ADD and OR).
+    [PSEUDO_MOVES] = { .name = "MOVE" , .fmt = "\'ds" , .out = 1, .opcode = OPS_ADD   }, // Move (pseudo of ADD).
     [PSEUDO_B    ] = { .name = "B"    , .fmt = "\'B"  , .out = 0, .opcode = OPC_BEQ   }, // Branch (pseudo of BEQ).
     [PSEUDO_BEQZ ] = { .name = "BEQZ" , .fmt = "\'sB" , .out = 0, .opcode = OPC_BEQ   }, // Branch on Equal to Zero (pseudo of BEQ).
     [PSEUDO_BNEZ ] = { .name = "BNEZ" , .fmt = "\'sB" , .out = 0, .opcode = OPC_BNE   }, // Branch on Not Equal to Zero (pseudo of BNE).
-    [PSEUDO_LI   ] = { .name = "LI"   , .fmt = "\'tI" , .out = 0, .opcode = OPC_ADDI  }, // Load Immediate (pseudo of ADDI and ADDIU).
-    [PSEUDO_SUBI ] = { .name = "SUBI" , .fmt = "\'tsi", .out = 0, .opcode = OPC_ADDI  }, // Subtract Immediate Word (pseudo of ADDI).
+    [PSEUDO_LI   ] = { .name = "LI"   , .fmt = "\'tI" , .out = 1, .opcode = OPC_ADDI  }, // Load Immediate (pseudo of ADDI and ADDIU).
+    [PSEUDO_SUBI ] = { .name = "SUBI" , .fmt = "\'tsi", .out = 1, .opcode = OPC_ADDI  }, // Subtract Immediate Word (pseudo of ADDI).
     [PSEUDO_BEQZL] = { .name = "BEQZL", .fmt = "\'sB" , .out = 0, .opcode = OPC_BEQL  }, // Branch on Equal to Zero Likely (pseudo of BEQL).
     [PSEUDO_BNEZL] = { .name = "BNEZL", .fmt = "\'sB" , .out = 0, .opcode = OPC_BNEL  }, // Branch on Not Equal to Zero Likely (pseudo of BNEL).
-    [PSEUDO_DSUBI] = { .name = "DSUBI", .fmt = "\'tsi", .out = 0, .opcode = OPC_DADDI }, // Doubleword Subtract Immediate (pseudo of DADDI).
+    [PSEUDO_DSUBI] = { .name = "DSUBI", .fmt = "\'tsi", .out = 1, .opcode = OPC_DADDI }, // Doubleword Subtract Immediate (pseudo of DADDI).
 };
 
 

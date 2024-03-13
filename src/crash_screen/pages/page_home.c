@@ -248,7 +248,21 @@ void page_home_draw(void) {
 
             cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction input values:", COLOR_RGBA32_CRASH_PAGE_NAME);
             for (int i = 0; i < gSavedRegBufSize; i++) {
-                cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
+                RegisterId reg = gSavedRegBuf[i];
+                _Bool skip = FALSE;
+
+                if (i > 0) {
+                    for (int j = 0; j < i; j++) { // Check all previous registers for duplicates.
+                        if (reg.raw == gSavedRegBuf[i - 1].raw) {
+                            skip = TRUE;
+                            break;
+                        }
+                    }
+                }
+
+                if (!skip) {
+                    cs_draw_register_info_long(1, line++, reg);
+                }
             }
         }
     }
