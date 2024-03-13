@@ -339,6 +339,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             if (unkAsBinary) {
                 // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
                 print_as_binary(charX, charY, data, COLOR_RGBA32_WHITE);
+                // cs_print(charX, charY, "%032b", data);
             } else {
                 // "[XXXXXXXX]"
                 cs_print(charX, charY, STR_HEX_WORD, data);
