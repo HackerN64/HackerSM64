@@ -17,6 +17,7 @@
 #include "page_registers.h"
 
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 
@@ -45,7 +46,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
 
 //! TODO: Re-add "MM"?
 #define LIST_REG(_cop, _idx) { .cop = _cop, .idx = _idx, }
-static const RegisterId sRegList[32 +2] = {
+static const RegisterId sRegList[32] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
     LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
     LIST_REG(CPU, REG_CPU_A0), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
@@ -56,7 +57,7 @@ static const RegisterId sRegList[32 +2] = {
     LIST_REG(CPU, REG_CPU_S3), LIST_REG(CPU, REG_CPU_S4), LIST_REG(CPU, REG_CPU_S5),
     LIST_REG(CPU, REG_CPU_S6), LIST_REG(CPU, REG_CPU_S7), LIST_REG(CPU, REG_CPU_T8),
     LIST_REG(CPU, REG_CPU_T9), LIST_REG(CPU, REG_CPU_GP), LIST_REG(CPU, REG_CPU_SP),
-    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA), LIST_REG(CPU, REG_CPU_K0), LIST_REG(CPU, REG_CPU_K1),
+    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA),
 };
 
 

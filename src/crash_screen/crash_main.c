@@ -21,6 +21,7 @@
 #include "buffers/zbuffer.h"
 #include "game/main.h"
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 

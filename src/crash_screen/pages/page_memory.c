@@ -16,6 +16,7 @@
 #include "page_memory.h"
 
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 
@@ -228,7 +229,7 @@ void page_memory_draw(void) {
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
         (sRamViewViewportIndex - VIRTUAL_RAM_START),
-        COLOR_RGBA32_CRASH_DIVIDER, TRUE
+        COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
     );
 
     // Scroll bar crash position marker:

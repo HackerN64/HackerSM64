@@ -20,6 +20,7 @@
 #include "page_disasm.h"
 
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 
@@ -426,7 +427,7 @@ void page_disasm_draw(void) {
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
         (sDisasmViewportIndex - VIRTUAL_RAM_START),
-        COLOR_RGBA32_CRASH_DIVIDER, TRUE
+        COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
     );
 
     // Scroll bar crash position marker:

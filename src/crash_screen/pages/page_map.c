@@ -18,6 +18,7 @@
 #include "page_map.h"
 
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 
@@ -167,7 +168,12 @@ void page_map_draw(void) {
 
     // Scroll Bar:
     if (gNumMapSymbols > MAP_VIEWER_NUM_ROWS) {
-        cs_draw_scroll_bar((DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y), MAP_VIEWER_NUM_ROWS, gNumMapSymbols, sMapViewerViewportIndex, COLOR_RGBA32_CRASH_DIVIDER, TRUE);
+        cs_draw_scroll_bar(
+            (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
+            MAP_VIEWER_NUM_ROWS, gNumMapSymbols,
+            sMapViewerViewportIndex,
+            COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
+        );
 
         cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
     }

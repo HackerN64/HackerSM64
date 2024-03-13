@@ -115,13 +115,18 @@ typedef struct PACKED {
     union {
         /*0x08*/ char info[27];             // Buffer for the info data. If type == CS_ABOUT_ENTRY_TYPE_LONG, uses a different, longer buffer, 
         struct PACKED {
-            u8 pad[25];
-            _Bool canExpand;
+            u8 pad[26];
             _Bool expanded;
         } flags;
     };
     /*0x23*/ s8 type;                   // enum CSAboutEntryTypes
 } CSAboutEntry; /*0x24*/
+
+typedef struct CSAboutEntryDisplay {
+    /*0x00*/ s16 groupID;
+    /*0x02*/ s16 entryID;
+} CSAboutEntryDisplay; /*0x04*/
+
 
 
 #define NUM_LONG_INFO_BUFFERS 2

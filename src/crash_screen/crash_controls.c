@@ -14,6 +14,7 @@
 #include "pages/page_stack.h"
 
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 

@@ -22,6 +22,7 @@
 #include "game/emutest.h"
 #include "game/version.h"
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 #ifdef LIBPL
@@ -188,19 +189,16 @@ u32 gLongInfoBufferIndex = 0;
     .desc = _desc,                                  \
     .func = NULL,                                   \
     .flags = {                                      \
-        .canExpand = _expandable,                   \
         .expanded  = TRUE,                          \
     },                                              \
     .type = CS_ABOUT_ENTRY_TYPE_HEADER,             \
 }
 CSAboutEntry sCSAboutEntries_title[CS_NUM_ABOUT_ENTRIES_TITLE] = {
-    // [CS_ABOUT_GROUP_HEADER_TITLE      ] = ABOUT_ENTRY_HEADER("title", FALSE),
     [CS_ABOUT_ENTRY_TITLE_HACKERSM64  ] = ABOUT_ENTRY_TITLE(hackersm64_v,   "HackerSM64"    ),
     [CS_ABOUT_ENTRY_TITLE_CRASH_SCREEN] = ABOUT_ENTRY_TITLE(crash_screen_v, "Crash Screen"  ),
     [CS_ABOUT_ENTRY_TITLE_END         ] = ABOUT_ENTRY_NULL(),
 };
 CSAboutEntry sCSAboutEntries_buttons[CS_NUM_ABOUT_ENTRIES_TITLE] = {
-    // [CS_ABOUT_GROUP_HEADER_BUTTONS    ] = ABOUT_ENTRY_HEADER("buttons", FALSE),
     [CS_ABOUT_ENTRY_BUTTONS_EXPAND_ALL  ] = ABOUT_ENTRY_BUTTON("expand all"  ),
     [CS_ABOUT_ENTRY_BUTTONS_COLLAPSE_ALL] = ABOUT_ENTRY_BUTTON("collapse all"),
     [CS_ABOUT_ENTRY_BUTTONS_END         ] = ABOUT_ENTRY_NULL(),
@@ -228,13 +226,12 @@ CSAboutEntry sCSAboutEntries_rom[CS_NUM_ABOUT_ENTRIES_ROM] = {
 };
 CSAboutEntry sCSAboutEntries_collision[CS_NUM_ABOUT_ENTRIES_COLLISION] = {
     [CS_ABOUT_GROUP_HEADER_COLLISION       ] = ABOUT_ENTRY_HEADER("collision", TRUE),
-    [CS_ABOUT_ENTRY_COLLISION_LEVEL_BOUNDS ] = ABOUT_ENTRY_SINGLE(level_bounds,  "LEVEL BOUNDS"  ),
+    [CS_ABOUT_ENTRY_COLLISION_LEVEL_BOUNDS ] = ABOUT_ENTRY_SINGLE(level_bounds,  "LEVEL BOUND"   ),
     [CS_ABOUT_ENTRY_COLLISION_CELL_SIZE    ] = ABOUT_ENTRY_SINGLE(cell_size,     "CELL SIZE"     ),
     [CS_ABOUT_ENTRY_COLLISION_WORLD_SCALE  ] = ABOUT_ENTRY_SINGLE(world_scale,   "WORLD SCALE"   ),
-    [CS_ABOUT_ENTRY_COLLISION_ST_SURF_POOL ] = ABOUT_ENTRY_SINGLE(st_surf_pool,  "ST SURF POOL"  ),
-    [CS_ABOUT_ENTRY_COLLISION_DYN_SURF_POOL] = ABOUT_ENTRY_SINGLE(dyn_surf_pool, "DYN SURF POOL" ),
+    [CS_ABOUT_ENTRY_COLLISION_ST_SURF_POOL ] = ABOUT_ENTRY_SINGLE(st_surf_pool,  "STATIC SURF"   ),
+    [CS_ABOUT_ENTRY_COLLISION_DYN_SURF_POOL] = ABOUT_ENTRY_SINGLE(dyn_surf_pool, "DYN SURF"      ),
     [CS_ABOUT_ENTRY_COLLISION_END          ] = ABOUT_ENTRY_NULL(),
-
 };
 CSAboutEntry sCSAboutEntries_misc[CS_NUM_ABOUT_ENTRIES_MISC] = {
     [CS_ABOUT_GROUP_HEADER_MISC    ] = ABOUT_ENTRY_HEADER("misc", TRUE),
@@ -252,14 +249,12 @@ CSAboutEntry sCSAboutEntries_emulator[CS_NUM_ABOUT_ENTRIES_EMULATOR] = {
 #ifdef LIBPL
     [CS_ABOUT_ENTRY_EMULATOR_GFX_PLUGIN   ] = ABOUT_ENTRY_SINGLE_LPL(gfx_plugin,    "GFX PLUGIN"    ),
     [CS_ABOUT_ENTRY_EMULATOR_LAUNCHER     ] = ABOUT_ENTRY_SINGLE_LPL(launcher,      "LAUNCHER"      ),
-    [CS_ABOUT_ENTRY_EMULATOR_LIBPL_VERSION] = ABOUT_ENTRY_SINGLE_LPL(libpl_version, "LIBPL VERSION" ),
+    [CS_ABOUT_ENTRY_EMULATOR_LIBPL_VERSION] = ABOUT_ENTRY_SINGLE_LPL(libpl_version, "LIBPL"         ),
     [CS_ABOUT_ENTRY_EMULATOR_CHEAT_FLAGS  ] = ABOUT_ENTRY_SINGLE_LPL(cheat_flags,   "CHEAT FLAGS"   ),
     [CS_ABOUT_ENTRY_EMULATOR_RHDC         ] = ABOUT_ENTRY_SINGLE_LPL(rhdc,          "RHDC"          ),
 #endif // LIBPL
     [CS_ABOUT_ENTRY_EMULATOR_END          ] = ABOUT_ENTRY_NULL(),
 };
-
-UNUSED size_t szAbtEnt = sizeof(CSAboutEntry);
 
 CSAboutEntry* sCSAboutEntryGroups[CS_NUM_ABOUT_GROUPS] = {
     [CS_ABOUT_GROUP_TITLE    ] = sCSAboutEntries_title,
@@ -270,13 +265,6 @@ CSAboutEntry* sCSAboutEntryGroups[CS_NUM_ABOUT_GROUPS] = {
     [CS_ABOUT_GROUP_MISC     ] = sCSAboutEntries_misc,
     [CS_ABOUT_GROUP_EMULATOR ] = sCSAboutEntries_emulator,
 };
-
-
-typedef struct CSAboutEntryDisplay {
-    /*0x00*/ s16 groupID;
-    /*0x02*/ s16 entryID;
-} CSAboutEntryDisplay; /*0x04*/
-
 
 CSAboutEntryDisplay sCSAboutDisplayedEntries[CS_NUM_ABOUT_GROUPS * 12];
 u32 sNumCSAboutDisplayedEntries = 0;
@@ -289,7 +277,7 @@ static CSAboutEntry* get_about_entry(enum CSAboutGroups groupID, int entryID) {
 void about_set_all_headers(_Bool expand) {
     for (enum CSAboutGroups groupID = 0; groupID < CS_NUM_ABOUT_GROUPS; groupID++) {
         CSAboutEntry* entry = get_about_entry(groupID, 0);
-        if (entry->flags.canExpand && (entry->type == CS_ABOUT_ENTRY_TYPE_HEADER)) {
+        if (entry->type == CS_ABOUT_ENTRY_TYPE_HEADER) {
             entry->flags.expanded = expand;
         }
     }
@@ -298,7 +286,7 @@ void about_set_all_headers(_Bool expand) {
 _Bool about_check_all_headers(_Bool expand) {
     for (enum CSAboutGroups groupID = 0; groupID < CS_NUM_ABOUT_GROUPS; groupID++) {
         CSAboutEntry* entry = get_about_entry(groupID, 0);
-        if (entry->flags.canExpand && (entry->flags.expanded == expand)) {
+        if ((entry->type == CS_ABOUT_ENTRY_TYPE_HEADER) && (entry->flags.expanded == expand)) {
             return TRUE;
         }
     }
@@ -394,7 +382,7 @@ void cs_print_about_entry(u32 y, s16 groupID, s16 entryID) {
         case CS_ABOUT_ENTRY_TYPE_NONE:
             break;
         case CS_ABOUT_ENTRY_TYPE_HEADER:
-            if ((entry->desc != NULL) && entry->flags.canExpand) {
+            if (entry->desc != NULL) {
                 gCSDefaultPrintColor = COLOR_RGBA32_CRASH_PAGE_NAME;
                 _Bool expanded = entry->flags.expanded;
                 cs_draw_triangle(TEXT_X(0), y, TEXT_WIDTH(1), TEXT_WIDTH(1), gCSDefaultPrintColor, (expanded ? CS_TRI_DOWN : CS_TRI_RIGHT));
@@ -491,7 +479,7 @@ void page_about_draw(void) {
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, sNumCSAboutDisplayedEntries,
             sAboutViewportIndex,
-            COLOR_RGBA32_CRASH_DIVIDER, TRUE
+            COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
         );
 
         cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
@@ -539,47 +527,51 @@ void page_about_print(void) {
 #ifdef UNF
     debug_printf("\n");
 
-//     u32 longBufferIndex = 0;
+    for (enum CSAboutGroups groupID = 0; groupID < CS_NUM_ABOUT_GROUPS; groupID++) {
+        CSAboutEntry* entry = get_about_entry(groupID, 0);
+        if (entry == NULL) {
+            break;
+        }
+        while (entry->type != CS_ABOUT_ENTRY_TYPE_NULL) {
+            switch (entry->type) {
+                case CS_ABOUT_ENTRY_TYPE_NULL:
+                case CS_ABOUT_ENTRY_TYPE_NONE:
+                case CS_ABOUT_ENTRY_TYPE_BUTTON:
+                    break;
+                case CS_ABOUT_ENTRY_TYPE_HEADER:
+                    if (entry->desc != NULL) {
+                        debug_printf("- [%s info]\n", entry->desc);
+                    }
+                    break;
+                case CS_ABOUT_ENTRY_TYPE_TITLE:
+                    if ((entry->desc != NULL) && (entry->info != NULL)) {
+                        debug_printf("- %s %s", entry->desc, entry->info); // Both entries that use this already have a newline at the end of their info.
+                    }
+                    break;
+                case CS_ABOUT_ENTRY_TYPE_SINGLE_LPL:
+                    if (!gSupportsLibpl) {
+                        break;
+                    }
+                    FALL_THROUGH;
+                case CS_ABOUT_ENTRY_TYPE_SINGLE:
+                    if (entry->desc != NULL) {
+                        debug_printf("-- %s:", entry->desc);
+                    }
+                    if (entry->info != NULL) {
+                        debug_printf("\t\t%s\n", entry->info);
+                    }
+                    break;
+                default: // CS_ABOUT_ENTRY_TYPE_LONG_N
+                    if (entry->info != NULL) {
+                        u32 logInfoBufferIndex = (entry->type - CS_ABOUT_ENTRY_TYPE_LONG_N);
+                        debug_printf("--- %s\n", gLongInfoBuffer[logInfoBufferIndex]);
+                    }
+                    break;
+            }
 
-//     for (u32 i = 0; i < sAboutNumTotalEntries; i++) {
-//         CSAboutEntry* entry = &sAboutEntries[i];
-
-//  #ifdef LIBPL
-//         if (!gSupportsLibpl && (i == FIRST_LIBPL_ENTRY)) {
-//             break;
-//         }
-//  #endif // LIBPL
-
-//         if (entry->desc != NULL) {
-//             debug_printf("- %s:", entry->desc);
-//         }
-//         const char* info = (entry->type == CS_ABOUT_ENTRY_TYPE_LONG) ? entry->info : gLongInfoBuffer[longBufferIndex++];
-//         if (info != NULL) {
-//             debug_printf("\t\t%s", info);
-//         }
-//         debug_printf("\n");
-//     }
-    //! TODO: Fix UNF print
-//     debug_printf("- HackerSM64\t\t%s",              HackerSM64_version_txt);
-//     debug_printf("- Crash screen\t\t%s\n",          crash_screen_version);
-//     debug_printf("- COMPILER:\t\t%s\n",             __compiler__);
-//     debug_printf("- LINKER:\t\t%s\n",               __linker__);
-//     debug_printf("- ROM NAME:\t\t%s\n",             INTERNAL_ROM_NAME);
-// #ifdef LIBDRAGON
-//     debug_printf("- LIBULTRA:\t\t%s\n",             "LIBDRAGON");
-// #else // !LIBDRAGON
-//     debug_printf("- LIBULTRA:\t\t%s (patch %i)\n",  OS_MAJOR_VERSION, OS_MINOR_VERSION);
-// #endif // !LIBDRAGON
-//     debug_printf("- MICROCODE:\t\t%s\n",            ucode_name);
-//     debug_printf("- REGION:\t\t%s (%s)\n",          region_name, osTvTypeStrings[osTvType]);
-//     debug_printf("- SAVE TYPE:\t\t%s\n",            savetype_name);
-//     debug_printf("- COMPRESSION:\t\t%s\n",          compression_name);
-//     debug_printf("- ROM SIZE:\t\t%i bytes\n",       (size_t)gRomSize);
-//     debug_printf("- RAM SIZE:\t\t%imb\n",           (TOTAL_RAM_SIZE / RAM_1MB));
-//     debug_printf("- EXTBOUNDS MODE:\t%d\n",         EXTENDED_BOUNDS_MODE);
-//     debug_printf("- RCVI HACK:\t\t%s\n",            gValNames_no_yes[VI.comRegs.vSync == (525 * 20)]);
-//     debug_printf("- DEBUG MODE:\t\t%s%s\n",         gValNames_no_yes[debug_mode], (debug_is_initialized() ? " +UNF" : ""));
-//     debug_printf("- EMULATOR:\t\t%s\n",             get_emulator_name(gEmulator));
+            entry++;
+        }
+    }
 #endif // UNF
 }
 

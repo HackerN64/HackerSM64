@@ -18,6 +18,7 @@
 #include "segment_symbols.h"
 
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 
@@ -233,7 +234,7 @@ void page_stack_draw(void) {
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
             STACK_TRACE_NUM_ROWS, sCSNumFoundFunctions,
             sStackTraceViewportIndex,
-            COLOR_RGBA32_CRASH_DIVIDER, TRUE
+            COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
         );
 
         cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));

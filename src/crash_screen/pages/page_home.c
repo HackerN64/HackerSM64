@@ -23,6 +23,7 @@
 
 #include "game/asm.h"
 #ifdef UNF
+#include "usb/usb.h"
 #include "usb/debug.h"
 #endif // UNF
 
@@ -314,7 +315,7 @@ void page_home_print(void) {
     // CAUSE:
     const char* desc = get_cause_desc(tc);
     if (desc != NULL) {
-        debug_printf("- CAUSE: (%s)\n", desc);
+        debug_printf("- CAUSE: %s\n", desc);
     }
 
     // FPCSR:
@@ -322,7 +323,7 @@ void page_home_print(void) {
     debug_printf("- FPCSR: "STR_HEX_WORD, fpcsr);
     const char* fpcsrDesc = get_fpcsr_desc(fpcsr, FALSE);
     if (fpcsrDesc != NULL) {
-        debug_printf(" (%s)", fpcsrDesc);
+        debug_printf(" %s", fpcsrDesc);
     }
     debug_printf("\n");
 
