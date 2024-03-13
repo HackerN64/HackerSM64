@@ -442,20 +442,27 @@ size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
     if (fltErrType != FLT_ERR_NONE) {
         const FloatPrefix* p = &sFltErrFmt[fltErrType];
         RGBA32 color = RGBA_TO_RGBA32(p->r, p->g, p->b, MSK_RGBA32_A);
-        // "[prefix][XXXXXXXX]"
-        numChars += cs_print(x, y, STR_COLOR_PREFIX"%c"STR_HEX_WORD, color, p->prefixChar, val.asU32);
+
         if (includeSuffix) {
-            numChars += cs_print((x + TEXT_WIDTH(numChars)), y, STR_COLOR_PREFIX" (%s)", color, p->suffix);
+            // "[XXXXXXXX] ([suffix])"
+            numChars += cs_print(x, y, (STR_COLOR_PREFIX STR_HEX_WORD" (%s)"), color, val.asU32, p->suffix);
+        } else {
+            // "[prefix][XXXXXXXX]"
+            numChars += cs_print(x, y, (STR_COLOR_PREFIX"%c"STR_HEX_WORD), color, p->prefixChar, val.asU32);
         }
     } else {
         const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT);
+        const char* buf = NULL;
+        _Bool asHex = FALSE;
 
         switch (floatsFormat) {
-            case PRINT_NUM_FMT_HEX: numChars += cs_print(x, y, " "STR_HEX_WORD, val.asU32); break; // "[XXXXXXXX]"
+            case PRINT_NUM_FMT_HEX: buf = " "STR_HEX_WORD; asHex = TRUE; break; // "[XXXXXXXX]"
             default:
-            case PRINT_NUM_FMT_DEC: numChars += cs_print(x, y, "% g",           val.asF32); break; // "[±][exponent]"
-            case PRINT_NUM_FMT_SCI: numChars += cs_print(x, y, "% .3e",         val.asF32); break; // "[scientific notation]"
+            case PRINT_NUM_FMT_DEC: buf = "% g";   break; // "[±][exponent]"
+            case PRINT_NUM_FMT_SCI: buf = "% .3e"; break; // "[scientific notation]"
         }
+
+        numChars += cs_print(x, y, buf, (asHex ? val.asU32 : val.asF32));
     }
 
     return numChars;
