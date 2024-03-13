@@ -516,37 +516,37 @@ void page_disasm_input(void) {
 
 void page_disasm_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     Address startAddr = sDisasmViewportIndex;
     Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
 
-    debug_printf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
+    osSyncPrintf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
 
     for (u32 y = 0; y < sDisasmNumShownRows; y++) {
         Address addr = (startAddr + (y * PAGE_DISASM_STEP));
-        debug_printf("- ["STR_HEX_WORD"]: ", addr);
+        osSyncPrintf("- ["STR_HEX_WORD"]: ", addr);
         Word data = 0x00000000;
         if (!try_read_data(&data, addr)) {
-            debug_printf("*");
+            osSyncPrintf("*");
         } else if (is_in_code_segment(addr)) {
             const char* destFname = NULL;
             const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, FALSE);
 
-            debug_printf("%s", insnAsStr);
+            osSyncPrintf("%s", insnAsStr);
  #ifdef INCLUDE_DEBUG_MAP
             if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
-                debug_printf("%s", destFname);
+                osSyncPrintf("%s", destFname);
             }
  #endif // INCLUDE_DEBUG_MAP
             if (addr == gCrashedThread->context.pc) {
-                debug_printf("<-- CRASH");
+                osSyncPrintf("<-- CRASH");
             }
         } else { // Outside of code segments:
-            debug_printf(STR_HEX_WORD, data);
+            osSyncPrintf(STR_HEX_WORD, data);
         }
 
-        debug_printf("\n");
+        osSyncPrintf("\n");
     }
 #endif // UNF
 }

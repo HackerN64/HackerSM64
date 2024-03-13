@@ -212,10 +212,10 @@ void page_map_input(void) {
 
 void page_map_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     u32 currIndex = sMapViewerViewportIndex;
-    debug_printf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", gMapSymbols[currIndex].addr, gMapSymbols[currIndex + (MAP_VIEWER_NUM_ROWS - 1)].addr);
+    osSyncPrintf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", gMapSymbols[currIndex].addr, gMapSymbols[currIndex + (MAP_VIEWER_NUM_ROWS - 1)].addr);
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
     for (u32 i = 0; i < MAP_VIEWER_NUM_ROWS; i++) {
@@ -229,7 +229,7 @@ void page_map_print(void) {
 
         const char* name = get_map_symbol_name(symbol);
         if (name != NULL) {
-            debug_printf("- ["STR_HEX_WORD"]: %s [TYPE: \'%c\'] (SIZE: "STR_HEX_PREFIX"%X)\n", symbol->addr, name, symbol->type, symbol->size);
+            osSyncPrintf("- ["STR_HEX_WORD"]: %s [TYPE: \'%c\'] (SIZE: "STR_HEX_PREFIX"%X)\n", symbol->addr, name, symbol->type, symbol->size);
         }
 
         currIndex++;

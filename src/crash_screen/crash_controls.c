@@ -196,14 +196,14 @@ _Bool cs_check_switch_page_input(void) {
 // Prints a page's data to the developer console.
 void cs_os_print_page(CSPage* page) {
     if (page->printFunc != NULL) {
-        debug_printf("---\n");
+        osSyncPrintf("---\n");
         const char* name = page->name;
         if (name != NULL) {
-            debug_printf("%s:\n", page->name);
+            osSyncPrintf("%s:\n", page->name);
         }
         page->printFunc();
     } else {
-        debug_printf("%s has no print function.\n", page->name);
+        osSyncPrintf("%s has no print function.\n", page->name);
     }
 }
 #endif // UNF

@@ -207,7 +207,7 @@ void page_registers_input(void) {
 
 void page_registers_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
@@ -216,7 +216,7 @@ void page_registers_print(void) {
     const u32 rows = ((ARRAY_COUNT(sRegList) / columns) + 1);
     const RegisterId* reg = sRegList;
     for (u32 y = 0; y < rows; y++) {
-        debug_printf("- ");
+        osSyncPrintf("- ");
         for (u32 x = 0; x < columns; x++) {
             if (reg->raw == REG_LIST_TERMINATOR) {
                 break;
@@ -225,26 +225,28 @@ void page_registers_print(void) {
             const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
 
             if (regInfo != NULL) {
-                debug_printf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));   
+                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));   
             }
 
             reg++;
         }
-        debug_printf("\n");
+        osSyncPrintf("\n");
     }
 
     // Float registers:
     u32 regNum = 0;
     __OSfp* osfp = &tc->fp0;
     for (u32 i = 0; i < 8; i++) {
-        debug_printf("- ");
+        osSyncPrintf("- ");
         for (u32 j = 0; j < 2; j++) {
-            if (regNum > 30) break;
-            debug_printf("d%02d "STR_HEX_DECIMAL"\t", regNum, osfp->f.f_even);
+            if (regNum > 30) {
+                break;
+            }
+            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, osfp->f.f_even);
             regNum += 2;
             osfp++;
         }
-        debug_printf("\n");
+        osSyncPrintf("\n");
     }
 #endif // UNF
 }

@@ -288,21 +288,21 @@ void page_memory_input(void) {
 
 void page_memory_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     Address startAddr = sRamViewViewportIndex;
     Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
 
-    debug_printf("- SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
+    osSyncPrintf("- SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
 
     for (u32 row = 0; row < sRamViewNumShownRows; row++) {
-        debug_printf("- ["STR_HEX_WORD"]:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
+        osSyncPrintf("- ["STR_HEX_WORD"]:", (startAddr + (row * PAGE_MEMORY_STEP))); // Row address.
 
         for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
-            debug_printf(" "STR_HEX_WORD, sMemoryViewData[row][wordOffset]);
+            osSyncPrintf(" "STR_HEX_WORD, sMemoryViewData[row][wordOffset]);
         }
 
-        debug_printf("\n");
+        osSyncPrintf("\n");
     }
 #endif // UNF
 }

@@ -525,7 +525,7 @@ void page_about_input(void) {
 
 void page_about_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     for (enum CSAboutGroups groupID = 0; groupID < CS_NUM_ABOUT_GROUPS; groupID++) {
         CSAboutEntry* entry = get_about_entry(groupID, 0);
@@ -540,12 +540,12 @@ void page_about_print(void) {
                     break;
                 case CS_ABOUT_ENTRY_TYPE_HEADER:
                     if (entry->desc != NULL) {
-                        debug_printf("- [%s info]\n", entry->desc);
+                        osSyncPrintf("- [%s info]\n", entry->desc);
                     }
                     break;
                 case CS_ABOUT_ENTRY_TYPE_TITLE:
                     if ((entry->desc != NULL) && (entry->info != NULL)) {
-                        debug_printf("- %s %s", entry->desc, entry->info); // Both entries that use this already have a newline at the end of their info.
+                        osSyncPrintf("- %s %s", entry->desc, entry->info); // Both entries that use this already have a newline at the end of their info.
                     }
                     break;
                 case CS_ABOUT_ENTRY_TYPE_SINGLE_LPL:
@@ -555,16 +555,16 @@ void page_about_print(void) {
                     FALL_THROUGH;
                 case CS_ABOUT_ENTRY_TYPE_SINGLE:
                     if (entry->desc != NULL) {
-                        debug_printf("-- %s:", entry->desc);
+                        osSyncPrintf("-- %s:", entry->desc);
                     }
                     if (entry->info != NULL) {
-                        debug_printf("\t\t%s\n", entry->info);
+                        osSyncPrintf("\t\t%s\n", entry->info);
                     }
                     break;
                 default: // CS_ABOUT_ENTRY_TYPE_LONG_N
                     if (entry->info != NULL) {
                         u32 logInfoBufferIndex = (entry->type - CS_ABOUT_ENTRY_TYPE_LONG_N);
-                        debug_printf("--- %s\n", gLongInfoBuffer[logInfoBufferIndex]);
+                        osSyncPrintf("--- %s\n", gLongInfoBuffer[logInfoBufferIndex]);
                     }
                     break;
             }

@@ -267,7 +267,7 @@ void page_stack_input(void) {
 
 void page_stack_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     for (u32 i = 0; i < sCSNumFoundFunctions; i++) {
         FunctionInStack* function = &sCSFunctionStackBuffer[i];
@@ -276,13 +276,13 @@ void page_stack_print(void) {
             break;
         }
 
-        debug_printf("- ["STR_HEX_WORD"]: "STR_HEX_WORD" +"STR_HEX_HALFWORD, function->stackAddr, function->faddr, (function->curAddr - function->faddr));
+        osSyncPrintf("- ["STR_HEX_WORD"]: "STR_HEX_WORD" +"STR_HEX_HALFWORD, function->stackAddr, function->faddr, (function->curAddr - function->faddr));
  #ifdef INCLUDE_DEBUG_MAP
         if (function->fname != NULL) {
-            debug_printf(" - %s", function->fname);
+            osSyncPrintf(" - %s", function->fname);
         }
  #endif // INCLUDE_DEBUG_MAP
-        debug_printf("\n");
+        osSyncPrintf("\n");
     }
 #endif // UNF
 }

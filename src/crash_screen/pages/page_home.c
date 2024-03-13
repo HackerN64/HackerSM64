@@ -301,50 +301,47 @@ void page_home_input(void) {
 
 void page_home_print(void) {
 #ifdef UNF
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
     // THREAD:
     enum ThreadID threadID = gCrashedThread->id;
-    debug_printf("- THREAD:\t%d", threadID);
+    osSyncPrintf("- THREAD:\t%d", threadID);
     if (threadID < NUM_THREADS) {
         const char* threadName = get_thread_name_from_id(threadID);
 
         if (threadName != NULL) {
             // "(thread name)"
-            debug_printf(" (%s)", threadName);
+            osSyncPrintf(" (%s)", threadName);
         }
     }
-    debug_printf("\n");
+    osSyncPrintf("\n");
 
  #ifdef INCLUDE_DEBUG_MAP
     // FUNCTION:
     const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
     if (symbol != NULL) {
-        debug_printf("- FUNC: %s\n", get_map_symbol_name(symbol));
+        osSyncPrintf("- FUNC: %s\n", get_map_symbol_name(symbol));
     }
  #endif // INCLUDE_DEBUG_MAP
 
     // CAUSE:
     const char* desc = get_cause_desc(tc);
     if (desc != NULL) {
-        debug_printf("- CAUSE: %s\n", desc);
+        osSyncPrintf("- CAUSE: %s\n", desc);
     }
 
-    // FPCSR:
-    u32 fpcsr = tc->fpcsr;
-    debug_printf("- FPCSR: "STR_HEX_WORD, fpcsr);
-    const char* fpcsrDesc = get_fpcsr_desc(fpcsr, FALSE);
+    // FPE:
+    const char* fpcsrDesc = get_fpcsr_desc(tc->fpcsr, FALSE);
     if (fpcsrDesc != NULL) {
-        debug_printf(" %s", fpcsrDesc);
+        osSyncPrintf("- FPE: %s\n", fpcsrDesc);
     }
-    debug_printf("\n");
 
     if (tc->cause == EXC_SYSCALL) {
-        debug_printf("- ASSERT:\n");
+        osSyncPrintf("- ASSERT:\n");
         if (__n64Assert_Filename  != NULL) {
-            debug_printf("-- FILE: %s in LINE: %d:\n", __n64Assert_Filename,__n64Assert_LineNum);
+            osSyncPrintf("-- FILE: %s in LINE: %d:\n", __n64Assert_Filename,__n64Assert_LineNum);
         }
  #ifdef INCLUDE_DEBUG_MAP
         if (__assert_address) {
@@ -352,17 +349,17 @@ void page_home_print(void) {
             if (symbol != NULL) {
                 const char* name = get_map_symbol_name(symbol);
                 if (name != NULL) {
-                    debug_printf("-- FUNC: %s\n", name);
+                    osSyncPrintf("-- FUNC: %s\n", name);
                 }
             }
 
         }
  #endif // INCLUDE_DEBUG_MAP
         if (__n64Assert_Condition != NULL) {
-            debug_printf("-- CONDITION: %s\n", __n64Assert_Condition);
+            osSyncPrintf("-- CONDITION: %s\n", __n64Assert_Condition);
         }
         if (__n64Assert_Message   != NULL) {
-            debug_printf("-- MESSAGE: %s\n", __n64Assert_Message);
+            osSyncPrintf("-- MESSAGE: %s\n", __n64Assert_Message);
         }
     } else {
         //! TODO: Disasm and registers.
