@@ -75,8 +75,8 @@ typedef struct CSPopup {
     /*0x0C*/ void (*inputFunc)(void);
     /*0x10*/ union {
                 struct PACKED {
-                    /*0x00*/ u32           : 32;
-                    /*0x03*/ u32 allowPage : 1;
+                    /*0x00*/ u32           : 31;
+                    /*0x03*/ u32 allowPage :  1;
                 };
                 u32 raw;
             } flags; /*0x04*/

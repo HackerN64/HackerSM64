@@ -51,7 +51,7 @@ void cs_popup_pages_draw(void) {
         }
 
         cs_draw_divider_translucent_impl(bgStartX, bgW, DIVIDER_Y(line));
-        cs_print(TEXT_X(startX + 1), TEXT_Y(line), STR_COLOR_PREFIX"<%02d>: %s", COLOR_RGBA32_CRASH_PAGE_NAME, (pageID + 1), page->name);
+        cs_print(TEXT_X(startX + 1), TEXT_Y(line), STR_COLOR_PREFIX"<%02d>: %s", ((page->flags.crashed) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_CRASH_PAGE_NAME), (pageID + 1), page->name);
 
         line++;
     }

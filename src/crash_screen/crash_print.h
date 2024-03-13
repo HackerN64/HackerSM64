@@ -105,3 +105,5 @@ typedef struct {
 } FloatPrefix; /*0x08*/
 
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix);
+
+int sprintf_int_with_commas(char* buf, int n);

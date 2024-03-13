@@ -6,6 +6,8 @@
 
 #include "game/main.h"
 
+#include "game/emutest.h"
+
 
 
 enum CauseDescriptions {
@@ -51,6 +53,23 @@ typedef struct ThreadIDName {
 } ThreadIDName; /*0x08*/
 
 
+typedef struct EmulatorName {
+    /*0x00*/ const enum Emulator bits;
+    /*0x04*/ const char* name;
+} EmulatorName; /*0x08*/
+
+
+extern char HackerSM64_version_txt[];
+extern const char crash_screen_version[];
+
+extern const char* region_name;
+extern const char* osTvTypeStrings[];
+extern const char* ucode_name;
+extern const char* savetype_name;
+extern const char* compression_name;
+
+
 const char* get_cause_desc(__OSThreadContext* tc);
 const char* get_thread_name_from_id(enum ThreadID threadID);
 const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial);
+const char* get_emulator_name(enum Emulator emu);

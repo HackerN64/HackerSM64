@@ -12,6 +12,16 @@
 
 #include "crash_descriptions.h"
 
+#include "game/emutest.h"
+#include "game/version.h"
+
+
+// Include the version number from VERSION.txt. Includes a newline at the end.
+INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
+
+// Crash screen version. Includes a newline at the end.
+const char crash_screen_version[] = "v2.0\n"; //! TODO: Change this on release.
+
 
 static const ThreadIDName sThreadIDNames[] = {
     { .threadID = THREAD_0,                   .name = "0",              },
@@ -64,6 +74,106 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
     [FLT_ERR_DENORM] = "Denormalized float",
     [FLT_ERR_NAN   ] = "NaN float",
 };
+
+
+// Region string:
+#define DEF_REGION_NAME(name) const char* region_name = TO_STRING2(name);
+#ifdef VERSION_JP
+DEF_REGION_NAME(jp);
+#elif VERSION_US
+DEF_REGION_NAME(us);
+#elif VERSION_EU
+DEF_REGION_NAME(eu);
+#elif VERSION_SH
+DEF_REGION_NAME(sh);
+#elif BBPLAYER
+DEF_REGION_NAME(bb);
+#else
+DEF_REGION_NAME(xx);
+#endif
+
+// osTvType strings:
+const char* osTvTypeStrings[] = {
+    [OS_TV_PAL ] = "pal",
+    [OS_TV_NTSC] = "ntsc",
+    [OS_TV_MPAL] = "mpal",
+};
+
+// Microcode string:
+#define DEF_UCODE_NAME(name) const char* ucode_name = TO_STRING2(name);
+#ifdef L3DEX2_ALONE
+DEF_UCODE_NAME(L3DEX2_alone);
+#elif F3DZEX_GBI_2
+DEF_UCODE_NAME(f3dzex2_PosLight);
+#elif F3DZEX_NON_GBI_2
+DEF_UCODE_NAME(f3dzex2_Non_PosLight);
+#elif F3DEX2PL_GBI
+DEF_UCODE_NAME(F3DEX2_PosLight);
+#elif F3DEX_GBI_2
+DEF_UCODE_NAME(F3DEX2);
+#elif F3DEX_GBI
+DEF_UCODE_NAME(F3DEX);
+#elif SUPER3D_GBI
+DEF_UCODE_NAME(Super3D);
+#else
+DEF_UCODE_NAME(Fast3D);
+#endif
+
+// Save type string:
+#define DEF_SAVETYPE_NAME(name) const char* savetype_name = TO_STRING2(name);
+#ifdef EEP4K
+DEF_SAVETYPE_NAME(eep4k);
+#elif EEP16K
+DEF_SAVETYPE_NAME(eep16k);
+#elif SRAM
+DEF_SAVETYPE_NAME(sram);
+#else
+DEF_SAVETYPE_NAME(unknown);
+#endif
+
+// Compression type string:
+#define DEF_COMPRESSION_NAME(name) const char* compression_name = TO_STRING2(name);
+#ifdef GZIP
+DEF_COMPRESSION_NAME(gzip);
+#elif RNC1
+DEF_COMPRESSION_NAME(rnc1);
+#elif RNC2
+DEF_COMPRESSION_NAME(rnc2);
+#elif YAYO
+DEF_COMPRESSION_NAME(yay0);
+#elif MIO0
+DEF_COMPRESSION_NAME(mio0);
+#elif UNCOMPRESSED
+DEF_COMPRESSION_NAME(none);
+#else
+DEF_COMPRESSION_NAME(unk);
+#endif
+
+// Emulator strings:
+#define EMULATOR_STRING(_bits, _name)  { .bits = _bits, .name = _name, }
+static const EmulatorName sEmulatorStrings[] = {
+    { .bits = EMU_WIIVC,            .name = "Wii VC",           },
+    { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
+    { .bits = EMU_PROJECT64_3,      .name = "pj64 3",           },
+    { .bits = EMU_PROJECT64_4,      .name = "pj64 4",           },
+    { .bits = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
+    { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
+    { .bits = EMU_CEN64,            .name = "cen64",            },
+    { .bits = EMU_SIMPLE64,         .name = "simple64",         },
+    { .bits = EMU_PARALLELN64,      .name = "ParaLLEl N64",     },
+    { .bits = EMU_ARES,             .name = "ares",             },
+    { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
+};
+
+const char* get_emulator_name(enum Emulator emu) {
+    for (int i = 0; i < ARRAY_COUNT(sEmulatorStrings); i++) {
+        if (emu == sEmulatorStrings[i].bits) {
+            return sEmulatorStrings[i].name;
+        }
+    }
+
+    return NULL;
+}
 
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc) {

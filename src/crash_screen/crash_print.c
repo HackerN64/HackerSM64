@@ -460,3 +460,28 @@ size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
 
     return numChars;
 }
+
+int sprintf_int_with_commas(char* buf, int n) {
+    char* p = buf;
+    int n2 = 0;
+    int scale = 1;
+
+    if (n < 0) {
+        p += sprintf(p, "-");
+        n = -n;
+    }
+    while (n >= 1000) {
+        n2 += (scale * (n % 1000));
+        n /= 1000;
+        scale *= 1000;
+    }
+    p += sprintf(p, "%d", n);
+    while (scale != 1) {
+        scale /= 1000;
+        n = n2 / scale;
+        n2 = n2 % scale;
+        p += sprintf(p, ",%03d", n);
+    }
+
+    return (p - buf);
+}

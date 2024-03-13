@@ -106,14 +106,14 @@ void print_settings_list(u32 line, u32 numLines) {
 
     // Print
     for (u32 i = 0; i < numLines; i++, currViewIndex++) {
+        if (currViewIndex >= sNumDisplayedSettings) {
+            break;
+        }
+
         CSSettingDisplay* settingDisplay = &gCSDisplayedSettings[currViewIndex];
         s16 groupID   = settingDisplay->groupID;
         s16 settingID = settingDisplay->settingID;
         const CSSetting* setting = cs_get_setting(groupID, settingID);
-
-        if (currViewIndex >= sNumDisplayedSettings) {
-            break;
-        }
 
         if (setting == NULL) {
             break;
