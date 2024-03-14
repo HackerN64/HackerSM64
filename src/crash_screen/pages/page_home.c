@@ -291,36 +291,6 @@ void page_home_input(void) {
     }
 }
 
-
-// void print_register_info_long(u32 charX, u32 line, RegisterId reg) {
-//     const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
-//     Word data = get_reg_val(reg.cop, reg.idx);
-//     _Bool isCOP1 = (reg.cop == COP1);
-
-//     charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
-//         COLOR_RGBA32_CRASH_VARIABLE, (isCOP1 ? regInfo->name : regInfo->shortName)
-//     );
-//     osSyncPrintf("%s", (isCOP1 ? regInfo->name : regInfo->shortName));
-//     if (isCOP1) { // Float.
-//         charX += cs_print_f32(TEXT_X(charX), TEXT_Y(line), (IEEE754_f32){ .asU32 = data, }, TRUE);
-//     } else {
-//         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_HEX_WORD" ", data);
-
-// #ifdef INCLUDE_DEBUG_MAP
-//         const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
-//         if (symbol != NULL) {
-//             size_t offsetStrSize = STRLEN("+0000 ");
-//             size_t endX = CRASH_SCREEN_NUM_CHARS_X;
-//             cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
-//             cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
-//                 (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
-//                 COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
-//             );
-//         }
-// #endif // INCLUDE_DEBUG_MAP
-//     }
-// }
-
 void page_home_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");

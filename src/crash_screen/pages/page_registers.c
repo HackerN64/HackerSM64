@@ -67,9 +67,26 @@ static const RegisterId sRegList[32 + 1] = {
 };
 
 
-
 void page_registers_init(void) {
 
+}
+
+void cs_registers_print_thread(u32 x, u32 y) {
+    // "THREAD: [thread id]"
+    enum ThreadID threadID = gCrashedThread->id;
+    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
+        COLOR_RGBA32_CRASH_THREAD, threadID
+    );
+    if (threadID < NUM_THREADS) {
+        const char* threadName = get_thread_name_from_id(threadID);
+
+        if (threadName != NULL) {
+            // "(thread name)"
+            cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
+                COLOR_RGBA32_CRASH_THREAD, threadName
+            );
+        }
+    }
 }
 
 // Print a fixed-point register.
@@ -104,7 +121,7 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 u32 cs_registers_print_registers(u32 line) {
     const size_t columnWidth = 15;
     const u32 columns = 3;
-    const u32 rows = ((ARRAY_COUNT(sRegList) / columns) + 1);
+    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
     const RegisterId* reg = sRegList;
 
     for (u32 y = 0; y < rows; y++) {
@@ -187,15 +204,16 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
 
 void page_registers_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
-    u32 line = 1;
-    line++;
-    line++;
+    u32 line = 2;
 
-    //! TODO: thread
+    cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"REGISTERS IN:",
+        COLOR_RGBA32_CRASH_THREAD
+    );
+    cs_registers_print_thread(TEXT_X(0), TEXT_Y(line++));
+    
+    line++;
 
     line = cs_registers_print_registers(line);
-
-    line++;
 
     osWritebackDCacheAll();
 
@@ -215,9 +233,23 @@ void page_registers_print(void) {
 
     __OSThreadContext* tc = &gCrashedThread->context;
 
+    osSyncPrintf("- REGISTERS IN:\n");
+    // THREAD:
+    enum ThreadID threadID = gCrashedThread->id;
+    osSyncPrintf("- THREAD:\t%d", threadID);
+    if (threadID < NUM_THREADS) {
+        const char* threadName = get_thread_name_from_id(threadID);
+
+        if (threadName != NULL) {
+            // "(thread name)"
+            osSyncPrintf(" (%s)", threadName);
+        }
+    }
+    osSyncPrintf("\n");
+
     // Thread registers:
     const u32 columns = 3;
-    const u32 rows = ((ARRAY_COUNT(sRegList) / columns) + 1);
+    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
     const RegisterId* reg = sRegList;
     for (u32 y = 0; y < rows; y++) {
         osSyncPrintf("- ");
