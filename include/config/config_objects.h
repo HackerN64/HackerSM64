@@ -129,3 +129,12 @@
  * The number of segments Wiggler has, not including the head. Vanilla is 4.
  */
 #define WIGGLER_NUM_SEGMENTS     4
+
+/*****************
+ * -- CANNONS --
+ *****************/
+
+/**
+ * Removes the restriction on horizontal turning when aiming a cannon, allowing full 360 degree rotation.
+ */
+#define UNRESTRICTED_CANNON_AIMING
