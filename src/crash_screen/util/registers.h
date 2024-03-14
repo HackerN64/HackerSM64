@@ -163,14 +163,6 @@ typedef union {
 } Reg_FPCSR;
 
 
-// enum COP1Registers {
-//     REG_COP1_F00, REG_COP1_F02,                                                         // Subroutine return value.
-//     REG_COP1_F04, REG_COP1_F06, REG_COP1_F08, REG_COP1_F10,                             // Temporary values.
-//     REG_COP1_F12, REG_COP1_F14,                                                         // Subroutine arguments.
-//     REG_COP1_F16, REG_COP1_F18,                                                         // Temporary values.
-//     REG_COP1_F20, REG_COP1_F22, REG_COP1_F24, REG_COP1_F26, REG_COP1_F28, REG_COP1_F30, // Saved Values.
-//     COP1_NUM_REGISTERS,
-// };
 enum COP1Registers {
     REG_COP1_F00, REG_COP1_F01, REG_COP1_F02, REG_COP1_F03,                                                                                                                 // Subroutine return value.
     REG_COP1_F04, REG_COP1_F05, REG_COP1_F06, REG_COP1_F07, REG_COP1_F08, REG_COP1_F09, REG_COP1_F10,  REG_COP1_F11,                                                        // Temporary values.
@@ -188,14 +180,6 @@ enum FloatErrorType {
 };
 
 
-typedef union {
-    struct {
-        /*0x00*/ s16 cop;
-        /*0x02*/ s16 idx;
-    }; /*0x04*/
-    /*0x04*/ u32 raw;
-} RegisterId; /*0x04*/
-
 typedef struct {
     /*0x00*/ const u16 offset;
     /*0x02*/ const u8 size;
@@ -203,9 +187,18 @@ typedef struct {
     /*0x06*/ const char name[10];
 } RegisterInfo; /*0x10*/
 
+typedef union {
+    struct {
+        /*0x00*/ s8 cop;
+        /*0x01*/ s8 idx;
+        /*0x02*/ _Bool flt;
+        /*0x03*/ _Bool out;
+    }; /*0x04*/
+    /*0x04*/ u32 raw;
+} RegisterId; /*0x04*/
+
 
 #define OSTHREAD_NULL_OFFSET (u16)-1
-
 
 #define DEF_SREG(_size, _name, _shortName) {    \
     .offset    = OSTHREAD_NULL_OFFSET,          \
@@ -227,9 +220,9 @@ typedef struct {
 #define DEF_COP0_SREG(_reg, _size,         _name, _shortName) DEF_SREG(        _size, _name, _shortName)
 #define DEF_COP0_TREG(_reg, _size, _field, _name, _shortName) DEF_TREG(_field, _size, _name, _shortName)
 
-#define DEF_COP1_SREG(_reg, _name) DEF_SREG(                   sizeof(f32), "F"_name, _name)
+#define DEF_COP1_SREG(_reg, _name)      DEF_SREG(                   sizeof(f32), "F"_name, _name)
 #define DEF_COP1_TREG_EVEN(_reg, _name) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
-#define DEF_COP1_TREG_ODD(_reg, _name) DEF_TREG(fp##_reg.f.f_odd, sizeof(f32), "F"_name, _name)
+#define DEF_COP1_TREG_ODD(_reg, _name)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name)
 
 #define REG_BUFFER_SIZE 3
 
@@ -241,6 +234,6 @@ uint64_t get_direct_reg_val(enum Coprocessors cop, int idx);
 uint64_t get_reg_val(enum Coprocessors cop, int idx);
 
 void clear_saved_reg_buffer(void);
-void append_reg_to_buffer(s16 cop, s16 idx);
+void append_reg_to_buffer(enum Coprocessors cop, int idx, _Bool isFlt, _Bool isOutput);
 
 enum FloatErrorType validate_float(IEEE754_f32 val);

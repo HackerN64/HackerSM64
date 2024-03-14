@@ -45,8 +45,12 @@ const enum ControlTypes cs_cont_list_registers[] = {
 
 
 #define REG_LIST_TERMINATOR (u32)-1
-
-#define LIST_REG(_cop, _idx) { .cop = _cop, .idx = _idx, }
+#define LIST_REG(_cop, _idx) {  \
+    .cop = _cop,                \
+    .idx = _idx,                \
+    .flt = FALSE,               \
+    .out = FALSE,               \
+}
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
 static const RegisterId sRegList[32 + 1] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
@@ -225,7 +229,7 @@ void page_registers_print(void) {
             const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
 
             if (regInfo != NULL) {
-                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));   
+                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));
             }
 
             reg++;
@@ -239,10 +243,12 @@ void page_registers_print(void) {
     for (u32 i = 0; i < 8; i++) {
         osSyncPrintf("- ");
         for (u32 j = 0; j < 2; j++) {
-            if (regNum > 30) {
+            if (regNum >= COP1_NUM_REGISTERS) {
                 break;
             }
-            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, osfp->f.f_even);
+
+            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, get_reg_val(COP1, regNum));
+
             regNum += 2;
             osfp++;
         }

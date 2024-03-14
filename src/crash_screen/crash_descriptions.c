@@ -241,7 +241,7 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
     for (int i = 0; i < gSavedRegBufSize; i++) {
         RegisterId reg = gSavedRegBuf[i];
 
-        if (reg.cop == COP1) {
+        if (reg.flt) {
             IEEE754_f32 val = {
                 .asU32 = get_reg_val(reg.cop, reg.idx)
             };

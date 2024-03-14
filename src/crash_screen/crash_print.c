@@ -429,7 +429,7 @@ void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
     );
 }
 
-static const FloatPrefix sFltErrFmt[] = {
+static const FloatErrorPrintFormat sFltErrFmt[] = {
     [FLT_ERR_NONE  ] = { .r = 0xFF, .g = 0xFF, .b = 0xFF, .prefixChar = CHAR_FLT_PREFIX_NULL,   .suffix = "",             },
     [FLT_ERR_DENORM] = { .r = 0xFF, .g = 0x9F, .b = 0x9F, .prefixChar = CHAR_FLT_PREFIX_DENORM, .suffix = "denormalized", },
     [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
@@ -440,7 +440,7 @@ size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
     size_t numChars = 0;
 
     if (fltErrType != FLT_ERR_NONE) {
-        const FloatPrefix* p = &sFltErrFmt[fltErrType];
+        const FloatErrorPrintFormat* p = &sFltErrFmt[fltErrType];
         RGBA32 color = RGBA_TO_RGBA32(p->r, p->g, p->b, MSK_RGBA32_A);
 
         if (includeSuffix) {

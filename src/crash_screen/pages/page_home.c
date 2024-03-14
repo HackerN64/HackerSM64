@@ -186,12 +186,13 @@ u32 cs_draw_assert(u32 line) {
 void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
     const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
     Word data = get_reg_val(reg.cop, reg.idx);
-    _Bool isCOP1 = (reg.cop == COP1);
 
     charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
-        COLOR_RGBA32_CRASH_VARIABLE, (isCOP1 ? regInfo->name : regInfo->shortName)
+        COLOR_RGBA32_CRASH_VARIABLE, ((reg.cop == COP1) ? regInfo->name : regInfo->shortName)
     );
-    if (isCOP1) { // Float.
+    if (reg.out) {
+        charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"[output]", COLOR_RGBA32_LIGHT_GRAY);
+    } else if (reg.flt) { // Float.
         charX += cs_print_f32(TEXT_X(charX), TEXT_Y(line), (IEEE754_f32){ .asU32 = data, }, TRUE);
     } else {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_HEX_WORD" ", data);
@@ -229,8 +230,13 @@ void page_home_draw(void) {
                 COLOR_RGBA32_CRASH_PAGE_NAME
             );
 
-            cs_draw_register_info_long(1, line++, (RegisterId){ .cop = COP0, .idx = REG_COP0_EPC, });
-            // line++;
+            RegisterId regPC = {
+                .cop = COP0,
+                .idx = REG_COP0_EPC,
+                .flt = FALSE,
+                .out = FALSE,
+            };
+            cs_draw_register_info_long(1, line++, regPC);
 
             cs_print(TEXT_X(0), TEXT_Y(line++),
                 STR_COLOR_PREFIX"instruction at crash:",
@@ -246,23 +252,9 @@ void page_home_draw(void) {
             print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
             // cs_draw_divider(DIVIDER_Y(line));
 
-            cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction input values:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction register values:", COLOR_RGBA32_CRASH_PAGE_NAME);
             for (int i = 0; i < gSavedRegBufSize; i++) {
-                RegisterId reg = gSavedRegBuf[i];
-                _Bool skip = FALSE;
-
-                if (i > 0) {
-                    for (int j = 0; j < i; j++) { // Check all previous registers for duplicates.
-                        if (reg.raw == gSavedRegBuf[i - 1].raw) {
-                            skip = TRUE;
-                            break;
-                        }
-                    }
-                }
-
-                if (!skip) {
-                    cs_draw_register_info_long(1, line++, reg);
-                }
+                cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
             }
         }
     }
@@ -298,6 +290,36 @@ void page_home_input(void) {
         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
     }
 }
+
+
+// void print_register_info_long(u32 charX, u32 line, RegisterId reg) {
+//     const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
+//     Word data = get_reg_val(reg.cop, reg.idx);
+//     _Bool isCOP1 = (reg.cop == COP1);
+
+//     charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
+//         COLOR_RGBA32_CRASH_VARIABLE, (isCOP1 ? regInfo->name : regInfo->shortName)
+//     );
+//     osSyncPrintf("%s", (isCOP1 ? regInfo->name : regInfo->shortName));
+//     if (isCOP1) { // Float.
+//         charX += cs_print_f32(TEXT_X(charX), TEXT_Y(line), (IEEE754_f32){ .asU32 = data, }, TRUE);
+//     } else {
+//         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_HEX_WORD" ", data);
+
+// #ifdef INCLUDE_DEBUG_MAP
+//         const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
+//         if (symbol != NULL) {
+//             size_t offsetStrSize = STRLEN("+0000 ");
+//             size_t endX = CRASH_SCREEN_NUM_CHARS_X;
+//             cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
+//             cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
+//                 (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
+//                 COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
+//             );
+//         }
+// #endif // INCLUDE_DEBUG_MAP
+//     }
+// }
 
 void page_home_print(void) {
 #ifdef UNF

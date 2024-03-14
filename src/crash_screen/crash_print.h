@@ -102,7 +102,7 @@ typedef struct {
     /*0x02*/ Color b;
     /*0x03*/ char prefixChar;
     /*0x04*/ char* suffix;
-} FloatPrefix; /*0x08*/
+} FloatErrorPrintFormat; /*0x08*/
 
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix);
 

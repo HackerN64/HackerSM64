@@ -222,9 +222,14 @@ void clear_saved_reg_buffer(void) {
     gSavedRegBufSize = 0;
 }
 
-void append_reg_to_buffer(s16 cop, s16 idx) {
+void append_reg_to_buffer(enum Coprocessors cop, int idx, _Bool isFlt, _Bool isOutput) {
     if (gSavedRegBufSize < ARRAY_COUNT(gSavedRegBuf)) {
-        gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){ .cop = cop, .idx = idx, };
+        gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){
+            .cop = cop,
+            .idx = idx,
+            .flt = isFlt,
+            .out = isOutput,
+        };
     }
 }
 
