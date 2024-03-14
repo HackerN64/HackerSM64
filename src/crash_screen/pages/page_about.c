@@ -20,6 +20,7 @@
 #include "config/config_world.h"
 #include "engine/surface_load.h"
 #include "game/emutest.h"
+#include "game/save_file.h"
 #include "game/version.h"
 #ifdef UNF
 #include "usb/usb.h"
@@ -65,10 +66,20 @@ extern const u8 gRomSize[];
 extern const u8 gGoddardSize[];
 
 
-f32 percent_of(f32 part, f32 total) {
-    return part / total * 100.0f;
+f32 percent_of(f32 size, f32 totalSize) {
+    return size / totalSize * 100.0f;
 }
 
+f32 bytes_to_megabytes(size_t size) {
+    return (f32)size / (f32)RAM_1MB;
+}
+
+#define STR_SUFFIX_BYTES        "b"
+#define STR_SUFFIX_KILOBYTES    "kb"
+#define STR_SUFFIX_MEGABYTES    "mb"
+#define STR_ABOUT_DECIMAL_FMT   "%.2g"
+#define STR_PERCENT_OF_ROM      "(~"STR_ABOUT_DECIMAL_FMT"%%%%rom)" //! TODO: Why does the first "%%" get eaten when using a float here?
+#define STR_LPL_VERSION         "v%d.%d.%d"
 
 #define ABOUT_ENTRY_FUNC(_name, fmt, ...) void _cs_about_func_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
 
@@ -85,7 +96,12 @@ ABOUT_ENTRY_FUNC(region,         "LIBDRAGON") //! TODO: Libdragon version
 #else // !LIBDRAGON
 ABOUT_ENTRY_FUNC(region,         "%s (%s)", gRegionName, osTvTypeStrings[osTvType])
 #endif //! LIBDRAGON
-ABOUT_ENTRY_FUNC(save_type,      gSaveTypeName)
+void _cs_about_func_save_type(char* buf) {
+    char* p = buf;
+    p += sprintf(p, "%s (", gSaveTypeName);
+    p += sprintf_int_with_commas(p, EEPROM_SIZE);
+    p += sprintf(p, STR_SUFFIX_BYTES")");
+}
 ABOUT_ENTRY_FUNC(compression,    gCompressionName)
 void _cs_about_func_symbols(char* buf) {
 #ifdef INCLUDE_DEBUG_MAP
@@ -94,26 +110,31 @@ void _cs_about_func_symbols(char* buf) {
     char* p = buf;
     p += sprintf(p, "%i =", numSymbols);
     p += sprintf_int_with_commas(p, mapSize);
-    p += sprintf(p, "b (%.2g%%%%rom)", percent_of(mapSize, (size_t)gRomSize)); //! TODO: Why does the first "%%" get eaten when using a float here?
+    p += sprintf(p, (STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM), percent_of(mapSize, (size_t)gRomSize));
 #else  // !INCLUDE_DEBUG_MAP
     sprintf(buf, "NOT INCLUDED");
 #endif // !INCLUDE_DEBUG_MAP
 }
 void _cs_about_func_rom_size(char* buf) {
     char* p = buf;
-    p += sprintf_int_with_commas(p, (size_t)gRomSize);
-    p += sprintf(p, "b");
+    size_t romSize = (size_t)gRomSize;
+    p += sprintf_int_with_commas(p, romSize);
+    p += sprintf(p, (STR_SUFFIX_BYTES" (~"STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes(romSize));
 }
-ABOUT_ENTRY_FUNC(ram_size,       "%imb", (size_t)(TOTAL_RAM_SIZE / RAM_1MB))
-ABOUT_ENTRY_FUNC(gfx_pool,       STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X", (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
-ABOUT_ENTRY_FUNC(st_surf_pool,   STR_HEX_PREFIX"%X", ((Address)gCurrStaticSurfacePoolEnd - (Address)gCurrStaticSurfacePool))
-ABOUT_ENTRY_FUNC(dyn_surf_pool,  STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X", ((Address)gDynamicSurfacePoolEnd - (Address)gDynamicSurfacePool), (size_t)DYNAMIC_SURFACE_POOL_SIZE)
-ABOUT_ENTRY_FUNC(level_bounds,   STR_HEX_PREFIX"%04X (%dx)", LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
-ABOUT_ENTRY_FUNC(cell_size,      STR_HEX_PREFIX"%03X (%dx%d)", CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
+void _cs_about_func_ram_size(char* buf) {
+    char* p = buf;
+    p += sprintf_int_with_commas(p, (size_t)TOTAL_RAM_SIZE);
+    p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes((size_t)TOTAL_RAM_SIZE));
+}
+ABOUT_ENTRY_FUNC(gfx_pool,       (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
+ABOUT_ENTRY_FUNC(st_surf_pool,   (STR_HEX_PREFIX"%X"), ((Address)gCurrStaticSurfacePoolEnd - (Address)gCurrStaticSurfacePool))
+ABOUT_ENTRY_FUNC(dyn_surf_pool,  (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), ((Address)gDynamicSurfacePoolEnd - (Address)gDynamicSurfacePool), (size_t)DYNAMIC_SURFACE_POOL_SIZE)
+ABOUT_ENTRY_FUNC(level_bounds,   (STR_HEX_PREFIX"%04X (%dx)"), LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
+ABOUT_ENTRY_FUNC(cell_size,      (STR_HEX_PREFIX"%03X (%dx%d)"), CELL_SIZE, ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE), ((LEVEL_BOUNDARY_MAX * 2) / CELL_SIZE))
 ABOUT_ENTRY_FUNC(world_scale,    "(%dx)", WORLD_SCALE)
 ABOUT_ENTRY_FUNC(rcvi_hack,      gValNames_no_yes[VI.comRegs.vSync == (525 * 20)])
 #ifdef SILHOUETTE
-ABOUT_ENTRY_FUNC(silhouette,     "%d", SILHOUETTE)
+ABOUT_ENTRY_FUNC(silhouette,     "opacity: %d", SILHOUETTE)
 #else // !SILHOUETTE
 ABOUT_ENTRY_FUNC(silhouette,     gValNames_no_yes[FALSE])
 #endif // !SILHOUETTE
@@ -122,7 +143,7 @@ void _cs_about_func_goddard(char* buf) {
     size_t goddardSize = (size_t)gGoddardSize;
     char* p = buf;
     p += sprintf_int_with_commas(p, goddardSize);
-    p += sprintf(p, "b (%.2g%%%%rom)", percent_of(goddardSize, (size_t)gRomSize)); //! TODO: Why does the first "%%" get eaten when using a float here?
+    p += sprintf(p, STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM, percent_of(goddardSize, (size_t)gRomSize));
 }
 #else // !KEEP_MARIO_HEAD
 ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[FALSE])
@@ -133,19 +154,18 @@ ABOUT_ENTRY_FUNC(rumble,         "%s%s", gValNames_no_yes[sRumblePakThreadActive
 ABOUT_ENTRY_FUNC(rumble,         gValNames_no_yes[FALSE])
 #endif // !ENABLE_RUMBLE
 void _cs_about_func_debug_mode(char* buf) {
-    sprintf(buf, "%s%s%s",
+    char* p = buf;
 #ifdef DEBUG
-        gValNames_no_yes[TRUE],
+    p += sprintf(p, gValNames_no_yes[TRUE]);
 #else // !DEBUG
-        gValNames_no_yes[FALSE],
+    p += sprintf(p, gValNames_no_yes[FALSE]);
 #endif // !DEBUG
 #ifdef PUPPYPRINT_DEBUG
-        " +ppdebug",
-#else // !PUPPYPRINT_DEBUG
-        "",
-#endif // !PUPPYPRINT_DEBUG
-        (debug_is_initialized() ? " +unf" : "")
-    );
+    p += sprintf(p, " +ppdebug");
+#endif // PUPPYPRINT_DEBUG
+    if (debug_is_initialized()) {
+        p += sprintf(p, " +unf");
+    }
 }
 #ifdef LIBPL
 void _cs_about_func_emulator(char* buf) {
@@ -153,24 +173,32 @@ void _cs_about_func_emulator(char* buf) {
     p += sprintf(p, "%s", get_emulator_name(gEmulator));
     if (gSupportsLibpl) {
         const lpl_version* v = libpl_get_core_version();
-        p += sprintf(p, " v%d.%d.%d", v->major, v->minor, v->patch);
+        p += sprintf(p, " "STR_LPL_VERSION, v->major, v->minor, v->patch);
     }
 }
 ABOUT_ENTRY_FUNC(gfx_plugin,     libpl_get_graphics_plugin()->name);
 void _cs_about_func_launcher(char* buf) {
     const lpl_version* v = libpl_get_launcher_version();
-    sprintf(buf, "v%d.%d.%d", v->major, v->minor, v->patch);
+    sprintf(buf, STR_LPL_VERSION, v->major, v->minor, v->patch);
 }
 ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
 void _cs_about_func_cheat_flags(char* buf) {
     lpl_cheat_flags cheatFlags = libpl_get_cheat_flags();
-    sprintf(buf, "%s%s%s%s%s",
-        (cheatFlags & LPL_USED_CHEATS       ) ? "[gs]" : "",
-        (cheatFlags & LPL_USED_SAVESTATES   ) ? "[ss]" : "",
-        (cheatFlags & LPL_USED_SLOWDOWN     ) ? "[sl]" : "",
-        (cheatFlags & LPL_USED_FRAME_ADVANCE) ? "[fa]" : "",
-        (cheatFlags & LPL_USED_SPEEDUP      ) ? "[sp]" : ""
-    );
+    const char flags[][2] = {
+        [__builtin_ctz(LPL_USED_CHEATS       )] = "gs",
+        [__builtin_ctz(LPL_USED_SAVESTATES   )] = "ss",
+        [__builtin_ctz(LPL_USED_SLOWDOWN     )] = "sl",
+        [__builtin_ctz(LPL_USED_FRAME_ADVANCE)] = "fa",
+        [__builtin_ctz(LPL_USED_SPEEDUP      )] = "sp",
+    };
+    char* p = buf;
+    u32 flag = 0x1;
+    for (int i = 0; i < ARRAY_COUNT(flags); i++) {
+        if (cheatFlags & flag) {
+            p += sprintf(p, "[%s]", flags[i]);
+        }
+        flag <<= 1;
+    }
 }
 ABOUT_ENTRY_FUNC(rhdc,           "%s", libpl_get_my_rhdc_username());
 #else // !LIBPL

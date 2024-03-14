@@ -23,61 +23,10 @@ INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
 const char crash_screen_version[] = "v2.0\n"; //! TODO: Change this on release.
 
 
-static const ThreadIDName sThreadIDNames[] = {
-    { .threadID = THREAD_0,                   .name = "0",              },
-    { .threadID = THREAD_1_IDLE,              .name = "idle",           },
-    { .threadID = THREAD_2,                   .name = "2",              },
-    { .threadID = THREAD_3_MAIN,              .name = "main",           },
-    { .threadID = THREAD_4_SOUND,             .name = "sound",          },
-    { .threadID = THREAD_5_GAME_LOOP,         .name = "game loop",      },
-    { .threadID = THREAD_6_RUMBLE,            .name = "rumble",         },
-    { .threadID = THREAD_7_HVQM,              .name = "HVQM",           },
-    { .threadID = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
-    { .threadID = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
-    { .threadID = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
-    { .threadID = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
-    { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
-};
-
-static const char* sCauseDesc[NUM_CAUSE_DESC] = {
-    [CAUSE_DESC_INT    ] = "Interrupt",
-    [CAUSE_DESC_MOD    ] = "TLB modification",
-    [CAUSE_DESC_RMISS  ] = "TLB exception on load or inst.",
-    [CAUSE_DESC_WMISS  ] = "TLB exception on store",
-    [CAUSE_DESC_RADE   ] = "Address error on load or inst.",
-    [CAUSE_DESC_WADE   ] = "Address error on store",
-    [CAUSE_DESC_IBE    ] = "Bus error on inst.",
-    [CAUSE_DESC_DBE    ] = "Bus error on data",
-    [CAUSE_DESC_SYSCALL] = "Failed Assert: See below",
-    [CAUSE_DESC_BREAK  ] = "Breakpoint exception",
-    [CAUSE_DESC_II     ] = "Reserved instruction",
-    [CAUSE_DESC_CPU    ] = "Coprocessor unusable",
-    [CAUSE_DESC_OV     ] = "Arithmetic overflow",
-    [CAUSE_DESC_TRAP   ] = "Trap exception",
-    [CAUSE_DESC_VCEI   ] = "Virtual coherency on inst.",
-    [CAUSE_DESC_FPE    ] = "Floating point exception",
-    [CAUSE_DESC_WATCH  ] = "Watchpoint exception",
-    [CAUSE_DESC_VCED   ] = "Virtual coherency on data",
-};
-
-static const char* sFpcsrDesc[NUM_FPCSR_DESC] = {
-    [FPCSR_DESC_CE] = "Unimplemented operation",
-    [FPCSR_DESC_CV] = "Invalid operation",
-    [FPCSR_DESC_CZ] = "Division by zero",
-    [FPCSR_DESC_CO] = "Overflow",
-    [FPCSR_DESC_CU] = "Underflow",
-    [FPCSR_DESC_CI] = "Inexact operation",
-};
-
-static const char* sFltErrDesc[NUM_FLT_ERR] = {
-    [FLT_ERR_NONE  ] = "",
-    [FLT_ERR_DENORM] = "Denormalized float",
-    [FLT_ERR_NAN   ] = "NaN float",
-};
-
+// -- STRINGS --
 
 // Region string:
-#define DEF_REGION_NAME(name) const char* gRegionName = TO_STRING2(name);
+#define DEF_REGION_NAME(_name) const char* gRegionName = TO_STRING2(_name);
 #ifdef VERSION_JP
 DEF_REGION_NAME(jp);
 #elif VERSION_US
@@ -100,7 +49,7 @@ const char* osTvTypeStrings[] = {
 };
 
 // Microcode string:
-#define DEF_UCODE_NAME(name) const char* gUcodeName = TO_STRING2(name);
+#define DEF_UCODE_NAME(_name) const char* gUcodeName = TO_STRING2(_name);
 #ifdef L3DEX2_ALONE
 DEF_UCODE_NAME(L3DEX2_alone);
 #elif F3DZEX_GBI_2
@@ -120,19 +69,19 @@ DEF_UCODE_NAME(Fast3D);
 #endif
 
 // Save type string:
-#define DEF_SAVETYPE_NAME(name) const char* gSaveTypeName = TO_STRING2(name);
+#define DEF_SAVETYPE_NAME(_name) const char* gSaveTypeName = TO_STRING2(_name);
 #ifdef EEP4K
-DEF_SAVETYPE_NAME(eep4k);
+DEF_SAVETYPE_NAME(eep4k); // 4kbit
 #elif EEP16K
-DEF_SAVETYPE_NAME(eep16k);
+DEF_SAVETYPE_NAME(eep16k); // 16kbit
 #elif SRAM
-DEF_SAVETYPE_NAME(sram);
+DEF_SAVETYPE_NAME(sram); // 256kbit
 #else
 DEF_SAVETYPE_NAME(unknown);
 #endif
 
 // Compression type string:
-#define DEF_COMPRESSION_NAME(name) const char* gCompressionName = TO_STRING2(name);
+#define DEF_COMPRESSION_NAME(_name) const char* gCompressionName = TO_STRING2(_name);
 #ifdef GZIP
 DEF_COMPRESSION_NAME(gzip);
 #elif RNC1
@@ -149,32 +98,62 @@ DEF_COMPRESSION_NAME(none);
 DEF_COMPRESSION_NAME(unk);
 #endif
 
-// Emulator strings:
-#define EMULATOR_STRING(_bits, _name)  { .bits = _bits, .name = _name, }
-static const EmulatorName sEmulatorStrings[] = {
-    { .bits = EMU_WIIVC,            .name = "Wii VC",           },
-    { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
-    { .bits = EMU_PROJECT64_3,      .name = "pj64 3",           },
-    { .bits = EMU_PROJECT64_4,      .name = "pj64 4",           },
-    { .bits = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
-    { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
-    { .bits = EMU_CEN64,            .name = "cen64",            },
-    { .bits = EMU_SIMPLE64,         .name = "simple64",         },
-    { .bits = EMU_PARALLELN64,      .name = "ParaLLEl N64",     },
-    { .bits = EMU_ARES,             .name = "ares",             },
-    { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
-};
 
-const char* get_emulator_name(enum Emulator emu) {
-    for (int i = 0; i < ARRAY_COUNT(sEmulatorStrings); i++) {
-        if (emu == sEmulatorStrings[i].bits) {
-            return sEmulatorStrings[i].name;
+// -- THREAD --
+
+static const ThreadIDName sThreadIDNames[] = {
+    { .threadID = THREAD_0,                   .name = "0",              },
+    { .threadID = THREAD_1_IDLE,              .name = "idle",           },
+    { .threadID = THREAD_2,                   .name = "2",              },
+    { .threadID = THREAD_3_MAIN,              .name = "main",           },
+    { .threadID = THREAD_4_SOUND,             .name = "sound",          },
+    { .threadID = THREAD_5_GAME_LOOP,         .name = "game loop",      },
+    { .threadID = THREAD_6_RUMBLE,            .name = "rumble",         },
+    { .threadID = THREAD_7_HVQM,              .name = "HVQM",           },
+    { .threadID = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
+    { .threadID = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
+    { .threadID = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
+    { .threadID = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
+    { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
+};
+// Returns a thread name from 'sThreadIDNames'.
+const char* get_thread_name_from_id(enum ThreadID threadID) {
+    const ThreadIDName* threadIDName = &sThreadIDNames[0];
+
+    for (int i = 0; i < ARRAY_COUNT(sThreadIDNames); i++) {
+        if (threadIDName->threadID == threadID) {
+            return threadIDName->name;
         }
+
+        threadIDName++;
     }
 
     return NULL;
 }
 
+
+// -- CAUSE --
+
+static const char* sCauseDesc[NUM_CAUSE_DESC] = {
+    [CAUSE_DESC_INT    ] = "Interrupt",
+    [CAUSE_DESC_MOD    ] = "TLB modification",
+    [CAUSE_DESC_RMISS  ] = "TLB exception on load or inst.",
+    [CAUSE_DESC_WMISS  ] = "TLB exception on store",
+    [CAUSE_DESC_RADE   ] = "Address error on load or inst.",
+    [CAUSE_DESC_WADE   ] = "Address error on store",
+    [CAUSE_DESC_IBE    ] = "Bus error on inst.",
+    [CAUSE_DESC_DBE    ] = "Bus error on data",
+    [CAUSE_DESC_SYSCALL] = "Failed Assert: See below",
+    [CAUSE_DESC_BREAK  ] = "Breakpoint exception",
+    [CAUSE_DESC_II     ] = "Reserved instruction",
+    [CAUSE_DESC_CPU    ] = "Coprocessor unusable",
+    [CAUSE_DESC_OV     ] = "Arithmetic overflow",
+    [CAUSE_DESC_TRAP   ] = "Trap exception",
+    [CAUSE_DESC_VCEI   ] = "Virtual coherency on inst.",
+    [CAUSE_DESC_FPE    ] = "Floating point exception",
+    [CAUSE_DESC_WATCH  ] = "Watchpoint exception",
+    [CAUSE_DESC_VCED   ] = "Virtual coherency on data",
+};
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc) {
     uint64_t badvaddr = tc->badvaddr;
@@ -234,6 +213,23 @@ const char* get_cause_desc(__OSThreadContext* tc) {
     return NULL;
 }
 
+
+// -- FPCSR/FPE --
+
+static const char* sFpcsrDesc[NUM_FPCSR_DESC] = {
+    [FPCSR_DESC_CE] = "Unimplemented operation",
+    [FPCSR_DESC_CV] = "Invalid operation",
+    [FPCSR_DESC_CZ] = "Division by zero",
+    [FPCSR_DESC_CO] = "Overflow",
+    [FPCSR_DESC_CU] = "Underflow",
+    [FPCSR_DESC_CI] = "Inexact operation",
+};
+static const char* sFltErrDesc[NUM_FLT_ERR] = {
+    [FLT_ERR_NONE  ] = "",
+    [FLT_ERR_DENORM] = "Denormalized float",
+    [FLT_ERR_NAN   ] = "NaN float",
+};
+
 //! TODO: NaN floats aren't detected here even though validate_float does, and this works with denorms.
 enum FloatErrorType validate_floats_in_reg_buffer(void) {
     enum FloatErrorType fltErrType = FLT_ERR_NONE;
@@ -280,16 +276,27 @@ const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial) {
     return NULL;
 }
 
-// Returns a thread name from 'sThreadIDNames'.
-const char* get_thread_name_from_id(enum ThreadID threadID) {
-    const ThreadIDName* threadIDName = &sThreadIDNames[0];
+// -- EMULATOR --
 
-    for (int i = 0; i < ARRAY_COUNT(sThreadIDNames); i++) {
-        if (threadIDName->threadID == threadID) {
-            return threadIDName->name;
+#define EMULATOR_STRING(_bits, _name)  { .bits = _bits, .name = _name, }
+static const EmulatorName sEmulatorStrings[] = {
+    { .bits = EMU_WIIVC,            .name = "Wii VC",           },
+    { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
+    { .bits = EMU_PROJECT64_3,      .name = "pj64 3",           },
+    { .bits = EMU_PROJECT64_4,      .name = "pj64 4",           },
+    { .bits = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
+    { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
+    { .bits = EMU_CEN64,            .name = "cen64",            },
+    { .bits = EMU_SIMPLE64,         .name = "simple64",         },
+    { .bits = EMU_PARALLELN64,      .name = "ParaLLEl N64",     },
+    { .bits = EMU_ARES,             .name = "ares",             },
+    { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
+};
+const char* get_emulator_name(enum Emulator emu) {
+    for (int i = 0; i < ARRAY_COUNT(sEmulatorStrings); i++) {
+        if (emu == sEmulatorStrings[i].bits) {
+            return sEmulatorStrings[i].name;
         }
-
-        threadIDName++;
     }
 
     return NULL;
