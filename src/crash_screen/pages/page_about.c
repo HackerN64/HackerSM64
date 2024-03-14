@@ -24,7 +24,9 @@
 #ifdef UNF
 #include "usb/usb.h"
 #include "usb/debug.h"
-#endif // UNF
+#else // !UNF
+#define debug_is_initialized() FALSE
+#endif // !UNF
 #ifdef LIBPL
 #include "lib/libpl/libpl.h"
 #endif // LIBPL
@@ -58,11 +60,14 @@ const char gValNames_no_yes[][4] = {
     [TRUE ] = "yes",
 };
 
-extern const u8 gRomSize[];
 
-#ifndef UNF
-    #define debug_is_initialized() FALSE
-#endif // !UNF
+extern const u8 gRomSize[];
+extern const u8 gGoddardSize[];
+
+
+f32 percent_of(f32 part, f32 total) {
+    return part / total * 100.0f;
+}
 
 
 #define ABOUT_ENTRY_FUNC(_name, fmt, ...) void _cs_about_func_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
@@ -74,30 +79,26 @@ ABOUT_ENTRY_FUNC(compiler,       __compiler__)
 ABOUT_ENTRY_FUNC(linker,         __linker__)
 ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
-ABOUT_ENTRY_FUNC(microcode,      ucode_name)
+ABOUT_ENTRY_FUNC(microcode,      gUcodeName)
 #ifdef LIBDRAGON
 ABOUT_ENTRY_FUNC(region,         "LIBDRAGON") //! TODO: Libdragon version
 #else // !LIBDRAGON
-ABOUT_ENTRY_FUNC(region,         "%s (%s)", region_name, osTvTypeStrings[osTvType])
+ABOUT_ENTRY_FUNC(region,         "%s (%s)", gRegionName, osTvTypeStrings[osTvType])
 #endif //! LIBDRAGON
-ABOUT_ENTRY_FUNC(save_type,      savetype_name)
-ABOUT_ENTRY_FUNC(compression,    compression_name)
+ABOUT_ENTRY_FUNC(save_type,      gSaveTypeName)
+ABOUT_ENTRY_FUNC(compression,    gCompressionName)
 void _cs_about_func_symbols(char* buf) {
 #ifdef INCLUDE_DEBUG_MAP
     size_t numSymbols = (gMapSymbolsEnd - gMapSymbols);
-    size_t numBytes = ((Address)_mapDataSegmentRomEnd - (Address)_mapDataSegmentRomStart);
-    size_t romSize = (size_t)gRomSize;
-    f32 percentOfRom = (f32)numBytes / (f32)romSize * 100.0f;
+    size_t mapSize = ((Address)_mapDataSegmentRomEnd - (Address)_mapDataSegmentRomStart);
     char* p = buf;
-    p += sprintf(p, "%i (", numSymbols);
-    p += sprintf_int_with_commas(p, numBytes);
-    p += sprintf(p, "b %.2g%%%%rom)", percentOfRom); //! TODO: Why does the first "%%" get eaten when using a float here?
-    // sprintf(buf, "%i (%ib ~%.3g%%%%rom)", numSymbols, numBytes, percentOfRom); //! TODO: Why does the first "%%" get eaten when using a float here?
+    p += sprintf(p, "%i =", numSymbols);
+    p += sprintf_int_with_commas(p, mapSize);
+    p += sprintf(p, "b (%.2g%%%%rom)", percent_of(mapSize, (size_t)gRomSize)); //! TODO: Why does the first "%%" get eaten when using a float here?
 #else  // !INCLUDE_DEBUG_MAP
     sprintf(buf, "NOT INCLUDED");
 #endif // !INCLUDE_DEBUG_MAP
 }
-// ABOUT_ENTRY_FUNC(rom_size,       "%ib", (size_t)gRomSize)
 void _cs_about_func_rom_size(char* buf) {
     char* p = buf;
     p += sprintf_int_with_commas(p, (size_t)gRomSize);
@@ -117,7 +118,12 @@ ABOUT_ENTRY_FUNC(silhouette,     "%d", SILHOUETTE)
 ABOUT_ENTRY_FUNC(silhouette,     gValNames_no_yes[FALSE])
 #endif // !SILHOUETTE
 #ifdef KEEP_MARIO_HEAD
-ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[TRUE])
+void _cs_about_func_goddard(char* buf) {
+    size_t goddardSize = (size_t)gGoddardSize;
+    char* p = buf;
+    p += sprintf_int_with_commas(p, goddardSize);
+    p += sprintf(p, "b (%.2g%%%%rom)", percent_of(goddardSize, (size_t)gRomSize)); //! TODO: Why does the first "%%" get eaten when using a float here?
+}
 #else // !KEEP_MARIO_HEAD
 ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[FALSE])
 #endif // !KEEP_MARIO_HEAD
@@ -143,11 +149,11 @@ void _cs_about_func_debug_mode(char* buf) {
 }
 #ifdef LIBPL
 void _cs_about_func_emulator(char* buf) {
+    char* p = buf;
+    p += sprintf(p, "%s", get_emulator_name(gEmulator));
     if (gSupportsLibpl) {
         const lpl_version* v = libpl_get_core_version();
-        sprintf(buf, "%s v%d.%d.%d", get_emulator_name(gEmulator), v->major, v->minor, v->patch);
-    } else {
-        sprintf(buf, "%s", get_emulator_name(gEmulator));
+        p += sprintf(p, " v%d.%d.%d", v->major, v->minor, v->patch);
     }
 }
 ABOUT_ENTRY_FUNC(gfx_plugin,     libpl_get_graphics_plugin()->name);

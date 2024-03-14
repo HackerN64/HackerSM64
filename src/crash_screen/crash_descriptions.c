@@ -77,7 +77,7 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
 
 
 // Region string:
-#define DEF_REGION_NAME(name) const char* region_name = TO_STRING2(name);
+#define DEF_REGION_NAME(name) const char* gRegionName = TO_STRING2(name);
 #ifdef VERSION_JP
 DEF_REGION_NAME(jp);
 #elif VERSION_US
@@ -100,7 +100,7 @@ const char* osTvTypeStrings[] = {
 };
 
 // Microcode string:
-#define DEF_UCODE_NAME(name) const char* ucode_name = TO_STRING2(name);
+#define DEF_UCODE_NAME(name) const char* gUcodeName = TO_STRING2(name);
 #ifdef L3DEX2_ALONE
 DEF_UCODE_NAME(L3DEX2_alone);
 #elif F3DZEX_GBI_2
@@ -120,7 +120,7 @@ DEF_UCODE_NAME(Fast3D);
 #endif
 
 // Save type string:
-#define DEF_SAVETYPE_NAME(name) const char* savetype_name = TO_STRING2(name);
+#define DEF_SAVETYPE_NAME(name) const char* gSaveTypeName = TO_STRING2(name);
 #ifdef EEP4K
 DEF_SAVETYPE_NAME(eep4k);
 #elif EEP16K
@@ -132,7 +132,7 @@ DEF_SAVETYPE_NAME(unknown);
 #endif
 
 // Compression type string:
-#define DEF_COMPRESSION_NAME(name) const char* compression_name = TO_STRING2(name);
+#define DEF_COMPRESSION_NAME(name) const char* gCompressionName = TO_STRING2(name);
 #ifdef GZIP
 DEF_COMPRESSION_NAME(gzip);
 #elif RNC1

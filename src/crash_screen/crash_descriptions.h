@@ -62,11 +62,11 @@ typedef struct EmulatorName {
 extern char HackerSM64_version_txt[];
 extern const char crash_screen_version[];
 
-extern const char* region_name;
+extern const char* gRegionName;
 extern const char* osTvTypeStrings[];
-extern const char* ucode_name;
-extern const char* savetype_name;
-extern const char* compression_name;
+extern const char* gUcodeName;
+extern const char* gSaveTypeName;
+extern const char* gCompressionName;
 
 
 const char* get_cause_desc(__OSThreadContext* tc);

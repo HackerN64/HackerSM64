@@ -437,6 +437,8 @@ SECTIONS
       ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
 #endif
 
+   gGoddardSize = GODDARD_SIZE;
+
    /* 0x268020 0x268020-0 [0] */
    BEGIN_SEG(intro, 0x14000000)
    {
