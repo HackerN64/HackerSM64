@@ -127,6 +127,16 @@ void _cs_about_func_ram_size(char* buf) {
     p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes((size_t)TOTAL_RAM_SIZE));
 }
 ABOUT_ENTRY_FUNC(gfx_pool,       (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
+#ifdef KEEP_MARIO_HEAD
+void _cs_about_func_goddard(char* buf) {
+    size_t goddardSize = (size_t)gGoddardSize;
+    char* p = buf;
+    p += sprintf_int_with_commas(p, goddardSize);
+    p += sprintf(p, STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM, percent_of(goddardSize, (size_t)gRomSize));
+}
+#else // !KEEP_MARIO_HEAD
+ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[FALSE])
+#endif // !KEEP_MARIO_HEAD
 ABOUT_ENTRY_FUNC(st_surf_pool,   (STR_HEX_PREFIX"%X"), ((Address)gCurrStaticSurfacePoolEnd - (Address)gCurrStaticSurfacePool))
 ABOUT_ENTRY_FUNC(dyn_surf_pool,  (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), ((Address)gDynamicSurfacePoolEnd - (Address)gDynamicSurfacePool), (size_t)DYNAMIC_SURFACE_POOL_SIZE)
 ABOUT_ENTRY_FUNC(level_bounds,   (STR_HEX_PREFIX"%04X (%dx)"), LEVEL_BOUNDARY_MAX, (LEVEL_BOUNDARY_MAX / 0x2000))
@@ -138,16 +148,6 @@ ABOUT_ENTRY_FUNC(silhouette,     "opacity: %d", SILHOUETTE)
 #else // !SILHOUETTE
 ABOUT_ENTRY_FUNC(silhouette,     gValNames_no_yes[FALSE])
 #endif // !SILHOUETTE
-#ifdef KEEP_MARIO_HEAD
-void _cs_about_func_goddard(char* buf) {
-    size_t goddardSize = (size_t)gGoddardSize;
-    char* p = buf;
-    p += sprintf_int_with_commas(p, goddardSize);
-    p += sprintf(p, STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM, percent_of(goddardSize, (size_t)gRomSize));
-}
-#else // !KEEP_MARIO_HEAD
-ABOUT_ENTRY_FUNC(goddard,        gValNames_no_yes[FALSE])
-#endif // !KEEP_MARIO_HEAD
 #if ENABLE_RUMBLE //! TODO: Update this when Input PR is merged.
 ABOUT_ENTRY_FUNC(rumble,         "%s%s", gValNames_no_yes[sRumblePakThreadActive], (sRumblePakActive ? " +pack" : ""))
 #else // !ENABLE_RUMBLE
@@ -270,9 +270,9 @@ CSAboutEntry sCSAboutEntries_collision[CS_NUM_ABOUT_ENTRIES_COLLISION] = {
 CSAboutEntry sCSAboutEntries_misc[CS_NUM_ABOUT_ENTRIES_MISC] = {
     [CS_ABOUT_GROUP_HEADER_MISC    ] = ABOUT_ENTRY_HEADER("misc", TRUE),
     [CS_ABOUT_ENTRY_MISC_GFX_POOL  ] = ABOUT_ENTRY_SINGLE(gfx_pool,      "GFX POOL"      ),
+    [CS_ABOUT_ENTRY_MISC_GODDARD   ] = ABOUT_ENTRY_SINGLE(goddard,       "GODDARD"       ),
     [CS_ABOUT_ENTRY_MISC_RCVI_HACK ] = ABOUT_ENTRY_SINGLE(rcvi_hack,     "RCVI HACK"     ),
     [CS_ABOUT_ENTRY_MISC_SILHOUETTE] = ABOUT_ENTRY_SINGLE(silhouette,    "SILHOUETTE"    ),
-    [CS_ABOUT_ENTRY_MISC_GODDARD   ] = ABOUT_ENTRY_SINGLE(goddard,       "GODDARD"       ),
     [CS_ABOUT_ENTRY_MISC_RUMBLE    ] = ABOUT_ENTRY_SINGLE(rumble,        "RUMBLE"        ),
     [CS_ABOUT_ENTRY_MISC_DEBUG_MODE] = ABOUT_ENTRY_SINGLE(debug_mode,    "DEBUG MODE"    ),
     [CS_ABOUT_ENTRY_MISC_END       ] = ABOUT_ENTRY_NULL(),
