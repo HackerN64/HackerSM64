@@ -94,29 +94,34 @@ DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
 TARGET := sm64
 
-
 # GRUCODE - selects which RSP microcode to use.
-#   f3dex   -
-#   f3dex2  -
-#   l3dex2  - F3DEX2 version that only renders in wireframe
-#   f3dzex  - newer, experimental microcode used in Animal Crossing
-#   super3d - extremely experimental version of Fast3D lacking many features for speed
-GRUCODE ?= f3dzex
-$(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2))
+#   f3dex   - Upgraded Fast3D. Offers worse performance than F3DEX2, but has a more precise z-buffer.
+#   f3dex2  - Upgraded F3DEX. Good performance and widely supported across almost all emulators.
+#   l3dex2  - F3DEX2 version that only renders in wireframe.
+#   f3dzex  - Newer microcode based on F3DEX2 used in Animal Crossing and Zelda 64. This is the HackerSM64 default.
+#   super3d - Extremely experimental version of Fast3D lacking many features and simplified routines for speed.
+#   f3dex3  - Upgraded F3DEX2. Great performance, but as of February 4th, 2024, it is only supported across LLE emulators and real hardware.
 
-ifeq ($(GRUCODE),f3dex) # Fast3DEX
+GRUCODE ?= f3dzex
+$(eval $(call validate-option,GRUCODE,f3dex f3dex2 l3dex2 f3dex2pl f3dzex super3d f3dex3))
+
+ifeq ($(GRUCODE),f3dex) # F3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dex2) # Fast3DEX2
+else ifeq ($(GRUCODE),f3dex2) # F3DEX2
   DEFINES += F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),l3dex2) # Line3DEX2
+else ifeq ($(GRUCODE),l3dex2) # L3DEX2
   DEFINES += L3DEX2_GBI=1 L3DEX2_ALONE=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dex2pl) # Fast3DEX2_PosLight
+else ifeq ($(GRUCODE),f3dex2pl) # F3DEX2_PosLight
   DEFINES += F3DEX2PL_GBI=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
+else ifeq ($(GRUCODE),f3dzex) # F3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
   DEFINES += F3DZEX_NON_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),super3d) # Super3D
   $(warning Super3D is experimental. Try at your own risk.)
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
+else ifeq ($(GRUCODE),f3dex3) # F3DEX3
+  DEFINES += F3DEX_GBI_3=1 F3DEX_GBI_SHARED=1
+  $(warning F3DEX3 is experimental, and as of February 4th, 2024, only fully works on a real Nintendo 64 or with low level emulation (LLE) (i.e. NOT PROJECT64 1.6). Try at your own risk and please inform your audience to avoid compatibility problems.)
+  $(warning Failure to change emulator settings CAN CAUSE YOUR GAME TO CRASH!)
 endif
 
 # TEXT ENGINES
@@ -548,7 +553,7 @@ ifneq (,$(call find-command,armips))
 else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
-EMULATOR = mupen64plus
+EMULATOR = parallel-launcher
 EMU_FLAGS =
 
 ifneq (,$(call find-command,wslview))

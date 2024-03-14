@@ -247,6 +247,13 @@ extern u64 gspL3DZEX2_PosLight_xbusTextStart[],
 extern u64 gspL3DZEX2_PosLight_xbusDataStart[],
            gspL3DZEX2_PosLight_xbusDataEnd[];
 
+/*========== F3DEX3 ==========*/
+/* FIFO version */
+extern u64 gspF3DEX3_fifoTextStart[],
+                     gspF3DEX3_fifoTextEnd[];
+extern u64 gspF3DEX3_fifoDataStart[],
+                     gspF3DEX3_fifoDataEnd[];
+
 /**************************************************************************
  *
  * decomp ucode names

@@ -52,6 +52,10 @@ ALIGNED16 Mat4 gMatStack[32];
 ALIGNED16 Mtx *gMatStackFixed[32];
 f32 sAspectRatio;
 
+#ifdef F3DEX_GBI_3
+PlainVtx *camWorld;
+#endif
+
 /**
  * Animation nodes have state in global variables, so this struct captures
  * the animation state so a 'context switch' can be made when rendering the
@@ -475,6 +479,10 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
 
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
 
+#ifdef F3DEX_GBI_3
+        gSPCameraWorld(gDisplayListHead++, camWorld);
+#endif
+
         gCurGraphNodeCamFrustum = node;
         geo_process_node_and_siblings(node->fnNode.node.children);
         gCurGraphNodeCamFrustum = NULL;
@@ -534,7 +542,7 @@ Lights1 defaultLight = gdSPDefLights1(
     0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
 );
 
-Vec3f globalLightDirection = { 0x28, 0x28, 0x28 };
+Vec3f globalLightDirection = { 0x49, 0x49, 0x49 };
 
 void setup_global_light() {
     Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
@@ -588,7 +596,11 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * -(*cameraMatrix)[0][1]);
     gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * -(*cameraMatrix)[1][1]);
     gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * -(*cameraMatrix)[2][1]);
-#endif // F3DEX_GBI_2
+#endif
+
+#ifdef F3DEX_GBI_3
+        gSPCameraWorld(gDisplayListHead++, camWorld);
+#endif
 
 #if WORLD_SCALE > 1
     // Make a copy of the view matrix and scale its translation based on WORLD_SCALE
@@ -1249,6 +1261,13 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
         gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
         bzero(gCurLookAt, sizeof(LookAt));
+
+#ifdef F3DEX_GBI_3
+        camWorld = alloc_display_list(sizeof(PlainVtx));
+        camWorld->c.pos[0] = gLakituState.pos[0];
+        camWorld->c.pos[1] = gLakituState.pos[1];
+        camWorld->c.pos[2] = gLakituState.pos[2];
+#endif
 
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
