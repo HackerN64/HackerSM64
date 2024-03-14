@@ -45,6 +45,16 @@
 #define PARALLEL_LAKITU_CAM
 
 /**
+ * These defines decide whether the turning, error and zoom out/zoom in out sounds are enabled, and which sounds to play if enabled.
+ * The turning, zooming out and zooming in sounds have been replaced with less annoying ones. 
+ * If you want the vanilla ones back, set them to SOUND_MENU_CAMERA_TURN, SOUND_MENU_CAMERA_ZOOM_OUT and SOUND_MENU_CAMERA_ZOOM_IN respectively.
+ */
+#define CAMERA_TURN_SOUND SOUND_MENU_MESSAGE_NEXT_PAGE
+#define CAMERA_ZOOM_OUT_SOUND SOUND_MENU_MESSAGE_DISAPPEAR
+#define CAMERA_ZOOM_IN_SOUND SOUND_MENU_MESSAGE_APPEAR
+// #define CAMERA_ERROR_SOUND SOUND_MENU_CAMERA_BUZZ
+
+/**
  * Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
  */
 // #define PUPPYCAM
