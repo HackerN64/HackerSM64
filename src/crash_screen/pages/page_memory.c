@@ -120,7 +120,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 if (currAddr == gSelectedAddress) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
                     textColor = RGBA32_INVERT(textColor);
-                } else if (currAddr == tc->pc) {
+                } else if (currAddr == GET_EPC(tc)) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
                 }
 
@@ -236,7 +236,7 @@ void page_memory_draw(void) {
     cs_draw_scroll_bar(
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
-        (tc->pc - VIRTUAL_RAM_START),
+        (GET_EPC(tc) - VIRTUAL_RAM_START),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
 

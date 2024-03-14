@@ -66,11 +66,12 @@ void fill_function_stack_trace(void) {
 
     // Include the current function at the top:
     __OSThreadContext* tc = &gCrashedThread->context;
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    Address pc = tc->pc;
+    const MapSymbol* symbol = get_map_symbol(pc, SYMBOL_SEARCH_BACKWARD);
     FunctionInStack currInfo = {
         .stackAddr = tc->sp,
-        .curAddr   = tc->pc,
-        .faddr     = (symbol ? symbol->addr : tc->pc),
+        .curAddr   = pc,
+        .faddr     = (symbol ? symbol->addr : pc),
         .fname     = get_map_symbol_name(symbol),
     };
     add_to_stack(&currInfo);

@@ -178,7 +178,7 @@ const char* get_emulator_name(enum Emulator emu) {
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc) {
     uint64_t badvaddr = tc->badvaddr;
-    uint32_t epc = tc->pc + ((tc->cause & 0x80000000) ? 4 : 0); //! TODO: Is this correct?
+    uint32_t epc = GET_EPC(tc);
     u32 cause = (tc->cause & CAUSE_EXCMASK);
 
     switch (cause) {

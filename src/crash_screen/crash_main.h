@@ -17,6 +17,12 @@
 #define CYCLES_TO_FRAMES(c) (((OSTime)(c) * FPS_COUNT) / OS_CPU_COUNTER)
 
 
+// Adjust tc->pc when in a delay slot.
+//! TODO: define for flag
+//! TODO: Is this correct?
+#define GET_EPC(tc) (tc->pc + ((tc->cause & 0x80000000) ? sizeof(uintptr_t) : 0))
+
+
 // The number of crash screen threads that will be cycled through when the crash screen crashes. This should be at least 3.
 #define NUM_CRASH_SCREEN_BUFFERS 3
 

@@ -86,7 +86,7 @@ void cs_print_crashed_thread(u32 x, u32 y) {
 
 #ifdef INCLUDE_DEBUG_MAP
 void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
     // "FUNC: [function name]"
     size_t charX = cs_print(x, y,
         STR_COLOR_PREFIX"FUNC:\t",
@@ -222,7 +222,7 @@ void page_home_draw(void) {
         cs_draw_divider(DIVIDER_Y(line));
         line = cs_draw_assert(line);
     } else {
-        Address addr = tc->pc;
+        Address addr = GET_EPC(tc);
         Word data = 0x00000000;
         if (try_read_data(&data, addr) && is_in_code_segment(addr)) {
             cs_print(TEXT_X(0), TEXT_Y(line++),
@@ -342,7 +342,7 @@ void page_home_print(void) {
 
  #ifdef INCLUDE_DEBUG_MAP
     // FUNCTION:
-    const MapSymbol* symbol = get_map_symbol(tc->pc, SYMBOL_SEARCH_BACKWARD);
+    const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
     if (symbol != NULL) {
         osSyncPrintf("- FUNC: %s\n", get_map_symbol_name(symbol));
     }

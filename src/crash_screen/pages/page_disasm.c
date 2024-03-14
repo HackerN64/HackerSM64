@@ -357,6 +357,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
 void page_disasm_draw(void) {
     __OSThreadContext* tc = &gCrashedThread->context;
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
+    Address epc = GET_EPC(tc);
 
     sDisasmNumShownRows = DISASM_NUM_SHOWN_ROWS;
     const _Bool showCurrentRange  = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_RANGE);
@@ -403,7 +404,7 @@ void page_disasm_draw(void) {
     }
 #endif // INCLUDE_DEBUG_MAP
 
-    disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, tc->pc);
+    disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, epc);
 
     if (
         showCurrentRange
@@ -435,7 +436,7 @@ void page_disasm_draw(void) {
     cs_draw_scroll_bar(
         scrollTop, scrollBottom,
         shownSection, VIRTUAL_RAM_SIZE,
-        (tc->pc - VIRTUAL_RAM_START),
+        (epc - VIRTUAL_RAM_START),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
 
@@ -539,7 +540,8 @@ void page_disasm_print(void) {
                 osSyncPrintf("%s", destFname);
             }
  #endif // INCLUDE_DEBUG_MAP
-            if (addr == gCrashedThread->context.pc) {
+            __OSThreadContext* tc = &gCrashedThread->context;
+            if (addr == GET_EPC(tc)) {
                 osSyncPrintf("<-- CRASH");
             }
         } else { // Outside of code segments:
