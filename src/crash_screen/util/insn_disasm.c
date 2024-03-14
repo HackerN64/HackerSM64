@@ -514,12 +514,15 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_FREG                "F%02d"                         // Float Register
 
 
-#define ADD_COLOR(_c) cs_insn_param_check_color_change(&strp, &color, (_c), format);
-#define ADD_STR(...) strp += sprintf(strp, __VA_ARGS__);
-//! TODO: Actually include the output register in the buffer, but mark it as output.
-#define ADD_REG(_fmt, _cop, _idx) {             \
-    regInfo = get_reg_info((_cop), (_idx));     \
-    ADD_STR((_fmt), regInfo->name);             \
+#define ADD_COLOR(_c) {                                             \
+    cs_insn_param_check_color_change(&strp, &color, (_c), format);  \
+}
+#define ADD_STR(...) {                  \
+    strp += sprintf(strp, __VA_ARGS__); \
+}
+#define ADD_REG(_fmt, _cop, _idx) {                                                                             \
+    regInfo = get_reg_info((_cop), (_idx));                                                                     \
+    ADD_STR((_fmt), regInfo->name);                                                                             \
     append_reg_to_buffer((_cop), (_idx), ((cmdIndex == info->f2i) ? isFlt2 : isFlt1), (cmdIndex == info->out)); \
 }
 

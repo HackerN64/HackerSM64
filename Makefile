@@ -254,7 +254,7 @@ endif
 # (library will be pulled into repo after building with this enabled for the first time)
 #   1 - includes code in ROM
 #   0 - does not
-LIBPL ?= 0
+LIBPL ?= 1
 LIBPL_DIR := lib/libpl
 $(eval $(call validate-option,LIBPL,0 1))
 ifeq ($(LIBPL),1)
