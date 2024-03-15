@@ -214,7 +214,6 @@ ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
 
 // Extra long string buffer for long entries to save space in sAboutEntries.
 char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][LONG_INFO_BUFFER_LENGTH];
-u32 gLongInfoBufferIndex = 0;
 
 
 #define ABOUT_ENTRY_GAP()                      { .desc = "",    .func = NULL,                   .info = "", .type = CS_ABOUT_ENTRY_TYPE_NONE,       }
@@ -342,6 +341,7 @@ void append_to_displayed_entries(enum CSAboutGroups groupID, int entryID) {
 }
 
 void fill_entry_info_buffers(void) {
+    bzero(gLongInfoBuffer, sizeof(gLongInfoBuffer));
     u32 longBufferIndex = 0;
 
     // Fill entry buffers;
@@ -349,6 +349,11 @@ void fill_entry_info_buffers(void) {
         CSAboutEntry* entry = get_about_entry(groupID, 0);
         while (entry->type != CS_ABOUT_ENTRY_TYPE_NULL) {
             char* buf = entry->info;
+
+            // For subsequent crashes:
+            if (entry->type > CS_ABOUT_ENTRY_TYPE_LONG) {
+                entry->type = CS_ABOUT_ENTRY_TYPE_LONG;
+            }
 
             if (entry->type == CS_ABOUT_ENTRY_TYPE_LONG) {
                 entry->type = (CS_ABOUT_ENTRY_TYPE_LONG_N + longBufferIndex);
