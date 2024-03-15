@@ -284,8 +284,22 @@ void cs_update_input(void) {
         return;
     }
 
-    // Run the page-specific input function.
-    if ((page->inputFunc != NULL) && !page->flags.crashed) {
+    if (page->flags.crashed) {
+        if (
+            (gCSCompositeController->buttonDown & A_BUTTON) &&
+            (gCSCompositeController->buttonDown & B_BUTTON) &&
+            (gCSCompositeController->buttonPressed & START_BUTTON)
+        ) {
+            gCSCompositeController->buttonPressed &= !(A_BUTTON | B_BUTTON);
+            // Attempt to reopen crashed page.
+            cs_open_popup(CS_POPUP_NONE);
+            page->flags.crashed = FALSE;
+            if (page->initFunc != NULL) {
+                page->initFunc();
+            }
+        }
+    } else if (page->inputFunc != NULL) {
+        // Run the page-specific input function.
         page->inputFunc();
     }
 
