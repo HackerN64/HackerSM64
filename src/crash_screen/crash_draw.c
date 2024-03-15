@@ -446,7 +446,7 @@ void cs_draw_main(void) {
             );
         } else if (page->flags.crashed) {
             cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
-                COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED\nPRESS A+B+START TO ATTEMPT TO REOPEN"
+                COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED\n\nPRESS A+B+START TO ATTEMPT TO REVIVE PAGE"
             );
         } else {
             page->drawFunc();

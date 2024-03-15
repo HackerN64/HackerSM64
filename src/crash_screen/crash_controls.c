@@ -247,9 +247,9 @@ void cs_update_input(void) {
 
     CSPopup* popup = cs_get_current_popup();
 
-    if ((popup == NULL) && !gCSSwitchedPopup) {
+    if ((popup == NULL) && !gCSSwitchedPopup && !page->flags.crashed) { //! TODO: Find out why checking page->flags.initialized here doesn't work.
         if (
-            !(gCSCompositeController->buttonDown & Z_TRIG) &&
+            !(gCSCompositeController->buttonDown & Z_TRIG) && // Don't open when crash screen is invisible or when doing UNF print.
             (gCSCompositeController->buttonPressed & START_BUTTON)
         ) {
             cs_open_popup(CS_POPUP_CONTROLS);
@@ -292,6 +292,7 @@ void cs_update_input(void) {
         ) {
             gCSCompositeController->buttonPressed &= !(A_BUTTON | B_BUTTON);
             page->flags.crashed = FALSE;
+            page->flags.initialized = FALSE;
             if (page->initFunc != NULL) {
                 page->initFunc();
             }
