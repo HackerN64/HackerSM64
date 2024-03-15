@@ -9,7 +9,7 @@
 
 //! TODO: Use nm map symbol data to get this info?
 //! TODO: Get this to work with stuff like bhv names.
-ALIGNED8 static const MemoryRegion sTextRegions[] = {
+ALIGNED8 static const AddressPair sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
 TEXT_REGION_SEGMENT(engine)
@@ -60,8 +60,9 @@ void map_data_init(void) {
 
     Address start = (Address)_mapDataSegmentRomStart;
     Address end   = (Address)_mapDataSegmentRomEnd;
+    size_t size = (end - start);
 
-    headless_dma(start, (size_t*)(RAM_END - RAM_1MB), (end - start));
+    headless_dma(start, (size_t*)(RAM_END - RAM_1MB), size);
 }
 
 /**
@@ -122,6 +123,10 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
     const MapSymbol* symbol = &gMapSymbols[0];
 
     for (size_t i = 0; i < gNumMapSymbols; i++) {
+        if (symbol == NULL) {
+            break;
+        }
+
         if (addr_is_in_symbol(addr, symbol)) {
             return i;
         }
@@ -146,6 +151,10 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
     const MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
     for (size_t i = gNumMapSymbols; i-- > 0;) {
+        if (symbol == NULL) {
+            break;
+        }
+
         if (addr_is_in_symbol(addr, symbol)) {
             return i;
         }
@@ -168,7 +177,7 @@ const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections search
     return NULL;
 #endif // INCLUDE_DEBUG_MAP
     Word data = 0;
-    if (!try_read_data(&data, addr)) {
+    if (!try_read_word_aligned(&data, addr)) {
         return NULL;
     }
 

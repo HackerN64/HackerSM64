@@ -562,11 +562,14 @@ SECTIONS
 #endif
 
 #if defined(INCLUDE_DEBUG_MAP) && !defined(PRELIMINARY)
-   BEGIN_SEG(mapData, (RAM_END - RAM_1MB)) {
+   BEGIN_SEG(mapData, (RAM_END - RAM_1MB))
+   {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));
+      . = ALIGN(0x10);
    }
    END_SEG(mapData)
 #endif
+
    /* DWARF debug sections.
       Symbols in the DWARF debugging sections are relative to the beginning
       of the section so we begin them at 0.  */

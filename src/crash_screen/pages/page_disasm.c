@@ -43,9 +43,7 @@ const char* sValNames_branch_arrow[] = {
 struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_HEADER_PAGE_DISASM      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASM",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_BINARY           ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknown as binary",              .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_PSEUDOINSNS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
@@ -320,7 +318,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         }
 
         Word data = 0x00000000;
-        if (!try_read_data(&data, addr)) {
+        if (!try_read_word_aligned(&data, addr)) {
             cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else if (is_in_code_segment(addr)) {
             print_as_insn(charX, charY, addr, data);
@@ -362,10 +360,8 @@ void page_disasm_draw(void) {
     sDisasmNumShownRows = DISASM_NUM_SHOWN_ROWS;
     const _Bool showCurrentRange  = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_RANGE);
     sDisasmNumShownRows -= showCurrentRange;
-#ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SHOW_SYMBOL);
     sDisasmNumShownRows -= showCurrentSymbol;
-#endif // INCLUDE_DEBUG_MAP
 
     sDisasmBranchStartX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET) +
                         cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)
@@ -387,31 +383,30 @@ void page_disasm_draw(void) {
         line++;
     }
 
-#ifdef INCLUDE_DEBUG_MAP
     if (showCurrentSymbol) {
+#ifdef INCLUDE_DEBUG_MAP
         const MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
-
         if (symbol != NULL) {
             // "[symbol]"
             cs_print_symbol_name(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, symbol);
+        } else
+#endif // INCLUDE_DEBUG_MAP
+        {
+            const char* name = get_memory_string_from_addr(gSelectedAddress);
+            if (name != NULL) {
+                cs_print_scroll(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, name);
+            }
         }
-
         line++;
     }
 
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         disasm_draw_branch_arrows(line);
     }
-#endif // INCLUDE_DEBUG_MAP
 
     disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, epc);
 
-    if (
-        showCurrentRange
-#ifdef INCLUDE_DEBUG_MAP
-        || showCurrentSymbol
-#endif // INCLUDE_DEBUG_MAP
-    ) {
+    if (showCurrentRange || showCurrentSymbol) {
         cs_draw_divider(DIVIDER_Y(line));
     }
 
@@ -528,7 +523,7 @@ void page_disasm_print(void) {
         Address addr = (startAddr + (y * PAGE_DISASM_STEP));
         osSyncPrintf("- ["STR_HEX_WORD"]: ", addr);
         Word data = 0x00000000;
-        if (!try_read_data(&data, addr)) {
+        if (!try_read_word_aligned(&data, addr)) {
             osSyncPrintf("*");
         } else if (is_in_code_segment(addr)) {
             const char* destFname = NULL;

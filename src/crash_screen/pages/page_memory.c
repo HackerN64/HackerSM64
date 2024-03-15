@@ -24,9 +24,7 @@
 struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MEMORY",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_AS_ASCII         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show data as ascii",             .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_END_MEMORY              ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -101,7 +99,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 .word = 0x00000000,
             };
             Address currAddrAligned = (rowAddr + (wordOffset * sizeof(Word)));
-            _Bool valid = try_read_data(&data.word, currAddrAligned);
+            _Bool valid = try_read_word_aligned(&data.word, currAddrAligned);
 
 #ifdef UNF
             if (valid) {
@@ -146,10 +144,8 @@ void page_memory_draw(void) {
     sRamViewNumShownRows = MEMORY_NUM_SHOWN_ROWS;
     const _Bool showCurrentRange  = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_RANGE);
     sRamViewNumShownRows -= showCurrentRange;
-#ifdef INCLUDE_DEBUG_MAP
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
     sRamViewNumShownRows -= showCurrentSymbol;
-#endif // INCLUDE_DEBUG_MAP
 
     u32 line = 1;
 
@@ -166,26 +162,24 @@ void page_memory_draw(void) {
         line++;
     }
 
-#ifdef INCLUDE_DEBUG_MAP
     if (showCurrentSymbol) {
+#ifdef INCLUDE_DEBUG_MAP
         const MapSymbol* symbol = get_map_symbol(gSelectedAddress, SYMBOL_SEARCH_BACKWARD);
-
         if (symbol != NULL) {
             // "[symbol]"
             cs_print_symbol_name(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, symbol);
+        } else
+#endif // INCLUDE_DEBUG_MAP
+        {
+            const char* name = get_memory_string_from_addr(gSelectedAddress);
+            if (name != NULL) {
+                cs_print_scroll(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, name);
+            }
         }
-
         line++;
-
     }
-#endif // INCLUDE_DEBUG_MAP
 
-    if (
-        showCurrentRange
-#ifdef INCLUDE_DEBUG_MAP
-        || showCurrentSymbol
-#endif // INCLUDE_DEBUG_MAP
-    ) {
+    if (showCurrentRange || showCurrentSymbol) {
         cs_draw_divider(DIVIDER_Y(line));
     }
 

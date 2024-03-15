@@ -201,12 +201,12 @@ uint64_t get_reg_val(enum Coprocessors cop, int idx) {
 
         if (info->size == sizeof(uint64_t)) {
             Doubleword data = 0;
-            if (try_read_doubleword(&data, addr)) {
+            if (try_read_doubleword_aligned(&data, addr)) {
                 return data;
             }
         } else {
             Word data = 0;
-            if (try_read_word(&data, addr)) {
+            if (try_read_word_aligned(&data, addr)) {
                 return data;
             }
         }

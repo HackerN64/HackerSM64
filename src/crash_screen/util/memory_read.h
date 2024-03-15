@@ -62,8 +62,25 @@ enum MemoryRegions {
 };
 
 
+typedef struct MemoryRegion {
+    /*0x00*/ const Address addr; // The starting address of this region.
+    /*0x04*/ const char* name;
+    /*0x08*/ union {
+                struct PACKED { //! TODO: implement these:
+                    /*0x08*/ const _Bool ro;     // Read only.
+                    /*0x09*/ const _Bool wo;     // Write only.
+                    /*0x0B*/ const _Bool align;  // Reads must be aligned.
+                    /*0x0A*/ const _Bool mapped; // Region is mapped.
+                };
+                u8 raw;
+            } flags;
+} MemoryRegion; /*0x0C*/
+
+
+const char* get_memory_string_from_addr(Address addr);
 void headless_dma(Address devAddr, void* dramAddr, size_t size);
-_Bool try_read_data(Word* dest, Address addr);
+_Bool try_read_word_aligned(Word* dest, Address addr);
+_Bool try_read_doubleword_aligned(Doubleword* dest, Address addr);
 _Bool try_read_byte(Byte* dest, Address addr);
 _Bool try_read_halfword(Halfword* dest, Address addr);
 _Bool try_read_word(Word* dest, Address addr);

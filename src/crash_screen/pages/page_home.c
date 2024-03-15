@@ -139,7 +139,6 @@ u32 cs_draw_assert(u32 line) {
     );
     line++;
 
-    //! TODO: print the function that called __n64Assert.
 #ifdef INCLUDE_DEBUG_MAP
     if (__assert_address) {
         const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
@@ -224,7 +223,7 @@ void page_home_draw(void) {
     } else {
         Address addr = GET_EPC(tc);
         Word data = 0x00000000;
-        if (try_read_data(&data, addr) && is_in_code_segment(addr)) {
+        if (try_read_word_aligned(&data, addr) && is_in_code_segment(addr)) {
             cs_print(TEXT_X(0), TEXT_Y(line++),
                 STR_COLOR_PREFIX"crash location:",
                 COLOR_RGBA32_CRASH_PAGE_NAME

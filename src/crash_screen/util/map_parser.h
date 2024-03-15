@@ -20,10 +20,10 @@ typedef struct MapSymbol {
     /*0x0E*/ uchar errc;            // Error char: 'S' = unknown size.
 } MapSymbol; /*0x10*/
 
-typedef struct MemoryRegion {
+typedef struct AddressPair {
     /*0x00*/ const Address start;
     /*0x04*/ const Address end;
-} MemoryRegion; /*0x08*/
+} AddressPair; /*0x08*/
 
 #define EXTERN_TEXT_SYMBOL(name, side) \
 extern const Byte _##name##SegmentText##side[];
