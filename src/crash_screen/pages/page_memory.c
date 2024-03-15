@@ -22,7 +22,7 @@
 
 
 struct CSSetting cs_settings_group_page_memory[] = {
-    [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "RAM VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MEMORY",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },

@@ -33,6 +33,7 @@ CSSetting cs_settings_group_global[] = {
     [CS_OPT_GLOBAL_DRAW_LR_ARROWS    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show L/R arrows",                .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GLOBAL_SYMBOL_NAMES      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Print symbol names",             .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_ADDRESS_SELECT_SYMBOL    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Address select symbol",          .valNames = &gValNames_bool,          .val = SHOW_FUNC_NAMES_DEFAULT,   .defaultVal = SHOW_FUNC_NAMES_DEFAULT,   .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
     [CS_OPT_GLOBAL_PRINT_SCROLL_SPEED] = { .type = CS_OPT_TYPE_SETTING, .name = "Text scroll speed",              .valNames = NULL,                     .val = 2,                         .defaultVal = 2,                         .lowerBound = 0,                     .upperBound = 5,                          },
     [CS_OPT_GLOBAL_FLOATS_FMT        ] = { .type = CS_OPT_TYPE_SETTING, .name = "Floats print format",            .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_DEC,         .defaultVal = PRINT_NUM_FMT_DEC,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_SCI,          },
@@ -53,7 +54,7 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_MAP      ] = { .name = "MAP",       .list = cs_settings_group_page_map,       },
 #endif // INCLUDE_DEBUG_MAP
-    [CS_OPT_GROUP_PAGE_MEMORY   ] = { .name = "RAM VIEW",  .list = cs_settings_group_page_memory,    },
+    [CS_OPT_GROUP_PAGE_MEMORY   ] = { .name = "MEMORY",    .list = cs_settings_group_page_memory,    },
     [CS_OPT_GROUP_PAGE_DISASM   ] = { .name = "DISASM",    .list = cs_settings_group_page_disasm,    },
     // [CS_OPT_GROUP_PAGE_SETTINGS ] = { .name = "SETTINGS",  .list = cs_settings_group_page_settings,  },
     // [CS_OPT_GROUP_PAGE_ABOUT    ] = { .name = "ABOUT",     .list = cs_settings_group_page_about,     },

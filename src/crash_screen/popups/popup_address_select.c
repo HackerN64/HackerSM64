@@ -67,7 +67,7 @@ void cs_address_select_draw(void) {
     );
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (isValid) {
+    if (isValid && cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_ADDRESS_SELECT_SYMBOL)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             // "[mapped data name]"
