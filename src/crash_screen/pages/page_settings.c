@@ -169,6 +169,13 @@ void print_settings_list(u32 line, u32 numLines) {
                 STR_COLOR_PREFIX"%s",
                 COLOR_RGBA32_CRASH_PAGE_NAME, setting->name
             );
+            if (cs_settings_apply_func_to_all_in_group(cs_setting_func_is_non_default, groupID)) {
+                // "*"
+                cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - 1), y,
+                    (STR_COLOR_PREFIX"*"),
+                    COLOR_RGBA32_CRASH_SETTINGS_DESCRIPTION
+                );
+            }
             // Translucent divider.
             cs_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
         } else { // Normal setting
