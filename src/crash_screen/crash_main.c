@@ -51,7 +51,9 @@ static void cs_reinitialize(void) {
     gCSPopupID       = CS_POPUP_NONE;
     gCSSwitchedPopup = FALSE;
 
-    cs_settings_apply_func_to_all(cs_setting_func_reset);
+    if (sFirstCrash) {
+        cs_settings_apply_func_to_all(cs_setting_func_reset);
+    }
     cs_settings_set_all_headers(FALSE);
 
     gSelectedAddress = 0x00000000;
