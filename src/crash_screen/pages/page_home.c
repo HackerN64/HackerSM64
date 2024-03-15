@@ -86,13 +86,15 @@ void cs_print_crashed_thread(u32 x, u32 y) {
 
 #ifdef INCLUDE_DEBUG_MAP
 void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
-    const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
     // "FUNC: [function name]"
     size_t charX = cs_print(x, y,
         STR_COLOR_PREFIX"FUNC:\t",
         COLOR_RGBA32_CRASH_AT
     );
-    cs_print_symbol_name(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+    const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        cs_print_symbol_name(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+    }
 }
 #endif // INCLUDE_DEBUG_MAP
 

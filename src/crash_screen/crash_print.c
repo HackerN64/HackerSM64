@@ -423,8 +423,12 @@ void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const c
  * @param[in] symbol   The symbol pointer.
  */
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
+    if (symbol == NULL) {
+        // "UNKNOWN"
+        cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+    }
     cs_print_symbol_name_impl(x, y, maxWidth,
-        (((symbol != NULL) && is_in_code_segment(symbol->addr)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
+        (is_in_code_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
         get_map_symbol_name(symbol)
     );
 }

@@ -291,8 +291,6 @@ void cs_update_input(void) {
             (gCSCompositeController->buttonPressed & START_BUTTON)
         ) {
             gCSCompositeController->buttonPressed &= !(A_BUTTON | B_BUTTON);
-            // Attempt to reopen crashed page.
-            cs_open_popup(CS_POPUP_NONE);
             page->flags.crashed = FALSE;
             if (page->initFunc != NULL) {
                 page->initFunc();
