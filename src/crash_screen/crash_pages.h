@@ -4,6 +4,7 @@
 
 #include "types.h"
 
+#include "pages/page_home.h"
 #include "pages/page_registers.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
@@ -13,6 +14,7 @@
 #include "pages/page_memory.h"
 #include "pages/page_disasm.h"
 #include "pages/page_settings.h"
+#include "pages/page_about.h"
 
 
 #define CRASH_SCREEN_START_PAGE PAGE_HOME

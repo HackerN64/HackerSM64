@@ -543,7 +543,8 @@ void page_about_input(void) {
             case CS_ABOUT_ENTRY_TYPE_HEADER:
                 entry->flags.expanded ^= TRUE;
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 
