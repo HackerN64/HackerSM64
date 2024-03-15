@@ -72,15 +72,13 @@ void cs_print_crashed_thread(u32 x, u32 y) {
     size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
         COLOR_RGBA32_CRASH_THREAD, threadID
     );
-    if (threadID < NUM_THREADS) {
-        const char* threadName = get_thread_name_from_id(threadID);
+    const char* threadName = get_thread_name_from_id(threadID);
 
-        if (threadName != NULL) {
-            // "(thread name)"
-            cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
-                COLOR_RGBA32_CRASH_THREAD, threadName
-            );
-        }
+    if (threadName != NULL) {
+        // "(thread name)"
+        cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
+            COLOR_RGBA32_CRASH_THREAD, threadName
+        );
     }
 }
 
@@ -302,13 +300,11 @@ void page_home_print(void) {
     // THREAD:
     enum ThreadID threadID = gCrashedThread->id;
     osSyncPrintf("- THREAD:\t%d", threadID);
-    if (threadID < NUM_THREADS) {
-        const char* threadName = get_thread_name_from_id(threadID);
+    const char* threadName = get_thread_name_from_id(threadID);
 
-        if (threadName != NULL) {
-            // "(thread name)"
-            osSyncPrintf(" (%s)", threadName);
-        }
+    if (threadName != NULL) {
+        // "(thread name)"
+        osSyncPrintf(" (%s)", threadName);
     }
     osSyncPrintf("\n");
 
