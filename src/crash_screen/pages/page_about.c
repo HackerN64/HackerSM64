@@ -126,7 +126,13 @@ void _cs_about_func_ram_size(char* buf) {
     p += sprintf_int_with_commas(p, (size_t)TOTAL_RAM_SIZE);
     p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes((size_t)TOTAL_RAM_SIZE));
 }
-ABOUT_ENTRY_FUNC(gfx_pool,       (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
+// ABOUT_ENTRY_FUNC(gfx_pool,       (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
+void _cs_about_func_gfx_pool(char* buf) {
+    char* p = buf;
+    size_t usedPool = ((Address)gDisplayListHead - (Address)gGfxPool->buffer);
+    size_t totalPool = GFX_POOL_SIZE;
+    p += sprintf(p, "%i/%i cmds", (usedPool / sizeof(Gfx)), (totalPool / sizeof(Gfx))); // Entries
+}
 #ifdef KEEP_MARIO_HEAD
 void _cs_about_func_goddard(char* buf) {
     size_t goddardSize = (size_t)gGoddardSize;
