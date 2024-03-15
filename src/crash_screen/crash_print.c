@@ -395,6 +395,16 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
 }
 
 /**
+ * @brief Prints "UNKNOWN" in place of an unknown symbol name.
+ *
+ * @param[in] x,y The starting position on the screen to print to.
+ */
+void cs_print_symbol_unknown(u32 x, u32 y) {
+    // "UNKNOWN"
+    cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+}
+
+/**
  * @brief Formats a symbol name.
  * 
  * @param[in] x,y      The starting position on the screen to print to.
@@ -404,8 +414,7 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
  */
 void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
     if (fname == NULL) {
-        // "UNKNOWN"
-        cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+        cs_print_symbol_unknown(x, y);
     } else {
         // "[name from map data]"
         cs_print_scroll(x, y, maxWidth,
@@ -424,12 +433,17 @@ void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const c
  */
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
     if (symbol == NULL) {
-        // "UNKNOWN"
-        cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+        cs_print_symbol_unknown(x, y);
+        return;
+    }
+    const char* name = get_map_symbol_name(symbol);
+    if (name == NULL) {
+        cs_print_symbol_unknown(x, y);
+        return;
     }
     cs_print_symbol_name_impl(x, y, maxWidth,
         (is_in_code_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
-        get_map_symbol_name(symbol)
+        name
     );
 }
 
