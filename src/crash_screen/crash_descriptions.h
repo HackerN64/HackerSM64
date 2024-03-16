@@ -47,10 +47,13 @@ enum FPCSRDescriptions {
 };
 
 
-typedef struct ThreadIDName {
-    /*0x00*/ enum ThreadID threadID;
+typedef struct ThreadName {
+    /*0x00*/ union {
+                /*0x00*/ OSId id;
+                /*0x00*/ OSPri pri;
+            };
     /*0x04*/ const char* name;
-} ThreadIDName; /*0x08*/
+} ThreadName; /*0x08*/
 
 
 typedef struct EmulatorName {
@@ -70,6 +73,6 @@ extern const char* gCompressionName;
 
 
 const char* get_cause_desc(__OSThreadContext* tc);
-const char* get_thread_name_from_id(enum ThreadID threadID);
+const char* get_thread_name(OSThread* thread);
 const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial);
 const char* get_emulator_name(enum Emulator emu);

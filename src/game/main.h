@@ -19,7 +19,7 @@ enum VIModes {
 #define THREAD1000_STACK 0x0400
 
 enum ThreadID {
-    THREAD_0_VI_PI_MGR,
+    THREAD_0_MANAGER,
     THREAD_1_IDLE,
     THREAD_2, // Unused
     THREAD_3_MAIN,

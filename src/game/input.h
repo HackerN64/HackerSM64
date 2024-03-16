@@ -5,7 +5,7 @@
 #include "crash_screen/crash_main.h"
 
 
-extern void read_controller_inputs(s32 threadID);
+extern void read_controller_inputs(OSId threadID);
 
 
 ALWAYS_INLINE void handle_input(UNUSED OSMesg* mesg) {

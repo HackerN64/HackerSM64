@@ -101,34 +101,55 @@ DEF_COMPRESSION_NAME(unk);
 
 // -- THREAD --
 
-static const ThreadIDName sThreadIDNames[] = {
-    { .threadID = THREAD_0_VI_PI_MGR,         .name = "VI/PI manager",  },
-    { .threadID = THREAD_1_IDLE,              .name = "idle",           },
-    { .threadID = THREAD_2,                   .name = "unused",         },
-    { .threadID = THREAD_3_MAIN,              .name = "main",           },
-    { .threadID = THREAD_4_SOUND,             .name = "sound",          },
-    { .threadID = THREAD_5_GAME_LOOP,         .name = "game loop",      },
-    { .threadID = THREAD_6_RUMBLE,            .name = "rumble",         },
-    { .threadID = THREAD_7_HVQM,              .name = "HVQM",           },
-    { .threadID = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
-    { .threadID = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
-    { .threadID = THREAD_13_FAULT,            .name = "UNF FAULT",      },
-    { .threadID = THREAD_14_USB,              .name = "UNF USB",        },
-    { .threadID = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
-    { .threadID = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
-    { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
+static const ThreadName sThreadIDNames[] = {
+    { .id = THREAD_0_MANAGER,           .name = "manager",        }, // Uses sThreadPriNames.
+    { .id = THREAD_1_IDLE,              .name = "idle",           },
+    { .id = THREAD_2,                   .name = "unused",         },
+    { .id = THREAD_3_MAIN,              .name = "main",           },
+    { .id = THREAD_4_SOUND,             .name = "sound",          }, //! TODO: libultra scheduler also uses ID 4.
+    { .id = THREAD_5_GAME_LOOP,         .name = "game loop",      },
+    { .id = THREAD_6_RUMBLE,            .name = "rumble",         },
+    { .id = THREAD_7_HVQM,              .name = "HVQM",           },
+    { .id = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
+    { .id = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
+    { .id = THREAD_13_FAULT,            .name = "UNF Fault",      },
+    { .id = THREAD_14_USB,              .name = "UNF USB",        },
+    { .id = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
+    { .id = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
+    { .id = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
 };
-// Returns a thread name from 'sThreadIDNames'.
-const char* get_thread_name_from_id(enum ThreadID threadID) {
-    const ThreadIDName* threadIDName = &sThreadIDNames[0];
-
-    for (int i = 0; i < ARRAY_COUNT(sThreadIDNames); i++) {
-        if (threadIDName->threadID == threadID) {
-            return threadIDName->name;
+static const ThreadName sThreadPriNames[] = {
+    { .pri = OS_PRIORITY_SIMGR,    .name = "SI manager", },
+    { .pri = OS_PRIORITY_PIMGR,    .name = "PI manager", },
+    { .pri = OS_PRIORITY_VIMGR,    .name = "VI manager", },
+    { .pri = OS_PRIORITY_RMON,     .name = "rmon",       },
+    { .pri = OS_PRIORITY_RMONSPIN, .name = "rmonspin",   },
+};
+static const char* get_thread_name_from_list(int id, const ThreadName* list, size_t listSize) {
+    const ThreadName* threadName = &list[0];
+    for (size_t i = 0; i < listSize; i++) {
+        if (threadName->id == id) {
+            return threadName->name;
         }
-
-        threadIDName++;
+        threadName++;
     }
+
+    return NULL;
+}
+
+// Returns a thread name from 'sThreadIDNames'.
+const char* get_thread_name(OSThread* thread) {
+    OSId id = osGetThreadId(thread);
+    const char* name = NULL;
+
+    // Libultra threads on thread ID 0:
+    if (id == THREAD_0_MANAGER) {
+        name = get_thread_name_from_list(osGetThreadPri(thread), sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
+        if (name != NULL) return name;
+    }
+
+    name = get_thread_name_from_list(id, sThreadIDNames, ARRAY_COUNT(sThreadIDNames));
+    if (name != NULL) return name;
 
     return NULL;
 }

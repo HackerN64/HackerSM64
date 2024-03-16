@@ -67,13 +67,13 @@ void cs_print_fpe_cause(u32 x, u32 y, u32 fpcsr) {
 }
 
 void cs_print_crashed_thread(u32 x, u32 y) {
-    // "THREAD: [thread id]"
-    enum ThreadID threadID = gInspectThread->id;
-    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
-        COLOR_RGBA32_CRASH_THREAD, threadID
-    );
-    const char* threadName = get_thread_name_from_id(threadID);
+    OSThread* thread = gInspectThread;
 
+    // "THREAD: [thread id]"
+    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
+        COLOR_RGBA32_CRASH_THREAD, osGetThreadId(thread)
+    );
+    const char* threadName = get_thread_name(thread);
     if (threadName != NULL) {
         // "(thread name)"
         cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
@@ -294,12 +294,12 @@ void page_home_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
-    __OSThreadContext* tc = &gInspectThread->context;
+    OSThread* thread = gInspectThread;
+    __OSThreadContext* tc = &thread->context;
 
     // THREAD:
-    enum ThreadID threadID = gInspectThread->id;
-    osSyncPrintf("- THREAD:\t%d", threadID);
-    const char* threadName = get_thread_name_from_id(threadID);
+    osSyncPrintf("- THREAD:\t%d", osGetThreadId(thread););
+    const char* threadName = get_thread_name(thread);
 
     if (threadName != NULL) {
         // "(thread name)"
