@@ -102,9 +102,9 @@ DEF_COMPRESSION_NAME(unk);
 // -- THREAD --
 
 static const ThreadIDName sThreadIDNames[] = {
-    { .threadID = THREAD_0,                   .name = "0",              },
+    { .threadID = THREAD_0_VI_PI_MGR,         .name = "VI/PI manager",  },
     { .threadID = THREAD_1_IDLE,              .name = "idle",           },
-    { .threadID = THREAD_2,                   .name = "2",              },
+    { .threadID = THREAD_2,                   .name = "unused",         },
     { .threadID = THREAD_3_MAIN,              .name = "main",           },
     { .threadID = THREAD_4_SOUND,             .name = "sound",          },
     { .threadID = THREAD_5_GAME_LOOP,         .name = "game loop",      },
@@ -112,6 +112,8 @@ static const ThreadIDName sThreadIDNames[] = {
     { .threadID = THREAD_7_HVQM,              .name = "HVQM",           },
     { .threadID = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
     { .threadID = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
+    { .threadID = THREAD_13_FAULT,            .name = "UNF FAULT",      },
+    { .threadID = THREAD_14_USB,              .name = "UNF USB",        },
     { .threadID = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
     { .threadID = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
     { .threadID = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },

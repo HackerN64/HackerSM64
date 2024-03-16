@@ -74,7 +74,7 @@ static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
 
 static void ram_viewer_print_data(u32 line, Address startAddr) {
     const _Bool memoryAsASCII = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII);
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
     u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     u32 charY = TEXT_Y(line);
 
@@ -139,7 +139,7 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
 }
 
 void page_memory_draw(void) {
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
 
     sRamViewNumShownRows = MEMORY_NUM_SHOWN_ROWS;
     const _Bool showCurrentRange  = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_RANGE);

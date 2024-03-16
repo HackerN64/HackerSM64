@@ -353,7 +353,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
 // const char* sCurrFuncName = NULL;
 
 void page_disasm_draw(void) {
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
     Address alignedSelectedAddr = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
     Address epc = GET_EPC(tc);
 
@@ -535,7 +535,7 @@ void page_disasm_print(void) {
                 osSyncPrintf("%s", destFname);
             }
  #endif // INCLUDE_DEBUG_MAP
-            __OSThreadContext* tc = &gCrashedThread->context;
+            __OSThreadContext* tc = &gInspectThread->context;
             if (addr == GET_EPC(tc)) {
                 osSyncPrintf("<-- CRASH");
             }

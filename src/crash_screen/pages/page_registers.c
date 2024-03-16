@@ -73,7 +73,7 @@ void page_registers_init(void) {
 
 void cs_registers_print_thread(u32 x, u32 y) {
     // "THREAD: [thread id]"
-    enum ThreadID threadID = gCrashedThread->id;
+    enum ThreadID threadID = gInspectThread->id;
     size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
         COLOR_RGBA32_CRASH_THREAD, threadID
     );
@@ -201,7 +201,7 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
 }
 
 void page_registers_draw(void) {
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
     u32 line = 2;
 
     cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"REGISTERS IN:",
@@ -229,11 +229,11 @@ void page_registers_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
 
     osSyncPrintf("- REGISTERS IN:\n");
     // THREAD:
-    enum ThreadID threadID = gCrashedThread->id;
+    enum ThreadID threadID = gInspectThread->id;
     osSyncPrintf("- THREAD:\t%d", threadID);
     const char* threadName = get_thread_name_from_id(threadID);
 

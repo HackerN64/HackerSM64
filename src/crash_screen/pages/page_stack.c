@@ -65,7 +65,7 @@ void fill_function_stack_trace(void) {
     sCSNumFoundFunctions = 0;
 
     // Include the current function at the top:
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
     Address pc = tc->pc;
     const MapSymbol* symbol = get_map_symbol(pc, SYMBOL_SEARCH_BACKWARD);
     FunctionInStack currInfo = {

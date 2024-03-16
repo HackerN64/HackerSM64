@@ -19,7 +19,7 @@ enum VIModes {
 #define THREAD1000_STACK 0x0400
 
 enum ThreadID {
-    THREAD_0,
+    THREAD_0_VI_PI_MGR,
     THREAD_1_IDLE,
     THREAD_2, // Unused
     THREAD_3_MAIN,
@@ -29,7 +29,8 @@ enum ThreadID {
     THREAD_7_HVQM,
     THREAD_8_TIMEKEEPER,
     THREAD_9_DA_COUNTER,
-    NUM_THREADS,
+    THREAD_13_FAULT, // From src/usb/debug.h
+    THREAD_14_USB,   // From src/usb/debug.h
 
     // Crash screen threads:
     THREAD_1000_CRASH_SCREEN_0 = 1000,

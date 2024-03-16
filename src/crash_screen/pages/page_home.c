@@ -68,7 +68,7 @@ void cs_print_fpe_cause(u32 x, u32 y, u32 fpcsr) {
 
 void cs_print_crashed_thread(u32 x, u32 y) {
     // "THREAD: [thread id]"
-    enum ThreadID threadID = gCrashedThread->id;
+    enum ThreadID threadID = gInspectThread->id;
     size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
         COLOR_RGBA32_CRASH_THREAD, threadID
     );
@@ -212,7 +212,7 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
 }
 
 void page_home_draw(void) {
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
     u32 cause = (tc->cause & CAUSE_EXCMASK);
     u32 line = 9;
 
@@ -294,10 +294,10 @@ void page_home_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
-    __OSThreadContext* tc = &gCrashedThread->context;
+    __OSThreadContext* tc = &gInspectThread->context;
 
     // THREAD:
-    enum ThreadID threadID = gCrashedThread->id;
+    enum ThreadID threadID = gInspectThread->id;
     osSyncPrintf("- THREAD:\t%d", threadID);
     const char* threadName = get_thread_name_from_id(threadID);
 

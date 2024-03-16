@@ -46,6 +46,7 @@ typedef struct CSThreadInfo {
 
 extern CSThreadInfo* gActiveCSThreadInfo;
 extern OSThread* gCrashedThread;
+extern OSThread* gInspectThread;
 
 extern Address gSelectedAddress;
 

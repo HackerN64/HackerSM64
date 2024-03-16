@@ -39,7 +39,7 @@ uint64_t get_cpu_reg_val(enum CPURegisters idx) {
         CASE_CPU_REG(REG_CPU_R0, zero);
         //! TODO: Directly accessing $at requires ".set noat".
         // CASE_CPU_REG(REG_CPU_AT, at);
-        case REG_CPU_AT: return gCrashedThread->context.at;
+        case REG_CPU_AT: return gInspectThread->context.at;
         CASE_CPU_REG(REG_CPU_V0, v0); CASE_CPU_REG(REG_CPU_V1, v1);
         CASE_CPU_REG(REG_CPU_A0, a0); CASE_CPU_REG(REG_CPU_A1, a1); CASE_CPU_REG(REG_CPU_A2, a2); CASE_CPU_REG(REG_CPU_A3, a3);
         CASE_CPU_REG(REG_CPU_T0, t0); CASE_CPU_REG(REG_CPU_T1, t1); CASE_CPU_REG(REG_CPU_T2, t2); CASE_CPU_REG(REG_CPU_T3, t3); CASE_CPU_REG(REG_CPU_T4, t4); CASE_CPU_REG(REG_CPU_T5, t5); CASE_CPU_REG(REG_CPU_T6, t6); CASE_CPU_REG(REG_CPU_T7, t7);
@@ -196,7 +196,7 @@ uint64_t get_reg_val(enum Coprocessors cop, int idx) {
     }
 
     if (info->offset != OSTHREAD_NULL_OFFSET) { // If register exists in __OSThreadContext, use the data from the crashed thread.
-        __OSThreadContext* tc = &gCrashedThread->context;
+        __OSThreadContext* tc = &gInspectThread->context;
         Address addr = ((Address)tc + info->offset);
 
         if (info->size == sizeof(uint64_t)) {
