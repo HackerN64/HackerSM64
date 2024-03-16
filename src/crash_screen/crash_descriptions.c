@@ -119,11 +119,11 @@ static const ThreadName sThreadIDNames[] = {
     { .id = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
 };
 static const ThreadName sThreadPriNames[] = {
-    { .pri = OS_PRIORITY_SIMGR,    .name = "SI manager", },
-    { .pri = OS_PRIORITY_PIMGR,    .name = "PI manager", },
-    { .pri = OS_PRIORITY_VIMGR,    .name = "VI manager", },
-    { .pri = OS_PRIORITY_RMON,     .name = "rmon",       },
-    { .pri = OS_PRIORITY_RMONSPIN, .name = "rmonspin",   },
+    { .pri = OS_PRIORITY_SIMGR,         .name = "SI manager", },
+    { .pri = OS_PRIORITY_PIMGR,         .name = "PI manager", },
+    { .pri = OS_PRIORITY_VIMGR,         .name = "VI manager", },
+    { .pri = OS_PRIORITY_RMON,          .name = "rmon",       },
+    { .pri = OS_PRIORITY_RMONSPIN,      .name = "rmonspin",   },
 };
 static const char* get_thread_name_from_list(int id, const ThreadName* list, size_t listSize) {
     const ThreadName* threadName = &list[0];
@@ -136,13 +136,12 @@ static const char* get_thread_name_from_list(int id, const ThreadName* list, siz
 
     return NULL;
 }
-
 // Returns a thread name from 'sThreadIDNames'.
 const char* get_thread_name(OSThread* thread) {
     OSId id = osGetThreadId(thread);
     const char* name = NULL;
 
-    // Libultra threads on thread ID 0:
+    // Determine libultra threads on thread ID 0 by priority instead of ID:
     if (id == THREAD_0_MANAGER) {
         name = get_thread_name_from_list(osGetThreadPri(thread), sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
         if (name != NULL) return name;
@@ -152,6 +151,28 @@ const char* get_thread_name(OSThread* thread) {
     if (name != NULL) return name;
 
     return NULL;
+}
+
+static const char* sThreadStateStrings[] = {
+    [__builtin_ctz(OS_STATE_STOPPED )] = "stopped",
+    [__builtin_ctz(OS_STATE_RUNNABLE)] = "runnable",
+    [__builtin_ctz(OS_STATE_RUNNING )] = "running",
+    [__builtin_ctz(OS_STATE_WAITING )] = "waiting",
+};
+const char* get_thread_state_str(OSThread* thread) {
+    u16 state = thread->state;
+    if (state == 0x0000) return "";
+    return sThreadStateStrings[__builtin_ctz(state)];
+}
+
+static const char* sThreadFlagStrings[] = {
+    [__builtin_ctz(OS_FLAG_CPU_BREAK)] = "cpu break",
+    [__builtin_ctz(OS_FLAG_FAULT    )] = "fault",
+};
+const char* get_thread_flags_str(OSThread* thread) {
+    u16 flags = thread->flags;
+    if (flags == 0x0000) return "";
+    return sThreadFlagStrings[__builtin_ctz(flags)];
 }
 
 

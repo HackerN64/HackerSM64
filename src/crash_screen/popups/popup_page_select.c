@@ -82,6 +82,11 @@ void cs_popup_pages_input(void) {
     if (gCSPageID != prevPage) {
         // Reset certain values when the page is changed.
         gCSSwitchedPage = TRUE;
+        CSPage* page = cs_get_current_page();
+        if ((page->initFunc != NULL) && !page->flags.initialized) {
+            page->initFunc();
+            page->flags.initialized = TRUE;
+        }
     }
 }
 

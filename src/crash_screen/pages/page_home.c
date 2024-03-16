@@ -298,7 +298,7 @@ void page_home_print(void) {
     __OSThreadContext* tc = &thread->context;
 
     // THREAD:
-    osSyncPrintf("- THREAD:\t%d", osGetThreadId(thread););
+    osSyncPrintf("- THREAD:\t%d", osGetThreadId(thread));
     const char* threadName = get_thread_name(thread);
 
     if (threadName != NULL) {
