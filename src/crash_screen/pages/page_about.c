@@ -123,8 +123,8 @@ void _cs_about_func_rom_size(char* buf) {
 }
 void _cs_about_func_ram_size(char* buf) {
     char* p = buf;
-    p += sprintf_int_with_commas(p, (size_t)TOTAL_RAM_SIZE);
-    p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes((size_t)TOTAL_RAM_SIZE));
+    p += sprintf_int_with_commas(p, osMemSize);
+    p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes(osMemSize));
 }
 // ABOUT_ENTRY_FUNC(gfx_pool,       (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
 void _cs_about_func_gfx_pool(char* buf) {
@@ -305,7 +305,15 @@ CSAboutEntry* sCSAboutEntryGroups[CS_NUM_ABOUT_GROUPS] = {
     [CS_ABOUT_GROUP_EMULATOR ] = sCSAboutEntries_emulator,
 };
 
-CSAboutEntryDisplay sCSAboutDisplayedEntries[CS_NUM_ABOUT_GROUPS * 12];
+CSAboutEntryDisplay sCSAboutDisplayedEntries[
+    CS_NUM_ABOUT_ENTRIES_TITLE     +
+    CS_NUM_ABOUT_ENTRIES_BUTTONS   +
+    CS_NUM_ABOUT_ENTRIES_COMPILER  +
+    CS_NUM_ABOUT_ENTRIES_ROM       +
+    CS_NUM_ABOUT_ENTRIES_COLLISION +
+    CS_NUM_ABOUT_ENTRIES_MISC      +
+    CS_NUM_ABOUT_ENTRIES_EMULATOR
+];
 u32 sNumCSAboutDisplayedEntries = 0;
 
 
