@@ -125,6 +125,10 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
 
+// Integer division of ([_a] / [_b]) but the result is rounded up instead of down. Only works for positive integers.
+#define DIV_CEIL(_a, _b) (!!(_a) + (((_a) - !!(_a)) / (_b)))
+
+
 // Integer limits and clamping
 
 #define S8_MAX   127
@@ -139,7 +143,7 @@ ALWAYS_INLINE s32 roundf(f32 in) {
 
 // Clamp a value inbetween a range
 #define CLAMP(x, low, high)  MIN(MAX((x), (low)), (high))
-#define WRAP(x, low, high)   (((x) > (high)) ? (low) : (((x) < (low)) ? (high) : (x)))
+#define WRAP(x, low, high)   (((x) > (high)) ? (low) : (((x) < (low)) ? (high) : (x))) //! TODO: Improve or remove this.
 
 // Clamp a value to the range of a specific data type
 #define CLAMP_U8( x)        CLAMP((x),       0,  U8_MAX)

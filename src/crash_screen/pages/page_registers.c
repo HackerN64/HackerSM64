@@ -54,17 +54,21 @@ const enum ControlTypes cs_cont_list_registers[] = {
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
 static const RegisterId sRegList[32 + 1] = {
     LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
-    LIST_REG(CPU, REG_CPU_AT), LIST_REG(CPU, REG_CPU_V0), LIST_REG(CPU, REG_CPU_V1),
-    LIST_REG(CPU, REG_CPU_A0), LIST_REG(CPU, REG_CPU_A1), LIST_REG(CPU, REG_CPU_A2),
-    LIST_REG(CPU, REG_CPU_A3), LIST_REG(CPU, REG_CPU_T0), LIST_REG(CPU, REG_CPU_T1),
-    LIST_REG(CPU, REG_CPU_T2), LIST_REG(CPU, REG_CPU_T3), LIST_REG(CPU, REG_CPU_T4),
-    LIST_REG(CPU, REG_CPU_T5), LIST_REG(CPU, REG_CPU_T6), LIST_REG(CPU, REG_CPU_T7),
-    LIST_REG(CPU, REG_CPU_S0), LIST_REG(CPU, REG_CPU_S1), LIST_REG(CPU, REG_CPU_S2),
-    LIST_REG(CPU, REG_CPU_S3), LIST_REG(CPU, REG_CPU_S4), LIST_REG(CPU, REG_CPU_S5),
-    LIST_REG(CPU, REG_CPU_S6), LIST_REG(CPU, REG_CPU_S7), LIST_REG(CPU, REG_CPU_T8),
-    LIST_REG(CPU, REG_CPU_T9), LIST_REG(CPU, REG_CPU_GP), LIST_REG(CPU, REG_CPU_SP),
-    LIST_REG(CPU, REG_CPU_FP), LIST_REG(CPU, REG_CPU_RA), LIST_REG_END(),
+    LIST_REG(CPU,  REG_CPU_AT  ), LIST_REG(CPU,  REG_CPU_V0 ), LIST_REG(CPU,  REG_CPU_V1       ),
+    LIST_REG(CPU,  REG_CPU_A0  ), LIST_REG(CPU,  REG_CPU_A1 ), LIST_REG(CPU,  REG_CPU_A2       ),
+    LIST_REG(CPU,  REG_CPU_A3  ), LIST_REG(CPU,  REG_CPU_T0 ), LIST_REG(CPU,  REG_CPU_T1       ),
+    LIST_REG(CPU,  REG_CPU_T2  ), LIST_REG(CPU,  REG_CPU_T3 ), LIST_REG(CPU,  REG_CPU_T4       ),
+    LIST_REG(CPU,  REG_CPU_T5  ), LIST_REG(CPU,  REG_CPU_T6 ), LIST_REG(CPU,  REG_CPU_T7       ),
+    LIST_REG(CPU,  REG_CPU_S0  ), LIST_REG(CPU,  REG_CPU_S1 ), LIST_REG(CPU,  REG_CPU_S2       ),
+    LIST_REG(CPU,  REG_CPU_S3  ), LIST_REG(CPU,  REG_CPU_S4 ), LIST_REG(CPU,  REG_CPU_S5       ),
+    LIST_REG(CPU,  REG_CPU_S6  ), LIST_REG(CPU,  REG_CPU_S7 ), LIST_REG(CPU,  REG_CPU_T8       ),
+    LIST_REG(CPU,  REG_CPU_T9  ), LIST_REG(CPU,  REG_CPU_GP ), LIST_REG(CPU,  REG_CPU_SP       ),
+    LIST_REG(CPU,  REG_CPU_FP  ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG_END(),
 };
+
+
+#define REG_LIST_COLUMNS 3
+#define REG_LIST_ROWS    DIV_CEIL((ARRAY_COUNT(sRegList) - 1), REG_LIST_COLUMNS)
 
 
 void page_registers_init(void) {
@@ -118,8 +122,8 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 // Print important fixed-point registers.
 u32 cs_registers_print_registers(u32 line) {
     const size_t columnWidth = 15;
-    const u32 columns = 3;
-    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
+    const u32 columns = REG_LIST_COLUMNS;
+    const u32 rows = REG_LIST_ROWS;
     const RegisterId* reg = sRegList;
 
     for (u32 y = 0; y < rows; y++) {
@@ -177,32 +181,35 @@ void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
 }
 
 void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
-    const size_t columnWidth = 15;
+    const size_t fpSize = (sizeof(__OSfp) / sizeof(uintptr_t));
+    const u32 columns = 3;
+    const size_t columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, columns);
+    const u32 rows = DIV_CEIL((COP1_NUM_REGISTERS / fpSize), columns);
+    __OSfp* osfp = &tc->fp0; // The first float pointer.
     u32 regNum = 0;
-    __OSfp* osfp = &tc->fp0;
 
     // cs_registers_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
     cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
 
     osWritebackDCacheAll();
 
-    for (u32 y = 0; y < 6; y++) {
-        for (u32 x = 0; x < 3; x++) {
+    for (u32 y = 0; y < rows; y++) {
+        for (u32 x = 0; x < columns; x++) {
             if (regNum >= COP1_NUM_REGISTERS) {
                 return;
             }
 
-            cs_registers_print_float_reg(TEXT_X(x * columnWidth), TEXT_Y(line + y), regNum);
+            cs_registers_print_float_reg(TEXT_X(x * columnCharWidth), TEXT_Y(line + y), regNum);
 
-            regNum += 2;
             osfp++;
+            regNum += fpSize;
         }
     }
 }
 
 void page_registers_draw(void) {
     __OSThreadContext* tc = &gInspectThread->context;
-    u32 line = 2;
+    u32 line = 1;
 
     cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"REGISTERS IN:",
         COLOR_RGBA32_CRASH_THREAD
@@ -244,8 +251,8 @@ void page_registers_print(void) {
     osSyncPrintf("\n");
 
     // Thread registers:
-    const u32 columns = 3;
-    const u32 rows = (ARRAY_COUNT(sRegList) / columns);
+    const u32 columns = REG_LIST_COLUMNS;
+    const u32 rows = REG_LIST_ROWS;
     const RegisterId* reg = sRegList;
     for (u32 y = 0; y < rows; y++) {
         osSyncPrintf("- ");
@@ -266,19 +273,22 @@ void page_registers_print(void) {
     }
 
     // Float registers:
-    u32 regNum = 0;
+    const size_t fpSize = (sizeof(__OSfp) / sizeof(uintptr_t));
+    const u32 f_columns = 2;
+    const u32 f_rows = DIV_CEIL((COP1_NUM_REGISTERS / fpSize), columns);
     __OSfp* osfp = &tc->fp0;
-    for (u32 i = 0; i < 8; i++) {
+    u32 regNum = 0;
+    for (u32 i = 0; i < f_rows; i++) {
         osSyncPrintf("- ");
-        for (u32 j = 0; j < 2; j++) {
+        for (u32 j = 0; j < f_columns; j++) {
             if (regNum >= COP1_NUM_REGISTERS) {
                 break;
             }
 
             osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, get_reg_val(COP1, regNum));
 
-            regNum += 2;
             osfp++;
+            regNum += 2;
         }
         osSyncPrintf("\n");
     }
