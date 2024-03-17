@@ -53,6 +53,7 @@ CSSetting* gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_PAGE_STACK    ] = cs_settings_group_page_stack,
     [CS_OPT_GROUP_PAGE_THREADS  ] = cs_settings_group_page_threads,
     [CS_OPT_GROUP_PAGE_REGISTERS] = cs_settings_group_page_registers,
+    [CS_OPT_GROUP_PAGE_DISASM   ] = cs_settings_group_page_disasm,
     [CS_OPT_GROUP_PAGE_MEMORY   ] = cs_settings_group_page_memory,
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_MAP      ] = cs_settings_group_page_map,
@@ -60,7 +61,6 @@ CSSetting* gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
 #ifdef PUPPYPRINT_DEBUG
     [CS_OPT_GROUP_PAGE_LOGS     ] = cs_settings_group_page_logs,
 #endif // PUPPYPRINT_DEBUG
-    [CS_OPT_GROUP_PAGE_DISASM   ] = cs_settings_group_page_disasm,
     // [CS_OPT_GROUP_PAGE_SETTINGS ] = cs_settings_group_page_settings,
     // [CS_OPT_GROUP_PAGE_ABOUT    ] = cs_settings_group_page_about,
 };

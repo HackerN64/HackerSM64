@@ -46,6 +46,7 @@ const enum ControlTypes cs_cont_list_threads[] = {
 #endif // UNF
     CONT_DESC_SCROLL_LIST,
     CONT_DESC_JUMP_TO_ADDRESS,
+    CONT_DESC_SET_THREAD,
     CONT_DESC_LIST_END,
 };
 
@@ -92,6 +93,24 @@ void draw_thread_state_icon(u32 x, u32 y, u16 state) {
     }
 }
 
+RGBA32 cs_thread_draw_highlight(OSThread* thread, u32 y) {
+    RGBA32 color = 0x00000000;
+
+    if (thread == gCrashedThread) {
+        color = COLOR_RGBA32_CRASH_PC_HIGHLIGHT;
+    } else if (thread == __osRunningThread) {
+        color = COLOR_RGBA32_CRASH_RUNNING_HIGHLIGHT;
+    } else if (thread == gInspectThread) {
+        color = COLOR_RGBA32_CRASH_INSPECT_HIGHLIGHT;
+    }
+
+    if (color) {
+        cs_draw_row_box_2(y, color);
+    }
+
+    return color;
+}
+
 void page_threads_draw(void) {
     u32 line = 2;
 
@@ -111,11 +130,7 @@ void page_threads_draw(void) {
         }
 
         y = TEXT_Y(line + i);
-        if (thread == gCrashedThread) {
-            cs_draw_row_crash_box_2(y);
-        } else if (thread == __osRunningThread) {
-            cs_draw_row_box_2(y, COLOR_RGBA32_CRASH_RUNNING_HIGHLIGHT);
-        }
+        cs_thread_draw_highlight(thread, y);
         if (threadIndex == sThreadsSelectedIndex) {
             sThreadsSelectedThreadPtr = thread;
             cs_draw_row_selection_box_2(y);
@@ -135,7 +150,7 @@ void page_threads_draw(void) {
 
         size_t charX = charAddrX;
         charX += cs_print(TEXT_X(charAddrX), y,
-            (STR_COLOR_PREFIX"THREAD %d"),
+            (STR_COLOR_PREFIX"thread %d"),
             threadColor, osGetThreadId(thread)
         );
         const char* threadName = get_thread_name(thread);
@@ -152,6 +167,11 @@ void page_threads_draw(void) {
         // Second line:
 
         draw_thread_state_icon(TEXT_X(showAddresses ? 0 : (CRASH_SCREEN_NUM_CHARS_X - 1)), y, thread->state);
+        if (thread == gInspectThread) {
+            cs_print(TEXT_X(showAddresses ? 1 : (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("viewing") + 1))), y,
+                STR_COLOR_PREFIX"viewing", COLOR_RGBA32_CRASH_THREAD
+            );
+        }
 
         charX = charAddrX;
         charX += cs_print(TEXT_X(charX), y,
@@ -184,10 +204,11 @@ void page_threads_draw(void) {
             }
         }
 
-        thread = thread->tlnext;
-        threadIndex++;
         i++;
         cs_draw_divider_translucent(DIVIDER_Y(line + i));
+
+        thread = thread->tlnext;
+        threadIndex++;
     }
 
     sThreadsTotalFoundThreads = threadIndex;
@@ -204,14 +225,21 @@ void page_threads_draw(void) {
     }
 
     line = 1;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "FOUND %d THREADS", sThreadsTotalFoundThreads);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "found threads: %d", sThreadsTotalFoundThreads);
     cs_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();
 }
 
 void page_threads_input(void) {
-    //! TODO: Change inspected thread.
+    //! TODO: Button combo for this instead of just B?
+    if (gCSCompositeController->buttonPressed & B_BUTTON) {
+        if (sThreadsSelectedThreadPtr != NULL) {
+            gInspectThread = sThreadsSelectedThreadPtr;
+            extern void cs_reinitialize_pages(void);
+            cs_reinitialize_pages();
+        }
+    }
 
     if (gCSCompositeController->buttonPressed & A_BUTTON) {
         if (sThreadsSelectedThreadPtr != NULL) {
@@ -233,6 +261,7 @@ void page_threads_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
+    //! TODO:
 #endif // UNF
 }
 

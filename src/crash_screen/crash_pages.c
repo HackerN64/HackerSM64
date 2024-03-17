@@ -32,9 +32,9 @@
 CSPage* gCSPages[CS_NUM_PAGES] = {
     [CS_PAGE_HOME       ] = &gCSPage_home,
     [CS_PAGE_STACK      ] = &gCSPage_stack,
-    [CS_PAGE_DISASM     ] = &gCSPage_disasm,
     [CS_PAGE_THREADS    ] = &gCSPage_threads,
     [CS_PAGE_REGISTERS  ] = &gCSPage_registers,
+    [CS_PAGE_DISASM     ] = &gCSPage_disasm,
     [CS_PAGE_MEMORY     ] = &gCSPage_memory,
 #ifdef INCLUDE_DEBUG_MAP
     [CS_PAGE_MAP        ] = &gCSPage_map,
