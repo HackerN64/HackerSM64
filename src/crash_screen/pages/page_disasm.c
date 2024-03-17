@@ -308,7 +308,7 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         // Draw crash and selection rectangles:
         if (addr == pc) {
             // Draw a red selection rectangle.
-            cs_draw_rect((charX - 1), (charY - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
+            cs_draw_row_crash_box(charY);
             // "<-- CRASH"
             cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
         }
@@ -491,6 +491,8 @@ void page_disasm_input(void) {
         const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
         if (symbol != NULL) {
             const char* fname = get_map_symbol_name(symbol);
+
+            //! TODO: fname null check.
 
             if (gFillBranchBuffer) {
                 gFillBranchBuffer = FALSE;

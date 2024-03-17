@@ -49,6 +49,7 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_CONTROLS      ] = { .name = "CONTROLS",  .list = cs_settings_group_controls,       },
     // [CS_OPT_GROUP_PAGE_HOME     ] = { .name = "HOME",      .list = cs_settings_group_page_home,      },
     [CS_OPT_GROUP_PAGE_REGISTERS] = { .name = "REGISTERS", .list = cs_settings_group_page_registers, },
+    [CS_OPT_GROUP_PAGE_THREADS  ] = { .name = "THREADS",   .list = cs_settings_group_page_threads,   },
     [CS_OPT_GROUP_PAGE_LOGS     ] = { .name = "LOGS",      .list = cs_settings_group_page_logs,      },
     [CS_OPT_GROUP_PAGE_STACK    ] = { .name = "STACK",     .list = cs_settings_group_page_stack,     },
 #ifdef INCLUDE_DEBUG_MAP

@@ -90,8 +90,15 @@ extern u32 gCSNumLinesPrinted;
 size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 
 //! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?).
-#define cs_print(x, y, fmt, ...)                   cs_print_impl((x), (y),           0, (fmt), ##__VA_ARGS__)
-#define cs_print_scroll(x, y, charLimit, fmt, ...) cs_print_impl((x), (y), (charLimit), (fmt), ##__VA_ARGS__)
+#define cs_print_scroll(_x, _y, _charLimit, _fmt, ...) cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__)
+#define cs_print(_x, _y, _fmt, ...) cs_print_scroll((_x), (_y), 0, (_fmt), ##__VA_ARGS__)
+#define cs_print_color_scroll(_x, _y, _charLimit, _color, _fmt, ...)  { \
+    RGBA32 __tempDefaultColor = gCSDefaultPrintColor;                   \
+    gCSDefaultPrintColor = (_color);                                    \
+    cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__);     \
+    gCSDefaultPrintColor = __tempDefaultColor;                          \
+}
+#define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
 void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);

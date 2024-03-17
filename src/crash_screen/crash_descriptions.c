@@ -102,21 +102,21 @@ DEF_COMPRESSION_NAME(unk);
 // -- THREAD --
 
 static const ThreadName sThreadIDNames[] = {
-    { .id = THREAD_0_MANAGER,           .name = "manager",        }, // Uses sThreadPriNames.
-    { .id = THREAD_1_IDLE,              .name = "idle",           },
-    { .id = THREAD_2,                   .name = "unused",         },
-    { .id = THREAD_3_MAIN,              .name = "main",           },
-    { .id = THREAD_4_SOUND,             .name = "sound",          }, //! TODO: libultra scheduler also uses ID 4.
-    { .id = THREAD_5_GAME_LOOP,         .name = "game loop",      },
-    { .id = THREAD_6_RUMBLE,            .name = "rumble",         },
-    { .id = THREAD_7_HVQM,              .name = "HVQM",           },
-    { .id = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
-    { .id = THREAD_9_DA_COUNTER,        .name = "DA counter",     },
-    { .id = THREAD_13_FAULT,            .name = "UNF Fault",      },
-    { .id = THREAD_14_USB,              .name = "UNF USB",        },
-    { .id = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen 0", },
-    { .id = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen 1", },
-    { .id = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen 2", },
+    { .id = THREAD_0_MANAGER,           .name = "manager",          }, // Uses sThreadPriNames.
+    { .id = THREAD_1_IDLE,              .name = "idle",             },
+    { .id = THREAD_2,                   .name = "unused",           },
+    { .id = THREAD_3_MAIN,              .name = "main",             },
+    { .id = THREAD_4_SOUND,             .name = "sound",            }, //! TODO: libultra scheduler also uses ID 4 and has no set priority. Is there a way to differentiate the two?
+    { .id = THREAD_5_GAME_LOOP,         .name = "game loop",        },
+    { .id = THREAD_6_RUMBLE,            .name = "rumble",           },
+    { .id = THREAD_7_HVQM,              .name = "HVQM",             },
+    { .id = THREAD_8_TIMEKEEPER,        .name = "timekeeper",       },
+    { .id = THREAD_9_DA_COUNTER,        .name = "DA counter",       },
+    { .id = THREAD_13_FAULT,            .name = "UNF Fault",        },
+    { .id = THREAD_14_USB,              .name = "UNF USB",          },
+    { .id = THREAD_1000_CRASH_SCREEN_0, .name = "Crash Screen (0)", },
+    { .id = THREAD_1001_CRASH_SCREEN_1, .name = "Crash Screen (1)", },
+    { .id = THREAD_1002_CRASH_SCREEN_2, .name = "Crash Screen (2)", },
 };
 static const ThreadName sThreadPriNames[] = {
     { .pri = OS_PRIORITY_SIMGR,         .name = "SI manager", },
@@ -161,7 +161,7 @@ static const char* sThreadStateStrings[] = {
 };
 const char* get_thread_state_str(OSThread* thread) {
     u16 state = thread->state;
-    if (state == 0x0000) return "";
+    if (state == 0x0000) return NULL;
     return sThreadStateStrings[__builtin_ctz(state)];
 }
 
@@ -171,7 +171,7 @@ static const char* sThreadFlagStrings[] = {
 };
 const char* get_thread_flags_str(OSThread* thread) {
     u16 flags = thread->flags;
-    if (flags == 0x0000) return "";
+    if (flags == 0x0000) return NULL;
     return sThreadFlagStrings[__builtin_ctz(flags)];
 }
 

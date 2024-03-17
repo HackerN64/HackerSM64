@@ -39,6 +39,15 @@ Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and di
 
 
 /**
+ * @brief Reinitialize all of the crash screen's pages.
+ */
+void cs_reinitialize_pages(void) {
+    for (int pageID = 0; pageID < ARRAY_COUNT(gCSPages); pageID++) {
+        gCSPages[pageID]->flags.initialized = FALSE;
+    }
+}
+
+/**
  * @brief Reinitialize the crash screen's global variables, settings, buffers, etc.
  */
 static void cs_reinitialize(void) {
@@ -61,9 +70,7 @@ static void cs_reinitialize(void) {
 
     gCSDirectionFlags.raw = 0b00000000;
 
-    for (int pageID = 0; pageID < ARRAY_COUNT(gCSPages); pageID++) {
-        gCSPages[pageID]->flags.initialized = FALSE;
-    }
+    cs_reinitialize_pages();
 }
 
 /**

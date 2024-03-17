@@ -139,14 +139,34 @@ ALWAYS_INLINE void cs_draw_divider_translucent(u32 line) {
     cs_draw_divider_translucent_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, line);
 }
 
-ALWAYS_INLINE void cs_draw_row_selection_box_impl(s32 x, s32 w, s32 line) {
+ALWAYS_INLINE void cs_draw_row_selection_box_impl(s32 x, s32 y, s32 w, s32 h, RGBA32 color) {
     cs_draw_rect(
-        x, (line - 2),
-        w, (TEXT_HEIGHT(1) + 1),
-        COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
+        (x - 1), (y - 2),
+        (w + 1), (h + 1),
+        color
     );
 }
-
-ALWAYS_INLINE void cs_draw_row_selection_box(u32 line) {
-    cs_draw_row_selection_box_impl((TEXT_X(0) - 1), (CRASH_SCREEN_TEXT_W + 1), line);
+ALWAYS_INLINE void cs_draw_row_box_1(u32 y, RGBA32 color) {
+    cs_draw_row_selection_box_impl(TEXT_X(0), y,
+        CRASH_SCREEN_TEXT_W, TEXT_HEIGHT(1),
+        color
+    );
+}
+ALWAYS_INLINE void cs_draw_row_box_2(u32 y, RGBA32 color) {
+    cs_draw_row_selection_box_impl(TEXT_X(0), (y + 1),
+        CRASH_SCREEN_TEXT_W, (TEXT_HEIGHT(2) - 2),
+        color
+    );
+}
+ALWAYS_INLINE void cs_draw_row_selection_box(u32 y) {
+    cs_draw_row_box_1(y, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
+}
+ALWAYS_INLINE void cs_draw_row_selection_box_2(u32 y) {
+    cs_draw_row_box_2(y, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
+}
+ALWAYS_INLINE void cs_draw_row_crash_box(u32 y) {
+    cs_draw_row_box_1(y, COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
+}
+ALWAYS_INLINE void cs_draw_row_crash_box_2(u32 y) {
+    cs_draw_row_box_2(y, COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
 }

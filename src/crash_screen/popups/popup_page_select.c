@@ -47,7 +47,7 @@ void cs_popup_pages_draw(void) {
         }
 
         if (pageID == gCSPageID) {
-            cs_draw_row_selection_box_impl(bgStartX, bgW, TEXT_Y((startY + 2) + pageID));
+            cs_draw_row_selection_box_impl(bgStartX, TEXT_Y((startY + 2) + pageID), bgW, TEXT_HEIGHT(1), COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
         }
 
         cs_draw_divider_translucent_impl(bgStartX, bgW, DIVIDER_Y(line));

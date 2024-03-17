@@ -11,6 +11,7 @@
 
 #include "pages/page_home.h"
 #include "pages/page_registers.h"
+#include "pages/page_threads.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
@@ -31,6 +32,7 @@
 CSPage* gCSPages[NUM_PAGES] = {
     [PAGE_HOME       ] = &gCSPage_home,
     [PAGE_REGISTERS  ] = &gCSPage_registers,
+    [PAGE_THREADS    ] = &gCSPage_threads,
     [PAGE_LOGS       ] = &gCSPage_logs,
     [PAGE_STACK_TRACE] = &gCSPage_stack,
 #ifdef INCLUDE_DEBUG_MAP

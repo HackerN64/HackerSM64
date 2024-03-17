@@ -7,6 +7,7 @@
 #include "sm64.h"
 
 #include "crash_screen/crash_controls.h"
+#include "crash_screen/crash_descriptions.h"
 #include "crash_screen/crash_draw.h"
 #include "crash_screen/crash_main.h"
 #include "crash_screen/crash_pages.h"
@@ -15,7 +16,6 @@
 
 #include "page_logs.h"
 
-#include "game/assert.h"
 #include "game/debug.h"
 #include "game/puppyprint.h"
 #ifdef UNF
@@ -48,6 +48,7 @@ static u32 sLogSelectedIndex = 0;
 static u32 sLogViewportIndex = 0;
 static u32 sLogNumShownRows = LOG_BUFFER_SIZE;
 static u32 sLogTotalRows    = LOG_BUFFER_SIZE;
+
 
 void page_logs_init(void) {
     sLogSelectedIndex = 0;
