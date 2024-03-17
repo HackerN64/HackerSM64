@@ -65,11 +65,6 @@ enum CSSettingsEntryType {
 };
 
 
-typedef struct CSSettingsGroup {
-    /*0x00*/ const char* name;
-    /*0x04*/ struct CSSetting* list;
-} CSSettingsGroup; /*0x08*/
-
 //! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt).
 typedef struct CSSetting {
     /*0x00*/ enum CSSettingsEntryType type;
@@ -86,7 +81,6 @@ extern const char* gValNames_bool[];
 extern const char* gValNames_print_num_fmt[];
 
 
-CSSettingsGroup* cs_get_settings_group(int groupID);
 CSSetting* cs_get_setting(int groupID, int settingID);
 SettingsType cs_get_setting_val(int groupID, int settingID);
 void cs_inc_setting(int groupID, int settingID, SettingsType inc);

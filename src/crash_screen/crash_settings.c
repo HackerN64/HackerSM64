@@ -43,38 +43,39 @@ CSSetting cs_settings_group_global[] = {
 };
 
 // Groups:
-CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
-    [CS_OPT_GROUP_BUTTONS       ] = { .name = "BUTTONS",   .list = cs_settings_group_buttons,        },
-    [CS_OPT_GROUP_GLOBAL        ] = { .name = "GLOBAL",    .list = cs_settings_group_global,         },
-    [CS_OPT_GROUP_CONTROLS      ] = { .name = "CONTROLS",  .list = cs_settings_group_controls,       },
+CSSetting* gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
+    [CS_OPT_GROUP_BUTTONS       ] = cs_settings_group_buttons,
+    [CS_OPT_GROUP_GLOBAL        ] = cs_settings_group_global,
+    [CS_OPT_GROUP_CONTROLS      ] = cs_settings_group_controls,
 
-    // [CS_OPT_GROUP_PAGE_HOME     ] = { .name = "HOME",      .list = cs_settings_group_page_home,      },
-    [CS_OPT_GROUP_PAGE_STACK    ] = { .name = "STACK",     .list = cs_settings_group_page_stack,     },
-    [CS_OPT_GROUP_PAGE_THREADS  ] = { .name = "THREADS",   .list = cs_settings_group_page_threads,   },
-    [CS_OPT_GROUP_PAGE_REGISTERS] = { .name = "REGISTERS", .list = cs_settings_group_page_registers, },
-    [CS_OPT_GROUP_PAGE_MEMORY   ] = { .name = "MEMORY",    .list = cs_settings_group_page_memory,    },
+    //! TODO: Automatically do this from gCSPages:
+    // [CS_OPT_GROUP_PAGE_HOME     ] = cs_settings_group_page_home,
+    [CS_OPT_GROUP_PAGE_STACK    ] = cs_settings_group_page_stack,
+    [CS_OPT_GROUP_PAGE_THREADS  ] = cs_settings_group_page_threads,
+    [CS_OPT_GROUP_PAGE_REGISTERS] = cs_settings_group_page_registers,
+    [CS_OPT_GROUP_PAGE_MEMORY   ] = cs_settings_group_page_memory,
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_GROUP_PAGE_MAP      ] = { .name = "MAP",       .list = cs_settings_group_page_map,       },
+    [CS_OPT_GROUP_PAGE_MAP      ] = cs_settings_group_page_map,
 #endif // INCLUDE_DEBUG_MAP
 #ifdef PUPPYPRINT_DEBUG
-    [CS_OPT_GROUP_PAGE_LOGS     ] = { .name = "LOGS",      .list = cs_settings_group_page_logs,      },
+    [CS_OPT_GROUP_PAGE_LOGS     ] = cs_settings_group_page_logs,
 #endif // PUPPYPRINT_DEBUG
-    [CS_OPT_GROUP_PAGE_DISASM   ] = { .name = "DISASM",    .list = cs_settings_group_page_disasm,    },
-    // [CS_OPT_GROUP_PAGE_SETTINGS ] = { .name = "SETTINGS",  .list = cs_settings_group_page_settings,  },
-    // [CS_OPT_GROUP_PAGE_ABOUT    ] = { .name = "ABOUT",     .list = cs_settings_group_page_about,     },
+    [CS_OPT_GROUP_PAGE_DISASM   ] = cs_settings_group_page_disasm,
+    // [CS_OPT_GROUP_PAGE_SETTINGS ] = cs_settings_group_page_settings,
+    // [CS_OPT_GROUP_PAGE_ABOUT    ] = cs_settings_group_page_about,
 };
 
 
 // Gets the settings group pointer from a groupID.
-CSSettingsGroup* cs_get_settings_group(int groupID) {
-    return &gCSSettingsGroups[groupID];
+static CSSetting* cs_get_settings_group(int groupID) {
+    return gCSSettingsGroups[groupID];
 }
 
 // Gets the setting pointer from a groupID and settingID.
 CSSetting* cs_get_setting(int groupID, int settingID) {
-    CSSettingsGroup* group = cs_get_settings_group(groupID);
+    CSSetting* group = cs_get_settings_group(groupID);
 
-    return &group->list[settingID];
+    return &group[settingID];
 }
 
 // Gets the value of a setting from a groupID and settingID.
@@ -101,9 +102,9 @@ void cs_inc_setting(int groupID, int settingID, SettingsType inc) {
 
 // Checks whether a specific settings group has a header.
 _Bool cs_settings_group_has_header(int groupID) {
-    CSSettingsGroup* group = cs_get_settings_group(groupID);
+    CSSetting* group = cs_get_settings_group(groupID);
 
-    return ((group != NULL) && (group->list != NULL) && (group->list[GROUP_HEADER_INDEX].type == CS_OPT_TYPE_HEADER));
+    return ((group != NULL) && (group[GROUP_HEADER_INDEX].type == CS_OPT_TYPE_HEADER));
 }
 
 // -- CSSettingsFunc --

@@ -68,9 +68,7 @@ void update_displayed_settings(void) {
 
         // Header.
         if (cs_settings_group_has_header(groupID)) {
-            CSSettingsGroup* group = cs_get_settings_group(groupID);
-
-            sectionShown = group->list[settingID].val;
+            sectionShown = cs_get_setting_val(groupID, settingID);
 
             append_to_displayed_settings(groupID, settingID);
 
