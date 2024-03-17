@@ -103,7 +103,7 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __att
 void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);
 
-typedef struct {
+typedef struct FloatErrorPrintFormat {
     /*0x00*/ Color r;
     /*0x01*/ Color g;
     /*0x02*/ Color b;

@@ -71,7 +71,7 @@ enum COP0Registers {
 
 
 // $Status register.
-typedef union {
+typedef union Reg_Status {
     struct PACKED {
         u32 ie  : 1; //  0   : Global interrupt enable         - Should interrupts be handled?
         u32 exl : 1; //  1   : Exception level                 - Are we currently handling an exception?
@@ -94,7 +94,7 @@ typedef union {
 } Reg_Status;
 
 // $Cause register.
-typedef union {
+typedef union Reg_Cause {
     struct PACKED {
         u32             :  2; //  0- 1: Unused            - Always zero.
         u32 exception   :  4; //  2- 6: Exception code    - Which exception/interrupt occurred?
@@ -109,7 +109,7 @@ typedef union {
 } Reg_Cause;
 
 // tc->cause register.
-typedef union {
+typedef union Reg_CauseT {
     struct PACKED {
         u32 delaySlot :  1; // Exception triggered in delay slot.
         u32 cop_num   :  2; // Coprocessor_exception.
@@ -120,7 +120,7 @@ typedef union {
 } Reg_CauseT;
 
 // tc->fpcsr register.
-typedef union {
+typedef union Reg_FPCSR {
     struct PACKED {
         u32                   :  7;
         u32 flushDenormToZero :  1; // Flush denorm to zero.
@@ -180,14 +180,14 @@ enum FloatErrorType {
 };
 
 
-typedef struct {
+typedef struct RegisterInfo {
     /*0x00*/ const u16 offset;
     /*0x02*/ const u8 size;
     /*0x03*/ const char shortName[3];
     /*0x06*/ const char name[10];
 } RegisterInfo; /*0x10*/
 
-typedef union {
+typedef union RegisterId {
     struct {
         /*0x00*/ s8 cop;
         /*0x01*/ s8 idx;

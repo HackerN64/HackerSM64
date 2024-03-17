@@ -16,7 +16,7 @@ enum CSSettingsGroup_page_registers {
 };
 
 
-typedef struct {
+typedef struct OSThreadContextRegister {
     /*0x00*/ const Address offset;
     /*0x04*/ const u8 size;
     /*0x05*/ const char name[3];
