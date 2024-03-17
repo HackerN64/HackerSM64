@@ -18,25 +18,28 @@
 #include "pages/page_about.h"
 
 
-#define CRASH_SCREEN_START_PAGE PAGE_HOME
+#define CRASH_SCREEN_START_PAGE CS_PAGE_HOME
 
 
 enum CSPages {
-    FIRST_PAGE,
-    PAGE_HOME = FIRST_PAGE,
-    PAGE_REGISTERS,
-    PAGE_THREADS,
-    PAGE_LOGS,
-    PAGE_STACK_TRACE,
+    CS_FIRST_PAGE,
+
+    CS_PAGE_HOME = CS_FIRST_PAGE,
+    CS_PAGE_STACK,
+    CS_PAGE_DISASM,
+    CS_PAGE_MEMORY,
+    CS_PAGE_THREADS,
+    CS_PAGE_REGISTERS,
 #ifdef INCLUDE_DEBUG_MAP
-    PAGE_MAP_VIEWER,
+    CS_PAGE_MAP,
 #endif // INCLUDE_DEBUG_MAP
-    PAGE_RAM_VIEWER,
-    PAGE_DISASM,
-    PAGE_SETTINGS,
-    PAGE_ABOUT,
-    NUM_PAGES,
-    MAX_PAGES = 255U,
+#ifdef PUPPYPRINT_DEBUG
+    CS_PAGE_LOGS,
+#endif // PUPPYPRINT_DEBUG
+    CS_PAGE_SETTINGS,
+    CS_PAGE_ABOUT,
+
+    CS_NUM_PAGES,
 };
 
 
@@ -59,7 +62,7 @@ typedef struct CSPage {
 } CSPage; /*0x20*/
 
 
-extern struct CSPage* gCSPages[NUM_PAGES];
+extern struct CSPage* gCSPages[CS_NUM_PAGES];
 extern enum CSPages gCSPageID;
 extern _Bool gCSSwitchedPage;
 

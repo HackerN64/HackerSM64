@@ -180,7 +180,7 @@ _Bool cs_check_switch_page_input(void) {
     s8 change = 0;
     if (buttonPressed & L_TRIG) change = -1; // Previous Page.
     if (buttonPressed & R_TRIG) change = +1; // Next page.
-    gCSPageID = WRAP(((s32)gCSPageID + change), FIRST_PAGE, (NUM_PAGES - 1));
+    gCSPageID = WRAP(((s32)gCSPageID + change), CS_FIRST_PAGE, (CS_NUM_PAGES - 1));
 
     if (gCSPageID == prevPage) {
         return FALSE;

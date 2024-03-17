@@ -160,7 +160,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     // Default to disasm page if the crash was caused by an Illegal Instruction.
     if (tc->cause == EXC_II) {
-        cs_set_page(PAGE_DISASM);
+        cs_set_page(CS_PAGE_DISASM);
     }
 
     // Only on the first crash:
@@ -171,7 +171,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
         if (gSetCrashAddress != 0x0) {
             tc->pc = gSetCrashAddress;
             gSetCrashAddress = 0x00000000;
-            cs_set_page(PAGE_RAM_VIEWER);
+            cs_set_page(CS_PAGE_MEMORY);
         }
 
         // Use the Z buffer's memory space to save a screenshot of the game.

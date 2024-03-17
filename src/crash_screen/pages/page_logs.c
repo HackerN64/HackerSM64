@@ -24,6 +24,8 @@
 #endif // UNF
 
 
+#ifdef PUPPYPRINT_DEBUG
+
 struct CSSetting cs_settings_group_page_logs[] = {
     [CS_OPT_HEADER_PAGE_LOG         ] = { .type = CS_OPT_TYPE_HEADER,  .name = "LOGS",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_LOG_INDEX_NUMBERS       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show index numbers",             .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -55,14 +57,9 @@ void page_logs_init(void) {
     sLogViewportIndex = 0;
 
     sLogNumShownRows = LOG_BUFFER_SIZE;
-#ifdef PUPPYPRINT_DEBUG
     sLogTotalRows = MIN(gConsoleLogLastIndex, (u32)LOG_BUFFER_SIZE);
-#else // !PUPPYPRINT_DEBUG
-    sLogTotalRows = LOG_BUFFER_SIZE;
-#endif // !PUPPYPRINT_DEBUG
 }
 
-#ifdef PUPPYPRINT_DEBUG
 void draw_logs_section(u32 line, u32 numLines) {
     const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOGS, CS_OPT_LOG_INDEX_NUMBERS);
 
@@ -101,19 +98,14 @@ void draw_logs_section(u32 line, u32 numLines) {
 
     osWritebackDCacheAll();
 }
-#endif // PUPPYPRINT_DEBUG
 
 void page_logs_draw(void) {
     u32 line = 1;
 
-#ifdef PUPPYPRINT_DEBUG
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
     gCSWordWrap = TRUE;
     draw_logs_section(line, sLogNumShownRows);
     gCSWordWrap = FALSE;
-#else // !PUPPYPRINT_DEBUG
-    cs_print(TEXT_X(0), TEXT_Y(line), "No log data.");
-#endif // !PUPPYPRINT_DEBUG
 
     osWritebackDCacheAll();
 }
@@ -141,7 +133,6 @@ void page_logs_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
- #ifdef PUPPYPRINT_DEBUG
     osSyncPrintf("- PUPPYPRINT LOG:\n");
     for (u32 i = 0; i < sLogTotalRows; i++) {
         char* entry = consoleLogTable[(LOG_BUFFER_SIZE - 1) - i];
@@ -152,11 +143,6 @@ void page_logs_print(void) {
 
         osSyncPrintf("-- %i: %s\n", ((gConsoleLogLastIndex - 1) - i), entry);
     }
- #else // !PUPPYPRINT_DEBUG
-    else {
-        osSyncPrintf("- No log or assert data.\n");
-    }
- #endif // !PUPPYPRINT_DEBUG
 #endif // UNF
 }
 
@@ -174,3 +160,5 @@ struct CSPage gCSPage_logs = {
         .crashed     = FALSE,
     },
 };
+
+#endif // PUPPYPRINT_DEBUG

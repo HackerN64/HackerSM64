@@ -47,15 +47,18 @@ CSSettingsGroup gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_BUTTONS       ] = { .name = "BUTTONS",   .list = cs_settings_group_buttons,        },
     [CS_OPT_GROUP_GLOBAL        ] = { .name = "GLOBAL",    .list = cs_settings_group_global,         },
     [CS_OPT_GROUP_CONTROLS      ] = { .name = "CONTROLS",  .list = cs_settings_group_controls,       },
+
     // [CS_OPT_GROUP_PAGE_HOME     ] = { .name = "HOME",      .list = cs_settings_group_page_home,      },
-    [CS_OPT_GROUP_PAGE_REGISTERS] = { .name = "REGISTERS", .list = cs_settings_group_page_registers, },
-    [CS_OPT_GROUP_PAGE_THREADS  ] = { .name = "THREADS",   .list = cs_settings_group_page_threads,   },
-    [CS_OPT_GROUP_PAGE_LOGS     ] = { .name = "LOGS",      .list = cs_settings_group_page_logs,      },
     [CS_OPT_GROUP_PAGE_STACK    ] = { .name = "STACK",     .list = cs_settings_group_page_stack,     },
+    [CS_OPT_GROUP_PAGE_THREADS  ] = { .name = "THREADS",   .list = cs_settings_group_page_threads,   },
+    [CS_OPT_GROUP_PAGE_REGISTERS] = { .name = "REGISTERS", .list = cs_settings_group_page_registers, },
+    [CS_OPT_GROUP_PAGE_MEMORY   ] = { .name = "MEMORY",    .list = cs_settings_group_page_memory,    },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_MAP      ] = { .name = "MAP",       .list = cs_settings_group_page_map,       },
 #endif // INCLUDE_DEBUG_MAP
-    [CS_OPT_GROUP_PAGE_MEMORY   ] = { .name = "MEMORY",    .list = cs_settings_group_page_memory,    },
+#ifdef PUPPYPRINT_DEBUG
+    [CS_OPT_GROUP_PAGE_LOGS     ] = { .name = "LOGS",      .list = cs_settings_group_page_logs,      },
+#endif // PUPPYPRINT_DEBUG
     [CS_OPT_GROUP_PAGE_DISASM   ] = { .name = "DISASM",    .list = cs_settings_group_page_disasm,    },
     // [CS_OPT_GROUP_PAGE_SETTINGS ] = { .name = "SETTINGS",  .list = cs_settings_group_page_settings,  },
     // [CS_OPT_GROUP_PAGE_ABOUT    ] = { .name = "ABOUT",     .list = cs_settings_group_page_about,     },

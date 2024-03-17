@@ -7,6 +7,8 @@
 #include "crash_screen/crash_settings.h"
 
 
+#ifdef PUPPYPRINT_DEBUG
+
 enum CSSettingsGroup_page_log {
     CS_OPT_HEADER_PAGE_LOG,
     CS_OPT_LOG_INDEX_NUMBERS,
@@ -16,3 +18,5 @@ enum CSSettingsGroup_page_log {
 
 extern struct CSSetting cs_settings_group_page_logs[];
 extern struct CSPage gCSPage_logs;
+
+#endif // PUPPYPRINT_DEBUG

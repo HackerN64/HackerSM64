@@ -128,24 +128,24 @@ void cs_address_select_input(void) {
         cs_open_popup(CS_POPUP_NONE);
 
         switch (gCSPageID) {
-            case PAGE_STACK_TRACE:
-                cs_set_page(PAGE_DISASM);
+            case CS_PAGE_STACK:
+                cs_set_page(CS_PAGE_DISASM);
                 break;
 #ifdef INCLUDE_DEBUG_MAP
-            case PAGE_MAP_VIEWER:;
+            case CS_PAGE_MAP:;
                 s32 targetIndex = get_symbol_index_from_addr_backward(sAddressSelectTarget);
                 if (targetIndex != -1) {
                     if (sMapViewerSelectedIndex == (u32)targetIndex) {
                         if (is_in_code_segment(gMapSymbols[targetIndex].addr)) {
-                            cs_set_page(PAGE_DISASM);
+                            cs_set_page(CS_PAGE_DISASM);
                         } else {
-                            cs_set_page(PAGE_RAM_VIEWER);
+                            cs_set_page(CS_PAGE_MEMORY);
                         }
                     }
                     sMapViewerSelectedIndex = targetIndex;
                 }
                 break;
-            case PAGE_DISASM:
+            case CS_PAGE_DISASM:
                 if (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget)) {
                     gFillBranchBuffer = TRUE;
                 }

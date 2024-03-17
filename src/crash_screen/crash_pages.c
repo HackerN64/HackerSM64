@@ -29,19 +29,21 @@
 
 // -- Pages --
 
-CSPage* gCSPages[NUM_PAGES] = {
-    [PAGE_HOME       ] = &gCSPage_home,
-    [PAGE_REGISTERS  ] = &gCSPage_registers,
-    [PAGE_THREADS    ] = &gCSPage_threads,
-    [PAGE_LOGS       ] = &gCSPage_logs,
-    [PAGE_STACK_TRACE] = &gCSPage_stack,
+CSPage* gCSPages[CS_NUM_PAGES] = {
+    [CS_PAGE_HOME       ] = &gCSPage_home,
+    [CS_PAGE_STACK      ] = &gCSPage_stack,
+    [CS_PAGE_DISASM     ] = &gCSPage_disasm,
+    [CS_PAGE_THREADS    ] = &gCSPage_threads,
+    [CS_PAGE_REGISTERS  ] = &gCSPage_registers,
+    [CS_PAGE_MEMORY     ] = &gCSPage_memory,
 #ifdef INCLUDE_DEBUG_MAP
-    [PAGE_MAP_VIEWER ] = &gCSPage_map,
+    [CS_PAGE_MAP        ] = &gCSPage_map,
 #endif // INCLUDE_DEBUG_MAP
-    [PAGE_RAM_VIEWER ] = &gCSPage_memory,
-    [PAGE_DISASM     ] = &gCSPage_disasm,
-    [PAGE_SETTINGS   ] = &gCSPage_settings,
-    [PAGE_ABOUT      ] = &gCSPage_about,
+#ifdef PUPPYPRINT_DEBUG
+    [CS_PAGE_LOGS       ] = &gCSPage_logs,
+#endif // PUPPYPRINT_DEBUG
+    [CS_PAGE_SETTINGS   ] = &gCSPage_settings,
+    [CS_PAGE_ABOUT      ] = &gCSPage_about,
 };
 enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE; // Current page ID.
 _Bool gCSSwitchedPage = FALSE;
