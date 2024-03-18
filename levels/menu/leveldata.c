@@ -1934,7 +1934,7 @@ const Gfx dl_menu_texture_kurs_upper[] = {
 };
 #endif
 
-#if defined(ENABLE_SPANISH_SPAIN) || defined(ENABLE_SPANISH_LATIN_AMERICA)
+#ifdef ENABLE_SPANISH
 ALIGNED8 static const Texture texture_menu_nivel_upper[] = {
 #include "levels/menu/main_menu_seg7.nivel_upper.rgba16.inc.c"
 };
@@ -1997,30 +1997,20 @@ const Collision main_menu_seg7_collision[] = {
 #undef COURSE_FILE
 #endif
 
-#ifdef ENABLE_SPANISH_SPAIN
-#define COURSE_NAME_TABLE course_strings_es_es_table
-#define COURSE_FILE "es_es/courses.h"
+#ifdef ENABLE_SPANISH
+#define COURSE_NAME_TABLE course_strings_es_table
+#define COURSE_FILE "es/courses.h"
 #include "text/define_courses.inc.c"
 #undef COURSE_NAME_TABLE
 #undef COURSE_FILE
 #endif
-
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-#define COURSE_NAME_TABLE course_strings_es_la_table
-#define COURSE_FILE "es_la/courses.h"
-#include "text/define_courses.inc.c"
-#undef COURSE_NAME_TABLE
-#undef COURSE_FILE
-#endif
-
 
 const char *(*course_strings_language_table[])[] = DEFINE_LANGUAGE_ARRAY(
     &course_strings_en_table,
     &course_strings_fr_table,
     &course_strings_de_table,
     &course_strings_jp_table,
-    &course_strings_es_es_table,
-    &course_strings_es_la_table
+    &course_strings_es_table,
 );
 
 #endif

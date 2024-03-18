@@ -187,11 +187,8 @@ enum MultilangLanguages {
 #ifdef ENABLE_JAPANESE
     LANGUAGE_JAPANESE,
 #endif
-#ifdef ENABLE_SPANISH_SPAIN
-    LANGUAGE_SPANISH_SPAIN,
-#endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-    LANGUAGE_SPANISH_LATIN_AMERICA,
+#ifdef ENABLE_SPANISH
+    LANGUAGE_SPANISH,
 #endif
     LANGUAGE_COUNT,
     NUM_DEFINED_LANGUAGES = (LANGUAGE_COUNT - 1),
@@ -212,26 +209,20 @@ enum MultilangLanguages {
 #else
 #define LANG_ARRAY_COND_JAPANESE(...)
 #endif
-#ifdef ENABLE_SPANISH_SPAIN
-#define LANG_ARRAY_COND_SPANISH_SPAIN(...) [LANGUAGE_SPANISH_SPAIN] = __VA_ARGS__,
+#ifdef ENABLE_SPANISH
+#define LANG_ARRAY_COND_SPANISH(...) [LANGUAGE_SPANISH] = __VA_ARGS__,
 #else
-#define LANG_ARRAY_COND_SPANISH_SPAIN(...)
-#endif
-#ifdef ENABLE_SPANISH_LATIN_AMERICA
-#define LANG_ARRAY_COND_LATIN_AMERICA(...) [LANGUAGE_SPANISH_LATIN_AMERICA] = __VA_ARGS__,
-#else
-#define LANG_ARRAY_COND_LATIN_AMERICA(...)
+#define LANG_ARRAY_COND_SPANISH(...)
 #endif
 
 typedef char * LangArray[LANGUAGE_COUNT];
 #define LANG_ARRAY(cmd) ((cmd)[gInGameLanguage])
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA) {\
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) {\
     [LANGUAGE_ENGLISH] = english,                                                                       \
     LANG_ARRAY_COND_FRENCH(french)                                                                      \
     LANG_ARRAY_COND_GERMAN(german)                                                                      \
     LANG_ARRAY_COND_JAPANESE(japanese)                                                                  \
-    LANG_ARRAY_COND_SPANISH_SPAIN(spanish_SPAIN)                                                        \
-    LANG_ARRAY_COND_LATIN_AMERICA(spanish_LATIN_AMERICA)                                                \
+    LANG_ARRAY_COND_SPANISH(spanish)                                                        \
 }
 
 #else
@@ -241,7 +232,7 @@ typedef char * LangArray[LANGUAGE_COUNT];
 
 typedef char * LangArray;
 #define LANG_ARRAY(cmd) (cmd)
-#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish_SPAIN, spanish_LATIN_AMERICA) english
+#define DEFINE_LANGUAGE_ARRAY(english, french, german, japanese, spanish) english
 
 #endif
 

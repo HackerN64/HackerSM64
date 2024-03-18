@@ -1235,7 +1235,6 @@ LangArray textNew = DEFINE_LANGUAGE_ARRAY(
     "VIDE",
     "FREI",
     "NEW",
-    "NUEVO",
     "NUEVO");
 
 void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
@@ -1263,15 +1262,13 @@ LangArray textSelectFile = DEFINE_LANGUAGE_ARRAY(
     "CHOISIR  FICHIER",
     "WÄHLE SPIEL",
     "ファイルセレクト",
-    "ELIGE ARCHIVO",
-    "SELECCIONA FICHERO");
+    "ELIGE ARCHIVO");
 
 LangArray textScore = DEFINE_LANGUAGE_ARRAY(
     "SCORE",
     "SCORE",
     "LEISTUNG",
     "スコア",
-    "RÉCORDS",
     "RÉCORDS");
 
 LangArray textCopy = DEFINE_LANGUAGE_ARRAY(
@@ -1279,7 +1276,6 @@ LangArray textCopy = DEFINE_LANGUAGE_ARRAY(
     "COPIER",
     "KOPIEREN",
     "コピー",
-    "COPIAR",
     "COPIAR");
 
 LangArray textErase = DEFINE_LANGUAGE_ARRAY(
@@ -1287,7 +1283,6 @@ LangArray textErase = DEFINE_LANGUAGE_ARRAY(
     "EFFACER",
     "LÖSCHEN",
     "けす",
-    "BORRAR",
     "BORRAR");
 
 LangArray textMarioA = DEFINE_LANGUAGE_ARRAY(
@@ -1295,7 +1290,6 @@ LangArray textMarioA = DEFINE_LANGUAGE_ARRAY(
     "MARIO A",
     "MARIO A",
     "マリオＡ",
-    "MARIO A",
     "MARIO A");
 
 LangArray textMarioB = DEFINE_LANGUAGE_ARRAY(
@@ -1303,7 +1297,6 @@ LangArray textMarioB = DEFINE_LANGUAGE_ARRAY(
     "MARIO B",
     "MARIO B",
     "マリオＢ",
-    "MARIO B",
     "MARIO B");
 
 LangArray textMarioC = DEFINE_LANGUAGE_ARRAY(
@@ -1311,7 +1304,6 @@ LangArray textMarioC = DEFINE_LANGUAGE_ARRAY(
     "MARIO C",
     "MARIO C",
     "マリオＣ",
-    "MARIO C",
     "MARIO C");
 
 LangArray textMarioD = DEFINE_LANGUAGE_ARRAY(
@@ -1319,7 +1311,6 @@ LangArray textMarioD = DEFINE_LANGUAGE_ARRAY(
     "MARIO D",
     "MARIO D",
     "マリオＤ",
-    "MARIO D",
     "MARIO D");
 
 LangArray textSoundModeStereo = DEFINE_LANGUAGE_ARRAY(
@@ -1327,7 +1318,6 @@ LangArray textSoundModeStereo = DEFINE_LANGUAGE_ARRAY(
     "STÉRÉO",
     "STEREO",
     "ステレオ",
-    "ESTÉREO",
     "ESTÉREO");
 
 LangArray textSoundModeMono = DEFINE_LANGUAGE_ARRAY(
@@ -1335,7 +1325,6 @@ LangArray textSoundModeMono = DEFINE_LANGUAGE_ARRAY(
     "MONO",
     "MONO",
     "モノラル",
-    "MONO",
     "MONO");
 
 LangArray textSoundModeHeadset = DEFINE_LANGUAGE_ARRAY(
@@ -1343,8 +1332,7 @@ LangArray textSoundModeHeadset = DEFINE_LANGUAGE_ARRAY(
     "CASQUE",
     "PHONES",
     "ヘッドホン",
-    "CASCOS",
-    "AURICULARES");
+    "CASCOS");
 
 LangArray *textSoundModes[] = {
     &textSoundModeStereo,
@@ -1358,7 +1346,6 @@ LangArray textOption = DEFINE_LANGUAGE_ARRAY(
     "OPTION",
     "OPTIONEN",
     "オプション",
-    "OPCIONES",
     "OPCIONES");
 #endif
 
@@ -1407,15 +1394,13 @@ LangArray textCheckFile = DEFINE_LANGUAGE_ARRAY(
     "VOIR  SCORE",
     "VON WELCHEM SPIEL",
     "どのスコアをみる？",
-    "VER ARCHIVO",
-    "VER FICHERO");
+    "VER ARCHIVO");
 
 LangArray textNoSavedDataExists = DEFINE_LANGUAGE_ARRAY(
     "NO SAVED DATA EXISTS",
     "AUCUNE SAUVEGARDE DISPONIBLE",
     "KEIN SPIEL VORHANDEN",
     "ファイルにデータがありません",
-    "NO HAY DATOS GUARDADOS",
     "NO HAY DATOS GUARDADOS");
 
 /**
@@ -1444,24 +1429,21 @@ LangArray textReturn = DEFINE_LANGUAGE_ARRAY(
     "RETOUR",
     "ZURÜCK",
     "もどる",
-    "VOLVER",
-    "REGRESAR");
+    "VOLVER");
 
 LangArray textCopyFileButton = DEFINE_LANGUAGE_ARRAY(
     "COPY FILE",
     "COPIER",
     "KOPIEREN",
     "ファイルコピー",
-    "COPIAR ARCHIVO",
-    "COPIAR FICHERO");
+    "COPIAR ARCHIVO");
 
 LangArray textEraseFileButton = DEFINE_LANGUAGE_ARRAY(
     "ERASE FILE",
     "EFFACER",
     "LÖSCHEN",
     "ファイルけす",
-    "BORRAR ARCHIVO",
-    "BORRAR FICHERO");
+    "BORRAR ARCHIVO");
 
 /**
  * Prints score menu strings that shows on the green background menu screen.
@@ -1514,15 +1496,13 @@ LangArray textCopyFile = DEFINE_LANGUAGE_ARRAY(
     "COPIER  FICHIER",
     "SPIEL KOPIEREN",
     "ファイルコピーする",
-    "COPIAR ARCHIVO",
-    "COPIAR FICHERO");
+    "COPIAR ARCHIVO");
 
 LangArray textCopyItToWhere = DEFINE_LANGUAGE_ARRAY(
     "COPY IT TO WHERE?",
     "COPIER SUR?",
     "WOHIN KOPIEREN?",
     "どこにコピーしますか？",
-    "¿COPIARLO A DÓNDE?",
     "¿COPIARLO A DÓNDE?");
 
 LangArray textCopyCompleted = DEFINE_LANGUAGE_ARRAY(
@@ -1530,7 +1510,6 @@ LangArray textCopyCompleted = DEFINE_LANGUAGE_ARRAY(
     "COPIE ACHEVEÉ",
     "SPIEL KOPIERT",
     "コピーおわりました",
-    "COPIA COMPLETADA",
     "COPIA COMPLETADA");
 
 LangArray textSavedDataExists = DEFINE_LANGUAGE_ARRAY(
@@ -1538,7 +1517,6 @@ LangArray textSavedDataExists = DEFINE_LANGUAGE_ARRAY(
     "SAVEGARDE EXISTANTE",
     "BEREITS BELEGT",
     "ファイルにデータがはいってます",
-    "YA EXISTEN DATOS GUARDADOS",
     "YA EXISTEN DATOS GUARDADOS");
 
 LangArray textNoFileToCopyFrom = DEFINE_LANGUAGE_ARRAY(
@@ -1546,8 +1524,7 @@ LangArray textNoFileToCopyFrom = DEFINE_LANGUAGE_ARRAY(
     "AUCUN FICHIER VIDE",
     "KEIN PLATZ VORHANDEN",
     "からのファイルがありません",
-    "NO HAY NINGÚN ARCHIVO VACÍO",
-    "NO HAY NINGÚN FICHERO VACÍO");
+    "NO HAY NINGÚN ARCHIVO VACÍO");
 
 /**
  * Defines IDs for the top message of the copy menu and displays it if the ID is called in messageID.
@@ -1627,7 +1604,6 @@ LangArray textViewScore = DEFINE_LANGUAGE_ARRAY(
     "SCORE",
     "LEISTUNG",
     "スコアをみる",
-    "VER RÉCORDS",
     "VER RÉCORDS");
 
 /**
@@ -1669,7 +1645,6 @@ LangArray textYes = DEFINE_LANGUAGE_ARRAY(
     "OUI",
     "JA",
     "はい",
-    "SÍ",
     "SÍ");
 
 LangArray textNo = DEFINE_LANGUAGE_ARRAY(
@@ -1677,7 +1652,6 @@ LangArray textNo = DEFINE_LANGUAGE_ARRAY(
     "NON",
     "NEIN",
     "いいえ",
-    "NO",
     "NO");
 
 /**
@@ -1753,15 +1727,13 @@ LangArray textEraseFile = DEFINE_LANGUAGE_ARRAY(
     "EFFACER  FICHIER",
     "SPIEL LÖSCHEN",
     "ファイルけす",
-    "BORRAR ARCHIVO",
-    "BORRAR FICHERO");
+    "BORRAR ARCHIVO");
 
 LangArray textSure = DEFINE_LANGUAGE_ARRAY(
     "SURE?",
     "OK?",
     "SICHER?",
     "ほんと？",
-    "¿SEGURO?",
     "¿SEGURO?");
 
 LangArray textMarioXJustErased = DEFINE_LANGUAGE_ARRAY(
@@ -1769,7 +1741,6 @@ LangArray textMarioXJustErased = DEFINE_LANGUAGE_ARRAY(
     "MARIO %s EFFACÉ",
     "MARIO %s GELÖSCHT",
     "マリオ%sをけしました",
-    "MARIO %s ELIMINADO",
     "MARIO %s ELIMINADO");
 
 /**
@@ -1883,7 +1854,6 @@ LangArray textSoundSelect = DEFINE_LANGUAGE_ARRAY(
     "SELECTION SON",
     "WÄHLE SOUND",
     "サウンドセレクト",
-    "MODO DE SONIDO",
     "MODO DE SONIDO");
 
 #ifdef MULTILANG
@@ -1892,7 +1862,6 @@ LangArray textLanguageSelect = DEFINE_LANGUAGE_ARRAY(
     "SELECTION LANGUE",
     "WÄHLE SPRACHE",
     "ランゲージセレクト",
-    "IDIOMA",
     "IDIOMA");
 
 LangArray textLanguage = DEFINE_LANGUAGE_ARRAY(
@@ -1900,8 +1869,7 @@ LangArray textLanguage = DEFINE_LANGUAGE_ARRAY(
     "FRANÇAIS",
     "DEUTSCH",
     "にほんご",
-    "ESPAÑOL ESPAÑA",
-    "ESPAÑOL LATINO"
+    "ESPAÑOL",
 );
 
 #define SOUND_LABEL_Y 141
@@ -1999,7 +1967,6 @@ LangArray text4Dashes = DEFINE_LANGUAGE_ARRAY(
     "----",
     "----",
     "ーーーー",
-    "----",
     "----");
 
 LangArray textMarioFace = DEFINE_LANGUAGE_ARRAY(
@@ -2007,7 +1974,6 @@ LangArray textMarioFace = DEFINE_LANGUAGE_ARRAY(
     "{}%s",
     "{}%s",
     "マリオ%s",
-    "{}%s",
     "{}%s");
 
 /**
@@ -2076,7 +2042,6 @@ LangArray textScoreMenuMarioX = DEFINE_LANGUAGE_ARRAY(
     "MARIO %c",
     "MARIO %c",
     "マリオ %c",
-    "MARIO %c",
     "MARIO %c");
 
 LangArray textHiScore = DEFINE_LANGUAGE_ARRAY(
@@ -2084,7 +2049,6 @@ LangArray textHiScore = DEFINE_LANGUAGE_ARRAY(
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "ハイスコア",
-    "RÉCORDS",
     "RÉCORDS");
 
 extern LangArray textMyScore;
