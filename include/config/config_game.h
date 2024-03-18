@@ -71,22 +71,24 @@
 // #define DIALOG_INDICATOR
 
 /**
- * Include the English characters that were missing from US segment2 and the rumble pak texture if using rumble.
- * J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
- * [MAKE SURE TO INCLUDE EU AND JP/SH BASEROMS IN THE REPO TO OBTAIN THE ASSETS]
- * If this is disabled, backup assets will be used.
+ * Adds support for multiple languages to the game.
  */
-// #define COMPLETE_EN_US_SEGMENT2
+// #define MULTILANG
 
 /**
- * Removes multi-language cake screen.
+ * Toggles for individual languages. Only works when MULTILANG is enabled.
+ * Note that English will always be enabled.
  */
-#define EU_CUSTOM_CAKE_FIX
+#define ENABLE_FRENCH
+#define ENABLE_GERMAN
+// #define ENABLE_JAPANESE
+#define ENABLE_SPANISH
 
 /**
- * Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
+ * This define enables support for Japanese characters even when multilang or Japanese is not enabled.
+ * Requires a Japanese baserom.
  */
-#define MULTILANG (0 || VERSION_EU)
+// #define JAPANESE_CHARACTERS
 
 /**
  * Prevents infinite death loops by always restoring Mario's health when he's warped to any kind of warp while dead.

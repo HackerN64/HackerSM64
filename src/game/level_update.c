@@ -20,9 +20,8 @@
 #include "ingame_menu.h"
 #include "obj_behaviors.h"
 #include "save_file.h"
-#if MULTILANG
+#ifdef MULTILANG
 #include "memory.h"
-#include "eu_translation.h"
 #include "segment_symbols.h"
 #endif
 #include "level_table.h"
@@ -1303,25 +1302,38 @@ s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused) {
     return (initOrUpdate ? update_level() : init_level());
 }
 
-#if MULTILANG
+#ifdef MULTILANG
 void load_language_text(void) {
-    switch (gInGameLanguage - 1) {
+    switch (gInGameLanguage) {
         case LANGUAGE_ENGLISH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_en_yay0SegmentRomStart, _translation_en_yay0SegmentRomEnd);
             break;
+#ifdef ENABLE_FRENCH
         case LANGUAGE_FRENCH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_fr_yay0SegmentRomStart, _translation_fr_yay0SegmentRomEnd);
             break;
+#endif
+#ifdef ENABLE_GERMAN
         case LANGUAGE_GERMAN:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_de_yay0SegmentRomStart, _translation_de_yay0SegmentRomEnd);
             break;
+#endif
+#ifdef ENABLE_JAPANESE
+        case LANGUAGE_JAPANESE:
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_jp_yay0SegmentRomStart, _translation_jp_yay0SegmentRomEnd);
+            break;
+#endif
+#ifdef ENABLE_SPANISH
+        case LANGUAGE_SPANISH:
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_yay0SegmentRomStart, _translation_es_yay0SegmentRomEnd);
+            break;
+#endif
     }
 }
 #endif
 
 s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
-#if MULTILANG
-    gInGameLanguage = eu_get_language()+1;
+#ifdef MULTILANG
     load_language_text();
 #endif
     sWarpDest.type = WARP_TYPE_NOT_WARPING;

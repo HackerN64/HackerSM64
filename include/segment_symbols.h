@@ -106,12 +106,6 @@ DECLARE_SEGMENT(title_screen_bg_yay0)
 
 DECLARE_SEGMENT(debug_level_select_yay0)
 
-#ifdef VERSION_EU
-DECLARE_SEGMENT(translation_de_yay0)
-DECLARE_SEGMENT(translation_en_yay0)
-DECLARE_SEGMENT(translation_fr_yay0)
-#endif
-
 //added for compatibility
 DECLARE_SEGMENT(segment2_mio0)
 
@@ -143,10 +137,25 @@ DECLARE_SEGMENT(title_screen_bg_mio0)
 
 DECLARE_SEGMENT(debug_level_select_mio0)
 
-#ifdef VERSION_EU
-DECLARE_SEGMENT(translation_de_mio0)
+#ifdef MULTILANG
+DECLARE_SEGMENT(translation_en_yay0)
 DECLARE_SEGMENT(translation_en_mio0)
+#ifdef ENABLE_FRENCH
+DECLARE_SEGMENT(translation_fr_yay0)
 DECLARE_SEGMENT(translation_fr_mio0)
+#endif
+#ifdef ENABLE_GERMAN
+DECLARE_SEGMENT(translation_de_yay0)
+DECLARE_SEGMENT(translation_de_mio0)
+#endif
+#ifdef ENABLE_JAPANESE
+DECLARE_SEGMENT(translation_jp_yay0)
+DECLARE_SEGMENT(translation_jp_mio0)
+#endif
+#ifdef ENABLE_SPANISH
+DECLARE_SEGMENT(translation_es_yay0)
+DECLARE_SEGMENT(translation_es_mio0)
+#endif
 #endif
 
 #endif
