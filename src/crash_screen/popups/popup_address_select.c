@@ -66,27 +66,7 @@ void cs_address_select_draw(void) {
         CS_TRI_DOWN
     );
 
-    _Bool printMemoryName = TRUE;
-
-#ifdef INCLUDE_DEBUG_MAP
-    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_ADDRESS_SELECT_SYMBOL)) {
-        if (isValid) {
-            const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
-            if (symbol != NULL) {
-                // "[mapped data name]"
-                cs_print_symbol_name(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, symbol);
-                printMemoryName = FALSE;
-            }
-        }
-    }
-#endif // INCLUDE_DEBUG_MAP
-
-    if (printMemoryName) {
-        const char* name = get_memory_string_from_addr(addr);
-        if (name != NULL) {
-            cs_print_scroll(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, name);
-        }
-    }
+    cs_print_addr_location_info(JUMP_MENU_X1, (JUMP_MENU_Y1 + TEXT_HEIGHT(4)), JUMP_MENU_CHARS_X, addr, TRUE);
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 

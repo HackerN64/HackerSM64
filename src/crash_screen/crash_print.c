@@ -6,6 +6,7 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "util/memory_read.h"
 #include "util/registers.h"
 #include "crash_draw.h"
 #include "crash_main.h"
@@ -399,29 +400,9 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
  *
  * @param[in] x,y The starting position on the screen to print to.
  */
-void cs_print_symbol_unknown(u32 x, u32 y) {
+static void cs_print_symbol_unknown(u32 x, u32 y) {
     // "UNKNOWN"
     cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
-}
-
-/**
- * @brief Formats a symbol name.
- * 
- * @param[in] x,y      The starting position on the screen to print to.
- * @param[in] maxWidth The maximum number of chars to print.
- * @param[in] color    The color of the printed text.
- * @param[in] fname    The symbol's name.
- */
-void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname) {
-    if (fname == NULL) {
-        cs_print_symbol_unknown(x, y);
-    } else {
-        // "[name from map data]"
-        cs_print_scroll(x, y, maxWidth,
-            STR_COLOR_PREFIX"%s",
-            color, fname
-        );
-    }
 }
 
 /**
@@ -441,10 +422,37 @@ void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
         cs_print_symbol_unknown(x, y);
         return;
     }
-    cs_print_symbol_name_impl(x, y, maxWidth,
-        (is_in_code_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE),
-        name
+    cs_print_scroll(x, y, maxWidth,
+        STR_COLOR_PREFIX"%s",
+        (is_in_code_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
     );
+}
+
+/**
+ * @brief Prints information about an address location.
+ *
+ * @param[in] x,y      The starting position on the screen to print to.
+ * @param[in] maxWidth The maximum number of chars to print.
+ * @param[in] addr     The address location.
+ */
+void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
+#ifdef INCLUDE_DEBUG_MAP
+    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
+        const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            cs_print_symbol_name(x, y, maxWidth, symbol);
+            return;
+        }
+    }
+#endif // INCLUDE_DEBUG_MAP
+    if (memoryLocationFallback) {
+        const char* memStr = get_memory_string_from_addr(addr);
+        if (memStr != NULL) {
+            cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, memStr);
+            return;
+        }
+    }
+    // cs_print_symbol_unknown(x, y);
 }
 
 static const FloatErrorPrintFormat sFltErrFmt[] = {

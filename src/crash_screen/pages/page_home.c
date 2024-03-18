@@ -89,10 +89,7 @@ void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
         STR_COLOR_PREFIX"FUNC:\t",
         COLOR_RGBA32_CRASH_AT
     );
-    const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        cs_print_symbol_name(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
-    }
+    cs_print_addr_location_info(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), GET_EPC(tc), TRUE);
 }
 #endif // INCLUDE_DEBUG_MAP
 
@@ -141,14 +138,13 @@ u32 cs_draw_assert(u32 line) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (__assert_address) {
-        const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
         // "FUNC:[function name]"
         size_t charX = cs_print(
             TEXT_X(0), TEXT_Y(line),
             STR_COLOR_PREFIX"FUNC:",
             COLOR_RGBA32_CRASH_HEADER
         );
-        cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), symbol);
+        cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), __assert_address, TRUE);
         line++;
     }
 #endif // INCLUDE_DEBUG_MAP

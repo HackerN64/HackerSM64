@@ -172,8 +172,9 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
                     );
                 }
                 // "[function name]"
-                cs_print_symbol_name_impl(TEXT_X(charX), y,
+                cs_print_scroll(TEXT_X(charX), y,
                     (CRASH_SCREEN_NUM_CHARS_X - (charX + offsetStrSize)),
+                    STR_COLOR_PREFIX"%s",
                     COLOR_RGBA32_CRASH_FUNCTION_NAME, function->fname
                 );
             } else {

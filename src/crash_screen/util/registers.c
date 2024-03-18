@@ -12,7 +12,7 @@
 #include "registers.h"
 
 
-#define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX TO_STRING2(_reg)); break;
+// https://n64.readthedocs.io/
 
 
 // -- CPU Register info --

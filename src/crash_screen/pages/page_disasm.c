@@ -272,8 +272,9 @@ void print_as_insn(const u32 charX, const u32 charY, const Address addr, const W
 #ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
         // "[function name]"
-        cs_print_symbol_name_impl((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
+        cs_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
+            STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
         );
     }
@@ -379,24 +380,11 @@ void page_disasm_draw(void) {
             (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
             COLOR_RGBA32_WHITE, alignedSelectedAddr, startAddr, endAddr
         );
-
         line++;
     }
 
     if (showCurrentSymbol) {
-#ifdef INCLUDE_DEBUG_MAP
-        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
-        if (symbol != NULL) {
-            // "[symbol]"
-            cs_print_symbol_name(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, symbol);
-        } else
-#endif // INCLUDE_DEBUG_MAP
-        {
-            const char* name = get_memory_string_from_addr(gSelectedAddress);
-            if (name != NULL) {
-                cs_print_scroll(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, name);
-            }
-        }
+        cs_print_addr_location_info(TEXT_X(0), TEXT_Y(line), CRASH_SCREEN_NUM_CHARS_X, alignedSelectedAddr, TRUE);
         line++;
     }
 

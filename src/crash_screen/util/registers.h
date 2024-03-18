@@ -224,10 +224,13 @@ typedef union RegisterId {
 #define DEF_COP1_TREG_EVEN(_reg, _name) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
 #define DEF_COP1_TREG_ODD(_reg, _name)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name)
 
-#define REG_BUFFER_SIZE 3
+#define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX TO_STRING2(_reg)); break;
 
+
+#define REG_BUFFER_SIZE 3
 extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
+
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);
 uint64_t get_direct_reg_val(enum Coprocessors cop, int idx);

@@ -100,8 +100,8 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __att
 }
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
-void cs_print_symbol_name_impl(u32 x, u32 y, u32 maxWidth, RGBA32 color, const char* fname);
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);
+void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
 
 typedef struct FloatErrorPrintFormat {
     /*0x00*/ Color r;
