@@ -2010,7 +2010,7 @@ const char *(*course_strings_language_table[])[] = DEFINE_LANGUAGE_ARRAY(
     &course_strings_fr_table,
     &course_strings_de_table,
     &course_strings_jp_table,
-    &course_strings_es_table,
+    &course_strings_es_table
 );
 
 #endif

@@ -1869,8 +1869,7 @@ LangArray textLanguage = DEFINE_LANGUAGE_ARRAY(
     "FRANÇAIS",
     "DEUTSCH",
     "にほんご",
-    "ESPAÑOL",
-);
+    "ESPAÑOL");
 
 #define SOUND_LABEL_Y 141
 #define LANGUAGE_SELECT_Y 80

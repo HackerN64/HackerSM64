@@ -41,7 +41,7 @@ const u8 gDefinedLanguages[] = DEFINE_LANGUAGE_ARRAY(
     LANGUAGE_FRENCH,
     LANGUAGE_GERMAN,
     LANGUAGE_JAPANESE,
-    LANGUAGE_SPANISH,
+    LANGUAGE_SPANISH
 );
 
 extern u8 dialog_table_en[];
