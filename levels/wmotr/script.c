@@ -15,7 +15,39 @@
 #include "make_const_nonconst.h"
 #include "levels/wmotr/header.h"
 
-static const LevelScript script_func_local_1[] = {
+
+static const LevelScript script_wmotr_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_DL_CANNON_LID,   /*pos*/ -4456,   827,   191, /*angle*/ 0,   0, 0, /*behParam*/ (0x00 << 16), /*beh*/ bhvCannonClosed),
+    OBJECT(/*model*/ MODEL_DL_CANNON_LID,   /*pos*/  3712, -2740,  5200, /*angle*/ 0,   0, 0, /*behParam*/ (0x80 << 16), /*beh*/ bhvCannonClosed),
+    OBJECT(/*model*/ MODEL_BOBOMB_BUDDY,    /*pos*/  3684, -2712,  4660, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvBobombBuddyOpensCannon),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/ -3050,  2100, -4200, /*angle*/ 0,   0, 0, /*behParam*/ ((COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING) << 16), /*beh*/ bhvCoinFormation),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/ -2744,  4899, -4439, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_1UP_WALKING << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/  3995, -1850,  5478, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upInPoleSpawner),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -2980,  3990, -4248, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  2735,  3140, -3085, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -3640,  4600, -4200, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  4400,   240,    80, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  3440, -2680,  5240, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/  -600, -1360,  5040, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/  -400,  1960,  -120, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/  -240, -1080,  4520, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/  3600, -2480,  5440, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/  3960,   520,   440, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/ -3200,  4880, -4040, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/ -2760,  2320, -4080, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_1UP,             /*pos*/ -3630,  -430,  3180, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/   320,  1725,    40, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_RED_COIN,        /*pos*/ -2560,  4600, -4800, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvRedCoin),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/   -50,  2180,  1900, /*angle*/ 0,   0, 0, /*behParam*/ ((COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL) << 16), /*beh*/ bhvCoinFormation),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/ -2850,  1550,  2280, /*angle*/ 0,  40, 0, /*behParam*/ ((COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL) << 16), /*beh*/ bhvCoinFormation),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/  1710,  -650,  4850, /*angle*/ 0,  85, 0, /*behParam*/ ((COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL) << 16), /*beh*/ bhvCoinFormation),
+    OBJECT(/*model*/ MODEL_NONE,            /*pos*/  2350,  2300,   240, /*angle*/ 0,   0, 0, /*behParam*/ ((COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL) << 16), /*beh*/ bhvCoinFormation),
+    OBJECT(/*model*/ MODEL_1UP,             /*pos*/ -3260,  3370, -3945, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    RETURN(),
+};
+
+static const LevelScript script_wmotr_objects_1[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  3996, -2739,  5477, /*angle*/ 0, 0, 0, /*behParam*/ 0x00520000, /*beh*/ bhvPoleGrabbing),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2911,  3564, -3967, /*angle*/ 0, 0, 0, /*behParam*/ 0x00540000, /*beh*/ bhvPoleGrabbing),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -3258,  3359, -3946, /*angle*/ 0, 0, 0, /*behParam*/ 0x00690000, /*beh*/ bhvPoleGrabbing),
@@ -25,7 +57,7 @@ static const LevelScript script_func_local_1[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_wmotr_objects_2[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -160, 1950, -470, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenRedCoinStar),
     RETURN(),
 };
@@ -53,10 +85,10 @@ const LevelScript level_wmotr_entry[] = {
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x38, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x6D, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF3, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_wmotr_objects_1),
+        JUMP_LINK(script_wmotr_objects_2),
         TERRAIN(/*terrainData*/ wmotr_seg7_collision),
-        MACRO_OBJECTS(/*objList*/ wmotr_seg7_macro_objs),
+        JUMP_LINK(script_wmotr_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_SLIDE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_SNOW),
     END_AREA(),

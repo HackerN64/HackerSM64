@@ -66,6 +66,7 @@
 #define BC_HH(a, b) (_SHIFTL(a, 16, 16) | _SHIFTL(b, 0, 16))
 #define BC_W(a) ((uintptr_t)(u32)(a))
 #define BC_PTR(a) ((uintptr_t)(a))
+#define BC_BPTR(a, b) (_SHIFTL(a, 24, 8) + OS_K0_TO_PHYSICAL(b))
 
 enum BehaviorCommands {
     /*0x00*/ BHV_CMD_BEGIN,
@@ -86,15 +87,15 @@ enum BehaviorCommands {
     /*0x0F*/ BHV_CMD_ADD_INT,
     /*0x10*/ BHV_CMD_SET_INT,
     /*0x11*/ BHV_CMD_OR_INT,
-    /*0x12*/ BHV_CMD_BIT_CLEAR,
-    /*0x13*/ BHV_CMD_SET_INT_RAND_RSHIFT,
-    /*0x14*/ BHV_CMD_SET_RANDOM_FLOAT,
-    /*0x15*/ BHV_CMD_SET_RANDOM_INT,
-    /*0x16*/ BHV_CMD_ADD_RANDOM_FLOAT,
-    /*0x17*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
-    /*0x18*/ BHV_CMD_NOP_1,
-    /*0x19*/ BHV_CMD_NOP_2,
-    /*0x1A*/ BHV_CMD_NOP_3,
+    /*0x12*/ BHV_CMD_OR_LONG,
+    /*0x13*/ BHV_CMD_BIT_CLEAR,
+    /*0x14*/ BHV_CMD_SET_INT_RAND_RSHIFT,
+    /*0x15*/ BHV_CMD_SET_RANDOM_FLOAT,
+    /*0x16*/ BHV_CMD_SET_RANDOM_INT,
+    /*0x17*/ BHV_CMD_ADD_RANDOM_FLOAT,
+    /*0x18*/ BHV_CMD_ADD_INT_RAND_RSHIFT,
+    /*0x19*/ BHV_CMD_NOP_1,
+    /*0x1A*/ BHV_CMD_NOP_2,
     /*0x1B*/ BHV_CMD_SET_MODEL,
     /*0x1C*/ BHV_CMD_SPAWN_CHILD,
     /*0x1D*/ BHV_CMD_DEACTIVATE,
@@ -180,8 +181,7 @@ enum BehaviorCommands {
 
 // Executes a native game function.
 #define CALL_NATIVE(func) \
-    BC_B(BHV_CMD_CALL_NATIVE), \
-    BC_PTR(func)
+    BC_BPTR(BHV_CMD_CALL_NATIVE, func)
 
 // Adds a float to the specified field.
 #define ADD_FLOAT(field, value) \
@@ -203,6 +203,12 @@ enum BehaviorCommands {
 // Usually used to set an object's flags.
 #define OR_INT(field, value) \
     BC_BBH(BHV_CMD_OR_INT, field, value)
+
+// Performs a bitwise OR with the specified field and the given (32 bit) integer.
+// Usually used to set an object's flags which use values above 16 bits.
+#define OR_LONG(field, value) \
+    BC_BB(BHV_CMD_OR_LONG, field), \
+    BC_W(value)
 
 // Performs a bit clear with the specified short. Unused in favor of the 32-bit version.
 #define BIT_CLEAR(field, value) \
@@ -242,10 +248,6 @@ enum BehaviorCommands {
 // No operation. Unused.
 #define CMD_NOP_2(field) \
     BC_BB(BHV_CMD_NOP_2, field)
-
-// No operation. Unused.
-#define CMD_NOP_3(field) \
-    BC_BB(BHV_CMD_NOP_3, field)
 
 // Sets the current model ID of the object.
 #define SET_MODEL(modelID) \
@@ -299,8 +301,6 @@ enum BehaviorCommands {
 // Uses a u8 as the argument, instead of a s16 like the other version does.
 #define BEGIN_REPEAT_UNUSED(count) \
     BC_BB(BHV_CMD_BEGIN_REPEAT_UNUSED, count)
-
-#define OR_LONG(field, value) LOAD_ANIMATIONS(field, value)
 
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \
@@ -386,8 +386,7 @@ enum BehaviorCommands {
 
 // Spawns a water droplet with the given parameters.
 #define SPAWN_WATER_DROPLET(dropletParams) \
-    BC_B(BHV_CMD_SPAWN_WATER_DROPLET), \
-    BC_PTR(dropletParams)
+    BC_BPTR(BHV_CMD_SPAWN_WATER_DROPLET, dropletParams)
 
 
 const BehaviorScript bhvStarDoor[] = {
@@ -403,8 +402,8 @@ const BehaviorScript bhvStarDoor[] = {
     SET_INT(oIntangibleTimer, 0),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_star_door_loop),
-        CALL_NATIVE(bhv_door_rendering_loop),
         CALL_NATIVE(load_object_collision_model),
+        CALL_NATIVE(bhv_door_rendering_loop),
     END_LOOP(),
 };
 
@@ -4581,6 +4580,7 @@ const BehaviorScript bhvRedCoin[] = {
 const BehaviorScript bhvBowserCourseRedCoinStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_bowser_course_red_coin_star_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bowser_course_red_coin_star_loop),
     END_LOOP(),
@@ -4862,7 +4862,6 @@ const BehaviorScript bhvOrangeNumber[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
-    SET_HOME(),
     CALL_NATIVE(bhv_orange_number_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_orange_number_loop),
@@ -5873,7 +5872,7 @@ const BehaviorScript bhvRacingPenguin[] = {
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, penguin_seg5_anims_05008B74),
     ANIMATE(PENGUIN_ANIM_IDLE),
-    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 300, /*Gravity*/ -800, /*Bounciness*/ -5, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 0, /*Unused*/ 0, 0),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 200, /*Gravity*/ -800, /*Bounciness*/ -5, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 0, /*Unused*/ 0, 0),
     SCALE(/*Unused*/ 0, /*Field*/ 400),
     CALL_NATIVE(bhv_racing_penguin_init),
     BEGIN_LOOP(),

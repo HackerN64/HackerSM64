@@ -104,12 +104,12 @@ static void chain_chomp_update_chain_segments(void) {
         // Cap distance to previous chain part (so that the tail follows the chomp)
         Vec3f offset;
         vec3f_diff(offset, segment->pos, prevSegment->pos);
-        vec3_normalize_max(offset, o->oChainChompMaxDistBetweenChainParts);
+        vec3_set_max_dist(offset, o->oChainChompMaxDistBetweenChainParts);
 
         // Cap distance to pivot (so that it stretches when the chomp moves far from the wooden post)
         vec3f_add(offset, prevSegment->pos);
         f32 maxTotalDist = o->oChainChompMaxDistFromPivotPerChainPart * (CHAIN_CHOMP_NUM_SEGMENTS - i);
-        vec3_normalize_max(offset, maxTotalDist);
+        vec3_set_max_dist(offset, maxTotalDist);
 
         vec3f_copy(segment->pos, offset);
     }
@@ -365,7 +365,7 @@ static void chain_chomp_act_move(void) {
             f32 ratio = maxDistToPivot / o->oChainChompDistToPivot;
             o->oChainChompDistToPivot = maxDistToPivot;
 
-            vec3_mul_val(o->oChainChompSegments[0].pos, ratio);
+            vec3_scale(o->oChainChompSegments[0].pos, ratio);
 
             if (o->oChainChompReleaseStatus == CHAIN_CHOMP_NOT_RELEASED) {
                 // Restrict chain chomp position
@@ -455,7 +455,7 @@ void bhv_wooden_post_update(void) {
 
     if (o->oWoodenPostOffsetY != 0.0f) {
         o->oPosY = o->oHomeY + o->oWoodenPostOffsetY;
-    } else if (!GET_BPARAM3(o->oBehParams)) { // Whether the post has coins or not
+    } else if (!(o->respawnInfo & RESPAWN_INFO_NO_COINS)) { // Whether the post has coins or not
         // Reset the timer once mario is far enough
         if (o->oDistanceToMario > 400.0f) {
             o->oTimer = o->oWoodenPostTotalMarioAngle = 0;
@@ -465,7 +465,7 @@ void bhv_wooden_post_update(void) {
             o->oWoodenPostTotalMarioAngle += (s16)(o->oAngleToMario - o->oWoodenPostPrevAngleToMario);
             if (absi(o->oWoodenPostTotalMarioAngle) > 0x30000 && o->oTimer < 200) {
                 obj_spawn_loot_yellow_coins(o, 5, 20.0f);
-                set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);
+                set_object_respawn_info_bits(o, RESPAWN_INFO_NO_COINS);
             }
         }
 

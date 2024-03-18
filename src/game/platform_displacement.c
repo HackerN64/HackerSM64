@@ -179,11 +179,16 @@ static u8 sInertiaFirstFrame = FALSE;
  * Apply inertia based on Mario's last platform.
  */
 static void apply_mario_inertia(void) {
+#ifdef MARIO_INERTIA_UPWARD
     // On the first frame of leaving the ground, boost Mario's y velocity
     if (sInertiaFirstFrame) {
-        gMarioState->vel[1] += sMarioAmountDisplaced[1];
+        if (sMarioAmountDisplaced[1] > 0.0f) {
+            gMarioState->vel[1] += sMarioAmountDisplaced[1];
+        }
     }
+#endif
 
+#ifdef MARIO_INERTIA_LATERAL
     // Apply sideways inertia
     gMarioState->pos[0] += sMarioAmountDisplaced[0];
     gMarioState->pos[2] += sMarioAmountDisplaced[2];
@@ -191,6 +196,7 @@ static void apply_mario_inertia(void) {
     // Drag
     sMarioAmountDisplaced[0] *= 0.97f;
     sMarioAmountDisplaced[2] *= 0.97f;
+#endif
 
     // Stop applying inertia once Mario has landed, or when ground pounding
     if (!(gMarioState->action & ACT_FLAG_AIR) || (gMarioState->action == ACT_GROUND_POUND)) {

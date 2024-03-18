@@ -359,7 +359,6 @@ void process_notes(void) {
 #endif
     u8 bookOffset;
 #endif
-    struct NoteAttributes *attributes;
 #if defined(VERSION_JP) || defined(VERSION_US)
     struct AudioListItem *it;
 #endif
@@ -578,19 +577,20 @@ void process_notes(void) {
                 }
             }
 
-            adsr_update(&note->adsr);
+            adsr_update(note);
             note_vibrato_update(note);
-            attributes = &note->attributes;
             if (note->priority == NOTE_PRIORITY_STOPPING) {
+                struct NoteAttributes *attributes = &note->attributes;
                 frequency = attributes->freqScale;
                 velocity = attributes->velocity;
                 pan = attributes->pan;
                 reverbVol = attributes->reverbVol;
             } else {
-                frequency = note->parentLayer->noteFreqScale;
-                velocity = note->parentLayer->noteVelocity;
-                pan = note->parentLayer->notePan;
-                reverbVol = note->parentLayer->seqChannel->reverbVol;
+                struct SequenceChannelLayer *parentLayer = note->parentLayer;
+                frequency = parentLayer->noteFreqScale;
+                velocity = parentLayer->noteVelocity;
+                pan = parentLayer->notePan;
+                reverbVol = parentLayer->seqChannel->reverbVol;
             }
 
             scale = note->adsrVolScale;
@@ -875,14 +875,8 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
     // Repeat sample
     for (offset = note->sampleCount; offset < 0x40; offset += note->sampleCount) {
         lim = note->sampleCount;
-        if (offset < 0 || offset > 0) {
-            for (j = 0; j < lim; j++) {
-                note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
-            }
-        } else {
-            for (j = 0; j < lim; j++) {
-                note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
-            }
+        for (j = 0; j < lim; j++) {
+            note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
         }
     }
 
@@ -1156,7 +1150,9 @@ s32 note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer
     }
 
     note->bankId = seqLayer->seqChannel->bankId;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     note->stereoHeadsetEffects = seqLayer->seqChannel->stereoHeadsetEffects;
+#endif
     note->sound = seqLayer->sound;
     seqLayer->status = SOUND_LOAD_STATUS_DISCARDABLE; // "loaded"
     seqLayer->note = note;
@@ -1410,9 +1406,12 @@ void note_init_all(void) {
         note->noteSubEu = gZeroNoteSub;
 #else
         note->enabled = FALSE;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
         note->stereoStrongRight = FALSE;
         note->stereoStrongLeft = FALSE;
         note->stereoHeadsetEffects = FALSE;
+        note->usesHeadsetPanEffects = FALSE;
+#endif
 #endif
         note->priority = NOTE_PRIORITY_DISABLED;
 #ifdef VERSION_SH
@@ -1423,21 +1422,21 @@ void note_init_all(void) {
         note->prevParentLayer = NO_LAYER;
 #if defined(VERSION_EU) || defined(VERSION_SH)
         note->waveId = 0;
+        note->vibratoState.active = FALSE;
 #else
         note->reverbVol = 0;
-        note->usesHeadsetPanEffects = FALSE;
+        note->initFullVelocity = FALSE;
         note->sampleCount = 0;
         note->instOrWave = 0;
         note->targetVolLeft = 0;
         note->targetVolRight = 0;
         note->frequency = 0.0f;
-        note->unused1 = 0x3f;
+        note->vibratoState.activeFlags = VIBMODE_NONE;
 #endif
         note->attributes.velocity = 0.0f;
         note->adsrVolScale = 0;
         note->adsr.state = ADSR_STATE_DISABLED;
         note->adsr.action = 0;
-        note->vibratoState.active = FALSE;
         note->portamento.cur = 0.0f;
         note->portamento.speed = 0.0f;
 #if defined(VERSION_SH)

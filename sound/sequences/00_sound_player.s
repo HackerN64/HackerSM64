@@ -73,13 +73,11 @@ chan_jump .main_loop_023589
 
 // Main loop for standard, non-continuous sound effects
 .main_loop_023589:
-chan_delay1
+chan_hang
 chan_ioreadval 0
 chan_bltz .main_loop_023589
 .start_playing_023589:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_setval 0
 chan_iowriteval 5
 chan_ioreadval 4
@@ -93,13 +91,11 @@ chan_bltz .skip_023589 // if we have a signal:
   chan_beqz .force_stop_023589 // told to stop
   chan_jump .start_playing_023589 // told to play something else
 .skip_023589:
-chan_testlayerfinished 0
-chan_beqz .poll_023589 // if layer 0 hasn't finished, keep polling
+chan_testlayersfinished
+chan_beqz .poll_023589 // if all layers haven't finished, keep polling
 chan_jump .main_loop_023589 // otherwise go back to the main loop
 .force_stop_023589:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_jump .main_loop_023589
 
 .channel1:
@@ -140,13 +136,11 @@ chan_jump .main_loop_146
 
 // Main loop for moving, env and air sound effects, which play continuously
 .main_loop_146:
-chan_delay1
+chan_hang
 chan_ioreadval 0
 chan_bltz .main_loop_146
 .start_playing_146:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_setvolscale 127
 chan_setval 0
 chan_iowriteval 5
@@ -161,9 +155,7 @@ chan_bltz .poll_146
 chan_beqz .force_stop_146
 chan_jump .start_playing_146
 .force_stop_146:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_jump .main_loop_146
 
 .channel7:
@@ -177,13 +169,11 @@ chan_setdyntable .channel7_table
 
 // Loop for menu sound effects
 .main_loop_7:
-chan_delay1
+chan_hang
 chan_ioreadval 0
 chan_bltz .main_loop_7
 .start_playing_7:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_setval 0
 chan_iowriteval 5
 chan_setreverb 0
@@ -201,14 +191,12 @@ chan_bltz .skip_7 // if we have a signal:
   chan_unreservenotes
   chan_jump .start_playing_7 // told to play something else
 .skip_7:
-chan_testlayerfinished 0
-chan_beqz .poll_7 // if layer 0 hasn't finished, keep polling
+chan_testlayersfinished
+chan_beqz .poll_7 // if all layers haven't finished, keep polling
 chan_unreservenotes
 chan_jump .main_loop_7 // otherwise go back to the main loop
 .force_stop_7:
-chan_freelayer 0
-chan_freelayer 1
-chan_freelayer 2
+chan_freelayers
 chan_unreservenotes
 chan_jump .main_loop_7
 
@@ -226,7 +214,7 @@ chan_end
 .delay_interrupt:
 chan_setpanmix 127
 chan_setvolscale 127
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff // 0xff represents disabled value
 chan_ioreadval 1 // IO slots 0-3 are reset to -1 when read; restore the value
 chan_iowriteval 0
 chan_break // break out of the loop
@@ -1147,6 +1135,9 @@ chan_setbank 4
 chan_setinstr 14
 chan_setdecayrelease 12
 chan_setvibratoextent 10
+chan_setval 0x7f
+chan_call .delay
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_68F:
@@ -1317,7 +1308,7 @@ chan_setlayer 0, .layer_79D
 chan_setlayer 1, .layer_79B
 chan_setval 36
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_79B:
@@ -3025,6 +3016,9 @@ chan_setvibratorate 60
 chan_setval 25
 chan_call .set_reverb
 chan_setlayer 0, .layer_11E4
+chan_setval 0x45
+chan_call .delay
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_11E4:
@@ -3070,7 +3064,7 @@ chan_setbank 4
 chan_setinstr 6
 chan_setval 49
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_1242:
@@ -4389,7 +4383,7 @@ chan_setlayer 0, .layer_1AEB
 chan_setlayer 1, .layer_1AE9
 chan_setval 35
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_1AE9:
@@ -6055,7 +6049,7 @@ chan_setvibratorate 60
 chan_setlayer 0, .layer_259B
 chan_setval 30
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_259B:
@@ -6189,7 +6183,7 @@ chan_setvibratorate 5
 chan_setlayer 0, .layer_2684
 chan_setval 88
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_2684:
@@ -6360,7 +6354,7 @@ chan_setlayer 0, .layer_27B7
 chan_setlayer 1, .layer_27B5
 chan_setval 56
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_27B5:
@@ -7067,6 +7061,9 @@ chan_setenvelope .envelope_3444
 chan_setvibratorate 1
 chan_setvibratoextent 100
 chan_setlayer 0, .layer_2CA0
+chan_setval 0x12
+chan_call .delay
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_2CA0:
@@ -7094,7 +7091,7 @@ chan_call .delay
 chan_setvibratoextent 80
 chan_setval 67
 chan_call .delay
-chan_setvibratoextent 0
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_2CD6:
@@ -7292,6 +7289,13 @@ chan_setval 70
 chan_call .delay
 chan_setbank 10
 chan_setinstr 8
+chan_setval 0x7f
+chan_call .delay
+chan_setval 0x7f
+chan_call .delay
+chan_setval 0x4
+chan_call .delay
+chan_setvibratoextent 0xff
 chan_end
 
 .layer_2E28:

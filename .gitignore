@@ -38,6 +38,9 @@
 # datadump
 /tools/ddump/*
 
+# python cache in tools/
+/tools/__pycache__/*
+
 # Text editor remnants
 *.swp
 .vscode/*

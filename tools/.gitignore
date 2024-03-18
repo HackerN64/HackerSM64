@@ -13,6 +13,7 @@
 /skyconv
 /tabledesign
 /vadpcm_enc
+/flips
 !/ido5.3_compiler/lib/*.so
 !/ido5.3_compiler/usr/lib/*.so
 !/ido5.3_compiler/usr/lib/*.so.1

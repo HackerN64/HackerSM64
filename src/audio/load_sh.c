@@ -8,8 +8,6 @@
 #include "load.h"
 #include "seqplayer.h"
 
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 struct SharedDma {
     /*0x0*/ u8 *buffer;       // target, points to pre-allocated buffer
     /*0x4*/ uintptr_t source; // device address
@@ -239,7 +237,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef, s3
     return (devAddr - dmaDevAddr) + dma->buffer;
 }
 
-void init_sample_dma_buffers(UNUSED s32 arg0) {
+void init_sample_dma_buffers() {
     s32 i;
 
     sDmaBufSize = 0x2D0;
@@ -505,7 +503,7 @@ void *func_sh_802f3564(s32 seqId) {
     return func_sh_802f3764(0, seqId2, &temp);
 }
 
-extern u8 gUnkLoadStatus[0x40];
+extern u8 gUnkLoadStatus[MAX_NUM_SOUNDBANKS];
 
 void *func_sh_802f3598(s32 idx, s32 *medium) {
     void *ret;

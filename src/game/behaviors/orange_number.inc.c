@@ -3,6 +3,7 @@
 void bhv_orange_number_init(void) {
     o->oAnimState = o->oBehParams2ndByte;
     o->oVelY = 26.0f;
+    o->oHomeY = o->oPosY;
 }
 
 void bhv_orange_number_loop(void) {
@@ -15,6 +16,13 @@ void bhv_orange_number_loop(void) {
         if (o->oVelY < -21.0f) {
             o->oVelY = 14.0f;
         }
+
+        s32 offsetX, offsetZ;
+        offsetX = o->oOrangeNumberOffset * sins(gCamera->nextYaw + 0x4000);
+        offsetZ = o->oOrangeNumberOffset * coss(gCamera->nextYaw + 0x4000);
+
+        o->oPosX = o->oHomeX + offsetX;
+        o->oPosZ = o->oHomeZ + offsetZ;
 
         if (o->oTimer == 35) {
             struct Object *sparkleObj = spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);

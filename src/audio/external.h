@@ -4,6 +4,7 @@
 #include <PR/ultratypes.h>
 
 #include "types.h"
+#include "level_table.h"
 
 // Sequence arguments, passed to seq_player_play_sequence. seqId may be bit-OR'ed with
 // SEQ_VARIATION; this will load the same sequence, but set a variation
@@ -12,9 +13,11 @@
 
 enum SoundModes {
     SOUND_MODE_STEREO,
-    SOUND_MODE_HEADSET,
-    SOUND_MODE_UNUSED,
     SOUND_MODE_MONO,
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+    SOUND_MODE_HEADSET,
+#endif
+    SOUND_MODE_COUNT,
 };
 
 enum SequencePlayers {
@@ -33,6 +36,8 @@ extern f32 gGlobalSoundSource[3];
 
 // defined in data.c, used by the game
 extern u32 gAudioRandom;
+
+extern s8 sLevelAreaReverbs[LEVEL_COUNT][3];
 
 struct SPTask *create_next_audio_frame_task(void);
 void play_sound(s32 soundBits, f32 *pos);
@@ -66,8 +71,7 @@ void play_star_fanfare(void);
 void play_power_star_jingle(void);
 void play_race_fanfare(void);
 void play_toads_jingle(void);
-void sound_reset(u8 presetId);
-void audio_set_sound_mode(u8 soundMode);
+void sound_reset(u8 reverbPresetId);
 
 void audio_init(void); // in load.c
 

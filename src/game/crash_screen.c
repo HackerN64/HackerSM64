@@ -18,7 +18,7 @@
 
 enum crashPages {
     PAGE_CONTEXT,
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
 #endif
     PAGE_STACKTRACE,
@@ -80,7 +80,7 @@ extern far char *find_function_in_stack(u32 *sp);
 
 struct {
     OSThread thread;
-    u64 stack[0x800 / sizeof(u64)];
+    u64 stack[THREAD2_STACK / sizeof(u64)];
     OSMesgQueue mesgQueue;
     OSMesg mesg;
     u16 *framebuffer;
@@ -133,6 +133,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     char *ptr;
     u32 glyph;
     s32 size;
+    s32 xOffset = x;
     char buf[0x108];
     bzero(&buf, sizeof(buf));
 
@@ -147,12 +148,15 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
         while (*ptr) {
             glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
 
-            if (glyph != 0xff) {
-                crash_screen_draw_glyph(x, y, glyph);
+            if (*ptr == '\n') {
+                xOffset = x;
+                y += 10;
+            } else if (glyph != 0xff) {
+                crash_screen_draw_glyph(xOffset, y, glyph);
             }
 
             ptr++;
-            x += 6;
+            xOffset += 6;
         }
     }
 
@@ -233,7 +237,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 }
 
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
     crash_screen_draw_rect(25, 20, 270, 210);
@@ -361,7 +365,7 @@ void draw_crash_screen(OSThread *thread) {
         crash_screen_print(30, 10, "Page:%02d                L/Z: Left   R: Right", crashPage);
         switch (crashPage) {
             case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
             case PAGE_LOG: 		  draw_crash_log(); break;
 #endif
             case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;

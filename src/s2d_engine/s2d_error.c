@@ -1,4 +1,4 @@
-#include "config.h"
+#include "s2d_config.h"
 #include "s2d_print.h"
 #include "s2d_error.h"
 

@@ -5,6 +5,7 @@
 #include "math_util.h"
 #include "game/memory.h"
 #include "graph_node.h"
+#include "game/debug.h"
 
 typedef void (*GeoLayoutCommandProc)(void);
 
@@ -261,7 +262,7 @@ void geo_layout_cmd_node_perspective(void) {
         gGeoLayoutCommand += 4 << CMD_SIZE_SHIFT;
     }
 
-    graphNode = init_graph_node_perspective(gGraphNodePool, NULL, (f32) fov, near, far, frustumFunc, 0);
+    graphNode = init_graph_node_perspective(gGraphNodePool, NULL, (f32) fov, near, far, frustumFunc);
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
@@ -771,6 +772,7 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoLayoutStack[1] = 0;
 
     while (gGeoLayoutCommand != NULL) {
+        assert((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT), "Invalid or unloaded geo layout detected.");
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }
 

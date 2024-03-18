@@ -7,13 +7,13 @@
 #include "behavior_data.h"
 #include "game/memory.h"
 #include "game/object_helpers.h"
-#include "game/macro_special_objects.h"
 #include "surface_collision.h"
 #include "math_util.h"
 #include "game/mario.h"
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "game/debug.h"
 
 #include "config.h"
 
@@ -186,13 +186,6 @@ static s32 lower_cell_index(s32 coord) {
     // [0, NUM_CELLS)
     s32 index = coord / CELL_SIZE;
 
-    // Include extra cell if close to boundary
-    //! Some wall checks are larger than the buffer, meaning wall checks can
-    //  miss walls that are near a cell border.
-    if (coord % CELL_SIZE < 50) {
-        index--;
-    }
-
     // Potentially > NUM_CELLS - 1, but since the upper index is <= NUM_CELLS - 1, not exploitable
     return MAX(0, index);
 }
@@ -211,13 +204,6 @@ static s32 upper_cell_index(s32 coord) {
 
     // [0, NUM_CELLS)
     s32 index = coord / CELL_SIZE;
-
-    // Include extra cell if close to boundary
-    //! Some wall checks are larger than the buffer, meaning wall checks can
-    //  miss walls that are near a cell border.
-    if (coord % CELL_SIZE > CELL_SIZE - 50) {
-        index++;
-    }
 
     // Potentially < 0, but since lower index is >= 0, not exploitable
     return MIN((NUM_CELLS - 1), index);
@@ -261,7 +247,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     Vec3t offset;
     s16 min, max;
 
-    vec3_prod_val(offset, (*vertexIndices), 3);
+    vec3_scale_dest(offset, (*vertexIndices), 3);
 
     vec3s_copy(v[0], (vertexData + offset[0]));
     vec3s_copy(v[1], (vertexData + offset[1]));
@@ -269,7 +255,16 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
 
     find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
-    vec3f_normalize(n);
+    f32 mag = (sqr(n[0]) + sqr(n[1]) + sqr(n[2]));
+    // This will never need to be run for custom levels because Fast64 does this step before exporting.
+    // assert(mag >= NEAR_ZERO, "Denorm tri was found.");
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    if (mag < NEAR_ZERO) {
+        return NULL;
+    }
+#endif
+    mag = 1.0f / sqrtf(mag);
+    vec3_scale(n, mag);
 
     struct Surface *surface = alloc_surface(dynamic);
 
@@ -450,10 +445,6 @@ u32 get_area_terrain_size(TerrainData *data) {
                 data += 3 * numVertices;
                 break;
 
-            case TERRAIN_LOAD_OBJECTS:
-                data += get_special_objects_size(data);
-                break;
-
             case TERRAIN_LOAD_ENVIRONMENT:
                 numRegions = *data++;
                 data += 6 * numRegions;
@@ -487,7 +478,8 @@ u32 get_area_terrain_size(TerrainData *data) {
  * Process the level file, loading in vertices, surfaces, some objects, and environmental
  * boxes (water, gas, JRB fog).
  */
-void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
+void load_area_terrain(TerrainData *data, RoomData *surfaceRooms) {
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
     u32 surfacePoolData;
@@ -516,8 +508,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
             load_static_surfaces(&data, vertexData, terrainLoadType, &surfaceRooms);
         } else if (terrainLoadType == TERRAIN_LOAD_VERTICES) {
             vertexData = read_vertex_data(&data);
-        } else if (terrainLoadType == TERRAIN_LOAD_OBJECTS) {
-            spawn_special_objects(index, &data);
         } else if (terrainLoadType == TERRAIN_LOAD_ENVIRONMENT) {
             load_environmental_regions(&data);
         } else if (terrainLoadType == TERRAIN_LOAD_CONTINUE) {
@@ -530,31 +520,23 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
         }
     }
 
-    if (macroObjects != NULL && *macroObjects != -1) {
-        // If the first macro object presetID is within the range [0, 29].
-        // Generally an early spawning method, every object is in BBH (the first level).
-        if (0 <= *macroObjects && *macroObjects < 30) {
-            spawn_macro_objects_hardcoded(index, macroObjects);
-        }
-        // A more general version that can spawn more objects.
-        else {
-            spawn_macro_objects(index, macroObjects);
-        }
-    }
-
     surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
     gTotalStaticSurfaceData += surfacePoolData;
     main_pool_realloc(gCurrStaticSurfacePool, surfacePoolData);
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }
 
 /**
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
+    PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
+        clear_dynamic_surface_references();
+
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
@@ -568,6 +550,7 @@ void clear_dynamic_surfaces(void) {
         sNumCellsUsed = 0;
         sClearAllCells = FALSE;
     }
+    profiler_collision_update(first);
 }
 
 /**
@@ -675,20 +658,20 @@ static void get_optimal_coll_dist(struct Object *obj) {
 }
 #endif
 
+static TerrainData sVertexData[600];
+
 /**
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
-    TerrainData vertexData[600];
-
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
-    f32 marioDist = o->oDistanceToMario;
 
-    // On an object's first frame, the distance is set to 19000.0f.
-    // If the distance hasn't been updated, update it now.
-    if (o->oDistanceToMario == 19000.0f) {
-        marioDist = dist_between_objects(o, gMarioObject);
-    }
+    Vec3f dist;
+    vec3_diff(dist, &o->oPosVec, &gMarioObject->oPosVec);
+    f32 sqrLateralDist = sqr(dist[0]) + sqr(dist[2]);
+
+    f32 verticalMarioDiff = gMarioObject->oPosY - o->oPosY;
 
 #ifdef AUTO_COLLISION_DISTANCE
     if (!(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
@@ -701,29 +684,45 @@ void load_object_collision_model(void) {
     if (o->oCollisionDistance > o->oDrawingDistance) {
         o->oDrawingDistance = o->oCollisionDistance;
     }
+    
+    s32 inColRadius = (
+           (sqrLateralDist < sqr(o->oCollisionDistance))
+        && (verticalMarioDiff > 0 || verticalMarioDiff > -o->oCollisionDistance)
+        && (verticalMarioDiff < 0 || verticalMarioDiff < o->oCollisionDistance + 2000.f)
+    );
 
     // Update if no Time Stop, in range, and in the current room.
     if (
         !(gTimeStopState & TIME_STOP_ACTIVE)
-        && (marioDist < o->oCollisionDistance)
+        && inColRadius
         && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
     ) {
         collisionData++;
-        transform_object_vertices(&collisionData, vertexData);
+        transform_object_vertices(&collisionData, sVertexData);
 
         // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
         while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-            load_object_surfaces(&collisionData, vertexData, TRUE);
+            load_object_surfaces(&collisionData, sVertexData, TRUE);
         }
     }
+
+    f32 marioDist = o->oDistanceToMario;
+
+    // On an object's first frame, the distance is set to 19000.0f.
+    // If the distance hasn't been updated, update it now.
+    if (marioDist == 19000.0f) {
+        marioDist = dist_between_objects(o, gMarioObject);
+    }
+
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+    profiler_collision_update(first);
 }
 
 /**
  * Transform an object's vertices and add them to the static surface pool.
  */
 void load_object_static_model(void) {
-    TerrainData vertexData[600];
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
     u32 surfacePoolData;
 
@@ -734,11 +733,11 @@ void load_object_static_model(void) {
     gSurfacesAllocated = gNumStaticSurfaces;
 
     collisionData++;
-    transform_object_vertices(&collisionData, vertexData);
+    transform_object_vertices(&collisionData, sVertexData);
 
     // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
     while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-        load_object_surfaces(&collisionData, vertexData, FALSE);
+        load_object_surfaces(&collisionData, sVertexData, FALSE);
     }
 
     surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
@@ -747,4 +746,5 @@ void load_object_static_model(void) {
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+    profiler_collision_update(first);
 }

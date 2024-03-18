@@ -14,9 +14,13 @@
  */
 // #define DISABLE_ALL
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 /**
  * Enables a comprehensive standalone profiler. Automatically enabled by PUPPYPRINT_DEBUG.
- * If not using PUPPYPRINT_DEBUG, press L to toggle the profiler.
+ * If not using PUPPYPRINT_DEBUG, press L + D-Pad Up to toggle the profiler.
  */
 #define USE_PROFILER
 
@@ -41,7 +45,7 @@
 /**
  * Enables a custom, enhanced performance profiler. (Enables PUPPYPRINT by default in config_safeguards).
  */
-// #define PUPPYPRINT_DEBUG 1
+// #define PUPPYPRINT_DEBUG
 
 /**
  * Uses cycles instead of microseconds in Puppyprint debug output.
@@ -85,3 +89,8 @@
  * Forces a crash when the game starts. Useful for debugging the crash screen.
  */
 // #define DEBUG_FORCE_CRASH_ON_BOOT
+
+/**
+ * Intentionally crash the game whenever a runtime assertion fails (also invoked by the DEBUG define in the Makefile).
+ */
+#define DEBUG_ASSERTIONS

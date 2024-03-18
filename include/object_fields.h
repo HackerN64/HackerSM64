@@ -169,9 +169,6 @@
 #define /*0x1BC*/ oAngleToHome                OBJECT_FIELD_S32(0x4D)
 #define /*0x1C0*/ oFloor                      OBJECT_FIELD_SURFACE(0x4E)
 #define /*0x1C4*/ oDeathSound                 OBJECT_FIELD_S32(0x4F)
-#ifdef PUPPYLIGHTS
-#define /*0x1C4*/ oLightID                                      OBJECT_FIELD_S32(0x50)
-#endif
 
 /* Pathed (see obj_follow_path) */
 #define /*0x0FC*/ oPathedStartWaypoint     OBJECT_FIELD_WAYPOINT(0x1D)
@@ -179,11 +176,6 @@
 #define /*0x104*/ oPathedPrevWaypointFlags OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oPathedTargetPitch       OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oPathedTargetYaw         OBJECT_FIELD_S32(0x21)
-
-/* Special Object Macro */
-#define /*0x108*/ oMacroUnk108 OBJECT_FIELD_F32(0x20)
-#define /*0x10C*/ oMacroUnk10C OBJECT_FIELD_F32(0x21)
-#define /*0x110*/ oMacroUnk110 OBJECT_FIELD_F32(0x22)
 
 /* Mario */
 #define /*0x0F4*/ oMarioParticleFlags    OBJECT_FIELD_S32(0x1B)
@@ -797,6 +789,9 @@
 #define /*0x0F8*/ oRespawnerMinSpawnDist      OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oRespawnerBehaviorToRespawn OBJECT_FIELD_CVPTR(0x1D)
 
+/* Orange Number */
+#define /*0x110*/ oOrangeNumberOffset OBJECT_FIELD_S32(0x22)
+
 /* Openable Grill */
 #define /*0x088*/ oOpenableGrillIsOpen         OBJECT_FIELD_S32(0x00)
 #define /*0x0F4*/ oOpenableGrillFloorSwitchObj OBJECT_FIELD_OBJ(0x1B)
@@ -998,6 +993,7 @@
 /* Hidden Star */
 // Secrets/Red Coins
 #define /*0x0F4*/ oHiddenStarTriggerCounter OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oHiddenStarTriggerTotal OBJECT_FIELD_S32(0x1C)
 
 /* Sealed Door Star */
 #define /*0x108*/ oUnlockDoorStarState  OBJECT_FIELD_U32(0x20)

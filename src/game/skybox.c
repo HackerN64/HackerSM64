@@ -61,7 +61,7 @@ struct Skybox {
 
 struct Skybox sSkyBoxInfo[2];
 
-typedef const Texture *const SkyboxTexture[80 * sqr(SKYBOX_SIZE)];
+typedef const Texture *const SkyboxTexture[80 * SKYBOX_SIZE * SKYBOX_SIZE];
 
 extern SkyboxTexture bbh_skybox_ptrlist;
 extern SkyboxTexture bidw_skybox_ptrlist;
@@ -293,10 +293,9 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
 Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, Vec3f focus) {
     s8 colorIndex = 1;
 
-    // If the "Plunder in the Sunken Ship" star in JRB is collected, make the sky darker and slightly green
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    if (background == BACKGROUND_ABOVE_CLOUDS
-        && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
+    // For the "Plunder in the Sunken Ship" star in JRB, make the sky darker and slightly green.
+    if (background == BACKGROUND_ABOVE_CLOUDS && gCurrActNum == 1) {
         colorIndex = 0;
     }
 #endif
@@ -305,7 +304,8 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
     //! the first frame, which causes a floating point divide by 0
     fov = 90.0f;
     s16 yaw;
-    vec3f_get_angle(pos, focus, &sSkyBoxInfo[player].pitch, &yaw);
+    f32 dist;
+    vec3f_get_dist_and_angle(pos, focus, &dist, &sSkyBoxInfo[player].pitch, &yaw);
     sSkyBoxInfo[player].yaw = yaw;
     sSkyBoxInfo[player].scaledX = calculate_skybox_scaled_x(player, fov);
     sSkyBoxInfo[player].scaledY = calculate_skybox_scaled_y(player, fov);

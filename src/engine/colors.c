@@ -81,8 +81,8 @@ void rgba32_to_colorRGBAf(ColorRGBAf dst, RGBA32 src) {
     dst[3] = COMPOSITE_TO_COLORF(src, MSK_RGBA32_A, IDX_RGBA32_A);
 }
 
-void colorRGB_to_colorRGBf(ColorRGBf dst, ColorRGB src) { vec3_quot_val(dst, src, 255.0f); }
-void colorRGBf_to_colorRGB(ColorRGB dst, ColorRGBf src) { vec3_prod_val(dst, src, 255.0f); }
+void colorRGB_to_colorRGBf(ColorRGBf dst, ColorRGB src) { vec3_scale_dest(dst, src, 1/255.0f); }
+void colorRGBf_to_colorRGB(ColorRGB dst, ColorRGBf src) { vec3_scale_dest(dst, src, 255.0f); }
 
 RGBA16Return32 colorRGBf_to_rgba16(ColorRGBf src) {
     return (COLORF_TO_COMPOSITE(src[0], MSK_RGBA16_C, IDX_RGBA16_R)
@@ -137,7 +137,7 @@ Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA 
 RGBA16Return32 rgba16_make_grayscale(RGBA16 rgba) {
     ColorRGBf color;
     rgba16_to_colorRGBf(color, rgba);
-    ColorF avg = vec3_average(color);
+    ColorF avg = (color[0] + color[1] + color[2]) / 3.f;
     vec3_same(color, avg);
     return colorRGBf_to_rgba16(color);
 }

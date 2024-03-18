@@ -73,9 +73,9 @@ static s16 sMainMenuTimer = 0;
 
 // Sound mode menu buttonID, has different values compared to gSoundMode in audio.
 // 0: gSoundMode = 0 (Stereo) | 1: gSoundMode = 3 (Mono) | 2: gSoundMode = 1 (Headset)
-static s8 sSoundMode = 0;
+s8 sSoundMode = 0;
 
-// Active language for EU arrays, values defined similar to sSoundMode
+// Active language for EU arrays
 // 0: English | 1: French | 2: German
 
 // Tracks which button will be pressed in the erase confirmation prompt (yes/no).
@@ -722,6 +722,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
  * Render buttons for the sound mode menu.
  */
 void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
     // Stereo option button
     sMainMenuButtons[MENU_BUTTON_STEREO] = spawn_object_rel_with_rot(
         soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton,  533, SOUND_BUTTON_Y, -100, 0x0, -0x8000, 0x0);
@@ -734,6 +735,16 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
     sMainMenuButtons[MENU_BUTTON_HEADSET] = spawn_object_rel_with_rot(
         soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, -533, SOUND_BUTTON_Y, -100, 0x0, -0x8000, 0x0);
     sMainMenuButtons[MENU_BUTTON_HEADSET]->oMenuButtonScale = MENU_BUTTON_SCALE;
+#else
+    // Stereo option button
+    sMainMenuButtons[MENU_BUTTON_STEREO] = spawn_object_rel_with_rot(
+        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton,  355, SOUND_BUTTON_Y, -100, 0x0, -0x8000, 0x0);
+    sMainMenuButtons[MENU_BUTTON_STEREO]->oMenuButtonScale = MENU_BUTTON_SCALE;
+    // Mono option button
+    sMainMenuButtons[MENU_BUTTON_MONO] = spawn_object_rel_with_rot(
+        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, -355, SOUND_BUTTON_Y, -100, 0x0, -0x8000, 0x0);
+    sMainMenuButtons[MENU_BUTTON_MONO]->oMenuButtonScale = MENU_BUTTON_SCALE;
+#endif
 
 #ifdef MULTILANG
     // Return button
@@ -742,7 +753,7 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
     sMainMenuButtons[MENU_BUTTON_OPTION_RETURN]->oMenuButtonScale = MENU_BUTTON_SCALE;
 #else
     // Zoom in current selection
-    sMainMenuButtons[MENU_BUTTON_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
+    sMainMenuButtons[MENU_BUTTON_SOUND_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
 #endif
 }
 
@@ -760,8 +771,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
             if (check_clicked_button(buttonX, buttonY, 22.0f) == TRUE) {
                 // If sound mode button clicked, select it and define sound mode
                 // The check will always be true because of the group configured above (In JP & US)
-                if (buttonID == MENU_BUTTON_STEREO || buttonID == MENU_BUTTON_MONO
-                    || buttonID == MENU_BUTTON_HEADSET) {
+                if (buttonID >= MENU_BUTTON_SOUND_OPTION_MIN && buttonID < MENU_BUTTON_SOUND_OPTION_MAX) {
                     if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -772,7 +782,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                         // Sound menu buttons don't return to Main Menu with multilang enabled
                         sSelectedButtonID = buttonID;
 #endif
-                        sSoundMode = buttonID - MENU_BUTTON_OPTION_MIN;
+                        sSoundMode = buttonID - MENU_BUTTON_SOUND_OPTION_MIN;
                         save_file_set_sound_mode(sSoundMode);
                     }
                 }
@@ -1063,7 +1073,9 @@ void bhv_menu_button_manager_loop(void) {
         // exiting the Options menu, as a result they added a return button
         case MENU_BUTTON_STEREO:  return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_STEREO ]); break;
         case MENU_BUTTON_MONO:    return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_MONO   ]); break;
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
         case MENU_BUTTON_HEADSET: return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_HEADSET]); break;
+#endif
     }
 
     sClickPos[0] = -10000;
@@ -1079,16 +1091,16 @@ void handle_cursor_button_input(void) {
     if (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_A || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B
         || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C
         || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_D) {
-        if (gPlayer3Controller->buttonPressed & (B_BUTTON | START_BUTTON | Z_TRIG)) {
+        if (gPlayer1Controller->buttonPressed & (B_BUTTON | START_BUTTON | Z_TRIG)) {
             sClickPos[0] = sCursorPos[0];
             sClickPos[1] = sCursorPos[1];
             sCursorClickingTimer = 1;
-        } else if (gPlayer3Controller->buttonPressed & A_BUTTON) {
+        } else if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             sScoreFileCoinScoreMode = 1 - sScoreFileCoinScoreMode;
             play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
         }
     } else { // If cursor is clicked
-        if (gPlayer3Controller->buttonPressed
+        if (gPlayer1Controller->buttonPressed
             & (A_BUTTON | B_BUTTON | START_BUTTON)) {
             sClickPos[0] = sCursorPos[0];
             sClickPos[1] = sCursorPos[1];
@@ -1101,8 +1113,8 @@ void handle_cursor_button_input(void) {
  * Cursor function that handles analog stick input and button presses with a function near the end.
  */
 void handle_controller_cursor_input(void) {
-    s16 rawStickX = gPlayer3Controller->rawStickX;
-    s16 rawStickY = gPlayer3Controller->rawStickY;
+    s16 rawStickX = gPlayer1Controller->rawStickX;
+    s16 rawStickY = gPlayer1Controller->rawStickY;
 
     // Handle deadzone
     if (rawStickY > -2 && rawStickY < 2) {
@@ -1337,7 +1349,9 @@ LangArray textSoundModeHeadset = DEFINE_LANGUAGE_ARRAY(
 LangArray *textSoundModes[] = {
     &textSoundModeStereo,
     &textSoundModeMono,
-    &textSoundModeHeadset
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
+    &textSoundModeHeadset,
+#endif
 };
 
 #ifdef MULTILANG
@@ -1877,7 +1891,13 @@ LangArray textLanguage = DEFINE_LANGUAGE_ARRAY(
 #define SOUND_LABEL_Y 87
 #endif
 
+#ifdef ENABLE_STEREO_HEADSET_EFFECTS
 #define OPTION_LABEL_SPACING 74
+#else
+#define OPTION_LABEL_SPACING 99
+#endif
+
+#define OPTION_LABEL_START_X (SCREEN_CENTER_X - ((ARRAY_COUNT(textSoundModes) - 1) * OPTION_LABEL_SPACING / 2))
 
 /**
  * Prints sound mode menu strings that shows on the purple background menu screen.
@@ -1902,7 +1922,7 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     // Print sound mode names
-    for (mode = 0, textX = SCREEN_CENTER_X - OPTION_LABEL_SPACING; mode < 3; textX += OPTION_LABEL_SPACING, mode++) {
+    for (mode = 0, textX = OPTION_LABEL_START_X; mode < ARRAY_COUNT(textSoundModes); textX += OPTION_LABEL_SPACING, mode++) {
         if (mode == sSoundMode) {
             set_text_color(255, 255, 255);
         } else {
@@ -2203,3 +2223,5 @@ s32 lvl_update_obj_and_load_file_selected(UNUSED s32 arg, UNUSED s32 unused) {
     area_update_objects();
     return sSelectedFileNum;
 }
+
+STATIC_ASSERT(SOUND_MODE_COUNT == MENU_BUTTON_SOUND_OPTION_MAX - MENU_BUTTON_SOUND_OPTION_MIN, "Mismatch between number of sound modes in audio code and file select!");

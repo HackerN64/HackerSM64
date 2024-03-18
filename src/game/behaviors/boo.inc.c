@@ -278,6 +278,7 @@ static s32 boo_update_during_death(void) {
 
         if (o->oTimer > 30 || o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
             spawn_mist_particles();
+            boo_stop();
             o->oBooDeathStatus = BOO_DEATH_STATUS_DEAD;
 
             if (o->oBooParentBigBoo != NULL) {

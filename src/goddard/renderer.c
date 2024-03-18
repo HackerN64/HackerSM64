@@ -987,7 +987,7 @@ void gd_free(void *ptr) {
 void *gd_allocblock(u32 size) {
     void *block; // 1c
 
-    size = ALIGN(size, 8);
+    size = ALIGN8(size);
     if ((sMemBlockPoolUsed + size) > sMemBlockPoolSize) {
         gd_printf("gd_allocblock(): Failed request: %dk (%d bytes)\n", size / 1024, size);
         gd_printf("gd_allocblock(): Heap usage: %dk (%d bytes) \n", sMemBlockPoolUsed / 1024,
@@ -1005,7 +1005,7 @@ void *gd_allocblock(u32 size) {
 /* 24A318 -> 24A3E8 */
 void *gd_malloc(u32 size, u8 perm) {
     void *ptr; // 1c
-    size = ALIGN(size, 8);
+    size = ALIGN8(size);
     ptr = gd_request_mem(size, perm);
 
     if (ptr == NULL) {
@@ -2757,8 +2757,8 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
                 view->colourBufs[1] = view->colourBufs[0];
             }
 
-            view->colourBufs[0] = (void *) ALIGN((uintptr_t) view->colourBufs[0], 64);
-            view->colourBufs[1] = (void *) ALIGN((uintptr_t) view->colourBufs[1], 64);
+            view->colourBufs[0] = (void *) ALIGN64((uintptr_t) view->colourBufs[0]);
+            view->colourBufs[1] = (void *) ALIGN64((uintptr_t) view->colourBufs[1]);
             stop_memtracker(memtrackerName);
 
             if (view->colourBufs[0] == NULL || view->colourBufs[1] == NULL) {
@@ -2778,7 +2778,7 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
                 if (view->zbuf == NULL) {
                     fatal_printf("Not enough DRAM for Z buffer\n");
                 }
-                view->zbuf = (void *) ALIGN((uintptr_t) view->zbuf, 64);
+                view->zbuf = (void *) ALIGN64((uintptr_t) view->zbuf);
             }
             stop_memtracker(memtrackerName);
         } else {

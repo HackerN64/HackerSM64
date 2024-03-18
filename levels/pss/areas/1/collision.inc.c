@@ -1812,7 +1812,5 @@ const Collision pss_seg7_collision[] = {
     COL_TRI(117, 127, 128),
     COL_TRI(118, 131, 129),
     COL_TRI_STOP(),
-    COL_SPECIAL_INIT(1),
-    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start, /*pos*/ 5632, 6656, -5631, /*yaw*/ 192),
     COL_END(),
 };

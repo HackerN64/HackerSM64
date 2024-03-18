@@ -3,6 +3,6 @@
 
 #include <PR/ultratypes.h>
 
-extern u64 gGfxSPTaskOutputBuffer[0x2fc0];
+extern u64 gGfxSPTaskOutputBuffer[0x2000];
 
 #endif // GFX_OUTPUT_BUFFER_H

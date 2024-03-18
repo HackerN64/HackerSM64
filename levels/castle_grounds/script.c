@@ -3,6 +3,7 @@
 #include "behavior_data.h"
 #include "model_ids.h"
 #include "seq_ids.h"
+#include "dialog_ids.h"
 #include "segment_symbols.h"
 #include "level_commands.h"
 
@@ -15,7 +16,61 @@
 #include "make_const_nonconst.h"
 #include "levels/castle_grounds/header.h"
 
-static const LevelScript script_func_local_1[] = {
+
+static const LevelScript script_castle_grounds_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,    /*pos*/  5288,   722,  -800, /*angle*/ 0, 262, 0, /*behParam*/ (DIALOG_050 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,    /*pos*/  1740,    35,  2500, /*angle*/ 0,  90, 0, /*behParam*/ (DIALOG_065 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,    /*pos*/ -1566,   260,  3503, /*angle*/ 0,   0, 0, /*behParam*/ (DIALOG_167 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,    /*pos*/ -4666,   260,   922, /*angle*/ 0,  82, 0, /*behParam*/ (DIALOG_051 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_NONE,               /*pos*/ -6270,   975, -2145, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upInPoleSpawner),
+    OBJECT(/*model*/ MODEL_1UP,                /*pos*/  -440,  3180, -5000, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    OBJECT(/*model*/ MODEL_1UP,                /*pos*/     0,  3180, -5200, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    OBJECT(/*model*/ MODEL_1UP,                /*pos*/   440,  3180, -5000, /*angle*/ 0,   0, 0, /*behParam*/ (MUSHROOM_BP_REQUIRES_NONE << 16), /*beh*/ bhv1Up),
+    OBJECT(/*model*/ MODEL_EXCLAMATION_BOX,    /*pos*/    13,  3476, -5646, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_WING_CAP << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_NONE,               /*pos*/     0,   535,  -500, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_NONE,               /*pos*/     0,   535, -1774, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHidden1upTrigger),
+    OBJECT(/*model*/ MODEL_1UP,                /*pos*/     0,   510, -1170, /*angle*/ 0,   0, 0, /*behParam*/ (2 << 16), /*beh*/ bhvHidden1up),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN,        /*pos*/     0,   540, -1774, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvYellowCoin),
+    OBJECT(/*model*/ MODEL_YELLOW_COIN,        /*pos*/     0,   540,  -500, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvYellowCoin),
+    OBJECT(/*model*/ MODEL_CANNON_BASE,        /*pos*/  2384,    70,  1961, /*angle*/ 0,   0, 0, /*behParam*/ (0x40 << 16), /*beh*/ bhvCannon),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/ -6240,   295,   320, /*angle*/ 0,   0, 0, /*behParam*/ (TRIPLET_BUTTERFLY_BP_NO_BOMBS << 16), /*beh*/ bhvTripletButterfly),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  6330,   710, -3760, /*angle*/ 0,   0, 0, /*behParam*/ (TRIPLET_BUTTERFLY_BP_NO_BOMBS << 16), /*beh*/ bhvTripletButterfly),
+    // Special objects
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03,  /*pos*/     0,  2867, -3924, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -1333,   711,  1881, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -6220,   468,  3458, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -5069,   350,  3221, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -2566,   438,  2626, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -1900,   401,  2868, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  6399,   494, -1680, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/   767,   498,  2598, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  1476,   189,  3280, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  3153,   206,   469, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  6178,   219,   167, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -6510,   260,  1411, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  5457,   528, -3259, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  5868,   698, -4453, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  6408,   869, -5314, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -4711,   342,   433, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  1132,   365,  1977, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -5506,   364,  -661, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -6269,   402, -2145, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -5600,   440, -2627, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  1919,   268,  1157, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -5957,   517, -3447, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -2021,   633,  1468, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  -109,   613,  3008, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  5774,   413, -1114, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/  5954,   526, -2846, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,    /*pos*/ -5204,   296,   811, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_CASTLE_METAL_DOOR,  /*pos*/  3292,  -511, -2931, /*angle*/ 0, 225, 0, /*behParam*/ (2 << 16), /*beh*/ bhvDoorWarp),
+    OBJECT(/*model*/ MODEL_CASTLE_CASTLE_DOOR, /*pos*/   -76,   803, -3155, /*angle*/ 0,   0, 0, /*behParam*/ (0 << 16), /*beh*/ bhvDoorWarp),
+    OBJECT(/*model*/ MODEL_CASTLE_CASTLE_DOOR, /*pos*/    77,   803, -3155, /*angle*/ 0, 180, 0, /*behParam*/ (1 << 16), /*beh*/ bhvDoorWarp),
+    RETURN(),
+};
+
+static const LevelScript script_castle_grounds_objects_1[] = {
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x02, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x03, /*destNode*/ 0x02, /*flags*/ WARP_NO_CHECKPOINT),
@@ -40,7 +95,7 @@ static const LevelScript script_func_local_1[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_castle_grounds_objects_2[] = {
     OBJECT(/*model*/ MODEL_NONE,                        /*pos*/ -5812,  100, -5937, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWaterfallSoundLoop),
     OBJECT(/*model*/ MODEL_NONE,                        /*pos*/ -7430, 1500,   873, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvBirdsSoundLoop),
     OBJECT(/*model*/ MODEL_NONE,                        /*pos*/   -80, 1500,  5004, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvBirdsSoundLoop),
@@ -67,7 +122,7 @@ static const LevelScript script_func_local_2[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_3[] = {
+static const LevelScript script_castle_grounds_objects_3[] = {
     OBJECT(/*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/ -3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving),
     OBJECT(/*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/  3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving),
     OBJECT(/*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/ -3835, 3348, -6647, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving),
@@ -75,7 +130,7 @@ static const LevelScript script_func_local_3[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_4[] = {
+static const LevelScript script_castle_grounds_objects_4[] = {
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -4508,  406,  4400, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvButterfly),
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -4408,  406,  4500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvButterfly),
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -4708,  406,  4100, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvButterfly),
@@ -119,12 +174,12 @@ const LevelScript level_castle_grounds_entry[] = {
 
     AREA(/*index*/ 1, castle_grounds_geo_00073C),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
-        JUMP_LINK(script_func_local_3),
-        JUMP_LINK(script_func_local_4),
+        JUMP_LINK(script_castle_grounds_objects_1),
+        JUMP_LINK(script_castle_grounds_objects_2),
+        JUMP_LINK(script_castle_grounds_objects_3),
+        JUMP_LINK(script_castle_grounds_objects_4),
         TERRAIN(/*terrainData*/ castle_grounds_seg7_collision_level),
-        MACRO_OBJECTS(/*objList*/ castle_grounds_seg7_macro_objs),
+        JUMP_LINK(script_castle_grounds_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_SOUND_PLAYER),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_GRASS),
     END_AREA(),

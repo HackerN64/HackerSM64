@@ -73,7 +73,6 @@ extern const Gfx bitfs_seg7_dl_07011BA0[];
 extern const Gfx bitfs_seg7_dl_07011D98[];
 extern const Gfx bitfs_seg7_dl_07011E28[];
 extern const Collision bitfs_seg7_collision_level[];
-extern const MacroObject bitfs_seg7_macro_objs[];
 extern const Collision bitfs_seg7_collision_elevator[];
 extern const Collision bitfs_seg7_collision_sinking_cage_platform[];
 extern const Collision bitfs_seg7_collision_inverted_pyramid[];
