@@ -15,7 +15,7 @@ NEVER_INLINE uintptr_t _asm_getaddr(void) {
     return RAddr;
 }
 
-// Replaces its own call instruction with a custom MIPS assembly instruction.
+// Replaces its own call instruction with a custom MIPS assembly instruction and jumps back to right before it to run it. Replaces the branch delay slot with a NOP.
 NEVER_INLINE void _asm_setbits(uintptr_t bits) {
     uintptr_t RAddr;
     ASM_GET_REG_CPU(RAddr, "$ra"); // Get $ra.

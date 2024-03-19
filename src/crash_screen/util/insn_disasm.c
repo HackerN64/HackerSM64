@@ -44,6 +44,8 @@
 
 
 // MIPS III Instructions:
+// https://n64brew.dev/wiki/MIPS_III_instructions
+// https://hack64.net/docs/VR43XX.pdf
 
 // Opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
@@ -196,6 +198,7 @@ ALIGNED32 static const InsnTemplate insn_db_cop0_sub00[] = { // OPC_COP0, INSN_T
 };
 ALIGNED32 static const InsnTemplate insn_db_cop0_sub10[] = { // OPC_COP0, INSN_TYPE_FUNC
     //! TODO: Find out the proper format for these?
+    //! TODO: These use the COP0 TLB Index register as the input/output.
     { .opcode = OPC_COP0_TLBP  , .name = "TLBP"   , .fmt = "\'"   , .out = 0, }, //  8: Searches for a TLB entry that matches the EntryHi register.
     { .opcode = OPC_COP0_TLBR  , .name = "TLBR"   , .fmt = "\'"   , .out = 0, }, //  1: Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
     { .opcode = OPC_COP0_TLBWI , .name = "TLBWI"  , .fmt = "\'"   , .out = 0, }, //  2: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
@@ -269,7 +272,7 @@ static const InsnTemplate* insn_db_cop_lists[][0b11 + 1] = {
     [COP3] = { [INSN_TYPE_COP_FMT] = NULL,               [INSN_TYPE_REGIMM] = NULL,               [INSN_TYPE_FUNC] = NULL,               [INSN_TYPE_UNKNOWN] = NULL, }, // Coprocessor-3 (CP3).
 };
 
-// Pseudo-instructions
+// Single-line pseudo-instructions.
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
     [PSEUDO_NOP  ] = { .opcode = OPS_SLL  , .name = "NOP"  , .fmt = "_"    , .out = 0, }, // NOP (pseudo of SLL).
     [PSEUDO_MOVET] = { .opcode = OPS_ADD  , .name = "MOVE" , .fmt = "\'dt" , .out = 1, }, // Move (pseudo of ADD and OR).

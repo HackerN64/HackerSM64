@@ -88,7 +88,7 @@ static OSThread* get_crashed_thread(void) {
     ) {
         if (
             (thread->priority > OS_PRIORITY_IDLE  ) &&
-            (thread->priority < OS_PRIORITY_APPMAX) && //! TODO: Should this include OS_PRIORITY_APPMAX threads? Official N64 games don't.
+            (thread->priority < OS_PRIORITY_APPMAX) && //! TODO: Should this include threads with priority OS_PRIORITY_APPMAX and higher? Official N64 games don't.
             (thread->flags & (OS_FLAG_CPU_BREAK | OS_FLAG_FAULT)) &&
             (thread != gCrashedThread)
         ) {

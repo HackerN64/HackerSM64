@@ -461,8 +461,9 @@ static const FloatErrorPrintFormat sFltErrFmt[] = {
     [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
 };
 
+//! TODO: Version of this but for f64.
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
-    const enum FloatErrorType fltErrType = validate_float(val);
+    const enum FloatErrorType fltErrType = validate_f32(val);
     size_t numChars = 0;
 
     if (fltErrType != FLT_ERR_NONE) {

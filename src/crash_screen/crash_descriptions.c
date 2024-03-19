@@ -35,6 +35,8 @@ DEF_REGION_NAME(us);
 DEF_REGION_NAME(eu);
 #elif VERSION_SH
 DEF_REGION_NAME(sh);
+#elif VERSION_CN
+DEF_REGION_NAME(cn);
 #elif BBPLAYER
 DEF_REGION_NAME(bb);
 #else
@@ -274,7 +276,7 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
     [FLT_ERR_NAN   ] = "NaN float",
 };
 
-//! TODO: NaN floats aren't detected here even though validate_float does, and this works with denorms.
+//! TODO: NaN floats aren't detected here even though validate_f32 does, and this works with denorms.
 enum FloatErrorType validate_floats_in_reg_buffer(void) {
     enum FloatErrorType fltErrType = FLT_ERR_NONE;
 
@@ -285,7 +287,7 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
             IEEE754_f32 val = {
                 .asU32 = get_reg_val(reg.cop, reg.idx)
             };
-            fltErrType = validate_float(val);
+            fltErrType = validate_f32(val);
 
             if (fltErrType != FLT_ERR_NONE) {
                 break;
