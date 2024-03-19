@@ -208,8 +208,8 @@ ALIGNED32 static const RegisterInfo sRegisters_FCR[2] = {
     [REG_DESC_FCR_CONTROL_STATUS] = DEF_TREG(fpcsr, sizeof(u32), "FPCSR", "FS", REG_DESC_FCR_CONTROL_STATUS),
 };
 const char* sRegDesc_FPR[] = {
-    [REG_DESC_FCR_COP_IMPL_REV  ] = "Coprocessor implementation/revision",
-    [REG_DESC_FCR_CONTROL_STATUS] = "Control/Status",
+    [REG_DESC_FCR_COP_IMPL_REV  ] = "coprocessor implementation/revision",
+    [REG_DESC_FCR_CONTROL_STATUS] = "floating point ontrol/status",
 };
 uint64_t get_fcr_reg_val(int idx) {
     int val = 0;

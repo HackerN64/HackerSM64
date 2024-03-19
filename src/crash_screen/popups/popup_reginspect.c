@@ -110,7 +110,7 @@ _Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
         .raw = (uint32_t)val,
     };
 
-    cs_print(TEXT_X(2), TEXT_Y(line++), "in branch delay:\t\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "in branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
     cs_print(TEXT_X(2), TEXT_Y(line++), "interrupts pending:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, c.IP);
     cs_print(TEXT_X(2), TEXT_Y(line++), "exc code:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, c.Exc_Code);
     if (c.Exc_Code == (EXC_CPU >> CAUSE_EXCSHIFT)) {
