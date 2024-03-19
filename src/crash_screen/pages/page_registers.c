@@ -342,11 +342,17 @@ void page_registers_input(void) {
         if (left) {
             if (sel->selX > 0) {
                 sel->selX--;
+            } else {
+                // Wrap horizontally.
+                sel->selX = (bounds->cols - 1);
             }
         }
         if (right) {
             if (sel->selX < (bounds->cols - 1)) {
                 sel->selX++;
+            } else {
+                // Wrap horizontally.
+                sel->selX = 0;
             }
         }
     }
