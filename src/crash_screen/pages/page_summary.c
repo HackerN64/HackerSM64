@@ -17,7 +17,7 @@
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 
-#include "page_home.h"
+#include "page_summary.h"
 
 #include "page_disasm.h"
 
@@ -28,13 +28,13 @@
 #endif // UNF
 
 
-struct CSSetting cs_settings_group_page_home[] = {
-    [CS_OPT_HEADER_PAGE_HOME        ] = { .type = CS_OPT_TYPE_HEADER,  .name = "HOME",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_END_HOME                ] = { .type = CS_OPT_TYPE_END, },
+struct CSSetting cs_settings_group_page_summary[] = {
+    [CS_OPT_HEADER_PAGE_SUMMARY     ] = { .type = CS_OPT_TYPE_HEADER,  .name = "SUMMARY",                           .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_END_SUMMARY             ] = { .type = CS_OPT_TYPE_END, },
 };
 
 
-const enum ControlTypes cs_cont_list_home[] = {
+const enum ControlTypes cs_cont_list_summary[] = {
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_PAGE_SELECT,
     CONT_DESC_SHOW_CONTROLS,
@@ -47,7 +47,7 @@ const enum ControlTypes cs_cont_list_home[] = {
 };
 
 
-void page_home_init(void) {
+void page_summary_init(void) {
 
 }
 
@@ -207,7 +207,7 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
     }
 }
 
-void page_home_draw(void) {
+void page_summary_draw(void) {
     __OSThreadContext* tc = &gInspectThread->context;
     u32 cause = (tc->cause & CAUSE_EXCMASK);
     u32 line = 9;
@@ -279,14 +279,14 @@ void page_home_draw(void) {
     );
 }
 
-void page_home_input(void) {
+void page_summary_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
     }
 }
 
-void page_home_print(void) {
+void page_summary_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
@@ -353,14 +353,14 @@ void page_home_print(void) {
 }
 
 
-struct CSPage gCSPage_home ={
-    .name         = "CRASH SCREEN HOME",
-    .initFunc     = page_home_init,
-    .drawFunc     = page_home_draw,
-    .inputFunc    = page_home_input,
-    .printFunc    = page_home_print,
-    .contList     = cs_cont_list_home,
-    .settingsList = cs_settings_group_page_home,
+struct CSPage gCSPage_summary ={
+    .name         = "SUMMARY",
+    .initFunc     = page_summary_init,
+    .drawFunc     = page_summary_draw,
+    .inputFunc    = page_summary_input,
+    .printFunc    = page_summary_print,
+    .contList     = cs_cont_list_summary,
+    .settingsList = cs_settings_group_page_summary,
     .flags = {
         .initialized = FALSE,
         .crashed     = FALSE,

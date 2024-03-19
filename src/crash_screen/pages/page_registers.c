@@ -14,7 +14,7 @@
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 
-#include "crash_screen/popups/popup_register.h"
+#include "crash_screen/popups/popup_reginspect.h"
 
 #include "page_registers.h"
 
@@ -373,7 +373,7 @@ void page_registers_input(void) {
             case PAGE_REG_SECTION_REG:
                 idx = cs_page_reg_get_select_idx(sel, bounds->cols);
                 if (idx < (ARRAY_COUNT(sRegList) - 1)) {
-                    cs_open_inspect_register(sRegList[idx]);
+                    cs_open_reginspect(sRegList[idx]);
                 }
                 break;
             case PAGE_REG_SECTION_FPCSR:;
@@ -383,7 +383,7 @@ void page_registers_input(void) {
                     .flt = FALSE,
                     .out = FALSE,
                 };
-                cs_open_inspect_register(regId);
+                cs_open_reginspect(regId);
                 break;
             case PAGE_REG_SECTION_FP:
                 idx = (cs_page_reg_get_select_idx(sel, bounds->cols) * FP_REG_SIZE);
@@ -394,7 +394,7 @@ void page_registers_input(void) {
                         .flt = TRUE,
                         .out = FALSE,
                     };
-                    cs_open_inspect_register(regId);
+                    cs_open_reginspect(regId);
                 }
                 break;
         }

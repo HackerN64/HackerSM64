@@ -49,7 +49,7 @@ CSSetting* gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_CONTROLS      ] = cs_settings_group_controls,
 
     //! TODO: Automatically do this from gCSPages:
-    // [CS_OPT_GROUP_PAGE_HOME     ] = cs_settings_group_page_home,
+    // [CS_OPT_GROUP_PAGE_SUMMARY  ] = cs_settings_group_page_summary,
     [CS_OPT_GROUP_PAGE_STACK    ] = cs_settings_group_page_stack,
     [CS_OPT_GROUP_PAGE_THREADS  ] = cs_settings_group_page_threads,
     [CS_OPT_GROUP_PAGE_REGISTERS] = cs_settings_group_page_registers,

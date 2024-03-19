@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include "pages/page_home.h"
+#include "pages/page_summary.h"
 #include "pages/page_registers.h"
 #include "pages/page_threads.h"
 #include "pages/page_logs.h"
@@ -18,13 +18,13 @@
 #include "pages/page_about.h"
 
 
-#define CRASH_SCREEN_START_PAGE CS_PAGE_HOME
+#define CRASH_SCREEN_START_PAGE CS_PAGE_SUMMARY
 
 
 enum CSPages {
     CS_FIRST_PAGE,
 
-    CS_PAGE_HOME = CS_FIRST_PAGE,
+    CS_PAGE_SUMMARY = CS_FIRST_PAGE,
     CS_PAGE_STACK,
     CS_PAGE_THREADS,
     CS_PAGE_REGISTERS,
@@ -71,7 +71,7 @@ enum CSPopups {
     CS_POPUP_NONE,
     CS_POPUP_CONTROLS,
     CS_POPUP_PAGES,
-    CS_POPUP_REGISTER,
+    CS_POPUP_REGINSPECT,
     CS_POPUP_ADDRESS_SELECT,
     NUM_CS_POPUPS,
 };

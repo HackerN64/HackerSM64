@@ -14,7 +14,7 @@
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 
-#include "popup_register.h"
+#include "popup_reginspect.h"
 
 
 RegisterId sInspectedRegister = {
@@ -25,7 +25,7 @@ RegisterId sInspectedRegister = {
     .out = FALSE,
 };
 
-void cs_popup_register_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
+void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
     const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
     _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
     uint32_t val32 = (uint32_t)val64;
@@ -130,7 +130,7 @@ void cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
 }
 
 // Register popup box draw function.
-void cs_popup_register_draw(void) {
+void cs_popup_reginspect_draw(void) {
     const s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
     const s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
     const s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
@@ -172,7 +172,7 @@ void cs_popup_register_draw(void) {
         gInspectThread->id, get_thread_name(gInspectThread)
     );
     uint64_t threadValue = get_reg_val(cop, idx);
-    cs_popup_register_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, threadValue);
+    cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, threadValue);
     line += 2;
 
     _Bool extraInfo = FALSE;
@@ -221,7 +221,7 @@ void cs_popup_register_draw(void) {
     osWritebackDCacheAll();
 }
 
-void cs_popup_register_input(void) {
+void cs_popup_reginspect_input(void) {
     //! TODO: If register is address, goto address select. (return to this if cancelled).
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
@@ -232,16 +232,16 @@ void cs_popup_register_input(void) {
 }
 
 // Open the register inspect popup box.
-void cs_open_inspect_register(RegisterId regId) {
-    cs_open_popup(CS_POPUP_REGISTER);
+void cs_open_reginspect(RegisterId regId) {
+    cs_open_popup(CS_POPUP_REGINSPECT);
     sInspectedRegister = regId;
 }
 
-struct CSPopup gCSPopup_register = {
+struct CSPopup gCSPopup_reginspect = {
     .name      = "REGISTER",
     .initFunc  = NULL,
-    .drawFunc  = cs_popup_register_draw,
-    .inputFunc = cs_popup_register_input,
+    .drawFunc  = cs_popup_reginspect_draw,
+    .inputFunc = cs_popup_reginspect_input,
     .flags = {
         .allowPage = FALSE,
     },

@@ -9,7 +9,7 @@
 
 #include "crash_pages.h"
 
-#include "pages/page_home.h"
+#include "pages/page_summary.h"
 #include "pages/page_registers.h"
 #include "pages/page_threads.h"
 #include "pages/page_logs.h"
@@ -25,13 +25,13 @@
 #include "popups/popup_address_select.h"
 #include "popups/popup_page_controls.h"
 #include "popups/popup_page_select.h"
-#include "popups/popup_register.h"
+#include "popups/popup_reginspect.h"
 
 
 // -- Pages --
 
 CSPage* gCSPages[CS_NUM_PAGES] = {
-    [CS_PAGE_HOME       ] = &gCSPage_home,
+    [CS_PAGE_SUMMARY    ] = &gCSPage_summary,
     [CS_PAGE_STACK      ] = &gCSPage_stack,
     [CS_PAGE_THREADS    ] = &gCSPage_threads,
     [CS_PAGE_REGISTERS  ] = &gCSPage_registers,
@@ -87,7 +87,7 @@ CSPopup* gCSPopups[NUM_CS_POPUPS] = {
     [CS_POPUP_NONE          ] = NULL,
     [CS_POPUP_CONTROLS      ] = &gCSPopup_controls,
     [CS_POPUP_PAGES         ] = &gCSPopup_pages,
-    [CS_POPUP_REGISTER      ] = &gCSPopup_register,
+    [CS_POPUP_REGINSPECT    ] = &gCSPopup_reginspect,
     [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address_select,
 };
 enum CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
