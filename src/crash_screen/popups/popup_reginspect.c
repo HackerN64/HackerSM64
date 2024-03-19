@@ -208,35 +208,46 @@ void cs_popup_reginspect_draw(void) {
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value on thread %d (%s):", descColor, (is64Bit ? 64 : 32),
         gInspectThread->id, get_thread_name(gInspectThread)
     );
-    uint64_t threadValue = get_reg_val(cop, idx);
-    cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, threadValue);
-    line += 2;
+    uint64_t value = get_reg_val(cop, idx);
+    cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line++), regId, value);
 
+    line++;
     _Bool hasExInfo = FALSE;
     const RegInspectExtraInfo* exInfo = &sRegInspectExtraInfoFuncs[0];
     for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
         if (exInfo->cop == cop && exInfo->idx == idx) {
-            hasExInfo = exInfo->func(line, threadValue);
+            hasExInfo = exInfo->func(line, value);
             break;
         }
         exInfo++;
     }
+    line--;
 
     if (hasExInfo) {
-        cs_print(TEXT_X(1), TEXT_Y(line - 1), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, exInfo->title);
+        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, exInfo->title);
     } else {
 #ifdef INCLUDE_DEBUG_MAP
-        u32 val32 = (uint32_t)threadValue;
+        u32 val32 = (uint32_t)value;
         const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            cs_print(TEXT_X(1), TEXT_Y(line - 1), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
             cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
-            cs_print(TEXT_X(2), TEXT_Y(line),
+            cs_print(TEXT_X(2), TEXT_Y(line++),
                 (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
                 COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
             );
         }
 #endif // INCLUDE_DEBUG_MAP
+        u32 data = 0;
+        if (try_read_word_aligned(&data, val32)) {
+            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            if (is_in_code_segment(val32)) {
+                print_as_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
+            } else {
+                cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
+                print_as_binary(TEXT_X(2), TEXT_Y(line++), data, COLOR_RGBA32_WHITE);
+            }
+        }
     }
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);

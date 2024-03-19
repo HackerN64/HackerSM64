@@ -281,20 +281,6 @@ void print_as_insn(const u32 charX, const u32 charY, const Address addr, const W
 #endif // INCLUDE_DEBUG_MAP
 }
 
-static void print_as_binary(const u32 charX, const u32 charY, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
-    u32 bitCharX = charX;
-
-    for (u32 c = 0; c < SIZEOF_BITS(Word); c++) {
-        if ((c % SIZEOF_BITS(Byte)) == 0) { // Space between each byte.
-            bitCharX += TEXT_WIDTH(1);
-        }
-
-        cs_draw_glyph(bitCharX, charY, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), color);
-
-        bitCharX += TEXT_WIDTH(1);
-    }
-}
-
 static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
     const enum CSDisasmBranchArrowModes branchArrowMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
     const _Bool unkAsBinary = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
@@ -321,27 +307,29 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         Word data = 0x00000000;
         if (!try_read_word_aligned(&data, addr)) {
             cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
-        } else if (is_in_code_segment(addr)) {
-            print_as_insn(charX, charY, addr, data);
+        } else {
+            if (is_in_code_segment(addr)) {
+                print_as_insn(charX, charY, addr, data);
 
-            if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
-                InsnData insn = {
-                    .raw = data,
-                };
-                s16 branchOffset = insn_check_for_branch_offset(insn);
+                if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
+                    InsnData insn = {
+                        .raw = data,
+                    };
+                    s16 branchOffset = insn_check_for_branch_offset(insn);
 
-                if (branchOffset != 0x0000) {
-                    draw_branch_arrow(y, (y + branchOffset + 1), (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET), COLOR_RGBA32_ORANGE, line);
+                    if (branchOffset != 0x0000) {
+                        draw_branch_arrow(y, (y + branchOffset + 1), (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET), COLOR_RGBA32_ORANGE, line);
+                    }
                 }
-            }
-        } else { // Outside of code segments:
-            if (unkAsBinary) {
-                // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                print_as_binary(charX, charY, data, COLOR_RGBA32_WHITE);
-                // cs_print(charX, charY, "%032b", data);
-            } else {
-                // "[XXXXXXXX]"
-                cs_print(charX, charY, STR_HEX_WORD, data);
+            } else { // Outside of code segments:
+                if (unkAsBinary) {
+                    // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
+                    print_as_binary(charX, charY, data, COLOR_RGBA32_WHITE);
+                    // cs_print(charX, charY, "%032b", data);
+                } else {
+                    // "[XXXXXXXX]"
+                    cs_print(charX, charY, STR_HEX_WORD, data);
+                }
             }
         }
     }

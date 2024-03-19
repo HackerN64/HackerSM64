@@ -529,3 +529,17 @@ int sprintf_int_with_commas(char* buf, int n) {
 
     return (p - buf);
 }
+
+void print_as_binary(const u32 x, const u32 y, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+    u32 bitX = x;
+
+    for (u32 c = 0; c < SIZEOF_BITS(Word); c++) {
+        if ((c % SIZEOF_BITS(Byte)) == 0) { // Space between each byte.
+            bitX += TEXT_WIDTH(1);
+        }
+
+        cs_draw_glyph(bitX, y, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), color);
+
+        bitX += TEXT_WIDTH(1);
+    }
+}

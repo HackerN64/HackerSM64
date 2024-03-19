@@ -114,3 +114,4 @@ typedef struct FloatErrorPrintFormat {
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
 
 int sprintf_int_with_commas(char* buf, int n);
+void print_as_binary(const u32 x, const u32 y, const Word data, RGBA32 color);

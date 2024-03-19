@@ -107,7 +107,7 @@ typedef struct RegisterPageSelection {
 } RegisterPageSelection;
 
 
-RegisterPageSelection sSelectedThreadRegister = {
+RegisterPageSelection sRegisterSelectionCursor = {
     .section = PAGE_REG_SECTION_THREAD,
     .selX = 0,
     .selY = 0,
@@ -119,7 +119,7 @@ void page_registers_init(void) {
 }
 
 void cs_registers_print_thread(u32 x, u32 y) {
-    if (sSelectedThreadRegister.section == PAGE_REG_SECTION_THREAD) {
+    if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_THREAD) {
         cs_draw_row_selection_box(y);
     }
 
@@ -172,7 +172,7 @@ u32 cs_registers_print_registers(u32 line) {
     const u32 rows = REG_LIST_ROWS;
     const size_t columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, columns);
     const RegisterId* reg = sRegList;
-    RegisterPageSelection* sel = &sSelectedThreadRegister;
+    RegisterPageSelection* sel = &sRegisterSelectionCursor;
     _Bool drawSel = (sel->section == PAGE_REG_SECTION_REG);
     _Bool listEnded = FALSE;
 
@@ -208,7 +208,7 @@ u32 cs_registers_print_registers(u32 line) {
 }
 
 void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
-    if (sSelectedThreadRegister.section == PAGE_REG_SECTION_FPCSR) {
+    if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_FPCSR) {
         cs_draw_row_selection_box(y);
     }
 
@@ -250,7 +250,7 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
     const size_t columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, FP_LIST_COLUMNS);
     __OSfp* osfp = &tc->fp0; // The first float pointer.
     u32 regNum = 0;
-    RegisterPageSelection* sel = &sSelectedThreadRegister;
+    RegisterPageSelection* sel = &sRegisterSelectionCursor;
     _Bool drawSel = (sel->section == PAGE_REG_SECTION_FP);
 
     // cs_registers_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
@@ -289,7 +289,7 @@ void page_registers_draw(void) {
     );
     cs_registers_print_thread(TEXT_X(0), TEXT_Y(line++));
     
-    // cs_print(TEXT_X(0), TEXT_Y(line), "s:%d x:%d y:%d", sSelectedThreadRegister.section, sSelectedThreadRegister.selX, sSelectedThreadRegister.selY);
+    // cs_print(TEXT_X(0), TEXT_Y(line), "s:%d x:%d y:%d", sRegisterSelectionCursor.section, sRegisterSelectionCursor.selX, sRegisterSelectionCursor.selY);
     line++;
 
     line = cs_registers_print_registers(line);
@@ -304,7 +304,7 @@ static int cs_page_reg_get_select_idx(RegisterPageSelection* sel, int columns) {
 }
 
 void page_registers_input(void) {
-    RegisterPageSelection* sel = &sSelectedThreadRegister;
+    RegisterPageSelection* sel = &sRegisterSelectionCursor;
     CrashScreenDirections* dir = &gCSDirectionFlags;
     _Bool up    = dir->pressed.up;
     _Bool down  = dir->pressed.down;
