@@ -100,7 +100,7 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __att
 }
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
-void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol);
+void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
 void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
 
 typedef struct FloatErrorPrintFormat {
@@ -111,6 +111,6 @@ typedef struct FloatErrorPrintFormat {
     /*0x04*/ char* suffix;
 } FloatErrorPrintFormat; /*0x08*/
 
-size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix);
+size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
 
 int sprintf_int_with_commas(char* buf, int n);

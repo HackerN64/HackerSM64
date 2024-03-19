@@ -178,6 +178,20 @@ const char* get_thread_flags_str(OSThread* thread) {
 }
 
 
+// -- COPROCESSOR --
+
+static const char* sCOPNames[] = {
+    [CPU  + 1] = "CPU",
+    [COP0 + 1] = "CP0 (system control)",
+    [COP1 + 1] = "CP1 (FPU)",
+    [COP2 + 1] = "CP2 (RCP vector unit)",
+    [COP3 + 1] = "CP3",
+};
+const char* get_coprocessor_name(enum Coprocessors cop) {
+    return sCOPNames[cop + 1];
+}
+
+
 // -- CAUSE --
 
 static const char* sCauseDesc[NUM_CAUSE_DESC] = {

@@ -8,6 +8,7 @@
 
 #include "PR/os_internal.h"
 
+#include "crash_screen/util/registers.h"
 #include "crash_screen/crash_controls.h"
 #include "crash_screen/crash_descriptions.h"
 #include "crash_screen/crash_draw.h"
@@ -50,8 +51,6 @@ const enum ControlTypes cs_cont_list_threads[] = {
     CONT_DESC_LIST_END,
 };
 
-
-extern OSThread* __osRunningThread;
 
 #define NUM_SHOWN_THREADS 10
 

@@ -412,14 +412,18 @@ static void cs_print_symbol_unknown(u32 x, u32 y) {
  * @param[in] maxWidth The maximum number of chars to print.
  * @param[in] symbol   The symbol pointer.
  */
-void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol) {
+void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
     if (symbol == NULL) {
-        cs_print_symbol_unknown(x, y);
+        if (printUnknown) {
+            cs_print_symbol_unknown(x, y);
+        }
         return;
     }
     const char* name = get_map_symbol_name(symbol);
     if (name == NULL) {
-        cs_print_symbol_unknown(x, y);
+        if (printUnknown) {
+            cs_print_symbol_unknown(x, y);
+        }
         return;
     }
     cs_print_scroll(x, y, maxWidth,
@@ -440,7 +444,7 @@ void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            cs_print_symbol_name(x, y, maxWidth, symbol);
+            cs_print_symbol_name(x, y, maxWidth, symbol, FALSE);
             return;
         }
     }
@@ -462,7 +466,7 @@ static const FloatErrorPrintFormat sFltErrFmt[] = {
 };
 
 //! TODO: Version of this but for f64.
-size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
+size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
     const enum FloatErrorType fltErrType = validate_f32(val);
     size_t numChars = 0;
 
@@ -478,11 +482,10 @@ size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, _Bool includeSuffix) {
             numChars += cs_print(x, y, (STR_COLOR_PREFIX"%c"STR_HEX_WORD), color, p->prefixChar, val.asU32);
         }
     } else {
-        const enum CSPrintNumberFormats floatsFormat = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT);
         const char* buf = NULL;
         _Bool asHex = FALSE;
 
-        switch (floatsFormat) {
+        switch (format) {
             case PRINT_NUM_FMT_HEX: buf = " "STR_HEX_WORD; asHex = TRUE; break; // "[XXXXXXXX]"
             default:
             case PRINT_NUM_FMT_DEC: buf = "% g";   break; // "[±][exponent]"
@@ -512,8 +515,8 @@ int sprintf_int_with_commas(char* buf, int n) {
     p += sprintf(p, "%d", n);
     while (scale != 1) {
         scale /= 1000;
-        n = n2 / scale;
-        n2 = n2 % scale;
+        n = (n2 / scale);
+        n2 = (n2 % scale);
         p += sprintf(p, ",%03d", n);
     }
 

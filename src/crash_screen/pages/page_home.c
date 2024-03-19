@@ -188,7 +188,7 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
     if (reg.out) {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"[output]", COLOR_RGBA32_LIGHT_GRAY);
     } else if (reg.flt) { // Float.
-        charX += cs_print_f32(TEXT_X(charX), TEXT_Y(line), (IEEE754_f32){ .asU32 = data, }, TRUE);
+        charX += cs_print_f32(TEXT_X(charX), TEXT_Y(line), (IEEE754_f32){ .asU32 = data, }, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), TRUE);
     } else {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_HEX_WORD" ", data);
 
@@ -197,7 +197,7 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
         if (symbol != NULL) {
             size_t offsetStrSize = STRLEN("+0000 ");
             size_t endX = CRASH_SCREEN_NUM_CHARS_X;
-            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol);
+            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol, FALSE);
             cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
                 (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
                 COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
@@ -227,7 +227,7 @@ void page_home_draw(void) {
 
             RegisterId regPC = {
                 .cop = COP0,
-                .idx = REG_COP0_EPC,
+                .idx = REG_CP0_EPC,
                 .flt = FALSE,
                 .out = FALSE,
             };

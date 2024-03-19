@@ -25,6 +25,66 @@ RegisterId sInspectedRegister = {
     .out = FALSE,
 };
 
+void cs_popup_register_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
+    const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
+    _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
+    uint32_t val32 = (uint32_t)val64;
+    enum FloatErrorType fltErrType = FLT_ERR_NONE;
+
+    //! TODO: simplify this:
+    if (regId.flt) {
+        if (is64Bit) {
+            IEEE754_f64 flt64 = {
+                .asU64 = val64,
+            };
+            fltErrType = validate_f64(flt64);
+            if (fltErrType != FLT_ERR_NONE) {
+            } else {
+                cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_LONG), val64);
+                y += TEXT_HEIGHT(1);
+                cs_print(x, y, "% g", flt64.asF64);
+                y += TEXT_HEIGHT(1);
+                cs_print(x, y, "% e", flt64.asF64);
+            }
+        } else {
+            IEEE754_f32 flt32 = {
+                .asU32 = val32,
+            };
+            fltErrType = validate_f32(flt32);
+            if (fltErrType != FLT_ERR_NONE) {
+
+            } else {
+                cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_WORD), val32);
+                y += TEXT_HEIGHT(1);
+                cs_print(x, y, "% g", flt32.asF32);
+                y += TEXT_HEIGHT(1);
+                cs_print(x, y, "% e", flt32.asF32);
+            }
+        }
+    } else {
+        if (is64Bit) {
+            cs_print(x, y, (STR_HEX_PREFIX STR_HEX_LONG), val64);
+        } else {
+            cs_print(x, y, (STR_HEX_PREFIX STR_HEX_WORD), val32);
+        }
+        y += TEXT_HEIGHT(1);
+#ifdef INCLUDE_DEBUG_MAP
+        cs_print_symbol_name(x, y, (CRASH_SCREEN_NUM_CHARS_X - 4),
+            get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD), FALSE
+        );
+        //! TODO: this is temporary, since direct register reads from asm put the low bits in the high bits of the result.
+        if (is64Bit) {
+            y += TEXT_HEIGHT(1);
+            HiLo64 hiLoVal = {
+                .raw = val64,
+            };
+            cs_print_symbol_name(x, y, (CRASH_SCREEN_NUM_CHARS_X - 4),
+                get_map_symbol(hiLoVal.hi, SYMBOL_SEARCH_BACKWARD), FALSE
+            );
+        }
+#endif // INCLUDE_DEBUG_MAP
+    }
+}
 
 // Register popup box draw function.
 void cs_popup_register_draw(void) {
@@ -38,52 +98,44 @@ void cs_popup_register_draw(void) {
         cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_POPUP_OPACITY)
     );
 
-    enum Coprocessors cop = sInspectedRegister.cop;
-    int idx = sInspectedRegister.idx;
+    RegisterId regId = sInspectedRegister;
+
+    enum Coprocessors cop = regId.cop;
+    int idx = regId.idx;
 
     const RegisterInfo* regInfo = get_reg_info(cop, idx);
-    uint64_t threadValue = get_reg_val(cop, idx);
-    uint64_t systemValue = get_direct_reg_val(cop, idx);
+    if (regInfo == NULL) {
+        return;
+    }
     _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
 
     u32 line = 1;
-    const RGBA32 dataColor = COLOR_RGBA32_VERY_LIGHT_GRAY;
     const RGBA32 descColor = COLOR_RGBA32_CRASH_PAGE_NAME;
     // "[register] REGISTER".
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register:", COLOR_RGBA32_CRASH_PAGE_NAME);
     cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"$%s (%d bits)", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name, (is64Bit ? 64 : 32));
+    const char* regDesc = get_reg_desc(cop, idx);
+    if (regDesc != NULL) {
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
+    }
+    const char* copName = get_coprocessor_name(cop);
+    if (copName != NULL) {
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
+    }
     line++;
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"thread value:", descColor);
-    if (is64Bit) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), (STR_COLOR_PREFIX STR_HEX_LONG), dataColor, threadValue);
-    } else {
-        cs_print(TEXT_X(2), TEXT_Y(line++), (STR_COLOR_PREFIX STR_HEX_WORD), dataColor, (uint32_t)threadValue);
-    }
-#ifdef INCLUDE_DEBUG_MAP
-    cs_print_addr_location_info(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), (uintptr_t)threadValue, FALSE);
-    // cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4),
-    //     get_map_symbol((uint32_t)threadValue, SYMBOL_SEARCH_BACKWARD)
-    // );
-#endif // INCLUDE_DEBUG_MAP
-    
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"system value:", descColor);
-    if (is64Bit) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), (STR_COLOR_PREFIX STR_HEX_LONG), dataColor, systemValue);
-    } else {
-        cs_print(TEXT_X(2), TEXT_Y(line++), (STR_COLOR_PREFIX STR_HEX_WORD), dataColor, (uint32_t)systemValue);
-    }
-#ifdef INCLUDE_DEBUG_MAP
-    cs_print_addr_location_info(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), (uintptr_t)systemValue, FALSE);
-    // cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4),
-    //     get_map_symbol((uint32_t)systemValue, SYMBOL_SEARCH_BACKWARD)
-    // );
-#endif // INCLUDE_DEBUG_MAP
-    
 
-    //! TODO: PC and FPCSR
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"thread value:", descColor);
+    uint64_t threadValue = get_reg_val(cop, idx);
+    cs_popup_register_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, threadValue);
+    line += 3;
+
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"system value:", descColor);
+    uint64_t systemValue = get_direct_reg_val(cop, idx);
+    cs_popup_register_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, systemValue);
+
+    //! TODO: lo, hi, rcp, fpcsr
     //! TODO: Float registers
-    //! TODO: Specific register bits/flags
-    //! TODO: Print symbol name if address
+    //! TODO: Specific register bits/flags (cp0 and fpcsr)
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 

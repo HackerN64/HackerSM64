@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#include "reg_bits.h"
+
 
 #define STR_REG_PREFIX "$"
 
@@ -33,144 +35,96 @@ enum CPURegisters {
     CPU_NUM_REGISTERS,
 };
 
-enum COP0Registers {
-    REG_COP0_INX       = C0_INX,         // Programmable pointer into TLB array.
-    REG_COP0_RAND      = C0_RAND,        // Pseudorandom pointer into TLB array (read only).
-    REG_COP0_ENTRYLO0  = C0_ENTRYLO0,    // Low half of TLB entry for even virtual addresses (VPN).
-    REG_COP0_ENTRYLO1  = C0_ENTRYLO1,    // Low half of TLB entry for odd virtual addresses (VPN).
-    REG_COP0_CONTEXT   = C0_CONTEXT,     // Pointer to kernel virtual page table entry (PTE) in 32-bit mode.
-    REG_COP0_PAGEMASK  = C0_PAGEMASK,    // Page size specification.
-    REG_COP0_WIRED     = C0_WIRED,       // Number of wired TLB entries.
-    REG_COP0_7         = 7,              // Reserved for future use.
-    REG_COP0_BADVADDR  = C0_BADVADDR,    // Display of virtual address that occurred an error last.
-    REG_COP0_COUNT     = C0_COUNT,       // Timer Count.
-    REG_COP0_ENTRYHI   = C0_ENTRYHI,     // High half of TLB entry (including ASID).
-    REG_COP0_COMPARE   = C0_COMPARE,     // Timer Compare Value.
-    REG_COP0_SR        = C0_SR,          // Operation status setting.
-    REG_COP0_CAUSE     = C0_CAUSE,       // Display of cause of last exception.
-    REG_COP0_EPC       = C0_EPC,         // Exception Program Counter.
-    REG_COP0_PRID      = C0_PRID,        // Processor Revision Identifier.
-    REG_COP0_CONFIG    = C0_CONFIG,      // Memory system mode setting.
-    REG_COP0_LLADDR    = C0_LLADDR,      // Load Linked instruction address display.
-    REG_COP0_WATCHLO   = C0_WATCHLO,     // Memory reference trap address low bits.
-    REG_COP0_WATCHHI   = C0_WATCHHI,     // Memory reference trap address high bits.
-    REG_COP0_XCONTEXT  = 20,             // Pointer to Kernel virtual PTE table in 64-bit mode.
-    REG_COP0_21        = 21,             // Reserved for future use.
-    REG_COP0_22        = 22,             // Reserved for future use.
-    REG_COP0_23        = 23,             // Reserved for future use.
-    REG_COP0_24        = 24,             // Reserved for future use.
-    REG_COP0_25        = 25,             // Reserved for future use.
-    REG_COP0_ECC       = C0_ECC,         // Cache parity bits.
-    REG_COP0_CACHE_ERR = C0_CACHE_ERR,   // Cache Error and Status register.
-    REG_COP0_TAGLO     = C0_TAGLO,       // Cache Tag register low.
-    REG_COP0_TAGHI     = C0_TAGHI,       // Cache Tag register high.
-    REG_COP0_ERROR_EPC = C0_ERROR_EPC,   // Error Exception Program Counter.
-    REG_COP0_31        = 31,             // Reserved for future use.
-    COP0_NUM_REGISTERS,
+enum RegDesc {
+    REG_DESC_ZERO,
+    REG_DESC_AT,
+    REG_DESC_SUBRET,
+    REG_DESC_SUBARG,
+    REG_DESC_TEMP,
+    REG_DESC_SAVED,
+    REG_DESC_KERNEL,
+    REG_DESC_GP,
+    REG_DESC_SP,
+    REG_DESC_FP,
+    REG_DESC_RA,
 };
 
+enum COP0Registers {
+    REG_CP0_INX       = C0_INX,         // Programmable pointer into TLB array.
+    REG_CP0_RAND      = C0_RAND,        // Pseudorandom pointer into TLB array (read only).
+    REG_CP0_ENTRYLO0  = C0_ENTRYLO0,    // Low half of TLB entry for even virtual addresses (VPN).
+    REG_CP0_ENTRYLO1  = C0_ENTRYLO1,    // Low half of TLB entry for odd virtual addresses (VPN).
+    REG_CP0_CONTEXT   = C0_CONTEXT,     // Pointer to kernel virtual page table entry (PTE) in 32-bit mode.
+    REG_CP0_PAGEMASK  = C0_PAGEMASK,    // Page size specification.
+    REG_CP0_WIRED     = C0_WIRED,       // Number of wired TLB entries.
+    REG_CP0_7         = 7,              // Reserved for future use.
+    REG_CP0_BADVADDR  = C0_BADVADDR,    // Display of virtual address that occurred an error last.
+    REG_CP0_COUNT     = C0_COUNT,       // Timer Count.
+    REG_CP0_ENTRYHI   = C0_ENTRYHI,     // High half of TLB entry (including ASID).
+    REG_CP0_COMPARE   = C0_COMPARE,     // Timer Compare Value.
+    REG_CP0_SR        = C0_SR,          // Operation status setting.
+    REG_CP0_CAUSE     = C0_CAUSE,       // Display of cause of last exception.
+    REG_CP0_EPC       = C0_EPC,         // Exception Program Counter.
+    REG_CP0_PRID      = C0_PRID,        // Processor Revision Identifier.
+    REG_CP0_CONFIG    = C0_CONFIG,      // Memory system mode setting.
+    REG_CP0_LLADDR    = C0_LLADDR,      // Load Linked instruction address display.
+    REG_CP0_WATCHLO   = C0_WATCHLO,     // Memory reference trap address low bits.
+    REG_CP0_WATCHHI   = C0_WATCHHI,     // Memory reference trap address high bits.
+    REG_CP0_XCONTEXT  = 20,             // Pointer to Kernel virtual PTE table in 64-bit mode.
+    REG_CP0_21        = 21,             // Reserved for future use.
+    REG_CP0_22        = 22,             // Reserved for future use.
+    REG_CP0_23        = 23,             // Reserved for future use.
+    REG_CP0_24        = 24,             // Reserved for future use.
+    REG_CP0_25        = 25,             // Reserved for future use.
+    REG_CP0_ECC       = C0_ECC,         // Cache parity bits.
+    REG_CP0_CACHE_ERR = C0_CACHE_ERR,   // Cache Error and Status register.
+    REG_CP0_TAGLO     = C0_TAGLO,       // Cache Tag register low.
+    REG_CP0_TAGHI     = C0_TAGHI,       // Cache Tag register high.
+    REG_CP0_ERROR_EPC = C0_ERROR_EPC,   // Error Exception Program Counter.
+    REG_CP0_31        = 31,             // Reserved for future use.
+    CP0_NUM_REGISTERS,
+};
 
-// $Status register.
-typedef union Reg_Status {
-    struct PACKED {
-        u32 ie  : 1; //  0   : Global interrupt enable         - Should interrupts be handled?
-        u32 exl : 1; //  1   : Exception level                 - Are we currently handling an exception?
-        u32 erl : 1; //  2   : Error level                     - Are we currently handling an error?
-        u32 ksu : 2; //  3- 4: Execution mode                  - (00 = kernel, 01 = supervisor, 10 = user)
-        u32 ux  : 1; //  5   : 64 bit addressing enabled in user mode.
-        u32 sx  : 1; //  6   : 64 bit addressing enabled in supervisor mode.
-        u32 kx  : 1; //  7   : 64 bit addressing enabled in kernel mode.
-        u32 im  : 8; //  8-15: Interrupt mask                  - &’d against interrupt pending in $Cause
-        u32 ds  : 9; // 16-24: Diagnostic status               - TODO: description
-        u32 re  : 1; // 25   : Reverse endianness              - (0 = big endian, 1 = little endian)
-        u32 fr  : 1; // 26   : Enables additional fp registers - (0 = 16 regs, 1 = 32 regs)
-        u32 rp  : 1; // 27   : Enable low power mode           - Run the CPU at 1/4th clock speed)
-        u32 cu0 : 1; // 28   : Coprocessor 0 enabled           - This bit is ignored by the N64, COP0 is always enabled!
-        u32 cu1 : 1; // 29   : Coprocessor 1 enabled           - If this bit is 0, all COP1 instructions throw exceptions
-        u32 cu2 : 1; // 30   : Coprocessor 2 enabled           - This bit is ignored by the N64, there is no COP2!
-        u32 cu3 : 1; // 31   : Coprocessor 3 enabled           - This bit is ignored by the N64, there is no COP3!
-    };
-    u32 raw;
-} Reg_Status;
-
-// $Cause register.
-typedef union Reg_Cause {
-    struct PACKED {
-        u32             :  2; //  0- 1: Unused            - Always zero.
-        u32 exception   :  4; //  2- 6: Exception code    - Which exception/interrupt occurred?
-        u32             :  1; //  7   : Unused            - Always zero.
-        u32 interrupt   :  8; //  8-15: Interrupt Pending - Which interrupts are waiting to be serviced? Used with Interrupt Mask on $Status.
-        u32             : 12; // 16-27: Unused            - Always zero.
-        u32 coprocessor :  2; // 28-29: Coprocessor error - Which coprocessor threw the exception, often not used.
-        u32             :  1; // 30   : Unused            - Always zero.
-        u32 delay       :  1; // 31   : Branch delay      - Did the exception/interrupt occur in a branch delay slot?
-    };
-    u32 raw;
-} Reg_Cause;
-
-// tc->cause register.
-typedef union Reg_CauseT {
-    struct PACKED {
-        u32 delaySlot :  1; // Exception triggered in delay slot.
-        u32 cop_num   :  2; // Coprocessor_exception.
-        u32           : 24;
-        u32 exc_code  :  5; // Exception Code.
-    };
-    u32 raw;
-} Reg_CauseT;
-
-// tc->fpcsr register.
-typedef union Reg_FPCSR {
-    struct PACKED {
-        u32                   :  7;
-        u32 flushDenormToZero :  1; // Flush denorm to zero.
-        u32 cond              :  1; // Condition bit.
-        u32                   :  5;
-        u32 cause_bits        :  6; // See Reg_FPCSR.cause.
-        u32 enable_bits       :  5; // See Reg_FPCSR.enable.
-        u32 flag_bits         :  5; // See Reg_FPCSR.flag.
-        u32 rounding_mode     :  2; // Round to: (1:zero, 2:+inf, 3:-inf).
-    };
-    struct PACKED {
-        u32               : 14;
-        u32 unimplemented :  1; // cause: unimplemented operation
-        u32 invalid       :  1; // cause: invalid operation
-        u32 div0          :  1; // cause: division by zero
-        u32 overflow      :  1; // cause: overflow
-        u32 underflow     :  1; // cause: underflow
-        u32 inexact       :  1; // cause: inexact operation
-        u32               : 12;
-    } cause;
-    struct PACKED {
-        u32               : 20;
-        u32 invalid       :  1; // enable: invalid operation
-        u32 div0          :  1; // enable: division by zero
-        u32 overflow      :  1; // enable: overflow
-        u32 underflow     :  1; // enable: underflow
-        u32 inexact       :  1; // enable: inexact operation
-        u32               :  7;
-    } enable;
-    struct PACKED {
-        u32               : 25;
-        u32 invalid       :  1; // flag: invalid operation
-        u32 div0          :  1; // flag: division by zero
-        u32 overflow      :  1; // flag: overflow
-        u32 underflow     :  1; // flag: underflow
-        u32 inexact       :  1; // flag: inexact operation
-        u32               :  2;
-    } flag;
-    u32 raw;
-} Reg_FPCSR;
+enum RegDesc_CP0 {
+    REG_DESC_CP0_INX,
+    REG_DESC_CP0_RAND,
+    REG_DESC_CP0_ENTRYLO0,
+    REG_DESC_CP0_ENTRYLO1,
+    REG_DESC_CP0_CONTEXT,
+    REG_DESC_CP0_PAGEMASK,
+    REG_DESC_CP0_WIRED,
+    REG_DESC_CP0_BADVADDR,
+    REG_DESC_CP0_COUNT,
+    REG_DESC_CP0_ENTRYHI,
+    REG_DESC_CP0_COMPARE,
+    REG_DESC_CP0_SR,
+    REG_DESC_CP0_CAUSE,
+    REG_DESC_CP0_EPC,
+    REG_DESC_CP0_PRID,
+    REG_DESC_CP0_CONFIG,
+    REG_DESC_CP0_LLADDR,
+    REG_DESC_CP0_WATCHLO,
+    REG_DESC_CP0_WATCHHI,
+    REG_DESC_CP0_XCONTEXT,
+    REG_DESC_CP0_ECC,
+    REG_DESC_CP0_CACHE_ERR,
+    REG_DESC_CP0_TAGLO,
+    REG_DESC_CP0_TAGHI,
+    REG_DESC_CP0_ERROR_EPC,
+    REG_DESC_CP0_RESERVED,
+};
 
 
 enum COP1Registers {
-    REG_COP1_F00, REG_COP1_F01, REG_COP1_F02, REG_COP1_F03,                                                                                                                 // Subroutine return value.
-    REG_COP1_F04, REG_COP1_F05, REG_COP1_F06, REG_COP1_F07, REG_COP1_F08, REG_COP1_F09, REG_COP1_F10,  REG_COP1_F11,                                                        // Temporary values.
-    REG_COP1_F12, REG_COP1_F13, REG_COP1_F14, REG_COP1_F15,                                                                                                                 // Subroutine arguments.
-    REG_COP1_F16, REG_COP1_F17, REG_COP1_F18, REG_COP1_F19,                                                                                                                 // Temporary values.
-    REG_COP1_F20, REG_COP1_F21, REG_COP1_F22, REG_COP1_F23, REG_COP1_F24, REG_COP1_F25, REG_COP1_F26, REG_COP1_F27, REG_COP1_F28, REG_COP1_F29, REG_COP1_F30, REG_COP1_F31, // Saved Values.
-    COP1_NUM_REGISTERS,
+    REG_CP1_F00, REG_CP1_F01, REG_CP1_F02, REG_CP1_F03,                                                                                                                 // Subroutine return value.
+    REG_CP1_F04, REG_CP1_F05, REG_CP1_F06, REG_CP1_F07, REG_CP1_F08, REG_CP1_F09, REG_CP1_F10,  REG_CP1_F11,                                                        // Temporary values.
+    REG_CP1_F12, REG_CP1_F13, REG_CP1_F14, REG_CP1_F15,                                                                                                                 // Subroutine arguments.
+    REG_CP1_F16, REG_CP1_F17, REG_CP1_F18, REG_CP1_F19,                                                                                                                 // Temporary values.
+    REG_CP1_F20, REG_CP1_F21, REG_CP1_F22, REG_CP1_F23, REG_CP1_F24, REG_CP1_F25, REG_CP1_F26, REG_CP1_F27, REG_CP1_F28, REG_CP1_F29, REG_CP1_F30, REG_CP1_F31, // Saved Values.
+    CP1_NUM_REGISTERS,
 };
+
+
 
 enum FloatErrorType {
     FLT_ERR_NONE,
@@ -183,9 +137,10 @@ enum FloatErrorType {
 typedef struct RegisterInfo {
     /*0x00*/ const u16 offset;
     /*0x02*/ const u8 size;
-    /*0x03*/ const char shortName[3];
-    /*0x06*/ const char name[10];
-} RegisterInfo; /*0x10*/
+    /*0x03*/ const u8 descId;
+    /*0x04*/ const char* name;
+    /*0x08*/ const char shortName[4];
+} RegisterInfo; /*0x0C*/
 
 typedef union RegisterId {
     struct {
@@ -200,31 +155,36 @@ typedef union RegisterId {
 
 #define OSTHREAD_NULL_OFFSET (u16)-1
 
-#define DEF_SREG(_size, _name, _shortName) {    \
-    .offset    = OSTHREAD_NULL_OFFSET,          \
-    .size      = _size,                         \
-    .name      = _name,                         \
-    .shortName = _shortName,                    \
+#define DEF_SREG(_size, _name, _shortName, _descId) {   \
+    .offset    = OSTHREAD_NULL_OFFSET,                  \
+    .size      = _size,                                 \
+    .name      = _name,                                 \
+    .shortName = _shortName,                            \
+    .descId    = _descId,                               \
 }
 
-#define DEF_TREG(_field, _size, _name, _shortName) {            \
+#define DEF_TREG(_field, _size, _name, _shortName, _descId) {   \
     .offset    = __builtin_offsetof(__OSThreadContext, _field), \
     .size      = sizeof_member(__OSThreadContext, _field),      \
     .name      = _name,                                         \
     .shortName = _shortName,                                    \
+    .descId    = _descId,                                       \
 }
 
-#define DEF_CPU_SREG(_reg, _name) DEF_SREG(      sizeof(u64), _name, _name)
-#define DEF_CPU_TREG(_reg, _name) DEF_TREG(_reg, sizeof(u64), _name, _name)
+#define DEF_CPU_SREG(_reg, _name, _descId) DEF_SREG(      sizeof(u64), _name, _name, _descId)
+#define DEF_CPU_TREG(_reg, _name, _descId) DEF_TREG(_reg, sizeof(u64), _name, _name, _descId)
 
-#define DEF_COP0_SREG(_reg, _size,         _name, _shortName) DEF_SREG(        _size, _name, _shortName)
-#define DEF_COP0_TREG(_reg, _size, _field, _name, _shortName) DEF_TREG(_field, _size, _name, _shortName)
+#define DEF_COP0_SREG(_reg, _type,         _name, _shortName, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _descId)
+#define DEF_COP0_TREG(_reg, _type, _field, _name, _shortName, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _descId)
 
-#define DEF_COP1_SREG(_reg, _name)      DEF_SREG(                   sizeof(f32), "F"_name, _name)
-#define DEF_COP1_TREG_EVEN(_reg, _name) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name)
-#define DEF_COP1_TREG_ODD(_reg, _name)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name)
+#define DEF_COP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, _descId)
+#define DEF_COP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, _descId)
+#define DEF_COP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, _descId)
 
 #define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX TO_STRING2(_reg)); break;
+
+
+extern OSThread* __osRunningThread;
 
 
 #define REG_BUFFER_SIZE 3
@@ -233,10 +193,21 @@ extern int gSavedRegBufSize;
 
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);
+uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread);
 uint64_t get_direct_reg_val(enum Coprocessors cop, int idx);
 uint64_t get_reg_val(enum Coprocessors cop, int idx);
+const char* get_reg_desc(enum Coprocessors cop, int idx);
 
 void clear_saved_reg_buffer(void);
 void append_reg_to_buffer(enum Coprocessors cop, int idx, _Bool isFlt, _Bool isOutput);
 
-enum FloatErrorType validate_float(IEEE754_f32 val);
+enum FloatErrorType validate_f32(IEEE754_f32 val);
+enum FloatErrorType validate_f64(IEEE754_f64 val);
+
+ALWAYS_INLINE static f32 f32_from_word(u32 x) {
+    return ((IEEE754_f32){ .asU32 = x, }).asF32;
+}
+
+ALWAYS_INLINE static f64 f64_from_doubleword(u64 x) {
+    return ((IEEE754_f64){ .asU64 = x, }).asF64;
+}

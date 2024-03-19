@@ -76,6 +76,8 @@ const char* get_thread_name(OSThread* thread);
 const char* get_thread_state_str(OSThread* thread);
 const char* get_thread_flags_str(OSThread* thread);
 
+const char* get_coprocessor_name(enum Coprocessors cop);
+
 const char* get_cause_desc(__OSThreadContext* tc);
 const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial);
 const char* get_emulator_name(enum Emulator emu);

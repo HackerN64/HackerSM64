@@ -121,7 +121,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
         }
 
         // "[name from map data]"
-        cs_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol);
+        cs_print_symbol_name(TEXT_X(addrStrSize), y, (CRASH_SCREEN_NUM_CHARS_X - (addrStrSize + typeStrSize + sizeStrSize)), symbol, TRUE);
 
         currIndex++;
         symbol++;

@@ -55,17 +55,17 @@ const enum ControlTypes cs_cont_list_registers[] = {
 }
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
 static const RegisterId sRegList[32 + 1] = {
-    LIST_REG(COP0, REG_COP0_EPC), LIST_REG(COP0, REG_COP0_SR), LIST_REG(COP0, REG_COP0_BADVADDR),
-    LIST_REG(CPU,  REG_CPU_AT  ), LIST_REG(CPU,  REG_CPU_V0 ), LIST_REG(CPU,  REG_CPU_V1       ),
-    LIST_REG(CPU,  REG_CPU_A0  ), LIST_REG(CPU,  REG_CPU_A1 ), LIST_REG(CPU,  REG_CPU_A2       ),
-    LIST_REG(CPU,  REG_CPU_A3  ), LIST_REG(CPU,  REG_CPU_T0 ), LIST_REG(CPU,  REG_CPU_T1       ),
-    LIST_REG(CPU,  REG_CPU_T2  ), LIST_REG(CPU,  REG_CPU_T3 ), LIST_REG(CPU,  REG_CPU_T4       ),
-    LIST_REG(CPU,  REG_CPU_T5  ), LIST_REG(CPU,  REG_CPU_T6 ), LIST_REG(CPU,  REG_CPU_T7       ),
-    LIST_REG(CPU,  REG_CPU_S0  ), LIST_REG(CPU,  REG_CPU_S1 ), LIST_REG(CPU,  REG_CPU_S2       ),
-    LIST_REG(CPU,  REG_CPU_S3  ), LIST_REG(CPU,  REG_CPU_S4 ), LIST_REG(CPU,  REG_CPU_S5       ),
-    LIST_REG(CPU,  REG_CPU_S6  ), LIST_REG(CPU,  REG_CPU_S7 ), LIST_REG(CPU,  REG_CPU_T8       ),
-    LIST_REG(CPU,  REG_CPU_T9  ), LIST_REG(CPU,  REG_CPU_GP ), LIST_REG(CPU,  REG_CPU_SP       ),
-    LIST_REG(CPU,  REG_CPU_FP  ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG_END(),
+    LIST_REG(COP0, REG_CP0_EPC), LIST_REG(COP0, REG_CP0_SR ), LIST_REG(COP0, REG_CP0_BADVADDR),
+    LIST_REG(CPU,  REG_CPU_AT ), LIST_REG(CPU,  REG_CPU_V0 ), LIST_REG(CPU,  REG_CPU_V1      ),
+    LIST_REG(CPU,  REG_CPU_A0 ), LIST_REG(CPU,  REG_CPU_A1 ), LIST_REG(CPU,  REG_CPU_A2      ),
+    LIST_REG(CPU,  REG_CPU_A3 ), LIST_REG(CPU,  REG_CPU_T0 ), LIST_REG(CPU,  REG_CPU_T1      ),
+    LIST_REG(CPU,  REG_CPU_T2 ), LIST_REG(CPU,  REG_CPU_T3 ), LIST_REG(CPU,  REG_CPU_T4      ),
+    LIST_REG(CPU,  REG_CPU_T5 ), LIST_REG(CPU,  REG_CPU_T6 ), LIST_REG(CPU,  REG_CPU_T7      ),
+    LIST_REG(CPU,  REG_CPU_S0 ), LIST_REG(CPU,  REG_CPU_S1 ), LIST_REG(CPU,  REG_CPU_S2      ),
+    LIST_REG(CPU,  REG_CPU_S3 ), LIST_REG(CPU,  REG_CPU_S4 ), LIST_REG(CPU,  REG_CPU_S5      ),
+    LIST_REG(CPU,  REG_CPU_S6 ), LIST_REG(CPU,  REG_CPU_S7 ), LIST_REG(CPU,  REG_CPU_T8      ),
+    LIST_REG(CPU,  REG_CPU_T9 ), LIST_REG(CPU,  REG_CPU_GP ), LIST_REG(CPU,  REG_CPU_SP      ),
+    LIST_REG(CPU,  REG_CPU_FP ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG_END(),
 };
 
 // Reg list:
@@ -75,7 +75,7 @@ static const RegisterId sRegList[32 + 1] = {
 // FP list:
 #define FP_REG_SIZE     (sizeof(__OSfp) / sizeof(uintptr_t))
 #define FP_LIST_COLUMNS 3
-#define FP_LIST_ROWS    DIV_CEIL((COP1_NUM_REGISTERS / FP_REG_SIZE), FP_LIST_COLUMNS)
+#define FP_LIST_ROWS    DIV_CEIL((CP1_NUM_REGISTERS / FP_REG_SIZE), FP_LIST_COLUMNS)
 
 
 enum RegisterPageSections {
@@ -155,7 +155,7 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 
     if (symbol != NULL) {
         // "[symbol name]"
-        cs_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol);
+        cs_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol, FALSE);
     } else {
         // "[XXXXXXXX]"
         cs_print((x + TEXT_WIDTH(charX + STRLEN(" "))), y,
@@ -242,7 +242,7 @@ void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
         .asU32 = (u32)get_reg_val(COP1, regNum),
     };
 
-    cs_print_f32(x, y, val, FALSE);
+    cs_print_f32(x, y, val, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), FALSE);
 }
 
 void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
@@ -269,7 +269,7 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
                 );
             }
 
-            if (regNum < COP1_NUM_REGISTERS) {
+            if (regNum < CP1_NUM_REGISTERS) {
                 cs_registers_print_float_reg(TEXT_X(charX), TEXT_Y(charY), regNum);
 
                 osfp++;
@@ -319,6 +319,10 @@ void page_registers_input(void) {
             // Go to bottom of previous section.
             sel->section--;
             sel->selY = sRegPageSelectBounds[sel->section].rows - 1;
+        } else {
+            // Wrap vertically.
+            sel->section = (NUM_REG_PAGE_SECTIONS - 1);
+            sel->selY = sRegPageSelectBounds[sel->section].rows - 1;
         }
     }
     if (down) {
@@ -327,6 +331,10 @@ void page_registers_input(void) {
         } else if (sel->section < (NUM_REG_PAGE_SECTIONS - 1)) {
             // Go to top of next section;
             sel->section++;
+            sel->selY = 0;
+        } else {
+            // Wrap vertically.
+            sel->section = 0;
             sel->selY = 0;
         }
     }
@@ -358,7 +366,7 @@ void page_registers_input(void) {
                 break;
             case PAGE_REG_SECTION_REG:
                 idx = cs_page_reg_get_select_idx(sel, bounds->cols);
-                if (idx < ARRAY_COUNT(sRegList)) {
+                if (idx < (ARRAY_COUNT(sRegList) - 1)) {
                     cs_open_inspect_register(sRegList[idx]);
                 }
                 break;
@@ -366,9 +374,15 @@ void page_registers_input(void) {
                 //! TODO:
                 break;
             case PAGE_REG_SECTION_FP:
-                idx = cs_page_reg_get_select_idx(sel, bounds->cols);
-                if (idx < (COP1_NUM_REGISTERS / FP_REG_SIZE)) {
-                    //! TODO: Open FP register inspection
+                idx = (cs_page_reg_get_select_idx(sel, bounds->cols) * FP_REG_SIZE);
+                if (idx < (CP1_NUM_REGISTERS - 1)) {
+                    RegisterId regId = {
+                        .cop = COP1,
+                        .idx = idx,
+                        .flt = TRUE,
+                        .out = FALSE,
+                    };
+                    cs_open_inspect_register(regId);
                 }
                 break;
         }
@@ -417,13 +431,13 @@ void page_registers_print(void) {
 
     // Float registers:
     const u32 f_columns = 2;
-    const u32 f_rows = DIV_CEIL((COP1_NUM_REGISTERS / FP_REG_SIZE), columns);
+    const u32 f_rows = DIV_CEIL((CP1_NUM_REGISTERS / FP_REG_SIZE), columns);
     __OSfp* osfp = &tc->fp0;
     u32 regNum = 0;
     for (u32 i = 0; i < f_rows; i++) {
         osSyncPrintf("- ");
         for (u32 j = 0; j < f_columns; j++) {
-            if (regNum >= COP1_NUM_REGISTERS) {
+            if (regNum >= CP1_NUM_REGISTERS) {
                 break;
             }
 
