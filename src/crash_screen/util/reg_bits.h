@@ -77,7 +77,7 @@ typedef union Reg_CP0_Status {
         u32 KX   : 1; // Enables 64-bit addressing in Kernel mode. When this bit is set, XTLB miss exception is generated on TLB misses in Kernel mode addresses space (64-bit operation is always valid in Kernel mode). [0:32-bit, 1:64-bit]
         u32 SX   : 1; // Enables 64-bit addressing and operations in Supervisor mode. When this bit is set, XTLB miss exception is generated on TLB misses in Supervisor mode addresses space. [0:32-bit, 1:64-bit]
         u32 UX   : 1; // Enables 64-bit addressing and operations in User mode. When this bit is set, XTLB miss exception is generated on TLB misses in User mode addresses space. [0:32-bit, 1:64-bit]
-        u32 KSU  : 1; // Specifies and indicates execution mode bits [10:User, 01:Supervisor, 00:Kernel]
+        u32 KSU  : 2; // Specifies and indicates execution mode bits [10:User, 01:Supervisor, 00:Kernel]
         u32 ERL  : 1; // Specifies and indicates error level (are we currently handling an error?). [0:normal, 1:error]
         u32 EXL  : 1; // Specifies and indicates exception level (are we currently handling an exception?). [0:normal, 1:exception]
         u32 IE   : 1; // Specifies and indicates global interrupt enable (should interrupts be handled?). [0:disable interrupts, 1:enable interrupts]
@@ -103,11 +103,11 @@ typedef union Reg_CP0_Status {
         u32          :  8;
     } IM_;
     struct PACKED {
-        u32 : 28;
-        u32 CU_3 : 1; // Coprocessor 3 enabled This bit is ignored by the N64, there is no COP3!
-        u32 CU_2 : 1; // Coprocessor 2 enabled This bit is ignored by the N64, there is no COP2!
-        u32 CU_1 : 1; // Coprocessor 1 enabled If this bit is 0, all COP1 instructions throw exceptions.
-        u32 CU_0 : 1; // Coprocessor 0 enabled This bit is ignored by the N64, COP0 is always enabled!
+        u32 CP3 :  1; // Coprocessor 3 enabled This bit is ignored by the N64, there is no COP3!
+        u32 CP2 :  1; // Coprocessor 2 enabled This bit is ignored by the N64, there is no COP2!
+        u32 CP1 :  1; // Coprocessor 1 enabled If this bit is 0, all COP1 instructions throw exceptions.
+        u32 CP0 :  1; // Coprocessor 0 enabled This bit is ignored by the N64, COP0 is always enabled!
+        u32     : 28;
     } CU_;
     u32 raw;
 } Reg_CP0_Status;
@@ -224,45 +224,63 @@ typedef union Reg_CP0_TagLo {
 
 // -- COP1 --
 
-// $FPCSR
-typedef union Reg_FPCSR {
+// FCR0: Coprocessor implementation/revision register
+// FCR1 to FCR30: Reserved
+// FCR31: Rounding mode, cause, exception enables, and flags
+
+// $FCR0
+typedef union Reg_FCR_0 {
     struct PACKED {
-        u32                   :  7;
-        u32 flushDenormToZero :  1; // Flush denorm to zero.
-        u32 cond              :  1; // Condition bit.
-        u32                   :  5;
-        u32 cause_bits        :  6; // See Reg_FPCSR.cause.
-        u32 enable_bits       :  5; // See Reg_FPCSR.enable.
-        u32 flag_bits         :  5; // See Reg_FPCSR.flag.
-        u32 rounding_mode     :  2; // Round to: (1:zero, 2:+inf, 3:-inf).
+        u32     : 16; // RFU. Must be written as zeroes, and returns zeroes when read.
+        u32 Imp :  8; // Processor ID number (0x0B for the VR4300 seriesTM).
+        u32 Rev :  8; // Processor revision number.
     };
     struct PACKED {
-        u32               : 14;
-        u32 unimplemented :  1; // cause: unimplemented operation
-        u32 invalid       :  1; // cause: invalid operation
-        u32 div0          :  1; // cause: division by zero
-        u32 overflow      :  1; // cause: overflow
-        u32 underflow     :  1; // cause: underflow
-        u32 inexact       :  1; // cause: inexact operation
-        u32               : 12;
-    } cause;
-    struct PACKED {
-        u32               : 20;
-        u32 invalid       :  1; // enable: invalid operation
-        u32 div0          :  1; // enable: division by zero
-        u32 overflow      :  1; // enable: overflow
-        u32 underflow     :  1; // enable: underflow
-        u32 inexact       :  1; // enable: inexact operation
-        u32               :  7;
-    } enable;
-    struct PACKED {
-        u32               : 25;
-        u32 invalid       :  1; // flag: invalid operation
-        u32 div0          :  1; // flag: division by zero
-        u32 overflow      :  1; // flag: overflow
-        u32 underflow     :  1; // flag: underflow
-        u32 inexact       :  1; // flag: inexact operation
-        u32               :  2;
-    } flag;
+        u32       : 24;
+        u32 major :  5;
+        u32 minor :  3;
+    } Rev_;
     u32 raw;
-} Reg_FPCSR;
+} Reg_FCR_0;
+// $FCR31 (FPCSR)
+typedef union Reg_FPR_31 {
+    struct PACKED {
+        u32         :  7;
+        u32 FS      :  1; // Flush denorm to zero.
+        u32 C       :  1; // Condition bit.
+        u32         :  5;
+        u32 Cause   :  6; // See Reg_FPCSR.cause.
+        u32 Enables :  5; // See Reg_FPCSR.enable.
+        u32 Flags   :  5; // See Reg_FPCSR.flag.
+        u32 RM      :  2; // Round to: (1:zero, 2:+inf, 3:-inf).
+    };
+    struct PACKED {
+        u32   : 14;
+        u32 E :  1; // cause: unimplemented operation
+        u32 V :  1; // cause: invalid operation
+        u32 Z :  1; // cause: division by zero
+        u32 O :  1; // cause: overflow
+        u32 U :  1; // cause: underflow
+        u32 I :  1; // cause: inexact operation
+        u32   : 12;
+    } cause_;
+    struct PACKED {
+        u32   : 20;
+        u32 V :  1; // enable: invalid operation
+        u32 Z :  1; // enable: division by zero
+        u32 O :  1; // enable: overflow
+        u32 U :  1; // enable: underflow
+        u32 I :  1; // enable: inexact operation
+        u32   :  7;
+    } enable_;
+    struct PACKED {
+        u32   : 25;
+        u32 V :  1; // flag: invalid operation
+        u32 Z :  1; // flag: division by zero
+        u32 O :  1; // flag: overflow
+        u32 U :  1; // flag: underflow
+        u32 I :  1; // flag: inexact operation
+        u32   :  2;
+    } flag_;
+    u32 raw;
+} Reg_FPR_31;

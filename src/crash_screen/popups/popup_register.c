@@ -67,23 +67,66 @@ void cs_popup_register_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t v
         } else {
             cs_print(x, y, (STR_HEX_PREFIX STR_HEX_WORD), val32);
         }
-        y += TEXT_HEIGHT(1);
-#ifdef INCLUDE_DEBUG_MAP
-        cs_print_symbol_name(x, y, (CRASH_SCREEN_NUM_CHARS_X - 4),
-            get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD), FALSE
-        );
-        //! TODO: this is temporary, since direct register reads from asm put the low bits in the high bits of the result.
-        if (is64Bit) {
-            y += TEXT_HEIGHT(1);
-            HiLo64 hiLoVal = {
-                .raw = val64,
-            };
-            cs_print_symbol_name(x, y, (CRASH_SCREEN_NUM_CHARS_X - 4),
-                get_map_symbol(hiLoVal.hi, SYMBOL_SEARCH_BACKWARD), FALSE
-            );
-        }
-#endif // INCLUDE_DEBUG_MAP
     }
+}
+
+void cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
+    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
+    const Reg_CP0_Status s = {
+        .raw = (uint32_t)val,
+    };
+    cs_print(TEXT_X(2), TEXT_Y(line++), "cop1 useable:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.CU_.CP1); // The other coprocessor bits are ignored by the N64.
+#undef RP // PR/region.h moment
+    cs_print(TEXT_X(2), TEXT_Y(line++), "low power mode:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.RP);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "extra fpr:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.FR);
+    const char* endian[] = {
+        [0] = "big",
+        [1] = "little",
+    };
+    cs_print(TEXT_X(2), TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "diagnostic status:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
+    cs_print(TEXT_X(2), TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
+    const char* bit_mode[] = {
+        [0] = "32-bit",
+        [1] = "64-bit",
+    };
+    cs_print(TEXT_X(2), TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.KX]);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.SX]);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "user:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.UX]);
+    const char* exec_mode[] = {
+        [0b00] = "kernel",
+        [0b01] = "supervisor",
+        [0b10] = "user",
+    };
+    cs_print(TEXT_X(2), TEXT_Y(line++), "exec mode:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, exec_mode[s.KSU]);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "error:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.ERL);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "exception:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.EXL);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "global interrupts:\t"STR_COLOR_PREFIX"%d", infoColor, s.IE);
+}
+
+void cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
+    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
+    const Reg_FPR_31 f = {
+        .raw = (uint32_t)val,
+    };
+    cs_print(TEXT_X(2), TEXT_Y(line++), "flush denorms to zero:\t"STR_COLOR_PREFIX"%d", infoColor, f.FS);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "condition bit:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, f.C);
+    const char* round_mode[] = {
+        [0b00] = "nearest",
+        [0b01] = "zero",
+        [0b10] = "+inf",
+        [0b11] = "-inf",
+    };
+    cs_print(TEXT_X(2), TEXT_Y(line++), "rounding mode:\t\t\t"STR_COLOR_PREFIX"to %s", infoColor, round_mode[f.RM]);
+    line++;
+    cs_print(TEXT_X(2), TEXT_Y(line++), "exception bits:");
+    cs_print(TEXT_X(4), TEXT_Y(line++), "E:unimpl   | V:invalid   | Z:div0");
+    cs_print(TEXT_X(4), TEXT_Y(line++), "O:overflow | U:underflow | I:inexact");
+    line++;
+    cs_print(TEXT_X(12), TEXT_Y(line++), "       E V Z O U I");
+    cs_print(TEXT_X(12), TEXT_Y(line++), "cause: "STR_COLOR_PREFIX"%d %d %d %d %d %d", infoColor, f.cause_.E, f.cause_.V,  f.cause_.Z,  f.cause_.O,  f.cause_.U,  f.cause_.I );
+    cs_print(TEXT_X(12), TEXT_Y(line++), "enable:  "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.enable_.V, f.enable_.Z, f.enable_.O, f.enable_.U, f.enable_.I);
+    cs_print(TEXT_X(12), TEXT_Y(line++), "flags:   "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.flag_.V,   f.flag_.Z,   f.flag_.O,   f.flag_.U,   f.flag_.I  );
 }
 
 // Register popup box draw function.
@@ -113,29 +156,65 @@ void cs_popup_register_draw(void) {
     const RGBA32 descColor = COLOR_RGBA32_CRASH_PAGE_NAME;
     // "[register] REGISTER".
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register:", COLOR_RGBA32_CRASH_PAGE_NAME);
-    cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"$%s (%d bits)", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name, (is64Bit ? 64 : 32));
+    size_t charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"$%s", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
+    const char* copName = get_coprocessor_name(cop);
+    if (copName != NULL) {
+        cs_print(TEXT_X(2 + charX), TEXT_Y(line), STR_COLOR_PREFIX" in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
+    }
+    line++;
     const char* regDesc = get_reg_desc(cop, idx);
     if (regDesc != NULL) {
         cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
     }
-    const char* copName = get_coprocessor_name(cop);
-    if (copName != NULL) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
-    }
     line++;
 
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"thread value:", descColor);
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value on thread %d (%s):", descColor, (is64Bit ? 64 : 32),
+        gInspectThread->id, get_thread_name(gInspectThread)
+    );
     uint64_t threadValue = get_reg_val(cop, idx);
     cs_popup_register_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, threadValue);
-    line += 3;
+    line += 2;
 
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"system value:", descColor);
-    uint64_t systemValue = get_direct_reg_val(cop, idx);
-    cs_popup_register_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, systemValue);
+    _Bool extraInfo = FALSE;
 
-    //! TODO: lo, hi, rcp, fpcsr
-    //! TODO: Float registers
-    //! TODO: Specific register bits/flags (cp0 and fpcsr)
+    //! TODO: lo, hi, rcp, cause, etc.
+    switch (cop) {
+        case COP0:
+            switch (idx) {
+                case REG_CP0_SR:
+                    cs_print_reg_info_C0_SR(line, threadValue);
+                    extraInfo = TRUE;
+                    break;
+            }
+            break;
+        case FCR:
+            switch (idx) {
+                case FCR_CONTROL_STATUS:
+                    cs_print_reg_info_FPR_CSR(line, threadValue);
+                    extraInfo = TRUE;
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+
+    if (extraInfo) {
+        cs_print(TEXT_X(1), TEXT_Y(line - 1), STR_COLOR_PREFIX"decoded info:", COLOR_RGBA32_CRASH_PAGE_NAME);
+    } else {
+#ifdef INCLUDE_DEBUG_MAP
+        u32 val32 = (uint32_t)threadValue;
+        const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            cs_print(TEXT_X(1), TEXT_Y(line - 1), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
+            cs_print(TEXT_X(2), TEXT_Y(line),
+                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
+                COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
+            );
+        }
+#endif // INCLUDE_DEBUG_MAP
+    }
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 

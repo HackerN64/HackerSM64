@@ -213,6 +213,7 @@ static const char* sCOPNames[] = {
     [COP1 + 1] = "CP1 (FPU)",
     [COP2 + 1] = "CP2 (RCP vector unit)",
     [COP3 + 1] = "CP3",
+    [FCR  + 1] = "CP1 (FCR)"
 };
 const char* get_coprocessor_name(enum Coprocessors cop) {
     return sCOPNames[cop + 1];
@@ -317,7 +318,7 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
     [FLT_ERR_NAN   ] = "NaN float",
 };
 
-//! TODO: NaN floats aren't detected here even though validate_f32 does, and this works with denorms.
+//! TODO: NaN floats aren't detected here even though they are in validate_f32, and this still works with denorms.
 enum FloatErrorType validate_floats_in_reg_buffer(void) {
     enum FloatErrorType fltErrType = FLT_ERR_NONE;
 

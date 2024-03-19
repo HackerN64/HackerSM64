@@ -14,6 +14,9 @@
 #define ASM_SET_REG_COP1(dst, src) asm volatile("mtc1 "dst",%0"::"r"(src))
 #define ASM_GET_REG_COP1(dst, src) asm volatile("mfc1 %0,"src:"=r"(dst):)
 
+#define ASM_SET_REG_FCR(dst, src) asm volatile("ctc1 "dst",%0"::"r"(src))
+#define ASM_GET_REG_FCR(dst, src) asm volatile("cfc1 %0,"src:"=r"(dst):)
+
 
 uintptr_t _asm_getaddr(void);
 void _asm_setbits(uintptr_t bits);

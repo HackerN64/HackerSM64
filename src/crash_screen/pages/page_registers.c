@@ -376,8 +376,14 @@ void page_registers_input(void) {
                     cs_open_inspect_register(sRegList[idx]);
                 }
                 break;
-            case PAGE_REG_SECTION_FPCSR:
-                //! TODO:
+            case PAGE_REG_SECTION_FPCSR:;
+                RegisterId regId = {
+                    .cop = FCR,
+                    .idx = FCR_CONTROL_STATUS,
+                    .flt = FALSE,
+                    .out = FALSE,
+                };
+                cs_open_inspect_register(regId);
                 break;
             case PAGE_REG_SECTION_FP:
                 idx = (cs_page_reg_get_select_idx(sel, bounds->cols) * FP_REG_SIZE);

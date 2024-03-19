@@ -35,7 +35,7 @@ ALIGNED32 static const RegisterInfo sRegisters_CPU[CPU_NUM_REGISTERS] = {
 
 #define CASE_CPU_REG(_idx, _reg) CASE_REG(CPU, _idx, _reg)
 uint64_t get_cpu_reg_val(enum CPURegisters idx) {
-    uint64_t val = 0;
+    int val = 0;
     switch (idx) {
         CASE_CPU_REG(REG_CPU_R0, zero);
         //! TODO: Directly accessing $at requires ".set noat".
@@ -109,7 +109,7 @@ ALIGNED32 static const RegisterInfo sRegisters_COP0[CP0_NUM_REGISTERS] = {
 
 #define CASE_COP0_REG(_idx, _reg) CASE_REG(COP0, _idx, _reg)
 uint64_t get_cop0_reg_val(enum COP0Registers idx) {
-    uint64_t val = 0;
+    int val = 0;
     switch (idx) {
         CASE_COP0_REG(REG_CP0_INX,       C0_INX      );
         CASE_COP0_REG(REG_CP0_RAND,      C0_RAND     );
@@ -191,7 +191,7 @@ ALIGNED32 static const RegisterInfo sRegisters_COP1[CP1_NUM_REGISTERS] = {
 
 #define CASE_COP1_REG(_idx, _reg) CASE_REG(COP1, _idx, _reg)
 uint64_t get_cop1_reg_val(enum COP1Registers idx) {
-    uint64_t val = 0;
+    int val = 0;
     switch (idx) {
         CASE_COP1_REG(REG_CP1_F00, f0 ); CASE_COP1_REG(REG_CP1_F02, f2 );
         CASE_COP1_REG(REG_CP1_F04, f4 ); CASE_COP1_REG(REG_CP1_F06, f6 ); CASE_COP1_REG(REG_CP1_F08, f8 ); CASE_COP1_REG(REG_CP1_F10, f10);
@@ -199,6 +199,25 @@ uint64_t get_cop1_reg_val(enum COP1Registers idx) {
         CASE_COP1_REG(REG_CP1_F16, f16); CASE_COP1_REG(REG_CP1_F18, f18);
         CASE_COP1_REG(REG_CP1_F20, f20); CASE_COP1_REG(REG_CP1_F22, f22); CASE_COP1_REG(REG_CP1_F24, f24); CASE_COP1_REG(REG_CP1_F26, f26); CASE_COP1_REG(REG_CP1_F28, f28); CASE_COP1_REG(REG_CP1_F30, f30);
         default: break;
+    }
+    return val;
+}
+
+ALIGNED32 static const RegisterInfo sRegisters_FCR[2] = {
+    [REG_DESC_FCR_COP_IMPL_REV  ] = DEF_SREG(       sizeof(u32), "FCR0",  "FC", REG_DESC_FCR_COP_IMPL_REV  ),
+    [REG_DESC_FCR_CONTROL_STATUS] = DEF_TREG(fpcsr, sizeof(u32), "FPCSR", "FS", REG_DESC_FCR_CONTROL_STATUS),
+};
+const char* sRegDesc_FPR[] = {
+    [REG_DESC_FCR_COP_IMPL_REV  ] = "Coprocessor implementation/revision",
+    [REG_DESC_FCR_CONTROL_STATUS] = "Control/Status",
+};
+uint64_t get_fcr_reg_val(int idx) {
+    int val = 0;
+    switch (idx) {
+        case FCR_IMPL_REV:       ASM_GET_REG_FCR(val,  "$0"); break;
+        case FCR_CONTROL_STATUS: ASM_GET_REG_FCR(val, "$31"); break;
+        default: break;
+        
     }
     return val;
 }
@@ -218,8 +237,15 @@ RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 int gSavedRegBufSize = 0;
 
 
+const RegisterInfo* get_fcr_reg_info(int idx) {
+    if (idx == FCR_CONTROL_STATUS) {
+        idx = REG_DESC_FCR_CONTROL_STATUS;
+    }
+
+    return &sRegisters_FCR[idx];
+}
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx) {
-    return &sRegisters[cop + 1][idx];
+    return ((cop == FCR) ? get_fcr_reg_info(idx) : &sRegisters[cop + 1][idx]);
 }
 
 uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
@@ -252,6 +278,7 @@ uint64_t get_direct_reg_val(enum Coprocessors cop, int idx) {
         case CPU:  return get_cpu_reg_val(idx);  break;
         case COP0: return get_cop0_reg_val(idx); break;
         case COP1: return get_cop1_reg_val(idx); break;
+        case FCR:  return get_fcr_reg_val(idx);  break;
         default: return 0;
     }
 }
@@ -259,11 +286,7 @@ uint64_t get_direct_reg_val(enum Coprocessors cop, int idx) {
 uint64_t get_reg_val(enum Coprocessors cop, int idx) {
     const RegisterInfo* info = get_reg_info(cop, idx);
 
-    if (info == NULL) {
-        return 0;
-    }
-
-    if (info->offset != OSTHREAD_NULL_OFFSET) { // If register exists in __OSThreadContext, use the data from the crashed thread.
+    if ((info != NULL) && (info->offset != OSTHREAD_NULL_OFFSET)) { // If register exists in __OSThreadContext, use the data from the crashed thread.
         return get_thread_reg_val(cop, idx, gInspectThread);
     } else {
         return get_direct_reg_val(cop, idx);
@@ -279,7 +302,11 @@ const char* get_reg_desc(enum Coprocessors cop, int idx) {
         return 0;
     }
 
-    return ((cop == COP0) ? sRegDesc_CP0[info->descId] : sRegDesc[info->descId]);
+    switch (cop) {
+        case COP0: return sRegDesc_CP0[info->descId];
+        case FCR:  return sRegDesc_FPR[info->descId];
+        default:   return sRegDesc[info->descId];
+    }
 }
 
 void clear_saved_reg_buffer(void) {

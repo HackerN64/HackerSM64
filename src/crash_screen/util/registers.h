@@ -17,6 +17,7 @@ enum Coprocessors {
     COP1, // Coprocessor-1 (Floating-Point Unit).
     COP2, // Coprocessor-2 (Reality Co-Processor Vector Unit).
     COP3, // Coprocessor-3 (CP3).
+    FCR, // Coprocessor-1 Control/Status registers
 };
 
 enum CPURegisters {
@@ -114,7 +115,6 @@ enum RegDesc_CP0 {
     REG_DESC_CP0_RESERVED,
 };
 
-
 enum COP1Registers {
     REG_CP1_F00, REG_CP1_F01, REG_CP1_F02, REG_CP1_F03,                                                                                                                 // Subroutine return value.
     REG_CP1_F04, REG_CP1_F05, REG_CP1_F06, REG_CP1_F07, REG_CP1_F08, REG_CP1_F09, REG_CP1_F10,  REG_CP1_F11,                                                        // Temporary values.
@@ -124,6 +124,16 @@ enum COP1Registers {
     CP1_NUM_REGISTERS,
 };
 
+enum FCRRegisters {
+    FCR_IMPL_REV       =  0,
+    FCR_CONTROL_STATUS = 31,
+    FCR_NUM_REGISTERS,
+};
+
+enum RegDesc_FCR {
+    REG_DESC_FCR_COP_IMPL_REV,
+    REG_DESC_FCR_CONTROL_STATUS,
+};
 
 
 enum FloatErrorType {
