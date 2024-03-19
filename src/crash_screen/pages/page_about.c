@@ -85,7 +85,7 @@ f32 bytes_to_megabytes(size_t size) {
 
 ABOUT_ENTRY_FUNC(empty,          "")
 ABOUT_ENTRY_FUNC(hackersm64_v,   HackerSM64_version_txt)
-ABOUT_ENTRY_FUNC(crash_screen_v, crash_screen_version)
+ABOUT_ENTRY_FUNC(crash_screen_v, CrashScreen_version_txt)
 ABOUT_ENTRY_FUNC(compiler,       __compiler__)
 ABOUT_ENTRY_FUNC(linker,         __linker__)
 ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)

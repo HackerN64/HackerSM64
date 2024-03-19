@@ -48,7 +48,7 @@ enum FPCSRDescriptions {
 
 
 extern char HackerSM64_version_txt[];
-extern const char crash_screen_version[];
+extern char CrashScreen_version_txt[];
 
 extern const char* gRegionName;
 extern const char* osTvTypeStrings[];

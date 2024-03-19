@@ -20,7 +20,7 @@
 INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
 
 // Crash screen version. Includes a newline at the end.
-const char crash_screen_version[] = "v2.0\n"; //! TODO: Change this on release.
+INCBIN(char, CrashScreen_version_txt, "src/crash_screen/VERSION.txt", 4);
 
 
 // -- STRINGS --
