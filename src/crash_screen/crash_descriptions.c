@@ -243,50 +243,54 @@ static const char* sCauseDesc[NUM_CAUSE_DESC] = {
     [CAUSE_DESC_VCED   ] = "Virtual coherency on data",
 };
 // Returns a CAUSE description from 'sCauseDesc'.
-const char* get_cause_desc(__OSThreadContext* tc) {
+const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
     uint64_t badvaddr = tc->badvaddr;
     uint32_t epc = GET_EPC(tc);
     u32 cause = (tc->cause & CAUSE_EXCMASK);
 
-    switch (cause) {
-        // Heuristics from libdragon.
-        case EXC_RMISS:
-            if (epc == (u32)badvaddr) {
-                return "Invalid program counter address";
-            } else if (badvaddr < 128) {
-                // This is probably a NULL pointer dereference, though it can go through a structure or an array,
-                // so leave some margin to the actual faulting address.
-                return "NULL pointer dereference (read)";
-            } else {
-                return "Read from invalid memory address";
-            }
-            break;
-        case EXC_WMISS:
-            if (badvaddr < 128) {
-                return "NULL pointer dereference (write)";
-            } else {
-                return "Write to invalid memory address";
-            }
-        case EXC_MOD:
-            return "Write to read-only memory";
-        case EXC_RADE:
-            if (epc == (uint32_t)badvaddr) {
-                if (is_unmapped_kx64(badvaddr)) {
-                    return "Program counter in invalid 64-bit address";
+    if (specific) {
+        // Heuristics from libdragon:
+        switch (cause) {
+            case EXC_RMISS:
+                if (epc == (u32)badvaddr) {
+                    return "Invalid program counter address";
+                } else if (badvaddr < 128) {
+                    // This is probably a NULL pointer dereference, though it can go through a structure or an array,
+                    // so leave some margin to the actual faulting address.
+                    return "NULL pointer dereference (read)";
                 } else {
-                    return "Misaligned program counter address";
+                    return "Read from invalid memory address";
                 }
-            } else {
-                if (is_unmapped_kx64(badvaddr)) {
-                    return "Read from invalid 64-bit address";
+                break;
+            case EXC_WMISS:
+                if (badvaddr < 128) {
+                    return "NULL pointer dereference (write)";
                 } else {
-                    return "Misaligned read from memory";
+                    return "Write to invalid memory address";
                 }
-            }
-            break;
-        case EXC_WADE:
-            return "Misaligned write to memory";
+            case EXC_MOD:
+                return "Write to read-only memory";
+            case EXC_RADE:
+                if (epc == (uint32_t)badvaddr) {
+                    if (is_unmapped_kx64(badvaddr)) {
+                        return "Program counter in invalid 64-bit address";
+                    } else {
+                        return "Misaligned program counter address";
+                    }
+                } else {
+                    if (is_unmapped_kx64(badvaddr)) {
+                        return "Read from invalid 64-bit address";
+                    } else {
+                        return "Misaligned read from memory";
+                    }
+                }
+                break;
+            case EXC_WADE:
+                return "Misaligned write to memory";
+        }
+    }
 
+    switch (cause) {
         // Make the last two "cause" case indexes sequential for array access.
         case EXC_WATCH: cause = EXC_CODE(CAUSE_DESC_WATCH); break; // 23 -> 16
         case EXC_VCED:  cause = EXC_CODE(CAUSE_DESC_VCED ); break; // 31 -> 17
@@ -341,13 +345,13 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
 }
 
 // Returns a FPCSR description from 'sFpcsrDesc'.
-// Only use 'checkSpecial' if disasm has just been run.
-const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial) {
+// Only use 'specific' if disasm has just been run, because it checks saved registers with validate_floats_in_reg_buffer().
+const char* get_fpcsr_desc(u32 fpcsr, _Bool specific) {
     u32 bit = BIT(FPCSR_SHIFT);
 
     for (u32 i = 0; i < NUM_FPCSR_DESC; i++) {
         if (fpcsr & bit) {
-            if (checkSpecial && (i == FPCSR_DESC_CE)) {
+            if (specific && (i == FPCSR_DESC_CE)) {
                 enum FloatErrorType fltErrType = validate_floats_in_reg_buffer();
 
                 if (fltErrType != FLT_ERR_NONE) {

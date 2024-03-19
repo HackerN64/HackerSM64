@@ -159,6 +159,7 @@ struct CSPopup gCSPopup_address_select = {
     .drawFunc  = cs_address_select_draw,
     .inputFunc = cs_address_select_input,
     .flags = {
-        .allowPage = FALSE,
+        .allowPageInput  = FALSE,
+        .allowChangePage = FALSE,
     },
 };

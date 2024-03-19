@@ -125,8 +125,8 @@ enum COP1Registers {
 };
 
 enum FCRRegisters {
-    FCR_IMPL_REV       =  0,
-    FCR_CONTROL_STATUS = 31,
+    REG_FCR_IMPL_REV       =  0,
+    REG_FCR_CONTROL_STATUS = 31,
     FCR_NUM_REGISTERS,
 };
 

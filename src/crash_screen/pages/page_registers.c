@@ -54,7 +54,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
     .out = FALSE,               \
 }
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
-static const RegisterId sRegList[32 + 1] = {
+static const RegisterId sRegList[] = {
     LIST_REG(COP0, REG_CP0_EPC), LIST_REG(COP0, REG_CP0_SR ), LIST_REG(COP0, REG_CP0_BADVADDR),
     LIST_REG(CPU,  REG_CPU_AT ), LIST_REG(CPU,  REG_CPU_V0 ), LIST_REG(CPU,  REG_CPU_V1      ),
     LIST_REG(CPU,  REG_CPU_A0 ), LIST_REG(CPU,  REG_CPU_A1 ), LIST_REG(CPU,  REG_CPU_A2      ),
@@ -65,7 +65,8 @@ static const RegisterId sRegList[32 + 1] = {
     LIST_REG(CPU,  REG_CPU_S3 ), LIST_REG(CPU,  REG_CPU_S4 ), LIST_REG(CPU,  REG_CPU_S5      ),
     LIST_REG(CPU,  REG_CPU_S6 ), LIST_REG(CPU,  REG_CPU_S7 ), LIST_REG(CPU,  REG_CPU_T8      ),
     LIST_REG(CPU,  REG_CPU_T9 ), LIST_REG(CPU,  REG_CPU_GP ), LIST_REG(CPU,  REG_CPU_SP      ),
-    LIST_REG(CPU,  REG_CPU_FP ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG_END(),
+    LIST_REG(CPU,  REG_CPU_FP ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG(COP0, REG_CP0_CAUSE   ),
+    LIST_REG_END(),
 };
 
 // Reg list:
@@ -288,7 +289,7 @@ void page_registers_draw(void) {
     );
     cs_registers_print_thread(TEXT_X(0), TEXT_Y(line++));
     
-    cs_print(TEXT_X(0), TEXT_Y(line), "s:%d x:%d y:%d", sSelectedThreadRegister.section, sSelectedThreadRegister.selX, sSelectedThreadRegister.selY);
+    // cs_print(TEXT_X(0), TEXT_Y(line), "s:%d x:%d y:%d", sSelectedThreadRegister.section, sSelectedThreadRegister.selX, sSelectedThreadRegister.selY);
     line++;
 
     line = cs_registers_print_registers(line);
@@ -379,7 +380,7 @@ void page_registers_input(void) {
             case PAGE_REG_SECTION_FPCSR:;
                 RegisterId regId = {
                     .cop = FCR,
-                    .idx = FCR_CONTROL_STATUS,
+                    .idx = REG_FCR_CONTROL_STATUS,
                     .flt = FALSE,
                     .out = FALSE,
                 };

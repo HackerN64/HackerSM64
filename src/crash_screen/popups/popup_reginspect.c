@@ -17,7 +17,7 @@
 #include "popup_reginspect.h"
 
 
-RegisterId sInspectedRegister = {
+RegisterId gInspectedRegister = {
     // Default to R0.
     .cop = CPU,
     .idx = REG_CPU_R0,
@@ -27,50 +27,48 @@ RegisterId sInspectedRegister = {
 
 void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
     const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
-    _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
-    uint32_t val32 = (uint32_t)val64;
-    enum FloatErrorType fltErrType = FLT_ERR_NONE;
+    const _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
+    const uint32_t val32 = (uint32_t)val64;
 
-    //! TODO: simplify this:
-    if (regId.flt) {
-        if (is64Bit) {
-            IEEE754_f64 flt64 = {
-                .asU64 = val64,
-            };
-            fltErrType = validate_f64(flt64);
-            if (fltErrType != FLT_ERR_NONE) {
-            } else {
-                cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_LONG), val64);
-                y += TEXT_HEIGHT(1);
-                cs_print(x, y, "% g", flt64.asF64);
-                y += TEXT_HEIGHT(1);
-                cs_print(x, y, "% e", flt64.asF64);
-            }
-        } else {
-            IEEE754_f32 flt32 = {
-                .asU32 = val32,
-            };
-            fltErrType = validate_f32(flt32);
-            if (fltErrType != FLT_ERR_NONE) {
-
-            } else {
-                cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_WORD), val32);
-                y += TEXT_HEIGHT(1);
-                cs_print(x, y, "% g", flt32.asF32);
-                y += TEXT_HEIGHT(1);
-                cs_print(x, y, "% e", flt32.asF32);
-            }
-        }
+    // Print as hex:
+    if (is64Bit) {
+        cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_LONG), val64);
     } else {
-        if (is64Bit) {
-            cs_print(x, y, (STR_HEX_PREFIX STR_HEX_LONG), val64);
+        cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_WORD), val32);
+    }
+
+    // Print as other floatint point formats:
+    if (regId.flt) {
+        y += TEXT_HEIGHT(1);
+        const IEEE754_f64 flt64 = { .asU64 = val64, };
+        const IEEE754_f32 flt32 = { .asU32 = val32, };
+        enum FloatErrorType fltErrType = (is64Bit ? validate_f64(flt64) : validate_f32(flt32));
+        if (fltErrType != FLT_ERR_NONE) {
+            cs_print(x, y, ((fltErrType == FLT_ERR_DENORM) ? "denormalized" : "NaN"));
         } else {
-            cs_print(x, y, (STR_HEX_PREFIX STR_HEX_WORD), val32);
+            cs_print(x, y, "% g", (is64Bit ? flt64.asF64 : flt32.asF32));
+            y += TEXT_HEIGHT(1);
+            cs_print(x, y, "% e", (is64Bit ? flt64.asF64 : flt32.asF32));
         }
     }
 }
 
-void cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
+_Bool cs_print_reg_info_CPU_V(u32 line, UNUSED uint64_t val) {
+    u32 v1 = get_reg_val(CPU, REG_CPU_V1);
+    if (v1 > 1) {
+        u32 v0 = get_reg_val(CPU, REG_CPU_V0);
+        HiLo64 combinedV = {
+            .hi = v0,
+            .lo = v1,
+        };
+        cs_print(TEXT_X(2), TEXT_Y(line), (" "STR_HEX_PREFIX STR_HEX_LONG), combinedV.raw);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+_Bool cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_CP0_Status s = {
         .raw = (uint32_t)val,
@@ -84,7 +82,7 @@ void cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
         [1] = "little",
     };
     cs_print(TEXT_X(2), TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "diagnostic status:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
+    cs_print(TEXT_X(2), TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
     cs_print(TEXT_X(2), TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
     const char* bit_mode[] = {
         [0] = "32-bit",
@@ -102,9 +100,31 @@ void cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
     cs_print(TEXT_X(2), TEXT_Y(line++), "error:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.ERL);
     cs_print(TEXT_X(2), TEXT_Y(line++), "exception:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.EXL);
     cs_print(TEXT_X(2), TEXT_Y(line++), "global interrupts:\t"STR_COLOR_PREFIX"%d", infoColor, s.IE);
+
+    return TRUE;
 }
 
-void cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
+_Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
+    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
+    const Reg_CP0_Cause c = {
+        .raw = (uint32_t)val,
+    };
+
+    cs_print(TEXT_X(2), TEXT_Y(line++), "in branch delay:\t\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "interrupts pending:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, c.IP);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "exc code:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, c.Exc_Code);
+    if (c.Exc_Code == (EXC_CPU >> CAUSE_EXCSHIFT)) {
+        cs_print(TEXT_X(2), TEXT_Y(line++), "unusable coprocessor:\t"STR_COLOR_PREFIX"cop%d", infoColor, c.CE);
+    }
+    const char* causeDesc = get_cause_desc(&gInspectThread->context, FALSE);
+    if (causeDesc != NULL) {
+        cs_print(TEXT_X(4), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", infoColor, causeDesc);
+    }
+
+    return TRUE;
+}
+
+_Bool cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_FPR_31 f = {
         .raw = (uint32_t)val,
@@ -127,7 +147,24 @@ void cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
     cs_print(TEXT_X(12), TEXT_Y(line++), "cause: "STR_COLOR_PREFIX"%d %d %d %d %d %d", infoColor, f.cause_.E, f.cause_.V,  f.cause_.Z,  f.cause_.O,  f.cause_.U,  f.cause_.I );
     cs_print(TEXT_X(12), TEXT_Y(line++), "enable:  "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.enable_.V, f.enable_.Z, f.enable_.O, f.enable_.U, f.enable_.I);
     cs_print(TEXT_X(12), TEXT_Y(line++), "flags:   "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.flag_.V,   f.flag_.Z,   f.flag_.O,   f.flag_.U,   f.flag_.I  );
+
+    return TRUE;
 }
+
+typedef struct RegInspectExtraInfo {
+    /*0x00*/ const enum Coprocessors cop;
+    /*0x04*/ const int idx;
+    /*0x08*/ _Bool (*func)(u32 line, uint64_t val);
+    /*0x0C*/ const char* title;
+} RegInspectExtraInfo; /*0x10*/
+
+const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
+    { .cop = CPU,  .idx = REG_CPU_V0,             .func = cs_print_reg_info_CPU_V,    .title = "64-bit combined value of $v0 and $v1", },
+    { .cop = CPU,  .idx = REG_CPU_V1,             .func = cs_print_reg_info_CPU_V,    .title = "64-bit combined value of $v0 and $v1", },
+    { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    .title = "decoded info", },
+    { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, .title = "decoded info", },
+    { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  .title = "decoded info", },
+};
 
 // Register popup box draw function.
 void cs_popup_reginspect_draw(void) {
@@ -141,7 +178,7 @@ void cs_popup_reginspect_draw(void) {
         cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_POPUP_OPACITY)
     );
 
-    RegisterId regId = sInspectedRegister;
+    RegisterId regId = gInspectedRegister;
 
     enum Coprocessors cop = regId.cop;
     int idx = regId.idx;
@@ -156,7 +193,7 @@ void cs_popup_reginspect_draw(void) {
     const RGBA32 descColor = COLOR_RGBA32_CRASH_PAGE_NAME;
     // "[register] REGISTER".
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register:", COLOR_RGBA32_CRASH_PAGE_NAME);
-    size_t charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"$%s", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
+    size_t charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     const char* copName = get_coprocessor_name(cop);
     if (copName != NULL) {
         cs_print(TEXT_X(2 + charX), TEXT_Y(line), STR_COLOR_PREFIX" in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
@@ -164,7 +201,7 @@ void cs_popup_reginspect_draw(void) {
     line++;
     const char* regDesc = get_reg_desc(cop, idx);
     if (regDesc != NULL) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
     }
     line++;
 
@@ -175,32 +212,18 @@ void cs_popup_reginspect_draw(void) {
     cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line), regId, threadValue);
     line += 2;
 
-    _Bool extraInfo = FALSE;
-
-    //! TODO: lo, hi, rcp, cause, etc.
-    switch (cop) {
-        case COP0:
-            switch (idx) {
-                case REG_CP0_SR:
-                    cs_print_reg_info_C0_SR(line, threadValue);
-                    extraInfo = TRUE;
-                    break;
-            }
+    _Bool hasExInfo = FALSE;
+    const RegInspectExtraInfo* exInfo = &sRegInspectExtraInfoFuncs[0];
+    for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
+        if (exInfo->cop == cop && exInfo->idx == idx) {
+            hasExInfo = exInfo->func(line, threadValue);
             break;
-        case FCR:
-            switch (idx) {
-                case FCR_CONTROL_STATUS:
-                    cs_print_reg_info_FPR_CSR(line, threadValue);
-                    extraInfo = TRUE;
-                    break;
-            }
-            break;
-        default:
-            break;
+        }
+        exInfo++;
     }
 
-    if (extraInfo) {
-        cs_print(TEXT_X(1), TEXT_Y(line - 1), STR_COLOR_PREFIX"decoded info:", COLOR_RGBA32_CRASH_PAGE_NAME);
+    if (hasExInfo) {
+        cs_print(TEXT_X(1), TEXT_Y(line - 1), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, exInfo->title);
     } else {
 #ifdef INCLUDE_DEBUG_MAP
         u32 val32 = (uint32_t)threadValue;
@@ -234,7 +257,7 @@ void cs_popup_reginspect_input(void) {
 // Open the register inspect popup box.
 void cs_open_reginspect(RegisterId regId) {
     cs_open_popup(CS_POPUP_REGINSPECT);
-    sInspectedRegister = regId;
+    gInspectedRegister = regId;
 }
 
 struct CSPopup gCSPopup_reginspect = {
@@ -243,6 +266,7 @@ struct CSPopup gCSPopup_reginspect = {
     .drawFunc  = cs_popup_reginspect_draw,
     .inputFunc = cs_popup_reginspect_input,
     .flags = {
-        .allowPage = FALSE,
+        .allowPageInput  = FALSE,
+        .allowChangePage = FALSE,
     },
 };

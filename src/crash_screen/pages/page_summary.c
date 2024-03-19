@@ -94,7 +94,7 @@ void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
 #endif // INCLUDE_DEBUG_MAP
 
 void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
-    const char* desc = get_cause_desc(tc);
+    const char* desc = get_cause_desc(tc, TRUE);
     if (desc != NULL) {
         // "CAUSE: ([exception cause description])"
         cs_print(x, y,
@@ -312,7 +312,7 @@ void page_summary_print(void) {
  #endif // INCLUDE_DEBUG_MAP
 
     // CAUSE:
-    const char* desc = get_cause_desc(tc);
+    const char* desc = get_cause_desc(tc, TRUE);
     if (desc != NULL) {
         osSyncPrintf("- CAUSE: %s\n", desc);
     }

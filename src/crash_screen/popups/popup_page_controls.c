@@ -66,6 +66,7 @@ struct CSPopup gCSPopup_controls = {
     .drawFunc  = cs_popup_controls_draw,
     .inputFunc = cs_popup_controls_input,
     .flags = {
-        .allowPage = TRUE,
+        .allowPageInput  = FALSE,
+        .allowChangePage = TRUE,
     },
 };

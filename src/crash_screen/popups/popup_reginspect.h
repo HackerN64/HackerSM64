@@ -5,6 +5,11 @@
 #include "types.h"
 
 
+
+extern RegisterId gInspectedRegister;
+
+
 extern struct CSPopup gCSPopup_reginspect;
+
 
 void cs_open_reginspect(RegisterId regId);

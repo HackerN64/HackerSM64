@@ -465,7 +465,6 @@ static const FloatErrorPrintFormat sFltErrFmt[] = {
     [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
 };
 
-//! TODO: Version of this but for f64.
 size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
     const enum FloatErrorType fltErrType = validate_f32(val);
     size_t numChars = 0;
@@ -482,21 +481,29 @@ size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberForma
             numChars += cs_print(x, y, (STR_COLOR_PREFIX"%c"STR_HEX_WORD), color, p->prefixChar, val.asU32);
         }
     } else {
-        const char* buf = NULL;
+        const char* fmt = NULL;
         _Bool asHex = FALSE;
 
         switch (format) {
-            case PRINT_NUM_FMT_HEX: buf = " "STR_HEX_WORD; asHex = TRUE; break; // "[XXXXXXXX]"
+            //! TODO: Hex version prints incorrectly here.
+            case PRINT_NUM_FMT_HEX: fmt = " "STR_HEX_WORD; asHex = TRUE; break; // "[XXXXXXXX]"
             default:
-            case PRINT_NUM_FMT_DEC: buf = "% g";   break; // "[±][exponent]"
-            case PRINT_NUM_FMT_SCI: buf = "% .3e"; break; // "[scientific notation]"
+            case PRINT_NUM_FMT_DEC: fmt = "% g";   break; // "[±][exponent]"
+            case PRINT_NUM_FMT_SCI: fmt = "% .3e"; break; // "[scientific notation]"
         }
 
-        numChars += cs_print(x, y, buf, (asHex ? val.asU32 : val.asF32));
+        numChars += cs_print(x, y, fmt, (asHex ? val.asU32 : val.asF32));
     }
 
     return numChars;
 }
+
+// size_t cs_print_f64(u32 x, u32 y, IEEE754_f64 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
+//     const enum FloatErrorType fltErrType = validate_f64(val);
+//     size_t numChars = 0;
+
+//     return numChars;
+// }
 
 int sprintf_int_with_commas(char* buf, int n) {
     char* p = buf;

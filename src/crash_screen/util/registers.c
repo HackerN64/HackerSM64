@@ -214,8 +214,8 @@ const char* sRegDesc_FPR[] = {
 uint64_t get_fcr_reg_val(int idx) {
     int val = 0;
     switch (idx) {
-        case FCR_IMPL_REV:       ASM_GET_REG_FCR(val,  "$0"); break;
-        case FCR_CONTROL_STATUS: ASM_GET_REG_FCR(val, "$31"); break;
+        case REG_FCR_IMPL_REV:       ASM_GET_REG_FCR(val,  "$0"); break;
+        case REG_FCR_CONTROL_STATUS: ASM_GET_REG_FCR(val, "$31"); break;
         default: break;
         
     }
@@ -238,7 +238,7 @@ int gSavedRegBufSize = 0;
 
 
 const RegisterInfo* get_fcr_reg_info(int idx) {
-    if (idx == FCR_CONTROL_STATUS) {
+    if (idx == REG_FCR_CONTROL_STATUS) {
         idx = REG_DESC_FCR_CONTROL_STATUS;
     }
 

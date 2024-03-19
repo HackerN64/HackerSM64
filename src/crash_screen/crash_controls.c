@@ -163,7 +163,7 @@ u32 cs_clamp_view_to_selection(u32 scrollIndex, u32 selectIndex, const u32 numRo
 // Whether L/R can be used to switch the page.
 _Bool can_switch_page(void) {
     CSPopup* popup = cs_get_current_popup();
-    return ((popup == NULL) || popup->flags.allowPage);
+    return ((popup == NULL) || popup->flags.allowChangePage);
 }
 
 // Check for a page switch input (L or R).
@@ -281,7 +281,7 @@ void cs_update_input(void) {
         }
     }
 
-    if (popup != NULL) {
+    if (popup != NULL && !popup->flags.allowPageInput) {
         return;
     }
 
