@@ -96,5 +96,7 @@ extern _Bool gCSSwitchedPopup;
 
 void cs_set_page(enum CSPages page);
 CSPage* cs_get_current_page(void);
+void cs_reinitialize_pages(void);
+
 void cs_open_popup(enum CSPopups popupID);
 CSPopup* cs_get_current_popup(void);

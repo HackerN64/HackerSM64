@@ -225,7 +225,7 @@ void page_threads_draw(void) {
     }
 
     line = 1;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "found threads: %d", sThreadsTotalFoundThreads);
+    cs_print(TEXT_X(0), TEXT_Y(line++), "total threads found: %d", sThreadsTotalFoundThreads);
     cs_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();
@@ -236,7 +236,6 @@ void page_threads_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         if (sThreadsSelectedThreadPtr != NULL) {
             gInspectThread = sThreadsSelectedThreadPtr;
-            extern void cs_reinitialize_pages(void);
             cs_reinitialize_pages();
         }
     }

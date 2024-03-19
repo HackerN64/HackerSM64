@@ -67,9 +67,18 @@ void cs_set_page(enum CSPages pageID) {
  *
  * @return CSPage* A pointer to the current page's info.
  */
- CSPage* cs_get_current_page(void) {
+CSPage* cs_get_current_page(void) {
     return gCSPages[gCSPageID];
- }
+}
+
+/**
+ * @brief Reinitialize all of the crash screen's pages.
+ */
+void cs_reinitialize_pages(void) {
+    for (int pageID = 0; pageID < ARRAY_COUNT(gCSPages); pageID++) {
+        gCSPages[pageID]->flags.initialized = FALSE;
+    }
+}
 
 
 // -- Popups --
