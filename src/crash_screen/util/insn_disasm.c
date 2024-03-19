@@ -325,32 +325,32 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
         case OPC_SPECIAL:
             switch (insn.func) {
                 case OPS_ADD:
-                    if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == 0))) return TRUE;
-                    if (check_pseudo_insn(type, PSEUDO_MOVET, (insn.rs == 0))) return TRUE;
+                    if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == REG_CPU_R0))) return TRUE;
+                    if (check_pseudo_insn(type, PSEUDO_MOVET, (insn.rs == REG_CPU_R0))) return TRUE;
                     break;
                 case OPS_OR:
-                    if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == 0))) return TRUE;
+                    if (check_pseudo_insn(type, PSEUDO_MOVES, (insn.rt == REG_CPU_R0))) return TRUE;
             }
             break;
         case OPC_BEQ:
             if (check_pseudo_insn(type, PSEUDO_B,     (insn.rs == insn.rt))) return TRUE;
-            if (check_pseudo_insn(type, PSEUDO_BEQZ,  (insn.rt == 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BEQZ,  (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_BNE:
-            if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_ADDI:
-            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == REG_CPU_R0))) return TRUE;
             if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) return TRUE;
             break;
         case OPC_ADDIU:
-            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == REG_CPU_R0))) return TRUE;
             break;
         case OPC_BEQL:
-            if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_BNEL:
-            if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_DADDI:
             if (check_pseudo_insn(type, PSEUDO_DSUBI, ((s16)insn.immediate < 0))) return TRUE;

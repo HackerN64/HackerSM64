@@ -47,21 +47,6 @@ enum FPCSRDescriptions {
 };
 
 
-typedef struct ThreadName {
-    /*0x00*/ union {
-                /*0x00*/ OSId id;
-                /*0x00*/ OSPri pri;
-            };
-    /*0x04*/ const char* name;
-} ThreadName; /*0x08*/
-
-
-typedef struct EmulatorName {
-    /*0x00*/ const enum Emulator bits;
-    /*0x04*/ const char* name;
-} EmulatorName; /*0x08*/
-
-
 extern char HackerSM64_version_txt[];
 extern const char crash_screen_version[];
 
@@ -76,6 +61,7 @@ const char* get_thread_name(OSThread* thread);
 const char* get_thread_state_str(OSThread* thread);
 const char* get_thread_flags_str(OSThread* thread);
 
+const char* get_processor_name(u8 imp);
 const char* get_coprocessor_name(enum Coprocessors cop);
 
 const char* get_cause_desc(__OSThreadContext* tc);

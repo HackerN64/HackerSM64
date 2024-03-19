@@ -103,6 +103,13 @@ DEF_COMPRESSION_NAME(unk);
 
 // -- THREAD --
 
+typedef struct ThreadName {
+    /*0x00*/ union {
+                /*0x00*/ OSId id;
+                /*0x00*/ OSPri pri;
+            };
+    /*0x04*/ const char* name;
+} ThreadName; /*0x08*/
 static const ThreadName sThreadIDNames[] = {
     { .id = THREAD_0_MANAGER,           .name = "unknown libultra", }, // Uses sThreadPriNames.
     { .id = THREAD_1_IDLE,              .name = "idle",             },
@@ -130,7 +137,7 @@ static const ThreadName sThreadPriNames[] = {
 static const char* get_thread_name_from_list(int id, const ThreadName* list, size_t listSize) {
     const ThreadName* threadName = &list[0];
     for (size_t i = 0; i < listSize; i++) {
-        if (threadName->id == id) {
+        if (id == threadName->id) {
             return threadName->name;
         }
         threadName++;
@@ -175,6 +182,26 @@ const char* get_thread_flags_str(OSThread* thread) {
     u16 flags = thread->flags;
     if (flags == 0x0000) return NULL;
     return sThreadFlagStrings[__builtin_ctz(flags)];
+}
+
+
+// -- PROCESSOR --
+
+typedef struct PRId_name {
+    /*0x00*/ const u8 Imp;
+    /*0x01*/ const char name[7];
+} PRId_name; /*0x08*/
+const PRId_name sPRId_names[] = {
+    { .Imp = 0x0B, .name = "vr4300", },
+};
+const char* get_processor_name(u8 imp) {
+    for (int i = 0; i < ARRAY_COUNT(sPRId_names); i++) {
+        if (imp == sPRId_names[i].Imp) {
+            return sPRId_names[i].name;
+        }
+    }
+
+    return "unknown";
 }
 
 
@@ -338,6 +365,10 @@ const char* get_fpcsr_desc(u32 fpcsr, _Bool checkSpecial) {
 
 // -- EMULATOR --
 
+typedef struct EmulatorName {
+    /*0x00*/ const enum Emulator bits;
+    /*0x04*/ const char* name;
+} EmulatorName; /*0x08*/
 #define EMULATOR_STRING(_bits, _name)  { .bits = _bits, .name = _name, }
 static const EmulatorName sEmulatorStrings[] = {
     { .bits = EMU_WIIVC,            .name = "Wii VC",           },

@@ -149,6 +149,11 @@ typedef union Reg_CP0_PRId {
         u32 Imp :  8; // Processor ID number (0x0B for the VR4300 seriesTM).
         u32 Rev :  8; // Processor revision number.
     };
+    struct PACKED {
+        u32       : 24;
+        u32 major :  5;
+        u32 minor :  3;
+    } Rev_;
     u32 raw;
 } Reg_CP0_PRId;
 // $Config

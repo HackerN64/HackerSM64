@@ -173,15 +173,22 @@ void _cs_about_func_debug_mode(char* buf) {
         p += sprintf(p, " +unf");
     }
 }
-#ifdef LIBPL
 void _cs_about_func_emulator(char* buf) {
     char* p = buf;
     p += sprintf(p, "%s", get_emulator_name(gEmulator));
-    if (gSupportsLibpl) {
+    if (gEmulator & EMU_CONSOLE) {
+        u32 val = 0x00000000;
+        ASM_GET_REG_COP0(val, "$15"); // TODO: use get_reg_val
+        Reg_CP0_PRId prid = {
+            .raw = val,
+        };
+        p += sprintf(p, " (%s rev%d.%d)", get_processor_name(prid.Imp), prid.Rev_.major, prid.Rev_.minor);
+    } else if (gSupportsLibpl) {
         const lpl_version* v = libpl_get_core_version();
         p += sprintf(p, " "STR_LPL_VERSION, v->major, v->minor, v->patch);
     }
 }
+#ifdef LIBPL
 ABOUT_ENTRY_FUNC(gfx_plugin,     libpl_get_graphics_plugin()->name);
 void _cs_about_func_launcher(char* buf) {
     const lpl_version* v = libpl_get_launcher_version();
@@ -207,9 +214,7 @@ void _cs_about_func_cheat_flags(char* buf) {
     }
 }
 ABOUT_ENTRY_FUNC(rhdc,           "%s", libpl_get_my_rhdc_username());
-#else // !LIBPL
-ABOUT_ENTRY_FUNC(emulator,       "%s", get_emulator_name(gEmulator))
-#endif // !LIBPL
+#endif // LIBPL
 
 
 // Extra long string buffer for long entries to save space in sAboutEntries.
