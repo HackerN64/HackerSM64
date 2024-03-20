@@ -114,6 +114,13 @@ void cs_address_select_input(void) {
             case CS_PAGE_THREADS:
                 cs_set_page(CS_PAGE_MEMORY);
                 break;
+            case CS_PAGE_REGISTERS:
+                if (is_in_code_segment(sAddressSelectTarget)) {
+                    cs_set_page(CS_PAGE_DISASM);
+                } else {
+                    cs_set_page(CS_PAGE_MEMORY);
+                }
+                break;
 #ifdef INCLUDE_DEBUG_MAP
             case CS_PAGE_DISASM:
                 if (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget)) {

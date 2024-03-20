@@ -14,6 +14,8 @@
 #include "crash_screen/crash_print.h"
 #include "crash_screen/crash_settings.h"
 
+#include "popup_address_select.h"
+
 #include "popup_reginspect.h"
 
 
@@ -24,6 +26,13 @@ RegisterId gInspectedRegister = {
     .flt = FALSE,
     .out = FALSE,
 };
+
+Address sInspectedRegisterPtrAddr = 0x00000000;
+
+
+void cs_popup_reginspect_init(void) {
+    sInspectedRegisterPtrAddr = 0x00000000;
+}
 
 void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
     const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
@@ -192,7 +201,9 @@ void cs_popup_reginspect_draw(void) {
     u32 line = 1;
     const RGBA32 descColor = COLOR_RGBA32_CRASH_PAGE_NAME;
     // "[register] REGISTER".
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register:", COLOR_RGBA32_CRASH_PAGE_NAME);
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
+        gInspectThread->id, get_thread_name(gInspectThread)
+    );
     size_t charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     const char* copName = get_coprocessor_name(cop);
     if (copName != NULL) {
@@ -205,9 +216,7 @@ void cs_popup_reginspect_draw(void) {
     }
     line++;
 
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value on thread %d (%s):", descColor, (is64Bit ? 64 : 32),
-        gInspectThread->id, get_thread_name(gInspectThread)
-    );
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", descColor, (is64Bit ? 64 : 32));
     uint64_t value = get_reg_val(cop, idx);
     cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line++), regId, value);
 
@@ -240,6 +249,7 @@ void cs_popup_reginspect_draw(void) {
 #endif // INCLUDE_DEBUG_MAP
         u32 data = 0;
         if (try_read_word_aligned(&data, val32)) {
+            sInspectedRegisterPtrAddr = val32;
             cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
             if (is_in_code_segment(val32)) {
                 print_as_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
@@ -247,6 +257,8 @@ void cs_popup_reginspect_draw(void) {
                 cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
                 print_as_binary(TEXT_X(2), TEXT_Y(line++), data, COLOR_RGBA32_WHITE);
             }
+        } else {
+            sInspectedRegisterPtrAddr = 0x00000000;
         }
     }
 
@@ -259,7 +271,12 @@ void cs_popup_reginspect_input(void) {
     //! TODO: If register is address, goto address select. (return to this if cancelled).
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
-    if (buttonPressed & (A_BUTTON | B_BUTTON | START_BUTTON)) {
+    if (buttonPressed & A_BUTTON) {
+        if (sInspectedRegisterPtrAddr != 0x00000000) {
+            open_address_select(sInspectedRegisterPtrAddr);
+        }
+    }
+    if (buttonPressed & (B_BUTTON | START_BUTTON)) {
         // Close the popup without jumping.
         cs_open_popup(CS_POPUP_NONE);
     }
@@ -273,7 +290,7 @@ void cs_open_reginspect(RegisterId regId) {
 
 struct CSPopup gCSPopup_reginspect = {
     .name      = "REGISTER",
-    .initFunc  = NULL,
+    .initFunc  = cs_popup_reginspect_init,
     .drawFunc  = cs_popup_reginspect_draw,
     .inputFunc = cs_popup_reginspect_input,
     .flags = {
