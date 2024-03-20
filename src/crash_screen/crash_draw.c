@@ -64,12 +64,28 @@ static RGBA16* get_rendering_fb_pixel(u32 x, u32 y) {
     return (FB_PTR_AS(RGBA16) + (SCREEN_WIDTH * y) + x);
 }
 
+/**
+ * A fast lerp function between two RGBA16 colors.
+ */
+static RGBA16 cs_rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac) {
+    RGBA16 ds, d = MSK_RGBA16_A;
+    RGBA16 s = (MSK_RGBA16_C << SIZ_RGBA16_A);
+
+    for (s32 i = 0; i < 3; i++) {
+        ds = (a & s);
+        d |= ((((fac * ((b & s) - ds)) >> 8) + ds) & s);
+        s <<= SIZ_RGBA16_C;
+    }
+
+    return d;
+}
+
 // Apply color to an RGBA16 pixel with alpha blending.
 static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
     if (alpha == MSK_RGBA32_A) {
         *dst = newColor;
     } else {
-        *dst = rgba16_blend(*dst, newColor, alpha);
+        *dst = cs_rgba16_blend(*dst, newColor, alpha);
     }
 }
 
