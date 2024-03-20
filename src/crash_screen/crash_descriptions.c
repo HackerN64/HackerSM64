@@ -232,7 +232,7 @@ static const char* sCauseDesc[NUM_CAUSE_DESC] = {
     [CAUSE_DESC_WADE   ] = "Address error on store",
     [CAUSE_DESC_IBE    ] = "Bus error on inst.",
     [CAUSE_DESC_DBE    ] = "Bus error on data",
-    [CAUSE_DESC_SYSCALL] = "Failed Assert: See below",
+    [CAUSE_DESC_SYSCALL] = "Syscall exception",
     [CAUSE_DESC_BREAK  ] = "Breakpoint exception",
     [CAUSE_DESC_II     ] = "Reserved instruction",
     [CAUSE_DESC_CPU    ] = "Coprocessor unusable",
@@ -245,13 +245,16 @@ static const char* sCauseDesc[NUM_CAUSE_DESC] = {
 };
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
-    uint64_t badvaddr = tc->badvaddr;
-    uint32_t epc = GET_EPC(tc);
     u32 cause = (tc->cause & CAUSE_EXCMASK);
 
     if (specific) {
+        uint64_t badvaddr = tc->badvaddr;
+        uint32_t epc = GET_EPC(tc);
+
         // Heuristics from libdragon:
         switch (cause) {
+            case EXC_MOD:
+                return "Write to read-only memory";
             case EXC_RMISS:
                 if (epc == (u32)badvaddr) {
                     return "Invalid program counter address";
@@ -269,8 +272,6 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 } else {
                     return "Write to invalid memory address";
                 }
-            case EXC_MOD:
-                return "Write to read-only memory";
             case EXC_RADE:
                 if (epc == (uint32_t)badvaddr) {
                     if (is_unmapped_kx64(badvaddr)) {
@@ -288,6 +289,8 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 break;
             case EXC_WADE:
                 return "Misaligned write to memory";
+            case EXC_SYSCALL:
+                return "Failed Assert: See below";
         }
     }
 

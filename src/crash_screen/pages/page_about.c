@@ -126,7 +126,6 @@ void _cs_about_func_ram_size(char* buf) {
     p += sprintf_int_with_commas(p, osMemSize);
     p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes(osMemSize));
 }
-// ABOUT_ENTRY_FUNC(gfx_pool,       (STR_HEX_PREFIX"%X/"STR_HEX_PREFIX"%X"), (((Address)gDisplayListHead - (Address)gGfxPool->buffer) / sizeof(u32)), GFX_POOL_SIZE)
 void _cs_about_func_gfx_pool(char* buf) {
     char* p = buf;
     size_t usedPool = ((Address)gDisplayListHead - (Address)gGfxPool->buffer);
@@ -177,10 +176,10 @@ void _cs_about_func_emulator(char* buf) {
     char* p = buf;
     p += sprintf(p, "%s", get_emulator_name(gEmulator));
     if (gEmulator & EMU_CONSOLE) {
-        u32 val = 0x00000000;
-        ASM_GET_REG_COP0(val, "$15"); // TODO: use get_reg_val
+        // u32 val = 0x00000000;
+        // ASM_GET_REG_COP0(val, "$15"); // TODO: use get_reg_val
         Reg_CP0_PRId prid = {
-            .raw = val,
+            .raw = (u32)get_direct_reg_val(COP0, REG_CP0_PRID),
         };
         p += sprintf(p, " (%s rev%d.%d)", get_processor_name(prid.Imp), prid.Rev_.major, prid.Rev_.minor);
     } else if (gSupportsLibpl) {

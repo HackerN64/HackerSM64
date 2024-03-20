@@ -235,6 +235,7 @@ void page_threads_input(void) {
     if (gCSCompositeController->buttonPressed & B_BUTTON) {
         if (sThreadsSelectedThreadPtr != NULL) {
             gInspectThread = sThreadsSelectedThreadPtr;
+            gSelectedAddress = gInspectThread->context.pc;
             cs_reinitialize_pages();
         }
     }

@@ -234,6 +234,7 @@ void cs_popup_reginspect_draw(void) {
 
     if (hasExInfo) {
         cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, exInfo->title);
+        sInspectedRegisterPtrAddr = 0x00000000;
     } else {
 #ifdef INCLUDE_DEBUG_MAP
         u32 val32 = (uint32_t)value;

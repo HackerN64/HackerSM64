@@ -5,6 +5,13 @@
 #include "types.h"
 
 
+#ifdef INCLUDE_DEBUG_MAP
+ #define IS_DEBUG_MAP_INCLUDED() TRUE
+#else // !INCLUDE_DEBUG_MAP
+ #define IS_DEBUG_MAP_INCLUDED() FALSE
+#endif // !INCLUDE_DEBUG_MAP
+
+
 enum SymbolSearchDirections {
     SYMBOL_SEARCH_FORWARD,  // Use this to get the earlier symbol on an overlap.
     SYMBOL_SEARCH_BACKWARD, // Use this to get the later symbol on an overlap.

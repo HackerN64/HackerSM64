@@ -51,6 +51,15 @@ void page_summary_init(void) {
 
 }
 
+void cs_print_cpu_cause(u32 x, u32 y, u32 cause) {
+    // "COP:"
+    cs_print(x, y,
+        STR_COLOR_PREFIX"COP:\tcop%d unusable",
+        COLOR_RGBA32_CRASH_DESCRIPTION,
+        ((Reg_CP0_Cause){ .raw = cause, }).CE
+    );
+}
+
 void cs_print_fpe_cause(u32 x, u32 y, u32 fpcsr) {
     // "FPE:"
     size_t charX = cs_print(x, y,
@@ -210,13 +219,15 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
 void page_summary_draw(void) {
     __OSThreadContext* tc = &gInspectThread->context;
     u32 cause = (tc->cause & CAUSE_EXCMASK);
-    u32 line = 9;
+    u32 line = 8;
 
     if (cause == EXC_SYSCALL) {
+        line = 7;
         // ASSERT:
         cs_draw_divider(DIVIDER_Y(line));
         line = cs_draw_assert(line);
     } else {
+        line = 9;
         Address addr = GET_EPC(tc);
         Word data = 0x00000000;
         if (try_read_word_aligned(&data, addr) && is_in_code_segment(addr)) {
@@ -267,8 +278,14 @@ void page_summary_draw(void) {
 #endif // INCLUDE_DEBUG_MAP
     cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
 
-    if (cause == EXC_FPE) {
-        cs_print_fpe_cause(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
+    // Second line of crash description:
+    switch (cause) {
+        case EXC_CPU:
+            cs_print_cpu_cause(TEXT_X(0), TEXT_Y(line), tc->cause);
+            break;
+        case EXC_FPE:
+            cs_print_fpe_cause(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
+            break;
     }
 
     u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
