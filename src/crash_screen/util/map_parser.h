@@ -6,8 +6,9 @@
 
 
 enum SymbolSearchDirections {
-    SYMBOL_SEARCH_FORWARD,
-    SYMBOL_SEARCH_BACKWARD,
+    SYMBOL_SEARCH_FORWARD,  // Use this to get the earlier symbol on an overlap.
+    SYMBOL_SEARCH_BACKWARD, // Use this to get the later symbol on an overlap.
+    SYMBOL_SEARCH_BINARY,   // Use this when speed matters more than getting a specific symbol on an overlap.
 };
 
 // See mapPacker.py.
@@ -113,4 +114,5 @@ _Bool is_in_code_segment(Address addr);
 const char* get_map_symbol_name(const MapSymbol* symbol);
 s32 get_symbol_index_from_addr_forward(Address addr);
 s32 get_symbol_index_from_addr_backward(Address addr);
+s32 get_symbol_index_from_addr_binary(Address addr);
 const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection);

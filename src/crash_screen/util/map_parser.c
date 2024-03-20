@@ -105,13 +105,13 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
  * @param[in] symbol The MapSymbol to check.
  * @return _Bool Whether the address is within the symbol's range.
  */
-static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
-    return ((symbol != NULL) && (addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
+ALWAYS_INLINE static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
+    return ((addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
 }
 
 /**
  * @brief Search for a symbol index starting from the beginning.
- * Some symbol ranges overlap. Use this
+ * Some symbol ranges overlap. Use this to get the earlier symbol on an overlap.
  *
  * @param[in] addr Address to check.
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
@@ -139,7 +139,7 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
 
 /**
  * @brief Search for a symbol index starting from the end.
- * Some symbol ranges overlap.
+ * Some symbol ranges overlap. Use this to get the later symbol on an overlap.
  *
  * @param[in] addr Address to check.
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
@@ -166,10 +166,39 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
 }
 
 /**
+ * @brief Search for a symbol index using a binary search algorithm.
+ * Some symbol ranges overlap. Use this when speed matters more than getting a specific symbol on an overlap.
+ *
+ * @param[in] addr Address to check.
+ * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
+ */
+s32 get_symbol_index_from_addr_binary(Address addr) {
+    const MapSymbol* symbol = NULL;
+    size_t searchStart = 0;
+    size_t searchEnd = (gNumMapSymbols - 1);
+    size_t index = -1;
+
+    while (searchStart <= searchEnd) {
+        index = (searchStart + ((searchEnd - searchStart) / 2)); // Get the middle position in the new search window.
+        symbol = &gMapSymbols[index];
+
+        if (addr < symbol->addr) {
+            searchEnd = (index - 1);
+        } else if (addr >= (symbol->addr + symbol->size)) {
+            searchStart = (index + 1);
+        } else {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+/**
  * @brief Get the MapSymbol data that the given address is in.
  *
  * @param[in] addr            Address to check.
- * @param[in] searchDirection The direction to search in. TODO: Explanation for this.
+ * @param[in] searchDirection The direction to search in. See enum SymbolSearchDirections.
  * @return const MapSymbol* Pointer to the MapSymbol data that was found. NULL if none were found.
  */
 const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
@@ -183,8 +212,9 @@ const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections search
 
     s32 index = -1;
     switch (searchDirection) {
-        case SYMBOL_SEARCH_FORWARD:  index = get_symbol_index_from_addr_forward(addr);  break;
-        case SYMBOL_SEARCH_BACKWARD: index = get_symbol_index_from_addr_backward(addr); break;
+        case SYMBOL_SEARCH_FORWARD:  index = get_symbol_index_from_addr_forward(addr);  break; // Get the earlier overlapping symbol.
+        case SYMBOL_SEARCH_BACKWARD: index = get_symbol_index_from_addr_backward(addr); break; // Get the later overlapping symbol.
+        case SYMBOL_SEARCH_BINARY:   index = get_symbol_index_from_addr_binary(addr);   break;
     }
 
     if (index != -1) {
