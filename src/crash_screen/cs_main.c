@@ -9,12 +9,12 @@
 #include "sm64.h"
 
 #include "util/map_parser.h"
-#include "crash_controls.h"
-#include "crash_draw.h"
-#include "crash_pages.h"
-#include "crash_settings.h"
+#include "cs_controls.h"
+#include "cs_draw.h"
+#include "cs_pages.h"
+#include "cs_settings.h"
 
-#include "crash_main.h"
+#include "cs_main.h"
 
 #include "audio/external.h"
 #include "buffers/framebuffers.h"

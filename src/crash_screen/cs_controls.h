@@ -6,8 +6,8 @@
 
 #include "game/input.h"
 
-#include "crash_screen/crash_pages.h"
-#include "crash_screen/crash_settings.h"
+#include "crash_screen/cs_pages.h"
+#include "crash_screen/cs_settings.h"
 
 
 // Input string defines:

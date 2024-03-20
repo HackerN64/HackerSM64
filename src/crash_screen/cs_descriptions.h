@@ -66,4 +66,7 @@ const char* get_coprocessor_name(enum Coprocessors cop);
 
 const char* get_cause_desc(__OSThreadContext* tc, _Bool specific);
 const char* get_fpcsr_desc(u32 fpcsr, _Bool specific);
+
 const char* get_emulator_name(enum Emulator emu);
+
+const char* get_map_symbol_type_desc(char c);

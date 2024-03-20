@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include "crash_screen/crash_settings.h"
+#include "crash_screen/cs_settings.h"
 
 
 #define SETTINGS_NUM_ROWS 21

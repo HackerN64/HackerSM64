@@ -8,11 +8,11 @@
 
 #include "util/memory_read.h"
 #include "util/registers.h"
-#include "crash_draw.h"
-#include "crash_main.h"
-#include "crash_settings.h"
+#include "cs_draw.h"
+#include "cs_main.h"
+#include "cs_settings.h"
 
-#include "crash_print.h"
+#include "cs_print.h"
 
 #include "game/printf.h"
 

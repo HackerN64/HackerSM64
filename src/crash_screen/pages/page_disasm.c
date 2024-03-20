@@ -8,12 +8,12 @@
 #include "crash_screen/util/insn_disasm.h"
 #include "crash_screen/util/map_parser.h"
 #include "crash_screen/util/memory_read.h"
-#include "crash_screen/crash_controls.h"
-#include "crash_screen/crash_draw.h"
-#include "crash_screen/crash_main.h"
-#include "crash_screen/crash_settings.h"
-#include "crash_screen/crash_pages.h"
-#include "crash_screen/crash_print.h"
+#include "crash_screen/cs_controls.h"
+#include "crash_screen/cs_draw.h"
+#include "crash_screen/cs_main.h"
+#include "crash_screen/cs_settings.h"
+#include "crash_screen/cs_pages.h"
+#include "crash_screen/cs_print.h"
 
 #include "crash_screen/popups/popup_address_select.h"
 
@@ -193,6 +193,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         sBranchBufferCurrAddr += PAGE_DISASM_STEP;
 
         // If branch mapping takes longer than a frame, so continue from the same place on the next frame.
+        //! TODO: Is this needed anymore with binary search?
         if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) { // Is there a better way to do this?
             return TRUE;
         }

@@ -5,11 +5,11 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_screen/crash_controls.h"
-#include "crash_screen/crash_draw.h"
-#include "crash_screen/crash_pages.h"
-#include "crash_screen/crash_print.h"
-#include "crash_screen/crash_settings.h"
+#include "crash_screen/cs_controls.h"
+#include "crash_screen/cs_draw.h"
+#include "crash_screen/cs_pages.h"
+#include "crash_screen/cs_print.h"
+#include "crash_screen/cs_settings.h"
 
 #include "page_settings.h"
 

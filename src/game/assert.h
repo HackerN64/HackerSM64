@@ -24,15 +24,21 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 
 
 /**
+ * Set the assert address to the current location.
+ */
+#define SET_ASSERT_ADDRESS() __assert_address = _asm_getaddr()
+
+
+/**
  * Will always cause a crash with your message of choice.
  */
 #define ERROR(message) do {                                                     \
-    __assert_address = _asm_getaddr();                                          \
+    SET_ASSERT_ADDRESS();                                                       \
     __n64Assert(NULL, __FILE__, __LINE__, (message));                           \
 } while (0)
 
 #define ERRORF(message, ...) do {                                               \
-    __assert_address = _asm_getaddr();                                          \
+    SET_ASSERT_ADDRESS();                                                       \
     __n64Assertf(NULL, __FILE__, __LINE__, (message), ##__VA_ARGS__);           \
 } while (0)
 
@@ -42,13 +48,13 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
  */
 #define ASSERT(condition, message) do {                                         \
     if (!(condition)) {                                                         \
-        __assert_address = _asm_getaddr();                                      \
+        SET_ASSERT_ADDRESS();                                                   \
         __n64Assert(#condition, __FILE__, __LINE__, (message));                 \
     }                                                                           \
 } while (0)
 #define ASSERTF(condition, message, ...) do {                                   \
     if (!(condition)) {                                                         \
-        __assert_address = _asm_getaddr();                                      \
+        SET_ASSERT_ADDRESS();                                                   \
         __n64Assertf(#condition, __FILE__, __LINE__, (message), ##__VA_ARGS__); \
     }                                                                           \
 } while (0)
@@ -75,8 +81,8 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 #define assertf         ASSERTF
 #define debug_error     DEBUG_ERROR
 #define debug_errorf    DEBUG_ERRORF
-//! TODO: This name conflicts with UNF debug_assert:
-// #define debug_assert    DEBUG_ASSERT
+#undef debug_assert // Overwrite the UNF version.
+#define debug_assert    DEBUG_ASSERT
 #define debug_assertf   DEBUG_ASSERTF
 
 // Backwards compatibility:

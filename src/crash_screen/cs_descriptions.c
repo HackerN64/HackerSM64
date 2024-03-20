@@ -5,12 +5,12 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_screen/crash_main.h"
+#include "crash_screen/cs_main.h"
 #include "util/map_parser.h"
 #include "util/memory_read.h"
 #include "util/registers.h"
 
-#include "crash_descriptions.h"
+#include "cs_descriptions.h"
 
 #include "game/emutest.h"
 #include "game/version.h"
@@ -396,6 +396,35 @@ const char* get_emulator_name(enum Emulator emu) {
     for (int i = 0; i < ARRAY_COUNT(sEmulatorStrings); i++) {
         if (emu == sEmulatorStrings[i].bits) {
             return sEmulatorStrings[i].name;
+        }
+    }
+
+    return NULL;
+}
+
+
+// -- MAP SYMBOL --
+
+typedef struct MapSymbolType {
+    /*0x00*/ char c;
+    /*0x01*/ u8 pad[3];
+    /*0x04*/ const char* desc;
+} MapSymbolType; /*0x08*/
+static const MapSymbolType sMapSymbolTypes[] = {
+    { .c = 'a', .desc = "absolute (static)", },
+    { .c = 'A', .desc = "absolute",          },
+    { .c = 'b', .desc = ".bss (static)",     },
+    { .c = 'B', .desc = ".bss",              },
+    { .c = 'd', .desc = ".data (static)",    },
+    { .c = 'D', .desc = ".data",             },
+    { .c = 't', .desc = ".text (static)",    },
+    { .c = 'T', .desc = ".text",             },
+    { .c = 'W', .desc = "weak (untagged)",   },
+};
+const char* get_map_symbol_type_desc(char c) {
+    for (int i = 0; i < ARRAY_COUNT(sMapSymbolTypes); i++) {
+        if (c == sMapSymbolTypes[i].c) {
+            return sMapSymbolTypes[i].desc;
         }
     }
 

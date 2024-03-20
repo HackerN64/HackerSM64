@@ -5,7 +5,7 @@
 #include "types.h"
 #include "sm64.h"
 
-#include "crash_screen/crash_main.h"
+#include "crash_screen/cs_main.h"
 #include "map_parser.h"
 #include "memory_read.h"
 

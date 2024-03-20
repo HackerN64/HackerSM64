@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include "crash_screen/crash_settings.h"
+#include "crash_screen/cs_settings.h"
 
 
 enum CSSettingsGroup_page_memory {
