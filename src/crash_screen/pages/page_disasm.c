@@ -116,7 +116,10 @@ void page_disasm_init(void) {
 }
 
 #ifdef INCLUDE_DEBUG_MAP
-//! TODO: Optimize this as much as possible.
+
+// Set this to SYMBOL_SEARCH_FORWARD for more accuracy when symbol sizes overlap at the cost of performance.
+#define BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION SYMBOL_SEARCH_BINARY
+
 //! TODO: Version that checks for branches relative to viewport (overscan).
 // @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
@@ -153,7 +156,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         }
 
         // Check if we have left the function.
-        const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_FORWARD);
+        const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_BINARY);
         if (symbol != NULL) {
             if (!is_in_code_segment(symbol->addr)) {
                 return FALSE;
@@ -480,7 +483,7 @@ void page_disasm_input(void) {
 
         Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
 
-        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, SYMBOL_SEARCH_FORWARD);
+        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
         if (symbol != NULL) {
             const char* fname = get_map_symbol_name(symbol);
 

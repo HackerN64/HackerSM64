@@ -113,7 +113,7 @@ ALWAYS_INLINE static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symb
  * @brief Search for a symbol index starting from the beginning.
  * Some symbol ranges overlap. Use this to get the earlier symbol on an overlap.
  *
- * @param[in] addr Address to check.
+ * @param[in] addr The address to check.
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
  */
 s32 get_symbol_index_from_addr_forward(Address addr) {
@@ -166,10 +166,10 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
 }
 
 /**
- * @brief Search for a symbol index using a binary search algorithm.
+ * @brief Search for a symbol index using a binary search.
  * Some symbol ranges overlap. Use this when speed matters more than getting a specific symbol on an overlap.
  *
- * @param[in] addr Address to check.
+ * @param[in] addr The address to check.
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
  */
 s32 get_symbol_index_from_addr_binary(Address addr) {
@@ -197,7 +197,7 @@ s32 get_symbol_index_from_addr_binary(Address addr) {
 /**
  * @brief Get the MapSymbol data that the given address is in.
  *
- * @param[in] addr            Address to check.
+ * @param[in] addr            The address to check.
  * @param[in] searchDirection The direction to search in. See enum SymbolSearchDirections.
  * @return const MapSymbol* Pointer to the MapSymbol data that was found. NULL if none were found.
  */

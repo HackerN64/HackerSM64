@@ -108,7 +108,7 @@ void _cs_about_func_symbols(char* buf) {
     size_t numSymbols = (gMapSymbolsEnd - gMapSymbols);
     size_t mapSize = ((Address)_mapDataSegmentRomEnd - (Address)_mapDataSegmentRomStart);
     char* p = buf;
-    p += sprintf(p, "%i =", numSymbols);
+    p += sprintf(p, "%i=", numSymbols);
     p += sprintf_int_with_commas(p, mapSize);
     p += sprintf(p, (STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM), percent_of(mapSize, (size_t)gRomSize));
 #else  // !INCLUDE_DEBUG_MAP

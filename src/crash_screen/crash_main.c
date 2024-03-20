@@ -32,7 +32,7 @@ static _Bool sFirstCrash    = TRUE; // Used to make certain things only happen o
 
 CSThreadInfo* gActiveCSThreadInfo = NULL; // Pointer to the current crash screen thread info.
 OSThread*     gCrashedThread      = NULL; // Pointer to the most recently crashed thread.
-OSThread*     gInspectThread      = NULL; // Pointer to the thread the crash screen will be inspecting. //! TODO: Allow changing inspected thread.
+OSThread*     gInspectThread      = NULL; // Pointer to the thread the crash screen will be inspecting.
 
 Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_PTR to set the crashed thread PC.
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
