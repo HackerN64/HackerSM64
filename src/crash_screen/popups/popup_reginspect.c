@@ -272,6 +272,7 @@ void cs_popup_reginspect_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
+        //! TODO: Option to jump to register's location in inspected thread's __OSThreadContext.
         if (sInspectedRegisterPtrAddr != 0x00000000) {
             open_address_select(sInspectedRegisterPtrAddr);
         }

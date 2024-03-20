@@ -312,7 +312,8 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
             // Translucent divider between symbols.
             const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
             if (symbol != NULL) {
-                if (addr == symbol->addr) { // || addr == (symbol->addr + symbol->size + sizeof(uintptr_t))) {
+                //! TODO: Do this for the end of symbols too.
+                if (addr == symbol->addr) {
                     cs_draw_divider_translucent(DIVIDER_Y(line + y));
                 }
             }
@@ -331,13 +332,19 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
                     }
                 }
             } else { // Outside of code segments:
+                RGBA32 color = COLOR_RGBA32_WHITE;
+#ifdef INCLUDE_DEBUG_MAP
+                if (symbol != NULL) {
+                    color = COLOR_RGBA32_CRASH_VARIABLE;
+                }
+#endif // INCLUDE_DEBUG_MAP
                 if (unkAsBinary) {
                     // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                    print_as_binary(charX, charY, data, COLOR_RGBA32_WHITE);
+                    print_as_binary(charX, charY, data, color);
                     // cs_print(charX, charY, "%032b", data);
                 } else {
                     // "[XXXXXXXX]"
-                    cs_print(charX, charY, STR_HEX_WORD, data);
+                    cs_print(charX, charY, (STR_COLOR_PREFIX STR_HEX_WORD), color, data);
                 }
             }
         }

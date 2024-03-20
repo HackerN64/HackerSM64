@@ -111,7 +111,7 @@ typedef struct ThreadName {
     /*0x04*/ const char* name;
 } ThreadName; /*0x08*/
 static const ThreadName sThreadIDNames[] = {
-    { .id = THREAD_0_MANAGER,           .name = "unknown libultra", }, // Uses sThreadPriNames.
+    { .id = THREAD_0_MANAGER,           .name = "libultra?",        }, // Uses sThreadPriNames.
     { .id = THREAD_1_IDLE,              .name = "idle",             },
     { .id = THREAD_2,                   .name = "unused",           },
     { .id = THREAD_3_MAIN,              .name = "main",             },
@@ -129,6 +129,7 @@ static const ThreadName sThreadIDNames[] = {
 };
 static const ThreadName sThreadPriNames[] = {
     { .pri = OS_PRIORITY_SIMGR,         .name = "si manager", },
+    { .pri = 149,                       .name = "debug/usb?", }, //! TODO: Find out what this thread is. It only exists when running UNF.
     { .pri = OS_PRIORITY_PIMGR,         .name = "pi manager", },
     { .pri = OS_PRIORITY_VIMGR,         .name = "vi manager", },
     { .pri = OS_PRIORITY_RMON,          .name = "rmon",       },
