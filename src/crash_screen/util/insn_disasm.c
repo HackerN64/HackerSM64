@@ -122,8 +122,8 @@ ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE
     { .opcode = OPS_SRAV       , .name = "SRAV"   , .fmt = "\'dts", .out = 1, }, //  7: Shift Word Right Arithmetic Variable.
     { .opcode = OPS_JR         , .name = "JR"     , .fmt = "\'s"  , .out = 0, }, //  8: Jump Register.
     { .opcode = OPS_JALR       , .name = "JALR"   , .fmt = "\'ds" , .out = 0, }, //  9: Jump and Link Register.
-    { .opcode = OPS_SYSCALL    , .name = "SYSCALL", .fmt = "\'"   , .out = 0, }, // 12: System Call (assert).
-    { .opcode = OPS_BREAK      , .name = "BREAK"  , .fmt = "\'"   , .out = 0, }, // 13: Breakpoint.
+    { .opcode = OPS_SYSCALL    , .name = "SYSCALL", .fmt = "\'E"  , .out = 0, }, // 12: System Call (assert).
+    { .opcode = OPS_BREAK      , .name = "BREAK"  , .fmt = "\'E"  , .out = 0, }, // 13: Breakpoint.
     { .opcode = OPS_SYNC       , .name = "SYNC"   , .fmt = "\'"   , .out = 0, }, // 15: Synchronize Shared Memory.
     { .opcode = OPS_MFHI       , .name = "MFHI"   , .fmt = "\'d"  , .out = 6, }, // 16: Move From HI.
     { .opcode = OPS_MTHI       , .name = "MTHI"   , .fmt = "\'s"  , .out = 6, }, // 17: Move To HI.
@@ -154,12 +154,12 @@ ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE
     { .opcode = OPS_DADDU      , .name = "DADDU"  , .fmt = "\'dst", .out = 1, }, // 45: Doubleword Add Unsigned.
     { .opcode = OPS_DSUB       , .name = "DSUB"   , .fmt = "\'dst", .out = 1, }, // 46: Doubleword Subtract.
     { .opcode = OPS_DSUBU      , .name = "DSUBU"  , .fmt = "\'dst", .out = 1, }, // 47: Doubleword Subtract Unsigned.
-    { .opcode = OPS_TGE        , .name = "TGE"    , .fmt = "\'st" , .out = 0, }, // 48: Trap if Greater Than or Equal.
-    { .opcode = OPS_TGEU       , .name = "TGEU"   , .fmt = "\'st" , .out = 0, }, // 49: Trap if Greater Than or Equal Unsigned.
-    { .opcode = OPS_TLT        , .name = "TLT"    , .fmt = "\'st" , .out = 0, }, // 50: Trap if Less Than.
-    { .opcode = OPS_TLTU       , .name = "TLTU"   , .fmt = "\'st" , .out = 0, }, // 51: Trap if Less Than Unsigned.
-    { .opcode = OPS_TEQ        , .name = "TEQ"    , .fmt = "\'st" , .out = 0, }, // 52: Trap if Equal.
-    { .opcode = OPS_TNE        , .name = "TNE"    , .fmt = "\'st" , .out = 0, }, // 54: Trap if Not Equal.
+    { .opcode = OPS_TGE        , .name = "TGE"    , .fmt = "\'ste", .out = 0, }, // 48: Trap if Greater Than or Equal.
+    { .opcode = OPS_TGEU       , .name = "TGEU"   , .fmt = "\'ste", .out = 0, }, // 49: Trap if Greater Than or Equal Unsigned.
+    { .opcode = OPS_TLT        , .name = "TLT"    , .fmt = "\'ste", .out = 0, }, // 50: Trap if Less Than.
+    { .opcode = OPS_TLTU       , .name = "TLTU"   , .fmt = "\'ste", .out = 0, }, // 51: Trap if Less Than Unsigned.
+    { .opcode = OPS_TEQ        , .name = "TEQ"    , .fmt = "\'ste", .out = 0, }, // 52: Trap if Equal.
+    { .opcode = OPS_TNE        , .name = "TNE"    , .fmt = "\'ste", .out = 0, }, // 54: Trap if Not Equal.
     { .opcode = OPS_DSLL       , .name = "DSLL"   , .fmt = "\'dta", .out = 1, }, // 56: Doubleword Shift Left Logical.
     { .opcode = OPS_DSRL       , .name = "DSRL"   , .fmt = "\'dta", .out = 1, }, // 58: Doubleword Shift Right Logical.
     { .opcode = OPS_DSRA       , .name = "DSRA"   , .fmt = "\'dta", .out = 1, }, // 59: Doubleword Shift Right Arithmetic.
@@ -509,12 +509,14 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_INSN_NAME           "%-"TO_STRING2(INSN_NAME_DISPLAY_WIDTH)"s"
 #define STR_INSN_NAME_FORMAT    STR_INSN_NAME_BASE"."STR_FORMAT
 
-#define STR_IREG                "%s"                            // Register
-#define STR_IMMEDIATE           STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI
-#define STR_OFFSET              "%c"STR_IMMEDIATE               // ±Offset
-#define STR_FUNCTION            STR_HEX_PREFIX STR_HEX_WORD     // Function address
-#define STR_IREG_BASE           "("STR_IREG")"                  // Base register
-#define STR_FREG                "F%02d"                         // Float Register
+#define STR_IREG                "%s"                            // Register.
+#define STR_IMMEDIATE           STR_HEX_PREFIX STR_HEX_HALFWORD // 0xI.
+#define STR_OFFSET              "%c"STR_IMMEDIATE               // ±Offset.
+#define STR_FUNCTION            STR_HEX_PREFIX STR_HEX_WORD     // Function address.
+#define STR_IREG_BASE           "("STR_IREG")"                  // Base register.
+#define STR_FREG                "F%02d"                         // Float Register.
+#define STR_CODE10              "%03X"                          // 10-bit data for exception handler.
+#define STR_CODE20              "%05X"                          // 20-bit data for exception handler.
 
 
 #define ADD_COLOR(_c) {                                             \
@@ -646,6 +648,14 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(STR_IREG, COP1, insn.fd);
                     separator = TRUE;
+                    break;
+                case CHAR_P_EXC10:
+                    ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
+                    ADD_STR(STR_CODE10, insn.code10);
+                    break;
+                case CHAR_P_EXC20:
+                    ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
+                    ADD_STR(STR_CODE20, insn.code20);
                     break;
                 case CHAR_P_FUNC: // Jump function.
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);

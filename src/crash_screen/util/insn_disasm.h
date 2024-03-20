@@ -24,6 +24,8 @@
 #define CHAR_P_FS       'S'     // "F[fs reg]".
 #define CHAR_P_FD       'D'     // "F[fd reg]".
 #define CHAR_P_FUNC     'J'     // "[function address]" or parse map.
+#define CHAR_P_EXC10    'e'     // "[0xXXX]" 10-bit data for the exception handler.
+#define CHAR_P_EXC20    'E'     // "[0xXXXXX]" 20-bit data for the exception handler.
 #define CHAR_P_COP0D    '0'     // "[rd reg]" COP0 Special register.
 
 
@@ -407,6 +409,16 @@ typedef union InsnData {
     struct PACKED {
         /*0x00*/ Word               :  6;
         /*0x00*/ Word instr_index   : 26;
+    };
+    struct PACKED {
+        /*0x00*/ Word               : 16;
+        /*0x00*/ Word code10        : 10; // 10-bit data for exception handler.
+        /*0x00*/ Word               :  6;
+    };
+    struct PACKED {
+        /*0x00*/ Word               :  6;
+        /*0x00*/ Word code20        : 20; // 20-bit data for exception handler.
+        /*0x00*/ Word               :  6;
     };
     Word raw;
 } InsnData; /*0x04*/
