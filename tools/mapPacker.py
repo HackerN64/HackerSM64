@@ -1,4 +1,4 @@
-import sys, struct, subprocess
+import sys, os, struct, subprocess
 
 onlyRDRAM = True
 
@@ -79,9 +79,14 @@ for x in symNames:
 	f2.write(struct.pack(">%ds" % x.strlen, bytes(x.name, encoding="ascii")))
 	off += x.strlen
 
-
 f1.close()
 f2.close()
+
+# Get sizes for linkerscript.
+with open(sys.argv[4], "w+") as f:
+	addr_size = os.path.getsize(sys.argv[2])
+	name_size = os.path.getsize(sys.argv[3])
+	f.write("DEBUG_MAP_DATA_ADDR_SIZE = 0x%X;\nDEBUG_MAP_DATA_NAME_SIZE = 0x%x;\nDEBUG_MAP_DATA_SIZE = 0x%X;" % (addr_size, name_size, (addr_size + name_size)))
 
 # print('\n'.join([str(hex(x.addr)) + " " + x.name for x in symNames]))
 

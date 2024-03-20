@@ -562,6 +562,7 @@ SECTIONS
 #endif
 
 #if defined(INCLUDE_DEBUG_MAP) && !defined(PRELIMINARY)
+   /* TODO: Use debug_map.txt to DMA map data to the end of RAM instead of at a hardcoded position. */
    BEGIN_SEG(mapData, (RAM_END - RAM_1MB))
    {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));
