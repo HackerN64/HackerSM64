@@ -92,16 +92,25 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __att
 //! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?).
 #define cs_print_scroll(_x, _y, _charLimit, _fmt, ...) cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__)
 #define cs_print(_x, _y, _fmt, ...) cs_print_scroll((_x), (_y), 0, (_fmt), ##__VA_ARGS__)
+
+#define CS_PRINT_DEFAULT_COLOR_START(_color)            \
+    RGBA32 __tempDefaultColor = gCSDefaultPrintColor;   \
+    gCSDefaultPrintColor = (_color);                    \
+
+#define CS_PRINT_DEFAULT_COLOR_END(_color)              \
+    gCSDefaultPrintColor = __tempDefaultColor;          \
+
 #define cs_print_color_scroll(_x, _y, _charLimit, _color, _fmt, ...)  { \
-    RGBA32 __tempDefaultColor = gCSDefaultPrintColor;                   \
-    gCSDefaultPrintColor = (_color);                                    \
+    CS_PRINT_DEFAULT_COLOR_START(_color);                               \
     cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__);     \
-    gCSDefaultPrintColor = __tempDefaultColor;                          \
+    CS_PRINT_DEFAULT_COLOR_END();                                       \
 }
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
+
 void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
 void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
+
 
 typedef struct FloatErrorPrintFormat {
     /*0x00*/ Color r;

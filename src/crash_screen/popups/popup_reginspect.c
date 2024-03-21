@@ -7,8 +7,8 @@
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/util/registers.h"
 #include "crash_screen/cs_controls.h"
-#include "crash_screen/cs_draw.h"
 #include "crash_screen/cs_descriptions.h"
+#include "crash_screen/cs_draw.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_pages.h"
 #include "crash_screen/cs_print.h"
@@ -36,8 +36,17 @@ void cs_popup_reginspect_init(void) {
 
 void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
     const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
-    const _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
+    _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
     const uint32_t val32 = (uint32_t)val64;
+
+    // //! TODO: Get high bits from odd float reg.
+    // if ((regId.cop == COP1) && ((regId.idx & 0x1) == 0)) {
+    //     uint32_t cop1_oddbits = get_reg_val(COP1, (regId.idx + 1));
+    //     if (cop1_oddbits != 0x00000000) {
+    //         val64 = (HiLo64){ .hi = cop1_oddbits, .lo = val32, }.raw;
+    //         is64Bit = TRUE;
+    //     }
+    // }
 
     // Print as hex:
     if (is64Bit) {
@@ -277,7 +286,6 @@ void cs_popup_reginspect_draw(void) {
 }
 
 void cs_popup_reginspect_input(void) {
-    //! TODO: If register is address, goto address select. (return to this if cancelled).
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {

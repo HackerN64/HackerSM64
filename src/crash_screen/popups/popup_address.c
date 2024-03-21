@@ -5,6 +5,7 @@
 
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/cs_controls.h"
+#include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_draw.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_print.h"
@@ -156,7 +157,7 @@ void cs_address_select_input(void) {
 
 // Open the address select (jump to address) popup box.
 void open_address_select(Address dest) {
-    cs_open_popup(CS_POPUP_ADDRESS_SELECT);
+    cs_open_popup(CS_POPUP_ADDRESS);
     sAddressSelectTarget = dest;
 }
 

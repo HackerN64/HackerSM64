@@ -182,7 +182,7 @@ const char* get_thread_state_str(OSThread* thread) {
 }
 
 static const char* sThreadFlagStrings[] = {
-    [__builtin_ctz(OS_FLAG_CPU_BREAK)] = "cpu break",
+    [__builtin_ctz(OS_FLAG_CPU_BREAK)] = "break", // CPU break
     [__builtin_ctz(OS_FLAG_FAULT    )] = "fault",
 };
 const char* get_thread_flags_str(OSThread* thread) {
