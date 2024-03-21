@@ -127,18 +127,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         return FALSE;
     }
 
-    u8 curBranchColorIndex = 0;
-    u8 curBranchX = sDisasmBranchStartX;
-
-    if (sNumBranchArrows == 0) {
-        // Start:
-        curBranchColorIndex = 0;
-        curBranchX = sDisasmBranchStartX;
-    } else {
-        // Continue:
-        curBranchColorIndex = sBranchArrows[sNumBranchArrows - 1].colorIndex;
-        curBranchX          = sBranchArrows[sNumBranchArrows - 1].xPos;
-    }
+    // Start or continue:
+    u8 curBranchX = (sNumBranchArrows == 0) ? sDisasmBranchStartX : sBranchArrows[sNumBranchArrows - 1].xPos;
 
     // Pick up where we left off.
     BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
@@ -174,7 +164,6 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
 
         if (branchOffset != 0x0000) {
             curBranchX += (DISASM_BRANCH_ARROW_SPACING + 1);
-            curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
 
             // Wrap around if extended past end of screen.
             if ((sDisasmBranchStartX + curBranchX) > CRASH_SCREEN_TEXT_X2) {
@@ -184,7 +173,6 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
             currArrow->startAddr    = sBranchBufferCurrAddr;
             currArrow->branchOffset = branchOffset;
             currArrow->xPos         = curBranchX;
-            currArrow->colorIndex   = curBranchColorIndex;
 
             currArrow++;
             sNumBranchArrows++;
@@ -257,7 +245,7 @@ void disasm_draw_branch_arrows(u32 printLine) {
         s32 startLine = (((s32)currArrow->startAddr - (s32)sDisasmViewportIndex) / PAGE_DISASM_STEP);
         s32 endLine = (startLine + currArrow->branchOffset + 1);
 
-        draw_branch_arrow(startLine, endLine, currArrow->xPos, sBranchColors[currArrow->colorIndex], printLine);
+        draw_branch_arrow(startLine, endLine, currArrow->xPos, sBranchColors[(i % ARRAY_COUNT(sBranchColors))], printLine);
 
         currArrow++;
     }

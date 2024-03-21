@@ -91,13 +91,9 @@ _Bool cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
     cs_print(x, TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
     cs_print(x, TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
     cs_print(x, TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
-    const char* bit_mode[] = {
-        [0] = "32-bit",
-        [1] = "64-bit",
-    };
-    cs_print(x, TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.KX]);
-    cs_print(x, TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.SX]);
-    cs_print(x, TEXT_Y(line++), "user:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.UX]);
+    cs_print(x, TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%d-bit",   infoColor, (s.KX ? 64 : 32));
+    cs_print(x, TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%d-bit", infoColor, (s.SX ? 64 : 32));
+    cs_print(x, TEXT_Y(line++), "user:\t\t\t\t"STR_COLOR_PREFIX"%d-bit",     infoColor, (s.UX ? 64 : 32));
     const char* exec_mode[] = {
         [0b00] = "kernel",
         [0b01] = "supervisor",
