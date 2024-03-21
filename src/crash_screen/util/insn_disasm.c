@@ -515,8 +515,8 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_FUNCTION            STR_HEX_PREFIX STR_HEX_WORD     // Function address.
 #define STR_IREG_BASE           "("STR_IREG")"                  // Base register.
 #define STR_FREG                "F%02d"                         // Float Register.
-#define STR_CODE10              "%03X"                          // 10-bit data for exception handler.
-#define STR_CODE20              "%05X"                          // 20-bit data for exception handler.
+#define STR_CODE10              STR_HEX_PREFIX "%03X"           // 10-bit data for exception handler.
+#define STR_CODE20              STR_HEX_PREFIX "%05X"           // 20-bit data for exception handler.
 
 
 #define ADD_COLOR(_c) {                                             \
