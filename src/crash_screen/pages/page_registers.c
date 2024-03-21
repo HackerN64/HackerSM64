@@ -74,7 +74,7 @@ static const RegisterId sRegList[] = {
 #define REG_LIST_ROWS    DIV_CEIL((ARRAY_COUNT(sRegList) - 1), REG_LIST_COLUMNS)
 
 // FP list:
-#define FP_REG_SIZE     (sizeof(__OSfp) / sizeof(uintptr_t))
+#define FP_REG_SIZE     (sizeof(__OSfp) / sizeof(float))
 #define FP_LIST_COLUMNS 3
 #define FP_LIST_ROWS    DIV_CEIL((CP1_NUM_REGISTERS / FP_REG_SIZE), FP_LIST_COLUMNS)
 

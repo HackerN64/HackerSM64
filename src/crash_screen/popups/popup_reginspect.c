@@ -66,11 +66,7 @@ _Bool cs_print_reg_info_CPU_V(u32 line, UNUSED uint64_t val) {
     u32 v1 = get_reg_val(CPU, REG_CPU_V1);
     if (v1 > 1) {
         u32 v0 = get_reg_val(CPU, REG_CPU_V0);
-        HiLo64 combinedV = {
-            .hi = v0,
-            .lo = v1,
-        };
-        cs_print(TEXT_X(2), TEXT_Y(line), (" "STR_HEX_PREFIX STR_HEX_LONG), combinedV.raw);
+        cs_print(TEXT_X(2), TEXT_Y(line), (" "STR_HEX_PREFIX STR_HEX_LONG), ((HiLo64){ .hi = v0, .lo = v1, }).raw);
         return TRUE;
     }
 
@@ -78,66 +74,83 @@ _Bool cs_print_reg_info_CPU_V(u32 line, UNUSED uint64_t val) {
 }
 
 _Bool cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
+    const u32 x = TEXT_X(2);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_CP0_Status s = {
         .raw = (uint32_t)val,
     };
-    cs_print(TEXT_X(2), TEXT_Y(line++), "cop1 useable:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.CU_.CP1); // The other coprocessor bits are ignored by the N64.
+
+    cs_print(x, TEXT_Y(line++), "cop1 useable:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.CU_.CP1); // The other coprocessor bits are ignored by the N64.
 #undef RP // PR/region.h moment
-    cs_print(TEXT_X(2), TEXT_Y(line++), "low power mode:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.RP);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "extra fpr:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.FR);
+    cs_print(x, TEXT_Y(line++), "low power mode:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.RP);
+    cs_print(x, TEXT_Y(line++), "extra fpr:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.FR);
     const char* endian[] = {
         [0] = "big",
         [1] = "little",
     };
-    cs_print(TEXT_X(2), TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
-    cs_print(TEXT_X(2), TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
+    cs_print(x, TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
+    cs_print(x, TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
+    cs_print(x, TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
     const char* bit_mode[] = {
         [0] = "32-bit",
         [1] = "64-bit",
     };
-    cs_print(TEXT_X(2), TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.KX]);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.SX]);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "user:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.UX]);
+    cs_print(x, TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.KX]);
+    cs_print(x, TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.SX]);
+    cs_print(x, TEXT_Y(line++), "user:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, bit_mode[s.UX]);
     const char* exec_mode[] = {
         [0b00] = "kernel",
         [0b01] = "supervisor",
         [0b10] = "user",
     };
-    cs_print(TEXT_X(2), TEXT_Y(line++), "exec mode:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, exec_mode[s.KSU]);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "error:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.ERL);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "exception:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.EXL);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "global interrupts:\t"STR_COLOR_PREFIX"%d", infoColor, s.IE);
+    cs_print(x, TEXT_Y(line++), "exec mode:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, exec_mode[s.KSU]);
+    cs_print(x, TEXT_Y(line++), "error:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.ERL);
+    cs_print(x, TEXT_Y(line++), "exception:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.EXL);
+    cs_print(x, TEXT_Y(line++), "global interrupts:\t"STR_COLOR_PREFIX"%d", infoColor, s.IE);
 
     return TRUE;
 }
 
 _Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
+    const u32 x1 = TEXT_X(2);
+    const u32 x2 = TEXT_X(4);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_CP0_Cause c = {
         .raw = (uint32_t)val,
     };
 
-    cs_print(TEXT_X(2), TEXT_Y(line++), "in branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "interrupts pending:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, c.IP);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "exc code:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, c.Exc_Code);
-    if (c.Exc_Code == (EXC_CPU >> CAUSE_EXCSHIFT)) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), "unusable coprocessor:\t"STR_COLOR_PREFIX"cop%d", infoColor, c.CE);
-    }
+    cs_print(x1, TEXT_Y(line++), "in branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
+    line++;
+    cs_print(x1, TEXT_Y(line++), "interrupts pending:");
+    cs_print(x2, TEXT_Y(line++), "Timer:\t\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_.Timer);
+    cs_print(x2, TEXT_Y(line++), "Indy RDB:\t\t\t  "STR_COLOR_PREFIX"R:%d/W:%d", infoColor, c.IP_External_.Indy_R, c.IP_External_.Indy_W);
+    cs_print(x2, TEXT_Y(line++), "Reset (NMI):\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_External_.Reset);
+    cs_print(x2, TEXT_Y(line++), "Cartridge:\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_External_.Cartridge);
+    cs_print(x2, TEXT_Y(line++), "MIPS:\t\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_External_.MI);
+    cs_print(x2, TEXT_Y(line++), "Software:\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_.Software);
+    line++;
+    cs_print(x1, TEXT_Y(line++), "exc code:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, c.Exc_Code);
+    size_t charX = 4;
     const char* causeDesc = get_cause_desc(&gInspectThread->context, FALSE);
     if (causeDesc != NULL) {
-        cs_print(TEXT_X(4), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", infoColor, causeDesc);
+        charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"%s", infoColor, causeDesc);
+    }
+    if (c.Exc_Code == (EXC_CPU >> CAUSE_EXCSHIFT)) {
+        cs_print(TEXT_X(charX), TEXT_Y(line++), " "STR_COLOR_PREFIX"(cop%d)", infoColor, c.CE);
     }
 
     return TRUE;
 }
 
 _Bool cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
+    const u32 x1 = TEXT_X(2);
+    const u32 x2 = TEXT_X(4);
+    const u32 x3 = TEXT_X(12);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_FPR_31 f = {
         .raw = (uint32_t)val,
     };
+
     cs_print(TEXT_X(2), TEXT_Y(line++), "flush denorms to zero:\t"STR_COLOR_PREFIX"%d", infoColor, f.FS);
     cs_print(TEXT_X(2), TEXT_Y(line++), "condition bit:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, f.C);
     const char* round_mode[] = {
@@ -146,16 +159,16 @@ _Bool cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
         [0b10] = "+inf",
         [0b11] = "-inf",
     };
-    cs_print(TEXT_X(2), TEXT_Y(line++), "rounding mode:\t\t\t"STR_COLOR_PREFIX"to %s", infoColor, round_mode[f.RM]);
+    cs_print(x1, TEXT_Y(line++), "rounding mode:\t\t\t"STR_COLOR_PREFIX"to %s", infoColor, round_mode[f.RM]);
     line++;
-    cs_print(TEXT_X(2), TEXT_Y(line++), "exception bits:");
-    cs_print(TEXT_X(4), TEXT_Y(line++), "E:unimpl   | V:invalid   | Z:div0");
-    cs_print(TEXT_X(4), TEXT_Y(line++), "O:overflow | U:underflow | I:inexact");
+    cs_print(x1, TEXT_Y(line++), "exception bits:");
+    cs_print(x2, TEXT_Y(line++), "E:unimpl   | V:invalid   | Z:div0");
+    cs_print(x2, TEXT_Y(line++), "O:overflow | U:underflow | I:inexact");
     line++;
-    cs_print(TEXT_X(12), TEXT_Y(line++), "       E V Z O U I");
-    cs_print(TEXT_X(12), TEXT_Y(line++), "cause: "STR_COLOR_PREFIX"%d %d %d %d %d %d", infoColor, f.cause_.E, f.cause_.V,  f.cause_.Z,  f.cause_.O,  f.cause_.U,  f.cause_.I );
-    cs_print(TEXT_X(12), TEXT_Y(line++), "enable:  "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.enable_.V, f.enable_.Z, f.enable_.O, f.enable_.U, f.enable_.I);
-    cs_print(TEXT_X(12), TEXT_Y(line++), "flags:   "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.flag_.V,   f.flag_.Z,   f.flag_.O,   f.flag_.U,   f.flag_.I  );
+    cs_print(x3, TEXT_Y(line++), "       E V Z O U I");
+    cs_print(x3, TEXT_Y(line++), "cause: "STR_COLOR_PREFIX"%d %d %d %d %d %d", infoColor, f.cause_.E, f.cause_.V,  f.cause_.Z,  f.cause_.O,  f.cause_.U,  f.cause_.I );
+    cs_print(x3, TEXT_Y(line++), "enable:  "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.enable_.V, f.enable_.Z, f.enable_.O, f.enable_.U, f.enable_.I);
+    cs_print(x3, TEXT_Y(line++), "flags:   "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.flag_.V,   f.flag_.Z,   f.flag_.O,   f.flag_.U,   f.flag_.I  );
 
     return TRUE;
 }
@@ -166,13 +179,12 @@ typedef struct RegInspectExtraInfo {
     /*0x08*/ _Bool (*func)(u32 line, uint64_t val);
     /*0x0C*/ const char* title;
 } RegInspectExtraInfo; /*0x10*/
-
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     { .cop = CPU,  .idx = REG_CPU_V0,             .func = cs_print_reg_info_CPU_V,    .title = "64-bit combined value of $v0 and $v1", },
     { .cop = CPU,  .idx = REG_CPU_V1,             .func = cs_print_reg_info_CPU_V,    .title = "64-bit combined value of $v0 and $v1", },
-    { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    .title = "decoded info", },
-    { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, .title = "decoded info", },
-    { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  .title = "decoded info", },
+    { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    .title = "decoded bits", },
+    { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, .title = "decoded bits", },
+    { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  .title = "decoded bits", },
 };
 
 // Register popup box draw function.

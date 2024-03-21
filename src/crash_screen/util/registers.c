@@ -18,6 +18,19 @@
 
 // -- CPU Register info --
 
+const char* sRegDesc[] = {
+    [REG_DESC_ZERO  ] = "zero",
+    [REG_DESC_AT    ] = "assembler temporary value",
+    [REG_DESC_SUBRET] = "subroutine return value",
+    [REG_DESC_SUBARG] = "subroutine argument",
+    [REG_DESC_TEMP  ] = "temporary value",
+    [REG_DESC_SAVED ] = "saved value",
+    [REG_DESC_KERNEL] = "kernel value",
+    [REG_DESC_GP    ] = "global pointer",
+    [REG_DESC_SP    ] = "stack pointer",
+    [REG_DESC_FP    ] = "saved value or frame pointer", //! TODO: determine which one this register is.
+    [REG_DESC_RA    ] = "return address",
+};
 ALIGNED32 static const RegisterInfo sRegisters_CPU[CPU_NUM_REGISTERS] = {
     [REG_CPU_R0] = DEF_CPU_SREG(zero, "R0", REG_DESC_ZERO),
     [REG_CPU_AT] = DEF_CPU_TREG(at, "AT", REG_DESC_AT    ),
@@ -55,23 +68,38 @@ uint64_t get_cpu_reg_val(enum CPURegisters idx) {
     }
     return val;
 }
-const char* sRegDesc[] = {
-    [REG_DESC_ZERO  ] = "zero",
-    [REG_DESC_AT    ] = "assembler temporary value",
-    [REG_DESC_SUBRET] = "subroutine return value",
-    [REG_DESC_SUBARG] = "subroutine argument",
-    [REG_DESC_TEMP  ] = "temporary value",
-    [REG_DESC_SAVED ] = "saved value",
-    [REG_DESC_KERNEL] = "kernel value",
-    [REG_DESC_GP    ] = "global pointer",
-    [REG_DESC_SP    ] = "stack pointer",
-    [REG_DESC_FP    ] = "saved value or frame pointer", //! TODO: determine which one this is.
-    [REG_DESC_RA    ] = "return address",
-};
 
 
 // -- COP0 Register info --
 
+const char* sRegDesc_CP0[] = {
+    [REG_DESC_CP0_INX      ] = "index of TLB entry",
+    [REG_DESC_CP0_RAND     ] = "random TLB index between $Wired and 0x1F",
+    [REG_DESC_CP0_ENTRYLO0 ] = "TLB entry low buts (even)",
+    [REG_DESC_CP0_ENTRYLO1 ] = "TLB entry low buts (odd)",
+    [REG_DESC_CP0_CONTEXT  ] = "pointer to PIE entry",
+    [REG_DESC_CP0_PAGEMASK ] = "page size spec.",
+    [REG_DESC_CP0_WIRED    ] = "num wired TLB entries",
+    [REG_DESC_CP0_BADVADDR ] = "virt. addr of failed TLB translation",
+    [REG_DESC_CP0_COUNT    ] = "timer count",
+    [REG_DESC_CP0_ENTRYHI  ] = "TLB entry high bits",
+    [REG_DESC_CP0_COMPARE  ] = "timer compare value",
+    [REG_DESC_CP0_SR       ] = "operation status setting",
+    [REG_DESC_CP0_CAUSE    ] = "cause of last exception",
+    [REG_DESC_CP0_EPC      ] = "exception program counter",
+    [REG_DESC_CP0_PRID     ] = "processor revision id",
+    [REG_DESC_CP0_CONFIG   ] = "memory system mode setting",
+    [REG_DESC_CP0_LLADDR   ] = "load linked insn addr",
+    [REG_DESC_CP0_WATCHLO  ] = "watch exception low bits",
+    [REG_DESC_CP0_WATCHHI  ] = "watch exception high bits",
+    [REG_DESC_CP0_XCONTEXT ] = "indicates PIE entry",
+    [REG_DESC_CP0_ECC      ] = "cache parity",
+    [REG_DESC_CP0_CACHE_ERR] = "cache error/status",
+    [REG_DESC_CP0_TAGLO    ] = "cache tag low bits",
+    [REG_DESC_CP0_TAGHI    ] = "cache tag high bits",
+    [REG_DESC_CP0_ERROR_EPC] = "error exception program counter",
+    [REG_DESC_CP0_RESERVED ] = "reserved",
+};
 ALIGNED32 static const RegisterInfo sRegisters_COP0[CP0_NUM_REGISTERS] = {
     [REG_CP0_INX      ] = DEF_COP0_SREG(C0_INX,       u32,           "Index",    "IX", REG_DESC_CP0_INX      ),
     [REG_CP0_RAND     ] = DEF_COP0_SREG(C0_RAND,      u32,           "Random",   "RN", REG_DESC_CP0_RAND     ),
@@ -86,7 +114,7 @@ ALIGNED32 static const RegisterInfo sRegisters_COP0[CP0_NUM_REGISTERS] = {
     [REG_CP0_ENTRYHI  ] = DEF_COP0_SREG(C0_ENTRYHI,   u64,           "EntryHi",  "EH", REG_DESC_CP0_ENTRYHI  ),
     [REG_CP0_COMPARE  ] = DEF_COP0_SREG(C0_COMPARE,   u32,           "Compare",  "CP", REG_DESC_CP0_COMPARE  ),
     [REG_CP0_SR       ] = DEF_COP0_TREG(C0_SR,        u32, sr,       "Status",   "SR", REG_DESC_CP0_SR       ),
-    [REG_CP0_CAUSE    ] = DEF_COP0_TREG(C0_CAUSE,     u32, cause,    "Cause",    "CS", REG_DESC_CP0_CAUSE    ),
+    [REG_CP0_CAUSE    ] = DEF_COP0_TREG(C0_CAUSE,     u32, cause,    "Cause",    "CR", REG_DESC_CP0_CAUSE    ),
     [REG_CP0_EPC      ] = DEF_COP0_TREG(C0_EPC,       u64, pc,       "EPC",      "PC", REG_DESC_CP0_EPC      ), //! TODO: Are pc and epc the same? They seem to be different sizes but they match on a crash.
     [REG_CP0_PRID     ] = DEF_COP0_SREG(C0_PRID,      u32,           "PRId",     "PR", REG_DESC_CP0_PRID     ),
     [REG_CP0_CONFIG   ] = DEF_COP0_SREG(C0_CONFIG,    u32,           "Config",   "CF", REG_DESC_CP0_CONFIG   ),
@@ -147,35 +175,6 @@ uint64_t get_cop0_reg_val(enum COP0Registers idx) {
     }
     return val;
 }
-
-const char* sRegDesc_CP0[] = {
-    [REG_DESC_CP0_INX      ] = "index of TLB entry",
-    [REG_DESC_CP0_RAND     ] = "random TLB index between $Wired and 0x1F",
-    [REG_DESC_CP0_ENTRYLO0 ] = "TLB entry low buts (even)",
-    [REG_DESC_CP0_ENTRYLO1 ] = "TLB entry low buts (odd)",
-    [REG_DESC_CP0_CONTEXT  ] = "pointer to PIE entry",
-    [REG_DESC_CP0_PAGEMASK ] = "page size spec.",
-    [REG_DESC_CP0_WIRED    ] = "num wired TLB entries",
-    [REG_DESC_CP0_BADVADDR ] = "virt. addr of failed TLB translation",
-    [REG_DESC_CP0_COUNT    ] = "timer count",
-    [REG_DESC_CP0_ENTRYHI  ] = "TLB entry high bits",
-    [REG_DESC_CP0_COMPARE  ] = "timer compare",
-    [REG_DESC_CP0_SR       ] = "operation status setting",
-    [REG_DESC_CP0_CAUSE    ] = "cause of last exception",
-    [REG_DESC_CP0_EPC      ] = "exception program counter",
-    [REG_DESC_CP0_PRID     ] = "processor revision id",
-    [REG_DESC_CP0_CONFIG   ] = "memory system mode setting",
-    [REG_DESC_CP0_LLADDR   ] = "load linked insn addr",
-    [REG_DESC_CP0_WATCHLO  ] = "watch exception low bits",
-    [REG_DESC_CP0_WATCHHI  ] = "watch exception high bits",
-    [REG_DESC_CP0_XCONTEXT ] = "indicates PIE entry",
-    [REG_DESC_CP0_ECC      ] = "cache parity",
-    [REG_DESC_CP0_CACHE_ERR] = "cache error/status",
-    [REG_DESC_CP0_TAGLO    ] = "cache tag low bits",
-    [REG_DESC_CP0_TAGHI    ] = "cache tag high bits",
-    [REG_DESC_CP0_ERROR_EPC] = "error exception program counter",
-    [REG_DESC_CP0_RESERVED ] = "reserved",
-};
 
 
 // -- COP1 Register info --

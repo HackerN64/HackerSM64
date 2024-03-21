@@ -33,10 +33,10 @@ enum CSSettingsGroup_page_disasm {
 
 typedef struct BranchArrow {
     /*0x00*/ Address startAddr;
-    /*0x02*/ s16 branchOffset;
-    /*0x04*/ s16 colorIndex;
-    /*0x08*/ s32 xPos;
-} BranchArrow; /*0x10*/
+    /*0x04*/ s16 branchOffset;
+    /*0x06*/ u8 xPos;
+    /*0x07*/ u8 colorIndex;
+} BranchArrow; /*0x08*/
 
 
 #define PAGE_DISASM_STEP (ssize_t)sizeof(InsnData)

@@ -6,6 +6,7 @@
 #include "sm64.h"
 
 #include "crash_screen/cs_main.h"
+#include "util/insn_disasm.h"
 #include "util/map_parser.h"
 #include "util/memory_read.h"
 #include "util/registers.h"
@@ -111,7 +112,7 @@ typedef struct ThreadName {
     /*0x04*/ const char* name;
 } ThreadName; /*0x08*/
 static const ThreadName sThreadIDNames[] = {
-    { .id = THREAD_0_MANAGER,           .name = "libultra?",        }, // Uses sThreadPriNames.
+    { .id = THREAD_0,                   .name = "libultra?",        }, // Uses sThreadPriNames.
     { .id = THREAD_1_IDLE,              .name = "idle",             },
     { .id = THREAD_2,                   .name = "unused",           },
     { .id = THREAD_3_MAIN,              .name = "main",             },
@@ -149,16 +150,21 @@ static const char* get_thread_name_from_list(int id, const ThreadName* list, siz
 // Returns a thread name from 'sThreadIDNames'.
 const char* get_thread_name(OSThread* thread) {
     OSId id = osGetThreadId(thread);
+    OSPri pri = osGetThreadPri(thread);
     const char* name = NULL;
 
     // Determine libultra threads on thread ID 0 by priority instead of ID:
-    if (id == THREAD_0_MANAGER) {
-        name = get_thread_name_from_list(osGetThreadPri(thread), sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
-        if (name != NULL) return name;
+    if ((id == THREAD_0) && (pri > OS_PRIORITY_APPMAX)) {
+        name = get_thread_name_from_list(pri, sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
+        if (name != NULL) {
+            return name;
+        }
     }
 
     name = get_thread_name_from_list(id, sThreadIDNames, ARRAY_COUNT(sThreadIDNames));
-    if (name != NULL) return name;
+    if (name != NULL) {
+        return name;
+    }
 
     return NULL;
 }
@@ -253,6 +259,20 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
 
         // Heuristics from libdragon:
         switch (cause) {
+            case EXC_INT: // Non-crash interrupts (can be shown after changing the inspected thread).
+                //! TODO: Can this potentially be different?
+                if (tc->pc == ((Address)osRecvMesg + (26 * sizeof(Word)))) { // 26th Instruction in osRecvMesg.
+                    return "Waiting for mesg";
+                }
+                //! TODO: Unsafe data reads:
+                InsnData insn = { .raw = *(u32*)tc->pc };
+                InsnData prev = { .raw = *(u32*)(tc->pc - sizeof(Word)) };
+                #define INSN_IS_B_0(_insn) (((_insn).opcode == OPC_BEQ) && ((_insn).rs == (_insn).rt) && ((_insn).offset == (u16)-1))
+                if (INSN_IS_B_0(insn) || (((insn.raw == 0x00000000)) && INSN_IS_B_0(prev) && ((Reg_CP0_Cause)tc->cause).BD)) {
+                    return "Empty infinite loop";
+                }
+                #undef INSN_IS_B_0
+                break;
             case EXC_MOD:
                 return "Write to read-only memory";
             case EXC_RMISS:
@@ -261,7 +281,11 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 } else if (badvaddr < 128) {
                     // This is probably a NULL pointer dereference, though it can go through a structure or an array,
                     // so leave some margin to the actual faulting address.
-                    return "NULL pointer dereference (read)";
+                    if (tc->pc == (Address)strlen) {
+                        return "NULL string dereference (read)";
+                    } else {
+                        return "NULL pointer dereference (read)";
+                    }
                 } else {
                     return "Read from invalid memory address";
                 }

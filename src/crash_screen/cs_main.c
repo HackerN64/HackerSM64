@@ -34,7 +34,7 @@ CSThreadInfo* gActiveCSThreadInfo = NULL; // Pointer to the current crash screen
 OSThread*     gCrashedThread      = NULL; // Pointer to the most recently crashed thread.
 OSThread*     gInspectThread      = NULL; // Pointer to the thread the crash screen will be inspecting.
 
-Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_PTR to set the crashed thread PC.
+Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_PTR to set the crashed thread PC. Externed in macros.h.
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
 
 
@@ -232,7 +232,7 @@ void create_crash_screen_thread(void) {
         &threadInfo->thread, (THREAD_1000_CRASH_SCREEN_0 + sCSThreadIndex),
         crash_screen_thread_entry, NULL,
         ((u8*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
-        (OS_PRIORITY_APPMAX - 1) //! TODO: Why shouldn't get_crashed_thread check for OS_PRIORITY_APPMAX threads?
+        (OS_PRIORITY_APPMAX - 1)
     );
     osStartThread(&threadInfo->thread);
 }

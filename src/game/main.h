@@ -19,7 +19,7 @@ enum VIModes {
 #define THREAD1000_STACK 0x0400 // Crash screen.
 
 enum ThreadID {
-    THREAD_0_MANAGER,       // Various libultra threads.
+    THREAD_0,               // Various libultra threads.
     THREAD_1_IDLE,          // Initial thread created by main_func. Sets up various things then creates main thread and goes idle.
     THREAD_2,               // Unused (previously crash screen).
     THREAD_3_MAIN,          // Main thread.

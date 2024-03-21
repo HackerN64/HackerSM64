@@ -27,6 +27,28 @@ typedef union Reg_CP0_Random {
 } Reg_CP0_Random;
 // $EntryLo0
 // $EntryLo1
+typedef union Reg_CP0_EntryLo_32 {
+    struct PACKED {
+        u32     :  6; // RFU. Must be written as zeroes, and returns zeroes when read.
+        u32 PFN : 20; // Page frame number; the high-order bits of the physical address.
+        u32 C   :  3; // Specifies the TLB page attribute. [0-7, 2 = cache is not used, otherwise cache is used.]
+        u32 D   :  1; // Dirty. If this bit is set, the page is marked as dirty and, therefore, writable. This bit is actually a write-protect bit that software can use to prevent alteration of data.
+        u32 V   :  1; // Valid. If this bit is set, it indicates that the TLB entry is valid; otherwise, a TLBL or TLBS miss occurs.
+        u32 G   :  1; // Global. If this bit is set in both Entry Lo0 and Entry Lo1, then the processor ignores the ASID during TLB lookup
+    };
+    u32 raw;
+} Reg_CP0_EntryLo_32;
+typedef union Reg_CP0_EntryLo_64 {
+    struct PACKED {
+        u64     : 38; // RFU. Must be written as zeroes, and returns zeroes when read.
+        u64 PFN : 20; // Page frame number; the high-order bits of the physical address.
+        u64 C   :  3; // Specifies the TLB page attribute. [0-7, 2 = cache is not used, otherwise cache is used.]
+        u64 D   :  1; // Dirty. If this bit is set, the page is marked as dirty and, therefore, writable. This bit is actually a write-protect bit that software can use to prevent alteration of data.
+        u64 V   :  1; // Valid. If this bit is set, it indicates that the TLB entry is valid; otherwise, a TLBL or TLBS miss occurs.
+        u64 G   :  1; // Global. If this bit is set in both Entry Lo0 and Entry Lo1, then the processor ignores the ASID during TLB lookup
+    };
+    u64 raw;
+} Reg_CP0_EntryLo_64;
 // $Context
 typedef union Reg_CP0_Context_32 {
     struct PACKED {
@@ -64,6 +86,24 @@ typedef union Reg_CP0_Wired {
 // $BadVAddr
 // $Count
 // $EntryHi
+typedef union Reg_CP0_EntryHi_32 {
+    struct PACKED {
+        u32 VPN2 : 19; // Virtual page number divided by two (maps to two pages)
+        u32      :  5; // RFU. Must be written as zeroes, and returns zeroes when read.
+        u32 ASID :  8; // Address space ID field. An 8-bit field that lets multiple processes share the TLB; virtual addresses for each process can be shared.
+    };
+    u32 raw;
+} Reg_CP0_EntryHi_32;
+typedef union Reg_CP0_EntryHi_64 {
+    struct PACKED {
+        u64 R    :  2; // Region. [00:user, 01:supervisor, 11:Kernel] used to match vAddr. [63...62]
+        u64 Fill : 22; // RFU. Writing this data to this area is ignored. 0 is returned when this bit area read.
+        u64 VPN2 : 27; // Virtual page number divided by two (maps to two pages).
+        u64      :  5; // RFU. Must be written as zeroes, and returns zeroes when read.
+        u64 ASID :  8; // Address space ID field. An 8-bit field that lets multiple processes share the TLB; virtual addresses for each process can be shared.
+    };
+    u64 raw;
+} Reg_CP0_EntryHi_64;
 // $Compare
 // $Status
 typedef union Reg_CP0_Status {
@@ -135,7 +175,7 @@ typedef union Reg_CP0_Cause {
         u32 Indy_W    :  1; // Connected to the Indy dev kit’s RDB port. Set to 1 when a value is written.
         u32 Indy_R    :  1; // Connected to the Indy dev kit’s RDB port. Set to 1 when a value is read.
         u32 Reset     :  1; // This is connected to the Reset button on the top of the console. When pressed, this becomes 1.
-        u32 Cartridge :  1; //This is connected to the cartridge slot. Cartridges with special hardware can trigger this interrupt. Unsure how common this is in practice.
+        u32 Cartridge :  1; // This is connected to the cartridge slot. Cartridges with special hardware can trigger this interrupt. Unsure how common this is in practice.
         u32 MI        :  1; // This is connected to the MI interrupt process described above. It is set to 1 when ((MI_INTR_REG & MI_INTR_MASK_REG) != 0).
         u32           :  8;
     } IP_External_;
@@ -284,3 +324,94 @@ typedef union Reg_FPR_31 {
     } flag_;
     u32 raw;
 } Reg_FPR_31;
+
+
+// -- RCP --
+
+// DPC_STATUS_REG
+typedef union Reg_DPC_Status_write {
+    struct PACKED {
+        u32 clr_clock_ctr     : 1;
+        u32 clr_cmd_ctr       : 1;
+        u32 clr_pipe_ctr      : 1;
+        u32 clr_tmem_ctr      : 1;
+        u32 set_flush         : 1;
+        u32 clr_flush         : 1;
+        u32 set_freeze        : 1;
+        u32 clr_freeze        : 1;
+        u32 set_xbus_dmem_dma : 1;
+        u32 clr_xbus_dmem_dma : 1;
+    };
+    u32 raw;
+} Reg_DPC_Status_write;
+typedef union Reg_DPC_Status_read {
+    struct PACKED {
+        u32               : 21;
+        u32 start_valid   :  1;
+        u32 end_valid     :  1;
+        u32 dma_busy      :  1;
+        u32 cbuf_busy     :  1;
+        u32 cmd_busy      :  1;
+        u32 pipe_busy     :  1;
+        u32 tmem_busy     :  1;
+        u32 start_gclk    :  1;
+        // u32 frozen         : 1;
+        u32 flush         :  1;
+        u32 freeze        :  1;
+        u32 xbus_dmem_dma :  1;
+    };
+    u32 raw;
+} Reg_DPC_Status_read;
+// SP_STATUS_REG
+typedef union Reg_SP_Status_write {
+    struct PACKED {
+        u32                : 7;
+        u32 set_signal_7   : 1;
+        u32 clr_signal_7   : 1;
+        u32 set_signal_6   : 1;
+        u32 clr_signal_6   : 1;
+        u32 set_signal_5   : 1;
+        u32 clr_signal_5   : 1;
+        u32 set_signal_4   : 1; // set cpusignal
+        u32 clr_signal_4   : 1; // clr cpusignal
+        u32 set_signal_3   : 1; // set rspsignal
+        u32 clr_signal_3   : 1; // clr rspsignal
+        u32 set_signal_2   : 1; // set taskdone
+        u32 clr_signal_2   : 1; // clr taskdone
+        u32 set_signal_1   : 1; // set yielded
+        u32 clr_signal_1   : 1; // clr yielded
+        u32 set_signal_0   : 1; // set yield
+        u32 clr_signal_0   : 1; // clr yield
+        u32 set_intr_break : 1;
+        u32 clr_intr_break : 1;
+        u32 set_sstep      : 1;
+        u32 clr_sstep      : 1;
+        u32 set_intr       : 1;
+        u32 clr_intr       : 1;
+        u32 clr_broke      : 1;
+        u32 set_halt       : 1;
+        u32 clr_halt       : 1;
+    };
+    u32 raw;
+} Reg_SP_Status_write;
+typedef union Reg_SP_Status_read {
+    struct PACKED {
+        u32                    : 17;
+        u32 signal_7_set       :  1;
+        u32 signal_6_set       :  1;
+        u32 signal_5_set       :  1;
+        u32 signal_4_set       :  1; // cpusignal
+        u32 signal_3_set       :  1; // rspsignal
+        u32 signal_2_set       :  1; // taskdone
+        u32 signal_1_set       :  1; // yielded
+        u32 signal_0_set       :  1; // yield
+        u32 interrupt_on_break :  1;
+        u32 single_step        :  1;
+        u32 io_full            :  1;
+        u32 dma_full           :  1;
+        u32 dma_busy           :  1;
+        u32 broke              :  1;
+        u32 halt               :  1;
+    };
+    u32 raw;
+} Reg_SP_Status_read;

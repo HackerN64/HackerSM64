@@ -18,9 +18,7 @@
 
 
 // Adjust tc->pc when in a delay slot.
-//! TODO: define for flag
-//! TODO: Is this correct?
-#define GET_EPC(tc) (tc->pc + ((tc->cause & 0x80000000) ? sizeof(uintptr_t) : 0))
+#define GET_EPC(tc) (tc->pc + (((Reg_CP0_Cause)tc->cause).BD ? sizeof(Word) : 0))
 
 
 // The number of crash screen threads that will be cycled through when the crash screen crashes. This should be at least 3.

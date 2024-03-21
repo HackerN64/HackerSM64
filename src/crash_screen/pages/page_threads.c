@@ -71,12 +71,25 @@ void page_threads_init(void) {
     sThreadsSelectedThreadPtr = __osGetActiveQueue();
 }
 
-void draw_thread_state_icon(u32 x, u32 y, u16 state) {
+void draw_thread_state_icon(u32 x, u32 y, OSThread* thread) {
     const s32 w = 6;
     const s32 h = 6;
+
+    u16 state = thread->state;
+    u16 flags = thread->flags;
     switch (state) {
         case OS_STATE_STOPPED:
-            cs_draw_rect(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
+            switch (flags) {
+                case OS_FLAG_CPU_BREAK:
+                    cs_draw_outline(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
+                    break;
+                case OS_FLAG_FAULT:
+                    cs_draw_rect(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
+                    break;
+                default:
+                    cs_draw_glyph(x, y, 'x', COLOR_RGBA32_CRASH_NO);
+                    break;
+            }
             break;
         case OS_STATE_RUNNABLE:
             cs_draw_rect(x, y, 1, (h - 1), COLOR_RGBA32_VERY_LIGHT_YELLOW);
@@ -118,6 +131,7 @@ void page_threads_draw(void) {
     u32 i = 0;
     u32 threadIndex = 0;
     u32 y = TEXT_Y(0);
+
     while (thread->priority != OS_PRIORITY_THREADTAIL) {
         if (
             (threadIndex < sThreadsViewportIndex) ||
@@ -165,7 +179,7 @@ void page_threads_draw(void) {
 
         // Second line:
 
-        draw_thread_state_icon(TEXT_X(showAddresses ? 0 : (CRASH_SCREEN_NUM_CHARS_X - 1)), y, thread->state);
+        draw_thread_state_icon(TEXT_X(showAddresses ? 0 : (CRASH_SCREEN_NUM_CHARS_X - 1)), y, thread);
         if (thread == gInspectThread) {
             cs_print(TEXT_X(showAddresses ? 1 : (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("viewing") + 1))), y,
                 STR_COLOR_PREFIX"viewing", COLOR_RGBA32_CRASH_THREAD

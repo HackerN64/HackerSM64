@@ -73,8 +73,8 @@ const enum ControlTypes cs_cont_list_disasm[] = {
 #define DISASM_NUM_SHOWN_ROWS 21
 
 static u32 sDisasmViewportIndex = 0x00000000;
-static u32 sDisasmBranchStartX = 0; // The X position where branch arrows start.
 static u32 sDisasmNumShownRows = DISASM_NUM_SHOWN_ROWS;
+static u8 sDisasmBranchStartX = 0; // The X position where branch arrows start.
 
 #ifdef INCLUDE_DEBUG_MAP
 static const RGBA32 sBranchColors[] = {
@@ -127,14 +127,14 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         return FALSE;
     }
 
-    s16 curBranchColorIndex;
-    s32 curBranchX;
+    u8 curBranchColorIndex = 0;
+    u8 curBranchX = sDisasmBranchStartX;
 
     if (sNumBranchArrows == 0) {
         // Start:
         curBranchColorIndex = 0;
         curBranchX = sDisasmBranchStartX;
-    } else { //! TODO: Verify that this ordering is correct:
+    } else {
         // Continue:
         curBranchColorIndex = sBranchArrows[sNumBranchArrows - 1].colorIndex;
         curBranchX          = sBranchArrows[sNumBranchArrows - 1].xPos;
@@ -172,7 +172,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         };
         s16 branchOffset = insn_check_for_branch_offset(insn);
 
-        if (branchOffset != 0x0000) { //! TODO: Verify ordering:
+        if (branchOffset != 0x0000) {
             curBranchX += (DISASM_BRANCH_ARROW_SPACING + 1);
             curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
 
@@ -183,8 +183,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
 
             currArrow->startAddr    = sBranchBufferCurrAddr;
             currArrow->branchOffset = branchOffset;
-            currArrow->colorIndex   = curBranchColorIndex;
             currArrow->xPos         = curBranchX;
+            currArrow->colorIndex   = curBranchColorIndex;
 
             currArrow++;
             sNumBranchArrows++;

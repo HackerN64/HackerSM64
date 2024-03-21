@@ -431,8 +431,8 @@ typedef struct PACKED InsnTemplate {
     /*0x0E*/ u8 out; // Output register index in fmt. 0 = no output (first char is always insn name format). 6 = HiLo (TODO). 7 = Link Register (TODO).
     /*0x0F*/ struct PACKED { // Floating point format data.
                 //! TODO: 32 bit vs. 64 bit.
-                u8 f1  : 1; // Primary format: 0 = fixed point, 1 = floating point.
-                u8 f2  : 1; // Secondary format. Overwritten by [fmt] in certain instructions.
+                u8 f1  : 1; // Primary format. [0:fixed point, 1:floating point]
+                u8 f2  : 1; // Secondary format. [0:fixed point, 1:floating point] Overwritten by [fmt] in certain instructions.
                 u8 f2i : 6; // Index of the register that uses the secondary format.
             };
 } InsnTemplate; /*0x10*/
