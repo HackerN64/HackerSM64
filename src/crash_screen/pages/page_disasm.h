@@ -31,25 +31,28 @@ enum CSSettingsGroup_page_disasm {
 };
 
 
-typedef struct BranchArrow {
-    /*0x00*/ Address startAddr;
-    /*0x04*/ s16 branchOffset;
-    /*0x06*/ u16 xPos;
-} BranchArrow; /*0x08*/
+typedef union BranchArrow {
+    struct {
+        /*0x00*/ u16 insnIndex;
+        /*0x02*/ s16 branchOffset;
+    };
+    u32 raw;
+} BranchArrow; /*0x04*/
 
 
+// The size of one instruction in bytes (4).
 #define PAGE_DISASM_STEP (ssize_t)sizeof(InsnData)
 
 
-// Disasm constants.
+// Branch arrow visual attributes.
 #define DISASM_BRANCH_ARROW_HEAD_SIZE       4 // The size of the branch arrow head.
 #define DISASM_BRANCH_ARROW_HEAD_OFFSET     1 // The distance between the line and the arrow head.
 #define DISASM_BRANCH_ARROW_SPACING         2 // The spacing between each arrow's line, inclusive.
-#define DISASM_FUNCTION_SEARCH_MAX_INSNS    2048
-#define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (DISASM_FUNCTION_SEARCH_MAX_INSNS * PAGE_DISASM_STEP) // The max number of instructions to search for branches within a function.
 
 // The number of branch arrows that can be stored per-function.
-#define DISASM_BRANCH_BUFFER_SIZE           0x200
+#define DISASM_BRANCH_BUFFER_SIZE           384
+#define DISASM_FUNCTION_SEARCH_MAX_INSNS    2048
+#define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (DISASM_FUNCTION_SEARCH_MAX_INSNS * PAGE_DISASM_STEP) // The max number of instructions to search for branches within a function.
 
 
 #ifdef INCLUDE_DEBUG_MAP

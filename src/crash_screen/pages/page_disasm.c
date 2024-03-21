@@ -117,6 +117,14 @@ void page_disasm_init(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
 
+static u16 addr_to_insn_index(Address startAddr, Address addr) {
+    return ((addr - startAddr) / PAGE_DISASM_STEP);
+}
+
+static Address insn_index_to_addr(Address startAddr, u16 insnIndex) {
+    return ((insnIndex * PAGE_DISASM_STEP) + startAddr);
+}
+
 // Set this to SYMBOL_SEARCH_FORWARD for more accuracy when symbol sizes overlap at the cost of performance.
 #define BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION SYMBOL_SEARCH_BINARY
 
@@ -126,9 +134,6 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
     if (fname == NULL) {
         return FALSE;
     }
-
-    // Start or continue:
-    u8 curBranchX = (sNumBranchArrows == 0) ? sDisasmBranchStartX : sBranchArrows[sNumBranchArrows - 1].xPos;
 
     // Pick up where we left off.
     BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
@@ -146,7 +151,7 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         }
 
         // Check if we have left the function.
-        const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, SYMBOL_SEARCH_BINARY);
+        const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
         if (symbol != NULL) {
             if (!is_in_code_segment(symbol->addr)) {
                 return FALSE;
@@ -163,16 +168,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         s16 branchOffset = insn_check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) {
-            curBranchX += (DISASM_BRANCH_ARROW_SPACING + 1);
-
-            // Wrap around if extended past end of screen.
-            if ((sDisasmBranchStartX + curBranchX) > CRASH_SCREEN_TEXT_X2) {
-                curBranchX = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET);
-            }
-
-            currArrow->startAddr    = sBranchBufferCurrAddr;
+            currArrow->insnIndex    = addr_to_insn_index(symbol->addr, sBranchBufferCurrAddr); // ((sBranchBufferCurrAddr - symbol->addr) / PAGE_DISASM_STEP);
             currArrow->branchOffset = branchOffset;
-            currArrow->xPos         = curBranchX;
 
             currArrow++;
             sNumBranchArrows++;
@@ -181,8 +178,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
         sBranchBufferCurrAddr += PAGE_DISASM_STEP;
 
         // If branch mapping takes longer than a frame, so continue from the same place on the next frame.
-        //! TODO: Is this needed anymore with binary search?
-        if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) { // Is there a better way to do this?
+        //! TODO: Is this needed anymore with binary search? If so, is there a better way to do this?
+        if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) {
             return TRUE;
         }
     }
@@ -237,15 +234,25 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
 }
 
 #ifdef INCLUDE_DEBUG_MAP
-void disasm_draw_branch_arrows(u32 printLine) {
+void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
     // Draw branch arrows from the buffer.
     BranchArrow* currArrow = &sBranchArrows[0];
 
+    int xPos = sDisasmBranchStartX;
+
     for (u32 i = 0; i < sNumBranchArrows; i++) {
-        s32 startLine = (((s32)currArrow->startAddr - (s32)sDisasmViewportIndex) / PAGE_DISASM_STEP);
+        // Address startLineAddr = ((currArrow->insnIndex * PAGE_DISASM_STEP) + symbol->addr);
+        s32 startLine = (((s32)insn_index_to_addr(symbol->addr, currArrow->insnIndex) - (s32)sDisasmViewportIndex) / PAGE_DISASM_STEP);
         s32 endLine = (startLine + currArrow->branchOffset + 1);
 
-        draw_branch_arrow(startLine, endLine, currArrow->xPos, sBranchColors[(i % ARRAY_COUNT(sBranchColors))], printLine);
+        xPos += (DISASM_BRANCH_ARROW_SPACING + 1);
+
+        // Wrap around if extended past end of screen.
+        if ((sDisasmBranchStartX + xPos) > CRASH_SCREEN_TEXT_X2) {
+            xPos = (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET);
+        }
+
+        draw_branch_arrow(startLine, endLine, xPos, sBranchColors[(i % ARRAY_COUNT(sBranchColors))], printLine);
 
         currArrow++;
     }
@@ -384,9 +391,14 @@ void page_disasm_draw(void) {
         line++;
     }
 
+#ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
-        disasm_draw_branch_arrows(line);
+        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddr, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            disasm_draw_branch_arrows(line, symbol);
+        }
     }
+#endif // INCLUDE_DEBUG_MAP
 
     disasm_draw_asm_entries(line, sDisasmNumShownRows, alignedSelectedAddr, epc);
 
