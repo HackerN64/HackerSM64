@@ -626,7 +626,7 @@ patch: $(ROM)
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
-$(BUILD_DIR)/src/crash_screen/crash_draw.o: $(CRASH_TEXTURE_C_FILES)
+$(BUILD_DIR)/src/crash_screen/cs_draw.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
 $(SOUND_BIN_DIR)/sound_data.o:        $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/sequences.bin $(SOUND_BIN_DIR)/bank_sets
