@@ -26,7 +26,7 @@
 #define SET_HEX_DIGIT(dst, src, shift)  (((dst) & ~(BITMASK(BITS_PER_HEX) << (shift))) | ((src) << (shift)))
 
 
-extern struct CSPopup gCSPopup_address_select;
+extern struct CSPopup gCSPopup_address;
 
 
 void open_address_select(Address dest);

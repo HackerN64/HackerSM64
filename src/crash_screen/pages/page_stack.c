@@ -11,7 +11,7 @@
 #include "crash_screen/cs_print.h"
 #include "crash_screen/cs_settings.h"
 
-#include "crash_screen/popups/popup_address_select.h"
+#include "crash_screen/popups/popup_address.h"
 
 #include "page_stack.h"
 

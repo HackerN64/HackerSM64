@@ -11,7 +11,7 @@
 #include "crash_screen/cs_settings.h"
 #include "crash_screen/cs_pages.h"
 
-#include "popup_address_select.h"
+#include "popup_address.h"
 
 #include "crash_screen/pages/page_disasm.h" // For gFillBranchBuffer.
 
@@ -160,7 +160,7 @@ void open_address_select(Address dest) {
     sAddressSelectTarget = dest;
 }
 
-struct CSPopup gCSPopup_address_select = {
+struct CSPopup gCSPopup_address = {
     .name      = "ADDRESS SELECT",
     .initFunc  = NULL,
     .drawFunc  = cs_address_select_draw,

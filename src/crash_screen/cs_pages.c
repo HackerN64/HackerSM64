@@ -22,7 +22,7 @@
 #include "pages/page_settings.h"
 #include "pages/page_about.h"
 
-#include "popups/popup_address_select.h"
+#include "popups/popup_address.h"
 #include "popups/popup_page_controls.h"
 #include "popups/popup_page_select.h"
 #include "popups/popup_reginspect.h"
@@ -88,7 +88,7 @@ CSPopup* gCSPopups[NUM_CS_POPUPS] = {
     [CS_POPUP_CONTROLS      ] = &gCSPopup_controls,
     [CS_POPUP_PAGES         ] = &gCSPopup_pages,
     [CS_POPUP_REGINSPECT    ] = &gCSPopup_reginspect,
-    [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address_select,
+    [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address,
 };
 enum CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
 _Bool gCSSwitchedPopup = FALSE;
