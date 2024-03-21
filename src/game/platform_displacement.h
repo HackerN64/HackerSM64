@@ -8,12 +8,12 @@
 #include "config.h"
 
 struct PlatformDisplacementInfo {
-	Vec3f prevPos;
-	Vec3f prevTransformedPos;
-	Vec3f prevTransformedYawVec;
-	s16 prevYaw;
-	struct Object *prevPlatform;
-	u32 prevTimer;
+    Vec3f prevPos;
+    Vec3f prevTransformedPos;
+    Vec3f prevTransformedYawVec;
+    s16 prevYaw;
+    struct Object *prevPlatform;
+    u32 prevTimer;
 };
 
 void update_mario_platform(void);

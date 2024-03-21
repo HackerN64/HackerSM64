@@ -67,22 +67,22 @@ void update_mario_platform(void) {
  * Set the values in the platform displacement struct for use next frame
  */
 void update_platform_displacement_info(struct PlatformDisplacementInfo *displaceInfo, Vec3f pos, s16 yaw, struct Object *platform) {
-	Vec3f scaledPos, yawVec, localPos;
+    Vec3f scaledPos, yawVec, localPos;
 
     // Update position
-	vec3_diff(localPos, pos, (*platform->header.gfx.throwMatrix)[3]);
-	linear_mtxf_transpose_mul_vec3(*platform->header.gfx.throwMatrix, scaledPos, localPos);
-	vec3_quot(displaceInfo->prevTransformedPos, scaledPos, platform->header.gfx.scale);
-	vec3_copy(displaceInfo->prevPos, pos);
+    vec3_diff(localPos, pos, (*platform->header.gfx.throwMatrix)[3]);
+    linear_mtxf_transpose_mul_vec3(*platform->header.gfx.throwMatrix, scaledPos, localPos);
+    vec3_quot(displaceInfo->prevTransformedPos, scaledPos, platform->header.gfx.scale);
+    vec3_copy(displaceInfo->prevPos, pos);
 
-	// Update yaw
-	vec3_set(yawVec, sins(yaw), 0, coss(yaw));
-	linear_mtxf_transpose_mul_vec3(*platform->header.gfx.throwMatrix, displaceInfo->prevTransformedYawVec, yawVec);
-	displaceInfo->prevYaw = yaw;
+    // Update yaw
+    vec3_set(yawVec, sins(yaw), 0, coss(yaw));
+    linear_mtxf_transpose_mul_vec3(*platform->header.gfx.throwMatrix, displaceInfo->prevTransformedYawVec, yawVec);
+    displaceInfo->prevYaw = yaw;
 
-	// Update platform and timer
-	displaceInfo->prevPlatform = platform;
-	displaceInfo->prevTimer = gGlobalTimer;
+    // Update platform and timer
+    displaceInfo->prevPlatform = platform;
+    displaceInfo->prevTimer = gGlobalTimer;
 }
 
 /**
@@ -125,8 +125,8 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     }
 
     Vec3f oldPos;
-	vec3_sum(oldPos, displaceInfo->prevPos, posDifference);
-	update_platform_displacement_info(displaceInfo, pos, *yaw, platform);
+    vec3_sum(oldPos, displaceInfo->prevPos, posDifference);
+    update_platform_displacement_info(displaceInfo, pos, *yaw, platform);
 
     // If the object is Mario, set inertia
     if (pos == gMarioState->pos) {
