@@ -71,40 +71,6 @@ void page_threads_init(void) {
     sThreadsSelectedThreadPtr = __osGetActiveQueue();
 }
 
-void draw_thread_state_icon(u32 x, u32 y, OSThread* thread) {
-    const s32 w = 6;
-    const s32 h = 6;
-
-    u16 state = thread->state;
-    u16 flags = thread->flags;
-    switch (state) {
-        case OS_STATE_STOPPED:
-            switch (flags) {
-                case OS_FLAG_CPU_BREAK:
-                    cs_draw_outline(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
-                    break;
-                case OS_FLAG_FAULT:
-                    cs_draw_rect(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
-                    break;
-                default:
-                    cs_draw_glyph(x, y, 'x', COLOR_RGBA32_CRASH_NO);
-                    break;
-            }
-            break;
-        case OS_STATE_RUNNABLE:
-            cs_draw_rect(x, y, 1, (h - 1), COLOR_RGBA32_VERY_LIGHT_YELLOW);
-            cs_draw_triangle((x + 2), (y - 1), (w - 2), h, COLOR_RGBA32_VERY_LIGHT_YELLOW, CS_TRI_RIGHT);
-            break;
-        case OS_STATE_RUNNING:
-            cs_draw_triangle(x, (y - 1), w, h, COLOR_RGBA32_CRASH_YES, CS_TRI_RIGHT);
-            break;
-        case OS_STATE_WAITING:
-            cs_draw_rect(x, y, (w / 3), (h - 1), COLOR_RGBA32_GRAY);
-            cs_draw_rect((x + (w / 3) + 1), y, (w / 3), (h - 1), COLOR_RGBA32_GRAY);
-            break;
-    }
-}
-
 RGBA32 cs_thread_draw_highlight(OSThread* thread, u32 y) {
     RGBA32 color = 0x00000000;
 
@@ -123,6 +89,67 @@ RGBA32 cs_thread_draw_highlight(OSThread* thread, u32 y) {
     return color;
 }
 
+void draw_thread_entry(u32 y, OSThread* thread) {
+    // First line:
+
+    const RGBA32 threadColor = COLOR_RGBA32_LIGHT_CYAN;
+    size_t charAddrX = 0;
+    _Bool showAddresses = cs_get_setting_val(CS_OPT_GROUP_PAGE_THREADS, CS_OPT_THREADS_SHOW_ADDRESSES);
+    if (showAddresses) {
+        charAddrX = cs_print(TEXT_X(0), y,
+            (STR_HEX_WORD":"),
+            (Address)thread
+        );
+    }
+
+    size_t charX = charAddrX;
+    charX += cs_print(TEXT_X(charAddrX), y,
+        (STR_COLOR_PREFIX"thread %d"),
+        threadColor, osGetThreadId(thread)
+    );
+    const char* threadName = get_thread_name(thread);
+    if (threadName != NULL) {
+        charX += cs_print(TEXT_X(charX), y,
+            (STR_COLOR_PREFIX": %s"),
+            threadColor, threadName
+        );
+    }
+
+    y += TEXT_HEIGHT(1);
+    // Second line:
+
+    RGBA32 stateColor = cs_draw_thread_state_icon(TEXT_X(showAddresses ? 0 : (CRASH_SCREEN_NUM_CHARS_X - 1)), y, thread);
+    if (thread == gInspectThread) {
+        cs_print(TEXT_X(showAddresses ? 1 : (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("viewing") + 1))), y,
+            STR_COLOR_PREFIX"viewing", COLOR_RGBA32_CRASH_THREAD
+        );
+    }
+
+    charX = charAddrX;
+    charX += cs_print(TEXT_X(charX), y,
+        (STR_COLOR_PREFIX"pri:"STR_COLOR_PREFIX"%3d"),
+        COLOR_RGBA32_LIGHT_GRAY,
+        COLOR_RGBA32_CRASH_THREAD, osGetThreadPri(thread)
+    );
+
+    const char* stateName = get_thread_state_str(thread);
+    if (stateName != NULL) {
+        charX += cs_print(TEXT_X(charX), y,
+            (STR_COLOR_PREFIX" state:"STR_COLOR_PREFIX"%s"),
+                COLOR_RGBA32_LIGHT_GRAY,
+                stateColor, stateName
+        );
+        const char* flagsName = get_thread_flags_str(thread);
+        if (flagsName != NULL) {
+            // "(fault)" or "(cpu break)".
+            charX += cs_print(TEXT_X(charX), y,
+                (STR_COLOR_PREFIX" (%s)"),
+                stateColor, flagsName
+            );
+        }
+    }
+}
+
 void page_threads_draw(void) {
     u32 line = 2;
 
@@ -132,7 +159,13 @@ void page_threads_draw(void) {
     u32 threadIndex = 0;
     u32 y = TEXT_Y(0);
 
-    while (thread->priority != OS_PRIORITY_THREADTAIL) {
+    const u32 maxSearchIterations = 32;
+    _Bool err = FALSE;
+    while (thread->priority != OS_PRIORITY_THREADTAIL/* && thread->tlnext != queue*/) {
+        if (threadIndex > maxSearchIterations) {
+            err = TRUE;
+            break;
+        }
         if (
             (threadIndex < sThreadsViewportIndex) ||
             (threadIndex > (sThreadsViewportIndex + sThreadsNumShownRows))
@@ -149,75 +182,9 @@ void page_threads_draw(void) {
             cs_draw_row_selection_box_2(y);
         }
 
-        // First line:
+        draw_thread_entry(y, thread);
 
-        const RGBA32 threadColor = COLOR_RGBA32_LIGHT_CYAN;
-        size_t charAddrX = 0;
-        _Bool showAddresses = cs_get_setting_val(CS_OPT_GROUP_PAGE_THREADS, CS_OPT_THREADS_SHOW_ADDRESSES);
-        if (showAddresses) {
-            charAddrX = cs_print(TEXT_X(0), y,
-                (STR_HEX_WORD":"),
-                (Address)thread
-            );
-        }
-
-        size_t charX = charAddrX;
-        charX += cs_print(TEXT_X(charAddrX), y,
-            (STR_COLOR_PREFIX"thread %d"),
-            threadColor, osGetThreadId(thread)
-        );
-        const char* threadName = get_thread_name(thread);
-        if (threadName != NULL) {
-            charX += cs_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX": %s"),
-                threadColor, threadName
-            );
-        }
-
-        i++;
-        y = TEXT_Y(line + i);
-
-        // Second line:
-
-        draw_thread_state_icon(TEXT_X(showAddresses ? 0 : (CRASH_SCREEN_NUM_CHARS_X - 1)), y, thread);
-        if (thread == gInspectThread) {
-            cs_print(TEXT_X(showAddresses ? 1 : (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("viewing") + 1))), y,
-                STR_COLOR_PREFIX"viewing", COLOR_RGBA32_CRASH_THREAD
-            );
-        }
-
-        charX = charAddrX;
-        charX += cs_print(TEXT_X(charX), y,
-            (STR_COLOR_PREFIX"pri:"STR_COLOR_PREFIX"%3d"),
-            COLOR_RGBA32_LIGHT_GRAY,
-            COLOR_RGBA32_CRASH_THREAD, osGetThreadPri(thread)
-        );
-
-        const char* stateName = get_thread_state_str(thread);
-        if (stateName != NULL) {
-            RGBA32 stateColor = COLOR_RGBA32_LIGHT_GRAY;
-            switch (thread->state) {
-                case OS_STATE_STOPPED:  stateColor = COLOR_RGBA32_CRASH_NO;          break;
-                case OS_STATE_RUNNABLE: stateColor = COLOR_RGBA32_VERY_LIGHT_YELLOW; break;
-                case OS_STATE_RUNNING:  stateColor = COLOR_RGBA32_CRASH_YES;         break;
-                case OS_STATE_WAITING:  stateColor = COLOR_RGBA32_GRAY;              break;
-            }
-            charX += cs_print(TEXT_X(charX), y,
-                (STR_COLOR_PREFIX" state:"STR_COLOR_PREFIX"%s"),
-                    COLOR_RGBA32_LIGHT_GRAY,
-                    stateColor, stateName
-            );
-            const char* flagsName = get_thread_flags_str(thread);
-            if (flagsName != NULL) {
-                // "(fault)" or "(cpu break)".
-                charX += cs_print(TEXT_X(charX), y,
-                    (STR_COLOR_PREFIX" (%s)"),
-                    stateColor, flagsName
-                );
-            }
-        }
-
-        i++;
+        i += 2;
         cs_draw_divider_translucent(DIVIDER_Y(line + i));
 
         thread = thread->tlnext;
@@ -238,7 +205,11 @@ void page_threads_draw(void) {
     }
 
     line = 1;
-    cs_print(TEXT_X(0), TEXT_Y(line++), "total threads found: %d", sThreadsTotalFoundThreads);
+    if (err) {
+        cs_print(TEXT_X(0), TEXT_Y(line++), "ERROR: over %d threads found.", maxSearchIterations);
+    } else {
+        cs_print(TEXT_X(0), TEXT_Y(line++), "total threads found: %d", sThreadsTotalFoundThreads);
+    }
     cs_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();

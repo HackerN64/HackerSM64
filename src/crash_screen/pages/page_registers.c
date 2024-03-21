@@ -25,7 +25,7 @@
 
 
 struct CSSetting cs_settings_group_page_registers[] = {
-    [CS_OPT_HEADER_PAGE_REGISTERS   ] = { .type = CS_OPT_TYPE_HEADER,  .name = "REGISTERS",                        .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_HEADER_PAGE_REGISTERS   ] = { .type = CS_OPT_TYPE_HEADER,  .name = "THREAD REGISTERS",               .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #ifdef INCLUDE_DEBUG_MAP
     [CS_OPT_REGISTERS_PARSE_REG     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Parse register addr names",      .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
@@ -116,26 +116,6 @@ RegisterPageSelection sRegisterSelectionCursor = {
 
 void page_registers_init(void) {
 
-}
-
-void cs_registers_print_thread(u32 x, u32 y) {
-    if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_THREAD) {
-        cs_draw_row_selection_box(y);
-    }
-
-    OSThread* thread = gInspectThread;
-
-    // "THREAD: [thread id]"
-    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
-        COLOR_RGBA32_CRASH_THREAD, osGetThreadId(thread)
-    );
-    const char* threadName = get_thread_name(thread);
-    if (threadName != NULL) {
-        // "(thread name)"
-        cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
-            COLOR_RGBA32_CRASH_THREAD, threadName
-        );
-    }
 }
 
 // Print a fixed-point register.
@@ -281,16 +261,12 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
 }
 
 void page_registers_draw(void) {
-    __OSThreadContext* tc = &gInspectThread->context;
-    u32 line = 1;
+    OSThread* thread = gInspectThread;
+    __OSThreadContext* tc = &thread->context;
+    u32 line = 2;
 
-    cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"REGISTERS IN:",
-        COLOR_RGBA32_CRASH_THREAD
-    );
-    cs_registers_print_thread(TEXT_X(0), TEXT_Y(line++));
-    
-    // cs_print(TEXT_X(0), TEXT_Y(line), "s:%d x:%d y:%d", sRegisterSelectionCursor.section, sRegisterSelectionCursor.selX, sRegisterSelectionCursor.selY);
-    line++;
+    draw_thread_entry(TEXT_Y(line), thread);
+    line += 2;
 
     line = cs_registers_print_registers(line);
 
@@ -465,7 +441,7 @@ void page_registers_print(void) {
 }
 
 struct CSPage gCSPage_registers ={
-    .name         = "REGISTERS",
+    .name         = "THREAD REGISTERS",
     .initFunc     = page_registers_init,
     .drawFunc     = page_registers_draw,
     .inputFunc    = page_registers_input,

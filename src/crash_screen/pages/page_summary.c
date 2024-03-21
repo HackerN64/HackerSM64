@@ -288,6 +288,10 @@ void page_summary_draw(void) {
             break;
     }
 
+    // if (gLastCSSelectedAddress) {
+    //     cs_print(TEXT_X(0), TEXT_Y(line++), "LAST SELECTED: %08X", gLastCSSelectedAddress);
+    // }
+
     u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
     cs_draw_divider(DIVIDER_Y(endLine));
     cs_print(TEXT_X(0), TEXT_Y(endLine),

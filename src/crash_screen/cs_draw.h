@@ -120,6 +120,7 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
 // void cs_draw_texture(s32 startX, s32 startY, s32 w, s32 h, RGBA16* texture);
 void cs_take_screenshot_of_game(RGBA16* dst, size_t size);
 void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
+RGBA32 cs_draw_thread_state_icon(u32 x, u32 y, OSThread* thread);
 void cs_draw_main(void);
 
 

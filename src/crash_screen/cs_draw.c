@@ -361,6 +361,42 @@ void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTot
     cs_draw_rect(x, (topY + barTop), 1, barHeight, color);
 }
 
+RGBA32 cs_draw_thread_state_icon(u32 x, u32 y, OSThread* thread) {
+    const s32 w = 6;
+    const s32 h = 6;
+
+    u16 state = thread->state;
+    u16 flags = thread->flags;
+    switch (state) {
+        case OS_STATE_STOPPED:
+            switch (flags) {
+                case OS_FLAG_CPU_BREAK:
+                    cs_draw_outline(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
+                    break;
+                case OS_FLAG_FAULT:
+                    cs_draw_rect(x, y, (w - 1), (h - 1), COLOR_RGBA32_CRASH_NO);
+                    break;
+                default:
+                    cs_draw_glyph(x, y, 'x', COLOR_RGBA32_CRASH_NO);
+                    break;
+            }
+            return COLOR_RGBA32_CRASH_NO;
+        case OS_STATE_RUNNABLE:
+            cs_draw_rect(x, y, 1, (h - 1), COLOR_RGBA32_VERY_LIGHT_YELLOW);
+            cs_draw_triangle((x + 2), (y - 1), (w - 2), h, COLOR_RGBA32_VERY_LIGHT_YELLOW, CS_TRI_RIGHT);
+            return COLOR_RGBA32_VERY_LIGHT_YELLOW;
+        case OS_STATE_RUNNING:
+            cs_draw_triangle(x, (y - 1), w, h, COLOR_RGBA32_CRASH_YES, CS_TRI_RIGHT);
+            return COLOR_RGBA32_CRASH_YES;
+        case OS_STATE_WAITING:
+            cs_draw_rect(x, y, (w / 3), (h - 1), COLOR_RGBA32_GRAY);
+            cs_draw_rect((x + (w / 3) + 1), y, (w / 3), (h - 1), COLOR_RGBA32_GRAY);
+            return COLOR_RGBA32_GRAY;
+    }
+
+    return COLOR_RGBA32_WHITE;
+}
+
 // Page header draw function.
 u32 cs_page_header_draw(void) {
     u32 line = 0;
