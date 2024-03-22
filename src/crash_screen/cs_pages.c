@@ -11,7 +11,6 @@
 
 #include "pages/page_summary.h"
 #include "pages/page_registers.h"
-// #include "pages/page_threads.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
@@ -34,7 +33,6 @@
 CSPage* gCSPages[CS_NUM_PAGES] = {
     [CS_PAGE_SUMMARY    ] = &gCSPage_summary,
     [CS_PAGE_STACK      ] = &gCSPage_stack,
-    // [CS_PAGE_THREADS    ] = &gCSPage_threads,
     [CS_PAGE_REGISTERS  ] = &gCSPage_registers,
     [CS_PAGE_DISASM     ] = &gCSPage_disasm,
     [CS_PAGE_MEMORY     ] = &gCSPage_memory,

@@ -6,7 +6,6 @@
 
 #include "pages/page_summary.h"
 #include "pages/page_registers.h"
-// #include "pages/page_threads.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
@@ -26,7 +25,6 @@ enum CSPages {
 
     CS_PAGE_SUMMARY = CS_FIRST_PAGE,
     CS_PAGE_STACK,
-    // CS_PAGE_THREADS,
     CS_PAGE_REGISTERS,
     CS_PAGE_DISASM,
     CS_PAGE_MEMORY,

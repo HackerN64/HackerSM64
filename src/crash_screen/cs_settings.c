@@ -51,7 +51,6 @@ CSSetting* gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     //! TODO: Automatically do this from gCSPages:
     // [CS_OPT_GROUP_PAGE_SUMMARY  ] = cs_settings_group_page_summary,
     [CS_OPT_GROUP_PAGE_STACK    ] = cs_settings_group_page_stack,
-    // [CS_OPT_GROUP_PAGE_THREADS  ] = cs_settings_group_page_threads,
     [CS_OPT_GROUP_PAGE_REGISTERS] = cs_settings_group_page_registers,
     [CS_OPT_GROUP_PAGE_DISASM   ] = cs_settings_group_page_disasm,
     [CS_OPT_GROUP_PAGE_MEMORY   ] = cs_settings_group_page_memory,

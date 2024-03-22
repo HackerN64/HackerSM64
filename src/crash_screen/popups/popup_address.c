@@ -112,9 +112,6 @@ void cs_address_select_input(void) {
             case CS_PAGE_STACK:
                 cs_set_page(CS_PAGE_DISASM);
                 break;
-            // case CS_PAGE_THREADS:
-            //     cs_set_page(CS_PAGE_MEMORY);
-            //     break;
             case CS_PAGE_REGISTERS:
                 if (is_in_code_segment(sAddressSelectTarget)) {
                     cs_set_page(CS_PAGE_DISASM);
