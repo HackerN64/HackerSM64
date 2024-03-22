@@ -36,7 +36,7 @@ OSThread*     gInspectThread      = NULL; // Pointer to the thread the crash scr
 
 Address gSetCrashAddress = 0x00000000; // Used by SET_CRASH_PTR to set the crashed thread PC. Externed in macros.h.
 Address gSelectedAddress = 0x00000000; // Selected address for ram viewer and disasm pages.
-// Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen crashes.
+Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen crashes.
 
 
 /**
@@ -58,7 +58,7 @@ static void cs_reinitialize(void) {
     }
     cs_settings_set_all_headers(FALSE);
 
-    // gLastCSSelectedAddress = gSelectedAddress;
+    gLastCSSelectedAddress = gSelectedAddress;
     gSelectedAddress = 0x00000000;
 
     gCSDirectionFlags.raw = 0b00000000;

@@ -466,7 +466,7 @@ void cs_print_about_entry(u32 y, s16 groupID, s16 entryID) {
                 }
             }
             if (entry->desc != NULL) {
-                u32 x = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (((STRLEN("<") + strlen(entry->desc) + STRLEN(">")) / 2)));
+                CSTextCoord_u32 x = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - (((STRLEN("<") + strlen(entry->desc) + STRLEN(">")) / 2)));
                 if (buttonCond) {
                     cs_print(x, y,
                         STR_COLOR_PREFIX"<"STR_COLOR_PREFIX"%s"STR_COLOR_PREFIX">",

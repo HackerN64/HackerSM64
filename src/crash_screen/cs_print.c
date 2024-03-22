@@ -8,6 +8,7 @@
 
 #include "util/memory_read.h"
 #include "util/registers.h"
+#include "cs_descriptions.h"
 #include "cs_draw.h"
 #include "cs_main.h"
 #include "cs_settings.h"
@@ -240,7 +241,7 @@ static _Bool cs_should_wrap(u32 x) {
  * @param[in] bufferCount The total number of chars in the string after formatting.
  * @return size_t The total number of chars printed to the screen.
  */
-static size_t cs_print_from_buffer(u32 x, u32 y, size_t bufferCount) {
+static size_t cs_print_from_buffer(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t bufferCount) {
     size_t numChars = 0;
     u32 startX = x;
 
@@ -359,7 +360,7 @@ static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
  * @param[in] fmt       The string to print.
  * @return size_t The total number of chars printed to the screen.
  */
-size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
+size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) {
     bzero(&sCSCharBuffer, sizeof(sCSCharBuffer));
     gCSNumLinesPrinted = 0;
 
@@ -400,7 +401,7 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) {
  *
  * @param[in] x,y The starting position on the screen to print to.
  */
-static void cs_print_symbol_unknown(u32 x, u32 y) {
+static void cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
     // "UNKNOWN"
     cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
 }
@@ -412,7 +413,7 @@ static void cs_print_symbol_unknown(u32 x, u32 y) {
  * @param[in] maxWidth The maximum number of chars to print.
  * @param[in] symbol   The symbol pointer.
  */
-void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
+void cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
     if (symbol == NULL) {
         if (printUnknown) {
             cs_print_symbol_unknown(x, y);
@@ -439,7 +440,7 @@ void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol, _
  * @param[in] maxWidth The maximum number of chars to print.
  * @param[in] addr     The address location.
  */
-void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
+void cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
 #ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
@@ -465,7 +466,7 @@ static const FloatErrorPrintFormat sFltErrFmt[] = {
     [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
 };
 
-size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
+size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
     const enum FloatErrorType fltErrType = validate_f32(val);
     size_t numChars = 0;
 
@@ -530,10 +531,10 @@ int sprintf_int_with_commas(char* buf, int n) {
     return (p - buf);
 }
 
-void print_as_binary(const u32 x, const u32 y, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
-    u32 bitX = x;
+void print_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+    CSScreenCoord_u32 bitX = x;
 
-    for (u32 c = 0; c < SIZEOF_BITS(Word); c++) {
+    for (size_t c = 0; c < SIZEOF_BITS(Word); c++) {
         if ((c % SIZEOF_BITS(Byte)) == 0) { // Space between each byte.
             bitX += TEXT_WIDTH(1);
         }

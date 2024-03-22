@@ -194,10 +194,10 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
 
 // Register popup box draw function.
 void cs_popup_reginspect_draw(void) {
-    const s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
-    const s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
-    const s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
-    const s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
+    const CSScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
+    const CSScreenCoord_s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
+    const CSScreenCoord_s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
+    const CSScreenCoord_s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
@@ -221,7 +221,7 @@ void cs_popup_reginspect_draw(void) {
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
         gInspectThread->id, get_thread_name(gInspectThread)
     );
-    size_t charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
+    CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     const char* copName = get_coprocessor_name(cop);
     if (copName != NULL) {
         cs_print(TEXT_X(2 + charX), TEXT_Y(line), STR_COLOR_PREFIX" in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);

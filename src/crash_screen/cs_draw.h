@@ -10,6 +10,12 @@
 // The size of one row of the font image.
 typedef u32 CSFontRow;
 
+// Used to keep track of screen coords vs. text coords.
+typedef u32 CSScreenCoord_u32;
+typedef s32 CSScreenCoord_s32;
+typedef u32 CSTextCoord_u32;
+typedef s32 CSTextCoord_s32;
+
 
 // Crash screen font image properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
@@ -99,75 +105,86 @@ enum CSDrawTriangleDirection {
 
 
 typedef struct CSScissorBox {
-    s32 x1;
-    s32 y1;
-    s32 x2;
-    s32 y2;
-} CSScissorBox;
+    /*0x00*/ CSScreenCoord_s32 x1;
+    /*0x04*/ CSScreenCoord_s32 y1;
+    /*0x08*/ CSScreenCoord_s32 x2;
+    /*0x0C*/ CSScreenCoord_s32 y2;
+} CSScissorBox; /*0x10*/
 
 extern struct CSScissorBox gCSScissorBox;
 
 
-void cs_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2);
+void cs_set_scissor_box(CSScreenCoord_s32 x1, CSScreenCoord_s32 y1, CSScreenCoord_s32 x2, CSScreenCoord_s32 y2);
 void cs_reset_scissor_box(void);
-void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken);
-void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void cs_draw_outline(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color);
-void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
-// void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
-void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color);
-// void cs_draw_texture(s32 startX, s32 startY, s32 w, s32 h, RGBA16* texture);
+void cs_draw_dark_rect(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, u32 darken);
+void cs_draw_rect(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color);
+void cs_draw_outline(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color);
+void cs_draw_diamond(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color);
+void cs_draw_triangle(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
+// void cs_draw_line(CSScreenCoord_u32 x1, CSScreenCoord_u32 y1, CSScreenCoord_u32 x2, CSScreenCoord_u32 y2, RGBA32 color);
+void cs_draw_glyph(CSScreenCoord_u32 startX, CSScreenCoord_u32 startY, uchar glyph, RGBA32 color);
+// void cs_draw_texture(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA16* texture);
 void cs_take_screenshot_of_game(RGBA16* dst, size_t size);
-void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
-RGBA32 cs_draw_thread_state_icon(u32 x, u32 y, OSThread* thread);
+void cs_draw_scroll_bar_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 topY, CSScreenCoord_u32 bottomY, CSScreenCoord_u32 numVisibleEntries, CSScreenCoord_u32 numTotalEntries, CSScreenCoord_u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
+ALWAYS_INLINE void cs_draw_scroll_bar(CSScreenCoord_u32 topY, CSScreenCoord_u32 bottomY, CSScreenCoord_u32 numVisibleEntries, CSScreenCoord_u32 numTotalEntries, CSScreenCoord_u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
+    cs_draw_scroll_bar_impl((CRASH_SCREEN_X2 - 1), topY, bottomY, numVisibleEntries, numTotalEntries, topVisibleEntry, color, drawBg);
+}
+// RGBA32 cs_thread_draw_highlight(OSThread* thread, CSScreenCoord_u32 y);
+RGBA32 cs_draw_thread_state_icon(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread);
 void cs_draw_main(void);
 
 
-ALWAYS_INLINE void cs_draw_divider_impl(s32 startX, s32 width, u32 line, RGBA32 color) {
-    cs_draw_rect(startX, line, width, 1, color);
+ALWAYS_INLINE void cs_draw_divider_impl(CSScreenCoord_s32 startX, CSScreenCoord_s32 width, CSScreenCoord_u32 startY, RGBA32 color) {
+    cs_draw_rect(startX, startY, width, 1, color);
 }
 
-ALWAYS_INLINE void cs_draw_divider(u32 line) {
-    cs_draw_divider_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, line, COLOR_RGBA32_CRASH_DIVIDER);
+ALWAYS_INLINE void cs_draw_divider(CSScreenCoord_u32 startY) {
+    cs_draw_divider_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, startY, COLOR_RGBA32_CRASH_DIVIDER);
 }
 
-ALWAYS_INLINE void cs_draw_divider_translucent_impl(s32 x, s32 w, u32 line) {
-    cs_draw_divider_impl(x, w, line, COLOR_RGBA32_CRASH_DIVIDER_TRANSLUCENT);
+ALWAYS_INLINE void cs_draw_divider_translucent_impl(CSScreenCoord_s32 startX, CSScreenCoord_s32 width, CSScreenCoord_u32 startY) {
+    cs_draw_divider_impl(startX, width, startY, COLOR_RGBA32_CRASH_DIVIDER_TRANSLUCENT);
 }
 
-ALWAYS_INLINE void cs_draw_divider_translucent(u32 line) {
-    cs_draw_divider_translucent_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, line);
+ALWAYS_INLINE void cs_draw_divider_translucent(CSScreenCoord_u32 startY) {
+    cs_draw_divider_translucent_impl(CRASH_SCREEN_X1, CRASH_SCREEN_W, startY);
 }
 
-ALWAYS_INLINE void cs_draw_row_selection_box_impl(s32 x, s32 y, s32 w, s32 h, RGBA32 color) {
+ALWAYS_INLINE void cs_draw_row_selection_box_impl(CSScreenCoord_s32 x, CSScreenCoord_s32 y, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color) {
     cs_draw_rect(
         (x - 1), (y - 2),
         (w + 1), (h + 1),
         color
     );
 }
-ALWAYS_INLINE void cs_draw_row_box_1(u32 y, RGBA32 color) {
+ALWAYS_INLINE void cs_draw_row_box_1(CSScreenCoord_u32 y, RGBA32 color) {
     cs_draw_row_selection_box_impl(TEXT_X(0), y,
         CRASH_SCREEN_TEXT_W, TEXT_HEIGHT(1),
         color
     );
 }
-ALWAYS_INLINE void cs_draw_row_box_2(u32 y, RGBA32 color) {
+ALWAYS_INLINE void cs_draw_row_box_2(CSScreenCoord_u32 y, RGBA32 color) {
     cs_draw_row_selection_box_impl(TEXT_X(0), (y + 1),
         CRASH_SCREEN_TEXT_W, (TEXT_HEIGHT(2) - 2),
         color
     );
 }
-ALWAYS_INLINE void cs_draw_row_selection_box(u32 y) {
+ALWAYS_INLINE void cs_draw_row_box_w(CSScreenCoord_u32 x, CSScreenCoord_u32 width, CSScreenCoord_u32 y, RGBA32 color) {
+    cs_draw_row_selection_box_impl(x, (y + 1),
+        width, (TEXT_HEIGHT(2) - 2),
+        color
+    );
+}
+
+ALWAYS_INLINE void cs_draw_row_selection_box(CSScreenCoord_u32 y) {
     cs_draw_row_box_1(y, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
 }
-ALWAYS_INLINE void cs_draw_row_selection_box_2(u32 y) {
+ALWAYS_INLINE void cs_draw_row_selection_box_2(CSScreenCoord_u32 y) {
     cs_draw_row_box_2(y, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
 }
-ALWAYS_INLINE void cs_draw_row_crash_box(u32 y) {
+ALWAYS_INLINE void cs_draw_row_crash_box(CSScreenCoord_u32 y) {
     cs_draw_row_box_1(y, COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
 }
-ALWAYS_INLINE void cs_draw_row_crash_box_2(u32 y) {
+ALWAYS_INLINE void cs_draw_row_crash_box_2(CSScreenCoord_u32 y) {
     cs_draw_row_box_2(y, COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
 }

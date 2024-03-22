@@ -123,9 +123,9 @@ typedef struct PACKED {
 } CSAboutEntry; /*0x24*/
 
 typedef struct CSAboutEntryDisplay {
-    /*0x00*/ s16 groupID;
-    /*0x02*/ s16 entryID;
-} CSAboutEntryDisplay; /*0x04*/
+    /*0x00*/ u8 groupID;
+    /*0x01*/ u8 entryID;
+} CSAboutEntryDisplay; /*0x02*/
 
 
 

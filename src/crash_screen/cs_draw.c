@@ -32,7 +32,7 @@ ALIGNED16 CSScissorBox gCSScissorBox = {
 };
 
 // Sets the scissor box.
-void cs_set_scissor_box(s32 x1, s32 y1, s32 x2, s32 y2) {
+void cs_set_scissor_box(CSScreenCoord_s32 x1, CSScreenCoord_s32 y1, CSScreenCoord_s32 x2, CSScreenCoord_s32 y2) {
     gCSScissorBox.x1 = x1;
     gCSScissorBox.y1 = y1;
     gCSScissorBox.x2 = x2;
@@ -60,7 +60,7 @@ static _Bool cs_is_in_scissor_box(s32 x, s32 y) {
 }
 
 // Get a pointer to the framebuffer pixel at the given screen coordinates.
-static RGBA16* get_rendering_fb_pixel(u32 x, u32 y) {
+static RGBA16* get_rendering_fb_pixel(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
     return (FB_PTR_AS(RGBA16) + (SCREEN_WIDTH * y) + x);
 }
 
@@ -97,7 +97,7 @@ static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
 // 3  - darken by 7/8
 // 4  - darken by 15/16
 // 5+ - darken to black
-void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken) {
+void cs_draw_dark_rect(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, u32 darken) {
     if (darken == CS_DARKEN_NONE) {
         return;
     }
@@ -110,8 +110,8 @@ void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken) {
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (s32 y = 0; y < h; y++) {
-        for (s32 x = 0; x < w; x++) {
+    for (CSScreenCoord_s32 y = 0; y < h; y++) {
+        for (CSScreenCoord_s32 x = 0; x < w; x++) {
             if (cs_is_in_scissor_box((startX + x), (startY + y))) {
                 *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
             }
@@ -122,7 +122,7 @@ void cs_draw_dark_rect(s32 startX, s32 startY, s32 w, s32 h, u32 darken) {
 }
 
 // Draws a rectangle.
-void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+void cs_draw_rect(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -131,8 +131,8 @@ void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (s32 y = 0; y < h; y++) {
-        for (s32 x = 0; x < w; x++) {
+    for (CSScreenCoord_s32 y = 0; y < h; y++) {
+        for (CSScreenCoord_s32 x = 0; x < w; x++) {
             if (cs_is_in_scissor_box((startX + x), (startY + y))) {
                 apply_color(dst, newColor, alpha);
             }
@@ -143,7 +143,7 @@ void cs_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
 }
 
 // Draws an empty box.
-void cs_draw_outline(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+void cs_draw_outline(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -152,8 +152,8 @@ void cs_draw_outline(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (s32 y = 0; y < h; y++) {
-        for (s32 x = 0; x < w; x++) {
+    for (CSScreenCoord_s32 y = 0; y < h; y++) {
+        for (CSScreenCoord_s32 x = 0; x < w; x++) {
             if (
                 cs_is_in_scissor_box((startX + x), (startY + y)) &&
                 ((y == 0) || (y == (h - 1)) || (x == 0) || (x == (w - 1)))
@@ -167,7 +167,7 @@ void cs_draw_outline(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
 }
 
 // Draws a diamond shape.
-void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
+void cs_draw_diamond(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -176,14 +176,14 @@ void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    s32 middleX = (w / 2.0f);
-    s32 middleY = (h / 2.0f);
+    CSScreenCoord_s32 middleX = (w / 2.0f);
+    CSScreenCoord_s32 middleY = (h / 2.0f);
 
     f32 dx = ((f32)w / (f32)h);
     f32 d = 0.0f;
 
-    for (s32 y = 0; y < h; y++) {
-        for (s32 x = 0; x < w; x++) {
+    for (CSScreenCoord_s32 y = 0; y < h; y++) {
+        for (CSScreenCoord_s32 x = 0; x < w; x++) {
             if (absi(x - middleX) < d) {
                 if (cs_is_in_scissor_box((startX + x), (startY + y))) {
                     apply_color(dst, newColor, alpha);
@@ -197,7 +197,7 @@ void cs_draw_diamond(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
 }
 
 // Draws a diamond then crops it using gCSScissorBox so that it looks like a triangle.
-void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
+void cs_draw_triangle(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
     CSScissorBox temp = gCSScissorBox;
 
     cs_set_scissor_box(startX, startY, (startX + w), (startY + h));
@@ -213,7 +213,7 @@ void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum C
 }
 
 // // Draws a line between any two points.
-// void cs_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
+// void cs_draw_line(CSScreenCoord_u32 x1, CSScreenCoord_u32 y1, CSScreenCoord_u32 x2, CSScreenCoord_u32 y2, RGBA32 color) {
 //     const Alpha alpha = RGBA32_A(color);
 //     if (alpha == 0x00) {
 //         return;
@@ -241,7 +241,7 @@ void cs_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, enum C
 // }
 
 // Draw a single character from gCSFont to the framebuffer.
-void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
+void cs_draw_glyph(CSScreenCoord_u32 startX, CSScreenCoord_u32 startY, uchar glyph, RGBA32 color) {
     if (glyph == CHAR_NULL) { // Null
         color = COLOR_RGBA32_CRASH_NULL_CHAR;
     }
@@ -257,11 +257,11 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     const CSFontRow* src = &((CSFontRow*)gCSFont)[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    for (u32 y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
+    for (CSScreenCoord_u32 y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
         bit = startBit;
         rowMask = *src++;
 
-        for (u32 x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
+        for (CSScreenCoord_u32 x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
             if ((bit & rowMask) && cs_is_in_scissor_box((startX + x), (startY + y))) {
                 apply_color(dst, newColor, alpha);
             }
@@ -273,7 +273,7 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
     }
 }
 
-// void cs_draw_texture(s32 startX, s32 startY, s32 w, s32 h, RGBA16* texture) {
+// void cs_draw_texture(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA16* texture) {
 //     if (texture == NULL) {
 //         return;
 //     }
@@ -281,8 +281,8 @@ void cs_draw_glyph(u32 startX, u32 startY, uchar glyph, RGBA32 color) {
 //     RGBA16* src = texture;
 //     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-//     for (s32 y = 0; y < h; y++) {
-//         for (s32 x = 0; x < w; x++) {
+//     for (CSScreenCoord_s32 y = 0; y < h; y++) {
+//         for (CSScreenCoord_s32 x = 0; x < w; x++) {
 //             if (cs_is_in_scissor_box((startX + x), (startY + y))) {
 //                 apply_color(dst, *src, MSK_RGBA32_A);
 //             }
@@ -336,11 +336,9 @@ void cs_update_framebuffer(void) {
 }
 
 // Draw a scroll bar at the right edge of the crash screen.
-void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
-    const u32 x = (CRASH_SCREEN_X2 - 1);
-
+void cs_draw_scroll_bar_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 topY, CSScreenCoord_u32 bottomY, CSScreenCoord_u32 numVisibleEntries, CSScreenCoord_u32 numTotalEntries, CSScreenCoord_u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
     // The total height of the area the scroll bar can move.
-    u32 scrollableHeight = (bottomY - topY);
+    CSScreenCoord_u32 scrollableHeight = (bottomY - topY);
 
     if (drawBg) {
         // Draw the background scroll bar
@@ -348,12 +346,12 @@ void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTot
         cs_draw_rect(x, topY, 1, scrollableHeight, RGBA32_SET_ALPHA(color, bgAlpha));
     }
 
-    u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);
+    CSScreenCoord_u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);
 
-    u32 barTop    = (scrollableHeight * ((f32)   topVisibleEntry / (f32)numTotalEntries));
-    u32 barBottom = (scrollableHeight * ((f32)bottomVisibleEntry / (f32)numTotalEntries));
+    CSScreenCoord_u32 barTop    = (scrollableHeight * ((f32)   topVisibleEntry / (f32)numTotalEntries));
+    CSScreenCoord_u32 barBottom = (scrollableHeight * ((f32)bottomVisibleEntry / (f32)numTotalEntries));
 
-    u32 barHeight = (barBottom - barTop);
+    CSScreenCoord_u32 barHeight = (barBottom - barTop);
     if (barHeight < 1) {
         barHeight = 1;
     }
@@ -361,12 +359,31 @@ void cs_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTot
     cs_draw_rect(x, (topY + barTop), 1, barHeight, color);
 }
 
-RGBA32 cs_draw_thread_state_icon(u32 x, u32 y, OSThread* thread) {
+// RGBA32 cs_thread_draw_highlight(OSThread* thread, CSScreenCoord_u32 y) {
+//     RGBA32 color = 0x00000000;
+
+//     if (thread == gCrashedThread) {
+//         color = COLOR_RGBA32_CRASH_PC_HIGHLIGHT;
+//     } else if (thread == __osRunningThread) {
+//         color = COLOR_RGBA32_CRASH_RUNNING_HIGHLIGHT;
+//     } else if (thread == gInspectThread) {
+//         color = COLOR_RGBA32_CRASH_INSPECT_HIGHLIGHT;
+//     }
+
+//     if (color) {
+//         cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, y, color);
+//     }
+
+//     return color;
+// }
+
+RGBA32 cs_draw_thread_state_icon(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread) {
     const s32 w = 6;
     const s32 h = 6;
 
     u16 state = thread->state;
     u16 flags = thread->flags;
+
     switch (state) {
         case OS_STATE_STOPPED:
             switch (flags) {
@@ -398,8 +415,8 @@ RGBA32 cs_draw_thread_state_icon(u32 x, u32 y, OSThread* thread) {
 }
 
 // Page header draw function.
-u32 cs_page_header_draw(void) {
-    u32 line = 0;
+CSTextCoord_u32 cs_page_header_draw(void) {
+    CSTextCoord_u32 line = 0;
 
     CSPage* page = cs_get_current_page();
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
@@ -430,27 +447,27 @@ static const Alpha sCSBackgroundAlphas[CS_DARKEN_LIMIT] = {
 void cs_draw_LR_triangles(void) {
     cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    const s32 triWidth = 14; // Width of the triangles.
-    const s32 triHeight = (triWidth * 2); // Height of the triangles.
+    const CSScreenCoord_s32 triWidth = 14; // Width of the triangles.
+    const CSScreenCoord_s32 triHeight = (triWidth * 2); // Height of the triangles.
 
-    const s32 yPos = SCREEN_CENTER_Y; // Height of the triangles.
+    const CSScreenCoord_s32 yPos = SCREEN_CENTER_Y; // Height of the triangles.
 
-    const s32 triSeparation = 2; // Separation between the edge of the triangle and the edge of the crash screen.
-    const s32 txtSeparation = 1; // Separation between the edge of the text and the edge of the triangle.
+    const CSScreenCoord_s32 triSeparation = 2; // Separation between the edge of the triangle and the edge of the crash screen.
+    const CSScreenCoord_s32 txtSeparation = 1; // Separation between the edge of the text and the edge of the triangle.
 
-    const s32 triY = (yPos - (triHeight / 2)); // Center triangles vertically.
-    const s32 txtY = ((yPos - (TEXT_HEIGHT(1) / 2)) + 2); // Center text vertically
+    const CSScreenCoord_s32 triY = (yPos - (triHeight / 2)); // Center triangles vertically.
+    const CSScreenCoord_s32 txtY = ((yPos - (TEXT_HEIGHT(1) / 2)) + 2); // Center text vertically
 
     u16 buttonDown    = gCSCompositeController->buttonDown;
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
-    s32 L_shift = ((BITFLAG_BOOL(buttonDown, L_TRIG) + BITFLAG_BOOL(buttonPressed, L_TRIG)));
-    s32 R_shift = ((BITFLAG_BOOL(buttonDown, R_TRIG) + BITFLAG_BOOL(buttonPressed, R_TRIG)));
+    CSScreenCoord_s32 L_shift = ((BITFLAG_BOOL(buttonDown, L_TRIG) + BITFLAG_BOOL(buttonPressed, L_TRIG)));
+    CSScreenCoord_s32 R_shift = ((BITFLAG_BOOL(buttonDown, R_TRIG) + BITFLAG_BOOL(buttonPressed, R_TRIG)));
 
     const RGBA32 bgColor = RGBA32_SET_ALPHA(COLOR_RGBA32_NONE, sCSBackgroundAlphas[cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)]);
 
     // 'L' triangle:
-    const s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - L_shift); // Edge of the 'L' triangle.
+    const CSScreenCoord_s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - L_shift); // Edge of the 'L' triangle.
     cs_draw_triangle((L_edge - triWidth), triY, triWidth, triHeight, bgColor, CS_TRI_LEFT);
     cs_draw_glyph(((L_edge - TEXT_WIDTH(1)) - txtSeparation), txtY, (STR_L)[0], COLOR_RGBA32_CRASH_HEADER);
     // 'R' triangle:
@@ -487,7 +504,7 @@ void cs_draw_main(void) {
         }
 
         // Draw the page header.
-        u32 line = cs_page_header_draw();
+        CSTextCoord_u32 line = cs_page_header_draw();
 
         CSPage* page = cs_get_current_page();
 

@@ -21,9 +21,9 @@ enum CSSettingsGroup_buttons {
 
 
 typedef struct CSSettingDisplay {
-    /*0x00*/ s16 groupID;
-    /*0x02*/ s16 settingID;
-} CSSettingDisplay; /*0x04*/
+    /*0x00*/ u8 groupID;
+    /*0x01*/ u8 settingID;
+} CSSettingDisplay; /*0x02*/
 
 
 extern struct CSSetting cs_settings_group_buttons[];

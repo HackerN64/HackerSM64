@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include "util/map_parser.h"
+#include "cs_draw.h"
 
 
 // Maximum number of chars to print at once.
@@ -87,7 +88,7 @@ extern RGBA32 gCSDefaultPrintColor;
 // Output:
 extern u32 gCSNumLinesPrinted;
 
-size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
+size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 
 //! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?).
 #define cs_print_scroll(_x, _y, _charLimit, _fmt, ...) cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__)
@@ -108,8 +109,8 @@ size_t cs_print_impl(u32 x, u32 y, size_t charLimit, const char* fmt, ...) __att
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
 
-void cs_print_symbol_name(u32 x, u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
-void cs_print_addr_location_info(u32 x, u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
+void cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
+void cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
 
 
 typedef struct FloatErrorPrintFormat {
@@ -120,7 +121,7 @@ typedef struct FloatErrorPrintFormat {
     /*0x04*/ char* suffix;
 } FloatErrorPrintFormat; /*0x08*/
 
-size_t cs_print_f32(u32 x, u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
+size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
 
 int sprintf_int_with_commas(char* buf, int n);
-void print_as_binary(const u32 x, const u32 y, const Word data, RGBA32 color);
+void print_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, const Word data, RGBA32 color);

@@ -17,10 +17,10 @@
 // Controls popup box draw function.
 //! TODO: Allow changing page-specific settings from here.
 void cs_popup_controls_draw(void) {
-    const s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
-    const s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
-    const s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
-    const s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
+    const CSScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
+    const CSScreenCoord_s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
+    const CSScreenCoord_s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
+    const CSScreenCoord_s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,

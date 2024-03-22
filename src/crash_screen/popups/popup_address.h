@@ -5,7 +5,7 @@
 #include "types.h"
 
 
-// Address Select constants
+// Address Select constants.
 #define JUMP_MENU_CHARS_X   20
 #define JUMP_MENU_CHARS_Y    5
 

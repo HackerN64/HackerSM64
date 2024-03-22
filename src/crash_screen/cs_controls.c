@@ -248,30 +248,6 @@ void cs_update_input(void) {
 
     CSPopup* popup = cs_get_current_popup();
 
-    if ((popup == NULL) && !gCSSwitchedPopup && !page->flags.crashed) { //! TODO: Find out why checking page->flags.initialized here doesn't work.
-        if (
-            !(gCSCompositeController->buttonDown & Z_TRIG) && // Don't open when crash screen is invisible or when doing UNF print.
-            (gCSCompositeController->buttonPressed & START_BUTTON)
-        ) {
-            cs_open_popup(CS_POPUP_CONTROLS);
-        }
-    }
-
-    // Popup is open.
-    if (popup != NULL) {
-        if (gCSSwitchedPopup) {
-            gCSSwitchedPopup = FALSE;
-            if (popup->initFunc != NULL) {
-                popup->initFunc();
-            }
-        } else {
-            if (popup->inputFunc != NULL) {
-                popup->inputFunc();
-            }
-        }
-
-    }
-
     if ((can_switch_page() && cs_check_switch_page_input()) || gCSSwitchedPage) {
         page = cs_get_current_page(); // Page may have changed in cs_check_switch_page_input.
 
@@ -281,27 +257,46 @@ void cs_update_input(void) {
         }
     }
 
-    if (popup != NULL && !popup->flags.allowPageInput) {
-        return;
+    if (popup == NULL || popup->flags.allowPageInput) {
+        if (page->flags.crashed) {
+            if (
+                (gCSCompositeController->buttonDown & A_BUTTON) &&
+                (gCSCompositeController->buttonDown & B_BUTTON) &&
+                (gCSCompositeController->buttonPressed & START_BUTTON)
+            ) {
+                gCSCompositeController->buttonPressed &= !(A_BUTTON | B_BUTTON);
+                page->flags.crashed = FALSE;
+                page->flags.initialized = FALSE;
+                if (page->initFunc != NULL) {
+                    page->initFunc();
+                }
+            }
+        } else if (page->inputFunc != NULL) {
+            // Run the page-specific input function.
+            page->inputFunc();
+        }
     }
 
-    if (page->flags.crashed) {
+    //! TODO: Is gCSSwitchedPopup still needed?
+    if ((popup == NULL) && !gCSSwitchedPopup && !page->flags.crashed) { //! TODO: Find out why checking page->flags.initialized here doesn't work.
         if (
-            (gCSCompositeController->buttonDown & A_BUTTON) &&
-            (gCSCompositeController->buttonDown & B_BUTTON) &&
+            !(gCSCompositeController->buttonDown & Z_TRIG) && // Don't open when crash screen is invisible or when doing UNF print.
             (gCSCompositeController->buttonPressed & START_BUTTON)
         ) {
-            gCSCompositeController->buttonPressed &= !(A_BUTTON | B_BUTTON);
-            page->flags.crashed = FALSE;
-            page->flags.initialized = FALSE;
-            if (page->initFunc != NULL) {
-                page->initFunc();
+            cs_open_popup(CS_POPUP_CONTROLS);
+        }
+    }
+
+    if (popup != NULL) {
+        if (gCSSwitchedPopup) {
+            gCSSwitchedPopup = FALSE;
+        } else {
+            if (popup->inputFunc != NULL) {
+                popup->inputFunc();
             }
         }
-    } else if (page->inputFunc != NULL) {
-        // Run the page-specific input function.
-        page->inputFunc();
     }
+    
 
     gCSSwitchedPage  = FALSE;
     gCSSwitchedPopup = FALSE;

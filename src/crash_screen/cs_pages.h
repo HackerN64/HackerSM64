@@ -6,7 +6,7 @@
 
 #include "pages/page_summary.h"
 #include "pages/page_registers.h"
-#include "pages/page_threads.h"
+// #include "pages/page_threads.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
@@ -26,7 +26,7 @@ enum CSPages {
 
     CS_PAGE_SUMMARY = CS_FIRST_PAGE,
     CS_PAGE_STACK,
-    CS_PAGE_THREADS,
+    // CS_PAGE_THREADS,
     CS_PAGE_REGISTERS,
     CS_PAGE_DISASM,
     CS_PAGE_MEMORY,
@@ -71,8 +71,9 @@ enum CSPopups {
     CS_POPUP_NONE,
     CS_POPUP_CONTROLS,
     CS_POPUP_PAGES,
+    CS_POPUP_ADDRESS,
     CS_POPUP_REGINSPECT,
-    CS_POPUP_ADDRESS_SELECT,
+    CS_POPUP_THREADS,
     NUM_CS_POPUPS,
 };
 
@@ -89,6 +90,11 @@ typedef struct CSPopup {
                 };
                 u32 raw;
             } flags; /*0x04*/
+    //! TODO:
+    // /*0x14*/ u16 bgStartX;
+    // /*0x16*/ u16 bgStartY;
+    // /*0x18*/ u16 bgW;
+    // /*0x1A*/ u16 bgH;
 } CSPopup; /*0x1C*/
 
 extern struct CSPopup* gCSPopups[NUM_CS_POPUPS];

@@ -23,10 +23,10 @@ static s8 sAddressSelectCharIndex = 7;
 
 // Address select draw function.
 void cs_address_select_draw(void) {
-    const s32 bgStartX = (JUMP_MENU_X1 - JUMP_MENU_MARGIN_X);
-    const s32 bgStartY = (JUMP_MENU_Y1 - JUMP_MENU_MARGIN_Y);
-    const s32 bgW = (JUMP_MENU_W + (JUMP_MENU_MARGIN_X * 2));
-    const s32 bgH = (JUMP_MENU_H + (JUMP_MENU_MARGIN_Y * 2));
+    const CSScreenCoord_s32 bgStartX = (JUMP_MENU_X1 - JUMP_MENU_MARGIN_X);
+    const CSScreenCoord_s32 bgStartY = (JUMP_MENU_Y1 - JUMP_MENU_MARGIN_Y);
+    const CSScreenCoord_s32 bgW = (JUMP_MENU_W + (JUMP_MENU_MARGIN_X * 2));
+    const CSScreenCoord_s32 bgH = (JUMP_MENU_H + (JUMP_MENU_MARGIN_Y * 2));
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
@@ -40,8 +40,8 @@ void cs_address_select_draw(void) {
     Word data = 0;
     _Bool isValid = try_read_word_aligned(&data, addr);
 
-    u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
-    u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
+    CSScreenCoord_u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
+    CSScreenCoord_u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
     // "[XXXXXXXX]"
     cs_print(
         addressStartX, addressStartY,
@@ -49,8 +49,8 @@ void cs_address_select_draw(void) {
         (isValid ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO), addr
     );
 
-    u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
-    u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
+    CSScreenCoord_u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
+    CSScreenCoord_u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
     // Up arrow:
     cs_draw_triangle(
         triangleStartX, triangleStartY,
@@ -112,9 +112,9 @@ void cs_address_select_input(void) {
             case CS_PAGE_STACK:
                 cs_set_page(CS_PAGE_DISASM);
                 break;
-            case CS_PAGE_THREADS:
-                cs_set_page(CS_PAGE_MEMORY);
-                break;
+            // case CS_PAGE_THREADS:
+            //     cs_set_page(CS_PAGE_MEMORY);
+            //     break;
             case CS_PAGE_REGISTERS:
                 if (is_in_code_segment(sAddressSelectTarget)) {
                     cs_set_page(CS_PAGE_DISASM);

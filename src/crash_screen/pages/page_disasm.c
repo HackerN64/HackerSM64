@@ -159,6 +159,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
             if (funcAddr != symbol->addr) {
                 return FALSE;
             }
+        } else {
+            return FALSE;
         }
 
         // Get the offset for the current function.

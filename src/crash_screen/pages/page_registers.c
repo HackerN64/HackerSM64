@@ -15,6 +15,7 @@
 #include "crash_screen/cs_settings.h"
 
 #include "crash_screen/popups/popup_reginspect.h"
+#include "crash_screen/popups/popup_threads.h"
 
 #include "page_registers.h"
 
@@ -265,7 +266,14 @@ void page_registers_draw(void) {
     __OSThreadContext* tc = &thread->context;
     u32 line = 2;
 
-    draw_thread_entry(TEXT_Y(line), thread);
+    if (gCSPopupID != CS_POPUP_THREADS) {
+        // Draw the thread box:
+        // cs_thread_draw_highlight(thread, CS_POPUP_THREADS_Y1);
+        if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_THREAD) {
+            cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, CS_POPUP_THREADS_Y1, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
+        }
+        cs_print_thread_info(CS_POPUP_THREADS_TEXT_X1, CS_POPUP_THREADS_Y1, thread, FALSE, FALSE);
+    }
     line += 2;
 
     line = cs_registers_print_registers(line);
@@ -345,7 +353,7 @@ void page_registers_input(void) {
         u32 idx = 0;
         switch (sel->section) {
             case PAGE_REG_SECTION_THREAD:
-                //! TODO: Change "THREADS" page into a popup that gets opened here.
+                cs_open_threads();
                 break;
             case PAGE_REG_SECTION_REG:
                 idx = cs_page_reg_get_select_idx(sel, bounds->cols);

@@ -11,7 +11,7 @@
 
 #include "pages/page_summary.h"
 #include "pages/page_registers.h"
-#include "pages/page_threads.h"
+// #include "pages/page_threads.h"
 #include "pages/page_logs.h"
 #include "pages/page_stack.h"
 #ifdef INCLUDE_DEBUG_MAP
@@ -26,6 +26,7 @@
 #include "popups/popup_page_controls.h"
 #include "popups/popup_page_select.h"
 #include "popups/popup_reginspect.h"
+#include "popups/popup_threads.h"
 
 
 // -- Pages --
@@ -33,7 +34,7 @@
 CSPage* gCSPages[CS_NUM_PAGES] = {
     [CS_PAGE_SUMMARY    ] = &gCSPage_summary,
     [CS_PAGE_STACK      ] = &gCSPage_stack,
-    [CS_PAGE_THREADS    ] = &gCSPage_threads,
+    // [CS_PAGE_THREADS    ] = &gCSPage_threads,
     [CS_PAGE_REGISTERS  ] = &gCSPage_registers,
     [CS_PAGE_DISASM     ] = &gCSPage_disasm,
     [CS_PAGE_MEMORY     ] = &gCSPage_memory,
@@ -87,8 +88,9 @@ CSPopup* gCSPopups[NUM_CS_POPUPS] = {
     [CS_POPUP_NONE          ] = NULL,
     [CS_POPUP_CONTROLS      ] = &gCSPopup_controls,
     [CS_POPUP_PAGES         ] = &gCSPopup_pages,
+    [CS_POPUP_ADDRESS       ] = &gCSPopup_address,
     [CS_POPUP_REGINSPECT    ] = &gCSPopup_reginspect,
-    [CS_POPUP_ADDRESS_SELECT] = &gCSPopup_address,
+    [CS_POPUP_THREADS       ] = &gCSPopup_threads,
 };
 enum CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
 _Bool gCSSwitchedPopup = FALSE;
@@ -103,6 +105,11 @@ void cs_open_popup(enum CSPopups popupID) {
     if (gCSPopupID != popupID) {
         gCSPopupID = popupID;
         gCSSwitchedPopup = TRUE;
+        if (gCSPopupID != CS_POPUP_NONE) {
+            if (gCSPopups[gCSPopupID]->initFunc != NULL) {
+                gCSPopups[gCSPopupID]->initFunc();
+            }
+        }
     }
 }
 
