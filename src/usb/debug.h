@@ -78,12 +78,12 @@
         
         
         /*==============================
-            debug_assert
+            debug_debug_assert
             Halts the program if the expression fails.
             @param The expression to test
         ==============================*/
         
-        #define debug_assert(expr) (expr) ? ((void)0) : _debug_assert(#expr, __FILE__, __LINE__)
+        #define debug_debug_assert(expr) (expr) ? ((void)0) : _debug_assert(#expr, __FILE__, __LINE__)
         
         
         /*==============================
@@ -163,7 +163,7 @@
         #define debug_is_initialized() 0
         #define debug_printf
         #define debug_screenshot(a, b, c)
-        #define debug_assert(a)
+        #define debug_debug_assert(a)
         #define debug_pollcommands()
         #define debug_addcommand(a, b, c)
         #define debug_parsecommand(a) NULL

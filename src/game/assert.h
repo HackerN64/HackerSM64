@@ -81,7 +81,6 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 #define assertf         ASSERTF
 #define debug_error     DEBUG_ERROR
 #define debug_errorf    DEBUG_ERRORF
-#undef debug_assert // Overwrite the UNF version.
 #define debug_assert    DEBUG_ASSERT
 #define debug_assertf   DEBUG_ASSERTF
 
