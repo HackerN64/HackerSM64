@@ -149,6 +149,9 @@ static const char* get_thread_name_from_list(int id, const ThreadName* list, siz
 }
 // Returns a thread name from 'sThreadIDNames'.
 const char* get_thread_name(OSThread* thread) {
+    if (thread == NULL) {
+        return NULL;
+    }
     OSId id = osGetThreadId(thread);
     OSPri pri = osGetThreadPri(thread);
     const char* name = NULL;
@@ -165,6 +168,15 @@ const char* get_thread_name(OSThread* thread) {
     if (name != NULL) {
         return name;
     }
+
+#ifdef INCLUDE_DEBUG_MAP
+    if (name == NULL) {
+        const MapSymbol* symbol = get_map_symbol((Address)thread, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            return get_map_symbol_name(symbol);
+        }
+    }
+#endif // INCLUDE_DEBUG_MAP
 
     return NULL;
 }

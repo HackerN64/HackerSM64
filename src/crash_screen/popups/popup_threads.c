@@ -91,7 +91,7 @@ void cs_print_thread_info(CSTextCoord_u32 charStartX, CSScreenCoord_u32 y, OSThr
         charX += cs_print_scroll(TEXT_X(charX), y,
             (charEndX - charX),
             (STR_COLOR_PREFIX"%s"),
-            threadColor, threadName
+            COLOR_RGBA32_CRASH_VARIABLE, threadName
         );
     }
 
