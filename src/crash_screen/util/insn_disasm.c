@@ -626,7 +626,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                         ADD_STR(STR_FUNCTION, get_insn_branch_target_from_addr(addr));
                     } else {
                         s16 branchOffset = (insn.offset + 1);
-                        ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Use '%+' format specifier if possible with 0x prefix.
+                        ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Is it possible to use the '%+' format specifier with the 0x prefix?
                     }
                     break;
                 case CHAR_P_COP0D: // COP0 'RD' register.

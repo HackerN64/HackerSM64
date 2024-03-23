@@ -269,18 +269,18 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
         uint64_t badvaddr = tc->badvaddr;
         uint32_t epc = GET_EPC(tc);
 
-        // Heuristics from libdragon:
+        // Heuristics from libdragon (plus a few extras):
         switch (cause) {
             case EXC_INT: // Non-crash interrupts (can be shown after changing the inspected thread).
-                //! TODO: Can this potentially be different?
-                if (tc->pc == ((Address)osRecvMesg + (26 * sizeof(Word)))) { // 26th Instruction in osRecvMesg.
+                //! TODO: Can the instruction location here potentially change?
+                if (tc->pc == ((Address)osRecvMesg + (26 * sizeof(Word)))) { // 27th Instruction in osRecvMesg.
                     return "Waiting for mesg";
                 }
-                //! TODO: Unsafe data reads:
+                //! TODO: Fix these unsafe data reads:
                 InsnData insn = { .raw = *(u32*)tc->pc };
                 InsnData prev = { .raw = *(u32*)(tc->pc - sizeof(Word)) };
                 #define INSN_IS_B_0(_insn) (((_insn).opcode == OPC_BEQ) && ((_insn).rs == (_insn).rt) && ((_insn).offset == (u16)-1))
-                if (INSN_IS_B_0(insn) || (((insn.raw == 0x00000000)) && INSN_IS_B_0(prev) && ((Reg_CP0_Cause)tc->cause).BD)) {
+                if (INSN_IS_B_0(insn) || (((Reg_CP0_Cause)tc->cause).BD && (insn.raw == 0x00000000) && INSN_IS_B_0(prev))) {
                     return "Empty infinite loop";
                 }
                 #undef INSN_IS_B_0
@@ -293,7 +293,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 } else if (badvaddr < 128) {
                     // This is probably a NULL pointer dereference, though it can go through a structure or an array,
                     // so leave some margin to the actual faulting address.
-                    if (tc->pc == (Address)strlen) {
+                    if (tc->pc == (Address)strlen) { // 1st instruction of strlen
                         return "NULL string dereference (read)";
                     } else {
                         return "NULL pointer dereference (read)";
