@@ -29,7 +29,7 @@ static u32 sNumShownThreadRows = NUM_SHOWN_SCROLL_THREADS;
 static u32 sTotalFoundThreads = 0;
 
 
-#define MAX_ITERATIONS 32
+#define MAX_THREAD_SEARCH_ITERATIONS 32
 
 
 u32 get_thread_index_in_queue(OSThread* findThread) {
@@ -42,7 +42,7 @@ u32 get_thread_index_in_queue(OSThread* findThread) {
         (thread != NULL) &&
         (thread->priority != OS_PRIORITY_THREADTAIL)
     ) {
-        if (threadIndex > MAX_ITERATIONS) {
+        if (threadIndex > MAX_THREAD_SEARCH_ITERATIONS) {
             return 0;
         }
 
@@ -146,7 +146,7 @@ void cs_popup_threads_draw_list(u32 startY) {
         (thread != NULL) &&
         (thread->priority != OS_PRIORITY_THREADTAIL)
     ) {
-        if (threadIndex > MAX_ITERATIONS) {
+        if (threadIndex > MAX_THREAD_SEARCH_ITERATIONS) {
             exceededMax = TRUE;
             break;
         }
@@ -182,7 +182,7 @@ void cs_popup_threads_draw_list(u32 startY) {
     }
 
     if (exceededMax) {
-        cs_print(TEXT_X(0), TEXT_Y(1), "num th.\nfound:\n>%d", MAX_ITERATIONS);
+        cs_print(TEXT_X(0), TEXT_Y(1), "num th.\nfound:\n>%d", MAX_THREAD_SEARCH_ITERATIONS);
     } else {
         cs_print(TEXT_X(0), TEXT_Y(1), "num th.\nfound:\n%d", sTotalFoundThreads);
     }

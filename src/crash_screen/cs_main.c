@@ -1,6 +1,6 @@
 #include <ultra64.h>
 
-#include <PR/os_internal_error.h>
+#include <PR/os_internal.h>
 
 #include <stdarg.h>
 #include <string.h>
@@ -30,10 +30,11 @@ ALIGNED16 static struct CSThreadInfo sCSThreadInfos[NUM_CRASH_SCREEN_BUFFERS]; /
 static s32   sCSThreadIndex = 0;    // Crash screen thread index.
 static _Bool sFirstCrash    = TRUE; // Used to make certain things only happen on the first crash.
 
-CSThreadInfo* gActiveCSThreadInfo = NULL; // Pointer to the current crash screen thread info.
-OSThread*     gCrashedThread      = NULL; // Pointer to the most recently crashed thread.
-OSThread*     gCrashedGameThread  = NULL; // Pointer to the most recently crashed non-crash-screen thread.
-OSThread*     gInspectThread      = NULL; // Pointer to the thread the crash screen will be inspecting.
+CSThreadInfo* gActiveCSThreadInfo  = NULL; // Pointer to the current crash screen thread info.
+CSThreadInfo* gWaitingCSThreadInfo = NULL; // Pointer to the next crash screen thread info.
+OSThread*     gCrashedThread       = NULL; // Pointer to the most recently crashed thread.
+OSThread*     gCrashedGameThread   = NULL; // Pointer to the most recently crashed non-crash-screen thread.
+OSThread*     gInspectThread       = NULL; // Pointer to the thread the crash screen will be inspecting.
 
 Address gSetCrashAddress       = 0x00000000; // Used by SET_CRASH_PTR to set the crashed thread PC. Externed in macros.h.
 Address gSelectedAddress       = 0x00000000; // Selected address for ram viewer and disasm pages.
@@ -186,7 +187,7 @@ static OSThread* get_crashed_thread(void) {
 
 /**
  * @brief Pauses the current thread until another thread crashes.
- * 
+ *
  * @param[in,out] mesgQueue The OSMesgQueue to use.
  * @param[in,out] mesg      The OSMesg to use.
  * @return OSThread* A pointer to the thread that crashed.
@@ -210,6 +211,8 @@ OSThread* wait_until_thread_crash(OSMesgQueue* mesgQueue, OSMesg* mesg) {
     }
 }
 
+#define CS_GET_NEXT_THREAD_ID(_currentThreadId) (((_currentThreadId) + 1) % ARRAY_COUNT(sCSThreadInfos))
+
 /**
  * @brief Crash screen tread function. Waits for a crash then loops the crash screen.
  *
@@ -217,7 +220,7 @@ OSThread* wait_until_thread_crash(OSMesgQueue* mesgQueue, OSMesg* mesg) {
  */
 void crash_screen_thread_entry(UNUSED void* arg) {
     // Get the current thread info.
-    struct CSThreadInfo* threadInfo = &sCSThreadInfos[sCSThreadIndex];
+    struct CSThreadInfo* threadInfo = gWaitingCSThreadInfo;
 
     // Wait until a thread to crash.
     gCrashedThread = wait_until_thread_crash(&threadInfo->mesgQueue, &threadInfo->mesg);
@@ -233,29 +236,48 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     }
 }
 
-#define CS_GET_NEXT_THREAD_ID(_currentThreadId) (((_currentThreadId) + 1) % ARRAY_COUNT(sCSThreadInfos))
+/**
+ * @brief Removes a thread from the active queue. Very similar to __osDequeueThread.
+ * TODO: Does this need an iteration limit?
+ *
+ * @param thread The thread to remove from the active queue.
+ */
+void remove_thread_from_queue(OSThread* thread) {
+    if (thread == NULL) {
+        return;
+    }
+
+    OSThread* queue = __osGetActiveQueue();
+    OSThread* prev = queue;
+
+    while (
+        (prev != NULL) &&
+        (prev->priority != OS_PRIORITY_THREADTAIL)
+    ) {
+        if (prev->tlnext == thread) {
+            prev->tlnext = thread->tlnext;
+        }
+
+        prev = prev->tlnext;
+    }
+}
 
 /**
  * @brief Create a crash screen thread.
  */
 void create_crash_screen_thread(void) {
-    // Increment the current thread index.
-    //   sCSThreadIndex == 0 on game boot,
-    //   sCSThreadIndex == 1 on normal crash,
-    //   sCSThreadIndex == 2 on crash screen crash,
-    //   then back to 0.
+    s32 threadIndex = sCSThreadIndex;
     sCSThreadIndex = CS_GET_NEXT_THREAD_ID(sCSThreadIndex);
-
-    struct CSThreadInfo* threadInfo = &sCSThreadInfos[sCSThreadIndex];
-    bzero(threadInfo, sizeof(struct CSThreadInfo));
-
-    //! TODO: Thread quueue gets messed up (looped) after the second crash screen crash.
-    osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
+    struct CSThreadInfo* threadInfo = &sCSThreadInfos[threadIndex];
     OSThread* thread = &threadInfo->thread;
-    // thread->next = NULL;
-    // thread->queue = NULL;
+
+    gWaitingCSThreadInfo = threadInfo;
+
+    remove_thread_from_queue(thread);
+    bzero(threadInfo, sizeof(struct CSThreadInfo));
+    osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
     osCreateThread(
-        thread, (THREAD_1000_CRASH_SCREEN_0 + sCSThreadIndex),
+        thread, (THREAD_1000_CRASH_SCREEN_0 + threadIndex),
         crash_screen_thread_entry, NULL,
         ((u8*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
         (OS_PRIORITY_APPMAX - 1)
