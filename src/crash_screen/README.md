@@ -11,7 +11,7 @@ TODO: more/update documentation
 # Pages:
 
 ## Summary
-- Description of the crash and relevant information.
+- Description of the crash and some relevant information.
 - If a code crash, prints the asm line at the crash and the values of the registers involved.
 - If an assert crash, shows the assert info.
 
@@ -94,7 +94,7 @@ TODO: more/update documentation
 <p>
 
 ### General
-- **Fix lowercase `debug_assert` conflict with UNF `debug_assert`.**
+- **Fix thread queue list getting messed up (looped) after the second crash screen crash**
 - **Fix the flickering on Ares (and some other emulators) if possible.**
 - **Fix .rodata symbols not appearing in debug map.**
 - Detect which segments are loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
@@ -144,6 +144,8 @@ TODO: more/update documentation
     - rcp thread register and other interface registers
   - Object bank overflow (show bhv of the object that attempted to spawn)
   - Stack overflow
+- Show hex and binary data on "illegal instruction" crash.
+- Add thread display from thread registers page.
 - Select section to go to the relevant page.
 ### Stack trace page
 - Use Libdragon's better stack trace functionality.

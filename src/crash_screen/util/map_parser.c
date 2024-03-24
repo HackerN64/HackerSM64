@@ -46,6 +46,9 @@ TEXT_REGION_GROUP(common1)
 #include "levels/level_defines.h"
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
+
+//! TODO: Does this only exist on boot? PJ64 interprets it as asm but it seems like garbage data when viewed via the crash screen.
+// MEMORY_REGION(0xA4000000, 0xA4001000) // RSP DMEM
 };
 
 
@@ -73,7 +76,7 @@ void map_data_init(void) {
  */
 _Bool is_in_code_segment(Address addr) {
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
-        if (addr >= sTextRegions[i].start && addr < sTextRegions[i].end) {
+        if ((addr >= sTextRegions[i].start) && addr < (sTextRegions[i].end)) {
             return TRUE;
         }
     }
