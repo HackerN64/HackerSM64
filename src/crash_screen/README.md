@@ -94,11 +94,9 @@ TODO: more/update documentation
 <p>
 
 ### General
-- **Fix thread queue list getting messed up (looped) after the second crash screen crash**
 - **Fix the flickering on Ares (and some other emulators) if possible.**
 - **Fix .rodata symbols not appearing in debug map.**
-- Detect which segments are loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
-- Don't have all crash screen code always loaded
+- Don't have all crash screen code always loaded.
   - Keep in its own segment then DMA it on crash?.
     - DMA to end of RAM right before Goddard.
     - Same place as map data.
@@ -145,7 +143,7 @@ TODO: more/update documentation
   - Object bank overflow (show bhv of the object that attempted to spawn)
   - Stack overflow
 - Show hex and binary data on "illegal instruction" crash.
-- Add thread display from thread registers page.
+- Add thread display (from thread registers page).
 - Select section to go to the relevant page.
 ### Stack trace page
 - Use Libdragon's better stack trace functionality.
@@ -182,7 +180,8 @@ TODO: more/update documentation
 - Translucent dividers at the end of symbols (already at beginning).
 - Can the bootleg "multithreading" for branch arrows be removed now that there is no longer lag with binary symbol searching?
 - Reset branch arrow distance when it won't overlap instead of wrapping only after the distance reaches the end of the screen.
-- Save register data types in register buffer?
+- Save register data types in the register buffer?
+- Detect which segments are currently loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
 ### Memory view page
 - Read 4 bytes as address for address select popup (requires multi-select?).
 - Binary view mode (disasm already has a version of this).
