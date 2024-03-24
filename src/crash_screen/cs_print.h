@@ -109,8 +109,8 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
 
-void cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
-void cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
+size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
+size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
 
 
 typedef struct FloatErrorPrintFormat {

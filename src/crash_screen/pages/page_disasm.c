@@ -47,6 +47,9 @@ struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_DISASM_BINARY           ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknown as binary",              .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_PSEUDOINSNS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_DISASM_SYMBOL_HEADERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Symbol headers",                 .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_OFFSET_ADDR      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Offsets as addresses",           .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_ARROW_MODE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Branch arrow mode",              .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
     [CS_OPT_END_DISASM              ] = { .type = CS_OPT_TYPE_END, },
@@ -282,16 +285,37 @@ void print_as_insn(const u32 charX, const u32 charY, const Address addr, const W
 #endif // INCLUDE_DEBUG_MAP
 }
 
-static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
+void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
     const enum CSDisasmBranchArrowModes branchArrowMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
-    const _Bool unkAsBinary = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
+    const _Bool unkAsBinary   = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
+#ifdef INCLUDE_DEBUG_MAP
+    const _Bool symbolHeaders = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SYMBOL_HEADERS);
+#endif // INCLUDE_DEBUG_MAP
+    Address addr = sDisasmViewportIndex;
 
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < numLines; y++) {
-        Address addr = (sDisasmViewportIndex + (y * PAGE_DISASM_STEP));
         charY = TEXT_Y(line + y);
+
+#ifdef INCLUDE_DEBUG_MAP
+            // Translucent divider between symbols.
+            const MapSymbol* symbol = get_map_symbol(addr, (symbolHeaders ? SYMBOL_SEARCH_BACKWARD : SYMBOL_SEARCH_BINARY));
+            if (symbol != NULL) {
+                //! TODO: Do this for the end of symbols too.
+                if (addr == symbol->addr) {
+                    cs_draw_divider_translucent(DIVIDER_Y(line + y));
+                    if (symbolHeaders) {
+                        //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
+                        size_t numChars = cs_print_symbol_name(charX, charY, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
+                        cs_print(charX + TEXT_WIDTH(numChars), charY, ":");
+                        y++;
+                        charY = TEXT_Y(line + y);
+                    }
+                }
+            }
+#endif // INCLUDE_DEBUG_MAP
 
         // Draw crash and selection rectangles:
         if (addr == pc) {
@@ -309,16 +333,6 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
         if (!try_read_word_aligned(&data, addr)) {
             cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else {
-#ifdef INCLUDE_DEBUG_MAP
-            // Translucent divider between symbols.
-            const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
-            if (symbol != NULL) {
-                //! TODO: Do this for the end of symbols too.
-                if (addr == symbol->addr) {
-                    cs_draw_divider_translucent(DIVIDER_Y(line + y));
-                }
-            }
-#endif // INCLUDE_DEBUG_MAP
             if (is_in_code_segment(addr)) {
                 print_as_insn(charX, charY, addr, data);
 
@@ -349,6 +363,8 @@ static void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr
                 }
             }
         }
+
+        addr += PAGE_DISASM_STEP;
     }
 
     osWritebackDCacheAll();

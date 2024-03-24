@@ -400,10 +400,11 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
  * @brief Prints "UNKNOWN" in place of an unknown symbol name.
  *
  * @param[in] x,y The starting position on the screen to print to.
+ * @return size_t The total number of chars printed to the screen.
  */
-static void cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
+static size_t cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
     // "UNKNOWN"
-    cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
+    return cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
 }
 
 /**
@@ -412,22 +413,17 @@ static void cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
  * @param[in] x,y      The starting position on the screen to print to.
  * @param[in] maxWidth The maximum number of chars to print.
  * @param[in] symbol   The symbol pointer.
+ * @return size_t The total number of chars printed to the screen.
  */
-void cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
+size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
     if (symbol == NULL) {
-        if (printUnknown) {
-            cs_print_symbol_unknown(x, y);
-        }
-        return;
+        return (printUnknown ? cs_print_symbol_unknown(x, y) : 0);
     }
     const char* name = get_map_symbol_name(symbol);
     if (name == NULL) {
-        if (printUnknown) {
-            cs_print_symbol_unknown(x, y);
-        }
-        return;
+        return (printUnknown ? cs_print_symbol_unknown(x, y) : 0);
     }
-    cs_print_scroll(x, y, maxWidth,
+    return cs_print_scroll(x, y, maxWidth,
         STR_COLOR_PREFIX"%s",
         (is_in_code_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
     );
@@ -439,25 +435,26 @@ void cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth
  * @param[in] x,y      The starting position on the screen to print to.
  * @param[in] maxWidth The maximum number of chars to print.
  * @param[in] addr     The address location.
+ * @return size_t The total number of chars printed to the screen.
  */
-void cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
+size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
 #ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            cs_print_symbol_name(x, y, maxWidth, symbol, FALSE);
-            return;
+            return cs_print_symbol_name(x, y, maxWidth, symbol, FALSE);
         }
     }
 #endif // INCLUDE_DEBUG_MAP
     if (memoryLocationFallback) {
         const char* memStr = get_memory_string_from_addr(addr);
         if (memStr != NULL) {
-            cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, memStr);
-            return;
+            return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, memStr);
+            
         }
     }
     // cs_print_symbol_unknown(x, y);
+    return 0;
 }
 
 static const FloatErrorPrintFormat sFltErrFmt[] = {
