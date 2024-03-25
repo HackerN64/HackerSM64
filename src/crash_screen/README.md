@@ -172,9 +172,9 @@ TODO: more/update documentation
 - Fix floats in hex mode printing the incorrect data.
 - Highlight registers used in instruction at pc.
 ### Disasm page
+- **Fix cursor passing the bottom of the screen when inline symbol headers are on.**
 - Show addresses for each row (setting).
 - Multi-line pseudoinstructions if possible (ABS, BLT, BGT, BLE, NEG, NEGU, NOT, BGE, LI, LA, SGE, SGE, ADD?).
-- Is it possible to include function names inline at the beginning of each function without compromising scrolling?
 - Can the `insn_as_string` and `insn_name` buffers be combined?
 - Implement "OVERSCAN" mode for branch arrows.
 - Translucent dividers at the end of symbols (already at beginning).
@@ -183,6 +183,7 @@ TODO: more/update documentation
 - Save register data types in the register buffer?
 - Detect which segments are currently loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
 ### Memory view page
+- Press and hold to select multiple bytes?
 - Read 4 bytes as address for address select popup (requires multi-select?).
 - Binary view mode (disasm already has a version of this).
 - Is search functionality possible/reasonable?
@@ -193,6 +194,7 @@ TODO: more/update documentation
 - Is search functionality possible/reasonable?
 - Describe "type" char.
 - Determine segment/linker data type from map data?
+- Is search functionality possible/reasonable?
 ### Logs page
 - Timestamps?
 ### Settings page

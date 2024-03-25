@@ -258,9 +258,14 @@ void page_summary_draw(void) {
             print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
             // cs_draw_divider(DIVIDER_Y(line));
 
-            cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction register values:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            for (int i = 0; i < gSavedRegBufSize; i++) {
-                cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
+            if (cause == EXC_II) {
+                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction as binary:", COLOR_RGBA32_CRASH_PAGE_NAME);
+                print_as_binary(TEXT_X(1), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
+            } else {
+                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction register values:", COLOR_RGBA32_CRASH_PAGE_NAME);
+                for (int i = 0; i < gSavedRegBufSize; i++) {
+                    cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
+                }
             }
         }
     }

@@ -273,7 +273,7 @@ void cs_popup_reginspect_draw(void) {
                 print_as_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
             } else {
                 cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
-                print_as_binary(TEXT_X(2), TEXT_Y(line++), data, COLOR_RGBA32_WHITE);
+                print_as_binary(TEXT_X(2), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
             }
         } else {
             sInspectedRegisterPtrAddr = 0x00000000;

@@ -692,7 +692,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
     }
 
     if (unimpl) { //! TODO: binary mode for these.
-        ADD_STR(("unimpl "STR_HEX_WORD), insn.raw);
+        ADD_STR((STR_HEX_WORD" (unimpl)"), insn.raw);
     }
 
     return insn_as_string;

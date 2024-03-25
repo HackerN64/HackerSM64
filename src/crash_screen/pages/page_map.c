@@ -53,7 +53,7 @@ static u32 sMapViewerViewportIndex = 0;
 
 
 void page_map_init(void) {
-    s32 newIndex = get_symbol_index_from_addr_backward(gSelectedAddress);
+    s32 newIndex = get_symbol_index_from_addr_backward(gInspectThread->context.pc);
     sMapViewerSelectedIndex = (newIndex != -1) ? newIndex : 0;
     sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }

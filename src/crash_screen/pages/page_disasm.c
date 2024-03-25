@@ -41,14 +41,14 @@ const char* sValNames_branch_arrow[] = {
 #endif // !INCLUDE_DEBUG_MAP
 
 struct CSSetting cs_settings_group_page_disasm[] = {
-    [CS_OPT_HEADER_PAGE_DISASM      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASM",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_HEADER_PAGE_DISASM      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASSEMBLY",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_BINARY           ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknown as binary",              .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_PSEUDOINSNS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_DISASM_SYMBOL_HEADERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Symbol headers",                 .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_SYMBOL_HEADERS   ] = { .type = CS_OPT_TYPE_SETTING, .name = "Inline symbol headers",          .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
 #endif // INCLUDE_DEBUG_MAP
     [CS_OPT_DISASM_OFFSET_ADDR      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Offsets as addresses",           .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_ARROW_MODE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Branch arrow mode",              .valNames = &sValNames_branch_arrow,  .val = DISASM_ARROW_MODE_DEFAULT, .defaultVal = DISASM_ARROW_MODE_DEFAULT, .lowerBound = DISASM_ARROW_MODE_OFF, .upperBound = DISASM_ARROW_MODE_OVERSCAN, },
@@ -301,7 +301,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
 
 #ifdef INCLUDE_DEBUG_MAP
             // Translucent divider between symbols.
-            const MapSymbol* symbol = get_map_symbol(addr, (symbolHeaders ? SYMBOL_SEARCH_BACKWARD : SYMBOL_SEARCH_BINARY));
+            const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
             if (symbol != NULL) {
                 //! TODO: Do this for the end of symbols too.
                 if (addr == symbol->addr) {
@@ -355,7 +355,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
 #endif // INCLUDE_DEBUG_MAP
                 if (unkAsBinary) {
                     // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                    print_as_binary(charX, charY, data, color);
+                    print_as_binary(charX, charY, &data, sizeof(data), color);
                     // cs_print(charX, charY, "%032b", data);
                 } else {
                     // "[XXXXXXXX]"
@@ -566,7 +566,7 @@ void page_disasm_print(void) {
 
 
 struct CSPage gCSPage_disasm = {
-    .name         = "DISASM",
+    .name         = "DISASSEMBLY",
     .initFunc     = page_disasm_init,
     .drawFunc     = page_disasm_draw,
     .inputFunc    = page_disasm_input,

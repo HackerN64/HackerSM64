@@ -376,19 +376,19 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
         bzero(&gCSPrintBuffer, sizeof(gCSPrintBuffer));
 
         // Handle non-shaping formatting like color.
-        size_t bufferCount = cs_format_print_buffer(sCSCharBuffer, totalSize);
+        size_t phase1FormattedSize = cs_format_print_buffer(sCSCharBuffer, totalSize);
 
         // Handle wrapping if applicable.
-        if (0 < charLimit && charLimit < bufferCount) {
+        if (0 < charLimit && charLimit < phase1FormattedSize) {
             if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) > 0) {
-                cs_scroll_buffer(bufferCount, charLimit);
+                cs_scroll_buffer(phase1FormattedSize, charLimit);
             }
 
-            bufferCount = charLimit;
+            phase1FormattedSize = charLimit;
         }
 
         // Handle shaping formatting like tabs and wrapping.
-        numChars = cs_print_from_buffer(x, y, bufferCount);
+        numChars = cs_print_from_buffer(x, y, phase1FormattedSize);
     }
 
     va_end(args);
@@ -496,6 +496,7 @@ size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, c
     return numChars;
 }
 
+//! TODO:
 // size_t cs_print_f64(u32 x, u32 y, IEEE754_f64 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
 //     const enum FloatErrorType fltErrType = validate_f64(val);
 //     size_t numChars = 0;
@@ -528,16 +529,21 @@ int sprintf_int_with_commas(char* buf, int n) {
     return (p - buf);
 }
 
-void print_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, const Word data, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+// Big Endian.
+void print_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
     CSScreenCoord_u32 bitX = x;
+    Byte* dataPtr = (Byte*)data;
 
-    for (size_t c = 0; c < SIZEOF_BITS(Word); c++) {
-        if ((c % SIZEOF_BITS(Byte)) == 0) { // Space between each byte.
+    for (size_t byte = 0; byte < numBytes; byte++){
+        for (size_t bit = 0; bit < BITS_PER_BYTE; bit++) {
+            char c = (((*dataPtr >> ((BITS_PER_BYTE - 1) - bit)) & 0b1) ? '1' : '0');
+
+            cs_draw_glyph(bitX, y, c, color);
+
             bitX += TEXT_WIDTH(1);
         }
 
-        cs_draw_glyph(bitX, y, (((data >> (SIZEOF_BITS(Word) - c)) & 0b1) ? '1' : '0'), color);
-
+        dataPtr++;
         bitX += TEXT_WIDTH(1);
     }
 }
