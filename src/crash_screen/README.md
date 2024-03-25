@@ -179,7 +179,6 @@ TODO: more/update documentation
 - Show direct register access values for each one.
 - Determine whether that one register is a saved value or a frame pointer.
 - Add missing controls descriptions.
-- Fix floats in hex mode printing the incorrect data.
 - Highlight registers used in instruction at pc.
 ### Disasm page
 - **Fix cursor passing the bottom of the screen when inline symbol headers are on.**

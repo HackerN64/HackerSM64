@@ -57,6 +57,7 @@ void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t
 
     // Print as other floatint point formats:
     if (regId.flt) {
+        //! TODO: Combine this with cs_print_f32.
         y += TEXT_HEIGHT(1);
         const IEEE754_f64 flt64 = { .asU64 = val64, };
         const IEEE754_f32 flt32 = { .asU32 = val32, };

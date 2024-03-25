@@ -479,18 +479,12 @@ size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, c
             numChars += cs_print(x, y, (STR_COLOR_PREFIX"%c"STR_HEX_WORD), color, p->prefixChar, val.asU32);
         }
     } else {
-        const char* fmt = NULL;
-        _Bool asHex = FALSE;
-
         switch (format) {
-            //! TODO: Hex version prints incorrectly here.
-            case PRINT_NUM_FMT_HEX: fmt = " "STR_HEX_WORD; asHex = TRUE; break; // "[XXXXXXXX]"
+            case PRINT_NUM_FMT_HEX: numChars += cs_print(x, y, (" "STR_HEX_WORD), val.asU32); break; // "[XXXXXXXX]"
             default:
-            case PRINT_NUM_FMT_DEC: fmt = "% g";   break; // "[±][exponent]"
-            case PRINT_NUM_FMT_SCI: fmt = "% .3e"; break; // "[scientific notation]"
+            case PRINT_NUM_FMT_DEC: numChars += cs_print(x, y, "% g",   val.asF32); break; // "[±][exponent]"
+            case PRINT_NUM_FMT_SCI: numChars += cs_print(x, y, "% .3e", val.asF32); break; // "[scientific notation]"
         }
-
-        numChars += cs_print(x, y, fmt, (asHex ? val.asU32 : val.asF32));
     }
 
     return numChars;

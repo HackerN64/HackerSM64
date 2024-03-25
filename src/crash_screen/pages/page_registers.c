@@ -220,11 +220,9 @@ void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
     size_t charX = cs_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     x += TEXT_WIDTH(charX);
 
-    IEEE754_f32 val = {
-        .asU32 = (u32)get_reg_val(COP1, regNum),
-    };
+    u32 data = get_reg_val(COP1, regNum);
 
-    cs_print_f32(x, y, val, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), FALSE);
+    cs_print_f32(x, y, (IEEE754_f32){ .asU32 = data, }, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), FALSE);
 }
 
 void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
