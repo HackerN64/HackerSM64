@@ -72,7 +72,7 @@ static RGBA16 cs_rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac) {
     RGBA16 s = (MSK_RGBA16_C << SIZ_RGBA16_A);
 
     for (s32 i = 0; i < 3; i++) {
-        ds = (a & s);
+        ds = (a & s); // Current color component of 'a'.
         d |= ((((fac * ((b & s) - ds)) >> 8) + ds) & s);
         s <<= SIZ_RGBA16_C;
     }
@@ -203,11 +203,21 @@ void cs_draw_triangle(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScre
     cs_set_scissor_box(startX, startY, (startX + w), (startY + h));
 
     switch (direction) {
-        case CS_TRI_UP:    cs_draw_diamond(startX,             startY,             w,       (h * 2), color); break;
-        case CS_TRI_DOWN:  cs_draw_diamond(startX,             ((startY - h) - 1), w,       (h * 2), color); break;
-        case CS_TRI_LEFT:  cs_draw_diamond(startX,             startY,             (w * 2), h,       color); break;
-        case CS_TRI_RIGHT: cs_draw_diamond(((startX - w) - 1), startY,             (w * 2), h,       color); break;
+        case CS_TRI_DOWN:
+            startY -= (h + 1); // Flip vertically.
+            FALL_THROUGH;
+        case CS_TRI_UP:
+            h *= 2;
+            break;
+        case CS_TRI_RIGHT:
+            startX -= (w + 1); // Flip horizontally.
+            FALL_THROUGH;
+        case CS_TRI_LEFT: 
+            w *= 2;
+            break;
     }
+
+    cs_draw_diamond(startX, startY, w, h, color);
 
     gCSScissorBox = temp;
 }

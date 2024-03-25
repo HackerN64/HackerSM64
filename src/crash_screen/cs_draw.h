@@ -97,10 +97,10 @@ enum CSDrawDarkRectDarken {
 
 // For cs_draw_triangle.
 enum CSDrawTriangleDirection {
-    CS_TRI_UP,
     CS_TRI_DOWN,
-    CS_TRI_LEFT,
+    CS_TRI_UP,
     CS_TRI_RIGHT,
+    CS_TRI_LEFT,
 };
 
 
