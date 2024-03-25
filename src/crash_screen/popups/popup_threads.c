@@ -37,7 +37,7 @@ u32 get_thread_index_in_queue(OSThread* findThread) {
     OSThread* thread = queue;
 
     u32 threadIndex = 0;
-    
+
     while (
         (thread != NULL) &&
         (thread->priority != OS_PRIORITY_THREADTAIL)
@@ -67,65 +67,51 @@ void cs_popup_threads_init(void) {
     sThreadsSelectedIndex = get_thread_index_in_queue(sSelectedThreadPtr);
 }
 
-void cs_print_thread_info(CSTextCoord_u32 charStartX, CSScreenCoord_u32 y, OSThread* thread, _Bool showAddress, _Bool showViewing) {
-    CSTextCoord_u32 charEndX = (charStartX + CS_POPUP_THREADS_NUM_CHARS_X);
-    // First line:
-
+void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread) {
     const RGBA32 threadColor = COLOR_RGBA32_LIGHT_CYAN;
-    CSTextCoord_u32 charAddrX = charStartX;
-    if (showAddress) {
-        charAddrX += cs_print(TEXT_X(charStartX), y,
-            (STR_HEX_WORD":"),
-            (Address)thread
-        );
-    }
 
-    CSTextCoord_u32 charX = charAddrX;
-    cs_print(TEXT_X(charAddrX), y,
+    // First line:
+    CSTextCoord_u32 charX = 0;
+
+    cs_print(x, y,
         (STR_COLOR_PREFIX"thread %d"),
         threadColor, osGetThreadId(thread)
     );
     charX += STRLEN("THREAD #####: ");
     const char* threadName = get_thread_name(thread);
     if (threadName != NULL) {
-        charX += cs_print_scroll(TEXT_X(charX), y,
-            (charEndX - charX),
+        charX += cs_print_scroll((x + TEXT_WIDTH(charX)), y,
+            (maxNumChars - charX),
             (STR_COLOR_PREFIX"%s"),
-            COLOR_RGBA32_CRASH_VARIABLE, threadName
+            threadColor, threadName
         );
     }
 
     y += TEXT_HEIGHT(1);
     // Second line:
 
-    if (showViewing && (thread == gInspectThread)) {
-        cs_print(TEXT_X(showAddress ? charStartX : (charEndX - (STRLEN("viewing") + 1))), y,
-            STR_COLOR_PREFIX"viewing", COLOR_RGBA32_CRASH_THREAD
-        );
-    }
-
-    charX = charAddrX;
-    cs_print(TEXT_X(charX), y,
+    charX = 0;
+    cs_print(x, y,
         (STR_COLOR_PREFIX"pri:"STR_COLOR_PREFIX"%d"),
         COLOR_RGBA32_LIGHT_GRAY,
         COLOR_RGBA32_CRASH_THREAD, osGetThreadPri(thread)
     );
     charX += STRLEN("pri:### ");
-    charX += cs_print(TEXT_X(charX), y,
+    charX += cs_print((x + TEXT_WIDTH(charX)), y,
         (STR_COLOR_PREFIX"state:"),
         COLOR_RGBA32_LIGHT_GRAY
     );
-    RGBA32 stateColor = cs_draw_thread_state_icon(TEXT_X(charX++), (y + 2), thread);
+    RGBA32 stateColor = cs_draw_thread_state_icon((x + TEXT_WIDTH(charX++)), (y + 2), thread);
     const char* stateName = get_thread_state_str(thread);
     if (stateName != NULL) {
-        charX += cs_print(TEXT_X(charX), y,
+        charX += cs_print((x + TEXT_WIDTH(charX)), y,
             (STR_COLOR_PREFIX"%s"),
             stateColor, stateName
         );
         const char* flagsName = get_thread_flags_str(thread);
         if (flagsName != NULL) {
             // "(fault)" or "(break)".
-            charX += cs_print(TEXT_X(charX), y,
+            charX += cs_print((x + TEXT_WIDTH(charX)), y,
                 (STR_COLOR_PREFIX" (%s)"),
                 stateColor, flagsName
             );
@@ -161,7 +147,7 @@ void cs_popup_threads_draw_list(u32 startY) {
                 cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, y, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
             }
 
-            cs_print_thread_info(CS_POPUP_THREADS_TEXT_X1, y, thread, FALSE, FALSE);
+            cs_print_thread_info(TEXT_X(CS_POPUP_THREADS_TEXT_X1), y, CS_POPUP_THREADS_NUM_CHARS_X, thread);
             y += TEXT_HEIGHT(2);
             cs_draw_divider_translucent_impl((CS_POPUP_THREADS_BG_X1 + 1), (CS_POPUP_THREADS_BG_WIDTH - 2), (y - 2));
         }
@@ -204,9 +190,11 @@ void cs_popup_threads_draw(void) {
 
     OSThread* thread = gInspectThread;
     u32 threadY = CS_POPUP_THREADS_Y1;
+
+    // Draw the currently selected thread at the top:
     // cs_thread_draw_highlight(thread, threadY);
-    cs_print_thread_info(CS_POPUP_THREADS_TEXT_X1, threadY, thread, FALSE, FALSE);
-    
+    cs_print_thread_info(TEXT_X(CS_POPUP_THREADS_TEXT_X1), threadY, CS_POPUP_THREADS_NUM_CHARS_X, thread);
+
     threadY += TEXT_HEIGHT(2);
     cs_draw_divider_impl((bgStartX + 1), (bgW - 2), (threadY - 2), COLOR_RGBA32_CRASH_DIVIDER);
     cs_popup_threads_draw_list(threadY);

@@ -139,24 +139,36 @@ TODO: more/update documentation
 - Special crash/assert handling:
   - RCP hang/Null SPTask (what RCP info can be printed?)
     - Mention the need to restart console when this happens.
-    - rcp thread register and other interface registers
-  - Object bank overflow (show bhv of the object that attempted to spawn)
-  - Stack overflow
-- Show hex and binary data on "illegal instruction" crash.
-- Add thread display (from thread registers page).
+    - `rcp` thread register and other interface registers.
+  - Object bank overflow (show bhv of the object that attempted to spawn).
+  - Stack overflow.
 - Select section to go to the relevant page.
+- Remove the word "state" from thread display?
+- `0x` prefix for Unimplemented instructions.
+- Separate registers from insn again.
+- Finalize layout.
 ### Stack trace page
 - Use Libdragon's better stack trace functionality.
-- Mention that the stack is thread-specific (show thread on page?)
+- Make it clearer that the stack is thread-specific (show thread on page?)
 ### Registers page
 - Extended version with a scrollable list of all registers and their full 64 bit contents (Everything from [here](https://n64.readthedocs.io/index.html) plus any other CPU/RCP registers). Thread registers on top (old context page) then all registers if scroll down.
-- Scrollable reginspect.
-- Status register diagnostic/interrupt bits in reginspect
+- Reginspect:
+  - Scrollable for more data.
+  - Status register diagnostic/interrupt bits.
+  - Show upper/odd bits of float registers.
+  - Switch between registers like pages or by selecting in the background.
+  - `A: GO TO` if valid pointer.
+  - If pointer, print the entire symbol?
+    - Get size from map data.
+  - If valid pointer, highlight address portion green like address select.
+  - If not a pointer, show binary format too.
 - Explain thread select
   - Controls
   - Explain that it affects the stack page (and summary page?)
   - Find out what that unknown thread 0 (libultra) thread is with pri 149 is that only appears with make UNF (but not necessarily if UNF is on)
-  - Single-line thread display?
+  - Clearn up thread print format.
+    - Single-line thread display?
+  - `A: GO TO MEMORY`, `START: SWITCH THREAD`, `B:EXIT`
 - Show offsets in parse register address names mode.
 - Different colors for register names from parsed global variable names (disasm page too)?
 - Multiple FPCSR descriptions at once (already kinda done in reginspect).
@@ -164,9 +176,7 @@ TODO: more/update documentation
   - Automatic bit mode check based on registers
   - Use upper bits of float registers from odd registers
 - Add "hi", "lo", and "rcp" from thread context.
-- Show upper/odd bits of float registers on reginspect.
-- Show direct register access values.
-- Switch between registers in reginspect like pages or by selecting in the background.
+- Show direct register access values for each one.
 - Determine whether that one register is a saved value or a frame pointer.
 - Add missing controls descriptions.
 - Fix floats in hex mode printing the incorrect data.
@@ -182,6 +192,7 @@ TODO: more/update documentation
 - Reset branch arrow distance when it won't overlap instead of wrapping only after the distance reaches the end of the screen.
 - Save register data types in the register buffer?
 - Detect which segments are currently loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
+- Print unknowns as binary should work on unimpl too.
 ### Memory view page
 - Press and hold to select multiple bytes?
 - Read 4 bytes as address for address select popup (requires multi-select?).
@@ -198,13 +209,13 @@ TODO: more/update documentation
 ### Logs page
 - Timestamps?
 ### Settings page
+- Move entirely to page-specific popup?
+  - Individual page settings in each page's controls/help popup box.
+- Jump to the page from a page group.
 - Save all changed settings somehow?
 - Confirmation dialog box to reset all to defaults.
-- Jump to the page from a page group.
 - Fix/remove redundant/similar settings.
 - Automatically add the page-specific settings instead of being a separate array.
-- Individual page settings in each page's controls/help popup box.
-- Move entirely to page-specific popup?
 - Can this work without a buffer for shown entries like the threads page?
 - Low vs. High resolution setting.
 - Physical vs. Virtual address setting?

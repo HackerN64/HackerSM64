@@ -266,10 +266,7 @@ void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
 }
 #endif // INCLUDE_DEBUG_MAP
 
-void print_as_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
-    const char* destFname = NULL;
-    const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, TRUE);
-
+void print_insn(const u32 charX, const u32 charY, const char* insnAsStr, const char* destFname) {
     // "[instruction name] [params]"
     cs_print(charX, charY, "%s", insnAsStr);
 
@@ -283,6 +280,12 @@ void print_as_insn(const u32 charX, const u32 charY, const Address addr, const W
         );
     }
 #endif // INCLUDE_DEBUG_MAP
+}
+
+void format_and_print_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
+    const char* destFname = NULL;
+    const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, TRUE);
+    print_insn(charX, charY, insnAsStr, destFname);
 }
 
 void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
@@ -334,7 +337,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
             cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else {
             if (is_in_code_segment(addr)) {
-                print_as_insn(charX, charY, addr, data);
+                format_and_print_insn(charX, charY, addr, data);
 
                 if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
                     InsnData insn = {
@@ -355,7 +358,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
 #endif // INCLUDE_DEBUG_MAP
                 if (unkAsBinary) {
                     // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                    print_as_binary(charX, charY, &data, sizeof(data), color);
+                    print_data_as_binary(charX, charY, &data, sizeof(data), color);
                     // cs_print(charX, charY, "%032b", data);
                 } else {
                     // "[XXXXXXXX]"

@@ -541,7 +541,7 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
  * @return char* The formatted string in insn_as_string.
  */
 char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool format) {
-    char* strp = &insn_as_string[0];
+    char* strp = &insn_as_string[0]; // Pointer to a location inside the string.
     _Bool unimpl = FALSE;
 
     bzero(insn_as_string, sizeof(insn_as_string));

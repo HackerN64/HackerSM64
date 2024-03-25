@@ -402,7 +402,7 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
  * @param[in] x,y The starting position on the screen to print to.
  * @return size_t The total number of chars printed to the screen.
  */
-static size_t cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
+ALWAYS_INLINE static size_t cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
     // "UNKNOWN"
     return cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
 }
@@ -449,7 +449,7 @@ size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32
     if (memoryLocationFallback) {
         const char* memStr = get_memory_string_from_addr(addr);
         if (memStr != NULL) {
-            return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, memStr);
+            return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_GRAY, memStr);
             
         }
     }
@@ -530,7 +530,7 @@ int sprintf_int_with_commas(char* buf, int n) {
 }
 
 // Big Endian.
-void print_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+void print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
     CSScreenCoord_u32 bitX = x;
     Byte* dataPtr = (Byte*)data;
 

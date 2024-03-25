@@ -16,6 +16,7 @@
 #include "crash_screen/cs_pages.h"
 #include "crash_screen/cs_print.h"
 #include "crash_screen/cs_settings.h"
+#include "crash_screen/popups/popup_threads.h"
 
 #include "page_summary.h"
 
@@ -51,67 +52,7 @@ void page_summary_init(void) {
 
 }
 
-void cs_print_cpu_cause(u32 x, u32 y, u32 cause) {
-    // "COP:"
-    cs_print(x, y,
-        STR_COLOR_PREFIX"COP:\tcop%d unusable",
-        COLOR_RGBA32_CRASH_DESCRIPTION,
-        ((Reg_CP0_Cause){ .raw = cause, }).CE
-    );
-}
-
-void cs_print_fpe_cause(u32 x, u32 y, u32 fpcsr) {
-    // "FPE:"
-    size_t charX = cs_print(x, y,
-        STR_COLOR_PREFIX"FPE:\t",
-        COLOR_RGBA32_CRASH_DESCRIPTION
-    );
-    x += TEXT_WIDTH(charX);
-
-    const char* fpcsrDesc = get_fpcsr_desc(fpcsr, TRUE);
-    if (fpcsrDesc != NULL) {
-        // "([float exception description])"
-        cs_print(x, y, STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc);
-    }
-}
-
-void cs_print_crashed_thread(u32 x, u32 y) {
-    OSThread* thread = gInspectThread;
-
-    // "THREAD: [thread id]"
-    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"THREAD:\t%d",
-        COLOR_RGBA32_CRASH_THREAD, osGetThreadId(thread)
-    );
-    const char* threadName = get_thread_name(thread);
-    if (threadName != NULL) {
-        // "(thread name)"
-        cs_print(TEXT_X(charX + STRLEN(" ")), y, STR_COLOR_PREFIX"(%s)",
-            COLOR_RGBA32_CRASH_THREAD, threadName
-        );
-    }
-}
-
-#ifdef INCLUDE_DEBUG_MAP
-void cs_print_func(u32 x, u32 y, __OSThreadContext* tc) {
-    // "FUNC: [function name]"
-    size_t charX = cs_print(x, y,
-        STR_COLOR_PREFIX"FUNC:\t",
-        COLOR_RGBA32_CRASH_AT
-    );
-    cs_print_addr_location_info(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), GET_EPC(tc), TRUE);
-}
-#endif // INCLUDE_DEBUG_MAP
-
-void cs_print_cause(u32 x, u32 y, __OSThreadContext* tc) {
-    const char* desc = get_cause_desc(tc, TRUE);
-    if (desc != NULL) {
-        // "CAUSE: ([exception cause description])"
-        cs_print(x, y,
-            STR_COLOR_PREFIX"CAUSE:\t%s",
-            COLOR_RGBA32_CRASH_DESCRIPTION, desc
-        );
-    }
-}
+extern void alert_rcp_hung_up(void);
 
 // Draw the assert info.
 //! TODO: Scrollable long asserts.
@@ -128,22 +69,24 @@ u32 cs_draw_assert(u32 line) {
     cs_draw_divider(DIVIDER_Y(line));
 
     size_t lineStrStart = (CRASH_SCREEN_NUM_CHARS_X - STRLEN("LINE:0000"));
-    // "FILE: [file name]"
-    charX += cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"FILE:",
-        COLOR_RGBA32_CRASH_HEADER
-    );
-    charX += cs_print_scroll(TEXT_X(charX), TEXT_Y(line), (lineStrStart - charX),
-        STR_COLOR_PREFIX"%s",
-        COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
-    );
-    // "LINE:[line number]"
-    cs_print(TEXT_X(lineStrStart), TEXT_Y(line),
-        STR_COLOR_PREFIX"LINE:"STR_COLOR_PREFIX"%d",
-        COLOR_RGBA32_CRASH_HEADER,
-        COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_LineNum
-    );
-    line++;
+    if (__n64Assert_Filename != NULL) {
+        // "FILE: [file name]"
+        charX += cs_print(TEXT_X(0), TEXT_Y(line),
+            STR_COLOR_PREFIX"FILE:",
+            COLOR_RGBA32_CRASH_HEADER
+        );
+        charX += cs_print_scroll(TEXT_X(charX), TEXT_Y(line), (lineStrStart - charX),
+            STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
+        );
+        // "LINE:[line number]"
+        cs_print(TEXT_X(lineStrStart), TEXT_Y(line),
+            STR_COLOR_PREFIX"LINE:"STR_COLOR_PREFIX"%d",
+            COLOR_RGBA32_CRASH_HEADER,
+            COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_LineNum
+        );
+        line++;
+    }
 
 #ifdef INCLUDE_DEBUG_MAP
     if (__assert_address) {
@@ -155,6 +98,15 @@ u32 cs_draw_assert(u32 line) {
         );
         cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), __assert_address, TRUE);
         line++;
+        const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            if (symbol->addr == INSN_OFFSET_FROM_ADDR(alert_rcp_hung_up, 0)) {
+                // RCP crash:
+                cs_print(TEXT_X(0), TEXT_Y(line++), "RCP:\t%08X", gInspectThread->context.rcp);
+                cs_print(TEXT_X(0), TEXT_Y(line++), "DPC: %08X in [%08X-%08X]", IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG));
+                cs_print(TEXT_X(0), TEXT_Y(line++), "Status: DPC:%08X SP:%08X", IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG));
+            }
+        }
     }
 #endif // INCLUDE_DEBUG_MAP
 
@@ -172,14 +124,15 @@ u32 cs_draw_assert(u32 line) {
         line++;
     }
 
-    // "MESSAGE:[message]"
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"MESSAGE:\n"STR_COLOR_PREFIX"%s",
-        COLOR_RGBA32_CRASH_HEADER,
-        gCSDefaultPrintColor, __n64Assert_Message
-    );
-    line += gCSNumLinesPrinted;
-
+    if (__n64Assert_Message != NULL) {
+        // "MESSAGE:[message]"
+        cs_print(TEXT_X(0), TEXT_Y(line),
+            STR_COLOR_PREFIX"MESSAGE:\n"STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_HEADER,
+            gCSDefaultPrintColor, __n64Assert_Message
+        );
+        line += gCSNumLinesPrinted;
+    }
     gCSWordWrap = FALSE;
 
     osWritebackDCacheAll();
@@ -216,81 +169,131 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
     }
 }
 
+enum CrashTypes {
+    CRASH_TYPE_DEFAULT,
+    CRASH_TYPE_ASSERT,
+    CRASH_TYPE_IPC,
+    CRASH_TYPE_II,
+};
+
+#define CRASH_SUMMARY_TITLE_TEXT "CRASH INFO:"
+
 void page_summary_draw(void) {
     __OSThreadContext* tc = &gInspectThread->context;
     u32 cause = (tc->cause & CAUSE_EXCMASK);
-    u32 line = 8;
+    u32 line = 2;
 
-    if (cause == EXC_SYSCALL) {
-        line = 7;
-        // ASSERT:
+    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
+    size_t len = STRLEN(CRASH_SUMMARY_TITLE_TEXT);
+    cs_print(TEXT_X(centerX - (len / 2)), TEXT_Y(line++), (STR_COLOR_PREFIX CRASH_SUMMARY_TITLE_TEXT), COLOR_RGBA32_RED);
+
+    Address epc = GET_EPC(tc);
+    Word data = 0x00000000;
+    const char* destFname = NULL;
+    const char* insnAsStr = NULL; 
+
+    enum CrashTypes crashType = CRASH_TYPE_DEFAULT;
+
+    if ((cause == EXC_SYSCALL) && (tc->pc == INSN_OFFSET_FROM_ADDR(__n64Assert, 8))) { // Crash is an assert.
+        crashType = CRASH_TYPE_ASSERT;
+    } else {
+        if (!try_read_word_aligned(&data, epc)) { // PC is at an invalid memory location.
+            crashType = CRASH_TYPE_IPC;
+        } else {
+            // Calculate this early so the register buffer can be checked.
+            insnAsStr = cs_insn_to_string(epc, (InsnData)data, &destFname, TRUE);
+            if ((cause == EXC_II) || !is_in_code_segment(epc)) { // PC is an invalid instruction.
+                crashType = CRASH_TYPE_II;
+            }
+        }
+    }
+
+    // -- CRASH DESCRIPTION --
+
+    cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"caused by:", COLOR_RGBA32_CRASH_PAGE_NAME);
+    cs_draw_divider_translucent(DIVIDER_Y(line));
+
+    // First line of crash description:
+    const char* desc = get_cause_desc(tc, TRUE);
+    if (desc != NULL) {
+        cs_print(
+            TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_DESCRIPTION, desc
+        );
+    }
+    // Second line of crash description:
+    switch (cause) {
+        case EXC_CPU:
+            // "COP:"
+            cs_print(TEXT_X(2), TEXT_Y(line++),
+                STR_COLOR_PREFIX"cop%d unusable",
+                COLOR_RGBA32_CRASH_DESCRIPTION,
+                ((Reg_CP0_Cause){ .raw = cause, }).CE
+            );
+            break;
+        case EXC_FPE:;
+            const char* fpcsrDesc = get_fpcsr_desc(tc->fpcsr, TRUE);
+            if (fpcsrDesc != NULL) {
+                cs_print(
+                    TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s",
+                    COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc
+                );
+            }
+            break;
+    }
+    line++;
+
+    // -- THREAD --
+    cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"in thread:", COLOR_RGBA32_CRASH_PAGE_NAME);
+    cs_draw_divider_translucent(DIVIDER_Y(line));
+    cs_print_thread_info(TEXT_X(1), TEXT_Y(line++), CRASH_SCREEN_NUM_CHARS_X, gInspectThread);
+    line += 2;
+
+    if (crashType == CRASH_TYPE_ASSERT) {
+        // -- ASSERT --
         cs_draw_divider(DIVIDER_Y(line));
         line = cs_draw_assert(line);
     } else {
-        line = 9;
-        Address addr = GET_EPC(tc);
-        Word data = 0x00000000;
-        if (try_read_word_aligned(&data, addr) && is_in_code_segment(addr)) {
-            cs_print(TEXT_X(0), TEXT_Y(line++),
-                STR_COLOR_PREFIX"crash location:",
-                COLOR_RGBA32_CRASH_PAGE_NAME
+        // -- PC --
+        cs_print(TEXT_X(0), TEXT_Y(line++),
+            STR_COLOR_PREFIX"crash location:",
+            COLOR_RGBA32_CRASH_PAGE_NAME
+        );
+        cs_draw_divider_translucent(DIVIDER_Y(line));
+        RegisterId regPC = {
+            .cop = COP0,
+            .idx = REG_CP0_EPC,
+            .flt = FALSE,
+            .out = FALSE,
+        };
+        cs_draw_register_info_long(1, line++, regPC);
+        line++;
+        if (crashType == CRASH_TYPE_IPC) {
+            cs_print(TEXT_X(1), TEXT_Y(line++),
+                STR_COLOR_PREFIX"Program counter at invalid memory location.",
+                COLOR_RGBA32_CRASH_DESCRIPTION
             );
-
-            RegisterId regPC = {
-                .cop = COP0,
-                .idx = REG_CP0_EPC,
-                .flt = FALSE,
-                .out = FALSE,
-            };
-            cs_draw_register_info_long(1, line++, regPC);
-
+        } else {
             cs_print(TEXT_X(0), TEXT_Y(line++),
                 STR_COLOR_PREFIX"instruction at crash:",
                 COLOR_RGBA32_CRASH_PAGE_NAME
             );
+            cs_draw_divider_translucent(DIVIDER_Y(line));
+            print_insn(TEXT_X(1), TEXT_Y(line++), insnAsStr, destFname);
+            line++;
 
-            // // Draw a red selection rectangle.
-            // cs_draw_rect((TEXT_X(0) - 1), (TEXT_Y(line) - 2), (CRASH_SCREEN_TEXT_W + 1), (TEXT_HEIGHT(1) + 1), COLOR_RGBA32_CRASH_PC_HIGHLIGHT);
-            // // "<-- CRASH"
-            // cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), TEXT_Y(line), STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
-
-            // cs_draw_divider(DIVIDER_Y(line));
-            print_as_insn(TEXT_X(1), TEXT_Y(line++), addr, data);
-            // cs_draw_divider(DIVIDER_Y(line));
-
-            if (cause == EXC_II) {
-                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction as binary:", COLOR_RGBA32_CRASH_PAGE_NAME);
-                print_as_binary(TEXT_X(1), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
+            if (crashType == CRASH_TYPE_II) {
+                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"as binary:", COLOR_RGBA32_CRASH_PAGE_NAME);
+                cs_draw_divider_translucent(DIVIDER_Y(line));
+                print_data_as_binary(TEXT_X(1), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
             } else {
-                cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction register values:", COLOR_RGBA32_CRASH_PAGE_NAME);
+                // cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"instruction register values:", COLOR_RGBA32_CRASH_PAGE_NAME);
+                // cs_draw_divider_translucent(DIVIDER_Y(line));
                 for (int i = 0; i < gSavedRegBufSize; i++) {
                     cs_draw_register_info_long(1, line++, gSavedRegBuf[i]);
                 }
             }
         }
-    }
-
-    line = 2;
-
-    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
-    size_t len = STRLEN("CRASH AT:");
-    cs_print(TEXT_X(centerX - (len / 2)), TEXT_Y(line++), STR_COLOR_PREFIX"CRASH AT:", COLOR_RGBA32_RED);
-    line++;
-
-    cs_print_crashed_thread(TEXT_X(0), TEXT_Y(line++));
-#ifdef INCLUDE_DEBUG_MAP
-    cs_print_func(TEXT_X(0), TEXT_Y(line++), tc);
-#endif // INCLUDE_DEBUG_MAP
-    cs_print_cause(TEXT_X(0), TEXT_Y(line++), tc);
-
-    // Second line of crash description:
-    switch (cause) {
-        case EXC_CPU:
-            cs_print_cpu_cause(TEXT_X(0), TEXT_Y(line), tc->cause);
-            break;
-        case EXC_FPE:
-            cs_print_fpe_cause(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
-            break;
     }
 
     // if (gLastCSSelectedAddress) {

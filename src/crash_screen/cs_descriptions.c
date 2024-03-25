@@ -273,7 +273,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
         switch (cause) {
             case EXC_INT: // Non-crash interrupts (can be shown after changing the inspected thread).
                 //! TODO: Can the instruction location here potentially change?
-                if (tc->pc == ((Address)osRecvMesg + (26 * sizeof(Word)))) { // 27th Instruction in osRecvMesg.
+                if (tc->pc == INSN_OFFSET_FROM_ADDR(osRecvMesg, 26)) { // 27th Instruction in osRecvMesg.
                     return "Waiting for mesg";
                 }
                 //! TODO: Fix these unsafe data reads:
@@ -293,7 +293,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 } else if (badvaddr < 128) {
                     // This is probably a NULL pointer dereference, though it can go through a structure or an array,
                     // so leave some margin to the actual faulting address.
-                    if (tc->pc == (Address)strlen) { // 1st instruction of strlen
+                    if (tc->pc == INSN_OFFSET_FROM_ADDR(strlen, 0)) { // 1st instruction of strlen
                         return "NULL string dereference (read)";
                     } else {
                         return "NULL pointer dereference (read)";

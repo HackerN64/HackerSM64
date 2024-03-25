@@ -438,7 +438,7 @@ typedef struct PACKED InsnTemplate {
 } InsnTemplate; /*0x10*/
 
 
-#define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
+#define INSN_OFFSET_FROM_ADDR(_addr, _insnOffset) ((Address)(_addr) + (sizeof(InsnData) * (s16)(_insnOffset)))
 
 
 s16 insn_check_for_branch_offset(InsnData insn);

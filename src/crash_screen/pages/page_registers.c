@@ -272,7 +272,7 @@ void page_registers_draw(void) {
         if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_THREAD) {
             cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, CS_POPUP_THREADS_Y1, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
         }
-        cs_print_thread_info(CS_POPUP_THREADS_TEXT_X1, CS_POPUP_THREADS_Y1, thread, FALSE, FALSE);
+        cs_print_thread_info(TEXT_X(CS_POPUP_THREADS_TEXT_X1), CS_POPUP_THREADS_Y1, CS_POPUP_THREADS_NUM_CHARS_X, thread);
     }
     line += 2;
 

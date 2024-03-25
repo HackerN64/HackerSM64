@@ -268,12 +268,12 @@ void cs_popup_reginspect_draw(void) {
         u32 data = 0;
         if (try_read_word_aligned(&data, val32)) {
             sInspectedRegisterPtrAddr = val32;
-            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
             if (is_in_code_segment(val32)) {
-                print_as_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
+                format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
             } else {
                 cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
-                print_as_binary(TEXT_X(2), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
+                print_data_as_binary(TEXT_X(2), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
             }
         } else {
             sInspectedRegisterPtrAddr = 0x00000000;
