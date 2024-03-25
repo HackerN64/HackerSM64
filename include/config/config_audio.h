@@ -45,8 +45,14 @@
 #define MAX_SIMULTANEOUS_NOTES_EMULATOR 40
 #define MAX_SIMULTANEOUS_NOTES_CONSOLE 24
 
-/** 
- * Uses a much better implementation of reverb over vanilla's fake echo reverb. Great for caves or eerie levels, as well as just a better audio experience in general.
- * Reverb presets can be configured in audio/data.c to meet desired aesthetic/performance needs. More detailed usage info can also be found on the HackerSM64 Wiki page.
+/**
+ * Allocate 6 additional SFX channels for general use. Sounds can be selectively distrubed across these channels in order to avoid sound overlapping conflicts.
+ * Also opens up free space to work with in 00_sound_banks.s. Likely doesn't hurt performance much beyond potentially having more notes playing at a time.
+ */
+#define EXTRA_SFX_CHANNEL_BANKS
+
+/**
+ * Use a much better implementation of reverb over vanilla's fake echo reverb. Great for caves or eerie levels, as well as just a better audio experience in general.
+ * Reverb parameters can be configured in audio/synthesis.c to meet desired aesthetic/performance needs. Currently US/JP only. Hurts emulator and console performance.
  */
 // #define BETTER_REVERB
