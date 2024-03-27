@@ -115,7 +115,7 @@ ALIGNED32 static const RegisterInfo sRegisters_COP0[CP0_NUM_REGISTERS] = {
     [REG_CP0_COMPARE  ] = DEF_COP0_SREG(C0_COMPARE,   u32,           "Compare",  "CP", REG_DESC_CP0_COMPARE  ),
     [REG_CP0_SR       ] = DEF_COP0_TREG(C0_SR,        u32, sr,       "Status",   "SR", REG_DESC_CP0_SR       ),
     [REG_CP0_CAUSE    ] = DEF_COP0_TREG(C0_CAUSE,     u32, cause,    "Cause",    "CR", REG_DESC_CP0_CAUSE    ),
-    [REG_CP0_EPC      ] = DEF_COP0_TREG(C0_EPC,       u64, pc,       "EPC",      "PC", REG_DESC_CP0_EPC      ), //! TODO: Are pc and epc the same? They seem to be different sizes but they match on a crash.
+    [REG_CP0_EPC      ] = DEF_COP0_TREG(C0_EPC,       u64, pc,       "EPC",      "PC", REG_DESC_CP0_EPC      ),
     [REG_CP0_PRID     ] = DEF_COP0_SREG(C0_PRID,      u32,           "PRId",     "PR", REG_DESC_CP0_PRID     ),
     [REG_CP0_CONFIG   ] = DEF_COP0_SREG(C0_CONFIG,    u32,           "Config",   "CF", REG_DESC_CP0_CONFIG   ),
     [REG_CP0_LLADDR   ] = DEF_COP0_SREG(C0_LLADDR,    u32,           "LLAddr",   "LL", REG_DESC_CP0_LLADDR   ),
@@ -248,7 +248,32 @@ uint64_t get_fcr_reg_val(int idx) {
         case REG_FCR_IMPL_REV:       ASM_GET_REG_FCR(val,  "$0"); break;
         case REG_FCR_CONTROL_STATUS: ASM_GET_REG_FCR(val, "$31"); break;
         default: break;
-        
+    }
+    return val;
+}
+
+ALIGNED32 static const RegisterInfo sRegisters_SPECIAL[] = {
+    [REG_SPC_LO   ] = DEF_TREG(lo,  sizeof(u64), "LO",    "LO", REG_SPC_LO   ),
+    [REG_SPC_HI   ] = DEF_TREG(hi,  sizeof(u64), "HI",    "HI", REG_SPC_HI   ),
+    // [REG_SPC_LLBIT] = DEF_SREG(     sizeof(u32), "LLBit", "LL", REG_SPC_LLBIT),
+    [REG_SPC_RCP  ] = DEF_TREG(rcp, sizeof(u32), "RCP",   "RC", REG_SPC_RCP  ),
+};
+const char* sRegDesc_SPECIAL[] = {
+    // [REG_SPC_PC   ] = "program counter",
+    [REG_SPC_LO   ] = "special register LO",
+    [REG_SPC_HI   ] = "special register HI",
+    // [REG_SPC_LLBIT] = "load linked bit",
+    [REG_SPC_RCP  ] = "thread rcp",
+};
+
+uint64_t get_special_reg_val(int idx) {
+    int val = 0;
+    switch (idx) {
+        case REG_SPC_LO:    asm volatile("mflo %0":"=r"(val):); break;
+        case REG_SPC_HI:    asm volatile("mfhi %0":"=r"(val):); break;
+        // case REG_SPC_LLBIT: asm volatile("sc %0,()":"=r"(val):); break;
+        case REG_SPC_RCP:   return __osRunningThread->context.rcp;
+        default: break;
     }
     return val;
 }
@@ -276,7 +301,11 @@ const RegisterInfo* get_fcr_reg_info(int idx) {
     return &sRegisters_FCR[idx];
 }
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx) {
-    return ((cop == FCR) ? get_fcr_reg_info(idx) : &sRegisters[cop + 1][idx]);
+    switch (cop) {
+        case FCR: return get_fcr_reg_info(idx);
+        case SPC: return &sRegisters_SPECIAL[idx];
+        default:  return &sRegisters[cop + 1][idx];
+    }
 }
 
 uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
@@ -306,11 +335,12 @@ uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
 
 uint64_t get_direct_reg_val(enum Coprocessors cop, int idx) {
     switch (cop) {
-        case CPU:  return get_cpu_reg_val(idx);  break;
-        case COP0: return get_cop0_reg_val(idx); break;
-        case COP1: return get_cop1_reg_val(idx); break;
-        case FCR:  return get_fcr_reg_val(idx);  break;
-        default: return 0;
+        case CPU:  return get_cpu_reg_val(idx);
+        case COP0: return get_cop0_reg_val(idx);
+        case COP1: return get_cop1_reg_val(idx);
+        case FCR:  return get_fcr_reg_val(idx);
+        case SPC:  return get_special_reg_val(idx);
+        default:   return 0;
     }
 }
 
@@ -336,6 +366,7 @@ const char* get_reg_desc(enum Coprocessors cop, int idx) {
     switch (cop) {
         case COP0: return sRegDesc_CP0[info->descId];
         case FCR:  return sRegDesc_FPR[info->descId];
+        case SPC:  return sRegDesc_SPECIAL[info->descId];
         default:   return sRegDesc[info->descId];
     }
 }

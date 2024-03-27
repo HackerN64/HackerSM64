@@ -17,7 +17,8 @@ enum Coprocessors {
     COP1, // Coprocessor-1 (Floating-Point Unit).
     COP2, // Coprocessor-2 (Reality Co-Processor Vector Unit).
     COP3, // Coprocessor-3 (CP3).
-    FCR, // Coprocessor-1 Control/Status registers
+    FCR,  // Coprocessor-1 Control/Status registers
+    SPC,  // Special registers
 };
 
 enum CPURegisters {
@@ -133,6 +134,14 @@ enum FCRRegisters {
 enum RegDesc_FCR {
     REG_DESC_FCR_COP_IMPL_REV,
     REG_DESC_FCR_CONTROL_STATUS,
+};
+
+enum SpecialRegisters {
+    // REG_SPC_PC,    // Program Counter
+    REG_SPC_LO,    // mflo/mtlo
+    REG_SPC_HI,    // mfhi/mthi
+    // REG_SPC_LLBIT, // Load Linked: set by LL, cleared by ERET, tested by SC
+    REG_SPC_RCP,   // From OSThread, not a vr4300 register.
 };
 
 

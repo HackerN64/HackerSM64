@@ -67,34 +67,27 @@ void cs_popup_threads_init(void) {
     sThreadsSelectedIndex = get_thread_index_in_queue(sSelectedThreadPtr);
 }
 
-void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread) {
-    const RGBA32 threadColor = COLOR_RGBA32_LIGHT_CYAN;
-
-    // First line:
-    CSTextCoord_u32 charX = 0;
-
-    cs_print(x, y,
-        (STR_COLOR_PREFIX"thread %d"),
-        threadColor, osGetThreadId(thread)
-    );
-    charX += STRLEN("THREAD #####: ");
+void cs_print_thread_info_line_1(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread, _Bool align) {
+    CS_PRINT_DEFAULT_COLOR_START(COLOR_RGBA32_CRASH_THREAD_NAME);
+    CSTextCoord_u32 charX = cs_print(x, y, "thread %d", osGetThreadId(thread));
+    if (align) {
+        charX = STRLEN("THREAD #####: ");    
+    } else {
+        charX += cs_print((x + TEXT_WIDTH(charX)), y, ": ");
+    }
     const char* threadName = get_thread_name(thread);
     if (threadName != NULL) {
-        charX += cs_print_scroll((x + TEXT_WIDTH(charX)), y,
-            (maxNumChars - charX),
-            (STR_COLOR_PREFIX"%s"),
-            threadColor, threadName
-        );
+        charX += cs_print_scroll((x + TEXT_WIDTH(charX)), y, (maxNumChars - charX), "%s", threadName);
     }
+    CS_PRINT_DEFAULT_COLOR_END();
+}
 
-    y += TEXT_HEIGHT(1);
-    // Second line:
-
-    charX = 0;
+void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread) {
+    CSTextCoord_u32 charX = 0;
     cs_print(x, y,
         (STR_COLOR_PREFIX"pri:"STR_COLOR_PREFIX"%d"),
         COLOR_RGBA32_LIGHT_GRAY,
-        COLOR_RGBA32_CRASH_THREAD, osGetThreadPri(thread)
+        COLOR_RGBA32_CRASH_THREAD_PRI, osGetThreadPri(thread)
     );
     charX += STRLEN("pri:### ");
     charX += cs_print((x + TEXT_WIDTH(charX)), y,
@@ -117,6 +110,12 @@ void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNu
             );
         }
     }
+}
+
+void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread) {
+    cs_print_thread_info_line_1(x, y, maxNumChars, thread, TRUE);
+    y += TEXT_HEIGHT(1);
+    cs_print_thread_info_line_2(x, y, thread);
 }
 
 void cs_popup_threads_draw_list(u32 startY) {

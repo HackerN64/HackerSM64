@@ -119,6 +119,7 @@ extern size_t gNumMapSymbols;
 void map_data_init(void);
 _Bool is_in_code_segment(Address addr);
 const char* get_map_symbol_name(const MapSymbol* symbol);
+_Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol);
 s32 get_symbol_index_from_addr_forward(Address addr);
 s32 get_symbol_index_from_addr_backward(Address addr);
 s32 get_symbol_index_from_addr_binary(Address addr);

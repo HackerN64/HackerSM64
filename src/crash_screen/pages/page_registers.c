@@ -56,7 +56,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
 }
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
 static const RegisterId sRegList[] = {
-    LIST_REG(COP0, REG_CP0_EPC), LIST_REG(COP0, REG_CP0_SR ), LIST_REG(COP0, REG_CP0_BADVADDR),
+    LIST_REG(COP0, REG_CP0_EPC), LIST_REG(COP0, REG_CP0_SR ), LIST_REG(COP0, REG_CP0_CAUSE   ),
     LIST_REG(CPU,  REG_CPU_AT ), LIST_REG(CPU,  REG_CPU_V0 ), LIST_REG(CPU,  REG_CPU_V1      ),
     LIST_REG(CPU,  REG_CPU_A0 ), LIST_REG(CPU,  REG_CPU_A1 ), LIST_REG(CPU,  REG_CPU_A2      ),
     LIST_REG(CPU,  REG_CPU_A3 ), LIST_REG(CPU,  REG_CPU_T0 ), LIST_REG(CPU,  REG_CPU_T1      ),
@@ -66,7 +66,8 @@ static const RegisterId sRegList[] = {
     LIST_REG(CPU,  REG_CPU_S3 ), LIST_REG(CPU,  REG_CPU_S4 ), LIST_REG(CPU,  REG_CPU_S5      ),
     LIST_REG(CPU,  REG_CPU_S6 ), LIST_REG(CPU,  REG_CPU_S7 ), LIST_REG(CPU,  REG_CPU_T8      ),
     LIST_REG(CPU,  REG_CPU_T9 ), LIST_REG(CPU,  REG_CPU_GP ), LIST_REG(CPU,  REG_CPU_SP      ),
-    LIST_REG(CPU,  REG_CPU_FP ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG(COP0, REG_CP0_CAUSE   ),
+    LIST_REG(CPU,  REG_CPU_FP ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG(COP0, REG_CP0_BADVADDR),
+    LIST_REG(SPC,  REG_SPC_HI ), LIST_REG(SPC,  REG_SPC_LO ), LIST_REG(SPC,  REG_SPC_RCP     ),
     LIST_REG_END(),
 };
 
@@ -272,7 +273,7 @@ void page_registers_draw(void) {
         }
         cs_print_thread_info(TEXT_X(CS_POPUP_THREADS_TEXT_X1), CS_POPUP_THREADS_Y1, CS_POPUP_THREADS_NUM_CHARS_X, thread);
     }
-    line += 2;
+    line++;
 
     line = cs_registers_print_registers(line);
 

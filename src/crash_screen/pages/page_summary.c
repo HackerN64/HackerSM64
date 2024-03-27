@@ -52,6 +52,7 @@ void page_summary_init(void) {
 
 }
 
+extern void handle_dp_complete(void);
 extern void alert_rcp_hung_up(void);
 
 // Draw the assert info.
@@ -88,27 +89,43 @@ u32 cs_draw_assert(u32 line) {
         line++;
     }
 
+    Address assertAddr = __assert_address;
+    if (assertAddr) {
 #ifdef INCLUDE_DEBUG_MAP
-    if (__assert_address) {
         // "FUNC:[function name]"
         size_t charX = cs_print(
             TEXT_X(0), TEXT_Y(line),
             STR_COLOR_PREFIX"FUNC:",
             COLOR_RGBA32_CRASH_HEADER
         );
-        cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), (CRASH_SCREEN_NUM_CHARS_X - charX), __assert_address, TRUE);
-        line++;
-        const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
+        const MapSymbol* symbol = get_map_symbol(assertAddr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            if (symbol->addr == INSN_OFFSET_FROM_ADDR(alert_rcp_hung_up, 0)) {
-                // RCP crash:
-                cs_print(TEXT_X(0), TEXT_Y(line++), "RCP:\t%08X", gInspectThread->context.rcp);
-                cs_print(TEXT_X(0), TEXT_Y(line++), "DPC: %08X in [%08X-%08X]", IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG));
-                cs_print(TEXT_X(0), TEXT_Y(line++), "Status: DPC:%08X SP:%08X", IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG));
-            }
+            charX += cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), ((CRASH_SCREEN_NUM_CHARS_X - STRLEN(" +0000")) - charX), assertAddr, TRUE);
+            cs_print(TEXT_X(charX + 1), TEXT_Y(line), (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD), COLOR_RGBA32_CRASH_OFFSET, (assertAddr - symbol->addr));
+            line++;
+        }
+
+        if (
+            (symbol != NULL) && (
+                (symbol->addr == (Address)handle_dp_complete) ||
+                (symbol->addr == (Address)alert_rcp_hung_up)
+            )
+        )
+#else
+        if (assertAddr == ADDR_INSN_RCP_HANG) //! TODO: handle_dp_complete null SPTask.
+#endif
+        { //! TODO: Better way of checking for RCP crashes.
+            CS_PRINT_DEFAULT_COLOR_START(COLOR_RGBA32_CRASH_HEADER);
+            // RCP crash:
+            cs_print(TEXT_X(0), TEXT_Y(line++), "DPC:\t"STR_COLOR_PREFIX STR_HEX_WORD" in ["STR_HEX_WORD"-"STR_HEX_WORD"]",
+                COLOR_RGBA32_WHITE, IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG)
+            );
+            cs_print(TEXT_X(0), TEXT_Y(line++), "STATUS:\t"STR_COLOR_PREFIX"DPC:"STR_HEX_WORD" SP:"STR_HEX_WORD,
+                COLOR_RGBA32_WHITE, IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG)
+            );
+            CS_PRINT_DEFAULT_COLOR_END();
         }
     }
-#endif // INCLUDE_DEBUG_MAP
 
     // "COND:[condition]"
     if (__n64Assert_Condition != NULL) {
@@ -157,11 +174,9 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg) {
 #ifdef INCLUDE_DEBUG_MAP
         const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            size_t offsetStrSize = STRLEN("+0000 ");
-            size_t endX = CRASH_SCREEN_NUM_CHARS_X;
-            cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), (endX - (charX + offsetStrSize)), symbol, FALSE);
-            cs_print(TEXT_X(endX - offsetStrSize), TEXT_Y(line),
-                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
+            charX += cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), ((CRASH_SCREEN_NUM_CHARS_X - STRLEN(" +0000")) - charX), symbol, FALSE);
+            cs_print(TEXT_X(charX + 1), TEXT_Y(line),
+                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
                 COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
             );
         }
@@ -176,7 +191,7 @@ enum CrashTypes {
     CRASH_TYPE_II,
 };
 
-#define CRASH_SUMMARY_TITLE_TEXT "CRASH INFO:"
+#define CRASH_SUMMARY_TITLE_TEXT "CRASH"
 
 void page_summary_draw(void) {
     __OSThreadContext* tc = &gInspectThread->context;
@@ -190,11 +205,11 @@ void page_summary_draw(void) {
     Address epc = GET_EPC(tc);
     Word data = 0x00000000;
     const char* destFname = NULL;
-    const char* insnAsStr = NULL; 
+    const char* insnAsStr = NULL;
 
     enum CrashTypes crashType = CRASH_TYPE_DEFAULT;
 
-    if ((cause == EXC_SYSCALL) && (tc->pc == INSN_OFFSET_FROM_ADDR(__n64Assert, 8))) { // Crash is an assert.
+    if ((cause == EXC_SYSCALL) && (tc->pc == ADDR_INSN_ASSERT)) { // Crash is an assert.
         crashType = CRASH_TYPE_ASSERT;
     } else {
         if (!try_read_word_aligned(&data, epc)) { // PC is at an invalid memory location.
@@ -208,25 +223,35 @@ void page_summary_draw(void) {
         }
     }
 
+    // -- THREAD --
+    cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"in thread:", COLOR_RGBA32_CRASH_PAGE_NAME);
+    cs_draw_divider_translucent(DIVIDER_Y(line));
+    // cs_print_thread_info(TEXT_X(1), TEXT_Y(line++), CRASH_SCREEN_NUM_CHARS_X, gInspectThread);
+    cs_print_thread_info_line_1(TEXT_X(1), TEXT_Y(line++), CRASH_SCREEN_NUM_CHARS_X, gInspectThread, FALSE);
+    // line += 2;
+    line++;
+
+
     // -- CRASH DESCRIPTION --
 
     cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"caused by:", COLOR_RGBA32_CRASH_PAGE_NAME);
     cs_draw_divider_translucent(DIVIDER_Y(line));
 
-    // First line of crash description:
+    // First part of crash description:
+    size_t charX = 0;
     const char* desc = get_cause_desc(tc, TRUE);
     if (desc != NULL) {
-        cs_print(
+        charX += cs_print(
             TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_DESCRIPTION, desc
         );
     }
-    // Second line of crash description:
+    // Second part of crash description:
     switch (cause) {
         case EXC_CPU:
             // "COP:"
-            cs_print(TEXT_X(2), TEXT_Y(line++),
-                STR_COLOR_PREFIX"cop%d unusable",
+            cs_print(TEXT_X(1 + charX), TEXT_Y(line++),
+                STR_COLOR_PREFIX" (cop%d)",
                 COLOR_RGBA32_CRASH_DESCRIPTION,
                 ((Reg_CP0_Cause){ .raw = cause, }).CE
             );
@@ -235,19 +260,13 @@ void page_summary_draw(void) {
             const char* fpcsrDesc = get_fpcsr_desc(tc->fpcsr, TRUE);
             if (fpcsrDesc != NULL) {
                 cs_print(
-                    TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s",
+                    TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)",
                     COLOR_RGBA32_CRASH_DESCRIPTION, fpcsrDesc
                 );
             }
             break;
     }
     line++;
-
-    // -- THREAD --
-    cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"in thread:", COLOR_RGBA32_CRASH_PAGE_NAME);
-    cs_draw_divider_translucent(DIVIDER_Y(line));
-    cs_print_thread_info(TEXT_X(1), TEXT_Y(line++), CRASH_SCREEN_NUM_CHARS_X, gInspectThread);
-    line += 2;
 
     if (crashType == CRASH_TYPE_ASSERT) {
         // -- ASSERT --

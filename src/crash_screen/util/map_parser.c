@@ -108,7 +108,7 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
  * @param[in] symbol The MapSymbol to check.
  * @return _Bool Whether the address is within the symbol's range.
  */
-ALWAYS_INLINE static _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
+_Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
     return ((addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
 }
 

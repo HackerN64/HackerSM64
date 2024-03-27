@@ -98,7 +98,7 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
     RGBA32 __tempDefaultColor = gCSDefaultPrintColor;   \
     gCSDefaultPrintColor = (_color);                    \
 
-#define CS_PRINT_DEFAULT_COLOR_END(_color)              \
+#define CS_PRINT_DEFAULT_COLOR_END()                    \
     gCSDefaultPrintColor = __tempDefaultColor;          \
 
 #define cs_print_color_scroll(_x, _y, _charLimit, _color, _fmt, ...)  { \

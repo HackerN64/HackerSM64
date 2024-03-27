@@ -22,8 +22,8 @@
 
 #define CS_POPUP_THREADS_NUM_CHARS_Y    (NUM_SHOWN_TOTAL_THREADS * 2)
 #define CS_POPUP_THREADS_HEIGHT         TEXT_HEIGHT(CS_POPUP_THREADS_NUM_CHARS_Y) // 200
-#define CS_POPUP_THREADS_STARTLINE      2
-#define CS_POPUP_THREADS_Y1             (TEXT_Y(CS_POPUP_THREADS_STARTLINE) - (TEXT_HEIGHT(1) / 2))
+#define CS_POPUP_THREADS_STARTLINE      1
+#define CS_POPUP_THREADS_Y1             TEXT_Y(CS_POPUP_THREADS_STARTLINE)
 #define CS_POPUP_THREADS_Y2             (CS_POPUP_THREADS_Y1 + CS_POPUP_THREADS_HEIGHT)
 #define CS_POPUP_THREADS_BG_Y1          (CS_POPUP_THREADS_Y1 - 2)
 #define CS_POPUP_THREADS_BG_Y2          (CS_POPUP_THREADS_Y2 - 1)
@@ -35,6 +35,9 @@ extern struct CSPopup gCSPopup_threads;
 
 void cs_open_threads(void);
 
+
+void cs_print_thread_info_line_1(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread, _Bool align);
+void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread);
 void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread);
 
 ALWAYS_INLINE void cs_draw_row_box_thread(CSScreenCoord_u32 x, CSScreenCoord_u32 y, RGBA32 color) {

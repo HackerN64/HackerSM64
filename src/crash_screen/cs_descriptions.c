@@ -232,7 +232,8 @@ static const char* sCOPNames[] = {
     [COP1 + 1] = "CP1 (FPU)",
     [COP2 + 1] = "CP2 (RCP vector unit)",
     [COP3 + 1] = "CP3",
-    [FCR  + 1] = "CP1 (FCR)"
+    [FCR  + 1] = "CP1 (FCR)",
+    [SPC  + 1] = "special registers",
 };
 const char* get_coprocessor_name(enum Coprocessors cop) {
     return sCOPNames[cop + 1];
@@ -273,10 +274,10 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
         switch (cause) {
             case EXC_INT: // Non-crash interrupts (can be shown after changing the inspected thread).
                 //! TODO: Can the instruction location here potentially change?
-                if (tc->pc == INSN_OFFSET_FROM_ADDR(osRecvMesg, 26)) { // 27th Instruction in osRecvMesg.
+                if (tc->pc == ADDR_INSN_WAITING_FOR_MESG) {
                     return "Waiting for mesg";
                 }
-                //! TODO: Fix these unsafe data reads:
+                //! TODO: Fix these unsafe data reads and clean this up:
                 InsnData insn = { .raw = *(u32*)tc->pc };
                 InsnData prev = { .raw = *(u32*)(tc->pc - sizeof(Word)) };
                 #define INSN_IS_B_0(_insn) (((_insn).opcode == OPC_BEQ) && ((_insn).rs == (_insn).rt) && ((_insn).offset == (u16)-1))
@@ -326,7 +327,9 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
             case EXC_WADE:
                 return "Misaligned write to memory";
             case EXC_SYSCALL:
-                return "Failed Assert: See below";
+                if (tc->pc == ADDR_INSN_ASSERT) {
+                    return "Failed Assert (see below)";
+                }
         }
     }
 
@@ -362,7 +365,6 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
     [FLT_ERR_NAN   ] = "NaN float",
 };
 
-//! TODO: NaN floats aren't detected here even though they are in validate_f32, and this still works with denorms.
 enum FloatErrorType validate_floats_in_reg_buffer(void) {
     enum FloatErrorType fltErrType = FLT_ERR_NONE;
 

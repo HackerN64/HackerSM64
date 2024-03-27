@@ -125,7 +125,7 @@ _Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
         .raw = (uint32_t)val,
     };
 
-    cs_print(x1, TEXT_Y(line++), "in branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
+    cs_print(x1, TEXT_Y(line++), "is branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
     line++;
     cs_print(x1, TEXT_Y(line++), "interrupts pending:");
     cs_print(x2, TEXT_Y(line++), "Timer:\t\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_.Timer);
@@ -179,6 +179,14 @@ _Bool cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
     return TRUE;
 }
 
+_Bool cs_print_reg_info_SPC_RCP(u32 line, uint64_t val) {
+    const u32 x1 = TEXT_X(2);
+    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
+    cs_print(x1, TEXT_Y(line++), "interrupts:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, (u32)(val & (RCP_IMASK >> RCP_IMASKSHIFT)));
+
+    return TRUE;
+}
+
 typedef struct RegInspectExtraInfo {
     /*0x00*/ const enum Coprocessors cop;
     /*0x04*/ const int idx;
@@ -191,6 +199,7 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    .title = "decoded bits", },
     { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, .title = "decoded bits", },
     { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  .title = "decoded bits", },
+    { .cop = SPC,  .idx = REG_SPC_RCP,            .func = cs_print_reg_info_SPC_RCP,  .title = "decoded bits", },
 };
 
 // Register popup box draw function.
