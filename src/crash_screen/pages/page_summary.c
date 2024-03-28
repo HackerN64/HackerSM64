@@ -124,7 +124,7 @@ u32 cs_draw_assert(u32 line) {
         cs_print(x, TEXT_Y(line),
             STR_COLOR_PREFIX"MESSAGE:\n"STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_HEADER,
-            COLOR_RGBA32_CRASH_DESCRIPTION_MAIN, __n64Assert_Message
+            gCSDefaultPrintColor, __n64Assert_Message
         );
 
         gCSWordWrap = FALSE;
