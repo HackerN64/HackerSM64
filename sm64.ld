@@ -6,6 +6,12 @@ OUTPUT_ARCH (mips)
 #include "config.h"
 #undef LINKER
 
+#define BEGIN_TEXT(name) \
+   _##name##SegmentTextStart = .;
+
+#define END_TEXT(name) \
+   _##name##SegmentTextEnd = .;
+
 #define BEGIN_SEG(name, addr) \
     _##name##SegmentStart = ADDR(.name); \
     _##name##SegmentRomStart = __romPos; \
@@ -54,10 +60,14 @@ OUTPUT_ARCH (mips)
    BEGIN_SEG(name, 0x0E000000) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
+      BEGIN_TEXT(name##script) \
       KEEP(BUILD_DIR/levels/name/script.o(.text*)); \
+      END_TEXT(name##script) \
       KEEP(BUILD_DIR/levels/name/script.o(.rodata*)); \
       KEEP(BUILD_DIR/levels/name/geo.o(.*data*)); \
+      BEGIN_TEXT(name##geo) \
       KEEP(BUILD_DIR/levels/name/geo.o(.text*)); \
+      END_TEXT(name##geo) \
       KEEP(BUILD_DIR/levels/name/geo.o(.rodata*)); \
    } \
    END_SEG(name) \
@@ -79,7 +89,9 @@ OUTPUT_ARCH (mips)
    { \
       KEEP(BUILD_DIR/actors/name##_geo.o(.*data*)); \
       KEEP(BUILD_DIR/actors/name##_geo.o(.rodata*)); \
+      BEGIN_TEXT(name##_geo) \
       KEEP(BUILD_DIR/actors/name##_geo.o(.text*)); \
+      END_TEXT(name##_geo) \
    } \
    END_SEG(name##_geo) \
    BEGIN_NOLOAD(name##_geo) \
@@ -96,8 +108,10 @@ SECTIONS
 
    BEGIN_SEG(boot, 0x04000000)
    {
+      BEGIN_TEXT(boot)
       KEEP(BUILD_DIR/asm/rom_header.o(.text*));
       KEEP(BUILD_DIR/asm/ipl3.o(.text*));
+      END_TEXT(boot)
    }
    END_SEG(boot)
 
@@ -146,15 +160,18 @@ SECTIONS
 #endif
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
-#ifndef DEBUG_MAP_STACKTRACE
-      _mapDataSegmentRomStart = 0;
-      gMapEntries   = 0;
-      gMapEntrySize = 0;
-      gMapStrings   = 0;
+#if defined(INCLUDE_DEBUG_MAP) && defined(PRELIMINARY)
+   _mapDataSegmentRomStart = 0;
+   _mapDataSegmentRomEnd   = 0;
+   gMapSymbols    = 0;
+   gMapSymbolsEnd = 0;
+   gMapStrings    = 0;
+   gMapStringsEnd = 0;
 #endif
 
-   BEGIN_SEG(main, .) SUBALIGN(16)
+   BEGIN_SEG(main, .)
    {
+      BEGIN_TEXT(main)
       KEEP(BUILD_DIR/asm/entry.o(.text*));
       KEEP(BUILD_DIR/asm/n64_assert.o(.text*));
 #ifdef EEP
@@ -166,6 +183,7 @@ SECTIONS
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
+      BUILD_DIR/src/crash_screen*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
@@ -186,11 +204,12 @@ SECTIONS
       BUILD_DIR/lib/aspMain.o(.text*);
       lib/PR/audio/n_aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text*);
-      _mainSegmentTextEnd = .;
+      END_TEXT(main)
 
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
+      BUILD_DIR/src/crash_screen*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
@@ -209,6 +228,7 @@ SECTIONS
 
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
+      BUILD_DIR/src/crash_screen*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
@@ -228,6 +248,7 @@ SECTIONS
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/boot*.o(.*bss*);
+      BUILD_DIR/src/crash_screen*.o(.*bss*);
       BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
@@ -251,6 +272,7 @@ SECTIONS
 
    BEGIN_SEG(engine, .)
    {
+      BEGIN_TEXT(engine)
       BUILD_DIR/src/game*.o(.text*);
       BUILD_DIR/src/game/behavior_actions.o(.text*);
       BUILD_DIR/src/game/obj_behaviors_2.o(.text*);
@@ -262,7 +284,7 @@ SECTIONS
       BUILD_DIR/src/engine/surface_load.o(.text*);
       BUILD_DIR/src/engine/graph_node.o(.text*);
       BUILD_DIR/src/engine*.o(.text*);
-      _engineSegmentTextEnd = .;
+      END_TEXT(engine)
       /* data */
       BUILD_DIR/src/game*.o(.data*);
       BUILD_DIR/src/engine*.o(.data*);
@@ -348,7 +370,9 @@ SECTIONS
    {
       KEEP(BUILD_DIR/data/behavior_data.o(.data*));
       KEEP(BUILD_DIR/data/behavior_data.o(.rodata*));
+      BEGIN_TEXT(behavior)
       KEEP(BUILD_DIR/data/behavior_data.o(.text*));
+      END_TEXT(behavior)
    }
    END_SEG(behavior)
    BEGIN_NOLOAD(behavior)
@@ -361,12 +385,15 @@ SECTIONS
    /* 0x8016F000 21D7D0-255EC0 [386F0] */
    BEGIN_SEG(goddard, (RAM_END - GODDARD_SIZE))
    {
+      BEGIN_TEXT(goddard)
       KEEP(BUILD_DIR/src/menu*.o(.text*));
-      _goddardSegmentTextEnd = .;
+      END_TEXT(goddard)
       KEEP(BUILD_DIR/src/menu*.o(.data*));
       KEEP(BUILD_DIR/src/menu*.o(.rodata*));
 #ifdef KEEP_MARIO_HEAD
+      BEGIN_TEXT(libgoddard)
       KEEP(BUILD_DIR/libgoddard.a:*.o(.text*));
+      END_TEXT(libgoddard)
       KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.data*));
       KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.data*));
       KEEP(BUILD_DIR/libgoddard.a:objects.o(.data*));
@@ -410,12 +437,16 @@ SECTIONS
       ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
 #endif
 
+   gGoddardSize = GODDARD_SIZE;
+
    /* 0x268020 0x268020-0 [0] */
    BEGIN_SEG(intro, 0x14000000)
    {
       KEEP(BUILD_DIR/levels/intro/script.o(.*data));
       KEEP(BUILD_DIR/levels/intro/script.o(.rodata*));
+      BEGIN_TEXT(intro)
       KEEP(BUILD_DIR/levels/intro/script.o(.text*));
+      END_TEXT(intro)
       KEEP(BUILD_DIR/levels/intro/geo.o(.data*));
    }
    END_SEG(intro)
@@ -530,12 +561,16 @@ SECTIONS
 	END_SEG(capcom)
 #endif
 
-#ifdef DEBUG_MAP_STACKTRACE
-   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
+#if defined(INCLUDE_DEBUG_MAP) && !defined(PRELIMINARY)
+   /* TODO: Use debug_map.txt to DMA map data to the end of RAM instead of at a hardcoded position. */
+   BEGIN_SEG(mapData, (RAM_END - RAM_1MB))
+   {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));
+      . = ALIGN(0x10);
    }
    END_SEG(mapData)
 #endif
+
    /* DWARF debug sections.
       Symbols in the DWARF debugging sections are relative to the beginning
       of the section so we begin them at 0.  */
@@ -572,4 +607,6 @@ SECTIONS
    {
       *(*);
    }
+
+   gRomSize = __romPos;
 }

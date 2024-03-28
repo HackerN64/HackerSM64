@@ -12,6 +12,7 @@
 #include "game/sound_init.h"
 #include "buffers/buffers.h"
 #include "segments.h"
+#include "crash_screen/cs_main.h"
 #include "game/main.h"
 #include "game/rumble_init.h"
 #include "game/version.h"
@@ -291,6 +292,7 @@ void handle_sp_complete(void) {
 }
 
 void handle_dp_complete(void) {
+    ASSERT((sCurrentDisplaySPTask != NULL), "NULL SP task in handle_dp_complete.");
     // Gfx SP task is completely done.
     if (sCurrentDisplaySPTask->msgqueue != NULL) {
         osSendMesg(sCurrentDisplaySPTask->msgqueue, sCurrentDisplaySPTask->msg, OS_MESG_NOBLOCK);
@@ -313,7 +315,7 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    error("RCP is HUNG UP!! Oh! MY GOD!!");
+    ERROR("RCP is HUNG UP!! Oh! MY GOD!!");
 }
 
 /**
@@ -324,39 +326,37 @@ void alert_rcp_hung_up(void) {
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
-    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.")
+    DEBUG_ASSERT((gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1]), "Thread 1 stack overflow.")
     gThread3Stack[0]++;
     gThread3Stack[THREAD3_STACK - 1]++;
-    assert(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.")
+    DEBUG_ASSERT((gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1]), "Thread 3 stack overflow.")
     gThread4Stack[0]++;
     gThread4Stack[THREAD4_STACK - 1]++;
-    assert(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.")
+    DEBUG_ASSERT((gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1]), "Thread 4 stack overflow.")
     gThread5Stack[0]++;
     gThread5Stack[THREAD5_STACK - 1]++;
-    assert(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    DEBUG_ASSERT((gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1]), "Thread 5 stack overflow.")
 #if ENABLE_RUMBLE
     gThread6Stack[0]++;
     gThread6Stack[THREAD6_STACK - 1]++;
-    assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
+    DEBUG_ASSERT((gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1]), "Thread 6 stack overflow.")
 #endif
 }
 #endif
 
-
-extern void crash_screen_init(void);
-extern OSViMode VI;
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
     load_engine_code_segment();
     detect_emulator();
-#ifndef UNF
-    crash_screen_init();
-#endif
-
+    create_crash_screen_thread();
 #ifdef UNF
-    debug_initialize();
-#endif
+    // Emulators do not handle UNF properly.
+    //! TODO: Update this for emulators that have proper support.
+    if (gEmulator & (EMU_CONSOLE)) {
+        debug_initialize();
+    }
+#endif // UNF
 
 #ifdef DEBUG
     osSyncPrintf("Super Mario 64\n");

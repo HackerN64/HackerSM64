@@ -4,8 +4,8 @@
 
 #define BUFF_LEN 0x18
 
-static u8 D_80334960[] = "0123456789abcdef";
-static u8 D_80334974[] = "0123456789ABCDEF";
+static u8 _hex_lowercase[] = "0123456789abcdef";
+static u8 _hex_uppercase[] = "0123456789ABCDEF";
 
 void _Litob(printf_struct *args, u8 type) {
     u8 buff[BUFF_LEN];
@@ -15,11 +15,7 @@ void _Litob(printf_struct *args, u8 type) {
     u64 num;
     lldiv_t quotrem;
 
-    if (type == 'X') {
-        num_map = D_80334974;
-    } else {
-        num_map = D_80334960;
-    }
+    num_map = (type == 'X') ? _hex_uppercase : _hex_lowercase;
 
     base = (type == 'o') ? 8 : ((type != 'x' && type != 'X') ? 10 : 16);
     buff_ind = BUFF_LEN;

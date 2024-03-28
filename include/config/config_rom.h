@@ -37,10 +37,10 @@
 // #define EMU_DEFAULT_TO_GCN
 
 /**
- * Screen Size Defines.
+ * RCVI hack. Increases performance on emulator, and does nothing on console.
+ * Might break on some emulators. Use at your own risk, and don't use it unless you actually need the extra performance.
  */
-#define SCREEN_WIDTH  320
-#define SCREEN_HEIGHT 240
+// #define RCVI_HACK
 
 /**
  * Height of the black borders at the top and bottom of the screen for NTSC Versions. You can set it to different values for console and emulator.
@@ -50,7 +50,14 @@
 #define BORDER_HEIGHT_EMULATOR 0
 
 /**
- * RCVI hack. Increases performance on emulator, and does nothing on console.
- * Might break on some emulators. Use at your own risk, and don't use it unless you actually need the extra performance.
+ * Screen Size Defines.
  */
-// #define RCVI_HACK
+#define SCREEN_WIDTH  320
+#define SCREEN_HEIGHT 240
+
+/**
+ * Don't change these.
+ */
+#define SCREEN_CENTER_X (SCREEN_WIDTH  / 2)
+#define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
+#define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)

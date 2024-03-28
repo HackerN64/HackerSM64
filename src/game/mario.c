@@ -1711,6 +1711,11 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
     vec3f_copy(gMarioState->prevPos, gMarioState->pos);
 
     if (gMarioState->action) {
+#ifdef DEBUG_FORCE_CRASH_ON_L
+        if (gPlayer1Controller->buttonDown & L_TRIG) {
+            FORCE_CRASH();
+        }
+#endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
             (gMarioState->controller->buttonDown & U_JPAD) &&

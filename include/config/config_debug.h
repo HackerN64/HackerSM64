@@ -45,7 +45,7 @@
 /**
  * Enables a custom, enhanced performance profiler. (Enables PUPPYPRINT by default in config_safeguards).
  */
-// #define PUPPYPRINT_DEBUG
+#define PUPPYPRINT_DEBUG
 
 /**
  * Uses cycles instead of microseconds in Puppyprint debug output.
@@ -86,11 +86,7 @@
 // #define VANILLA_DEBUG
 
 /**
- * Forces a crash when the game starts. Useful for debugging the crash screen.
- */
-// #define DEBUG_FORCE_CRASH_ON_BOOT
-
-/**
  * Intentionally crash the game whenever a runtime assertion fails (also invoked by the DEBUG define in the Makefile).
+ * Enables ASSERT and ERROR macros with a "DEBUG_" prefix (see src/game/assert.h).
  */
 #define DEBUG_ASSERTIONS

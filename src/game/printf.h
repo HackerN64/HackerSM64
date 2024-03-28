@@ -1,6 +1,9 @@
 #ifndef _PRINTF_H_
 #define _PRINTF_H_
+#include <ultra64.h>
 #include <stdarg.h>
+
+#include "types.h"
 
 typedef struct
 {
@@ -32,6 +35,10 @@ enum PrintfFlags {
     FLAGS_HASH  = (1 << 3), // 0x08
     FLAGS_ZERO  = (1 << 4), // 0x10
 };
+
+ALWAYS_INLINE static char* write_to_buf(char* buffer, const char* data, size_t size) {
+    return ((char*)memcpy(buffer, data, size) + size);
+}
 
 s32 _Printf(char *(*prout)(char *, const char *, size_t), char *dst, const char *fmt, va_list args);
 void _Litob(printf_struct *args, u8 type);

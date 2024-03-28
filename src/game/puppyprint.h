@@ -7,6 +7,7 @@
 #define PERF_AGGREGATE NUM_PERF_ITERATIONS
 #define PERF_TOTAL NUM_PERF_ITERATIONS + 1
 #define LOG_BUFFER_SIZE       16
+#define LOG_MESSAGE_SIZE      255
 #define PUPPYPRINT_DEFERRED_BUFFER_SIZE 0x1000
 
 #ifdef PUPPYPRINT_DEBUG
@@ -145,7 +146,8 @@ extern void prepare_blank_box(void);
 extern void finish_blank_box(void);
 extern void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
 extern void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
-extern char consoleLogTable[LOG_BUFFER_SIZE][255];
+extern char consoleLogTable[LOG_BUFFER_SIZE][LOG_MESSAGE_SIZE];
+extern u32 gConsoleLogLastIndex;
 extern void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
 extern void puppyprint_print_deferred(void);
 extern s32 puppyprint_strlen(const char *str);
