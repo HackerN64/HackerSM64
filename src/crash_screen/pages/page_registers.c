@@ -49,10 +49,9 @@ const enum ControlTypes cs_cont_list_registers[] = {
 
 #define REG_LIST_TERMINATOR (u32)-1
 #define LIST_REG(_cop, _idx) {  \
-    .cop = _cop,                \
-    .idx = _idx,                \
-    .flt = FALSE,               \
-    .out = FALSE,               \
+    .cop           = _cop,      \
+    .idx           = _idx,      \
+    .valInfo.raw   = 0,         \
 }
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
 static const RegisterId sRegList[] = {
@@ -364,8 +363,11 @@ void page_registers_input(void) {
                 RegisterId regId = {
                     .cop = FCR,
                     .idx = REG_FCR_CONTROL_STATUS,
-                    .flt = FALSE,
-                    .out = FALSE,
+                    .valInfo = {
+                        .type = REG_VAL_TYPE_INT,
+                        .dbl  = FALSE,
+                        .out  = FALSE,
+                    },
                 };
                 cs_open_reginspect(regId);
                 break;
@@ -375,8 +377,11 @@ void page_registers_input(void) {
                     RegisterId regId = {
                         .cop = COP1,
                         .idx = idx,
-                        .flt = TRUE,
-                        .out = FALSE,
+                        .valInfo = {
+                            .type = REG_VAL_TYPE_FLOAT,
+                            .dbl  = FALSE, //! TODO:
+                            .out  = FALSE,
+                        },
                     };
                     cs_open_reginspect(regId);
                 }

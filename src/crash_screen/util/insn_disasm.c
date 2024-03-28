@@ -75,40 +75,40 @@ ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
     { .opcode = OPC_BGTZL      , .name = "BGTZL"  , .fmt = "\'sB" , .out = 0, }, // 23: Branch on Greater Than Zero Likely.
     { .opcode = OPC_DADDI      , .name = "DADDI"  , .fmt = "\'tsI", .out = 1, }, // 24: Doubleword Add Immediate.
     { .opcode = OPC_DADDIU     , .name = "DADDIU" , .fmt = "\'tsI", .out = 1, }, // 25: Doubleword Add Immediate Unsigned.
-    { .opcode = OPC_LDL        , .name = "LDL"    , .fmt = "\'tI(", .out = 1, }, // 26: Load Doubleword Left.
-    { .opcode = OPC_LDR        , .name = "LDR"    , .fmt = "\'tI(", .out = 1, }, // 27: Load Doubleword Right.
-    { .opcode = OPC_LB         , .name = "LB"     , .fmt = "\'tI(", .out = 1, }, // 32: Load Byte.
-    { .opcode = OPC_LH         , .name = "LH"     , .fmt = "\'tI(", .out = 1, }, // 33: Load Halfword.
-    { .opcode = OPC_LWL        , .name = "LWL"    , .fmt = "\'tI(", .out = 1, }, // 34: Load Word Left.
-    { .opcode = OPC_LW         , .name = "LW"     , .fmt = "\'tI(", .out = 1, }, // 35: Load Word.
-    { .opcode = OPC_LBU        , .name = "LBU"    , .fmt = "\'tI(", .out = 1, }, // 36: Load Byte Unsigned.
-    { .opcode = OPC_LHU        , .name = "LHU"    , .fmt = "\'tI(", .out = 1, }, // 37: Load Halfword Unsigned.
-    { .opcode = OPC_LWR        , .name = "LWR"    , .fmt = "\'tI(", .out = 1, }, // 38: Load Word Right.
-    { .opcode = OPC_LWU        , .name = "LWU"    , .fmt = "\'tI(", .out = 1, }, // 39: Load Word Unsigned.
-    { .opcode = OPC_SB         , .name = "SB"     , .fmt = "\'tI(", .out = 0, }, // 40: Store Byte.
-    { .opcode = OPC_SH         , .name = "SH"     , .fmt = "\'tI(", .out = 0, }, // 41: Store Halfword.
-    { .opcode = OPC_SWL        , .name = "SWL"    , .fmt = "\'tI(", .out = 0, }, // 42: Store Word Left.
-    { .opcode = OPC_SW         , .name = "SW"     , .fmt = "\'tI(", .out = 0, }, // 43: Store Word.
-    { .opcode = OPC_SDL        , .name = "SDL"    , .fmt = "\'tI(", .out = 0, }, // 44: Store Doubleword Left.
-    { .opcode = OPC_SDR        , .name = "SDR"    , .fmt = "\'tI(", .out = 0, }, // 45: Store Doubleword Right.
-    { .opcode = OPC_SWR        , .name = "SWR"    , .fmt = "\'tI(", .out = 0, }, // 46: Store Word Right.
-    { .opcode = OPC_CACHE      , .name = "CACHE"  , .fmt = "\'tI(", .out = 0, }, // 47: https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
-    { .opcode = OPC_LL         , .name = "LL"     , .fmt = "\'tI(", .out = 1, }, // 48: Load Linked Word.
-    { .opcode = OPC_LWC1       , .name = "LWC1"   , .fmt = "\'TI(", .out = 0, }, // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
-    { .opcode = OPC_LWC2       , .name = "LWC2"   , .fmt = "\'TI(", .out = 0, }, // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .opcode = OPC_LWC3       , .name = "LWC3"   , .fmt = "\'TI(", .out = 0, }, // 51: Load Word to Coprocessor-3 (COP3).
-    { .opcode = OPC_LLD        , .name = "LLD"    , .fmt = "\'tI(", .out = 1, }, // 52: Load Linked Doubleword.
-    { .opcode = OPC_LDC1       , .name = "LDC1"   , .fmt = "\'tI(", .out = 1, }, // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
-    { .opcode = OPC_LDC2       , .name = "LDC2"   , .fmt = "\'tI(", .out = 1, }, // 54: Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .opcode = OPC_LD         , .name = "LD"     , .fmt = "\'tI(", .out = 1, }, // 55: Load Doubleword.
-    { .opcode = OPC_SC         , .name = "SC"     , .fmt = "\'tI(", .out = 0, }, // 56: Store Conditional Word.
-    { .opcode = OPC_SWC1       , .name = "SWC1"   , .fmt = "\'TI(", .out = 0, }, // 57: Store Word to Coprocessor-1 (Floating-Point Unit).
-    { .opcode = OPC_SWC2       , .name = "SWC2"   , .fmt = "\'TI(", .out = 0, }, // 58: Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .opcode = OPC_SWC3       , .name = "SWC3"   , .fmt = "\'TI(", .out = 0, }, // 59: Store Word to Coprocessor-3 (COP3).
-    { .opcode = OPC_SCD        , .name = "SCD"    , .fmt = "\'tI(", .out = 0, }, // 60: Store Conditional Doubleword.
-    { .opcode = OPC_SDC1       , .name = "SDC1"   , .fmt = "\'tI(", .out = 0, }, // 61: Store Doubleword to Coprocessor-1 (Floating-Point Unit).
-    { .opcode = OPC_SDC2       , .name = "SDC2"   , .fmt = "\'tI(", .out = 0, }, // 62: Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .opcode = OPC_SD         , .name = "SD"     , .fmt = "\'tI(", .out = 0, }, // 63: Store Doubleword.
+    { .opcode = OPC_LDL        , .name = "LDL"    , .fmt = "\'to(", .out = 1, }, // 26: Load Doubleword Left.
+    { .opcode = OPC_LDR        , .name = "LDR"    , .fmt = "\'to(", .out = 1, }, // 27: Load Doubleword Right.
+    { .opcode = OPC_LB         , .name = "LB"     , .fmt = "\'to(", .out = 1, }, // 32: Load Byte.
+    { .opcode = OPC_LH         , .name = "LH"     , .fmt = "\'to(", .out = 1, }, // 33: Load Halfword.
+    { .opcode = OPC_LWL        , .name = "LWL"    , .fmt = "\'to(", .out = 1, }, // 34: Load Word Left.
+    { .opcode = OPC_LW         , .name = "LW"     , .fmt = "\'to(", .out = 1, }, // 35: Load Word.
+    { .opcode = OPC_LBU        , .name = "LBU"    , .fmt = "\'to(", .out = 1, }, // 36: Load Byte Unsigned.
+    { .opcode = OPC_LHU        , .name = "LHU"    , .fmt = "\'to(", .out = 1, }, // 37: Load Halfword Unsigned.
+    { .opcode = OPC_LWR        , .name = "LWR"    , .fmt = "\'to(", .out = 1, }, // 38: Load Word Right.
+    { .opcode = OPC_LWU        , .name = "LWU"    , .fmt = "\'to(", .out = 1, }, // 39: Load Word Unsigned.
+    { .opcode = OPC_SB         , .name = "SB"     , .fmt = "\'to(", .out = 0, }, // 40: Store Byte.
+    { .opcode = OPC_SH         , .name = "SH"     , .fmt = "\'to(", .out = 0, }, // 41: Store Halfword.
+    { .opcode = OPC_SWL        , .name = "SWL"    , .fmt = "\'to(", .out = 0, }, // 42: Store Word Left.
+    { .opcode = OPC_SW         , .name = "SW"     , .fmt = "\'to(", .out = 0, }, // 43: Store Word.
+    { .opcode = OPC_SDL        , .name = "SDL"    , .fmt = "\'to(", .out = 0, }, // 44: Store Doubleword Left.
+    { .opcode = OPC_SDR        , .name = "SDR"    , .fmt = "\'to(", .out = 0, }, // 45: Store Doubleword Right.
+    { .opcode = OPC_SWR        , .name = "SWR"    , .fmt = "\'to(", .out = 0, }, // 46: Store Word Right.
+    { .opcode = OPC_CACHE      , .name = "CACHE"  , .fmt = "\'to(", .out = 0, }, // 47: https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
+    { .opcode = OPC_LL         , .name = "LL"     , .fmt = "\'to(", .out = 1, }, // 48: Load Linked Word.
+    { .opcode = OPC_LWC1       , .name = "LWC1"   , .fmt = "\'To(", .out = 0, }, // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_LWC2       , .name = "LWC2"   , .fmt = "\'To(", .out = 0, }, // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .opcode = OPC_LWC3       , .name = "LWC3"   , .fmt = "\'To(", .out = 0, }, // 51: Load Word to Coprocessor-3 (COP3).
+    { .opcode = OPC_LLD        , .name = "LLD"    , .fmt = "\'to(", .out = 1, }, // 52: Load Linked Doubleword.
+    { .opcode = OPC_LDC1       , .name = "LDC1"   , .fmt = "\'to(", .out = 1, }, // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_LDC2       , .name = "LDC2"   , .fmt = "\'to(", .out = 1, }, // 54: Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .opcode = OPC_LD         , .name = "LD"     , .fmt = "\'to(", .out = 1, }, // 55: Load Doubleword.
+    { .opcode = OPC_SC         , .name = "SC"     , .fmt = "\'to(", .out = 0, }, // 56: Store Conditional Word.
+    { .opcode = OPC_SWC1       , .name = "SWC1"   , .fmt = "\'To(", .out = 0, }, // 57: Store Word to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_SWC2       , .name = "SWC2"   , .fmt = "\'To(", .out = 0, }, // 58: Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .opcode = OPC_SWC3       , .name = "SWC3"   , .fmt = "\'To(", .out = 0, }, // 59: Store Word to Coprocessor-3 (COP3).
+    { .opcode = OPC_SCD        , .name = "SCD"    , .fmt = "\'to(", .out = 0, }, // 60: Store Conditional Doubleword.
+    { .opcode = OPC_SDC1       , .name = "SDC1"   , .fmt = "\'to(", .out = 0, }, // 61: Store Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_SDC2       , .name = "SDC2"   , .fmt = "\'to(", .out = 0, }, // 62: Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .opcode = OPC_SD         , .name = "SD"     , .fmt = "\'to(", .out = 0, }, // 63: Store Doubleword.
     {}, // NULL terminator.
 };
 
@@ -490,8 +490,8 @@ static char cop1_fmt_to_char(InsnData insn) {
  * @param[in,out] oldColor The previous color. Gets set to 'newColor' if they are different.
  * @param[in    ] newColor The new color to add to the string.
  */
-static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor, _Bool format) {
-    if (format && (*oldColor != newColor)) {
+static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA32 newColor, _Bool formatting) {
+    if (formatting && (*oldColor != newColor)) {
         *oldColor = newColor;
         *strp += sprintf(*strp, STR_COLOR_PREFIX, newColor);
     }
@@ -519,16 +519,22 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_CODE20              STR_HEX_PREFIX "%05X"           // 20-bit data for exception handler.
 
 
-#define ADD_COLOR(_c) {                                             \
-    cs_insn_param_check_color_change(&strp, &color, (_c), format);  \
+#define ADD_COLOR(_c) {                                                 \
+    cs_insn_param_check_color_change(&strp, &color, (_c), formatting);  \
 }
 #define ADD_STR(...) {                  \
     strp += sprintf(strp, __VA_ARGS__); \
 }
-#define ADD_REG(_fmt, _cop, _idx) {                                                                             \
-    regInfo = get_reg_info((_cop), (_idx));                                                                     \
-    ADD_STR((_fmt), regInfo->name);                                                                             \
-    append_reg_to_buffer((_cop), (_idx), ((cmdIndex == info->f2i) ? isFlt2 : isFlt1), (cmdIndex == info->out)); \
+#define ADD_REG(_cop, _idx) {                                                                                     \
+    regInfo = get_reg_info((_cop), (_idx));                                                                       \
+    ADD_STR(STR_IREG, regInfo->name);                                                                             \
+    append_reg_to_buffer((_cop), (_idx), ((cmdIndex == info->f2i) ? valFmt2 : valFmt1), (cmdIndex == info->out)); \
+}
+
+#define ADD_ADDR_REG(_cop, _idx) {                                  \
+    regInfo = get_reg_info((_cop), (_idx));                         \
+    ADD_STR(STR_IREG_BASE, regInfo->name);                          \
+    append_reg_to_buffer((_cop), (_idx), REG_VAL_TYPE_ADDR, FALSE); \
 }
 
 
@@ -537,10 +543,10 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
  *
  * @param[in ] addr  The address of the instruction. Used to calculate the target of branches and jumps.
  * @param[in ] insn  The instruction data that is being read.
- * @param[out] fname If the instruction points
+ * @param[out] fname If the instruction points to a function, this is set to the function's name string in the map data, otherwise NULL.
  * @return char* The formatted string in insn_as_string.
  */
-char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool format) {
+char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool formatting) {
     char* strp = &insn_as_string[0]; // Pointer to a location inside the string.
     _Bool unimpl = FALSE;
 
@@ -553,8 +559,8 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
         const RegisterInfo* regInfo = NULL;
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
-        _Bool isFlt1 = info->f1; // Primary format.
-        _Bool isFlt2 = info->f2; // Secondary format.
+        enum RegisterValueTypes valFmt1 = (info->f1 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Primary format.
+        enum RegisterValueTypes valFmt2 = (info->f2 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Secondary format.
 
         clear_saved_reg_buffer();
 
@@ -586,22 +592,22 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     bzero(insn_name, sizeof(insn_name));
                     char fmtChar = cop1_fmt_to_char(insn);
                     sprintf(insn_name, STR_INSN_NAME_FORMAT, info->name, fmtChar);
-                    isFlt2 = (fmtChar == 'S' || fmtChar == 'D'); // Overwrite secondary format.
+                    valFmt2 = ((fmtChar == 'S' || fmtChar == 'D') ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Overwrite secondary format.
                     ADD_STR(STR_INSN_NAME, insn_name);
                     break;
                 case CHAR_P_RS: // CPU 'RS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, CPU, insn.rs);
+                    ADD_REG(CPU, insn.rs);
                     separator = TRUE;
                     break;
                 case CHAR_P_RT: // CPU 'RT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, CPU, insn.rt);
+                    ADD_REG(CPU, insn.rt);
                     separator = TRUE;
                     break;
                 case CHAR_P_RD: // CPU 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, CPU, insn.rd);
+                    ADD_REG(CPU, insn.rd);
                     separator = TRUE;
                     break;
                 case CHAR_P_IMM: // Immediate.
@@ -616,9 +622,13 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR(STR_IMMEDIATE, insn.sa);
                     break;
+                case CHAR_P_REGOFF: // Register offset offset.
+                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REGOFFSET);
+                    ADD_STR(STR_IMMEDIATE, insn.immediate);
+                    break;
                 case CHAR_P_BASE: // Register offset base.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG_BASE, CPU, insn.base);
+                    ADD_ADDR_REG(CPU, insn.base);
                     break;
                 case CHAR_P_BRANCH: // Branch offset.
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
@@ -631,29 +641,29 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_COP0D: // COP0 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, COP0, insn.rd);
+                    ADD_REG(COP0, insn.rd);
                     separator = TRUE;
                     break;
                 case CHAR_P_FT: // COP1 'FT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, COP1, insn.ft);
+                    ADD_REG(COP1, insn.ft);
                     separator = TRUE;
                     break;
                 case CHAR_P_FS: // COP1 'FS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, COP1, insn.fs);
+                    ADD_REG(COP1, insn.fs);
                     separator = TRUE;
                     break;
                 case CHAR_P_FD: // COP1 'FD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(STR_IREG, COP1, insn.fd);
+                    ADD_REG(COP1, insn.fd);
                     separator = TRUE;
                     break;
-                case CHAR_P_EXC10:
+                case CHAR_P_EXC10: // For TRAP IF instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     ADD_STR(STR_CODE10, insn.code10);
                     break;
-                case CHAR_P_EXC20:
+                case CHAR_P_EXC20: // For SYSCALL and BREAK instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     ADD_STR(STR_CODE20, insn.code20);
                     break;

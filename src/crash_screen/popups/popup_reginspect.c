@@ -21,10 +21,9 @@
 
 RegisterId gInspectedRegister = {
     // Default to R0.
-    .cop = CPU,
-    .idx = REG_CPU_R0,
-    .flt = FALSE,
-    .out = FALSE,
+    .cop         = CPU,
+    .idx         = REG_CPU_R0,
+    .valInfo.raw = 0,
 };
 
 Address sInspectedRegisterPtrAddr = 0x00000000;
@@ -56,7 +55,7 @@ void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t
     }
 
     // Print as other floatint point formats:
-    if (regId.flt) {
+    if (regId.valInfo.type == REG_VAL_TYPE_FLOAT) {
         //! TODO: Combine this with cs_print_f32.
         y += TEXT_HEIGHT(1);
         const IEEE754_f64 flt64 = { .asU64 = val64, };

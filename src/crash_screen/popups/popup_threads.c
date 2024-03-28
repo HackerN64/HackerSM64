@@ -68,32 +68,26 @@ void cs_popup_threads_init(void) {
 }
 
 void cs_print_thread_info_line_1(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread, _Bool align) {
-    CS_PRINT_DEFAULT_COLOR_START(COLOR_RGBA32_CRASH_THREAD_NAME);
-    CSTextCoord_u32 charX = cs_print(x, y, "thread %d", osGetThreadId(thread));
+    CSTextCoord_u32 charX = cs_print(x, y, "thread: "STR_COLOR_PREFIX"%d", COLOR_RGBA32_CRASH_THREAD_NAME, osGetThreadId(thread));
     if (align) {
-        charX = STRLEN("THREAD #####: ");    
+        charX = STRLEN("thread: ##### ");    
     } else {
-        charX += cs_print((x + TEXT_WIDTH(charX)), y, ": ");
+        charX++;
     }
     const char* threadName = get_thread_name(thread);
     if (threadName != NULL) {
-        charX += cs_print_scroll((x + TEXT_WIDTH(charX)), y, (maxNumChars - charX), "%s", threadName);
+        charX += cs_print_scroll((x + TEXT_WIDTH(charX)), y, (maxNumChars - charX), (align ? (STR_COLOR_PREFIX"%s") : (STR_COLOR_PREFIX"(%s)")), COLOR_RGBA32_CRASH_THREAD_NAME, threadName);
     }
-    CS_PRINT_DEFAULT_COLOR_END();
 }
 
 void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread) {
     CSTextCoord_u32 charX = 0;
     cs_print(x, y,
-        (STR_COLOR_PREFIX"pri:"STR_COLOR_PREFIX"%d"),
-        COLOR_RGBA32_LIGHT_GRAY,
+        ("pri:"STR_COLOR_PREFIX"%d"),
         COLOR_RGBA32_CRASH_THREAD_PRI, osGetThreadPri(thread)
     );
     charX += STRLEN("pri:### ");
-    charX += cs_print((x + TEXT_WIDTH(charX)), y,
-        (STR_COLOR_PREFIX"state:"),
-        COLOR_RGBA32_LIGHT_GRAY
-    );
+    charX += cs_print((x + TEXT_WIDTH(charX)), y, "state:");
     RGBA32 stateColor = cs_draw_thread_state_icon((x + TEXT_WIDTH(charX++)), (y + 2), thread);
     const char* stateName = get_thread_state_str(thread);
     if (stateName != NULL) {
@@ -113,13 +107,14 @@ void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThr
 }
 
 void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread) {
+    CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_LIGHT_GRAY);
     cs_print_thread_info_line_1(x, y, maxNumChars, thread, TRUE);
     y += TEXT_HEIGHT(1);
     cs_print_thread_info_line_2(x, y, thread);
+    CS_SET_DEFAULT_PRINT_COLOR_END();
 }
 
 void cs_popup_threads_draw_list(u32 startY) {
-    _Bool exceededMax = FALSE;
     OSThread* queue = __osGetActiveQueue();
     OSThread* thread = queue;
 
@@ -132,7 +127,6 @@ void cs_popup_threads_draw_list(u32 startY) {
         (thread->priority != OS_PRIORITY_THREADTAIL)
     ) {
         if (threadIndex > MAX_THREAD_SEARCH_ITERATIONS) {
-            exceededMax = TRUE;
             break;
         }
         if (
@@ -166,11 +160,7 @@ void cs_popup_threads_draw_list(u32 startY) {
         );
     }
 
-    if (exceededMax) {
-        cs_print(TEXT_X(0), TEXT_Y(1), "num th.\nfound:\n>%d", MAX_THREAD_SEARCH_ITERATIONS);
-    } else {
-        cs_print(TEXT_X(0), TEXT_Y(1), "num th.\nfound:\n%d", sTotalFoundThreads);
-    }
+    cs_print(TEXT_X(STRLEN("THREAD REGISTERS   ")), TEXT_Y(0), "#th.found:%d", sTotalFoundThreads);
 
     osWritebackDCacheAll();
 

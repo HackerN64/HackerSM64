@@ -539,6 +539,10 @@ void cs_draw_main(void) {
                 popup->drawFunc();
             }
         }
+
+        if (!CS_IS_DEFAULT_PRINT_COLOR_DEFAULT()) {
+            gCSDefaultPrintColor = CS_DEFAULT_PRINT_COLOR;
+        }
     }
 
     cs_update_framebuffer();

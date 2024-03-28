@@ -195,7 +195,12 @@ void _cs_about_func_launcher(char* buf) {
 }
 ABOUT_ENTRY_FUNC(libpl_version,  "%d", (gSupportsLibpl ? LPL_ABI_VERSION_CURRENT : 0));
 void _cs_about_func_cheat_flags(char* buf) {
+    char* p = buf;
     lpl_cheat_flags cheatFlags = libpl_get_cheat_flags();
+    if (cheatFlags == 0) {
+        p += sprintf(p, "none");
+        return;
+    }
     const char flags[][2] = {
         [__builtin_ctz(LPL_USED_CHEATS       )] = "gs",
         [__builtin_ctz(LPL_USED_SAVESTATES   )] = "ss",
@@ -203,7 +208,6 @@ void _cs_about_func_cheat_flags(char* buf) {
         [__builtin_ctz(LPL_USED_FRAME_ADVANCE)] = "fa",
         [__builtin_ctz(LPL_USED_SPEEDUP      )] = "sp",
     };
-    char* p = buf;
     u32 flag = 0x1;
     for (int i = 0; i < ARRAY_COUNT(flags); i++) {
         if (cheatFlags & flag) {

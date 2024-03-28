@@ -68,6 +68,9 @@
 #define CHAR_FLT_PREFIX_NAN     'N'
 
 
+#define CS_DEFAULT_PRINT_COLOR COLOR_RGBA32_WHITE
+
+
 typedef union PrintBuffer {
     struct PACKED {
         /*0x00*/ RGBA16 red    : 5;
@@ -94,17 +97,19 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
 #define cs_print_scroll(_x, _y, _charLimit, _fmt, ...) cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__)
 #define cs_print(_x, _y, _fmt, ...) cs_print_scroll((_x), (_y), 0, (_fmt), ##__VA_ARGS__)
 
-#define CS_PRINT_DEFAULT_COLOR_START(_color)            \
+#define CS_SET_DEFAULT_PRINT_COLOR_START(_color)        \
     RGBA32 __tempDefaultColor = gCSDefaultPrintColor;   \
     gCSDefaultPrintColor = (_color);                    \
 
-#define CS_PRINT_DEFAULT_COLOR_END()                    \
+#define CS_SET_DEFAULT_PRINT_COLOR_END()                \
     gCSDefaultPrintColor = __tempDefaultColor;          \
 
+#define CS_IS_DEFAULT_PRINT_COLOR_DEFAULT() (gCSDefaultPrintColor == CS_DEFAULT_PRINT_COLOR)
+
 #define cs_print_color_scroll(_x, _y, _charLimit, _color, _fmt, ...)  { \
-    CS_PRINT_DEFAULT_COLOR_START(_color);                               \
+    CS_SET_DEFAULT_PRINT_COLOR_START(_color);                           \
     cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__);     \
-    CS_PRINT_DEFAULT_COLOR_END();                                       \
+    CS_SET_DEFAULT_PRINT_COLOR_END();                                   \
 }
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 

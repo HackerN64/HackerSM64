@@ -25,7 +25,7 @@ PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
 // Input:
 _Bool  gCSWordWrap          = FALSE;
 u32    gCSWordWrapXLimit    = CRASH_SCREEN_TEXT_X2;
-RGBA32 gCSDefaultPrintColor = COLOR_RGBA32_WHITE;
+RGBA32 gCSDefaultPrintColor = CS_DEFAULT_PRINT_COLOR;
 
 // Output:
 u32 gCSNumLinesPrinted = 0;
@@ -442,8 +442,9 @@ size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            //! TODO: offset
-            return cs_print_symbol_name(x, y, maxWidth, symbol, FALSE);
+            size_t charX = cs_print_symbol_name(x, y, (maxWidth - STRLEN(" +0000")), symbol, FALSE);
+            charX += cs_print((x + TEXT_WIDTH(charX + 1)), y, (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD), COLOR_RGBA32_CRASH_OFFSET, (addr - symbol->addr));
+            return charX;
         }
     }
 #endif // INCLUDE_DEBUG_MAP

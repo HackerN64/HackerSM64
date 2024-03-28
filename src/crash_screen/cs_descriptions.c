@@ -224,22 +224,6 @@ const char* get_processor_name(u8 imp) {
 }
 
 
-// -- COPROCESSOR --
-
-static const char* sCOPNames[] = {
-    [CPU  + 1] = "CPU",
-    [COP0 + 1] = "CP0 (system control)",
-    [COP1 + 1] = "CP1 (FPU)",
-    [COP2 + 1] = "CP2 (RCP vector unit)",
-    [COP3 + 1] = "CP3",
-    [FCR  + 1] = "CP1 (FCR)",
-    [SPC  + 1] = "special registers",
-};
-const char* get_coprocessor_name(enum Coprocessors cop) {
-    return sCOPNames[cop + 1];
-}
-
-
 // -- CAUSE --
 
 static const char* sCauseDesc[NUM_CAUSE_DESC] = {
@@ -371,7 +355,7 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
     for (int i = 0; i < gSavedRegBufSize; i++) {
         RegisterId reg = gSavedRegBuf[i];
 
-        if (reg.flt) {
+        if (reg.valInfo.type == REG_VAL_TYPE_FLOAT) {
             IEEE754_f32 val = {
                 .asU32 = get_reg_val(reg.cop, reg.idx)
             };

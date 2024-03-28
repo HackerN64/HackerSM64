@@ -18,6 +18,7 @@
 #define CHAR_P_IMM      'I'     // "0x[last 16 bits]".
 #define CHAR_P_NIMM     'i'     // "[±]0x[[last 16 bits]]" (for SUBI pseudo-instruction).
 #define CHAR_P_SHIFT    'a'     // "[shift]"".
+#define CHAR_P_REGOFF   'o'     // "0x[last 16 bits]"
 #define CHAR_P_BASE     '('     // "([rs reg])".
 #define CHAR_P_BRANCH   'B'     // "[±]0x[last 16 bits]" + draw branch arrow.
 #define CHAR_P_FT       'T'     // "F[ft reg]".
@@ -448,4 +449,4 @@ typedef struct PACKED InsnTemplate {
 
 s16 insn_check_for_branch_offset(InsnData insn);
 Address get_insn_branch_target_from_addr(Address addr);
-char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool format);
+char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool formatting);

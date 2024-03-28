@@ -51,7 +51,7 @@ enum RegDesc {
     REG_DESC_RA,
 };
 
-enum COP0Registers {
+enum CP0Registers {
     REG_CP0_INX       = C0_INX,         // Programmable pointer into TLB array.
     REG_CP0_RAND      = C0_RAND,        // Pseudorandom pointer into TLB array (read only).
     REG_CP0_ENTRYLO0  = C0_ENTRYLO0,    // Low half of TLB entry for even virtual addresses (VPN).
@@ -116,7 +116,7 @@ enum RegDesc_CP0 {
     REG_DESC_CP0_RESERVED,
 };
 
-enum COP1Registers {
+enum CP1Registers {
     REG_CP1_F00, REG_CP1_F01, REG_CP1_F02, REG_CP1_F03,                                                                                                                 // Subroutine return value.
     REG_CP1_F04, REG_CP1_F05, REG_CP1_F06, REG_CP1_F07, REG_CP1_F08, REG_CP1_F09, REG_CP1_F10,  REG_CP1_F11,                                                        // Temporary values.
     REG_CP1_F12, REG_CP1_F13, REG_CP1_F14, REG_CP1_F15,                                                                                                                 // Subroutine arguments.
@@ -161,12 +161,34 @@ typedef struct RegisterInfo {
     /*0x08*/ const char shortName[4];
 } RegisterInfo; /*0x0C*/
 
+typedef struct CoprocessorInfo {
+    const char* name;
+    uint64_t (*getRegValFunc)(int idx);
+    const RegisterInfo* (*getRegInfoFunc)(int idx);
+    const char** regDescList;
+} CoprocessorInfo;
+
+enum RegisterValueTypes {
+    REG_VAL_TYPE_INT,
+    REG_VAL_TYPE_FLOAT,
+    REG_VAL_TYPE_ADDR,
+};
+
 typedef union RegisterId {
     struct {
         /*0x00*/ s8 cop;
         /*0x01*/ s8 idx;
-        /*0x02*/ _Bool flt;
-        /*0x03*/ _Bool out;
+        /*0x02*/ union {
+            /*0x02*/ struct {
+                /*0x02*/ u8 type; // enum RegisterValueTypes
+                /*0x03*/ struct PACKED {
+                            u8     : 6;
+                            u8 dbl : 1; // is 64-bit?
+                            u8 out : 1; // is output?
+                        };
+                    };
+            u16 raw;
+        } valInfo;
     }; /*0x04*/
     /*0x04*/ u32 raw;
 } RegisterId; /*0x04*/
@@ -193,12 +215,12 @@ typedef union RegisterId {
 #define DEF_CPU_SREG(_reg, _name, _descId) DEF_SREG(      sizeof(u64), _name, _name, _descId)
 #define DEF_CPU_TREG(_reg, _name, _descId) DEF_TREG(_reg, sizeof(u64), _name, _name, _descId)
 
-#define DEF_COP0_SREG(_reg, _type,         _name, _shortName, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _descId)
-#define DEF_COP0_TREG(_reg, _type, _field, _name, _shortName, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _descId)
+#define DEF_CP0_SREG(_reg, _type,         _name, _shortName, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _descId)
+#define DEF_CP0_TREG(_reg, _type, _field, _name, _shortName, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _descId)
 
-#define DEF_COP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, _descId)
-#define DEF_COP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, _descId)
-#define DEF_COP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, _descId)
+#define DEF_CP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, _descId)
+#define DEF_CP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, _descId)
+#define DEF_CP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, _descId)
 
 #define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX TO_STRING2(_reg)); break;
 
@@ -210,6 +232,7 @@ extern OSThread* __osRunningThread;
 extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
 
+const char* get_coprocessor_name(enum Coprocessors cop);
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);
 uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread);
@@ -218,7 +241,7 @@ uint64_t get_reg_val(enum Coprocessors cop, int idx);
 const char* get_reg_desc(enum Coprocessors cop, int idx);
 
 void clear_saved_reg_buffer(void);
-void append_reg_to_buffer(enum Coprocessors cop, int idx, _Bool isFlt, _Bool isOutput);
+void append_reg_to_buffer(enum Coprocessors cop, int idx, enum RegisterValueTypes type, _Bool isOutput);
 
 enum FloatErrorType validate_f32(IEEE754_f32 val);
 enum FloatErrorType validate_f64(IEEE754_f64 val);
