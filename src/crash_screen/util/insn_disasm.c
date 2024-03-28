@@ -179,6 +179,7 @@ ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM, INSN_TYPE_
     { .opcode = OPR_BGEZAL     , .name = "BGEZAL" , .fmt = "\'sB" , .out = 7, }, // 17: Branch on Greater Than or Equal to Zero and Link.
     { .opcode = OPR_BLTZALL    , .name = "BLTZALL", .fmt = "\'sB" , .out = 7, }, // 18: Branch on Less Than Zero and Link Likely.
     { .opcode = OPR_BGEZALL    , .name = "BGEZALL", .fmt = "\'sB" , .out = 7, }, // 19: Branch on Greater Than or Equal to Zero and Link Likely.
+
     { .opcode = OPR_TGEI       , .name = "TGEI"   , .fmt = "\'sI" , .out = 0, }, //  8: Trap if Greater Than or Equal Immediate.
     { .opcode = OPR_TGEIU      , .name = "TGEIU"  , .fmt = "\'sI" , .out = 0, }, //  9: Trap if Greater Than or Equal Unsigned Immediate.
     { .opcode = OPR_TLTI       , .name = "TLTI"   , .fmt = "\'sI" , .out = 0, }, // 10: Trap if Less Than Immediate.
@@ -241,10 +242,12 @@ ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_T
     { .opcode = OPS_TRUNC_W_F  , .name = "TRUNC.W", .fmt = "\"DS" , .out = 1, .f1 = 0, .f2 = 1, .f2i = 2, }, // 13: TRUNC.W.[FMT] Floating-Point Truncate to Word Fixed-Point (5cyc).
     { .opcode = OPS_CEIL_W_F   , .name = "CEIL.W" , .fmt = "\"DS" , .out = 1, .f1 = 0, .f2 = 1, .f2i = 2, }, // 14: CEIL.W.[FMT]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
     { .opcode = OPS_FLOOR_W_F  , .name = "FLOOR.W", .fmt = "\"DS" , .out = 1, .f1 = 0, .f2 = 1, .f2i = 2, }, // 15: FLOOR.W.[FMT] Floating-Point Floor to Word Fixed-Point (5cyc).
+
     { .opcode = OPS_CVT_S_F    , .name = "CVT.S"  , .fmt = "\"DS" , .out = 1, .f1 = 1, .f2 = 0, .f2i = 2, }, // 32: CVT.S.[FMT]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
     { .opcode = OPS_CVT_D_F    , .name = "CVT.D"  , .fmt = "\"DS" , .out = 1, .f1 = 1, .f2 = 0, .f2i = 2, }, // 33: CVT.D.[FMT]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
     { .opcode = OPS_CVT_W_F    , .name = "CVT.W"  , .fmt = "\"DS" , .out = 1, .f1 = 0, .f2 = 1, .f2i = 2, }, // 36: CVT.W.[FMT]   Floating-Point Convert to Word Fixed-Point (5cyc).
     { .opcode = OPS_CVT_L_F    , .name = "CVT.L"  , .fmt = "\"DS" , .out = 1, .f1 = 0, .f2 = 1, .f2i = 2, }, // 37: CVT.L.[FMT]   Floating-Point Convert to Long Fixed-Point (5cyc).
+
     { .opcode = OPS_C_F        , .name = "C.F"    , .fmt = "\"ST" , .out = 0, .f1 = 1, .f2 = 1, .f2i = 0, }, // 48: C.F.[FMT]     Floating-Point Compare (False) (1cyc).
     { .opcode = OPS_C_UN       , .name = "C.UN"   , .fmt = "\"ST" , .out = 0, .f1 = 1, .f2 = 1, .f2i = 0, }, // 49: C.UN.[FMT]    Floating-Point Compare (Unordered) (1cyc).
     { .opcode = OPS_C_EQ       , .name = "C.EQ"   , .fmt = "\"ST" , .out = 0, .f1 = 1, .f2 = 1, .f2i = 0, }, // 50: C.EQ.[FMT]    Floating-point Compare (Equal) (1cyc).

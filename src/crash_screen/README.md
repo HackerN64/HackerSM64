@@ -135,7 +135,7 @@ TODO: more/update documentation
 - Update UNF to match pages.
 - Should the coprocessor enum start at 0?
 ### Summary page
-- Show cond bit from fpcsr if pc is c.cond? Or would that be the old cond bit?
+- Show cond bit from fpcsr if pc is c.cond? Or would that be the previous cond bit?
 - Special crash/assert handling:
   - RCP hang/Null SPTask (what RCP info can be printed?)
     - Mention the need to restart console when this happens.

@@ -246,39 +246,52 @@ static const char* sCauseDesc[NUM_CAUSE_DESC] = {
     [CAUSE_DESC_WATCH  ] = "Watchpoint exception",
     [CAUSE_DESC_VCED   ] = "Virtual coherency on data",
 };
+_Bool check_for_empty_infinite_loop(Address pc, _Bool inBranchDelaySlot) {
+    InsnData insn = { .raw = 0, };
+    InsnData prev = { .raw = 0, };
+    _Bool insnValid = try_read_word_aligned(&insn.raw, pc);
+    #define INSN_IS_B_0(_insn) (((_insn).opcode == OPC_BEQ) && ((_insn).rs == (_insn).rt) && ((_insn).offset == (u16)-1))
+    return (
+        insnValid && (
+            INSN_IS_B_0(insn) || (
+                inBranchDelaySlot &&
+                try_read_word_aligned(&prev.raw, (pc - sizeof(Word))) &&
+                (insn.raw == 0x00000000) &&
+                INSN_IS_B_0(prev)
+            )
+        )
+    );
+    #undef INSN_IS_B_0
+}
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
     u32 cause = (tc->cause & CAUSE_EXCMASK);
 
     if (specific) {
-        uint64_t badvaddr = tc->badvaddr;
-        uint32_t epc = GET_EPC(tc);
+        Address badvaddr = tc->badvaddr;
+        Address pc = tc->pc;
+        _Bool inBranchDelaySlot = ((Reg_CP0_Cause)tc->cause).BD;
+        Address epc = (pc + (inBranchDelaySlot ? sizeof(Word) : 0)); // GET_EPC(pc);
 
         // Heuristics from libdragon (plus a few extras):
         switch (cause) {
             case EXC_INT: // Non-crash interrupts (can be shown after changing the inspected thread).
-                //! TODO: Can the instruction location here potentially change?
-                if (tc->pc == ADDR_INSN_WAITING_FOR_MESG) {
+                if (pc == ADDR_INSN_WAITING_FOR_MESG) {
                     return "Waiting for mesg";
                 }
-                //! TODO: Fix these unsafe data reads and clean this up:
-                InsnData insn = { .raw = *(u32*)tc->pc };
-                InsnData prev = { .raw = *(u32*)(tc->pc - sizeof(Word)) };
-                #define INSN_IS_B_0(_insn) (((_insn).opcode == OPC_BEQ) && ((_insn).rs == (_insn).rt) && ((_insn).offset == (u16)-1))
-                if (INSN_IS_B_0(insn) || (((Reg_CP0_Cause)tc->cause).BD && (insn.raw == 0x00000000) && INSN_IS_B_0(prev))) {
+                if (check_for_empty_infinite_loop(pc, inBranchDelaySlot)) {
                     return "Empty infinite loop";
                 }
-                #undef INSN_IS_B_0
                 break;
             case EXC_MOD:
                 return "Write to read-only memory";
             case EXC_RMISS:
-                if (epc == (u32)badvaddr) {
+                if (epc == badvaddr) {
                     return "Invalid program counter address";
                 } else if (badvaddr < 128) {
                     // This is probably a NULL pointer dereference, though it can go through a structure or an array,
                     // so leave some margin to the actual faulting address.
-                    if (tc->pc == INSN_OFFSET_FROM_ADDR(strlen, 0)) { // 1st instruction of strlen
+                    if (pc == INSN_OFFSET_FROM_ADDR(strlen, 0)) { // 1st instruction of strlen
                         return "NULL string dereference (read)";
                     } else {
                         return "NULL pointer dereference (read)";
@@ -294,7 +307,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                     return "Write to invalid memory address";
                 }
             case EXC_RADE:
-                if (epc == (uint32_t)badvaddr) {
+                if (epc == badvaddr) {
                     if (is_unmapped_kx64(badvaddr)) {
                         return "Program counter in invalid 64-bit address";
                     } else {
@@ -311,7 +324,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
             case EXC_WADE:
                 return "Misaligned write to memory";
             case EXC_SYSCALL:
-                if (tc->pc == ADDR_INSN_ASSERT) {
+                if (pc == ADDR_INSN_ASSERT) {
                     return "Failed Assert (see below)";
                 }
         }

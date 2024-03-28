@@ -267,7 +267,7 @@ void page_summary_draw(void) {
         // -- ASSERT --
         cs_draw_assert(line);
     } else {
-        line++;
+        // line++;
         // -- PC --
         RegisterId regPC = {
             .cop = COP0,
@@ -285,21 +285,24 @@ void page_summary_draw(void) {
                 COLOR_RGBA32_CRASH_DESCRIPTION_MAIN
             );
         } else {
+            line = draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
+            line += 2;
+            cs_print(TEXT_X(x), TEXT_Y(line++), STR_COLOR_PREFIX"DISASM:", COLOR_RGBA32_CRASH_HEADER);
             cs_draw_divider_translucent(DIVIDER_Y(line));
             print_insn(TEXT_X(x), TEXT_Y(line++), insnAsStr, destFname);
 
             if (crashType == CRASH_TYPE_II) {
                 print_data_as_binary(TEXT_X(x), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
-                cs_draw_divider_translucent(DIVIDER_Y(line));
+                // cs_draw_divider_translucent(DIVIDER_Y(line));
             } else {
-                cs_draw_divider_translucent(DIVIDER_Y(line));
+                // cs_draw_divider_translucent(DIVIDER_Y(line));
                 for (int i = 0; i < gSavedRegBufSize; i++) {
                     cs_draw_register_info_long(x, line++, gSavedRegBuf[i], maxNumChars, TRUE);
                 }
             }
 
-            line++;
-            draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
+            // line++;
+            // line = draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
         }
     }
 
