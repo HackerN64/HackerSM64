@@ -21,11 +21,28 @@
 #endif // UNF
 
 
+enum MemoryDisplayModes {
+    MEMORY_MODE_HEX,
+    MEMORY_MODE_ASCII,
+    MEMORY_MODE_BINARY,
+    MEMORY_MODE_RGBA16,
+    MEMORY_MODE_RGBA32,
+};
+
+const char* gValNames_mem_disp_mode[] = {
+    [MEMORY_MODE_HEX   ] = "HEX",
+    [MEMORY_MODE_ASCII ] = "ASCII",
+    [MEMORY_MODE_BINARY] = "BINARY",
+    [MEMORY_MODE_RGBA16] = "RGBA16",
+    [MEMORY_MODE_RGBA32] = "RGBA32",
+};
+
+
 struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MEMORY",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_MEMORY_AS_ASCII         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show data as ascii",             .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_MEMORY_DISPLAY_MODE     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Display mode",                   .valNames = &gValNames_mem_disp_mode, .val = MEMORY_MODE_HEX,           .defaultVal = MEMORY_MODE_HEX,           .lowerBound = MEMORY_MODE_HEX,       .upperBound = MEMORY_MODE_RGBA32,         },
     [CS_OPT_END_MEMORY              ] = { .type = CS_OPT_TYPE_END, },
 };
 
@@ -53,7 +70,7 @@ static u32 sRamViewNumShownRows = MEMORY_NUM_SHOWN_ROWS;
 
 static const char gHex[0x10] = "0123456789ABCDEF";
 #ifdef UNF
-static u32 sMemoryViewData[20][4];
+static u32 sMemoryViewData[MEMORY_NUM_SHOWN_ROWS][4];
 #endif // UNF
 
 
@@ -61,28 +78,21 @@ void page_memory_init(void) {
     sRamViewViewportIndex = gSelectedAddress;
 }
 
-static void print_byte(u32 x, u32 y, Byte byte, RGBA32 color) {
-    // "[XX]"
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII)) {
-        cs_draw_glyph((x + TEXT_WIDTH(1)), y, byte, color);
-    } else {
-        // Faster than doing cs_print:
-        cs_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> 4], color);
-        cs_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & 0xF], color);
-    }
+void cs_memory_draw_byte() {
+
 }
 
-static void ram_viewer_print_data(u32 line, Address startAddr) {
-    const _Bool memoryAsASCII = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII);
+void ram_viewer_print_data(u32 line, Address startAddr) {
+    const enum MemoryDisplayModes mode = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE);
     __OSThreadContext* tc = &gInspectThread->context;
-    u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
-    u32 charY = TEXT_Y(line);
+    CSScreenCoord_u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
+    CSScreenCoord_u32 charY = TEXT_Y(line);
 
 #ifdef UNF
     bzero(&sMemoryViewData, sizeof(sMemoryViewData));
 #endif // UNF
 
-    for (u32 y = 0; y < sRamViewNumShownRows; y++) {
+    for (CSTextCoord_u32 y = 0; y < sRamViewNumShownRows; y++) {
         Address rowAddr = (startAddr + (y * PAGE_MEMORY_STEP));
 
         // Row header:
@@ -112,8 +122,9 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
             for (u32 byteOffset = 0; byteOffset < sizeof(Word); byteOffset++) {
                 Address currAddr = (currAddrAligned + byteOffset);
 
-                RGBA32 textColor = ((memoryAsASCII || (byteOffset % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
+                RGBA32 textColor = (((mode == MEMORY_MODE_ASCII) || (byteOffset % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
                 RGBA32 selectColor = COLOR_RGBA32_NONE;
+                _Bool isColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
 
                 if (currAddr == gSelectedAddress) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
@@ -121,15 +132,47 @@ static void ram_viewer_print_data(u32 line, Address startAddr) {
                 } else if (currAddr == GET_EPC(tc)) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
                 }
+                _Bool selected = (selectColor != COLOR_RGBA32_NONE);
 
-                if (selectColor != COLOR_RGBA32_NONE) {
-                    cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), selectColor);
+                // If the display mode isn't a color, draw a solid box behind the data.
+                if (selected && !isColor) {
+                    cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), selectColor);
                 }
 
                 if (valid) {
-                    print_byte(charX, charY, data.byte[byteOffset], textColor);
+                    Byte byte = data.byte[byteOffset];
+                    switch (mode) {
+                        case MEMORY_MODE_HEX:
+                            cs_draw_glyph((charX + TEXT_WIDTH(0)), charY, gHex[byte >> BITS_PER_HEX], textColor);
+                            cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, gHex[byte & BITMASK(BITS_PER_HEX)], textColor);
+                            break;
+                        case MEMORY_MODE_ASCII:
+                            cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, byte, textColor);
+                            break;
+                        case MEMORY_MODE_BINARY:;
+                            CSScreenCoord_u32 bitX = 0;
+                            for (Byte bit = 0; bit < BITS_PER_BYTE; bit++) {
+                                RGBA32 color = (((byte >> ((BITS_PER_BYTE - 1) - bit)) & 0b1) ? COLOR_RGBA32_LIGHT_GRAY : COLOR_RGBA32_DARK_GRAY);
+                                cs_draw_rect((charX + bitX), charY, 1, CRASH_SCREEN_FONT_CHAR_HEIGHT, color);
+                                bitX += (1 + (bit & 0x1));
+                            }
+                            break;
+                        case MEMORY_MODE_RGBA16:;
+                            RGBA16 color = data.halfword[byteOffset > 1];
+                            cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA16_TO_RGBA32(color));
+                            break;
+                        case MEMORY_MODE_RGBA32:;
+                            cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), data.word);
+                            break;
+
+                    }
                 } else {
                     cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
+                }
+
+                // If the display mode is a color, draw a translucent box on top of the data.
+                if (selected && isColor) {
+                    cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA32_SET_ALPHA(selectColor, 0x7F));
                 }
 
                 charX += (TEXT_WIDTH(2) + 1);
@@ -260,8 +303,7 @@ void page_memory_input(void) {
     }
 
     if (buttonPressed & B_BUTTON) {
-        // Toggle whether the memory is printed as hex values or as ASCII chars.
-        cs_inc_setting(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_AS_ASCII, TRUE);
+        cs_inc_setting(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE, 1);
     }
 
     sRamViewViewportIndex = cs_clamp_view_to_selection(sRamViewViewportIndex, gSelectedAddress, sRamViewNumShownRows, PAGE_MEMORY_STEP);

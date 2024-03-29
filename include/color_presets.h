@@ -158,6 +158,7 @@
 
 #define COLORRGBA_TO_RGBA16(src)                        RGBA_TO_RGBA16((src)[0], (src)[1], (src)[2], (src)[3])
 #define RGBA32_TO_RGBA16(src)                           RGBA_TO_RGBA16(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
+#define RGBA16_TO_RGBA32(src)                           RGBA_TO_RGBA32(C16_TO_C32(RGBA16_R(src)), C16_TO_C32(RGBA16_G(src)), C16_TO_C32(RGBA16_B(src)), 0xFF) // RGBA16_A(src) ? 0xFF : 0x00)
 
 
 // -- Color modification macros --

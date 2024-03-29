@@ -107,6 +107,7 @@ typedef uintptr_t Address; //! TODO: 64 bit addressing mode.
 
 typedef union {
     Byte byte[4];
+    Halfword halfword[2];
     Word word;
 } Word_4Bytes;
 
