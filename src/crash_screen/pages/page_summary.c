@@ -152,21 +152,7 @@ void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg, size_t maxN
             charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_HEX_WORD" "), data);
         }
 
-        if (reg.valInfo.type == REG_VAL_TYPE_ADDR) {
-            if (data == 0x00000000) {
-                cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"NULL", COLOR_RGBA32_GRAY);
-            }
-        }
-#ifdef INCLUDE_DEBUG_MAP
-        const MapSymbol* symbol = get_map_symbol(data, SYMBOL_SEARCH_BACKWARD);
-        if (symbol != NULL) {
-            charX += cs_print_symbol_name(TEXT_X(charX), TEXT_Y(line), ((maxNumChars - STRLEN(" +0000")) - charX), symbol, FALSE);
-            cs_print(TEXT_X(charX + 1), TEXT_Y(line),
-                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
-                COLOR_RGBA32_CRASH_OFFSET, (data - symbol->addr)
-            );
-        }
-#endif // INCLUDE_DEBUG_MAP
+        charX += cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), maxNumChars, data, (reg.valInfo.type == REG_VAL_TYPE_ADDR));
     }
     CS_SET_DEFAULT_PRINT_COLOR_END();
 }
@@ -222,7 +208,7 @@ u32 draw_crash_cause_section(u32 line, RGBA32 descColor) {
         }
     }
 
-    return line;
+    return (line + 1);
 }
 
 void page_summary_draw(void) {
@@ -267,18 +253,7 @@ void page_summary_draw(void) {
         // -- ASSERT --
         cs_draw_assert(line);
     } else {
-        // line++;
-        // -- PC --
-        RegisterId regPC = {
-            .cop = COP0,
-            .idx = REG_CP0_EPC,
-            .valInfo = {
-                .type = REG_VAL_TYPE_ADDR,
-                .dbl  = FALSE,
-                .out  = FALSE,
-            },
-        };
-        cs_draw_register_info_long(x, line++, regPC, maxNumChars, FALSE);
+        cs_print_addr_location_info(TEXT_X(x), TEXT_Y(line++), maxNumChars, epc, TRUE);
         if (crashType == CRASH_TYPE_IPC) {
             cs_print(TEXT_X(x), TEXT_Y(line++),
                 STR_COLOR_PREFIX"Program counter at invalid memory location.",
@@ -286,9 +261,9 @@ void page_summary_draw(void) {
             );
         } else {
             line = draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
-            line += 2;
+            line++;
             cs_print(TEXT_X(x), TEXT_Y(line++), STR_COLOR_PREFIX"DISASM:", COLOR_RGBA32_CRASH_HEADER);
-            cs_draw_divider_translucent(DIVIDER_Y(line));
+            // cs_draw_divider_translucent(DIVIDER_Y(line));
             print_insn(TEXT_X(x), TEXT_Y(line++), insnAsStr, destFname);
 
             if (crashType == CRASH_TYPE_II) {
@@ -300,9 +275,6 @@ void page_summary_draw(void) {
                     cs_draw_register_info_long(x, line++, gSavedRegBuf[i], maxNumChars, TRUE);
                 }
             }
-
-            // line++;
-            // line = draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
         }
     }
 

@@ -438,6 +438,9 @@ size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWid
  * @return size_t The total number of chars printed to the screen.
  */
 size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
+    if (memoryLocationFallback && (addr == 0x00000000)) {
+        return cs_print(x, y, STR_COLOR_PREFIX"NULL", COLOR_RGBA32_GRAY);
+    }
 #ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
@@ -452,7 +455,6 @@ size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32
         const char* memStr = get_memory_string_from_addr(addr);
         if (memStr != NULL) {
             return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_GRAY, memStr);
-            
         }
     }
     // cs_print_symbol_unknown(x, y);
