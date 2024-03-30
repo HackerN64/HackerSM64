@@ -135,7 +135,7 @@ endif
 #==============================================================================#
 
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS = -Ofast
+DEFAULT_OPT_FLAGS = -Ofast -falign-functions=32
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # TODO: Figure out how to allow -fassociative-math to be enabled
@@ -350,7 +350,7 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
 
   # Clone any needed submodules
   ifeq ($(LIBPL),1)
-    ifeq ($(wildcard $(LIBPL_DIR)),)
+    ifeq ($(wildcard $(LIBPL_DIR)/*.h),)
       $(info Cloning libpl submodule...)
       DUMMY != git submodule update --init $(LIBPL_DIR) > /dev/null || echo FAIL
       ifeq ($(DUMMY),FAIL)

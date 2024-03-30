@@ -1643,7 +1643,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
         }
 
         get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
+        s32 goddamnJMeasure = textX == 256 ? 1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1736,7 +1736,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
         }
 
         get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = textX == 256 ? -1 : 0; // Hack to fix a rendering bug.
+        s32 goddamnJMeasure = textX == 256 ? 1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -2092,7 +2092,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
 
         gDPLoadSync(gDisplayListHead++);
         gDPLoadTextureTile(gDisplayListHead++,
-            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), maskW, maskH, 0, 0);
+            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
         gSPScisTextureRectangle(gDisplayListHead++,
             ((x + posW) << 2),
             ((y + posH) << 2),
@@ -2108,7 +2108,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posW = i * imW;
             gDPLoadSync(gDisplayListHead++);
             gDPLoadTextureTile(gDisplayListHead++,
-                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), maskW, maskH, 0, 0);
+                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
             gSPScisTextureRectangle(gDisplayListHead++,
                 (x + posW) << 2,
                 (y + posH) << 2,
