@@ -1039,6 +1039,8 @@ void geo_process_object(struct Object *node) {
     if (node->header.gfx.areaIndex == gCurGraphNodeRoot->areaIndex) {
         s32 isInvisible = (node->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE);
         s32 noThrowMatrix = (node->header.gfx.throwMatrix == NULL);
+        // Maintain throw matrix pointer if the game is paused as it won't be updated.
+        Mat4 *oldThrowMatrix = (sCurrPlayMode == PLAY_MODE_PAUSED) ? node->header.gfx.throwMatrix : NULL;
 
         // If the throw matrix is null and the object is invisible, there is no need
         // to update billboarding, scale, rotation, etc. 
@@ -1087,7 +1089,7 @@ void geo_process_object(struct Object *node) {
 
         gMatStackIndex--;
         gCurrAnimType = ANIM_TYPE_NONE;
-        node->header.gfx.throwMatrix = NULL;
+        node->header.gfx.throwMatrix = oldThrowMatrix;
     }
 }
 
