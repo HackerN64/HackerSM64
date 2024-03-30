@@ -9,7 +9,9 @@
 
 
 // Maximum number of chars to print at once.
-#define CHAR_BUFFER_SIZE 128
+#define CHAR_BUFFER_SIZE 256
+#define CS_PRINT_BUFFER_SIZE 128
+#define CS_SCROLL_BUFFER_SIZE CRASH_SCREEN_NUM_CHARS_X
 
 // Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2
@@ -115,7 +117,7 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
 
 
 size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
-size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback);
+size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress);
 
 
 typedef struct FloatErrorPrintFormat {
@@ -129,4 +131,4 @@ typedef struct FloatErrorPrintFormat {
 size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
 
 int sprintf_int_with_commas(char* buf, int n);
-void print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color);
+size_t print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color);

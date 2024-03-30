@@ -19,8 +19,9 @@
 
 
 static char sCSCharBuffer[CHAR_BUFFER_SIZE];
-PrintBuffer gCSPrintBuffer[CHAR_BUFFER_SIZE];
-PrintBuffer gCSScrollBuffer[CHAR_BUFFER_SIZE];
+//! TODO: Can print buffer be reused as scroll buffer?
+PrintBuffer gCSPrintBuffer[CS_PRINT_BUFFER_SIZE];
+PrintBuffer gCSScrollBuffer[CS_SCROLL_BUFFER_SIZE];
 
 // Input:
 _Bool  gCSWordWrap          = FALSE;
@@ -33,7 +34,7 @@ u32 gCSNumLinesPrinted = 0;
 
 /**
  * @brief Tries to extract a hexadecimal value from a char.
- * 
+ *
  * @param[out] dest The resulting hex value.
  * @param[in ] c    The char to check.
  * @return _Bool Whether the char was a valid hexadecimal value.
@@ -54,7 +55,7 @@ static _Bool char_to_hex(Byte* dest, char c) {
 
 /**
  * @brief Reads a hexadecimal value from a string buffer and writes it to a byte array.
- * 
+ *
  * @param[out] dest     The byte array to write to.
  * @param[in ] buf      The source string buffer.
  * @param[in ] index    The starting index of the source string buffer.
@@ -89,7 +90,7 @@ static _Bool read_str_to_bytes(Byte dest[], const char* buf, u32 index, size_t n
 
 /**
  * @brief Checks whether a char is a control character with specific handling.
- * 
+ *
  * @param[in] c The char to check.
  * @return _Bool Whether the check was successful.
  */
@@ -105,7 +106,7 @@ static _Bool is_special_char(char c) {
 
 /**
  * @brief Checks whether a char is a type of space.
- * 
+ *
  * @param[in] c The char to check.
  * @return _Bool Whether the check was successful.
  */
@@ -121,7 +122,7 @@ static _Bool is_space_char(char c) {
 
 /**
  * @brief Formats a string into gCSPrintBuffer.
- * 
+ *
  * @param[in] buf       The original string.
  * @param[in] totalSize The size of the original string.
  * @return size_t The size of the resulting formatted string.
@@ -193,6 +194,10 @@ static size_t cs_format_print_buffer(const char* buf, size_t totalSize) {
             data->glyph = glyph;
 
             bufferCount++;
+
+            if (bufferCount > (CS_PRINT_BUFFER_SIZE - 1)) {
+                break;
+            }
         }
     }
 
@@ -201,7 +206,7 @@ static size_t cs_format_print_buffer(const char* buf, size_t totalSize) {
 
 /**
  * @brief Gets the length of the next word (used for text wrapping).
- * 
+ *
  * @param[in] pBuf        The PrintBuffer (formatted string) pointer.
  * @param[in] index       The starting index in the formatted string.
  * @param[in] bufferCount The total number of chars in the string after formatting.
@@ -226,7 +231,7 @@ static size_t cs_get_next_word_length(PrintBuffer* pBuf, u32 index, size_t buffe
 
 /**
  * @brief Checks whether the text at the x char position should wrap.
- * 
+ *
  * @param[in] x The x char position.
  * @return _Bool Whether to wrap the text.
  */
@@ -236,7 +241,7 @@ static _Bool cs_should_wrap(u32 x) {
 
 /**
  * @brief Prints a formatted string buffer.
- * 
+ *
  * @param[in] x,y         The starting position on the screen to print to.
  * @param[in] bufferCount The total number of chars in the string after formatting.
  * @return size_t The total number of chars printed to the screen.
@@ -326,11 +331,14 @@ static size_t cs_print_from_buffer(CSScreenCoord_u32 x, CSScreenCoord_u32 y, siz
 
 /**
  * @brief Handles text scrolling.
- * 
+ *
  * @param[in] bufferCount The total number of chars in the string after formatting.
  * @param[in] charLimit   The maximum number of chars to print.
  */
 static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
+    if (charLimit > (CS_SCROLL_BUFFER_SIZE - 1)) {
+        charLimit = (CS_SCROLL_BUFFER_SIZE - 1);
+    }
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
     const SettingsType scrollSpeed = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
@@ -354,7 +362,7 @@ static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
 
 /**
  * @brief General text printing function.
- * 
+ *
  * @param[in] x,y       The starting position on the screen to print to.
  * @param[in] charLimit The maximum number of chars to print.
  * @param[in] fmt       The string to print.
@@ -367,8 +375,13 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
     va_list args;
     va_start(args, fmt);
 
+    //! TODO: Is there a way to prevent this from writing outside the buffer?
     size_t totalSize = _Printf(write_to_buf, sCSCharBuffer, fmt, args);
-    ASSERTF((totalSize < (CHAR_BUFFER_SIZE - 1)), STR_COLOR_PREFIX"CRASH SCREEN PRINT BUFFER EXCEEDED", COLOR_RGBA32_RED);
+    //! TODO: Do something visually to show that size was exceeded on any of the buffers.
+    // ASSERTF((totalSize < (CHAR_BUFFER_SIZE - 1)), STR_COLOR_PREFIX"CRASH SCREEN PRINT BUFFER EXCEEDED", COLOR_RGBA32_RED);
+    if (totalSize > (CHAR_BUFFER_SIZE - 1)) {
+        sCSCharBuffer[CHAR_BUFFER_SIZE - 1] = '\0'; // Prevent writing outside the buffers with 'CHAR_BUFFER_SIZE' entries.
+    }
     size_t numChars = 0;
 
     if (totalSize > 0) {
@@ -387,7 +400,7 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
             phase1FormattedSize = charLimit;
         }
 
-        // Handle shaping formatting like tabs and wrapping.
+        // Handle shaping formatting like tabs and wrapping, and draw the chars to the screen.
         numChars = cs_print_from_buffer(x, y, phase1FormattedSize);
     }
 
@@ -409,10 +422,11 @@ ALWAYS_INLINE static size_t cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScree
 
 /**
  * @brief Gets a name from a symbol and prints it.
- * 
- * @param[in] x,y      The starting position on the screen to print to.
- * @param[in] maxWidth The maximum number of chars to print.
- * @param[in] symbol   The symbol pointer.
+ *
+ * @param[in] x,y          The starting position on the screen to print to.
+ * @param[in] maxWidth     The maximum number of chars to print.
+ * @param[in] symbol       The symbol pointer.
+ * @param[in] printUnknown Whether to print "UNKNOWN" when no symbol name is found.
  * @return size_t The total number of chars printed to the screen.
  */
 size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
@@ -432,26 +446,27 @@ size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWid
 /**
  * @brief Prints information about an address location.
  *
- * @param[in] x,y      The starting position on the screen to print to.
- * @param[in] maxWidth The maximum number of chars to print.
- * @param[in] addr     The address location.
+ * @param[in] x,y         The starting position on the screen to print to.
+ * @param[in] maxWidth    The maximum number of chars to print.
+ * @param[in] addr        The address location.
+ * @param[in] sureAddress Whether we are sure that 'addr' is supposed to be a memory address.
  * @return size_t The total number of chars printed to the screen.
  */
-size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool memoryLocationFallback) {
-    if (memoryLocationFallback && (addr == 0x00000000)) {
+size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress) {
+    if (sureAddress && (addr == 0x00000000)) {
         return cs_print(x, y, STR_COLOR_PREFIX"NULL", COLOR_RGBA32_GRAY);
     }
 #ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
-            size_t charX = cs_print_symbol_name(x, y, (maxWidth - STRLEN(" +0000")), symbol, FALSE);
+            size_t charX = cs_print_symbol_name(x, y, (maxWidth - STRLEN(" +0000")), symbol, sureAddress);
             charX += cs_print((x + TEXT_WIDTH(charX + 1)), y, (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD), COLOR_RGBA32_CRASH_OFFSET, (addr - symbol->addr));
             return charX;
         }
     }
 #endif // INCLUDE_DEBUG_MAP
-    if (memoryLocationFallback) {
+    if (sureAddress) {
         const char* memStr = get_memory_string_from_addr(addr);
         if (memStr != NULL) {
             return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_GRAY, memStr);
@@ -528,20 +543,22 @@ int sprintf_int_with_commas(char* buf, int n) {
 }
 
 // Big Endian.
-void print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
-    CSScreenCoord_u32 bitX = x;
+size_t print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+    size_t numChars = 0;
     Byte* dataPtr = (Byte*)data;
 
     for (size_t byte = 0; byte < numBytes; byte++){
         for (size_t bit = 0; bit < BITS_PER_BYTE; bit++) {
             char c = (((*dataPtr >> ((BITS_PER_BYTE - 1) - bit)) & 0b1) ? '1' : '0');
 
-            cs_draw_glyph(bitX, y, c, color);
+            cs_draw_glyph((x + TEXT_WIDTH(numChars)), y, c, color);
 
-            bitX += TEXT_WIDTH(1);
+            numChars++;
         }
 
         dataPtr++;
-        bitX += TEXT_WIDTH(1);
+        numChars++;
     }
+
+    return numChars;
 }

@@ -71,6 +71,7 @@ void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t
     }
 }
 
+//! TODO: clean this up.
 _Bool cs_print_reg_info_CPU_V(u32 line, UNUSED uint64_t val) {
     u32 v1 = get_reg_val(CPU, REG_CPU_V1);
     if (v1 > 1) {

@@ -443,7 +443,6 @@ typedef struct PACKED InsnTemplate {
 //! TODO: Are any of these subject to change?
 #define ADDR_INSN_ASSERT           INSN_OFFSET_FROM_ADDR(__n64Assert,        8) // 9th instruction in __n64Assert.
 #define ADDR_INSN_WAITING_FOR_MESG INSN_OFFSET_FROM_ADDR(osRecvMesg,        26) // 27th instruction in osRecvMesg.
-#define ADDR_INSN_RCP_HANG         INSN_OFFSET_FROM_ADDR(alert_rcp_hung_up,  2) // 2nd instruction in alert_rcp_hung_up.
 #define ADDR_INSN_NULL_STRING      INSN_OFFSET_FROM_ADDR(strlen,             0) // 1st instruction in strlen.
 
 

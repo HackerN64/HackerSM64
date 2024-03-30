@@ -65,32 +65,10 @@ u32 cs_draw_assert(u32 line) {
     Address assertAddr = __assert_address;
     if (assertAddr == 0x00000000) {
         __OSThreadContext* tc = &gInspectThread->context;
-        assertAddr = GET_EPC(tc); // Will almost always be __n64Assert in this case.
+        assertAddr = GET_EPC(tc); // This will always be __n64Assert here, unless a new 'syscall' was added somewhere.
     }
-#ifdef INCLUDE_DEBUG_MAP
-    cs_print_addr_location_info(x, TEXT_Y(line++), maxNumChars, assertAddr, TRUE);
 
-    const MapSymbol* symbol = get_map_symbol(assertAddr, SYMBOL_SEARCH_BACKWARD);
-    if (
-        (symbol != NULL) && (
-            (symbol->addr == (Address)handle_dp_complete) ||
-            (symbol->addr == (Address)alert_rcp_hung_up)
-        )
-    )
-#else // !INCLUDE_DEBUG_MAP
-    if (assertAddr == ADDR_INSN_RCP_HANG) //! TODO: handle_dp_complete null SPTask.
-#endif // !INCLUDE_DEBUG_MAP
-    { //! TODO: Better way of checking for RCP crashes.
-        CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_CRASH_HEADER);
-        // RCP crash:
-        cs_print(x, TEXT_Y(line++), "DPC:\t"STR_COLOR_PREFIX STR_HEX_WORD" in ["STR_HEX_WORD"-"STR_HEX_WORD"]",
-            COLOR_RGBA32_WHITE, IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG)
-        );
-        cs_print(x, TEXT_Y(line++), "STATUS:\t"STR_COLOR_PREFIX"DPC:"STR_HEX_WORD" SP:"STR_HEX_WORD,
-            COLOR_RGBA32_WHITE, IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG)
-        );
-        CS_SET_DEFAULT_PRINT_COLOR_END();
-    }
+    cs_print_addr_location_info(x, TEXT_Y(line++), maxNumChars, assertAddr, TRUE);
 
     if (__n64Assert_Filename != NULL) {
         size_t charX = cs_print_scroll(x, TEXT_Y(line),
@@ -225,6 +203,7 @@ void page_summary_draw(void) {
     if ((cause == EXC_SYSCALL) && (tc->pc == ADDR_INSN_ASSERT)) { // Crash is an assert.
         crashType = CRASH_TYPE_ASSERT;
     } else {
+        // Read this data early to fill gSavedRegBuf.
         if (!try_read_word_aligned(&data, epc)) { // PC is at an invalid memory location.
             crashType = CRASH_TYPE_IPC;
         } else {
