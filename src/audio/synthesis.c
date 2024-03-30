@@ -1,6 +1,7 @@
 #ifndef VERSION_SH
 #include <ultra64.h>
 
+#include "sm64.h"
 #include "synthesis.h"
 #include "heap.h"
 #include "data.h"

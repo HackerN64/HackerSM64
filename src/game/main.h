@@ -127,6 +127,7 @@ typedef struct {
         IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG), \
         IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG), \
         IO_READ(SP_DMA_FULL_REG), IO_READ(SP_DMA_BUSY_REG)
+        //! TODO: Why does VSCode intellisense make the last 'IO_READ' yellow?
 
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
