@@ -78,7 +78,8 @@ void cs_popup_pages_input(void) {
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    gCSPageID = WRAP(((s32)gCSPageID + change), CS_FIRST_PAGE, (CS_NUM_PAGES - 1)); //! TODO: combine with normal L/R functionality
+    //! TODO: combine this with the normal L/R functionality.
+    gCSPageID = WRAP(((s32)gCSPageID + change), CS_FIRST_PAGE, (CS_NUM_PAGES - 1));
 
     if (gCSPageID != prevPage) {
         // Reset certain values when the page is changed.

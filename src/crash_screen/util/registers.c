@@ -438,7 +438,7 @@ void append_reg_to_buffer(enum Coprocessors cop, int idx, enum RegisterValueType
             .idx = idx,
             .valInfo = {
                 .type = type,
-                .dbl  = FALSE, //! TODO:
+                .dbl  = FALSE, //! TODO: implement this.
                 .out  = isOutput,
             },
         };

@@ -198,7 +198,6 @@ ALIGNED32 static const InsnTemplate insn_db_cop0_sub00[] = { // OPC_COP0, INSN_T
     {}, // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop0_sub10[] = { // OPC_COP0, INSN_TYPE_FUNC
-    //! TODO: Find out the proper format for these?
     //! TODO: These use the COP0 TLB Index register as the input/output.
     { .opcode = OPC_COP0_TLBP  , .name = "TLBP"   , .fmt = "\'"   , .out = 0, }, //  8: Searches for a TLB entry that matches the EntryHi register.
     { .opcode = OPC_COP0_TLBR  , .name = "TLBR"   , .fmt = "\'"   , .out = 0, }, //  1: Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
@@ -639,7 +638,8 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                         ADD_STR(STR_FUNCTION, get_insn_branch_target_from_addr(addr));
                     } else {
                         s16 branchOffset = (insn.offset + 1);
-                        ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset)); //! TODO: Is it possible to use the '%+' format specifier with the 0x prefix?
+                        //! TODO: Is it possible to use the '%+' format specifier with the 0x prefix?
+                        ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset));
                     }
                     break;
                 case CHAR_P_COP0D: // COP0 'RD' register.
@@ -704,7 +704,8 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
         unimpl = TRUE;
     }
 
-    if (unimpl) { //! TODO: binary mode for these.
+    if (unimpl) {
+        //! TODO: binary mode for these.
         ADD_STR((STR_HEX_WORD" (unimpl)"), insn.raw);
     }
 

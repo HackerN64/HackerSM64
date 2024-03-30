@@ -38,7 +38,7 @@ void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t
     _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
     const uint32_t val32 = (uint32_t)val64;
 
-    // //! TODO: Get high bits from odd float reg.
+    //! TODO: Get high bits from odd float reg.
     // if ((regId.cop == COP1) && ((regId.idx & 0x1) == 0)) {
     //     uint32_t cop1_oddbits = get_reg_val(COP1, (regId.idx + 1));
     //     if (cop1_oddbits != 0x00000000) {
@@ -99,7 +99,8 @@ _Bool cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
         [1] = "little",
     };
     cs_print(x, TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
-    cs_print(x, TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS); //! TODO: list this properly
+    //! TODO: list these two properly:
+    cs_print(x, TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS);
     cs_print(x, TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
     cs_print(x, TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%d-bit",   infoColor, (s.KX ? 64 : 32));
     cs_print(x, TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%d-bit", infoColor, (s.SX ? 64 : 32));

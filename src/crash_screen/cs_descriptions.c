@@ -273,7 +273,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
         _Bool inBranchDelaySlot = ((Reg_CP0_Cause)tc->cause).BD;
         Address epc = (pc + (inBranchDelaySlot ? sizeof(Word) : 0)); // GET_EPC(pc);
 
-        // Heuristics from libdragon (plus a few extras):
+        // Special crash heuristics, mostly from libdragon:
         switch (cause) {
             case EXC_INT: // Non-crash interrupts (can be shown after changing the inspected thread).
                 if (pc == ADDR_INSN_WAITING_FOR_MESG) {

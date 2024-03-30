@@ -92,7 +92,8 @@ ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
 ABOUT_ENTRY_FUNC(microcode,      gUcodeName)
 #ifdef LIBDRAGON
-ABOUT_ENTRY_FUNC(region,         "LIBDRAGON") //! TODO: Libdragon version
+//! TODO: Libdragon version:
+ABOUT_ENTRY_FUNC(region,         "LIBDRAGON")
 #else // !LIBDRAGON
 ABOUT_ENTRY_FUNC(region,         "%s (%s)", gRegionName, osTvTypeStrings[osTvType])
 #endif //! LIBDRAGON
@@ -153,7 +154,8 @@ ABOUT_ENTRY_FUNC(silhouette,     "opacity: %d", SILHOUETTE)
 #else // !SILHOUETTE
 ABOUT_ENTRY_FUNC(silhouette,     gValNames_no_yes[FALSE])
 #endif // !SILHOUETTE
-#if ENABLE_RUMBLE //! TODO: Update this when Input PR is merged.
+//! TODO: Update this to #ifdef when Input PR is merged.
+#if ENABLE_RUMBLE
 ABOUT_ENTRY_FUNC(rumble,         "%s%s", gValNames_no_yes[sRumblePakThreadActive], (sRumblePakActive ? " +pack" : ""))
 #else // !ENABLE_RUMBLE
 ABOUT_ENTRY_FUNC(rumble,         gValNames_no_yes[FALSE])

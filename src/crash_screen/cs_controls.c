@@ -172,6 +172,7 @@ _Bool cs_check_switch_page_input(void) {
 
     u16 buttonDown = gCSCompositeController->buttonDown;
     if ((buttonDown & (L_TRIG | R_TRIG)) == (L_TRIG | R_TRIG)) {
+        //! TODO: Find out why, when testing RCP hang by setting the limit to 30 usec, that when the crash screen opens, without any user input, this opens and the floats mode setting is changed.
         cs_open_popup(CS_POPUP_PAGES);
         return FALSE;
     }

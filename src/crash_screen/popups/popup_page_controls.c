@@ -52,7 +52,8 @@ void cs_popup_controls_draw(void) {
     osWritebackDCacheAll();
 }
 
-void cs_popup_controls_input(void) { //! TODO: Scrolling if list is too long.
+//! TODO: Scrolling if list of controls is too long.
+void cs_popup_controls_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & (A_BUTTON | B_BUTTON | START_BUTTON)) {

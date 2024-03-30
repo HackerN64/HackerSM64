@@ -66,7 +66,8 @@ typedef struct MemoryRegion {
     /*0x00*/ const Address addr; // The starting address of this region.
     /*0x04*/ const char* name;
     /*0x08*/ union {
-                struct PACKED { //! TODO: implement these:
+                struct PACKED {
+                    //! TODO: implement these:
                     /*0x08*/ const _Bool ro;     // Read only.
                     /*0x09*/ const _Bool wo;     // Write only.
                     /*0x0B*/ const _Bool align;  // Reads must be aligned.

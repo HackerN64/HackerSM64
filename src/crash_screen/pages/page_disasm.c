@@ -133,11 +133,7 @@ static Address insn_index_to_addr(Address startAddr, u16 insnIndex) {
 
 //! TODO: Version that checks for branches relative to viewport (overscan).
 // @returns whether to continue next frame.
-_Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
-    if (fname == NULL) {
-        return FALSE;
-    }
-
+_Bool disasm_fill_branch_buffer(Address funcAddr) {
     // Pick up where we left off.
     BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
 
@@ -168,7 +164,8 @@ _Bool disasm_fill_branch_buffer(const char* fname, Address funcAddr) {
 
         // Get the offset for the current function.
         InsnData insn = {
-            .raw = *(Word*)sBranchBufferCurrAddr, //! TODO: Is this an unsafe read?
+            //! TODO: Is this potentially an unsafe read?
+            .raw = *(Word*)sBranchBufferCurrAddr,
         };
         s16 branchOffset = insn_check_for_branch_offset(insn);
 
@@ -507,10 +504,6 @@ void page_disasm_input(void) {
 
         const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
         if (symbol != NULL) {
-            const char* fname = get_map_symbol_name(symbol);
-
-            //! TODO: fname null check.
-
             if (gFillBranchBuffer) {
                 gFillBranchBuffer = FALSE;
                 reset_branch_buffer(symbol->addr);
@@ -518,7 +511,7 @@ void page_disasm_input(void) {
             }
 
             if (sContinueFillBranchBuffer) {
-                sContinueFillBranchBuffer = disasm_fill_branch_buffer(fname, symbol->addr);
+                sContinueFillBranchBuffer = disasm_fill_branch_buffer(symbol->addr);
             }
         } else {
             gFillBranchBuffer = FALSE;
