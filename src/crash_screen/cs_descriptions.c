@@ -15,6 +15,7 @@
 
 #include "game/emutest.h"
 #include "game/version.h"
+#include "game/level_update.h"
 
 
 // Include the version number from VERSION.txt. Includes a newline at the end.
@@ -201,6 +202,32 @@ const char* get_thread_flags_str(OSThread* thread) {
     u16 flags = thread->flags;
     if (flags == 0x0000) return NULL;
     return sThreadFlagStrings[__builtin_ctz(flags)];
+}
+
+
+typedef struct WarpNodeSpecialId {
+    const enum WarpNodes id;
+    const char* name;
+} WarpNodeSpecialId;
+static WarpNodeSpecialId sWarpNodeSpecialIds[] = {
+    { .id = WARP_NODE_MAIN_ENTRY,    .name = "main entry",    },
+    { .id = WARP_NODE_DEFAULT,       .name = "default",       },
+    { .id = WARP_NODE_DEATH,         .name = "death",         },
+    { .id = WARP_NODE_LOOK_UP,       .name = "look up",       },
+    { .id = WARP_NODE_WARP_FLOOR,    .name = "warp floor",    },
+    { .id = WARP_NODE_CREDITS_MIN,   .name = "credits min",   },
+    { .id = WARP_NODE_CREDITS_START, .name = "credits start", },
+    { .id = WARP_NODE_CREDITS_NEXT,  .name = "credits next",  },
+    { .id = WARP_NODE_CREDITS_END,   .name = "credits end",   },
+};
+const char* get_warp_node_name(const enum WarpNodes id) {
+    for (size_t i = 0; i < ARRAY_COUNT(sWarpNodeSpecialIds); i++) {
+        if (id == sWarpNodeSpecialIds[i].id) {
+            return sWarpNodeSpecialIds[i].name;
+        }
+    }
+
+    return "";
 }
 
 
