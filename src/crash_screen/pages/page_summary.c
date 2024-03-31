@@ -235,8 +235,8 @@ void page_summary_draw(void) {
         cs_print_addr_location_info(TEXT_X(x), TEXT_Y(line++), maxNumChars, epc, TRUE);
         if (crashType == CRASH_TYPE_IPC) {
             cs_print(TEXT_X(x), TEXT_Y(line++),
-                STR_COLOR_PREFIX"Program counter at invalid memory location.",
-                COLOR_RGBA32_CRASH_DESCRIPTION_MAIN
+                STR_COLOR_PREFIX"Program counter at invalid memory location:\n"STR_COLOR_PREFIX"PC: %08X",
+                COLOR_RGBA32_CRASH_DESCRIPTION_MAIN, COLOR_RGBA32_WHITE, epc
             );
         } else {
             line = draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);

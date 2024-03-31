@@ -771,7 +771,7 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoLayoutStack[1] = 0;
 
     while (gGeoLayoutCommand != NULL) {
-        DEBUG_ASSERTF((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT), "Invalid or unloaded geo layout detected: 0x%02X", gGeoLayoutCommand[0x00]);
+        DEBUG_ASSERTF((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT), "Invalid or unloaded geo layout detected: 0x%02X\nin segment %d", gGeoLayoutCommand[0x00], ((u32)segptr >> 24));
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }
 

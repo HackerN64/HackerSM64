@@ -60,6 +60,7 @@ static void add_to_stack(FunctionInStack* func) {
 
 extern void __osCleanupThread(void);
 
+//! TODO: Use libdragon's method of walking the stack.
 void fill_function_stack_trace(void) {
     bzero(&sCSFunctionStackBuffer, sizeof(sCSFunctionStackBuffer));
     sCSNumFoundFunctions = 0;
