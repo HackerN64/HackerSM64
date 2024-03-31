@@ -61,6 +61,8 @@ const char* get_thread_name(OSThread* thread);
 const char* get_thread_state_str(OSThread* thread);
 const char* get_thread_flags_str(OSThread* thread);
 
+const char* get_segment_name(u8 segmentId);
+
 const char* get_processor_name(u8 imp);
 
 const char* get_cause_desc(__OSThreadContext* tc, _Bool specific);

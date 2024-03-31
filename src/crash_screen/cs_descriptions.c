@@ -204,6 +204,47 @@ const char* get_thread_flags_str(OSThread* thread) {
 }
 
 
+// -- SEGMENTS --
+
+static const char* sSegmentNames[32] = {
+    [SEGMENT_MAIN               ] = "main",
+    [SEGMENT_RENDER             ] = "render",
+    [SEGMENT_SEGMENT2           ] = "segment2",
+    [SEGMENT_COMMON1_YAY0       ] = "common1 yay0",
+    [SEGMENT_GROUP0_YAY0        ] = "group0 yay0",
+    [SEGMENT_GROUPA_YAY0        ] = "groupA yay0",
+    [SEGMENT_GROUPB_YAY0        ] = "groupB yay0",
+    [SEGMENT_LEVEL_DATA         ] = "level data",
+    [SEGMENT_COMMON0_YAY0       ] = "common0 yay0",
+    [SEGMENT_TEXTURE            ] = "texture",
+    [SEGMENT_SKYBOX             ] = "skybox",
+    [SEGMENT_EFFECT_YAY0        ] = "effect yay0",
+    [SEGMENT_GROUPA_GEO         ] = "groupA geo",
+    [SEGMENT_GROUPB_GEO         ] = "groupB geo",
+    [SEGMENT_LEVEL_SCRIPT       ] = "level script",
+    [SEGMENT_COMMON0_GEO        ] = "common0 geo",
+    [SEGMENT_LEVEL_ENTRY        ] = "level entry",
+    [SEGMENT_MARIO_ANIMS        ] = "mario anims",
+    [SEGMENT_UNKNOWN_18         ] = "18",
+    [SEGMENT_BEHAVIOR_DATA      ] = "behavior data",
+    [SEGMENT_MENU_INTRO         ] = "menu intro",
+    [SEGMENT_GLOBAL_LEVEL_SCRIPT] = "global level script",
+    [SEGMENT_COMMON1_GEO        ] = "common1 geo",
+    [SEGMENT_GROUP0_GEO         ] = "group0 geo",
+    [SEGMENT_DEMO_INPUTS        ] = "demo inputs",
+    [SEGMENT_EU_TRANSLATION     ] = "eu translation",
+    [SEGMENT_UNKNOWN_26         ] = "26",
+    [SEGMENT_UNKNOWN_27         ] = "27",
+    [SEGMENT_UNKNOWN_28         ] = "28",
+    [SEGMENT_UNKNOWN_29         ] = "29",
+    [SEGMENT_UNKNOWN_30         ] = "30",
+    [SEGMENT_UNKNOWN_31         ] = "31",
+};
+const char* get_segment_name(u8 segmentId) {
+    return ((segmentId < 32) ? sSegmentNames[segmentId] : NULL);
+}
+
+
 // -- PROCESSOR --
 
 typedef struct PRId_name {
