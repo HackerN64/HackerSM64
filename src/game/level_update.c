@@ -898,7 +898,7 @@ void initiate_delayed_warp(void) {
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
 
-                    DEBUG_ASSERTF((warpNode != NULL), "Source warp node doesn't exist.\n\nID: 0x%02X (%s)t.\nWarp op: %d", sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId), sDelayedWarpOp);
+                    DEBUG_ASSERTF((warpNode != NULL), "Source warp node doesn't exist.\n\nID: 0x%02X (%s).\nWarp op: %d", sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId), sDelayedWarpOp);
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);
