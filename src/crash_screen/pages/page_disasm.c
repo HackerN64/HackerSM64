@@ -302,18 +302,15 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
 #ifdef INCLUDE_DEBUG_MAP
             // Translucent divider between symbols.
             const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
-            if (symbol != NULL) {
-                //! TODO: Do this for the end of symbols too.
-                if (addr == symbol->addr) {
-                    cs_draw_divider_translucent(DIVIDER_Y(line + y));
-                    if (symbolHeaders) {
-                        //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
-                        size_t numChars = cs_print_symbol_name(charX, charY, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
-                        cs_print(charX + TEXT_WIDTH(numChars), charY, ":");
-                        y++;
-                        charY = TEXT_Y(line + y);
-                    }
-                }
+            if ((addr >= PAGE_DISASM_STEP) && (symbol != get_map_symbol((addr - PAGE_DISASM_STEP), SYMBOL_SEARCH_BINARY))) {
+                cs_draw_divider_translucent(DIVIDER_Y(line + y));
+            }
+            if (symbolHeaders && (symbol != NULL) && (addr == symbol->addr)) {
+                //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
+                size_t numChars = cs_print_symbol_name(charX, charY, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
+                cs_print(charX + TEXT_WIDTH(numChars), charY, ":");
+                y++;
+                charY = TEXT_Y(line + y);
             }
 #endif // INCLUDE_DEBUG_MAP
 

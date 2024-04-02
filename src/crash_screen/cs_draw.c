@@ -352,8 +352,8 @@ void cs_draw_scroll_bar_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 topY, CSScre
 
     if (drawBg) {
         // Draw the background scroll bar
-        const Alpha bgAlpha = (RGBA32_A(color) / 2);
-        cs_draw_rect(x, topY, 1, scrollableHeight, RGBA32_SET_ALPHA(color, bgAlpha));
+        cs_draw_rect(x, topY, 1, scrollableHeight, color);
+        cs_draw_dark_rect(x, topY, 1, scrollableHeight, CS_DARKEN_HALF);
     }
 
     CSScreenCoord_u32 bottomVisibleEntry = (topVisibleEntry + numVisibleEntries);

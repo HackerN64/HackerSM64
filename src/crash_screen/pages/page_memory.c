@@ -41,7 +41,10 @@ const char* gValNames_mem_disp_mode[] = {
 struct CSSetting cs_settings_group_page_memory[] = {
     [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MEMORY",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#ifdef INCLUDE_DEBUG_MAP
+    [CS_OPT_MEMORY_SYMBOL_DIVIDERS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show symbol dividers",           .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MEMORY_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+#endif // INCLUDE_DEBUG_MAP
     [CS_OPT_MEMORY_DISPLAY_MODE     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Display mode",                   .valNames = &gValNames_mem_disp_mode, .val = MEMORY_MODE_HEX,           .defaultVal = MEMORY_MODE_HEX,           .lowerBound = MEMORY_MODE_HEX,       .upperBound = MEMORY_MODE_RGBA32,         },
     [CS_OPT_END_MEMORY              ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -104,6 +107,13 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
         charX = (TEXT_X(SIZEOF_HEX(Word)) + 3);
         charY = TEXT_Y(line + y);
 
+        _Bool isColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
+        // if (!isColor) {
+        //     // RGBA32 highlightColor = is_in_code_segment(rowAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x3F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x3F);
+        //     RGBA32 highlightColor = is_in_code_segment(rowAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
+        //     cs_draw_rect(charX, (charY - 2), (TEXT_WIDTH(CRASH_SCREEN_NUM_CHARS_X - 9) + 5), TEXT_HEIGHT(1), highlightColor);
+        // }
+
         for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
             Word_4Bytes data = {
                 .word = 0x00000000,
@@ -124,7 +134,6 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
 
                 RGBA32 textColor = (((mode == MEMORY_MODE_ASCII) || (byteOffset % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
                 RGBA32 selectColor = COLOR_RGBA32_NONE;
-                _Bool isColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
 
                 if (currAddr == gSelectedAddress) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
@@ -133,6 +142,30 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
                 }
                 _Bool selected = (selectColor != COLOR_RGBA32_NONE);
+
+#ifdef INCLUDE_DEBUG_MAP
+
+                // Draw symbol separator lines:
+                if (currAddr >= sizeof(Byte)) {
+                    const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
+                    // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  is_in_code_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
+                    const RGBA32 dividerColor = is_in_code_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
+                    _Bool aligned0 = ((currAddr & (sizeof(Word) - 1)) == 0); // (byteOffset == 0);
+                    _Bool aligned3 = ((currAddr & (sizeof(Word) - 1)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
+                    // Prev byte:
+                    const MapSymbol *otherSymbol = get_map_symbol((currAddr - sizeof(Byte)), SYMBOL_SEARCH_BINARY);
+                    if (currSymbol != otherSymbol) {
+                        cs_draw_rect(((charX - 2) - aligned0), (charY - 2), 2, (TEXT_HEIGHT(1) + 1), dividerColor);
+                    }
+                    // Prev row:
+                    if (currAddr >= PAGE_MEMORY_STEP) {
+                        otherSymbol = get_map_symbol((currAddr - PAGE_MEMORY_STEP), SYMBOL_SEARCH_BINARY);
+                        if (currSymbol != otherSymbol) {
+                            cs_draw_rect(((charX - 2) - aligned0), (charY - 2), (TEXT_WIDTH(2) + 1 + aligned0 + aligned3), 1, dividerColor);
+                        }
+                    }
+                }
+#endif // INCLUDE_DEBUG_MAP
 
                 // If the display mode isn't a color, draw a solid box behind the data.
                 if (selected && !isColor) {
@@ -227,6 +260,8 @@ void page_memory_draw(void) {
         charX += (TEXT_WIDTH(2) + 1);
     }
 
+    ram_viewer_print_data((line + 1), startAddr);
+
     // Veertical divider
     cs_draw_rect((TEXT_X(SIZEOF_HEX(Address)) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(sRamViewNumShownRows + 1), COLOR_RGBA32_CRASH_DIVIDER);
 
@@ -236,8 +271,6 @@ void page_memory_draw(void) {
     line++;
 
     cs_draw_divider(DIVIDER_Y(line));
-
-    ram_viewer_print_data(line, startAddr);
 
     u32 line2 = (line + sRamViewNumShownRows);
 
