@@ -62,6 +62,7 @@ const char* get_thread_state_str(OSThread* thread);
 const char* get_thread_flags_str(OSThread* thread);
 
 const char* get_segment_name(u8 segmentId);
+const char* get_hardcoded_memory_str(Address addr);
 
 const char* get_processor_name(u8 imp);
 

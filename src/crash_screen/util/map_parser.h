@@ -109,6 +109,8 @@ extern const MapSymbol gMapSymbols[];
 extern const MapSymbol gMapSymbolsEnd[];
 extern const Byte gMapStrings[];
 extern const Byte gMapStringEnd[];
+extern const Byte _mapDataSegmentStart[];
+extern const Byte _mapDataSegmentEnd[];
 extern const Byte _mapDataSegmentRomStart[];
 extern const Byte _mapDataSegmentRomEnd[];
 

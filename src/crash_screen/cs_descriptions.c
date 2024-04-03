@@ -103,16 +103,24 @@ DEF_COMPRESSION_NAME(unk);
 #endif
 
 
+typedef struct IdNamePair {
+    /*0x00*/ const int id;
+    /*0x04*/ const char* name;
+} IdNamePair; /*0x08*/
+static const char* get_name_from_id_list(int id, const IdNamePair* list, size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        if (id == list[i].id) {
+            return list[i].name;
+        }
+    }
+
+    return NULL;
+}
+
+
 // -- THREAD --
 
-typedef struct ThreadName {
-    /*0x00*/ union {
-                /*0x00*/ OSId id;
-                /*0x00*/ OSPri pri;
-            };
-    /*0x04*/ const char* name;
-} ThreadName; /*0x08*/
-static const ThreadName sThreadIDNames[] = {
+static const IdNamePair sThreadIDNames[] = {
     { .id = THREAD_0,                   .name = "libultra?",        }, // Uses sThreadPriNames.
     { .id = THREAD_1_IDLE,              .name = "idle",             },
     { .id = THREAD_2,                   .name = "unused",           },
@@ -129,25 +137,14 @@ static const ThreadName sThreadIDNames[] = {
     { .id = THREAD_1001_CRASH_SCREEN_1, .name = "crash screen 1",   },
     { .id = THREAD_1002_CRASH_SCREEN_2, .name = "crash screen 2",   },
 };
-static const ThreadName sThreadPriNames[] = {
-    { .pri = OS_PRIORITY_SIMGR,         .name = "si manager", },
-    { .pri = 149,                       .name = "debug/usb?", }, //! TODO: Find out what this thread is. It only exists when running UNF.
-    { .pri = OS_PRIORITY_PIMGR,         .name = "pi manager", },
-    { .pri = OS_PRIORITY_VIMGR,         .name = "vi manager", },
-    { .pri = OS_PRIORITY_RMON,          .name = "rmon",       },
-    { .pri = OS_PRIORITY_RMONSPIN,      .name = "rmonspin",   },
+static const IdNamePair sThreadPriNames[] = {
+    { .id = OS_PRIORITY_SIMGR,          .name = "si manager", },
+    { .id = 149,                        .name = "debug/usb?", }, //! TODO: Find out what this thread is. It only exists when running UNF.
+    { .id = OS_PRIORITY_PIMGR,          .name = "pi manager", },
+    { .id = OS_PRIORITY_VIMGR,          .name = "vi manager", },
+    { .id = OS_PRIORITY_RMON,           .name = "rmon",       },
+    { .id = OS_PRIORITY_RMONSPIN,       .name = "rmonspin",   },
 };
-static const char* get_thread_name_from_list(int id, const ThreadName* list, size_t listSize) {
-    const ThreadName* threadName = &list[0];
-    for (size_t i = 0; i < listSize; i++) {
-        if (id == threadName->id) {
-            return threadName->name;
-        }
-        threadName++;
-    }
-
-    return NULL;
-}
 // Returns a thread name from 'sThreadIDNames'.
 const char* get_thread_name(OSThread* thread) {
     if (thread == NULL) {
@@ -159,13 +156,13 @@ const char* get_thread_name(OSThread* thread) {
 
     // Determine libultra threads on thread ID 0 by priority instead of ID:
     if ((id == THREAD_0) && (pri > OS_PRIORITY_APPMAX)) {
-        name = get_thread_name_from_list(pri, sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
+        name = get_name_from_id_list(pri, sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
         if (name != NULL) {
             return name;
         }
     }
 
-    name = get_thread_name_from_list(id, sThreadIDNames, ARRAY_COUNT(sThreadIDNames));
+    name = get_name_from_id_list(id,  sThreadIDNames, ARRAY_COUNT(sThreadIDNames));
     if (name != NULL) {
         return name;
     }
@@ -205,11 +202,9 @@ const char* get_thread_flags_str(OSThread* thread) {
 }
 
 
-typedef struct WarpNodeSpecialId {
-    const enum WarpNodes id;
-    const char* name;
-} WarpNodeSpecialId;
-static WarpNodeSpecialId sWarpNodeSpecialIds[] = {
+// -- WARP NODE PRESETS --
+
+static IdNamePair sWarpNodeSpecialIds[] = {
     { .id = WARP_NODE_MAIN_ENTRY,    .name = "main entry",    },
     { .id = WARP_NODE_DEFAULT,       .name = "default",       },
     { .id = WARP_NODE_DEATH,         .name = "death",         },
@@ -221,13 +216,8 @@ static WarpNodeSpecialId sWarpNodeSpecialIds[] = {
     { .id = WARP_NODE_CREDITS_END,   .name = "credits end",   },
 };
 const char* get_warp_node_name(const enum WarpNodes id) {
-    for (size_t i = 0; i < ARRAY_COUNT(sWarpNodeSpecialIds); i++) {
-        if (id == sWarpNodeSpecialIds[i].id) {
-            return sWarpNodeSpecialIds[i].name;
-        }
-    }
-
-    return "";
+    const char* ret = get_name_from_id_list(id, sWarpNodeSpecialIds, ARRAY_COUNT(sWarpNodeSpecialIds));
+    return ((ret != NULL) ? ret : "");
 }
 
 
@@ -237,15 +227,15 @@ static const char* sSegmentNames[32] = {
     [SEGMENT_MAIN               ] = "main",
     [SEGMENT_RENDER             ] = "render",
     [SEGMENT_SEGMENT2           ] = "segment2",
-    [SEGMENT_COMMON1_YAY0       ] = "common1 yay0",
-    [SEGMENT_GROUP0_YAY0        ] = "group0 yay0",
-    [SEGMENT_GROUPA_YAY0        ] = "groupA yay0",
-    [SEGMENT_GROUPB_YAY0        ] = "groupB yay0",
+    [SEGMENT_COMMON1_YAY0       ] = "common1 gfx",
+    [SEGMENT_GROUP0_YAY0        ] = "group0 gfx",
+    [SEGMENT_GROUPA_YAY0        ] = "groupA gfx",
+    [SEGMENT_GROUPB_YAY0        ] = "groupB gfx",
     [SEGMENT_LEVEL_DATA         ] = "level data",
-    [SEGMENT_COMMON0_YAY0       ] = "common0 yay0",
-    [SEGMENT_TEXTURE            ] = "texture",
+    [SEGMENT_COMMON0_YAY0       ] = "common0 gfx",
+    [SEGMENT_TEXTURE            ] = "textures",
     [SEGMENT_SKYBOX             ] = "skybox",
-    [SEGMENT_EFFECT_YAY0        ] = "effect yay0",
+    [SEGMENT_EFFECT_YAY0        ] = "effects",
     [SEGMENT_GROUPA_GEO         ] = "groupA geo",
     [SEGMENT_GROUPB_GEO         ] = "groupB geo",
     [SEGMENT_LEVEL_SCRIPT       ] = "level script",
@@ -253,13 +243,13 @@ static const char* sSegmentNames[32] = {
     [SEGMENT_LEVEL_ENTRY        ] = "level entry",
     [SEGMENT_MARIO_ANIMS        ] = "mario anims",
     [SEGMENT_UNKNOWN_18         ] = "18",
-    [SEGMENT_BEHAVIOR_DATA      ] = "behavior data",
-    [SEGMENT_MENU_INTRO         ] = "menu intro",
+    [SEGMENT_BEHAVIOR_DATA      ] = "bhv data",
+    [SEGMENT_MENU_INTRO         ] = "menu",
     [SEGMENT_GLOBAL_LEVEL_SCRIPT] = "global level script",
     [SEGMENT_COMMON1_GEO        ] = "common1 geo",
     [SEGMENT_GROUP0_GEO         ] = "group0 geo",
     [SEGMENT_DEMO_INPUTS        ] = "demo inputs",
-    [SEGMENT_EU_TRANSLATION     ] = "eu translation",
+    [SEGMENT_EU_TRANSLATION     ] = "translations",
     [SEGMENT_UNKNOWN_26         ] = "26",
     [SEGMENT_UNKNOWN_27         ] = "27",
     [SEGMENT_UNKNOWN_28         ] = "28",
@@ -268,27 +258,106 @@ static const char* sSegmentNames[32] = {
     [SEGMENT_UNKNOWN_31         ] = "31",
 };
 const char* get_segment_name(u8 segmentId) {
-    return ((segmentId < 32) ? sSegmentNames[segmentId] : NULL);
+    return ((segmentId < ARRAY_COUNT(sSegmentNames)) ? sSegmentNames[segmentId] : NULL);
+}
+
+
+// -- RAM POOLS --
+
+#include "game/game_init.h"
+#include "engine/surface_load.h"
+
+extern u32 sPoolFreeSpace;
+extern u8 *sPoolStart;
+extern u8 *sPoolEnd;
+
+
+struct HardcodedSegmentRange {
+    const char* name;
+    // Address of pointer?
+    Address start;
+    Address end;
+} sHardcodedSegmentRanges[] = {
+    { .name = "MAIN SEG",     .start = (Address)_mainSegmentStart,            .end = (Address)_mainSegmentEnd,            },
+    { .name = "ENGINE SEG",   .start = (Address)_engineSegmentStart,          .end = (Address)_engineSegmentEnd,          },
+    { .name = "GODDARD",      .start = (Address)_goddardSegmentStart,         .end = (Address)_goddardSegmentEnd,         },
+    { .name = "FRAMEBUFFERS", .start = (Address)_framebuffersSegmentBssStart, .end = (Address)_framebuffersSegmentBssEnd, },
+    { .name = "ZBUFFER",      .start = (Address)_zbufferSegmentBssStart,      .end = (Address)_zbufferSegmentBssEnd,      },
+    { .name = "BUFFERS",      .start = (Address)_buffersSegmentBssStart,      .end = (Address)_buffersSegmentBssEnd,      },
+};
+
+// For stuff that doesn't have a map symbol name.
+const char* get_hardcoded_memory_str(Address addr) {
+    // Is addr in static surface pool?
+    if (
+        (addr >= (Address)gCurrStaticSurfacePool) &&
+        (addr < (Address)gCurrStaticSurfacePoolEnd)
+    ) {
+        return "STATIC SURF POOL";
+    }
+
+    // Is addr in dynamic surface pool?
+    if (addr >= (Address)gDynamicSurfacePool) {
+        if (addr < (Address)gDynamicSurfacePoolEnd) {
+            return "DYNAMIC SURF POOL (ACTIVE)";
+        } else if (addr < (Address)((Byte*)gCurrStaticSurfacePool + DYNAMIC_SURFACE_POOL_SIZE)) {
+            return "DYNAMIC SURF POOL (UNUSED)";
+        }
+    }
+
+#ifdef INCLUDE_DEBUG_MAP
+    // Is addr in map symbol data?
+    if ((gNumMapSymbols != 0) /* Map data was loaded. */ && (addr >= (Address)_mapDataSegmentStart)) {
+        if (addr < (Address)((Byte*)_mapDataSegmentStart + ((gMapSymbolsEnd - gMapSymbols) * sizeof(MapSymbol)))) {
+            return "MAP SYMBOLS (DATA)";
+        } else if (addr < (Address)_mapDataSegmentEnd) {
+            return "MAP SYMBOLS (STRINGS)";
+        }
+    }
+#else // !INCLUDE_DEBUG_MAP
+    // Inportant sections that had a map symbol:
+
+    // Is addr in GFX pool?
+    if (addr >= (Address)gGfxPool->buffer) {
+        if (addr < (Address)gDisplayListHead) {
+            return "GFX POOL (USED)";
+        } else if (addr < (Address)gGfxPoolEnd) {
+            return "GFX POOL (ALLOCATED)";
+        } else if (addr < (Address)((Byte*)gGfxPool->buffer + GFX_POOL_SIZE)) {
+            return "GFX POOL (UNUSED)";
+        }
+    }
+
+//     //! TODO: audio heap, thread stacks, SPTasks, save buffer both gGfxPools
+#endif // !INCLUDE_DEBUG_MAP
+
+    for (int i = 0; i < ARRAY_COUNT(sHardcodedSegmentRanges); i++) {
+        if ((addr >= sHardcodedSegmentRanges[i].start) && (addr < sHardcodedSegmentRanges[i].end)) {
+            return sHardcodedSegmentRanges[i].name;
+        }
+    }
+
+    if (addr >= (Address)sPoolStart) {
+        if (addr < ((Address)sPoolEnd - sPoolFreeSpace)) {
+            return "MAIN POOL (USED)";
+        }
+        if (addr < (Address)sPoolEnd) {
+            return "MAIN POOL (UNUSED)";
+        }
+    }
+
+    return NULL;
 }
 
 
 // -- PROCESSOR --
 
-typedef struct PRId_name {
-    /*0x00*/ const u8 Imp;
-    /*0x01*/ const char name[7];
-} PRId_name; /*0x08*/
-const PRId_name sPRId_names[] = {
-    { .Imp = 0x0B, .name = "vr4300", },
+const IdNamePair sPRId_names[] = {
+    { .id = 0x0B, .name = "vr4300", },
 };
 const char* get_processor_name(u8 imp) {
-    for (int i = 0; i < ARRAY_COUNT(sPRId_names); i++) {
-        if (imp == sPRId_names[i].Imp) {
-            return sPRId_names[i].name;
-        }
-    }
-
-    return "unknown";
+    const char* ret = get_name_from_id_list(imp, sPRId_names, ARRAY_COUNT(sPRId_names));
+    return ((ret != NULL) ? ret : "unknown");
 }
 
 
@@ -477,59 +546,37 @@ const char* get_fpcsr_desc(u32 fpcsr, _Bool specific) {
 
 // -- EMULATOR --
 
-typedef struct EmulatorName {
-    /*0x00*/ const enum Emulator bits;
-    /*0x04*/ const char* name;
-} EmulatorName; /*0x08*/
-#define EMULATOR_STRING(_bits, _name)  { .bits = _bits, .name = _name, }
-static const EmulatorName sEmulatorStrings[] = {
-    { .bits = EMU_WIIVC,            .name = "Wii VC",           },
-    { .bits = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
-    { .bits = EMU_PROJECT64_3,      .name = "pj64 3",           },
-    { .bits = EMU_PROJECT64_4,      .name = "pj64 4",           },
-    { .bits = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
-    { .bits = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
-    { .bits = EMU_CEN64,            .name = "cen64",            },
-    { .bits = EMU_SIMPLE64,         .name = "simple64",         },
-    { .bits = EMU_PARALLELN64,      .name = "ParaLLEl N64",     },
-    { .bits = EMU_ARES,             .name = "ares",             },
-    { .bits = EMU_CONSOLE,          .name = "CONSOLE",          },
+static const IdNamePair sEmulatorStrings[] = {
+    { .id = EMU_WIIVC,            .name = "Wii VC",           },
+    { .id = EMU_PROJECT64_1_OR_2, .name = "pj64 1 or 2",      },
+    { .id = EMU_PROJECT64_3,      .name = "pj64 3",           },
+    { .id = EMU_PROJECT64_4,      .name = "pj64 4",           },
+    { .id = EMU_MUPEN_OLD,        .name = "mupen (old)",      },
+    { .id = EMU_MUPEN64PLUS_NEXT, .name = "mupen64plus-next", },
+    { .id = EMU_CEN64,            .name = "cen64",            },
+    { .id = EMU_SIMPLE64,         .name = "simple64",         },
+    { .id = EMU_PARALLELN64,      .name = "ParaLLEl N64",     },
+    { .id = EMU_ARES,             .name = "ares",             },
+    { .id = EMU_CONSOLE,          .name = "CONSOLE",          },
 };
 const char* get_emulator_name(enum Emulator emu) {
-    for (int i = 0; i < ARRAY_COUNT(sEmulatorStrings); i++) {
-        if (emu == sEmulatorStrings[i].bits) {
-            return sEmulatorStrings[i].name;
-        }
-    }
-
-    return NULL;
+    return get_name_from_id_list(emu, sEmulatorStrings, ARRAY_COUNT(sEmulatorStrings));
 }
 
 
 // -- MAP SYMBOL --
 
-typedef struct MapSymbolType {
-    /*0x00*/ char c;
-    /*0x01*/ u8 pad[3];
-    /*0x04*/ const char* desc;
-} MapSymbolType; /*0x08*/
-static const MapSymbolType sMapSymbolTypes[] = {
-    { .c = 'a', .desc = "absolute (static)", },
-    { .c = 'A', .desc = "absolute",          },
-    { .c = 'b', .desc = ".bss (static)",     },
-    { .c = 'B', .desc = ".bss",              },
-    { .c = 'd', .desc = ".data (static)",    },
-    { .c = 'D', .desc = ".data",             },
-    { .c = 't', .desc = ".text (static)",    },
-    { .c = 'T', .desc = ".text",             },
-    { .c = 'W', .desc = "weak (untagged)",   },
+static const IdNamePair sMapSymbolTypes[] = {
+    { .id = 'a', .name = "absolute (static)", },
+    { .id = 'A', .name = "absolute",          },
+    { .id = 'b', .name = ".bss (static)",     },
+    { .id = 'B', .name = ".bss",              },
+    { .id = 'd', .name = ".data (static)",    },
+    { .id = 'D', .name = ".data",             },
+    { .id = 't', .name = ".text (static)",    },
+    { .id = 'T', .name = ".text",             },
+    { .id = 'W', .name = "weak (untagged)",   },
 };
 const char* get_map_symbol_type_desc(char c) {
-    for (int i = 0; i < ARRAY_COUNT(sMapSymbolTypes); i++) {
-        if (c == sMapSymbolTypes[i].c) {
-            return sMapSymbolTypes[i].desc;
-        }
-    }
-
-    return NULL;
+    return get_name_from_id_list(c, sMapSymbolTypes, ARRAY_COUNT(sMapSymbolTypes));
 }

@@ -467,12 +467,19 @@ size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32
     }
 #endif // INCLUDE_DEBUG_MAP
     if (sureAddress) {
-        const char* memStr = get_memory_string_from_addr(addr);
+        const char* memStr = get_hardcoded_memory_str(addr);
         if (memStr != NULL) {
-            return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_GRAY, memStr);
+            return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_LIGHT_GRAY, memStr);
+        } else {
+            memStr = get_memory_string_from_addr(addr);
+            if (memStr != NULL) {
+                return cs_print_scroll(x, y, maxWidth, STR_COLOR_PREFIX"%s", COLOR_RGBA32_GRAY, memStr);
+            } else {
+                return cs_print_symbol_unknown(x, y);
+            }
         }
     }
-    // cs_print_symbol_unknown(x, y);
+
     return 0;
 }
 

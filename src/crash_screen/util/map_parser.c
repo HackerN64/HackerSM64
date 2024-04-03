@@ -98,7 +98,7 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
         return NULL;
     }
 
-    return (const char*)((u32)gMapStrings + symbol->name_offset);
+    return (const char*)((Address)gMapStrings + symbol->name_offset);
 }
 
 /**
