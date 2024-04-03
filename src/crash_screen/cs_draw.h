@@ -116,6 +116,14 @@ extern struct CSScissorBox gCSScissorBox;
 
 void cs_set_scissor_box(CSScreenCoord_s32 x1, CSScreenCoord_s32 y1, CSScreenCoord_s32 x2, CSScreenCoord_s32 y2);
 void cs_reset_scissor_box(void);
+
+#define CS_SCISSOR_BOX_START(x, y, w, h) \
+    CSScissorBox __tempScissorBox = gCSScissorBox; \
+    cs_set_scissor_box((x), (y), (w), (h));
+
+#define CS_SCISSOR_BOX_END() \
+    gCSScissorBox = __tempScissorBox;
+
 void cs_draw_dark_rect(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, u32 darken);
 void cs_draw_rect(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color);
 void cs_draw_outline(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color);

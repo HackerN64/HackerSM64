@@ -144,7 +144,6 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
                 _Bool selected = (selectColor != COLOR_RGBA32_NONE);
 
 #ifdef INCLUDE_DEBUG_MAP
-
                 // Draw symbol separator lines:
                 if (currAddr >= sizeof(Byte)) {
                     const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
@@ -156,6 +155,9 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
                     const MapSymbol *otherSymbol = get_map_symbol((currAddr - sizeof(Byte)), SYMBOL_SEARCH_BINARY);
                     if (currSymbol != otherSymbol) {
                         cs_draw_rect(((charX - 2) - aligned0), (charY - 2), 2, (TEXT_HEIGHT(1) + 1), dividerColor);
+                        if ((y != 0) && (wordOffset == 0) && aligned0) {
+                            cs_draw_rect((CRASH_SCREEN_X2 - 2), ((charY - TEXT_HEIGHT(1)) - 2), 1, (TEXT_HEIGHT(1) + 1), dividerColor);
+                        }
                     }
                     // Prev row:
                     if (currAddr >= PAGE_MEMORY_STEP) {
@@ -332,7 +334,12 @@ void page_memory_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
-        open_address_select(gSelectedAddress);
+        Word dataAtAddr = 0x00000000;
+        if (try_read_word_aligned(&dataAtAddr, gSelectedAddress) && is_valid_ram_addr(dataAtAddr)) {
+            open_address_select(dataAtAddr);
+        } else {
+            open_address_select(gSelectedAddress);
+        }
     }
 
     if (buttonPressed & B_BUTTON) {

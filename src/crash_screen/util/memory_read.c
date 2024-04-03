@@ -415,6 +415,11 @@ _Bool try_read_doubleword(Doubleword* dest, Address addr) {
     return FALSE;
 }
 
+_Bool is_valid_ram_addr(Address addr) {
+    Word data = 0x00000000;
+    return ((addr >= RAM_START) && (addr < RAM_END) && try_read_word_aligned(&data, addr));
+}
+
 /**
  * @brief Return TRUE if the specified address is unmapped in 64-bit kernel space.
  */

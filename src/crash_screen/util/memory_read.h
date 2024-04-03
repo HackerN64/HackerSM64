@@ -86,4 +86,5 @@ _Bool try_read_byte(Byte* dest, Address addr);
 _Bool try_read_halfword(Halfword* dest, Address addr);
 _Bool try_read_word(Word* dest, Address addr);
 _Bool try_read_doubleword(Doubleword* dest, Address addr);
+_Bool is_valid_ram_addr(Address addr);
 _Bool is_unmapped_kx64(uint64_t vaddr);

@@ -198,9 +198,7 @@ void cs_draw_diamond(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScree
 
 // Draws a diamond then crops it using gCSScissorBox so that it looks like a triangle.
 void cs_draw_triangle(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScreenCoord_s32 w, CSScreenCoord_s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
-    CSScissorBox temp = gCSScissorBox;
-
-    cs_set_scissor_box(startX, startY, (startX + w), (startY + h));
+    CS_SCISSOR_BOX_START(startX, startY, (startX + w), (startY + h));
 
     switch (direction) {
         case CS_TRI_DOWN:
@@ -219,7 +217,7 @@ void cs_draw_triangle(CSScreenCoord_s32 startX, CSScreenCoord_s32 startY, CSScre
 
     cs_draw_diamond(startX, startY, w, h, color);
 
-    gCSScissorBox = temp;
+    CS_SCISSOR_BOX_END();
 }
 
 // // Draws a line between any two points.
@@ -327,6 +325,7 @@ void cs_reset_framebuffer(_Bool drawBackground) {
 
 // Cycle through the 3 framebuffers.
 //! TODO: Instant input?
+//! TODO: Fix flickering on emulators.
 void cs_update_framebuffer(void) {
     osWritebackDCacheAll();
 
