@@ -94,19 +94,19 @@ ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
     { .opcode = OPC_SWR        , .name = "SWR"    , .fmt = "\'to(", .out = 0, }, // 46: Store Word Right.
     { .opcode = OPC_CACHE      , .name = "CACHE"  , .fmt = "\'to(", .out = 0, }, // 47: https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
     { .opcode = OPC_LL         , .name = "LL"     , .fmt = "\'to(", .out = 1, }, // 48: Load Linked Word.
-    { .opcode = OPC_LWC1       , .name = "LWC1"   , .fmt = "\'To(", .out = 0, }, // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
-    { .opcode = OPC_LWC2       , .name = "LWC2"   , .fmt = "\'To(", .out = 0, }, // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .opcode = OPC_LWC3       , .name = "LWC3"   , .fmt = "\'To(", .out = 0, }, // 51: Load Word to Coprocessor-3 (COP3).
+    { .opcode = OPC_LWC1       , .name = "LWC1"   , .fmt = "\'To(", .out = 0, .f1 = 0, .f2 = 1, .f2i = 1, }, // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_LWC2       , .name = "LWC2"   , .fmt = "\'to(", .out = 0, }, // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .opcode = OPC_LWC3       , .name = "LWC3"   , .fmt = "\'to(", .out = 0, }, // 51: Load Word to Coprocessor-3 (COP3).
     { .opcode = OPC_LLD        , .name = "LLD"    , .fmt = "\'to(", .out = 1, }, // 52: Load Linked Doubleword.
-    { .opcode = OPC_LDC1       , .name = "LDC1"   , .fmt = "\'to(", .out = 1, }, // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_LDC1       , .name = "LDC1"   , .fmt = "\'To(", .out = 1, .f1 = 0, .f2 = 1, .f2i = 1, }, // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
     { .opcode = OPC_LDC2       , .name = "LDC2"   , .fmt = "\'to(", .out = 1, }, // 54: Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
     { .opcode = OPC_LD         , .name = "LD"     , .fmt = "\'to(", .out = 1, }, // 55: Load Doubleword.
     { .opcode = OPC_SC         , .name = "SC"     , .fmt = "\'to(", .out = 0, }, // 56: Store Conditional Word.
-    { .opcode = OPC_SWC1       , .name = "SWC1"   , .fmt = "\'To(", .out = 0, }, // 57: Store Word to Coprocessor-1 (Floating-Point Unit).
-    { .opcode = OPC_SWC2       , .name = "SWC2"   , .fmt = "\'To(", .out = 0, }, // 58: Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    { .opcode = OPC_SWC3       , .name = "SWC3"   , .fmt = "\'To(", .out = 0, }, // 59: Store Word to Coprocessor-3 (COP3).
+    { .opcode = OPC_SWC1       , .name = "SWC1"   , .fmt = "\'To(", .out = 0, .f1 = 0, .f2 = 1, .f2i = 1, }, // 57: Store Word to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_SWC2       , .name = "SWC2"   , .fmt = "\'to(", .out = 0, }, // 58: Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    { .opcode = OPC_SWC3       , .name = "SWC3"   , .fmt = "\'to(", .out = 0, }, // 59: Store Word to Coprocessor-3 (COP3).
     { .opcode = OPC_SCD        , .name = "SCD"    , .fmt = "\'to(", .out = 0, }, // 60: Store Conditional Doubleword.
-    { .opcode = OPC_SDC1       , .name = "SDC1"   , .fmt = "\'to(", .out = 0, }, // 61: Store Doubleword to Coprocessor-1 (Floating-Point Unit).
+    { .opcode = OPC_SDC1       , .name = "SDC1"   , .fmt = "\'To(", .out = 0, .f1 = 0, .f2 = 1, .f2i = 1, }, // 61: Store Doubleword to Coprocessor-1 (Floating-Point Unit).
     { .opcode = OPC_SDC2       , .name = "SDC2"   , .fmt = "\'to(", .out = 0, }, // 62: Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
     { .opcode = OPC_SD         , .name = "SD"     , .fmt = "\'to(", .out = 0, }, // 63: Store Doubleword.
     {}, // NULL terminator.
