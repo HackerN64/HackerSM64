@@ -107,7 +107,7 @@ typedef struct IdNamePair {
     /*0x00*/ const int id;
     /*0x04*/ const char* name;
 } IdNamePair; /*0x08*/
-static const char* get_name_from_id_list(int id, const IdNamePair* list, size_t count) {
+static const char* get_name_from_id_list_impl(int id, const IdNamePair* list, size_t count) {
     for (size_t i = 0; i < count; i++) {
         if (id == list[i].id) {
             return list[i].name;
@@ -116,6 +116,23 @@ static const char* get_name_from_id_list(int id, const IdNamePair* list, size_t 
 
     return NULL;
 }
+#define get_name_from_id_list(_id, _list) get_name_from_id_list_impl((_id), (_list), ARRAY_COUNT(_list))
+
+typedef struct RangeNamePair {
+    /*0x00*/ const u32 start;
+    /*0x04*/ const u32 end;
+    /*0x08*/ const char* name;
+} RangeNamePair; /*0x0C*/
+static const char* get_name_from_range_list_impl(u32 id, const RangeNamePair* list, size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        if ((id >= list[i].start) && (id < list[i].end)) {
+            return list[i].name;
+        }
+    }
+
+    return NULL;
+}
+#define get_name_from_range_list(_id, _list) get_name_from_range_list_impl((_id), (_list), ARRAY_COUNT(_list))
 
 
 // -- THREAD --
@@ -156,13 +173,13 @@ const char* get_thread_name(OSThread* thread) {
 
     // Determine libultra threads on thread ID 0 by priority instead of ID:
     if ((id == THREAD_0) && (pri > OS_PRIORITY_APPMAX)) {
-        name = get_name_from_id_list(pri, sThreadPriNames, ARRAY_COUNT(sThreadPriNames));
+        name = get_name_from_id_list(pri, sThreadPriNames);
         if (name != NULL) {
             return name;
         }
     }
 
-    name = get_name_from_id_list(id,  sThreadIDNames, ARRAY_COUNT(sThreadIDNames));
+    name = get_name_from_id_list(id, sThreadIDNames);
     if (name != NULL) {
         return name;
     }
@@ -216,7 +233,7 @@ static IdNamePair sWarpNodeSpecialIds[] = {
     { .id = WARP_NODE_CREDITS_END,   .name = "credits end",   },
 };
 const char* get_warp_node_name(const enum WarpNodes id) {
-    const char* ret = get_name_from_id_list(id, sWarpNodeSpecialIds, ARRAY_COUNT(sWarpNodeSpecialIds));
+    const char* ret = get_name_from_id_list(id, sWarpNodeSpecialIds);
     return ((ret != NULL) ? ret : "");
 }
 
@@ -272,18 +289,13 @@ extern u8 *sPoolStart;
 extern u8 *sPoolEnd;
 
 
-struct HardcodedSegmentRange {
-    const char* name;
-    // Address of pointer?
-    Address start;
-    Address end;
-} sHardcodedSegmentRanges[] = {
-    { .name = "MAIN SEG",     .start = (Address)_mainSegmentStart,            .end = (Address)_mainSegmentEnd,            },
-    { .name = "ENGINE SEG",   .start = (Address)_engineSegmentStart,          .end = (Address)_engineSegmentEnd,          },
-    { .name = "GODDARD",      .start = (Address)_goddardSegmentStart,         .end = (Address)_goddardSegmentEnd,         },
-    { .name = "FRAMEBUFFERS", .start = (Address)_framebuffersSegmentBssStart, .end = (Address)_framebuffersSegmentBssEnd, },
-    { .name = "ZBUFFER",      .start = (Address)_zbufferSegmentBssStart,      .end = (Address)_zbufferSegmentBssEnd,      },
-    { .name = "BUFFERS",      .start = (Address)_buffersSegmentBssStart,      .end = (Address)_buffersSegmentBssEnd,      },
+static const RangeNamePair sHardcodedSegmentRanges[] = {
+    { .start = (Address)_mainSegmentStart,            .end = (Address)_mainSegmentEnd,            .name = "MAIN SEG",     },
+    { .start = (Address)_engineSegmentStart,          .end = (Address)_engineSegmentEnd,          .name = "ENGINE SEG",   },
+    { .start = (Address)_goddardSegmentStart,         .end = (Address)_goddardSegmentEnd,         .name = "GODDARD",      },
+    { .start = (Address)_framebuffersSegmentBssStart, .end = (Address)_framebuffersSegmentBssEnd, .name = "FRAMEBUFFERS", },
+    { .start = (Address)_zbufferSegmentBssStart,      .end = (Address)_zbufferSegmentBssEnd,      .name = "ZBUFFER",      },
+    { .start = (Address)_buffersSegmentBssStart,      .end = (Address)_buffersSegmentBssEnd,      .name = "BUFFERS",      },
 };
 
 // For stuff that doesn't have a map symbol name.
@@ -307,7 +319,7 @@ const char* get_hardcoded_memory_str(Address addr) {
 
 #ifdef INCLUDE_DEBUG_MAP
     // Is addr in map symbol data?
-    if ((gNumMapSymbols != 0) /* Map data was loaded. */ && (addr >= (Address)_mapDataSegmentStart)) {
+    if ((gNumMapSymbols != 0) /* Check whether the map data was loaded. */ && (addr >= (Address)_mapDataSegmentStart)) {
         if (addr < (Address)((Byte*)_mapDataSegmentStart + ((gMapSymbolsEnd - gMapSymbols) * sizeof(MapSymbol)))) {
             return "MAP SYMBOLS (DATA)";
         } else if (addr < (Address)_mapDataSegmentEnd) {
@@ -328,13 +340,12 @@ const char* get_hardcoded_memory_str(Address addr) {
         }
     }
 
-//     //! TODO: audio heap, thread stacks, SPTasks, save buffer both gGfxPools
+    //! TODO: audio heap, thread stacks, SPTasks, save buffer, both gGfxPools.
 #endif // !INCLUDE_DEBUG_MAP
 
-    for (int i = 0; i < ARRAY_COUNT(sHardcodedSegmentRanges); i++) {
-        if ((addr >= sHardcodedSegmentRanges[i].start) && (addr < sHardcodedSegmentRanges[i].end)) {
-            return sHardcodedSegmentRanges[i].name;
-        }
+    const char* hardcodedSegmentStr = get_name_from_range_list(addr, sHardcodedSegmentRanges);
+    if (hardcodedSegmentStr != NULL) {
+        return hardcodedSegmentStr;
     }
 
     if (addr >= (Address)sPoolStart) {
@@ -352,11 +363,12 @@ const char* get_hardcoded_memory_str(Address addr) {
 
 // -- PROCESSOR --
 
+// https://en.wikichip.org/wiki/mips/prid_register
 const IdNamePair sPRId_names[] = {
     { .id = 0x0B, .name = "vr4300", },
 };
 const char* get_processor_name(u8 imp) {
-    const char* ret = get_name_from_id_list(imp, sPRId_names, ARRAY_COUNT(sPRId_names));
+    const char* ret = get_name_from_id_list(imp, sPRId_names);
     return ((ret != NULL) ? ret : "unknown");
 }
 
@@ -384,8 +396,8 @@ static const char* sCauseDesc[NUM_CAUSE_DESC] = {
     [CAUSE_DESC_VCED   ] = "Virtual coherency on data",
 };
 _Bool check_for_empty_infinite_loop(Address pc, _Bool inBranchDelaySlot) {
-    InsnData insn = { .raw = 0, };
-    InsnData prev = { .raw = 0, };
+    InsnData insn = { .raw = 0x00000000, };
+    InsnData prev = { .raw = 0x00000000, };
     _Bool insnValid = try_read_word_aligned(&insn.raw, pc);
     #define INSN_IS_B_0(_insn) (((_insn).opcode == OPC_BEQ) && ((_insn).rs == (_insn).rt) && ((_insn).offset == (u16)-1))
     return (
@@ -560,23 +572,27 @@ static const IdNamePair sEmulatorStrings[] = {
     { .id = EMU_CONSOLE,          .name = "CONSOLE",          },
 };
 const char* get_emulator_name(enum Emulator emu) {
-    return get_name_from_id_list(emu, sEmulatorStrings, ARRAY_COUNT(sEmulatorStrings));
+    return get_name_from_id_list(emu, sEmulatorStrings);
 }
 
 
 // -- MAP SYMBOL --
 
+// https://sourceware.org/binutils/docs/binutils/nm.html
 static const IdNamePair sMapSymbolTypes[] = {
-    { .id = 'a', .name = "absolute (static)", },
-    { .id = 'A', .name = "absolute",          },
-    { .id = 'b', .name = ".bss (static)",     },
-    { .id = 'B', .name = ".bss",              },
-    { .id = 'd', .name = ".data (static)",    },
-    { .id = 'D', .name = ".data",             },
-    { .id = 't', .name = ".text (static)",    },
-    { .id = 'T', .name = ".text",             },
+    { .id = 'a', .name = "absolute (static)", }, // Local absolute symbol.
+    { .id = 'A', .name = "absolute",          }, // Global absolute symbol.
+    { .id = 'b', .name = ".bss (static)",     }, // Local bss symbol.
+    { .id = 'B', .name = ".bss",              }, // Global bss symbol.
+    { .id = 'd', .name = ".data (static)",    }, // Local data symbol.
+    { .id = 'D', .name = ".data",             }, // Global data symbol.
+    { .id = 'r', .name = ".rodata (static)",  }, // Local read only symbol.
+    { .id = 'R', .name = ".rodata",           }, // Global read only symbol.
+    { .id = 't', .name = ".text (static)",    }, // Local text symbol.
+    { .id = 'T', .name = ".text",             }, // Global text symbol.
     { .id = 'W', .name = "weak (untagged)",   },
+    { .id = 'U', .name = "undefined",         }, // Undefined symbol.
 };
 const char* get_map_symbol_type_desc(char c) {
-    return get_name_from_id_list(c, sMapSymbolTypes, ARRAY_COUNT(sMapSymbolTypes));
+    return get_name_from_id_list(c, sMapSymbolTypes);
 }

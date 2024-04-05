@@ -74,7 +74,7 @@ void map_data_init(void) {
  * @param[in] addr Address to check.
  * @return _Bool Whether the address is in a .text segment.
  */
-_Bool is_in_code_segment(Address addr) {
+_Bool addr_is_in_text_segment(Address addr) {
     for (int i = 0; i < ARRAY_COUNT(sTextRegions); i++) {
         if ((addr >= sTextRegions[i].start) && addr < (sTextRegions[i].end)) {
             return TRUE;
@@ -82,6 +82,16 @@ _Bool is_in_code_segment(Address addr) {
     }
 
     return FALSE;
+}
+
+/**
+ * @brief Check whether a symbol is marked as a .text segment.
+ *
+ * @param[in] symbol Map symbol to check.
+ * @return _Bool Whether the symbol is marked as a .text segment.
+ */
+_Bool symbol_is_text(const MapSymbol* symbol) {
+    return ((symbol->type == 't') || (symbol->type == 'T'));
 }
 
 /**

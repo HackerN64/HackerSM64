@@ -11,7 +11,7 @@
 
 
 // Coprocessors.
-enum Coprocessors {
+enum PACKED Coprocessors {
     CPU = -1,
     COP0, // Coprocessor-0 (System Control Coprocessor).
     COP1, // Coprocessor-1 (Floating-Point Unit).
@@ -163,7 +163,7 @@ typedef struct RegisterInfo {
 
 typedef struct CoprocessorInfo {
     const char* name;
-    uint64_t (*getRegValFunc)(int idx);
+    Doubleword (*getRegValFunc)(int idx);
     const RegisterInfo* (*getRegInfoFunc)(int idx);
     const char** regDescList;
 } CoprocessorInfo;
@@ -235,9 +235,9 @@ extern int gSavedRegBufSize;
 const char* get_coprocessor_name(enum Coprocessors cop);
 
 const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx);
-uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread);
-uint64_t get_direct_reg_val(enum Coprocessors cop, int idx);
-uint64_t get_reg_val(enum Coprocessors cop, int idx);
+Doubleword get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread);
+Doubleword get_direct_reg_val(enum Coprocessors cop, int idx);
+Doubleword get_reg_val(enum Coprocessors cop, int idx);
 const char* get_reg_desc(enum Coprocessors cop, int idx);
 
 void clear_saved_reg_buffer(void);
@@ -246,10 +246,10 @@ void append_reg_to_buffer(enum Coprocessors cop, int idx, enum RegisterValueType
 enum FloatErrorType validate_f32(IEEE754_f32 val);
 enum FloatErrorType validate_f64(IEEE754_f64 val);
 
-ALWAYS_INLINE static f32 f32_from_word(u32 x) {
+ALWAYS_INLINE static f32 f32_from_word(Word x) {
     return ((IEEE754_f32){ .asU32 = x, }).asF32;
 }
 
-ALWAYS_INLINE static f64 f64_from_doubleword(u64 x) {
+ALWAYS_INLINE static f64 f64_from_doubleword(Doubleword x) {
     return ((IEEE754_f64){ .asU64 = x, }).asF64;
 }

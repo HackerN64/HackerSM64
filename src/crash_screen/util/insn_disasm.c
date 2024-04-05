@@ -443,7 +443,7 @@ s16 insn_check_for_branch_offset(InsnData insn) {
  * @return Address The target address of the instruction. 'addr' if there is no branch instruction.
  */
 Address get_insn_branch_target_from_addr(Address addr) {
-    if (!is_in_code_segment(addr)) {
+    if (!addr_is_in_text_segment(addr)) {
         return addr;
     }
 
@@ -674,7 +674,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
 #ifdef INCLUDE_DEBUG_MAP
-                    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && is_in_code_segment(target)) {
+                    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && addr_is_in_text_segment(target)) {
                         const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
                         if (symbol != NULL) {
                             *fname = get_map_symbol_name(symbol);

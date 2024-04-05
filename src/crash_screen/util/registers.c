@@ -49,8 +49,8 @@ const RegisterInfo* get_cpu_reg_info(int idx) {
     return &sRegisters_CPU[idx];
 }
 #define CASE_CPU_REG(_idx, _reg) CASE_REG(CPU, _idx, _reg)
-uint64_t get_cpu_reg_val(int idx) {
-    int val = 0;
+Doubleword get_cpu_reg_val(int idx) {
+    Word val = 0;
     switch (idx) {
         CASE_CPU_REG(REG_CPU_R0, zero);
         //! TODO: Directly accessing $at requires ".set noat".
@@ -146,8 +146,8 @@ const RegisterInfo* get_cp0_reg_info(int idx) {
     return &sRegisters_CP0[idx];
 }
 #define CASE_CP0_REG(_idx, _reg) CASE_REG(COP0, _idx, _reg)
-uint64_t get_cp0_reg_val(int idx) {
-    int val = 0;
+Doubleword get_cp0_reg_val(int idx) {
+    Word val = 0;
     switch (idx) {
         CASE_CP0_REG(REG_CP0_INX,       C0_INX      );
         CASE_CP0_REG(REG_CP0_RAND,      C0_RAND     );
@@ -223,8 +223,8 @@ const RegisterInfo* get_cp1_reg_info(int idx) {
     return &sRegisters_CP1[idx];
 }
 #define CASE_CP1_REG(_idx, _reg) CASE_REG(COP1, _idx, _reg)
-uint64_t get_cp1_reg_val(int idx) {
-    int val = 0;
+Doubleword get_cp1_reg_val(int idx) {
+    Word val = 0;
     switch (idx) {
         // Subroutine return values:
         CASE_CP1_REG(REG_CP1_F00, f0 ); CASE_CP1_REG(REG_CP1_F01, f1 );
@@ -296,8 +296,8 @@ const RegisterInfo* get_fcr_reg_info(int idx) {
 
     return &sRegisters_FCR[idx];
 }
-uint64_t get_fcr_reg_val(int idx) {
-    int val = 0;
+Doubleword get_fcr_reg_val(int idx) {
+    Word val = 0;
     switch (idx) {
         case REG_FCR_IMPL_REV:       ASM_GET_REG_FCR(val,  "$0"); break;
         case REG_FCR_CONTROL_STATUS: ASM_GET_REG_FCR(val, "$31"); break;
@@ -331,8 +331,8 @@ ALIGNED32 static const RegisterInfo sRegisters_SPECIAL[] = {
 const RegisterInfo* get_special_reg_info(int idx) {
     return &sRegisters_SPECIAL[idx];
 }
-uint64_t get_special_reg_val(int idx) {
-    int val = 0;
+Doubleword get_special_reg_val(int idx) {
+    Word val = 0;
     switch (idx) {
         case REG_SPC_LO:    asm volatile("mflo %0":"=r"(val):); break;
         case REG_SPC_HI:    asm volatile("mfhi %0":"=r"(val):); break;
@@ -375,7 +375,7 @@ const RegisterInfo* get_reg_info(enum Coprocessors cop, int idx) {
     return sCoprocessorInfos[cop + 1]->getRegInfoFunc(idx);
 }
 
-uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
+Doubleword get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
     const RegisterInfo* info = get_reg_info(cop, idx);
 
     if (info == NULL) {
@@ -385,7 +385,7 @@ uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
     __OSThreadContext* tc = &thread->context;
     Address addr = ((Address)tc + info->offset);
 
-    if (info->size == sizeof(uint64_t)) {
+    if (info->size == sizeof(Doubleword)) {
         Doubleword data = 0;
         if (try_read_doubleword_aligned(&data, addr)) {
             return data;
@@ -400,11 +400,11 @@ uint64_t get_thread_reg_val(enum Coprocessors cop, int idx, OSThread* thread) {
     return 0;
 }
 
-uint64_t get_direct_reg_val(enum Coprocessors cop, int idx) {
+Doubleword get_direct_reg_val(enum Coprocessors cop, int idx) {
     return sCoprocessorInfos[cop + 1]->getRegValFunc(idx);
 }
 
-uint64_t get_reg_val(enum Coprocessors cop, int idx) {
+Doubleword get_reg_val(enum Coprocessors cop, int idx) {
     const RegisterInfo* info = get_reg_info(cop, idx);
 
     if ((info != NULL) && (info->offset != OSTHREAD_NULL_OFFSET)) { // If register exists in __OSThreadContext, use the data from the crashed thread.

@@ -33,23 +33,23 @@ typedef struct AddressPair {
     /*0x04*/ const Address end;
 } AddressPair; /*0x08*/
 
-#define EXTERN_TEXT_SYMBOL(name, side) \
-extern const Byte _##name##SegmentText##side[];
+#define EXTERN_TEXT_SYMBOL(_name, _side) \
+extern const Byte _##_name##SegmentText##_side[];
 
-#define EXTERN_TEXT_REGION(name) \
-EXTERN_TEXT_SYMBOL(name, Start) \
-EXTERN_TEXT_SYMBOL(name, End)
+#define EXTERN_TEXT_REGION(_name) \
+EXTERN_TEXT_SYMBOL(_name, Start) \
+EXTERN_TEXT_SYMBOL(_name, End)
 
 
-#define EXTERN_SEGMENT_TEXT(name) \
-EXTERN_TEXT_REGION(name)
+#define EXTERN_SEGMENT_TEXT(_name) \
+EXTERN_TEXT_REGION(_name)
 
-#define EXTERN_GROUP_TEXT(name) \
-EXTERN_TEXT_REGION(name##_geo)
+#define EXTERN_GROUP_TEXT(_name) \
+EXTERN_TEXT_REGION(_name##_geo)
 
-#define EXTERN_LEVEL_TEXT(name) \
-EXTERN_TEXT_REGION(name##script) \
-EXTERN_TEXT_REGION(name##geo)
+#define EXTERN_LEVEL_TEXT(_name) \
+EXTERN_TEXT_REGION(_name##script) \
+EXTERN_TEXT_REGION(_name##geo)
 
 EXTERN_SEGMENT_TEXT(boot)
 EXTERN_SEGMENT_TEXT(main)
@@ -88,21 +88,21 @@ EXTERN_GROUP_TEXT(common1)
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
-#define MEMORY_REGION(start, end) \
-    { (const Address)(start), (const Address)(end) },
+#define MEMORY_REGION(_start, _end) \
+    { .start = (const Address)(_start), .end = (const Address)(_end) },
 
-#define TEXT_REGION(name) \
-    MEMORY_REGION(_##name##SegmentTextStart, _##name##SegmentTextEnd)
+#define TEXT_REGION(_name) \
+    MEMORY_REGION(_##_name##SegmentTextStart, _##_name##SegmentTextEnd)
 
-#define TEXT_REGION_SEGMENT(name) \
-    TEXT_REGION(name)
+#define TEXT_REGION_SEGMENT(_name) \
+    TEXT_REGION(_name)
 
-#define TEXT_REGION_GROUP(name) \
-    TEXT_REGION(name##_geo)
+#define TEXT_REGION_GROUP(_name) \
+    TEXT_REGION(_name##_geo)
 
-#define TEXT_REGION_LEVEL(name) \
-    TEXT_REGION(name##script) \
-    TEXT_REGION(name##geo)
+#define TEXT_REGION_LEVEL(_name) \
+    TEXT_REGION(_name##script) \
+    TEXT_REGION(_name##geo)
 
 
 extern const MapSymbol gMapSymbols[];
@@ -119,7 +119,8 @@ extern size_t gNumMapSymbols;
 
 
 void map_data_init(void);
-_Bool is_in_code_segment(Address addr);
+_Bool addr_is_in_text_segment(Address addr);
+_Bool symbol_is_text(const MapSymbol* symbol);
 const char* get_map_symbol_name(const MapSymbol* symbol);
 _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol);
 s32 get_symbol_index_from_addr_forward(Address addr);

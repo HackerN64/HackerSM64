@@ -9,9 +9,9 @@
 
 
 // Maximum number of chars to print at once.
-#define CHAR_BUFFER_SIZE 256
-#define CS_PRINT_BUFFER_SIZE 128
-#define CS_SCROLL_BUFFER_SIZE CRASH_SCREEN_NUM_CHARS_X
+#define CHAR_BUFFER_SIZE        256
+#define CS_PRINT_BUFFER_SIZE    128
+#define CS_SCROLL_BUFFER_SIZE   CRASH_SCREEN_NUM_CHARS_X
 
 // Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2
@@ -43,16 +43,23 @@
 #define CHAR_LOWERCASE_HEX_END      'f'
 
 // Alphanumeric check macros:
-#define IS_NUMERIC(c)           ((c) >= CHAR_NUMERIC_START       && (c) <= CHAR_NUMERIC_END      )
+#define IS_NUMERIC(_c)          ((_c) >= CHAR_NUMERIC_START       && (_c) <= CHAR_NUMERIC_END      )
 
-#define IS_UPPERCASE(c)         ((c) >= CHAR_UPPERCASE_START     && (c) <= CHAR_UPPERCASE_END    )
-#define IS_LOWERCASE(c)         ((c) >= CHAR_LOWERCASE_START     && (c) <= CHAR_LOWERCASE_END    )
+#define IS_UPPERCASE(_c)        ((_c) >= CHAR_UPPERCASE_START     && (_c) <= CHAR_UPPERCASE_END    )
+#define IS_LOWERCASE(_c)        ((_c) >= CHAR_LOWERCASE_START     && (_c) <= CHAR_LOWERCASE_END    )
 
-#define IS_UPPERCASE_HEX(c)     ((c) >= CHAR_UPPERCASE_HEX_START && (c) <= CHAR_UPPERCASE_HEX_END)
-#define IS_LOWERCASE_HEX(c)     ((c) >= CHAR_LOWERCASE_HEX_START && (c) <= CHAR_LOWERCASE_HEX_END)
+#define IS_UPPERCASE_HEX(_c)    ((_c) >= CHAR_UPPERCASE_HEX_START && (_c) <= CHAR_UPPERCASE_HEX_END)
+#define IS_LOWERCASE_HEX(_c)    ((_c) >= CHAR_LOWERCASE_HEX_START && (_c) <= CHAR_LOWERCASE_HEX_END)
 
-#define IS_ALPHANUMERIC(c)      (IS_NUMERIC(c) || IS_UPPERCASE(c)     || IS_LOWERCASE(c)    )
-#define IS_ALPHANUMERIC_HEX(c)  (IS_NUMERIC(c) || IS_UPPERCASE_HEX(c) || IS_LOWERCASE_HEX(c))
+#define IS_ALPHANUMERIC(_c)     (IS_NUMERIC(_c) || IS_UPPERCASE(_c)     || IS_LOWERCASE(_c)    )
+#define IS_ALPHANUMERIC_HEX(_c) (IS_NUMERIC(_c) || IS_UPPERCASE_HEX(_c) || IS_LOWERCASE_HEX(_c))
+
+// Alphanumeric conversion macros:
+
+// #define TO_UPPERCASE(_c) if (IS_LOWERCASE(_c)) { (_c) = (((_c) - CHAR_LOWERCASE_START) + CHAR_UPPERCASE_START); }
+// #define TO_LOWERCASE(_c) if (IS_UPPERCASE(_c)) { (_c) = (((_c) - CHAR_UPPERCASE_START) + CHAR_LOWERCASE_START); }
+#define TO_UPPERCASE(_c) if (IS_LOWERCASE(_c)) { (_c) = ((_c) - (CHAR_LOWERCASE_START - CHAR_UPPERCASE_START)); }
+#define TO_LOWERCASE(_c) if (IS_UPPERCASE(_c)) { (_c) = ((_c) + (CHAR_LOWERCASE_START - CHAR_UPPERCASE_START)); }
 
 // Preset strings:
 #define STR_HEX_PREFIX      "0x"
@@ -93,7 +100,7 @@ extern RGBA32 gCSDefaultPrintColor;
 // Output:
 extern u32 gCSNumLinesPrinted;
 
-size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
+size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 
 //! TODO: Change these to ALWAYS_INLINE functions for proper syntax highlighting (is this possible with variable args?).
 #define cs_print_scroll(_x, _y, _charLimit, _fmt, ...) cs_print_impl((_x), (_y), (_charLimit), (_fmt), ##__VA_ARGS__)
@@ -116,8 +123,8 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
 #define cs_print_color(_x, _y, _color, _fmt, ...) cs_print_color_scroll((_x), (_y), 0, (_color), (_fmt), ##__VA_ARGS__)
 
 
-size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
-size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress);
+size_t cs_print_symbol_name(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown);
+size_t cs_print_addr_location_info(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress);
 
 
 typedef struct FloatErrorPrintFormat {
@@ -128,7 +135,7 @@ typedef struct FloatErrorPrintFormat {
     /*0x04*/ char* suffix;
 } FloatErrorPrintFormat; /*0x08*/
 
-size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
+size_t cs_print_f32(ScreenCoord_u32 x, ScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix);
 
 int sprintf_int_with_commas(char* buf, int n);
-size_t print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color);
+size_t print_data_as_binary(const ScreenCoord_u32 x, const ScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color);

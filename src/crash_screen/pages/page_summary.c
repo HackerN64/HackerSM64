@@ -57,10 +57,10 @@ extern void alert_rcp_hung_up(void);
 
 // Draw the assert info.
 //! TODO: Scrollable long asserts.
-u32 cs_draw_assert(u32 line) {
-    u32 x = TEXT_X(1);
-    size_t maxNumChars = (CRASH_SCREEN_NUM_CHARS_X - 2);
-    u32 charX = 0;
+CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
+    ScreenCoord_u32 x = TEXT_X(1);
+    CSTextCoord_u32 maxNumChars = (CRASH_SCREEN_NUM_CHARS_X - 2);
+    CSTextCoord_u32 charX = 0;
 
     Address assertAddr = __assert_address;
     if (assertAddr == 0x00000000) {
@@ -71,7 +71,7 @@ u32 cs_draw_assert(u32 line) {
     cs_print_addr_location_info(x, TEXT_Y(line++), maxNumChars, assertAddr, TRUE);
 
     if (__n64Assert_Filename != NULL) {
-        size_t charX = cs_print_scroll(x, TEXT_Y(line),
+        charX = cs_print_scroll(x, TEXT_Y(line),
             (maxNumChars - STRLEN("(line 0000)")),
             STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename
@@ -113,7 +113,7 @@ u32 cs_draw_assert(u32 line) {
     return line;
 }
 
-void cs_draw_register_info_long(u32 charX, u32 line, RegisterId reg, size_t maxNumChars, _Bool showAddrIfPtr) {
+void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, RegisterId reg, CSTextCoord_u32 maxNumChars, _Bool showAddrIfPtr) {
     CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_WHITE);
     const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
     Word data = get_reg_val(reg.cop, reg.idx);
@@ -142,23 +142,23 @@ enum CrashTypes {
     CRASH_TYPE_II,
 };
 
-void draw_centered_title_text(u32 line, const char* text) {
-    const s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
-    size_t len = strlen(text);
+void draw_centered_title_text(CSTextCoord_u32 line, const char* text) {
+    const CSTextCoord_s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
+    CSTextCoord_u32 len = strlen(text);
     cs_print(TEXT_X(centerX - (len / 2)), TEXT_Y(line), (STR_COLOR_PREFIX"%s"), COLOR_RGBA32_RED, text);
 }
 
 
-// CRASH DESCRIPTION
-u32 draw_crash_cause_section(u32 line, RGBA32 descColor) {
-    u32 x = 1;
+// Crash description:
+CSTextCoord_u32 draw_crash_cause_section(CSTextCoord_u32 line, RGBA32 descColor) {
+    CSTextCoord_u32 x = 1;
     __OSThreadContext* tc = &gInspectThread->context;
     u32 cause = (tc->cause & CAUSE_EXCMASK);
 
     // First part of crash description:
     const char* desc = get_cause_desc(tc, TRUE);
     if (desc != NULL) {
-        size_t charX = 0;
+        CSTextCoord_u32 charX = 0;
         charX += cs_print(
             TEXT_X(x), TEXT_Y(line), (STR_COLOR_PREFIX"%s"),
             descColor, desc
@@ -209,22 +209,22 @@ void page_summary_draw(void) {
         } else {
             // Calculate this early so the register buffer can be checked.
             insnAsStr = cs_insn_to_string(epc, (InsnData)data, &destFname, TRUE);
-            if ((cause == EXC_II) || !is_in_code_segment(epc)) { // PC is an invalid instruction.
+            if ((cause == EXC_II) || !addr_is_in_text_segment(epc)) { // PC is an invalid instruction.
                 crashType = CRASH_TYPE_II;
             }
         }
     }
 
-    u32 line = 2;
+    CSTextCoord_u32 line = 2;
     draw_centered_title_text(line, ((crashType == CRASH_TYPE_ASSERT) ? "ASSERT:" : "CRASH:"));
     line += 2;
 
-    size_t x = 1;
-    size_t maxNumChars = (CRASH_SCREEN_NUM_CHARS_X - 2);
+    CSTextCoord_u32 x = 1;
+    CSTextCoord_u32 maxNumChars = (CRASH_SCREEN_NUM_CHARS_X - 2);
 
     // -- THREAD --
     CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_CRASH_THREAD_NAME);
-    size_t charX = cs_print(TEXT_X(x), TEXT_Y(line), "in ");
+    CSTextCoord_u32 charX = cs_print(TEXT_X(x), TEXT_Y(line), "in ");
     cs_print_thread_info_line_1((TEXT_X(x) + TEXT_WIDTH(charX)), TEXT_Y(line++), maxNumChars, gInspectThread, FALSE);
     CS_SET_DEFAULT_PRINT_COLOR_END();
 
@@ -261,7 +261,7 @@ void page_summary_draw(void) {
     //     cs_print(TEXT_X(0), TEXT_Y(line++), "LAST SELECTED: %08X", gLastCSSelectedAddress);
     // }
 
-    u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
+    CSTextCoord_u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
     cs_draw_divider(DIVIDER_Y(endLine));
     cs_print(TEXT_X(0), TEXT_Y(endLine),
         STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls",

@@ -223,7 +223,7 @@ ABOUT_ENTRY_FUNC(rhdc,           "%s", libpl_get_my_rhdc_username());
 
 
 // Extra long string buffer for long entries to save space in sAboutEntries.
-char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][LONG_INFO_BUFFER_LENGTH];
+char gLongInfoBuffer[NUM_LONG_INFO_BUFFERS][LONG_INFO_BUFFER_SIZE];
 
 
 #define ABOUT_ENTRY_GAP()                      { .desc = "",    .func = NULL,                   .info = "", .type = CS_ABOUT_ENTRY_TYPE_NONE,       }
@@ -432,12 +432,12 @@ void page_about_init(void) {
     update_displayed_about_entries();
 }
 
-void cs_print_about_entry(u32 y, s16 groupID, s16 entryID) {
+void cs_print_about_entry(ScreenCoord_u32 y, s16 groupID, s16 entryID) {
     CSAboutEntry* entry = get_about_entry(groupID, entryID);
     if (entry == NULL) {
         return;
     }
-    const u32 section_indent = STRLEN("> ");
+    const CSTextCoord_u32 section_indent = STRLEN("> ");
     RGBA32 tempDefaultColor = gCSDefaultPrintColor;
 
     switch (entry->type) {
@@ -515,10 +515,10 @@ void cs_print_about_entry(u32 y, s16 groupID, s16 entryID) {
 }
 
 void page_about_draw(void) {
-    u32 line = 1;
+    CSTextCoord_u32 line = 1;
     u32 currViewIndex = sAboutViewportIndex;
 
-    for (u32 i = 0; i < ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES; i++, currViewIndex++) {
+    for (CSTextCoord_u32 i = 0; i < ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES; i++, currViewIndex++) {
         if (currViewIndex >= sNumCSAboutDisplayedEntries) {
             break;
         }
@@ -527,7 +527,7 @@ void page_about_draw(void) {
         s16 groupID = display->groupID;
         s16 entryID = display->entryID;
 
-        u32 y = TEXT_Y(line + i);
+        ScreenCoord_u32 y = TEXT_Y(line + i);
 
         if (currViewIndex == sAboutSelectedIndex) {
             cs_draw_row_selection_box(y);

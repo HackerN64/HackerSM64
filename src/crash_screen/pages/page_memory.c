@@ -85,11 +85,11 @@ void cs_memory_draw_byte() {
 
 }
 
-void ram_viewer_print_data(u32 line, Address startAddr) {
+void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
     const enum MemoryDisplayModes mode = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE);
     __OSThreadContext* tc = &gInspectThread->context;
-    CSScreenCoord_u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
-    CSScreenCoord_u32 charY = TEXT_Y(line);
+    ScreenCoord_u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
+    ScreenCoord_u32 charY = TEXT_Y(line);
 
 #ifdef UNF
     bzero(&sMemoryViewData, sizeof(sMemoryViewData));
@@ -109,8 +109,8 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
 
         _Bool isColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
         // if (!isColor) {
-        //     // RGBA32 highlightColor = is_in_code_segment(rowAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x3F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x3F);
-        //     RGBA32 highlightColor = is_in_code_segment(rowAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
+        //     // RGBA32 highlightColor = addr_is_in_text_segment(rowAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x3F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x3F);
+        //     RGBA32 highlightColor = addr_is_in_text_segment(rowAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
         //     cs_draw_rect(charX, (charY - 2), (TEXT_WIDTH(CRASH_SCREEN_NUM_CHARS_X - 9) + 5), TEXT_HEIGHT(1), highlightColor);
         // }
 
@@ -147,8 +147,8 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
                 // Draw symbol separator lines:
                 if (currAddr >= sizeof(Byte)) {
                     const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
-                    // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  is_in_code_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
-                    const RGBA32 dividerColor = is_in_code_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
+                    // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  addr_is_in_text_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
+                    const RGBA32 dividerColor = addr_is_in_text_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
                     _Bool aligned0 = ((currAddr & (sizeof(Word) - 1)) == 0); // (byteOffset == 0);
                     _Bool aligned3 = ((currAddr & (sizeof(Word) - 1)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
                     // Prev byte:
@@ -185,7 +185,7 @@ void ram_viewer_print_data(u32 line, Address startAddr) {
                             cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, byte, textColor);
                             break;
                         case MEMORY_MODE_BINARY:;
-                            CSScreenCoord_u32 bitX = 0;
+                            ScreenCoord_u32 bitX = 0;
                             for (Byte bit = 0; bit < BITS_PER_BYTE; bit++) {
                                 RGBA32 color = (((byte >> ((BITS_PER_BYTE - 1) - bit)) & 0b1) ? COLOR_RGBA32_LIGHT_GRAY : COLOR_RGBA32_DARK_GRAY);
                                 cs_draw_rect((charX + bitX), charY, 1, CRASH_SCREEN_FONT_CHAR_HEIGHT, color);
@@ -225,7 +225,7 @@ void page_memory_draw(void) {
     const _Bool showCurrentSymbol = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SHOW_SYMBOL);
     sRamViewNumShownRows -= showCurrentSymbol;
 
-    u32 line = 1;
+    CSTextCoord_u32 line = 1;
 
     Address startAddr = sRamViewViewportIndex;
     Address endAddr = (startAddr + ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP));
@@ -248,7 +248,7 @@ void page_memory_draw(void) {
         cs_draw_divider(DIVIDER_Y(line));
     }
 
-    u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
+    ScreenCoord_u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
 
     // Print column headers:
     for (u32 i = 0; i < (4 * sizeof(Word)); i++) {
@@ -274,12 +274,12 @@ void page_memory_draw(void) {
 
     cs_draw_divider(DIVIDER_Y(line));
 
-    u32 line2 = (line + sRamViewNumShownRows);
+    CSTextCoord_u32 line2 = (line + sRamViewNumShownRows);
 
     cs_draw_divider(DIVIDER_Y(line2));
 
-    u32 scrollTop = (DIVIDER_Y(line) + 1);
-    u32 scrollBottom = DIVIDER_Y(line2);
+    ScreenCoord_u32 scrollTop = (DIVIDER_Y(line) + 1);
+    ScreenCoord_u32 scrollBottom = DIVIDER_Y(line2);
 
     const size_t shownSection = ((sRamViewNumShownRows - 1) * PAGE_MEMORY_STEP);
 

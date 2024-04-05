@@ -23,10 +23,10 @@ static s8 sAddressSelectCharIndex = 7;
 
 // Address select draw function.
 void cs_address_select_draw(void) {
-    const CSScreenCoord_s32 bgStartX = (JUMP_MENU_X1 - JUMP_MENU_MARGIN_X);
-    const CSScreenCoord_s32 bgStartY = (JUMP_MENU_Y1 - JUMP_MENU_MARGIN_Y);
-    const CSScreenCoord_s32 bgW = (JUMP_MENU_W + (JUMP_MENU_MARGIN_X * 2));
-    const CSScreenCoord_s32 bgH = (JUMP_MENU_H + (JUMP_MENU_MARGIN_Y * 2));
+    const ScreenCoord_s32 bgStartX = (JUMP_MENU_X1 - JUMP_MENU_MARGIN_X);
+    const ScreenCoord_s32 bgStartY = (JUMP_MENU_Y1 - JUMP_MENU_MARGIN_Y);
+    const ScreenCoord_s32 bgW = (JUMP_MENU_W + (JUMP_MENU_MARGIN_X * 2));
+    const ScreenCoord_s32 bgH = (JUMP_MENU_H + (JUMP_MENU_MARGIN_Y * 2));
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
@@ -40,8 +40,8 @@ void cs_address_select_draw(void) {
     Word data = 0;
     _Bool isValid = try_read_word_aligned(&data, addr);
 
-    CSScreenCoord_u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
-    CSScreenCoord_u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
+    ScreenCoord_u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
+    ScreenCoord_u32 addressStartY = (JUMP_MENU_Y1 + TEXT_HEIGHT(2));
     // "[XXXXXXXX]"
     cs_print(
         addressStartX, addressStartY,
@@ -49,8 +49,8 @@ void cs_address_select_draw(void) {
         (isValid ? COLOR_RGBA32_CRASH_YES : COLOR_RGBA32_CRASH_NO), addr
     );
 
-    CSScreenCoord_u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
-    CSScreenCoord_u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
+    ScreenCoord_u32 triangleStartX = ((addressStartX + (sAddressSelectCharIndex * TEXT_WIDTH(1))) - 1);
+    ScreenCoord_u32 triangleStartY = ((addressStartY - TEXT_HEIGHT(1)) + CRASH_SCREEN_CHAR_SPACING_Y);
     // Up arrow:
     cs_draw_triangle(
         triangleStartX, triangleStartY,
@@ -113,7 +113,7 @@ void cs_address_select_input(void) {
                 cs_set_page(CS_PAGE_DISASM);
                 break;
             case CS_PAGE_REGISTERS:
-                if (is_in_code_segment(sAddressSelectTarget)) {
+                if (addr_is_in_text_segment(sAddressSelectTarget)) {
                     cs_set_page(CS_PAGE_DISASM);
                 } else {
                     cs_set_page(CS_PAGE_MEMORY);
@@ -129,7 +129,7 @@ void cs_address_select_input(void) {
                 s32 targetIndex = get_symbol_index_from_addr_backward(sAddressSelectTarget);
                 if (targetIndex != -1) {
                     if (sMapViewerSelectedIndex == (u32)targetIndex) {
-                        if (is_in_code_segment(gMapSymbols[targetIndex].addr)) {
+                        if (addr_is_in_text_segment(gMapSymbols[targetIndex].addr)) {
                             cs_set_page(CS_PAGE_DISASM);
                         } else {
                             cs_set_page(CS_PAGE_MEMORY);

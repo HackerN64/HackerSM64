@@ -58,7 +58,7 @@ void page_map_init(void) {
     sMapViewerViewportIndex = cs_clamp_view_to_selection(sMapViewerViewportIndex, sMapViewerSelectedIndex, MAP_VIEWER_NUM_ROWS, 1);
 }
 
-void map_viewer_print_entries(u32 line, u32 numLines) {
+void map_viewer_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     _Bool showAddresses = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
     _Bool showTypes     = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES    );
     _Bool showSizes     = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES    );
@@ -66,7 +66,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
     // Print.
-    for (u32 i = 0; i < numLines; i++) {
+    for (CSTextCoord_u32 i = 0; i < numLines; i++) {
         if (currIndex >= gNumMapSymbols) {
             break;
         }
@@ -75,24 +75,24 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             break;
         }
 
-        u32 y = TEXT_Y(line + i);
+        ScreenCoord_u32 y = TEXT_Y(line + i);
 
         if (currIndex == sMapViewerSelectedIndex) {
             cs_draw_row_selection_box(y);
         }
 
-        size_t addrStrSize = 0;
+        CSTextCoord_u32 addrStrSize = 0;
         if (showAddresses) {
             // "[stack address]:"
             addrStrSize += cs_print(TEXT_X(addrStrSize), y, STR_HEX_WORD":", symbol->addr);
         }
 
-        size_t sizeStrSize = 0;
+        CSTextCoord_u32 sizeStrSize = 0;
         if (showSizes) {
             sizeStrSize = STRLEN("00000");
 
             // Print size:
-            u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
+            ScreenCoord_u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
 
             if (symbol->errc == 'S') {
                 // Size too large.
@@ -110,7 +110,7 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
             }
         }
 
-        size_t typeStrSize = 0;
+        CSTextCoord_u32 typeStrSize = 0;
         if (showTypes) {
             typeStrSize = STRLEN("T") + showSizes; // Add a space if both types and sizes are shown.
             // "[type]"
@@ -131,8 +131,8 @@ void map_viewer_print_entries(u32 line, u32 numLines) {
 }
 
 void page_map_draw(void) {
-    u32 line = 1;
-    u32 charX = 0;
+    CSTextCoord_u32 line = 1;
+    CSTextCoord_u32 charX = 0;
     _Bool showAddr = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
     _Bool showType = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES);
     _Bool showSize = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES);
@@ -145,14 +145,14 @@ void page_map_draw(void) {
 
     cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"NAME:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
 
-    size_t sizeStrSize = 0;
+    CSTextCoord_u32 sizeStrSize = 0;
     if (showSize) {
         sizeStrSize = STRLEN("SIZE:");
         // "SIZE:"
         cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), TEXT_Y(line), STR_COLOR_PREFIX"SIZE:", COLOR_RGBA32_CRASH_OFFSET);
     }
 
-    size_t typeStrSize = 0;
+    CSTextCoord_u32 typeStrSize = 0;
     if (showType) {
         typeStrSize = STRLEN("TYPE:");
         // "TYPE:"

@@ -28,16 +28,16 @@
 #define STR_LAST_CHAR(s)    (s)[STRLEN(s) - 1]
 
 // Includes the raw data of the file at 'path' into the rom, aligned by 'align' number of bytes, and creates a pointer to it with the given type and name.
-#define INCBIN(type, name, path, align) \
+#define INCBIN(_type, _name, _path, _align) \
     __asm__( \
         ".section \".rodata\", \"a\", @progbits\n" \
-        ".balign "TO_STRING2(align)"\n" \
-        ".global "TO_STRING2(name)"\n" \
-        TO_STRING2(name)":\n" \
-        ".incbin \""path"\"\n" \
+        ".balign "TO_STRING2(_align)"\n" \
+        ".global "TO_STRING2(_name)"\n" \
+        TO_STRING2(_name)":\n" \
+        ".incbin \""_path"\"\n" \
         ".previous\n" \
     ); \
-    extern type name[];
+    extern _type _name[];
 
 // Avoid compiler warnings for unused variables.
 #ifdef __GNUC__

@@ -36,11 +36,11 @@ extern struct CSPopup gCSPopup_threads;
 void cs_open_threads(void);
 
 
-void cs_print_thread_info_line_1(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread, _Bool align);
-void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread);
-void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread);
+void cs_print_thread_info_line_1(ScreenCoord_u32 x, ScreenCoord_u32 y, CSTextCoord_u32 maxNumChars, OSThread* thread, _Bool align);
+void cs_print_thread_info_line_2(ScreenCoord_u32 x, ScreenCoord_u32 y, OSThread* thread);
+void cs_print_thread_info(ScreenCoord_u32 x, ScreenCoord_u32 y, CSTextCoord_u32 maxNumChars, OSThread* thread);
 
-ALWAYS_INLINE void cs_draw_row_box_thread(CSScreenCoord_u32 x, CSScreenCoord_u32 y, RGBA32 color) {
+ALWAYS_INLINE void cs_draw_row_box_thread(ScreenCoord_u32 x, ScreenCoord_u32 y, RGBA32 color) {
     cs_draw_row_box_w((x + 2), (CS_POPUP_THREADS_BG_WIDTH - 3), y, color);
 }
 

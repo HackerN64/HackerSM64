@@ -235,7 +235,7 @@ static size_t cs_get_next_word_length(PrintBuffer* pBuf, u32 index, size_t buffe
  * @param[in] x The x char position.
  * @return _Bool Whether to wrap the text.
  */
-static _Bool cs_should_wrap(u32 x) {
+static _Bool cs_should_wrap(ScreenCoord_u32 x) {
     return (gCSWordWrap && (x >= gCSWordWrapXLimit));
 }
 
@@ -246,9 +246,9 @@ static _Bool cs_should_wrap(u32 x) {
  * @param[in] bufferCount The total number of chars in the string after formatting.
  * @return size_t The total number of chars printed to the screen.
  */
-static size_t cs_print_from_buffer(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t bufferCount) {
+static size_t cs_print_from_buffer(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t bufferCount) {
     size_t numChars = 0;
-    u32 startX = x;
+    ScreenCoord_u32 startX = x;
 
     // Pass 3: whitespace, newlines, and print
     for (size_t index = 0; index < bufferCount; index++) {
@@ -285,7 +285,7 @@ static size_t cs_print_from_buffer(CSScreenCoord_u32 x, CSScreenCoord_u32 y, siz
         }
 
         if (space && index < (bufferCount - 1)) {
-            size_t nextWordLength = cs_get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
+            CSTextCoord_u32 nextWordLength = cs_get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
 
             if (cs_should_wrap(x + TEXT_WIDTH(nextWordLength))) {
                 newline = TRUE;
@@ -311,13 +311,13 @@ static size_t cs_print_from_buffer(CSScreenCoord_u32 x, CSScreenCoord_u32 y, siz
         if (newline) {
             x = startX;
             y += TEXT_HEIGHT(1);
-            if (y > (u32)gCSScissorBox.y2) {
+            if (y > (ScreenCoord_u32)gCSScissorBox.y2) {
                 break;
             }
             gCSNumLinesPrinted++;
         } else if (tab) {
-            u32 tempX = x;
-            u32 tabCount = (((x - startX) + TAB_WIDTH) / TAB_WIDTH);
+            ScreenCoord_u32 tempX = x;
+            CSTextCoord_u32 tabCount = (((x - startX) + TAB_WIDTH) / TAB_WIDTH);
             x = (tabCount * TAB_WIDTH) + startX;
             numChars += ((x - tempX) / TEXT_WIDTH(1));
         } else {
@@ -368,7 +368,7 @@ static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
  * @param[in] fmt       The string to print.
  * @return size_t The total number of chars printed to the screen.
  */
-size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) {
+size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) {
     bzero(&sCSCharBuffer, sizeof(sCSCharBuffer));
     gCSNumLinesPrinted = 0;
 
@@ -415,7 +415,7 @@ size_t cs_print_impl(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t charLimit,
  * @param[in] x,y The starting position on the screen to print to.
  * @return size_t The total number of chars printed to the screen.
  */
-ALWAYS_INLINE static size_t cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScreenCoord_u32 y) {
+ALWAYS_INLINE static size_t cs_print_symbol_unknown(ScreenCoord_u32 x, ScreenCoord_u32 y) {
     // "UNKNOWN"
     return cs_print(x, y, STR_COLOR_PREFIX"UNKNOWN", COLOR_RGBA32_CRASH_UNKNOWN);
 }
@@ -429,7 +429,7 @@ ALWAYS_INLINE static size_t cs_print_symbol_unknown(CSScreenCoord_u32 x, CSScree
  * @param[in] printUnknown Whether to print "UNKNOWN" when no symbol name is found.
  * @return size_t The total number of chars printed to the screen.
  */
-size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
+size_t cs_print_symbol_name(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, const MapSymbol* symbol, _Bool printUnknown) {
     if (symbol == NULL) {
         return (printUnknown ? cs_print_symbol_unknown(x, y) : 0);
     }
@@ -439,7 +439,7 @@ size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWid
     }
     return cs_print_scroll(x, y, maxWidth,
         STR_COLOR_PREFIX"%s",
-        (is_in_code_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
+        (addr_is_in_text_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
     );
 }
 
@@ -452,7 +452,7 @@ size_t cs_print_symbol_name(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWid
  * @param[in] sureAddress Whether we are sure that 'addr' is supposed to be a memory address.
  * @return size_t The total number of chars printed to the screen.
  */
-size_t cs_print_addr_location_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress) {
+size_t cs_print_addr_location_info(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress) {
     if (sureAddress && (addr == 0x00000000)) {
         return cs_print(x, y, STR_COLOR_PREFIX"NULL", COLOR_RGBA32_GRAY);
     }
@@ -489,7 +489,7 @@ static const FloatErrorPrintFormat sFltErrFmt[] = {
     [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
 };
 
-size_t cs_print_f32(CSScreenCoord_u32 x, CSScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
+size_t cs_print_f32(ScreenCoord_u32 x, ScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
     const enum FloatErrorType fltErrType = validate_f32(val);
     size_t numChars = 0;
 
@@ -550,8 +550,8 @@ int sprintf_int_with_commas(char* buf, int n) {
 }
 
 // Big Endian.
-size_t print_data_as_binary(const CSScreenCoord_u32 x, const CSScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
-    size_t numChars = 0;
+size_t print_data_as_binary(const ScreenCoord_u32 x, const ScreenCoord_u32 y, void* data, size_t numBytes, RGBA32 color) { //! TODO: make this a custom formatting specifier?, maybe \%b?
+    CSTextCoord_u32 numChars = 0;
     Byte* dataPtr = (Byte*)data;
 
     for (size_t byte = 0; byte < numBytes; byte++){

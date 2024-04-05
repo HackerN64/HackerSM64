@@ -33,14 +33,14 @@ void cs_popup_reginspect_init(void) {
     sInspectedRegisterPtrAddr = 0x00000000;
 }
 
-void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t val64) {
+void cs_popup_reginspect_draw_reg_value(ScreenCoord_u32 x, ScreenCoord_u32 y, RegisterId regId, Doubleword val64) {
     const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
-    _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
-    const uint32_t val32 = (uint32_t)val64;
+    _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
+    const Word val32 = (Word)val64;
 
     //! TODO: Get high bits from odd float reg.
     // if ((regId.cop == COP1) && ((regId.idx & 0x1) == 0)) {
-    //     uint32_t cop1_oddbits = get_reg_val(COP1, (regId.idx + 1));
+    //     Word cop1_oddbits = get_reg_val(COP1, (regId.idx + 1));
     //     if (cop1_oddbits != 0x00000000) {
     //         val64 = (HiLo64){ .hi = cop1_oddbits, .lo = val32, }.raw;
     //         is64Bit = TRUE;
@@ -72,10 +72,10 @@ void cs_popup_reginspect_draw_reg_value(u32 x, u32 y, RegisterId regId, uint64_t
 }
 
 //! TODO: clean this up.
-_Bool cs_print_reg_info_CPU_V(u32 line, UNUSED uint64_t val) {
-    u32 v1 = get_reg_val(CPU, REG_CPU_V1);
+_Bool cs_print_reg_info_CPU_V(CSTextCoord_u32 line, UNUSED Doubleword val) {
+    Word v1 = get_reg_val(CPU, REG_CPU_V1);
     if (v1 > 1) {
-        u32 v0 = get_reg_val(CPU, REG_CPU_V0);
+        Word v0 = get_reg_val(CPU, REG_CPU_V0);
         cs_print(TEXT_X(2), TEXT_Y(line), (" "STR_HEX_PREFIX STR_HEX_LONG), ((HiLo64){ .hi = v0, .lo = v1, }).raw);
         return TRUE;
     }
@@ -83,11 +83,11 @@ _Bool cs_print_reg_info_CPU_V(u32 line, UNUSED uint64_t val) {
     return FALSE;
 }
 
-_Bool cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
-    const u32 x = TEXT_X(2);
+_Bool cs_print_reg_info_C0_SR(CSTextCoord_u32 line, Doubleword val) {
+    const ScreenCoord_u32 x = TEXT_X(2);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_CP0_Status s = {
-        .raw = (uint32_t)val,
+        .raw = (Word)val,
     };
 
     cs_print(x, TEXT_Y(line++), "cop1 useable:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.CU_.CP1); // The other coprocessor bits are ignored by the N64.
@@ -118,12 +118,12 @@ _Bool cs_print_reg_info_C0_SR(u32 line, uint64_t val) {
     return TRUE;
 }
 
-_Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
-    const u32 x1 = TEXT_X(2);
-    const u32 x2 = TEXT_X(4);
+_Bool cs_print_reg_info_C0_CAUSE(CSTextCoord_u32 line, Doubleword val) {
+    const ScreenCoord_u32 x1 = TEXT_X(2);
+    const ScreenCoord_u32 x2 = TEXT_X(4);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_CP0_Cause c = {
-        .raw = (uint32_t)val,
+        .raw = (Word)val,
     };
 
     cs_print(x1, TEXT_Y(line++), "is branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
@@ -137,7 +137,7 @@ _Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
     cs_print(x2, TEXT_Y(line++), "Software:\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_.Software);
     line++;
     cs_print(x1, TEXT_Y(line++), "exc code:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, c.Exc_Code);
-    size_t charX = 4;
+    CSTextCoord_u32 charX = 4;
     const char* causeDesc = get_cause_desc(&gInspectThread->context, FALSE);
     if (causeDesc != NULL) {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"%s", infoColor, causeDesc);
@@ -149,13 +149,13 @@ _Bool cs_print_reg_info_C0_CAUSE(u32 line, uint64_t val) {
     return TRUE;
 }
 
-_Bool cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
-    const u32 x1 = TEXT_X(2);
-    const u32 x2 = TEXT_X(4);
-    const u32 x3 = TEXT_X(12);
+_Bool cs_print_reg_info_FPR_CSR(CSTextCoord_u32 line, Doubleword val) {
+    const ScreenCoord_u32 x1 = TEXT_X(2);
+    const ScreenCoord_u32 x2 = TEXT_X(4);
+    const ScreenCoord_u32 x3 = TEXT_X(12);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_FPR_31 f = {
-        .raw = (uint32_t)val,
+        .raw = (Word)val,
     };
 
     cs_print(TEXT_X(2), TEXT_Y(line++), "flush denorms to zero:\t"STR_COLOR_PREFIX"%d", infoColor, f.FS);
@@ -180,8 +180,8 @@ _Bool cs_print_reg_info_FPR_CSR(u32 line, uint64_t val) {
     return TRUE;
 }
 
-_Bool cs_print_reg_info_SPC_RCP(u32 line, uint64_t val) {
-    const u32 x1 = TEXT_X(2);
+_Bool cs_print_reg_info_SPC_RCP(CSTextCoord_u32 line, Doubleword val) {
+    const ScreenCoord_u32 x1 = TEXT_X(2);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     cs_print(x1, TEXT_Y(line++), "interrupts:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, (u32)(val & (RCP_IMASK >> RCP_IMASKSHIFT)));
 
@@ -191,7 +191,7 @@ _Bool cs_print_reg_info_SPC_RCP(u32 line, uint64_t val) {
 typedef struct RegInspectExtraInfo {
     /*0x00*/ const enum Coprocessors cop;
     /*0x04*/ const int idx;
-    /*0x08*/ _Bool (*func)(u32 line, uint64_t val);
+    /*0x08*/ _Bool (*func)(CSTextCoord_u32 line, Doubleword val);
     /*0x0C*/ const char* title;
 } RegInspectExtraInfo; /*0x10*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
@@ -205,10 +205,10 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
 
 // Register popup box draw function.
 void cs_popup_reginspect_draw(void) {
-    const CSScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
-    const CSScreenCoord_s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
-    const CSScreenCoord_s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
-    const CSScreenCoord_s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
+    const ScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
+    const ScreenCoord_s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
+    const ScreenCoord_s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
+    const ScreenCoord_s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
@@ -224,9 +224,9 @@ void cs_popup_reginspect_draw(void) {
     if (regInfo == NULL) {
         return;
     }
-    _Bool is64Bit = (regInfo->size == sizeof(uint64_t));
+    _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
 
-    u32 line = 1;
+    CSTextCoord_u32 line = 1;
     const RGBA32 descColor = COLOR_RGBA32_CRASH_PAGE_NAME;
     // "[register] REGISTER".
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
@@ -245,7 +245,7 @@ void cs_popup_reginspect_draw(void) {
     line++;
 
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", descColor, (is64Bit ? 64 : 32));
-    uint64_t value = get_reg_val(cop, idx);
+    Doubleword value = get_reg_val(cop, idx);
     cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line++), regId, value);
 
     line++;
@@ -265,7 +265,7 @@ void cs_popup_reginspect_draw(void) {
         sInspectedRegisterPtrAddr = 0x00000000;
     } else {
 #ifdef INCLUDE_DEBUG_MAP
-        u32 val32 = (uint32_t)value;
+        Word val32 = (Word)value;
         const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
@@ -276,11 +276,11 @@ void cs_popup_reginspect_draw(void) {
             );
         }
 #endif // INCLUDE_DEBUG_MAP
-        u32 data = 0;
+        Word data = 0x00000000;
         if (try_read_word_aligned(&data, val32)) {
             sInspectedRegisterPtrAddr = val32;
             cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            if (is_in_code_segment(val32)) {
+            if (addr_is_in_text_segment(val32)) {
                 format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
             } else {
                 cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);

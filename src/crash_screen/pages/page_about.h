@@ -27,7 +27,7 @@ enum CSAboutEntryTypes {
     CS_ABOUT_ENTRY_TYPE_LONG_N,
 };
 
-enum CSAboutGroups {
+enum PACKED CSAboutGroups {
     CS_ABOUT_GROUP_TITLE,
     CS_ABOUT_GROUP_BUTTONS,
     CS_ABOUT_GROUP_COMPILER,
@@ -113,24 +113,23 @@ typedef struct PACKED {
     /*0x00*/ const char* desc;          // Entry description.
     /*0x04*/ void (*func)(char* buf);   // Funxtion that writes the info string to a buffer.
     union {
-        /*0x08*/ char info[27];             // Buffer for the info data. If type == CS_ABOUT_ENTRY_TYPE_LONG, uses a different, longer buffer, 
+        /*0x08*/ char info[27];             // Buffer for the info data. If type == CS_ABOUT_ENTRY_TYPE_LONG, uses a different, longer buffer.
         struct PACKED {
             u8 pad[26];
-            _Bool expanded;
+            _Bool expanded;                 // CS_ABOUT_ENTRY_TYPE_HEADER doesn't use the info buffer, so repurpose it.
         } flags;
     };
-    /*0x23*/ s8 type;                   // enum CSAboutEntryTypes
+    /*0x23*/ s8 type;                   // enum CSAboutEntryTypes.
 } CSAboutEntry; /*0x24*/
 
 typedef struct CSAboutEntryDisplay {
-    /*0x00*/ u8 groupID;
+    /*0x00*/ enum CSAboutGroups groupID;
     /*0x01*/ u8 entryID;
 } CSAboutEntryDisplay; /*0x02*/
 
 
-
 #define NUM_LONG_INFO_BUFFERS 2
-#define LONG_INFO_BUFFER_LENGTH 40
+#define LONG_INFO_BUFFER_SIZE 40
 
 #define ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES 21
 

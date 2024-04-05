@@ -60,11 +60,11 @@ void page_logs_init(void) {
     sLogTotalRows = MIN(gConsoleLogLastIndex, (u32)LOG_BUFFER_SIZE);
 }
 
-void draw_logs_section(u32 line, u32 numLines) {
+void draw_logs_section(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     const _Bool showIndexNumbers = cs_get_setting_val(CS_OPT_GROUP_PAGE_LOGS, CS_OPT_LOG_INDEX_NUMBERS);
 
     // Print entries:
-    for (u32 y = 0; y < numLines; y++) {
+    for (CSTextCoord_u32 y = 0; y < numLines; y++) {
         u32 printIndex = (sLogViewportIndex + y);
         char* entry = consoleLogTable[(LOG_BUFFER_SIZE - 1) - printIndex];
 
@@ -72,7 +72,7 @@ void draw_logs_section(u32 line, u32 numLines) {
             break;
         }
 
-        u32 charY = TEXT_Y(line + y);
+        ScreenCoord_u32 charY = TEXT_Y(line + y);
 
         if (printIndex == sLogSelectedIndex) {
             cs_draw_row_selection_box(charY);
@@ -100,7 +100,7 @@ void draw_logs_section(u32 line, u32 numLines) {
 }
 
 void page_logs_draw(void) {
-    u32 line = 1;
+    CSTextCoord_u32 line = 1;
 
     sLogNumShownRows = ((CRASH_SCREEN_NUM_CHARS_Y - line) - 1);
     gCSWordWrap = TRUE;

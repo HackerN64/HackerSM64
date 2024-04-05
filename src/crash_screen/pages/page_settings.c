@@ -99,12 +99,12 @@ void page_settings_init(void) {
 
 extern const char* gValNames_bool[];
 
-void print_settings_list(u32 line, u32 numLines) {
+void print_settings_list(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     u32 currViewIndex = sSettingsViewportIndex;
     const u32 section_indent = STRLEN("> ");
 
     // Print
-    for (u32 i = 0; i < numLines; i++, currViewIndex++) {
+    for (CSTextCoord_u32 i = 0; i < numLines; i++, currViewIndex++) {
         if (currViewIndex >= sNumDisplayedSettings) {
             break;
         }
@@ -118,7 +118,7 @@ void print_settings_list(u32 line, u32 numLines) {
             break;
         }
 
-        u32 y = TEXT_Y(line + i);
+        ScreenCoord_u32 y = TEXT_Y(line + i);
 
         if (currViewIndex == sSettingsSelectedIndex) {
             cs_draw_row_selection_box(y);
@@ -142,7 +142,7 @@ void print_settings_list(u32 line, u32 numLines) {
                     break;
             }
 
-            s32 centeredDefaultsStartX = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - ((STRLEN("<") + strlen(setting->name) + STRLEN(">")) / 2));
+            ScreenCoord_s32 centeredDefaultsStartX = TEXT_X((CRASH_SCREEN_NUM_CHARS_X / 2) - ((STRLEN("<") + strlen(setting->name) + STRLEN(">")) / 2));
 
             // "<[button name]>"
             if (buttonCond) {
@@ -178,7 +178,7 @@ void print_settings_list(u32 line, u32 numLines) {
             cs_draw_divider_translucent(DIVIDER_Y((line + i) + 1));
         } else { // Normal setting
             // Maximum description print size.
-            u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
+            CSTextCoord_u32 charX = (CRASH_SCREEN_NUM_CHARS_X - (STRLEN("*<") + VALUE_NAME_SIZE + STRLEN(">")));
 
             cs_print_scroll(
                 TEXT_X(section_indent), y, (charX - section_indent),
@@ -236,7 +236,7 @@ void print_settings_list(u32 line, u32 numLines) {
 void page_settings_draw(void) {
     osWritebackDCacheAll();
 
-    u32 line = 1;
+    CSTextCoord_u32 line = 1;
 
     print_settings_list(line, SETTINGS_NUM_ROWS);
 

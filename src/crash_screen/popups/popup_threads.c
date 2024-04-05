@@ -67,7 +67,7 @@ void cs_popup_threads_init(void) {
     sThreadsSelectedIndex = get_thread_index_in_queue(sSelectedThreadPtr);
 }
 
-void cs_print_thread_info_line_1(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread, _Bool align) {
+void cs_print_thread_info_line_1(ScreenCoord_u32 x, ScreenCoord_u32 y, CSTextCoord_u32 maxNumChars, OSThread* thread, _Bool align) {
     CSTextCoord_u32 charX = cs_print(x, y, "thread: "STR_COLOR_PREFIX"%d", COLOR_RGBA32_CRASH_THREAD_NAME, osGetThreadId(thread));
     if (align) {
         charX = STRLEN("thread: ##### ");    
@@ -80,7 +80,7 @@ void cs_print_thread_info_line_1(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_
     }
 }
 
-void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThread* thread) {
+void cs_print_thread_info_line_2(ScreenCoord_u32 x, ScreenCoord_u32 y, OSThread* thread) {
     CSTextCoord_u32 charX = 0;
     cs_print(x, y,
         ("pri:"STR_COLOR_PREFIX"%d"),
@@ -106,7 +106,7 @@ void cs_print_thread_info_line_2(CSScreenCoord_u32 x, CSScreenCoord_u32 y, OSThr
     }
 }
 
-void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNumChars, OSThread* thread) {
+void cs_print_thread_info(ScreenCoord_u32 x, ScreenCoord_u32 y, CSTextCoord_u32 maxNumChars, OSThread* thread) {
     CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_LIGHT_GRAY);
     cs_print_thread_info_line_1(x, y, maxNumChars, thread, TRUE);
     y += TEXT_HEIGHT(1);
@@ -114,12 +114,12 @@ void cs_print_thread_info(CSScreenCoord_u32 x, CSScreenCoord_u32 y, size_t maxNu
     CS_SET_DEFAULT_PRINT_COLOR_END();
 }
 
-void cs_popup_threads_draw_list(u32 startY) {
+void cs_popup_threads_draw_list(ScreenCoord_u32 startY) {
     OSThread* queue = __osGetActiveQueue();
     OSThread* thread = queue;
 
 
-    u32 y = startY;
+    ScreenCoord_u32 y = startY;
     u32 threadIndex = 0;
 
     while (
@@ -167,10 +167,10 @@ void cs_popup_threads_draw_list(u32 startY) {
 }
 
 void cs_popup_threads_draw(void) {
-    const CSScreenCoord_s32 bgStartX = CS_POPUP_THREADS_BG_X1;
-    const CSScreenCoord_s32 bgStartY = CS_POPUP_THREADS_BG_Y1;
-    const CSScreenCoord_s32 bgW = CS_POPUP_THREADS_BG_WIDTH;
-    const CSScreenCoord_s32 bgH = CS_POPUP_THREADS_BG_HEIGHT;
+    const ScreenCoord_s32 bgStartX = CS_POPUP_THREADS_BG_X1;
+    const ScreenCoord_s32 bgStartY = CS_POPUP_THREADS_BG_Y1;
+    const ScreenCoord_s32 bgW = CS_POPUP_THREADS_BG_WIDTH;
+    const ScreenCoord_s32 bgH = CS_POPUP_THREADS_BG_HEIGHT;
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
@@ -178,7 +178,7 @@ void cs_popup_threads_draw(void) {
     );
 
     OSThread* thread = gInspectThread;
-    u32 threadY = CS_POPUP_THREADS_Y1;
+    ScreenCoord_u32 threadY = CS_POPUP_THREADS_Y1;
 
     // Draw the currently selected thread at the top:
     // cs_thread_draw_highlight(thread, threadY);

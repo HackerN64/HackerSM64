@@ -58,7 +58,7 @@ typedef union CrashScreenDirections {
     u8 raw;
 } CrashScreenDirections;
 
-enum ControlTypes {
+enum PACKED ControlTypes {
     CONT_DESC_LIST_END = -1,
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_PAGE_SELECT,

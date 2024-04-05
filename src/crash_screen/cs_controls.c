@@ -297,7 +297,6 @@ void cs_update_input(void) {
             }
         }
     }
-    
 
     gCSSwitchedPage  = FALSE;
     gCSSwitchedPopup = FALSE;

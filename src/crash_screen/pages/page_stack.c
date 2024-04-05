@@ -77,13 +77,13 @@ void fill_function_stack_trace(void) {
     };
     add_to_stack(&currInfo);
 
-    u64* sp = (u64*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
+    Doubleword* sp = (Doubleword*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
 
     // Loop through the stack buffer and find all the addresses that point to a function.
     while (sCSNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
         currInfo.curAddr = (Address)(*sp); // Check the lower bits.
 
-        if (is_in_code_segment(currInfo.curAddr)) {
+        if (addr_is_in_text_segment(currInfo.curAddr)) {
             currInfo.faddr = currInfo.curAddr;
 #ifdef INCLUDE_DEBUG_MAP
             symbol = get_map_symbol(currInfo.faddr, SYMBOL_SEARCH_BACKWARD);
@@ -117,7 +117,7 @@ void page_stack_init(void) {
     fill_function_stack_trace();
 }
 
-void stack_trace_print_entries(u32 line, u32 numLines) {
+void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     const _Bool showAddressess   = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES);
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool showOffsets      = cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS  );
@@ -126,8 +126,8 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
     u32 currIndex = sStackTraceViewportIndex;
     FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
 
-    // Print
-    for (u32 i = 0; i < numLines; i++) {
+    // Print:
+    for (CSTextCoord_u32 i = 0; i < numLines; i++) {
         if (currIndex >= sCSNumFoundFunctions) {
             break;
         }
@@ -136,13 +136,13 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
             break;
         }
 
-        u32 y = TEXT_Y(line + i);
+        ScreenCoord_u32 y = TEXT_Y(line + i);
 
         if (currIndex == sStackTraceSelectedIndex) {
             cs_draw_row_selection_box(y);
         }
 
-        size_t charX = 0;
+        CSTextCoord_u32 charX = 0;
 
         if (showAddressess) {
             // "[stack address]:"
@@ -163,7 +163,7 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
         } else {
             // Print known function.
             if (parseSymbolNames) {
-                size_t offsetStrSize = 0;
+                CSTextCoord_u32 offsetStrSize = 0;
                 if (showOffsets) {
                     offsetStrSize = STRLEN("+0000");
                     // "+[offset]"
@@ -204,8 +204,8 @@ void stack_trace_print_entries(u32 line, u32 numLines) {
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void page_stack_draw(void) {
-    u32 line = 1;
-    u32 charX = 0;
+    CSTextCoord_u32 line = 1;
+    CSTextCoord_u32 charX = 0;
 
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES)) {
         cs_print(TEXT_X(0), TEXT_Y(line), "IN STACK:");

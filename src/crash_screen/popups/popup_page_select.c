@@ -16,14 +16,14 @@
 
 // Page select popup box draw function.
 void cs_popup_pages_draw(void) {
-    const CSScreenCoord_s32 w = 32; // TEXT_WIDTH(32);
-    const CSScreenCoord_s32 h = 16; // TEXT_HEIGHT(16);
-    const CSScreenCoord_s32 startX = ((CRASH_SCREEN_NUM_CHARS_X / 2) - (w / 2));
-    const CSScreenCoord_s32 startY = ((CRASH_SCREEN_NUM_CHARS_Y / 2) - (h / 2));
-    const CSScreenCoord_s32 bgStartX = (TEXT_X(startX) - (TEXT_WIDTH(1) / 2));
-    const CSScreenCoord_s32 bgStartY = (TEXT_Y(startY) - (TEXT_HEIGHT(1) / 2));
-    const CSScreenCoord_s32 bgW = (TEXT_WIDTH(w) + TEXT_WIDTH(1));
-    const CSScreenCoord_s32 bgH = (TEXT_HEIGHT(h) + (TEXT_HEIGHT(1)));
+    const ScreenCoord_s32 w = 32; // TEXT_WIDTH(32);
+    const ScreenCoord_s32 h = 16; // TEXT_HEIGHT(16);
+    const ScreenCoord_s32 startX = ((CRASH_SCREEN_NUM_CHARS_X / 2) - (w / 2));
+    const ScreenCoord_s32 startY = ((CRASH_SCREEN_NUM_CHARS_Y / 2) - (h / 2));
+    const ScreenCoord_s32 bgStartX = (TEXT_X(startX) - (TEXT_WIDTH(1) / 2));
+    const ScreenCoord_s32 bgStartY = (TEXT_Y(startY) - (TEXT_HEIGHT(1) / 2));
+    const ScreenCoord_s32 bgW = (TEXT_WIDTH(w) + TEXT_WIDTH(1));
+    const ScreenCoord_s32 bgH = (TEXT_HEIGHT(h) + (TEXT_HEIGHT(1)));
     cs_draw_dark_rect(
         bgStartX, bgStartY,
         bgW, bgH,
@@ -38,7 +38,7 @@ void cs_popup_pages_draw(void) {
         COLOR_RGBA32_CRASH_PAGE_NAME, currPopup->name
     );
 
-    u32 line = (startY + 2);
+    CSTextCoord_u32 line = (startY + 2);
     //! TODO: Scrollable if the list is long enough.
     for (enum CSPages pageID = 0; pageID < CS_NUM_PAGES; pageID++) {
         CSPage* page = gCSPages[pageID];

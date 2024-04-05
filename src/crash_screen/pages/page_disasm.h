@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include "crash_screen/cs_settings.h"
+#include "crash_screen/cs_draw.h" // For ScreenCoord_ typedefs.
 
 
 enum CSDisasmBranchArrowModes {
@@ -66,5 +67,5 @@ extern _Bool gFillBranchBuffer;
 extern struct CSSetting cs_settings_group_page_disasm[];
 extern struct CSPage gCSPage_disasm;
 
-void print_insn(const u32 charX, const u32 charY, const char* insnAsStr, const char* destFname);
-void format_and_print_insn(const u32 charX, const u32 charY, const Address addr, const Word data);
+void print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const char* insnAsStr, const char* destFname);
+void format_and_print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const Address addr, const Word data);

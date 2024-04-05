@@ -92,10 +92,10 @@ enum InsnDB_base_Opcodes {
     OPC_LDL     = 0b011010, // 26: Load Doubleword Left.
     OPC_LDR     = 0b011011, // 27: Load Doubleword Right.
 
-    //! TODO: OPC_UNK_28  = 0b011100, // 28:
-    //! TODO: OPC_UNK_29  = 0b011101, // 29:
-    //! TODO: OPC_UNK_30  = 0b011110, // 30:
-    //! TODO: OPC_UNK_31  = 0b011111, // 31:
+    // OPC_UNK_28  = 0b011100, // 28:
+    // OPC_UNK_29  = 0b011101, // 29:
+    // OPC_UNK_30  = 0b011110, // 30:
+    // OPC_UNK_31  = 0b011111, // 31:
 
     OPC_LB      = 0b100000, // 32: Load Byte.
     OPC_LH      = 0b100001, // 33: Load Halfword.
@@ -144,18 +144,18 @@ enum InsnDB_spec_Opcodes {
     OPS_NOP     = 0b000000, //  0: NOP (pseudo of SLL).
 
     OPS_SLL     = 0b000000, //  0: Shift Word Left Logical.
-    //! TODO: OPS_SLA     = 0b000001, //  1: Shift Word Left Arithmetic.
+    // OPS_SLA     = 0b000001, //  1: Shift Word Left Arithmetic.
     OPS_SRL     = 0b000010, //  2: Shift Word Right Logical.
     OPS_SRA     = 0b000011, //  3: Shift Word Right Arithmetic.
     OPS_SLLV    = 0b000100, //  4: Shift Word Left Logical Variable.
-    //! TODO: OPS_SLAV    = 0b000101, //  5: Shift Word Left Arithmetic Variable.
+    // OPS_SLAV    = 0b000101, //  5: Shift Word Left Arithmetic Variable.
     OPS_SRLV    = 0b000110, //  6: Shift Word Right Logical Variable.
     OPS_SRAV    = 0b000111, //  7: Shift Word Right Arithmetic Variable.
 
     OPS_JR      = 0b001000, //  8: Jump Register.
     OPS_JALR    = 0b001001, //  9: Jump and Link Register.
-    //! TODO: OPS_UNK_10  = 0b001010, // 10:
-    //! TODO: OPS_UNK_11  = 0b001011, // 11:
+    // OPS_UNK_10  = 0b001010, // 10:
+    // OPS_UNK_11  = 0b001011, // 11:
     OPS_SYSCALL = 0b001100, // 12: System Call (assert).
     OPS_BREAK   = 0b001101, // 13: Breakpoint.
     // OPS_UNK_14  = 0b001110, // 14:
@@ -167,7 +167,7 @@ enum InsnDB_spec_Opcodes {
     OPS_MTLO    = 0b010011, // 19: Move To LO.
 
     OPS_DSLLV   = 0b010100, // 20: Doubleword Shift Left Logical Variable.
-    //! TODO: OPS_DSLAV   = 0b010101, // 21: Doubleword Shift Left Arithmetic Variable.
+    // OPS_DSLAV   = 0b010101, // 21: Doubleword Shift Left Arithmetic Variable.
     OPS_DSRLV   = 0b010110, // 22: Doubleword Shift Right Logical Variable.
     OPS_DSRAV   = 0b010111, // 23: Doubleword Shift Right Arithmetic Variable.
 
@@ -188,8 +188,8 @@ enum InsnDB_spec_Opcodes {
     OPS_OR      = 0b100101, // 37: Or.
     OPS_XOR     = 0b100110, // 38: Exclusive Or.
     OPS_NOR     = 0b100111, // 39: Nor.
-    //! TODO: OPS_UNK_40  = 0b101000, // 40:
-    //! TODO: OPS_UNK_41  = 0b101001, // 41:
+    // OPS_UNK_40  = 0b101000, // 40:
+    // OPS_UNK_41  = 0b101001, // 41:
     OPS_SLT     = 0b101010, // 42: Set on Less Than.
     OPS_SLTU    = 0b101011, // 43: Set on Less Than Unsigned.
     OPS_DADD    = 0b101100, // 44: Doubleword Add.
@@ -202,15 +202,15 @@ enum InsnDB_spec_Opcodes {
     OPS_TLT     = 0b110010, // 50: Trap if Less Than.
     OPS_TLTU    = 0b110011, // 51: Trap if Less Than Unsigned.
     OPS_TEQ     = 0b110100, // 52: Trap if Equal.
-    //! TODO: OPS_UNK_53  = 0b110101, // 53:
+    // OPS_UNK_53  = 0b110101, // 53:
     OPS_TNE     = 0b110110, // 54: Trap if Not Equal.
-    //! TODO: OPS_UNK_55  = 0b110111, // 55:
+    // OPS_UNK_55  = 0b110111, // 55:
     OPS_DSLL    = 0b111000, // 56: Doubleword Shift Left Logical.
-    //! TODO: OPS_DSLA    = 0b111001, // 57: Doubleword Shift Left Arithmetic.
+    // OPS_DSLA    = 0b111001, // 57: Doubleword Shift Left Arithmetic.
     OPS_DSRL    = 0b111010, // 58: Doubleword Shift Right Logical.
     OPS_DSRA    = 0b111011, // 59: Doubleword Shift Right Arithmetic.
     OPS_DSLL32  = 0b111100, // 60: Doubleword Shift Left Logical + 32.
-    //! TODO: OPS_DSLA32  = 0b111101, // 61: Doubleword Shift Left Arithmetic + 32.
+    // OPS_DSLA32  = 0b111101, // 61: Doubleword Shift Left Arithmetic + 32.
     OPS_DSRL32  = 0b111110, // 62: Doubleword Shift Right Logical + 32.
     OPS_DSRA32  = 0b111111, // 63: Doubleword Shift Right Arithmetic + 32.
 };
@@ -233,7 +233,7 @@ enum InsnDB_regi_Opcodes {
     OPR_TLTI    = 0b01010, // 10: Trap if Less Than Immediate.
     OPR_TLTIU   = 0b01011, // 11: Trap if Less Than Unsigned Immediate.
     OPR_TEQI    = 0b01100, // 12: Trap if Equal Immediate.
-    //! TODO: OPR_UNK_13  = 0b01101, // 13:
+    // OPR_UNK_13  = 0b01101, // 13:
     OPR_TNEI    = 0b01110, // 14: Trap if Not Equal Immediate.
 };
 

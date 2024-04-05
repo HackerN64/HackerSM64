@@ -120,11 +120,11 @@ void page_registers_init(void) {
 }
 
 // Print a fixed-point register.
-void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
+void cs_registers_print_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, const char* name, Word val) {
     const MapSymbol* symbol = NULL;
 
     // "[register name]:"
-    size_t charX = cs_print(x, y,
+    CSTextCoord_u32 charX = cs_print(x, y,
         (" "STR_COLOR_PREFIX"%s:"),
         COLOR_RGBA32_CRASH_VARIABLE, name
     );
@@ -148,10 +148,10 @@ void cs_registers_print_reg(u32 x, u32 y, const char* name, Word val) {
 }
 
 // Print important fixed-point registers.
-u32 cs_registers_print_registers(u32 line) {
+CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
     const u32 columns = REG_LIST_COLUMNS;
     const u32 rows = REG_LIST_ROWS;
-    const size_t columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, columns);
+    const CSTextCoord_u32 columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, columns);
     const RegisterId* reg = sRegList;
     RegisterPageSelection* sel = &sRegisterSelectionCursor;
     _Bool drawSel = (sel->section == PAGE_REG_SECTION_REG);
@@ -163,8 +163,8 @@ u32 cs_registers_print_registers(u32 line) {
                 listEnded = TRUE;
             }
 
-            u32 charX = (x * columnCharWidth);
-            u32 charY = (line + y);
+            CSTextCoord_u32 charX = (x * columnCharWidth);
+            CSTextCoord_u32 charY = (line + y);
 
             if (drawSel && (x == sel->selX) && (y == sel->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
@@ -188,13 +188,13 @@ u32 cs_registers_print_registers(u32 line) {
     return (line + rows);
 }
 
-void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
+void cs_print_fpcsr(ScreenCoord_u32 x, ScreenCoord_u32 y, Word fpcsr) {
     if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_FPCSR) {
         cs_draw_row_selection_box(y);
     }
 
     // "FPCSR:[XXXXXXXX]"
-    size_t fpcsrSize = cs_print(x, y,
+    CSTextCoord_u32 fpcsrSize = cs_print(x, y,
         STR_COLOR_PREFIX"FPCSR: "STR_COLOR_PREFIX STR_HEX_WORD" ",
         COLOR_RGBA32_CRASH_VARIABLE,
         COLOR_RGBA32_WHITE, fpcsr
@@ -209,7 +209,7 @@ void cs_print_fpcsr(u32 x, u32 y, u32 fpcsr) {
 }
 
 // Print a floating-point register.
-void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
+void cs_registers_print_float_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 regNum) {
     const RegisterInfo* regInfo = get_reg_info(COP1, regNum);
 
     if (regInfo == NULL) {
@@ -217,16 +217,16 @@ void cs_registers_print_float_reg(u32 x, u32 y, u32 regNum) {
     }
 
     // "[register name]:"
-    size_t charX = cs_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
+    CSTextCoord_u32 charX = cs_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     x += TEXT_WIDTH(charX);
 
-    u32 data = get_reg_val(COP1, regNum);
+    Word data = get_reg_val(COP1, regNum);
 
     cs_print_f32(x, y, (IEEE754_f32){ .asU32 = data, }, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), FALSE);
 }
 
-void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
-    const size_t columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, FP_LIST_COLUMNS);
+void cs_registers_print_float_registers(CSTextCoord_u32 line, __OSThreadContext* tc) {
+    const CSTextCoord_u32 columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, FP_LIST_COLUMNS);
     __OSfp* osfp = &tc->fp0; // The first float pointer.
     u32 regNum = 0;
     RegisterPageSelection* sel = &sRegisterSelectionCursor;
@@ -239,8 +239,8 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
 
     for (u32 y = 0; y < FP_LIST_ROWS; y++) {
         for (u32 x = 0; x < FP_LIST_COLUMNS; x++) {
-            u32 charX = (x * columnCharWidth);
-            u32 charY = (line + y);
+            CSTextCoord_u32 charX = (x * columnCharWidth);
+            CSTextCoord_u32 charY = (line + y);
             
             if (drawSel && (x == sel->selX) && (y == sel->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
@@ -262,7 +262,7 @@ void cs_registers_print_float_registers(u32 line, __OSThreadContext* tc) {
 void page_registers_draw(void) {
     OSThread* thread = gInspectThread;
     __OSThreadContext* tc = &thread->context;
-    u32 line = 2;
+    CSTextCoord_u32 line = 2;
 
     if (gCSPopupID != CS_POPUP_THREADS) {
         // Draw the thread box:
@@ -281,7 +281,7 @@ void page_registers_draw(void) {
     cs_registers_print_float_registers(line, tc);
 }
 
-static int cs_page_reg_get_select_idx(RegisterPageSelection* sel, int columns) {
+static int cs_page_reg_get_select_idx(RegisterPageSelection* sel, u32 columns) {
     return ((sel->selY * columns) + sel->selX);
 }
 

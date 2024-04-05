@@ -152,7 +152,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
         // Check if we have left the function.
         const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
         if (symbol != NULL) {
-            if (!is_in_code_segment(symbol->addr)) {
+            if (!addr_is_in_text_segment(symbol->addr)) {
                 return FALSE;
             }
             if (funcAddr != symbol->addr) {
@@ -190,7 +190,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
 }
 #endif // INCLUDE_DEBUG_MAP
 
-void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 printLine) {
+void draw_branch_arrow(CSTextCoord_s32 startLine, CSTextCoord_s32 endLine, ScreenCoord_s32 dist, RGBA32 color, u32 printLine) {
     s32 numShownRows = sDisasmNumShownRows;
 
     // Check to see if arrow is fully away from the screen.
@@ -198,8 +198,8 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         ((startLine >= 0           ) || (endLine >= 0           )) &&
         ((startLine <  numShownRows) || (endLine <  numShownRows))
     ) {
-        s32 arrowStartHeight = (TEXT_Y(printLine + startLine) + 3);
-        s32 arrowEndHeight   = (TEXT_Y(printLine +   endLine) + 3);
+        ScreenCoord_s32 arrowStartHeight = (TEXT_Y(printLine + startLine) + 3);
+        ScreenCoord_s32 arrowEndHeight   = (TEXT_Y(printLine +   endLine) + 3);
 
         if (startLine < 0) {
             arrowStartHeight = (TEXT_Y(printLine) - 1);
@@ -214,7 +214,7 @@ void draw_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color, u32 p
         } else if (endLine >= numShownRows) {
             arrowEndHeight = (TEXT_Y(printLine + numShownRows) - 2);
         } else {
-            const u32 startX = ((sDisasmBranchStartX + dist) - DISASM_BRANCH_ARROW_HEAD_OFFSET);
+            const ScreenCoord_u32 startX = ((sDisasmBranchStartX + dist) - DISASM_BRANCH_ARROW_HEAD_OFFSET);
 
             cs_draw_triangle(
                 (startX - DISASM_BRANCH_ARROW_HEAD_SIZE), (arrowEndHeight - DISASM_BRANCH_ARROW_HEAD_SIZE),
@@ -244,8 +244,8 @@ void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
 
     for (u32 i = 0; i < sNumBranchArrows; i++) {
         // Address startLineAddr = ((currArrow->insnIndex * PAGE_DISASM_STEP) + symbol->addr);
-        s32 startLine = (((s32)insn_index_to_addr(symbol->addr, currArrow->insnIndex) - (s32)sDisasmViewportIndex) / PAGE_DISASM_STEP);
-        s32 endLine = (startLine + currArrow->branchOffset + 1);
+        CSTextCoord_s32 startLine = (((s32)insn_index_to_addr(symbol->addr, currArrow->insnIndex) - (CSTextCoord_s32)sDisasmViewportIndex) / PAGE_DISASM_STEP);
+        CSTextCoord_s32 endLine = (startLine + currArrow->branchOffset + 1);
 
         xPos += (DISASM_BRANCH_ARROW_SPACING + 1);
 
@@ -263,7 +263,7 @@ void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
 }
 #endif // INCLUDE_DEBUG_MAP
 
-void print_insn(const u32 charX, const u32 charY, const char* insnAsStr, const char* destFname) {
+void print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const char* insnAsStr, const char* destFname) {
     // "[instruction name] [params]"
     cs_print(charX, charY, "%s", insnAsStr);
 
@@ -279,13 +279,13 @@ void print_insn(const u32 charX, const u32 charY, const char* insnAsStr, const c
 #endif // INCLUDE_DEBUG_MAP
 }
 
-void format_and_print_insn(const u32 charX, const u32 charY, const Address addr, const Word data) {
+void format_and_print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const Address addr, const Word data) {
     const char* destFname = NULL;
     const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, TRUE);
     print_insn(charX, charY, insnAsStr, destFname);
 }
 
-void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Address pc) {
+void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Address selectedAddr, Address pc) {
     const enum CSDisasmBranchArrowModes branchArrowMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
     const _Bool unkAsBinary   = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
 #ifdef INCLUDE_DEBUG_MAP
@@ -293,10 +293,10 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
 #endif // INCLUDE_DEBUG_MAP
     Address addr = sDisasmViewportIndex;
 
-    u32 charX = TEXT_X(0);
-    u32 charY = TEXT_Y(line);
+    ScreenCoord_u32 charX = TEXT_X(0);
+    ScreenCoord_u32 charY = TEXT_Y(line);
 
-    for (u32 y = 0; y < numLines; y++) {
+    for (CSTextCoord_u32 y = 0; y < numLines; y++) {
         charY = TEXT_Y(line + y);
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -307,7 +307,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
             }
             if (symbolHeaders && (symbol != NULL) && (addr == symbol->addr)) {
                 //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
-                size_t numChars = cs_print_symbol_name(charX, charY, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
+                CSTextCoord_u32 numChars = cs_print_symbol_name(charX, charY, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
                 cs_print(charX + TEXT_WIDTH(numChars), charY, ":");
                 y++;
                 charY = TEXT_Y(line + y);
@@ -330,7 +330,7 @@ void disasm_draw_asm_entries(u32 line, u32 numLines, Address selectedAddr, Addre
         if (!try_read_word_aligned(&data, addr)) {
             cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else {
-            if (is_in_code_segment(addr)) {
+            if (addr_is_in_text_segment(addr)) {
                 format_and_print_insn(charX, charY, addr, data);
 
                 if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
@@ -387,7 +387,7 @@ void page_disasm_draw(void) {
                         ? TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, 0x80XXXXXX"))
                         : TEXT_X(INSN_NAME_DISPLAY_WIDTH + STRLEN("R0, R0, +0x0000"));
 
-    u32 line = 1;
+    CSTextCoord_u32 line = 1;
 
     Address startAddr = sDisasmViewportIndex;
     Address endAddr   = (startAddr + ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP));
@@ -421,12 +421,12 @@ void page_disasm_draw(void) {
         cs_draw_divider(DIVIDER_Y(line));
     }
 
-    u32 line2 = (line + sDisasmNumShownRows);
+    CSTextCoord_u32 line2 = (line + sDisasmNumShownRows);
 
     cs_draw_divider(DIVIDER_Y(line2));
 
-    u32 scrollTop = (DIVIDER_Y(line) + 1);
-    u32 scrollBottom = DIVIDER_Y(line2);
+    ScreenCoord_u32 scrollTop = (DIVIDER_Y(line) + 1);
+    ScreenCoord_u32 scrollBottom = DIVIDER_Y(line2);
 
     const size_t shownSection = ((sDisasmNumShownRows - 1) * PAGE_DISASM_STEP);
 
@@ -534,7 +534,7 @@ void page_disasm_print(void) {
         Word data = 0x00000000;
         if (!try_read_word_aligned(&data, addr)) {
             osSyncPrintf("*");
-        } else if (is_in_code_segment(addr)) {
+        } else if (addr_is_in_text_segment(addr)) {
             const char* destFname = NULL;
             const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, FALSE);
 
