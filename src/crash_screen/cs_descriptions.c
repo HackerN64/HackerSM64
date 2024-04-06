@@ -494,7 +494,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 } else if (badvaddr < 128) {
                     // This is probably a NULL pointer dereference, though it can go through a structure or an array,
                     // so leave some margin to the actual faulting address.
-                    if (pc == INSN_OFFSET_FROM_ADDR(strlen, 0)) { // 1st instruction of strlen
+                    if (pc == ADDR_INSN_STRLEN_DEREFERENCE_ARG) { // 1st instruction of strlen
                         return "NULL string dereference (read)";
                     } else {
                         return "NULL pointer dereference (read)";

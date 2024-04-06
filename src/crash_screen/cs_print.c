@@ -439,7 +439,7 @@ size_t cs_print_symbol_name(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, 
     }
     return cs_print_scroll(x, y, maxWidth,
         STR_COLOR_PREFIX"%s",
-        (addr_is_in_text_segment(symbol->addr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
+        ((addr_is_in_text_segment(symbol->addr) && symbol_is_text(symbol)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
     );
 }
 

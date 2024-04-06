@@ -33,54 +33,33 @@ void cs_popup_reginspect_init(void) {
     sInspectedRegisterPtrAddr = 0x00000000;
 }
 
-void cs_popup_reginspect_draw_reg_value(ScreenCoord_u32 x, ScreenCoord_u32 y, RegisterId regId, Doubleword val64) {
-    const RegisterInfo* regInfo = get_reg_info(regId.cop, regId.idx);
-    _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
-    const Word val32 = (Word)val64;
+CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, RegisterId regId, Doubleword val64, _Bool is64Bit) {
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", COLOR_RGBA32_CRASH_PAGE_NAME, (is64Bit ? 64 : 32));
 
-    //! TODO: Get high bits from odd float reg.
-    // if ((regId.cop == COP1) && ((regId.idx & 0x1) == 0)) {
-    //     Word cop1_oddbits = get_reg_val(COP1, (regId.idx + 1));
-    //     if (cop1_oddbits != 0x00000000) {
-    //         val64 = (HiLo64){ .hi = cop1_oddbits, .lo = val32, }.raw;
-    //         is64Bit = TRUE;
-    //     }
-    // }
+    const Word val32 = (Word)val64;
 
     // Print as hex:
     if (is64Bit) {
-        cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_LONG), val64);
+        cs_print(TEXT_X(2), TEXT_Y(line++), (" "STR_HEX_PREFIX STR_HEX_LONG), val64);
     } else {
-        cs_print(x, y, (" "STR_HEX_PREFIX STR_HEX_WORD), val32);
+        cs_print(TEXT_X(2), TEXT_Y(line++), (" "STR_HEX_PREFIX STR_HEX_WORD), val32);
     }
 
     // Print as other floatint point formats:
     if (regId.valInfo.type == REG_VAL_TYPE_FLOAT) {
         //! TODO: Combine this with cs_print_f32.
-        y += TEXT_HEIGHT(1);
         const IEEE754_f64 flt64 = { .asU64 = val64, };
         const IEEE754_f32 flt32 = { .asU32 = val32, };
         enum FloatErrorType fltErrType = (is64Bit ? validate_f64(flt64) : validate_f32(flt32));
         if (fltErrType != FLT_ERR_NONE) {
-            cs_print(x, y, ((fltErrType == FLT_ERR_DENORM) ? "denormalized" : "NaN"));
+            cs_print(TEXT_X(2), TEXT_Y(line++), ((fltErrType == FLT_ERR_DENORM) ? "denormalized" : "NaN"));
         } else {
-            cs_print(x, y, "% g", (is64Bit ? flt64.asF64 : flt32.asF32));
-            y += TEXT_HEIGHT(1);
-            cs_print(x, y, "% e", (is64Bit ? flt64.asF64 : flt32.asF32));
+            cs_print(TEXT_X(2), TEXT_Y(line++), "% g", (is64Bit ? flt64.asF64 : flt32.asF32));
+            cs_print(TEXT_X(2), TEXT_Y(line++), "% e", (is64Bit ? flt64.asF64 : flt32.asF32));
         }
     }
-}
 
-//! TODO: clean this up.
-_Bool cs_print_reg_info_CPU_V(CSTextCoord_u32 line, UNUSED Doubleword val) {
-    Word v1 = get_reg_val(CPU, REG_CPU_V1);
-    if (v1 > 1) {
-        Word v0 = get_reg_val(CPU, REG_CPU_V0);
-        cs_print(TEXT_X(2), TEXT_Y(line), (" "STR_HEX_PREFIX STR_HEX_LONG), ((HiLo64){ .hi = v0, .lo = v1, }).raw);
-        return TRUE;
-    }
-
-    return FALSE;
+    return line;
 }
 
 _Bool cs_print_reg_info_C0_SR(CSTextCoord_u32 line, Doubleword val) {
@@ -188,19 +167,44 @@ _Bool cs_print_reg_info_SPC_RCP(CSTextCoord_u32 line, Doubleword val) {
     return TRUE;
 }
 
+void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
+#ifdef INCLUDE_DEBUG_MAP
+    const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
+    if (symbol != NULL) {
+        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
+        cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
+        cs_print(TEXT_X(2), TEXT_Y(line++),
+            (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
+            COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
+        );
+    }
+#endif // INCLUDE_DEBUG_MAP
+    Word data = 0x00000000;
+    if (try_read_word_aligned(&data, val32)) {
+        sInspectedRegisterPtrAddr = val32;
+        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
+        if (addr_is_in_text_segment(val32)) {
+            format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
+        } else {
+            cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
+            print_data_as_binary(TEXT_X(2), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
+        }
+    } else {
+        sInspectedRegisterPtrAddr = 0x00000000;
+    }
+}
+
 typedef struct RegInspectExtraInfo {
     /*0x00*/ const enum Coprocessors cop;
-    /*0x04*/ const int idx;
-    /*0x08*/ _Bool (*func)(CSTextCoord_u32 line, Doubleword val);
-    /*0x0C*/ const char* title;
-} RegInspectExtraInfo; /*0x10*/
+    /*0x01*/ const s8 idx;
+    /*0x03*/ const u8 pad[2];
+    /*0x04*/ _Bool (*func)(CSTextCoord_u32 line, Doubleword val);
+} RegInspectExtraInfo; /*0x08*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
-    { .cop = CPU,  .idx = REG_CPU_V0,             .func = cs_print_reg_info_CPU_V,    .title = "64-bit combined value of $v0 and $v1", },
-    { .cop = CPU,  .idx = REG_CPU_V1,             .func = cs_print_reg_info_CPU_V,    .title = "64-bit combined value of $v0 and $v1", },
-    { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    .title = "decoded bits", },
-    { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, .title = "decoded bits", },
-    { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  .title = "decoded bits", },
-    { .cop = SPC,  .idx = REG_SPC_RCP,            .func = cs_print_reg_info_SPC_RCP,  .title = "decoded bits", },
+    { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    },
+    { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, },
+    { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  },
+    { .cop = SPC,  .idx = REG_SPC_RCP,            .func = cs_print_reg_info_SPC_RCP,  },
 };
 
 // Register popup box draw function.
@@ -225,9 +229,16 @@ void cs_popup_reginspect_draw(void) {
         return;
     }
     _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
+    Doubleword value = get_reg_val(cop, idx);
+    if ((regId.cop == COP1) && ((regId.idx & 0x1) == 0)) {
+        Word cop1OddBits = get_reg_val(COP1, (regId.idx + 1));
+        if (cop1OddBits != 0) {
+            value = ((HiLo64){ .hi = cop1OddBits, .lo = (Word)value, }).raw;
+            is64Bit = TRUE;
+        }
+    }
 
     CSTextCoord_u32 line = 1;
-    const RGBA32 descColor = COLOR_RGBA32_CRASH_PAGE_NAME;
     // "[register] REGISTER".
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
         gInspectThread->id, get_thread_name(gInspectThread)
@@ -244,51 +255,23 @@ void cs_popup_reginspect_draw(void) {
     }
     line++;
 
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", descColor, (is64Bit ? 64 : 32));
-    Doubleword value = get_reg_val(cop, idx);
-    cs_popup_reginspect_draw_reg_value(TEXT_X(2), TEXT_Y(line++), regId, value);
+    line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
 
-    line++;
+    // line++;
     _Bool hasExInfo = FALSE;
     const RegInspectExtraInfo* exInfo = &sRegInspectExtraInfoFuncs[0];
     for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
-        if (exInfo->cop == cop && exInfo->idx == idx) {
+        if ((exInfo->cop == cop) && (exInfo->idx == idx)) {
+            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"decoded bits:", COLOR_RGBA32_CRASH_PAGE_NAME);
             hasExInfo = exInfo->func(line, value);
+            sInspectedRegisterPtrAddr = 0x00000000;
             break;
         }
         exInfo++;
     }
-    line--;
 
-    if (hasExInfo) {
-        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_PAGE_NAME, exInfo->title);
-        sInspectedRegisterPtrAddr = 0x00000000;
-    } else {
-#ifdef INCLUDE_DEBUG_MAP
-        Word val32 = (Word)value;
-        const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
-        if (symbol != NULL) {
-            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
-            cs_print(TEXT_X(2), TEXT_Y(line++),
-                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
-                COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
-            );
-        }
-#endif // INCLUDE_DEBUG_MAP
-        Word data = 0x00000000;
-        if (try_read_word_aligned(&data, val32)) {
-            sInspectedRegisterPtrAddr = val32;
-            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            if (addr_is_in_text_segment(val32)) {
-                format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
-            } else {
-                cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
-                print_data_as_binary(TEXT_X(2), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
-            }
-        } else {
-            sInspectedRegisterPtrAddr = 0x00000000;
-        }
+    if (!hasExInfo) {
+        cs_reginspect_pointer(line++, (Word)value);
     }
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);

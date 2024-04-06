@@ -351,8 +351,8 @@ void thread3_main(UNUSED void *arg) {
     detect_emulator();
     create_crash_screen_thread();
 #ifdef UNF
-    // Emulators do not handle UNF properly.
-    //! TODO: Update this for emulators that have proper support.
+    // Most emulators do not handle UNF properly.
+    //! TODO: Update this for any emulators that have proper support.
     if (gEmulator & (EMU_CONSOLE)) {
         debug_initialize();
     }
@@ -486,10 +486,10 @@ void turn_off_audio(void) {
 }
 
 void change_vi(OSViMode *mode, int width, int height) {
-    mode->comRegs.width  = width;
+    mode->comRegs.width = width;
     mode->comRegs.xScale = ((width * 512) / 320);
     if (height > 240) {
-        mode->comRegs.ctrl     |= 0x40;
+        mode->comRegs.ctrl |= VI_CTRL_SERRATE_ON;
         mode->fldRegs[0].origin = (width * 2);
         mode->fldRegs[1].origin = (width * 4);
         mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
@@ -543,8 +543,7 @@ void thread1_idle(UNUSED void *arg) {
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
     osViSetMode(&VI);
     osViBlack(TRUE);
-    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
-    osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
+    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON | OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
     create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, gThread3Stack + THREAD3_STACK, 100);
     osStartThread(&gMainThread);
