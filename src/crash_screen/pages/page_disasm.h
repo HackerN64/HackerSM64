@@ -67,5 +67,5 @@ extern _Bool gFillBranchBuffer;
 extern struct CSSetting cs_settings_group_page_disasm[];
 extern struct CSPage gCSPage_disasm;
 
-void print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const char* insnAsStr, const char* destFname);
-void format_and_print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const Address addr, const Word data);
+void print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, const char* insnAsStr, const char* destFname);
+void format_and_print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, const Address addr, const Word data);

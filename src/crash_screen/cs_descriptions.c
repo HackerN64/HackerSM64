@@ -363,9 +363,63 @@ const char* get_hardcoded_memory_str(Address addr) {
 
 // -- PROCESSOR --
 
+// #define ENABLE_NON_N64_PRID
+
 // https://en.wikichip.org/wiki/mips/prid_register
 const IdNamePair sPRId_names[] = {
-    { .id = 0x0B, .name = "vr4300", },
+    // LEGACY:
+#ifdef ENABLE_NON_N64_PRID
+    { .id = 0x01, .name = "r2000",  },
+    { .id = 0x02, .name = "r3000",  },
+    { .id = 0x03, .name = "r6000",  },
+    { .id = 0x04, .name = "r4000",  },
+    { .id = 0x06, .name = "r4000a", },
+    { .id = 0x09, .name = "r10000", },
+#endif // ENABLE_NON_N64_PRID
+    { .id = 0x0B, .name = "r4300",  }, // vr4300 (N64)
+#ifdef ENABLE_NON_N64_PRID
+    { .id = 0x0C, .name = "vr41XX", },
+    { .id = 0x0E, .name = "r12000", },
+    { .id = 0x0F, .name = "r14000", },
+    { .id = 0x10, .name = "r8000",  },
+    { .id = 0x12, .name = "pr4450", },
+    { .id = 0x20, .name = "r4600",  },
+    { .id = 0x21, .name = "r4700",  },
+    { .id = 0x22, .name = "tx39",   },
+    { .id = 0x22, .name = "r4640",  }, // duplicate?
+    { .id = 0x23, .name = "r5000",  },
+    { .id = 0x2D, .name = "tx49",   },
+    { .id = 0x24, .name = "sonic",  },
+    { .id = 0x25, .name = "magic",  },
+    { .id = 0x27, .name = "rm7000", },
+    { .id = 0x28, .name = "nevada", }, // rm5260?
+    { .id = 0x34, .name = "rm9000", },
+    { .id = 0x42, .name = "LOONGSON1", },
+    { .id = 0x54, .name = "r5432",  },
+    { .id = 0x55, .name = "r5500",  },
+    { .id = 0x63, .name = "LOONGSON2", },
+    // MIPS:
+    { .id = 0x80, .name = "4KC",     },
+    { .id = 0x81, .name = "5KC",     },
+    { .id = 0x82, .name = "20KC",    },
+    { .id = 0x83, .name = "4Kx",     }, // 4Km or 4Kp
+    { .id = 0x84, .name = "4KEC",    },
+    { .id = 0x86, .name = "4KSC",    },
+    { .id = 0x88, .name = "25KF",    },
+    { .id = 0x89, .name = "5KE",     },
+    { .id = 0x90, .name = "4KECR2",  },
+    { .id = 0x91, .name = "4KEMPR2", },
+    { .id = 0x92, .name = "4KSD",    },
+    { .id = 0x93, .name = "24K",     },
+    { .id = 0x95, .name = "34K",     },
+    { .id = 0x96, .name = "24KE",    },
+    { .id = 0x97, .name = "74K",     },
+    { .id = 0x99, .name = "1004K",   },
+    { .id = 0x9A, .name = "1074K",   },
+    { .id = 0x9C, .name = "M14KC",   },
+    { .id = 0x9E, .name = "M14KEC",  },
+#endif // ENABLE_NON_N64_PRID
+    { .id = 0xFF, .name = "unknown", },
 };
 const char* get_processor_name(u8 imp) {
     const char* ret = get_name_from_id_list(imp, sPRId_names);

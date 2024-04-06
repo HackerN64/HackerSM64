@@ -88,30 +88,30 @@ void cs_memory_draw_byte() {
 void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
     const enum MemoryDisplayModes mode = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE);
     __OSThreadContext* tc = &gInspectThread->context;
-    ScreenCoord_u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
-    ScreenCoord_u32 charY = TEXT_Y(line);
+    ScreenCoord_u32 x = (TEXT_X(SIZEOF_HEX(Address)) + 3);
+    ScreenCoord_u32 y = TEXT_Y(line);
 
 #ifdef UNF
     bzero(&sMemoryViewData, sizeof(sMemoryViewData));
 #endif // UNF
 
-    for (CSTextCoord_u32 y = 0; y < sRamViewNumShownRows; y++) {
-        Address rowAddr = (startAddr + (y * PAGE_MEMORY_STEP));
+    for (CSTextCoord_u32 row = 0; row < sRamViewNumShownRows; row++) {
+        Address rowAddr = (startAddr + (row * PAGE_MEMORY_STEP));
 
         // Row header:
         // "[XXXXXXXX]"
-        cs_print(TEXT_X(0), TEXT_Y(line + y), (STR_COLOR_PREFIX STR_HEX_WORD),
-            ((y % 2) ? COLOR_RGBA32_CRASH_MEMORY_ROW1 : COLOR_RGBA32_CRASH_MEMORY_ROW2), rowAddr
+        cs_print(TEXT_X(0), TEXT_Y(line + row), (STR_COLOR_PREFIX STR_HEX_WORD),
+            ((row % 2) ? COLOR_RGBA32_CRASH_MEMORY_ROW1 : COLOR_RGBA32_CRASH_MEMORY_ROW2), rowAddr
         );
 
-        charX = (TEXT_X(SIZEOF_HEX(Word)) + 3);
-        charY = TEXT_Y(line + y);
+        x = (TEXT_X(SIZEOF_HEX(Word)) + 3);
+        y = TEXT_Y(line + row);
 
         _Bool isColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
         // if (!isColor) {
         //     // RGBA32 highlightColor = addr_is_in_text_segment(rowAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x3F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x3F);
         //     RGBA32 highlightColor = addr_is_in_text_segment(rowAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
-        //     cs_draw_rect(charX, (charY - 2), (TEXT_WIDTH(CRASH_SCREEN_NUM_CHARS_X - 9) + 5), TEXT_HEIGHT(1), highlightColor);
+        //     cs_draw_rect(x, (y - 2), (TEXT_WIDTH(CRASH_SCREEN_NUM_CHARS_X - 9) + 5), TEXT_HEIGHT(1), highlightColor);
         // }
 
         for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
@@ -123,11 +123,11 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
 #ifdef UNF
             if (valid) {
-                sMemoryViewData[y][wordOffset] = data.word;
+                sMemoryViewData[row][wordOffset] = data.word;
             }
 #endif // UNF
 
-            charX += 2;
+            x += 2;
 
             for (u32 byteOffset = 0; byteOffset < sizeof(Word); byteOffset++) {
                 Address currAddr = (currAddrAligned + byteOffset);
@@ -154,16 +154,16 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                     // Prev byte:
                     const MapSymbol *otherSymbol = get_map_symbol((currAddr - sizeof(Byte)), SYMBOL_SEARCH_BINARY);
                     if (currSymbol != otherSymbol) {
-                        cs_draw_rect(((charX - 2) - aligned0), (charY - 2), 2, (TEXT_HEIGHT(1) + 1), dividerColor);
-                        if ((y != 0) && (wordOffset == 0) && aligned0) {
-                            cs_draw_rect((CRASH_SCREEN_X2 - 2), ((charY - TEXT_HEIGHT(1)) - 2), 1, (TEXT_HEIGHT(1) + 1), dividerColor);
+                        cs_draw_rect(((x - 2) - aligned0), (y - 2), 2, (TEXT_HEIGHT(1) + 1), dividerColor);
+                        if ((row != 0) && (wordOffset == 0) && aligned0) {
+                            cs_draw_rect((CRASH_SCREEN_X2 - 2), ((y - TEXT_HEIGHT(1)) - 2), 1, (TEXT_HEIGHT(1) + 1), dividerColor);
                         }
                     }
                     // Prev row:
                     if (currAddr >= PAGE_MEMORY_STEP) {
                         otherSymbol = get_map_symbol((currAddr - PAGE_MEMORY_STEP), SYMBOL_SEARCH_BINARY);
                         if (currSymbol != otherSymbol) {
-                            cs_draw_rect(((charX - 2) - aligned0), (charY - 2), (TEXT_WIDTH(2) + 1 + aligned0 + aligned3), 1, dividerColor);
+                            cs_draw_rect(((x - 2) - aligned0), (y - 2), (TEXT_WIDTH(2) + 1 + aligned0 + aligned3), 1, dividerColor);
                         }
                     }
                 }
@@ -171,46 +171,46 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
                 // If the display mode isn't a color, draw a solid box behind the data.
                 if (selected && !isColor) {
-                    cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), selectColor);
+                    cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), selectColor);
                 }
 
                 if (valid) {
                     Byte byte = data.byte[byteOffset];
                     switch (mode) {
                         case MEMORY_MODE_HEX:
-                            cs_draw_glyph((charX + TEXT_WIDTH(0)), charY, gHex[byte >> BITS_PER_HEX], textColor);
-                            cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, gHex[byte & BITMASK(BITS_PER_HEX)], textColor);
+                            cs_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> BITS_PER_HEX], textColor);
+                            cs_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & BITMASK(BITS_PER_HEX)], textColor);
                             break;
                         case MEMORY_MODE_ASCII:
-                            cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, byte, textColor);
+                            cs_draw_glyph((x + TEXT_WIDTH(1)), y, byte, textColor);
                             break;
                         case MEMORY_MODE_BINARY:;
                             ScreenCoord_u32 bitX = 0;
                             for (Byte bit = 0; bit < BITS_PER_BYTE; bit++) {
                                 RGBA32 color = (((byte >> ((BITS_PER_BYTE - 1) - bit)) & 0b1) ? COLOR_RGBA32_LIGHT_GRAY : COLOR_RGBA32_DARK_GRAY);
-                                cs_draw_rect((charX + bitX), charY, 1, CRASH_SCREEN_FONT_CHAR_HEIGHT, color);
+                                cs_draw_rect((x + bitX), y, 1, CRASH_SCREEN_FONT_CHAR_HEIGHT, color);
                                 bitX += (1 + (bit & 0x1));
                             }
                             break;
                         case MEMORY_MODE_RGBA16:;
                             RGBA16 color = data.halfword[byteOffset > 1];
-                            cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA16_TO_RGBA32(color));
+                            cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA16_TO_RGBA32(color));
                             break;
                         case MEMORY_MODE_RGBA32:;
-                            cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), data.word);
+                            cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), data.word);
                             break;
 
                     }
                 } else {
-                    cs_draw_glyph((charX + TEXT_WIDTH(1)), charY, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
+                    cs_draw_glyph((x + TEXT_WIDTH(1)), y, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
                 }
 
                 // If the display mode is a color, draw a translucent box on top of the data.
                 if (selected && isColor) {
-                    cs_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA32_SET_ALPHA(selectColor, 0x7F));
+                    cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA32_SET_ALPHA(selectColor, 0x7F));
                 }
 
-                charX += (TEXT_WIDTH(2) + 1);
+                x += (TEXT_WIDTH(2) + 1);
             }
         }
     }
@@ -248,18 +248,18 @@ void page_memory_draw(void) {
         cs_draw_divider(DIVIDER_Y(line));
     }
 
-    ScreenCoord_u32 charX = (TEXT_X(SIZEOF_HEX(Address)) + 3);
+    ScreenCoord_u32 x = (TEXT_X(SIZEOF_HEX(Address)) + 3);
 
     // Print column headers:
     for (u32 i = 0; i < (4 * sizeof(Word)); i++) {
         if ((i % 4) == 0) {
-            charX += 2;
+            x += 2;
         }
 
         // "[XX]"
-        cs_print(charX, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_MEMORY_COL1 : COLOR_RGBA32_CRASH_MEMORY_COL2), i);
+        cs_print(x, TEXT_Y(line), (STR_COLOR_PREFIX STR_HEX_BYTE), ((i % 2) ? COLOR_RGBA32_CRASH_MEMORY_COL1 : COLOR_RGBA32_CRASH_MEMORY_COL2), i);
 
-        charX += (TEXT_WIDTH(2) + 1);
+        x += (TEXT_WIDTH(2) + 1);
     }
 
     ram_viewer_print_data((line + 1), startAddr);

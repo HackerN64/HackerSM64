@@ -430,7 +430,7 @@ typedef struct PACKED InsnTemplate {
     /*0x08*/ u8 opcode;
     /*0x09*/ char fmt[4 + 1]; // 4 chars + null terminator (see CHAR_P_* defines).
     /*0x0E*/ u8 out; // Output register index in fmt. 0 = no output (first char is always insn name format). 6 = HiLo (TODO). 7 = Link Register (TODO).
-    /*0x0F*/ struct PACKED { // Floating point format data.
+    /*0x0F*/ struct PACKED { // Info about what the contents of the register will most likely be.
                 //! TODO: 32 bit vs. 64 bit.
                 //! TODO: This can probably be simplified.
                 u8 f1  : 1; // Primary format. [0:fixed point, 1:floating point]

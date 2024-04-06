@@ -127,7 +127,7 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
 
     // Print:
-    for (CSTextCoord_u32 i = 0; i < numLines; i++) {
+    for (CSTextCoord_u32 row = 0; row < numLines; row++) {
         if (currIndex >= sCSNumFoundFunctions) {
             break;
         }
@@ -136,7 +136,7 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
             break;
         }
 
-        ScreenCoord_u32 y = TEXT_Y(line + i);
+        ScreenCoord_u32 y = TEXT_Y(line + row);
 
         if (currIndex == sStackTraceSelectedIndex) {
             cs_draw_row_selection_box(y);

@@ -415,8 +415,14 @@ _Bool try_read_doubleword(Doubleword* dest, Address addr) {
     return FALSE;
 }
 
+/**
+ * @brief Check whether an address is a valid RAM address.
+ * 
+ * @param[in] addr The address to check.
+ * @return _Bool Whether the address is a valid RAM address.
+ */
 _Bool is_valid_ram_addr(Address addr) {
-    Word data = 0x00000000;
+    Word data = 0;
     return ((addr >= RAM_START) && (addr < RAM_END) && try_read_word_aligned(&data, addr));
 }
 
@@ -424,31 +430,31 @@ _Bool is_valid_ram_addr(Address addr) {
  * @brief Return TRUE if the specified address is unmapped in 64-bit kernel space.
  */
 _Bool is_unmapped_kx64(uint64_t vaddr) {
-    if (vaddr <= 0x000000ffffffffffull) return FALSE;
-    if (vaddr <= 0x3fffffffffffffffull) return TRUE;
-    if (vaddr <= 0x400000ffffffffffull) return FALSE;
-    if (vaddr <= 0x7fffffffffffffffull) return TRUE;
-    if (vaddr <= 0x80000000ffffffffull) return FALSE;
-    if (vaddr <= 0x87ffffffffffffffull) return TRUE;
-    if (vaddr <= 0x88000000ffffffffull) return FALSE;
-    if (vaddr <= 0x8fffffffffffffffull) return TRUE;
-    if (vaddr <= 0x90000000ffffffffull) return FALSE;
-    if (vaddr <= 0x97ffffffffffffffull) return TRUE;
-    if (vaddr <= 0x98000000ffffffffull) return FALSE;
-    if (vaddr <= 0x9fffffffffffffffull) return TRUE;
-    if (vaddr <= 0xa0000000ffffffffull) return FALSE;
-    if (vaddr <= 0xa7ffffffffffffffull) return TRUE;
-    if (vaddr <= 0xa8000000ffffffffull) return FALSE;
-    if (vaddr <= 0xafffffffffffffffull) return TRUE;
-    if (vaddr <= 0xb0000000ffffffffull) return FALSE;
-    if (vaddr <= 0xb7ffffffffffffffull) return TRUE;
-    if (vaddr <= 0xb8000000ffffffffull) return FALSE;
-    if (vaddr <= 0xbfffffffffffffffull) return TRUE;
-    if (vaddr <= 0xc00000ff7fffffffull) return FALSE;
-    if (vaddr <= 0xffffffff7fffffffull) return TRUE;
-    if (vaddr <= 0xffffffff9fffffffull) return FALSE;
-    if (vaddr <= 0xffffffffbfffffffull) return FALSE;
-    if (vaddr <= 0xffffffffdfffffffull) return FALSE;
-    if (vaddr <= 0xffffffffffffffffull) return FALSE;
+    if (vaddr <= 0x000000ffffffffffull) return FALSE; // 0x0000000000000000 - 0x000000ffffffffff
+    if (vaddr <= 0x3fffffffffffffffull) return TRUE;  // 0x0000010000000000 - 0x3fffffffffffffff
+    if (vaddr <= 0x400000ffffffffffull) return FALSE; // 0x4000000000000000 - 0x400000ffffffffff
+    if (vaddr <= 0x7fffffffffffffffull) return TRUE;  // 0x4000010000000000 - 0x7fffffffffffffff
+    if (vaddr <= 0x80000000ffffffffull) return FALSE; // 0x8000000000000000 - 0x80000000ffffffff
+    if (vaddr <= 0x87ffffffffffffffull) return TRUE;  // 0x8000000100000000 - 0x87ffffffffffffff
+    if (vaddr <= 0x88000000ffffffffull) return FALSE; // 0x8800000000000000 - 0x88000000ffffffff
+    if (vaddr <= 0x8fffffffffffffffull) return TRUE;  // 0x8800000100000000 - 0x8fffffffffffffff
+    if (vaddr <= 0x90000000ffffffffull) return FALSE; // 0x9000000000000000 - 0x90000000ffffffff
+    if (vaddr <= 0x97ffffffffffffffull) return TRUE;  // 0x9000000100000000 - 0x97ffffffffffffff
+    if (vaddr <= 0x98000000ffffffffull) return FALSE; // 0x9800000000000000 - 0x98000000ffffffff
+    if (vaddr <= 0x9fffffffffffffffull) return TRUE;  // 0x9800000100000000 - 0x9fffffffffffffff
+    if (vaddr <= 0xa0000000ffffffffull) return FALSE; // 0xa000000000000000 - 0xa0000000ffffffff
+    if (vaddr <= 0xa7ffffffffffffffull) return TRUE;  // 0xa000000100000000 - 0xa7ffffffffffffff
+    if (vaddr <= 0xa8000000ffffffffull) return FALSE; // 0xa800000000000000 - 0xa8000000ffffffff
+    if (vaddr <= 0xafffffffffffffffull) return TRUE;  // 0xa800000100000000 - 0xafffffffffffffff
+    if (vaddr <= 0xb0000000ffffffffull) return FALSE; // 0xb000000000000000 - 0xb0000000ffffffff
+    if (vaddr <= 0xb7ffffffffffffffull) return TRUE;  // 0xb000000100000000 - 0xb7ffffffffffffff
+    if (vaddr <= 0xb8000000ffffffffull) return FALSE; // 0xb800000000000000 - 0xb8000000ffffffff
+    if (vaddr <= 0xbfffffffffffffffull) return TRUE;  // 0xb800000100000000 - 0xbfffffffffffffff
+    if (vaddr <= 0xc00000ff7fffffffull) return FALSE; // 0xc000000000000000 - 0xc00000ff7fffffff
+    if (vaddr <= 0xffffffff7fffffffull) return TRUE;  // 0xc00000ff80000000 - 0xffffffff7fffffff
+    if (vaddr <= 0xffffffff9fffffffull) return FALSE; // 0xffffffff80000000 - 0xffffffff9fffffff (KSEG0)
+    if (vaddr <= 0xffffffffbfffffffull) return FALSE; // 0xffffffffa0000000 - 0xffffffffbfffffff (KSEG1)
+    if (vaddr <= 0xffffffffdfffffffull) return FALSE; // 0xffffffffc0000000 - 0xffffffffdfffffff (KSSEG)
+    if (vaddr <= 0xffffffffffffffffull) return FALSE; // 0xffffffffe0000000 - 0xffffffffffffffff (KSEG3)
     __builtin_unreachable();
 }

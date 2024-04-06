@@ -157,16 +157,16 @@ CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
     _Bool drawSel = (sel->section == PAGE_REG_SECTION_REG);
     _Bool listEnded = FALSE;
 
-    for (u32 y = 0; y < rows; y++) {
-        for (u32 x = 0; x < columns; x++) {
+    for (u32 row = 0; row < rows; row++) {
+        for (u32 col = 0; col < columns; col++) {
             if (reg->raw == REG_LIST_TERMINATOR) {
                 listEnded = TRUE;
             }
 
-            CSTextCoord_u32 charX = (x * columnCharWidth);
-            CSTextCoord_u32 charY = (line + y);
+            CSTextCoord_u32 charX = (col * columnCharWidth);
+            CSTextCoord_u32 charY = (line + row);
 
-            if (drawSel && (x == sel->selX) && (y == sel->selY)) {
+            if (drawSel && (col == sel->selX) && (row == sel->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
                     TEXT_WIDTH(STRLEN(" XX: 00000000 ")), TEXT_HEIGHT(1),
                     COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
@@ -237,12 +237,12 @@ void cs_registers_print_float_registers(CSTextCoord_u32 line, __OSThreadContext*
 
     osWritebackDCacheAll();
 
-    for (u32 y = 0; y < FP_LIST_ROWS; y++) {
-        for (u32 x = 0; x < FP_LIST_COLUMNS; x++) {
-            CSTextCoord_u32 charX = (x * columnCharWidth);
-            CSTextCoord_u32 charY = (line + y);
+    for (u32 row = 0; row < FP_LIST_ROWS; row++) {
+        for (u32 col = 0; col < FP_LIST_COLUMNS; col++) {
+            CSTextCoord_u32 charX = (col * columnCharWidth);
+            CSTextCoord_u32 charY = (line + row);
             
-            if (drawSel && (x == sel->selX) && (y == sel->selY)) {
+            if (drawSel && (col == sel->selX) && (row == sel->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
                     TEXT_WIDTH(STRLEN("FXX: 00000000 ")), TEXT_HEIGHT(1),
                     COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
@@ -412,9 +412,9 @@ void page_registers_print(void) {
     const u32 columns = REG_LIST_COLUMNS;
     const u32 rows = REG_LIST_ROWS;
     const RegisterId* reg = sRegList;
-    for (u32 y = 0; y < rows; y++) {
+    for (u32 row = 0; row < rows; row++) {
         osSyncPrintf("- ");
-        for (u32 x = 0; x < columns; x++) {
+        for (u32 col = 0; col < columns; col++) {
             if (reg->raw == REG_LIST_TERMINATOR) {
                 break;
             }
@@ -435,9 +435,9 @@ void page_registers_print(void) {
     const u32 f_rows = DIV_CEIL((CP1_NUM_REGISTERS / FP_REG_SIZE), columns);
     __OSfp* osfp = &tc->fp0;
     u32 regNum = 0;
-    for (u32 i = 0; i < f_rows; i++) {
+    for (u32 row = 0; row < f_rows; row++) {
         osSyncPrintf("- ");
-        for (u32 j = 0; j < f_columns; j++) {
+        for (u32 col = 0; col < f_columns; col++) {
             if (regNum >= CP1_NUM_REGISTERS) {
                 break;
             }

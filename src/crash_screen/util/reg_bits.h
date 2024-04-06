@@ -185,9 +185,11 @@ typedef union Reg_CP0_Cause {
 // $PRId
 typedef union Reg_CP0_PRId {
     struct PACKED {
-        u32     : 16; // RFU. Must be written as zeroes, and returns zeroes when read.
-        u32 Imp :  8; // Processor ID number (0x0B for the VR4300 seriesTM).
-        u32 Rev :  8; // Processor revision number.
+        // On N64, Company_Options and Company_Name are RFU. Must be written as zeroes, and returns zeroes when read.
+        u32 Company_Options :  8; // Relatively new addition, legacy processors have it defined as 0. https://en.wikichip.org/wiki/mips/prid_register.
+        u32 Company_Name    :  8; // Relatively new addition, legacy processors have it defined as 0. https://en.wikichip.org/wiki/mips/prid_register.
+        u32 Imp             :  8; // Processor ID number (0x0B for the VR4300 seriesTM).
+        u32 Rev             :  8; // Processor revision number.
     };
     struct PACKED {
         u32       : 24;

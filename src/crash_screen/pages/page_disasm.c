@@ -263,14 +263,14 @@ void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
 }
 #endif // INCLUDE_DEBUG_MAP
 
-void print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const char* insnAsStr, const char* destFname) {
+void print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, const char* insnAsStr, const char* destFname) {
     // "[instruction name] [params]"
-    cs_print(charX, charY, "%s", insnAsStr);
+    cs_print(x, y, "%s", insnAsStr);
 
 #ifdef INCLUDE_DEBUG_MAP
     if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && (destFname != NULL)) {
         // "[function name]"
-        cs_print_scroll((charX + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), charY,
+        cs_print_scroll((x + TEXT_WIDTH(INSN_NAME_DISPLAY_WIDTH)), y,
             (CRASH_SCREEN_NUM_CHARS_X - (INSN_NAME_DISPLAY_WIDTH)),
             STR_COLOR_PREFIX"%s",
             COLOR_RGBA32_CRASH_FUNCTION_NAME, destFname
@@ -279,10 +279,10 @@ void print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const 
 #endif // INCLUDE_DEBUG_MAP
 }
 
-void format_and_print_insn(const ScreenCoord_u32 charX, const ScreenCoord_u32 charY, const Address addr, const Word data) {
+void format_and_print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, const Address addr, const Word data) {
     const char* destFname = NULL;
     const char* insnAsStr = cs_insn_to_string(addr, (InsnData)data, &destFname, TRUE);
-    print_insn(charX, charY, insnAsStr, destFname);
+    print_insn(x, y, insnAsStr, destFname);
 }
 
 void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Address selectedAddr, Address pc) {
@@ -293,45 +293,45 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
 #endif // INCLUDE_DEBUG_MAP
     Address addr = sDisasmViewportIndex;
 
-    ScreenCoord_u32 charX = TEXT_X(0);
-    ScreenCoord_u32 charY = TEXT_Y(line);
+    ScreenCoord_u32 x = TEXT_X(0);
+    ScreenCoord_u32 y = TEXT_Y(line);
 
-    for (CSTextCoord_u32 y = 0; y < numLines; y++) {
-        charY = TEXT_Y(line + y);
+    for (CSTextCoord_u32 row = 0; row < numLines; row++) {
+        y = TEXT_Y(line + row);
 
 #ifdef INCLUDE_DEBUG_MAP
             // Translucent divider between symbols.
             const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
             if ((addr >= PAGE_DISASM_STEP) && (symbol != get_map_symbol((addr - PAGE_DISASM_STEP), SYMBOL_SEARCH_BINARY))) {
-                cs_draw_divider_translucent(DIVIDER_Y(line + y));
+                cs_draw_divider_translucent(DIVIDER_Y(line + row));
             }
             if (symbolHeaders && (symbol != NULL) && (addr == symbol->addr)) {
                 //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
-                CSTextCoord_u32 numChars = cs_print_symbol_name(charX, charY, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
-                cs_print(charX + TEXT_WIDTH(numChars), charY, ":");
-                y++;
-                charY = TEXT_Y(line + y);
+                CSTextCoord_u32 numChars = cs_print_symbol_name(x, y, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
+                cs_print(x + TEXT_WIDTH(numChars), y, ":");
+                row++;
+                y = TEXT_Y(line + row);
             }
 #endif // INCLUDE_DEBUG_MAP
 
         // Draw crash and selection rectangles:
         if (addr == pc) {
             // Draw a red selection rectangle.
-            cs_draw_row_crash_box(charY);
+            cs_draw_row_crash_box(y);
             // "<-- CRASH"
-            cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), charY, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
+            cs_print((CRASH_SCREEN_TEXT_X2 - TEXT_WIDTH(STRLEN("<-- CRASH"))), y, STR_COLOR_PREFIX"<-- CRASH", COLOR_RGBA32_CRASH_AT);
         }
         if (addr == selectedAddr) {
             // Draw a gray selection rectangle.
-            cs_draw_row_selection_box(charY);
+            cs_draw_row_selection_box(y);
         }
 
         Word data = 0x00000000;
         if (!try_read_word_aligned(&data, addr)) {
-            cs_print(charX, charY, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
+            cs_print(x, y, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else {
             if (addr_is_in_text_segment(addr)) {
-                format_and_print_insn(charX, charY, addr, data);
+                format_and_print_insn(x, y, addr, data);
 
                 if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
                     InsnData insn = {
@@ -340,7 +340,7 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
                     s16 branchOffset = insn_check_for_branch_offset(insn);
 
                     if (branchOffset != 0x0000) {
-                        draw_branch_arrow(y, (y + branchOffset + 1), (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET), COLOR_RGBA32_ORANGE, line);
+                        draw_branch_arrow(row, (row + branchOffset + 1), (DISASM_BRANCH_ARROW_HEAD_SIZE + DISASM_BRANCH_ARROW_HEAD_OFFSET), COLOR_RGBA32_ORANGE, line);
                     }
                 }
             } else { // Outside of code segments:
@@ -352,11 +352,11 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
 #endif // INCLUDE_DEBUG_MAP
                 if (unkAsBinary) {
                     // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
-                    print_data_as_binary(charX, charY, &data, sizeof(data), color);
-                    // cs_print(charX, charY, "%032b", data);
+                    print_data_as_binary(x, y, &data, sizeof(data), color);
+                    // cs_print(x, y, "%032b", data);
                 } else {
                     // "[XXXXXXXX]"
-                    cs_print(charX, charY, (STR_COLOR_PREFIX STR_HEX_WORD), color, data);
+                    cs_print(x, y, (STR_COLOR_PREFIX STR_HEX_WORD), color, data);
                 }
             }
         }
@@ -528,8 +528,8 @@ void page_disasm_print(void) {
 
     osSyncPrintf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", startAddr, endAddr);
 
-    for (u32 y = 0; y < sDisasmNumShownRows; y++) {
-        Address addr = (startAddr + (y * PAGE_DISASM_STEP));
+    for (u32 row = 0; row < sDisasmNumShownRows; row++) {
+        Address addr = (startAddr + (row * PAGE_DISASM_STEP));
         osSyncPrintf("- ["STR_HEX_WORD"]: ", addr);
         Word data = 0x00000000;
         if (!try_read_word_aligned(&data, addr)) {
