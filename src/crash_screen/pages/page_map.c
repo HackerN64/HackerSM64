@@ -26,7 +26,7 @@
 #ifdef INCLUDE_DEBUG_MAP
 
 struct CSSetting cs_settings_group_page_map[] = {
-    [CS_OPT_HEADER_PAGE_MAP         ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MAP VIEW",                       .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_HEADER_PAGE_MAP         ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MAP SYMBOLS",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MAP_SHOW_ADDRESSES      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show symbol addresses",          .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MAP_SHOW_TYPES          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show symbol types",              .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_MAP_SHOW_SIZES          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show symbol sizes",              .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
@@ -240,7 +240,7 @@ void page_map_print(void) {
 
 
 struct CSPage gCSPage_map = {
-    .name         = "MAP VIEW",
+    .name         = "MAP SYMBOLS",
     .initFunc     = page_map_init,
     .drawFunc     = page_map_draw,
     .inputFunc    = page_map_input,
