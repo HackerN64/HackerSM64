@@ -91,23 +91,12 @@ void map_viewer_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
         if (showSizes) {
             sizeStrSize = STRLEN("00000");
 
-            // Print size:
-            ScreenCoord_u32 x = TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize);
-
-            if (symbol->errc == 'S') {
-                // Size too large.
-                // "?"
-                cs_print(x, y,
-                    (STR_COLOR_PREFIX"%c"),
-                    COLOR_RGBA32_CRASH_UNKNOWN, '?'
-                );
-            } else {
-                // "[size]"
-                cs_print(x, y,
-                    (STR_COLOR_PREFIX"%-X"),
-                    COLOR_RGBA32_CRASH_OFFSET, symbol->size
-                );
-            }
+            // "[size]"
+            cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - sizeStrSize), y,
+                (STR_COLOR_PREFIX"%-X"STR_COLOR_PREFIX"%c"),
+                COLOR_RGBA32_CRASH_OFFSET, symbol->size,
+                COLOR_RGBA32_CRASH_UNKNOWN, (symbol->errc == 'S') ? '?' : '\0'
+            );
         }
 
         CSTextCoord_u32 typeStrSize = 0;
