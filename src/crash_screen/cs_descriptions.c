@@ -138,6 +138,11 @@ static const char* get_name_from_range_list_impl(u32 id, const RangeNamePair* li
 #define get_name_from_range_list(_id, _list) get_name_from_range_list_impl((_id), (_list), ARRAY_COUNT(_list))
 
 
+const char* str_null_fallback(const char* str, const char* fallback) {
+    return ((str != NULL) ? str : fallback);
+}
+
+
 // -- THREAD --
 
 static const IdNamePair sThreadIDNames[] = {
@@ -277,6 +282,130 @@ static const char* sSegmentNames[32] = {
 };
 const char* get_segment_name(u8 segmentId) {
     return ((segmentId < ARRAY_COUNT(sSegmentNames)) ? sSegmentNames[segmentId] : NULL);
+}
+
+#define DEFINE_ROM_SEGMENT_START()
+
+static const IdNamePair sLevelROMSegments[] = {
+#define STUB_LEVEL(textname, _1, _2, _3, _4, _5, _6, _7, _8)
+#define DEFINE_LEVEL(textname, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) { .id = (uintptr_t)(_##folder##_segment_7SegmentRomStart), .name = textname },
+#include "levels/level_defines.h"
+#undef STUB_LEVEL
+#undef DEFINE_LEVEL
+    { .id = (uintptr_t)_debug_level_select_yay0SegmentRomStart, .name = "level select", },
+};
+static const IdNamePair sTextureBinROMSegments[] = {
+    { .id = (uintptr_t)_fire_yay0SegmentRomStart,     .name = "fire",     },
+    { .id = (uintptr_t)_spooky_yay0SegmentRomStart,   .name = "spooky",   },
+    { .id = (uintptr_t)_generic_yay0SegmentRomStart,  .name = "generic",  },
+    { .id = (uintptr_t)_water_yay0SegmentRomStart,    .name = "water",    },
+    { .id = (uintptr_t)_sky_yay0SegmentRomStart,      .name = "sky",      },
+    { .id = (uintptr_t)_snow_yay0SegmentRomStart,     .name = "snow",     },
+    { .id = (uintptr_t)_cave_yay0SegmentRomStart,     .name = "cave",     },
+    { .id = (uintptr_t)_machine_yay0SegmentRomStart,  .name = "machine",  },
+    { .id = (uintptr_t)_mountain_yay0SegmentRomStart, .name = "mountain", },
+    { .id = (uintptr_t)_grass_yay0SegmentRomStart,    .name = "grass",    },
+    { .id = (uintptr_t)_outside_yay0SegmentRomStart,  .name = "outside",  },
+    { .id = (uintptr_t)_inside_yay0SegmentRomStart,   .name = "inside",   },
+    { .id = (uintptr_t)_effect_yay0SegmentRomStart,   .name = "effect",   },
+};
+static const IdNamePair sSkyboxBinROMSegments[] = {
+    { .id = (uintptr_t)_water_skybox_yay0SegmentRomStart,       .name = "water",        },
+    { .id = (uintptr_t)_ccm_skybox_yay0SegmentRomStart,         .name = "ccm",          },
+    { .id = (uintptr_t)_clouds_skybox_yay0SegmentRomStart,      .name = "clouds",       },
+    { .id = (uintptr_t)_bitfs_skybox_yay0SegmentRomStart,       .name = "bitfs",        },
+    { .id = (uintptr_t)_wdw_skybox_yay0SegmentRomStart,         .name = "wdw",          },
+    { .id = (uintptr_t)_cloud_floor_skybox_yay0SegmentRomStart, .name = "cloud floor",  },
+    { .id = (uintptr_t)_ssl_skybox_yay0SegmentRomStart,         .name = "ssl",          },
+    { .id = (uintptr_t)_bbh_skybox_yay0SegmentRomStart,         .name = "bbh",          },
+    { .id = (uintptr_t)_bidw_skybox_yay0SegmentRomStart,        .name = "bidw",         },
+    { .id = (uintptr_t)_bits_skybox_yay0SegmentRomStart,        .name = "bits",         },
+    { .id = (uintptr_t)_title_screen_bg_yay0SegmentRomStart,    .name = "title screen", },
+};
+static const IdNamePair sGroupA_yay0ROMSegments[] = {
+    { .id = (uintptr_t)_group1_yay0SegmentRomStart,  .name = "group1",  },
+    { .id = (uintptr_t)_group2_yay0SegmentRomStart,  .name = "group2",  },
+    { .id = (uintptr_t)_group3_yay0SegmentRomStart,  .name = "group3",  },
+    { .id = (uintptr_t)_group4_yay0SegmentRomStart,  .name = "group4",  },
+    { .id = (uintptr_t)_group5_yay0SegmentRomStart,  .name = "group5",  },
+    { .id = (uintptr_t)_group6_yay0SegmentRomStart,  .name = "group6",  },
+    { .id = (uintptr_t)_group7_yay0SegmentRomStart,  .name = "group7",  },
+    { .id = (uintptr_t)_group8_yay0SegmentRomStart,  .name = "group8",  },
+    { .id = (uintptr_t)_group9_yay0SegmentRomStart,  .name = "group9",  },
+    { .id = (uintptr_t)_group10_yay0SegmentRomStart, .name = "group10", },
+    { .id = (uintptr_t)_group11_yay0SegmentRomStart, .name = "group11", },
+};
+static const IdNamePair sGroupA_geoROMSegments[] = {
+    { .id = (uintptr_t)_group1_geoSegmentRomStart,  .name = "group1",  },
+    { .id = (uintptr_t)_group2_geoSegmentRomStart,  .name = "group2",  },
+    { .id = (uintptr_t)_group3_geoSegmentRomStart,  .name = "group3",  },
+    { .id = (uintptr_t)_group4_geoSegmentRomStart,  .name = "group4",  },
+    { .id = (uintptr_t)_group5_geoSegmentRomStart,  .name = "group5",  },
+    { .id = (uintptr_t)_group6_geoSegmentRomStart,  .name = "group6",  },
+    { .id = (uintptr_t)_group7_geoSegmentRomStart,  .name = "group7",  },
+    { .id = (uintptr_t)_group8_geoSegmentRomStart,  .name = "group8",  },
+    { .id = (uintptr_t)_group9_geoSegmentRomStart,  .name = "group9",  },
+    { .id = (uintptr_t)_group10_geoSegmentRomStart, .name = "group10", },
+    { .id = (uintptr_t)_group11_geoSegmentRomStart, .name = "group11", },
+};
+static const IdNamePair sGroupB_yay0ROMSegments[] = {
+    { .id = (uintptr_t)_group12_yay0SegmentRomStart, .name = "group12", },
+    { .id = (uintptr_t)_group13_yay0SegmentRomStart, .name = "group13", },
+    { .id = (uintptr_t)_group14_yay0SegmentRomStart, .name = "group14", },
+    { .id = (uintptr_t)_group15_yay0SegmentRomStart, .name = "group15", },
+    { .id = (uintptr_t)_group16_yay0SegmentRomStart, .name = "group16", },
+    { .id = (uintptr_t)_group17_yay0SegmentRomStart, .name = "group17", },
+};
+static const IdNamePair sGroupB_geoROMSegments[] = {
+    { .id = (uintptr_t)_group12_geoSegmentRomStart, .name = "group12", },
+    { .id = (uintptr_t)_group13_geoSegmentRomStart, .name = "group13", },
+    { .id = (uintptr_t)_group14_geoSegmentRomStart, .name = "group14", },
+    { .id = (uintptr_t)_group15_geoSegmentRomStart, .name = "group15", },
+    { .id = (uintptr_t)_group16_geoSegmentRomStart, .name = "group16", },
+    { .id = (uintptr_t)_group17_geoSegmentRomStart, .name = "group17", },
+};
+static const IdNamePair sMenuIntroROMSegments[] = {
+    { .id = (uintptr_t)_introSegmentRomStart,  .name = "intro", },
+    { .id = (uintptr_t)_menuSegmentRomStart,   .name = "intro", },
+    { .id = (uintptr_t)_endingSegmentRomStart, .name = "intro", },
+};
+#if MULTILANG
+//! TODO: Update this when ASCII PR is merged:
+static const IdNamePair sTranslationROMSegments[] = {
+    { .id = (uintptr_t)_translation_en_yay0SegmentRomStart, .name = "english", },
+    { .id = (uintptr_t)_translation_fr_yay0SegmentRomStart, .name = "french",  },
+    { .id = (uintptr_t)_translation_de_yay0SegmentRomStart, .name = "german",  },
+};
+#endif // MULTILANG
+
+// Get the name of what is currently loaded in a segment.
+const char* get_segment_sub_name(u8 segmentId) {
+    Address romAddr = sSegmentROMTable[segmentId];
+    if (romAddr == 0) {
+        return NULL;
+    }
+    switch (segmentId) {
+        //! TODO: Remaining segments.
+        case SEGMENT_LEVEL_DATA:        return get_name_from_id_list(romAddr, sLevelROMSegments);
+        case SEGMENT_TEXTURE:           return get_name_from_id_list(romAddr, sTextureBinROMSegments);
+        case SEGMENT_SKYBOX:            return get_name_from_id_list(romAddr, sSkyboxBinROMSegments);
+        case SEGMENT_COMMON0_YAY0:      return ((romAddr == (uintptr_t)_common0_yay0SegmentRomStart) ? "common0" : NULL);
+        case SEGMENT_COMMON0_GEO:       return ((romAddr == (uintptr_t)_common0_geoSegmentRomStart ) ? "common0" : NULL);
+        case SEGMENT_COMMON1_YAY0:      return ((romAddr == (uintptr_t)_common1_yay0SegmentRomStart) ? "common1" : NULL);
+        case SEGMENT_COMMON1_GEO:       return ((romAddr == (uintptr_t)_common1_geoSegmentRomStart ) ? "common1" : NULL);
+        case SEGMENT_GROUP0_YAY0:       return ((romAddr == (uintptr_t)_group0_yay0SegmentRomStart ) ? "group0"  : NULL);
+        case SEGMENT_GROUP0_GEO:        return ((romAddr == (uintptr_t)_group0_geoSegmentRomStart  ) ? "group0"  : NULL);
+        case SEGMENT_GROUPA_YAY0:       return get_name_from_id_list(romAddr, sGroupA_yay0ROMSegments);
+        case SEGMENT_GROUPA_GEO:        return get_name_from_id_list(romAddr, sGroupA_geoROMSegments);
+        case SEGMENT_GROUPB_YAY0:       return get_name_from_id_list(romAddr, sGroupB_yay0ROMSegments);
+        case SEGMENT_GROUPB_GEO:        return get_name_from_id_list(romAddr, sGroupB_geoROMSegments);
+        case SEGMENT_MENU_INTRO:        return get_name_from_id_list(romAddr, sMenuIntroROMSegments);
+#if MULTILANG
+        case SEGMENT_EU_TRANSLATION:    return get_name_from_id_list(romAddr, sTranslationROMSegments);
+#endif // MULTILANG
+    }
+
+    return NULL;
 }
 
 

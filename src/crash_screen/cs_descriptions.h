@@ -57,11 +57,14 @@ extern const char* gSaveTypeName;
 extern const char* gCompressionName;
 
 
+const char* str_null_fallback(const char* str, const char* fallback);
+
 const char* get_thread_name(OSThread* thread);
 const char* get_thread_state_str(OSThread* thread);
 const char* get_thread_flags_str(OSThread* thread);
 
 const char* get_segment_name(u8 segmentId);
+const char* get_segment_sub_name(u8 segmentId);
 const char* get_hardcoded_memory_str(Address addr);
 
 const char* get_processor_name(u8 imp);

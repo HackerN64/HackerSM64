@@ -31,6 +31,7 @@ struct MemoryPool *gEffectsMemoryPool;
 
 uintptr_t sSegmentTable[32];
 uintptr_t sSegmentSizes[32];
+uintptr_t sSegmentROMTable[32];
 u32 sPoolFreeSpace;
 u8 *sPoolStart;
 u8 *sPoolEnd;
@@ -325,12 +326,14 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
             set_segment_base_addr(segment, realAddr);
             size_t size = ((srcEnd - srcStart) + ((uintptr_t)bssEnd - (uintptr_t)bssStart));
             set_segment_size(segment, size);
+            sSegmentROMTable[segment] = (uintptr_t)srcStart;
             mapTLBPages((segment << 24), VIRTUAL_TO_PHYSICAL(realAddr), size, segment);
         }
     } else {
         addr = dynamic_dma_read(srcStart, srcEnd, side, 0, 0);
         if (addr != NULL) {
             set_segment_base_addr(segment, addr);
+            sSegmentROMTable[segment] = (uintptr_t)srcStart;
             set_segment_size(segment, (size_t)(srcEnd - srcStart));
         }
     }
@@ -409,6 +412,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #endif
             osSyncPrintf("end decompress\n");
             set_segment_base_addr(segment, dest);
+            sSegmentROMTable[segment] = (uintptr_t)srcStart;
             set_segment_size(segment, *size);
             main_pool_free(compressed);
         }

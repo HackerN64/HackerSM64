@@ -68,6 +68,7 @@ struct MemoryPool {
 
 extern uintptr_t sSegmentTable[32];
 extern uintptr_t sSegmentSizes[32];
+extern uintptr_t sSegmentROMTable[32];
 extern u32 sPoolFreeSpace;
 extern u8 *sPoolStart;
 extern u8 *sPoolEnd;
