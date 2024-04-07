@@ -185,7 +185,6 @@ SECTIONS
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
-      BUILD_DIR/src/crash_screen*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
@@ -211,7 +210,6 @@ SECTIONS
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
-      BUILD_DIR/src/crash_screen*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
@@ -230,7 +228,6 @@ SECTIONS
 
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
-      BUILD_DIR/src/crash_screen*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
@@ -250,7 +247,6 @@ SECTIONS
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/boot*.o(.*bss*);
-      BUILD_DIR/src/crash_screen*.o(.*bss*);
       BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
@@ -311,6 +307,26 @@ SECTIONS
    END_NOLOAD(engine)
 
    . = _engineSegmentBssEnd;
+
+   BEGIN_SEG(crashscreen, .)
+   {
+      BEGIN_TEXT(crashscreen)
+      BUILD_DIR/src/crash_screen*.o(.text*);
+      END_TEXT(crashscreen)
+      BUILD_DIR/src/crash_screen*.o(.*data*);
+      BUILD_DIR/src/crash_screen*.o(.rodata*);
+      . = ALIGN(0x10);
+   }
+   END_SEG(crashscreen)
+   BEGIN_NOLOAD(crashscreen)
+   {
+      BUILD_DIR/src/crash_screen*.o(.*bss*);
+      . = ALIGN(0x40);
+   }
+   END_NOLOAD(crashscreen)
+
+   . = _crashscreenSegmentBssEnd;
+
    BEGIN_NOLOAD(framebuffers)
    {
       BUILD_DIR/src/buffers/framebuffers.o(.bss*);

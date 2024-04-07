@@ -13,6 +13,7 @@ ALIGNED8 static const AddressPair sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
 TEXT_REGION_SEGMENT(engine)
+TEXT_REGION_SEGMENT(crashscreen)
 TEXT_REGION_SEGMENT(behavior)
 TEXT_REGION_SEGMENT(goddard)
 #ifdef KEEP_MARIO_HEAD

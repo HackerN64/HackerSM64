@@ -50,12 +50,12 @@ static void cs_reinitialize(void) {
         cs_get_current_page()->flags.crashed = TRUE;
     }
 
-    gCSPageID        = CRASH_SCREEN_START_PAGE;
     gCSSwitchedPage  = FALSE;
     gCSPopupID       = CS_POPUP_NONE;
     gCSSwitchedPopup = FALSE;
 
     if (sFirstCrash) {
+        gCSPageID = CRASH_SCREEN_START_PAGE;
         cs_settings_apply_func_to_all(cs_setting_func_reset);
         cs_settings_set_all_headers(FALSE);
     }

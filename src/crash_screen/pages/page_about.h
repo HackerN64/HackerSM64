@@ -67,6 +67,7 @@ enum CSAboutEntries_Rom {
     CS_ABOUT_ENTRY_ROM_REGION,
     CS_ABOUT_ENTRY_ROM_SAVE_TYPE,
     CS_ABOUT_ENTRY_ROM_COMPRESSION,
+    CS_ABOUT_ENTRY_ROM_CRASH_SCREEN,
     CS_ABOUT_ENTRY_ROM_SYMBOLS,
     CS_ABOUT_ENTRY_ROM_ROM_SIZE,
     CS_ABOUT_ENTRY_ROM_RAM_SIZE,
@@ -116,7 +117,7 @@ typedef struct PACKED {
         /*0x08*/ char info[27];             // Buffer for the info data. If type == CS_ABOUT_ENTRY_TYPE_LONG, uses a different, longer buffer.
         struct PACKED {
             u8 pad[26];
-            _Bool expanded;                 // CS_ABOUT_ENTRY_TYPE_HEADER doesn't use the info buffer, so repurpose it.
+            _Bool expanded;                 // CS_ABOUT_ENTRY_TYPE_HEADER doesn't use the 'info' buffer, so repurpose it.
         } flags;
     };
     /*0x23*/ s8 type;                   // enum CSAboutEntryTypes.

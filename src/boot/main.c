@@ -347,7 +347,8 @@ void check_stack_validity(void) {
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
-    load_engine_code_segment();
+    load_code_segment(_engineSegmentStart, _engineSegmentEnd, _engineSegmentRomStart, _engineSegmentRomEnd);
+    load_code_segment(_crashscreenSegmentStart, _crashscreenSegmentEnd, _crashscreenSegmentRomStart, _crashscreenSegmentRomEnd);
     detect_emulator();
     create_crash_screen_thread();
 #ifdef UNF

@@ -104,6 +104,12 @@ void _cs_about_func_save_type(char* buf) {
     p += sprintf(p, STR_SUFFIX_BYTES")");
 }
 ABOUT_ENTRY_FUNC(compression,    gCompressionName)
+void _cs_about_func_crash_screen(char* buf) {
+    size_t csSize = ((Address)_crashscreenSegmentRomEnd - (Address)_crashscreenSegmentRomStart);
+    char* p = buf;
+    p += sprintf_int_with_commas(p, csSize);
+    p += sprintf(p, (STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM), percent_of(csSize, (size_t)gRomSize));
+}
 void _cs_about_func_symbols(char* buf) {
 #ifdef INCLUDE_DEBUG_MAP
     size_t numSymbols = (gMapSymbolsEnd - gMapSymbols);
@@ -127,12 +133,7 @@ void _cs_about_func_ram_size(char* buf) {
     p += sprintf_int_with_commas(p, osMemSize);
     p += sprintf(p, (STR_SUFFIX_BYTES" ("STR_ABOUT_DECIMAL_FMT STR_SUFFIX_MEGABYTES")"), bytes_to_megabytes(osMemSize));
 }
-void _cs_about_func_gfx_pool(char* buf) {
-    char* p = buf;
-    size_t usedPool = ((Address)gDisplayListHead - (Address)gGfxPool->buffer);
-    size_t totalPool = GFX_POOL_SIZE;
-    p += sprintf(p, "%i/%i cmds", (usedPool / sizeof(Gfx)), (totalPool / sizeof(Gfx))); // Entries
-}
+ABOUT_ENTRY_FUNC(gfx_pool,       STR_HEX_PREFIX"%X (%d cmds)", GFX_POOL_SIZE, (GFX_POOL_SIZE / sizeof(Gfx)))
 #ifdef KEEP_MARIO_HEAD
 void _cs_about_func_goddard(char* buf) {
     size_t goddardSize = (size_t)gGoddardSize;
@@ -261,17 +262,18 @@ CSAboutEntry sCSAboutEntries_compiler[CS_NUM_ABOUT_ENTRIES_COMPILER] = {
     [CS_ABOUT_ENTRY_COMPILER_END       ] = ABOUT_ENTRY_NULL(),
 };
 CSAboutEntry sCSAboutEntries_rom[CS_NUM_ABOUT_ENTRIES_ROM] = {
-    [CS_ABOUT_GROUP_HEADER_ROM     ] = ABOUT_ENTRY_HEADER("rom", TRUE),
-    [CS_ABOUT_ENTRY_ROM_ROM_NAME   ] = ABOUT_ENTRY_SINGLE(rom_name,      "ROM NAME"      ),
-    [CS_ABOUT_ENTRY_ROM_LIBULTRA   ] = ABOUT_ENTRY_SINGLE(libultra,      "LIBULTRA"      ),
-    [CS_ABOUT_ENTRY_ROM_MICROCODE  ] = ABOUT_ENTRY_SINGLE(microcode,     "MICROCODE"     ),
-    [CS_ABOUT_ENTRY_ROM_REGION     ] = ABOUT_ENTRY_SINGLE(region,        "REGION"        ),
-    [CS_ABOUT_ENTRY_ROM_SAVE_TYPE  ] = ABOUT_ENTRY_SINGLE(save_type,     "SAVE TYPE"     ),
-    [CS_ABOUT_ENTRY_ROM_COMPRESSION] = ABOUT_ENTRY_SINGLE(compression,   "COMPRESSION"   ),
-    [CS_ABOUT_ENTRY_ROM_SYMBOLS    ] = ABOUT_ENTRY_SINGLE(symbols,       "MAP SYMBOLS"   ),
-    [CS_ABOUT_ENTRY_ROM_ROM_SIZE   ] = ABOUT_ENTRY_SINGLE(rom_size,      "ROM SIZE"      ),
-    [CS_ABOUT_ENTRY_ROM_RAM_SIZE   ] = ABOUT_ENTRY_SINGLE(ram_size,      "RAM SIZE"      ),
-    [CS_ABOUT_ENTRY_ROM_END        ] = ABOUT_ENTRY_NULL(),
+    [CS_ABOUT_GROUP_HEADER_ROM      ] = ABOUT_ENTRY_HEADER("rom", TRUE),
+    [CS_ABOUT_ENTRY_ROM_ROM_NAME    ] = ABOUT_ENTRY_SINGLE(rom_name,      "ROM NAME"      ),
+    [CS_ABOUT_ENTRY_ROM_LIBULTRA    ] = ABOUT_ENTRY_SINGLE(libultra,      "LIBULTRA"      ),
+    [CS_ABOUT_ENTRY_ROM_MICROCODE   ] = ABOUT_ENTRY_SINGLE(microcode,     "MICROCODE"     ),
+    [CS_ABOUT_ENTRY_ROM_REGION      ] = ABOUT_ENTRY_SINGLE(region,        "REGION"        ),
+    [CS_ABOUT_ENTRY_ROM_SAVE_TYPE   ] = ABOUT_ENTRY_SINGLE(save_type,     "SAVE TYPE"     ),
+    [CS_ABOUT_ENTRY_ROM_COMPRESSION ] = ABOUT_ENTRY_SINGLE(compression,   "COMPRESSION"   ),
+    [CS_ABOUT_ENTRY_ROM_CRASH_SCREEN] = ABOUT_ENTRY_SINGLE(crash_screen,  "CRASH SCREEN"  ),
+    [CS_ABOUT_ENTRY_ROM_SYMBOLS     ] = ABOUT_ENTRY_SINGLE(symbols,       "MAP SYMBOLS"   ),
+    [CS_ABOUT_ENTRY_ROM_ROM_SIZE    ] = ABOUT_ENTRY_SINGLE(rom_size,      "ROM SIZE"      ),
+    [CS_ABOUT_ENTRY_ROM_RAM_SIZE    ] = ABOUT_ENTRY_SINGLE(ram_size,      "RAM SIZE"      ),
+    [CS_ABOUT_ENTRY_ROM_END         ] = ABOUT_ENTRY_NULL(),
 };
 CSAboutEntry sCSAboutEntries_collision[CS_NUM_ABOUT_ENTRIES_COLLISION] = {
     [CS_ABOUT_GROUP_HEADER_COLLISION       ] = ABOUT_ENTRY_HEADER("collision", TRUE),

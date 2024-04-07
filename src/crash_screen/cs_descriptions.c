@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include "sm64.h"
+#include "segment_symbols.h"
 
 #include "crash_screen/cs_main.h"
 #include "util/insn_disasm.h"
@@ -13,9 +14,11 @@
 
 #include "cs_descriptions.h"
 
+#include "engine/surface_load.h"
 #include "game/emutest.h"
-#include "game/version.h"
+#include "game/game_init.h"
 #include "game/level_update.h"
+#include "game/version.h"
 
 
 // Include the version number from VERSION.txt. Includes a newline at the end.
@@ -184,14 +187,12 @@ const char* get_thread_name(OSThread* thread) {
         return name;
     }
 
-#ifdef INCLUDE_DEBUG_MAP
-    if (name == NULL) {
+    if (IS_DEBUG_MAP_INCLUDED() && (name == NULL)) {
         const MapSymbol* symbol = get_map_symbol((Address)thread, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             return get_map_symbol_name(symbol);
         }
     }
-#endif // INCLUDE_DEBUG_MAP
 
     return NULL;
 }
@@ -281,21 +282,14 @@ const char* get_segment_name(u8 segmentId) {
 
 // -- RAM POOLS --
 
-#include "game/game_init.h"
-#include "engine/surface_load.h"
-
-extern u32 sPoolFreeSpace;
-extern u8 *sPoolStart;
-extern u8 *sPoolEnd;
-
-
 static const RangeNamePair sHardcodedSegmentRanges[] = {
-    { .start = (Address)_mainSegmentStart,            .end = (Address)_mainSegmentEnd,            .name = "MAIN SEG",     },
-    { .start = (Address)_engineSegmentStart,          .end = (Address)_engineSegmentEnd,          .name = "ENGINE SEG",   },
-    { .start = (Address)_goddardSegmentStart,         .end = (Address)_goddardSegmentEnd,         .name = "GODDARD",      },
-    { .start = (Address)_framebuffersSegmentBssStart, .end = (Address)_framebuffersSegmentBssEnd, .name = "FRAMEBUFFERS", },
-    { .start = (Address)_zbufferSegmentBssStart,      .end = (Address)_zbufferSegmentBssEnd,      .name = "ZBUFFER",      },
-    { .start = (Address)_buffersSegmentBssStart,      .end = (Address)_buffersSegmentBssEnd,      .name = "BUFFERS",      },
+    { .start = (Address)_mainSegmentStart,            .end = (Address)_mainSegmentEnd,            .name = "main",          },
+    { .start = (Address)_engineSegmentStart,          .end = (Address)_engineSegmentEnd,          .name = "engine",        },
+    { .start = (Address)_crashscreenSegmentStart,     .end = (Address)_crashscreenSegmentBssEnd,  .name = "crash screeen", },
+    { .start = (Address)_goddardSegmentStart,         .end = (Address)_goddardSegmentEnd,         .name = "goddard",       },
+    { .start = (Address)_framebuffersSegmentBssStart, .end = (Address)_framebuffersSegmentBssEnd, .name = "framebuffers",  },
+    { .start = (Address)_zbufferSegmentBssStart,      .end = (Address)_zbufferSegmentBssEnd,      .name = "zbuffer",       },
+    { .start = (Address)_buffersSegmentBssStart,      .end = (Address)_buffersSegmentBssEnd,      .name = "buffers",       },
 };
 
 // For stuff that doesn't have a map symbol name.
@@ -305,25 +299,25 @@ const char* get_hardcoded_memory_str(Address addr) {
         (addr >= (Address)gCurrStaticSurfacePool) &&
         (addr < (Address)gCurrStaticSurfacePoolEnd)
     ) {
-        return "STATIC SURF POOL";
+        return "static surf pool";
     }
 
     // Is addr in dynamic surface pool?
     if (addr >= (Address)gDynamicSurfacePool) {
         if (addr < (Address)gDynamicSurfacePoolEnd) {
-            return "DYNAMIC SURF POOL (ACTIVE)";
-        } else if (addr < (Address)((Byte*)gCurrStaticSurfacePool + DYNAMIC_SURFACE_POOL_SIZE)) {
-            return "DYNAMIC SURF POOL (UNUSED)";
+            return "dyn surf pool (active)";
+        } else if (addr < (Address)((Byte*)gDynamicSurfacePool + DYNAMIC_SURFACE_POOL_SIZE)) {
+            return "dyn surf pool (unused)";
         }
     }
 
 #ifdef INCLUDE_DEBUG_MAP
     // Is addr in map symbol data?
-    if ((gNumMapSymbols != 0) /* Check whether the map data was loaded. */ && (addr >= (Address)_mapDataSegmentStart)) {
+    if ((gNumMapSymbols != 0) /* Checks whether the map data was loaded. */ && (addr >= (Address)_mapDataSegmentStart)) {
         if (addr < (Address)((Byte*)_mapDataSegmentStart + ((gMapSymbolsEnd - gMapSymbols) * sizeof(MapSymbol)))) {
-            return "MAP SYMBOLS (DATA)";
+            return "map symbols (data)";
         } else if (addr < (Address)_mapDataSegmentEnd) {
-            return "MAP SYMBOLS (STRINGS)";
+            return "map symbols (strings)";
         }
     }
 #else // !INCLUDE_DEBUG_MAP
@@ -332,28 +326,35 @@ const char* get_hardcoded_memory_str(Address addr) {
     // Is addr in GFX pool?
     if (addr >= (Address)gGfxPool->buffer) {
         if (addr < (Address)gDisplayListHead) {
-            return "GFX POOL (USED)";
+            return "gfx pool (used)";
         } else if (addr < (Address)gGfxPoolEnd) {
-            return "GFX POOL (ALLOCATED)";
+            return "gfx pool (allocated)";
         } else if (addr < (Address)((Byte*)gGfxPool->buffer + GFX_POOL_SIZE)) {
-            return "GFX POOL (UNUSED)";
+            return "gfx pool (unused)";
         }
     }
 
     //! TODO: audio heap, thread stacks, SPTasks, save buffer, both gGfxPools.
 #endif // !INCLUDE_DEBUG_MAP
 
+    s32 segment = get_segment_from_virtual_addr((void*)addr);
+    if (segment != 0) {
+        return get_segment_name(segment);
+    }
+
     const char* hardcodedSegmentStr = get_name_from_range_list(addr, sHardcodedSegmentRanges);
     if (hardcodedSegmentStr != NULL) {
         return hardcodedSegmentStr;
     }
 
+    // sPoolStart = SEG_POOL_START/__mainPoolStart + 0x10
+    // sPoolEnd = 0x80800000 - 0x10 (POOL_SIZE)
     if (addr >= (Address)sPoolStart) {
         if (addr < ((Address)sPoolEnd - sPoolFreeSpace)) {
-            return "MAIN POOL (USED)";
+            return "main pool (used)";
         }
         if (addr < (Address)sPoolEnd) {
-            return "MAIN POOL (UNUSED)";
+            return "main pool (unused)";
         }
     }
 
@@ -376,7 +377,7 @@ const IdNamePair sPRId_names[] = {
     { .id = 0x06, .name = "r4000a", },
     { .id = 0x09, .name = "r10000", },
 #endif // ENABLE_NON_N64_PRID
-    { .id = 0x0B, .name = "r4300",  }, // vr4300 (N64)
+    { .id = 0x0B, .name = "vr4300", }, // r4300
 #ifdef ENABLE_NON_N64_PRID
     { .id = 0x0C, .name = "vr41XX", },
     { .id = 0x0E, .name = "r12000", },
@@ -640,6 +641,7 @@ static const IdNamePair sMapSymbolTypes[] = {
     { .id = 'B', .name = ".bss",              }, // Global bss symbol.
     { .id = 'd', .name = ".data (static)",    }, // Local data symbol.
     { .id = 'D', .name = ".data",             }, // Global data symbol.
+    { .id = 'N', .name = "debug",             }, // Debugging symbol.
     { .id = 'r', .name = ".rodata (static)",  }, // Local read only symbol.
     { .id = 'R', .name = ".rodata",           }, // Global read only symbol.
     { .id = 't', .name = ".text (static)",    }, // Local text symbol.

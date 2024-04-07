@@ -22,37 +22,6 @@
 #include "game/puppyprint.h"
 
 
-struct MainPoolState {
-    u32 freeSpace;
-    struct MainPoolBlock *listHeadL;
-    struct MainPoolBlock *listHeadR;
-    struct MainPoolState *prev;
-};
-
-struct MainPoolBlock {
-    struct MainPoolBlock *prev;
-    struct MainPoolBlock *next;
-};
-
-struct MemoryBlock {
-    struct MemoryBlock *next;
-    u32 size;
-};
-
-struct MemoryPool {
-    u32 totalSpace;
-    struct MemoryBlock *firstBlock;
-    struct MemoryBlock freeList;
-};
-
-extern uintptr_t sSegmentTable[32];
-extern u32 sPoolFreeSpace;
-extern u8 *sPoolStart;
-extern u8 *sPoolEnd;
-extern struct MainPoolBlock *sPoolListHeadL;
-extern struct MainPoolBlock *sPoolListHeadR;
-
-
 /**
  * Memory pool for small graphical effects that aren't connected to Objects.
  * Used for colored text, paintings, and environmental snow and bubbles.
@@ -61,6 +30,7 @@ struct MemoryPool *gEffectsMemoryPool;
 
 
 uintptr_t sSegmentTable[32];
+uintptr_t sSegmentSizes[32];
 u32 sPoolFreeSpace;
 u8 *sPoolStart;
 u8 *sPoolEnd;
@@ -75,8 +45,33 @@ uintptr_t set_segment_base_addr(s32 segment, void *addr) {
     return sSegmentTable[segment];
 }
 
-UNUSED void *get_segment_base_addr(s32 segment) {
+void *get_segment_base_addr(s32 segment) {
     return (void *) (sSegmentTable[segment] | 0x80000000);
+}
+
+void set_segment_size(s32 segment, size_t size) {
+    sSegmentSizes[segment] = size;
+}
+
+size_t get_segment_size(s32 segment) {
+    return sSegmentSizes[segment];
+}
+
+s32 is_addr_in_segment(void* addr, s32 segment) {
+    void *segBase = get_segment_base_addr(segment);
+    size_t size = get_segment_size(segment);
+
+    return ((segBase != (void*)RAM_START) && (addr >= segBase) && (addr < (segBase + size)));
+}
+
+s32 get_segment_from_virtual_addr(void* addr) {
+    for (s32 i = 0; i < 32; i++) {
+        if (is_addr_in_segment(addr, i)) {
+            return i;
+        }
+    }
+
+    return 0;
 }
 
 #ifndef NO_SEGMENTED_MEMORY
@@ -328,12 +323,15 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
         if (addr != NULL) {
             u8 *realAddr = (u8 *)ALIGN((uintptr_t)addr, TLB_PAGE_SIZE);
             set_segment_base_addr(segment, realAddr);
-            mapTLBPages((segment << 24), VIRTUAL_TO_PHYSICAL(realAddr), ((srcEnd - srcStart) + ((uintptr_t)bssEnd - (uintptr_t)bssStart)), segment);
+            size_t size = ((srcEnd - srcStart) + ((uintptr_t)bssEnd - (uintptr_t)bssStart));
+            set_segment_size(segment, size);
+            mapTLBPages((segment << 24), VIRTUAL_TO_PHYSICAL(realAddr), size, segment);
         }
     } else {
         addr = dynamic_dma_read(srcStart, srcEnd, side, 0, 0);
         if (addr != NULL) {
             set_segment_base_addr(segment, addr);
+            set_segment_size(segment, (size_t)(srcEnd - srcStart));
         }
     }
 #ifdef PUPPYPRINT_DEBUG
@@ -411,6 +409,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #endif
             osSyncPrintf("end decompress\n");
             set_segment_base_addr(segment, dest);
+            set_segment_size(segment, *size);
             main_pool_free(compressed);
         }
     }
@@ -421,18 +420,18 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     return dest;
 }
 
-void load_engine_code_segment(void) {
-    void *startAddr = (void *) _engineSegmentStart;
-    u32 totalSize = _engineSegmentEnd - _engineSegmentStart;
-    // UNUSED u32 alignedSize = ALIGN16(_engineSegmentRomEnd - _engineSegmentRomStart);
+void load_code_segment(u8* start, u8* end, u8* srcStart, u8* srcEnd) {
+    void *startAddr = (void *)start;
+    u32 totalSize = end - start;
+    // UNUSED u32 alignedSize = ALIGN16(srcEnd - srcStart);
 
     bzero(startAddr, totalSize);
     osWritebackDCacheAll();
-    dma_read(startAddr, _engineSegmentRomStart, _engineSegmentRomEnd);
+    dma_read(startAddr, srcStart, srcEnd);
     osInvalICache(startAddr, totalSize);
     osInvalDCache(startAddr, totalSize);
 }
-#endif
+#endif // !NO_SEGMENTED_MEMORY
 
 /**
  * Allocate an allocation-only pool from the main pool. This pool doesn't

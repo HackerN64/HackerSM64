@@ -46,6 +46,8 @@ DECLARE_SEGMENT(entry)
 DECLARE_SEGMENT(engine)
 DECLARE_SEGMENT(behavior)
 DECLARE_NOLOAD(behavior)
+DECLARE_SEGMENT(crashscreen)
+DECLARE_NOLOAD(crashscreen)
 DECLARE_SEGMENT(scripts)
 DECLARE_SEGMENT(goddard)
 DECLARE_SEGMENT(framebuffers)
@@ -57,6 +59,8 @@ extern u8 _engineSegmentBssEnd[];
 extern u8 _mainSegmentStart[];
 extern u8 _mainSegmentEnd[];
 extern u8 _engineSegmentEnd[];
+extern u8 _crashscreenSegmentStart[];
+extern u8 _crashscreenSegmentEnd[];
 extern u8 _framebuffersSegmentBssStart[];
 extern u8 _framebuffersSegmentBssEnd[];
 extern u8 _zbufferSegmentBssStart[];
