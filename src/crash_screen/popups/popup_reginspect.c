@@ -168,17 +168,18 @@ _Bool cs_print_reg_info_SPC_RCP(CSTextCoord_u32 line, Doubleword val) {
 }
 
 void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
-#ifdef INCLUDE_DEBUG_MAP
-    const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
-        cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
-        cs_print(TEXT_X(2), TEXT_Y(line++),
-            (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
-            COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
-        );
+    if (IS_DEBUG_MAP_INCLUDED()) {
+        const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
+            cs_print(TEXT_X(2), TEXT_Y(line++),
+                (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
+                COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
+            );
+        }
     }
-#endif // INCLUDE_DEBUG_MAP
+
     Word data = 0x00000000;
     if (try_read_word_aligned(&data, val32)) {
         sInspectedRegisterPtrAddr = val32;

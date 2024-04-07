@@ -456,8 +456,8 @@ size_t cs_print_addr_location_info(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 max
     if (sureAddress && (addr == 0x00000000)) {
         return cs_print(x, y, STR_COLOR_PREFIX"NULL", COLOR_RGBA32_GRAY);
     }
-#ifdef INCLUDE_DEBUG_MAP
-    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
+
+    if (IS_DEBUG_MAP_INCLUDED() && cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {
         const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             size_t charX = cs_print_symbol_name(x, y, (maxWidth - STRLEN(" +0000")), symbol, sureAddress);
@@ -465,7 +465,7 @@ size_t cs_print_addr_location_info(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 max
             return charX;
         }
     }
-#endif // INCLUDE_DEBUG_MAP
+
     if (sureAddress) {
         const char* memStr = get_hardcoded_memory_str(addr);
         if (memStr != NULL) {
