@@ -10,6 +10,7 @@
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_draw.h"
+#include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_settings.h"
 #include "crash_screen/cs_pages.h"
