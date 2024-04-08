@@ -5,7 +5,7 @@
 #include "segments.h"
 
 
-#define MEMORY_REGION_MAPPED(_addr, _name, _ro, _wo, _align) {  \
+#define MEM_REGION_MAPPED(_addr, _name, _ro, _wo, _align) {  \
     .addr = _addr,                                              \
     .name = _name,                                              \
     .flags = {                                                  \
@@ -15,7 +15,7 @@
         .mapped = TRUE,                                         \
     },                                                          \
 }
-#define MEMORY_REGION_UNMAPPED(_addr) { \
+#define MEM_REGION_UNMAPPED(_addr) { \
     .addr = _addr,                      \
     .name = "",                         \
     .flags = {                          \
@@ -25,61 +25,62 @@
         .mapped = FALSE,                \
     },                                  \
 }
-#define MEMORY_REGION_END() MEMORY_REGION_UNMAPPED(0xFFFFFFFF)
+#define MEM_REGION_END() MEM_REGION_UNMAPPED(0xFFFFFFFF)
 
 // https://n64brew.dev/wiki/Memory_map
+//                                                        start address:                 name:                       ro:    wo:    align:
 const MemoryRegion sKernelSegments[K_END + 1] = {
-    [KUSEG                          ] = MEMORY_REGION_MAPPED(0x00000000,                    "KUSEG",                    FALSE, FALSE, FALSE), // [0x00000000 - 0x7FFFFFFF] User segment, TLB mapped
-    [KSEG0                          ] = MEMORY_REGION_MAPPED(VIRTUAL_RAM_START,             "KSEG0",                    FALSE, FALSE, FALSE), // [0x80000000 - 0x9FFFFFFF] Kernel segment 0, directly mapped, cached
-    [KSEG1                          ] = MEMORY_REGION_MAPPED(0xA0000000,                    "KSEG1",                    FALSE, FALSE, FALSE), // [0xA0000000 - 0xBFFFFFFF] Kernel segment 1, directly mapped, uncached
-    [KSSEG                          ] = MEMORY_REGION_MAPPED(0xC0000000,                    "KSSEG",                    FALSE, FALSE, FALSE), // [0xC0000000 - 0xDFFFFFFF] Kernel supervisor segment, TLB mapped
-    [KSEG3                          ] = MEMORY_REGION_MAPPED(0xE0000000,                    "KSEG3",                    FALSE, FALSE, FALSE), // [0xE0000000 - 0xFFFFFFFF] Kernel segment 3, TLB mapped
-    [K_END                          ] = MEMORY_REGION_END(),
+    [KUSEG                          ] = MEM_REGION_MAPPED(0x00000000,                    "KUSEG",                    FALSE, FALSE, FALSE), // [0x00000000 - 0x7FFFFFFF] User segment, TLB mapped
+    [KSEG0                          ] = MEM_REGION_MAPPED(VIRTUAL_RAM_START,             "KSEG0",                    FALSE, FALSE, FALSE), // [0x80000000 - 0x9FFFFFFF] Kernel segment 0, directly mapped, cached
+    [KSEG1                          ] = MEM_REGION_MAPPED(0xA0000000,                    "KSEG1",                    FALSE, FALSE, FALSE), // [0xA0000000 - 0xBFFFFFFF] Kernel segment 1, directly mapped, uncached
+    [KSSEG                          ] = MEM_REGION_MAPPED(0xC0000000,                    "KSSEG",                    FALSE, FALSE, FALSE), // [0xC0000000 - 0xDFFFFFFF] Kernel supervisor segment, TLB mapped
+    [KSEG3                          ] = MEM_REGION_MAPPED(0xE0000000,                    "KSEG3",                    FALSE, FALSE, FALSE), // [0xE0000000 - 0xFFFFFFFF] Kernel segment 3, TLB mapped
+    [K_END                          ] = MEM_REGION_END(),
 };
 const MemoryRegion sBusDevices[BUS_END + 1] = {
-    [BUS_RDRAM                      ] = MEMORY_REGION_MAPPED(0x00000000,                    "RDRAM",                    FALSE, FALSE, FALSE), // [0x00000000 - 0x03FFFFFF]
-    [BUS_RCP                        ] = MEMORY_REGION_MAPPED(SP_DMEM_START,                 "RCP",                      FALSE, FALSE, FALSE), // [0x04000000 - 0x04FFFFFF]
-    [BUS_PI_EXT_1                   ] = MEMORY_REGION_MAPPED(PI_DOM2_ADDR1,                 "PI",                       FALSE, FALSE, FALSE), // [0x05000000 - 0x1FBFFFFF]
-    [BUS_SI_EXT                     ] = MEMORY_REGION_MAPPED(PIF_ROM_START,                 "SI",                       FALSE, FALSE, FALSE), // [0x1FC00000 - 0x1FCFFFFF]
-    [BUS_PI_EXT_2                   ] = MEMORY_REGION_MAPPED(PI_DOM1_ADDR3,                 "PI",                       FALSE, FALSE, FALSE), // [0x1FD00000 - 0x7FFFFFFF]
-    [BUS_UNMAPPED                   ] = MEMORY_REGION_UNMAPPED(VIRTUAL_RAM_START),                                                            // [0x80000000 - 0xFFFFFFFF]
-    [BUS_END                        ] = MEMORY_REGION_END(),
+    [BUS_RDRAM                      ] = MEM_REGION_MAPPED(0x00000000,                    "RDRAM",                    FALSE, FALSE, FALSE), // [0x00000000 - 0x03FFFFFF]
+    [BUS_RCP                        ] = MEM_REGION_MAPPED(SP_DMEM_START,                 "RCP",                      FALSE, FALSE, FALSE), // [0x04000000 - 0x04FFFFFF]
+    [BUS_PI_EXT_1                   ] = MEM_REGION_MAPPED(PI_DOM2_ADDR1,                 "PI",                       FALSE, FALSE, FALSE), // [0x05000000 - 0x1FBFFFFF]
+    [BUS_SI_EXT                     ] = MEM_REGION_MAPPED(PIF_ROM_START,                 "SI",                       FALSE, FALSE, FALSE), // [0x1FC00000 - 0x1FCFFFFF]
+    [BUS_PI_EXT_2                   ] = MEM_REGION_MAPPED(PI_DOM1_ADDR3,                 "PI",                       FALSE, FALSE, FALSE), // [0x1FD00000 - 0x7FFFFFFF]
+    [BUS_UNMAPPED                   ] = MEM_REGION_UNMAPPED(VIRTUAL_RAM_START),                                                            // [0x80000000 - 0xFFFFFFFF]
+    [BUS_END                        ] = MEM_REGION_END(),
 };
 const MemoryRegion sMemoryRegions[MEM_MEMORY_REGIONS_END + 1] = {
     // RDRAM:
-    [MEM_RDRAM_MEMORY               ] = MEMORY_REGION_MAPPED(0x00000000,                    "Memory",                   FALSE, FALSE, FALSE), // [0x00000000 - 0x03EFFFFF] (RDRAM)
-    [MEM_RDRAM_REGISTERS            ] = MEMORY_REGION_MAPPED(RDRAM_BASE_REG,                "Registers",                FALSE, FALSE, FALSE), // [0x03F00000 - 0x03F7FFFF] (RDRAM)
-    [MEM_RDRAM_REGISTERS_BROADCAST  ] = MEMORY_REGION_MAPPED((RDRAM_BASE_REG + 0x80000),    "Registers (broadcast)",    FALSE, TRUE,  FALSE), // [0x03F80000 - 0x03FFFFFF] (RDRAM)
+    [MEM_RDRAM_MEMORY               ] = MEM_REGION_MAPPED(0x00000000,                    "Memory",                   FALSE, FALSE, FALSE), // [0x00000000 - 0x03EFFFFF] (RDRAM)
+    [MEM_RDRAM_REGISTERS            ] = MEM_REGION_MAPPED(RDRAM_BASE_REG,                "Registers",                FALSE, FALSE, FALSE), // [0x03F00000 - 0x03F7FFFF] (RDRAM)
+    [MEM_RDRAM_REGISTERS_BROADCAST  ] = MEM_REGION_MAPPED((RDRAM_BASE_REG + 0x80000),    "Registers (broadcast)",    FALSE, TRUE,  FALSE), // [0x03F80000 - 0x03FFFFFF] (RDRAM)
     // RCP:
-    [MEM_RCP_RSP_DMEM               ] = MEMORY_REGION_MAPPED(SP_DMEM_START,                 "DMEM",                     FALSE, FALSE, FALSE), // [0x04000000 - 0x04000FFF] (RCP)
-    [MEM_RCP_RSP_IMEM               ] = MEMORY_REGION_MAPPED(SP_IMEM_START,                 "IMEM",                     FALSE, FALSE, FALSE), // [0x04001000 - 0x04001FFF] (RCP)
-    [MEM_RCP_RSP_DMEM_IMEM_MIRRORS  ] = MEMORY_REGION_MAPPED((SP_IMEM_END + 1),             "DMEM IMEM Mirrors",        FALSE, FALSE, FALSE), // [0x04002000 - 0x0403FFFF] (RCP)
-    [MEM_RCP_RSP_REGISTERS          ] = MEMORY_REGION_MAPPED(SP_BASE_REG,                   "Registers",                FALSE, FALSE, FALSE), // [0x04040000 - 0x040BFFFF] (RCP)
-    [MEM_RCP_UNMAPPED_1             ] = MEMORY_REGION_UNMAPPED(SP_BASE_REG + 0x80000),                                                        // [0x040C0000 - 0x040FFFFF] (RCP)
-    [MEM_RCP_RDP_COMMAND_REGISTERS  ] = MEMORY_REGION_MAPPED(DPC_BASE_REG,                  "Command Registers",        FALSE, FALSE, FALSE), // [0x04100000 - 0x041FFFFF] (RCP)
-    [MEM_RCP_RDP_SPAN_REGISTERS     ] = MEMORY_REGION_MAPPED(DPS_BASE_REG,                  "Span Registers",           FALSE, FALSE, FALSE), // [0x04200000 - 0x042FFFFF] (RCP)
-    [MEM_RCP_MI                     ] = MEMORY_REGION_MAPPED(MI_BASE_REG,                   "MIPS Interface",           FALSE, FALSE, FALSE), // [0x04300000 - 0x043FFFFF] (RCP)
-    [MEM_RCP_VI                     ] = MEMORY_REGION_MAPPED(VI_BASE_REG,                   "Video Interface",          FALSE, FALSE, FALSE), // [0x04400000 - 0x044FFFFF] (RCP)
-    [MEM_RCP_AI                     ] = MEMORY_REGION_MAPPED(AI_BASE_REG,                   "Audio Interface",          FALSE, FALSE, FALSE), // [0x04500000 - 0x045FFFFF] (RCP)
-    [MEM_RCP_PI                     ] = MEMORY_REGION_MAPPED(PI_BASE_REG,                   "Peripheral Interface",     FALSE, FALSE, FALSE), // [0x04600000 - 0x046FFFFF] (RCP)
-    [MEM_RCP_RI                     ] = MEMORY_REGION_MAPPED(RI_BASE_REG,                   "RDRAM Interface",          FALSE, FALSE, FALSE), // [0x04700000 - 0x047FFFFF] (RCP)
-    [MEM_RCP_SI                     ] = MEMORY_REGION_MAPPED(SI_BASE_REG,                   "Serial Interface",         FALSE, FALSE, FALSE), // [0x04800000 - 0x048FFFFF] (RCP)
-    [MEM_RCP_UNMAPPED_2             ] = MEMORY_REGION_UNMAPPED(SI_BASE_REG + 0x100000),                                                       // [0x04900000 - 0x04FFFFFF] (RCP)
+    [MEM_RCP_RSP_DMEM               ] = MEM_REGION_MAPPED(SP_DMEM_START,                 "DMEM",                     FALSE, FALSE, FALSE), // [0x04000000 - 0x04000FFF] (RCP)
+    [MEM_RCP_RSP_IMEM               ] = MEM_REGION_MAPPED(SP_IMEM_START,                 "IMEM",                     FALSE, FALSE, FALSE), // [0x04001000 - 0x04001FFF] (RCP)
+    [MEM_RCP_RSP_DMEM_IMEM_MIRRORS  ] = MEM_REGION_MAPPED((SP_IMEM_END + 1),             "DMEM IMEM Mirrors",        FALSE, FALSE, FALSE), // [0x04002000 - 0x0403FFFF] (RCP)
+    [MEM_RCP_RSP_REGISTERS          ] = MEM_REGION_MAPPED(SP_BASE_REG,                   "Registers",                FALSE, FALSE, FALSE), // [0x04040000 - 0x040BFFFF] (RCP)
+    [MEM_RCP_UNMAPPED_1             ] = MEM_REGION_UNMAPPED(SP_BASE_REG + 0x80000),                                                        // [0x040C0000 - 0x040FFFFF] (RCP)
+    [MEM_RCP_RDP_COMMAND_REGISTERS  ] = MEM_REGION_MAPPED(DPC_BASE_REG,                  "Command Registers",        FALSE, FALSE, FALSE), // [0x04100000 - 0x041FFFFF] (RCP)
+    [MEM_RCP_RDP_SPAN_REGISTERS     ] = MEM_REGION_MAPPED(DPS_BASE_REG,                  "Span Registers",           FALSE, FALSE, FALSE), // [0x04200000 - 0x042FFFFF] (RCP)
+    [MEM_RCP_MI                     ] = MEM_REGION_MAPPED(MI_BASE_REG,                   "MIPS Interface",           FALSE, FALSE, FALSE), // [0x04300000 - 0x043FFFFF] (RCP)
+    [MEM_RCP_VI                     ] = MEM_REGION_MAPPED(VI_BASE_REG,                   "Video Interface",          FALSE, FALSE, FALSE), // [0x04400000 - 0x044FFFFF] (RCP)
+    [MEM_RCP_AI                     ] = MEM_REGION_MAPPED(AI_BASE_REG,                   "Audio Interface",          FALSE, FALSE, FALSE), // [0x04500000 - 0x045FFFFF] (RCP)
+    [MEM_RCP_PI                     ] = MEM_REGION_MAPPED(PI_BASE_REG,                   "Peripheral Interface",     FALSE, FALSE, FALSE), // [0x04600000 - 0x046FFFFF] (RCP)
+    [MEM_RCP_RI                     ] = MEM_REGION_MAPPED(RI_BASE_REG,                   "RDRAM Interface",          FALSE, FALSE, FALSE), // [0x04700000 - 0x047FFFFF] (RCP)
+    [MEM_RCP_SI                     ] = MEM_REGION_MAPPED(SI_BASE_REG,                   "Serial Interface",         FALSE, FALSE, FALSE), // [0x04800000 - 0x048FFFFF] (RCP)
+    [MEM_RCP_UNMAPPED_2             ] = MEM_REGION_UNMAPPED(SI_BASE_REG + 0x100000),                                                       // [0x04900000 - 0x04FFFFFF] (RCP)
     // PI EXT 1:
-    [MEM_PI_EXT_N64DD_REGISTERS     ] = MEMORY_REGION_MAPPED(PI_DOM2_ADDR1,                 "N64DD Registers",          FALSE, FALSE, FALSE), // [0x05000000 - 0x05FFFFFF] (PI)
-    [MEM_PI_EXT_N64DD_IPL_ROM       ] = MEMORY_REGION_MAPPED(PI_DOM1_ADDR1,                 "N64DD IPL Rom",            FALSE, FALSE, FALSE), // [0x06000000 - 0x07FFFFFF] (PI)
-    [MEM_PI_EXT_CARTRIDGE_SRAM      ] = MEMORY_REGION_MAPPED(PI_DOM2_ADDR2,                 "Cartridge SRAM",           FALSE, FALSE, FALSE), // [0x08000000 - 0x0FFFFFFF] (PI)
-    [MEM_PI_EXT_CARTRIDGE_ROM       ] = MEMORY_REGION_MAPPED(PI_DOM1_ADDR2,                 "Cartridge ROM",            FALSE, FALSE, FALSE), // [0x10000000 - 0x1FBFFFFF] (PI)
+    [MEM_PI_EXT_N64DD_REGISTERS     ] = MEM_REGION_MAPPED(PI_DOM2_ADDR1,                 "N64DD Registers",          FALSE, FALSE, FALSE), // [0x05000000 - 0x05FFFFFF] (PI)
+    [MEM_PI_EXT_N64DD_IPL_ROM       ] = MEM_REGION_MAPPED(PI_DOM1_ADDR1,                 "N64DD IPL Rom",            FALSE, FALSE, FALSE), // [0x06000000 - 0x07FFFFFF] (PI)
+    [MEM_PI_EXT_CARTRIDGE_SRAM      ] = MEM_REGION_MAPPED(PI_DOM2_ADDR2,                 "Cartridge SRAM",           FALSE, FALSE, FALSE), // [0x08000000 - 0x0FFFFFFF] (PI)
+    [MEM_PI_EXT_CARTRIDGE_ROM       ] = MEM_REGION_MAPPED(PI_DOM1_ADDR2,                 "Cartridge ROM",            FALSE, FALSE, FALSE), // [0x10000000 - 0x1FBFFFFF] (PI)
     // SI EXT:
-    [MEM_SI_EXT_PIF_ROM             ] = MEMORY_REGION_MAPPED(PIF_ROM_START,                 "PIF Boot ROM",             FALSE, FALSE, FALSE), // [0x1FC00000 - 0x1FC007BF] (SI)
-    [MEM_SI_EXT_PIF_RAM             ] = MEMORY_REGION_MAPPED(PIF_RAM_START,                 "PIF RAM",                  FALSE, FALSE, FALSE), // [0x1FC001C0 - 0x1FC007FF] (SI)
-    [MEM_SI_EXT_RESERVED            ] = MEMORY_REGION_MAPPED((PIF_RAM_END + 1),             "Reserved",                 FALSE, FALSE, FALSE), // [0x1FC00800 - 0x1FCFFFFF] (SI)
+    [MEM_SI_EXT_PIF_ROM             ] = MEM_REGION_MAPPED(PIF_ROM_START,                 "PIF Boot ROM",             FALSE, FALSE, FALSE), // [0x1FC00000 - 0x1FC007BF] (SI)
+    [MEM_SI_EXT_PIF_RAM             ] = MEM_REGION_MAPPED(PIF_RAM_START,                 "PIF RAM",                  FALSE, FALSE, FALSE), // [0x1FC001C0 - 0x1FC007FF] (SI)
+    [MEM_SI_EXT_RESERVED            ] = MEM_REGION_MAPPED((PIF_RAM_END + 1),             "Reserved",                 FALSE, FALSE, FALSE), // [0x1FC00800 - 0x1FCFFFFF] (SI)
     // PI EXT 2:
-    [MEM_PI_EXT_UNUSED1             ] = MEMORY_REGION_MAPPED(PI_DOM1_ADDR3,                 "Unused 1",                 FALSE, FALSE, FALSE), // [0x1FD00000 - 0x1FFFFFFF] (PI)
-    [MEM_PI_EXT_UNUSED2             ] = MEMORY_REGION_MAPPED(0x20000000,                    "Unused 2",                 FALSE, FALSE, FALSE), // [0x20000000 - 0x7FFFFFFF] (PI)
+    [MEM_PI_EXT_UNUSED1             ] = MEM_REGION_MAPPED(PI_DOM1_ADDR3,                 "Unused 1",                 FALSE, FALSE, FALSE), // [0x1FD00000 - 0x1FFFFFFF] (PI)
+    [MEM_PI_EXT_UNUSED2             ] = MEM_REGION_MAPPED(0x20000000,                    "Unused 2",                 FALSE, FALSE, FALSE), // [0x20000000 - 0x7FFFFFFF] (PI)
     // UNMAPPED:
-    [MEM_UNMAPPED                   ] = MEMORY_REGION_UNMAPPED(VIRTUAL_RAM_START),                                                            // [0x80000000 - 0xFFFFFFFF]
-    [MEM_MEMORY_REGIONS_END         ] = MEMORY_REGION_END(),
+    [MEM_UNMAPPED                   ] = MEM_REGION_UNMAPPED(VIRTUAL_RAM_START),                                                            // [0x80000000 - 0xFFFFFFFF]
+    [MEM_MEMORY_REGIONS_END         ] = MEM_REGION_END(),
 };
 
 

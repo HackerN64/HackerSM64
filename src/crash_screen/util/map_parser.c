@@ -86,13 +86,19 @@ _Bool addr_is_in_text_segment(Address addr) {
 }
 
 /**
- * @brief Check whether a symbol is marked as a .text segment.
+ * @brief Check whether a symbol is a function.
  *
  * @param[in] symbol Map symbol to check.
- * @return _Bool Whether the symbol is marked as a .text segment.
+ * @return _Bool Whether the symbol is a function.
  */
-_Bool symbol_is_text(const MapSymbol* symbol) {
-    return ((symbol->type == 't') || (symbol->type == 'T'));
+_Bool symbol_is_function(const MapSymbol* symbol) {
+    return (
+        ((symbol->type == 't') || (symbol->type == 'T')) && // The symbol itself is marked as .text.
+        (symbol->size != 0) && // The symbol has data.
+        ((symbol->addr & sizeof(Word)) == 0) && // The symbol is 4byte aligned.
+        ((symbol->size % sizeof(Word)) == 0) && // The symbol's size is divisible by the size of an instruction.
+        addr_is_in_text_segment(symbol->addr) // The symbol is in a .text segment.
+    );
 }
 
 /**

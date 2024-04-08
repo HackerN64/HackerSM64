@@ -6,6 +6,7 @@
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_draw.h"
+#include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_pages.h"
 #include "crash_screen/cs_print.h"
@@ -149,8 +150,8 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                     const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
                     // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  addr_is_in_text_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
                     const RGBA32 dividerColor = addr_is_in_text_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
-                    _Bool aligned0 = ((currAddr & (sizeof(Word) - 1)) == 0); // (byteOffset == 0);
-                    _Bool aligned3 = ((currAddr & (sizeof(Word) - 1)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
+                    _Bool aligned0 = ((currAddr % sizeof(Word)) == 0); // (byteOffset == 0);
+                    _Bool aligned3 = ((currAddr % sizeof(Word)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
                     // Prev byte:
                     const MapSymbol *otherSymbol = get_map_symbol((currAddr - sizeof(Byte)), SYMBOL_SEARCH_BINARY);
                     if (currSymbol != otherSymbol) {
@@ -232,11 +233,19 @@ void page_memory_draw(void) {
 
     if (showCurrentRange) {
         // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-        cs_print(TEXT_X(0), TEXT_Y(line),
+        CSTextCoord_u32 rangeStrSize = cs_print(TEXT_X(0), TEXT_Y(line),
             (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
             COLOR_RGBA32_WHITE, gSelectedAddress, startAddr, endAddr
+        ) + 1;
+        cs_print_scroll((TEXT_X(0) + TEXT_WIDTH(rangeStrSize)), TEXT_Y(line),
+            (CRASH_SCREEN_NUM_CHARS_X - rangeStrSize), STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_HEADER, str_null_fallback(get_hardcoded_memory_str(gSelectedAddress), "")
         );
         line++;
+        // cs_print_scroll((TEXT_X(0) + TEXT_WIDTH(rangeStrSize)), TEXT_Y(line),
+        //     (CRASH_SCREEN_NUM_CHARS_X - rangeStrSize), STR_COLOR_PREFIX"%s",
+        //     COLOR_RGBA32_CRASH_HEADER, str_null_fallback(get_segment_sub_name(get_segment_from_virtual_addr((void*)gSelectedAddress)), "")
+        // );
     }
 
     if (showCurrentSymbol) {

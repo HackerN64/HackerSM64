@@ -394,11 +394,19 @@ void page_disasm_draw(void) {
 
     if (showCurrentRange) {
         // "[XXXXXXXX] in [XXXXXXXX]-[XXXXXXXX]"
-        cs_print(TEXT_X(0), TEXT_Y(line),
+        CSTextCoord_u32 rangeStrSize = cs_print(TEXT_X(0), TEXT_Y(line),
             (STR_COLOR_PREFIX STR_HEX_WORD" in "STR_HEX_WORD"-"STR_HEX_WORD),
             COLOR_RGBA32_WHITE, alignedSelectedAddr, startAddr, endAddr
+        ) + 1;
+        cs_print_scroll((TEXT_X(0) + TEXT_WIDTH(rangeStrSize)), TEXT_Y(line),
+            (CRASH_SCREEN_NUM_CHARS_X - rangeStrSize), STR_COLOR_PREFIX"%s",
+            COLOR_RGBA32_CRASH_HEADER, str_null_fallback(get_hardcoded_memory_str(alignedSelectedAddr), "")
         );
         line++;
+        // cs_print_scroll((TEXT_X(0) + TEXT_WIDTH(rangeStrSize)), TEXT_Y(line),
+        //     (CRASH_SCREEN_NUM_CHARS_X - rangeStrSize), STR_COLOR_PREFIX"%s",
+        //     COLOR_RGBA32_CRASH_HEADER, str_null_fallback(get_segment_sub_name(get_segment_from_virtual_addr((void*)alignedSelectedAddr)), "")
+        // );
     }
 
     if (showCurrentSymbol) {

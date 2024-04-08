@@ -421,7 +421,7 @@ ALWAYS_INLINE static size_t cs_print_symbol_unknown(ScreenCoord_u32 x, ScreenCoo
 }
 
 /**
- * @brief Gets a name from a symbol and prints it.
+ * @brief Gets the name of a symbol and prints it.
  *
  * @param[in] x,y          The starting position on the screen to print to.
  * @param[in] maxWidth     The maximum number of chars to print.
@@ -439,7 +439,7 @@ size_t cs_print_symbol_name(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, 
     }
     return cs_print_scroll(x, y, maxWidth,
         STR_COLOR_PREFIX"%s",
-        ((addr_is_in_text_segment(symbol->addr) && symbol_is_text(symbol) && (symbol->size > 0)) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
+        (symbol_is_function(symbol) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE), name
     );
 }
 
