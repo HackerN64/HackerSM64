@@ -8,6 +8,7 @@
 #include "crash_screen/util/map_parser.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_draw.h"
+#include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_pages.h"
 #include "crash_screen/cs_print.h"
@@ -66,7 +67,7 @@ void map_viewer_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
     // Print.
-    for (CSTextCoord_u32 i = 0; i < numLines; i++) {
+    for (CSTextCoord_u32 row = 0; row < numLines; row++) {
         if (currIndex >= gNumMapSymbols) {
             break;
         }
@@ -75,7 +76,7 @@ void map_viewer_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
             break;
         }
 
-        ScreenCoord_u32 y = TEXT_Y(line + i);
+        ScreenCoord_u32 y = TEXT_Y(line + row);
 
         if (currIndex == sMapViewerSelectedIndex) {
             cs_draw_row_selection_box(y);

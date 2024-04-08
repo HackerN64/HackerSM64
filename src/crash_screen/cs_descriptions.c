@@ -14,6 +14,7 @@
 
 #include "cs_descriptions.h"
 
+#include "buffers/buffers.h"
 #include "engine/surface_load.h"
 #include "game/emutest.h"
 #include "game/game_init.h"
@@ -120,6 +121,25 @@ static const char* get_name_from_id_list_impl(int id, const IdNamePair* list, si
     return NULL;
 }
 #define get_name_from_id_list(_id, _list) get_name_from_id_list_impl((_id), (_list), ARRAY_COUNT(_list))
+static const char* get_name_from_null_terminated_id_list(int id, const IdNamePair* list) {
+    const u32 max_iterations = 32;
+    u32 i = 0;
+
+    const IdNamePair* entry = &list[0];
+    while (entry->name != NULL) {
+        if (i++ >= max_iterations) {
+            return "error";
+        }
+
+        if ((int)id == (int)entry->id) {
+            return entry->name;
+        }
+
+        entry++;
+    }
+
+    return NULL;
+}
 
 typedef struct RangeNamePair {
     /*0x00*/ const u32 start;
@@ -136,6 +156,25 @@ static const char* get_name_from_range_list_impl(u32 id, const RangeNamePair* li
     return NULL;
 }
 #define get_name_from_range_list(_id, _list) get_name_from_range_list_impl((_id), (_list), ARRAY_COUNT(_list))
+UNUSED static const char* get_name_from_null_terminated_range_list(u32 id, const RangeNamePair* list) {
+    const u32 max_iterations = 32;
+    u32 i = 0;
+
+    const RangeNamePair* entry = &list[0];
+    while (entry->name != NULL) {
+        if (i++ >= max_iterations) {
+            return "error";
+        }
+
+        if (((u32)id >= (u32)entry->start) && ((u32)id < (u32)entry->end)) {
+            return entry->name;
+        }
+
+        entry++;
+    }
+
+    return NULL;
+}
 
 
 const char* str_null_fallback(const char* str, const char* fallback) {
@@ -246,73 +285,84 @@ const char* get_warp_node_name(const enum WarpNodes id) {
 
 // -- SEGMENTS --
 
-static const char* sSegmentNames[32] = {
-    [SEGMENT_MAIN               ] = "main",
-    [SEGMENT_RENDER             ] = "render",
-    [SEGMENT_SEGMENT2           ] = "segment2",
-    [SEGMENT_COMMON1_YAY0       ] = "common1 gfx",
-    [SEGMENT_GROUP0_YAY0        ] = "group0 gfx",
-    [SEGMENT_GROUPA_YAY0        ] = "groupA gfx",
-    [SEGMENT_GROUPB_YAY0        ] = "groupB gfx",
-    [SEGMENT_LEVEL_DATA         ] = "level data",
-    [SEGMENT_COMMON0_YAY0       ] = "common0 gfx",
-    [SEGMENT_TEXTURE            ] = "textures",
-    [SEGMENT_SKYBOX             ] = "skybox",
-    [SEGMENT_EFFECT_YAY0        ] = "effects",
-    [SEGMENT_GROUPA_GEO         ] = "groupA geo",
-    [SEGMENT_GROUPB_GEO         ] = "groupB geo",
-    [SEGMENT_LEVEL_SCRIPT       ] = "level script",
-    [SEGMENT_COMMON0_GEO        ] = "common0 geo",
-    [SEGMENT_LEVEL_ENTRY        ] = "level entry",
-    [SEGMENT_MARIO_ANIMS        ] = "mario anims",
-    [SEGMENT_UNKNOWN_18         ] = "18",
-    [SEGMENT_BEHAVIOR_DATA      ] = "bhv data",
-    [SEGMENT_MENU_INTRO         ] = "menu",
-    [SEGMENT_GLOBAL_LEVEL_SCRIPT] = "global level script",
-    [SEGMENT_COMMON1_GEO        ] = "common1 geo",
-    [SEGMENT_GROUP0_GEO         ] = "group0 geo",
-    [SEGMENT_DEMO_INPUTS        ] = "demo inputs",
-    [SEGMENT_EU_TRANSLATION     ] = "translations",
-    [SEGMENT_UNKNOWN_26         ] = "26",
-    [SEGMENT_UNKNOWN_27         ] = "27",
-    [SEGMENT_UNKNOWN_28         ] = "28",
-    [SEGMENT_UNKNOWN_29         ] = "29",
-    [SEGMENT_UNKNOWN_30         ] = "30",
-    [SEGMENT_UNKNOWN_31         ] = "31",
-};
-const char* get_segment_name(u8 segmentId) {
-    return ((segmentId < ARRAY_COUNT(sSegmentNames)) ? sSegmentNames[segmentId] : NULL);
-}
-
 #define DEF_ROM_SEG_IMPL(_name, _str) { .id = (uintptr_t)_##_name##SegmentRomStart, .name = TO_STRING2(_str), } 
 #define DEF_ROM_SEG(_name)            DEF_ROM_SEG_IMPL(_name,                      _name)
 #define DEF_ROM_SEG_YAY0(_name)       DEF_ROM_SEG_IMPL(_name##_yay0,               _name)
 #define DEF_ROM_SEG_GEO(_name)        DEF_ROM_SEG_IMPL(_name##_geo,                _name)
 #define DEF_ROM_SEG_SKY_YAY0(_name)   DEF_ROM_SEG_IMPL(_name##_skybox_yay0,        _name)
+#define DEF_ROM_SEG_SEG7(_name)       DEF_ROM_SEG_IMPL(_name##_segment_7,          _name)
 #define DEF_ROM_SEG_LANG_YAY0(_name)  DEF_ROM_SEG_IMPL(translation_##_name##_yay0, _name)
+#define DEF_ROM_SEG_GLOBAL_VAR(_name) { .id = (uintptr_t)_name, .name = TO_STRING2(_name), }
+#define ID_LIST_END()                 { .id = -1, .name = NULL, }
 
-// SEGMENT_LEVEL_DATA
-static const IdNamePair sLevelDataROMSegments[] = {
+// 00: SEGMENT_MAIN
+static const IdNamePair sROMSegNames_00_main[] = {
+    DEF_ROM_SEG(main),
+    ID_LIST_END(),
+};
+// 01: SEGMENT_RENDER
+static const IdNamePair sROMSegNames_01_render[] = {
+    { .id = OS_K0_TO_PHYSICAL(gGfxPools[0].buffer), .name = "gGfxPools[0]", },
+    { .id = OS_K0_TO_PHYSICAL(gGfxPools[1].buffer), .name = "gGfxPools[1]", },
+    ID_LIST_END(),
+};
+// 02: SEGMENT_SEGMENT2
+static const IdNamePair sROMSegNames_02_segment2[] = {
+    DEF_ROM_SEG_YAY0(segment2),
+    ID_LIST_END(),
+};
+// 03: SEGMENT_COMMON1_YAY0
+static const IdNamePair sROMSegNames_03_common1_gfx[] = {
+    DEF_ROM_SEG_YAY0(common1),
+    ID_LIST_END(),
+};
+// 04: SEGMENT_GROUP0_YAY0
+static const IdNamePair sROMSegNames_04_group0_gfx[] = {
+    DEF_ROM_SEG_YAY0(group0),
+    ID_LIST_END(),
+};
+// 05: SEGMENT_GROUPA_YAY0
+static const IdNamePair sROMSegNames_05_groupA_gfx[] = {
+    DEF_ROM_SEG_YAY0(group1),
+    DEF_ROM_SEG_YAY0(group2),
+    DEF_ROM_SEG_YAY0(group3),
+    DEF_ROM_SEG_YAY0(group4),
+    DEF_ROM_SEG_YAY0(group5),
+    DEF_ROM_SEG_YAY0(group6),
+    DEF_ROM_SEG_YAY0(group7),
+    DEF_ROM_SEG_YAY0(group8),
+    DEF_ROM_SEG_YAY0(group9),
+    DEF_ROM_SEG_YAY0(group10),
+    DEF_ROM_SEG_YAY0(group11),
+    ID_LIST_END(),
+};
+// 06: SEGMENT_GROUPB_YAY0
+static const IdNamePair sROMSegNames_06_groupB_gfx[] = {
+    DEF_ROM_SEG_YAY0(group12),
+    DEF_ROM_SEG_YAY0(group13),
+    DEF_ROM_SEG_YAY0(group14),
+    DEF_ROM_SEG_YAY0(group15),
+    DEF_ROM_SEG_YAY0(group16),
+    DEF_ROM_SEG_YAY0(group17),
+    ID_LIST_END(),
+};
+// 07: SEGMENT_LEVEL_DATA
+static const IdNamePair sROMSegNames_07_level_data[] = {
 #define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
-#define DEFINE_LEVEL(textname, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) \
-    { .id = (uintptr_t)(_##folder##_segment_7SegmentRomStart), .name = textname },
+#define DEFINE_LEVEL(textname, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) DEF_ROM_SEG_SEG7(folder),
 #include "levels/level_defines.h"
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
     DEF_ROM_SEG_YAY0(debug_level_select),
+    ID_LIST_END(),
 };
-// SEGMENT_LEVEL_SCRIPT
-static const IdNamePair sLevelScriptROMSegments[] = {
-#define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
-#define DEFINE_LEVEL(textname, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) \
-    { .id = (uintptr_t)(_##folder##SegmentRomStart), .name = textname },
-#include "levels/level_defines.h"
-#undef STUB_LEVEL
-#undef DEFINE_LEVEL
-    DEF_ROM_SEG(ending),
+// 08: SEGMENT_COMMON0_YAY0
+static const IdNamePair sROMSegNames_08_common0_gfx[] = {
+    DEF_ROM_SEG_YAY0(common0),
+    ID_LIST_END(),
 };
-// SEGMENT_TEXTURE
-static const IdNamePair sTextureBinROMSegments[] = {
+// 09: SEGMENT_TEXTURE
+static const IdNamePair sROMSegNames_09_texture[] = {
     DEF_ROM_SEG_YAY0(fire),
     DEF_ROM_SEG_YAY0(spooky),
     DEF_ROM_SEG_YAY0(generic),
@@ -326,9 +376,10 @@ static const IdNamePair sTextureBinROMSegments[] = {
     DEF_ROM_SEG_YAY0(outside),
     DEF_ROM_SEG_YAY0(inside),
     DEF_ROM_SEG_YAY0(effect),
+    ID_LIST_END(),
 };
-// SEGMENT_SKYBOX
-static const IdNamePair sSkyboxBinROMSegments[] = {
+// 10: SEGMENT_SKYBOX
+static const IdNamePair sROMSegNames_10_skybox[] = {
     DEF_ROM_SEG_SKY_YAY0(water),
     DEF_ROM_SEG_SKY_YAY0(ccm),
     DEF_ROM_SEG_SKY_YAY0(clouds),
@@ -340,23 +391,15 @@ static const IdNamePair sSkyboxBinROMSegments[] = {
     DEF_ROM_SEG_SKY_YAY0(bidw),
     DEF_ROM_SEG_SKY_YAY0(bits),
     DEF_ROM_SEG_YAY0(title_screen_bg), // For some reason the game uses the skybox segment for this.
+    ID_LIST_END(),
 };
-// SEGMENT_GROUPA_YAY0
-static const IdNamePair sGroupA_yay0ROMSegments[] = {
-    DEF_ROM_SEG_YAY0(group1),
-    DEF_ROM_SEG_YAY0(group2),
-    DEF_ROM_SEG_YAY0(group3),
-    DEF_ROM_SEG_YAY0(group4),
-    DEF_ROM_SEG_YAY0(group5),
-    DEF_ROM_SEG_YAY0(group6),
-    DEF_ROM_SEG_YAY0(group7),
-    DEF_ROM_SEG_YAY0(group8),
-    DEF_ROM_SEG_YAY0(group9),
-    DEF_ROM_SEG_YAY0(group10),
-    DEF_ROM_SEG_YAY0(group11),
+// 11: SEGMENT_COMMON0_YAY0
+static const IdNamePair sROMSegNames_11_effect_gfx[] = {
+    DEF_ROM_SEG_YAY0(effect),
+    ID_LIST_END(),
 };
-// SEGMENT_GROUPA_GEO
-static const IdNamePair sGroupA_geoROMSegments[] = {
+// 12: SEGMENT_GROUPA_GEO
+static const IdNamePair sROMSegNames_12_groupA_geo[] = {
     DEF_ROM_SEG_GEO(group1),
     DEF_ROM_SEG_GEO(group2),
     DEF_ROM_SEG_GEO(group3),
@@ -368,86 +411,149 @@ static const IdNamePair sGroupA_geoROMSegments[] = {
     DEF_ROM_SEG_GEO(group9),
     DEF_ROM_SEG_GEO(group10),
     DEF_ROM_SEG_GEO(group11),
+    ID_LIST_END(),
 };
-// SEGMENT_GROUPB_YAY0
-static const IdNamePair sGroupB_yay0ROMSegments[] = {
-    DEF_ROM_SEG_YAY0(group12),
-    DEF_ROM_SEG_YAY0(group13),
-    DEF_ROM_SEG_YAY0(group14),
-    DEF_ROM_SEG_YAY0(group15),
-    DEF_ROM_SEG_YAY0(group16),
-    DEF_ROM_SEG_YAY0(group17),
-};
-// SEGMENT_GROUPB_GEO
-static const IdNamePair sGroupB_geoROMSegments[] = {
+// 13: SEGMENT_GROUPB_GEO
+static const IdNamePair sROMSegNames_13_groupB_geo[] = {
     DEF_ROM_SEG_GEO(group12),
     DEF_ROM_SEG_GEO(group13),
     DEF_ROM_SEG_GEO(group14),
     DEF_ROM_SEG_GEO(group15),
     DEF_ROM_SEG_GEO(group16),
     DEF_ROM_SEG_GEO(group17),
+    ID_LIST_END(),
 };
-// SEGMENT_MENU_INTRO
-static const IdNamePair sMenuIntroROMSegments[] = {
+// 14: SEGMENT_LEVEL_SCRIPT
+static const IdNamePair sROMSegNames_14_level_script[] = {
+#define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
+#define DEFINE_LEVEL(textname, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) DEF_ROM_SEG(folder),
+#include "levels/level_defines.h"
+#undef STUB_LEVEL
+#undef DEFINE_LEVEL
+    DEF_ROM_SEG(ending),
+    ID_LIST_END(),
+};
+// 15: SEGMENT_COMMON0_GEO
+static const IdNamePair sROMSegNames_15_common0_geo[] = {
+    DEF_ROM_SEG_GEO(common0),
+    ID_LIST_END(),
+};
+// 16: SEGMENT_LEVEL_ENTRY
+static const IdNamePair sROMSegNames_16_entry[] = {
+    DEF_ROM_SEG(entry),
+    ID_LIST_END(),
+};
+// 17: SEGMENT_MARIO_ANIMS
+static const IdNamePair sROMSegNames_17_mario_anims[] = {
+    DEF_ROM_SEG_GLOBAL_VAR(gMarioAnims),
+    ID_LIST_END(),
+};
+// 18: SEGMENT_UNKNOWN_18
+// 19: SEGMENT_BEHAVIOR_DATA
+static const IdNamePair sROMSegNames_19_behavior[] = {
+    DEF_ROM_SEG(behavior),
+    ID_LIST_END(),
+};
+// 20: SEGMENT_MENU_INTRO
+static const IdNamePair sROMSegNames_20_menu_intro[] = {
     DEF_ROM_SEG(intro),
     DEF_ROM_SEG(menu),
     DEF_ROM_SEG(ending),
+    ID_LIST_END(),
 };
-#if MULTILANG
-// SEGMENT_EU_TRANSLATION
+// 21: SEGMENT_GLOBAL_LEVEL_SCRIPT
+static const IdNamePair sROMSegNames_21_global_level_script[] = {
+    DEF_ROM_SEG(scripts),
+    ID_LIST_END(),
+};
+// 22: SEGMENT_COMMON1_GEO
+static const IdNamePair sROMSegNames_22_common1_geo[] = {
+    DEF_ROM_SEG_GEO(common1),
+    ID_LIST_END(),
+};
+// 23: SEGMENT_GROUP0_GEO
+static const IdNamePair sROMSegNames_23_group0_geo[] = {
+    DEF_ROM_SEG_GEO(group0),
+    ID_LIST_END(),
+};
+// 24: SEGMENT_DEMO_INPUTS
+static const IdNamePair sROMSegNames_24_demo_inputs[] = {
+    DEF_ROM_SEG_GLOBAL_VAR(gDemoInputs),
+    ID_LIST_END(),
+};
+// 25: SEGMENT_EU_TRANSLATION
 //! TODO: Update this when ASCII PR is merged:
-static const IdNamePair sTranslationROMSegments[] = {
+static const IdNamePair sROMSegNames_25_eu_translation[] = {
+#if MULTILANG
     DEF_ROM_SEG_IMPL(translation_en_yay0, english),
     DEF_ROM_SEG_IMPL(translation_fr_yay0, french),
     DEF_ROM_SEG_IMPL(translation_de_yay0, german),
-};
 #endif // MULTILANG
-
-static const char* sLoadedStr[] = {
-    [FALSE] = "unloaded",
-    [TRUE ] = "loaded",
+    ID_LIST_END(),
 };
+// 26: SEGMENT_UNKNOWN_26
+// 27: SEGMENT_UNKNOWN_27
+// 28: SEGMENT_UNKNOWN_28
+// 29: SEGMENT_UNKNOWN_29
+// 30: SEGMENT_UNKNOWN_30
+// 31: SEGMENT_UNKNOWN_31
 
-#define get_loaded_data_in_seg_str(romAddr, list) str_null_fallback(get_name_from_id_list(romAddr, list), sLoadedStr[FALSE])
-
+typedef struct SegmentInfo {
+    const IdNamePair* list;
+    const char* name;
+} SegmentInfo;
+static const SegmentInfo sSegmentInfos[32] = {
+    [SEGMENT_MAIN               ] = { .list = sROMSegNames_00_main,                .name = "main",                },
+    [SEGMENT_RENDER             ] = { .list = sROMSegNames_01_render,              .name = "render",              },
+    [SEGMENT_SEGMENT2           ] = { .list = sROMSegNames_02_segment2,            .name = "hud gfx",             },
+    [SEGMENT_COMMON1_YAY0       ] = { .list = sROMSegNames_03_common1_gfx,         .name = "common1 gfx",         },
+    [SEGMENT_GROUP0_YAY0        ] = { .list = sROMSegNames_04_group0_gfx,          .name = "group0 gfx",          },
+    [SEGMENT_GROUPA_YAY0        ] = { .list = sROMSegNames_05_groupA_gfx,          .name = "groupA gfx",          },
+    [SEGMENT_GROUPB_YAY0        ] = { .list = sROMSegNames_06_groupB_gfx,          .name = "groupB gfx",          },
+    [SEGMENT_LEVEL_DATA         ] = { .list = sROMSegNames_07_level_data,          .name = "level data",          },
+    [SEGMENT_COMMON0_YAY0       ] = { .list = sROMSegNames_08_common0_gfx,         .name = "common0 gfx",         },
+    [SEGMENT_TEXTURE            ] = { .list = sROMSegNames_09_texture,             .name = "textures bin",        },
+    [SEGMENT_SKYBOX             ] = { .list = sROMSegNames_10_skybox,              .name = "skybox bin",          },
+    [SEGMENT_EFFECT_YAY0        ] = { .list = sROMSegNames_11_effect_gfx,          .name = "effects gfx",         },
+    [SEGMENT_GROUPA_GEO         ] = { .list = sROMSegNames_12_groupA_geo,          .name = "groupA geo",          },
+    [SEGMENT_GROUPB_GEO         ] = { .list = sROMSegNames_13_groupB_geo,          .name = "groupB geo",          },
+    [SEGMENT_LEVEL_SCRIPT       ] = { .list = sROMSegNames_14_level_script,        .name = "level script",        },
+    [SEGMENT_COMMON0_GEO        ] = { .list = sROMSegNames_15_common0_geo,         .name = "common0 geo",         },
+    [SEGMENT_LEVEL_ENTRY        ] = { .list = sROMSegNames_16_entry,               .name = "level entry",         },
+    [SEGMENT_MARIO_ANIMS        ] = { .list = sROMSegNames_17_mario_anims,         .name = "mario anims",         },
+    [SEGMENT_UNKNOWN_18         ] = { .list = NULL,                                .name = "unknown 18",          },
+    [SEGMENT_BEHAVIOR_DATA      ] = { .list = sROMSegNames_19_behavior,            .name = "bhv data",            },
+    [SEGMENT_MENU_INTRO         ] = { .list = sROMSegNames_20_menu_intro,          .name = "menu/intro",          },
+    [SEGMENT_GLOBAL_LEVEL_SCRIPT] = { .list = sROMSegNames_21_global_level_script, .name = "global level script", },
+    [SEGMENT_COMMON1_GEO        ] = { .list = sROMSegNames_22_common1_geo,         .name = "common1 geo",         },
+    [SEGMENT_GROUP0_GEO         ] = { .list = sROMSegNames_23_group0_geo,          .name = "group0 geo",          },
+    [SEGMENT_DEMO_INPUTS        ] = { .list = sROMSegNames_24_demo_inputs,         .name = "demo inputs",         },
+    [SEGMENT_EU_TRANSLATION     ] = { .list = sROMSegNames_25_eu_translation,      .name = "translations",        },
+    [SEGMENT_UNKNOWN_26         ] = { .list = NULL,                                .name = "unknown 26",          },
+    [SEGMENT_UNKNOWN_27         ] = { .list = NULL,                                .name = "unknown 27",          },
+    [SEGMENT_UNKNOWN_28         ] = { .list = NULL,                                .name = "unknown 28",          },
+    [SEGMENT_UNKNOWN_29         ] = { .list = NULL,                                .name = "unknown 29",          },
+    [SEGMENT_UNKNOWN_30         ] = { .list = NULL,                                .name = "unknown 30",          },
+    [SEGMENT_UNKNOWN_31         ] = { .list = NULL,                                .name = "unknown 31",          },
+};
+// Get the name of a segment.
+const char* get_segment_name(u8 segmentId) {
+    return ((segmentId < ARRAY_COUNT(sSegmentInfos)) ? sSegmentInfos[segmentId].name : NULL);
+}
 // Get the name of what is currently loaded in a segment.
 const char* get_segment_sub_name(u8 segmentId) {
+    const char* ret = NULL;
     Address romAddr = sSegmentROMTable[segmentId];
-    if (romAddr == 0) {
-        return NULL;
-    }
-    switch (segmentId) {
-        case SEGMENT_MAIN:                  return ""; //! TODO: ?
-        case SEGMENT_RENDER:                return ""; //! TODO: Which gfx pool?
-        case SEGMENT_SEGMENT2:              return sLoadedStr[romAddr == (uintptr_t)_segment2_yay0SegmentRomStart];
-        case SEGMENT_TEXTURE:               return get_loaded_data_in_seg_str(romAddr, sTextureBinROMSegments);
-        case SEGMENT_SKYBOX:                return get_loaded_data_in_seg_str(romAddr, sSkyboxBinROMSegments);
-        case SEGMENT_EFFECT_YAY0:           return sLoadedStr[romAddr == (uintptr_t)_effect_yay0SegmentRomStart];
-        case SEGMENT_COMMON0_YAY0:          return ((romAddr == (uintptr_t)_common0_yay0SegmentRomStart) ? "common0" : NULL);
-        case SEGMENT_COMMON0_GEO:           return ((romAddr == (uintptr_t)_common0_geoSegmentRomStart ) ? "common0" : NULL);
-        case SEGMENT_COMMON1_YAY0:          return ((romAddr == (uintptr_t)_common1_yay0SegmentRomStart) ? "common1" : NULL);
-        case SEGMENT_COMMON1_GEO:           return ((romAddr == (uintptr_t)_common1_geoSegmentRomStart ) ? "common1" : NULL);
-        case SEGMENT_GROUP0_YAY0:           return ((romAddr == (uintptr_t)_group0_yay0SegmentRomStart ) ? "group0"  : NULL); //! TODO: Apparently this can also include goddard dynlists.
-        case SEGMENT_GROUP0_GEO:            return ((romAddr == (uintptr_t)_group0_geoSegmentRomStart  ) ? "group0"  : NULL);
-        case SEGMENT_GROUPA_YAY0:           return get_loaded_data_in_seg_str(romAddr, sGroupA_yay0ROMSegments);
-        case SEGMENT_GROUPA_GEO:            return get_loaded_data_in_seg_str(romAddr, sGroupA_geoROMSegments);
-        case SEGMENT_GROUPB_YAY0:           return get_loaded_data_in_seg_str(romAddr, sGroupB_yay0ROMSegments);
-        case SEGMENT_GROUPB_GEO:            return get_loaded_data_in_seg_str(romAddr, sGroupB_geoROMSegments);
-        case SEGMENT_LEVEL_DATA:            return get_loaded_data_in_seg_str(romAddr, sLevelDataROMSegments);
-        case SEGMENT_LEVEL_SCRIPT:          return get_loaded_data_in_seg_str(romAddr, sLevelScriptROMSegments);
-        case SEGMENT_LEVEL_ENTRY:           return sLoadedStr[romAddr == (uintptr_t)_entrySegmentRomStart];
-        case SEGMENT_BEHAVIOR_DATA:         return sLoadedStr[romAddr == (uintptr_t)_behaviorSegmentRomStart];
-        case SEGMENT_MENU_INTRO:            return get_loaded_data_in_seg_str(romAddr, sMenuIntroROMSegments);
-        case SEGMENT_GLOBAL_LEVEL_SCRIPT:   return sLoadedStr[romAddr == (uintptr_t)_scriptsSegmentRomStart];
-        case SEGMENT_MARIO_ANIMS:           return sLoadedStr[romAddr == (uintptr_t)gMarioAnims];
-        case SEGMENT_DEMO_INPUTS:           return sLoadedStr[romAddr == (uintptr_t)gDemoInputs];
-#if MULTILANG
-        case SEGMENT_EU_TRANSLATION:        return get_loaded_data_in_seg_str(romAddr, sTranslationROMSegments);
-#endif // MULTILANG
-        default: return "";
+    if (romAddr == (uintptr_t)NULL) {
+        return "unloaded";
     }
 
-    return NULL;
+    const IdNamePair* list = sSegmentInfos[segmentId].list;
+    if (list != NULL) {
+        ret = get_name_from_null_terminated_id_list(romAddr, list);
+    }
+
+    return ((ret != NULL) ? ret : "unknown");
 }
 
 

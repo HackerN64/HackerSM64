@@ -424,7 +424,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     return dest;
 }
 
-void load_code_segment(u8* start, u8* end, u8* srcStart, u8* srcEnd) {
+void load_code_segment(u8 *start, u8 *end, u8 *srcStart, u8 *srcEnd) {
     void *startAddr = (void *)start;
     u32 totalSize = end - start;
     // UNUSED u32 alignedSize = ALIGN16(srcEnd - srcStart);

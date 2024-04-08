@@ -110,9 +110,8 @@ void cs_address_select_input(void) {
 
         switch (gCSPageID) {
             case CS_PAGE_STACK:
-                cs_set_page(CS_PAGE_DISASM);
-                break;
             case CS_PAGE_REGISTERS:
+            case CS_PAGE_SEGMENTS:
                 if (addr_is_in_text_segment(sAddressSelectTarget)) {
                     cs_set_page(CS_PAGE_DISASM);
                 } else {

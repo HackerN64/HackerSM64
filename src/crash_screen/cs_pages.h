@@ -5,14 +5,17 @@
 #include "types.h"
 
 #include "pages/page_summary.h"
-#include "pages/page_registers.h"
-#include "pages/page_logs.h"
 #include "pages/page_stack.h"
+#include "pages/page_registers.h"
+#include "pages/page_disasm.h"
+#include "pages/page_memory.h"
 #ifdef INCLUDE_DEBUG_MAP
 #include "pages/page_map.h"
 #endif // INCLUDE_DEBUG_MAP
-#include "pages/page_memory.h"
-#include "pages/page_disasm.h"
+#include "pages/page_segments.h"
+#ifdef PUPPYPRINT_DEBUG
+#include "pages/page_logs.h"
+#endif // PUPPYPRINT_DEBUG
 #include "pages/page_settings.h"
 #include "pages/page_about.h"
 
@@ -31,6 +34,7 @@ enum CSPages {
 #ifdef INCLUDE_DEBUG_MAP
     CS_PAGE_MAP,
 #endif // INCLUDE_DEBUG_MAP
+    CS_PAGE_SEGMENTS,
 #ifdef PUPPYPRINT_DEBUG
     CS_PAGE_LOGS,
 #endif // PUPPYPRINT_DEBUG
