@@ -33,16 +33,19 @@ void cs_popup_reginspect_init(void) {
     sInspectedRegisterPtrAddr = 0x00000000;
 }
 
-CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, RegisterId regId, Doubleword val64, _Bool is64Bit) {
+CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, RegisterId regId, const Doubleword val64, _Bool is64Bit) {
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", COLOR_RGBA32_CRASH_PAGE_NAME, (is64Bit ? 64 : 32));
 
     const Word val32 = (Word)val64;
 
+    CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_CRASH_HEADER);
+    const RGBA32 valColor = COLOR_RGBA32_WHITE;
+
     // Print as hex:
     if (is64Bit) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), (" "STR_HEX_PREFIX STR_HEX_LONG), val64);
+        cs_print(TEXT_X(2), TEXT_Y(line++), ("hex: "STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_LONG), valColor, val64);
     } else {
-        cs_print(TEXT_X(2), TEXT_Y(line++), (" "STR_HEX_PREFIX STR_HEX_WORD), val32);
+        cs_print(TEXT_X(2), TEXT_Y(line++), ("hex: "STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_WORD), valColor, val32);
     }
 
     // Print as other floatint point formats:
@@ -54,10 +57,12 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
         if (fltErrType != FLT_ERR_NONE) {
             cs_print(TEXT_X(2), TEXT_Y(line++), ((fltErrType == FLT_ERR_DENORM) ? "denormalized" : "NaN"));
         } else {
-            cs_print(TEXT_X(2), TEXT_Y(line++), "% g", (is64Bit ? flt64.asF64 : flt32.asF32));
-            cs_print(TEXT_X(2), TEXT_Y(line++), "% e", (is64Bit ? flt64.asF64 : flt32.asF32));
+            cs_print(TEXT_X(2), TEXT_Y(line++), ("dec:"STR_COLOR_PREFIX"% g"), valColor, (is64Bit ? flt64.asF64 : flt32.asF32));
+            cs_print(TEXT_X(2), TEXT_Y(line++), ("sci:"STR_COLOR_PREFIX"% e"), valColor, (is64Bit ? flt64.asF64 : flt32.asF32));
         }
     }
+
+    CS_SET_DEFAULT_PRINT_COLOR_END();
 
     return line;
 }
@@ -180,15 +185,19 @@ void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
         }
     }
 
-    Word data = 0x00000000;
-    if (try_read_word_aligned(&data, val32)) {
+    Word dataAtAddr = 0x00000000;
+    if (is_valid_ram_addr(val32) && try_read_word_aligned(&dataAtAddr, val32)) {
         sInspectedRegisterPtrAddr = val32;
         cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
         if (addr_is_in_text_segment(val32)) {
-            format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, data);
+            format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, dataAtAddr);
         } else {
-            cs_print(TEXT_X(2), TEXT_Y(line++), STR_HEX_PREFIX STR_HEX_WORD, data);
-            print_data_as_binary(TEXT_X(2), TEXT_Y(line++), &data, sizeof(data), COLOR_RGBA32_WHITE);
+            CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_CRASH_HEADER);
+            const RGBA32 valColor = COLOR_RGBA32_WHITE;
+            cs_print(TEXT_X(2), TEXT_Y(line++), ("hex: "STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_WORD), valColor, dataAtAddr);
+            CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), "bin: ");
+            print_data_as_binary(TEXT_X(2 + charX), TEXT_Y(line++), &dataAtAddr, sizeof(dataAtAddr), valColor);
+            CS_SET_DEFAULT_PRINT_COLOR_END();
         }
     } else {
         sInspectedRegisterPtrAddr = 0x00000000;
@@ -230,8 +239,9 @@ void cs_popup_reginspect_draw(void) {
         return;
     }
     _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
+    _Bool isCOP1 = (regId.cop == COP1); //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
     Doubleword value = get_reg_val(cop, idx);
-    if ((regId.cop == COP1) && ((regId.idx & 0x1) == 0)) {
+    if (isCOP1 && ((regId.idx & 0x1) == 0)) {
         Word cop1OddBits = get_reg_val(COP1, (regId.idx + 1));
         if (cop1OddBits != 0) {
             value = ((HiLo64){ .hi = cop1OddBits, .lo = (Word)value, }).raw;
@@ -256,7 +266,13 @@ void cs_popup_reginspect_draw(void) {
     }
     line++;
 
-    line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
+    // 64 bit value if it exists:
+    if (is64Bit) {
+        line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
+    }
+
+    // 32 bit value:
+    line = cs_popup_reginspect_draw_reg_value(line, regId, value, FALSE);
 
     // line++;
     _Bool hasExInfo = FALSE;

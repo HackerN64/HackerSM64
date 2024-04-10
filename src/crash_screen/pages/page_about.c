@@ -440,7 +440,7 @@ void cs_print_about_entry(ScreenCoord_u32 y, s16 groupID, s16 entryID) {
         return;
     }
     const CSTextCoord_u32 section_indent = STRLEN("> ");
-    RGBA32 tempDefaultColor = gCSDefaultPrintColor;
+    RGBA32 tempDefaultColor = gCSDefaultPrintColor; // CS_SET_DEFAULT_PRINT_COLOR_START()?
 
     switch (entry->type) {
         case CS_ABOUT_ENTRY_TYPE_NULL:
