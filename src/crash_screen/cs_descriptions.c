@@ -266,7 +266,7 @@ const char* get_thread_flags_str(OSThread* thread) {
 
 // -- WARP NODE PRESETS --
 
-static IdNamePair sWarpNodeSpecialIds[] = {
+static const IdNamePair sWarpNodeSpecialIds[] = {
     { .id = WARP_NODE_MAIN_ENTRY,    .name = "main entry",    },
     { .id = WARP_NODE_DEFAULT,       .name = "default",       },
     { .id = WARP_NODE_DEATH,         .name = "death",         },
@@ -528,7 +528,7 @@ static const SegmentInfo sSegmentInfos[32] = {
     [SEGMENT_COMMON1_GEO        ] = { .list = sROMSegNames_22_common1_geo,         .name = "common1 geo",         },
     [SEGMENT_GROUP0_GEO         ] = { .list = sROMSegNames_23_group0_geo,          .name = "group0 geo",          },
     [SEGMENT_DEMO_INPUTS        ] = { .list = sROMSegNames_24_demo_inputs,         .name = "demo inputs",         },
-    [SEGMENT_EU_TRANSLATION     ] = { .list = sROMSegNames_25_eu_translation,      .name = "translations",        },
+    [SEGMENT_EU_TRANSLATION     ] = { .list = sROMSegNames_25_eu_translation,      .name = "languages",           },
     [SEGMENT_UNKNOWN_26         ] = { .list = NULL,                                .name = "unknown 26",          },
     [SEGMENT_UNKNOWN_27         ] = { .list = NULL,                                .name = "unknown 27",          },
     [SEGMENT_UNKNOWN_28         ] = { .list = NULL,                                .name = "unknown 28",          },
@@ -648,7 +648,7 @@ const char* get_hardcoded_memory_str(Address addr) {
 // #define ENABLE_NON_N64_PRID
 
 // https://en.wikichip.org/wiki/mips/prid_register
-const IdNamePair sPRId_names[] = {
+static const IdNamePair sPRId_names[] = {
     // LEGACY:
 #ifdef ENABLE_NON_N64_PRID
     { .id = 0x01, .name = "r2000",  },
@@ -846,7 +846,6 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
     [FLT_ERR_DENORM] = "Denormalized float",
     [FLT_ERR_NAN   ] = "NaN float",
 };
-
 enum FloatErrorType validate_floats_in_reg_buffer(void) {
     enum FloatErrorType fltErrType = FLT_ERR_NONE;
 
@@ -867,7 +866,6 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
 
     return fltErrType;
 }
-
 // Returns a FPCSR description from 'sFpcsrDesc'.
 // Only use 'specific' if disasm has just been run, because it checks saved registers with validate_floats_in_reg_buffer().
 const char* get_fpcsr_desc(u32 fpcsr, _Bool specific) {

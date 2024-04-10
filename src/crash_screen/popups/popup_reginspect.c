@@ -67,37 +67,66 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
     return line;
 }
 
+static const char* sLowercaseBool[] = {
+    [FALSE] = "false",
+    [TRUE ] = "true",
+};
+static const char* sLowercaseYesNo[] = {
+    [FALSE] = "no",
+    [TRUE ] = "yes",
+};
+static const char* sLowercaseEnable[] = {
+    [FALSE] = "disabled",
+    [TRUE ] = "enabled",
+};
+static const char* sLowercaseOnOff[] = {
+    [FALSE] = "off",
+    [TRUE ] = "on",
+};
+
 _Bool cs_print_reg_info_C0_SR(CSTextCoord_u32 line, Doubleword val) {
-    const ScreenCoord_u32 x = TEXT_X(2);
+    ScreenCoord_u32 x = TEXT_X(2);
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     const Reg_CP0_Status s = {
         .raw = (Word)val,
     };
+    CSTextCoord_u32 startLine = line;
 
-    cs_print(x, TEXT_Y(line++), "cop1 useable:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.CU_.CP1); // The other coprocessor bits are ignored by the N64.
+    cs_print(x, TEXT_Y(line++), "cop1:\t\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseEnable[s.CU_.CP1]); // The other coprocessor bits are ignored by the N64.
 #undef RP // PR/region.h moment
-    cs_print(x, TEXT_Y(line++), "low power mode:\t\t"STR_COLOR_PREFIX"%d", infoColor, s.RP);
-    cs_print(x, TEXT_Y(line++), "extra fpr:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.FR);
+    cs_print(x, TEXT_Y(line++), "low power:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseOnOff[s.RP]);
+    cs_print(x, TEXT_Y(line++), "extra fpr:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseEnable[s.FR]);
     const char* endian[] = {
         [0] = "big",
         [1] = "little",
     };
-    cs_print(x, TEXT_Y(line++), "endian:\t\t\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
-    //! TODO: list these two properly:
-    cs_print(x, TEXT_Y(line++), "diagnostic bits:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%03X", infoColor, s.DS);
-    cs_print(x, TEXT_Y(line++), "interrupt mask:\t\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
-    cs_print(x, TEXT_Y(line++), "kernel:\t\t\t\t"STR_COLOR_PREFIX"%d-bit",   infoColor, (s.KX ? 64 : 32));
-    cs_print(x, TEXT_Y(line++), "supervisor:\t\t\t"STR_COLOR_PREFIX"%d-bit", infoColor, (s.SX ? 64 : 32));
-    cs_print(x, TEXT_Y(line++), "user:\t\t\t\t"STR_COLOR_PREFIX"%d-bit",     infoColor, (s.UX ? 64 : 32));
+    cs_print(x, TEXT_Y(line++), "endian:\t\t"STR_COLOR_PREFIX"%s", infoColor, endian[s.RE]);
+    //! TODO: list interrupt bits properly:
+    cs_print(x, TEXT_Y(line++), "int. mask:\t"STR_COLOR_PREFIX STR_HEX_PREFIX"%02X", infoColor, s.IM);
+    cs_print(x, TEXT_Y(line++), "kernel:\t\t"STR_COLOR_PREFIX"%d-bit",   infoColor, (s.KX ? 64 : 32));
+    cs_print(x, TEXT_Y(line++), "supervisor:\t"STR_COLOR_PREFIX"%d-bit", infoColor, (s.SX ? 64 : 32));
+    cs_print(x, TEXT_Y(line++), "user:\t\t"STR_COLOR_PREFIX"%d-bit",     infoColor, (s.UX ? 64 : 32));
     const char* exec_mode[] = {
         [0b00] = "kernel",
         [0b01] = "supervisor",
         [0b10] = "user",
     };
-    cs_print(x, TEXT_Y(line++), "exec mode:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, exec_mode[s.KSU]);
-    cs_print(x, TEXT_Y(line++), "error:\t\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.ERL);
-    cs_print(x, TEXT_Y(line++), "exception:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, s.EXL);
-    cs_print(x, TEXT_Y(line++), "global interrupts:\t"STR_COLOR_PREFIX"%d", infoColor, s.IE);
+    cs_print(x, TEXT_Y(line++), "exec mode:\t"STR_COLOR_PREFIX"%s", infoColor, exec_mode[s.KSU]);
+    cs_print(x, TEXT_Y(line++), "error:\t\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseYesNo[s.ERL]);
+    cs_print(x, TEXT_Y(line++), "exception:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseYesNo[s.EXL]);
+    cs_print(x, TEXT_Y(line++), "global int:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseEnable[s.IE]);
+
+    line = startLine;
+    x += TEXT_WIDTH(STRLEN("extra fpr:  disabled "));
+    cs_print(x, TEXT_Y(line++), "insn trace:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseEnable[s.DS_.ITS]);
+    const char* ds_bev[] = {
+        [0b0] = "normal",
+        [0b1] = "bootstrap",
+    };
+    cs_print(x, TEXT_Y(line++), "bs exc vec:\t"STR_COLOR_PREFIX"%s", infoColor, ds_bev[s.DS_.BEV]);
+    cs_print(x, TEXT_Y(line++), "tlb down:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseYesNo[s.DS_.TS]);
+    cs_print(x, TEXT_Y(line++), "soft reset:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseYesNo[s.DS_.SR]);
+    cs_print(x, TEXT_Y(line++), "cp0 cond:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseBool[s.DS_.CH]);
 
     return TRUE;
 }
@@ -110,7 +139,7 @@ _Bool cs_print_reg_info_C0_CAUSE(CSTextCoord_u32 line, Doubleword val) {
         .raw = (Word)val,
     };
 
-    cs_print(x1, TEXT_Y(line++), "is branch delay slot:\t"STR_COLOR_PREFIX"%d", infoColor, c.BD);
+    cs_print(x1, TEXT_Y(line++), "is branch delay slot:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseYesNo[c.BD]);
     line++;
     cs_print(x1, TEXT_Y(line++), "interrupts pending:");
     cs_print(x2, TEXT_Y(line++), "Timer:\t\t\t\t  "STR_COLOR_PREFIX"%d", infoColor, c.IP_.Timer);
@@ -142,8 +171,8 @@ _Bool cs_print_reg_info_FPR_CSR(CSTextCoord_u32 line, Doubleword val) {
         .raw = (Word)val,
     };
 
-    cs_print(TEXT_X(2), TEXT_Y(line++), "flush denorms to zero:\t"STR_COLOR_PREFIX"%d", infoColor, f.FS);
-    cs_print(TEXT_X(2), TEXT_Y(line++), "condition bit:\t\t\t"STR_COLOR_PREFIX"%d", infoColor, f.C);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "flush denorms to zero:\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseYesNo[f.FS]);
+    cs_print(TEXT_X(2), TEXT_Y(line++), "condition bit:\t\t\t"STR_COLOR_PREFIX"%s", infoColor, sLowercaseBool[f.C]);
     const char* round_mode[] = {
         [0b00] = "nearest",
         [0b01] = "zero",
