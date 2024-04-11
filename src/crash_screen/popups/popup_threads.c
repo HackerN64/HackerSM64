@@ -160,7 +160,7 @@ void cs_popup_threads_draw_list(ScreenCoord_u32 startY) {
         );
     }
 
-    cs_print(TEXT_X(STRLEN("THREAD REGISTERS   ")), TEXT_Y(0), "#th.found:%d", sTotalFoundThreads);
+    cs_print(TEXT_X(STRLEN("THREAD REGISTERS    ")), TEXT_Y(0), "#th.found:%d", sTotalFoundThreads);
 
     osWritebackDCacheAll();
 
