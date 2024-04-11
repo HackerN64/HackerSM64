@@ -164,10 +164,11 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
         }
 
         // Get the offset for the current function.
-        InsnData insn = {
-            //! TODO: Is this potentially an unsafe read?
-            .raw = *(Word*)sBranchBufferCurrAddr,
-        };
+        InsnData insn = { .raw = 0x00000000, };
+        //! TODO: Is this needed? It slows down the search slightly.
+        if (!try_read_word_aligned(&insn.raw, sBranchBufferCurrAddr)) {
+            return FALSE;
+        }
         s16 branchOffset = insn_check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) {
