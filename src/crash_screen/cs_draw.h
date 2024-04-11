@@ -86,7 +86,7 @@ typedef s32 CSTextCoord_s32;
 #define FB_PTR_AS(_type) (_type*)(Address)(gFramebuffers[sRenderingFramebuffer])
 
 
-// For cs_draw_dark_rect.
+// For gCSDarkenAlphas (bit indices in RGBA16 color component).
 enum CSDrawDarkRectDarken {
     CS_DARKEN_NONE,
     CS_DARKEN_HALF,
@@ -96,6 +96,8 @@ enum CSDrawDarkRectDarken {
     CS_DARKEN_TO_BLACK,
     CS_DARKEN_LIMIT,
 };
+
+extern const Alpha gCSDarkenAlphas[CS_DARKEN_LIMIT];
 
 // For cs_draw_triangle.
 enum CSDrawTriangleDirection {
@@ -125,9 +127,6 @@ void cs_reset_scissor_box(void);
 
 #define CS_SCISSOR_BOX_END() \
     gCSScissorBox = __tempScissorBox;
-
-
-extern const Alpha gCSDarkenAlphas[CS_DARKEN_LIMIT];
 
 void cs_draw_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color);
 ALWAYS_INLINE void cs_draw_dark_rect(ScreenCoord_s32 startX, ScreenCoord_u32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, u16 darken) {

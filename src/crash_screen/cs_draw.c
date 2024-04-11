@@ -90,11 +90,48 @@ const Alpha gCSDarkenAlphas[CS_DARKEN_LIMIT] = {
 };
 
 // Apply color to an RGBA16 pixel with alpha blending.
-static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
+static void apply_rgba16_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
     if (alpha == MSK_RGBA32_A) {
         *dst = newColor;
     } else {
         *dst = cs_rgba16_blend(*dst, newColor, alpha);
+    }
+}
+
+// For specific translucent black colors (see gCSDarkenAlphas), an even faster blending method can be used.
+static u16 cs_get_darken_rgba16(RGBA16 color, Alpha alpha) {
+    if ((color | MSK_RGBA16_A) != COLOR_RGBA16_BLACK) {
+        return CS_DARKEN_NONE;
+    }
+
+    for (u16 darken = CS_DARKEN_NONE; darken < CS_DARKEN_LIMIT; darken++) {
+        if (alpha == gCSDarkenAlphas[darken]) {
+            return darken;
+        }
+    }
+
+    return CS_DARKEN_NONE;
+}
+// Generate a mask for each component of RGBA16 to later mask the color and shift to the right:
+// eg:                         RRRRRGGGGGBBBBBA
+//  0: 0x00 alpha -> ((color & 1111111111111110) >> 0) (does nothing)
+//  1: 0x7F alpha -> ((color & 1111011110111100) >> 1) (darken by 1/2)
+//  2: 0xBF alpha -> ((color & 1110011100111000) >> 2) (darken by 3/4)
+//  3: 0xDF alpha -> ((color & 1100011000110000) >> 3) (darken by 7/8)
+//  4: 0xEF alpha -> ((color & 1000010000100000) >> 4) (darken by 15/16)
+//  5: 0xFF alpha -> ((color & 0000000000000000) >> 5) (darken to black)
+static RGBA16 generate_darken_rgba16_mask(u16 darken) {
+    return ASSEMBLE_RGBA16_GRAYSCALE((MSK_RGBA16_C & ~BITMASK(darken)), 0);
+}
+static void apply_rgba16_darken(RGBA16* dst, RGBA16 mask, u16 darken) {
+    *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
+}
+
+static void apply_rgba16_color_or_darken(RGBA16* dst, RGBA16 newColor, Alpha alpha, RGBA16 mask, u16 darken) {
+    if (darken != CS_DARKEN_NONE) {
+        apply_rgba16_darken(dst, mask, darken);
+    } else {
+        apply_rgba16_color(dst, newColor, alpha);
     }
 }
 
@@ -106,26 +143,8 @@ void cs_draw_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s3
     }
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
-    // For specific translucent black colors (see gCSDarkenAlphas), an even faster blending method can be used.
-    // Generate a mask for each component of RGBA16 to later mask the color and shift to the right:
-    // eg:                         RRRRRGGGGGBBBBBA
-    //  0: 0x00 alpha -> ((color & 1111111111111110) >> 0) (does nothing)
-    //  1: 0x7F alpha -> ((color & 1111011110111100) >> 1) (darken by 1/2)
-    //  2: 0xBF alpha -> ((color & 1110011100111000) >> 2) (darken by 3/4)
-    //  3: 0xDF alpha -> ((color & 1100011000110000) >> 3) (darken by 7/8)
-    //  4: 0xEF alpha -> ((color & 1000010000100000) >> 4) (darken by 15/16)
-    //  5: 0xFF alpha -> ((color & 0000000000000000) >> 5) (darken to black)
-    //! TODO: Implement this in other draw functions too.
-    RGBA16 mask = COLOR_RGBA16_NONE;
-    u16 darken = 0;
-    if ((newColor | MSK_RGBA16_A) == COLOR_RGBA16_BLACK) {
-        for (darken = 0; darken < CS_DARKEN_LIMIT; darken++) {
-            if (alpha == gCSDarkenAlphas[darken]) {
-                mask = ASSEMBLE_RGBA16_GRAYSCALE((MSK_RGBA16_C & ~BITMASK(darken)), 0);
-                break;
-            }
-        }
-    }
+    const u16 darken = cs_get_darken_rgba16(newColor, alpha);
+    const RGBA16 mask = generate_darken_rgba16_mask(darken);
 
     // Scale the rectangle to fit inside the scissor box:
     ScreenCoord_s32 x1 = startX;
@@ -145,12 +164,7 @@ void cs_draw_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s3
 
     for (ScreenCoord_s32 y = 0; y < h; y++) {
         for (ScreenCoord_s32 x = 0; x < w; x++) {
-            if (mask != COLOR_RGBA16_NONE) {
-                // See above.
-                *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
-            } else {
-                apply_color(dst, newColor, alpha);
-            }
+            apply_rgba16_color_or_darken(dst, newColor, alpha, mask, darken);
             dst++;
         }
         dst += (SCREEN_WIDTH - w);
@@ -177,6 +191,8 @@ void cs_draw_diamond(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord
         return;
     }
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const u16 darken = cs_get_darken_rgba16(newColor, alpha);
+    const RGBA16 mask = generate_darken_rgba16_mask(darken);
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
@@ -190,7 +206,7 @@ void cs_draw_diamond(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord
         for (ScreenCoord_s32 x = 0; x < w; x++) {
             if (absi(x - middleX) < d) {
                 if (cs_is_in_scissor_box((startX + x), (startY + y))) {
-                    apply_color(dst, newColor, alpha);
+                    apply_rgba16_color_or_darken(dst, newColor, alpha, mask, darken);
                 }
             }
             dst++;
@@ -232,6 +248,8 @@ void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoor
 //         return;
 //     }
 //     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+//     const u16 darken = cs_get_darken_rgba16(newColor, alpha);
+//     const RGBA16 mask = generate_darken_rgba16_mask(darken);
 
 //     RGBA16* dst;
 
@@ -247,7 +265,7 @@ void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoor
 //         y = ((slope * (x - x1)) + y1);
 //         if (cs_is_in_scissor_box(x, y)) {
 //             dst = get_rendering_fb_pixel(x, y);
-//             apply_color(dst, newColor, alpha);
+//             apply_rgba16_color_or_darken(dst, newColor, alpha, mask, darken);
 //         }
 //         x++;
 //     }
@@ -263,6 +281,9 @@ void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, 
         return;
     }
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const u16 darken = cs_get_darken_rgba16(newColor, alpha);
+    const RGBA16 mask = generate_darken_rgba16_mask(darken);
+
     CSFontRow startBit = ((CSFontRow)BIT(SIZEOF_BITS(CSFontRow) - 1) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
     CSFontRow bit;
     CSFontRow rowMask;
@@ -276,7 +297,7 @@ void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, 
 
         for (ScreenCoord_u32 x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
             if ((bit & rowMask) && cs_is_in_scissor_box((startX + x), (startY + y))) {
-                apply_color(dst, newColor, alpha);
+                apply_rgba16_color_or_darken(dst, newColor, alpha, mask, darken);
             }
             dst++;
             bit >>= 1;
@@ -298,7 +319,7 @@ void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, 
 //     for (ScreenCoord_s32 y = 0; y < h; y++) {
 //         for (ScreenCoord_s32 x = 0; x < w; x++) {
 //             if (cs_is_in_scissor_box((startX + x), (startY + y))) {
-//                 apply_color(dst, *src, MSK_RGBA32_A);
+//                 apply_rgba16_color(dst, *src, MSK_RGBA32_A);
 //             }
 //             src++;
 //             dst++;
@@ -462,7 +483,7 @@ void cs_draw_LR_triangles(void) {
     ScreenCoord_s32 L_shift = ((BITFLAG_BOOL(buttonDown, L_TRIG) + BITFLAG_BOOL(buttonPressed, L_TRIG)));
     ScreenCoord_s32 R_shift = ((BITFLAG_BOOL(buttonDown, R_TRIG) + BITFLAG_BOOL(buttonPressed, R_TRIG)));
 
-    const RGBA32 bgColor = RGBA32_SET_ALPHA(COLOR_RGBA32_NONE, gCSDarkenAlphas[cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)]);
+    const RGBA32 bgColor = RGBA32_SET_ALPHA(COLOR_RGBA32_BLACK, gCSDarkenAlphas[cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)]);
 
     // 'L' triangle:
     const ScreenCoord_s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - L_shift); // Edge of the 'L' triangle.
