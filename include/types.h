@@ -166,10 +166,14 @@ typedef s32 DrawingLayer;
 typedef s16 PaintingData;
 typedef s32 CameraTransitionAngle;
 typedef s16 Movtex;
+typedef s16 MacroObject; // Required for backwards compatibility with Fast64
 typedef s16 Trajectory;
 typedef u8  CutsceneID;
 
 typedef u8 uchar;
+
+// Required for backwards compatibility with Fast64
+#define MACRO_OBJECT_END() 0
 
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,
