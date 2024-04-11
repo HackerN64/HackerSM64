@@ -449,6 +449,10 @@ enum GoddardScene {
 #define SET_ECHO(console, emulator) \
     CMD_BBBB(LEVEL_CMD_SET_ECHO, 0x04, console, emulator)
 
+// Required for backwards compatibility with Fast64
+#define MACRO_OBJECTS(objList) \
+    CMD_BBH(LEVEL_CMD_NOP, 0x04, 0x0000)
+
 // unused (previously MACRO_OBJECTS)
 #define CMD39(unk4) \
     CMD_BBH(LEVEL_CMD_39, 0x08, 0x0000), \
