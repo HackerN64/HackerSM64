@@ -60,7 +60,7 @@ static _Bool cs_is_in_scissor_box(s32 x, s32 y) {
 }
 
 // Get a pointer to the framebuffer pixel at the given screen coordinates.
-static RGBA16* get_rendering_fb_pixel(ScreenCoord_u32 x, ScreenCoord_u32 y) {
+ALWAYS_INLINE static RGBA16* get_rendering_fb_pixel(ScreenCoord_u32 x, ScreenCoord_u32 y) {
     return (FB_PTR_AS(RGBA16) + (SCREEN_WIDTH * y) + x);
 }
 
@@ -80,44 +80,21 @@ static RGBA16 cs_rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac) {
     return d;
 }
 
+const Alpha gCSDarkenAlphas[CS_DARKEN_LIMIT] = {
+    [CS_DARKEN_NONE              ] = 0x00, // 000/000
+    [CS_DARKEN_HALF              ] = 0x7F, // 127/128
+    [CS_DARKEN_THREE_QUARTERS    ] = 0xBF, // 191/192
+    [CS_DARKEN_SEVEN_EIGHTHS     ] = 0xDF, // 223/224
+    [CS_DARKEN_FIFTEEN_SIXTEENTHS] = 0xEF, // 239/240
+    [CS_DARKEN_TO_BLACK          ] = 0xFF, // 255/256
+};
+
 // Apply color to an RGBA16 pixel with alpha blending.
 static void apply_color(RGBA16* dst, RGBA16 newColor, Alpha alpha) {
     if (alpha == MSK_RGBA32_A) {
         *dst = newColor;
     } else {
         *dst = cs_rgba16_blend(*dst, newColor, alpha);
-    }
-}
-
-// Darkens a rectangular area. This is faster than the color blending done by
-// cs_draw_rect, so it's used for the large background rectangle.
-// 0  - does nothing
-// 1  - darken by 1/2
-// 2  - darken by 3/4
-// 3  - darken by 7/8
-// 4  - darken by 15/16
-// 5+ - darken to black
-void cs_draw_dark_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, u32 darken) {
-    if (darken == CS_DARKEN_NONE) {
-        return;
-    }
-
-    const RGBA16Component componentMask = (MSK_RGBA16_C & ~BITMASK(darken));
-    RGBA16 mask = GPACK_RGBA5551(0, 0, 0, 0);
-    for (u32 i = SIZ_RGBA16_A; i < (SIZ_RGBA16_C * 3); i += SIZ_RGBA16_C) {
-        mask |= (componentMask << i);
-    }
-
-    RGBA16* dst = get_rendering_fb_pixel(startX, startY);
-
-    for (ScreenCoord_s32 y = 0; y < h; y++) {
-        for (ScreenCoord_s32 x = 0; x < w; x++) {
-            if (cs_is_in_scissor_box((startX + x), (startY + y))) {
-                *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
-            }
-            dst++;
-        }
-        dst += (SCREEN_WIDTH - w);
     }
 }
 
@@ -129,11 +106,49 @@ void cs_draw_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s3
     }
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
 
+    // For specific translucent black colors (see gCSDarkenAlphas), an even faster blending method can be used.
+    // Generate a mask for each component of RGBA16 to later mask the color and shift to the right:
+    // eg:                         RRRRRGGGGGBBBBBA
+    //  0: 0x00 alpha -> ((color & 1111111111111110) >> 0) (does nothing)
+    //  1: 0x7F alpha -> ((color & 1111011110111100) >> 1) (darken by 1/2)
+    //  2: 0xBF alpha -> ((color & 1110011100111000) >> 2) (darken by 3/4)
+    //  3: 0xDF alpha -> ((color & 1100011000110000) >> 3) (darken by 7/8)
+    //  4: 0xEF alpha -> ((color & 1000010000100000) >> 4) (darken by 15/16)
+    //  5: 0xFF alpha -> ((color & 0000000000000000) >> 5) (darken to black)
+    //! TODO: Implement this in other draw functions too.
+    RGBA16 mask = COLOR_RGBA16_NONE;
+    u16 darken = 0;
+    if ((newColor | MSK_RGBA16_A) == COLOR_RGBA16_BLACK) {
+        for (darken = 0; darken < CS_DARKEN_LIMIT; darken++) {
+            if (alpha == gCSDarkenAlphas[darken]) {
+                mask = ASSEMBLE_RGBA16_GRAYSCALE((MSK_RGBA16_C & ~BITMASK(darken)), 0);
+                break;
+            }
+        }
+    }
+
+    // Scale the rectangle to fit inside the scissor box:
+    ScreenCoord_s32 x1 = startX;
+    ScreenCoord_s32 y1 = startY;
+    ScreenCoord_s32 x2 = (startX + w);
+    ScreenCoord_s32 y2 = (startY + h);
+    if (x1 <  gCSScissorBox.x1) x1 = gCSScissorBox.x1;
+    if (y1 <  gCSScissorBox.y1) y1 = gCSScissorBox.y1;
+    if (x2 >= gCSScissorBox.x2) x2 = gCSScissorBox.x2;
+    if (y2 >= gCSScissorBox.y2) y2 = gCSScissorBox.y2;
+    startX = x1;
+    startY = y1;
+    w = (x2 - x1);
+    h = (y2 - y1);
+
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
     for (ScreenCoord_s32 y = 0; y < h; y++) {
         for (ScreenCoord_s32 x = 0; x < w; x++) {
-            if (cs_is_in_scissor_box((startX + x), (startY + y))) {
+            if (mask != COLOR_RGBA16_NONE) {
+                // See above.
+                *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
+            } else {
                 apply_color(dst, newColor, alpha);
             }
             dst++;
@@ -144,26 +159,15 @@ void cs_draw_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s3
 
 // Draws an empty box.
 void cs_draw_outline(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    ScreenCoord_s32 x1 = startX;
+    ScreenCoord_s32 y1 = startY;
+    ScreenCoord_s32 x2 = startX + (w - 1);
+    ScreenCoord_s32 y2 = startY + (h - 1);
 
-    RGBA16* dst = get_rendering_fb_pixel(startX, startY);
-
-    for (ScreenCoord_s32 y = 0; y < h; y++) {
-        for (ScreenCoord_s32 x = 0; x < w; x++) {
-            if (
-                cs_is_in_scissor_box((startX + x), (startY + y)) &&
-                ((y == 0) || (y == (h - 1)) || (x == 0) || (x == (w - 1)))
-            ) {
-                apply_color(dst, newColor, alpha);
-            }
-            dst++;
-        }
-        dst += (SCREEN_WIDTH - w);
-    }
+    cs_draw_rect(x1, y1,       w, 1,       color); // Top line.
+    cs_draw_rect(x1, y2,       w, 1,       color); // Bottom line.
+    cs_draw_rect(x1, (y1 + 1), 1, (h - 2), color); // Left line.
+    cs_draw_rect(x2, (y1 + 1), 1, (h - 2), color); // Right line.
 }
 
 // Draws a diamond shape.
@@ -176,8 +180,8 @@ void cs_draw_diamond(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord
 
     RGBA16* dst = get_rendering_fb_pixel(startX, startY);
 
-    ScreenCoord_s32 middleX = (w / 2.0f);
-    ScreenCoord_s32 middleY = (h / 2.0f);
+    const ScreenCoord_s32 middleX = (w / 2.0f);
+    const ScreenCoord_s32 middleY = (h / 2.0f);
 
     f32 dx = ((f32)w / (f32)h);
     f32 d = 0.0f;
@@ -210,7 +214,7 @@ void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoor
         case CS_TRI_RIGHT:
             startX -= (w + 1); // Flip horizontally.
             FALL_THROUGH;
-        case CS_TRI_LEFT: 
+        case CS_TRI_LEFT:
             w *= 2;
             break;
     }
@@ -220,6 +224,7 @@ void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoor
     CS_SCISSOR_BOX_END();
 }
 
+//! TODO:
 // // Draws a line between any two points.
 // void cs_draw_line(ScreenCoord_u32 x1, ScreenCoord_u32 y1, ScreenCoord_u32 x2, ScreenCoord_u32 y2, RGBA32 color) {
 //     const Alpha alpha = RGBA32_A(color);
@@ -281,6 +286,7 @@ void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, 
     }
 }
 
+//! TODO:
 // void cs_draw_texture(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA16* texture) {
 //     if (texture == NULL) {
 //         return;
@@ -303,11 +309,11 @@ void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, 
 
 // Copy the framebuffer data from gFramebuffers one frame at a time, forcing alpha to true to turn off broken anti-aliasing.
 void cs_take_screenshot_of_game(RGBA16* dst, size_t size) {
-    u32* src = FB_PTR_AS(u32);
-    u32* ptr = (u32*)dst;
-    const u32 mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
+    RGBA16FILL* src = FB_PTR_AS(RGBA16FILL);
+    RGBA16FILL* ptr = (RGBA16FILL*)dst;
+    const RGBA16FILL mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
 
-    for (size_t s = 0; s < size; s += sizeof(u32)) {
+    for (size_t s = 0; s < size; s += sizeof(RGBA16FILL)) {
         *ptr++ = (*src++ | mask);
     }
 }
@@ -375,24 +381,6 @@ void cs_draw_scroll_bar_impl(ScreenCoord_u32 x, ScreenCoord_u32 topY, ScreenCoor
     cs_draw_rect(x, (topY + barTop), 1, barHeight, color);
 }
 
-// RGBA32 cs_thread_draw_highlight(OSThread* thread, ScreenCoord_u32 y) {
-//     RGBA32 color = 0x00000000;
-
-//     if (thread == gCrashedThread) {
-//         color = COLOR_RGBA32_CRASH_PC_HIGHLIGHT;
-//     } else if (thread == __osRunningThread) {
-//         color = COLOR_RGBA32_CRASH_RUNNING_HIGHLIGHT;
-//     } else if (thread == gInspectThread) {
-//         color = COLOR_RGBA32_CRASH_INSPECT_HIGHLIGHT;
-//     }
-
-//     if (color) {
-//         cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, y, color);
-//     }
-
-//     return color;
-// }
-
 RGBA32 cs_draw_thread_state_icon(ScreenCoord_u32 x, ScreenCoord_u32 y, OSThread* thread) {
     const s32 w = (CRASH_SCREEN_FONT_CHAR_WIDTH + 1);
     const s32 h = (CRASH_SCREEN_FONT_CHAR_WIDTH + 1);
@@ -453,15 +441,6 @@ CSTextCoord_u32 cs_page_header_draw(void) {
     return line;
 }
 
-static const Alpha sCSBackgroundAlphas[CS_DARKEN_LIMIT] = {
-    [CS_DARKEN_NONE              ] = 0x00,
-    [CS_DARKEN_HALF              ] = 0x7F,
-    [CS_DARKEN_THREE_QUARTERS    ] = 0xBF,
-    [CS_DARKEN_SEVEN_EIGHTHS     ] = 0xDF,
-    [CS_DARKEN_FIFTEEN_SIXTEENTHS] = 0xEF,
-    [CS_DARKEN_TO_BLACK          ] = 0xFF,
-};
-
 // Draws the 'L' and 'R' triangles.
 void cs_draw_LR_triangles(void) {
     cs_set_scissor_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -483,7 +462,7 @@ void cs_draw_LR_triangles(void) {
     ScreenCoord_s32 L_shift = ((BITFLAG_BOOL(buttonDown, L_TRIG) + BITFLAG_BOOL(buttonPressed, L_TRIG)));
     ScreenCoord_s32 R_shift = ((BITFLAG_BOOL(buttonDown, R_TRIG) + BITFLAG_BOOL(buttonPressed, R_TRIG)));
 
-    const RGBA32 bgColor = RGBA32_SET_ALPHA(COLOR_RGBA32_NONE, sCSBackgroundAlphas[cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)]);
+    const RGBA32 bgColor = RGBA32_SET_ALPHA(COLOR_RGBA32_NONE, gCSDarkenAlphas[cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_BG_OPACITY)]);
 
     // 'L' triangle:
     const ScreenCoord_s32 L_edge = ((CRASH_SCREEN_X1 - triSeparation) - L_shift); // Edge of the 'L' triangle.

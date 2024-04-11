@@ -148,13 +148,18 @@
     ((a) << IDX_RGBA32_A)               \
 )
 
-// GPACK_RGBA5551 but converts from [0..255] component values.
+// Another version of GPACK_RGBA5551.
 #define RGBA_TO_RGBA16(r, g, b, a) (    \
     (C32_TO_C16(r) << IDX_RGBA16_R) |   \
     (C32_TO_C16(g) << IDX_RGBA16_G) |   \
     (C32_TO_C16(b) << IDX_RGBA16_B) |   \
     (A32_TO_A16(a) << IDX_RGBA16_A)     \
 )
+
+// GPACK_RGBA5551 but without converting from [0..255].
+#define ASSEMBLE_RGBA16(r, g, b, a)     ( R_RGBA16(r) | G_RGBA16(g) | B_RGBA16(b) | A_RGBA16(a) )
+#define ASSEMBLE_RGBA16_GRAYSCALE(c, a) ASSEMBLE_RGBA16((c), (c), (c), (a))
+
 
 #define COLORRGBA_TO_RGBA16(src)                        RGBA_TO_RGBA16((src)[0], (src)[1], (src)[2], (src)[3])
 #define RGBA32_TO_RGBA16(src)                           RGBA_TO_RGBA16(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
@@ -163,7 +168,7 @@
 
 // -- Color modification macros --
 
-#define STATIC_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low ) : (x)))
+#define STATIC_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 
 #define RGBA32_SHADE(src, amt) (RGBA32)( \

@@ -126,8 +126,13 @@ void cs_reset_scissor_box(void);
 #define CS_SCISSOR_BOX_END() \
     gCSScissorBox = __tempScissorBox;
 
-void cs_draw_dark_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, u32 darken);
+
+extern const Alpha gCSDarkenAlphas[CS_DARKEN_LIMIT];
+
 void cs_draw_rect(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color);
+ALWAYS_INLINE void cs_draw_dark_rect(ScreenCoord_s32 startX, ScreenCoord_u32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, u16 darken) {
+    cs_draw_rect(startX, startY, w, h, RGBA32_SET_ALPHA(COLOR_RGBA32_BLACK, gCSDarkenAlphas[darken]));
+}
 void cs_draw_outline(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color);
 void cs_draw_diamond(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color);
 void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
