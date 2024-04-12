@@ -23,15 +23,6 @@
 
 #include "game/vc_check.h"
 
-// Message IDs
-enum MessageIDs {
-    MESG_SP_COMPLETE = 100,
-    MESG_DP_COMPLETE,
-    MESG_VI_VBLANK,
-    MESG_START_GFX_SPTASK,
-    MESG_NMI_REQUEST,
-};
-
 // OSThread gUnkThread; // unused?
 OSThread gIdleThread;
 OSThread gMainThread;
