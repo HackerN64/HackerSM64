@@ -95,7 +95,7 @@ _Bool symbol_is_function(const MapSymbol* symbol) {
     return (
         ((symbol->type == 't') || (symbol->type == 'T')) && // The symbol itself is marked as .text.
         (symbol->size != 0) && // The symbol has data.
-        ((symbol->addr & sizeof(Word)) == 0) && // The symbol is 4byte aligned.
+        ((symbol->addr % sizeof(Word)) == 0) && // The symbol is 4byte aligned.
         ((symbol->size % sizeof(Word)) == 0) && // The symbol's size is divisible by the size of an instruction.
         addr_is_in_text_segment(symbol->addr) // The symbol is in a .text segment.
     );
