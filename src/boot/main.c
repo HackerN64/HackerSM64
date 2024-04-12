@@ -292,7 +292,7 @@ void handle_sp_complete(void) {
 }
 
 void handle_dp_complete(void) {
-    ASSERTF((sCurrentDisplaySPTask != NULL), "NULL SP task in handle_dp_complete.\n\n"DEBUG_RCP_STR, DEBUG_RCP_ARGS);
+    ASSERTF((sCurrentDisplaySPTask != NULL), ASSERT_PREFIX_RCP"NULL SP task in handle_dp_complete.");
     // Gfx SP task is completely done.
     if (sCurrentDisplaySPTask->msgqueue != NULL) {
         osSendMesg(sCurrentDisplaySPTask->msgqueue, sCurrentDisplaySPTask->msg, OS_MESG_NOBLOCK);
@@ -315,7 +315,7 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    ERRORF("RCP is HUNG UP!! Oh! MY GOD!!\n\n"DEBUG_RCP_STR, DEBUG_RCP_ARGS);
+    ERRORF(ASSERT_PREFIX_RCP"RCP is HUNG UP!! Oh! MY GOD!!");
 }
 
 /**

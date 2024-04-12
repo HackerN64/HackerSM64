@@ -2055,7 +2055,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     void **actNameTbl    = segmented_to_virtual(languageTable[gInGameLanguage][2]);
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
-    if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
+    if ((gLastCompletedCourseNum != COURSE_NONE) && (gLastCompletedCourseNum <= COURSE_STAGES_MAX)) { // Main courses
         print_hud_course_complete_coins(118, 103);
         play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
 

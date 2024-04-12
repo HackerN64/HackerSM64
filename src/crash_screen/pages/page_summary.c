@@ -23,6 +23,7 @@
 #include "page_disasm.h"
 
 #include "game/asm.h"
+#include "game/area.h"
 #ifdef UNF
 #include "usb/usb.h"
 #include "usb/debug.h"
@@ -51,9 +52,6 @@ const enum ControlTypes cs_cont_list_summary[] = {
 void page_summary_init(void) {
 
 }
-
-extern void handle_dp_complete(void);
-extern void alert_rcp_hung_up(void);
 
 // Draw the assert info.
 //! TODO: Scrollable long asserts.
@@ -96,16 +94,57 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
     }
 
     if (__n64Assert_Message != NULL) {
+        // "MESSAGE:"
+        cs_print(x, TEXT_Y(line++), STR_COLOR_PREFIX"MESSAGE:", COLOR_RGBA32_CRASH_HEADER);
+
+        const char* message = __n64Assert_Message;
+
+        enum AssertType {
+            ASSERT_TYPE_DEFAULT,
+            ASSERT_TYPE_LEVEL,
+            ASSERT_TYPE_RCP,
+        } type = ASSERT_TYPE_DEFAULT;
+        if (message[0] == CHAR_ASSERT_PREFIX) {
+            switch (message[1]) {
+                case CHAR_ASSERT_PREFIX_LEVEL: type = ASSERT_TYPE_LEVEL; break; // ASSERT_PREFIX_LEVEL
+                case CHAR_ASSERT_PREFIX_RCP:   type = ASSERT_TYPE_RCP;   break; // ASSERT_PREFIX_RCP  
+            }
+        }
+
+        // Skip the first two characters of the message if they were used to set the assert type.
+        if (type != ASSERT_TYPE_DEFAULT) {
+            message += 2;
+        }
+
+        // "[message]"
         gCSWordWrap = TRUE;
-
-        // "MESSAGE:[message]"
-        cs_print(x, TEXT_Y(line),
-            STR_COLOR_PREFIX"MESSAGE:\n"STR_COLOR_PREFIX"%s",
-            COLOR_RGBA32_CRASH_HEADER,
-            gCSDefaultPrintColor, __n64Assert_Message
-        );
-
+        cs_print(x, TEXT_Y(line), "%s", message);
+        line += (gCSNumLinesPrinted + 1);
         gCSWordWrap = FALSE;
+
+        switch (type) {
+            case ASSERT_TYPE_LEVEL:
+                // line = (CRASH_SCREEN_NUM_CHARS_Y - 3 - 1);
+                line++;
+                CSTextCoord_u32 levelStrSize = cs_print(x, TEXT_Y(line), "Level %d: %s", 
+                    gCurrLevelNum, get_level_name(gCurrLevelNum)
+                );
+                if (gCurrentArea != NULL) {
+                    cs_print((x + TEXT_WIDTH(levelStrSize)), TEXT_Y(line), " (area %d)", gCurrentArea->index);
+                }
+                break;
+            case ASSERT_TYPE_RCP:
+                // line = (CRASH_SCREEN_NUM_CHARS_Y - 3 - 3);
+                line++;
+                cs_print(x, TEXT_Y(line), "DPC:\t0x%08X in 0x%08X-0x%08X\nSTAT:\tdp:0x%04X\tsp:0x%04X\nSP DMA:\tfull:%X busy:%X", 
+                    IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG),
+                    IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG),
+                    IO_READ(SP_DMA_FULL_REG), IO_READ(SP_DMA_BUSY_REG)
+                );
+                break;
+            default:
+                break;
+        }
     }
 
     osWritebackDCacheAll();

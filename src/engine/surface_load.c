@@ -686,6 +686,8 @@ void load_object_collision_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
 
+    DEBUG_ASSERTF((collisionData != NULL), ASSERT_PREFIX_LEVEL"Object's collision data is missing!");
+
     Vec3f dist;
     vec3_diff(dist, &o->oPosVec, &gMarioObject->oPosVec);
     f32 sqrLateralDist = sqr(dist[0]) + sqr(dist[2]);
@@ -744,6 +746,8 @@ void load_object_static_model(void) {
     PUPPYPRINT_GET_SNAPSHOT();
     TerrainData *collisionData = o->collisionData;
     u32 surfacePoolData;
+
+    DEBUG_ASSERTF((collisionData != NULL), ASSERT_PREFIX_LEVEL"Object's collision data is missing!");
 
     // Initialise a new surface pool for this block of surface data
     gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);

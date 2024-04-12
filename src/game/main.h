@@ -119,17 +119,6 @@ typedef struct {
 } OSTimerEx;
 
 
-//! TODO:
-// DPC_STATUS_REG bits + DPC_CLOCK_REG, DPC_BUFBUSY_REG, DPC_PIPEBUSY_REG, DPC_TMEM_REG
-// SP_STATUS_REG bits + SP_MEM_ADDR_REG, SP_DRAM_ADDR_REG, SP_RD_LEN_REG, SP_WR_LEN_REG, SP_SEMAPHORE_REG, SP_PC_REG
-#define DEBUG_RCP_STR "DPC:\t0x%08X in 0x%08X-0x%08X\nSTAT:\tdp:0x%04X\tsp:0x%04X\nSP DMA:\tfull:%X busy:%X"
-#define DEBUG_RCP_ARGS \
-        IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG), \
-        IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG), \
-        IO_READ(SP_DMA_FULL_REG), IO_READ(SP_DMA_BUSY_REG)
-        //! TODO: Why does VSCode intellisense make the last 'IO_READ' yellow?
-
-
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
 void dispatch_audio_sptask(struct SPTask *spTask);
 void exec_display_list(struct SPTask *spTask);

@@ -1236,7 +1236,7 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 prevPitch, nextPitch;
     s16 prevYaw, nextYaw;
 
-    DEBUG_ASSERT((sParTrackPath != NULL), "Parallel tracking path is uninitialized");
+    DEBUG_ASSERT((sParTrackPath != NULL), ASSERT_PREFIX_LEVEL"Parallel tracking path is uninitialized");
 
     // Store camera pos, for changing between paths
     vec3f_copy(oldPos, pos);

@@ -752,7 +752,6 @@ void geo_layout_cmd_node_culling_radius(void) {
 
 extern const char* get_segment_name(u8 segmentId);
 extern const char* get_segment_sub_name(u8 segmentId);
-extern const char* str_null_fallback(const char* str, const char* fallback);
 
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     // set by register_scene_graph_node when gCurGraphNodeIndex is 0
@@ -776,11 +775,11 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
 
     while (gGeoLayoutCommand != NULL) {
         DEBUG_ASSERTF((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT),
-            "Invalid or unloaded geo layout detected: 0x%02X\nin segment %d (%s)\n%s",
+            ASSERT_PREFIX_LEVEL"Invalid/unloaded geo layout!\n CMD: 0x%02X\nIn segment %d (%s)\n %s",
             gGeoLayoutCommand[0x00],
             ((u32)segptr >> 24),
-            str_null_fallback(get_segment_name((u32)segptr >> 24), "unknown"),
-            str_null_fallback(get_segment_sub_name((u32)segptr >> 24), "unloaded")
+            get_segment_name((u32)segptr >> 24),
+            get_segment_sub_name((u32)segptr >> 24)
         );
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }

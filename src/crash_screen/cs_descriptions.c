@@ -107,6 +107,9 @@ DEF_COMPRESSION_NAME(unk);
 #endif
 
 
+#define ID_LIST_END() { .id = -1, .name = NULL, }
+
+
 typedef struct IdNamePair {
     /*0x00*/ const int id;
     /*0x04*/ const char* name;
@@ -277,9 +280,28 @@ static const IdNamePair sWarpNodeSpecialIds[] = {
     { .id = WARP_NODE_CREDITS_NEXT,  .name = "credits next",  },
     { .id = WARP_NODE_CREDITS_END,   .name = "credits end",   },
 };
-const char* get_warp_node_name(const enum WarpNodes id) {
-    const char* ret = get_name_from_id_list(id, sWarpNodeSpecialIds);
-    return ((ret != NULL) ? ret : "");
+const char* get_warp_node_name(enum WarpNodes id) {
+    return str_null_fallback(get_name_from_id_list(id, sWarpNodeSpecialIds), "");
+}
+
+
+// -- COURSES --
+
+static const char* sLevelNames[] = {
+    [LEVEL_NONE] = "none",
+#define STUB_LEVEL(_0, levelenum, _2, _3, _4, _5, _6, _7, _8) [levelenum] = "",
+#define DEFINE_LEVEL(textname, levelenum, _2, folder, _4, _5, _6, _7, _8, _9, _10) [levelenum] = TO_STRING2(folder),
+#include "levels/level_defines.h"
+#undef STUB_LEVEL
+#undef DEFINE_LEVEL
+    [LEVEL_FILE_SELECT ] = "file_select",
+    [LEVEL_LEVEL_SELECT] = "level_select",
+};
+const char* get_level_name(enum LevelNum levelNum) {
+    if (levelNum < LEVEL_NONE) {
+        return "restart_game";
+    }
+    return ((levelNum < ARRAY_COUNT(sLevelNames)) ? sLevelNames[levelNum] : "");
 }
 
 
@@ -293,7 +315,6 @@ const char* get_warp_node_name(const enum WarpNodes id) {
 #define DEF_ROM_SEG_SEG7(_name)       DEF_ROM_SEG_IMPL(_name##_segment_7,          _name)
 #define DEF_ROM_SEG_LANG_YAY0(_name)  DEF_ROM_SEG_IMPL(translation_##_name##_yay0, _name)
 #define DEF_ROM_SEG_GLOBAL_VAR(_name) { .id = (uintptr_t)_name, .name = TO_STRING2(_name), }
-#define ID_LIST_END()                 { .id = -1, .name = NULL, }
 
 // 00: SEGMENT_MAIN
 static const IdNamePair sROMSegNames_00_main[] = {
@@ -538,7 +559,7 @@ static const SegmentInfo sSegmentInfos[32] = {
 };
 // Get the name of a segment.
 const char* get_segment_name(u8 segmentId) {
-    return ((segmentId < ARRAY_COUNT(sSegmentInfos)) ? sSegmentInfos[segmentId].name : NULL);
+    return ((segmentId < ARRAY_COUNT(sSegmentInfos)) ? sSegmentInfos[segmentId].name : "unknown");
 }
 // Get the name of what is currently loaded in a segment.
 const char* get_segment_sub_name(u8 segmentId) {
@@ -553,7 +574,7 @@ const char* get_segment_sub_name(u8 segmentId) {
         ret = get_name_from_null_terminated_id_list(romAddr, list);
     }
 
-    return ((ret != NULL) ? ret : "unknown");
+    return str_null_fallback(ret, "unknown");
 }
 
 
@@ -568,7 +589,6 @@ static const RangeNamePair sHardcodedSegmentRanges[] = {
     { .start = (Address)_zbufferSegmentBssStart,      .end = (Address)_zbufferSegmentBssEnd,      .name = "zbuffer",       },
     { .start = (Address)_buffersSegmentBssStart,      .end = (Address)_buffersSegmentBssEnd,      .name = "buffers",       },
 };
-
 // For stuff that doesn't have a map symbol name.
 const char* get_hardcoded_memory_str(Address addr) {
     if (addr == (Address)NULL) {
@@ -704,8 +724,7 @@ static const IdNamePair sPRId_names[] = {
     { .id = 0xFF, .name = "unknown", },
 };
 const char* get_processor_name(u8 imp) {
-    const char* ret = get_name_from_id_list(imp, sPRId_names);
-    return ((ret != NULL) ? ret : "unknown");
+    return str_null_fallback(get_name_from_id_list(imp, sPRId_names), "unknown");
 }
 
 
@@ -925,7 +944,7 @@ static const IdNamePair sMapSymbolTypes[] = {
     { .id = 'R', .name = ".rodata",           }, // Global read only symbol.
     { .id = 't', .name = ".text (static)",    }, // Local text symbol.
     { .id = 'T', .name = ".text",             }, // Global text symbol.
-    { .id = 'W', .name = "weak (untagged)",   },
+    { .id = 'W', .name = "weak (untagged)",   }, // Untagged weak symbol.
     { .id = 'U', .name = "undefined",         }, // Undefined symbol.
 };
 const char* get_map_symbol_type_desc(char c) {

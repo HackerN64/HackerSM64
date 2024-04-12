@@ -284,7 +284,7 @@ static size_t cs_print_from_buffer(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t 
                 break;
         }
 
-        if (space && index < (bufferCount - 1)) {
+        if (space && (index < (bufferCount - 1))) {
             CSTextCoord_u32 nextWordLength = cs_get_next_word_length(gCSPrintBuffer, (index + 1), bufferCount);
 
             if (cs_should_wrap(x + TEXT_WIDTH(nextWordLength))) {

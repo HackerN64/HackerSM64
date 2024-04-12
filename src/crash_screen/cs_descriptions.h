@@ -3,10 +3,11 @@
 #include <ultra64.h>
 
 #include "types.h"
-
-#include "game/main.h"
+#include "level_table.h"
 
 #include "game/emutest.h"
+#include "game/level_update.h"
+#include "game/main.h"
 
 
 
@@ -62,6 +63,9 @@ const char* str_null_fallback(const char* str, const char* fallback);
 const char* get_thread_name(OSThread* thread);
 const char* get_thread_state_str(OSThread* thread);
 const char* get_thread_flags_str(OSThread* thread);
+
+const char* get_warp_node_name(enum WarpNodes id);
+const char* get_level_name(enum LevelNum levelNum);
 
 const char* get_segment_name(u8 segmentId);
 const char* get_segment_sub_name(u8 segmentId);

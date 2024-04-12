@@ -569,8 +569,7 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
-    s16 levelNum = warpNode->node.destLevel & 0x7F;
-
+    s16 levelNum = (warpNode->node.destLevel & 0x7F);
     s16 destArea = warpNode->node.destArea;
     s16 unchanged = TRUE;
 
@@ -833,8 +832,6 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
     return sDelayedWarpTimer;
 }
 
-extern const char* get_warp_node_name(const enum WarpNodes id);
-
 /**
  * If a delayed warp is ready, initiate it.
  */
@@ -897,8 +894,6 @@ void initiate_delayed_warp(void) {
 
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
-
-                    DEBUG_ASSERTF((warpNode != NULL), "Source warp node doesn't exist.\n\nID: 0x%02X (%s).\nWarp op: %d", sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId), sDelayedWarpOp);
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);

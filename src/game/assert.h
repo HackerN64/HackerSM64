@@ -16,11 +16,20 @@ extern int         __n64Assert_LineNum;
 extern const char* __n64Assert_Message;
 
 
-extern int __assert_address;
+extern uintptr_t __assert_address;
 
 
 extern void __n64Assert(char* condition, char* fileName, u32 lineNum, char* message);
 extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* message, ...) __attribute__((format(printf, 4, 5)));
+
+
+#define CHAR_ASSERT_PREFIX          '\x10'
+
+#define CHAR_ASSERT_PREFIX_LEVEL    '\xCA'
+#define ASSERT_PREFIX_LEVEL         "\x10\xCA"
+
+#define CHAR_ASSERT_PREFIX_RCP      '\xBA'
+#define ASSERT_PREFIX_RCP           "\x10\xBA"
 
 
 /**
@@ -32,31 +41,31 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 /**
  * Will always cause a crash with your message of choice.
  */
-#define ERROR(__message__) do {                                                             \
-    SET_ASSERT_ADDRESS();                                                                   \
-    __n64Assert(NULL, __FILE__, __LINE__, __message__"\n");                                 \
+#define ERROR(__message__) do {                                                         \
+    SET_ASSERT_ADDRESS();                                                               \
+    __n64Assert(NULL, __FILE__, __LINE__, (__message__));                               \
 } while (0)
 
-#define ERRORF(__message__, ...) do {                                                       \
-    SET_ASSERT_ADDRESS();                                                                   \
-    __n64Assertf(NULL, __FILE__, __LINE__, __message__"\n", ##__VA_ARGS__);                 \
+#define ERRORF(__message__, ...) do {                                                   \
+    SET_ASSERT_ADDRESS();                                                               \
+    __n64Assertf(NULL, __FILE__, __LINE__, (__message__), ##__VA_ARGS__);               \
 } while (0)
 
 
 /**
  * Will always cause a crash if cond is not true (handle with care).
  */
-#define ASSERT(__condition__, __message__) do {                                             \
-    if (!(__condition__)) {                                                                 \
-        SET_ASSERT_ADDRESS();                                                               \
-        __n64Assert(#__condition__, __FILE__, __LINE__, __message__"\n");                   \
-    }                                                                                       \
+#define ASSERT(__condition__, __message__) do {                                         \
+    if (!(__condition__)) {                                                             \
+        SET_ASSERT_ADDRESS();                                                           \
+        __n64Assert(#__condition__, __FILE__, __LINE__, (__message__));                 \
+    }                                                                                   \
 } while (0)
-#define ASSERTF(__condition__, __message__, ...) do {                                       \
-    if (!(__condition__)) {                                                                 \
-        SET_ASSERT_ADDRESS();                                                               \
-        __n64Assertf(#__condition__, __FILE__, __LINE__, __message__"\n", ##__VA_ARGS__);   \
-    }                                                                                       \
+#define ASSERTF(__condition__, __message__, ...) do {                                   \
+    if (!(__condition__)) {                                                             \
+        SET_ASSERT_ADDRESS();                                                           \
+        __n64Assertf(#__condition__, __FILE__, __LINE__, (__message__), ##__VA_ARGS__); \
+    }                                                                                   \
 } while (0)
 
 /**
@@ -64,9 +73,9 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
  */
 #ifdef DEBUG_ASSERTIONS
     #define DEBUG_ERROR(__message__)                        ERROR(__message__)
-    #define DEBUG_ERRORF(__message__, ...)                  ERRORF(__message__, ##__VA_ARGS__)
-    #define DEBUG_ASSERT(__condition__, __message__)        ASSERT(__condition__, __message__)
-    #define DEBUG_ASSERTF(__condition__, __message__, ...)  ASSERTF(__condition__, __message__, ##__VA_ARGS__)
+    #define DEBUG_ERRORF(__message__, ...)                  ERRORF((__message__), ##__VA_ARGS__)
+    #define DEBUG_ASSERT(__condition__, __message__)        ASSERT(__condition__, (__message__))
+    #define DEBUG_ASSERTF(__condition__, __message__, ...)  ASSERTF(__condition__, (__message__), ##__VA_ARGS__)
 #else
     #define DEBUG_ERROR(__message__)
     #define DEBUG_ERRORF(__message__, ...)
