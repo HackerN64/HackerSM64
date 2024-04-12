@@ -53,6 +53,7 @@ build/*
 *.z64
 *.map
 .assets-local.txt
+*.mp4
 
 # Vanilla Assets.
 # You can allow an asset to be committed by deleting one of these lines.
