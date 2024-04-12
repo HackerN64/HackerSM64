@@ -18,6 +18,8 @@
 #include "make_const_nonconst.h"
 #include "levels/menu/header.h"
 
+EXTERN_MPEG(flstudio);
+
 const LevelScript level_main_menu_entry_file_select[] = {
     INIT_LEVEL(),
     LOAD_GODDARD(),
@@ -54,6 +56,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     SET_REG(/*value*/ START_LEVEL),
+    PLAY_MPEG(0, 0, 320, 240, flstudio),
     EXIT_AND_EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
 };
 

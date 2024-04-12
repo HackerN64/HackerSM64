@@ -253,19 +253,21 @@ ifeq ($(HVQM),1)
   SRC_DIRS += src/hvqm
 endif
 
+BUILD_DIR_BASE := build
+# BUILD_DIR is the location where all build artifacts are placed
+BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
+
 # UMPEG - whether to use ultra_mpeg fmv library
 #   1 - includes code in ROM
 #   0 - does not
 UMPEG ?= 1
 $(eval $(call validate-option,UMPEG,0 1))
 ifeq ($(UMPEG),1)
-  DEFINES += _UMPG_PL_MPEG=1 UMPEG=1
-  SRC_DIRS += src/ultra_mpeg
+	DEFINES += _UMPG_PL_MPEG=1 UMPEG=1
+	SRC_DIRS += src/ultra_mpeg
+	MPEG_FILES += $(wildcard data/*.mp4)
+	MPEG_OBJS := $(foreach file, $(MPEG_FILES), $(BUILD_DIR)/$(file:.mp4=.o))
 endif
-
-BUILD_DIR_BASE := build
-# BUILD_DIR is the location where all build artifacts are placed
-BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
 COMPRESS ?= rnc1
 $(eval $(call validate-option,COMPRESS,mio0 yay0 gzip rnc1 rnc2 uncomp))
@@ -789,6 +791,12 @@ $(SOUND_BIN_DIR)/%.m64: $(SOUND_BIN_DIR)/%.o
 	$(V)$(OBJCOPY) -j .rodata $< -O binary $@
 
 
+# Video file rules
+$(BUILD_DIR)/data/%.o: data/%.mp4
+	ffmpeg -y -i $< $(FFMPEGFLAG) -c:v mpeg1video -c:a mp2 -format mpeg $(@:.o=.mpg)
+	echo ".data; .incbin \"$(@:.o=.mpg)\"" > $(@:.o=.s)
+	$(CC) $(CFLAGS) -c -o $@ $(@:.o=.s)
+
 #==============================================================================#
 # Generated Source Code Files                                                  #
 #==============================================================================#
@@ -897,7 +905,7 @@ $(BUILD_DIR)/asm/debug/map.o: asm/debug/map.s $(BUILD_DIR)/sm64_prelim.elf
 	$(V)$(CROSS)gcc -c $(ASMFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Link SM64 ELF file
-$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
+$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(MPEG_OBJS) $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 

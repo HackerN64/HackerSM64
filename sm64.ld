@@ -90,6 +90,11 @@ OUTPUT_ARCH (mips)
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
+#define MPEG(name) \
+   BEGIN_SEG(name, 0) {\
+      KEEP(BUILD_DIR/data/name.o(.data)); \
+   } END_SEG(name)
+
 SECTIONS
 {
    __romPos = 0;
@@ -525,6 +530,8 @@ SECTIONS
    }
 	END_SEG(capcom)
 #endif
+
+   MPEG(flstudio)
 
 #ifdef DEBUG_MAP_STACKTRACE
    BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {

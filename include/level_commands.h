@@ -388,12 +388,16 @@ enum GoddardScene {
     CMD_HH(yaw, posX), \
     CMD_HH(posY, posZ)
 
-#define PLAY_MPEG(ulx, uly, wd, ht, vstart, vend) \
+#define EXTERN_MPEG(name) \
+    extern u8 _ ## name ## SegmentRomStart[]; \
+    extern u8 _ ## name ## SegmentRomEnd[];
+
+#define PLAY_MPEG(ulx, uly, wd, ht, name) \
     CMD_BBH(LEVEL_CMD_PLAY_MPEG, 20, 0), \
     CMD_HH(ulx, uly), \
     CMD_HH(wd, ht), \
-    CMD_PTR(vstart), \
-    CMD_PTR(vend)
+    CMD_PTR(_ ## name ## SegmentRomStart), \
+    CMD_PTR(_ ## name ## SegmentRomEnd)
 
 // unused
 #define UNLOAD_MARIO_AREA() \
