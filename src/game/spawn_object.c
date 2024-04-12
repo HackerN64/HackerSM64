@@ -94,6 +94,7 @@ void clear_object_lists(struct ObjectNode *objLists) {
 void unload_object(struct Object *obj) {
     obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     obj->prevObj = NULL;
+    obj->oFloor = NULL;
 
     obj->header.gfx.throwMatrix = NULL;
     stop_sounds_from_source(obj->header.gfx.cameraToObject);
@@ -180,8 +181,8 @@ struct Object *allocate_object(struct ObjectNode *objList) {
 
     mtxf_identity(obj->transform);
 
-    obj->respawnInfoType = RESPAWN_INFO_TYPE_NULL;
-    obj->respawnInfo = NULL;
+    obj->respawnInfo = RESPAWN_INFO_NONE;
+    obj->respawnInfoPointer = NULL;
 
     obj->oDistanceToMario = 19000.0f;
     obj->oRoom = -1;

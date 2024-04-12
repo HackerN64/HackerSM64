@@ -17,6 +17,7 @@
 #include "behavior_data.h"
 #include "string.h"
 #include "color_presets.h"
+#include "emutest.h"
 
 #include "config.h"
 #include "config/config_world.h"
@@ -46,7 +47,7 @@
  *
  */
 
-s16 gMatStackIndex;
+s16 gMatStackIndex = 0;
 ALIGNED16 Mat4 gMatStack[32];
 ALIGNED16 Mtx *gMatStackFixed[32];
 f32 sAspectRatio;
@@ -78,82 +79,78 @@ s16 *gCurrAnimData;
 
 struct AllocOnlyPool *gDisplayListHeap;
 
-struct RenderModeContainer {
-    u32 modes[LAYER_COUNT];
-};
-
 /* Rendermode settings for cycle 1 for all 8 or 13 layers. */
-struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
-        G_RM_OPA_SURF,                      // LAYER_FORCE
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
-        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
-        G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
+struct RenderModeContainer renderModeTable_1Cycle[2] = { 
+    [RENDER_NO_ZB] = { {
+        [LAYER_FORCE] = G_RM_OPA_SURF,
+        [LAYER_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_OPA_SURF,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_OPA_SURF,
+        [LAYER_ALPHA] = G_RM_AA_TEX_EDGE,
 #if SILHOUETTE
-        G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
-        G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_TEX_EDGE | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE,
 #endif
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
-        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_XLU_SURF,
+        [LAYER_TRANSPARENT] = G_RM_AA_XLU_SURF,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_XLU_SURF,
     } },
-    { {
-        /* z-buffered */
-        G_RM_ZB_OPA_SURF,                   // LAYER_FORCE
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_OPAQUE
-        G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
-        G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
+    [RENDER_ZB] = { {
+        [LAYER_FORCE] = G_RM_ZB_OPA_SURF,
+        [LAYER_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_ZB_OPA_INTER,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_ZB_OPA_DECAL,
+        [LAYER_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
 #if SILHOUETTE
-        G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE,
 #endif
-        G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
-        G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_ZB_XLU_DECAL,
+        [LAYER_TRANSPARENT] = G_RM_AA_ZB_XLU_SURF,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_ZB_XLU_INTER,
     } } };
 
 /* Rendermode settings for cycle 2 for all 13 layers. */
-struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
-        G_RM_OPA_SURF2,                     // LAYER_FORCE
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_INTER
-        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_DECAL
-        G_RM_AA_TEX_EDGE2,                  // LAYER_ALPHA
+struct RenderModeContainer renderModeTable_2Cycle[2] = {
+    [RENDER_NO_ZB] = { {
+        [LAYER_FORCE] = G_RM_OPA_SURF2,
+        [LAYER_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_OPA_SURF2,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_OPA_SURF2,
+        [LAYER_ALPHA] = G_RM_AA_TEX_EDGE2,
 #if SILHOUETTE
-        G_RM_AA_TEX_EDGE2 | ZMODE_DEC,      // LAYER_ALPHA_DECAL
-        G_RM_AA_OPA_SURF2,                  // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE2,                  // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_OPA_SURF2,                  // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_TEX_EDGE2,                  // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_TEX_EDGE2 | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE2,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_OPA_SURF2,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_TEX_EDGE2,
 #endif
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT
-        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_XLU_SURF2,
+        [LAYER_TRANSPARENT] = G_RM_AA_XLU_SURF2,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_XLU_SURF2,
     } },
-    { {
-        /* z-buffered */
-        G_RM_ZB_OPA_SURF2,                  // LAYER_FORCE
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OPAQUE
-        G_RM_AA_ZB_OPA_INTER2,              // LAYER_OPAQUE_INTER
-        G_RM_AA_ZB_OPA_DECAL2,              // LAYER_OPAQUE_DECAL
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_ALPHA
+    [RENDER_ZB] = { {
+        [LAYER_FORCE] = G_RM_ZB_OPA_SURF2,
+        [LAYER_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_OPAQUE_INTER] = G_RM_AA_ZB_OPA_INTER2,
+        [LAYER_OPAQUE_DECAL] = G_RM_AA_ZB_OPA_DECAL2,
+        [LAYER_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
 #if SILHOUETTE
-        G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,   // LAYER_ALPHA_DECAL
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_SILHOUETTE_ALPHA
-        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        [LAYER_ALPHA_DECAL] = G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,
+        [LAYER_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
+        [LAYER_OCCLUDE_SILHOUETTE_OPAQUE] = G_RM_AA_ZB_OPA_SURF2,
+        [LAYER_OCCLUDE_SILHOUETTE_ALPHA] = G_RM_AA_ZB_TEX_EDGE2,
 #endif
-        G_RM_AA_ZB_XLU_DECAL2,              // LAYER_TRANSPARENT_DECAL
-        G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
-        G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
+        [LAYER_TRANSPARENT_DECAL] = G_RM_AA_ZB_XLU_DECAL2,
+        [LAYER_TRANSPARENT] = G_RM_AA_ZB_XLU_SURF2,
+        [LAYER_TRANSPARENT_INTER] = G_RM_AA_ZB_XLU_INTER2,
     } } };
 
 ALIGNED16 struct GraphNodeRoot *gCurGraphNodeRoot = NULL;
@@ -163,10 +160,7 @@ ALIGNED16 struct GraphNodeCamera *gCurGraphNodeCamera = NULL;
 ALIGNED16 struct GraphNodeObject *gCurGraphNodeObject = NULL;
 ALIGNED16 struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
-
-#ifdef F3DEX_GBI_2
-LookAt lookAt;
-#endif
+LookAt* gCurLookAt;
 
 #if SILHOUETTE
 // AA_EN        Enable anti aliasing (not actually used for AA in this case).
@@ -206,36 +200,103 @@ struct RenderPhase {
 #endif
 };
 
-//                                               startLayer                      endLayer                        ucode
 static struct RenderPhase sRenderPhases[] = {
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     },
+    [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_ZB]                  = {
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_SILHOUETTE]          = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_NON_SILHOUETTE]      = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE]  = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_NON_ZB]              = {
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
  #else
     // No silhouette, .rej
-    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_ZB_LAST,                  GRAPH_NODE_UCODE_REJ     },
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT },
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     },
+    [RENDER_PHASE_ZEX_BG]                  = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_FIRST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_ZB]                  = {
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_ZB_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
+    [RENDER_PHASE_ZEX_ALL]                 = {
+        .startLayer = LAYER_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_DEFAULT
+    },
+    [RENDER_PHASE_REJ_NON_ZB]              = {
+        .startLayer = LAYER_NON_ZB_FIRST,
+        .endLayer   = LAYER_LAST,
+        .ucode      = GRAPH_NODE_UCODE_REJ
+    },
  #endif
 #else
  #if SILHOUETTE
     // Silhouette, no .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE    },
-    /* RENDER_PHASE_ZEX_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
-    /* RENDER_PHASE_ZEX_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
-    /* RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST   },
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST                      },
+    [RENDER_PHASE_ZEX_BEFORE_SILHOUETTE]   = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST_BEFORE_SILHOUETTE,
+    },
+
+    [RENDER_PHASE_ZEX_SILHOUETTE]          = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+    },
+
+    [RENDER_PHASE_ZEX_NON_SILHOUETTE]      = {
+        .startLayer = LAYER_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_SILHOUETTE_LAST,
+    },
+
+    [RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE]  = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_OCCLUDE_SILHOUETTE_LAST,
+    },
+
+    [RENDER_PHASE_ZEX_AFTER_SILHOUETTE]    = {
+        .startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST,
+        .endLayer   = LAYER_LAST,
+    },
+
  #else
     // No silhouette, no .rej
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_FIRST,                    LAYER_LAST                      },
+    [RENDER_PHASE_ZEX_ALL]                 = {
+        .startLayer = LAYER_FIRST,
+        .endLayer   = LAYER_LAST,
+    },
+
  #endif
 #endif
 };
@@ -248,13 +309,13 @@ void switch_ucode(s32 ucode) {
     switch (ucode) {
         default: // GRAPH_NODE_UCODE_DEFAULT
         case GRAPH_NODE_UCODE_DEFAULT:
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo); // F3DZEX2_PosLight
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_NoN_PosLight_fifo); // F3DZEX2_PosLight
             // Reload the necessary RSP settings
             gSPDisplayList(gDisplayListHead++, init_rsp);
             break;
         case GRAPH_NODE_UCODE_REJ:
             // Use .rej Microcode, skip sub-pixel processing on console
-            if (gIsConsole) {
+            if (gEmulator & EMU_CONSOLE) {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
             } else {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
@@ -267,6 +328,21 @@ void switch_ucode(s32 ucode) {
     }
 }
 #endif
+
+#define UPPER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) >> 16))
+#define LOWER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) & 0xFFFF))
+
+// Fixed-point identity matrix with the inverse of world scale
+Mtx identityMatrixWorldScale = {{
+    {UPPER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
+     UPPER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
+    {0x00000000,                            UPPER_FIXED(1.0f / WORLD_SCALE) << 16,
+     0x00000000,                            UPPER_FIXED(1.0f)               <<  0},
+    {LOWER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
+     LOWER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
+    {0x00000000,                            LOWER_FIXED(1.0f / WORLD_SCALE) << 16,
+     0x00000000,                            LOWER_FIXED(1.0f)               <<  0}
+}};
 
 /**
  * Process a master list node. This has been modified, so now it runs twice, for each microcode.
@@ -287,18 +363,6 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
 
-#ifdef F3DEX_GBI_2
-    // @bug This is where the LookAt values should be calculated but aren't.
-    // As a result, environment mapping is broken on Fast3DEX2 without the
-    // changes below.
-    Mtx lMtx;
- #ifdef FIX_REFLECT_MTX
-    guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 0.0f, -1.0f, 0.0f /* up */);
- #else
-    guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 1.0f, 0.0f, 0.0f /* up */);
- #endif
-#endif // F3DEX_GBI_2
-
     // Loop through the render phases
     for (phaseIndex = RENDER_PHASE_FIRST; phaseIndex < RENDER_PHASE_END; phaseIndex++) {
         // Get the render phase information.
@@ -309,7 +373,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         ucode       = renderPhase->ucode;
         // Set the ucode for the current render phase
         switch_ucode(ucode);
-        gSPLookAt(gDisplayListHead++, &lookAt);
+        gSPLookAt(gDisplayListHead++, gCurLookAt);
 #endif
         if (enableZBuffer) {
             // Enable z buffer.
@@ -367,13 +431,15 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
 #ifdef OBJECTS_REJ
- #if defined(F3DZEX_GBI_2) && defined(VISUAL_DEBUG)
+ #if defined(F3DEX_GBI_2) && defined(VISUAL_DEBUG)
     if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
  #endif
     switch_ucode(GRAPH_NODE_UCODE_DEFAULT);
 #endif
 #ifdef VISUAL_DEBUG
     if ( hitboxView) render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
+    // Load the world scale identity matrix
+    gSPMatrix(gDisplayListHead++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     if (surfaceView) visual_surface_loop();
 #endif
 }
@@ -386,7 +452,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 void geo_append_display_list(void *displayList, s32 layer) {
     s32 ucode = GRAPH_NODE_UCODE_DEFAULT;
 #ifdef F3DEX_GBI_2
-    gSPLookAt(gDisplayListHead++, &lookAt);
+    gSPLookAt(gDisplayListHead++, gCurLookAt);
 #endif
 #if defined(OBJECTS_REJ) || SILHOUETTE
     if (gCurGraphNodeObject != NULL) {
@@ -408,7 +474,7 @@ void geo_append_display_list(void *displayList, s32 layer) {
         }
  #endif // SILHOUETTE
     }
-#endif // F3DZEX_GBI_2 || SILHOUETTE
+#endif // F3DEX_GBI_2 || SILHOUETTE
     if (gCurGraphNodeMasterList != NULL) {
         struct DisplayListNode *listNode =
             alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
@@ -501,7 +567,20 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / (f32)WORLD_SCALE, node->far / (f32)WORLD_SCALE, 1.0f);
+        f32 vHalfFov = ( ((node->fov * 4096.f) + 8192.f) ) / 45.f;
+
+        // We need to account for aspect ratio changes by multiplying by the widescreen horizontal stretch 
+        // (normally 1.775).
+        node->halfFovHorizontal = tans(vHalfFov * sAspectRatio);
+
+#ifdef VERTICAL_CULLING
+        node->halfFovVertical = tans(vHalfFov);
+#endif
+
+        // With low fovs, coordinate overflow can occur more easily. This slightly reduces precision only while zoomed in.
+        f32 scale = node->fov < 28.0f ? remap(MAX(node->fov, 15), 15, 28, 0.5f, 1.0f): 1.0f;
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / WORLD_SCALE, node->far / WORLD_SCALE, scale);
+
         gSPPerspNormalize(gDisplayListHead++, perspNorm);
 
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
@@ -512,6 +591,13 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
     }
 }
 
+static f32 get_dist_from_camera(Vec3f pos) {
+    return -((gCameraTransform[0][2] * pos[0])
+           + (gCameraTransform[1][2] * pos[1])
+           + (gCameraTransform[2][2] * pos[2])
+           +  gCameraTransform[3][2]);
+}
+
 /**
  * Process a level of detail node. From the current transformation matrix,
  * the perpendicular distance to the camera is extracted and the children
@@ -520,9 +606,9 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
  */
 void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #ifdef AUTO_LOD
-    f32 distanceFromCam = gIsConsole ? -gMatStack[gMatStackIndex][3][2] : 50.0f;
+    f32 distanceFromCam = (gEmulator & EMU_CONSOLE) ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : 50.0f;
 #else
-    f32 distanceFromCam = -gMatStack[gMatStackIndex][3][2];
+    f32 distanceFromCam = get_dist_from_camera(gMatStack[gMatStackIndex][3]);
 #endif
 
     if ((f32)node->minDistance <= distanceFromCam
@@ -552,12 +638,39 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
     }
 }
 
+Mat4 gCameraTransform;
+
+Lights1 defaultLight = gdSPDefLights1(
+    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
+);
+
+Vec3f globalLightDirection = { 0x28, 0x28, 0x28 };
+
+void setup_global_light() {
+    Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
+    bcopy(&defaultLight, curLight, sizeof(Lights1));
+
+#ifdef WORLDSPACE_LIGHTING
+    curLight->l->l.dir[0] = (s8)(globalLightDirection[0]);
+    curLight->l->l.dir[1] = (s8)(globalLightDirection[1]);
+    curLight->l->l.dir[2] = (s8)(globalLightDirection[2]);
+#else
+    Vec3f transformedLightDirection;
+    linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
+    curLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
+    curLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
+    curLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
+#endif
+
+    gSPSetLights1(gDisplayListHead++, (*curLight));
+}
+
 /**
  * Process a camera node.
  */
 void geo_process_camera(struct GraphNodeCamera *node) {
-    Mat4 cameraTransform;
     Mtx *rollMtx = alloc_display_list(sizeof(*rollMtx));
+    Mtx *viewMtx = alloc_display_list(sizeof(Mtx));
 
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
@@ -566,17 +679,49 @@ void geo_process_camera(struct GraphNodeCamera *node) {
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 
-    mtxf_lookat(cameraTransform, node->pos, node->focus, node->roll);
-    mtxf_mul(gMatStack[gMatStackIndex + 1], cameraTransform, gMatStack[gMatStackIndex]);
-    inc_mat_stack();
+    mtxf_lookat(gCameraTransform, node->pos, node->focus, node->roll);
+
+    // Calculate the lookAt
+#ifdef F3DEX_GBI_2
+    // @bug This is where the LookAt values should be calculated but aren't.
+    // As a result, environment mapping is broken on Fast3DEX2 without the
+    // changes below.
+    Mat4* cameraMatrix = &gCameraTransform;
+    /**
+    * HackerSM64 2.1: Now uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
+    * It was originally sideways in vanilla, with vanilla's environment map textures sideways to accommodate, but those
+    * textures are now rotated automatically on extraction to allow for this to be fixed.
+    */
+    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
+    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
+    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
+    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * -(*cameraMatrix)[0][1]);
+    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * -(*cameraMatrix)[1][1]);
+    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * -(*cameraMatrix)[2][1]);
+#endif // F3DEX_GBI_2
+
+#if WORLD_SCALE > 1
+    // Make a copy of the view matrix and scale its translation based on WORLD_SCALE
+    Mat4 scaledCamera;
+    mtxf_copy(scaledCamera, gCameraTransform);
+    for (int i = 0; i < 3; i++) {
+        scaledCamera[3][i] /= WORLD_SCALE;
+    }
+
+    // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
+    guMtxF2L(scaledCamera, viewMtx);
+#else
+    guMtxF2L(gCameraTransform, viewMtx);
+#endif
+    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    setup_global_light();
 
     if (node->fnNode.node.children != 0) {
         gCurGraphNodeCamera = node;
-        node->matrixPtr = &gMatStack[gMatStackIndex];
+        node->matrixPtr = &gCameraTransform;
         geo_process_node_and_siblings(node->fnNode.node.children);
         gCurGraphNodeCamera = NULL;
     }
-    gMatStackIndex--;
 }
 
 /**
@@ -781,58 +926,6 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
 }
 
 /**
- * Render an animated part that has an initial rotation value
- */
-void geo_process_bone(struct GraphNodeBone *node) {
-    Vec3s rotation    = { node->rotation[0],    node->rotation[1],    node->rotation[2]    };
-    Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
-
-    if (gCurrAnimType == ANIM_TYPE_TRANSLATION) {
-        translation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
-                          * gCurrAnimTranslationMultiplier;
-        translation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
-                          * gCurrAnimTranslationMultiplier;
-        translation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
-                          * gCurrAnimTranslationMultiplier;
-        gCurrAnimType = ANIM_TYPE_ROTATION;
-    } else {
-        if (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
-            translation[0] +=
-                gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
-                * gCurrAnimTranslationMultiplier;
-            gCurrAnimAttribute += 2;
-            translation[2] +=
-                gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
-                * gCurrAnimTranslationMultiplier;
-            gCurrAnimType = ANIM_TYPE_ROTATION;
-        } else {
-            if (gCurrAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
-                gCurrAnimAttribute += 2;
-                translation[1] +=
-                    gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
-                    * gCurrAnimTranslationMultiplier;
-                gCurrAnimAttribute += 2;
-                gCurrAnimType = ANIM_TYPE_ROTATION;
-            } else if (gCurrAnimType == ANIM_TYPE_NO_TRANSLATION) {
-                gCurrAnimAttribute += 6;
-                gCurrAnimType = ANIM_TYPE_ROTATION;
-            }
-        }
-    }
-
-    if (gCurrAnimType == ANIM_TYPE_ROTATION) {
-        rotation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-        rotation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-        rotation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-    }
-
-    mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
-
-    inc_mat_stack();
-    append_dl_and_return((struct GraphNodeDisplayList *)node);
-}
-
-/**
  * Initialize the animation-related global variables for the currently drawn
  * object's animation.
  */
@@ -877,8 +970,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
         f32 shadowScale;
 
         if (gCurGraphNodeHeldObject != NULL) {
-            get_pos_from_transform_mtx(shadowPos, gMatStack[gMatStackIndex],
-                                       *gCurGraphNodeCamera->matrixPtr);
+            vec3f_copy(shadowPos, gMatStack[gMatStackIndex][3]);
             shadowScale = node->shadowScale * gCurGraphNodeHeldObject->objNode->header.gfx.scale[0];
         } else {
             vec3f_copy(shadowPos, gCurGraphNodeObject->pos);
@@ -917,7 +1009,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                                                   node->shadowSolidity, node->shadowType, shifted);
 
         if (shadowList != NULL) {
-            mtxf_shadow(gMatStack[gMatStackIndex + 1], *gCurGraphNodeCamera->matrixPtr,
+            mtxf_shadow(gMatStack[gMatStackIndex + 1],
                 gCurrShadow.floorNormal, shadowPos, gCurrShadow.scale, gCurGraphNodeObject->angle[1]);
 
             inc_mat_stack();
@@ -936,23 +1028,24 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
 }
 
 /**
- * Check whether an object is in view to determine whether it should be drawn.
+ * Check whether an object is in view to determine whether if it should be drawn.
  * This is known as frustum culling.
- * It checks whether the object is far away, very close / behind the camera,
- * or horizontally out of view. It does not check whether it is vertically
- * out of view. It assumes a sphere of 300 units around the object's position
- * unless the object has a culling radius node that specifies otherwise.
- *
+ * It checks whether the object is far away, very close or behind the camera and 
+ * vertically or horizontally out of view. 
+ * The radius used is specified in DEFAULT_CULLING_RADIUS unless the object 
+ * has a culling radius node that specifies another value.
+ * 
  * The matrix parameter should be the top of the matrix stack, which is the
  * object's transformation matrix times the camera 'look-at' matrix. The math
  * is counter-intuitive, but it checks column 3 (translation vector) of this
  * matrix to determine where the origin (0,0,0) in object space will be once
  * transformed to camera space (x+ = right, y+ = up, z = 'coming out the screen').
+ * 
  * In 3D graphics, you typically model the world as being moved in front of a
  * static camera instead of a moving camera through a static world, which in
  * this case simplifies calculations. Note that the perspective matrix is not
  * on the matrix stack, so there are still calculations with the fov to compute
- * the slope of the lines of the frustum.
+ * the slope of the lines of the frustum, these are done once during geo_process_perspective.
  *
  *        z-
  *
@@ -966,11 +1059,10 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  *
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
-s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
-    if (node->node.flags & GRAPH_RENDER_INVISIBLE) {
-        return FALSE;
-    }
 
+#define NO_CULLING_EMULATOR_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+
+s32 obj_is_in_view(struct GraphNodeObject *node) {
     struct GraphNode *geo = node->sharedChild;
 
     s16 cullingRadius;
@@ -978,43 +1070,45 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     if (geo != NULL && geo->type == GRAPH_NODE_TYPE_CULLING_RADIUS) {
         cullingRadius = ((struct GraphNodeCullingRadius *) geo)->cullingRadius;
     } else {
-        cullingRadius = 300;
+        cullingRadius = DEFAULT_CULLING_RADIUS;
     }
 
-    // Don't render if the object is close to or behind the camera
-    if (matrix[3][2] > -100.0f + cullingRadius) {
+    // Check whether the object is not too far away or too close / behind the camera.
+    // This makes the HOLP not update when the camera is far away, and it
+    // makes PU travel safe when the camera is locked on the main map.
+    // If Mario were rendered with a depth over 65536 it would cause overflow
+    // when converting the transformation matrix to a fixed point matrix.
+    f32 cameraToObjectDepth = node->cameraToObject[2];
+
+    #define VALID_DEPTH_MIDDLE (-20100.f / 2.f)
+    #define VALID_DEPTH_RANGE (19900 / 2.f)
+    if (absf(cameraToObjectDepth - VALID_DEPTH_MIDDLE) >= VALID_DEPTH_RANGE + cullingRadius) {
         return FALSE;
     }
 
-    //! This makes the HOLP not update when the camera is far away, and it
-    //  makes PU travel safe when the camera is locked on the main map.
-    //  If Mario were rendered with a depth over 65536 it would cause overflow
-    //  when converting the transformation matrix to a fixed point matrix.
-    if (matrix[3][2] < -20000.0f - cullingRadius) {
+#ifndef CULLING_ON_EMULATOR
+    // If an emulator is detected, skip any other culling.
+    if(!(gEmulator & NO_CULLING_EMULATOR_BLACKLIST)){
+        return TRUE;
+    }
+#endif
+
+#ifdef VERTICAL_CULLING
+    f32 vScreenEdge = -cameraToObjectDepth * gCurGraphNodeCamFrustum->halfFovVertical;
+
+    // Unlike with horizontal culling, we only check if the object is bellow the screen
+    // to prevent shadows from being culled.
+    if (node->cameraToObject[1] < -vScreenEdge - cullingRadius) {
         return FALSE;
     }
 
-    // half of the fov in in-game angle units instead of degrees
-    s16 halfFov = (((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f;
+#endif
+    
+    f32 hScreenEdge = -cameraToObjectDepth * gCurGraphNodeCamFrustum->halfFovHorizontal;
 
-    f32 hScreenEdge = -matrix[3][2] * tans(halfFov);
-    // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
-    // the amount of units between the center of the screen and the horizontal edge
-    // given the distance from the object to the camera.
-
-    // This multiplication should really be performed on 4:3 as well,
-    // but the issue will be more apparent on widescreen.
-    // HackerSM64: This multiplication is done regardless of aspect ratio to fix object pop-in on the edges of the screen (which happens at 4:3 too)
-    // hScreenEdge *= GFX_DIMENSIONS_ASPECT_RATIO;
-
-    // Check whether the object is horizontally in view
-    if (matrix[3][0] > hScreenEdge + cullingRadius) {
+    if (absf(node->cameraToObject[0]) > hScreenEdge + cullingRadius) {
         return FALSE;
     }
-    if (matrix[3][0] < -hScreenEdge - cullingRadius) {
-        return FALSE;
-    }
-
     return TRUE;
 }
 
@@ -1053,26 +1147,36 @@ void visualise_object_hitbox(struct Object *node) {
  */
 void geo_process_object(struct Object *node) {
     if (node->header.gfx.areaIndex == gCurGraphNodeRoot->areaIndex) {
-        if (node->header.gfx.throwMatrix != NULL) {
-            mtxf_mul(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix,
-                     gMatStack[gMatStackIndex]);
-            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
-        } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
-            mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
-                           node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
-        } else {
-            mtxf_rotate_zxy_and_translate_and_mul(node->header.gfx.angle, node->header.gfx.pos, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
-            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
+        s32 isInvisible = (node->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE);
+        s32 noThrowMatrix = (node->header.gfx.throwMatrix == NULL);
+
+        // If the throw matrix is null and the object is invisible, there is no need
+        // to update billboarding, scale, rotation, etc. 
+        // This still updates translation since it is needed for sound.
+        if (isInvisible && noThrowMatrix) {
+            mtxf_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos);
+        }
+        else{
+            if (!noThrowMatrix) {
+                mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix, node->header.gfx.scale);
+            } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
+                mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
+                            node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
+            } else {
+                mtxf_rotate_zxy_and_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos, node->header.gfx.angle);
+                mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
+            }
         }
 
         node->header.gfx.throwMatrix = &gMatStack[++gMatStackIndex];
-        vec3_copy(node->header.gfx.cameraToObject, gMatStack[gMatStackIndex][3]);
+        linear_mtxf_mul_vec3f_and_translate(gCameraTransform, node->header.gfx.cameraToObject, (*node->header.gfx.throwMatrix)[3]);
 
         // FIXME: correct types
         if (node->header.gfx.animInfo.curAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
         }
-        if (obj_is_in_view(&node->header.gfx, gMatStack[gMatStackIndex])) {
+
+        if (!isInvisible && obj_is_in_view(&node->header.gfx)) {
             gMatStackIndex--;
             inc_mat_stack();
 
@@ -1122,7 +1226,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
     Mat4 tempMtx;
 
 #ifdef F3DEX_GBI_2
-    gSPLookAt(gDisplayListHead++, &lookAt);
+    gSPLookAt(gDisplayListHead++, gCurLookAt);
 #endif
 
     if (node->fnNode.func != NULL) {
@@ -1180,6 +1284,34 @@ void geo_try_process_children(struct GraphNode *node) {
     }
 }
 
+typedef void (*GeoProcessFunc)();
+
+// See enum 'GraphNodeTypes' in 'graph_node.h'.
+static GeoProcessFunc GeoProcessJumpTable[] = {
+    [GRAPH_NODE_TYPE_ORTHO_PROJECTION    ] = geo_process_ortho_projection,
+    [GRAPH_NODE_TYPE_PERSPECTIVE         ] = geo_process_perspective,
+    [GRAPH_NODE_TYPE_MASTER_LIST         ] = geo_process_master_list,
+    [GRAPH_NODE_TYPE_LEVEL_OF_DETAIL     ] = geo_process_level_of_detail,
+    [GRAPH_NODE_TYPE_SWITCH_CASE         ] = geo_process_switch,
+    [GRAPH_NODE_TYPE_CAMERA              ] = geo_process_camera,
+    [GRAPH_NODE_TYPE_TRANSLATION_ROTATION] = geo_process_translation_rotation,
+    [GRAPH_NODE_TYPE_TRANSLATION         ] = geo_process_translation,
+    [GRAPH_NODE_TYPE_ROTATION            ] = geo_process_rotation,
+    [GRAPH_NODE_TYPE_OBJECT              ] = geo_process_object,
+    [GRAPH_NODE_TYPE_ANIMATED_PART       ] = geo_process_animated_part,
+    [GRAPH_NODE_TYPE_BILLBOARD           ] = geo_process_billboard,
+    [GRAPH_NODE_TYPE_DISPLAY_LIST        ] = geo_process_display_list,
+    [GRAPH_NODE_TYPE_SCALE               ] = geo_process_scale,
+    [GRAPH_NODE_TYPE_SHADOW              ] = geo_process_shadow,
+    [GRAPH_NODE_TYPE_OBJECT_PARENT       ] = geo_process_object_parent,
+    [GRAPH_NODE_TYPE_GENERATED_LIST      ] = geo_process_generated_list,
+    [GRAPH_NODE_TYPE_BACKGROUND          ] = geo_process_background,
+    [GRAPH_NODE_TYPE_HELD_OBJ            ] = geo_process_held_object,
+    [GRAPH_NODE_TYPE_CULLING_RADIUS      ] = geo_try_process_children,
+    [GRAPH_NODE_TYPE_ROOT                ] = geo_try_process_children,
+    [GRAPH_NODE_TYPE_START               ] = geo_try_process_children,
+};
+
 /**
  * Process a generic geo node and its siblings.
  * The first argument is the start node, and all its siblings will
@@ -1201,29 +1333,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
             if (curGraphNode->flags & GRAPH_RENDER_CHILDREN_FIRST) {
                 geo_try_process_children(curGraphNode);
             } else {
-                switch (curGraphNode->type) {
-                    case GRAPH_NODE_TYPE_ORTHO_PROJECTION:     geo_process_ortho_projection    ((struct GraphNodeOrthoProjection     *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_PERSPECTIVE:          geo_process_perspective         ((struct GraphNodePerspective         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_MASTER_LIST:          geo_process_master_list         ((struct GraphNodeMasterList          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:      geo_process_level_of_detail     ((struct GraphNodeLevelOfDetail       *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_SWITCH_CASE:          geo_process_switch              ((struct GraphNodeSwitchCase          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_CAMERA:               geo_process_camera              ((struct GraphNodeCamera              *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_TRANSLATION_ROTATION: geo_process_translation_rotation((struct GraphNodeTranslationRotation *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_TRANSLATION:          geo_process_translation         ((struct GraphNodeTranslation         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_ROTATION:             geo_process_rotation            ((struct GraphNodeRotation            *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_OBJECT:               geo_process_object              ((struct Object                       *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_ANIMATED_PART:        geo_process_animated_part       ((struct GraphNodeAnimatedPart        *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_BILLBOARD:            geo_process_billboard           ((struct GraphNodeBillboard           *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_DISPLAY_LIST:         geo_process_display_list        ((struct GraphNodeDisplayList         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_SCALE:                geo_process_scale               ((struct GraphNodeScale               *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_SHADOW:               geo_process_shadow              ((struct GraphNodeShadow              *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_OBJECT_PARENT:        geo_process_object_parent       ((struct GraphNodeObjectParent        *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_GENERATED_LIST:       geo_process_generated_list      ((struct GraphNodeGenerated           *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_BACKGROUND:           geo_process_background          ((struct GraphNodeBackground          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_HELD_OBJ:             geo_process_held_object         ((struct GraphNodeHeldObject          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;
-                    default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
-                }
+                GeoProcessJumpTable[curGraphNode->type](curGraphNode);
             }
         } else {
             if (curGraphNode->type == GRAPH_NODE_TYPE_OBJECT) {
@@ -1245,6 +1355,9 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
 
         gDisplayListHeap = alloc_only_pool_init(main_pool_available() - sizeof(struct AllocOnlyPool), MEMORY_POOL_LEFT);
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
+        gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
+        bzero(gCurLookAt, sizeof(LookAt));
+
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, node->x * 4, node->y * 4, 511);

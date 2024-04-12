@@ -336,7 +336,6 @@ index ad9fdb7d..26e1f000 100644
 @@ -29,6 +29,9 @@
  #include "puppycam2.h"
  #include "debug_box.h"
- #include "vc_check.h"
 +#ifdef REONUCAM
 +#include "camera.h"
 +#endif

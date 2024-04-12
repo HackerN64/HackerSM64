@@ -1,0 +1,728 @@
+{
+    "date": "1996-03-19",
+    "sample_bank": "instruments",
+    "envelopes": {
+        "envelope0": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope1": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope2": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope3": [
+            [6, 32700],
+            [298, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope4": [
+            [2, 32700],
+            [205, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope5": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope6": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope7": [
+            [6, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope8_unused": [
+            [3, 32700],
+            [298, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope9": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope10": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope11": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope12_unused": [
+            [11, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope13_unused": [
+            [2, 32700],
+            [205, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope14": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope15": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope16": [
+            [2, 32700],
+            [103, 24112],
+            [409, 0],
+            "hang"
+        ],
+        "envelope17": [
+            [2, 32700],
+            [130, 4954],
+            [523, 0],
+            "hang"
+        ],
+        "envelope18": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope19": [
+            [2, 32700],
+            [55, 32700],
+            [127, 0],
+            "hang"
+        ],
+        "envelope20": [
+            [2, 32700],
+            [136, 0],
+            [32700, 0],
+            "hang"
+        ],
+        "envelope21": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope22": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope23": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope24": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope25": [
+            [2, 32700],
+            [205, 19818],
+            [535, 0],
+            "hang"
+        ],
+        "envelope26": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope27": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope28": [
+            [6, 32700],
+            [298, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope29": [
+            [2, 32700],
+            [205, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope30": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope31": [
+            [2, 32700],
+            [55, 32700],
+            [127, 0],
+            "hang"
+        ],
+        "envelope32": [
+            [2, 32700],
+            [55, 32700],
+            [127, 0],
+            "hang"
+        ],
+        "envelope33": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope34": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope35": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope36": [
+            [2, 32700],
+            [202, 0],
+            [1, 0],
+            "hang"
+        ],
+        "envelope37": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope38": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope39": [
+            [2, 32700],
+            [145, 7597],
+            [343, 0],
+            "hang"
+        ],
+        "envelope40": [
+            [2, 32700],
+            [1, 32700],
+            [32700, 29430],
+            "hang"
+        ],
+        "envelope41": [
+            [2, 32700],
+            [187, 0],
+            [32700, 0],
+            "hang"
+        ]
+    },
+    "instruments": {
+        "Accordion": {
+            "release_rate": 19,
+            "envelope": "envelope0",
+            "sound": "2E_accordion"
+        },
+        "Slap Bass": {
+            "release_rate": 208,
+            "envelope": "envelope1",
+            "sound": "1A_slap_bass"
+        },
+        "Ele Guitar": {
+            "release_rate": 208,
+            "envelope": "envelope2",
+            "sound": "1C"
+        },
+        "Ele Piano": {
+            "release_rate": 10,
+            "envelope": "envelope3",
+            "sound": "26_crystal_rhodes"
+        },
+        "Grand Piano": {
+            "release_rate": 34,
+            "envelope": "envelope4",
+            "sound": "44_grand_piano"
+        },
+        "French Horn": {
+            "release_rate": 53,
+            "normal_range_hi": 50,
+            "envelope": "envelope5",
+            "sound": "16_french_horns",
+            "sound_hi": "45_french_horns_lq"
+        },
+        "Pan Flute": {
+            "release_rate": 43,
+            "envelope": "envelope6",
+            "sound": "41_pan_flute"
+        },
+        "Strings": {
+            "release_rate": 15,
+            "normal_range_lo": 27,
+            "normal_range_hi": 46,
+            "envelope": "envelope7",
+            "sound_lo": "23_strings_1",
+            "sound": "24_strings_2",
+            "sound_hi": "25_strings_3"
+        },
+        "Acoustic Guitar": {
+            "release_rate": 19,
+            "normal_range_lo": 29,
+            "normal_range_hi": 63,
+            "envelope": "envelope9",
+            "sound_lo": "3B_banjo_2",
+            "sound": "3C_acoustic_guitar",
+            "sound_hi": "3D"
+        },
+        "Sleigh Bells": {
+            "release_rate": 208,
+            "envelope": "envelope10",
+            "sound": "2F_sleigh_bells"
+        },
+        "Hi-Hat": {
+            "release_rate": 208,
+            "normal_range_lo": 24,
+            "envelope": "envelope11",
+            "sound_lo": "0E_hihat_closed",
+            "sound": "0F_hihat_open"
+        },
+        "Crash Cymbal": {
+            "release_rate": 19,
+            "normal_range_lo": 28,
+            "normal_range_hi": 28,
+            "envelope": "envelope0",
+            "sound_lo": "10_cymbal_bell",
+            "sound": "11_splash_cymbal",
+            "sound_hi": "10_cymbal_bell"
+        },
+        "Triangle&Cabasa": {
+            "release_rate": 208,
+            "normal_range_lo": 60,
+            "normal_range_hi": 60,
+            "envelope": "envelope15",
+            "sound_lo": "1E_closed_triangle",
+            "sound": "1F_open_triangle",
+            "sound_hi": "20_cabasa"
+        },
+        "Celesta": {
+            "release_rate": 10,
+            "envelope": "envelope16",
+            "sound": "42_vibraphone"
+        },
+        "Banjo": {
+            "release_rate": 100,
+            "normal_range_lo": 41,
+            "envelope": "envelope17",
+            "sound_lo": {"sample": "00", "tuning": 1.781798},
+            "sound": "01_banjo_1"
+        },
+        "Fiddle": {
+            "release_rate": 180,
+            "envelope": "envelope2",
+            "sound": "02"
+        },
+        "Whistle": {
+            "release_rate": 76,
+            "envelope": "envelope18",
+            "sound": "03_human_whistle"
+        },
+        "Acoustic Bass": {
+            "release_rate": 208,
+            "envelope": "envelope6",
+            "sound": "05_acoustic_bass"
+        },
+        "Snare Clap": {
+            "release_rate": 10,
+            "normal_range_lo": 18,
+            "envelope": "envelope19",
+            "sound_lo": "12_snare_drum_1",
+            "sound": "13_snare_drum_2"
+        },
+        "Pizzicato Strings": {
+            "release_rate": 43,
+            "normal_range_hi": 47,
+            "envelope": "envelope20",
+            "sound": "46_pizzicato_strings_1",
+            "sound_hi": "47_pizzicato_strings_2"
+        },
+        "Trombone": {
+            "release_rate": 119,
+            "envelope": "envelope18",
+            "sound": "2D_trombone"
+        },
+        "Choir Ooh": {
+            "release_rate": 10,
+            "envelope": "envelope1",
+            "sound": "22_boys_choir"
+        },
+        "Sitar Drone": {
+            "release_rate": 90,
+            "envelope": "envelope2",
+            "sound": "28_sitar_1"
+        },
+        "Sitar": {
+            "release_rate": 10,
+            "envelope": "envelope21",
+            "sound": "39_sitar_2"
+        },
+        "Drum Snare Split": {
+            "release_rate": 10,
+            "normal_range_lo": 19,
+            "normal_range_hi": 19,
+            "envelope": "envelope0",
+            "sound_lo": "38_electric_kick_drum",
+            "sound": {"sample": "08", "tuning": 2.121321},
+            "sound_hi": "38_electric_kick_drum"
+        },
+        "Bass+Lead": {
+            "release_rate": 208,
+            "envelope": "envelope1",
+            "sound": "21_sine_bass"
+        },
+        "Percussive Organ": {
+            "release_rate": 208,
+            "envelope": "envelope22",
+            "sound": "35_gospel_organ"
+        },
+        "Steel Drum": {
+            "release_rate": 10,
+            "envelope": "envelope23",
+            "sound": "48_steel_drum"
+        },
+        "Brass": {
+            "release_rate": 208,
+            "envelope": "envelope24",
+            "sound": "19_brass"
+        },
+        "Synth Voice": {
+            "release_rate": 128,
+            "envelope": "envelope25",
+            "sound": "1B_organ_2"
+        },
+        "Ele Guitar (Clean)": {
+            "release_rate": 208,
+            "envelope": "envelope26",
+            "sound": "1C"
+        },
+        "Charang": {
+            "release_rate": 10,
+            "envelope": "envelope0",
+            "sound": "30_rarefaction-lahna"
+        },
+        "Overdriven Guitar": {
+            "release_rate": 208,
+            "envelope": "envelope1",
+            "sound": "31_rarefaction-convolution"
+        },
+        "Orchestra Hit": {
+            "release_rate": 208,
+            "envelope": "envelope21",
+            "sound": "29_orchestra_hit"
+        },
+        "Recorder": {
+            "release_rate": 114,
+            "envelope": "envelope18",
+            "sound": "34_alto_flute"
+        },
+        "Drum Sample 18": {
+            "release_rate": 10,
+            "normal_range_lo": 14,
+            "normal_range_hi": 15,
+            "envelope": "envelope27",
+            "sound_lo": {"sample": "32_metal_rimshot", "tuning": 2.244924},
+            "sound": "33_kick_drum_2",
+            "sound_hi": {"sample": "32_metal_rimshot", "tuning": 2.828428}
+        },
+        "Melodic Tom": {
+            "release_rate": 119,
+            "envelope": "envelope28",
+            "sound": "1D"
+        },
+        "Melodic Tom 2": {
+            "release_rate": 34,
+            "envelope": "envelope0",
+            "sound": "1D"
+        },
+        "Steel Guitar": {
+            "release_rate": 53,
+            "envelope": "envelope29",
+            "sound": "04_bright_piano"
+        },
+        "Pah": {
+            "release_rate": 208,
+            "envelope": "envelope0",
+            "sound": {"sample": "1D", "tuning": 0.793701}
+        },
+        "Accordion 2": {
+            "release_rate": 208,
+            "envelope": "envelope0",
+            "sound": "2E_accordion"
+        },
+        "Synth Bass": {
+            "release_rate": 208,
+            "envelope": "envelope1",
+            "sound": "36_sawtooth_synth"
+        },
+        "Square Synth": {
+            "release_rate": 208,
+            "envelope": "envelope2",
+            "sound": "37_square_synth"
+        },
+        "Orchestra Hit 2": {
+            "release_rate": 208,
+            "envelope": "envelope21",
+            "sound": "29_orchestra_hit"
+        },
+        "Brass 2": {
+            "release_rate": 208,
+            "envelope": "envelope1",
+            "sound": "19_brass"
+        },
+        "Timpani": {
+            "release_rate": 10,
+            "envelope": "envelope30",
+            "sound": "18_timpani"
+        },
+        "Drum Sample 26": {
+            "release_rate": 10,
+            "normal_range_lo": 18,
+            "envelope": "envelope31",
+            "sound_lo": "12_snare_drum_1",
+            "sound": "13_snare_drum_2"
+        },
+        "Drum Sample 27": {
+            "release_rate": 10,
+            "normal_range_lo": 18,
+            "envelope": "envelope32",
+            "sound_lo": "12_snare_drum_1",
+            "sound": "13_snare_drum_2"
+        },
+        "Music Box": {
+            "release_rate": 119,
+            "envelope": "envelope28",
+            "sound": "3A_music_box"
+        },
+        "Synth Voice 2": {
+            "release_rate": 19,
+            "normal_range_hi": 50,
+            "envelope": "envelope0",
+            "sound": {"sample": "1B_organ_2", "tuning": 1.0},
+            "sound_hi": "1B_organ_2"
+        },
+        "Sleigh Bells 2": {
+            "release_rate": 208,
+            "envelope": "envelope33",
+            "sound": "2F_sleigh_bells"
+        },
+        "Strings Ensemble": {
+            "release_rate": 24,
+            "normal_range_lo": 42,
+            "envelope": "envelope34",
+            "sound_lo": "14_strings_5",
+            "sound": "15_strings_4"
+        },
+        "Trumpet": {
+            "release_rate": 67,
+            "envelope": "envelope35",
+            "sound": "17_trumpet"
+        },
+        "Harpsichord": {
+            "release_rate": 255,
+            "envelope": "envelope36",
+            "sound": "27_harpsichord"
+        },
+        "Monk Choir": {
+            "release_rate": 10,
+            "envelope": "envelope37",
+            "sound": "3E_monk_choir"
+        },
+        "Low Bell": {
+            "release_rate": 10,
+            "envelope": "envelope38",
+            "sound": "3F"
+        },
+        "High Bell": {
+            "release_rate": 10,
+            "envelope": "envelope39",
+            "sound": "40_bell"
+        },
+        "Harmonica": {
+            "release_rate": 19,
+            "envelope": "envelope40",
+            "sound": "43_harmonica"
+        },
+        "Percussion Loop": {
+            "release_rate": 100,
+            "normal_range_lo": 55,
+            "normal_range_hi": 56,
+            "envelope": "envelope41",
+            "sound_lo": "2A",
+            "sound": "2B",
+            "sound_hi": "2C"
+        },
+        "percussion": [
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.210224}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.2227245}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.2359685}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.25}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.264866}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.2806155}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.297302}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.3149805}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.33371}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.3535535}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.374577}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.3968505}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.4204485}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.4454495}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.4719375}},
+            {"release_rate": 10, "pan": 62, "envelope": "envelope11", "sound": {"sample": "06_kick_drum_1", "tuning": 0.5}},
+            {"release_rate": 10, "pan": 57, "envelope": "envelope11", "sound": "07_rimshot"},
+            {"release_rate": 10, "pan": 65, "envelope": "envelope11", "sound": {"sample": "08", "tuning": 1.1905508}},
+            {"release_rate": 10, "pan": 66, "envelope": "envelope11", "sound": {"sample": "08", "tuning": 0.8418465}},
+            {"release_rate": 10, "pan": 66, "envelope": "envelope11", "sound": {"sample": "08", "tuning": 0.8919052}},
+            {"release_rate": 10, "pan": 6, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 0.471937}},
+            {"release_rate": 10, "pan": 6, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 0.5}},
+            {"release_rate": 10, "pan": 27, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 0.66742}},
+            {"release_rate": 10, "pan": 27, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 0.707107}},
+            {"release_rate": 10, "pan": 45, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 0.793701}},
+            {"release_rate": 10, "pan": 45, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 0.840897}},
+            {"release_rate": 10, "pan": 53, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.0}},
+            {"release_rate": 10, "pan": 53, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.059463}},
+            {"release_rate": 10, "pan": 83, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.189207}},
+            {"release_rate": 10, "pan": 83, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.259921}},
+            {"release_rate": 10, "pan": 83, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.33484}},
+            {"release_rate": 10, "pan": 83, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.414214}},
+            {"release_rate": 10, "pan": 83, "envelope": "envelope11", "sound": {"sample": "09", "tuning": 1.498307}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.189207}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.259921}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.33484}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.414214}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.498307}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.587401}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.681793}},
+            {"release_rate": 10, "pan": 35, "envelope": "envelope11", "sound": {"sample": "0A_tambourine", "tuning": 1.781798}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.5469096}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.5794306}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.61388505}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.65038884}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.6890625}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.7300362}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.77344644}},
+            {"release_rate": 10, "pan": 54, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 0.81943786}},
+            {"release_rate": 10, "pan": 70, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 1.5468929}},
+            {"release_rate": 10, "pan": 70, "envelope": "envelope11", "sound": {"sample": "0B", "tuning": 1.6388757}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 0.793701}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 0.840897}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 0.890899}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 0.943875}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.0}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.059463}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.122462}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.189207}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.259921}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.33484}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.414214}},
+            {"release_rate": 10, "pan": 82, "envelope": "envelope11", "sound": {"sample": "0C_conga_stick", "tuning": 1.498307}},
+            {"release_rate": 10, "pan": 128, "envelope": "envelope11", "sound": "0D_clave"}
+        ]
+    },
+    "instrument_list": [
+        "Accordion",
+        "Slap Bass",
+        "Ele Guitar",
+        "Ele Piano",
+        "Grand Piano",
+        "French Horn",
+        "Pan Flute",
+        "Strings",
+        "Acoustic Guitar",
+        "Sleigh Bells",
+        "Hi-Hat",
+        "Crash Cymbal",
+        "Triangle&Cabasa",
+        "Celesta",
+        "Banjo",
+        "Fiddle",
+        "Whistle",
+        "Acoustic Bass",
+        "Snare Clap",
+        "Pizzicato Strings",
+        "Trombone",
+        "Choir Ooh",
+        "Sitar Drone",
+        "Sitar",
+        "Drum Snare Split",
+        "Bass+Lead",
+        "Percussive Organ",
+        "Steel Drum",
+        "Brass",
+        "Synth Voice",
+        "Ele Guitar (Clean)",
+        "Charang",
+        "Overdriven Guitar",
+        "Orchestra Hit",
+        "Recorder",
+        "Drum Sample 18",
+        "Melodic Tom",
+        "Melodic Tom 2",
+        "Steel Guitar",
+        "Pah",
+        "Accordion 2",
+        "Synth Bass",
+        "Square Synth",
+        "Orchestra Hit 2",
+        "Brass 2",
+        "Timpani",
+        "Drum Sample 26",
+        "Drum Sample 27",
+        "Music Box",
+        "Synth Voice 2",
+        "Sleigh Bells 2",
+        "Strings Ensemble",
+        "Trumpet",
+        "Harpsichord",
+        "Monk Choir",
+        "Low Bell",
+        "High Bell",
+        "Harmonica",
+        "Percussion Loop"
+    ]
+}

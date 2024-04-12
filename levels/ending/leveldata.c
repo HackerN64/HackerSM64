@@ -9,6 +9,7 @@
 #ifdef VERSION_EU
 #include "levels/ending/cake_eu.inc.c"
 
+#ifndef EU_CUSTOM_CAKE_FIX
 // 0x07023000 - 0x07023FFF
 ALIGNED8 static const Texture cake_end_texture_eu_35_thank_you[] = {
 #include "levels/ending/eu_023000.rgba16.inc.c"
@@ -38,6 +39,7 @@ ALIGNED8 static const Texture cake_end_texture_eu_39_fin[] = {
 ALIGNED8 static const Texture cake_end_texture_eu_40_ende[] = {
 #include "levels/ending/eu_028000.rgba16.inc.c"
 };
+#endif // !EU_CUSTOM_CAKE_FIX
 
 // 0x07029000 - 0x070296D8
 const Gfx dl_cake_end_screen[] = {

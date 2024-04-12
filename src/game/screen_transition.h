@@ -24,7 +24,7 @@ enum ColorTransitionFade {
     COLOR_TRANS_FADE_FROM_COLOR,
 };
 
-s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct WarpTransitionData *transData);
+s32 render_screen_transition(s8 transType, u8 transTime, struct WarpTransitionData *transData);
 Gfx *geo_cannon_circle_base(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
 
 #endif // SCREEN_TRANSITION_H

@@ -242,8 +242,10 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     mario_set_forward_vel(m, 0.0f);
     m->vel[1] = 0.0f;
 
-    //! This is responsible for some downwarps.
-    m->pos[1] = m->floorHeight;
+    // HackerSM64 2.1: This check fixes the ledgegrab downwarp after being pushed off a ledge.
+    if (m->pos[1] <= m->floorHeight + 160.0f) {
+        m->pos[1] = m->floorHeight;
+    }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
@@ -259,7 +261,7 @@ s32 stationary_ground_step(struct MarioState *m) {
     if (takeStep) {
         stepResult = perform_ground_step(m);
     } else {
-        // Hackersm64: this condition fixes potential downwarps
+        // HackerSM64 2.1: This check prevents the downwarps that plagued stationary actions.
         if (m->pos[1] <= m->floorHeight + 160.0f) {
             m->pos[1] = m->floorHeight;
         }
@@ -404,8 +406,10 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall,
     if (ledgeFloor == NULL
         || (*ledgeFloor) == NULL
         || ledgePos[1] < nextPos[1] + 100.0f
+#ifdef DONT_LEDGE_GRAB_STEEP_SLOPES
         || (*ledgeFloor)->normal.y < COS25 // H64 TODO: check if floor is actually slippery
-        || SURFACE_IS_UNSAFE((*ledgeFloor)->type)) {
+#endif
+    ) {
         return NULL;
     }
 
@@ -540,7 +544,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             }
         }
 
-        if (stepResult == AIR_STEP_GRABBED_LEDGE && grabbedWall != NULL && ledgeFloor != NULL && ledgePos != NULL) {
+        if (stepResult == AIR_STEP_GRABBED_LEDGE && grabbedWall != NULL && ledgeFloor != NULL) {
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
             m->faceAngle[0] = 0x0;

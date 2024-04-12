@@ -7,7 +7,7 @@ CC           := gcc
 CXX          := g++
 CFLAGS       := -I. -O2 -s
 LDFLAGS      := -lm
-ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv patch_elf_32bit aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv
+ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
 LIBAUDIOFILE := audiofile/libaudiofile.a
 
 # Only build armips from tools if it is not found on the system
@@ -39,8 +39,6 @@ n64cksum_CFLAGS  := -DN64CKSUM_STANDALONE
 
 textconv_SOURCES := textconv.c utf8.c hashtable.c
 
-patch_elf_32bit_SOURCES := patch_elf_32bit.c
-
 aifc_decode_SOURCES := aifc_decode.c
 
 aiff_extract_codebook_SOURCES := aiff_extract_codebook.c
@@ -66,13 +64,23 @@ ifeq ($(HOST_ENV),MinGW)
   armips_LDFLAGS += -municode
 endif
 
+flips: CC := $(CXX)
+flips_SOURCES := FlipsSrc/Flips.cpp
+flips_CFLAGS := -Wall -Wextra -fopenmp -Os -flto -fuse-linker-plugin -fomit-frame-pointer -fmerge-all-constants \
+-fvisibility=hidden -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables \
+-ffunction-sections -fdata-sections -Wl,--gc-sections \
+-Wl,-z,relro,-z,now,--as-needed,--hash-style=gnu,--relax
+
 all-except-recomp: $(LIBAUDIOFILE) $(BUILD_PROGRAMS)
 
 all: all-except-recomp
 
 clean:
 	$(RM) $(ALL_PROGRAMS)
+	$(RM) UNFLoader*
 	$(MAKE) -C audiofile clean
+
+distclean: clean
 
 define COMPILE
 $(1): $($1_SOURCES)
@@ -84,4 +92,4 @@ $(foreach p,$(BUILD_PROGRAMS),$(eval $(call COMPILE,$(p))))
 $(LIBAUDIOFILE):
 	@$(MAKE) -C audiofile
 
-.PHONY: all all-except-recomp clean default
+.PHONY: all all-except-recomp clean distclean default

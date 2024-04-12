@@ -1,10 +1,6 @@
 // Water Mine (unused)
 
 // 0x0600A4E0
-static const Lights1 water_mine_seg6_lights_0600A4E0 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600A4F8
 ALIGNED8 static const Texture water_mine_seg6_texture_0600A4F8[] = {
@@ -173,8 +169,8 @@ const Gfx water_mine_seg6_dl_0600D2E0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, water_mine_seg6_texture_0600C4F8),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&water_mine_seg6_lights_0600A4E0.l, 1),
-    gsSPLight(&water_mine_seg6_lights_0600A4E0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(water_mine_seg6_vertex_0600CD78, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),

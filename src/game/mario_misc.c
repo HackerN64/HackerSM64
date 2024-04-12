@@ -309,7 +309,7 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
         SET_GRAPH_NODE_LAYER(node->fnNode.node.flags, LAYER_TRANSPARENT);
         gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
         gfx = gfxHead;
-        if (gMarioState->flags & MARIO_VANISH_CAP) {
+        if (gMarioState->flags & (MARIO_VANISH_CAP | MARIO_TELEPORTING)) {
             gDPSetAlphaCompare(gfx++, G_AC_DITHER);
         } else {
             gDPSetAlphaCompare(gfx++, G_AC_NONE);
@@ -571,8 +571,7 @@ Gfx *geo_switch_mario_hand_grab_pos(s32 callContext, struct GraphNode *node, Mat
         // ! The HOLP is set here, which is why it only updates when the held object is drawn.
         // This is why it won't update during a pause buffered hitstun or when the camera is very far
         // away.
-        get_pos_from_transform_mtx(marioState->marioBodyState->heldObjLastPosition, *curTransform,
-                                   *gCurGraphNodeCamera->matrixPtr);
+        vec3f_copy(marioState->marioBodyState->heldObjLastPosition, (*curTransform)[3]);
     }
     return NULL;
 }

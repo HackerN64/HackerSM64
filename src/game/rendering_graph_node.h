@@ -13,6 +13,7 @@ extern struct GraphNodeObject      *gCurGraphNodeObject;
 extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
 #define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
+extern Vec3f globalLightDirection;
 
 enum AnimType {
     // after processing an object, the type is reset to this
@@ -30,6 +31,15 @@ enum AnimType {
 
 #define IS_LAYER_ZB(    layer) (((layer) >= LAYER_ZB_FIRST    ) || ((layer) <= LAYER_ZB_LAST))
 #define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_NON_ZB_FIRST) || ((layer) <= LAYER_LAST   ))
+
+enum RenderModeTypes {
+    RENDER_NO_ZB = 0,
+    RENDER_ZB,
+};
+
+struct RenderModeContainer {
+    u32 modes[LAYER_COUNT];
+};
 
 #ifdef OBJECTS_REJ
  #if SILHOUETTE

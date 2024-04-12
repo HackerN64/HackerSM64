@@ -1,26 +1,10 @@
 // 0x07012F18 - 0x07012F30
-static const Lights1 wdw_seg7_lights_07012F18 = gdSPDefLights1(
-    0x99, 0x99, 0x00,
-    0xff, 0xff, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x07012F30 - 0x07012F48
-static const Lights1 wdw_seg7_lights_07012F30 = gdSPDefLights1(
-    0x00, 0x00, 0x99,
-    0x00, 0x00, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07012F48 - 0x07012F60
-static const Lights1 wdw_seg7_lights_07012F48 = gdSPDefLights1(
-    0x00, 0x99, 0x00,
-    0x00, 0xff, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x07012F60 - 0x07012F78
-static const Lights1 wdw_seg7_lights_07012F60 = gdSPDefLights1(
-    0x99, 0x00, 0x00,
-    0xff, 0x00, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x07012F78 - 0x07012FD8
 static const Vtx wdw_seg7_vertex_07012F78[] = {
@@ -67,20 +51,20 @@ static const Gfx wdw_seg7_dl_070130F8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, wdw_seg7_texture_07001000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&wdw_seg7_lights_07012F18.l, 1),
-    gsSPLight(&wdw_seg7_lights_07012F18.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffff00ff),
+    gsSPLightColor(LIGHT_2, 0x999900ff),
     gsSPVertex(wdw_seg7_vertex_07012F78, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&wdw_seg7_lights_07012F30.l, 1),
-    gsSPLight(&wdw_seg7_lights_07012F30.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffff),
+    gsSPLightColor(LIGHT_2, 0x99ff),
     gsSPVertex(wdw_seg7_vertex_07012FD8, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&wdw_seg7_lights_07012F48.l, 1),
-    gsSPLight(&wdw_seg7_lights_07012F48.a, 2),
+    gsSPLightColor(LIGHT_1, 0xff00ff),
+    gsSPLightColor(LIGHT_2, 0x9900ff),
     gsSPVertex(wdw_seg7_vertex_07013038, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&wdw_seg7_lights_07012F60.l, 1),
-    gsSPLight(&wdw_seg7_lights_07012F60.a, 2),
+    gsSPLightColor(LIGHT_1, 0xff0000ff),
+    gsSPLightColor(LIGHT_2, 0x990000ff),
     gsSPVertex(wdw_seg7_vertex_07013098, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),

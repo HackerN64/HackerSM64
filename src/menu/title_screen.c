@@ -110,7 +110,7 @@ s32 intro_level_select(void) {
     if (((index ^ gLevelSelectHoldKeyIndex) & index) == 2) {
         if (gCurrLevelNum > LEVEL_MAX) {
             gCurrLevelNum = LEVEL_MIN;
-        } else if (gPlayer3Controller->buttonDown & B_BUTTON) {
+        } else if (gPlayer1Controller->buttonDown & B_BUTTON) {
             play_sound(SOUND_GENERAL_LEVEL_SELECT_CHANGE, gGlobalSoundSource);
             gCurrLevelNum += 10;
         } else {
@@ -123,7 +123,7 @@ s32 intro_level_select(void) {
         if (gCurrLevelNum < LEVEL_MIN) {
             // Same applies to here as above
             gCurrLevelNum = LEVEL_MAX;
-        } else if (gPlayer3Controller->buttonDown & B_BUTTON) {
+        } else if (gPlayer1Controller->buttonDown & B_BUTTON) {
             play_sound(SOUND_GENERAL_LEVEL_SELECT_CHANGE, gGlobalSoundSource);
             gCurrLevelNum -= 10;
         } else {
@@ -187,7 +187,7 @@ s32 intro_regular(void) {
     }
     print_intro_text();
 #ifdef DEBUG_LEVEL_SELECT
-    if (gPlayer3Controller->buttonDown & L_TRIG) {
+    if (gPlayer1Controller->buttonDown & L_TRIG) {
         gDebugLevelSelect = TRUE;
     }
 #endif
@@ -246,7 +246,6 @@ s32 intro_game_over(void) {
  * Plays the casual "It's a me mario" when the game stars.
  */
 s32 intro_play_its_a_me_mario(void) {
-    set_background_music(0, SEQ_SOUND_PLAYER, 0);
     play_sound(SOUND_MENU_COIN_ITS_A_ME_MARIO, gGlobalSoundSource);
     return LEVEL_NONE + 1;
 }
@@ -264,7 +263,7 @@ s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
 #else
         case LVL_INTRO_REGULAR:
 #ifdef DEBUG_LEVEL_SELECT
-            if (gPlayer3Controller->buttonDown & L_TRIG) {
+            if (gPlayer1Controller->buttonDown & L_TRIG) {
                 gDebugLevelSelect = TRUE;
             }
 #endif

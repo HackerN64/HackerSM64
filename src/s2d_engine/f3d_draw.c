@@ -1,4 +1,4 @@
-#include "config.h"
+#include "s2d_config.h"
 
 #include <ultra64.h>
 #include "mtx.h"
@@ -62,7 +62,7 @@ void texrect(int x, int y, float scale) {
         qs510(1.0f / myScale), qs510(1.0f / myScale));
 }
 
-void draw_f3d_dropshadow(char c, int x, int y, uObjMtx *ds) {
+void draw_f3d_dropshadow(char c, int x, int y, UNUSED uObjMtx *ds) {
     setup_f3d_texture(c);
 
     if (s2d_red != 0
@@ -81,7 +81,7 @@ void draw_f3d_dropshadow(char c, int x, int y, uObjMtx *ds) {
     }
 }
 
-void draw_f3d_glyph(char c, int x, int y, uObjMtx *mt) {
+void draw_f3d_glyph(char c, int x, int y, UNUSED uObjMtx *mt) {
     setup_f3d_texture(c);
 
     texrect(x, y, myScale);

@@ -1,8 +1,4 @@
 // 0x07022B48 - 0x07022B60
-static const Lights1 hmc_seg7_lights_07022B48 = gdSPDefLights1(
-    0x79, 0x79, 0x79,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07022B60 - 0x07022C60
 static const Vtx hmc_seg7_vertex_07022B60[] = {
@@ -41,8 +37,8 @@ static const Gfx hmc_seg7_dl_07022CE0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hmc_seg7_texture_07004000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&hmc_seg7_lights_07022B48.l, 1),
-    gsSPLight(&hmc_seg7_lights_07022B48.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x797979ff),
     gsSPVertex(hmc_seg7_vertex_07022B60, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),

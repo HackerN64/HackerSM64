@@ -2,7 +2,7 @@
 #include <PR/gs2dex.h>
 #include <PR/gu.h>
 
-#include "config.h"
+#include "s2d_config.h"
 
 #define ftoq FTOFIX32
 #define qtof FIX32TOF

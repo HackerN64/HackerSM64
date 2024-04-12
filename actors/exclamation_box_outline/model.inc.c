@@ -1,28 +1,12 @@
 // Exclamation Box Outline
 
 // 0x08024CB8
-static const Lights1 exclamation_box_outline_seg8_lights_08024CB8 = gdSPDefLights1(
-    0x7f, 0x00, 0x00,
-    0xff, 0x00, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x08024CD0
-static const Lights1 exclamation_box_outline_seg8_lights_08024CD0 = gdSPDefLights1(
-    0x00, 0x7f, 0x00,
-    0x00, 0xff, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x08024CE8
-static const Lights1 exclamation_box_outline_seg8_lights_08024CE8 = gdSPDefLights1(
-    0x00, 0x00, 0x7f,
-    0x00, 0x00, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x08024D00
-static const Lights1 exclamation_box_outline_seg8_lights_08024D00 = gdSPDefLights1(
-    0x7f, 0x6a, 0x00,
-    0xff, 0xd4, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x08024D18
 static const Vtx exclamation_box_outline_seg8_vertex_08024D18[] = {
@@ -94,32 +78,32 @@ const Gfx exclamation_box_outline_seg8_dl_08024F58[] = {
 // 0x08024F88 - 0x08024FA8
 const Gfx exclamation_box_outline_seg8_dl_08024F88[] = {
     gsSPDisplayList(exclamation_box_outline_seg8_dl_08024F30),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024CB8.l, 1),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024CB8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xff0000ff),
+    gsSPLightColor(LIGHT_2, 0x7f0000ff),
     gsSPBranchList(exclamation_box_outline_seg8_dl_08024F58),
 };
 
 // 0x08024FA8 - 0x08024FC8
 const Gfx exclamation_box_outline_seg8_dl_08024FA8[] = {
     gsSPDisplayList(exclamation_box_outline_seg8_dl_08024F30),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024CD0.l, 1),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024CD0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xff00ff),
+    gsSPLightColor(LIGHT_2, 0x7f00ff),
     gsSPBranchList(exclamation_box_outline_seg8_dl_08024F58),
 };
 
 // 0x08024FC8 - 0x08024FE8
 const Gfx exclamation_box_outline_seg8_dl_08024FC8[] = {
     gsSPDisplayList(exclamation_box_outline_seg8_dl_08024F30),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024CE8.l, 1),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024CE8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffff),
+    gsSPLightColor(LIGHT_2, 0x7fff),
     gsSPBranchList(exclamation_box_outline_seg8_dl_08024F58),
 };
 
 // 0x08024FE8 - 0x08025008
 const Gfx exclamation_box_outline_seg8_dl_08024FE8[] = {
     gsSPDisplayList(exclamation_box_outline_seg8_dl_08024F30),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024D00.l, 1),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08024D00.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffd400ff),
+    gsSPLightColor(LIGHT_2, 0x7f6a00ff),
     gsSPBranchList(exclamation_box_outline_seg8_dl_08024F58),
 };
 
@@ -193,10 +177,6 @@ const Gfx exclamation_box_outline_seg8_dl_080259F8[] = {
 };
 
 // 0x08025A68
-static const Lights1 exclamation_box_outline_seg8_lights_08025A68 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x08025A80
 ALIGNED8 static const Texture exclamation_box_outline_seg8_texture_08025A80[] = {
@@ -216,8 +196,8 @@ const Gfx exclamation_box_outline_seg8_dl_08025EC0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, exclamation_box_outline_seg8_texture_08025A80),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 32 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08025A68.l, 1),
-    gsSPLight(&exclamation_box_outline_seg8_lights_08025A68.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(exclamation_box_outline_seg8_vertex_08025E80, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPEndDisplayList(),

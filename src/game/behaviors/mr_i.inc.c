@@ -76,7 +76,7 @@ void bhv_mr_i_iris_loop(void) {
         obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX);
         obj_translate_local(o, O_POS_INDEX, O_PARENT_RELATIVE_POS_INDEX);
         o->oFaceAnglePitch = o->oMoveAnglePitch;
-        o->oGraphYOffset = o->header.gfx.scale[1] * 100.0f;
+        o->oGraphYOffset = o->parentObj->oGraphYOffset;
     }
 
     if (!o->parentObj->oMrIBlinking) {
@@ -128,7 +128,7 @@ void mr_i_body_act_spin_death(void) {
             cur_obj_become_intangible();
             spawn_mist_particles();
             o->oMrIScale = scaleModifier * 0.6f;
-            if (o->oBehParams2ndByte != 0) {
+            if (o->oBehParams2ndByte != MR_I_BP_NORMAL) {
                 o->oPosY += 100.0f;
                 spawn_default_star(1370, 2000.0f, -320.0f);
                 obj_mark_for_deletion(o);

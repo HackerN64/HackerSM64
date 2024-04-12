@@ -1,16 +1,8 @@
 // Scuttlebug
 
 // Unreferenced light group
-UNUSED static const Lights1 scuttlebug_lights_unused1 = gdSPDefLights1(
-    0x2c, 0x00, 0x00,
-    0xb2, 0x00, 0x00, 0x28, 0x28, 0x28
-);
 
 // Unreferenced light group
-UNUSED static const Lights1 scuttlebug_lights_unused2 = gdSPDefLights1(
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x06010108
 ALIGNED8 static const Texture scuttlebug_seg6_texture_06010108[] = {
@@ -237,10 +229,6 @@ const Gfx scuttlebug_seg6_dl_06013DA0[] = {
 };
 
 // 0x06013E10
-static const Lights1 scuttlebug_seg6_lights_06013E10 = gdSPDefLights1(
-    0x33, 0x22, 0x01,
-    0xcf, 0x89, 0x06, 0x28, 0x28, 0x28
-);
 
 // 0x06013E28
 static const Vtx scuttlebug_seg6_vertex_06013E28[] = {
@@ -278,8 +266,8 @@ static const Vtx scuttlebug_seg6_vertex_06013F28[] = {
 
 // 0x06013FC8 - 0x060140F0
 const Gfx scuttlebug_seg6_dl_06013FC8[] = {
-    gsSPLight(&scuttlebug_seg6_lights_06013E10.l, 1),
-    gsSPLight(&scuttlebug_seg6_lights_06013E10.a, 2),
+    gsSPLightColor(LIGHT_1, 0xcf8906ff),
+    gsSPLightColor(LIGHT_2, 0x332201ff),
     gsSPVertex(scuttlebug_seg6_vertex_06013E28, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  7, 0x0,  5,  4,  6, 0x0),
@@ -382,10 +370,6 @@ const Gfx scuttlebug_seg6_dl_06014270[] = {
 };
 
 // 0x060142E0
-static const Lights1 scuttlebug_seg6_lights_060142E0 = gdSPDefLights1(
-    0x26, 0x05, 0x05,
-    0x99, 0x16, 0x16, 0x28, 0x28, 0x28
-);
 
 // 0x060142F8
 static const Vtx scuttlebug_seg6_vertex_060142F8[] = {
@@ -397,8 +381,8 @@ static const Vtx scuttlebug_seg6_vertex_060142F8[] = {
 
 // 0x06014338 - 0x06014378
 const Gfx scuttlebug_seg6_dl_06014338[] = {
-    gsSPLight(&scuttlebug_seg6_lights_060142E0.l, 1),
-    gsSPLight(&scuttlebug_seg6_lights_060142E0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x991616ff),
+    gsSPLightColor(LIGHT_2, 0x260505ff),
     gsSPVertex(scuttlebug_seg6_vertex_060142F8, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  1, 0x0),
     gsSP2Triangles( 2,  3,  0, 0x0,  1,  0,  3, 0x0),

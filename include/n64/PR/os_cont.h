@@ -63,6 +63,18 @@ typedef struct {
 	u8      error;
 } OSContPad;
 
+// Custom extended controller pad struct that contains fields for gamecube controllers
+typedef struct {
+	u16     button;
+	s8      stick_x;		/* -80 <= stick_x <= 80 */
+	s8      stick_y;		/* -80 <= stick_y <= 80 */
+	s8      c_stick_x;
+	s8      c_stick_y;
+	u8      l_trig;
+	u8      r_trig;
+	u8	errno;
+} OSContPadEx;
+
 typedef struct {
 	void    *address;               /* Ram pad Address:  11 bits */
 	u8      databuffer[32];         /* address of the data buffer */
@@ -100,9 +112,15 @@ typedef struct {
 
 /* Controller type */
 
+// Console ID:
+#define CONT_CONSOLE_MASK       (0x3 <<  3) // 0x0018 | 0: N64, 1: Dolphin
+#define CONT_CONSOLE_N64        (  0 <<  3) // 0x0000
+#define CONT_CONSOLE_GCN        (  1 <<  3) // 0x0008
+
 #define CONT_ABSOLUTE           0x0001
 #define CONT_RELATIVE           0x0002
 #define CONT_JOYPORT            0x0004
+#define CONT_GCN                0x0008
 #define CONT_EEPROM		0x8000
 #define CONT_EEP16K		0x4000
 #define	CONT_TYPE_MASK		0x1f07
@@ -150,6 +168,25 @@ typedef struct {
 #define L_CBUTTONS	CONT_C
 #define R_CBUTTONS	CONT_F
 #define D_CBUTTONS	CONT_D
+#define GCN_X_BUTTON 0x0040
+#define GCN_Y_BUTTON 0x0080
+
+/* Gamecube controller buttons */
+
+#define CONT_GCN_GET_ORIGIN  0x2000
+#define CONT_GCN_START       0x1000
+#define CONT_GCN_Y           0x0800
+#define CONT_GCN_X           0x0400
+#define CONT_GCN_B           0x0200
+#define CONT_GCN_A           0x0100
+#define CONT_GCN_USE_ORIGIN  0x0080
+#define CONT_GCN_L           0x0040
+#define CONT_GCN_R           0x0020
+#define CONT_GCN_Z           0x0010
+#define CONT_GCN_UP          0x0008
+#define CONT_GCN_DOWN        0x0004
+#define CONT_GCN_RIGHT       0x0002
+#define CONT_GCN_LEFT        0x0001
 
 /* Controller error number */
 
@@ -191,11 +228,13 @@ extern s32		osContInit(         OSMesgQueue *mq, u8 *bitpattern, OSContStatus *s
 extern s32		osContReset(        OSMesgQueue *mq,                 OSContStatus *status);
 extern s32		osContStartQuery(   OSMesgQueue *mq);
 extern s32		osContStartReadData(OSMesgQueue *mq);
+extern s32		osContStartReadDataEx(OSMesgQueue *mq);
 #ifndef _HW_VERSION_1
 extern s32		osContSetCh(u8 ch);
 #endif
 extern void		osContGetQuery(OSContStatus *status);
 extern void		osContGetReadData(OSContPad *pad);
+extern void		osContGetReadDataEx(OSContPadEx *pad);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

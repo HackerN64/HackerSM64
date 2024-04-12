@@ -1,14 +1,6 @@
 // 0x07004030 - 0x07004048
-static const Lights1 bowser_3_seg7_lights_07004030 = gdSPDefLights1(
-    0x22, 0x22, 0x22,
-    0x89, 0x89, 0x8a, 0x28, 0x28, 0x28
-);
 
 // 0x07004048 - 0x07004060
-static const Lights1 bowser_3_seg7_lights_07004048 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07004060 - 0x07004160
 static const Vtx bowser_3_seg7_vertex_07004060[] = {
@@ -113,16 +105,16 @@ static const Gfx bowser_3_seg7_dl_07004500[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, bowser_3_seg7_texture_07000800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&bowser_3_seg7_lights_07004030.l, 1),
-    gsSPLight(&bowser_3_seg7_lights_07004030.a, 2),
+    gsSPLightColor(LIGHT_1, 0x89898aff),
+    gsSPLightColor(LIGHT_2, 0x222222ff),
     gsSPVertex(bowser_3_seg7_vertex_07004060, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
     gsSP2Triangles( 6,  8, 12, 0x0, 13, 14, 15, 0x0),
     gsSPVertex(bowser_3_seg7_vertex_07004160, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&bowser_3_seg7_lights_07004048.l, 1),
-    gsSPLight(&bowser_3_seg7_lights_07004048.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(bowser_3_seg7_vertex_070041C0, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSP2Triangles( 1,  4,  3, 0x0,  2,  3,  5, 0x0),

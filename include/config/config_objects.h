@@ -4,72 +4,128 @@
  * SPECIFIC OBJECT SETTINGS *
  ****************************/
 
-// -- COIN --
+/**************
+ * -- COIN --
+ **************/
 
-// The distance from Mario which coin formations spawn coins at.
-// Vanilla is 2000.0f. 
-// Set this to o->oDrawingDistance for a more reasonable range at the cost of performance.
+/**
+ * The distance from Mario at which coin formations spawn their coins. Vanilla is 2000.0f.
+ * Set this to o->oDrawingDistance for a more reasonable range at the cost of performance.
+ */
 #define COIN_FORMATION_DISTANCE 2000.0f
 
-// Moving Coins flicker and disappear when they hit lava instead of being instantly deleted.
+/**
+ * Moving Coins flicker and disappear when they hit lava instead of being instantly deleted.
+ */
 #define COIN_LAVA_FLICKER
 
-// Allow for retries on collecting the remaining blue coins from a blue coin switch.
-//#define BLUE_COIN_SWITCH_RETRY
+/**
+ * Allows for retries on collecting the remaining blue coins from a blue coin switch.
+ */
+// #define BLUE_COIN_SWITCH_RETRY
 
-// -- GOOMBA --
+/**
+ * Allow previewing blue coin locations from a blue coin switch when Mario is standing on the blue coin switch.
+ */
+// #define BLUE_COIN_SWITCH_PREVIEW
 
-// Tiny Goombas (from THI) always drop their coin.
+/****************
+ * -- GOOMBA --
+ ****************/
+
+/**
+ * Tiny Goombas (from THI) always drop their coin.
+ */
 // #define TINY_GOOMBA_ALWAYS_DROPS_COIN
 
-// Floombas! These fellas sport custom behaviors (bhvFloomba, bhvFloombaTripletSpawner) and of course the iconic Floomba texture.
-// Also support macros (macro_floomba, macro_huge_floomba, macro_tiny_floomba, macro_floomba_triplet_spawner, macro_floomba_quintuplet_spawner).
+/**
+ * Floombas! These fellas sport custom behaviors (bhvFloomba, bhvFloombaTripletSpawner) and of course the iconic Floomba texture.
+ * Also supports macros (macro_floomba, macro_huge_floomba, macro_tiny_floomba, macro_floomba_triplet_spawner, macro_floomba_quintuplet_spawner).
+ */
 #define FLOOMBAS
 
-// -- HOOT --
+/**************
+ * -- HOOT --
+ **************/
 
-// Use intendedYaw to control Hoot instead of raw left and right inputs.
+/**
+ * Uses intendedYaw to control Hoot instead of the raw left and right inputs.
+ */
 #define HOOT_YAW_FIX
 
-// Leaf particles occasionally fall from trees which contain Hoot.
+/**
+ * Causes leaf particles to occasionally fall from trees which contain Hoot.
+ */
 #define HOOT_TREE_PARTICLES
 
-// -- MR I --
+/**************
+ * -- MR I --
+ **************/
 
-// Uncomment to allow MR I to shoot his particle in any direction 
+/**
+ * Enables Mr I to shoot his particle in any direction.
+ */
 // #define MR_I_PITCH_SHOOTING
 
-// -- WATER RING --
+/********************
+ * -- WATER RING --
+ ********************/
 
-// Fix DDD water rings by checking for interaction rather than normals.
-// #define FIX_WATER_RINGS
+/**
+ * Fix the water rings in DDD by checking for interaction rather than normals.
+ */
+#define FIX_WATER_RINGS
 
-// -- POWER STAR --
+/********************
+ * -- POWER STAR --
+ ********************/
 
-// Collecting a Power Star will fully heal Mario.
+/**
+ * Collecting a Power Star will fully heal Mario.
+ */
 #define POWER_STARS_HEAL
 
-// -- 1-UP MUSHROOM --
+/**********************
+ * -- 1-UP MUSHROOM --
+ **********************/
 
-// Collecting a 1-Up Mushroom will fully heal Mario.
+/**
+ * Collecting a 1-Up Mushroom will fully heal Mario.
+ */
 #define MUSHROOMS_HEAL
 
-// -- PLATFORM ON TRACK --
+/***************************
+ * -- PLATFORM ON TRACK --
+ ***************************/
 
-// The speed of a platform on a track can be controlled by standing near the front or back of it
-//#define CONTROLLABLE_PLATFORM_SPEED
+/**
+ * Allows the speed of a platform on a track to be controlled by standing near the front or back of it.
+ */
+// #define CONTROLLABLE_PLATFORM_SPEED
 
-// -- CHAIN CHOMP --
+/*********************
+ * -- CHAIN CHOMP --
+ *********************/
 
-// The number of chain balls the Chain Chomp has.  Vanilla is 5.
+/**
+ * The number of chain balls the Chain Chomp has. Vanilla is 5.
+ */
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
 
-// -- POKEY --
+/***************
+ * -- POKEY --
+ ***************/
 
-// The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
+/**
+ * The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
+ */
 #define POKEY_NUM_SEGMENTS       5
 
-// -- WIGGLER --
+/*****************
+ * -- WIGGLER --
+ *****************/
 
-// The number of segments Wiggler has, not including the head. Vanilla is 4.
+/**
+ * The number of segments Wiggler has, not including the head. Vanilla is 4.
+ */
 #define WIGGLER_NUM_SEGMENTS     4

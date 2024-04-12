@@ -1,8 +1,4 @@
 // 0x0700E7D0 - 0x0700E7E8
-static const Lights1 wf_seg7_lights_0700E7D0 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0700E7E8 - 0x0700E8E8
 static const Vtx wf_seg7_vertex_0700E7E8[] = {
@@ -36,8 +32,8 @@ static const Gfx wf_seg7_dl_0700E918[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, grass_09006800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&wf_seg7_lights_0700E7D0.l, 1),
-    gsSPLight(&wf_seg7_lights_0700E7D0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(wf_seg7_vertex_0700E7E8, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),

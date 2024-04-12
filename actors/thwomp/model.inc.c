@@ -1,10 +1,6 @@
 // Thwomp
 
 // 0x050098E8
-static const Lights1 thwomp_seg5_lights_050098E8 = gdSPDefLights1(
-    0x4c, 0x4c, 0x4c,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x05009900
 ALIGNED8 static const Texture thwomp_seg5_texture_05009900[] = {
@@ -116,8 +112,8 @@ const Gfx thwomp_seg5_dl_0500B570[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, thwomp_seg5_texture_0500A900),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&thwomp_seg5_lights_050098E8.l, 1),
-    gsSPLight(&thwomp_seg5_lights_050098E8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x4c4c4cff),
     gsSPVertex(thwomp_seg5_vertex_0500B100, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
     gsSP2Triangles( 0,  3,  4, 0x0,  0,  4,  5, 0x0),

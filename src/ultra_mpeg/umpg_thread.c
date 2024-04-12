@@ -44,10 +44,10 @@ void umpg_maketask(void) {
 
     umpg_task.t.flags = 0x0;
 
-    umpg_task.t.ucode = gspF3DZEX2_PosLight_fifoTextStart;
-    umpg_task.t.ucode_data = gspF3DZEX2_PosLight_fifoDataStart;
-    umpg_task.t.ucode_size = ((u8 *) gspF3DZEX2_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_PosLight_fifoTextStart);
-    umpg_task.t.ucode_data_size = ((u8 *) gspF3DZEX2_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_PosLight_fifoDataStart);
+    umpg_task.t.ucode = gspF3DEX2_fifoTextStart;
+    umpg_task.t.ucode_data = gspF3DEX2_fifoDataStart;
+    umpg_task.t.ucode_size = ((u8 *) gspF3DEX2_fifoTextEnd - (u8 *) gspF3DEX2_fifoTextStart);
+    umpg_task.t.ucode_data_size = ((u8 *) gspF3DEX2_fifoDataEnd - (u8 *) gspF3DEX2_fifoDataStart);
 
     umpg_task.t.dram_stack = (u64 *) gGfxSPTaskStack;
     umpg_task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;

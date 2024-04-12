@@ -1,10 +1,6 @@
 // Water Bubble
 
 // 0x0500FE68
-static const Lights1 water_bubble_seg5_lights_0500FE68 = gdSPDefLights1(
-    0xbf, 0xbf, 0xbf,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500FE80
 ALIGNED8 static const Texture water_bubble_seg5_texture_0500FE80[] = {
@@ -148,8 +144,8 @@ static const Vtx water_bubble_seg5_vertex_05010C50[] = {
 
 // 0x05010D30 - 0x05011000
 const Gfx water_bubble_seg5_dl_05010D30[] = {
-    gsSPLight(&water_bubble_seg5_lights_0500FE68.l, 1),
-    gsSPLight(&water_bubble_seg5_lights_0500FE68.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0xbfbfbfff),
     gsSPVertex(water_bubble_seg5_vertex_05010680, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 2,  3,  4, 0x0,  1,  5,  3, 0x0),

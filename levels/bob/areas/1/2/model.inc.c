@@ -1,8 +1,4 @@
 // 0x07004478 - 0x07004490
-static const Lights1 bob_seg7_lights_07004478 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07004490 - 0x07004590
 static const Vtx bob_seg7_vertex_07004490[] = {
@@ -1451,8 +1447,8 @@ static const Gfx bob_seg7_dl_07008AF0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, generic_09003800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&bob_seg7_lights_07004478.l, 1),
-    gsSPLight(&bob_seg7_lights_07004478.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(bob_seg7_vertex_07004490, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  3,  5, 0x0,  7,  8,  9, 0x0),

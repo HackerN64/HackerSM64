@@ -1,16 +1,8 @@
 // Swoop
 
 // Unreferenced light group
-UNUSED static const Lights1 swoop_lights_unused1 = gdSPDefLights1(
-    0x0a, 0x00, 0x25,
-    0x2a, 0x00, 0x95, 0x28, 0x28, 0x28
-);
 
 // Unreferenced light group
-UNUSED static const Lights1 swoop_lights_unused2 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06004270
 ALIGNED8 static const Texture swoop_seg6_texture_06004270[] = {
@@ -33,10 +25,6 @@ ALIGNED8 static const Texture swoop_seg6_texture_06005A70[] = {
 };
 
 // 0x06006270
-static const Lights1 swoop_seg6_lights_06006270 = gdSPDefLights1(
-    0x79, 0x79, 0x79,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06006288
 static const Vtx swoop_seg6_vertex_06006288[] = {
@@ -110,8 +98,8 @@ const Gfx swoop_seg6_dl_060065B8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, swoop_seg6_texture_06004A70),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&swoop_seg6_lights_06006270.l, 1),
-    gsSPLight(&swoop_seg6_lights_06006270.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x797979ff),
     gsSPVertex(swoop_seg6_vertex_06006288, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  3, 0x0,  3,  7,  4, 0x0),
@@ -219,10 +207,6 @@ const Gfx swoop_seg6_dl_06006880[] = {
 };
 
 // 0x06006938
-static const Lights1 swoop_seg6_lights_06006938 = gdSPDefLights1(
-    0x79, 0x79, 0x79,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x06006950
 static const Vtx swoop_seg6_vertex_06006950[] = {
@@ -249,8 +233,8 @@ const Gfx swoop_seg6_dl_06006A10[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, swoop_seg6_texture_06005270),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&swoop_seg6_lights_06006938.l, 1),
-    gsSPLight(&swoop_seg6_lights_06006938.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x797979ff),
     gsSPVertex(swoop_seg6_vertex_06006950, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),

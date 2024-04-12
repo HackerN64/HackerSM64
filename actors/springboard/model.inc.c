@@ -1,10 +1,6 @@
 // Springboard (unused)
 
 // 0x05000000
-static const Lights1 springboard_seg5_lights_05000000 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x05000018
 ALIGNED8 static const Texture springboard_seg5_texture_05000018[] = {
@@ -167,8 +163,8 @@ const Gfx springboard_checkerboard_seg5_dl_050016B8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, springboard_seg5_texture_05000018),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&springboard_seg5_lights_05000000.l, 1),
-    gsSPLight(&springboard_seg5_lights_05000000.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(springboard_seg5_vertex_05001018, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  6,  9,  7, 0x0),
@@ -203,8 +199,8 @@ const Gfx springboard_spring_seg5_dl_05001800[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, springboard_seg5_texture_05000818),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&springboard_seg5_lights_05000000.l, 1),
-    gsSPLight(&springboard_seg5_lights_05000000.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(springboard_seg5_vertex_050012B8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
@@ -234,8 +230,8 @@ const Gfx springboard_checkerboard_seg5_dl_05001900[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, springboard_seg5_texture_05000018),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&springboard_seg5_lights_05000000.l, 1),
-    gsSPLight(&springboard_seg5_lights_05000000.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(springboard_seg5_vertex_05001458, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  5,  7,  6, 0x0),

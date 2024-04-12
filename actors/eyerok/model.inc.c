@@ -1,10 +1,6 @@
 // Eyerok
 
 // Unreferenced light group
-UNUSED static const Lights1 eyerok_lights_unused = gdSPDefLights1(
-    0x3f, 0x2a, 0x16,
-    0xff, 0xa9, 0x5b, 0x28, 0x28, 0x28
-);
 
 // 0x05008D40
 ALIGNED8 static const Texture eyerok_seg5_texture_05008D40[] = {
@@ -32,10 +28,6 @@ ALIGNED8 static const Texture eyerok_seg5_texture_0500AD40[] = {
 };
 
 // 0x0500B540
-static const Lights1 eyerok_seg5_lights_0500B540 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500B558
 static const Vtx eyerok_seg5_vertex_0500B558[] = {
@@ -72,8 +64,8 @@ const Gfx eyerok_seg5_dl_0500B6B8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500B540.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500B540.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500B558, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  3,  5, 0x0,  7,  8,  9, 0x0),
@@ -104,10 +96,6 @@ const Gfx eyerok_seg5_dl_0500B748[] = {
 };
 
 // 0x0500B7B8
-static const Lights1 eyerok_seg5_lights_0500B7B8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500B7D0
 static const Vtx eyerok_seg5_vertex_0500B7D0[] = {
@@ -144,8 +132,8 @@ const Gfx eyerok_seg5_dl_0500B930[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500B7B8.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500B7B8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500B7D0, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
@@ -176,10 +164,6 @@ const Gfx eyerok_seg5_dl_0500B9C0[] = {
 };
 
 // 0x0500BA30
-static const Lights1 eyerok_seg5_lights_0500BA30 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BA48
 static const Vtx eyerok_seg5_vertex_0500BA48[] = {
@@ -220,8 +204,8 @@ const Gfx eyerok_seg5_dl_0500BBE8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500BA30.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500BA30.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500BA48, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
@@ -253,10 +237,6 @@ const Gfx eyerok_seg5_dl_0500BC88[] = {
 };
 
 // 0x0500BCF8
-static const Lights1 eyerok_seg5_lights_0500BCF8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BD10
 static const Vtx eyerok_seg5_vertex_0500BD10[] = {
@@ -293,8 +273,8 @@ const Gfx eyerok_seg5_dl_0500BE70[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500BCF8.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500BCF8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500BD10, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
@@ -325,10 +305,6 @@ const Gfx eyerok_seg5_dl_0500BF00[] = {
 };
 
 // 0x0500BF70
-static const Lights1 eyerok_seg5_lights_0500BF70 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BF88
 static const Vtx eyerok_seg5_vertex_0500BF88[] = {
@@ -355,8 +331,8 @@ const Gfx eyerok_seg5_dl_0500C088[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500BF70.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500BF70.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500BF88, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
@@ -384,10 +360,6 @@ const Gfx eyerok_seg5_dl_0500C100[] = {
 };
 
 // 0x0500C170
-static const Lights1 eyerok_seg5_lights_0500C170 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C188
 static const Vtx eyerok_seg5_vertex_0500C188[] = {
@@ -424,8 +396,8 @@ const Gfx eyerok_seg5_dl_0500C2E8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500C170.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500C170.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500C188, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
@@ -456,10 +428,6 @@ const Gfx eyerok_seg5_dl_0500C378[] = {
 };
 
 // 0x0500C3E8
-static const Lights1 eyerok_seg5_lights_0500C3E8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C400
 static const Vtx eyerok_seg5_vertex_0500C400[] = {
@@ -500,8 +468,8 @@ const Gfx eyerok_seg5_dl_0500C5A0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500C3E8.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500C3E8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500C400, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
@@ -533,10 +501,6 @@ const Gfx eyerok_seg5_dl_0500C640[] = {
 };
 
 // 0x0500C6B0
-static const Lights1 eyerok_seg5_lights_0500C6B0 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C6C8
 static const Vtx eyerok_seg5_vertex_0500C6C8[] = {
@@ -577,8 +541,8 @@ const Gfx eyerok_seg5_dl_0500C868[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, eyerok_seg5_texture_05008D40),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&eyerok_seg5_lights_0500C6B0.l, 1),
-    gsSPLight(&eyerok_seg5_lights_0500C6B0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(eyerok_seg5_vertex_0500C6C8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),

@@ -1,7 +1,6 @@
 #include <PR/ultratypes.h>
 #include <stdio.h>
 
-#include "bad_declarations.h"
 #include "debug_utils.h"
 #include "draw_objects.h"
 #include "dynlist_proc.h"
@@ -626,12 +625,7 @@ struct GdObj *d_makeobj(enum DObjTypes type, DynObjName name) {
         case D_DATA_GRP:
             d_makeobj(D_GROUP, name);
             ((struct ObjGroup *) sDynListCurObj)->linkType = 1;
-//! @bug Returns garbage when making `D_DATA_GRP` object
-#ifdef AVOID_UB
             return NULL;
-#else
-            return;
-#endif
         case D_CAMERA:
             dobj = &make_camera(0, NULL)->header;
             break;
@@ -1228,7 +1222,7 @@ void d_map_materials(DynObjName name) {
 
 /**
  * For all faces in the current `ObjGroup`, resolve their vertex indices to
- * `ObjVertex` pointers that point to vertices in the specified vertex group. 
+ * `ObjVertex` pointers that point to vertices in the specified vertex group.
  * Also compute normals for all faces in the current `ObjGroup` and all vertices
  * in the specified vertex group.
  * See `map_vertices()` for more info.
@@ -1893,47 +1887,6 @@ void d_set_att_offset(const struct GdVec3f *off) {
             fatal_printf("%s: Object '%s'(%x) does not support this function.", "dSetAttOffset()",
                          sDynListCurInfo->name, sDynListCurObj->type);
     }
-}
-
-/**
- * An incorrectly-coded recursive function that was presumably supposed to
- * set the offset of an attached object. Now, it will only call itself
- * until it encounters a NULL pointer, which will trigger a `fatal_printf()`
- * call.
- *
- * @note Not called
- */
-void d_set_att_to_offset(UNUSED u32 a) {
-    struct GdObj *dynobj; // sp3c
-    UNUSED u8 filler[24];
-
-    if (sDynListCurObj == NULL) {
-        fatal_printf("proc_dynlist(): No current object");
-    }
-
-    dynobj = sDynListCurObj;
-    d_stash_dynobj();
-    switch (sDynListCurObj->type) {
-        case OBJ_TYPE_JOINTS:
-            set_cur_dynobj(((struct ObjJoint *) dynobj)->attachedToObj);
-            break;
-        case OBJ_TYPE_NETS:
-            set_cur_dynobj(((struct ObjNet *) dynobj)->attachedToObj);
-            break;
-        case OBJ_TYPE_PARTICLES:
-            set_cur_dynobj(((struct ObjParticle *) dynobj)->attachedToObj);
-            break;
-        default:
-            fatal_printf("%s: Object '%s'(%x) does not support this function.", "dSetAttToOffset()",
-                         sDynListCurInfo->name, sDynListCurObj->type);
-    }
-
-    if (sDynListCurObj == NULL) {
-        fatal_printf("dSetAttOffset(): Object '%s' isnt attached to anything",
-                     sStashedDynObjInfo->name);
-    }
-    d_set_att_to_offset(a);
-    d_unstash_dynobj();
 }
 
 /**
@@ -2635,7 +2588,7 @@ void d_set_parm_ptr(enum DParmPtr param, void *ptr) {
                         fatal_printf("dsetparmp() too many points");
                     }
                     // `ptr` here is a vertex index, not an actual pointer.
-                    // These vertex indices later get converted to `ObjVertex` pointers when `find_thisface_verts` is called. 
+                    // These vertex indices later get converted to `ObjVertex` pointers when `find_thisface_verts` is called.
                     ((struct ObjFace *) sDynListCurObj)->vertices[((struct ObjFace *) sDynListCurObj)->vtxCount++] = ptr;
                     break;
                 default:

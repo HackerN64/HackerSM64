@@ -153,7 +153,7 @@
 #define /*0x17C*/ oOpacity                                      OBJECT_FIELD_S32(0x3D)
 #define /*0x180*/ oDamageOrCoinValue                            OBJECT_FIELD_S32(0x3E)
 #define /*0x184*/ oHealth                                       OBJECT_FIELD_S32(0x3F)
-#define /*0x188*/ oBehParams                                    OBJECT_FIELD_S32(0x40)
+#define /*0x188*/ oBehParams                                    OBJECT_FIELD_U32(0x40)
 #define /*0x18C*/ oPrevAction                                   OBJECT_FIELD_S32(0x41)
 #define /*0x190*/ oInteractionSubtype                           OBJECT_FIELD_U32(0x42)
 #define /*0x194*/ oCollisionDistance                            OBJECT_FIELD_F32(0x43)
@@ -179,11 +179,6 @@
 #define /*0x104*/ oPathedPrevWaypointFlags OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oPathedTargetPitch       OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oPathedTargetYaw         OBJECT_FIELD_S32(0x21)
-
-/* Special Object Macro */
-#define /*0x108*/ oMacroUnk108 OBJECT_FIELD_F32(0x20)
-#define /*0x10C*/ oMacroUnk10C OBJECT_FIELD_F32(0x21)
-#define /*0x110*/ oMacroUnk110 OBJECT_FIELD_F32(0x22)
 
 /* Mario */
 #define /*0x0F4*/ oMarioParticleFlags    OBJECT_FIELD_S32(0x1B)
@@ -606,7 +601,7 @@
 #define /*0x110*/ oIsFloomba OBJECT_FIELD_S32(0x22)
 
 #ifdef INTRO_FLOOMBAS
-#define /*0x1AC*/ oZoomCounter OBJECT_FIELD_S32(0x49)
+#define /*0x1AC*/ oZoomCounter OBJECT_FIELD_U32(0x49)
 #define /*0x1B0*/ oZoomPosZ    OBJECT_FIELD_F32(0x4A)
 #endif
 #endif
@@ -797,6 +792,9 @@
 #define /*0x0F8*/ oRespawnerMinSpawnDist      OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oRespawnerBehaviorToRespawn OBJECT_FIELD_CVPTR(0x1D)
 
+/* Orange Number */
+#define /*0x110*/ oOrangeNumberOffset OBJECT_FIELD_S32(0x22)
+
 /* Openable Grill */
 #define /*0x088*/ oOpenableGrillIsOpen         OBJECT_FIELD_S32(0x00)
 #define /*0x0F4*/ oOpenableGrillFloorSwitchObj OBJECT_FIELD_OBJ(0x1B)
@@ -973,11 +971,7 @@
 #define /*0x104*/ oSnufitBodyScalePeriod OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oSnufitBodyBaseScale   OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oSnufitBullets         OBJECT_FIELD_S32(0x21)
-#define /*0x1AC*/ oSnufitOffsetVec       OBJECT_FIELD_S16(0x49, 0) // start pos of s16 vec
-#define /*0x1AC*/ oSnufitXOffset         OBJECT_FIELD_S16(0x49, 0)
-#define /*0x1AE*/ oSnufitYOffset         OBJECT_FIELD_S16(0x49, 1)
-#define /*0x1B0*/ oSnufitZOffset         OBJECT_FIELD_S16(0x4A, 0)
-#define /*0x1B2*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x4A, 1)
+#define /*0x1AC*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x49, 0)
 
 /* Spindel */
 #define /*0x0F4*/ oSpindelMoveTimer     OBJECT_FIELD_S32(0x1B)
@@ -1002,6 +996,7 @@
 /* Hidden Star */
 // Secrets/Red Coins
 #define /*0x0F4*/ oHiddenStarTriggerCounter OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oHiddenStarTriggerTotal OBJECT_FIELD_S32(0x1C)
 
 /* Sealed Door Star */
 #define /*0x108*/ oUnlockDoorStarState  OBJECT_FIELD_U32(0x20)
@@ -1047,7 +1042,6 @@
 #define /*0x0F4*/ oTiltingPyramidNormalX         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_X_INDEX)
 #define /*0x0F8*/ oTiltingPyramidNormalY         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_Y_INDEX)
 #define /*0x0FC*/ oTiltingPyramidNormalZ         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_Z_INDEX)
-#define /*0x10C*/ oTiltingPyramidMarioOnPlatform OBJECT_FIELD_S32(0x21)
 
 /* Toad Message */
 #define /*0x108*/ oToadMessageDialogId       OBJECT_FIELD_U32(0x20)

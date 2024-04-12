@@ -1,16 +1,8 @@
 // Cannon Base
 
 // 0x08004988
-static const Lights1 cannon_base_seg8_lights_08004988 = gdSPDefLights1(
-    0x4c, 0x4c, 0x4c,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x080049A0
-static const Lights1 cannon_base_seg8_lights_080049A0 = gdSPDefLights1(
-    0x0e, 0x10, 0x4c,
-    0x30, 0x37, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x080049B8
 ALIGNED8 static const Texture cannon_base_seg8_texture_080049B8[] = {
@@ -116,8 +108,8 @@ const Gfx cannon_base_seg8_dl_08005658[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cannon_base_seg8_texture_080049B8),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&cannon_base_seg8_lights_08004988.l, 1),
-    gsSPLight(&cannon_base_seg8_lights_08004988.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x4c4c4cff),
     gsSPVertex(cannon_base_seg8_vertex_080051B8, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  4, 0x0),
     gsSP2Triangles( 0,  2,  5, 0x0,  0,  5,  3, 0x0),
@@ -128,8 +120,8 @@ const Gfx cannon_base_seg8_dl_08005658[] = {
 
 // 0x080056D0 - 0x080057F8
 const Gfx cannon_base_seg8_dl_080056D0[] = {
-    gsSPLight(&cannon_base_seg8_lights_080049A0.l, 1),
-    gsSPLight(&cannon_base_seg8_lights_080049A0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x3037ffff),
+    gsSPLightColor(LIGHT_2, 0xe104cff),
     gsSPVertex(cannon_base_seg8_vertex_08005278, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),

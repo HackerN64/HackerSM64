@@ -153,7 +153,7 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
             break;
 
         case 0xf0:
-            gSoundMode = cmd->u2.as_s32;
+            // gSoundMode = cmd->u2.as_s32; // Commenting this out, as the way to reset this has been removed.
             break;
 
         case 0xf1:

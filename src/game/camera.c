@@ -27,6 +27,7 @@
 #include "level_table.h"
 #include "config.h"
 #include "puppyprint.h"
+#include "profiling.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
@@ -2865,16 +2866,12 @@ void update_lakitu(struct Camera *c) {
     gLakituState.defMode = c->defMode;
 }
 
-
 /**
  * The main camera update function.
  * Gets controller input, checks for cutscenes, handles mode changes, and moves the camera
  */
 void update_camera(struct Camera *c) {
-#if PUPPYPRINT_DEBUG
-    OSTime first   = osGetTime();
-    OSTime colTime = collisionTime[perfIteration];
-#endif
+    PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     gCamera = c;
     update_camera_hud_status(c);
     if (c->cutscene == CUTSCENE_NONE
@@ -3117,10 +3114,7 @@ void update_camera(struct Camera *c) {
     }
 #endif
     gLakituState.lastFrameAction = sMarioCamState->action;
-#if PUPPYPRINT_DEBUG
-    profiler_update(cameraTime, first);
-    cameraTime[perfIteration] -= collisionTime[perfIteration]-colTime;
-#endif
+    profiler_update(PROFILER_TIME_CAMERA, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
 }
 
 /**
@@ -4265,7 +4259,7 @@ s32 is_pos_in_bounds(Vec3f pos, Vec3f center, Vec3f bounds, s16 boundsYaw) {
             -bounds[2] < rel[2] && rel[2] < bounds[2]);
 }
 
-s32 calculate_pitch(Vec3f from, Vec3f to) {
+s16 calculate_pitch(Vec3f from, Vec3f to) {
     f32 dx = to[0] - from[0];
     f32 dy = to[1] - from[1];
     f32 dz = to[2] - from[2];
@@ -4274,7 +4268,7 @@ s32 calculate_pitch(Vec3f from, Vec3f to) {
     return pitch;
 }
 
-s32 calculate_yaw(Vec3f from, Vec3f to) {
+s16 calculate_yaw(Vec3f from, Vec3f to) {
     f32 dx = to[0] - from[0];
     // UNUSED f32 dy = to[1] - from[1];
     f32 dz = to[2] - from[2];
@@ -4782,6 +4776,9 @@ void start_cutscene(struct Camera *c, u8 cutscene) {
  * @return the victory cutscene to use
  */
 s32 determine_dance_cutscene(UNUSED struct Camera *c) {
+#ifdef NON_STOP_STARS
+    return CUTSCENE_DANCE_DEFAULT;
+#else
     u8 cutscene = CUTSCENE_NONE;
     u8 cutsceneIndex = 0;
     u8 starIndex = (gLastCompletedStarNum - 1) / 2;
@@ -4804,6 +4801,7 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
     }
     cutscene = sDanceCutsceneTable[cutsceneIndex];
     return cutscene;
+#endif
 }
 
 /**
@@ -11031,7 +11029,9 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
             case CAM_FOV_APP_60:
                 approach_fov_60(marioState);
                 break;
-            //! No default case
+            default:
+                set_fov_45(marioState);
+                break;
         }
     }
 

@@ -1,8 +1,4 @@
 // 0x07016718 - 0x07016730
-static const Lights1 ccm_seg7_lights_07016718 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07016730 - 0x07016770
 static const Vtx ccm_seg7_vertex_07016730[] = {
@@ -1500,8 +1496,8 @@ static const Gfx ccm_seg7_dl_0701B0E0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snow_09005000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ccm_seg7_lights_07016718.l, 1),
-    gsSPLight(&ccm_seg7_lights_07016718.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(ccm_seg7_vertex_07016730, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSPEndDisplayList(),
@@ -2003,6 +1999,9 @@ static const Gfx ccm_seg7_dl_0701C5C8[] = {
 // 0x0701CC40 - 0x0701CE30
 static const Gfx ccm_seg7_dl_0701CC40[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snow_09001000),
+#ifdef USE_FRUSTRATIO2
+    gsSPClipRatio(FRUSTRATIO_1),
+#endif
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPVertex(ccm_seg7_vertex_0701AB50, 16, 0),
@@ -2039,6 +2038,9 @@ static const Gfx ccm_seg7_dl_0701CC40[] = {
     gsSPVertex(ccm_seg7_vertex_0701B040, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  7,  8,  9, 0x0),
+#ifdef USE_FRUSTRATIO2
+    gsSPClipRatio(FRUSTRATIO_2),
+#endif
     gsSPEndDisplayList(),
 };
 

@@ -35,6 +35,7 @@ static struct Object *sEndLeftToadObj;
 static struct Object *sEndJumboStarObj;
 static s16 sEndPeachAnimation;
 static s16 sEndToadAnims[2];
+ModelID32 gStarModelLastCollected = MODEL_STAR;
 
 Vp sEndCutsceneVp = {
     {
@@ -582,15 +583,27 @@ s32 act_debug_free_move(struct MarioState *m) {
 }
 
 void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
+    struct Object *celebStar = NULL;
+
     if (m->actionState == ACT_STATE_STAR_DANCE_CUTSCENE) {
         switch (++m->actionTimer) {
             case 1:
-                spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
+                celebStar = spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
+#ifdef STAR_DANCE_USES_STARS_MODEL
+                obj_set_model(celebStar, gStarModelLastCollected);
+#else
+                if (gStarModelLastCollected == MODEL_BOWSER_KEY) {
+                    obj_set_model(celebStar, gStarModelLastCollected);
+                }
+#endif
                 disable_background_sound();
+                //! TODO: Is this check necessary? Both seem to do the exact same thing.
                 if (m->actionArg & 1) {
-                    play_course_clear();
+                    // No exit
+                    play_course_clear(obj_has_model(celebStar, MODEL_BOWSER_KEY));
                 } else {
-                    if (gCurrLevelNum == LEVEL_BOWSER_1 || gCurrLevelNum == LEVEL_BOWSER_2) {
+                    // Exit
+                    if (obj_has_model(celebStar, MODEL_BOWSER_KEY)) {
                         play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_KEY), 0);
                     } else {
                         play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_STAR), 0);
@@ -1166,9 +1179,8 @@ s32 act_death_exit(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
+#ifdef ENABLE_LIVES
         m->numLives--;
-#ifdef SAVE_NUM_LIVES
-        save_file_set_num_lives(m->numLives);
 #endif
         // restore 7.75 units of health
         m->healCounter = 31;
@@ -1184,9 +1196,8 @@ s32 act_death_exit(struct MarioState *m) {
 s32 act_unused_death_exit(struct MarioState *m) {
     if (launch_mario_until_land(m, ACT_FREEFALL_LAND_STOP, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
+#ifdef ENABLE_LIVES
         m->numLives--;
-#ifdef SAVE_NUM_LIVES
-        save_file_set_num_lives(m->numLives);
 #endif
         // restore 7.75 units of health
         m->healCounter = 31;
@@ -1205,9 +1216,8 @@ s32 act_falling_death_exit(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
+#ifdef ENABLE_LIVES
         m->numLives--;
-#ifdef SAVE_NUM_LIVES
-        save_file_set_num_lives(m->numLives);
 #endif
         // restore 7.75 units of health
         m->healCounter = 31;
@@ -1261,9 +1271,8 @@ s32 act_special_death_exit(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
+#ifdef ENABLE_LIVES
         m->numLives--;
-#ifdef SAVE_NUM_LIVES
-        save_file_set_num_lives(m->numLives);
 #endif
         m->healCounter = 31;
     }
@@ -1463,6 +1472,7 @@ s32 act_teleport_fade_in(struct MarioState *m) {
         }
     }
 
+    m->pos[1] = m->floorHeight;
     stop_and_set_height_to_floor(m);
 
     return FALSE;

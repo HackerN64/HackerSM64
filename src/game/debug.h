@@ -45,11 +45,27 @@ extern u32   __n64Assert_LineNum;
 extern char *__n64Assert_Message;
 extern void __n64Assert(char *fileName, u32 lineNum, char *message);
 
+/**
+ * Will always cause a crash with your message of choice
+ */
+#define error(message) __n64Assert(__FILE__, __LINE__, (message))
 
+/**
+ * Will always cause a crash if cond is not true (handle with care)
+ */
+#define aggress(cond, message) do {\
+    if ((cond) == FALSE) { \
+        error(message); \
+    } \
+} while (0);
+
+/**
+ * Will cause a crash if cond is not true, and DEBUG is defined (allows for quick removal of littered asserts)
+ */
 #ifdef DEBUG
 #define assert(cond, message) do {\
     if ((cond) == FALSE) { \
-        __n64Assert(__FILE__, __LINE__, (message)); \
+        error(message); \
     } \
 } while (0);
 #else
