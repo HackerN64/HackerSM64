@@ -2373,7 +2373,7 @@ void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) 
  * Called from threads: thread5_game_loop
  * Plays the primary music and stops playing the secondary music. Call it to cancel the above function.
  */
-void play_primary_music(u16 fadeTimer) {
+void stop_secondary_music(u16 fadeTimer) {
     if (sBackgroundMusicTargetVolume != TARGET_VOLUME_UNSET) {
         sBackgroundMusicTargetVolume = TARGET_VOLUME_UNSET;
         D_80332120 = 0;
