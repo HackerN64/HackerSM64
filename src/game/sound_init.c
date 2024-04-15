@@ -220,7 +220,7 @@ void play_infinite_stairs_music(void) {
         if (shouldPlay) {
             play_secondary_music(SEQ_EVENT_ENDLESS_STAIRS, 0, 255, 1000);
         } else {
-            func_80321080(500);
+            stop_secondary_music(500);
         }
     }
 #endif
