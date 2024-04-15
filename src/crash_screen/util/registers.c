@@ -283,7 +283,7 @@ static const CoprocessorInfo sCoprocessorInfo_CP3 = {
 
 const char* sRegDesc_FCR[] = {
     [REG_DESC_FCR_COP_IMPL_REV  ] = "coprocessor implementation/revision",
-    [REG_DESC_FCR_CONTROL_STATUS] = "floating point ontrol/status",
+    [REG_DESC_FCR_CONTROL_STATUS] = "floating point control/status",
 };
 ALIGNED32 static const RegisterInfo sRegisters_FCR[2] = {
     [REG_DESC_FCR_COP_IMPL_REV  ] = DEF_SREG(       sizeof(u32), "FCR0",  "FC", REG_DESC_FCR_COP_IMPL_REV  ),
