@@ -4,11 +4,17 @@
 #ifndef NO_SEGMENTED_MEMORY
 #define DECLARE_SEGMENT(name) \
     extern u8 _##name##SegmentRomStart[]; \
-    extern u8 _##name##SegmentRomEnd[];
+    extern u8 _##name##SegmentRomEnd[]; \
+    extern u8 _##name##SegmentStart[]; \
+    extern u8 _##name##SegmentEnd[];
 
 #define DECLARE_NOLOAD(name) \
     extern u8 _##name##SegmentBssStart[]; \
     extern u8 _##name##SegmentBssEnd[];
+
+#define DECLARE_TEXT(name) \
+    extern u8 _##name##SegmentTextStart[]; \
+    extern u8 _##name##SegmentTextEnd[];
 
 #define DECLARE_ACTOR_SEGMENT(name) \
     DECLARE_SEGMENT(name##_mio0) \
@@ -42,32 +48,34 @@ DECLARE_ACTOR_SEGMENT(group15)
 DECLARE_ACTOR_SEGMENT(group16)
 DECLARE_ACTOR_SEGMENT(group17)
 
-DECLARE_SEGMENT(entry)
+// BEGIN_SEG()
+DECLARE_SEGMENT(boot) // Segment 4
+#ifdef KEEP_MARIO_HEAD
+DECLARE_SEGMENT(gd_dynlists) // Segment 4
+#endif // KEEP_MARIO_HEAD
+#ifdef HVQM
+DECLARE_NOLOAD(hvqmwork)
+DECLARE_NOLOAD(adpcmbuf)
+DECLARE_NOLOAD(hvqbuf)
+#endif // HVQM
+DECLARE_SEGMENT(entry) // Segment 7
 DECLARE_SEGMENT(main)
+DECLARE_NOLOAD(main)
 DECLARE_SEGMENT(engine)
-DECLARE_SEGMENT(behavior)
+DECLARE_NOLOAD(engine)
+DECLARE_SEGMENT(behavior) // Segment 19
 DECLARE_NOLOAD(behavior)
 DECLARE_SEGMENT(crashscreen)
 DECLARE_NOLOAD(crashscreen)
 DECLARE_SEGMENT(scripts)
 DECLARE_SEGMENT(goddard)
+DECLARE_NOLOAD(goddard)
 DECLARE_SEGMENT(framebuffers)
+DECLARE_NOLOAD(framebuffers)
+DECLARE_NOLOAD(zbuffer)
+DECLARE_NOLOAD(buffers)
 DECLARE_SEGMENT(assets)
-extern u8 _goddardSegmentStart[];
-extern u8 _goddardSegmentEnd[];
-extern u8 _engineSegmentStart[];
-extern u8 _engineSegmentBssEnd[];
-extern u8 _mainSegmentStart[];
-extern u8 _mainSegmentEnd[];
-extern u8 _engineSegmentEnd[];
-extern u8 _crashscreenSegmentStart[];
-extern u8 _crashscreenSegmentEnd[];
-extern u8 _framebuffersSegmentBssStart[];
-extern u8 _framebuffersSegmentBssEnd[];
-extern u8 _zbufferSegmentBssStart[];
-extern u8 _zbufferSegmentBssEnd[];
-extern u8 _buffersSegmentBssStart[];
-extern u8 _buffersSegmentBssEnd[];
+DECLARE_SEGMENT(mapData)
 
 DECLARE_LEVEL_SEGMENT(menu)
 DECLARE_LEVEL_SEGMENT(intro)
@@ -115,7 +123,7 @@ DECLARE_SEGMENT(debug_level_select_yay0)
 DECLARE_SEGMENT(translation_de_yay0)
 DECLARE_SEGMENT(translation_en_yay0)
 DECLARE_SEGMENT(translation_fr_yay0)
-#endif
+#endif // VERSION_EU
 
 //added for compatibility
 DECLARE_SEGMENT(segment2_mio0)
@@ -152,8 +160,8 @@ DECLARE_SEGMENT(debug_level_select_mio0)
 DECLARE_SEGMENT(translation_de_mio0)
 DECLARE_SEGMENT(translation_en_mio0)
 DECLARE_SEGMENT(translation_fr_mio0)
-#endif
+#endif // VERSION_EU
 
-#endif
+#endif // !NO_SEGMENTED_MEMORY
 
 #endif // SEGMENT_SYMBOLS_H

@@ -127,7 +127,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
             case ASSERT_TYPE_LEVEL:
                 // line = (CRASH_SCREEN_NUM_CHARS_Y - 3 - 1);
                 line++;
-                CSTextCoord_u32 levelStrSize = cs_print(x, TEXT_Y(line), "Level %d: %s", 
+                CSTextCoord_u32 levelStrSize = cs_print(x, TEXT_Y(line), "Level %d %s", 
                     gCurrLevelNum, get_level_name(gCurrLevelNum)
                 );
                 if (gCurrentArea != NULL) {
@@ -137,6 +137,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
             case ASSERT_TYPE_RCP:
                 // line = (CRASH_SCREEN_NUM_CHARS_Y - 3 - 3);
                 line++;
+                //! TODO: Other RCP registers.
                 cs_print(x, TEXT_Y(line), "DPC:\t0x%08X in 0x%08X-0x%08X\nSTAT:\tdp:0x%04X\tsp:0x%04X\nSP DMA:\tfull:%X busy:%X", 
                     IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG),
                     IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG),

@@ -340,6 +340,7 @@ static const IdNamePair sROMSegNames_03_common1_gfx[] = {
 // 04: SEGMENT_GROUP0_YAY0
 static const IdNamePair sROMSegNames_04_group0_gfx[] = {
     DEF_ROM_SEG_YAY0(group0),
+    DEF_ROM_SEG(boot),
     ID_LIST_END(),
 };
 // 05: SEGMENT_GROUPA_YAY0
