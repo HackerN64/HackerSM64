@@ -1525,14 +1525,14 @@ void reset_red_coins_collected(void) {
 
 LangArray textReonucam1 = DEFINE_LANGUAGE_ARRAY(
     "CAMERA SPEED: %d",
-    "FRENCH PLACEHOLDER: %d",
+    "VITESSE CAMÉRA: %d",
     "KAMERA GESCHWINDIGKEIT: %d",
     "JAPANESE PLACEHOLDER: %d",
     "VELOCIDAD DE CÁMARA: %d");
 
 LangArray textReonucam2 = DEFINE_LANGUAGE_ARRAY(
     "DPAD TO CHANGE",
-    "FRENCH PLACEHOLDER",
+    "CHANGER AVEC DPAD",
     "DPAD ZU ÄNDERN",
     "JAPANESE PLACEHOLDER",
     "DPAD PARA CAMBIAR");
