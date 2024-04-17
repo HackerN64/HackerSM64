@@ -243,7 +243,7 @@ extern u32 __osSpDeviceBusy(void);
 _Bool try_read_word_aligned(Word* dest, Address addr) {
     addr = ALIGNFLOOR(addr, sizeof(Word));
 
-    Address physAddr = osVirtualToPhysical((void*)addr);
+    Address physAddr = ((addr >= K0BASE) ? osVirtualToPhysical((void*)addr) : addr);
 
     // Check whether the address is virtually mapped (would throw a TLB exception):
     if (physAddr == ((Address)-1)) {
