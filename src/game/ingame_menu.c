@@ -1527,14 +1527,14 @@ LangArray textReonucam1 = DEFINE_LANGUAGE_ARRAY(
     "CAMERA SPEED: %d",
     "VITESSE CAMÉRA: %d",
     "KAMERA GESCHWINDIGKEIT: %d",
-    "JAPANESE PLACEHOLDER: %d",
+    "カメラそくど: %d",
     "VELOCIDAD DE CÁMARA: %d");
 
 LangArray textReonucam2 = DEFINE_LANGUAGE_ARRAY(
     "DPAD TO CHANGE",
     "CHANGER AVEC DPAD",
     "DPAD ZU ÄNDERN",
-    "JAPANESE PLACEHOLDER",
+    "DPADでへんこう",
     "DPAD PARA CAMBIAR");
 
 #ifdef REONUCAM
