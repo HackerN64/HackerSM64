@@ -67,11 +67,11 @@ extern const u8 gGoddardSize[];
 
 
 f32 percent_of(f32 size, f32 totalSize) {
-    return size / totalSize * 100.0f;
+    return (size / totalSize * 100.0f);
 }
 
 f32 bytes_to_megabytes(size_t size) {
-    return (f32)size / (f32)RAM_1MB;
+    return ((f32)size / (f32)RAM_1MB);
 }
 
 #define STR_SUFFIX_BYTES        "b"
@@ -79,15 +79,19 @@ f32 bytes_to_megabytes(size_t size) {
 #define STR_SUFFIX_MEGABYTES    "mb"
 #define STR_ABOUT_DECIMAL_FMT   "%.2g"
 #define STR_PERCENT_OF_ROM      "(~"STR_ABOUT_DECIMAL_FMT"%%%%rom)" //! TODO: Why does the first "%%" get eaten when using a float here?
-#define STR_LPL_VERSION         "v%d.%d.%d"
+#define STR_MAJOR_MINOR_PATCH   "%d.%d.%d"
+#define STR_LPL_VERSION         "v"STR_MAJOR_MINOR_PATCH
 
 #define ABOUT_ENTRY_FUNC(_name, fmt, ...) void _cs_about_func_##_name(char* buf) { sprintf(buf, fmt, ##__VA_ARGS__); }
 
 ABOUT_ENTRY_FUNC(empty,          "")
 ABOUT_ENTRY_FUNC(hackersm64_v,   HackerSM64_version_txt)
 ABOUT_ENTRY_FUNC(crash_screen_v, CrashScreen_version_txt)
-ABOUT_ENTRY_FUNC(compiler,       __compiler__)
+ABOUT_ENTRY_FUNC(compiler,       __compiler__) // __VERSION__ // STR_MAJOR_MINOR_PATCH, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__
 ABOUT_ENTRY_FUNC(linker,         __linker__)
+#ifdef __STDC__
+ABOUT_ENTRY_FUNC(stdc_version,   "%luL", __STDC_VERSION__)
+#endif // __STDC__
 ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
 ABOUT_ENTRY_FUNC(microcode,      gUcodeName)
@@ -254,12 +258,15 @@ CSAboutEntry sCSAboutEntries_buttons[CS_NUM_ABOUT_ENTRIES_TITLE] = {
     [CS_ABOUT_ENTRY_BUTTONS_END         ] = ABOUT_ENTRY_NULL(),
 };
 CSAboutEntry sCSAboutEntries_compiler[CS_NUM_ABOUT_ENTRIES_COMPILER] = {
-    [CS_ABOUT_GROUP_HEADER_COMPILER    ] = ABOUT_ENTRY_HEADER("compiler", TRUE),
-    [CS_ABOUT_ENTRY_COMPILER_COMPILER_1] = ABOUT_ENTRY_LONG1(compiler,       "COMPILER"      ),
-    [CS_ABOUT_ENTRY_COMPILER_COMPILER_2] = ABOUT_ENTRY_LONG2(compiler,       "COMPILER"      ),
-    [CS_ABOUT_ENTRY_COMPILER_LINKER_1  ] = ABOUT_ENTRY_LONG1(linker,         "LINKER"        ),
-    [CS_ABOUT_ENTRY_COMPILER_LINKER_2  ] = ABOUT_ENTRY_LONG2(linker,         "LINKER"        ),
-    [CS_ABOUT_ENTRY_COMPILER_END       ] = ABOUT_ENTRY_NULL(),
+    [CS_ABOUT_GROUP_HEADER_COMPILER      ] = ABOUT_ENTRY_HEADER("compiler", TRUE),
+    [CS_ABOUT_ENTRY_COMPILER_COMPILER_1  ] = ABOUT_ENTRY_LONG1(compiler,       "COMPILER"      ),
+    [CS_ABOUT_ENTRY_COMPILER_COMPILER_2  ] = ABOUT_ENTRY_LONG2(compiler,       "COMPILER"      ),
+    [CS_ABOUT_ENTRY_COMPILER_LINKER_1    ] = ABOUT_ENTRY_LONG1(linker,         "LINKER"        ),
+    [CS_ABOUT_ENTRY_COMPILER_LINKER_2    ] = ABOUT_ENTRY_LONG2(linker,         "LINKER"        ),
+#ifdef __STDC__
+    [CS_ABOUT_ENTRY_COMPILER_STDC_VERSION] = ABOUT_ENTRY_SINGLE(stdc_version,  "STDC VERSION"  ),
+#endif // __STDC__
+    [CS_ABOUT_ENTRY_COMPILER_END         ] = ABOUT_ENTRY_NULL(),
 };
 CSAboutEntry sCSAboutEntries_rom[CS_NUM_ABOUT_ENTRIES_ROM] = {
     [CS_ABOUT_GROUP_HEADER_ROM      ] = ABOUT_ENTRY_HEADER("rom", TRUE),
