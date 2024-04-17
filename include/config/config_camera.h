@@ -40,26 +40,25 @@
 #define FAST_VERTICAL_CAMERA_MOVEMENT
 
 /**
- * Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad.
- */
-#define PARALLEL_LAKITU_CAM
-
-/**
- * Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
- */
-// #define PUPPYCAM
-
-/**
- * Enables camera collision for 8 direction camera and, by extension, to Reonucam if enabled.
+ * Enables camera collision for 8 direction camera and, by extension, to Parallel Lakitu cam or Reonucam if enabled.
  * If you enable it, please consider using surface types with the SURFACE_FLAG_NO_CAM_COLLISION flag for small obstacles,
  * such as fences, pillars, signs, etc, in order to make your game more enjoyable and not let the camera get in the way of gameplay.
  */
 #define EIGHT_DIR_CAMERA_COLLISION
 
-// Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that also uses less buttons.
+/**
+ * Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad. Will be disabled if Reonucam is enabled.
+ */
+#define PARALLEL_LAKITU_CAM
+
+// Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that doesn't use a single button more than the vanilla camera. 
 // An explanation the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k (please note that the analog feature shown at the end is no longer present)
 #define REONUCAM
 
+/**
+ * Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
+ */
+// #define PUPPYCAM
 
 /**********************************/
 /***** Vanilla config options *****/
