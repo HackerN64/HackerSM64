@@ -1149,7 +1149,7 @@ void eight_dir_collision_handler(struct Camera *c) {
     Vec3f thick;
     Vec3f hitpos;
     vec3f_copy(origin,gMarioState->pos);
-    origin[1] += 50.0f;
+    origin[1] += 300.0f; // the ray is cast from 300 units above Mario in order to prevent small obstacles from constantly snapping the camera
     camdir[0] = c->pos[0] - origin[0];
     camdir[1] = c->pos[1] - origin[1];
     camdir[2] = c->pos[2] - origin[2];
