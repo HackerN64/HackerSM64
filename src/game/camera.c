@@ -1143,16 +1143,21 @@ s32 snap_to_45_degrees(s16 angle) {
 #ifdef EIGHT_DIR_CAMERA_COLLISION
 void eight_dir_collision_handler(struct Camera *c) {
     struct Surface *surf;
+
     Vec3f camdir;
     Vec3f origin;
     Vec3f thick;
     Vec3f hitpos;
+
     vec3f_copy(origin,gMarioState->pos);
+
     origin[1] += 300.0f; // the ray is cast from 300 units above Mario in order to prevent small obstacles from constantly snapping the camera
     camdir[0] = c->pos[0] - origin[0];
     camdir[1] = c->pos[1] - origin[1];
     camdir[2] = c->pos[2] - origin[2];
+
     find_surface_on_ray(origin, camdir, &surf, hitpos, (RAYCAST_FIND_FLOOR | RAYCAST_FIND_WALL | RAYCAST_FIND_CEIL));
+
     if (surf) {
         f32 distFromSurf = 100.0f;
         f32 dist;
@@ -1171,23 +1176,27 @@ void eight_dir_collision_handler(struct Camera *c) {
         thick[2] = coss(yaw) * distFromSurf;
         vec3f_add(hitpos,thick);
         vec3f_copy(c->pos,hitpos);
-
     }
+
     c->yaw = atan2s(c->pos[2] - gMarioState->pos[2], c->pos[0] - gMarioState->pos[0]);
+
 }
 #endif
 
 #ifdef REONUCAM
 f32 cameraSpeeds[] = {0.5f, 1.f, 1.5f, 2.f, 3.5f}; // The camera speed settings, from slowest to fastest.
+
 void reonucam_handler(void) {
     // Get the camera speed based on the user's setting
     f32 cameraSpeed = cameraSpeeds[gReonucamState.speed];
+    
     //45º rotations
     if ((gPlayer1Controller->buttonPressed & L_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
         s8DirModeBaseYaw =  snap_to_45_degrees(s8DirModeBaseYaw - DEGREES(45));
     } else if ((gPlayer1Controller->buttonPressed & R_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
         s8DirModeBaseYaw =  snap_to_45_degrees(s8DirModeBaseYaw + DEGREES(45));
     }
+
     //Smooth rotation
     if (gPlayer1Controller->buttonDown & R_TRIG) {
         if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
@@ -1206,6 +1215,7 @@ void reonucam_handler(void) {
         }
         gReonucamState.rButtonCounter = 0;
     }
+
     if (gPlayer1Controller->buttonPressed & R_TRIG) {
         if (gReonucamState.rButtonCounter2 <= 5) {
             set_cam_angle(CAM_ANGLE_MARIO); // Enter mario cam if R is pressed 2 times in less than 5 frames
@@ -1216,9 +1226,6 @@ void reonucam_handler(void) {
     } else {
         gReonucamState.rButtonCounter2++;
      }
-    if (gPlayer1Controller->buttonPressed & D_JPAD) {
-       s8DirModeBaseYaw = snap_to_45_degrees(s8DirModeBaseYaw); // Lock the camera to the nearest 45deg axis
-    }
 }
 #endif
 
