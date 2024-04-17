@@ -457,25 +457,6 @@ CameraTransition sModeTransitions[] = {
 extern u8 sDanceCutsceneIndexTable[][4];
 extern u8 sZoomOutAreaMasks[];
 
-#ifdef REONUCAM
-// Returns the camera speed based on the user's camera speed setting
-f32 set_camera_speed(void) {
-    switch(gReonucamState.speed) {
-        case 0:
-            return 0.5f;
-        case 1:
-            return 1;
-        case 2:
-            return 1.5f;
-        case 3:
-            return 2;
-        case 4:
-            return 3.5f;
-    }
-    return 0;
-}
-#endif
-
 /**
  * Starts a camera shake triggered by an interaction
  */
@@ -1161,9 +1142,10 @@ s32 snap_to_45_degrees(s16 angle) {
 }
 
 #ifdef REONUCAM
+f32 cameraSpeeds[] = {0.5f, 1.f, 1.5f, 2.f, 3.5f}; // The camera speed settings, from slowest to fastest.
 void reonucam_handler(void) {
     // Get the camera speed based on the user's setting
-    f32 cameraSpeed = set_camera_speed();
+    f32 cameraSpeed = cameraSpeeds[gReonucamState.speed];
     //45º rotations
     if ((gPlayer1Controller->buttonPressed & L_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
         s8DirModeBaseYaw -= DEGREES(45);

@@ -89,14 +89,6 @@ const struct LanguageTables gLanguageTables[] = DEFINE_LANGUAGE_ARRAY(
     LANGUAGE_TABLES(dialog_table_es, course_name_table_es, act_name_table_es)
 );
 
-#ifdef REONUCAM
-u8 textCamInfoSlowest[] = { TEXT_CAM_INFO_SLOWEST };
-u8 textCamInfoSlow[] = { TEXT_CAM_INFO_SLOW };
-u8 textCamInfoMedium[] = { TEXT_CAM_INFO_MEDIUM };
-u8 textCamInfoFast[] = { TEXT_CAM_INFO_FAST};
-u8 textCamInfoFastest[] = { TEXT_CAM_INFO_FASTEST };
-#endif
-
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
 
@@ -1531,44 +1523,40 @@ void reset_red_coins_collected(void) {
     gRedCoinsCollected = 0;
 }
 
+LangArray textReonucam1 = DEFINE_LANGUAGE_ARRAY(
+    "CAMERA SPEED: %d",
+    "FRENCH PLACEHOLDER: %d",
+    "KAMERA GESCHWINDIGKEIT: %d",
+    "JAPANESE PLACEHOLDER: %d",
+    "VELOCIDAD DE CÁMARA: %d");
+
+LangArray textReonucam2 = DEFINE_LANGUAGE_ARRAY(
+    "DPAD TO CHANGE",
+    "FRENCH PLACEHOLDER",
+    "DPAD ZU ÄNDERN",
+    "JAPANESE PLACEHOLDER",
+    "DPAD PARA CAMBIAR");
+
 #ifdef REONUCAM
 void render_reonucam_speed_setting(void) {
+    char buf[25];
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-    switch (gReonucamState.speed) {
-        case 0:
-            print_generic_string(190, 20, textCamInfoSlowest);
-            break;
-        case 1:
-            print_generic_string(190, 20, textCamInfoSlow);
-            break;
-        case 2:
-            print_generic_string(190, 20, textCamInfoMedium);
-            break;
-        case 3:
-            print_generic_string(190, 20, textCamInfoFast);
-            break;
-        case 4:
-            print_generic_string(190, 20, textCamInfoFastest);
-            break;
-    }
+    sprintf(buf, LANG_ARRAY(textReonucam1), gReonucamState.speed +1 );
+
+    print_generic_string_aligned(310, 24, buf, TEXT_ALIGN_RIGHT);
+    print_generic_string_aligned(310, 8, LANG_ARRAY(textReonucam2), TEXT_ALIGN_RIGHT);
+
+
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     if (gPlayer1Controller->buttonPressed & R_JPAD) {
-        if (gReonucamState.speed < 4) {
-            gReonucamState.speed += 1;
-        } else {
-            gReonucamState.speed = 0;
-        }
-        save_file_set_camera_speed(gReonucamState.speed);
+        gReonucamState.speed++;
     } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
-        if (gReonucamState.speed > 0) {
-            gReonucamState.speed -= 1;
-        } else {
-            gReonucamState.speed = 4;
-        }
-        save_file_set_camera_speed(gReonucamState.speed);
+        gReonucamState.speed--;
     }
+    gReonucamState.speed = (gReonucamState.speed + 5) % 5;
+    save_file_set_camera_speed(gReonucamState.speed);
 }
 #endif
 
