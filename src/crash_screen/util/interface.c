@@ -140,7 +140,6 @@ InterfaceReg iregs_RDB[] = {
     [REGID_RDB_BASE             ] = DEF_IREG(RDB_BASE_REG,          "BASE"             ),
     [REGID_RDB_WRITE_INTR       ] = DEF_IREG(RDB_WRITE_INTR_REG,    "WRITE_INTERRUPT"  ),
     [REGID_RDB_READ_INTR        ] = DEF_IREG(RDB_READ_INTR_REG,     "READ_INTERRUPT"   ),
-    [REGID_RDB_BASE_VIRTUAL_ADDR] = DEF_IREG(RDB_BASE_VIRTUAL_ADDR, "BASE_VIRTUAL_ADDR"),
     DEF_IREG_END(),
 };
 InterfaceReg iregs_GIO_RDB[] = {
