@@ -11,7 +11,7 @@
 #include "game/printf.h"
 
 
-uintptr_t __assert_address = 0x00000000;
+const char* __assert_function = NULL;
 
 
 void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* message, ...) {

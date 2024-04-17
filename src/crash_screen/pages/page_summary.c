@@ -60,13 +60,9 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
     CSTextCoord_u32 maxNumChars = (CRASH_SCREEN_NUM_CHARS_X - 2);
     CSTextCoord_u32 charX = 0;
 
-    Address assertAddr = __assert_address;
-    if (assertAddr == 0x00000000) {
-        __OSThreadContext* tc = &gInspectThread->context;
-        assertAddr = GET_EPC(tc); // This will always be __n64Assert here, unless a new 'syscall' was added somewhere.
+    if (__assert_function != NULL) {
+        cs_print(x, TEXT_Y(line++), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, __assert_function);
     }
-
-    cs_print_addr_location_info(x, TEXT_Y(line++), maxNumChars, assertAddr, TRUE);
 
     if (__n64Assert_Filename != NULL) {
         charX = cs_print_scroll(x, TEXT_Y(line),
@@ -108,7 +104,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
         if (message[0] == CHAR_ASSERT_PREFIX) {
             switch (message[1]) {
                 case CHAR_ASSERT_PREFIX_LEVEL: type = ASSERT_TYPE_LEVEL; break; // ASSERT_PREFIX_LEVEL
-                case CHAR_ASSERT_PREFIX_RCP:   type = ASSERT_TYPE_RCP;   break; // ASSERT_PREFIX_RCP  
+                case CHAR_ASSERT_PREFIX_RCP:   type = ASSERT_TYPE_RCP;   break; // ASSERT_PREFIX_RCP
             }
         }
 
@@ -127,7 +123,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
             case ASSERT_TYPE_LEVEL:
                 // line = (CRASH_SCREEN_NUM_CHARS_Y - 3 - 1);
                 line++;
-                CSTextCoord_u32 levelStrSize = cs_print(x, TEXT_Y(line), "Level %d %s", 
+                CSTextCoord_u32 levelStrSize = cs_print(x, TEXT_Y(line), "Level %d %s",
                     gCurrLevelNum, get_level_name(gCurrLevelNum)
                 );
                 if (gCurrentArea != NULL) {
@@ -138,7 +134,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
                 // line = (CRASH_SCREEN_NUM_CHARS_Y - 3 - 3);
                 line++;
                 //! TODO: Other RCP registers.
-                cs_print(x, TEXT_Y(line), "DPC:\t0x%08X in 0x%08X-0x%08X\nSTAT:\tdp:0x%04X\tsp:0x%04X\nSP DMA:\tfull:%X busy:%X", 
+                cs_print(x, TEXT_Y(line), "DPC:\t0x%08X in 0x%08X-0x%08X\nSTAT:\tdp:0x%04X\tsp:0x%04X\nSP DMA:\tfull:%X busy:%X",
                     IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG),
                     IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG),
                     IO_READ(SP_DMA_FULL_REG), IO_READ(SP_DMA_BUSY_REG)
@@ -359,20 +355,11 @@ void page_summary_print(void) {
     if (tc->cause == EXC_SYSCALL) {
         osSyncPrintf("- ASSERT:\n");
         if (__n64Assert_Filename  != NULL) {
-            osSyncPrintf("-- FILE: %s in LINE: %d:\n", __n64Assert_Filename,__n64Assert_LineNum);
+            osSyncPrintf("-- FILE: %s in LINE: %d:\n", __n64Assert_Filename, __n64Assert_LineNum);
         }
- #ifdef INCLUDE_DEBUG_MAP
-        if (__assert_address) {
-            const MapSymbol* symbol = get_map_symbol(__assert_address, SYMBOL_SEARCH_BACKWARD);
-            if (symbol != NULL) {
-                const char* name = get_map_symbol_name(symbol);
-                if (name != NULL) {
-                    osSyncPrintf("-- FUNC: %s\n", name);
-                }
-            }
-
+        if (__assert_function != NULL) {
+            osSyncPrintf("-- FUNC: %s\n", __assert_function);
         }
- #endif // INCLUDE_DEBUG_MAP
         if (__n64Assert_Condition != NULL) {
             osSyncPrintf("-- CONDITION: %s\n", __n64Assert_Condition);
         }

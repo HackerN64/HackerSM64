@@ -4,10 +4,8 @@
 
 #include "types.h"
 
-#include "asm.h"
 
-
-#define ASSERTF_BUFFER_SIZE 255
+#define ASSERTF_BUFFER_SIZE 256
 
 
 extern const char* __n64Assert_Condition;
@@ -16,7 +14,7 @@ extern int         __n64Assert_LineNum;
 extern const char* __n64Assert_Message;
 
 
-extern uintptr_t __assert_address;
+extern const char* __assert_function;
 
 
 extern void __n64Assert(char* condition, char* fileName, u32 lineNum, char* message);
@@ -33,9 +31,9 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 
 
 /**
- * Set the assert address to the current location.
+ * Get the name of the current function.
  */
-#define SET_ASSERT_ADDRESS() __assert_address = _asm_getaddr()
+#define SET_ASSERT_ADDRESS() { __assert_function = __func__; }
 
 
 /**

@@ -15,7 +15,7 @@
 
 #define ARRAY_COUNT(_arr) (s32)(sizeof(_arr) / sizeof(_arr[0]))
 
-#define BITS_PER_BYTE   8
+#define BITS_PER_BYTE   __CHAR_BIT__
 #define BITS_PER_HEX    4
 #define SIZEOF_BITS(_t) (sizeof(_t) * BITS_PER_BYTE)
 #define SIZEOF_HEX(_t)  (SIZEOF_BITS(_t) / BITS_PER_HEX)
