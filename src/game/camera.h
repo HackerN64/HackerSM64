@@ -92,7 +92,7 @@
 
 #ifdef REONUCAM
 struct ReonucamState {
-    u8 speed;
+    s8 speed;
     u8 waterCamOverride;
     u8 flyingCamOverride;
     u8 keepCliffCam;
