@@ -49,9 +49,14 @@
  */
 // #define PUPPYCAM
 
+/**
+ * Enables camera collision for 8 direction camera and, by extension, to Reonucam if enabled.
+ */
+//#define EIGHT_DIR_CAMERA_COLLISION
+
 // Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that also uses less buttons.
 // An explanation the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k (please note that the analog feature shown at the end is no longer present)
-#define REONUCAM
+//#define REONUCAM
 
 
 /**********************************/
