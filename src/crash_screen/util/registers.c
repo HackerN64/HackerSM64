@@ -6,6 +6,7 @@
 #include "sm64.h"
 
 #include "crash_screen/cs_main.h"
+#include "interface.h"
 #include "map_parser.h"
 #include "memory_read.h"
 

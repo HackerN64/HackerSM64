@@ -58,6 +58,7 @@ CSSetting* gCSSettingsGroups[NUM_CS_OPT_GROUPS] = {
     [CS_OPT_GROUP_PAGE_MAP      ] = cs_settings_group_page_map,
 #endif // INCLUDE_DEBUG_MAP
     [CS_OPT_GROUP_PAGE_SEGMENTS ] = cs_settings_group_page_segments,
+    // [CS_OPT_GORUP_PAGE_INTERFACES] = cs_Settings_group_page_interfaces,
 #ifdef PUPPYPRINT_DEBUG
     [CS_OPT_GROUP_PAGE_LOGS     ] = cs_settings_group_page_logs,
 #endif // PUPPYPRINT_DEBUG

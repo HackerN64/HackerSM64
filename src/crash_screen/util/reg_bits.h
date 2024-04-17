@@ -6,7 +6,7 @@
 
 
 
-// -- COP0 -- 
+// -- COP0 --
 
 // $Index
 typedef union Reg_CP0_Index {
@@ -109,6 +109,7 @@ typedef union Reg_CP0_EntryHi_64 {
 typedef union Reg_CP0_Status {
     struct PACKED {
         u32 CU   : 4; // Controls the usability of each of the four coprocessor unit numbers. [1:usable, 0:unusable]
+#undef RP // Previously defined in PR/region.h
         u32 RP   : 1; // Enables low-power operation by reducing the internal clock frequency and the system interface clock frequency to one-quarter speed. [0:normal, 1:low power mode (1/4th CPU clock speed)]
         u32 FR   : 1; // Enables additional floating-point registers. [0:16 registers, 1:32 registers]
         u32 RE   : 1; // Reverse-Endian bit, enables reverse of system endianness in User mode. [0:disabled (big endian), 1:reversed (little endian)]
@@ -294,7 +295,7 @@ typedef union Reg_FPR_31 {
         u32 Cause   :  6; // See Reg_FPCSR.cause.
         u32 Enables :  5; // See Reg_FPCSR.enable.
         u32 Flags   :  5; // See Reg_FPCSR.flag.
-        u32 RM      :  2; // Round to: (1:zero, 2:+inf, 3:-inf).
+        u32 RM      :  2; // Round to: [1:zero, 2:+inf, 3:-inf].
     };
     struct PACKED {
         u32   : 14;
@@ -328,9 +329,273 @@ typedef union Reg_FPR_31 {
 } Reg_FPR_31;
 
 
-// -- RCP --
+// -- RDRAM--
+// https://n64brew.dev/wiki/RDRAM#RDRAM_registers
+
+// RDRAM_CONFIG_REG/RDRAM_DEVICE_TYPE_REG
+typedef union Reg_RDRAM_Status {
+    struct PACKED {
+        u32 ColumnBits : 4; // Number of column address bits, or said differently, declares that this RDRAM device has 2^ColumnBits bytes per row.
+        u32            : 1;
+        u32 Bn         : 1; // Bonus, number of bits per byte. [0:8bit byte, 1:9bit byte]
+        u32            : 1;
+        u32 En         : 1; // Enhanced speed grade. [0:Normal, 1:Low Latency]
+        u32 BankBits   : 4; // Number of bank address bits, or said differently, declares that this RDRAM device has 2^BankBits banks.
+        u32 RowBits    : 4; // Number of row address bits, or said differently, declares that this RDRAM devices has 2^RowBits rows per bank.
+        u32            : 8;
+        u32 Version    : 4; // RDRAM version. [0b0001:Extended architecture (Base RDRAM protocol), 0b0010:Concurrent RDRAM device (not used on N64, as far as we know)]
+        u32 type       : 4; // Device type. [0b0000:RDRAM device]
+    };
+    u32 raw;
+} Reg_RDRAM_Config;
+// RDRAM_DEVICE_ID_REG
+typedef union Reg_RDRAM_DeviceId {
+    struct PACKED {
+        u32 IdField_25_20 : 6; //
+        u32               : 2; //
+        u32 IdField_26    : 1; //
+        u32               : 7; //
+        u32 IdField_24_27 : 8; //
+        u32 IdField_35    : 1; //
+        u32               : 7; //
+    };
+    u32 raw;
+} Reg_RDRAM_DeviceId;
+// RDRAM_DELAY_REG
+typedef union Reg_RDRAM_Delay {
+    struct PACKED {
+        u32             : 2; //
+        u32 AckWinDelay : 3; // Adjusts the size of the acknowledge window. Normally set to 5 = 101b. [bits=tcycles : 101=5,110=6,111=7,000=8,001=9,010=10,011=11,100=12]
+        u32 AckWinBits  : 3; // Read-only. Number of bits of AckWinDelay (3).
+        u32             : 2; //
+        u32 ReadDelay   : 3; // Delay between end of request and start of Read data packet. Normally set to 7 = 111b. Defaults to 8 = 001b after reset. [bits=tcycles : 111=7,000=8,001=9,010=10,011=11,100=12,101=13,110=14]
+        u32 ReadBits    : 3; // Read-only. Number of bits of ReadDelay (3).
+        u32             : 3; //
+        u32 AckDelay    : 2; // Delay between end of request and start of Ack data packet. Normally set to 3 = 11b. [bits=tcycles = 11=3,00=4,01=5,10=6]
+        u32 AckBits     : 3; // Read-only. Number of bits of AckDelay (2).
+        u32             : 2; //
+        u32 WriteDelay  : 3; // Delay between end of request and start of Write data packet. Normally set to 1 = 001b. Defaults to 4 = 100b after reset. [bits=tcycles : 001=1,010=2,011=3,100=4,101=5,110=6,111=7,000=8]
+        u32 WriteBits   : 3; // Read-only. Number of bits of WriteDelay (3).
+    };
+    u32 raw;
+} Reg_RDRAM_Delay;
+// RDRAM_MODE_REG
+typedef union Reg_RDRAM_Mode {
+    struct PACKED {
+        u32 CE : 1; // CCEnable: Current Control Enable. [0:manual, 1:auto]
+        u32 X2 : 1; // CCMult: Should be 1. Inverted when read. (Toshiba datasheet states that it select wether X1 or X2 register is used for the current control register).
+        u32 PL : 1; // Select PowerDown Latency
+        u32 SV : 1; // SkipValue: For tests. 0
+        u32 SK : 1; // Skip: For tests. 0
+        u32 AS : 1; // AutoSkip: For tests. 1
+        u32 DE : 1; // DeviceEnable: Enable RDRAM device. When disabled, only broadcast register requests can be executed. [0=disabled,1=enabled]
+        u32 LE : 1; // Enable PowerDown mode for RDRAM that supports it to reduce power consumption.
+        u32 C5 : 1; //! TODO:
+        u32 C2 : 1; //! TODO:
+        u32    : 2;
+        u32 AD : 1; // AckDis: For low latency RDRAM only. Allows to supress acknowledge response when set to 1.
+        u32    : 3;
+        u32 C4 : 1; //! TODO:
+        u32 C1 : 1; //! TODO:
+        u32    : 6;
+        u32 C3 : 1; //! TODO:
+        u32 C0 : 1; //! TODO:
+    };
+    u32 raw;
+} Reg_RDRAM_Mode;
+// RDRAM_REF_INTERVAL_REG
+typedef union Reg_RDRAM_RefInterval {
+    struct PACKED {
+        u32 : 32;
+    };
+    u32 raw;
+} Reg_RDRAM_RefInterval;
+// RDRAM_REF_ROW_REG
+typedef union Reg_RDRAM_RefRow {
+    struct PACKED {
+        u32 RowField_A : 7; // Current row being refreshed.
+        u32            : 4;
+        u32 BankField  : 1; // Current bank being refreshed.
+        u32            : 3;
+        u32            : 6;
+        u32 RowField_B : 2; // Current row being refreshed.
+        u32            : 8;
+    };
+    u32 raw;
+} Reg_RDRAM_RefRow;
+// RDRAM_RAS_INTERVAL_REG
+typedef union Reg_RDRAM_RasInterval {
+    struct PACKED {
+        u32               : 3;
+        u32 RowPrecharge  : 5; // Specify RowPrecharge timing.
+        u32               : 3;
+        u32 RowSense      : 5; // Specify RowSense timing.
+        u32               : 3;
+        u32 RowImpRestore : 5; // Specify RowImpRestore timing.
+        u32               : 3;
+        u32 RowExpRestore : 5; // Specify RowImpRestore timing.
+    };
+    u32 raw;
+} Reg_RDRAM_RasInterval;
+// RDRAM_MIN_INTERVAL_REG
+typedef union Reg_RDRAM_MinInterval {
+    struct PACKED {
+        u32 MAD3     : 1; // MAD[3]: MinAckDelay: Minimum of AckDelay of RDRAM.
+        u32 MRD3     : 1; // MRD[3]: MinReadDelay: Minimum of ReadDelay of RDRAM.
+        u32 MWD3     : 1; // MWD[3]: MinWriteDelay: Minimum of WriteDelay of RDRAM.
+        u32          : 5;
+        u32 MAD2     : 1; // MAD[2]: MinAckDelay: Minimum of AckDelay of RDRAM.
+        u32 MRD2     : 1; // MRD[2]: MinReadDelay: Minimum of ReadDelay of RDRAM.
+        u32 MWD2     : 1; // MWD[2]: MinWriteDelay: Minimum of WriteDelay of RDRAM.
+        u32          : 5;
+        u32 MAD1     : 1; // MAD[1]: MinAckDelay: Minimum of AckDelay of RDRAM.
+        u32 MRD1     : 1; // MRD[1]: MinReadDelay: Minimum of ReadDelay of RDRAM.
+        u32 MWD1     : 1; // MWD[1]: MinWriteDelay: Minimum of WriteDelay of RDRAM.
+        u32          : 5;
+        u32 MAD0     : 1; // MAD[0]: MinAckDelay: Minimum of AckDelay of RDRAM.
+        u32 MRD0     : 1; // MRD[0]: MinReadDelay: Minimum of ReadDelay of RDRAM.
+        u32 MWD0     : 1; // MWD[0]: MinWriteDelay: Minimum of WriteDelay of RDRAM.
+        u32 SpecFunc : 5; // SpecFunc: Performs various commands when written, see table below.
+                          // 00000 = Nop      = Do nothing
+                          // xxxx1 = SetRR    = Manual refresh. The device immediately preforms a single a burst refresh of two rows per bank
+                          // x0x10 = ClrRE    = Disable automatic refresh
+                          // x01xx = SetPD    = Enter the powerdown state
+                          // ×1x0x = SetRE    = Enable automatic refresh
+                          // 1xxxx = Reserved
+    };
+    u32 raw;
+} Reg_RDRAM_MinInterval;
+// RDRAM_ADDR_SELECT_REG
+typedef union Reg_RDRAM_AddressSelect {
+    struct PACKED {
+        u32 SwapField_A :  7; // Each bit swaps two bits of the address. When all bits are 0, there is no swaping.
+        u32             :  7;
+        u32 SwapField_B :  2; // Each bit swaps two bits of the address. When all bits are 0, there is no swaping.
+        u32             : 16;
+    };
+    u32 raw;
+} Reg_RDRAM_AddressSelect;
+// RDRAM_DEVICE_MANUF_REG
+typedef union Reg_RDRAM_DeviceManufacturer {
+    struct PACKED {
+        u32 ManufactureCode : 16; // Manufacture is allowed to put whatever they want here?
+        u32 Manufacture     : 16; // Code specifying the manufacturing company, see table below.
+                                  // 0x0002 = Toshiba
+                                  // 0x0003 = Fujitsu
+                                  // 0x0005 = NEC
+                                  // 0x0007 = Hitachi
+                                  // 0x0009 = Oki
+                                  // 0x000a = LG Semicon
+                                  // 0x0010 = Samsung
+                                  // 0x0013 = Hyundai
+
+    };
+    u32 raw;
+} Reg_RDRAM_DeviceManufacturer;
+
+
+// -- SP --
+// https://n64brew.dev/wiki/Reality_Signal_Processor/Interface#RSP_Internal_Registers
+
+// DP_MEM_ADDR_REG
+typedef union Reg_SP_MemAddr {
+    struct PACKED {
+        u32          : 19; // Undefined: Initialized to 0
+        u32 MEM_BANK :  1; // Bank accessed by the transfer [0=DMEM,1=IMEM]
+        u32 MEM_ADDR : 10; // DMEM or IMEM address used in SP DMAs. Notice that the lowest 3 bits are always 0.
+    };
+    u32 raw;
+} Reg_SP_MemAddr;
+// SP_DRAM_ADDR_REG
+typedef union Reg_SP_DRAMAddr {
+    struct PACKED {
+        u32           :  8; // Undefined: Initialized to 0
+        u32 DRAM_ADDR : 24; // RDRAM address used in SP DMAs. Notice that the lowest 3 bits are always 0.
+    };
+    u32 raw;
+} Reg_SP_DRAMAddr;
+// SP_RD_LEN_REG
+typedef union Reg_SP_ReadLength {
+    struct PACKED {
+        u32 SKIP  : 12; // Number of bytes to skip in RDRAM after each row. Notice that the lowest 3 bits are always 0.
+        u32 COUNT :  8; // Number of rows to transfer minus 1.
+        u32 RDLEN : 12; // Number of bytes to transfer for each row minus 1. Notice that the lowest 3 bits are always 0.
+    };
+    u32 raw;
+} Reg_SP_ReadLength;
+// SP_WR_LEN_REG
+typedef union Reg_SP_WriteLength {
+    struct PACKED {
+        u32 SKIP  : 12; // Number of bytes to skip in RDRAM after each row. Notice that the lowest 3 bits are always 0.
+        u32 COUNT :  8; // Number of rows to transfer minus 1.
+        u32 WRLEN : 12; // Number of bytes to transfer for each row minus 1. Notice that the lowest 3 bits are always 0.
+    };
+    u32 raw;
+} Reg_SP_WriteLength;
+// SP_STATUS_REG
+typedef union Reg_SP_Status_read {
+    struct PACKED {
+        u32                    : 17;
+        u32 signal_7_set       :  1;
+        u32 signal_6_set       :  1;
+        u32 signal_5_set       :  1;
+        u32 signal_4_set       :  1; // cpusignal
+        u32 signal_3_set       :  1; // rspsignal
+        u32 signal_2_set       :  1; // taskdone
+        u32 signal_1_set       :  1; // yielded
+        u32 signal_0_set       :  1; // yield
+        u32 interrupt_on_break :  1;
+        u32 single_step        :  1;
+        u32 io_full            :  1;
+        u32 dma_full           :  1;
+        u32 dma_busy           :  1;
+        u32 broke              :  1;
+        u32 halt               :  1;
+    };
+    u32 raw;
+} Reg_SP_Status_read;
+typedef union Reg_SP_Status_write {
+    struct PACKED {
+        u32                : 7;
+        u32 set_signal_7   : 1;
+        u32 clr_signal_7   : 1;
+        u32 set_signal_6   : 1;
+        u32 clr_signal_6   : 1;
+        u32 set_signal_5   : 1;
+        u32 clr_signal_5   : 1;
+        u32 set_signal_4   : 1; // set cpusignal
+        u32 clr_signal_4   : 1; // clr cpusignal
+        u32 set_signal_3   : 1; // set rspsignal
+        u32 clr_signal_3   : 1; // clr rspsignal
+        u32 set_signal_2   : 1; // set taskdone
+        u32 clr_signal_2   : 1; // clr taskdone
+        u32 set_signal_1   : 1; // set yielded
+        u32 clr_signal_1   : 1; // clr yielded
+        u32 set_signal_0   : 1; // set yield
+        u32 clr_signal_0   : 1; // clr yield
+        u32 set_intr_break : 1;
+        u32 clr_intr_break : 1;
+        u32 set_sstep      : 1;
+        u32 clr_sstep      : 1;
+        u32 set_intr       : 1;
+        u32 clr_intr       : 1;
+        u32 clr_broke      : 1;
+        u32 set_halt       : 1;
+        u32 clr_halt       : 1;
+    };
+    u32 raw;
+} Reg_SP_Status_write;
+// SP_DMA_FULL_REG
+// SP_DMA_BUSY_REG
+// SP_SEMAPHORE_REG
+// SP_PC_REG
+// SP_IBIST_REG
+
+
+// -- DPC --
 
 // DPC_STATUS_REG
+//! TODO: https://n64brew.dev/wiki/Reality_Signal_Processor/Interface#SP_STATUS
 typedef union Reg_DPC_Status_write {
     struct PACKED {
         u32 clr_clock_ctr     : 1;
@@ -364,56 +629,87 @@ typedef union Reg_DPC_Status_read {
     };
     u32 raw;
 } Reg_DPC_Status_read;
-// SP_STATUS_REG
-typedef union Reg_SP_Status_write {
+
+
+// -- MI --
+// https://n64brew.dev/wiki/MIPS_Interface#Registers
+
+// MI_INIT_MODE_REG/MI_MODE_REG
+typedef union Reg_MI_Mode_write {
     struct PACKED {
-        u32                : 7;
-        u32 set_signal_7   : 1;
-        u32 clr_signal_7   : 1;
-        u32 set_signal_6   : 1;
-        u32 clr_signal_6   : 1;
-        u32 set_signal_5   : 1;
-        u32 clr_signal_5   : 1;
-        u32 set_signal_4   : 1; // set cpusignal
-        u32 clr_signal_4   : 1; // clr cpusignal
-        u32 set_signal_3   : 1; // set rspsignal
-        u32 clr_signal_3   : 1; // clr rspsignal
-        u32 set_signal_2   : 1; // set taskdone
-        u32 clr_signal_2   : 1; // clr taskdone
-        u32 set_signal_1   : 1; // set yielded
-        u32 clr_signal_1   : 1; // clr yielded
-        u32 set_signal_0   : 1; // set yield
-        u32 clr_signal_0   : 1; // clr yield
-        u32 set_intr_break : 1;
-        u32 clr_intr_break : 1;
-        u32 set_sstep      : 1;
-        u32 clr_sstep      : 1;
-        u32 set_intr       : 1;
-        u32 clr_intr       : 1;
-        u32 clr_broke      : 1;
-        u32 set_halt       : 1;
-        u32 clr_halt       : 1;
+        u32             : 18;
+        u32 SetUpper    :  1; // Set Upper mode.
+        u32 ClearUpper  :  1; // Clear Upper mode.
+        u32 ClearDP     :  1; // Clear the DP Interrupt.
+        u32 SetEBus     :  1; // Set Ebus mode.
+        u32 ClearEBus   :  1; // Clear Ebus mode.
+        u32 SetRepeat   :  1; // Set repeat mode. Automatically clears after a single Rambus write.
+        u32 ClearRepeat :  1; // Clear repeat mode.
+        u32 RepeatCount :  7; // Number of bytes (minus 1) to write in repeat mode.
     };
     u32 raw;
-} Reg_SP_Status_write;
-typedef union Reg_SP_Status_read {
+} Reg_MI_Mode_write;
+typedef union Reg_MI_Mode_read {
     struct PACKED {
-        u32                    : 17;
-        u32 signal_7_set       :  1;
-        u32 signal_6_set       :  1;
-        u32 signal_5_set       :  1;
-        u32 signal_4_set       :  1; // cpusignal
-        u32 signal_3_set       :  1; // rspsignal
-        u32 signal_2_set       :  1; // taskdone
-        u32 signal_1_set       :  1; // yielded
-        u32 signal_0_set       :  1; // yield
-        u32 interrupt_on_break :  1;
-        u32 single_step        :  1;
-        u32 io_full            :  1;
-        u32 dma_full           :  1;
-        u32 dma_busy           :  1;
-        u32 broke              :  1;
-        u32 halt               :  1;
+        u32             : 22;
+        u32 Upper       :  1; // Upper mode enabled.
+        u32 EBus        :  1; // EBus mode enabled.
+        u32 Repeat      :  1; // Repeat mode enabled, Automatically clears after a single Rambus write.
+        u32 RepeatCount :  7; // Number of bytes (minus 1) to write in repeat mode.
     };
     u32 raw;
-} Reg_SP_Status_read;
+} Reg_MI_Mode_read;
+// MI_VERSION_REG/MI_NOOP_REG
+typedef union Reg_MI_Version {
+    struct PACKED {
+        u32 RSP_VERSION : 8; // RSP hardware version.
+        u32 RDP_VERSION : 8; // RDP hardware version.
+        u32 RAC_VERSION : 8; // RAC hardware version.
+        u32 IO_VERSION  : 8; // IO hardware version.
+    };
+    u32 raw;
+} Reg_MI_Version;
+// MI_INTR_REG
+typedef union Reg_MI_Interrupt {
+    struct PACKED {
+        u32    : 26; // Undefined: Initialized to 0
+        u32 DP :  1; // DP: Interrupt flag - Set when the RDP finishes a full sync (requested explicitly via a SYNC_FULL command).
+        u32 PI :  1; // PI: Interrupt flag - Set when a PI DMA transfer finishes.
+        u32 VI :  1; // VI: Interrupt flag - Set when the VI starts processing a specific half-line of the screen (VI_V_CURRENT == VI_V_INTR). Usually, this is configured with VI_V_CURRENT = 2 so that it behaves as a VBlank interrupt.
+        u32 AI :  1; // AI: Interrupt flag - Set when the AI begins playing back a new audio buffer (to notify that the next one should be enqueued as soon as possible, to avoid crackings).
+        u32 SI :  1; // SI: Interrupt flag - Set when a SI DMA to/from PIF RAM finishes
+        u32 SP :  1; // SP: Interrupt flag - Set when the RSP executes a BREAK opcode while SP_STATUS has been configured with the INTERRUPT_ON_BREAK bit; alternatively, it can also be set by explicitly writing the INTERRUPT flag in the SP_STATUS register (by either the CPU or the RSP itself).
+    };
+    u32 raw;
+} Reg_MI_Interrupt;
+// MI_INTR_MASK_REG
+typedef union Reg_MI_Mask_write {
+    struct PACKED {
+        u32         : 20;
+        u32 SetDP   :  1; // Set DP Interrupt Mask.
+        u32 ClearDP :  1; // Clear DP Interrupt Mask.
+        u32 SetPI   :  1; // Set PI Interrupt Mask.
+        u32 ClearPI :  1; // Clear PI Interrupt Mask.
+        u32 SetVI   :  1; // Set VI Interrupt Mask.
+        u32 ClearVI :  1; // Clear VI Interrupt Mask.
+        u32 SetAI   :  1; // Set AI Interrupt Mask.
+        u32 ClearAI :  1; // Clear AI Interrupt Mask.
+        u32 SetSI   :  1; // Set SI Interrupt Mask.
+        u32 ClearSI :  1; // Clear SI Interrupt Mask.
+        u32 SetSP   :  1; // Set SP Interrupt Mask.
+        u32 ClearSP :  1; // Clear SP Interrupt Mask.
+    };
+    u32 raw;
+} Reg_MI_Mask_write;
+typedef union Reg_MI_Mask_read {
+    struct PACKED {
+        u32    : 26;
+        u32 DP :  1; // DP Interrupt Mask.
+        u32 PI :  1; // PI Interrupt Mask.
+        u32 VI :  1; // VI Interrupt Mask.
+        u32 AI :  1; // AI Interrupt Mask.
+        u32 SI :  1; // SI Interrupt Mask.
+        u32 SP :  1; // SP Interrupt Mask.
+    };
+    u32 raw;
+} Reg_MI_Mask_read;

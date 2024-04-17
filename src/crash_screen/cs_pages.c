@@ -18,6 +18,7 @@
 #include "pages/page_map.h"
 #endif // INCLUDE_DEBUG_MAP
 #include "pages/page_segments.h"
+#include "pages/page_interfaces.h"
 #ifdef PUPPYPRINT_DEBUG
 #include "pages/page_logs.h"
 #endif // PUPPYPRINT_DEBUG
@@ -43,6 +44,7 @@ CSPage* gCSPages[CS_NUM_PAGES] = {
     [CS_PAGE_MAP        ] = &gCSPage_map,
 #endif // INCLUDE_DEBUG_MAP
     [CS_PAGE_SEGMENTS   ] = &gCSPage_segments,
+    [CS_PAGE_INTERFACES ] = &gCSPage_interfaces,
 #ifdef PUPPYPRINT_DEBUG
     [CS_PAGE_LOGS       ] = &gCSPage_logs,
 #endif // PUPPYPRINT_DEBUG

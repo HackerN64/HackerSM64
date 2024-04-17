@@ -13,6 +13,7 @@
 #include "pages/page_map.h"
 #endif // INCLUDE_DEBUG_MAP
 #include "pages/page_segments.h"
+#include "pages/page_interfaces.h"
 #ifdef PUPPYPRINT_DEBUG
 #include "pages/page_logs.h"
 #endif // PUPPYPRINT_DEBUG
@@ -35,6 +36,7 @@ enum CSPages {
     CS_PAGE_MAP,
 #endif // INCLUDE_DEBUG_MAP
     CS_PAGE_SEGMENTS,
+    CS_PAGE_INTERFACES,
 #ifdef PUPPYPRINT_DEBUG
     CS_PAGE_LOGS,
 #endif // PUPPYPRINT_DEBUG
