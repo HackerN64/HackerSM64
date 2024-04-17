@@ -51,12 +51,14 @@
 
 /**
  * Enables camera collision for 8 direction camera and, by extension, to Reonucam if enabled.
+ * If you enable it, please consider using surface types with the SURFACE_FLAG_NO_CAM_COLLISION flag for small obstacles,
+ * such as fences, pillars, signs, etc, in order to make your game more enjoyable and not let the camera get in the way of gameplay.
  */
-//#define EIGHT_DIR_CAMERA_COLLISION
+#define EIGHT_DIR_CAMERA_COLLISION
 
 // Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that also uses less buttons.
 // An explanation the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k (please note that the analog feature shown at the end is no longer present)
-//#define REONUCAM
+#define REONUCAM
 
 
 /**********************************/
