@@ -876,16 +876,15 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 pitch = look_down_slopes(camYaw);
     f32 posY;
     f32 focusY;
-#ifdef REONUCAM
-    f32 yOff;
-#else
     f32 yOff = 125.f;
-#endif
+
     f32 baseDist = 1000.f;
 
 #ifdef REONUCAM
     if (gMarioState->action & ACT_FLAG_SWIMMING) {
         yOff = -125.f;
+    } else if (gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING) {
+        yOff = 325.f;
     } else {
         yOff = 125.f;
     }
