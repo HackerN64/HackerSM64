@@ -18,7 +18,7 @@
 
 // Equivalent to (([bitfield] & [flag]) != 0) but avoids branching. Best used only with constants and if [flag] is a single bit.
 // If [flag] is not a single bit, OR the result with 0x1 afterward to use the rightmost 1 bit of [flag].
-#define BITFLAG_BOOL(bitfield, flag) (((bitfield) & (flag)) >> __builtin_ctz(flag))
+#define BITFLAG_BOOL(bitfield, flag) (((bitfield) & (flag)) >> CTZ(flag))
 
 // #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
 #define COND_BIT(cond, dst, flag) { \

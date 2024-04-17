@@ -7,25 +7,27 @@
 #define GLOBAL_ASM(...)
 #endif
 
-#define member(T, m) ((T*)0)->m
-#define sizeof_member(T, m) sizeof(member(T, m))
-#define typeof_member(T, m) typeof(member(T, m))
+#include "builtins.h"
 
-#define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
+#define member(_T, _m) ((_T*)0)->_m
+#define sizeof_member(_T, _m) sizeof(member(_T, _m))
+#define typeof_member(_T, _m) typeof(member(_T, _m))
+
+#define ARRAY_COUNT(_arr) (s32)(sizeof(_arr) / sizeof(_arr[0]))
 
 #define BITS_PER_BYTE   8
 #define BITS_PER_HEX    4
-#define SIZEOF_BITS(t)  (sizeof(t) * BITS_PER_BYTE)
-#define SIZEOF_HEX(t)   (SIZEOF_BITS(t) / BITS_PER_HEX)
+#define SIZEOF_BITS(_t) (sizeof(_t) * BITS_PER_BYTE)
+#define SIZEOF_HEX(_t)  (SIZEOF_BITS(_t) / BITS_PER_HEX)
 
-#define GLUE(a, b) a ## b
-#define GLUE2(a, b) GLUE(a, b)
+#define GLUE(_a, _b) _a ## _b
+#define GLUE2(_a, _b) GLUE(_a, _b)
 
-#define TO_STRING(s)    #s
-#define TO_STRING2(s)   TO_STRING(s)
+#define TO_STRING(_s)    #_s
+#define TO_STRING2(_s)   TO_STRING(_s)
 
-#define STRLEN(s)           (sizeof(s) - 1)
-#define STR_LAST_CHAR(s)    (s)[STRLEN(s) - 1]
+#define STRLEN(_s)          (sizeof(_s) - 1)
+#define STR_LAST_CHAR(_s)   (_s)[STRLEN(_s) - 1]
 
 // Includes the raw data of the file at 'path' into the rom, aligned by 'align' number of bytes, and creates a pointer to it with the given type and name.
 #define INCBIN(_type, _name, _path, _align) \

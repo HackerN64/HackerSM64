@@ -245,25 +245,25 @@ const char* get_thread_name(OSThread* thread) {
 }
 
 static const char* sThreadStateStrings[] = {
-    [__builtin_ctz(OS_STATE_STOPPED )] = "stopped",
-    [__builtin_ctz(OS_STATE_RUNNABLE)] = "runnable",
-    [__builtin_ctz(OS_STATE_RUNNING )] = "running",
-    [__builtin_ctz(OS_STATE_WAITING )] = "waiting",
+    [CTZ(OS_STATE_STOPPED )] = "stopped",
+    [CTZ(OS_STATE_RUNNABLE)] = "runnable",
+    [CTZ(OS_STATE_RUNNING )] = "running",
+    [CTZ(OS_STATE_WAITING )] = "waiting",
 };
 const char* get_thread_state_str(OSThread* thread) {
     u16 state = thread->state;
     if (state == 0x0000) return NULL;
-    return sThreadStateStrings[__builtin_ctz(state)];
+    return sThreadStateStrings[CTZ(state)];
 }
 
 static const char* sThreadFlagStrings[] = {
-    [__builtin_ctz(OS_FLAG_CPU_BREAK)] = "break", // CPU break
-    [__builtin_ctz(OS_FLAG_FAULT    )] = "fault",
+    [CTZ(OS_FLAG_CPU_BREAK)] = "break", // CPU break
+    [CTZ(OS_FLAG_FAULT    )] = "fault",
 };
 const char* get_thread_flags_str(OSThread* thread) {
     u16 flags = thread->flags;
     if (flags == 0x0000) return NULL;
-    return sThreadFlagStrings[__builtin_ctz(flags)];
+    return sThreadFlagStrings[CTZ(flags)];
 }
 
 

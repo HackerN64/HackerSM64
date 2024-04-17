@@ -38,12 +38,12 @@ enum CauseDescriptions {
 #define FPCSR_SHIFT_2 (FPCSR_SHIFT - FPCSR_CAUSES)
 
 enum FPCSRDescriptions {
-    FPCSR_DESC_CE = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CE >> FPCSR_SHIFT_2)), // Unimplemented operation.
-    FPCSR_DESC_CV = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CV >> FPCSR_SHIFT_2)), // Invalid operation.
-    FPCSR_DESC_CZ = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CZ >> FPCSR_SHIFT_2)), // Division by zero.
-    FPCSR_DESC_CO = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CO >> FPCSR_SHIFT_2)), // Overflow.
-    FPCSR_DESC_CU = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CU >> FPCSR_SHIFT_2)), // Underflow.
-    FPCSR_DESC_CI = (FPCSR_CAUSES - __builtin_ctz(FPCSR_CI >> FPCSR_SHIFT_2)), // Inexact operation.
+    FPCSR_DESC_CE = (FPCSR_CAUSES - CTZ(FPCSR_CE >> FPCSR_SHIFT_2)), // Unimplemented operation.
+    FPCSR_DESC_CV = (FPCSR_CAUSES - CTZ(FPCSR_CV >> FPCSR_SHIFT_2)), // Invalid operation.
+    FPCSR_DESC_CZ = (FPCSR_CAUSES - CTZ(FPCSR_CZ >> FPCSR_SHIFT_2)), // Division by zero.
+    FPCSR_DESC_CO = (FPCSR_CAUSES - CTZ(FPCSR_CO >> FPCSR_SHIFT_2)), // Overflow.
+    FPCSR_DESC_CU = (FPCSR_CAUSES - CTZ(FPCSR_CU >> FPCSR_SHIFT_2)), // Underflow.
+    FPCSR_DESC_CI = (FPCSR_CAUSES - CTZ(FPCSR_CI >> FPCSR_SHIFT_2)), // Inexact operation.
     NUM_FPCSR_DESC,
 };
 

@@ -205,11 +205,11 @@ void _cs_about_func_cheat_flags(char* buf) {
         return;
     }
     const char flags[][2] = {
-        [__builtin_ctz(LPL_USED_CHEATS       )] = "gs",
-        [__builtin_ctz(LPL_USED_SAVESTATES   )] = "ss",
-        [__builtin_ctz(LPL_USED_SLOWDOWN     )] = "sl",
-        [__builtin_ctz(LPL_USED_FRAME_ADVANCE)] = "fa",
-        [__builtin_ctz(LPL_USED_SPEEDUP      )] = "sp",
+        [CTZ(LPL_USED_CHEATS       )] = "gs",
+        [CTZ(LPL_USED_SAVESTATES   )] = "ss",
+        [CTZ(LPL_USED_SLOWDOWN     )] = "sl",
+        [CTZ(LPL_USED_FRAME_ADVANCE)] = "fa",
+        [CTZ(LPL_USED_SPEEDUP      )] = "sp",
     };
     u32 flag = 0x1;
     for (int i = 0; i < ARRAY_COUNT(flags); i++) {
