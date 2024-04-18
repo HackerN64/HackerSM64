@@ -160,9 +160,9 @@ InterfaceInfo gInterfaceInfos[] = {
     [REGS_PI     ] = { .list = iregs_PI,      .name = "PI",      .desc = "Peripheral Interface", },
     [REGS_RI     ] = { .list = iregs_RI,      .name = "RI",      .desc = "Rambus DRAM (RDRAM) Interface", },
     [REGS_SI     ] = { .list = iregs_SI,      .name = "SI",      .desc = "Serial Interface", },
-    [REGS_GIO    ] = { .list = iregs_GIO,     .name = "GIO",     .desc = "GIO Development Board", },
-    [REGS_RDB    ] = { .list = iregs_RDB,     .name = "RDB",     .desc = "Rom Database", },
-    [REGS_GIO_RDB] = { .list = iregs_GIO_RDB, .name = "GIO_RDB", .desc = "GIO Development Board Rom Database", },
+    [REGS_GIO    ] = { .list = iregs_GIO,     .name = "GIO",     .desc = "Development Board", },
+    [REGS_RDB    ] = { .list = iregs_RDB,     .name = "RDB",     .desc = "Debug port", },
+    [REGS_GIO_RDB] = { .list = iregs_GIO_RDB, .name = "GIO_RDB", .desc = "Development Board & Debug Port", },
 };
 
 InterfaceInfo* get_interface_info(enum Interfaces interfaceId) {
