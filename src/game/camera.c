@@ -877,7 +877,6 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     f32 posY;
     f32 focusY;
     f32 yOff = 125.f;
-
     f32 baseDist = 1000.f;
 
 #ifdef REONUCAM
