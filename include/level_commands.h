@@ -490,13 +490,24 @@ enum GoddardScene {
     LOAD_YAY0(/*seg*/ SEGMENT_GROUPA_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
     LOAD_RAW( /*seg*/ SEGMENT_GROUPA_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd)
 
+#define LOAD_GROUPA_FULL(groupName) \
+    LOAD_YAY0(/*seg*/ SEGMENT_GROUPA_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
+    LOAD_RAW( /*seg*/ SEGMENT_GROUPA_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd),  \
+    JUMP_LINK(groupName ## _load_geolayouts)
+
 #define LOAD_GROUPB(groupName) \
     LOAD_YAY0(/*seg*/ SEGMENT_GROUPB_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
     LOAD_RAW (/*seg*/ SEGMENT_GROUPB_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd)
 
+#define LOAD_GROUPB_FULL(groupName) \
+    LOAD_YAY0(/*seg*/ SEGMENT_GROUPB_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
+    LOAD_RAW (/*seg*/ SEGMENT_GROUPB_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd),  \
+    JUMP_LINK(groupName ## _load_geolayouts)
+
 #define LOAD_COMMON0() \
     LOAD_YAY0(/*seg*/ SEGMENT_COMMON0_YAY0, /*romStart*/ _common0_yay0SegmentRomStart, /*romEnd*/ _common0_yay0SegmentRomEnd), \
-    LOAD_RAW( /*seg*/ SEGMENT_COMMON0_GEO,  /*romStart*/ _common0_geoSegmentRomStart,  /*romEnd*/ _common0_geoSegmentRomEnd)
+    LOAD_RAW( /*seg*/ SEGMENT_COMMON0_GEO,  /*romStart*/ _common0_geoSegmentRomStart,  /*romEnd*/ _common0_geoSegmentRomEnd),  \
+    JUMP_LINK(groupName ## _load_geolayouts)
 
 #define LOAD_BEHAVIOR_DATA() \
     LOAD_RAW( /*seg*/ SEGMENT_BEHAVIOR_DATA, /*romStart*/ _behaviorSegmentRomStart, /*romEnd*/ _behaviorSegmentRomEnd)
