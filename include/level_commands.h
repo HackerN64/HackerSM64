@@ -488,18 +488,12 @@ enum GoddardScene {
 
 #define LOAD_GROUPA(groupName) \
     LOAD_YAY0(/*seg*/ SEGMENT_GROUPA_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
-    LOAD_RAW( /*seg*/ SEGMENT_GROUPA_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd)
-
-#define LOAD_GROUPA_FULL(groupName) \
-    LOAD_GROUPA(groupName),         \
+    LOAD_RAW( /*seg*/ SEGMENT_GROUPA_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd),  \
     JUMP_LINK(groupName ## _load_geolayouts)
 
 #define LOAD_GROUPB(groupName) \
     LOAD_YAY0(/*seg*/ SEGMENT_GROUPB_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
-    LOAD_RAW (/*seg*/ SEGMENT_GROUPB_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd)
-
-#define LOAD_GROUPB_FULL(groupName) \
-    LOAD_GROUPB(groupName),         \
+    LOAD_RAW (/*seg*/ SEGMENT_GROUPB_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd),  \
     JUMP_LINK(groupName ## _load_geolayouts)
 
 #define LOAD_COMMON0() \
