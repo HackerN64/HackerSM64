@@ -69,6 +69,9 @@ void update_mario_platform(void) {
 void update_platform_displacement_info(struct PlatformDisplacementInfo *displaceInfo, Vec3f pos, s16 yaw, struct Object *platform) {
     Vec3f scaledPos, yawVec, localPos;
 
+    // Avoid a crash if the platform unloaded its collision while stood on or is static
+    if (platform->header.gfx.throwMatrix == NULL) return;
+
     // Update position
     vec3_diff(localPos, pos, (*platform->header.gfx.throwMatrix)[3]);
     linear_mtxf_transpose_mul_vec3(*platform->header.gfx.throwMatrix, scaledPos, localPos);
@@ -96,7 +99,7 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     // Determine how much Mario turned on his own since last frame
     s16 yawDifference = *yaw - displaceInfo->prevYaw;
 
-    // Avoid a crash if the platform unloaded its collision while stood on
+    // Avoid a crash if the platform unloaded its collision while stood on or is static
     if (platform->header.gfx.throwMatrix == NULL) return;
 
     // Determine how far Mario moved on his own since last frame
