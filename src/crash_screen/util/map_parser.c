@@ -93,7 +93,7 @@ _Bool addr_is_in_text_segment(Address addr) {
  */
 _Bool symbol_is_function(const MapSymbol* symbol) {
     return (
-        ((symbol->type == 't') || (symbol->type == 'T')) && // The symbol itself is marked as .text.
+        ((symbol->type == 't') || (symbol->type == 'T') || (symbol->type == 'W')) && // The symbol itself is marked as .text.
         (symbol->size != 0) && // The symbol has data.
         ((symbol->addr % sizeof(Word)) == 0) && // The symbol is 4byte aligned.
         ((symbol->size % sizeof(Word)) == 0) && // The symbol's size is divisible by the size of an instruction.
@@ -108,9 +108,9 @@ _Bool symbol_is_function(const MapSymbol* symbol) {
  * @return const char* Pointer to the string of the symbol's name.
  */
 const char* get_map_symbol_name(const MapSymbol* symbol) {
-#ifndef INCLUDE_DEBUG_MAP
-    return NULL;
-#endif // !INCLUDE_DEBUG_MAP
+    if (!IS_DEBUG_MAP_INCLUDED() || (gNumMapSymbols == 0)) {
+        return NULL;
+    }
     if (symbol == NULL) {
         return NULL;
     }
@@ -137,9 +137,9 @@ _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
  */
 s32 get_symbol_index_from_addr_forward(Address addr) {
-#ifndef INCLUDE_DEBUG_MAP
-    return -1;
-#endif // !INCLUDE_DEBUG_MAP
+    if (!IS_DEBUG_MAP_INCLUDED() || (gNumMapSymbols == 0)) {
+        return -1;
+    }
     const MapSymbol* symbol = &gMapSymbols[0];
 
     for (size_t i = 0; i < gNumMapSymbols; i++) {
@@ -165,9 +165,9 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
  */
 s32 get_symbol_index_from_addr_backward(Address addr) {
-#ifndef INCLUDE_DEBUG_MAP
-    return -1;
-#endif // !INCLUDE_DEBUG_MAP
+    if (!IS_DEBUG_MAP_INCLUDED() || (gNumMapSymbols == 0)) {
+        return -1;
+    }
     const MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
     for (size_t i = gNumMapSymbols; i-- > 0;) {
@@ -193,9 +193,9 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
  * @return s32 Index in gMapSymbols of the MapSymbol that was found. -1 if none were found.
  */
 s32 get_symbol_index_from_addr_binary(Address addr) {
-#ifndef INCLUDE_DEBUG_MAP
-    return -1;
-#endif // !INCLUDE_DEBUG_MAP
+    if (!IS_DEBUG_MAP_INCLUDED() || (gNumMapSymbols == 0)) {
+        return -1;
+    }
     const MapSymbol* symbol = NULL;
     size_t searchStart = 0;
     size_t searchEnd = (gNumMapSymbols - 1);
@@ -228,7 +228,7 @@ const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections search
 #ifndef INCLUDE_DEBUG_MAP
     return NULL;
 #endif // !INCLUDE_DEBUG_MAP
-    Word data = 0;
+    Word data = 0x00000000;
     if (!try_read_word_aligned(&data, addr)) {
         return NULL;
     }

@@ -11,6 +11,16 @@
 #define VIRTUAL_RAM_SIZE  (size_t)(VIRTUAL_RAM_END - VIRTUAL_RAM_START)
 
 
+enum KernelSegments {
+    KUSEG, // 0x00000000-0x7FFFFFFF
+    KSEG0, // 0x80000000-0x9FFFFFFF
+    KSEG1, // 0xA0000000-0xBFFFFFFF
+    KSSEG, // 0xC0000000-0xDFFFFFFF
+    KSEG3, // 0xE0000000-0xFFFFFFFF
+    K_END,
+    NUM_KSEGS,
+};
+
 enum BusDevices {
     BUS_RDRAM,
     BUS_RCP,
@@ -19,15 +29,7 @@ enum BusDevices {
     BUS_PI_EXT_2,
     BUS_UNMAPPED,
     BUS_END,
-};
-
-enum KernelSegments {
-    KUSEG,
-    KSEG0,
-    KSEG1,
-    KSSEG,
-    KSEG3,
-    K_END,
+    NUM_BUS_DEVICES,
 };
 
 enum MemoryRegions {
@@ -59,6 +61,7 @@ enum MemoryRegions {
     MEM_PI_EXT_UNUSED2,
     MEM_UNMAPPED,
     MEM_MEMORY_REGIONS_END,
+    NUM_MEM_REGIONS,
 };
 
 
@@ -78,8 +81,8 @@ typedef struct MemoryRegion {
 } MemoryRegion; /*0x0C*/
 
 
-const char* get_memory_string_from_addr(Address addr);
 void headless_dma(Address devAddr, void* dramAddr, size_t size);
+_Bool virtual_to_physical(Address* pAddr, Address vAddr);
 _Bool try_read_word_aligned(Word* dest, Address addr);
 _Bool try_read_doubleword_aligned(Doubleword* dest, Address addr);
 _Bool try_read_byte(Byte* dest, Address addr);
@@ -88,3 +91,4 @@ _Bool try_read_word(Word* dest, Address addr);
 _Bool try_read_doubleword(Doubleword* dest, Address addr);
 _Bool is_valid_ram_addr(Address addr);
 _Bool is_unmapped_kx64(uint64_t vaddr);
+const char* get_memory_string_from_addr(Address addr);

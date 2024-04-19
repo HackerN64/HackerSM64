@@ -150,7 +150,7 @@ InterfaceReg iregs_GIO_RDB[] = {
 };
 
 InterfaceInfo gInterfaceInfos[] = {
-    [REGS_RDRAM  ] = { .list = iregs_RDRAM,   .name = "RDRAM",   .desc = "Rambus DRAM", },
+    [REGS_RDRAM  ] = { .list = iregs_RDRAM,   .name = "RDRAM",   .desc = "RAMBus DRAM", },
     [REGS_SP     ] = { .list = iregs_SP,      .name = "SP",      .desc = "Reality Signal Processor", },
     [REGS_DPC    ] = { .list = iregs_DPC,     .name = "DPC",     .desc = "Reality Display Processor (RDP) Command", },
     [REGS_DPS    ] = { .list = iregs_DPS,     .name = "DPS",     .desc = "Reality Display Processor (RDP) Span", },

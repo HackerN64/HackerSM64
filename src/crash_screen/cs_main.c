@@ -45,20 +45,25 @@ Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen 
  * @brief Reinitialize the crash screen's global variables, settings, buffers, etc.
  */
 static void cs_reinitialize(void) {
+    _Bool wasAssert = (gCrashedThread->context.cause == EXC_SYSCALL);
+
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
-    if (!sFirstCrash && (gCrashedThread->context.cause != EXC_SYSCALL)) {
+    if (!sFirstCrash) {// && !wasAssert) {
         cs_get_current_page()->flags.crashed = TRUE;
+    }
+
+    if (sFirstCrash || wasAssert) {
+        gCSPageID = CRASH_SCREEN_START_PAGE;
+    }
+
+    if (sFirstCrash) {
+        cs_settings_apply_func_to_all(cs_setting_func_reset);
+        cs_settings_set_all_headers(FALSE);
     }
 
     gCSSwitchedPage  = FALSE;
     gCSPopupID       = CS_POPUP_NONE;
     gCSSwitchedPopup = FALSE;
-
-    if (sFirstCrash) {
-        gCSPageID = CRASH_SCREEN_START_PAGE;
-        cs_settings_apply_func_to_all(cs_setting_func_reset);
-        cs_settings_set_all_headers(FALSE);
-    }
 
     gLastCSSelectedAddress = gSelectedAddress;
     gSelectedAddress = 0x00000000;
