@@ -204,6 +204,7 @@ CSTextCoord_u32 draw_crash_cause_section(CSTextCoord_u32 line) {
         u32 cause = (tc->cause & CAUSE_EXCMASK);
         // Second part of crash description:
         switch (cause) {
+            case EXC_MOD:
             case EXC_RMISS:
             case EXC_WMISS:
             case EXC_RADE:
