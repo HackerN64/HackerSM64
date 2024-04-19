@@ -6,6 +6,7 @@
 
 #include "util/map_parser.h"
 #include "cs_draw.h"
+#include "cs_settings.h"
 
 
 // Maximum number of chars to print at once.

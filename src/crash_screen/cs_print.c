@@ -370,7 +370,7 @@ static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
  */
 size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) {
     bzero(&sCSCharBuffer, sizeof(sCSCharBuffer));
-    gCSNumLinesPrinted = 0;
+    gCSNumLinesPrinted = 1;
 
     va_list args;
     va_start(args, fmt);

@@ -116,7 +116,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
         // "[message]"
         gCSWordWrap = TRUE;
         cs_print(x, TEXT_Y(line), "%s", message);
-        line += (gCSNumLinesPrinted + 1);
+        line += gCSNumLinesPrinted;
         gCSWordWrap = FALSE;
 
         switch (type) {
@@ -156,7 +156,7 @@ void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, Reg
     Word data = get_reg_val(reg.cop, reg.idx);
 
     charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
-        COLOR_RGBA32_CRASH_VARIABLE, ((reg.cop == COP1) ? regInfo->name : regInfo->shortName)
+        COLOR_RGBA32_CRASH_VARIABLE, ((reg.cop == CPU) ? regInfo->shortName : regInfo->name)
     );
     if (reg.valInfo.out) {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"[output]", COLOR_RGBA32_LIGHT_GRAY);
@@ -167,7 +167,7 @@ void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, Reg
             charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_HEX_WORD" "), data);
         }
 
-        charX += cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), maxNumChars, data, (reg.valInfo.type == REG_VAL_TYPE_ADDR));
+        charX += cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), (maxNumChars - charX), data, (reg.valInfo.type == REG_VAL_TYPE_ADDR));
     }
     CS_SET_DEFAULT_PRINT_COLOR_END();
 }
@@ -187,41 +187,49 @@ void draw_centered_title_text(CSTextCoord_u32 line, const char* text) {
 
 
 // Crash description:
-CSTextCoord_u32 draw_crash_cause_section(CSTextCoord_u32 line, RGBA32 descColor) {
+CSTextCoord_u32 draw_crash_cause_section(CSTextCoord_u32 line) {
     CSTextCoord_u32 x = 1;
     __OSThreadContext* tc = &gInspectThread->context;
-    u32 cause = (tc->cause & CAUSE_EXCMASK);
 
     // First part of crash description:
     const char* desc = get_cause_desc(tc, TRUE);
     if (desc != NULL) {
+        CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
+        gCSWordWrap = TRUE;
+
         CSTextCoord_u32 charX = 0;
-        charX += cs_print(
-            TEXT_X(x), TEXT_Y(line), (STR_COLOR_PREFIX"%s"),
-            descColor, desc
-        );
+        charX += cs_print(TEXT_X(x), TEXT_Y(line), desc, tc->badvaddr);
+        line += gCSNumLinesPrinted;
+
+        u32 cause = (tc->cause & CAUSE_EXCMASK);
         // Second part of crash description:
         switch (cause) {
+            case EXC_RMISS:
+            case EXC_WMISS:
+            case EXC_RADE:
+            case EXC_WADE:
+                charX = cs_print(TEXT_X(x), TEXT_Y(line),
+                    ("When %s: "STR_COLOR_PREFIX STR_HEX_WORD),
+                    (((cause == EXC_RMISS) || (cause == EXC_RADE)) ? "reading from" : "writing to"),
+                    COLOR_RGBA32_WHITE, tc->badvaddr
+                ) + 2;
+                cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), ((CRASH_SCREEN_NUM_CHARS_X - 2) - charX), tc->badvaddr, TRUE);
+                break;
             case EXC_CPU:
-                // "COP:"
-                cs_print(TEXT_X(x + charX), TEXT_Y(line),
-                    STR_COLOR_PREFIX" (cop%d)",
-                    descColor,
-                    ((Reg_CP0_Cause){ .raw = cause, }).CE
-                );
+                line--;
+                cs_print(TEXT_X(x + charX), TEXT_Y(line), " (cop%d)", ((Reg_CP0_Cause){ .raw = cause, }).CE);
                 break;
             case EXC_FPE:
-                line++;
                 const char* fpcsrDesc = get_fpcsr_desc(tc->fpcsr, TRUE);
                 if (fpcsrDesc != NULL) {
-                    cs_print(
-                        TEXT_X(x), TEXT_Y(line), STR_COLOR_PREFIX"(%s)",
-                        descColor, fpcsrDesc
-                    );
+                    cs_print(TEXT_X(x), TEXT_Y(line), "(%s)", fpcsrDesc);
                 }
                 break;
         }
+        gCSWordWrap = FALSE;
+        CS_SET_DEFAULT_PRINT_COLOR_END();
     }
+
 
     return (line + 1);
 }
@@ -276,7 +284,7 @@ void page_summary_draw(void) {
                 COLOR_RGBA32_CRASH_DESCRIPTION_MAIN, COLOR_RGBA32_WHITE, epc
             );
         } else {
-            line = draw_crash_cause_section(line, COLOR_RGBA32_CRASH_DESCRIPTION_MAIN);
+            line = draw_crash_cause_section(line);
             line++;
             cs_print(TEXT_X(x), TEXT_Y(line++), STR_COLOR_PREFIX"DISASM:", COLOR_RGBA32_CRASH_HEADER);
             // cs_draw_divider_translucent(DIVIDER_Y(line));
