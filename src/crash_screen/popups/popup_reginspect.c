@@ -123,13 +123,13 @@ enum PACKED RegBitsType {
 };
 typedef struct RegBitsInfo {
     /*0x00*/ const char* name;
-    /*0x04*/ u8 maskSize;
-    /*0x05*/ u8 shiftSize;
-    /*0x06*/ enum RegBitsType type;
+    /*0x04*/ const u8 maskSize;
+    /*0x05*/ const u8 shiftSize;
+    /*0x06*/ const enum RegBitsType type;
     /*0x07*/ union {
-                u8 numDigits;                     // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
-                enum RegBitsInfoStringLists list; // REG_BITS_TYPE_STR
-                enum RegBitsInfoFuncs func;       // REG_BITS_TYPE_FUNC
+                const u8 numDigits;                     // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
+                const enum RegBitsInfoStringLists list; // REG_BITS_TYPE_STR
+                const enum RegBitsInfoFuncs func;       // REG_BITS_TYPE_FUNC
             };
 } RegBitsInfo; /*0x08*/
 #define REG_BITS_INFO_HEX(_name, _mask, _numDigits) {   \
@@ -164,7 +164,7 @@ typedef struct RegBitsInfo {
 #define REG_BITS_INFO_GAP()         REG_BITS_INFO_NONE("")
 #define REG_BITS_INFO_END()         REG_BITS_INFO_NONE(NULL)
 
-RegBitsInfo regBits_C0_SR[] = {
+const RegBitsInfo regBits_C0_SR[] = {
     REG_BITS_INFO_STR("cop1",       SR_CU1,      REG_BITS_INFO_STR_ENABLE),
     REG_BITS_INFO_STR("low power",  SR_RP,       REG_BITS_INFO_STR_ON_OFF),
     REG_BITS_INFO_STR("extra fpr",  SR_FR,       REG_BITS_INFO_STR_ENABLE),
@@ -188,14 +188,14 @@ RegBitsInfo regBits_C0_SR[] = {
     REG_BITS_INFO_END(),
 };
 
-CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, CSTextCoord_u32 descW, CSTextCoord_u32 infoW, Word val, RegBitsInfo* list) {
+CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, CSTextCoord_u32 descW, CSTextCoord_u32 infoW, Word val, const RegBitsInfo* list) {
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
     ScreenCoord_u32 x = TEXT_X(2);
     CSTextCoord_u32 currLine = line;
 
     descW += STRLEN(": ");
 
-    RegBitsInfo* info = &list[0];
+    const RegBitsInfo* info = &list[0];
     while (info->name != NULL) {
         if (currLine >= (CRASH_SCREEN_NUM_CHARS_Y - 1)) {
             currLine = line;
@@ -243,7 +243,7 @@ void cs_print_reg_info_C0_SR(CSTextCoord_u32 line, Doubleword val) {
     cs_print_reg_info_list(line, STRLEN("xxxxxxxxxx"), STRLEN("xxxxxxxx"), (Word)val, regBits_C0_SR);
 }
 
-RegBitsInfo regBits_C0_CAUSE[] = {
+const RegBitsInfo regBits_C0_CAUSE[] = {
     REG_BITS_INFO_STR("is branch delay slot", CAUSE_BD, REG_BITS_INFO_STR_YES_NO),
     REG_BITS_INFO_GAP(),
     REG_BITS_INFO_NONE("interrupts pending"),
@@ -277,7 +277,7 @@ void cs_print_reg_info_C0_CAUSE(CSTextCoord_u32 line, Doubleword val) {
     }
 }
 
-RegBitsInfo regBits_FPR_CSR[] = {
+const RegBitsInfo regBits_FPR_CSR[] = {
     REG_BITS_INFO_STR("flush denorms to zero", FPCSR_FS,      REG_BITS_INFO_STR_YES_NO),
     REG_BITS_INFO_STR("condition bit",         FPCSR_C,       REG_BITS_INFO_STR_TRUTH),
     REG_BITS_INFO_STR("rounding mode",         FPCSR_RM_MASK, REG_BITS_INFO_STR_FCR31_ROUNDING_MODE),
@@ -305,7 +305,7 @@ void cs_print_reg_info_FPR_CSR(CSTextCoord_u32 line, Doubleword val) {
     cs_print(x3, TEXT_Y(line++), "flags:   "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.flag_.V,   f.flag_.Z,   f.flag_.O,   f.flag_.U,   f.flag_.I  );
 }
 
-RegBitsInfo regBits_SPC_RCP[] = {
+const RegBitsInfo regBits_SPC_RCP[] = {
     REG_BITS_INFO_HEX("interrupt mask", (RCP_IMASK >> RCP_IMASKSHIFT), 2),
     REG_BITS_INFO_END(),
 };
@@ -328,7 +328,7 @@ void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
     }
 
     Word dataAtAddr = 0x00000000;
-    if (is_valid_ram_addr(val32) && try_read_word_aligned(&dataAtAddr, val32)) {
+    if (try_read_word_aligned(&dataAtAddr, val32)) {
         sInspectedRegisterPtrAddr = val32;
         cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
         if (addr_is_in_text_segment(val32)) {
@@ -362,7 +362,7 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
 CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, RegisterId regId, const Doubleword val64, _Bool is64Bit) {
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", COLOR_RGBA32_CRASH_PAGE_NAME, (is64Bit ? 64 : 32));
 
-    const Word val32 = (Word)val64;
+    Word val32 = (Word)val64;
 
     CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_CRASH_HEADER);
     const RGBA32 valColor = COLOR_RGBA32_WHITE;
@@ -373,6 +373,12 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
     } else {
         cs_print(TEXT_X(2), TEXT_Y(line++), ("hex: "STR_COLOR_PREFIX STR_HEX_PREFIX STR_HEX_WORD), valColor, val32);
     }
+    CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), "bin: ");
+    if (is64Bit) {
+        Word valHi = ((HiLo64){ .raw = val64 }).hi;
+        print_data_as_binary(TEXT_X(2 + charX), TEXT_Y(line++), &valHi, sizeof(valHi), valColor);
+    }
+    print_data_as_binary(TEXT_X(2 + charX), TEXT_Y(line++), &val32, sizeof(val32), valColor);
 
     // Print as other floatint point formats:
     if (regId.valInfo.type == REG_VAL_TYPE_FLOAT) {
@@ -416,11 +422,13 @@ void cs_popup_reginspect_draw(void) {
     }
     _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
     _Bool isCOP1 = (regId.cop == COP1); //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
+    _Bool isFCR = (regId.cop == FCR);
     Doubleword value = get_reg_val(cop, idx);
+    Word val32 = (Word)value;
     if (isCOP1 && ((regId.idx & 0x1) == 0)) {
         Word cop1OddBits = get_reg_val(COP1, (regId.idx + 1));
         if (cop1OddBits != 0) {
-            value = ((HiLo64){ .hi = cop1OddBits, .lo = (Word)value, }).raw;
+            value = ((HiLo64){ .hi = cop1OddBits, .lo = val32, }).raw;
             is64Bit = TRUE;
         }
     }
@@ -447,8 +455,10 @@ void cs_popup_reginspect_draw(void) {
         line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
     }
 
-    // 32 bit value:
-    line = cs_popup_reginspect_draw_reg_value(line, regId, value, FALSE);
+    if (!is64Bit || isCOP1) {
+        // 32 bit value:
+        line = cs_popup_reginspect_draw_reg_value(line, regId, value, FALSE);
+    }
 
     // line++;
     _Bool hasExInfo = FALSE;
@@ -464,8 +474,8 @@ void cs_popup_reginspect_draw(void) {
         exInfo++;
     }
 
-    if (!hasExInfo) {
-        cs_reginspect_pointer(line++, (Word)value);
+    if (!isCOP1 && !isFCR && !hasExInfo && is_valid_ram_addr(val32)) {
+        cs_reginspect_pointer(line++, val32);
     }
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
@@ -500,7 +510,7 @@ struct CSPopup gCSPopup_reginspect = {
     .drawFunc  = cs_popup_reginspect_draw,
     .inputFunc = cs_popup_reginspect_input,
     .flags = {
-        .allowPageInput  = FALSE,
+        .allowPageInput  = TRUE,
         .allowChangePage = FALSE,
     },
 };

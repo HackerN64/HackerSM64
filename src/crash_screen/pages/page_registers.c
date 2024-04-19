@@ -48,31 +48,47 @@ const enum ControlTypes cs_cont_list_registers[] = {
 
 
 #define REG_LIST_TERMINATOR (u32)-1
-#define LIST_REG(_cop, _idx) {  \
-    .cop           = _cop,      \
-    .idx           = _idx,      \
-    .valInfo.raw   = 0,         \
+#define LIST_REG_IMPL(_cop, _idx, _type) {  \
+    .cop           = _cop,                  \
+    .idx           = _idx,                  \
+    .valInfo.type  = _type,                 \
 }
+#define LIST_REGI(_cop, _idx) LIST_REG_IMPL(_cop, _idx, REG_VAL_TYPE_INT)
+#define LIST_REGA(_cop, _idx) LIST_REG_IMPL(_cop, _idx, REG_VAL_TYPE_ADDR)
+#define LIST_REGF(_cop, _idx) LIST_REG_IMPL(_cop, _idx, REG_VAL_TYPE_FLOAT)
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
-static const RegisterId sRegList[] = {
-    LIST_REG(COP0, REG_CP0_EPC), LIST_REG(COP0, REG_CP0_SR ), LIST_REG(COP0, REG_CP0_CAUSE   ),
-    LIST_REG(CPU,  REG_CPU_AT ), LIST_REG(CPU,  REG_CPU_V0 ), LIST_REG(CPU,  REG_CPU_V1      ),
-    LIST_REG(CPU,  REG_CPU_A0 ), LIST_REG(CPU,  REG_CPU_A1 ), LIST_REG(CPU,  REG_CPU_A2      ),
-    LIST_REG(CPU,  REG_CPU_A3 ), LIST_REG(CPU,  REG_CPU_T0 ), LIST_REG(CPU,  REG_CPU_T1      ),
-    LIST_REG(CPU,  REG_CPU_T2 ), LIST_REG(CPU,  REG_CPU_T3 ), LIST_REG(CPU,  REG_CPU_T4      ),
-    LIST_REG(CPU,  REG_CPU_T5 ), LIST_REG(CPU,  REG_CPU_T6 ), LIST_REG(CPU,  REG_CPU_T7      ),
-    LIST_REG(CPU,  REG_CPU_S0 ), LIST_REG(CPU,  REG_CPU_S1 ), LIST_REG(CPU,  REG_CPU_S2      ),
-    LIST_REG(CPU,  REG_CPU_S3 ), LIST_REG(CPU,  REG_CPU_S4 ), LIST_REG(CPU,  REG_CPU_S5      ),
-    LIST_REG(CPU,  REG_CPU_S6 ), LIST_REG(CPU,  REG_CPU_S7 ), LIST_REG(CPU,  REG_CPU_T8      ),
-    LIST_REG(CPU,  REG_CPU_T9 ), LIST_REG(CPU,  REG_CPU_GP ), LIST_REG(CPU,  REG_CPU_SP      ),
-    LIST_REG(CPU,  REG_CPU_FP ), LIST_REG(CPU,  REG_CPU_RA ), LIST_REG(COP0, REG_CP0_BADVADDR),
-    LIST_REG(SPC,  REG_SPC_HI ), LIST_REG(SPC,  REG_SPC_LO ), LIST_REG(SPC,  REG_SPC_RCP     ),
+static const RegisterId sThreadRegList[] = {
+    LIST_REGA(COP0, REG_CP0_EPC), LIST_REGI(COP0, REG_CP0_SR ), LIST_REGI(COP0, REG_CP0_CAUSE   ),
+    LIST_REGI(CPU,  REG_CPU_AT ), LIST_REGI(CPU,  REG_CPU_V0 ), LIST_REGI(CPU,  REG_CPU_V1      ),
+    LIST_REGI(CPU,  REG_CPU_A0 ), LIST_REGI(CPU,  REG_CPU_A1 ), LIST_REGI(CPU,  REG_CPU_A2      ),
+    LIST_REGI(CPU,  REG_CPU_A3 ), LIST_REGI(CPU,  REG_CPU_T0 ), LIST_REGI(CPU,  REG_CPU_T1      ),
+    LIST_REGI(CPU,  REG_CPU_T2 ), LIST_REGI(CPU,  REG_CPU_T3 ), LIST_REGI(CPU,  REG_CPU_T4      ),
+    LIST_REGI(CPU,  REG_CPU_T5 ), LIST_REGI(CPU,  REG_CPU_T6 ), LIST_REGI(CPU,  REG_CPU_T7      ),
+    LIST_REGI(CPU,  REG_CPU_S0 ), LIST_REGI(CPU,  REG_CPU_S1 ), LIST_REGI(CPU,  REG_CPU_S2      ),
+    LIST_REGI(CPU,  REG_CPU_S3 ), LIST_REGI(CPU,  REG_CPU_S4 ), LIST_REGI(CPU,  REG_CPU_S5      ),
+    LIST_REGI(CPU,  REG_CPU_S6 ), LIST_REGI(CPU,  REG_CPU_S7 ), LIST_REGI(CPU,  REG_CPU_T8      ),
+    LIST_REGI(CPU,  REG_CPU_T9 ), LIST_REGI(CPU,  REG_CPU_GP ), LIST_REGI(CPU,  REG_CPU_SP      ),
+    LIST_REGI(CPU,  REG_CPU_FP ), LIST_REGA(CPU,  REG_CPU_RA ), LIST_REGA(COP0, REG_CP0_BADVADDR),
+    LIST_REGI(SPC,  REG_SPC_HI ), LIST_REGI(SPC,  REG_SPC_LO ), LIST_REGI(SPC,  REG_SPC_RCP     ),
+    LIST_REG_END(),
+};
+static const RegisterId sThreadFPCSRList[] = { //! TODO: Use this for printing.
+    LIST_REGI(FCR, REG_FCR_CONTROL_STATUS),
+    LIST_REG_END(),
+};
+static const RegisterId sThreadFloatRegList[] = { //! TODO: Use this for printing.
+    LIST_REGF(COP1, REG_CP1_F00), LIST_REGF(COP1, REG_CP1_F02), LIST_REGF(COP1, REG_CP1_F04),
+    LIST_REGF(COP1, REG_CP1_F06), LIST_REGF(COP1, REG_CP1_F08), LIST_REGF(COP1, REG_CP1_F10),
+    LIST_REGF(COP1, REG_CP1_F12), LIST_REGF(COP1, REG_CP1_F14), LIST_REGF(COP1, REG_CP1_F16),
+    LIST_REGF(COP1, REG_CP1_F18), LIST_REGF(COP1, REG_CP1_F20), LIST_REGF(COP1, REG_CP1_F22),
+    LIST_REGF(COP1, REG_CP1_F24), LIST_REGF(COP1, REG_CP1_F26), LIST_REGF(COP1, REG_CP1_F28),
+    LIST_REGF(COP1, REG_CP1_F30),
     LIST_REG_END(),
 };
 
 // Reg list:
 #define REG_LIST_COLUMNS 3
-#define REG_LIST_ROWS    DIV_CEIL((ARRAY_COUNT(sRegList) - 1), REG_LIST_COLUMNS)
+#define REG_LIST_ROWS    DIV_CEIL((ARRAY_COUNT(sThreadRegList) - 1), REG_LIST_COLUMNS)
 
 // FP list:
 #define FP_REG_SIZE     (sizeof(__OSfp) / sizeof(float))
@@ -88,28 +104,38 @@ enum RegisterPageSections {
     NUM_REG_PAGE_SECTIONS,
 };
 
-typedef struct RegisterPageSelectionBounds {
-    u8 cols;
-    u8 rows;
-} RegisterPageSelectionBounds;
+typedef struct RegisterPageSection {
+    /*0x00*/ const RegisterId* list; // Register list.
+    /*0x04*/ const u8 listSize;      // (ARRAY_COUNT(list) - 1).
+    /*0x05*/ const _Bool clamp;      // How to handle out of bounds accesses.
+    /*0x06*/ const u8 cols;          // Number of columns.
+    /*0x07*/ const u8 rows;          // Number of rows.
+} RegisterPageSection; /*0x08*/
+#define REG_LIST_BOUNDS(_rows, _cols, _list, _clamp) { \
+    .rows = _rows, \
+    .cols = _cols, \
+    .list = _list, \
+    .listSize = (ARRAY_COUNT(_list) - 1), \
+    .clamp = _clamp, \
+}
 
-RegisterPageSelectionBounds sRegPageSelectBounds[NUM_REG_PAGE_SECTIONS] = {
-    [PAGE_REG_SECTION_THREAD] = { .cols =                1, .rows =             1, },
-    [PAGE_REG_SECTION_REG   ] = { .cols = REG_LIST_COLUMNS, .rows = REG_LIST_ROWS, },
-    [PAGE_REG_SECTION_FPCSR ] = { .cols =                1, .rows =             1, },
-    [PAGE_REG_SECTION_FP    ] = { .cols =  FP_LIST_COLUMNS, .rows =  FP_LIST_ROWS, },
+const RegisterPageSection sRegPageSections[NUM_REG_PAGE_SECTIONS] = {
+    [PAGE_REG_SECTION_THREAD] = { .rows = 1, .cols = 1, .list = NULL, .listSize = 0, .clamp = TRUE, },// { .cols =                1, .rows =             1, .list = NULL,                },
+    [PAGE_REG_SECTION_REG   ] = REG_LIST_BOUNDS(REG_LIST_ROWS, REG_LIST_COLUMNS, sThreadRegList,      FALSE),//{ .cols = REG_LIST_COLUMNS, .rows = REG_LIST_ROWS, .list = sThreadRegList,      },
+    [PAGE_REG_SECTION_FPCSR ] = REG_LIST_BOUNDS(1,             1,                sThreadFPCSRList,    TRUE ),//{ .cols =                1, .rows =             1, .list = sThreadFPCSRList,    },
+    [PAGE_REG_SECTION_FP    ] = REG_LIST_BOUNDS(FP_LIST_ROWS,  FP_LIST_COLUMNS,  sThreadFloatRegList, FALSE),//{ .cols =  FP_LIST_COLUMNS, .rows =  FP_LIST_ROWS, .list = sThreadFloatRegList, },
 };
 
-typedef struct RegisterPageSelection {
-    u8 section;
-    u8 pad[1];
-    u8 selX;
-    u8 selY;
-} RegisterPageSelection;
+typedef struct RegisterPageCursor {
+    /*0x00*/ u8 sectionID;
+    /*0x01*/ u8 pad[1];
+    /*0x02*/ u8 selX;
+    /*0x03*/ u8 selY;
+} RegisterPageCursor; /*0x04*/
 
 
-RegisterPageSelection sRegisterSelectionCursor = {
-    .section = PAGE_REG_SECTION_THREAD,
+RegisterPageCursor sRegisterSelectionCursor = {
+    .sectionID = PAGE_REG_SECTION_THREAD,
     .selX = 0,
     .selY = 0,
 };
@@ -149,12 +175,14 @@ void cs_registers_print_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, const char* na
 
 // Print important fixed-point registers.
 CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
-    const u32 columns = REG_LIST_COLUMNS;
-    const u32 rows = REG_LIST_ROWS;
+    const RegisterPageSection* section = &sRegPageSections[PAGE_REG_SECTION_REG];
+    const u32 columns = section->cols;
+    const u32 rows = section->rows;
+
     const CSTextCoord_u32 columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, columns);
-    const RegisterId* reg = sRegList;
-    RegisterPageSelection* sel = &sRegisterSelectionCursor;
-    _Bool drawSel = (sel->section == PAGE_REG_SECTION_REG);
+    const RegisterId* reg = &section->list[0];
+    RegisterPageCursor* cursor = &sRegisterSelectionCursor;
+    _Bool drawSel = (cursor->sectionID == PAGE_REG_SECTION_REG);
     _Bool listEnded = FALSE;
 
     for (u32 row = 0; row < rows; row++) {
@@ -166,7 +194,7 @@ CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
             CSTextCoord_u32 charX = (col * columnCharWidth);
             CSTextCoord_u32 charY = (line + row);
 
-            if (drawSel && (col == sel->selX) && (row == sel->selY)) {
+            if (drawSel && (col == cursor->selX) && (row == cursor->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
                     TEXT_WIDTH(STRLEN(" XX: 00000000 ")), TEXT_HEIGHT(1),
                     COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
@@ -189,7 +217,7 @@ CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
 }
 
 void cs_print_fpcsr(ScreenCoord_u32 x, ScreenCoord_u32 y, Word fpcsr) {
-    if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_FPCSR) {
+    if (sRegisterSelectionCursor.sectionID == PAGE_REG_SECTION_FPCSR) {
         cs_draw_row_selection_box(y);
     }
 
@@ -226,23 +254,21 @@ void cs_registers_print_float_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 regN
 }
 
 void cs_registers_print_float_registers(CSTextCoord_u32 line, __OSThreadContext* tc) {
-    const CSTextCoord_u32 columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, FP_LIST_COLUMNS);
+    const RegisterPageSection* section = &sRegPageSections[PAGE_REG_SECTION_FP];
+    const u32 cols = section->cols;
+    const u32 rows = section->rows;
+    const CSTextCoord_u32 columnCharWidth = DIV_CEIL(CRASH_SCREEN_NUM_CHARS_X, cols);
     __OSfp* osfp = &tc->fp0; // The first float pointer.
     u32 regNum = 0;
-    RegisterPageSelection* sel = &sRegisterSelectionCursor;
-    _Bool drawSel = (sel->section == PAGE_REG_SECTION_FP);
+    RegisterPageCursor* cursor = &sRegisterSelectionCursor;
+    _Bool drawSel = (cursor->sectionID == PAGE_REG_SECTION_FP);
 
-    // cs_registers_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
-    cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
-
-    osWritebackDCacheAll();
-
-    for (u32 row = 0; row < FP_LIST_ROWS; row++) {
-        for (u32 col = 0; col < FP_LIST_COLUMNS; col++) {
+    for (u32 row = 0; row < rows; row++) {
+        for (u32 col = 0; col < cols; col++) {
             CSTextCoord_u32 charX = (col * columnCharWidth);
             CSTextCoord_u32 charY = (line + row);
-            
-            if (drawSel && (col == sel->selX) && (row == sel->selY)) {
+
+            if (drawSel && (col == cursor->selX) && (row == cursor->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
                     TEXT_WIDTH(STRLEN("FXX: 00000000 ")), TEXT_HEIGHT(1),
                     COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
@@ -267,7 +293,7 @@ void page_registers_draw(void) {
     if (gCSPopupID != CS_POPUP_THREADS) {
         // Draw the thread box:
         // cs_thread_draw_highlight(thread, CS_POPUP_THREADS_Y1);
-        if (sRegisterSelectionCursor.section == PAGE_REG_SECTION_THREAD) {
+        if (sRegisterSelectionCursor.sectionID == PAGE_REG_SECTION_THREAD) {
             cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, CS_POPUP_THREADS_Y1, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
         }
         cs_print_thread_info(TEXT_X(CS_POPUP_THREADS_TEXT_X1), CS_POPUP_THREADS_Y1, CS_POPUP_THREADS_NUM_CHARS_X, thread);
@@ -277,113 +303,96 @@ void page_registers_draw(void) {
     line = cs_registers_print_registers(line);
 
     osWritebackDCacheAll();
+    
+    // cs_registers_print_fpcsr(TEXT_X(0), TEXT_Y(line), tc->fpcsr);
+    cs_print_fpcsr(TEXT_X(0), TEXT_Y(line++), tc->fpcsr);
+
+    osWritebackDCacheAll();
 
     cs_registers_print_float_registers(line, tc);
 }
 
-static int cs_page_reg_get_select_idx(RegisterPageSelection* sel, u32 columns) {
-    return ((sel->selY * columns) + sel->selX);
-}
-
 void page_registers_input(void) {
-    RegisterPageSelection* sel = &sRegisterSelectionCursor;
+    RegisterPageCursor* cursor = &sRegisterSelectionCursor;
     CrashScreenDirections* dir = &gCSDirectionFlags;
     _Bool up    = dir->pressed.up;
     _Bool down  = dir->pressed.down;
     _Bool left  = dir->pressed.left;
     _Bool right = dir->pressed.right;
 
-    RegisterPageSelectionBounds* bounds = &sRegPageSelectBounds[sel->section];
+    const RegisterPageSection* section = &sRegPageSections[cursor->sectionID];
+
+    _Bool reginspectOpen = (gCSPopupID == CS_POPUP_REGINSPECT);
+    const enum RegisterPageSections firstSection = (reginspectOpen ? PAGE_REG_SECTION_REG : PAGE_REG_SECTION_THREAD);
+    const enum RegisterPageSections lastSection = (NUM_REG_PAGE_SECTIONS - 1);
 
     if (up) {
-        if (sel->selY > 0) {
-            sel->selY--;
-        } else if (sel->section > 0) {
+        if (cursor->selY > 0) {
+            cursor->selY--;
+        } else if (cursor->sectionID > firstSection) {
             // Go to bottom of previous section.
-            sel->section--;
-            sel->selY = sRegPageSelectBounds[sel->section].rows - 1;
+            cursor->sectionID--;
+            cursor->selY = sRegPageSections[cursor->sectionID].rows - 1;
         } else {
             // Wrap vertically.
-            sel->section = (NUM_REG_PAGE_SECTIONS - 1);
-            sel->selY = sRegPageSelectBounds[sel->section].rows - 1;
+            cursor->sectionID = lastSection;
+            cursor->selY = sRegPageSections[cursor->sectionID].rows - 1;
         }
     }
     if (down) {
-        if (sel->selY < (bounds->rows - 1)) {
-            sel->selY++;
-        } else if (sel->section < (NUM_REG_PAGE_SECTIONS - 1)) {
+        if (cursor->selY < (section->rows - 1)) {
+            cursor->selY++;
+        } else if (cursor->sectionID < lastSection) {
             // Go to top of next section;
-            sel->section++;
-            sel->selY = 0;
+            cursor->sectionID++;
+            cursor->selY = 0;
         } else {
             // Wrap vertically.
-            sel->section = 0;
-            sel->selY = 0;
+            cursor->sectionID = firstSection;
+            cursor->selY = 0;
         }
     }
-    if (bounds->cols > 1) {
+    if (section->cols > 1) {
         if (left) {
-            if (sel->selX > 0) {
-                sel->selX--;
+            if (cursor->selX > 0) {
+                cursor->selX--;
             } else {
                 // Wrap horizontally.
-                sel->selX = (bounds->cols - 1);
+                cursor->selX = (section->cols - 1);
             }
         }
         if (right) {
-            if (sel->selX < (bounds->cols - 1)) {
-                sel->selX++;
+            if (cursor->selX < (section->cols - 1)) {
+                cursor->selX++;
             } else {
                 // Wrap horizontally.
-                sel->selX = 0;
+                cursor->selX = 0;
             }
         }
     }
 
-    bounds = &sRegPageSelectBounds[sel->section];
+    section = &sRegPageSections[cursor->sectionID];
 
     u16 buttonPressed = gCSCompositeController->buttonPressed;
     if (buttonPressed & B_BUTTON) {
         // Cycle floats print mode.
         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
     }
-    if (buttonPressed & A_BUTTON) {
+    if ((buttonPressed & A_BUTTON) || reginspectOpen) {
         u32 idx = 0;
-        switch (sel->section) {
+        switch (cursor->sectionID) {
             case PAGE_REG_SECTION_THREAD:
                 cs_open_threads();
                 break;
             case PAGE_REG_SECTION_REG:
-                idx = cs_page_reg_get_select_idx(sel, bounds->cols);
-                if (idx < (ARRAY_COUNT(sRegList) - 1)) {
-                    cs_open_reginspect(sRegList[idx]);
-                }
-                break;
-            case PAGE_REG_SECTION_FPCSR:;
-                RegisterId regId = {
-                    .cop = FCR,
-                    .idx = REG_FCR_CONTROL_STATUS,
-                    .valInfo = {
-                        .type = REG_VAL_TYPE_INT,
-                        .dbl  = FALSE,
-                        .out  = FALSE,
-                    },
-                };
-                cs_open_reginspect(regId);
-                break;
+            case PAGE_REG_SECTION_FPCSR:
             case PAGE_REG_SECTION_FP:
-                idx = (cs_page_reg_get_select_idx(sel, bounds->cols) * FP_REG_SIZE);
-                if (idx < (CP1_NUM_REGISTERS - 1)) {
-                    RegisterId regId = {
-                        .cop = COP1,
-                        .idx = idx,
-                        .valInfo = {
-                            .type = REG_VAL_TYPE_FLOAT,
-                            .dbl  = FALSE, //! TODO:
-                            .out  = FALSE,
-                        },
-                    };
-                    cs_open_reginspect(regId);
+                idx = ((cursor->selY * section->cols) + cursor->selX);
+                if ((idx >= section->listSize) && section->clamp) {
+                    idx = (section->listSize - 1);
+                }
+                if (idx < section->listSize) {
+                    cs_open_reginspect(section->list[idx]);
                 }
                 break;
         }
@@ -409,9 +418,10 @@ void page_registers_print(void) {
     osSyncPrintf("\n");
 
     // Thread registers:
-    const u32 columns = REG_LIST_COLUMNS;
-    const u32 rows = REG_LIST_ROWS;
-    const RegisterId* reg = sRegList;
+    const RegisterPageSection* section = &sRegPageSections[PAGE_REG_SECTION_REG];
+    const u32 columns = section->cols;
+    const u32 rows = section->rows;
+    const RegisterId* reg = &section->list[0];
     for (u32 row = 0; row < rows; row++) {
         osSyncPrintf("- ");
         for (u32 col = 0; col < columns; col++) {
