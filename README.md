@@ -63,7 +63,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Removed course-specific camera processing *
 - Ability to set Mario's movement speed when hanging from a ceiling *
 - Tighter hanging controls (Mario will face the direction of the analog stick directly while hanging from a ceiling) *
-- reonucam: custom camera by Reonu. Now included as a define in config_camera.h.
+- Reonucam: Custom camera by Reonu. Now included as a define in config_camera.h.
 - Ability to disable Mario getting suck in snow or sand
 
 **Hacker QOL:**
