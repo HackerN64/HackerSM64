@@ -12,11 +12,7 @@ seq_setmutescale 0
   seq_setvol 127
 #endif
 seq_settempo 120
-#ifdef EXTRA_SFX_CHANNEL_BANKS
 seq_initchannels 0xffff
-#else
-seq_initchannels 0x3ff
-#endif
 seq_startchannel 0, .channel0
 seq_startchannel 1, .channel1
 seq_startchannel 2, .channel2
@@ -27,14 +23,12 @@ seq_startchannel 6, .channel6
 seq_startchannel 7, .channel7
 seq_startchannel 8, .channel38
 seq_startchannel 9, .channel59
-#ifdef EXTRA_SFX_CHANNEL_BANKS
 seq_startchannel 10, .channelA
 seq_startchannel 11, .channelB
 seq_startchannel 12, .channelC
 seq_startchannel 13, .channelD
 seq_startchannel 14, .channelE
 seq_startchannel 15, .channelF
-#endif
 .seq_loop:
 seq_delay 20000
 seq_jump .seq_loop
@@ -83,7 +77,6 @@ chan_stereoheadseteffects 1
 chan_setdyntable .channel59_table
 chan_jump .main_loop_023589
 
-#ifdef EXTRA_SFX_CHANNEL_BANKS
 .channelA:
 chan_largenoteson
 chan_setinstr 0
@@ -149,7 +142,6 @@ chan_iowriteval 5
 chan_stereoheadseteffects 1
 chan_setdyntable .channelF_table
 chan_jump .main_loop_023589
-#endif
 
 // Main loop for standard, non-continuous sound effects
 .main_loop_023589:
@@ -7983,27 +7975,30 @@ layer_note0 38, 0x3, 127, 127
 layer_delay 0x2a
 layer_jump .layer_32B7
 
-#ifdef EXTRA_SFX_CHANNEL_BANKS
 
 .channelA_table:
 // Add custom sounds for Channel A here!
 
+
 .channelB_table:
 // Add custom sounds for Channel B here!
+
 
 .channelC_table:
 // Add custom sounds for Channel C here!
 
+
 .channelD_table:
 // Add custom sounds for Channel D here!
+
 
 .channelE_table:
 // Add custom sounds for Channel E here!
 
+
 .channelF_table:
 // Add custom sounds for Channel F here!
 
-#endif
 
 .align 2, 0
 .envelope_32C4:
