@@ -87,6 +87,11 @@ else ifeq ($(VERSION),sh)
   DEFINES += VERSION_SH=1
 endif
 
+# Does local config file exist?
+ifneq ($(wildcard include/config/config_local.h),)
+  DEFINES += LOCAL_CONFIG=1
+endif
+
 # FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
 FIXLIGHTS ?= 1
 
