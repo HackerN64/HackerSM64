@@ -1383,7 +1383,8 @@ void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
     s16 camPreset;
 #ifdef REONUCAM
     // skip if not submerged
-    if ((m->action & ACT_GROUP_MASK) != ACT_GROUP_SUBMERGED) return;
+    if ((m->action & ACT_GROUP_MASK) != ACT_GROUP_SUBMERGED) 
+        return;
 
     // R Trigger toggles camera mode override
     if ((gPlayer1Controller->buttonPressed & R_TRIG) && (m->action & ACT_FLAG_SWIMMING)) {
@@ -1392,7 +1393,9 @@ void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
 
     // If override, set mode to 8 dir. Otherwise, use normal water processing
     if (gReonucamState.waterCamOverride) {
-        if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+        if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) {
+            set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+        }  
     } else {
 #else
     if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
