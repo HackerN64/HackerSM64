@@ -1140,6 +1140,10 @@ s32 snap_to_45_degrees(s16 angle) {
 }
 
 #ifdef EIGHT_DIR_CAMERA_COLLISION
+
+#define MIN_CAMERA_DISTANCE 300.0f // Minimum distance between Mario and the camera.
+#define VERTICAL_RAY_OFFSET 300.0f // The ray is cast from 300 units above Mario in order to prevent small obstacles from constantly snapping the camera
+
 void eight_dir_collision_handler(struct Camera *c) {
     struct Surface *surf;
 
@@ -1150,7 +1154,7 @@ void eight_dir_collision_handler(struct Camera *c) {
 
     vec3f_copy(origin,gMarioState->pos);
 
-    origin[1] += 300.0f; // the ray is cast from 300 units above Mario in order to prevent small obstacles from constantly snapping the camera
+    origin[1] += VERTICAL_RAY_OFFSET; 
     camdir[0] = c->pos[0] - origin[0];
     camdir[1] = c->pos[1] - origin[1];
     camdir[2] = c->pos[2] - origin[2];
@@ -1165,7 +1169,6 @@ void eight_dir_collision_handler(struct Camera *c) {
         vec3f_diff(camToMario, gMarioState->pos, hitpos);
         s16 yaw = atan2s(camToMario[2], camToMario[0]);
         vec3f_get_lateral_dist(hitpos,gMarioState->pos, &dist);
-        #define MIN_CAMERA_DISTANCE 300.0f // Minimum distance between Mario and the camera. See the next comment.
         if (dist < MIN_CAMERA_DISTANCE) {
             distFromSurf += (dist - MIN_CAMERA_DISTANCE); // If Mario runs right up to the screen, the camera pull back slightly...
             yDist = MIN_CAMERA_DISTANCE - CLAMP(dist, 0, MIN_CAMERA_DISTANCE); // ...and also up slightly.
@@ -1184,6 +1187,7 @@ void eight_dir_collision_handler(struct Camera *c) {
 
 #ifdef REONUCAM
 f32 cameraSpeeds[] = {0.5f, 1.f, 1.5f, 2.f, 3.5f}; // The camera speed settings, from slowest to fastest.
+#define R_DOUBLE_TAP_WINDOW 5 // How many frames the player has to double tap R in order to ender Mario cam mode.
 
 void reonucam_handler(void) {
     // Get the camera speed based on the user's setting
@@ -1203,9 +1207,11 @@ void reonucam_handler(void) {
         } else if (gPlayer1Controller->buttonDown & R_CBUTTONS) {
             s8DirModeBaseYaw += DEGREES(cameraSpeed);
         }
-        gReonucamState.rButtonCounter++; // This increses whenever R is held.
+        if (gReonucamState.rButtonCounter++ > 100) { // This increses whenever R is held.
+            gReonucamState.rButtonCounter = 100;
+        }
     } else {
-        if (gReonucamState.rButtonCounter > 0 && gReonucamState.rButtonCounter <= 5 && !((gPlayer1Controller->buttonDown & L_CBUTTONS) || (gPlayer1Controller->buttonDown & R_CBUTTONS) || (gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING))) {
+        if (gReonucamState.rButtonCounter > 0 && gReonucamState.rButtonCounter <= R_DOUBLE_TAP_WINDOW && !((gPlayer1Controller->buttonDown & L_CBUTTONS) || (gPlayer1Controller->buttonDown & R_CBUTTONS) || (gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING))) {
             // This centers the camera behind mario. It triggers when you let go of R in less than 5 frames.
             s8DirModeYawOffset = 0;
             s8DirModeBaseYaw = gMarioState->faceAngle[1]-0x8000;
@@ -1216,15 +1222,21 @@ void reonucam_handler(void) {
     }
 
     if (gPlayer1Controller->buttonPressed & R_TRIG) {
-        if (gReonucamState.rButtonCounter2 <= 5) {
+        if (gReonucamState.rButtonCounter2 <= R_DOUBLE_TAP_WINDOW) {
             set_cam_angle(CAM_ANGLE_MARIO); // Enter mario cam if R is pressed 2 times in less than 5 frames
-            gReonucamState.rButtonCounter2 = 6;
+            gReonucamState.rButtonCounter2 = R_DOUBLE_TAP_WINDOW + 1;
         } else {
             gReonucamState.rButtonCounter2 = 0;
         }
     } else {
-        gReonucamState.rButtonCounter2++;
+        if (gReonucamState.rButtonCounter2++ > 100) {
+            gReonucamState.rButtonCounter2 = 100;
+        }
      }
+
+    print_text_fmt_int(20, 40, "R %d", gReonucamState.rButtonCounter);
+    print_text_fmt_int(20, 20, "R %d", gReonucamState.rButtonCounter2);
+    
 }
 #endif
 

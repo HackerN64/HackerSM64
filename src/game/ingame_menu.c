@@ -1523,6 +1523,8 @@ void reset_red_coins_collected(void) {
     gRedCoinsCollected = 0;
 }
 
+#ifdef REONUCAM
+
 LangArray textReonucam1 = DEFINE_LANGUAGE_ARRAY(
     "CAMERA SPEED: %d",
     "VITESSE CAMÉRA: %d",
@@ -1537,9 +1539,8 @@ LangArray textReonucam2 = DEFINE_LANGUAGE_ARRAY(
     "DPADでへんこう",
     "DPAD PARA CAMBIAR");
 
-#ifdef REONUCAM
 void render_reonucam_speed_setting(void) {
-    char buf[25];
+    char buf[32];
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     sprintf(buf, LANG_ARRAY(textReonucam1), gReonucamState.speed +1 );
