@@ -153,14 +153,10 @@
     #define FORCED_CAMERA_MODE CAMERA_MODE_8_DIRECTIONS
 
     // Disable vanilla cam processing
-    #ifdef ENABLE_VANILLA_CAM_PROCESSING
     #undef ENABLE_VANILLA_CAM_PROCESSING
-    #endif
 
     // Disable aglab cam
-    #ifdef PARALLEL_LAKITU_CAM
     #undef PARALLEL_LAKITU_CAM
-    #endif
 #endif
 
 
