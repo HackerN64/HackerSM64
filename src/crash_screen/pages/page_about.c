@@ -65,6 +65,42 @@ const char gValNames_no_yes[][4] = {
 extern const u8 gRomSize[];
 extern const u8 gGoddardSize[];
 
+extern const char gSaveTypeStr[];
+extern const char gRegionStr[];
+extern const char gGrucodeStr[];
+extern const char gCompressionFormat[];
+extern const char gBuildGitVersion[];
+
+// osTvType strings:
+const char* osTvTypeStrings[] = {
+    [OS_TV_PAL ] = "pal",
+    [OS_TV_NTSC] = "ntsc",
+    [OS_TV_MPAL] = "mpal",
+};
+
+// Microcode string:
+#define DEF_UCODE_NAME(_name) const char* sUCodeName = TO_STRING2(_name);
+#ifdef L3DEX2_ALONE
+DEF_UCODE_NAME(L3DEX2_alone);
+#elif F3DZEX_GBI_2
+DEF_UCODE_NAME(f3dzex2_PosLight);
+#elif F3DZEX_NON_GBI_2
+DEF_UCODE_NAME(f3dzex2_Non_PosLight);
+#elif F3DEX2PL_GBI
+DEF_UCODE_NAME(F3DEX2_PosLight);
+#elif F3DEX_GBI_2
+DEF_UCODE_NAME(F3DEX2);
+#elif F3DEX_GBI
+DEF_UCODE_NAME(F3DEX);
+#elif SUPER3D_GBI
+DEF_UCODE_NAME(Super3D);
+#elif F3D_NEW
+DEF_UCODE_NAME(Fast3D_New);
+#elif F3D_OLD
+DEF_UCODE_NAME(Fast3D_Old);
+#else
+#define sUCodeName gGrucodeStr
+#endif
 
 f32 percent_of(f32 size, f32 totalSize) {
     return (size / totalSize * 100.0f);
@@ -87,6 +123,7 @@ f32 bytes_to_megabytes(size_t size) {
 ABOUT_ENTRY_FUNC(empty,          "")
 ABOUT_ENTRY_FUNC(hackersm64_v,   HackerSM64_version_txt)
 ABOUT_ENTRY_FUNC(crash_screen_v, CrashScreen_version_txt)
+ABOUT_ENTRY_FUNC(commit_hash,    gBuildGitVersion)
 ABOUT_ENTRY_FUNC(compiler,       __compiler__) // __VERSION__ // STR_MAJOR_MINOR_PATCH, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__
 ABOUT_ENTRY_FUNC(linker,         __linker__)
 #ifdef __STDC__
@@ -94,20 +131,20 @@ ABOUT_ENTRY_FUNC(stdc_version,   "%luL", __STDC_VERSION__)
 #endif // __STDC__
 ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
-ABOUT_ENTRY_FUNC(microcode,      gUcodeName)
+ABOUT_ENTRY_FUNC(microcode,      sUCodeName)
 #ifdef LIBDRAGON
 //! TODO: Libdragon version (if this ever becomes compatible):
 ABOUT_ENTRY_FUNC(region,         "LIBDRAGON")
 #else // !LIBDRAGON
-ABOUT_ENTRY_FUNC(region,         "%s (%s)", gRegionName, osTvTypeStrings[osTvType])
+ABOUT_ENTRY_FUNC(region,         "%s (%s)", gRegionStr, osTvTypeStrings[osTvType])
 #endif //! LIBDRAGON
 void _cs_about_func_save_type(char* buf) {
     char* p = buf;
-    p += sprintf(p, "%s (", gSaveTypeName);
+    p += sprintf(p, "%s (", gSaveTypeStr);
     p += sprintf_int_with_commas(p, EEPROM_SIZE);
     p += sprintf(p, STR_SUFFIX_BYTES")");
 }
-ABOUT_ENTRY_FUNC(compression,    gCompressionName)
+ABOUT_ENTRY_FUNC(compression,    gCompressionFormat)
 void _cs_about_func_crash_screen(char* buf) {
     size_t csSize = ((Address)_crashscreenSegmentRomEnd - (Address)_crashscreenSegmentRomStart);
     char* p = buf;
@@ -255,16 +292,17 @@ CSAboutEntry sCSAboutEntries_buttons[CS_NUM_ABOUT_ENTRIES_TITLE] = {
     [CS_ABOUT_ENTRY_BUTTONS_COLLAPSE_ALL] = ABOUT_ENTRY_BUTTON("collapse all"),
     [CS_ABOUT_ENTRY_BUTTONS_END         ] = ABOUT_ENTRY_NULL(),
 };
-CSAboutEntry sCSAboutEntries_compiler[CS_NUM_ABOUT_ENTRIES_COMPILER] = {
-    [CS_ABOUT_GROUP_HEADER_COMPILER      ] = ABOUT_ENTRY_HEADER("compiler", TRUE),
-    [CS_ABOUT_ENTRY_COMPILER_COMPILER_1  ] = ABOUT_ENTRY_LONG1(compiler,       "COMPILER"      ),
-    [CS_ABOUT_ENTRY_COMPILER_COMPILER_2  ] = ABOUT_ENTRY_LONG2(compiler,       "COMPILER"      ),
-    [CS_ABOUT_ENTRY_COMPILER_LINKER_1    ] = ABOUT_ENTRY_LONG1(linker,         "LINKER"        ),
-    [CS_ABOUT_ENTRY_COMPILER_LINKER_2    ] = ABOUT_ENTRY_LONG2(linker,         "LINKER"        ),
+CSAboutEntry sCSAboutEntries_build[CS_NUM_ABOUT_ENTRIES_BUILD] = {
+    [CS_ABOUT_GROUP_HEADER_BUILD      ] = ABOUT_ENTRY_HEADER("build", TRUE),
+    [CS_ABOUT_ENTRY_BUILD_COMMIT_HASH ] = ABOUT_ENTRY_SINGLE(commit_hash,   "COMMIT HASH"   ),
+    [CS_ABOUT_ENTRY_BUILD_COMPILER_1  ] = ABOUT_ENTRY_LONG1(compiler,       "COMPILER"      ),
+    [CS_ABOUT_ENTRY_BUILD_COMPILER_2  ] = ABOUT_ENTRY_LONG2(compiler,       "COMPILER"      ),
+    [CS_ABOUT_ENTRY_BUILD_LINKER_1    ] = ABOUT_ENTRY_LONG1(linker,         "LINKER"        ),
+    [CS_ABOUT_ENTRY_BUILD_LINKER_2    ] = ABOUT_ENTRY_LONG2(linker,         "LINKER"        ),
 #ifdef __STDC__
-    [CS_ABOUT_ENTRY_COMPILER_STDC_VERSION] = ABOUT_ENTRY_SINGLE(stdc_version,  "STDC VERSION"  ),
+    [CS_ABOUT_ENTRY_BUILD_STDC_VERSION] = ABOUT_ENTRY_SINGLE(stdc_version,  "STDC VERSION"  ),
 #endif // __STDC__
-    [CS_ABOUT_ENTRY_COMPILER_END         ] = ABOUT_ENTRY_NULL(),
+    [CS_ABOUT_ENTRY_BUILD_END         ] = ABOUT_ENTRY_NULL(),
 };
 CSAboutEntry sCSAboutEntries_rom[CS_NUM_ABOUT_ENTRIES_ROM] = {
     [CS_ABOUT_GROUP_HEADER_ROM      ] = ABOUT_ENTRY_HEADER("rom", TRUE),
@@ -315,7 +353,7 @@ CSAboutEntry sCSAboutEntries_emulator[CS_NUM_ABOUT_ENTRIES_EMULATOR] = {
 CSAboutEntry* sCSAboutEntryGroups[CS_NUM_ABOUT_GROUPS] = {
     [CS_ABOUT_GROUP_TITLE    ] = sCSAboutEntries_title,
     [CS_ABOUT_GROUP_BUTTONS  ] = sCSAboutEntries_buttons,
-    [CS_ABOUT_GROUP_COMPILER ] = sCSAboutEntries_compiler,
+    [CS_ABOUT_GROUP_BUILD    ] = sCSAboutEntries_build,
     [CS_ABOUT_GROUP_ROM      ] = sCSAboutEntries_rom,
     [CS_ABOUT_GROUP_COLLISION] = sCSAboutEntries_collision,
     [CS_ABOUT_GROUP_MISC     ] = sCSAboutEntries_misc,
@@ -325,7 +363,7 @@ CSAboutEntry* sCSAboutEntryGroups[CS_NUM_ABOUT_GROUPS] = {
 CSAboutEntryDisplay sCSAboutDisplayedEntries[
     CS_NUM_ABOUT_ENTRIES_TITLE     +
     CS_NUM_ABOUT_ENTRIES_BUTTONS   +
-    CS_NUM_ABOUT_ENTRIES_COMPILER  +
+    CS_NUM_ABOUT_ENTRIES_BUILD     +
     CS_NUM_ABOUT_ENTRIES_ROM       +
     CS_NUM_ABOUT_ENTRIES_COLLISION +
     CS_NUM_ABOUT_ENTRIES_MISC      +

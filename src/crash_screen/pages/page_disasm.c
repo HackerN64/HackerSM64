@@ -165,7 +165,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
 
         // Get the offset for the current function.
         InsnData insn = { .raw = 0x00000000, };
-        //! TODO: Is this needed? It slows down the search slightly.
+        //! TODO: Does this need to be a safe read? It slows down the search.
         if (!try_read_word_aligned(&insn.raw, sBranchBufferCurrAddr)) {
             return FALSE;
         }
@@ -181,7 +181,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
 
         sBranchBufferCurrAddr += PAGE_DISASM_STEP;
 
-        // If branch mapping takes longer than a frame, so continue from the same place on the next frame.
+        // If branch mapping takes longer than a frame, continue from the same place on the next frame.
         //! TODO: Is this needed anymore with binary search? If so, is there a better way to do this?
         if ((osGetTime() - startTime) > FRAMES_TO_CYCLES(1)) {
             return TRUE;

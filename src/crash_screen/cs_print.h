@@ -94,12 +94,12 @@ typedef union PrintBuffer {
 } PrintBuffer; /*0x04*/
 
 // Input:
-extern _Bool  gCSWordWrap;
-extern u32    gCSWordWrapXLimit;
-extern RGBA32 gCSDefaultPrintColor;
+extern _Bool           gCSWordWrap;
+extern ScreenCoord_u32 gCSWordWrapXLimit;
+extern RGBA32          gCSDefaultPrintColor;
 
 // Output:
-extern u32 gCSNumLinesPrinted;
+extern CSTextCoord_u32 gCSNumLinesPrinted;
 
 size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, const char* fmt, ...) __attribute__((format(printf, 4, 5)));
 

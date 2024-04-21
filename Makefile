@@ -424,6 +424,21 @@ GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(BUILD_DIR)/$(LD_SCRIPT).d
 
 #==============================================================================#
+# Git Options                                                                  #
+#==============================================================================#
+
+# Set PACKAGE_VERSION define for printing commit hash
+ifeq ($(origin PACKAGE_VERSION), undefined)
+  PACKAGE_VERSION := $(shell git log -1 --pretty=%h | tr -d '\n')
+  ifeq ('$(PACKAGE_VERSION)', '')
+    PACKAGE_VERSION = Unknown version
+  endif
+endif
+
+# Make sure the build reports the correct version
+$(shell touch src/boot/build.c)
+
+#==============================================================================#
 # Compiler Options                                                             #
 #==============================================================================#
 
@@ -492,6 +507,8 @@ ifeq ($(TARGET_N64),1)
   INCLUDE_DIRS += include/libc
 endif
 
+# DEFINES += PACKAGE_VERSION=$(PACKAGE_VERSION) COMPRESS=$(COMPRESS)
+
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 
@@ -513,6 +530,13 @@ RSPASMFLAGS := $(foreach d,$(DEFINES),-definelabel $(subst =, ,$(d)))
 
 # C preprocessor flags
 CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
+
+DEBUG_FLAGS := -DSAVETYPE='$(SAVETYPE)' -DREGION='$(VERSION)' -DGRUCODE='$(GRUCODE)' -DCOMPRESSION_FORMAT='$(COMPRESS)' -DPACKAGE_VERSION='$(PACKAGE_VERSION)'
+
+CFLAGS += $(DEBUG_FLAGS)
+CPPFLAGS += $(DEBUG_FLAGS)
+
+# SAVETYPE VERSION GRUCODE
 
 #==============================================================================#
 # Miscellaneous Tools                                                          #

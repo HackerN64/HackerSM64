@@ -25,12 +25,12 @@ PrintBuffer gCSPrintBuffer[CS_PRINT_BUFFER_SIZE];
 PrintBuffer gCSScrollBuffer[CS_SCROLL_BUFFER_SIZE];
 
 // Input:
-_Bool  gCSWordWrap          = FALSE;                    // Whether to wrap the text if it passes the x position defined by 'gCSWordWrapXLimit'.
-u32    gCSWordWrapXLimit    = CRASH_SCREEN_TEXT_X2;     // The x position that causes the text to wrap when 'gCSWordWrap' is TRUE.
-RGBA32 gCSDefaultPrintColor = CS_DEFAULT_PRINT_COLOR;   // The default text color. Use the macros in cs_print.h to change this.
+_Bool           gCSWordWrap          = FALSE;                    // Whether to wrap the text if it passes the x position defined by 'gCSWordWrapXLimit'.
+ScreenCoord_u32 gCSWordWrapXLimit    = CRASH_SCREEN_TEXT_X2;     // The x position that causes the text to wrap when 'gCSWordWrap' is TRUE.
+RGBA32          gCSDefaultPrintColor = CS_DEFAULT_PRINT_COLOR;   // The default text color. Use the macros in cs_print.h to change this.
 
 // Output:
-u32 gCSNumLinesPrinted = 0; // The number of lines printed by the last cs_print function.
+CSTextCoord_u32 gCSNumLinesPrinted = 0; // The number of lines printed by the last cs_print function.
 
 
 /**

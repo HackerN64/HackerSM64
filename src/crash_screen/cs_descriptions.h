@@ -51,12 +51,6 @@ enum FPCSRDescriptions {
 extern char HackerSM64_version_txt[];
 extern char CrashScreen_version_txt[];
 
-extern const char* gRegionName;
-extern const char* osTvTypeStrings[];
-extern const char* gUcodeName;
-extern const char* gSaveTypeName;
-extern const char* gCompressionName;
-
 
 const char* str_null_fallback(const char* str, const char* fallback);
 
