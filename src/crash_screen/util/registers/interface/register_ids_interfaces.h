@@ -1,30 +1,4 @@
-#pragma once
 
-#include <ultra64.h>
-
-#include "types.h"
-
-#include "reg_bits.h"
-
-
-enum PACKED Interfaces {
-    REGS_RDRAM,     // RDRAM_BASE_REG
-    REGS_SP,        // SP_BASE_REG
-    REGS_DPC,       // DPC_BASE_REG
-    REGS_DPS,       // DPS_BASE_REG // DP Span Registers
-    REGS_MI,        // MI_BASE_REG
-    REGS_VI,        // VI_BASE_REG
-    REGS_AI,        // AI_BASE_REG
-    REGS_PI,        // PI_BASE_REG
-    REGS_RI,        // RI_BASE_REG
-    REGS_SI,        // SI_BASE_REG
-
-    REGS_GIO,       // GIO_BASE_REG
-    REGS_RDB,       // RGB_BASE_REG
-    REGS_GIO_RDB,   // GIO_RDB_BASE_REG
-
-    NUM_INTERFACES,
-};
 enum PACKED REGIDS_RDRAM { // RDRAM_BASE_REG
     REGID_RDRAM_CONFIG, REGID_RDRAM_DEVICE_TYPE = REGID_RDRAM_CONFIG, // RDRAM_CONFIG_REG/RDRAM_DEVICE_TYPE_REG
     REGID_RDRAM_DEVICE_ID,    // RDRAM_DEVICE_ID_REG
@@ -36,6 +10,7 @@ enum PACKED REGIDS_RDRAM { // RDRAM_BASE_REG
     REGID_RDRAM_MIN_INTERVAL, // RDRAM_MIN_INTERVAL_REG
     REGID_RDRAM_ADDR_SELECT,  // RDRAM_ADDR_SELECT_REG
     REGID_RDRAM_DEVICE_MANUF, // RDRAM_DEVICE_MANUF_REG
+    REGID_RDRAM_ROW,
 
     NUM_REGS_RDRAM,
 };
@@ -77,7 +52,7 @@ enum PACKED REGIDS_MI { // MI_BASE_REG
     REGID_MI_INIT_MODE, REGID_MI_MODE = REGID_MI_INIT_MODE, // MI_INIT_MODE_REG/MI_MODE_REG // MI init mode (W): [6:0] init length, [7] clear init mode, [8] set init mode [9/10] clear/set ebus test mode, [11] clear DP interrupt (R): [6:0] init length, [7] init mode, [8] ebus test mode
     REGID_MI_VERSION,   REGID_MI_NOOP = REGID_MI_VERSION,   // MI_VERSION_REG/MI_NOOP_REG   // MI version (R): [7:0] io, [15:8] rac, [23:16] rdp, [31:24] rsp
     REGID_MI_INTR,                                          // MI_INTR_REG                  // MI interrupt (R): [5:0] valid bits - see below for bit patterns
-    REGID_MI_INTR_MASK,                                     // MI_INTR_MASK_REG             // MI interrupt mask (W): [11:0] valid bits - see below for bit patterns (R): [5:0] valid bits - see below for bit patterns 
+    REGID_MI_INTR_MASK,                                     // MI_INTR_MASK_REG             // MI interrupt mask (W): [11:0] valid bits - see below for bit patterns (R): [5:0] valid bits - see below for bit patterns
 
     NUM_REGS_MI,
 };
@@ -168,29 +143,3 @@ enum PACKED REGIDS_GIO_RDB { // GIO_RDB_BASE_REG
 
     NUM_REGS_GIO_RDB,
 };
-
-typedef struct InterfaceReg {
-    /*0x00*/ const char* name;
-    /*0x04*/ Address addr;
-} InterfaceReg; /*0x08*/
-
-#define DEF_IREG(_reg, _name) { \
-    .name = _name,              \
-    .addr = _reg,               \
-}
-#define DEF_IREG_END() DEF_IREG(0, NULL)
-
-
-typedef struct InterfaceInfo {
-    /*0x00*/ const char* name;
-    /*0x04*/ const char* desc;
-    /*0x08*/ InterfaceReg* list;
-} InterfaceInfo; /*0x0C*/
-
-
-extern InterfaceInfo gInterfaceInfos[];
-
-InterfaceInfo* get_interface_info(enum Interfaces interfaceId);
-InterfaceReg* get_interface_reg_info(enum Interfaces interfaceId, u8 regId);
-const char* get_interface_reg_name(enum Interfaces interfaceId, u8 regId);
-Word get_interface_reg_val(enum Interfaces interfaceId, u8 regId);

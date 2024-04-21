@@ -6,9 +6,9 @@
 #include "types.h"
 #include "sm64.h"
 
-// #include "crash_screen/util/map_parser.h"
-#include "crash_screen/util/interface.h"
 #include "crash_screen/util/memory_read.h"
+#include "crash_screen/util/registers.h"
+#include "crash_screen/popups/popup_reginspect.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_draw.h"
@@ -42,22 +42,23 @@ const enum ControlTypes cs_cont_list_interfaces[] = {
 };
 
 
-enum Interfaces sSelectedInterface = 0;
-u8 sSelectedRegister = 0;
+enum Interfaces sInterfaceSelectIndex = 0;
+u8 sSelectedRegisterIndex = 0;
 u8 sNumShownRegisters = 0;
 
 void page_interfaces_init(void) {
-    sSelectedInterface = 0;
-    sSelectedRegister = 0;
+    sInterfaceSelectIndex = 0;
+    sSelectedRegisterIndex = 0;
     sNumShownRegisters = 0;
 }
 
 void draw_interface_regs(CSTextCoord_u32 line) {
-    InterfaceReg* reg = &gInterfaceInfos[sSelectedInterface].list[0];
-    u32 regId = 0;
+    const RegisterSource* src = get_interface_src(sInterfaceSelectIndex);
+    const RegisterInfo* reg = &src->infoList[0];
+    u8 regId = 0;
 
-    while (reg->name != NULL) {
-        if (regId == sSelectedRegister) {
+    for (regId = 0; regId < src->numRegs; regId++) {
+        if (regId == sSelectedRegisterIndex) {
             cs_draw_row_selection_box(TEXT_Y(line));
         }
         CSTextCoord_u32 charX = 0;
@@ -74,15 +75,12 @@ void draw_interface_regs(CSTextCoord_u32 line) {
 
         line++;
         reg++;
-        regId++;
     }
 
     sNumShownRegisters = regId;
 }
 
 void page_interfaces_draw(void) {
-    InterfaceInfo* selectedInterface = &gInterfaceInfos[sSelectedInterface];
-
     CSTextCoord_u32 line = 1;
 
     cs_draw_triangle((TEXT_X(0                       ) - 2), (TEXT_Y(line) - 1), 4, 8, COLOR_RGBA32_CRASH_SELECT_ARROW, CS_TRI_LEFT);
@@ -92,9 +90,9 @@ void page_interfaces_draw(void) {
     ScreenCoord_u32 y = TEXT_Y(line);
     cs_draw_rect(x, (y - 1), 1, TEXT_HEIGHT(1), COLOR_RGBA32_CRASH_DIVIDER);
     x += 2;
-    for (int interfaceId = 0; interfaceId < NUM_INTERFACES; interfaceId++) {
-        InterfaceInfo* interface = &gInterfaceInfos[interfaceId];
-        if (interfaceId == sSelectedInterface) {
+    for (int interfaceID = 0; interfaceID < NUM_INTERFACES; interfaceID++) {
+        const RegisterSource* interface = get_interface_src(interfaceID);
+        if (interfaceID == sInterfaceSelectIndex) {
             cs_draw_row_selection_box_impl(x, (y + 1),
                 TEXT_WIDTH(strlen(interface->name)), (TEXT_HEIGHT(1) - 1),
                 COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
@@ -108,6 +106,7 @@ void page_interfaces_draw(void) {
     line++;
 
     cs_draw_divider(DIVIDER_Y(line));
+    const RegisterSource* selectedInterface = get_interface_src(sInterfaceSelectIndex);
     cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"%s: %s", COLOR_RGBA32_LIGHT_CYAN, selectedInterface->name, selectedInterface->desc);
 
     draw_interface_regs(line);
@@ -116,15 +115,29 @@ void page_interfaces_draw(void) {
 }
 
 void page_interfaces_input(void) {
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
+    if (buttonPressed & A_BUTTON) {
+        RegisterId regId = (RegisterId){
+            .src = INTERFACE_TO_SRC(sInterfaceSelectIndex),
+            .idx = sSelectedRegisterIndex,
+            .valInfo = {
+                .type = REG_VAL_TYPE_BITS,
+                .dbl  = FALSE,
+                .out  = FALSE,
+            },
+        };
+        cs_open_reginspect(regId);
+    }
+
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    sSelectedRegister = WRAP(((s32)sSelectedRegister + change), 0, (s32)(sNumShownRegisters - 1));
+    sSelectedRegisterIndex = WRAP(((s32)sSelectedRegisterIndex + change), 0, (s32)(sNumShownRegisters - 1));
 
     change = 0;
     if (gCSDirectionFlags.pressed.left ) change = -1; // Scroll left.
     if (gCSDirectionFlags.pressed.right) change = +1; // Scroll right.
-    sSelectedInterface = WRAP(((s32)sSelectedInterface + change), 0, (s32)(NUM_INTERFACES - 1));
+    sInterfaceSelectIndex = WRAP(((s32)sInterfaceSelectIndex + change), 0, (s32)(NUM_INTERFACES - 1));
 
 }
 

@@ -6,6 +6,7 @@
 #include "crash_screen/util/map_parser.h"
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/util/registers.h"
+#include "crash_screen/util/floats.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_draw.h"
@@ -21,7 +22,7 @@
 
 RegisterId gInspectedRegister = {
     // Default to R0.
-    .cop         = CPU,
+    .src         = REGS_CPU,
     .idx         = REG_CPU_R0,
     .valInfo.raw = 0,
 };
@@ -347,16 +348,16 @@ void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
 }
 
 typedef struct RegInspectExtraInfo {
-    /*0x00*/ const enum Coprocessors cop;
+    /*0x00*/ const enum RegisterSources src;
     /*0x01*/ const s8 idx;
     /*0x03*/ const u8 pad[2];
     /*0x04*/ void (*func)(CSTextCoord_u32 line, Doubleword val);
 } RegInspectExtraInfo; /*0x08*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
-    { .cop = COP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    },
-    { .cop = COP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, },
-    { .cop = FCR,  .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  },
-    { .cop = SPC,  .idx = REG_SPC_RCP,            .func = cs_print_reg_info_SPC_RCP,  },
+    { .src = REGS_CP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    },
+    { .src = REGS_CP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, },
+    { .src = REGS_FCR, .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  },
+    { .src = REGS_SPC, .idx = REG_SPC_RCP,            .func = cs_print_reg_info_SPC_RCP,  },
 };
 
 CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, RegisterId regId, const Doubleword val64, _Bool is64Bit) {
@@ -399,6 +400,82 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
     return line;
 }
 
+void reginspect_draw_for_thread(RegisterId regId) {
+    enum RegisterSources src = regId.src;
+    int idx = regId.idx;
+
+    const RegisterSource* regSrc = get_reg_src(src);
+    const RegisterInfo* regInfo = get_reg_info(src, idx);
+    if (regInfo == NULL) {
+        return;
+    }
+    _Bool is64Bit = (regInfo->is64bit);
+    _Bool isCP1 = (regId.src == REGS_CP1); //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
+    _Bool isFCR = (regId.src == REGS_FCR);
+    Doubleword value = get_reg_val(src, idx);
+    Word val32 = (Word)value;
+    if (isCP1 && ((regId.idx & 0x1) == 0)) {
+        Word cop1OddBits = get_reg_val(REGS_CP1, (regId.idx + 1));
+        if (cop1OddBits != 0) {
+            value = ((HiLo64){ .hi = cop1OddBits, .lo = val32, }).raw;
+            is64Bit = TRUE;
+        }
+    }
+
+    CSTextCoord_u32 line = 1;
+    // "[register] REGISTER".
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
+        gInspectThread->id, get_thread_name(gInspectThread)
+    );
+    CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
+    const char* copName = regSrc->name;
+    if (copName != NULL) {
+        cs_print(TEXT_X(2 + charX), TEXT_Y(line), STR_COLOR_PREFIX" in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
+    }
+    line++;
+    const char* regDesc = get_reg_desc(src, idx);
+    if (regDesc != NULL) {
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
+    }
+    line++;
+
+    // 64 bit value if it exists:
+    if (is64Bit) {
+        line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
+    }
+
+    if (!is64Bit || isCP1) {
+        // 32 bit value:
+        line = cs_popup_reginspect_draw_reg_value(line, regId, value, FALSE);
+    }
+
+    // line++;
+    _Bool hasExInfo = FALSE;
+    const RegInspectExtraInfo* exInfo = &sRegInspectExtraInfoFuncs[0];
+    for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
+        if ((exInfo->src == src) && (exInfo->idx == idx)) {
+            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"decoded bits:", COLOR_RGBA32_CRASH_PAGE_NAME);
+            exInfo->func(line, value);
+            hasExInfo = TRUE;
+            sInspectedRegisterPtrAddr = 0x00000000;
+            break;
+        }
+        exInfo++;
+    }
+
+    if (!isCP1 && !isFCR && !hasExInfo && is_valid_ram_addr(val32)) {
+        cs_reginspect_pointer(line++, val32);
+    }
+}
+
+void reginspect_draw_for_interface(UNUSED RegisterId regId) {
+    // InterfaceReg* regInfo = get_interface_reg_info(regId.src, regId.idx);
+    // Word data = 0x00000000;
+    // if (try_read_word_aligned(&data, regInfo->addr)) {
+
+    // }
+}
+
 // Register popup box draw function.
 void cs_popup_reginspect_draw(void) {
     const ScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
@@ -413,69 +490,10 @@ void cs_popup_reginspect_draw(void) {
 
     RegisterId regId = gInspectedRegister;
 
-    enum Coprocessors cop = regId.cop;
-    int idx = regId.idx;
-
-    const RegisterInfo* regInfo = get_reg_info(cop, idx);
-    if (regInfo == NULL) {
-        return;
-    }
-    _Bool is64Bit = (regInfo->size == sizeof(Doubleword));
-    _Bool isCOP1 = (regId.cop == COP1); //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
-    _Bool isFCR = (regId.cop == FCR);
-    Doubleword value = get_reg_val(cop, idx);
-    Word val32 = (Word)value;
-    if (isCOP1 && ((regId.idx & 0x1) == 0)) {
-        Word cop1OddBits = get_reg_val(COP1, (regId.idx + 1));
-        if (cop1OddBits != 0) {
-            value = ((HiLo64){ .hi = cop1OddBits, .lo = val32, }).raw;
-            is64Bit = TRUE;
-        }
-    }
-
-    CSTextCoord_u32 line = 1;
-    // "[register] REGISTER".
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
-        gInspectThread->id, get_thread_name(gInspectThread)
-    );
-    CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
-    const char* copName = get_coprocessor_name(cop);
-    if (copName != NULL) {
-        cs_print(TEXT_X(2 + charX), TEXT_Y(line), STR_COLOR_PREFIX" in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
-    }
-    line++;
-    const char* regDesc = get_reg_desc(cop, idx);
-    if (regDesc != NULL) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
-    }
-    line++;
-
-    // 64 bit value if it exists:
-    if (is64Bit) {
-        line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
-    }
-
-    if (!is64Bit || isCOP1) {
-        // 32 bit value:
-        line = cs_popup_reginspect_draw_reg_value(line, regId, value, FALSE);
-    }
-
-    // line++;
-    _Bool hasExInfo = FALSE;
-    const RegInspectExtraInfo* exInfo = &sRegInspectExtraInfoFuncs[0];
-    for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
-        if ((exInfo->cop == cop) && (exInfo->idx == idx)) {
-            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"decoded bits:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            exInfo->func(line, value);
-            hasExInfo = TRUE;
-            sInspectedRegisterPtrAddr = 0x00000000;
-            break;
-        }
-        exInfo++;
-    }
-
-    if (!isCOP1 && !isFCR && !hasExInfo && is_valid_ram_addr(val32)) {
-        cs_reginspect_pointer(line++, val32);
+    if (regId.src >= REGS_INTERFACES_START) {
+        reginspect_draw_for_interface(regId);
+    } else {
+        reginspect_draw_for_thread(regId);
     }
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);

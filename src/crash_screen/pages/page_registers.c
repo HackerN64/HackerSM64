@@ -48,41 +48,41 @@ const enum ControlTypes cs_cont_list_registers[] = {
 
 
 #define REG_LIST_TERMINATOR (u32)-1
-#define LIST_REG_IMPL(_cop, _idx, _type) {  \
-    .cop           = _cop,                  \
+#define LIST_REG_IMPL(_src, _idx, _type) {  \
+    .src           = _src,                  \
     .idx           = _idx,                  \
     .valInfo.type  = _type,                 \
 }
-#define LIST_REGI(_cop, _idx) LIST_REG_IMPL(_cop, _idx, REG_VAL_TYPE_INT)
-#define LIST_REGA(_cop, _idx) LIST_REG_IMPL(_cop, _idx, REG_VAL_TYPE_ADDR)
-#define LIST_REGF(_cop, _idx) LIST_REG_IMPL(_cop, _idx, REG_VAL_TYPE_FLOAT)
+#define LIST_REGI(_src, _idx) LIST_REG_IMPL(_src, _idx, REG_VAL_TYPE_INT)
+#define LIST_REGA(_src, _idx) LIST_REG_IMPL(_src, _idx, REG_VAL_TYPE_ADDR)
+#define LIST_REGF(_src, _idx) LIST_REG_IMPL(_src, _idx, REG_VAL_TYPE_FLOAT)
 #define LIST_REG_END() { .raw = REG_LIST_TERMINATOR, }
 static const RegisterId sThreadRegList[] = {
-    LIST_REGA(COP0, REG_CP0_EPC), LIST_REGI(COP0, REG_CP0_SR ), LIST_REGI(COP0, REG_CP0_CAUSE   ),
-    LIST_REGI(CPU,  REG_CPU_AT ), LIST_REGI(CPU,  REG_CPU_V0 ), LIST_REGI(CPU,  REG_CPU_V1      ),
-    LIST_REGI(CPU,  REG_CPU_A0 ), LIST_REGI(CPU,  REG_CPU_A1 ), LIST_REGI(CPU,  REG_CPU_A2      ),
-    LIST_REGI(CPU,  REG_CPU_A3 ), LIST_REGI(CPU,  REG_CPU_T0 ), LIST_REGI(CPU,  REG_CPU_T1      ),
-    LIST_REGI(CPU,  REG_CPU_T2 ), LIST_REGI(CPU,  REG_CPU_T3 ), LIST_REGI(CPU,  REG_CPU_T4      ),
-    LIST_REGI(CPU,  REG_CPU_T5 ), LIST_REGI(CPU,  REG_CPU_T6 ), LIST_REGI(CPU,  REG_CPU_T7      ),
-    LIST_REGI(CPU,  REG_CPU_S0 ), LIST_REGI(CPU,  REG_CPU_S1 ), LIST_REGI(CPU,  REG_CPU_S2      ),
-    LIST_REGI(CPU,  REG_CPU_S3 ), LIST_REGI(CPU,  REG_CPU_S4 ), LIST_REGI(CPU,  REG_CPU_S5      ),
-    LIST_REGI(CPU,  REG_CPU_S6 ), LIST_REGI(CPU,  REG_CPU_S7 ), LIST_REGI(CPU,  REG_CPU_T8      ),
-    LIST_REGI(CPU,  REG_CPU_T9 ), LIST_REGI(CPU,  REG_CPU_GP ), LIST_REGI(CPU,  REG_CPU_SP      ),
-    LIST_REGI(CPU,  REG_CPU_FP ), LIST_REGA(CPU,  REG_CPU_RA ), LIST_REGA(COP0, REG_CP0_BADVADDR),
-    LIST_REGI(SPC,  REG_SPC_HI ), LIST_REGI(SPC,  REG_SPC_LO ), LIST_REGI(SPC,  REG_SPC_RCP     ),
+    LIST_REGA(REGS_CP0, REG_CP0_EPC), LIST_REGI(REGS_CP0, REG_CP0_SR ), LIST_REGI(REGS_CP0, REG_CP0_CAUSE   ),
+    LIST_REGI(REGS_CPU, REG_CPU_AT ), LIST_REGI(REGS_CPU, REG_CPU_V0 ), LIST_REGI(REGS_CPU, REG_CPU_V1      ),
+    LIST_REGI(REGS_CPU, REG_CPU_A0 ), LIST_REGI(REGS_CPU, REG_CPU_A1 ), LIST_REGI(REGS_CPU, REG_CPU_A2      ),
+    LIST_REGI(REGS_CPU, REG_CPU_A3 ), LIST_REGI(REGS_CPU, REG_CPU_T0 ), LIST_REGI(REGS_CPU, REG_CPU_T1      ),
+    LIST_REGI(REGS_CPU, REG_CPU_T2 ), LIST_REGI(REGS_CPU, REG_CPU_T3 ), LIST_REGI(REGS_CPU, REG_CPU_T4      ),
+    LIST_REGI(REGS_CPU, REG_CPU_T5 ), LIST_REGI(REGS_CPU, REG_CPU_T6 ), LIST_REGI(REGS_CPU, REG_CPU_T7      ),
+    LIST_REGI(REGS_CPU, REG_CPU_S0 ), LIST_REGI(REGS_CPU, REG_CPU_S1 ), LIST_REGI(REGS_CPU, REG_CPU_S2      ),
+    LIST_REGI(REGS_CPU, REG_CPU_S3 ), LIST_REGI(REGS_CPU, REG_CPU_S4 ), LIST_REGI(REGS_CPU, REG_CPU_S5      ),
+    LIST_REGI(REGS_CPU, REG_CPU_S6 ), LIST_REGI(REGS_CPU, REG_CPU_S7 ), LIST_REGI(REGS_CPU, REG_CPU_T8      ),
+    LIST_REGI(REGS_CPU, REG_CPU_T9 ), LIST_REGI(REGS_CPU, REG_CPU_GP ), LIST_REGI(REGS_CPU, REG_CPU_SP      ),
+    LIST_REGI(REGS_CPU, REG_CPU_FP ), LIST_REGA(REGS_CPU, REG_CPU_RA ), LIST_REGA(REGS_CP0, REG_CP0_BADVADDR),
+    LIST_REGI(REGS_SPC, REG_SPC_HI ), LIST_REGI(REGS_SPC, REG_SPC_LO ), LIST_REGI(REGS_SPC, REG_SPC_RCP     ),
     LIST_REG_END(),
 };
 static const RegisterId sThreadFPCSRList[] = { //! TODO: Use this for printing.
-    LIST_REGI(FCR, REG_FCR_CONTROL_STATUS),
+    LIST_REGI(REGS_FCR, REG_FCR_CONTROL_STATUS),
     LIST_REG_END(),
 };
 static const RegisterId sThreadFloatRegList[] = { //! TODO: Use this for printing.
-    LIST_REGF(COP1, REG_CP1_F00), LIST_REGF(COP1, REG_CP1_F02), LIST_REGF(COP1, REG_CP1_F04),
-    LIST_REGF(COP1, REG_CP1_F06), LIST_REGF(COP1, REG_CP1_F08), LIST_REGF(COP1, REG_CP1_F10),
-    LIST_REGF(COP1, REG_CP1_F12), LIST_REGF(COP1, REG_CP1_F14), LIST_REGF(COP1, REG_CP1_F16),
-    LIST_REGF(COP1, REG_CP1_F18), LIST_REGF(COP1, REG_CP1_F20), LIST_REGF(COP1, REG_CP1_F22),
-    LIST_REGF(COP1, REG_CP1_F24), LIST_REGF(COP1, REG_CP1_F26), LIST_REGF(COP1, REG_CP1_F28),
-    LIST_REGF(COP1, REG_CP1_F30),
+    LIST_REGF(REGS_CP1, REG_CP1_F00), LIST_REGF(REGS_CP1, REG_CP1_F02), LIST_REGF(REGS_CP1, REG_CP1_F04),
+    LIST_REGF(REGS_CP1, REG_CP1_F06), LIST_REGF(REGS_CP1, REG_CP1_F08), LIST_REGF(REGS_CP1, REG_CP1_F10),
+    LIST_REGF(REGS_CP1, REG_CP1_F12), LIST_REGF(REGS_CP1, REG_CP1_F14), LIST_REGF(REGS_CP1, REG_CP1_F16),
+    LIST_REGF(REGS_CP1, REG_CP1_F18), LIST_REGF(REGS_CP1, REG_CP1_F20), LIST_REGF(REGS_CP1, REG_CP1_F22),
+    LIST_REGF(REGS_CP1, REG_CP1_F24), LIST_REGF(REGS_CP1, REG_CP1_F26), LIST_REGF(REGS_CP1, REG_CP1_F28),
+    LIST_REGF(REGS_CP1, REG_CP1_F30),
     LIST_REG_END(),
 };
 
@@ -202,10 +202,10 @@ CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
             }
 
             if (!listEnded) {
-                const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
+                const RegisterInfo* regInfo = get_reg_info(reg->src, reg->idx);
 
                 if (regInfo != NULL) {
-                    cs_registers_print_reg(TEXT_X(charX), TEXT_Y(charY), regInfo->shortName, get_reg_val(reg->cop, reg->idx));
+                    cs_registers_print_reg(TEXT_X(charX), TEXT_Y(charY), regInfo->shortName, get_reg_val(reg->src, reg->idx));
                 }
 
                 reg++;
@@ -238,7 +238,7 @@ void cs_print_fpcsr(ScreenCoord_u32 x, ScreenCoord_u32 y, Word fpcsr) {
 
 // Print a floating-point register.
 void cs_registers_print_float_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 regNum) {
-    const RegisterInfo* regInfo = get_reg_info(COP1, regNum);
+    const RegisterInfo* regInfo = get_reg_info(REGS_CP1, regNum);
 
     if (regInfo == NULL) {
         return;
@@ -248,7 +248,7 @@ void cs_registers_print_float_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 regN
     CSTextCoord_u32 charX = cs_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     x += TEXT_WIDTH(charX);
 
-    Word data = get_reg_val(COP1, regNum);
+    Word data = get_reg_val(REGS_CP1, regNum);
 
     cs_print_f32(x, y, (IEEE754_f32){ .asU32 = data, }, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), FALSE);
 }
@@ -429,10 +429,10 @@ void page_registers_print(void) {
                 break;
             }
 
-            const RegisterInfo* regInfo = get_reg_info(reg->cop, reg->idx);
+            const RegisterInfo* regInfo = get_reg_info(reg->src, reg->idx);
 
             if (regInfo != NULL) {
-                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->cop, reg->idx));
+                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->src, reg->idx));
             }
 
             reg++;
@@ -452,7 +452,7 @@ void page_registers_print(void) {
                 break;
             }
 
-            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, get_reg_val(COP1, regNum));
+            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, get_reg_val(REGS_CP1, regNum));
 
             osfp++;
             regNum += FP_REG_SIZE;

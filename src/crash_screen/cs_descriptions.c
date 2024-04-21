@@ -11,6 +11,7 @@
 #include "util/map_parser.h"
 #include "util/memory_read.h"
 #include "util/registers.h"
+#include "util/floats.h"
 
 #include "cs_descriptions.h"
 
@@ -880,7 +881,7 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
 
         if (reg.valInfo.type == REG_VAL_TYPE_FLOAT) {
             IEEE754_f32 val = {
-                .asU32 = get_reg_val(reg.cop, reg.idx)
+                .asU32 = get_reg_val(reg.src, reg.idx)
             };
             fltErrType = validate_f32(val);
 

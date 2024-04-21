@@ -599,17 +599,17 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_RS: // CPU 'RS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(CPU, insn.rs);
+                    ADD_REG(REGS_CPU, insn.rs);
                     separator = TRUE;
                     break;
                 case CHAR_P_RT: // CPU 'RT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(CPU, insn.rt);
+                    ADD_REG(REGS_CPU, insn.rt);
                     separator = TRUE;
                     break;
                 case CHAR_P_RD: // CPU 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(CPU, insn.rd);
+                    ADD_REG(REGS_CPU, insn.rd);
                     separator = TRUE;
                     break;
                 case CHAR_P_IMM: // Immediate.
@@ -630,7 +630,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_BASE: // Register offset base.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_ADDR_REG(CPU, insn.base);
+                    ADD_ADDR_REG(REGS_CPU, insn.base);
                     break;
                 case CHAR_P_BRANCH: // Branch offset.
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
@@ -644,22 +644,22 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 case CHAR_P_COP0D: // COP0 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(COP0, insn.rd);
+                    ADD_REG(REGS_CP0, insn.rd);
                     separator = TRUE;
                     break;
                 case CHAR_P_FT: // COP1 'FT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(COP1, insn.ft);
+                    ADD_REG(REGS_CP1, insn.ft);
                     separator = TRUE;
                     break;
                 case CHAR_P_FS: // COP1 'FS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(COP1, insn.fs);
+                    ADD_REG(REGS_CP1, insn.fs);
                     separator = TRUE;
                     break;
                 case CHAR_P_FD: // COP1 'FD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
-                    ADD_REG(COP1, insn.fd);
+                    ADD_REG(REGS_CP1, insn.fd);
                     separator = TRUE;
                     break;
                 case CHAR_P_EXC10: // For TRAP IF instructions.

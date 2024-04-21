@@ -8,6 +8,7 @@
 
 #include "util/memory_read.h"
 #include "util/registers.h"
+#include "util/floats.h"
 #include "cs_descriptions.h"
 #include "cs_draw.h"
 #include "cs_main.h"

@@ -153,11 +153,11 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
 
 void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, RegisterId reg, CSTextCoord_u32 maxNumChars, _Bool showAddrIfPtr) {
     CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_WHITE);
-    const RegisterInfo* regInfo = get_reg_info(reg.cop, reg.idx);
-    Word data = get_reg_val(reg.cop, reg.idx);
+    const RegisterInfo* regInfo = get_reg_info(reg.src, reg.idx);
+    Word data = get_reg_val(reg.src, reg.idx);
 
     charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
-        COLOR_RGBA32_CRASH_VARIABLE, ((reg.cop == CPU) ? regInfo->shortName : regInfo->name)
+        COLOR_RGBA32_CRASH_VARIABLE, ((reg.src == REGS_CPU) ? regInfo->shortName : regInfo->name)
     );
     if (reg.valInfo.out) {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"[output]", COLOR_RGBA32_LIGHT_GRAY);
