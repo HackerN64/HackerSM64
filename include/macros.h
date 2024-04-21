@@ -23,8 +23,8 @@
 #define GLUE(_a, _b) _a ## _b
 #define GLUE2(_a, _b) GLUE(_a, _b)
 
-#define TO_STRING(_s)    #_s
-#define TO_STRING2(_s)   TO_STRING(_s)
+#define STRINGIFY(_s)    #_s
+#define EXPAND_AND_STRINGIFY(_s)   STRINGIFY(_s)
 
 #define STRLEN(_s)          (sizeof(_s) - 1)
 #define STR_LAST_CHAR(_s)   (_s)[STRLEN(_s) - 1]
@@ -33,9 +33,9 @@
 #define INCBIN(_type, _name, _path, _align) \
     __asm__( \
         ".section \".rodata\", \"a\", @progbits\n" \
-        ".balign "TO_STRING2(_align)"\n" \
-        ".global "TO_STRING2(_name)"\n" \
-        TO_STRING2(_name)":\n" \
+        ".balign "EXPAND_AND_STRINGIFY(_align)"\n" \
+        ".global "EXPAND_AND_STRINGIFY(_name)"\n" \
+        EXPAND_AND_STRINGIFY(_name)":\n" \
         ".incbin \""_path"\"\n" \
         ".previous\n" \
     ); \

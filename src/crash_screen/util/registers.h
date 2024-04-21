@@ -152,7 +152,7 @@ typedef struct RegisterInfo {
 #define DEF_CP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, _descId)
 #define DEF_CP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, _descId)
 
-#define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX TO_STRING2(_reg)); break;
+#define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX EXPAND_AND_STRINGIFY(_reg)); break;
 
 #define DEF_IREG_END() DEF_IREG(0, NULL, 0)
 

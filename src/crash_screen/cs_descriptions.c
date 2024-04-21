@@ -212,7 +212,7 @@ const char* get_warp_node_name(enum WarpNodes id) {
 static const char* sLevelNames[] = {
     [LEVEL_NONE] = "none",
 #define STUB_LEVEL(_0, levelenum, _2, _3, _4, _5, _6, _7, _8) [levelenum] = "",
-#define DEFINE_LEVEL(textname, levelenum, _2, folder, _4, _5, _6, _7, _8, _9, _10) [levelenum] = TO_STRING2(folder),
+#define DEFINE_LEVEL(textname, levelenum, _2, folder, _4, _5, _6, _7, _8, _9, _10) [levelenum] = EXPAND_AND_STRINGIFY(folder),
 #include "levels/level_defines.h"
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
@@ -229,14 +229,14 @@ const char* get_level_name(enum LevelNum levelNum) {
 
 // -- SEGMENTS --
 
-#define DEF_ROM_SEG_IMPL(_name, _str) { .id = (uintptr_t)_##_name##SegmentRomStart, .name = TO_STRING2(_str), } 
+#define DEF_ROM_SEG_IMPL(_name, _str) { .id = (uintptr_t)_##_name##SegmentRomStart, .name = EXPAND_AND_STRINGIFY(_str), } 
 #define DEF_ROM_SEG(_name)            DEF_ROM_SEG_IMPL(_name,                      _name)
 #define DEF_ROM_SEG_YAY0(_name)       DEF_ROM_SEG_IMPL(_name##_yay0,               _name)
 #define DEF_ROM_SEG_GEO(_name)        DEF_ROM_SEG_IMPL(_name##_geo,                _name)
 #define DEF_ROM_SEG_SKY_YAY0(_name)   DEF_ROM_SEG_IMPL(_name##_skybox_yay0,        _name)
 #define DEF_ROM_SEG_SEG7(_name)       DEF_ROM_SEG_IMPL(_name##_segment_7,          _name)
 #define DEF_ROM_SEG_LANG_YAY0(_name)  DEF_ROM_SEG_IMPL(translation_##_name##_yay0, _name)
-#define DEF_ROM_SEG_GLOBAL_VAR(_name) { .id = (uintptr_t)_name, .name = TO_STRING2(_name), }
+#define DEF_ROM_SEG_GLOBAL_VAR(_name) { .id = (uintptr_t)_name, .name = EXPAND_AND_STRINGIFY(_name), }
 
 // 00: SEGMENT_MAIN
 static const IdNamePair sROMSegNames_00_main[] = {

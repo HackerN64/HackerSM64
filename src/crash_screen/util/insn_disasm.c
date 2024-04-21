@@ -508,7 +508,7 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define STR_FORMAT              "%c"
 #define STR_CONDITION           "%s"
 
-#define STR_INSN_NAME           "%-"TO_STRING2(INSN_NAME_DISPLAY_WIDTH)"s"
+#define STR_INSN_NAME           "%-"EXPAND_AND_STRINGIFY(INSN_NAME_DISPLAY_WIDTH)"s"
 #define STR_INSN_NAME_FORMAT    STR_INSN_NAME_BASE"."STR_FORMAT
 
 #define STR_IREG                "%s"                            // Register.

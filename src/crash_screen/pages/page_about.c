@@ -79,7 +79,7 @@ const char* osTvTypeStrings[] = {
 };
 
 // Microcode string:
-#define DEF_UCODE_NAME(_name) const char* sUCodeName = TO_STRING2(_name);
+#define DEF_UCODE_NAME(_name) const char* sUCodeName = EXPAND_AND_STRINGIFY(_name);
 #ifdef L3DEX2_ALONE
 DEF_UCODE_NAME(L3DEX2_alone);
 #elif F3DZEX_GBI_2
