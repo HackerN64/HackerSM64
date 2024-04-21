@@ -417,7 +417,6 @@ void reginspect_draw_for_thread(RegisterId regId) {
     }
 
     CSTextCoord_u32 line = 1;
-    // "[register] REGISTER".
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
         gInspectThread->id, get_thread_name(gInspectThread)
     );
@@ -463,6 +462,19 @@ void reginspect_draw_for_thread(RegisterId regId) {
 }
 
 void reginspect_draw_for_interface(UNUSED RegisterId regId) {
+    // enum RegisterSources src = regId.src;
+    // int idx = regId.idx;
+
+    // const RegisterSource* regSrc = get_reg_src(src);
+    // const RegisterInfo* regInfo = get_reg_info(src, idx);
+    // if (regInfo == NULL) {
+    //     return;
+    // }
+    // Word value = get_reg_val(src, idx);
+
+    // CSTextCoord_u32 line = 1;
+
+
     // InterfaceReg* regInfo = get_interface_reg_info(regId.src, regId.idx);
     // Word data = 0x00000000;
     // if (try_read_word_aligned(&data, regInfo->addr)) {

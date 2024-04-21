@@ -140,7 +140,7 @@ void _cs_about_func_ram_size(char* buf) {
 ABOUT_ENTRY_FUNC(gfx_pool,       STR_HEX_PREFIX"%X (%d cmds)", GFX_POOL_SIZE, (GFX_POOL_SIZE / sizeof(Gfx)))
 #ifdef KEEP_MARIO_HEAD
 void _cs_about_func_goddard(char* buf) {
-    size_t goddardSize = (size_t)gGoddardSize;
+    size_t goddardSize = (size_t)gGoddardSize; //! TODO: Use segmentEnd - segmentStart here?
     char* p = buf;
     p += sprintf_int_with_commas(p, goddardSize);
     p += sprintf(p, STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM, percent_of(goddardSize, (size_t)gRomSize));

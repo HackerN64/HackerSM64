@@ -22,7 +22,7 @@ Doubleword get_cpu_reg_val(int idx) {
         CASE_CPU_REG(REG_CPU_R0, zero);
         //! TODO: Directly accessing $at requires ".set noat".
         // CASE_CPU_REG(REG_CPU_AT, at);
-        case REG_CPU_AT: return __osRunningThread->context.at;
+        case REG_CPU_AT: val = __osRunningThread->context.at; break;
         CASE_CPU_REG(REG_CPU_V0, v0); CASE_CPU_REG(REG_CPU_V1, v1);
         CASE_CPU_REG(REG_CPU_A0, a0); CASE_CPU_REG(REG_CPU_A1, a1); CASE_CPU_REG(REG_CPU_A2, a2); CASE_CPU_REG(REG_CPU_A3, a3);
         CASE_CPU_REG(REG_CPU_T0, t0); CASE_CPU_REG(REG_CPU_T1, t1); CASE_CPU_REG(REG_CPU_T2, t2); CASE_CPU_REG(REG_CPU_T3, t3); CASE_CPU_REG(REG_CPU_T4, t4); CASE_CPU_REG(REG_CPU_T5, t5); CASE_CPU_REG(REG_CPU_T6, t6); CASE_CPU_REG(REG_CPU_T7, t7);

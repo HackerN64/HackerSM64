@@ -42,18 +42,18 @@ const enum ControlTypes cs_cont_list_interfaces[] = {
 };
 
 
-enum Interfaces sInterfaceSelectIndex = 0;
+enum Interfaces sSelectedInterfaceIndex = 0;
 u8 sSelectedRegisterIndex = 0;
 u8 sNumShownRegisters = 0;
 
 void page_interfaces_init(void) {
-    sInterfaceSelectIndex = 0;
+    sSelectedInterfaceIndex = 0;
     sSelectedRegisterIndex = 0;
     sNumShownRegisters = 0;
 }
 
 void draw_interface_regs(CSTextCoord_u32 line) {
-    const RegisterSource* src = get_interface_src(sInterfaceSelectIndex);
+    const RegisterSource* src = get_interface_src(sSelectedInterfaceIndex);
     const RegisterInfo* reg = &src->infoList[0];
     u8 regId = 0;
 
@@ -92,7 +92,7 @@ void page_interfaces_draw(void) {
     x += 2;
     for (int interfaceID = 0; interfaceID < NUM_INTERFACES; interfaceID++) {
         const RegisterSource* interface = get_interface_src(interfaceID);
-        if (interfaceID == sInterfaceSelectIndex) {
+        if (interfaceID == sSelectedInterfaceIndex) {
             cs_draw_row_selection_box_impl(x, (y + 1),
                 TEXT_WIDTH(strlen(interface->name)), (TEXT_HEIGHT(1) - 1),
                 COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
@@ -106,7 +106,7 @@ void page_interfaces_draw(void) {
     line++;
 
     cs_draw_divider(DIVIDER_Y(line));
-    const RegisterSource* selectedInterface = get_interface_src(sInterfaceSelectIndex);
+    const RegisterSource* selectedInterface = get_interface_src(sSelectedInterfaceIndex);
     cs_print(TEXT_X(0), TEXT_Y(line++), STR_COLOR_PREFIX"%s: %s", COLOR_RGBA32_LIGHT_CYAN, selectedInterface->name, selectedInterface->desc);
 
     draw_interface_regs(line);
@@ -118,7 +118,7 @@ void page_interfaces_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
     if (buttonPressed & A_BUTTON) {
         RegisterId regId = (RegisterId){
-            .src = INTERFACE_TO_SRC(sInterfaceSelectIndex),
+            .src = INTERFACE_TO_SRC(sSelectedInterfaceIndex),
             .idx = sSelectedRegisterIndex,
             .valInfo = {
                 .type = REG_VAL_TYPE_BITS,
@@ -137,7 +137,7 @@ void page_interfaces_input(void) {
     change = 0;
     if (gCSDirectionFlags.pressed.left ) change = -1; // Scroll left.
     if (gCSDirectionFlags.pressed.right) change = +1; // Scroll right.
-    sInterfaceSelectIndex = WRAP(((s32)sInterfaceSelectIndex + change), 0, (s32)(NUM_INTERFACES - 1));
+    sSelectedInterfaceIndex = WRAP(((s32)sSelectedInterfaceIndex + change), 0, (s32)(NUM_INTERFACES - 1));
 
 }
 

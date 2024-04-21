@@ -442,7 +442,7 @@ typedef struct PACKED InsnTemplate {
 
 #define INSN_OFFSET_FROM_ADDR(_addr, _insnOffset) ((Address)(_addr) + (sizeof(InsnData) * (s16)(_insnOffset)))
 //! TODO: Are any of these subject to change?
-#define ADDR_INSN_ASSERT                    INSN_OFFSET_FROM_ADDR(__n64Assert,   8) // 9th instruction in __n64Assert.
+#define ADDR_INSN_ASSERT                    INSN_OFFSET_FROM_ADDR(__n64Assert,   8) // 9th instruction in __n64Assert (the 'syscall').
 #define ADDR_INSN_WAITING_FOR_MESG          INSN_OFFSET_FROM_ADDR(osRecvMesg,   26) // 27th instruction in osRecvMesg.
 #define ADDR_INSN_STRLEN_DEREFERENCE_ARG    INSN_OFFSET_FROM_ADDR(strlen,        0) // 1st instruction in strlen (dereference arg).
 
