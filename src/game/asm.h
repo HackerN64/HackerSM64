@@ -1,5 +1,8 @@
 #pragma once
 
+#include <ultra64.h>
+#include <PR/os_internal.h>
+
 #include "config.h"
 #include "types.h"
 
@@ -32,9 +35,9 @@ void _asm_setbits(uintptr_t bits);
 #define EXCEPTION_IBE()     //! TODO: do { ; } while (0) // Bus error on instruction fetch.
 #define EXCEPTION_DBE()     //! TODO: do { ; } while (0) // Bus error on data.
 #define EXCEPTION_SYSCALL() do { asm volatile("syscall");                                               } while (0) // System call exception.
-#define EXCEPTION_BREAK()   do { asm volatile("break");                                                 } while (0) // Breakpoint exception.
+#define EXCEPTION_BREAK()   do { asm volatile("break");                                                 } while (0) // Breakpoint exception. //! TODO: No crash screen?
 #define EXCEPTION_II()      do { _asm_setbits(0x00000001);                                              } while (0) // Reserved instruction exception.
-#define EXCEPTION_CPU()     //! TODO: do { ; } while (0) // Coprocessor unusable exception.
+#define EXCEPTION_CPU()     do { __osSetSR(__osGetSR() & ~SR_CU1); volatile float __x = 1.0f; __x += 1.0f; } while (0) // Coprocessor unusable exception. //! TODO: No crash screen?
 #define EXCEPTION_OV()      //! TODO: do { ; } while (0) // Arithmetic overflow exception.
 #define EXCEPTION_TRAP()    do { TRAP();                                                                } while (0) // Trap exception. 
 #define EXCEPTION_VCEI()    //! TODO: do { ; } while (0) // Virtual coherency exception on intruction fetch.

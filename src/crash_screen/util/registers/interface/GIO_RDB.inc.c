@@ -8,7 +8,6 @@ static const char* sRegDesc_GIO[] = {
     "unknown",
 };
 ALIGNED32 static const RegisterInfo sRegInfo_GIO[] = {
-    [REGID_GIO_BASE     ] = DEF_IREG(GIO_BASE_REG,      "BASE",           0),
     [REGID_GIO_GIO_INTR ] = DEF_IREG(GIO_GIO_INTR_REG,  "INTERRUPT",      0),
     [REGID_GIO_GIO_SYNC ] = DEF_IREG(GIO_GIO_SYNC_REG,  "SYNC",           0),
     [REGID_GIO_CART_INTR] = DEF_IREG(GIO_CART_INTR_REG, "CART_INTERRUPT", 0),

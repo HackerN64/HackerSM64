@@ -105,13 +105,13 @@ typedef union RegisterId {
 typedef struct RegisterInfo {
     /*0x00*/ const char* name;
     /*0x04*/ union {
-                const Address addr; // Interface register address.
+                const Address addr; // Interface register address. //! TODO: Can this be changed to offset from base address to save 3 bytes? Potential issues: [RDRAM_ROW,SP_PC,SP_IBIST,GIO_SYNC,GIO_CART_INTERRUPT]
                 struct {
                     struct PACKED {
                         const u8 is64bit : 1; // [0=32bit,1=64bit]
                         const u8 offset  : 7; // (byte offset in __OSThreadContext) / sizeof(u32)
                     };
-                    const char shortName[3];
+                    const char shortName[3]; //! TODO: Can the null terminator be excluded here somehow to make room for other data?
                 }; // Thread register.
             };
     /*0x08*/ const u8 descId; // : 5

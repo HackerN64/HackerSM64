@@ -1,5 +1,4 @@
 #include <ultra64.h>
-
 #include <PR/os_internal.h>
 
 #include <stdarg.h>

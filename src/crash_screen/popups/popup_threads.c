@@ -1,12 +1,12 @@
 #include <ultra64.h>
 
+#include <PR/os_internal.h>
+
 #include <string.h>
 #include <stdarg.h>
 
 #include "types.h"
 #include "sm64.h"
-
-#include "PR/os_internal.h"
 
 #include "crash_screen/util/registers.h"
 #include "crash_screen/cs_controls.h"

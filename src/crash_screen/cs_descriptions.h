@@ -73,6 +73,7 @@ const char* get_hardcoded_memory_str(Address addr);
 
 const char* get_processor_name(u8 imp);
 
+const char* get_cause_desc_simple(u32 cause);
 const char* get_cause_desc(__OSThreadContext* tc, _Bool specific);
 const char* get_fpcsr_desc(u32 fpcsr, _Bool specific);
 

@@ -769,6 +769,23 @@ _Bool check_for_empty_infinite_loop(Address pc, _Bool inBranchDelaySlot) {
     );
     #undef INSN_IS_B_0
 }
+const char* get_cause_desc_simple(u32 cause) {
+    cause &= CAUSE_EXCMASK;
+
+    switch (cause) {
+        // Make the last two "cause" case indexes sequential for array access.
+        case EXC_WATCH: cause = EXC_CODE(CAUSE_DESC_WATCH); break; // 23 -> 16
+        case EXC_VCED:  cause = EXC_CODE(CAUSE_DESC_VCED ); break; // 31 -> 17
+    }
+
+    cause >>= CAUSE_EXCSHIFT;
+
+    if (cause < ARRAY_COUNT(sCauseDesc)) {
+        return sCauseDesc[cause];
+    }
+
+    return NULL;
+}
 // Returns a CAUSE description from 'sCauseDesc'.
 const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
     u32 cause = (tc->cause & CAUSE_EXCMASK);
@@ -842,19 +859,7 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
         }
     }
 
-    switch (cause) {
-        // Make the last two "cause" case indexes sequential for array access.
-        case EXC_WATCH: cause = EXC_CODE(CAUSE_DESC_WATCH); break; // 23 -> 16
-        case EXC_VCED:  cause = EXC_CODE(CAUSE_DESC_VCED ); break; // 31 -> 17
-    }
-
-    cause >>= CAUSE_EXCSHIFT;
-
-    if (cause < ARRAY_COUNT(sCauseDesc)) {
-        return sCauseDesc[cause];
-    }
-
-    return NULL;
+    return get_cause_desc_simple(cause);
 }
 
 
