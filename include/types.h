@@ -8,7 +8,7 @@
 #include "macros.h"
 #include "config.h"
 
-#define BIT(i)  (1 << (i))
+#define BIT(i)  ((u64)1 << (i))
 #define BITMASK(size) ((BIT(size)) - 1)
 #define SHIFTED_BITMASK(size, shift) (BITMASK(size) << (shift))
 

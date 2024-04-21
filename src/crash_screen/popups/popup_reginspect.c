@@ -98,29 +98,42 @@ const char** sRegBitsInfoStrings[] = {
     [REG_BITS_INFO_STR_FCR31_ROUNDING_MODE] = sStr_FCR31_RoundingMode,
 };
 
-static char sRegBitsInfoFuncBuffer[8];
+static char sRegBitsInfoFuncBuffer[CRASH_SCREEN_NUM_CHARS_X];
 
 enum PACKED RegBitsInfoFuncs {
     REG_BITS_INFO_FUNC_READWRITE,
+    REG_BITS_INFO_FUNC_CAUSE,
 };
 
-void regbits_str_readwrite(char* buf, u32 bits) {
+void regbits_str_readwrite(char* buf, Word bits) {
     char* p = buf;
-    bits &= 0b11;
     p += sprintf(p, "R:%d/W:%d", (bits >> 1), (bits & 0b1));
 }
 
-typedef void (*RegBitsInfoFunc)(char* buf, u32 bits);
+void regbits_str_cause(char* buf, Word bits) {
+    char* p = buf;
+    p += sprintf(p, "%s", get_cause_desc_simple(bits));
+    if (((bits & CAUSE_EXCMASK) >> CAUSE_EXCSHIFT) == EXC_CPU) {
+        p += sprintf(p, " (cop%d)", ((bits & CAUSE_CEMASK) >> CAUSE_CESHIFT));//c.CE);
+    }
+}
+
+typedef void (*RegBitsInfoFunc)(char* buf, Word bits);
 RegBitsInfoFunc sRegBitsInfoFuncs[] = {
     [REG_BITS_INFO_FUNC_READWRITE] = regbits_str_readwrite,
+    [REG_BITS_INFO_FUNC_CAUSE    ] = regbits_str_cause,
 };
 
 enum PACKED RegBitsType {
+    REG_BITS_TYPE_END = -1,
     REG_BITS_TYPE_NONE,
+    REG_BITS_TYPE_BIN,
     REG_BITS_TYPE_HEX,
     REG_BITS_TYPE_DEC,
     REG_BITS_TYPE_STR,
     REG_BITS_TYPE_FUNC,
+    REG_BITS_TYPE_SETX, // Set info start X.
+    REG_BITS_TYPE_SETW, // Set info width (for wrapping).
 };
 typedef struct RegBitsInfo {
     /*0x00*/ const char* name;
@@ -128,44 +141,111 @@ typedef struct RegBitsInfo {
     /*0x05*/ const u8 shiftSize;
     /*0x06*/ const enum RegBitsType type;
     /*0x07*/ union {
+                const u8 arg;
+                const u8 spacing;                       // REG_BITS_TYPE_BIN
                 const u8 numDigits;                     // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
                 const enum RegBitsInfoStringLists list; // REG_BITS_TYPE_STR
                 const enum RegBitsInfoFuncs func;       // REG_BITS_TYPE_FUNC
+                const u8 xPos;                          // REG_BITS_TYPE_SETX
+                const u8 width;                         // REG_BITS_TYPE_SETW
             };
 } RegBitsInfo; /*0x08*/
-#define REG_BITS_INFO_HEX(_name, _mask, _numDigits) {   \
-    .name      = _name,                                 \
-    .maskSize  = POPCOUNT(_mask),                       \
-    .shiftSize = CTZ(_mask),                            \
-    .type      = REG_BITS_TYPE_HEX,                     \
-    .numDigits = _numDigits,                            \
+#define REG_BITS_INFO(_name, _mask, _type, _arg) {  \
+    .name      = _name,                             \
+    .maskSize  = POPCOUNT(_mask),                   \
+    .shiftSize = CTZ(_mask),                        \
+    .type      = _type,                             \
+    .arg       = _arg,                              \
 }
-#define REG_BITS_INFO_DEC(_name, _mask, _numDigits) {   \
-    .name      = _name,                                 \
-    .maskSize  = POPCOUNT(_mask),                       \
-    .shiftSize = CTZ(_mask),                            \
-    .type      = REG_BITS_TYPE_DEC,                     \
-    .numDigits = _numDigits,                            \
+#define REG_BITS_INFO_BIN(_name, _mask, _spacing)   REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_BIN,  _spacing)
+#define REG_BITS_INFO_HEX(_name, _mask, _numDigits) REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_HEX,  _numDigits)
+#define REG_BITS_INFO_DEC(_name, _mask, _numDigits) REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_DEC,  _numDigits)
+#define REG_BITS_INFO_STR(_name, _mask, _list)      REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_STR,  _list)
+#define REG_BITS_INFO_FUNC(_name, _mask, _func)     REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_FUNC, _func)
+#define REG_BITS_INFO_SETX(_x)                      REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_SETX, _x)
+#define REG_BITS_INFO_SETW(_width)                  REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_SETW, _width)
+#define REG_BITS_INFO_NONE(_name)                   REG_BITS_INFO(_name, 0,     REG_BITS_TYPE_NONE, 0)
+#define REG_BITS_INFO_GAP()                         REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_NONE, 0)
+#define REG_BITS_INFO_END()                         REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_END,  0)
+
+
+CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const RegBitsInfo* list) {
+    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
+    ScreenCoord_u32 x = TEXT_X(2);
+    CSTextCoord_u32 currLine = line;
+    CSTextCoord_u32 descW = ((CRASH_SCREEN_NUM_CHARS_X - 2) / 2);
+    CSTextCoord_u32 infoW = 0;
+
+    const RegBitsInfo* info = &list[0];
+    while ((info != NULL) && (info->type != REG_BITS_TYPE_END)) {
+        if (currLine >= (CRASH_SCREEN_NUM_CHARS_Y - 1)) {
+            currLine = line;
+            x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
+        }
+
+        ScreenCoord_u32 y = TEXT_Y(currLine);
+        CSTextCoord_u32 linesPrinted = 1;
+        enum RegBitsType type = info->type;
+        _Bool hasInfo = (type != REG_BITS_TYPE_NONE);
+        const char* name = info->name;
+        if (name != NULL) {
+            // cs_print(x, y, "%s%c", name, (hasInfo ? ':' : ' '));
+            cs_print(x, y, "%s:", name);
+            linesPrinted = gCSNumLinesPrinted; 
+        }
+        if (hasInfo) {
+            ScreenCoord_u32 x2 = (x + TEXT_WIDTH(descW));
+            u8 maskSize = info->maskSize;
+            Word mask = BITMASK(maskSize);
+            u8 shiftSize = info->shiftSize;
+            Word bits = ((val >> shiftSize) & mask);
+
+            switch (type) {
+                case REG_BITS_TYPE_BIN:
+                    //! TODO: combine this with cs_print_as_binary:
+                    ScreenCoord_u32 x3 = x2;
+                    for (int i = 0; i < maskSize; i++) {
+                        char c = (((bits >> ((maskSize - 1) - i)) & 0b1) ? '1' : '0');
+                        cs_draw_glyph(x3, y, c, infoColor);
+                        x3 += TEXT_WIDTH(info->spacing);
+                    }
+                    break;
+                case REG_BITS_TYPE_HEX:
+                    cs_print(x2, y, (STR_COLOR_PREFIX STR_HEX_PREFIX"%0*X"), infoColor, info->numDigits, bits);
+                    break;
+                case REG_BITS_TYPE_DEC:
+                    cs_print(x2, y, (STR_COLOR_PREFIX"%0*d"), infoColor, info->numDigits, bits);
+                    break;
+                case REG_BITS_TYPE_STR:
+                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoStrings[info->list][bits]);
+                    break;
+                case REG_BITS_TYPE_FUNC:
+                    bzero(sRegBitsInfoFuncBuffer, sizeof(sRegBitsInfoFuncBuffer));
+                    sRegBitsInfoFuncs[info->func](sRegBitsInfoFuncBuffer, bits);
+                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoFuncBuffer);
+                    break;
+                case REG_BITS_TYPE_SETX:
+                    linesPrinted = 0;
+                    descW = info->xPos;
+                    break;
+                case REG_BITS_TYPE_SETW:
+                    linesPrinted = 0;
+                    infoW = info->width;
+                    break;
+                default:
+                    break;
+            }
+        }
+        currLine += linesPrinted;
+        info++;
+    }
+
+    return currLine;
 }
-#define REG_BITS_INFO_STR(_name, _mask, _list) {        \
-    .name      = _name,                                 \
-    .maskSize  = POPCOUNT(_mask),                       \
-    .shiftSize = CTZ(_mask),                            \
-    .type      = REG_BITS_TYPE_STR,                     \
-    .list      = _list,                                 \
-}
-#define REG_BITS_INFO_FUNC(_name, _mask, _func) {       \
-    .name      = _name,                                 \
-    .maskSize  = POPCOUNT(_mask),                       \
-    .shiftSize = CTZ(_mask),                            \
-    .type      = REG_BITS_TYPE_FUNC,                    \
-    .func      = _func,                                 \
-}
-#define REG_BITS_INFO_NONE(_name)   { .name = _name, .type = REG_BITS_TYPE_NONE, }
-#define REG_BITS_INFO_GAP()         REG_BITS_INFO_NONE("")
-#define REG_BITS_INFO_END()         REG_BITS_INFO_NONE(NULL)
 
 const RegBitsInfo regBits_C0_SR[] = {
+    REG_BITS_INFO_SETX(STRLEN("xxxxxxxxxx: ")),
+    REG_BITS_INFO_SETW(STRLEN("xxxxxxxx")),
     REG_BITS_INFO_STR("cop1",       SR_CU1,      REG_BITS_INFO_STR_ENABLE),
     REG_BITS_INFO_STR("low power",  SR_RP,       REG_BITS_INFO_STR_ON_OFF),
     REG_BITS_INFO_STR("extra fpr",  SR_FR,       REG_BITS_INFO_STR_ENABLE),
@@ -189,62 +269,8 @@ const RegBitsInfo regBits_C0_SR[] = {
     REG_BITS_INFO_END(),
 };
 
-CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, CSTextCoord_u32 descW, CSTextCoord_u32 infoW, Word val, const RegBitsInfo* list) {
-    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
-    ScreenCoord_u32 x = TEXT_X(2);
-    CSTextCoord_u32 currLine = line;
-
-    descW += STRLEN(": ");
-
-    const RegBitsInfo* info = &list[0];
-    while (info->name != NULL) {
-        if (currLine >= (CRASH_SCREEN_NUM_CHARS_Y - 1)) {
-            currLine = line;
-            x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
-        }
-
-        ScreenCoord_u32 y = TEXT_Y(currLine);
-        const char* name = info->name;
-        if (name[0] != '\0') {
-            cs_print(x, y, "%s:", info->name);
-        }
-        enum RegBitsType type = info->type;
-        if (type != REG_BITS_TYPE_NONE) {
-            ScreenCoord_u32 x2 = (x + TEXT_WIDTH(descW));
-            Word mask = BITMASK(info->maskSize);
-            Word bits = ((val >> info->shiftSize) & mask);
-
-            switch (type) {
-                case REG_BITS_TYPE_HEX:
-                    cs_print(x2, y, (STR_COLOR_PREFIX STR_HEX_PREFIX"%0*X"), infoColor, info->numDigits, bits);
-                    break;
-                case REG_BITS_TYPE_DEC:
-                    cs_print(x2, y, (STR_COLOR_PREFIX"%0*d"), infoColor, info->numDigits, bits);
-                    break;
-                case REG_BITS_TYPE_STR:
-                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoStrings[info->list][bits]);
-                    break;
-                case REG_BITS_TYPE_FUNC:
-                    bzero(sRegBitsInfoFuncBuffer, sizeof(sRegBitsInfoFuncBuffer));
-                    sRegBitsInfoFuncs[info->func](sRegBitsInfoFuncBuffer, bits);
-                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoFuncBuffer);
-                    break;
-                default:
-                    break;
-            }
-        }
-        currLine++;
-        info++;
-    }
-
-    return currLine;
-}
-
-void cs_print_reg_info_C0_SR(CSTextCoord_u32 line, Doubleword val) {
-    cs_print_reg_info_list(line, STRLEN("xxxxxxxxxx"), STRLEN("xxxxxxxx"), (Word)val, regBits_C0_SR);
-}
-
 const RegBitsInfo regBits_C0_CAUSE[] = {
+    REG_BITS_INFO_SETX(STRLEN("is branch delay slot: ")),
     REG_BITS_INFO_STR("is branch delay slot", CAUSE_BD, REG_BITS_INFO_STR_YES_NO),
     REG_BITS_INFO_GAP(),
     REG_BITS_INFO_NONE("interrupts pending"),
@@ -256,64 +282,45 @@ const RegBitsInfo regBits_C0_CAUSE[] = {
     REG_BITS_INFO_DEC( "  Software",    (CAUSE_SW2 | CAUSE_SW1), 1),
     REG_BITS_INFO_GAP(),
     REG_BITS_INFO_DEC("exc code", CAUSE_EXCMASK, 2),
+    REG_BITS_INFO_SETX(2),
+    REG_BITS_INFO_FUNC(NULL, BITMASK(32), REG_BITS_INFO_FUNC_CAUSE),
 
     REG_BITS_INFO_END(),
 };
 
-void cs_print_reg_info_C0_CAUSE(CSTextCoord_u32 line, Doubleword val) {
-    line = cs_print_reg_info_list(line, STRLEN("is branch delay slot"), 0, (Word)val, regBits_C0_CAUSE);
-
-    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
-    const Reg_CP0_Cause c = {
-        .raw = (Word)val,
-    };
-
-    CSTextCoord_u32 charX = 4;
-    const char* causeDesc = get_cause_desc(&gInspectThread->context, FALSE);
-    if (causeDesc != NULL) {
-        charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"%s", infoColor, causeDesc);
-    }
-    if (c.Exc_Code == (EXC_CPU >> CAUSE_EXCSHIFT)) {
-        cs_print(TEXT_X(charX), TEXT_Y(line++), " "STR_COLOR_PREFIX"(cop%d)", infoColor, c.CE);
-    }
-}
-
 const RegBitsInfo regBits_FPR_CSR[] = {
+    REG_BITS_INFO_SETX(STRLEN("flush denorms to zero: ")),
     REG_BITS_INFO_STR("flush denorms to zero", FPCSR_FS,      REG_BITS_INFO_STR_YES_NO),
     REG_BITS_INFO_STR("condition bit",         FPCSR_C,       REG_BITS_INFO_STR_TRUTH),
     REG_BITS_INFO_STR("rounding mode",         FPCSR_RM_MASK, REG_BITS_INFO_STR_FCR31_ROUNDING_MODE),
+    REG_BITS_INFO_NONE("\nexception bits:\n  E:unimpl   | V:invalid   | Z:div0\n  O:overflow | U:underflow | I:inexact\n\n                 E V Z O U I"),
+    REG_BITS_INFO_SETX(17),
+    REG_BITS_INFO_BIN("          cause",  (FPCSR_CE | FPCSR_CV | FPCSR_CZ | FPCSR_CO | FPCSR_CU | FPCSR_CI), 2),
+    REG_BITS_INFO_SETX(19),
+    REG_BITS_INFO_BIN("          enable",            (FPCSR_EV | FPCSR_EZ | FPCSR_EO | FPCSR_EU | FPCSR_EI), 2),
+    REG_BITS_INFO_BIN("          flags",             (FPCSR_FV | FPCSR_FZ | FPCSR_FO | FPCSR_FU | FPCSR_FI), 2),
     REG_BITS_INFO_END(),
 };
-
-void cs_print_reg_info_FPR_CSR(CSTextCoord_u32 line, Doubleword val) {
-    const ScreenCoord_u32 x1 = TEXT_X(2);
-    const ScreenCoord_u32 x2 = TEXT_X(4);
-    const ScreenCoord_u32 x3 = TEXT_X(12);
-    const RGBA32 infoColor = COLOR_RGBA32_GRAY;
-    const Reg_FPR_31 f = {
-        .raw = (Word)val,
-    };
-
-    line = cs_print_reg_info_list(line, STRLEN("flush denorms to zero: "), 0, (Word)val, regBits_FPR_CSR);
-    line++;
-    cs_print(x1, TEXT_Y(line++), "exception bits:");
-    cs_print(x2, TEXT_Y(line++), "E:unimpl   | V:invalid   | Z:div0");
-    cs_print(x2, TEXT_Y(line++), "O:overflow | U:underflow | I:inexact");
-    line++;
-    cs_print(x3, TEXT_Y(line++), "       E V Z O U I");
-    cs_print(x3, TEXT_Y(line++), "cause: "STR_COLOR_PREFIX"%d %d %d %d %d %d", infoColor, f.cause_.E, f.cause_.V,  f.cause_.Z,  f.cause_.O,  f.cause_.U,  f.cause_.I );
-    cs_print(x3, TEXT_Y(line++), "enable:  "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.enable_.V, f.enable_.Z, f.enable_.O, f.enable_.U, f.enable_.I);
-    cs_print(x3, TEXT_Y(line++), "flags:   "STR_COLOR_PREFIX"%d %d %d %d %d",  infoColor,             f.flag_.V,   f.flag_.Z,   f.flag_.O,   f.flag_.U,   f.flag_.I  );
-}
 
 const RegBitsInfo regBits_SPC_RCP[] = {
+    REG_BITS_INFO_SETX(STRLEN("interrupt mask: ")),
     REG_BITS_INFO_HEX("interrupt mask", (RCP_IMASK >> RCP_IMASKSHIFT), 2),
+
     REG_BITS_INFO_END(),
 };
 
-void cs_print_reg_info_SPC_RCP(CSTextCoord_u32 line, Doubleword val) {
-    cs_print_reg_info_list(line, STRLEN("interrupt mask"), 0, (Word)val, regBits_SPC_RCP);
-}
+typedef struct RegInspectExtraInfo {
+    /*0x00*/ const enum RegisterSources src;
+    /*0x01*/ const s8 idx;
+    /*0x03*/ const u8 pad[2];
+    /*0x04*/ const RegBitsInfo* list;
+} RegInspectExtraInfo; /*0x08*/
+const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
+    { .src = REGS_CP0, .idx = REG_CP0_SR,             .list = regBits_C0_SR,    },
+    { .src = REGS_CP0, .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE, },
+    { .src = REGS_FCR, .idx = REG_FCR_CONTROL_STATUS, .list = regBits_FPR_CSR,  },
+    { .src = REGS_SPC, .idx = REG_SPC_RCP,            .list = regBits_SPC_RCP,  },
+};
 
 void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
     if (IS_DEBUG_MAP_INCLUDED()) {
@@ -346,19 +353,6 @@ void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
         sInspectedRegisterPtrAddr = 0x00000000;
     }
 }
-
-typedef struct RegInspectExtraInfo {
-    /*0x00*/ const enum RegisterSources src;
-    /*0x01*/ const s8 idx;
-    /*0x03*/ const u8 pad[2];
-    /*0x04*/ void (*func)(CSTextCoord_u32 line, Doubleword val);
-} RegInspectExtraInfo; /*0x08*/
-const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
-    { .src = REGS_CP0, .idx = REG_CP0_SR,             .func = cs_print_reg_info_C0_SR,    },
-    { .src = REGS_CP0, .idx = REG_CP0_CAUSE,          .func = cs_print_reg_info_C0_CAUSE, },
-    { .src = REGS_FCR, .idx = REG_FCR_CONTROL_STATUS, .func = cs_print_reg_info_FPR_CSR,  },
-    { .src = REGS_SPC, .idx = REG_SPC_RCP,            .func = cs_print_reg_info_SPC_RCP,  },
-};
 
 CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, RegisterId regId, const Doubleword val64, _Bool is64Bit) {
     cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"%d-bit value:", COLOR_RGBA32_CRASH_PAGE_NAME, (is64Bit ? 64 : 32));
@@ -455,7 +449,7 @@ void reginspect_draw_for_thread(RegisterId regId) {
     for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
         if ((exInfo->src == src) && (exInfo->idx == idx)) {
             cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"decoded bits:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            exInfo->func(line, value);
+            cs_print_reg_info_list(line, val32, exInfo->list);
             hasExInfo = TRUE;
             sInspectedRegisterPtrAddr = 0x00000000;
             break;
