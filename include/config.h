@@ -20,8 +20,10 @@
 #include "config/config_rom.h"
 
 // Local config - include a gitignore'd config file that's specific to just the user (if the file exists)
-#if defined(LOCAL_CONFIG) && !defined(DISABLE_ALL)
-#include "config/config_local.h"
+#ifdef __has_include
+    #if __has_include("config/config_local.h")
+        #include "config/config_local.h"
+    #endif
 #endif
 
 // WARNING: Compatibility safeguards - don't remove this file unless you know what you're doing
