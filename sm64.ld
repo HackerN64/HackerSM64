@@ -146,7 +146,6 @@ SECTIONS
       */ULTRALIB.a:*.o(.text*);
       */libnustd.a:*.o(.text*);
       */libgcc.a:*.o(.text*);
-      */librtc.a:*.o(.text*);
       */libz.a:*.o(.text*);
       lib/rspboot.o(.text*);
 #include "rsptext.inc.ld"
@@ -161,7 +160,6 @@ SECTIONS
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
       */ULTRALIB.a:*.o(.data*);
-      */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
 #include "rspdata.inc.ld"
       lib/PR/audio/aspMain.o(.data*);
@@ -175,7 +173,6 @@ SECTIONS
 #endif
       */ULTRALIB.a:*.o(.rodata*);
       */libgcc.a:*.o(.rodata*);
-      */librtc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
 
    }
@@ -191,7 +188,6 @@ SECTIONS
       */ULTRALIB.a:*.o(COMMON);
       */ULTRALIB.a:*.o(.scommon);
       */ULTRALIB.a:*.o(.*bss*);
-      */librtc.a:*.o(.bss*);
       */libz.a:*.o(.bss*);
       . = ALIGN(0x8);
    }
