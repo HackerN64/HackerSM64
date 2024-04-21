@@ -6,7 +6,7 @@
 
 // scripts
 extern const LevelScript level_main_scripts_entry[];
-#define common1_load_geolayouts script_func_global_1
+#define common1_load_geolayouts level_main_scripts_entry
 extern const LevelScript script_func_global_1[];
 #define common0_load_geolayouts script_func_global_1
 extern const LevelScript script_func_global_2[];
