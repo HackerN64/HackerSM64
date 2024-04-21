@@ -832,6 +832,12 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
                 if (pc == ADDR_INSN_ASSERT) {
                     return "Failed Assert (see below)";
                 }
+                break;
+            case EXC_II:
+                if (!addr_is_in_text_segment(pc)) {
+                    return "Reading code in non-code segment";
+                }
+                break;
         }
     }
 

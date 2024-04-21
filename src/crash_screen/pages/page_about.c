@@ -96,7 +96,7 @@ ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
 ABOUT_ENTRY_FUNC(microcode,      gUcodeName)
 #ifdef LIBDRAGON
-//! TODO: Libdragon version:
+//! TODO: Libdragon version (if this ever becomes compatible):
 ABOUT_ENTRY_FUNC(region,         "LIBDRAGON")
 #else // !LIBDRAGON
 ABOUT_ENTRY_FUNC(region,         "%s (%s)", gRegionName, osTvTypeStrings[osTvType])
@@ -183,10 +183,8 @@ void _cs_about_func_emulator(char* buf) {
     char* p = buf;
     p += sprintf(p, "%s", get_emulator_name(gEmulator));
     if (gEmulator & EMU_CONSOLE) {
-        // u32 val = 0x00000000;
-        // ASM_GET_REG_COP0(val, "$15"); // TODO: use get_reg_val
         Reg_CP0_PRId prid = {
-            .raw = (u32)get_direct_reg_val(COP0, REG_CP0_PRID),
+            .raw = (Word)get_reg_val(COP0, REG_CP0_PRID),
         };
         p += sprintf(p, " (%s rev%d.%d)", get_processor_name(prid.Imp), prid.Rev_.major, prid.Rev_.minor);
     } else if (gSupportsLibpl) {

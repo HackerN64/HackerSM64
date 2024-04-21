@@ -100,6 +100,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
             ASSERT_TYPE_LEVEL,
             ASSERT_TYPE_RCP,
             //! TODO: ASSERT_TYPE_AUDIO
+            //! TODO: ASSERT_TYPE_CRASH_SCREEN
         } type = ASSERT_TYPE_DEFAULT;
         if (message[0] == CHAR_ASSERT_PREFIX) {
             switch (message[1]) {

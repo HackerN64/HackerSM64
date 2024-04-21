@@ -197,7 +197,7 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                             RGBA16 color = data.halfword[byteOffset > 1];
                             cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA16_TO_RGBA32(color));
                             break;
-                        case MEMORY_MODE_RGBA32:;
+                        case MEMORY_MODE_RGBA32:
                             cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), data.word);
                             break;
 

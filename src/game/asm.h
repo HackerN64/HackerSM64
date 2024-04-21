@@ -36,7 +36,7 @@ void _asm_setbits(uintptr_t bits);
 #define EXCEPTION_II()      do { _asm_setbits(0x00000001);                                              } while (0) // Reserved instruction exception.
 #define EXCEPTION_CPU()     //! TODO: do { ; } while (0) // Coprocessor unusable exception.
 #define EXCEPTION_OV()      //! TODO: do { ; } while (0) // Arithmetic overflow exception.
-#define EXCEPTION_TRAP()    do { __builtin_trap();                                                      } while (0) // Trap exception. 
+#define EXCEPTION_TRAP()    do { TRAP();                                                                } while (0) // Trap exception. 
 #define EXCEPTION_VCEI()    //! TODO: do { ; } while (0) // Virtual coherency exception on intruction fetch.
 #define EXCEPTION_FPE()     do { volatile IEEE754_f32 __x = { .asU32 = 0x00000001, } asm volatile("add.s %0,%1,%2":"=f"(__x):"f"(__x),"f"(__x)); } while (0) // Floating point exception (see fpcsr).
 #define EXCEPTION_WATCH()   //! TODO: do { ; } while (0) // Watchpoint exception.

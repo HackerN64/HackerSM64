@@ -462,7 +462,7 @@ _Bool is_unmapped_kx64(uint64_t vAddr) {
     if (vAddr <= 0xffffffffbfffffffull) return FALSE; //   mapped: 0xffffffffa0000000 - 0xffffffffbfffffff (KSEG1)
     if (vAddr <= 0xffffffffdfffffffull) return FALSE; //   mapped: 0xffffffffc0000000 - 0xffffffffdfffffff (KSSEG)
     if (vAddr <= 0xffffffffffffffffull) return FALSE; //   mapped: 0xffffffffe0000000 - 0xffffffffffffffff (KSEG3)
-    __builtin_unreachable();
+    UNREACHABLE();
 }
 
 const char* get_region_str_from_addr_impl(Address addr, const MemoryRegion* regionList, size_t listSize) {
