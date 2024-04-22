@@ -12,6 +12,9 @@
 #endif // !INCLUDE_DEBUG_MAP
 
 
+typedef s32 MapSymbolIndex;
+
+
 enum SymbolSearchDirections {
     SYMBOL_SEARCH_FORWARD,  // Use this to get the earlier symbol on an overlap.
     SYMBOL_SEARCH_BACKWARD, // Use this to get the later symbol on an overlap.
@@ -112,7 +115,7 @@ extern const Byte gMapStrings[];
 extern const Byte gMapStringEnd[];
 
 
-extern size_t gNumMapSymbols;
+extern MapSymbolIndex gNumMapSymbols;
 
 
 void map_data_init(void);
@@ -120,7 +123,7 @@ _Bool addr_is_in_text_segment(Address addr);
 _Bool symbol_is_function(const MapSymbol* symbol);
 const char* get_map_symbol_name(const MapSymbol* symbol);
 _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol);
-s32 get_symbol_index_from_addr_forward(Address addr);
-s32 get_symbol_index_from_addr_backward(Address addr);
-s32 get_symbol_index_from_addr_binary(Address addr);
+MapSymbolIndex get_symbol_index_from_addr_forward(Address addr);
+MapSymbolIndex get_symbol_index_from_addr_backward(Address addr);
+MapSymbolIndex get_symbol_index_from_addr_binary(Address addr);
 const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection);

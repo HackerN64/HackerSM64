@@ -49,8 +49,8 @@ const enum ControlTypes cs_cont_list_map[] = {
 };
 
 
-u32 sMapViewerSelectedIndex = 0;
-static u32 sMapViewerViewportIndex = 0;
+MapSymbolIndex sMapViewerSelectedIndex = 0;
+static MapSymbolIndex sMapViewerViewportIndex = 0;
 
 
 void page_map_init(void) {
@@ -63,7 +63,7 @@ void map_viewer_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     _Bool showAddresses = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_ADDRESSES);
     _Bool showTypes     = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_TYPES    );
     _Bool showSizes     = cs_get_setting_val(CS_OPT_GROUP_PAGE_MAP, CS_OPT_MAP_SHOW_SIZES    );
-    u32 currIndex = sMapViewerViewportIndex;
+    MapSymbolIndex currIndex = sMapViewerViewportIndex;
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
     // Print.
@@ -204,11 +204,11 @@ void page_map_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
-    u32 currIndex = sMapViewerViewportIndex;
+    MapSymbolIndex currIndex = sMapViewerViewportIndex;
     osSyncPrintf("SECTION: ["STR_HEX_WORD"-"STR_HEX_WORD"]\n", gMapSymbols[currIndex].addr, gMapSymbols[currIndex + (MAP_VIEWER_NUM_ROWS - 1)].addr);
     const MapSymbol* symbol = &gMapSymbols[currIndex];
 
-    for (u32 i = 0; i < MAP_VIEWER_NUM_ROWS; i++) {
+    for (MapSymbolIndex i = 0; i < MAP_VIEWER_NUM_ROWS; i++) {
         if (currIndex >= gNumMapSymbols) {
             break;
         }
