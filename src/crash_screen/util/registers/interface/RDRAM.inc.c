@@ -28,13 +28,6 @@ ALIGNED32 static const RegisterInfo sRegInfo_RDRAM[] = {
     [REGID_RDRAM_DEVICE_MANUF] = DEF_IREG(RDRAM_DEVICE_MANUF_REG, "DEVICE_MANUF",       REGID_RDRAM_DEVICE_MANUF),
     [REGID_RDRAM_ROW         ] = DEF_IREG(0x03F00200,             "ROW",                REGID_RDRAM_ROW         ),
 };
-// Word get_rdram_reg_val(int idx) {
-//     Word data = 0x00000000;
-//     if (try_read_word_aligned(&data, sRegInfo_RDRAM[idx].addr)) {
-//         return data;
-//     }
-//     return -1;
-// }
 static const RegisterSource sRegisters_RDRAM = DEF_REG_LIST_INTERFACE(
     "RDRAM",
     "RAMbus DRAM",

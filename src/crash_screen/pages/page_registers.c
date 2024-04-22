@@ -378,7 +378,7 @@ void page_registers_input(void) {
         // Cycle floats print mode.
         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
     }
-    if ((buttonPressed & A_BUTTON) || reginspectOpen) {
+    if (reginspectOpen || (buttonPressed & A_BUTTON)) {
         u32 idx = 0;
         switch (cursor->sectionID) {
             case PAGE_REG_SECTION_THREAD:

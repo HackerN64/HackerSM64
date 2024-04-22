@@ -394,7 +394,7 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
     return line;
 }
 
-void reginspect_draw_for_thread(RegisterId regId) {
+void reginspect_draw_contents(RegisterId regId) {
     enum RegisterSources src = regId.src;
     int idx = regId.idx;
 
@@ -403,12 +403,14 @@ void reginspect_draw_for_thread(RegisterId regId) {
     if (regInfo == NULL) {
         return;
     }
-    _Bool is64Bit = (regInfo->is64bit);
-    _Bool isCP1 = (regId.src == REGS_CP1); //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
+    _Bool isInterface = (regId.src >= REGS_INTERFACES_START);
+    _Bool is64Bit = (!isInterface && regInfo->is64bit);
+    _Bool isCP1 = (regId.src == REGS_CP1);
     _Bool isFCR = (regId.src == REGS_FCR);
     Doubleword value = get_reg_val(src, idx);
     Word val32 = (Word)value;
     if (isCP1 && ((regId.idx & 0x1) == 0)) {
+        //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
         Word cop1OddBits = get_reg_val(REGS_CP1, (regId.idx + 1));
         if (cop1OddBits != 0) {
             value = ((HiLo64){ .hi = cop1OddBits, .lo = val32, }).raw;
@@ -417,15 +419,19 @@ void reginspect_draw_for_thread(RegisterId regId) {
     }
 
     CSTextCoord_u32 line = 1;
-    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
-        gInspectThread->id, get_thread_name(gInspectThread)
-    );
-    CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\"", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
-    const char* copName = regSrc->name;
-    if (copName != NULL) {
-        cs_print(TEXT_X(2 + charX), TEXT_Y(line), STR_COLOR_PREFIX" in %s", COLOR_RGBA32_CRASH_VARIABLE, copName);
+    if (isInterface) {
+        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on %s (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
+            regSrc->desc, regSrc->name
+        );
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s %s REG", COLOR_RGBA32_VSC_DEFINE,
+            regSrc->name, regInfo->name
+        );
+    } else {
+        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
+            gInspectThread->id, get_thread_name(gInspectThread)
+        );
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"\"$%s\" in %s", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name, regSrc->name);
     }
-    line++;
     const char* regDesc = get_reg_desc(src, idx);
     if (regDesc != NULL) {
         cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
@@ -461,27 +467,6 @@ void reginspect_draw_for_thread(RegisterId regId) {
     }
 }
 
-void reginspect_draw_for_interface(UNUSED RegisterId regId) {
-    // enum RegisterSources src = regId.src;
-    // int idx = regId.idx;
-
-    // const RegisterSource* regSrc = get_reg_src(src);
-    // const RegisterInfo* regInfo = get_reg_info(src, idx);
-    // if (regInfo == NULL) {
-    //     return;
-    // }
-    // Word value = get_reg_val(src, idx);
-
-    // CSTextCoord_u32 line = 1;
-
-
-    // InterfaceReg* regInfo = get_interface_reg_info(regId.src, regId.idx);
-    // Word data = 0x00000000;
-    // if (try_read_word_aligned(&data, regInfo->addr)) {
-
-    // }
-}
-
 // Register popup box draw function.
 void cs_popup_reginspect_draw(void) {
     const ScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
@@ -496,11 +481,7 @@ void cs_popup_reginspect_draw(void) {
 
     RegisterId regId = gInspectedRegister;
 
-    if (regId.src >= REGS_INTERFACES_START) {
-        reginspect_draw_for_interface(regId);
-    } else {
-        reginspect_draw_for_thread(regId);
-    }
+    reginspect_draw_contents(regId);
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 

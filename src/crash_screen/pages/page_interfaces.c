@@ -115,20 +115,6 @@ void page_interfaces_draw(void) {
 }
 
 void page_interfaces_input(void) {
-    u16 buttonPressed = gCSCompositeController->buttonPressed;
-    if (buttonPressed & A_BUTTON) {
-        RegisterId regId = (RegisterId){
-            .src = INTERFACE_TO_SRC(sSelectedInterfaceIndex),
-            .idx = sSelectedRegisterIndex,
-            .valInfo = {
-                .type = REG_VAL_TYPE_BITS,
-                .dbl  = FALSE,
-                .out  = FALSE,
-            },
-        };
-        cs_open_reginspect(regId);
-    }
-
     s32 change = 0;
     if (gCSDirectionFlags.pressed.left ) change = -1; // Scroll left.
     if (gCSDirectionFlags.pressed.right) change = +1; // Scroll right.
@@ -146,6 +132,21 @@ void page_interfaces_input(void) {
         sSelectedRegisterIndex = CLAMP(newIndex, 0, endIndex);
     } else {
         sSelectedRegisterIndex = WRAP(newIndex, 0, endIndex);
+    }
+
+    _Bool reginspectOpen = (gCSPopupID == CS_POPUP_REGINSPECT);
+    u16 buttonPressed = gCSCompositeController->buttonPressed;
+    if (reginspectOpen || (buttonPressed & A_BUTTON)) {
+        RegisterId regId = (RegisterId){
+            .src = INTERFACE_TO_SRC(sSelectedInterfaceIndex),
+            .idx = sSelectedRegisterIndex,
+            .valInfo = {
+                .type = REG_VAL_TYPE_BITS,
+                .dbl  = FALSE,
+                .out  = FALSE,
+            },
+        };
+        cs_open_reginspect(regId);
     }
 }
 
