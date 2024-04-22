@@ -435,16 +435,16 @@ void page_disasm_draw(void) {
     // Scroll bar:
     cs_draw_scroll_bar(
         scrollTop, scrollBottom,
-        shownSection, VIRTUAL_RAM_SIZE,
-        (sDisasmViewportIndex - VIRTUAL_RAM_START),
+        shownSection, VIEW_MEM_SIZE,
+        (sDisasmViewportIndex - VIEW_MEM_START),
         COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
     );
 
     // Scroll bar crash position marker:
     cs_draw_scroll_bar(
         scrollTop, scrollBottom,
-        shownSection, VIRTUAL_RAM_SIZE,
-        (epc - VIRTUAL_RAM_START),
+        shownSection, VIEW_MEM_SIZE,
+        (epc - VIEW_MEM_START),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
 
@@ -454,7 +454,7 @@ void page_disasm_draw(void) {
 static void disasm_move_up(void) {
     gSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
     // Scroll up.
-    if (gSelectedAddress >= (VIRTUAL_RAM_START + PAGE_DISASM_STEP))  {
+    if (gSelectedAddress >= (VIEW_MEM_START + PAGE_DISASM_STEP))  {
         gSelectedAddress -= PAGE_DISASM_STEP;
     }
 }
@@ -462,7 +462,7 @@ static void disasm_move_up(void) {
 static void disasm_move_down(void) {
     gSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
     // Scroll down.
-    if (gSelectedAddress <= (VIRTUAL_RAM_END - PAGE_DISASM_STEP)) {
+    if (gSelectedAddress <= (VIEW_MEM_END - PAGE_DISASM_STEP)) {
         gSelectedAddress += PAGE_DISASM_STEP;
     }
 }

@@ -37,7 +37,7 @@ void cs_address_select_draw(void) {
     cs_print((SCREEN_CENTER_X - (TEXT_WIDTH(STRLEN("GO TO")) / 2)), JUMP_MENU_Y1, "GO TO:");
 
     Address addr = sAddressSelectTarget;
-    Word data = 0;
+    Word data = 0x00000000;
     _Bool isValid = try_read_word_aligned(&data, addr);
 
     ScreenCoord_u32 addressStartX = (SCREEN_CENTER_X - (TEXT_WIDTH(SIZEOF_HEX(Address)) / 2));
@@ -93,9 +93,13 @@ void cs_address_select_input(void) {
 
     if (change != 0) {
         // Wrap to virtual ram address:
+#if (VIEW_MEM_START == TOTAL_MEM_START)
+        new = ((new + change) & BITMASK(BITS_PER_HEX));
+#else
         do {
             new = ((new + change) & BITMASK(BITS_PER_HEX));
-        } while (SET_HEX_DIGIT(sAddressSelectTarget, new, shift) < VIRTUAL_RAM_START);
+        } while ((Address)SET_HEX_DIGIT(sAddressSelectTarget, new, shift) < VIEW_MEM_START);
+#endif
     }
 
     if (new != digit) {

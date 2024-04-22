@@ -45,7 +45,7 @@ const MemoryRegion sBusDevices[NUM_BUS_DEVICES] = {
     [BUS_PI_EXT_1                   ] = MEM_REGION_MAPPED(PI_DOM2_ADDR1,                "PI",                       FALSE, FALSE, FALSE), // [0x05000000 - 0x1FBFFFFF]
     [BUS_SI_EXT                     ] = MEM_REGION_MAPPED(PIF_ROM_START,                "SI",                       FALSE, FALSE, FALSE), // [0x1FC00000 - 0x1FCFFFFF]
     [BUS_PI_EXT_2                   ] = MEM_REGION_MAPPED(PI_DOM1_ADDR3,                "PI",                       FALSE, FALSE, FALSE), // [0x1FD00000 - 0x7FFFFFFF]
-    [BUS_UNMAPPED                   ] = MEM_REGION_UNMAPPED(VIRTUAL_RAM_START),                                                           // [0x80000000 - 0xFFFFFFFF]
+    [BUS_UNMAPPED                   ] = MEM_REGION_UNMAPPED(K0BASE),                                                           // [0x80000000 - 0xFFFFFFFF]
     [BUS_END                        ] = MEM_REGION_END(),
 };
 const MemoryRegion sMemoryRegions[NUM_MEM_REGIONS] = {
@@ -81,7 +81,7 @@ const MemoryRegion sMemoryRegions[NUM_MEM_REGIONS] = {
     [MEM_PI_EXT_UNUSED1             ] = MEM_REGION_MAPPED(PI_DOM1_ADDR3,                "Unused 1",                 FALSE, FALSE, FALSE), // [0x1FD00000 - 0x1FFFFFFF] (PI)
     [MEM_PI_EXT_UNUSED2             ] = MEM_REGION_MAPPED(0x20000000,                   "Unused 2",                 FALSE, FALSE, FALSE), // [0x20000000 - 0x7FFFFFFF] (PI)
     // UNMAPPED:
-    [MEM_UNMAPPED                   ] = MEM_REGION_UNMAPPED(VIRTUAL_RAM_START),                                                           // [0x80000000 - 0xFFFFFFFF]
+    [MEM_UNMAPPED                   ] = MEM_REGION_UNMAPPED(K0BASE),                                                           // [0x80000000 - 0xFFFFFFFF]
     [MEM_MEMORY_REGIONS_END         ] = MEM_REGION_END(),
 };
 

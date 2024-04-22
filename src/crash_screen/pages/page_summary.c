@@ -304,11 +304,11 @@ void page_summary_draw(void) {
         }
     }
 
-    // if (gLastCSSelectedAddress) {
-    //     cs_print(TEXT_X(0), TEXT_Y(line++), "LAST SELECTED: %08X", gLastCSSelectedAddress);
-    // }
-
     CSTextCoord_u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
+
+    if (gLastCSSelectedAddress) {
+        cs_print(TEXT_X(0), TEXT_Y(endLine - 1), "LAST SELECTED: %08X", gLastCSSelectedAddress);
+    }
     cs_draw_divider(DIVIDER_Y(endLine));
     cs_print(TEXT_X(0), TEXT_Y(endLine),
         STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls",
@@ -317,12 +317,12 @@ void page_summary_draw(void) {
 }
 
 void page_summary_input(void) {
-    u16 buttonPressed = gCSCompositeController->buttonPressed;
+    // u16 buttonPressed = gCSCompositeController->buttonPressed;
 
-    if (buttonPressed & B_BUTTON) {
-        // Cycle floats print mode.
-        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
-    }
+    // if (buttonPressed & B_BUTTON) {
+    //     // Cycle floats print mode.
+    //     cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
+    // }
 }
 
 void page_summary_print(void) {

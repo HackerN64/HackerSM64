@@ -287,16 +287,16 @@ void page_memory_draw(void) {
     // Scroll bar:
     cs_draw_scroll_bar(
         scrollTop, scrollBottom,
-        shownSection, VIRTUAL_RAM_SIZE,
-        (sRamViewViewportIndex - VIRTUAL_RAM_START),
+        shownSection, VIEW_MEM_SIZE,
+        (sRamViewViewportIndex - VIEW_MEM_START),
         COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
     );
 
     // Scroll bar crash position marker:
     cs_draw_scroll_bar(
         scrollTop, scrollBottom,
-        shownSection, VIRTUAL_RAM_SIZE,
-        (GET_EPC(tc) - VIRTUAL_RAM_START),
+        shownSection, VIEW_MEM_SIZE,
+        (GET_EPC(tc) - VIEW_MEM_START),
         COLOR_RGBA32_CRASH_AT, FALSE
     );
 
@@ -306,14 +306,14 @@ void page_memory_draw(void) {
 void page_memory_input(void) {
     if (gCSDirectionFlags.pressed.up) {
         // Scroll up.
-        if (gSelectedAddress >= (VIRTUAL_RAM_START + PAGE_MEMORY_STEP)) {
+        if (gSelectedAddress >= (VIEW_MEM_START + PAGE_MEMORY_STEP)) {
             gSelectedAddress -= PAGE_MEMORY_STEP;
         }
     }
 
     if (gCSDirectionFlags.pressed.down) {
         // Scroll down.
-        if (gSelectedAddress <= (VIRTUAL_RAM_END - PAGE_MEMORY_STEP)) {
+        if (gSelectedAddress <= (VIEW_MEM_END - PAGE_MEMORY_STEP)) {
             gSelectedAddress += PAGE_MEMORY_STEP;
         }
     }

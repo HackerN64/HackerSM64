@@ -5,10 +5,22 @@
 #include "types.h"
 
 
-// Virtual RAM boundary defines.
-#define VIRTUAL_RAM_START (Address)RAM_START
-#define VIRTUAL_RAM_END   (Address)0xFFFFFFFF
-#define VIRTUAL_RAM_SIZE  (size_t)(VIRTUAL_RAM_END - VIRTUAL_RAM_START)
+// Physical addresses:
+#define PHYS_MEM_START  0x00000000
+#define PHYS_MEM_END    (K0BASE - 1)
+#define PHYS_MEM_SIZE   (size_t)(PHYS_MEM_END - PHYS_MEM_START)
+// Virtual addresses:
+#define VIRT_MEM_START  K0BASE
+#define VIRT_MEM_END    0xFFFFFFFF
+#define VIRT_MEM_SIZE   (size_t)(VIRT_MEM_END - VIRT_MEM_START)
+// Total memory size:
+#define TOTAL_MEM_START PHYS_MEM_START
+#define TOTAL_MEM_END   VIRT_MEM_END
+#define TOTAL_MEM_SIZE  (size_t)(TOTAL_MEM_END - TOTAL_MEM_START)
+// Viewable/scrollable memory size:
+#define VIEW_MEM_START VIRT_MEM_START // TOTAL_MEM_START
+#define VIEW_MEM_END   VIRT_MEM_END   // TOTAL_MEM_END
+#define VIEW_MEM_SIZE  VIRT_MEM_SIZE  // TOTAL_MEM_SIZE
 
 
 enum KernelSegments {
