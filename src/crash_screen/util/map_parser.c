@@ -142,7 +142,7 @@ s32 get_symbol_index_from_addr_forward(Address addr) {
     }
     const MapSymbol* symbol = &gMapSymbols[0];
 
-    for (size_t i = 0; i < gNumMapSymbols; i++) {
+    for (s32 i = 0; i < gNumMapSymbols; i++) {
         if (symbol == NULL) {
             break;
         }
@@ -170,7 +170,7 @@ s32 get_symbol_index_from_addr_backward(Address addr) {
     }
     const MapSymbol* symbol = &gMapSymbols[gNumMapSymbols - 1];
 
-    for (size_t i = gNumMapSymbols; i-- > 0;) {
+    for (s32 i = gNumMapSymbols; i-- > 0;) {
         if (symbol == NULL) {
             break;
         }
@@ -197,9 +197,9 @@ s32 get_symbol_index_from_addr_binary(Address addr) {
         return -1;
     }
     const MapSymbol* symbol = NULL;
-    size_t searchStart = 0;
-    size_t searchEnd = (gNumMapSymbols - 1);
-    size_t index = -1;
+    s32 searchStart = 0;
+    s32 searchEnd = (gNumMapSymbols - 1);
+    s32 index = -1;
 
     while (searchStart <= searchEnd) {
         index = (searchStart + ((searchEnd - searchStart) / 2)); // Get the middle position in the new search window.

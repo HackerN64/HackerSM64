@@ -237,8 +237,10 @@ void draw_branch_arrow(CSTextCoord_s32 startLine, CSTextCoord_s32 endLine, Scree
     }
 }
 
-#ifdef INCLUDE_DEBUG_MAP
 void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
+#ifndef INCLUDE_DEBUG_MAP
+    return;
+#endif // !INCLUDE_DEBUG_MAP
     // Draw branch arrows from the buffer.
     BranchArrow* currArrow = &sBranchArrows[0];
 
@@ -263,7 +265,6 @@ void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
 
     osWritebackDCacheAll();
 }
-#endif // INCLUDE_DEBUG_MAP
 
 void print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, const char* insnAsStr, const char* destFname) {
     // "[instruction name] [params]"
@@ -292,6 +293,8 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
     const _Bool unkAsBinary   = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool symbolHeaders = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SYMBOL_HEADERS);
+    const MapSymbol* currSymbol = NULL;
+    const MapSymbol* prevSymbol = NULL;
 #endif // INCLUDE_DEBUG_MAP
     Address addr = sDisasmViewportIndex;
 
@@ -302,18 +305,19 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
         y = TEXT_Y(line + row);
 
 #ifdef INCLUDE_DEBUG_MAP
-            // Translucent divider between symbols.
-            const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
-            if ((addr >= PAGE_DISASM_STEP) && (symbol != get_map_symbol((addr - PAGE_DISASM_STEP), SYMBOL_SEARCH_BINARY))) {
-                cs_draw_divider_translucent(DIVIDER_Y(line + row));
-            }
-            if (symbolHeaders && (symbol != NULL) && (addr == symbol->addr)) {
-                //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
-                CSTextCoord_u32 numChars = cs_print_symbol_name(x, y, CRASH_SCREEN_NUM_CHARS_X, symbol, TRUE);
-                cs_print(x + TEXT_WIDTH(numChars), y, ":");
-                row++;
-                y = TEXT_Y(line + row);
-            }
+        // Translucent divider between symbols.
+        currSymbol = get_map_symbol(addr, SYMBOL_SEARCH_BINARY);
+        if ((addr >= PAGE_DISASM_STEP) && (currSymbol != prevSymbol)) {
+            cs_draw_divider_translucent(DIVIDER_Y(line + row));
+        }
+        if (symbolHeaders && (currSymbol != NULL) && (addr == currSymbol->addr)) {
+            //! TODO: This allows the selection cursor to go beyond the bottom of the screen.
+            CSTextCoord_u32 numChars = cs_print_symbol_name(x, y, CRASH_SCREEN_NUM_CHARS_X, currSymbol, TRUE);
+            cs_print(x + TEXT_WIDTH(numChars), y, ":");
+            row++;
+            y = TEXT_Y(line + row);
+        }
+        prevSymbol = currSymbol;
 #endif // INCLUDE_DEBUG_MAP
 
         // Draw crash and selection rectangles:
@@ -348,7 +352,7 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
             } else { // Outside of code segments:
                 RGBA32 color = COLOR_RGBA32_WHITE;
 #ifdef INCLUDE_DEBUG_MAP
-                if (symbol != NULL) {
+                if (currSymbol != NULL) {
                     color = COLOR_RGBA32_CRASH_VARIABLE;
                 }
 #endif // INCLUDE_DEBUG_MAP

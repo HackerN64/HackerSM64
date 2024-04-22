@@ -88,6 +88,7 @@ void cs_memory_draw_byte() {
 
 void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
     const enum MemoryDisplayModes mode = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE);
+    _Bool symbolDividers = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SYMBOL_DIVIDERS);
     __OSThreadContext* tc = &gInspectThread->context;
     ScreenCoord_u32 x = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     ScreenCoord_u32 y = TEXT_Y(line);
@@ -95,6 +96,13 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 #ifdef UNF
     bzero(&sMemoryViewData, sizeof(sMemoryViewData));
 #endif // UNF
+
+//! TODO: Save symbol from prev byte in loop instead of searching twice:
+// #ifdef INCLUDE_DEBUG_MAP
+//     const MapSymbol* currSymbol = NULL;
+//     const MapSymbol* prevByteSymbol = NULL;
+//     const MapSymbol* prevRowSymbol = NULL;
+// #endif // INCLUDE_DEBUG_MAP
 
     for (CSTextCoord_u32 row = 0; row < sRamViewNumShownRows; row++) {
         Address rowAddr = (startAddr + (row * PAGE_MEMORY_STEP));
@@ -146,25 +154,27 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
 #ifdef INCLUDE_DEBUG_MAP
                 // Draw symbol separator lines:
-                if (currAddr >= sizeof(Byte)) {
-                    const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
-                    // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  addr_is_in_text_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
-                    const RGBA32 dividerColor = addr_is_in_text_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
-                    _Bool aligned0 = ((currAddr % sizeof(Word)) == 0); // (byteOffset == 0);
-                    _Bool aligned3 = ((currAddr % sizeof(Word)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
-                    // Prev byte:
-                    const MapSymbol *otherSymbol = get_map_symbol((currAddr - sizeof(Byte)), SYMBOL_SEARCH_BINARY);
-                    if (currSymbol != otherSymbol) {
-                        cs_draw_rect(((x - 2) - aligned0), (y - 2), 2, (TEXT_HEIGHT(1) + 1), dividerColor);
-                        if ((row != 0) && (wordOffset == 0) && aligned0) {
-                            cs_draw_rect((CRASH_SCREEN_X2 - 2), ((y - TEXT_HEIGHT(1)) - 2), 1, (TEXT_HEIGHT(1) + 1), dividerColor);
-                        }
-                    }
-                    // Prev row:
-                    if (currAddr >= PAGE_MEMORY_STEP) {
-                        otherSymbol = get_map_symbol((currAddr - PAGE_MEMORY_STEP), SYMBOL_SEARCH_BINARY);
+                if (symbolDividers) {
+                    if (currAddr >= sizeof(Byte)) {
+                        const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
+                        // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  addr_is_in_text_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
+                        const RGBA32 dividerColor = addr_is_in_text_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
+                        _Bool aligned0 = ((currAddr % sizeof(Word)) == 0); // (byteOffset == 0);
+                        _Bool aligned3 = ((currAddr % sizeof(Word)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
+                        // Prev byte:
+                        const MapSymbol *otherSymbol = get_map_symbol((currAddr - sizeof(Byte)), SYMBOL_SEARCH_BINARY);
                         if (currSymbol != otherSymbol) {
-                            cs_draw_rect(((x - 2) - aligned0), (y - 2), (TEXT_WIDTH(2) + 1 + aligned0 + aligned3), 1, dividerColor);
+                            cs_draw_rect(((x - 2) - aligned0), (y - 2), 2, (TEXT_HEIGHT(1) + 1), dividerColor);
+                            if ((row != 0) && (wordOffset == 0) && aligned0) {
+                                cs_draw_rect((CRASH_SCREEN_X2 - 2), ((y - TEXT_HEIGHT(1)) - 2), 1, (TEXT_HEIGHT(1) + 1), dividerColor);
+                            }
+                        }
+                        // Prev row:
+                        if (currAddr >= PAGE_MEMORY_STEP) {
+                            otherSymbol = get_map_symbol((currAddr - PAGE_MEMORY_STEP), SYMBOL_SEARCH_BINARY);
+                            if (currSymbol != otherSymbol) {
+                                cs_draw_rect(((x - 2) - aligned0), (y - 2), (TEXT_WIDTH(2) + 1 + aligned0 + aligned3), 1, dividerColor);
+                            }
                         }
                     }
                 }

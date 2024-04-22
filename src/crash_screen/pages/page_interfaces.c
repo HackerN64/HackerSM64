@@ -130,15 +130,23 @@ void page_interfaces_input(void) {
     }
 
     s32 change = 0;
-    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
-    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    sSelectedRegisterIndex = WRAP(((s32)sSelectedRegisterIndex + change), 0, (s32)(sNumShownRegisters - 1));
-
-    change = 0;
     if (gCSDirectionFlags.pressed.left ) change = -1; // Scroll left.
     if (gCSDirectionFlags.pressed.right) change = +1; // Scroll right.
     sSelectedInterfaceIndex = WRAP(((s32)sSelectedInterfaceIndex + change), 0, (s32)(NUM_INTERFACES - 1));
 
+    _Bool switched = (change != 0);
+    const RegisterSource* src = get_interface_src(sSelectedInterfaceIndex);
+
+    change = 0;
+    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
+    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    s32 newIndex = (sSelectedRegisterIndex + change);
+    s32 endIndex = (src->numRegs - 1);
+    if (switched) {
+        sSelectedRegisterIndex = CLAMP(newIndex, 0, endIndex);
+    } else {
+        sSelectedRegisterIndex = WRAP(newIndex, 0, endIndex);
+    }
 }
 
 void page_interfaces_print(void) {

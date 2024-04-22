@@ -18,9 +18,9 @@
 #define TOTAL_MEM_END   VIRT_MEM_END
 #define TOTAL_MEM_SIZE  (size_t)(TOTAL_MEM_END - TOTAL_MEM_START)
 // Viewable/scrollable memory size:
-#define VIEW_MEM_START VIRT_MEM_START // TOTAL_MEM_START
-#define VIEW_MEM_END   VIRT_MEM_END   // TOTAL_MEM_END
-#define VIEW_MEM_SIZE  VIRT_MEM_SIZE  // TOTAL_MEM_SIZE
+#define VIEW_MEM_START TOTAL_MEM_START
+#define VIEW_MEM_END   TOTAL_MEM_END
+#define VIEW_MEM_SIZE  TOTAL_MEM_SIZE
 
 
 enum KernelSegments {
