@@ -79,27 +79,26 @@ const char* osTvTypeStrings[] = {
 };
 
 // Microcode string:
-#define DEF_UCODE_NAME(_name) const char* sUCodeName = EXPAND_AND_STRINGIFY(_name);
 #ifdef L3DEX2_ALONE
-DEF_UCODE_NAME(L3DEX2_alone);
+    #define UCODE_NAME "L3DEX2_alone"
 #elif F3DZEX_GBI_2
-DEF_UCODE_NAME(f3dzex2_PosLight);
+    #define UCODE_NAME "f3dzex2_PosLight"
 #elif F3DZEX_NON_GBI_2
-DEF_UCODE_NAME(f3dzex2_Non_PosLight);
+    #define UCODE_NAME "f3dzex2_Non_PosLight"
 #elif F3DEX2PL_GBI
-DEF_UCODE_NAME(F3DEX2_PosLight);
+    #define UCODE_NAME "F3DEX2_PosLight"
 #elif F3DEX_GBI_2
-DEF_UCODE_NAME(F3DEX2);
+    #define UCODE_NAME "F3DEX2"
 #elif F3DEX_GBI
-DEF_UCODE_NAME(F3DEX);
+    #define UCODE_NAME "F3DEX"
 #elif SUPER3D_GBI
-DEF_UCODE_NAME(Super3D);
+    #define UCODE_NAME "Super3D"
 #elif F3D_NEW
-DEF_UCODE_NAME(Fast3D_New);
+    #define UCODE_NAME "Fast3D_New"
 #elif F3D_OLD
-DEF_UCODE_NAME(Fast3D_Old);
+    #define UCODE_NAME "Fast3D_Old"
 #else
-#define sUCodeName gGrucodeStr
+    #define UCODE_NAME gGrucodeStr
 #endif
 
 f32 percent_of(f32 size, f32 totalSize) {
@@ -131,7 +130,7 @@ ABOUT_ENTRY_FUNC(stdc_version,   "%luL", __STDC_VERSION__)
 #endif // __STDC__
 ABOUT_ENTRY_FUNC(rom_name,       INTERNAL_ROM_NAME)
 ABOUT_ENTRY_FUNC(libultra,       "%s (patch %d)", OS_MAJOR_VERSION, OS_MINOR_VERSION)
-ABOUT_ENTRY_FUNC(microcode,      sUCodeName)
+ABOUT_ENTRY_FUNC(microcode,      UCODE_NAME)
 #ifdef LIBDRAGON
 //! TODO: Libdragon version (if this ever becomes compatible):
 ABOUT_ENTRY_FUNC(region,         "LIBDRAGON")
