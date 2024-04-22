@@ -49,12 +49,6 @@ void bhv_hidden_blue_coin_loop(void) {
             cur_obj_enable_rendering();
             cur_obj_become_tangible();
 
-            // Delete the coin once collected
-            if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-                spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
-                obj_mark_for_deletion(o);
-            }
-
             // After 200 frames of waiting and 20 2-frame blinks (for 240 frames total),
             // delete the object.
             if (cur_obj_wait_then_blink(200, 20)) {
@@ -67,6 +61,12 @@ void bhv_hidden_blue_coin_loop(void) {
             }
 
             break;
+    }
+
+    // Delete the coin once collected
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
+        spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
+        obj_mark_for_deletion(o);
     }
 
     o->oInteractStatus = INT_STATUS_NONE;
@@ -158,7 +158,11 @@ void bhv_blue_coin_switch_loop(void) {
             load_object_collision_model();
             break;
         case BLUE_COIN_SWITCH_ACT_EXTENDING:
-            if (o->oTimer > 3) {
+            if (cur_obj_nearest_object_with_behavior(bhvHiddenBlueCoin) == NULL) {
+                // This code can be executed if the last blue coin is collected at the very end of the timer.
+                spawn_mist_particles_variable(0, 0, 46.0f);
+                obj_mark_for_deletion(o);
+            } else if (o->oTimer > 3) {
                 // Set to BLUE_COIN_SWITCH_ACT_IDLE
                 o->oAction = BLUE_COIN_SWITCH_ACT_IDLE;
             } else {
