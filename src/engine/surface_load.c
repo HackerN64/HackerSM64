@@ -93,10 +93,10 @@ static void clear_spatial_partition(SpatialPartitionCell *cells) {
     register s32 i = sqr(NUM_CELLS);
 
     while (i--) {
-        (*cells)[SPATIAL_PARTITION_FLOORS].next = NULL;
-        (*cells)[SPATIAL_PARTITION_CEILS].next = NULL;
-        (*cells)[SPATIAL_PARTITION_WALLS].next = NULL;
-        (*cells)[SPATIAL_PARTITION_WATER].next = NULL;
+        (*cells)[SPATIAL_PARTITION_FLOORS] = NULL;
+        (*cells)[SPATIAL_PARTITION_CEILS] = NULL;
+        (*cells)[SPATIAL_PARTITION_WALLS] = NULL;
+        (*cells)[SPATIAL_PARTITION_WATER] = NULL;
 
         cells++;
     }
@@ -118,7 +118,7 @@ static void clear_static_surfaces(void) {
  * @param surface The surface to add
  */
 static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surface *surface) {
-    struct SurfaceNode *list;
+    struct SurfaceNode **list;
     s32 priority;
     s32 sortDir = 1; // highest to lowest, then insertion order (water and floors)
     s32 listIndex;
@@ -145,7 +145,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         if (sNumCellsUsed >= sizeof(sCellsUsed) / sizeof(struct CellCoords)) {
             sClearAllCells = TRUE;
         } else {
-            if (list->next == NULL) {
+            if (*list == NULL) {
                 sCellsUsed[sNumCellsUsed].z = cellZ;
                 sCellsUsed[sNumCellsUsed].x = cellX;
                 sCellsUsed[sNumCellsUsed].partition = listIndex;
@@ -156,19 +156,26 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
     }
 
+    if (*list == NULL) {
+        *list = newNode;
+        return;
+    }
+
+    struct SurfaceNode *curNode = *list;
+
     // Loop until we find the appropriate place for the surface in the list.
-    while (list->next != NULL) {
-        priority = list->next->surface->upperY * sortDir;
+    while (curNode->next != NULL) {
+        priority = curNode->next->surface->upperY * sortDir;
 
         if (surfacePriority > priority) {
             break;
         }
 
-        list = list->next;
+        curNode = curNode->next;
     }
 
-    newNode->next = list->next;
-    list->next = newNode;
+    newNode->next = curNode->next;
+    curNode->next = newNode;
 }
 
 /**
@@ -544,7 +551,7 @@ void clear_dynamic_surfaces(void) {
             clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
         } else {
             for (u32 i = 0; i < sNumCellsUsed; i++) {
-                gDynamicSurfacePartition[sCellsUsed[i].z][sCellsUsed[i].x][sCellsUsed[i].partition].next = NULL;
+                gDynamicSurfacePartition[sCellsUsed[i].z][sCellsUsed[i].x][sCellsUsed[i].partition] = NULL;
             }
         }
         sNumCellsUsed = 0;
