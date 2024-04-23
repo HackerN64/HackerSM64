@@ -171,7 +171,6 @@ SECTIONS
       */libgcc.a:*.o(.text*);
       */librtc.a:*.o(.text*);
       */libz.a:*.o(.text*);
-      */libhvqm2.a:*.o(.text*);
       lib/rspboot.o(.text*);
 #include "rsptext.inc.ld"
       lib/PR/audio/aspMain.o(.text*);
@@ -188,7 +187,6 @@ SECTIONS
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
       */ULTRALIB.a:*.o(.data*);
-      */libhvqm2.a:*.o(.data*);
       */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
 #include "rspdata.inc.ld"
@@ -214,7 +212,6 @@ SECTIONS
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/boot*.o(.*bss*);
-      BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
 #ifdef S2DEX_TEXT_ENGINE
@@ -226,7 +223,6 @@ SECTIONS
       */ULTRALIB.a:*.o(COMMON);
       */ULTRALIB.a:*.o(.scommon);
       */ULTRALIB.a:*.o(.*bss*);
-      */libhvqm2.a:*.o(.bss*);
       */librtc.a:*.o(.bss*);
       */libz.a:*.o(.bss*);
       . = ALIGN(0x8);

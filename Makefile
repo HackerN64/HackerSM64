@@ -108,17 +108,6 @@ else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX 2 (Majora's Mask)
   DEFINES += F3DZEX_NON_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 endif
 
-# TEXT ENGINES
-#   s2dex_text_engine - Text Engine by someone2639
-TEXT_ENGINE := none
-$(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
-
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  SRC_DIRS += src/s2d_engine
-endif
-# add more text engines here
-
 #==============================================================================#
 # Optimization flags                                                           #
 #==============================================================================#
@@ -230,16 +219,6 @@ else ifeq ($(UNF),1)
 else
   ULTRALIB := ultra_rom
   DEFINES += _FINALROM=1 NDEBUG=1 OVERWRITE_OSPRINT=0
-endif
-
-# HVQM - whether to use HVQM fmv library
-#   1 - includes code in ROM
-#   0 - does not
-HVQM ?= 0
-$(eval $(call validate-option,HVQM,0 1))
-ifeq ($(HVQM),1)
-  DEFINES += HVQM=1
-  SRC_DIRS += src/hvqm
 endif
 
 # LIBPL - whether to include libpl library for interfacing with Parallel Launcher
@@ -435,7 +414,7 @@ else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
 
-LIBRARIES := nustd hvqm2 z goddard
+LIBRARIES := nustd z goddard
 
 LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
