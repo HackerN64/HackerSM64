@@ -11,6 +11,8 @@
 // -- COP0 --
 
 // $Index
+#define C0_INX_TLB_FAIL    0x80000000
+#define C0_INX_TLB_INDEX   0x0000003F
 typedef union Reg_CP0_Index {
     struct PACKED {
         u32 P     :  1; // Probe success or failure. Set to 1 when the previous TLBProbe (TLBP) instruction was unsuccessful; set to 0 when successful.
@@ -20,6 +22,7 @@ typedef union Reg_CP0_Index {
     u32 raw;
 } Reg_CP0_Index;
 // $Random
+#define C0_RANDOM_MASK  0x3F
 typedef union Reg_CP0_Random {
     struct PACKED {
         u32        : 26; // RFU. Must be written as zeroes, and returns zeroes when read.
@@ -29,6 +32,11 @@ typedef union Reg_CP0_Random {
 } Reg_CP0_Random;
 // $EntryLo0
 // $EntryLo1
+#define C0_ENTRYLO_PFN   0x03FFFFC0
+#define C0_ENTRYLO_C     0x00000038
+#define C0_ENTRYLO_D     0x00000004
+#define C0_ENTRYLO_V     0x00000002
+#define C0_ENTRYLO_G     0x00000001
 typedef union Reg_CP0_EntryLo_32 {
     struct PACKED {
         u32     :  6; // RFU. Must be written as zeroes, and returns zeroes when read.
@@ -78,6 +86,7 @@ typedef union Reg_CP0_PageMask {
     u32 raw;
 } Reg_CP0_PageMask;
 // $Wired
+#define C0_WIRED_MASK  0x3F
 typedef union Reg_CP0_Wired {
     struct PACKED {
         u32       : 26; // RFU. Must be written as zeroes, and returns zeroes when read.
@@ -88,6 +97,8 @@ typedef union Reg_CP0_Wired {
 // $BadVAddr
 // $Count
 // $EntryHi
+#define ENTRYHI32_VPN2  0xFFFFE000
+#define ENTRYHI32_ASID  0x000000FF
 typedef union Reg_CP0_EntryHi_32 {
     struct PACKED {
         u32 VPN2 : 19; // Virtual page number divided by two (maps to two pages)
@@ -96,6 +107,9 @@ typedef union Reg_CP0_EntryHi_32 {
     };
     u32 raw;
 } Reg_CP0_EntryHi_32;
+#define ENTRYHI64_R     0xC000000000000000
+#define ENTRYHI64_VPN2  0x000000FFFFFFE000
+#define ENTRYHI64_ASID  0x00000000000000FF
 typedef union Reg_CP0_EntryHi_64 {
     struct PACKED {
         u64 R    :  2; // Region. [00:user, 01:supervisor, 11:Kernel] used to match vAddr. [63...62]
@@ -186,6 +200,12 @@ typedef union Reg_CP0_Cause {
 } Reg_CP0_Cause;
 // $EPC
 // $PRId
+#define C0_PRID_OPT         0xFF000000
+#define C0_PRID_NAME        0x00FF0000
+#define C0_PRID_IMP         0x0000FF00
+#define C0_PRID_REV_MAJOR   0x000000F8
+#define C0_PRID_REV_MINOR   0x00000007
+#define C0_PRID_REV_MASK    0x000000FF
 typedef union Reg_CP0_PRId {
     struct PACKED {
         // On N64, Company_Options and Company_Name are RFU. Must be written as zeroes, and returns zeroes when read.

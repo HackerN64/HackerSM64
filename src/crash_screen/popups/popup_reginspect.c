@@ -50,6 +50,14 @@ static const char* sStrOnOff[] = {
     [FALSE] = "off",
     [TRUE ] = "on",
 };
+static const char* sStrSuccess[] = {
+    [FALSE] = "fail",
+    [TRUE ] = "success",
+};
+static const char* strFail[] = {
+    [FALSE] = "success",
+    [TRUE ] = "fail",
+};
 static const char* sStrEndian[] = {
     [0b0] = "big",
     [0b1] = "little",
@@ -116,6 +124,8 @@ enum PACKED RegBitsInfoStringLists {
     REG_BITS_INFO_STR_YES_NO,
     REG_BITS_INFO_STR_ENABLE,
     REG_BITS_INFO_STR_ON_OFF,
+    REG_BITS_INFO_STR_SUCCESS,
+    REG_BITS_INFO_STR_FAIL,
     REG_BITS_INFO_STR_ENDIAN,
     REG_BITS_INFO_STR_BIT_MODE,
     REG_BITS_INFO_STR_AUTO,
@@ -136,6 +146,8 @@ const char** sRegBitsInfoStrings[] = {
     [REG_BITS_INFO_STR_YES_NO  ] = sStrYesNo,
     [REG_BITS_INFO_STR_ENABLE  ] = sStrEnable,
     [REG_BITS_INFO_STR_ON_OFF  ] = sStrOnOff,
+    [REG_BITS_INFO_STR_SUCCESS ] = sStrSuccess,
+    [REG_BITS_INFO_STR_FAIL    ] = sStrFail,
     [REG_BITS_INFO_STR_ENDIAN  ] = sStrEndian,
     [REG_BITS_INFO_STR_BIT_MODE] = sStrBitMode,
     [REG_BITS_INFO_STR_AUTO    ] = sStrAuto,
@@ -318,6 +330,14 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
 
     return currLine;
 }
+
+const RegBitsInfo regBits_C0_Index[] = {
+    REG_BITS_CMD_SETX(STRLEN("tlb probe: ")),
+    REG_BITS_CMD_STR("tlb probe", C0_INX_TLB_FAIL,  REG_BITS_INFO_STR_FAIL),
+    REG_BITS_CMD_DEC("tlb index", C0_INX_TLB_INDEX, 2),
+
+    REG_BITS_CMD_END(),
+};
 
 const RegBitsInfo regBits_C0_SR[] = {
     REG_BITS_CMD_SETX(STRLEN("xxxxxxxxxx: ")),
@@ -547,6 +567,7 @@ typedef struct RegInspectExtraInfo {
     /*0x04*/ const RegBitsInfo* list;
 } RegInspectExtraInfo; /*0x08*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
+    { .src = REGS_CP0,   .idx = REG_CP0_INX,            .list = regBits_C0_Index, },
     { .src = REGS_CP0,   .idx = REG_CP0_SR,             .list = regBits_C0_SR,    },
     { .src = REGS_CP0,   .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE, },
     //! TODO: CP0 $Config, $Context, etc.
