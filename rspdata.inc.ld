@@ -16,14 +16,14 @@
 
 /* Line3DEX Data */
 #ifdef L3DEX_GBI
-      lib/PR/f3dex/fifo/gspL3DEX.fifo.o(.data);
+      lib/PR/f3dex/gspL3DEX.fifo.o(.data);
 #endif
 
 /* Fast3DEX2 series */
 
 /* Fast3DEX2 Rej Data */
 #ifdef F3DEX2_REJ_GBI
-      lib/PR/f3dex2/fifo/gspF3DEX2.Rej.fifo.o(.data);
+      lib/PR/f3dex2/gspF3DEX2.Rej.fifo.o(.data);
 #endif
 
 /* Line3DZEX Data */

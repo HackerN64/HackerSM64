@@ -16,7 +16,7 @@
 
 /* Line3DEX Data */
 #ifdef L3DEX_GBI
-      lib/PR/f3dex/fifo/gspL3DEX.fifo.o(.text);
+      lib/PR/f3dex/gspL3DEX.fifo.o(.text);
 #endif
 
 /* Fast3DEX2 series */
