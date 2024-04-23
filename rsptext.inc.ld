@@ -1,7 +1,7 @@
 #if F3DEX_GBI == 1
       lib/PR/f3dex/gspF3DEX.NoN.fifo.o(.text);
 #else /* Fast3DZEX */
-      lib/PR/f3dzex/gspF3DZEX2.NoN_PosLight.fifo.o(.text);
+      lib/PR/f3dzex/gspF3DZEX2.NoN.fifo.o(.text);
 #endif
 
 /*
@@ -28,5 +28,5 @@
 
 /* Line3DZEX Data */
 #ifdef L3DZEX_GBI
-      lib/PR/f3dzex/gspL3DZEX2_PosLight.fifo.o(.text);
+      lib/PR/f3dzex/gspL3DZEX2.fifo.o(.text);
 #endif
