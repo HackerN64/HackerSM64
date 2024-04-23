@@ -52,6 +52,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
     .src           = _src,                  \
     .idx           = _idx,                  \
     .valInfo.type  = _type,                 \
+    .valInfo.thr   = TRUE,                  \
 }
 #define LIST_REGI(_src, _idx) LIST_REG_IMPL(_src, _idx, REG_VAL_TYPE_INT)
 #define LIST_REGA(_src, _idx) LIST_REG_IMPL(_src, _idx, REG_VAL_TYPE_ADDR)
@@ -205,7 +206,7 @@ CSTextCoord_u32 cs_registers_print_registers(CSTextCoord_u32 line) {
                 const RegisterInfo* regInfo = get_reg_info(reg->src, reg->idx);
 
                 if (regInfo != NULL) {
-                    cs_registers_print_reg(TEXT_X(charX), TEXT_Y(charY), regInfo->shortName, get_reg_val(reg->src, reg->idx));
+                    cs_registers_print_reg(TEXT_X(charX), TEXT_Y(charY), regInfo->shortName, get_reg_val(reg->src, reg->idx, TRUE));
                 }
 
                 reg++;
@@ -248,7 +249,7 @@ void cs_registers_print_float_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 regN
     CSTextCoord_u32 charX = cs_print(x, y, STR_COLOR_PREFIX"%s:", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name);
     x += TEXT_WIDTH(charX);
 
-    Word data = get_reg_val(REGS_CP1, regNum);
+    Word data = get_reg_val(REGS_CP1, regNum, TRUE);
 
     cs_print_f32(x, y, (IEEE754_f32){ .asU32 = data, }, cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT), FALSE);
 }
@@ -374,10 +375,10 @@ void page_registers_input(void) {
     section = &sRegPageSections[cursor->sectionID];
 
     u16 buttonPressed = gCSCompositeController->buttonPressed;
-    if (buttonPressed & B_BUTTON) {
-        // Cycle floats print mode.
-        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
-    }
+    // if (buttonPressed & B_BUTTON) {
+    //     // Cycle floats print mode.
+    //     cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_FLOATS_FMT, 1);
+    // }
     if (reginspectOpen || (buttonPressed & A_BUTTON)) {
         u32 idx = 0;
         switch (cursor->sectionID) {
@@ -432,7 +433,7 @@ void page_registers_print(void) {
             const RegisterInfo* regInfo = get_reg_info(reg->src, reg->idx);
 
             if (regInfo != NULL) {
-                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->src, reg->idx));
+                osSyncPrintf("%s "STR_HEX_PREFIX STR_HEX_LONG" ", regInfo->shortName, get_reg_val(reg->src, reg->idx, TRUE));
             }
 
             reg++;
@@ -452,7 +453,7 @@ void page_registers_print(void) {
                 break;
             }
 
-            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, get_reg_val(REGS_CP1, regNum));
+            osSyncPrintf("d%02d "STR_HEX_DECIMAL"\t", regNum, get_reg_val(REGS_CP1, regNum, TRUE));
 
             osfp++;
             regNum += FP_REG_SIZE;

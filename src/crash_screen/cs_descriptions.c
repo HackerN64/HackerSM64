@@ -807,7 +807,7 @@ enum FloatErrorType validate_floats_in_reg_buffer(void) {
 
         if (reg.valInfo.type == REG_VAL_TYPE_FLOAT) {
             IEEE754_f32 val = {
-                .asU32 = get_reg_val(reg.src, reg.idx)
+                .asU32 = get_reg_val(reg.src, reg.idx, TRUE)
             };
             fltErrType = validate_f32(val);
 

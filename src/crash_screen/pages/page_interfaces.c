@@ -142,6 +142,7 @@ void page_interfaces_input(void) {
             .idx = sSelectedRegisterIndex,
             .valInfo = {
                 .type = REG_VAL_TYPE_BITS,
+                .thr  = FALSE,
                 .dbl  = FALSE,
                 .out  = FALSE,
             },

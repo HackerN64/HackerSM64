@@ -227,7 +227,7 @@ void _cs_about_func_emulator(char* buf) {
     p += sprintf(p, "%s", get_emulator_name(gEmulator));
     if (gEmulator & EMU_CONSOLE) {
         Reg_CP0_PRId prid = {
-            .raw = (Word)get_reg_val(REGS_CP0, REG_CP0_PRID),
+            .raw = (Word)get_reg_val(REGS_CP0, REG_CP0_PRID, FALSE),
         };
         p += sprintf(p, " (%s rev%d.%d)", get_processor_name(prid.Imp), prid.Rev_.major, prid.Rev_.minor);
     } else if (gSupportsLibpl) {

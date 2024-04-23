@@ -144,15 +144,19 @@ Doubleword get_direct_reg_val(enum RegisterSources src, int idx) {
     return (regSrc->valFunc != NULL) ? regSrc->valFunc(idx) : 0;
 }
 
-Doubleword get_reg_val(enum RegisterSources src, int idx) {
+Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread) {
     const RegisterInfo* regInfo = get_reg_info(src, idx);
+
+    if (regInfo == NULL) {
+        return 0;
+    }
 
     if (src >= REGS_INTERFACES_START) {
         Word data = 0x00000000;
         if (try_read_word_aligned(&data, regInfo->addr)) {
             return data;
         }
-    } else if ((regInfo != NULL) && (regInfo->offset != REGINFO_NULL_OFFSET)) {
+    } else if (checkThread && (regInfo->offset != REGINFO_NULL_OFFSET)) {
         // If register exists in __OSThreadContext, use the data from the inspected thread.
         return get_thread_reg_val(src, idx, gInspectThread);
     } else {
@@ -189,6 +193,7 @@ void append_reg_to_buffer(enum RegisterSources src, int idx, enum RegisterValueT
             .idx = idx,
             .valInfo = {
                 .type = type,
+                .thr  = TRUE,
                 .dbl  = FALSE, //! TODO: implement this.
                 .out  = isOutput,
             },

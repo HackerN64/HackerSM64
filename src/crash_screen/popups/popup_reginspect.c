@@ -709,11 +709,12 @@ void reginspect_draw_contents(RegisterId regId) {
     _Bool is64Bit = (!isInterface && regInfo->is64bit);
     _Bool isCP1 = (regId.src == REGS_CP1);
     _Bool isFCR = (regId.src == REGS_FCR);
-    Doubleword value = get_reg_val(src, idx);
+    _Bool checkThread = regId.valInfo.thr;
+    Doubleword value = get_reg_val(src, idx, checkThread);
     Word val32 = (Word)value;
     if (isCP1 && ((regId.idx & 0x1) == 0)) {
         //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
-        Word cop1OddBits = get_reg_val(REGS_CP1, (regId.idx + 1));
+        Word cop1OddBits = get_reg_val(REGS_CP1, (regId.idx + 1), checkThread);
         if (cop1OddBits != 0) {
             value = ((HiLo64){ .hi = cop1OddBits, .lo = val32, }).raw;
             is64Bit = TRUE;
