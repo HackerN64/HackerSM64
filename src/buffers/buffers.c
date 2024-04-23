@@ -1,5 +1,4 @@
 #include <ultra64.h>
-#include <hvqm2dec.h>
 
 #include "buffers.h"
 #include "audio/data.h"
