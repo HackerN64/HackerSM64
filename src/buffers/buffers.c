@@ -3,9 +3,6 @@
 
 #include "buffers.h"
 #include "audio/data.h"
-#ifdef HVQM
-#include <hvqm/hvqm.h>
-#endif
 #include "config.h"
 #include "audio/synthesis.h"
 

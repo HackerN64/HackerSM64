@@ -28,11 +28,4 @@ extern u8 gGfxSPTaskStack[];
 
 extern struct GfxPool gGfxPools[2];
 
-extern u8 adpcmbuf[];		/* Buffer for audio records ADPCM) */
-
-extern u64 hvq_yieldbuf[];	/* RSP task yield buffer */
-extern HVQM2Info hvq_spfifo[];	/* Data area for HVQM2 microcode */
-extern u16 hvqwork[];		/* Work buffer for HVQM2 decoder */
-extern u8 hvqbuf[];		/* Buffer for video records (HVQM2) */
-
 #endif // BUFFERS_H
