@@ -95,15 +95,16 @@ DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 TARGET := sm64
 
 
-# GRUCODE - selects which RSP microcode to use.
-#   f3dex   -
-#   f3dzex  - newer, experimental microcode used in Animal Crossing
+# GRUCODE - selects which RSP graphics microcode to use.
+#   f3dex   - Upgraded version of the Fast3D microcode.
+#   f3dzex  - newer, experimental microcode used in Majora's Mask
+
 GRUCODE ?= f3dzex
 $(eval $(call validate-option,GRUCODE,f3dex f3dzex))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
   DEFINES += F3DEX_GBI=1 F3DEX_GBI_SHARED=1
-else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
+else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX 2 (Majora's Mask)
   DEFINES += F3DZEX_NON_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 endif
 
