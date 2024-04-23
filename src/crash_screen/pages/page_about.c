@@ -71,35 +71,42 @@ extern const char gGrucodeStr[];
 extern const char gCompressionFormat[];
 extern const char gBuildGitVersion[];
 
+// Microcode string:
+#if defined(L3DEX2_ALONE)
+    #define UCODE_NAME "L3DEX2_alone"
+#elif defined(F3DZEX_GBI_2)
+    #define UCODE_NAME "f3dzex2_PosLight"
+#elif defined(F3DZEX_NON_GBI_2)
+    #define UCODE_NAME "f3dzex2_Non_PosLight"
+#elif defined(F3DEX2PL_GBI)
+    #define UCODE_NAME "F3DEX2_PosLight"
+#elif defined(F3DEX_GBI_3)
+    //! TODO: Should this be checked first?
+    #if (F3DEX_GBI_3 == 1)
+        #define UCODE_NAME "F3DEX3"
+    #elif (F3DEX_GBI_3 == 2)
+        #define UCODE_NAME "F3DEX3 (debug)"
+    #endif
+#elif defined(F3DEX_GBI_2)
+    #define UCODE_NAME "F3DEX2"
+#elif defined(F3DEX_GBI)
+    #define UCODE_NAME "F3DEX"
+#elif defined(SUPER3D_GBI)
+    #define UCODE_NAME "Super3D"
+#elif defined(F3D_NEW)
+    #define UCODE_NAME "Fast3D_New"
+#elif defined(F3D_OLD)
+    #define UCODE_NAME "Fast3D_Old"
+#else
+    #define UCODE_NAME gGrucodeStr
+#endif
+
 // osTvType strings:
 const char* osTvTypeStrings[] = {
     [OS_TV_PAL ] = "pal",
     [OS_TV_NTSC] = "ntsc",
     [OS_TV_MPAL] = "mpal",
 };
-
-// Microcode string:
-#ifdef L3DEX2_ALONE
-    #define UCODE_NAME "L3DEX2_alone"
-#elif F3DZEX_GBI_2
-    #define UCODE_NAME "f3dzex2_PosLight"
-#elif F3DZEX_NON_GBI_2
-    #define UCODE_NAME "f3dzex2_Non_PosLight"
-#elif F3DEX2PL_GBI
-    #define UCODE_NAME "F3DEX2_PosLight"
-#elif F3DEX_GBI_2
-    #define UCODE_NAME "F3DEX2"
-#elif F3DEX_GBI
-    #define UCODE_NAME "F3DEX"
-#elif SUPER3D_GBI
-    #define UCODE_NAME "Super3D"
-#elif F3D_NEW
-    #define UCODE_NAME "Fast3D_New"
-#elif F3D_OLD
-    #define UCODE_NAME "Fast3D_Old"
-#else
-    #define UCODE_NAME gGrucodeStr
-#endif
 
 f32 percent_of(f32 size, f32 totalSize) {
     return (size / totalSize * 100.0f);
