@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- Reality Signal Processor (RSP) (SP) --
 // https://n64brew.dev/wiki/Reality_Signal_Processor/Interface
 

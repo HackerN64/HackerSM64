@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- Serial Interface (SI) --
 // https://n64brew.dev/wiki/Serial_Interface
 

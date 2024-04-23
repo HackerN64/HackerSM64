@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- RDP Span (DPS) --
 // https://n64brew.dev/wiki/Reality_Display_Processor/Interface
 

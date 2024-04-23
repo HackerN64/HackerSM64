@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- Audio Interface (AI) --
 // https://n64brew.dev/wiki/Audio_Interface
 

@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- Peripheral Interface (PI) --
 // https://n64brew.dev/wiki/Peripheral_Interface
 

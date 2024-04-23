@@ -90,8 +90,9 @@ typedef union RegisterId {
                     struct {
                         enum RegisterValueTypes type;
                         struct PACKED {
-                            u8     : 6;
-                            u8 dbl : 1; // [0=32-bit,1=64-bit]
+                            u8     : 5;
+                            u8 thr : 1; // Is on thread (unimplemented).
+                            u8 dbl : 1; // [0=32-bit,1=64-bit] (unimplemented).
                             u8 out : 1; // [0=default,1=output] (don't print value on summary if output).
                         };
                     };
@@ -108,14 +109,16 @@ typedef struct RegisterInfo {
                 const Address addr; // Interface register address. //! TODO: Can this be changed to offset from base address to save 3 bytes? Potential issues: [RDRAM_ROW,SP_PC,SP_IBIST,GIO_SYNC,GIO_CART_INTERRUPT]
                 struct {
                     struct PACKED {
-                        const u8 is64bit : 1; // [0=32bit,1=64bit]
+                        const u8 is64bit : 1; // [0=32bit,1=64bit]. This is ignored for interface registers which are always 32 bit.
                         const u8 offset  : 7; // (byte offset in __OSThreadContext) / sizeof(u32)
                     };
                     const char shortName[3]; //! TODO: Can the null terminator be excluded here somehow to make room for other data?
                 }; // Thread register.
             };
     /*0x08*/ const u8 descId; // : 5
-} RegisterInfo; /*0x09*/
+    /*0x09*/ const u8 bitsId; // : 5 //! TODO:
+    /*0x10*/ const u8 pad[2];
+} RegisterInfo; /*0x0C*/
 
 #define REGINFO_NULL_OFFSET BITMASK(7)//(u16)-1
 
@@ -168,10 +171,11 @@ typedef struct RegisterSource {
                 const RegisterInfo* infoList;
             };
     /*0x10*/ const char** descList;
+    /*0x14*/ 
     /*0x14*/ u8 numRegs;
     /*0x15*/ _Bool hasInfoFunc;
-    /*0x15*/ u8 pad[2];
-} RegisterSource; /*0x1C*/
+    /*0x16*/ u8 pad[2];
+} RegisterSource; /*0x20*/
 
 #define DEF_REG_LIST_PROCESSOR_FUNC(_name, _desc, _valFunc, _descList, _infoList, _infoFunc) { \
     .name        = _name,       \

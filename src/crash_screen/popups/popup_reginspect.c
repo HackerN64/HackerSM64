@@ -51,16 +51,16 @@ static const char* sStrOnOff[] = {
     [TRUE ] = "on",
 };
 static const char* sStrEndian[] = {
-    [0] = "big",
-    [1] = "little",
+    [0b0] = "big",
+    [0b1] = "little",
 };
 static const char* sStrBitMode[] = {
-    [0] = "32-bit",
-    [1] = "64-bit",
+    [0b0] = "32-bit",
+    [0b1] = "64-bit",
 };
 static const char* sStrAuto[] = {
-    [0] = "manual",
-    [1] = "auto",
+    [0b0] = "manual",
+    [0b1] = "auto",
 };
 static const char* sStr_C0_SR_ExecMode[] = {
     [0b00] = "kernel",
@@ -89,8 +89,8 @@ static const char* sStr_RDRAM_TYPE[] = {
     //! TODO: Can this potentially read out of bounds?
 };
 static const char* sStr_XBUS_DMEM[] = {
-    [0] = "xbus",
-    [1] = "dmem",
+    [0b0] = "xbus",
+    [0b1] = "dmem",
 };
 static const char* sStr_VI_AA_MODE[] = {
     [0b00] = "aa=1,resample=1,ex=always",

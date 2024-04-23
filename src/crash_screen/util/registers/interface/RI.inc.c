@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- RDRAM Interface (RI) --
 // https://n64brew.dev/wiki/RDRAM_Interface
 

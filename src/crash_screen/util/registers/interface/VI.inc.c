@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- Video Interface (VI) --
 // https://n64brew.dev/wiki/Video_Interface
 

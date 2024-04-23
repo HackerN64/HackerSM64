@@ -1,3 +1,9 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+#include "PR/rdb.h"
+
+
 // -- GIO & RDB --
 
 

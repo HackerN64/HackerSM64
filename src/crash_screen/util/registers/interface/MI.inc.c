@@ -1,3 +1,8 @@
+#pragma once
+
+#include "crash_screen/util/registers.h"
+
+
 // -- MIPS Interface (MI) --
 // https://n64brew.dev/wiki/MIPS_Interface
 
