@@ -1,9 +1,11 @@
 #pragma once
 
 #include <ultra64.h>
+#include <PR/R4300.h>
+#include <PR/rcp.h>
+#include <PR/rdb.h>
 
 #include "types.h"
-
 
 
 // -- COP0 --
@@ -333,6 +335,13 @@ typedef union Reg_FPR_31 {
 // https://n64brew.dev/wiki/RDRAM#RDRAM_registers
 
 // RDRAM_CONFIG_REG/RDRAM_DEVICE_TYPE_REG
+#define RDRAM_CONFIG_COLUMN_BITS    0xF0000000
+#define RDRAM_CONFIG_BN             0x04000000
+#define RDRAM_CONFIG_EN             0x01000000
+#define RDRAM_CONFIG_BANK_BITS      0x00F00000
+#define RDRAM_CONFIG_ROW_BITS       0x000F0000
+#define RDRAM_CONFIG_VERSION        0x000000F0
+#define RDRAM_CONFIG_TYPE           0x0000000F
 typedef union Reg_RDRAM_Status {
     struct PACKED {
         u32 ColumnBits : 4; // Number of column address bits, or said differently, declares that this RDRAM device has 2^ColumnBits bytes per row.
@@ -380,6 +389,22 @@ typedef union Reg_RDRAM_Delay {
     u32 raw;
 } Reg_RDRAM_Delay;
 // RDRAM_MODE_REG
+#define RDRAM_MODE_CE_MASK 0x80000000
+#define RDRAM_MODE_X2_MASK 0x40000000
+#define RDRAM_MODE_PL_MASK 0x20000000
+#define RDRAM_MODE_SV_MASK 0x10000000 // always 0
+#define RDRAM_MODE_SK_MASK 0x08000000 // always 0
+#define RDRAM_MODE_AS_MASK 0x04000000 // always 1
+#define RDRAM_MODE_DE_MASK 0x02000000
+#define RDRAM_MODE_LE_MASK 0x01000000
+#define RDRAM_MODE_AD_MASK 0x00080000
+#define RDRAM_MODE_C5_MASK 0x00800000
+#define RDRAM_MODE_C4_MASK 0x00008000
+#define RDRAM_MODE_C3_MASK 0x00000080
+#define RDRAM_MODE_C2_MASK 0x00400000
+#define RDRAM_MODE_C1_MASK 0x00004000
+#define RDRAM_MODE_C0_MASK 0x00000040
+#define RDRAM_MODE_CC_MASK (RDRAM_MODE_C5_MASK | RDRAM_MODE_C4_MASK | RDRAM_MODE_C3_MASK | RDRAM_MODE_C2_MASK | RDRAM_MODE_C1_MASK | RDRAM_MODE_C0_MASK) // 0x00C0C0C0
 typedef union Reg_RDRAM_Mode {
     struct PACKED {
         u32 CE : 1; // CCEnable: Current Control Enable. [0:manual, 1:auto]
@@ -630,6 +655,7 @@ typedef union Reg_DPC_Status_read {
     u32 raw;
 } Reg_DPC_Status_read;
 
+// -- DPS --
 
 // -- MI --
 // https://n64brew.dev/wiki/MIPS_Interface#Registers
@@ -713,3 +739,50 @@ typedef union Reg_MI_Mask_read {
     };
     u32 raw;
 } Reg_MI_Mask_read;
+
+// -- VI --
+
+// VI_CONTROL_REG
+#define VI_CTRL_PIXEL_ADVANCE_MASK  0x0F000
+#define VI_CTRL_KILL_WE             0x00800
+#define VI_CTRL_TEST_MODE           0x00080
+#define VI_CTRL_VBUS_CLOCK_ENABLE   0x00020 //! TODO: Warning to never set this bit.
+#define VI_CTRL_TYPE_MASK           0x00003
+
+// -- AI--
+
+// AI_STATUS_REG
+#define AI_STATUS_ENABLED   0x03000000
+#define AI_STATUS_WC        0x00080000
+#define AI_STATUS_BC        0x00010000
+#define AI_STATUS_COUNT     0x00007FFE
+#define AI_STATUS_FULL2     0x00000001
+
+// -- PI --
+
+// PI_STATUS_REG
+#define PI_STATUS_INTR 0x08
+
+// -- RI --
+
+// RI_MODE_REG
+#define RI_MODE_STOP_R  0x08
+#define RI_MODE_STOP_T  0x04
+#define RI_MODE_OP_MODE 0x03
+// RI_CONFIG_REG
+#define RI_CONFIG_AUTO  0x40
+#define RI_CONFIG_CC    0x3F
+// RI_REFRESH_REG/RI_COUNT_REG
+#define RI_REFRESH_MULTIBANK    0x00780000
+#define RI_REFRESH_OPT          0x00040000
+#define RI_REFRESH_EN           0x00020000
+#define RI_REFRESH_BANK         0x00010000
+#define RI_REFRESH_DIRTY        0x0000FF00
+#define RI_REFRESH_CLEAN        0x000000FF
+
+// -- SI --
+
+// SI_STATUS_REG
+#define SI_STATUS_DMA_STATE_MASK    0x0F00
+#define SI_STATUS_PCH_STATE_MASK    0x00F0
+#define SI_STATUS_READ_PENDING      0x0004

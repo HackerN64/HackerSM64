@@ -173,23 +173,6 @@ void regbits_str_cause(char* buf, Word bits) {
     }
 }
 
-#define RDRAM_MODE_CE_MASK 0x80000000
-#define RDRAM_MODE_X2_MASK 0x40000000
-#define RDRAM_MODE_PL_MASK 0x20000000
-#define RDRAM_MODE_SV_MASK 0x10000000 // always 0
-#define RDRAM_MODE_SK_MASK 0x08000000 // always 0
-#define RDRAM_MODE_AS_MASK 0x04000000 // always 1
-#define RDRAM_MODE_DE_MASK 0x02000000
-#define RDRAM_MODE_LE_MASK 0x01000000
-#define RDRAM_MODE_AD_MASK 0x00080000
-#define RDRAM_MODE_C5_MASK 0x00800000
-#define RDRAM_MODE_C4_MASK 0x00008000
-#define RDRAM_MODE_C3_MASK 0x00000080
-#define RDRAM_MODE_C2_MASK 0x00400000
-#define RDRAM_MODE_C1_MASK 0x00004000
-#define RDRAM_MODE_C0_MASK 0x00000040
-#define RDRAM_MODE_CC_MASK (RDRAM_MODE_C5_MASK | RDRAM_MODE_C4_MASK | RDRAM_MODE_C3_MASK | RDRAM_MODE_C2_MASK | RDRAM_MODE_C1_MASK | RDRAM_MODE_C0_MASK) // 0x00C0C0C0
-
 void regbits_str_RDRAM_MODE_CCValue(char* buf, Word bits) {
     char* p = buf;
     p += sprintf(p, "%c %c %c %c %c",
@@ -402,14 +385,6 @@ const RegBitsInfo regBits_SPC_RCP[] = {
     REG_BITS_CMD_END(),
 };
 
-#define RDRAM_CONFIG_COLUMN_BITS    0xF0000000
-#define RDRAM_CONFIG_BN             0x04000000
-#define RDRAM_CONFIG_EN             0x01000000
-#define RDRAM_CONFIG_BANK_BITS      0x00F00000
-#define RDRAM_CONFIG_ROW_BITS       0x000F0000
-#define RDRAM_CONFIG_VERSION        0x000000F0
-#define RDRAM_CONFIG_TYPE           0x0000000F
-
 const RegBitsInfo regBits_RDRAM_CONFIG[] = {
     REG_BITS_CMD_STR("9 bits per byte", RDRAM_CONFIG_BN,          REG_BITS_INFO_STR_YES_NO),
     REG_BITS_CMD_STR("Low latency",     RDRAM_CONFIG_EN,          REG_BITS_INFO_STR_ENABLE),
@@ -476,12 +451,6 @@ const RegBitsInfo regBits_DPC_STATUS[] = {
     REG_BITS_CMD_END(),
 };
 
-#define VI_CTRL_PIXEL_ADVANCE_MASK  0x0F000
-#define VI_CTRL_KILL_WE             0x00800
-#define VI_CTRL_TEST_MODE           0x00080
-#define VI_CTRL_VBUS_CLOCK_ENABLE   0x00020 //! TODO: Warning to never set this bit.
-#define VI_CTRL_TYPE_MASK           0x00003
-
 const RegBitsInfo regBits_VI_CONTROL[] = {
     REG_BITS_CMD_SETX(STRLEN("dither filter: ")),
     REG_BITS_CMD_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ENABLE),
@@ -506,12 +475,6 @@ const RegBitsInfo regBits_AI_CONTROL[] = {
     REG_BITS_CMD_END(),
 };
 
-#define AI_STATUS_ENABLED   0x03000000
-#define AI_STATUS_WC        0x00080000
-#define AI_STATUS_BC        0x00010000
-#define AI_STATUS_COUNT     0x00007FFE
-#define AI_STATUS_FULL2     0x00000001
-
 const RegBitsInfo regBits_AI_STATUS[] = {
     REG_BITS_CMD_SETX(STRLEN("word clock: ")),
     REG_BITS_CMD_STR("fifo full",  AI_STATUS_FIFO_FULL,         REG_BITS_INFO_STR_YES_NO),
@@ -525,8 +488,6 @@ const RegBitsInfo regBits_AI_STATUS[] = {
     REG_BITS_CMD_END(),
 };
 
-#define PI_STATUS_INTR 0x08
-
 const RegBitsInfo regBits_PI_STATUS[] = {
     REG_BITS_CMD_SETX(STRLEN("intr. (dma completed): ")),
     REG_BITS_CMD_STR("intr. (dma completed)", PI_STATUS_INTR,     REG_BITS_INFO_STR_YES_NO),
@@ -537,10 +498,6 @@ const RegBitsInfo regBits_PI_STATUS[] = {
     REG_BITS_CMD_END(),
 };
 
-#define RI_MODE_STOP_R  0x08
-#define RI_MODE_STOP_T  0x04
-#define RI_MODE_OP_MODE 0x03
-
 const RegBitsInfo regBits_RI_MODE[] = {
     REG_BITS_CMD_SETX(STRLEN("op mode: ")),
     REG_BITS_CMD_STR("stop r",  RI_MODE_STOP_R,  REG_BITS_INFO_STR_ENABLE),
@@ -550,9 +507,6 @@ const RegBitsInfo regBits_RI_MODE[] = {
     REG_BITS_CMD_END(),
 };
 
-#define RI_CONFIG_AUTO  0x40
-#define RI_CONFIG_CC    0x3F
-
 const RegBitsInfo regBits_RI_CONFIG[] = {
     REG_BITS_CMD_SETX(STRLEN("auto cc: ")),
     REG_BITS_CMD_STR("auto cc", RI_CONFIG_AUTO, REG_BITS_INFO_STR_ENABLE),
@@ -560,13 +514,6 @@ const RegBitsInfo regBits_RI_CONFIG[] = {
 
     REG_BITS_CMD_END(),
 };
-
-#define RI_REFRESH_MULTIBANK    0x00780000
-#define RI_REFRESH_OPT          0x00040000
-#define RI_REFRESH_EN           0x00020000
-#define RI_REFRESH_BANK         0x00010000
-#define RI_REFRESH_DIRTY        0x0000FF00
-#define RI_REFRESH_CLEAN        0x000000FF
 
 const RegBitsInfo regBits_RI_REFRESH[] = {
     REG_BITS_CMD_SETX(STRLEN("dirty refresh delay: ")),
@@ -579,10 +526,6 @@ const RegBitsInfo regBits_RI_REFRESH[] = {
 
     REG_BITS_CMD_END(),
 };
-
-#define SI_STATUS_DMA_STATE_MASK    0x0F00
-#define SI_STATUS_PCH_STATE_MASK    0x00F0
-#define SI_STATUS_READ_PENDING      0x0004
 
 const RegBitsInfo regBits_SI_STATUS[] = {
     REG_BITS_CMD_SETX(STRLEN("pif channel state: ")),
