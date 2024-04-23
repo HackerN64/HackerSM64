@@ -58,6 +58,10 @@ static const char* sStrBitMode[] = {
     [0] = "32-bit",
     [1] = "64-bit",
 };
+static const char* sStrAuto[] = {
+    [0] = "manual",
+    [1] = "auto",
+};
 static const char* sStr_C0_SR_ExecMode[] = {
     [0b00] = "kernel",
     [0b01] = "supervisor",
@@ -73,6 +77,39 @@ static const char* sStr_FCR31_RoundingMode[] = {
     [0b10] = "+inf",
     [0b11] = "-inf",
 };
+static const char* sStr_RDRAM_VERSION[] = {
+    [0b0000] = "unknown",
+    [0b0001] = "extended",
+    [0b0010] = "concurrent",
+    [0b0011] = "unknown",
+    //! TODO: Can this potentially read out of bounds?
+};
+static const char* sStr_RDRAM_TYPE[] = {
+    [0b0000] = "rdram device",
+    //! TODO: Can this potentially read out of bounds?
+};
+static const char* sStr_XBUS_DMEM[] = {
+    [0] = "xbus",
+    [1] = "dmem",
+};
+static const char* sStr_VI_AA_MODE[] = {
+    [0b00] = "aa=1,resample=1,ex=always",
+    [0b01] = "aa=1,resample=1,ex=needed",
+    [0b10] = "aa=0,resample=1",
+    [0b11] = "aa=0,resample=0",
+};
+static const char* sStr_VI_TYPE[] = {
+    [0b00] = "blank",
+    [0b01] = "reserved",
+    [VI_CTRL_TYPE_16] = "rgba16",
+    [VI_CTRL_TYPE_32] = "rgba32",
+};
+static const char* sStr_RI_MODE_OP[] = {
+    [0b00] = "continuous",
+    [0b01] = "every 4 BusClk cycles",
+    [0b10] = "pre-instruction",
+    [0b11] = "unknown",
+};
 
 enum PACKED RegBitsInfoStringLists {
     REG_BITS_INFO_STR_TRUTH,
@@ -81,9 +118,17 @@ enum PACKED RegBitsInfoStringLists {
     REG_BITS_INFO_STR_ON_OFF,
     REG_BITS_INFO_STR_ENDIAN,
     REG_BITS_INFO_STR_BIT_MODE,
+    REG_BITS_INFO_STR_AUTO,
     REG_BITS_INFO_STR_C0_SR_EXEC_MODE,
     REG_BITS_INFO_STR_C0_SR_BEV,
     REG_BITS_INFO_STR_FCR31_ROUNDING_MODE,
+
+    REG_BITS_INFO_STR_RDRAM_VERSION,
+    REG_BITS_INFO_STR_RDRAM_TYPE,
+    REG_BITS_INFO_STR_XBUS_DMEM,
+    REG_BITS_INFO_STR_VI_AA_MODE,
+    REG_BITS_INFO_STR_VI_TYPE,
+    REG_BITS_INFO_STR_RI_MODE_OP,
 };
 
 const char** sRegBitsInfoStrings[] = {
@@ -93,9 +138,18 @@ const char** sRegBitsInfoStrings[] = {
     [REG_BITS_INFO_STR_ON_OFF  ] = sStrOnOff,
     [REG_BITS_INFO_STR_ENDIAN  ] = sStrEndian,
     [REG_BITS_INFO_STR_BIT_MODE] = sStrBitMode,
+    [REG_BITS_INFO_STR_AUTO    ] = sStrAuto,
+
     [REG_BITS_INFO_STR_C0_SR_EXEC_MODE] = sStr_C0_SR_ExecMode,
     [REG_BITS_INFO_STR_C0_SR_BEV      ] = sStr_C0_SR_BEV,
     [REG_BITS_INFO_STR_FCR31_ROUNDING_MODE] = sStr_FCR31_RoundingMode,
+
+    [REG_BITS_INFO_STR_RDRAM_VERSION] = sStr_RDRAM_VERSION,
+    [REG_BITS_INFO_STR_RDRAM_TYPE   ] = sStr_RDRAM_TYPE,
+    [REG_BITS_INFO_STR_XBUS_DMEM    ] = sStr_XBUS_DMEM,
+    [REG_BITS_INFO_STR_VI_AA_MODE   ] = sStr_VI_AA_MODE,
+    [REG_BITS_INFO_STR_VI_TYPE      ] = sStr_VI_TYPE,
+    [REG_BITS_INFO_STR_RI_MODE_OP   ] = sStr_RI_MODE_OP,
 };
 
 static char sRegBitsInfoFuncBuffer[CRASH_SCREEN_NUM_CHARS_X];
@@ -103,6 +157,7 @@ static char sRegBitsInfoFuncBuffer[CRASH_SCREEN_NUM_CHARS_X];
 enum PACKED RegBitsInfoFuncs {
     REG_BITS_INFO_FUNC_READWRITE,
     REG_BITS_INFO_FUNC_CAUSE,
+    REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE,
 };
 
 void regbits_str_readwrite(char* buf, Word bits) {
@@ -118,10 +173,41 @@ void regbits_str_cause(char* buf, Word bits) {
     }
 }
 
+#define RDRAM_MODE_CE_MASK 0x80000000
+#define RDRAM_MODE_X2_MASK 0x40000000
+#define RDRAM_MODE_PL_MASK 0x20000000
+#define RDRAM_MODE_SV_MASK 0x10000000 // always 0
+#define RDRAM_MODE_SK_MASK 0x08000000 // always 0
+#define RDRAM_MODE_AS_MASK 0x04000000 // always 1
+#define RDRAM_MODE_DE_MASK 0x02000000
+#define RDRAM_MODE_LE_MASK 0x01000000
+#define RDRAM_MODE_AD_MASK 0x00080000
+#define RDRAM_MODE_C5_MASK 0x00800000
+#define RDRAM_MODE_C4_MASK 0x00008000
+#define RDRAM_MODE_C3_MASK 0x00000080
+#define RDRAM_MODE_C2_MASK 0x00400000
+#define RDRAM_MODE_C1_MASK 0x00004000
+#define RDRAM_MODE_C0_MASK 0x00000040
+#define RDRAM_MODE_CC_MASK (RDRAM_MODE_C5_MASK | RDRAM_MODE_C4_MASK | RDRAM_MODE_C3_MASK | RDRAM_MODE_C2_MASK | RDRAM_MODE_C1_MASK | RDRAM_MODE_C0_MASK) // 0x00C0C0C0
+
+void regbits_str_RDRAM_MODE_CCValue(char* buf, Word bits) {
+    char* p = buf;
+    p += sprintf(p, "%c %c %c %c %c",
+        ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C5_MASK)),
+        ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C4_MASK)),
+        ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C3_MASK)),
+        ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C2_MASK)),
+        ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C1_MASK)),
+        ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C0_MASK))
+    );
+}
+
 typedef void (*RegBitsInfoFunc)(char* buf, Word bits);
 RegBitsInfoFunc sRegBitsInfoFuncs[] = {
     [REG_BITS_INFO_FUNC_READWRITE] = regbits_str_readwrite,
     [REG_BITS_INFO_FUNC_CAUSE    ] = regbits_str_cause,
+
+    [REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE] = regbits_str_RDRAM_MODE_CCValue,
 };
 
 enum PACKED RegBitsType {
@@ -134,6 +220,7 @@ enum PACKED RegBitsType {
     REG_BITS_TYPE_FUNC,
     REG_BITS_TYPE_SETX, // Set info start X.
     REG_BITS_TYPE_SETW, // Set info width (for wrapping).
+    REG_BITS_TYPE_WRAP,
 };
 typedef struct RegBitsInfo {
     /*0x00*/ const char* name;
@@ -164,6 +251,7 @@ typedef struct RegBitsInfo {
 #define REG_BITS_INFO_FUNC(_name, _mask, _func)     REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_FUNC, _func)
 #define REG_BITS_INFO_SETX(_x)                      REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_SETX, _x)
 #define REG_BITS_INFO_SETW(_width)                  REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_SETW, _width)
+#define REG_BITS_INFO_WRAP()                        REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_WRAP, 0)
 #define REG_BITS_INFO_NONE(_name)                   REG_BITS_INFO(_name, 0,     REG_BITS_TYPE_NONE, 0)
 #define REG_BITS_INFO_GAP()                         REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_NONE, 0)
 #define REG_BITS_INFO_END()                         REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_END,  0)
@@ -231,6 +319,11 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
                 case REG_BITS_TYPE_SETW:
                     linesPrinted = 0;
                     infoW = info->width;
+                    break;
+                case REG_BITS_TYPE_WRAP:
+                    linesPrinted = 0;
+                    currLine = line;
+                    x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
                     break;
                 default:
                     break;
@@ -309,6 +402,201 @@ const RegBitsInfo regBits_SPC_RCP[] = {
     REG_BITS_INFO_END(),
 };
 
+#define RDRAM_CONFIG_COLUMN_BITS    0xF0000000
+#define RDRAM_CONFIG_BN             0x04000000
+#define RDRAM_CONFIG_EN             0x01000000
+#define RDRAM_CONFIG_BANK_BITS      0x00F00000
+#define RDRAM_CONFIG_ROW_BITS       0x000F0000
+#define RDRAM_CONFIG_VERSION        0x000000F0
+#define RDRAM_CONFIG_TYPE           0x0000000F
+
+const RegBitsInfo regBits_RDRAM_CONFIG[] = {
+    REG_BITS_INFO_STR("9 bits per byte", RDRAM_CONFIG_BN,          REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("Low latency",     RDRAM_CONFIG_EN,          REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_DEC("column bits",     RDRAM_CONFIG_COLUMN_BITS, 2),
+    REG_BITS_INFO_DEC("bank bits",       RDRAM_CONFIG_BANK_BITS,   2),
+    REG_BITS_INFO_DEC("row bits",        RDRAM_CONFIG_ROW_BITS,    2),
+    REG_BITS_INFO_STR("version",         RDRAM_CONFIG_VERSION,     REG_BITS_INFO_STR_RDRAM_VERSION),
+    REG_BITS_INFO_STR("device type",     RDRAM_CONFIG_TYPE,        REG_BITS_INFO_STR_RDRAM_TYPE),
+
+    REG_BITS_INFO_END(),
+};
+
+const RegBitsInfo regBits_RDRAM_MODE[] = {
+    REG_BITS_INFO_SETX(STRLEN("Select PowerDown latency: ")),
+    REG_BITS_INFO_STR("CCEnable",                 RDRAM_MODE_CE_MASK, REG_BITS_INFO_STR_AUTO),
+    REG_BITS_INFO_DEC("CCMult",                   RDRAM_MODE_X2_MASK, 1),
+    REG_BITS_INFO_DEC("Select PowerDown Latency", RDRAM_MODE_PL_MASK, 1),
+    REG_BITS_INFO_STR("RDRAM device",             RDRAM_MODE_DE_MASK, REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_STR("PowerDown",                RDRAM_MODE_LE_MASK, REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_DEC("AckDis",                   RDRAM_MODE_AD_MASK, 1),
+    REG_BITS_INFO_FUNC("CCValue",                 BITMASK(32),        REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE),
+
+    REG_BITS_INFO_END(),
+};
+
+const RegBitsInfo regBits_SP_STATUS[] = {
+    REG_BITS_INFO_SETX(STRLEN("intr. on break: ")),
+    REG_BITS_INFO_SETW(STRLEN("yes")),
+    REG_BITS_INFO_STR("halt",           SP_STATUS_HALT,       REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("broke",          SP_STATUS_BROKE,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma busy",       SP_STATUS_DMA_BUSY,   REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma full",       SP_STATUS_DMA_FULL,   REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("io full",        SP_STATUS_IO_FULL,    REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("single step",    SP_STATUS_SSTEP,      REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_INFO_STR("intr. on break", SP_STATUS_INTR_BREAK, REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_WRAP(),
+    REG_BITS_INFO_SETX(STRLEN("sigN (xxx signal): ")),
+    REG_BITS_INFO_DEC("sig0 (yield)",      SP_STATUS_YIELD,     1),
+    REG_BITS_INFO_DEC("sig1 (yielded)",    SP_STATUS_YIELDED,   1),
+    REG_BITS_INFO_DEC("sig2 (task done)",  SP_STATUS_TASKDONE,  1),
+    REG_BITS_INFO_DEC("sig3 (rsp signal)", SP_STATUS_RSPSIGNAL, 1),
+    REG_BITS_INFO_DEC("sig4 (cpu signal)", SP_STATUS_CPUSIGNAL, 1),
+    REG_BITS_INFO_DEC("sig5",              SP_STATUS_SIG5,      1),
+    REG_BITS_INFO_DEC("sig6",              SP_STATUS_SIG6,      1),
+    REG_BITS_INFO_DEC("sig7",              SP_STATUS_SIG7,      1),
+
+    REG_BITS_INFO_END(),
+};
+
+const RegBitsInfo regBits_DPC_STATUS[] = {
+    REG_BITS_INFO_SETX(STRLEN("transfer src: ")),
+    REG_BITS_INFO_STR("start valid",  DPC_STATUS_START_VALID,   REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("end valid",    DPC_STATUS_END_VALID,     REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma busy",     DPC_STATUS_DMA_BUSY,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("cbuf ready",   DPC_STATUS_CBUF_READY,    REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("cmd busy",     DPC_STATUS_CMD_BUSY,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("pipe busy",    DPC_STATUS_PIPE_BUSY,     REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("tmem busy",    DPC_STATUS_TMEM_BUSY,     REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("start gclk",   DPC_STATUS_START_GCLK,    REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("flush",        DPC_STATUS_FLUSH,         REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("freeze",       DPC_STATUS_FREEZE,        REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("transfer src", DPC_STATUS_XBUS_DMEM_DMA, REG_BITS_INFO_STR_XBUS_DMEM),
+
+    REG_BITS_INFO_END(),
+};
+
+#define VI_CTRL_PIXEL_ADVANCE_MASK  0x0F000
+#define VI_CTRL_KILL_WE             0x00800
+#define VI_CTRL_TEST_MODE           0x00080
+#define VI_CTRL_VBUS_CLOCK_ENABLE   0x00020 //! TODO: Warning to never set this bit.
+#define VI_CTRL_TYPE_MASK           0x00003
+
+const RegBitsInfo regBits_VI_CONTROL[] = {
+    REG_BITS_INFO_SETX(STRLEN("dither filter: ")),
+    REG_BITS_INFO_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_BIN("pixel advance", VI_CTRL_PIXEL_ADVANCE_MASK, 1),
+    REG_BITS_INFO_STR("kill we",       VI_CTRL_KILL_WE,            REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("aa mode",       VI_CTRL_ANTIALIAS_MASK,     REG_BITS_INFO_STR_VI_AA_MODE),
+    REG_BITS_INFO_STR("test mode",     VI_CTRL_TEST_MODE,          REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("serrate",       VI_CTRL_SERRATE_ON,         REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_INFO_STR("vbus clock",    VI_CTRL_VBUS_CLOCK_ENABLE,  REG_BITS_INFO_STR_ENABLE), //! TODO: Warning to never set this bit.
+    REG_BITS_INFO_STR("divot",         VI_CTRL_DIVOT_ON,           REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_INFO_STR("gamma",         VI_CTRL_GAMMA_ON,           REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_INFO_STR("gamma dither",  VI_CTRL_GAMMA_DITHER_ON,    REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_INFO_STR("type",          VI_CTRL_TYPE_MASK,          REG_BITS_INFO_STR_VI_TYPE),
+
+    REG_BITS_INFO_END(),
+};
+
+const RegBitsInfo regBits_AI_CONTROL[] = {
+    REG_BITS_INFO_SETX(STRLEN("dma: ")),
+    REG_BITS_INFO_STR("dma", AI_CONTROL_DMA_ON, REG_BITS_INFO_STR_ON_OFF),
+
+    REG_BITS_INFO_END(),
+};
+
+#define AI_STATUS_ENABLED   0x03000000
+#define AI_STATUS_WC        0x00080000
+#define AI_STATUS_BC        0x00010000
+#define AI_STATUS_COUNT     0x00007FFE
+#define AI_STATUS_FULL2     0x00000001
+
+const RegBitsInfo regBits_AI_STATUS[] = {
+    REG_BITS_INFO_SETX(STRLEN("word clock: ")),
+    REG_BITS_INFO_STR("fifo full",  AI_STATUS_FIFO_FULL,         REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma busy",   AI_STATUS_DMA_BUSY,          REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("enabled",    BIT(CTZ(AI_STATUS_ENABLED)), REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_DEC("word clock", AI_STATUS_WC,    1),
+    REG_BITS_INFO_DEC("bit clock",  AI_STATUS_BC,    1),
+    REG_BITS_INFO_DEC("count",      AI_STATUS_COUNT, 5),
+    //! TODO: AI_STATUS_FULL2?
+
+    REG_BITS_INFO_END(),
+};
+
+#define PI_STATUS_INTR 0x08
+
+const RegBitsInfo regBits_PI_STATUS[] = {
+    REG_BITS_INFO_SETX(STRLEN("intr. (dma completed): ")),
+    REG_BITS_INFO_STR("intr. (dma completed)", PI_STATUS_INTR,     REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma error",             PI_STATUS_ERROR,    REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("io busy",               PI_STATUS_IO_BUSY,  REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma busy",              PI_STATUS_DMA_BUSY, REG_BITS_INFO_STR_YES_NO),
+
+    REG_BITS_INFO_END(),
+};
+
+#define RI_MODE_STOP_R  0x08
+#define RI_MODE_STOP_T  0x04
+#define RI_MODE_OP_MODE 0x03
+
+const RegBitsInfo regBits_RI_MODE[] = {
+    REG_BITS_INFO_SETX(STRLEN("op mode: ")),
+    REG_BITS_INFO_STR("stop r",  RI_MODE_STOP_R,  REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_STR("stop t",  RI_MODE_STOP_T,  REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_STR("op mode", RI_MODE_OP_MODE, REG_BITS_INFO_STR_RI_MODE_OP),
+
+    REG_BITS_INFO_END(),
+};
+
+#define RI_CONFIG_AUTO  0x40
+#define RI_CONFIG_CC    0x3F
+
+const RegBitsInfo regBits_RI_CONFIG[] = {
+    REG_BITS_INFO_SETX(STRLEN("auto cc: ")),
+    REG_BITS_INFO_STR("auto cc", RI_CONFIG_AUTO, REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_DEC("cc",      RI_CONFIG_CC,   2),
+
+    REG_BITS_INFO_END(),
+};
+
+#define RI_REFRESH_MULTIBANK    0x00780000
+#define RI_REFRESH_OPT          0x00040000
+#define RI_REFRESH_EN           0x00020000
+#define RI_REFRESH_BANK         0x00010000
+#define RI_REFRESH_DIRTY        0x0000FF00
+#define RI_REFRESH_CLEAN        0x000000FF
+
+const RegBitsInfo regBits_RI_REFRESH[] = {
+    REG_BITS_INFO_SETX(STRLEN("dirty refresh delay: ")),
+    REG_BITS_INFO_BIN("multibank",           RI_REFRESH_MULTIBANK, 2),
+    REG_BITS_INFO_STR("optimize",            RI_REFRESH_OPT,       REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_STR("automatic refresh",   RI_REFRESH_EN,        REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_INFO_DEC("bank",                RI_REFRESH_BANK,      1),
+    REG_BITS_INFO_DEC("dirty refresh delay", RI_REFRESH_DIRTY,     3),
+    REG_BITS_INFO_DEC("clean refresh delay", RI_REFRESH_CLEAN,     3),
+
+    REG_BITS_INFO_END(),
+};
+
+#define SI_STATUS_DMA_STATE_MASK    0x0F00
+#define SI_STATUS_PCH_STATE_MASK    0x00F0
+#define SI_STATUS_READ_PENDING      0x0004
+
+const RegBitsInfo regBits_SI_STATUS[] = {
+    REG_BITS_INFO_SETX(STRLEN("pif channel state: ")),
+    REG_BITS_INFO_STR("interrupt",         SI_STATUS_INTERRUPT,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_BIN("dma state",         SI_STATUS_DMA_STATE_MASK, 2),
+    REG_BITS_INFO_BIN("pif channel state", SI_STATUS_PCH_STATE_MASK, 2),
+    REG_BITS_INFO_STR("dma error",         SI_STATUS_DMA_ERROR,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("read pending",      SI_STATUS_READ_PENDING,   REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("io busy",           SI_STATUS_RD_BUSY,        REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_INFO_STR("dma busy",          SI_STATUS_DMA_BUSY,       REG_BITS_INFO_STR_YES_NO),
+
+    REG_BITS_INFO_END(),
+};
+
 typedef struct RegInspectExtraInfo {
     /*0x00*/ const enum RegisterSources src;
     /*0x01*/ const s8 idx;
@@ -316,10 +604,24 @@ typedef struct RegInspectExtraInfo {
     /*0x04*/ const RegBitsInfo* list;
 } RegInspectExtraInfo; /*0x08*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
-    { .src = REGS_CP0, .idx = REG_CP0_SR,             .list = regBits_C0_SR,    },
-    { .src = REGS_CP0, .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE, },
-    { .src = REGS_FCR, .idx = REG_FCR_CONTROL_STATUS, .list = regBits_FPR_CSR,  },
-    { .src = REGS_SPC, .idx = REG_SPC_RCP,            .list = regBits_SPC_RCP,  },
+    { .src = REGS_CP0,   .idx = REG_CP0_SR,             .list = regBits_C0_SR,    },
+    { .src = REGS_CP0,   .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE, },
+    //! TODO: CP0 $Config, $Context, etc.
+    { .src = REGS_FCR,   .idx = REG_FCR_CONTROL_STATUS, .list = regBits_FPR_CSR,  },
+    { .src = REGS_SPC,   .idx = REG_SPC_RCP,            .list = regBits_SPC_RCP,  },
+
+    { .src = REGS_RDRAM, .idx = REGID_RDRAM_CONFIG,     .list = regBits_RDRAM_CONFIG, },
+    { .src = REGS_RDRAM, .idx = REGID_RDRAM_MODE,       .list = regBits_RDRAM_MODE,   },
+    { .src = REGS_SP,    .idx = REGID_SP_STATUS,        .list = regBits_SP_STATUS,    },
+    { .src = REGS_DPC,   .idx = REGID_DPC_STATUS,       .list = regBits_DPC_STATUS,   },
+    { .src = REGS_VI,    .idx = REGID_VI_CONTROL,       .list = regBits_VI_CONTROL,   },
+    { .src = REGS_AI,    .idx = REGID_AI_CONTROL,       .list = regBits_AI_CONTROL,   },
+    { .src = REGS_AI,    .idx = REGID_AI_STATUS,        .list = regBits_AI_STATUS,    },
+    { .src = REGS_PI,    .idx = REGID_PI_STATUS,        .list = regBits_PI_STATUS,    },
+    { .src = REGS_RI,    .idx = REGID_RI_MODE,          .list = regBits_RI_MODE,      },
+    { .src = REGS_RI,    .idx = REGID_RI_CONFIG,        .list = regBits_RI_CONFIG,    },
+    { .src = REGS_RI,    .idx = REGID_RI_REFRESH,       .list = regBits_RI_REFRESH,   },
+    { .src = REGS_SI,    .idx = REGID_SI_STATUS,        .list = regBits_SI_STATUS,    },
 };
 
 void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
@@ -419,22 +721,26 @@ void reginspect_draw_contents(RegisterId regId) {
     }
 
     CSTextCoord_u32 line = 1;
+    RGBA32 color = COLOR_RGBA32_WHITE;
     if (isInterface) {
         cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on %s (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
             regSrc->desc, regSrc->name
         );
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s %s REG", COLOR_RGBA32_VSC_DEFINE,
-            regSrc->name, regInfo->name
-        );
+        color = COLOR_RGBA32_VSC_DEFINE;
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s %s REG", color, regSrc->name, regInfo->name);
     } else {
         cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
             gInspectThread->id, get_thread_name(gInspectThread)
         );
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"\"$%s\" in %s", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name, regSrc->name);
+        color = COLOR_RGBA32_CRASH_VARIABLE;
+        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"\"$%s\" in %s", color, regInfo->name, regSrc->name);
     }
     const char* regDesc = get_reg_desc(src, idx);
     if (regDesc != NULL) {
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"(%s)", COLOR_RGBA32_CRASH_VARIABLE, regDesc);
+        gCSWordWrap = TRUE;
+        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", color, regDesc);
+        gCSWordWrap = FALSE;
+        line += gCSNumLinesPrinted;
     }
     line++;
 
