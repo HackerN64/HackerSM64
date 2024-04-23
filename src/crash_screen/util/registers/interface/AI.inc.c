@@ -4,7 +4,7 @@
 
 static const char* sRegDesc_AI[] = {
     [REGID_AI_DRAM_ADDR] = "DRAM address",
-    [REGID_AI_LEN      ] = "Lengtb",
+    [REGID_AI_LEN      ] = "Length",
     [REGID_AI_CONTROL  ] = "DMA control",
     [REGID_AI_STATUS   ] = "AI status",
     [REGID_AI_DACRATE  ] = "DA counter rate",

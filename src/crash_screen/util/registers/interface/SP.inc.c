@@ -10,7 +10,7 @@ static const char* sRegDesc_SP[] = {
     [REGID_SP_STATUS   ] = "RSP status", // RSP status register.
     [REGID_SP_DMA_FULL ] = "DMA pending", // Report whether there is a pending DMA transfer (mirror of DMA_FULL bit of SP_STATUS).
     [REGID_SP_DMA_BUSY ] = "DMA in progress", // 	Report whether there is a DMA transfer in progress (mirror of DMA_BUSY bit of SP_STATUS).
-    [REGID_SP_SEMAPHORE] = "", // Register to assist implementing a simple mutex between VR4300 and RSP.
+    [REGID_SP_SEMAPHORE] = "CPU <-> RSP mutex", // Register to assist implementing a simple mutex between VR4300 and RSP.
     [REGID_SP_PC       ] = "Program counter",
     [REGID_SP_IBIST    ] = "BIST Status",
 };

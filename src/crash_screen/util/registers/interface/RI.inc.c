@@ -5,7 +5,7 @@
 static const char* sRegDesc_RI[] = {
     [REGID_RI_MODE        ] = "Mode",
     [REGID_RI_CONFIG      ] = "Config",
-    [REGID_RI_CURRENT_LOAD] = "",
+    [REGID_RI_CURRENT_LOAD] = "Current load",
     [REGID_RI_SELECT      ] = "Select",
     [REGID_RI_REFRESH     ] = "Refresh",
     [REGID_RI_LATENCY     ] = "Latency",
