@@ -18,7 +18,7 @@
 // https://hack64.net/docs/VR43XX.pdf
 
 
-static const char* sRegDesc_Default[] = {
+const char* sRegDesc_Default[] = {
     [REG_DESC_ZERO  ] = "zero",
     [REG_DESC_AT    ] = "assembler temporary value",
     [REG_DESC_SUBRET] = "subroutine return value",

@@ -209,6 +209,8 @@ typedef struct RegisterSource {
 extern OSThread* __osRunningThread;
 
 
+extern const char* sRegDesc_Default[];
+
 #define REG_BUFFER_SIZE 3
 extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
