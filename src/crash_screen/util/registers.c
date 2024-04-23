@@ -32,9 +32,9 @@ const char* sRegDesc_Default[] = {
     [REG_DESC_RA    ] = "return address",
 };
 
-#include "registers/CPU.inc.c"
-#include "registers/CP0.inc.c"
-#include "registers/CP1.inc.c"
+#include "register_data/CPU.inc.c"
+#include "register_data/CP0.inc.c"
+#include "register_data/CP1.inc.c"
 // -- COP2 --
 static const RegisterSource sRegisters_CP2 = {
     .name     = "CP2 (RCP vector unit)",
@@ -53,21 +53,21 @@ static const RegisterSource sRegisters_CP3 = {
     .descList = NULL,
     .numRegs  = 0,
 };
-#include "registers/SPECIAL.inc.c"
+#include "register_data/SPECIAL.inc.c"
 
-#include "registers/interface/RDRAM.inc.c"
-#include "registers/interface/SP.inc.c"
-#include "registers/interface/DPC.inc.c"
-#include "registers/interface/DPS.inc.c"
-#include "registers/interface/MI.inc.c"
-#include "registers/interface/VI.inc.c"
-#include "registers/interface/AI.inc.c"
-#include "registers/interface/PI.inc.c"
-#include "registers/interface/RI.inc.c"
-#include "registers/interface/SI.inc.c"
+#include "register_data/interface/RDRAM.inc.c"
+#include "register_data/interface/SP.inc.c"
+#include "register_data/interface/DPC.inc.c"
+#include "register_data/interface/DPS.inc.c"
+#include "register_data/interface/MI.inc.c"
+#include "register_data/interface/VI.inc.c"
+#include "register_data/interface/AI.inc.c"
+#include "register_data/interface/PI.inc.c"
+#include "register_data/interface/RI.inc.c"
+#include "register_data/interface/SI.inc.c"
 // GIO
 // RDB
-#include "registers/interface/GIO_RDB.inc.c"
+#include "register_data/interface/GIO_RDB.inc.c"
 
 
 

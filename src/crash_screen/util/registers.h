@@ -71,8 +71,8 @@ enum PACKED RegisterSources {
 };
 
 
-#include "registers/register_ids.h"
-#include "registers/interface/register_ids_interfaces.h"
+#include "register_data/register_ids.h"
+#include "register_data/interface/register_ids_interfaces.h"
 
 
 enum PACKED RegisterValueTypes {
