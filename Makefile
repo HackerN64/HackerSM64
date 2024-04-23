@@ -407,7 +407,6 @@ O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
            $(foreach file,$(CPP_FILES),$(BUILD_DIR)/$(file:.cpp=.o)) \
            $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
-           lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
 
 LIBZ_O_FILES := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
@@ -620,7 +619,6 @@ patch: $(ROM)
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
 $(BUILD_DIR)/src/game/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
-$(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
 $(SOUND_BIN_DIR)/sound_data.o:        $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/sequences.bin $(SOUND_BIN_DIR)/bank_sets
 $(BUILD_DIR)/levels/scripts.o:        $(BUILD_DIR)/include/level_headers.h
 
