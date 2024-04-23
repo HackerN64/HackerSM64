@@ -107,7 +107,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Instant Input patch by Wiseguy (Removes all input lag caused by plugins supporting framebuffer)
   - This means that you'll have to do your framebuffer effects on buffer 0 for emulator, but NOT for console. You can use the `gEmulator` variable to check for console when doing your framebuffer effects.
 - Widescreen (16:9) support toggleable by pressing `L` in the pause menu. *
-- S2DEX engine by someone2639! To use it, compile with `make TEXT_ENGINE=s2dex_text_engine` or just set `TEXT_ENGINE` to `s2dex_text_engine` in the makefile.
 - ia8 (64x64) coins, the vanilla coin texture is upgraded to accomodate. *
 - ia8 (64x64) 30 FPS coins (Textures by InTheBeef, cleaned up by Arceveti). *
 - Floombas! Simply just retextured goombas with customizable behaviors (does not overwrite standard goombas). *
@@ -137,7 +136,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
   This does mean that any framebuffer effects will have to be done on buffer 0 if targeting emulators
 - Automatic console and emulator detection: Use the `gEmulator` variable to wrap your code in an emulator check.
 - Separate defines for emulator and console black border height.
-- Getting HVQM FMV support to work with the game is WIP.
 
 Requirements are the same as regular SM64, however a GCC MIPS cross compiler is also required. If you're on Debian-like Linux, you can use the ``gcc-mips-linux-gnu`` package. The toolchain that comes with my SDK is also supported.
 
