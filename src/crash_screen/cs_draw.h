@@ -143,6 +143,26 @@ void cs_draw_scroll_bar_impl(ScreenCoord_u32 x, ScreenCoord_u32 topY, ScreenCoor
 ALWAYS_INLINE void cs_draw_scroll_bar(ScreenCoord_u32 topY, ScreenCoord_u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
     cs_draw_scroll_bar_impl((CRASH_SCREEN_X2 - 1), topY, bottomY, numVisibleEntries, numTotalEntries, topVisibleEntry, color, drawBg);
 }
+// 5x5 bit data fits into one u32.
+typedef union CSCustom5x5Glyph {
+    struct PACKED {
+        u32    : 7;
+        u32 r0 : 5;
+        u32 r1 : 5;
+        u32 r2 : 5;
+        u32 r3 : 5;
+        u32 r4 : 5;
+    };
+    u32 raw;
+} CSCustom5x5Glyph;
+#define GLYPH_5X5(_r0, _r1, _r2, _r3, _r4) (CSCustom5x5Glyph){ \
+    .r0 = _r0, \
+    .r1 = _r1, \
+    .r2 = _r2, \
+    .r3 = _r3, \
+    .r4 = _r4, \
+}
+void cs_draw_custom_5x5_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, CSCustom5x5Glyph glyph, RGBA32 color);
 // RGBA32 cs_thread_draw_highlight(OSThread* thread, ScreenCoord_u32 y);
 RGBA32 cs_draw_thread_state_icon(ScreenCoord_u32 x, ScreenCoord_u32 y, OSThread* thread);
 void cs_draw_main(void);

@@ -302,10 +302,34 @@ void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, 
             dst++;
             bit >>= 1;
         }
-
         dst += (SCREEN_WIDTH - CRASH_SCREEN_FONT_CHAR_WIDTH);
     }
 }
+
+UNUSED void cs_draw_custom_5x5_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, CSCustom5x5Glyph glyph, RGBA32 color) {
+    const ScreenCoord_u32 w = 5;
+    const ScreenCoord_u32 h = 5;
+    const Alpha alpha = RGBA32_A(color);
+    if (alpha == 0x00) {
+        return;
+    }
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const u16 darken = cs_get_darken_rgba16(newColor, alpha);
+    const RGBA16 mask = generate_darken_rgba16_mask(darken);
+    RGBA16* dst = get_rendering_fb_pixel(startX, startY);
+
+    u32 bit = BIT((w * h) - 1);
+    for (ScreenCoord_u32 y = 0; y < h; y++) {
+        for (ScreenCoord_u32 x = 0; x < w; x++) {
+            if (glyph.raw & bit) {
+                apply_rgba16_color_or_darken(dst, newColor, alpha, mask, darken);
+            }
+            dst++;
+            bit >>= 1;
+        }
+        dst += (SCREEN_WIDTH - w);
+    }
+};
 
 //! TODO:
 // void cs_draw_texture(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA16* texture) {
@@ -402,6 +426,7 @@ void cs_draw_scroll_bar_impl(ScreenCoord_u32 x, ScreenCoord_u32 topY, ScreenCoor
     cs_draw_rect(x, (topY + barTop), 1, barHeight, color);
 }
 
+//! TODO: If `cs_draw_custom_5x5_glyph` gets used somewhere else and is therefore included in the rom, also use it here to save space.
 RGBA32 cs_draw_thread_state_icon(ScreenCoord_u32 x, ScreenCoord_u32 y, OSThread* thread) {
     const s32 w = (CRASH_SCREEN_FONT_CHAR_WIDTH + 1);
     const s32 h = (CRASH_SCREEN_FONT_CHAR_WIDTH + 1);
