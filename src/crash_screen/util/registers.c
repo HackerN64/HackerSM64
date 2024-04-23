@@ -35,24 +35,8 @@ const char* sRegDesc_Default[] = {
 #include "register_data/CPU.inc.c"
 #include "register_data/CP0.inc.c"
 #include "register_data/CP1.inc.c"
-// -- COP2 --
-static const RegisterSource sRegisters_CP2 = {
-    .name     = "CP2 (RCP vector unit)",
-    .desc     = "Reality Co-Processor Vector Unit",
-    .valFunc  = NULL,
-    .infoFunc = NULL,
-    .descList = NULL,
-    .numRegs  = 0,
-};
-// -- COP3 --
-static const RegisterSource sRegisters_CP3 = {
-    .name     = "CP3",
-    .desc     = "unused",
-    .valFunc  = NULL,
-    .infoFunc = NULL,
-    .descList = NULL,
-    .numRegs  = 0,
-};
+#include "register_data/CP2.inc.c"
+#include "register_data/CP3.inc.c"
 #include "register_data/SPECIAL.inc.c"
 
 #include "register_data/interface/RDRAM.inc.c"

@@ -70,6 +70,7 @@ static const RegisterSource sRegisters_CP1 = DEF_REG_LIST_PROCESSOR(
 
 // -- FCR Registers --
 
+
 static const char* sRegDesc_FCR[] = {
     [REG_DESC_FCR_COP_IMPL_REV  ] = "coprocessor implementation/revision",
     [REG_DESC_FCR_CONTROL_STATUS] = "floating point control/status",
