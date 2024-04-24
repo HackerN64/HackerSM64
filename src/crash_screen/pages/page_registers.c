@@ -47,6 +47,7 @@ const enum ControlTypes cs_cont_list_registers[] = {
 };
 
 
+// List of all registers in __OSThreadContext:
 #define REG_LIST_TERMINATOR (u32)-1
 #define LIST_REG_IMPL(_src, _idx, _type) {  \
     .src           = _src,                  \
@@ -90,7 +91,7 @@ static const RegisterId sThreadFloatRegList[] = { //! TODO: Use this for printin
     LIST_REG_END(),
 };
 
-//! TODO: autogenerate rows from columns and list
+//! TODO: autogenerate number of rows from columns and list
 
 // Reg list:
 #define REG_LIST_COLUMNS 3
@@ -112,7 +113,7 @@ enum RegisterPageSections {
 
 typedef struct RegisterPageSection {
     /*0x00*/ const RegisterId* list; // Register list.
-    /*0x04*/ const u8 size;      // (ARRAY_COUNT(list) - 1).
+    /*0x04*/ const u8 size;          // (ARRAY_COUNT(list) - 1).
     /*0x05*/ const _Bool clamp;      // How to handle out of bounds accesses.
     /*0x06*/ const u8 cols;          // Number of columns.
     /*0x07*/ const u8 rows;          // Number of rows.
@@ -272,21 +273,21 @@ CSTextCoord_u32 cs_registers_draw_register_list(CSTextCoord_u32 line, enum Regis
 void page_registers_draw(void) {
     OSThread* thread = gInspectThread;
     CSTextCoord_u32 line = 2;
-    enum RegisterPageSections section = PAGE_REG_SECTION_THREAD;
+    enum RegisterPageSections sectionID = PAGE_REG_SECTION_THREAD;
 
     if (gCSPopupID != CS_POPUP_THREADS) {
         // Draw the thread box:
         // cs_thread_draw_highlight(thread, CS_POPUP_THREADS_Y1);
-        if (sRegisterSelectionCursor.sectionID == section) {
+        if (sRegisterSelectionCursor.sectionID == sectionID) {
             cs_draw_row_box_thread(CS_POPUP_THREADS_BG_X1, CS_POPUP_THREADS_Y1, COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT);
         }
         cs_print_thread_info(TEXT_X(CS_POPUP_THREADS_TEXT_X1), CS_POPUP_THREADS_Y1, CS_POPUP_THREADS_NUM_CHARS_X, thread);
     }
     line++;
-    section++;
+    sectionID++;
 
-    while (section < NUM_REG_PAGE_SECTIONS) {
-        line = cs_registers_draw_register_list(line, section++);
+    while (sectionID < NUM_REG_PAGE_SECTIONS) {
+        line = cs_registers_draw_register_list(line, sectionID++);
     }
 }
 

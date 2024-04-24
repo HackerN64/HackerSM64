@@ -336,7 +336,7 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
         if (name != NULL) {
             // cs_print(x, y, "%s%c", name, (hasInfo ? ':' : ' '));
             cs_print(x, y, "%s:", name);
-            linesPrinted = gCSNumLinesPrinted; 
+            linesPrinted = gCSNumLinesPrinted;
         }
         if (hasInfo) {
             ScreenCoord_u32 x2 = (x + TEXT_WIDTH(descW));
@@ -669,7 +669,7 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     { .src = REGS_CP0,   .idx = REG_CP0_SR,             .list = regBits_C0_SR,     },
     { .src = REGS_CP0,   .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE,  },
     { .src = REGS_CP0,   .idx = REG_CP0_CONFIG,         .list = regBits_C0_Config, },
-    //! TODO: CP0 $Config, $Context, etc.
+
     { .src = REGS_FCR,   .idx = REG_FCR_CONTROL_STATUS, .list = regBits_FPR_CSR,  },
     { .src = REGS_SPC,   .idx = REG_SPC_RCP,            .list = regBits_SPC_RCP,  },
 
@@ -687,22 +687,32 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     { .src = REGS_SI,    .idx = REGID_SI_STATUS,        .list = regBits_SI_STATUS,    },
 };
 
-void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
-    if (IS_DEBUG_MAP_INCLUDED()) {
-        const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD);
-        if (symbol != NULL) {
-            cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 4), symbol, FALSE);
+void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32, _Bool sureAddr) {
+    const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD); // Returns NULL if debug map is not included.
+    _Bool inSymbol = (symbol != NULL);
+
+    if (inSymbol || sureAddr) {
+        const CSTextCoord_u32 maxWidth = (CRASH_SCREEN_NUM_CHARS_X - 4);
+
+        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"pointer to:", COLOR_RGBA32_CRASH_PAGE_NAME);
+
+        if (inSymbol) {
+            cs_print_symbol_name(TEXT_X(2), TEXT_Y(line++), maxWidth, symbol, FALSE);
             cs_print(TEXT_X(2), TEXT_Y(line++),
                 (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD" "),
                 COLOR_RGBA32_CRASH_OFFSET, (val32 - symbol->addr)
             );
+        } else if (sureAddr) {
+            cs_print_addr_location_info(TEXT_X(2), TEXT_Y(line++), maxWidth, val32, TRUE);
         }
+
+        sInspectedRegisterPtrAddr = val32;
     }
 
     Word dataAtAddr = 0x00000000;
-    if (try_read_word_aligned(&dataAtAddr, val32)) {
-        sInspectedRegisterPtrAddr = val32;
+    _Bool validAddr = try_read_word_aligned(&dataAtAddr, val32);
+
+    if ((val32 != (Address)NULL) && (validAddr || sureAddr)) {
         cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"data at dereferenced pointer:", COLOR_RGBA32_CRASH_PAGE_NAME);
         if (addr_is_in_text_segment(val32)) {
             format_and_print_insn(TEXT_X(2), TEXT_Y(line++), val32, dataAtAddr);
@@ -714,8 +724,6 @@ void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32) {
             print_data_as_binary(TEXT_X(2 + charX), TEXT_Y(line++), &dataAtAddr, sizeof(dataAtAddr), valColor);
             CS_SET_DEFAULT_PRINT_COLOR_END();
         }
-    } else {
-        sInspectedRegisterPtrAddr = 0x00000000;
     }
 }
 
@@ -833,8 +841,10 @@ void reginspect_draw_contents(RegisterId regId) {
         exInfo++;
     }
 
-    if (!isCP1 && !isFCR && !hasExInfo && (regInfo->sureAddr || is_valid_ram_addr(val32))) {
-        cs_reginspect_pointer(line++, val32);
+    sInspectedRegisterPtrAddr = 0x00000000; // Reset this in case it doesn't get set later in cs_reginspect_pointer().
+    _Bool sureAddr = regInfo->sureAddr;
+    if (!isCP1 && !isFCR && !hasExInfo && (sureAddr || is_valid_ram_addr(val32))) {
+        cs_reginspect_pointer(line++, val32, sureAddr);
     }
 }
 
