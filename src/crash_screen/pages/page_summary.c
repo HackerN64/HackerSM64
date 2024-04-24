@@ -311,7 +311,7 @@ void page_summary_draw(void) {
     }
     cs_draw_divider(DIVIDER_Y(endLine));
     cs_print(TEXT_X(0), TEXT_Y(endLine),
-        STR_COLOR_PREFIX"see other pages for more info\npress [%s] for page-specific controls",
+        STR_COLOR_PREFIX"see other pages with <"STR_L"|"STR_R"> for more info\npress [%s] for page-specific controls",
         COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
     );
 }

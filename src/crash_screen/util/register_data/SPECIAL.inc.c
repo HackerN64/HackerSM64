@@ -25,7 +25,7 @@ Doubleword get_special_reg_val(int idx) {
         case REG_SPC_LO:    asm volatile("mflo %0":"=r"(val):); break;
         case REG_SPC_HI:    asm volatile("mfhi %0":"=r"(val):); break;
         // case REG_SPC_LLBIT: asm volatile("sc %0,()":"=r"(val):); break;
-        case REG_SPC_RCP:   return __osRunningThread->context.rcp;
+        case REG_SPC_RCP:   return __osRunningThread->context.rcp; // Thread exclusive (from libultra).
         default: break;
     }
     return val;
