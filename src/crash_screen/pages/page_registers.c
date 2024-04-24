@@ -121,10 +121,10 @@ typedef struct RegisterPageSection {
 }
 
 const RegisterPageSection sRegPageSections[NUM_REG_PAGE_SECTIONS] = {
-    [PAGE_REG_SECTION_THREAD] = { .rows = 1, .cols = 1, .list = NULL, .listSize = 0, .clamp = TRUE, },// { .cols =                1, .rows =             1, .list = NULL,                },
-    [PAGE_REG_SECTION_REG   ] = REG_LIST_BOUNDS(REG_LIST_ROWS, REG_LIST_COLUMNS, sThreadRegList,      FALSE),//{ .cols = REG_LIST_COLUMNS, .rows = REG_LIST_ROWS, .list = sThreadRegList,      },
-    [PAGE_REG_SECTION_FPCSR ] = REG_LIST_BOUNDS(1,             1,                sThreadFPCSRList,    TRUE ),//{ .cols =                1, .rows =             1, .list = sThreadFPCSRList,    },
-    [PAGE_REG_SECTION_FP    ] = REG_LIST_BOUNDS(FP_LIST_ROWS,  FP_LIST_COLUMNS,  sThreadFloatRegList, FALSE),//{ .cols =  FP_LIST_COLUMNS, .rows =  FP_LIST_ROWS, .list = sThreadFloatRegList, },
+    [PAGE_REG_SECTION_THREAD] = { .rows = 1, .cols = 1, .list = NULL, .listSize = 0, .clamp = TRUE, },
+    [PAGE_REG_SECTION_REG   ] = REG_LIST_BOUNDS(REG_LIST_ROWS, REG_LIST_COLUMNS, sThreadRegList,      FALSE),
+    [PAGE_REG_SECTION_FPCSR ] = REG_LIST_BOUNDS(1,             1,                sThreadFPCSRList,    TRUE ),
+    [PAGE_REG_SECTION_FP    ] = REG_LIST_BOUNDS(FP_LIST_ROWS,  FP_LIST_COLUMNS,  sThreadFloatRegList, FALSE),
 };
 
 typedef struct RegisterPageCursor {

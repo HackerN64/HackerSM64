@@ -30,13 +30,7 @@ INCBIN(char, HackerSM64_version_txt, "VERSION.txt", 4);
 INCBIN(char, CrashScreen_version_txt, "src/crash_screen/VERSION.txt", 4);
 
 
-#define ID_LIST_END() { .id = -1, .name = NULL, }
-
-typedef struct IdNamePair {
-    /*0x00*/ const int id;
-    /*0x04*/ const char* name;
-} IdNamePair; /*0x08*/
-static const char* get_name_from_id_list_impl(int id, const IdNamePair* list, size_t count) {
+const char* get_name_from_id_list_impl(int id, const IdNamePair* list, size_t count) {
     for (size_t i = 0; i < count; i++) {
         if ((int)id == (int)list[i].id) {
             return list[i].name;
@@ -45,8 +39,8 @@ static const char* get_name_from_id_list_impl(int id, const IdNamePair* list, si
 
     return NULL;
 }
-#define get_name_from_id_list(_id, _list) get_name_from_id_list_impl((_id), (_list), ARRAY_COUNT(_list))
-static const char* get_name_from_null_terminated_id_list(int id, const IdNamePair* list) {
+
+const char* get_name_from_null_terminated_id_list(int id, const IdNamePair* list) {
     const u32 max_iterations = 32;
     u32 i = 0;
 
@@ -66,12 +60,7 @@ static const char* get_name_from_null_terminated_id_list(int id, const IdNamePai
     return NULL;
 }
 
-typedef struct RangeNamePair {
-    /*0x00*/ const u32 start;
-    /*0x04*/ const u32 end;
-    /*0x08*/ const char* name;
-} RangeNamePair; /*0x0C*/
-static const char* get_name_from_range_list_impl(u32 id, const RangeNamePair* list, size_t count) {
+const char* get_name_from_range_list_impl(u32 id, const RangeNamePair* list, size_t count) {
     for (size_t i = 0; i < count; i++) {
         if (((u32)id >= (u32)list[i].start) && ((u32)id < (u32)list[i].end)) {
             return list[i].name;
@@ -80,8 +69,8 @@ static const char* get_name_from_range_list_impl(u32 id, const RangeNamePair* li
 
     return NULL;
 }
-#define get_name_from_range_list(_id, _list) get_name_from_range_list_impl((_id), (_list), ARRAY_COUNT(_list))
-UNUSED static const char* get_name_from_null_terminated_range_list(u32 id, const RangeNamePair* list) {
+
+UNUSED const char* get_name_from_null_terminated_range_list(u32 id, const RangeNamePair* list) {
     const u32 max_iterations = 32;
     u32 i = 0;
 
@@ -653,6 +642,27 @@ const char* get_processor_name(u8 imp) {
 
 // -- CAUSE --
 
+enum CauseDescriptions {
+    CAUSE_DESC_INT     = (EXC_INT     >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_MOD     = (EXC_MOD     >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_RMISS   = (EXC_RMISS   >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_WMISS   = (EXC_WMISS   >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_RADE    = (EXC_RADE    >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_WADE    = (EXC_WADE    >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_IBE     = (EXC_IBE     >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_DBE     = (EXC_DBE     >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_SYSCALL = (EXC_SYSCALL >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_BREAK   = (EXC_BREAK   >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_II      = (EXC_II      >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_CPU     = (EXC_CPU     >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_OV      = (EXC_OV      >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_TRAP    = (EXC_TRAP    >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_VCEI    = (EXC_VCEI    >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_FPE     = (EXC_FPE     >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_WATCH   = 16, // (EXC_WATCH   >> CAUSE_EXCSHIFT),
+    CAUSE_DESC_VCED    = 17, // (EXC_VCED    >> CAUSE_EXCSHIFT),
+    NUM_CAUSE_DESC,
+};
 static const char* sCauseDesc[NUM_CAUSE_DESC] = {
     [CAUSE_DESC_INT    ] = "Interrupt",
     [CAUSE_DESC_MOD    ] = "TLB modification",
@@ -786,6 +796,19 @@ const char* get_cause_desc(__OSThreadContext* tc, _Bool specific) {
 
 // -- FPCSR/FPE --
 
+#define FPCSR_SHIFT 17
+#define FPCSR_CAUSES (6 - 1)
+#define FPCSR_SHIFT_2 (FPCSR_SHIFT - FPCSR_CAUSES)
+
+enum FPCSRDescriptions {
+    FPCSR_DESC_CE = (FPCSR_CAUSES - CTZ(FPCSR_CE >> FPCSR_SHIFT_2)), // Unimplemented operation.
+    FPCSR_DESC_CV = (FPCSR_CAUSES - CTZ(FPCSR_CV >> FPCSR_SHIFT_2)), // Invalid operation.
+    FPCSR_DESC_CZ = (FPCSR_CAUSES - CTZ(FPCSR_CZ >> FPCSR_SHIFT_2)), // Division by zero.
+    FPCSR_DESC_CO = (FPCSR_CAUSES - CTZ(FPCSR_CO >> FPCSR_SHIFT_2)), // Overflow.
+    FPCSR_DESC_CU = (FPCSR_CAUSES - CTZ(FPCSR_CU >> FPCSR_SHIFT_2)), // Underflow.
+    FPCSR_DESC_CI = (FPCSR_CAUSES - CTZ(FPCSR_CI >> FPCSR_SHIFT_2)), // Inexact operation.
+    NUM_FPCSR_DESC,
+};
 static const char* sFpcsrDesc[NUM_FPCSR_DESC] = {
     [FPCSR_DESC_CE] = "Unimplemented operation",
     [FPCSR_DESC_CV] = "Invalid operation",

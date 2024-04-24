@@ -42,7 +42,7 @@ static const char* sStrYesNo[] = {
     [FALSE] = "no",
     [TRUE ] = "yes",
 };
-static const char* sStrEnable[] = {
+static const char* sStrEnabled[] = {
     [FALSE] = "disabled",
     [TRUE ] = "enabled",
 };
@@ -54,17 +54,21 @@ static const char* sStrSuccess[] = {
     [FALSE] = "fail",
     [TRUE ] = "success",
 };
-static const char* sStrFailure[] = {
-    [FALSE] = "success",
-    [TRUE ] = "fail",
-};
 static const char* sStrEndian[] = {
-    [0b0] = "big",
-    [0b1] = "little",
+    [0b0] = "little",
+    [0b1] = "big",
 };
 static const char* sStrBitMode[] = {
     [0b0] = "32-bit",
     [0b1] = "64-bit",
+};
+static const char* sStr_32_64[] = {
+    [0b0] = "32",
+    [0b1] = "64",
+};
+static const char* sStr_64_128[] = {
+    [0b0] = "64",
+    [0b1] = "128",
 };
 static const char* sStrAuto[] = {
     [0b0] = "manual",
@@ -78,6 +82,14 @@ static const char* sStr_C0_SR_ExecMode[] = {
 static const char* sStr_C0_SR_BEV[] = {
     [0b0] = "normal",
     [0b1] = "bootstrap",
+};
+static const char* sStr_C0_CONFIG_EM[] = {
+    [0b0] = "parity",
+    [0b1] = "ecc",
+};
+static const char* sStr_C0_CONFIG_EB[] = {
+    [0b0] = "subblock",
+    [0b1] = "sequent",
 };
 static const char* sStr_FCR31_RoundingMode[] = {
     [0b00] = "nearest",
@@ -118,19 +130,22 @@ static const char* sStr_RI_MODE_OP[] = {
     [0b10] = "pre-instruction",
     [0b11] = "unknown",
 };
-
 enum PACKED RegBitsInfoStringLists {
     REG_BITS_INFO_STR_TRUTH,
     REG_BITS_INFO_STR_YES_NO,
-    REG_BITS_INFO_STR_ENABLE,
+    REG_BITS_INFO_STR_ENABLED,
     REG_BITS_INFO_STR_ON_OFF,
     REG_BITS_INFO_STR_SUCCESS,
-    REG_BITS_INFO_STR_FAILURE,
     REG_BITS_INFO_STR_ENDIAN,
     REG_BITS_INFO_STR_BIT_MODE,
+    REG_BITS_INFO_STR_32_64,
+    REG_BITS_INFO_STR_64_128,
     REG_BITS_INFO_STR_AUTO,
+
     REG_BITS_INFO_STR_C0_SR_EXEC_MODE,
     REG_BITS_INFO_STR_C0_SR_BEV,
+    REG_BITS_INFO_STR_C0_CONFIG_EM,
+    REG_BITS_INFO_STR_C0_CONFIG_EB,
     REG_BITS_INFO_STR_FCR31_ROUNDING_MODE,
 
     REG_BITS_INFO_STR_RDRAM_VERSION,
@@ -140,20 +155,22 @@ enum PACKED RegBitsInfoStringLists {
     REG_BITS_INFO_STR_VI_TYPE,
     REG_BITS_INFO_STR_RI_MODE_OP,
 };
-
 const char** sRegBitsInfoStrings[] = {
     [REG_BITS_INFO_STR_TRUTH   ] = sStrTruth,
     [REG_BITS_INFO_STR_YES_NO  ] = sStrYesNo,
-    [REG_BITS_INFO_STR_ENABLE  ] = sStrEnable,
+    [REG_BITS_INFO_STR_ENABLED ] = sStrEnabled,
     [REG_BITS_INFO_STR_ON_OFF  ] = sStrOnOff,
     [REG_BITS_INFO_STR_SUCCESS ] = sStrSuccess,
-    [REG_BITS_INFO_STR_FAILURE ] = sStrFailure,
     [REG_BITS_INFO_STR_ENDIAN  ] = sStrEndian,
     [REG_BITS_INFO_STR_BIT_MODE] = sStrBitMode,
+    [REG_BITS_INFO_STR_32_64   ] = sStr_32_64,
+    [REG_BITS_INFO_STR_64_128  ] = sStr_64_128,
     [REG_BITS_INFO_STR_AUTO    ] = sStrAuto,
 
     [REG_BITS_INFO_STR_C0_SR_EXEC_MODE] = sStr_C0_SR_ExecMode,
     [REG_BITS_INFO_STR_C0_SR_BEV      ] = sStr_C0_SR_BEV,
+    [REG_BITS_INFO_STR_C0_CONFIG_EM   ] = sStr_C0_CONFIG_EM,
+    [REG_BITS_INFO_STR_C0_CONFIG_EB   ] = sStr_C0_CONFIG_EB,
     [REG_BITS_INFO_STR_FCR31_ROUNDING_MODE] = sStr_FCR31_RoundingMode,
 
     [REG_BITS_INFO_STR_RDRAM_VERSION] = sStr_RDRAM_VERSION,
@@ -164,27 +181,61 @@ const char** sRegBitsInfoStrings[] = {
     [REG_BITS_INFO_STR_RI_MODE_OP   ] = sStr_RI_MODE_OP,
 };
 
-static char sRegBitsInfoFuncBuffer[CRASH_SCREEN_NUM_CHARS_X];
 
-enum PACKED RegBitsInfoFuncs {
-    REG_BITS_INFO_FUNC_READWRITE,
-    REG_BITS_INFO_FUNC_CAUSE,
-    REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE,
+
+
+typedef struct IdNamePairList {
+    const IdNamePair* list;
+    size_t numEntries;
+} IdNamePairList;
+#define DEF_BITS_PAIR_LIST(_name, ...)          \
+    static const IdNamePair _##_name[] = {      \
+        __VA_ARGS__                             \
+        ID_LIST_END(),                          \
+    };                                          \
+    static const IdNamePairList _name = {       \
+        .list = _##_name,                       \
+        .numEntries = ARRAY_COUNT(_##_name),    \
+    }
+DEF_BITS_PAIR_LIST(sPairList_sys_clock_ratio,
+    { .id = CONFIG_EC_1_1, .name = "1:1",   },
+    { .id = CONFIG_EC_3_2, .name = "1.5:1", },
+    { .id = CONFIG_EC_2_1, .name = "2:1",   },
+    { .id = CONFIG_EC_3_1, .name = "3:1",   },
+);
+DEF_BITS_PAIR_LIST(sPairList_trans_data_pattern,
+    { .id = 0, .name = "cold rst", },
+    { .id = 6, .name = "2dw/6c",     },
+);
+DEF_BITS_PAIR_LIST(sPairList_config_k0,
+    { .id = CONFIG_UNCACHED,     .name = "uncached",   },
+    { .id = CONFIG_NONCOHRNT,    .name = "non-coh.",   },
+    { .id = CONFIG_COHRNT_EXLWR, .name = "coh. exlwr", },
+);
+enum PACKED RegBitsInfoIdStringPairs {
+    REG_BITS_INFO_LIST_C0_CONFIG_SYS_CLOCK_RATIO,
+    REG_BITS_INFO_LIST_C0_CONFIG_TRANS_DATA_PATTERN,
+    REG_BITS_INFO_LIST_C0_CONFIG_K0,
+};
+const IdNamePairList* sRegBitsInfoIdStringPairs[] = {
+    [REG_BITS_INFO_LIST_C0_CONFIG_SYS_CLOCK_RATIO   ] = &sPairList_sys_clock_ratio,
+    [REG_BITS_INFO_LIST_C0_CONFIG_TRANS_DATA_PATTERN] = &sPairList_trans_data_pattern,
+    [REG_BITS_INFO_LIST_C0_CONFIG_K0                ] = &sPairList_config_k0,
 };
 
+
+static char sRegBitsInfoFuncBuffer[CRASH_SCREEN_NUM_CHARS_X];
 void regbits_str_readwrite(char* buf, Word bits) {
     char* p = buf;
     p += sprintf(p, "R:%d/W:%d", (bits >> 1), (bits & 0b1));
 }
-
-void regbits_str_cause(char* buf, Word bits) {
+void regbits_str_C0_cause(char* buf, Word bits) {
     char* p = buf;
     p += sprintf(p, "%s", get_cause_desc_simple(bits));
     if (((bits & CAUSE_EXCMASK) >> CAUSE_EXCSHIFT) == EXC_CPU) {
         p += sprintf(p, " (cop%d)", ((bits & CAUSE_CEMASK) >> CAUSE_CESHIFT));//c.CE);
     }
 }
-
 void regbits_str_RDRAM_MODE_CCValue(char* buf, Word bits) {
     char* p = buf;
     p += sprintf(p, "%c %c %c %c %c",
@@ -196,14 +247,19 @@ void regbits_str_RDRAM_MODE_CCValue(char* buf, Word bits) {
         ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C0_MASK))
     );
 }
-
+enum PACKED RegBitsInfoFuncs {
+    REG_BITS_INFO_FUNC_READWRITE,
+    REG_BITS_INFO_FUNC_C0_CAUSE,
+    REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE,
+};
 typedef void (*RegBitsInfoFunc)(char* buf, Word bits);
 RegBitsInfoFunc sRegBitsInfoFuncs[] = {
-    [REG_BITS_INFO_FUNC_READWRITE] = regbits_str_readwrite,
-    [REG_BITS_INFO_FUNC_CAUSE    ] = regbits_str_cause,
-
+    [REG_BITS_INFO_FUNC_READWRITE         ] = regbits_str_readwrite,
+    [REG_BITS_INFO_FUNC_C0_CAUSE          ] = regbits_str_C0_cause,
     [REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE] = regbits_str_RDRAM_MODE_CCValue,
 };
+
+
 
 enum PACKED RegBitsType {
     REG_BITS_TYPE_END = -1,
@@ -211,7 +267,9 @@ enum PACKED RegBitsType {
     REG_BITS_TYPE_BIN,
     REG_BITS_TYPE_HEX,
     REG_BITS_TYPE_DEC,
-    REG_BITS_TYPE_STR,
+    REG_BITS_TYPE_STR,  // String array.
+    REG_BITS_TYPE_BSTR, // Invert boolean string array.
+    REG_BITS_TYPE_ISTR,
     REG_BITS_TYPE_FUNC,
     REG_BITS_TYPE_SETX, // Set info start X.
     REG_BITS_TYPE_SETW, // Set info width (for wrapping).
@@ -223,33 +281,36 @@ typedef struct RegBitsInfo {
     /*0x05*/ const u8 shiftSize;
     /*0x06*/ const enum RegBitsType type;
     /*0x07*/ union {
-                const u8 arg;
-                const u8 spacing;                       // REG_BITS_TYPE_BIN
-                const u8 numDigits;                     // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
-                const enum RegBitsInfoStringLists list; // REG_BITS_TYPE_STR
-                const enum RegBitsInfoFuncs func;       // REG_BITS_TYPE_FUNC
-                const u8 xPos;                          // REG_BITS_TYPE_SETX
-                const u8 width;                         // REG_BITS_TYPE_SETW
+                const u8 arg;                               // Generic arg for macro.
+                const u8 spacing;                           // REG_BITS_TYPE_BIN
+                const u8 numDigits;                         // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
+                const enum RegBitsInfoStringLists list;     // REG_BITS_TYPE_STR
+                const enum RegBitsInfoIdStringPairs iList;  // RET_BITS_TYPE_ISTR
+                const enum RegBitsInfoFuncs func;           // REG_BITS_TYPE_FUNC
+                const u8 xPos;                              // REG_BITS_TYPE_SETX
+                const u8 width;                             // REG_BITS_TYPE_SETW
             };
 } RegBitsInfo; /*0x08*/
-#define REG_BITS_INFO(_name, _mask, _type, _arg) {  \
+#define REG_BITS_CMD(_name, _mask, _type, _arg) {  \
     .name      = _name,                             \
     .maskSize  = POPCOUNT(_mask),                   \
     .shiftSize = CTZ(_mask),                        \
     .type      = _type,                             \
     .arg       = _arg,                              \
 }
-#define REG_BITS_CMD_BIN(_name, _mask, _spacing)   REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_BIN,  _spacing)
-#define REG_BITS_CMD_HEX(_name, _mask, _numDigits) REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_HEX,  _numDigits)
-#define REG_BITS_CMD_DEC(_name, _mask, _numDigits) REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_DEC,  _numDigits)
-#define REG_BITS_CMD_STR(_name, _mask, _list)      REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_STR,  _list)
-#define REG_BITS_CMD_FUNC(_name, _mask, _func)     REG_BITS_INFO(_name, _mask, REG_BITS_TYPE_FUNC, _func)
-#define REG_BITS_CMD_SETX(_x)                      REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_SETX, _x)
-#define REG_BITS_CMD_SETW(_width)                  REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_SETW, _width)
-#define REG_BITS_CMD_WRAP()                        REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_WRAP, 0)
-#define REG_BITS_CMD_NONE(_name)                   REG_BITS_INFO(_name, 0,     REG_BITS_TYPE_NONE, 0)
-#define REG_BITS_CMD_GAP()                         REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_NONE, 0)
-#define REG_BITS_CMD_END()                         REG_BITS_INFO(NULL,  0,     REG_BITS_TYPE_END,  0)
+#define REG_BITS_CMD_BIN(_name,  _mask, _spacing)   REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_BIN,  _spacing)
+#define REG_BITS_CMD_HEX(_name,  _mask, _numDigits) REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_HEX,  _numDigits)
+#define REG_BITS_CMD_DEC(_name,  _mask, _numDigits) REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_DEC,  _numDigits)
+#define REG_BITS_CMD_STR(_name,  _mask, _list)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_STR,  _list)
+#define REG_BITS_CMD_BSTR(_name, _mask, _list)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_BSTR, _list)
+#define REG_BITS_CMD_ISTR(_name, _mask, _list)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_ISTR, _list)
+#define REG_BITS_CMD_FUNC(_name, _mask, _func)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_FUNC, _func)
+#define REG_BITS_CMD_SETX(_x)                       REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_SETX, _x)
+#define REG_BITS_CMD_SETW(_width)                   REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_SETW, _width)
+#define REG_BITS_CMD_WRAP()                         REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_WRAP, 0)
+#define REG_BITS_CMD_NONE(_name)                    REG_BITS_CMD(_name, 0,     REG_BITS_TYPE_NONE, 0)
+#define REG_BITS_CMD_GAP()                          REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_NONE, 0)
+#define REG_BITS_CMD_END()                          REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_END,  0)
 
 
 CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const RegBitsInfo* list) {
@@ -261,10 +322,11 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
 
     const RegBitsInfo* info = &list[0];
     while ((info != NULL) && (info->type != REG_BITS_TYPE_END)) {
-        if (currLine >= (CRASH_SCREEN_NUM_CHARS_Y - 1)) {
-            currLine = line;
-            x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
-        }
+        //! TODO: This wraps twice (going offscreen) when using REG_BITS_CMD_WRAP().
+        // if (currLine >= (CRASH_SCREEN_NUM_CHARS_Y - 1)) {
+        //     currLine = line;
+        //     x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
+        // }
 
         ScreenCoord_u32 y = TEXT_Y(currLine);
         CSTextCoord_u32 linesPrinted = 1;
@@ -284,7 +346,7 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
             Word bits = ((val >> shiftSize) & mask);
 
             switch (type) {
-                case REG_BITS_TYPE_BIN:
+                case REG_BITS_TYPE_BIN: // Print as binary (arg = spacing between chars):
                     //! TODO: combine this with cs_print_as_binary:
                     ScreenCoord_u32 x3 = x2;
                     for (int i = 0; i < maskSize; i++) {
@@ -293,29 +355,38 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
                         x3 += TEXT_WIDTH(info->spacing);
                     }
                     break;
-                case REG_BITS_TYPE_HEX:
+                case REG_BITS_TYPE_HEX: // Print as hexadecimal:
                     cs_print(x2, y, (STR_COLOR_PREFIX STR_HEX_PREFIX"%0*X"), infoColor, info->numDigits, bits);
                     break;
-                case REG_BITS_TYPE_DEC:
+                case REG_BITS_TYPE_DEC: // Print as decimal:
                     cs_print(x2, y, (STR_COLOR_PREFIX"%0*d"), infoColor, info->numDigits, bits);
                     break;
-                case REG_BITS_TYPE_STR:
+                case REG_BITS_TYPE_STR: // Print from string array:
                     cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoStrings[info->list][bits]);
                     break;
-                case REG_BITS_TYPE_FUNC:
+                case REG_BITS_TYPE_BSTR: // Print from string array (inverted boolean):
+                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoStrings[info->list][!bits]);
+                    break;
+                case REG_BITS_TYPE_ISTR:; // Print from id/string pair array:
+                    const IdNamePairList* list = sRegBitsInfoIdStringPairs[info->iList];
+                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor,
+                        str_null_fallback(get_name_from_id_list_impl(bits, list->list, list->numEntries), "?")
+                    );
+                    break;
+                case REG_BITS_TYPE_FUNC: // Print from formatting function:
                     bzero(sRegBitsInfoFuncBuffer, sizeof(sRegBitsInfoFuncBuffer));
                     sRegBitsInfoFuncs[info->func](sRegBitsInfoFuncBuffer, bits);
                     cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoFuncBuffer);
                     break;
-                case REG_BITS_TYPE_SETX:
+                case REG_BITS_TYPE_SETX: // Set x position of data:
                     linesPrinted = 0;
                     descW = info->xPos;
                     break;
-                case REG_BITS_TYPE_SETW:
+                case REG_BITS_TYPE_SETW: // Set max width of data:
                     linesPrinted = 0;
                     infoW = info->width;
                     break;
-                case REG_BITS_TYPE_WRAP:
+                case REG_BITS_TYPE_WRAP: // Wrap the list:
                     linesPrinted = 0;
                     currLine = line;
                     x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
@@ -333,8 +404,8 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
 
 const RegBitsInfo regBits_C0_Index[] = {
     REG_BITS_CMD_SETX(STRLEN("tlb probe: ")),
-    REG_BITS_CMD_STR("tlb probe", C0_INX_TLB_FAIL,  REG_BITS_INFO_STR_FAILURE),
-    REG_BITS_CMD_DEC("tlb index", C0_INX_TLB_INDEX, 2),
+    REG_BITS_CMD_BSTR("tlb probe", C0_INX_TLB_FAIL,  REG_BITS_INFO_STR_SUCCESS),
+    REG_BITS_CMD_DEC( "tlb index", C0_INX_TLB_INDEX, 2),
 
     REG_BITS_CMD_END(),
 };
@@ -342,25 +413,24 @@ const RegBitsInfo regBits_C0_Index[] = {
 const RegBitsInfo regBits_C0_SR[] = {
     REG_BITS_CMD_SETX(STRLEN("xxxxxxxxxx: ")),
     REG_BITS_CMD_SETW(STRLEN("xxxxxxxx")),
-    REG_BITS_CMD_STR("cop1",       SR_CU1,      REG_BITS_INFO_STR_ENABLE),
-    REG_BITS_CMD_STR("low power",  SR_RP,       REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("extra fpr",  SR_FR,       REG_BITS_INFO_STR_ENABLE),
-    REG_BITS_CMD_STR("endian",     SR_RE,       REG_BITS_INFO_STR_ENDIAN),
-    REG_BITS_CMD_HEX("intr mask",  SR_IMASK,    2),
-
-    REG_BITS_CMD_STR("kernel",     SR_KX,       REG_BITS_INFO_STR_BIT_MODE),
-    REG_BITS_CMD_STR("supervisor", SR_SX,       REG_BITS_INFO_STR_BIT_MODE),
-    REG_BITS_CMD_STR("user",       SR_UX,       REG_BITS_INFO_STR_BIT_MODE),
-    REG_BITS_CMD_STR("exec mode",  SR_KSU_MASK, REG_BITS_INFO_STR_C0_SR_EXEC_MODE),
-    REG_BITS_CMD_STR("error",      SR_ERL,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("exception",  SR_EXL,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("glbl intr",  SR_IE,       REG_BITS_INFO_STR_ENABLE),
-
-    REG_BITS_CMD_STR("insn trace", SR_ITS,      REG_BITS_INFO_STR_ENABLE),
-    REG_BITS_CMD_STR("bs exc vec", SR_BEV,      REG_BITS_INFO_STR_C0_SR_BEV),
-    REG_BITS_CMD_STR("tlb down",   SR_TS,       REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("soft reset", SR_SR,       REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("cp0 cond",   SR_CH,       REG_BITS_INFO_STR_TRUTH),
+    REG_BITS_CMD_STR( "cop1",       SR_CU1,      REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR( "low power",  SR_RP,       REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_CMD_STR( "extra fpr",  SR_FR,       REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_BSTR("endian",     SR_RE,       REG_BITS_INFO_STR_ENDIAN),
+    REG_BITS_CMD_HEX( "intr mask",  SR_IMASK,    2),
+    REG_BITS_CMD_STR( "kernel",     SR_KX,       REG_BITS_INFO_STR_BIT_MODE),
+    REG_BITS_CMD_STR( "supervisor", SR_SX,       REG_BITS_INFO_STR_BIT_MODE),
+    REG_BITS_CMD_STR( "user",       SR_UX,       REG_BITS_INFO_STR_BIT_MODE),
+    REG_BITS_CMD_STR( "exec mode",  SR_KSU_MASK, REG_BITS_INFO_STR_C0_SR_EXEC_MODE),
+    REG_BITS_CMD_STR( "error",      SR_ERL,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_CMD_STR( "exception",  SR_EXL,      REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_CMD_STR( "glbl intr",  SR_IE,       REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_WRAP(),
+    REG_BITS_CMD_STR( "insn trace", SR_ITS,      REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR( "bs exc vec", SR_BEV,      REG_BITS_INFO_STR_C0_SR_BEV),
+    REG_BITS_CMD_STR( "tlb down",   SR_TS,       REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_CMD_STR( "soft reset", SR_SR,       REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_CMD_STR( "cp0 cond",   SR_CH,       REG_BITS_INFO_STR_TRUTH),
 
     REG_BITS_CMD_END(),
 };
@@ -379,7 +449,35 @@ const RegBitsInfo regBits_C0_CAUSE[] = {
     REG_BITS_CMD_GAP(),
     REG_BITS_CMD_DEC("exc code", CAUSE_EXCMASK, 2),
     REG_BITS_CMD_SETX(2),
-    REG_BITS_CMD_FUNC(NULL, BITMASK(32), REG_BITS_INFO_FUNC_CAUSE),
+    REG_BITS_CMD_FUNC(NULL, BITMASK(32), REG_BITS_INFO_FUNC_C0_CAUSE),
+
+    REG_BITS_CMD_END(),
+};
+
+const RegBitsInfo regBits_C0_Config[] = {
+    REG_BITS_CMD_SETX(STRLEN("dirty shr coh:")),
+    REG_BITS_CMD_SETW(STRLEN("xxxxxxxx")),
+    REG_BITS_CMD_STR( "master check",  CONFIG_CM, REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_ISTR("clock ratio",   CONFIG_EC, REG_BITS_INFO_LIST_C0_CONFIG_SYS_CLOCK_RATIO),
+    REG_BITS_CMD_ISTR("data pattern",  CONFIG_EP, REG_BITS_INFO_LIST_C0_CONFIG_TRANS_DATA_PATTERN),
+    REG_BITS_CMD_HEX( "2cache blksz",  CONFIG_SB, 2),
+
+    REG_BITS_CMD_STR( "split cache",   CONFIG_SS, REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_CMD_BSTR("scache port",   CONFIG_SW, REG_BITS_INFO_STR_64_128),
+    REG_BITS_CMD_BSTR("port width",    CONFIG_EW, REG_BITS_INFO_STR_32_64),
+    REG_BITS_CMD_BSTR("2cache",        CONFIG_SC, REG_BITS_INFO_STR_YES_NO),
+    REG_BITS_CMD_BSTR("dirty shr coh", CONFIG_SM, REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR( "endian",        CONFIG_BE, REG_BITS_INFO_STR_ENDIAN),
+    REG_BITS_CMD_STR( "ecc mode",      CONFIG_EM, REG_BITS_INFO_STR_C0_CONFIG_EM),
+    REG_BITS_CMD_STR( "blk order",     CONFIG_EB, REG_BITS_INFO_STR_C0_CONFIG_EB),
+    REG_BITS_CMD_ISTR("k0seg coh",     CONFIG_K0, REG_BITS_INFO_LIST_C0_CONFIG_K0),
+    REG_BITS_CMD_WRAP(),
+    REG_BITS_CMD_SETX(STRLEN("icache blksz:")),
+    REG_BITS_CMD_HEX( "1icache sz",    CONFIG_IC, 1),
+    REG_BITS_CMD_HEX( "1dcache sz",    CONFIG_DC, 1),
+    REG_BITS_CMD_HEX( "icache blksz",  CONFIG_IB, 1),
+    REG_BITS_CMD_HEX( "dcache blksz",  CONFIG_DB, 1),
+    REG_BITS_CMD_STR( "upd on SC",     CONFIG_CU, REG_BITS_INFO_STR_YES_NO),
 
     REG_BITS_CMD_END(),
 };
@@ -407,7 +505,7 @@ const RegBitsInfo regBits_SPC_RCP[] = {
 
 const RegBitsInfo regBits_RDRAM_CONFIG[] = {
     REG_BITS_CMD_STR("9 bits per byte", RDRAM_CONFIG_BN,          REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("Low latency",     RDRAM_CONFIG_EN,          REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("Low latency",     RDRAM_CONFIG_EN,          REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_DEC("column bits",     RDRAM_CONFIG_COLUMN_BITS, 2),
     REG_BITS_CMD_DEC("bank bits",       RDRAM_CONFIG_BANK_BITS,   2),
     REG_BITS_CMD_DEC("row bits",        RDRAM_CONFIG_ROW_BITS,    2),
@@ -422,8 +520,8 @@ const RegBitsInfo regBits_RDRAM_MODE[] = {
     REG_BITS_CMD_STR("CCEnable",                 RDRAM_MODE_CE_MASK, REG_BITS_INFO_STR_AUTO),
     REG_BITS_CMD_DEC("CCMult",                   RDRAM_MODE_X2_MASK, 1),
     REG_BITS_CMD_DEC("Select PowerDown Latency", RDRAM_MODE_PL_MASK, 1),
-    REG_BITS_CMD_STR("RDRAM device",             RDRAM_MODE_DE_MASK, REG_BITS_INFO_STR_ENABLE),
-    REG_BITS_CMD_STR("PowerDown",                RDRAM_MODE_LE_MASK, REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("RDRAM device",             RDRAM_MODE_DE_MASK, REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR("PowerDown",                RDRAM_MODE_LE_MASK, REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_DEC("AckDis",                   RDRAM_MODE_AD_MASK, 1),
     REG_BITS_CMD_FUNC("CCValue",                 BITMASK(32),        REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE),
 
@@ -473,13 +571,13 @@ const RegBitsInfo regBits_DPC_STATUS[] = {
 
 const RegBitsInfo regBits_VI_CONTROL[] = {
     REG_BITS_CMD_SETX(STRLEN("dither filter: ")),
-    REG_BITS_CMD_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_BIN("pixel advance", VI_CTRL_PIXEL_ADVANCE_MASK, 1),
     REG_BITS_CMD_STR("kill we",       VI_CTRL_KILL_WE,            REG_BITS_INFO_STR_YES_NO),
     REG_BITS_CMD_STR("aa mode",       VI_CTRL_ANTIALIAS_MASK,     REG_BITS_INFO_STR_VI_AA_MODE),
     REG_BITS_CMD_STR("test mode",     VI_CTRL_TEST_MODE,          REG_BITS_INFO_STR_YES_NO),
     REG_BITS_CMD_STR("serrate",       VI_CTRL_SERRATE_ON,         REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("vbus clock",    VI_CTRL_VBUS_CLOCK_ENABLE,  REG_BITS_INFO_STR_ENABLE), //! TODO: Warning to never set this bit.
+    REG_BITS_CMD_STR("vbus clock",    VI_CTRL_VBUS_CLOCK_ENABLE,  REG_BITS_INFO_STR_ENABLED), //! TODO: Warning to never set this bit.
     REG_BITS_CMD_STR("divot",         VI_CTRL_DIVOT_ON,           REG_BITS_INFO_STR_ON_OFF),
     REG_BITS_CMD_STR("gamma",         VI_CTRL_GAMMA_ON,           REG_BITS_INFO_STR_ON_OFF),
     REG_BITS_CMD_STR("gamma dither",  VI_CTRL_GAMMA_DITHER_ON,    REG_BITS_INFO_STR_ON_OFF),
@@ -499,7 +597,7 @@ const RegBitsInfo regBits_AI_STATUS[] = {
     REG_BITS_CMD_SETX(STRLEN("word clock: ")),
     REG_BITS_CMD_STR("fifo full",  AI_STATUS_FIFO_FULL,         REG_BITS_INFO_STR_YES_NO),
     REG_BITS_CMD_STR("dma busy",   AI_STATUS_DMA_BUSY,          REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("enabled",    BIT(CTZ(AI_STATUS_ENABLED)), REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("enabled",    BIT(CTZ(AI_STATUS_ENABLED)), REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_DEC("word clock", AI_STATUS_WC,    1),
     REG_BITS_CMD_DEC("bit clock",  AI_STATUS_BC,    1),
     REG_BITS_CMD_DEC("count",      AI_STATUS_COUNT, 5),
@@ -520,8 +618,8 @@ const RegBitsInfo regBits_PI_STATUS[] = {
 
 const RegBitsInfo regBits_RI_MODE[] = {
     REG_BITS_CMD_SETX(STRLEN("op mode: ")),
-    REG_BITS_CMD_STR("stop r",  RI_MODE_STOP_R,  REG_BITS_INFO_STR_ENABLE),
-    REG_BITS_CMD_STR("stop t",  RI_MODE_STOP_T,  REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("stop r",  RI_MODE_STOP_R,  REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR("stop t",  RI_MODE_STOP_T,  REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_STR("op mode", RI_MODE_OP_MODE, REG_BITS_INFO_STR_RI_MODE_OP),
 
     REG_BITS_CMD_END(),
@@ -529,7 +627,7 @@ const RegBitsInfo regBits_RI_MODE[] = {
 
 const RegBitsInfo regBits_RI_CONFIG[] = {
     REG_BITS_CMD_SETX(STRLEN("auto cc: ")),
-    REG_BITS_CMD_STR("auto cc", RI_CONFIG_AUTO, REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("auto cc", RI_CONFIG_AUTO, REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_DEC("cc",      RI_CONFIG_CC,   2),
 
     REG_BITS_CMD_END(),
@@ -538,8 +636,8 @@ const RegBitsInfo regBits_RI_CONFIG[] = {
 const RegBitsInfo regBits_RI_REFRESH[] = {
     REG_BITS_CMD_SETX(STRLEN("dirty refresh delay: ")),
     REG_BITS_CMD_BIN("multibank",           RI_REFRESH_MULTIBANK, 2),
-    REG_BITS_CMD_STR("optimize",            RI_REFRESH_OPT,       REG_BITS_INFO_STR_ENABLE),
-    REG_BITS_CMD_STR("automatic refresh",   RI_REFRESH_EN,        REG_BITS_INFO_STR_ENABLE),
+    REG_BITS_CMD_STR("optimize",            RI_REFRESH_OPT,       REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR("automatic refresh",   RI_REFRESH_EN,        REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_DEC("bank",                RI_REFRESH_BANK,      1),
     REG_BITS_CMD_DEC("dirty refresh delay", RI_REFRESH_DIRTY,     3),
     REG_BITS_CMD_DEC("clean refresh delay", RI_REFRESH_CLEAN,     3),
@@ -567,9 +665,10 @@ typedef struct RegInspectExtraInfo {
     /*0x04*/ const RegBitsInfo* list;
 } RegInspectExtraInfo; /*0x08*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
-    { .src = REGS_CP0,   .idx = REG_CP0_INX,            .list = regBits_C0_Index, },
-    { .src = REGS_CP0,   .idx = REG_CP0_SR,             .list = regBits_C0_SR,    },
-    { .src = REGS_CP0,   .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE, },
+    { .src = REGS_CP0,   .idx = REG_CP0_INX,            .list = regBits_C0_Index,  },
+    { .src = REGS_CP0,   .idx = REG_CP0_SR,             .list = regBits_C0_SR,     },
+    { .src = REGS_CP0,   .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE,  },
+    { .src = REGS_CP0,   .idx = REG_CP0_CONFIG,         .list = regBits_C0_Config, },
     //! TODO: CP0 $Config, $Context, etc.
     { .src = REGS_FCR,   .idx = REG_FCR_CONTROL_STATUS, .list = regBits_FPR_CSR,  },
     { .src = REGS_SPC,   .idx = REG_SPC_RCP,            .list = regBits_SPC_RCP,  },
@@ -687,27 +786,28 @@ void reginspect_draw_contents(RegisterId regId) {
 
     CSTextCoord_u32 line = 1;
     RGBA32 color = COLOR_RGBA32_WHITE;
+    gCSWordWrap = TRUE;
     if (isInterface) {
-        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on %s (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
+        cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"register on %s (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
             regSrc->desc, regSrc->name
         );
+        line += gCSNumLinesPrinted;
         color = COLOR_RGBA32_VSC_DEFINE;
         cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s %s REG", color, regSrc->name, regInfo->name);
     } else {
-        cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
+        cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
             gInspectThread->id, get_thread_name(gInspectThread)
         );
+        line += gCSNumLinesPrinted;
         color = COLOR_RGBA32_CRASH_VARIABLE;
         cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"\"$%s\" in %s", color, regInfo->name, regSrc->name);
     }
     const char* regDesc = get_reg_desc(src, idx);
     if (regDesc != NULL) {
-        gCSWordWrap = TRUE;
         cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", color, regDesc);
-        gCSWordWrap = FALSE;
         line += gCSNumLinesPrinted;
     }
-    line++;
+    gCSWordWrap = FALSE;
 
     // 64 bit value if it exists:
     if (is64Bit) {
@@ -733,7 +833,7 @@ void reginspect_draw_contents(RegisterId regId) {
         exInfo++;
     }
 
-    if (!isCP1 && !isFCR && !hasExInfo && is_valid_ram_addr(val32)) {
+    if (!isCP1 && !isFCR && !hasExInfo && (regInfo->sureAddr || is_valid_ram_addr(val32))) {
         cs_reginspect_pointer(line++, val32);
     }
 }

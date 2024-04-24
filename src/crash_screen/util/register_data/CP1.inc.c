@@ -76,8 +76,8 @@ static const char* sRegDesc_FCR[] = {
     [REG_DESC_FCR_CONTROL_STATUS] = "floating point control/status",
 };
 ALIGNED32 static const RegisterInfo sRegInfo_FCR[2] = {
-    [REG_DESC_FCR_COP_IMPL_REV  ] = DEF_SREG(       sizeof(u32), "FCR0",  "FC", REG_DESC_FCR_COP_IMPL_REV  ),
-    [REG_DESC_FCR_CONTROL_STATUS] = DEF_TREG(fpcsr, sizeof(u32), "FPCSR", "FS", REG_DESC_FCR_CONTROL_STATUS),
+    [REG_DESC_FCR_COP_IMPL_REV  ] = DEF_SREG(       sizeof(u32), "FCR0",  "FC", FALSE, REG_DESC_FCR_COP_IMPL_REV  ),
+    [REG_DESC_FCR_CONTROL_STATUS] = DEF_TREG(fpcsr, sizeof(u32), "FPCSR", "FS", FALSE, REG_DESC_FCR_CONTROL_STATUS),
 };
 const RegisterInfo* get_fcr_reg_info(int idx) {
     if (idx == REG_FCR_CONTROL_STATUS) {

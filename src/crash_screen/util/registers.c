@@ -145,7 +145,7 @@ Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread) {
         return get_direct_reg_val(src, idx);
     }
 
-    UNREACHABLE();
+    return 0;
 }
 
 const char* get_reg_desc(enum RegisterSources src, int idx) {

@@ -115,45 +115,49 @@ typedef struct RegisterInfo {
                     const char shortName[3]; //! TODO: Can the null terminator be excluded here somehow to make room for other data?
                 }; // Thread register.
             };
-    /*0x08*/ const u8 descId; // : 5
-    /*0x09*/ const u8 bitsId; // : 5 //! TODO:
-    /*0x10*/ const u8 pad[2];
+    /*0x08*/ const _Bool sureAddr; // : 1; // If TRUE, this register should always be an address. //! TODO: 'sure address' vs. 'unknown' vs. 'sure NOT address'?
+    /*0x09*/ const u8 descId; // : 5;
+    /*0x0A*/ const u8 bitsId; // : 5; //! TODO:
+    /*0x0B*/ const u8 pad[1];
 } RegisterInfo; /*0x0C*/
 
-#define REGINFO_NULL_OFFSET BITMASK(7)//(u16)-1
+#define REGINFO_NULL_OFFSET BITMASK(7)
 
-#define DEF_SREG(_size, _name, _shortName, _descId) {   \
-    .offset    = REGINFO_NULL_OFFSET,                   \
-    .is64bit   = (_size == sizeof(u64)),                \
-    .name      = _name,                                 \
-    .shortName = _shortName,                            \
-    .descId    = _descId,                               \
+#define DEF_SREG(_size, _name, _shortName, _sureAddr, _descId) {    \
+    .offset    = REGINFO_NULL_OFFSET,                               \
+    .is64bit   = (_size == sizeof(u64)),                            \
+    .name      = _name,                                             \
+    .shortName = _shortName,                                        \
+    .sureAddr  = _sureAddr,                                         \
+    .descId    = _descId,                                           \
 }
 
-#define DEF_TREG(_field, _size, _name, _shortName, _descId) {   \
-    .offset    = ((OFFSETOF(__OSThreadContext, _field)) / sizeof(u32)), \
-    .is64bit   = (sizeof_member(__OSThreadContext, _field) == sizeof(u64)),      \
-    .name      = _name,                                         \
-    .shortName = _shortName,                                    \
-    .descId    = _descId,                                       \
+#define DEF_TREG(_field, _size, _name, _shortName, _sureAddr, _descId) {    \
+    .offset    = ((OFFSETOF(__OSThreadContext, _field)) / sizeof(u32)),     \
+    .is64bit   = (sizeof_member(__OSThreadContext, _field) == sizeof(u64)), \
+    .name      = _name,                                                     \
+    .shortName = _shortName,                                                \
+    .sureAddr  = _sureAddr,                                                 \
+    .descId    = _descId,                                                   \
 }
 
 //! TODO: Use offset from base addr?
 #define DEF_IREG(_reg, _name, _descId) {    \
-    .name   = _name,                        \
-    .addr   = _reg,                         \
-    .descId = _descId,                      \
+    .name     = _name,                      \
+    .addr     = _reg,                       \
+    .sureAddr = FALSE,                      \
+    .descId   = _descId,                    \
 }
 
-#define DEF_CPU_SREG(_reg, _name, _descId) DEF_SREG(      sizeof(u64), _name, _name, _descId)
-#define DEF_CPU_TREG(_reg, _name, _descId) DEF_TREG(_reg, sizeof(u64), _name, _name, _descId)
+#define DEF_CPU_SREG(_reg, _name, _sureAddr, _descId) DEF_SREG(      sizeof(u64), _name, _name, _sureAddr, _descId)
+#define DEF_CPU_TREG(_reg, _name, _sureAddr, _descId) DEF_TREG(_reg, sizeof(u64), _name, _name, _sureAddr, _descId)
 
-#define DEF_CP0_SREG(_reg, _type,         _name, _shortName, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _descId)
-#define DEF_CP0_TREG(_reg, _type, _field, _name, _shortName, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _descId)
+#define DEF_CP0_SREG(_reg, _type,         _name, _shortName, _sureAddr, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _sureAddr, _descId)
+#define DEF_CP0_TREG(_reg, _type, _field, _name, _shortName, _sureAddr, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _sureAddr, _descId)
 
-#define DEF_CP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, _descId)
-#define DEF_CP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, _descId)
-#define DEF_CP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, _descId)
+#define DEF_CP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, FALSE, _descId)
+#define DEF_CP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, FALSE, _descId)
+#define DEF_CP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, FALSE, _descId)
 
 #define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX EXPAND_AND_STRINGIFY(_reg)); break;
 

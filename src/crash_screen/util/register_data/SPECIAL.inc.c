@@ -14,10 +14,10 @@ static const char* sRegDesc_SPECIAL[] = {
     [REG_SPC_RCP  ] = "thread rcp",
 };
 ALIGNED32 static const RegisterInfo sRegInfo_SPECIAL[] = {
-    [REG_SPC_LO   ] = DEF_TREG(lo,  sizeof(u64), "LO",    "LO", REG_SPC_LO   ),
-    [REG_SPC_HI   ] = DEF_TREG(hi,  sizeof(u64), "HI",    "HI", REG_SPC_HI   ),
-    // [REG_SPC_LLBIT] = DEF_SREG(     sizeof(u32), "LLBit", "LL", REG_SPC_LLBIT),
-    [REG_SPC_RCP  ] = DEF_TREG(rcp, sizeof(u32), "RCP",   "RC", REG_SPC_RCP  ),
+    [REG_SPC_LO   ] = DEF_TREG(lo,  sizeof(u64), "LO",    "LO", FALSE, REG_SPC_LO   ),
+    [REG_SPC_HI   ] = DEF_TREG(hi,  sizeof(u64), "HI",    "HI", FALSE, REG_SPC_HI   ),
+    // [REG_SPC_LLBIT] = DEF_SREG(     sizeof(u32), "LLBit", "LL", FALSE, REG_SPC_LLBIT),
+    [REG_SPC_RCP  ] = DEF_TREG(rcp, sizeof(u32), "RCP",   "RC", FALSE, REG_SPC_RCP  ),
 };
 Doubleword get_special_reg_val(int idx) {
     Word val = 0;
