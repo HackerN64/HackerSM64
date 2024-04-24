@@ -23,9 +23,7 @@ enum ThreadID {
     THREAD_3_MAIN,
     THREAD_4_SOUND,
     THREAD_5_GAME_LOOP,
-    THREAD_6_RUMBLE,
-    THREAD_8_TIMEKEEPER,
-    THREAD_9_DA_COUNTER,
+    THREAD_6_RUMBLE
 };
 
 struct RumbleData {
