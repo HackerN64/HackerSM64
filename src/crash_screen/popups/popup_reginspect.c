@@ -850,9 +850,7 @@ void cs_popup_reginspect_draw(void) {
         cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_POPUP_OPACITY)
     );
 
-    RegisterId regId = gInspectedRegister;
-
-    reginspect_draw_contents(regId);
+    reginspect_draw_contents(gInspectedRegister);
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 

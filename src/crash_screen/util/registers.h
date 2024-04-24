@@ -229,8 +229,6 @@ ALWAYS_INLINE static const RegisterSource* get_interface_src(enum Interfaces int
 }
 const RegisterInfo* get_reg_info_from_src(const RegisterSource* regSrc, int idx);
 const RegisterInfo* get_reg_info(enum RegisterSources src, int idx);
-Doubleword get_thread_reg_val(enum RegisterSources src, int idx, OSThread* thread);
-Doubleword get_direct_reg_val(enum RegisterSources src, int idx);
 Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread);
 const char* get_reg_desc(enum RegisterSources src, int idx);
 

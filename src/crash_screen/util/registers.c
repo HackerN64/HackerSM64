@@ -84,35 +84,46 @@ static const RegisterSource* sRegisterLists[NUM_REG_SOURCES] = {
 
 
 const RegisterSource* get_reg_src(enum RegisterSources src) {
+    if (src >= NUM_REG_SOURCES) {
+        return NULL;
+    }
+
     return sRegisterLists[src];
 }
 
 const RegisterInfo* get_reg_info_from_src(const RegisterSource* regSrc, int idx) {
+    if (regSrc->infoList == NULL) { // This checks both func and list because they are a union.
+        return NULL;
+    }
+
     return (regSrc->hasInfoFunc) ? regSrc->infoFunc(idx) : &regSrc->infoList[idx];
 }
 
 const RegisterInfo* get_reg_info(enum RegisterSources src, int idx) {
-    const RegisterSource* regSrc = sRegisterLists[src];
+    const RegisterSource* regSrc = get_reg_src(src);
+    if (regSrc == NULL) {
+        return NULL;
+    }
     return get_reg_info_from_src(regSrc, idx);
 }
 
-Doubleword get_thread_reg_val(enum RegisterSources src, int idx, OSThread* thread) {
-    const RegisterInfo* info = get_reg_info(src, idx);
-
-    if (info == NULL) {
-        return 0;
+//! TODO: Boolean return for these:
+Word get_interface_reg_val(const RegisterInfo* regInfo) {
+    Word data = 0x00000000;
+    if (try_read_word_aligned(&data, regInfo->addr)) {
+        return data;
     }
+    return data;
+}
 
-    __OSThreadContext* tc = &thread->context;
-    Address addr = ((Address)tc + (info->offset * sizeof(u32)));
-
-    if (info->is64bit) {
-        Doubleword data = 0;
+Doubleword get_32_or_64_bit_val(Address addr, _Bool is64Bit) {
+    if (is64Bit) {
+        Doubleword data = 0x0000000000000000;
         if (try_read_doubleword_aligned(&data, addr)) {
             return data;
         }
     } else {
-        Word data = 0;
+        Word data = 0x00000000;
         if (try_read_word_aligned(&data, addr)) {
             return data;
         }
@@ -121,31 +132,35 @@ Doubleword get_thread_reg_val(enum RegisterSources src, int idx, OSThread* threa
     return 0;
 }
 
-Doubleword get_direct_reg_val(enum RegisterSources src, int idx) {
-    const RegisterSource* regSrc = sRegisterLists[src];
-    return (regSrc->valFunc != NULL) ? regSrc->valFunc(idx) : 0;
+Doubleword get_thread_reg_val(const RegisterInfo* regInfo, OSThread* thread) {
+    __OSThreadContext* tc = &thread->context;
+    Address addr = ((Address)tc + (regInfo->offset * sizeof(u32)));
+
+    return get_32_or_64_bit_val(addr, regInfo->is64bit);
+}
+
+Doubleword get_direct_reg_val(const RegisterSource* regSrc, int idx) {
+    return ((regSrc->valFunc != NULL) ? regSrc->valFunc(idx) : 0);
 }
 
 Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread) {
-    const RegisterInfo* regInfo = get_reg_info(src, idx);
-
+    const RegisterSource* regSrc = get_reg_src(src);
+    if (regSrc == NULL) {
+        return 0;
+    }
+    const RegisterInfo* regInfo = get_reg_info_from_src(regSrc, idx);
     if (regInfo == NULL) {
         return 0;
     }
 
     if (src >= REGS_INTERFACES_START) {
-        Word data = 0x00000000;
-        if (try_read_word_aligned(&data, regInfo->addr)) {
-            return data;
-        }
-    } else if (checkThread && (regInfo->offset != REGINFO_NULL_OFFSET)) {
+        return get_interface_reg_val(regInfo);
+    } else if (checkThread && (regInfo->offset != REGINFO_NULL_OFFSET) && (gInspectThread != NULL)) {
         // If register exists in __OSThreadContext, use the data from the inspected thread.
-        return get_thread_reg_val(src, idx, gInspectThread);
+        return get_thread_reg_val(regInfo, gInspectThread);
     } else {
-        return get_direct_reg_val(src, idx);
+        return get_direct_reg_val(regSrc, idx);
     }
-
-    return 0;
 }
 
 const char* get_reg_desc(enum RegisterSources src, int idx) {
