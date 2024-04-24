@@ -37,33 +37,45 @@ extern void __n64Assertf(char* condition, char* fileName, u32 lineNum, char* mes
 
 
 /**
+ * Helper macros.
+ */
+#define __assert_impl(__condition__, __message__) {                                 \
+    SET_ASSERT_ADDRESS();                                                           \
+    __n64Assert(__condition__, __FILE__, __LINE__, (__message__));                  \
+    UNREACHABLE();                                                                  \
+}
+
+#define __assertf_impl(__condition__, __message__, ...) {                           \
+    SET_ASSERT_ADDRESS();                                                           \
+    __n64Assertf(__condition__, __FILE__, __LINE__, (__message__), ##__VA_ARGS__);  \
+    UNREACHABLE();                                                                  \
+}
+
+
+/**
  * Will always cause a crash with your message of choice.
  */
-#define ERROR(__message__) do {                                                         \
-    SET_ASSERT_ADDRESS();                                                               \
-    __n64Assert(NULL, __FILE__, __LINE__, (__message__));                               \
+#define ERROR(__message__) do {                                         \
+    __assert_impl(NULL, (__message__));                                 \
 } while (0)
 
-#define ERRORF(__message__, ...) do {                                                   \
-    SET_ASSERT_ADDRESS();                                                               \
-    __n64Assertf(NULL, __FILE__, __LINE__, (__message__), ##__VA_ARGS__);               \
+#define ERRORF(__message__, ...) do {                                   \
+    __assertf_impl(NULL, (__message__), ##__VA_ARGS__);                 \
 } while (0)
 
 
 /**
  * Will always cause a crash if cond is not true (handle with care).
  */
-#define ASSERT(__condition__, __message__) do {                                         \
-    if (!(__condition__)) {                                                             \
-        SET_ASSERT_ADDRESS();                                                           \
-        __n64Assert(#__condition__, __FILE__, __LINE__, (__message__));                 \
-    }                                                                                   \
+#define ASSERT(__condition__, __message__) do {                         \
+    if (!(__condition__)) {                                             \
+        __assert_impl(#__condition__, (__message__));                   \
+    }                                                                   \
 } while (0)
-#define ASSERTF(__condition__, __message__, ...) do {                                   \
-    if (!(__condition__)) {                                                             \
-        SET_ASSERT_ADDRESS();                                                           \
-        __n64Assertf(#__condition__, __FILE__, __LINE__, (__message__), ##__VA_ARGS__); \
-    }                                                                                   \
+#define ASSERTF(__condition__, __message__, ...) do {                   \
+    if (!(__condition__)) {                                             \
+        __assertf_impl(#__condition__, (__message__), ##__VA_ARGS__);   \
+    }                                                                   \
 } while (0)
 
 /**
