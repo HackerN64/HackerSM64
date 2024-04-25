@@ -94,7 +94,6 @@ DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
 TARGET := sm64
 
-
 # GRUCODE - selects which RSP graphics microcode to use.
 #   f3dex   - Upgraded version of the Fast3D microcode.
 #   f3dzex  - newer, experimental microcode used in Majora's Mask
