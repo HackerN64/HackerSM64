@@ -793,27 +793,25 @@ void reginspect_draw_contents(RegisterId regId) {
     }
 
     CSTextCoord_u32 line = 1;
-    RGBA32 color = COLOR_RGBA32_WHITE;
     gCSWordWrap = TRUE;
+    const char* regDesc = str_null_fallback(get_reg_desc(src, idx), "");
     if (isInterface) {
         cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"register on %s (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
             regSrc->desc, regSrc->name
         );
         line += gCSNumLinesPrinted;
-        color = COLOR_RGBA32_VSC_DEFINE;
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"%s %s REG", color, regSrc->name, regInfo->name);
+        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"%s %s REG\n(%s)", COLOR_RGBA32_VSC_DEFINE, regSrc->name, regInfo->name, regDesc);
+        line += gCSNumLinesPrinted;
     } else {
         cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
             gInspectThread->id, get_thread_name(gInspectThread)
         );
         line += gCSNumLinesPrinted;
-        color = COLOR_RGBA32_CRASH_VARIABLE;
-        cs_print(TEXT_X(2), TEXT_Y(line++), STR_COLOR_PREFIX"\"$%s\" in %s", color, regInfo->name, regSrc->name);
-    }
-    const char* regDesc = get_reg_desc(src, idx);
-    if (regDesc != NULL) {
-        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"(%s)", color, regDesc);
+        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\" (%s) in %s (%s)", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name, regDesc, regSrc->name, regSrc->desc);
         line += gCSNumLinesPrinted;
+    }
+    
+    if (regDesc != NULL) {
     }
     gCSWordWrap = FALSE;
 

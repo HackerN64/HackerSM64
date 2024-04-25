@@ -7,7 +7,6 @@
 
 
 static const char* sRegDesc_SPECIAL[] = {
-    // [REG_SPC_PC   ] = "program counter",
     [REG_SPC_LO   ] = "special register LO",
     [REG_SPC_HI   ] = "special register HI",
     // [REG_SPC_LLBIT] = "load linked bit",
@@ -31,7 +30,7 @@ Doubleword get_special_reg_val(int idx) {
     return val;
 }
 static const RegisterSource sRegisters_SPECIAL = DEF_REG_LIST_PROCESSOR(
-    "special",
+    "SPC",
     "special registers",
     get_special_reg_val,
     sRegDesc_SPECIAL,
