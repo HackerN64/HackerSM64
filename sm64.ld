@@ -483,13 +483,6 @@ SECTIONS
       KEEP(BUILD_DIR/sound/sound_data.o(.data*));
    }
    END_SEG(assets)
-#ifdef HVQM
-   BEGIN_SEG(capcom, __romPos) SUBALIGN(2)
-   {
-      KEEP(BUILD_DIR/data/capcom.o(.data*));
-   }
-	END_SEG(capcom)
-#endif
 
 #ifdef DEBUG_MAP_STACKTRACE
    BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
