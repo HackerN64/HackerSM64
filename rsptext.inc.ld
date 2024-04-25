@@ -9,24 +9,24 @@
  * These are setup to be loaded by G_LOAD_UCODE
  */
 
-/* Fast3DLX Rej Data */
+/* Fast3DLX Rej Text */
 #ifdef F3DLX_REJ_GBI
       lib/PR/f3dex/gspF3DLX.Rej.fifo.o(.text);
 #endif
 
-/* Line3DEX Data */
+/* Line3DEX Text */
 #ifdef L3DEX_GBI
       lib/PR/f3dex/gspL3DEX.fifo.o(.text);
 #endif
 
 /* Fast3DEX2 series */
 
-/* Fast3DEX2 Rej Data */
+/* Fast3DEX2 Rej Text */
 #ifdef F3DEX2_REJ_GBI
       lib/PR/f3dex2/fifo/gspF3DEX2.Rej.fifo.o(.text);
 #endif
 
-/* Line3DZEX Data */
+/* Line3DZEX Text */
 #ifdef L3DZEX_GBI
       lib/PR/f3dzex/gspL3DZEX2.fifo.o(.text);
 #endif
