@@ -169,7 +169,6 @@ SECTIONS
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
       */ULTRALIB.a:*.o(.data*);
-      */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
 #include "rspdata.inc.ld"
       lib/PR/audio/aspMain.o(.data*);
@@ -198,7 +197,6 @@ SECTIONS
       */ULTRALIB.a:*.o(COMMON);
       */ULTRALIB.a:*.o(.scommon);
       */ULTRALIB.a:*.o(.*bss*);
-      */librtc.a:*.o(.bss*);
       */libz.a:*.o(.bss*);
       . = ALIGN(0x8);
    }
