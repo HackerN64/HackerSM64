@@ -130,31 +130,6 @@ static const char* sStr_RI_MODE_OP[] = {
     [0b10] = "pre-instruction",
     [0b11] = "unknown",
 };
-enum PACKED RegBitsInfoStringLists {
-    REG_BITS_INFO_STR_TRUTH,
-    REG_BITS_INFO_STR_YES_NO,
-    REG_BITS_INFO_STR_ENABLED,
-    REG_BITS_INFO_STR_ON_OFF,
-    REG_BITS_INFO_STR_SUCCESS,
-    REG_BITS_INFO_STR_ENDIAN,
-    REG_BITS_INFO_STR_BIT_MODE,
-    REG_BITS_INFO_STR_32_64,
-    REG_BITS_INFO_STR_64_128,
-    REG_BITS_INFO_STR_AUTO,
-
-    REG_BITS_INFO_STR_C0_SR_EXEC_MODE,
-    REG_BITS_INFO_STR_C0_SR_BEV,
-    REG_BITS_INFO_STR_C0_CONFIG_EM,
-    REG_BITS_INFO_STR_C0_CONFIG_EB,
-    REG_BITS_INFO_STR_FCR31_ROUNDING_MODE,
-
-    REG_BITS_INFO_STR_RDRAM_VERSION,
-    REG_BITS_INFO_STR_RDRAM_TYPE,
-    REG_BITS_INFO_STR_XBUS_DMEM,
-    REG_BITS_INFO_STR_VI_AA_MODE,
-    REG_BITS_INFO_STR_VI_TYPE,
-    REG_BITS_INFO_STR_RI_MODE_OP,
-};
 const char** sRegBitsInfoStrings[] = {
     [REG_BITS_INFO_STR_TRUTH   ] = sStrTruth,
     [REG_BITS_INFO_STR_YES_NO  ] = sStrYesNo,
@@ -212,11 +187,6 @@ DEF_BITS_PAIR_LIST(sPairList_config_k0,
     { .id = CONFIG_NONCOHRNT,    .name = "non-coh.",   },
     { .id = CONFIG_COHRNT_EXLWR, .name = "coh. exlwr", },
 );
-enum PACKED RegBitsInfoIdStringPairs {
-    REG_BITS_INFO_LIST_C0_CONFIG_SYS_CLOCK_RATIO,
-    REG_BITS_INFO_LIST_C0_CONFIG_TRANS_DATA_PATTERN,
-    REG_BITS_INFO_LIST_C0_CONFIG_K0,
-};
 const IdNamePairList* sRegBitsInfoIdStringPairs[] = {
     [REG_BITS_INFO_LIST_C0_CONFIG_SYS_CLOCK_RATIO   ] = &sPairList_sys_clock_ratio,
     [REG_BITS_INFO_LIST_C0_CONFIG_TRANS_DATA_PATTERN] = &sPairList_trans_data_pattern,
@@ -247,70 +217,12 @@ void regbits_str_RDRAM_MODE_CCValue(char* buf, Word bits) {
         ('0' + BITFLAG_BOOL(bits, RDRAM_MODE_C0_MASK))
     );
 }
-enum PACKED RegBitsInfoFuncs {
-    REG_BITS_INFO_FUNC_READWRITE,
-    REG_BITS_INFO_FUNC_C0_CAUSE,
-    REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE,
-};
 typedef void (*RegBitsInfoFunc)(char* buf, Word bits);
 RegBitsInfoFunc sRegBitsInfoFuncs[] = {
     [REG_BITS_INFO_FUNC_READWRITE         ] = regbits_str_readwrite,
     [REG_BITS_INFO_FUNC_C0_CAUSE          ] = regbits_str_C0_cause,
     [REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE] = regbits_str_RDRAM_MODE_CCValue,
 };
-
-
-
-enum PACKED RegBitsType {
-    REG_BITS_TYPE_END = -1,
-    REG_BITS_TYPE_NONE,
-    REG_BITS_TYPE_BIN,
-    REG_BITS_TYPE_HEX,
-    REG_BITS_TYPE_DEC,
-    REG_BITS_TYPE_STR,  // String array.
-    REG_BITS_TYPE_BSTR, // Invert boolean string array.
-    REG_BITS_TYPE_ISTR,
-    REG_BITS_TYPE_FUNC,
-    REG_BITS_TYPE_SETX, // Set info start X.
-    REG_BITS_TYPE_SETW, // Set info width (for wrapping).
-    REG_BITS_TYPE_WRAP,
-};
-typedef struct RegBitsInfo {
-    /*0x00*/ const char* name;
-    /*0x04*/ const u8 maskSize;
-    /*0x05*/ const u8 shiftSize;
-    /*0x06*/ const enum RegBitsType type;
-    /*0x07*/ union {
-                const u8 arg;                               // Generic arg for macro.
-                const u8 spacing;                           // REG_BITS_TYPE_BIN
-                const u8 numDigits;                         // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
-                const enum RegBitsInfoStringLists list;     // REG_BITS_TYPE_STR
-                const enum RegBitsInfoIdStringPairs iList;  // RET_BITS_TYPE_ISTR
-                const enum RegBitsInfoFuncs func;           // REG_BITS_TYPE_FUNC
-                const u8 xPos;                              // REG_BITS_TYPE_SETX
-                const u8 width;                             // REG_BITS_TYPE_SETW
-            };
-} RegBitsInfo; /*0x08*/
-#define REG_BITS_CMD(_name, _mask, _type, _arg) {  \
-    .name      = _name,                             \
-    .maskSize  = POPCOUNT(_mask),                   \
-    .shiftSize = CTZ(_mask),                        \
-    .type      = _type,                             \
-    .arg       = _arg,                              \
-}
-#define REG_BITS_CMD_BIN(_name,  _mask, _spacing)   REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_BIN,  _spacing)
-#define REG_BITS_CMD_HEX(_name,  _mask, _numDigits) REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_HEX,  _numDigits)
-#define REG_BITS_CMD_DEC(_name,  _mask, _numDigits) REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_DEC,  _numDigits)
-#define REG_BITS_CMD_STR(_name,  _mask, _list)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_STR,  _list)
-#define REG_BITS_CMD_BSTR(_name, _mask, _list)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_BSTR, _list)
-#define REG_BITS_CMD_ISTR(_name, _mask, _list)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_ISTR, _list)
-#define REG_BITS_CMD_FUNC(_name, _mask, _func)      REG_BITS_CMD(_name, _mask, REG_BITS_TYPE_FUNC, _func)
-#define REG_BITS_CMD_SETX(_x)                       REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_SETX, _x)
-#define REG_BITS_CMD_SETW(_width)                   REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_SETW, _width)
-#define REG_BITS_CMD_WRAP()                         REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_WRAP, 0)
-#define REG_BITS_CMD_NONE(_name)                    REG_BITS_CMD(_name, 0,     REG_BITS_TYPE_NONE, 0)
-#define REG_BITS_CMD_GAP()                          REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_NONE, 0)
-#define REG_BITS_CMD_END()                          REG_BITS_CMD(NULL,  0,     REG_BITS_TYPE_END,  0)
 
 
 CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const RegBitsInfo* list) {
@@ -402,290 +314,7 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
     return currLine;
 }
 
-const RegBitsInfo regBits_C0_Index[] = {
-    REG_BITS_CMD_SETX(STRLEN("tlb probe: ")),
-    REG_BITS_CMD_BSTR("tlb probe", C0_INX_TLB_FAIL,  REG_BITS_INFO_STR_SUCCESS),
-    REG_BITS_CMD_DEC( "tlb index", C0_INX_TLB_INDEX, 2),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_C0_SR[] = {
-    REG_BITS_CMD_SETX(STRLEN("xxxxxxxxxx: ")),
-    REG_BITS_CMD_SETW(STRLEN("xxxxxxxx")),
-    REG_BITS_CMD_STR( "cop1",       SR_CU1,      REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR( "low power",  SR_RP,       REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR( "extra fpr",  SR_FR,       REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_BSTR("endian",     SR_RE,       REG_BITS_INFO_STR_ENDIAN),
-    REG_BITS_CMD_HEX( "intr mask",  SR_IMASK,    2),
-    REG_BITS_CMD_STR( "kernel",     SR_KX,       REG_BITS_INFO_STR_BIT_MODE),
-    REG_BITS_CMD_STR( "supervisor", SR_SX,       REG_BITS_INFO_STR_BIT_MODE),
-    REG_BITS_CMD_STR( "user",       SR_UX,       REG_BITS_INFO_STR_BIT_MODE),
-    REG_BITS_CMD_STR( "exec mode",  SR_KSU_MASK, REG_BITS_INFO_STR_C0_SR_EXEC_MODE),
-    REG_BITS_CMD_STR( "error",      SR_ERL,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR( "exception",  SR_EXL,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR( "glbl intr",  SR_IE,       REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_WRAP(),
-    REG_BITS_CMD_STR( "insn trace", SR_ITS,      REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR( "bs exc vec", SR_BEV,      REG_BITS_INFO_STR_C0_SR_BEV),
-    REG_BITS_CMD_STR( "tlb down",   SR_TS,       REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR( "soft reset", SR_SR,       REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR( "cp0 cond",   SR_CH,       REG_BITS_INFO_STR_TRUTH),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_C0_CAUSE[] = {
-    REG_BITS_CMD_SETX(STRLEN("is branch delay slot: ")),
-    REG_BITS_CMD_STR("is branch delay slot", CAUSE_BD, REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_GAP(),
-    REG_BITS_CMD_NONE("interrupts pending"),
-    REG_BITS_CMD_DEC( "  Timer",       CAUSE_IP8, 1),
-    REG_BITS_CMD_FUNC("  Indy RDB",    (CAUSE_IP7 | CAUSE_IP6), REG_BITS_INFO_FUNC_READWRITE),
-    REG_BITS_CMD_DEC( "  Reset (NMI)", CAUSE_IP5, 1),
-    REG_BITS_CMD_DEC( "  Cartridge",   CAUSE_IP4, 1),
-    REG_BITS_CMD_DEC( "  MIPS",        CAUSE_IP3, 1),
-    REG_BITS_CMD_DEC( "  Software",    (CAUSE_SW2 | CAUSE_SW1), 1),
-    REG_BITS_CMD_GAP(),
-    REG_BITS_CMD_DEC("exc code", CAUSE_EXCMASK, 2),
-    REG_BITS_CMD_SETX(2),
-    REG_BITS_CMD_FUNC(NULL, BITMASK(32), REG_BITS_INFO_FUNC_C0_CAUSE),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_C0_Config[] = {
-    REG_BITS_CMD_SETX(STRLEN("dirty shr coh:")),
-    REG_BITS_CMD_SETW(STRLEN("xxxxxxxx")),
-    REG_BITS_CMD_STR( "master check",  CONFIG_CM, REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_ISTR("clock ratio",   CONFIG_EC, REG_BITS_INFO_LIST_C0_CONFIG_SYS_CLOCK_RATIO),
-    REG_BITS_CMD_ISTR("data pattern",  CONFIG_EP, REG_BITS_INFO_LIST_C0_CONFIG_TRANS_DATA_PATTERN),
-    REG_BITS_CMD_HEX( "2cache blksz",  CONFIG_SB, 2),
-
-    REG_BITS_CMD_STR( "split cache",   CONFIG_SS, REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_BSTR("scache port",   CONFIG_SW, REG_BITS_INFO_STR_64_128),
-    REG_BITS_CMD_BSTR("port width",    CONFIG_EW, REG_BITS_INFO_STR_32_64),
-    REG_BITS_CMD_BSTR("2cache",        CONFIG_SC, REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_BSTR("dirty shr coh", CONFIG_SM, REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR( "endian",        CONFIG_BE, REG_BITS_INFO_STR_ENDIAN),
-    REG_BITS_CMD_STR( "ecc mode",      CONFIG_EM, REG_BITS_INFO_STR_C0_CONFIG_EM),
-    REG_BITS_CMD_STR( "blk order",     CONFIG_EB, REG_BITS_INFO_STR_C0_CONFIG_EB),
-    REG_BITS_CMD_ISTR("k0seg coh",     CONFIG_K0, REG_BITS_INFO_LIST_C0_CONFIG_K0),
-    REG_BITS_CMD_WRAP(),
-    REG_BITS_CMD_SETX(STRLEN("icache blksz:")),
-    REG_BITS_CMD_HEX( "1icache sz",    CONFIG_IC, 1),
-    REG_BITS_CMD_HEX( "1dcache sz",    CONFIG_DC, 1),
-    REG_BITS_CMD_HEX( "icache blksz",  CONFIG_IB, 1),
-    REG_BITS_CMD_HEX( "dcache blksz",  CONFIG_DB, 1),
-    REG_BITS_CMD_STR( "upd on SC",     CONFIG_CU, REG_BITS_INFO_STR_YES_NO),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_FPR_CSR[] = {
-    REG_BITS_CMD_SETX(STRLEN("flush denorms to zero: ")),
-    REG_BITS_CMD_STR("flush denorms to zero", FPCSR_FS,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("condition bit",         FPCSR_C,       REG_BITS_INFO_STR_TRUTH),
-    REG_BITS_CMD_STR("rounding mode",         FPCSR_RM_MASK, REG_BITS_INFO_STR_FCR31_ROUNDING_MODE),
-    REG_BITS_CMD_NONE("\nexception bits:\n  E:unimpl   | V:invalid   | Z:div0\n  O:overflow | U:underflow | I:inexact\n\n                 E V Z O U I"),
-    REG_BITS_CMD_SETX(17),
-    REG_BITS_CMD_BIN("          cause",  (FPCSR_CE | FPCSR_CV | FPCSR_CZ | FPCSR_CO | FPCSR_CU | FPCSR_CI), 2),
-    REG_BITS_CMD_SETX(19),
-    REG_BITS_CMD_BIN("          enable",            (FPCSR_EV | FPCSR_EZ | FPCSR_EO | FPCSR_EU | FPCSR_EI), 2),
-    REG_BITS_CMD_BIN("          flags",             (FPCSR_FV | FPCSR_FZ | FPCSR_FO | FPCSR_FU | FPCSR_FI), 2),
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_SPC_RCP[] = {
-    REG_BITS_CMD_SETX(STRLEN("interrupt mask: ")),
-    REG_BITS_CMD_HEX("interrupt mask", (RCP_IMASK >> RCP_IMASKSHIFT), 2),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_RDRAM_CONFIG[] = {
-    REG_BITS_CMD_STR("9 bits per byte", RDRAM_CONFIG_BN,          REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("Low latency",     RDRAM_CONFIG_EN,          REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_DEC("column bits",     RDRAM_CONFIG_COLUMN_BITS, 2),
-    REG_BITS_CMD_DEC("bank bits",       RDRAM_CONFIG_BANK_BITS,   2),
-    REG_BITS_CMD_DEC("row bits",        RDRAM_CONFIG_ROW_BITS,    2),
-    REG_BITS_CMD_STR("version",         RDRAM_CONFIG_VERSION,     REG_BITS_INFO_STR_RDRAM_VERSION),
-    REG_BITS_CMD_STR("device type",     RDRAM_CONFIG_TYPE,        REG_BITS_INFO_STR_RDRAM_TYPE),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_RDRAM_MODE[] = {
-    REG_BITS_CMD_SETX(STRLEN("Select PowerDown latency: ")),
-    REG_BITS_CMD_STR("CCEnable",                 RDRAM_MODE_CE_MASK, REG_BITS_INFO_STR_AUTO),
-    REG_BITS_CMD_DEC("CCMult",                   RDRAM_MODE_X2_MASK, 1),
-    REG_BITS_CMD_DEC("Select PowerDown Latency", RDRAM_MODE_PL_MASK, 1),
-    REG_BITS_CMD_STR("RDRAM device",             RDRAM_MODE_DE_MASK, REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR("PowerDown",                RDRAM_MODE_LE_MASK, REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_DEC("AckDis",                   RDRAM_MODE_AD_MASK, 1),
-    REG_BITS_CMD_FUNC("CCValue",                 BITMASK(32),        REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_SP_STATUS[] = {
-    REG_BITS_CMD_SETX(STRLEN("intr. on break: ")),
-    REG_BITS_CMD_SETW(STRLEN("yes")),
-    REG_BITS_CMD_STR("halt",           SP_STATUS_HALT,       REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("broke",          SP_STATUS_BROKE,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma busy",       SP_STATUS_DMA_BUSY,   REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma full",       SP_STATUS_DMA_FULL,   REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("io full",        SP_STATUS_IO_FULL,    REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("single step",    SP_STATUS_SSTEP,      REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("intr. on break", SP_STATUS_INTR_BREAK, REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_WRAP(),
-    REG_BITS_CMD_SETX(STRLEN("sigN (xxx signal): ")),
-    REG_BITS_CMD_DEC("sig0 (yield)",      SP_STATUS_YIELD,     1),
-    REG_BITS_CMD_DEC("sig1 (yielded)",    SP_STATUS_YIELDED,   1),
-    REG_BITS_CMD_DEC("sig2 (task done)",  SP_STATUS_TASKDONE,  1),
-    REG_BITS_CMD_DEC("sig3 (rsp signal)", SP_STATUS_RSPSIGNAL, 1),
-    REG_BITS_CMD_DEC("sig4 (cpu signal)", SP_STATUS_CPUSIGNAL, 1),
-    REG_BITS_CMD_DEC("sig5",              SP_STATUS_SIG5,      1),
-    REG_BITS_CMD_DEC("sig6",              SP_STATUS_SIG6,      1),
-    REG_BITS_CMD_DEC("sig7",              SP_STATUS_SIG7,      1),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_DPC_STATUS[] = {
-    REG_BITS_CMD_SETX(STRLEN("transfer src: ")),
-    REG_BITS_CMD_STR("start valid",  DPC_STATUS_START_VALID,   REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("end valid",    DPC_STATUS_END_VALID,     REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma busy",     DPC_STATUS_DMA_BUSY,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("cbuf ready",   DPC_STATUS_CBUF_READY,    REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("cmd busy",     DPC_STATUS_CMD_BUSY,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("pipe busy",    DPC_STATUS_PIPE_BUSY,     REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("tmem busy",    DPC_STATUS_TMEM_BUSY,     REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("start gclk",   DPC_STATUS_START_GCLK,    REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("flush",        DPC_STATUS_FLUSH,         REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("freeze",       DPC_STATUS_FREEZE,        REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("transfer src", DPC_STATUS_XBUS_DMEM_DMA, REG_BITS_INFO_STR_XBUS_DMEM),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_VI_CONTROL[] = {
-    REG_BITS_CMD_SETX(STRLEN("dither filter: ")),
-    REG_BITS_CMD_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_BIN("pixel advance", VI_CTRL_PIXEL_ADVANCE_MASK, 1),
-    REG_BITS_CMD_STR("kill we",       VI_CTRL_KILL_WE,            REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("aa mode",       VI_CTRL_ANTIALIAS_MASK,     REG_BITS_INFO_STR_VI_AA_MODE),
-    REG_BITS_CMD_STR("test mode",     VI_CTRL_TEST_MODE,          REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("serrate",       VI_CTRL_SERRATE_ON,         REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("vbus clock",    VI_CTRL_VBUS_CLOCK_ENABLE,  REG_BITS_INFO_STR_ENABLED), //! TODO: Warning to never set this bit.
-    REG_BITS_CMD_STR("divot",         VI_CTRL_DIVOT_ON,           REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("gamma",         VI_CTRL_GAMMA_ON,           REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("gamma dither",  VI_CTRL_GAMMA_DITHER_ON,    REG_BITS_INFO_STR_ON_OFF),
-    REG_BITS_CMD_STR("type",          VI_CTRL_TYPE_MASK,          REG_BITS_INFO_STR_VI_TYPE),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_AI_CONTROL[] = {
-    REG_BITS_CMD_SETX(STRLEN("dma: ")),
-    REG_BITS_CMD_STR("dma", AI_CONTROL_DMA_ON, REG_BITS_INFO_STR_ON_OFF),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_AI_STATUS[] = {
-    REG_BITS_CMD_SETX(STRLEN("word clock: ")),
-    REG_BITS_CMD_STR("fifo full",  AI_STATUS_FIFO_FULL,         REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma busy",   AI_STATUS_DMA_BUSY,          REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("enabled",    BIT(CTZ(AI_STATUS_ENABLED)), REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_DEC("word clock", AI_STATUS_WC,    1),
-    REG_BITS_CMD_DEC("bit clock",  AI_STATUS_BC,    1),
-    REG_BITS_CMD_DEC("count",      AI_STATUS_COUNT, 5),
-    //! TODO: AI_STATUS_FULL2?
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_PI_STATUS[] = {
-    REG_BITS_CMD_SETX(STRLEN("intr. (dma completed): ")),
-    REG_BITS_CMD_STR("intr. (dma completed)", PI_STATUS_INTR,     REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma error",             PI_STATUS_ERROR,    REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("io busy",               PI_STATUS_IO_BUSY,  REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma busy",              PI_STATUS_DMA_BUSY, REG_BITS_INFO_STR_YES_NO),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_RI_MODE[] = {
-    REG_BITS_CMD_SETX(STRLEN("op mode: ")),
-    REG_BITS_CMD_STR("stop r",  RI_MODE_STOP_R,  REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR("stop t",  RI_MODE_STOP_T,  REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR("op mode", RI_MODE_OP_MODE, REG_BITS_INFO_STR_RI_MODE_OP),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_RI_CONFIG[] = {
-    REG_BITS_CMD_SETX(STRLEN("auto cc: ")),
-    REG_BITS_CMD_STR("auto cc", RI_CONFIG_AUTO, REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_DEC("cc",      RI_CONFIG_CC,   2),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_RI_REFRESH[] = {
-    REG_BITS_CMD_SETX(STRLEN("dirty refresh delay: ")),
-    REG_BITS_CMD_BIN("multibank",           RI_REFRESH_MULTIBANK, 2),
-    REG_BITS_CMD_STR("optimize",            RI_REFRESH_OPT,       REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_STR("automatic refresh",   RI_REFRESH_EN,        REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_DEC("bank",                RI_REFRESH_BANK,      1),
-    REG_BITS_CMD_DEC("dirty refresh delay", RI_REFRESH_DIRTY,     3),
-    REG_BITS_CMD_DEC("clean refresh delay", RI_REFRESH_CLEAN,     3),
-
-    REG_BITS_CMD_END(),
-};
-
-const RegBitsInfo regBits_SI_STATUS[] = {
-    REG_BITS_CMD_SETX(STRLEN("pif channel state: ")),
-    REG_BITS_CMD_STR("interrupt",         SI_STATUS_INTERRUPT,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_BIN("dma state",         SI_STATUS_DMA_STATE_MASK, 2),
-    REG_BITS_CMD_BIN("pif channel state", SI_STATUS_PCH_STATE_MASK, 2),
-    REG_BITS_CMD_STR("dma error",         SI_STATUS_DMA_ERROR,      REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("read pending",      SI_STATUS_READ_PENDING,   REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("io busy",           SI_STATUS_RD_BUSY,        REG_BITS_INFO_STR_YES_NO),
-    REG_BITS_CMD_STR("dma busy",          SI_STATUS_DMA_BUSY,       REG_BITS_INFO_STR_YES_NO),
-
-    REG_BITS_CMD_END(),
-};
-
-typedef struct RegInspectExtraInfo {
-    /*0x00*/ const enum RegisterSources src;
-    /*0x01*/ const s8 idx;
-    /*0x03*/ const u8 pad[2];
-    /*0x04*/ const RegBitsInfo* list;
-} RegInspectExtraInfo; /*0x08*/
-const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
-    { .src = REGS_CP0,   .idx = REG_CP0_INX,            .list = regBits_C0_Index,  },
-    { .src = REGS_CP0,   .idx = REG_CP0_SR,             .list = regBits_C0_SR,     },
-    { .src = REGS_CP0,   .idx = REG_CP0_CAUSE,          .list = regBits_C0_CAUSE,  },
-    { .src = REGS_CP0,   .idx = REG_CP0_CONFIG,         .list = regBits_C0_Config, },
-
-    { .src = REGS_FCR,   .idx = REG_FCR_CONTROL_STATUS, .list = regBits_FPR_CSR,  },
-    { .src = REGS_SPC,   .idx = REG_SPC_RCP,            .list = regBits_SPC_RCP,  },
-
-    { .src = REGS_RDRAM, .idx = REGID_RDRAM_CONFIG,     .list = regBits_RDRAM_CONFIG, },
-    { .src = REGS_RDRAM, .idx = REGID_RDRAM_MODE,       .list = regBits_RDRAM_MODE,   },
-    { .src = REGS_SP,    .idx = REGID_SP_STATUS,        .list = regBits_SP_STATUS,    },
-    { .src = REGS_DPC,   .idx = REGID_DPC_STATUS,       .list = regBits_DPC_STATUS,   },
-    { .src = REGS_VI,    .idx = REGID_VI_CONTROL,       .list = regBits_VI_CONTROL,   },
-    { .src = REGS_AI,    .idx = REGID_AI_CONTROL,       .list = regBits_AI_CONTROL,   },
-    { .src = REGS_AI,    .idx = REGID_AI_STATUS,        .list = regBits_AI_STATUS,    },
-    { .src = REGS_PI,    .idx = REGID_PI_STATUS,        .list = regBits_PI_STATUS,    },
-    { .src = REGS_RI,    .idx = REGID_RI_MODE,          .list = regBits_RI_MODE,      },
-    { .src = REGS_RI,    .idx = REGID_RI_CONFIG,        .list = regBits_RI_CONFIG,    },
-    { .src = REGS_RI,    .idx = REGID_RI_REFRESH,       .list = regBits_RI_REFRESH,   },
-    { .src = REGS_SI,    .idx = REGID_SI_STATUS,        .list = regBits_SI_STATUS,    },
-};
+#include "reginspect_bits.inc.c"
 
 void cs_reginspect_pointer(CSTextCoord_u32 line, Word val32, _Bool sureAddr) {
     const MapSymbol* symbol = get_map_symbol(val32, SYMBOL_SEARCH_BACKWARD); // Returns NULL if debug map is not included.
@@ -794,34 +423,34 @@ void reginspect_draw_contents(RegisterId regId) {
 
     CSTextCoord_u32 line = 1;
     gCSWordWrap = TRUE;
+    cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"register:", COLOR_RGBA32_CRASH_PAGE_NAME);
     const char* regDesc = str_null_fallback(get_reg_desc(src, idx), "");
     if (isInterface) {
-        cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"register on %s (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
-            regSrc->desc, regSrc->name
+        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"%s_%s_REG\n (%s)\n in %s - %s", COLOR_RGBA32_VSC_DEFINE, //! TODO: Change this (colon makes it look like a subsection)
+            regSrc->name, regInfo->name, regDesc, regSrc->name, regSrc->desc
         );
-        line += gCSNumLinesPrinted;
-        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"%s %s REG\n(%s)", COLOR_RGBA32_VSC_DEFINE, regSrc->name, regInfo->name, regDesc);
         line += gCSNumLinesPrinted;
     } else {
-        cs_print(TEXT_X(1), TEXT_Y(line), STR_COLOR_PREFIX"register on thread %d (%s):", COLOR_RGBA32_CRASH_PAGE_NAME,
-            gInspectThread->id, get_thread_name(gInspectThread)
+        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\" (%s)\n in %s - %s", COLOR_RGBA32_CRASH_VARIABLE,
+            regInfo->name, regDesc, regSrc->name, regSrc->desc
         );
         line += gCSNumLinesPrinted;
-        cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX"\"$%s\" (%s) in %s (%s)", COLOR_RGBA32_CRASH_VARIABLE, regInfo->name, regDesc, regSrc->name, regSrc->desc);
-        line += gCSNumLinesPrinted;
-    }
-    
-    if (regDesc != NULL) {
+        if (checkThread && (regInfo->offset != REGINFO_NULL_OFFSET)) {
+            cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX" on thread %d (%s)", COLOR_RGBA32_CRASH_VARIABLE,
+                gInspectThread->id, get_thread_name(gInspectThread)
+            );
+            line += gCSNumLinesPrinted;
+        }
     }
     gCSWordWrap = FALSE;
 
-    // 64 bit value if it exists:
+    // 64 bit value if it exists.
     if (is64Bit) {
-        line = cs_popup_reginspect_draw_reg_value(line, regId, value, is64Bit);
+        line = cs_popup_reginspect_draw_reg_value(line, regId, value, TRUE);
     }
 
+    // 32 bit value. Always print for CP1 registers.
     if (!is64Bit || isCP1) {
-        // 32 bit value:
         line = cs_popup_reginspect_draw_reg_value(line, regId, value, FALSE);
     }
 
