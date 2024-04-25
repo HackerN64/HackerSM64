@@ -155,7 +155,6 @@ SECTIONS
       */ULTRALIB.a:*.o(.text*);
       */libnustd.a:*.o(.text*);
       */libgcc.a:*.o(.text*);
-      */librtc.a:*.o(.text*);
       */libz.a:*.o(.text*);
       lib/rspboot.o(.text*);
 #include "rsptext.inc.ld"
@@ -184,7 +183,6 @@ SECTIONS
 #endif
       */ULTRALIB.a:*.o(.rodata*);
       */libgcc.a:*.o(.rodata*);
-      */librtc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
 
    }

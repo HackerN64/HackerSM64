@@ -236,7 +236,7 @@ BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
-COMPRESS ?= rnc1
+COMPRESS ?= yay0
 $(eval $(call validate-option,COMPRESS,mio0 yay0 gzip rnc1 rnc2 uncomp))
 ifeq ($(COMPRESS),gzip)
   DEFINES += GZIP=1
@@ -365,6 +365,9 @@ LIBZ_C_FILES      := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
 GODDARD_C_FILES   := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/demo_data.c
+
+# Ignore all .inc.c files
+C_FILES           := $(filter-out %.inc.c,$(C_FILES))
 
 # Sound files
 SOUND_BANK_FILES    := $(wildcard sound/sound_banks/*.json)
@@ -878,7 +881,7 @@ $(BUILD_DIR)/asm/debug/map.o: asm/debug/map.s $(BUILD_DIR)/sm64_prelim.elf
 # Link SM64 ELF file
 $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
+	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
 
 # Build ROM
 ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))

@@ -38,7 +38,7 @@ s32 piranha_plant_check_interactions(void) {
     s32 i;
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-        func_80321080(50);
+        stop_secondary_music(50);
         if (o->oInteractStatus & INT_STATUS_WAS_ATTACKED) {
             cur_obj_play_sound_2(SOUND_OBJ2_PIRANHA_PLANT_DYING);
 
@@ -89,7 +89,7 @@ void piranha_plant_act_sleeping(void) {
         o->oPiranhaPlantSleepMusicState = PIRANHA_PLANT_SLEEP_MUSIC_PLAYING;
     } else if (o->oPiranhaPlantSleepMusicState == PIRANHA_PLANT_SLEEP_MUSIC_PLAYING) {
         o->oPiranhaPlantSleepMusicState++;
-        func_80321080(50);
+        stop_secondary_music(50);
     }
     piranha_plant_check_interactions();
 }
@@ -104,7 +104,7 @@ void piranha_plant_act_woken_up(void) {
      */
     o->oDamageOrCoinValue = 3;
     if (o->oTimer == 0) {
-        func_80321080(50);
+        stop_secondary_music(50);
     }
 
     if (!piranha_plant_check_interactions() && o->oTimer > 10) {
