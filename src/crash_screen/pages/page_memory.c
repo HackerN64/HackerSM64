@@ -148,7 +148,7 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
             if (IS_DEBUG_MAP_ENABLED() && (mode == MEMORY_MODE_SYMBOL)) {
                 destSymbol = get_map_symbol(data.word, SYMBOL_SEARCH_BINARY);
                 if (destSymbol != NULL) {
-                    cs_print_symbol_name(x, y, 8, destSymbol, FALSE);
+                    cs_print_symbol_name((x - 1), y, 9, destSymbol, FALSE);
                 }
             }
 

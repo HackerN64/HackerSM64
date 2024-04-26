@@ -400,7 +400,7 @@ size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, con
         if (0 < charLimit && charLimit < phase1FormattedSize) {
             const SettingsType scrollSpeedSetting = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
             if (scrollSpeedSetting > 0) {
-                cs_add_scissor_box(x, y, (x + TEXT_WIDTH(charLimit)), (y + TEXT_HEIGHT(1)));
+                cs_add_scissor_box(x, y, (x + TEXT_WIDTH(charLimit) - 1), (y + TEXT_HEIGHT(1)));
                 // Print an extra character when scrolling to overlap the end of the scissor box.
                 extraChar = 1;
                 charLimit += extraChar;

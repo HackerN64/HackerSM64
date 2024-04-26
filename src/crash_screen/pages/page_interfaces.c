@@ -78,6 +78,8 @@ void draw_interface_regs(CSTextCoord_u32 line) {
     }
 
     sNumShownRegisters = regId;
+
+    osWritebackDCacheAll();
 }
 
 void page_interfaces_draw(void) {
@@ -112,6 +114,8 @@ void page_interfaces_draw(void) {
     draw_interface_regs(line);
 
     cs_draw_divider(DIVIDER_Y(3));
+
+    osWritebackDCacheAll();
 }
 
 void page_interfaces_input(void) {
