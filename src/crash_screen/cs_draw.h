@@ -117,14 +117,16 @@ typedef struct CSScissorBox {
 
 extern struct CSScissorBox gCSScissorBox;
 
+extern u32 gCSFrameCounter;
+
 
 void cs_set_scissor_box(ScreenCoord_s16 x1, ScreenCoord_s16 y1, ScreenCoord_s16 x2, ScreenCoord_s16 y2);
+void cs_add_scissor_box(ScreenCoord_s16 x1, ScreenCoord_s16 y1, ScreenCoord_s16 x2, ScreenCoord_s16 y2);
 void cs_reset_scissor_box(void);
 
 #define CS_SCISSOR_BOX_START(_x, _y, _w, _h) \
     CSScissorBox __tempScissorBox = gCSScissorBox; \
-    cs_set_scissor_box((_x), (_y), (_w), (_h));
-
+    cs_add_scissor_box((_x), (_y), (_w), (_h));
 #define CS_SCISSOR_BOX_END() \
     gCSScissorBox = __tempScissorBox;
 

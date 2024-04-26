@@ -342,8 +342,9 @@ static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
     }
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
-    const SettingsType scrollSpeed = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
-    const size_t offset = (CYCLES_TO_FRAMES(osGetTime()) >> (5 - scrollSpeed));
+    // Floats are used here to prevent overflow from directly multiplying gCSFrameCounter.
+    f32 scrollSpeed = ((f32)cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) / (f32)CRASH_SCREEN_LETTER_WIDTH);
+    const size_t offset = ((u32)((f32)gCSFrameCounter * (f32)scrollSpeed) / CRASH_SCREEN_LETTER_WIDTH);
     const size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
     PrintBuffer* bufChar = &gCSScrollBuffer[0];
@@ -392,17 +393,29 @@ size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, con
         // Handle non-shaping formatting like color.
         size_t phase1FormattedSize = cs_format_print_buffer(sCSCharBuffer, totalSize);
 
-        // Handle wrapping if applicable.
+        // Handle text scroll wrapping if applicable.
+        ScreenCoord_u32 tx = x;
+        CSScissorBox tempScissorBox = gCSScissorBox;
+        size_t extraChar = 0;
         if (0 < charLimit && charLimit < phase1FormattedSize) {
-            if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) > 0) {
+            const SettingsType scrollSpeedSetting = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED);
+            if (scrollSpeedSetting > 0) {
+                cs_add_scissor_box(x, y, (x + TEXT_WIDTH(charLimit)), (y + TEXT_HEIGHT(1)));
+                // Print an extra character when scrolling to overlap the end of the scissor box.
+                extraChar = 1;
+                charLimit += extraChar;
                 cs_scroll_buffer(phase1FormattedSize, charLimit);
+                // Floats are used here to prevent overflow from directly multiplying gCSFrameCounter.
+                f32 scrollSpeed = ((f32)scrollSpeedSetting / (f32)CRASH_SCREEN_LETTER_WIDTH);
+                tx -= ((u32)((f32)gCSFrameCounter * (f32)scrollSpeed) % CRASH_SCREEN_LETTER_WIDTH);
             }
 
             phase1FormattedSize = charLimit;
         }
 
         // Handle shaping formatting like tabs and wrapping, and draw the chars to the screen.
-        numChars = cs_print_from_buffer(x, y, phase1FormattedSize);
+        numChars = cs_print_from_buffer(tx, y, phase1FormattedSize) - extraChar;
+        gCSScissorBox = tempScissorBox;
     }
 
     va_end(args);

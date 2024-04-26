@@ -39,6 +39,14 @@ void cs_set_scissor_box(ScreenCoord_s16 x1, ScreenCoord_s16 y1, ScreenCoord_s16 
     gCSScissorBox.y2 = y2;
 }
 
+// Sets the scissor box, cut by the previous scissor box.
+void cs_add_scissor_box(ScreenCoord_s16 x1, ScreenCoord_s16 y1, ScreenCoord_s16 x2, ScreenCoord_s16 y2) {
+    gCSScissorBox.x1 = MAX(gCSScissorBox.x1, x1);
+    gCSScissorBox.y1 = MAX(gCSScissorBox.y1, y1);
+    gCSScissorBox.x2 = MIN(gCSScissorBox.x2, x2);
+    gCSScissorBox.y2 = MIN(gCSScissorBox.y2, y2);
+}
+
 // Resets the scissor box to the defaults.
 void cs_reset_scissor_box(void) {
     cs_set_scissor_box(
@@ -522,6 +530,8 @@ void cs_draw_LR_triangles(void) {
     cs_reset_scissor_box();
 }
 
+u32 gCSFrameCounter = 0;
+
 // Crash screen main draw function.
 void cs_draw_main(void) {
     const _Bool drawScreenshot = cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_DRAW_SCREENSHOT);
@@ -577,6 +587,8 @@ void cs_draw_main(void) {
         if (!CS_IS_DEFAULT_PRINT_COLOR_DEFAULT()) {
             gCSDefaultPrintColor = CS_DEFAULT_PRINT_COLOR;
         }
+
+        gCSFrameCounter++;
     }
 
     cs_update_framebuffer();
