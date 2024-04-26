@@ -405,24 +405,24 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                 case CHAR_P_FUNC: // Jump function.
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
-#ifdef INCLUDE_DEBUG_MAP
-                    if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && addr_is_in_text_segment(target)) {
-                        const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
-                        if (symbol != NULL) {
-                            *fname = get_map_symbol_name(symbol);
-                            // Only print as the function name if it's the exact starting address of the function.
-                            if (target != symbol->addr) {
-                                *fname = NULL;
-                            }
+                    if (IS_DEBUG_MAP_ENABLED()) {
+                        if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && addr_is_in_text_segment(target)) {
+                            const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
+                            if (symbol != NULL) {
+                                *fname = get_map_symbol_name(symbol);
+                                // Only print as the function name if it's the exact starting address of the function.
+                                if (target != symbol->addr) {
+                                    *fname = NULL;
+                                }
 
-                            if (*fname != NULL) {
-                                break;
+                                if (*fname != NULL) {
+                                    break;
+                                }
                             }
                         }
+                    } else {
+                        *fname = NULL;
                     }
-#else // !INCLUDE_DEBUG_MAP
-                    *fname = NULL;
-#endif // !INCLUDE_DEBUG_MAP
                     ADD_STR(STR_FUNCTION, target);
                     break;
                 default: // Unknown parameter.

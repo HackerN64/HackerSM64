@@ -342,13 +342,13 @@ void page_summary_print(void) {
     }
     osSyncPrintf("\n");
 
- #ifdef INCLUDE_DEBUG_MAP
-    // FUNCTION:
-    const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
-    if (symbol != NULL) {
-        osSyncPrintf("- FUNC: %s\n", get_map_symbol_name(symbol));
+    if (IS_DEBUG_MAP_ENABLED()) {
+        // FUNCTION:
+        const MapSymbol* symbol = get_map_symbol(GET_EPC(tc), SYMBOL_SEARCH_BACKWARD);
+        if (symbol != NULL) {
+            osSyncPrintf("- FUNC: %s\n", get_map_symbol_name(symbol));
+        }
     }
- #endif // INCLUDE_DEBUG_MAP
 
     // CAUSE:
     const char* desc = get_cause_desc(tc, TRUE);

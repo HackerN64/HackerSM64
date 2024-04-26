@@ -238,9 +238,10 @@ void draw_branch_arrow(CSTextCoord_s32 startLine, CSTextCoord_s32 endLine, Scree
 }
 
 void disasm_draw_branch_arrows(u32 printLine, const MapSymbol* symbol) {
-#ifndef INCLUDE_DEBUG_MAP
-    return;
-#endif // !INCLUDE_DEBUG_MAP
+    if (!IS_DEBUG_MAP_ENABLED()) {
+        return;
+    }
+
     // Draw branch arrows from the buffer.
     BranchArrow* currArrow = &sBranchArrows[0];
 
@@ -493,9 +494,9 @@ void page_disasm_input(void) {
     sDisasmViewportIndex = cs_clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, PAGE_DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (buttonPressed & B_BUTTON) {
-        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
-    }
+    // if (buttonPressed & B_BUTTON) {
+    //     cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
+    // }
 
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
         //! TODO: don't reset branch buffer if switched page back into the same function.

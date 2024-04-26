@@ -122,12 +122,12 @@ void cs_address_select_input(void) {
                     cs_set_page(CS_PAGE_MEMORY);
                 }
                 break;
-#ifdef INCLUDE_DEBUG_MAP
             case CS_PAGE_DISASM:
-                if (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget)) {
+                if (IS_DEBUG_MAP_ENABLED() && (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget))) {
                     gFillBranchBuffer = TRUE;
                 }
                 break;
+#ifdef INCLUDE_DEBUG_MAP
             case CS_PAGE_MAP:;
                 s32 targetIndex = get_symbol_index_from_addr_backward(sAddressSelectTarget);
                 if (targetIndex != -1) {

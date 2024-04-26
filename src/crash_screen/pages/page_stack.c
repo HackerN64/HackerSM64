@@ -82,7 +82,7 @@ void fill_function_stack_trace(void) {
         if (
             addr_is_in_text_segment(addr) &&
             (
-                IS_DEBUG_MAP_INCLUDED() ||
+                IS_DEBUG_MAP_ENABLED() ||
                 symbol_is_function(get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD))
             )
         ) {
@@ -143,12 +143,12 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
         }
 
         Address currAddr = function->currAddr;
-        const MapSymbol* symbol = (IS_DEBUG_MAP_INCLUDED() ? get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY) : NULL); //! TODO: SYMBOL_SEARCH_BACKWARDS here slows down rendering.
+        const MapSymbol* symbol = (IS_DEBUG_MAP_ENABLED() ? get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY) : NULL); //! TODO: SYMBOL_SEARCH_BACKWARDS here slows down rendering.
         if (symbol == NULL) {
             // Print unknown function as just the address.
             cs_print(TEXT_X(charX), y,
                 (STR_COLOR_PREFIX STR_HEX_WORD),
-                (IS_DEBUG_MAP_INCLUDED() ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_UNKNOWN), currAddr
+                (IS_DEBUG_MAP_ENABLED() ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_UNKNOWN), currAddr
             );
         } else {
             // Print known function.
@@ -199,6 +199,7 @@ void page_stack_draw(void) {
 
 #ifdef INCLUDE_DEBUG_MAP
     if (
+        IS_DEBUG_MAP_ENABLED() &&
         cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) &&
         cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_OFFSETS)
     ) {
@@ -236,12 +237,12 @@ void page_stack_input(void) {
         open_address_select(sStackTraceBuffer[sStackTraceSelectedIndex].currAddr);
     }
 
-#ifdef INCLUDE_DEBUG_MAP
-    if (buttonPressed & B_BUTTON) {
-        // Toggle whether to display function names.
-        cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
-    }
-#endif // INCLUDE_DEBUG_MAP
+// #ifdef INCLUDE_DEBUG_MAP
+//     if (IS_DEBUG_MAP_ENABLED() && (buttonPressed & B_BUTTON)) {
+//         // Toggle whether to display function names.
+//         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
+//     }
+// #endif // INCLUDE_DEBUG_MAP
 
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
@@ -265,13 +266,14 @@ void page_stack_print(void) {
         Address currAddr = function->currAddr;
         const MapSymbol* symbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BACKWARD);
         osSyncPrintf("- ["STR_HEX_WORD"]: "STR_HEX_WORD" +"STR_HEX_HALFWORD, function->stackAddr, symbol->addr, (currAddr - symbol->addr));
- #ifdef INCLUDE_DEBUG_MAP
-        const char* fname = get_map_symbol_name(symbol);
-        if (fname != NULL) {
-            osSyncPrintf(" - %s", fname);
+        if (IS_DEBUG_MAP_ENABLED()) {
+            const char* fname = get_map_symbol_name(symbol);
+            if (fname != NULL) {
+                osSyncPrintf(" - %s", fname);
+            }
+        } else {
+            osSyncPrintf("\n");
         }
- #endif // INCLUDE_DEBUG_MAP
-        osSyncPrintf("\n");
     }
 #endif // UNF
 }

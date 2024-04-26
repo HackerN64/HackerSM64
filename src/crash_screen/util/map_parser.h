@@ -6,9 +6,9 @@
 
 
 #ifdef INCLUDE_DEBUG_MAP
- #define IS_DEBUG_MAP_INCLUDED() TRUE
+ #define IS_DEBUG_MAP_ENABLED() (gNumMapSymbols > 0)
 #else // !INCLUDE_DEBUG_MAP
- #define IS_DEBUG_MAP_INCLUDED() FALSE
+ #define IS_DEBUG_MAP_ENABLED() FALSE
 #endif // !INCLUDE_DEBUG_MAP
 
 

@@ -145,7 +145,7 @@ const char* get_thread_name(OSThread* thread) {
         return name;
     }
 
-    if (IS_DEBUG_MAP_INCLUDED() && (name == NULL)) {
+    if (IS_DEBUG_MAP_ENABLED() && (name == NULL)) {
         const MapSymbol* symbol = get_map_symbol((Address)thread, SYMBOL_SEARCH_BACKWARD);
         if (symbol != NULL) {
             return get_map_symbol_name(symbol);
@@ -524,31 +524,31 @@ const char* get_hardcoded_memory_str(Address addr) {
         }
     }
 
-#ifdef INCLUDE_DEBUG_MAP
-    // Is addr in map symbol data?
-    if ((gNumMapSymbols != 0) /* Checks whether the map data was loaded. */ && (addr >= (Address)_mapDataSegmentStart)) {
-        if (addr < (Address)((Byte*)_mapDataSegmentStart + ((gMapSymbolsEnd - gMapSymbols) * sizeof(MapSymbol)))) {
-            return "map symbols (data)";
-        } else if (addr < (Address)_mapDataSegmentEnd) {
-            return "map symbols (strings)";
+    if (IS_DEBUG_MAP_ENABLED()) {
+        // Is addr in map symbol data?
+        if (addr >= (Address)_mapDataSegmentStart) {
+            if (addr < (Address)((Byte*)_mapDataSegmentStart + ((gMapSymbolsEnd - gMapSymbols) * sizeof(MapSymbol)))) {
+                return "map symbols (data)";
+            } else if (addr < (Address)_mapDataSegmentEnd) {
+                return "map symbols (strings)";
+            }
         }
-    }
-#else // !INCLUDE_DEBUG_MAP
-    // Inportant sections that had a map symbol:
+    } else {
+        // Inportant sections that had a map symbol:
 
-    // Is addr in GFX pool?
-    if (addr >= (Address)gGfxPool->buffer) {
-        if (addr < (Address)gDisplayListHead) {
-            return "gfx pool (used)";
-        } else if (addr < (Address)gGfxPoolEnd) {
-            return "gfx pool (allocated)";
-        } else if (addr < (Address)((Byte*)gGfxPool->buffer + GFX_POOL_SIZE)) {
-            return "gfx pool (unused)";
+        // Is addr in GFX pool?
+        if (addr >= (Address)gGfxPool->buffer) {
+            if (addr < (Address)gDisplayListHead) {
+                return "gfx pool (used)";
+            } else if (addr < (Address)gGfxPoolEnd) {
+                return "gfx pool (allocated)";
+            } else if (addr < (Address)((Byte*)gGfxPool->buffer + GFX_POOL_SIZE)) {
+                return "gfx pool (unused)";
+            }
         }
-    }
 
-    //! TODO: audio heap, thread stacks, SPTasks, save buffer, both gGfxPools.
-#endif // !INCLUDE_DEBUG_MAP
+        //! TODO: audio heap, thread stacks, SPTasks, save buffer, both gGfxPools.
+    }
 
     s32 segment = get_segment_from_virtual_addr((void*)addr);
     if (segment != 0) {

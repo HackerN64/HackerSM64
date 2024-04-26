@@ -88,7 +88,7 @@ void cs_memory_draw_byte() {
 
 void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
     const enum MemoryDisplayModes mode = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE);
-    _Bool symbolDividers = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SYMBOL_DIVIDERS);
+    const _Bool symbolDividers = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SYMBOL_DIVIDERS);
     __OSThreadContext* tc = &gInspectThread->context;
     ScreenCoord_u32 x = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     ScreenCoord_u32 y = TEXT_Y(line);

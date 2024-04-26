@@ -160,7 +160,7 @@ void cs_registers_print_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, const char* na
     );
 
 #ifdef INCLUDE_DEBUG_MAP
-    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_PARSE_REG)) {
+    if (IS_DEBUG_MAP_ENABLED() && cs_get_setting_val(CS_OPT_GROUP_PAGE_REGISTERS, CS_OPT_REGISTERS_PARSE_REG)) {
         symbol = get_map_symbol(val, SYMBOL_SEARCH_BACKWARD);
     }
 #endif // INCLUDE_DEBUG_MAP
