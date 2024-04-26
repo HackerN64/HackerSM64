@@ -167,7 +167,7 @@ void cs_registers_print_reg(ScreenCoord_u32 x, ScreenCoord_u32 y, const char* na
 
     if (symbol != NULL) {
         // "[symbol name]"
-        cs_print_symbol_name((x + TEXT_WIDTH(charX)), y, 10, symbol, FALSE);
+        cs_print_symbol_name((x + TEXT_WIDTH(charX) - 2), y, 12, symbol, FALSE);
     } else {
         // "[XXXXXXXX]"
         cs_print((x + TEXT_WIDTH(charX + STRLEN(" "))), y,
