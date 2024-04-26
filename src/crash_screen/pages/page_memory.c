@@ -28,25 +28,28 @@ enum MemoryDisplayModes {
     MEMORY_MODE_BINARY,
     MEMORY_MODE_RGBA16,
     MEMORY_MODE_RGBA32,
+    MEMORY_MODE_SYMBOL,
+    NUM_MEMORY_VIEW_MODES,
 };
 
-const char* gValNames_mem_disp_mode[] = {
+const char* gValNames_mem_disp_mode[NUM_MEMORY_VIEW_MODES] = {
     [MEMORY_MODE_HEX   ] = "HEX",
     [MEMORY_MODE_ASCII ] = "ASCII",
     [MEMORY_MODE_BINARY] = "BINARY",
     [MEMORY_MODE_RGBA16] = "RGBA16",
     [MEMORY_MODE_RGBA32] = "RGBA32",
+    [MEMORY_MODE_SYMBOL] = "SYMBOLS"
 };
 
 
 struct CSSetting cs_settings_group_page_memory[] = {
-    [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MEMORY",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_MEMORY_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_HEADER_PAGE_MEMORY      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "MEMORY",                         .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                        },
+    [CS_OPT_MEMORY_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                        },
 #ifdef INCLUDE_DEBUG_MAP
-    [CS_OPT_MEMORY_SYMBOL_DIVIDERS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show symbol dividers",           .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_MEMORY_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_MEMORY_SYMBOL_DIVIDERS  ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show symbol dividers",           .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                        },
+    [CS_OPT_MEMORY_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                        },
 #endif // INCLUDE_DEBUG_MAP
-    [CS_OPT_MEMORY_DISPLAY_MODE     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Display mode",                   .valNames = &gValNames_mem_disp_mode, .val = MEMORY_MODE_HEX,           .defaultVal = MEMORY_MODE_HEX,           .lowerBound = MEMORY_MODE_HEX,       .upperBound = MEMORY_MODE_RGBA32,         },
+    [CS_OPT_MEMORY_DISPLAY_MODE     ] = { .type = CS_OPT_TYPE_SETTING, .name = "Display mode",                   .valNames = &gValNames_mem_disp_mode, .val = MEMORY_MODE_HEX,           .defaultVal = MEMORY_MODE_HEX,           .lowerBound = MEMORY_MODE_HEX,       .upperBound = (NUM_MEMORY_VIEW_MODES - 1), },
     [CS_OPT_END_MEMORY              ] = { .type = CS_OPT_TYPE_END, },
 };
 
@@ -104,6 +107,7 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 //     const MapSymbol* prevRowSymbol = NULL;
 // #endif // INCLUDE_DEBUG_MAP
 
+    // Rows on screen:
     for (CSTextCoord_u32 row = 0; row < sRamViewNumShownRows; row++) {
         Address rowAddr = (startAddr + (row * PAGE_MEMORY_STEP));
 
@@ -123,7 +127,8 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
         //     cs_draw_rect(x, (y - 2), (TEXT_WIDTH(CRASH_SCREEN_NUM_CHARS_X - 9) + 5), TEXT_HEIGHT(1), highlightColor);
         // }
 
-        for (u32 wordOffset = 0; wordOffset < 4; wordOffset++) {
+        // 4 Words per row:
+        for (size_t wordOffset = 0; wordOffset < PAGE_MEMORY_WORDS_PER_ROW; wordOffset++) {
             Word_4Bytes data = {
                 .word = 0x00000000,
             };
@@ -138,7 +143,17 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
             x += 2;
 
-            for (u32 byteOffset = 0; byteOffset < sizeof(Word); byteOffset++) {
+            // _Bool isSymbol = FALSE;
+            const MapSymbol* destSymbol = NULL;
+            if (IS_DEBUG_MAP_ENABLED() && (mode == MEMORY_MODE_SYMBOL)) {
+                destSymbol = get_map_symbol(data.word, SYMBOL_SEARCH_BINARY);
+                if (destSymbol != NULL) {
+                    cs_print_symbol_name(x, y, 8, destSymbol, FALSE);
+                }
+            }
+
+            // 4 bytes per Word:
+            for (size_t byteOffset = 0; byteOffset < sizeof(Word); byteOffset++) {
                 Address currAddr = (currAddrAligned + byteOffset);
 
                 RGBA32 textColor = (((mode == MEMORY_MODE_ASCII) || (byteOffset % 2)) ? COLOR_RGBA32_CRASH_MEMORY_DATA1 : COLOR_RGBA32_CRASH_MEMORY_DATA2);
@@ -188,9 +203,12 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                 if (valid) {
                     Byte byte = data.byte[byteOffset];
                     switch (mode) {
+                        case MEMORY_MODE_SYMBOL:
                         case MEMORY_MODE_HEX:
-                            cs_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> BITS_PER_HEX], textColor);
-                            cs_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & BITMASK(BITS_PER_HEX)], textColor);
+                            if (destSymbol == NULL) {
+                                cs_draw_glyph((x + TEXT_WIDTH(0)), y, gHex[byte >> BITS_PER_HEX], textColor);
+                                cs_draw_glyph((x + TEXT_WIDTH(1)), y, gHex[byte & BITMASK(BITS_PER_HEX)], textColor);
+                            }
                             break;
                         case MEMORY_MODE_ASCII:
                             cs_draw_glyph((x + TEXT_WIDTH(1)), y, byte, textColor);
@@ -210,7 +228,8 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                         case MEMORY_MODE_RGBA32:
                             cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), data.word);
                             break;
-
+                        default:
+                            break;
                     }
                 } else {
                     cs_draw_glyph((x + TEXT_WIDTH(1)), y, '*', COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);

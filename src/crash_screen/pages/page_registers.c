@@ -257,6 +257,8 @@ CSTextCoord_u32 cs_registers_draw_register_list(CSTextCoord_u32 line, enum Regis
                         case REG_VAL_TYPE_BITS:
                             cs_registers_print_bitfield(x, y, name, value, ((reg->src == REGS_FCR) && (reg->idx == REG_FCR_CONTROL_STATUS)));
                             break;
+                        default:
+                            break;
                     }
                 }
 
@@ -413,7 +415,7 @@ void page_registers_print(void) {
     // Float registers:
     const u32 f_columns = 2;
     const u32 f_rows = DIV_CEIL((CP1_NUM_REGISTERS / FP_REG_SIZE), columns);
-    __OSfp* osfp = &tc->fp0;
+    __OSfp* osfp = &tc->fp0; //! TODO: Use the lists
     u32 regNum = 0;
     for (u32 row = 0; row < f_rows; row++) {
         osSyncPrintf("- ");
