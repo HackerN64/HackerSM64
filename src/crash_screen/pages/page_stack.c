@@ -48,62 +48,51 @@ const enum ControlTypes cs_cont_list_stack[] = {
 };
 
 
-ALIGNED16 static FunctionInStack sCSFunctionStackBuffer[STACK_TRACE_BUFFER_SIZE];
-static u32 sCSNumFoundFunctions = 0;
+ALIGNED8 static FunctionInStack sStackTraceBuffer[STACK_TRACE_BUFFER_SIZE];
+static u32 sStackTraceBufferEnd = 0;
 
 static u32 sStackTraceSelectedIndex = 0;
 static u32 sStackTraceViewportIndex = 0;
 
-static void add_to_stack(FunctionInStack* func) {
-    sCSFunctionStackBuffer[sCSNumFoundFunctions++] = *func;
-}
 
 extern void __osCleanupThread(void);
 
+static void append_stack_entry_to_buffer(Address stackAddr, Address currAddr) {
+    sStackTraceBuffer[sStackTraceBufferEnd++] = (FunctionInStack){
+        .stackAddr = stackAddr,
+        .currAddr  = currAddr,
+    };
+}
+
 //! TODO: Use libdragon's method of walking the stack.
 void fill_function_stack_trace(void) {
-    bzero(&sCSFunctionStackBuffer, sizeof(sCSFunctionStackBuffer));
-    sCSNumFoundFunctions = 0;
+    bzero(&sStackTraceBuffer, sizeof(sStackTraceBuffer));
+    sStackTraceBufferEnd = 0;
 
     // Include the current function at the top:
     __OSThreadContext* tc = &gInspectThread->context;
-    Address pc = tc->pc;
-    const MapSymbol* symbol = get_map_symbol(pc, SYMBOL_SEARCH_BACKWARD);
-    FunctionInStack currInfo = {
-        .stackAddr = tc->sp,
-        .curAddr   = pc,
-        .faddr     = (symbol ? symbol->addr : pc),
-        .fname     = get_map_symbol_name(symbol),
-    };
-    add_to_stack(&currInfo);
+    append_stack_entry_to_buffer(tc->sp, tc->pc); // Set the first entry in the stack buffer to pc.
 
     Doubleword* sp = (Doubleword*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
 
     // Loop through the stack buffer and find all the addresses that point to a function.
-    while (sCSNumFoundFunctions < STACK_TRACE_BUFFER_SIZE) {
-        currInfo.curAddr = (Address)(*sp); // Check the lower bits.
+    while (sStackTraceBufferEnd < STACK_TRACE_BUFFER_SIZE) {
+        Address addr = LO_OF_64(*sp); // Function address are in the lower bits.
 
-        if (addr_is_in_text_segment(currInfo.curAddr)) {
-            currInfo.faddr = currInfo.curAddr;
-#ifdef INCLUDE_DEBUG_MAP
-            symbol = get_map_symbol(currInfo.faddr, SYMBOL_SEARCH_BACKWARD);
-            if (symbol != NULL) {
-                currInfo.faddr = symbol->addr;
-                currInfo.fname = get_map_symbol_name(symbol);
-            }
+        if (
+            addr_is_in_text_segment(addr) &&
+            (
+                IS_DEBUG_MAP_INCLUDED() ||
+                symbol_is_function(get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD))
+            )
+        ) {
+            //! TODO: If JAL command uses a different function than the previous entry's funcAddr, replace it with the one in the JAL command?
+            //! TODO: handle duplicate entries caused by JALR RA, V0
+            append_stack_entry_to_buffer((Address)sp + sizeof(Address), addr); // Address in stack uses lower bits of the doubleword.
+        }
 
-            if (currInfo.fname != NULL)
-#endif
-            {
-                //! TODO: If JAL command uses a different function than the previous entry's faddr, replace it with the one in the JAL command?
-                //! TODO: handle duplicate entries caused by JALR RA, V0
-                currInfo.stackAddr = (Address)sp + sizeof(Address);
-                add_to_stack(&currInfo);
-            }
-
-            if (currInfo.faddr == (Address)__osCleanupThread) {
-                break;
-            }
+        if (addr == (Address)__osCleanupThread) {
+            break;
         }
 
         sp++;
@@ -124,11 +113,11 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
     const _Bool parseSymbolNames = cs_get_setting_val(CS_OPT_GROUP_GLOBAL,     CS_OPT_GLOBAL_SYMBOL_NAMES );
 #endif // INCLUDE_DEBUG_MAP
     u32 currIndex = sStackTraceViewportIndex;
-    FunctionInStack* function = &sCSFunctionStackBuffer[currIndex];
+    FunctionInStack* function = &sStackTraceBuffer[currIndex];
 
     // Print:
     for (CSTextCoord_u32 row = 0; row < numLines; row++) {
-        if (currIndex >= sCSNumFoundFunctions) {
+        if (currIndex >= sStackTraceBufferEnd) {
             break;
         }
 
@@ -148,17 +137,18 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
             // "[stack address]:"
             charX += cs_print(TEXT_X(charX), y,
                 STR_COLOR_PREFIX STR_HEX_WORD":",
-                ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE), function->stackAddr
+                ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE),
+                function->stackAddr
             );
         }
 
-#ifdef INCLUDE_DEBUG_MAP
-        if (function->fname == NULL) {
-            // Print unknown function.
-            // "[function address]"
+        Address currAddr = function->currAddr;
+        const MapSymbol* symbol = (IS_DEBUG_MAP_INCLUDED() ? get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY) : NULL); //! TODO: SYMBOL_SEARCH_BACKWARDS here slows down rendering.
+        if (symbol == NULL) {
+            // Print unknown function as just the address.
             cs_print(TEXT_X(charX), y,
                 (STR_COLOR_PREFIX STR_HEX_WORD),
-                COLOR_RGBA32_CRASH_UNKNOWN, function->curAddr
+                (IS_DEBUG_MAP_INCLUDED() ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_UNKNOWN), currAddr
             );
         } else {
             // Print known function.
@@ -169,30 +159,23 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
                     // "+[offset]"
                     cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - offsetStrSize), y,
                         (STR_COLOR_PREFIX"+"STR_HEX_HALFWORD),
-                        COLOR_RGBA32_CRASH_OFFSET, (function->curAddr - function->faddr)
+                        COLOR_RGBA32_CRASH_OFFSET, (currAddr - symbol->addr)
                     );
                 }
                 // "[function name]"
                 cs_print_scroll(TEXT_X(charX), y,
                     (CRASH_SCREEN_NUM_CHARS_X - (charX + offsetStrSize)),
                     STR_COLOR_PREFIX"%s",
-                    COLOR_RGBA32_CRASH_FUNCTION_NAME, function->fname
+                    COLOR_RGBA32_CRASH_FUNCTION_NAME, get_map_symbol_name(symbol)
                 );
             } else {
-                // "[function address]"
+                // "[address in function]"
                 cs_print(TEXT_X(charX), y,
                     (STR_COLOR_PREFIX STR_HEX_WORD),
-                    COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
+                    COLOR_RGBA32_CRASH_FUNCTION_NAME, currAddr
                 );
             }
         }
-#else // !INCLUDE_DEBUG_MAP
-        // "[function address]"
-        cs_print(TEXT_X(charX), y,
-            (STR_COLOR_PREFIX STR_HEX_WORD),
-            COLOR_RGBA32_CRASH_FUNCTION_NAME, function->curAddr
-        );
-#endif // !INCLUDE_DEBUG_MAP
 
         currIndex++;
         function++;
@@ -232,10 +215,10 @@ void page_stack_draw(void) {
     cs_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
-    if (sCSNumFoundFunctions > STACK_TRACE_NUM_ROWS) {
+    if (sStackTraceBufferEnd > STACK_TRACE_NUM_ROWS) {
         cs_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
-            STACK_TRACE_NUM_ROWS, sCSNumFoundFunctions,
+            STACK_TRACE_NUM_ROWS, sStackTraceBufferEnd,
             sStackTraceViewportIndex,
             COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
         );
@@ -250,7 +233,7 @@ void page_stack_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
 
     if (buttonPressed & A_BUTTON) {
-        open_address_select(sCSFunctionStackBuffer[sStackTraceSelectedIndex].curAddr);
+        open_address_select(sStackTraceBuffer[sStackTraceSelectedIndex].currAddr);
     }
 
 #ifdef INCLUDE_DEBUG_MAP
@@ -263,7 +246,7 @@ void page_stack_input(void) {
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    sStackTraceSelectedIndex = WRAP(((s32)sStackTraceSelectedIndex + change), 0, (s32)(sCSNumFoundFunctions - 1));
+    sStackTraceSelectedIndex = WRAP(((s32)sStackTraceSelectedIndex + change), 0, (s32)(sStackTraceBufferEnd - 1));
 
     sStackTraceViewportIndex = cs_clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
 }
@@ -272,17 +255,20 @@ void page_stack_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
-    for (u32 i = 0; i < sCSNumFoundFunctions; i++) {
-        FunctionInStack* function = &sCSFunctionStackBuffer[i];
+    for (u32 i = 0; i < sStackTraceBufferEnd; i++) {
+        FunctionInStack* function = &sStackTraceBuffer[i];
 
         if (function == NULL) {
             break;
         }
 
-        osSyncPrintf("- ["STR_HEX_WORD"]: "STR_HEX_WORD" +"STR_HEX_HALFWORD, function->stackAddr, function->faddr, (function->curAddr - function->faddr));
+        Address currAddr = function->currAddr;
+        const MapSymbol* symbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BACKWARD);
+        osSyncPrintf("- ["STR_HEX_WORD"]: "STR_HEX_WORD" +"STR_HEX_HALFWORD, function->stackAddr, symbol->addr, (currAddr - symbol->addr));
  #ifdef INCLUDE_DEBUG_MAP
-        if (function->fname != NULL) {
-            osSyncPrintf(" - %s", function->fname);
+        const char* fname = get_map_symbol_name(symbol);
+        if (fname != NULL) {
+            osSyncPrintf(" - %s", fname);
         }
  #endif // INCLUDE_DEBUG_MAP
         osSyncPrintf("\n");

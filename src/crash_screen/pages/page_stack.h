@@ -22,13 +22,10 @@ enum CSSettingsGroup_page_stack {
 #define STACK_TRACE_BUFFER_SIZE 64
 
 
-//! TODO: Can this be shrunk? The resulting buffer is 0x400.
 typedef struct FunctionInStack {
     /*0x00*/ Address stackAddr;
-    /*0x04*/ Address curAddr;
-    /*0x08*/ Address faddr;
-    /*0x0C*/ const char* fname;
-} FunctionInStack; /*0x10*/
+    /*0x04*/ Address currAddr;
+} FunctionInStack; /*0x08*/
 
 
 extern struct CSSetting cs_settings_group_page_stack[];

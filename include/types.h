@@ -53,6 +53,18 @@ typedef union {
     u64 raw;
 } HiLo64; /*0x02*/
 
+#define HI_OF_16(_x)        ((HiLo16){ .raw = _x }).hi
+#define LO_OF_16(_x)        ((HiLo16){ .raw = _x }).lo
+#define HI_LO_16(_hi, _lo)  ((HiLo16){ .hi = _hi, .lo = _lo }).raw
+
+#define HI_OF_32(_x)        ((HiLo32){ .raw = _x }).hi
+#define LO_OF_32(_x)        ((HiLo32){ .raw = _x }).lo
+#define HI_LO_32(_hi, _lo)  ((HiLo16){ .hi = _hi, .lo = _lo }).raw
+
+#define HI_OF_64(_x)        ((HiLo64){ .raw = _x }).hi
+#define LO_OF_64(_x)        ((HiLo64){ .raw = _x }).lo
+#define HI_LO_64(_hi, _lo)  ((HiLo64){ .hi = _hi, .lo = _lo }).raw
+
 typedef union {
     struct PACKED {
         /*0x00*/ u32 sign     :  1;

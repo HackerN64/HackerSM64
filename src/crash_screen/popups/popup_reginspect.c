@@ -372,7 +372,7 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
     }
     CSTextCoord_u32 charX = cs_print(TEXT_X(2), TEXT_Y(line), "bin: ");
     if (is64Bit) {
-        Word valHi = ((HiLo64){ .raw = val64 }).hi;
+        Word valHi = HI_OF_64(val64);
         print_data_as_binary(TEXT_X(2 + charX), TEXT_Y(line++), &valHi, sizeof(valHi), valColor);
     }
     print_data_as_binary(TEXT_X(2 + charX), TEXT_Y(line++), &val32, sizeof(val32), valColor);
@@ -416,7 +416,7 @@ void reginspect_draw_contents(RegisterId regId) {
         //! TODO: Split hi and lo bits for FGR and label them even/odd + combined.
         Word cop1OddBits = get_reg_val(REGS_CP1, (regId.idx + 1), checkThread);
         if (cop1OddBits != 0) {
-            value = ((HiLo64){ .hi = cop1OddBits, .lo = val32, }).raw;
+            value = HI_LO_64(cop1OddBits, val32);
             is64Bit = TRUE;
         }
     }

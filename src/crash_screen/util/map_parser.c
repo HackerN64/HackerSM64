@@ -93,6 +93,8 @@ _Bool addr_is_in_text_segment(Address addr) {
  */
 _Bool symbol_is_function(const MapSymbol* symbol) {
     return (
+        IS_DEBUG_MAP_INCLUDED() &&
+        (symbol != NULL) &&
         ((symbol->type == 't') || (symbol->type == 'T') || (symbol->type == 'W')) && // The symbol itself is marked as .text.
         (symbol->size != 0) && // The symbol has data.
         ((symbol->addr % sizeof(Word)) == 0) && // The symbol is 4byte aligned.

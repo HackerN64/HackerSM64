@@ -309,10 +309,7 @@ _Bool try_read_doubleword_aligned(Doubleword* dest, Address addr) {
         try_read_word_aligned(&hi, (addr + (0 * sizeof(Word)))) &&
         try_read_word_aligned(&lo, (addr + (1 * sizeof(Word))))
     ) {
-        *dest = (HiLo64){
-            .hi = hi,
-            .lo = lo,
-        }.raw;
+        *dest = HI_LO_64(hi, lo);
 
         return TRUE;
     }
@@ -358,10 +355,7 @@ _Bool try_read_halfword(Halfword* dest, Address addr) {
         try_read_byte(&hi, (addr + (0 * sizeof(Byte)))) &&
         try_read_byte(&lo, (addr + (1 * sizeof(Byte))))
     ) {
-        *dest = (HiLo16){
-            .hi = hi,
-            .lo = lo,
-        }.raw;
+        *dest = HI_LO_16(hi, lo);
 
         return TRUE;
     }
@@ -384,10 +378,7 @@ _Bool try_read_word(Word* dest, Address addr) {
         try_read_halfword(&hi, (addr + (0 * sizeof(Halfword)))) &&
         try_read_halfword(&lo, (addr + (1 * sizeof(Halfword))))
     ) {
-        *dest = (HiLo32){
-            .hi = hi,
-            .lo = lo,
-        }.raw;
+        *dest = HI_LO_32(hi, lo);
 
         return TRUE;
     }
@@ -410,10 +401,7 @@ _Bool try_read_doubleword(Doubleword* dest, Address addr) {
         try_read_word(&hi, (addr + (0 * sizeof(Word)))) &&
         try_read_word(&lo, (addr + (1 * sizeof(Word))))
     ) {
-        *dest = (HiLo64){
-            .hi = hi,
-            .lo = lo,
-        }.raw;
+        *dest = HI_LO_64(hi, lo);
 
         return TRUE;
     }
