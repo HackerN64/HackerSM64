@@ -196,7 +196,6 @@ void clear_areas(void) {
         gAreaData[i].surfaceRooms = NULL;
         gAreaData[i].macroObjects = NULL;
         gAreaData[i].warpNodes = NULL;
-        gAreaData[i].paintingWarpNodes = NULL;
         gAreaData[i].instantWarps = NULL;
         gAreaData[i].objectSpawnInfos = NULL;
         gAreaData[i].camera = NULL;

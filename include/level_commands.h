@@ -46,7 +46,7 @@ enum LevelCommands {
     /*0x24*/ LEVEL_CMD_PLACE_OBJECT,
     /*0x25*/ LEVEL_CMD_INIT_MARIO,
     /*0x26*/ LEVEL_CMD_CREATE_WARP_NODE,
-    /*0x27*/ LEVEL_CMD_CREATE_PAINTING_WARP_NODE,
+    /*0x27*/ LEVEL_CMD_27,
     /*0x28*/ LEVEL_CMD_CREATE_INSTANT_WARP,
     /*0x29*/ LEVEL_CMD_LOAD_AREA,
     /*0x2A*/ LEVEL_CMD_UNLOAD_AREA,
@@ -111,6 +111,8 @@ enum WarpCheckpointFlags {
     WARP_NO_CHECKPOINT = (0 << 0), // 0x00
     WARP_CHECKPOINT    = (1 << 7), // 0x80
 };
+
+#define WARP_DEST_LEVEL_NUM_MASK 0x7F
 
 // Head defines
 enum GoddardScene {
@@ -363,8 +365,12 @@ enum GoddardScene {
     CMD_BBBB(LEVEL_CMD_CREATE_WARP_NODE, 0x08, id, destLevel), \
     CMD_BBBB(destArea, destNode, flags, 0x00)
 
+// Backwards compatibility:
 #define PAINTING_WARP_NODE(id, destLevel, destArea, destNode, flags) \
-    CMD_BBBB(LEVEL_CMD_CREATE_PAINTING_WARP_NODE, 0x08, id, destLevel), \
+    WARP_NODE(id, destLevel, destArea, destNode, flags)
+
+#define CMD27(id, destLevel, destArea, destNode, flags) \
+    CMD_BBBB(LEVEL_CMD_27, 0x08, id, destLevel), \
     CMD_BBBB(destArea, destNode, flags, 0x00)
 
 #define INSTANT_WARP(index, destArea, displaceX, displaceY, displaceZ) \

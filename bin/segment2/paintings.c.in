@@ -1,0 +1,539 @@
+
+// 0x02014970 - 0x020149A8
+const Gfx dl_paintings_rippling_begin[] = {
+    gsDPPipeSync(),
+    gsSPSetGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
+    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x505050ff),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsSPEndDisplayList(),
+};
+
+// 0x020149A8 - 0x020149C8
+const Gfx dl_paintings_rippling_end[] = {
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+};
+
+const Gfx sub_dl_paintings_textured_begin[] = {
+    gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
+    // gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsSPEndDisplayList(),
+};
+
+// 0x07021A48 - 0x07021AA0
+const Gfx dl_paintings_textured_shaded_begin[] = {
+    gsDPPipeSync(),
+    gsSPSetGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x505050ff),
+    gsSPDisplayList(sub_dl_paintings_textured_begin),
+    gsSPEndDisplayList(),
+};
+
+// 0x07021A48 - 0x07021AA0
+const Gfx dl_paintings_textured_vertex_colored_begin[] = {
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsSPDisplayList(sub_dl_paintings_textured_begin),
+    gsSPEndDisplayList(),
+};
+
+// 0x07021AA0 - 0x07021AC0
+const Gfx dl_paintings_textured_end[] = {
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+};
+
+// 0x020149C8 - 0x02014A00
+const Gfx dl_paintings_env_mapped_begin[] = {
+    gsDPPipeSync(),
+    gsSPSetGeometryMode(G_LIGHTING | G_TEXTURE_GEN),
+    gsDPSetCombineMode(G_CC_DECALRGB, G_CC_DECALRGB),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x505050ff),
+    gsSPTexture(0x4000, 0x4000, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsSPEndDisplayList(),
+};
+
+// 0x02014A00 - 0x02014A30
+const Gfx dl_paintings_env_mapped_end[] = {
+    gsSPTexture(0x4000, 0x4000, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsSPGeometryModeSetFirst(G_TEXTURE_GEN, G_LIGHTING),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+};
+
+// 0x02014A30 - 0x02014A60
+const Gfx dl_paintings_ripple_triangles[] = {
+#ifdef F3DEX_GBI_2
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
+    gsSP2Triangles(12, 13, 14, 0x0, 15, 16, 17, 0x0),
+    gsSP2Triangles(18, 19, 20, 0x0, 21, 22, 23, 0x0),
+    gsSP2Triangles(24, 25, 26, 0x0, 27, 28, 29, 0x0),
+#else
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
+    gsSP1Triangle( 12, 13, 14, 0x0),
+#endif
+    gsSPEndDisplayList(),
+};
+
+// Painting vertex coordinates
+#define PDX(x) ((x) * (PAINTING_SIZE / 12.0f)) // 51.2f
+#define PDY(y) ((y) * (PAINTING_SIZE / 20.0f)) // 30.72f
+#define PAINTING_VERTEX(x, y, r) PDX(x), PDY(y), (r)
+
+// 14A60: triangle mesh
+// 0x02014A60
+const PaintingData painting_data_vertices[] = {
+    157, // numVtx
+    // format:
+    // 2D point (x, y), ripple (0 or 1)
+    PAINTING_VERTEX(12, 19, 0), // 0
+    PAINTING_VERTEX(12, 20, 0), // 1
+    PAINTING_VERTEX(11, 20, 0), // 2
+    PAINTING_VERTEX(11, 18, 1), // 3
+    PAINTING_VERTEX(12, 17, 0), // 4
+    PAINTING_VERTEX(10, 19, 1), // 5
+    PAINTING_VERTEX(10, 20, 0), // 6
+    PAINTING_VERTEX( 6, 20, 0), // 7
+    PAINTING_VERTEX( 6, 19, 1), // 8
+    PAINTING_VERTEX( 7, 20, 0), // 9
+    PAINTING_VERTEX( 5, 20, 0), // 10
+    PAINTING_VERTEX( 5, 18, 1), // 11
+    PAINTING_VERTEX( 6, 17, 1), // 12
+    PAINTING_VERTEX( 7, 18, 1), // 13
+    PAINTING_VERTEX( 8, 19, 1), // 14
+    PAINTING_VERTEX( 9, 20, 0), // 15
+    PAINTING_VERTEX(10, 17, 1), // 16
+    PAINTING_VERTEX( 9, 18, 1), // 17
+    PAINTING_VERTEX( 8, 17, 1), // 18
+    PAINTING_VERTEX(11, 10, 1), // 19
+    PAINTING_VERTEX(12, 11, 0), // 20
+    PAINTING_VERTEX(11, 14, 1), // 21
+    PAINTING_VERTEX(12, 13, 0), // 22
+    PAINTING_VERTEX(11, 12, 1), // 23
+    PAINTING_VERTEX(10, 11, 1), // 24
+    PAINTING_VERTEX( 9, 10, 1), // 25
+    PAINTING_VERTEX( 9, 14, 1), // 26
+    PAINTING_VERTEX(10, 13, 1), // 27
+    PAINTING_VERTEX(10, 15, 1), // 28
+    PAINTING_VERTEX( 8, 11, 1), // 29
+    PAINTING_VERTEX( 9, 12, 1), // 30
+    PAINTING_VERTEX( 7, 10, 1), // 31
+    PAINTING_VERTEX( 8, 15, 1), // 32
+    PAINTING_VERTEX( 7, 14, 1), // 33
+    PAINTING_VERTEX( 8, 13, 1), // 34
+    PAINTING_VERTEX( 7, 12, 1), // 35
+    PAINTING_VERTEX( 6, 11, 1), // 36
+    PAINTING_VERTEX( 5, 10, 1), // 37
+    PAINTING_VERTEX( 6, 13, 1), // 38
+    PAINTING_VERTEX( 5, 14, 1), // 39
+    PAINTING_VERTEX( 6, 15, 1), // 40
+    PAINTING_VERTEX(12, 15, 0), // 41
+    PAINTING_VERTEX(11, 16, 1), // 42
+    PAINTING_VERTEX( 9, 16, 1), // 43
+    PAINTING_VERTEX( 7, 16, 1), // 44
+    PAINTING_VERTEX( 5, 16, 1), // 45
+    PAINTING_VERTEX( 8,  9, 1), // 46
+    PAINTING_VERTEX(10,  9, 1), // 47
+    PAINTING_VERTEX( 6,  9, 1), // 48
+    PAINTING_VERTEX(12,  1, 0), // 49
+    PAINTING_VERTEX(12,  0, 0), // 50
+    PAINTING_VERTEX(11,  0, 0), // 51
+    PAINTING_VERTEX(11,  4, 1), // 52
+    PAINTING_VERTEX(12,  3, 0), // 53
+    PAINTING_VERTEX(10,  1, 1), // 54
+    PAINTING_VERTEX(11,  2, 1), // 55
+    PAINTING_VERTEX( 9,  0, 0), // 56
+    PAINTING_VERTEX(10,  0, 0), // 57
+    PAINTING_VERTEX( 9,  4, 1), // 58
+    PAINTING_VERTEX(10,  3, 1), // 59
+    PAINTING_VERTEX(10,  5, 1), // 60
+    PAINTING_VERTEX( 8,  1, 1), // 61
+    PAINTING_VERTEX( 9,  2, 1), // 62
+    PAINTING_VERTEX( 7,  0, 0), // 63
+    PAINTING_VERTEX( 8,  0, 0), // 64
+    PAINTING_VERTEX( 8,  3, 1), // 65
+    PAINTING_VERTEX( 7,  4, 1), // 66
+    PAINTING_VERTEX( 8,  5, 1), // 67
+    PAINTING_VERTEX( 6,  1, 1), // 68
+    PAINTING_VERTEX( 7,  2, 1), // 69
+    PAINTING_VERTEX( 5,  0, 0), // 70
+    PAINTING_VERTEX( 6,  0, 0), // 71
+    PAINTING_VERTEX( 5,  4, 1), // 72
+    PAINTING_VERTEX( 6,  3, 1), // 73
+    PAINTING_VERTEX( 6,  5, 1), // 74
+    PAINTING_VERTEX(12,  5, 0), // 75
+    PAINTING_VERTEX(11,  8, 1), // 76
+    PAINTING_VERTEX(12,  7, 0), // 77
+    PAINTING_VERTEX(11,  6, 1), // 78
+    PAINTING_VERTEX( 9,  8, 1), // 79
+    PAINTING_VERTEX(10,  7, 1), // 80
+    PAINTING_VERTEX( 9,  6, 1), // 81
+    PAINTING_VERTEX( 7,  8, 1), // 82
+    PAINTING_VERTEX( 8,  7, 1), // 83
+    PAINTING_VERTEX( 7,  6, 1), // 84
+    PAINTING_VERTEX( 5,  8, 1), // 85
+    PAINTING_VERTEX( 6,  7, 1), // 86
+    PAINTING_VERTEX( 4, 19, 1), // 87
+    PAINTING_VERTEX( 0, 20, 0), // 88
+    PAINTING_VERTEX( 0, 19, 0), // 89
+    PAINTING_VERTEX( 1, 20, 0), // 90
+    PAINTING_VERTEX( 1, 18, 1), // 91
+    PAINTING_VERTEX( 2, 19, 1), // 92
+    PAINTING_VERTEX( 4, 17, 1), // 93
+    PAINTING_VERTEX( 3, 18, 1), // 94
+    PAINTING_VERTEX( 3, 20, 0), // 95
+    PAINTING_VERTEX( 2, 17, 1), // 96
+    PAINTING_VERTEX( 5, 12, 1), // 97
+    PAINTING_VERTEX( 4, 11, 1), // 98
+    PAINTING_VERTEX( 3, 10, 1), // 99
+    PAINTING_VERTEX( 3, 14, 1), // 100
+    PAINTING_VERTEX( 4, 13, 1), // 101
+    PAINTING_VERTEX( 4, 15, 1), // 102
+    PAINTING_VERTEX( 3, 12, 1), // 103
+    PAINTING_VERTEX( 2, 11, 1), // 104
+    PAINTING_VERTEX( 1, 10, 1), // 105
+    PAINTING_VERTEX( 1, 14, 1), // 106
+    PAINTING_VERTEX( 2, 13, 1), // 107
+    PAINTING_VERTEX( 2, 15, 1), // 108
+    PAINTING_VERTEX( 1, 12, 1), // 109
+    PAINTING_VERTEX( 0, 11, 0), // 110
+    PAINTING_VERTEX( 0, 15, 0), // 111
+    PAINTING_VERTEX( 3, 16, 1), // 112
+    PAINTING_VERTEX( 1, 16, 1), // 113
+    PAINTING_VERTEX( 3,  8, 1), // 114
+    PAINTING_VERTEX( 2,  9, 1), // 115
+    PAINTING_VERTEX( 4,  9, 1), // 116
+    PAINTING_VERTEX( 0,  9, 0), // 117
+    PAINTING_VERTEX( 1,  8, 1), // 118
+    PAINTING_VERTEX( 4,  1, 1), // 119
+    PAINTING_VERTEX( 5,  2, 1), // 120
+    PAINTING_VERTEX( 4,  0, 0), // 121
+    PAINTING_VERTEX( 3,  0, 0), // 122
+    PAINTING_VERTEX( 4,  5, 1), // 123
+    PAINTING_VERTEX( 4,  3, 1), // 124
+    PAINTING_VERTEX( 3,  4, 1), // 125
+    PAINTING_VERTEX( 2,  1, 1), // 126
+    PAINTING_VERTEX( 3,  2, 1), // 127
+    PAINTING_VERTEX( 2,  0, 0), // 128
+    PAINTING_VERTEX( 1,  0, 0), // 129
+    PAINTING_VERTEX( 1,  4, 1), // 130
+    PAINTING_VERTEX( 2,  3, 1), // 131
+    PAINTING_VERTEX( 2,  5, 1), // 132
+    PAINTING_VERTEX( 0,  1, 0), // 133
+    PAINTING_VERTEX( 1,  2, 1), // 134
+    PAINTING_VERTEX( 0,  5, 0), // 135
+    PAINTING_VERTEX( 5,  6, 1), // 136
+    PAINTING_VERTEX( 4,  7, 1), // 137
+    PAINTING_VERTEX( 3,  6, 1), // 138
+    PAINTING_VERTEX( 2,  7, 1), // 139
+    PAINTING_VERTEX( 1,  6, 1), // 140
+    PAINTING_VERTEX( 8, 20, 0), // 141
+    PAINTING_VERTEX(12, 10, 0), // 142
+    PAINTING_VERTEX(12,  9, 0), // 143
+    PAINTING_VERTEX(10, 10, 1), // 144
+    PAINTING_VERTEX( 8, 10, 1), // 145
+    PAINTING_VERTEX( 6, 10, 1), // 146
+    PAINTING_VERTEX( 4, 20, 0), // 147
+    PAINTING_VERTEX( 0, 17, 0), // 148
+    PAINTING_VERTEX( 2, 20, 0), // 149
+    PAINTING_VERTEX( 4, 10, 1), // 150
+    PAINTING_VERTEX( 2, 10, 1), // 151
+    PAINTING_VERTEX( 0, 13, 0), // 152
+    PAINTING_VERTEX( 0, 10, 0), // 153
+    PAINTING_VERTEX( 0,  7, 0), // 154
+    PAINTING_VERTEX( 0,  3, 0), // 155
+    PAINTING_VERTEX( 0,  0, 0), // 156
+};
+
+#undef PDX
+#undef PDY
+#undef PAINTING_VERTEX
+
+// 0x07022660 - 0x07023042
+const PaintingData painting_data_triangles[] = {
+    264, // num triangles
+    // Grouped by 5 + one remainder group,
+    // = 15 vertices per group + a few extra triangles
+
+    // Bottom half
+      60,   59,   52,
+      49,   53,   55,
+      50,   49,   51,
+      51,   49,   55,
+      52,   55,   53,
+      53,   75,   52,
+      54,   55,   59,
+      52,   59,   55,
+      55,   54,   51,
+      54,   59,   62,
+      56,   54,   62,
+      57,   54,   56,
+      54,   57,   51,
+      58,   62,   59,
+      59,   60,   58,
+      68,   73,  120,
+      61,   62,   65,
+      58,   65,   62,
+      62,   61,   56,
+      63,   61,   69,
+      64,   61,   63,
+      61,   65,   69,
+      61,   64,   56,
+      65,   67,   66,
+      66,   69,   65,
+      67,   65,   58,
+      69,   68,   63,
+      66,   73,   69,
+      68,   69,   73,
+      70,   68,  120,
+      71,   68,   70,
+      68,   71,   63,
+      73,   74,   72,
+      72,  120,   73,
+      74,   73,   66,
+      75,   77,   78,
+      52,   75,   78,
+      76,   78,   77,
+      77,  143,   76,
+      76,   80,   78,
+      60,   78,   80,
+      78,   60,   52,
+      83,   46,   82,
+      58,   60,   81,
+      60,   80,   81,
+      80,   47,   79,
+      47,   80,   76,
+      79,   81,   80,
+      79,   83,   81,
+      81,   67,   58,
+      67,   81,   83,
+      66,   67,   84,
+      67,   83,   84,
+      46,   83,   79,
+      82,   84,   83,
+      84,   74,   66,
+      82,   86,   84,
+      74,   84,   86,
+      72,   74,  136,
+      74,   86,  136,
+      86,   48,   85,
+      85,  136,   86,
+      48,   86,   82,
+      25,   46,   79,
+      79,   47,   25,
+      31,   46,  145,
+      46,   25,  145,
+      82,   46,   31,
+      47,   19,  144,
+      25,   47,  144,
+      19,   47,   76,
+      76,  143,  19,
+      19,  143,  142,
+     119,  124,  127,
+      31,   48,   82,
+      85,   48,   37,
+      48,   31,  146,
+      37,   48,  146,
+      72,  124,  120,
+     120,  119,   70,
+     119,  120,  124,
+     122,  119,  127,
+     121,  119,  122,
+     119,  121,   70,
+     130,  134,  131,
+     124,  123,  125,
+     125,  127,  124,
+     123,  124,   72,
+     125,  131,  127,
+     127,  126,  122,
+     126,  127,  131,
+     126,  128,  122,
+     129,  126,  134,
+     128,  126,  129,
+     126,  131,  134,
+     132,  131,  125,
+     131,  132,  130,
+     130,  155,  134,
+     134,  133,  129,
+     133,  134,  155,
+     133,  156,  129,
+     135,  155,  130,
+     136,  123,   72,
+      85,  137,  136,
+     123,  136,  137,
+     125,  123,  138,
+     123,  137,  138,
+     116,  137,   85,
+     137,  116,  114,
+     114,  138,  137,
+     138,  132,  125,
+     132,  138,  139,
+     114,  139,  138,
+     130,  132,  140,
+     132,  139,  140,
+     139,  115,  118,
+     118,  140,  139,
+     115,  139,  114,
+     140,  135,  130,
+     118,  154,  140,
+     135,  140,  154,
+     117,  105,  153,
+     117,  154,  118,
+      99,  115,  114,
+     114,  116,   99,
+     118,  115,  105,
+     115,   99,  151,
+     105,  115,  151,
+      37,  116,   85,
+     116,   37,  150,
+      99,  116,  150,
+     105,  117,  118,
+    // Top half
+       9,    8,   13,
+       0,    1,    2,
+       3,    0,    2,
+       4,    0,    3,
+       5,    2,    6,
+       2,    5,    3,
+       8,    7,   10,
+       7,    8,    9,
+      11,    8,   10,
+      12,    8,   11,
+       8,   12,   13,
+      13,   14,    9,
+      14,  141,    9,
+       5,    6,   15,
+       5,   16,    3,
+      16,    5,   17,
+      17,    5,   15,
+      14,   15,  141,
+      15,   14,   17,
+      18,   14,   13,
+      14,   18,   17,
+      19,  142,   20,
+      19,   20,   23,
+      28,   27,   21,
+      22,   41,   21,
+      21,   23,   22,
+      20,   22,   23,
+      23,   24,   19,
+      21,   27,   23,
+      24,   23,   27,
+      19,   24,  144,
+      25,  144,   24,
+      25,   24,   30,
+      24,   27,   30,
+      26,   30,   27,
+      27,   28,   26,
+      31,   36,  146,
+      26,   34,   30,
+      30,   29,   25,
+      29,   30,   34,
+      25,   29,  145,
+      31,  145,   29,
+      31,   29,   35,
+      29,   34,   35,
+      32,   34,   26,
+      33,   35,   34,
+      34,   32,   33,
+      35,   36,   31,
+      33,   38,   35,
+      36,   35,   38,
+      37,   36,   97,
+      36,   38,   97,
+      37,  146,   36,
+      28,   16,   43,
+      39,   97,   38,
+      38,   40,   39,
+      40,   38,   33,
+      21,   41,   42,
+      41,    4,   42,
+       3,   42,    4,
+      42,   28,   21,
+      28,   42,   16,
+       3,   16,   42,
+      26,   28,   43,
+      17,   43,   16,
+      43,   32,   26,
+      32,   43,   18,
+      17,   18,   43,
+      33,   32,   44,
+      32,   18,   44,
+      13,   44,   18,
+      13,   12,   44,
+      44,   40,   33,
+      40,   44,   12,
+      39,   40,   45,
+      40,   12,   45,
+      11,   45,   12,
+      10,   87,   11,
+      87,   10,  147,
+      88,   89,   90,
+      90,   89,   91,
+      89,  148,   91,
+      92,  149,   90,
+      91,   92,   90,
+      98,   97,  101,
+      87,   93,   11,
+      94,   87,   95,
+      93,   87,   94,
+      87,  147,   95,
+      95,   92,   94,
+      92,   95,  149,
+      92,   96,   94,
+      96,   92,   91,
+      39,  101,   97,
+      97,   98,   37,
+      99,   98,  103,
+      98,  101,  103,
+      99,  150,   98,
+      37,   98,  150,
+     102,  101,   39,
+     101,  102,  100,
+     100,  103,  101,
+     103,  104,   99,
+     104,  103,  107,
+     100,  107,  103,
+     104,  107,  109,
+      99,  104,  151,
+     105,  151,  104,
+     105,  104,  109,
+      45,  102,   39,
+     108,  107,  100,
+     107,  108,  106,
+     106,  109,  107,
+     110,  109,  152,
+     109,  110,  105,
+     106,  152,  109,
+     105,  110,  153,
+     111,  152,  106,
+      11,   93,   45,
+     102,   45,   93,
+     102,   93,  112,
+     100,  102,  112,
+      94,  112,   93,
+      94,   96,  112,
+     108,  112,   96,
+     112,  108,  100,
+     108,   96,  113,
+     106,  108,  113,
+      91,  113,   96,
+     111,  113,  148,
+      91,  148,  113,
+     113,  111,  106,
+};

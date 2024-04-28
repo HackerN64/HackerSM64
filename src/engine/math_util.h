@@ -651,6 +651,10 @@ ALWAYS_INLINE void mtxf_to_mtx(void *dest, void *src) {
 
 void mtxf_rotate_xy(Mtx *mtx, s16 angle);
 
+// Local/World pos conversions
+void vec3f_local_pos_to_world_pos(Vec3f destWorldPos, Vec3f srcLocalPos, Vec3f originPos, Vec3s rotation);
+void vec3f_world_pos_to_local_pos(Vec3f destLocalPos, Vec3f srcWorldPos, Vec3f originPos, Vec3s rotation);
+
 s16 approach_s16(s16 current, s16 target, s16 inc, s16 dec);
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec);
 f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec);

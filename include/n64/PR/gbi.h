@@ -1861,6 +1861,7 @@ typedef union {
 /*
  * Macros to assemble the graphics display list
  */
+#define SIZEOF_GFX_CMD(_cmd) sizeof((Gfx[]){gs##_cmd})
 
 /*
  * DMA macros

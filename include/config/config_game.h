@@ -7,7 +7,7 @@
 /**
  * Enables some mechanics that change behavior depending on hardcoded level numbers.
  * TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic.
-*/
+ */
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
 /**

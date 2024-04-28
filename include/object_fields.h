@@ -1255,6 +1255,15 @@
 #define /*0x0FC*/ oYoshiChosenHome OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
 
+/* Painting */
+#define /*0x0F4*/ oPaintingImage                OBJECT_FIELD_CVPTR(0x1B)
+#define /*0x0F8*/ oPaintingRippleAnimation      OBJECT_FIELD_CVPTR(0x1C)
+#define /*0x0FC*/ oPaintingCurrRippleMag        OBJECT_FIELD_F32(0x1D)
+#define /*0x100*/ oPaintingRipplePosX           OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oPaintingRipplePosY           OBJECT_FIELD_F32(0x1F)
+#define /*0x108*/ oPaintingRippleTimer          OBJECT_FIELD_S32(0x20)
+#define /*0x10C*/ oPaintingStoredAction         OBJECT_FIELD_S32(0x21)
+
 
 /*Custom general defines:
 

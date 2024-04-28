@@ -83,8 +83,6 @@ const GeoLayout hmc_geo_000748[] = {
    GEO_NODE_START(),
    GEO_OPEN_NODE(),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07020FD0),
-      GEO_ASM(0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(0, 0), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -246,8 +244,6 @@ const GeoLayout hmc_geo_000A88[] = {
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_0701F818),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701FD58),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07020FD0),
-      GEO_ASM(   0, geo_painting_update),
-      GEO_ASM(   PAINTING_ID(0, 0), geo_painting_draw),
       GEO_ASM(   0, geo_movtex_pause_control),
       GEO_ASM(HMC_MOVTEX_DORRIE_POOL_WATER, geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),

@@ -114,7 +114,7 @@ enum SaveProgressFlags {
     SAVE_FLAG_HAVE_KEY_2             = (1 <<  5), /* 0x00000020 */
     SAVE_FLAG_UNLOCKED_BASEMENT_DOOR = (1 <<  6), /* 0x00000040 */
     SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR = (1 <<  7), /* 0x00000080 */
-    SAVE_FLAG_DDD_MOVED_BACK         = (1 <<  8), /* 0x00000100 */
+    SAVE_FLAG_UNUSED_8               = (1 <<  8), /* 0x00000100 */
     SAVE_FLAG_MOAT_DRAINED           = (1 <<  9), /* 0x00000200 */
     SAVE_FLAG_UNLOCKED_PSS_DOOR      = (1 << 10), /* 0x00000400 */
     SAVE_FLAG_UNLOCKED_WF_DOOR       = (1 << 11), /* 0x00000800 */
