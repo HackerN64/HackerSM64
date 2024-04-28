@@ -124,7 +124,7 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         .reverbMultsL = sReverbMultsArr[1], // Ignored with lightweight settings
         .reverbMultsR = sReverbMultsArr[2], // Ignored with lightweight settings
     },
-    { /* Preset 2 - Sample Emulator Configuration (RCVI Hack or Emulator CPU Overclocking Required!) */
+    { /* Preset 2 - Sample Emulator Configuration (Emulator CPU Overclocking Required!) */
         .useLightweightSettings = FALSE,
         .downsampleRate = 1,
         .isMono = FALSE,

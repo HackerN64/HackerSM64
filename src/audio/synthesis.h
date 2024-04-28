@@ -35,8 +35,7 @@ enum ChannelIndexes {
 
 // Minimum size requirement determined by ((all delaysL and delaysR values) / (2 ^ (downsampleRate - 1)) * sizeof(s16) + BETTER_REVERB_PTR_SIZE).
 // The default value can be increased or decreased in conjunction with the values in delaysL/R.
-// This can be significantly decreased if a downsample rate of 1 is not being used or if filter count is less than NUM_ALLPASS,
-// as this default is configured to handle the emulator RCVI settings.
+// This can be significantly decreased if a downsample rate of 1 is not being used or if filter count is less than NUM_ALLPASS.
 #define BETTER_REVERB_SIZE ALIGN16(0xEDE0 + BETTER_REVERB_PTR_SIZE)
 
 
