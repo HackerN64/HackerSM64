@@ -336,15 +336,13 @@ static size_t cs_print_from_buffer(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t 
  * @param[in] bufferCount The total number of chars in the string after formatting.
  * @param[in] charLimit   The maximum number of chars to print.
  */
-static void cs_scroll_buffer(size_t bufferCount, size_t charLimit) {
+static void cs_scroll_buffer(size_t bufferCount, size_t charLimit, u32 scrollSpeed) {
     if (charLimit > (CS_SCROLL_BUFFER_SIZE - 1)) {
         charLimit = (CS_SCROLL_BUFFER_SIZE - 1);
     }
     bzero(&gCSScrollBuffer, sizeof(gCSScrollBuffer));
 
-    // Floats are used here to prevent overflow from directly multiplying gCSFrameCounter.
-    f32 scrollSpeed = ((f32)cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_PRINT_SCROLL_SPEED) / (f32)CRASH_SCREEN_LETTER_WIDTH);
-    const size_t offset = ((u32)((f32)gCSFrameCounter * (f32)scrollSpeed) / CRASH_SCREEN_LETTER_WIDTH);
+    const size_t offset = (scrollSpeed / CRASH_SCREEN_LETTER_WIDTH);
     const size_t size = (bufferCount + TEXT_SCROLL_NUM_SPACES);
 
     PrintBuffer* bufChar = &gCSScrollBuffer[0];
@@ -404,10 +402,10 @@ size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, con
                 // Print an extra character when scrolling to overlap the end of the scissor box.
                 extraChar = 1;
                 charLimit += extraChar;
-                cs_scroll_buffer(phase1FormattedSize, charLimit);
                 // Floats are used here to prevent overflow from directly multiplying gCSFrameCounter.
-                f32 scrollSpeed = ((f32)scrollSpeedSetting / (f32)CRASH_SCREEN_LETTER_WIDTH);
-                tx -= ((u32)((f32)gCSFrameCounter * (f32)scrollSpeed) % CRASH_SCREEN_LETTER_WIDTH);
+                u32 scrollSpeed = ((f32)gCSFrameCounter * ((f32)scrollSpeedSetting / (f32)CRASH_SCREEN_LETTER_WIDTH));
+                cs_scroll_buffer(phase1FormattedSize, charLimit, scrollSpeed);
+                tx -= (scrollSpeed % CRASH_SCREEN_LETTER_WIDTH);
             }
 
             phase1FormattedSize = charLimit;
