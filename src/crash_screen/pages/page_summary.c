@@ -173,13 +173,6 @@ void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, Reg
     CS_SET_DEFAULT_PRINT_COLOR_END();
 }
 
-enum CrashTypes {
-    CRASH_TYPE_DEFAULT,
-    CRASH_TYPE_ASSERT,
-    CRASH_TYPE_IPC,
-    CRASH_TYPE_II,
-};
-
 void draw_centered_title_text(CSTextCoord_u32 line, const char* text) {
     const CSTextCoord_s32 centerX = (CRASH_SCREEN_NUM_CHARS_X / 2);
     CSTextCoord_u32 len = strlen(text);
@@ -245,7 +238,12 @@ void page_summary_draw(void) {
     const char* destFname = NULL;
     const char* insnAsStr = NULL;
 
-    enum CrashTypes crashType = CRASH_TYPE_DEFAULT;
+    enum CrashTypes {
+        CRASH_TYPE_DEFAULT,
+        CRASH_TYPE_ASSERT,
+        CRASH_TYPE_IPC,
+        CRASH_TYPE_II,
+    } crashType = CRASH_TYPE_DEFAULT;
 
     if ((cause == EXC_SYSCALL) && (tc->pc == ADDR_INSN_ASSERT)) { // Crash is an assert.
         crashType = CRASH_TYPE_ASSERT;
@@ -304,16 +302,7 @@ void page_summary_draw(void) {
         }
     }
 
-    CSTextCoord_u32 endLine = (CRASH_SCREEN_NUM_CHARS_Y - 2);
-
-    if (gLastCSSelectedAddress) {
-        cs_print(TEXT_X(0), TEXT_Y(endLine - 1), "LAST SELECTED: %08X", gLastCSSelectedAddress);
-    }
-    cs_draw_divider(DIVIDER_Y(endLine));
-    cs_print(TEXT_X(0), TEXT_Y(endLine),
-        STR_COLOR_PREFIX"see other pages with <"STR_L"|"STR_R"> for more info\npress [%s] for page-specific controls",
-        COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
-    );
+    cs_draw_footer_instructions(TRUE);
 }
 
 void page_summary_input(void) {

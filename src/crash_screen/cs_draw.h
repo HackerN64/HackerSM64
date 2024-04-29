@@ -167,6 +167,7 @@ typedef union CSCustom5x5Glyph {
 void cs_draw_custom_5x5_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, CSCustom5x5Glyph glyph, RGBA32 color);
 // RGBA32 cs_thread_draw_highlight(OSThread* thread, ScreenCoord_u32 y);
 RGBA32 cs_draw_thread_state_icon(ScreenCoord_u32 x, ScreenCoord_u32 y, OSThread* thread);
+void cs_draw_footer_instructions(_Bool showPressStart);
 void cs_draw_main(void);
 
 

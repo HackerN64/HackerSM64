@@ -44,11 +44,14 @@ Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen 
  * @brief Reinitialize the crash screen's global variables, settings, buffers, etc.
  */
 static void cs_reinitialize(void) {
-    _Bool wasAssert = (gCrashedThread->context.cause == EXC_SYSCALL);
+    _Bool wasAssert = (((gCrashedThread != NULL) && (gCrashedThread->context.cause == EXC_SYSCALL)));
 
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
     if (!sFirstCrash) {// && !wasAssert) {
-        cs_get_current_page()->flags.crashed = TRUE;
+        CSPage* page = cs_get_current_page();
+        if (page != NULL) {
+            page->flags.crashed = TRUE;
+        }
     }
 
     if (sFirstCrash || wasAssert) {
@@ -154,7 +157,10 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 #endif // INCLUDE_DEBUG_MAP
 
 #ifdef UNF
-        cs_os_print_page(cs_get_current_page());
+        CSPage* page = cs_get_current_page();
+        if (page != NULL) {
+            cs_os_print_page(page);
+        }
 #endif // UNF
     }
 

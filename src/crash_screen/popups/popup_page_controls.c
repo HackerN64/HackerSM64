@@ -14,19 +14,11 @@
 #include "popup_page_controls.h"
 
 
-// Controls popup box draw function.
-//! TODO: Allow changing page-specific settings from here.
-void cs_popup_controls_draw(void) {
-    const ScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
-    const ScreenCoord_s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
-    const ScreenCoord_s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
-    const ScreenCoord_s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
-    cs_draw_dark_rect(
-        bgStartX, bgStartY,
-        bgW, bgH,
-        cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_POPUP_OPACITY)
-    );
+void cs_popup_controls_draw_list(void) {
     CSPage* page = cs_get_current_page();
+    if (page == NULL) {
+        return;
+    }
 
     // "[page name] PAGE CONTROLS"
     cs_print(TEXT_X(1), TEXT_Y(1), STR_COLOR_PREFIX"%s PAGE CONTROLS", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
@@ -46,6 +38,23 @@ void cs_popup_controls_draw(void) {
             line += 2;
         }
     }
+}
+
+
+// Controls popup box draw function.
+//! TODO: Allow changing page-specific settings from here.
+void cs_popup_controls_draw(void) {
+    const ScreenCoord_s32 bgStartX = (CRASH_SCREEN_X1 + (TEXT_WIDTH(1) / 2));
+    const ScreenCoord_s32 bgStartY = (CRASH_SCREEN_Y1 + (TEXT_HEIGHT(1) / 2));
+    const ScreenCoord_s32 bgW = (CRASH_SCREEN_W - TEXT_WIDTH(1));
+    const ScreenCoord_s32 bgH = (CRASH_SCREEN_H - TEXT_HEIGHT(1));
+    cs_draw_dark_rect(
+        bgStartX, bgStartY,
+        bgW, bgH,
+        cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_POPUP_OPACITY)
+    );
+
+    cs_popup_controls_draw_list();
 
     cs_draw_outline(bgStartX, bgStartY, bgW, bgH, COLOR_RGBA32_CRASH_DIVIDER);
 

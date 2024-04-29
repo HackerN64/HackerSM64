@@ -480,7 +480,10 @@ CSTextCoord_u32 cs_page_header_draw(void) {
     CSTextCoord_u32 line = 0;
 
     CSPage* page = cs_get_current_page();
-    cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
+
+    if (page != NULL) {
+        cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s", COLOR_RGBA32_CRASH_PAGE_NAME, page->name);
+    }
 
     // "<Page:##>"
     cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("<Page:##>")), TEXT_Y(line),
@@ -530,6 +533,25 @@ void cs_draw_LR_triangles(void) {
     cs_reset_scissor_box();
 }
 
+void cs_draw_footer_instructions(_Bool showPressStart) {
+    CSTextCoord_u32 line = (CRASH_SCREEN_NUM_CHARS_Y - (1 + showPressStart));
+
+    if (gLastCSSelectedAddress) {
+        cs_print(TEXT_X(0), TEXT_Y(line - 1), "LAST SELECTED: %08X", gLastCSSelectedAddress);
+    }
+    cs_draw_divider(DIVIDER_Y(line));
+    cs_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"see other pages with <"STR_L"|"STR_R"> for more info",
+        COLOR_RGBA32_CRASH_HEADER
+    );
+    if (showPressStart) {
+        cs_print(TEXT_X(0), TEXT_Y(line + 1),
+            STR_COLOR_PREFIX"press [%s] for page-specific controls",
+            COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
+        );
+    }
+}
+
 u32 gCSFrameCounter = 0;
 
 // Crash screen main draw function.
@@ -561,18 +583,21 @@ void cs_draw_main(void) {
         CSTextCoord_u32 line = cs_page_header_draw();
 
         CSPage* page = cs_get_current_page();
-
-        // Run the page-specific draw function.
-        if (page->drawFunc == NULL) {
-            cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
-                COLOR_RGBA32_CRASH_PAGE_NAME, "THIS PAGE DOESN'T EXIST"
-            );
-        } else if (page->flags.crashed) {
-            cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
-                COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED\n\nPRESS A+B+START TO ATTEMPT TO REVIVE PAGE"
-            );
-        } else {
-            page->drawFunc();
+        if (page != NULL) {
+            // Run the page-specific draw function.
+            if (page->drawFunc == NULL) {
+                cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
+                    COLOR_RGBA32_CRASH_PAGE_NAME, "THIS PAGE DOESN'T EXIST"
+                );
+                cs_draw_footer_instructions(FALSE);
+            } else if (page->flags.crashed) {
+                cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"%s",
+                    COLOR_RGBA32_CRASH_AT, "THIS PAGE HAS CRASHED\n\nPRESS A+B+START TO ATTEMPT TO REVIVE PAGE"
+                );
+                cs_draw_footer_instructions(FALSE);
+            } else {
+                page->drawFunc();
+            }
         }
 
         cs_draw_divider(DIVIDER_Y(line));

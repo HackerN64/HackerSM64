@@ -73,7 +73,7 @@ void cs_set_page(enum CSPages pageID) {
  * @return CSPage* A pointer to the current page's info.
  */
 CSPage* cs_get_current_page(void) {
-    return gCSPages[gCSPageID];
+    return (FITS_IN_ARRAY(gCSPageID, gCSPages) ? gCSPages[gCSPageID] : NULL);
 }
 
 /**
@@ -110,8 +110,9 @@ void cs_open_popup(enum CSPopups popupID) {
         gCSPopupID = popupID;
         gCSSwitchedPopup = TRUE;
         if (gCSPopupID != CS_POPUP_NONE) {
-            if (gCSPopups[gCSPopupID]->initFunc != NULL) {
-                gCSPopups[gCSPopupID]->initFunc();
+            CSPopup* popup = gCSPopups[gCSPopupID];
+            if (popup->initFunc != NULL) {
+                popup->initFunc();
             }
         }
     }
