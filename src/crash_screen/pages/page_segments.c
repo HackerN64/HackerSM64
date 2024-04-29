@@ -67,7 +67,7 @@ void draw_segments_list(CSTextCoord_u32 line) {
         cs_draw_divider_translucent(DIVIDER_Y(line + row));
 
         Address start = (uintptr_t)get_segment_base_addr(currIndex);
-        Address end = (start + get_segment_size(currIndex));
+        size_t size = get_segment_size(currIndex);
         Address romStart = sSegmentROMTable[currIndex];
         _Bool isLoaded = (romStart != (Address)NULL);
 
@@ -75,7 +75,7 @@ void draw_segments_list(CSTextCoord_u32 line) {
         CSTextCoord_u32 textEnd = CRASH_SCREEN_NUM_CHARS_X;
         if (showAddresses && isLoaded) {
             textEnd -= STRLEN("00000000-00000000");
-            cs_print(TEXT_X(textEnd), y, STR_HEX_WORD"-"STR_HEX_WORD, start, end);
+            cs_print(TEXT_X(textEnd), y, (STR_HEX_WORD" "STR_COLOR_PREFIX STR_HEX_WORD), start, COLOR_RGBA32_CRASH_HEADER, romStart);
         }
         const RGBA32 segColor = COLOR_RGBA32_LIGHT_CYAN;
         CSTextCoord_u32 textStart = cs_print(TEXT_X(0), y, STR_COLOR_PREFIX"seg%02d:", segColor, currIndex);
@@ -90,7 +90,7 @@ void draw_segments_list(CSTextCoord_u32 line) {
             cs_print_scroll(TEXT_X(1 + romStrStart), y, (textEnd - (1 + romStrStart)), STR_COLOR_PREFIX"%s",
                 romColor, get_segment_sub_name(currIndex)
             );
-            cs_print(TEXT_X(textEnd + 5), y, (STR_COLOR_PREFIX"rom:"STR_HEX_WORD), COLOR_RGBA32_CRASH_HEADER, romStart);
+            cs_print(TEXT_X(textEnd + 4), y, (STR_COLOR_PREFIX"size:"STR_HEX_PREFIX"%X"), COLOR_RGBA32_GRAY, size);
         } else {
             cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"unloaded", COLOR_RGBA32_GRAY);
         }
@@ -105,7 +105,7 @@ void page_segments_draw(void) {
     cs_print(TEXT_X(0), TEXT_Y(line), STR_COLOR_PREFIX"ID:", COLOR_RGBA32_LIGHT_CYAN);
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_SEGMENTS, CS_OPT_SEGMENTS_SHOW_ADDRESSES)) {
         // cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("START-00000000")), TEXT_Y(line), STR_COLOR_PREFIX"START-END:", COLOR_RGBA32_CRASH_HEADER);
-        cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("00000000-00000000")), TEXT_Y(line), STR_COLOR_PREFIX"LOCATION:", COLOR_RGBA32_CRASH_HEADER);
+        cs_print(TEXT_X(CRASH_SCREEN_NUM_CHARS_X - STRLEN("00000000 00000000")), TEXT_Y(line), "RAM:     "STR_COLOR_PREFIX"ROM:", COLOR_RGBA32_CRASH_HEADER);
     }
     line++;
 
