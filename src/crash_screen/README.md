@@ -94,7 +94,6 @@ TODO: more/update documentation
 <p>
 
 ### General
-- **Fix the flickering on Ares (and some other emulators) if possible.**
 - **Fix .rodata symbols not appearing in debug map.**
 - **Find out why `break` and `coprocessor unusable` exceptions don't trigger the crash screen**
   - Find out if any other exceptions have the same issue
@@ -103,9 +102,9 @@ TODO: more/update documentation
     - DMA to end of RAM right before Goddard.
     - Same place as map data.
     - Determine crash screen code/data size (like goddard.txt and debug_map.txt).
+    - Can it be DMAd to a framebuffer? The crash screen works double buffered.
   - Simplified crash screen (for HLE? or if DMA fails?).
   - Ifdef the entire crash screen?
-- 
 - RSP crash screen (see libdragon).
 - Finish and clean up exception macros in `asm.h`.
 - Move all inline asm stuff (eg. math_util.h) to `asm.h`/`asm.c`?
@@ -116,59 +115,92 @@ TODO: more/update documentation
 - Ability to undo address select and disasm jumps?
 - Controls rebinding page (necessary?)
   - Or just preset controls modes in settings?
-- Should assert macros be uppercase or lowercase?
-- Horizontal text scrolling should actually scroll by pixels rather than scrolling the char buffer.
-  - Use scissor box?
 - Implement global grid system for selection cursor stuff (currently only exists on Thread Registers page).
-- Better UNF print combo?
 - Better page revive combo?
   - Should it just be a selection on the crashed page?
   - Currently `A+B+START`
 - Better page select popup combo?
   - Currently `L+R`
-- Write draw commands to a buffer then read them all at once instead of drawing directly?
-  - 64-bit command entries
-  - 1024 commands
-  - 0x2000 bytes total
 - Improve or remove WRAP macro.
 - Is the stuff with `$(CRASH_TEXTURE_C_FILES)` in the makefile necessary?
 - On a crash screen crash, should the new crash screen automatically return to the previous position debugging the crashed game thread instead of inspecting the first crash screen thread?
+- Draw multiple pixels at a time (eg. RGBA16FILL).
+- Makefile rule or config define (possible?) for whether to include non-virtual symbols
+  - eg. behavior and displaylist names
+- "...ID" vs. "...Id" naming discrepancy
+- Show data preview in address select (same as reginspect).
+- Should FORCE_CRASH_AT_PTR only set the initial selected address and not the actual crash address?
+#### Refactoring
 - Should cs_print/cs_draw be in util folder?
 - Move print specific stuff out of util files.
-- Draw multiple pixels at a time (eg. RGBA32FILL).
+- Include `os_convert.h` in crash_main.h and move the framerate defines/macros to it.
+#### UNF
 - Update UNF to match pages.
-- Makefile rule or config define (possible?) for whether to include non-virtual symbols
-  - eg. behavior names
-### Summary page
-- Show cond bit from `fpcsr` if pc is c.cond? Or does a crash happen before that is set?
+- Better UNF print combo?
+- Combine cs_print and unf print layout funcs.
+- Find out why UNF print is constantly desyncing (not crash screen related).
+#### Crash screen crashes
+- On a crash screen crash, disable specific components instead of the whole page
+  Especially on the Summary page
+- The next crash screen checks for timeout of prev (handle infinite loop crashes).
+#### Rendering
+- **Fix the flickering on Ares (and some other emulators) if possible.**
+- Does double framebuffer mode have any input lag?
+#### Debug map
+
+#### Asserts
+- Should assert macros be uppercase or lowercase?
 - More special crash/assert handling:
   - RCP hang/Null SPTask.
     - Mention the need to restart console when this happens.
     - `rcp` thread register and other interface registers.
   - Object (eg. bank overflow).
-    - (show bhv of the object that attempted to spawn).
+    - (show bhv of the object that attempted to spawn or gCurrentObject).
   - Stack overflow.
   - Audio
     - Show AI registers?
   - Crash screen
     - Crashed page number and name
     - Selection cursor location
+- More asserts for common crashes
+  - `geo_process_animated_part`
+  - `geo_process_node_and_siblings`
+  - NULL Mario floor
+- In `ASSERTF`/`ERRORF`, automatically create static buffer using `sizeof(the const string)`
+  - Could help bypass cs_print buffer limit?
+- Fix asserts expanding macros in condition string.
+  - eg. NULL being printed as (void *)0
+- If assert is too long, split buffer and print on the next line.
+- Should `__func__` be reverted to getting the actual address + symbol?
+  - Can this be done via the stack instead of inline asm?
+  - Use for summary page print/jump.
+- `check_stack_validity` for other thread stacks (loop through entire thread queue).
+### Summary page
+- Show cond bit from `fpcsr` if pc is c.cond? Or does a crash happen before that is set?
 - Select section to go to the relevant page.
 - `0x` prefix for Unimplemented instructions.
 - Separate registers from insn again.
 - Finalize layout.
 - If `pc` is invalid, use the next function in the stack.
 - Check for f64 denorms/NaN.
-- Fix asserts expanding macros in condition string.
-  - eg. NULL being printed as (void *)0
+- "Likely NULL pointer dereference" if badvaddr is not actually 0 but still < 128
+	Check disasm registers for NULL sureAddress to make sure it's a NULL pointer for more accuracy
+- Skip printing duplicate saved registers.
+- Show register data as ASCII.
 ### Stack trace page
 - Use Libdragon's better stack trace functionality.
+- Can stack trace be printed without a buffer?
 - Make it clearer that the stack is thread-specific (show thread name on page?)
 ### Thread Registers page
 - Extended version with a scrollable list of all registers and their full 64 bit contents (Everything from [here](https://n64.readthedocs.io/index.html) plus any other CPU/RCP registers). Thread registers on top (old context page) then all registers if scroll down.
-- Reginspect:
+#### Threads
+- Can thread entries fit on one line while still being readable?
+- Find out what the extra libultra thread is that only appears when UNF is on.
+- Get thread name from map symbol of thread pointer?
+- Color for "#th.found" text.
+#### Reginspect
   - Scrollable for more data.
-  - Status register interrupt bits.
+  - Status register individual interrupt bits.
   - Show upper/odd bits of float registers separately.
   - `A: GO TO` text if valid pointer.
   - If pointer, print the entire symbol?
@@ -193,6 +225,8 @@ TODO: more/update documentation
 - Highlight registers used in the instruction at `pc`.
   - Including `pc` itself?
 - Move bit info arrays to the register souce's respective .inc.c files.
+- Show "N/A" for registers without a corresponding thread register instead of falling back on direct access.
+- Show register data as ASCII.
 ### Disasm page
 - **Fix cursor passing the bottom of the screen when inline symbol headers are on.**
 - Show addresses for each row (setting).
@@ -207,10 +241,19 @@ TODO: more/update documentation
 - Detect which segments are currently loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
   - Entry in text segment address range array?
 - Print unknowns as binary should work on unimpl too.
+- Automatically detect symbol change to reset/refill branch arrows?
+- Segment name to the right of range at the top?
+- Show offset/total of symbol.
+- Non-symbol in .text segment and `NOP` prints "function alignment".
 ### Memory view page
 - Press and hold to select multiple bytes?
 - Is search functionality possible/reasonable?
 - Highlight stuff like `$sp` location
+- Should the cursor wrap horizontally?
+- Segment name to the right of range at the top?
+- Move segments page to be a submenu of this page.
+- Show offset/total of symbol.
+- Non-symbol in .text segment and `NOP` prints "function alignment".
 ### Map view page
 - Should moving the cursor location here also change the location in ram view and disasm?
 - Jumping to an address that's not in a symbol should find the nearest symbol index and jump to there.
@@ -219,13 +262,13 @@ TODO: more/update documentation
 - Determine segment/linker data type from map data?
 - Is search functionality possible/reasonable?
 ### Segments page
-- Show base + size instead of range.
-  - Both rom and ram size? (for compressed data)
+- Show both rom and ram size? (for compressed data)
 - Show hardcoded segments:
+  - Main/engine/boot
   - Goddard
-  - Crash screen
+  - Crash screen/mapData
   - framebuffers/zbuffer/buffers
-  - Boot
+  - Various pools
 - Move to be a submenu on memory page?
 ### Interface registers page
 - Combine with thread registers page?
@@ -255,6 +298,12 @@ TODO: more/update documentation
 - Can this work without a buffer for shown entries like the threads page?
 - Low vs. High resolution setting.
 - Physical vs. Virtual address setting?
+- Dropdowns for settings with enum values?
+- Draw boolean settings as checkboxes?
+- Fix/remove redundant/shared settings (mostly map symbol related).
+- Print without buffer?
+- Setting for staying on the same page on crash.
+- Setting for staying on the same inspected thread on crash.
 ### About page
 - Can this work without a buffer for shown entries like the threads page?
   - Info uses a text buffer

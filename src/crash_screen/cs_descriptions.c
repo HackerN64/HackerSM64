@@ -209,10 +209,7 @@ static const char* sLevelNames[] = {
     [LEVEL_LEVEL_SELECT] = "level_select",
 };
 const char* get_level_name(enum LevelNum levelNum) {
-    if (levelNum < LEVEL_NONE) {
-        return "restart_game";
-    }
-    return ((levelNum < ARRAY_COUNT(sLevelNames)) ? sLevelNames[levelNum] : "");
+    return ((FITS_IN_ARRAY(levelNum, sLevelNames) && (sLevelNames[levelNum] != NULL)) ? sLevelNames[levelNum] : "");
 }
 
 

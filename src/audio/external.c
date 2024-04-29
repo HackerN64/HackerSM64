@@ -1688,6 +1688,11 @@ void process_level_music_dynamics(void) {
     s16 dur1, dur2;
     u16 bit;
 
+    DEBUG_ASSERT(
+        (FITS_IN_ARRAY(gCurrLevelNum, sLevelDynamics) && (sLevelDynamics[gCurrLevelNum] != NULL)),
+        ASSERT_PREFIX_LEVEL"Invalid level for music dynamics!"
+    );
+
     func_8031F96C(0);
     func_8031F96C(2);
     func_80320ED8();

@@ -347,8 +347,13 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
     set_mario_initial_cap_powerup(m);
 }
 
+extern const char* get_warp_node_name(const enum WarpNodes id);
+
 void init_mario_after_warp(void) {
     struct ObjectWarpNode *spawnNode = area_get_warp_node(sWarpDest.nodeId);
+    DEBUG_ASSERTF((spawnNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find destination warp node!\nNode ID: 0x%02X %s",
+        sWarpDest.nodeId, get_warp_node_name(sWarpDest.nodeId)
+    );
     u32 marioSpawnType = get_mario_spawn_type(spawnNode->object);
 
     if (gMarioState->action != ACT_UNINITIALIZED) {
@@ -569,6 +574,9 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
+    DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
+        arg, get_warp_node_name(arg)
+    );
     s16 levelNum = (warpNode->node.destLevel & 0x7F);
     s16 destArea = warpNode->node.destArea;
     s16 unchanged = TRUE;
@@ -765,7 +773,7 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 #else
                         sSourceWarpNodeId = WARP_NODE_DEATH;
 #endif
-                    }                    
+                    }
                 }
 
                 sDelayedWarpTimer = 20;
@@ -894,6 +902,9 @@ void initiate_delayed_warp(void) {
 
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
+                    DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
+                        sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId)
+                    );
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);

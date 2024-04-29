@@ -14,6 +14,7 @@
 #define typeof_member(_T, _m) typeof(member(_T, _m))
 
 #define ARRAY_COUNT(_arr) (s32)(sizeof(_arr) / sizeof(_arr[0]))
+#define FITS_IN_ARRAY(_x, _arr) (((_x) >= 0) && ((_x) < ARRAY_COUNT(_arr)))
 
 #define BITS_PER_BYTE   __CHAR_BIT__
 #define BITS_PER_HEX    4

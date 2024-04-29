@@ -137,7 +137,7 @@ CSTextCoord_u32 cs_draw_assert(CSTextCoord_u32 line) {
                 //! TODO: Other RCP registers.
                 cs_print(x, TEXT_Y(line), "DPC:\t0x%08X in 0x%08X-0x%08X\nSTAT:\tdp:0x%04X\tsp:0x%04X\nSP DMA:\tfull:%X busy:%X",
                     IO_READ(DPC_CURRENT_REG), IO_READ(DPC_START_REG), IO_READ(DPC_END_REG),
-                    IO_READ(DPC_STATUS_REG), IO_READ(SP_STATUS_REG),
+                    IO_READ(DPC_STATUS_REG ), IO_READ(SP_STATUS_REG),
                     IO_READ(SP_DMA_FULL_REG), IO_READ(SP_DMA_BUSY_REG)
                 );
                 break;

@@ -162,10 +162,6 @@ struct ObjectWarpNode *area_get_warp_node(u8 id) {
         }
     }
 
-    DEBUG_ASSERTF((node != NULL), ASSERT_PREFIX_LEVEL"Couldn't find warp node!\nNode ID: 0x%02X %s",
-        id, get_warp_node_name(id)
-    );
-
     return node;
 }
 
