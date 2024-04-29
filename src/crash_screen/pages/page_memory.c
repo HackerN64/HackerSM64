@@ -143,7 +143,6 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
             x += 2;
 
-            // _Bool isSymbol = FALSE;
             const MapSymbol* destSymbol = NULL;
             if (IS_DEBUG_MAP_ENABLED() && (mode == MEMORY_MODE_SYMBOL)) {
                 destSymbol = get_map_symbol(data.word, SYMBOL_SEARCH_BINARY);

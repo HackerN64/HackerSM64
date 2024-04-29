@@ -96,27 +96,30 @@ TODO: more/update documentation
 ### General
 - **Fix the flickering on Ares (and some other emulators) if possible.**
 - **Fix .rodata symbols not appearing in debug map.**
-- Don't have all crash screen code always loaded.
+- **Find out why `break` and `coprocessor unusable` exceptions don't trigger the crash screen**
+  - Find out if any other exceptions have the same issue
+- **Don't have all crash screen code always loaded.**
   - Keep in its own segment then DMA it on crash?.
     - DMA to end of RAM right before Goddard.
     - Same place as map data.
     - Determine crash screen code/data size (like goddard.txt and debug_map.txt).
   - Simplified crash screen (for HLE? or if DMA fails?).
   - Ifdef the entire crash screen?
+- 
+- RSP crash screen (see libdragon).
 - Finish and clean up exception macros in `asm.h`.
 - Move all inline asm stuff (eg. math_util.h) to `asm.h`/`asm.c`?
 - Clean up `INCLUDE_DEBUG_MAP` ifdefs as much as possible.
 - Verify whether `osWritebackDCacheAll()` usage is correct.
 - Make the controls list in the popup scrollable if too long.
-- A page to interpret memory as an image? For texture viewing? How would wrap width work?
-  - Or a mode on the memory page to interpret byte pairs as large RGBA16 squares.
+- A page to interpret memory as an image with proper wrap width (for texture viewing).
 - Ability to undo address select and disasm jumps?
 - Controls rebinding page (necessary?)
   - Or just preset controls modes in settings?
 - Should assert macros be uppercase or lowercase?
 - Horizontal text scrolling should actually scroll by pixels rather than scrolling the char buffer.
   - Use scissor box?
-- Implement global grid system for selection cursor stuff.
+- Implement global grid system for selection cursor stuff (currently only exists on Thread Registers page).
 - Better UNF print combo?
 - Better page revive combo?
   - Should it just be a selection on the crashed page?
@@ -132,38 +135,48 @@ TODO: more/update documentation
 - On a crash screen crash, should the new crash screen automatically return to the previous position debugging the crashed game thread instead of inspecting the first crash screen thread?
 - Should cs_print/cs_draw be in util folder?
 - Move print specific stuff out of util files.
+- Draw multiple pixels at a time (eg. RGBA32FILL).
 - Update UNF to match pages.
-- Should the coprocessor enum start at 0?
+- Makefile rule or config define (possible?) for whether to include non-virtual symbols
+  - eg. behavior names
 ### Summary page
-- Show cond bit from fpcsr if pc is c.cond? Or would that be the previous cond bit?
-- Special crash/assert handling:
-  - RCP hang/Null SPTask (what RCP info can be printed?)
+- Show cond bit from `fpcsr` if pc is c.cond? Or does a crash happen before that is set?
+- More special crash/assert handling:
+  - RCP hang/Null SPTask.
     - Mention the need to restart console when this happens.
     - `rcp` thread register and other interface registers.
-  - Object bank overflow (show bhv of the object that attempted to spawn).
+  - Object (eg. bank overflow).
+    - (show bhv of the object that attempted to spawn).
   - Stack overflow.
+  - Audio
+    - Show AI registers?
+  - Crash screen
+    - Crashed page number and name
+    - Selection cursor location
 - Select section to go to the relevant page.
-- Remove the word "state" from thread display?
 - `0x` prefix for Unimplemented instructions.
 - Separate registers from insn again.
 - Finalize layout.
+- If `pc` is invalid, use the next function in the stack.
+- Check for f64 denorms/NaN.
+- Fix asserts expanding macros in condition string.
+  - eg. NULL being printed as (void *)0
 ### Stack trace page
 - Use Libdragon's better stack trace functionality.
-- Make it clearer that the stack is thread-specific (show thread on page?)
-### Registers page
+- Make it clearer that the stack is thread-specific (show thread name on page?)
+### Thread Registers page
 - Extended version with a scrollable list of all registers and their full 64 bit contents (Everything from [here](https://n64.readthedocs.io/index.html) plus any other CPU/RCP registers). Thread registers on top (old context page) then all registers if scroll down.
 - Reginspect:
   - Scrollable for more data.
-  - Status register diagnostic/interrupt bits.
-  - Show upper/odd bits of float registers.
-  - Switch between registers like pages or by selecting in the background.
-  - `A: GO TO` if valid pointer.
+  - Status register interrupt bits.
+  - Show upper/odd bits of float registers separately.
+  - `A: GO TO` text if valid pointer.
   - If pointer, print the entire symbol?
     - Get size from map data.
-  - If valid pointer, highlight address portion green like address select.
-  - If not a pointer, show binary format too.
+    - Scrollable
+  - If valid pointer, highlight address portion green like address select (lower 32 bits of 64 bit register).
 - Explain thread select
-  - Controls
+  - Controls (press start to select thread)
   - Explain that it affects the stack page (and summary page?)
   - Find out what that unknown thread 0 (libultra) thread is with pri 149 is that only appears with make UNF (but not necessarily if UNF is on)
   - Clearn up thread print format.
@@ -173,16 +186,17 @@ TODO: more/update documentation
 - Different colors for register names from parsed global variable names (disasm page too)?
 - Multiple FPCSR descriptions at once (already kinda done in reginspect).
 - Better 64-bit register handling
-  - Automatic bit mode check based on registers
-  - Use upper bits of float registers from odd registers
-- Add "hi", "lo", and "rcp" from thread context.
+  - Automatic bit mode check based on registers and `FR` bit in `fpcsr`
 - Show direct register access values for each one.
 - Determine whether that one register is a saved value or a frame pointer.
 - Add missing controls descriptions.
-- Highlight registers used in instruction at pc.
+- Highlight registers used in the instruction at `pc`.
+  - Including `pc` itself?
+- Move bit info arrays to the register souce's respective .inc.c files.
 ### Disasm page
 - **Fix cursor passing the bottom of the screen when inline symbol headers are on.**
 - Show addresses for each row (setting).
+  - How can branch arrows fit?
 - Multi-line pseudoinstructions if possible (ABS, BLT, BGT, BLE, NEG, NEGU, NOT, BGE, LI, LA, SGE, SGE, ADD?).
 - Can the `insn_as_string` and `insn_name` buffers be combined?
 - Implement "OVERSCAN" mode for branch arrows.
@@ -191,13 +205,12 @@ TODO: more/update documentation
 - Reset branch arrow distance when it won't overlap instead of wrapping only after the distance reaches the end of the screen.
 - Save register data types in the register buffer?
 - Detect which segments are currently loaded to prevent trying to disasm garbage data (eg. reading from menu segment during normal gameplay).
+  - Entry in text segment address range array?
 - Print unknowns as binary should work on unimpl too.
 ### Memory view page
 - Press and hold to select multiple bytes?
-- Read 4 bytes as address for address select popup (requires multi-select?).
-- Binary view mode (disasm already has a version of this).
 - Is search functionality possible/reasonable?
-- Show dividers/borders around symbols?
+- Highlight stuff like `$sp` location
 ### Map view page
 - Should moving the cursor location here also change the location in ram view and disasm?
 - Jumping to an address that's not in a symbol should find the nearest symbol index and jump to there.
@@ -205,11 +218,35 @@ TODO: more/update documentation
 - Describe "type" char.
 - Determine segment/linker data type from map data?
 - Is search functionality possible/reasonable?
+### Segments page
+- Show base + size instead of range.
+  - Both rom and ram size? (for compressed data)
+- Show hardcoded segments:
+  - Goddard
+  - Crash screen
+  - framebuffers/zbuffer/buffers
+  - Boot
+- Move to be a submenu on memory page?
+### Interface registers page
+- Combine with thread registers page?
+  - Interfaces as part of the threads dropdown.
+    - 1 line vs. 2 lines.
+    - Ordering?
+    - Also register lists for direct access of CPU/CP0(+SPC)/CP1(+FCR) registers.
+- Remove GIO/RDB/GIO_RDB?
+- Print PIF ROM/RAM when PI/SI is selected.
+- Combine DPC/DPS into "RCP"?
+- Combine RI into RDRAM?
 ### Logs page
 - Timestamps?
+- Separate logs from puppyprint debug.
+- Different warning levels per message.
+  - info/debug/warning/error
+  - Filtering
 ### Settings page
 - Move entirely to page-specific popup?
   - Individual page settings in each page's controls/help popup box.
+  - Press `B` to open
 - Jump to the page from a page group.
 - Save all changed settings somehow?
 - Confirmation dialog box to reset all to defaults.
@@ -220,14 +257,14 @@ TODO: more/update documentation
 - Physical vs. Virtual address setting?
 ### About page
 - Can this work without a buffer for shown entries like the threads page?
-- Button to cycle memory size formats (bytes/kb/mb/hex/num entries)
-- Arbitrarily determine microcode name (from map symbol?)
+  - Info uses a text buffer
+- Button/setting to cycle memory size formats (bytes/kb/mb/hex/num entries)
+- Can goddardSegmentEnd -goddardSegmentStart replace gGoddardSize?
 - Clean up code
 - More entries:
   - Current RTC time if RTC is enabled? or `osGetTime()`/`osGetCount()`?
   - `gGlobalTimer`?
   - Mario action?
   - Mario floor?
-  - VI/etc. info
 </p>
 </details>

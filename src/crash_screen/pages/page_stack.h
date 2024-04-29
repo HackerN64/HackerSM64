@@ -19,7 +19,7 @@ enum CSSettingsGroup_page_stack {
 #define STACK_TRACE_NUM_ROWS 20
 
 // The number of functions to save to the stack trace buffer.
-#define STACK_TRACE_BUFFER_SIZE 64
+#define STACK_TRACE_BUFFER_SIZE 32
 
 
 typedef struct FunctionInStack {
