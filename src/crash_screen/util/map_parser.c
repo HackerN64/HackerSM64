@@ -7,8 +7,10 @@
 #include "segments.h"
 
 
-//! TODO: Use nm map symbol data to get this info?
-//! TODO: Get this to work with stuff like bhv names.
+//! TODO: Can nm map symbol data be used to get this info?
+//! TODO: Get this to work with level and behavior segments.
+//! TODO: Check if the segment is actually loaded into RAM.
+//! TODO: Table with all segment symbols, not just .text.
 ALIGNED8 static const AddressPair sTextRegions[] = {
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
@@ -230,7 +232,7 @@ MapSymbolIndex get_symbol_index_from_addr_binary(Address addr) {
  * @param[in] searchDirection The direction to search in. See enum SymbolSearchDirections.
  * @return const MapSymbol* Pointer to the MapSymbol data that was found. NULL if none were found.
  */
-const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection) {
+const MapSymbol* get_map_symbol(Address addr, SymbolSearchDirections searchDirection) {
     if (!IS_DEBUG_MAP_ENABLED()) {
         return NULL;
     }

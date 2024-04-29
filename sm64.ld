@@ -60,14 +60,14 @@ OUTPUT_ARCH (mips)
    BEGIN_SEG(name, 0x0E000000) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
-      BEGIN_TEXT(name##script) \
+      BEGIN_TEXT(name) \
       KEEP(BUILD_DIR/levels/name/script.o(.text*)); \
-      END_TEXT(name##script) \
+      END_TEXT(name) \
       KEEP(BUILD_DIR/levels/name/script.o(.rodata*)); \
       KEEP(BUILD_DIR/levels/name/geo.o(.*data*)); \
-      BEGIN_TEXT(name##geo) \
+      BEGIN_TEXT(name##_geo) \
       KEEP(BUILD_DIR/levels/name/geo.o(.text*)); \
-      END_TEXT(name##geo) \
+      END_TEXT(name##_geo) \
       KEEP(BUILD_DIR/levels/name/geo.o(.rodata*)); \
    } \
    END_SEG(name) \

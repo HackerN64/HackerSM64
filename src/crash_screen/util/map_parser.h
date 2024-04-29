@@ -15,11 +15,11 @@
 typedef s32 MapSymbolIndex;
 
 
-enum SymbolSearchDirections {
+typedef enum SymbolSearchDirections {
     SYMBOL_SEARCH_FORWARD,  // Use this to get the earlier symbol on an overlap.
     SYMBOL_SEARCH_BACKWARD, // Use this to get the later symbol on an overlap.
     SYMBOL_SEARCH_BINARY,   // Use this when speed matters more than getting a specific symbol on an overlap.
-};
+} SymbolSearchDirections;
 
 // See mapPacker.py.
 typedef struct MapSymbol {
@@ -36,64 +36,10 @@ typedef struct AddressPair {
     /*0x04*/ const Address end;
 } AddressPair; /*0x08*/
 
-#define EXTERN_TEXT_SYMBOL(_name, _side) \
-extern const Byte _##_name##SegmentText##_side[];
-
-#define EXTERN_TEXT_REGION(_name) \
-EXTERN_TEXT_SYMBOL(_name, Start) \
-EXTERN_TEXT_SYMBOL(_name, End)
-
-
-#define EXTERN_SEGMENT_TEXT(_name) \
-EXTERN_TEXT_REGION(_name)
-
-#define EXTERN_GROUP_TEXT(_name) \
-EXTERN_TEXT_REGION(_name##_geo)
-
-#define EXTERN_LEVEL_TEXT(_name) \
-EXTERN_TEXT_REGION(_name##script) \
-EXTERN_TEXT_REGION(_name##geo)
-
-EXTERN_SEGMENT_TEXT(boot)
-EXTERN_SEGMENT_TEXT(main)
-EXTERN_SEGMENT_TEXT(engine)
-EXTERN_SEGMENT_TEXT(crashscreen)
-EXTERN_SEGMENT_TEXT(behavior)
-EXTERN_SEGMENT_TEXT(goddard)
-#ifdef KEEP_MARIO_HEAD
-EXTERN_SEGMENT_TEXT(libgoddard)
-#endif // KEEP_MARIO_HEAD
-EXTERN_SEGMENT_TEXT(intro)
-
-EXTERN_GROUP_TEXT(group0)
-EXTERN_GROUP_TEXT(group1)
-EXTERN_GROUP_TEXT(group2)
-EXTERN_GROUP_TEXT(group3)
-EXTERN_GROUP_TEXT(group4)
-EXTERN_GROUP_TEXT(group5)
-EXTERN_GROUP_TEXT(group6)
-EXTERN_GROUP_TEXT(group7)
-EXTERN_GROUP_TEXT(group8)
-EXTERN_GROUP_TEXT(group9)
-EXTERN_GROUP_TEXT(group10)
-EXTERN_GROUP_TEXT(group11)
-EXTERN_GROUP_TEXT(group12)
-EXTERN_GROUP_TEXT(group13)
-EXTERN_GROUP_TEXT(group14)
-EXTERN_GROUP_TEXT(group15)
-EXTERN_GROUP_TEXT(group16)
-EXTERN_GROUP_TEXT(group17)
-EXTERN_GROUP_TEXT(common0)
-EXTERN_GROUP_TEXT(common1)
-
-#define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
-#define DEFINE_LEVEL(_0, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) EXTERN_LEVEL_TEXT(folder)
-#include "levels/level_defines.h"
-#undef STUB_LEVEL
-#undef DEFINE_LEVEL
-
-#define MEMORY_REGION(_start, _end) \
-    { .start = (const Address)(_start), .end = (const Address)(_end) },
+#define MEMORY_REGION(_start, _end) {   \
+    .start = (const Address)(_start),   \
+    .end   = (const Address)(_end),     \
+},
 
 #define TEXT_REGION(_name) \
     MEMORY_REGION(_##_name##SegmentTextStart, _##_name##SegmentTextEnd)
@@ -105,8 +51,8 @@ EXTERN_GROUP_TEXT(common1)
     TEXT_REGION(_name##_geo)
 
 #define TEXT_REGION_LEVEL(_name) \
-    TEXT_REGION(_name##script) \
-    TEXT_REGION(_name##geo)
+    TEXT_REGION(_name) \
+    TEXT_REGION(_name##_geo)
 
 
 extern const MapSymbol gMapSymbols[];
@@ -126,4 +72,4 @@ _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol);
 MapSymbolIndex get_symbol_index_from_addr_forward(Address addr);
 MapSymbolIndex get_symbol_index_from_addr_backward(Address addr);
 MapSymbolIndex get_symbol_index_from_addr_binary(Address addr);
-const MapSymbol* get_map_symbol(Address addr, enum SymbolSearchDirections searchDirection);
+const MapSymbol* get_map_symbol(Address addr, SymbolSearchDirections searchDirection);
