@@ -21,6 +21,46 @@
 
 #include "insn_db.inc.c"
 
+char insn_alphabet[] = "\0.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+const MIPSParams insn_param_formats[][3] = {
+    [IFMT_NOP] = { MP_NOP,   MP_NOP,  MP_NOP,   }, // nop
+
+    [IFMT_s  ] = { MP_RS,    MP_NOP,  MP_NOP,   }, // rs
+    [IFMT_t  ] = { MP_RT,    MP_NOP,  MP_NOP,   }, // rt // unused
+    [IFMT_d  ] = { MP_RD,    MP_NOP,  MP_NOP,   }, // rd
+    [IFMT_ds ] = { MP_RD,    MP_RS,   MP_NOP,   }, // rd rs
+    [IFMT_st ] = { MP_RS,    MP_RT,   MP_NOP,   }, // rs rt
+    [IFMT_dt ] = { MP_RD,    MP_RT,   MP_NOP,   }, // rd rt // for pseudos
+    [IFMT_dst] = { MP_RD,    MP_RS,   MP_RT,    }, // rd rs rt
+    [IFMT_dts] = { MP_RD,    MP_RT,   MP_RS,    }, // rd rt rs
+
+    [IFMT_t0 ] = { MP_RT,    MP_CP0D, MP_NOP,   }, // rt rd[cp0]
+    [IFMT_tS ] = { MP_RT,    MP_FS,   MP_NOP,   }, // rt fs
+
+    [IFMT_DS ] = { MP_FD,    MP_FS,   MP_NOP,   }, // fd fs
+    [IFMT_ST ] = { MP_FS,    MP_FT,   MP_NOP,   }, // fs ft
+    [IFMT_DST] = { MP_FD,    MP_FS,   MP_FT,    }, // fd fs ft
+
+    [IFMT_tsI] = { MP_RT,    MP_RS,   MP_IMM,   }, // rt rs immediate
+    [IFMT_tsi] = { MP_RT,    MP_RS,   MP_NIMM,  }, // rt rs abs(immediate) // for pseudos
+    [IFMT_tI ] = { MP_RT,    MP_IMM,  MP_NOP,   }, // rt immediate    
+    [IFMT_sI ] = { MP_RS,    MP_IMM,  MP_NOP,   }, // rs immediate
+
+    [IFMT_to ] = { MP_RT,    MP_OFF,  MP_NOP,   }, // rt offset(base)
+    [IFMT_To ] = { MP_FT,    MP_OFF,  MP_NOP,   }, // ft offset(base)
+
+    [IFMT_dta] = { MP_RD,    MP_RT,   MP_SHIFT, }, // rd rt shift
+    [IFMT_ste] = { MP_RS,    MP_RT,   MP_EXC10, }, // rs rt exc10
+    [IFMT_E  ] = { MP_EXC20, MP_NOP,  MP_NOP,   }, // exc20
+
+    [IFMT_stB] = { MP_RS,    MP_RT,   MP_B,     }, // rs rt branch
+    [IFMT_sB ] = { MP_RS,    MP_B,    MP_NOP,   }, // rs branch
+    [IFMT_B  ] = { MP_B,     MP_NOP,  MP_NOP,   }, // branch
+
+    [IFMT_J  ] = { MP_JUMP,  MP_NOP,  MP_NOP,   }, // jump
+};
+
 
 /**
  * @brief Use a specific pseudo-instruction from insn_db_pseudo if 'cond' is TRUE.
@@ -141,7 +181,7 @@ const InsnTemplate* get_insn(InsnData insn) {
     }
 
     // Loop through the given list.
-    while (checkInsn->name != NULL) {
+    while (checkInsn->raw != 0) {
         if (checkInsn->opcode == opcode) {
             return checkInsn;
         }
@@ -160,9 +200,13 @@ const InsnTemplate* get_insn(InsnData insn) {
  */
 s16 insn_check_for_branch_offset(InsnData insn) {
     const InsnTemplate* info = get_insn(insn);
+    MIPSParamFmts fmt = info->params;
+    const MIPSParams* list = insn_param_formats[fmt];
 
-    if ((info != NULL) && strchr(info->fmt, CHAR_P_BRANCH)) {
-        return insn.offset;
+    for (size_t i = 0; i < sizeof(insn_param_formats[0]); i++) {
+        if (list[i] == MP_B) {
+            return insn.offset;
+        }
     }
 
     return 0x0000;
@@ -233,7 +277,6 @@ static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA
 
 
 static char insn_as_string[CHAR_BUFFER_SIZE] = "";
-static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 
 
 #define STR_INSN_NAME_BASE      "%s"
@@ -259,21 +302,20 @@ static char insn_name[INSN_NAME_DISPLAY_WIDTH] = "";
 #define ADD_STR(...) {                  \
     strp += sprintf(strp, __VA_ARGS__); \
 }
-#define ADD_REG(_cop, _idx) {                                                                                     \
-    regInfo = get_reg_info((_cop), (_idx));                                                                       \
-    ADD_STR(STR_IREG, regInfo->name);                                                                             \
-    append_reg_to_buffer((_cop), (_idx), ((cmdIndex == info->f2i) ? valFmt2 : valFmt1), (cmdIndex == info->out)); \
+#define ADD_REG(_src, _idx) {                                                                                       \
+    regInfo = get_reg_info((_src), (_idx));                                                                         \
+    ADD_STR(STR_IREG, regInfo->name);                                                                               \
+    append_reg_to_buffer((_src), (_idx), (((cmdIndex == f2index) ? valFmt2 : valFmt1)), (cmdIndex == outputIndex)); \
 }
-
-#define ADD_ADDR_REG(_cop, _idx) {                                  \
-    regInfo = get_reg_info((_cop), (_idx));                         \
+#define ADD_ADDR_REG(_src, _idx) {                                  \
+    regInfo = get_reg_info((_src), (_idx));                         \
     ADD_STR(STR_IREG_BASE, regInfo->name);                          \
-    append_reg_to_buffer((_cop), (_idx), REG_VAL_TYPE_ADDR, FALSE); \
+    append_reg_to_buffer((_src), (_idx), REG_VAL_TYPE_ADDR, FALSE); \
 }
-
 
 /**
  * @brief Converts MIPS instruction data into a formatted string.
+ * TODO: This is by far the largest crash screen function. Can it be reduced?
  *
  * @param[in ] addr  The address of the instruction. Used to calculate the target of branches and jumps.
  * @param[in ] insn  The instruction data that is being read.
@@ -289,7 +331,9 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
     const InsnTemplate* info = get_insn(insn);
 
     if (info != NULL) {
-        const char* curCmd = &info->fmt[0];
+        const MIPSParams* curCmd = &insn_param_formats[info->params][0];
+        u8 outputIndex = (info->output - 1);
+        u8 f2index = (info->f2i - 1);
         const RegisterInfo* regInfo = NULL;
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
@@ -298,12 +342,22 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
 
         clear_saved_reg_buffer();
 
+        ADD_COLOR((insn.raw == OPS_NOP) ? COLOR_RGBA32_CRASH_DISASM_NOP : COLOR_RGBA32_CRASH_DISASM_INSN);
+        char name[INSN_NAME_DISPLAY_WIDTH] = UNPACK_STR7(info->name);
+        if (info->hasFmt) {
+            char fmtChar = cop1_fmt_to_char(insn);
+            sprintf(name, STR_INSN_NAME_FORMAT, name, fmtChar);
+            valFmt2 = ((fmtChar == 'S' || fmtChar == 'D') ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Overwrite secondary format.
+        }
+        ADD_STR(STR_INSN_NAME, name);
+
         // Whether to print immediates as decimal values rather than hexadecimal.
         _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
 
         // Loop through the chars in the 'fmt' member of 'info' and print the insn data accordingly.
-        for (size_t cmdIndex = 0; cmdIndex < STRLEN(info->fmt); cmdIndex++) {
-            if (unimpl || (*curCmd == CHAR_NULL)) {
+        for (size_t cmdIndex = 0; cmdIndex < sizeof(insn_param_formats[0]); cmdIndex++) {
+            const MIPSParams cmd = *curCmd;
+            if (unimpl || (cmd == MP_NOP)) {
                 break;
             }
 
@@ -312,59 +366,41 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                 ADD_STR(", ");
             }
 
-            switch (*curCmd) {
-                case CHAR_P_NOP: // NOP.
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_NOP);
-                    ADD_STR(info->name);
-                    return insn_as_string;
-                case CHAR_P_NAME: // Instruction name.
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_INSN);
-                    ADD_STR(STR_INSN_NAME, info->name);
-                    break;
-                case CHAR_P_NAMEF: // Instruction name with format.
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_INSN);
-                    bzero(insn_name, sizeof(insn_name));
-                    char fmtChar = cop1_fmt_to_char(insn);
-                    sprintf(insn_name, STR_INSN_NAME_FORMAT, info->name, fmtChar);
-                    valFmt2 = ((fmtChar == 'S' || fmtChar == 'D') ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Overwrite secondary format.
-                    ADD_STR(STR_INSN_NAME, insn_name);
-                    break;
-                case CHAR_P_RS: // CPU 'RS' register.
+            switch (cmd) {
+                case MP_RS: // CPU 'RS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CPU, insn.rs);
                     separator = TRUE;
                     break;
-                case CHAR_P_RT: // CPU 'RT' register.
+                case MP_RT: // CPU 'RT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CPU, insn.rt);
                     separator = TRUE;
                     break;
-                case CHAR_P_RD: // CPU 'RD' register.
+                case MP_RD: // CPU 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CPU, insn.rd);
                     separator = TRUE;
                     break;
-                case CHAR_P_IMM: // Immediate.
+                case MP_IMM: // Immediate.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), insn.immediate);
                     break;
-                case CHAR_P_NIMM: // Negative Immediate.
+                case MP_NIMM: // Negative Immediate.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), -(s16)insn.immediate);
                     break;
-                case CHAR_P_SHIFT: // Shift amount.
+                case MP_SHIFT: // Shift amount.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR(STR_IMMEDIATE, insn.sa);
                     break;
-                case CHAR_P_REGOFF: // Register offset offset.
+                case MP_OFF: // Register base + offset.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_REGOFFSET);
                     ADD_STR(STR_IMMEDIATE, insn.immediate);
-                    break;
-                case CHAR_P_BASE: // Register offset base.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_ADDR_REG(REGS_CPU, insn.base);
                     break;
-                case CHAR_P_BRANCH: // Branch offset.
+                case MP_B: // Branch offset.
                     ADD_COLOR(COLOR_RGBA32_CRASH_OFFSET);
                     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_OFFSET_ADDR)) {
                         ADD_STR(STR_FUNCTION, get_insn_branch_target_from_addr(addr));
@@ -374,35 +410,35 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                         ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset));
                     }
                     break;
-                case CHAR_P_COP0D: // COP0 'RD' register.
+                case MP_CP0D: // COP0 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CP0, insn.rd);
                     separator = TRUE;
                     break;
-                case CHAR_P_FT: // COP1 'FT' register.
+                case MP_FT: // COP1 'FT' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CP1, insn.ft);
                     separator = TRUE;
                     break;
-                case CHAR_P_FS: // COP1 'FS' register.
+                case MP_FS: // COP1 'FS' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CP1, insn.fs);
                     separator = TRUE;
                     break;
-                case CHAR_P_FD: // COP1 'FD' register.
+                case MP_FD: // COP1 'FD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CP1, insn.fd);
                     separator = TRUE;
                     break;
-                case CHAR_P_EXC10: // For TRAP IF instructions.
+                case MP_EXC10: // For TRAP IF instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     ADD_STR(STR_CODE10, insn.code10);
                     break;
-                case CHAR_P_EXC20: // For SYSCALL and BREAK instructions.
+                case MP_EXC20: // For SYSCALL and BREAK instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     ADD_STR(STR_CODE20, insn.code20);
                     break;
-                case CHAR_P_FUNC: // Jump function.
+                case MP_JUMP: // Jump function.
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
                     if (IS_DEBUG_MAP_ENABLED()) {
@@ -427,6 +463,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     break;
                 default: // Unknown parameter.
                     unimpl = TRUE;
+                    ADD_STR("{%c}", cmd);
                     break;
             }
 
@@ -438,7 +475,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
 
     if (unimpl) {
         //! TODO: binary mode for these.
-        ADD_STR((STR_HEX_WORD" (unimpl)"), insn.raw);
+        ADD_STR((" (unimpl)"), insn.raw);
     }
 
     return insn_as_string;

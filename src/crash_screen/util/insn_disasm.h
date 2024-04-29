@@ -5,29 +5,69 @@
 #include "types.h"
 
 #include "registers.h"
+#include "crash_screen/cs_print.h"
 
 
 #define INSN_NAME_DISPLAY_WIDTH 10
 
-#define CHAR_P_NOP      '_'     // "NOP".
-#define CHAR_P_NAME     '\''    // "[name]%-6".
-#define CHAR_P_NAMEF    '\"'    // "[name].[fmt]%-6".
-#define CHAR_P_RS       's'     // "[rs reg]".
-#define CHAR_P_RT       't'     // "[rt reg]".
-#define CHAR_P_RD       'd'     // "[rd reg]".
-#define CHAR_P_IMM      'I'     // "0x[last 16 bits]".
-#define CHAR_P_NIMM     'i'     // "[±]0x[[last 16 bits]]" (for SUBI pseudo-instruction).
-#define CHAR_P_SHIFT    'a'     // "[shift]"".
-#define CHAR_P_REGOFF   'o'     // "0x[last 16 bits]"
-#define CHAR_P_BASE     '('     // "([rs reg])".
-#define CHAR_P_BRANCH   'B'     // "[±]0x[last 16 bits]" + draw branch arrow.
-#define CHAR_P_FT       'T'     // "F[ft reg]".
-#define CHAR_P_FS       'S'     // "F[fs reg]".
-#define CHAR_P_FD       'D'     // "F[fd reg]".
-#define CHAR_P_FUNC     'J'     // "[function address]" or parse map.
-#define CHAR_P_EXC10    'e'     // "[0xXXX]" 10-bit data for the exception handler.
-#define CHAR_P_EXC20    'E'     // "[0xXXXXX]" 20-bit data for the exception handler.
-#define CHAR_P_COP0D    '0'     // "[rd reg]" COP0 Special register.
+
+typedef enum MIPSParamFmts {
+    IFMT_NOP,
+
+    IFMT_s,     // rs
+    IFMT_t,     // rt // unused
+    IFMT_d,     // rd
+    IFMT_ds,    // rd rs
+    IFMT_st,    // rs rt
+    IFMT_dt,    // rd rt // for pseudos
+    IFMT_dst,   // rd rs rt
+    IFMT_dts,   // rd rt rs
+
+    IFMT_t0,    // rt rd[cp0]
+    IFMT_tS,    // rt fs
+
+    IFMT_DS,    // fd fs
+    IFMT_ST,    // fs ft
+    IFMT_DST,   // fd fs ft
+
+    IFMT_tsI,   // rt rs immediate
+    IFMT_tsi,   // rt rs abs(immediate) // for pseudos
+    IFMT_tI,    // rt immediate    
+    IFMT_sI,    // rs immediate
+
+    IFMT_to,    // rt offset(base)
+    IFMT_To,    // ft offset(base)
+
+    IFMT_dta,   // rd rt shift
+    IFMT_ste,   // rs rt exc10
+    IFMT_E,     // exc20
+
+    IFMT_stB,   // rs rt branch
+    IFMT_sB,    // rs branch
+    IFMT_B,     // branch
+
+    IFMT_J,     // jump
+} MIPSParamFmts;
+
+// Lower 4 bits:
+typedef enum PACKED MIPSParams {
+    MP_NOP,     // "NOP".
+    MP_RS,      // "[rs reg]".
+    MP_RT,      // "[rt reg]".
+    MP_RD,      // "[rd reg]".
+    MP_CP0D,    // "[rd reg]" COP0 Special register.
+    MP_FT,      // "F[ft reg]".
+    MP_FS,      // "F[fs reg]".
+    MP_FD,      // "F[fd reg]".
+    MP_IMM,     // "0x[last 16 bits]".
+    MP_NIMM,    // "[±]0x[[last 16 bits]]" (for SUBI pseudo-instruction).
+    MP_SHIFT,   // "[shift]".
+    MP_OFF,     // "0x[last 16 bits]([rs reg])".
+    MP_B,       // "[±]0x[last 16 bits]" + draw branch arrow.
+    MP_JUMP,    // "[function address]" or parse map.
+    MP_EXC10,   // "[0xXXX]" 10-bit data for the exception handler.
+    MP_EXC20,   // "[0xXXXXX]" 20-bit data for the exception handler.
+} MIPSParams;
 
 
 #define COP_FROM    (0 * BIT(2)) // 0b00000 (move from).
@@ -424,21 +464,115 @@ typedef union InsnData {
     Word raw;
 } InsnData; /*0x04*/
 
-// Instruction database format.
-typedef struct PACKED InsnTemplate {
-    /*0x00*/ char name[8];
-    /*0x08*/ u8 opcode;
-    /*0x09*/ char fmt[4 + 1]; // 4 chars + null terminator (see CHAR_P_* defines).
-    /*0x0E*/ u8 out; // Output register index in fmt. 0 = no output (first char is always insn name format). 6 = HiLo (TODO). 7 = Link Register (TODO).
-    /*0x0F*/ struct PACKED { // Info about what the contents of the register will most likely be.
-                //! TODO: 32 bit vs. 64 bit.
-                //! TODO: This can probably be simplified.
-                u8 f1  : 1; // Primary format. [0:fixed point, 1:floating point]
-                u8 f2  : 1; // Secondary format. [0:fixed point, 1:floating point] Overwritten by [fmt] in certain instructions.
-                u8 f2i : 6; // Index of the register that uses the secondary format.
-            };
-} InsnTemplate; /*0x10*/
 
+// Pack single char (see insn_alphabet for format). (6 bits) Can be used by preprocessor.
+#define _PL(_c) ( \
+    ((_c) == '.') \
+    ? 1 \
+    : ( \
+        IS_NUMERIC(_c) \
+        ? (((_c) - '0') + STRLEN("\0.")) \
+        : ( \
+            IS_UPPERCASE(_c) \
+            ? (((_c) - 'A') + STRLEN("\0.0123456789")) \
+            : 0 \
+        ) \
+    ) \
+)
+// Unpack single char.
+#define _UL(_arr, _c) (_arr)[_c]
+
+#define PCKCSZ 6 // Num bits in packed char.
+
+// Pack and shift a single char.
+#define PACK_CHR(_str, _idx)    ((u64)(_PL((_str)[_idx]) & BITMASK(PCKCSZ)) << (PCKCSZ * (_idx)))
+// Unpack and shift a single char.
+#define UNPACK_CHR(_src, _idx)  _UL(insn_alphabet, (unsigned char)(((_src) >> (PCKCSZ * (_idx))) & BITMASK(PCKCSZ)))
+
+// Pack a string of 7 chars.
+#define PACK_STR7(_str) ( \
+    PACK_CHR(_str, 0) | \
+    PACK_CHR(_str, 1) | \
+    PACK_CHR(_str, 2) | \
+    PACK_CHR(_str, 3) | \
+    PACK_CHR(_str, 4) | \
+    PACK_CHR(_str, 5) | \
+    PACK_CHR(_str, 6)   \
+)
+// Unpack a string of 7 (+ null terminator) chars.
+#define UNPACK_STR7(_src) { \
+    UNPACK_CHR(_src, 0), \
+    UNPACK_CHR(_src, 1), \
+    UNPACK_CHR(_src, 2), \
+    UNPACK_CHR(_src, 3), \
+    UNPACK_CHR(_src, 4), \
+    UNPACK_CHR(_src, 5), \
+    UNPACK_CHR(_src, 6), \
+    '\0', \
+}
+
+//! TODO: Implement theses:
+typedef enum DisasmOutputIndex {
+    OUT_NONE,
+    OUT_P1,
+    OUT_P2,
+    OUT_P3,
+    OUT_HILO,
+    OUT_LINK,
+    OUT_TLB, //... index, random, etc.
+} DisasmOutputIndex;
+
+// Instruction database format.
+typedef union InsnTemplate {
+    struct PACKED {
+        /*0x00*/ struct PACKED {
+            /*00*/ u64 name      : 42; // Packed name (7 6-bit chars).
+            /*42*/ u64 hasFmt    :  1; // Whether the name has a format suffix.
+            /*43*/ u64 params    :  5; // enum MIPSParamFmts.
+        }; /*0x06*/
+        /*0x06*/ struct PACKED {
+            /*00*/ u8 f1        :  1; // Primary format,
+            /*01*/ u8 f2        :  1; // Secondary format (gets overwritten by instruction format).
+            /*02*/ u8 f2i       :  3; // Index of param with secondary format.
+            /*05*/ u8 output    :  3; // Output index [0=no output,1..3=arg index,2=HiLo,3=Link,...=TODO]. If needed, can be changed to 1 bit (hasOutput) by autodetecting "move to coprocessor" instructions. //! TODO: enum DisasmOutputIndex
+        }; /*0x01*/
+        /*0x07*/ struct PACKED {
+            /*00*/ u8           :  2;
+            /*02*/ u8 opcode    :  6; // Opcode to compare to.
+        }; /*0x01*/
+    };
+    u64 raw;
+    u64 raw64[1];
+    u32 raw32[2];
+    u16 raw16[4];
+    u8  raw8[8];
+} InsnTemplate;
+
+// #define SIZEOF_INSN_TEMPLATE sizeof(InsnTemplate)
+
+// Default instruction:
+#define INSNI(_opc, _name, _fmt, _out) { \
+    .opcode = _opc,             \
+    .name   = PACK_STR7(_name), \
+    .hasFmt = FALSE,            \
+    .params = _fmt,             \
+    .output = _out,             \
+    .f1     = 0,                \
+    .f2     = 0,                \
+    .f2i    = 0,                \
+}
+// Instruction with registers with special formats (eg. floats):
+#define INSNF(_opc, _name, _nf, _fmt, _out, _f1, _f2, _f2i) { \
+    .opcode = _opc,             \
+    .name   = PACK_STR7(_name), \
+    .hasFmt = _nf,              \
+    .params = _fmt,             \
+    .output = _out,             \
+    .f1     = _f1,              \
+    .f2     = _f2,              \
+    .f2i    = _f2i,             \
+}
+#define INSN_END() {}
 
 #define INSN_OFFSET_FROM_ADDR(_addr, _insnOffset) ((Address)(_addr) + (sizeof(InsnData) * (s16)(_insnOffset)))
 //! TODO: Are any of these subject to change?
