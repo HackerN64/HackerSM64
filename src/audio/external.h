@@ -62,7 +62,7 @@ void fadeout_background_music(u16 seqId, u16 fadeOut);
 void drop_queued_background_music(void);
 u32 get_current_background_music(void);
 void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer);
-void func_80321080(u16 fadeTimer);
+void stop_secondary_music(u16 fadeTimer);
 void func_803210D4(u16 fadeOutTime);
 void play_course_clear(s32 isKey);
 void play_peachs_jingle(void);

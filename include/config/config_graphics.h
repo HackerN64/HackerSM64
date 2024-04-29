@@ -60,12 +60,12 @@
 /**
  * Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
  */
-#define IA8_COINS
+// #define IA8_COINS
 
 /**
  * Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti).
  */
-#define IA8_30FPS_COINS
+// #define IA8_30FPS_COINS
 
 /**
  * Use .rej microcode for certain objects (experimental - only should be used when F3DEX_GBI_2 is defined).

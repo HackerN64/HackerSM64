@@ -26,12 +26,12 @@
  * - Precise turning control.
  * - Prevents falling from the edges.
  */
-#define BETTER_HANGING
+// #define BETTER_HANGING
 
 /**
  * Change the movement speed when hanging from a ceiling (the vanilla value is 4.0f, has no effect if BETTER_HANGING is enabled).
  */
-#define HANGING_SPEED 12.0f
+#define HANGING_SPEED 4.0f
 
 /**
  * Prevents Mario from falling asleep while idle.
@@ -81,12 +81,12 @@
 /**
  * If A and Z are pressed on the same frame while running, Mario will long jump instead of ground pound.
  */
-#define EASIER_LONG_JUMPS
+// #define EASIER_LONG_JUMPS
 
 /**
  * Enables the ability to hold Z while twirling to descend faster.
  */
-#define Z_TWIRL
+// #define Z_TWIRL
 
 /**
  * Disables bonks when ground pounding next to a wall.
@@ -101,7 +101,7 @@
 /**
  * Allows Mario to grab hangable ceilings from any state.
  */
-#define HANGING_FIX
+// #define HANGING_FIX
 
 /**
  * The maximum angle the player can wall kick, in degrees. 0..90. To allow 45 degree wall kicks, you must supply `46` to allow 45 and under.
@@ -139,16 +139,10 @@
  * be interrupted with text
  * Uncomment this to fix this bug, and frustrate speedrunners
  */
-// #define BUGFIX_DIALOG_TIME_STOP
-
-/**
- * Enables Platform Displacement 2, an upgrade to the physics involving moving platforms and how Mario interacts with them.
- */
-#define PLATFORM_DISPLACEMENT_2
+#define BUGFIX_DIALOG_TIME_STOP
 
 /**
  * Inertia defines; allow Mario to preserve his momemtum when leaving moving platforms.
- * These require Platform Displacement 2 to be enabled.
  */
 #define MARIO_INERTIA_UPWARD
 // #define MARIO_INERTIA_LATERAL

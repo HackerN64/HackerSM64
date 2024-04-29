@@ -17,7 +17,7 @@
 /**
  * Moving Coins flicker and disappear when they hit lava instead of being instantly deleted.
  */
-#define COIN_LAVA_FLICKER
+// #define COIN_LAVA_FLICKER
 
 /**
  * Allows for retries on collecting the remaining blue coins from a blue coin switch.
@@ -56,7 +56,7 @@
 /**
  * Causes leaf particles to occasionally fall from trees which contain Hoot.
  */
-#define HOOT_TREE_PARTICLES
+// #define HOOT_TREE_PARTICLES
 
 /**************
  * -- MR I --

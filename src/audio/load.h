@@ -87,7 +87,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef, s3
 #else
 void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef);
 #endif
-void init_sample_dma_buffers(s32 arg0);
+void init_sample_dma_buffers();
 #if defined(VERSION_SH)
 void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo);
 #else

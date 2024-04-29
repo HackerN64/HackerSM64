@@ -475,8 +475,8 @@
     .byte \a
 .endm
 
-.macro chan_testlayerfinished a
-    .byte 0x80 + \a
+.macro chan_testlayersfinished
+    .byte 0x80
 .endm
 
 .macro chan_setlayer a, b
@@ -488,14 +488,14 @@
     .byte 0x60 + \a
 .endm
 
-.macro chan_freelayer a
-    .byte 0x90 + \a
+.macro chan_freelayers
+    .byte 0x90
 .endm
 
 #else
 
-.macro chan_testlayerfinished a
-    .byte 0x0 + \a
+.macro chan_testlayersfinished
+    .byte 0x00
 .endm
 
 .macro chan_ioreadval a
@@ -507,8 +507,8 @@
     .byte (\b - sequence_start) >> 8, (\b - sequence_start) & 0xff
 .endm
 
-.macro chan_freelayer a
-    .byte 0xa0 + \a
+.macro chan_freelayers
+    .byte 0xa0
 .endm
 
 #ifdef VERSION_EU
