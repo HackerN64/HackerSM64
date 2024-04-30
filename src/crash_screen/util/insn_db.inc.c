@@ -79,9 +79,9 @@ ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
     INSNI(OPC_SWR,    "SWR    ",        IFMT_to,  0         ), // 46: Store Word Right.
     INSNI(OPC_CACHE,  "CACHE  ",        IFMT_to,  0         ), // 47: https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
     INSNI(OPC_LL,     "LL     ",        IFMT_to,  1         ), // 48: Load Linked Word.
-    INSNF(OPC_LWC1,   "LWC1   ", FALSE, IFMT_To,  0, 0, 1, 1), // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
-    INSNI(OPC_LWC2,   "LWC2   ",        IFMT_to,  0         ), // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    INSNI(OPC_LWC3,   "LWC3   ",        IFMT_to,  0         ), // 51: Load Word to Coprocessor-3 (COP3).
+    INSNF(OPC_LWC1,   "LWC1   ", FALSE, IFMT_To,  1, 0, 1, 1), // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
+    INSNI(OPC_LWC2,   "LWC2   ",        IFMT_to,  1         ), // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    INSNI(OPC_LWC3,   "LWC3   ",        IFMT_to,  1         ), // 51: Load Word to Coprocessor-3 (COP3).
     INSNI(OPC_LLD ,   "LLD    ",        IFMT_to,  1         ), // 52: Load Linked Doubleword.
     INSNF(OPC_LDC1,   "LDC1   ", FALSE, IFMT_To,  1, 0, 1, 1), // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
     INSNI(OPC_LDC2,   "LDC2   ",        IFMT_to,  1         ), // 54: Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
@@ -106,7 +106,7 @@ ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE
     INSNI(OPS_SRLV,    "SRLV   ", IFMT_dts, 1), //  6: Shift Word Right Logical Variable.
     INSNI(OPS_SRAV,    "SRAV   ", IFMT_dts, 1), //  7: Shift Word Right Arithmetic Variable.
     INSNI(OPS_JR,      "JR     ", IFMT_s,   0), //  8: Jump Register.
-    INSNI(OPS_JALR,    "JALR   ", IFMT_ds,  0), //  9: Jump and Link Register.
+    INSNI(OPS_JALR,    "JALR   ", IFMT_ds,  1), //  9: Jump and Link Register.
     INSNI(OPS_SYSCALL, "SYSCALL", IFMT_E,   0), // 12: System Call (assert).
     INSNI(OPS_BREAK,   "BREAK  ", IFMT_E,   0), // 13: Breakpoint.
     INSNI(OPS_SYNC,    "SYNC   ", IFMT_NOP, 0), // 15: Synchronize Shared Memory.
@@ -198,43 +198,45 @@ ALIGNED32 static const InsnTemplate insn_db_cop1_sub00[] = { // OPC_COP1, INSN_T
     INSNF(COP1_FMT_DOUBLE, "DMFC1  ", FALSE, IFMT_tS, 1, 1, 0, 1), //  1: Doubleword Move From Floating-Point.
     INSNF(COP1_FMT_WORD,   "MTC1   ", FALSE, IFMT_tS, 2, 0, 1, 2), //  4: Move Word To Floating-Point.
     INSNF(COP1_FMT_LONG,   "DMTC1  ", FALSE, IFMT_tS, 2, 0, 1, 2), //  5: Doubleword Move To Floating-Point.
+    //! TODO: FCR registers:
     INSNI(COP1_FMT_CTL_F,  "CFC1   ",        IFMT_tS, 1         ), //  2: Move Control Word From Floating-Point.
     INSNI(COP1_FMT_CTL_T,  "CTC1   ",        IFMT_tS, 2         ), //  6: Move Control Word To Floating-Point.
     INSN_END(), // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub01[] = { // OPC_COP1, INSN_TYPE_REGIMM
-    INSNF(OPT_COP1_BC1F,  "BC1F   ", FALSE, IFMT_B, 0, 1, 1, 0), //  0: Branch on FP False (1cyc*).
-    INSNF(OPT_COP1_BC1T,  "BC1T   ", FALSE, IFMT_B, 0, 1, 1, 0), //  1: Branch on FP True (1cyc*).
-    INSNF(OPT_COP1_BC1FL, "BC1FL  ", FALSE, IFMT_B, 0, 1, 1, 0), //  2: Branch on FP False Likely (1cyc*).
-    INSNF(OPT_COP1_BC1TL, "BC1TL  ", FALSE, IFMT_B, 0, 1, 1, 0), //  3: Branch on FP True Likely (1cyc*).
+    //! TODO: Output FP condition?
+    INSNI(OPT_COP1_BC1F,  "BC1F   ", IFMT_B, 0), //  0: Branch on FP False (1cyc*).
+    INSNI(OPT_COP1_BC1T,  "BC1T   ", IFMT_B, 0), //  1: Branch on FP True (1cyc*).
+    INSNI(OPT_COP1_BC1FL, "BC1FL  ", IFMT_B, 0), //  2: Branch on FP False Likely (1cyc*).
+    INSNI(OPT_COP1_BC1TL, "BC1TL  ", IFMT_B, 0), //  3: Branch on FP True Likely (1cyc*).
     INSN_END(), // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_TYPE_FUNC
-    INSNF(OPS_ADD_F,     "ADD    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  0: ADD.[FMT]     Floating-Point Add (3cyc).
-    INSNF(OPS_SUB_F,     "SUB    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  1: SUB.[FMT]     Floating-Point Subtract (3cyc).
-    INSNF(OPS_MUL_F,     "MUL    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  2: MUL.[FMT]     Floating-Point Multiply (S:5cyc; D:8cyc).
-    INSNF(OPS_DIV_F,     "DIV    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  3: DIV.[FMT]     Floating-Point Divide (S:29cyc; D:58cyc).
-    INSNF(OPS_SQRT_F,    "SQRT   ", TRUE, IFMT_DS,  1, 1, 1, 0), //  4: SQRT.[FMT]    Floating-Point Square Root (S:29cyc; D:58cyc).
-    INSNF(OPS_ABS_F,     "ABS    ", TRUE, IFMT_DS,  1, 1, 1, 0), //  5: ABS.[FMT]     Floating-Point Absolute Value (1cyc).
-    INSNF(OPS_MOV_F,     "MOV    ", TRUE, IFMT_DS,  1, 1, 1, 0), //  6: MOV.[FMT]     Floating-Point Move (1cyc).
-    INSNF(OPS_NEG_F,     "NEG    ", TRUE, IFMT_DS,  1, 1, 1, 0), //  7: NEG.[FMT]     Floating-Point Negate (1cyc).
-    INSNF(OPS_ROUND_L_F, "ROUND.L", TRUE, IFMT_DS,  1, 0, 1, 2), //  8: ROUND.L.[FMT] Floating-Point Round to Long Fixed-Point (5cyc).
-    INSNF(OPS_TRUNC_L_F, "TRUNC.L", TRUE, IFMT_DS,  1, 0, 1, 2), //  9: TRUNC.L.[FMT] Floating-Point Truncate to Long Fixed-Point (5cyc).
-    INSNF(OPS_CEIL_L_F,  "CEIL.L ", TRUE, IFMT_DS,  1, 0, 1, 2), // 10: CEIL.L.[FMT]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
-    INSNF(OPS_FLOOR_L_F, "FLOOR.L", TRUE, IFMT_DS,  1, 0, 1, 2), // 11: FLOOR.L.[FMT] Floating-Point Floor to Long Fixed-Point (5cyc).
-    INSNF(OPS_ROUND_W_F, "ROUND.W", TRUE, IFMT_DS,  1, 0, 1, 2), // 12: ROUND.W.[FMT] Floating-Point Round to Word Fixed-Point (5cyc).
-    INSNF(OPS_TRUNC_W_F, "TRUNC.W", TRUE, IFMT_DS,  1, 0, 1, 2), // 13: TRUNC.W.[FMT] Floating-Point Truncate to Word Fixed-Point (5cyc).
-    INSNF(OPS_CEIL_W_F,  "CEIL.W ", TRUE, IFMT_DS,  1, 0, 1, 2), // 14: CEIL.W.[FMT]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
-    INSNF(OPS_FLOOR_W_F, "FLOOR.W", TRUE, IFMT_DS,  1, 0, 1, 2), // 15: FLOOR.W.[FMT] Floating-Point Floor to Word Fixed-Point (5cyc).
+    INSNF(OPS_ADD_F,     "ADD    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  0: ADD.[fmt]     Floating-Point Add (3cyc).
+    INSNF(OPS_SUB_F,     "SUB    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  1: SUB.[fmt]     Floating-Point Subtract (3cyc).
+    INSNF(OPS_MUL_F,     "MUL    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  2: MUL.[fmt]     Floating-Point Multiply (S:5cyc; D:8cyc).
+    INSNF(OPS_DIV_F,     "DIV    ", TRUE, IFMT_DST, 1, 1, 1, 0), //  3: DIV.[fmt]     Floating-Point Divide (S:29cyc; D:58cyc).
+    INSNF(OPS_SQRT_F,    "SQRT   ", TRUE, IFMT_DS,  1, 1, 1, 0), //  4: SQRT.[fmt]    Floating-Point Square Root (S:29cyc; D:58cyc).
+    INSNF(OPS_ABS_F,     "ABS    ", TRUE, IFMT_DS,  1, 1, 1, 0), //  5: ABS.[fmt]     Floating-Point Absolute Value (1cyc).
+    INSNF(OPS_MOV_F,     "MOV    ", TRUE, IFMT_DS,  1, 1, 1, 0), //  6: MOV.[fmt]     Floating-Point Move (1cyc).
+    INSNF(OPS_NEG_F,     "NEG    ", TRUE, IFMT_DS,  1, 1, 1, 0), //  7: NEG.[fmt]     Floating-Point Negate (1cyc).
+    INSNF(OPS_ROUND_L_F, "ROUND.L", TRUE, IFMT_DS,  1, 0, 1, 2), //  8: ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
+    INSNF(OPS_TRUNC_L_F, "TRUNC.L", TRUE, IFMT_DS,  1, 0, 1, 2), //  9: TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
+    INSNF(OPS_CEIL_L_F,  "CEIL.L ", TRUE, IFMT_DS,  1, 0, 1, 2), // 10: CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
+    INSNF(OPS_FLOOR_L_F, "FLOOR.L", TRUE, IFMT_DS,  1, 0, 1, 2), // 11: FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
+    INSNF(OPS_ROUND_W_F, "ROUND.W", TRUE, IFMT_DS,  1, 0, 1, 2), // 12: ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
+    INSNF(OPS_TRUNC_W_F, "TRUNC.W", TRUE, IFMT_DS,  1, 0, 1, 2), // 13: TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
+    INSNF(OPS_CEIL_W_F,  "CEIL.W ", TRUE, IFMT_DS,  1, 0, 1, 2), // 14: CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
+    INSNF(OPS_FLOOR_W_F, "FLOOR.W", TRUE, IFMT_DS,  1, 0, 1, 2), // 15: FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
 
-    INSNF(OPS_CVT_S_F,   "CVT.S  ", TRUE, IFMT_DS,  1, 1, 0, 2), // 32: CVT.S.[FMT]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
-    INSNF(OPS_CVT_D_F,   "CVT.D  ", TRUE, IFMT_DS,  1, 1, 0, 2), // 33: CVT.D.[FMT]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
-    INSNF(OPS_CVT_W_F,   "CVT.W  ", TRUE, IFMT_DS,  1, 0, 1, 2), // 36: CVT.W.[FMT]   Floating-Point Convert to Word Fixed-Point (5cyc).
-    INSNF(OPS_CVT_L_F,   "CVT.L  ", TRUE, IFMT_DS,  1, 0, 1, 2), // 37: CVT.L.[FMT]   Floating-Point Convert to Long Fixed-Point (5cyc).
+    INSNF(OPS_CVT_S_F,   "CVT.S  ", TRUE, IFMT_DS,  1, 1, 0, 2), // 32: CVT.S.[fmt]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
+    INSNF(OPS_CVT_D_F,   "CVT.D  ", TRUE, IFMT_DS,  1, 1, 0, 2), // 33: CVT.D.[fmt]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
+    INSNF(OPS_CVT_W_F,   "CVT.W  ", TRUE, IFMT_DS,  1, 0, 1, 2), // 36: CVT.W.[fmt]   Floating-Point Convert to Word Fixed-Point (5cyc).
+    INSNF(OPS_CVT_L_F,   "CVT.L  ", TRUE, IFMT_DS,  1, 0, 1, 2), // 37: CVT.L.[fmt]   Floating-Point Convert to Long Fixed-Point (5cyc).
 
-    INSNF(OPS_C_F,       "C.F    ", TRUE, IFMT_ST,  0, 1, 1, 0), // 48: C.F.[FMT]     Floating-Point Compare (False) (1cyc).
-    INSNF(OPS_C_UN,      "C.UN   ", TRUE, IFMT_ST,  0, 1, 1, 0), // 49: C.UN.[FMT]    Floating-Point Compare (Unordered) (1cyc).
-    INSNF(OPS_C_EQ,      "C.EQ   ", TRUE, IFMT_ST,  0, 1, 1, 0), // 50: C.EQ.[FMT]    Floating-point Compare (Equal) (1cyc).
+    INSNF(OPS_C_F,       "C.F    ", TRUE, IFMT_ST,  0, 1, 1, 0), // 48: C.F.[fmt]     Floating-Point Compare (False) (1cyc).
+    INSNF(OPS_C_UN,      "C.UN   ", TRUE, IFMT_ST,  0, 1, 1, 0), // 49: C.UN.[fmt]    Floating-Point Compare (Unordered) (1cyc).
+    INSNF(OPS_C_EQ,      "C.EQ   ", TRUE, IFMT_ST,  0, 1, 1, 0), // 50: C.EQ.[fmt]    Floating-point Compare (Equal) (1cyc).
     INSNF(OPS_C_UEQ,     "C.UEQ  ", TRUE, IFMT_ST,  0, 1, 1, 0), // 51: C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc).
     INSNF(OPS_C_OLT,     "C.OLT  ", TRUE, IFMT_ST,  0, 1, 1, 0), // 52: C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc).
     INSNF(OPS_C_ULT,     "C.ULT  ", TRUE, IFMT_ST,  0, 1, 1, 0), // 53: C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc).
