@@ -97,6 +97,7 @@ const char* str_null_fallback(const char* str, const char* fallback) {
 
 // -- THREAD --
 
+//! TODO: One list with both id and pri.
 static const IdNamePair sThreadIDNames[] = {
     { .id = THREAD_0,                   .name = "libultra?",        }, // Uses sThreadPriNames.
     { .id = THREAD_1_IDLE,              .name = "idle",             },
@@ -110,6 +111,7 @@ static const IdNamePair sThreadIDNames[] = {
     { .id = THREAD_9_DA_COUNTER,        .name = "da counter",       },
     { .id = THREAD_13_FAULT,            .name = "unf fault",        },
     { .id = THREAD_14_USB,              .name = "unf usb",          },
+    { .id = THREAD_15_RDB,              .name = "unf rdb",          },
     { .id = THREAD_1000_CRASH_SCREEN_0, .name = "crash screen 0",   },
     { .id = THREAD_1001_CRASH_SCREEN_1, .name = "crash screen 1",   },
     { .id = THREAD_1002_CRASH_SCREEN_2, .name = "crash screen 2",   },

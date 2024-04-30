@@ -31,6 +31,7 @@ enum ThreadID {
     THREAD_9_DA_COUNTER,    // HVQM DA counterthread (see DA_COUNTER_THREAD_ID in src/hvqm/hvqm.h).
     THREAD_13_FAULT = 13,   // UNF debug thread (see FAULT_THREAD_ID in src/usb/debug.h).
     THREAD_14_USB   = 14,   // UNF USB thread (see USB_THREAD_ID in src/usb/debug.h).
+    THREAD_15_RDB   = 15,   // UNF RDB thread (see RDB_THREAD_ID in src/usb/debug.h).
 
     // Crash screen threads (the crash screen has its own crash thread):
     THREAD_1000_CRASH_SCREEN_0 = 1000,  // Initial crash screen thread for the normal game. Can be repurposed as a crash screen for the crash screen.

@@ -37,7 +37,7 @@ ALIGNED32 static const RegisterInfo sRegInfo_RDB[] = {
 };
 static const RegisterSource sRegisters_RDB = DEF_REG_LIST_INTERFACE(
     "RDB",
-    "Debug port",
+    "Remote Debugger",
     sRegDesc_RDB,
     sRegInfo_RDB
 );
@@ -55,7 +55,7 @@ ALIGNED32 static const RegisterInfo sRegInfo_GIO_RDB[] = {
 };
 static const RegisterSource sRegisters_GIO_RDB = DEF_REG_LIST_INTERFACE(
     "GIO_RDB",
-    "Development Board & Debug Port",
+    "Development Board & Remote Debugger",
     sRegDesc_GIO_RDB,
     sRegInfo_GIO_RDB
 );

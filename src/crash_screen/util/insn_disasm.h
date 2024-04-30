@@ -50,7 +50,7 @@ typedef enum MIPSParamFmts {
 } MIPSParamFmts;
 
 // Lower 4 bits:
-typedef enum PACKED MIPSParams {
+typedef enum PACKED MIPSParam {
     MP_NOP,     // "NOP".
     MP_RS,      // "[rs reg]".
     MP_RT,      // "[rt reg]".
@@ -67,7 +67,7 @@ typedef enum PACKED MIPSParams {
     MP_JUMP,    // "[function address]" or parse map.
     MP_EXC10,   // "[0xXXX]" 10-bit data for the exception handler.
     MP_EXC20,   // "[0xXXXXX]" 20-bit data for the exception handler.
-} MIPSParams;
+} MIPSParam;
 
 
 #define COP_FROM    (0 * BIT(2)) // 0b00000 (move from).

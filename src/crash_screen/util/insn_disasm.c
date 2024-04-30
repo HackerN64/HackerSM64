@@ -21,9 +21,11 @@
 
 #include "insn_db.inc.c"
 
-char insn_alphabet[] = "\0.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const MIPSParams insn_param_formats[][3] = {
+static const char insn_alphabet[] = "\0.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+const MIPSParam insn_param_formats[][3] = {
     [IFMT_NOP] = { MP_NOP,   MP_NOP,  MP_NOP,   }, // nop
 
     [IFMT_s  ] = { MP_RS,    MP_NOP,  MP_NOP,   }, // rs
@@ -201,7 +203,7 @@ const InsnTemplate* get_insn(InsnData insn) {
 s16 insn_check_for_branch_offset(InsnData insn) {
     const InsnTemplate* info = get_insn(insn);
     MIPSParamFmts fmt = info->params;
-    const MIPSParams* list = insn_param_formats[fmt];
+    const MIPSParam* list = insn_param_formats[fmt];
 
     for (size_t i = 0; i < sizeof(insn_param_formats[0]); i++) {
         if (list[i] == MP_B) {
@@ -331,7 +333,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
     const InsnTemplate* info = get_insn(insn);
 
     if (info != NULL) {
-        const MIPSParams* curCmd = &insn_param_formats[info->params][0];
+        const MIPSParam* curCmd = &insn_param_formats[info->params][0];
         u8 outputIndex = (info->output - 1);
         u8 f2index = (info->f2i - 1);
         const RegisterInfo* regInfo = NULL;
@@ -356,7 +358,7 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
 
         // Loop through the chars in the 'fmt' member of 'info' and print the insn data accordingly.
         for (size_t cmdIndex = 0; cmdIndex < sizeof(insn_param_formats[0]); cmdIndex++) {
-            const MIPSParams cmd = *curCmd;
+            const MIPSParam cmd = *curCmd;
             if (unimpl || (cmd == MP_NOP)) {
                 break;
             }
