@@ -348,7 +348,7 @@ void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
     load_code_segment(_engineSegmentStart, _engineSegmentEnd, _engineSegmentRomStart, _engineSegmentRomEnd);
-    load_code_segment(_crashscreenSegmentStart, _crashscreenSegmentEnd, _crashscreenSegmentRomStart, _crashscreenSegmentRomEnd);
+    load_code_segment(_crashScreenSegmentStart, _crashScreenSegmentEnd, _crashScreenSegmentRomStart, _crashScreenSegmentRomEnd);
     detect_emulator();
     create_crash_screen_thread();
 #ifdef UNF

@@ -304,24 +304,24 @@ SECTIONS
 
    . = _engineSegmentBssEnd;
 
-   BEGIN_SEG(crashscreen, .)
+   BEGIN_SEG(crashScreen, .)
    {
-      BEGIN_TEXT(crashscreen)
+      BEGIN_TEXT(crashScreen)
       BUILD_DIR/src/crash_screen*.o(.text*);
-      END_TEXT(crashscreen)
+      END_TEXT(crashScreen)
       BUILD_DIR/src/crash_screen*.o(.*data*);
       BUILD_DIR/src/crash_screen*.o(.rodata*);
       . = ALIGN(0x10);
    }
-   END_SEG(crashscreen)
-   BEGIN_NOLOAD(crashscreen)
+   END_SEG(crashScreen)
+   BEGIN_NOLOAD(crashScreen)
    {
       BUILD_DIR/src/crash_screen*.o(.*bss*);
       . = ALIGN(0x40);
    }
-   END_NOLOAD(crashscreen)
+   END_NOLOAD(crashScreen)
 
-   . = _crashscreenSegmentBssEnd;
+   . = _crashScreenSegmentBssEnd;
 
    BEGIN_NOLOAD(framebuffers)
    {

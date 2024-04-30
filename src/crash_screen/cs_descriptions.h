@@ -9,6 +9,8 @@
 #include "game/level_update.h"
 #include "game/main.h"
 
+#include "util/cs_segments.h"
+
 
 extern char HackerSM64_version_txt[];
 extern char CrashScreen_version_txt[];
@@ -41,8 +43,6 @@ const char* get_thread_flags_str(OSThread* thread);
 const char* get_warp_node_name(enum WarpNodes id);
 const char* get_level_name(enum LevelNum levelNum);
 
-const char* get_segment_name(u8 segmentId);
-const char* get_segment_sub_name(u8 segmentId);
 const char* get_hardcoded_memory_str(Address addr);
 
 const char* get_processor_name(u8 imp);

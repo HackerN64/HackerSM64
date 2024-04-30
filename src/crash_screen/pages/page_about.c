@@ -152,7 +152,7 @@ void _cs_about_func_save_type(char* buf) {
 }
 ABOUT_ENTRY_FUNC(compression,    gCompressionFormat)
 void _cs_about_func_crash_screen(char* buf) {
-    size_t csSize = ((Address)_crashscreenSegmentRomEnd - (Address)_crashscreenSegmentRomStart);
+    size_t csSize = ((Address)_crashScreenSegmentRomEnd - (Address)_crashScreenSegmentRomStart);
     char* p = buf;
     p += sprintf_int_with_commas(p, csSize);
     p += sprintf(p, (STR_SUFFIX_BYTES" "STR_PERCENT_OF_ROM), percent_of(csSize, (size_t)gRomSize));

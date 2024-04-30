@@ -89,7 +89,7 @@ DECLARE_SEGMENT(capcom)                     // Hardcoded
 #endif // HVQM
 DECLARE_SEGMENT_NOLOAD_TEXT(main)           // Hardcoded
 DECLARE_SEGMENT_NOLOAD_TEXT(engine)         // Hardcoded
-DECLARE_SEGMENT_NOLOAD_TEXT(crashscreen)    // Hardcoded
+DECLARE_SEGMENT_NOLOAD_TEXT(crashScreen)    // Hardcoded
 DECLARE_SEGMENT_NOLOAD(framebuffers)        // Hardcoded
 DECLARE_SEGMENT(entry)                      // Segment 16 (level entry)
 DECLARE_SEGMENT_NOLOAD_TEXT(behavior)       // Segment 19 (bhv data)

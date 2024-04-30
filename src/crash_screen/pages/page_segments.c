@@ -6,6 +6,7 @@
 #include "sm64.h"
 
 #include "crash_screen/util/map_parser.h"
+#include "crash_screen/util/cs_segments.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_draw.h"
 #include "crash_screen/cs_descriptions.h"
@@ -44,8 +45,8 @@ const enum ControlTypes cs_cont_list_segments[] = {
 };
 
 
-u32 sSegmentsSelectedIndex = 0;
-static u32 sSegmentsViewportIndex = 0;
+SegmentsList sSegmentsSelectedIndex = 0;
+static SegmentsList sSegmentsViewportIndex = 0;
 
 
 void page_segments_init(void) {
@@ -53,9 +54,17 @@ void page_segments_init(void) {
     sSegmentsViewportIndex = 0;
 }
 
+void draw_ram_segment(void) {
+
+}
+
+void draw_hardcoded_segment(void) {
+
+}
+
 void draw_segments_list(CSTextCoord_u32 line) {
     _Bool showAddresses = cs_get_setting_val(CS_OPT_GROUP_PAGE_SEGMENTS, CS_OPT_SEGMENTS_SHOW_ADDRESSES);
-    u32 currIndex = sSegmentsViewportIndex;
+    SegmentsList currIndex = sSegmentsViewportIndex;
 
     for (CSTextCoord_u32 row = 0; row < (NUM_SHOWN_SEGMENTS * 2); row += 2) {
         ScreenCoord_u32 y = TEXT_Y(line + row);
@@ -66,31 +75,41 @@ void draw_segments_list(CSTextCoord_u32 line) {
 
         cs_draw_divider_translucent(DIVIDER_Y(line + row));
 
-        Address start = (uintptr_t)get_segment_base_addr(currIndex);
-        size_t size = get_segment_size(currIndex);
-        Address romStart = sSegmentROMTable[currIndex];
-        _Bool isLoaded = (romStart != (Address)NULL);
+        Address pAddr = cs_get_segment_pAddr(currIndex);
+        _Bool isLoaded = is_segment_loaded(currIndex);
+        _Bool isHardcoded = is_segment_hardcoded(currIndex);
 
         // Line 1:
         CSTextCoord_u32 textEnd = CRASH_SCREEN_NUM_CHARS_X;
         if (showAddresses && isLoaded) {
             textEnd -= STRLEN("00000000-00000000");
-            cs_print(TEXT_X(textEnd), y, (STR_HEX_WORD" "STR_COLOR_PREFIX STR_HEX_WORD), start, COLOR_RGBA32_CRASH_HEADER, romStart);
+            cs_print(TEXT_X(textEnd), y, (STR_HEX_WORD" "STR_COLOR_PREFIX STR_HEX_WORD),
+                cs_get_segment_vAddr(currIndex), COLOR_RGBA32_CRASH_HEADER, pAddr
+            );
         }
         const RGBA32 segColor = COLOR_RGBA32_LIGHT_CYAN;
-        CSTextCoord_u32 textStart = cs_print(TEXT_X(0), y, STR_COLOR_PREFIX"seg%02d:", segColor, currIndex);
-        cs_print_scroll(TEXT_X(textStart), y, (textEnd - textStart), STR_COLOR_PREFIX"%s", segColor, get_segment_name(currIndex));
+        CSTextCoord_u32 textStart = 0;
+        if (!isHardcoded) {
+            textStart += cs_print(TEXT_X(0), y, STR_COLOR_PREFIX"seg%02d:", segColor, SEGMENT_LIST_TO_TABLE(currIndex));
+        }
+        cs_print_scroll(TEXT_X(textStart), y, (textEnd - textStart), STR_COLOR_PREFIX"%s", segColor, cs_get_segment_name(currIndex));
 
         y += TEXT_HEIGHT(1);
 
         // Line 2:
         if (showAddresses && isLoaded) {
-            const RGBA32 romColor = COLOR_RGBA32_LIGHT_BLUE;
-            CSTextCoord_u32 romStrStart = cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"loaded:", COLOR_RGBA32_CRASH_HEADER);
-            cs_print_scroll(TEXT_X(1 + romStrStart), y, (textEnd - (1 + romStrStart)), STR_COLOR_PREFIX"%s",
-                romColor, get_segment_sub_name(currIndex)
+            if (isHardcoded) {
+                cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"hardcoded", COLOR_RGBA32_GRAY);
+            } else {
+                const RGBA32 romColor = COLOR_RGBA32_LIGHT_BLUE;
+                CSTextCoord_u32 romStrStart = cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"loaded:", COLOR_RGBA32_CRASH_HEADER);
+                cs_print_scroll(TEXT_X(1 + romStrStart), y, (textEnd - (1 + romStrStart)), STR_COLOR_PREFIX"%s",
+                    romColor, cs_get_segment_sub_name(currIndex)
+                );
+            }
+            cs_print(TEXT_X(textEnd + 4), y, (STR_COLOR_PREFIX"size:"STR_HEX_PREFIX"%X"), COLOR_RGBA32_GRAY,
+                cs_get_segment_size(currIndex)
             );
-            cs_print(TEXT_X(textEnd + 4), y, (STR_COLOR_PREFIX"size:"STR_HEX_PREFIX"%X"), COLOR_RGBA32_GRAY, size);
         } else {
             cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"unloaded", COLOR_RGBA32_GRAY);
         }
@@ -117,7 +136,7 @@ void page_segments_draw(void) {
     // Scroll Bar:
     cs_draw_scroll_bar(
         (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
-        NUM_SHOWN_SEGMENTS, 32,
+        NUM_SHOWN_SEGMENTS, NUM_SEGS,
         sSegmentsViewportIndex,
         COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
     );
@@ -129,15 +148,15 @@ void page_segments_draw(void) {
 }
 void page_segments_input(void) {
     if (gCSCompositeController->buttonPressed & A_BUTTON) {
-        if (sSegmentROMTable[sSegmentsSelectedIndex] != (Address)NULL) {
-            open_address_select((Address)get_segment_base_addr(sSegmentsSelectedIndex));
+        if (is_segment_loaded(sSegmentsSelectedIndex)) {
+            open_address_select(cs_get_segment_vAddr(sSegmentsSelectedIndex));
         }
     }
 
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
-    sSegmentsSelectedIndex = WRAP(((s32)sSegmentsSelectedIndex + change), 0, (s32)(32 - 1));
+    sSegmentsSelectedIndex = WRAP(((s32)sSegmentsSelectedIndex + change), 0, (s32)(NUM_SEGS - 1));
 
     sSegmentsViewportIndex = cs_clamp_view_to_selection(sSegmentsViewportIndex, sSegmentsSelectedIndex, NUM_SHOWN_SEGMENTS, 1);
 }
@@ -146,11 +165,15 @@ void page_segments_print(void) {
 #ifdef UNF
     osSyncPrintf("\n");
 
-    for (int i = 0; i < 32; i++) {
-        Address start = (uintptr_t)get_segment_base_addr(i);
-        Address end = (start + get_segment_size(i));
-        Address romStart = sSegmentROMTable[i];
-        osSyncPrintf("["STR_HEX_WORD"-"STR_HEX_WORD"]: seg%02d %s\t\tloaded: "STR_HEX_WORD" %s\n", start, end, i, get_segment_name(i), romStart, get_segment_sub_name(i));
+    for (int i = 0; i < NUM_SEGS; i++) {
+        Address start = cs_get_segment_vAddr(i);
+        Address end = (start + cs_get_segment_size(i));
+        Address romStart = cs_get_segment_pAddr(i);
+        osSyncPrintf(
+            "["STR_HEX_WORD"-"STR_HEX_WORD"]: seg%02d %s\t\tloaded: "STR_HEX_WORD" %s\n",
+            start, end, SEGMENT_LIST_TO_TABLE(i),
+            cs_get_segment_name(i), romStart, cs_get_segment_sub_name(i)
+        );
     }
 #endif // UNF
 }
