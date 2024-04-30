@@ -544,8 +544,8 @@ static const char* sFltErrDesc[NUM_FLT_ERR] = {
     [FLT_ERR_DENORM] = "Denormalized float",
     [FLT_ERR_NAN   ] = "NaN float",
 };
-enum FloatErrorType validate_floats_in_reg_buffer(void) {
-    enum FloatErrorType fltErrType = FLT_ERR_NONE;
+FloatError validate_floats_in_reg_buffer(void) {
+    FloatError fltErrType = FLT_ERR_NONE;
 
     for (int i = 0; i < gSavedRegBufSize; i++) {
         RegisterId reg = gSavedRegBuf[i];
@@ -572,7 +572,7 @@ const char* get_fpcsr_desc(u32 fpcsr, _Bool specific) {
     for (u32 i = 0; i < NUM_FPCSR_DESC; i++) {
         if (fpcsr & bit) {
             if (specific && (i == FPCSR_DESC_CE)) {
-                enum FloatErrorType fltErrType = validate_floats_in_reg_buffer();
+                FloatError fltErrType = validate_floats_in_reg_buffer();
 
                 if (fltErrType != FLT_ERR_NONE) {
                     return sFltErrDesc[fltErrType];

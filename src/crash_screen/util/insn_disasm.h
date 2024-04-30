@@ -95,7 +95,7 @@ enum COP1Formats {
 #define COP_OPCODE 0b0100
 
 // insn_db_standard opcodes.
-enum InsnDB_base_Opcodes {
+typedef enum InsnDB_base_Opcodes {
     OPC_SPECIAL = 0b000000, //  0: Use function (last 6 bits) as opcode.
     OPC_REGIMM  = 0b000001, //  1: Use rt (skip 5 bits after opcode and the 5 bits after that) as opcode.
 
@@ -177,10 +177,10 @@ enum InsnDB_base_Opcodes {
     OPC_SDC1    = (B_OPC_SDC | OPC_COP1), // 0b111101 (61): Store Doubleword to Coprocessor-1 (Floating-Point Unit).
     OPC_SDC2    = (B_OPC_SDC | OPC_COP2), // 0b111110 (62): Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
     OPC_SD      = 0b111111, // 63: Store Doubleword.
-};
+} InsnDB_base_Opcodes;
 
 // insn_db_spec opcodes.
-enum InsnDB_spec_Opcodes {
+typedef enum InsnDB_spec_Opcodes {
     OPS_NOP     = 0b000000, //  0: NOP (pseudo of SLL).
 
     OPS_SLL     = 0b000000, //  0: Shift Word Left Logical.
@@ -253,10 +253,10 @@ enum InsnDB_spec_Opcodes {
     // OPS_DSLA32  = 0b111101, // 61: Doubleword Shift Left Arithmetic + 32.
     OPS_DSRL32  = 0b111110, // 62: Doubleword Shift Right Logical + 32.
     OPS_DSRA32  = 0b111111, // 63: Doubleword Shift Right Arithmetic + 32.
-};
+} InsnDB_spec_Opcodes;
 
 // insn_db_regi opcodes.
-enum InsnDB_regi_Opcodes {
+typedef enum InsnDB_regi_Opcodes {
     OPR_BLTZ    = 0b00000, //  0: Branch on Less Than Zero.
     OPR_BGEZ    = 0b00001, //  1: Branch on Greater Than or Equal to Zero.
     OPR_BLTZL   = 0b00010, //  2: Branch on Less Than Zero Likely.
@@ -275,18 +275,18 @@ enum InsnDB_regi_Opcodes {
     OPR_TEQI    = 0b01100, // 12: Trap if Equal Immediate.
     // OPR_UNK_13  = 0b01101, // 13:
     OPR_TNEI    = 0b01110, // 14: Trap if Not Equal Immediate.
-};
+} InsnDB_regi_Opcodes;
 
 // Coprocessor-0 (System Control Coprocessor) move formats.
-enum COP0MoveFormats {
+typedef enum COP0MoveFormats {
     COP0_MF  = (COP_FROM | FMT_32b), // 0b00000 (16): 32-bit floating-point.
     COP0_DMF = (COP_FROM | FMT_64b), // 0b00001 (17): 64-bit floating-point.
     COP0_MT  = (COP_TO   | FMT_32b), // 0b00100 (20): 32-bit fixed-point.
     COP0_DMT = (COP_TO   | FMT_64b), // 0b00101 (21): 64-bit fixed-point.
-};
+} COP0MoveFormats;
 
 // insn_db_cop0_sub10 opcodes.
-enum InsnDB_COP0_sub10_Opcodes {
+typedef enum InsnDB_COP0_sub10_Opcodes {
     // OPC_COP0_MOVE  = 0b000000, //  0:
 
     OPC_COP0_TLBP  = 0b001000, //  8: Searches for a TLB entry that matches the EntryHi register.
@@ -295,27 +295,27 @@ enum InsnDB_COP0_sub10_Opcodes {
     OPC_COP0_TLBWR = 0b000110, //  6: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
 
     OPC_COP0_ERET  = 0b011000, // 24: Return from interrupt, exception, or error exception.
-};
+} InsnDB_COP0_sub10_Opcodes;
 
 // insn_db_cop1_sub01 opcodes.
-enum InsnDB_COP1_sub01_Opcodes {
+typedef enum InsnDB_COP1_sub01_Opcodes {
     OPT_COP1_BC1F  = (0b00000 | FALSE), // 0b00000  (0): Branch on FP False (1cyc*).
     OPT_COP1_BC1T  = (0b00000 | TRUE ), // 0b00001  (1): Branch on FP True (1cyc*).
 #define B_OPT_COP1_LIKELY 0b00010
     OPT_COP1_BC1FL = (B_OPT_COP1_LIKELY | FALSE), // 0b00010  (2): Branch on FP False Likely (1cyc*).
     OPT_COP1_BC1TL = (B_OPT_COP1_LIKELY | TRUE ), // 0b00011  (3): Branch on FP True Likely (1cyc*).
-};
+} InsnDB_COP1_sub01_Opcodes;
 
 // Coprocessor-1 (Floating-Point Unit) functions.
-enum COP1Funcs {
+typedef enum COP1Funcs {
     COP1_ROUND,
     COP1_TRUNC,
     COP1_CEIL,
     COP1_FLOOR,
-};
+} COP1Funcs;
 
 // Coprocessor-1 (Floating-Point Unit) conditions.
-enum COP1FPUConditions {
+typedef enum COP1FPUConditions {
     COP0_COND_F,    // False.
     COP0_COND_UN,   // Unordered.
     COP0_COND_EQ,   // Equal.
@@ -332,10 +332,10 @@ enum COP1FPUConditions {
     COP0_COND_NGE,  // Not Greater Than or Equal.
     COP0_COND_LE,   // Less Than or Equal.
     COP0_COND_NGT,  // Not Greater Than.
-};
+} COP1FPUConditions;
 
 // insn_db_cop1_sub10 opcodes.
-enum InsnDB_COP1_sub10_Opcodes {
+typedef enum InsnDB_COP1_sub10_Opcodes {
     OPS_ADD_F       = 0b000000, //  0: ADD.[fmt] Floating-Point Add (3cyc).
     OPS_SUB_F       = 0b000001, //  1: SUB.[fmt] Floating-Point Subtract (3cyc).
     OPS_MUL_F       = 0b000010, //  2: MUL.[fmt] Floating-Point Multiply (S:5cyc; D:8cyc).
@@ -381,10 +381,10 @@ enum InsnDB_COP1_sub10_Opcodes {
     OPS_C_NGE       = (B_OPS_C_F | COP0_COND_NGE ), // 0b111101 (61): C.NGE.[fmt]  Floating-point Compare (Not Greater Than or Equal) (1cyc).
     OPS_C_LE        = (B_OPS_C_F | COP0_COND_LE  ), // 0b111110 (62): C.LE.[fmt]   Floating-point Compare (Less Than or Equal) (1cyc).
     OPS_C_NGT       = (B_OPS_C_F | COP0_COND_NGT ), // 0b111111 (63): C.NGT.[fmt]  Floating-point Compare (Not Greater Than) (1cyc).
-};
+} InsnDB_COP1_sub10_Opcodes;
 
 // Pseudo-instruction IDs for insn_db_pseudo.
-enum PseudoInsns {
+typedef enum PseudoInsns {
     PSEUDO_NOP,
     PSEUDO_MOVET,
     PSEUDO_MOVES,
@@ -396,17 +396,17 @@ enum PseudoInsns {
     PSEUDO_BEQZL,
     PSEUDO_BNEZL,
     PSEUDO_DSUBI,
-};
+} PseudoInsns;
 
 // Types of instructions.
 // For COPz instructions, equivalent to cop_subtype.
-enum InsnType {
+typedef enum InsnType {
     INSN_TYPE_COP_FMT = 0b00, // Use 'fmt' as opcode.
     INSN_TYPE_REGIMM  = 0b01, // Use 'regimm' as opcode.
     INSN_TYPE_FUNC    = 0b10, // Use 'func' as opcode.
     INSN_TYPE_UNKNOWN = 0b11, // Unknown.
     INSN_TYPE_OPCODE, // Use 'opcode' as opcode.
-};
+} InsnType;
 
 // Instruction data
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
@@ -546,7 +546,7 @@ typedef union InsnTemplate {
     u32 raw32[2];
     u16 raw16[4];
     u8  raw8[8];
-} InsnTemplate;
+} InsnTemplate; /*0x08*/
 
 // #define SIZEOF_INSN_TEMPLATE sizeof(InsnTemplate)
 

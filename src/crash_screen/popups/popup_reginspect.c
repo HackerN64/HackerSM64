@@ -382,7 +382,7 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
         //! TODO: Combine this with cs_print_f32.
         const IEEE754_f64 flt64 = { .asU64 = val64, };
         const IEEE754_f32 flt32 = { .asU32 = val32, };
-        enum FloatErrorType fltErrType = (is64Bit ? validate_f64(flt64) : validate_f32(flt32));
+        FloatError fltErrType = (is64Bit ? validate_f64(flt64) : validate_f32(flt32));
         if (fltErrType != FLT_ERR_NONE) {
             cs_print(TEXT_X(2), TEXT_Y(line++), (STR_COLOR_PREFIX"%s"), COLOR_RGBA32_LIGHT_RED, ((fltErrType == FLT_ERR_DENORM) ? "denormalized" : "NaN"));
         } else {

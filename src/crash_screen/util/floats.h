@@ -6,16 +6,16 @@
 
 
 
-enum FloatErrorType {
+typedef enum FloatError {
     FLT_ERR_NONE,
     FLT_ERR_DENORM,
     FLT_ERR_NAN,
     NUM_FLT_ERR,
-};
+} FloatError;
 
 
-enum FloatErrorType validate_f32(IEEE754_f32 val);
-enum FloatErrorType validate_f64(IEEE754_f64 val);
+FloatError validate_f32(IEEE754_f32 val);
+FloatError validate_f64(IEEE754_f64 val);
 
 ALWAYS_INLINE static f32 f32_from_word(Word x) {
     return ((IEEE754_f32){ .asU32 = x, }).asF32;

@@ -24,7 +24,7 @@
 #define CRASH_SCREEN_START_PAGE CS_PAGE_SUMMARY
 
 
-enum CSPages {
+typedef enum CSPages {
     CS_FIRST_PAGE,
 
     CS_PAGE_SUMMARY = CS_FIRST_PAGE,
@@ -44,7 +44,7 @@ enum CSPages {
     CS_PAGE_ABOUT,
 
     CS_NUM_PAGES,
-};
+} CSPages;
 
 
 typedef struct CSPage {
@@ -67,11 +67,11 @@ typedef struct CSPage {
 
 
 extern struct CSPage* gCSPages[CS_NUM_PAGES];
-extern enum CSPages gCSPageID;
+extern CSPages gCSPageID;
 extern _Bool gCSSwitchedPage;
 
 
-enum CSPopups {
+typedef enum CSPopups {
     CS_POPUP_NONE,
     CS_POPUP_CONTROLS,
     CS_POPUP_PAGES,
@@ -79,7 +79,7 @@ enum CSPopups {
     CS_POPUP_REGINSPECT,
     CS_POPUP_THREADS,
     NUM_CS_POPUPS,
-};
+} CSPopups;
 
 typedef struct CSPopup {
     /*0x00*/ const char* name;
@@ -102,12 +102,12 @@ typedef struct CSPopup {
 } CSPopup; /*0x1C*/
 
 extern struct CSPopup* gCSPopups[NUM_CS_POPUPS];
-extern enum CSPopups gCSPopupID;
+extern CSPopups gCSPopupID;
 extern _Bool gCSSwitchedPopup;
 
-void cs_set_page(enum CSPages page);
+void cs_set_page(CSPages page);
 CSPage* cs_get_current_page(void);
 void cs_reinitialize_pages(void);
 
-void cs_open_popup(enum CSPopups popupID);
+void cs_open_popup(CSPopups popupID);
 CSPopup* cs_get_current_popup(void);

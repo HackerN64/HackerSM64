@@ -23,12 +23,12 @@
 #define STR_R       "R"
 
 
-enum CSSettingsGroup_controls {
+typedef enum CSSettingsGroup_controls {
     CS_OPT_HEADER_CONTROLS,
     CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES,
     CS_OPT_CONTROLS_ANALOG_DEADZONE,
     CS_OPT_END_CONTROLS,
-};
+} CSSettingsGroup_controls;
 
 
 typedef struct CSController {
@@ -58,7 +58,7 @@ typedef union CrashScreenDirections {
     u8 raw;
 } CrashScreenDirections;
 
-enum PACKED ControlTypes {
+typedef enum PACKED ControlTypes {
     CONT_DESC_LIST_END = -1,
     CONT_DESC_SWITCH_PAGE,
     CONT_DESC_PAGE_SELECT,
@@ -81,7 +81,7 @@ enum PACKED ControlTypes {
     CONT_DESC_CHANGE_SETTING,
     CONT_DESC_RESET_SETTING,
     NUM_CONT_DESC,
-};
+} ControlTypes;
 
 typedef struct ControlType {
     /*0x00*/ const char* control;

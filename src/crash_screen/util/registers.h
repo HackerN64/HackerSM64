@@ -10,14 +10,14 @@
 #define STR_REG_PREFIX "$"
 
 
-enum PACKED Coprocessors {
+typedef enum PACKED Coprocessors {
     COP0, // Coprocessor-0 (System Control Coprocessor).
     COP1, // Coprocessor-1 (Floating-Point Unit).
     COP2, // Coprocessor-2 (Reality Co-Processor Vector Unit).
     COP3, // Coprocessor-3 (CP3).
-};
+} Coprocessors;
 
-enum PACKED Interfaces {
+typedef enum PACKED Interfaces {
     INTERFACE_RDRAM,     // RDRAM_BASE_REG
     INTERFACE_SP,        // SP_BASE_REG
     INTERFACE_DPC,       // DPC_BASE_REG
@@ -34,10 +34,10 @@ enum PACKED Interfaces {
     INTERFACE_GIO_RDB,   // GIO_RDB_BASE_REG
 
     NUM_INTERFACES,
-};
+} Interfaces;
 
 // Coprocessors.
-enum PACKED RegisterSources {
+typedef enum PACKED RegisterSources {
     REGS_CPU,
 
     REGS_COPROCESSORS_START,
@@ -68,27 +68,27 @@ enum PACKED RegisterSources {
     REGS_INTERFACES_END = REGS_GIO_RDB,
 
     NUM_REG_SOURCES,
-};
+} RegisterSources;
 
 
 #include "register_data/register_ids.h"
 #include "register_data/interface/register_ids_interfaces.h"
 
 
-enum PACKED RegisterValueTypes {
+typedef enum PACKED RegisterValueTypes {
     REG_VAL_TYPE_INT,
     REG_VAL_TYPE_FLOAT,
     REG_VAL_TYPE_ADDR,
     REG_VAL_TYPE_BITS, //! TODO: Is this needed?
-};
+} RegisterValueTypes;
 
 typedef union RegisterId {
     struct {
-        /*0x00*/ enum RegisterSources src;
+        /*0x00*/ RegisterSources src;
         /*0x01*/ s8 idx;
         /*0x02*/ union {
                     struct {
-                        enum RegisterValueTypes type;
+                        RegisterValueTypes type;
                         struct PACKED {
                             u8     : 5;
                             u8 thr : 1; // Is on thread (unimplemented).
@@ -220,17 +220,17 @@ extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
 
 
-const RegisterSource* get_reg_src(enum RegisterSources src);
-ALWAYS_INLINE static const RegisterSource* get_coprocessor_src(enum Coprocessors copID) {
+const RegisterSource* get_reg_src(RegisterSources src);
+ALWAYS_INLINE static const RegisterSource* get_coprocessor_src(Coprocessors copID) {
     return get_reg_src(COPROCESSOR_TO_SRC(copID));
 }
-ALWAYS_INLINE static const RegisterSource* get_interface_src(enum Interfaces interfaceID) {
+ALWAYS_INLINE static const RegisterSource* get_interface_src(Interfaces interfaceID) {
     return get_reg_src(INTERFACE_TO_SRC(interfaceID));
 }
 const RegisterInfo* get_reg_info_from_src(const RegisterSource* regSrc, int idx);
-const RegisterInfo* get_reg_info(enum RegisterSources src, int idx);
-Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread);
-const char* get_reg_desc(enum RegisterSources src, int idx);
+const RegisterInfo* get_reg_info(RegisterSources src, int idx);
+Doubleword get_reg_val(RegisterSources src, int idx, _Bool checkThread);
+const char* get_reg_desc(RegisterSources src, int idx);
 
 void clear_saved_reg_buffer(void);
-void append_reg_to_buffer(enum RegisterSources src, int idx, enum RegisterValueTypes type, _Bool isOutput);
+void append_reg_to_buffer(RegisterSources src, int idx, RegisterValueTypes type, _Bool isOutput);

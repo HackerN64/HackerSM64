@@ -278,18 +278,18 @@ void remove_thread_from_queue(OSThread* thread) {
 void create_crash_screen_thread(void) {
     s32 threadIndex = sCSThreadIndex;
     sCSThreadIndex = CS_GET_NEXT_THREAD_ID(sCSThreadIndex);
-    struct CSThreadInfo* threadInfo = &sCSThreadInfos[threadIndex];
+    CSThreadInfo* threadInfo = &sCSThreadInfos[threadIndex];
     OSThread* thread = &threadInfo->thread;
 
     gWaitingCSThreadInfo = threadInfo;
 
     remove_thread_from_queue(thread);
-    bzero(threadInfo, sizeof(struct CSThreadInfo));
+    bzero(threadInfo, sizeof(CSThreadInfo));
     osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
     osCreateThread(
         thread, (THREAD_1000_CRASH_SCREEN_0 + threadIndex),
         crash_screen_thread_entry, NULL,
-        ((u8*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
+        ((Byte*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
         (OS_PRIORITY_APPMAX - 1)
     );
     osStartThread(thread);

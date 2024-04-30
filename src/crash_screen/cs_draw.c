@@ -225,7 +225,7 @@ void cs_draw_diamond(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord
 }
 
 // Draws a diamond then crops it using gCSScissorBox so that it looks like a triangle.
-void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color, enum CSDrawTriangleDirection direction) {
+void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color, CSDrawTriangleDirection direction) {
     CS_SCISSOR_BOX_START(startX, startY, (startX + w), (startY + h));
 
     switch (direction) {

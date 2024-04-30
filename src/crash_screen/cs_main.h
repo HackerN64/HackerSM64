@@ -25,13 +25,13 @@
 #define NUM_CRASH_SCREEN_BUFFERS 3
 
 
-enum CrashScreenMessageIDs {
+typedef enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_NONE,
     CRASH_SCREEN_MSG_VI_VBLANK,
     CRASH_SCREEN_MSG_CPU_BREAK = OS_EVENT_CPU_BREAK,
     CRASH_SCREEN_MSG_SP_BREAK  = OS_EVENT_SP_BREAK,
     CRASH_SCREEN_MSG_FAULT     = OS_EVENT_FAULT,
-};
+} CrashScreenMessageIDs;
 
 
 typedef struct CSThreadInfo {

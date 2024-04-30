@@ -83,7 +83,7 @@ static const RegisterSource* sRegisterLists[NUM_REG_SOURCES] = {
 };
 
 
-const RegisterSource* get_reg_src(enum RegisterSources src) {
+const RegisterSource* get_reg_src(RegisterSources src) {
     if (src >= NUM_REG_SOURCES) {
         return NULL;
     }
@@ -99,7 +99,7 @@ const RegisterInfo* get_reg_info_from_src(const RegisterSource* regSrc, int idx)
     return (regSrc->hasInfoFunc) ? regSrc->infoFunc(idx) : &regSrc->infoList[idx];
 }
 
-const RegisterInfo* get_reg_info(enum RegisterSources src, int idx) {
+const RegisterInfo* get_reg_info(RegisterSources src, int idx) {
     const RegisterSource* regSrc = get_reg_src(src);
     if (regSrc == NULL) {
         return NULL;
@@ -143,7 +143,7 @@ Doubleword get_direct_reg_val(const RegisterSource* regSrc, int idx) {
     return ((regSrc->valFunc != NULL) ? regSrc->valFunc(idx) : 0);
 }
 
-Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread) {
+Doubleword get_reg_val(RegisterSources src, int idx, _Bool checkThread) {
     const RegisterSource* regSrc = get_reg_src(src);
     if (regSrc == NULL) {
         return 0;
@@ -163,7 +163,7 @@ Doubleword get_reg_val(enum RegisterSources src, int idx, _Bool checkThread) {
     }
 }
 
-const char* get_reg_desc(enum RegisterSources src, int idx) {
+const char* get_reg_desc(RegisterSources src, int idx) {
     const RegisterSource* regSrc = sRegisterLists[src];
     const RegisterInfo* info = get_reg_info_from_src(regSrc, idx);
 
@@ -183,7 +183,7 @@ void clear_saved_reg_buffer(void) {
     gSavedRegBufSize = 0;
 }
 
-void append_reg_to_buffer(enum RegisterSources src, int idx, enum RegisterValueTypes type, _Bool isOutput) {
+void append_reg_to_buffer(RegisterSources src, int idx, RegisterValueTypes type, _Bool isOutput) {
     if (gSavedRegBufSize < ARRAY_COUNT(gSavedRegBuf)) {
         gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){
             .src = src,

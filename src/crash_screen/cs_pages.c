@@ -51,7 +51,7 @@ CSPage* gCSPages[CS_NUM_PAGES] = {
     [CS_PAGE_SETTINGS   ] = &gCSPage_settings,
     [CS_PAGE_ABOUT      ] = &gCSPage_about,
 };
-enum CSPages gCSPageID = CRASH_SCREEN_START_PAGE; // Current page ID.
+CSPages gCSPageID = CRASH_SCREEN_START_PAGE; // Current page ID.
 _Bool gCSSwitchedPage = FALSE;
 
 
@@ -60,7 +60,7 @@ _Bool gCSSwitchedPage = FALSE;
  *
  * @param[in] pageID The page ID to switch to.
  */
-void cs_set_page(enum CSPages pageID) {
+void cs_set_page(CSPages pageID) {
     if ((gCSPageID != pageID) && !gCSPages[pageID]->flags.crashed) {
         gCSPageID       = pageID;
         gCSSwitchedPage = TRUE;
@@ -96,7 +96,7 @@ CSPopup* gCSPopups[NUM_CS_POPUPS] = {
     [CS_POPUP_REGINSPECT    ] = &gCSPopup_reginspect,
     [CS_POPUP_THREADS       ] = &gCSPopup_threads,
 };
-enum CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
+CSPopups gCSPopupID = CS_POPUP_NONE; // Current open popup ID. CS_POPUP_NONE means no popup is open.
 _Bool gCSSwitchedPopup = FALSE;
 
 
@@ -105,7 +105,7 @@ _Bool gCSSwitchedPopup = FALSE;
  *
  * @param popupID The popup ID to switch to.
  */
-void cs_open_popup(enum CSPopups popupID) {
+void cs_open_popup(CSPopups popupID) {
     if (gCSPopupID != popupID) {
         gCSPopupID = popupID;
         gCSSwitchedPopup = TRUE;

@@ -337,8 +337,8 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
         const RegisterInfo* regInfo = NULL;
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
-        enum RegisterValueTypes valFmt1 = (info->f1 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Primary format.
-        enum RegisterValueTypes valFmt2 = (info->f2 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Secondary format.
+        RegisterValueTypes valFmt1 = (info->f1 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Primary format.
+        RegisterValueTypes valFmt2 = (info->f2 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Secondary format.
 
         clear_saved_reg_buffer();
 

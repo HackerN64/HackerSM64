@@ -87,7 +87,7 @@ typedef s32 CSTextCoord_s32;
 
 
 // For gCSDarkenAlphas (bit indices in RGBA16 color component).
-enum CSDrawDarkRectDarken {
+typedef enum CSDrawDarkRectDarken {
     CS_DARKEN_NONE,
     CS_DARKEN_HALF,
     CS_DARKEN_THREE_QUARTERS,
@@ -95,17 +95,17 @@ enum CSDrawDarkRectDarken {
     CS_DARKEN_FIFTEEN_SIXTEENTHS,
     CS_DARKEN_TO_BLACK,
     CS_DARKEN_LIMIT,
-};
+} CSDrawDarkRectDarken;
 
 extern const Alpha gCSDarkenAlphas[CS_DARKEN_LIMIT];
 
 // For cs_draw_triangle.
-enum CSDrawTriangleDirection {
+typedef enum CSDrawTriangleDirection {
     CS_TRI_DOWN,
     CS_TRI_UP,
     CS_TRI_RIGHT,
     CS_TRI_LEFT,
-};
+} CSDrawTriangleDirection;
 
 
 typedef struct CSScissorBox {
@@ -136,7 +136,7 @@ ALWAYS_INLINE void cs_draw_dark_rect(ScreenCoord_s32 startX, ScreenCoord_u32 sta
 }
 void cs_draw_outline(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color);
 void cs_draw_diamond(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color);
-void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color, enum CSDrawTriangleDirection direction);
+void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA32 color, CSDrawTriangleDirection direction);
 // void cs_draw_line(ScreenCoord_u32 x1, ScreenCoord_u32 y1, ScreenCoord_u32 x2, ScreenCoord_u32 y2, RGBA32 color);
 void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, RGBA32 color);
 // void cs_draw_texture(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA16* texture);

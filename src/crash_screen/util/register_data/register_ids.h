@@ -1,5 +1,5 @@
 
-enum REGIDS_CPU {
+typedef enum REGIDS_CPU {
     REG_CPU_R0,                                                                                     // $zero. Hardware enforced.
     REG_CPU_AT,                                                                                     // Assembler temporary value. Don't use unless you know it's safe.
     REG_CPU_V0, REG_CPU_V1,                                                                         // Subroutine return value. V1 is used for 64 bit returns.
@@ -13,9 +13,9 @@ enum REGIDS_CPU {
     REG_CPU_FP,                                                                                     // Saved value 8 ("S8") or frame pointer ("FP"), depending on compiler.
     REG_CPU_RA,                                                                                     // Return address. Jump to this to return from a function. Hardware enforced.
     CPU_NUM_REGISTERS,
-};
+} REGIDS_CPU;
 
-enum RegDesc {
+typedef enum RegDesc_default {
     REG_DESC_ZERO,
     REG_DESC_AT,
     REG_DESC_SUBRET,
@@ -27,9 +27,9 @@ enum RegDesc {
     REG_DESC_SP,
     REG_DESC_FP,
     REG_DESC_RA,
-};
+} RegDesc_default;
 
-enum REGIDS_CP0 {
+typedef enum REGIDS_CP0 {
     REG_CP0_INX       = C0_INX,         // Programmable pointer into TLB array.
     REG_CP0_RAND      = C0_RAND,        // Pseudorandom pointer into TLB array (read only).
     REG_CP0_ENTRYLO0  = C0_ENTRYLO0,    // Low half of TLB entry for even virtual addresses (VPN).
@@ -63,9 +63,9 @@ enum REGIDS_CP0 {
     REG_CP0_ERROR_EPC = C0_ERROR_EPC,   // Error Exception Program Counter.
     REG_CP0_31        = 31,             // Reserved for future use.
     CP0_NUM_REGISTERS,
-};
+} REGIDS_CP0;
 
-enum RegDesc_CP0 {
+typedef enum RegDesc_CP0 {
     REG_DESC_CP0_INX,
     REG_DESC_CP0_RAND,
     REG_DESC_CP0_ENTRYLO0,
@@ -92,32 +92,32 @@ enum RegDesc_CP0 {
     REG_DESC_CP0_TAGHI,
     REG_DESC_CP0_ERROR_EPC,
     REG_DESC_CP0_RESERVED,
-};
+} RegDesc_CP0;
 
-enum REGIDS_CP1 {
+typedef enum REGIDS_CP1 {
     REG_CP1_F00, REG_CP1_F01, REG_CP1_F02, REG_CP1_F03,                                                                                                                 // Subroutine return value.
     REG_CP1_F04, REG_CP1_F05, REG_CP1_F06, REG_CP1_F07, REG_CP1_F08, REG_CP1_F09, REG_CP1_F10,  REG_CP1_F11,                                                        // Temporary values.
     REG_CP1_F12, REG_CP1_F13, REG_CP1_F14, REG_CP1_F15,                                                                                                                 // Subroutine arguments.
     REG_CP1_F16, REG_CP1_F17, REG_CP1_F18, REG_CP1_F19,                                                                                                                 // Temporary values.
     REG_CP1_F20, REG_CP1_F21, REG_CP1_F22, REG_CP1_F23, REG_CP1_F24, REG_CP1_F25, REG_CP1_F26, REG_CP1_F27, REG_CP1_F28, REG_CP1_F29, REG_CP1_F30, REG_CP1_F31, // Saved Values.
     CP1_NUM_REGISTERS,
-};
+} REGIDS_CP1;
 
-enum REGIDS_FCR {
+typedef enum REGIDS_FCR {
     REG_FCR_IMPL_REV       =  0,
     REG_FCR_CONTROL_STATUS = 31,
     FCR_NUM_REGISTERS,
-};
+} REGIDS_FCR;
 
-enum RegDesc_FCR {
+typedef enum RegDesc_FCR {
     REG_DESC_FCR_COP_IMPL_REV,
     REG_DESC_FCR_CONTROL_STATUS,
-};
+} RegDesc_FCR;
 
-enum REGIDS_SPC {
+typedef enum REGIDS_SPC {
     // REG_SPC_PC,    // Program Counter
     REG_SPC_LO,    // mflo/mtlo
     REG_SPC_HI,    // mfhi/mthi
     // REG_SPC_LLBIT, // Load Linked: set by LL, cleared by ERET, tested by SC
     REG_SPC_RCP,   // From OSThread, not a vr4300 register.
-};
+} REGIDS_SPC;

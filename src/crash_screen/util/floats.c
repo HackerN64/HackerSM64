@@ -12,7 +12,7 @@
 
 
 
-enum FloatErrorType validate_f32(IEEE754_f32 val) {
+FloatError validate_f32(IEEE754_f32 val) {
     if (val.mantissa != 0) {
         if (val.exponent == 0x00) {
             return FLT_ERR_DENORM; // Denormalized value.
@@ -24,7 +24,7 @@ enum FloatErrorType validate_f32(IEEE754_f32 val) {
     return FLT_ERR_NONE;
 }
 
-enum FloatErrorType validate_f64(IEEE754_f64 val) {
+FloatError validate_f64(IEEE754_f64 val) {
     if (val.mantissa != 0) {
         if (val.exponent == 0x00) {
             return FLT_ERR_DENORM; // Denormalized value.

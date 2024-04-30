@@ -74,7 +74,7 @@ static const HardcodedSegmentInfo sHardcodedSegmentInfos[NUM_HARDCODED_SEGS] = {
     [SEG_HARDCODED_FRAMEBUFFERS] = HARDCODED_SEG("framebuffers", framebuffers, Bss, Bss, Bss),
     [SEG_HARDCODED_ZBUFFER     ] = HARDCODED_SEG("zbuffer",      zbuffer,      Bss, Bss, Bss),
     [SEG_HARDCODED_BUFFERS     ] = HARDCODED_SEG("buffers",      buffers,      Bss, Bss, Bss),
-    [SEG_HARDCODED_MAPDATA     ] = HARDCODED_SEG("map data",     mapData,      Rom,    ,    ),
+    [SEG_HARDCODED_MAPDATA     ] = HARDCODED_SEG("map symbols",  mapData,      Rom,    ,    ),
     [SEG_HARDCODED_GODDARD     ] = HARDCODED_SEG("goddard",      goddard,      Rom,    , Bss),
 };
 

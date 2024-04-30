@@ -14,13 +14,13 @@ typedef s16 SettingsType;
 typedef _Bool (*CSSettingsFunc)(int groupID, int settingID);
 
 
-enum PACKED CSPrintNumberFormats {
+typedef enum PACKED CSPrintNumberFormats {
     PRINT_NUM_FMT_HEX, // 0xFFFFFFFF
     PRINT_NUM_FMT_DEC, // 0.0
     PRINT_NUM_FMT_SCI, // XeX
-};
+} CSPrintNumberFormats;
 
-enum PACKED CSSettingsGroups {
+typedef enum PACKED CSSettingsGroups {
     CS_OPT_GROUP_BUTTONS,
     CS_OPT_GROUP_GLOBAL,
     CS_OPT_GROUP_CONTROLS,
@@ -42,7 +42,7 @@ enum PACKED CSSettingsGroups {
     // CS_OPT_GROUP_PAGE_ABOUT,
 
     NUM_CS_OPT_GROUPS,
-};
+} CSSettingsGroups;
 
 enum CSSettingsGroup_global {
     CS_OPT_HEADER_GLOBAL,
@@ -59,16 +59,16 @@ enum CSSettingsGroup_global {
     CS_OPT_END_GLOBAL,
 };
 
-enum CSSettingsEntryType {
+typedef enum CSSettingsEntryType {
     CS_OPT_TYPE_END,
     CS_OPT_TYPE_SETTING,
     CS_OPT_TYPE_HEADER,
-};
+} CSSettingsEntryType;
 
 
 //! TODO: shown flag + enabled flag + callback func(old, new) + draw func(x, y, text, opt).
 typedef struct CSSetting {
-    /*0x00*/ const enum CSSettingsEntryType type;
+    /*0x00*/ const CSSettingsEntryType type;
     /*0x04*/ const char* name;
     /*0x08*/ const char* (*valNames)[];
     /*0x0C*/ SettingsType val;

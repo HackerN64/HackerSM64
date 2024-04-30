@@ -501,8 +501,8 @@ static const FloatErrorPrintFormat sFltErrFmt[] = {
     [FLT_ERR_NAN   ] = { .r = 0xFF, .g = 0x7F, .b = 0x7F, .prefixChar = CHAR_FLT_PREFIX_NAN,    .suffix = "NaN",          },
 };
 
-size_t cs_print_f32(ScreenCoord_u32 x, ScreenCoord_u32 y, IEEE754_f32 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
-    const enum FloatErrorType fltErrType = validate_f32(val);
+size_t cs_print_f32(ScreenCoord_u32 x, ScreenCoord_u32 y, IEEE754_f32 val, const CSPrintNumberFormats format, _Bool includeSuffix) {
+    const FloatError fltErrType = validate_f32(val);
     size_t numChars = 0;
 
     if (fltErrType != FLT_ERR_NONE) {
@@ -530,7 +530,7 @@ size_t cs_print_f32(ScreenCoord_u32 x, ScreenCoord_u32 y, IEEE754_f32 val, const
 
 //! TODO:
 // size_t cs_print_f64(u32 x, u32 y, IEEE754_f64 val, const enum CSPrintNumberFormats format, _Bool includeSuffix) {
-//     const enum FloatErrorType fltErrType = validate_f64(val);
+//     const FloatError fltErrType = validate_f64(val);
 //     size_t numChars = 0;
 
 //     return numChars;

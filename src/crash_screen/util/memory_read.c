@@ -116,7 +116,7 @@ ALWAYS_INLINE static _Bool is_in_region(const MemoryRegion* regionList, Address 
 }
 
 // Whether the address is in a specific memory region (see 'enum MemoryRegions' and 'sMemoryBounds').
-ALWAYS_INLINE static _Bool is_in_memory_region(Address addr, enum MemoryRegions regionId) {
+ALWAYS_INLINE static _Bool is_in_memory_region(Address addr, MemoryRegions regionId) {
     return is_in_region(sMemoryRegions, addr, regionId);
     // return ((addr >= sMemoryBounds[region]) && (addr < sMemoryBounds[region + 1]));
 }
