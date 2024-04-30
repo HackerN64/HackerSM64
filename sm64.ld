@@ -42,7 +42,7 @@ OUTPUT_ARCH (mips)
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_segment_7) \
-   BEGIN_SEG(name, 0x0E000000) \
+   BEGIN_SEG(name, 0x1A000000) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
       KEEP(BUILD_DIR/levels/name/script.o(.text*)); \
