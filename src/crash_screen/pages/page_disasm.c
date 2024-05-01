@@ -92,13 +92,15 @@ static const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_LIGHT_BLUE,
 };
 
-_Bool gFillBranchBuffer = FALSE;
 static _Bool sContinueFillBranchBuffer = FALSE;
 
 ALIGNED16 static BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static u32 sNumBranchArrows = 0;
 
 static Address sBranchBufferCurrAddr = 0x00000000;
+
+const MapSymbol* sDisasmCurrSymbol = NULL;
+const MapSymbol* sDisasmCurrBranchSymbol = NULL;
 
 
 void reset_branch_buffer(Address funcAddr) {
@@ -113,9 +115,10 @@ void page_disasm_init(void) {
     sDisasmViewportIndex = gSelectedAddress;
 
 #ifdef INCLUDE_DEBUG_MAP
-    gFillBranchBuffer         = FALSE;
     sContinueFillBranchBuffer = FALSE;
     reset_branch_buffer((Address)NULL);
+    sDisasmCurrSymbol         = NULL;
+    sDisasmCurrBranchSymbol   = NULL;
 #endif // INCLUDE_DEBUG_MAP
 }
 
@@ -172,7 +175,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
         s16 branchOffset = insn_check_for_branch_offset(insn);
 
         if (branchOffset != 0x0000) {
-            currArrow->insnIndex    = addr_to_insn_index(symbol->addr, sBranchBufferCurrAddr); // ((sBranchBufferCurrAddr - symbol->addr) / PAGE_DISASM_STEP);
+            currArrow->insnIndex    = addr_to_insn_index(symbol->addr, sBranchBufferCurrAddr);
             currArrow->branchOffset = branchOffset;
 
             currArrow++;
@@ -419,6 +422,7 @@ void page_disasm_draw(void) {
         if (symbol != NULL) {
             disasm_draw_branch_arrows(line, symbol);
         }
+        sDisasmCurrSymbol = symbol;
     }
 #endif // INCLUDE_DEBUG_MAP
 
@@ -473,10 +477,6 @@ static void disasm_move_down(void) {
 }
 
 void page_disasm_input(void) {
-#ifdef INCLUDE_DEBUG_MAP
-    Address oldPos = gSelectedAddress;
-#endif // INCLUDE_DEBUG_MAP
-
     if (gCSDirectionFlags.pressed.up) {
         disasm_move_up();
     }
@@ -486,7 +486,6 @@ void page_disasm_input(void) {
     }
 
     u16 buttonPressed = gCSCompositeController->buttonPressed;
-
     if (buttonPressed & A_BUTTON) {
         open_address_select(get_insn_branch_target_from_addr(gSelectedAddress));
     }
@@ -494,22 +493,19 @@ void page_disasm_input(void) {
     sDisasmViewportIndex = cs_clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, PAGE_DISASM_STEP);
 
 #ifdef INCLUDE_DEBUG_MAP
-    // if (buttonPressed & B_BUTTON) {
-    //     cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
-    // }
-
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE) == DISASM_ARROW_MODE_FUNCTION) {
-        //! TODO: don't reset branch buffer if switched page back into the same function.
-        if (gCSSwitchedPage || (get_symbol_index_from_addr_forward(oldPos) != get_symbol_index_from_addr_forward(gSelectedAddress))) {
-            gFillBranchBuffer = TRUE;
+        Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
+        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
+        _Bool startFillBranchBuffer = FALSE;
+
+        if (sDisasmCurrBranchSymbol != symbol) {
+            sDisasmCurrBranchSymbol = symbol;
+            startFillBranchBuffer = TRUE;
         }
 
-        Address alignedSelectedAddress = ALIGNFLOOR(gSelectedAddress, PAGE_DISASM_STEP);
-
-        const MapSymbol* symbol = get_map_symbol(alignedSelectedAddress, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
         if (symbol != NULL) {
-            if (gFillBranchBuffer) {
-                gFillBranchBuffer = FALSE;
+            if (startFillBranchBuffer) {
+                startFillBranchBuffer = FALSE;
                 reset_branch_buffer(symbol->addr);
                 sContinueFillBranchBuffer = TRUE;
             }
@@ -518,7 +514,6 @@ void page_disasm_input(void) {
                 sContinueFillBranchBuffer = disasm_fill_branch_buffer(symbol->addr);
             }
         } else {
-            gFillBranchBuffer = FALSE;
             reset_branch_buffer(alignedSelectedAddress);
             sContinueFillBranchBuffer = FALSE;
         }

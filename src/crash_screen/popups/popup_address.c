@@ -14,8 +14,6 @@
 
 #include "popup_address.h"
 
-#include "crash_screen/pages/page_disasm.h" // For gFillBranchBuffer.
-
 
 static Address sAddressSelectTarget = 0x00000000;
 static s8 sAddressSelectCharIndex = 7;
@@ -120,11 +118,6 @@ void cs_address_select_input(void) {
                     cs_set_page(CS_PAGE_DISASM);
                 } else {
                     cs_set_page(CS_PAGE_MEMORY);
-                }
-                break;
-            case CS_PAGE_DISASM:
-                if (IS_DEBUG_MAP_ENABLED() && (get_symbol_index_from_addr_forward(gSelectedAddress) != get_symbol_index_from_addr_forward(sAddressSelectTarget))) {
-                    gFillBranchBuffer = TRUE;
                 }
                 break;
 #ifdef INCLUDE_DEBUG_MAP

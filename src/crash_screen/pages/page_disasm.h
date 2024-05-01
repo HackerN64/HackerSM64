@@ -59,11 +59,6 @@ typedef union BranchArrow {
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET   (DISASM_FUNCTION_SEARCH_MAX_INSNS * PAGE_DISASM_STEP) // The max number of instructions to search for branches within a function.
 
 
-#ifdef INCLUDE_DEBUG_MAP
-extern _Bool gFillBranchBuffer;
-#endif // INCLUDE_DEBUG_MAP
-
-
 extern struct CSSetting cs_settings_group_page_disasm[];
 extern struct CSPage gCSPage_disasm;
 
