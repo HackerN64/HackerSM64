@@ -102,9 +102,9 @@ extern struct MemoryPool *gObjectMemoryPool;
 
 enum CollisionFlags {
     COLLISION_FLAGS_NONE              = (0 << 0),
+    COLLISION_FLAG_EXCLUDE_DYNAMIC    = (1 << 0),
     COLLISION_FLAG_CAMERA             = (1 << 1),
     COLLISION_FLAG_INCLUDE_INTANGIBLE = (1 << 2),
-    COLLISION_FLAG_EXCLUDE_DYNAMIC    = (1 << 3),
 };
 
 extern s16 gCollisionFlags;

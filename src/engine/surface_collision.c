@@ -69,14 +69,14 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     };
     s32 numCols = 0;
 
-    _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
+    s32 checkingForCamera = ((gCollisionFlags & COLLISION_FLAG_CAMERA) != 0);
 
     // Check whether the object will be able to pass through certain walls.
     struct Object* obj = o;
-    _Bool canPassVanishWalls = (
+    s32 canPassVanishWalls = (
         (obj != NULL) && (
             (obj->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) ||
-            (obj == gMarioObject && (gMarioState->flags & MARIO_VANISH_CAP))
+            ((obj == gMarioObject) && (gMarioState->flags & MARIO_VANISH_CAP))
         )
     );
 
@@ -87,19 +87,27 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         surfaceNode = surfaceNode->next;
 
         // Exclude a large number of walls immediately to optimize.
-        if (pos[1] < surf->lowerY || pos[1] > surf->upperY) continue;
+        if ((pos[1] < surf->lowerY) || (pos[1] > surf->upperY)) {
+            continue;
+        }
 
         // Determine if checking for the camera or not.
         if (checkingForCamera) {
-            if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
+            if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
+                continue;
+            }
         } else {
             TerrainData type = surf->type;
 
             // Ignore camera only surfaces.
-            if (type == SURFACE_CAMERA_BOUNDARY) continue;
+            if (type == SURFACE_CAMERA_BOUNDARY) {
+                continue;
+            }
 
             // If an object can pass through a vanish cap wall, pass through.
-            if (canPassVanishWalls && (type == SURFACE_VANISH_CAP_WALLS)) continue;
+            if (canPassVanishWalls && (type == SURFACE_VANISH_CAP_WALLS)) {
+                continue;
+            }
         }
 
         // Dot of normal and pos, + origin offset
@@ -109,7 +117,9 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
                      surf->originOffset;
 
         // Exclude surfaces outside of the radius.
-        if (offset < -radius || offset > radius) continue;
+        if ((offset < -radius) || (offset > radius)) {
+            continue;
+        }
 
 #ifdef ROUNDED_WALL_CORNERS
         Vec3f v0, v1, v2;
@@ -126,11 +136,13 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
 
         f32 invDenom = (d00 * d11) - (d01 * d01);
         if (FLT_IS_NONZERO(invDenom)) {
-            invDenom = 1.0f / invDenom;
+            invDenom = (1.0f / invDenom);
         }
 
         if (check_wall_triangle_vw(d00, d01, d11, d20, d21, invDenom)) {
-            if (offset < 0) continue;
+            if (offset < 0) {
+                continue;
+            }
 
             // Edge 1-2
             if (check_wall_triangle_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
@@ -322,14 +334,14 @@ static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *ceil)
     vz[1] = ceil->vertex2[2];
 
     // Checking if point is in bounds of the triangle laterally.
-    if (((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0])) > 0) return FALSE;
+    if ((((vz[0] - z) * (vx[1] - vx[0])) - ((vx[0] - x) * (vz[1] - vz[0]))) > 0) return FALSE;
 
     // Slight optimization by checking these later.
     vx[2] = ceil->vertex3[0];
     vz[2] = ceil->vertex3[2];
 
-    if (((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1])) > 0) return FALSE;
-    if (((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2])) > 0) return FALSE;
+    if ((((vz[1] - z) * (vx[2] - vx[1])) - ((vx[1] - x) * (vz[2] - vz[1]))) > 0) return FALSE;
+    if ((((vz[2] - z) * (vx[0] - vx[2])) - ((vx[2] - x) * (vz[0] - vz[2]))) > 0) return FALSE;
 
     return TRUE;
 }
@@ -342,7 +354,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
     struct Surface *lowestCeil = NULL;
     f32 lowestCeilHeight = *pheight;
 
-    _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
+    s32 checkingForCamera = ((gCollisionFlags & COLLISION_FLAG_CAMERA) != 0);
 
     // Iterate through the list of ceilings until there are no more ceilings.
     while (surfaceNode != NULL) {
@@ -351,17 +363,25 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 
         // Determine if checking for the camera or not.
         if (checkingForCamera) {
-            if (ceil->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
+            if (ceil->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
+                continue;
+            }
         } else {
             // If we are not checking for the camera, ignore camera only ceilings.
-            if (ceil->type == SURFACE_CAMERA_BOUNDARY) continue;
+            if (ceil->type == SURFACE_CAMERA_BOUNDARY) {
+                continue;
+            }
         }
 
         // Exclude all ceilings below the check height.
-        if (y > ceil->upperY) continue;
+        if (y > ceil->upperY) {
+            continue;
+        }
 
         // Check that the point is within the triangle bounds.
-        if (!check_within_ceil_triangle_bounds(x, z, ceil)) continue;
+        if (!check_within_ceil_triangle_bounds(x, z, ceil)) {
+            continue;
+        }
 
         // Find the height of the ceiling above the current location.
         f32 ceilHeight = get_surface_height_at_location(x, z, ceil);
@@ -370,14 +390,18 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         if (
             (ceilHeight < y)                 || // Lower than the check height.
             (ceilHeight >= lowestCeilHeight)    // Higher than the previous lowest ceiling.
-        ) continue;
+        ) {
+            continue;
+        }
 
         // Update the lowest found ceiling.
         lowestCeil       = ceil;
         lowestCeilHeight = ceilHeight;
 
         // Exit the loop if it's not possible for another ceiling to be closer to the check height.
-        if (ceilHeight == y) break;
+        if (ceilHeight == y) {
+            break;
+        }
     }
 
     *pheight = lowestCeilHeight;
@@ -463,14 +487,14 @@ static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *floo
     vz[1] = floor->vertex2[2];
 
     // Checking if point is in bounds of the triangle laterally.
-    if (((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0])) < 0) return FALSE;
+    if ((((vz[0] - z) * (vx[1] - vx[0])) - ((vx[0] - x) * (vz[1] - vz[0]))) < 0) return FALSE;
 
     // Slight optimization by checking these later.
     vx[2] = floor->vertex3[0];
     vz[2] = floor->vertex3[2];
 
-    if (((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1])) < 0) return FALSE;
-    if (((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2])) < 0) return FALSE;
+    if ((((vz[1] - z) * (vx[2] - vx[1])) - ((vx[1] - x) * (vz[2] - vz[1]))) < 0) return FALSE;
+    if ((((vz[2] - z) * (vx[0] - vx[2])) - ((vx[2] - x) * (vz[0] - vz[2]))) < 0) return FALSE;
 
     return TRUE;
 }
@@ -483,8 +507,8 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     struct Surface *highestFloor = NULL;
     f32 highestFloorHeight = *pheight;
 
-    _Bool checkingForCamera = (gCollisionFlags & COLLISION_FLAG_CAMERA);
-    _Bool skipIntangible = !(gCollisionFlags & COLLISION_FLAG_INCLUDE_INTANGIBLE);
+    s32 checkingForCamera = ((gCollisionFlags & COLLISION_FLAG_CAMERA) != 0);
+    s32 skipIntangible = ((gCollisionFlags & COLLISION_FLAG_INCLUDE_INTANGIBLE) == 0);
 
     // Iterate through the list of floors until there are no more floors.
     while (surfaceNode != NULL) {
@@ -495,21 +519,31 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 
         // To prevent the Merry-Go-Round room from loading when Mario is above the hole that leads there, SURFACE_INTANGIBLE is used.
         // This prevents the wrong room from loading, but can also allow Mario to pass through.
-        if (skipIntangible && (type == SURFACE_INTANGIBLE)) continue;
+        if (skipIntangible && (type == SURFACE_INTANGIBLE)) {
+            continue;
+        }
 
         // Determine if we are checking for the camera or not.
         if (checkingForCamera) {
-            if (floor->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
+            if (floor->flags & SURFACE_FLAG_NO_CAM_COLLISION) {
+                continue;
+            }
         } else {
             // If we are not checking for the camera, ignore camera only floors.
-            if (type == SURFACE_CAMERA_BOUNDARY) continue;
+            if (type == SURFACE_CAMERA_BOUNDARY) {
+                continue;
+            }
         }
 
         // Exclude all floors above the check height.
-        if (y < floor->lowerY) continue;
+        if (y < floor->lowerY) {
+            continue;
+        }
 
         // Check that the point is within the triangle bounds.
-        if (!check_within_floor_triangle_bounds(x, z, floor)) continue;
+        if (!check_within_floor_triangle_bounds(x, z, floor)) {
+            continue;
+        }
 
         // Get the height of the floor under the current location.
         f32 floorHeight = get_surface_height_at_location(x, z, floor);
@@ -518,14 +552,18 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         if (
             (floorHeight > y)                   || // Higher than the check height.
             (floorHeight <= highestFloorHeight)    // Lower than the previous highest floor.
-        ) continue;
+        ) {
+            continue;
+        }
 
         // Update the highest found floor.
         highestFloor       = floor;
         highestFloorHeight = floorHeight;
 
         // Exit the loop if it's not possible for another floor to be closer to the check height (eg. standing on a floor).
-        if (floorHeight == y) break;
+        if (floorHeight == y) {
+            break;
+        }
     }
 
     *pheight = highestFloorHeight;

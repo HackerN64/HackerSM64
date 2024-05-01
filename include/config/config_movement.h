@@ -146,14 +146,3 @@
  */
 #define MARIO_INERTIA_UPWARD
 // #define MARIO_INERTIA_LATERAL
-
-/**
- * Improves the handling of convex wall corners by rounding wall collision at triangle edges to close the seams.
- * Also properly handles simultaneous collisions with multiple walls (eg. concave wall corners or narrow tunnels).
- */
-#define ROUNDED_WALL_CORNERS
-/**
- * Fixes an issue where entering an area above a ceiling without an intermediate floor would count as hitting a ceiling.
- * NOTE: This may allow Mario to clip through the wall on the deck of the the rocking JRB ship.
- */
-#define FIX_EXPOSED_CEILINGS

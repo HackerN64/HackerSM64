@@ -5,6 +5,18 @@
  **********************/
 
 /**
+ * Improves the handling of convex wall corners by rounding wall collision at triangle edges to close the seams.
+ * Also properly handles simultaneous collisions with multiple walls (eg. concave wall corners or narrow tunnels).
+ */
+#define ROUNDED_WALL_CORNERS
+
+/**
+ * Fixes an issue where entering an area above a ceiling without an intermediate floor would count as hitting a ceiling.
+ * NOTE: This may allow Mario to clip through the wall on the deck of the the rocking JRB ship.
+ */
+#define FIX_EXPOSED_CEILINGS
+
+/**
  * Reduces some find_floor calls, at the cost of some barely noticeable smoothness in Mario's visual movement in a few actions at higher speeds.
  * The defined number is the forward speed threshold before the change is active, since it's only noticeable at lower speeds.
  */
