@@ -1,0 +1,7 @@
+LOAD_YAY0(        /*seg*/ 0x07, _ssl_segment_7SegmentRomStart, _ssl_segment_7SegmentRomEnd),
+LOAD_YAY0(        /*seg*/ 0x0A, _ssl_skybox_yay0SegmentRomStart, _ssl_skybox_yay0SegmentRomEnd),
+LOAD_VANILLA_OBJECTS(ssl, generic),
+LOAD_YAY0(        /*seg*/ 0x05, _group5_yay0SegmentRomStart, _group5_yay0SegmentRomEnd),
+LOAD_RAW(         /*seg*/ 0x0C, _group5_geoSegmentRomStart,  _group5_geoSegmentRomEnd),
+LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
+LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),

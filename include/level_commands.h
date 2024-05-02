@@ -480,6 +480,11 @@ enum GoddardScene {
 #define LOAD_TEXTURE_BIN(textureBin) \
     LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_TEXTURE, /*romStart*/ _##textureBin##_yay0SegmentRomStart, /*romEnd*/ _##textureBin##_yay0SegmentRomEnd)
 
+#define LOAD_VANILLA_OBJECTS(objectBin, textureBin) \
+    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_TEXTURE, _##textureBin##_yay0SegmentRomStart, _##textureBin##_yay0SegmentRomEnd), \
+    LOAD_YAY0(        /*seg*/ SEGMENT_VANILLA_OBJECTS, _vo_##objectBin##_yay0SegmentRomStart,  _vo_##objectBin##_yay0SegmentRomEnd), \
+    LOAD_RAW(         /*seg*/ SEGMENT_VANILLA_GEO, _vo_##objectBin##_geoSegmentRomStart,  _vo_##objectBin##_geoSegmentRomEnd)
+
 #define LOAD_SKYBOX(skybox) \
     LOAD_YAY0(/*seg*/ SEGMENT_SKYBOX, /*romStart*/ _##skybox##_skybox_yay0SegmentRomStart, /*romEnd*/ _##skybox##_skybox_yay0SegmentRomEnd)
 

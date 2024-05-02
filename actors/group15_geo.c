@@ -11,3 +11,13 @@
 #include "toad/geo.inc.c"
 #include "mips/geo.inc.c"
 #include "boo_castle/geo.inc.c"
+
+#include "level_commands.h"
+
+const LevelScript script_func_global_16[] = {
+    LOAD_MODEL_FROM_GEO(MODEL_MIPS,                    mips_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_BOO_CASTLE,              boo_castle_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_LAKITU,                  lakitu_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_TOAD,                    toad_geo),
+    RETURN(),
+};

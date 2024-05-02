@@ -13,14 +13,4 @@
 
 #include "levels/ssl/header.h"
 
-#include "levels/ssl/areas/1/5/geo.inc.c"
-#include "levels/ssl/areas/2/4/geo.inc.c"
-#include "levels/ssl/pyramid_top/geo.inc.c"
-#include "levels/ssl/tox_box/geo.inc.c"
-#include "levels/ssl/areas/1/geo.inc.c"
-#include "levels/ssl/grindel/geo.inc.c"
-#include "levels/ssl/spindel/geo.inc.c"
-#include "levels/ssl/moving_pyramid_wall/geo.inc.c"
-#include "levels/ssl/pyramid_elevator/geo.inc.c"
-#include "levels/ssl/areas/2/geo.inc.c"
-#include "levels/ssl/areas/3/geo.inc.c"
+#include "levels/ssl/geo.inc.c"
