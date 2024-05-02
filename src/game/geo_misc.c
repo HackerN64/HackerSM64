@@ -3,8 +3,8 @@
 #include "sm64.h"
 #include "geo_misc.h"
 
-#include "actors_vanilla/castle_inside/header.h"
-#include "actors_vanilla/rr/header.h"
+#include "actors/vanilla_actors/castle_inside/header.h"
+#include "actors/vanilla_actors/rr/header.h"
 #include "area.h"
 #include "engine/math_util.h"
 #include "level_update.h"

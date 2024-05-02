@@ -1,7 +1,7 @@
 #include <ultra64.h>
 
 #include "actors/common1.h"
-#include "actors_vanilla/castle_grounds/header.h"
+#include "actors/vanilla_actors/castle_grounds/header.h"
 #include "area.h"
 #include "audio/external.h"
 #include "camera.h"

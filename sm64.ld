@@ -84,20 +84,20 @@ OUTPUT_ARCH (mips)
 #define VANILLA_OBJECTS(name, segAddr, geoAddr) \
    BEGIN_SEG(vo_##name##_yay0, segAddr) \
    { \
-      KEEP(BUILD_DIR/actors_vanilla/name/data.szp.o(.data*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/data.szp.o(.data*)); \
       . = ALIGN(0x10); \
    } \
    END_SEG(vo_##name##_yay0) \
    BEGIN_SEG(vo_##name##_geo, geoAddr) \
    { \
-      KEEP(BUILD_DIR/actors_vanilla/name/geo.o(.*data*)); \
-      KEEP(BUILD_DIR/actors_vanilla/name/geo.o(.rodata*)); \
-      KEEP(BUILD_DIR/actors_vanilla/name/geo.o(.text*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.*data*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.rodata*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.text*)); \
    } \
    END_SEG(vo_##name##_geo) \
    BEGIN_NOLOAD(vo_##name##_geo) \
    { \
-      KEEP(BUILD_DIR/actors_vanilla/name/geo.o(.bss*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.bss*)); \
    } \
    END_NOLOAD(vo_##name##_geo) \
    _vo_##name##_mio0SegmentRomStart = _vo_##name##_yay0SegmentRomStart; \

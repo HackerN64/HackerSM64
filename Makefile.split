@@ -43,19 +43,19 @@ LEVEL_ELF_FILES := $(foreach level_dir,$(LEVEL_DIRS),$(BUILD_DIR)/levels/$(level
 
 VANILLA_ACTORS_FILES := $(addsuffix data,$(VNL_ACTRS_DIRS))
 
-VANILLA_ACTORS_ELF_FILES := $(foreach level_dir,$(VNL_ACTRS_DIRS),$(BUILD_DIR)/actors_vanilla/$(level_dir)data.elf)
+VANILLA_ACTORS_ELF_FILES := $(foreach level_dir,$(VNL_ACTRS_DIRS),$(BUILD_DIR)/actors/vanilla_actors/$(level_dir)data.elf)
 
 SEG_FILES := \
     $(SEGMENTS:%=$(BUILD_DIR)/bin/%.elf) \
     $(ACTOR_GROUPS:%=$(BUILD_DIR)/actors/%.elf) \
     $(LEVEL_FILES:%=$(BUILD_DIR)/levels/%.elf) \
-    $(VANILLA_ACTORS_FILES:%=$(BUILD_DIR)/actors_vanilla/%.elf)
+    $(VANILLA_ACTORS_FILES:%=$(BUILD_DIR)/actors/vanilla_actors/%.elf)
 
 YAY0_FILES := \
     $(SEGMENTS:%=$(BUILD_DIR)/bin/%.szp) \
     $(ACTOR_GROUPS:%=$(BUILD_DIR)/actors/%.szp) \
     $(LEVEL_FILES:%=$(BUILD_DIR)/levels/%.szp) \
-    $(VANILLA_ACTORS_FILES:%=$(BUILD_DIR)/actors_vanilla/%.szp)
+    $(VANILLA_ACTORS_FILES:%=$(BUILD_DIR)/actors/vanilla_actors/%.szp)
 
 YAY0_OBJ_FILES := $(YAY0_FILES:.szp=.szp.o)
 
@@ -284,10 +284,10 @@ CRASH_TEXTURE_C_FILES       := $(addprefix $(BUILD_DIR)/,$(patsubst %.png,%.inc.
 # --------------------------------------
 
 define vanilla_objects_rules =
-    VANILLA_ACTORS_$(1)_TEXTURE_FILES := $$(patsubst %.png,%.inc.c,$$(wildcard actors_vanilla/$(1)/*.png))
-    $$(BUILD_DIR)/actors_vanilla/$(1)/data.o: $$(addprefix $$(BUILD_DIR)/,$$(VANILLA_ACTORS_$(1)_TEXTURE_FILES))
-    $$(BUILD_DIR)/actors_vanilla/$(1)/data.elf: SEGMENT_ADDRESS := 0x0e000000
-    $$(BUILD_DIR)/actors_vanilla/$(1)/data.elf: TEXTURE_BIN := $(2)
+    VANILLA_ACTORS_$(1)_TEXTURE_FILES := $$(patsubst %.png,%.inc.c,$$(wildcard actors/vanilla_actors/$(1)/*.png))
+    $$(BUILD_DIR)/actors/vanilla_actors/$(1)/data.o: $$(addprefix $$(BUILD_DIR)/,$$(VANILLA_ACTORS_$(1)_TEXTURE_FILES))
+    $$(BUILD_DIR)/actors/vanilla_actors/$(1)/data.elf: SEGMENT_ADDRESS := 0x0e000000
+    $$(BUILD_DIR)/actors/vanilla_actors/$(1)/data.elf: TEXTURE_BIN := $(2)
 endef
 
 $(eval $(call vanilla_objects_rules,bob,generic))
