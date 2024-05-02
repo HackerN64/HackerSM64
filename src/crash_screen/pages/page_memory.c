@@ -3,6 +3,7 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "crash_screen/util/floats.h"
 #include "crash_screen/util/memory_read.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_draw.h"
@@ -29,6 +30,7 @@ enum MemoryDisplayModes {
     MEMORY_MODE_RGBA16,
     MEMORY_MODE_RGBA32,
     MEMORY_MODE_SYMBOL,
+    MEMORY_MODE_F32,
     NUM_MEMORY_VIEW_MODES,
 };
 
@@ -38,7 +40,8 @@ const char* gValNames_mem_disp_mode[NUM_MEMORY_VIEW_MODES] = {
     [MEMORY_MODE_BINARY] = "BINARY",
     [MEMORY_MODE_RGBA16] = "RGBA16",
     [MEMORY_MODE_RGBA32] = "RGBA32",
-    [MEMORY_MODE_SYMBOL] = "SYMBOLS"
+    [MEMORY_MODE_SYMBOL] = "SYMBOLS",
+    [MEMORY_MODE_F32   ] = "F32",
 };
 
 
@@ -143,12 +146,28 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
             x += 2;
 
+
             const MapSymbol* destSymbol = NULL;
-            if (IS_DEBUG_MAP_ENABLED() && (mode == MEMORY_MODE_SYMBOL)) {
-                destSymbol = get_map_symbol(data.word, SYMBOL_SEARCH_BINARY);
-                if (destSymbol != NULL) {
-                    cs_print_symbol_name((x - 1), y, 9, destSymbol, FALSE);
-                }
+            // Modes that apply to the whole 4-byte Word:
+            switch (mode) {
+                case MEMORY_MODE_SYMBOL:
+                    if (IS_DEBUG_MAP_ENABLED()) {
+                        destSymbol = get_map_symbol(data.word, SYMBOL_SEARCH_BINARY);
+                        if (destSymbol != NULL) {
+                            cs_print_symbol_name((x - 1), y, 9, destSymbol, FALSE);
+                        }
+                    }
+                    break;
+                case MEMORY_MODE_F32:;
+                    //! TODO: Setting to change alignment?
+                    IEEE754_f32 f = { .asU32 = data.word, };
+                    if (validate_f32(f) == FLT_ERR_NONE) {
+                        cs_print(x, y, "% .3g", f.asF32);
+                    }
+                    break;
+                //! TODO: RGBA32 and RGBA16?
+                default:
+                    break;
             }
 
             // 4 bytes per Word:
@@ -227,6 +246,7 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                         case MEMORY_MODE_RGBA32:
                             cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), data.word);
                             break;
+                        case MEMORY_MODE_F32:
                         default:
                             break;
                     }
