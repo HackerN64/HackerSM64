@@ -249,11 +249,11 @@ $(BUILD_DIR)/bin/machine.elf:            SEGMENT_ADDRESS := 0x09000000
 $(BUILD_DIR)/bin/mountain.elf:           SEGMENT_ADDRESS := 0x09000000
 $(BUILD_DIR)/bin/grass.elf:              SEGMENT_ADDRESS := 0x09000000
 # EU segment 19 translations
-$(BUILD_DIR)/bin/translation_de.elf:  SEGMENT_ADDRESS := 0x19000000
-$(BUILD_DIR)/bin/translation_en.elf:  SEGMENT_ADDRESS := 0x19000000
-$(BUILD_DIR)/bin/translation_fr.elf:  SEGMENT_ADDRESS := 0x19000000
-$(BUILD_DIR)/bin/translation_jp.elf:  SEGMENT_ADDRESS := 0x19000000
-$(BUILD_DIR)/bin/translation_es.elf:  SEGMENT_ADDRESS := 0x19000000
+$(BUILD_DIR)/bin/translation_de.elf:  SEGMENT_ADDRESS := 0x1B000000
+$(BUILD_DIR)/bin/translation_en.elf:  SEGMENT_ADDRESS := 0x1B000000
+$(BUILD_DIR)/bin/translation_fr.elf:  SEGMENT_ADDRESS := 0x1B000000
+$(BUILD_DIR)/bin/translation_jp.elf:  SEGMENT_ADDRESS := 0x1B000000
+$(BUILD_DIR)/bin/translation_es.elf:  SEGMENT_ADDRESS := 0x1B000000
 
 # --------------------------------------
 # Skybox Rules

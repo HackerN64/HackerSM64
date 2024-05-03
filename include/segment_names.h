@@ -38,9 +38,9 @@
 #define SEGMENT_COMMON1_GEO          0x16 // | Segment 22 | /actors/common1_geo
 #define SEGMENT_GROUP0_GEO           0x17 // | Segment 23 | /actors/group0_geo
 #define SEGMENT_DEMO_INPUTS          0x18 // | Segment 24 | Demo Inputs List
-#define SEGMENT_EU_TRANSLATION       0x19 // | Segment 25 | EU language translations
-#define SEGMENT_LEVEL_SCRIPT         0x1A // | Segment 26 | level_ending_entry (/levels/ending/), DEFINE_LEVEL
-#define SEGMENT_VANILLA_GEO          0x1B // | Segment 27 | Geolayouts for vanilla objects
+#define SEGMENT_LEVEL_SCRIPT         0x19 // | Segment 25 | level_ending_entry (/levels/ending/), DEFINE_LEVEL
+#define SEGMENT_VANILLA_GEO          0x1A // | Segment 26 | Geolayouts for vanilla objects
+#define SEGMENT_EU_TRANSLATION       0x1B // | Segment 27 | EU language translations
 #define SEGMENT_UNKNOWN_28           0x1C // | Segment 28 | Unknown/Unused?
 #define SEGMENT_UNKNOWN_29           0x1D // | Segment 29 | Unknown/Unused?
 #define SEGMENT_UNKNOWN_30           0x1E // | Segment 30 | Unknown/Unused?

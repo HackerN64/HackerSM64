@@ -42,7 +42,7 @@ OUTPUT_ARCH (mips)
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_segment_7) \
-   BEGIN_SEG(name, 0x1A000000) \
+   BEGIN_SEG(name, 0x19000000) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
       KEEP(BUILD_DIR/levels/name/script.o(.text*)); \
@@ -81,14 +81,14 @@ OUTPUT_ARCH (mips)
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
-#define VANILLA_OBJECTS(name, segAddr, geoAddr) \
-   BEGIN_SEG(vo_##name##_yay0, segAddr) \
+#define VANILLA_OBJECTS(name) \
+   BEGIN_SEG(vo_##name##_yay0, 0x0e000000) \
    { \
       KEEP(BUILD_DIR/actors/vanilla_actors/name/data.szp.o(.data*)); \
       . = ALIGN(0x10); \
    } \
    END_SEG(vo_##name##_yay0) \
-   BEGIN_SEG(vo_##name##_geo, geoAddr) \
+   BEGIN_SEG(vo_##name##_geo, 0x1a000000) \
    { \
       KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.*data*)); \
       KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.rodata*)); \
@@ -326,18 +326,18 @@ SECTIONS
    YAY0_SEG(segment2, 0x02000000)
 
 #ifdef MULTILANG
-   YAY0_SEG(translation_en, 0x19000000)
+   YAY0_SEG(translation_en, 0x1B000000)
 #ifdef ENABLE_FRENCH
-   YAY0_SEG(translation_fr, 0x19000000)
+   YAY0_SEG(translation_fr, 0x1B000000)
 #endif
 #ifdef ENABLE_GERMAN
-   YAY0_SEG(translation_de, 0x19000000)
+   YAY0_SEG(translation_de, 0x1B000000)
 #endif
 #ifdef ENABLE_JAPANESE
-   YAY0_SEG(translation_jp, 0x19000000)
+   YAY0_SEG(translation_jp, 0x1B000000)
 #endif
 #ifdef ENABLE_SPANISH
-   YAY0_SEG(translation_es, 0x19000000)
+   YAY0_SEG(translation_es, 0x1B000000)
 #endif
 #endif
 
@@ -367,27 +367,27 @@ SECTIONS
    STANDARD_OBJECTS(common0, 0x08000000, 0x0F000000)
    STANDARD_OBJECTS(common1, 0x03000000, 0x16000000)
 
-   VANILLA_OBJECTS(bob, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(wf, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(jrb, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(ccm, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(bbh, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(hmc, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(lll, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(ssl, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(ddd, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(sl, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(wdw, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(ttm, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(thi, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(ttc, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(rr, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(bitdw, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(bitfs, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(bits, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(vcutm, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(castle_inside, 0x0E000000, 0x1B000000)
-   VANILLA_OBJECTS(castle_grounds, 0x0E000000, 0x1B000000)
+   VANILLA_OBJECTS(bob)
+   VANILLA_OBJECTS(wf)
+   VANILLA_OBJECTS(jrb)
+   VANILLA_OBJECTS(ccm)
+   VANILLA_OBJECTS(bbh)
+   VANILLA_OBJECTS(hmc)
+   VANILLA_OBJECTS(lll)
+   VANILLA_OBJECTS(ssl)
+   VANILLA_OBJECTS(ddd)
+   VANILLA_OBJECTS(sl)
+   VANILLA_OBJECTS(wdw)
+   VANILLA_OBJECTS(ttm)
+   VANILLA_OBJECTS(thi)
+   VANILLA_OBJECTS(ttc)
+   VANILLA_OBJECTS(rr)
+   VANILLA_OBJECTS(bitdw)
+   VANILLA_OBJECTS(bitfs)
+   VANILLA_OBJECTS(bits)
+   VANILLA_OBJECTS(vcutm)
+   VANILLA_OBJECTS(castle_inside)
+   VANILLA_OBJECTS(castle_grounds)
 
    /* use segmented addressing for behaviors */
    BEGIN_SEG(behavior, 0x13000000)
