@@ -18,13 +18,12 @@ ALIGNED32 static const RegisterInfo sRegInfo_SPECIAL[] = {
     [REG_SPC_LLBIT] = DEF_SREG(     sizeof(u32), "LLBit", "LL", FALSE, REG_SPC_LLBIT),
     [REG_SPC_RCP  ] = DEF_TREG(rcp, sizeof(u32), "RCP",   "RC", FALSE, REG_SPC_RCP  ),
 };
-Word sLLBitCheck = 0;
 Doubleword get_special_reg_val(int idx) {
     Word val = 0;
     switch (idx) {
         case REG_SPC_LO:    asm volatile("mflo %0":"=r"(val):); break;
         case REG_SPC_HI:    asm volatile("mfhi %0":"=r"(val):); break;
-        case REG_SPC_LLBIT: asm volatile("sc %0,0x0000(%1)":"=r"(val):"r"(&sLLBitCheck)); break;
+        case REG_SPC_LLBIT: Word LLBitCheck = 0; asm volatile("sc %0,0x0000(%1)":"=r"(val):"r"(&LLBitCheck)); break;
         case REG_SPC_RCP:   return __osRunningThread->context.rcp; // Thread exclusive (from libultra).
         default: break;
     }
