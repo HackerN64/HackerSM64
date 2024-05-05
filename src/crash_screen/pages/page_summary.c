@@ -220,6 +220,14 @@ CSTextCoord_u32 draw_crash_cause_section(CSTextCoord_u32 line) {
                     cs_print(TEXT_X(x), TEXT_Y(line), "(%s)", fpcsrDesc);
                 }
                 break;
+            case EXC_WATCH:
+                Address watchedAddr = PHYSICAL_TO_VIRTUAL(gWatchLo & ~(WATCHLO_WTRAP | WATCHLO_RTRAP));
+                charX = cs_print(TEXT_X(x), TEXT_Y(line),
+                    ("Watched: "STR_COLOR_PREFIX STR_HEX_WORD),
+                    COLOR_RGBA32_WHITE, watchedAddr
+                ) + 2;
+                cs_print_addr_location_info(TEXT_X(charX), TEXT_Y(line), ((CRASH_SCREEN_NUM_CHARS_X - 2) - charX), watchedAddr, TRUE);
+                break;
         }
         gCSWordWrap = FALSE;
         CS_SET_DEFAULT_PRINT_COLOR_END();

@@ -49,5 +49,7 @@ extern OSThread* gInspectThread;
 extern Address gSelectedAddress;
 extern Address gLastCSSelectedAddress;
 
+extern Address gWatchLo;
+
 
 void create_crash_screen_thread(void);

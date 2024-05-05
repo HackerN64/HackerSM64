@@ -42,7 +42,7 @@ void _asm_setbits(uintptr_t bits);
 #define EXCEPTION_TRAP()    do { TRAP();                                                                } while (0) // Trap exception. 
 #define EXCEPTION_VCEI()    //! TODO: do { ; } while (0) // Virtual coherency exception on intruction fetch.
 #define EXCEPTION_FPE()     do { volatile IEEE754_f32 __x = { .asU32 = 0x00000001, } asm volatile("add.s %0,%1,%2":"=f"(__x):"f"(__x),"f"(__x)); } while (0) // Floating point exception (see fpcsr).
-#define EXCEPTION_WATCH()   //! TODO: do { ; } while (0) // Watchpoint exception.
+#define EXCEPTION_WATCH()   do { vs32 __x = 0; __osSetWatchLo(VIRTUAL_TO_PHYSICAL((Address)&__x) | WATCHLO_WTRAP | WATCHLO_RTRAP); __x = *(vs32*)&__x; } while (0) // Watchpoint exception.
 #define EXCEPTION_VCED()    //! TODO: do { ; } while (0) // Virtual coherency exception on data reference.
 // Trigger specific floating-point exceptions:
 #define EXCEPTION_CE()      do { vs32 __x; asm volatile("add.s %0,%1,%2":"=f"(__x):"f"(__x),"f"(__x));  } while (0) // Unimplemented operation.

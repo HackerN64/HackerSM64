@@ -39,6 +39,8 @@ Address gSetCrashAddress       = 0x00000000; // Used by SET_CRASH_PTR to set the
 Address gSelectedAddress       = 0x00000000; // Selected address for ram viewer and disasm pages.
 Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen crashes.
 
+Word gWatchLo = 0x00000000; // Save $WatchLo on crash.
+
 
 /**
  * @brief Reinitialize the crash screen's global variables, settings, buffers, etc.
@@ -110,11 +112,25 @@ void cs_play_sound(struct CSThreadInfo* threadInfo, s32 sound) {
 #endif // FUNNY_CRASH_SOUND
 
 /**
+ * @brief Get $WatchLo on CP0 and set it to 0 so that it doesn't affect the crash screen.
+ */
+ALWAYS_INLINE static Word get_and_reset_watchlo(void) {
+    Word watchLo = 0;
+
+    asm volatile("mfc0 %0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO):"=r"(watchLo));
+    asm volatile("mtc0 $0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO)); //! TODO: Do this on game boot too? Libdragon does.
+
+    return watchLo;
+}
+
+/**
  * @brief Runs once on every crash.
  *
  * @param[in,out] threadInfo Pointer to the thread info.
  */
 static void on_crash(struct CSThreadInfo* threadInfo) {
+    gWatchLo = get_and_reset_watchlo();
+
     // Set the current inspected thread pointer.
     gInspectThread = gCrashedThread;
 
