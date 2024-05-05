@@ -146,12 +146,11 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
             x += 2;
 
-
             const MapSymbol* destSymbol = NULL;
             // Modes that apply to the whole 4-byte Word:
             switch (mode) {
                 case MEMORY_MODE_SYMBOL:
-                    if (IS_DEBUG_MAP_ENABLED()) {
+                    if (IS_DEBUG_MAP_ENABLED() && is_valid_ram_addr(data.word)) {
                         destSymbol = get_map_symbol(data.word, SYMBOL_SEARCH_BINARY);
                         if (destSymbol != NULL) {
                             cs_print_symbol_name((x - 1), y, 9, destSymbol, FALSE);

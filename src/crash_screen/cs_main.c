@@ -221,8 +221,6 @@ OSThread* wait_until_thread_crash(OSMesgQueue* mesgQueue, OSMesg* mesg) {
     }
 }
 
-#define CS_GET_NEXT_THREAD_ID(_currentThreadId) (((_currentThreadId) + 1) % ARRAY_COUNT(sCSThreadInfos))
-
 /**
  * @brief Crash screen tread function. Waits for a crash then loops the crash screen.
  *
@@ -277,7 +275,7 @@ void remove_thread_from_queue(OSThread* thread) {
  */
 void create_crash_screen_thread(void) {
     s32 threadIndex = sCSThreadIndex;
-    sCSThreadIndex = CS_GET_NEXT_THREAD_ID(sCSThreadIndex);
+    sCSThreadIndex = ((sCSThreadIndex + 1) % ARRAY_COUNT(sCSThreadInfos)); // Get the next thread ID.
     CSThreadInfo* threadInfo = &sCSThreadInfos[threadIndex];
     OSThread* thread = &threadInfo->thread;
 
