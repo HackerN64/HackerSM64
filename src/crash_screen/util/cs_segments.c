@@ -60,12 +60,12 @@ typedef struct HardcodedSegmentInfo {
     /*0x08*/ const Address vStart;
     /*0x0C*/ const Address vEnd;
 } HardcodedSegmentInfo; /*0x10*/
-#define HARDCODED_SEG(_name, _seg, _romType, _startType, _endType) {       \
-    .name = _name, \
-    .pStart = (const Address)_##_seg##Segment##_romType##Start,     \
-    .pEnd   = (const Address)_##_seg##Segment##_romType##End,       \
-    .vStart = (const Address)_##_seg##Segment##_startType##Start,   \
-    .vEnd   = (const Address)_##_seg##Segment##_endType##End,       \
+#define HARDCODED_SEG(_name, _seg, _romType, _startType, _endType) {    \
+    .name   = _name,                                                    \
+    .pStart = (const Address)_##_seg##Segment##_romType##Start,         \
+    .pEnd   = (const Address)_##_seg##Segment##_romType##End,           \
+    .vStart = (const Address)_##_seg##Segment##_startType##Start,       \
+    .vEnd   = (const Address)_##_seg##Segment##_endType##End,           \
 }
 static const HardcodedSegmentInfo sHardcodedSegmentInfos[NUM_HARDCODED_SEGS] = {
     [SEG_HARDCODED_MAIN        ] = HARDCODED_SEG("main",         main,         Rom,    , Bss),
