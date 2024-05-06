@@ -232,7 +232,7 @@ CSTextCoord_u32 cs_registers_draw_register_list(CSTextCoord_u32 line, enum Regis
 
             if (drawSel && (fullRow || (col == cursor->selX)) && (row == cursor->selY)) {
                 cs_draw_row_selection_box_impl(TEXT_X(charX), TEXT_Y(charY),
-                    (TEXT_WIDTH(columnCharWidth - 1)), TEXT_HEIGHT(1),
+                    (TEXT_WIDTH(columnCharWidth - !fullRow)), TEXT_HEIGHT(1),
                     COLOR_RGBA32_CRASH_SELECT_HIGHLIGHT
                 );
             }

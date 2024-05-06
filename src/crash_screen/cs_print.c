@@ -403,7 +403,8 @@ size_t cs_print_impl(ScreenCoord_u32 x, ScreenCoord_u32 y, size_t charLimit, con
                 extraChar = 1;
                 charLimit += extraChar;
                 // Floats are used here to prevent overflow from directly multiplying gCSFrameCounter.
-                u32 scrollSpeed = ((f32)gCSFrameCounter * ((f32)scrollSpeedSetting / (f32)CRASH_SCREEN_LETTER_WIDTH));
+                //! TODO: Is the count factor thing correct?
+                u32 scrollSpeed = ((f32)(gCSFrameCounter / ((gCountFactor == 1) ? 2 : 1)) * ((f32)scrollSpeedSetting / (f32)CRASH_SCREEN_LETTER_WIDTH));
                 cs_scroll_buffer(phase1FormattedSize, charLimit, scrollSpeed);
                 tx -= (scrollSpeed % CRASH_SCREEN_LETTER_WIDTH);
             }

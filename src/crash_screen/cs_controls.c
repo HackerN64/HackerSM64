@@ -74,7 +74,9 @@ const ControlType gCSControlDescriptions[] = {
 
 // Updates gCSDirectionFlags with directional inputs. Analog stick, D-pad, or C-buttons.
 void cs_update_direction_input(void) {
-    OSTime currTime = osGetTime();
+    //! TODO: Is the count factor thing correct?
+    u32 divFactor = ((gCountFactor == 1) ? 2 : 1);
+    OSTime currTime = osGetTime() / divFactor;
 
     gCSDirectionFlags.pressed.up    = FALSE;
     gCSDirectionFlags.pressed.down  = FALSE;
@@ -93,7 +95,7 @@ void cs_update_direction_input(void) {
     _Bool right = ((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  deadzone));
 
     // How long to wait when holding a direction before it becomes continuous.
-    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(cs_get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES));
+    const OSTime cursorWaitCycles = FRAMES_TO_CYCLES(cs_get_setting_val(CS_OPT_GROUP_CONTROLS, CS_OPT_CONTROLS_CURSOR_WAIT_FRAMES)) / divFactor;
 
     if (up ^ down) {
         if (

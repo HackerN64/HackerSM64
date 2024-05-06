@@ -41,6 +41,8 @@ Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen 
 
 Word gWatchLo = 0x00000000; // Save $WatchLo on crash.
 
+u32 gCountFactor = 0; // Count factor.
+
 
 /**
  * @brief Reinitialize the crash screen's global variables, settings, buffers, etc.
@@ -115,12 +117,26 @@ void cs_play_sound(struct CSThreadInfo* threadInfo, s32 sound) {
  * @brief Get $WatchLo on CP0 and set it to 0 so that it doesn't affect the crash screen.
  */
 ALWAYS_INLINE static Word get_and_reset_watchlo(void) {
+    const u32 saved = __osDisableInt();
     Word watchLo = 0;
-
     asm volatile("mfc0 %0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO):"=r"(watchLo));
     asm volatile("mtc0 $0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO)); //! TODO: Do this on game boot too? Libdragon does.
-
+    __osRestoreInt(saved);
     return watchLo;
+}
+
+/**
+ * @brief Get the count factor.
+ * TODO: TODO: Is this correct? This returns 0 on console and ares, and on ParaLLEl 2 without overclock CPU, and 1 with overclock CPU.
+ *
+ * @return u32 the count ractor.
+ */
+u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
+static inline u32 check_count_factor() {
+    const u32 saved = __osDisableInt();
+    const u32 cf = pj64_get_count_factor_asm();
+    __osRestoreInt(saved);
+    return cf;
 }
 
 /**
@@ -153,6 +169,8 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     // Only on the first crash:
     if (sFirstCrash) {
+        gCountFactor = check_count_factor();
+
         sFirstCrash = FALSE;
 
         // Set the crashed game thread pointer.

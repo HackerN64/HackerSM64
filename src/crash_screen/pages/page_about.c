@@ -235,6 +235,7 @@ void _cs_about_func_emulator(char* buf) {
         p += sprintf(p, " "STR_LPL_VERSION, v->major, v->minor, v->patch);
     }
 }
+ABOUT_ENTRY_FUNC(count_factor,   "%d", gCountFactor)
 #ifdef LIBPL
 ABOUT_ENTRY_FUNC(gfx_plugin,     libpl_get_graphics_plugin()->name);
 void _cs_about_func_launcher(char* buf) {
@@ -346,6 +347,7 @@ CSAboutEntry sCSAboutEntries_misc[CS_NUM_ABOUT_ENTRIES_MISC] = {
 CSAboutEntry sCSAboutEntries_emulator[CS_NUM_ABOUT_ENTRIES_EMULATOR] = {
     [CS_ABOUT_GROUP_HEADER_EMULATOR       ] = ABOUT_ENTRY_HEADER("emulator", TRUE),
     [CS_ABOUT_ENTRY_EMULATOR_EMULATOR     ] = ABOUT_ENTRY_SINGLE(emulator,      "EMULATOR"      ),
+    [CS_ABOUT_ENTRY_EMULATOR_COUNT_FACTOR ] = ABOUT_ENTRY_SINGLE(count_factor,  "COUNT FACTOR"  ),
 #ifdef LIBPL
     [CS_ABOUT_ENTRY_EMULATOR_GFX_PLUGIN   ] = ABOUT_ENTRY_SINGLE_LPL(gfx_plugin,    "GFX PLUGIN"    ),
     [CS_ABOUT_ENTRY_EMULATOR_LAUNCHER     ] = ABOUT_ENTRY_SINGLE_LPL(launcher,      "LAUNCHER"      ),
