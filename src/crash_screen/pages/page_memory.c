@@ -94,10 +94,15 @@ void cs_memory_draw_byte() {
 
 void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
     const enum MemoryDisplayModes mode = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_DISPLAY_MODE);
+    _Bool modeIsColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
     const _Bool symbolDividers = cs_get_setting_val(CS_OPT_GROUP_PAGE_MEMORY, CS_OPT_MEMORY_SYMBOL_DIVIDERS);
     __OSThreadContext* tc = &gInspectThread->context;
     ScreenCoord_u32 x = (TEXT_X(SIZEOF_HEX(Address)) + 3);
     ScreenCoord_u32 y = TEXT_Y(line);
+    Address epc = GET_EPC(tc);
+    Address sp = (Address)tc->sp;
+    Address badvaddr = tc->badvaddr;
+    _Bool hasBadVaddr = (badvaddr != is_valid_ram_addr(badvaddr));
 
 #ifdef UNF
     bzero(&sMemoryViewData, sizeof(sMemoryViewData));
@@ -122,13 +127,6 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 
         x = (TEXT_X(SIZEOF_HEX(Word)) + 3);
         y = TEXT_Y(line + row);
-
-        _Bool isColor = ((mode == MEMORY_MODE_RGBA16) || (mode == MEMORY_MODE_RGBA32));
-        // if (!isColor) {
-        //     // RGBA32 highlightColor = addr_is_in_text_segment(rowAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x3F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x3F);
-        //     RGBA32 highlightColor = addr_is_in_text_segment(rowAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
-        //     cs_draw_rect(x, (y - 2), (TEXT_WIDTH(CRASH_SCREEN_NUM_CHARS_X - 9) + 5), TEXT_HEIGHT(1), highlightColor);
-        // }
 
         // 4 Words per row:
         for (size_t wordOffset = 0; wordOffset < PAGE_MEMORY_WORDS_PER_ROW; wordOffset++) {
@@ -179,8 +177,11 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                 if (currAddr == gSelectedAddress) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_SELECT;
                     textColor = RGBA32_INVERT(textColor);
-                } else if (currAddr == GET_EPC(tc)) {
+                } else if ((currAddr == epc) || (hasBadVaddr && (currAddr == badvaddr))) {
                     selectColor = COLOR_RGBA32_CRASH_MEMORY_PC;
+                } else if (currAddr == sp) {
+                    selectColor = COLOR_RGBA32_CRASH_FUNCTION_NAME;
+                    textColor = RGBA32_INVERT(textColor);
                 }
                 _Bool selected = (selectColor != COLOR_RGBA32_NONE);
 
@@ -189,7 +190,6 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                 if (symbolDividers) {
                     if (currAddr >= sizeof(Byte)) {
                         const MapSymbol *currSymbol = get_map_symbol(currAddr, SYMBOL_SEARCH_BINARY);
-                        // const RGBA32 dividerColor = COLOR_RGBA32_GRAY;//  addr_is_in_text_segment(currAddr) ? RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_FUNCTION_NAME, 0x7F) : RGBA32_SET_ALPHA(COLOR_RGBA32_CRASH_VARIABLE, 0x7F);
                         const RGBA32 dividerColor = addr_is_in_text_segment(currAddr) ? COLOR_RGBA32_CRASH_FUNCTION_NAME : COLOR_RGBA32_CRASH_VARIABLE;
                         _Bool aligned0 = ((currAddr % sizeof(Word)) == 0); // (byteOffset == 0);
                         _Bool aligned3 = ((currAddr % sizeof(Word)) == (sizeof(Word) - 1)); // (byteOffset == (sizeof(Word) - 1));
@@ -213,7 +213,7 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
 #endif // INCLUDE_DEBUG_MAP
 
                 // If the display mode isn't a color, draw a solid box behind the data.
-                if (selected && !isColor) {
+                if (selected && !modeIsColor) {
                     cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), selectColor);
                 }
 
@@ -254,7 +254,7 @@ void ram_viewer_print_data(CSTextCoord_u32 line, Address startAddr) {
                 }
 
                 // If the display mode is a color, draw a translucent box on top of the data.
-                if (selected && isColor) {
+                if (selected && modeIsColor) {
                     cs_draw_rect((x - 1), (y - 1), (TEXT_WIDTH(2) + 1), (TEXT_HEIGHT(1) - 1), RGBA32_SET_ALPHA(selectColor, 0x7F));
                 }
 
