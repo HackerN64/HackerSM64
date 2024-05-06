@@ -34,6 +34,8 @@ static const char* sRegDesc_CP0[] = {
     [REG_DESC_CP0_ERROR_EPC] = "error exception program counter",
     [REG_DESC_CP0_RESERVED ] = "reserved",
 };
+#define DEF_CP0_SREG(_reg, _type,         _name, _shortName, _sureAddr, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _sureAddr, _descId)
+#define DEF_CP0_TREG(_reg, _type, _field, _name, _shortName, _sureAddr, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _sureAddr, _descId)
 ALIGNED32 static const RegisterInfo sRegInfo_CP0[CP0_NUM_REGISTERS] = {
     [REG_CP0_INX      ] = DEF_CP0_SREG(C0_INX,       u32,           "Index",    "IX", FALSE, REG_DESC_CP0_INX      ),
     [REG_CP0_RAND     ] = DEF_CP0_SREG(C0_RAND,      u32,           "Random",   "RN", FALSE, REG_DESC_CP0_RAND     ),

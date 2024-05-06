@@ -149,19 +149,9 @@ typedef struct RegisterInfo {
     .descId   = _descId,                    \
 }
 
-#define DEF_CPU_SREG(_reg, _name, _sureAddr, _descId) DEF_SREG(      sizeof(u64), _name, _name, _sureAddr, _descId)
-#define DEF_CPU_TREG(_reg, _name, _sureAddr, _descId) DEF_TREG(_reg, sizeof(u64), _name, _name, _sureAddr, _descId)
-
-#define DEF_CP0_SREG(_reg, _type,         _name, _shortName, _sureAddr, _descId) DEF_SREG(        sizeof(_type), _name, _shortName, _sureAddr, _descId)
-#define DEF_CP0_TREG(_reg, _type, _field, _name, _shortName, _sureAddr, _descId) DEF_TREG(_field, sizeof(_type), _name, _shortName, _sureAddr, _descId)
-
-#define DEF_CP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, FALSE, _descId)
-#define DEF_CP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, FALSE, _descId)
-#define DEF_CP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, FALSE, _descId)
+#define DEF_IREG_END() DEF_IREG(0, NULL, 0)
 
 #define CASE_REG(_cop, _idx, _reg) case _idx: ASM_GET_REG_##_cop(val, STR_REG_PREFIX EXPAND_AND_STRINGIFY(_reg)); break;
-
-#define DEF_IREG_END() DEF_IREG(0, NULL, 0)
 
 
 typedef struct RegisterSource {

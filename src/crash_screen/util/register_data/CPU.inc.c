@@ -6,6 +6,8 @@
 // -- CPU Registers --
 
 
+#define DEF_CPU_SREG(_reg, _name, _sureAddr, _descId) DEF_SREG(      sizeof(u64), _name, _name, _sureAddr, _descId)
+#define DEF_CPU_TREG(_reg, _name, _sureAddr, _descId) DEF_TREG(_reg, sizeof(u64), _name, _name, _sureAddr, _descId)
 ALIGNED32 static const RegisterInfo sRegInfo_CPU[CPU_NUM_REGISTERS] = {
     [REG_CPU_R0] = DEF_CPU_SREG(zero, "R0", FALSE, REG_DESC_ZERO),
     [REG_CPU_AT] = DEF_CPU_TREG(at, "AT", FALSE, REG_DESC_AT    ),

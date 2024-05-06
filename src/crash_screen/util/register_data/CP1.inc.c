@@ -6,6 +6,9 @@
 // -- COP1 Registers --
 
 
+#define DEF_CP1_SREG(_reg, _name, _descId)      DEF_SREG(                   sizeof(f32), "F"_name, _name, FALSE, _descId)
+#define DEF_CP1_TREG_EVEN(_reg, _name, _descId) DEF_TREG(fp##_reg.f.f_even, sizeof(f32), "F"_name, _name, FALSE, _descId)
+#define DEF_CP1_TREG_ODD(_reg, _name, _descId)  DEF_TREG(fp##_reg.f.f_odd,  sizeof(f32), "F"_name, _name, FALSE, _descId)
 //! TODO: Better name format
 ALIGNED32 static const RegisterInfo sRegInfo_CP1[CP1_NUM_REGISTERS] = { // even = low bits, odd = high bits.
     // Subroutine return values:
