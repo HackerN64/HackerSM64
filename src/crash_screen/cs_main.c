@@ -127,7 +127,7 @@ ALWAYS_INLINE static Word get_and_reset_watchlo(void) {
 
 /**
  * @brief Get the count factor.
- * TODO: TODO: Is this correct? This returns 0 on console and ares, and on ParaLLEl 2 without overclock CPU, and 1 with overclock CPU.
+ * TODO: Is this correct? This returns 0 on console and ares, and on ParaLLEl 2 without overclock CPU, and 1 with overclock CPU.
  *
  * @return u32 the count ractor.
  */
@@ -147,6 +147,9 @@ static inline u32 check_count_factor() {
 static void on_crash(struct CSThreadInfo* threadInfo) {
     gWatchLo = get_and_reset_watchlo();
 
+    // Set the crash screen thread to a high priority.
+    osSetThreadPri(&threadInfo->thread, (OS_PRIORITY_APPMAX - 1));
+
     // Set the current inspected thread pointer.
     gInspectThread = gCrashedThread;
 
@@ -162,6 +165,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
 #ifdef FUNNY_CRASH_SOUND
+    //! TODO: This doesn't work anymore for some reason.
     cs_play_sound(threadInfo, SOUND_MARIO_WAAAOOOW);
 #endif // FUNNY_CRASH_SOUND
 
@@ -322,7 +326,7 @@ void create_crash_screen_thread(void) {
         thread, (THREAD_1000_CRASH_SCREEN_0 + threadIndex),
         crash_screen_thread_entry, NULL,
         ((Byte*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
-        (OS_PRIORITY_APPMAX - 1)
+        0
     );
     osStartThread(thread);
 }

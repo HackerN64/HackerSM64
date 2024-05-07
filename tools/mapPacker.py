@@ -1,6 +1,7 @@
 import sys, os, struct, subprocess
 
-onlyRDRAM = True
+includeSegmented = True
+maxSymbolSize = 0xFFFFF
 
 class MapSymbol():
 	def __init__(self, addr, size, name, type, errc):
@@ -37,8 +38,8 @@ for line in symbols:
 		addr = int(tokens[0], 16)
 		# Error char.
 		errc = ord('\0')
-		# Skip non-RDRAM addresses if onlyRDRAM is True.
-		if (not onlyRDRAM or (addr & 0x80000000)):
+		# Skip non-segmented addresses if includeSegmented is False.
+		if (includeSegmented or (addr & 0x80000000)):
 			# If this is not the first entry...
 			if symNames:
 				# Get the previous entry.
@@ -48,7 +49,7 @@ for line in symbols:
 					# Get the size between the current entry and the previous entry.
 					sizeToLastEntry = (addr - prevEntry.addr)
 					# If the distance to the previous entry is not unreasonably large, use it as the symbol's size.
-					if (sizeToLastEntry < 0xFFFFF):
+					if (sizeToLastEntry < maxSymbolSize):
 						prevEntry.size = sizeToLastEntry
 					else:
 						# Size too large, set error char 'S'.
@@ -59,7 +60,7 @@ for line in symbols:
 			type = ord(tokens[-2])
 			# Check for size data.
 			if (len(tokens) < 4):
-				# No size data, so assume 0. It may be set by the next entry.
+				# No size data, so assume 0 for now. It may be set by the next entry.
 				size = 0
 			else:
 				# Get the size data.
@@ -71,7 +72,7 @@ for line in symbols:
 f1 = open(sys.argv[2], "wb+") # addr.bin
 f2 = open(sys.argv[3], "wb+") # name.bin
 
-symNames.sort(key=lambda x: x.addr)
+symNames.sort(key=lambda x: x.addr) # (x.addr & 0xFFFFFF) to sort segmented addresses
 
 off = 0
 for x in symNames:
