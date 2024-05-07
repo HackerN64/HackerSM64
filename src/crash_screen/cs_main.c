@@ -18,6 +18,7 @@
 #include "audio/external.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
+#include "game/emutest.h"
 #include "game/main.h"
 #ifdef UNF
 #include "usb/usb.h"
@@ -42,6 +43,7 @@ Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen 
 Word gWatchLo = 0x00000000; // Save $WatchLo on crash.
 
 u32 gCountFactor = 0; // Count factor.
+u32 gTimingDiv = 1;
 
 
 /**
@@ -147,6 +149,8 @@ static inline u32 check_count_factor() {
 static void on_crash(struct CSThreadInfo* threadInfo) {
     gWatchLo = get_and_reset_watchlo();
 
+    //! TODO: Coprocessor Unusable exception doesn't trigger the crash screen properly. Re-enable CP1 if it was down? __osSetSR(__osGetSR() | SR_CU1);
+
     // Set the crash screen thread to a high priority.
     osSetThreadPri(&threadInfo->thread, (OS_PRIORITY_APPMAX - 1));
 
@@ -173,9 +177,13 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
 
     // Only on the first crash:
     if (sFirstCrash) {
-        gCountFactor = check_count_factor();
-
         sFirstCrash = FALSE;
+
+        gCountFactor = check_count_factor();
+        //! TODO: Better check for this, and other emulators:
+        if ((gEmulator & EMU_PARALLELN64) && (gCountFactor == 1)) {
+            gTimingDiv = 2;
+        }
 
         // Set the crashed game thread pointer.
         gCrashedGameThread = gCrashedThread;

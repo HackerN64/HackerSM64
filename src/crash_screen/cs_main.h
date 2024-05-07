@@ -52,6 +52,7 @@ extern Address gLastCSSelectedAddress;
 extern Word gWatchLo;
 
 extern u32 gCountFactor;
+extern u32 gTimingDiv;
 
 
 void create_crash_screen_thread(void);
