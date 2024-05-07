@@ -5,6 +5,7 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_draw.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_settings.h"
@@ -22,46 +23,59 @@
 #include "insn_db.inc.c"
 
 
-static const char insn_alphabet[] = "\0.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+// All chars that can appear in an instruction name, packed by '_PL()'.
+static const char insn_alphabet[] = (INSN_ALPHABET_STR_0 INSN_ALPHABET_STR_N INSN_ALPHABET_STR_A); // "\0.0123ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-const MIPSParam insn_param_formats[][3] = {
-    [IFMT_NOP] = { MP_NOP,   MP_NOP,  MP_NOP,   }, // nop
+#define PARAM(_id,_fmt) { \
+    .id  = _id, \
+    .fmt = _fmt, \
+}
 
-    [IFMT_s  ] = { MP_RS,    MP_NOP,  MP_NOP,   }, // rs
-    [IFMT_t  ] = { MP_RT,    MP_NOP,  MP_NOP,   }, // rt // unused
-    [IFMT_d  ] = { MP_RD,    MP_NOP,  MP_NOP,   }, // rd
-    [IFMT_ds ] = { MP_RD,    MP_RS,   MP_NOP,   }, // rd rs
-    [IFMT_st ] = { MP_RS,    MP_RT,   MP_NOP,   }, // rs rt
-    [IFMT_dt ] = { MP_RD,    MP_RT,   MP_NOP,   }, // rd rt // for pseudos
-    [IFMT_dst] = { MP_RD,    MP_RS,   MP_RT,    }, // rd rs rt
-    [IFMT_dts] = { MP_RD,    MP_RT,   MP_RS,    }, // rd rt rs
+#define MIPS_NUM_PARAMS 3
+#define PARAM_NOP PARAM(MP_NOP, MP_FMT_I)
 
-    [IFMT_t0 ] = { MP_RT,    MP_CP0D, MP_NOP,   }, // rt rd[cp0]
-    [IFMT_tS ] = { MP_RT,    MP_FS,   MP_NOP,   }, // rt fs
 
-    [IFMT_DS ] = { MP_FD,    MP_FS,   MP_NOP,   }, // fd fs
-    [IFMT_ST ] = { MP_FS,    MP_FT,   MP_NOP,   }, // fs ft
-    [IFMT_DST] = { MP_FD,    MP_FS,   MP_FT,    }, // fd fs ft
+const InsnParam insn_param_formats[][MIPS_NUM_PARAMS] = {
+    [IFMT_NOP  ] = { PARAM_NOP,                 PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // nop
 
-    [IFMT_tsI] = { MP_RT,    MP_RS,   MP_IMM,   }, // rt rs immediate
-    [IFMT_tsi] = { MP_RT,    MP_RS,   MP_NIMM,  }, // rt rs abs(immediate) // for pseudos
-    [IFMT_tI ] = { MP_RT,    MP_IMM,  MP_NOP,   }, // rt immediate    
-    [IFMT_sI ] = { MP_RS,    MP_IMM,  MP_NOP,   }, // rs immediate
+    [IFMT_s    ] = { PARAM(MP_RS,    MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // rs
+    [IFMT_d    ] = { PARAM(MP_RD,    MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // rd
+    [IFMT_ds   ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rd rs
+    [IFMT_st   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rs rt
+    [IFMT_dt   ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rd rt // for pseudos
+    [IFMT_dst  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), },/*0, FALSE),*/ // rd rs rt
+    [IFMT_dts  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), },/*0, FALSE),*/ // rd rt rs
 
-    [IFMT_to ] = { MP_RT,    MP_OFF,  MP_NOP,   }, // rt offset(base)
-    [IFMT_To ] = { MP_FT,    MP_OFF,  MP_NOP,   }, // ft offset(base)
+    [IFMT_tdCP0] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RDCP0, MP_FMT_I), PARAM_NOP,                 },/*1, FALSE),*/ // rt rd[cp0]   // output 1 or output 2
+    [IFMT_tSCP1] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_FS,    MP_FMT_F), PARAM_NOP,                 },/*1, FALSE),*/ // rt fs        // output 1 or output 2
+    [IFMT_tSFCR] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_FSFCR, MP_FMT_I), PARAM_NOP,                 },/*1, FALSE),*/ // rt fs        // output 1 or output 2
 
-    [IFMT_dta] = { MP_RD,    MP_RT,   MP_SHIFT, }, // rd rt shift
-    [IFMT_ste] = { MP_RS,    MP_RT,   MP_EXC10, }, // rs rt exc10
-    [IFMT_E  ] = { MP_EXC20, MP_NOP,  MP_NOP,   }, // exc20
+    [IFMT_ST   ] = { PARAM(MP_FS,    MP_FMT_F), PARAM(MP_FT,    MP_FMT_F), PARAM_NOP,                 },/*0, TRUE ),*/ // fs ft // FPcond.out, fs.f, ft.f
+    [IFMT_DST  ] = { PARAM(MP_FD,    MP_FMT_F), PARAM(MP_FS,    MP_FMT_F), PARAM(MP_FT,    MP_FMT_F), },/*0, TRUE ),*/ // fd fs ft // fd.out, fd.f, fs.f, ft.f
 
-    [IFMT_stB] = { MP_RS,    MP_RT,   MP_B,     }, // rs rt branch
-    [IFMT_sB ] = { MP_RS,    MP_B,    MP_NOP,   }, // rs branch
-    [IFMT_B  ] = { MP_B,     MP_NOP,  MP_NOP,   }, // branch
+    [IFMT_DS_XX] = { PARAM(MP_FD,    MP_FMT_O), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 },/*0, TRUE ),*/ // op.sd fd fs // fd.out, fd.f, fs.f
+    [IFMT_DS_IX] = { PARAM(MP_FD,    MP_FMT_I), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 },/*0, TRUE ),*/ // op.i[.f] // fd.i, fs.ovr
+    [IFMT_DS_FX] = { PARAM(MP_FD,    MP_FMT_F), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 },/*0, TRUE ),*/ // op.f[.i] // fd.f, fs.ovr
 
-    [IFMT_J  ] = { MP_JUMP,  MP_NOP,  MP_NOP,   }, // jump
+    [IFMT_tsI  ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), },/*0, FALSE),*/ // rt rs immediate
+    [IFMT_tI   ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rt immediate
+    [IFMT_sI   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rs immediate
+
+    [IFMT_to   ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rt offset(base)
+    [IFMT_To   ] = { PARAM(MP_FT,    MP_FMT_F), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // ft offset(base)
+
+    [IFMT_dta  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_SHIFT, MP_FMT_I), },/*0, FALSE),*/ // rd rt shift
+    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXC10, MP_FMT_I), },/*0, FALSE),*/ // rs rt exc10
+    [IFMT_E    ] = { PARAM(MP_EXC20, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // exc20
+
+    [IFMT_stB  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), },/*0, FALSE),*/ // rs rt branch
+    [IFMT_sB   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rs branch
+    [IFMT_B    ] = { PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // branch
+
+    [IFMT_J    ] = { PARAM(MP_JUMP,  MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // jump
 };
+#define SIZEOF_PARAM_LISTS sizeof(insn_param_formats)
 
 
 /**
@@ -85,10 +99,11 @@ static _Bool check_pseudo_insn(const InsnTemplate** checkInsn, enum PseudoInsns 
  * @brief Checks for pseudo-instructions.
  *
  * @param[out] checkInsn A pointer to the InsnTemplate data in insn_db_pseudo matching the given instruction data.
- * @param[in ] insn      The instruction data that is being read.
+ * @param[in ] insnSrc   The instruction data that is being read.
  * @return _Bool Whether the instruction has been converted.
  */
-static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn) {
+static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData* insnSrc) {
+    InsnData insn = *insnSrc;
     // NOP (trivial case).
     if (check_pseudo_insn(type, PSEUDO_NOP, (insn.raw == 0))) return TRUE;
 
@@ -117,7 +132,7 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
             break;
         case OPC_ADDI:
             if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == REG_CPU_R0))) return TRUE;
-            if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
             break;
         case OPC_ADDIU:
             if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == REG_CPU_R0))) return TRUE;
@@ -129,7 +144,7 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
             if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_DADDI:
-            if (check_pseudo_insn(type, PSEUDO_DSUBI, ((s16)insn.immediate < 0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_DSUBI, ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
             break;
     }
 
@@ -139,17 +154,18 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData insn)
 /**
  * @brief Gets a pointer to the InsnTemplate data matching the given instruction data.
  *
- * @param[in] insn The instruction data that is being read.
+ * @param[in] insnSrc The instruction data that is being read.
  * @return const InsnTemplate* A pointer to the InsnTemplate data matching the given instruction data.
  */
-const InsnTemplate* get_insn(InsnData insn) {
+const InsnTemplate* get_insn(InsnData* insnSrc) {
+    InsnData insn = *insnSrc;
     const InsnTemplate* checkInsn = NULL;
     u8 opcode = insn.opcode; // First 6 bits.
 
     // Check for pseudo-instructions.
     if (
         cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS) &&
-        check_pseudo_instructions(&checkInsn, insn)
+        check_pseudo_instructions(&checkInsn, insnSrc)
     ) {
         return checkInsn;
     }
@@ -201,13 +217,15 @@ const InsnTemplate* get_insn(InsnData insn) {
  * @return s16 The branch offset. 0 if there is no branch.
  */
 s16 insn_check_for_branch_offset(InsnData insn) {
-    const InsnTemplate* info = get_insn(insn);
-    MIPSParamFmts fmt = info->params;
-    const MIPSParam* list = insn_param_formats[fmt];
+    const InsnTemplate* info = get_insn(&insn);
+    if (info != NULL) {
+        MIPSParamFmts fmt = info->params;
+        const InsnParam* list = &insn_param_formats[fmt][0];
 
-    for (size_t i = 0; i < sizeof(insn_param_formats[0]); i++) {
-        if (list[i] == MP_B) {
-            return insn.offset;
+        for (size_t i = 0; i < MIPS_NUM_PARAMS; i++) {
+            if (list[i].id == MP_B) {
+                return insn.offset;
+            }
         }
     }
 
@@ -226,7 +244,7 @@ Address get_insn_branch_target_from_addr(Address addr) {
     }
 
     InsnData insn = {
-        .raw = *(Word*)addr,
+        .raw = *(Word*)addr, //! TODO: safe read here?
     };
 
     // Jump instructions are handled differently than branch instructions.
@@ -252,7 +270,7 @@ Address get_insn_branch_target_from_addr(Address addr) {
  * @param[in] insn The instruction data that is being read.
  * @return char The char value that represents the format in the instruction name.
  */
-static char cop1_fmt_to_char(InsnData insn) {
+static char cp1_fmt_to_char(InsnData insn) {
     switch (insn.fmt) {
         case COP1_FMT_SINGLE: return 'S'; // Single
         case COP1_FMT_DOUBLE: return 'D'; // Double
@@ -276,6 +294,14 @@ static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA
         *strp += sprintf(*strp, STR_COLOR_PREFIX, newColor);
     }
 }
+
+// "break" instruction codes generated by gcc:
+//! TODO: Are these accurate, and are there more of these?
+static const IdNamePair insn_break_codes[] = {
+    { .id = 6, .name = "overflow", },
+    { .id = 7, .name = "div0",     },
+    ID_LIST_END(),
+};
 
 
 static char insn_as_string[CHAR_BUFFER_SIZE] = "";
@@ -307,7 +333,7 @@ static char insn_as_string[CHAR_BUFFER_SIZE] = "";
 #define ADD_REG(_src, _idx) {                                                                                       \
     regInfo = get_reg_info((_src), (_idx));                                                                         \
     ADD_STR(STR_IREG, regInfo->name);                                                                               \
-    append_reg_to_buffer((_src), (_idx), (((cmdIndex == f2index) ? valFmt2 : valFmt1)), (cmdIndex == outputIndex)); \
+    append_reg_to_buffer((_src), (_idx), fmt, (cmdIndex == outputIndex)); \
 }
 #define ADD_ADDR_REG(_src, _idx) {                                  \
     regInfo = get_reg_info((_src), (_idx));                         \
@@ -330,35 +356,33 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
 
     bzero(insn_as_string, sizeof(insn_as_string));
 
-    const InsnTemplate* info = get_insn(insn);
+    const InsnTemplate* info = get_insn(&insn);
 
     if (info != NULL) {
-        const MIPSParam* curCmd = &insn_param_formats[info->params][0];
+        const InsnParam* curCmd = &insn_param_formats[info->params][0];
         u8 outputIndex = (info->output - 1);
-        u8 f2index = (info->f2i - 1);
         const RegisterInfo* regInfo = NULL;
         RGBA32 color = COLOR_RGBA32_NONE;
         _Bool separator = FALSE;
-        RegisterValueTypes valFmt1 = (info->f1 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Primary format.
-        RegisterValueTypes valFmt2 = (info->f2 ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Secondary format.
+        RegisterValueTypes overwriteFmt = REG_VAL_TYPE_FLOAT;
 
         clear_saved_reg_buffer();
 
         ADD_COLOR((insn.raw == OPS_NOP) ? COLOR_RGBA32_CRASH_DISASM_NOP : COLOR_RGBA32_CRASH_DISASM_INSN);
         char name[INSN_NAME_DISPLAY_WIDTH] = UNPACK_STR7(info->name);
         if (info->hasFmt) {
-            char fmtChar = cop1_fmt_to_char(insn);
+            char fmtChar = cp1_fmt_to_char(insn);
             sprintf(name, STR_INSN_NAME_FORMAT, name, fmtChar);
-            valFmt2 = ((fmtChar == 'S' || fmtChar == 'D') ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Overwrite secondary format.
+            overwriteFmt = ((fmtChar == 'S' || fmtChar == 'D') ? REG_VAL_TYPE_FLOAT : REG_VAL_TYPE_INT); // Overwrite secondary format.
         }
         ADD_STR(STR_INSN_NAME, name);
 
         // Whether to print immediates as decimal values rather than hexadecimal.
         _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
 
-        // Loop through the chars in the 'fmt' member of 'info' and print the insn data accordingly.
-        for (size_t cmdIndex = 0; cmdIndex < sizeof(insn_param_formats[0]); cmdIndex++) {
-            const MIPSParam cmd = *curCmd;
+        // Loop through the chars in the 'insn_param_formats' entry and print the insn data accordingly.
+        for (size_t cmdIndex = 0; cmdIndex < MIPS_NUM_PARAMS; cmdIndex++) {
+            const MIPSParamID cmd = curCmd->id;
             if (unimpl || (cmd == MP_NOP)) {
                 break;
             }
@@ -367,6 +391,8 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                 separator = FALSE;
                 ADD_STR(", ");
             }
+
+            const RegisterValueTypes fmt = ((curCmd->fmt == MP_FMT_O) ? overwriteFmt : curCmd->fmt);
 
             switch (cmd) {
                 case MP_RS: // CPU 'RS' register.
@@ -388,10 +414,6 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), insn.immediate);
                     break;
-                case MP_NIMM: // Negative Immediate.
-                    ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
-                    ADD_STR((decImmediates ? "%d" : STR_IMMEDIATE), -(s16)insn.immediate);
-                    break;
                 case MP_SHIFT: // Shift amount.
                     ADD_COLOR(COLOR_RGBA32_CRASH_DISASM_IMMEDIATE);
                     ADD_STR(STR_IMMEDIATE, insn.sa);
@@ -412,9 +434,14 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                         ADD_STR(STR_OFFSET, ((branchOffset < 0x0000) ? '-' : '+'), abss(branchOffset));
                     }
                     break;
-                case MP_CP0D: // COP0 'RD' register.
+                case MP_RDCP0: // COP0 'RD' register.
                     ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
                     ADD_REG(REGS_CP0, insn.rd);
+                    separator = TRUE;
+                    break;
+                case MP_FSFCR: // FCR 'FS' register;
+                    ADD_COLOR(COLOR_RGBA32_CRASH_VARIABLE);
+                    ADD_REG(REGS_FCR, insn.fs);
                     separator = TRUE;
                     break;
                 case MP_FT: // COP1 'FT' register.
@@ -439,23 +466,28 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                 case MP_EXC20: // For SYSCALL and BREAK instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     ADD_STR(STR_CODE20, insn.code20);
+                    if (info->opcode == OPS_BREAK) {
+                        const char* desc = get_name_from_null_terminated_id_list((insn.code20 >> 10), insn_break_codes);
+                        if (desc != NULL) {
+                            ADD_STR(" (%s)", desc);
+                        }
+                    }
                     break;
                 case MP_JUMP: // Jump function.
                     ADD_COLOR(COLOR_RGBA32_CRASH_FUNCTION_NAME);
                     Address target = PHYSICAL_TO_VIRTUAL(insn.instr_index * sizeof(InsnData));
-                    if (IS_DEBUG_MAP_ENABLED()) {
-                        if (cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && addr_is_in_text_segment(target)) {
-                            const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
-                            if (symbol != NULL) {
-                                *fname = get_map_symbol_name(symbol);
-                                // Only print as the function name if it's the exact starting address of the function.
-                                if (target != symbol->addr) {
-                                    *fname = NULL;
-                                }
+                    if (IS_DEBUG_MAP_ENABLED() && cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES) && addr_is_in_text_segment(target)) {
+                        const MapSymbol* symbol = get_map_symbol(target, SYMBOL_SEARCH_BACKWARD);
 
-                                if (*fname != NULL) {
-                                    break;
-                                }
+                        if (symbol != NULL) {
+                            *fname = get_map_symbol_name(symbol);
+                            // Only print as the function name if it's the exact starting address of the function.
+                            if (target != symbol->addr) {
+                                *fname = NULL;
+                            }
+
+                            if (*fname != NULL) {
+                                break;
                             }
                         }
                     } else {
