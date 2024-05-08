@@ -1,17 +1,28 @@
 #include <ultra64.h>
 
+#include "segments.h"
+
 #include "memory_read.h"
 
 #include "map_parser.h"
 
-#include "segments.h"
+#include "src/game/memory.h"
+
+
+const char map_alphabet[] = "\0._0123456789ABCDEFGHIJKLMNOP!RSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 
 //! TODO: Can nm map symbol data be used to get this info?
 //! TODO: Get this to work with level and behavior segments.
 //! TODO: Check if the segment is actually loaded into RAM.
 //! TODO: Table with all segment symbols, not just .text.
-ALIGNED8 static const AddressPair sTextRegions[] = {
+ALIGNED8 const AddressPair sTextRegions[] = {
+MEMORY_REGION(0xBFC00000, 0xBFC000D3) // ipl1
+MEMORY_REGION(0xA4001000, 0xA4001FFF) // ipl2 //! TODO: Is end address correct?
+//! TODO: Does this only exist on boot? PJ64 interprets it as asm but it seems like garbage data when viewed via the crash screen.
+MEMORY_REGION(0xA4000040, 0xA4000FFF) // ipl3 // RSP DMEM
+// ipl4
+
 TEXT_REGION_SEGMENT(boot)
 TEXT_REGION_SEGMENT(main)
 TEXT_REGION_SEGMENT(engine)
@@ -49,9 +60,6 @@ TEXT_REGION_GROUP(common1)
 #include "levels/level_defines.h"
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
-
-//! TODO: Does this only exist on boot? PJ64 interprets it as asm but it seems like garbage data when viewed via the crash screen.
-// MEMORY_REGION(0xA4000000, 0xA4001000) // RSP DMEM
 };
 
 
@@ -123,6 +131,17 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
     return (const char*)((Address)gMapStrings + symbol->name_offset);
 }
 
+Address get_map_symbol_addr(const MapSymbol* symbol) {
+    Address symbolAddr = symbol->addr;
+    // u8 segment = symbol->segment; //! TODO: Check if the loaded segment is the same one the symbol is from?
+
+    // if (segment < 0x80) {
+    //     symbolAddr = ((Address)get_segment_base_addr(segment) + PHYSICAL_TO_VIRTUAL(symbol->address));
+    // }
+
+    return symbolAddr;
+}
+
 /**
  * @brief Check whether an address is within a map symbol's range.
  *
@@ -131,7 +150,8 @@ const char* get_map_symbol_name(const MapSymbol* symbol) {
  * @return _Bool Whether the address is within the symbol's range.
  */
 _Bool addr_is_in_symbol(Address addr, const MapSymbol* symbol) {
-    return ((addr >= symbol->addr) && (addr < (symbol->addr + symbol->size)));
+    Address symbolAddr = get_map_symbol_addr(symbol);
+    return ((addr >= symbolAddr) && (addr < (symbolAddr + symbol->size)));
 }
 
 /**
@@ -212,10 +232,11 @@ MapSymbolIndex get_symbol_index_from_addr_binary(Address addr) {
     while (searchStart <= searchEnd) {
         index = (searchStart + ((searchEnd - searchStart) / 2)); // Get the middle position in the new search window.
         symbol = &gMapSymbols[index];
+        Address symbolAddr = get_map_symbol_addr(symbol);
 
-        if (addr < symbol->addr) {
+        if (addr < symbolAddr) {
             searchEnd = (index - 1);
-        } else if (addr >= (symbol->addr + symbol->size)) {
+        } else if (addr >= (symbolAddr + symbol->size)) {
             searchStart = (index + 1);
         } else {
             return index;
@@ -246,7 +267,7 @@ const MapSymbol* get_map_symbol(Address addr, SymbolSearchDirections searchDirec
     switch (searchDirection) {
         case SYMBOL_SEARCH_FORWARD:  index = get_symbol_index_from_addr_forward(addr);  break; // Get the earlier overlapping symbol.
         case SYMBOL_SEARCH_BACKWARD: index = get_symbol_index_from_addr_backward(addr); break; // Get the later overlapping symbol.
-        case SYMBOL_SEARCH_BINARY:   index = get_symbol_index_from_addr_binary(addr);   break;
+        case SYMBOL_SEARCH_BINARY:   index = get_symbol_index_from_addr_binary(addr);   break; // Much faster method.
     }
 
     if (index != -1) {

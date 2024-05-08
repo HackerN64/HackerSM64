@@ -26,6 +26,12 @@
 #endif // UNF
 
 
+const char* sValnames_asm_unknowns[] = {
+    [DISASM_UNK_MODE_HEX  ] = "HEX",
+    [DISASM_UNK_MODE_BIN  ] = "BINARY",
+    [DISASM_UNK_MODE_PARSE] = "PARSE",
+};
+
 const char* sValNames_branch_arrow[] = {
     [DISASM_ARROW_MODE_OFF      ] = "OFF",
     [DISASM_ARROW_MODE_SELECTION] = "SELECTION",
@@ -45,7 +51,7 @@ struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_HEADER_PAGE_DISASM      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASSEMBLY",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_BINARY           ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknown as binary",              .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_DISASM_UNKNOWNS         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknowns handling",              .valNames = &sValnames_asm_unknowns,  .val = DISASM_UNK_MODE_HEX,       .defaultVal = DISASM_UNK_MODE_HEX,       .lowerBound = DISASM_UNK_MODE_HEX,   .upperBound = DISASM_UNK_MODE_PARSE,     },
     [CS_OPT_DISASM_PSEUDOINSNS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
 #ifdef INCLUDE_DEBUG_MAP
@@ -138,6 +144,9 @@ static Address insn_index_to_addr(Address startAddr, u16 insnIndex) {
 //! TODO: Version that checks for branches relative to viewport (overscan).
 // @returns whether to continue next frame.
 _Bool disasm_fill_branch_buffer(Address funcAddr) {
+    const enum CSDisasmUnknownsModes unknownsMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_UNKNOWNS);
+    const _Bool skipUnknowns = (unknownsMode != DISASM_UNK_MODE_PARSE);
+
     // Pick up where we left off.
     BranchArrow* currArrow = &sBranchArrows[sNumBranchArrows];
 
@@ -156,7 +165,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
         // Check if we have left the function.
         const MapSymbol* symbol = get_map_symbol(sBranchBufferCurrAddr, BRANCH_ARROW_SYMBOL_SEARCH_DIRECTION);
         if (symbol != NULL) {
-            if (!addr_is_in_text_segment(symbol->addr)) {
+            if (skipUnknowns && !addr_is_in_text_segment(symbol->addr)) {
                 return FALSE;
             }
             if (funcAddr != symbol->addr) {
@@ -169,6 +178,7 @@ _Bool disasm_fill_branch_buffer(Address funcAddr) {
         // Get the offset for the current function.
         InsnData insn = { .raw = 0x00000000, };
         //! TODO: Does this need to be a safe read? It slows down the search.
+        //        Probably required when skipUnknowns is FALSE?
         if (!try_read_word_aligned(&insn.raw, sBranchBufferCurrAddr)) {
             return FALSE;
         }
@@ -294,7 +304,7 @@ void format_and_print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, con
 
 void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Address selectedAddr, Address pc) {
     const enum CSDisasmBranchArrowModes branchArrowMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
-    const _Bool unkAsBinary   = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_BINARY);
+    const enum CSDisasmUnknownsModes unknownsMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_UNKNOWNS);
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool symbolHeaders = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SYMBOL_HEADERS);
     const MapSymbol* currSymbol = NULL;
@@ -340,7 +350,7 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
         if (!try_read_word_aligned(&data, addr)) {
             cs_print(x, y, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else {
-            if (addr_is_in_text_segment(addr)) {
+            if ((unknownsMode == DISASM_UNK_MODE_PARSE) || addr_is_in_text_segment(addr)) {
                 format_and_print_insn(x, y, addr, data);
 
                 if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
@@ -360,7 +370,7 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
                     color = COLOR_RGBA32_CRASH_VARIABLE;
                 }
 #endif // INCLUDE_DEBUG_MAP
-                if (unkAsBinary) {
+                if (unknownsMode == DISASM_UNK_MODE_BIN) {
                     // "bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb"
                     print_data_as_binary(x, y, &data, sizeof(data), color);
                     // cs_print(x, y, "%032b", data);

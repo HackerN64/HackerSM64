@@ -23,7 +23,13 @@ typedef enum SymbolSearchDirections {
 
 // See mapPacker.py.
 typedef struct MapSymbol {
-    /*0x00*/ Address addr;          // Symbol address.
+    /*0x00*/ union {
+                Address addr;          // Symbol address.
+                struct PACKED {
+                    /*0x00*/ Address segment :  8; // 0x80 or higher = global symbol.
+                    /*0x01*/ Address address : 24;
+                }; // Segmented address
+            };
     /*0x04*/ size_t size;           // Symbol size.
     /*0x08*/ size_t name_offset;    // Offset of symbol name in gMapStrings.
     /*0x0C*/ u16 name_len;          // Symbol name length.

@@ -8,6 +8,12 @@
 #include "crash_screen/cs_draw.h" // For ScreenCoord_ typedefs.
 
 
+enum CSDisasmUnknownsModes {
+    DISASM_UNK_MODE_HEX,
+    DISASM_UNK_MODE_BIN,
+    DISASM_UNK_MODE_PARSE,
+};
+
 enum CSDisasmBranchArrowModes {
     DISASM_ARROW_MODE_OFF,
     DISASM_ARROW_MODE_SELECTION,
@@ -23,7 +29,7 @@ enum CSSettingsGroup_page_disasm {
 #ifdef INCLUDE_DEBUG_MAP
     CS_OPT_DISASM_SHOW_SYMBOL,
 #endif // INCLUDE_DEBUG_MAP
-    CS_OPT_DISASM_BINARY,
+    CS_OPT_DISASM_UNKNOWNS,
     CS_OPT_DISASM_PSEUDOINSNS,
     CS_OPT_DISASM_IMM_FMT,
 #ifdef INCLUDE_DEBUG_MAP
