@@ -9,6 +9,8 @@
 .balign 32
 glabel pj64_get_count_factor_asm
 mfc0 $t0, $9 // $9 is the COUNT register
+NOP
 mfc0 $t1, $9 
-jr $ra
 subu $v0, $t1, $t0
+jr $ra
+srl $v0, $v0, 1

@@ -180,8 +180,8 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
         sFirstCrash = FALSE;
 
         gCountFactor = check_count_factor();
-        //! TODO: Better check for this, and other emulators:
-        if ((gEmulator & EMU_PARALLELN64) && (gCountFactor == 1)) {
+        //! TODO: Is there a cleaner way to do this?
+        if (!(gEmulator & EMU_CONSOLE) && (gCountFactor == 1)) {
             gTimingDiv = 2;
         }
 

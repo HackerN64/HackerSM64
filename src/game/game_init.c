@@ -802,7 +802,7 @@ void thread5_game_loop(UNUSED void *arg) {
             continue;
         }
 #ifdef PUPPYPRINT_DEBUG
-    bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
+        bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
 #endif
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
