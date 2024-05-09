@@ -205,10 +205,6 @@ extern OSThread* __osRunningThread;
 
 extern const char* sRegDesc_Default[];
 
-#define REG_BUFFER_SIZE 3
-extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
-extern int gSavedRegBufSize;
-
 
 const RegisterSource* get_reg_src(RegisterSources src);
 ALWAYS_INLINE static const RegisterSource* get_coprocessor_src(Coprocessors copID) {
@@ -221,6 +217,3 @@ const RegisterInfo* get_reg_info_from_src(const RegisterSource* regSrc, int idx)
 const RegisterInfo* get_reg_info(RegisterSources src, int idx);
 Doubleword get_reg_val(RegisterSources src, int idx, _Bool checkThread);
 const char* get_reg_desc(RegisterSources src, int idx);
-
-void clear_saved_reg_buffer(void);
-void append_reg_to_buffer(RegisterSources src, int idx, RegisterValueTypes type, _Bool isOutput);

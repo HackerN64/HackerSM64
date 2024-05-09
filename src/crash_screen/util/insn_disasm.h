@@ -557,6 +557,7 @@ typedef union InsnTemplate {
 #define INSNI(_opc, _name, _fmt, _out) INSN(_opc, _name, FALSE, _fmt, _out)
 // Instruction with registers with special formats (eg. floats):
 #define INSNF(_opc, _name, _fmt, _out) INSN(_opc, _name, TRUE, _fmt, _out)
+
 #define INSN_END() {}
 
 
@@ -569,7 +570,7 @@ typedef enum PACKED RegFmts {
 typedef union InsnParam {
     struct PACKED {
         const u8 id  : 4; // enum MIPSParamID
-        const u8 fmt : 2; // [0=int,1=flt,2=overwrite]
+        const u8 fmt : 2; // [0=int,1=flt,2=overwrite,3=?]
         const u8     : 2; //! TODO:
     };
     u8 raw;
@@ -583,6 +584,10 @@ typedef union InsnParam {
 #define ADDR_INSN_WAITING_FOR_MESG          INSN_OFFSET_FROM_ADDR(osRecvMesg,   26) // 27th instruction in osRecvMesg.
 #define ADDR_INSN_STRLEN_DEREFERENCE_ARG    INSN_OFFSET_FROM_ADDR(strlen,        0) // 1st instruction in strlen (dereference arg).
 
+
+#define REG_BUFFER_SIZE 3
+extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
+extern int gSavedRegBufSize;
 
 s16 insn_check_for_branch_offset(InsnData insn);
 Address get_insn_branch_target_from_addr(Address addr);

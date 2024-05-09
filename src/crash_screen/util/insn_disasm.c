@@ -37,43 +37,43 @@ static const char insn_alphabet[] = (INSN_ALPHABET_STR_0 INSN_ALPHABET_STR_N INS
 
 
 const InsnParam insn_param_formats[][MIPS_NUM_PARAMS] = {
-    [IFMT_NOP  ] = { PARAM_NOP,                 PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // nop
+    [IFMT_NOP  ] = { PARAM_NOP,                 PARAM_NOP,                 PARAM_NOP,                 }, // nop
 
-    [IFMT_s    ] = { PARAM(MP_RS,    MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // rs
-    [IFMT_d    ] = { PARAM(MP_RD,    MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // rd
-    [IFMT_ds   ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rd rs
-    [IFMT_st   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rs rt
-    [IFMT_dt   ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rd rt // for pseudos
-    [IFMT_dst  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), },/*0, FALSE),*/ // rd rs rt
-    [IFMT_dts  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), },/*0, FALSE),*/ // rd rt rs
+    [IFMT_s    ] = { PARAM(MP_RS,    MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // rs
+    [IFMT_d    ] = { PARAM(MP_RD,    MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // rd
+    [IFMT_ds   ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM_NOP,                 }, // rd rs
+    [IFMT_st   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM_NOP,                 }, // rs rt
+    [IFMT_dt   ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM_NOP,                 }, // rd rt // for pseudos
+    [IFMT_dst  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), }, // rd rs rt
+    [IFMT_dts  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), }, // rd rt rs
 
-    [IFMT_tdCP0] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RDCP0, MP_FMT_I), PARAM_NOP,                 },/*1, FALSE),*/ // rt rd[cp0]   // output 1 or output 2
-    [IFMT_tSCP1] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_FS,    MP_FMT_F), PARAM_NOP,                 },/*1, FALSE),*/ // rt fs        // output 1 or output 2
-    [IFMT_tSFCR] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_FSFCR, MP_FMT_I), PARAM_NOP,                 },/*1, FALSE),*/ // rt fs        // output 1 or output 2
+    [IFMT_tdCP0] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RDCP0, MP_FMT_I), PARAM_NOP,                 }, // rt rd[cp0]
+    [IFMT_tSCP1] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_FS,    MP_FMT_F), PARAM_NOP,                 }, // rt fs
+    [IFMT_tSFCR] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_FSFCR, MP_FMT_I), PARAM_NOP,                 }, // rt fs
 
-    [IFMT_ST   ] = { PARAM(MP_FS,    MP_FMT_F), PARAM(MP_FT,    MP_FMT_F), PARAM_NOP,                 },/*0, TRUE ),*/ // fs ft // FPcond.out, fs.f, ft.f
-    [IFMT_DST  ] = { PARAM(MP_FD,    MP_FMT_F), PARAM(MP_FS,    MP_FMT_F), PARAM(MP_FT,    MP_FMT_F), },/*0, TRUE ),*/ // fd fs ft // fd.out, fd.f, fs.f, ft.f
+    [IFMT_ST   ] = { PARAM(MP_FS,    MP_FMT_F), PARAM(MP_FT,    MP_FMT_F), PARAM_NOP,                 }, // fs ft
+    [IFMT_DST  ] = { PARAM(MP_FD,    MP_FMT_F), PARAM(MP_FS,    MP_FMT_F), PARAM(MP_FT,    MP_FMT_F), }, // fd fs ft
 
-    [IFMT_DS_XX] = { PARAM(MP_FD,    MP_FMT_O), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 },/*0, TRUE ),*/ // op.sd fd fs // fd.out, fd.f, fs.f
-    [IFMT_DS_IX] = { PARAM(MP_FD,    MP_FMT_I), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 },/*0, TRUE ),*/ // op.i[.f] // fd.i, fs.ovr
-    [IFMT_DS_FX] = { PARAM(MP_FD,    MP_FMT_F), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 },/*0, TRUE ),*/ // op.f[.i] // fd.f, fs.ovr
+    [IFMT_DS_XX] = { PARAM(MP_FD,    MP_FMT_O), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 }, // op.sd fd fs
+    [IFMT_DS_IX] = { PARAM(MP_FD,    MP_FMT_I), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 }, // op.i[.f]
+    [IFMT_DS_FX] = { PARAM(MP_FD,    MP_FMT_F), PARAM(MP_FS,    MP_FMT_O), PARAM_NOP,                 }, // op.f[.i]
 
-    [IFMT_tsI  ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), },/*0, FALSE),*/ // rt rs immediate
-    [IFMT_tI   ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rt immediate
-    [IFMT_sI   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rs immediate
+    [IFMT_tsI  ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_RS,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), }, // rt rs immediate
+    [IFMT_tI   ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), PARAM_NOP,                 }, // rt immediate
+    [IFMT_sI   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_IMM,   MP_FMT_I), PARAM_NOP,                 }, // rs immediate
 
-    [IFMT_to   ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rt offset(base)
-    [IFMT_To   ] = { PARAM(MP_FT,    MP_FMT_F), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // ft offset(base)
+    [IFMT_to   ] = { PARAM(MP_RT,    MP_FMT_I), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 }, // rt offset(base)
+    [IFMT_To   ] = { PARAM(MP_FT,    MP_FMT_F), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 }, // ft offset(base)
 
-    [IFMT_dta  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_SHIFT, MP_FMT_I), },/*0, FALSE),*/ // rd rt shift
-    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXC10, MP_FMT_I), },/*0, FALSE),*/ // rs rt exc10
-    [IFMT_E    ] = { PARAM(MP_EXC20, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // exc20
+    [IFMT_dta  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_SHIFT, MP_FMT_I), }, // rd rt shift
+    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXC10, MP_FMT_I), }, // rs rt exc10
+    [IFMT_E    ] = { PARAM(MP_EXC20, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // exc20
 
-    [IFMT_stB  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), },/*0, FALSE),*/ // rs rt branch
-    [IFMT_sB   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 },/*0, FALSE),*/ // rs branch
-    [IFMT_B    ] = { PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // branch
+    [IFMT_stB  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), }, // rs rt branch
+    [IFMT_sB   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 }, // rs branch
+    [IFMT_B    ] = { PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // branch
 
-    [IFMT_J    ] = { PARAM(MP_JUMP,  MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 },/*0, FALSE),*/ // jump
+    [IFMT_J    ] = { PARAM(MP_JUMP,  MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // jump
 };
 #define SIZEOF_PARAM_LISTS sizeof(insn_param_formats)
 
@@ -218,6 +218,7 @@ const InsnTemplate* get_insn(InsnData* insnSrc) {
  */
 s16 insn_check_for_branch_offset(InsnData insn) {
     const InsnTemplate* info = get_insn(&insn);
+
     if (info != NULL) {
         MIPSParamFmts fmt = info->params;
         const InsnParam* list = &insn_param_formats[fmt][0];
@@ -292,6 +293,30 @@ static void cs_insn_param_check_color_change(char** strp, RGBA32* oldColor, RGBA
     if (formatting && (*oldColor != newColor)) {
         *oldColor = newColor;
         *strp += sprintf(*strp, STR_COLOR_PREFIX, newColor);
+    }
+}
+
+// A buffer to save registers to. Used by cs_insn_to_string().
+RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
+int gSavedRegBufSize = 0;
+
+void clear_saved_reg_buffer(void) {
+    bzero(gSavedRegBuf, sizeof(gSavedRegBuf));
+    gSavedRegBufSize = 0;
+}
+
+void append_reg_to_buffer(RegisterSources src, int idx, RegisterValueTypes type, _Bool isOutput) {
+    if (gSavedRegBufSize < ARRAY_COUNT(gSavedRegBuf)) {
+        gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){
+            .src = src,
+            .idx = idx,
+            .valInfo = {
+                .type = type,
+                .thr  = TRUE,
+                .dbl  = FALSE, //! TODO: implement this.
+                .out  = isOutput,
+            },
+        };
     }
 }
 

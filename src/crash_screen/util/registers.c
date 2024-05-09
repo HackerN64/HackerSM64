@@ -143,6 +143,10 @@ Doubleword get_direct_reg_val(const RegisterSource* regSrc, int idx) {
     return ((regSrc->valFunc != NULL) ? regSrc->valFunc(idx) : 0);
 }
 
+static _Bool reg_is_in_thread(const RegisterInfo* regInfo) {
+    return (regInfo->offset != REGINFO_NULL_OFFSET);
+}
+
 Doubleword get_reg_val(RegisterSources src, int idx, _Bool checkThread) {
     const RegisterSource* regSrc = get_reg_src(src);
     if (regSrc == NULL) {
@@ -155,7 +159,7 @@ Doubleword get_reg_val(RegisterSources src, int idx, _Bool checkThread) {
 
     if (src >= REGS_INTERFACES_START) {
         return get_interface_reg_val(regInfo);
-    } else if (checkThread && (regInfo->offset != REGINFO_NULL_OFFSET) && (gInspectThread != NULL)) {
+    } else if (checkThread && reg_is_in_thread(regInfo) && (gInspectThread != NULL)) {
         // If register exists in __OSThreadContext, use the data from the inspected thread.
         return get_thread_reg_val(regInfo, gInspectThread);
     } else {
@@ -172,28 +176,4 @@ const char* get_reg_desc(RegisterSources src, int idx) {
     }
 
     return regSrc->descList[info->descId];
-}
-
-// A buffer to save registers to. Used by cs_insn_to_string().
-RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
-int gSavedRegBufSize = 0;
-
-void clear_saved_reg_buffer(void) {
-    bzero(gSavedRegBuf, sizeof(gSavedRegBuf));
-    gSavedRegBufSize = 0;
-}
-
-void append_reg_to_buffer(RegisterSources src, int idx, RegisterValueTypes type, _Bool isOutput) {
-    if (gSavedRegBufSize < ARRAY_COUNT(gSavedRegBuf)) {
-        gSavedRegBuf[gSavedRegBufSize++] = (RegisterId){
-            .src = src,
-            .idx = idx,
-            .valInfo = {
-                .type = type,
-                .thr  = TRUE,
-                .dbl  = FALSE, //! TODO: implement this.
-                .out  = isOutput,
-            },
-        };
-    }
 }
