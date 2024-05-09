@@ -120,4 +120,5 @@ typedef enum REGIDS_SPC {
     REG_SPC_HI,    // mfhi/mthi.
     REG_SPC_LLBIT, // Load Linked: set by LL, cleared by ERET, tested by SC.
     REG_SPC_RCP,   // From OSThread, not a vr4300 register.
+    SPC_NUM_REGISTERS,
 } REGIDS_SPC;

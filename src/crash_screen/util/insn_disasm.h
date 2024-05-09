@@ -520,22 +520,36 @@ typedef union InsnData {
     '\0', \
 }
 
+typedef enum PACKED DisasmExtraPrintedRegisters {
+    EXR_00,
+    EXR_HI,
+    EXR_LO,
+    EXR_LL,
+    EXR_EN,
+    EXR_IX,
+    EXR_RD,
+    EXR_FP,
+    NUM_EXR_TYPES,
+} DisasmExtraPrintedRegisters;
+
 // Instruction database format.
 typedef union InsnTemplate {
     struct PACKED {
         /*0x00*/ struct PACKED {
             /*00*/ u64 name   : 35; // (PCKCSZ * 7) Packed name (7 5-bit chars). 
-            /*42*/ u16 hasFmt :  1; // Whether the name has a format suffix.
-            /*43*/ u16 params :  5; // enum MIPSParamFmts.
-            /*00*/ u16 output :  2; // [0=none,1=p1,2=p2,3=p3]
-            /*00*/ u16        :  5;
+            /*35*/ u16 params :  5; // enum MIPSParamFmts.
+            /*40*/ u16 output :  2; // [0=none,1=p1,2=p2,3=p3]
+            /*42*/ u16 ex1    :  3; // 1st extra register slot (enum DisasmExtraPrintedRegisters).
+            /*45*/ u16 ex2    :  3; // 2nd extra register slot (enum DisasmExtraPrintedRegisters).
         }; /*0x06*/
         /*0x06*/ struct PACKED {
-            /*00*/ u8        :  2;
+            /*00*/ u8 exo    :  2; // Mask for extra registers [0b0=input,0b1=output].
             /*02*/ u8 opcode :  6; // Opcode to compare to.
         }; /*0x01*/
-        /*0x07*/ u8 pseudoC; // enum MIPS_C_Pseudocodes //! TODO:
-        //! TODO: extra registers for buffer.
+        /*0x07*/ struct PACKED {
+            /*00*/ u8 hasFmt  : 1; // Whether the name has a format suffix.
+            /*01*/ u8 pseudoC : 7; // enum MIPS_C_Pseudocodes //! TODO:
+        };
     };
     u64 raw;
     u64 raw64[1];
@@ -545,19 +559,21 @@ typedef union InsnTemplate {
 } InsnTemplate; /*0x08*/
 #define SIZEOF_INSN_TEMPLATE sizeof(InsnTemplate)
 
-#define INSN(_opcode, _name, _hasFmt, _params, _output) { \
+#define INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _ex1, _ex2, _exo) { \
     .opcode = _opcode,          \
     .name   = PACK_STR7(_name), \
     .hasFmt = _hasFmt,          \
     .params = _params,          \
     .output = _output,          \
+    .ex1    = _ex1,             \
+    .ex2    = _ex2,             \
+    .exo    = _exo,             \
 }
 
-// Default instruction:
-#define INSNI(_opc, _name, _fmt, _out) INSN(_opc, _name, FALSE, _fmt, _out)
-// Instruction with registers with special formats (eg. floats):
-#define INSNF(_opc, _name, _fmt, _out) INSN(_opc, _name, TRUE, _fmt, _out)
-
+#define INSN_DB(_opcode, _name, _hasFmt, _params, _output) \
+    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, EXR_00, EXR_00, 0b00)
+#define INSN_EX(_opcode, _name, _hasFmt, _params, _output, _ex1, _ex2, _exo) \
+    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _ex1, _ex2, _exo)
 #define INSN_END() {}
 
 
@@ -585,7 +601,7 @@ typedef union InsnParam {
 #define ADDR_INSN_STRLEN_DEREFERENCE_ARG    INSN_OFFSET_FROM_ADDR(strlen,        0) // 1st instruction in strlen (dereference arg).
 
 
-#define REG_BUFFER_SIZE 3
+#define REG_BUFFER_SIZE (3 + 3) // 3 registers from instruction + up to 3 extra registers.
 extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
 

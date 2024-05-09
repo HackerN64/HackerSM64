@@ -155,9 +155,16 @@ void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, Reg
     CS_SET_DEFAULT_PRINT_COLOR_START(COLOR_RGBA32_WHITE);
     const RegisterInfo* regInfo = get_reg_info(reg.src, reg.idx);
     Word data = get_reg_val(reg.src, reg.idx, TRUE);
+    const char* name = ((reg.src == REGS_CPU) ? regInfo->shortName : regInfo->name);
+
+    // FP is part of FPCSR.
+    if (reg.valInfo.type == REG_VAL_TYPE_CONDBIT) {
+        name = "FP";
+        data = ((Reg_FPR_31)data).C;
+    }
 
     charX += cs_print(TEXT_X(charX), TEXT_Y(line), (STR_COLOR_PREFIX"%s: "),
-        COLOR_RGBA32_CRASH_VARIABLE, ((reg.src == REGS_CPU) ? regInfo->shortName : regInfo->name)
+        COLOR_RGBA32_CRASH_VARIABLE, name
     );
     if (reg.valInfo.out) {
         charX += cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"[output]", COLOR_RGBA32_LIGHT_GRAY);

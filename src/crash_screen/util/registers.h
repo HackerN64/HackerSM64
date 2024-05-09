@@ -80,6 +80,7 @@ typedef enum PACKED RegisterValueTypes {
     REG_VAL_TYPE_FLOAT,
     REG_VAL_TYPE_ADDR,
     REG_VAL_TYPE_BITS, //! TODO: Is this needed?
+    REG_VAL_TYPE_CONDBIT, // FP condition bit, Exclusive to FPCSR.
 } RegisterValueTypes;
 
 typedef union RegisterId {
