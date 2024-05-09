@@ -3,6 +3,7 @@
 #include "area.h"
 #include "audio/external.h"
 #include "audio/load.h"
+#include "audio/synthesis.h"
 #include "engine/graph_node.h"
 #include "engine/math_util.h"
 #include "level_table.h"
@@ -230,7 +231,11 @@ void play_infinite_stairs_music(void) {
  * Called from threads: thread5_game_loop
  */
 void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer) {
-    if (gResetTimer == 0 && seqArgs != sCurrentMusic) {
+    if (gResetTimer == 0 && (seqArgs != sCurrentMusic
+#ifdef BETTER_REVERB
+        || gBetterReverbPresetValue != activeBetterReverbPreset
+#endif
+    )) {
         if (gCurrCreditsEntry != NULL) {
             sound_reset(7);
         } else {
