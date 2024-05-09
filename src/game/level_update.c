@@ -350,19 +350,21 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
 extern const char* get_warp_node_name(const enum WarpNodes id);
 
 void init_mario_after_warp(void) {
-    struct ObjectWarpNode *spawnNode = area_get_warp_node(sWarpDest.nodeId);
-    DEBUG_ASSERTF((spawnNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find destination warp node!\nNode ID: 0x%02X %s",
+    struct Object *object = get_destination_warp_object(sWarpDest.nodeId);
+
+    DEBUG_ASSERTF((object != NULL), ASSERT_PREFIX_LEVEL"Couldn't find destination warp object!\nNode ID: 0x%02X %s",
         sWarpDest.nodeId, get_warp_node_name(sWarpDest.nodeId)
     );
-    u32 marioSpawnType = get_mario_spawn_type(spawnNode->object);
+
+    u32 marioSpawnType = get_mario_spawn_type(object);
 
     if (gMarioState->action != ACT_UNINITIALIZED) {
-        gPlayerSpawnInfos[0].startPos[0] = (s16) spawnNode->object->oPosX;
-        gPlayerSpawnInfos[0].startPos[1] = (s16) spawnNode->object->oPosY;
-        gPlayerSpawnInfos[0].startPos[2] = (s16) spawnNode->object->oPosZ;
+        gPlayerSpawnInfos[0].startPos[0] = (s16) object->oPosX;
+        gPlayerSpawnInfos[0].startPos[1] = (s16) object->oPosY;
+        gPlayerSpawnInfos[0].startPos[2] = (s16) object->oPosZ;
 
         gPlayerSpawnInfos[0].startAngle[0] = 0;
-        gPlayerSpawnInfos[0].startAngle[1] = spawnNode->object->oMoveAngleYaw;
+        gPlayerSpawnInfos[0].startAngle[1] = object->oMoveAngleYaw;
         gPlayerSpawnInfos[0].startAngle[2] = 0;
 
         if (marioSpawnType == MARIO_SPAWN_DOOR_WARP) {
@@ -377,8 +379,8 @@ void init_mario_after_warp(void) {
         init_mario();
         set_mario_initial_action(gMarioState, marioSpawnType, sWarpDest.arg);
 
-        gMarioState->interactObj = spawnNode->object;
-        gMarioState->usedObj = spawnNode->object;
+        gMarioState->interactObj = object;
+        gMarioState->usedObj = object;
     }
 
     reset_camera(gCurrentArea->camera);
@@ -574,9 +576,11 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
+
     DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
         arg, get_warp_node_name(arg)
     );
+
     s16 levelNum = (warpNode->node.destLevel & 0x7F);
     s16 destArea = warpNode->node.destArea;
     s16 unchanged = TRUE;
@@ -902,6 +906,7 @@ void initiate_delayed_warp(void) {
 
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
+
                     DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
                         sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId)
                     );
