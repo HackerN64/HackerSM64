@@ -122,7 +122,7 @@ ALWAYS_INLINE static Word get_and_reset_watchlo(void) {
     const u32 saved = __osDisableInt();
     Word watchLo = 0;
     asm volatile("mfc0 %0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO):"=r"(watchLo));
-    asm volatile("mtc0 $0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO)); //! TODO: Do this on game boot too? Libdragon does.
+    asm volatile("mtc0 $0,$"EXPAND_AND_STRINGIFY(C0_WATCHLO)"; nop; nop"); //! TODO: Do this on game boot too? Libdragon does.
     __osRestoreInt(saved);
     return watchLo;
 }
@@ -166,6 +166,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     // Reinitialize global variables, settings, buffers, etc.
     cs_reinitialize();
 
+    sRenderingFramebuffer = 0;
     osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
 #ifdef FUNNY_CRASH_SOUND

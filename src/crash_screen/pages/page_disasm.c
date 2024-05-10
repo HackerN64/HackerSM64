@@ -26,7 +26,7 @@
 #endif // UNF
 
 
-const char* sValnames_asm_unknowns[] = {
+const char* sValNames_asm_unknowns[] = {
     [DISASM_UNK_MODE_HEX  ] = "HEX",
     [DISASM_UNK_MODE_BIN  ] = "BINARY",
     [DISASM_UNK_MODE_PARSE] = "PARSE",
@@ -51,7 +51,7 @@ struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_HEADER_PAGE_DISASM      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASSEMBLY",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_UNKNOWNS         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknowns handling",              .valNames = &sValnames_asm_unknowns,  .val = DISASM_UNK_MODE_HEX,       .defaultVal = DISASM_UNK_MODE_HEX,       .lowerBound = DISASM_UNK_MODE_HEX,   .upperBound = DISASM_UNK_MODE_PARSE,     },
+    [CS_OPT_DISASM_UNKNOWNS         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknowns handling",              .valNames = &sValNames_asm_unknowns,  .val = DISASM_UNK_MODE_HEX,       .defaultVal = DISASM_UNK_MODE_HEX,       .lowerBound = DISASM_UNK_MODE_HEX,   .upperBound = DISASM_UNK_MODE_PARSE,      },
     [CS_OPT_DISASM_PSEUDOINSNS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
 #ifdef INCLUDE_DEBUG_MAP

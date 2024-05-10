@@ -385,7 +385,7 @@ void cs_reset_framebuffer(_Bool drawBackground) {
 // // Emulators that the Instant Input patch should not be applied to
 // #define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
 
-#define CRASH_SCREEN_NUM_FRAMEBUFFERS 3
+#define CRASH_SCREEN_NUM_FRAMEBUFFERS 2
 
 // Cycle through the 3 framebuffers.
 //! TODO: Instant input?
@@ -396,7 +396,9 @@ void cs_update_framebuffer(void) {
     OSMesgQueue* queue = &gActiveCSThreadInfo->mesgQueue;
     OSMesg* mesg = &gActiveCSThreadInfo->mesg;
 
+    // Turn off osViBlack in case it was on.
     osViBlack(FALSE);
+
     osRecvMesg(queue, mesg, OS_MESG_BLOCK);
     osViSwapBuffer(FB_PTR_AS(void));
     osRecvMesg(queue, mesg, OS_MESG_BLOCK);
@@ -537,19 +539,19 @@ void cs_draw_footer_instructions(_Bool showPressStart) {
     CSTextCoord_u32 line = (CRASH_SCREEN_NUM_CHARS_Y - (1 + showPressStart));
 
     if (gLastCSSelectedAddress) {
-        cs_print(TEXT_X(0), TEXT_Y(line - 1), "LAST SELECTED: %08X", gLastCSSelectedAddress);
+        cs_print(TEXT_X(0), TEXT_Y(line - 1), ("LAST SELECTED: "STR_HEX_PREFIX STR_HEX_WORD), gLastCSSelectedAddress);
     }
     cs_draw_divider(DIVIDER_Y(line));
-    cs_print(TEXT_X(0), TEXT_Y(line),
-        STR_COLOR_PREFIX"see other pages with <"STR_L"|"STR_R"> for more info",
-        COLOR_RGBA32_CRASH_HEADER
-    );
     if (showPressStart) {
-        cs_print(TEXT_X(0), TEXT_Y(line + 1),
+        cs_print(TEXT_X(0), TEXT_Y(line++),
             STR_COLOR_PREFIX"press [%s] for page-specific controls",
             COLOR_RGBA32_CRASH_HEADER, gCSControlDescriptions[CONT_DESC_SHOW_CONTROLS].control
         );
     }
+    cs_print(TEXT_X(0), TEXT_Y(line),
+        STR_COLOR_PREFIX"see other pages with <"STR_L"|"STR_R"> for more info",
+        COLOR_RGBA32_CRASH_HEADER
+    );
 }
 
 u32 gCSFrameCounter = 0;

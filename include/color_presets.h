@@ -302,6 +302,7 @@
 
 // VSCode default theme colors
 #define COLOR_RGBA32_VSC_COMMENT                0x6A9955FF // 106 153  85 255
+#define COLOR_RGBA32_VSC_CONTROL                0xC586C0FF // 197 134 192 255
 #define COLOR_RGBA32_VSC_FUNCTION               0xDCDCAAFF // 220 220 170 255
 #define COLOR_RGBA32_VSC_VARIABLE               0x9CDCFEFF // 156 220 254 255
 #define COLOR_RGBA32_VSC_DEFINE                 0x569CD6FF //  86 156 214 255

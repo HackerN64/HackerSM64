@@ -12,7 +12,7 @@
 // Maximum number of chars to print at once.
 #define CHAR_BUFFER_SIZE        256
 #define CS_PRINT_BUFFER_SIZE    128
-#define CS_SCROLL_BUFFER_SIZE   CRASH_SCREEN_NUM_CHARS_X
+#define CS_SCROLL_BUFFER_SIZE   48
 
 // Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2

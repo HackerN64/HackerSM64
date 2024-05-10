@@ -578,7 +578,7 @@ s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
 
     DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
-        arg, get_warp_node_name(arg)
+        (u8)arg, get_warp_node_name(arg)
     );
 
     s16 levelNum = (warpNode->node.destLevel & 0x7F);
@@ -908,7 +908,7 @@ void initiate_delayed_warp(void) {
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
 
                     DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
-                        sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId)
+                        (u8)sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId)
                     );
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
