@@ -36,217 +36,217 @@
 ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
     // OPC_SPECIAL (insn_db_spec) // 0: OPC_SPECIAL, INSN_TYPE_FUNC
     // OPC_REGIMM  (insn_db_regi) // 1: OPC_REGIMM,  INSN_TYPE_REGIMM
-    INSN_DB(OPC_J,      "J      ", FALSE, IFMT_J,   0), //  2: Jump.
-    INSN_DB(OPC_JAL,    "JAL    ", FALSE, IFMT_J,   0), //  3: Jump and Link.
-    INSN_DB(OPC_BEQ,    "BEQ    ", FALSE, IFMT_stB, 0), //  4: Branch on Equal.
-    INSN_DB(OPC_BNE,    "BNE    ", FALSE, IFMT_stB, 0), //  5: Branch on Not Equal.
-    INSN_DB(OPC_BLEZ,   "BLEZ   ", FALSE, IFMT_sB,  0), //  6: Branch on Less Than or Equal to Zero.
-    INSN_DB(OPC_BGTZ,   "BGTZ   ", FALSE, IFMT_sB,  0), //  7: Branch on Greater Than Zero.
-    INSN_DB(OPC_ADDI,   "ADDI   ", FALSE, IFMT_tsI, 1), //  8: Add Immediate Word.
-    INSN_DB(OPC_ADDIU,  "ADDIU  ", FALSE, IFMT_tsI, 1), //  9: Add Immediate Unsigned Word.
-    INSN_DB(OPC_SLTI,   "SLTI   ", FALSE, IFMT_tsI, 1), // 10: Set on Less Than Immediate.
-    INSN_DB(OPC_SLTIU,  "SLTIU  ", FALSE, IFMT_tsI, 1), // 11: Set on Less Than Immediate Unsigned.
-    INSN_DB(OPC_ANDI,   "ANDI   ", FALSE, IFMT_tsI, 1), // 12: And Immediate.
-    INSN_DB(OPC_ORI,    "ORI    ", FALSE, IFMT_tsI, 1), // 13: Or Immediate.
-    INSN_DB(OPC_XORI,   "XORI   ", FALSE, IFMT_tsI, 1), // 14: Exclusive Or Immediate.
-    INSN_DB(OPC_LUI,    "LUI    ", FALSE, IFMT_tI,  1), // 15: Load Upper Immediate.
+    INSN_DB(OPC_J,      "J      ", FALSE, IFMT_J,   0, PSI_J    ), //  2: Jump.
+    INSN_DB(OPC_JAL,    "JAL    ", FALSE, IFMT_J,   0, PSI_JAL  ), //  3: Jump and Link.
+    INSN_DB(OPC_BEQ,    "BEQ    ", FALSE, IFMT_stB, 0, PSI_BEQ  ), //  4: Branch on Equal.
+    INSN_DB(OPC_BNE,    "BNE    ", FALSE, IFMT_stB, 0, PSI_BNE  ), //  5: Branch on Not Equal.
+    INSN_DB(OPC_BLEZ,   "BLEZ   ", FALSE, IFMT_sB,  0, PSI_BLEZ ), //  6: Branch on Less Than or Equal to Zero.
+    INSN_DB(OPC_BGTZ,   "BGTZ   ", FALSE, IFMT_sB,  0, PSI_BGTZ ), //  7: Branch on Greater Than Zero.
+    INSN_DB(OPC_ADDI,   "ADDI   ", FALSE, IFMT_tsI, 1, PSI_ADDI ), //  8: Add Immediate Word.
+    INSN_DB(OPC_ADDIU,  "ADDIU  ", FALSE, IFMT_tsI, 1, PSI_ADDI ), //  9: Add Immediate Unsigned Word.
+    INSN_DB(OPC_SLTI,   "SLTI   ", FALSE, IFMT_tsI, 1, PSI_SLTI ), // 10: Set on Less Than Immediate.
+    INSN_DB(OPC_SLTIU,  "SLTIU  ", FALSE, IFMT_tsI, 1, PSI_SLTI ), // 11: Set on Less Than Immediate Unsigned.
+    INSN_DB(OPC_ANDI,   "ANDI   ", FALSE, IFMT_tsI, 1, PSI_ANDI ), // 12: And Immediate.
+    INSN_DB(OPC_ORI,    "ORI    ", FALSE, IFMT_tsI, 1, PSI_ORI  ), // 13: Or Immediate.
+    INSN_DB(OPC_XORI,   "XORI   ", FALSE, IFMT_tsI, 1, PSI_XORI ), // 14: Exclusive Or Immediate.
+    INSN_DB(OPC_LUI,    "LUI    ", FALSE, IFMT_tI,  1, PSI_LUI  ), // 15: Load Upper Immediate.
     // OPC_COP0 (insn_db_cop0) // 16: Coprocessor-0 (System Control Coprocessor).
     // OPC_COP1 (insn_db_cop1) // 17: Coprocessor-1 (Floating-Point Unit).
     // OPC_COP2 (insn_db_cop2) // 18: Coprocessor-2 (Reality Co-Processor Vector Unit).
     // OPC_COP3 (insn_db_cop3) // 19: Coprocessor-3 (CP3).
-    INSN_DB(OPC_BEQL,   "BEQL   ", FALSE, IFMT_stB, 0), // 20: Branch on Equal Likely.
-    INSN_DB(OPC_BNEL,   "BNEL   ", FALSE, IFMT_stB, 0), // 21: Branch on Not Equal Likely.
-    INSN_DB(OPC_BLEZL,  "BLEZL  ", FALSE, IFMT_sB,  0), // 22: Branch on Less Than or Equal to Zero Likely.
-    INSN_DB(OPC_BGTZL,  "BGTZL  ", FALSE, IFMT_sB,  0), // 23: Branch on Greater Than Zero Likely.
-    INSN_DB(OPC_DADDI,  "DADDI  ", FALSE, IFMT_tsI, 1), // 24: Doubleword Add Immediate.
-    INSN_DB(OPC_DADDIU, "DADDIU ", FALSE, IFMT_tsI, 1), // 25: Doubleword Add Immediate Unsigned.
-    INSN_DB(OPC_LDL,    "LDL    ", FALSE, IFMT_to,  1), // 26: Load Doubleword Left.
-    INSN_DB(OPC_LDR,    "LDR    ", FALSE, IFMT_to,  1), // 27: Load Doubleword Right.
-    INSN_DB(OPC_LB,     "LB     ", FALSE, IFMT_to,  1), // 32: Load Byte.
-    INSN_DB(OPC_LH,     "LH     ", FALSE, IFMT_to,  1), // 33: Load Halfword.
-    INSN_DB(OPC_LWL,    "LWL    ", FALSE, IFMT_to,  1), // 34: Load Word Left.
-    INSN_DB(OPC_LW,     "LW     ", FALSE, IFMT_to,  1), // 35: Load Word.
-    INSN_DB(OPC_LBU,    "LBU    ", FALSE, IFMT_to,  1), // 36: Load Byte Unsigned.
-    INSN_DB(OPC_LHU,    "LHU    ", FALSE, IFMT_to,  1), // 37: Load Halfword Unsigned.
-    INSN_DB(OPC_LWR,    "LWR    ", FALSE, IFMT_to,  1), // 38: Load Word Right.
-    INSN_DB(OPC_LWU,    "LWU    ", FALSE, IFMT_to,  1), // 39: Load Word Unsigned.
-    INSN_DB(OPC_SB,     "SB     ", FALSE, IFMT_to,  0), // 40: Store Byte.
-    INSN_DB(OPC_SH,     "SH     ", FALSE, IFMT_to,  0), // 41: Store Halfword.
-    INSN_DB(OPC_SWL,    "SWL    ", FALSE, IFMT_to,  0), // 42: Store Word Left.
-    INSN_DB(OPC_SW,     "SW     ", FALSE, IFMT_to,  0), // 43: Store Word.
-    INSN_DB(OPC_SDL,    "SDL    ", FALSE, IFMT_to,  0), // 44: Store Doubleword Left.
-    INSN_DB(OPC_SDR,    "SDR    ", FALSE, IFMT_to,  0), // 45: Store Doubleword Right.
-    INSN_DB(OPC_SWR,    "SWR    ", FALSE, IFMT_to,  0), // 46: Store Word Right.
-    INSN_DB(OPC_CACHE,  "CACHE  ", FALSE, IFMT_to,  0), // 47: https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
-    INSN_EX(OPC_LL,     "LL     ", FALSE, IFMT_to,  1, EXR_LL, EXR_00, 0b10), // 48: Load Linked Word.
-    INSN_DB(OPC_LWC1,   "LWC1   ", FALSE, IFMT_To,  1), // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
-    INSN_DB(OPC_LWC2,   "LWC2   ", FALSE, IFMT_to,  1), // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    INSN_DB(OPC_LWC3,   "LWC3   ", FALSE, IFMT_to,  1), // 51: Load Word to Coprocessor-3 (COP3).
-    INSN_EX(OPC_LLD ,   "LLD    ", FALSE, IFMT_to,  1, EXR_LL, EXR_00, 0b10), // 52: Load Linked Doubleword.
-    INSN_DB(OPC_LDC1,   "LDC1   ", FALSE, IFMT_To,  1), // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
-    INSN_DB(OPC_LDC2,   "LDC2   ", FALSE, IFMT_to,  1), // 54: Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    INSN_DB(OPC_LD,     "LD     ", FALSE, IFMT_to,  1), // 55: Load Doubleword.
-    INSN_DB(OPC_SC,     "SC     ", FALSE, IFMT_to,  0), // 56: Store Conditional Word.
-    INSN_DB(OPC_SWC1,   "SWC1   ", FALSE, IFMT_To,  0), // 57: Store Word to Coprocessor-1 (Floating-Point Unit).
-    INSN_DB(OPC_SWC2,   "SWC2   ", FALSE, IFMT_to,  0), // 58: Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    INSN_DB(OPC_SWC3,   "SWC3   ", FALSE, IFMT_to,  0), // 59: Store Word to Coprocessor-3 (COP3).
-    INSN_EX(OPC_SCD,    "SCD    ", FALSE, IFMT_to,  0, EXR_LL, EXR_00, 0b00), // 60: Store Conditional Doubleword.
-    INSN_DB(OPC_SDC1,   "SDC1   ", FALSE, IFMT_To,  0), // 61: Store Doubleword to Coprocessor-1 (Floating-Point Unit).
-    INSN_DB(OPC_SDC2,   "SDC2   ", FALSE, IFMT_to,  0), // 62: Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
-    INSN_EX(OPC_SD,     "SD     ", FALSE, IFMT_to,  0, EXR_LL, EXR_00, 0b00), // 63: Store Doubleword.
+    INSN_DB(OPC_BEQL,   "BEQL   ", FALSE, IFMT_stB, 0, PSI_BEQ  ), // 20: Branch on Equal Likely.
+    INSN_DB(OPC_BNEL,   "BNEL   ", FALSE, IFMT_stB, 0, PSI_BNE  ), // 21: Branch on Not Equal Likely.
+    INSN_DB(OPC_BLEZL,  "BLEZL  ", FALSE, IFMT_sB,  0, PSI_BLEZ ), // 22: Branch on Less Than or Equal to Zero Likely.
+    INSN_DB(OPC_BGTZL,  "BGTZL  ", FALSE, IFMT_sB,  0, PSI_BGTZ ), // 23: Branch on Greater Than Zero Likely.
+    INSN_DB(OPC_DADDI,  "DADDI  ", FALSE, IFMT_tsI, 1, PSI_ADDI ), // 24: Doubleword Add Immediate.
+    INSN_DB(OPC_DADDIU, "DADDIU ", FALSE, IFMT_tsI, 1, PSI_ADDI ), // 25: Doubleword Add Immediate Unsigned.
+    INSN_DB(OPC_LDL,    "LDL    ", FALSE, IFMT_to,  1, PSI_L_L  ), // 26: Load Doubleword Left.
+    INSN_DB(OPC_LDR,    "LDR    ", FALSE, IFMT_to,  1, PSI_L_R  ), // 27: Load Doubleword Right.
+    INSN_DB(OPC_LB,     "LB     ", FALSE, IFMT_to,  1, PSI_L    ), // 32: Load Byte.
+    INSN_DB(OPC_LH,     "LH     ", FALSE, IFMT_to,  1, PSI_L    ), // 33: Load Halfword.
+    INSN_DB(OPC_LWL,    "LWL    ", FALSE, IFMT_to,  1, PSI_L_L  ), // 34: Load Word Left.
+    INSN_DB(OPC_LW,     "LW     ", FALSE, IFMT_to,  1, PSI_L    ), // 35: Load Word.
+    INSN_DB(OPC_LBU,    "LBU    ", FALSE, IFMT_to,  1, PSI_L    ), // 36: Load Byte Unsigned.
+    INSN_DB(OPC_LHU,    "LHU    ", FALSE, IFMT_to,  1, PSI_L    ), // 37: Load Halfword Unsigned.
+    INSN_DB(OPC_LWR,    "LWR    ", FALSE, IFMT_to,  1, PSI_L_R  ), // 38: Load Word Right.
+    INSN_DB(OPC_LWU,    "LWU    ", FALSE, IFMT_to,  1, PSI_L    ), // 39: Load Word Unsigned.
+    INSN_DB(OPC_SB,     "SB     ", FALSE, IFMT_to,  0, PSI_S    ), // 40: Store Byte.
+    INSN_DB(OPC_SH,     "SH     ", FALSE, IFMT_to,  0, PSI_S    ), // 41: Store Halfword.
+    INSN_DB(OPC_SWL,    "SWL    ", FALSE, IFMT_to,  0, PSI_S_L  ), // 42: Store Word Left.
+    INSN_DB(OPC_SW,     "SW     ", FALSE, IFMT_to,  0, PSI_S    ), // 43: Store Word.
+    INSN_DB(OPC_SDL,    "SDL    ", FALSE, IFMT_to,  0, PSI_S_L  ), // 44: Store Doubleword Left.
+    INSN_DB(OPC_SDR,    "SDR    ", FALSE, IFMT_to,  0, PSI_S_R  ), // 45: Store Doubleword Right.
+    INSN_DB(OPC_SWR,    "SWR    ", FALSE, IFMT_to,  0, PSI_S_R  ), // 46: Store Word Right.
+    INSN_DB(OPC_CACHE,  "CACHE  ", FALSE, IFMT_to,  0, PSI_CACHE), // 47: https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html.
+    INSN_EX(OPC_LL,     "LL     ", FALSE, IFMT_to,  1, PSI_LL,    EXR_LL, EXR_00, 0b10), // 48: Load Linked Word.
+    INSN_DB(OPC_LWC1,   "LWC1   ", FALSE, IFMT_To,  1, PSI_LC1  ), // 49: Load Word to Coprocessor-1 (Floating-Point Unit).
+    INSN_DB(OPC_LWC2,   "LWC2   ", FALSE, IFMT_to,  1, PSI_L    ), // 50: Load Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    INSN_DB(OPC_LWC3,   "LWC3   ", FALSE, IFMT_to,  1, PSI_L    ), // 51: Load Word to Coprocessor-3 (COP3).
+    INSN_EX(OPC_LLD ,   "LLD    ", FALSE, IFMT_to,  1, PSI_LL,    EXR_LL, EXR_00, 0b10), // 52: Load Linked Doubleword.
+    INSN_DB(OPC_LDC1,   "LDC1   ", FALSE, IFMT_To,  1, PSI_LC1  ), // 53: Load Doubleword to Coprocessor-1 (Floating-Point Unit).
+    INSN_DB(OPC_LDC2,   "LDC2   ", FALSE, IFMT_to,  1, PSI_L    ), // 54: Load Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    INSN_DB(OPC_LD,     "LD     ", FALSE, IFMT_to,  1, PSI_L    ), // 55: Load Doubleword.
+    INSN_DB(OPC_SC,     "SC     ", FALSE, IFMT_to,  0, PSI_SC   ), // 56: Store Conditional Word.
+    INSN_DB(OPC_SWC1,   "SWC1   ", FALSE, IFMT_To,  0, PSI_SC1  ), // 57: Store Word to Coprocessor-1 (Floating-Point Unit).
+    INSN_DB(OPC_SWC2,   "SWC2   ", FALSE, IFMT_to,  0, PSI_S    ), // 58: Store Word to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    INSN_DB(OPC_SWC3,   "SWC3   ", FALSE, IFMT_to,  0, PSI_S    ), // 59: Store Word to Coprocessor-3 (COP3).
+    INSN_EX(OPC_SCD,    "SCD    ", FALSE, IFMT_to,  0, PSI_SC,    EXR_LL, EXR_00, 0b00), // 60: Store Conditional Doubleword.
+    INSN_DB(OPC_SDC1,   "SDC1   ", FALSE, IFMT_To,  0, PSI_SC1  ), // 61: Store Doubleword to Coprocessor-1 (Floating-Point Unit).
+    INSN_DB(OPC_SDC2,   "SDC2   ", FALSE, IFMT_to,  0, PSI_S    ), // 62: Store Doubleword to Coprocessor-2 (Reality Co-Processor Vector Unit).
+    INSN_EX(OPC_SD,     "SD     ", FALSE, IFMT_to,  0, PSI_S,     EXR_LL, EXR_00, 0b00), // 63: Store Doubleword.
     INSN_END(), // NULL terminator.
 };
 
 // Special opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE_FUNC
-    INSN_DB(OPS_SLL,     "SLL    ", FALSE, IFMT_dta, 1), //  0: Shift Word Left Logical.
-    INSN_DB(OPS_SRL,     "SRL    ", FALSE, IFMT_dta, 1), //  2: Shift Word Right Logical.
-    INSN_DB(OPS_SRA,     "SRA    ", FALSE, IFMT_dta, 1), //  3: Shift Word Right Arithmetic.
-    INSN_DB(OPS_SLLV,    "SLLV   ", FALSE, IFMT_dts, 1), //  4: Shift Word Left Logical Variable.
-    INSN_DB(OPS_SRLV,    "SRLV   ", FALSE, IFMT_dts, 1), //  6: Shift Word Right Logical Variable.
-    INSN_DB(OPS_SRAV,    "SRAV   ", FALSE, IFMT_dts, 1), //  7: Shift Word Right Arithmetic Variable.
-    INSN_DB(OPS_JR,      "JR     ", FALSE, IFMT_s,   0), //  8: Jump Register.
-    INSN_DB(OPS_JALR,    "JALR   ", FALSE, IFMT_ds,  1), //  9: Jump and Link Register.
-    INSN_DB(OPS_SYSCALL, "SYSCALL", FALSE, IFMT_E,   0), // 12: System Call (assert).
-    INSN_DB(OPS_BREAK,   "BREAK  ", FALSE, IFMT_E,   0), // 13: Breakpoint.
-    INSN_DB(OPS_SYNC,    "SYNC   ", FALSE, IFMT_NOP, 0), // 15: Synchronize Shared Memory.
-    INSN_EX(OPS_MFHI,    "MFHI   ", FALSE, IFMT_d,   0, EXR_HI, EXR_00, 0b00), // 16: Move From HI.
-    INSN_EX(OPS_MTHI,    "MTHI   ", FALSE, IFMT_s,   0, EXR_HI, EXR_00, 0b11), // 17: Move To HI.
-    INSN_EX(OPS_MFLO,    "MFLO   ", FALSE, IFMT_d,   0, EXR_LO, EXR_00, 0b00), // 18: Move From LO.
-    INSN_EX(OPS_MTLO,    "MTLO   ", FALSE, IFMT_s,   0, EXR_LO, EXR_00, 0b11), // 19: Move To LO.
-    INSN_DB(OPS_DSLLV,   "DSLLV  ", FALSE, IFMT_dts, 1), // 20: Doubleword Shift Left Logical Variable.
-    INSN_DB(OPS_DSRLV,   "DSRLV  ", FALSE, IFMT_dts, 1), // 22: Doubleword Shift Right Logical Variable.
-    INSN_DB(OPS_DSRAV,   "DSRAV  ", FALSE, IFMT_dts, 1), // 23: Doubleword Shift Right Arithmetic Variable.
-    INSN_EX(OPS_MULT,    "MULT   ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 24: Multiply Word (5cyc).
-    INSN_EX(OPS_MULTU,   "MULTU  ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 25: Multiply Unsigned Word (5cyc).
-    INSN_EX(OPS_DIV,     "DIV    ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 26: Divide Word (37cyc).
-    INSN_EX(OPS_DIVU,    "DIVU   ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 27: Divide Unsigned Word (37cyc).
-    INSN_EX(OPS_DMULT,   "DMULT  ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 28: Doubleword Multiply (8cyc).
-    INSN_EX(OPS_DMULTU,  "DMULTU ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 29: Doubleword Multiply Unsigned (8cyc).
-    INSN_EX(OPS_DDIV,    "DDIV   ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 30: Doubleword Divide (69cyc).
-    INSN_EX(OPS_DDIVU,   "DDIVU  ", FALSE, IFMT_st,  0, EXR_HI, EXR_LO, 0b11), // 31: Doubleword Divide Unsigned (69cyc).
-    INSN_DB(OPS_ADD,     "ADD    ", FALSE, IFMT_dst, 1), // 32: Add Word.
-    INSN_DB(OPS_ADDU,    "ADDU   ", FALSE, IFMT_dst, 1), // 33: Add Unsigned Word.
-    INSN_DB(OPS_SUB,     "SUB    ", FALSE, IFMT_dst, 1), // 34: Subtract Word.
-    INSN_DB(OPS_SUBU,    "SUBU   ", FALSE, IFMT_dst, 1), // 35: Subtract Unsigned Word.
-    INSN_DB(OPS_AND,     "AND    ", FALSE, IFMT_dst, 1), // 36: And.
-    INSN_DB(OPS_OR,      "OR     ", FALSE, IFMT_dst, 1), // 37: Or.
-    INSN_DB(OPS_XOR,     "XOR    ", FALSE, IFMT_dst, 1), // 38: Exclusive Or.
-    INSN_DB(OPS_NOR,     "NOR    ", FALSE, IFMT_dst, 1), // 39: Nor.
-    INSN_DB(OPS_SLT,     "SLT    ", FALSE, IFMT_dst, 1), // 42: Set on Less Than.
-    INSN_DB(OPS_SLTU,    "SLTU   ", FALSE, IFMT_dst, 1), // 43: Set on Less Than Unsigned.
-    INSN_DB(OPS_DADD,    "DADD   ", FALSE, IFMT_dst, 1), // 44: Doubleword Add.
-    INSN_DB(OPS_DADDU,   "DADDU  ", FALSE, IFMT_dst, 1), // 45: Doubleword Add Unsigned.
-    INSN_DB(OPS_DSUB,    "DSUB   ", FALSE, IFMT_dst, 1), // 46: Doubleword Subtract.
-    INSN_DB(OPS_DSUBU,   "DSUBU  ", FALSE, IFMT_dst, 1), // 47: Doubleword Subtract Unsigned.
-    INSN_DB(OPS_TGE,     "TGE    ", FALSE, IFMT_ste, 0), // 48: Trap if Greater Than or Equal.
-    INSN_DB(OPS_TGEU,    "TGEU   ", FALSE, IFMT_ste, 0), // 49: Trap if Greater Than or Equal Unsigned.
-    INSN_DB(OPS_TLT,     "TLT    ", FALSE, IFMT_ste, 0), // 50: Trap if Less Than.
-    INSN_DB(OPS_TLTU,    "TLTU   ", FALSE, IFMT_ste, 0), // 51: Trap if Less Than Unsigned.
-    INSN_DB(OPS_TEQ,     "TEQ    ", FALSE, IFMT_ste, 0), // 52: Trap if Equal.
-    INSN_DB(OPS_TNE,     "TNE    ", FALSE, IFMT_ste, 0), // 54: Trap if Not Equal.
-    INSN_DB(OPS_DSLL,    "DSLL   ", FALSE, IFMT_dta, 1), // 56: Doubleword Shift Left Logical.
-    INSN_DB(OPS_DSRL,    "DSRL   ", FALSE, IFMT_dta, 1), // 58: Doubleword Shift Right Logical.
-    INSN_DB(OPS_DSRA,    "DSRA   ", FALSE, IFMT_dta, 1), // 59: Doubleword Shift Right Arithmetic.
-    INSN_DB(OPS_DSLL32,  "DSLL32 ", FALSE, IFMT_dta, 1), // 60: Doubleword Shift Left Logical + 32.
-    INSN_DB(OPS_DSRL32,  "DSRL32 ", FALSE, IFMT_dta, 1), // 62: Doubleword Shift Right Logical + 32.
-    INSN_DB(OPS_DSRA32,  "DSRA32 ", FALSE, IFMT_dta, 1), // 63: Doubleword Shift Right Arithmetic + 32.
+    INSN_DB(OPS_SLL,     "SLL    ", FALSE, IFMT_dta, 1, PSI_SLI   ), //  0: Shift Word Left Logical.
+    INSN_DB(OPS_SRL,     "SRL    ", FALSE, IFMT_dta, 1, PSI_SRI   ), //  2: Shift Word Right Logical.
+    INSN_DB(OPS_SRA,     "SRA    ", FALSE, IFMT_dta, 1, PSI_SRI   ), //  3: Shift Word Right Arithmetic.
+    INSN_DB(OPS_SLLV,    "SLLV   ", FALSE, IFMT_dts, 1, PSI_SLV   ), //  4: Shift Word Left Logical Variable.
+    INSN_DB(OPS_SRLV,    "SRLV   ", FALSE, IFMT_dts, 1, PSI_SRV   ), //  6: Shift Word Right Logical Variable.
+    INSN_DB(OPS_SRAV,    "SRAV   ", FALSE, IFMT_dts, 1, PSI_SRV   ), //  7: Shift Word Right Arithmetic Variable.
+    INSN_DB(OPS_JR,      "JR     ", FALSE, IFMT_s,   0, PSI_JR    ), //  8: Jump Register.
+    INSN_DB(OPS_JALR,    "JALR   ", FALSE, IFMT_ds,  1, PSI_JALR  ), //  9: Jump and Link Register.
+    INSN_DB(OPS_SYSCALL, "SYSCALL", FALSE, IFMT_E,   0, PSI_BREAK ), // 12: System Call (assert).
+    INSN_DB(OPS_BREAK,   "BREAK  ", FALSE, IFMT_E,   0, PSI_BREAK ), // 13: Breakpoint.
+    INSN_DB(OPS_SYNC,    "SYNC   ", FALSE, IFMT_NOP, 0, PSI_FUNC  ), // 15: Synchronize Shared Memory.
+    INSN_EX(OPS_MFHI,    "MFHI   ", FALSE, IFMT_d,   0, PSI_MFHI,   EXR_HI, EXR_00, 0b00), // 16: Move From HI.
+    INSN_EX(OPS_MTHI,    "MTHI   ", FALSE, IFMT_s,   0, PSI_MTHI,   EXR_HI, EXR_00, 0b11), // 17: Move To HI.
+    INSN_EX(OPS_MFLO,    "MFLO   ", FALSE, IFMT_d,   0, PSI_MFLO,   EXR_LO, EXR_00, 0b00), // 18: Move From LO.
+    INSN_EX(OPS_MTLO,    "MTLO   ", FALSE, IFMT_s,   0, PSI_MTLO,   EXR_LO, EXR_00, 0b11), // 19: Move To LO.
+    INSN_DB(OPS_DSLLV,   "DSLLV  ", FALSE, IFMT_dts, 1, PSI_SLV   ), // 20: Doubleword Shift Left Logical Variable.
+    INSN_DB(OPS_DSRLV,   "DSRLV  ", FALSE, IFMT_dts, 1, PSI_SRV   ), // 22: Doubleword Shift Right Logical Variable.
+    INSN_DB(OPS_DSRAV,   "DSRAV  ", FALSE, IFMT_dts, 1, PSI_SRV   ), // 23: Doubleword Shift Right Arithmetic Variable.
+    INSN_EX(OPS_MULT,    "MULT   ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 24: Multiply Word (5cyc).
+    INSN_EX(OPS_MULTU,   "MULTU  ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 25: Multiply Unsigned Word (5cyc).
+    INSN_EX(OPS_DIV,     "DIV    ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 26: Divide Word (37cyc).
+    INSN_EX(OPS_DIVU,    "DIVU   ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 27: Divide Unsigned Word (37cyc).
+    INSN_EX(OPS_DMULT,   "DMULT  ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 28: Doubleword Multiply (8cyc).
+    INSN_EX(OPS_DMULTU,  "DMULTU ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 29: Doubleword Multiply Unsigned (8cyc).
+    INSN_EX(OPS_DDIV,    "DDIV   ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 30: Doubleword Divide (69cyc).
+    INSN_EX(OPS_DDIVU,   "DDIVU  ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 31: Doubleword Divide Unsigned (69cyc).
+    INSN_DB(OPS_ADD,     "ADD    ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 32: Add Word.
+    INSN_DB(OPS_ADDU,    "ADDU   ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 33: Add Unsigned Word.
+    INSN_DB(OPS_SUB,     "SUB    ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 34: Subtract Word.
+    INSN_DB(OPS_SUBU,    "SUBU   ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 35: Subtract Unsigned Word.
+    INSN_DB(OPS_AND,     "AND    ", FALSE, IFMT_dst, 1, PSI_AND   ), // 36: And.
+    INSN_DB(OPS_OR,      "OR     ", FALSE, IFMT_dst, 1, PSI_OR    ), // 37: Or.
+    INSN_DB(OPS_XOR,     "XOR    ", FALSE, IFMT_dst, 1, PSI_XOR   ), // 38: Exclusive Or.
+    INSN_DB(OPS_NOR,     "NOR    ", FALSE, IFMT_dst, 1, PSI_NOR   ), // 39: Nor.
+    INSN_DB(OPS_SLT,     "SLT    ", FALSE, IFMT_dst, 1, PSI_SLT   ), // 42: Set on Less Than.
+    INSN_DB(OPS_SLTU,    "SLTU   ", FALSE, IFMT_dst, 1, PSI_SLT   ), // 43: Set on Less Than Unsigned.
+    INSN_DB(OPS_DADD,    "DADD   ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 44: Doubleword Add.
+    INSN_DB(OPS_DADDU,   "DADDU  ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 45: Doubleword Add Unsigned.
+    INSN_DB(OPS_DSUB,    "DSUB   ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 46: Doubleword Subtract.
+    INSN_DB(OPS_DSUBU,   "DSUBU  ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 47: Doubleword Subtract Unsigned.
+    INSN_DB(OPS_TGE,     "TGE    ", FALSE, IFMT_ste, 0, PSI_TGE   ), // 48: Trap if Greater Than or Equal.
+    INSN_DB(OPS_TGEU,    "TGEU   ", FALSE, IFMT_ste, 0, PSI_TGE   ), // 49: Trap if Greater Than or Equal Unsigned.
+    INSN_DB(OPS_TLT,     "TLT    ", FALSE, IFMT_ste, 0, PSI_TLT   ), // 50: Trap if Less Than.
+    INSN_DB(OPS_TLTU,    "TLTU   ", FALSE, IFMT_ste, 0, PSI_TLT   ), // 51: Trap if Less Than Unsigned.
+    INSN_DB(OPS_TEQ,     "TEQ    ", FALSE, IFMT_ste, 0, PSI_TEQ   ), // 52: Trap if Equal.
+    INSN_DB(OPS_TNE,     "TNE    ", FALSE, IFMT_ste, 0, PSI_TEQ   ), // 54: Trap if Not Equal.
+    INSN_DB(OPS_DSLL,    "DSLL   ", FALSE, IFMT_dta, 1, PSI_SLI   ), // 56: Doubleword Shift Left Logical.
+    INSN_DB(OPS_DSRL,    "DSRL   ", FALSE, IFMT_dta, 1, PSI_SRI   ), // 58: Doubleword Shift Right Logical.
+    INSN_DB(OPS_DSRA,    "DSRA   ", FALSE, IFMT_dta, 1, PSI_SRI   ), // 59: Doubleword Shift Right Arithmetic.
+    INSN_DB(OPS_DSLL32,  "DSLL32 ", FALSE, IFMT_dta, 1, PSI_DSLI32), // 60: Doubleword Shift Left Logical + 32.
+    INSN_DB(OPS_DSRL32,  "DSRL32 ", FALSE, IFMT_dta, 1, PSI_DSRI32), // 62: Doubleword Shift Right Logical + 32.
+    INSN_DB(OPS_DSRA32,  "DSRA32 ", FALSE, IFMT_dta, 1, PSI_DSRI32), // 63: Doubleword Shift Right Arithmetic + 32.
     INSN_END(), // NULL terminator.
 };
 
 // Register opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db_regi[] = { // OPC_REGIMM, INSN_TYPE_REGIMM
-    INSN_DB(OPR_BLTZ,    "BLTZ   ", FALSE, IFMT_sB, 0), //  0: Branch on Less Than Zero.
-    INSN_DB(OPR_BGEZ,    "BGEZ   ", FALSE, IFMT_sB, 0), //  1: Branch on Greater Than or Equal to Zero.
-    INSN_DB(OPR_BLTZL,   "BLTZL  ", FALSE, IFMT_sB, 0), //  2: Branch on Less Than Zero Likely.
-    INSN_DB(OPR_BGEZL,   "BGEZL  ", FALSE, IFMT_sB, 0), //  3: Branch on Greater Than or Equal to Zero Likely.
-    INSN_EX(OPR_BLTZAL,  "BLTZAL ", FALSE, IFMT_sB, 0, EXR_LL, EXR_00, 0b00), // 16: Branch on Less Than Zero and Link.
-    INSN_EX(OPR_BGEZAL,  "BGEZAL ", FALSE, IFMT_sB, 0, EXR_LL, EXR_00, 0b00), // 17: Branch on Greater Than or Equal to Zero and Link.
-    INSN_EX(OPR_BLTZALL, "BLTZALL", FALSE, IFMT_sB, 0, EXR_LL, EXR_00, 0b00), // 18: Branch on Less Than Zero and Link Likely.
-    INSN_EX(OPR_BGEZALL, "BGEZALL", FALSE, IFMT_sB, 0, EXR_LL, EXR_00, 0b00), // 19: Branch on Greater Than or Equal to Zero and Link Likely.
+    INSN_DB(OPR_BLTZ,    "BLTZ   ", FALSE, IFMT_sB, 0, PSI_BLTZ ), //  0: Branch on Less Than Zero.
+    INSN_DB(OPR_BGEZ,    "BGEZ   ", FALSE, IFMT_sB, 0, PSI_BGEZ ), //  1: Branch on Greater Than or Equal to Zero.
+    INSN_DB(OPR_BLTZL,   "BLTZL  ", FALSE, IFMT_sB, 0, PSI_BLTZ ), //  2: Branch on Less Than Zero Likely.
+    INSN_DB(OPR_BGEZL,   "BGEZL  ", FALSE, IFMT_sB, 0, PSI_BGEZ ), //  3: Branch on Greater Than or Equal to Zero Likely.
+    INSN_EX(OPR_BLTZAL,  "BLTZAL ", FALSE, IFMT_sB, 0, PSI_BLTZAL, EXR_LL, EXR_00, 0b00), // 16: Branch on Less Than Zero and Link.
+    INSN_EX(OPR_BGEZAL,  "BGEZAL ", FALSE, IFMT_sB, 0, PSI_BGEZAL, EXR_LL, EXR_00, 0b00), // 17: Branch on Greater Than or Equal to Zero and Link.
+    INSN_EX(OPR_BLTZALL, "BLTZALL", FALSE, IFMT_sB, 0, PSI_BLTZAL, EXR_LL, EXR_00, 0b00), // 18: Branch on Less Than Zero and Link Likely.
+    INSN_EX(OPR_BGEZALL, "BGEZALL", FALSE, IFMT_sB, 0, PSI_BGEZAL, EXR_LL, EXR_00, 0b00), // 19: Branch on Greater Than or Equal to Zero and Link Likely.
 
-    INSN_DB(OPR_TGEI,    "TGEI   ", FALSE, IFMT_sI, 0), //  8: Trap if Greater Than or Equal Immediate.
-    INSN_DB(OPR_TGEIU,   "TGEIU  ", FALSE, IFMT_sI, 0), //  9: Trap if Greater Than or Equal Unsigned Immediate.
-    INSN_DB(OPR_TLTI,    "TLTI   ", FALSE, IFMT_sI, 0), // 10: Trap if Less Than Immediate.
-    INSN_DB(OPR_TLTIU,   "TLTIU  ", FALSE, IFMT_sI, 0), // 11: Trap if Less Than Unsigned Immediate.
-    INSN_DB(OPR_TEQI,    "TEQI   ", FALSE, IFMT_sI, 0), // 12: Trap if Equal Immediate.
-    INSN_DB(OPR_TNEI,    "TNEI   ", FALSE, IFMT_sI, 0), // 14: Trap if Not Equal Immediate.
+    INSN_DB(OPR_TGEI,    "TGEI   ", FALSE, IFMT_sI, 0, PSI_TGEI), //  8: Trap if Greater Than or Equal Immediate.
+    INSN_DB(OPR_TGEIU,   "TGEIU  ", FALSE, IFMT_sI, 0, PSI_TGEI), //  9: Trap if Greater Than or Equal Unsigned Immediate.
+    INSN_DB(OPR_TLTI,    "TLTI   ", FALSE, IFMT_sI, 0, PSI_TLTI), // 10: Trap if Less Than Immediate.
+    INSN_DB(OPR_TLTIU,   "TLTIU  ", FALSE, IFMT_sI, 0, PSI_TLTI), // 11: Trap if Less Than Unsigned Immediate.
+    INSN_DB(OPR_TEQI,    "TEQI   ", FALSE, IFMT_sI, 0, PSI_TEQI), // 12: Trap if Equal Immediate.
+    INSN_DB(OPR_TNEI,    "TNEI   ", FALSE, IFMT_sI, 0, PSI_TNEI), // 14: Trap if Not Equal Immediate.
     INSN_END(), // NULL terminator.
 };
 
 // Coprocessor-0 (System Control Coprocessor):
 ALIGNED32 static const InsnTemplate insn_db_cop0_sub00[] = { // OPC_COP0, INSN_TYPE_COP_FMT
-    INSN_DB(COP0_MF,  "MFC0   ", FALSE, IFMT_tdCP0, 1), //  0: Move from System Control Coprocessor.
-    INSN_DB(COP0_DMF, "DMFC0  ", FALSE, IFMT_tdCP0, 1), //  1: Doubleword Move from System Control Coprocessor.
-    INSN_DB(COP0_MT,  "MTC0   ", FALSE, IFMT_tdCP0, 2), //  4: Move to System Control Coprocessor.
-    INSN_DB(COP0_DMT, "DMTC0  ", FALSE, IFMT_tdCP0, 2), //  5: Doubleword Move to System Control Coprocessor.
+    INSN_DB(COP0_MF,  "MFC0   ", FALSE, IFMT_tdCP0, 1, PSI_MFC0), //  0: Move from System Control Coprocessor.
+    INSN_DB(COP0_DMF, "DMFC0  ", FALSE, IFMT_tdCP0, 1, PSI_MFC0), //  1: Doubleword Move from System Control Coprocessor.
+    INSN_DB(COP0_MT,  "MTC0   ", FALSE, IFMT_tdCP0, 2, PSI_MTC0), //  4: Move to System Control Coprocessor.
+    INSN_DB(COP0_DMT, "DMTC0  ", FALSE, IFMT_tdCP0, 2, PSI_MTC0), //  5: Doubleword Move to System Control Coprocessor.
     INSN_END(), // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop0_sub10[] = { // OPC_COP0, INSN_TYPE_FUNC
-    INSN_EX(OPC_COP0_TLBP,  "TLBP   ", FALSE, IFMT_NOP, 0, EXR_EN, EXR_00, 0b00), //  8: Searches for a TLB entry that matches the EntryHi register.
-    INSN_EX(OPC_COP0_TLBR,  "TLBR   ", FALSE, IFMT_NOP, 0, EXR_EN, EXR_IX, 0b10), //  1: Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
-    INSN_EX(OPC_COP0_TLBWI, "TLBWI  ", FALSE, IFMT_NOP, 0, EXR_EN, EXR_IX, 0b00), //  2: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
-    INSN_EX(OPC_COP0_TLBWR, "TLBWR  ", FALSE, IFMT_NOP, 0, EXR_EN, EXR_RD, 0b00), //  6: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
-    INSN_DB(OPC_COP0_ERET,  "ERET   ", FALSE, IFMT_NOP, 0), // 24: Return from interrupt, exception, or error exception.
+    INSN_EX(OPC_COP0_TLBP,  "TLBP   ", FALSE, IFMT_NOP, 0, PSI_FUNC, EXR_EN, EXR_00, 0b00), //  8: Searches for a TLB entry that matches the EntryHi register.
+    INSN_EX(OPC_COP0_TLBR,  "TLBR   ", FALSE, IFMT_NOP, 0, PSI_FUNC, EXR_EN, EXR_IX, 0b10), //  1: Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register.
+    INSN_EX(OPC_COP0_TLBWI, "TLBWI  ", FALSE, IFMT_NOP, 0, PSI_FUNC, EXR_EN, EXR_IX, 0b00), //  2: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register.
+    INSN_EX(OPC_COP0_TLBWR, "TLBWR  ", FALSE, IFMT_NOP, 0, PSI_FUNC, EXR_EN, EXR_RD, 0b00), //  6: Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register.
+    INSN_DB(OPC_COP0_ERET,  "ERET   ", FALSE, IFMT_NOP, 0, PSI_FUNC), // 24: Return from interrupt, exception, or error exception.
     INSN_END(), // NULL terminator.
 };
 
 // Coprocessor-1 (Floating-Point Unit):
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub00[] = { // OPC_COP1, INSN_TYPE_COP_FMT
-    INSN_DB(COP1_FMT_SINGLE, "MFC1   ", FALSE, IFMT_tSCP1, 1), //  0: Move Word From Floating-Point.
-    INSN_DB(COP1_FMT_DOUBLE, "DMFC1  ", FALSE, IFMT_tSCP1, 1), //  1: Doubleword Move From Floating-Point.
-    INSN_DB(COP1_FMT_WORD,   "MTC1   ", FALSE, IFMT_tSCP1, 2), //  4: Move Word To Floating-Point.
-    INSN_DB(COP1_FMT_LONG,   "DMTC1  ", FALSE, IFMT_tSCP1, 2), //  5: Doubleword Move To Floating-Point.
-    INSN_DB(COP1_FMT_CTL_F,  "CFC1   ", FALSE, IFMT_tSFCR, 1), //  2: Move Control Word From Floating-Point.
-    INSN_DB(COP1_FMT_CTL_T,  "CTC1   ", FALSE, IFMT_tSFCR, 2), //  6: Move Control Word To Floating-Point.
+    INSN_DB(COP1_FMT_SINGLE, "MFC1   ", FALSE, IFMT_tSCP1, 1, PSI_MFC1), //  0: Move Word From Floating-Point.
+    INSN_DB(COP1_FMT_DOUBLE, "DMFC1  ", FALSE, IFMT_tSCP1, 1, PSI_MFC1), //  1: Doubleword Move From Floating-Point.
+    INSN_DB(COP1_FMT_WORD,   "MTC1   ", FALSE, IFMT_tSCP1, 2, PSI_MTC1), //  4: Move Word To Floating-Point.
+    INSN_DB(COP1_FMT_LONG,   "DMTC1  ", FALSE, IFMT_tSCP1, 2, PSI_MTC1), //  5: Doubleword Move To Floating-Point.
+    INSN_DB(COP1_FMT_CTL_F,  "CFC1   ", FALSE, IFMT_tSFCR, 1, PSI_CFC1), //  2: Move Control Word From Floating-Point.
+    INSN_DB(COP1_FMT_CTL_T,  "CTC1   ", FALSE, IFMT_tSFCR, 2, PSI_CTC1), //  6: Move Control Word To Floating-Point.
     INSN_END(), // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub01[] = { // OPC_COP1, INSN_TYPE_REGIMM
-    INSN_EX(OPT_COP1_BC1F,  "BC1F   ", FALSE, IFMT_B, 0, EXR_FP, EXR_00, 0b00), //  0: Branch on FP False (1cyc*).
-    INSN_EX(OPT_COP1_BC1T,  "BC1T   ", FALSE, IFMT_B, 0, EXR_FP, EXR_00, 0b00), //  1: Branch on FP True (1cyc*).
-    INSN_EX(OPT_COP1_BC1FL, "BC1FL  ", FALSE, IFMT_B, 0, EXR_FP, EXR_00, 0b00), //  2: Branch on FP False Likely (1cyc*).
-    INSN_EX(OPT_COP1_BC1TL, "BC1TL  ", FALSE, IFMT_B, 0, EXR_FP, EXR_00, 0b00), //  3: Branch on FP True Likely (1cyc*).
+    INSN_EX(OPT_COP1_BC1F,  "BC1F   ", FALSE, IFMT_B, 0, PSI_BC1F, EXR_FP, EXR_00, 0b00), //  0: Branch on FP False (1cyc*).
+    INSN_EX(OPT_COP1_BC1T,  "BC1T   ", FALSE, IFMT_B, 0, PSI_BC1T, EXR_FP, EXR_00, 0b00), //  1: Branch on FP True (1cyc*).
+    INSN_EX(OPT_COP1_BC1FL, "BC1FL  ", FALSE, IFMT_B, 0, PSI_BC1F, EXR_FP, EXR_00, 0b00), //  2: Branch on FP False Likely (1cyc*).
+    INSN_EX(OPT_COP1_BC1TL, "BC1TL  ", FALSE, IFMT_B, 0, PSI_BC1T, EXR_FP, EXR_00, 0b00), //  3: Branch on FP True Likely (1cyc*).
     INSN_END(), // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_TYPE_FUNC
-    INSN_DB(OPS_ADD_F,     "ADD    ", TRUE, IFMT_DST,   1), //  0: ADD.[fmt]     Floating-Point Add (3cyc).
-    INSN_DB(OPS_SUB_F,     "SUB    ", TRUE, IFMT_DST,   1), //  1: SUB.[fmt]     Floating-Point Subtract (3cyc).
-    INSN_DB(OPS_MUL_F,     "MUL    ", TRUE, IFMT_DST,   1), //  2: MUL.[fmt]     Floating-Point Multiply (S:5cyc; D:8cyc).
-    INSN_DB(OPS_DIV_F,     "DIV    ", TRUE, IFMT_DST,   1), //  3: DIV.[fmt]     Floating-Point Divide (S:29cyc; D:58cyc).
-    INSN_DB(OPS_SQRT_F,    "SQRT   ", TRUE, IFMT_DS_XX, 1), //  4: SQRT.[fmt]    Floating-Point Square Root (S:29cyc; D:58cyc).
-    INSN_DB(OPS_ABS_F,     "ABS    ", TRUE, IFMT_DS_XX, 1), //  5: ABS.[fmt]     Floating-Point Absolute Value (1cyc).
-    INSN_DB(OPS_MOV_F,     "MOV    ", TRUE, IFMT_DS_XX, 1), //  6: MOV.[fmt]     Floating-Point Move (1cyc).
-    INSN_DB(OPS_NEG_F,     "NEG    ", TRUE, IFMT_DS_XX, 1), //  7: NEG.[fmt]     Floating-Point Negate (1cyc).
-    INSN_DB(OPS_ROUND_L_F, "ROUND.L", TRUE, IFMT_DS_IX, 1), //  8: ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_TRUNC_L_F, "TRUNC.L", TRUE, IFMT_DS_IX, 1), //  9: TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_CEIL_L_F,  "CEIL.L ", TRUE, IFMT_DS_IX, 1), // 10: CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_FLOOR_L_F, "FLOOR.L", TRUE, IFMT_DS_IX, 1), // 11: FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_ROUND_W_F, "ROUND.W", TRUE, IFMT_DS_IX, 1), // 12: ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_TRUNC_W_F, "TRUNC.W", TRUE, IFMT_DS_IX, 1), // 13: TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_CEIL_W_F,  "CEIL.W ", TRUE, IFMT_DS_IX, 1), // 14: CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_FLOOR_W_F, "FLOOR.W", TRUE, IFMT_DS_IX, 1), // 15: FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_ADD_F,     "ADD    ", TRUE, IFMT_DST,   1, PSI_ADDF ), //  0: ADD.[fmt]     Floating-Point Add (3cyc).
+    INSN_DB(OPS_SUB_F,     "SUB    ", TRUE, IFMT_DST,   1, PSI_SUBF ), //  1: SUB.[fmt]     Floating-Point Subtract (3cyc).
+    INSN_DB(OPS_MUL_F,     "MUL    ", TRUE, IFMT_DST,   1, PSI_MULF ), //  2: MUL.[fmt]     Floating-Point Multiply (S:5cyc; D:8cyc).
+    INSN_DB(OPS_DIV_F,     "DIV    ", TRUE, IFMT_DST,   1, PSI_DIVF ), //  3: DIV.[fmt]     Floating-Point Divide (S:29cyc; D:58cyc).
+    INSN_DB(OPS_SQRT_F,    "SQRT   ", TRUE, IFMT_DS_XX, 1, PSI_CVTF ), //  4: SQRT.[fmt]    Floating-Point Square Root (S:29cyc; D:58cyc).
+    INSN_DB(OPS_ABS_F,     "ABS    ", TRUE, IFMT_DS_XX, 1, PSI_CVTF ), //  5: ABS.[fmt]     Floating-Point Absolute Value (1cyc).
+    INSN_DB(OPS_MOV_F,     "MOV    ", TRUE, IFMT_DS_XX, 1, PSI_MOVF ), //  6: MOV.[fmt]     Floating-Point Move (1cyc).
+    INSN_DB(OPS_NEG_F,     "NEG    ", TRUE, IFMT_DS_XX, 1, PSI_NEGF ), //  7: NEG.[fmt]     Floating-Point Negate (1cyc).
+    INSN_DB(OPS_ROUND_L_F, "ROUND.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), //  8: ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_TRUNC_L_F, "TRUNC.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), //  9: TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_CEIL_L_F,  "CEIL.L ", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 10: CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_FLOOR_L_F, "FLOOR.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 11: FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_ROUND_W_F, "ROUND.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 12: ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_TRUNC_W_F, "TRUNC.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 13: TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_CEIL_W_F,  "CEIL.W ", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 14: CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_FLOOR_W_F, "FLOOR.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 15: FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
 
-    INSN_DB(OPS_CVT_S_F,   "CVT.S  ", TRUE, IFMT_DS_FX, 1), // 32: CVT.S.[fmt]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
-    INSN_DB(OPS_CVT_D_F,   "CVT.D  ", TRUE, IFMT_DS_FX, 1), // 33: CVT.D.[fmt]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
-    INSN_DB(OPS_CVT_W_F,   "CVT.W  ", TRUE, IFMT_DS_IX, 1), // 36: CVT.W.[fmt]   Floating-Point Convert to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_CVT_L_F,   "CVT.L  ", TRUE, IFMT_DS_IX, 1), // 37: CVT.L.[fmt]   Floating-Point Convert to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_CVT_S_F,   "CVT.S  ", TRUE, IFMT_DS_FX, 1, PSI_CVTF), // 32: CVT.S.[fmt]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
+    INSN_DB(OPS_CVT_D_F,   "CVT.D  ", TRUE, IFMT_DS_FX, 1, PSI_CVTF), // 33: CVT.D.[fmt]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
+    INSN_DB(OPS_CVT_W_F,   "CVT.W  ", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 36: CVT.W.[fmt]   Floating-Point Convert to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_CVT_L_F,   "CVT.L  ", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 37: CVT.L.[fmt]   Floating-Point Convert to Long Fixed-Point (5cyc).
 
-    INSN_EX(OPS_C_F,       "C.F    ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 48: C.F.[fmt]     Floating-Point Compare (False) (1cyc).
-    INSN_EX(OPS_C_UN,      "C.UN   ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 49: C.UN.[fmt]    Floating-Point Compare (Unordered) (1cyc).
-    INSN_EX(OPS_C_EQ,      "C.EQ   ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 50: C.EQ.[fmt]    Floating-point Compare (Equal) (1cyc).
-    INSN_EX(OPS_C_UEQ,     "C.UEQ  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 51: C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc).
-    INSN_EX(OPS_C_OLT,     "C.OLT  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 52: C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc).
-    INSN_EX(OPS_C_ULT,     "C.ULT  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 53: C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc).
-    INSN_EX(OPS_C_OLE,     "C.OLE  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 54: C.OLE.[fmt]   Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
-    INSN_EX(OPS_C_ULE,     "C.ULE  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 55: C.ULE.[fmt]   Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
-    INSN_EX(OPS_C_SF,      "C.SF   ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 56: C.SF.[fmt]    Floating-point Compare (Signaling False) (1cyc).
-    INSN_EX(OPS_C_NGLE,    "C.NGLE ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 57: C.NGLE.[fmt]  Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
-    INSN_EX(OPS_C_SEQ,     "C.SEQ  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 58: C.SEQ.[fmt]   Floating-point Compare (Signalling Equal) (1cyc).
-    INSN_EX(OPS_C_NGL,     "C.NGL  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 59: C.NGL.[fmt]   Floating-point Compare (Not Greater or Less Than) (1cyc).
-    INSN_EX(OPS_C_LT,      "C.LT   ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 60: C.LT.[fmt]    Floating-point Compare (Less Than) (1cyc).
-    INSN_EX(OPS_C_NGE,     "C.NGE  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 61: C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc).
-    INSN_EX(OPS_C_LE,      "C.LE   ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 62: C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc).
-    INSN_EX(OPS_C_NGT,     "C.NGT  ", TRUE, IFMT_ST,    0, EXR_FP, EXR_00, 0b10), // 63: C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc).
+    INSN_EX(OPS_C_F,       "C.F    ", TRUE, IFMT_ST,    0, PSI_C_F,    EXR_FP, EXR_00, 0b10), // 48: C.F.[fmt]     Floating-Point Compare (False) (1cyc).
+    INSN_EX(OPS_C_UN,      "C.UN   ", TRUE, IFMT_ST,    0, PSI_C_UN,   EXR_FP, EXR_00, 0b10), // 49: C.UN.[fmt]    Floating-Point Compare (Unordered) (1cyc).
+    INSN_EX(OPS_C_EQ,      "C.EQ   ", TRUE, IFMT_ST,    0, PSI_C_EQ,   EXR_FP, EXR_00, 0b10), // 50: C.EQ.[fmt]    Floating-point Compare (Equal) (1cyc).
+    INSN_EX(OPS_C_UEQ,     "C.UEQ  ", TRUE, IFMT_ST,    0, PSI_C_UEQ,  EXR_FP, EXR_00, 0b10), // 51: C.UEQ.[fmt]   Floating-point Compare (Unordered or Equal) (1cyc).
+    INSN_EX(OPS_C_OLT,     "C.OLT  ", TRUE, IFMT_ST,    0, PSI_C_OLT,  EXR_FP, EXR_00, 0b10), // 52: C.OLT.[fmt]   Floating-point Compare (Ordered Less Than) (1cyc).
+    INSN_EX(OPS_C_ULT,     "C.ULT  ", TRUE, IFMT_ST,    0, PSI_C_ULT,  EXR_FP, EXR_00, 0b10), // 53: C.ULT.[fmt]   Floating-point Compare (Unordered or Less Than) (1cyc).
+    INSN_EX(OPS_C_OLE,     "C.OLE  ", TRUE, IFMT_ST,    0, PSI_C_OLE,  EXR_FP, EXR_00, 0b10), // 54: C.OLE.[fmt]   Floating-point Compare (Ordered or Less Than or Equal) (1cyc).
+    INSN_EX(OPS_C_ULE,     "C.ULE  ", TRUE, IFMT_ST,    0, PSI_C_ULE,  EXR_FP, EXR_00, 0b10), // 55: C.ULE.[fmt]   Floating-point Compare (Unordered or Less Than or Equal) (1cyc).
+    INSN_EX(OPS_C_SF,      "C.SF   ", TRUE, IFMT_ST,    0, PSI_C_SF,   EXR_FP, EXR_00, 0b10), // 56: C.SF.[fmt]    Floating-point Compare (Signaling False) (1cyc).
+    INSN_EX(OPS_C_NGLE,    "C.NGLE ", TRUE, IFMT_ST,    0, PSI_C_NGLE, EXR_FP, EXR_00, 0b10), // 57: C.NGLE.[fmt]  Floating-point Compare (Not Greater or Less Than or Equal) (1cyc).
+    INSN_EX(OPS_C_SEQ,     "C.SEQ  ", TRUE, IFMT_ST,    0, PSI_C_SEQ,  EXR_FP, EXR_00, 0b10), // 58: C.SEQ.[fmt]   Floating-point Compare (Signalling Equal) (1cyc).
+    INSN_EX(OPS_C_NGL,     "C.NGL  ", TRUE, IFMT_ST,    0, PSI_C_NGL,  EXR_FP, EXR_00, 0b10), // 59: C.NGL.[fmt]   Floating-point Compare (Not Greater or Less Than) (1cyc).
+    INSN_EX(OPS_C_LT,      "C.LT   ", TRUE, IFMT_ST,    0, PSI_C_LT,   EXR_FP, EXR_00, 0b10), // 60: C.LT.[fmt]    Floating-point Compare (Less Than) (1cyc).
+    INSN_EX(OPS_C_NGE,     "C.NGE  ", TRUE, IFMT_ST,    0, PSI_C_NGE,  EXR_FP, EXR_00, 0b10), // 61: C.NGE.[fmt]   Floating-point Compare (Not Greater Than or Equal) (1cyc).
+    INSN_EX(OPS_C_LE,      "C.LE   ", TRUE, IFMT_ST,    0, PSI_C_LE,   EXR_FP, EXR_00, 0b10), // 62: C.LE.[fmt]    Floating-point Compare (Less Than or Equal) (1cyc).
+    INSN_EX(OPS_C_NGT,     "C.NGT  ", TRUE, IFMT_ST,    0, PSI_C_NGT,  EXR_FP, EXR_00, 0b10), // 63: C.NGT.[fmt]   Floating-point Compare (Not Greater Than) (1cyc).
     INSN_END(), // NULL terminator.
 };
 
@@ -260,17 +260,17 @@ static const InsnTemplate* insn_db_cop_lists[][0b11 + 1] = {
 
 // Single-line pseudo-instructions.
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
-    [PSEUDO_NOP  ] = INSN_DB(OPS_SLL,   "NOP    ", FALSE, IFMT_NOP, 0), // NOP (pseudo of SLL).
-    [PSEUDO_MOVET] = INSN_DB(OPS_ADD,   "MOVE   ", FALSE, IFMT_dt,  1), // Move (pseudo of ADD and OR).
-    [PSEUDO_MOVES] = INSN_DB(OPS_ADD,   "MOVE   ", FALSE, IFMT_ds,  1), // Move (pseudo of ADD).
-    [PSEUDO_B    ] = INSN_DB(OPC_BEQ,   "B      ", FALSE, IFMT_B,   0), // Branch (pseudo of BEQ).
-    [PSEUDO_BEQZ ] = INSN_DB(OPC_BEQ,   "BEQZ   ", FALSE, IFMT_sB,  0), // Branch on Equal to Zero (pseudo of BEQ).
-    [PSEUDO_BNEZ ] = INSN_DB(OPC_BNE,   "BNEZ   ", FALSE, IFMT_sB,  0), // Branch on Not Equal to Zero (pseudo of BNE).
-    [PSEUDO_LI   ] = INSN_DB(OPC_ADDI,  "LI     ", FALSE, IFMT_tI,  1), // Load Immediate (pseudo of ADDI and ADDIU).
-    [PSEUDO_SUBI ] = INSN_DB(OPC_ADDI,  "SUBI   ", FALSE, IFMT_tsI, 1), // Subtract Immediate Word (pseudo of ADDI).
-    [PSEUDO_BEQZL] = INSN_DB(OPC_BEQL,  "BEQZL  ", FALSE, IFMT_sB,  0), // Branch on Equal to Zero Likely (pseudo of BEQL).
-    [PSEUDO_BNEZL] = INSN_DB(OPC_BNEL,  "BNEZL  ", FALSE, IFMT_sB,  0), // Branch on Not Equal to Zero Likely (pseudo of BNEL).
-    [PSEUDO_DSUBI] = INSN_DB(OPC_DADDI, "DSUBI  ", FALSE, IFMT_tsI, 1), // Doubleword Subtract Immediate (pseudo of DADDI).
+    [PSEUDO_NOP  ] = INSN_DB(OPS_SLL,   "NOP    ", FALSE, IFMT_NOP, 0, PSI_NOP  ), // NOP (pseudo of SLL).
+    [PSEUDO_MOVET] = INSN_DB(OPS_ADD,   "MOVE   ", FALSE, IFMT_dt,  1, PSI_MOVET), // Move (pseudo of ADD and OR).
+    [PSEUDO_MOVES] = INSN_DB(OPS_ADD,   "MOVE   ", FALSE, IFMT_ds,  1, PSI_MOVES), // Move (pseudo of ADD).
+    [PSEUDO_B    ] = INSN_DB(OPC_BEQ,   "B      ", FALSE, IFMT_B,   0, PSI_B    ), // Branch (pseudo of BEQ).
+    [PSEUDO_BEQZ ] = INSN_DB(OPC_BEQ,   "BEQZ   ", FALSE, IFMT_sB,  0, PSI_BEQ  ), // Branch on Equal to Zero (pseudo of BEQ).
+    [PSEUDO_BNEZ ] = INSN_DB(OPC_BNE,   "BNEZ   ", FALSE, IFMT_sB,  0, PSI_BNE  ), // Branch on Not Equal to Zero (pseudo of BNE).
+    [PSEUDO_LI   ] = INSN_DB(OPC_ADDI,  "LI     ", FALSE, IFMT_tI,  1, PSI_LI   ), // Load Immediate (pseudo of ADDI and ADDIU).
+    [PSEUDO_SUBI ] = INSN_DB(OPC_ADDI,  "SUBI   ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Subtract Immediate Word (pseudo of ADDI).
+    [PSEUDO_BEQZL] = INSN_DB(OPC_BEQL,  "BEQZL  ", FALSE, IFMT_sB,  0, PSI_BEQ  ), // Branch on Equal to Zero Likely (pseudo of BEQL).
+    [PSEUDO_BNEZL] = INSN_DB(OPC_BNEL,  "BNEZL  ", FALSE, IFMT_sB,  0, PSI_BNE  ), // Branch on Not Equal to Zero Likely (pseudo of BNEL).
+    [PSEUDO_DSUBI] = INSN_DB(OPC_DADDI, "DSUBI  ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Doubleword Subtract Immediate (pseudo of DADDI).
 };
 
 
@@ -283,16 +283,9 @@ ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
 void mips_III_insn_test(f32 a, f32 b, f32 c) {
     insn_test:
 // insn_db_standard
-    // UNUSED int a = 0;
-    // UNUSED int b = 0;
-    // UNUSED int c = 0;
     asm_v("nop"); // nop
-    // UNUSED volatile Address addr = (Address)mips_III_insn_test;
-    asm_v("j   0");//, addr); // j
-    asm_v("jal 0");// jal
-    // asm volatile("beq %0,%1 0":"r"(a):"r"(b));// beq
-    // void* gotoInsnTest = &&insn_test;
-    // asm volatile goto("beq $t0,$t1,%l0"::::insn_test); // beq
+    asm_v("j   0"); // j
+    asm_v("jal 0"); // jal
     asm_v_b("beq  $t0,$t1,", insn_test); // beq
     asm_v_b("bne  $t0,$t1,", insn_test); // bne
     asm_v_b("blez $t0,",     insn_test); // blez

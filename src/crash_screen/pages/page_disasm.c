@@ -51,7 +51,8 @@ struct CSSetting cs_settings_group_page_disasm[] = {
     [CS_OPT_HEADER_PAGE_DISASM      ] = { .type = CS_OPT_TYPE_HEADER,  .name = "DISASSEMBLY",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_RANGE       ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current address range",     .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_SHOW_SYMBOL      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show current symbol name",       .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_DISASM_UNKNOWNS         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknowns handling",              .valNames = &sValNames_asm_unknowns,  .val = DISASM_UNK_MODE_HEX,       .defaultVal = DISASM_UNK_MODE_HEX,       .lowerBound = DISASM_UNK_MODE_HEX,   .upperBound = DISASM_UNK_MODE_PARSE,      },
+    [CS_OPT_DISASM_UNKNOWNS         ] = { .type = CS_OPT_TYPE_SETTING, .name = "Unknowns display mode",          .valNames = &sValNames_asm_unknowns,  .val = DISASM_UNK_MODE_HEX,       .defaultVal = DISASM_UNK_MODE_HEX,       .lowerBound = DISASM_UNK_MODE_HEX,   .upperBound = DISASM_UNK_MODE_PARSE,      },
+    [CS_OPT_DISASM_PSEUDOC          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo C code",                  .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_PSEUDOINSNS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Pseudo-instructions",            .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_DISASM_IMM_FMT          ] = { .type = CS_OPT_TYPE_SETTING, .name = "Immediates format",              .valNames = &gValNames_print_num_fmt, .val = PRINT_NUM_FMT_HEX,         .defaultVal = PRINT_NUM_FMT_HEX,         .lowerBound = PRINT_NUM_FMT_HEX,     .upperBound = PRINT_NUM_FMT_DEC,          },
 #ifdef INCLUDE_DEBUG_MAP
@@ -305,6 +306,7 @@ void format_and_print_insn(const ScreenCoord_u32 x, const ScreenCoord_u32 y, con
 void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Address selectedAddr, Address pc) {
     const enum CSDisasmBranchArrowModes branchArrowMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_ARROW_MODE);
     const enum CSDisasmUnknownsModes unknownsMode = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_UNKNOWNS);
+    const _Bool asPseudoC = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOC);
 #ifdef INCLUDE_DEBUG_MAP
     const _Bool symbolHeaders = cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_SYMBOL_HEADERS);
     const MapSymbol* currSymbol = NULL;
@@ -351,12 +353,17 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
             cs_print(x, y, (STR_COLOR_PREFIX"*"), COLOR_RGBA32_CRASH_OUT_OF_BOUNDS);
         } else {
             if ((unknownsMode == DISASM_UNK_MODE_PARSE) || addr_is_in_text_segment(addr)) {
-                format_and_print_insn(x, y, addr, data);
+                InsnData insn = {
+                    .raw = data,
+                };
+
+                if (asPseudoC) {
+                    cs_print_scroll(x, y, CRASH_SCREEN_NUM_CHARS_X, "%s", cs_insn_to_pseudo_c(insn));
+                } else {
+                    format_and_print_insn(x, y, addr, data);
+                }
 
                 if ((addr == selectedAddr) && (branchArrowMode == DISASM_ARROW_MODE_SELECTION)) {
-                    InsnData insn = {
-                        .raw = data,
-                    };
                     s16 branchOffset = insn_check_for_branch_offset(insn);
 
                     if (branchOffset != 0x0000) {
@@ -498,6 +505,9 @@ void page_disasm_input(void) {
     u16 buttonPressed = gCSCompositeController->buttonPressed;
     if (buttonPressed & A_BUTTON) {
         open_address_select(get_insn_branch_target_from_addr(gSelectedAddress));
+    }
+    if (buttonPressed & B_BUTTON) {
+        cs_inc_setting(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOC, 1);
     }
 
     sDisasmViewportIndex = cs_clamp_view_to_selection(sDisasmViewportIndex, gSelectedAddress, sDisasmNumShownRows, PAGE_DISASM_STEP);

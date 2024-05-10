@@ -313,6 +313,10 @@ void page_summary_draw(void) {
                 for (int i = 0; i < gSavedRegBufSize; i++) {
                     cs_draw_register_info_long(x, line++, gSavedRegBuf[i], maxNumChars, TRUE);
                 }
+
+                line++;
+                cs_print(TEXT_X(x), TEXT_Y(line++), STR_COLOR_PREFIX"PSEUDO:", COLOR_RGBA32_CRASH_HEADER);
+                cs_print_scroll(TEXT_X(x), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 2), "%s", cs_insn_to_pseudo_c((InsnData)data));
             }
         }
     }

@@ -74,6 +74,45 @@ typedef enum PACKED MIPSParamID {
 } MIPSParamID;
 
 
+typedef enum PACKED MIPS_C_Pseudocodes {
+    PSI_NOP,
+    PSI_J, PSI_JAL,
+    PSI_JR, PSI_JALR,
+    PSI_B, PSI_BEQ, PSI_BNE,
+    PSI_BGTZ, PSI_BLTZ,
+    PSI_BLEZ, PSI_BGEZ,
+    PSI_BLTZAL, PSI_BGEZAL,
+    PSI_ADDI, PSI_SLTI, PSI_ANDI, PSI_ORI, PSI_XORI,
+    PSI_LI, PSI_SUBI,
+    PSI_LUI,
+    PSI_L, PSI_L_L, PSI_L_R,
+    PSI_S, PSI_S_L, PSI_S_R,
+    PSI_LC1, PSI_SC1,
+    PSI_LL, PSI_SC,
+    PSI_CACHE,
+    PSI_SLI, PSI_SRI,
+    PSI_DSLI32, PSI_DSRI32,
+    PSI_SLV, PSI_SRV,
+    PSI_BREAK, PSI_FUNC,
+    PSI_MFHI, PSI_MTHI, PSI_MFLO, PSI_MTLO,
+    PSI_MULT, PSI_DIV, PSI_ADD, PSI_SUB,
+    PSI_AND, PSI_OR, PSI_XOR, PSI_NOR,
+    PSI_SLT,
+    PSI_TGE, PSI_TLT, PSI_TEQ, PSI_TNE,
+    PSI_TGEI, PSI_TLTI, PSI_TEQI, PSI_TNEI,
+    PSI_MFC0, PSI_MTC0,
+    PSI_MFC1, PSI_MTC1,
+    PSI_CFC1, PSI_CTC1,
+    PSI_BC1F, PSI_BC1T,
+    PSI_ADDF, PSI_SUBF, PSI_MULF, PSI_DIVF,
+    PSI_CVTF,
+    PSI_MOVF, PSI_NEGF,
+    PSI_C_F,  PSI_C_UN,   PSI_C_EQ,  PSI_C_UEQ, PSI_C_OLT, PSI_C_ULT, PSI_C_OLE, PSI_C_ULE,
+    PSI_C_SF, PSI_C_NGLE, PSI_C_SEQ, PSI_C_NGL, PSI_C_LT,  PSI_C_NGE, PSI_C_LE,  PSI_C_NGT,
+    PSI_MOVET, PSI_MOVES,
+} MIPS_C_Pseudocodes;
+
+
 #define COP_FROM    (0 * BIT(2)) // 0b00000 (move from).
 #define COP_TO      (1 * BIT(2)) // 0b00100 (move to).
 #define FMT_FLT     COP_FROM // 0b00000 (floating-point).
@@ -473,8 +512,9 @@ typedef union InsnData {
 #define INSN_ALPHABET_STR_0 "\0."
 #define INSN_ALPHABET_STR_N "0123" // Numbers 4-9 do not appear in amy instruction names, but all other alphanumeric chars do.
 #define INSN_ALPHABET_STR_A "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define INSN_ALPHABET_STR_a "abcdefghijklmnopqrstuvwxyz"
 
-// Pack single char (see insn_alphabet and above defines for format). Can be used by the preprocessor.
+// Pack single char (see insn_alphabet_uppercase/insn_alphabet_lowercase and above defines for format). Can be used by the preprocessor.
 #define _PL(_c) ( \
     ((_c) == '.') \
     ? 1 \
@@ -482,7 +522,7 @@ typedef union InsnData {
         ((_c) >= '0' && (_c) <= '3') \
         ? (((_c) - '0') + STRLEN(INSN_ALPHABET_STR_0)) \
         : ( \
-            IS_UPPERCASE(_c) \
+            (IS_UPPERCASE(_c) || IS_LOWERCASE(_c)) \
             ? (((_c) - 'A') + STRLEN(INSN_ALPHABET_STR_0 INSN_ALPHABET_STR_N)) \
             : 0 \
         ) \
@@ -496,7 +536,7 @@ typedef union InsnData {
 // Pack and shift a single char.
 #define PACK_CHR(_str, _idx)    ((u64)(_PL((_str)[_idx]) & BITMASK(PCKCSZ)) << (PCKCSZ * (_idx)))
 // Unpack and shift a single char.
-#define UNPACK_CHR(_src, _idx)  _UL(insn_alphabet, (unsigned char)(((_src) >> (PCKCSZ * (_idx))) & BITMASK(PCKCSZ)))
+#define UNPACK_CHR(_alphabet, _src, _idx)  _UL(_alphabet, (unsigned char)(((_src) >> (PCKCSZ * (_idx))) & BITMASK(PCKCSZ)))
 
 // Pack a string of 7 chars.
 #define PACK_STR7(_str) ( \
@@ -509,14 +549,14 @@ typedef union InsnData {
     PACK_CHR(_str, 6)   \
 )
 // Unpack a string of 7 (+ null terminator) chars.
-#define UNPACK_STR7(_src) { \
-    UNPACK_CHR((_src), 0), \
-    UNPACK_CHR((_src), 1), \
-    UNPACK_CHR((_src), 2), \
-    UNPACK_CHR((_src), 3), \
-    UNPACK_CHR((_src), 4), \
-    UNPACK_CHR((_src), 5), \
-    UNPACK_CHR((_src), 6), \
+#define UNPACK_STR7(_alphabet, _src) { \
+    UNPACK_CHR((_alphabet), (_src), 0), \
+    UNPACK_CHR((_alphabet), (_src), 1), \
+    UNPACK_CHR((_alphabet), (_src), 2), \
+    UNPACK_CHR((_alphabet), (_src), 3), \
+    UNPACK_CHR((_alphabet), (_src), 4), \
+    UNPACK_CHR((_alphabet), (_src), 5), \
+    UNPACK_CHR((_alphabet), (_src), 6), \
     '\0', \
 }
 
@@ -559,21 +599,22 @@ typedef union InsnTemplate {
 } InsnTemplate; /*0x08*/
 #define SIZEOF_INSN_TEMPLATE sizeof(InsnTemplate)
 
-#define INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _ex1, _ex2, _exo) { \
-    .opcode = _opcode,          \
-    .name   = PACK_STR7(_name), \
-    .hasFmt = _hasFmt,          \
-    .params = _params,          \
-    .output = _output,          \
-    .ex1    = _ex1,             \
-    .ex2    = _ex2,             \
-    .exo    = _exo,             \
+#define INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo) { \
+    .opcode  = _opcode,          \
+    .name    = PACK_STR7(_name), \
+    .hasFmt  = _hasFmt,          \
+    .params  = _params,          \
+    .output  = _output,          \
+    .pseudoC = _pseudoC,         \
+    .ex1     = _ex1,             \
+    .ex2     = _ex2,             \
+    .exo     = _exo,             \
 }
 
-#define INSN_DB(_opcode, _name, _hasFmt, _params, _output) \
-    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, EXR_00, EXR_00, 0b00)
-#define INSN_EX(_opcode, _name, _hasFmt, _params, _output, _ex1, _ex2, _exo) \
-    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _ex1, _ex2, _exo)
+#define INSN_DB(_opcode, _name, _hasFmt, _params, _output, _pseudoC) \
+    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, EXR_00, EXR_00, 0b00)
+#define INSN_EX(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo) \
+    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo)
 #define INSN_END() {}
 
 
@@ -601,10 +642,12 @@ typedef union InsnParam {
 #define ADDR_INSN_STRLEN_DEREFERENCE_ARG    INSN_OFFSET_FROM_ADDR(strlen,        0) // 1st instruction in strlen (dereference arg).
 
 
-#define REG_BUFFER_SIZE (3 + 3) // 3 registers from instruction + up to 3 extra registers.
+#define REG_BUFFER_SIZE 4 // 3 registers from instruction + up to 3 extra registers (but only 4 are usead at a time).
 extern RegisterId gSavedRegBuf[REG_BUFFER_SIZE];
 extern int gSavedRegBufSize;
 
 s16 insn_check_for_branch_offset(InsnData insn);
 Address get_insn_branch_target_from_addr(Address addr);
 char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool formatting);
+
+char* cs_insn_to_pseudo_c(InsnData insn);
