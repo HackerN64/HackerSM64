@@ -167,7 +167,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     cs_reinitialize();
 
     sRenderingFramebuffer = 0;
-    osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
+    osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 2);
 
 #ifdef FUNNY_CRASH_SOUND
     //! TODO: This doesn't work anymore for some reason.
@@ -180,8 +180,9 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     if (sFirstCrash) {
         sFirstCrash = FALSE;
 
-        gCountFactor = check_count_factor();
+        // Get count factor, and if CPU is overclocked, divide timers by 2.
         //! TODO: Is there a cleaner way to do this?
+        gCountFactor = check_count_factor();
         if (!(gEmulator & EMU_CONSOLE) && (gCountFactor == 1)) {
             gTimingDiv = 2;
         }
