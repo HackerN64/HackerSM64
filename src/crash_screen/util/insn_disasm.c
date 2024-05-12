@@ -67,8 +67,8 @@ const InsnParam insn_param_formats[][MIPS_NUM_PARAMS] = {
     [IFMT_To   ] = { PARAM(MP_FT,    MP_FMT_F), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 }, // ft offset(base)
 
     [IFMT_dta  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_SHIFT, MP_FMT_I), }, // rd rt shift
-    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXC10, MP_FMT_I), }, // rs rt exc10
-    [IFMT_E    ] = { PARAM(MP_EXC20, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // exc20
+    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXCA,  MP_FMT_I), }, // rs rt exc10
+    [IFMT_E    ] = { PARAM(MP_EXCAB, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // exc20
 
     [IFMT_stB  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), }, // rs rt branch
     [IFMT_sB   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 }, // rs branch
@@ -550,18 +550,25 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     ADD_REG(REGS_CP1, insn.fd);
                     separator = TRUE;
                     break;
-                case MP_EXC10: // For TRAP IF instructions.
+                case MP_EXCA: // For TRAP IF instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
-                    ADD_STR(STR_CODE10, insn.code10);
+                    ADD_STR(STR_CODE10, insn.codeB);
                     break;
-                case MP_EXC20: // For SYSCALL and BREAK instructions.
+                case MP_EXCAB: // For SYSCALL and BREAK instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
-                    ADD_STR(STR_CODE20, insn.code20);
                     if (info->opcode == OPS_BREAK) {
-                        const char* desc = get_name_from_null_terminated_id_list((insn.code20 >> 10), insn_break_codes);
-                        if (desc != NULL) {
-                            ADD_STR(" (%s)", desc);
+                        u16 eA = insn.codeA;
+                        u16 eB = insn.codeB;
+                        ADD_STR(STR_CODE10", "STR_CODE10, eA, eB);
+                        if (eB == 0) {
+                            const char* desc = get_name_from_null_terminated_id_list(eA, insn_break_codes);
+                            if (desc != NULL) {
+                                ADD_COLOR(COLOR_RGBA32_VSC_COMMENT);
+                                ADD_STR(" # %s", desc);
+                            }
                         }
+                    } else { // syscall
+                        ADD_STR(STR_CODE20, insn.codeAB);
                     }
                     break;
                 case MP_JUMP: // Jump function.
@@ -617,6 +624,7 @@ typedef enum PACKED PSC_Colors {
     PSC_COL_FUNC,
     PSC_COL_DEF,
     PSC_COL_FLOW,
+    PSC_COL_COMM,
     NUM_PSC_COLORS,
 } PSC_Colors;
 
@@ -627,6 +635,7 @@ const RGBA32 sPSCColors[NUM_PSC_COLORS] = {
     [PSC_COL_FUNC] = COLOR_RGBA32_CRASH_FUNCTION_NAME,
     [PSC_COL_DEF ] = COLOR_RGBA32_VSC_DEFINE,
     [PSC_COL_FLOW] = COLOR_RGBA32_VSC_CONTROL,
+    [PSC_COL_COMM] = COLOR_RGBA32_VSC_COMMENT,
 };
 
 typedef struct PSC_Entry {
@@ -644,15 +653,15 @@ typedef struct PSC_Entry {
 const PSC_Entry psc_entries[] = {
     // Insn name as func:
 #define PSC_INSN    '\\'
-    { .c = PSC_INSN,   .col = PSC_COL_FUNC, .a = "%s", },
+    { .c = PSC_INSN,   .col = PSC_COL_OFF,  .a = "%s", },
 
     // Flow control:
 #define PSC_GOTO    'g'
-    { .c = PSC_GOTO,   .col = PSC_COL_FLOW, .s = "goto ",    },
-#define PSC_RETURN  'R'
-    { .c = PSC_RETURN, .col = PSC_COL_FLOW, .s = "return ",  },
+    { .c = PSC_GOTO,   .col = PSC_COL_FLOW, .s = "goto ", },
 #define PSC_IF      '?'
-    { .c = PSC_IF,     .col = PSC_COL_FLOW, .s = "if ",    },
+    { .c = PSC_IF,     .col = PSC_COL_FLOW, .a = "if ", },
+#define PSC_RETURN  'r'
+    { .c = PSC_RETURN, .col = PSC_COL_FLOW, .s = "return", },
 
     // Pseudo-defines:
 #define PSC_ALIGNL  '['
@@ -662,11 +671,11 @@ const PSC_Entry psc_entries[] = {
 
     // Functions:
 #define PSC_ORD     'V'
-    { .c = PSC_ORD,    .col = PSC_COL_FUNC, .s = "ord",    }, // ordered
+    { .c = PSC_ORD,    .col = PSC_COL_OFF,  .a = "ord",    }, // ordered
 #define PSC_SIG     'G'
-    { .c = PSC_SIG,    .col = PSC_COL_FUNC, .s = "sig",    }, // signalling
-#define PSC_TRAP    'x'
-    { .c = PSC_TRAP,   .col = PSC_COL_FUNC, .s = "trap",   },
+    { .c = PSC_SIG,    .col = PSC_COL_OFF,  .a = "sig",    }, // signalling
+#define PSC_TRAP    'X'
+    { .c = PSC_TRAP,   .col = PSC_COL_OFF,  .s = "trap",   },
 
     // Non-InsnData registers:
 #define PSC_FP      '#'
@@ -700,11 +709,9 @@ const PSC_Entry psc_entries[] = {
 #define PSC_FSC     'F'
     { .c = PSC_FSC,    .col = PSC_COL_VAR,  .a = "%s", }, // fs(fcr)
 #define PSC_BASE    'o'
-    { .c = PSC_BASE,   .col = PSC_COL_VAR,  .s = "%s", }, //"*(%s+0x%04X)", }, // address offset
+    { .c = PSC_BASE,   .col = PSC_COL_VAR,  .a = "%s", }, // address base (+ offset)
 #define PSC_IMM     'i'
-    { .c = PSC_IMM,    .col = PSC_COL_IMM,  .s = "0x%X", }, // immediate (hex)
-// #define PSC_DIMM    'I'
-//     { .c = PSC_DIMM,   .col = PSC_COL_IMM,  .a = "%d", }, // immediate (dec)
+    { .c = PSC_IMM,    .col = PSC_COL_IMM,  .s = "0x%X", }, // immediate
 #define PSC_SHIFT   'a'
     { .c = PSC_SHIFT,  .col = PSC_COL_IMM,  .a = "%d", }, // shift amount
 #define PSC_SH32    'A'
@@ -720,32 +727,36 @@ const PSC_Entry psc_entries[] = {
 };
 
 //! TODO: Clean this up:
+#define CAO     "o->i" // "*(o + i)"
+#define CAOL    "[(o->i)" // "*ALIGNL(o + i)"
+#define CAOR    "](o->i)" // "*ALIGNR(o + i)"
+#define CLINK   "$=.+2"
 ALIGNED4 const char* pseudo_c_code_formats[] = {
     [PSI_NOP] = /*nop*/ "",
     // jump
-    [PSI_J] = /*j*/ "J", [PSI_JAL] = /*jal*/ "$ = .+2; J",
-    [PSI_JR] = /*jr*/ "gs", [PSI_JALR] = /*jalr*/ "d = .+8; gs",
+    [PSI_J] = /*j*/ "J", [PSI_JAL] = /*jal*/ CLINK"J",
+    [PSI_JR] = /*jr*/ "gs", [PSI_JALR] = /*jalr*/ CLINK"gs",
     // branch
     [PSI_B] = /*b*/ "gb", [PSI_BEQ] = /*beq/beql/beqz/beqzl*/ "?(s == t) gb", [PSI_BNE] = /*bne/bnel/bnez/bnezl*/ "?(s != t) gb",
     [PSI_BGTZ] = /*bgtz/bgtzl*/ "?(s > 0) gb",  [PSI_BLTZ] = /*bltz/bltzl*/ "?(s < 0) gb",
     [PSI_BLEZ] = /*blez/blezl*/ "?(s <= 0) gb", [PSI_BGEZ] = /*bgez/bgezl*/ "?(s >= 0) gb",
-    [PSI_BLTZAL] = /*bltzal/bltzall*/ "$ = .+2; ?(s < 0) gb", [PSI_BGEZAL] = /*bgezal/bgezall*/ "$ = .+2; ?(s >= 0) gb",
+    [PSI_BLTZAL] = /*bltzal/bltzall*/ CLINK"?(s < 0) gb", [PSI_BGEZAL] = /*bgezal/bgezall*/ CLINK"?(s >= 0) gb",
     // arithmetic
     [PSI_ADDI] = /*addi/addiu/daddi/daddiu*/ "t = s + i", [PSI_SLTI] = /*slti/sltiu*/ "t = s < i", [PSI_ANDI] = /*andi*/ "t = s & i", [PSI_ORI] = /*ori*/ "t = s | i", [PSI_XORI] = /*xori*/ "t = s ^ i",
     [PSI_LI] = /*li*/ "t = i", [PSI_SUBI] = /*subi/dsubi*/ "t = s - i",
     [PSI_LUI] = /*lui*/ "t = i0000",
     // load/store
-    [PSI_L] = /*lb/lbu/lh/lhu/lw/lwu/ld/lwc2/lwc3/ldc2*/ "t = *(o + i)", [PSI_L_L] = /*lwl/ldl*/ "t = *[(o + i)", [PSI_L_R] = /*lwr/ldr*/ "t = *](o + i)",
-    [PSI_S] = /*sb/sh/sw/sd/swc2/swc3/sdc2*/             "*(o + i) = t", [PSI_S_L] = /*swl/sdl*/ "*[(o + i) = t", [PSI_S_R] = /*swr/sdr*/ "*](o + i) = t",
-    [PSI_LC1] = /*lwc1/ldc1*/ "T = *(o + i)", [PSI_SC1] = /*swc1/sdc1*/ "*(o + i) = T",
-    [PSI_LL] = /*ll/lld*/ "t = *(o + i); l = 1", [PSI_SC] = /*sc/scd*/ "?(l) { *(o + i) = t; } t = l",
-    [PSI_CACHE] = /*cache*/ "\\(t, *(o + i))",
+    [PSI_L] = /*lb/lbu/lh/lhu/lw/lwu/ld/lwc2/lwc3/ldc2*/ "t = "CAO, [PSI_L_L] = /*lwl/ldl*/ "t = "CAOL, [PSI_L_R] = /*lwr/ldr*/ "t = "CAOR,
+    [PSI_S] = /*sb/sh/sw/sd/swc2/swc3/sdc2*/             CAO" = t", [PSI_S_L] = /*swl/sdl*/ CAOL" = t", [PSI_S_R] = /*swr/sdr*/ CAOR" = t",
+    [PSI_LC1] = /*lwc1/ldc1*/ "T = "CAO, [PSI_SC1] = /*swc1/sdc1*/ CAO" = T",
+    [PSI_LL] = /*ll/lld*/ "t = "CAO"; l = 1", [PSI_SC] = /*sc/scd*/ "?(l) { "CAO" = t; } t = l",
+    [PSI_CACHE] = /*cache*/ "\\(t, "CAO")",
     // shift
     [PSI_SLI] = /*sll/dsll*/ "d = t << a", [PSI_SRI] = /*srl/sra/dsrl/dsra*/ "d = t >> a",
     [PSI_DSLI32] = /*dsll32*/ "d = t << A", [PSI_DSRI32] = /*dsrl32/dsra32*/ "d = t >> A",
     [PSI_SLV] = /*sllv/dsllv*/ "d = t << s", [PSI_SRV] = /*srlv/srav/dsrlv/dsrav*/ "d = t >> s",
     // system
-    [PSI_BREAK] = /*syscall/break*/ "\\(E)", [PSI_FUNC] = /*sync/tlbp/tlbr/tlbwi/tlbwr/eret*/ "\\()",
+    [PSI_BREAK] = /*syscall*/ "\\(E)", [PSI_FUNC] = /*sync/tlbp/tlbr/tlbwi/tlbwr/eret*/ "\\()",
     [PSI_MFHI] = /*mfhi*/ "d = H", [PSI_MTHI] = /*mthi*/ "H = s", [PSI_MFLO] = /*mflo*/ "d = L", [PSI_MTLO] = /*mtlo*/ "L = s",
     // arithmetic
     [PSI_MULT] = /*mult/multu/dmult/dmultu*/ "H,L = s * t", [PSI_DIV] = /*div/divu/ddiv/ddivu*/ "H,L = s / t",
@@ -753,8 +764,8 @@ ALIGNED4 const char* pseudo_c_code_formats[] = {
     [PSI_AND] = /*and*/ "d = s & t", [PSI_OR] = /*or*/ "d = s | t", [PSI_XOR] = /*xor*/ "d = s ^ t", [PSI_NOR] = /*nor*/ "d = ~s & ~t",
     [PSI_SLT] = /*slt/sltu*/ "d = s < t",
     // trap
-    [PSI_TGE ] = /*tge/tgeu*/   "?(s >= t) x(e)", [PSI_TLT] = /*tlt/tltu*/   "?(s < t) x(e)", [PSI_TEQ] = /*teq*/  "?(s == t) x(e)", [PSI_TNE] = /*tne*/  "?(s != t) x(e)",
-    [PSI_TGEI] = /*tgei/tgeiu*/ "?(s >= i) x()", [PSI_TLTI] = /*tlti/tltiu*/ "?(s < i) x()", [PSI_TEQI] = /*teqi*/ "?(s == i) x()", [PSI_TNEI] = /*tnei*/ "?(s != i) x()",
+    [PSI_TGE ] = /*tge/tgeu*/   "?(s >= t) X(e)", [PSI_TLT] = /*tlt/tltu*/   "?(s < t) X(e)", [PSI_TEQ] = /*teq*/  "?(s == t) X(e)", [PSI_TNE] = /*tne*/  "?(s != t) X(e)",
+    [PSI_TGEI] = /*tgei/tgeiu*/ "?(s >= i) X()", [PSI_TLTI] = /*tlti/tltiu*/ "?(s < i) X()", [PSI_TEQI] = /*teqi*/ "?(s == i) X()", [PSI_TNEI] = /*tnei*/ "?(s != i) X()",
     // etc.
     [PSI_MFC0] = /*mfc0/dmfc0*/ "t = c", [PSI_MTC0] = /*mtc0/dmtc0*/ "c = t",
     [PSI_MFC1] = /*mfc1/dmfc1*/ "t = S", [PSI_MTC1] = /*mtc1/dmtc1*/ "S = t",
@@ -766,19 +777,20 @@ ALIGNED4 const char* pseudo_c_code_formats[] = {
     [PSI_MOVF] = /*mov.fmt*/ "D = S", [PSI_NEGF] = /*neg.fmt*/ "D = -S",
 
     // c.cond.fmt //! TODO: Are these correct? Can this be reduced?
+#define ORDERED "V(S, T)"
     [PSI_C_F   ] = /*f*/    "# = 0",
-    [PSI_C_UN  ] = /*un*/   "# = !V(S, T)",
+    [PSI_C_UN  ] = /*un*/   "# = !"ORDERED,
     [PSI_C_EQ  ] = /*eq*/   "# = (S == T)",
-    [PSI_C_UEQ ] = /*ueq*/  "# = !V(S, T) || (S == T)",
-    [PSI_C_OLT ] = /*olt*/  "# = V(S, T) && (S < T)",
-    [PSI_C_ULT ] = /*ult*/  "# = !V(S, T) || (S < T)",
-    [PSI_C_OLE ] = /*ole*/  "# = V(S, T) && (S <= T)",
-    [PSI_C_ULE ] = /*ule*/  "# = !V(S, T) || (S <= T)",
+    [PSI_C_UEQ ] = /*ueq*/  "# = !"ORDERED" || (S == T)",
+    [PSI_C_OLT ] = /*olt*/  "# = "ORDERED" && (S < T)",
+    [PSI_C_ULT ] = /*ult*/  "# = !"ORDERED" || (S < T)",
+    [PSI_C_OLE ] = /*ole*/  "# = "ORDERED" && (S <= T)",
+    [PSI_C_ULE ] = /*ule*/  "# = !"ORDERED" || (S <= T)",
 
     [PSI_C_SF  ] = /*sf*/   "# = G(0)",
-    [PSI_C_NGLE] = /*ngle*/ /*"# = !V(S, T) || !((S > T) || (S < T) || (S == T))",*/ "# = !V(S, T)",
+    [PSI_C_NGLE] = /*ngle*/ /*"# = !"ORDERED" || !((S > T) || (S < T) || (S == T))",*/ "# = !"ORDERED,
     [PSI_C_SEQ ] = /*seq*/  "# = G(S == T)",
-    [PSI_C_NGL ] = /*ngl*/  /*"# = !V(S, T) || !((S > T) || (S < T))",*/ "# = !V(S, T) || (S == T)",
+    [PSI_C_NGL ] = /*ngl*/  /*"# = !"ORDERED" || !((S > T) || (S < T))",*/ "# = !"ORDERED" || (S == T)",
     [PSI_C_LT  ] = /*lt*/   "# = (S < T)",
     [PSI_C_NGE ] = /*nge*/  "# = !(S >= T)",
     [PSI_C_LE  ] = /*le*/   "# = (S <= T)",
@@ -790,11 +802,13 @@ ALIGNED4 const char* pseudo_c_code_formats[] = {
 #define SIZEOF_PSC sizeof(pseudo_c_code_formats)
 
 
-char pseudo_c_str[256] = "";
-
-void add_reg_str(char** c, RegisterSources src, int idx) {
+void add_reg_str(char** c, RegisterSources src, int idx, _Bool isBase) {
     if ((src == REGS_CPU) && (idx == REG_CPU_R0)) { // $r0 -> 0
-        *c += sprintf(*c, STR_COLOR_PREFIX"0"STR_COLOR_PREFIX, COLOR_RGBA32_CRASH_DISASM_IMMEDIATE, gCSDefaultPrintColor);
+        if (isBase) {
+            *c += sprintf(*c, STR_COLOR_PREFIX"NULL"STR_COLOR_PREFIX, COLOR_RGBA32_VSC_DEFINE, gCSDefaultPrintColor);
+        } else {
+            *c += sprintf(*c, STR_COLOR_PREFIX"0"STR_COLOR_PREFIX, COLOR_RGBA32_CRASH_DISASM_IMMEDIATE, gCSDefaultPrintColor);
+        }
     } else {
         const RegisterInfo* regInfo = get_reg_info(src, idx);
         if (regInfo->name != NULL) {
@@ -803,10 +817,14 @@ void add_reg_str(char** c, RegisterSources src, int idx) {
     }
 }
 
+//! TODO: Should these be checked via structs/enums instead?
+#define INSN_RAW_JR_RA      0x03E00008
+#define INSN_RAW_TEQ_R0_R0  0x00000034
+
 char* cs_insn_to_pseudo_c(InsnData insn) {
     _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
-    char* strp = &pseudo_c_str[0]; // Pointer to a location inside the string.
-    bzero(pseudo_c_str, sizeof(pseudo_c_str));
+    char* strp = &insn_as_string[0]; // Pointer to a location inside the string.
+    bzero(insn_as_string, sizeof(insn_as_string));
 
     const InsnTemplate* info = get_insn(&insn);
 
@@ -814,10 +832,30 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
         return "";
     }
 
-    const char* c = &pseudo_c_code_formats[info->pseudoC][0];
+    u8 pseudoC = info->pseudoC;
+
+    const char* formatStr = pseudo_c_code_formats[pseudoC];
+    const char* comment = NULL;
+
+    if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS)) {
+        if (insn.raw == INSN_RAW_JR_RA) { // jr $ra -> "return;"
+            formatStr = "r";
+            comment = "goto RA";
+        } else if (insn.raw == INSN_RAW_TEQ_R0_R0) { // teq $r0,$r0 -> "trap();"
+            formatStr = "X(e)";
+            // comment = "if (0==0)";
+        } else if (formatStr[0] == PSC_RA) { // "and link"
+            formatStr += STRLEN(CLINK);
+            comment = "RA=PC+2";
+        }
+    }
+
+    const char* c = &formatStr[0];
 
     const RGBA32 baseColor = gCSDefaultPrintColor;
     RGBA32 newColor = baseColor;
+
+    const char* immFmt = ((decImmediates && (pseudoC != PSI_LUI)) ? "%d" : STR_HEX_PREFIX"%X");
 
     while (*c != '\0') {
         const PSC_Entry* entry = NULL;
@@ -849,24 +887,22 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
                 strp += sprintf(strp, STR_COLOR_PREFIX, newColor);
             }
             switch (*c) {
-                default:            strp += sprintf(strp, foundStr); break; // Copy string with no formatting
-                case PSC_INSN:      strp += sprintf(strp, (char[])UNPACK_STR7(insn_alphabet_lowercase, info->name)); break;
-                case PSC_RS:        add_reg_str(&strp, REGS_CPU, insn.rs); break;
-                case PSC_RT:        add_reg_str(&strp, REGS_CPU, insn.rt); break;
-                case PSC_RD:        add_reg_str(&strp, REGS_CPU, insn.rd); break;
-                case PSC_RD0:       add_reg_str(&strp, REGS_CP0, insn.rd); break;
-                case PSC_FT:        add_reg_str(&strp, REGS_CP1, insn.ft); break;
-                case PSC_FS:        add_reg_str(&strp, REGS_CP1, insn.fs); break;
-                case PSC_FD:        add_reg_str(&strp, REGS_CP1, insn.fd); break;
-                case PSC_FSC:       add_reg_str(&strp, REGS_FCR, insn.fs); break;
-                case PSC_IMM:
-                    strp += sprintf(strp, ((decImmediates && (info->pseudoC != PSI_LUI)) ? "%d" : STR_HEX_PREFIX"%X"), insn.immediate);
-                    break;
-                case PSC_SHIFT:     strp += sprintf(strp, foundStr, insn.sa); break;
-                case PSC_SH32:      strp += sprintf(strp, foundStr, (insn.sa + 32)); break;
-                case PSC_BASE:
-                    add_reg_str(&strp, REGS_CPU, insn.base);
-                    break;
+                default:        strp += sprintf(strp, foundStr); break; // String without formatting specifiers.
+                case PSC_INSN:  strp += sprintf(strp, (char[])UNPACK_STR7(insn_alphabet_lowercase, info->name)); break;
+
+                case PSC_RS:    add_reg_str(&strp, REGS_CPU, insn.rs,  FALSE); break;
+                case PSC_RT:    add_reg_str(&strp, REGS_CPU, insn.rt,  FALSE); break;
+                case PSC_RD:    add_reg_str(&strp, REGS_CPU, insn.rd,  FALSE); break;
+                case PSC_RD0:   add_reg_str(&strp, REGS_CP0, insn.rd,  FALSE); break;
+                case PSC_FT:    add_reg_str(&strp, REGS_CP1, insn.ft,  FALSE); break;
+                case PSC_FS:    add_reg_str(&strp, REGS_CP1, insn.fs,  FALSE); break;
+                case PSC_FD:    add_reg_str(&strp, REGS_CP1, insn.fd,  FALSE); break;
+                case PSC_FSC:   add_reg_str(&strp, REGS_FCR, insn.fs,  FALSE); break;
+                case PSC_BASE:  add_reg_str(&strp, REGS_CPU, insn.base, TRUE); break;
+
+                case PSC_IMM:   strp += sprintf(strp, immFmt, insn.immediate); break;
+                case PSC_SHIFT: strp += sprintf(strp, foundStr, (insn.sa +  0)); break;
+                case PSC_SH32:  strp += sprintf(strp, foundStr, (insn.sa + 32)); break;
                 case PSC_BRANCH:
                     s16 b = (insn.offset + 1); strp += sprintf(strp, foundStr, ((b < 0x0000) ? '-' : '+'), abss(b));
                     break;
@@ -886,8 +922,19 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
                         strp += sprintf(strp, foundStr, target);
                     }
                     break;
-                case PSC_EXC10:     strp += sprintf(strp, foundStr, insn.code10); break;
-                case PSC_EXC20:     strp += sprintf(strp, foundStr, insn.code20); break;
+                case PSC_EXC10:
+                    strp += sprintf(strp, immFmt, insn.codeA);
+                    break;
+                case PSC_EXC20:
+                    if (info->opcode == OPS_BREAK) {
+                        u16 eA = insn.codeA;
+                        u16 eB = insn.codeB;
+                        strp += sprintf(strp, (decImmediates ? "%d, %d" : STR_HEX_PREFIX"%X, "STR_HEX_PREFIX"%X"), eA, eB);
+                        comment = get_name_from_null_terminated_id_list(eA, insn_break_codes);
+                    } else {
+                        strp += sprintf(strp, immFmt, insn.codeAB);
+                    }
+                    break;
             }
         }
 
@@ -901,5 +948,9 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
 
     *strp++ = ';';
 
-    return pseudo_c_str;
+    if (comment != NULL) {
+        strp += sprintf(strp, STR_COLOR_PREFIX" // %s", COLOR_RGBA32_VSC_COMMENT, comment);
+    }
+
+    return insn_as_string;
 }

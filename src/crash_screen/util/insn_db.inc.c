@@ -99,58 +99,58 @@ ALIGNED32 static const InsnTemplate insn_db_standard[] = { // INSN_TYPE_OPCODE
 
 // Special opcode instructions:
 ALIGNED32 static const InsnTemplate insn_db_spec[] = { // OPC_SPECIAL, INSN_TYPE_FUNC
-    INSN_DB(OPS_SLL,     "SLL    ", FALSE, IFMT_dta, 1, PSI_SLI   ), //  0: Shift Word Left Logical.
-    INSN_DB(OPS_SRL,     "SRL    ", FALSE, IFMT_dta, 1, PSI_SRI   ), //  2: Shift Word Right Logical.
-    INSN_DB(OPS_SRA,     "SRA    ", FALSE, IFMT_dta, 1, PSI_SRI   ), //  3: Shift Word Right Arithmetic.
-    INSN_DB(OPS_SLLV,    "SLLV   ", FALSE, IFMT_dts, 1, PSI_SLV   ), //  4: Shift Word Left Logical Variable.
-    INSN_DB(OPS_SRLV,    "SRLV   ", FALSE, IFMT_dts, 1, PSI_SRV   ), //  6: Shift Word Right Logical Variable.
-    INSN_DB(OPS_SRAV,    "SRAV   ", FALSE, IFMT_dts, 1, PSI_SRV   ), //  7: Shift Word Right Arithmetic Variable.
-    INSN_DB(OPS_JR,      "JR     ", FALSE, IFMT_s,   0, PSI_JR    ), //  8: Jump Register.
-    INSN_DB(OPS_JALR,    "JALR   ", FALSE, IFMT_ds,  1, PSI_JALR  ), //  9: Jump and Link Register.
-    INSN_DB(OPS_SYSCALL, "SYSCALL", FALSE, IFMT_E,   0, PSI_BREAK ), // 12: System Call (assert).
-    INSN_DB(OPS_BREAK,   "BREAK  ", FALSE, IFMT_E,   0, PSI_BREAK ), // 13: Breakpoint.
-    INSN_DB(OPS_SYNC,    "SYNC   ", FALSE, IFMT_NOP, 0, PSI_FUNC  ), // 15: Synchronize Shared Memory.
-    INSN_EX(OPS_MFHI,    "MFHI   ", FALSE, IFMT_d,   0, PSI_MFHI,   EXR_HI, EXR_00, 0b00), // 16: Move From HI.
-    INSN_EX(OPS_MTHI,    "MTHI   ", FALSE, IFMT_s,   0, PSI_MTHI,   EXR_HI, EXR_00, 0b11), // 17: Move To HI.
-    INSN_EX(OPS_MFLO,    "MFLO   ", FALSE, IFMT_d,   0, PSI_MFLO,   EXR_LO, EXR_00, 0b00), // 18: Move From LO.
-    INSN_EX(OPS_MTLO,    "MTLO   ", FALSE, IFMT_s,   0, PSI_MTLO,   EXR_LO, EXR_00, 0b11), // 19: Move To LO.
-    INSN_DB(OPS_DSLLV,   "DSLLV  ", FALSE, IFMT_dts, 1, PSI_SLV   ), // 20: Doubleword Shift Left Logical Variable.
-    INSN_DB(OPS_DSRLV,   "DSRLV  ", FALSE, IFMT_dts, 1, PSI_SRV   ), // 22: Doubleword Shift Right Logical Variable.
-    INSN_DB(OPS_DSRAV,   "DSRAV  ", FALSE, IFMT_dts, 1, PSI_SRV   ), // 23: Doubleword Shift Right Arithmetic Variable.
-    INSN_EX(OPS_MULT,    "MULT   ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 24: Multiply Word (5cyc).
-    INSN_EX(OPS_MULTU,   "MULTU  ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 25: Multiply Unsigned Word (5cyc).
-    INSN_EX(OPS_DIV,     "DIV    ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 26: Divide Word (37cyc).
-    INSN_EX(OPS_DIVU,    "DIVU   ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 27: Divide Unsigned Word (37cyc).
-    INSN_EX(OPS_DMULT,   "DMULT  ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 28: Doubleword Multiply (8cyc).
-    INSN_EX(OPS_DMULTU,  "DMULTU ", FALSE, IFMT_st,  0, PSI_MULT,   EXR_HI, EXR_LO, 0b11), // 29: Doubleword Multiply Unsigned (8cyc).
-    INSN_EX(OPS_DDIV,    "DDIV   ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 30: Doubleword Divide (69cyc).
-    INSN_EX(OPS_DDIVU,   "DDIVU  ", FALSE, IFMT_st,  0, PSI_DIV,    EXR_HI, EXR_LO, 0b11), // 31: Doubleword Divide Unsigned (69cyc).
-    INSN_DB(OPS_ADD,     "ADD    ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 32: Add Word.
-    INSN_DB(OPS_ADDU,    "ADDU   ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 33: Add Unsigned Word.
-    INSN_DB(OPS_SUB,     "SUB    ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 34: Subtract Word.
-    INSN_DB(OPS_SUBU,    "SUBU   ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 35: Subtract Unsigned Word.
-    INSN_DB(OPS_AND,     "AND    ", FALSE, IFMT_dst, 1, PSI_AND   ), // 36: And.
-    INSN_DB(OPS_OR,      "OR     ", FALSE, IFMT_dst, 1, PSI_OR    ), // 37: Or.
-    INSN_DB(OPS_XOR,     "XOR    ", FALSE, IFMT_dst, 1, PSI_XOR   ), // 38: Exclusive Or.
-    INSN_DB(OPS_NOR,     "NOR    ", FALSE, IFMT_dst, 1, PSI_NOR   ), // 39: Nor.
-    INSN_DB(OPS_SLT,     "SLT    ", FALSE, IFMT_dst, 1, PSI_SLT   ), // 42: Set on Less Than.
-    INSN_DB(OPS_SLTU,    "SLTU   ", FALSE, IFMT_dst, 1, PSI_SLT   ), // 43: Set on Less Than Unsigned.
-    INSN_DB(OPS_DADD,    "DADD   ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 44: Doubleword Add.
-    INSN_DB(OPS_DADDU,   "DADDU  ", FALSE, IFMT_dst, 1, PSI_ADD   ), // 45: Doubleword Add Unsigned.
-    INSN_DB(OPS_DSUB,    "DSUB   ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 46: Doubleword Subtract.
-    INSN_DB(OPS_DSUBU,   "DSUBU  ", FALSE, IFMT_dst, 1, PSI_SUB   ), // 47: Doubleword Subtract Unsigned.
-    INSN_DB(OPS_TGE,     "TGE    ", FALSE, IFMT_ste, 0, PSI_TGE   ), // 48: Trap if Greater Than or Equal.
-    INSN_DB(OPS_TGEU,    "TGEU   ", FALSE, IFMT_ste, 0, PSI_TGE   ), // 49: Trap if Greater Than or Equal Unsigned.
-    INSN_DB(OPS_TLT,     "TLT    ", FALSE, IFMT_ste, 0, PSI_TLT   ), // 50: Trap if Less Than.
-    INSN_DB(OPS_TLTU,    "TLTU   ", FALSE, IFMT_ste, 0, PSI_TLT   ), // 51: Trap if Less Than Unsigned.
-    INSN_DB(OPS_TEQ,     "TEQ    ", FALSE, IFMT_ste, 0, PSI_TEQ   ), // 52: Trap if Equal.
-    INSN_DB(OPS_TNE,     "TNE    ", FALSE, IFMT_ste, 0, PSI_TEQ   ), // 54: Trap if Not Equal.
-    INSN_DB(OPS_DSLL,    "DSLL   ", FALSE, IFMT_dta, 1, PSI_SLI   ), // 56: Doubleword Shift Left Logical.
-    INSN_DB(OPS_DSRL,    "DSRL   ", FALSE, IFMT_dta, 1, PSI_SRI   ), // 58: Doubleword Shift Right Logical.
-    INSN_DB(OPS_DSRA,    "DSRA   ", FALSE, IFMT_dta, 1, PSI_SRI   ), // 59: Doubleword Shift Right Arithmetic.
-    INSN_DB(OPS_DSLL32,  "DSLL32 ", FALSE, IFMT_dta, 1, PSI_DSLI32), // 60: Doubleword Shift Left Logical + 32.
-    INSN_DB(OPS_DSRL32,  "DSRL32 ", FALSE, IFMT_dta, 1, PSI_DSRI32), // 62: Doubleword Shift Right Logical + 32.
-    INSN_DB(OPS_DSRA32,  "DSRA32 ", FALSE, IFMT_dta, 1, PSI_DSRI32), // 63: Doubleword Shift Right Arithmetic + 32.
+    INSN_DB(OPS_SLL,     "SLL    ", FALSE, IFMT_dta, 1, PSI_SLI    ), //  0: Shift Word Left Logical.
+    INSN_DB(OPS_SRL,     "SRL    ", FALSE, IFMT_dta, 1, PSI_SRI    ), //  2: Shift Word Right Logical.
+    INSN_DB(OPS_SRA,     "SRA    ", FALSE, IFMT_dta, 1, PSI_SRI    ), //  3: Shift Word Right Arithmetic.
+    INSN_DB(OPS_SLLV,    "SLLV   ", FALSE, IFMT_dts, 1, PSI_SLV    ), //  4: Shift Word Left Logical Variable.
+    INSN_DB(OPS_SRLV,    "SRLV   ", FALSE, IFMT_dts, 1, PSI_SRV    ), //  6: Shift Word Right Logical Variable.
+    INSN_DB(OPS_SRAV,    "SRAV   ", FALSE, IFMT_dts, 1, PSI_SRV    ), //  7: Shift Word Right Arithmetic Variable.
+    INSN_DB(OPS_JR,      "JR     ", FALSE, IFMT_s,   0, PSI_JR     ), //  8: Jump Register.
+    INSN_DB(OPS_JALR,    "JALR   ", FALSE, IFMT_ds,  1, PSI_JALR   ), //  9: Jump and Link Register.
+    INSN_DB(OPS_SYSCALL, "SYSCALL", FALSE, IFMT_E,   0, PSI_BREAK  ), // 12: System Call (assert).
+    INSN_DB(OPS_BREAK,   "BREAK  ", FALSE, IFMT_E,   0, PSI_BREAK  ), // 13: Breakpoint.
+    INSN_DB(OPS_SYNC,    "SYNC   ", FALSE, IFMT_NOP, 0, PSI_FUNC   ), // 15: Synchronize Shared Memory.
+    INSN_EX(OPS_MFHI,    "MFHI   ", FALSE, IFMT_d,   0, PSI_MFHI,    EXR_HI, EXR_00, 0b00), // 16: Move From HI.
+    INSN_EX(OPS_MTHI,    "MTHI   ", FALSE, IFMT_s,   0, PSI_MTHI,    EXR_HI, EXR_00, 0b11), // 17: Move To HI.
+    INSN_EX(OPS_MFLO,    "MFLO   ", FALSE, IFMT_d,   0, PSI_MFLO,    EXR_LO, EXR_00, 0b00), // 18: Move From LO.
+    INSN_EX(OPS_MTLO,    "MTLO   ", FALSE, IFMT_s,   0, PSI_MTLO,    EXR_LO, EXR_00, 0b11), // 19: Move To LO.
+    INSN_DB(OPS_DSLLV,   "DSLLV  ", FALSE, IFMT_dts, 1, PSI_SLV    ), // 20: Doubleword Shift Left Logical Variable.
+    INSN_DB(OPS_DSRLV,   "DSRLV  ", FALSE, IFMT_dts, 1, PSI_SRV    ), // 22: Doubleword Shift Right Logical Variable.
+    INSN_DB(OPS_DSRAV,   "DSRAV  ", FALSE, IFMT_dts, 1, PSI_SRV    ), // 23: Doubleword Shift Right Arithmetic Variable.
+    INSN_EX(OPS_MULT,    "MULT   ", FALSE, IFMT_st,  0, PSI_MULT,    EXR_HI, EXR_LO, 0b11), // 24: Multiply Word (5cyc).
+    INSN_EX(OPS_MULTU,   "MULTU  ", FALSE, IFMT_st,  0, PSI_MULT,    EXR_HI, EXR_LO, 0b11), // 25: Multiply Unsigned Word (5cyc).
+    INSN_EX(OPS_DIV,     "DIV    ", FALSE, IFMT_st,  0, PSI_DIV,     EXR_HI, EXR_LO, 0b11), // 26: Divide Word (37cyc).
+    INSN_EX(OPS_DIVU,    "DIVU   ", FALSE, IFMT_st,  0, PSI_DIV,     EXR_HI, EXR_LO, 0b11), // 27: Divide Unsigned Word (37cyc).
+    INSN_EX(OPS_DMULT,   "DMULT  ", FALSE, IFMT_st,  0, PSI_MULT,    EXR_HI, EXR_LO, 0b11), // 28: Doubleword Multiply (8cyc).
+    INSN_EX(OPS_DMULTU,  "DMULTU ", FALSE, IFMT_st,  0, PSI_MULT,    EXR_HI, EXR_LO, 0b11), // 29: Doubleword Multiply Unsigned (8cyc).
+    INSN_EX(OPS_DDIV,    "DDIV   ", FALSE, IFMT_st,  0, PSI_DIV,     EXR_HI, EXR_LO, 0b11), // 30: Doubleword Divide (69cyc).
+    INSN_EX(OPS_DDIVU,   "DDIVU  ", FALSE, IFMT_st,  0, PSI_DIV,     EXR_HI, EXR_LO, 0b11), // 31: Doubleword Divide Unsigned (69cyc).
+    INSN_DB(OPS_ADD,     "ADD    ", FALSE, IFMT_dst, 1, PSI_ADD    ), // 32: Add Word.
+    INSN_DB(OPS_ADDU,    "ADDU   ", FALSE, IFMT_dst, 1, PSI_ADD    ), // 33: Add Unsigned Word.
+    INSN_DB(OPS_SUB,     "SUB    ", FALSE, IFMT_dst, 1, PSI_SUB    ), // 34: Subtract Word.
+    INSN_DB(OPS_SUBU,    "SUBU   ", FALSE, IFMT_dst, 1, PSI_SUB    ), // 35: Subtract Unsigned Word.
+    INSN_DB(OPS_AND,     "AND    ", FALSE, IFMT_dst, 1, PSI_AND    ), // 36: And.
+    INSN_DB(OPS_OR,      "OR     ", FALSE, IFMT_dst, 1, PSI_OR     ), // 37: Or.
+    INSN_DB(OPS_XOR,     "XOR    ", FALSE, IFMT_dst, 1, PSI_XOR    ), // 38: Exclusive Or.
+    INSN_DB(OPS_NOR,     "NOR    ", FALSE, IFMT_dst, 1, PSI_NOR    ), // 39: Nor.
+    INSN_DB(OPS_SLT,     "SLT    ", FALSE, IFMT_dst, 1, PSI_SLT    ), // 42: Set on Less Than.
+    INSN_DB(OPS_SLTU,    "SLTU   ", FALSE, IFMT_dst, 1, PSI_SLT    ), // 43: Set on Less Than Unsigned.
+    INSN_DB(OPS_DADD,    "DADD   ", FALSE, IFMT_dst, 1, PSI_ADD    ), // 44: Doubleword Add.
+    INSN_DB(OPS_DADDU,   "DADDU  ", FALSE, IFMT_dst, 1, PSI_ADD    ), // 45: Doubleword Add Unsigned.
+    INSN_DB(OPS_DSUB,    "DSUB   ", FALSE, IFMT_dst, 1, PSI_SUB    ), // 46: Doubleword Subtract.
+    INSN_DB(OPS_DSUBU,   "DSUBU  ", FALSE, IFMT_dst, 1, PSI_SUB    ), // 47: Doubleword Subtract Unsigned.
+    INSN_DB(OPS_TGE,     "TGE    ", FALSE, IFMT_ste, 0, PSI_TGE    ), // 48: Trap if Greater Than or Equal.
+    INSN_DB(OPS_TGEU,    "TGEU   ", FALSE, IFMT_ste, 0, PSI_TGE    ), // 49: Trap if Greater Than or Equal Unsigned.
+    INSN_DB(OPS_TLT,     "TLT    ", FALSE, IFMT_ste, 0, PSI_TLT    ), // 50: Trap if Less Than.
+    INSN_DB(OPS_TLTU,    "TLTU   ", FALSE, IFMT_ste, 0, PSI_TLT    ), // 51: Trap if Less Than Unsigned.
+    INSN_DB(OPS_TEQ,     "TEQ    ", FALSE, IFMT_ste, 0, PSI_TEQ    ), // 52: Trap if Equal.
+    INSN_DB(OPS_TNE,     "TNE    ", FALSE, IFMT_ste, 0, PSI_TEQ    ), // 54: Trap if Not Equal.
+    INSN_DB(OPS_DSLL,    "DSLL   ", FALSE, IFMT_dta, 1, PSI_SLI    ), // 56: Doubleword Shift Left Logical.
+    INSN_DB(OPS_DSRL,    "DSRL   ", FALSE, IFMT_dta, 1, PSI_SRI    ), // 58: Doubleword Shift Right Logical.
+    INSN_DB(OPS_DSRA,    "DSRA   ", FALSE, IFMT_dta, 1, PSI_SRI    ), // 59: Doubleword Shift Right Arithmetic.
+    INSN_DB(OPS_DSLL32,  "DSLL32 ", FALSE, IFMT_dta, 1, PSI_DSLI32 ), // 60: Doubleword Shift Left Logical + 32.
+    INSN_DB(OPS_DSRL32,  "DSRL32 ", FALSE, IFMT_dta, 1, PSI_DSRI32 ), // 62: Doubleword Shift Right Logical + 32.
+    INSN_DB(OPS_DSRA32,  "DSRA32 ", FALSE, IFMT_dta, 1, PSI_DSRI32 ), // 63: Doubleword Shift Right Arithmetic + 32.
     INSN_END(), // NULL terminator.
 };
 
@@ -352,7 +352,7 @@ void mips_III_insn_test(f32 a, f32 b, f32 c) {
     asm volatile("jr      $t0"          ); // jr
     asm volatile("jalr    $t0"          ); // jalr
     asm volatile("syscall 1"            ); // syscall
-    asm volatile("break   1"            ); // break
+    asm volatile("break   1,2"          ); // break
     asm volatile("sync"                 ); // sync
     asm volatile("mfhi    $t0"          ); // mfhi
     asm volatile("mthi    $t0"          ); // mthi

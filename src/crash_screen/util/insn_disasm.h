@@ -34,7 +34,6 @@ typedef enum PACKED MIPSParamFmts {
     IFMT_DST,   // fd fs ft
 
     IFMT_tsI,   // rt rs immediate
-    IFMT_tsN,   // rt rs abs(immediate) // for pseudos
     IFMT_tI,    // rt immediate    
     IFMT_sI,    // rs immediate
 
@@ -42,7 +41,7 @@ typedef enum PACKED MIPSParamFmts {
     IFMT_To,    // ft offset(base)
 
     IFMT_dta,   // rd rt shift
-    IFMT_ste,   // rs rt exc10
+    IFMT_ste,   // rs rt excA
     IFMT_E,     // exc20
 
     IFMT_stB,   // rs rt branch
@@ -69,8 +68,8 @@ typedef enum PACKED MIPSParamID {
     MP_OFF,     // "0x[last 16 bits]([rs reg])".
     MP_B,       // "[±]0x[last 16 bits]" + draw branch arrow.
     MP_JUMP,    // "[function address]" or parse map.
-    MP_EXC10,   // "[0xXXX]" 10-bit data for the exception handler.
-    MP_EXC20,   // "[0xXXXXX]" 20-bit data for the exception handler.
+    MP_EXCA,    // "[0xXXX]" 10-bit data for the exception handler.
+    MP_EXCAB,   // "[0xXXXXX]" 20-bit data for the exception handler.
 } MIPSParamID;
 
 
@@ -495,13 +494,14 @@ typedef union InsnData {
         /*0x00*/ Word instr_index   : 26;
     };
     struct PACKED {
-        /*0x00*/ Word               : 16;
-        /*0x00*/ Word code10        : 10; // 10-bit data for exception handler.
+        /*0x00*/ Word               :  6;
+        /*0x00*/ Word codeA         : 10; // 10-bit data for exception handler.
+        /*0x00*/ Word codeB         : 10; // 10-bit data for exception handler.
         /*0x00*/ Word               :  6;
     };
     struct PACKED {
         /*0x00*/ Word               :  6;
-        /*0x00*/ Word code20        : 20; // 20-bit data for exception handler.
+        /*0x00*/ Word codeAB        : 20; // 20-bit data for exception handler.
         /*0x00*/ Word               :  6;
     };
     Word raw;

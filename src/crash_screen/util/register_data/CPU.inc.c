@@ -19,7 +19,7 @@ ALIGNED32 static const RegisterInfo sRegInfo_CPU[CPU_NUM_REGISTERS] = {
     [REG_CPU_K0] = DEF_CPU_SREG(k0, "K0", FALSE, REG_DESC_KERNEL), [REG_CPU_K1] = DEF_CPU_SREG(k1, "K1", FALSE, REG_DESC_KERNEL),
     [REG_CPU_GP] = DEF_CPU_TREG(gp, "GP", TRUE,  REG_DESC_GP    ),
     [REG_CPU_SP] = DEF_CPU_TREG(sp, "SP", TRUE,  REG_DESC_SP    ),
-    [REG_CPU_FP] = DEF_CPU_TREG(s8, "FP", FALSE, REG_DESC_FP    ),
+    [REG_CPU_FP] = DEF_CPU_TREG(s8, "S8", FALSE, REG_DESC_FP    ),
     [REG_CPU_RA] = DEF_CPU_TREG(ra, "RA", TRUE,  REG_DESC_RA    ),
 };
 #define CASE_CPU_REG(_idx, _reg) CASE_REG(CPU, _idx, _reg)
