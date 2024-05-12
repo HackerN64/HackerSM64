@@ -821,7 +821,7 @@ void add_reg_str(char** c, RegisterSources src, int idx, _Bool isBase) {
 #define INSN_RAW_JR_RA      0x03E00008
 #define INSN_RAW_TEQ_R0_R0  0x00000034
 
-char* cs_insn_to_pseudo_c(InsnData insn) {
+char* cs_insn_to_pseudo_c(InsnData insn, const char** comment) {
     _Bool decImmediates = (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_IMM_FMT) == PRINT_NUM_FMT_DEC);
     char* strp = &insn_as_string[0]; // Pointer to a location inside the string.
     bzero(insn_as_string, sizeof(insn_as_string));
@@ -835,18 +835,17 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
     u8 pseudoC = info->pseudoC;
 
     const char* formatStr = pseudo_c_code_formats[pseudoC];
-    const char* comment = NULL;
 
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS)) {
         if (insn.raw == INSN_RAW_JR_RA) { // jr $ra -> "return;"
             formatStr = "r";
-            comment = "goto RA";
+            *comment = "goto RA";
         } else if (insn.raw == INSN_RAW_TEQ_R0_R0) { // teq $r0,$r0 -> "trap();"
             formatStr = "X(e)";
-            // comment = "if (0==0)";
+            // *comment = "if (0==0)";
         } else if (formatStr[0] == PSC_RA) { // "and link"
             formatStr += STRLEN(CLINK);
-            comment = "RA=PC+2";
+            *comment = "RA=PC+2";
         }
     }
 
@@ -930,7 +929,7 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
                         u16 eA = insn.codeA;
                         u16 eB = insn.codeB;
                         strp += sprintf(strp, (decImmediates ? "%d, %d" : STR_HEX_PREFIX"%X, "STR_HEX_PREFIX"%X"), eA, eB);
-                        comment = get_name_from_null_terminated_id_list(eA, insn_break_codes);
+                        *comment = get_name_from_null_terminated_id_list(eA, insn_break_codes);
                     } else {
                         strp += sprintf(strp, immFmt, insn.codeAB);
                     }
@@ -947,10 +946,6 @@ char* cs_insn_to_pseudo_c(InsnData insn) {
     }
 
     *strp++ = ';';
-
-    if (comment != NULL) {
-        strp += sprintf(strp, STR_COLOR_PREFIX" // %s", COLOR_RGBA32_VSC_COMMENT, comment);
-    }
 
     return insn_as_string;
 }

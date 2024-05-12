@@ -650,4 +650,4 @@ s16 insn_check_for_branch_offset(InsnData insn);
 Address get_insn_branch_target_from_addr(Address addr);
 char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool formatting);
 
-char* cs_insn_to_pseudo_c(InsnData insn);
+char* cs_insn_to_pseudo_c(InsnData insn, const char** comment);

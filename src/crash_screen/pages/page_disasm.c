@@ -358,7 +358,16 @@ void disasm_draw_asm_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines, Add
                 };
 
                 if (asPseudoC) {
-                    cs_print_scroll(x, y, CRASH_SCREEN_NUM_CHARS_X, "%s", cs_insn_to_pseudo_c(insn));
+                    const char* comment = NULL;
+                    const char* pseudoC = cs_insn_to_pseudo_c(insn, &comment);
+                    size_t commentSize = 0;
+                    if (comment != NULL) {
+                        commentSize = (1 + STRLEN("// ") + strlen(comment));
+                    }
+                    size_t charX = cs_print_scroll(x, y, (CRASH_SCREEN_NUM_CHARS_X - commentSize), "%s", pseudoC);
+                    if (comment != NULL) {
+                        cs_print((x + TEXT_WIDTH(charX + 1)), y, STR_COLOR_PREFIX"// %s", COLOR_RGBA32_VSC_COMMENT, comment);
+                    }
                 } else {
                     format_and_print_insn(x, y, addr, data);
                 }

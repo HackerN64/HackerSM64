@@ -316,7 +316,14 @@ void page_summary_draw(void) {
 
                 line++;
                 cs_print(TEXT_X(x), TEXT_Y(line++), STR_COLOR_PREFIX"PSEUDO:", COLOR_RGBA32_CRASH_HEADER);
-                cs_print_scroll(TEXT_X(x), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 2), "%s", cs_insn_to_pseudo_c((InsnData)data));
+                const char* comment = NULL;
+                const char* pseudoC = cs_insn_to_pseudo_c((InsnData)data, &comment);
+                if (pseudoC != NULL) {
+                    cs_print_scroll(TEXT_X(x), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 2), "%s", pseudoC);
+                }
+                if (comment != NULL) {
+                    cs_print_scroll(TEXT_X(x), TEXT_Y(line++), (CRASH_SCREEN_NUM_CHARS_X - 2), STR_COLOR_PREFIX"// %s", COLOR_RGBA32_VSC_COMMENT, comment);
+                }
             }
         }
     }
