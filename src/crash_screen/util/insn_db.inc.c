@@ -260,17 +260,19 @@ static const InsnTemplate* insn_db_cop_lists[][0b11 + 1] = {
 
 // Single-line pseudo-instructions.
 ALIGNED32 static const InsnTemplate insn_db_pseudo[] = {
-    [PSEUDO_NOP  ] = INSN_DB(OPS_SLL,   "NOP    ", FALSE, IFMT_NOP, 0, PSI_NOP  ), // NOP (pseudo of SLL).
-    [PSEUDO_MOVET] = INSN_DB(OPS_ADD,   "MOVE   ", FALSE, IFMT_dt,  1, PSI_MOVET), // Move (pseudo of ADD and OR).
-    [PSEUDO_MOVES] = INSN_DB(OPS_ADD,   "MOVE   ", FALSE, IFMT_ds,  1, PSI_MOVES), // Move (pseudo of ADD).
-    [PSEUDO_B    ] = INSN_DB(OPC_BEQ,   "B      ", FALSE, IFMT_B,   0, PSI_B    ), // Branch (pseudo of BEQ).
-    [PSEUDO_BEQZ ] = INSN_DB(OPC_BEQ,   "BEQZ   ", FALSE, IFMT_sB,  0, PSI_BEQ  ), // Branch on Equal to Zero (pseudo of BEQ).
-    [PSEUDO_BNEZ ] = INSN_DB(OPC_BNE,   "BNEZ   ", FALSE, IFMT_sB,  0, PSI_BNE  ), // Branch on Not Equal to Zero (pseudo of BNE).
-    [PSEUDO_LI   ] = INSN_DB(OPC_ADDI,  "LI     ", FALSE, IFMT_tI,  1, PSI_LI   ), // Load Immediate (pseudo of ADDI and ADDIU).
-    [PSEUDO_SUBI ] = INSN_DB(OPC_ADDI,  "SUBI   ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Subtract Immediate Word (pseudo of ADDI).
-    [PSEUDO_BEQZL] = INSN_DB(OPC_BEQL,  "BEQZL  ", FALSE, IFMT_sB,  0, PSI_BEQ  ), // Branch on Equal to Zero Likely (pseudo of BEQL).
-    [PSEUDO_BNEZL] = INSN_DB(OPC_BNEL,  "BNEZL  ", FALSE, IFMT_sB,  0, PSI_BNE  ), // Branch on Not Equal to Zero Likely (pseudo of BNEL).
-    [PSEUDO_DSUBI] = INSN_DB(OPC_DADDI, "DSUBI  ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Doubleword Subtract Immediate (pseudo of DADDI).
+    [PSEUDO_NOP   ] = INSN_DB(OPS_SLL,    "NOP    ", FALSE, IFMT_NOP, 0, PSI_NOP  ), // NOP (pseudo of SLL).
+    [PSEUDO_MOVET ] = INSN_DB(OPS_ADD,    "MOVE   ", FALSE, IFMT_dt,  1, PSI_MOVET), // Move (pseudo of ADD and OR).
+    [PSEUDO_MOVES ] = INSN_DB(OPS_ADD,    "MOVE   ", FALSE, IFMT_ds,  1, PSI_MOVES), // Move (pseudo of ADD).
+    [PSEUDO_B     ] = INSN_DB(OPC_BEQ,    "B      ", FALSE, IFMT_B,   0, PSI_B    ), // Branch (pseudo of BEQ).
+    [PSEUDO_BEQZ  ] = INSN_DB(OPC_BEQ,    "BEQZ   ", FALSE, IFMT_sB,  0, PSI_BEQ  ), // Branch on Equal to Zero (pseudo of BEQ).
+    [PSEUDO_BNEZ  ] = INSN_DB(OPC_BNE,    "BNEZ   ", FALSE, IFMT_sB,  0, PSI_BNE  ), // Branch on Not Equal to Zero (pseudo of BNE).
+    [PSEUDO_LI    ] = INSN_DB(OPC_ADDI,   "LI     ", FALSE, IFMT_tI,  1, PSI_LI   ), // Load Immediate (pseudo of ADDI and ADDIU).
+    [PSEUDO_SUBI  ] = INSN_DB(OPC_ADDI,   "SUBI   ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Word Subtract Immediate (pseudo of ADDI).
+    [PSEUDO_SUBIU ] = INSN_DB(OPC_ADDIU,  "SUBIU  ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Word Subtract Immediate Unsigned (pseudo of ADDIU).
+    [PSEUDO_BEQZL ] = INSN_DB(OPC_BEQL,   "BEQZL  ", FALSE, IFMT_sB,  0, PSI_BEQ  ), // Branch on Equal to Zero Likely (pseudo of BEQL).
+    [PSEUDO_BNEZL ] = INSN_DB(OPC_BNEL,   "BNEZL  ", FALSE, IFMT_sB,  0, PSI_BNE  ), // Branch on Not Equal to Zero Likely (pseudo of BNEL).
+    [PSEUDO_DSUBI ] = INSN_DB(OPC_DADDI,  "DSUBI  ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Doubleword Subtract Immediate (pseudo of DADDI).
+    [PSEUDO_DSUBIU] = INSN_DB(OPC_DADDIU, "DSUBIU ", FALSE, IFMT_tsI, 1, PSI_SUBI ), // Doubleword Subtract Immediate Unsigned (pseudo of DADDIU).
 };
 
 

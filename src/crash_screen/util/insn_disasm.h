@@ -435,9 +435,11 @@ typedef enum PseudoInsns {
     PSEUDO_BNEZ,
     PSEUDO_LI,
     PSEUDO_SUBI,
+    PSEUDO_SUBIU,
     PSEUDO_BEQZL,
     PSEUDO_BNEZL,
     PSEUDO_DSUBI,
+    PSEUDO_DSUBIU,
 } PseudoInsns;
 
 // Types of instructions.

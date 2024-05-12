@@ -125,27 +125,31 @@ static _Bool check_pseudo_instructions(const InsnTemplate** type, InsnData* insn
             }
             break;
         case OPC_BEQ:
-            if (check_pseudo_insn(type, PSEUDO_B,     (insn.rs == insn.rt))) return TRUE;
-            if (check_pseudo_insn(type, PSEUDO_BEQZ,  (insn.rt == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_B,      (insn.rs == insn.rt))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BEQZ,   (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_BNE:
-            if (check_pseudo_insn(type, PSEUDO_BNEZ,  (insn.rt == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BNEZ,   (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_ADDI:
-            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == REG_CPU_R0))) return TRUE;
-            if (check_pseudo_insn(type, PSEUDO_SUBI,  ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
+            if (check_pseudo_insn(type, PSEUDO_LI,     (insn.rs == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_SUBI,   ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
             break;
         case OPC_ADDIU:
-            if (check_pseudo_insn(type, PSEUDO_LI,    (insn.rs == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_LI,     (insn.rs == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_SUBIU,  ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
             break;
         case OPC_BEQL:
-            if (check_pseudo_insn(type, PSEUDO_BEQZL, (insn.rt == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BEQZL,  (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_BNEL:
-            if (check_pseudo_insn(type, PSEUDO_BNEZL, (insn.rt == REG_CPU_R0))) return TRUE;
+            if (check_pseudo_insn(type, PSEUDO_BNEZL,  (insn.rt == REG_CPU_R0))) return TRUE;
             break;
         case OPC_DADDI:
-            if (check_pseudo_insn(type, PSEUDO_DSUBI, ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
+            if (check_pseudo_insn(type, PSEUDO_DSUBI,  ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
+            break;
+        case OPC_DADDIU:
+            if (check_pseudo_insn(type, PSEUDO_DSUBIU, ((s16)insn.immediate < 0))) { insnSrc->immediate = -(s16)insnSrc->immediate; return TRUE; }
             break;
     }
 
@@ -727,23 +731,23 @@ const PSC_Entry psc_entries[] = {
 };
 
 //! TODO: Clean this up:
-#define CAO     "o->i" // "*(o + i)"
-#define CAOL    "[(o->i)" // "*ALIGNL(o + i)"
-#define CAOR    "](o->i)" // "*ALIGNR(o + i)"
-#define CLINK   "$=.+2"
+#define CAO     "o->i"
+#define CAOL    "[(o->i)"
+#define CAOR    "](o->i)"
+#define C_LINK  "$=.+2"
 ALIGNED4 const char* pseudo_c_code_formats[] = {
     [PSI_NOP] = /*nop*/ "",
     // jump
-    [PSI_J] = /*j*/ "J", [PSI_JAL] = /*jal*/ CLINK"J",
-    [PSI_JR] = /*jr*/ "gs", [PSI_JALR] = /*jalr*/ CLINK"gs",
+    [PSI_J] = /*j*/ "J", [PSI_JAL] = /*jal*/ C_LINK"J",
+    [PSI_JR] = /*jr*/ "gs", [PSI_JALR] = /*jalr*/ C_LINK"gs",
     // branch
     [PSI_B] = /*b*/ "gb", [PSI_BEQ] = /*beq/beql/beqz/beqzl*/ "?(s == t) gb", [PSI_BNE] = /*bne/bnel/bnez/bnezl*/ "?(s != t) gb",
     [PSI_BGTZ] = /*bgtz/bgtzl*/ "?(s > 0) gb",  [PSI_BLTZ] = /*bltz/bltzl*/ "?(s < 0) gb",
     [PSI_BLEZ] = /*blez/blezl*/ "?(s <= 0) gb", [PSI_BGEZ] = /*bgez/bgezl*/ "?(s >= 0) gb",
-    [PSI_BLTZAL] = /*bltzal/bltzall*/ CLINK"?(s < 0) gb", [PSI_BGEZAL] = /*bgezal/bgezall*/ CLINK"?(s >= 0) gb",
+    [PSI_BLTZAL] = /*bltzal/bltzall*/ C_LINK"?(s < 0) gb", [PSI_BGEZAL] = /*bgezal/bgezall*/ C_LINK"?(s >= 0) gb",
     // arithmetic
     [PSI_ADDI] = /*addi/addiu/daddi/daddiu*/ "t = s + i", [PSI_SLTI] = /*slti/sltiu*/ "t = s < i", [PSI_ANDI] = /*andi*/ "t = s & i", [PSI_ORI] = /*ori*/ "t = s | i", [PSI_XORI] = /*xori*/ "t = s ^ i",
-    [PSI_LI] = /*li*/ "t = i", [PSI_SUBI] = /*subi/dsubi*/ "t = s - i",
+    [PSI_LI] = /*li*/ "t = i", [PSI_SUBI] = /*subi/subiu/dsubi/dsubiu*/ "t = s - i",
     [PSI_LUI] = /*lui*/ "t = i0000",
     // load/store
     [PSI_L] = /*lb/lbu/lh/lhu/lw/lwu/ld/lwc2/lwc3/ldc2*/ "t = "CAO, [PSI_L_L] = /*lwl/ldl*/ "t = "CAOL, [PSI_L_R] = /*lwr/ldr*/ "t = "CAOR,
@@ -833,7 +837,6 @@ char* cs_insn_to_pseudo_c(InsnData insn, const char** comment) {
     }
 
     u8 pseudoC = info->pseudoC;
-
     const char* formatStr = pseudo_c_code_formats[pseudoC];
 
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_DISASM, CS_OPT_DISASM_PSEUDOINSNS)) {
@@ -844,8 +847,8 @@ char* cs_insn_to_pseudo_c(InsnData insn, const char** comment) {
             formatStr = "X(e)";
             // *comment = "if (0==0)";
         } else if (formatStr[0] == PSC_RA) { // "and link"
-            formatStr += STRLEN(CLINK);
-            *comment = "RA=PC+2";
+            formatStr += STRLEN(C_LINK);
+            *comment = "RA=PC+2; goto";
         }
     }
 
