@@ -68,8 +68,8 @@ typedef enum PACKED MIPSParamID {
     MP_OFF,     // "0x[last 16 bits]([rs reg])".
     MP_B,       // "[±]0x[last 16 bits]" + draw branch arrow.
     MP_JUMP,    // "[function address]" or parse map.
-    MP_EXCA,    // "[0xXXX]" 10-bit data for the exception handler.
-    MP_EXCAB,   // "[0xXXXXX]" 20-bit data for the exception handler.
+    MP_EXC10,   // "[0xXXX]" 10-bit data for the exception handler.
+    MP_EXC20,   // "[0xXXXXX]" 20-bit data for the exception handler.
 } MIPSParamID;
 
 

@@ -67,8 +67,8 @@ const InsnParam insn_param_formats[][MIPS_NUM_PARAMS] = {
     [IFMT_To   ] = { PARAM(MP_FT,    MP_FMT_F), PARAM(MP_OFF,   MP_FMT_I), PARAM_NOP,                 }, // ft offset(base)
 
     [IFMT_dta  ] = { PARAM(MP_RD,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_SHIFT, MP_FMT_I), }, // rd rt shift
-    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXCA,  MP_FMT_I), }, // rs rt exc10
-    [IFMT_E    ] = { PARAM(MP_EXCAB, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // exc20
+    [IFMT_ste  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_EXC10, MP_FMT_I), }, // rs rt exc10
+    [IFMT_E    ] = { PARAM(MP_EXC20, MP_FMT_I), PARAM_NOP,                 PARAM_NOP,                 }, // exc20
 
     [IFMT_stB  ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_RT,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), }, // rs rt branch
     [IFMT_sB   ] = { PARAM(MP_RS,    MP_FMT_I), PARAM(MP_B,     MP_FMT_I), PARAM_NOP,                 }, // rs branch
@@ -554,11 +554,11 @@ char* cs_insn_to_string(Address addr, InsnData insn, const char** fname, _Bool f
                     ADD_REG(REGS_CP1, insn.fd);
                     separator = TRUE;
                     break;
-                case MP_EXCA: // For TRAP IF instructions.
+                case MP_EXC10: // For TRAP IF instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     ADD_STR(STR_CODE10, insn.codeB);
                     break;
-                case MP_EXCAB: // For SYSCALL and BREAK instructions.
+                case MP_EXC20: // For SYSCALL and BREAK instructions.
                     ADD_COLOR(COLOR_RGBA32_LIGHT_GRAY);
                     if (info->opcode == OPS_BREAK) {
                         u16 eA = insn.codeA;
@@ -925,7 +925,7 @@ char* cs_insn_to_pseudo_c(InsnData insn, const char** comment) {
                     }
                     break;
                 case PSC_EXC10:
-                    strp += sprintf(strp, immFmt, insn.codeA);
+                    strp += sprintf(strp, immFmt, insn.codeB);
                     break;
                 case PSC_EXC20:
                     if (info->opcode == OPS_BREAK) {
