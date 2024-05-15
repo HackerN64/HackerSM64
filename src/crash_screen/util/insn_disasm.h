@@ -452,6 +452,13 @@ typedef enum InsnType {
     INSN_TYPE_OPCODE, // Use 'opcode' as opcode.
 } InsnType;
 
+enum PACKED CacheCache {
+    CACHE_ICACHE, // Instruction cache.
+    CACHE_DCACHE, // Data cache.
+    CACHE_RESV_2,
+    CACHE_RESV_3,
+};
+
 // Instruction data
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
 typedef union InsnData {
@@ -466,7 +473,8 @@ typedef union InsnData {
     struct PACKED {
         /*0x00*/ Word               :  6;
         /*0x00*/ Word base          :  5;
-        /*0x00*/ Word               :  5;
+        /*0x00*/ Word cache_op      :  3; //! TODO: Proper documentation.
+        /*0x00*/ Word cache_cache   :  2; // [0=icache,1=dcache,2=?,3=?]
         /*0x00*/ Word offset        : 16; // AKA: immediate.
     };
     struct PACKED {
@@ -506,8 +514,37 @@ typedef union InsnData {
         /*0x00*/ Word codeAB        : 20; // 20-bit data for exception handler.
         /*0x00*/ Word               :  6;
     };
+    struct PACKED {
+        Word a:6, b:5, c:5, d:5, e:5, f:6;
+    } _6_5_5_5_5_6;
+    struct PACKED {
+        Word a:6, b:5, c:5;
+        u16 d;
+    } _6_5_5_16;
     Word raw;
 } InsnData; /*0x04*/
+#define SIZEOF_INSNDATA sizeof(InsnData)
+
+
+#define INSNDATA_6_5_5_5_5_6(_0, _1, _2, _3, _4, _5) (InsnData){ \
+    ._6_5_5_5_5_6 = { \
+        .a = _0, \
+        .b = _1, \
+        .c = _2, \
+        .d = _3, \
+        .e = _4, \
+        .f = _5, \
+    }, \
+}
+
+#define INSNDATA_6_5_5_16(_0, _1, _2, _3) (InsnData){ \
+    ._6_5_5_16 = { \
+        .a = _0, \
+        .b = _1, \
+        .c = _2, \
+        .d = _3, \
+    }, \
+}
 
 
 // All chars that can appear in an instruction name, packed by '_PL()'.
@@ -536,9 +573,9 @@ typedef union InsnData {
 #define PCKCSZ 5 // Num bits in packed char.
 
 // Pack and shift a single char.
-#define PACK_CHR(_str, _idx)    ((u64)(_PL((_str)[_idx]) & BITMASK(PCKCSZ)) << (PCKCSZ * (_idx)))
+#define PACK_CHR(_str, _idx) ((u64)(_PL((_str)[_idx]) & BITMASK(PCKCSZ)) << (PCKCSZ * (_idx)))
 // Unpack and shift a single char.
-#define UNPACK_CHR(_alphabet, _src, _idx)  _UL(_alphabet, (unsigned char)(((_src) >> (PCKCSZ * (_idx))) & BITMASK(PCKCSZ)))
+#define UNPACK_CHR(_alphabet, _src, _idx) _UL(_alphabet, (unsigned char)(((_src) >> (PCKCSZ * (_idx))) & BITMASK(PCKCSZ)))
 
 // Pack a string of 7 chars.
 #define PACK_STR7(_str) ( \

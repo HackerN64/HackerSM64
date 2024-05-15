@@ -326,7 +326,38 @@ void mips_III_insn_test(f32 a, f32 b, f32 c) {
     asm volatile("sw     $t0,0x1234($t1)"); // sw
     asm volatile("sdl    $t0,0x1234($t1)"); // sdl
     asm volatile("sdr    $t0,0x1234($t1)"); // sdr
-    asm volatile("cache  0x0,0x1234($t1)"); // cache
+    asm volatile("cache  0x00,0x1234($t1)"); // cache
+    asm volatile("cache  0x01,0x1234($t1)"); // cache
+    // asm volatile("cache  0x02,0x1234($t1)"); // cache
+    // asm volatile("cache  0x03,0x1234($t1)"); // cache
+    asm volatile("cache  0x04,0x1234($t1)"); // cache
+    asm volatile("cache  0x05,0x1234($t1)"); // cache
+    // asm volatile("cache  0x06,0x1234($t1)"); // cache
+    // asm volatile("cache  0x07,0x1234($t1)"); // cache
+    asm volatile("cache  0x08,0x1234($t1)"); // cache
+    asm volatile("cache  0x09,0x1234($t1)"); // cache
+    // asm volatile("cache  0x0A,0x1234($t1)"); // cache
+    // asm volatile("cache  0x0B,0x1234($t1)"); // cache
+    // asm volatile("cache  0x0C,0x1234($t1)"); // cache
+    // asm volatile("cache  0x0D,0x1234($t1)"); // cache
+    // asm volatile("cache  0x0E,0x1234($t1)"); // cache
+    // asm volatile("cache  0x0F,0x1234($t1)"); // cache
+    asm volatile("cache  0x10,0x1234($t1)"); // cache
+    asm volatile("cache  0x11,0x1234($t1)"); // cache
+    // asm volatile("cache  0x12,0x1234($t1)"); // cache
+    // asm volatile("cache  0x13,0x1234($t1)"); // cache
+    asm volatile("cache  0x14,0x1234($t1)"); // cache
+    asm volatile("cache  0x15,0x1234($t1)"); // cache
+    // asm volatile("cache  0x16,0x1234($t1)"); // cache
+    // asm volatile("cache  0x17,0x1234($t1)"); // cache
+    asm volatile("cache  0x18,0x1234($t1)"); // cache
+    asm volatile("cache  0x19,0x1234($t1)"); // cache
+    // asm volatile("cache  0x1A,0x1234($t1)"); // cache
+    // asm volatile("cache  0x1B,0x1234($t1)"); // cache
+    // asm volatile("cache  0x1C,0x1234($t1)"); // cache
+    // asm volatile("cache  0x1D,0x1234($t1)"); // cache
+    // asm volatile("cache  0x1E,0x1234($t1)"); // cache
+    // asm volatile("cache  0x1F,0x1234($t1)"); // cache
     asm volatile("ll     $t0,0x1234($t1)"); // ll
     asm volatile("lwc1   $0,0x1234($t1)"); // lwc1
     asm volatile("lwc2   $0,0x1234($t1)"); // lwc2
