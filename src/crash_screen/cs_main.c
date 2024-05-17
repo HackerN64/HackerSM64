@@ -50,7 +50,7 @@ u32 gTimingDiv = 1;
  * @brief Reinitialize the crash screen's global variables, settings, buffers, etc.
  */
 static void cs_reinitialize(void) {
-    _Bool wasAssert = (((gCrashedThread != NULL) && (gCrashedThread->context.cause == EXC_SYSCALL)));
+    _Bool wasAssert = ((gCrashedThread != NULL) && (gCrashedThread->context.cause == EXC_SYSCALL));
 
     // If the crash screen has crashed, disable the page that crashed, unless it was an assert.
     if (!sFirstCrash) {// && !wasAssert) {

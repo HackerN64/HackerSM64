@@ -209,22 +209,22 @@ ALIGNED32 static const InsnTemplate insn_db_cop1_sub01[] = { // OPC_COP1, INSN_T
     INSN_END(), // NULL terminator.
 };
 ALIGNED32 static const InsnTemplate insn_db_cop1_sub10[] = { // OPC_COP1, INSN_TYPE_FUNC
-    INSN_DB(OPS_ADD_F,     "ADD    ", TRUE, IFMT_DST,   1, PSI_ADDF ), //  0: ADD.[fmt]     Floating-Point Add (3cyc).
-    INSN_DB(OPS_SUB_F,     "SUB    ", TRUE, IFMT_DST,   1, PSI_SUBF ), //  1: SUB.[fmt]     Floating-Point Subtract (3cyc).
-    INSN_DB(OPS_MUL_F,     "MUL    ", TRUE, IFMT_DST,   1, PSI_MULF ), //  2: MUL.[fmt]     Floating-Point Multiply (S:5cyc; D:8cyc).
-    INSN_DB(OPS_DIV_F,     "DIV    ", TRUE, IFMT_DST,   1, PSI_DIVF ), //  3: DIV.[fmt]     Floating-Point Divide (S:29cyc; D:58cyc).
-    INSN_DB(OPS_SQRT_F,    "SQRT   ", TRUE, IFMT_DS_XX, 1, PSI_CVTF ), //  4: SQRT.[fmt]    Floating-Point Square Root (S:29cyc; D:58cyc).
-    INSN_DB(OPS_ABS_F,     "ABS    ", TRUE, IFMT_DS_XX, 1, PSI_CVTF ), //  5: ABS.[fmt]     Floating-Point Absolute Value (1cyc).
-    INSN_DB(OPS_MOV_F,     "MOV    ", TRUE, IFMT_DS_XX, 1, PSI_MOVF ), //  6: MOV.[fmt]     Floating-Point Move (1cyc).
-    INSN_DB(OPS_NEG_F,     "NEG    ", TRUE, IFMT_DS_XX, 1, PSI_NEGF ), //  7: NEG.[fmt]     Floating-Point Negate (1cyc).
-    INSN_DB(OPS_ROUND_L_F, "ROUND.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), //  8: ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_TRUNC_L_F, "TRUNC.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), //  9: TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_CEIL_L_F,  "CEIL.L ", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 10: CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_FLOOR_L_F, "FLOOR.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 11: FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
-    INSN_DB(OPS_ROUND_W_F, "ROUND.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 12: ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_TRUNC_W_F, "TRUNC.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 13: TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_CEIL_W_F,  "CEIL.W ", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 14: CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
-    INSN_DB(OPS_FLOOR_W_F, "FLOOR.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF ), // 15: FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_ADD_F,     "ADD    ", TRUE, IFMT_DST,   1, PSI_ADDF), //  0: ADD.[fmt]     Floating-Point Add (3cyc).
+    INSN_DB(OPS_SUB_F,     "SUB    ", TRUE, IFMT_DST,   1, PSI_SUBF), //  1: SUB.[fmt]     Floating-Point Subtract (3cyc).
+    INSN_DB(OPS_MUL_F,     "MUL    ", TRUE, IFMT_DST,   1, PSI_MULF), //  2: MUL.[fmt]     Floating-Point Multiply (S:5cyc; D:8cyc).
+    INSN_DB(OPS_DIV_F,     "DIV    ", TRUE, IFMT_DST,   1, PSI_DIVF), //  3: DIV.[fmt]     Floating-Point Divide (S:29cyc; D:58cyc).
+    INSN_DB(OPS_SQRT_F,    "SQRT   ", TRUE, IFMT_DS_XX, 1, PSI_CVTF), //  4: SQRT.[fmt]    Floating-Point Square Root (S:29cyc; D:58cyc).
+    INSN_DB(OPS_ABS_F,     "ABS    ", TRUE, IFMT_DS_XX, 1, PSI_CVTF), //  5: ABS.[fmt]     Floating-Point Absolute Value (1cyc).
+    INSN_DB(OPS_MOV_F,     "MOV    ", TRUE, IFMT_DS_XX, 1, PSI_MOVF), //  6: MOV.[fmt]     Floating-Point Move (1cyc).
+    INSN_DB(OPS_NEG_F,     "NEG    ", TRUE, IFMT_DS_XX, 1, PSI_NEGF), //  7: NEG.[fmt]     Floating-Point Negate (1cyc).
+    INSN_DB(OPS_ROUND_L_F, "ROUND.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF), //  8: ROUND.L.[fmt] Floating-Point Round to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_TRUNC_L_F, "TRUNC.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF), //  9: TRUNC.L.[fmt] Floating-Point Truncate to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_CEIL_L_F,  "CEIL.L ", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 10: CEIL.L.[fmt]  Floating-Point Ceiling to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_FLOOR_L_F, "FLOOR.L", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 11: FLOOR.L.[fmt] Floating-Point Floor to Long Fixed-Point (5cyc).
+    INSN_DB(OPS_ROUND_W_F, "ROUND.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 12: ROUND.W.[fmt] Floating-Point Round to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_TRUNC_W_F, "TRUNC.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 13: TRUNC.W.[fmt] Floating-Point Truncate to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_CEIL_W_F,  "CEIL.W ", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 14: CEIL.W.[fmt]  Floating-Point Ceiling to Word Fixed-Point (5cyc).
+    INSN_DB(OPS_FLOOR_W_F, "FLOOR.W", TRUE, IFMT_DS_IX, 1, PSI_CVTF), // 15: FLOOR.W.[fmt] Floating-Point Floor to Word Fixed-Point (5cyc).
 
     INSN_DB(OPS_CVT_S_F,   "CVT.S  ", TRUE, IFMT_DS_FX, 1, PSI_CVTF), // 32: CVT.S.[fmt]   Floating-Point Convert to Single Floating-Point (D:2cyc; W:5cyc; L:5cyc).
     INSN_DB(OPS_CVT_D_F,   "CVT.D  ", TRUE, IFMT_DS_FX, 1, PSI_CVTF), // 33: CVT.D.[fmt]   Floating-Point Convert to Double Floating-Point (S:1cyc; W:5cyc; L:5cyc).
