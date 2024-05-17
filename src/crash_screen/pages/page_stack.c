@@ -3,6 +3,7 @@
 #include "types.h"
 #include "sm64.h"
 
+#include "crash_screen/util/insn_disasm.h"
 #include "crash_screen/util/map_parser.h"
 #include "crash_screen/cs_controls.h"
 #include "crash_screen/cs_draw.h"
@@ -25,7 +26,7 @@
 
 struct CSSetting cs_settings_group_page_stack[] = {
     [CS_OPT_HEADER_PAGE_STACK       ] = { .type = CS_OPT_TYPE_HEADER,  .name = "STACK TRACE",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_STACK_SHOW_ADDRESSES    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show stack addresses",           .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_STACK_SHOW_ADDRESSES    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show stack addresses",           .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_STACK_SHOW_OFFSETS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show function offsets",          .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_END_STACK               ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -53,9 +54,21 @@ static u32 sStackTraceBufferEnd = 0;
 
 static u32 sStackTraceSelectedIndex = 0;
 static u32 sStackTraceViewportIndex = 0;
+static u32 sStackTraceNumShownRows = STACK_TRACE_NUM_ROWS;
 
+static const char* sStackTraceError = NULL;
+
+
+// Jumps with links store the address of the instruction after the delay slot to $ra ($ra = $pc + 2).
+#define LINK_SIZE (2 * sizeof(InsnData))
 
 extern void __osCleanupThread(void);
+
+static void set_stack_trace_error_mesg(const char* errorStr) {
+    if (sStackTraceError == NULL) {
+        sStackTraceError = errorStr;
+    }
+}
 
 static void append_stack_entry_to_buffer(Address stackAddr, Address currAddr) {
     sStackTraceBuffer[sStackTraceBufferEnd++] = (FunctionInStack){
@@ -64,46 +77,138 @@ static void append_stack_entry_to_buffer(Address stackAddr, Address currAddr) {
     };
 }
 
-//! TODO: Use libdragon's method of walking the stack.
-void fill_function_stack_trace(void) {
+#define STACK_TRACE_MAX_INSN_SCAN (size_t)1024
+
+//! TODO: Return should determine whether leaf or null symbol.
+_Bool stacktrace_step(Address** sp, Address** ra, Address addr) {
+    const MapSymbol* symbol = get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD);
+    if (symbol == NULL) {
+        set_stack_trace_error_mesg("null symbol");
+        return FALSE;
+    }
+    size_t stack_size = 0;
+    size_t ra_offset = 0;
+
+    // Get stack_size and ra_offset.
+    InsnData* insnPtr = (InsnData*)symbol->addr; // Starting addr.
+
+    const size_t numInsnsInFunc = MIN(STACK_TRACE_MAX_INSN_SCAN, (symbol->size / sizeof(InsnData)));
+    for (size_t i = 0; i < numInsnsInFunc; i++) {
+        InsnData insn = *insnPtr;
+        u16 insnHi = (insn.raw >> 16);
+        s16 imm = insn.immediate;
+
+        //! TODO: Use defines/enums for insn check magic values:
+        if (
+            (stack_size == 0) &&
+            ((insnHi == 0x27BD) || (insnHi == 0x67BD)) // [addiu/daddiu] $sp, $sp, 0xXXXX
+        ) {
+            if (imm < 0) {
+                stack_size = -imm;
+            }
+        } else if (
+            ((insnHi == 0xFFBF) || (insnHi == 0xAFBF)) // [sw/sd] $ra, 0xXXXX($sp)
+        ) {
+            ra_offset = imm;
+        }
+
+        // Exit the loop if both have been found.
+        if ((stack_size != 0) && (ra_offset != 0)) {
+            *ra = (Address*)((Address)*sp + ra_offset);
+            *sp = (Address*)((Address)*sp + stack_size);
+            return TRUE;
+        }
+
+        insnPtr++;
+    }
+
+    // No stack allocation found, so thit is a leaf function.
+    return FALSE;
+}
+
+static const char* stack_error_leaf_not_at_top = "leaf func found not at top";
+
+//! TODO: Failsafe in case the address of __osCleanupThread doesn't appear in the stack.
+_Bool fill_function_stack_trace(void) {
     bzero(&sStackTraceBuffer, sizeof(sStackTraceBuffer));
     sStackTraceBufferEnd = 0;
 
+    _Bool success = FALSE; 
+
     // Include the current function at the top:
     __OSThreadContext* tc = &gInspectThread->context;
-    append_stack_entry_to_buffer(tc->sp, tc->pc); // Set the first entry in the stack buffer to pc.
+    const Address epc  = GET_EPC(tc); // thread $pc
+    const Address t_sp = tc->sp;      // thread $sp
+    append_stack_entry_to_buffer((Address)t_sp, epc); // Set the first entry in the stack buffer to the function $EPC is in.
 
-    Doubleword* sp = (Doubleword*)(Address)tc->sp; // Stack pointer is already aligned, so get the lower bits.
+    Address* sp = (Address*)((Address)t_sp);
 
-    // Loop through the stack buffer and find all the addresses that point to a function.
-    while (sStackTraceBufferEnd < STACK_TRACE_BUFFER_SIZE) {
-        Address addr = LO_OF_64(*sp); // Function address are in the lower bits.
+    if (IS_DEBUG_MAP_ENABLED()) {
+        const Address t_ra = tc->ra; // thread $ra
+        Address* ra = (Address*)((Address)t_ra - LINK_SIZE);
+        _Bool err = FALSE;
 
-        if (
-            addr_is_in_text_segment(addr) &&
-            (
-                IS_DEBUG_MAP_ENABLED() ||
-                symbol_is_function(get_map_symbol(addr, SYMBOL_SEARCH_BACKWARD))
-            )
-        ) {
-            //! TODO: If JAL command uses a different function than the previous entry's funcAddr, replace it with the one in the JAL command?
-            //! TODO: handle duplicate entries caused by JALR RA, V0
-            append_stack_entry_to_buffer((Address)sp + sizeof(Address), addr); // Address in stack uses lower bits of the doubleword.
+        if (!stacktrace_step(&sp, &ra, epc)) {
+            // $EPC is in a leaf function, so get the next entry from $ra because it's not in the stack.
+            if (stacktrace_step(&sp, &ra, ((Address)t_ra - LINK_SIZE))) {
+                append_stack_entry_to_buffer((Address)t_sp, (t_ra - LINK_SIZE));
+            } else {
+                set_stack_trace_error_mesg(stack_error_leaf_not_at_top);
+                err = TRUE;
+            }
         }
 
-        if (addr == (Address)__osCleanupThread) {
-            break;
+        if (!err) {
+            // Loop through the stack buffer and find all the addresses that point to a function.
+            while (sStackTraceBufferEnd < STACK_TRACE_BUFFER_SIZE) {
+                if ((Address)*ra == (Address)__osCleanupThread) {
+                    success = TRUE;
+                    break;
+                }
+                append_stack_entry_to_buffer((Address)ra, (*ra - LINK_SIZE));
+                if (!stacktrace_step(&sp, &ra, ((Address)*ra - LINK_SIZE))) {
+                    set_stack_trace_error_mesg(stack_error_leaf_not_at_top);
+                    break;
+                }
+            }
         }
-
-        sp++;
     }
+
+    // Fallback simpler stack trace functionality in case walking the stack fails or the debug map is disabled.
+    // Just uses all aligned .text addresses in the stack.
+    if (!success) {
+        // Align sp to lower 32 of 64:
+        sp = (Address*)(ALIGNFLOOR((Address)sp, sizeof(Doubleword)) + sizeof(Address));
+
+        // Loop through the stack buffer and find all the addresses that point to a function.
+        while (sStackTraceBufferEnd < STACK_TRACE_BUFFER_SIZE) {
+            if (*sp == (Address)__osCleanupThread) {
+                success = TRUE;
+                break;
+            } else if (addr_is_in_text_segment(*sp)) {
+                append_stack_entry_to_buffer((Address)sp, (*sp - LINK_SIZE));
+            }
+
+            sp += 2;
+        }
+    }
+
+    return success;
 }
 
 void page_stack_init(void) {
     sStackTraceSelectedIndex = 0;
     sStackTraceViewportIndex = 0;
+    sStackTraceNumShownRows = STACK_TRACE_NUM_ROWS;
 
-    fill_function_stack_trace();
+    sStackTraceError = NULL;
+
+    if (!cs_get_current_page()->flags.crashed) {
+        fill_function_stack_trace();
+        if (sStackTraceError != NULL) {
+            sStackTraceNumShownRows--;
+        }
+    }
 }
 
 void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
@@ -210,21 +315,28 @@ void page_stack_draw(void) {
 
     line++;
 
-    stack_trace_print_entries(line, STACK_TRACE_NUM_ROWS);
+    stack_trace_print_entries(line, sStackTraceNumShownRows);
 
     // Draw the top line after the entries so the selection rectangle is behind it.
     cs_draw_divider(DIVIDER_Y(line));
 
     // Scroll Bar:
-    if (sStackTraceBufferEnd > STACK_TRACE_NUM_ROWS) {
+    if (sStackTraceBufferEnd > sStackTraceNumShownRows) {
         cs_draw_scroll_bar(
             (DIVIDER_Y(line) + 1), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y),
-            STACK_TRACE_NUM_ROWS, sStackTraceBufferEnd,
+            sStackTraceNumShownRows, sStackTraceBufferEnd,
             sStackTraceViewportIndex,
             COLOR_RGBA32_CRASH_SCROLL_BAR, TRUE
         );
 
         cs_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y));
+    }
+
+    if (sStackTraceError != NULL) {
+        cs_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1),
+            STR_COLOR_PREFIX"stack error: %s",
+            COLOR_RGBA32_CRASH_DESCRIPTION_MAIN, sStackTraceError
+        );
     }
 
     osWritebackDCacheAll();
@@ -237,19 +349,12 @@ void page_stack_input(void) {
         open_address_select(sStackTraceBuffer[sStackTraceSelectedIndex].currAddr);
     }
 
-// #ifdef INCLUDE_DEBUG_MAP
-//     if (IS_DEBUG_MAP_ENABLED() && (buttonPressed & B_BUTTON)) {
-//         // Toggle whether to display function names.
-//         cs_inc_setting(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES, TRUE);
-//     }
-// #endif // INCLUDE_DEBUG_MAP
-
     s32 change = 0;
     if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
     if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
     sStackTraceSelectedIndex = WRAP(((s32)sStackTraceSelectedIndex + change), 0, (s32)(sStackTraceBufferEnd - 1));
 
-    sStackTraceViewportIndex = cs_clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, STACK_TRACE_NUM_ROWS, 1);
+    sStackTraceViewportIndex = cs_clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, sStackTraceNumShownRows, 1);
 }
 
 void page_stack_print(void) {
