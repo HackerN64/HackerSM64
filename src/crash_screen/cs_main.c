@@ -166,7 +166,6 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     // Reinitialize global variables, settings, buffers, etc.
     cs_reinitialize();
 
-    sRenderingFramebuffer = 0;
     osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 2);
 
 #ifdef FUNNY_CRASH_SOUND
@@ -197,8 +196,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
             cs_set_page(CS_PAGE_MEMORY);
         }
 
-        // Use the Z buffer's memory space to save a screenshot of the game.
-        cs_take_screenshot_of_game(gZBuffer, sizeof(gZBuffer));
+        cs_set_up_framebuffers();
 
 #ifdef INCLUDE_DEBUG_MAP
         map_data_init();

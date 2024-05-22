@@ -360,36 +360,31 @@ UNUSED void cs_draw_custom_5x5_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 sta
 //     }
 // }
 
-// Copy the framebuffer data from gFramebuffers one frame at a time, forcing alpha to true to turn off broken anti-aliasing.
-void cs_take_screenshot_of_game(RGBA16* dst, size_t size) {
-    RGBA16FILL* src = FB_PTR_AS(RGBA16FILL);
-    RGBA16FILL* ptr = (RGBA16FILL*)dst;
-    const RGBA16FILL mask = ((MSK_RGBA16_A << SIZEOF_BITS(RGBA16)) | MSK_RGBA16_A);
+static RGBA16* sCSScreenshotFB = gFramebuffers[2];
+static u16 sCSFB[2] = { 0, 1, };
+static int sCSFBRenderIndex = 0;
 
-    for (size_t s = 0; s < size; s += sizeof(RGBA16FILL)) {
-        *ptr++ = (*src++ | mask);
+// Keep the most recent framebuffer as-is to use as a screenshot, and use the two other framebuffers for the crash screen itself.
+void cs_set_up_framebuffers(void) {
+    u16 currIndex = sRenderingFramebuffer;
+
+    // Use the most recent framebuffer as the screenshot background.
+    sCSScreenshotFB = gFramebuffers[currIndex];
+
+    // Set sCSFB to the other two framebuffers:
+    switch (currIndex) {
+        default:
+        case 0: sCSFB[0] = 1, sCSFB[1] = 2; break;
+        case 1: sCSFB[0] = 0, sCSFB[1] = 2; break;
+        case 2: sCSFB[0] = 0, sCSFB[1] = 1; break;
     }
+
+    // Make sure the current rendering framebuffer is one of the two stored in sCSFB.
+    sRenderingFramebuffer = sCSFB[0];
 }
 
-// Set the entire framebuffer either to the saved screenshot or to black.
-void cs_reset_framebuffer(_Bool drawBackground) {
-    if (drawBackground) {
-        bcopy(gZBuffer, FB_PTR_AS(void), sizeof(gZBuffer));
-    } else {
-        cs_draw_dark_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CS_DARKEN_TO_BLACK);
-    }
-
-    osWritebackDCacheAll();
-}
-
-// // Emulators that the Instant Input patch should not be applied to
-// #define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
-
-#define CRASH_SCREEN_NUM_FRAMEBUFFERS 2
-
-// Cycle through the 3 framebuffers.
-//! TODO: Instant input?
-//! TODO: Fix flickering on emulators.
+// Cycle through the framebuffers.
+//! TODO: Fix coverage flickering on ares and some other emulators.
 void cs_update_framebuffer(void) {
     osWritebackDCacheAll();
 
@@ -403,11 +398,22 @@ void cs_update_framebuffer(void) {
     osViSwapBuffer(FB_PTR_AS(void));
     osRecvMesg(queue, mesg, OS_MESG_BLOCK);
 
-    // if (gEmulator & INSTANT_INPUT_BLACKLIST) {
-        if (++sRenderingFramebuffer == CRASH_SCREEN_NUM_FRAMEBUFFERS) {
-            sRenderingFramebuffer = 0;
-        }
-    // }
+    // Swap between the two framebuffers:
+    sCSFBRenderIndex = !sCSFBRenderIndex;
+
+    sRenderingFramebuffer = sCSFB[sCSFBRenderIndex];
+
+    osWritebackDCacheAll();
+}
+
+// Set the entire framebuffer either to the saved screenshot or to black.
+static void cs_reset_framebuffer(_Bool drawBackground) {
+    if (drawBackground) {
+        // bcopy(gZBuffer, FB_PTR_AS(void), sizeof(gZBuffer));
+        bcopy(sCSScreenshotFB, FB_PTR_AS(void), sizeof(gFramebuffers[0]));
+    } else {
+        cs_draw_dark_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, CS_DARKEN_TO_BLACK);
+    }
 
     osWritebackDCacheAll();
 }

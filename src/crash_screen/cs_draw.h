@@ -140,7 +140,7 @@ void cs_draw_triangle(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoor
 // void cs_draw_line(ScreenCoord_u32 x1, ScreenCoord_u32 y1, ScreenCoord_u32 x2, ScreenCoord_u32 y2, RGBA32 color);
 void cs_draw_glyph(ScreenCoord_u32 startX, ScreenCoord_u32 startY, uchar glyph, RGBA32 color);
 // void cs_draw_texture(ScreenCoord_s32 startX, ScreenCoord_s32 startY, ScreenCoord_s32 w, ScreenCoord_s32 h, RGBA16* texture);
-void cs_take_screenshot_of_game(RGBA16* dst, size_t size);
+void cs_set_up_framebuffers(void);
 void cs_draw_scroll_bar_impl(ScreenCoord_u32 x, ScreenCoord_u32 topY, ScreenCoord_u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg);
 ALWAYS_INLINE void cs_draw_scroll_bar(ScreenCoord_u32 topY, ScreenCoord_u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 topVisibleEntry, RGBA32 color, _Bool drawBg) {
     cs_draw_scroll_bar_impl((CRASH_SCREEN_X2 - 1), topY, bottomY, numVisibleEntries, numTotalEntries, topVisibleEntry, color, drawBg);
