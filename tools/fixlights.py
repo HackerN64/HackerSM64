@@ -29,7 +29,7 @@ lightStructs = {}
 # FIRST PASS: COLLECT LIGHT STRUCT INFO, REMOVE LIGHT STRUCTS
 for file in lightFiles:
     changed = False
-    with open(file, "r") as f:
+    with open(file, "r", encoding='utf-8') as f:
         fileLines = f.readlines()
         index = 0
 
@@ -80,7 +80,7 @@ def index_delta(mat_name, orig_index, delta):
 # SECOND PASS - CHANGE LIGHT COMMANDS
 for file in lightFiles:
     changed = False
-    with open(file, "r") as f:
+    with open(file, "r", encoding='utf-8') as f:
         fileLines = f.readlines()
         index = 0
         dl_index = -1
