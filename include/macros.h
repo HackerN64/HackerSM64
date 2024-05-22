@@ -90,7 +90,11 @@
 
 #include "game/asm.h"
 
-#define FORCE_CRASH() EXCEPTION_RMISS() //! TODO: This should be EXCEPTION_TRAP() to save 8 bytes, but that freezes most emulators instead of doing a proper crash.
+//! TODO: Ideally this should use EXCEPTION_TRAP() to save 8 bytes, but that freezes most emulators instead of doing a proper crash.
+#define FORCE_CRASH() do {  \
+    EXCEPTION_RMISS();      \
+    UNREACHABLE();          \
+} while (0);
 
 // Set where the program counter will be on the next crash.
 #define SET_CRASH_PTR(ptr) \

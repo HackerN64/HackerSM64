@@ -374,8 +374,7 @@ void thread3_main(UNUSED void *arg) {
         VI.comRegs.vSync = 525*20;   
         change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
         osViSetMode(&VI);
-        osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
-        osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
+        osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON | OS_VI_GAMMA_OFF);
 #endif
     } else {
         gBorderHeight = BORDER_HEIGHT_CONSOLE;

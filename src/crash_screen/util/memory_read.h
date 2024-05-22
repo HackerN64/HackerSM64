@@ -10,7 +10,7 @@
 #define PHYS_MEM_END    (K0BASE - 1)
 #define PHYS_MEM_SIZE   (size_t)(PHYS_MEM_END - PHYS_MEM_START)
 // Virtual addresses:
-#define VIRT_MEM_START  K0BASE
+#define VIRT_MEM_START  K0BASE //! TODO: (RAM_START+0x400) ?
 #define VIRT_MEM_END    0xFFFFFFFF
 #define VIRT_MEM_SIZE   (size_t)(VIRT_MEM_END - VIRT_MEM_START)
 // Total memory size:
