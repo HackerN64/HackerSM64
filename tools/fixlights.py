@@ -88,7 +88,7 @@ for file in lightFiles:
             curLine = fileLines[index].strip()
             dl_index += 1
 
-            match_result = re.search("Gfx\s*([A-Za-z_]\w+)\s*\[\s*\w*\s*\]\s*=\s*\{", curLine)
+            match_result = re.search(r"Gfx\s*([A-Za-z_]\w+)\s*\[\s*\w*\s*\]\s*=\s*\{", curLine)
             if match_result is not None and len(match_result.groups()) >= 1:
                 curDL = match_result.group(1)
                 dl_index = -1
@@ -136,7 +136,7 @@ def get_texscroll_files():
     mat_grep_commands = []
     for mat in material_deltas.keys():
         print("grep -Rl \"segmented_to_virtual(" + re.escape(mat) + f"\" {sys.argv[1]}**/texscroll.inc.c")
-        mat_grep_commands.append("grep -Rl \"segmented_to_virtual(" + re.escape(mat) + f"\" {sys.argv[1]} --include \*texscroll*")
+        mat_grep_commands.append("grep -Rl \"segmented_to_virtual(" + re.escape(mat) + rf"\" {sys.argv[1]} --include \*texscroll*")
 
     texscroll_files = set()
     for cmd in mat_grep_commands:
@@ -164,7 +164,7 @@ for file in t_files:
             curLine = curLineFull.strip()
 
             if not in_func:
-                match_result = re.search("void \w+\(\) \{", curLine)
+                match_result = re.search(r"void \w+\(\) \{", curLine)
                 in_func = match_result is not None
                 found_mat_match = False
                 continue
@@ -174,7 +174,7 @@ for file in t_files:
                 continue
 
             if not found_mat_match:
-                match_result = re.search("Gfx \*mat = segmented_to_virtual\((\w*)\)", curLine)
+                match_result = re.search(r"Gfx \*mat = segmented_to_virtual\((\w*)\)", curLine)
                 if not match_result:
                     continue
 
@@ -184,7 +184,7 @@ for file in t_files:
                     mat_match = seg_mat
                 continue
 
-            match_result = re.search("shift_\w*\(mat, (\d*),", curLine)
+            match_result = re.search(r"shift_\w*\(mat, (\d*),", curLine)
             if match_result is not None and len(match_result.groups()) >= 1:
                 sts_index_str = match_result.group(1)
                 sts_index = int(sts_index_str)
