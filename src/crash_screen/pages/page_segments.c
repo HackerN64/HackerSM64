@@ -99,7 +99,7 @@ void draw_segments_list(CSTextCoord_u32 line) {
         // Line 2:
         if (showAddresses && isLoaded) {
             if (isHardcoded) {
-                cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"hardcoded", COLOR_RGBA32_GRAY);
+                cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"hardcoded", COLOR_RGBA32_CRASH_HEADER);
             } else {
                 const RGBA32 romColor = COLOR_RGBA32_LIGHT_BLUE;
                 CSTextCoord_u32 romStrStart = cs_print(TEXT_X(1), y, STR_COLOR_PREFIX"loaded:", COLOR_RGBA32_CRASH_HEADER);

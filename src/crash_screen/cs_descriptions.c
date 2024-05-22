@@ -99,22 +99,22 @@ const char* str_null_fallback(const char* str, const char* fallback) {
 
 //! TODO: One list with both id and pri.
 static const IdNamePair sThreadIDNames[] = {
-    { .id = THREAD_0,                   .name = "libultra?",        }, // Uses sThreadPriNames.
-    { .id = THREAD_1_IDLE,              .name = "idle",             },
-    { .id = THREAD_2,                   .name = "unused",           },
-    { .id = THREAD_3_MAIN,              .name = "main",             },
-    { .id = THREAD_4_SOUND,             .name = "sound",            }, //! TODO: libultra scheduler also uses ID 4 and has no set priority. Is there a way to differentiate the two?
-    { .id = THREAD_5_GAME_LOOP,         .name = "game loop",        },
-    { .id = THREAD_6_RUMBLE,            .name = "rumble",           },
-    { .id = THREAD_7_HVQM,              .name = "hvqm",             },
-    { .id = THREAD_8_TIMEKEEPER,        .name = "timekeeper",       },
-    { .id = THREAD_9_DA_COUNTER,        .name = "da counter",       },
-    { .id = THREAD_13_FAULT,            .name = "unf fault",        },
-    { .id = THREAD_14_USB,              .name = "unf usb",          },
-    { .id = THREAD_15_RDB,              .name = "unf rdb",          },
-    { .id = THREAD_1000_CRASH_SCREEN_0, .name = "crash screen 0",   },
-    { .id = THREAD_1001_CRASH_SCREEN_1, .name = "crash screen 1",   },
-    { .id = THREAD_1002_CRASH_SCREEN_2, .name = "crash screen 2",   },
+    { .id = THREAD_0,                   .name = "libultra?",      }, // Uses sThreadPriNames.
+    { .id = THREAD_1_IDLE,              .name = "idle",           },
+    { .id = THREAD_2,                   .name = "unused",         },
+    { .id = THREAD_3_MAIN,              .name = "main",           },
+    { .id = THREAD_4_SOUND,             .name = "sound",          }, //! TODO: libultra scheduler also uses ID 4 and has no set priority. Is there a way to differentiate the two?
+    { .id = THREAD_5_GAME_LOOP,         .name = "game loop",      },
+    { .id = THREAD_6_RUMBLE,            .name = "rumble",         },
+    { .id = THREAD_7_HVQM,              .name = "hvqm",           },
+    { .id = THREAD_8_TIMEKEEPER,        .name = "timekeeper",     },
+    { .id = THREAD_9_DA_COUNTER,        .name = "da counter",     },
+    { .id = THREAD_13_FAULT,            .name = "unf fault",      },
+    { .id = THREAD_14_USB,              .name = "unf usb",        },
+    { .id = THREAD_15_RDB,              .name = "unf rdb",        },
+    { .id = THREAD_1000_CRASH_SCREEN_0, .name = "crash screen 0", },
+    { .id = THREAD_1001_CRASH_SCREEN_1, .name = "crash screen 1", },
+    { .id = THREAD_1002_CRASH_SCREEN_2, .name = "crash screen 2", },
 };
 static const IdNamePair sThreadPriNames[] = {
     { .id = OS_PRIORITY_SIMGR,          .name = "si manager", },

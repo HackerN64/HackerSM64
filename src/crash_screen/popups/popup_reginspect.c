@@ -437,7 +437,7 @@ void reginspect_draw_contents(RegisterId regId) {
         line += gCSNumLinesPrinted;
         if (checkThread && (regInfo->offset != REGINFO_NULL_OFFSET)) {
             cs_print(TEXT_X(2), TEXT_Y(line), STR_COLOR_PREFIX" on thread %d (%s)", COLOR_RGBA32_CRASH_VARIABLE,
-                gInspectThread->id, get_thread_name(gInspectThread)
+                gInspectThread->id, str_null_fallback(get_thread_name(gInspectThread), "unknown")
             );
             line += gCSNumLinesPrinted;
         }

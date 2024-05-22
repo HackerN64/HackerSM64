@@ -159,7 +159,7 @@ void cs_draw_register_info_long(CSTextCoord_u32 charX, CSTextCoord_u32 line, Reg
 
     // FP is part of FPCSR.
     if (reg.valInfo.type == REG_VAL_TYPE_CONDBIT) {
-        name = "FP";
+        name = "FC";
         data = ((Reg_FPR_31)data).C;
     }
 

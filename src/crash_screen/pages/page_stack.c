@@ -6,6 +6,7 @@
 #include "crash_screen/util/insn_disasm.h"
 #include "crash_screen/util/map_parser.h"
 #include "crash_screen/cs_controls.h"
+#include "crash_screen/cs_descriptions.h"
 #include "crash_screen/cs_draw.h"
 #include "crash_screen/cs_main.h"
 #include "crash_screen/cs_pages.h"
@@ -26,7 +27,7 @@
 
 struct CSSetting cs_settings_group_page_stack[] = {
     [CS_OPT_HEADER_PAGE_STACK       ] = { .type = CS_OPT_TYPE_HEADER,  .name = "STACK TRACE",                    .valNames = &gValNames_bool,          .val = SECTION_EXPANDED_DEFAULT,  .defaultVal = SECTION_EXPANDED_DEFAULT,  .lowerBound = FALSE,                 .upperBound = TRUE,                       },
-    [CS_OPT_STACK_SHOW_ADDRESSES    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show stack addresses",           .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
+    [CS_OPT_STACK_SHOW_ADDRESSES    ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show addresses in stack",        .valNames = &gValNames_bool,          .val = FALSE,                     .defaultVal = FALSE,                     .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_STACK_SHOW_OFFSETS      ] = { .type = CS_OPT_TYPE_SETTING, .name = "Show function offsets",          .valNames = &gValNames_bool,          .val = TRUE,                      .defaultVal = TRUE,                      .lowerBound = FALSE,                 .upperBound = TRUE,                       },
     [CS_OPT_END_STACK               ] = { .type = CS_OPT_TYPE_END, },
 };
@@ -144,14 +145,14 @@ _Bool fill_function_stack_trace(void) {
     Address* sp = (Address*)((Address)t_sp);
 
     if (IS_DEBUG_MAP_ENABLED()) {
-        const Address t_ra = tc->ra; // thread $ra
-        Address* ra = (Address*)((Address)t_ra - LINK_SIZE);
+        const Address t_ra = ((Address)tc->ra - LINK_SIZE); // thread $ra - link
+        Address* ra = (Address*)t_ra;
         _Bool err = FALSE;
 
         if (!stacktrace_step(&sp, &ra, epc)) {
             // $EPC is in a leaf function, so get the next entry from $ra because it's not in the stack.
-            if (stacktrace_step(&sp, &ra, ((Address)t_ra - LINK_SIZE))) {
-                append_stack_entry_to_buffer((Address)t_sp, (t_ra - LINK_SIZE));
+            if (stacktrace_step(&sp, &ra, t_ra)) {
+                append_stack_entry_to_buffer(t_sp, t_ra);
             } else {
                 set_stack_trace_error_mesg(stack_error_leaf_not_at_top);
                 err = TRUE;
@@ -165,8 +166,9 @@ _Bool fill_function_stack_trace(void) {
                     success = TRUE;
                     break;
                 }
-                append_stack_entry_to_buffer((Address)ra, (*ra - LINK_SIZE));
-                if (!stacktrace_step(&sp, &ra, ((Address)*ra - LINK_SIZE))) {
+                Address raddr = ((Address)*ra - LINK_SIZE);
+                append_stack_entry_to_buffer((Address)ra, raddr);
+                if (!stacktrace_step(&sp, &ra, raddr)) {
                     set_stack_trace_error_mesg(stack_error_leaf_not_at_top);
                     break;
                 }
@@ -178,18 +180,20 @@ _Bool fill_function_stack_trace(void) {
     // Just uses all aligned .text addresses in the stack.
     if (!success) {
         // Align sp to lower 32 of 64:
-        sp = (Address*)(ALIGNFLOOR((Address)sp, sizeof(Doubleword)) + sizeof(Address));
+        Address* ra = (Address*)(ALIGNFLOOR((Address)sp, sizeof(Doubleword)) + sizeof(Address));
 
         // Loop through the stack buffer and find all the addresses that point to a function.
         while (sStackTraceBufferEnd < STACK_TRACE_BUFFER_SIZE) {
-            if (*sp == (Address)__osCleanupThread) {
+            if (*ra == (Address)__osCleanupThread) {
                 success = TRUE;
                 break;
-            } else if (addr_is_in_text_segment(*sp)) {
-                append_stack_entry_to_buffer((Address)sp, (*sp - LINK_SIZE));
+            }
+            Address raddr = ((Address)*ra - LINK_SIZE);
+            if (addr_is_in_text_segment(raddr)) {
+                append_stack_entry_to_buffer((Address)ra, raddr);
             }
 
-            sp += 2;
+            ra += 2;
         }
     }
 
@@ -245,6 +249,11 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
                 ((currIndex == 0) ? COLOR_RGBA32_CRASH_AT : COLOR_RGBA32_WHITE),
                 function->stackAddr
             );
+        } else if (row > 0) {
+            charX += cs_print(TEXT_X(charX), y,
+                STR_COLOR_PREFIX"at ",
+                COLOR_RGBA32_GRAY
+            );
         }
 
         Address currAddr = function->currAddr;
@@ -273,6 +282,7 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
                     STR_COLOR_PREFIX"%s",
                     COLOR_RGBA32_CRASH_FUNCTION_NAME, get_map_symbol_name(symbol)
                 );
+                // cs_print_addr_location_info(TEXT_X(charX), y, (CRASH_SCREEN_NUM_CHARS_X - charX), currAddr, TRUE);
             } else {
                 // "[address in function]"
                 cs_print(TEXT_X(charX), y,
@@ -292,14 +302,24 @@ void stack_trace_print_entries(CSTextCoord_u32 line, CSTextCoord_u32 numLines) {
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void page_stack_draw(void) {
+    OSThread* thread = gInspectThread;
     CSTextCoord_u32 line = 1;
     CSTextCoord_u32 charX = 0;
 
+    charX += cs_print(TEXT_X(charX), TEXT_Y(line++),
+        (STR_COLOR_PREFIX"SP: "STR_COLOR_PREFIX STR_HEX_WORD" "STR_COLOR_PREFIX"in thread: "STR_COLOR_PREFIX"%d %s"),
+        COLOR_RGBA32_CRASH_VARIABLE, COLOR_RGBA32_WHITE,
+        (Address)thread->context.sp,
+        COLOR_RGBA32_CRASH_HEADER, COLOR_RGBA32_CRASH_THREAD_NAME,
+        thread->id, str_null_fallback(get_thread_name(thread), "unknown")
+    );
+
+    cs_draw_divider(DIVIDER_Y(line));
+    charX = 0;
     if (cs_get_setting_val(CS_OPT_GROUP_PAGE_STACK, CS_OPT_STACK_SHOW_ADDRESSES)) {
         cs_print(TEXT_X(0), TEXT_Y(line), "IN STACK:");
         charX = STRLEN("00000000:");
     }
-
     cs_print(TEXT_X(charX), TEXT_Y(line), STR_COLOR_PREFIX"FUNCTION:", COLOR_RGBA32_CRASH_FUNCTION_NAME);
 
 #ifdef INCLUDE_DEBUG_MAP
