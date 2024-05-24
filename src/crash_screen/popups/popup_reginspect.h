@@ -6,6 +6,7 @@
 
 
 typedef enum PACKED RegBitsInfoStringLists {
+    REG_BITS_INFO_STR_SET,
     REG_BITS_INFO_STR_TRUTH,
     REG_BITS_INFO_STR_YES_NO,
     REG_BITS_INFO_STR_ENABLED,
@@ -25,6 +26,7 @@ typedef enum PACKED RegBitsInfoStringLists {
 
     REG_BITS_INFO_STR_RDRAM_VERSION,
     REG_BITS_INFO_STR_RDRAM_TYPE,
+    REG_BITS_INFO_STR_BANK,
     REG_BITS_INFO_STR_XBUS_DMEM,
     REG_BITS_INFO_STR_VI_AA_MODE,
     REG_BITS_INFO_STR_VI_TYPE,
@@ -52,6 +54,8 @@ typedef enum PACKED RegBitsType {
     REG_BITS_TYPE_BSTR, // Invert boolean string array.
     REG_BITS_TYPE_ISTR,
     REG_BITS_TYPE_FUNC,
+    REG_BITS_TYPE_ADDR,
+    // non-print:
     REG_BITS_TYPE_SETX, // Set info start X.
     REG_BITS_TYPE_SETW, // Set info width (for wrapping).
     REG_BITS_TYPE_WRAP,
@@ -60,18 +64,20 @@ typedef struct RegBitsInfo {
     /*0x00*/ const char* name;
     /*0x04*/ const u8 maskSize;
     /*0x05*/ const u8 shiftSize;
-    /*0x06*/ const RegBitsType type;
+    /*0x06*/ RegBitsType type;
     /*0x07*/ union {
-                const u8 arg;                           // Generic arg for macro.
-                const u8 spacing;                       // REG_BITS_TYPE_BIN
-                const u8 numDigits;                     // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
-                const RegBitsInfoStringLists list;      // REG_BITS_TYPE_STR
-                const RegBitsInfoIdStringPairs iList;   // RET_BITS_TYPE_ISTR
-                const RegBitsInfoFuncs func;            // REG_BITS_TYPE_FUNC
-                const u8 xPos;                          // REG_BITS_TYPE_SETX
-                const u8 width;                         // REG_BITS_TYPE_SETW
+                u8 arg;                         // Generic arg for macro.
+                u8 spacing;                     // REG_BITS_TYPE_BIN
+                u8 numDigits;                   // REG_BITS_TYPE_HEX/REG_BITS_TYPE_DEC
+                RegBitsInfoStringLists list;    // REG_BITS_TYPE_STR
+                RegBitsInfoIdStringPairs iList; // RET_BITS_TYPE_ISTR
+                RegBitsInfoFuncs func;          // REG_BITS_TYPE_FUNC
+                _Bool isVirtual;                // REG_BITS_TYPE_ADDR
+                u8 xPos;                        // REG_BITS_TYPE_SETX
+                u8 width;                       // REG_BITS_TYPE_SETW
             };
 } RegBitsInfo; /*0x08*/
+#define SIZEOF_REG_BITS_INFO sizeof(RegBitsInfo)
 #define REG_BITS_CMD(_name, _mask, _type, _arg) {   \
     .name      = _name,                             \
     .maskSize  = POPCOUNT(_mask),                   \

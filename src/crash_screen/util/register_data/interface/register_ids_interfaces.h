@@ -76,6 +76,8 @@ typedef enum PACKED REGIDS_VI { // VI_BASE_REG
     REGID_VI_V_BURST,                                               // VI_V_BURST_REG
     REGID_VI_X_SCALE,                                               // VI_X_SCALE_REG
     REGID_VI_Y_SCALE,                                               // VI_Y_SCALE_REG
+    REGID_VI_TEST_ADDR,
+    REGID_VI_STAGED_DATA,
 
     NUM_REGS_VI,
 } REGIDS_VI;

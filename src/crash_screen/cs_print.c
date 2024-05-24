@@ -357,7 +357,7 @@ static void cs_scroll_buffer(size_t bufferCount, size_t charLimit, u32 scrollSpe
         bufChar++;
     }
 
-    memcpy(&gCSPrintBuffer, &gCSScrollBuffer, (charLimit * sizeof(PrintBuffer)));
+    bcopy(&gCSScrollBuffer, &gCSPrintBuffer, (charLimit * sizeof(PrintBuffer)));
 }
 
 /**

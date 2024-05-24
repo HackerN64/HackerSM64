@@ -34,6 +34,10 @@ void cs_popup_reginspect_init(void) {
     sInspectedRegisterPtrAddr = 0x00000000;
 }
 
+static const char* sStrSet[] = {
+    [FALSE] = "unset",
+    [TRUE ] = "set",
+};
 static const char* sStrTruth[] = {
     [FALSE] = "false",
     [TRUE ] = "true",
@@ -108,6 +112,10 @@ static const char* sStr_RDRAM_TYPE[] = {
     [0b0000] = "rdram device",
     //! TODO: Can this potentially read out of bounds?
 };
+static const char* sStr_BANK[] = {
+    [0b0] = "dmem",
+    [0b1] = "imem",
+};
 static const char* sStr_XBUS_DMEM[] = {
     [0b0] = "xbus",
     [0b1] = "dmem",
@@ -131,6 +139,7 @@ static const char* sStr_RI_MODE_OP[] = {
     [0b11] = "unknown",
 };
 const char** sRegBitsInfoStrings[] = {
+    [REG_BITS_INFO_STR_SET     ] = sStrSet,
     [REG_BITS_INFO_STR_TRUTH   ] = sStrTruth,
     [REG_BITS_INFO_STR_YES_NO  ] = sStrYesNo,
     [REG_BITS_INFO_STR_ENABLED ] = sStrEnabled,
@@ -150,6 +159,7 @@ const char** sRegBitsInfoStrings[] = {
 
     [REG_BITS_INFO_STR_RDRAM_VERSION] = sStr_RDRAM_VERSION,
     [REG_BITS_INFO_STR_RDRAM_TYPE   ] = sStr_RDRAM_TYPE,
+    [REG_BITS_INFO_STR_BANK         ] = sStr_BANK,
     [REG_BITS_INFO_STR_XBUS_DMEM    ] = sStr_XBUS_DMEM,
     [REG_BITS_INFO_STR_VI_AA_MODE   ] = sStr_VI_AA_MODE,
     [REG_BITS_INFO_STR_VI_TYPE      ] = sStr_VI_TYPE,
@@ -224,6 +234,18 @@ RegBitsInfoFunc sRegBitsInfoFuncs[] = {
     [REG_BITS_INFO_FUNC_RDRAM_MODE_CCVALUE] = regbits_str_RDRAM_MODE_CCValue,
 };
 
+static const char sRegInspectDefaultLinePrints[][4 + 1] = {
+    [REG_BITS_TYPE_NONE] = "data",
+    [REG_BITS_TYPE_BIN ] = "bin",
+    [REG_BITS_TYPE_HEX ] = "hex",
+    [REG_BITS_TYPE_DEC ] = "dec",
+    [REG_BITS_TYPE_STR ] = "str",
+    [REG_BITS_TYPE_BSTR] = "bool",
+    [REG_BITS_TYPE_ISTR] = "bool",
+    [REG_BITS_TYPE_FUNC] = "func",
+    [REG_BITS_TYPE_ADDR] = "addr",
+};
+
 
 CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const RegBitsInfo* list) {
     const RGBA32 infoColor = COLOR_RGBA32_GRAY;
@@ -234,24 +256,18 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
 
     const RegBitsInfo* info = &list[0];
     while ((info != NULL) && (info->type != REG_BITS_TYPE_END)) {
-        //! TODO: This wraps twice (going offscreen) when using REG_BITS_CMD_WRAP().
-        // if (currLine >= (CRASH_SCREEN_NUM_CHARS_Y - 1)) {
-        //     currLine = line;
-        //     x += TEXT_WIDTH(descW + infoW + STRLEN(" "));
-        // }
-
         ScreenCoord_u32 y = TEXT_Y(currLine);
         CSTextCoord_u32 linesPrinted = 1;
         enum RegBitsType type = info->type;
-        _Bool hasInfo = (type != REG_BITS_TYPE_NONE);
         const char* name = info->name;
         if (name != NULL) {
-            // cs_print(x, y, "%s%c", name, (hasInfo ? ':' : ' '));
+            //! TODO: default name if null?
             cs_print(x, y, "%s:", name);
             linesPrinted = gCSNumLinesPrinted;
         }
-        if (hasInfo) {
+        if (type != REG_BITS_TYPE_NONE) {
             ScreenCoord_u32 x2 = (x + TEXT_WIDTH(descW));
+            ScreenCoord_u32 x3 = x2;
             u8 maskSize = info->maskSize;
             Word mask = BITMASK(maskSize);
             u8 shiftSize = info->shiftSize;
@@ -260,7 +276,6 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
             switch (type) {
                 case REG_BITS_TYPE_BIN: // Print as binary (arg = spacing between chars):
                     //! TODO: combine this with cs_print_as_binary:
-                    ScreenCoord_u32 x3 = x2;
                     for (int i = 0; i < maskSize; i++) {
                         char c = (((bits >> ((maskSize - 1) - i)) & 0b1) ? '1' : '0');
                         cs_draw_glyph(x3, y, c, infoColor);
@@ -273,11 +288,11 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
                 case REG_BITS_TYPE_DEC: // Print as decimal:
                     cs_print(x2, y, (STR_COLOR_PREFIX"%0*d"), infoColor, info->numDigits, bits);
                     break;
-                case REG_BITS_TYPE_STR: // Print from string array:
-                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoStrings[info->list][bits]);
-                    break;
                 case REG_BITS_TYPE_BSTR: // Print from string array (inverted boolean):
-                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoStrings[info->list][!bits]);
+                    bits = !bits;
+                    FALL_THROUGH;
+                case REG_BITS_TYPE_STR: // Print from string array:
+                    cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, str_null_fallback(sRegBitsInfoStrings[info->list][bits], "?"));
                     break;
                 case REG_BITS_TYPE_ISTR:; // Print from id/string pair array:
                     const IdNamePairList* list = sRegBitsInfoIdStringPairs[info->iList];
@@ -289,6 +304,15 @@ CSTextCoord_u32 cs_print_reg_info_list(CSTextCoord_u32 line, Word val, const Reg
                     bzero(sRegBitsInfoFuncBuffer, sizeof(sRegBitsInfoFuncBuffer));
                     sRegBitsInfoFuncs[info->func](sRegBitsInfoFuncBuffer, bits);
                     cs_print(x2, y, (STR_COLOR_PREFIX"%s"), infoColor, sRegBitsInfoFuncBuffer);
+                    break;
+                case REG_BITS_TYPE_ADDR: // Print as address:
+                    _Bool isVirtual = info->isVirtual;
+                    Address addr = (bits | (isVirtual << 31));
+                    cs_print(x2, y, (STR_COLOR_PREFIX STR_HEX_WORD), infoColor, addr);
+                    if (isVirtual) {
+                        x3 += TEXT_WIDTH(STRLEN("80XXXXXX "));
+                        cs_print_addr_location_info(x3, y, (((CRASH_SCREEN_W - x3) / TEXT_WIDTH(1)) + 2), addr, TRUE);
+                    }
                     break;
                 case REG_BITS_TYPE_SETX: // Set x position of data:
                     linesPrinted = 0;
@@ -396,6 +420,12 @@ CSTextCoord_u32 cs_popup_reginspect_draw_reg_value(CSTextCoord_u32 line, Registe
     return line;
 }
 
+RegBitsInfo sSingleInfoList[] = {
+    REG_BITS_CMD_SETX(STRLEN("data: ")),
+    REG_BITS_CMD("data", BITMASK(32), 0, 0),
+    REG_BITS_CMD_END(),
+};
+
 void reginspect_draw_contents(RegisterId regId) {
     enum RegisterSources src = regId.src;
     int idx = regId.idx;
@@ -460,9 +490,19 @@ void reginspect_draw_contents(RegisterId regId) {
     for (int i = 0; i < ARRAY_COUNT(sRegInspectExtraInfoFuncs); i++) {
         if ((exInfo->src == src) && (exInfo->idx == idx)) {
             cs_print(TEXT_X(1), TEXT_Y(line++), STR_COLOR_PREFIX"decoded bits:", COLOR_RGBA32_CRASH_PAGE_NAME);
-            cs_print_reg_info_list(line, val32, exInfo->list);
-            hasExInfo = TRUE;
-            sInspectedRegisterPtrAddr = 0x00000000;
+            const RegBitsInfo* list = exInfo->list;
+            RegBitsType singlePrint = exInfo->singlePrint;
+            if (singlePrint != REG_BITS_TYPE_NONE) {
+                sSingleInfoList[1].name = sRegInspectDefaultLinePrints[singlePrint];
+                sSingleInfoList[1].type = singlePrint;
+                sSingleInfoList[1].arg  = exInfo->singlePrintArg;
+                list = sSingleInfoList;
+            }
+            if (list != NULL) {
+                cs_print_reg_info_list(line, val32, list);
+                hasExInfo = TRUE;
+                sInspectedRegisterPtrAddr = 0x00000000;
+            }
             break;
         }
         exInfo++;

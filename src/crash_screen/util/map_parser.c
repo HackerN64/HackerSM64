@@ -258,8 +258,9 @@ const MapSymbol* get_map_symbol(Address addr, SymbolSearchDirections searchDirec
         return NULL;
     }
 
-    Word data = 0x00000000;
-    if (!try_read_word_aligned(&data, addr)) {
+    // Word data = 0x00000000;
+    // if (!try_read_word_aligned(&data, addr)) {
+    if (!is_valid_ram_addr(addr)) {
         return NULL;
     }
 

@@ -101,7 +101,7 @@ const RegBitsInfo regBits_FPR_CSR[] = {
     REG_BITS_CMD_END(),
 };
 
-const RegBitsInfo regBits_SPC_RCP[] = {
+const RegBitsInfo regBits_SPC_RCP[] = { //! TODO: Individual interrupts.
     REG_BITS_CMD_SETX(STRLEN("interrupt mask: ")),
     REG_BITS_CMD_HEX("interrupt mask", (RCP_IMASK >> RCP_IMASKSHIFT), 2),
 
@@ -191,9 +191,27 @@ const RegBitsInfo regBits_VI_CONTROL[] = {
     REG_BITS_CMD_END(),
 };
 
-const RegBitsInfo regBits_AI_CONTROL[] = {
+const RegBitsInfo regBits_VI_BURST[] = {
+    REG_BITS_CMD_SETX(STRLEN("burst start: ")),
+    REG_BITS_CMD_DEC("vsync width", VI_BURST_VSYNC_WIDTH, 1),
+    REG_BITS_CMD_DEC("hsync width", VI_BURST_HSYNC_WIDTH, 1),
+    REG_BITS_CMD_DEC("burst start", VI_BURST_START,       1),
+    REG_BITS_CMD_DEC("burst width", VI_BURST_WIDTH,       1),
+
+    REG_BITS_CMD_END(),
+};
+
+const RegBitsInfo regBits_VI_H_SYNC[] = {
+    REG_BITS_CMD_SETX(STRLEN("h sync: ")),
+    REG_BITS_CMD_BIN("leap",   VI_H_SYNC_LEAP,   1),
+    REG_BITS_CMD_DEC("h sync", VI_H_SYNC_H_SYNC, 1),
+
+    REG_BITS_CMD_END(),
+};
+
+const RegBitsInfo regBits_AI_CONTROL[] = { //! TODO: Should single print be used for this?
     REG_BITS_CMD_SETX(STRLEN("dma: ")),
-    REG_BITS_CMD_STR("dma", AI_CONTROL_DMA_ON, REG_BITS_INFO_STR_ON_OFF),
+    REG_BITS_CMD_STR("dma", AI_CONTROL_DMA_ON, REG_BITS_INFO_STR_ENABLED),
 
     REG_BITS_CMD_END(),
 };
@@ -238,14 +256,39 @@ const RegBitsInfo regBits_RI_CONFIG[] = {
     REG_BITS_CMD_END(),
 };
 
+const RegBitsInfo regBits_RI_SELECT[] = {
+    REG_BITS_CMD_SETX(STRLEN("transmit: ")),
+    REG_BITS_CMD_HEX("transmit", RI_SELECT_TSEL, 1),
+    REG_BITS_CMD_HEX("receive",  RI_SELECT_RSEL, 1),
+
+    REG_BITS_CMD_END(),
+};
+
 const RegBitsInfo regBits_RI_REFRESH[] = {
     REG_BITS_CMD_SETX(STRLEN("dirty refresh delay: ")),
     REG_BITS_CMD_BIN("multibank",           RI_REFRESH_MULTIBANK, 2),
     REG_BITS_CMD_STR("optimize",            RI_REFRESH_OPT,       REG_BITS_INFO_STR_ENABLED),
     REG_BITS_CMD_STR("automatic refresh",   RI_REFRESH_EN,        REG_BITS_INFO_STR_ENABLED),
-    REG_BITS_CMD_DEC("bank",                RI_REFRESH_BANK,      1),
+    REG_BITS_CMD_DEC("bank",                RI_REFRESH_BANK,      1), //! TODO: imem/dmem?
     REG_BITS_CMD_DEC("dirty refresh delay", RI_REFRESH_DIRTY,     3),
     REG_BITS_CMD_DEC("clean refresh delay", RI_REFRESH_CLEAN,     3),
+
+    REG_BITS_CMD_END(),
+};
+
+const RegBitsInfo regBits_RI_RERROR[] = {
+    REG_BITS_CMD_SETX(STRLEN("over range error: ")),
+    REG_BITS_CMD_STR("over range error", RI_ERROR_OVER, REG_BITS_INFO_STR_SET),
+    REG_BITS_CMD_STR("unexpected nack",  RI_ERROR_NACK, REG_BITS_INFO_STR_SET),
+    REG_BITS_CMD_STR("missing ack",      RI_ERROR_ACK,  REG_BITS_INFO_STR_SET),
+
+    REG_BITS_CMD_END(),
+};
+
+const RegBitsInfo regBits_RI_WERROR[] = {
+    REG_BITS_CMD_SETX(STRLEN("dirty bits: ")),
+    REG_BITS_CMD_BIN("dirty bits", RI_BANK_DIRTY, 1),
+    REG_BITS_CMD_BIN("valid bits", RI_BANK_VALID, 1),
 
     REG_BITS_CMD_END(),
 };
@@ -266,7 +309,8 @@ const RegBitsInfo regBits_SI_STATUS[] = {
 typedef struct RegInspectExtraInfo {
     /*0x00*/ const enum RegisterSources src;
     /*0x01*/ const s8 idx;
-    /*0x03*/ const u8 pad[2];
+    /*0x02*/ const RegBitsType singlePrint; // If != 0, then ignore 'list' and print the whole value in a different format.
+    /*0x03*/ const u8 singlePrintArg;
     /*0x04*/ const RegBitsInfo* list;
 } RegInspectExtraInfo; /*0x08*/
 const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
@@ -314,7 +358,7 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     // RDRAM_ROW_REG
 
     // SP_MEM_ADDR_REG
-    // SP_DRAM_ADDR_REG
+    { .src = REGS_SP,    .idx = REGID_SP_DRAM_ADDR,     .singlePrint = REG_BITS_TYPE_ADDR, .singlePrintArg = 1, }, // SP_DRAM_ADDR_REG
     // SP_READ_LENGTH_REG
     // SP_WRITE_LENGTH_REG
     { .src = REGS_SP,    .idx = REGID_SP_STATUS,        .list = regBits_SP_STATUS,    }, // SP_STATUS_REG
@@ -324,9 +368,9 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     // SP_PC_REG
     // SP_IBIST_REG
 
-    // DPC_START_REG
-    // DPC_END_REG
-    // DPC_CURRENT_REG
+    { .src = REGS_DPC,   .idx = REGID_DPC_START,        .singlePrint = REG_BITS_TYPE_ADDR, .singlePrintArg = 1, }, // DPC_START_REG
+    { .src = REGS_DPC,   .idx = REGID_DPC_END,          .singlePrint = REG_BITS_TYPE_ADDR, .singlePrintArg = 1, }, // DPC_END_REG
+    { .src = REGS_DPC,   .idx = REGID_DPC_CURRENT,      .singlePrint = REG_BITS_TYPE_ADDR, .singlePrintArg = 1, }, // DPC_CURRENT_REG
     { .src = REGS_DPC,   .idx = REGID_DPC_STATUS,       .list = regBits_DPC_STATUS,   }, // DPC_STATUS_REG
     // DPC_CLOCK_REG
     // DPC_BUFBUSY_REG
@@ -344,28 +388,30 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     // MI_INTERRUPT_MASK_REG
 
     { .src = REGS_VI,    .idx = REGID_VI_CONTROL,       .list = regBits_VI_CONTROL,   }, // VI_STATUS_REG/VI_CONTROL_REG
-    // VI_ORIGIN_REG/VI_DRAM_ADDR_REG
-    // VI_WIDTH_REG/VI_H_WIDTH_REG
+    { .src = REGS_VI,    .idx = REGID_VI_ORIGIN,        .singlePrint = REG_BITS_TYPE_ADDR, .singlePrintArg = 1, }, // VI_ORIGIN_REG/VI_DRAM_ADDR_REG
+    { .src = REGS_VI,    .idx = REGID_VI_WIDTH,         .singlePrint = REG_BITS_TYPE_DEC,  .singlePrintArg = 1, }, // VI_WIDTH_REG/VI_H_WIDTH_REG
     // VI_INTERRUPT_REG/VI_V_INTERRUPT_REG
     // VI_CURRENT_REG/VI_V_CURRENT_LINE_REG
-    // VI_BURST_REG/VI_TIMING_REG
-    // VI_V_SYNC_REG
-    // VI_H_SYNC_REG
+    { .src = REGS_VI,    .idx = REGID_VI_BURST,         .list = regBits_VI_BURST,     }, // VI_BURST_REG/VI_TIMING_REG
+    { .src = REGS_VI,    .idx = REGID_VI_V_SYNC,        .singlePrint = REG_BITS_TYPE_DEC,  .singlePrintArg = 1, }, // VI_V_SYNC_REG
+    { .src = REGS_VI,    .idx = REGID_VI_H_SYNC,        .list = regBits_VI_H_SYNC,    }, // VI_H_SYNC_REG
     // VI_H_SYNC_LEAP_REG
     // VI_H_START_REG/VI_VIDEO_REG
     // VI_V_START_REG/VI_VIDEO_REG
     // VI_V_BURST_REG
     // VI_X_SCALE_REG
     // VI_Y_SCALE_REG
+    // VI_TEST_ADDR_REG
+    // VI_STAGED_DATA_REG
 
-    // AI_DRAM_ADDR_REG
-    // AI_LENGTH_REG
+    { .src = REGS_AI,    .idx = REGID_AI_DRAM_ADDR,     .singlePrint = REG_BITS_TYPE_ADDR,  .singlePrintArg = 1, }, // AI_DRAM_ADDR_REG
+    { .src = REGS_AI,    .idx = REGID_AI_LEN,           .singlePrint = REG_BITS_TYPE_HEX,   .singlePrintArg = 1, }, // AI_LENGTH_REG
     { .src = REGS_AI,    .idx = REGID_AI_CONTROL,       .list = regBits_AI_CONTROL,   }, // AI_CONTROL_REG
     { .src = REGS_AI,    .idx = REGID_AI_STATUS,        .list = regBits_AI_STATUS,    }, // AI_STATUS_REG
-    // AI_DAC_RATE_REG
-    // AI_BIT_RATE_REG
+    { .src = REGS_AI,    .idx = REGID_AI_DACRATE,       .singlePrint = REG_BITS_TYPE_DEC,   .singlePrintArg = 1, }, // AI_DAC_RATE_REG
+    { .src = REGS_AI,    .idx = REGID_AI_BITRATE,       .singlePrint = REG_BITS_TYPE_DEC,   .singlePrintArg = 1, }, // AI_BIT_RATE_REG
 
-    // PI_DRAM_ADDR_REG
+    { .src = REGS_PI,    .idx = REGID_PI_DRAM_ADDR,     .singlePrint = REG_BITS_TYPE_ADDR,  .singlePrintArg = 1, }, // PI_DRAM_ADDR_REG
     // PI_CART_ADDR_REG
     // PI_READ_LENGTH_REG
     // PI_WRITE_LENGTH_REG
@@ -378,13 +424,13 @@ const RegInspectExtraInfo sRegInspectExtraInfoFuncs[] = {
     { .src = REGS_RI,    .idx = REGID_RI_MODE,          .list = regBits_RI_MODE,      }, // RI_MODE_REG
     { .src = REGS_RI,    .idx = REGID_RI_CONFIG,        .list = regBits_RI_CONFIG,    }, // RI_CONFIG_REG
     // RI_CURRENT_LOAD_REG
-    // RI_SELECT_REG
+    { .src = REGS_RI,    .idx = REGID_RI_SELECT,        .list = regBits_RI_SELECT,    }, // RI_SELECT_REG
     { .src = REGS_RI,    .idx = REGID_RI_REFRESH,       .list = regBits_RI_REFRESH,   }, // RI_REFRESH_REG/RI_COUNT_REG
     // RI_LATENCY_REG
-    // RI_READ_ERROR_REG
-    // RI_WRITE_ERROR_REG
+    { .src = REGS_RI,    .idx = REGID_RI_RERROR,        .list = regBits_RI_RERROR,    }, // RI_READ_ERROR_REG
+    { .src = REGS_RI,    .idx = REGID_RI_WERROR,        .list = regBits_RI_WERROR,    }, // RI_WRITE_ERROR_REG
 
-    // SI_DRAM_ADDR_REG
+    { .src = REGS_SI,    .idx = REGID_SI_DRAM_ADDR,     .singlePrint = REG_BITS_TYPE_ADDR,  .singlePrintArg = 1, }, // SI_DRAM_ADDR_REG
     // SI_PIF_ADDR_READ64B_REG
     // SI_PIF_ADDR_WRITE64B_REG
     { .src = REGS_SI,    .idx = REGID_SI_STATUS,        .list = regBits_SI_STATUS,    }, // SI_STATUS_REG

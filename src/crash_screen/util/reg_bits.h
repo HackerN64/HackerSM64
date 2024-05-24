@@ -769,6 +769,19 @@ typedef union Reg_MI_Mask_read {
 #define VI_CTRL_VBUS_CLOCK_ENABLE   0x00020 //! TODO: Warning to never set this bit.
 #define VI_CTRL_TYPE_MASK           0x00003
 
+// VI_BURST_REG/VI_TIMING_REG
+#define VI_BURST_START              0x3FF00000
+#define VI_BURST_VSYNC_WIDTH        0x000F0000
+#define VI_BURST_WIDTH              0x0000FF00
+#define VI_BURST_HSYNC_WIDTH        0x000000FF
+
+// VI_H_SYNC_REG
+#define VI_H_SYNC_LEAP              0x000F0000
+#define VI_H_SYNC_H_SYNC            0x000007FF
+
+#define VI_TEST_ADDR_REG            (VI_BASE_REG+0x38)
+#define VI_STAGED_DATA_REG          (VI_BASE_REG+0x3C)
+
 // -- AI--
 
 // AI_STATUS_REG
@@ -792,6 +805,10 @@ typedef union Reg_MI_Mask_read {
 // RI_CONFIG_REG
 #define RI_CONFIG_AUTO  0x40
 #define RI_CONFIG_CC    0x3F
+// RI_CURRENT_LOAD_REG (write only)
+// RI_SELECT_REG
+#define RI_SELECT_TSEL  0xF0
+#define RI_SELECT_RSEL  0x0F
 // RI_REFRESH_REG/RI_COUNT_REG
 #define RI_REFRESH_MULTIBANK    0x00780000
 #define RI_REFRESH_OPT          0x00040000
@@ -799,6 +816,13 @@ typedef union Reg_MI_Mask_read {
 #define RI_REFRESH_BANK         0x00010000
 #define RI_REFRESH_DIRTY        0x0000FF00
 #define RI_REFRESH_CLEAN        0x000000FF
+// RI_READ_ERROR_REG/RI_ERROR
+#define RI_ERROR_OVER   0x4
+#define RI_ERROR_NACK   0x2
+#define RI_ERROR_ACK    0x1
+// RI_WRITE_ERROR_REG/RI_BANK_STATUS
+#define RI_BANK_DIRTY   0xFF00
+#define RI_BANK_VALID   0x00FF
 
 // -- SI --
 
@@ -806,3 +830,119 @@ typedef union Reg_MI_Mask_read {
 #define SI_STATUS_DMA_STATE_MASK    0x0F00
 #define SI_STATUS_PCH_STATE_MASK    0x00F0
 #define SI_STATUS_READ_PENDING      0x0004
+
+// -- ED64 v3 --
+// https://n64brew.dev/wiki/EverDrive-64_v3
+//! TODO: Individual bits.
+
+#define ED_BASE_REG         0x08040000
+
+#define ED_CFG_REG          (ED_BASE_REG+0x00) // R W | ED64 general configurations.
+#define ED_STATUS_REG       (ED_BASE_REG+0x04) // R   | ED64 registers, SPI, DMA statuses.
+#define ED_DMA_LEN_REG      (ED_BASE_REG+0x08) //   W | SD/USB DMA length in 512bytes blocks - 1 (ex. 0 = 0x200 bytes).
+#define ED_DMA_RAM_ADDR_REG (ED_BASE_REG+0x0C) //   W | SD/USB Cart address in 2048bytes blocks (ex. 1 = 0x00000800).
+#define ED_MSG_REG          (ED_BASE_REG+0x10) // R W | 16bit general storage? used to remember last used save type by ED64 OS (menu).
+#define ED_DMA_CFG_REG      (ED_BASE_REG+0x14) //   W | Invoke SD/USB DMA.
+#define ED_SPI_REG          (ED_BASE_REG+0x18) // R W | SPI (SD card) DAT/CMD (write invoke CLK).
+#define ED_SPI_CFG_REG      (ED_BASE_REG+0x1C) // R W | SPI (SD card) configurations.
+#define ED_KEY_REG          (ED_BASE_REG+0x20) //   W | Enable or disable ED64 registers.
+#define ED_SAV_CFG_REG      (ED_BASE_REG+0x24) // R W | Save configurations (EEPROM/SRAM/FLASH).
+#define ED_SEC_REG          (ED_BASE_REG+0x28) //  ?  | 
+#define ED_VER_REG          (ED_BASE_REG+0x2C) // R   | Firmware version.
+#define ED_30_REG           (ED_BASE_REG+0x30) // R W | I2C to access RTC.
+#define ED_34_REG           (ED_BASE_REG+0x34) //  ?  | 
+#define ED_38_REG           (ED_BASE_REG+0x38) //  ?  | 
+#define ED_3C_REG           (ED_BASE_REG+0x3C) //  ?  | 
+#define ED_CFG_CNT_REG      (ED_BASE_REG+0x40) // R W | FPGA configuration control.
+#define ED_CFG_DAT_REG      (ED_BASE_REG+0x44) //   W | FPGA configuration data.
+#define ED_MAX_MSG_REG      (ED_BASE_REG+0x48) // R W | Some configurations.
+#define ED_CRC_REG          (ED_BASE_REG+0x4C) //  ?  | 
+#define ED_50_REG           (ED_BASE_REG+0x50) //  ?  | Flash?
+#define ED_54_REG           (ED_BASE_REG+0x54) //  ?  | Flash?
+
+// -- ED64 x7 --
+// https://n64brew.dev/wiki/EverDrive-64_X7
+
+#define EDX_BASE_REG        0x1F800000
+
+#define EDX_BOOT_CFG_REG        (EDX_BASE_REG+0x0010)
+#define EDX_EDID_REG            (EDX_BASE_REG+0x0014)
+
+#define EDX_SYS_CFG_REG         (EDX_BASE_REG+0x8000) // 4 bytes
+#define EDX_KEY_REG             (EDX_BASE_REG+0x8004) // 4 bytes
+#define EDX_DMA_STA_REG         (EDX_BASE_REG+0x8008)
+#define EDX_DMA_ADDR_REG        (EDX_BASE_REG+0x8008)
+#define EDX_DMA_LEN_REG         (EDX_BASE_REG+0x800C)
+#define EDX_SDIO_REG            (EDX_BASE_REG+0x8020)
+#define EDX_SDIO_ARD_REG        (EDX_BASE_REG+0x8200)
+#define EDX_SD_CMD_RD_REG       (EDX_BASE_REG+0x8020)
+#define EDX_SD_CMD_WR_REG       (EDX_BASE_REG+0x8024)
+#define EDX_SD_DAT_RD_REG       (EDX_BASE_REG+0x8028)
+#define EDX_SD_DAT_WR_REG       (EDX_BASE_REG+0x802C)
+#define EDX_SD_STATUS_REG       (EDX_BASE_REG+0x8030)
+
+#define EDX_USB_CFG_REG         (EDX_BASE_REG+0x0004) // 4 bytes
+#define EDX_USB_DATA_REG        (EDX_BASE_REG+0x0400) // 512 bytes
+
+// EDX_USB_CFG_REG
+#define EDX_USB_LE_CFG  0x8000
+#define EDX_USB_LE_CTR  0x4000
+#define EDX_USB_STA_BSY 0x2000
+#define EDX_USB_STA_PWR 0x1000
+#define EDX_USB_STA_TXE 0x0800
+#define EDX_USB_CFG_RD  0x0400
+#define EDX_USB_STA_RXF 0x0400
+#define EDX_USB_CFG_ACT 0x0200
+#define EDX_USB_STA_ACT 0x0200
+#define EDX_BADDR       0x01FF
+typedef union Reg_ED64x_USB_CFG {
+    struct PACKED {
+        u32         : 16;
+        u32 LE_CFG  :  1;
+        u32 LE_CTR  :  1;
+        u32 STA_BSY :  1;
+        u32 STA_PWR :  1;
+        u32 STA_TXE :  1;
+
+        u32 CFG_RD  :  1;
+        u32 CFG_ACT :  1;
+        u32 baddr   :  9;
+    };
+    struct PACKED {
+        u32         : 21;
+        u32 STA_RXF :  1;
+        u32 STA_ACT :  1;
+        u32         :  9;
+    };
+    u32 raw32;
+    u16 raw16;
+} Reg_ED64x_USB_CFG;
+
+
+// -- SC64 --
+// https://github.com/Polprzewodnikowy/SummerCart64/blob/main/docs/01_memory_map.md
+
+#define SC64_BASE_REG       0x1FFF0000
+
+#define SC64_STATUS_REG     (SC64_BASE_REG+0x00) // R W | Command execution and status.
+#define SC64_COMMAND_REG    (SC64_BASE_REG+0x00) // R W | Command execution and status.
+#define SC64_DATA0_REG      (SC64_BASE_REG+0x04) // R W | Command argument/result 0.
+#define SC64_DATA1_REG      (SC64_BASE_REG+0x08) // R W | Command argument/result 1.
+#define SC64_IDENTIFIER_REG (SC64_BASE_REG+0x0C) // R W | Flashcart identifier and IRQ clear.
+#define SC64_KEY_REG        (SC64_BASE_REG+0x10) //   W | SC64 register access lock/unlock
+
+// SC64_STATUS_REG/SC64_COMMAND_REG
+#define SC64_CMD_BUSY       0x80000000 // R   | 1 if dispatched command is pending/executing.
+#define SC64_CMD_ERROR      0x40000000 // R   | 1 if last executed command returned with error code.
+#define SC64_IRQ_PENDING    0x20000000 // R   | 1 if flashcart has raised an interrupt.
+#define SC64_CMD_ID         0x000000FF // R W | Command ID to be executed.
+typedef union Reg_SC64_STATUS_COMMAND {
+    struct PACKED {
+        u32 cmd_busy    :  1; // R   | 1 if dispatched command is pending/executing.
+        u32 cmd_error   :  1; // R   | 1 if last executed command returned with error code.
+        u32 irq_pending :  1; // R   | 1 if flashcart has raised an interrupt.
+        u32             : 21; // N/A | Unused, write 0 for future compatibility.
+        u32 cmd_id      :  8; // R W | Command ID to be executed.
+    };
+    u32 raw;
+} Reg_SC64_STATUS_COMMAND;
