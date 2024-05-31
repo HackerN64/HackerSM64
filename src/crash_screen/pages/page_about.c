@@ -632,9 +632,7 @@ void page_about_input(void) {
 
     update_displayed_about_entries();
 
-    s32 change = 0;
-    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
-    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    s32 change = gCSDirectionFlags.pressed.down - gCSDirectionFlags.pressed.up;
     sAboutSelectedIndex = WRAP(((s32)sAboutSelectedIndex + change), 0, (s32)(sNumCSAboutDisplayedEntries - 1));
 
     sAboutViewportIndex = cs_clamp_view_to_selection(sAboutViewportIndex, sAboutSelectedIndex, ABOUT_PAGE_NUM_SCROLLABLE_ENTRIES, 1);

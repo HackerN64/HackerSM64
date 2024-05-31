@@ -462,12 +462,12 @@ size_t cs_print_symbol_name(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, 
  * @param[in] x,y         The starting position on the screen to print to.
  * @param[in] maxWidth    The maximum number of chars to print.
  * @param[in] addr        The address location.
- * @param[in] sureAddress Whether we are sure that 'addr' is supposed to be a memory address.
+ * @param[in] sureAddress Whether 'addr' is guaranteed to be a memory address.
  * @return size_t The total number of chars printed to the screen.
  */
 size_t cs_print_addr_location_info(ScreenCoord_u32 x, ScreenCoord_u32 y, u32 maxWidth, Address addr, _Bool sureAddress) {
-    if (sureAddress && (addr == 0x00000000)) {
-        return cs_print(x, y, STR_COLOR_PREFIX"NULL", COLOR_RGBA32_GRAY);
+    if (sureAddress && (addr == (Address)NULL)) {
+        return cs_print(x, y, STR_COLOR_PREFIX"NULL", COLOR_RGBA32_VSC_DEFINE);
     }
 
     if (IS_DEBUG_MAP_ENABLED() && cs_get_setting_val(CS_OPT_GROUP_GLOBAL, CS_OPT_GLOBAL_SYMBOL_NAMES)) {

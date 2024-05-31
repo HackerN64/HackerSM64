@@ -276,7 +276,9 @@ TODO: more/update documentation
     - 1 line vs. 2 lines.
     - Ordering?
     - Also register lists for direct access of CPU/CP0(+SPC)/CP1(+FCR) registers.
-- Remove GIO/RDB/GIO_RDB?
+- Remove or combine GIO/RDB/GIO_RDB?
+- Add flashcart registers?
+- Add global CPU/Coprocessor registers?
 - Print PIF ROM/RAM when PI/SI is selected.
 - Combine DPC/DPS into "RCP"?
 - Combine RI into RDRAM?

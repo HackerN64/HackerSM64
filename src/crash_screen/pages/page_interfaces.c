@@ -119,17 +119,13 @@ void page_interfaces_draw(void) {
 }
 
 void page_interfaces_input(void) {
-    s32 change = 0;
-    if (gCSDirectionFlags.pressed.left ) change = -1; // Scroll left.
-    if (gCSDirectionFlags.pressed.right) change = +1; // Scroll right.
+    s32 change = gCSDirectionFlags.pressed.right - gCSDirectionFlags.pressed.left;
     sSelectedInterfaceIndex = WRAP(((s32)sSelectedInterfaceIndex + change), 0, (s32)(NUM_INTERFACES - 1));
 
     _Bool switched = (change != 0);
     const RegisterSource* src = get_interface_src(sSelectedInterfaceIndex);
 
-    change = 0;
-    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
-    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    change = gCSDirectionFlags.pressed.down - gCSDirectionFlags.pressed.up;
     s32 newIndex = (sSelectedRegisterIndex + change);
     s32 endIndex = (src->numRegs - 1);
     if (switched) {

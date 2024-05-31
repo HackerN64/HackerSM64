@@ -227,10 +227,6 @@ static const RangeNamePair sHardcodedSegmentRanges[] = {
 };
 // For stuff that doesn't have a map symbol name.
 const char* get_hardcoded_memory_str(Address addr) {
-    if (addr == (Address)NULL) {
-        return "NULL";
-    }
-
     // Is addr in static surface pool?
     if (
         (addr >= (Address)gCurrStaticSurfacePool) &&

@@ -50,6 +50,7 @@ extern Address gSelectedAddress;
 extern Address gLastCSSelectedAddress;
 
 extern Word gWatchLo;
+extern Word gVIControl;
 
 extern u32 gCountFactor;
 extern u32 gTimingDiv;

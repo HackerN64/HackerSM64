@@ -40,7 +40,8 @@ Address gSetCrashAddress       = 0x00000000; // Used by SET_CRASH_PTR to set the
 Address gSelectedAddress       = 0x00000000; // Selected address for ram viewer and disasm pages.
 Address gLastCSSelectedAddress = 0x00000000; // Used for debugging crash screen crashes.
 
-Word gWatchLo = 0x00000000; // Save $WatchLo on crash.
+Word gWatchLo   = 0x00000000; // Save $WatchLo on crash.
+Word gVIControl = 0x00000000; // Save VI_CONTROL_REG on crash.
 
 u32 gCountFactor = 0; // Count factor.
 u32 gTimingDiv = 1;
@@ -166,7 +167,8 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     // Reinitialize global variables, settings, buffers, etc.
     cs_reinitialize();
 
-    osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 2);
+    // Set the VI blank event.
+    osViSetEvent(&threadInfo->mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
 #ifdef FUNNY_CRASH_SOUND
     //! TODO: This doesn't work anymore for some reason.
@@ -178,6 +180,11 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
     // Only on the first crash:
     if (sFirstCrash) {
         sFirstCrash = FALSE;
+
+        gVIControl = IO_READ(VI_CONTROL_REG);
+        // For a performance boost and also to prevent coverage flickering on ares (divot off):
+        //! TODO: Turning off VI dither filter saves 1-2ms on console but noticably changes how the framebuffer screenshot looks. Should it be left on?
+        osViSetSpecialFeatures(OS_VI_GAMMA_OFF | OS_VI_GAMMA_DITHER_OFF | OS_VI_DIVOT_OFF | OS_VI_DITHER_FILTER_OFF);
 
         // Get count factor, and if CPU is overclocked, divide timers by 2.
         //! TODO: Is there a cleaner way to do this?
@@ -287,6 +294,8 @@ void crash_screen_thread_entry(UNUSED void* arg) {
     while (TRUE) {
         cs_update_input();
         cs_draw_main();
+
+        osWritebackDCacheAll();
     }
 }
 
@@ -331,10 +340,10 @@ void create_crash_screen_thread(void) {
     bzero(threadInfo, sizeof(CSThreadInfo));
     osCreateMesgQueue(&threadInfo->mesgQueue, &threadInfo->mesg, 1);
     osCreateThread(
-        thread, (THREAD_1000_CRASH_SCREEN_0 + threadIndex),
+        thread, (THREAD_1000_CRASH_SCREEN_0 + threadIndex), // Threads 1000,1001,1002.
         crash_screen_thread_entry, NULL,
         ((Byte*)threadInfo->stack + sizeof(threadInfo->stack)), // Pointer to the end of the stack.
-        0
+        0 // Priority (gets changed to appmax-1 when the crash screne opens).
     );
     osStartThread(thread);
 }

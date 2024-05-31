@@ -369,9 +369,8 @@ void page_stack_input(void) {
         open_address_select(sStackTraceBuffer[sStackTraceSelectedIndex].currAddr);
     }
 
-    s32 change = 0;
-    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
-    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    
+    s32 change = gCSDirectionFlags.pressed.down - gCSDirectionFlags.pressed.up;
     sStackTraceSelectedIndex = WRAP(((s32)sStackTraceSelectedIndex + change), 0, (s32)(sStackTraceBufferEnd - 1));
 
     sStackTraceViewportIndex = cs_clamp_view_to_selection(sStackTraceViewportIndex, sStackTraceSelectedIndex, sStackTraceNumShownRows, 1);

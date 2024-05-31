@@ -293,9 +293,7 @@ void page_settings_input(void) {
 
     update_displayed_settings();
 
-    s32 change = 0;
-    if (gCSDirectionFlags.pressed.up  ) change = -1; // Scroll up.
-    if (gCSDirectionFlags.pressed.down) change = +1; // Scroll down.
+    s32 change = gCSDirectionFlags.pressed.down - gCSDirectionFlags.pressed.up;
     sSettingsSelectedIndex = WRAP(((s32)sSettingsSelectedIndex + change), 0, ((s32)sNumDisplayedSettings - 1));
 
     sSettingsViewportIndex = cs_clamp_view_to_selection(sSettingsViewportIndex, sSettingsSelectedIndex, SETTINGS_NUM_ROWS, 1);

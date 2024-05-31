@@ -8,9 +8,9 @@
 #include "macros.h"
 #include "config.h"
 
-#define BIT(i)  ((u64)1 << (i))
-#define BITMASK(size) ((BIT(size)) - 1)
-#define SHIFTED_BITMASK(size, shift) (BITMASK(size) << (shift))
+#define BIT(i)                          (1LL << (i))
+#define BITMASK(size)                   ((BIT(size)) - 1)
+#define SHIFTED_BITMASK(size, shift)    (BITMASK(size) << (shift))
 
 // Signed shift (inverts shift direction if the shift amount is negative).
 #define SSHIFTL(src, shift) (((shift) < 0) ? ((src) >> -(shift)) : ((src) << (shift)))

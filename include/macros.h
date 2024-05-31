@@ -14,12 +14,12 @@
 #define sizeof_member(_T, _m) sizeof(member(_T, _m))
 #define typeof_member(_T, _m) typeof(member(_T, _m))
 
-#define ARRAY_COUNT(_arr) (s32)(sizeof(_arr) / sizeof(_arr[0]))
+#define ARRAY_COUNT(_arr) (ssize_t)(sizeof(_arr) / sizeof(_arr[0])) //! TODO: Use size_t here to match sizeof.
 #define FITS_IN_ARRAY(_x, _arr) (((_x) >= 0) && ((_x) < ARRAY_COUNT(_arr)))
 
 #define BITS_PER_BYTE   __CHAR_BIT__
 #define BITS_PER_HEX    4
-#define SIZEOF_BITS(_t) (sizeof(_t) * BITS_PER_BYTE)
+#define SIZEOF_BITS(_t) (sizeof(_t) * BITS_PER_BYTE) // NOTE: Does not work with sizes that are not multiples of 8 (eg. packed struct bitfields).
 #define SIZEOF_HEX(_t)  (SIZEOF_BITS(_t) / BITS_PER_HEX)
 
 #define GLUE(_a, _b) _a ## _b
@@ -32,6 +32,7 @@
 #define STR_LAST_CHAR(_s)   (_s)[STRLEN(_s) - 1]
 
 // Includes the raw data of the file at 'path' into the rom, aligned by 'align' number of bytes, and creates a pointer to it with the given type and name.
+//! TODO: Non-.rodata versions.
 #define INCBIN(_type, _name, _path, _align) \
     __asm__( \
         ".section \".rodata\", \"a\", @progbits\n" \

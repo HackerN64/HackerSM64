@@ -107,7 +107,7 @@ typedef union RegisterId {
 typedef struct RegisterInfo {
     /*0x00*/ const char* name;
     /*0x04*/ union {
-                const Address addr; // Interface register address. //! TODO: Can this be changed to offset from base address to save 3 bytes? Potential issues: [RDRAM_ROW,SP_PC,SP_IBIST,GIO_SYNC,GIO_CART_INTERRUPT]
+                const Address addr; // Interface register address. //! TODO: Can this be changed to offset from base address to save 2-3 bytes? Potential issues: [RDRAM_ROW,SP_PC,SP_IBIST,GIO_SYNC,GIO_CART_INTERRUPT]
                 struct {
                     struct PACKED {
                         const u8 is64bit : 1; // [0=32bit,1=64bit]. This is ignored for interface registers which are always 32 bit.
