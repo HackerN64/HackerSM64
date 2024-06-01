@@ -38,7 +38,7 @@ ALIGNED8 static const Texture king_bobomb_seg5_texture_eyes[] = {
 
 // 0x05005078 - Unused
 UNUSED ALIGNED8 static const Texture king_bobomb_seg5_texture_eyes_blink[] = {
-#include "actors/king_bobomb/king_bob-omb_eyes_blink.rgba16.inc.c"
+//#include "actors/king_bobomb/king_bob-omb_eyes_blink.rgba16.inc.c"
 };
 
 // 0x05005878
