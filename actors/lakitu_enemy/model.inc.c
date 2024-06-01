@@ -9,7 +9,7 @@
 // Unreferenced texture
 // 0x0500ECE0
 UNUSED ALIGNED8 static const Texture lakitu_enemy_seg5_texture_0500ECE0[] = {
-#include "actors/lakitu_enemy/lakitu_enemy_cloud_face_unused.rgba16.inc.c"
+//#include "actors/lakitu_enemy/lakitu_enemy_cloud_face_unused.rgba16.inc.c"
 };
 
 // 0x0500F4E0
