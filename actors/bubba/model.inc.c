@@ -15,7 +15,7 @@ ALIGNED8 static const Texture bubba_seg5_texture_05000008[] = {
 // unused eye texture, assumed leftover from when actor file was copied from bub
 // 0x05000408
 UNUSED ALIGNED8 static const Texture bubba_seg5_texture_05000408[] = {
-#include "actors/bubba/bubba_eyes_unused.rgba16.inc.c"
+//#include "actors/bubba/bubba_eyes_unused.rgba16.inc.c"
 };
 
 // 0x05001408
