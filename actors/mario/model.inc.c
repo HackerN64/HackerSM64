@@ -55,33 +55,33 @@ ALIGNED8 static const Texture mario_texture_eyes_closed[] = {
 // Unreferenced texture
 // 0x04004890
 UNUSED ALIGNED8 static const Texture mario_texture_eyes_closed_unused1[] = {
-#include "actors/mario/mario_eyes_closed_unused_0.rgba16.inc.c"
+//#include "actors/mario/mario_eyes_closed_unused_0.rgba16.inc.c"
 };
 
 // Unreferenced texture
 // 0x04005090
 UNUSED ALIGNED8 static const Texture mario_texture_eyes_closed_unused2[] = {
-#include "actors/mario/mario_eyes_closed_unused_1.rgba16.inc.c"
+//#include "actors/mario/mario_eyes_closed_unused_1.rgba16.inc.c"
 };
 
 // 0x04005890
 ALIGNED8 static const Texture mario_texture_eyes_right[] = {
-#include "actors/mario/mario_eyes_left_unused.rgba16.inc.c"
+//#include "actors/mario/mario_eyes_left_unused.rgba16.inc.c"
 };
 
 // 0x04006090
 ALIGNED8 static const Texture mario_texture_eyes_left[] = {
-#include "actors/mario/mario_eyes_right_unused.rgba16.inc.c"
+//#include "actors/mario/mario_eyes_right_unused.rgba16.inc.c"
 };
 
 // 0x04006890
 ALIGNED8 static const Texture mario_texture_eyes_up[] = {
-#include "actors/mario/mario_eyes_up_unused.rgba16.inc.c"
+//#include "actors/mario/mario_eyes_up_unused.rgba16.inc.c"
 };
 
 // 0x04007090
 ALIGNED8 static const Texture mario_texture_eyes_down[] = {
-#include "actors/mario/mario_eyes_down_unused.rgba16.inc.c"
+//#include "actors/mario/mario_eyes_down_unused.rgba16.inc.c"
 };
 
 // 0x04007890
