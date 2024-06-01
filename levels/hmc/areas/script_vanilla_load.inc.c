@@ -1,5 +1,5 @@
 LOAD_YAY0(        /*seg*/ 0x07, _hmc_segment_7SegmentRomStart, _hmc_segment_7SegmentRomEnd),
-LOAD_VANILLA_OBJECTS(hmc, cave),
+LOAD_VANILLA_OBJECTS(0, hmc, cave),
 LOAD_YAY0(        /*seg*/ 0x05, _group6_yay0SegmentRomStart, _group6_yay0SegmentRomEnd),
 LOAD_RAW(         /*seg*/ 0x0C, _group6_geoSegmentRomStart, _group6_geoSegmentRomEnd),
 LOAD_YAY0(        /*seg*/ 0x06, _group17_yay0SegmentRomStart, _group17_yay0SegmentRomEnd),

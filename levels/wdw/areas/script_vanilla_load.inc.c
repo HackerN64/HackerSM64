@@ -1,5 +1,5 @@
 LOAD_YAY0(        /*seg*/ 0x07, _wdw_segment_7SegmentRomStart, _wdw_segment_7SegmentRomEnd),
-LOAD_VANILLA_OBJECTS(wdw, grass),
+LOAD_VANILLA_OBJECTS(0, wdw, grass),
 LOAD_YAY0(        /*seg*/ 0x0A, _wdw_skybox_yay0SegmentRomStart, _wdw_skybox_yay0SegmentRomEnd),
 LOAD_YAY0(        /*seg*/ 0x05, _group1_yay0SegmentRomStart, _group1_yay0SegmentRomEnd),
 LOAD_RAW(         /*seg*/ 0x0C, _group1_geoSegmentRomStart,  _group1_geoSegmentRomEnd),
