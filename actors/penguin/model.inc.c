@@ -30,7 +30,7 @@ ALIGNED8 static const Texture penguin_seg5_texture_eye_angry[] = {
 
 // 0x05004DE0
 ALIGNED8 static const Texture penguin_seg5_texture_eye_sad[] = {
-#include "actors/penguin/penguin_eye_angry_unused.rgba16.inc.c"
+//#include "actors/penguin/penguin_eye_angry_unused.rgba16.inc.c"
 };
 
 // 0x050055E0
