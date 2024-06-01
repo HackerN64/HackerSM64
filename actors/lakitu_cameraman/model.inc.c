@@ -2,7 +2,7 @@
 
 // 0x06000000
 UNUSED ALIGNED8 static const Texture lakitu_seg6_texture_06000000[] = {
-#include "actors/lakitu_cameraman/lakitu_cameraman_cloud_face_unused.rgba16.inc.c"
+//#include "actors/lakitu_cameraman/lakitu_cameraman_cloud_face_unused.rgba16.inc.c"
 };
 
 // 0x06000800
