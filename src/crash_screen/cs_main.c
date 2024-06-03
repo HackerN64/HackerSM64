@@ -184,6 +184,7 @@ static void on_crash(struct CSThreadInfo* threadInfo) {
         gVIControl = IO_READ(VI_CONTROL_REG);
         // For a performance boost and also to prevent coverage flickering on ares (divot off):
         //! TODO: Turning off VI dither filter saves 1-2ms on console but noticably changes how the framebuffer screenshot looks. Should it be left on?
+        //! TODO: Show the original value of VI status/control reg on interface registers page?
         osViSetSpecialFeatures(OS_VI_GAMMA_OFF | OS_VI_GAMMA_DITHER_OFF | OS_VI_DIVOT_OFF | OS_VI_DITHER_FILTER_OFF);
 
         // Get count factor, and if CPU is overclocked, divide timers by 2.

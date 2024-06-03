@@ -27,9 +27,9 @@ typedef enum PACKED MIPSParamFmts {
     IFMT_tSCP1, // rt fs[cp1]
     IFMT_tSFCR, // rt fs[fcr]
 
-    IFMT_DS_XX, // fd fs // allflt
-    IFMT_DS_IX, // 
-    IFMT_DS_FX, // 
+    IFMT_DS_XX, // fd fs
+    IFMT_DS_IX, // fd fs
+    IFMT_DS_FX, // fd fs
     IFMT_ST,    // fs ft
     IFMT_DST,   // fd fs ft
 
@@ -444,20 +444,13 @@ typedef enum PseudoInsns {
 
 // Types of instructions.
 // For COPz instructions, equivalent to cop_subtype.
-typedef enum InsnType {
+typedef enum PACKED InsnType {
     INSN_TYPE_COP_FMT = 0b00, // Use 'fmt' as opcode.
     INSN_TYPE_REGIMM  = 0b01, // Use 'regimm' as opcode.
     INSN_TYPE_FUNC    = 0b10, // Use 'func' as opcode.
     INSN_TYPE_UNKNOWN = 0b11, // Unknown.
     INSN_TYPE_OPCODE, // Use 'opcode' as opcode.
 } InsnType;
-
-enum PACKED CacheCache {
-    CACHE_ICACHE, // Instruction cache.
-    CACHE_DCACHE, // Data cache.
-    CACHE_RESV_2,
-    CACHE_RESV_3,
-};
 
 // Instruction data
 //! TODO: Clean this up if it's possible to make the structs not overwrite each other.
@@ -515,6 +508,10 @@ typedef union InsnData {
         /*0x00*/ Word               :  6;
     };
     struct PACKED {
+        Word hi : 16;
+        Word lo : 16;
+    };
+    struct PACKED {
         Word a:6, b:5, c:5, d:5, e:5, f:6;
     } _6_5_5_5_5_6;
     struct PACKED {
@@ -523,9 +520,9 @@ typedef union InsnData {
     } _6_5_5_16;
     Word raw;
 } InsnData; /*0x04*/
-#define SIZEOF_INSNDATA sizeof(InsnData)
+STATIC_ASSERT_STRUCT_SIZE_EQ(InsnData, sizeof(u32));
 
-
+#define COND_MASK(_cond, _size) ((_cond) ? BITMASK(_size) : 0)
 #define INSNDATA_6_5_5_5_5_6(_0, _1, _2, _3, _4, _5) (InsnData){ \
     ._6_5_5_5_5_6 = { \
         .a = _0, \
@@ -536,6 +533,14 @@ typedef union InsnData {
         .f = _5, \
     }, \
 }
+#define INSNMASK_6_5_5_5_5_6(_0, _1, _2, _3, _4, _5) INSNDATA_6_5_5_5_5_6( \
+    COND_MASK(_0,  6), \
+    COND_MASK(_1,  5), \
+    COND_MASK(_2,  5), \
+    COND_MASK(_3,  5), \
+    COND_MASK(_4,  5), \
+    COND_MASK(_5,  6), \
+)
 
 #define INSNDATA_6_5_5_16(_0, _1, _2, _3) (InsnData){ \
     ._6_5_5_16 = { \
@@ -545,7 +550,12 @@ typedef union InsnData {
         .d = _3, \
     }, \
 }
-
+#define INSNMASK_6_5_5_16(_0, _1, _2, _3) INSNDATA_6_5_5_16( \
+    COND_MASK(_0,  6), \
+    COND_MASK(_1,  5), \
+    COND_MASK(_2,  5), \
+    COND_MASK(_3, 16)  \
+)
 
 // All chars that can appear in an instruction name, packed by '_PL()'.
 #define INSN_ALPHABET_STR_0 "\0."
@@ -636,7 +646,7 @@ typedef union InsnTemplate {
     u16 raw16[4];
     u8  raw8[8];
 } InsnTemplate; /*0x08*/
-#define SIZEOF_INSN_TEMPLATE sizeof(InsnTemplate)
+STATIC_ASSERT_STRUCT_SIZE_LE(InsnTemplate, 0x8);
 
 #define INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo) { \
     .opcode  = _opcode,          \
@@ -671,7 +681,7 @@ typedef union InsnParam {
     };
     u8 raw;
 } InsnParam;
-#define SIZEOF_PARAM sizeof(InsnParam)
+STATIC_ASSERT_STRUCT_SIZE_LE(InsnParam, 0x1);
 
 
 #define INSN_OFFSET_FROM_ADDR(_addr, _insnOffset) ((Address)(_addr) + (sizeof(InsnData) * (s16)(_insnOffset)))

@@ -36,6 +36,7 @@ typedef struct MapSymbol {
     /*0x0D*/ uchar type;            // Symbol type.
     /*0x0E*/ uchar errc;            // Error char: 'S' = unknown size.
 } MapSymbol; /*0x10*/
+STATIC_ASSERT_STRUCT_SIZE_EQ(MapSymbol, 0x10);
 
 typedef struct AddressPair {
     /*0x00*/ const Address start;

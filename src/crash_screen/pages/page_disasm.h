@@ -49,6 +49,7 @@ typedef union BranchArrow {
     };
     u32 raw;
 } BranchArrow; /*0x04*/
+STATIC_ASSERT_STRUCT_SIZE_LE(BranchArrow, sizeof(u32));
 
 
 // The size of one instruction in bytes (4).

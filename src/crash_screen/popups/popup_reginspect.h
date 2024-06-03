@@ -77,7 +77,7 @@ typedef struct RegBitsInfo {
                 u8 width;                       // REG_BITS_TYPE_SETW
             };
 } RegBitsInfo; /*0x08*/
-#define SIZEOF_REG_BITS_INFO sizeof(RegBitsInfo)
+STATIC_ASSERT_STRUCT_SIZE_LE(RegBitsInfo, 0x8);
 #define REG_BITS_CMD(_name, _mask, _type, _arg) {   \
     .name      = _name,                             \
     .maskSize  = POPCOUNT(_mask),                   \

@@ -101,7 +101,7 @@ _Bool stacktrace_step(Address** sp, Address** ra, Address addr) {
 
         //! TODO: Use defines/enums for insn check magic values:
         if (
-            (stack_size == 0) &&
+            (stack_size == 0) && // Only use the first instance of stack allocation.
             ((insnHi == 0x27BD) || (insnHi == 0x67BD)) // [addiu/daddiu] $sp, $sp, 0xXXXX
         ) {
             if (imm < 0) {
@@ -176,7 +176,7 @@ _Bool fill_function_stack_trace(void) {
         }
     }
 
-    // Fallback simpler stack trace functionality in case walking the stack fails or the debug map is disabled.
+    // Fallback simpler stack trace functionality in case walking the stack fails or the debug map is not present.
     // Just uses all aligned .text addresses in the stack.
     if (!success) {
         // Align sp to lower 32 of 64:

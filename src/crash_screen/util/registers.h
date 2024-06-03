@@ -102,6 +102,7 @@ typedef union RegisterId {
     }; /*0x04*/
     /*0x04*/ u32 raw;
 } RegisterId; /*0x04*/
+STATIC_ASSERT_STRUCT_SIZE_EQ(RegisterId, sizeof(u32));
 
 //! TODO: Can this be shrunk? Ideally it fits into 8 bytes, but that may not be possible.
 typedef struct RegisterInfo {
@@ -121,6 +122,7 @@ typedef struct RegisterInfo {
     /*0x0A*/ const u8 bitsId; // : 5; //! TODO:
     /*0x0B*/ const u8 pad[1];
 } RegisterInfo; /*0x0C*/
+STATIC_ASSERT_STRUCT_SIZE_LE(RegisterInfo, 0xC);
 
 #define REGINFO_NULL_OFFSET BITMASK(7)
 
@@ -171,6 +173,7 @@ typedef struct RegisterSource {
     /*0x15*/ _Bool hasInfoFunc;
     /*0x16*/ u8 pad[2];
 } RegisterSource; /*0x20*/
+STATIC_ASSERT_STRUCT_SIZE_LE(RegisterInfo, 0x20);
 
 #define DEF_REG_LIST_PROCESSOR_FUNC(_name, _desc, _valFunc, _descList, _infoList, _infoFunc) { \
     .name        = _name,       \

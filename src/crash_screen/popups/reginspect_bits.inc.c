@@ -176,7 +176,7 @@ const RegBitsInfo regBits_DPC_STATUS[] = {
 
 const RegBitsInfo regBits_VI_CONTROL[] = {
     REG_BITS_CMD_SETX(STRLEN("dither filter: ")),
-    REG_BITS_CMD_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ENABLED),
+    REG_BITS_CMD_STR("dither filter", VI_CTRL_DITHER_FILTER_ON,   REG_BITS_INFO_STR_ON_OFF),
     REG_BITS_CMD_BIN("pixel advance", VI_CTRL_PIXEL_ADVANCE_MASK, 1),
     REG_BITS_CMD_STR("kill we",       VI_CTRL_KILL_WE,            REG_BITS_INFO_STR_YES_NO),
     REG_BITS_CMD_STR("aa mode",       VI_CTRL_ANTIALIAS_MASK,     REG_BITS_INFO_STR_VI_AA_MODE),

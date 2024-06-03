@@ -92,6 +92,7 @@ typedef union PrintBuffer {
     }; /*0x04*/
     u32 raw;
 } PrintBuffer; /*0x04*/
+STATIC_ASSERT_STRUCT_SIZE_LE(PrintBuffer, sizeof(u32));
 
 // Input:
 extern _Bool           gCSWordWrap;
