@@ -571,9 +571,13 @@ STATIC_ASSERT_STRUCT_SIZE_EQ(InsnData, sizeof(u32));
         ((_c) >= '0' && (_c) <= '3') \
         ? (((_c) - '0') + STRLEN(INSN_ALPHABET_STR_0)) \
         : ( \
-            (IS_UPPERCASE(_c) || IS_LOWERCASE(_c)) \
+            (IS_UPPERCASE(_c)) \
             ? (((_c) - 'A') + STRLEN(INSN_ALPHABET_STR_0 INSN_ALPHABET_STR_N)) \
-            : 0 \
+            : ( \
+                (IS_LOWERCASE(_c)) \
+                ? (((_c) - 'a') + STRLEN(INSN_ALPHABET_STR_0 INSN_ALPHABET_STR_N)) \
+                : 0 \
+            ) \
         ) \
     ) \
 )
@@ -636,7 +640,7 @@ typedef union InsnTemplate {
             /*02*/ u8 opcode :  6; // Opcode to compare to.
         }; /*0x01*/
         /*0x07*/ struct PACKED {
-            /*00*/ u8 hasFmt  : 1; // Whether the name has a format suffix.
+            /*00*/ u8 suffix  : 1; // Whether the name has a format suffix.
             /*01*/ u8 pseudoC : 7; // enum MIPS_C_Pseudocodes //! TODO:
         };
     };
@@ -648,10 +652,10 @@ typedef union InsnTemplate {
 } InsnTemplate; /*0x08*/
 STATIC_ASSERT_STRUCT_SIZE_LE(InsnTemplate, 0x8);
 
-#define INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo) { \
+#define INSN_DB_IMPL(_opcode, _name, _suffix, _params, _output, _pseudoC, _ex1, _ex2, _exo) { \
     .opcode  = _opcode,          \
     .name    = PACK_STR7(_name), \
-    .hasFmt  = _hasFmt,          \
+    .suffix  = _suffix,          \
     .params  = _params,          \
     .output  = _output,          \
     .pseudoC = _pseudoC,         \
@@ -660,10 +664,10 @@ STATIC_ASSERT_STRUCT_SIZE_LE(InsnTemplate, 0x8);
     .exo     = _exo,             \
 }
 
-#define INSN_DB(_opcode, _name, _hasFmt, _params, _output, _pseudoC) \
-    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, EXR_00, EXR_00, 0b00)
-#define INSN_EX(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo) \
-    INSN_DB_IMPL(_opcode, _name, _hasFmt, _params, _output, _pseudoC, _ex1, _ex2, _exo)
+#define INSN_DB(_opcode, _name, _suffix, _params, _output, _pseudoC) \
+    INSN_DB_IMPL(_opcode, _name, _suffix, _params, _output, _pseudoC, EXR_00, EXR_00, 0b00)
+#define INSN_EX(_opcode, _name, _suffix, _params, _output, _pseudoC, _ex1, _ex2, _exo) \
+    INSN_DB_IMPL(_opcode, _name, _suffix, _params, _output, _pseudoC, _ex1, _ex2, _exo)
 #define INSN_END() {}
 
 

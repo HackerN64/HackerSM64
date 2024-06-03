@@ -96,7 +96,7 @@ _Bool stacktrace_step(Address** sp, Address** ra, Address addr) {
     const size_t numInsnsInFunc = MIN(STACK_TRACE_MAX_INSN_SCAN, (symbol->size / sizeof(InsnData)));
     for (size_t i = 0; i < numInsnsInFunc; i++) {
         InsnData insn = *insnPtr;
-        u16 insnHi = (insn.raw >> 16);
+        u16 insnHi = insn.hi;
         s16 imm = insn.immediate;
 
         //! TODO: Use defines/enums for insn check magic values:
