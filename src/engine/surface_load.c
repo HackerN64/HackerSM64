@@ -88,30 +88,6 @@ static struct Surface *alloc_surface(u32 dynamic) {
 }
 
 /**
- * Iterates through the entire partition, clearing the surfaces.
- */
-static void clear_spatial_partition(SpatialPartitionCell *cells) {
-    register s32 i = sqr(NUM_CELLS);
-
-    while (i--) {
-        (*cells)[SPATIAL_PARTITION_FLOORS] = NULL;
-        (*cells)[SPATIAL_PARTITION_CEILS] = NULL;
-        (*cells)[SPATIAL_PARTITION_WALLS] = NULL;
-        (*cells)[SPATIAL_PARTITION_WATER] = NULL;
-
-        cells++;
-    }
-}
-
-/**
- * Clears the static (level) surface partitions for new use.
- */
-static void clear_static_surfaces(void) {
-    gTotalStaticSurfaceData = 0;
-    clear_spatial_partition(&gStaticSurfacePartition[0][0]);
-}
-
-/**
  * Add a surface to the correct cell list of surfaces.
  * @param dynamic Determines whether the surface is static or dynamic
  * @param cellX The X position of the cell in which the surface resides
@@ -512,7 +488,9 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     sNumCellsUsed = 0;
     sClearAllCells = TRUE;
 
-    clear_static_surfaces();
+    // Clear the static (level) surface partitions for new use.
+    bzero(gStaticSurfacePartition, sizeof(gStaticSurfacePartition));
+    gTotalStaticSurfaceData = 0;
 
     // Initialise a new surface pool for this block of static surface data
     gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
@@ -575,7 +553,7 @@ void clear_dynamic_surfaces(void) {
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
         if (sClearAllCells) {
-            clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
+            bzero(gDynamicSurfacePartition, sizeof(gDynamicSurfacePartition));
         } else {
             for (u32 i = 0; i < sNumCellsUsed; i++) {
                 gDynamicSurfacePartition[sCellsUsed[i].z][sCellsUsed[i].x][sCellsUsed[i].partition] = NULL;
