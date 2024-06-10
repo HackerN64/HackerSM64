@@ -164,6 +164,14 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
 
     struct SurfaceNode *curNode = *list;
 
+    // Check if surface should be placed at the beginning of the list.
+    priority = curNode->surface->upperY * sortDir;
+    if (surfacePriority > priority) {
+        *list = newNode;
+        newNode->next = curNode;
+        return;
+    }
+
     // Loop until we find the appropriate place for the surface in the list.
     while (curNode->next != NULL) {
         priority = curNode->next->surface->upperY * sortDir;
