@@ -131,7 +131,7 @@ void bhv_coin_loop(void) {
         }
     }
 
-    if (o->oVelY < 0) {
+    if (o->oVelY <= 0) {
         cur_obj_become_tangible();
     }
 
