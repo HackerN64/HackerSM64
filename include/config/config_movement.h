@@ -114,6 +114,11 @@
 #define DONT_LEDGE_GRAB_STEEP_SLOPES
 
 /**
+ * Disables bonking on sloped ceilings by separating the handling of ceiling interactions and wall interactions.
+ */
+#define DISABLE_CEILING_BONKS
+
+/**
  * Buffers an A input if you jump off a slope during the landing lag
  */
 // #define SLOPE_BUFFER
@@ -128,7 +133,7 @@
  */
 // #define WATER_PLUNGE_UPWARP
 
-/** 
+/**
  * This bug allows mario to move when initiating a dialog,
  * just as long as mario doesn't enter an action that can
  * be interrupted with text

@@ -214,7 +214,6 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         floorHeight = obj->oFloorHeight;
     } else {
         // The object has no referenced floor, so find a new one.
-        // gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
         floorHeight = find_floor(x, y, z, &floor);
 
         // No shadow if the position is OOB.
