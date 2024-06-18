@@ -201,7 +201,7 @@ void set_play_mode(s16 playMode) {
 }
 
 void warp_special(s32 arg) {
-    sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL;
+    set_play_mode(PLAY_MODE_CHANGE_LEVEL);
     sSpecialWarpDest = arg;
 }
 
@@ -1088,19 +1088,24 @@ s32 play_mode_paused(void) {
             fade_into_special_warp(WARP_SPECIAL_LEVEL_SELECT, 1);
         } else {
 #ifdef DEATH_ON_EXIT_COURSE
-            raise_background_noise(1);
-            gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
-            set_play_mode(PLAY_MODE_NORMAL);
-            level_trigger_warp(gMarioState, WARP_OP_DEATH);
-#else
+            struct ObjectWarpNode *warpNode = area_get_warp_node(WARP_NODE_DEATH);
+            assert(warpNode != NULL, "No death warp node could be found!");
+
+            initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
+                            warpNode->node.destNode, WARP_FLAGS_NONE);
+#else // DEATH_ON_EXIT_COURSE
             initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAG_EXIT_COURSE);
-            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
             gSavedCourseNum = COURSE_NONE;
-#endif
+#endif // DEATH_ON_EXIT_COURSE
+
+            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
+            if (sWarpDest.type != WARP_TYPE_CHANGE_LEVEL) {
+                set_play_mode(PLAY_MODE_CHANGE_AREA);
+            }
         }
 
         gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
-#endif
+#endif // DISABLE_EXIT_COURSE
     }
 
     return FALSE;
