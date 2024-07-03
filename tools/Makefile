@@ -49,7 +49,10 @@ textconv_SOURCES := textconv.c utf8.c hashtable.c
 
 aifc_decode_SOURCES := aifc_decode.c
 
-aiff_extract_codebook_SOURCES := aiff_extract_codebook.c
+aiff_extract_codebook: $(LIBAUDIOFILE)
+aiff_extract_codebook_SOURCES := aiff_extract_codebook.c sdk-tools/tabledesign/codebook.c sdk-tools/tabledesign/estimate.c sdk-tools/tabledesign/print.c sdk-tools/tabledesign/tabledesign.c
+aiff_extract_codebook_CFLAGS  := -DEXTRACT_CODEBOOK -Iaudiofile -Wno-uninitialized
+aiff_extract_codebook_LDFLAGS := -Laudiofile -laudiofile -lstdc++
 
 tabledesign$(EXT): $(LIBAUDIOFILE)
 tabledesign_SOURCES := sdk-tools/tabledesign/codebook.c sdk-tools/tabledesign/estimate.c sdk-tools/tabledesign/print.c sdk-tools/tabledesign/tabledesign.c

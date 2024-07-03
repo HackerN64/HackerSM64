@@ -11,10 +11,18 @@ int print_entry(FILE *out, double *row, int order)
     int overflows;
 
     table = malloc(8 * sizeof(double*));
+    if (table == NULL) {
+        fprintf(stderr, "print_entry: could not allocate memory for table\n");
+        exit(1);
+    }
 
     for (i = 0; i < 8; i++)
     {
         table[i] = malloc(order * sizeof(double));
+        if (table[i] == NULL) {
+            fprintf(stderr, "print_entry: could not allocate memory for table[%d]\n", i);
+            exit(1);
+        }
     }
 
     for (i = 0; i < order; i++)
