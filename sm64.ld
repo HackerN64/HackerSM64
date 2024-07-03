@@ -118,25 +118,6 @@ SECTIONS
 
    . = _buffersSegmentBssEnd;
 
-#ifdef HVQM
-   BEGIN_NOLOAD(hvqmwork)
-   {
-      BUILD_DIR/src/buffers/hvqmwork.o(.bss*);
-   }
-   END_NOLOAD(hvqmwork)
-   BEGIN_NOLOAD(adpcmbuf)
-   {
-      BUILD_DIR/src/buffers/adpcmbuf.o(.bss*);
-   }
-   END_NOLOAD(adpcmbuf)
-   BEGIN_NOLOAD(hvqbuf)
-   {
-      BUILD_DIR/src/buffers/hvqbuf.o(.bss*);
-   }
-   END_NOLOAD(hvqbuf)
-
-   . = _hvqbufSegmentBssEnd;
-#endif
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #ifndef DEBUG_MAP_STACKTRACE
@@ -159,7 +140,6 @@ SECTIONS
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
-      BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
 #ifdef S2DEX_TEXT_ENGINE
@@ -173,7 +153,6 @@ SECTIONS
       */libgcc.a:*.o(.text*);
       */librtc.a:*.o(.text*);
       */libz.a:*.o(.text*);
-      */libhvqm2.a:*.o(.text*);
       lib/rspboot.o(.text*);
 // Primary grucode
 #if (defined(F3DEX_GBI_2))
@@ -184,7 +163,6 @@ SECTIONS
       #error "Invalid microcode selection."
 #endif
       lib/PR/audio/aspMain.o(.text*);
-      lib/PR/hvqm/hvqm2sp1.o(.text*);
       _mainSegmentTextEnd = .;
 
       /* data */
@@ -198,7 +176,6 @@ SECTIONS
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
       */ULTRALIB.a:*.o(.data*);
-      */libhvqm2.a:*.o(.data*);
       */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
 // Primary grucode
@@ -210,7 +187,6 @@ SECTIONS
       #error "Invalid microcode selection."
 #endif
       lib/PR/audio/aspMain.o(.data*);
-      lib/PR/hvqm/hvqm2sp1.o(.data*);
 
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
@@ -227,13 +203,11 @@ SECTIONS
       */librtc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
 
-      lib/PR/hvqm/hvqm2sp1.o(.rodata*);
    }
    END_SEG(main)
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/boot*.o(.*bss*);
-      BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
 #ifdef S2DEX_TEXT_ENGINE
@@ -245,7 +219,6 @@ SECTIONS
       */ULTRALIB.a:*.o(COMMON);
       */ULTRALIB.a:*.o(.scommon);
       */ULTRALIB.a:*.o(.*bss*);
-      */libhvqm2.a:*.o(.bss*);
       */librtc.a:*.o(.bss*);
       */libz.a:*.o(.bss*);
       . = ALIGN(0x8);

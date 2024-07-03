@@ -218,15 +218,6 @@ else
   DEFINES += _FINALROM=1 NDEBUG=1 OVERWRITE_OSPRINT=0
 endif
 
-# HVQM - whether to use HVQM fmv library
-#   1 - includes code in ROM
-#   0 - does not
-HVQM ?= 0
-$(eval $(call validate-option,HVQM,0 1))
-ifeq ($(HVQM),1)
-  DEFINES += HVQM=1
-  SRC_DIRS += src/hvqm
-endif
 
 # LIBPL - whether to include libpl library for interfacing with Parallel Launcher
 # (library will be pulled into repo after building with this enabled for the first time)
@@ -393,7 +384,6 @@ O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
            $(foreach file,$(CPP_FILES),$(BUILD_DIR)/$(file:.cpp=.o)) \
            $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
-           lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
 
 LIBZ_O_FILES := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
@@ -422,7 +412,7 @@ else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
 
-LIBRARIES := nustd hvqm2 z goddard
+LIBRARIES := nustd z goddard
 
 LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 

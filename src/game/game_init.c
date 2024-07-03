@@ -19,9 +19,6 @@
 #include "segment2.h"
 #include "segment_symbols.h"
 #include "rumble_init.h"
-#ifdef HVQM
-#include <hvqm/hvqm.h>
-#endif
 #ifdef SRAM
 #include "sram.h"
 #endif
@@ -742,9 +739,6 @@ void thread5_game_loop(UNUSED void *arg) {
 #if ENABLE_RUMBLE
     create_thread_6();
 #endif
-#ifdef HVQM
-    createHvqmThread();
-#endif
     save_file_load_all();
 #ifdef PUPPYCAM
     puppycam_boot();
@@ -802,12 +796,6 @@ void thread5_game_loop(UNUSED void *arg) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
             print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
-        }
-#endif
-#if 0
-        if (gPlayer1Controller->buttonPressed & L_TRIG) {
-            osStartThread(&hvqmThread);
-            osRecvMesg(&gDmaMesgQueue, NULL, OS_MESG_BLOCK);
         }
 #endif
     }
