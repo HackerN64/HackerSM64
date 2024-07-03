@@ -206,3 +206,21 @@
     #undef BORDER_HEIGHT_EMULATOR
     #define BORDER_HEIGHT_EMULATOR 0
 #endif // !TARGET_N64
+
+/*****************
+ * config_rom.h
+ */
+
+#ifdef F3DEX_VERSION
+    #if F3DEX_VERSION == 1
+        #define F3DEX_GBI
+    #elif F3DEX_VERSION == 2
+        #define F3DEX_GBI_2
+    #elif F3DEX_VERSION == 3 || F3DEX_VERSION == 4
+        #define F3DEX_GBI_3
+    #else
+        #error "Invalid microcode selection. Valid options are 1-4 inclusive."
+    #endif
+#else
+    #error "F3DEX_VERSION is not defined in config/config_graphics.h"
+#endif
