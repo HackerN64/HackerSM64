@@ -560,10 +560,6 @@ endef
 all: $(ROM)
 	@$(SHA1SUM) $(ROM)
 	@$(PRINT) "${BLINK}Build succeeded.\n$(NO_COL)"
-	@$(PRINT) "==== Build Options ====$(NO_COL)\n"
-	@$(PRINT) "${GREEN}Version:        $(BLUE)$(VERSION)$(NO_COL)\n"
-	@$(PRINT) "${GREEN}Microcode:      $(BLUE)$(GRUCODE)$(NO_COL)\n"
-	@$(PRINT) "${GREEN}Console:        $(BLUE)$(CONSOLE)$(NO_COL)\n"
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
