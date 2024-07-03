@@ -153,9 +153,9 @@ SECTIONS
       lib/rspboot.o(.text*);
 // Primary grucode
 #if (defined(F3DEX_GBI_2))
-      lib/PR/f3dzex2/gspF3DZEX2_NoN.fifo.o(.text*)
+      lib/PR/f3dzex2/gspF3DZEX2.NoN.fifo.o(.text*)
 #elif (defined(F3DEX_GBI))
-      lib/PR/f3dex/gspF3DEX_NoN.fifo.o(.text*);
+      lib/PR/f3dex/gspF3DEX.NoN.fifo.o(.text*);
 #else
       #error "Invalid microcode selection."
 #endif
@@ -174,9 +174,9 @@ SECTIONS
       */libz.a:*.o(.data*);
 // Primary grucode
 #if (defined(F3DEX_GBI_2))
-      lib/PR/f3dzex2/gspF3DZEX2_NoN.fifo.o(.data*)
+      lib/PR/f3dzex2/gspF3DZEX2.NoN.fifo.o(.data*)
 #elif (defined(F3DEX_GBI))
-      lib/PR/f3dex/fifo/gspF3DEX_NoN.fifo.o(.data*);
+      lib/PR/f3dex/gspF3DEX.NoN.fifo.o(.data*);
 #else
       #error "Invalid microcode selection."
 #endif
