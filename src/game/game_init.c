@@ -139,16 +139,6 @@ const Gfx init_rsp[] = {
     gsSPEndDisplayList(),
 };
 
-#ifdef S2DEX_TEXT_ENGINE
-void my_rdp_init(void) {
-    gSPDisplayList(gDisplayListHead++, init_rdp);
-}
-
-void my_rsp_init(void) {
-    gSPDisplayList(gDisplayListHead++, init_rsp);
-}
-#endif
-
 /**
  * Initialize the z buffer for the current frame.
  */

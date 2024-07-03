@@ -94,17 +94,6 @@ DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
 TARGET := sm64
 
-# TEXT ENGINES
-#   s2dex_text_engine - Text Engine by someone2639
-TEXT_ENGINE := none
-$(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
-
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  SRC_DIRS += src/s2d_engine
-endif
-# add more text engines here
-
 #==============================================================================#
 # Optimization flags                                                           #
 #==============================================================================#
