@@ -164,7 +164,7 @@
  *                                           Read F3DEX3 README for more information.
  */
 
-#define F3DEX_VERSION 4
+#define F3DEX_VERSION 2
 
 /**
  * Enables usage of the line microcode. It can be loaded with gSPLoadUcode within a display list.
