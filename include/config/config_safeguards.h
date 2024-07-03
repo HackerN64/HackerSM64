@@ -224,3 +224,10 @@
 #else
     #error "F3DEX_VERSION is not defined in config/config_graphics.h"
 #endif
+
+#ifdef ENABLE_LINE_UCODE
+    #if F3DEX_VERSION > 2
+        #undef ENABLE_LINE_UCODE
+        #warning "F3DEX3 does not support ENABLE_LINE_UCODE, so it will be disabled."
+    #endif
+#endif

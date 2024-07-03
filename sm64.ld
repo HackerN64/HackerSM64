@@ -151,14 +151,35 @@ SECTIONS
       */librtc.a:*.o(.text*);
       */libz.a:*.o(.text*);
       lib/rspboot.o(.text*);
+
 // Primary grucode
-#if (defined(F3DEX_GBI_2))
+
+#if (defined(F3DEX_GBI_3))
+   #if F3DEX_VERSION == 3
+      lib/PR/f3dex3/gspF3DEX3.fifo.o(.text*);
+   #elif F3DEX_VERSION == 4
+      lib/PR/f3dex3/gspF3DEX3.LVP.fifo.o(.text*);
+   #else
+      #error "Invalid F3DEX3 selection."
+   #endif
+#elif (defined(F3DEX_GBI_2))
       lib/PR/f3dzex2/gspF3DZEX2.NoN.fifo.o(.text*)
 #elif (defined(F3DEX_GBI))
       lib/PR/f3dex/gspF3DEX.NoN.fifo.o(.text*);
 #else
       #error "Invalid microcode selection."
 #endif
+
+// Optional line microcode
+
+#ifdef ENABLE_LINE_UCODE
+   #if (defined(F3DEX_GBI_2))
+         lib/PR/f3dzex2/gspL3DZEX2.fifo.o(.text*)
+   #elif (defined(F3DEX_GBI))
+         lib/PR/f3dex/gspL3DEX.fifo.o(.text*)
+   #endif
+#endif
+
       lib/PR/audio/aspMain.o(.text*);
       _mainSegmentTextEnd = .;
 
@@ -172,14 +193,35 @@ SECTIONS
       */ULTRALIB.a:*.o(.data*);
       */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
+
 // Primary grucode
-#if (defined(F3DEX_GBI_2))
+
+#if (defined(F3DEX_GBI_3))
+   #if F3DEX_VERSION == 3
+      lib/PR/f3dex3/gspF3DEX3.fifo.o(.data*);
+   #elif F3DEX_VERSION == 4
+      lib/PR/f3dex3/gspF3DEX3.LVP.fifo.o(.data*);
+   #else
+      #error "Invalid F3DEX3 selection."
+   #endif
+#elif (defined(F3DEX_GBI_2))
       lib/PR/f3dzex2/gspF3DZEX2.NoN.fifo.o(.data*)
 #elif (defined(F3DEX_GBI))
       lib/PR/f3dex/gspF3DEX.NoN.fifo.o(.data*);
 #else
       #error "Invalid microcode selection."
 #endif
+
+// Optional line microcode
+
+#ifdef ENABLE_LINE_UCODE
+   #if (defined(F3DEX_GBI_2))
+         lib/PR/f3dzex2/gspL3DZEX2.fifo.o(.data*)
+   #elif (defined(F3DEX_GBI))
+         lib/PR/f3dex/gspL3DEX.fifo.o(.data*)
+   #endif
+#endif
+
       lib/PR/audio/aspMain.o(.data*);
 
       /* rodata */
