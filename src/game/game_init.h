@@ -13,6 +13,12 @@
 #define MARIO_ANIMS_POOL_SIZE 0x4000
 #define DEMO_INPUTS_POOL_SIZE 0x800
 
+#define GRUCODE_TASK(grucode) \
+    gGfxSPTask->task.t.ucode            = gsp##grucode##_fifoTextStart; \
+    gGfxSPTask->task.t.ucode_data       = gsp##grucode##_fifoDataStart; \
+    gGfxSPTask->task.t.ucode_size       = ((u8 *) gsp##grucode##_fifoTextEnd - (u8 *) gsp##grucode##_fifoTextStart); \
+    gGfxSPTask->task.t.ucode_data_size 	= ((u8 *) gsp##grucode##_fifoDataEnd - (u8 *) gsp##grucode##_fifoDataStart); \
+
 struct GfxPool {
     Gfx buffer[GFX_POOL_SIZE];
     struct SPTask spTask;

@@ -287,23 +287,15 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
 
 #if defined(F3DEX_GBI_3)
-    gGfxSPTask->task.t.ucode = gspF3DEX3_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data = gspF3DEX3_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX3_fifoTextEnd - (u8 *) gspF3DEX3_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX3_fifoDataEnd - (u8 *) gspF3DEX3_fifoDataStart);
+    GRUCODE_TASK(F3DEX3);
 #elif defined(F3DEX_GBI_2)
-    gGfxSPTask->task.t.ucode = gspF3DZEX2_NoN_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data = gspF3DZEX2_NoN_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DZEX2_NoN_fifoTextEnd - (u8 *) gspF3DZEX2_NoN_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_NoN_fifoDataEnd - (u8 *) gspF3DZEX2_NoN_fifoDataStart);
+    GRUCODE_TASK(F3DZEX2_NoN)
 #elif defined(F3DEX_GBI)
-    gGfxSPTask->task.t.ucode = gspF3DEX_NoN_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data = gspF3DEX_NoN_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX_NoN_fifoTextEnd - (u8 *) gspF3DEX_NoN_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX_NoN_fifoDataEnd - (u8 *) gspF3DEX_NoN_fifoDataStart);
+    GRUCODE_TASK(F3DEX_NoN);
 #else
     #error "Invalid microcode selected."
 #endif
+
     gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;
     gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
     gGfxSPTask->task.t.output_buff = gGfxSPTaskOutputBuffer;
