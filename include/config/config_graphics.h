@@ -152,3 +152,14 @@
  * Only use this if you can test the difference of your hack with and without this change on console.
  */
 // #define USE_FRUSTRATIO2
+
+/**
+ * Primary graphics microcode selection
+ * Define one of the following to select the primary graphics microcode:
+ * F3DEX_GBI   - F3DEX. Worse console performance for improved Z-buffer precision.
+ * F3DEX_GBI_2 - F3DZEX2 (Majora's Mask version). HLE emulator compatible, good console performance.
+ * F3DEX_GBI_3 - F3DEX3 by Sauraen. Define as 1 for standard F3DEX3, 
+ *               define as 2 for legacy vertex pipeline (LVP) version instead.
+ */
+
+#define F3DEX_GBI_2 1

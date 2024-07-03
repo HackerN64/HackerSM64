@@ -232,7 +232,7 @@ typedef	struct	{
  *	GBI Commands for S2DEX microcode
  *===========================================================================*/
 /* GBI Header */
-#ifdef	F3DEX_GBI_2
+#if (defined(F3DEX_GBI_2)||defined(F3DEX_GBI_3))
 #define	G_OBJ_RECTANGLE_R	0xda
 #define	G_OBJ_MOVEMEM		0xdc
 #define	G_RDPHALF_0		0xe4
@@ -374,7 +374,7 @@ extern	u64	gspS2DEX2_xbusTextStart[], gspS2DEX2_xbusTextEnd[];
 extern	u64	gspS2DEX2_xbusDataStart[], gspS2DEX2_xbusDataEnd[];
 extern	void	guS2DInitBg(uObjBg *bg);
 
-#ifdef	F3DEX_GBI_2
+#if (defined(F3DEX_GBI_2)||defined(F3DEX_GBI_3))
 # define guS2DEmuBgRect1Cyc	guS2D2EmuBgRect1Cyc	/*Wrapper*/
 # define guS2DEmuSetScissor	guS2D2EmuSetScissor	/*Wrapper*/
   extern void	guS2D2EmuSetScissor(u32 ulx, u32 uly, u32 lrx, u32 lry, u8 bilerp);

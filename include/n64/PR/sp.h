@@ -158,7 +158,7 @@ typedef struct sprite Sprite;
 /*
  * Function wrapper
  */
-#if	defined(F3DEX_GBI_2)
+#if	(defined(F3DEX_GBI_2)||defined(F3DEX_GBI_3))
 #define	spMove			spX2Move
 #define	spSetZ			spX2SetZ
 #define	spScissor		spX2Scissor

@@ -3,7 +3,9 @@ OUTPUT_ARCH (mips)
 #define LINKER /* Removes externs from preprocessed script */
 #define TARGET_N64
 #include "segments.h"
+
 #include "config.h"
+
 #undef LINKER
 
 #define BEGIN_SEG(name, addr) \
@@ -173,7 +175,14 @@ SECTIONS
       */libz.a:*.o(.text*);
       */libhvqm2.a:*.o(.text*);
       lib/rspboot.o(.text*);
-#include "rsptext.inc.ld"
+// Primary grucode
+#if (defined(F3DEX_GBI_2))
+      lib/PR/f3dzex/fifo/F3DZEX_NoN.o(.text*)
+#elif (defined(F3DEX_GBI))
+      lib/PR/f3dex/fifo/gspF3DEX_NoN.fifo.o(.text*);
+#else
+      #error "Invalid microcode selection."
+#endif
       BUILD_DIR/lib/aspMain.o(.text*);
       lib/PR/audio/n_aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text*);
@@ -193,7 +202,14 @@ SECTIONS
       */libhvqm2.a:*.o(.data*);
       */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
-#include "rspdata.inc.ld"
+// Primary grucode
+#if (defined(F3DEX_GBI_2))
+      lib/PR/f3dzex/fifo/F3DZEX_NoN.o(.data*)
+#elif (defined(F3DEX_GBI))
+      lib/PR/f3dex/fifo/gspF3DEX_NoN.fifo.o(.data*);
+#else
+      #error "Invalid microcode selection."
+#endif
       BUILD_DIR/lib/aspMain.o(.data*);
       lib/PR/audio/n_aspMain.o(.data*);
       lib/PR/hvqm/hvqm2sp1.o(.data*);
