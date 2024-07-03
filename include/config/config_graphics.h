@@ -155,10 +155,10 @@
 
 /**
  * Primary graphics microcode selection
- * Define one of the following to select the primary graphics microcode:
- * 1 - F3DEX   - F3DEX. Worse console performance for improved Z-buffer precision.
- * 2 - F3DZEX2 - F3DZEX2 (Majora's Mask version). HLE emulator compatible, good console performance.
- * 3 - F3DEX3  - F3DEX3 by Sauraen. Better console performance in most situations. 
+ * Define F3DEX_VERSION as one of the following to select the primary graphics microcode:
+ * 1 - F3DEX   - Worse console performance for improved Z-buffer precision.
+ * 2 - F3DZEX2 - (Majora's Mask version). HLE emulator compatible, good console performance.
+ * 3 - F3DEX3  - Created by Sauraen. Better console performance in most situations. 
  * 4 - F3DEX3 LVP (legacy vertex pipeline) - F3DEX3 with legacy vertex pipeline.
  *                                           Lowers RSP processing time at the cost of new features.
  *                                           Read F3DEX3 README for more information.
