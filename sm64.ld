@@ -177,14 +177,13 @@ SECTIONS
       lib/rspboot.o(.text*);
 // Primary grucode
 #if (defined(F3DEX_GBI_2))
-      lib/PR/f3dzex/fifo/F3DZEX_NoN.o(.text*)
+      lib/PR/f3dzex2/gspF3DZEX2_NoN.fifo.o(.text*)
 #elif (defined(F3DEX_GBI))
-      lib/PR/f3dex/fifo/gspF3DEX_NoN.fifo.o(.text*);
+      lib/PR/f3dex/gspF3DEX_NoN.fifo.o(.text*);
 #else
       #error "Invalid microcode selection."
 #endif
-      BUILD_DIR/lib/aspMain.o(.text*);
-      lib/PR/audio/n_aspMain.o(.text*);
+      lib/PR/audio/aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text*);
       _mainSegmentTextEnd = .;
 
@@ -204,14 +203,13 @@ SECTIONS
       */libz.a:*.o(.data*);
 // Primary grucode
 #if (defined(F3DEX_GBI_2))
-      lib/PR/f3dzex/fifo/F3DZEX_NoN.o(.data*)
+      lib/PR/f3dzex2/gspF3DZEX2_NoN.fifo.o(.data*)
 #elif (defined(F3DEX_GBI))
       lib/PR/f3dex/fifo/gspF3DEX_NoN.fifo.o(.data*);
 #else
       #error "Invalid microcode selection."
 #endif
-      BUILD_DIR/lib/aspMain.o(.data*);
-      lib/PR/audio/n_aspMain.o(.data*);
+      lib/PR/audio/aspMain.o(.data*);
       lib/PR/hvqm/hvqm2sp1.o(.data*);
 
       /* rodata */
