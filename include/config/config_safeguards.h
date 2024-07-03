@@ -208,7 +208,7 @@
 #endif // !TARGET_N64
 
 /*****************
- * config_rom.h
+ * config_graphics.h
  */
 
 #ifdef F3DEX_VERSION
