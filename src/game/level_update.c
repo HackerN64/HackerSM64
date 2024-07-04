@@ -31,6 +31,7 @@
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "level_commands.h"
+#include "debug.h"
 
 #include "config.h"
 
@@ -200,7 +201,7 @@ void set_play_mode(s16 playMode) {
 }
 
 void warp_special(s32 arg) {
-    sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL;
+    set_play_mode(PLAY_MODE_CHANGE_LEVEL);
     sSpecialWarpDest = arg;
 }
 
@@ -348,16 +349,24 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
 }
 
 void init_mario_after_warp(void) {
-    struct ObjectWarpNode *spawnNode = area_get_warp_node(sWarpDest.nodeId);
-    u32 marioSpawnType = get_mario_spawn_type(spawnNode->object);
+    struct Object *object = get_destination_warp_object(sWarpDest.nodeId);
+
+#ifdef DEBUG_ASSERTIONS
+    if (!object) {
+        char errorMsg[40];
+        sprintf(errorMsg, "No dest warp object found for: 0x%02X", sWarpDest.nodeId);
+        error(errorMsg);
+    }
+#endif
+    u32 marioSpawnType = get_mario_spawn_type(object);
 
     if (gMarioState->action != ACT_UNINITIALIZED) {
-        gPlayerSpawnInfos[0].startPos[0] = (s16) spawnNode->object->oPosX;
-        gPlayerSpawnInfos[0].startPos[1] = (s16) spawnNode->object->oPosY;
-        gPlayerSpawnInfos[0].startPos[2] = (s16) spawnNode->object->oPosZ;
+        gPlayerSpawnInfos[0].startPos[0] = (s16) object->oPosX;
+        gPlayerSpawnInfos[0].startPos[1] = (s16) object->oPosY;
+        gPlayerSpawnInfos[0].startPos[2] = (s16) object->oPosZ;
 
         gPlayerSpawnInfos[0].startAngle[0] = 0;
-        gPlayerSpawnInfos[0].startAngle[1] = spawnNode->object->oMoveAngleYaw;
+        gPlayerSpawnInfos[0].startAngle[1] = object->oMoveAngleYaw;
         gPlayerSpawnInfos[0].startAngle[2] = 0;
 
         if (marioSpawnType == MARIO_SPAWN_DOOR_WARP) {
@@ -372,8 +381,8 @@ void init_mario_after_warp(void) {
         init_mario();
         set_mario_initial_action(gMarioState, marioSpawnType, sWarpDest.arg);
 
-        gMarioState->interactObj = spawnNode->object;
-        gMarioState->usedObj = spawnNode->object;
+        gMarioState->interactObj = object;
+        gMarioState->usedObj = object;
     }
 
     reset_camera(gCurrentArea->camera);
@@ -569,6 +578,15 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
+
+#ifdef DEBUG_ASSERTIONS
+    if (!warpNode) {
+        char errorMsg[40];
+        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) arg);
+        error(errorMsg);
+    }
+#endif
+
     s16 levelNum = warpNode->node.destLevel & 0x7F;
 
     s16 destArea = warpNode->node.destArea;
@@ -896,6 +914,14 @@ void initiate_delayed_warp(void) {
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
 
+#ifdef DEBUG_ASSERTIONS
+                    if (!warpNode) {
+                        char errorMsg[40];
+                        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) sSourceWarpNodeId);
+                        error(errorMsg);
+                    }
+#endif
+
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);
 
@@ -1062,19 +1088,24 @@ s32 play_mode_paused(void) {
             fade_into_special_warp(WARP_SPECIAL_LEVEL_SELECT, 1);
         } else {
 #ifdef DEATH_ON_EXIT_COURSE
-            raise_background_noise(1);
-            gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
-            set_play_mode(PLAY_MODE_NORMAL);
-            level_trigger_warp(gMarioState, WARP_OP_DEATH);
-#else
+            struct ObjectWarpNode *warpNode = area_get_warp_node(WARP_NODE_DEATH);
+            assert(warpNode != NULL, "No death warp node could be found!");
+
+            initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
+                            warpNode->node.destNode, WARP_FLAGS_NONE);
+#else // DEATH_ON_EXIT_COURSE
             initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAG_EXIT_COURSE);
-            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
             gSavedCourseNum = COURSE_NONE;
-#endif
+#endif // DEATH_ON_EXIT_COURSE
+
+            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
+            if (sWarpDest.type != WARP_TYPE_CHANGE_LEVEL) {
+                set_play_mode(PLAY_MODE_CHANGE_AREA);
+            }
         }
 
         gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
-#endif
+#endif // DISABLE_EXIT_COURSE
     }
 
     return FALSE;

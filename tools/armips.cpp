@@ -15496,7 +15496,7 @@ int64_t fileSize(const std::wstring& fileName)
 {
 #ifdef _WIN32
 	WIN32_FILE_ATTRIBUTE_DATA attr;
-	if (!GetFileAttributesEx(fileName.c_str(),GetFileExInfoStandard,&attr)
+	if (!GetFileAttributesExW(fileName.c_str(),GetFileExInfoStandard,&attr)
 		|| (attr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		return 0;
 	return ((int64_t) attr.nFileSizeHigh << 32) | (int64_t) attr.nFileSizeLow;
@@ -15514,10 +15514,10 @@ bool fileExists(const std::wstring& strFilename)
 {
 #ifdef _WIN32
 #ifdef ARMIPS_WINDOWS_UWP
-	return GetFileAttributes(strFilename.c_str()) != INVALID_FILE_ATTRIBUTES;
+	return GetFileAttributesW(strFilename.c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
 	int OldMode = SetErrorMode(SEM_FAILCRITICALERRORS);
-	bool success = GetFileAttributes(strFilename.c_str()) != INVALID_FILE_ATTRIBUTES;
+	bool success = GetFileAttributesW(strFilename.c_str()) != INVALID_FILE_ATTRIBUTES;
 	SetErrorMode(OldMode);
 	return success;
 #endif
@@ -19877,8 +19877,6 @@ int wmain(int argc, wchar_t* argv[])
 	return runFromCommandLine(arguments);
 }
 
-#ifndef _WIN32
-
 int main(int argc, char* argv[])
 {
 	// convert input to wstring
@@ -19901,6 +19899,3 @@ int main(int argc, char* argv[])
 	delete[] wargv;
 	return result;
 }
-
-#endif
-
