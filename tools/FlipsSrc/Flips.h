@@ -109,30 +109,6 @@ public:
 #define flipsversion "Floating IPS"
 
 
-#if defined(FLIPS_WINDOWS)
-#define UNICODE
-#define _WIN32_WINNT 0x0501
-#define _WIN32_IE 0x0600
-
-#define NOMINMAX // this seems automatically on in C++ - crazy.
-#ifdef __MINGW32__
-#include <stdlib.h>
-#undef __USE_MINGW_ANSI_STDIO // must remove this, to avoid a libgcc_s_sjlj-1.dll dependency on 32bit
-#endif                        // comments say libstdc++ demands a POSIX printf, but I'm not using that, so I don't care
-#include <windows.h>
-#include <windowsx.h>
-#include <shlobj.h>
-#include <wchar.h>
-#include <stdio.h>
-#include <commctrl.h>
-#include <ctype.h>
-
-#define wcsicmp _wcsicmp // wcsicmp deprecated? okay, have a define
-#define wcsdup _wcsdup
-#define wtoi _wtoi
-
-
-#else
 #include <string.h>
 #include <strings.h>
 #include <stdlib.h>
@@ -190,7 +166,6 @@ static inline char* strdup(const char * in)
 	memcpy(ret, in, len+1);
 	return ret;
 }
-#endif
 
 
 #ifndef __cplusplus
@@ -341,11 +316,7 @@ void bpsdeltaEnd();
 int GUIShow(LPCWSTR filename);
 void GUILoadConfig();
 //LPCWSTR GUIGetFileFor(uint32_t crc32); // use FindRomForPatch instead
-#ifdef FLIPS_WINDOWS
-void GUIClaimConsole();
-#else
-#define GUIClaimConsole() // all other platforms have consoles already
-#endif
+#define GUIClaimConsole()
 
 //the OS port is responsible for main()
 //Module name: crc32

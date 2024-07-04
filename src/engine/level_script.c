@@ -524,8 +524,6 @@ static void level_cmd_create_warp_node(void) {
         warpNode->node.destArea = CMD_GET(u8, 4);
         warpNode->node.destNode = CMD_GET(u8, 5);
 
-        warpNode->object = NULL;
-
         warpNode->next = gAreas[sCurrAreaIndex].warpNodes;
         gAreas[sCurrAreaIndex].warpNodes = warpNode;
     }

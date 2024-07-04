@@ -21,6 +21,7 @@
 #define SCALE_3_8(VAL_) ((VAL_) * 0x24)
 #define SCALE_8_3(VAL_) ((VAL_) / 0x24)
 
+#define bcopy(s1, s2, n) memcpy((s2), (s1), (n))
 
 typedef struct
 {

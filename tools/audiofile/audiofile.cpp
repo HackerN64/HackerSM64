@@ -3552,6 +3552,17 @@ struct IntTypes<kInt24> { typedef int32_t SignedType; typedef uint32_t UnsignedT
 template <>
 struct IntTypes<kInt32> { typedef int32_t SignedType; typedef uint32_t UnsignedType; };
 
+namespace compat
+{
+	template<typename Arg, typename R>
+	class unary_function
+	{
+	public:
+		using argument_type = Arg;
+		using result_type = R;
+	};
+}
+
 template <FormatCode Format>
 struct signConverter
 {
@@ -3562,12 +3573,12 @@ struct signConverter
 	static const int kMaxSignedValue = (((1 << (kScaleBits - 1)) - 1) << 1) + 1;
 	static const int kMinSignedValue = -kMaxSignedValue - 1;
 
-	struct signedToUnsigned : public std::unary_function<SignedType, UnsignedType>
+	struct signedToUnsigned : public compat::unary_function<SignedType, UnsignedType>
 	{
 		UnsignedType operator()(SignedType x) { return x - kMinSignedValue; }
 	};
 
-	struct unsignedToSigned : public std::unary_function<SignedType, UnsignedType>
+	struct unsignedToSigned : public compat::unary_function<SignedType, UnsignedType>
 	{
 		SignedType operator()(UnsignedType x) { return x + kMinSignedValue; }
 	};
@@ -3760,7 +3771,7 @@ private:
 };
 
 template <typename Arg, typename Result>
-struct intToFloat : public std::unary_function<Arg, Result>
+struct intToFloat : public compat::unary_function<Arg, Result>
 {
 	Result operator()(Arg x) const { return x; }
 };
@@ -3826,13 +3837,13 @@ private:
 };
 
 template <typename Arg, typename Result, unsigned shift>
-struct lshift : public std::unary_function<Arg, Result>
+struct lshift : public compat::unary_function<Arg, Result>
 {
 	Result operator()(const Arg &x) const { return x << shift; }
 };
 
 template <typename Arg, typename Result, unsigned shift>
-struct rshift : public std::unary_function<Arg, Result>
+struct rshift : public compat::unary_function<Arg, Result>
 {
 	Result operator()(const Arg &x) const { return x >> shift; }
 };
@@ -3928,7 +3939,7 @@ private:
 };
 
 template <typename Arg, typename Result>
-struct floatToFloat : public std::unary_function<Arg, Result>
+struct floatToFloat : public compat::unary_function<Arg, Result>
 {
 	Result operator()(Arg x) const { return x; }
 };
