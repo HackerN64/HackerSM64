@@ -1850,11 +1850,13 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4,
     lookat->l[1].l.dir[0] = LOOKAT_PACK(cam->unkE8[0][1]);
     lookat->l[1].l.dir[1] = LOOKAT_PACK(cam->unkE8[1][1]);
     lookat->l[1].l.dir[2] = LOOKAT_PACK(cam->unkE8[2][1]);
-
+#ifndef F3DEX_GBI_3
     lookat->l[0].l.col[0] = 0;
     lookat->l[0].l.col[1] = 0;
     lookat->l[0].l.col[2] = 0;
+#endif
     lookat->l[0].l.pad1 = 0;
+#ifndef F3DEX_GBI_3
     lookat->l[0].l.colc[0] = 0;
     lookat->l[0].l.colc[1] = 0;
     lookat->l[0].l.colc[2] = 0;
@@ -1862,11 +1864,14 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4,
     lookat->l[1].l.col[0] = 0;
     lookat->l[1].l.col[1] = 0x80;
     lookat->l[1].l.col[2] = 0;
+#endif
     lookat->l[1].l.pad1 = 0;
+#ifndef F3DEX_GBI_3
     lookat->l[1].l.colc[0] = 0;
     lookat->l[1].l.colc[1] = 0x80;
     lookat->l[1].l.colc[2] = 0;
     lookat->l[1].l.pad2 = 0;
+#endif
 
     lookat = &D_801BE790[0];
     lookat->l[0].l.dir[0] = 1;
@@ -1876,7 +1881,7 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4,
     lookat->l[1].l.dir[0] = 0;
     lookat->l[1].l.dir[1] = 1;
     lookat->l[1].l.dir[2] = 0;
-
+#ifndef F3DEX_GBI_3
     lookat->l[0].l.col[0] = 0;
     lookat->l[0].l.col[1] = 0;
     lookat->l[0].l.col[2] = 0;
@@ -1893,7 +1898,7 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4,
     lookat->l[1].l.colc[1] = 0x80;
     lookat->l[1].l.colc[2] = 0;
     lookat->l[1].l.pad2 = 0;
-
+#endif
     gSPLookAt(next_gfx(), osVirtualToPhysical(&D_801BE7D0[gGdFrameBufNum]));
     next_mtx();
 }

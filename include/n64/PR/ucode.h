@@ -247,6 +247,32 @@ extern u64 gspL3DZEX2_PosLight_xbusTextStart[],
 extern u64 gspL3DZEX2_PosLight_xbusDataStart[],
            gspL3DZEX2_PosLight_xbusDataEnd[];
 
+/*========== F3DEX3 ==========*/
+extern u64 gspF3DEX3_BrW_fifoTextStart[],           gspF3DEX3_BrW_fifoTextEnd[];        // F3DEX3
+extern u64 gspF3DEX3_BrW_fifoDataStart[],           gspF3DEX3_BrW_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_PA_fifoTextStart[],        gspF3DEX3_BrW_PA_fifoTextEnd[];     // F3DEX3 Profiler A
+extern u64 gspF3DEX3_BrW_PA_fifoDataStart[],        gspF3DEX3_BrW_PA_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_PB_fifoTextStart[],        gspF3DEX3_BrW_PB_fifoTextEnd[];     // F3DEX3 Profiler B
+extern u64 gspF3DEX3_BrW_PB_fifoDataStart[],        gspF3DEX3_BrW_PB_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_PC_fifoTextStart[],        gspF3DEX3_BrW_PC_fifoTextEnd[];     // F3DEX3 Profiler C
+extern u64 gspF3DEX3_BrW_PC_fifoDataStart[],        gspF3DEX3_BrW_PC_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_LVP_fifoTextStart[],       gspF3DEX3_BrW_LVP_fifoTextEnd[];    // F3DEX3 LVP
+extern u64 gspF3DEX3_BrW_LVP_fifoDataStart[],       gspF3DEX3_BrW_LVP_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_LVP_PA_fifoTextStart[],    gspF3DEX3_BrW_LVP_PA_fifoTextEnd[]; // F3DEX3 LVP Profiler A
+extern u64 gspF3DEX3_BrW_LVP_PA_fifoDataStart[],    gspF3DEX3_BrW_LVP_PA_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_LVP_PB_fifoTextStart[],    gspF3DEX3_BrW_LVP_PB_fifoTextEnd[]; // F3DEX3 LVP Profiler B
+extern u64 gspF3DEX3_BrW_LVP_PB_fifoDataStart[],    gspF3DEX3_BrW_LVP_PB_fifoDataEnd[];
+
+extern u64 gspF3DEX3_BrW_LVP_PC_fifoTextStart[],    gspF3DEX3_BrW_LVP_PC_fifoTextEnd[]; // F3DEX3 LVP Profiler C
+extern u64 gspF3DEX3_BrW_LVP_PC_fifoDataStart[],    gspF3DEX3_BrW_LVP_PC_fifoDataEnd[];
+
+
 /**************************************************************************
  *
  * decomp ucode names

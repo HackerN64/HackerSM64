@@ -94,6 +94,10 @@ UNUSED void handle_debug_key_sequences(void) {
 }
 #endif
 
+#ifdef DEBUG_F3DEX3_PROFILER
+volatile F3DEX3YieldDataFooter gRSPProfilingResults;
+#endif
+
 void setup_mesg_queues(void) {
     osCreateMesgQueue(&gDmaMesgQueue, gDmaMesgBuf, ARRAY_COUNT(gDmaMesgBuf));
     osCreateMesgQueue(&gSIEventMesgQueue, gSIEventMesgBuf, ARRAY_COUNT(gSIEventMesgBuf));
@@ -297,6 +301,11 @@ void handle_dp_complete(void) {
     }
     sCurrentDisplaySPTask->state = SPTASK_STATE_FINISHED_DP;
     sCurrentDisplaySPTask = NULL;
+
+    F3DEX3YieldDataFooter* footer = (F3DEX3YieldDataFooter*)((u8*)gGfxSPTaskYieldBuffer +
+                                    OS_YIELD_DATA_SIZE - sizeof(F3DEX3YieldDataFooter));
+    osInvalDCache(footer, sizeof(F3DEX3YieldDataFooter));
+    bcopy(footer, &gRSPProfilingResults, sizeof(F3DEX3YieldDataFooter));
 }
 
 OSTimerEx RCPHangTimer;

@@ -137,7 +137,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
   This does mean that any framebuffer effects will have to be done on buffer 0 if targeting emulators
 - Automatic console and emulator detection: Use the `gEmulator` variable to wrap your code in an emulator check.
 - Separate defines for emulator and console black border height.
-- Getting HVQM FMV support to work with the game is WIP.
 
 Requirements are the same as regular SM64, however a GCC MIPS cross compiler is also required. If you're on Debian-like Linux, you can use the ``gcc-mips-linux-gnu`` package. The toolchain that comes with my SDK is also supported.
 
