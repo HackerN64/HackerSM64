@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "sdk-tools/tabledesign/tabledesign.h"
+
 typedef short s16;
 typedef int s32;
 typedef unsigned char u8;
@@ -28,8 +30,9 @@ typedef struct
     s16 state[16];
 } ALADPCMloop;
 
-static const char usage[] = "input.aiff";
-static const char *progname, *infilename;
+static const char usage[] = "input.aiff, output.table";
+static const char *progname;
+static char *infilename, *outfilename;
 
 #define checked_fread(a, b, c, d) if (fread(a, b, c, d) != c) fail_parse("error parsing file")
 
@@ -115,12 +118,13 @@ int main(int argc, char **argv)
     FILE *ifile;
     progname = argv[0];
 
-    if (argc < 2) {
+    if (argc < 3) {
         fprintf(stderr, "%s %s\n", progname, usage);
         exit(1);
     }
 
     infilename = argv[1];
+    outfilename = argv[2];
 
     if ((ifile = fopen(infilename, "rb")) == NULL) {
         fail_parse("AIFF file could not be opened");
@@ -168,17 +172,33 @@ int main(int argc, char **argv)
     fclose(ifile);
 
     if (coefTable == NULL) {
-        execl("./tools/tabledesign", "tabledesign", "-s", "1", infilename, NULL);
+        char* arguments[] = {
+            "tabledesign",
+            "-s",
+            "1",
+            "-p",
+            outfilename,
+            infilename
+        };
+        return tabledesign_entry(6, arguments);
     } else {
-        printf("%d\n%d\n", order, npredictors);
+        FILE *fp;
+        if ((fp = fopen(outfilename, "w")) == NULL) {
+            fprintf(stderr, "%s: could not write to file: %s", progname, outfilename);
+            exit(1);
+        }
+
+        fprintf(fp, "%d\n%d\n", order, npredictors);
         for (s32 i = 0; i < npredictors; i++) {
             for (s32 j = 0; j < order; j++) {
                 for (s32 k = 0; k < 8; k++) {
-                    printf("% 5d ", coefTable[i][k][j]);
+                    fprintf(fp, "% 5d ", coefTable[i][k][j]);
                 }
-                puts("");
+                fprintf(fp, "\n");
             }
         }
+
+        fclose(fp);
     }
     return 0;
 }

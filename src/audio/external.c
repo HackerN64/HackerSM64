@@ -313,10 +313,10 @@ STATIC_ASSERT(ARRAY_COUNT(sBackgroundMusicDefaultVolume) == SEQ_COUNT,
 
 u8 sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
 u8 sMusicDynamicDelay = 0;
-u8 sSoundBankUsedListBack[SOUND_BANK_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-u8 sSoundBankFreeListFront[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-u8 sNumSoundsInBank[SOUND_BANK_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // only used for debugging
-u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+u8 sSoundBankUsedListBack[SOUND_BANK_COUNT] = {[0 ... SOUND_BANK_COUNT-1] = 0};
+u8 sSoundBankFreeListFront[SOUND_BANK_COUNT] = {[0 ... SOUND_BANK_COUNT-1] = 1};
+u8 sNumSoundsInBank[SOUND_BANK_COUNT] = {[0 ... SOUND_BANK_COUNT-1] = 0}; // only used for debugging
+u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = {[0 ... SOUND_BANK_COUNT-1] = 1};
 
 // sBackgroundMusicMaxTargetVolume and sBackgroundMusicTargetVolume use the 0x80
 // bit to indicate that they are set, and the rest of the bits for the actual value
@@ -347,8 +347,7 @@ struct UnkStruct80343D00 D_SH_80343D00;
 #endif
 
 struct Sound sSoundRequests[0x100];
-// Curiously, this has size 3, despite SEQUENCE_PLAYERS == 4 on EU
-struct ChannelVolumeScaleFade D_80360928[3][CHANNELS_MAX];
+struct ChannelVolumeScaleFade D_80360928[SEQUENCE_PLAYERS][CHANNELS_MAX];
 u8 sUsedChannelsForSoundBank[SOUND_BANK_COUNT];
 u8 sCurrentSound[SOUND_BANK_COUNT][MAX_CHANNELS_PER_SOUND_BANK]; // index into sSoundBanks
 
@@ -1341,12 +1340,7 @@ static void update_game_sound(void) {
                                 get_sound_reverb(bank, soundIndex, channelIndex);
 #endif
                             break;
-                        case SOUND_BANK_GENERAL:
-                        case SOUND_BANK_ENV:
-                        case SOUND_BANK_OBJ:
-                        case SOUND_BANK_AIR:
-                        case SOUND_BANK_GENERAL2:
-                        case SOUND_BANK_OBJ2:
+                        default:
 #if defined(VERSION_EU) || defined(VERSION_SH)
                             func_802ad770(0x05020000 | ((channelIndex & 0xff) << 8),
                                           get_sound_reverb(bank, soundIndex, channelIndex));
@@ -1507,12 +1501,7 @@ static void update_game_sound(void) {
                                 get_sound_reverb(bank, soundIndex, channelIndex);
 #endif
                             break;
-                        case SOUND_BANK_GENERAL:
-                        case SOUND_BANK_ENV:
-                        case SOUND_BANK_OBJ:
-                        case SOUND_BANK_AIR:
-                        case SOUND_BANK_GENERAL2:
-                        case SOUND_BANK_OBJ2:
+                        default:
 #if defined(VERSION_EU) || defined(VERSION_SH)
                             func_802ad770(0x05020000 | ((channelIndex & 0xff) << 8),
                                           get_sound_reverb(bank, soundIndex, channelIndex));
@@ -1952,7 +1941,7 @@ void sound_init(void) {
 
     for (i = 0; i < SOUND_BANK_COUNT; i++) {
         // Set each sound in the bank to STOPPED
-        for (j = 0; j < 40; j++) {
+        for (j = 0; j < ARRAY_COUNT(sSoundBanks[0]); j++) {
             sSoundBanks[i][j].soundStatus = SOUND_STATUS_STOPPED;
         }
 
@@ -1972,7 +1961,7 @@ void sound_init(void) {
         sSoundBanks[i][0].next = 0xff;
 
         // Set free list to contain every sound slot
-        for (j = 1; j < 40 - 1; j++) {
+        for (j = 1; j < ARRAY_COUNT(sSoundBanks[0]) - 1; j++) {
             sSoundBanks[i][j].prev = j - 1;
             sSoundBanks[i][j].next = j + 1;
         }
@@ -1980,7 +1969,7 @@ void sound_init(void) {
         sSoundBanks[i][j].next = 0xff;
     }
 
-    for (j = 0; j < 3; j++) {
+    for (j = 0; j < SEQUENCE_PLAYERS; j++) {
         for (i = 0; i < CHANNELS_MAX; i++) {
             D_80360928[j][i].remainingFrames = 0;
         }
@@ -2371,9 +2360,9 @@ void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) 
 
 /**
  * Called from threads: thread5_game_loop
- * Seems to be related to music fading based on position, such as sleeping Piranha Plants, BBH Merry-Go-Round, and Endless Stairs
+ * Plays the primary music and stops playing the secondary music. Call it to cancel the above function.
  */
-void func_80321080(u16 fadeTimer) {
+void stop_secondary_music(u16 fadeTimer) {
     if (sBackgroundMusicTargetVolume != TARGET_VOLUME_UNSET) {
         sBackgroundMusicTargetVolume = TARGET_VOLUME_UNSET;
         D_80332120 = 0;

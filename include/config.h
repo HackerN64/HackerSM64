@@ -19,6 +19,10 @@
 #include "config/config_objects.h"
 #include "config/config_rom.h"
 
+// Local config - include a gitignore'd config file that's specific to just the user (if the file exists)
+#if __has_include("config/config_local.h")
+    #include "config/config_local.h"
+#endif
 
-/* WARNING: Compatibility safeguards - don't remove this file unless you know what you're doing */
+// WARNING: Compatibility safeguards - don't remove this file unless you know what you're doing
 #include "config/config_safeguards.h"

@@ -1,21 +1,37 @@
 #!/usr/bin/python3
 
-import sys, subprocess, re
+import sys, subprocess, re, shutil
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} [folder to search]")
     sys.exit()
 
 lightFiles = set()
+has_rg = shutil.which("rg") is not None
+
+def make_search_cmd(regex, include = None):
+    cmd = None
+    if has_rg:
+        cmd = f"rg -lF {regex}"
+    else:
+        cmd = f"grep -Rl {regex}"
+
+    if include:
+        if has_rg:
+            cmd += f" -g {include}"
+        else:
+            cmd += f" --include {include}"
+
+    return cmd
 
 # The original command that was run across the entire repo to convert all assets
 # cmds = ("grep -Rl \"gsSPSetLight\" levels actors bin","grep -Rl \"gsSPLight\" levels actors bin","grep -Rl \"Lights1\" levels actors bin")
 
 # Operate on the folder passed as an argument to this program
 cmds = [
-    f"grep -Rl \"gsSPSetLight\" {sys.argv[1]}",
-    f"grep -Rl \"gsSPLight\" {sys.argv[1]}",
-    f"grep -Rl \"Lights1\" {sys.argv[1]}"
+    make_search_cmd(f"\"gsSPSetLight\" {sys.argv[1]}"),
+    make_search_cmd(f"\"gsSPLight\" {sys.argv[1]}"),
+    make_search_cmd(f"\"Lights1\" {sys.argv[1]}")
 ]
 
 for cmd in cmds:
@@ -29,7 +45,7 @@ lightStructs = {}
 # FIRST PASS: COLLECT LIGHT STRUCT INFO, REMOVE LIGHT STRUCTS
 for file in lightFiles:
     changed = False
-    with open(file, "r") as f:
+    with open(file, "r", encoding='utf-8') as f:
         fileLines = f.readlines()
         index = 0
 
@@ -80,7 +96,7 @@ def index_delta(mat_name, orig_index, delta):
 # SECOND PASS - CHANGE LIGHT COMMANDS
 for file in lightFiles:
     changed = False
-    with open(file, "r") as f:
+    with open(file, "r", encoding='utf-8') as f:
         fileLines = f.readlines()
         index = 0
         dl_index = -1
@@ -88,7 +104,7 @@ for file in lightFiles:
             curLine = fileLines[index].strip()
             dl_index += 1
 
-            match_result = re.search("Gfx\s*([A-Za-z_]\w+)\s*\[\s*\w*\s*\]\s*=\s*\{", curLine)
+            match_result = re.search(r"Gfx\s*([A-Za-z_]\w+)\s*\[\s*\w*\s*\]\s*=\s*\{", curLine)
             if match_result is not None and len(match_result.groups()) >= 1:
                 curDL = match_result.group(1)
                 dl_index = -1
@@ -135,8 +151,7 @@ for file in lightFiles:
 def get_texscroll_files():
     mat_grep_commands = []
     for mat in material_deltas.keys():
-        print("grep -Rl \"segmented_to_virtual(" + re.escape(mat) + f"\" {sys.argv[1]}**/texscroll.inc.c")
-        mat_grep_commands.append("grep -Rl \"segmented_to_virtual(" + re.escape(mat) + f"\" {sys.argv[1]} --include \*texscroll*")
+        mat_grep_commands.append(make_search_cmd("\"segmented_to_virtual(" + re.escape(mat) + rf"\" {sys.argv[1]}", "\"*texscroll*\""))
 
     texscroll_files = set()
     for cmd in mat_grep_commands:
@@ -164,7 +179,7 @@ for file in t_files:
             curLine = curLineFull.strip()
 
             if not in_func:
-                match_result = re.search("void \w+\(\) \{", curLine)
+                match_result = re.search(r"void \w+\(\) \{", curLine)
                 in_func = match_result is not None
                 found_mat_match = False
                 continue
@@ -174,7 +189,7 @@ for file in t_files:
                 continue
 
             if not found_mat_match:
-                match_result = re.search("Gfx \*mat = segmented_to_virtual\((\w*)\)", curLine)
+                match_result = re.search(r"Gfx \*mat = segmented_to_virtual\((\w*)\)", curLine)
                 if not match_result:
                     continue
 
@@ -184,7 +199,7 @@ for file in t_files:
                     mat_match = seg_mat
                 continue
 
-            match_result = re.search("shift_\w*\(mat, (\d*),", curLine)
+            match_result = re.search(r"shift_\w*\(mat, (\d*),", curLine)
             if match_result is not None and len(match_result.groups()) >= 1:
                 sts_index_str = match_result.group(1)
                 sts_index = int(sts_index_str)

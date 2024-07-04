@@ -1435,9 +1435,7 @@ s32 bowser_check_fallen_off_stage(void) {
     return FALSE;
 }
 
-#ifdef PLATFORM_DISPLACEMENT_2
 struct PlatformDisplacementInfo sBowserDisplacementInfo;
-#endif
 
 /**
  * Set Bowser's actions
@@ -1513,18 +1511,13 @@ s8 sBowserHealth[] = { 1, 1, 3 };
  */
 void bowser_free_update(void) {
     struct Object *platform = o->platform;
-#ifdef PLATFORM_DISPLACEMENT_2
-    s16 tmpOFaceAngleYaw = (s16) o->oFaceAngleYaw;
+
     if (platform != NULL) {
-        // NOTE: This function was at one point using '&o->oFaceAngleYaw', which is a s32 address. Should tmpOFaceAngleYaw be using the first 16 bits instead, or was that a bug?
-        apply_platform_displacement(&sBowserDisplacementInfo, &o->oPosVec, &tmpOFaceAngleYaw, platform);
-        o->oFaceAngleYaw = tmpOFaceAngleYaw;
+        s16 tempYaw = (s16) o->oFaceAngleYaw;
+        apply_platform_displacement(&sBowserDisplacementInfo, &o->oPosVec, &tempYaw, platform);
+        o->oFaceAngleYaw = tempYaw;
     }
-#else
-    if (platform != NULL) {
-        apply_platform_displacement(FALSE, platform);
-    }
-#endif
+
     // Reset grabbed status
     o->oBowserGrabbedStatus = BOWSER_GRAB_STATUS_NONE;
     // Update positions and actions (default action)

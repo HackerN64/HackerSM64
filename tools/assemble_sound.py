@@ -66,7 +66,7 @@ def validate(cond, msg, forstr=""):
 
 
 def strip_comments(string):
-    string = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", string)
+    string = re.sub(re.compile(r"/\*.*?\*/", re.DOTALL), "", string)
     return re.sub(re.compile("//.*?\n"), "", string)
 
 
@@ -781,9 +781,14 @@ def write_sequences(
     defines,
     is_shindou,
 ):
-    bank_names = sorted(
-        [os.path.splitext(os.path.basename(x))[0] for x in os.listdir(sound_bank_dir)]
+    bank_names = []
+    banks = sorted(
+        [os.path.basename(x) for x in os.listdir(sound_bank_dir)]
     )
+
+    for x in banks:
+        if x.endswith(".json"):
+            bank_names.append(os.path.splitext(x)[0])
 
     try:
         with open(seq_json, "r") as inf:
@@ -841,6 +846,15 @@ def write_sequences(
 
     while ind_to_name and json.get(ind_to_name[-1]) is None:
         ind_to_name.pop()
+
+    if ind_to_name:
+        for x in range(len(ind_to_name)):
+            if ind_to_name[x] is None:
+                fail(
+                    "Sequence file index jump detected. "
+                    + "Please make sure your sequence files are labeled correctly "
+                    + "in incremental hexadecimal order."
+                )
 
     def serialize_file(name, ser, is_shindou):
         if json.get(name) is None:
