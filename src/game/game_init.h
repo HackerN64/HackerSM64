@@ -86,6 +86,12 @@ extern u8 gDemoInputs[];
 extern u16 sRenderingFramebuffer;
 extern u32 gGlobalTimer;
 
+// F3DEX3 profiler
+#ifdef DEBUG_F3DEX3_PROFILER
+extern u32 gF3DEX3ProfilerPage;
+extern u32 gF3DEX3ProfilerDisplay;
+#endif
+
 void setup_game_memory(void);
 void thread5_game_loop(UNUSED void *arg);
 void clear_framebuffer(s32 color);

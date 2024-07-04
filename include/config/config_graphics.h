@@ -162,12 +162,16 @@
  * 4 - F3DEX3 LVP (legacy vertex pipeline) - F3DEX3 with legacy vertex pipeline.
  *                                           Lowers RSP processing time at the cost of new features.
  *                                           Read F3DEX3 README for more information.
+ * All microcodes provided by HackerSM64 use the "NoN" (no near-field clipping) variants.
+ * A built-in profiler is available for F3DEX3 and can be enabled inside config/config_debug.h
+ * under DEBUG_F3DEX3_PROFILER.
  */
 
 #define F3DEX_VERSION 2
 
 /**
  * Enables usage of the line microcode. It can be loaded with gSPLoadUcode within a display list.
+ * This feature is not available for use with F3DEX3.
  */
 
 // #define ENABLE_LINE_UCODE

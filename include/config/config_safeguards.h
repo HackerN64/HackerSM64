@@ -112,6 +112,15 @@
     #define UNLOCK_ALL
 #endif // COMPLETE_SAVE_FILE
 
+#ifdef DEBUG_F3DEX3_PROFILER
+    #ifdef F3DEX_GBI_3
+        #undef PUPPYPRINT
+        #define PUPPYPRINT
+    #else
+        #undef DEBUG_F3DEX3_PROFILER
+    #endif
+#endif // DEBUG_F3DEX3_PROFILER
+
 #ifdef DEBUG
     #undef DEBUG_ASSERTIONS
     #define DEBUG_ASSERTIONS

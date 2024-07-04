@@ -94,6 +94,12 @@ struct DemoInput *gCurrDemoInput = NULL;
 u16 gDemoInputListID = 0;
 struct DemoInput gRecordedDemoInput = { 0 };
 
+// F3DEX3 profiler
+#ifdef DEBUG_F3DEX3_PROFILER
+u32 gF3DEX3ProfilerPage = 0;
+u32 gF3DEX3ProfilerDisplay = FALSE;
+#endif
+
 // Display
 // ----------------------------------------------------------------------------------------------------
 
@@ -273,6 +279,23 @@ void make_viewport_clip_rect(Vp *viewport) {
 }
 
 /**
+ * Queries user input for the F3DEX3 profiler. See config/config_debug.h for more information.
+ */
+
+#ifdef DEBUG_F3DEX3_PROFILER
+void query_f3dex3_profiler() {
+    if (gPlayer1Controller->buttonDown & L_TRIG && gPlayer1Controller->buttonDown & R_TRIG) {
+        gF3DEX3ProfilerDisplay = TRUE;
+        if (gPlayer1Controller->buttonPressed & B_BUTTON && ++gF3DEX3ProfilerPage > 3) {
+            gF3DEX3ProfilerPage = 0;
+        }
+    } else {
+        gF3DEX3ProfilerDisplay = FALSE;
+    }
+}
+#endif
+
+/**
  * Initializes the Fast3D OSTask structure.
  * If you plan on using gSPLoadUcode, make sure to add OS_TASK_LOADABLE to the flags member.
  */
@@ -287,7 +310,33 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
 
 #if defined(F3DEX_GBI_3)
-    GRUCODE_TASK(F3DEX3);
+    #if F3DEX_VERSION == 3 // Standard F3DEX3
+        #if defined(DEBUG_F3DEX3_PROFILER)
+            query_f3dex3_profiler();
+            switch (gF3DEX3ProfilerPage) {
+                case 3: GRUCODE_TASK(F3DEX3_BrW_PC); break;
+                case 2: GRUCODE_TASK(F3DEX3_BrW_PB); break;
+                case 1: GRUCODE_TASK(F3DEX3_BrW_PA); break;
+                default: case 0: GRUCODE_TASK(F3DEX3_BrW); break;
+            }
+        #else
+            GRUCODE_TASK(F3DEX3_BrW);
+        #endif
+    #elif F3D_VERSION == 4 // F3DEX3 LVP
+        #if defined(DEBUG_F3DEX3_PROFILER)
+            query_f3dex3_profiler();
+            switch (gF3DEX3ProfilerPage) {
+                case 3: GRUCODE_TASK(F3DEX3_BrW_LVP_PC); break;
+                case 2: GRUCODE_TASK(F3DEX3_BrW_LVP_PB); break;
+                case 1: GRUCODE_TASK(F3DEX3_BrW_LVP_PA); break;
+                default: case 0: GRUCODE_TASK(F3DEX3_BrW_LVP); break;
+            }
+        #else
+            GRUCODE_TASK(F3DEX3_BrW_LVP);
+        #endif
+    #else
+        #error "Invalid F3DEX3 selection."
+    #endif
 #elif defined(F3DEX_GBI_2)
     GRUCODE_TASK(F3DZEX2_NoN)
 #elif defined(F3DEX_GBI)
