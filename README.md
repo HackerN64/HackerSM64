@@ -31,6 +31,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
 - **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector
+- **Sauraen**: Creating the F3DEX3 microcode. HackerSM64 implementation by red.
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
