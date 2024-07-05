@@ -22,6 +22,9 @@
 #ifdef SRAM
 #include "sram.h"
 #endif
+#ifdef F3DEX_GBI_3
+#include "f3dex3.h"
+#endif
 #include "puppyprint.h"
 #include "puppycam2.h"
 #include "debug_box.h"
@@ -93,12 +96,6 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 struct DemoInput *gCurrDemoInput = NULL;
 u16 gDemoInputListID = 0;
 struct DemoInput gRecordedDemoInput = { 0 };
-
-// F3DEX3 profiler
-#ifdef DEBUG_F3DEX3_PROFILER
-u32 gF3DEX3ProfilerPage = 0;
-u32 gF3DEX3ProfilerDisplay = FALSE;
-#endif
 
 // Display
 // ----------------------------------------------------------------------------------------------------
@@ -277,23 +274,6 @@ void make_viewport_clip_rect(Vp *viewport) {
 
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, vpUlx, vpPly, vpLrx, vpLry);
 }
-
-/**
- * Queries user input for the F3DEX3 profiler. See config/config_debug.h for more information.
- */
-
-#ifdef DEBUG_F3DEX3_PROFILER
-void query_f3dex3_profiler() {
-    if (gPlayer1Controller->buttonDown & L_TRIG && gPlayer1Controller->buttonDown & R_TRIG) {
-        gF3DEX3ProfilerDisplay = TRUE;
-        if (gPlayer1Controller->buttonPressed & B_BUTTON && ++gF3DEX3ProfilerPage > 3) {
-            gF3DEX3ProfilerPage = 0;
-        }
-    } else {
-        gF3DEX3ProfilerDisplay = FALSE;
-    }
-}
-#endif
 
 /**
  * Initializes the Fast3D OSTask structure.

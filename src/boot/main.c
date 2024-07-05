@@ -22,6 +22,9 @@
 #include "game/puppyprint.h"
 #include "game/profiling.h"
 #include "game/emutest.h"
+#ifdef F3DEX_GBI_3
+#include "game/f3dex3.h"
+#endif
 
 // Message IDs
 enum MessageIDs {
@@ -92,10 +95,6 @@ UNUSED void handle_debug_key_sequences(void) {
         }
     }
 }
-#endif
-
-#ifdef DEBUG_F3DEX3_PROFILER
-volatile F3DEX3YieldDataFooter gRSPProfilingResults;
 #endif
 
 void setup_mesg_queues(void) {
@@ -301,11 +300,9 @@ void handle_dp_complete(void) {
     }
     sCurrentDisplaySPTask->state = SPTASK_STATE_FINISHED_DP;
     sCurrentDisplaySPTask = NULL;
-
-    F3DEX3YieldDataFooter* footer = (F3DEX3YieldDataFooter*)((u8*)gGfxSPTaskYieldBuffer +
-                                    OS_YIELD_DATA_SIZE - sizeof(F3DEX3YieldDataFooter));
-    osInvalDCache(footer, sizeof(F3DEX3YieldDataFooter));
-    bcopy(footer, &gRSPProfilingResults, sizeof(F3DEX3YieldDataFooter));
+#ifdef DEBUG_F3DEX3_PROFILER
+    extract_f3dex3_profiler_data();
+#endif
 }
 
 OSTimerEx RCPHangTimer;
