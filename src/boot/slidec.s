@@ -5,6 +5,7 @@
 .set noat      # allow manual use of $at
 .set gp=64
 .set noreorder
+
 .include "macros.inc"
 
 .align 4

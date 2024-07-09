@@ -31,9 +31,9 @@ enum LevelCommands {
     /*0x15*/ LEVEL_CMD_POP_POOL_STATE,
     /*0x16*/ LEVEL_CMD_LOAD_TO_FIXED_ADDRESS,
     /*0x17*/ LEVEL_CMD_LOAD_RAW,
-    /*0x18*/ LEVEL_CMD_LOAD_YAY0,
+    /*0x18*/ LEVEL_CMD_LOAD_YAZ0,
     /*0x19*/ LEVEL_CMD_LOAD_MARIO_HEAD,
-    /*0x1A*/ LEVEL_CMD_LOAD_YAY0_TEXTURE,
+    /*0x1A*/ LEVEL_CMD_LOAD_YAZ0_TEXTURE,
     /*0x1B*/ LEVEL_CMD_INIT_LEVEL,
     /*0x1C*/ LEVEL_CMD_CLEAR_LEVEL,
     /*0x1D*/ LEVEL_CMD_ALLOC_LEVEL_POOL,
@@ -236,10 +236,10 @@ enum GoddardScene {
     CMD_BBH(LEVEL_CMD_POP_POOL_STATE, 0x04, 0x0000)
 
 #undef LOAD_MIO0
-#define LOAD_MIO0(a,b,c) LOAD_YAY0(a,b,c)
+#define LOAD_MIO0(a,b,c) LOAD_YAZ0(a,b,c)
 
 #undef LOAD_MIO0_TEXTURE
-#define LOAD_MIO0_TEXTURE(a,b,c) LOAD_YAY0_TEXTURE(a,b,c)
+#define LOAD_MIO0_TEXTURE(a,b,c) LOAD_YAZ0_TEXTURE(a,b,c)
 
 #ifdef NO_SEGMENTED_MEMORY
 #define FIXED_LOAD(loadAddr, romStart, romEnd) \
@@ -253,8 +253,8 @@ enum GoddardScene {
     CMD_PTR(NULL), \
     CMD_PTR(NULL)
 
-#define LOAD_YAY0(seg, romStart, romEnd) \
-    CMD_BBH(LEVEL_CMD_LOAD_YAY0, 0x0C, 0x0000), \
+#define LOAD_YAZ0(seg, romStart, romEnd) \
+    CMD_BBH(LEVEL_CMD_LOAD_YAZ0, 0x0C, 0x0000), \
     CMD_PTR(NULL), \
     CMD_PTR(NULL)
 #else
@@ -278,8 +278,8 @@ enum GoddardScene {
     CMD_PTR(bssStart), \
     CMD_PTR(bssEnd)
 
-#define LOAD_YAY0(seg, romStart, romEnd) \
-    CMD_BBH(LEVEL_CMD_LOAD_YAY0, 0x0C, seg), \
+#define LOAD_YAZ0(seg, romStart, romEnd) \
+    CMD_BBH(LEVEL_CMD_LOAD_YAZ0, 0x0C, seg), \
     CMD_PTR(romStart), \
     CMD_PTR(romEnd)
 #endif
@@ -293,13 +293,13 @@ enum GoddardScene {
 #endif
 
 #ifdef NO_SEGMENTED_MEMORY
-#define LOAD_YAY0_TEXTURE(seg, romStart, romEnd) \
-    CMD_BBH(LEVEL_CMD_LOAD_YAY0_TEXTURE, 0x0C, 0x0000), \
+#define LOAD_YAZ0_TEXTURE(seg, romStart, romEnd) \
+    CMD_BBH(LEVEL_CMD_LOAD_YAZ0_TEXTURE, 0x0C, 0x0000), \
     CMD_PTR(NULL), \
     CMD_PTR(NULL)
 #else
-#define LOAD_YAY0_TEXTURE(seg, romStart, romEnd) \
-    CMD_BBH(LEVEL_CMD_LOAD_YAY0_TEXTURE, 0x0C, seg), \
+#define LOAD_YAZ0_TEXTURE(seg, romStart, romEnd) \
+    CMD_BBH(LEVEL_CMD_LOAD_YAZ0_TEXTURE, 0x0C, seg), \
     CMD_PTR(romStart), \
     CMD_PTR(romEnd)
 #endif
@@ -470,27 +470,27 @@ enum GoddardScene {
 // Presets
 
 #define LOAD_LEVEL_DATA(level) \
-    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, /*romStart*/ _##level##_segment_7SegmentRomStart, /*romEnd*/ _##level##_segment_7SegmentRomEnd)
+    LOAD_YAZ0(/*seg*/ SEGMENT_LEVEL_DATA, /*romStart*/ _##level##_segment_7SegmentRomStart, /*romEnd*/ _##level##_segment_7SegmentRomEnd)
 
 #define LOAD_TEXTURE_BIN(textureBin) \
-    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_TEXTURE, /*romStart*/ _##textureBin##_yay0SegmentRomStart, /*romEnd*/ _##textureBin##_yay0SegmentRomEnd)
+    LOAD_YAZ0_TEXTURE(/*seg*/ SEGMENT_TEXTURE, /*romStart*/ _##textureBin##_yaz0SegmentRomStart, /*romEnd*/ _##textureBin##_yaz0SegmentRomEnd)
 
 #define LOAD_SKYBOX(skybox) \
-    LOAD_YAY0(/*seg*/ SEGMENT_SKYBOX, /*romStart*/ _##skybox##_skybox_yay0SegmentRomStart, /*romEnd*/ _##skybox##_skybox_yay0SegmentRomEnd)
+    LOAD_YAZ0(/*seg*/ SEGMENT_SKYBOX, /*romStart*/ _##skybox##_skybox_yaz0SegmentRomStart, /*romEnd*/ _##skybox##_skybox_yaz0SegmentRomEnd)
 
 #define LOAD_EFFECTS() \
-    LOAD_YAY0(/*seg*/ SEGMENT_EFFECT_YAY0, /*romStart*/ _effect_yay0SegmentRomStart, /*romEnd*/ _effect_yay0SegmentRomEnd)
+    LOAD_YAZ0(/*seg*/ SEGMENT_EFFECT_YAZ0, /*romStart*/ _effect_yaz0SegmentRomStart, /*romEnd*/ _effect_yaz0SegmentRomEnd)
 
 #define LOAD_GROUPA(groupName) \
-    LOAD_YAY0(/*seg*/ SEGMENT_GROUPA_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
+    LOAD_YAZ0(/*seg*/ SEGMENT_GROUPA_YAZ0, /*romStart*/ _##groupName##_yaz0SegmentRomStart, /*romEnd*/ _##groupName##_yaz0SegmentRomEnd), \
     LOAD_RAW( /*seg*/ SEGMENT_GROUPA_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd)
 
 #define LOAD_GROUPB(groupName) \
-    LOAD_YAY0(/*seg*/ SEGMENT_GROUPB_YAY0, /*romStart*/ _##groupName##_yay0SegmentRomStart, /*romEnd*/ _##groupName##_yay0SegmentRomEnd), \
+    LOAD_YAZ0(/*seg*/ SEGMENT_GROUPB_YAZ0, /*romStart*/ _##groupName##_yaz0SegmentRomStart, /*romEnd*/ _##groupName##_yaz0SegmentRomEnd), \
     LOAD_RAW (/*seg*/ SEGMENT_GROUPB_GEO,  /*romStart*/ _##groupName##_geoSegmentRomStart,  /*romEnd*/ _##groupName##_geoSegmentRomEnd)
 
 #define LOAD_COMMON0() \
-    LOAD_YAY0(/*seg*/ SEGMENT_COMMON0_YAY0, /*romStart*/ _common0_yay0SegmentRomStart, /*romEnd*/ _common0_yay0SegmentRomEnd), \
+    LOAD_YAZ0(/*seg*/ SEGMENT_COMMON0_YAZ0, /*romStart*/ _common0_yaz0SegmentRomStart, /*romEnd*/ _common0_yaz0SegmentRomEnd), \
     LOAD_RAW( /*seg*/ SEGMENT_COMMON0_GEO,  /*romStart*/ _common0_geoSegmentRomStart,  /*romEnd*/ _common0_geoSegmentRomEnd)
 
 #define LOAD_BEHAVIOR_DATA() \
@@ -500,7 +500,7 @@ enum GoddardScene {
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd)
 
 #define LOAD_TITLE_SCREEN_BG() \
-    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, /*romStart*/ _title_screen_bg_yay0SegmentRomStart, /*romEnd*/ _title_screen_bg_yay0SegmentRomEnd)
+    LOAD_YAZ0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, /*romStart*/ _title_screen_bg_yaz0SegmentRomStart, /*romEnd*/ _title_screen_bg_yaz0SegmentRomEnd)
 
 // behParams
 

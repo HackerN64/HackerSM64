@@ -404,7 +404,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
             Propack_UnpackM1(compressed, dest);
 #elif RNC2
             Propack_UnpackM2(compressed, dest);
-#elif YAY0
+#elif YAZ0
             slidstart(compressed, dest);
 #elif MIO0
             decompress(compressed, dest);
