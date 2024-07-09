@@ -23,14 +23,14 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **JoshDuMan**: Decomp guy, general assistance
 - **Arceveti**: Silhouette, shadow optimisation, better hanging, breath meter, 4 controller support
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
-- **Wiseguy**:  World scale reimplementation, silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
+- **Wiseguy**:  World scale reimplementation, silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, YAZ0 compressor, and various optimizations/fixes
 - **Kaze**: Graph node optimisations, automatic optimal collision distance
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
 - **CrashOveride**: creating the [ultrasm64](https://github.com/CrashOveride95/ultrasm64) repo
 - **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds, emulator detector
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
-- **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector
+- **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector, YAZ0 decompressor
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
