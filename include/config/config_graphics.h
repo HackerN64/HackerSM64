@@ -167,7 +167,7 @@
  * under DEBUG_F3DEX3_PROFILER.
  */
 
-#define F3DEX_VERSION 3
+#define F3DEX_VERSION 2
 
 /**
  * Enables usage of the line microcode. It can be loaded with gSPLoadUcode within a display list.
