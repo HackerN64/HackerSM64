@@ -9,6 +9,7 @@ CFLAGS       := -I. -O2 -s
 LDFLAGS      := -lm
 ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
 LIBAUDIOFILE := audiofile/libaudiofile.a
+APLIB_COMPRESS := apultra/apultra
 
 ifeq ($(OS),Windows_NT)
   EXT := .exe
@@ -48,6 +49,8 @@ n64cksum_CFLAGS  := -DN64CKSUM_STANDALONE
 textconv_SOURCES := textconv.c utf8.c hashtable.c
 
 aifc_decode_SOURCES := aifc_decode.c
+
+aplib_compress: $(APLIB_COMPRESS)
 
 aiff_extract_codebook: $(LIBAUDIOFILE)
 aiff_extract_codebook_SOURCES := aiff_extract_codebook.c sdk-tools/tabledesign/codebook.c sdk-tools/tabledesign/estimate.c sdk-tools/tabledesign/print.c sdk-tools/tabledesign/tabledesign.c
@@ -90,7 +93,7 @@ flips_CFLAGS := -Wall -Wextra -fopenmp -Os -flto -fuse-linker-plugin -fomit-fram
 -Wl,-z,relro,-z,now,--as-needed,--hash-style=gnu,--relax
 endif
 
-all-except-recomp: $(LIBAUDIOFILE) $(OUTPUTS)
+all-except-recomp: $(LIBAUDIOFILE) $(APLIB_COMPRESS) $(OUTPUTS)
 
 all: all-except-recomp
 
@@ -98,6 +101,7 @@ clean:
 	$(RM) $(ALL_PROGRAMS)
 	$(RM) UNFLoader*
 	$(MAKE) -C audiofile clean
+	$(MAKE) -C apultra clean
 
 distclean: clean
 
@@ -110,5 +114,8 @@ $(foreach p,$(BUILD_PROGRAMS),$(eval $(call COMPILE,$(p))))
 
 $(LIBAUDIOFILE):
 	@$(MAKE) -C audiofile
+
+$(APLIB_COMPRESS):
+	@$(MAKE) -C apultra
 
 .PHONY: all all-except-recomp clean distclean default

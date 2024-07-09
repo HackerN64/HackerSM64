@@ -10,11 +10,12 @@
 #include "segment_symbols.h"
 #include "segments.h"
 #ifdef GZIP
-#include <gzip.h>
+#include "aplib.h"
 #endif
 #if defined(RNC1) || defined(RNC2)
 #include <rnc.h>
 #endif
+
 #ifdef UNF
 #include "usb/usb.h"
 #include "usb/debug.h"
@@ -376,12 +377,12 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
 
 #ifdef GZIP
-    u32 compSize = (srcEnd - 4 - srcStart);
+    u32 compSize = (srcEnd - srcStart);
 #else
     u32 compSize = ALIGN16(srcEnd - srcStart);
 #endif
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
-#ifdef GZIP
+#if GZIP
     // Decompressed size from end of gzip
     u32 *size = (u32 *) (compressed + compSize);
 #else
@@ -399,7 +400,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
 #ifdef GZIP
-            expand_gzip(compressed, dest, compSize, (u32)size);
+            decompress_aplib_full_fast(compressed, compSize, dest);
 #elif RNC1
             Propack_UnpackM1(compressed, dest);
 #elif RNC2

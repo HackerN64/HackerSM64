@@ -269,7 +269,7 @@ BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
-COMPRESS ?= yaz0
+COMPRESS ?= gzip
 $(eval $(call validate-option,COMPRESS,mio0 yaz0 gzip rnc1 rnc2 uncomp))
 ifeq ($(COMPRESS),gzip)
   DEFINES += GZIP=1
@@ -286,9 +286,6 @@ else ifeq ($(COMPRESS),mio0)
 else ifeq ($(COMPRESS),uncomp)
   DEFINES += UNCOMPRESSED=1
 endif
-
-GZIPVER ?= std
-$(eval $(call validate-option,GZIPVER,std libdef))
 
 # Whether to hide commands or not
 VERBOSE ?= 0
@@ -542,11 +539,7 @@ EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
 SKYCONV               := $(TOOLS_DIR)/skyconv
 FIXLIGHTS_PY          := $(TOOLS_DIR)/fixlights.py
 FLIPS                 := $(TOOLS_DIR)/flips
-ifeq ($(GZIPVER),std)
-GZIP                  := gzip
-else
-GZIP                  := libdeflate-gzip
-endif
+GZIP                  := $(TOOLS_DIR)/apultra/apultra
 # Use the system installed armips if available. Otherwise use the one provided with this repository.
 ifneq (,$(call find-command,armips))
   RSPASM              := armips
