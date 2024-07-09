@@ -10,7 +10,6 @@
 
 #ifdef DEBUG_F3DEX3_PROFILER
 u32 gF3DEX3ProfilerPage = 0;
-static u32 gF3DEX3ProfilerDisplay = FALSE;
 
 volatile F3DEX3YieldDataFooter gRSPProfilingResults;
 
@@ -30,36 +29,34 @@ void extract_f3dex3_profiler_data() {
  */
 
 void query_f3dex3_profiler() {
-    if (gPlayer1Controller->buttonDown & L_TRIG && gPlayer1Controller->buttonDown & R_TRIG) {
-        gF3DEX3ProfilerDisplay = TRUE;
-        if (gPlayer1Controller->buttonPressed & B_BUTTON && ++gF3DEX3ProfilerPage > 3) {
+    if (gPlayer1Controller->buttonPressed & L_TRIG && gPlayer1Controller->buttonPressed & D_CBUTTONS) {
+        if (++gF3DEX3ProfilerPage > 4) {
             gF3DEX3ProfilerPage = 0;
         }
-    } else {
-        gF3DEX3ProfilerDisplay = FALSE;
+        gPlayer1Controller->buttonPressed &= ~D_CBUTTONS;
     }
 }
 
 void draw_f3dex3_profiler() {
-    if (!gF3DEX3ProfilerDisplay) {
+    if (!gF3DEX3ProfilerPage) {
         return;
     }
     char profilerBuffers[9][32];
 
-    sprintf(profilerBuffers[8], "Page %u of 4", gF3DEX3ProfilerPage + 1);
+    sprintf(profilerBuffers[8], "Page %u of 4", gF3DEX3ProfilerPage);
 
     switch (gF3DEX3ProfilerPage) {
-        case 3:
+        case 4:
             sprintf(profilerBuffers[0], "Grucode cycles: %u", gRSPProfilingResults.c.ex3UcodeCycles);
             sprintf(profilerBuffers[1], "GLCK alive: %u", gRSPProfilingResults.c.commandsSampledGclkActive);
             sprintf(profilerBuffers[2], "RSP commands: %u", gRSPProfilingResults.c.dlCommandCount);
             sprintf(profilerBuffers[3], "Small RDP commands: %u", gRSPProfilingResults.c.smallRDPCommandCount);
             sprintf(profilerBuffers[4], "Matrix count: %u", gRSPProfilingResults.c.matrixCount);
             sprintf(profilerBuffers[5], "DMA stall cycles: %u", gRSPProfilingResults.c.stallDMACycles);
-            sprintf(profilerBuffers[6], "Memory impact: %f", (f32) gRSPProfilingResults.c.ex3UcodeCycles / (f32) gRSPProfilingResults.c.dlCommandCount);
+            sprintf(profilerBuffers[6], "Cycles / command: %f01", (f32) gRSPProfilingResults.c.ex3UcodeCycles / (f32) gRSPProfilingResults.c.dlCommandCount);
             sprintf(profilerBuffers[7], "");
         break;
-        case 2:
+        case 3:
             sprintf(profilerBuffers[0], "Vertex: %u", gRSPProfilingResults.b.vertexCount);
             sprintf(profilerBuffers[1], "Lit vertex: %u", gRSPProfilingResults.b.litVertexCount);
             sprintf(profilerBuffers[2], "Occluded triangles: %u", gRSPProfilingResults.b.occlusionPlaneCullCount);
@@ -69,7 +66,7 @@ void draw_f3dex3_profiler() {
             sprintf(profilerBuffers[6], "Clipping overlay loads: %u", gRSPProfilingResults.b.clippingOverlayLoadCount);
             sprintf(profilerBuffers[7], "Miscallaneous overlay loads: %u", gRSPProfilingResults.b.miscOverlayLoadCount);
         break;
-        case 1:
+        case 2:
             sprintf(profilerBuffers[0], "Vertex cycles: %u", gRSPProfilingResults.a.vertexProcCycles);
             sprintf(profilerBuffers[1], "RSP fetched commands: %u", gRSPProfilingResults.a.fetchedDLCommandCount);
             sprintf(profilerBuffers[2], "RSP commands: %u", gRSPProfilingResults.a.dlCommandCount);
@@ -79,7 +76,7 @@ void draw_f3dex3_profiler() {
             sprintf(profilerBuffers[6], "");
             sprintf(profilerBuffers[7], "");
         break;
-        default: case 0:
+        case 1:
             sprintf(profilerBuffers[0], "Vertex: %u", gRSPProfilingResults.def.vertexCount);
             sprintf(profilerBuffers[1], "RDP triangles: %u", gRSPProfilingResults.def.rdpOutTriCount);
             sprintf(profilerBuffers[2], "RSP triangles: %u", gRSPProfilingResults.def.rspInTriCount);

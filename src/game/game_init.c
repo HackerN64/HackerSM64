@@ -292,24 +292,22 @@ void create_gfx_task_structure(void) {
 #if defined(F3DEX_GBI_3)
     #if F3DEX_VERSION == 3 // Standard F3DEX3
         #if defined(DEBUG_F3DEX3_PROFILER)
-            query_f3dex3_profiler();
             switch (gF3DEX3ProfilerPage) {
-                case 3: GRUCODE_TASK(F3DEX3_BrW_PC); break;
-                case 2: GRUCODE_TASK(F3DEX3_BrW_PB); break;
-                case 1: GRUCODE_TASK(F3DEX3_BrW_PA); break;
-                default: case 0: GRUCODE_TASK(F3DEX3_BrW); break;
+                case 4: GRUCODE_TASK(F3DEX3_BrW_PC); break;
+                case 3: GRUCODE_TASK(F3DEX3_BrW_PB); break;
+                case 2: GRUCODE_TASK(F3DEX3_BrW_PA); break;
+                default: case 1: GRUCODE_TASK(F3DEX3_BrW); break;
             }
         #else
             GRUCODE_TASK(F3DEX3_BrW);
         #endif
     #elif F3D_VERSION == 4 // F3DEX3 LVP
         #if defined(DEBUG_F3DEX3_PROFILER)
-            query_f3dex3_profiler();
             switch (gF3DEX3ProfilerPage) {
-                case 3: GRUCODE_TASK(F3DEX3_BrW_LVP_PC); break;
-                case 2: GRUCODE_TASK(F3DEX3_BrW_LVP_PB); break;
-                case 1: GRUCODE_TASK(F3DEX3_BrW_LVP_PA); break;
-                default: case 0: GRUCODE_TASK(F3DEX3_BrW_LVP); break;
+                case 4: GRUCODE_TASK(F3DEX3_BrW_LVP_PC); break;
+                case 3: GRUCODE_TASK(F3DEX3_BrW_LVP_PB); break;
+                case 2: GRUCODE_TASK(F3DEX3_BrW_LVP_PA); break;
+                default: case 1: GRUCODE_TASK(F3DEX3_BrW_LVP); break;
             }
         #else
             GRUCODE_TASK(F3DEX3_BrW_LVP);
@@ -795,6 +793,9 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+#ifdef DEBUG_F3DEX3_PROFILER
+        query_f3dex3_profiler();
+#endif
         profiler_update(PROFILER_TIME_CONTROLLERS, 0);
         profiler_collision_reset();
         addr = level_script_execute(addr);
