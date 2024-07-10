@@ -273,8 +273,6 @@ COMPRESS ?= gzip
 $(eval $(call validate-option,COMPRESS,mio0 yaz0 gzip rnc1 rnc2 uncomp))
 ifeq ($(COMPRESS),gzip)
   DEFINES += GZIP=1
-  LIBZRULE := $(BUILD_DIR)/libz.a
-  LIBZLINK := -lz
 else ifeq ($(COMPRESS),rnc1)
   DEFINES += RNC1=1
 else ifeq ($(COMPRESS),rnc2)

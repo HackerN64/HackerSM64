@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #ifdef _WIN32
 #include <windows.h>
 #include <sys/timeb.h>
@@ -222,7 +223,10 @@ static int do_compress(const char *pszInFilename, const char *pszOutFilename, co
       fprintf(stderr, "error opening '%s' for writing\n", pszOutFilename);
       return 100;
    }
-   
+
+   uint32_t decompressHeader[2] = { __builtin_bswap32(nOriginalSize), __builtin_bswap32(stats.safe_dist) }; // Modified for SM64 so the game knows how much to allocate for decompression and work buffer
+   printf("Dest alloc: %u // Buffer alloc: %u", nOriginalSize, stats.safe_dist);
+   fwrite(decompressHeader, sizeof(decompressHeader[0]), 2, f_out);
    fwrite(pCompressedData, 1, nCompressedSize, f_out);
    fclose(f_out);
 
