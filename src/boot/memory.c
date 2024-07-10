@@ -377,28 +377,32 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
 
 #ifdef GZIP
-    u32 compSize = (u32)(srcStart + 4); // aPLib uses the 5-8th bytes for work buffer size. aPLib simultaneously decompresses and DMAs data in to maintain a smaller memory footprint.
+    u32 compSize = ALIGN16(srcEnd - srcStart + 8);
 #else
     u32 compSize = ALIGN16(srcEnd - srcStart);
 #endif
-
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
 
-#if GZIP
-    u32 *size = (u32*)compressed; // Decompressed size comes from the 1st-4th bytes of raw data
+#ifdef GZIP
+    struct {
+        u32 destLength;
+        u32 bufferLength;
+        u64 padding;
+    } ApLibHeader;
+
+    dma_read((u8*)&ApLibHeader, srcStart, srcStart + 16); // We must extract this data from the header
+    u32 *size = &ApLibHeader.destLength;
 #else
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *) (compressed + 4);
 #endif
     if (compressed != NULL) {
 
-    osSyncPrintf("Decompress stats - Destination alloc: %u // Work buffer: %u", *size, compSize);
-
 #ifdef UNCOMPRESSED
         dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
         dma_read(dest, srcStart, srcEnd);
 #elif defined(GZIP)
-        dma_read(compressed, srcStart, srcStart + compSize);
+        dma_read(compressed, srcStart + 8, srcEnd);
         dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
 #else
         dma_read(compressed, srcStart, srcEnd);
@@ -408,7 +412,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 	if (dest != NULL) {
             osSyncPrintf("start decompress\n");
 #ifdef GZIP
-            decompress_aplib_full_fast(compressed + 8, srcEnd - srcStart, dest);
+            decompress_aplib_full_fast(compressed, srcEnd - srcStart - 8, dest);
 #elif RNC1
             Propack_UnpackM1(compressed, dest);
 #elif RNC2
