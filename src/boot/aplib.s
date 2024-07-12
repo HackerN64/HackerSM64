@@ -1,3 +1,7 @@
+/*
+ * Written by Rasky for the libdragon project.
+ */
+
 #define DMA_RACE_MARGIN     16
 #define PI_STATUS           0xA4600010
 #define PI_DRAM_ADDR        0xA4600000
