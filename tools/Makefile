@@ -10,12 +10,13 @@ LDFLAGS      := -lm
 ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
 LIBAUDIOFILE := audiofile/libaudiofile.a
 APLIB_COMPRESS := apultra/apultra
+SHRINKLER_COMPRESS := shrinkler/build/native/Shrinkler
 
 ifeq ($(OS),Windows_NT)
   EXT := .exe
   OUTPUTS := $(ALL_PROGRAMS:=.exe)
 else
-  EXT :=
+EXT :=
   OUTPUTS := $(ALL_PROGRAMS)
 endif
 
@@ -51,6 +52,7 @@ textconv_SOURCES := textconv.c utf8.c hashtable.c
 aifc_decode_SOURCES := aifc_decode.c
 
 aplib_compress: $(APLIB_COMPRESS)
+shrinkler_compress: $(SHRINKLER_COMPRESS)
 
 aiff_extract_codebook: $(LIBAUDIOFILE)
 aiff_extract_codebook_SOURCES := aiff_extract_codebook.c sdk-tools/tabledesign/codebook.c sdk-tools/tabledesign/estimate.c sdk-tools/tabledesign/print.c sdk-tools/tabledesign/tabledesign.c
@@ -93,7 +95,7 @@ flips_CFLAGS := -Wall -Wextra -fopenmp -Os -flto -fuse-linker-plugin -fomit-fram
 -Wl,-z,relro,-z,now,--as-needed,--hash-style=gnu,--relax
 endif
 
-all-except-recomp: $(LIBAUDIOFILE) $(APLIB_COMPRESS) $(OUTPUTS)
+all-except-recomp: $(LIBAUDIOFILE) $(APLIB_COMPRESS) $(SHRINKLER_COMPRESS) $(OUTPUTS)
 
 all: all-except-recomp
 
@@ -102,6 +104,7 @@ clean:
 	$(RM) UNFLoader*
 	$(MAKE) -C audiofile clean
 	$(MAKE) -C apultra clean
+	$(MAKE) -C shrinkler clean
 
 distclean: clean
 
@@ -117,5 +120,8 @@ $(LIBAUDIOFILE):
 
 $(APLIB_COMPRESS):
 	@$(MAKE) -C apultra
+
+$(SHRINKLER_COMPRESS):
+	@$(MAKE) -C shrinkler
 
 .PHONY: all all-except-recomp clean distclean default
