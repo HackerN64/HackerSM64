@@ -70,13 +70,13 @@ static const LevelScript script_func_local_4[] = {
 
 const LevelScript level_hmc_entry[] = {
     INIT_LEVEL(),
-    LOAD_YAZ0(        /*seg*/ 0x07, _hmc_segment_7SegmentRomStart, _hmc_segment_7SegmentRomEnd),
-    LOAD_YAZ0_TEXTURE(/*seg*/ 0x09, _cave_yaz0SegmentRomStart, _cave_yaz0SegmentRomEnd),
-    LOAD_YAZ0(        /*seg*/ 0x05, _group6_yaz0SegmentRomStart, _group6_yaz0SegmentRomEnd),
+    LOAD_YAY0(        /*seg*/ 0x07, _hmc_segment_7SegmentRomStart, _hmc_segment_7SegmentRomEnd),
+    LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _cave_yay0SegmentRomStart, _cave_yay0SegmentRomEnd),
+    LOAD_YAY0(        /*seg*/ 0x05, _group6_yay0SegmentRomStart, _group6_yay0SegmentRomEnd),
     LOAD_RAW(         /*seg*/ 0x0C, _group6_geoSegmentRomStart, _group6_geoSegmentRomEnd),
-    LOAD_YAZ0(        /*seg*/ 0x06, _group17_yaz0SegmentRomStart, _group17_yaz0SegmentRomEnd),
+    LOAD_YAY0(        /*seg*/ 0x06, _group17_yay0SegmentRomStart, _group17_yay0SegmentRomEnd),
     LOAD_RAW(         /*seg*/ 0x0D, _group17_geoSegmentRomStart, _group17_geoSegmentRomEnd),
-    LOAD_YAZ0(        /*seg*/ 0x08, _common0_yaz0SegmentRomStart, _common0_yaz0SegmentRomEnd),
+    LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
     LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),

@@ -24,25 +24,25 @@ OUTPUT_ARCH (mips)
     _##name##SegmentBssEnd = ADDR(.name.noload) + SIZEOF(.name.noload); \
     _##name##SegmentBssSize = SIZEOF(.name.noload);
 
-#define YAZ0_SEG(name, segAddr) \
-   BEGIN_SEG(name##_yaz0, segAddr) \
+#define YAY0_SEG(name, segAddr) \
+   BEGIN_SEG(name##_yay0, segAddr) \
    { \
       KEEP(BUILD_DIR/bin/name.szp.o(.data*)); \
       . = ALIGN(0x10); \
    } \
-   END_SEG(name##_yaz0) \
-   _##name##_mio0SegmentRomStart = _##name##_yaz0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd   = _##name##_yaz0SegmentRomEnd;
+   END_SEG(name##_yay0) \
+   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
+   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
 
-#define YAZ0_EU_SEG(name, segAddr) \
-   BEGIN_SEG(name##_yaz0, segAddr) \
+#define YAY0_EU_SEG(name, segAddr) \
+   BEGIN_SEG(name##_yay0, segAddr) \
    { \
       KEEP(BUILD_DIR/bin/eu/name.szp.o(.data*)); \
       . = ALIGN(0x10); \
    } \
-   END_SEG(name##_yaz0) \
-   _##name##_mio0SegmentRomStart = _##name##_yaz0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd   = _##name##_yaz0SegmentRomEnd;
+   END_SEG(name##_yay0) \
+   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
+   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
 
 #define STANDARD_LEVEL(name) \
    BEGIN_SEG(name##_segment_7, 0x07000000) \
@@ -69,12 +69,12 @@ OUTPUT_ARCH (mips)
    END_NOLOAD(name)
 
 #define STANDARD_OBJECTS(name, segAddr, geoAddr) \
-   BEGIN_SEG(name##_yaz0, segAddr) \
+   BEGIN_SEG(name##_yay0, segAddr) \
    { \
       KEEP(BUILD_DIR/actors/name.szp.o(.data*)); \
       . = ALIGN(0x10); \
    } \
-   END_SEG(name##_yaz0) \
+   END_SEG(name##_yay0) \
    BEGIN_SEG(name##_geo, geoAddr) \
    { \
       KEEP(BUILD_DIR/actors/name##_geo.o(.*data*)); \
@@ -87,8 +87,8 @@ OUTPUT_ARCH (mips)
       KEEP(BUILD_DIR/actors/name##_geo.o(.bss*)); \
    } \
    END_NOLOAD(name##_geo) \
-   _##name##_mio0SegmentRomStart = _##name##_yaz0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd = _##name##_yaz0SegmentRomEnd;
+   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
+   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
 SECTIONS
 {
@@ -305,12 +305,12 @@ SECTIONS
    }
    END_SEG(entry)
 
-   /* load YAZ0 and level data */
-   YAZ0_SEG(segment2, 0x02000000)
+   /* load YAY0 and level data */
+   YAY0_SEG(segment2, 0x02000000)
 #ifdef VERSION_EU
-   YAZ0_EU_SEG(translation_en, 0x19000000)
-   YAZ0_EU_SEG(translation_fr, 0x19000000)
-   YAZ0_EU_SEG(translation_de, 0x19000000)
+   YAY0_EU_SEG(translation_en, 0x19000000)
+   YAY0_EU_SEG(translation_fr, 0x19000000)
+   YAY0_EU_SEG(translation_de, 0x19000000)
 #endif
 
    /* mario actor group */
@@ -427,8 +427,8 @@ SECTIONS
    }
    END_SEG(intro_segment_7)
 
-   YAZ0_SEG(debug_level_select, 0x07000000)
-   YAZ0_SEG(title_screen_bg,    0x0A000000)
+   YAY0_SEG(debug_level_select, 0x07000000)
+   YAY0_SEG(title_screen_bg,    0x0A000000)
 
 #ifdef KEEP_MARIO_HEAD
    BEGIN_SEG(gd_dynlists, 0x04000000)
@@ -475,31 +475,31 @@ SECTIONS
    }
    END_SEG(scripts)
 
-   YAZ0_SEG(water_skybox,       0x0A000000)
-   YAZ0_SEG(ccm_skybox,         0x0A000000)
-   YAZ0_SEG(clouds_skybox,      0x0A000000)
-   YAZ0_SEG(bitfs_skybox,       0x0A000000)
-   YAZ0_SEG(wdw_skybox,         0x0A000000)
-   YAZ0_SEG(cloud_floor_skybox, 0x0A000000)
-   YAZ0_SEG(ssl_skybox,         0x0A000000)
-   YAZ0_SEG(bbh_skybox,         0x0A000000)
-   YAZ0_SEG(bidw_skybox,        0x0A000000)
-   YAZ0_SEG(bits_skybox,        0x0A000000)
+   YAY0_SEG(water_skybox,       0x0A000000)
+   YAY0_SEG(ccm_skybox,         0x0A000000)
+   YAY0_SEG(clouds_skybox,      0x0A000000)
+   YAY0_SEG(bitfs_skybox,       0x0A000000)
+   YAY0_SEG(wdw_skybox,         0x0A000000)
+   YAY0_SEG(cloud_floor_skybox, 0x0A000000)
+   YAY0_SEG(ssl_skybox,         0x0A000000)
+   YAY0_SEG(bbh_skybox,         0x0A000000)
+   YAY0_SEG(bidw_skybox,        0x0A000000)
+   YAY0_SEG(bits_skybox,        0x0A000000)
 
    // Texture bins
-   YAZ0_SEG(fire,     0x09000000)
-   YAZ0_SEG(spooky,   0x09000000)
-   YAZ0_SEG(generic,  0x09000000)
-   YAZ0_SEG(water,    0x09000000)
-   YAZ0_SEG(sky,      0x09000000)
-   YAZ0_SEG(snow,     0x09000000)
-   YAZ0_SEG(cave,     0x09000000)
-   YAZ0_SEG(machine,  0x09000000)
-   YAZ0_SEG(mountain, 0x09000000)
-   YAZ0_SEG(grass,    0x09000000)
-   YAZ0_SEG(outside,  0x09000000)
-   YAZ0_SEG(inside,   0x09000000)
-   YAZ0_SEG(effect,   0x0B000000)
+   YAY0_SEG(fire,     0x09000000)
+   YAY0_SEG(spooky,   0x09000000)
+   YAY0_SEG(generic,  0x09000000)
+   YAY0_SEG(water,    0x09000000)
+   YAY0_SEG(sky,      0x09000000)
+   YAY0_SEG(snow,     0x09000000)
+   YAY0_SEG(cave,     0x09000000)
+   YAY0_SEG(machine,  0x09000000)
+   YAY0_SEG(mountain, 0x09000000)
+   YAY0_SEG(grass,    0x09000000)
+   YAY0_SEG(outside,  0x09000000)
+   YAY0_SEG(inside,   0x09000000)
+   YAY0_SEG(effect,   0x0B000000)
 
 #define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
 #define DEFINE_LEVEL(_0, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) STANDARD_LEVEL(folder)

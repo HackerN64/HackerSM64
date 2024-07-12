@@ -1338,13 +1338,13 @@ s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused) {
 void load_language_text(void) {
     switch (gInGameLanguage - 1) {
         case LANGUAGE_ENGLISH:
-            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_en_yaz0SegmentRomStart, _translation_en_yaz0SegmentRomEnd);
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_en_yay0SegmentRomStart, _translation_en_yay0SegmentRomEnd);
             break;
         case LANGUAGE_FRENCH:
-            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_fr_yaz0SegmentRomStart, _translation_fr_yaz0SegmentRomEnd);
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_fr_yay0SegmentRomStart, _translation_fr_yay0SegmentRomEnd);
             break;
         case LANGUAGE_GERMAN:
-            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_de_yaz0SegmentRomStart, _translation_de_yaz0SegmentRomEnd);
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_de_yay0SegmentRomStart, _translation_de_yay0SegmentRomEnd);
             break;
     }
 }

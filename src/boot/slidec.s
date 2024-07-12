@@ -1,5 +1,5 @@
 /*
- * MIPS YAZ0 decoder created by devwizard64.
+ * MIPS YAY0 decoder created by devwizard64.
  */
 
 .set noat      # allow manual use of $at
