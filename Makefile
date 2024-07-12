@@ -225,7 +225,7 @@ endif
 # allowing for usage of CEN64 (and possibly Project64) to print messages to terminal.
 #   1 - includes code in ROM
 #   0 - does not
-ISVPRINT ?= 0
+ISVPRINT ?= 1
 $(eval $(call validate-option,ISVPRINT,0 1))
 ifeq ($(ISVPRINT),1)
   DEFINES += ISVPRINT=1
@@ -269,7 +269,7 @@ BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
-COMPRESS ?= gzip
+COMPRESS ?= rnc1
 $(eval $(call validate-option,COMPRESS,mio0 yaz0 gzip rnc1 rnc2 uncomp))
 ifeq ($(COMPRESS),gzip)
   DEFINES += GZIP=1
@@ -520,7 +520,7 @@ CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
 # N64 tools
 YAZ0TOOL              := $(TOOLS_DIR)/slienc
 MIO0TOOL              := $(TOOLS_DIR)/mio0
-RNCPACK               := $(TOOLS_DIR)/rncpack
+RNCPACK               := $(TOOLS_DIR)/shrinkler/build/native/Shrinkler
 FILESIZER             := $(TOOLS_DIR)/filesizer
 N64CKSUM              := $(TOOLS_DIR)/n64cksum
 N64GRAPHICS           := $(TOOLS_DIR)/n64graphics

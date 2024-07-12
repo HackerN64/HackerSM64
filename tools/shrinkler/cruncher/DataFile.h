@@ -38,6 +38,8 @@ struct DataHeader {
 	Longword uncompressed_size;
 	Longword safety_margin;
 	Longword flags;
+	Longword pad0; // needed for 16-bit alignment on n64
+	Longword pad1; // dito
 };
 
 class DataFile {
