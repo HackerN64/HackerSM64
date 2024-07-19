@@ -12,7 +12,6 @@
 #include "object_list_processor.h"
 #include "spawn_object.h"
 #include "types.h"
-#include "puppylights.h"
 
 /**
  * Attempt to allocate an object from freeList (singly linked) and append it
@@ -181,8 +180,8 @@ struct Object *allocate_object(struct ObjectNode *objList) {
 
     mtxf_identity(obj->transform);
 
-    obj->respawnInfoType = RESPAWN_INFO_TYPE_NULL;
-    obj->respawnInfo = NULL;
+    obj->respawnInfo = RESPAWN_INFO_NONE;
+    obj->respawnInfoPointer = NULL;
 
     obj->oDistanceToMario = 19000.0f;
     obj->oRoom = -1;
@@ -190,9 +189,6 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     vec3_same(obj->header.gfx.pos, -10000.0f);
     obj->header.gfx.throwMatrix = NULL;
-#ifdef PUPPYLIGHTS
-    obj->oLightID = 0xFFFF;
-#endif
 
     return obj;
 }

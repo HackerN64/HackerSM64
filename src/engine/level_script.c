@@ -9,6 +9,7 @@
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/area.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/mario.h"
 #include "game/memory.h"
@@ -20,7 +21,6 @@
 #include "geo_layout.h"
 #include "graph_node.h"
 #include "level_script.h"
-#include "level_misc_macros.h"
 #include "level_commands.h"
 #include "math_util.h"
 #include "surface_collision.h"
@@ -28,7 +28,6 @@
 #include "string.h"
 #include "game/puppycam2.h"
 #include "game/puppyprint.h"
-#include "game/puppylights.h"
 #include "game/emutest.h"
 
 #include "config.h"
@@ -431,6 +430,7 @@ static void level_cmd_load_model_from_dl(void) {
     s16 layer = CMD_GET(u16, 0x8);
     void *dl_ptr = CMD_GET(void *, 4);
 
+    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
     if (model < MODEL_ID_COUNT) {
         gLoadedGraphNodes[model] =
             (struct GraphNode *) init_graph_node_display_list(sLevelPool, 0, layer, dl_ptr);
@@ -443,6 +443,7 @@ static void level_cmd_load_model_from_geo(void) {
     ModelID16 model = CMD_GET(ModelID16, 2);
     void *geo = CMD_GET(void *, 4);
 
+    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
     if (model < MODEL_ID_COUNT) {
         gLoadedGraphNodes[model] = process_geo_layout(sLevelPool, geo);
     }
@@ -456,6 +457,7 @@ static void level_cmd_23(void) {
     void *dl  = CMD_GET(void *, 4);
     s32 scale = CMD_GET(s32, 8);
 
+    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
     if (model < MODEL_ID_COUNT) {
         // GraphNodeScale has a GraphNode at the top. This
         // is being stored to the array, so cast the pointer.
@@ -472,6 +474,7 @@ static void level_cmd_init_mario(void) {
 
     gMarioSpawnInfo->activeAreaIndex = -1;
     gMarioSpawnInfo->areaIndex = 0;
+    gMarioSpawnInfo->respawnInfo = RESPAWN_INFO_NONE;
     gMarioSpawnInfo->behaviorArg = CMD_GET(u32, 4);
     gMarioSpawnInfo->behaviorScript = CMD_GET(void *, 8);
     gMarioSpawnInfo->model = gLoadedGraphNodes[CMD_GET(ModelID16, 0x2)]; // u8, 3?
@@ -498,6 +501,7 @@ static void level_cmd_place_object(void) {
 
         spawnInfo->areaIndex = sCurrAreaIndex;
         spawnInfo->activeAreaIndex = sCurrAreaIndex;
+        spawnInfo->respawnInfo = RESPAWN_INFO_NONE;
 
         spawnInfo->behaviorArg = CMD_GET(u32, 16);
         spawnInfo->behaviorScript = CMD_GET(void *, 20);
@@ -661,22 +665,8 @@ static void level_cmd_set_rooms(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_set_macro_objects(void) {
-    if (sCurrAreaIndex != -1) {
-#ifndef NO_SEGMENTED_MEMORY
-        gAreas[sCurrAreaIndex].macroObjects = segmented_to_virtual(CMD_GET(void *, 4));
-#else
-        // The game modifies the macro object data (for example marking coins as taken),
-        // so it must be reset when the level reloads.
-        MacroObject *data = segmented_to_virtual(CMD_GET(void *, 4));
-        s32 len = 0;
-        while (data[len++] != MACRO_OBJECT_END()) {
-            len += 4;
-        }
-        gAreas[sCurrAreaIndex].macroObjects = alloc_only_pool_alloc(sLevelPool, len * sizeof(MacroObject));
-        memcpy(gAreas[sCurrAreaIndex].macroObjects, data, len * sizeof(MacroObject));
-#endif
-    }
+// Unused. Previously level_cmd_set_macro_objects
+static void level_cmd_39(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -859,52 +849,6 @@ static void level_cmd_puppyvolume(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_puppylight_environment(void) {
-#ifdef PUPPYLIGHTS
-    Lights1 temp = gdSPDefLights1(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4),
-                                  CMD_GET(u8, 5), CMD_GET(u8, 6), CMD_GET(u8, 7),
-                                  CMD_GET(u8, 8), CMD_GET(u8, 9), CMD_GET(u8, 10));
-
-    memcpy(&gLevelLight, &temp, sizeof(Lights1));
-    levelAmbient = TRUE;
-#endif
-    sCurrentCmd = CMD_NEXT;
-}
-
-static void level_cmd_puppylight_node(void) {
-#ifdef PUPPYLIGHTS
-    gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight));
-    if (gPuppyLights[gNumLights] == NULL) {
-        append_puppyprint_log("Puppylight allocation failed.");
-        sCurrentCmd = CMD_NEXT;
-        return;
-    }
-
-    vec4_set(gPuppyLights[gNumLights]->rgba, CMD_GET(u8,   2),
-                                             CMD_GET(u8,   3),
-                                             CMD_GET(u8,   4),
-                                             CMD_GET(u8,   5));
-
-    vec3s_set(gPuppyLights[gNumLights]->pos[0], CMD_GET(s16,  6),
-                                                CMD_GET(s16,  8),
-                                                CMD_GET(s16, 10));
-
-    vec3s_set(gPuppyLights[gNumLights]->pos[1], CMD_GET(s16, 12),
-                                                CMD_GET(s16, 14),
-                                                CMD_GET(s16, 16));
-    gPuppyLights[gNumLights]->yaw       = CMD_GET(s16, 18);
-    gPuppyLights[gNumLights]->epicentre = CMD_GET(u8,  20);
-    gPuppyLights[gNumLights]->flags     = CMD_GET(u8,  21);
-    gPuppyLights[gNumLights]->active    = TRUE;
-    gPuppyLights[gNumLights]->area      = sCurrAreaIndex;
-    gPuppyLights[gNumLights]->room      = CMD_GET(s16, 22);
-
-    gNumLights++;
-
-#endif
-    sCurrentCmd = CMD_NEXT;
-}
-
 static void level_cmd_set_echo(void) {
     if (sCurrAreaIndex >= 0 && sCurrAreaIndex < AREA_COUNT) {
         gAreaData[sCurrAreaIndex].useEchoOverride = TRUE;
@@ -974,14 +918,12 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_SET_MUSIC                   */ level_cmd_set_music,
     /*LEVEL_CMD_SET_MENU_MUSIC              */ level_cmd_set_menu_music,
     /*LEVEL_CMD_FADEOUT_MUSIC               */ level_cmd_fadeout_music,
-    /*LEVEL_CMD_SET_MACRO_OBJECTS           */ level_cmd_set_macro_objects,
+    /*LEVEL_CMD_39                          */ level_cmd_39, // previously level_cmd_set_macro_objects
     /*LEVEL_CMD_3A                          */ level_cmd_3A,
     /*LEVEL_CMD_CREATE_WHIRLPOOL            */ level_cmd_create_whirlpool,
     /*LEVEL_CMD_GET_OR_SET_VAR              */ level_cmd_get_or_set_var,
     /*LEVEL_CMD_PUPPYVOLUME                 */ level_cmd_puppyvolume,
     /*LEVEL_CMD_CHANGE_AREA_SKYBOX          */ level_cmd_change_area_skybox,
-    /*LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT      */ level_cmd_puppylight_environment,
-    /*LEVEL_CMD_PUPPYLIGHT_NODE             */ level_cmd_puppylight_node,
     /*LEVEL_CMD_SET_ECHO                    */ level_cmd_set_echo,
 };
 

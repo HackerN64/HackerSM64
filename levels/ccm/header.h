@@ -38,7 +38,6 @@ extern const Gfx ccm_seg7_dl_07012BD8[];
 extern const Gfx ccm_seg7_dl_070136D0[];
 extern const Gfx ccm_seg7_dl_07013870[];
 extern const Collision ccm_seg7_area_1_collision[];
-extern const MacroObject ccm_seg7_area_1_macro_objs[];
 extern const Collision ccm_seg7_collision_ropeway_lift[];
 extern const Trajectory ccm_seg7_trajectory_snowman[];
 extern const Trajectory ccm_seg7_trajectory_ropeway_lift[];
@@ -51,7 +50,6 @@ extern const Gfx ccm_seg7_dl_0701FD78[];
 extern const Gfx ccm_seg7_dl_0701FE60[];
 extern const Gfx ccm_seg7_dl_070207F0[];
 extern const Collision ccm_seg7_area_2_collision[];
-extern const MacroObject ccm_seg7_area_2_macro_objs[];
 extern const Trajectory ccm_seg7_trajectory_penguin_race[];
 
 // script

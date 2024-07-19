@@ -88,13 +88,12 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-#if MULTILANG
-const char *gNoControllerMsg[] = {
+LangArray gNoControllerMsg = DEFINE_LANGUAGE_ARRAY(
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
     "CONTROLLER FEHLT",
-};
-#endif
+    "NO CONTROLLER",
+    "NO HAY MANDO");
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
@@ -114,23 +113,12 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#if MULTILANG
-    s32 language = eu_get_language();
-#endif
     if ((gGlobalTimer & 31) < 20) {
         if (gControllerBits == 0) {
-#if MULTILANG
-            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
-#endif
+            print_text_aligned(SCREEN_CENTER_X, 20, LANG_ARRAY(gNoControllerMsg), TEXT_ALIGN_CENTER);
         } else {
-#ifdef VERSION_EU
-            print_text(20, 20, "START");
-#else
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
-#endif
+            print_text_aligned(60, 38, "PRESS", TEXT_ALIGN_CENTER);
+            print_text_aligned(60, 20, "START", TEXT_ALIGN_CENTER);
         }
     }
 }
@@ -194,7 +182,6 @@ void clear_areas(void) {
         gAreaData[i].graphNode = NULL;
         gAreaData[i].terrainData = NULL;
         gAreaData[i].surfaceRooms = NULL;
-        gAreaData[i].macroObjects = NULL;
         gAreaData[i].warpNodes = NULL;
         gAreaData[i].paintingWarpNodes = NULL;
         gAreaData[i].instantWarps = NULL;
@@ -243,8 +230,7 @@ void load_area(s32 index) {
         gMarioCurrentRoom = 0;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
-                              gCurrentArea->macroObjects);
+            load_area_terrain(gCurrentArea->terrainData, gCurrentArea->surfaceRooms);
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {
@@ -331,11 +317,13 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         red = gWarpTransRed, green = gWarpTransGreen, blue = gWarpTransBlue;
     }
 
-    if (transType < WARP_TRANSITION_TYPE_STAR) { // if transition is WARP_TRANSITION_TYPE_COLOR
+    if (transType & WARP_TRANSITION_TYPE_COLOR) {
         gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue = blue;
     } else { // if transition is textured
+        set_and_reset_transition_fade_timer(0); // Reset transition timers by passing in 0 for time
+
         gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue = blue;
@@ -353,8 +341,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
 
         s16 fullRadius = GFX_DIMENSIONS_FULL_RADIUS;
 
-        // HackerSM64: this fixes the pop-in with texture transition, comment out this switch
-        // statement if you want to restore the original full radius.
+#ifdef POLISHED_TRANSITIONS
         switch (transType){
             case WARP_TRANSITION_TYPE_BOWSER:
             case WARP_TRANSITION_FADE_INTO_BOWSER:
@@ -369,6 +356,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
                 fullRadius *= 1.5f;
             break;
         }
+#endif
 
         if (transType & WARP_TRANSITION_FADE_INTO) { // Is the image fading in?
             gWarpTransition.data.startTexRadius = fullRadius;

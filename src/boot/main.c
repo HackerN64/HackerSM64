@@ -20,7 +20,6 @@
 #include "usb/debug.h"
 #endif
 #include "game/puppyprint.h"
-#include "game/puppylights.h"
 #include "game/profiling.h"
 #include "game/emutest.h"
 
@@ -115,9 +114,6 @@ void alloc_pool(void) {
 
     main_pool_init(start, end);
     gEffectsMemoryPool = mem_pool_init(EFFECTS_MEMORY_POOL, MEMORY_POOL_LEFT);
-#ifdef PUPPYLIGHTS
-    gLightsPool = mem_pool_init(PUPPYLIGHTS_POOL, MEMORY_POOL_LEFT);
-#endif
 }
 
 void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri) {

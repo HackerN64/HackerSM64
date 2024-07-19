@@ -28,16 +28,7 @@ OUTPUT_ARCH (mips)
    BEGIN_SEG(name##_yay0, segAddr) \
    { \
       KEEP(BUILD_DIR/bin/name.szp.o(.data*)); \
-      . = ALIGN(0x10); \
-   } \
-   END_SEG(name##_yay0) \
-   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
-
-#define YAY0_EU_SEG(name, segAddr) \
-   BEGIN_SEG(name##_yay0, segAddr) \
-   { \
-      KEEP(BUILD_DIR/bin/eu/name.szp.o(.data*)); \
+      KEEP(BUILD_DIR/bin/name.szp.o(.rodata*)); \
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_yay0) \
@@ -172,6 +163,9 @@ SECTIONS
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.text*);
 #endif
+#ifdef LIBPL
+      BUILD_DIR/lib/libpl*.o(.text*);
+#endif
       */ULTRALIB.a:*.o(.text*);
       */libnustd.a:*.o(.text*);
       */libgcc.a:*.o(.text*);
@@ -192,6 +186,9 @@ SECTIONS
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
 #endif
+#ifdef LIBPL
+      BUILD_DIR/lib/libpl*.o(.*data*);
+#endif
       */ULTRALIB.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
       */librtc.a:*.o(.data*);
@@ -207,6 +204,9 @@ SECTIONS
       BUILD_DIR/src/audio*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.rodata*);
+#endif
+#ifdef LIBPL
+      BUILD_DIR/lib/libpl*.o(.rodata*);
 #endif
       */ULTRALIB.a:*.o(.rodata*);
       */libgcc.a:*.o(.rodata*);
@@ -224,6 +224,9 @@ SECTIONS
       BUILD_DIR/src/audio*.o(.*bss*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*bss*);
+#endif
+#ifdef LIBPL
+      BUILD_DIR/lib/libpl*.o(.*bss*);
 #endif
       */ULTRALIB.a:*.o(COMMON);
       */ULTRALIB.a:*.o(.scommon);
@@ -298,10 +301,21 @@ SECTIONS
 
    /* load YAY0 and level data */
    YAY0_SEG(segment2, 0x02000000)
-#ifdef VERSION_EU
-   YAY0_EU_SEG(translation_en, 0x19000000)
-   YAY0_EU_SEG(translation_fr, 0x19000000)
-   YAY0_EU_SEG(translation_de, 0x19000000)
+
+#ifdef MULTILANG
+   YAY0_SEG(translation_en, 0x19000000)
+#ifdef ENABLE_FRENCH
+   YAY0_SEG(translation_fr, 0x19000000)
+#endif
+#ifdef ENABLE_GERMAN
+   YAY0_SEG(translation_de, 0x19000000)
+#endif
+#ifdef ENABLE_JAPANESE
+   YAY0_SEG(translation_jp, 0x19000000)
+#endif
+#ifdef ENABLE_SPANISH
+   YAY0_SEG(translation_es, 0x19000000)
+#endif
 #endif
 
    /* mario actor group */

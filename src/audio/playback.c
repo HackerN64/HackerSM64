@@ -359,7 +359,6 @@ void process_notes(void) {
 #endif
     u8 bookOffset;
 #endif
-    struct NoteAttributes *attributes;
 #if defined(VERSION_JP) || defined(VERSION_US)
     struct AudioListItem *it;
 #endif
@@ -580,17 +579,18 @@ void process_notes(void) {
 
             adsr_update(note);
             note_vibrato_update(note);
-            attributes = &note->attributes;
             if (note->priority == NOTE_PRIORITY_STOPPING) {
+                struct NoteAttributes *attributes = &note->attributes;
                 frequency = attributes->freqScale;
                 velocity = attributes->velocity;
                 pan = attributes->pan;
                 reverbVol = attributes->reverbVol;
             } else {
-                frequency = note->parentLayer->noteFreqScale;
-                velocity = note->parentLayer->noteVelocity;
-                pan = note->parentLayer->notePan;
-                reverbVol = note->parentLayer->seqChannel->reverbVol;
+                struct SequenceChannelLayer *parentLayer = note->parentLayer;
+                frequency = parentLayer->noteFreqScale;
+                velocity = parentLayer->noteVelocity;
+                pan = parentLayer->notePan;
+                reverbVol = parentLayer->seqChannel->reverbVol;
             }
 
             scale = note->adsrVolScale;
@@ -875,14 +875,8 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
     // Repeat sample
     for (offset = note->sampleCount; offset < 0x40; offset += note->sampleCount) {
         lim = note->sampleCount;
-        if (offset < 0 || offset > 0) {
-            for (j = 0; j < lim; j++) {
-                note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
-            }
-        } else {
-            for (j = 0; j < lim; j++) {
-                note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
-            }
+        for (j = 0; j < lim; j++) {
+            note->synthesisBuffers->samples[offset + j] = note->synthesisBuffers->samples[j];
         }
     }
 

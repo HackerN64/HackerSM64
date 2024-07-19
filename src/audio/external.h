@@ -55,7 +55,7 @@ void stop_sounds_in_continuous_banks(void);
 void sound_banks_disable(u8 player, u16 bankMask);
 void sound_banks_enable(u8 player, u16 bankMask);
 void set_sound_moving_speed(u8 bank, u8 speed);
-void play_dialog_sound(u8 dialogID);
+void play_dialog_sound(s32 voice);
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer);
 void stop_background_music(u16 seqId);
 void fadeout_background_music(u16 seqId, u16 fadeOut);

@@ -265,7 +265,6 @@ enum TerrainLoadCmd {
     TERRAIN_LOAD_VERTICES = 0x40, // Begins vertices list for collision triangles
     TERRAIN_LOAD_CONTINUE,        // Stop loading vertices but continues to load other collision commands
     TERRAIN_LOAD_END,             // End the collision list
-    TERRAIN_LOAD_OBJECTS,         // Loads in certain objects for level start
     TERRAIN_LOAD_ENVIRONMENT      // Loads water/HMC gas
 };
 
@@ -314,13 +313,17 @@ enum TerrainType {
 // End Collision Data
 #define COL_END() TERRAIN_LOAD_END
 
-// Special Object Initiate
-#define COL_SPECIAL_INIT(num) TERRAIN_LOAD_OBJECTS, num
-
 // Water Boxes Initiate
 #define COL_WATER_BOX_INIT(num) TERRAIN_LOAD_ENVIRONMENT, num
 
 // Water Box
 #define COL_WATER_BOX(id, x1, z1, x2, z2, y) id, x1, z1, x2, z2, y
+
+// Trajectories
+#define TRAJECTORY_POS(trajId, x, y, z) \
+    trajId, x, y, z
+
+#define TRAJECTORY_END() \
+    -1
 
 #endif // SURFACE_TERRAINS_H

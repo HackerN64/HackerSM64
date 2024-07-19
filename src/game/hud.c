@@ -117,29 +117,37 @@ static struct CameraHUD sCameraHUD = { CAM_STATUS_NONE };
  * Renders a rgba16 16x16 glyph texture from a table list.
  */
 void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
-    gSPDisplayList(gDisplayListHead++, &dl_hud_img_load_tex_block);
-    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2,
+    Gfx *tempGfxHead = gDisplayListHead;
+
+    gDPPipeSync(tempGfxHead++);
+    gDPSetTextureImage(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+    gSPDisplayList(tempGfxHead++, &dl_hud_img_load_tex_block);
+    gSPTextureRectangle(tempGfxHead++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2,
                         G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
+
+    gDisplayListHead = tempGfxHead;
 }
 
 /**
  * Renders a rgba16 8x8 glyph texture from a table list.
  */
 void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
+    Gfx *tempGfxHead = gDisplayListHead;
+
+    gDPSetTile(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
-    gDPTileSync(gDisplayListHead++);
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
+    gDPTileSync(tempGfxHead++);
+    gDPSetTile(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
                 G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
-    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
-    gDPLoadSync(gDisplayListHead++);
-    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE,
+    gDPSetTileSize(tempGfxHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
+    gDPPipeSync(tempGfxHead++);
+    gDPSetTextureImage(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+    gDPLoadSync(tempGfxHead++);
+    gDPLoadBlock(tempGfxHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
+    gSPTextureRectangle(tempGfxHead++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE,
                         0, 0, 4 << 10, 1 << 10);
+
+    gDisplayListHead = tempGfxHead;
 }
 
 /**
@@ -147,14 +155,17 @@ void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
  */
 void render_power_meter_health_segment(s16 numHealthWedges) {
     Texture *(*healthLUT)[] = segmented_to_virtual(&power_meter_health_segments_lut);
+    Gfx *tempGfxHead = gDisplayListHead;
 
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1,
+    gDPPipeSync(tempGfxHead++);
+    gDPSetTextureImage(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1,
                        (*healthLUT)[numHealthWedges - 1]);
-    gDPLoadSync(gDisplayListHead++);
-    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
-    gSP1Triangle(gDisplayListHead++, 0, 1, 2, 0);
-    gSP1Triangle(gDisplayListHead++, 0, 2, 3, 0);
+    gDPLoadSync(tempGfxHead++);
+    gDPLoadBlock(tempGfxHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
+    gSP1Triangle(tempGfxHead++, 0, 1, 2, 0);
+    gSP1Triangle(tempGfxHead++, 0, 2, 3, 0);
+
+    gDisplayListHead = tempGfxHead;
 }
 
 /**
@@ -293,12 +304,16 @@ void render_hud_power_meter(void) {
 void render_breath_meter_segment(s16 numBreathWedges) {
     Texture *(*breathLUT)[];
     breathLUT = segmented_to_virtual(&breath_meter_segments_lut);
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, (*breathLUT)[numBreathWedges - 1]);
-    gDPLoadSync(gDisplayListHead++);
-    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
-    gSP1Triangle(gDisplayListHead++, 0, 1, 2, 0);
-    gSP1Triangle(gDisplayListHead++, 0, 2, 3, 0);
+    Gfx *tempGfxHead = gDisplayListHead;
+
+    gDPPipeSync(tempGfxHead++);
+    gDPSetTextureImage(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, (*breathLUT)[numBreathWedges - 1]);
+    gDPLoadSync(tempGfxHead++);
+    gDPLoadBlock(tempGfxHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
+    gSP1Triangle(tempGfxHead++, 0, 1, 2, 0);
+    gSP1Triangle(tempGfxHead++, 0, 2, 3, 0);
+
+    gDisplayListHead = tempGfxHead;
 }
 
 /**
@@ -389,9 +404,9 @@ void render_hud_breath_meter(void) {
  * Renders the amount of lives Mario has.
  */
 void render_hud_mario_lives(void) {
-    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), HUD_TOP_Y, ","); // 'Mario Head' glyph
-    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(38), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y, "%d", gHudDisplay.lives);
+    char str[10];
+    sprintf(str, "☺×%d", gHudDisplay.lives);
+    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), HUD_TOP_Y, str);
 }
 
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
@@ -401,7 +416,7 @@ void render_debug_mode(void) {
     print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
     print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
     print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
-    print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
+    print_text_fmt_int(10, 120, "ANG 0×%04x", (u16) gMarioState->faceAngle[1]);
     print_fps(10,80);
 }
 #endif
@@ -410,9 +425,9 @@ void render_debug_mode(void) {
  * Renders the amount of coins collected.
  */
 void render_hud_coins(void) {
-    print_text(HUD_COINS_X, HUD_TOP_Y, "$"); // 'Coin' glyph
-    print_text((HUD_COINS_X + 16), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int((HUD_COINS_X + 30), HUD_TOP_Y, "%d", gHudDisplay.coins);
+    char str[10];
+    sprintf(str, "✪×%d", gHudDisplay.coins);
+    print_text(HUD_COINS_X, HUD_TOP_Y, str);
 }
 
 /**
@@ -420,12 +435,14 @@ void render_hud_coins(void) {
  * Disables "X" glyph when Mario has 100 stars or more.
  */
 void render_hud_stars(void) {
+    char str[10];
     if (gHudFlash == HUD_FLASH_STARS && gGlobalTimer & 0x8) return;
-    s8 showX = (gHudDisplay.stars < 100);
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
-    if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int((showX * 14) + GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X - 16),
-                       HUD_TOP_Y, "%d", gHudDisplay.stars);
+    if (gHudDisplay.stars < 100) {
+        sprintf(str, "★×%d", gHudDisplay.stars);
+    } else {
+        sprintf(str, "★%d", gHudDisplay.stars);
+    }
+    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, str);
 }
 
 /**
@@ -440,34 +457,25 @@ void render_hud_keys(void) {
     }
 }
 
+LangArray textTime = DEFINE_LANGUAGE_ARRAY(
+    "TIME %0d'%02d\"%d",
+    "TEMPS %0d'%02d\"%d",
+    "ZEIT %0d'%02d\"%d",
+    "TIME %0d'%02d\"%d",
+    "TIEM. %0d'%02d\"%d");
+
 /**
  * Renders the timer when Mario start sliding in PSS.
  */
 void render_hud_timer(void) {
-    Texture *(*hudLUT)[58] = segmented_to_virtual(&main_hud_lut);
+    char str[20];
     u16 timerValFrames = gHudDisplay.timer;
     u16 timerMins = timerValFrames / (30 * 60);
     u16 timerSecs = (timerValFrames - (timerMins * 1800)) / 30;
     u16 timerFracSecs = ((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3;
 
-#if MULTILANG
-    switch (eu_get_language()) {
-        case LANGUAGE_ENGLISH: print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "TIME"); break;
-        case LANGUAGE_FRENCH:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(155), 185, "TEMPS"); break;
-        case LANGUAGE_GERMAN:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "ZEIT"); break;
-    }
-#else
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185, "TIME");
-#endif
-
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), 185, "%0d", timerMins);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(71), 185, "%02d", timerSecs);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(37), 185, "%d", timerFracSecs);
-
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
-    render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(81), 32, (*hudLUT)[GLYPH_APOSTROPHE]);
-    render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(46), 32, (*hudLUT)[GLYPH_DOUBLE_QUOTE]);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
+    sprintf(str, LANG_ARRAY(textTime), timerMins, timerSecs, timerFracSecs);
+    print_text_aligned(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(28), 185, str, TEXT_ALIGN_RIGHT);
 }
 
 /**

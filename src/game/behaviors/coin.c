@@ -115,20 +115,33 @@ void bhv_coin_loop(void) {
     struct Surface *floor = o->oFloor;
 
     if (floor != NULL) {
-        if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
-            o->oAction = BOUNCING_COIN_ACT_BOUNCING;
-        }
-        if (o->oAction == BOUNCING_COIN_ACT_BOUNCING) {
-            o->oBounciness = 0;
-            if (floor->normal.y < 0.9f) {
-                s16 targetYaw = SURFACE_YAW(floor);
-                cur_obj_rotate_yaw_toward(targetYaw, 0x400);
-            }
-        }
-    }
+        switch (o->oAction) {
+            case BOUNCING_COIN_ACT_FALLING:
+                if (o->oTimer == 0) {
+                    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
+                }
+                if (o->oMoveFlags & OBJ_MOVE_LANDED) {
+                    o->oAction = BOUNCING_COIN_ACT_BOUNCING;
+                }
+                
+                break;
 
-    if (o->oTimer == 0) {
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
+            case BOUNCING_COIN_ACT_BOUNCING:
+                o->oBounciness = 0;
+                if (floor->normal.y < 0.9f) {
+                    s16 targetYaw = SURFACE_YAW(floor);
+                    cur_obj_rotate_yaw_toward(targetYaw, 0x400);
+                }
+                break;
+
+            case OBJ_ACT_LAVA_DEATH:
+#ifdef COIN_LAVA_FLICKER
+                obj_flicker_and_disappear(o, 0);
+#else
+                obj_mark_for_deletion(o);
+#endif
+                break;
+        }
     }
 
     if (o->oVelY < 0) {
@@ -136,16 +149,11 @@ void bhv_coin_loop(void) {
     }
 
     if (o->oMoveFlags & OBJ_MOVE_LANDED) {
-#ifdef COIN_LAVA_FLICKER
-        if ((o->oMoveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER)
-        || ((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20))) {
+        if (o->oMoveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER) {
             obj_mark_for_deletion(o);
+        } else if (o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) {
+            o->oAction = OBJ_ACT_LAVA_DEATH;
         }
-#else
-        if (o->oMoveFlags & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA)) {
-            obj_mark_for_deletion(o);
-        }
-#endif
     }
 
     if (o->oMoveFlags & OBJ_MOVE_BOUNCE) {
@@ -236,7 +244,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
 }
 
 void bhv_coin_formation_init(void) {
-    o->oCoinRespawnBits = GET_BPARAM3(o->oBehParams);
+    o->oCoinRespawnBits = o->respawnInfo;
 }
 
 void bhv_coin_formation_loop(void) {
@@ -263,8 +271,7 @@ void bhv_coin_formation_loop(void) {
             break;
     }
 
-    // Casting to u8 doesn't seem to match
-    set_object_respawn_info_bits(o, o->oCoinRespawnBits & RESPAWN_INFO_DONT_RESPAWN);
+    set_object_respawn_info_bits(o, o->oCoinRespawnBits);
 }
 
 void coin_inside_boo_act_dropped(void) {

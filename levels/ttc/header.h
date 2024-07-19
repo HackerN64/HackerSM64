@@ -54,7 +54,6 @@ extern const Collision ttc_seg7_collision_070157D8[];
 extern const Collision ttc_seg7_collision_clock_platform[];
 extern const Collision ttc_seg7_collision_clock_main_rotation[];
 extern const Collision ttc_seg7_collision_rotating_clock_platform2[];
-extern const MacroObject ttc_seg7_macro_objs[];
 extern const Texture ttc_yellow_triangle[];
 extern const Gfx ttc_dl_surface_treadmill_begin[];
 extern const Gfx ttc_dl_surface_treadmill_end[];

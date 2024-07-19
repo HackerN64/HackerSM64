@@ -12,11 +12,9 @@
 struct SharedDma {
     /*0x0*/ u8 *buffer;       // target, points to pre-allocated buffer
     /*0x4*/ uintptr_t source; // device address
-    /*0x8*/ u16 sizeUnused;   // set to bufSize, never read
-    /*0xA*/ u16 bufSize;      // size of buffer
-    /*0xC*/ u8 unused2;       // set to 0, never read
-    /*0xD*/ u8 reuseIndex;    // position in sSampleDmaReuseQueue1/2, if ttl == 0
-    /*0xE*/ u8 ttl;           // duration after which the DMA can be discarded
+    /*0x8*/ u32 bufSize;      // size of buffer (converted from u16 for intentional padding to size 0x10)
+    /*0xC*/ u8 reuseIndex;    // position in sSampleDmaReuseQueue1/2, if ttl == 0
+    /*   */ // u8 pad[3];
 };                            // size = 0x10
 
 // EU only
@@ -43,6 +41,7 @@ OSMesg gAudioDmaMesg;
 OSIoMesg gAudioDmaIoMesg;
 
 struct SharedDma sSampleDmas[MAX_SIMULTANEOUS_NOTES * 4];
+u8 sSampleTTLs[MAX_SIMULTANEOUS_NOTES * 4];
 u32 gSampleDmaNumListItems; // sh: 0x803503D4
 u32 sSampleDmaListSize1; // sh: 0x803503D8
 
@@ -71,7 +70,6 @@ struct AudioBufferParametersEU gAudioBufferParameters;
 s32 gAiFrequency;
 #endif
 
-u32 sDmaBufSize;
 s32 gMaxAudioCmds;
 s32 gMaxSimultaneousNotes;
 
@@ -158,30 +156,20 @@ void decrease_sample_dma_ttls() {
     u32 i;
 
     for (i = 0; i < sSampleDmaListSize1; i++) {
-#if defined(VERSION_EU)
-        struct SharedDma *temp = &sSampleDmas[i];
-#else
-        struct SharedDma *temp = sSampleDmas + i;
-#endif
-        if (temp->ttl != 0) {
-            temp->ttl--;
-            if (temp->ttl == 0) {
-                temp->reuseIndex = sSampleDmaReuseQueueHead1;
+        if (sSampleTTLs[i] != 0) {
+            sSampleTTLs[i]--;
+            if (sSampleTTLs[i] == 0) {
+                sSampleDmas[i].reuseIndex = sSampleDmaReuseQueueHead1;
                 sSampleDmaReuseQueue1[sSampleDmaReuseQueueHead1++] = (u8) i;
             }
         }
     }
 
     for (i = sSampleDmaListSize1; i < gSampleDmaNumListItems; i++) {
-#if defined(VERSION_EU)
-        struct SharedDma *temp = &sSampleDmas[i];
-#else
-        struct SharedDma *temp = sSampleDmas + i;
-#endif
-        if (temp->ttl != 0) {
-            temp->ttl--;
-            if (temp->ttl == 0) {
-                temp->reuseIndex = sSampleDmaReuseQueueHead2;
+        if (sSampleTTLs[i] != 0) {
+            sSampleTTLs[i]--;
+            if (sSampleTTLs[i] == 0) {
+                sSampleDmas[i].reuseIndex = sSampleDmaReuseQueueHead2;
                 sSampleDmaReuseQueue2[sSampleDmaReuseQueueHead2++] = (u8) i;
             }
         }
@@ -203,7 +191,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
             bufferPos = devAddr - dma->source;
             if (0 <= bufferPos && (size_t) bufferPos <= dma->bufSize - size) {
                 // We already have a DMA request for this memory range.
-                if (dma->ttl == 0 && sSampleDmaReuseQueueTail2 != sSampleDmaReuseQueueHead2) {
+                if (sSampleTTLs[i] == 0 && sSampleDmaReuseQueueTail2 != sSampleDmaReuseQueueHead2) {
                     // Move the DMA out of the reuse queue, by swapping it with the
                     // tail, and then incrementing the tail.
                     if (dma->reuseIndex != sSampleDmaReuseQueueTail2) {
@@ -214,7 +202,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
                     }
                     sSampleDmaReuseQueueTail2++;
                 }
-                dma->ttl = 60;
+                sSampleTTLs[i] = 60;
                 *dmaIndexRef = (u8) i;
                 return (devAddr - dma->source) + dma->buffer;
             }
@@ -226,6 +214,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
             dmaIndex = sSampleDmaReuseQueue2[sSampleDmaReuseQueueTail2];
             sSampleDmaReuseQueueTail2++;
             dma = sSampleDmas + dmaIndex;
+            sSampleTTLs[dmaIndex] = 2;
             hasDma = TRUE;
         }
     } else {
@@ -233,7 +222,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
         bufferPos = devAddr - dma->source;
         if (0 <= bufferPos && (size_t) bufferPos <= dma->bufSize - size) {
             // We already have DMA for this memory range.
-            if (dma->ttl == 0) {
+            if (sSampleTTLs[*dmaIndexRef] == 0) {
                 // Move the DMA out of the reuse queue, by swapping it with the
                 // tail, and then incrementing the tail.
                 if (dma->reuseIndex != sSampleDmaReuseQueueTail1) {
@@ -244,7 +233,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
                 }
                 sSampleDmaReuseQueueTail1++;
             }
-            dma->ttl = 2;
+            sSampleTTLs[*dmaIndexRef] = 2;
             return dma->buffer + (devAddr - dma->source);
         }
     }
@@ -254,14 +243,13 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
         // be empty, since TTL 2 is so small.
         dmaIndex = sSampleDmaReuseQueue1[sSampleDmaReuseQueueTail1++];
         dma = sSampleDmas + dmaIndex;
+        sSampleTTLs[dmaIndex] = 2;
         hasDma = TRUE;
     }
 
     transfer = dma->bufSize;
     dmaDevAddr = devAddr & ~0xF;
-    dma->ttl = 2;
     dma->source = dmaDevAddr;
-    dma->sizeUnused = transfer;
 #ifdef VERSION_US // TODO: Is there a reason this only exists in US?
     osInvalDCache(dma->buffer, transfer);
 #endif
@@ -272,14 +260,10 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
 }
 
 
-void init_sample_dma_buffers(UNUSED s32 arg0) {
+void init_sample_dma_buffers() {
     s32 i;
-#if defined(VERSION_EU)
-#define j i
-#else
-    s32 j;
-#endif
-
+    s32 sDmaBufSize;
+    
     sDmaBufSize = DMA_BUF_SIZE_0;
 
 #if defined(VERSION_EU)
@@ -289,30 +273,21 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
 #endif
         sSampleDmas[gSampleDmaNumListItems].buffer = soundAlloc(&gNotesAndBuffersPool, sDmaBufSize);
         if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
-#if defined(VERSION_EU)
             break;
-#else
-            goto out1;
-#endif
         }
         sSampleDmas[gSampleDmaNumListItems].bufSize = sDmaBufSize;
         sSampleDmas[gSampleDmaNumListItems].source = 0;
-        sSampleDmas[gSampleDmaNumListItems].sizeUnused = 0;
-        sSampleDmas[gSampleDmaNumListItems].unused2 = 0;
-        sSampleDmas[gSampleDmaNumListItems].ttl = 0;
+        sSampleTTLs[gSampleDmaNumListItems] = 0;
         gSampleDmaNumListItems++;
     }
-#if defined(VERSION_JP) || defined(VERSION_US)
-out1:
-#endif
 
     for (i = 0; (u32) i < gSampleDmaNumListItems; i++) {
         sSampleDmaReuseQueue1[i] = (u8) i;
         sSampleDmas[i].reuseIndex = (u8) i;
     }
 
-    for (j = gSampleDmaNumListItems; j < 0x100; j++) {
-        sSampleDmaReuseQueue1[j] = 0;
+    for (i = gSampleDmaNumListItems; i < ARRAY_COUNT(sSampleDmaReuseQueue1); i++) {
+        sSampleDmaReuseQueue1[i] = 0;
     }
 
     sSampleDmaReuseQueueTail1 = 0;
@@ -324,22 +299,13 @@ out1:
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
         sSampleDmas[gSampleDmaNumListItems].buffer = soundAlloc(&gNotesAndBuffersPool, sDmaBufSize);
         if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
-#if defined(VERSION_EU)
             break;
-#else
-            goto out2;
-#endif
         }
         sSampleDmas[gSampleDmaNumListItems].bufSize = sDmaBufSize;
         sSampleDmas[gSampleDmaNumListItems].source = 0;
-        sSampleDmas[gSampleDmaNumListItems].sizeUnused = 0;
-        sSampleDmas[gSampleDmaNumListItems].unused2 = 0;
-        sSampleDmas[gSampleDmaNumListItems].ttl = 0;
+        sSampleTTLs[gSampleDmaNumListItems] = 0;
         gSampleDmaNumListItems++;
     }
-#if defined(VERSION_JP) || defined(VERSION_US)
-out2:
-#endif
 
     for (i = sSampleDmaListSize1; (u32) i < gSampleDmaNumListItems; i++) {
         sSampleDmaReuseQueue2[i - sSampleDmaListSize1] = (u8) i;
@@ -348,15 +314,12 @@ out2:
 
     // This probably meant to touch the range size1..size2 as well... but it
     // doesn't matter, since these values are never read anyway.
-    for (j = gSampleDmaNumListItems; j < 0x100; j++) {
-        sSampleDmaReuseQueue2[j] = sSampleDmaListSize1;
+    for (i = gSampleDmaNumListItems; i < ARRAY_COUNT(sSampleDmaReuseQueue2); i++) {
+        sSampleDmaReuseQueue2[i] = sSampleDmaListSize1;
     }
 
     sSampleDmaReuseQueueTail2 = 0;
     sSampleDmaReuseQueueHead2 = gSampleDmaNumListItems - sSampleDmaListSize1;
-#if defined(VERSION_EU)
-#undef j
-#endif
 }
 
 #if defined(VERSION_JP) || defined(VERSION_US)

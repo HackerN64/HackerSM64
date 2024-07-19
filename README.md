@@ -17,9 +17,9 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **MrComit**: General use object defines, JUMP_KICK_FIX
 - **aglab2**: Bugfixes (particularly puppycam), refactor stuff
 - **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
-- **Arthurtilly**: Platform Displacement 2
+- **Arthurtilly**: ASCII / UTF-8 support, Multilang, Platform Displacement 2
 - **Fazana**: PuppyLib, ucode swapping, audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
-- **Reonu**: Starting the project/repo, widescreen, reonucam, various defines for hacker QoL
+- **Reonu**: Starting the project + widescreen, reonucam, various defines for hacker QoL, and a custom Spanish (Spain) translation of the game.
 - **JoshDuMan**: Decomp guy, general assistance
 - **Arceveti**: Silhouette, shadow optimisation, better hanging, breath meter, 4 controller support
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
@@ -36,7 +36,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
 **Lighting Engine by Wiseguy**
 - Lighting Engine is available on a separate branch ([base/lighting-engine](https://github.com/Reonu/HackerSM64/tree/base/lighting-engine)). Instructions on how to use it are in the readme of that branch.
-- Alternatively, the main repo has `Puppylights` available, which is a more lightweight, but limited lighting library intended to be used to modify existing light properties. You can look at `puppylights.c` to find out how to use it.
 
 **Puppycam**
 - Puppycam is available on the master branch now, you can toggle it in `config/config_camera.h`. *
@@ -88,9 +87,9 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - You can set a test level in `config/config_debug.h` in order to boot straight into it, so you can quickly test the level you're working on. *
 - Allow all surfaces in the game to have a `force` parameter. Activating this doesn't REQUIRE you to set `force` for every surface: If you don't set, it will default to 0x0000 rather than crashing. Increases RAM usage of collision. *
 - The clown font includes the entire English alphabet.
-- Colored ia4 text support. Format: `"@XXXXXXXX[YOUR TEXT]@--------"` (By ArcticJaguar725)
-  - Example Text: `"@FF0000FFRED @00FF00FFGREEN @0000FFFFBLUE @FFFFFF00INVISIBLE @--------NORMAL"`
-  - NOTE: It is not mandatory to reset the text color with `"@--------"`, but text will need to be recolored each time it scrolls in a dialog box, or the custom color will reset.
+- Colored ia4 text support. Format: `"@XXXXXX[YOUR TEXT]@--------"` (By Arthurtilly)
+  - Example Text: `"@FF0000RED @00FF00GREEN @0000FFBLUE @FFFFFFWHITE"`
+  - NOTE: Text will need to be recolored each time it scrolls in a dialog box, or the custom color will reset. The text will use gDialogTextAlpha as the alpha value when changing the color.
 - Toggle visiblity of collision surfaces and object hitboxes with Visual Surface Debug. `config/config_debug.h` has VISUAL_DEBUG which can be turned on to enable this feature.
 - Workaround for infinite death loops caused by using the wrong warp type for death warps. Mario's HP will be restored when being warped to any warp if (and only if) he was warped while dead. *
 
