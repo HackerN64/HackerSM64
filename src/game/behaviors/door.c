@@ -114,6 +114,9 @@ void bhv_door_init(void) {
     x = o->oPosX + (sins(o->oMoveAngleYaw) *  checkDist);
     z = o->oPosZ + (coss(o->oMoveAngleYaw) *  checkDist);
 
+    char dpos[100];
+    sprintf(dpos, "FORWARD AT %f %f %f", x, y, z);
+    osSyncPrintf(dpos);
     o->oDoorForwardRoom = get_room_at_pos(x, y, z);
 
     x = o->oPosX + (sins(o->oMoveAngleYaw) * -checkDist);
@@ -147,18 +150,6 @@ void bhv_door_rendering_loop(void) {
         transitionRoom->backwardRoom == o->oDoorForwardRoom  || // The transition room's backward room is in the same room as this door's  forward room.
         transitionRoom->backwardRoom == o->oDoorBackwardRoom    // The transition room's backward room is in the same room as this door's backward room.
     );
-
-    if ( gMarioCurrentRoom            == o->oDoorForwardRoom) {
-        assert(o->oDoorIsRendering, "HOW ARE U NOT");
-    }
-
-    osSyncPrintf("CURR ROOM: %d", gMarioCurrentRoom);
-    osSyncPrintf("SELF ROOM: %d", o->oDoorSelfRoom);
-    osSyncPrintf("FWD ROOM: %d", o->oDoorForwardRoom);
-    osSyncPrintf("BCK ROOM: %d", o->oDoorBackwardRoom);
-
-    osSyncPrintf("T FWD ROOM: %d", transitionRoom->forwardRoom);
-    osSyncPrintf("T BCK ROOM: %d", transitionRoom->backwardRoom);
 
     COND_BIT(o->oDoorIsRendering, o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 }
