@@ -766,6 +766,11 @@ s32 act_walking(struct MarioState *m) {
     }
 
     if (m->input & INPUT_A_PRESSED) {
+#ifdef EASIER_LONG_JUMPS
+        if (m->input & INPUT_Z_PRESSED && m->forwardVel > 10.0f) {
+            return set_mario_action(m, ACT_CROUCH_SLIDE, 0);
+        }
+#endif
         return set_jump_from_landing(m);
     }
 

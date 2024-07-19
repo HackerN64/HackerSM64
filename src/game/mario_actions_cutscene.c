@@ -500,6 +500,10 @@ s32 act_debug_free_move(struct MarioState *m) {
     struct Surface *floor, *ceil;
     Vec3f pos;
 
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+        m->health = 0x880;
+    }
+
     f32 speed = (gPlayer1Controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f;
     if (gPlayer1Controller->buttonDown & Z_TRIG) speed = 0.01f;
     if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);

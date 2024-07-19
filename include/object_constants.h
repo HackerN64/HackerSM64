@@ -42,7 +42,7 @@ enum ObjFlags {
     OBJ_FLAG_1000                              = (1 << 12), // 0x00001000
     OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO            = (1 << 13), // 0x00002000
     OBJ_FLAG_PERSISTENT_RESPAWN                = (1 << 14), // 0x00004000
-    OBJ_FLAG_VELOCITY_PLATFORM                 = (1 << 15), // 0x00008000
+    OBJ_FLAG_NO_AUTO_DISPLACEMENT              = (1 << 15), // 0x00008000
     OBJ_FLAG_DONT_CALC_COLL_DIST               = (1 << 16), // 0x00010000
     OBJ_FLAG_SILHOUETTE                        = (1 << 19), // 0x00080000
     OBJ_FLAG_OCCLUDE_SILHOUETTE                = (1 << 20), // 0x00100000

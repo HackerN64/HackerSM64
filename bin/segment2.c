@@ -2658,6 +2658,7 @@ static const Vtx vertex_billboard_num[] = {
 // 0x0200EFF0 - 0x0200F038
 const Gfx dl_billboard_num_begin[] = {
     gsDPPipeSync(),
+    gsDPSetTextureFilter(G_TF_POINT),
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPClearGeometryMode(G_LIGHTING),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD),
@@ -2674,6 +2675,7 @@ const Gfx dl_billboard_num_end[] = {
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
+    gsDPSetTextureFilter(G_TF_BILERP),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
