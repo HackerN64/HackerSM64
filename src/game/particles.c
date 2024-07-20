@@ -38,7 +38,6 @@ void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
     cur_obj_spawn_particles(&sMistParticles);
 }
 
-// not in behavior file
 // n is the number of objects to spawn, r if the rate of change of phase (frequency?)
 void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
     static s16 spawnSparkleParticleAngle = 0x0;

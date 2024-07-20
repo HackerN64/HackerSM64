@@ -22,7 +22,7 @@
 #include "mario_actions_object.h"
 #include "mario_actions_stationary.h"
 #include "mario_actions_submerged.h"
-#include "mario_misc.h"
+#include "mario_geo.h"
 #include "mario_step.h"
 #include "memory.h"
 #include "global_object_fields.h"

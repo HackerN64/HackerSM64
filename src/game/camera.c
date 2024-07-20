@@ -5,7 +5,7 @@
 #include "seq_ids.h"
 #include "dialog_ids.h"
 #include "audio/external.h"
-#include "mario_misc.h"
+#include "mario_geo.h"
 #include "game_init.h"
 #include "hud.h"
 #include "engine/math_util.h"

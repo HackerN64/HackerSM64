@@ -13,10 +13,6 @@ extern struct MarioBodyState gBodyStates[2];
 #ifdef KEEP_MARIO_HEAD
 Gfx *geo_draw_mario_head_goddard(s32 callContext, struct GraphNode *node, Mat4 *mtx);
 #endif
-void bhv_toad_message_loop(void);
-void bhv_toad_message_init(void);
-void bhv_unlock_door_star_init(void);
-void bhv_unlock_door_star_loop(void);
 Gfx *geo_mirror_mario_set_alpha(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 Gfx *geo_switch_mario_stand_run(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 Gfx *geo_switch_mario_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
