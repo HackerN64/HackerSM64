@@ -28,33 +28,6 @@
 
 #include "config.h"
 
-#define TOAD_STAR_1_REQUIREMENT 12
-#define TOAD_STAR_2_REQUIREMENT 25
-#define TOAD_STAR_3_REQUIREMENT 35
-
-#define TOAD_STAR_1_DIALOG DIALOG_082
-#define TOAD_STAR_2_DIALOG DIALOG_076
-#define TOAD_STAR_3_DIALOG DIALOG_083
-
-#define TOAD_STAR_1_DIALOG_AFTER DIALOG_154
-#define TOAD_STAR_2_DIALOG_AFTER DIALOG_155
-#define TOAD_STAR_3_DIALOG_AFTER DIALOG_156
-
-enum ToadMessageStates {
-    TOAD_MESSAGE_FADED,
-    TOAD_MESSAGE_OPAQUE,
-    TOAD_MESSAGE_OPACIFYING,
-    TOAD_MESSAGE_FADING,
-    TOAD_MESSAGE_TALKING
-};
-
-enum UnlockDoorStarStates {
-    UNLOCK_DOOR_STAR_RISING,
-    UNLOCK_DOOR_STAR_WAITING,
-    UNLOCK_DOOR_STAR_SPAWNING_PARTICLES,
-    UNLOCK_DOOR_STAR_DONE
-};
-
 /**
  * The eye texture on succesive frames of Mario's blink animation.
  * He intentionally blinks twice each time.
@@ -101,198 +74,6 @@ Gfx *geo_draw_mario_head_goddard(s32 callContext, struct GraphNode *node, UNUSED
     return gfx;
 }
 #endif
-
-static void toad_message_faded(void) {
-    if (o->oDistanceToMario > 700.0f) {
-        o->oToadMessageRecentlyTalked = FALSE;
-    }
-    if (!o->oToadMessageRecentlyTalked && o->oDistanceToMario < 600.0f) {
-        o->oToadMessageState = TOAD_MESSAGE_OPACIFYING;
-    }
-}
-
-static void toad_message_opaque(void) {
-    if (o->oDistanceToMario > 700.0f) {
-        o->oToadMessageState = TOAD_MESSAGE_FADING;
-    } else if (!o->oToadMessageRecentlyTalked) {
-        o->oInteractionSubtype = INT_SUBTYPE_NPC;
-        if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-            o->oInteractStatus = INT_STATUS_NONE;
-            o->oToadMessageState = TOAD_MESSAGE_TALKING;
-            play_toads_jingle();
-        }
-    }
-}
-
-static void toad_message_talking(void) {
-    if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_DOWN,
-        DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, o->oToadMessageDialogId)) {
-        o->oToadMessageRecentlyTalked = TRUE;
-        o->oToadMessageState = TOAD_MESSAGE_FADING;
-        switch (o->oToadMessageDialogId) {
-            case TOAD_STAR_1_DIALOG:
-                o->oToadMessageDialogId = TOAD_STAR_1_DIALOG_AFTER;
-                bhv_spawn_star_no_level_exit(STAR_BP_ACT_1);
-                break;
-            case TOAD_STAR_2_DIALOG:
-                o->oToadMessageDialogId = TOAD_STAR_2_DIALOG_AFTER;
-                bhv_spawn_star_no_level_exit(STAR_BP_ACT_2);
-                break;
-            case TOAD_STAR_3_DIALOG:
-                o->oToadMessageDialogId = TOAD_STAR_3_DIALOG_AFTER;
-                bhv_spawn_star_no_level_exit(STAR_BP_ACT_3);
-                break;
-        }
-    }
-}
-
-static void toad_message_opacifying(void) {
-    if ((o->oOpacity += 6) == 255) {
-        o->oToadMessageState = TOAD_MESSAGE_OPAQUE;
-    }
-}
-
-static void toad_message_fading(void) {
-    if ((o->oOpacity -= 6) == 81) {
-        o->oToadMessageState = TOAD_MESSAGE_FADED;
-    }
-}
-
-void bhv_toad_message_loop(void) {
-    if (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
-        o->oInteractionSubtype = INT_STATUS_NONE;
-        switch (o->oToadMessageState) {
-            case TOAD_MESSAGE_FADED:
-                toad_message_faded();
-                break;
-            case TOAD_MESSAGE_OPAQUE:
-                toad_message_opaque();
-                break;
-            case TOAD_MESSAGE_OPACIFYING:
-                toad_message_opacifying();
-                break;
-            case TOAD_MESSAGE_FADING:
-                toad_message_fading();
-                break;
-            case TOAD_MESSAGE_TALKING:
-                toad_message_talking();
-                break;
-        }
-    }
-}
-
-void bhv_toad_message_init(void) {
-    s32 saveFlags = save_file_get_flags();
-#ifdef UNLOCK_ALL
-    s32 starCount = 999;
-#else
-    s32 starCount = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
-#endif
-    s32 dialogId = GET_BPARAM1(o->oBehParams);
-    s32 enoughStars = TRUE;
-
-    switch (dialogId) {
-        case TOAD_STAR_1_DIALOG:
-            enoughStars = (starCount >= TOAD_STAR_1_REQUIREMENT);
-            if (saveFlags & SAVE_FLAG_COLLECTED_TOAD_STAR_1) {
-                dialogId = TOAD_STAR_1_DIALOG_AFTER;
-            }
-            break;
-        case TOAD_STAR_2_DIALOG:
-            enoughStars = (starCount >= TOAD_STAR_2_REQUIREMENT);
-            if (saveFlags & SAVE_FLAG_COLLECTED_TOAD_STAR_2) {
-                dialogId = TOAD_STAR_2_DIALOG_AFTER;
-            }
-            break;
-        case TOAD_STAR_3_DIALOG:
-            enoughStars = (starCount >= TOAD_STAR_3_REQUIREMENT);
-            if (saveFlags & SAVE_FLAG_COLLECTED_TOAD_STAR_3) {
-                dialogId = TOAD_STAR_3_DIALOG_AFTER;
-            }
-            break;
-    }
-    if (enoughStars) {
-        o->oToadMessageDialogId = dialogId;
-        o->oToadMessageRecentlyTalked = FALSE;
-        o->oToadMessageState = TOAD_MESSAGE_FADED;
-        o->oOpacity = 81;
-    } else {
-        obj_mark_for_deletion(o);
-    }
-}
-
-static void star_door_unlock_spawn_particles(s16 angleOffset) {
-    struct Object *sparkleParticle = spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
-
-    sparkleParticle->oPosX += 100.0f * sins((o->oUnlockDoorStarTimer * 0x2800) + angleOffset);
-    sparkleParticle->oPosZ += 100.0f * coss((o->oUnlockDoorStarTimer * 0x2800) + angleOffset);
-    // Particles are spawned lower each frame
-    sparkleParticle->oPosY -= o->oUnlockDoorStarTimer * 10.0f;
-}
-
-void bhv_unlock_door_star_init(void) {
-    o->oUnlockDoorStarState = UNLOCK_DOOR_STAR_RISING;
-    o->oUnlockDoorStarTimer = 0;
-    o->oUnlockDoorStarYawVel = 0x1000;
-    o->oPosX += 30.0f * sins(gMarioState->faceAngle[1] - 0x4000);
-    o->oPosY += 160.0f;
-    o->oPosZ += 30.0f * coss(gMarioState->faceAngle[1] - 0x4000);
-    o->oMoveAngleYaw = 0x7800;
-    obj_scale(o, 0.5f);
-}
-
-void bhv_unlock_door_star_loop(void) {
-    s16 prevYaw = o->oMoveAngleYaw;
-
-    // Speed up the star every frame
-    if (o->oUnlockDoorStarYawVel < 0x2400) {
-        o->oUnlockDoorStarYawVel += 0x60;
-    }
-    switch (o->oUnlockDoorStarState) {
-        case UNLOCK_DOOR_STAR_RISING:
-            o->oPosY += 3.4f; // Raise the star up in the air
-            o->oMoveAngleYaw +=
-                o->oUnlockDoorStarYawVel; // Apply yaw velocity
-            cur_obj_scale(o->oUnlockDoorStarTimer / 50.0f + 0.5f); // Scale the star to be bigger
-            if (++o->oUnlockDoorStarTimer == 30) {
-                o->oUnlockDoorStarTimer = 0;
-                o->oUnlockDoorStarState++; // Sets state to UNLOCK_DOOR_STAR_WAITING
-            }
-            break;
-        case UNLOCK_DOOR_STAR_WAITING:
-            o->oMoveAngleYaw +=
-                o->oUnlockDoorStarYawVel; // Apply yaw velocity
-            if (++o->oUnlockDoorStarTimer == 30) {
-                play_sound(SOUND_MENU_STAR_SOUND, o->header.gfx.cameraToObject); // Play final sound
-                cur_obj_hide(); // Hide the object
-                o->oUnlockDoorStarTimer = 0;
-                o->oUnlockDoorStarState++; // Sets state to UNLOCK_DOOR_STAR_SPAWNING_PARTICLES
-            }
-            break;
-        case UNLOCK_DOOR_STAR_SPAWNING_PARTICLES:
-            // Spawn two particles, opposite sides of the star.
-            star_door_unlock_spawn_particles(0);
-            star_door_unlock_spawn_particles(0x8000);
-            if (o->oUnlockDoorStarTimer++ == 20) {
-                o->oUnlockDoorStarTimer = 0;
-                o->oUnlockDoorStarState++; // Sets state to UNLOCK_DOOR_STAR_DONE
-            }
-            break;
-        case UNLOCK_DOOR_STAR_DONE: // The object stays loaded for an additional 50 frames so that the
-                                    // sound doesn't immediately stop.
-            if (o->oUnlockDoorStarTimer++ == 50) {
-                obj_mark_for_deletion(o);
-            }
-            break;
-    }
-    // Checks if the angle has cycled back to 0.
-    // This means that the code will execute when the star completes a full revolution.
-    if (prevYaw > (s16) o->oMoveAngleYaw) {
-        play_sound(
-            SOUND_GENERAL_SHORT_STAR,
-            o->header.gfx.cameraToObject); // Play a sound every time the star spins once
-    }
-}
 
 /**
  * Generate a display list that sets the correct blend mode and color for mirror Mario.
@@ -640,4 +421,17 @@ Gfx *geo_mirror_mario_backface_culling(s32 callContext, struct GraphNode *node, 
         SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, LAYER_OPAQUE);
     }
     return gfx;
+}
+
+Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        struct Object *obj = (struct Object *) gCurGraphNodeObject;
+        if (obj == gMarioObject && obj->prevObj != NULL) {
+            obj_update_pos_from_parent_transformation(mtx, obj->prevObj);
+            obj_set_gfx_pos_from_pos(obj->prevObj);
+        }
+    }
+
+    return NULL;
 }

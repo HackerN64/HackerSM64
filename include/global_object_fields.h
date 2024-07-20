@@ -213,16 +213,6 @@
 /* Hoot */
 #define /*0x110*/ oHootMarioReleaseTime OBJECT_FIELD_S32(0x22)
 
-/* Sealed Door Star */
-#define /*0x108*/ oUnlockDoorStarState  OBJECT_FIELD_U32(0x20)
-#define /*0x10C*/ oUnlockDoorStarTimer  OBJECT_FIELD_S32(0x21)
-#define /*0x110*/ oUnlockDoorStarYawVel OBJECT_FIELD_S32(0x22)
-
-/* Toad Message */
-#define /*0x108*/ oToadMessageDialogId       OBJECT_FIELD_U32(0x20)
-#define /*0x10C*/ oToadMessageRecentlyTalked OBJECT_FIELD_S32(0x21)
-#define /*0x110*/ oToadMessageState          OBJECT_FIELD_S32(0x22)
-
 /* Orange Number */
 #define /*0x110*/ oOrangeNumberOffset OBJECT_FIELD_S32(0x22)
 

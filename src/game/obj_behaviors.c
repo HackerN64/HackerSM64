@@ -872,6 +872,17 @@ s32 cur_obj_set_anim_if_at_end(s32 animIndex) {
     return FALSE;
 }
 
+void set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound) {
+    s32 range = o->header.gfx.animInfo.animAccel / 0x10000;
+    if (range == 0) {
+        range = 1;
+    }
+
+    if (cur_obj_check_anim_frame_in_range(frame1, range) || cur_obj_check_anim_frame_in_range(frame2, range)) {
+        cur_obj_play_sound_2(sound);
+    }
+}
+
 s32 cur_obj_play_sound_at_anim_range(s8 startFrame1, s8 startFrame2, u32 sound) {
     s32 rangeLength = o->header.gfx.animInfo.animAccel / 0x10000;
 
@@ -1415,5 +1426,3 @@ void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 sca
         obj->oMoveAnglePitch = movePitch;
     }
 }
-
-
