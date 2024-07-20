@@ -2,6 +2,7 @@
 #include "behavior_data.h"
 #include "global_object_fields.h"
 #include "game/debug.h"
+#include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "engine/surface_load.h"
 #include "game/interaction.h"
@@ -114,9 +115,6 @@ void bhv_door_init(void) {
     x = o->oPosX + (sins(o->oMoveAngleYaw) *  checkDist);
     z = o->oPosZ + (coss(o->oMoveAngleYaw) *  checkDist);
 
-    char dpos[100];
-    sprintf(dpos, "FORWARD AT %f %f %f", x, y, z);
-    osSyncPrintf(dpos);
     o->oDoorForwardRoom = get_room_at_pos(x, y, z);
 
     x = o->oPosX + (sins(o->oMoveAngleYaw) * -checkDist);
