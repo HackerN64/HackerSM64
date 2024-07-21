@@ -1402,15 +1402,6 @@ void treat_far_home_as_mario(f32 threshold) {
     }
 }
 
-// TODO koopa : Text arg field name
-// TODO chain_chomp : chain_chomp_sub_act_lunge documentation
-// TODO wiggler
-// TODO enemy_lakitu
-// TODO camera_lakitu : 104 label, follow cam documentation
-// TODO monty_mole
-// TODO water_bomb : Shadow position
-// TODO ttc_treadmill
-
 /**
  * Used by bowser, fly guy, piranha plant, and fire spitters.
  */
