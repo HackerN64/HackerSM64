@@ -1428,7 +1428,7 @@ s32 credits_end(void) {
 
 // Added so the player can reset the game at the end screen
 s32 credits_end_wait_for_reset(void) {
-    if (gPlayer1Controller->buttonPressed != 0) {
+    if (gPlayer1Controller->buttonPressed) {
         fade_into_special_warp(WARP_SPECIAL_INTRO_SPLASH_SCREEN, 0);
     }
     return lvl_init_or_update(1, 0);
