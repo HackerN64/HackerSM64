@@ -23,3 +23,8 @@
  */
 // #define SKIP_FILE_SELECT
 
+
+/**
+ * Press any button on cake screen to reset game.
+ */
+#define RESET_AFTER_CREDITS

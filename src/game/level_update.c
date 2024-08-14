@@ -1414,3 +1414,23 @@ s32 lvl_play_the_end_screen_sound(UNUSED s16 initOrUpdate, UNUSED s32 levelNum) 
     play_sound(SOUND_MENU_THANK_YOU_PLAYING_MY_GAME, gGlobalSoundSource);
     return TRUE;
 }
+
+
+#ifdef RESET_AFTER_CREDITS
+s32 credits_end(void) {
+    set_play_mode(PLAY_MODE_NORMAL);
+
+    sDelayedWarpOp = WARP_OP_NONE;
+    sTransitionTimer = 0;
+    sSpecialWarpDest = WARP_SPECIAL_NONE;
+    return TRUE;
+}
+
+// Added so the player can reset the game at the end screen
+s32 credits_end_wait_for_reset(void) {
+    if (gPlayer1Controller->buttonPressed != 0) {
+        fade_into_special_warp(WARP_SPECIAL_INTRO_SPLASH_SCREEN, 0);
+    }
+    return lvl_init_or_update(1, 0);
+}
+#endif // RESET_AFTER_CREDITS

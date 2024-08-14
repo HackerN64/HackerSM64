@@ -21,6 +21,16 @@ const LevelScript level_ending_entry_loop[] = {
     JUMP(level_ending_entry_loop), // (loop sleep 1 forever)
 };
 
+#ifdef RESET_AFTER_CREDITS
+const LevelScript level_ending_wait_loop[] = {
+    CALL(0, credits_end),
+    CALL_LOOP(1, credits_end_wait_for_reset),
+    CLEAR_LEVEL(),
+    SLEEP_BEFORE_EXIT(/*frames*/ 1),
+    EXIT(),
+};
+#endif // RESET_AFTER_CREDITS
+
 const LevelScript level_ending_entry[] = {
     INIT_LEVEL(),
     LOAD_LEVEL_DATA(ending),
@@ -37,5 +47,9 @@ const LevelScript level_ending_entry[] = {
     SLEEP(/*frames*/ 120),
     CALL(/*arg*/ 0, /*func*/ lvl_play_the_end_screen_sound),
 
+#ifdef RESET_AFTER_CREDITS
+    JUMP(level_ending_wait_loop),
+#else
     JUMP(level_ending_entry_loop), // (loop sleep 1 forever)
+#endif // RESET_AFTER_CREDITS
 };
