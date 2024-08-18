@@ -3,6 +3,8 @@
 /armips
 /extract_data_for_mio
 /filesizer
+/lz4pack
+/lz4tpack
 /mio0
 /n64cksum
 /n64graphics
