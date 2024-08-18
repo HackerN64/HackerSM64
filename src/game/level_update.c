@@ -1229,6 +1229,11 @@ s32 update_level(void) {
     return changeLevel;
 }
 
+#ifdef PUPPYPRINT_DEBUG
+extern u8 gLoadLevel;
+extern u32 gLoadLevelAreaTime;
+#endif
+
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
 #ifdef PUPPYPRINT_DEBUG
@@ -1323,7 +1328,10 @@ s32 init_level(void) {
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
     }
 
-    append_puppyprint_log("Level loaded in %d" PP_CYCLE_STRING ".", (s32)(PP_CYCLE_CONV(osGetTime() - first)));
+#ifdef PUPPYPRINT_DEBUG
+    gLoadLevelAreaTime = osGetCount() - first;
+#endif
+
     return TRUE;
 }
 
