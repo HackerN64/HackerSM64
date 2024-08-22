@@ -7,7 +7,7 @@ CC           := gcc
 CXX          := g++
 CFLAGS       := -I. -O2 -s
 LDFLAGS      := -lm
-ALL_PROGRAMS := armips filesizer lz4pack lz4tpack rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
+ALL_PROGRAMS := armips filesizer lz4tpack rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
 LIBAUDIOFILE := audiofile/libaudiofile.a
 
 ifeq ($(OS),Windows_NT)
@@ -29,10 +29,8 @@ default: all
 
 filesizer_SOURCES	:= filesizer.c
 
-lz4pack_SOURCES	:= lz4.c lz4hc.c lz4pack.c
-lz4pack_CFLAGS  := -flto
-lz4tpack_SOURCES	:= lz4.c lz4hc.c lz4tpack.c
-lz4tpack_CFLAGS  := -DLZ4T -flto
+lz4tpack_SOURCES	:= lz4tpack.c
+lz4tpack_CFLAGS  := -DLZ4T -flto -O3 -fwhole-program
 
 rncpack_SOURCES	:= rncpack.c
 

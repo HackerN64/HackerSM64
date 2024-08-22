@@ -160,7 +160,7 @@ LZ4LIB_API const char* LZ4_versionString (void);   /**< library version string; 
 
 /* These are absolute limits, they should not be changed by users */
 #define LZ4_MEMORY_USAGE_MIN 10
-#define LZ4_MEMORY_USAGE_DEFAULT 14
+#define LZ4_MEMORY_USAGE_DEFAULT 20
 #define LZ4_MEMORY_USAGE_MAX 20
 
 #if (LZ4_MEMORY_USAGE < LZ4_MEMORY_USAGE_MIN)
@@ -664,6 +664,11 @@ LZ4_attach_dictionary(LZ4_stream_t* workingStream,
 
 #define LZ4_DECOMPRESS_INPLACE_MARGIN(compressedSize)          (((compressedSize) >> 8) + 32)
 #define LZ4_DECOMPRESS_INPLACE_BUFFER_SIZE(decompressedSize)   ((decompressedSize) + LZ4_DECOMPRESS_INPLACE_MARGIN(decompressedSize))  /**< note: presumes that compressedSize < decompressedSize. note2: margin is overestimated a bit, since it could use compressedSize instead */
+
+#ifdef LZ4T
+extern int LZ4T_distanceMax;
+#define LZ4_DISTANCE_MAX LZ4T_distanceMax
+#endif
 
 #ifndef LZ4_DISTANCE_MAX   /* history window size; can be user-defined at compile time */
 #  define LZ4_DISTANCE_MAX 65535   /* set to maximum value by default */

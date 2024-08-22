@@ -3,8 +3,8 @@
 #include "sm64.h"
 
 #include "buffers/buffers.h"
+#include "dma_async.h"
 #include "slidec.h"
-#include "game/emutest.h"
 #include "game/game_init.h"
 #include "game/main.h"
 #include "game/memory.h"
@@ -15,6 +15,9 @@
 #endif
 #if defined(RNC1) || defined(RNC2)
 #include <rnc.h>
+#endif
+#ifdef LZ4T
+#include "lz4t.h"
 #endif
 #ifdef UNF
 #include "usb/usb.h"
@@ -272,52 +275,6 @@ void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
     }
 }
 
-struct DMAAsyncCtx {
-    u8* srcStart;
-    u8* dest;
-    u32 size;
-};
-
-// Starts to DMA the first block
-static void dma_async_ctx_init(struct DMAAsyncCtx* ctx, u8 *dest, u8 *srcStart, u8 *srcEnd) {
-    u32 size = ALIGN16(srcEnd - srcStart);
-    osInvalDCache(dest, size);
-
-    u32 copySize = (size >= 0x1000) ? 0x1000 : size;
-
-    osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) srcStart, dest, copySize, &gDmaMesgQueue);
-
-    dest += copySize;
-    srcStart += copySize;
-    size -= copySize;
-
-    ctx->srcStart = srcStart;
-    ctx->dest = dest;
-    ctx->size = size;
-}
-
-// Starts to DMA the next block and waits for the previous block
-void* dma_async_ctx_read(struct DMAAsyncCtx* ctx) {
-    // wait for the previous DMA issued
-    osRecvMesg(&gDmaMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-
-    // start the new DMA transfer
-    u32 copySize = (ctx->size >= 0x1000) ? 0x1000 : ctx->size;
-    if (copySize == 0) {
-        // we are done, return a dummy address that is so gigantic that we will never be called again
-        return (void*) 0x80800000;
-    }
-    osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) ctx->srcStart, ctx->dest, copySize, &gDmaMesgQueue);
-
-    const u32 margin = 16;
-    void* ret = ctx->dest - margin;
-    ctx->dest += copySize;
-    ctx->srcStart += copySize;
-    ctx->size -= copySize;
-
-    return ret;
-}
-
 /**
  * Perform a DMA read from ROM, allocating space in the memory pool to write to.
  * Return the destination address.
@@ -414,298 +371,7 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
     return dest;
 }
 
-#define PACKED __attribute__((packed))
-
-#define __GET_UNALIGNED_T(type, ptr) ({						\
-	const struct { type x; } PACKED *__pptr = (typeof(__pptr))(ptr);	\
-	__pptr->x;								\
-})
-
-#define __PUT_UNALIGNED_T(type, val, ptr) do {					\
-	struct { type x; } PACKED *__pptr = (typeof(__pptr))(ptr);		\
-	__pptr->x = (val);							\
-} while (0)
-
-#define GET_UNALIGNED8(ptr)	__GET_UNALIGNED_T(uint64_t, (ptr))
-#define PUT_UNALIGNED8(val, ptr) __PUT_UNALIGNED_T(uint64_t, (val), (ptr))
-#define GET_UNALIGNED4(ptr)	__GET_UNALIGNED_T(uint32_t, (ptr))
-#define GET_UNALIGNED4S(ptr)	__GET_UNALIGNED_T(int32_t, (ptr))
-#define PUT_UNALIGNED4(val, ptr) __PUT_UNALIGNED_T(uint32_t, (val), (ptr))
-
-#define EXPECT(expr,value)    (__builtin_expect ((expr),(value)) )
-#define LIKELY(expr)     EXPECT((expr) != 0, 1)
-#define UNLIKELY(expr)   EXPECT((expr) != 0, 0)
-
-#ifdef LZ4
-static int lz4_read_length(const uint8_t** inbuf, const uint8_t** dmaLimit, struct DMAAsyncCtx* ctx)
-{
-    int size = 0;
-    uint8_t byte;
-
-    do
-    {
-        if (UNLIKELY(*inbuf > *dmaLimit)) { *dmaLimit = dma_async_ctx_read(ctx); }
-        byte = **inbuf;
-        (*inbuf)++;
-        size += byte;
-    }
-    while (UNLIKELY(byte == 0xFF));
-
-    return size;
-}
-
-static void lz4_unpack(const uint8_t* inbuf, u32 inbufSize, uint8_t* dst, struct DMAAsyncCtx* ctx)
-{
-    const uint8_t* inbufEnd = inbuf + inbufSize;
-    const uint8_t* dmaLimit = inbuf - 16; 
-    while (1)
-    {
-        if (UNLIKELY(inbuf > dmaLimit)) { dmaLimit = dma_async_ctx_read(ctx); }
-        uint8_t token = *inbuf;
-        inbuf++;
-
-        {
-            int literalSize = token >> 4;
-            if (LIKELY(literalSize))
-            {
-                if (UNLIKELY(literalSize == 0xF))
-                    literalSize += lz4_read_length(&inbuf, &dmaLimit, ctx);
-
-                const uint8_t* copySrc = inbuf;
-                inbuf += literalSize;
-                do
-                {
-                    if (UNLIKELY((uint8_t*) copySrc > dmaLimit)) { dmaLimit = dma_async_ctx_read(ctx); }
-                    const uint64_t data = GET_UNALIGNED8(copySrc);
-                    copySrc += 8;
-                    PUT_UNALIGNED8(data, dst);
-                    dst += 8;
-                    literalSize -= 8;
-                } while (literalSize > 0);
-                dst += literalSize;
-            }
-        }
-
-        if (UNLIKELY(inbuf >= inbufEnd)) break;
-
-        {
-            if (UNLIKELY(inbuf > dmaLimit)) { dmaLimit = dma_async_ctx_read(ctx); }
-            uint16_t b1 = inbuf[1];
-            inbuf += 2;
-            uint16_t b0 = inbuf[-2];
-            b1 <<= 8;
-            uint16_t matchOffset = b0 | b1;
-            
-            int matchSize = token & 0xF;
-            if (UNLIKELY(matchSize == 0xF))
-                matchSize += lz4_read_length(&inbuf, &dmaLimit, ctx);
-            
-            matchSize += 4;
-            const uint8_t* copySrc = dst - matchOffset;
-            if (matchOffset > matchSize || matchOffset >= 8)
-            {
-                do
-                {
-                    const uint64_t data = GET_UNALIGNED8(copySrc);
-                    copySrc += 8;
-                    PUT_UNALIGNED8(data, dst);
-                    dst += 8;
-                    matchSize -= 8;
-                } while (matchSize > 0);
-                dst += matchSize;
-            }
-            else
-            {
-                do
-                {
-                    uint8_t data = *copySrc;
-                    copySrc++;
-                    *dst = data;
-                    dst++;
-                    matchSize--;
-                } while (matchSize > 0);
-            }
-        }
-    }
-}
-#endif
-
-#ifdef LZ4T
-static void lz4t_unpack(const uint8_t* restrict inbuf, int32_t nibbles, uint8_t* restrict dst, struct DMAAsyncCtx* ctx)
-{
-#define LOAD_FRESH_NIBBLES() if (nibbles == 0) { nibbles = GET_UNALIGNED4S(inbuf); if (UNLIKELY(!nibbles)) { return; } inbuf += 4; }
-    // DMA checks is checking whether dmaLimit will be exceeded after reading the data.
-    // 'dma_async_ctx_read' will wait for the current DMA request and fire the next DMA request
-#define DMA_CHECK(v) if (UNLIKELY(v > dmaLimit)) { dmaLimit = dma_async_ctx_read(ctx); }
-
-    const uint8_t* dmaLimit = inbuf - 16;
-    for (;; nibbles <<= 4)
-    {
-        // we will need to read the data (literal or offset) so might as well do it unconditionally from the start
-        DMA_CHECK(inbuf);
-
-        // matchLim will define the max amount of size encoded in a single nibble
-        // If it is a match after guaranteed literal, it is 15, otherwise 7 (we checked for nibbles >= 0)
-        int matchLim = 7;
-
-        LOAD_FRESH_NIBBLES();
-
-        // Each nibble is either 0xxx or 1xxx, xxx is a length
-        int len = 7 & (nibbles >> 28);
-
-        // If highest bit of current nibble is set to 1, then it is a literal load
-        // Conveniently check for that using '<0' condition
-        // Condition for matches will fallthru this check
-        if (nibbles < 0)
-        {
-            // If length is 0, it is an extended match which will be bit encoded
-            if (0 != len)
-            {
-                // Load full 8 byte literals, similar to LZ4 fast dec loop
-                // No need to check for DMA limit here, we are still within the range
-                const uint64_t data = GET_UNALIGNED8(inbuf);
-                inbuf += len;
-                PUT_UNALIGNED8(data, dst);
-                dst += len;
-
-                // It is unknown whether next nibble will be match or literal so continue
-                if (len == matchLim)
-                    continue;
-                
-                // ...otherwise fallthru to matches with extended matchLim
-            }
-            else
-            {
-                // Load more than 8 byte literals with a bit encoding loop
-                len = 0;
-                int shift = 0;
-                while (1)
-                {
-                    int8_t next = *(int8_t*) (inbuf);
-                    inbuf++;
-                    len |= (next & 0x7f) << shift;
-                    shift += 7;
-                    if (next >= 0)
-                    {
-                        break;
-                    }
-                }
-
-                len += 22;
-                const uint8_t* copySrc = inbuf;
-                inbuf += len;
-                do
-                {
-                    // TODO: This is unnecessary for the first loop, we are already in the range
-                    DMA_CHECK(copySrc);
-                    const uint64_t data = GET_UNALIGNED8(copySrc);
-                    copySrc += 8;
-                    PUT_UNALIGNED8(data, dst);
-                    dst += 8;
-                    len -= 8;
-                } while (len > 0);
-                dst += len;
-
-                // ... and fallthru to matches with extended limit
-            }
-        }
-        else
-        {
-            // This is ugly, but it is the easiest way to do it
-            goto matches;
-        }
-
-        // here is a fallthru for matches with extended limit so clear out the nibble
-        nibbles <<= 4;
-        LOAD_FRESH_NIBBLES();
-
-        // match limit is 15 because it is after guaranteed literal
-        matchLim = 15;
-        // we are here after a literal was loaded so check DMA before loading offset in
-        DMA_CHECK(inbuf);
-        // cast like this is valid - signed to unsigned will just properly overflow
-        len = (((uint32_t) nibbles) >> 28);
-
-matches:
-        // pull in offset and potentially the first size
-        uint32_t matchCombo = GET_UNALIGNED4(inbuf);
-        inbuf += 2;
-        // It is 16 bit valid offset that fits in 'int', no need to do casts
-        int matchOffset = matchCombo >> 16;
-        // If it is 'regular' match, len='7 & (nibbles >> 28)', otherwise extended match '(nibbles >> 28)'
-        // We need to start preparing the value for 'matchLen' which is 'matchLim + 3 + exSize'
-        int matchLen = 3 + len;
-        if (matchLim == len)
-        {
-            // we want extended matchLen so pull it from data
-            // conveniently we have the first 'next' already
-            // but I want a sign extended matchCombo 2nd byte so I am doing some ugly stuff
-            int8_t next = ((((int) (matchCombo)) << 16) >> 24);
-            int exLen = next & 0x7f;
-            int shift = 7;
-            inbuf++;
-            while (next < 0)
-            {
-                next = *(int8_t*) (inbuf);
-                inbuf++;
-                exLen |= (next & 0x7f) << shift;
-                shift += 7;
-            }
-
-            matchLen += exLen;
-        }
-
-        const uint8_t* copySrc = dst - matchOffset;
-        if (matchOffset > matchLen || matchOffset >= 8)
-        {
-            do
-            {
-                const uint64_t data = GET_UNALIGNED8(copySrc);
-                copySrc += 8;
-                PUT_UNALIGNED8(data, dst);
-                dst += 8;
-                matchLen -= 8;
-            } while (matchLen > 0);
-            dst += matchLen;
-        }
-        else
-        {
-            if (1 == matchOffset)
-            {
-                uint64_t data = *copySrc;
-                data |= data << 8;
-                data |= data << 16;
-                data |= data << 32;
-                do
-                {
-                    PUT_UNALIGNED8(data, dst);
-                    dst += 8;
-                    matchLen -= 8;
-                } while (matchLen > 0);
-                dst += matchLen;            
-            }
-            else
-            {
-                do
-                {
-                    uint8_t data = *copySrc;
-                    copySrc++;
-                    *dst = data;
-                    dst++;
-                    matchLen--;
-                } while (matchLen > 0);
-            }
-        }
-
-        // repeat the loop...
-    }
-
-#undef DMA_CHECK
-#undef LOAD_FRESH_NIBBLES
-}
-#endif
-
-#if defined(LZ4) || defined(LZ4T)
+#if defined(LZ4T)
 #define DMA_ASYNC_HEADER_SIZE 16
 #else
 #define DMA_ASYNC_HEADER_SIZE 0
@@ -758,19 +424,8 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
             slidstart(compressed, dest);
 #elif MIO0
             decompress(compressed, dest);
-#elif LZ4
-            u32 lz4CompSize = *(u32 *) (compressed + 8);
-            extern int decompress_lz4_full_fast(const void *inbuf, int insize, void *outbuf, void* dmaCtx);
-            if (LIKELY(gIsConsole))
-                decompress_lz4_full_fast(compressed + DMA_ASYNC_HEADER_SIZE, lz4CompSize, dest, &asyncCtx);
-            else
-                lz4_unpack(compressed + DMA_ASYNC_HEADER_SIZE, lz4CompSize, dest, &asyncCtx);
 #elif LZ4T
-            extern int decompress_lz4t_full_fast(const void *inbuf, int insize, void *outbuf, void* dmaCtx);
-            if (LIKELY(gIsConsole))
-                decompress_lz4t_full_fast(compressed + DMA_ASYNC_HEADER_SIZE, *(int32_t *) (compressed + 12), dest, &asyncCtx);
-            else
-                lz4t_unpack(compressed + DMA_ASYNC_HEADER_SIZE, *(int32_t *) (compressed + 12), dest, &asyncCtx);
+            lz4t_unpack(compressed, dest, &asyncCtx);
 #endif
             osSyncPrintf("end decompress\n");
             set_segment_base_addr(segment, dest);

@@ -12,9 +12,10 @@
 #define inbuf       $s0
 #define nibbles     $s1
 #define outbuf      $s2
-
+#define match_combo_mask $s3
 #define len         $s4
 #define match_lim   $s5
+#define match_min   $s6
 #define v0_st       $s7
 
 #define dma_ctx     $s8
@@ -25,37 +26,40 @@
 #define match_len   $t7
 #define match_off   $t6
 #define match_combo $t5
+#define off_nibble  $t4
 
-    .section .text.decompress_lz4t_full_fast
+    .section .text.lz4t_unpack_fast
 	.p2align 5
-    .globl decompress_lz4t_full_fast 
-    .func decompress_lz4t_full_fast
+    .globl lz4t_unpack_fast 
+    .func lz4t_unpack_fast
     .set at
     .set noreorder
 
-decompress_lz4t_full_fast:
+lz4t_unpack_fast:
     addiu $sp, $sp, -0x40
     sw $ra, 0x14($sp)
     sw $s0, 0x18($sp)
     sw $s1, 0x1c($sp)
     sw $s2, 0x20($sp)
+    sw $s3, 0x24($sp)
     sw $s4, 0x28($sp)
     sw $s5, 0x2C($sp)
+    sw $s6, 0x30($sp)
     sw $s7, 0x34($sp)
     sw $s8, 0x38($sp)
 
     move $s0, $a0
-    move $s1, $a1
-    move $s2, $a2
-    move dma_ctx, $a3
+    lw $s1, 12($a0)
+    move $s2, $a1
+    move dma_ctx, $a2
+    lbu match_combo_mask, 8($a0)
+    sll match_combo_mask, 28
+    lbu match_min, 9($a0)
 
     move dma_ptr, $a0
-    b .Lstart
-     addiu dma_ptr, -16
+    addiu $s0, 16
 
 .Lloop:
-    sll nibbles, 4
-.Lstart:
     sub $t0, inbuf, dma_ptr                     # check if we need to wait for dma
     bgezal $t0, dma_async_ctx_read                    # if inbuf >= dma_ptr, wait for dma
      move $a0, dma_ctx
@@ -84,9 +88,9 @@ decompress_lz4t_full_fast:
     add inbuf, len
     sdl $t0, 0(outbuf)
     sdr $t0, 7(outbuf)
+    sll nibbles, 4
     beq len, match_lim, .Lloop
     add outbuf, len
-    sll nibbles, 4
 
 .Lmatches_ex:
     sub $t0, inbuf, dma_ptr                     # check if we need to wait for dma
@@ -111,8 +115,16 @@ decompress_lz4t_full_fast:
     addiu inbuf, 2
     srl match_off, match_combo, 16
 
+    beqz match_combo_mask, .Lfull_offset
+    sll nibbles, 4
+    srl nibbles, 4
+    and off_nibble, match_combo, match_combo_mask
+    or nibbles, off_nibble
+    andi match_off, 0xfff
+.Lfull_offset:
+
     bne len, match_lim, .Lmatch
-     add match_len, len, 3
+     addu match_len, len, match_min
 
     # len is sign extended match_combo[8:15]
     sll match_combo, 16
@@ -124,11 +136,11 @@ decompress_lz4t_full_fast:
     add match_len, len
 
 .Lmatch:
-    blt match_off, match_len, .Lmatch1_loop     # check if we can do 8-byte copy
+    ble match_off, match_len, .Lmatch1_loop     # check if we can do 8-byte copy
      sub v0_st, outbuf, match_off                 # calculate start of match
 .Lmatch8_loop:                                  # 8-byte copy loop
-    ldl $t0, 0(v0_st)                             # load 8 bytes
-    ldr $t0, 7(v0_st)
+    ldl $t0, -1(v0_st)                             # load 8 bytes
+    ldr $t0, 6(v0_st)
     addiu v0_st, 8
     sdl $t0, 0(outbuf)                          # store 8 bytes
     sdr $t0, 7(outbuf)
@@ -139,7 +151,7 @@ decompress_lz4t_full_fast:
      addu outbuf, match_len                     # adjust pointer remove extra bytes
 
 .Lmatch1_loop:                                  # 1-byte copy loop
-    lbu $t0, 0(v0_st)                             # load 1 byte
+    lbu $t0, -1(v0_st)                             # load 1 byte
     addiu v0_st, 1
     sb $t0, 0(outbuf)                           # store 1 byte
     addiu match_len, -1
@@ -179,8 +191,10 @@ decompress_lz4t_full_fast:
     lw $s0, 0x18($sp)
     lw $s1, 0x1c($sp)
     lw $s2, 0x20($sp)
+    lw $s3, 0x24($sp)
     lw $s4, 0x28($sp)
     lw $s5, 0x2C($sp)
+    lw $s6, 0x30($sp)
     lw $s7, 0x34($sp)
     lw $s8, 0x38($sp)
     jr $ra

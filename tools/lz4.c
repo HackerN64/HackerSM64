@@ -240,7 +240,8 @@ void  LZ4_free(void* p);
 *  Common Constants
 **************************************/
 #ifdef LZ4T
-#define MINMATCH 4
+extern int LZ4T_minMatch;
+#define MINMATCH LZ4T_minMatch
 #else
 #define MINMATCH 4
 #endif
@@ -786,9 +787,9 @@ int LZ4_decompress_safe_partial_forceExtDict(const char* source, char* dest,
 LZ4_FORCE_INLINE U32 LZ4_hash4(U32 sequence, tableType_t const tableType)
 {
     if (tableType == byU16)
-        return ((sequence * 2654435761U) >> ((MINMATCH*8)-(LZ4_HASHLOG+1)));
+        return ((sequence * 2654435761U) >> ((4*8)-(LZ4_HASHLOG+1)));
     else
-        return ((sequence * 2654435761U) >> ((MINMATCH*8)-LZ4_HASHLOG));
+        return ((sequence * 2654435761U) >> ((4*8)-LZ4_HASHLOG));
 }
 
 LZ4_FORCE_INLINE U32 LZ4_hash5(U64 sequence, tableType_t const tableType)

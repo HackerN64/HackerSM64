@@ -74,7 +74,7 @@ typedef enum { noDictCtx, usingDictCtxHc } dictCtx_directive;
 
 /*===   Constants   ===*/
 #define OPTIMAL_ML (int)((ML_MASK-1)+MINMATCH)
-#define LZ4_OPT_NUM   (1<<12)
+#define LZ4_OPT_NUM   (1<<16)
 
 
 /*===   Macros   ===*/
@@ -87,7 +87,13 @@ typedef enum { noDictCtx, usingDictCtxHc } dictCtx_directive;
 
 /*===   Hashing   ===*/
 #define LZ4HC_HASHSIZE 4
-#define HASH_FUNCTION(i)         (((i) * 2654435761U) >> ((4*8)-LZ4HC_HASH_LOG))
+#ifdef LZ4T
+extern uint32_t LZ4T_hashMask;
+#define LZ4T_HASH_MASK LZ4T_hashMask
+#else
+#define LZ4T_HASH_MASK 0xffffffffU
+#endif
+#define HASH_FUNCTION(i)         (((i & 0x00ffffff) * 2654435761U) >> ((4*8)-LZ4HC_HASH_LOG))
 static U32 LZ4HC_hashPtr(const void* ptr) { return HASH_FUNCTION(LZ4_read32(ptr)); }
 
 #if defined(LZ4_FORCE_MEMORY_ACCESS) && (LZ4_FORCE_MEMORY_ACCESS==2)
@@ -318,7 +324,7 @@ LZ4_FORCE_INLINE int LZ4HC_encodeSequence (
 #undef anchor
 }
 #else
-extern int LZ4HC_encodeSequence (
+LZ4_FORCE_INLINE int LZ4HC_encodeSequence (
     const BYTE** _ip,
     BYTE** _op,
     const BYTE** _anchor,
@@ -776,7 +782,7 @@ LZ4HC_InsertAndGetWiderMatch (
             assert(matchPtr < ip);
             assert(longest >= 1);
             if (LZ4_read16(iLowLimit + longest - 1) == LZ4_read16(matchPtr - lookBackLength + longest - 1)) {
-                if (LZ4_read32(matchPtr) == pattern) {
+                if ((LZ4_read32(matchPtr) & LZ4T_HASH_MASK) == (pattern & LZ4T_HASH_MASK)) {
                     int const back = lookBackLength ? LZ4HC_countBack(ip, matchPtr, iLowLimit, prefixPtr) : 0;
                     matchLength = MINMATCH + (int)LZ4_count(ip+MINMATCH, matchPtr+MINMATCH, iHighLimit);
                     matchLength -= back;
@@ -790,7 +796,7 @@ LZ4HC_InsertAndGetWiderMatch (
             const BYTE* const matchPtr = dictStart + (matchIndex - dictIdx);
             assert(matchIndex >= dictIdx);
             if ( likely(matchIndex <= prefixIdx - 4)
-              && (LZ4_read32(matchPtr) == pattern) ) {
+              && ((LZ4_read32(matchPtr) & LZ4T_HASH_MASK) == (pattern & LZ4T_HASH_MASK)) ) {
                 int back = 0;
                 const BYTE* vLimit = ip + (prefixIdx - matchIndex);
                 if (vLimit > iHighLimit) vLimit = iHighLimit;
@@ -1727,8 +1733,8 @@ LZ4_FORCE_INLINE int LZ4HC_sequencePrice(int litlen, int mlen)
     return price;
 }
 #else
-extern int LZ4HC_literalsPrice(int const litlen);
-extern int LZ4HC_sequencePrice(int litlen, int mlen);
+LZ4_FORCE_INLINE int LZ4HC_literalsPrice(int const litlen);
+LZ4_FORCE_INLINE int LZ4HC_sequencePrice(int litlen, int mlen);
 #endif
 
 
@@ -2021,7 +2027,7 @@ _last_literals:
          op += lastRunSize;
      }
 #else
-extern int LZ4T_lastLiterals (
+int LZ4T_lastLiterals (
     const BYTE** _ip,
     BYTE** _op,
     const BYTE** _anchor,
