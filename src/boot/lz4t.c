@@ -4,12 +4,12 @@
 
 #include "macros.h"
 
-void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restrict dst, struct DMAAsyncCtx* ctx)
+OPTIMIZE_OS void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restrict dst, struct DMAAsyncCtx* ctx)
 {
-#define LOAD_FRESH_NIBBLES() if (nibbles == 0) { nibbles = GET_UNALIGNED4S(inbuf); if (UNLIKELY(!nibbles)) { return; } inbuf += 4; }
+#define LOAD_FRESH_NIBBLES() if (nibbles == 0) { nibbles = GET_UNALIGNED4S(inbuf); if (!nibbles) { return; } inbuf += 4; }
     // DMA checks is checking whether dmaLimit will be exceeded after reading the data.
     // 'dma_async_ctx_read' will wait for the current DMA request and fire the next DMA request
-#define DMA_CHECK(v) if (UNLIKELY(v > dmaLimit)) { dmaLimit = dma_async_ctx_read(ctx); }
+#define DMA_CHECK(v) if (v > dmaLimit) { dmaLimit = dma_async_ctx_read(ctx); }
 
     uint32_t shortOffsetMask = *(uint8_t*) (inbuf + 8);
     shortOffsetMask <<= 28;

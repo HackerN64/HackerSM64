@@ -162,8 +162,4 @@
 #define GET_UNALIGNED4S(ptr) __GET_UNALIGNED_T(int32_t, (ptr))
 #define PUT_UNALIGNED4(val, ptr) __PUT_UNALIGNED_T(uint32_t, (val), (ptr))
 
-#define EXPECT(expr, value) (__builtin_expect((expr), (value)))
-#define LIKELY(expr) EXPECT((expr) != 0, 1)
-#define UNLIKELY(expr) EXPECT((expr) != 0, 0)
-
 #endif // MACROS_H
