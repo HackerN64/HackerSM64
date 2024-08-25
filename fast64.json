@@ -21,7 +21,7 @@
   },
   "sm64": {
     "refresh_version": "Refresh 13",
-    "compression_format": "mio0",
+    "compression_format": "yay0",
     "force_extended_ram": false,
     "matstack_fix": true
   }
