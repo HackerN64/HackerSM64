@@ -8999,35 +8999,6 @@ void cutscene_enter_cannon_start(struct Camera *c) {
     sCutsceneVars[4].point[1] = 0.f;
 }
 
-/**
- * Used for entering a room that uses a specific camera mode, like the castle lobby or BBH
- */
-void cutscene_door_mode(struct Camera *c) {
-    reset_pan_distance(c);
-#ifdef USE_COURSE_DEFAULT_MODE
-    c->mode = c->defMode;
-#else
-    camera_course_processing(c);
-
-    if (c->mode == CAMERA_MODE_FIXED) {
-        c->nextYaw = update_fixed_camera(c, c->focus, c->pos);
-    }
-    if (c->mode == CAMERA_MODE_PARALLEL_TRACKING) {
-        c->nextYaw = update_parallel_tracking_camera(c, c->focus, c->pos);
-    }
-#endif
-
-    c->yaw = c->nextYaw;
-
-    // Loop until Mario is no longer using the door
-    if (sMarioCamState->action != ACT_ENTERING_STAR_DOOR &&
-        sMarioCamState->action != ACT_PULLING_DOOR &&
-        sMarioCamState->action != ACT_PUSHING_DOOR) {
-        gCutsceneTimer = CUTSCENE_STOP;
-        c->cutscene = 0;
-    }
-}
-
 /* TODO:
  * The next two arrays are both related to levels, and they look generated.
  * These should be split into their own file.

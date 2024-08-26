@@ -75,6 +75,35 @@ void cutscene_door_end(struct Camera *c) {
 }
 
 /**
+ * Used for entering a room that uses a specific camera mode, like the castle lobby or BBH
+ */
+void cutscene_door_mode(struct Camera *c) {
+    reset_pan_distance(c);
+#ifdef USE_COURSE_DEFAULT_MODE
+    c->mode = c->defMode;
+#else
+    camera_course_processing(c);
+
+    if (c->mode == CAMERA_MODE_FIXED) {
+        c->nextYaw = update_fixed_camera(c, c->focus, c->pos);
+    }
+    if (c->mode == CAMERA_MODE_PARALLEL_TRACKING) {
+        c->nextYaw = update_parallel_tracking_camera(c, c->focus, c->pos);
+    }
+#endif
+
+    c->yaw = c->nextYaw;
+
+    // Loop until Mario is no longer using the door
+    if (sMarioCamState->action != ACT_ENTERING_STAR_DOOR &&
+        sMarioCamState->action != ACT_PULLING_DOOR &&
+        sMarioCamState->action != ACT_PUSHING_DOOR) {
+        gCutsceneTimer = CUTSCENE_STOP;
+        c->cutscene = 0;
+    }
+}
+
+/**
  * Cutscene that plays when Mario pulls open a door.
  */
 struct Cutscene sCutsceneDoorPull[] = {
@@ -99,4 +128,39 @@ struct Cutscene sCutsceneDoorPullMode[] = {
     { cutscene_door_fix_cam, 30 },
 #endif
     { cutscene_door_mode, CUTSCENE_LOOP }
+};
+
+/**
+ * Cutscene that plays when Mario pushes open a door.
+ */
+struct Cutscene sCutsceneDoorPush[] = {
+// HackerSM64 TODO: Properly transition when moving through doors
+#ifndef FORCED_CAMERA_MODE
+    { cutscene_door_start, 1 },
+    { cutscene_door_fix_cam, 20 },
+    { cutscene_door_move_behind_mario, 1 },
+    { cutscene_door_follow_mario, 50 },
+#endif
+    { cutscene_door_end, 0 }
+};
+
+/**
+ * Cutscene that plays when Mario pushes open a door that has some special mode requirement on the other
+ * side.
+ */
+struct Cutscene sCutsceneDoorPushMode[] = {
+// HackerSM64 TODO: Properly transition when moving through doors
+#ifndef FORCED_CAMERA_MODE
+    { cutscene_door_start, 1 },
+    { cutscene_door_fix_cam, 20 },
+#endif
+    { cutscene_door_mode, CUTSCENE_LOOP }
+};
+
+/**
+ * Cutscene that plays when Mario enters a door that warps to another area.
+ */
+struct Cutscene sCutsceneDoorWarp[] = {
+    { cutscene_door_start, 1 },
+    { cutscene_door_loop, CUTSCENE_LOOP }
 };
