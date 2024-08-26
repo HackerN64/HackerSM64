@@ -1,5 +1,6 @@
 - globals:
-cutscene_exit_painting
-cutscene_exit_painting_end
-cutscene_exit_to_castle_grounds_end
-cutscene_non_painting_end
+cutscene_mario_dialog
+cutscene_death_stomach_start
+cutscene_double_doors_end
+
+- maybe consolidate death cutscene files?
