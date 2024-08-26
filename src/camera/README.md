@@ -10,6 +10,8 @@ src/camera
 │   └── {cutscene}.c: the code for a cutscene (or group of scenes), and its cutscene struct definition
 ├── level_specific
 │   └── {level}.c: camera trigger code for a vanilla level, if applicable
+├── modes
+│   └── {mode}.c: code for a specific camera mode
 ├── camera_cutscene.c: cutscene and spline procesing, as well as shared cutscene functions
 ├── camera_geo.c: code for generating the Camera GraphNode
 └── camera_math.c: math routines
