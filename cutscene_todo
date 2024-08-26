@@ -1,1 +1,5 @@
-- cutscene_exit_painting and cutscene_exit_painting_end are global
+- globals:
+cutscene_exit_painting
+cutscene_exit_painting_end
+cutscene_exit_to_castle_grounds_end
+cutscene_non_painting_end
