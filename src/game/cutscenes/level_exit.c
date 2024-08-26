@@ -299,6 +299,78 @@ void cutscene_non_painting_death(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
 }
 
+void cutscene_exit_waterfall_warp(struct Camera *c) {
+    //! hardcoded position
+    vec3f_set(c->pos, -3899.f, 39.f, -5671.f);
+}
+
+/**
+ * Look at Mario, used by cutscenes that play when Mario exits a course to castle grounds.
+ */
+void cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
+    vec3f_copy(c->focus, sMarioCamState->pos);
+    c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] + 125.f - c->pos[1]) * 0.5f;
+    approach_vec3f_asymptotic(c->focus, sMarioCamState->pos, 0.05f, 0.4f, 0.05f);
+}
+
+/**
+ * Cutscene that plays when Mario leaves CotMC through the waterfall.
+ */
+void cutscene_exit_waterfall(struct Camera *c) {
+    cutscene_event(cutscene_exit_waterfall_warp, c, 0, 0);
+    cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
+    update_camera_yaw(c);
+}
+
+/**
+ * End the cutscene, used by cutscenes that play when Mario exits a course to castle grounds.
+ */
+void cutscene_exit_to_castle_grounds_end(struct Camera *c) {
+    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+    gCutsceneTimer = CUTSCENE_STOP;
+    c->cutscene = 0;
+    update_camera_yaw(c);
+}
+
+void cutscene_exit_fall_to_castle_grounds_warp(struct Camera *c) {
+    //! hardcoded position
+    vec3f_set(c->pos, 5830.f, 32.f, 3985.f);
+}
+
+/**
+ * Cutscene that plays when Mario falls from WMOTR.
+ */
+void cutscene_exit_fall_to_castle_grounds(struct Camera *c) {
+    cutscene_event(cutscene_exit_fall_to_castle_grounds_warp, c, 0, 0);
+    cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
+    update_camera_yaw(c);
+}
+
+/**
+ * Unused. Warp the camera to Mario.
+ */
+void cutscene_unused_exit_start(struct Camera *c) {
+    Vec3f offset;
+    Vec3s marioAngle;
+
+    vec3f_set(offset, 200.f, 300.f, 200.f);
+    vec3s_set(marioAngle, 0, sMarioCamState->faceAngle[1], 0);
+    offset_rotated(c->pos, sMarioCamState->pos, offset, marioAngle);
+    set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
+}
+
+/**
+ * Unused. Focus on Mario as he exits.
+ */
+void cutscene_unused_exit_focus_mario(struct Camera *c) {
+    Vec3f focus;
+
+    vec3f_set(focus, sMarioCamState->pos[0], sMarioCamState->pos[1] + 125.f, sMarioCamState->pos[2]);
+    set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
+    approach_vec3f_asymptotic(c->focus, focus, 0.02f, 0.001f, 0.02f);
+    update_camera_yaw(c);
+}
+
 /**
  * Cutscene that plays when Mario dies and warps back to the castle.
  */
