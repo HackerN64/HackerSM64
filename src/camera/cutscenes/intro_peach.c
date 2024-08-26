@@ -3,6 +3,34 @@
  */
 
 /**
+ * Lower the volume (US only) and start the peach letter background music
+ */
+void cutscene_intro_peach_start_letter_music(UNUSED struct Camera *c) {
+#if defined(VERSION_US) || defined(VERSION_SH)
+    seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
+#endif
+    cutscene_intro_peach_play_message_music();
+}
+
+/**
+ * Raise the volume (not in JP) and start the flying music.
+ */
+void cutscene_intro_peach_start_flying_music(UNUSED struct Camera *c) {
+    seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
+    cutscene_intro_peach_play_lakitu_flying_music();
+}
+
+#ifdef VERSION_EU
+/**
+ * Lower the volume for the letter background music. In US, this happens on the same frame as the music
+ * starts.
+ */
+void cutscene_intro_peach_eu_lower_volume(UNUSED struct Camera *c) {
+    seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
+}
+#endif
+
+/**
  * Move the camera along `positionSpline` and point its focus at the corresponding point along
  * `focusSpline`. sCutsceneSplineSegmentProgress is updated after pos and focus are calculated.
  */

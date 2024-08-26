@@ -11,3 +11,6 @@ split into:
   - all sound routines
 -camera_geo (maybe)
   - FOV and stuff
+
+
+- sModeTransitions has functions that can be consolidated to a stub func

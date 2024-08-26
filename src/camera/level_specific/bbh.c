@@ -1,6 +1,17 @@
 
 
 void cam_bbh_room_6(struct Camera *c) {
+    /**
+     * Table that dictates camera movement in bookend room.
+     * Due to only the X being varied in the table, this only moves along the X axis linearly.
+     * Third entry is seemingly unused.
+     */
+    static struct ParallelTrackingPoint sBBHLibraryParTrackPath[] = {
+        { 1, { -929.0f, 1619.0f, -1490.0f }, 50.0f, 0.0f },
+        { 0, { -2118.0f, 1619.0f, -1490.0f }, 50.0f, 0.0f },
+        { 0, { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f },
+    };
+
     parallel_tracking_init(c, sBBHLibraryParTrackPath);
 }
 

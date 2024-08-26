@@ -325,6 +325,33 @@ struct CutsceneSplinePoint sCcmOutsideCreditsSplineFocus[] = {
     { -1, 50, { -4730, -1215, 1795 } }
 };
 
+void init_spline_point(struct CutsceneSplinePoint *splinePoint, s8 index, u8 speed, Vec3s point) {
+    splinePoint->index = index;
+    splinePoint->speed = speed;
+    vec3s_copy(splinePoint->point, point);
+}
+
+// TODO: (Scrub C)
+void copy_spline_segment(struct CutsceneSplinePoint dst[], struct CutsceneSplinePoint src[]) {
+    s32 j = 0;
+    s32 i = 0;
+
+    init_spline_point(&dst[i], src[j].index, src[j].speed, src[j].point);
+    i++;
+    do {
+        do {
+            init_spline_point(&dst[i], src[j].index, src[j].speed, src[j].point);
+            i++;
+            j++;
+        } while (src[j].index != -1);
+    } while (j > 16);
+
+    // Create the end of the spline by duplicating the last point
+    init_spline_point(&dst[i + 0],  0, src[j].speed, src[j].point);
+    init_spline_point(&dst[i + 1],  0,            0, src[j].point);
+    init_spline_point(&dst[i + 2],  0,            0, src[j].point);
+    init_spline_point(&dst[i + 3], -1,            0, src[j].point);
+}
 
 /**
  * Called on the first frame of the credits. Resets the spline progress.

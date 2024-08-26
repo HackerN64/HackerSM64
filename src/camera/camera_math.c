@@ -808,3 +808,20 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
     return finished;
 }
 
+/**
+ * Change the spherical coordinates of `to` relative to `from` by `incDist`, `incPitch`, and `incYaw`
+ *
+ * @param from    the base position
+ * @param[out] to the destination position
+ */
+void rotate_and_move_vec3f(Vec3f to, Vec3f from, f32 incDist, s16 incPitch, s16 incYaw) {
+    f32 dist;
+    s16 pitch, yaw;
+
+    vec3f_get_dist_and_angle(from, to, &dist, &pitch, &yaw);
+    pitch += incPitch;
+    yaw += incYaw;
+    dist += incDist;
+    vec3f_set_dist_and_angle(from, to, dist, pitch, yaw);
+}
+
