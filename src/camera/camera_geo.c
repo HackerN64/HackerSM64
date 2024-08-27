@@ -1,3 +1,9 @@
+#include <ultra64.h>
+
+#include "engine/math_util.h"
+#include "game/camera.h"
+#include "game/level_update.h"
+#include "game/rendering_graph_node.h"
 
 /**
  * Add a cyclic offset to the camera's field of view based on a cosine wave

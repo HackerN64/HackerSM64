@@ -29,6 +29,11 @@
 #include "puppyprint.h"
 #include "profiling.h"
 
+#include "camera/camera_math.h"
+#include "camera/vanilla_trigger_code.h"
+#include "camera/camera_modes.h"
+#include "camera/camera_cutscene.h"
+
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
 /**
@@ -105,59 +110,6 @@ s16 sCreditsPlayer2Yaw;
  * Used to decide when to zoom out in the pause menu.
  */
 u8 sFramesPaused;
-
-extern struct CameraFOVStatus sFOVState;
-extern struct TransitionInfo sModeTransition;
-extern struct PlayerGeometry sMarioGeometry;
-extern s16 sAvoidYawVel;
-extern s16 sCameraYawAfterDoorCutscene;
-extern struct HandheldShakePoint sHandheldShakeSpline[4];
-extern s16 sHandheldShakeMag;
-extern f32 sHandheldShakeTimer;
-extern f32 sHandheldShakeInc;
-extern s16 sHandheldShakePitch;
-extern s16 sHandheldShakeYaw;
-extern s16 sHandheldShakeRoll;
-extern s16 sSelectionFlags;
-extern s16 s2ndRotateFlags;
-extern s16 sCameraSoundFlags;
-extern u16 sCButtonsPressed;
-extern s16 sCutsceneDialogID;
-extern struct LakituState gLakituState;
-extern s16 sAreaYaw;
-extern s16 sAreaYawChange;
-extern s16 sLakituDist;
-extern s16 sLakituPitch;
-extern f32 sZoomAmount;
-extern s16 sCSideButtonYaw;
-extern s16 sBehindMarioSoundTimer;
-extern f32 sZeroZoomDist;
-extern s16 sCUpCameraPitch;
-extern s16 sModeOffsetYaw;
-extern s16 sSpiralStairsYawOffset;
-extern s16 s8DirModeBaseYaw;
-extern s16 s8DirModeYawOffset;
-extern f32 sPanDistance;
-extern f32 sCannonYOffset;
-extern struct ModeTransitionInfo sModeInfo;
-extern Vec3f sCastleEntranceOffset;
-extern u32 sParTrackIndex;
-extern struct ParallelTrackingPoint *sParTrackPath;
-extern struct CameraStoredInfo sParTrackTransOff;
-extern struct CameraStoredInfo sCameraStoreCUp;
-extern struct CameraStoredInfo sCameraStoreCutscene;
-extern s16 gCameraMovementFlags;
-extern s16 sStatusFlags;
-extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
-extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
-extern s16 sCutsceneSplineSegment;
-extern f32 sCutsceneSplineSegmentProgress;
-extern s16 sCutsceneShot;
-extern s16 gCutsceneTimer;
-extern struct CutsceneVariable sCutsceneVars[10];
-extern s32 gObjCutsceneDone;
-extern u32 gCutsceneObjSpawn;
-extern struct Camera *gCamera;
 
 /**
  * Lakitu's position and focus.
@@ -448,10 +400,6 @@ CameraTransition sModeTransitions[] = {
     update_mario_camera,
     update_spiral_stairs_camera
 };
-
-// Move these two tables to another include file?
-extern u8 sDanceCutsceneIndexTable[][4];
-extern u8 sZoomOutAreaMasks[];
 
 /**
  * Starts a camera shake triggered by an interaction

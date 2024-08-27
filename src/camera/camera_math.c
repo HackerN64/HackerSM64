@@ -1,3 +1,7 @@
+#include "types.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+#include "game/level_update.h"
 
 void object_pos_to_vec3f(Vec3f dst, struct Object *obj) {
     dst[0] = obj->oPosX;

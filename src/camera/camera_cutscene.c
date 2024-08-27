@@ -1,3 +1,7 @@
+#include "engine/math_util.h"
+#include "game/camera.h"
+#include "camera_cutscene.h"
+#include "camera_math.h"
 
 /**
  * Call the event while `start` <= gCutsceneTimer <= `end`

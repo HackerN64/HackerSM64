@@ -405,14 +405,6 @@ struct HandheldShakePoint {
  * These are concurrent: multiple CameraEvents can occur on the same frame.
  */
 typedef void (*CameraEvent)(struct Camera *c);
-/**
- * The same type as a CameraEvent, but because these are generally longer, and happen in sequential
- * order, they're are called "shots," a term taken from cinematography.
- *
- * To further tell the difference: CutsceneShots usually call multiple CameraEvents at once, but only
- * one CutsceneShot is ever called on a given frame.
- */
-typedef CameraEvent CutsceneShot;
 
 /**
  * Defines a bounding box which activates an event while Mario is inside
@@ -439,17 +431,6 @@ struct CameraTrigger {
     s16 boundsZ;
     /// This angle rotates Mario's offset from the box's origin, before it is checked for being inside.
     s16 boundsYaw;
-};
-
-/**
- * A camera shot that is active for a number of frames.
- * Together, a sequence of shots makes up a cutscene.
- */
-struct Cutscene {
-    /// The function that gets called.
-    CutsceneShot shot;
-    /// How long the shot lasts.
-    s16 duration;
 };
 
 /**
@@ -780,6 +761,7 @@ void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
 void start_cutscene(struct Camera *c, u8 cutscene);
 u8 get_cutscene_from_mario_status(struct Camera *c);
+void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw);
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc);
 void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation);
@@ -804,5 +786,63 @@ void set_fov_shake_from_point_preset(u8 preset, f32 posX, f32 posY, f32 posZ);
 void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16 yawOff, s16 pitchDiv, s16 yawDiv);
 
 Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context);
+
+extern struct PlayerCameraState *sMarioCamState;
+extern struct CameraFOVStatus sFOVState;
+extern struct TransitionInfo sModeTransition;
+extern struct PlayerGeometry sMarioGeometry;
+extern s16 sAvoidYawVel;
+extern s16 sCameraYawAfterDoorCutscene;
+extern struct HandheldShakePoint sHandheldShakeSpline[4];
+extern s16 sHandheldShakeMag;
+extern f32 sHandheldShakeTimer;
+extern f32 sHandheldShakeInc;
+extern s16 sHandheldShakePitch;
+extern s16 sHandheldShakeYaw;
+extern s16 sHandheldShakeRoll;
+extern s16 sSelectionFlags;
+extern s16 s2ndRotateFlags;
+extern s16 sCameraSoundFlags;
+extern u16 sCButtonsPressed;
+extern s16 sCutsceneDialogID;
+extern struct LakituState gLakituState;
+extern s16 sAreaYaw;
+extern s16 sAreaYawChange;
+extern s16 sLakituDist;
+extern s16 sLakituPitch;
+extern f32 sZoomAmount;
+extern s16 sCSideButtonYaw;
+extern s16 sBehindMarioSoundTimer;
+extern f32 sZeroZoomDist;
+extern s16 sCUpCameraPitch;
+extern s16 sModeOffsetYaw;
+extern s16 sSpiralStairsYawOffset;
+extern s16 s8DirModeBaseYaw;
+extern s16 s8DirModeYawOffset;
+extern f32 sPanDistance;
+extern f32 sCannonYOffset;
+extern struct ModeTransitionInfo sModeInfo;
+extern Vec3f sCastleEntranceOffset;
+extern u32 sParTrackIndex;
+extern struct ParallelTrackingPoint *sParTrackPath;
+extern struct CameraStoredInfo sParTrackTransOff;
+extern struct CameraStoredInfo sCameraStoreCUp;
+extern struct CameraStoredInfo sCameraStoreCutscene;
+extern s16 gCameraMovementFlags;
+extern s16 sStatusFlags;
+extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
+extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
+extern s16 sCutsceneSplineSegment;
+extern f32 sCutsceneSplineSegmentProgress;
+extern s16 sCutsceneShot;
+extern s16 gCutsceneTimer;
+extern struct CutsceneVariable sCutsceneVars[10];
+extern s32 gObjCutsceneDone;
+extern u32 gCutsceneObjSpawn;
+extern struct Camera *gCamera;
+extern u8 sFramesPaused;
+extern u8 sDanceCutsceneIndexTable[][4];
+extern u8 sZoomOutAreaMasks[];
+extern s32 gCurrLevelArea;
 
 #endif // CAMERA_H
