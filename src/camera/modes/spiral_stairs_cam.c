@@ -4,6 +4,10 @@
 #include "engine/surface_collision.h"
 #include "game/camera.h"
 
+/**
+ * Stores Mario's yaw around the stairs, relative to the camera's position.
+ */
+s16 sSpiralStairsYawOffset;
 
 /**
  * Rotates the camera around the spiral staircase.

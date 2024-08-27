@@ -7,6 +7,9 @@ struct CameraMode {
     void (*updateFunc)(struct Camera *c);
 };
 
+// mode-specific export variables
+extern s16 sSpiralStairsYawOffset;
+
 void exit_c_up(struct Camera *c);
 void radial_camera_input(struct Camera *c);
 void radial_camera_move(struct Camera *c);
@@ -35,5 +38,4 @@ void lakitu_zoom(f32 rangeDist, s16 rangePitch);
 s16 look_down_slopes(s16 camYaw);
 void pan_ahead_of_player(struct Camera *c);
 s32 mode_behind_mario(struct Camera *c);
-// TODO: set_focus_rel_mario to camera_cutscene
 void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound);
