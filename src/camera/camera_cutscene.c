@@ -1,6 +1,8 @@
 #include "audio/external.h"
 #include "engine/math_util.h"
+#include "engine/surface_collision.h"
 #include "game/camera.h"
+#include "game/level_update.h"
 #include "camera_cutscene.h"
 #include "camera_math.h"
 
@@ -128,6 +130,74 @@ void retrieve_info_star(struct Camera *c) {
     vec3f_copy(c->focus, sCameraStoreCutscene.focus);
 }
 
+/**
+ * Calculates Mario's distance to the floor, or the water level if it is above the floor. Then:
+ * `posOff` is set to the distance multiplied by posMul and bounded to [-posBound, posBound]
+ * `focOff` is set to the distance multiplied by focMul and bounded to [-focBound, focBound]
+ *
+ * Notes:
+ *      posMul is always 1.0f, focMul is always 0.9f
+ *      both ranges are always 200.0f
+ *          Since focMul is 0.9, `focOff` is closer to the floor than `posOff`
+ *      posOff and focOff are sometimes the same address, which just ignores the pos calculation
+ */
+void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound) {
+    f32 floorHeight = sMarioGeometry.currFloorHeight;
+    f32 waterHeight;
+
+    if (!(sMarioCamState->action & ACT_FLAG_METAL_WATER)) {
+        //! @bug this should use sMarioGeometry.waterHeight
+        if (floorHeight < (waterHeight = find_water_level(sMarioCamState->pos[0], sMarioCamState->pos[2]))) {
+            floorHeight = waterHeight;
+        }
+    }
+
+    if (sMarioCamState->action & ACT_FLAG_ON_POLE) {
+        if (sMarioGeometry.currFloorHeight >= gMarioStates[0].usedObj->oPosY && sMarioCamState->pos[1]
+                   < 0.7f * gMarioStates[0].usedObj->hitboxHeight + gMarioStates[0].usedObj->oPosY) {
+            posBound = 1200;
+        }
+    }
+
+    *posOff = (floorHeight - sMarioCamState->pos[1]) * posMul;
+
+    if (*posOff > posBound) {
+        *posOff = posBound;
+    }
+
+    if (*posOff < -posBound) {
+        *posOff = -posBound;
+    }
+
+    *focOff = (floorHeight - sMarioCamState->pos[1]) * focMul;
+
+    if (*focOff > focBound) {
+        *focOff = focBound;
+    }
+
+    if (*focOff < -focBound) {
+        *focOff = -focBound;
+    }
+}
+
+/**
+ * Set the camera's focus to Mario's position, and add several relative offsets.
+ *
+ * @param leftRight offset to Mario's left/right, relative to his faceAngle
+ * @param yOff y offset
+ * @param forwBack offset to Mario's front/back, relative to his faceAngle
+ * @param yawOff offset to Mario's faceAngle, changes the direction of `leftRight` and `forwBack`
+ */
+void set_focus_rel_mario(struct Camera *c, f32 leftRight, f32 yOff, f32 forwBack, s16 yawOff) {
+    s16 yaw;
+    f32 focFloorYOff;
+
+    calc_y_to_curr_floor(&focFloorYOff, 1.f, 200.f, &focFloorYOff, 0.9f, 200.f);
+    yaw = sMarioCamState->faceAngle[1] + yawOff;
+    c->focus[2] = sMarioCamState->pos[2] + forwBack * coss(yaw) - leftRight * sins(yaw);
+    c->focus[0] = sMarioCamState->pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw);
+    c->focus[1] = sMarioCamState->pos[1] + yOff + focFloorYOff;
+}
 
 /**
  * Call the event while `start` <= gCutsceneTimer <= `end`
