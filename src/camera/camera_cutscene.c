@@ -1,7 +1,133 @@
+#include "audio/external.h"
 #include "engine/math_util.h"
 #include "game/camera.h"
 #include "camera_cutscene.h"
 #include "camera_math.h"
+
+/**
+ * Triggers Mario to enter a dialog state. This is used to make Mario look at the focus of a cutscene,
+ * for example, bowser.
+ * @param state 0 = stop, 1 = start, 2 = start and look up, and 3 = start and look down
+ *
+ * @return if Mario left the dialog state, return CUTSCENE_LOOP, else return gCutsceneTimer
+ */
+s16 cutscene_common_set_dialog_state(s32 state) {
+    s16 timer = gCutsceneTimer;
+    // If the dialog ended, return CUTSCENE_LOOP, which would end the cutscene shot
+    if (set_mario_npc_dialog(state) == MARIO_DIALOG_STATUS_SPEAK) {
+        timer = CUTSCENE_LOOP;
+    }
+    return timer;
+}
+
+void cutscene_stop_dialog(UNUSED struct Camera *c) {
+    cutscene_common_set_dialog_state(MARIO_DIALOG_STOP);
+}
+
+/**
+ * Cause Mario to enter the normal dialog state.
+ */
+void cutscene_mario_dialog(UNUSED struct Camera *c) {
+    gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT);
+}
+
+/**
+ * End the cutscene, used by cutscenes that play when Mario exits a course to castle grounds.
+ */
+void cutscene_exit_to_castle_grounds_end(struct Camera *c) {
+    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+    gCutsceneTimer = CUTSCENE_STOP;
+    c->cutscene = 0;
+    update_camera_yaw(c);
+}
+
+/**
+ * Start a preset fov shake. Used in cutscenes
+ */
+void cutscene_set_fov_shake_preset(u8 preset) {
+    switch (preset) {
+        case 1:
+            set_fov_shake(0x100, 0x30, 0x8000);
+            break;
+        case 2:
+            set_fov_shake(0x400, 0x20, 0x4000);
+            break;
+    }
+}
+
+void cutscene_shake_explosion(UNUSED struct Camera *c) {
+    set_environmental_camera_shake(SHAKE_ENV_EXPLOSION);
+    cutscene_set_fov_shake_preset(1);
+}
+
+/**
+ * Update the camera's yaw and nextYaw. This is called from cutscenes to ignore the camera mode's yaw.
+ * TODO: cutscene_update_camera_yaw
+ */
+void update_camera_yaw(struct Camera *c) {
+    c->nextYaw = calculate_yaw(c->focus, c->pos);
+    c->yaw = c->nextYaw;
+}
+
+void cutscene_soften_music(UNUSED struct Camera *c) {
+    seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
+}
+
+void cutscene_unsoften_music(UNUSED struct Camera *c) {
+    seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
+}
+
+void cutscene_reset_spline(void) {
+    sCutsceneSplineSegment = 0;
+    sCutsceneSplineSegmentProgress = 0;
+}
+
+void stop_cutscene_and_retrieve_stored_info(struct Camera *c) {
+    gCutsceneTimer = CUTSCENE_STOP;
+    c->cutscene = 0;
+    vec3f_copy(c->focus, sCameraStoreCutscene.focus);
+    vec3f_copy(c->pos, sCameraStoreCutscene.pos);
+}
+
+/**
+ * Store camera info for the cannon opening cutscene
+ */
+void store_info_cannon(struct Camera *c) {
+    vec3f_copy(sCameraStoreCutscene.pos, c->pos);
+    vec3f_copy(sCameraStoreCutscene.focus, c->focus);
+    sCameraStoreCutscene.panDist = sPanDistance;
+    sCameraStoreCutscene.cannonYOffset = sCannonYOffset;
+}
+
+/**
+ * Retrieve camera info for the cannon opening cutscene
+ */
+void retrieve_info_cannon(struct Camera *c) {
+    vec3f_copy(c->pos, sCameraStoreCutscene.pos);
+    vec3f_copy(c->focus, sCameraStoreCutscene.focus);
+    sPanDistance = sCameraStoreCutscene.panDist;
+    sCannonYOffset = sCameraStoreCutscene.cannonYOffset;
+}
+
+/**
+ * Store camera info for the star spawn cutscene
+ */
+void store_info_star(struct Camera *c) {
+    reset_pan_distance(c);
+    vec3f_copy(sCameraStoreCutscene.pos, c->pos);
+    sCameraStoreCutscene.focus[0] = sMarioCamState->pos[0];
+    sCameraStoreCutscene.focus[1] = c->focus[1];
+    sCameraStoreCutscene.focus[2] = sMarioCamState->pos[2];
+}
+
+/**
+ * Retrieve camera info for the star spawn cutscene
+ */
+void retrieve_info_star(struct Camera *c) {
+    vec3f_copy(c->pos, sCameraStoreCutscene.pos);
+    vec3f_copy(c->focus, sCameraStoreCutscene.focus);
+}
+
 
 /**
  * Call the event while `start` <= gCutsceneTimer <= `end`

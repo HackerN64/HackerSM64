@@ -1,3 +1,8 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 
 /**
  * Moves the camera to Mario's side when Mario starts ACT_WATER_DEATH

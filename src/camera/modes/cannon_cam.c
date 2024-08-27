@@ -1,3 +1,9 @@
+#include "camera/camera_math.h"
+#include "camera/camera_modes.h"
+#include "engine/math_util.h"
+#include "game/game_init.h"
+#include "game/camera.h"
+
 
 /**
  * Used when Mario is in a cannon.

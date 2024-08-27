@@ -1,3 +1,5 @@
+#include "game/camera.h"
+
 /**
  * Sets 8 directional mode and blocks the next trigger from processing.
  * Activated when Mario is walking in front of the snowman's head.

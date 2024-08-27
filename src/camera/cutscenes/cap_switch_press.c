@@ -1,6 +1,16 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+#include "game/save_file.h"
+
 /**
  * Cutscene that plays when Mario presses a cap switch.
  */
+
+void cap_switch_save(UNUSED s16 param) {
+    save_file_do_save(gCurrSaveFileNum - 1);
+}
 
 /**
  * Set cvars:

@@ -1,3 +1,8 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 /**
  * Star dance cutscene.
  * For the default dance, the camera moves closer to Mario, then stays in place.

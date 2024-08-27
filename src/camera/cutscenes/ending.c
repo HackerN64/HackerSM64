@@ -1,3 +1,8 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 /**
  * Cutscene that plays when Mario beats the game.
  */
@@ -54,19 +59,19 @@ void cutscene_ending_reset_spline(UNUSED struct Camera *c) {
 /**
  * Follow sEndingFlyToWindowPos/Focus up to the window.
  */
+static struct CutsceneSplinePoint sEndingFlyToWindowPos[] = {
+    { 0, 0, { -86, 876, 640 } },   { 1, 0, { -86, 876, 610 } },   { 2, 0, { -66, 945, 393 } },
+    { 3, 0, { -80, 976, 272 } },   { 4, 0, { -66, 1306, -36 } },  { 5, 0, { -70, 1869, -149 } },
+    { 6, 0, { -10, 2093, -146 } }, { 7, 0, { -10, 2530, -248 } }, { 8, 0, { -10, 2530, -263 } },
+    { 9, 0, { -10, 2530, -273 } }
+};
+static struct CutsceneSplinePoint sEndingFlyToWindowFocus[] = {
+    { 0, 50, { -33, 889, -7 } },    { 1, 35, { -33, 889, -7 } },    { 2, 31, { -17, 1070, -193 } },
+    { 3, 25, { -65, 1182, -272 } }, { 4, 20, { -64, 1559, -542 } }, { 5, 25, { -68, 2029, -677 } },
+    { 6, 25, { -9, 2204, -673 } },  { 7, 25, { -8, 2529, -772 } },  { 8, 0, { -8, 2529, -772 } },
+    { 9, 0, { -8, 2529, -772 } },   { -1, 0, { -8, 2529, -772 } }
+};
 void cutscene_ending_fly_up_to_window(struct Camera *c) {
-    static struct CutsceneSplinePoint sEndingFlyToWindowPos[] = {
-        { 0, 0, { -86, 876, 640 } },   { 1, 0, { -86, 876, 610 } },   { 2, 0, { -66, 945, 393 } },
-        { 3, 0, { -80, 976, 272 } },   { 4, 0, { -66, 1306, -36 } },  { 5, 0, { -70, 1869, -149 } },
-        { 6, 0, { -10, 2093, -146 } }, { 7, 0, { -10, 2530, -248 } }, { 8, 0, { -10, 2530, -263 } },
-        { 9, 0, { -10, 2530, -273 } }
-    };
-    static struct CutsceneSplinePoint sEndingFlyToWindowFocus[] = {
-        { 0, 50, { -33, 889, -7 } },    { 1, 35, { -33, 889, -7 } },    { 2, 31, { -17, 1070, -193 } },
-        { 3, 25, { -65, 1182, -272 } }, { 4, 20, { -64, 1559, -542 } }, { 5, 25, { -68, 2029, -677 } },
-        { 6, 25, { -9, 2204, -673 } },  { 7, 25, { -8, 2529, -772 } },  { 8, 0, { -8, 2529, -772 } },
-        { 9, 0, { -8, 2529, -772 } },   { -1, 0, { -8, 2529, -772 } }
-    };
 
     move_point_along_spline(c->pos, sEndingFlyToWindowPos, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     move_point_along_spline(c->focus, sEndingFlyToWindowFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);

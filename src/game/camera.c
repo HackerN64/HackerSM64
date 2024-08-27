@@ -363,22 +363,6 @@ struct PlayerCameraState *sMarioCamState = &gPlayerCameraState[0];
 // struct PlayerCameraState *sLuigiCamState = &gPlayerCameraState[1];
 Vec3f sFixedModeBasePosition    = { 646.0f, 143.0f, -1513.0f };
 
-s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_outward_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 unused_update_mode_5_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_c_up(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 nop_update_water_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_slide_or_0f_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_in_cannon(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_fixed_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_slide_or_0f_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos);
-
 typedef s32 (*CameraTransition)(struct Camera *c, Vec3f focus, Vec3f pos);
 CameraTransition sModeTransitions[] = {
     NULL,
@@ -918,39 +902,6 @@ void move_mario_head_c_up(UNUSED struct Camera *c) {
     // Give Mario's neck natural-looking constraints
     sMarioCamState->headRotation[0] = sCUpCameraPitch * 3 / 4;
     sMarioCamState->headRotation[1] = sModeOffsetYaw * 3 / 4;
-}
-
-/**
- * Zooms the camera in for C-Up mode
- */
-void move_into_c_up(struct Camera *c) {
-    struct LinearTransitionPoint *start = &sModeInfo.transitionStart;
-    struct LinearTransitionPoint *end = &sModeInfo.transitionEnd;
-
-    f32 dist  = end->dist  - start->dist;
-    s16 pitch = end->pitch - start->pitch;
-    s16 yaw   = end->yaw   - start->yaw;
-
-    // Linearly interpolate from start to end position's polar coordinates
-    dist  = start->dist  + dist  * sModeInfo.frame / sModeInfo.max;
-    pitch = start->pitch + pitch * sModeInfo.frame / sModeInfo.max;
-    yaw   = start->yaw   + yaw   * sModeInfo.frame / sModeInfo.max;
-
-    // Linearly interpolate the focus from start to end
-    c->focus[0] = start->focus[0] + (end->focus[0] - start->focus[0]) * sModeInfo.frame / sModeInfo.max;
-    c->focus[1] = start->focus[1] + (end->focus[1] - start->focus[1]) * sModeInfo.frame / sModeInfo.max;
-    c->focus[2] = start->focus[2] + (end->focus[2] - start->focus[2]) * sModeInfo.frame / sModeInfo.max;
-
-    vec3f_add(c->focus, sMarioCamState->pos);
-    vec3f_set_dist_and_angle(c->focus, c->pos, dist, pitch, yaw);
-
-    sMarioCamState->headRotation[0] = 0;
-    sMarioCamState->headRotation[1] = 0;
-
-    // Finished zooming in
-    if (++sModeInfo.frame == sModeInfo.max) {
-        gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE;
-    }
 }
 
 /**
@@ -1655,20 +1606,6 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
     return numCollisions;
 }
 
-/**
- * Plays the background music that starts while peach reads the intro message.
- */
-void cutscene_intro_peach_play_message_music(void) {
-    play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(4, SEQ_EVENT_PEACH_MESSAGE), 0);
-}
-
-/**
- * Plays the music that starts after peach fades and Lakitu appears.
- */
-void cutscene_intro_peach_play_lakitu_flying_music(void) {
-    play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_INTRO), 0);
-}
-
 void play_camera_buzz_if_cdown(void) {
     if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
         play_sound_button_change_blocked();
@@ -2075,48 +2012,6 @@ UNUSED static void unused_set_pos_rel_mario(struct Camera *c, f32 leftRight, f32
     c->pos[0] = sMarioCamState->pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw);
     c->pos[1] = sMarioCamState->pos[1] + yOff;
     c->pos[2] = sMarioCamState->pos[2] + forwBack * coss(yaw) - leftRight * sins(yaw);
-}
-
-/**
- * Rotates the offset `to` according to the pitch and yaw values in `rotation`.
- * Adds `from` to the rotated offset, and stores the result in `dst`.
- *
- * @warning Flips the Z axis, so that relative to `rotation`, -Z moves forwards and +Z moves backwards.
- */
-void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation) {
-    Vec3f pitchRotated;
-
-    // First rotate the direction by rotation's pitch
-    //! The Z axis is flipped here.
-    pitchRotated[2] = -(to[2] * coss(rotation[0]) - to[1] * sins(rotation[0]));
-    pitchRotated[1] =   to[2] * sins(rotation[0]) + to[1] * coss(rotation[0]);
-    pitchRotated[0] =   to[0];
-
-    // Rotate again by rotation's yaw
-    dst[0] = from[0] + pitchRotated[2] * sins(rotation[1]) + pitchRotated[0] * coss(rotation[1]);
-    dst[1] = from[1] + pitchRotated[1];
-    dst[2] = from[2] + pitchRotated[2] * coss(rotation[1]) - pitchRotated[0] * sins(rotation[1]);
-}
-
-/**
- * Rotates the offset defined by (`xTo`, `yTo`, `zTo`) according to the pitch and yaw values in `rotation`.
- * Adds `from` to the rotated offset, and stores the result in `dst`.
- *
- * @warning Flips the Z axis, so that relative to `rotation`, -Z moves forwards and +Z moves backwards.
- */
-void offset_rotated_coords(Vec3f dst, Vec3f from, Vec3s rotation, f32 xTo, f32 yTo, f32 zTo) {
-    Vec3f to;
-
-    vec3f_set(to, xTo, yTo, zTo);
-    offset_rotated(dst, from, to, rotation);
-}
-
-void determine_pushing_or_pulling_door(s16 *rotation) {
-    if (sMarioCamState->action == ACT_PULLING_DOOR) {
-        *rotation = 0;
-    } else {
-        *rotation = DEGREES(-180);
-    }
 }
 
 /**
@@ -3088,56 +2983,9 @@ s16 cutscene_object(u8 cutscene, struct Object *obj) {
     return status;
 }
 
-/**
- * Update the camera's yaw and nextYaw. This is called from cutscenes to ignore the camera mode's yaw.
- */
-void update_camera_yaw(struct Camera *c) {
-    c->nextYaw = calculate_yaw(c->focus, c->pos);
-    c->yaw = c->nextYaw;
-}
-
-void cutscene_reset_spline(void) {
-    sCutsceneSplineSegment = 0;
-    sCutsceneSplineSegmentProgress = 0;
-}
-
-void stop_cutscene_and_retrieve_stored_info(struct Camera *c) {
-    gCutsceneTimer = CUTSCENE_STOP;
-    c->cutscene = 0;
-    vec3f_copy(c->focus, sCameraStoreCutscene.focus);
-    vec3f_copy(c->pos, sCameraStoreCutscene.pos);
-}
-
-void cap_switch_save(UNUSED s16 param) {
-    save_file_do_save(gCurrSaveFileNum - 1);
-}
-
-/**
- * Triggers Mario to enter a dialog state. This is used to make Mario look at the focus of a cutscene,
- * for example, bowser.
- * @param state 0 = stop, 1 = start, 2 = start and look up, and 3 = start and look down
- *
- * @return if Mario left the dialog state, return CUTSCENE_LOOP, else return gCutsceneTimer
- */
-s16 cutscene_common_set_dialog_state(s32 state) {
-    s16 timer = gCutsceneTimer;
-    // If the dialog ended, return CUTSCENE_LOOP, which would end the cutscene shot
-    if (set_mario_npc_dialog(state) == MARIO_DIALOG_STATUS_SPEAK) {
-        timer = CUTSCENE_LOOP;
-    }
-    return timer;
-}
-
 /// Unused SSL cutscene?
 static UNUSED void unused_cutscene_mario_dialog_looking_down(UNUSED struct Camera *c) {
     gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_DOWN);
-}
-
-/**
- * Cause Mario to enter the normal dialog state.
- */
-void cutscene_mario_dialog(UNUSED struct Camera *c) {
-    gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT);
 }
 
 /// Unused SSL cutscene?
@@ -3198,45 +3046,6 @@ void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw
 }
 
 /**
- * Store camera info for the cannon opening cutscene
- */
-void store_info_cannon(struct Camera *c) {
-    vec3f_copy(sCameraStoreCutscene.pos, c->pos);
-    vec3f_copy(sCameraStoreCutscene.focus, c->focus);
-    sCameraStoreCutscene.panDist = sPanDistance;
-    sCameraStoreCutscene.cannonYOffset = sCannonYOffset;
-}
-
-/**
- * Retrieve camera info for the cannon opening cutscene
- */
-void retrieve_info_cannon(struct Camera *c) {
-    vec3f_copy(c->pos, sCameraStoreCutscene.pos);
-    vec3f_copy(c->focus, sCameraStoreCutscene.focus);
-    sPanDistance = sCameraStoreCutscene.panDist;
-    sCannonYOffset = sCameraStoreCutscene.cannonYOffset;
-}
-
-/**
- * Store camera info for the star spawn cutscene
- */
-void store_info_star(struct Camera *c) {
-    reset_pan_distance(c);
-    vec3f_copy(sCameraStoreCutscene.pos, c->pos);
-    sCameraStoreCutscene.focus[0] = sMarioCamState->pos[0];
-    sCameraStoreCutscene.focus[1] = c->focus[1];
-    sCameraStoreCutscene.focus[2] = sMarioCamState->pos[2];
-}
-
-/**
- * Retrieve camera info for the star spawn cutscene
- */
-void retrieve_info_star(struct Camera *c) {
-    vec3f_copy(c->pos, sCameraStoreCutscene.pos);
-    vec3f_copy(c->focus, sCameraStoreCutscene.focus);
-}
-
-/**
  * Rotate the camera's focus around the camera's position by incYaw and incPitch
  */
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw) {
@@ -3249,10 +3058,6 @@ void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw) {
     vec3f_set_dist_and_angle(c->pos, c->focus, distCamToFocus, pitch, yaw);
 }
 
-void cutscene_shake_explosion(UNUSED struct Camera *c) {
-    set_environmental_camera_shake(SHAKE_ENV_EXPLOSION);
-    cutscene_set_fov_shake_preset(1);
-}
 
 static UNUSED void unused_start_bowser_bounce_shake(UNUSED struct Camera *c) {
     set_environmental_camera_shake(SHAKE_ENV_BOWSER_THROW_BOUNCE);
@@ -3262,14 +3067,6 @@ static UNUSED void unused_start_bowser_bounce_shake(UNUSED struct Camera *c) {
 void set_flag_post_door(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_BEHIND_MARIO_POST_DOOR;
     sCameraYawAfterDoorCutscene = calculate_yaw(c->focus, c->pos);
-}
-
-void cutscene_soften_music(UNUSED struct Camera *c) {
-    seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
-}
-
-void cutscene_unsoften_music(UNUSED struct Camera *c) {
-    seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
 }
 
 /**
@@ -3426,20 +3223,6 @@ static UNUSED void unused_deactivate_sleeping_camera(UNUSED struct MarioState *m
  */
 void set_fov_function(u8 func) {
     sFOVState.fovFunc = func;
-}
-
-/**
- * Start a preset fov shake. Used in cutscenes
- */
-void cutscene_set_fov_shake_preset(u8 preset) {
-    switch (preset) {
-        case 1:
-            set_fov_shake(0x100, 0x30, 0x8000);
-            break;
-        case 2:
-            set_fov_shake(0x400, 0x20, 0x4000);
-            break;
-    }
 }
 
 /**

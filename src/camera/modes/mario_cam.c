@@ -1,3 +1,8 @@
+#include "camera/camera_math.h"
+#include "camera/camera_modes.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 /**
  * Used in sModeTransitions for CLOSE and FREE_ROAM mode
  */

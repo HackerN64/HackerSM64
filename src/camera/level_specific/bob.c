@@ -1,3 +1,5 @@
+#include "game/camera.h"
+
 
 /**
  * Unused. Changes the camera to radial mode when Mario is on the tower.

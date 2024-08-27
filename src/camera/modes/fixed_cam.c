@@ -1,3 +1,9 @@
+#include "camera/camera_math.h"
+#include "camera/camera_modes.h"
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
+#include "game/camera.h"
+
 
 /**
  * Updates the camera during fixed mode.

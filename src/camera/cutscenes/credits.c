@@ -1,3 +1,9 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+#include "game/save_file.h"
+
 /**
  * The game's credits.
  */

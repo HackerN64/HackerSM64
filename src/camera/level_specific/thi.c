@@ -1,3 +1,5 @@
+#include "engine/math_util.h"
+#include "game/camera.h"
 
 /**
  * Moves the camera to through the tunnel by forcing sModeOffsetYaw

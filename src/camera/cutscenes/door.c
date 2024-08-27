@@ -1,3 +1,15 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
+void determine_pushing_or_pulling_door(s16 *rotation) {
+    if (sMarioCamState->action == ACT_PULLING_DOOR) {
+        *rotation = 0;
+    } else {
+        *rotation = DEGREES(-180);
+    }
+}
 
 /**
  * Store the camera's pos and focus for the door cutscene

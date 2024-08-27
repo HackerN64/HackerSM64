@@ -49,3 +49,5 @@ void shake_camera_yaw(Vec3f pos, Vec3f focus);
 void shake_camera_roll(s16 *roll);
 void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4);
 void rotate_and_move_vec3f(Vec3f to, Vec3f from, f32 incDist, s16 incPitch, s16 incYaw);
+void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation);
+void offset_rotated_coords(Vec3f dst, Vec3f from, Vec3s rotation, f32 xTo, f32 yTo, f32 zTo);

@@ -3,6 +3,41 @@
 #include "game/camera.h"
 #include "game/level_update.h"
 
+/**
+ * Rotates the offset `to` according to the pitch and yaw values in `rotation`.
+ * Adds `from` to the rotated offset, and stores the result in `dst`.
+ *
+ * @warning Flips the Z axis, so that relative to `rotation`, -Z moves forwards and +Z moves backwards.
+ */
+void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation) {
+    Vec3f pitchRotated;
+
+    // First rotate the direction by rotation's pitch
+    //! The Z axis is flipped here.
+    pitchRotated[2] = -(to[2] * coss(rotation[0]) - to[1] * sins(rotation[0]));
+    pitchRotated[1] =   to[2] * sins(rotation[0]) + to[1] * coss(rotation[0]);
+    pitchRotated[0] =   to[0];
+
+    // Rotate again by rotation's yaw
+    dst[0] = from[0] + pitchRotated[2] * sins(rotation[1]) + pitchRotated[0] * coss(rotation[1]);
+    dst[1] = from[1] + pitchRotated[1];
+    dst[2] = from[2] + pitchRotated[2] * coss(rotation[1]) - pitchRotated[0] * sins(rotation[1]);
+}
+
+/**
+ * Rotates the offset defined by (`xTo`, `yTo`, `zTo`) according to the pitch and yaw values in `rotation`.
+ * Adds `from` to the rotated offset, and stores the result in `dst`.
+ *
+ * @warning Flips the Z axis, so that relative to `rotation`, -Z moves forwards and +Z moves backwards.
+ */
+void offset_rotated_coords(Vec3f dst, Vec3f from, Vec3s rotation, f32 xTo, f32 yTo, f32 zTo) {
+    Vec3f to;
+
+    vec3f_set(to, xTo, yTo, zTo);
+    offset_rotated(dst, from, to, rotation);
+}
+
+
 void object_pos_to_vec3f(Vec3f dst, struct Object *obj) {
     dst[0] = obj->oPosX;
     dst[1] = obj->oPosY;

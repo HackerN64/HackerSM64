@@ -1,3 +1,7 @@
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
+#include "game/camera.h"
+
 /**
  * Starts the pool entrance cutscene if Mario is not exiting the pool.
  * Used in both the castle and HMC.

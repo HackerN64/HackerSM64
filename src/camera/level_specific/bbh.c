@@ -1,4 +1,6 @@
-
+#include "engine/math_util.h"
+#include "camera/camera_modes.h"
+#include "game/camera.h"
 
 void cam_bbh_room_6(struct Camera *c) {
     /**

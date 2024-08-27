@@ -1,3 +1,5 @@
+#include "game/camera.h"
+
 /**
  * Fix the camera in place as Mario gets exits out the MC cave into the waterfall.
  */

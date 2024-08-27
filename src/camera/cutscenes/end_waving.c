@@ -1,3 +1,8 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 /**
  * Cutscene that plays after the credits, when Lakitu is flying away from the castle.
  */

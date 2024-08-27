@@ -1,3 +1,8 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 /**
  * Cutscene that plays when entering bowser's arenas.
  */
@@ -65,10 +70,6 @@ void cutscene_bowser_arena_pan_left(UNUSED struct Camera *c) {
  */
 void cutscene_bowser_arena_mario_dialog(UNUSED struct Camera *c) {
     cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT);
-}
-
-void cutscene_stop_dialog(UNUSED struct Camera *c) {
-    cutscene_common_set_dialog_state(MARIO_DIALOG_STOP);
 }
 
 /**

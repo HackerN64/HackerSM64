@@ -1,3 +1,8 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+
 /**
  * Star dance cutscene.
  * The camera moves closer and rotates clockwise around Mario.

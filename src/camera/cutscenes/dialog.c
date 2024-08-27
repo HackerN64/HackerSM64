@@ -1,3 +1,9 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "game/camera.h"
+#include "game/object_list_processor.h"
+
 /**
  * Cutscene that plays when Mario talks to a creature.
  */

@@ -1,3 +1,5 @@
+#include "engine/math_util.h"
+#include "game/camera.h"
 
 void cam_rr_exit_building_side(struct Camera *c) {
     set_camera_mode_8_directions(c);

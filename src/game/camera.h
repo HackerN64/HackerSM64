@@ -762,6 +762,7 @@ void handle_c_button_movement(struct Camera *c);
 void start_cutscene(struct Camera *c, u8 cutscene);
 u8 get_cutscene_from_mario_status(struct Camera *c);
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw);
+void reset_pan_distance(UNUSED struct Camera *c);
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc);
 void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation);
@@ -780,19 +781,55 @@ void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
 void cutscene_spawn_obj(u32 obj, s16 frame);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
 
+s32 snap_to_45_degrees(s16 angle);
+
+s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z);
+void set_camera_mode_8_directions(struct Camera *c);
+void set_camera_mode_boss_fight(struct Camera *c);
+void set_camera_mode_close_cam(u8 *mode);
+void set_camera_mode_radial(struct Camera *c, s16 transitionTime);
+void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames);
+void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw);
+
+void focus_in_front_of_mario(struct Camera *c, f32 dist, f32 speed);
+void set_focus_rel_mario(struct Camera *c, f32 leftRight, f32 yOff, f32 forwBack, s16 yawOff);
+void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, s16 pitch, s16 yaw);
+
 void set_fov_function(u8 func);
 void cutscene_set_fov_shake_preset(u8 preset);
 void set_fov_shake_from_point_preset(u8 preset, f32 posX, f32 posY, f32 posZ);
 void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16 yawOff, s16 pitchDiv, s16 yawDiv);
 
+void set_mode_c_up(struct Camera *c);
+
+// TODO: port this and cutscene_double_doors_end
+void set_flag_post_door(struct Camera *c);
+
+s16 update_slide_camera(struct Camera *c);
+s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_outward_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 unused_update_mode_5_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_c_up(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 nop_update_water_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_slide_or_0f_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_in_cannon(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_fixed_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_slide_or_0f_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos);
+
 Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context);
 
+extern s16 sYawSpeed;
 extern struct PlayerCameraState *sMarioCamState;
 extern struct CameraFOVStatus sFOVState;
 extern struct TransitionInfo sModeTransition;
 extern struct PlayerGeometry sMarioGeometry;
 extern s16 sAvoidYawVel;
-extern s16 sCameraYawAfterDoorCutscene;
 extern struct HandheldShakePoint sHandheldShakeSpline[4];
 extern s16 sHandheldShakeMag;
 extern f32 sHandheldShakeTimer;
@@ -823,26 +860,34 @@ extern f32 sPanDistance;
 extern f32 sCannonYOffset;
 extern struct ModeTransitionInfo sModeInfo;
 extern Vec3f sCastleEntranceOffset;
+extern Vec3f sFixedModeBasePosition;
 extern u32 sParTrackIndex;
-extern struct ParallelTrackingPoint *sParTrackPath;
-extern struct CameraStoredInfo sParTrackTransOff;
-extern struct CameraStoredInfo sCameraStoreCUp;
-extern struct CameraStoredInfo sCameraStoreCutscene;
 extern s16 gCameraMovementFlags;
 extern s16 sStatusFlags;
-extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
-extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
-extern s16 sCutsceneSplineSegment;
-extern f32 sCutsceneSplineSegmentProgress;
-extern s16 sCutsceneShot;
-extern s16 gCutsceneTimer;
-extern struct CutsceneVariable sCutsceneVars[10];
-extern s32 gObjCutsceneDone;
-extern u32 gCutsceneObjSpawn;
 extern struct Camera *gCamera;
 extern u8 sFramesPaused;
 extern u8 sDanceCutsceneIndexTable[][4];
 extern u8 sZoomOutAreaMasks[];
 extern s32 gCurrLevelArea;
+extern u32 gPrevLevel;
+
+
+extern f32 gCameraZoomDist;
+
+extern struct ParallelTrackingPoint *sParTrackPath;
+extern struct CameraStoredInfo sParTrackTransOff;
+extern struct CameraStoredInfo sCameraStoreCUp;
+extern struct CameraStoredInfo sCameraStoreCutscene;
+extern s16 sCameraYawAfterDoorCutscene;
+extern s16 sCutsceneSplineSegment;
+extern f32 sCutsceneSplineSegmentProgress;
+extern s16 sCutsceneShot;
+extern s16 gCutsceneTimer;
+extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
+extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
+extern struct CutsceneVariable sCutsceneVars[10];
+extern s32 gObjCutsceneDone;
+extern u32 gCutsceneObjSpawn;
+extern u8 sCutsceneDialogResponse;
 
 #endif // CAMERA_H

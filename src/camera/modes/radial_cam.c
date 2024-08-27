@@ -1,3 +1,10 @@
+#include "camera/camera_math.h"
+#include "camera/camera_modes.h"
+#include "engine/math_util.h"
+#include "game/game_init.h"
+#include "game/level_update.h"
+#include "game/camera.h"
+
 
 /**
  * Handles input for radial, outwards radial, parallel tracking, and 8 direction mode.

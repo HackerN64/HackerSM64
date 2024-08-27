@@ -1,3 +1,89 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
+#include "game/camera.h"
+
+/**
+ * Set cvar7 to Mario's pos and faceAngle
+ * Set cvar6 to the focus offset from Mario.
+ * set cvar5 to the pos offset from Mario. (This is always overwritten)
+ */
+void cutscene_non_painting_death_start(UNUSED struct Camera *c) {
+    vec3f_copy(sCutsceneVars[7].point, sMarioCamState->pos);
+    vec3s_copy(sCutsceneVars[7].angle, sMarioCamState->faceAngle);
+    vec3f_set(sCutsceneVars[6].point, -42.f, 350.f, 727.f);
+    // This is always overwritten, except in the unused cutscene_exit_bowser_death()
+    vec3f_set(sCutsceneVars[5].point, 107.f, 226.f, 1187.f);
+}
+
+/**
+ * Set the camera pos depending on which level Mario exited.
+ */
+void cutscene_non_painting_set_cam_pos(struct Camera *c) {
+    struct Surface *floor;
+
+    switch (gPrevLevel) {
+        case LEVEL_HMC:
+            vec3f_set(c->pos, 3465.f, -1008.f, -2961.f);
+            break;
+
+        case LEVEL_COTMC:
+            vec3f_set(c->pos, 3465.f, -1008.f, -2961.f);
+            break;
+
+        case LEVEL_RR:
+            vec3f_set(c->pos, -3741.f, 3151.f, 6065.f);
+            break;
+
+        case LEVEL_WMOTR:
+            vec3f_set(c->pos, 1972.f, 3230.f, 5891.f);
+            break;
+
+        default:
+            offset_rotated(c->pos, sCutsceneVars[7].point, sCutsceneVars[5].point, sCutsceneVars[7].angle);
+            c->pos[1] = find_floor(c->pos[0], c->pos[1] + 1000.f, c->pos[2], &floor) + 125.f;
+            break;
+    }
+}
+
+/**
+ * Update the camera focus depending on which level Mario exited.
+ */
+void cutscene_non_painting_set_cam_focus(struct Camera *c) {
+    offset_rotated(c->focus, sCutsceneVars[7].point, sCutsceneVars[6].point, sCutsceneVars[7].angle);
+
+    if ((gPrevLevel == LEVEL_COTMC) || (gPrevLevel == LEVEL_HMC) || (gPrevLevel == LEVEL_RR)
+        || (gPrevLevel == LEVEL_WMOTR)) {
+        c->focus[0] = c->pos[0] + (sMarioCamState->pos[0] - c->pos[0]) * 0.7f;
+        c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] - c->pos[1]) * 0.4f;
+        c->focus[2] = c->pos[2] + (sMarioCamState->pos[2] - c->pos[2]) * 0.7f;
+    } else {
+        c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] - c->pos[1]) * 0.2f;
+    }
+}
+
+/**
+ * End a non-painting exit cutscene. Used by BBH and bowser courses.
+ */
+void cutscene_non_painting_end(struct Camera *c) {
+    c->cutscene = 0;
+
+#ifdef USE_COURSE_DEFAULT_MODE
+    c->mode = c->defMode;
+#else
+    if (c->defMode == CAMERA_MODE_CLOSE) {
+        c->mode = CAMERA_MODE_CLOSE;
+    } else {
+        c->mode = CAMERA_MODE_FREE_ROAM;
+    }
+#endif
+
+    sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
+    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+    transition_next_state(c, 60);
+    update_camera_yaw(c);
+}
 
 /**
  * Warp the camera to Mario, then use his faceAngle to calculate the right relative position.
@@ -120,28 +206,6 @@ void cutscene_exit_bowser_death(struct Camera *c) {
 }
 
 /**
- * End a non-painting exit cutscene. Used by BBH and bowser courses.
- */
-void cutscene_non_painting_end(struct Camera *c) {
-    c->cutscene = 0;
-
-#ifdef USE_COURSE_DEFAULT_MODE
-    c->mode = c->defMode;
-#else
-    if (c->defMode == CAMERA_MODE_CLOSE) {
-        c->mode = CAMERA_MODE_CLOSE;
-    } else {
-        c->mode = CAMERA_MODE_FREE_ROAM;
-    }
-#endif
-
-    sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
-    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
-    transition_next_state(c, 60);
-    update_camera_yaw(c);
-}
-
-/**
  * Set cvars:
  * cvar7 is Mario's pos and angle
  * cvar6 is the focus offset
@@ -152,52 +216,6 @@ void cutscene_exit_succ_start(UNUSED struct Camera *c) {
     vec3s_copy(sCutsceneVars[7].angle, sMarioCamState->faceAngle);
     vec3f_set(sCutsceneVars[6].point, 6.f, 363.f, 543.f);
     vec3f_set(sCutsceneVars[5].point, 137.f, 226.f, 995.f);
-}
-
-/**
- * Set the camera pos depending on which level Mario exited.
- */
-void cutscene_non_painting_set_cam_pos(struct Camera *c) {
-    struct Surface *floor;
-
-    switch (gPrevLevel) {
-        case LEVEL_HMC:
-            vec3f_set(c->pos, 3465.f, -1008.f, -2961.f);
-            break;
-
-        case LEVEL_COTMC:
-            vec3f_set(c->pos, 3465.f, -1008.f, -2961.f);
-            break;
-
-        case LEVEL_RR:
-            vec3f_set(c->pos, -3741.f, 3151.f, 6065.f);
-            break;
-
-        case LEVEL_WMOTR:
-            vec3f_set(c->pos, 1972.f, 3230.f, 5891.f);
-            break;
-
-        default:
-            offset_rotated(c->pos, sCutsceneVars[7].point, sCutsceneVars[5].point, sCutsceneVars[7].angle);
-            c->pos[1] = find_floor(c->pos[0], c->pos[1] + 1000.f, c->pos[2], &floor) + 125.f;
-            break;
-    }
-}
-
-/**
- * Update the camera focus depending on which level Mario exited.
- */
-void cutscene_non_painting_set_cam_focus(struct Camera *c) {
-    offset_rotated(c->focus, sCutsceneVars[7].point, sCutsceneVars[6].point, sCutsceneVars[7].angle);
-
-    if ((gPrevLevel == LEVEL_COTMC) || (gPrevLevel == LEVEL_HMC) || (gPrevLevel == LEVEL_RR)
-        || (gPrevLevel == LEVEL_WMOTR)) {
-        c->focus[0] = c->pos[0] + (sMarioCamState->pos[0] - c->pos[0]) * 0.7f;
-        c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] - c->pos[1]) * 0.4f;
-        c->focus[2] = c->pos[2] + (sMarioCamState->pos[2] - c->pos[2]) * 0.7f;
-    } else {
-        c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] - c->pos[1]) * 0.2f;
-    }
 }
 
 /**
@@ -258,19 +276,6 @@ void cutscene_exit_non_painting_succ(struct Camera *c) {
 }
 
 /**
- * Set cvar7 to Mario's pos and faceAngle
- * Set cvar6 to the focus offset from Mario.
- * set cvar5 to the pos offset from Mario. (This is always overwritten)
- */
-void cutscene_non_painting_death_start(UNUSED struct Camera *c) {
-    vec3f_copy(sCutsceneVars[7].point, sMarioCamState->pos);
-    vec3s_copy(sCutsceneVars[7].angle, sMarioCamState->faceAngle);
-    vec3f_set(sCutsceneVars[6].point, -42.f, 350.f, 727.f);
-    // This is always overwritten, except in the unused cutscene_exit_bowser_death()
-    vec3f_set(sCutsceneVars[5].point, 107.f, 226.f, 1187.f);
-}
-
-/**
  * Set the offset from Mario depending on the course Mario exited.
  * This overrides cutscene_non_painting_death_start()
  */
@@ -319,16 +324,6 @@ void cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
 void cutscene_exit_waterfall(struct Camera *c) {
     cutscene_event(cutscene_exit_waterfall_warp, c, 0, 0);
     cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
-    update_camera_yaw(c);
-}
-
-/**
- * End the cutscene, used by cutscenes that play when Mario exits a course to castle grounds.
- */
-void cutscene_exit_to_castle_grounds_end(struct Camera *c) {
-    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
-    gCutsceneTimer = CUTSCENE_STOP;
-    c->cutscene = 0;
     update_camera_yaw(c);
 }
 

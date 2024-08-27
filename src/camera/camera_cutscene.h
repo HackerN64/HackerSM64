@@ -22,6 +22,29 @@ struct Cutscene {
     s16 duration;
 };
 
+void store_info_star(struct Camera *c);
+void retrieve_info_star(struct Camera *c);
+void store_info_cannon(struct Camera *c);
+void retrieve_info_cannon(struct Camera *c);
+void cutscene_reset_spline(void);
+void stop_cutscene_and_retrieve_stored_info(struct Camera *c);
+void cutscene_goto_cvar_pos(struct Camera *c, f32 goalDist, s16 goalPitch, s16 rotPitch, s16 rotYaw);
+void cutscene_soften_music(UNUSED struct Camera *c);
+void cutscene_unsoften_music(UNUSED struct Camera *c);
+void update_camera_yaw(struct Camera *c);
+s16 cutscene_common_set_dialog_state(s32 state);
+void cutscene_stop_dialog(UNUSED struct Camera *c);
+void cutscene_shake_explosion(UNUSED struct Camera *c);
+void cutscene_exit_to_castle_grounds_end(struct Camera *c);
+void cutscene_dance_move_to_mario(struct Camera *c);
+void cutscene_mario_dialog(UNUSED struct Camera *c);
+
+// Shared cutscene functions
+void cutscene_death_stomach_start(struct Camera *c);
+void water_death_move_to_mario_side(struct Camera *c);
+void cutscene_double_doors_end(struct Camera *c);
+void cutscene_quicksand_death(struct Camera *c);
+
 extern struct Cutscene sCutsceneCapSwitchPress[];
 extern struct Cutscene sCutsceneCredits[];
 extern struct Cutscene sCutsceneDanceCloseup[];

@@ -1,3 +1,9 @@
+#include "camera/camera_cutscene.h"
+#include "camera/camera_math.h"
+#include "engine/math_util.h"
+#include "engine/surface_collision.h"
+#include "game/camera.h"
+
 /**
  * Cutscene that plays when Mario suffocates.
  */

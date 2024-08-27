@@ -1,3 +1,5 @@
+#include "engine/math_util.h"
+#include "game/camera.h"
 
 /**
  * Warps the camera underneath the floor, used in HMC to move under the elevator platforms
