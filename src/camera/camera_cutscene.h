@@ -37,10 +37,14 @@ void cutscene_stop_dialog(UNUSED struct Camera *c);
 void cutscene_shake_explosion(UNUSED struct Camera *c);
 void cutscene_exit_to_castle_grounds_end(struct Camera *c);
 void cutscene_dance_move_to_mario(struct Camera *c);
-void cutscene_mario_dialog(UNUSED struct Camera *c);
 void set_focus_rel_mario(struct Camera *c, f32 leftRight, f32 yOff, f32 forwBack, s16 yawOff);
 
+void cutscene_mario_dialog_look_up(UNUSED struct Camera *c);
+void cutscene_mario_dialog_look_front(UNUSED struct Camera *c);
+void cutscene_mario_dialog_look_down(UNUSED struct Camera *c);
+
 // Shared cutscene functions
+void init_current_credits_spline();
 void cutscene_death_stomach_start(struct Camera *c);
 void water_death_move_to_mario_side(struct Camera *c);
 void cutscene_double_doors_end(struct Camera *c);

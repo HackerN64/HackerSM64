@@ -26,12 +26,23 @@ void cutscene_stop_dialog(UNUSED struct Camera *c) {
     cutscene_common_set_dialog_state(MARIO_DIALOG_STOP);
 }
 
+
+
 /**
- * Cause Mario to enter the normal dialog state.
+ * Cutscene helpers for Mario to enter the dialog state and look in a direction
  */
-void cutscene_mario_dialog(UNUSED struct Camera *c) {
+void cutscene_mario_dialog_look_down(UNUSED struct Camera *c) {
+    gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_DOWN);
+}
+
+void cutscene_mario_dialog_look_front(UNUSED struct Camera *c) {
     gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT);
 }
+
+void cutscene_mario_dialog_look_up(UNUSED struct Camera *c) {
+    gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_UP);
+}
+
 
 /**
  * End the cutscene, used by cutscenes that play when Mario exits a course to castle grounds.

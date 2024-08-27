@@ -110,7 +110,7 @@ void cutscene_pyramid_top_explode_end(struct Camera *c) {
 }
 
 struct Cutscene sCutscenePyramidTopExplode[] = {
-    { cutscene_mario_dialog, CUTSCENE_LOOP },
+    { cutscene_mario_dialog_look_front, CUTSCENE_LOOP },
     { cutscene_pyramid_top_explode, 150 },
     { cutscene_pyramid_top_explode_end, 0 }
 };

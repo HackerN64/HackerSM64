@@ -8,11 +8,17 @@
  * The game's credits.
  */
 
+void init_current_credits_spline() {    
+    for (int i = 0; i < 32; i++) {
+        sCurCreditsSplinePos[i].index = -1;
+        sCurCreditsSplineFocus[i].index = -1;
+    }
+}
+
 /*
  * credits spline paths.
  * TODO: Separate these into their own file(s)
  */
-
 struct CutsceneSplinePoint sBobCreditsSplinePositions[] = {
     { 1, 0, { 5984, 3255, 4975 } },
     { 2, 0, { 4423, 3315, 1888 } },

@@ -997,12 +997,8 @@ void init_camera(struct Camera *c) {
     sMarioGeometry.prevCeil = sMarioGeometry.currCeil;
     sMarioGeometry.prevFloorType = sMarioGeometry.currFloorType;
     sMarioGeometry.prevCeilType = sMarioGeometry.currCeilType;
-    for (i = 0; i < 32; i++) {
-        sCurCreditsSplinePos[i].index = -1;
-        sCurCreditsSplineFocus[i].index = -1;
-    }
-    sCutsceneSplineSegment = 0;
-    sCutsceneSplineSegmentProgress = 0.f;
+    init_current_credits_spline();
+    cutscene_reset_spline();
     sHandheldShakeInc = 0.f;
     sHandheldShakeTimer = 0.f;
     sHandheldShakeMag = 0;
@@ -2758,16 +2754,6 @@ s16 cutscene_object(u8 cutscene, struct Object *obj) {
         }
     }
     return status;
-}
-
-/// Unused SSL cutscene?
-static UNUSED void unused_cutscene_mario_dialog_looking_down(UNUSED struct Camera *c) {
-    gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_DOWN);
-}
-
-/// Unused SSL cutscene?
-static UNUSED void unused_cutscene_mario_dialog_looking_up(UNUSED struct Camera *c) {
-    gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_UP);
 }
 
 void reset_pan_distance(UNUSED struct Camera *c) {
