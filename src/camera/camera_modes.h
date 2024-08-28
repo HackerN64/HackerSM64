@@ -45,6 +45,7 @@ void mode_spiral_stairs_camera(struct Camera *c);
 void mode_water_surface_camera(struct Camera *c);
 
 void set_camera_height(struct Camera *c, f32 goalHeight);
+void handle_c_button_movement(struct Camera *c);
 void lakitu_zoom(f32 rangeDist, s16 rangePitch);
 s16 look_down_slopes(s16 camYaw);
 void pan_ahead_of_player(struct Camera *c);

@@ -1,4 +1,5 @@
 #include "game/camera.h"
+#include "camera/camera_cutscene.h"
 
 /**
  * Starts the "Enter Pyramid Top" cutscene.

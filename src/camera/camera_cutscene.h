@@ -58,6 +58,17 @@ void cutscene_mario_dialog_look_front(UNUSED struct Camera *c);
 void cutscene_mario_dialog_look_down(UNUSED struct Camera *c);
 void set_flag_post_door(struct Camera *c);
 void reset_pan_distance(UNUSED struct Camera *c);
+s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
+void trigger_cutscene_dialog(s32 trigger);
+u8 get_cutscene_from_mario_status(struct Camera *c);
+void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
+
+// Object cutscene functions
+s16 cutscene_object(u8 cutscene, struct Object *obj);
+s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
+s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj);
+void start_object_cutscene_without_focus(u8 cutscene);
+void cutscene_spawn_obj(u32 obj, s16 frame);
 
 // Shared cutscene functions
 void cutscene_dance_move_to_mario(struct Camera *c);

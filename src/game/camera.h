@@ -765,17 +765,6 @@ void play_sound_if_cam_switched_to_lakitu_or_mario(void);
 
 void radial_camera_input(struct Camera *c);
 
-s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
-void trigger_cutscene_dialog(s32 trigger);
-void handle_c_button_movement(struct Camera *c);
-u8 get_cutscene_from_mario_status(struct Camera *c);
-void start_object_cutscene_without_focus(u8 cutscene);
-s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
-s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj);
-s16 cutscene_object(u8 cutscene, struct Object *obj);
-void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
-void cutscene_spawn_obj(u32 obj, s16 frame);
-
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw);
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc);

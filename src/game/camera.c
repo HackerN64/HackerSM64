@@ -1264,67 +1264,6 @@ void play_sound_if_cam_switched_to_lakitu_or_mario(void) {
 }
 
 /**
- * Updates the camera based on which C buttons are pressed this frame
- */
-void handle_c_button_movement(struct Camera *c) {
-    s16 cSideYaw;
-
-    // Zoom in
-    if (gPlayer1Controller->buttonPressed & U_CBUTTONS) {
-        if (c->mode != CAMERA_MODE_FIXED && (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
-            gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
-            play_sound_cbutton_up();
-        } else {
-            set_mode_c_up(c);
-            if (sZeroZoomDist > gCameraZoomDist) {
-                sZoomAmount = -gCameraZoomDist;
-            } else {
-                sZoomAmount = gCameraZoomDist;
-            }
-        }
-    }
-    if (c->mode != CAMERA_MODE_FIXED) {
-        // Zoom out
-        if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
-            if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-                gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
-                sZoomAmount = gCameraZoomDist + 400.f;
-                play_camera_buzz_if_cdown();
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
-                sZoomAmount = gCameraZoomDist + 400.f;
-                play_sound_cbutton_down();
-            }
-        }
-
-        // Rotate left or right
-        cSideYaw = 0x1000;
-        if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
-            if (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
-                gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT;
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
-                if (sCSideButtonYaw == 0) {
-                    play_sound_cbutton_side();
-                }
-                sCSideButtonYaw = -cSideYaw;
-            }
-        }
-        if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
-            if (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) {
-                gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT;
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
-                if (sCSideButtonYaw == 0) {
-                    play_sound_cbutton_side();
-                }
-                sCSideButtonYaw = cSideYaw;
-            }
-        }
-    }
-}
-
-/**
  * Moves the camera when Mario has triggered a warp
  */
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {

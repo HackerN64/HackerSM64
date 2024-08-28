@@ -6,6 +6,7 @@
 #include "behavior_actions.h"
 #include "behavior_data.h"
 #include "camera.h"
+#include "camera/camera_cutscene.h"
 #include "course_table.h"
 #include "dialog_ids.h"
 #include "engine/behavior_script.h"
