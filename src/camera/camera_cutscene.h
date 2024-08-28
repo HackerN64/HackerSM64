@@ -22,6 +22,14 @@ struct Cutscene {
     s16 duration;
 };
 
+extern s16 gCutsceneTimer;
+extern s16 sCutsceneShot;
+extern struct CutsceneVariable sCutsceneVars[10];
+
+extern u8 sObjectCutscene;
+extern s32 gObjCutsceneDone;
+extern u32 gCutsceneObjSpawn;
+extern u8 sCutsceneDialogResponse;
 extern s16 sCutsceneSplineSegment;
 extern f32 sCutsceneSplineSegmentProgress;
 
@@ -49,6 +57,7 @@ void cutscene_mario_dialog_look_up(UNUSED struct Camera *c);
 void cutscene_mario_dialog_look_front(UNUSED struct Camera *c);
 void cutscene_mario_dialog_look_down(UNUSED struct Camera *c);
 void set_flag_post_door(struct Camera *c);
+void reset_pan_distance(UNUSED struct Camera *c);
 
 // Shared cutscene functions
 void cutscene_dance_move_to_mario(struct Camera *c);

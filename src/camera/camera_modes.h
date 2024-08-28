@@ -17,8 +17,9 @@ struct ParallelTrackingPoint {
 };
 
 
-// mode-specific export variables
+// mode-specific export variables and functions
 extern s16 sSpiralStairsYawOffset;
+void move_mario_head_c_up(UNUSED struct Camera *c);
 
 void exit_c_up(struct Camera *c);
 void radial_camera_input(struct Camera *c);
@@ -48,4 +49,5 @@ void lakitu_zoom(f32 rangeDist, s16 rangePitch);
 s16 look_down_slopes(s16 camYaw);
 void pan_ahead_of_player(struct Camera *c);
 s32 mode_behind_mario(struct Camera *c);
+s32 rotate_camera_around_walls(struct Camera *c, Vec3f cPos, s16 *avoidYaw, s16 yawRange);
 void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound);

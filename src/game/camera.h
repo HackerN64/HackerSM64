@@ -11,6 +11,52 @@
 
 #include "level_table.h"
 
+/**
+ * @file camera.c
+ * TODO: rewrite this lol
+ * Implements the camera system, including C-button input, camera modes, camera triggers, and cutscenes.
+ *
+ * When working with the camera, you should be familiar with sm64's coordinate system.
+ * Relative to the camera, the coordinate system follows the right hand rule:
+ *          +X points right.
+ *          +Y points up.
+ *          +Z points out of the screen.
+ *
+ * You should also be familiar with Euler angles: 'pitch', 'yaw', and 'roll'.
+ *      pitch: rotation about the X-axis, measured from +Y.
+ *          Unlike yaw and roll, pitch is bounded in +-0x4000 (90 degrees).
+ *          Pitch is 0 when the camera points parallel to the xz-plane (+Y points straight up).
+ *
+ *      yaw: rotation about the Y-axis, measured from (absolute) +Z.
+ *          Positive yaw rotates clockwise, towards +X.
+ *
+ *      roll: rotation about the Z-axis, measured from the camera's right direction.
+ *          Unfortunately, it's weird: For some reason, roll is flipped. Positive roll makes the camera
+ *          rotate counterclockwise, which means the WORLD rotates clockwise. Luckily roll is rarely
+ *          used.
+ *
+ *      Remember the right hand rule: make a thumbs-up with your right hand, stick your thumb in the
+ *      +direction (except for roll), and the angle follows the rotation of your curled fingers.
+ *
+ * Illustrations:
+ * Following the right hand rule, each hidden axis's positive direction points out of the screen.
+ *
+ *       YZ-Plane (pitch)        XZ-Plane (yaw)          XY-Plane (roll -- Note flipped)
+ *          +Y                      -Z                      +Y
+ *           ^                       ^ (into the             ^
+ *         --|--                     |   screen)             |<-
+ * +pitch /  |  \ -pitch             |                       |  \ -roll
+ *       v   |   v                   |                       |   |
+ * +Z <------O------> -Z   -X <------O------> +X   -X <------O------> +X
+ *           |                   ^   |   ^                   |   |
+ *           |                    \  |  /                    |  / +roll
+ *           |               -yaw  --|--  +yaw               |<-
+ *           v                       v                       v
+ *          -Y                      +Z                      -Y
+ *
+ */
+
+
 // X position of the mirror
 #define CASTLE_MIRROR_X 4331.53f
 
@@ -678,7 +724,6 @@ extern u8 gRecentCutscene;
 void set_camera_shake_from_hit(s16 shake);
 void set_environmental_camera_shake(s16 shake);
 void set_camera_shake_from_point(s16 shake, f32 posX, f32 posY, f32 posZ);
-void move_mario_head_c_up(UNUSED struct Camera *c);
 void transition_next_state(UNUSED struct Camera *c, s16 frames);
 void set_camera_mode(struct Camera *c, s16 mode, s16 frames);
 void update_camera(struct Camera *c);
@@ -732,7 +777,6 @@ void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
 void cutscene_spawn_obj(u32 obj, s16 frame);
 
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw);
-void reset_pan_distance(UNUSED struct Camera *c);
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc);
 void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation);
@@ -740,7 +784,6 @@ s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc, Ve
 void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset);
 s16 camera_course_processing(struct Camera *c);
 void resolve_geometry_collisions(Vec3f pos);
-s32 rotate_camera_around_walls(struct Camera *c, Vec3f cPos, s16 *avoidYaw, s16 yawRange);
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
 
@@ -823,22 +866,13 @@ extern s16 gCameraMovementFlags;
 extern s16 sStatusFlags;
 extern struct Camera *gCamera;
 extern u8 sFramesPaused;
-extern u8 sDanceCutsceneIndexTable[][4];
 extern u8 sZoomOutAreaMasks[];
 extern s32 gCurrLevelArea;
 extern u32 gPrevLevel;
-
-
 extern f32 gCameraZoomDist;
-
 extern struct CameraStoredInfo sCameraStoreCUp;
 extern struct CameraStoredInfo sCameraStoreCutscene;
 extern s16 sCameraYawAfterDoorCutscene;
-extern s16 sCutsceneShot;
-extern s16 gCutsceneTimer;
-extern struct CutsceneVariable sCutsceneVars[10];
-extern s32 gObjCutsceneDone;
-extern u32 gCutsceneObjSpawn;
-extern u8 sCutsceneDialogResponse;
+
 
 #endif // CAMERA_H

@@ -7,6 +7,28 @@
 #include "camera_math.h"
 
 /**
+ * A cutscene that plays when the player interacts with an object
+ */
+u8 sObjectCutscene = CUTSCENE_NONE;
+
+/**
+ * The current frame of the cutscene shot.
+ */
+s16 gCutsceneTimer;
+
+/**
+ * The currently playing shot in the cutscene.
+ */
+s16 sCutsceneShot;
+
+/**
+ * These structs are used by the cutscenes. Most of the fields are unused, and some (all?) of the used
+ * ones have multiple uses.
+ * Check the cutscene_start functions for documentation on the cvars used by a specific cutscene.
+ */
+struct CutsceneVariable sCutsceneVars[10];
+
+/**
  * The progress (from 0 to 1) through the current spline segment.
  * When it becomes >= 1, 1.0 is subtracted from it and sCutsceneSplineSegment is increased.
  */
@@ -16,6 +38,92 @@ f32 sCutsceneSplineSegmentProgress;
  * The current segment of the CutsceneSplinePoint[] being used.
  */
 s16 sCutsceneSplineSegment;
+
+/**
+ * Start a cutscene focusing on an object
+ * This will play if nothing else happened in the same frame, like exiting or warping.
+ */
+void start_object_cutscene(u8 cutscene, struct Object *obj) {
+    sObjectCutscene = cutscene;
+    gRecentCutscene = CUTSCENE_NONE;
+    gCutsceneFocus = obj;
+    gObjCutsceneDone = FALSE;
+}
+
+/**
+ * Start a low-priority cutscene without focusing on an object
+ * This will play if nothing else happened in the same frame, like exiting or warping.
+ */
+void start_object_cutscene_without_focus(u8 cutscene) {
+    sObjectCutscene = cutscene;
+    sCutsceneDialogResponse = DIALOG_RESPONSE_NONE;
+}
+
+UNUSED s32 unused_dialog_cutscene_response(u8 cutscene) {
+    // if not in a cutscene, start this one
+    if ((gCamera->cutscene == 0) && (sObjectCutscene == 0)) {
+        sObjectCutscene = cutscene;
+    }
+
+    // if playing this cutscene and Mario responded, return the response
+    if ((gCamera->cutscene == cutscene) && (sCutsceneDialogResponse)) {
+        return sCutsceneDialogResponse;
+    } else {
+        return 0;
+    }
+}
+
+s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID) {
+    s16 response = DIALOG_RESPONSE_NONE;
+
+    if ((gCamera->cutscene == CUTSCENE_NONE) && (sObjectCutscene == CUTSCENE_NONE)) {
+        if (gRecentCutscene != cutscene) {
+            start_object_cutscene(cutscene, obj);
+            if (dialogID != DIALOG_NONE) {
+                sCutsceneDialogID = dialogID;
+            } else {
+                sCutsceneDialogID = DIALOG_001;
+            }
+        } else {
+            response = sCutsceneDialogResponse;
+        }
+
+        gRecentCutscene = CUTSCENE_NONE;
+    }
+    return response;
+}
+
+s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj) {
+    return cutscene_object_with_dialog(cutscene, obj, DIALOG_NONE);
+}
+
+/**
+ * @return 0 if not started, 1 if started, and -1 if finished
+ */
+s16 cutscene_object(u8 cutscene, struct Object *obj) {
+    s16 status = 0;
+
+    if ((gCamera->cutscene == 0) && (sObjectCutscene == 0)) {
+        if (gRecentCutscene != cutscene) {
+            start_object_cutscene(cutscene, obj);
+            status = 1;
+        } else {
+            status = -1;
+        }
+    }
+    return status;
+}
+
+/**
+ * Starts a cutscene dialog. Only has an effect when `trigger` is 1
+ */
+void trigger_cutscene_dialog(s32 trigger) {
+    if (trigger == 1) start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE);
+}
+
+void reset_pan_distance(UNUSED struct Camera *c) {
+    sPanDistance = 0;
+}
 
 /**
  * Triggers Mario to enter a dialog state. This is used to make Mario look at the focus of a cutscene,

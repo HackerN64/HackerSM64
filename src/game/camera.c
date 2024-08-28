@@ -36,50 +36,6 @@
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
-/**
- * @file camera.c
- * Implements the camera system, including C-button input, camera modes, camera triggers, and cutscenes.
- *
- * When working with the camera, you should be familiar with sm64's coordinate system.
- * Relative to the camera, the coordinate system follows the right hand rule:
- *          +X points right.
- *          +Y points up.
- *          +Z points out of the screen.
- *
- * You should also be familiar with Euler angles: 'pitch', 'yaw', and 'roll'.
- *      pitch: rotation about the X-axis, measured from +Y.
- *          Unlike yaw and roll, pitch is bounded in +-0x4000 (90 degrees).
- *          Pitch is 0 when the camera points parallel to the xz-plane (+Y points straight up).
- *
- *      yaw: rotation about the Y-axis, measured from (absolute) +Z.
- *          Positive yaw rotates clockwise, towards +X.
- *
- *      roll: rotation about the Z-axis, measured from the camera's right direction.
- *          Unfortunately, it's weird: For some reason, roll is flipped. Positive roll makes the camera
- *          rotate counterclockwise, which means the WORLD rotates clockwise. Luckily roll is rarely
- *          used.
- *
- *      Remember the right hand rule: make a thumbs-up with your right hand, stick your thumb in the
- *      +direction (except for roll), and the angle follows the rotation of your curled fingers.
- *
- * Illustrations:
- * Following the right hand rule, each hidden axis's positive direction points out of the screen.
- *
- *       YZ-Plane (pitch)        XZ-Plane (yaw)          XY-Plane (roll -- Note flipped)
- *          +Y                      -Z                      +Y
- *           ^                       ^ (into the             ^
- *         --|--                     |   screen)             |<-
- * +pitch /  |  \ -pitch             |                       |  \ -roll
- *       v   |   v                   |                       |   |
- * +Z <------O------> -Z   -X <------O------> +X   -X <------O------> +X
- *           |                   ^   |   ^                   |   |
- *           |                    \  |  /                    |  / +roll
- *           |               -yaw  --|--  +yaw               |<-
- *           v                       v                       v
- *          -Y                      +Z                      -Y
- *
- */
-
 // BSS
 /**
  * Stores Lakitu's position from the last frame, used for transitioning in next_lakitu_state()
@@ -175,14 +131,6 @@ u16 sCButtonsPressed;
  * A copy of gDialogID, the dialog displayed during the cutscene.
  */
 s16 sCutsceneDialogID;
-/**
- * The currently playing shot in the cutscene.
- */
-s16 sCutsceneShot;
-/**
- * The current frame of the cutscene shot.
- */
-s16 gCutsceneTimer;
 
 /**
  * The angle of the direction vector from the area's center to Mario's position.
@@ -249,12 +197,7 @@ f32 sPanDistance;
  * This is used to make the camera start up and rotate down, like the cannon.
  */
 f32 sCannonYOffset;
-/**
- * These structs are used by the cutscenes. Most of the fields are unused, and some (all?) of the used
- * ones have multiple uses.
- * Check the cutscene_start functions for documentation on the cvars used by a specific cutscene.
- */
-struct CutsceneVariable sCutsceneVars[10];
+
 struct ModeTransitionInfo sModeInfo;
 /**
  * Offset added to sFixedModeBasePosition when Mario is inside, near the castle lobby entrance
@@ -271,7 +214,6 @@ struct CameraStoredInfo sCameraStoreCUp;
  */
 struct CameraStoredInfo sCameraStoreCutscene;
 
-// first iteration of data
 struct Object *gCutsceneFocus = NULL;
 
 /**
@@ -283,15 +225,10 @@ struct Object *gSecondCameraFocus = NULL;
  * How fast the camera's yaw should approach the next yaw.
  */
 s16 sYawSpeed = 0x400;
+
 s32 gCurrLevelArea = 0;
 u32 gPrevLevel = 0;
-
 f32 gCameraZoomDist = 800.0f;
-
-/**
- * A cutscene that plays when the player interacts with an object
- */
-u8 sObjectCutscene = CUTSCENE_NONE;
 
 /**
  * The ID of the cutscene that ended. It's set to 0 if no cutscene ended less than 8 frames ago.
@@ -591,17 +528,6 @@ s32 snap_to_45_degrees(s16 angle) {
     return angle;
 }
 
-/**
- * Maps cutscene to numbers in [0,4]. Used in determine_dance_cutscene() with sDanceCutsceneIndexTable.
- *
- * Only the first 5 entries are used. Perhaps the last 5 were bools used to indicate whether the star
- * type exits the course or not.
- */
-u8 sDanceCutsceneTable[] = {
-    CUTSCENE_DANCE_FLY_AWAY, CUTSCENE_DANCE_ROTATE, CUTSCENE_DANCE_CLOSEUP, CUTSCENE_KEY_DANCE, CUTSCENE_DANCE_DEFAULT,
-    CUTSCENE_NONE,           CUTSCENE_NONE,         CUTSCENE_NONE,          CUTSCENE_NONE,      CUTSCENE_NONE,
-};
-
 s32 unused_update_mode_5_camera(UNUSED struct Camera *c, UNUSED Vec3f focus, UNUSED Vec3f pos) {
    return 0;
 }
@@ -636,35 +562,6 @@ void set_mode_c_up(struct Camera *c) {
         store_lakitu_cam_info_for_c_up(c);
         sCameraSoundFlags &= ~CAM_SOUND_C_UP_PLAYED;
     }
-}
-
-/**
- * Make Mario's head move in C-Up mode.
- */
-void move_mario_head_c_up(UNUSED struct Camera *c) {
-    sCUpCameraPitch += (s16)(gPlayer1Controller->stickY * 10.f);
-    sModeOffsetYaw -= (s16)(gPlayer1Controller->stickX * 10.f);
-
-    // Bound looking up to nearly 80 degrees.
-    if (sCUpCameraPitch > 0x38E3) {
-        sCUpCameraPitch = 0x38E3;
-    }
-    // Bound looking down to -45 degrees
-    if (sCUpCameraPitch < -0x2000) {
-        sCUpCameraPitch = -0x2000;
-    }
-
-    // Bound the camera yaw to +-120 degrees
-    if (sModeOffsetYaw > 0x5555) {
-        sModeOffsetYaw = 0x5555;
-    }
-    if (sModeOffsetYaw < -0x5555) {
-        sModeOffsetYaw = -0x5555;
-    }
-
-    // Give Mario's neck natural-looking constraints
-    sMarioCamState->headRotation[0] = sCUpCameraPitch * 3 / 4;
-    sMarioCamState->headRotation[1] = sModeOffsetYaw * 3 / 4;
 }
 
 /**
@@ -880,11 +777,13 @@ void reset_camera(struct Camera *c) {
     gCamera = c;
     s2ndRotateFlags = 0;
     sStatusFlags = 0;
-    gCutsceneTimer = 0;
-    sCutsceneShot = 0;
-    gCutsceneObjSpawn = CUTSCENE_OBJ_NONE;
-    gObjCutsceneDone = FALSE;
-    gCutsceneFocus = NULL;
+
+    // TODO: cutscene_reset
+    // gCutsceneTimer = 0;
+    // sCutsceneShot = 0;
+    // gCutsceneObjSpawn = CUTSCENE_OBJ_NONE;
+    // gObjCutsceneDone = FALSE;
+    // gCutsceneFocus = NULL;
     gSecondCameraFocus = NULL;
     sCButtonsPressed = 0;
     vec3f_copy(sModeTransition.marioPos, sMarioCamState->pos);
@@ -922,8 +821,10 @@ void reset_camera(struct Camera *c) {
     sFOVState.unusedIsSleeping = 0;
     sFOVState.shakeAmplitude = 0.f;
     sFOVState.shakePhase = 0;
-    sObjectCutscene = CUTSCENE_NONE;
-    gRecentCutscene = CUTSCENE_NONE;
+
+    // TODO: cutscene reset
+    // sObjectCutscene = CUTSCENE_NONE;
+    // gRecentCutscene = CUTSCENE_NONE;
 }
 
 void init_camera(struct Camera *c) {
@@ -1314,48 +1215,6 @@ s32 update_camera_hud_status(struct Camera *c) {
     return status;
 }
 
-/**
- * Check `pos` for collisions within `radius`, and update `pos`
- *
- * @return the number of collisions found
- */
-s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
-    struct WallCollisionData collisionData;
-    struct Surface *wall = NULL;
-    f32 normX, normY, normZ;
-    f32 originOffset;
-    f32 offset;
-    f32 offsetAbsolute;
-    Vec3f newPos[MAX_REFERENCED_WALLS];
-    s32 i;
-    s32 numCollisions = 0;
-
-    collisionData.x = pos[0];
-    collisionData.y = pos[1];
-    collisionData.z = pos[2];
-    collisionData.radius = radius;
-    collisionData.offsetY = offsetY;
-    numCollisions = find_wall_collisions(&collisionData);
-    if (numCollisions != 0) {
-        for (i = 0; i < collisionData.numWalls; i++) {
-            wall = collisionData.walls[collisionData.numWalls - 1];
-            vec3f_copy(newPos[i], pos);
-            normX = wall->normal.x;
-            normY = wall->normal.y;
-            normZ = wall->normal.z;
-            originOffset = wall->originOffset;
-            offset = normX * newPos[i][0] + normY * newPos[i][1] + normZ * newPos[i][2] + originOffset;
-            offsetAbsolute = absf(offset);
-            if (offsetAbsolute < radius) {
-                newPos[i][0] += normX * (radius - offset);
-                newPos[i][2] += normZ * (radius - offset);
-                vec3f_copy(pos, newPos[i]);
-            }
-        }
-    }
-    return numCollisions;
-}
-
 void play_camera_buzz_if_cdown(void) {
     if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
         play_sound_button_change_blocked();
@@ -1463,199 +1322,6 @@ void handle_c_button_movement(struct Camera *c) {
             }
         }
     }
-}
-
-/**
- * Starts a cutscene dialog. Only has an effect when `trigger` is 1
- */
-void trigger_cutscene_dialog(s32 trigger) {
-    if (trigger == 1) start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE);
-}
-
-/**
- * Look up the victory dance cutscene in sDanceCutsceneTable
- *
- * First the index entry is determined based on the course and the star that was just picked up
- * Like the entries in sZoomOutAreaMasks, each entry represents two stars
- * The current courses's 4 bits of the index entry are used as the actual index into sDanceCutsceneTable
- *
- * @return the victory cutscene to use
- */
-s32 determine_dance_cutscene(UNUSED struct Camera *c) {
-#ifdef NON_STOP_STARS
-    return CUTSCENE_DANCE_DEFAULT;
-#else
-    u8 cutscene = CUTSCENE_NONE;
-    u8 cutsceneIndex = 0;
-    u8 starIndex = (gLastCompletedStarNum - 1) / 2;
-    u8 courseNum = gCurrCourseNum;
-
-    if (starIndex > 3) {
-        starIndex = 0;
-    }
-    if (courseNum > COURSE_MAX) {
-        courseNum = COURSE_NONE;
-    }
-    cutsceneIndex = sDanceCutsceneIndexTable[courseNum][starIndex];
-
-    if (gLastCompletedStarNum & 1) {
-        // Odd stars take the lower four bytes
-        cutsceneIndex &= 0xF;
-    } else {
-        // Even stars use the upper four bytes
-        cutsceneIndex = cutsceneIndex >> 4;
-    }
-    cutscene = sDanceCutsceneTable[cutsceneIndex];
-    return cutscene;
-#endif
-}
-
-/**
- * @return `pullResult` or `pushResult` depending on Mario's door action
- */
-u8 open_door_cutscene(u8 pullResult, u8 pushResult) {
-    if (sMarioCamState->action == ACT_PULLING_DOOR) {
-        return pullResult;
-    }
-    if (sMarioCamState->action == ACT_PUSHING_DOOR) {
-        return pushResult;
-    }
-    return CUTSCENE_NONE;
-}
-
-/**
- * If no cutscenes are playing, determines if a cutscene should play based on Mario's action and
- * cameraEvent
- *
- * @return the cutscene that should start, 0 if none
- */
-u8 get_cutscene_from_mario_status(struct Camera *c) {
-    u8 cutscene = c->cutscene;
-
-    if (cutscene == CUTSCENE_NONE) {
-        // A cutscene started by an object, if any, will start if nothing else happened
-        cutscene = sObjectCutscene;
-        sObjectCutscene = CUTSCENE_NONE;
-        if (sMarioCamState->cameraEvent == CAM_EVENT_DOOR) {
-            switch (gCurrLevelArea) {
-                case AREA_CASTLE_LOBBY:
-                    //! doorStatus is never DOOR_ENTER_LOBBY when cameraEvent == 6, because
-                    //! doorStatus is only used for the star door in the lobby, which uses
-                    //! ACT_ENTERING_STAR_DOOR
-                    if (c->mode == CAMERA_MODE_SPIRAL_STAIRS || c->mode == CAMERA_MODE_CLOSE || c->doorStatus == DOOR_ENTER_LOBBY) {
-                        cutscene = open_door_cutscene(CUTSCENE_DOOR_PULL_MODE, CUTSCENE_DOOR_PUSH_MODE);
-                    } else {
-                        cutscene = open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH);
-                    }
-                    break;
-                case AREA_BBH:
-                    //! Castle Lobby uses 0 to mean 'no special modes', but BBH uses 1...
-                    if (c->doorStatus == DOOR_LEAVING_SPECIAL) {
-                        cutscene = open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH);
-                    } else {
-                        cutscene = open_door_cutscene(CUTSCENE_DOOR_PULL_MODE, CUTSCENE_DOOR_PUSH_MODE);
-                    }
-                    break;
-                default:
-                    cutscene = open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH);
-                    break;
-            }
-        }
-        if (sMarioCamState->cameraEvent == CAM_EVENT_DOOR_WARP) {
-            cutscene = CUTSCENE_DOOR_WARP;
-        }
-        if (sMarioCamState->cameraEvent == CAM_EVENT_CANNON) {
-            cutscene = CUTSCENE_ENTER_CANNON;
-        }
-        if (SURFACE_IS_PAINTING_WARP(sMarioGeometry.currFloorType)) {
-            cutscene = CUTSCENE_ENTER_PAINTING;
-        }
-        switch (sMarioCamState->action) {
-            case ACT_DEATH_EXIT:
-                cutscene = CUTSCENE_DEATH_EXIT;
-                break;
-            case ACT_EXIT_AIRBORNE:
-                cutscene = CUTSCENE_EXIT_PAINTING_SUCC;
-                break;
-            case ACT_SPECIAL_EXIT_AIRBORNE:
-                if (gPrevLevel == LEVEL_BOWSER_1 || gPrevLevel == LEVEL_BOWSER_2
-                    || gPrevLevel == LEVEL_BOWSER_3) {
-                    cutscene = CUTSCENE_EXIT_BOWSER_SUCC;
-                } else {
-                    cutscene = CUTSCENE_EXIT_SPECIAL_SUCC;
-                }
-                break;
-            case ACT_SPECIAL_DEATH_EXIT:
-                if (gPrevLevel == LEVEL_BOWSER_1 || gPrevLevel == LEVEL_BOWSER_2
-                    || gPrevLevel == LEVEL_BOWSER_3) {
-                    cutscene = CUTSCENE_EXIT_BOWSER_DEATH;
-                } else {
-                    cutscene = CUTSCENE_NONPAINTING_DEATH;
-                }
-                break;
-            case ACT_ENTERING_STAR_DOOR:
-                if (c->doorStatus == DOOR_DEFAULT) {
-                    cutscene = CUTSCENE_SLIDING_DOORS_OPEN;
-                } else {
-                    cutscene = CUTSCENE_DOOR_PULL_MODE;
-                }
-                break;
-            case ACT_UNLOCKING_KEY_DOOR:
-                cutscene = CUTSCENE_UNLOCK_KEY_DOOR;
-                break;
-            case ACT_WATER_DEATH:
-                cutscene = CUTSCENE_WATER_DEATH;
-                break;
-            case ACT_DEATH_ON_BACK:
-                cutscene = CUTSCENE_DEATH_ON_BACK;
-                break;
-            case ACT_DEATH_ON_STOMACH:
-                cutscene = CUTSCENE_DEATH_ON_STOMACH;
-                break;
-            case ACT_STANDING_DEATH:
-                cutscene = CUTSCENE_STANDING_DEATH;
-                break;
-            case ACT_SUFFOCATION:
-                cutscene = CUTSCENE_SUFFOCATION_DEATH;
-                break;
-            case ACT_QUICKSAND_DEATH:
-                cutscene = CUTSCENE_QUICKSAND_DEATH;
-                break;
-            case ACT_ELECTROCUTION:
-                cutscene = CUTSCENE_STANDING_DEATH;
-                break;
-            case ACT_STAR_DANCE_EXIT:
-                cutscene = determine_dance_cutscene(c);
-                break;
-            case ACT_STAR_DANCE_WATER:
-                cutscene = determine_dance_cutscene(c);
-                break;
-            case ACT_STAR_DANCE_NO_EXIT:
-                cutscene = CUTSCENE_DANCE_DEFAULT;
-                break;
-        }
-        switch (sMarioCamState->cameraEvent) {
-            case CAM_EVENT_START_INTRO:
-                cutscene = CUTSCENE_INTRO_PEACH;
-                break;
-            case CAM_EVENT_START_GRAND_STAR:
-                cutscene = CUTSCENE_GRAND_STAR;
-                break;
-            case CAM_EVENT_START_ENDING:
-                cutscene = CUTSCENE_ENDING;
-                break;
-            case CAM_EVENT_START_END_WAVING:
-                cutscene = CUTSCENE_END_WAVING;
-                break;
-            case CAM_EVENT_START_CREDITS:
-                cutscene = CUTSCENE_CREDITS;
-                break;
-        }
-    }
-    //! doorStatus is reset every frame. CameraTriggers need to constantly set doorStatus
-    c->doorStatus = DOOR_DEFAULT;
-
-    return cutscene;
 }
 
 /**
@@ -2485,100 +2151,6 @@ void resolve_geometry_collisions(Vec3f pos) {
 }
 
 /**
- * Checks for any walls obstructing Mario from view, and calculates a new yaw that the camera should
- * rotate towards.
- *
- * @param[out] avoidYaw the angle (from Mario) that the camera should rotate towards to avoid the wall.
- *                      The camera then approaches avoidYaw until Mario is no longer obstructed.
- *                      avoidYaw is always parallel to the wall.
- * @param yawRange      how wide of an arc to check for walls obscuring Mario.
- *
- * @return 3 if a wall is covering Mario, 1 if a wall is only near the camera.
- */
-s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYaw, s16 yawRange) {
-    struct WallCollisionData colData;
-    struct Surface *wall;
-    f32 dummyDist, checkDist;
-    f32 coarseRadius;
-    f32 fineRadius;
-    s16 wallYaw, horWallNorm;
-    s16 dummyPitch;
-    // The yaw of the vector from Mario to the camera.
-    s16 yawFromMario;
-    s32 status = 0;
-    /// The current iteration. The algorithm takes 8 equal steps from Mario back to the camera.
-    s32 step = 0;
-
-    vec3f_get_dist_and_angle(sMarioCamState->pos, cPos, &dummyDist, &dummyPitch, &yawFromMario);
-    sStatusFlags &= ~CAM_FLAG_CAM_NEAR_WALL;
-    colData.offsetY = 100.0f;
-    // The distance from Mario to Lakitu
-    checkDist = 0.0f;
-    /// The radius used to find potential walls to avoid.
-    /// @bug Increases to 250.f, but the max collision radius is 200.f
-    coarseRadius = 150.0f;
-    /// This only increases when there is a wall collision found in the coarse pass
-    fineRadius = 100.0f;
-
-    for (step = 0; step < 8; step++) {
-        // Start at Mario, move backwards to Lakitu's position
-        colData.x = sMarioCamState->pos[0] + ((cPos[0] - sMarioCamState->pos[0]) * checkDist);
-        colData.y = sMarioCamState->pos[1] + ((cPos[1] - sMarioCamState->pos[1]) * checkDist);
-        colData.z = sMarioCamState->pos[2] + ((cPos[2] - sMarioCamState->pos[2]) * checkDist);
-        colData.radius = coarseRadius;
-        // Increase the coarse check radius
-        camera_approach_f32_symmetric_bool(&coarseRadius, 250.f, 30.f);
-
-        if (find_wall_collisions(&colData) != 0) {
-            wall = colData.walls[colData.numWalls - 1];
-
-            // If we're over halfway from Mario to Lakitu, then there's a wall near the camera, but
-            // not necessarily obstructing Mario
-            if (step >= 5) {
-                sStatusFlags |= CAM_FLAG_CAM_NEAR_WALL;
-                if (status <= 0) {
-                    status = 1;
-                    wall = colData.walls[colData.numWalls - 1];
-                    // wallYaw is parallel to the wall, not perpendicular
-                    wallYaw = atan2s(wall->normal.z, wall->normal.x) + DEGREES(90);
-                    // Calculate the avoid direction. The function returns the opposite direction so add 180
-                    // degrees.
-                    *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180);
-                }
-            }
-
-            colData.x = sMarioCamState->pos[0] + ((cPos[0] - sMarioCamState->pos[0]) * checkDist);
-            colData.y = sMarioCamState->pos[1] + ((cPos[1] - sMarioCamState->pos[1]) * checkDist);
-            colData.z = sMarioCamState->pos[2] + ((cPos[2] - sMarioCamState->pos[2]) * checkDist);
-            colData.radius = fineRadius;
-            // Increase the fine check radius
-            camera_approach_f32_symmetric_bool(&fineRadius, 200.f, 20.f);
-
-            if (find_wall_collisions(&colData) != 0) {
-                wall = colData.walls[colData.numWalls - 1];
-                horWallNorm = atan2s(wall->normal.z, wall->normal.x);
-                wallYaw = horWallNorm + DEGREES(90);
-                // If Mario would be blocked by the surface, then avoid it
-                if ((is_range_behind_surface(sMarioCamState->pos, cPos, wall, yawRange, SURFACE_WALL_MISC) == 0)
-                    && (is_mario_behind_surface(c, wall) == TRUE)
-                    // Also check if the wall is tall enough to cover Mario
-                    && (is_surf_within_bounding_box(wall, -1.f, 150.f, -1.f) == FALSE)) {
-                    // Calculate the avoid direction. The function returns the opposite direction so add 180
-                    // degrees.
-                    *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180);
-                    camera_approach_s16_symmetric_bool(avoidYaw, horWallNorm, yawRange);
-                    status = 3;
-                    step = 8;
-                }
-            }
-        }
-        checkDist += 0.125f;
-    }
-
-    return status;
-}
-
-/**
  * Stores type and height of the nearest floor and ceiling to Mario in `pg`
  *
  * Note: Also finds the water level, but waterHeight is unused
@@ -2611,85 +2183,6 @@ void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
                                    sMarioCamState->pos[2], &pg->currCeil);
     pg->waterHeight = find_water_level(sMarioCamState->pos[0], sMarioCamState->pos[2]);
     gCollisionFlags = tempCollisionFlags;
-}
-
-/**
- * Start a cutscene focusing on an object
- * This will play if nothing else happened in the same frame, like exiting or warping.
- */
-void start_object_cutscene(u8 cutscene, struct Object *obj) {
-    sObjectCutscene = cutscene;
-    gRecentCutscene = CUTSCENE_NONE;
-    gCutsceneFocus = obj;
-    gObjCutsceneDone = FALSE;
-}
-
-/**
- * Start a low-priority cutscene without focusing on an object
- * This will play if nothing else happened in the same frame, like exiting or warping.
- */
-void start_object_cutscene_without_focus(u8 cutscene) {
-    sObjectCutscene = cutscene;
-    sCutsceneDialogResponse = DIALOG_RESPONSE_NONE;
-}
-
-UNUSED s32 unused_dialog_cutscene_response(u8 cutscene) {
-    // if not in a cutscene, start this one
-    if ((gCamera->cutscene == 0) && (sObjectCutscene == 0)) {
-        sObjectCutscene = cutscene;
-    }
-
-    // if playing this cutscene and Mario responded, return the response
-    if ((gCamera->cutscene == cutscene) && (sCutsceneDialogResponse)) {
-        return sCutsceneDialogResponse;
-    } else {
-        return 0;
-    }
-}
-
-s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID) {
-    s16 response = DIALOG_RESPONSE_NONE;
-
-    if ((gCamera->cutscene == CUTSCENE_NONE) && (sObjectCutscene == CUTSCENE_NONE)) {
-        if (gRecentCutscene != cutscene) {
-            start_object_cutscene(cutscene, obj);
-            if (dialogID != DIALOG_NONE) {
-                sCutsceneDialogID = dialogID;
-            } else {
-                sCutsceneDialogID = DIALOG_001;
-            }
-        } else {
-            response = sCutsceneDialogResponse;
-        }
-
-        gRecentCutscene = CUTSCENE_NONE;
-    }
-    return response;
-}
-
-s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj) {
-    return cutscene_object_with_dialog(cutscene, obj, DIALOG_NONE);
-}
-
-/**
- * @return 0 if not started, 1 if started, and -1 if finished
- */
-s16 cutscene_object(u8 cutscene, struct Object *obj) {
-    s16 status = 0;
-
-    if ((gCamera->cutscene == 0) && (sObjectCutscene == 0)) {
-        if (gRecentCutscene != cutscene) {
-            start_object_cutscene(cutscene, obj);
-            status = 1;
-        } else {
-            status = -1;
-        }
-    }
-    return status;
-}
-
-void reset_pan_distance(UNUSED struct Camera *c) {
-    sPanDistance = 0;
 }
 
 /**
@@ -2798,39 +2291,6 @@ void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
  * The next two arrays are both related to levels, and they look generated.
  * These should be split into their own file.
  */
-
-/**
- * Converts the u32 given in DEFINE_COURSE to a u8 with the odd and even digits rotated into the right
- * order for sDanceCutsceneIndexTable
- */
-#define DROT(value, index) ((value >> (32 - (index + 1) * 8)) & 0xF0) >> 4 | \
-                           ((value >> (32 - (index + 1) * 8)) & 0x0F) << 4
-
-#define DANCE_ENTRY(c) { DROT(c, 0), DROT(c, 1), DROT(c, 2), DROT(c, 3) },
-
-#define DEFINE_COURSE(_0, cutscenes) DANCE_ENTRY(cutscenes)
-#define DEFINE_COURSES_END()
-#define DEFINE_BONUS_COURSE(_0, cutscenes) DANCE_ENTRY(cutscenes)
-
-/**
- * Each hex digit is an index into sDanceCutsceneTable.
- *
- * 0: Lakitu flies away after the dance
- * 1: Only rotates the camera, doesn't zoom out
- * 2: The camera goes to a close up of Mario
- * 3: Bowser keys and the grand star
- * 4: Default, used for 100 coin stars, 8 red coin stars in bowser levels, and secret stars
- */
-u8 sDanceCutsceneIndexTable[][4] = {
-    #include "levels/course_defines.h"
-    { 0x44, 0x44, 0x44, 0x04 }, // (26) Why go to all this trouble to save bytes and do this?!
-};
-#undef DEFINE_COURSE
-#undef DEFINE_COURSES_END
-#undef DEFINE_BONUS_COURSE
-
-#undef DANCE_ENTRY
-#undef DROT
 
 /**
  * These masks set whether or not the camera zooms out when game is paused.

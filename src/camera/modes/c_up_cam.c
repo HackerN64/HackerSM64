@@ -5,6 +5,35 @@
 #include "game/camera.h"
 
 /**
+ * Make Mario's head move in C-Up mode.
+ */
+void move_mario_head_c_up(UNUSED struct Camera *c) {
+    sCUpCameraPitch += (s16)(gPlayer1Controller->stickY * 10.f);
+    sModeOffsetYaw -= (s16)(gPlayer1Controller->stickX * 10.f);
+
+    // Bound looking up to nearly 80 degrees.
+    if (sCUpCameraPitch > 0x38E3) {
+        sCUpCameraPitch = 0x38E3;
+    }
+    // Bound looking down to -45 degrees
+    if (sCUpCameraPitch < -0x2000) {
+        sCUpCameraPitch = -0x2000;
+    }
+
+    // Bound the camera yaw to +-120 degrees
+    if (sModeOffsetYaw > 0x5555) {
+        sModeOffsetYaw = 0x5555;
+    }
+    if (sModeOffsetYaw < -0x5555) {
+        sModeOffsetYaw = -0x5555;
+    }
+
+    // Give Mario's neck natural-looking constraints
+    sMarioCamState->headRotation[0] = sCUpCameraPitch * 3 / 4;
+    sMarioCamState->headRotation[1] = sModeOffsetYaw * 3 / 4;
+}
+
+/**
  * Zooms the camera in for C-Up mode
  */
 void move_into_c_up(struct Camera *c) {
