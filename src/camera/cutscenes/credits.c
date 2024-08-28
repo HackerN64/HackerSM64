@@ -1,3 +1,6 @@
+/**
+ * The game's credits.
+ */
 #include "camera/camera_cutscene.h"
 #include "camera/camera_math.h"
 #include "engine/math_util.h"
@@ -5,8 +8,15 @@
 #include "game/save_file.h"
 
 /**
- * The game's credits.
+ * The current spline that controls the camera's position during the credits.
  */
+static struct CutsceneSplinePoint sCurCreditsSplinePos[32];
+
+/**
+ * The current spline that controls the camera's focus during the credits.
+ */
+static struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
+
 
 void init_current_credits_spline() {    
     for (int i = 0; i < 32; i++) {

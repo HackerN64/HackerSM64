@@ -312,6 +312,7 @@ enum CameraDoor {
 };
 
 // Might rename these to reflect what they are used for instead "SET_45" etc.
+// TODO: to camera_geo
 enum CameraFov {
     CAM_FOV_NONE,
     CAM_FOV_SET_45,
@@ -435,6 +436,7 @@ struct CameraTrigger {
 
 /**
  * Info for the camera's field of view and the FOV shake effect.
+ * TODO: to camera_geo
  */
 struct CameraFOVStatus {
     /// The current function being used to set the camera's field of view (before any fov shake is applied).
@@ -673,7 +675,6 @@ struct LakituState {
     /*0xB8*/ u32 lastFrameAction;
 };
 
-// BSS
 extern s16 sSelectionFlags;
 extern s16 sCameraSoundFlags;
 extern u16 sCButtonsPressed;
@@ -701,7 +702,6 @@ void select_mario_cam_mode(void);
 Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context);
 void object_pos_to_vec3f(Vec3f dst, struct Object *obj);
 void vec3f_to_object_pos(struct Object *obj, Vec3f src);
-s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
 s32 cam_select_alt_mode(s32 angle);
 s32 set_cam_angle(s32 mode);
 void set_handheld_shake(u8 mode);
@@ -712,24 +712,7 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius);
 void clamp_pitch(Vec3f from, Vec3f to, s16 maxPitch, s16 minPitch);
 s32 is_within_100_units_of_mario(f32 posX, f32 posY, f32 posZ);
 s32 set_or_approach_f32_asymptotic(f32 *dst, f32 goal, f32 scale);
-void approach_vec3f_asymptotic(Vec3f current, Vec3f target, f32 xMul, f32 yMul, f32 zMul);
-void set_or_approach_vec3f_asymptotic(Vec3f dst, Vec3f goal, f32 xMul, f32 yMul, f32 zMul);
-s32 camera_approach_s16_symmetric_bool(s16 *current, s16 target, s16 increment);
-s32 set_or_approach_s16_symmetric(s16 *current, s16 target, s16 increment);
-s32 camera_approach_f32_symmetric_bool(f32 *current, f32 target, f32 increment);
-f32 camera_approach_f32_symmetric(f32 value, f32 target, f32 increment);
-void random_vec3s(Vec3s dst, s16 xRange, s16 yRange, s16 zRange);
-s32 clamp_positions_and_find_yaw(Vec3f pos, Vec3f origin, f32 xMax, f32 xMin, f32 zMax, f32 zMin);
-s32 is_range_behind_surface(Vec3f from, Vec3f to, struct Surface *surf, s16 range, s16 surfType);
-void scale_along_line(Vec3f dest, Vec3f from, Vec3f to, f32 scale);
-s16 calculate_pitch(Vec3f from, Vec3f to);
-s16 calculate_yaw(Vec3f from, Vec3f to);
-void calculate_angles(Vec3f from, Vec3f to, s16 *pitch, s16 *yaw);
-f32 calc_abs_dist(Vec3f a, Vec3f b);
-f32 calc_abs_dist_squared(Vec3f a, Vec3f b);
-f32 calc_hor_dist(Vec3f a, Vec3f b);
-void rotate_in_xz(Vec3f dst, Vec3f src, s16 yaw);
-void rotate_in_yz(Vec3f dst, Vec3f src, s16 pitch);
+
 void set_camera_pitch_shake(s16 mag, s16 decay, s16 inc);
 void set_camera_yaw_shake(s16 mag, s16 decay, s16 inc);
 void set_camera_roll_shake(s16 mag, s16 decay, s16 inc);
@@ -738,6 +721,7 @@ void shake_camera_pitch(Vec3f pos, Vec3f focus);
 void shake_camera_yaw(Vec3f pos, Vec3f focus);
 void shake_camera_roll(s16 *roll);
 s32 offset_yaw_outward_radial(struct Camera *c, s16 areaYaw);
+
 void play_camera_buzz_if_cdown(void);
 void play_camera_buzz_if_cbutton(void);
 void play_camera_buzz_if_c_sideways(void);
@@ -747,11 +731,21 @@ void play_sound_cbutton_side(void);
 void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);
 void play_sound_if_cam_switched_to_lakitu_or_mario(void);
+
 void radial_camera_input(struct Camera *c);
+
+s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
 void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
 void start_cutscene(struct Camera *c, u8 cutscene);
 u8 get_cutscene_from_mario_status(struct Camera *c);
+void start_object_cutscene_without_focus(u8 cutscene);
+s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
+s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj);
+s16 cutscene_object(u8 cutscene, struct Object *obj);
+void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
+void cutscene_spawn_obj(u32 obj, s16 frame);
+
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw);
 void reset_pan_distance(UNUSED struct Camera *c);
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
@@ -763,13 +757,6 @@ s16 camera_course_processing(struct Camera *c);
 void resolve_geometry_collisions(Vec3f pos);
 s32 rotate_camera_around_walls(struct Camera *c, Vec3f cPos, s16 *avoidYaw, s16 yawRange);
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg);
-void start_object_cutscene_without_focus(u8 cutscene);
-s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
-s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj);
-s16 cutscene_object(u8 cutscene, struct Object *obj);
-void play_cutscene(struct Camera *c);
-void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
-void cutscene_spawn_obj(u32 obj, s16 frame);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
 
 s32 snap_to_45_degrees(s16 angle);
@@ -791,9 +778,6 @@ void set_fov_shake_from_point_preset(u8 preset, f32 posX, f32 posY, f32 posZ);
 void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16 yawOff, s16 pitchDiv, s16 yawDiv);
 
 void set_mode_c_up(struct Camera *c);
-
-// TODO: port this and cutscene_double_doors_end
-void set_flag_post_door(struct Camera *c);
 
 s16 update_slide_camera(struct Camera *c);
 s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos);
@@ -850,7 +834,6 @@ extern f32 sCannonYOffset;
 extern struct ModeTransitionInfo sModeInfo;
 extern Vec3f sCastleEntranceOffset;
 extern Vec3f sFixedModeBasePosition;
-extern u32 sParTrackIndex;
 extern s16 gCameraMovementFlags;
 extern s16 sStatusFlags;
 extern struct Camera *gCamera;
@@ -863,17 +846,11 @@ extern u32 gPrevLevel;
 
 extern f32 gCameraZoomDist;
 
-extern struct ParallelTrackingPoint *sParTrackPath;
-extern struct CameraStoredInfo sParTrackTransOff;
 extern struct CameraStoredInfo sCameraStoreCUp;
 extern struct CameraStoredInfo sCameraStoreCutscene;
 extern s16 sCameraYawAfterDoorCutscene;
-extern s16 sCutsceneSplineSegment;
-extern f32 sCutsceneSplineSegmentProgress;
 extern s16 sCutsceneShot;
 extern s16 gCutsceneTimer;
-extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
-extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
 extern struct CutsceneVariable sCutsceneVars[10];
 extern s32 gObjCutsceneDone;
 extern u32 gCutsceneObjSpawn;

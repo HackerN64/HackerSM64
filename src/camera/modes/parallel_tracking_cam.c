@@ -3,6 +3,24 @@
 #include "engine/math_util.h"
 #include "game/camera.h"
 
+/**
+ * The index into the current parallel tracking path
+ */
+static u32 sParTrackIndex;
+
+/**
+ * The current list of ParallelTrackingPoints used in update_parallel_tracking_camera()
+ */
+static struct ParallelTrackingPoint *sParTrackPath;
+
+/**
+ * On the first frame after the camera changes to a different parallel tracking path, this stores the
+ * displacement between the camera's calculated new position and its previous positions
+ *
+ * This transition offset is then used to smoothly interpolate the camera's position between the two
+ * paths
+ */
+static struct CameraStoredInfo sParTrackTransOff;
 
 /**
  * Start parallel tracking mode using the path `path`

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "camera/camera_math.h"
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "game/camera.h"
@@ -143,58 +144,3 @@ void pan_ahead_of_player(struct Camera *c) {
     rotate_in_xz(pan, pan, yaw);
     vec3f_add(c->focus, pan);
 }
-
-// CameraMode gCameraModes[] = {
-//     [CAMERA_MODE_NONE] = { .modeFunc = NULL, .updateFunc = NULL },
-//     [CAMERA_MODE_RADIAL] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_OUTWARD_RADIAL] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_BEHIND_MARIO] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_CLOSE] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_5] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_C_UP] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_7] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_WATER_SURFACE] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_SLIDE_HOOT] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_INSIDE_CANNON] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_BOSS_FIGHT] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_PARALLEL_TRACKING] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_FIXED] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_8_DIRECTIONS] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_0F] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_FREE_ROAM] = {
-//         .modeFunc = 
-//     },
-//     [CAMERA_MODE_SPIRAL_STAIRS] = {
-//         .modeFunc = 
-//     },
-// }

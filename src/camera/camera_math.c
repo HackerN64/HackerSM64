@@ -1,4 +1,5 @@
 #include "types.h"
+#include "camera/camera_math.h"
 #include "engine/math_util.h"
 #include "game/camera.h"
 #include "game/level_update.h"

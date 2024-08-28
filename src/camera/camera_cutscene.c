@@ -7,6 +7,17 @@
 #include "camera_math.h"
 
 /**
+ * The progress (from 0 to 1) through the current spline segment.
+ * When it becomes >= 1, 1.0 is subtracted from it and sCutsceneSplineSegment is increased.
+ */
+f32 sCutsceneSplineSegmentProgress;
+
+/**
+ * The current segment of the CutsceneSplinePoint[] being used.
+ */
+s16 sCutsceneSplineSegment;
+
+/**
  * Triggers Mario to enter a dialog state. This is used to make Mario look at the focus of a cutscene,
  * for example, bowser.
  * @param state 0 = stop, 1 = start, 2 = start and look up, and 3 = start and look down
@@ -26,8 +37,6 @@ void cutscene_stop_dialog(UNUSED struct Camera *c) {
     cutscene_common_set_dialog_state(MARIO_DIALOG_STOP);
 }
 
-
-
 /**
  * Cutscene helpers for Mario to enter the dialog state and look in a direction
  */
@@ -43,6 +52,19 @@ void cutscene_mario_dialog_look_up(UNUSED struct Camera *c) {
     gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_UP);
 }
 
+void set_flag_post_door(struct Camera *c) {
+    sStatusFlags |= CAM_FLAG_BEHIND_MARIO_POST_DOOR;
+    sCameraYawAfterDoorCutscene = calculate_yaw(c->focus, c->pos);
+}
+
+/**
+ * Ends the double door cutscene.
+ */
+void cutscene_double_doors_end(struct Camera *c) {
+    set_flag_post_door(c);
+    c->cutscene = 0;
+    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+}
 
 /**
  * End the cutscene, used by cutscenes that play when Mario exits a course to castle grounds.

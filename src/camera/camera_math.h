@@ -23,6 +23,8 @@ s32 offset_yaw_outward_radial(struct Camera *c, s16 areaYaw);
 s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
 
 f32 camera_approach_f32_symmetric(f32 current, f32 target, f32 increment);
+s16 calculate_pitch(Vec3f from, Vec3f to);
+s16 calculate_yaw(Vec3f from, Vec3f to);
 f32 calc_abs_dist(Vec3f a, Vec3f b);
 f32 calc_abs_dist_squared(Vec3f a, Vec3f b);
 f32 calc_hor_dist(Vec3f a, Vec3f b);

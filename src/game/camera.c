@@ -122,26 +122,6 @@ struct PlayerGeometry sMarioGeometry;
 struct Camera *gCamera;
 s16 sAvoidYawVel;
 s16 sCameraYawAfterDoorCutscene;
-/**
- * The current spline that controls the camera's position during the credits.
- */
-struct CutsceneSplinePoint sCurCreditsSplinePos[32];
-
-/**
- * The current spline that controls the camera's focus during the credits.
- */
-struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
-
-/**
- * The progress (from 0 to 1) through the current spline segment.
- * When it becomes >= 1, 1.0 is subtracted from it and sCutsceneSplineSegment is increased.
- */
-f32 sCutsceneSplineSegmentProgress;
-
-/**
- * The current segment of the CutsceneSplinePoint[] being used.
- */
-s16 sCutsceneSplineSegment;
 
 // Shaky Hand-held Camera effect variables
 struct HandheldShakePoint sHandheldShakeSpline[4];
@@ -280,25 +260,6 @@ struct ModeTransitionInfo sModeInfo;
  * Offset added to sFixedModeBasePosition when Mario is inside, near the castle lobby entrance
  */
 Vec3f sCastleEntranceOffset;
-
-/**
- * The index into the current parallel tracking path
- */
-u32 sParTrackIndex;
-
-/**
- * The current list of ParallelTrackingPoints used in update_parallel_tracking_camera()
- */
-struct ParallelTrackingPoint *sParTrackPath;
-
-/**
- * On the first frame after the camera changes to a different parallel tracking path, this stores the
- * displacement between the camera's calculated new position and its previous positions
- *
- * This transition offset is then used to smoothly interpolate the camera's position between the two
- * paths
- */
-struct CameraStoredInfo sParTrackTransOff;
 
 /**
  * The information stored when C-Up is active, used to update Lakitu's rotation when exiting C-Up
@@ -1446,14 +1407,6 @@ void play_sound_if_cam_switched_to_lakitu_or_mario(void) {
     sCameraSoundFlags &= ~(CAM_SOUND_MARIO_ACTIVE | CAM_SOUND_NORMAL_ACTIVE);
 }
 
-
-/**
- * Starts a cutscene dialog. Only has an effect when `trigger` is 1
- */
-void trigger_cutscene_dialog(s32 trigger) {
-    if (trigger == 1) start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE);
-}
-
 /**
  * Updates the camera based on which C buttons are pressed this frame
  */
@@ -1538,6 +1491,13 @@ void start_cutscene(struct Camera *c, u8 cutscene) {
         c->cutscene = cutscene;
         clear_cutscene_vars(c);
     }
+}
+
+/**
+ * Starts a cutscene dialog. Only has an effect when `trigger` is 1
+ */
+void trigger_cutscene_dialog(s32 trigger) {
+    if (trigger == 1) start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE);
 }
 
 /**
@@ -2826,12 +2786,6 @@ static UNUSED void unused_start_bowser_bounce_shake(UNUSED struct Camera *c) {
     set_environmental_camera_shake(SHAKE_ENV_BOWSER_THROW_BOUNCE);
 }
 
-
-void set_flag_post_door(struct Camera *c) {
-    sStatusFlags |= CAM_FLAG_BEHIND_MARIO_POST_DOOR;
-    sCameraYawAfterDoorCutscene = calculate_yaw(c->focus, c->pos);
-}
-
 /**
  * Adjust the camera focus towards a point `dist` units in front of Mario.
  * @param dist distance in Mario's forward direction. Note that this is relative to Mario, so a negative
@@ -2866,15 +2820,6 @@ void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
         c->nextYaw = yaw;
         c->yaw = yaw;
     }
-}
-
-/**
- * Ends the double door cutscene.
- */
-void cutscene_double_doors_end(struct Camera *c) {
-    set_flag_post_door(c);
-    c->cutscene = 0;
-    sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 }
 
 /* TODO:
