@@ -2,10 +2,20 @@
 
 #include "game/camera.h"
 
-struct CameraMode {
-    void (*modeFunc)(struct Camera *c);
-    void (*updateFunc)(struct Camera *c);
+/**
+ * A point in a path used by update_parallel_tracking_camera
+ */
+struct ParallelTrackingPoint {
+    /// Whether this point is the start of a path
+    s16 startOfPath;
+    /// Point used to define a line segment to follow
+    Vec3f pos;
+    /// The distance Mario can move along the line before the camera should move
+    f32 distThresh;
+    /// The percentage that the camera should move from the line to Mario
+    f32 zoom;
 };
+
 
 // mode-specific export variables
 extern s16 sSpiralStairsYawOffset;

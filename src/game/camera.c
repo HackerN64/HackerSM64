@@ -314,7 +314,6 @@ u8 sFramesSinceCutsceneEnded = 0;
  */
 u8 sCutsceneDialogResponse = DIALOG_RESPONSE_NONE;
 struct PlayerCameraState *sMarioCamState = &gPlayerCameraState[0];
-// struct PlayerCameraState *sLuigiCamState = &gPlayerCameraState[1];
 Vec3f sFixedModeBasePosition    = { 646.0f, 143.0f, -1513.0f };
 
 typedef s32 (*CameraTransition)(struct Camera *c, Vec3f focus, Vec3f pos);
@@ -911,8 +910,6 @@ void reset_camera(struct Camera *c) {
     c->doorStatus = DOOR_DEFAULT;
     sMarioCamState->headRotation[0] = 0;
     sMarioCamState->headRotation[1] = 0;
-    // sLuigiCamState->headRotation[0] = 0;
-    // sLuigiCamState->headRotation[1] = 0;
     sMarioCamState->cameraEvent = CAM_EVENT_NONE;
     sMarioCamState->usedObj = NULL;
     gLakituState.shakeMagnitude[0] = 0;
@@ -1465,31 +1462,6 @@ void handle_c_button_movement(struct Camera *c) {
                 sCSideButtonYaw = cSideYaw;
             }
         }
-    }
-}
-
-/**
- * Zero the 10 cvars.
- */
-void clear_cutscene_vars(UNUSED struct Camera *c) {
-    s32 i;
-
-    for (i = 0; i < 10; i++) {
-        sCutsceneVars[i].unused1 = 0;
-        vec3_zero(sCutsceneVars[i].point);
-        vec3_zero(sCutsceneVars[i].unusedPoint);
-        vec3_zero(sCutsceneVars[i].angle);
-        sCutsceneVars[i].unused2 = 0;
-    }
-}
-
-/**
- * Start the cutscene, `cutscene`, if it is not already playing.
- */
-void start_cutscene(struct Camera *c, u8 cutscene) {
-    if (c->cutscene != cutscene) {
-        c->cutscene = cutscene;
-        clear_cutscene_vars(c);
     }
 }
 

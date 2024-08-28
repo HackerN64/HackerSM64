@@ -321,6 +321,30 @@ void cutscene_goto_cvar_pos(struct Camera *c, f32 goalDist, s16 goalPitch, s16 r
     vec3f_set_dist_and_angle(c->pos, c->focus, nextDist, nextPitch, nextYaw);
 }
 
+/**
+ * Zero the 10 cvars.
+ */
+void clear_cutscene_vars(UNUSED struct Camera *c) {
+    s32 i;
+
+    for (i = 0; i < 10; i++) {
+        sCutsceneVars[i].unused1 = 0;
+        vec3_zero(sCutsceneVars[i].point);
+        vec3_zero(sCutsceneVars[i].unusedPoint);
+        vec3_zero(sCutsceneVars[i].angle);
+        sCutsceneVars[i].unused2 = 0;
+    }
+}
+
+/**
+ * Start the cutscene, `cutscene`, if it is not already playing.
+ */
+void start_cutscene(struct Camera *c, u8 cutscene) {
+    if (c->cutscene != cutscene) {
+        c->cutscene = cutscene;
+        clear_cutscene_vars(c);
+    }
+}
 
 /**
  * Play the current cutscene until either gCutsceneTimer reaches the max time, or c->cutscene is set to 0

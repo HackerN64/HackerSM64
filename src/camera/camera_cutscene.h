@@ -26,6 +26,7 @@ extern s16 sCutsceneSplineSegment;
 extern f32 sCutsceneSplineSegmentProgress;
 
 // Cutscene Interface
+void start_cutscene(struct Camera *c, u8 cutscene);
 void play_cutscene(struct Camera *c);
 void cutscene_reset_spline(void);
 void init_current_credits_spline();

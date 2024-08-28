@@ -517,20 +517,6 @@ struct ModeTransitionInfo {
 };
 
 /**
- * A point in a path used by update_parallel_tracking_camera
- */
-struct ParallelTrackingPoint {
-    /// Whether this point is the start of a path
-    s16 startOfPath;
-    /// Point used to define a line segment to follow
-    Vec3f pos;
-    /// The distance Mario can move along the line before the camera should move
-    f32 distThresh;
-    /// The percentage that the camera should move from the line to Mario
-    f32 zoom;
-};
-
-/**
  * Stores the camera's info
  */
 struct CameraStoredInfo {
@@ -737,7 +723,6 @@ void radial_camera_input(struct Camera *c);
 s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
 void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
-void start_cutscene(struct Camera *c, u8 cutscene);
 u8 get_cutscene_from_mario_status(struct Camera *c);
 void start_object_cutscene_without_focus(u8 cutscene);
 s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
