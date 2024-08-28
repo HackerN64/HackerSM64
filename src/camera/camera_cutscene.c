@@ -2,6 +2,7 @@
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"
 #include "game/camera.h"
+#include "game/game_init.h"
 #include "game/level_update.h"
 #include "camera_cutscene.h"
 #include "camera_math.h"
@@ -10,6 +11,15 @@
  * A cutscene that plays when the player interacts with an object
  */
 u8 sObjectCutscene = CUTSCENE_NONE;
+
+struct Object *gCutsceneFocus = NULL;
+
+/**
+ * The ID of the cutscene that ended. It's set to 0 if no cutscene ended less than 8 frames ago.
+ *
+ * It is only used to prevent the same cutscene from playing twice before 8 frames have passed.
+ */
+u8 gRecentCutscene = CUTSCENE_NONE;
 
 /**
  * The current frame of the cutscene shot.
@@ -38,6 +48,97 @@ f32 sCutsceneSplineSegmentProgress;
  * The current segment of the CutsceneSplinePoint[] being used.
  */
 s16 sCutsceneSplineSegment;
+
+/**
+ * Direction controlled by player 2, moves the focus during the credits.
+ */
+Vec3f sPlayer2FocusOffset;
+/**
+ * The pitch used for the credits easter egg.
+ */
+s16 sCreditsPlayer2Pitch;
+/**
+ * The yaw used for the credits easter egg.
+ */
+s16 sCreditsPlayer2Yaw;
+
+void reset_cutscene_system() {
+    gCutsceneTimer = 0;
+    sCutsceneShot = 0;
+    gCutsceneObjSpawn = CUTSCENE_OBJ_NONE;
+    gObjCutsceneDone = FALSE;
+    gCutsceneFocus = NULL;
+    sObjectCutscene = CUTSCENE_NONE;
+    gRecentCutscene = CUTSCENE_NONE;
+}
+
+/**
+ * If the camera's yaw is out of the range of `absYaw` +- `yawMax`, then set the yaw to `absYaw`
+ */
+void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
+    s16 yaw;
+
+    vec3f_get_yaw(sMarioCamState->pos, c->pos, &yaw);
+    s16 yawFromAbs = yaw - absYaw;
+
+    // Because angles are s16, this checks if yaw is negative
+    if ((yawFromAbs & 0x8000) != 0) {
+        yawFromAbs = -yawFromAbs;
+    }
+    if (yawFromAbs > yawMax) {
+        yaw = absYaw;
+        c->nextYaw = yaw;
+        c->yaw = yaw;
+    }
+}
+
+/**
+ * Easter egg: the player 2 controller can move the camera's focus in the ending and credits.
+ */
+void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw) {
+    f32 distCamToFocus;
+    s16 pitch, yaw, pitchCap;
+
+    // Change the camera rotation to match the 2nd player's stick
+    approach_s16_asymptotic_bool(&sCreditsPlayer2Yaw, -(s16)(gPlayer2Controller->stickX * 250.f), 4);
+    approach_s16_asymptotic_bool(&sCreditsPlayer2Pitch, -(s16)(gPlayer2Controller->stickY * 265.f), 4);
+    vec3f_get_dist_and_angle(c->pos, c->focus, &distCamToFocus, &pitch, &yaw);
+
+    pitchCap = 0x3800 - pitch;
+    if (pitchCap < 0) {
+        pitchCap = 0;
+    }
+    if (maxPitch > pitchCap) {
+        maxPitch = pitchCap;
+    }
+
+    pitchCap = -0x3800 - pitch;
+    if (pitchCap > 0) {
+        pitchCap = 0;
+    }
+    if (minPitch < pitchCap) {
+        minPitch = pitchCap;
+    }
+
+    if (sCreditsPlayer2Pitch > maxPitch) {
+        sCreditsPlayer2Pitch = maxPitch;
+    }
+    if (sCreditsPlayer2Pitch < minPitch) {
+        sCreditsPlayer2Pitch = minPitch;
+    }
+
+    if (sCreditsPlayer2Yaw > maxYaw) {
+        sCreditsPlayer2Yaw = maxYaw;
+    }
+    if (sCreditsPlayer2Yaw < minYaw) {
+        sCreditsPlayer2Yaw = minYaw;
+    }
+
+    pitch += sCreditsPlayer2Pitch;
+    yaw += sCreditsPlayer2Yaw;
+    vec3f_set_dist_and_angle(c->pos, sPlayer2FocusOffset, distCamToFocus, pitch, yaw);
+    vec3f_sub(sPlayer2FocusOffset, c->focus);
+}
 
 /**
  * Start a cutscene focusing on an object
@@ -338,6 +439,22 @@ void set_focus_rel_mario(struct Camera *c, f32 leftRight, f32 yOff, f32 forwBack
     c->focus[2] = sMarioCamState->pos[2] + forwBack * coss(yaw) - leftRight * sins(yaw);
     c->focus[0] = sMarioCamState->pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw);
     c->focus[1] = sMarioCamState->pos[1] + yOff + focFloorYOff;
+}
+
+/**
+ * Adjust the camera focus towards a point `dist` units in front of Mario.
+ * @param dist distance in Mario's forward direction. Note that this is relative to Mario, so a negative
+ *        distance will focus in front of Mario, and a positive distance will focus behind him.
+ */
+void focus_in_front_of_mario(struct Camera *c, f32 dist, f32 speed) {
+    Vec3f goalFocus, offset;
+
+    offset[0] = 0.f;
+    offset[2] = dist;
+    offset[1] = 100.f;
+
+    offset_rotated(goalFocus, sMarioCamState->pos, offset, sMarioCamState->faceAngle);
+    approach_vec3f_asymptotic(c->focus, goalFocus, speed, speed, speed);
 }
 
 /**

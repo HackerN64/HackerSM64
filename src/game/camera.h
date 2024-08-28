@@ -715,9 +715,7 @@ extern struct LakituState gLakituState;
 extern s16 gCameraMovementFlags;
 extern s32 gObjCutsceneDone;
 extern struct Camera *gCamera;
-extern struct Object *gCutsceneFocus;
 extern struct Object *gSecondCameraFocus;
-extern u8 gRecentCutscene;
 
 // TODO: sort all of this extremely messy shit out after the split
 
@@ -785,9 +783,6 @@ void set_camera_mode_close_cam(u8 *mode);
 void set_camera_mode_radial(struct Camera *c, s16 transitionTime);
 void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames);
 void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw);
-
-void focus_in_front_of_mario(struct Camera *c, f32 dist, f32 speed);
-void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, s16 pitch, s16 yaw);
 
 void set_fov_function(u8 func);
 void cutscene_set_fov_shake_preset(u8 preset);

@@ -32,8 +32,12 @@ extern u32 gCutsceneObjSpawn;
 extern u8 sCutsceneDialogResponse;
 extern s16 sCutsceneSplineSegment;
 extern f32 sCutsceneSplineSegmentProgress;
+extern struct Object *gCutsceneFocus;
+extern u8 gRecentCutscene;
+extern Vec3f sPlayer2FocusOffset;
 
 // Cutscene Interface
+void reset_cutscene_system();
 void start_cutscene(struct Camera *c, u8 cutscene);
 void play_cutscene(struct Camera *c);
 void cutscene_reset_spline(void);
@@ -48,6 +52,7 @@ void update_camera_yaw(struct Camera *c);
 s16 cutscene_common_set_dialog_state(s32 state);
 void cutscene_stop_dialog(UNUSED struct Camera *c);
 void cutscene_shake_explosion(UNUSED struct Camera *c);
+void focus_in_front_of_mario(struct Camera *c, f32 dist, f32 speed);
 void set_focus_rel_mario(struct Camera *c, f32 leftRight, f32 yOff, f32 forwBack, s16 yawOff);
 void store_info_star(struct Camera *c);
 void retrieve_info_star(struct Camera *c);

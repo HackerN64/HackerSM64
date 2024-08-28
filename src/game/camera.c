@@ -50,18 +50,7 @@ Vec3f sOldFocus;
  * L is real.
  */
 struct PlayerCameraState gPlayerCameraState[2];
-/**
- * Direction controlled by player 2, moves the focus during the credits.
- */
-Vec3f sPlayer2FocusOffset;
-/**
- * The pitch used for the credits easter egg.
- */
-s16 sCreditsPlayer2Pitch;
-/**
- * The yaw used for the credits easter egg.
- */
-s16 sCreditsPlayer2Yaw;
+
 /**
  * Used to decide when to zoom out in the pause menu.
  */
@@ -214,8 +203,6 @@ struct CameraStoredInfo sCameraStoreCUp;
  */
 struct CameraStoredInfo sCameraStoreCutscene;
 
-struct Object *gCutsceneFocus = NULL;
-
 /**
  * The information of a second focus camera used by some objects
  */
@@ -229,13 +216,6 @@ s16 sYawSpeed = 0x400;
 s32 gCurrLevelArea = 0;
 u32 gPrevLevel = 0;
 f32 gCameraZoomDist = 800.0f;
-
-/**
- * The ID of the cutscene that ended. It's set to 0 if no cutscene ended less than 8 frames ago.
- *
- * It is only used to prevent the same cutscene from playing twice before 8 frames have passed.
- */
-u8 gRecentCutscene = CUTSCENE_NONE;
 
 /**
  * A timer that increments for 8 frames when a cutscene ends.
@@ -439,20 +419,6 @@ void unused_set_camera_pitch_shake_env(s16 shake) {
             set_camera_pitch_shake(0x100, 0x8, 0x3000);
             break;
     }
-}
-
-void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, s16 pitch, s16 yaw) {
-    Vec3f marioPos;
-
-    marioPos[0] = sMarioCamState->pos[0];
-    marioPos[1] = sMarioCamState->pos[1] + posYOff;
-    marioPos[2] = sMarioCamState->pos[2];
-
-    vec3f_set_dist_and_angle(marioPos, pos, dist, pitch + sLakituPitch, yaw);
-
-    focus[0] = sMarioCamState->pos[0];
-    focus[1] = sMarioCamState->pos[1] + focYOff;
-    focus[2] = sMarioCamState->pos[2];
 }
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
@@ -778,12 +744,7 @@ void reset_camera(struct Camera *c) {
     s2ndRotateFlags = 0;
     sStatusFlags = 0;
 
-    // TODO: cutscene_reset
-    // gCutsceneTimer = 0;
-    // sCutsceneShot = 0;
-    // gCutsceneObjSpawn = CUTSCENE_OBJ_NONE;
-    // gObjCutsceneDone = FALSE;
-    // gCutsceneFocus = NULL;
+    reset_cutscene_system();
     gSecondCameraFocus = NULL;
     sCButtonsPressed = 0;
     vec3f_copy(sModeTransition.marioPos, sMarioCamState->pos);
@@ -821,10 +782,6 @@ void reset_camera(struct Camera *c) {
     sFOVState.unusedIsSleeping = 0;
     sFOVState.shakeAmplitude = 0.f;
     sFOVState.shakePhase = 0;
-
-    // TODO: cutscene reset
-    // sObjectCutscene = CUTSCENE_NONE;
-    // gRecentCutscene = CUTSCENE_NONE;
 }
 
 void init_camera(struct Camera *c) {
@@ -832,8 +789,10 @@ void init_camera(struct Camera *c) {
     Vec3f marioOffset;
     s32 i;
 
-    sCreditsPlayer2Pitch = 0;
-    sCreditsPlayer2Yaw = 0;
+    // todo: init_camera_modes
+    // sCreditsPlayer2Pitch = 0;
+    // sCreditsPlayer2Yaw = 0;
+    // vec3_zero(sPlayer2FocusOffset);
     gPrevLevel = gCurrLevelArea / 16;
     gCurrLevelArea = gCurrLevelNum * 16 + gCurrentArea->index;
     sSelectionFlags &= CAM_MODE_MARIO_SELECTED;
@@ -848,7 +807,6 @@ void init_camera(struct Camera *c) {
     gLakituState.keyDanceRoll = 0;
     sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
     vec3_zero(sCastleEntranceOffset);
-    vec3_zero(sPlayer2FocusOffset);
     find_mario_floor_and_ceil(&sMarioGeometry);
     sMarioGeometry.prevFloorHeight = sMarioGeometry.currFloorHeight;
     sMarioGeometry.prevCeilHeight = sMarioGeometry.currCeilHeight;
@@ -2125,54 +2083,6 @@ void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
 }
 
 /**
- * Easter egg: the player 2 controller can move the camera's focus in the ending and credits.
- */
-void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw) {
-    f32 distCamToFocus;
-    s16 pitch, yaw, pitchCap;
-
-    // Change the camera rotation to match the 2nd player's stick
-    approach_s16_asymptotic_bool(&sCreditsPlayer2Yaw, -(s16)(gPlayer2Controller->stickX * 250.f), 4);
-    approach_s16_asymptotic_bool(&sCreditsPlayer2Pitch, -(s16)(gPlayer2Controller->stickY * 265.f), 4);
-    vec3f_get_dist_and_angle(c->pos, c->focus, &distCamToFocus, &pitch, &yaw);
-
-    pitchCap = 0x3800 - pitch;
-    if (pitchCap < 0) {
-        pitchCap = 0;
-    }
-    if (maxPitch > pitchCap) {
-        maxPitch = pitchCap;
-    }
-
-    pitchCap = -0x3800 - pitch;
-    if (pitchCap > 0) {
-        pitchCap = 0;
-    }
-    if (minPitch < pitchCap) {
-        minPitch = pitchCap;
-    }
-
-    if (sCreditsPlayer2Pitch > maxPitch) {
-        sCreditsPlayer2Pitch = maxPitch;
-    }
-    if (sCreditsPlayer2Pitch < minPitch) {
-        sCreditsPlayer2Pitch = minPitch;
-    }
-
-    if (sCreditsPlayer2Yaw > maxYaw) {
-        sCreditsPlayer2Yaw = maxYaw;
-    }
-    if (sCreditsPlayer2Yaw < minYaw) {
-        sCreditsPlayer2Yaw = minYaw;
-    }
-
-    pitch += sCreditsPlayer2Pitch;
-    yaw += sCreditsPlayer2Yaw;
-    vec3f_set_dist_and_angle(c->pos, sPlayer2FocusOffset, distCamToFocus, pitch, yaw);
-    vec3f_sub(sPlayer2FocusOffset, c->focus);
-}
-
-/**
  * Rotate the camera's focus around the camera's position by incYaw and incPitch
  */
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw) {
@@ -2188,42 +2098,6 @@ void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw) {
 
 static UNUSED void unused_start_bowser_bounce_shake(UNUSED struct Camera *c) {
     set_environmental_camera_shake(SHAKE_ENV_BOWSER_THROW_BOUNCE);
-}
-
-/**
- * Adjust the camera focus towards a point `dist` units in front of Mario.
- * @param dist distance in Mario's forward direction. Note that this is relative to Mario, so a negative
- *        distance will focus in front of Mario, and a positive distance will focus behind him.
- */
-void focus_in_front_of_mario(struct Camera *c, f32 dist, f32 speed) {
-    Vec3f goalFocus, offset;
-
-    offset[0] = 0.f;
-    offset[2] = dist;
-    offset[1] = 100.f;
-
-    offset_rotated(goalFocus, sMarioCamState->pos, offset, sMarioCamState->faceAngle);
-    approach_vec3f_asymptotic(c->focus, goalFocus, speed, speed, speed);
-}
-
-/**
- * If the camera's yaw is out of the range of `absYaw` +- `yawMax`, then set the yaw to `absYaw`
- */
-void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
-    s16 yaw;
-
-    vec3f_get_yaw(sMarioCamState->pos, c->pos, &yaw);
-    s16 yawFromAbs = yaw - absYaw;
-
-    // Because angles are s16, this checks if yaw is negative
-    if ((yawFromAbs & 0x8000) != 0) {
-        yawFromAbs = -yawFromAbs;
-    }
-    if (yawFromAbs > yawMax) {
-        yaw = absYaw;
-        c->nextYaw = yaw;
-        c->yaw = yaw;
-    }
 }
 
 /* TODO:
