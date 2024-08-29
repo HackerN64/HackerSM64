@@ -713,9 +713,6 @@ extern struct Object *gSecondCameraFocus;
 
 // TODO: sort all of this extremely messy shit out after the split
 
-void set_camera_shake_from_hit(s16 shake);
-void set_environmental_camera_shake(s16 shake);
-void set_camera_shake_from_point(s16 shake, f32 posX, f32 posY, f32 posZ);
 void transition_next_state(UNUSED struct Camera *c, s16 frames);
 void update_camera(struct Camera *c);
 void reset_camera(struct Camera *c);
@@ -725,13 +722,16 @@ void object_pos_to_vec3f(Vec3f dst, struct Object *obj);
 void vec3f_to_object_pos(struct Object *obj, Vec3f src);
 s32 cam_select_alt_mode(s32 angle);
 s32 set_cam_angle(s32 mode);
-void set_handheld_shake(u8 mode);
-void shake_camera_handheld(Vec3f pos, Vec3f focus);
 s32 find_c_buttons_pressed(u16 currentState, u16 buttonsPressed, u16 buttonsDown);
 s32 update_camera_hud_status(struct Camera *c);
 s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius);
 void clamp_pitch(Vec3f from, Vec3f to, s16 maxPitch, s16 minPitch);
 s32 is_within_100_units_of_mario(f32 posX, f32 posY, f32 posZ);
+void set_camera_shake_from_hit(s16 shake);
+void set_environmental_camera_shake(s16 shake);
+void set_camera_shake_from_point(s16 shake, f32 posX, f32 posY, f32 posZ);
+void set_handheld_shake(u8 mode);
+void shake_camera_handheld(Vec3f pos, Vec3f focus);
 void set_camera_pitch_shake(s16 mag, s16 decay, s16 inc);
 void set_camera_yaw_shake(s16 mag, s16 decay, s16 inc);
 void set_camera_roll_shake(s16 mag, s16 decay, s16 inc);
