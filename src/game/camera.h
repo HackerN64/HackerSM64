@@ -808,6 +808,10 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos);
 s32 update_slide_or_0f_camera(struct Camera *c, Vec3f focus, Vec3f pos);
 s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos);
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw);
+#endif
+
 Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context);
 
 extern s16 sYawSpeed;

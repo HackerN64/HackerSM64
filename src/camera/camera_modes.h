@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config/config_game.h"
 #include "game/camera.h"
 
 /**

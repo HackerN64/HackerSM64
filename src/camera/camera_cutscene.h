@@ -1,6 +1,8 @@
 #pragma once
 
+#include "config/config_game.h"
 #include "game/camera.h"
+#include "game/save_file.h"
 
 /**
  * The same type as a CameraEvent, but because these are generally longer, and happen in sequential
@@ -67,6 +69,7 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
 void trigger_cutscene_dialog(s32 trigger);
 u8 get_cutscene_from_mario_status(struct Camera *c);
 void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
+void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax);
 
 // Object cutscene functions
 s16 cutscene_object(u8 cutscene, struct Object *obj);
