@@ -32,7 +32,7 @@
 #include "camera/camera_math.h"
 #include "camera/vanilla_trigger_code.h"
 #include "camera/camera_modes.h"
-#include "camera/camera_cutscene.h"
+#include "camera/cutscene_helpers.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 

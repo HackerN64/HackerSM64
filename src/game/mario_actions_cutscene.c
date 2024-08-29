@@ -9,7 +9,7 @@
 #include "camera.h"
 #include "dialog_ids.h"
 #include "camera/camera_math.h"
-#include "camera/camera_cutscene.h"
+#include "camera/cutscene_helpers.h"
 #include "engine/behavior_script.h"
 #include "engine/graph_node.h"
 #include "engine/math_util.h"
