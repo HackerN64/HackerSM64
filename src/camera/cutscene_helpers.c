@@ -4,7 +4,7 @@
 #include "game/camera.h"
 #include "game/game_init.h"
 #include "game/level_update.h"
-#include "camera_cutscene.h"
+#include "cutscene_helpers.h"
 #include "camera_math.h"
 
 /**
