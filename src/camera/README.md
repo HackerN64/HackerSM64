@@ -12,7 +12,8 @@ src/camera
 │   └── {level}.c: camera trigger code for a vanilla level, if applicable
 ├── modes
 │   └── {mode}.c: code for a specific camera mode
-├── camera_cutscene.c: cutscene and spline procesing, as well as shared cutscene functions
+├── cutscene_helpers.c: cutscene and spline procesing, as well as shared cutscene functions
 ├── camera_geo.c: code for generating the Camera GraphNode
-└── camera_math.c: math routines
+├── camera_math.c: math routines
+└── camera_modes.c: shared functions used by camera modes
 ```
