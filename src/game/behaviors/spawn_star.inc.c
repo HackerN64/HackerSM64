@@ -134,7 +134,14 @@ struct Object *spawn_star(struct Object *starObj, f32 x, f32 y, f32 z) {
 
 void spawn_default_star(f32 x, f32 y, f32 z) {
     struct Object *starObj = NULL;
-    starObj = spawn_star(starObj, x, y, z);
+    struct Object *override = NULL;
+    override = cur_obj_nearest_object_with_behavior(bhvStarSpawnOverride);
+    if(!override){
+        starObj = spawn_star(starObj, x, y, z);
+    } else {
+        starObj = spawn_star(starObj, override->oPosX, override->oPosY, override->oPosZ);
+        obj_mark_for_deletion(override);
+    }
     starObj->oBehParams2ndByte = SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR;
 }
 

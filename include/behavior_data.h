@@ -400,6 +400,7 @@ extern const BehaviorScript bhvNormalCap[];
 extern const BehaviorScript bhvVanishCap[];
 extern const BehaviorScript bhvStar[];
 extern const BehaviorScript bhvStarSpawnCoordinates[];
+extern const BehaviorScript bhvStarSpawnOverride[];
 extern const BehaviorScript bhvHiddenRedCoinStar[];
 extern const BehaviorScript bhvRedCoin[];
 extern const BehaviorScript bhvBowserCourseRedCoinStar[];
