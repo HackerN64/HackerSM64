@@ -10,16 +10,16 @@
  */
 void acf(double *vec, int n, double *out, int k)
 {
-    int i, j;
-    double sum;
-    for (i = 0; i < k; i++)
+    int i, j;
+    double sum;
+    for (i = 0; i < k; i++)
     {
-        sum = 0.0;
-        for (j = 0; j < n - i; j++)
+        sum = 0.0;
+        for (j = 0; j < n - i; j++)
         {
-            sum += vec[j + i] * vec[j];
+            sum += vec[j + i] * vec[j];
         }
-        out[i] = sum;
+        out[i] = sum;
     }
 }
 
@@ -27,182 +27,182 @@ void acf(double *vec, int n, double *out, int k)
 // "detects the presence of autocorrelation at lag 1 in the residuals (prediction errors)"
 int durbin(double *arg0, int n, double *arg2, double *arg3, double *outSomething)
 {
-    int i, j;
-    double sum, div;
-    int ret;
+    int i, j;
+    double sum, div;
+    int ret;
 
-    arg3[0] = 1.0;
-    div = arg0[0];
-    ret = 0;
+    arg3[0] = 1.0;
+    div = arg0[0];
+    ret = 0;
 
-    for (i = 1; i <= n; i++)
+    for (i = 1; i <= n; i++)
     {
-        sum = 0.0;
-        for (j = 1; j <= i-1; j++)
+        sum = 0.0;
+        for (j = 1; j <= i-1; j++)
         {
-            sum += arg3[j] * arg0[i - j];
+            sum += arg3[j] * arg0[i - j];
         }
 
-        arg3[i] = (div > 0.0 ? -(arg0[i] + sum) / div : 0.0);
-        arg2[i] = arg3[i];
+        arg3[i] = (div > 0.0 ? -(arg0[i] + sum) / div : 0.0);
+        arg2[i] = arg3[i];
 
         if (fabs(arg2[i]) > 1.0)
         {
-            ret++;
+            ret++;
         }
 
-        for (j = 1; j < i; j++)
+        for (j = 1; j < i; j++)
         {
-            arg3[j] += arg3[i - j] * arg3[i];
+            arg3[j] += arg3[i - j] * arg3[i];
         }
 
-        div *= 1.0 - arg3[i] * arg3[i];
+        div *= 1.0 - arg3[i] * arg3[i];
     }
-    *outSomething = div;
-    return ret;
+    *outSomething = div;
+    return ret;
 }
 
 void afromk(double *in, double *out, int n)
 {
-    int i, j;
-    out[0] = 1.0;
-    for (i = 1; i <= n; i++)
+    int i, j;
+    out[0] = 1.0;
+    for (i = 1; i <= n; i++)
     {
-        out[i] = in[i];
-        for (j = 1; j <= i - 1; j++)
+        out[i] = in[i];
+        for (j = 1; j <= i - 1; j++)
         {
-            out[j] += out[i - j] * out[i];
+            out[j] += out[i - j] * out[i];
         }
     }
 }
 
 int kfroma(double *in, double *out, int n)
 {
-    int i, j;
-    double div;
-    double temp;
-    double *next;
-    int ret;
+    int i, j;
+    double div;
+    double temp;
+    double *next;
+    int ret;
 
-    ret = 0;
-    next = malloc((n + 1) * sizeof(double));
+    ret = 0;
+    next = malloc((n + 1) * sizeof(double));
 
-    out[n] = in[n];
-    for (i = n - 1; i >= 1; i--)
+    out[n] = in[n];
+    for (i = n - 1; i >= 1; i--)
     {
-        for (j = 0; j <= i; j++)
+        for (j = 0; j <= i; j++)
         {
-            temp = out[i + 1];
-            div = 1.0 - (temp * temp);
+            temp = out[i + 1];
+            div = 1.0 - (temp * temp);
             if (div == 0.0)
             {
-                free(next);
-                return 1;
+                free(next);
+                return 1;
             }
-            next[j] = (in[j] - in[i + 1 - j] * temp) / div;
+            next[j] = (in[j] - in[i + 1 - j] * temp) / div;
         }
 
-        for (j = 0; j <= i; j++)
+        for (j = 0; j <= i; j++)
         {
-            in[j] = next[j];
+            in[j] = next[j];
         }
 
-        out[i] = next[i];
+        out[i] = next[i];
         if (fabs(out[i]) > 1.0)
         {
-            ret++;
+            ret++;
         }
     }
 
-    free(next);
-    return ret;
+    free(next);
+    return ret;
 }
 
 void rfroma(double *arg0, int n, double *arg2)
 {
-    int i, j;
-    double **mat;
-    double div;
+    int i, j;
+    double **mat;
+    double div;
 
-    mat = malloc((n + 1) * sizeof(double*));
-    mat[n] = malloc((n + 1) * sizeof(double));
-    mat[n][0] = 1.0;
-    for (i = 1; i <= n; i++)
+    mat = malloc((n + 1) * sizeof(double*));
+    mat[n] = malloc((n + 1) * sizeof(double));
+    mat[n][0] = 1.0;
+    for (i = 1; i <= n; i++)
     {
-        mat[n][i] = -arg0[i];
+        mat[n][i] = -arg0[i];
     }
 
-    for (i = n; i >= 1; i--)
+    for (i = n; i >= 1; i--)
     {
-        mat[i - 1] = malloc(i * sizeof(double));
-        div = 1.0 - mat[i][i] * mat[i][i];
-        for (j = 1; j <= i - 1; j++)
+        mat[i - 1] = malloc(i * sizeof(double));
+        div = 1.0 - mat[i][i] * mat[i][i];
+        for (j = 1; j <= i - 1; j++)
         {
-            mat[i - 1][j] = (mat[i][i - j] * mat[i][i] + mat[i][j]) / div;
+            mat[i - 1][j] = (mat[i][i - j] * mat[i][i] + mat[i][j]) / div;
         }
     }
 
-    arg2[0] = 1.0;
-    for (i = 1; i <= n; i++)
+    arg2[0] = 1.0;
+    for (i = 1; i <= n; i++)
     {
-        arg2[i] = 0.0;
-        for (j = 1; j <= i; j++)
+        arg2[i] = 0.0;
+        for (j = 1; j <= i; j++)
         {
-            arg2[i] += mat[i][j] * arg2[i - j];
+            arg2[i] += mat[i][j] * arg2[i - j];
         }
     }
 
-    free(mat[n]);
-    for (i = n; i > 0; i--)
+    free(mat[n]);
+    for (i = n; i > 0; i--)
     {
-        free(mat[i - 1]);
+        free(mat[i - 1]);
     }
-    free(mat);
+    free(mat);
 }
 
 double model_dist(double *arg0, double *arg1, int n)
 {
-    double *sp3C;
-    double *sp38;
-    double ret;
-    int i, j;
+    double *sp3C;
+    double *sp38;
+    double ret;
+    int i, j;
 
-    sp3C = malloc((n + 1) * sizeof(double));
-    sp38 = malloc((n + 1) * sizeof(double));
-    rfroma(arg1, n, sp3C);
+    sp3C = malloc((n + 1) * sizeof(double));
+    sp38 = malloc((n + 1) * sizeof(double));
+    rfroma(arg1, n, sp3C);
 
-    for (i = 0; i <= n; i++)
+    for (i = 0; i <= n; i++)
     {
-        sp38[i] = 0.0;
-        for (j = 0; j <= n - i; j++)
+        sp38[i] = 0.0;
+        for (j = 0; j <= n - i; j++)
         {
-            sp38[i] += arg0[j] * arg0[i + j];
+            sp38[i] += arg0[j] * arg0[i + j];
         }
     }
 
-    ret = sp38[0] * sp3C[0];
-    for (i = 1; i <= n; i++)
+    ret = sp38[0] * sp3C[0];
+    for (i = 1; i <= n; i++)
     {
-        ret += 2 * sp3C[i] * sp38[i];
+        ret += 2 * sp3C[i] * sp38[i];
     }
 
-    free(sp3C);
-    free(sp38);
-    return ret;
+    free(sp3C);
+    free(sp38);
+    return ret;
 }
 
 // compute autocorrelation matrix?
 void acmat(short *in, int n, int m, double **out)
 {
-    int i, j, k;
-    for (i = 1; i <= n; i++)
+    int i, j, k;
+    for (i = 1; i <= n; i++)
     {
-        for (j = 1; j <= n; j++)
+        for (j = 1; j <= n; j++)
         {
-            out[i][j] = 0.0;
-            for (k = 0; k < m; k++)
+            out[i][j] = 0.0;
+            for (k = 0; k < m; k++)
             {
-                out[i][j] += in[k - i] * in[k - j];
+                out[i][j] += in[k - i] * in[k - j];
             }
         }
     }
@@ -211,13 +211,13 @@ void acmat(short *in, int n, int m, double **out)
 // compute autocorrelation vector?
 void acvect(short *in, int n, int m, double *out)
 {
-    int i, j;
-    for (i = 0; i <= n; i++)
+    int i, j;
+    for (i = 0; i <= n; i++)
     {
-        out[i] = 0.0;
-        for (j = 0; j < m; j++)
+        out[i] = 0.0;
+        for (j = 0; j < m; j++)
         {
-            out[i] -= in[j - i] * in[j];
+            out[i] -= in[j - i] * in[j];
         }
     }
 }
@@ -227,12 +227,12 @@ void acvect(short *in, int n, int m, double *out)
  * permutation of itself.
  *
  * Input parameters:
- * a: The matrix which is operated on. 1-indexed; it should be of size
+ * a: The matrix which is operated on. 1-indexed; it should be of size
  *    (n+1) x (n+1), and row/column index 0 is not used.
  * n: The size of the matrix.
  *
  * Output parameters:
- * indx: The row permutation performed. 1-indexed; it should be of size n+1,
+ * indx: The row permutation performed. 1-indexed; it should be of size n+1,
  *       and index 0 is not used.
  * d: the determinant of the permutation matrix.
  *
@@ -244,64 +244,64 @@ void acvect(short *in, int n, int m, double *out)
  */
 int lud(double **a, int n, int *indx, int *d)
 {
-    int i,imax,j,k;
-    double big,dum,sum,temp;
-    double min,max;
-    double *vv;
+    int i,imax,j,k;
+    double big,dum,sum,temp;
+    double min,max;
+    double *vv;
 
-    vv = malloc((n + 1) * sizeof(double));
-    *d=1;
-    for (i=1;i<=n;i++) {
-        big=0.0;
-        for (j=1;j<=n;j++)
-            if ((temp=fabs(a[i][j])) > big) big=temp;
-        if (big == 0.0) return 1;
-        vv[i]=1.0/big;
+    vv = malloc((n + 1) * sizeof(double));
+    *d=1;
+    for (i=1;i<=n;i++) {
+        big=0.0;
+        for (j=1;j<=n;j++)
+            if ((temp=fabs(a[i][j])) > big) big=temp;
+        if (big == 0.0) return 1;
+        vv[i]=1.0/big;
     }
-    for (j=1;j<=n;j++) {
-        for (i=1;i<j;i++) {
-            sum=a[i][j];
-            for (k=1;k<i;k++) sum -= a[i][k]*a[k][j];
-            a[i][j]=sum;
+    for (j=1;j<=n;j++) {
+        for (i=1;i<j;i++) {
+            sum=a[i][j];
+            for (k=1;k<i;k++) sum -= a[i][k]*a[k][j];
+            a[i][j]=sum;
         }
-        big=0.0;
-        for (i=j;i<=n;i++) {
-            sum=a[i][j];
-            for (k=1;k<j;k++)
-                sum -= a[i][k]*a[k][j];
-            a[i][j]=sum;
+        big=0.0;
+        for (i=j;i<=n;i++) {
+            sum=a[i][j];
+            for (k=1;k<j;k++)
+                sum -= a[i][k]*a[k][j];
+            a[i][j]=sum;
             if ( (dum=vv[i]*fabs(sum)) >= big) {
-                big=dum;
-                imax=i;
+                big=dum;
+                imax=i;
             }
         }
         if (j != imax) {
-            for (k=1;k<=n;k++) {
-                dum=a[imax][k];
-                a[imax][k]=a[j][k];
-                a[j][k]=dum;
+            for (k=1;k<=n;k++) {
+                dum=a[imax][k];
+                a[imax][k]=a[j][k];
+                a[j][k]=dum;
             }
-            *d = -(*d);
-            vv[imax]=vv[j];
+            *d = -(*d);
+            vv[imax]=vv[j];
         }
-        indx[j]=imax;
-        if (a[j][j] == 0.0) return 1;
+        indx[j]=imax;
+        if (a[j][j] == 0.0) return 1;
         if (j != n) {
-            dum=1.0/(a[j][j]);
-            for (i=j+1;i<=n;i++) a[i][j] *= dum;
+            dum=1.0/(a[j][j]);
+            for (i=j+1;i<=n;i++) a[i][j] *= dum;
         }
     }
-    free(vv);
+    free(vv);
 
-    min = 1e10;
-    max = 0.0;
-    for (i = 1; i <= n; i++)
+    min = 1e10;
+    max = 0.0;
+    for (i = 1; i <= n; i++)
     {
-        temp = fabs(a[i][i]);
-        if (temp < min) min = temp;
-        if (temp > max) max = temp;
+        temp = fabs(a[i][i]);
+        if (temp < min) min = temp;
+        if (temp > max) max = temp;
     }
-    return min / max < 1e-10 ? 1 : 0;
+    return min / max < 1e-10 ? 1 : 0;
 }
 
 /**
@@ -312,7 +312,7 @@ int lud(double **a, int n, int *indx, int *d)
  * a: The LU decomposition of a matrix, created by "lud".
  * n: The size of the matrix.
  * indx: Row permutation vector, created by "lud".
- * b: The vector b in the equation. 1-indexed; is should be of size n+1, and
+ * b: The vector b in the equation. 1-indexed; is should be of size n+1, and
  *    index 0 is not used.
  *
  * Output parameters:
@@ -322,21 +322,21 @@ int lud(double **a, int n, int *indx, int *d)
  */
 void lubksb(double **a, int n, int *indx, double *b)
 {
-    int i,ii=0,ip,j;
-    double sum;
+    int i,ii=0,ip,j;
+    double sum;
 
-    for (i=1;i<=n;i++) {
-        ip=indx[i];
-        sum=b[ip];
-        b[ip]=b[i];
+    for (i=1;i<=n;i++) {
+        ip=indx[i];
+        sum=b[ip];
+        b[ip]=b[i];
         if (ii)
-            for (j=ii;j<=i-1;j++) sum -= a[i][j]*b[j];
-        else if (sum) ii=i;
-        b[i]=sum;
+            for (j=ii;j<=i-1;j++) sum -= a[i][j]*b[j];
+        else if (sum) ii=i;
+        b[i]=sum;
     }
-    for (i=n;i>=1;i--) {
-        sum=b[i];
-        for (j=i+1;j<=n;j++) sum -= a[i][j]*b[j];
-        b[i]=sum/a[i][i];
+    for (i=n;i>=1;i--) {
+        sum=b[i];
+        for (j=i+1;j<=n;j++) sum -= a[i][j]*b[j];
+        b[i]=sum/a[i][i];
     }
 }

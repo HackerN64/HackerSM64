@@ -60,7 +60,7 @@ for file in lightFiles:
                     args += fileLines[index].strip()
                     del fileLines[index]
                 del fileLines[index] # Remove ending line
-                args = args.strip(");")
+                args = args.strip(");")
                 args = [int(arg.strip()[2:],16) for arg in args.split(",")]
                 lightStructs[structName] = args
                 changed = True
@@ -74,7 +74,7 @@ for file in lightFiles:
                         break
                     del fileLines[index]
                 del fileLines[index] # Remove ending line
-                args = args.strip(");")
+                args = args.strip(");")
                 args = [int(arg.strip()[2:],16) for arg in args.split(",")]
                 lightStructs[structName] = args
                 changed = True

@@ -42,33 +42,33 @@ static const uint8_t utf8d[] = {
   1,2,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1, // s3..s4
   1,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1, // s5..s6
   1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
-};
+};
 
 static uint32_t
 decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
-  uint32_t type = utf8d[byte];
+  uint32_t type = utf8d[byte];
 
   *codep = (*state != UTF8_ACCEPT) ?
     (byte & 0x3fu) | (*codep << 6) :
-    (0xff >> type) & (byte);
+    (0xff >> type) & (byte);
 
-  *state = utf8d[256 + *state*16 + type];
-  return *state;
+  *state = utf8d[256 + *state*16 + type];
+  return *state;
 }
 
 char *utf8_decode(char *str, uint32_t *codep)
 {
-    uint32_t state = UTF8_ACCEPT;
+    uint32_t state = UTF8_ACCEPT;
 
-    *codep = 0;
+    *codep = 0;
     while (*str != 0)
     {
-        int result = decode(&state, codep, (unsigned char)*str);
-        str++;
+        int result = decode(&state, codep, (unsigned char)*str);
+        str++;
         if (result == UTF8_ACCEPT)
-            return str;
+            return str;
         if (result == UTF8_REJECT)
-            return NULL;
+            return NULL;
     }
-    return NULL;
+    return NULL;
 }

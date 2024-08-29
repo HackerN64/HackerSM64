@@ -3,10 +3,10 @@
 #include "data.h"
 #include "effects.h"
 
-extern struct OSMesgQueue OSMesgQueue0;
-extern struct OSMesgQueue OSMesgQueue1;
-extern struct OSMesgQueue OSMesgQueue2;
-extern struct OSMesgQueue OSMesgQueue3;
+extern struct OSMesgQueue OSMesgQueue0;
+extern struct OSMesgQueue OSMesgQueue1;
+extern struct OSMesgQueue OSMesgQueue2;
+extern struct OSMesgQueue OSMesgQueue3;
 
 // Since the audio session is just one now, the reverb settings are duplicated to match the original audio setting scenario.
 // It's a bit hacky but whatever lol. Index range must be defined, since it's needed by the compiler.
@@ -21,7 +21,7 @@ struct ReverbSettingsEU sReverbSettings[8] = {
     { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF }, // Duplicate of the first index
     { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x47FF }, // Duplicate of the second index
     { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x37FF },
-};
+};
 /**
 1: Frequency
 2: Unk1 - Should be 1
@@ -38,7 +38,7 @@ struct ReverbSettingsEU sReverbSettings[8] = {
 
 struct AudioSessionSettingsEU gAudioSessionPresets[] = {
     { /*1*/ 32000,/*2*/ 1,/*3*/ MAX_SIMULTANEOUS_NOTES,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ PERSISTENT_SEQ_MEM,/*9*/ PERSISTENT_BANK_MEM,/*10*/ TEMPORARY_SEQ_MEM,/*11*/ TEMPORARY_BANK_MEM },
-};
+};
 #endif
 
 #ifdef BETTER_REVERB
@@ -62,31 +62,31 @@ u32 sReverbDelaysArr[][NUM_ALLPASS] = {
         1080, 1200, 1352,
         1200, 1432, 1232,
     },
-};
+};
 
 // Each entry represents an array of multipliers applied to the final output of each group of 3 filters.
 u8 sReverbMultsArr[][NUM_ALLPASS / 3] = {
     /* 0 */ {0x00, 0x00, 0x00, 0x00},
     /* 1 */ {0xD7, 0x6F, 0x36, 0x22},
     /* 2 */ {0xCF, 0x73, 0x38, 0x1F},
-};
+};
 
 /**
  * Format:
- * - useLightweightSettings (Reduce some runtime configurability options in favor of a significant speed boost during processing; Light configurability settings are found in synthesis.h)
- * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality; number <= 0 signifies use of vanilla reverb)
+ * - useLightweightSettings (Reduce some runtime configurability options in favor of a significant speed boost during processing; Light configurability settings are found in synthesis.h)
+ * - downsampleRate         (Higher values exponentially reduce the number of input samples to process, improving perfomance at cost of quality; number <= 0 signifies use of vanilla reverb)
  * - isMono                 (Only process reverb on the left channel and share it with the right channel, improving performance at cost of quality)
- * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
+ * - filterCount            (Number of filters to process data with; in general, more filters means higher quality at the cost of performance demand; always 3 with light settings)
  * 
- * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound; value of 0 disables all reverb)
- * - gain                   (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
- * - gainIndex              (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
- * - reverbIndex            (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
+ * - windowSize             (Size of circular reverb buffer; higher values work better for a more open soundscape, lower is better for a more compact sound; value of 0 disables all reverb)
+ * - gain                   (Amount of audio retransmitted into the circular reverb buffer, emulating decay; higher values represent a lengthier decay period)
+ * - gainIndex              (Advanced parameter; used to tune the outputs of every first two of three filters; overridden when using light settings)
+ * - reverbIndex            (Advanced parameter; used to tune the incoming output of every third filter; overridden when using light settings)
  * 
- * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel])
- * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel])
- * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; unused when using light settings)
- * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; unused when using light settings)
+ * - *delaysL               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [left channel])
+ * - *delaysR               (Advanced parameter; array of variable audio buffer sizes / delays for each respective filter [right channel])
+ * - *reverbMultsL          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [left channel]; unused when using light settings)
+ * - *reverbMultsR          (Advanced parameter; array of multipliers applied to the final output of each group of 3 filters [right channel]; unused when using light settings)
  * 
  * NOTE: The first entry will always be used by default when not using the level commands to specify a preset.
  * Please reference the HackerSM64 Wiki for more descriptive documentation of these parameters and usage of BETTER_REVERB in general.
@@ -140,7 +140,7 @@ struct BetterReverbSettings gBetterReverbSettings[] = {
         .reverbMultsL = sReverbMultsArr[1],
         .reverbMultsR = sReverbMultsArr[2],
     },
-};
+};
 
 #ifdef PUPPYPRINT_DEBUG
 // Used for A/B comparisons and preset configuration debugging alongside Puppyprint Debug
@@ -177,12 +177,12 @@ struct BetterReverbSettings gDebugBetterReverbSettings[2] = {
         .reverbMultsL = sReverbMultsArr[1],
         .reverbMultsR = sReverbMultsArr[2],
     },
-};
+};
 #endif // PUPPYPRINT_DEBUG
 
-STATIC_ASSERT(ARRAY_COUNT(gBetterReverbSettings) > 0, "gBetterReverbSettings must contain presets!");
-STATIC_ASSERT(ARRAY_COUNT(sReverbDelaysArr) > 0, "sReverbDelaysArr must not be empty!");
-STATIC_ASSERT(ARRAY_COUNT(sReverbMultsArr) > 0, "sReverbMultsArr must not be empty!");
+STATIC_ASSERT(ARRAY_COUNT(gBetterReverbSettings) > 0, "gBetterReverbSettings must contain presets!");
+STATIC_ASSERT(ARRAY_COUNT(sReverbDelaysArr) > 0, "sReverbDelaysArr must not be empty!");
+STATIC_ASSERT(ARRAY_COUNT(sReverbMultsArr) > 0, "sReverbMultsArr must not be empty!");
 
 #endif // BETTER_REVERB
 
@@ -219,9 +219,9 @@ struct ReverbSettingsUS gReverbSettings[18] = {
     { 1, 0x0800, 0x2FFF },
     { 1, 0x0800, 0x2FFF },
     { 1, 0x0800, 0x2FFF },
-};
+};
 
-struct AudioSessionSettings gAudioSessionSettings = { 32000, MAX_SIMULTANEOUS_NOTES, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM };
+struct AudioSessionSettings gAudioSessionSettings = { 32000, MAX_SIMULTANEOUS_NOTES, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM };
 #endif
 
 // gAudioCosineTable[k] = round((2**15 - 1) * cos(pi/2 * k / 127)). Unused.
@@ -237,7 +237,7 @@ u16 gAudioCosineTable[128] = {
     14113,  13746, 13377, 13006, 12633, 12258, 11881, 11503, 11122, 10740, 10357,  9971,  9584,
      9196,   8806,  8415,  8023,  7630,  7235,  6839,  6442,  6044,  5646,  5246,  4845,  4444,
      4042,   3640,  3237,  2833,  2429,  2025,  1620,  1216,   810,   405,     0,
-};
+};
 #endif
 
 // Transforms a pitch scale factor in -127..127 into a frequency scale factor
@@ -274,7 +274,7 @@ f32 gPitchBendFrequencyScale[256] = {
     1.783419f, 1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f,
     1.873209f, 1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f,
     1.967520f, 1.978287f, 1.989114f, 2.000000f
-};
+};
 
 // Frequencies for notes using the standard twelve-tone equal temperament scale.
 // For indices 0..116, gNoteFrequencies[k] = 2^((k-39)/12).
@@ -294,34 +294,34 @@ f32 gNoteFrequencies[128] = {
     26.908691f, 28.508766f, 30.203985f, 32.0f,  33.90282f, 35.91879f,  38.05463f,  40.31748f, 42.71488f, 45.25484f, 47.945835f, 50.796844f,
     53.817383f, 57.017532f, 60.40797f,  64.0f,  67.80564f, 71.83758f,  76.10926f,  80.63496f, 85.42976f, 45.25484f, 47.945835f, 50.796844f,
     53.817383f, 57.017532f, 60.40797f,  64.0f,  67.80564f, 71.83758f,  76.10926f,  80.63496f
-};
+};
 // clang-format on
 
 // goes up by ~12 at each step for the first 4 values (starting from 0), then by ~6
 u8 gDefaultShortNoteVelocityTable[16] = {
     12, 25, 38, 51, 57, 64, 71, 76, 83, 89, 96, 102, 109, 115, 121, 127,
-};
+};
 
 // goes down by 26 at each step for the first 4 values (starting from 255), then by ~12
 u8 gDefaultShortNoteDurationTable[16] = {
     229, 203, 177, 151, 139, 126, 113, 100, 87, 74, 61, 48, 36, 23, 10, 0,
-};
+};
 
 #if defined(VERSION_JP) || defined(VERSION_US)
 // gVibratoCurve[k] = k*8
-s8 gVibratoCurve[16] = { 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 };
+s8 gVibratoCurve[16] = { 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 };
 #endif
 
 struct AdsrEnvelope gDefaultEnvelope[] = {
     { BSWAP16(4), BSWAP16(32000) },    // go from 0 to 32000 over the course of 16ms
     { BSWAP16(1000), BSWAP16(32000) }, // stay there for 4.16 seconds
     { BSWAP16(ADSR_HANG), 0 }          // then continue staying there
-};
+};
 #endif
 
 #ifdef VERSION_EU
-struct NoteSubEu gZeroNoteSub = { 0 };
-struct NoteSubEu gDefaultNoteSub = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { NULL } };
+struct NoteSubEu gZeroNoteSub = { 0 };
+struct NoteSubEu gDefaultNoteSub = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { NULL } };
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -354,7 +354,7 @@ s16 sSawtoothWaves[256] = {
     0x0000, 0x1fff, 0x3fff, 0x5fff, 0x8001, 0xa001, 0xc001, 0xe001,
     0x0000, 0x1fff, 0x3fff, 0x5fff, 0x8001, 0xa001, 0xc001, 0xe001,
     0x0000, 0x1fff, 0x3fff, 0x5fff, 0x8001, 0xa001, 0xc001, 0xe001
-};
+};
 s16 sTriangleWaves[256] = {
     0x0000, 0x07ff, 0x0fff, 0x17ff, 0x1fff, 0x27ff, 0x2fff, 0x37ff, 0x3fff, 0x47ff, 0x4fff, 0x57ff,
     0x5fff, 0x67ff, 0x6fff, 0x77ff, 0x7fff, 0x77ff, 0x6fff, 0x67ff, 0x5fff, 0x57ff, 0x4fff, 0x47ff,
@@ -378,7 +378,7 @@ s16 sTriangleWaves[256] = {
     0x0000, 0xc001, 0x8001, 0xc001, 0x0000, 0x3fff, 0x7fff, 0x3fff, 0x0000, 0xc001, 0x8001, 0xc001,
     0x0000, 0x3fff, 0x7fff, 0x3fff, 0x0000, 0xc001, 0x8001, 0xc001, 0x0000, 0x3fff, 0x7fff, 0x3fff,
     0x0000, 0xc001, 0x8001, 0xc001,
-};
+};
 s16 sSineWaves[256] = {
     0x0000, 0x0c8b, 0x18f8, 0x2527, 0x30fb, 0x3c56, 0x471c, 0x5133, 0x5a81, 0x62f1, 0x6a6c, 0x70e1,
     0x7640, 0x7a7c, 0x7d89, 0x7f61, 0x7fff, 0x7f61, 0x7d89, 0x7a7c, 0x7640, 0x70e1, 0x6a6c, 0x62f1,
@@ -402,7 +402,7 @@ s16 sSineWaves[256] = {
     0x0000, 0xa57f, 0x8001, 0xa57f, 0x0000, 0x5a81, 0x7fff, 0x5a81, 0x0000, 0xa57f, 0x8001, 0xa57f,
     0x0000, 0x5a81, 0x7fff, 0x5a81, 0x0000, 0xa57f, 0x8001, 0xa57f, 0x0000, 0x5a81, 0x7fff, 0x5a81,
     0x0000, 0xa57f, 0x8001, 0xa57f,
-};
+};
 s16 sSquareWaves[256] = {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
     0x0000, 0x0000, 0x0000, 0x0000, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
@@ -426,7 +426,7 @@ s16 sSquareWaves[256] = {
     0x0000, 0x0000, 0x8001, 0x8001, 0x0000, 0x0000, 0x7fff, 0x7fff, 0x0000, 0x0000, 0x8001, 0x8001,
     0x0000, 0x0000, 0x7fff, 0x7fff, 0x0000, 0x0000, 0x8001, 0x8001, 0x0000, 0x0000, 0x7fff, 0x7fff,
     0x0000, 0x0000, 0x8001, 0x8001,
-};
+};
 s16 sEuUnknownWave6[256] = {
     0x0000, 0x9ba7, 0x9b41, 0x6c9b, 0x9450, 0xadda, 0x569e, 0x189a, 0x69bf, 0xb79d, 0x6fe9, 0x08ec,
     0x0d34, 0x1aea, 0xce76, 0xad86, 0x2710, 0xa038, 0x7e28, 0x2fd8, 0x3af8, 0x3bfa, 0xd10b, 0x84c7,
@@ -450,7 +450,7 @@ s16 sEuUnknownWave6[256] = {
     0x0000, 0x3281, 0xd8f0, 0x9641, 0x0000, 0x69bf, 0x2710, 0xcd7f, 0x0000, 0x3281, 0xd8f0, 0x9641,
     0x0000, 0x69bf, 0x2710, 0xcd7f, 0x0000, 0x3281, 0xd8f0, 0x9641, 0x0000, 0x69bf, 0x2710, 0xcd7f,
     0x0000, 0x3281, 0xd8f0, 0x9641,
-};
+};
 s16 gEuUnknownWave7[256] = {
     0x0000, 0x3fbc, 0x4eb4, 0x4f21, 0x6a49, 0x806f, 0x7250, 0x6a7b, 0x8d2e, 0xac0a, 0x98d6, 0x7832,
     0x7551, 0x71ca, 0x4eee, 0x3731, 0x4e20, 0x644d, 0x4a50, 0x23ba, 0x1b09, 0x119a, 0xe914, 0xccbe,
@@ -474,8 +474,8 @@ s16 gEuUnknownWave7[256] = {
     0x0000, 0x1eb2, 0xb1e0, 0x72d2, 0x0000, 0x8d2e, 0x4e20, 0xe14e, 0x0000, 0x1eb2, 0xb1e0, 0x72d2,
     0x0000, 0x8d2e, 0x4e20, 0xe14e, 0x0000, 0x1eb2, 0xb1e0, 0x72d2, 0x0000, 0x8d2e, 0x4e20, 0xe14e,
     0x0000, 0x1eb2, 0xb1e0, 0x72d2,
-};
-s16 *gWaveSamples[6] = { sSawtoothWaves, sTriangleWaves, sSineWaves, sSquareWaves, sEuUnknownWave6, gEuUnknownWave7 };
+};
+s16 *gWaveSamples[6] = { sSawtoothWaves, sTriangleWaves, sSineWaves, sSquareWaves, sEuUnknownWave6, gEuUnknownWave7 };
 
 #else
 // !VERSION_EU
@@ -487,7 +487,7 @@ s16 sSineWave[0x40] = {
     -3211,  -6392,  -9511,  -12539, -15446,  -18204, -20787, -23169, -25329, -27244, -28897,
     -30272, -31356, -32137, -32609, -0x7FFF, -32609, -32137, -31356, -30272, -28897, -27244,
     -25329, -23169, -20787, -18204, -15446,  -12539, -9511,  -6392,  -3211,
-};
+};
 
 s16 sSquareWave[0x40] = {
     0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,
@@ -496,7 +496,7 @@ s16 sSquareWave[0x40] = {
     0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,
     0,       0,       0,       0,       -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF,
     -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF,
-};
+};
 s16 sTriangleWave[0x40] = {
     0,       0x7FF,   0xFFF,   0x17FF,  0x1FFF,  0x27FF,  0x2FFF,  0x37FF,  0x3FFF,  0x47FF,  0x4FFF,
     0x57FF,  0x5FFF,  0x67FF,  0x6FFF,  0x77FF,  0x7FFF,  0x77FF,  0x6FFF,  0x67FF,  0x5FFF,  0x57FF,
@@ -504,7 +504,7 @@ s16 sTriangleWave[0x40] = {
     -0x7FF,  -0xFFF,  -0x17FF, -0x1FFF, -10239,  -0x2FFF, -0x37FF, -0x3FFF, -0x47FF, -0x4FFF, -22527,
     -24575,  -26623,  -28671,  -30719,  -0x7FFF, -30719,  -28671,  -26623,  -24575,  -22527,  -0x4FFF,
     -0x47FF, -0x3FFF, -0x37FF, -0x2FFF, -0x27FF, -0x1FFF, -0x17FF, -0xFFF,  -0x7FF,
-};
+};
 
 s16 sSawtoothWave[0x40] = {
     0,       1023,   2047,    3071,   4095,    5119,   6143,    7167,   8191,    9215,   10239,
@@ -513,17 +513,17 @@ s16 sSawtoothWave[0x40] = {
     -31743,  -30719, -29695,  -28671, -27647,  -26623, -25599,  -24575, -23551,  -22527, -21503,
     -0x4FFF, -19455, -0x47FF, -17407, -0x3FFF, -15359, -0x37FF, -13311, -0x2FFF, -11263, -10239,
     -9215,   -8191,  -7167,   -6143,  -5119,   -4095,  -3071,   -2047,  -1023,
-};
+};
 s16 *gWaveSamples[4] = {
     sSawtoothWave,
     sTriangleWave,
     sSineWave,
     sSquareWave
-};
+};
 #endif
 
 #ifdef VERSION_SH
-s32 unk_sh_data_0[2] = {0, 0};
+s32 unk_sh_data_0[2] = {0, 0};
 f32 gPitchBendFrequencyScale[256] = {
     0.5f,      0.5f,      0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f,
     0.522315f, 0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f,
@@ -554,7 +554,7 @@ f32 gPitchBendFrequencyScale[256] = {
     1.783419f, 1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f,
     1.873209f, 1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f,
     1.967520f, 1.978287f, 1.989114f, 2.0f
-};
+};
 #endif
 
 #ifdef VERSION_SH
@@ -591,7 +591,7 @@ f32 unk_sh_data_1[] = {
   1.099222f,  1.100222f,  1.101224f,  1.102226f,  1.103229f,  1.104233f,  1.105238f,  1.106244f,
   1.10725f,   1.108258f,  1.109267f,  1.110276f,  1.111287f,  1.112298f,  1.11331f,   1.114323f,
   1.115337f,  1.116352f,  1.117368f,  1.118385f,  1.119403f,  1.120422f,  1.121441f,  1.122462f,
-};
+};
 
 // Shindou moved these variables down here. :/
 // clang-format off
@@ -607,32 +607,32 @@ f32 gNoteFrequencies[128] = {
     26.908691f, 28.508766f, 30.203985f, 32.0f,  33.90282f, 35.91879f,  38.05463f,  40.31748f, 42.71488f, 45.25484f, 47.945835f, 50.796844f,
     53.817383f, 57.017532f, 60.40797f,  64.0f,  67.80564f, 71.83758f,  76.10926f,  80.63496f, 85.42976f, 45.25484f, 47.945835f, 50.796844f,
     53.817383f, 57.017532f, 60.40797f,  64.0f,  67.80564f, 71.83758f,  76.10926f,  80.63496f
-};
+};
 // clang-format on
 
 u8 gDefaultShortNoteVelocityTable[16] = {
     12, 25, 38, 51, 57, 64, 71, 76, 83, 89, 96, 102, 109, 115, 121, 127,
-};
+};
 
 u8 gDefaultShortNoteDurationTable[16] = {
     229, 203, 177, 151, 139, 126, 113, 100, 87, 74, 61, 48, 36, 23, 10, 0,
-};
+};
 
 struct AdsrEnvelope gDefaultEnvelope[] = {
     { BSWAP16(4), BSWAP16(32000) },    // go from 0 to 32000 over the course of 16ms
     { BSWAP16(1000), BSWAP16(32000) }, // stay there for 4.16 seconds
     { BSWAP16(ADSR_HANG), 0 }          // then continue staying there
-};
+};
 
-u8 unk_sh_data2[4] = { 0, 0, 0, 0 };
+u8 unk_sh_data2[4] = { 0, 0, 0, 0 };
 
-struct NoteSubEu gZeroNoteSub = { 0 };
+struct NoteSubEu gZeroNoteSub = { 0 };
 struct NoteSubEu gDefaultNoteSub = {
     1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { NULL },
 #ifdef VERSION_SH
     0
 #endif
-};
+};
 
 u16 gHeadsetPanQuantization[0x40] = {
 0x3C, 0x3A, 0x38, 0x36, 0x34, 0x32, 0x30, 0x2E,
@@ -641,17 +641,17 @@ u16 gHeadsetPanQuantization[0x40] = {
 0x0C, 0x0A, 0x08, 0x06, 0x04, 0x02,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
+};
 #endif
 
 #ifdef VERSION_EU
-u8 euUnknownData_8030194c[4] = { 0x40, 0x20, 0x10, 0x08 };
+u8 euUnknownData_8030194c[4] = { 0x40, 0x20, 0x10, 0x08 };
 u16 gHeadsetPanQuantization[0x10] = {
     0x40, 0x40, 0x30, 0x30, 0x20, 0x20, 0x10, 0, 0, 0,
-};
+};
 #elif !defined(VERSION_SH)
 #ifdef ENABLE_STEREO_HEADSET_EFFECTS
-u16 gHeadsetPanQuantization[10] = { 0x40, 0x30, 0x20, 0x10, 0, 0, 0, 0, 0, 0 };
+u16 gHeadsetPanQuantization[10] = { 0x40, 0x30, 0x20, 0x10, 0, 0, 0, 0, 0, 0 };
 #endif
 #endif
 
@@ -659,7 +659,7 @@ u16 gHeadsetPanQuantization[10] = { 0x40, 0x30, 0x20, 0x10, 0, 0, 0, 0, 0, 0 };
 s16 euUnknownData_80301950[64] = {
     0, 0, 0,   0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
     0, 0, 0, 500, 0, 0, 0, 0, 0, 0, 0, 500, 0, 0, 0, 0, 0, 0, 0, 500, 0, 0, 0, 0, 0, 0, 0, 500, 0, 0, 0, 0,
-};
+};
 #endif
 
 #ifdef ENABLE_STEREO_HEADSET_EFFECTS
@@ -683,7 +683,7 @@ f32 gHeadsetPanVolume[128] = {
     0.561937f, 0.558677f, 0.555417f, 0.552157f, 0.548898f, 0.545638f, 0.542378f, 0.539118f, 0.535858f,
     0.532598f, 0.529339f, 0.526079f, 0.522819f, 0.519559f, 0.516299f, 0.513039f, 0.50978f,  0.50652f,
     0.50326f,  0.5f
-};
+};
 
 // Linearly interpolated between
 // f(0/4 * 127) = 1/sqrt(2)
@@ -707,7 +707,7 @@ f32 gStereoPanVolume[128] = {
     0.141957f, 0.153091f, 0.164224f, 0.175358f, 0.186492f, 0.197626f, 0.20876f,  0.219894f, 0.231028f,
     0.242161f, 0.253295f, 0.264429f, 0.275563f, 0.286697f, 0.297831f, 0.308965f, 0.320098f, 0.331232f,
     0.342366f, 0.3535f
-};
+};
 #endif
 
 // gDefaultVolume[k] = cos(pi/2 * k / 127)
@@ -727,7 +727,7 @@ f32 gDefaultPanVolume[128] = {
     0.232844f, 0.220798f, 0.208718f, 0.196606f, 0.184465f, 0.172295f, 0.160098f, 0.147877f, 0.135634f,
     0.12337f,  0.111087f, 0.098786f, 0.086471f, 0.074143f, 0.061803f, 0.049454f, 0.037097f, 0.024734f,
     0.012368f, 0.0f
-};
+};
 
 #if defined(VERSION_JP) || defined(VERSION_US)
 #include "volramping.c.in"
@@ -815,7 +815,7 @@ u16 unk_sh_data_3[] = {
     0x05DC, 0x585F,
     0x05DC, 0xFA43,
     0x058F, 0xFAB3,
-};
+};
 
 u16 unk_sh_data_4[] = {
     0xFA73, 0xFA42,
@@ -899,91 +899,91 @@ u16 unk_sh_data_4[] = {
     0x3FFF, 0xF001,
     0x5FFF, 0x9001,
     0x7FFF, 0x8001
-};
+};
 #endif
 
 #ifndef VERSION_SH
-s16 gTatumsPerBeat = TATUMS_PER_BEAT;
-s32 gAudioHeapSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
-s32 gAudioInitPoolSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_INIT_POOL_SIZE);
-volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
+s16 gTatumsPerBeat = TATUMS_PER_BEAT;
+s32 gAudioHeapSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
+s32 gAudioInitPoolSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_INIT_POOL_SIZE);
+volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
 #endif
 
 #if defined(VERSION_EU)
-u8 bufferDelete2[12] = { 0 };
-u8 D_EU_80302010 = 0;
-u8 D_EU_80302014 = 0;
+u8 bufferDelete2[12] = { 0 };
+u8 D_EU_80302010 = 0;
+u8 D_EU_80302014 = 0;
 
 struct OSMesgQueue *OSMesgQueues[4] = {
     &OSMesgQueue0,
     &OSMesgQueue1,
     &OSMesgQueue2,
     &OSMesgQueue3
-};
+};
 #endif
 
 // .bss
 
-volatile s32 gAudioFrameCount;
+volatile s32 gAudioFrameCount;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-s32 gCurrAudioFrameDmaCount;
+s32 gCurrAudioFrameDmaCount;
 #else
-volatile s32 gCurrAudioFrameDmaCount;
+volatile s32 gCurrAudioFrameDmaCount;
 #endif
 
-s32 gAudioTaskIndex;
-s32 gCurrAiBufferIndex;
+s32 gAudioTaskIndex;
+s32 gCurrAiBufferIndex;
 
-u64 *gAudioCmdBuffers[2];
-u64 *gAudioCmd;
+u64 *gAudioCmdBuffers[2];
+u64 *gAudioCmd;
 
-struct SPTask *gAudioTask;
-struct SPTask gAudioTasks[2];
+struct SPTask *gAudioTask;
+struct SPTask gAudioTasks[2];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-f32 D_EU_802298D0;
-s32 gRefreshRate;
+f32 D_EU_802298D0;
+s32 gRefreshRate;
 #endif
 
-ALIGNED8 s16 *gAiBuffers[NUMAIBUFFERS];
-s16 gAiBufferLengths[NUMAIBUFFERS];
+ALIGNED8 s16 *gAiBuffers[NUMAIBUFFERS];
+s16 gAiBufferLengths[NUMAIBUFFERS];
 
-u32 gAudioRandom;
+u32 gAudioRandom;
 
 #ifdef BETTER_REVERB
-u8 gBetterReverbPresetCount = ARRAY_COUNT(gBetterReverbSettings);
+u8 gBetterReverbPresetCount = ARRAY_COUNT(gBetterReverbSettings);
 #ifdef PUPPYPRINT_DEBUG
-u8 gReverbDelaysArrCount = ARRAY_COUNT(sReverbDelaysArr);
-u8 gReverbMultsArrCount = ARRAY_COUNT(sReverbMultsArr);
+u8 gReverbDelaysArrCount = ARRAY_COUNT(sReverbDelaysArr);
+u8 gReverbMultsArrCount = ARRAY_COUNT(sReverbMultsArr);
 #endif // PUPPYPRINT_DEBUG
 #endif // BETTER_REVERB
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-s32 gAudioErrorFlags;
+s32 gAudioErrorFlags;
 #endif
 
 #ifdef VERSION_SH
-volatile u32 gAudioLoadLockSH;
-struct EuAudioCmd sAudioCmd[0x100];
-u8 D_SH_80350F18;
-u8 D_SH_80350F19;
+volatile u32 gAudioLoadLockSH;
+struct EuAudioCmd sAudioCmd[0x100];
+u8 D_SH_80350F18;
+u8 D_SH_80350F19;
 
-OSMesg D_SH_80350F1C[1];
-OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
-OSMesgQueue *D_SH_80350F38;
+OSMesg D_SH_80350F1C[1];
+OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
+OSMesgQueue *D_SH_80350F38;
 
-OSMesg D_SH_80350F40[4];
-OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
-OSMesgQueue *D_SH_80350F68;
+OSMesg D_SH_80350F40[4];
+OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
+OSMesgQueue *D_SH_80350F68;
 
-OSMesg D_SH_80350F6C[1];
-OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
-OSMesgQueue *D_SH_80350F88;
+OSMesg D_SH_80350F6C[1];
+OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
+OSMesgQueue *D_SH_80350F88;
 
-OSMesg D_SH_80350F8C[1];
-OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
-OSMesgQueue *D_SH_80350FA8;
+OSMesg D_SH_80350F8C[1];
+OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
+OSMesgQueue *D_SH_80350FA8;
 #endif
 
-u64 gAudioGlobalsEndMarker;
+u64 gAudioGlobalsEndMarker;

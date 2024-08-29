@@ -10,12 +10,12 @@ COMPILER_OPTS="-nostdinc -fno-builtin -std=gnu90 -Iinclude -Isrc -D_LANGUAGE_C"
 VERSIONS="-DVERSION_US -DVERSION_JP -DVERSION_EU"
 
 # run script from the root of the repository
-cd "$( dirname $0 )" >/dev/null 2>&1; cd ../
+cd "$( dirname $0 )" >/dev/null 2>&1; cd ../
 
-if (( $# > 0 )); then
+if (( $# > 0 )); then
     printf "Tidy file(s) $*"
     echo
-    for VER in ${VERSIONS}; do  
+    for VER in ${VERSIONS}; do  
         echo "with compiler version flag ${VER}"
         clang-tidy ${TIDY_OPTS} "$@" -- ${COMPILER_OPTS} ${VER}
     done
@@ -25,7 +25,7 @@ if (( $# > 0 )); then
 fi
 
 echo "Tidying all C files for all versions. This will take a bit"
-for VER in ${VERSIONS}; do  
+for VER in ${VERSIONS}; do  
         echo "Tidying for compiler version flag ${VER}"
         # Don't run clang-tidy on behaviors
         clang-tidy ${TIDY_OPTS} src/audio/*.c -- ${COMPILER_OPTS} ${VER}

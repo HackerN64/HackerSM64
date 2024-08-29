@@ -26,8 +26,8 @@ def parse_struct(filename, lines, lineindex, name):
     values = lines[lineindex + 6].rstrip(",")
     indices = lines[lineindex + 7].rstrip(",")
     items.append(("header", name, (v1, v2, v3, v4, v5, values, indices)))
-    if lines[lineindex + 9] != "};":
-        raise_error(filename, lineindex + 9, "Expected \"};\" but got " + lines[lineindex + 9])
+    if lines[lineindex + 9] != "};":
+        raise_error(filename, lineindex + 9, "Expected \"};\" but got " + lines[lineindex + 9])
     order_mapping[name] = len(items)
     lineindex += 10
     return lineindex
@@ -36,13 +36,13 @@ def parse_array(filename, lines, lineindex, name, is_indices):
     global items, len_mapping, order_mapping
     lineindex += 1
     values = []
-    while lineindex < len(lines) and lines[lineindex] != "};":
+    while lineindex < len(lines) and lines[lineindex] != "};":
         line = lines[lineindex].rstrip(",")
         if line:
             values.extend(line.split(","))
         lineindex += 1
     if lineindex >= len(lines):
-        raise_error(filename, lineindex, "Expected \"};\" but reached end of file")
+        raise_error(filename, lineindex, "Expected \"};\" but reached end of file")
     items.append(("array", name, (is_indices, values)))
     len_mapping[name] = len(values)
     order_mapping[name] = len(items)
@@ -93,7 +93,7 @@ try:
             if lines:
                 parse_file(filename, lines)
 
-    structdef = ["u32 numEntries;", "const struct Animation *addrPlaceholder;", "struct OffsetSizePair entries[" + str(num_headers) + "];"]
+    structdef = ["u32 numEntries;", "const struct Animation *addrPlaceholder;", "struct OffsetSizePair entries[" + str(num_headers) + "];"]
     structobj = [str(num_headers) + ",", "NULL,","{"]
 
     for item in items:
@@ -118,7 +118,7 @@ try:
             values_num_values = len_mapping[values]
             offset_to_struct = "offsetof(struct MarioAnimsObj, " + name + ")"
             offset_to_end = "offsetof(struct MarioAnimsObj, " + values + ") + sizeof(gMarioAnims." + values + ")"
-            structdef.append("struct Animation " + name + ";")
+            structdef.append("struct Animation " + name + ";")
             structobj.append("{" + ", ".join([
                 str(v1),
                 str(v2),
@@ -133,7 +133,7 @@ try:
         else:
             is_indices, arr = obj
             type = "u16" if is_indices else "s16"
-            structdef.append("{} {}[{}];".format(type, name, len(arr)))
+            structdef.append("{} {}[{}];".format(type, name, len(arr)))
             structobj.append("{" + ",".join(arr) + "},")
 
     print("#include \"game/memory.h\"")
@@ -146,7 +146,7 @@ try:
     print("} gMarioAnims = {")
     for s in structobj:
         print(s)
-    print("};")
+    print("};")
 
 except Exception as e:
     note = "NOTE! The mario animation C files are not processed by a normal C compiler, but by the script in tools/mario_anims_converter.py. The format is much more strict than normal C, so please follow the syntax of existing files.\n"

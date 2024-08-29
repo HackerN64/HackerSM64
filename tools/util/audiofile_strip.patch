@@ -5,29 +5,29 @@ index 8562d4b..5d6342a 100644
 @@ -74,26 +74,8 @@ _AFfilehandle *_AFfilehandle::create(int fileFormat)
  		case AF_FILE_AIFF:
  		case AF_FILE_AIFFC:
- 			return new AIFFFile();
+ 			return new AIFFFile();
 -		case AF_FILE_NEXTSND:
--			return new NeXTFile();
+-			return new NeXTFile();
  		case AF_FILE_WAVE:
- 			return new WAVEFile();
+ 			return new WAVEFile();
 -		case AF_FILE_BICSF:
--			return new IRCAMFile();
+-			return new IRCAMFile();
 -		case AF_FILE_AVR:
--			return new AVRFile();
+-			return new AVRFile();
 -		case AF_FILE_IFF_8SVX:
--			return new IFFFile();
+-			return new IFFFile();
 -		case AF_FILE_SAMPLEVISION:
--			return new SampleVisionFile();
+-			return new SampleVisionFile();
 -		case AF_FILE_VOC:
--			return new VOCFile();
+-			return new VOCFile();
 -		case AF_FILE_NIST_SPHERE:
--			return new NISTFile();
+-			return new NISTFile();
 -		case AF_FILE_CAF:
--			return new CAFFile();
+-			return new CAFFile();
 -		case AF_FILE_FLAC:
--			return new FLACFile();
+-			return new FLACFile();
  		default:
- 			return NULL;
+ 			return NULL;
  	}
 diff --git a/libaudiofile/aupv.c b/libaudiofile/aupv.c
 index 64e798b..374838b 100644
@@ -35,12 +35,12 @@ index 64e798b..374838b 100644
 +++ b/libaudiofile/aupv.c
 @@ -47,7 +47,7 @@ AUpvlist AUpvnew (int maxitems)
  	if (aupvlist == NULL)
- 		return AU_NULL_PVLIST;
+ 		return AU_NULL_PVLIST;
  
--	aupvlist->items = calloc(maxitems, sizeof (struct _AUpvitem));
-+	aupvlist->items = (struct _AUpvitem *)calloc(maxitems, sizeof (struct _AUpvitem));
+-	aupvlist->items = calloc(maxitems, sizeof (struct _AUpvitem));
++	aupvlist->items = (struct _AUpvitem *)calloc(maxitems, sizeof (struct _AUpvitem));
  
- 	assert(aupvlist->items);
+ 	assert(aupvlist->items);
  	if (aupvlist->items == NULL)
 diff --git a/libaudiofile/g711.c b/libaudiofile/g711.c
 index 8fb2323..1b323ec 100644
@@ -51,21 +51,21 @@ index 8fb2323..1b323ec 100644
   */
  unsigned char
 -_af_linear2alaw(pcm_val)
--	int		pcm_val;	/* 2's complement (16-bit range) */
+-	int		pcm_val;	/* 2's complement (16-bit range) */
 +_af_linear2alaw(int	pcm_val)
  {
- 	int		mask;
- 	int		seg;
+ 	int		mask;
+ 	int		seg;
 @@ -110,8 +109,7 @@ _af_linear2alaw(pcm_val)
   *
   */
  int
 -_af_alaw2linear(a_val)
--	unsigned char	a_val;
+-	unsigned char	a_val;
 +_af_alaw2linear(unsigned char	a_val)
  {
- 	int		t;
- 	int		seg;
+ 	int		t;
+ 	int		seg;
 diff --git a/libaudiofile/units.cpp b/libaudiofile/units.cpp
 index ffd0a63..51d2dc3 100644
 --- a/libaudiofile/units.cpp
@@ -258,7 +258,7 @@ index ffd0a63..51d2dc3 100644
 -		0,		// number of instrument parameters
 -		NULL	// instrument parameters
 -	}
- };
+ };
  
  const CompressionUnit _af_compression[_AF_NUM_COMPRESSION] =
 @@ -309,19 +145,6 @@ const CompressionUnit _af_compression[_AF_NUM_COMPRESSION] =
@@ -315,4 +315,4 @@ index ffd0a63..51d2dc3 100644
 -		_af_alac_format_ok,
 -		_af_alac_init_compress, _af_alac_init_decompress
 -	}
- };
+ };

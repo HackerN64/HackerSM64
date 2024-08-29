@@ -57,7 +57,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} version (us jp eu sh)")
         sys.exit(1)
-    gamelist = get_rom_candidates();
+    gamelist = get_rom_candidates();
     version = sys.argv[1]
 
     if version in gamelist:

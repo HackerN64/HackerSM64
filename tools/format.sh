@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 shopt -s globstar
-if (( $# > 0 )); then
+if (( $# > 0 )); then
     printf "formatting file(s) $*"
     echo
     clang-format -i -style=file "$@"

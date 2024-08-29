@@ -408,7 +408,7 @@ def decode_one(state):
     def var():
         ret = u8()
         if ret & 0x80:
-            ret = (ret << 8) & 0x7f00;
+            ret = (ret << 8) & 0x7f00;
             ret |= u8()
             return (ret, ret < 0x80)
         return (ret, False)

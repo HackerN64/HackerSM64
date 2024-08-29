@@ -41,9 +41,9 @@ def main():
         if not "ifdef" in item or any(d in defines for d in item["ifdef"]):
             demofiles.append(item)
 
-    structdef = ["u32 numEntries;",
-                 "const void *addrPlaceholder;",
-                 "struct OffsetSizePair entries[" + str(len(table)) + "];"]
+    structdef = ["u32 numEntries;",
+                 "const void *addrPlaceholder;",
+                 "struct OffsetSizePair entries[" + str(len(table)) + "];"]
     structobj = [str(len(table)) + ",",
                  "NULL,"]
 
@@ -59,7 +59,7 @@ def main():
     for item in demofiles:
         with open("assets/demos/" + item["name"] + ".bin", "rb") as file:
             demobytes = file.read()
-        structdef.append("u8 " + item["name"] + "[" + str(len(demobytes)) + "];")
+        structdef.append("u8 " + item["name"] + "[" + str(len(demobytes)) + "];")
         structobj.append("{" + ",".join(hex(x) for x in demobytes) + "},")
 
     print("#include \"game/memory.h\"")
@@ -72,7 +72,7 @@ def main():
     print("} gDemoInputs = {")
     for s in structobj:
         print(s)
-    print("};")
+    print("};")
 
 if __name__ == "__main__":
     main()

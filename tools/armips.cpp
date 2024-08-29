@@ -67,7 +67,7 @@ SOFTWARE.
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args)
 {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 // file: ext/tinyformat/tinyformat.h
@@ -117,28 +117,28 @@ std::unique_ptr<T> make_unique(Args&&... args)
 //
 // To print a date to std::wcout:
 //
-//   std::wstring weekday = L"Wednesday";
-//   const wchar_t* month = L"July";
-//   size_t day = 27;
-//   long hour = 14;
-//   int min = 44;
+//   std::wstring weekday = L"Wednesday";
+//   const wchar_t* month = L"July";
+//   size_t day = 27;
+//   long hour = 14;
+//   int min = 44;
 //
-//   tfm::printf("%s, %s %d, %.2d:%.2d\n", weekday, month, day, hour, min);
+//   tfm::printf("%s, %s %d, %.2d:%.2d\n", weekday, month, day, hour, min);
 //
-// The strange types here emphasize the type safety of the interface; it is
+// The strange types here emphasize the type safety of the interface; it is
 // possible to print a std::wstring using the "%s" conversion, and a
 // size_t using the "%d" conversion.  A similar result could be achieved
 // using either of the tfm::format() functions.  One prints on a user provided
 // stream:
 //
 //   tfm::format(std::cerr, L"%s, %s %d, %.2d:%.2d\n",
-//               weekday, month, day, hour, min);
+//               weekday, month, day, hour, min);
 //
 // The other returns a std::wstring:
 //
 //   std::wstring date = tfm::format(L"%s, %s %d, %.2d:%.2d\n",
-//                                  weekday, month, day, hour, min);
-//   std::wcout << date;
+//                                  weekday, month, day, hour, min);
+//   std::wcout << date;
 //
 // These are the three primary interface functions.  There is also a
 // convenience function printfln() which appends a newline to the usual result
@@ -166,12 +166,12 @@ std::unique_ptr<T> make_unique(Args&&... args)
 // this by storing the argument list in a type-opaque way.  Continuing the
 // example from above, we construct a FormatList using makeFormatList():
 //
-//   FormatListRef formatList = tfm::makeFormatList(weekday, month, day, hour, min);
+//   FormatListRef formatList = tfm::makeFormatList(weekday, month, day, hour, min);
 //
 // The format list can now be passed into any non-template function and used
 // via a call to the vformat() function:
 //
-//   tfm::vformat(std::wcout, L"%s, %s %d, %.2d:%.2d\n", formatList);
+//   tfm::vformat(std::wcout, L"%s, %s %d, %.2d:%.2d\n", formatList);
 //
 //
 // Additional API information
@@ -193,9 +193,9 @@ namespace tinyformat {}
 // Config section.  Customize to your liking!
 
 // Namespace alias to encourage brevity
-namespace tfm = tinyformat;
+namespace tfm = tinyformat;
 
-// Error handling; calls assert() by default.
+// Error handling; calls assert() by default.
 // #define TINYFORMAT_ERROR(reasonString) your_error_handler(reasonString)
 
 // Define for C++11 variadic templates which make the code shorter & more
@@ -253,12 +253,12 @@ struct is_convertible
 {
     private:
         // two types of different size
-        struct fail { wchar_t dummy[2]; };
-        struct succeed { wchar_t dummy; };
+        struct fail { wchar_t dummy[2]; };
+        struct succeed { wchar_t dummy; };
         // Try to convert a T1 to a T2 by plugging into tryConvert
-        static fail tryConvert(...);
-        static succeed tryConvert(const T2&);
-        static const T1& makeT1();
+        static fail tryConvert(...);
+        static succeed tryConvert(const T2&);
+        static const T1& makeT1();
     public:
 #       ifdef _MSC_VER
         // Disable spurious loss of precision warnings in tryConvert(makeT1())
@@ -271,19 +271,19 @@ struct is_convertible
         // Then we compare the sizes of the return types to check which
         // function matched.  Very neat, in a disgusting kind of way :)
         static const bool value =
-            sizeof(tryConvert(makeT1())) == sizeof(succeed);
+            sizeof(tryConvert(makeT1())) == sizeof(succeed);
 #       ifdef _MSC_VER
 #       pragma warning(pop)
 #       endif
-};
+};
 
 
 // Detect when a type is not a wchar_t string
-template<typename T> struct is_wchar { typedef int tinyformat_wchar_is_not_supported; };
-template<> struct is_wchar<wchar_t*> {};
-template<> struct is_wchar<const wchar_t*> {};
-template<int n> struct is_wchar<const wchar_t[n]> {};
-template<int n> struct is_wchar<wchar_t[n]> {};
+template<typename T> struct is_wchar { typedef int tinyformat_wchar_is_not_supported; };
+template<> struct is_wchar<wchar_t*> {};
+template<> struct is_wchar<const wchar_t*> {};
+template<int n> struct is_wchar<const wchar_t[n]> {};
+template<int n> struct is_wchar<wchar_t[n]> {};
 
 
 // Format the value by casting to type fmtT.  This default implementation
@@ -291,23 +291,23 @@ template<int n> struct is_wchar<wchar_t[n]> {};
 template<typename T, typename fmtT, bool convertible = is_convertible<T, fmtT>::value>
 struct formatValueAsType
 {
-    static void invoke(std::wostream& /*out*/, const T& /*value*/) { TINYFORMAT_ASSERT(0); }
-};
+    static void invoke(std::wostream& /*out*/, const T& /*value*/) { TINYFORMAT_ASSERT(0); }
+};
 // Specialized version for types that can actually be converted to fmtT, as
 // indicated by the "convertible" template parameter.
 template<typename T, typename fmtT>
 struct formatValueAsType<T,fmtT,true>
 {
     static void invoke(std::wostream& out, const T& value)
-        { out << static_cast<fmtT>(value); }
-};
+        { out << static_cast<fmtT>(value); }
+};
 
 #ifdef TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
 template<typename T, bool convertible = is_convertible<T, int>::value>
 struct formatZeroIntegerWorkaround
 {
-    static bool invoke(std::wostream& /**/, const T& /**/) { return false; }
-};
+    static bool invoke(std::wostream& /**/, const T& /**/) { return false; }
+};
 template<typename T>
 struct formatZeroIntegerWorkaround<T,true>
 {
@@ -315,12 +315,12 @@ struct formatZeroIntegerWorkaround<T,true>
     {
         if (static_cast<int>(value) == 0 && out.flags() & std::ios::showpos)
         {
-            out << "+0";
-            return true;
+            out << "+0";
+            return true;
         }
-        return false;
+        return false;
     }
-};
+};
 #endif // TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
 
 // Convert an arbitrary type to integer.  The version with convertible=false
@@ -331,33 +331,33 @@ struct convertToInt
     static int invoke(const T& /*value*/)
     {
         TINYFORMAT_ERROR("tinyformat: Cannot convert from argument type to "
-                         "integer for use as variable width or precision");
-        return 0;
+                         "integer for use as variable width or precision");
+        return 0;
     }
-};
+};
 // Specialization for convertToInt when conversion is possible
 template<typename T>
 struct convertToInt<T,true>
 {
-    static int invoke(const T& value) { return static_cast<int>(value); }
-};
+    static int invoke(const T& value) { return static_cast<int>(value); }
+};
 
 // Format at most ntrunc wchar_tacters to the given stream.
 template<typename T>
 inline void formatTruncated(std::wostream& out, const T& value, int ntrunc)
 {
-    std::wostringstream tmp;
-    tmp << value;
-    std::wstring result = tmp.str();
-    out.write(result.c_str(), (std::min)(ntrunc, static_cast<int>(result.size())));
+    std::wostringstream tmp;
+    tmp << value;
+    std::wstring result = tmp.str();
+    out.write(result.c_str(), (std::min)(ntrunc, static_cast<int>(result.size())));
 }
 #define TINYFORMAT_DEFINE_FORMAT_TRUNCATED_CSTR(type)       \
 inline void formatTruncated(std::wostream& out, type* value, int ntrunc) \
 {                                                           \
-    std::streamsize len = 0;                                \
+    std::streamsize len = 0;                                \
     while(len < ntrunc && value[len] != 0)                  \
-        ++len;                                              \
-    out.write(value, len);                                  \
+        ++len;                                              \
+    out.write(value, len);                                  \
 }
 // Overload for const wchar_t* and wchar_t*.  Could overload for signed & unsigned
 // wchar_t too, but these are technically unneeded for printf compatibility.
@@ -391,31 +391,31 @@ inline void formatValue(std::wostream& out, const wchar_t* /*fmtBegin*/,
 #ifndef TINYFORMAT_ALLOW_WCHAR_STRINGS
     // Since we don't support printing of wchar_t using "%ls", make it fail at
     // compile time in preference to printing as a void* at runtime.
-    typedef typename detail::is_wchar<T>::tinyformat_wchar_is_not_supported DummyType;
-    (void) DummyType(); // avoid unused type warning with gcc-4.8
+    typedef typename detail::is_wchar<T>::tinyformat_wchar_is_not_supported DummyType;
+    (void) DummyType(); // avoid unused type warning with gcc-4.8
 #endif
     // The mess here is to support the %c and %p conversions: if these
     // conversions are active we try to convert the type to a wchar_t or const
     // void* respectively and format that instead of the value itself.  For the
     // %p conversion it's important to avoid dereferencing the pointer, which
     // could otherwise lead to a crash when printing a dangling (const wchar_t*).
-    const bool canConvertToChar = detail::is_convertible<T,wchar_t>::value;
-    const bool canConvertToVoidPtr = detail::is_convertible<T, const void*>::value;
+    const bool canConvertToChar = detail::is_convertible<T,wchar_t>::value;
+    const bool canConvertToVoidPtr = detail::is_convertible<T, const void*>::value;
     if(canConvertToChar && *(fmtEnd-1) == 'c')
-        detail::formatValueAsType<T, wchar_t>::invoke(out, value);
+        detail::formatValueAsType<T, wchar_t>::invoke(out, value);
     else if(canConvertToVoidPtr && *(fmtEnd-1) == 'p')
-        detail::formatValueAsType<T, const void*>::invoke(out, value);
+        detail::formatValueAsType<T, const void*>::invoke(out, value);
 #ifdef TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
-    else if(detail::formatZeroIntegerWorkaround<T>::invoke(out, value)) /**/;
+    else if(detail::formatZeroIntegerWorkaround<T>::invoke(out, value)) /**/;
 #endif
     else if(ntrunc >= 0)
     {
         // Take care not to overread C strings in truncating conversions like
         // "%.4s" where at most 4 wchar_tacters may be read.
-        detail::formatTruncated(out, value, ntrunc);
+        detail::formatTruncated(out, value, ntrunc);
     }
     else
-        out << value;
+        out << value;
 }
 
 
@@ -427,9 +427,9 @@ inline void formatValue(std::wostream& out, const wchar_t* /*fmtBegin*/,  \
     switch(*(fmtEnd-1))                                               \
     {                                                                 \
         case 'u': case 'd': case 'i': case 'o': case 'X': case 'x':   \
-            out << static_cast<int>(value); break;                    \
+            out << static_cast<int>(value); break;                    \
         default:                                                      \
-            out << value;                   break;                    \
+            out << value;                   break;                    \
     }                                                                 \
 }
 // per 3.9.1: char, signed char and unsigned char are all distinct types
@@ -584,16 +584,16 @@ class FormatArg
         void format(std::wostream& out, const wchar_t* fmtBegin,
                     const wchar_t* fmtEnd, int ntrunc) const
         {
-            TINYFORMAT_ASSERT(m_value);
-            TINYFORMAT_ASSERT(m_formatImpl);
-            m_formatImpl(out, fmtBegin, fmtEnd, ntrunc, m_value);
+            TINYFORMAT_ASSERT(m_value);
+            TINYFORMAT_ASSERT(m_formatImpl);
+            m_formatImpl(out, fmtBegin, fmtEnd, ntrunc, m_value);
         }
 
         int toInt() const
         {
-            TINYFORMAT_ASSERT(m_value);
-            TINYFORMAT_ASSERT(m_toIntImpl);
-            return m_toIntImpl(m_value);
+            TINYFORMAT_ASSERT(m_value);
+            TINYFORMAT_ASSERT(m_toIntImpl);
+            return m_toIntImpl(m_value);
         }
 
     private:
@@ -601,30 +601,30 @@ class FormatArg
         TINYFORMAT_HIDDEN static void formatImpl(std::wostream& out, const wchar_t* fmtBegin,
                         const wchar_t* fmtEnd, int ntrunc, const void* value)
         {
-            formatValue(out, fmtBegin, fmtEnd, ntrunc, *static_cast<const T*>(value));
+            formatValue(out, fmtBegin, fmtEnd, ntrunc, *static_cast<const T*>(value));
         }
 
         template<typename T>
         TINYFORMAT_HIDDEN static int toIntImpl(const void* value)
         {
-            return convertToInt<T>::invoke(*static_cast<const T*>(value));
+            return convertToInt<T>::invoke(*static_cast<const T*>(value));
         }
 
-        const void* m_value;
+        const void* m_value;
         void (*m_formatImpl)(std::wostream& out, const wchar_t* fmtBegin,
-                             const wchar_t* fmtEnd, int ntrunc, const void* value);
-        int (*m_toIntImpl)(const void* value);
-};
+                             const wchar_t* fmtEnd, int ntrunc, const void* value);
+        int (*m_toIntImpl)(const void* value);
+};
 
 
 // Parse and return an integer from the string c, as atoi()
 // On return, c is set to one past the end of the integer.
 inline int parseIntAndAdvance(const wchar_t*& c)
 {
-    int i = 0;
-    for(;*c >= '0' && *c <= '9'; ++c)
-        i = 10*i + (*c - '0');
-    return i;
+    int i = 0;
+    for(;*c >= '0' && *c <= '9'; ++c)
+        i = 10*i + (*c - '0');
+    return i;
 }
 
 // Print literal part of format string and return next format spec
@@ -635,23 +635,23 @@ inline int parseIntAndAdvance(const wchar_t*& c)
 // nontrivial format spec is returned, or the end of string.
 inline const wchar_t* printFormatStringLiteral(std::wostream& out, const wchar_t* fmt)
 {
-    const wchar_t* c = fmt;
-    for(;; ++c)
+    const wchar_t* c = fmt;
+    for(;; ++c)
     {
         switch(*c)
         {
             case '\0':
-                out.write(fmt, c - fmt);
-                return c;
+                out.write(fmt, c - fmt);
+                return c;
             case '%':
-                out.write(fmt, c - fmt);
+                out.write(fmt, c - fmt);
                 if(*(c+1) != '%')
-                    return c;
+                    return c;
                 // for "%%", tack trailing % onto next literal section.
-                fmt = ++c;
-                break;
+                fmt = ++c;
+                break;
             default:
-                break;
+                break;
         }
     }
 }
@@ -674,174 +674,174 @@ inline const wchar_t* streamStateFromFormat(std::wostream& out, bool& spacePadPo
 {
     if(*fmtStart != '%')
     {
-        TINYFORMAT_ERROR("tinyformat: Not enough conversion specifiers in format string");
-        return fmtStart;
+        TINYFORMAT_ERROR("tinyformat: Not enough conversion specifiers in format string");
+        return fmtStart;
     }
     // Reset stream state to defaults.
-    out.width(0);
-    out.precision(6);
-    out.fill(' ');
-    // Reset most flags; ignore irrelevant unitbuf & skipws.
+    out.width(0);
+    out.precision(6);
+    out.fill(' ');
+    // Reset most flags; ignore irrelevant unitbuf & skipws.
     out.unsetf(std::ios::adjustfield | std::ios::basefield |
                std::ios::floatfield | std::ios::showbase | std::ios::boolalpha |
-               std::ios::showpoint | std::ios::showpos | std::ios::uppercase);
-    bool precisionSet = false;
-    bool widthSet = false;
-    int widthExtra = 0;
-    const wchar_t* c = fmtStart + 1;
+               std::ios::showpoint | std::ios::showpos | std::ios::uppercase);
+    bool precisionSet = false;
+    bool widthSet = false;
+    int widthExtra = 0;
+    const wchar_t* c = fmtStart + 1;
     // 1) Parse flags
-    for(;; ++c)
+    for(;; ++c)
     {
         switch(*c)
         {
             case '#':
-                out.setf(std::ios::showpoint | std::ios::showbase);
-                continue;
+                out.setf(std::ios::showpoint | std::ios::showbase);
+                continue;
             case '0':
                 // overridden by left alignment ('-' flag)
                 if(!(out.flags() & std::ios::left))
                 {
                     // Use internal padding so that numeric values are
                     // formatted correctly, eg -00010 rather than 000-10
-                    out.fill('0');
-                    out.setf(std::ios::internal, std::ios::adjustfield);
+                    out.fill('0');
+                    out.setf(std::ios::internal, std::ios::adjustfield);
                 }
-                continue;
+                continue;
             case '-':
-                out.fill(' ');
-                out.setf(std::ios::left, std::ios::adjustfield);
-                continue;
+                out.fill(' ');
+                out.setf(std::ios::left, std::ios::adjustfield);
+                continue;
             case ' ':
                 // overridden by show positive sign, '+' flag.
                 if(!(out.flags() & std::ios::showpos))
-                    spacePadPositive = true;
-                continue;
+                    spacePadPositive = true;
+                continue;
             case '+':
-                out.setf(std::ios::showpos);
-                spacePadPositive = false;
-                widthExtra = 1;
-                continue;
+                out.setf(std::ios::showpos);
+                spacePadPositive = false;
+                widthExtra = 1;
+                continue;
             default:
-                break;
+                break;
         }
-        break;
+        break;
     }
     // 2) Parse width
     if(*c >= '0' && *c <= '9')
     {
-        widthSet = true;
-        out.width(parseIntAndAdvance(c));
+        widthSet = true;
+        out.width(parseIntAndAdvance(c));
     }
     if(*c == '*')
     {
-        widthSet = true;
-        int width = 0;
+        widthSet = true;
+        int width = 0;
         if(argIndex < numFormatters)
-            width = formatters[argIndex++].toInt();
+            width = formatters[argIndex++].toInt();
         else
-            TINYFORMAT_ERROR("tinyformat: Not enough arguments to read variable width");
+            TINYFORMAT_ERROR("tinyformat: Not enough arguments to read variable width");
         if(width < 0)
         {
             // negative widths correspond to '-' flag set
-            out.fill(' ');
-            out.setf(std::ios::left, std::ios::adjustfield);
-            width = -width;
+            out.fill(' ');
+            out.setf(std::ios::left, std::ios::adjustfield);
+            width = -width;
         }
-        out.width(width);
-        ++c;
+        out.width(width);
+        ++c;
     }
     // 3) Parse precision
     if(*c == '.')
     {
-        ++c;
-        int precision = 0;
+        ++c;
+        int precision = 0;
         if(*c == '*')
         {
-            ++c;
+            ++c;
             if(argIndex < numFormatters)
-                precision = formatters[argIndex++].toInt();
+                precision = formatters[argIndex++].toInt();
             else
-                TINYFORMAT_ERROR("tinyformat: Not enough arguments to read variable precision");
+                TINYFORMAT_ERROR("tinyformat: Not enough arguments to read variable precision");
         }
         else
         {
             if(*c >= '0' && *c <= '9')
-                precision = parseIntAndAdvance(c);
+                precision = parseIntAndAdvance(c);
             else if(*c == '-') // negative precisions ignored, treated as zero.
-                parseIntAndAdvance(++c);
+                parseIntAndAdvance(++c);
         }
-        out.precision(precision);
-        precisionSet = true;
+        out.precision(precision);
+        precisionSet = true;
     }
     // 4) Ignore any C99 length modifier
     while(*c == 'l' || *c == 'h' || *c == 'L' ||
           *c == 'j' || *c == 'z' || *c == 't')
-        ++c;
+        ++c;
     // 5) We're up to the conversion specifier character.
     // Set stream flags based on conversion specifier (thanks to the
     // boost::format class for forging the way here).
-    bool intConversion = false;
+    bool intConversion = false;
     switch(*c)
     {
         case 'u': case 'd': case 'i':
-            out.setf(std::ios::dec, std::ios::basefield);
-            intConversion = true;
-            break;
+            out.setf(std::ios::dec, std::ios::basefield);
+            intConversion = true;
+            break;
         case 'o':
-            out.setf(std::ios::oct, std::ios::basefield);
-            intConversion = true;
-            break;
+            out.setf(std::ios::oct, std::ios::basefield);
+            intConversion = true;
+            break;
         case 'X':
-            out.setf(std::ios::uppercase);
+            out.setf(std::ios::uppercase);
             // Falls through
         case 'x': case 'p':
-            out.setf(std::ios::hex, std::ios::basefield);
-            intConversion = true;
-            break;
+            out.setf(std::ios::hex, std::ios::basefield);
+            intConversion = true;
+            break;
         case 'E':
-            out.setf(std::ios::uppercase);
+            out.setf(std::ios::uppercase);
             // Falls through
         case 'e':
-            out.setf(std::ios::scientific, std::ios::floatfield);
-            out.setf(std::ios::dec, std::ios::basefield);
-            break;
+            out.setf(std::ios::scientific, std::ios::floatfield);
+            out.setf(std::ios::dec, std::ios::basefield);
+            break;
         case 'F':
-            out.setf(std::ios::uppercase);
+            out.setf(std::ios::uppercase);
             // Falls through
         case 'f':
-            out.setf(std::ios::fixed, std::ios::floatfield);
-            break;
+            out.setf(std::ios::fixed, std::ios::floatfield);
+            break;
         case 'G':
-            out.setf(std::ios::uppercase);
+            out.setf(std::ios::uppercase);
             // Falls through
         case 'g':
-            out.setf(std::ios::dec, std::ios::basefield);
+            out.setf(std::ios::dec, std::ios::basefield);
             // As in boost::format, let stream decide float format.
-            out.flags(out.flags() & ~std::ios::floatfield);
-            break;
+            out.flags(out.flags() & ~std::ios::floatfield);
+            break;
         case 'a': case 'A':
             TINYFORMAT_ERROR("tinyformat: the %a and %A conversion specs "
-                             "are not supported");
-            break;
+                             "are not supported");
+            break;
         case 'c':
             // Handled as special case inside formatValue()
-            break;
+            break;
         case 's':
             if(precisionSet)
-                ntrunc = static_cast<int>(out.precision());
+                ntrunc = static_cast<int>(out.precision());
             // Make %s print booleans as "true" and "false"
-            out.setf(std::ios::boolalpha);
-            break;
+            out.setf(std::ios::boolalpha);
+            break;
         case 'n':
             // Not supported - will cause problems!
-            TINYFORMAT_ERROR("tinyformat: %n conversion spec not supported");
-            break;
+            TINYFORMAT_ERROR("tinyformat: %n conversion spec not supported");
+            break;
         case '\0':
             TINYFORMAT_ERROR("tinyformat: Conversion spec incorrectly "
-                             "terminated by end of string");
-            return c;
+                             "terminated by end of string");
+            return c;
         default:
-            break;
+            break;
     }
     if(intConversion && precisionSet && !widthSet)
     {
@@ -849,11 +849,11 @@ inline const wchar_t* streamStateFromFormat(std::wostream& out, bool& spacePadPo
         // padded with zeros on the left).  This isn't really supported by the
         // iostreams, but we can approximately simulate it with the width if
         // the width isn't otherwise used.
-        out.width(out.precision() + widthExtra);
-        out.setf(std::ios::internal, std::ios::adjustfield);
-        out.fill('0');
+        out.width(out.precision() + widthExtra);
+        out.setf(std::ios::internal, std::ios::adjustfield);
+        out.fill('0');
     }
-    return c+1;
+    return c+1;
 }
 
 
@@ -863,57 +863,57 @@ inline void formatImpl(std::wostream& out, const wchar_t* fmt,
                        int numFormatters)
 {
     // Saved stream state
-    std::streamsize origWidth = out.width();
-    std::streamsize origPrecision = out.precision();
-    std::ios::fmtflags origFlags = out.flags();
-    wchar_t origFill = out.fill();
+    std::streamsize origWidth = out.width();
+    std::streamsize origPrecision = out.precision();
+    std::ios::fmtflags origFlags = out.flags();
+    wchar_t origFill = out.fill();
 
-    for (int argIndex = 0; argIndex < numFormatters; ++argIndex)
+    for (int argIndex = 0; argIndex < numFormatters; ++argIndex)
     {
         // Parse the format string
-        fmt = printFormatStringLiteral(out, fmt);
-        bool spacePadPositive = false;
-        int ntrunc = -1;
+        fmt = printFormatStringLiteral(out, fmt);
+        bool spacePadPositive = false;
+        int ntrunc = -1;
         const wchar_t* fmtEnd = streamStateFromFormat(out, spacePadPositive, ntrunc, fmt,
-                                                   formatters, argIndex, numFormatters);
+                                                   formatters, argIndex, numFormatters);
         if (argIndex >= numFormatters)
         {
             // Check args remain after reading any variable width/precision
-            TINYFORMAT_ERROR("tinyformat: Not enough format arguments");
-            return;
+            TINYFORMAT_ERROR("tinyformat: Not enough format arguments");
+            return;
         }
-        const FormatArg& arg = formatters[argIndex];
+        const FormatArg& arg = formatters[argIndex];
         // Format the arg into the stream.
         if(!spacePadPositive)
-            arg.format(out, fmt, fmtEnd, ntrunc);
+            arg.format(out, fmt, fmtEnd, ntrunc);
         else
         {
             // The following is a special case with no direct correspondence
             // between stream formatting and the printf() behaviour.  Simulate
             // it crudely by formatting into a temporary string stream and
             // munging the resulting string.
-            std::wostringstream tmpStream;
-            tmpStream.copyfmt(out);
-            tmpStream.setf(std::ios::showpos);
-            arg.format(tmpStream, fmt, fmtEnd, ntrunc);
-            std::wstring result = tmpStream.str(); // allocates... yuck.
-            for(size_t i = 0, iend = result.size(); i < iend; ++i)
-                if(result[i] == '+') result[i] = ' ';
-            out << result;
+            std::wostringstream tmpStream;
+            tmpStream.copyfmt(out);
+            tmpStream.setf(std::ios::showpos);
+            arg.format(tmpStream, fmt, fmtEnd, ntrunc);
+            std::wstring result = tmpStream.str(); // allocates... yuck.
+            for(size_t i = 0, iend = result.size(); i < iend; ++i)
+                if(result[i] == '+') result[i] = ' ';
+            out << result;
         }
-        fmt = fmtEnd;
+        fmt = fmtEnd;
     }
 
     // Print remaining part of format string.
-    fmt = printFormatStringLiteral(out, fmt);
+    fmt = printFormatStringLiteral(out, fmt);
     if(*fmt != '\0')
-        TINYFORMAT_ERROR("tinyformat: Too many conversion specifiers in format string");
+        TINYFORMAT_ERROR("tinyformat: Too many conversion specifiers in format string");
 
     // Restore stream state
-    out.width(origWidth);
-    out.precision(origPrecision);
-    out.flags(origFlags);
-    out.fill(origFill);
+    out.width(origWidth);
+    out.precision(origPrecision);
+    out.flags(origFlags);
+    out.fill(origFill);
 }
 
 } // namespace detail
@@ -932,15 +932,15 @@ class FormatList
             : m_formatters(formatters), m_N(N) { }
 
         friend void vformat(std::wostream& out, const wchar_t* fmt,
-                            const FormatList& list);
+                            const FormatList& list);
 
     private:
-        const detail::FormatArg* m_formatters;
-        int m_N;
-};
+        const detail::FormatArg* m_formatters;
+        int m_N;
+};
 
 /// Reference to type-opaque format list for passing to vformat()
-typedef const FormatList& FormatListRef;
+typedef const FormatList& FormatListRef;
 
 
 namespace detail {
@@ -955,7 +955,7 @@ class FormatListN : public FormatList
         FormatListN(const Args&... args)
             : FormatList(&m_formatterStore[0], N),
             m_formatterStore { FormatArg(args)... }
-        { static_assert(sizeof...(args) == N, "Number of args must be N"); }
+        { static_assert(sizeof...(args) == N, "Number of args must be N"); }
 #else // C++98 version
         void init(int) {}
 #       define TINYFORMAT_MAKE_FORMATLIST_CONSTRUCTOR(n)                \
@@ -963,13 +963,13 @@ class FormatListN : public FormatList
         template<TINYFORMAT_ARGTYPES(n)>                                \
         FormatListN(TINYFORMAT_VARARGS(n))                              \
             : FormatList(&m_formatterStore[0], n)                       \
-        { TINYFORMAT_ASSERT(n == N); init(0, TINYFORMAT_PASSARGS(n)); } \
+        { TINYFORMAT_ASSERT(n == N); init(0, TINYFORMAT_PASSARGS(n)); } \
                                                                         \
         template<TINYFORMAT_ARGTYPES(n)>                                \
         void init(int i, TINYFORMAT_VARARGS(n))                         \
         {                                                               \
-            m_formatterStore[i] = FormatArg(v1);                        \
-            init(i+1 TINYFORMAT_PASSARGS_TAIL(n));                      \
+            m_formatterStore[i] = FormatArg(v1);                        \
+            init(i+1 TINYFORMAT_PASSARGS_TAIL(n));                      \
         }
 
         TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_FORMATLIST_CONSTRUCTOR)
@@ -977,14 +977,14 @@ class FormatListN : public FormatList
 #endif
 
     private:
-        FormatArg m_formatterStore[N];
-};
+        FormatArg m_formatterStore[N];
+};
 
 // Special 0-arg version - MSVC says zero-sized C array in struct is nonstandard
 template<> class FormatListN<0> : public FormatList
 {
     public: FormatListN() : FormatList(0, 0) {}
-};
+};
 
 } // namespace detail
 
@@ -999,24 +999,24 @@ template<> class FormatListN<0> : public FormatList
 /// The exact return type of this function is an implementation detail and
 /// shouldn't be relied upon.  Instead it should be stored as a FormatListRef:
 ///
-///   FormatListRef formatList = makeFormatList( /*...*/ );
+///   FormatListRef formatList = makeFormatList( /*...*/ );
 template<typename... Args>
 detail::FormatListN<sizeof...(Args)> makeFormatList(const Args&... args)
 {
-    return detail::FormatListN<sizeof...(args)>(args...);
+    return detail::FormatListN<sizeof...(args)>(args...);
 }
 
 #else // C++98 version
 
 inline detail::FormatListN<0> makeFormatList()
 {
-    return detail::FormatListN<0>();
+    return detail::FormatListN<0>();
 }
 #define TINYFORMAT_MAKE_MAKEFORMATLIST(n)                     \
 template<TINYFORMAT_ARGTYPES(n)>                              \
 detail::FormatListN<n> makeFormatList(TINYFORMAT_VARARGS(n))  \
 {                                                             \
-    return detail::FormatListN<n>(TINYFORMAT_PASSARGS(n));    \
+    return detail::FormatListN<n>(TINYFORMAT_PASSARGS(n));    \
 }
 TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_MAKEFORMATLIST)
 #undef TINYFORMAT_MAKE_MAKEFORMATLIST
@@ -1029,7 +1029,7 @@ TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_MAKEFORMATLIST)
 /// list of format arguments is held in a single function argument.
 inline void vformat(std::wostream& out, const wchar_t* fmt, FormatListRef list)
 {
-    detail::formatImpl(out, fmt, list.m_formatters, list.m_N);
+    detail::formatImpl(out, fmt, list.m_formatters, list.m_N);
 }
 
 
@@ -1039,7 +1039,7 @@ inline void vformat(std::wostream& out, const wchar_t* fmt, FormatListRef list)
 template<typename... Args>
 void format(std::wostream& out, const wchar_t* fmt, const Args&... args)
 {
-    vformat(out, fmt, makeFormatList(args...));
+    vformat(out, fmt, makeFormatList(args...));
 }
 
 /// Format list of arguments according to the given format string and return
@@ -1047,23 +1047,23 @@ void format(std::wostream& out, const wchar_t* fmt, const Args&... args)
 template<typename... Args>
 std::wstring format(const wchar_t* fmt, const Args&... args)
 {
-    std::wostringstream oss;
-    format(oss, fmt, args...);
-    return oss.str();
+    std::wostringstream oss;
+    format(oss, fmt, args...);
+    return oss.str();
 }
 
 /// Format list of arguments to std::wcout, according to the given format string
 template<typename... Args>
 void printf(const wchar_t* fmt, const Args&... args)
 {
-    format(std::wcout, fmt, args...);
+    format(std::wcout, fmt, args...);
 }
 
 template<typename... Args>
 void printfln(const wchar_t* fmt, const Args&... args)
 {
-    format(std::wcout, fmt, args...);
-    std::wcout << '\n';
+    format(std::wcout, fmt, args...);
+    std::wcout << '\n';
 }
 
 
@@ -1071,25 +1071,25 @@ void printfln(const wchar_t* fmt, const Args&... args)
 
 inline void format(std::wostream& out, const wchar_t* fmt)
 {
-    vformat(out, fmt, makeFormatList());
+    vformat(out, fmt, makeFormatList());
 }
 
 inline std::wstring format(const wchar_t* fmt)
 {
-    std::wostringstream oss;
-    format(oss, fmt);
-    return oss.str();
+    std::wostringstream oss;
+    format(oss, fmt);
+    return oss.str();
 }
 
 inline void printf(const wchar_t* fmt)
 {
-    format(std::wcout, fmt);
+    format(std::wcout, fmt);
 }
 
 inline void printfln(const wchar_t* fmt)
 {
-    format(std::wcout, fmt);
-    std::wcout << '\n';
+    format(std::wcout, fmt);
+    std::wcout << '\n';
 }
 
 #define TINYFORMAT_MAKE_FORMAT_FUNCS(n)                                   \
@@ -1097,28 +1097,28 @@ inline void printfln(const wchar_t* fmt)
 template<TINYFORMAT_ARGTYPES(n)>                                          \
 void format(std::wostream& out, const wchar_t* fmt, TINYFORMAT_VARARGS(n))    \
 {                                                                         \
-    vformat(out, fmt, makeFormatList(TINYFORMAT_PASSARGS(n)));            \
+    vformat(out, fmt, makeFormatList(TINYFORMAT_PASSARGS(n)));            \
 }                                                                         \
                                                                           \
 template<TINYFORMAT_ARGTYPES(n)>                                          \
 std::wstring format(const wchar_t* fmt, TINYFORMAT_VARARGS(n))                \
 {                                                                         \
-    std::wostringstream oss;                                               \
-    format(oss, fmt, TINYFORMAT_PASSARGS(n));                             \
-    return oss.str();                                                     \
+    std::wostringstream oss;                                               \
+    format(oss, fmt, TINYFORMAT_PASSARGS(n));                             \
+    return oss.str();                                                     \
 }                                                                         \
                                                                           \
 template<TINYFORMAT_ARGTYPES(n)>                                          \
 void printf(const wchar_t* fmt, TINYFORMAT_VARARGS(n))                       \
 {                                                                         \
-    format(std::wcout, fmt, TINYFORMAT_PASSARGS(n));                       \
+    format(std::wcout, fmt, TINYFORMAT_PASSARGS(n));                       \
 }                                                                         \
                                                                           \
 template<TINYFORMAT_ARGTYPES(n)>                                          \
 void printfln(const wchar_t* fmt, TINYFORMAT_VARARGS(n))                     \
 {                                                                         \
-    format(std::wcout, fmt, TINYFORMAT_PASSARGS(n));                       \
-    std::wcout << '\n';                                                    \
+    format(std::wcout, fmt, TINYFORMAT_PASSARGS(n));                       \
+    std::wcout << '\n';                                                    \
 }
 
 TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_FORMAT_FUNCS)
@@ -1133,57 +1133,57 @@ TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_FORMAT_FUNCS)
 
 // file: Commands/CAssemblerCommand.h
 
-class TempData;
-class SymbolData;
+class TempData;
+class SymbolData;
 
 class CAssemblerCommand
 {
 public:
-	CAssemblerCommand();
-	virtual ~CAssemblerCommand() { };
-	virtual bool Validate() = 0;
-	virtual void Encode() const = 0;
-	virtual void writeTempData(TempData& tempData) const = 0;
-	virtual void writeSymData(SymbolData& symData) const { };
-	void applyFileInfo();
-	int getSection() { return section; }
-	void updateSection(int num) { section = num; }
+	CAssemblerCommand();
+	virtual ~CAssemblerCommand() { };
+	virtual bool Validate() = 0;
+	virtual void Encode() const = 0;
+	virtual void writeTempData(TempData& tempData) const = 0;
+	virtual void writeSymData(SymbolData& symData) const { };
+	void applyFileInfo();
+	int getSection() { return section; }
+	void updateSection(int num) { section = num; }
 protected:
-	int FileNum;
-	int FileLine;
+	int FileNum;
+	int FileLine;
 private:
-	int section;
-};
+	int section;
+};
 
 class DummyCommand: public CAssemblerCommand
 {
 public:
-	virtual bool Validate() { return false; };
-	virtual void Encode() const { };
-	virtual void writeTempData(TempData& tempData) const { };
-	virtual void writeSymData(SymbolData& symData) const { };
-};
+	virtual bool Validate() { return false; };
+	virtual void Encode() const { };
+	virtual void writeTempData(TempData& tempData) const { };
+	virtual void writeSymData(SymbolData& symData) const { };
+};
 
 class InvalidCommand: public CAssemblerCommand
 {
 public:
-	virtual bool Validate() { return false; };
-	virtual void Encode() const { };
-	virtual void writeTempData(TempData& tempData) const { };
-	virtual void writeSymData(SymbolData& symData) const { };
-};
+	virtual bool Validate() { return false; };
+	virtual void Encode() const { };
+	virtual void writeTempData(TempData& tempData) const { };
+	virtual void writeSymData(SymbolData& symData) const { };
+};
 
 // file: Core/Expression.h
 #include <memory>
 
 inline std::wstring to_wstring(int64_t value)
 {
-	return formatString(L"%d", value);
+	return formatString(L"%d", value);
 }
 
 inline std::wstring to_wstring(double value)
 {
-	return formatString(L"%#.17g", value);
+	return formatString(L"%#.17g", value);
 }
 
 enum class OperatorType
@@ -1218,212 +1218,212 @@ enum class OperatorType
 	TertiaryIf,
 	ToString,
 	FunctionCall
-};
+};
 
-enum class ExpressionValueType { Invalid, Integer, Float, String};
+enum class ExpressionValueType { Invalid, Integer, Float, String};
 
 struct ExpressionValue
 {
-	ExpressionValueType type;
+	ExpressionValueType type;
 
 	ExpressionValue()
 	{
-		type = ExpressionValueType::Invalid;
+		type = ExpressionValueType::Invalid;
 	}
 
 	ExpressionValue(int64_t value)
 	{
-		type = ExpressionValueType::Integer;
-		intValue = value;
+		type = ExpressionValueType::Integer;
+		intValue = value;
 	}
 
 	ExpressionValue(double value)
 	{
-		type = ExpressionValueType::Float;
-		floatValue = value;
+		type = ExpressionValueType::Float;
+		floatValue = value;
 	}
 
 	ExpressionValue(const std::wstring& value)
 	{
-		type = ExpressionValueType::String;
-		strValue = value;
+		type = ExpressionValueType::String;
+		strValue = value;
 	}
 
 	bool isFloat() const
 	{
-		return type == ExpressionValueType::Float;
+		return type == ExpressionValueType::Float;
 	}
 
 	bool isInt() const
 	{
-		return type == ExpressionValueType::Integer;
+		return type == ExpressionValueType::Integer;
 	}
 
 	bool isString() const
 	{
-		return type == ExpressionValueType::String;
+		return type == ExpressionValueType::String;
 	}
 
 	bool isValid() const
 	{
-		return type != ExpressionValueType::Invalid;
+		return type != ExpressionValueType::Invalid;
 	}
 
 	struct
 	{
-		int64_t intValue;
-		double floatValue;
-	};
+		int64_t intValue;
+		double floatValue;
+	};
 
-	std::wstring strValue;
+	std::wstring strValue;
 
-	ExpressionValue operator!() const;
-	ExpressionValue operator~() const;
-	bool operator<(const ExpressionValue& other) const;
-	bool operator<=(const ExpressionValue& other) const;
-	bool operator>(const ExpressionValue& other) const;
-	bool operator>=(const ExpressionValue& other) const;
-	bool operator==(const ExpressionValue& other) const;
-	bool operator!=(const ExpressionValue& other) const;
-	ExpressionValue operator+(const ExpressionValue& other) const;
-	ExpressionValue operator-(const ExpressionValue& other) const;
-	ExpressionValue operator*(const ExpressionValue& other) const;
-	ExpressionValue operator/(const ExpressionValue& other) const;
-	ExpressionValue operator%(const ExpressionValue& other) const;
-	ExpressionValue operator<<(const ExpressionValue& other) const;
-	ExpressionValue operator>>(const ExpressionValue& other) const;
-	ExpressionValue operator&(const ExpressionValue& other) const;
-	ExpressionValue operator|(const ExpressionValue& other) const;
-	ExpressionValue operator&&(const ExpressionValue& other) const;
-	ExpressionValue operator||(const ExpressionValue& other) const;
-	ExpressionValue operator^(const ExpressionValue& other) const;
-};
+	ExpressionValue operator!() const;
+	ExpressionValue operator~() const;
+	bool operator<(const ExpressionValue& other) const;
+	bool operator<=(const ExpressionValue& other) const;
+	bool operator>(const ExpressionValue& other) const;
+	bool operator>=(const ExpressionValue& other) const;
+	bool operator==(const ExpressionValue& other) const;
+	bool operator!=(const ExpressionValue& other) const;
+	ExpressionValue operator+(const ExpressionValue& other) const;
+	ExpressionValue operator-(const ExpressionValue& other) const;
+	ExpressionValue operator*(const ExpressionValue& other) const;
+	ExpressionValue operator/(const ExpressionValue& other) const;
+	ExpressionValue operator%(const ExpressionValue& other) const;
+	ExpressionValue operator<<(const ExpressionValue& other) const;
+	ExpressionValue operator>>(const ExpressionValue& other) const;
+	ExpressionValue operator&(const ExpressionValue& other) const;
+	ExpressionValue operator|(const ExpressionValue& other) const;
+	ExpressionValue operator&&(const ExpressionValue& other) const;
+	ExpressionValue operator||(const ExpressionValue& other) const;
+	ExpressionValue operator^(const ExpressionValue& other) const;
+};
 
-class Label;
+class Label;
 
-struct ExpressionFunctionEntry;
-struct ExpressionLabelFunctionEntry;
+struct ExpressionFunctionEntry;
+struct ExpressionLabelFunctionEntry;
 
 class ExpressionInternal
 {
 public:
-	ExpressionInternal();
-	~ExpressionInternal();
-	ExpressionInternal(int64_t value);
-	ExpressionInternal(double value);
-	ExpressionInternal(const std::wstring& value, OperatorType type);
+	ExpressionInternal();
+	~ExpressionInternal();
+	ExpressionInternal(int64_t value);
+	ExpressionInternal(double value);
+	ExpressionInternal(const std::wstring& value, OperatorType type);
 	ExpressionInternal(OperatorType op, ExpressionInternal* a = nullptr,
-		ExpressionInternal* b = nullptr, ExpressionInternal* c = nullptr);
-	ExpressionInternal(const std::wstring& name, const std::vector<ExpressionInternal*>& parameters);
-	ExpressionValue evaluate();
-	std::wstring toString();
-	bool isIdentifier() { return type == OperatorType::Identifier; }
-	std::wstring getStringValue() { return strValue; }
-	void replaceMemoryPos(const std::wstring& identifierName);
-	bool simplify(bool inUnknownOrFalseBlock);
-	unsigned int getFileNum() { return fileNum; }
-	unsigned int getSection() { return section; }
+		ExpressionInternal* b = nullptr, ExpressionInternal* c = nullptr);
+	ExpressionInternal(const std::wstring& name, const std::vector<ExpressionInternal*>& parameters);
+	ExpressionValue evaluate();
+	std::wstring toString();
+	bool isIdentifier() { return type == OperatorType::Identifier; }
+	std::wstring getStringValue() { return strValue; }
+	void replaceMemoryPos(const std::wstring& identifierName);
+	bool simplify(bool inUnknownOrFalseBlock);
+	unsigned int getFileNum() { return fileNum; }
+	unsigned int getSection() { return section; }
 private:
-	void allocate(size_t count);
-	void deallocate();
-	std::wstring formatFunctionCall();
-	ExpressionValue executeExpressionFunctionCall(const ExpressionFunctionEntry& entry);
-	ExpressionValue executeExpressionLabelFunctionCall(const ExpressionLabelFunctionEntry& entry);
-	ExpressionValue executeFunctionCall();
-	bool checkParameterCount(size_t min, size_t max);
+	void allocate(size_t count);
+	void deallocate();
+	std::wstring formatFunctionCall();
+	ExpressionValue executeExpressionFunctionCall(const ExpressionFunctionEntry& entry);
+	ExpressionValue executeExpressionLabelFunctionCall(const ExpressionLabelFunctionEntry& entry);
+	ExpressionValue executeFunctionCall();
+	bool checkParameterCount(size_t min, size_t max);
 
-	OperatorType type;
-	ExpressionInternal** children;
-	size_t childrenCount;
+	OperatorType type;
+	ExpressionInternal** children;
+	size_t childrenCount;
 
 	union
 	{
-		int64_t intValue;
-		double floatValue;
-	};
-	std::wstring strValue;
+		int64_t intValue;
+		double floatValue;
+	};
+	std::wstring strValue;
 
-	unsigned int fileNum, section;
-};
+	unsigned int fileNum, section;
+};
 
 class Expression
 {
 public:
-	Expression();
-	ExpressionValue evaluate();
-	bool isLoaded() const { return expression != nullptr; }
-	void setExpression(ExpressionInternal* exp, bool inUnknownOrFalseBlock);
-	void replaceMemoryPos(const std::wstring& identifierName);
-	bool isConstExpression() { return constExpression; }
+	Expression();
+	ExpressionValue evaluate();
+	bool isLoaded() const { return expression != nullptr; }
+	void setExpression(ExpressionInternal* exp, bool inUnknownOrFalseBlock);
+	void replaceMemoryPos(const std::wstring& identifierName);
+	bool isConstExpression() { return constExpression; }
 
 	template<typename T>
 	bool evaluateInteger(T& dest)
 	{
 		if (expression == nullptr)
-			return false;
+			return false;
 
-		ExpressionValue value = expression->evaluate();
+		ExpressionValue value = expression->evaluate();
 		if (value.isInt() == false)
-			return false;
+			return false;
 
-		dest = (T) value.intValue;
-		return true;
+		dest = (T) value.intValue;
+		return true;
 	}
 
 	bool evaluateString(std::wstring& dest, bool convert)
 	{
 		if (expression == nullptr)
-			return false;
+			return false;
 
-		ExpressionValue value = expression->evaluate();
+		ExpressionValue value = expression->evaluate();
 		if (convert && value.isInt())
 		{
-			dest = to_wstring(value.intValue);
-			return true;
+			dest = to_wstring(value.intValue);
+			return true;
 		}
 
 		if (convert && value.isFloat())
 		{
-			dest = to_wstring(value.floatValue);
-			return true;
+			dest = to_wstring(value.floatValue);
+			return true;
 		}
 
 		if (value.isString() == false)
-			return false;
+			return false;
 
-		dest = value.strValue;
-		return true;
+		dest = value.strValue;
+		return true;
 	}
 
 	bool evaluateIdentifier(std::wstring& dest)
 	{
 		if (expression == nullptr || expression->isIdentifier() == false)
-			return false;
+			return false;
 
-		dest = expression->getStringValue();
-		return true;
+		dest = expression->getStringValue();
+		return true;
 	}
 
-	std::wstring toString() { return expression != nullptr ? expression->toString() : L""; };
+	std::wstring toString() { return expression != nullptr ? expression->toString() : L""; };
 private:
-	std::shared_ptr<ExpressionInternal> expression;
-	std::wstring originalText;
-	bool constExpression;
-};
+	std::shared_ptr<ExpressionInternal> expression;
+	std::wstring originalText;
+	bool constExpression;
+};
 
-Expression createConstExpression(int64_t value);
+Expression createConstExpression(int64_t value);
 
 // file: Core/ExpressionFunctions.h
 #include <map>
 
 bool getExpFuncParameter(const std::vector<ExpressionValue>& parameters, size_t index, int64_t& dest,
-	const std::wstring& funcName, bool optional);
+	const std::wstring& funcName, bool optional);
 
 bool getExpFuncParameter(const std::vector<ExpressionValue>& parameters, size_t index, const std::wstring*& dest,
-	const std::wstring& funcName, bool optional);
+	const std::wstring& funcName, bool optional);
 
-using ExpressionFunction = ExpressionValue (*)(const std::wstring& funcName, const std::vector<ExpressionValue>&);
-using ExpressionLabelFunction = ExpressionValue (*)(const std::wstring& funcName, const std::vector<std::shared_ptr<Label>> &);
+using ExpressionFunction = ExpressionValue (*)(const std::wstring& funcName, const std::vector<ExpressionValue>&);
+using ExpressionLabelFunction = ExpressionValue (*)(const std::wstring& funcName, const std::vector<std::shared_ptr<Label>> &);
 
 enum class ExpFuncSafety
 {
@@ -1433,169 +1433,169 @@ enum class ExpFuncSafety
 	ConditionalUnsafe,
 	// Result is completely independent of the internal state
 	Safe,
-};
+};
 
 struct ExpressionFunctionEntry
 {
-	ExpressionFunction function;
-	size_t minParams;
-	size_t maxParams;
-	ExpFuncSafety safety;
-};
+	ExpressionFunction function;
+	size_t minParams;
+	size_t maxParams;
+	ExpFuncSafety safety;
+};
 
 struct ExpressionLabelFunctionEntry
 {
-	ExpressionLabelFunction function;
-	size_t minParams;
-	size_t maxParams;
-	ExpFuncSafety safety;
-};
+	ExpressionLabelFunction function;
+	size_t minParams;
+	size_t maxParams;
+	ExpFuncSafety safety;
+};
 
 
-using ExpressionFunctionMap =  std::map<std::wstring, const ExpressionFunctionEntry>;
-using ExpressionLabelFunctionMap =  std::map<std::wstring, const ExpressionLabelFunctionEntry>;
+using ExpressionFunctionMap =  std::map<std::wstring, const ExpressionFunctionEntry>;
+using ExpressionLabelFunctionMap =  std::map<std::wstring, const ExpressionLabelFunctionEntry>;
 
-extern const ExpressionFunctionMap expressionFunctions;
-extern const ExpressionLabelFunctionMap expressionLabelFunctions;
+extern const ExpressionFunctionMap expressionFunctions;
+extern const ExpressionLabelFunctionMap expressionLabelFunctions;
 
 // file: Core/SymbolData.h
 #include <set>
 
-class AssemblerFile;
+class AssemblerFile;
 
 struct SymDataSymbol
 {
-	std::wstring name;
-	int64_t address;
+	std::wstring name;
+	int64_t address;
 
 	bool operator<(const SymDataSymbol& other) const
 	{
-		return address < other.address;
+		return address < other.address;
 	}
-};
+};
 
 struct SymDataAddressInfo
 {
-	int64_t address;
-	size_t fileIndex;
-	size_t lineNumber;
+	int64_t address;
+	size_t fileIndex;
+	size_t lineNumber;
 
 	bool operator<(const SymDataAddressInfo& other) const
 	{
-		return address < other.address;
+		return address < other.address;
 	}
-};
+};
 
 struct SymDataFunction
 {
-	int64_t address;
-	size_t size;
+	int64_t address;
+	size_t size;
 
 	bool operator<(const SymDataFunction& other) const
 	{
-		return address < other.address;
+		return address < other.address;
 	}
-};
+};
 
 struct SymDataData
 {
-	int64_t address;
-	size_t size;
-	int type;
+	int64_t address;
+	size_t size;
+	int type;
 
 	bool operator<(const SymDataData& other) const
 	{
 		if (address != other.address)
-			return address < other.address;
+			return address < other.address;
 
 		if (size != other.size)
-			return size < other.size;
+			return size < other.size;
 
-		return type < other.type;
+		return type < other.type;
 	}
-};
+};
 
 struct SymDataModule
 {
-	AssemblerFile* file;
-	std::vector<SymDataSymbol> symbols;
-	std::vector<SymDataFunction> functions;
-	std::set<SymDataData> data;
-};
+	AssemblerFile* file;
+	std::vector<SymDataSymbol> symbols;
+	std::vector<SymDataFunction> functions;
+	std::set<SymDataData> data;
+};
 
 struct SymDataModuleInfo
 {
-	unsigned int crc32;
-};
+	unsigned int crc32;
+};
 
 class SymbolData
 {
 public:
-	enum DataType { Data8, Data16, Data32, Data64, DataAscii };
+	enum DataType { Data8, Data16, Data32, Data64, DataAscii };
 
-	SymbolData();
-	void clear();
-	void setNocashSymFileName(const std::wstring& name, int version) { nocashSymFileName = name; nocashSymVersion = version; };
-	void write();
-	void setEnabled(bool b) { enabled = b; };
+	SymbolData();
+	void clear();
+	void setNocashSymFileName(const std::wstring& name, int version) { nocashSymFileName = name; nocashSymVersion = version; };
+	void write();
+	void setEnabled(bool b) { enabled = b; };
 
-	void addLabel(int64_t address, const std::wstring& name);
-	void addData(int64_t address, size_t size, DataType type);
-	void startModule(AssemblerFile* file);
-	void endModule(AssemblerFile* file);
-	void startFunction(int64_t address);
-	void endFunction(int64_t address);
+	void addLabel(int64_t address, const std::wstring& name);
+	void addData(int64_t address, size_t size, DataType type);
+	void startModule(AssemblerFile* file);
+	void endModule(AssemblerFile* file);
+	void startFunction(int64_t address);
+	void endFunction(int64_t address);
 private:
-	void writeNocashSym();
-	size_t addFileName(const std::wstring& fileName);
+	void writeNocashSym();
+	size_t addFileName(const std::wstring& fileName);
 
-	std::wstring nocashSymFileName;
-	bool enabled;
-	int nocashSymVersion;
+	std::wstring nocashSymFileName;
+	bool enabled;
+	int nocashSymVersion;
 
 	// entry 0 is for data without parent modules
-	std::vector<SymDataModule> modules;
-	std::vector<std::wstring> files;
-	int currentModule;
-	int currentFunction;
-};
+	std::vector<SymDataModule> modules;
+	std::vector<std::wstring> files;
+	int currentModule;
+	int currentFunction;
+};
 
 // file: Util/Util.h
 #include <string>
 #include <stdio.h>
 
 
-typedef std::vector<std::wstring> StringList;
+typedef std::vector<std::wstring> StringList;
 
-std::wstring convertUtf8ToWString(const char* source);
-std::string convertWCharToUtf8(wchar_t character);
-;std::string convertWStringToUtf8(const std::wstring& source);
+std::wstring convertUtf8ToWString(const char* source);
+std::string convertWCharToUtf8(wchar_t character);
+;std::string convertWStringToUtf8(const std::wstring& source);
 
-std::wstring intToHexString(unsigned int value, int digits, bool prefix = false);
-std::wstring intToString(unsigned int value, int digits);
-bool stringToInt(const std::wstring& line, size_t start, size_t end, int64_t& result);
-int32_t getFloatBits(float value);
-float bitsToFloat(int32_t value);
-int64_t getDoubleBits(double value);
+std::wstring intToHexString(unsigned int value, int digits, bool prefix = false);
+std::wstring intToString(unsigned int value, int digits);
+bool stringToInt(const std::wstring& line, size_t start, size_t end, int64_t& result);
+int32_t getFloatBits(float value);
+float bitsToFloat(int32_t value);
+int64_t getDoubleBits(double value);
 
-StringList getStringListFromArray(wchar_t** source, int count);
-StringList splitString(const std::wstring& str, const wchar_t delim, bool skipEmpty);
+StringList getStringListFromArray(wchar_t** source, int count);
+StringList splitString(const std::wstring& str, const wchar_t delim, bool skipEmpty);
 
-int64_t fileSize(const std::wstring& fileName);
-bool fileExists(const std::wstring& strFilename);
-bool copyFile(const std::wstring& existingFile, const std::wstring& newFile);
-bool deleteFile(const std::wstring& fileName);;
+int64_t fileSize(const std::wstring& fileName);
+bool fileExists(const std::wstring& strFilename);
+bool copyFile(const std::wstring& existingFile, const std::wstring& newFile);
+bool deleteFile(const std::wstring& fileName);;
 
-std::wstring toWLowercase(const std::string& str);
-std::wstring getFileNameFromPath(const std::wstring& path);
-size_t replaceAll(std::wstring& str, const wchar_t* oldValue,const std::wstring& newValue);
-bool startsWith(const std::wstring& str, const wchar_t* value, size_t stringPos = 0);
+std::wstring toWLowercase(const std::string& str);
+std::wstring getFileNameFromPath(const std::wstring& path);
+size_t replaceAll(std::wstring& str, const wchar_t* oldValue,const std::wstring& newValue);
+bool startsWith(const std::wstring& str, const wchar_t* value, size_t stringPos = 0);
 
-enum class OpenFileMode { ReadBinary, WriteBinary, ReadWriteBinary };
-FILE* openFile(const std::wstring& fileName, OpenFileMode mode);
-std::wstring getCurrentDirectory();
-bool changeDirectory(const std::wstring& dir);
-bool isAbsolutePath(const std::wstring& path);
+enum class OpenFileMode { ReadBinary, WriteBinary, ReadWriteBinary };
+FILE* openFile(const std::wstring& fileName, OpenFileMode mode);
+std::wstring getCurrentDirectory();
+bool changeDirectory(const std::wstring& dir);
+bool isAbsolutePath(const std::wstring& path);
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
@@ -1607,249 +1607,249 @@ bool isAbsolutePath(const std::wstring& path);
 class BinaryFile
 {
 public:
-	enum Mode { Read, Write, ReadWrite };
+	enum Mode { Read, Write, ReadWrite };
 
-	BinaryFile();
-	~BinaryFile();
+	BinaryFile();
+	~BinaryFile();
 
-	bool open(const std::wstring& fileName, Mode mode);
-	bool open(Mode mode);
-	bool isOpen() { return handle != nullptr; };
-	bool atEnd() { return isOpen() && mode != Write && ftell(handle) == size_; };
-	void setPos(long pos) { if (isOpen()) fseek(handle,pos,SEEK_SET); };
-	long pos() { return isOpen() ? ftell(handle) : -1; }
-	long size() { return size_; };
-	void close();
+	bool open(const std::wstring& fileName, Mode mode);
+	bool open(Mode mode);
+	bool isOpen() { return handle != nullptr; };
+	bool atEnd() { return isOpen() && mode != Write && ftell(handle) == size_; };
+	void setPos(long pos) { if (isOpen()) fseek(handle,pos,SEEK_SET); };
+	long pos() { return isOpen() ? ftell(handle) : -1; }
+	long size() { return size_; };
+	void close();
 
-	void setFileName(const std::wstring& name) { fileName = name; };
-	const std::wstring& getFileName() { return fileName; };
+	void setFileName(const std::wstring& name) { fileName = name; };
+	const std::wstring& getFileName() { return fileName; };
 
-	size_t read(void* dest, size_t length);
-	size_t write(void* source, size_t length);
+	size_t read(void* dest, size_t length);
+	size_t write(void* source, size_t length);
 private:
-	FILE* handle;
-	std::wstring fileName;
-	Mode mode;
-	long size_;
-};
+	FILE* handle;
+	std::wstring fileName;
+	Mode mode;
+	long size_;
+};
 
 class TextFile
 {
 public:
-	enum Encoding { ASCII, UTF8, UTF16LE, UTF16BE, SJIS, GUESS };
-	enum Mode { Read, Write };
+	enum Encoding { ASCII, UTF8, UTF16LE, UTF16BE, SJIS, GUESS };
+	enum Mode { Read, Write };
 
-	TextFile();
-	~TextFile();
-	void openMemory(const std::wstring& content);
-	bool open(const std::wstring& fileName, Mode mode, Encoding defaultEncoding = GUESS);
-	bool open(Mode mode, Encoding defaultEncoding = GUESS);
-	bool isOpen() { return fromMemory || handle != nullptr; };
-	bool atEnd() { return isOpen() && mode == Read && tell() >= size_; };
-	long size() { return size_; };
-	void close();
+	TextFile();
+	~TextFile();
+	void openMemory(const std::wstring& content);
+	bool open(const std::wstring& fileName, Mode mode, Encoding defaultEncoding = GUESS);
+	bool open(Mode mode, Encoding defaultEncoding = GUESS);
+	bool isOpen() { return fromMemory || handle != nullptr; };
+	bool atEnd() { return isOpen() && mode == Read && tell() >= size_; };
+	long size() { return size_; };
+	void close();
 
-	bool hasGuessedEncoding() { return guessedEncoding; };
-	bool isFromMemory() { return fromMemory; }
-	int getNumLines() { return lineCount; }
+	bool hasGuessedEncoding() { return guessedEncoding; };
+	bool isFromMemory() { return fromMemory; }
+	int getNumLines() { return lineCount; }
 
-	void setFileName(const std::wstring& name) { fileName = name; };
-	const std::wstring& getFileName() { return fileName; };
+	void setFileName(const std::wstring& name) { fileName = name; };
+	const std::wstring& getFileName() { return fileName; };
 
-	wchar_t readCharacter();
-	std::wstring readLine();
-	StringList readAll();
-	void writeCharacter(wchar_t character);
-	void write(const wchar_t* line);
-	void write(const std::wstring& line);
-	void write(const char* value);
-	void write(const std::string& value);
-	void writeLine(const wchar_t* line);
-	void writeLine(const std::wstring& line);
-	void writeLine(const char* line);
-	void writeLine(const std::string& line);
-	void writeLines(StringList& list);
+	wchar_t readCharacter();
+	std::wstring readLine();
+	StringList readAll();
+	void writeCharacter(wchar_t character);
+	void write(const wchar_t* line);
+	void write(const std::wstring& line);
+	void write(const char* value);
+	void write(const std::string& value);
+	void writeLine(const wchar_t* line);
+	void writeLine(const std::wstring& line);
+	void writeLine(const char* line);
+	void writeLine(const std::string& line);
+	void writeLines(StringList& list);
 
 	template <typename... Args>
 	void writeFormat(const wchar_t* text, const Args&... args)
 	{
-		std::wstring message = formatString(text,args...);
-		write(message);
+		std::wstring message = formatString(text,args...);
+		write(message);
 	}
 
-	bool hasError() { return errorText.size() != 0 && !errorRetrieved; };
-	const std::wstring& getErrorText() { errorRetrieved = true; return errorText; };
+	bool hasError() { return errorText.size() != 0 && !errorRetrieved; };
+	const std::wstring& getErrorText() { errorRetrieved = true; return errorText; };
 private:
-	long tell();
-	void seek(long pos);
+	long tell();
+	void seek(long pos);
 
-	FILE* handle;
-	std::wstring fileName;
-	Encoding encoding;
-	Mode mode;
-	bool recursion;
-	bool guessedEncoding;
-	long size_;
-	std::wstring errorText;
-	bool errorRetrieved;
-	bool fromMemory;
-	std::wstring content;
-	size_t contentPos;
-	int lineCount;
+	FILE* handle;
+	std::wstring fileName;
+	Encoding encoding;
+	Mode mode;
+	bool recursion;
+	bool guessedEncoding;
+	long size_;
+	std::wstring errorText;
+	bool errorRetrieved;
+	bool fromMemory;
+	std::wstring content;
+	size_t contentPos;
+	int lineCount;
 
-	std::string buf;
-	size_t bufPos;
+	std::string buf;
+	size_t bufPos;
 
 	inline unsigned char bufGetChar()
 	{
 		if (buf.size() <= bufPos)
 		{
-			bufFillRead();
+			bufFillRead();
 			if (buf.size() == 0)
-				return 0;
+				return 0;
 		}
-		return buf[bufPos++];
+		return buf[bufPos++];
 	}
 	inline unsigned short bufGet16LE()
 	{
-		char c1 = bufGetChar();
-		char c2 = bufGetChar();
-		return c1 | (c2 << 8);
+		char c1 = bufGetChar();
+		char c2 = bufGetChar();
+		return c1 | (c2 << 8);
 	}
 	inline unsigned short bufGet16BE()
 	{
-		char c1 = bufGetChar();
-		char c2 = bufGetChar();
-		return c2 | (c1 << 8);
+		char c1 = bufGetChar();
+		char c2 = bufGetChar();
+		return c2 | (c1 << 8);
 	}
 
-	void bufPut(const void *p, const size_t len);
-	void bufPut(const char c);
+	void bufPut(const void *p, const size_t len);
+	void bufPut(const char c);
 
-	void bufFillRead();
-	void bufDrainWrite();
-};
+	void bufFillRead();
+	void bufDrainWrite();
+};
 
-wchar_t sjisToUnicode(unsigned short);
-TextFile::Encoding getEncodingFromString(const std::wstring& str);
+wchar_t sjisToUnicode(unsigned short);
+TextFile::Encoding getEncodingFromString(const std::wstring& str);
 
 // file: Util/ByteArray.h
 
 #include <sys/types.h>
 
 #if defined(_MSC_VER) && !defined(ssize_t)
-typedef intptr_t ssize_t;
+typedef intptr_t ssize_t;
 #endif
 
-typedef unsigned char byte;
+typedef unsigned char byte;
 
-enum class Endianness { Big, Little };
+enum class Endianness { Big, Little };
 
 class ByteArray
 {
 public:
-	ByteArray();
-	ByteArray(const ByteArray& other);
-	ByteArray(byte* data, size_t size);
-	ByteArray(ByteArray&& other);
-	~ByteArray();
-	ByteArray& operator=(ByteArray& other);
-	ByteArray& operator=(ByteArray&& other);
+	ByteArray();
+	ByteArray(const ByteArray& other);
+	ByteArray(byte* data, size_t size);
+	ByteArray(ByteArray&& other);
+	~ByteArray();
+	ByteArray& operator=(ByteArray& other);
+	ByteArray& operator=(ByteArray&& other);
 
-	size_t append(const ByteArray& other);
-	size_t append(void* data, size_t size);
-	size_t appendByte(byte b) { return append(&b,1); };
-	void replaceByte(size_t pos, byte b) { data_[pos] = b; };
-	void replaceBytes(size_t pos, byte* data, size_t size);
-	void reserveBytes(size_t count, byte value = 0);
-	void alignSize(size_t alignment);
+	size_t append(const ByteArray& other);
+	size_t append(void* data, size_t size);
+	size_t appendByte(byte b) { return append(&b,1); };
+	void replaceByte(size_t pos, byte b) { data_[pos] = b; };
+	void replaceBytes(size_t pos, byte* data, size_t size);
+	void reserveBytes(size_t count, byte value = 0);
+	void alignSize(size_t alignment);
 
 	int getWord(size_t pos, Endianness endianness = Endianness::Little) const
 	{
-		if (pos+1 >= this->size()) return -1;
-		unsigned char* d = (unsigned char*) this->data();
+		if (pos+1 >= this->size()) return -1;
+		unsigned char* d = (unsigned char*) this->data();
 
 		if (endianness == Endianness::Little)
 		{
-			return d[pos+0] | (d[pos+1] << 8);
+			return d[pos+0] | (d[pos+1] << 8);
 		} else {
-			return d[pos+1] | (d[pos+0] << 8);
+			return d[pos+1] | (d[pos+0] << 8);
 		}
 	}
 
 	int getDoubleWord(size_t pos, Endianness endianness = Endianness::Little) const
 	{
-		if (pos+3 >= this->size()) return -1;
-		unsigned char* d = (unsigned char*) this->data();
+		if (pos+3 >= this->size()) return -1;
+		unsigned char* d = (unsigned char*) this->data();
 
 		if (endianness == Endianness::Little)
 		{
-			return d[pos+0] | (d[pos+1] << 8) | (d[pos+2] << 16) | (d[pos+3] << 24);
+			return d[pos+0] | (d[pos+1] << 8) | (d[pos+2] << 16) | (d[pos+3] << 24);
 		} else {
-			return d[pos+3] | (d[pos+2] << 8) | (d[pos+1] << 16) | (d[pos+0] << 24);
+			return d[pos+3] | (d[pos+2] << 8) | (d[pos+1] << 16) | (d[pos+0] << 24);
 		}
 	}
 
 	void replaceWord(size_t pos, unsigned int w, Endianness endianness = Endianness::Little)
 	{
-		if (pos+1 >= this->size()) return;
-		unsigned char* d = (unsigned char*) this->data();
+		if (pos+1 >= this->size()) return;
+		unsigned char* d = (unsigned char*) this->data();
 
 		if (endianness == Endianness::Little)
 		{
-			d[pos+0] = w & 0xFF;
-			d[pos+1] = (w >> 8) & 0xFF;
+			d[pos+0] = w & 0xFF;
+			d[pos+1] = (w >> 8) & 0xFF;
 		} else {
-			d[pos+0] = (w >> 8) & 0xFF;
-			d[pos+1] = w & 0xFF;
+			d[pos+0] = (w >> 8) & 0xFF;
+			d[pos+1] = w & 0xFF;
 		}
 	}
 
 	void replaceDoubleWord(size_t pos, unsigned int w, Endianness endianness = Endianness::Little)
 	{
-		if (pos+3 >= this->size()) return;
-		unsigned char* d = (unsigned char*) this->data();
+		if (pos+3 >= this->size()) return;
+		unsigned char* d = (unsigned char*) this->data();
 
 		if (endianness == Endianness::Little)
 		{
-			d[pos+0] = w & 0xFF;
-			d[pos+1] = (w >> 8) & 0xFF;
-			d[pos+2] = (w >> 16) & 0xFF;
-			d[pos+3] = (w >> 24) & 0xFF;
+			d[pos+0] = w & 0xFF;
+			d[pos+1] = (w >> 8) & 0xFF;
+			d[pos+2] = (w >> 16) & 0xFF;
+			d[pos+3] = (w >> 24) & 0xFF;
 		} else {
-			d[pos+0] = (w >> 24) & 0xFF;
-			d[pos+1] = (w >> 16) & 0xFF;
-			d[pos+2] = (w >> 8) & 0xFF;
-			d[pos+3] = w & 0xFF;
+			d[pos+0] = (w >> 24) & 0xFF;
+			d[pos+1] = (w >> 16) & 0xFF;
+			d[pos+2] = (w >> 8) & 0xFF;
+			d[pos+3] = w & 0xFF;
 		}
 	}
 
 	byte& operator [](size_t index)
 	{
-		return data_[index];
-	};
+		return data_[index];
+	};
 
 	const byte& operator [](size_t index) const
 	{
-		return data_[index];
-	};
+		return data_[index];
+	};
 
-	size_t size() const { return size_; };
-	byte* data(size_t pos = 0) const { return &data_[pos]; };
-	void clear() { size_ = 0; };
-	void resize(size_t newSize);
-	ByteArray mid(size_t start, ssize_t length = 0);
-	ByteArray left(size_t length) { return mid(0,length); };
-	ByteArray right(size_t length) { return mid(size_-length,length); };
+	size_t size() const { return size_; };
+	byte* data(size_t pos = 0) const { return &data_[pos]; };
+	void clear() { size_ = 0; };
+	void resize(size_t newSize);
+	ByteArray mid(size_t start, ssize_t length = 0);
+	ByteArray left(size_t length) { return mid(0,length); };
+	ByteArray right(size_t length) { return mid(size_-length,length); };
 
-	static ByteArray fromFile(const std::wstring& fileName, long start = 0, size_t size = 0);
-	bool toFile(const std::wstring& fileName);
+	static ByteArray fromFile(const std::wstring& fileName, long start = 0, size_t size = 0);
+	bool toFile(const std::wstring& fileName);
 private:
-	void grow(size_t neededSize);
-	byte* data_;
-	size_t size_;
-	size_t allocatedSize_;
-};
+	void grow(size_t neededSize);
+	byte* data_;
+	size_t size_;
+	size_t allocatedSize_;
+};
 
 // file: Core/FileManager.h
 #include <vector>
@@ -1857,90 +1857,90 @@ private:
 class AssemblerFile
 {
 public:
-	virtual ~AssemblerFile() { };
+	virtual ~AssemblerFile() { };
 
-	virtual bool open(bool onlyCheck) = 0;
-	virtual void close() = 0;
-	virtual bool isOpen() = 0;
-	virtual bool write(void* data, size_t length) = 0;
-	virtual int64_t getVirtualAddress() = 0;
-	virtual int64_t getPhysicalAddress() = 0;
-	virtual int64_t getHeaderSize() = 0;
-	virtual bool seekVirtual(int64_t virtualAddress) = 0;
-	virtual bool seekPhysical(int64_t physicalAddress) = 0;
-	virtual bool getModuleInfo(SymDataModuleInfo& info) { return false; };
-	virtual bool hasFixedVirtualAddress() { return false; };
-	virtual void beginSymData(SymbolData& symData) { };
-	virtual void endSymData(SymbolData& symData) { };
-	virtual const std::wstring& getFileName() = 0;
-};
+	virtual bool open(bool onlyCheck) = 0;
+	virtual void close() = 0;
+	virtual bool isOpen() = 0;
+	virtual bool write(void* data, size_t length) = 0;
+	virtual int64_t getVirtualAddress() = 0;
+	virtual int64_t getPhysicalAddress() = 0;
+	virtual int64_t getHeaderSize() = 0;
+	virtual bool seekVirtual(int64_t virtualAddress) = 0;
+	virtual bool seekPhysical(int64_t physicalAddress) = 0;
+	virtual bool getModuleInfo(SymDataModuleInfo& info) { return false; };
+	virtual bool hasFixedVirtualAddress() { return false; };
+	virtual void beginSymData(SymbolData& symData) { };
+	virtual void endSymData(SymbolData& symData) { };
+	virtual const std::wstring& getFileName() = 0;
+};
 
 class GenericAssemblerFile: public AssemblerFile
 {
 public:
-	GenericAssemblerFile(const std::wstring& fileName, int64_t headerSize, bool overwrite);
-	GenericAssemblerFile(const std::wstring& fileName, const std::wstring& originalFileName, int64_t headerSize);
+	GenericAssemblerFile(const std::wstring& fileName, int64_t headerSize, bool overwrite);
+	GenericAssemblerFile(const std::wstring& fileName, const std::wstring& originalFileName, int64_t headerSize);
 
-	virtual bool open(bool onlyCheck);
-	virtual void close() { if (handle.isOpen()) handle.close(); };
-	virtual bool isOpen() { return handle.isOpen(); };
-	virtual bool write(void* data, size_t length);
-	virtual int64_t getVirtualAddress() { return virtualAddress; };
-	virtual int64_t getPhysicalAddress() { return virtualAddress-headerSize; };
-	virtual int64_t getHeaderSize() { return headerSize; };
-	virtual bool seekVirtual(int64_t virtualAddress);
-	virtual bool seekPhysical(int64_t physicalAddress);
-	virtual bool hasFixedVirtualAddress() { return true; };
+	virtual bool open(bool onlyCheck);
+	virtual void close() { if (handle.isOpen()) handle.close(); };
+	virtual bool isOpen() { return handle.isOpen(); };
+	virtual bool write(void* data, size_t length);
+	virtual int64_t getVirtualAddress() { return virtualAddress; };
+	virtual int64_t getPhysicalAddress() { return virtualAddress-headerSize; };
+	virtual int64_t getHeaderSize() { return headerSize; };
+	virtual bool seekVirtual(int64_t virtualAddress);
+	virtual bool seekPhysical(int64_t physicalAddress);
+	virtual bool hasFixedVirtualAddress() { return true; };
 
-	virtual const std::wstring& getFileName() { return fileName; };
-	const std::wstring& getOriginalFileName() { return originalName; };
-	int64_t getOriginalHeaderSize() { return originalHeaderSize; };
-	void setHeaderSize(int64_t size) { headerSize = size; };
+	virtual const std::wstring& getFileName() { return fileName; };
+	const std::wstring& getOriginalFileName() { return originalName; };
+	int64_t getOriginalHeaderSize() { return originalHeaderSize; };
+	void setHeaderSize(int64_t size) { headerSize = size; };
 
 private:
-	enum Mode { Open, Create, Copy };
+	enum Mode { Open, Create, Copy };
 
-	Mode mode;
-	int64_t originalHeaderSize;
-	int64_t headerSize;
-	int64_t virtualAddress;
-	BinaryFile handle;
-	std::wstring fileName;
-	std::wstring originalName;
-};
+	Mode mode;
+	int64_t originalHeaderSize;
+	int64_t headerSize;
+	int64_t virtualAddress;
+	BinaryFile handle;
+	std::wstring fileName;
+	std::wstring originalName;
+};
 
 
 class FileManager
 {
 public:
-	FileManager();
-	~FileManager();
-	void reset();
-	bool openFile(std::shared_ptr<AssemblerFile> file, bool onlyCheck);
-	void addFile(std::shared_ptr<AssemblerFile> file);
-	bool hasOpenFile() { return activeFile != nullptr; };
-	void closeFile();
-	bool write(void* data, size_t length);
-	bool writeU8(uint8_t data);
-	bool writeU16(uint16_t data);
-	bool writeU32(uint32_t data);
-	bool writeU64(uint64_t data);
-	int64_t getVirtualAddress();
-	int64_t getPhysicalAddress();
-	int64_t getHeaderSize();
-	bool seekVirtual(int64_t virtualAddress);
-	bool seekPhysical(int64_t physicalAddress);
-	bool advanceMemory(size_t bytes);
-	std::shared_ptr<AssemblerFile> getOpenFile() { return activeFile; };
-	void setEndianness(Endianness endianness) { this->endianness = endianness; };
-	Endianness getEndianness() { return endianness; }
+	FileManager();
+	~FileManager();
+	void reset();
+	bool openFile(std::shared_ptr<AssemblerFile> file, bool onlyCheck);
+	void addFile(std::shared_ptr<AssemblerFile> file);
+	bool hasOpenFile() { return activeFile != nullptr; };
+	void closeFile();
+	bool write(void* data, size_t length);
+	bool writeU8(uint8_t data);
+	bool writeU16(uint16_t data);
+	bool writeU32(uint32_t data);
+	bool writeU64(uint64_t data);
+	int64_t getVirtualAddress();
+	int64_t getPhysicalAddress();
+	int64_t getHeaderSize();
+	bool seekVirtual(int64_t virtualAddress);
+	bool seekPhysical(int64_t physicalAddress);
+	bool advanceMemory(size_t bytes);
+	std::shared_ptr<AssemblerFile> getOpenFile() { return activeFile; };
+	void setEndianness(Endianness endianness) { this->endianness = endianness; };
+	Endianness getEndianness() { return endianness; }
 private:
-	bool checkActiveFile();
-	std::vector<std::shared_ptr<AssemblerFile>> files;
-	std::shared_ptr<AssemblerFile> activeFile;
-	Endianness endianness;
-	Endianness ownEndianness;
-};
+	bool checkActiveFile();
+	std::vector<std::shared_ptr<AssemblerFile>> files;
+	std::shared_ptr<AssemblerFile> activeFile;
+	Endianness endianness;
+	Endianness ownEndianness;
+};
 
 // file: Core/ELF/ElfTypes.h
 
@@ -1957,7 +1957,7 @@ enum ElfType
 	ET_CORE        =4,
 	ET_LOPROC =0xFF00,
 	ET_HIPROC =0xFFFF,
-};
+};
 
 // Machine/Architecture
 enum ElfMachine
@@ -1965,7 +1965,7 @@ enum ElfMachine
 	EM_NONE  =0,
 	EM_MIPS  =8,
 	EM_ARM   =40,
-};
+};
 
 // File version
 #define EV_NONE    0
@@ -2041,7 +2041,7 @@ enum ElfSectionFlags
 	SHF_ALLOC     =0x2,
 	SHF_EXECINSTR =0x4,
 	SHF_MASKPROC  =0xF0000000,
-};
+};
 
 // Symbol binding
 #define STB_LOCAL   0
@@ -2119,70 +2119,70 @@ enum ElfSectionFlags
 #define DT_LOPROC   0x70000000
 #define DT_HIPROC   0x7FFFFFFF
 
-typedef unsigned int Elf32_Addr;
-typedef unsigned short Elf32_Half;
-typedef unsigned int Elf32_Off;
-typedef signed int Elf32_Sword;
-typedef unsigned int Elf32_Word;
+typedef unsigned int Elf32_Addr;
+typedef unsigned short Elf32_Half;
+typedef unsigned int Elf32_Off;
+typedef signed int Elf32_Sword;
+typedef unsigned int Elf32_Word;
 
 
 // ELF file header
 struct Elf32_Ehdr
 {
-	unsigned char e_ident[EI_NIDENT];
-	Elf32_Half    e_type;
-	Elf32_Half    e_machine;
-	Elf32_Word    e_version;
-	Elf32_Addr    e_entry;
-	Elf32_Off     e_phoff;
-	Elf32_Off     e_shoff;
-	Elf32_Word    e_flags;
-	Elf32_Half    e_ehsize;
-	Elf32_Half    e_phentsize;
-	Elf32_Half    e_phnum;
-	Elf32_Half    e_shentsize;
-	Elf32_Half    e_shnum;
-	Elf32_Half    e_shstrndx;
-};
+	unsigned char e_ident[EI_NIDENT];
+	Elf32_Half    e_type;
+	Elf32_Half    e_machine;
+	Elf32_Word    e_version;
+	Elf32_Addr    e_entry;
+	Elf32_Off     e_phoff;
+	Elf32_Off     e_shoff;
+	Elf32_Word    e_flags;
+	Elf32_Half    e_ehsize;
+	Elf32_Half    e_phentsize;
+	Elf32_Half    e_phnum;
+	Elf32_Half    e_shentsize;
+	Elf32_Half    e_shnum;
+	Elf32_Half    e_shstrndx;
+};
 
 // Section header
 struct Elf32_Shdr
 {
-	Elf32_Word sh_name;
-	Elf32_Word sh_type;
-	Elf32_Word sh_flags;
-	Elf32_Addr sh_addr;
-	Elf32_Off  sh_offset;
-	Elf32_Word sh_size;
-	Elf32_Word sh_link;
-	Elf32_Word sh_info;
-	Elf32_Word sh_addralign;
-	Elf32_Word sh_entsize;
-};
+	Elf32_Word sh_name;
+	Elf32_Word sh_type;
+	Elf32_Word sh_flags;
+	Elf32_Addr sh_addr;
+	Elf32_Off  sh_offset;
+	Elf32_Word sh_size;
+	Elf32_Word sh_link;
+	Elf32_Word sh_info;
+	Elf32_Word sh_addralign;
+	Elf32_Word sh_entsize;
+};
 
 // Segment header
 struct Elf32_Phdr
 {
-	Elf32_Word p_type;
-	Elf32_Off  p_offset;
-	Elf32_Addr p_vaddr;
-	Elf32_Addr p_paddr;
-	Elf32_Word p_filesz;
-	Elf32_Word p_memsz;
-	Elf32_Word p_flags;
-	Elf32_Word p_align;
-};
+	Elf32_Word p_type;
+	Elf32_Off  p_offset;
+	Elf32_Addr p_vaddr;
+	Elf32_Addr p_paddr;
+	Elf32_Word p_filesz;
+	Elf32_Word p_memsz;
+	Elf32_Word p_flags;
+	Elf32_Word p_align;
+};
 
 // Symbol table entry
 struct Elf32_Sym
 {
-	Elf32_Word    st_name;
-	Elf32_Addr    st_value;
-	Elf32_Word    st_size;
-	unsigned char st_info;
-	unsigned char st_other;
-	Elf32_Half    st_shndx;
-};
+	Elf32_Word    st_name;
+	Elf32_Addr    st_value;
+	Elf32_Word    st_size;
+	unsigned char st_info;
+	unsigned char st_other;
+	Elf32_Half    st_shndx;
+};
 
 #define ELF32_ST_BIND(i)   ((i)>>4)
 #define ELF32_ST_TYPE(i)   ((i)&0xf)
@@ -2191,26 +2191,26 @@ struct Elf32_Sym
 // Relocation entries
 struct Elf32_Rel
 {
-	Elf32_Addr r_offset;
-	Elf32_Word r_info;
+	Elf32_Addr r_offset;
+	Elf32_Word r_info;
 
 	unsigned char getType()
 	{
-		return r_info & 0xFF;
+		return r_info & 0xFF;
 	}
 
 	Elf32_Word getSymbolNum()
 	{
-		return r_info >> 8;
+		return r_info >> 8;
 	}
-};
+};
 
 struct Elf32_Rela
 {
-	Elf32_Addr  r_offset;
-	Elf32_Word  r_info;
-	Elf32_Sword r_addend;
-};
+	Elf32_Addr  r_offset;
+	Elf32_Word  r_info;
+	Elf32_Sword r_addend;
+};
 
 #define ELF32_R_SYM(i) ((i)>>8)
 #define ELF32_R_TYPE(i) ((unsigned char)(i))
@@ -2220,320 +2220,320 @@ struct Elf32_Rela
 
 #include <vector>
 
-enum ElfPart { ELFPART_SEGMENTTABLE, ELFPART_SECTIONTABLE, ELFPART_SEGMENTS, ELFPART_SEGMENTLESSSECTIONS };
+enum ElfPart { ELFPART_SEGMENTTABLE, ELFPART_SECTIONTABLE, ELFPART_SEGMENTS, ELFPART_SEGMENTLESSSECTIONS };
 
-class ElfSegment;
-class ElfSection;
+class ElfSegment;
+class ElfSection;
 
 class ElfFile
 {
 public:
 
-	bool load(const std::wstring&fileName, bool sort);
-	bool load(ByteArray& data, bool sort);
-	void save(const std::wstring&fileName);
+	bool load(const std::wstring&fileName, bool sort);
+	bool load(ByteArray& data, bool sort);
+	void save(const std::wstring&fileName);
 
-	Elf32_Half getType() { return fileHeader.e_type; };
-	Elf32_Half getMachine() { return fileHeader.e_machine; };
+	Elf32_Half getType() { return fileHeader.e_type; };
+	Elf32_Half getMachine() { return fileHeader.e_machine; };
 	Endianness getEndianness()
 	{
-		return fileHeader.e_ident[EI_DATA] == ELFDATA2MSB ? Endianness::Big : Endianness::Little;
+		return fileHeader.e_ident[EI_DATA] == ELFDATA2MSB ? Endianness::Big : Endianness::Little;
 	}
-	size_t getSegmentCount() { return segments.size(); };
-	ElfSegment* getSegment(size_t index) { return segments[index]; };
+	size_t getSegmentCount() { return segments.size(); };
+	ElfSegment* getSegment(size_t index) { return segments[index]; };
 
-	int findSegmentlessSection(const std::string& name);
-	ElfSection* getSegmentlessSection(size_t index) { return segmentlessSections[index]; };
-	size_t getSegmentlessSectionCount() { return segmentlessSections.size(); };
-	ByteArray& getFileData() { return fileData; }
+	int findSegmentlessSection(const std::string& name);
+	ElfSection* getSegmentlessSection(size_t index) { return segmentlessSections[index]; };
+	size_t getSegmentlessSectionCount() { return segmentlessSections.size(); };
+	ByteArray& getFileData() { return fileData; }
 
-	int getSymbolCount();
-	bool getSymbol(Elf32_Sym& symbol, size_t index);
-	const char* getStrTableString(size_t pos);
+	int getSymbolCount();
+	bool getSymbol(Elf32_Sym& symbol, size_t index);
+	const char* getStrTableString(size_t pos);
 private:
-	void loadElfHeader();
-	void writeHeader(ByteArray& data, int pos, Endianness endianness);
-	void loadProgramHeader(Elf32_Phdr& header, ByteArray& data, int pos);
-	void loadSectionHeader(Elf32_Shdr& header, ByteArray& data, int pos);
-	void loadSectionNames();
-	void determinePartOrder();
+	void loadElfHeader();
+	void writeHeader(ByteArray& data, int pos, Endianness endianness);
+	void loadProgramHeader(Elf32_Phdr& header, ByteArray& data, int pos);
+	void loadSectionHeader(Elf32_Shdr& header, ByteArray& data, int pos);
+	void loadSectionNames();
+	void determinePartOrder();
 
-	Elf32_Ehdr fileHeader;
-	std::vector<ElfSegment*> segments;
-	std::vector<ElfSection*> sections;
-	std::vector<ElfSection*> segmentlessSections;
-	ByteArray fileData;
-	ElfPart partsOrder[4];
+	Elf32_Ehdr fileHeader;
+	std::vector<ElfSegment*> segments;
+	std::vector<ElfSection*> sections;
+	std::vector<ElfSection*> segmentlessSections;
+	ByteArray fileData;
+	ElfPart partsOrder[4];
 
-	ElfSection* symTab;
-	ElfSection* strTab;
-};
+	ElfSection* symTab;
+	ElfSection* strTab;
+};
 
 
 class ElfSection
 {
 public:
-	ElfSection(Elf32_Shdr header);
-	void setName(std::string& name) { this->name = name; };
-	const std::string& getName() { return name; };
-	void setData(ByteArray& data) { this->data = data; };
-	void setOwner(ElfSegment* segment);
-	bool hasOwner() { return owner != nullptr; };
-	void writeHeader(ByteArray& data, int pos, Endianness endianness);
-	void writeData(ByteArray& output);
-	void setOffsetBase(int base);
-	ByteArray& getData() { return data; };
+	ElfSection(Elf32_Shdr header);
+	void setName(std::string& name) { this->name = name; };
+	const std::string& getName() { return name; };
+	void setData(ByteArray& data) { this->data = data; };
+	void setOwner(ElfSegment* segment);
+	bool hasOwner() { return owner != nullptr; };
+	void writeHeader(ByteArray& data, int pos, Endianness endianness);
+	void writeData(ByteArray& output);
+	void setOffsetBase(int base);
+	ByteArray& getData() { return data; };
 
-	Elf32_Word getType() { return header.sh_type; };
-	Elf32_Off getOffset() { return header.sh_offset; };
-	Elf32_Word getSize() { return header.sh_size; };
-	Elf32_Word getNameOffset() { return header.sh_name; };
-	Elf32_Word getAlignment() { return header.sh_addralign; };
-	Elf32_Addr getAddress() { return header.sh_addr; };
-	Elf32_Half getInfo() { return header.sh_info; };
-	Elf32_Word getFlags() { return header.sh_flags; };
+	Elf32_Word getType() { return header.sh_type; };
+	Elf32_Off getOffset() { return header.sh_offset; };
+	Elf32_Word getSize() { return header.sh_size; };
+	Elf32_Word getNameOffset() { return header.sh_name; };
+	Elf32_Word getAlignment() { return header.sh_addralign; };
+	Elf32_Addr getAddress() { return header.sh_addr; };
+	Elf32_Half getInfo() { return header.sh_info; };
+	Elf32_Word getFlags() { return header.sh_flags; };
 private:
-	Elf32_Shdr header;
-	std::string name;
-	ByteArray data;
-	ElfSegment* owner;
-};
+	Elf32_Shdr header;
+	std::string name;
+	ByteArray data;
+	ElfSegment* owner;
+};
 
 class ElfSegment
 {
 public:
-	ElfSegment(Elf32_Phdr header, ByteArray& segmentData);
-	bool isSectionPartOf(ElfSection* section);
-	void addSection(ElfSection* section);
-	Elf32_Off getOffset() { return header.p_offset; };
-	Elf32_Word getPhysSize() { return header.p_filesz; };
-	Elf32_Word getType() { return header.p_type; };
-	Elf32_Addr getVirtualAddress() { return header.p_vaddr; };
-	size_t getSectionCount() { return sections.size(); };
-	void writeHeader(ByteArray& data, int pos, Endianness endianness);
-	void writeData(ByteArray& output);
-	void splitSections();
+	ElfSegment(Elf32_Phdr header, ByteArray& segmentData);
+	bool isSectionPartOf(ElfSection* section);
+	void addSection(ElfSection* section);
+	Elf32_Off getOffset() { return header.p_offset; };
+	Elf32_Word getPhysSize() { return header.p_filesz; };
+	Elf32_Word getType() { return header.p_type; };
+	Elf32_Addr getVirtualAddress() { return header.p_vaddr; };
+	size_t getSectionCount() { return sections.size(); };
+	void writeHeader(ByteArray& data, int pos, Endianness endianness);
+	void writeData(ByteArray& output);
+	void splitSections();
 
-	int findSection(const std::string& name);
-	ElfSection* getSection(size_t index) { return sections[index]; };
-	void writeToData(size_t offset, void* data, size_t size);
-	void sortSections();
+	int findSection(const std::string& name);
+	ElfSection* getSection(size_t index) { return sections[index]; };
+	void writeToData(size_t offset, void* data, size_t size);
+	void sortSections();
 private:
-	Elf32_Phdr header;
-	ByteArray data;
-	std::vector<ElfSection*> sections;
-	ElfSection* paddrSection;
-};
+	Elf32_Phdr header;
+	ByteArray data;
+	std::vector<ElfSection*> sections;
+	ElfSection* paddrSection;
+};
 
 struct RelocationData
 {
-	int64_t opcodeOffset;
-	int64_t relocationBase;
-	uint32_t opcode;
+	int64_t opcodeOffset;
+	int64_t relocationBase;
+	uint32_t opcode;
 
-	int64_t symbolAddress;
-	int targetSymbolType;
-	int targetSymbolInfo;
-};
+	int64_t symbolAddress;
+	int targetSymbolType;
+	int targetSymbolInfo;
+};
 
 // file: Core/ELF/ElfRelocator.h
 
 struct ElfRelocatorCtor
 {
-	std::wstring symbolName;
-	size_t size;
-};
+	std::wstring symbolName;
+	size_t size;
+};
 
 struct RelocationAction
 {
 	RelocationAction(int64_t offset, uint32_t newValue) : offset(offset), newValue(newValue) {}
-	int64_t offset;
-	uint32_t newValue;
-};
+	int64_t offset;
+	uint32_t newValue;
+};
 
-class CAssemblerCommand;
-class Parser;
+class CAssemblerCommand;
+class Parser;
 
 class IElfRelocator
 {
 public:
-	virtual ~IElfRelocator() {};
-	virtual int expectedMachine() const = 0;
-	virtual bool isDummyRelocationType(int type) const { return false; }
-	virtual bool relocateOpcode(int type, const RelocationData& data, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) = 0;
-	virtual bool finish(std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) { return true; }
-	virtual void setSymbolAddress(RelocationData& data, int64_t symbolAddress, int symbolType) = 0;
+	virtual ~IElfRelocator() {};
+	virtual int expectedMachine() const = 0;
+	virtual bool isDummyRelocationType(int type) const { return false; }
+	virtual bool relocateOpcode(int type, const RelocationData& data, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) = 0;
+	virtual bool finish(std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) { return true; }
+	virtual void setSymbolAddress(RelocationData& data, int64_t symbolAddress, int symbolType) = 0;
 
-	virtual std::unique_ptr<CAssemblerCommand> generateCtorStub(std::vector<ElfRelocatorCtor>& ctors) { return nullptr; }
-};
+	virtual std::unique_ptr<CAssemblerCommand> generateCtorStub(std::vector<ElfRelocatorCtor>& ctors) { return nullptr; }
+};
 
 
-class Label;
+class Label;
 
 struct ElfRelocatorSection
 {
-	ElfSection* section;
-	size_t index;
-	ElfSection* relSection;
-	std::shared_ptr<Label> label;
-};
+	ElfSection* section;
+	size_t index;
+	ElfSection* relSection;
+	std::shared_ptr<Label> label;
+};
 
 struct ElfRelocatorSymbol
 {
-	std::shared_ptr<Label> label;
-	std::wstring name;
-	int64_t relativeAddress;
-	int64_t relocatedAddress;
-	size_t section;
-	size_t size;
-	int type;
-};
+	std::shared_ptr<Label> label;
+	std::wstring name;
+	int64_t relativeAddress;
+	int64_t relocatedAddress;
+	size_t section;
+	size_t size;
+	int type;
+};
 
 struct ElfRelocatorFile
 {
-	ElfFile* elf;
-	std::vector<ElfRelocatorSection> sections;
-	std::vector<ElfRelocatorSymbol> symbols;
-	std::wstring name;
-};
+	ElfFile* elf;
+	std::vector<ElfRelocatorSection> sections;
+	std::vector<ElfRelocatorSymbol> symbols;
+	std::wstring name;
+};
 
 class ElfRelocator
 {
 public:
-	bool init(const std::wstring& inputName);
-	bool exportSymbols();
-	void writeSymbols(SymbolData& symData) const;
-	std::unique_ptr<CAssemblerCommand> generateCtor(const std::wstring& ctorName);
-	bool relocate(int64_t& memoryAddress);
-	bool hasDataChanged() { return dataChanged; };
-	const ByteArray& getData() const { return outputData; };
+	bool init(const std::wstring& inputName);
+	bool exportSymbols();
+	void writeSymbols(SymbolData& symData) const;
+	std::unique_ptr<CAssemblerCommand> generateCtor(const std::wstring& ctorName);
+	bool relocate(int64_t& memoryAddress);
+	bool hasDataChanged() { return dataChanged; };
+	const ByteArray& getData() const { return outputData; };
 private:
-	bool relocateFile(ElfRelocatorFile& file, int64_t& relocationAddress);
-	void loadRelocation(Elf32_Rel& rel, ByteArray& data, int offset, Endianness endianness);
+	bool relocateFile(ElfRelocatorFile& file, int64_t& relocationAddress);
+	void loadRelocation(Elf32_Rel& rel, ByteArray& data, int offset, Endianness endianness);
 
-	ByteArray outputData;
-	std::unique_ptr<IElfRelocator> relocator;
-	std::vector<ElfRelocatorFile> files;
-	std::vector<ElfRelocatorCtor> ctors;
-	bool dataChanged;
-};
+	ByteArray outputData;
+	std::unique_ptr<IElfRelocator> relocator;
+	std::vector<ElfRelocatorFile> files;
+	std::vector<ElfRelocatorCtor> ctors;
+	bool dataChanged;
+};
 
 // file: Archs/Architecture.h
 
-class Tokenizer;
-class Parser;
+class Tokenizer;
+class Parser;
 
 class CArchitecture
 {
 public:
-	virtual std::unique_ptr<CAssemblerCommand> parseDirective(Parser& parser) { return nullptr; }
-	virtual std::unique_ptr<CAssemblerCommand> parseOpcode(Parser& parser) { return nullptr; }
-	virtual const ExpressionFunctionMap& getExpressionFunctions() { return emptyMap; }
-	virtual void NextSection() = 0;
-	virtual void Pass2() = 0;
-	virtual void Revalidate() = 0;
-	virtual std::unique_ptr<IElfRelocator> getElfRelocator() = 0;
-	virtual Endianness getEndianness() = 0;
+	virtual std::unique_ptr<CAssemblerCommand> parseDirective(Parser& parser) { return nullptr; }
+	virtual std::unique_ptr<CAssemblerCommand> parseOpcode(Parser& parser) { return nullptr; }
+	virtual const ExpressionFunctionMap& getExpressionFunctions() { return emptyMap; }
+	virtual void NextSection() = 0;
+	virtual void Pass2() = 0;
+	virtual void Revalidate() = 0;
+	virtual std::unique_ptr<IElfRelocator> getElfRelocator() = 0;
+	virtual Endianness getEndianness() = 0;
 private:
-	const ExpressionFunctionMap emptyMap = {};
-};
+	const ExpressionFunctionMap emptyMap = {};
+};
 
 class ArchitectureCommand: public CAssemblerCommand
 {
 public:
-	ArchitectureCommand(const std::wstring& tempText, const std::wstring& symText);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	ArchitectureCommand(const std::wstring& tempText, const std::wstring& symText);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	int64_t position;
-	Endianness endianness;
-	std::wstring tempText;
-	std::wstring symText;
-};
+	int64_t position;
+	Endianness endianness;
+	std::wstring tempText;
+	std::wstring symText;
+};
 
 class CInvalidArchitecture: public CArchitecture
 {
 public:
-	virtual void NextSection();
-	virtual void Pass2();
-	virtual void Revalidate();
-	virtual std::unique_ptr<IElfRelocator> getElfRelocator();
-	virtual Endianness getEndianness() { return Endianness::Little; }
-};
+	virtual void NextSection();
+	virtual void Pass2();
+	virtual void Revalidate();
+	virtual std::unique_ptr<IElfRelocator> getElfRelocator();
+	virtual Endianness getEndianness() { return Endianness::Little; }
+};
 
-extern CInvalidArchitecture InvalidArchitecture;
+extern CInvalidArchitecture InvalidArchitecture;
 
 // file: Archs/MIPS/Mips.h
 
-enum MipsArchType { MARCH_PSX = 0, MARCH_N64, MARCH_PS2, MARCH_PSP, MARCH_RSP, MARCH_INVALID };
+enum MipsArchType { MARCH_PSX = 0, MARCH_N64, MARCH_PS2, MARCH_PSP, MARCH_RSP, MARCH_INVALID };
 
 class CMipsArchitecture: public CArchitecture
 {
 public:
-	CMipsArchitecture();
-	virtual std::unique_ptr<CAssemblerCommand> parseDirective(Parser& parser);
-	virtual std::unique_ptr<CAssemblerCommand> parseOpcode(Parser& parser);
-	virtual const ExpressionFunctionMap& getExpressionFunctions();
-	virtual void NextSection();
-	virtual void Pass2() { return; };
-	virtual void Revalidate();
-	virtual std::unique_ptr<IElfRelocator> getElfRelocator();
+	CMipsArchitecture();
+	virtual std::unique_ptr<CAssemblerCommand> parseDirective(Parser& parser);
+	virtual std::unique_ptr<CAssemblerCommand> parseOpcode(Parser& parser);
+	virtual const ExpressionFunctionMap& getExpressionFunctions();
+	virtual void NextSection();
+	virtual void Pass2() { return; };
+	virtual void Revalidate();
+	virtual std::unique_ptr<IElfRelocator> getElfRelocator();
 	virtual Endianness getEndianness()
 	{
-		return Version == MARCH_N64 || Version == MARCH_RSP ? Endianness::Big : Endianness::Little;
-	};
-	void SetLoadDelay(bool Delay, int Register);
-	bool GetLoadDelay() { return LoadDelay; };
-	int GetLoadDelayRegister() { return LoadDelayRegister; };
-	bool GetIgnoreDelay() { return IgnoreLoadDelay; };
-	void SetIgnoreDelay(bool b) { IgnoreLoadDelay = b; };
-	void SetFixLoadDelay(bool b) { FixLoadDelay = b; };
-	bool GetFixLoadDelay() { return FixLoadDelay; };
-	void SetVersion(MipsArchType v) { Version = v; };
-	MipsArchType GetVersion() { return Version; };
-	bool GetDelaySlot() { return DelaySlot; };
-	void SetDelaySlot(bool b) {DelaySlot = b; };
-	bool hasLoadDelay() { return Version == MARCH_PSX; };
+		return Version == MARCH_N64 || Version == MARCH_RSP ? Endianness::Big : Endianness::Little;
+	};
+	void SetLoadDelay(bool Delay, int Register);
+	bool GetLoadDelay() { return LoadDelay; };
+	int GetLoadDelayRegister() { return LoadDelayRegister; };
+	bool GetIgnoreDelay() { return IgnoreLoadDelay; };
+	void SetIgnoreDelay(bool b) { IgnoreLoadDelay = b; };
+	void SetFixLoadDelay(bool b) { FixLoadDelay = b; };
+	bool GetFixLoadDelay() { return FixLoadDelay; };
+	void SetVersion(MipsArchType v) { Version = v; };
+	MipsArchType GetVersion() { return Version; };
+	bool GetDelaySlot() { return DelaySlot; };
+	void SetDelaySlot(bool b) {DelaySlot = b; };
+	bool hasLoadDelay() { return Version == MARCH_PSX; };
 private:
-	bool FixLoadDelay;
-	bool IgnoreLoadDelay;
-	bool LoadDelay;
-	int LoadDelayRegister;
-	bool DelaySlot;
-	MipsArchType Version;
-};
+	bool FixLoadDelay;
+	bool IgnoreLoadDelay;
+	bool LoadDelay;
+	int LoadDelayRegister;
+	bool DelaySlot;
+	MipsArchType Version;
+};
 
 typedef struct {
-	const char* name;
-	short num;
-	short len;
-} tMipsRegister;
+	const char* name;
+	short num;
+	short len;
+} tMipsRegister;
 
 typedef struct {
-	char name[5];
-	short num;
-} MipsRegisterInfo;
+	char name[5];
+	short num;
+} MipsRegisterInfo;
 
-enum MipsVfpuType { MIPSVFPU_VECTOR, MIPSVFPU_MATRIX };
+enum MipsVfpuType { MIPSVFPU_VECTOR, MIPSVFPU_MATRIX };
 
 struct MipsVFPURegister
 {
-	MipsVfpuType type;
-	int num;
-	char name[8];
-};
+	MipsVfpuType type;
+	int num;
+	char name[8];
+};
 
-extern const tMipsRegister MipsRegister[];
-extern CMipsArchitecture Mips;
+extern const tMipsRegister MipsRegister[];
+extern CMipsArchitecture Mips;
 
-bool MipsGetRegister(const char* source, int& RetLen, MipsRegisterInfo& Result);
-int MipsGetRegister(const char* source, int& RetLen);
-bool MipsGetFloatRegister(const char* source, int& RetLen, MipsRegisterInfo& Result);
-bool MipsGetPs2VectorRegister(const char* source, int& RetLen, MipsRegisterInfo& Result);
-int MipsGetFloatRegister(const char* source, int& RetLen);
-bool MipsCheckImmediate(const char* Source, Expression& Dest, int& RetLen);
+bool MipsGetRegister(const char* source, int& RetLen, MipsRegisterInfo& Result);
+int MipsGetRegister(const char* source, int& RetLen);
+bool MipsGetFloatRegister(const char* source, int& RetLen, MipsRegisterInfo& Result);
+bool MipsGetPs2VectorRegister(const char* source, int& RetLen, MipsRegisterInfo& Result);
+int MipsGetFloatRegister(const char* source, int& RetLen);
+bool MipsCheckImmediate(const char* Source, Expression& Dest, int& RetLen);
 
 
 // file: Archs/MIPS/MipsOpcodes.h
@@ -2635,23 +2635,23 @@ bool MipsCheckImmediate(const char* Source, Expression& Dest, int& RetLen);
 
 struct MipsArchDefinition
 {
-	const char* name;
-	int supportSets;
-	int excludeMask;
-	int flags;
-};
+	const char* name;
+	int supportSets;
+	int excludeMask;
+	int flags;
+};
 
-extern const MipsArchDefinition mipsArchs[];
+extern const MipsArchDefinition mipsArchs[];
 
 typedef struct {
-	const char* name;
-	const char* encoding;
-	int destencoding;
-	int archs;
-	int flags;
-} tMipsOpcode;
+	const char* name;
+	const char* encoding;
+	int destencoding;
+	int archs;
+	int flags;
+} tMipsOpcode;
 
-extern const tMipsOpcode MipsOpcodes[];
+extern const tMipsOpcode MipsOpcodes[];
 
 // file: Archs/MIPS/CMipsInstruction.h
 
@@ -2672,7 +2672,7 @@ enum class MipsRegisterType
 	RspVectorElement,
 	RspScalarElement,
 	RspOffsetElement
-};
+};
 
 enum class MipsImmediateType
 {
@@ -2690,114 +2690,114 @@ enum class MipsImmediateType
 	Ext,
 	Ins,
 	Cop2BranchType
-};
+};
 
 struct MipsRegisterValue
 {
-	MipsRegisterType type;
-	std::wstring name;
-	int num;
-};
+	MipsRegisterType type;
+	std::wstring name;
+	int num;
+};
 
 struct MipsRegisterData {
-	MipsRegisterValue grs;			// general source reg
-	MipsRegisterValue grt;			// general target reg
-	MipsRegisterValue grd;			// general dest reg
+	MipsRegisterValue grs;			// general source reg
+	MipsRegisterValue grt;			// general target reg
+	MipsRegisterValue grd;			// general dest reg
 
-	MipsRegisterValue frs;			// float source reg
-	MipsRegisterValue frt;			// float target reg
-	MipsRegisterValue frd;			// float dest reg
+	MipsRegisterValue frs;			// float source reg
+	MipsRegisterValue frt;			// float target reg
+	MipsRegisterValue frd;			// float dest reg
 
-	MipsRegisterValue ps2vrs;		// ps2 vector source reg
-	MipsRegisterValue ps2vrt;		// ps2 vector target reg
-	MipsRegisterValue ps2vrd;		// ps2 vector dest reg
+	MipsRegisterValue ps2vrs;		// ps2 vector source reg
+	MipsRegisterValue ps2vrt;		// ps2 vector target reg
+	MipsRegisterValue ps2vrd;		// ps2 vector dest reg
 
-	MipsRegisterValue rspvrs;		// rsp vector source reg
-	MipsRegisterValue rspvrt;		// rsp vector target reg
-	MipsRegisterValue rspvrd;		// rsp vector dest reg
-	MipsRegisterValue rspve;		// rsp vector element reg
-	MipsRegisterValue rspvde;		// rsp vector dest element reg
-	MipsRegisterValue rspvealt;		// rsp vector element reg (alt. placement)
+	MipsRegisterValue rspvrs;		// rsp vector source reg
+	MipsRegisterValue rspvrt;		// rsp vector target reg
+	MipsRegisterValue rspvrd;		// rsp vector dest reg
+	MipsRegisterValue rspve;		// rsp vector element reg
+	MipsRegisterValue rspvde;		// rsp vector dest element reg
+	MipsRegisterValue rspvealt;		// rsp vector element reg (alt. placement)
 
-	MipsRegisterValue vrs;			// vfpu source reg
-	MipsRegisterValue vrt;			// vfpu target reg
-	MipsRegisterValue vrd;			// vfpu dest reg
+	MipsRegisterValue vrs;			// vfpu source reg
+	MipsRegisterValue vrt;			// vfpu target reg
+	MipsRegisterValue vrd;			// vfpu dest reg
 
 	void reset()
 	{
-		grs.num = grt.num = grd.num = -1;
-		frs.num = frt.num = frd.num = -1;
-		vrs.num = vrt.num = vrd.num = -1;
-		ps2vrs.num = ps2vrt.num = ps2vrd.num = -1;
-		rspvrs.num = rspvrt.num = rspvrd.num = -1;
-		rspve.num = rspvde.num = rspvealt.num = -1;
+		grs.num = grt.num = grd.num = -1;
+		frs.num = frt.num = frd.num = -1;
+		vrs.num = vrt.num = vrd.num = -1;
+		ps2vrs.num = ps2vrt.num = ps2vrd.num = -1;
+		rspvrs.num = rspvrt.num = rspvrd.num = -1;
+		rspve.num = rspvde.num = rspvealt.num = -1;
 	}
-};
+};
 
 struct MipsImmediateData
 {
 	struct
 	{
-		MipsImmediateType type;
-		Expression expression;
-		int value;
-		int originalValue;
-	} primary;
+		MipsImmediateType type;
+		Expression expression;
+		int value;
+		int originalValue;
+	} primary;
 
 	struct
 	{
-		MipsImmediateType type;
-		Expression expression;
-		int value;
-		int originalValue;
-	} secondary;
+		MipsImmediateType type;
+		Expression expression;
+		int value;
+		int originalValue;
+	} secondary;
 
 	void reset()
 	{
-		primary.type = MipsImmediateType::None;
+		primary.type = MipsImmediateType::None;
 		if (primary.expression.isLoaded())
-			primary.expression = Expression();
+			primary.expression = Expression();
 
-		secondary.type = MipsImmediateType::None;
+		secondary.type = MipsImmediateType::None;
 		if (secondary.expression.isLoaded())
-			secondary.expression = Expression();
+			secondary.expression = Expression();
 	}
-};
+};
 
 struct MipsOpcodeData
 {
-	tMipsOpcode opcode;
-	int vfpuSize;
-	int vectorCondition;
+	tMipsOpcode opcode;
+	int vfpuSize;
+	int vectorCondition;
 
 	void reset()
 	{
-		vfpuSize = vectorCondition = -1;
+		vfpuSize = vectorCondition = -1;
 	}
-};
+};
 
 class CMipsInstruction: public CAssemblerCommand
 {
 public:
-	CMipsInstruction(MipsOpcodeData& opcode, MipsImmediateData& immediate, MipsRegisterData& registers);
-	~CMipsInstruction();
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
+	CMipsInstruction(MipsOpcodeData& opcode, MipsImmediateData& immediate, MipsRegisterData& registers);
+	~CMipsInstruction();
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
 private:
-	void encodeNormal() const;
-	void encodeVfpu() const;
-	int floatToHalfFloat(int i);
+	void encodeNormal() const;
+	void encodeVfpu() const;
+	int floatToHalfFloat(int i);
 
-	bool IgnoreLoadDelay;
-	int64_t RamPos;
-	bool addNop;
+	bool IgnoreLoadDelay;
+	int64_t RamPos;
+	bool addNop;
 
 	// opcode variables
-	MipsOpcodeData opcodeData;
-	MipsImmediateData immediateData;
-	MipsRegisterData registerData;
-};
+	MipsOpcodeData opcodeData;
+	MipsImmediateData immediateData;
+	MipsRegisterData registerData;
+};
 
 // file: Util/EncodingTable.h
 #include <map>
@@ -2805,61 +2805,61 @@ private:
 class Trie
 {
 public:
-	Trie();
-	void insert(const wchar_t* text, size_t value);
-	void insert(wchar_t character, size_t value);
-	bool findLongestPrefix(const wchar_t* text, size_t& result);
+	Trie();
+	void insert(const wchar_t* text, size_t value);
+	void insert(wchar_t character, size_t value);
+	bool findLongestPrefix(const wchar_t* text, size_t& result);
 private:
 	struct LookupEntry
 	{
-		size_t node;
-		wchar_t input;
+		size_t node;
+		wchar_t input;
 
 		bool operator<(const LookupEntry& other) const
 		{
 			if (node != other.node)
-				return node < other.node;
-			return input < other.input;
+				return node < other.node;
+			return input < other.input;
 		}
-	};
+	};
 
 	struct Node
 	{
-		size_t index;
-		bool hasValue;
-		size_t value;
-	};
+		size_t index;
+		bool hasValue;
+		size_t value;
+	};
 
-	std::vector<Node> nodes;
-	std::map<LookupEntry,size_t> lookup;
-};
+	std::vector<Node> nodes;
+	std::map<LookupEntry,size_t> lookup;
+};
 
 class EncodingTable
 {
 public:
-	EncodingTable();
-	~EncodingTable();
-	void clear();
-	bool load(const std::wstring& fileName, TextFile::Encoding encoding = TextFile::GUESS);
-	bool isLoaded() { return entries.size() != 0; };
-	void addEntry(unsigned char* hex, size_t hexLength, const std::wstring& value);
-	void addEntry(unsigned char* hex, size_t hexLength, wchar_t value);
-	void setTerminationEntry(unsigned char* hex, size_t hexLength);
-	ByteArray encodeString(const std::wstring& str, bool writeTermination = true);
-	ByteArray encodeTermination();
+	EncodingTable();
+	~EncodingTable();
+	void clear();
+	bool load(const std::wstring& fileName, TextFile::Encoding encoding = TextFile::GUESS);
+	bool isLoaded() { return entries.size() != 0; };
+	void addEntry(unsigned char* hex, size_t hexLength, const std::wstring& value);
+	void addEntry(unsigned char* hex, size_t hexLength, wchar_t value);
+	void setTerminationEntry(unsigned char* hex, size_t hexLength);
+	ByteArray encodeString(const std::wstring& str, bool writeTermination = true);
+	ByteArray encodeTermination();
 private:
 	struct TableEntry
 	{
-		size_t hexPos;
-		size_t hexLen;
-		size_t valueLen;
-	};
+		size_t hexPos;
+		size_t hexLen;
+		size_t valueLen;
+	};
 
-	ByteArray hexData;
-	std::vector<TableEntry> entries;
-	Trie lookup;
-	TableEntry terminationEntry;
-};
+	ByteArray hexData;
+	std::vector<TableEntry> entries;
+	Trie lookup;
+	TableEntry terminationEntry;
+};
 
 // file: Core/Misc.h
 #include <vector>
@@ -2867,88 +2867,88 @@ private:
 class Logger
 {
 public:
-	enum ErrorType { Warning, Error, FatalError, Notice };
+	enum ErrorType { Warning, Error, FatalError, Notice };
 
-	static void clear();
-	static void printLine(const std::wstring& text);
-	static void printLine(const std::string& text);
+	static void clear();
+	static void printLine(const std::wstring& text);
+	static void printLine(const std::string& text);
 
 	template <typename... Args>
 	static void printLine(const wchar_t* text, const Args&... args)
 	{
-		std::wstring message = formatString(text,args...);
-		printLine(message);
+		std::wstring message = formatString(text,args...);
+		printLine(message);
 	}
 
-	static void print(const std::wstring& text);
+	static void print(const std::wstring& text);
 
 	template <typename... Args>
 	static void print(const wchar_t* text, const Args&... args)
 	{
-		std::wstring message = formatString(text,args...);
-		print(message);
+		std::wstring message = formatString(text,args...);
+		print(message);
 	}
 
-	static void printError(ErrorType type, const std::wstring& text);
-	static void printError(ErrorType type, const wchar_t* text);
-	static void queueError(ErrorType type, const std::wstring& text);
-	static void queueError(ErrorType type, const wchar_t* text);
+	static void printError(ErrorType type, const std::wstring& text);
+	static void printError(ErrorType type, const wchar_t* text);
+	static void queueError(ErrorType type, const std::wstring& text);
+	static void queueError(ErrorType type, const wchar_t* text);
 
 	template <typename... Args>
 	static void printError(ErrorType type, const wchar_t* text, const Args&... args)
 	{
-		std::wstring message = formatString(text,args...);
-		printError(type,message);
+		std::wstring message = formatString(text,args...);
+		printError(type,message);
 	}
 
 	template <typename... Args>
 	static void queueError(ErrorType type, const wchar_t* text, const Args&... args)
 	{
-		std::wstring message = formatString(text,args...);
-		queueError(type,message);
+		std::wstring message = formatString(text,args...);
+		queueError(type,message);
 	}
 
-	static void printQueue();
-	static void clearQueue() { queue.clear(); };
-	static StringList getErrors() { return errors; };
-	static bool hasError() { return error; };
-	static bool hasFatalError() { return fatalError; };
-	static void setErrorOnWarning(bool b) { errorOnWarning = b; };
-	static void setSilent(bool b) { silent = b; };
-	static bool isSilent() { return silent; }
-	static void suppressErrors() { ++suppressLevel; }
-	static void unsuppressErrors() { if (suppressLevel) --suppressLevel; }
+	static void printQueue();
+	static void clearQueue() { queue.clear(); };
+	static StringList getErrors() { return errors; };
+	static bool hasError() { return error; };
+	static bool hasFatalError() { return fatalError; };
+	static void setErrorOnWarning(bool b) { errorOnWarning = b; };
+	static void setSilent(bool b) { silent = b; };
+	static bool isSilent() { return silent; }
+	static void suppressErrors() { ++suppressLevel; }
+	static void unsuppressErrors() { if (suppressLevel) --suppressLevel; }
 private:
-	static std::wstring formatError(ErrorType type, const wchar_t* text);
-	static void setFlags(ErrorType type);
+	static std::wstring formatError(ErrorType type, const wchar_t* text);
+	static void setFlags(ErrorType type);
 
 	struct QueueEntry
 	{
-		ErrorType type;
-		std::wstring text;
-	};
+		ErrorType type;
+		std::wstring text;
+	};
 
-	static std::vector<QueueEntry> queue;
-	static std::vector<std::wstring> errors;
-	static bool error;
-	static bool fatalError;
-	static bool errorOnWarning;
-	static bool silent;
-	static int suppressLevel;
-};
+	static std::vector<QueueEntry> queue;
+	static std::vector<std::wstring> errors;
+	static bool error;
+	static bool fatalError;
+	static bool errorOnWarning;
+	static bool silent;
+	static int suppressLevel;
+};
 
 class TempData
 {
 public:
-	void setFileName(const std::wstring& name) { file.setFileName(name); };
-	void clear() { file.setFileName(L""); }
-	void start();
-	void end();
-	void writeLine(int64_t memoryAddress, const std::wstring& text);
-	bool isOpen() { return file.isOpen(); }
+	void setFileName(const std::wstring& name) { file.setFileName(name); };
+	void clear() { file.setFileName(L""); }
+	void start();
+	void end();
+	void writeLine(int64_t memoryAddress, const std::wstring& text);
+	bool isOpen() { return file.isOpen(); }
 private:
-	TextFile file;
-};
+	TextFile file;
+};
 
 // file: Core/Assembler.h
 
@@ -2956,54 +2956,54 @@ private:
 #define ARMIPS_VERSION_MINOR    11
 #define ARMIPS_VERSION_REVISION 0
 
-enum class ArmipsMode { FILE, MEMORY };
+enum class ArmipsMode { FILE, MEMORY };
 
 struct LabelDefinition
 {
-	std::wstring originalName;
-	std::wstring name;
-	int64_t value;
-};
+	std::wstring originalName;
+	std::wstring name;
+	int64_t value;
+};
 
 struct EquationDefinition
 {
-	std::wstring name;
-	std::wstring value;
-};
+	std::wstring name;
+	std::wstring value;
+};
 
 struct ArmipsArguments
 {
 	// common
-	ArmipsMode mode;
-	int symFileVersion;
-	bool errorOnWarning;
-	bool silent;
-	StringList* errorsResult;
-	std::vector<EquationDefinition> equList;
-	std::vector<LabelDefinition> labels;
+	ArmipsMode mode;
+	int symFileVersion;
+	bool errorOnWarning;
+	bool silent;
+	StringList* errorsResult;
+	std::vector<EquationDefinition> equList;
+	std::vector<LabelDefinition> labels;
 
 	// file mode
-	std::wstring inputFileName;
-	std::wstring tempFileName;
-	std::wstring symFileName;
-	bool useAbsoluteFileNames;
+	std::wstring inputFileName;
+	std::wstring tempFileName;
+	std::wstring symFileName;
+	bool useAbsoluteFileNames;
 
 	// memory mode
-	std::shared_ptr<AssemblerFile> memoryFile;
-	std::wstring content;
+	std::shared_ptr<AssemblerFile> memoryFile;
+	std::wstring content;
 
 	ArmipsArguments()
 	{
-		mode = ArmipsMode::FILE;
-		symFileVersion = 0;
-		errorOnWarning = false;
-		silent = false;
-		errorsResult = nullptr;
-		useAbsoluteFileNames = true;
+		mode = ArmipsMode::FILE;
+		symFileVersion = 0;
+		errorOnWarning = false;
+		silent = false;
+		errorsResult = nullptr;
+		useAbsoluteFileNames = true;
 	}
-};
+};
 
-bool runArmips(ArmipsArguments& settings);
+bool runArmips(ArmipsArguments& settings);
 
 // file: Core/SymbolTable.h
 
@@ -3011,141 +3011,141 @@ bool runArmips(ArmipsArguments& settings);
 
 struct SymbolKey
 {
-	std::wstring name;
-	int file;
-	int section;
-};
+	std::wstring name;
+	int file;
+	int section;
+};
 
-bool operator<(SymbolKey const& lhs, SymbolKey const& rhs);
+bool operator<(SymbolKey const& lhs, SymbolKey const& rhs);
 
 class Label
 {
 public:
-	Label(std::wstring name): name(name),defined(false),data(false),updateInfo(true),info(0) { };
-	const std::wstring getName() { return name; };
-	void setOriginalName(const std::wstring& name) { originalName = name; }
-	const std::wstring getOriginalName() { return originalName.empty() ? name : originalName; }
-	int64_t getValue() { return value; };
-	void setValue(int64_t val) { value = val; };
-	bool hasPhysicalValue() { return physicalValueSet; }
-	int64_t getPhysicalValue() { return physicalValue; }
-	void setPhysicalValue(int64_t val) { physicalValue = val; physicalValueSet = true; }
-	bool isDefined() { return defined; };
-	void setDefined(bool b) { defined = b; };
-	bool isData() { return data; };
-	void setIsData(bool b) { data = b; };
-	void setInfo(int inf) { info = inf; };
-	int getInfo() { return info; };
-	void setUpdateInfo(bool b) { updateInfo = b; };
-	bool getUpdateInfo() { return updateInfo; };
-	void setSection(int num) { section = num; }
-	int getSection() { return section; }
+	Label(std::wstring name): name(name),defined(false),data(false),updateInfo(true),info(0) { };
+	const std::wstring getName() { return name; };
+	void setOriginalName(const std::wstring& name) { originalName = name; }
+	const std::wstring getOriginalName() { return originalName.empty() ? name : originalName; }
+	int64_t getValue() { return value; };
+	void setValue(int64_t val) { value = val; };
+	bool hasPhysicalValue() { return physicalValueSet; }
+	int64_t getPhysicalValue() { return physicalValue; }
+	void setPhysicalValue(int64_t val) { physicalValue = val; physicalValueSet = true; }
+	bool isDefined() { return defined; };
+	void setDefined(bool b) { defined = b; };
+	bool isData() { return data; };
+	void setIsData(bool b) { data = b; };
+	void setInfo(int inf) { info = inf; };
+	int getInfo() { return info; };
+	void setUpdateInfo(bool b) { updateInfo = b; };
+	bool getUpdateInfo() { return updateInfo; };
+	void setSection(int num) { section = num; }
+	int getSection() { return section; }
 private:
-	std::wstring name, originalName;
-	int64_t value;
-	int64_t physicalValue;
-	bool physicalValueSet = false;
-	bool defined;
-	bool data;
-	bool updateInfo;
-	int info;
-	int section;
-};
+	std::wstring name, originalName;
+	int64_t value;
+	int64_t physicalValue;
+	bool physicalValueSet = false;
+	bool defined;
+	bool data;
+	bool updateInfo;
+	int info;
+	int section;
+};
 
 class SymbolTable
 {
 public:
-	SymbolTable();
-	~SymbolTable();
-	void clear();
-	bool symbolExists(const std::wstring& symbol, int file, int section);
-	static bool isValidSymbolName(const std::wstring& symbol);
-	static bool isValidSymbolCharacter(wchar_t character, bool first = false);
-	static bool isLocalSymbol(const std::wstring& symbol, size_t pos = 0) { return symbol.size() >= pos+2 && symbol[pos+0] == '@' && symbol[pos+1] == '@'; };
-	static bool isStaticSymbol(const std::wstring& symbol, size_t pos = 0) { return symbol.size() >= pos+1 && symbol[pos+0] == '@'; };
-	static bool isGlobalSymbol(const std::wstring& symbol, size_t pos = 0) { return !isLocalSymbol(symbol) && !isStaticSymbol(symbol); };
+	SymbolTable();
+	~SymbolTable();
+	void clear();
+	bool symbolExists(const std::wstring& symbol, int file, int section);
+	static bool isValidSymbolName(const std::wstring& symbol);
+	static bool isValidSymbolCharacter(wchar_t character, bool first = false);
+	static bool isLocalSymbol(const std::wstring& symbol, size_t pos = 0) { return symbol.size() >= pos+2 && symbol[pos+0] == '@' && symbol[pos+1] == '@'; };
+	static bool isStaticSymbol(const std::wstring& symbol, size_t pos = 0) { return symbol.size() >= pos+1 && symbol[pos+0] == '@'; };
+	static bool isGlobalSymbol(const std::wstring& symbol, size_t pos = 0) { return !isLocalSymbol(symbol) && !isStaticSymbol(symbol); };
 
-	std::shared_ptr<Label> getLabel(const std::wstring& symbol, int file, int section);
-	bool addEquation(const std::wstring& name, int file, int section, size_t referenceIndex);
-	bool findEquation(const std::wstring& name, int file, int section, size_t& dest);
-	void addLabels(const std::vector<LabelDefinition>& labels);
-	int findSection(int64_t address);
+	std::shared_ptr<Label> getLabel(const std::wstring& symbol, int file, int section);
+	bool addEquation(const std::wstring& name, int file, int section, size_t referenceIndex);
+	bool findEquation(const std::wstring& name, int file, int section, size_t& dest);
+	void addLabels(const std::vector<LabelDefinition>& labels);
+	int findSection(int64_t address);
 
-	std::wstring getUniqueLabelName(bool local = false);
-	size_t getLabelCount() { return labels.size(); };
-	size_t getEquationCount() { return equationsCount; };
-	bool isGeneratedLabel(const std::wstring& name) { return generatedLabels.find(name) != generatedLabels.end(); }
+	std::wstring getUniqueLabelName(bool local = false);
+	size_t getLabelCount() { return labels.size(); };
+	size_t getEquationCount() { return equationsCount; };
+	bool isGeneratedLabel(const std::wstring& name) { return generatedLabels.find(name) != generatedLabels.end(); }
 private:
-	void setFileSectionValues(const std::wstring& symbol, int& file, int& section);
+	void setFileSectionValues(const std::wstring& symbol, int& file, int& section);
 
-	enum SymbolType { LabelSymbol, EquationSymbol };
+	enum SymbolType { LabelSymbol, EquationSymbol };
 	struct SymbolInfo
 	{
-		SymbolType type;
-		size_t index;
-	};
+		SymbolType type;
+		size_t index;
+	};
 
-	std::map<SymbolKey,SymbolInfo> symbols;
-	std::vector<std::shared_ptr<Label>> labels;
-	size_t equationsCount;
-	size_t uniqueCount;
-	std::set<std::wstring> generatedLabels;
-};
+	std::map<SymbolKey,SymbolInfo> symbols;
+	std::vector<std::shared_ptr<Label>> labels;
+	size_t equationsCount;
+	size_t uniqueCount;
+	std::set<std::wstring> generatedLabels;
+};
 
 // file: Core/Common.h
 
 #include <vector>
 
 typedef struct {
-	std::vector<std::wstring> FileList;
-	int FileCount;
-	int FileNum;
-	int LineNumber;
-	int TotalLineCount;
-} tFileInfo;
+	std::vector<std::wstring> FileList;
+	int FileCount;
+	int FileNum;
+	int LineNumber;
+	int TotalLineCount;
+} tFileInfo;
 
 typedef struct {
-	tFileInfo FileInfo;
-	SymbolTable symbolTable;
-	EncodingTable Table;
-	int Section;
-	bool nocash;
-	bool relativeInclude;
-	int validationPasses;
-	bool memoryMode;
-	std::shared_ptr<AssemblerFile> memoryFile;
-	bool multiThreading;
-} tGlobal;
+	tFileInfo FileInfo;
+	SymbolTable symbolTable;
+	EncodingTable Table;
+	int Section;
+	bool nocash;
+	bool relativeInclude;
+	int validationPasses;
+	bool memoryMode;
+	std::shared_ptr<AssemblerFile> memoryFile;
+	bool multiThreading;
+} tGlobal;
 
-extern tGlobal Global;
-extern CArchitecture* Arch;
+extern tGlobal Global;
+extern CArchitecture* Arch;
 
-class FileManager;
-extern FileManager* g_fileManager;
+class FileManager;
+extern FileManager* g_fileManager;
 
-std::wstring getFolderNameFromPath(const std::wstring& src);
-std::wstring getFullPathName(const std::wstring& path);
+std::wstring getFolderNameFromPath(const std::wstring& src);
+std::wstring getFullPathName(const std::wstring& path);
 
-bool checkLabelDefined(const std::wstring& labelName, int section);
-bool checkValidLabelName(const std::wstring& labelName);
+bool checkLabelDefined(const std::wstring& labelName, int section);
+bool checkValidLabelName(const std::wstring& labelName);
 
-bool isPowerOfTwo(int64_t n);
+bool isPowerOfTwo(int64_t n);
 
 // file: Parser/DirectivesParser.h
 
 #include <unordered_map>
 
-class CAssemblerCommand;
-class Parser;
+class CAssemblerCommand;
+class Parser;
 
-using DirectiveFunc = std::unique_ptr<CAssemblerCommand> (*)(Parser&,int);
+using DirectiveFunc = std::unique_ptr<CAssemblerCommand> (*)(Parser&,int);
 
 struct DirectiveEntry {
-	DirectiveFunc function;
-	int flags;
-};
+	DirectiveFunc function;
+	int flags;
+};
 
-using DirectiveMap = std::unordered_multimap<std::wstring, const DirectiveEntry>;
+using DirectiveMap = std::unordered_multimap<std::wstring, const DirectiveEntry>;
 
 #define DIRECTIVE_USERMASK			0x0000FFFF
 
@@ -3200,7 +3200,7 @@ using DirectiveMap = std::unordered_multimap<std::wstring, const DirectiveEntry>
 #define DIRECTIVE_ARM_BIG			0x00000004
 #define DIRECTIVE_ARM_LITTLE		0x00000005
 
-extern const DirectiveMap directives;
+extern const DirectiveMap directives;
 
 // file: Parser/Tokenizer.h
 
@@ -3248,11 +3248,11 @@ enum class TokenType
 	NumberString,
 	Degree,
 	Separator
-};
+};
 
 struct Token
 {
-	friend class Tokenizer;
+	friend class Tokenizer;
 
 	Token() : originalText(nullptr), stringValue(nullptr), checked(false)
 	{
@@ -3261,247 +3261,247 @@ struct Token
 	Token(Token &&src)
 	{
 		// Move strings.
-		originalText = src.originalText;
-		src.originalText = nullptr;
-		stringValue = src.stringValue;
-		src.stringValue = nullptr;
+		originalText = src.originalText;
+		src.originalText = nullptr;
+		stringValue = src.stringValue;
+		src.stringValue = nullptr;
 
 		// Just copy the rest.
-		type = src.type;
-		line = src.line;
-		column = src.column;
-		floatValue = src.floatValue;
-		checked = src.checked;
+		type = src.type;
+		line = src.line;
+		column = src.column;
+		floatValue = src.floatValue;
+		checked = src.checked;
 	}
 
 	Token(const Token &src) {
 		// Copy strings.
-		originalText = nullptr;
+		originalText = nullptr;
 		if (src.originalText)
-			setOriginalText(src.originalText);
-		stringValue = nullptr;
+			setOriginalText(src.originalText);
+		stringValue = nullptr;
 		if (src.stringValue)
-			setStringValue(src.stringValue);
+			setStringValue(src.stringValue);
 
 		// And copy the rest.
-		type = src.type;
-		line = src.line;
-		column = src.column;
-		floatValue = src.floatValue;
-		checked = src.checked;
+		type = src.type;
+		line = src.line;
+		column = src.column;
+		floatValue = src.floatValue;
+		checked = src.checked;
 	}
 
 	~Token()
 	{
-		clearOriginalText();
-		clearStringValue();
+		clearOriginalText();
+		clearStringValue();
 	}
 
 	Token& operator=(const Token& src)
 	{
 		// Copy strings.
-		originalText = nullptr;
+		originalText = nullptr;
 		if (src.originalText)
-			setOriginalText(src.originalText);
-		stringValue = nullptr;
+			setOriginalText(src.originalText);
+		stringValue = nullptr;
 		if (src.stringValue)
-			setStringValue(src.stringValue);
+			setStringValue(src.stringValue);
 
 		// And copy the rest.
-		type = src.type;
-		line = src.line;
-		column = src.column;
-		floatValue = src.floatValue;
-		checked = src.checked;
+		type = src.type;
+		line = src.line;
+		column = src.column;
+		floatValue = src.floatValue;
+		checked = src.checked;
 
-		return *this;
+		return *this;
 	}
 
 	void setOriginalText(const std::wstring& t)
 	{
-		setOriginalText(t, 0, t.length());
+		setOriginalText(t, 0, t.length());
 	}
 
 	void setOriginalText(const std::wstring& t, const size_t pos, const size_t len)
 	{
-		clearOriginalText();
-		originalText = new wchar_t[len + 1];
-		wmemcpy(originalText, t.data() + pos, len);
-		originalText[len] = 0;
+		clearOriginalText();
+		originalText = new wchar_t[len + 1];
+		wmemcpy(originalText, t.data() + pos, len);
+		originalText[len] = 0;
 	}
 
 	std::wstring getOriginalText() const
 	{
-		return originalText;
+		return originalText;
 	}
 
 	void setStringValue(const std::wstring& t)
 	{
-		setStringValue(t, 0, t.length());
+		setStringValue(t, 0, t.length());
 	}
 
 	void setStringValue(const std::wstring& t, const size_t pos, const size_t len)
 	{
-		clearStringValue();
-		stringValue = new wchar_t[len + 1];
-		wmemcpy(stringValue, t.data() + pos, len);
-		stringValue[len] = 0;
+		clearStringValue();
+		stringValue = new wchar_t[len + 1];
+		wmemcpy(stringValue, t.data() + pos, len);
+		stringValue[len] = 0;
 	}
 
 	void setStringAndOriginalValue(const std::wstring& t)
 	{
-		setStringAndOriginalValue(t, 0, t.length());
+		setStringAndOriginalValue(t, 0, t.length());
 	}
 
 	void setStringAndOriginalValue(const std::wstring& t, const size_t pos, const size_t len)
 	{
-		setStringValue(t, pos, len);
-		clearOriginalText();
-		originalText = stringValue;
+		setStringValue(t, pos, len);
+		clearOriginalText();
+		originalText = stringValue;
 	}
 
 	std::wstring getStringValue() const
 	{
 		if (stringValue)
-			return stringValue;
-		return L"";
+			return stringValue;
+		return L"";
 	}
 
 	bool stringValueStartsWith(wchar_t c) const
 	{
 		if (stringValue)
-			return stringValue[0] == c;
-		return false;
+			return stringValue[0] == c;
+		return false;
 	}
 
-	TokenType type;
-	size_t line;
-	size_t column;
+	TokenType type;
+	size_t line;
+	size_t column;
 
 	union
 	{
-		int64_t intValue;
-		double floatValue;
-	};
+		int64_t intValue;
+		double floatValue;
+	};
 
 protected:
 	void clearOriginalText()
 	{
 		if (originalText != stringValue)
-			delete [] originalText;
-		originalText = nullptr;
+			delete [] originalText;
+		originalText = nullptr;
 	}
 
 	void clearStringValue()
 	{
 		if (stringValue != originalText)
-			delete [] stringValue;
-		stringValue = nullptr;
+			delete [] stringValue;
+		stringValue = nullptr;
 	}
 
-	wchar_t* originalText;
-	wchar_t* stringValue;
+	wchar_t* originalText;
+	wchar_t* stringValue;
 
-	bool checked;
-};
+	bool checked;
+};
 
-typedef std::list<Token> TokenList;
+typedef std::list<Token> TokenList;
 
 struct TokenizerPosition
 {
-	friend class Tokenizer;
+	friend class Tokenizer;
 
 	TokenizerPosition previous()
 	{
-		TokenizerPosition pos = *this;
-		pos.it--;
-		return pos;
+		TokenizerPosition pos = *this;
+		pos.it--;
+		return pos;
 	}
 private:
-	TokenList::iterator it;
-};
+	TokenList::iterator it;
+};
 
 class Tokenizer
 {
 public:
-	Tokenizer();
-	const Token& nextToken();
-	const Token& peekToken(int ahead = 0);
-	void eatToken() { eatTokens(1); }
-	void eatTokens(int num);
-	bool atEnd() { return position.it == tokens.end(); }
-	TokenizerPosition getPosition() { return position; }
-	void setPosition(TokenizerPosition pos) { position = pos; }
-	void skipLookahead();
-	std::vector<Token> getTokens(TokenizerPosition start, TokenizerPosition end) const;
-	void registerReplacement(const std::wstring& identifier, std::vector<Token>& tokens);
-	void registerReplacement(const std::wstring& identifier, const std::wstring& newValue);
-	static size_t addEquValue(const std::vector<Token>& tokens);
-	static void clearEquValues() { equValues.clear(); }
-	void resetLookaheadCheckMarks();
+	Tokenizer();
+	const Token& nextToken();
+	const Token& peekToken(int ahead = 0);
+	void eatToken() { eatTokens(1); }
+	void eatTokens(int num);
+	bool atEnd() { return position.it == tokens.end(); }
+	TokenizerPosition getPosition() { return position; }
+	void setPosition(TokenizerPosition pos) { position = pos; }
+	void skipLookahead();
+	std::vector<Token> getTokens(TokenizerPosition start, TokenizerPosition end) const;
+	void registerReplacement(const std::wstring& identifier, std::vector<Token>& tokens);
+	void registerReplacement(const std::wstring& identifier, const std::wstring& newValue);
+	static size_t addEquValue(const std::vector<Token>& tokens);
+	static void clearEquValues() { equValues.clear(); }
+	void resetLookaheadCheckMarks();
 protected:
-	void clearTokens() { tokens.clear(); };
-	void resetPosition() { position.it = tokens.begin(); }
-	void addToken(Token token);
+	void clearTokens() { tokens.clear(); };
+	void resetPosition() { position.it = tokens.begin(); }
+	void addToken(Token token);
 private:
-	bool processElement(TokenList::iterator& it);
+	bool processElement(TokenList::iterator& it);
 
-	TokenList tokens;
-	TokenizerPosition position;
+	TokenList tokens;
+	TokenizerPosition position;
 
 	struct Replacement
 	{
-		std::wstring identifier;
-		std::vector<Token> value;
-	};
+		std::wstring identifier;
+		std::vector<Token> value;
+	};
 
-	Token invalidToken;
-	std::vector<Replacement> replacements;
-	static std::vector<std::vector<Token>> equValues;
-};
+	Token invalidToken;
+	std::vector<Replacement> replacements;
+	static std::vector<std::vector<Token>> equValues;
+};
 
 class FileTokenizer: public Tokenizer
 {
 public:
-	bool init(TextFile* input);
+	bool init(TextFile* input);
 protected:
-	Token loadToken();
-	bool isInputAtEnd() { return linePos >= currentLine.size() && input->atEnd(); };
+	Token loadToken();
+	bool isInputAtEnd() { return linePos >= currentLine.size() && input->atEnd(); };
 
-	void skipWhitespace();
-	void createToken(TokenType type, size_t length);
-	void createToken(TokenType type, size_t length, int64_t value);
-	void createToken(TokenType type, size_t length, double value);
-	void createToken(TokenType type, size_t length, const std::wstring& value);
-	void createToken(TokenType type, size_t length, const std::wstring& value, size_t valuePos, size_t valueLength);
-	void createTokenCurrentString(TokenType type, size_t length);
+	void skipWhitespace();
+	void createToken(TokenType type, size_t length);
+	void createToken(TokenType type, size_t length, int64_t value);
+	void createToken(TokenType type, size_t length, double value);
+	void createToken(TokenType type, size_t length, const std::wstring& value);
+	void createToken(TokenType type, size_t length, const std::wstring& value, size_t valuePos, size_t valueLength);
+	void createTokenCurrentString(TokenType type, size_t length);
 
-	bool convertInteger(size_t start, size_t end, int64_t& result);
-	bool convertFloat(size_t start, size_t end, double& result);
-	bool parseOperator();
+	bool convertInteger(size_t start, size_t end, int64_t& result);
+	bool convertFloat(size_t start, size_t end, double& result);
+	bool parseOperator();
 
-	TextFile* input;
-	std::wstring currentLine;
-	size_t lineNumber;
-	size_t linePos;
+	TextFile* input;
+	std::wstring currentLine;
+	size_t lineNumber;
+	size_t linePos;
 
-	Token token;
-	bool equActive;
-};
+	Token token;
+	bool equActive;
+};
 
 class TokenStreamTokenizer: public Tokenizer
 {
 public:
 	void init(const std::vector<Token>& tokens)
 	{
-		clearTokens();
+		clearTokens();
 
 		for (const Token &tok: tokens)
-			addToken(tok);
+			addToken(tok);
 
-		resetPosition();
+		resetPosition();
 	}
-};
+};
 
 // file: Archs/MIPS/MipsMacros.h
 
@@ -3540,112 +3540,112 @@ public:
 #define MIPSM_LIKELY				0x00040000
 #define MIPSM_REVCMP				0x00080000
 
-class Parser;
+class Parser;
 
-using MipsMacroFunc = std::unique_ptr<CAssemblerCommand> (*)(Parser&,MipsRegisterData&,MipsImmediateData&,int);
+using MipsMacroFunc = std::unique_ptr<CAssemblerCommand> (*)(Parser&,MipsRegisterData&,MipsImmediateData&,int);
 
 struct MipsMacroDefinition {
-	const wchar_t* name;
-	const wchar_t* args;
-	MipsMacroFunc function;
-	int flags;
-};
+	const wchar_t* name;
+	const wchar_t* args;
+	MipsMacroFunc function;
+	int flags;
+};
 
-extern const MipsMacroDefinition mipsMacros[];
+extern const MipsMacroDefinition mipsMacros[];
 
 class MipsMacroCommand: public CAssemblerCommand
 {
 public:
-	MipsMacroCommand(std::unique_ptr<CAssemblerCommand> content, int macroFlags);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
+	MipsMacroCommand(std::unique_ptr<CAssemblerCommand> content, int macroFlags);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
 private:
-	std::unique_ptr<CAssemblerCommand> content;
-	int macroFlags;
-	bool IgnoreLoadDelay;
-};
+	std::unique_ptr<CAssemblerCommand> content;
+	int macroFlags;
+	bool IgnoreLoadDelay;
+};
 
 // file: Archs/MIPS/MipsParser.h
 #include <unordered_map>
 
 struct MipsRegisterDescriptor {
-	const wchar_t* name;
-	int num;
-};
+	const wchar_t* name;
+	int num;
+};
 
 class MipsParser
 {
 public:
-	std::unique_ptr<CAssemblerCommand> parseDirective(Parser& parser);
-	std::unique_ptr<CMipsInstruction> parseOpcode(Parser& parser);
-	std::unique_ptr<CAssemblerCommand> parseMacro(Parser& parser);
+	std::unique_ptr<CAssemblerCommand> parseDirective(Parser& parser);
+	std::unique_ptr<CMipsInstruction> parseOpcode(Parser& parser);
+	std::unique_ptr<CAssemblerCommand> parseMacro(Parser& parser);
 private:
-	bool parseRegisterNumber(Parser& parser, MipsRegisterValue& dest, int numValues);
-	bool parseRegisterTable(Parser& parser, MipsRegisterValue& dest, const MipsRegisterDescriptor* table, size_t count);
-	bool parseRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parseFpuRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parseFpuControlRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parseCop0Register(Parser& parser, MipsRegisterValue& dest);
-	bool parsePs2Cop2Register(Parser& parser, MipsRegisterValue& dest);
-	bool parsePsxCop2DataRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parsePsxCop2ControlRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parseRspCop0Register(Parser& parser, MipsRegisterValue& dest);
-	bool parseRspVectorControlRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parseRspVectorRegister(Parser& parser, MipsRegisterValue& dest);
-	bool parseRspVectorElement(Parser& parser, MipsRegisterValue& dest);
-	bool parseRspScalarElement(Parser& parser, MipsRegisterValue& dest);
-	bool parseRspOffsetElement(Parser& parser, MipsRegisterValue& dest);
-	bool parseVfpuRegister(Parser& parser, MipsRegisterValue& reg, int size);
-	bool parseVfpuControlRegister(Parser& parser, MipsRegisterValue& reg);
-	bool parseImmediate(Parser& parser, Expression& dest);
-	bool parseVcstParameter(Parser& parser, int& result);
-	bool parseVfpuVrot(Parser& parser, int& result, int size);
-	bool parseVfpuCondition(Parser& parser, int& result);
-	bool parseVpfxsParameter(Parser& parser, int& result);
-	bool parseVpfxdParameter(Parser& parser, int& result);
-	bool parseCop2BranchCondition(Parser& parser, int& result);
-	bool parseWb(Parser& parser);
+	bool parseRegisterNumber(Parser& parser, MipsRegisterValue& dest, int numValues);
+	bool parseRegisterTable(Parser& parser, MipsRegisterValue& dest, const MipsRegisterDescriptor* table, size_t count);
+	bool parseRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parseFpuRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parseFpuControlRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parseCop0Register(Parser& parser, MipsRegisterValue& dest);
+	bool parsePs2Cop2Register(Parser& parser, MipsRegisterValue& dest);
+	bool parsePsxCop2DataRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parsePsxCop2ControlRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parseRspCop0Register(Parser& parser, MipsRegisterValue& dest);
+	bool parseRspVectorControlRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parseRspVectorRegister(Parser& parser, MipsRegisterValue& dest);
+	bool parseRspVectorElement(Parser& parser, MipsRegisterValue& dest);
+	bool parseRspScalarElement(Parser& parser, MipsRegisterValue& dest);
+	bool parseRspOffsetElement(Parser& parser, MipsRegisterValue& dest);
+	bool parseVfpuRegister(Parser& parser, MipsRegisterValue& reg, int size);
+	bool parseVfpuControlRegister(Parser& parser, MipsRegisterValue& reg);
+	bool parseImmediate(Parser& parser, Expression& dest);
+	bool parseVcstParameter(Parser& parser, int& result);
+	bool parseVfpuVrot(Parser& parser, int& result, int size);
+	bool parseVfpuCondition(Parser& parser, int& result);
+	bool parseVpfxsParameter(Parser& parser, int& result);
+	bool parseVpfxdParameter(Parser& parser, int& result);
+	bool parseCop2BranchCondition(Parser& parser, int& result);
+	bool parseWb(Parser& parser);
 
-	bool decodeCop2BranchCondition(const std::wstring& text, size_t& pos, int& result);
-	bool decodeVfpuType(const std::wstring& name, size_t& pos, int& dest);
-	bool decodeOpcode(const std::wstring& name, const tMipsOpcode& opcode);
+	bool decodeCop2BranchCondition(const std::wstring& text, size_t& pos, int& result);
+	bool decodeVfpuType(const std::wstring& name, size_t& pos, int& dest);
+	bool decodeOpcode(const std::wstring& name, const tMipsOpcode& opcode);
 
-	void setOmittedRegisters(const tMipsOpcode& opcode);
-	bool matchSymbol(Parser& parser, wchar_t symbol);
-	bool parseParameters(Parser& parser, const tMipsOpcode& opcode);
-	bool parseMacroParameters(Parser& parser, const MipsMacroDefinition& macro);
+	void setOmittedRegisters(const tMipsOpcode& opcode);
+	bool matchSymbol(Parser& parser, wchar_t symbol);
+	bool parseParameters(Parser& parser, const tMipsOpcode& opcode);
+	bool parseMacroParameters(Parser& parser, const MipsMacroDefinition& macro);
 
-	MipsRegisterData registers;
-	MipsImmediateData immediate;
-	MipsOpcodeData opcodeData;
-	bool hasFixedSecondaryImmediate;
-};
+	MipsRegisterData registers;
+	MipsImmediateData immediate;
+	MipsOpcodeData opcodeData;
+	bool hasFixedSecondaryImmediate;
+};
 
 class MipsOpcodeFormatter
 {
 public:
 	const std::wstring& formatOpcode(const MipsOpcodeData& opData, const MipsRegisterData& regData,
-		const MipsImmediateData& immData);
+		const MipsImmediateData& immData);
 private:
-	void handleOpcodeName(const MipsOpcodeData& opData);
+	void handleOpcodeName(const MipsOpcodeData& opData);
 	void handleOpcodeParameters(const MipsOpcodeData& opData, const MipsRegisterData& regData,
-		const MipsImmediateData& immData);
-	void handleImmediate(MipsImmediateType type, unsigned int originalValue, unsigned int opcodeFlags);
+		const MipsImmediateData& immData);
+	void handleImmediate(MipsImmediateType type, unsigned int originalValue, unsigned int opcodeFlags);
 
-	std::wstring buffer;
-};
+	std::wstring buffer;
+};
 
 // file: Archs/MIPS/CMipsInstruction.cpp
 
 CMipsInstruction::CMipsInstruction(MipsOpcodeData& opcode, MipsImmediateData& immediate, MipsRegisterData& registers)
 {
-	this->opcodeData = opcode;
-	this->immediateData = immediate;
-	this->registerData = registers;
+	this->opcodeData = opcode;
+	this->immediateData = immediate;
+	this->registerData = registers;
 
-	addNop = false;
-	IgnoreLoadDelay = Mips.GetIgnoreDelay();
+	addNop = false;
+	IgnoreLoadDelay = Mips.GetIgnoreDelay();
 }
 
 CMipsInstruction::~CMipsInstruction()
@@ -3658,73 +3658,73 @@ int getImmediateBits(MipsImmediateType type)
 	switch (type)
 	{
 	case MipsImmediateType::Immediate5:
-		return 5;
+		return 5;
 	case MipsImmediateType::Immediate7:
-		return 7;
+		return 7;
 	case MipsImmediateType::Immediate10:
-		return 10;
+		return 10;
 	case MipsImmediateType::Immediate16:
 	case MipsImmediateType::ImmediateHalfFloat:
-		return 16;
+		return 16;
 	case MipsImmediateType::Immediate20:
 	case MipsImmediateType::Immediate20_0:
-		return 20;
+		return 20;
 	case MipsImmediateType::Immediate25:
-		return 25;
+		return 25;
 	case MipsImmediateType::Immediate26:
-		return 26;
+		return 26;
 	default:
-		return 0;
+		return 0;
 	}
 }
 
 // http://code.google.com/p/jpcsp/source/browse/trunk/src/jpcsp/Allegrex/VfpuState.java?spec=svn3676&r=3383#1196
 int CMipsInstruction::floatToHalfFloat(int i)
 {
-	int s = ((i >> 16) & 0x00008000); // sign
-	int e = ((i >> 23) & 0x000000ff) - (127 - 15); // exponent
-	int f = ((i >> 0) & 0x007fffff); // fraction
+	int s = ((i >> 16) & 0x00008000); // sign
+	int e = ((i >> 23) & 0x000000ff) - (127 - 15); // exponent
+	int f = ((i >> 0) & 0x007fffff); // fraction
 
 	// need to handle NaNs and Inf?
 	if (e <= 0) {
 		if (e < -10) {
 			if (s != 0) {
 				// handle -0.0
-				return 0x8000;
+				return 0x8000;
 			}
-			return 0;
+			return 0;
 		}
-		f = (f | 0x00800000) >> (1 - e);
-		return s | (f >> 13);
+		f = (f | 0x00800000) >> (1 - e);
+		return s | (f >> 13);
 	} else if (e == 0xff - (127 - 15)) {
 		if (f == 0) {
 			// Inf
-			return s | 0x7c00;
+			return s | 0x7c00;
 		}
 		// NAN
-		return s | 0x7fff;
+		return s | 0x7fff;
 	}
 
 	if (e > 30) {
 		// Overflow
-		return s | 0x7c00;
+		return s | 0x7c00;
 	}
 
-	return s | (e << 10) | (f >> 13);
+	return s | (e << 10) | (f >> 13);
 }
 
 bool CMipsInstruction::Validate()
 {
-	bool Result = false;
+	bool Result = false;
 
-	bool previousNop = addNop;
-	addNop = false;
+	bool previousNop = addNop;
+	addNop = false;
 
-	RamPos = g_fileManager->getVirtualAddress();
+	RamPos = g_fileManager->getVirtualAddress();
 	if (RamPos % 4)
 	{
-		Logger::queueError(Logger::Error,L"opcode not aligned to word boundary");
-		return false;
+		Logger::queueError(Logger::Error,L"opcode not aligned to word boundary");
+		return false;
 	}
 
 	// check immediates
@@ -3734,69 +3734,69 @@ bool CMipsInstruction::Validate()
 		{
 			if (immediateData.primary.expression.evaluateInteger(immediateData.primary.value) == false)
 			{
-				Logger::queueError(Logger::Error, L"Invalid immediate expression");
-				return false;
+				Logger::queueError(Logger::Error, L"Invalid immediate expression");
+				return false;
 			}
 
-			immediateData.primary.originalValue = immediateData.primary.value;
+			immediateData.primary.originalValue = immediateData.primary.value;
 		}
 
 		if (immediateData.primary.type == MipsImmediateType::ImmediateHalfFloat)
-			immediateData.primary.value = floatToHalfFloat(immediateData.primary.originalValue);
+			immediateData.primary.value = floatToHalfFloat(immediateData.primary.originalValue);
 
 		if (opcodeData.opcode.flags & MO_IMMALIGNED)	// immediate must be aligned
 		{
 			if (immediateData.primary.value % 4)
 			{
-				Logger::queueError(Logger::Error,L"Immediate must be word aligned");
-				return false;
+				Logger::queueError(Logger::Error,L"Immediate must be word aligned");
+				return false;
 			}
 		}
 
 		if (opcodeData.opcode.flags & MO_NEGIMM) 		// negated immediate
 		{
-			immediateData.primary.value = -immediateData.primary.value;
+			immediateData.primary.value = -immediateData.primary.value;
 		} else if (opcodeData.opcode.flags & MO_IPCA)	// absolute value >> 2
 		{
-			immediateData.primary.value = (immediateData.primary.value >> 2) & 0x3FFFFFF;
+			immediateData.primary.value = (immediateData.primary.value >> 2) & 0x3FFFFFF;
 		} else if (opcodeData.opcode.flags & MO_IPCR)	// relative 16 bit value
 		{
-			int num = (int) (immediateData.primary.value-RamPos-4);
+			int num = (int) (immediateData.primary.value-RamPos-4);
 
 			if (num > 0x20000 || num < (-0x20000))
 			{
-				Logger::queueError(Logger::Error,L"Branch target %08X out of range",immediateData.primary.value);
-				return false;
+				Logger::queueError(Logger::Error,L"Branch target %08X out of range",immediateData.primary.value);
+				return false;
 			}
-			immediateData.primary.value = num >> 2;
+			immediateData.primary.value = num >> 2;
 		} else if (opcodeData.opcode.flags & (MO_RSP_HWOFFSET | MO_RSP_WOFFSET | MO_RSP_DWOFFSET | MO_RSP_QWOFFSET))
 		{
-			int shift = 0;
+			int shift = 0;
 
-			if (opcodeData.opcode.flags & MO_RSP_HWOFFSET) shift = 1;
-			else if (opcodeData.opcode.flags & MO_RSP_WOFFSET) shift = 2;
-			else if (opcodeData.opcode.flags & MO_RSP_DWOFFSET) shift = 3;
-			else if (opcodeData.opcode.flags & MO_RSP_QWOFFSET) shift = 4;
+			if (opcodeData.opcode.flags & MO_RSP_HWOFFSET) shift = 1;
+			else if (opcodeData.opcode.flags & MO_RSP_WOFFSET) shift = 2;
+			else if (opcodeData.opcode.flags & MO_RSP_DWOFFSET) shift = 3;
+			else if (opcodeData.opcode.flags & MO_RSP_QWOFFSET) shift = 4;
 
 			if (immediateData.primary.value & ((1 << shift) - 1))
 			{
-				Logger::queueError(Logger::Error,L"Offset must be %d-byte aligned",1<<shift);
-				return false;
+				Logger::queueError(Logger::Error,L"Offset must be %d-byte aligned",1<<shift);
+				return false;
 			}
-			immediateData.primary.value = immediateData.primary.value >> shift;
+			immediateData.primary.value = immediateData.primary.value >> shift;
 		}
 
-		int immediateBits = getImmediateBits(immediateData.primary.type);
-		unsigned int mask = (0xFFFFFFFF << (32-immediateBits)) >> (32-immediateBits);
-		int digits = (immediateBits+3) / 4;
+		int immediateBits = getImmediateBits(immediateData.primary.type);
+		unsigned int mask = (0xFFFFFFFF << (32-immediateBits)) >> (32-immediateBits);
+		int digits = (immediateBits+3) / 4;
 
 		if ((unsigned int)std::abs(immediateData.primary.value) > mask)
 		{
-			Logger::queueError(Logger::Error,L"Immediate value 0x%0*X out of range",digits,immediateData.primary.value);
-			return false;
+			Logger::queueError(Logger::Error,L"Immediate value 0x%0*X out of range",digits,immediateData.primary.value);
+			return false;
 		}
 
-		immediateData.primary.value &= mask;
+		immediateData.primary.value &= mask;
 	}
 
 	if (immediateData.secondary.type != MipsImmediateType::None)
@@ -3805,11 +3805,11 @@ bool CMipsInstruction::Validate()
 		{
 			if (immediateData.secondary.expression.evaluateInteger(immediateData.secondary.value) == false)
 			{
-				Logger::queueError(Logger::Error, L"Invalid immediate expression");
-				return false;
+				Logger::queueError(Logger::Error, L"Invalid immediate expression");
+				return false;
 			}
 
-			immediateData.secondary.originalValue = immediateData.secondary.value;
+			immediateData.secondary.originalValue = immediateData.secondary.value;
 		}
 
 		switch (immediateData.secondary.type)
@@ -3817,199 +3817,199 @@ bool CMipsInstruction::Validate()
 		case MipsImmediateType::CacheOp:
 			if ((unsigned int)immediateData.secondary.value > 0x1f)
 			{
-				Logger::queueError(Logger::Error,L"Immediate value %02X out of range",immediateData.secondary.value);
-				return false;
+				Logger::queueError(Logger::Error,L"Immediate value %02X out of range",immediateData.secondary.value);
+				return false;
 			}
-			break;
+			break;
 		case MipsImmediateType::Ext:
 		case MipsImmediateType::Ins:
 			if (immediateData.secondary.value > 32 || immediateData.secondary.value == 0)
 			{
-				Logger::queueError(Logger::Error,L"Immediate value %02X out of range",immediateData.secondary.value);
-				return false;
+				Logger::queueError(Logger::Error,L"Immediate value %02X out of range",immediateData.secondary.value);
+				return false;
 			}
 
-			immediateData.secondary.value--;
+			immediateData.secondary.value--;
 			if (immediateData.secondary.type == MipsImmediateType::Ins)
-				immediateData.secondary.value += immediateData.primary.value;
-			break;
+				immediateData.secondary.value += immediateData.primary.value;
+			break;
 		case MipsImmediateType::Cop2BranchType:
 		default:
-			break;
+			break;
 		}
 	}
 
 	// check load delay
 	if (Mips.hasLoadDelay() && Mips.GetLoadDelay() && IgnoreLoadDelay == false)
 	{
-		bool fix = false;
+		bool fix = false;
 
 		if (registerData.grd.num != -1 && registerData.grd.num == Mips.GetLoadDelayRegister())
 		{
-			Logger::queueError(Logger::Warning,L"register %S may not be available due to load delay",registerData.grd.name);
-			fix = true;
+			Logger::queueError(Logger::Warning,L"register %S may not be available due to load delay",registerData.grd.name);
+			fix = true;
 		} else if (registerData.grs.num != -1 && registerData.grs.num == Mips.GetLoadDelayRegister())
 		{
-			Logger::queueError(Logger::Warning,L"register %S may not be available due to load delay",registerData.grs.name);
-			fix = true;
+			Logger::queueError(Logger::Warning,L"register %S may not be available due to load delay",registerData.grs.name);
+			fix = true;
 		} else if (registerData.grt.num != -1 && registerData.grt.num == Mips.GetLoadDelayRegister()
 			&& !(opcodeData.opcode.flags & MO_IGNORERTD))
 		{
-			Logger::queueError(Logger::Warning,L"register %S may not be available due to load delay",registerData.grt.name);
-			fix = true;
+			Logger::queueError(Logger::Warning,L"register %S may not be available due to load delay",registerData.grt.name);
+			fix = true;
 		}
 
 		if (Mips.GetFixLoadDelay() == true && fix == true)
 		{
-			addNop = true;
-			Logger::queueError(Logger::Notice,L"added nop to ensure correct behavior");
+			addNop = true;
+			Logger::queueError(Logger::Notice,L"added nop to ensure correct behavior");
 		}
 	}
 
 	if ((opcodeData.opcode.flags & MO_NODELAYSLOT) && Mips.GetDelaySlot() == true && IgnoreLoadDelay == false)
 	{
-		Logger::queueError(Logger::Error,L"This instruction can't be in a delay slot");
+		Logger::queueError(Logger::Error,L"This instruction can't be in a delay slot");
 	}
 
-	Mips.SetDelaySlot(opcodeData.opcode.flags & MO_DELAY ? true : false);
+	Mips.SetDelaySlot(opcodeData.opcode.flags & MO_DELAY ? true : false);
 
 	// now check if this opcode causes a load delay
 	if (Mips.hasLoadDelay())
-		Mips.SetLoadDelay(opcodeData.opcode.flags & MO_DELAYRT ? true : false,registerData.grt.num);
+		Mips.SetLoadDelay(opcodeData.opcode.flags & MO_DELAYRT ? true : false,registerData.grt.num);
 
 	if (previousNop != addNop)
-		Result = true;
+		Result = true;
 
-	g_fileManager->advanceMemory(addNop ? 8 : 4);
-	return Result;
+	g_fileManager->advanceMemory(addNop ? 8 : 4);
+	return Result;
 }
 
 void CMipsInstruction::encodeNormal() const
 {
-	int encoding = opcodeData.opcode.destencoding;
+	int encoding = opcodeData.opcode.destencoding;
 
-	if (registerData.grs.num != -1) encoding |= MIPS_RS(registerData.grs.num);	// source reg
-	if (registerData.grt.num != -1) encoding |= MIPS_RT(registerData.grt.num);	// target reg
-	if (registerData.grd.num != -1) encoding |= MIPS_RD(registerData.grd.num);	// dest reg
+	if (registerData.grs.num != -1) encoding |= MIPS_RS(registerData.grs.num);	// source reg
+	if (registerData.grt.num != -1) encoding |= MIPS_RT(registerData.grt.num);	// target reg
+	if (registerData.grd.num != -1) encoding |= MIPS_RD(registerData.grd.num);	// dest reg
 
-	if (registerData.frt.num != -1) encoding |= MIPS_FT(registerData.frt.num);	// float target reg
-	if (registerData.frs.num != -1) encoding |= MIPS_FS(registerData.frs.num);	// float source reg
-	if (registerData.frd.num != -1) encoding |= MIPS_FD(registerData.frd.num);	// float dest reg
+	if (registerData.frt.num != -1) encoding |= MIPS_FT(registerData.frt.num);	// float target reg
+	if (registerData.frs.num != -1) encoding |= MIPS_FS(registerData.frs.num);	// float source reg
+	if (registerData.frd.num != -1) encoding |= MIPS_FD(registerData.frd.num);	// float dest reg
 
-	if (registerData.ps2vrt.num != -1) encoding |= (registerData.ps2vrt.num << 16);	// ps2 vector target reg
-	if (registerData.ps2vrs.num != -1) encoding |= (registerData.ps2vrs.num << 21);	// ps2 vector source reg
-	if (registerData.ps2vrd.num != -1) encoding |= (registerData.ps2vrd.num << 6);	// ps2 vector dest reg
+	if (registerData.ps2vrt.num != -1) encoding |= (registerData.ps2vrt.num << 16);	// ps2 vector target reg
+	if (registerData.ps2vrs.num != -1) encoding |= (registerData.ps2vrs.num << 21);	// ps2 vector source reg
+	if (registerData.ps2vrd.num != -1) encoding |= (registerData.ps2vrd.num << 6);	// ps2 vector dest reg
 
-	if (registerData.rspvrt.num != -1) encoding |= MIPS_FT(registerData.rspvrt.num);	// rsp vector target reg
-	if (registerData.rspvrs.num != -1) encoding |= MIPS_FS(registerData.rspvrs.num);	// rsp vector source reg
-	if (registerData.rspvrd.num != -1) encoding |= MIPS_FD(registerData.rspvrd.num);	// rsp vector dest reg
+	if (registerData.rspvrt.num != -1) encoding |= MIPS_FT(registerData.rspvrt.num);	// rsp vector target reg
+	if (registerData.rspvrs.num != -1) encoding |= MIPS_FS(registerData.rspvrs.num);	// rsp vector source reg
+	if (registerData.rspvrd.num != -1) encoding |= MIPS_FD(registerData.rspvrd.num);	// rsp vector dest reg
 
-	if (registerData.rspve.num != -1) encoding |= MIPS_RSP_VE(registerData.rspve.num);			// rsp element
-	if (registerData.rspvde.num != -1) encoding |= MIPS_RSP_VDE(registerData.rspvde.num);		// rsp destination element
-	if (registerData.rspvealt.num != -1) encoding |= MIPS_RSP_VEALT(registerData.rspvealt.num);	// rsp element (alt. placement)
+	if (registerData.rspve.num != -1) encoding |= MIPS_RSP_VE(registerData.rspve.num);			// rsp element
+	if (registerData.rspvde.num != -1) encoding |= MIPS_RSP_VDE(registerData.rspvde.num);		// rsp destination element
+	if (registerData.rspvealt.num != -1) encoding |= MIPS_RSP_VEALT(registerData.rspvealt.num);	// rsp element (alt. placement)
 
 	if (!(opcodeData.opcode.flags & MO_VFPU_MIXED) && registerData.vrt.num != -1)			// vfpu rt
-		encoding |= registerData.vrt.num << 16;
+		encoding |= registerData.vrt.num << 16;
 
 	switch (immediateData.primary.type)
 	{
 	case MipsImmediateType::Immediate5:
 	case MipsImmediateType::Immediate10:
 	case MipsImmediateType::Immediate20:
-		encoding |= immediateData.primary.value << 6;
-		break;
+		encoding |= immediateData.primary.value << 6;
+		break;
 	case MipsImmediateType::Immediate16:
 	case MipsImmediateType::Immediate25:
 	case MipsImmediateType::Immediate26:
 	case MipsImmediateType::Immediate20_0:
 	case MipsImmediateType::Immediate7:
 	case MipsImmediateType::ImmediateHalfFloat:
-		encoding |= immediateData.primary.value;
-		break;
+		encoding |= immediateData.primary.value;
+		break;
 	default:
 		// TODO: Assert?
-		break;
+		break;
 	}
 
 	switch (immediateData.secondary.type)
 	{
 	case MipsImmediateType::CacheOp:
-		encoding |= immediateData.secondary.value << 16;
-		break;
+		encoding |= immediateData.secondary.value << 16;
+		break;
 	case MipsImmediateType::Ext:
 	case MipsImmediateType::Ins:
-		encoding |= immediateData.secondary.value << 11;
-		break;
+		encoding |= immediateData.secondary.value << 11;
+		break;
 	case MipsImmediateType::Cop2BranchType:
-		encoding |= immediateData.secondary.value << 18;
-		break;
+		encoding |= immediateData.secondary.value << 18;
+		break;
 	default:
 		// TODO: Assert?
-		break;
+		break;
 	}
 
 	if (opcodeData.opcode.flags & MO_VFPU_MIXED)
 	{
 		// always vrt
-		encoding |= registerData.vrt.num >> 5;
-		encoding |= (registerData.vrt.num & 0x1F) << 16;
+		encoding |= registerData.vrt.num >> 5;
+		encoding |= (registerData.vrt.num & 0x1F) << 16;
 	}
 
-	g_fileManager->writeU32((uint32_t)encoding);
+	g_fileManager->writeU32((uint32_t)encoding);
 }
 
 void CMipsInstruction::encodeVfpu() const
 {
-	int encoding = opcodeData.opcode.destencoding;
+	int encoding = opcodeData.opcode.destencoding;
 
-	if (opcodeData.vectorCondition != -1) encoding |= (opcodeData.vectorCondition << 0);
-	if (registerData.vrd.num != -1) encoding |= (registerData.vrd.num << 0);
-	if (registerData.vrs.num != -1) encoding |= (registerData.vrs.num << 8);
-	if (registerData.vrt.num != -1) encoding |= (registerData.vrt.num << 16);
+	if (opcodeData.vectorCondition != -1) encoding |= (opcodeData.vectorCondition << 0);
+	if (registerData.vrd.num != -1) encoding |= (registerData.vrd.num << 0);
+	if (registerData.vrs.num != -1) encoding |= (registerData.vrs.num << 8);
+	if (registerData.vrt.num != -1) encoding |= (registerData.vrt.num << 16);
 	if (opcodeData.vfpuSize != -1 && (opcodeData.opcode.flags & (MO_VFPU_PAIR|MO_VFPU_SINGLE|MO_VFPU_TRIPLE|MO_VFPU_QUAD)) == 0)
 	{
-		if (opcodeData.vfpuSize & 1) encoding |= (1 << 7);
-		if (opcodeData.vfpuSize & 2) encoding |= (1 << 15);
+		if (opcodeData.vfpuSize & 1) encoding |= (1 << 7);
+		if (opcodeData.vfpuSize & 2) encoding |= (1 << 15);
 	}
 
-	if (registerData.grt.num != -1) encoding |= (registerData.grt.num << 16);
+	if (registerData.grt.num != -1) encoding |= (registerData.grt.num << 16);
 
 	switch (immediateData.primary.type)
 	{
 	case MipsImmediateType::Immediate5:
-		encoding |= immediateData.primary.value << 16;
-		break;
+		encoding |= immediateData.primary.value << 16;
+		break;
 	case MipsImmediateType::Immediate7:
-		encoding |= immediateData.primary.value << 0;
-		break;
+		encoding |= immediateData.primary.value << 0;
+		break;
 	default:
 		// TODO: Assert?
-		break;
+		break;
 	}
 
-	g_fileManager->writeU32((uint32_t)encoding);
+	g_fileManager->writeU32((uint32_t)encoding);
 }
 
 void CMipsInstruction::Encode() const
 {
 	if (addNop)
-		g_fileManager->writeU32(0);
+		g_fileManager->writeU32(0);
 
 	if (opcodeData.opcode.flags & MO_VFPU)
-		encodeVfpu();
+		encodeVfpu();
 	else
-		encodeNormal();
+		encodeNormal();
 }
 
 void CMipsInstruction::writeTempData(TempData& tempData) const
 {
-	MipsOpcodeFormatter formatter;
-	tempData.writeLine(RamPos,formatter.formatOpcode(opcodeData,registerData,immediateData));
+	MipsOpcodeFormatter formatter;
+	tempData.writeLine(RamPos,formatter.formatOpcode(opcodeData,registerData,immediateData));
 }
 
 // file: Archs/MIPS/MipsExpressionFunctions.h
 
-extern const ExpressionFunctionMap mipsExpressionFunctions;
+extern const ExpressionFunctionMap mipsExpressionFunctions;
 
 // file: Archs/MIPS/MipsElfRelocator.h
 
@@ -4027,78 +4027,78 @@ enum {
 	R_MIPS_PC16,
 	R_MIPS_CALL16,
 	R_MIPS_GPREL32
-};
+};
 
 class MipsElfRelocator: public IElfRelocator
 {
 public:
-	int expectedMachine() const override;
-	bool relocateOpcode(int type, const RelocationData& data, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) override;
-	bool finish(std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) override;
-	void setSymbolAddress(RelocationData& data, int64_t symbolAddress, int symbolType) override;
-	std::unique_ptr<CAssemblerCommand> generateCtorStub(std::vector<ElfRelocatorCtor>& ctors) override;
+	int expectedMachine() const override;
+	bool relocateOpcode(int type, const RelocationData& data, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) override;
+	bool finish(std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors) override;
+	void setSymbolAddress(RelocationData& data, int64_t symbolAddress, int symbolType) override;
+	std::unique_ptr<CAssemblerCommand> generateCtorStub(std::vector<ElfRelocatorCtor>& ctors) override;
 private:
-	bool processHi16Entries(uint32_t lo16Opcode, int64_t lo16RelocationBase, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors);
+	bool processHi16Entries(uint32_t lo16Opcode, int64_t lo16RelocationBase, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors);
 
 	struct Hi16Entry
 	{
 		Hi16Entry(int64_t offset, int64_t relocationBase, uint32_t opcode) : offset(offset), relocationBase(relocationBase), opcode(opcode) {}
-		int64_t offset;
-		int64_t relocationBase;
-		uint32_t opcode;
-	};
+		int64_t offset;
+		int64_t relocationBase;
+		uint32_t opcode;
+	};
 
-	std::vector<Hi16Entry> hi16Entries;
-};
+	std::vector<Hi16Entry> hi16Entries;
+};
 
 // file: Archs/MIPS/Mips.cpp
 
-CMipsArchitecture Mips;
+CMipsArchitecture Mips;
 
 CMipsArchitecture::CMipsArchitecture()
 {
-	FixLoadDelay = false;
-	IgnoreLoadDelay = false;
-	LoadDelay = false;
-	LoadDelayRegister = 0;
-	DelaySlot = false;
-	Version = MARCH_INVALID;
+	FixLoadDelay = false;
+	IgnoreLoadDelay = false;
+	LoadDelay = false;
+	LoadDelayRegister = 0;
+	DelaySlot = false;
+	Version = MARCH_INVALID;
 }
 
 std::unique_ptr<CAssemblerCommand> CMipsArchitecture::parseDirective(Parser& parser)
 {
-	MipsParser mipsParser;
-	return mipsParser.parseDirective(parser);
+	MipsParser mipsParser;
+	return mipsParser.parseDirective(parser);
 }
 
 std::unique_ptr<CAssemblerCommand> CMipsArchitecture::parseOpcode(Parser& parser)
 {
-	MipsParser mipsParser;
+	MipsParser mipsParser;
 
-	std::unique_ptr<CAssemblerCommand> macro = mipsParser.parseMacro(parser);
+	std::unique_ptr<CAssemblerCommand> macro = mipsParser.parseMacro(parser);
 	if (macro != nullptr)
-		return macro;
+		return macro;
 
-	return mipsParser.parseOpcode(parser);
+	return mipsParser.parseOpcode(parser);
 }
 
 const ExpressionFunctionMap& CMipsArchitecture::getExpressionFunctions()
 {
-	return mipsExpressionFunctions;
+	return mipsExpressionFunctions;
 }
 
 void CMipsArchitecture::NextSection()
 {
-	LoadDelay = false;
-	LoadDelayRegister = 0;
-	DelaySlot = false;
+	LoadDelay = false;
+	LoadDelayRegister = 0;
+	DelaySlot = false;
 }
 
 void CMipsArchitecture::Revalidate()
 {
-	LoadDelay = false;
-	LoadDelayRegister = 0;
-	DelaySlot = false;
+	LoadDelay = false;
+	LoadDelayRegister = 0;
+	DelaySlot = false;
 }
 
 std::unique_ptr<IElfRelocator> CMipsArchitecture::getElfRelocator()
@@ -4108,18 +4108,18 @@ std::unique_ptr<IElfRelocator> CMipsArchitecture::getElfRelocator()
 	case MARCH_PS2:
 	case MARCH_PSP:
 	case MARCH_N64:
-		return ::make_unique<MipsElfRelocator>();
+		return ::make_unique<MipsElfRelocator>();
 	case MARCH_PSX:
 	case MARCH_RSP:
 	default:
-		return nullptr;
+		return nullptr;
 	}
 }
 
 void CMipsArchitecture::SetLoadDelay(bool Delay, int Register)
 {
-	LoadDelay = Delay;
-	LoadDelayRegister = Register;
+	LoadDelay = Delay;
+	LoadDelayRegister = Register;
 }
 
 // file: Archs/MIPS/MipsElfFile.h
@@ -4127,312 +4127,312 @@ void CMipsArchitecture::SetLoadDelay(bool Delay, int Register)
 class MipsElfFile: public AssemblerFile
 {
 public:
-	MipsElfFile();
-	virtual bool open(bool onlyCheck);
-	virtual void close();
-	virtual bool isOpen() { return opened; };
-	virtual bool write(void* data, size_t length);
-	virtual int64_t getVirtualAddress();
-	virtual int64_t getPhysicalAddress();
-	virtual int64_t getHeaderSize();
-	virtual bool seekVirtual(int64_t virtualAddress);
-	virtual bool seekPhysical(int64_t physicalAddress);
-	virtual bool getModuleInfo(SymDataModuleInfo& info);
-	virtual void beginSymData(SymbolData& symData);
-	virtual void endSymData(SymbolData& symData);
-	virtual const std::wstring& getFileName() { return fileName; };
+	MipsElfFile();
+	virtual bool open(bool onlyCheck);
+	virtual void close();
+	virtual bool isOpen() { return opened; };
+	virtual bool write(void* data, size_t length);
+	virtual int64_t getVirtualAddress();
+	virtual int64_t getPhysicalAddress();
+	virtual int64_t getHeaderSize();
+	virtual bool seekVirtual(int64_t virtualAddress);
+	virtual bool seekPhysical(int64_t physicalAddress);
+	virtual bool getModuleInfo(SymDataModuleInfo& info);
+	virtual void beginSymData(SymbolData& symData);
+	virtual void endSymData(SymbolData& symData);
+	virtual const std::wstring& getFileName() { return fileName; };
 
-	bool load(const std::wstring& fileName, const std::wstring& outputFileName);
-	void save();
-	bool setSection(const std::wstring& name);
+	bool load(const std::wstring& fileName, const std::wstring& outputFileName);
+	void save();
+	bool setSection(const std::wstring& name);
 private:
-	ElfFile elf;
-	std::wstring fileName;
-	std::wstring outputFileName;
-	bool opened;
-	int platform;
+	ElfFile elf;
+	std::wstring fileName;
+	std::wstring outputFileName;
+	bool opened;
+	int platform;
 
-	int segment;
-	int section;
-	size_t sectionOffset;
-};
+	int segment;
+	int section;
+	size_t sectionOffset;
+};
 
 
 class DirectiveLoadMipsElf: public CAssemblerCommand
 {
 public:
-	DirectiveLoadMipsElf(const std::wstring& fileName);
-	DirectiveLoadMipsElf(const std::wstring& inputName, const std::wstring& outputName);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	DirectiveLoadMipsElf(const std::wstring& fileName);
+	DirectiveLoadMipsElf(const std::wstring& inputName, const std::wstring& outputName);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	std::shared_ptr<MipsElfFile> file;
-	std::wstring inputName;
-	std::wstring outputName;
-};
+	std::shared_ptr<MipsElfFile> file;
+	std::wstring inputName;
+	std::wstring outputName;
+};
 
 // file: Util/CRC.h
 
-unsigned short getCrc16(unsigned char* Source, size_t len);
-unsigned int getCrc32(unsigned char* Source, size_t len);
-unsigned int getChecksum(unsigned char* Source, size_t len);
+unsigned short getCrc16(unsigned char* Source, size_t len);
+unsigned int getCrc32(unsigned char* Source, size_t len);
+unsigned int getChecksum(unsigned char* Source, size_t len);
 
 // file: Archs/MIPS/MipsElfFile.cpp
 
 MipsElfFile::MipsElfFile()
 {
-	platform = Mips.GetVersion();
-	section = segment = -1;
-	opened = false;
+	platform = Mips.GetVersion();
+	section = segment = -1;
+	opened = false;
 }
 
 bool MipsElfFile::open(bool onlyCheck)
 {
-	opened = !onlyCheck;
-	return true;
+	opened = !onlyCheck;
+	return true;
 }
 
 void MipsElfFile::close()
 {
 	if (isOpen())
-		save();
+		save();
 }
 
 void MipsElfFile::beginSymData(SymbolData& symData)
 {
-	symData.startModule(this);
+	symData.startModule(this);
 }
 
 void MipsElfFile::endSymData(SymbolData& symData)
 {
-	symData.endModule(this);
+	symData.endModule(this);
 }
 
 int64_t MipsElfFile::getVirtualAddress()
 {
 	if (segment != -1)
 	{
-		ElfSegment* seg = elf.getSegment(segment);
-		ElfSection* sect = seg->getSection(section);
-		int64_t addr = seg->getVirtualAddress() + sect->getOffset();
-		return addr+sectionOffset;
+		ElfSegment* seg = elf.getSegment(segment);
+		ElfSection* sect = seg->getSection(section);
+		int64_t addr = seg->getVirtualAddress() + sect->getOffset();
+		return addr+sectionOffset;
 	}
 
 	// segmentless sections don't have a virtual address
-	Logger::queueError(Logger::Error,L"Not inside a mapped section");
-	return -1;
+	Logger::queueError(Logger::Error,L"Not inside a mapped section");
+	return -1;
 }
 
 int64_t MipsElfFile::getPhysicalAddress()
 {
 	if (segment != -1)
 	{
-		ElfSegment* seg = elf.getSegment(segment);
-		ElfSection* sect = seg->getSection(section);
-		int64_t addr = seg->getOffset() + sect->getOffset();
-		return addr;
+		ElfSegment* seg = elf.getSegment(segment);
+		ElfSection* sect = seg->getSection(section);
+		int64_t addr = seg->getOffset() + sect->getOffset();
+		return addr;
 	}
 
 	if (section != -1)
 	{
-		ElfSection* sect = elf.getSegmentlessSection(section);
-		return sect->getOffset();
+		ElfSection* sect = elf.getSegmentlessSection(section);
+		return sect->getOffset();
 	}
 
-	Logger::queueError(Logger::Error,L"Not inside a section");
-	return -1;
+	Logger::queueError(Logger::Error,L"Not inside a section");
+	return -1;
 }
 
 int64_t MipsElfFile::getHeaderSize()
 {
 	// this method is not used
-	Logger::queueError(Logger::Error,L"Unimplemented method");
-	return -1;
+	Logger::queueError(Logger::Error,L"Unimplemented method");
+	return -1;
 }
 
 bool MipsElfFile::seekVirtual(int64_t virtualAddress)
 {
 	// search in segments
-	for (size_t i = 0; i < elf.getSegmentCount(); i++)
+	for (size_t i = 0; i < elf.getSegmentCount(); i++)
 	{
-		ElfSegment* seg = elf.getSegment(i);
-		int64_t segStart = seg->getVirtualAddress();
-		int64_t segEnd = segStart+seg->getPhysSize();
+		ElfSegment* seg = elf.getSegment(i);
+		int64_t segStart = seg->getVirtualAddress();
+		int64_t segEnd = segStart+seg->getPhysSize();
 
 		if (segStart <= virtualAddress && virtualAddress < segEnd)
 		{
 			// find section
-			for (size_t l = 0; l < seg->getSectionCount(); l++)
+			for (size_t l = 0; l < seg->getSectionCount(); l++)
 			{
-				ElfSection* sect = seg->getSection(l);
-				int64_t sectStart = segStart+sect->getOffset();
-				int64_t sectEnd = sectStart+sect->getSize();
+				ElfSection* sect = seg->getSection(l);
+				int64_t sectStart = segStart+sect->getOffset();
+				int64_t sectEnd = sectStart+sect->getSize();
 
 				if (sectStart <= virtualAddress && virtualAddress < sectEnd)
 				{
-					segment = (int) i;
-					section = (int) l;
-					sectionOffset = (size_t) (virtualAddress-sectStart);
-					return true;
+					segment = (int) i;
+					section = (int) l;
+					sectionOffset = (size_t) (virtualAddress-sectStart);
+					return true;
 				}
 			}
 
-			Logger::queueError(Logger::Error,L"Found segment, but no containing section");
-			return false;
+			Logger::queueError(Logger::Error,L"Found segment, but no containing section");
+			return false;
 		}
 	}
 
 	// segmentless sections don't have a virtual address
-	Logger::printError(Logger::Error,L"Couldn't find a mapped section");
-	return false;
+	Logger::printError(Logger::Error,L"Couldn't find a mapped section");
+	return false;
 }
 
 bool MipsElfFile::seekPhysical(int64_t physicalAddress)
 {
 	// search in segments
-	for (size_t i = 0; i < elf.getSegmentCount(); i++)
+	for (size_t i = 0; i < elf.getSegmentCount(); i++)
 	{
-		ElfSegment* seg = elf.getSegment(i);
-		int64_t segStart = seg->getOffset();
-		int64_t segEnd = segStart+seg->getPhysSize();
+		ElfSegment* seg = elf.getSegment(i);
+		int64_t segStart = seg->getOffset();
+		int64_t segEnd = segStart+seg->getPhysSize();
 
 		if (segStart <= physicalAddress && physicalAddress < segEnd)
 		{
 			// find section
-			for (size_t l = 0; l < seg->getSectionCount(); l++)
+			for (size_t l = 0; l < seg->getSectionCount(); l++)
 			{
-				ElfSection* sect = seg->getSection(l);
-				int64_t sectStart = segStart+sect->getOffset();
-				int64_t sectEnd = sectStart+sect->getSize();
+				ElfSection* sect = seg->getSection(l);
+				int64_t sectStart = segStart+sect->getOffset();
+				int64_t sectEnd = sectStart+sect->getSize();
 
 				if (sectStart <= physicalAddress && physicalAddress < sectEnd)
 				{
-					segment = (int) i;
-					section = (int) l;
-					sectionOffset = physicalAddress-sectStart;
-					return true;
+					segment = (int) i;
+					section = (int) l;
+					sectionOffset = physicalAddress-sectStart;
+					return true;
 				}
 			}
 
-			Logger::queueError(Logger::Error,L"Found segment, but no containing section");
-			return false;
+			Logger::queueError(Logger::Error,L"Found segment, but no containing section");
+			return false;
 		}
 	}
 
 	// search in segmentless sections
-	for (size_t i = 0; i < elf.getSegmentlessSectionCount(); i++)
+	for (size_t i = 0; i < elf.getSegmentlessSectionCount(); i++)
 	{
-		ElfSection* sect = elf.getSegmentlessSection(i);
-		int64_t sectStart = sect->getOffset();
-		int64_t sectEnd = sectStart+sect->getSize();
+		ElfSection* sect = elf.getSegmentlessSection(i);
+		int64_t sectStart = sect->getOffset();
+		int64_t sectEnd = sectStart+sect->getSize();
 
 		if (sectStart <= physicalAddress && physicalAddress < sectEnd)
 		{
-			segment = -1;
-			section = (int) i;
-			sectionOffset = physicalAddress-sectStart;
-			return true;
+			segment = -1;
+			section = (int) i;
+			sectionOffset = physicalAddress-sectStart;
+			return true;
 		}
 	}
 
-	segment = -1;
-	section = -1;
-	Logger::queueError(Logger::Error,L"Couldn't find a section");
-	return false;
+	segment = -1;
+	section = -1;
+	Logger::queueError(Logger::Error,L"Couldn't find a section");
+	return false;
 }
 
 bool MipsElfFile::getModuleInfo(SymDataModuleInfo& info)
 {
-	info.crc32 = getCrc32(elf.getFileData().data(),elf.getFileData().size());
-	return true;
+	info.crc32 = getCrc32(elf.getFileData().data(),elf.getFileData().size());
+	return true;
 }
 
 bool MipsElfFile::write(void* data, size_t length)
 {
 	if (segment != -1)
 	{
-		ElfSegment* seg = elf.getSegment(segment);
-		ElfSection* sect = seg->getSection(section);
+		ElfSegment* seg = elf.getSegment(segment);
+		ElfSection* sect = seg->getSection(section);
 
-		int64_t pos = sect->getOffset()+sectionOffset;
-		seg->writeToData(pos,data,length);
-		sectionOffset += length;
-		return true;
+		int64_t pos = sect->getOffset()+sectionOffset;
+		seg->writeToData(pos,data,length);
+		sectionOffset += length;
+		return true;
 	}
 
 	if (section != -1)
 	{
 		// TODO: segmentless sections
-		return false;
+		return false;
 	}
 
-	Logger::printError(Logger::Error,L"Not inside a section");
-	return false;
+	Logger::printError(Logger::Error,L"Not inside a section");
+	return false;
 }
 
 bool MipsElfFile::load(const std::wstring& fileName, const std::wstring& outputFileName)
 {
-	this->outputFileName = outputFileName;
+	this->outputFileName = outputFileName;
 
 	if (elf.load(fileName,true) == false)
 	{
-		Logger::printError(Logger::FatalError,L"Failed to load %s",fileName);
-		return false;
+		Logger::printError(Logger::FatalError,L"Failed to load %s",fileName);
+		return false;
 	}
 
 	if (elf.getType() == 0xFFA0)
 	{
-		Logger::printError(Logger::FatalError,L"Relocatable ELF %s not supported yet",fileName);
-		return false;
+		Logger::printError(Logger::FatalError,L"Relocatable ELF %s not supported yet",fileName);
+		return false;
 	}
 
 	if (elf.getType() != 2)
 	{
-		Logger::printError(Logger::FatalError,L"Unknown ELF %s type %d",fileName,elf.getType());
-		return false;
+		Logger::printError(Logger::FatalError,L"Unknown ELF %s type %d",fileName,elf.getType());
+		return false;
 	}
 
 	if (elf.getSegmentCount() != 0)
-		seekVirtual(elf.getSegment(0)->getVirtualAddress());
+		seekVirtual(elf.getSegment(0)->getVirtualAddress());
 
-	return true;
+	return true;
 }
 
 bool MipsElfFile::setSection(const std::wstring& name)
 {
-	std::string utf8Name = convertWStringToUtf8(name);
+	std::string utf8Name = convertWStringToUtf8(name);
 
 	// look in segments
-	for (size_t i = 0; i < elf.getSegmentCount(); i++)
+	for (size_t i = 0; i < elf.getSegmentCount(); i++)
 	{
-		ElfSegment* seg = elf.getSegment(i);
-		int n = seg->findSection(utf8Name);
+		ElfSegment* seg = elf.getSegment(i);
+		int n = seg->findSection(utf8Name);
 		if (n != -1)
 		{
-			segment = (int) i;
-			section = n;
-			return true;
+			segment = (int) i;
+			section = n;
+			return true;
 		}
 	}
 
 	// look in stray sections
-	int n = elf.findSegmentlessSection(utf8Name);
+	int n = elf.findSegmentlessSection(utf8Name);
 	if (n != -1)
 	{
-		segment = -1;
-		section = n;
-		return true;
+		segment = -1;
+		section = n;
+		return true;
 	}
 
-	Logger::queueError(Logger::Warning,L"Section %s not found",name);
-	return false;
+	Logger::queueError(Logger::Warning,L"Section %s not found",name);
+	return false;
 }
 
 void MipsElfFile::save()
 {
-	elf.save(outputFileName);
+	elf.save(outputFileName);
 }
 
 //
@@ -4441,77 +4441,77 @@ void MipsElfFile::save()
 
 DirectiveLoadMipsElf::DirectiveLoadMipsElf(const std::wstring& fileName)
 {
-	file = std::make_shared<MipsElfFile>();
+	file = std::make_shared<MipsElfFile>();
 
-	this->inputName = getFullPathName(fileName);
+	this->inputName = getFullPathName(fileName);
 	if (file->load(this->inputName,this->inputName) == false)
 	{
-		file = nullptr;
-		return;
+		file = nullptr;
+		return;
 	}
 
-	g_fileManager->addFile(file);
+	g_fileManager->addFile(file);
 }
 
 DirectiveLoadMipsElf::DirectiveLoadMipsElf(const std::wstring& inputName, const std::wstring& outputName)
 {
-	file = std::make_shared<MipsElfFile>();
+	file = std::make_shared<MipsElfFile>();
 
-	this->inputName = getFullPathName(inputName);
-	this->outputName = getFullPathName(outputName);
+	this->inputName = getFullPathName(inputName);
+	this->outputName = getFullPathName(outputName);
 	if (file->load(this->inputName,this->outputName) == false)
 	{
-		file = nullptr;
-		return;
+		file = nullptr;
+		return;
 	}
 
-	g_fileManager->addFile(file);
+	g_fileManager->addFile(file);
 }
 
 bool DirectiveLoadMipsElf::Validate()
 {
-	Arch->NextSection();
-	g_fileManager->openFile(file,true);
-	return false;
+	Arch->NextSection();
+	g_fileManager->openFile(file,true);
+	return false;
 }
 
 void DirectiveLoadMipsElf::Encode() const
 {
-	g_fileManager->openFile(file,false);
+	g_fileManager->openFile(file,false);
 }
 
 void DirectiveLoadMipsElf::writeTempData(TempData& tempData) const
 {
 	if (outputName.empty())
 	{
-		tempData.writeLine(g_fileManager->getVirtualAddress(),formatString(L".loadelf \"%s\"",inputName));
+		tempData.writeLine(g_fileManager->getVirtualAddress(),formatString(L".loadelf \"%s\"",inputName));
 	} else {
 		tempData.writeLine(g_fileManager->getVirtualAddress(),formatString(L".loadelf \"%s\",\"%s\"",
-			inputName,outputName));
+			inputName,outputName));
 	}
 }
 
 void DirectiveLoadMipsElf::writeSymData(SymbolData& symData) const
 {
-	file->beginSymData(symData);
+	file->beginSymData(symData);
 }
 
 // file: Commands/CommandSequence.h
 
-class Label;
+class Label;
 
 class CommandSequence: public CAssemblerCommand
 {
 public:
-	CommandSequence();
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
-	void addCommand(std::unique_ptr<CAssemblerCommand> cmd) { commands.push_back(std::move(cmd)); }
+	CommandSequence();
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
+	void addCommand(std::unique_ptr<CAssemblerCommand> cmd) { commands.push_back(std::move(cmd)); }
 private:
-	std::vector<std::unique_ptr<CAssemblerCommand>> commands;
-};
+	std::vector<std::unique_ptr<CAssemblerCommand>> commands;
+};
 
 // file: Parser/Parser.h
 #include <set>
@@ -4520,223 +4520,223 @@ private:
 
 struct AssemblyTemplateArgument
 {
-	const wchar_t* variableName;
-	std::wstring value;
-};
+	const wchar_t* variableName;
+	std::wstring value;
+};
 
 struct ParserMacro
 {
-	std::wstring name;
-	std::vector<std::wstring> parameters;
-	std::set<std::wstring> labels;
-	std::vector<Token> content;
-	size_t counter;
-};
+	std::wstring name;
+	std::vector<std::wstring> parameters;
+	std::set<std::wstring> labels;
+	std::vector<Token> content;
+	size_t counter;
+};
 
-enum class ConditionalResult { Unknown, True, False };
+enum class ConditionalResult { Unknown, True, False };
 
 class Parser
 {
 public:
-	Parser();
-	bool atEnd() { return entries.back().tokenizer->atEnd(); }
+	Parser();
+	bool atEnd() { return entries.back().tokenizer->atEnd(); }
 
-	void addEquation(const Token& start, const std::wstring& name, const std::wstring& value);
+	void addEquation(const Token& start, const std::wstring& name, const std::wstring& value);
 
-	Expression parseExpression();
-	bool parseExpressionList(std::vector<Expression>& list, int min = -1, int max = -1);
-	bool parseIdentifier(std::wstring& dest);
-	std::unique_ptr<CAssemblerCommand> parseCommand();
-	std::unique_ptr<CAssemblerCommand> parseCommandSequence(wchar_t indicator = 0, const std::initializer_list<const wchar_t*> terminators = {});
-	std::unique_ptr<CAssemblerCommand> parseFile(TextFile& file, bool virtualFile = false);
-	std::unique_ptr<CAssemblerCommand> parseString(const std::wstring& text);
-	std::unique_ptr<CAssemblerCommand> parseTemplate(const std::wstring& text, const std::initializer_list<AssemblyTemplateArgument> variables = {});
-	std::unique_ptr<CAssemblerCommand> parseDirective(const DirectiveMap &directiveSet);
-	bool matchToken(TokenType type, bool optional = false);
+	Expression parseExpression();
+	bool parseExpressionList(std::vector<Expression>& list, int min = -1, int max = -1);
+	bool parseIdentifier(std::wstring& dest);
+	std::unique_ptr<CAssemblerCommand> parseCommand();
+	std::unique_ptr<CAssemblerCommand> parseCommandSequence(wchar_t indicator = 0, const std::initializer_list<const wchar_t*> terminators = {});
+	std::unique_ptr<CAssemblerCommand> parseFile(TextFile& file, bool virtualFile = false);
+	std::unique_ptr<CAssemblerCommand> parseString(const std::wstring& text);
+	std::unique_ptr<CAssemblerCommand> parseTemplate(const std::wstring& text, const std::initializer_list<AssemblyTemplateArgument> variables = {});
+	std::unique_ptr<CAssemblerCommand> parseDirective(const DirectiveMap &directiveSet);
+	bool matchToken(TokenType type, bool optional = false);
 
-	Tokenizer* getTokenizer() { return entries.back().tokenizer; };
-	const Token& peekToken(int ahead = 0) { return getTokenizer()->peekToken(ahead); };
-	const Token& nextToken() { return getTokenizer()->nextToken(); };
-	void eatToken() { getTokenizer()->eatToken(); };
-	void eatTokens(int num) { getTokenizer()->eatTokens(num); };
+	Tokenizer* getTokenizer() { return entries.back().tokenizer; };
+	const Token& peekToken(int ahead = 0) { return getTokenizer()->peekToken(ahead); };
+	const Token& nextToken() { return getTokenizer()->nextToken(); };
+	void eatToken() { getTokenizer()->eatToken(); };
+	void eatTokens(int num) { getTokenizer()->eatTokens(num); };
 
-	void pushConditionalResult(ConditionalResult cond);
-	void popConditionalResult() { conditionStack.pop_back(); };
-	bool isInsideTrueBlock() { return conditionStack.back().inTrueBlock; }
-	bool isInsideUnknownBlock() { return conditionStack.back().inUnknownBlock; }
+	void pushConditionalResult(ConditionalResult cond);
+	void popConditionalResult() { conditionStack.pop_back(); };
+	bool isInsideTrueBlock() { return conditionStack.back().inTrueBlock; }
+	bool isInsideUnknownBlock() { return conditionStack.back().inUnknownBlock; }
 
 	template <typename... Args>
 	void printError(const Token& token, const wchar_t* text, const Args&... args)
 	{
-		errorLine = token.line;
-		Global.FileInfo.LineNumber = (int) token.line;
-		std::wstring errorText = formatString(text,args...);
-		Logger::printError(Logger::Error,errorText);
-		error = true;
+		errorLine = token.line;
+		Global.FileInfo.LineNumber = (int) token.line;
+		std::wstring errorText = formatString(text,args...);
+		Logger::printError(Logger::Error,errorText);
+		error = true;
 	}
 
-	bool hasError() { return error; }
-	void updateFileInfo();
+	bool hasError() { return error; }
+	void updateFileInfo();
 protected:
-	void clearError() { error = false; }
-	std::unique_ptr<CAssemblerCommand> handleError();
+	void clearError() { error = false; }
+	std::unique_ptr<CAssemblerCommand> handleError();
 
-	std::unique_ptr<CAssemblerCommand> parse(Tokenizer* tokenizer, bool virtualFile, const std::wstring& name = L"");
-	std::unique_ptr<CAssemblerCommand> parseLabel();
-	bool checkEquLabel();
-	bool checkMacroDefinition();
-	std::unique_ptr<CAssemblerCommand> parseMacroCall();
+	std::unique_ptr<CAssemblerCommand> parse(Tokenizer* tokenizer, bool virtualFile, const std::wstring& name = L"");
+	std::unique_ptr<CAssemblerCommand> parseLabel();
+	bool checkEquLabel();
+	bool checkMacroDefinition();
+	std::unique_ptr<CAssemblerCommand> parseMacroCall();
 
 	struct FileEntry
 	{
-		Tokenizer* tokenizer;
-		bool virtualFile;
-		int fileNum;
-		int previousCommandLine;
-	};
+		Tokenizer* tokenizer;
+		bool virtualFile;
+		int fileNum;
+		int previousCommandLine;
+	};
 
-	std::vector<FileEntry> entries;
-	std::map<std::wstring,ParserMacro> macros;
-	std::set<std::wstring> macroLabels;
-	bool initializingMacro;
-	bool error;
-	size_t errorLine;
+	std::vector<FileEntry> entries;
+	std::map<std::wstring,ParserMacro> macros;
+	std::set<std::wstring> macroLabels;
+	bool initializingMacro;
+	bool error;
+	size_t errorLine;
 
-	bool overrideFileInfo;
-	int overrideFileNum;
-	int overrideLineNum;
+	bool overrideFileInfo;
+	int overrideFileNum;
+	int overrideLineNum;
 
 	struct ConditionInfo
 	{
-		bool inTrueBlock;
-		bool inUnknownBlock;
-	};
+		bool inTrueBlock;
+		bool inUnknownBlock;
+	};
 
-	std::vector<ConditionInfo> conditionStack;
-};
+	std::vector<ConditionInfo> conditionStack;
+};
 
 struct TokenSequenceValue
 {
 	TokenSequenceValue(const wchar_t* text)
 	{
-		type = TokenType::Identifier;
-		textValue = text;
+		type = TokenType::Identifier;
+		textValue = text;
 	}
 
 	TokenSequenceValue(int64_t num)
 	{
-		type = TokenType::Integer;
-		intValue = num;
+		type = TokenType::Integer;
+		intValue = num;
 	}
 
 	TokenSequenceValue(double num)
 	{
-		type = TokenType::Float;
-		floatValue = num;
+		type = TokenType::Float;
+		floatValue = num;
 	}
 
 
-	TokenType type;
+	TokenType type;
 	union
 	{
-		const wchar_t* textValue;
-		int64_t intValue;
-		double floatValue;
-	};
-};
+		const wchar_t* textValue;
+		int64_t intValue;
+		double floatValue;
+	};
+};
 
-using TokenSequence = std::initializer_list<TokenType>;
-using TokenValueSequence = std::initializer_list<TokenSequenceValue>;
+using TokenSequence = std::initializer_list<TokenType>;
+using TokenValueSequence = std::initializer_list<TokenSequenceValue>;
 
 class TokenSequenceParser
 {
 public:
-	void addEntry(int result, TokenSequence tokens, TokenValueSequence values);
-	bool parse(Parser& parser, int& result);
-	size_t getEntryCount() { return entries.size(); }
+	void addEntry(int result, TokenSequence tokens, TokenValueSequence values);
+	bool parse(Parser& parser, int& result);
+	size_t getEntryCount() { return entries.size(); }
 private:
 	struct Entry
 	{
-		std::vector<TokenType> tokens;
-		std::vector<TokenSequenceValue> values;
-		int result;
-	};
+		std::vector<TokenType> tokens;
+		std::vector<TokenSequenceValue> values;
+		int result;
+	};
 
-	std::vector<Entry> entries;
-};
+	std::vector<Entry> entries;
+};
 
 // file: Archs/MIPS/MipsElfRelocator.cpp
 
 int MipsElfRelocator::expectedMachine() const
 {
-	return EM_MIPS;
+	return EM_MIPS;
 }
 
 bool MipsElfRelocator::processHi16Entries(uint32_t lo16Opcode, int64_t lo16RelocationBase, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors)
 {
-	bool result = true;
+	bool result = true;
 
 	for (const Hi16Entry &hi16: hi16Entries)
 	{
 		if (hi16.relocationBase != lo16RelocationBase)
 		{
-			errors.push_back(formatString(L"Mismatched R_MIPS_HI16 with	R_MIPS_LO16 of a different symbol"));
-			result = false;
-			continue;
+			errors.push_back(formatString(L"Mismatched R_MIPS_HI16 with	R_MIPS_LO16 of a different symbol"));
+			result = false;
+			continue;
 		}
 
-		int32_t addend = (int32_t)((hi16.opcode & 0xFFFF) << 16) + (int16_t)(lo16Opcode & 0xFFFF);
-		int64_t fullPosition = addend + hi16.relocationBase;
-		uint32_t opcode = (hi16.opcode & 0xffff0000) | (((fullPosition >> 16) + ((fullPosition & 0x8000) != 0)) & 0xFFFF);
-		actions.emplace_back(hi16.offset, opcode);
+		int32_t addend = (int32_t)((hi16.opcode & 0xFFFF) << 16) + (int16_t)(lo16Opcode & 0xFFFF);
+		int64_t fullPosition = addend + hi16.relocationBase;
+		uint32_t opcode = (hi16.opcode & 0xffff0000) | (((fullPosition >> 16) + ((fullPosition & 0x8000) != 0)) & 0xFFFF);
+		actions.emplace_back(hi16.offset, opcode);
 	}
 
-	hi16Entries.clear();
-	return result;
+	hi16Entries.clear();
+	return result;
 }
 
 bool MipsElfRelocator::relocateOpcode(int type, const RelocationData& data, std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors)
 {
-	unsigned int op = data.opcode;
-	bool result = true;
+	unsigned int op = data.opcode;
+	bool result = true;
 
 	switch (type)
 	{
 	case R_MIPS_26: //j, jal
-		op = (op & 0xFC000000) | (((op&0x03FFFFFF)+(data.relocationBase>>2))&0x03FFFFFF);
-		break;
+		op = (op & 0xFC000000) | (((op&0x03FFFFFF)+(data.relocationBase>>2))&0x03FFFFFF);
+		break;
 	case R_MIPS_32:
-		op += (int) data.relocationBase;
-		break;
+		op += (int) data.relocationBase;
+		break;
 	case R_MIPS_HI16:
-		hi16Entries.emplace_back(data.opcodeOffset, data.relocationBase, data.opcode);
-		break;
+		hi16Entries.emplace_back(data.opcodeOffset, data.relocationBase, data.opcode);
+		break;
 	case R_MIPS_LO16:
 		if (!processHi16Entries(op, data.relocationBase, actions, errors))
-			result = false;
-		op = (op&0xffff0000) | (((op&0xffff)+data.relocationBase)&0xffff);
-		break;
+			result = false;
+		op = (op&0xffff0000) | (((op&0xffff)+data.relocationBase)&0xffff);
+		break;
 	default:
-		errors.emplace_back(formatString(L"Unknown MIPS relocation type %d",type));
-		return false;
+		errors.emplace_back(formatString(L"Unknown MIPS relocation type %d",type));
+		return false;
 	}
 
-	actions.emplace_back(data.opcodeOffset, op);
-	return result;
+	actions.emplace_back(data.opcodeOffset, op);
+	return result;
 }
 
 bool MipsElfRelocator::finish(std::vector<RelocationAction>& actions, std::vector<std::wstring>& errors)
 {
 	// This shouldn't happen. If it does, relocate as if there was no lo16 opcode
 	if (!hi16Entries.empty())
-		return processHi16Entries(0, hi16Entries.front().relocationBase, actions, errors);
-	return true;
+		return processHi16Entries(0, hi16Entries.front().relocationBase, actions, errors);
+	return true;
 }
 
 void MipsElfRelocator::setSymbolAddress(RelocationData& data, int64_t symbolAddress, int symbolType)
 {
-	data.symbolAddress = symbolAddress;
-	data.targetSymbolType = symbolType;
+	data.symbolAddress = symbolAddress;
+	data.targetSymbolType = symbolType;
 }
 
 const wchar_t* mipsCtorTemplate = LR"(
@@ -4769,20 +4769,20 @@ const wchar_t* mipsCtorTemplate = LR"(
 	addiu	sp,32
 	%ctorTable%:
 	.word	%ctorContent%
-)";
+)";
 
 std::unique_ptr<CAssemblerCommand> MipsElfRelocator::generateCtorStub(std::vector<ElfRelocatorCtor>& ctors)
 {
-	Parser parser;
+	Parser parser;
 	if (ctors.size() != 0)
 	{
 		// create constructor table
-		std::wstring table;
-		for (size_t i = 0; i < ctors.size(); i++)
+		std::wstring table;
+		for (size_t i = 0; i < ctors.size(); i++)
 		{
 			if (i != 0)
-				table += ',';
-			table += formatString(L"%s,%s+0x%08X",ctors[i].symbolName,ctors[i].symbolName,ctors[i].size);
+				table += ',';
+			table += formatString(L"%s,%s+0x%08X",ctors[i].symbolName,ctors[i].symbolName,ctors[i].size);
 		}
 
 		return parser.parseTemplate(mipsCtorTemplate,{
@@ -4791,9 +4791,9 @@ std::unique_ptr<CAssemblerCommand> MipsElfRelocator::generateCtorStub(std::vecto
 			{ L"%outerLoopLabel%",	Global.symbolTable.getUniqueLabelName() },
 			{ L"%innerLoopLabel%",	Global.symbolTable.getUniqueLabelName() },
 			{ L"%ctorContent%",		table },
-		});
+		});
 	} else {
-		return parser.parseTemplate(L"jr ra :: nop");
+		return parser.parseTemplate(L"jr ra :: nop");
 	}
 }
 
@@ -4801,70 +4801,70 @@ std::unique_ptr<CAssemblerCommand> MipsElfRelocator::generateCtorStub(std::vecto
 
 #define GET_PARAM(params,index,dest) \
 	if (getExpFuncParameter(params,index,dest,funcName,false) == false) \
-		return ExpressionValue();
+		return ExpressionValue();
 
 ExpressionValue expFuncHi(const std::wstring& funcName, const std::vector<ExpressionValue>& parameters)
 {
-	int64_t value;
+	int64_t value;
 
-	GET_PARAM(parameters,0,value);
+	GET_PARAM(parameters,0,value);
 
-	return ExpressionValue((int64_t)((value >> 16) + ((value & 0x8000) != 0)) & 0xFFFF);
+	return ExpressionValue((int64_t)((value >> 16) + ((value & 0x8000) != 0)) & 0xFFFF);
 }
 
 ExpressionValue expFuncLo(const std::wstring& funcName, const std::vector<ExpressionValue>& parameters)
 {
-	int64_t value;
+	int64_t value;
 
-	GET_PARAM(parameters,0,value);
+	GET_PARAM(parameters,0,value);
 
-	return ExpressionValue((int64_t)(int16_t)(value & 0xFFFF));
+	return ExpressionValue((int64_t)(int16_t)(value & 0xFFFF));
 }
 
 const ExpressionFunctionMap mipsExpressionFunctions = {
 	{ L"lo",			{ &expFuncLo,				1,	1,	ExpFuncSafety::Safe } },
 	{ L"hi",			{ &expFuncHi,				1,	1,	ExpFuncSafety::Safe } },
-};
+};
 
 // file: Archs/MIPS/MipsMacros.cpp
 
 MipsMacroCommand::MipsMacroCommand(std::unique_ptr<CAssemblerCommand> content, int macroFlags)
 {
-	this->content = std::move(content);
-	this->macroFlags = macroFlags;
-	IgnoreLoadDelay = Mips.GetIgnoreDelay();
+	this->content = std::move(content);
+	this->macroFlags = macroFlags;
+	IgnoreLoadDelay = Mips.GetIgnoreDelay();
 }
 
 bool MipsMacroCommand::Validate()
 {
-	int64_t memoryPos = g_fileManager->getVirtualAddress();
-	content->applyFileInfo();
-	bool result = content->Validate();
-	int64_t newMemoryPos = g_fileManager->getVirtualAddress();
+	int64_t memoryPos = g_fileManager->getVirtualAddress();
+	content->applyFileInfo();
+	bool result = content->Validate();
+	int64_t newMemoryPos = g_fileManager->getVirtualAddress();
 
-	applyFileInfo();
+	applyFileInfo();
 
 	if (IgnoreLoadDelay == false && Mips.GetDelaySlot() == true && (newMemoryPos-memoryPos) > 4
 		&& (macroFlags & MIPSM_DONTWARNDELAYSLOT) == 0)
 	{
-		Logger::queueError(Logger::Warning,L"Macro with multiple opcodes used inside a delay slot");
+		Logger::queueError(Logger::Warning,L"Macro with multiple opcodes used inside a delay slot");
 	}
 
 	if (newMemoryPos == memoryPos)
-		Logger::queueError(Logger::Warning,L"Empty macro content");
+		Logger::queueError(Logger::Warning,L"Empty macro content");
 
-	return result;
+	return result;
 }
 
 void MipsMacroCommand::Encode() const
 {
-	content->Encode();
+	content->Encode();
 }
 
 void MipsMacroCommand::writeTempData(TempData& tempData) const
 {
-	content->applyFileInfo();
-	content->writeTempData(tempData);
+	content->applyFileInfo();
+	content->writeTempData(tempData);
 }
 
 std::wstring preprocessMacro(const wchar_t* text, MipsImmediateData& immediates)
@@ -4873,17 +4873,17 @@ std::wstring preprocessMacro(const wchar_t* text, MipsImmediateData& immediates)
 	// Any expressions used in the macro may be evaluated at a different memory
 	// position, so the '.' operator needs to be replaced by a label at the start
 	// of the macro
-	std::wstring labelName = Global.symbolTable.getUniqueLabelName(true);
-	immediates.primary.expression.replaceMemoryPos(labelName);
-	immediates.secondary.expression.replaceMemoryPos(labelName);
+	std::wstring labelName = Global.symbolTable.getUniqueLabelName(true);
+	immediates.primary.expression.replaceMemoryPos(labelName);
+	immediates.secondary.expression.replaceMemoryPos(labelName);
 
-	return formatString(L"%s: %s",labelName,text);
+	return formatString(L"%s: %s",labelName,text);
 }
 
 std::unique_ptr<CAssemblerCommand> createMacro(Parser& parser, const std::wstring& text, int flags, std::initializer_list<AssemblyTemplateArgument> variables)
 {
-	std::unique_ptr<CAssemblerCommand> content = parser.parseTemplate(text,variables);
-	return ::make_unique<MipsMacroCommand>(std::move(content),flags);
+	std::unique_ptr<CAssemblerCommand> content = parser.parseTemplate(text,variables);
+	return ::make_unique<MipsMacroCommand>(std::move(content),flags);
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroAbs(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
@@ -4892,24 +4892,24 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroAbs(Parser& parser, MipsRegi
 		%sraop% 	r1,%rs%,31
 		xor 		%rd%,%rs%,r1
 		%subop% 	%rd%,%rd%,r1
-	)";
+	)";
 
-	std::wstring sraop, subop;
+	std::wstring sraop, subop;
 
 	switch (flags & MIPSM_ACCESSMASK)
 	{
-	case MIPSM_W:	sraop = L"sra"; subop = L"subu"; break;
-	case MIPSM_DW:	sraop = L"dsra32"; subop = L"dsubu"; break;
-	default: return nullptr;
+	case MIPSM_W:	sraop = L"sra"; subop = L"subu"; break;
+	case MIPSM_DW:	sraop = L"dsra32"; subop = L"dsubu"; break;
+	default: return nullptr;
 	}
 
-	std::wstring macroText = preprocessMacro(templateAbs,immediates);
+	std::wstring macroText = preprocessMacro(templateAbs,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%rd%",		registers.grd.name },
 			{ L"%rs%",		registers.grs.name },
 			{ L"%sraop%",	sraop },
 			{ L"%subop%",	subop },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroLiFloat(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
@@ -4917,15 +4917,15 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroLiFloat(Parser& parser, Mips
 	const wchar_t* templateLiFloat = LR"(
 		li 		r1,float(%imm%)
 		mtc1	r1,%rs%
-	)";
+	)";
 
-	std::wstring sraop, subop;
+	std::wstring sraop, subop;
 
-	std::wstring macroText = preprocessMacro(templateLiFloat,immediates);
+	std::wstring macroText = preprocessMacro(templateLiFloat,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%imm%",		immediates.secondary.expression.toString() },
 			{ L"%rs%",		registers.frs.name },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroLi(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
@@ -4957,26 +4957,26 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroLi(Parser& parser, MipsRegis
 				ori		%rs%,r0,%imm%
 			.endif
 		.endif
-	)";
+	)";
 
 	// floats need to be treated as integers, convert them
 	if (immediates.secondary.expression.isConstExpression())
 	{
-		ExpressionValue value = immediates.secondary.expression.evaluate();
+		ExpressionValue value = immediates.secondary.expression.evaluate();
 		if (value.isFloat())
 		{
-			int32_t newValue = getFloatBits((float)value.floatValue);
-			immediates.secondary.expression = createConstExpression(newValue);
+			int32_t newValue = getFloatBits((float)value.floatValue);
+			immediates.secondary.expression = createConstExpression(newValue);
 		}
 	}
 
-	std::wstring macroText = preprocessMacro(templateLi,immediates);
+	std::wstring macroText = preprocessMacro(templateLi,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%upper%",	(flags & MIPSM_UPPER) ? L"1" : L"0" },
 			{ L"%lower%",	(flags & MIPSM_LOWER) ? L"1" : L"0" },
 			{ L"%rs%",		registers.grs.name },
 			{ L"%imm%",		immediates.secondary.expression.toString() },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroLoadStore(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
@@ -4998,41 +4998,41 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroLoadStore(Parser& parser, Mi
 				%op%	%rs%, lo(%imm%)(%temp%)
 			.endif
 		.endif
-	)";
+	)";
 
-	const wchar_t* op;
-	bool isCop = false;
+	const wchar_t* op;
+	bool isCop = false;
 	switch (flags & (MIPSM_ACCESSMASK|MIPSM_LOAD|MIPSM_STORE))
 	{
-	case MIPSM_LOAD|MIPSM_B:		op = L"lb"; break;
-	case MIPSM_LOAD|MIPSM_BU:		op = L"lbu"; break;
-	case MIPSM_LOAD|MIPSM_HW:		op = L"lh"; break;
-	case MIPSM_LOAD|MIPSM_HWU:		op = L"lhu"; break;
-	case MIPSM_LOAD|MIPSM_W:		op = L"lw"; break;
-	case MIPSM_LOAD|MIPSM_WU:		op = L"lwu"; break;
-	case MIPSM_LOAD|MIPSM_DW:		op = L"ld"; break;
-	case MIPSM_LOAD|MIPSM_LLSCW:	op = L"ll"; break;
-	case MIPSM_LOAD|MIPSM_LLSCDW:	op = L"lld"; break;
-	case MIPSM_LOAD|MIPSM_COP1:		op = L"lwc1"; isCop = true; break;
-	case MIPSM_LOAD|MIPSM_COP2:		op = L"lwc2"; isCop = true; break;
-	case MIPSM_LOAD|MIPSM_DCOP1:	op = L"ldc1"; isCop = true; break;
-	case MIPSM_LOAD|MIPSM_DCOP2:	op = L"ldc2"; isCop = true; break;
-	case MIPSM_STORE|MIPSM_B:		op = L"sb"; break;
-	case MIPSM_STORE|MIPSM_HW:		op = L"sh"; break;
-	case MIPSM_STORE|MIPSM_W:		op = L"sw"; break;
-	case MIPSM_STORE|MIPSM_DW:		op = L"sd"; break;
-	case MIPSM_STORE|MIPSM_LLSCW:	op = L"sc"; break;
-	case MIPSM_STORE|MIPSM_LLSCDW:	op = L"scd"; break;
-	case MIPSM_STORE|MIPSM_COP1:	op = L"swc1"; isCop = true; break;
-	case MIPSM_STORE|MIPSM_COP2:	op = L"swc2"; isCop = true; break;
-	case MIPSM_STORE|MIPSM_DCOP1:	op = L"sdc1"; isCop = true; break;
-	case MIPSM_STORE|MIPSM_DCOP2:	op = L"sdc2"; isCop = true; break;
-	default: return nullptr;
+	case MIPSM_LOAD|MIPSM_B:		op = L"lb"; break;
+	case MIPSM_LOAD|MIPSM_BU:		op = L"lbu"; break;
+	case MIPSM_LOAD|MIPSM_HW:		op = L"lh"; break;
+	case MIPSM_LOAD|MIPSM_HWU:		op = L"lhu"; break;
+	case MIPSM_LOAD|MIPSM_W:		op = L"lw"; break;
+	case MIPSM_LOAD|MIPSM_WU:		op = L"lwu"; break;
+	case MIPSM_LOAD|MIPSM_DW:		op = L"ld"; break;
+	case MIPSM_LOAD|MIPSM_LLSCW:	op = L"ll"; break;
+	case MIPSM_LOAD|MIPSM_LLSCDW:	op = L"lld"; break;
+	case MIPSM_LOAD|MIPSM_COP1:		op = L"lwc1"; isCop = true; break;
+	case MIPSM_LOAD|MIPSM_COP2:		op = L"lwc2"; isCop = true; break;
+	case MIPSM_LOAD|MIPSM_DCOP1:	op = L"ldc1"; isCop = true; break;
+	case MIPSM_LOAD|MIPSM_DCOP2:	op = L"ldc2"; isCop = true; break;
+	case MIPSM_STORE|MIPSM_B:		op = L"sb"; break;
+	case MIPSM_STORE|MIPSM_HW:		op = L"sh"; break;
+	case MIPSM_STORE|MIPSM_W:		op = L"sw"; break;
+	case MIPSM_STORE|MIPSM_DW:		op = L"sd"; break;
+	case MIPSM_STORE|MIPSM_LLSCW:	op = L"sc"; break;
+	case MIPSM_STORE|MIPSM_LLSCDW:	op = L"scd"; break;
+	case MIPSM_STORE|MIPSM_COP1:	op = L"swc1"; isCop = true; break;
+	case MIPSM_STORE|MIPSM_COP2:	op = L"swc2"; isCop = true; break;
+	case MIPSM_STORE|MIPSM_DCOP1:	op = L"sdc1"; isCop = true; break;
+	case MIPSM_STORE|MIPSM_DCOP2:	op = L"sdc2"; isCop = true; break;
+	default: return nullptr;
 	}
 
-	std::wstring macroText = preprocessMacro(templateLoadStore,immediates);
+	std::wstring macroText = preprocessMacro(templateLoadStore,immediates);
 
-	bool store = (flags & MIPSM_STORE) != 0;
+	bool store = (flags & MIPSM_STORE) != 0;
 	return createMacro(parser,macroText,flags, {
 			{ L"%upper%",	(flags & MIPSM_UPPER) ? L"1" : L"0" },
 			{ L"%lower%",	(flags & MIPSM_LOWER) ? L"1" : L"0" },
@@ -5040,15 +5040,15 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroLoadStore(Parser& parser, Mi
 			{ L"%temp%",	isCop || store ? L"r1" : registers.grs.name },
 			{ L"%imm%",		immediates.secondary.expression.toString() },
 			{ L"%op%",		op },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroLoadUnaligned(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
 {
-	const wchar_t* selectedTemplate;
+	const wchar_t* selectedTemplate;
 
-	std::wstring op, size;
-	int type = flags & MIPSM_ACCESSMASK;
+	std::wstring op, size;
+	int type = flags & MIPSM_ACCESSMASK;
 	if (type == MIPSM_HW || type == MIPSM_HWU)
 	{
 		const wchar_t* templateHalfword = LR"(
@@ -5060,10 +5060,10 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroLoadUnaligned(Parser& parser
 				sll		r1,8
 				or		%rd%,r1
 			.endif
-		)";
+		)";
 
-		op = type == MIPSM_HWU ? L"lbu" : L"lb";
-		selectedTemplate = templateHalfword;
+		op = type == MIPSM_HWU ? L"lbu" : L"lb";
+		selectedTemplate = templateHalfword;
 	} else if (type == MIPSM_W || type == MIPSM_DW)
 	{
 		const wchar_t* templateWord = LR"(
@@ -5073,37 +5073,37 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroLoadUnaligned(Parser& parser
 				%op%l	%rd%,%off%+%size%-1(%rs%)
 				%op%r	%rd%,%off%(%rs%)
 			.endif
-		)";
+		)";
 
 		if (registers.grs.num == registers.grd.num)
 		{
-			Logger::printError(Logger::Error,L"Cannot use same register as source and destination");
-			return ::make_unique<DummyCommand>();
+			Logger::printError(Logger::Error,L"Cannot use same register as source and destination");
+			return ::make_unique<DummyCommand>();
 		}
 
-		op = type == MIPSM_W ? L"lw" : L"ld";
-		size = type == MIPSM_W ? L"4" : L"8";
-		selectedTemplate = templateWord;
+		op = type == MIPSM_W ? L"lw" : L"ld";
+		size = type == MIPSM_W ? L"4" : L"8";
+		selectedTemplate = templateWord;
 	} else {
-		return nullptr;
+		return nullptr;
 	}
 
-	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
+	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%rs%",		registers.grs.name },
 			{ L"%rd%",		registers.grd.name },
 			{ L"%off%",		immediates.primary.expression.toString() },
 			{ L"%op%",		op },
 			{ L"%size%",    size },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroStoreUnaligned(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
 {
-	const wchar_t* selectedTemplate;
+	const wchar_t* selectedTemplate;
 
-	std::wstring op, size;
-	int type = flags & MIPSM_ACCESSMASK;
+	std::wstring op, size;
+	int type = flags & MIPSM_ACCESSMASK;
 	if (type == MIPSM_HW)
 	{
 		const wchar_t* templateHalfword = LR"(
@@ -5114,9 +5114,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroStoreUnaligned(Parser& parse
 				srl		r1,%rd%,8
 				sb		r1,%off%+1(%rs%)
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templateHalfword;
+		selectedTemplate = templateHalfword;
 	} else if (type == MIPSM_W || type == MIPSM_DW)
 	{
 		const wchar_t* templateWord = LR"(
@@ -5126,47 +5126,47 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroStoreUnaligned(Parser& parse
 				%op%l	%rd%,%off%+%size%-1(%rs%)
 				%op%r	%rd%,%off%(%rs%)
 			.endif
-		)";
+		)";
 
 		if (registers.grs.num == registers.grd.num)
 		{
-			Logger::printError(Logger::Error,L"Cannot use same register as source and destination");
-			return ::make_unique<DummyCommand>();
+			Logger::printError(Logger::Error,L"Cannot use same register as source and destination");
+			return ::make_unique<DummyCommand>();
 		}
 
-		op = type == MIPSM_W ? L"sw" : L"sd";
-		size = type == MIPSM_W ? L"4" : L"8";
-		selectedTemplate = templateWord;
+		op = type == MIPSM_W ? L"sw" : L"sd";
+		size = type == MIPSM_W ? L"4" : L"8";
+		selectedTemplate = templateWord;
 	} else {
-		return nullptr;
+		return nullptr;
 	}
 
-	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
+	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%rs%",		registers.grs.name },
 			{ L"%rd%",		registers.grd.name },
 			{ L"%off%",		immediates.primary.expression.toString() },
 			{ L"%op%",		op },
 			{ L"%size%",	size },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroBranch(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
 {
-	const wchar_t* selectedTemplate;
+	const wchar_t* selectedTemplate;
 
-	int type = flags & MIPSM_CONDITIONMASK;
+	int type = flags & MIPSM_CONDITIONMASK;
 
-	bool bne = type == MIPSM_NE;
-	bool beq = type == MIPSM_EQ;
-	bool beqz = type == MIPSM_GE || type == MIPSM_GEU;
-	bool bnez = type == MIPSM_LT || type == MIPSM_LTU;
-	bool unsigned_ = type == MIPSM_GEU || type == MIPSM_LTU;
-	bool immediate = (flags & MIPSM_IMM) != 0;
-	bool likely = (flags & MIPSM_LIKELY) != 0;
-	bool revcmp = (flags & MIPSM_REVCMP) != 0;
+	bool bne = type == MIPSM_NE;
+	bool beq = type == MIPSM_EQ;
+	bool beqz = type == MIPSM_GE || type == MIPSM_GEU;
+	bool bnez = type == MIPSM_LT || type == MIPSM_LTU;
+	bool unsigned_ = type == MIPSM_GEU || type == MIPSM_LTU;
+	bool immediate = (flags & MIPSM_IMM) != 0;
+	bool likely = (flags & MIPSM_LIKELY) != 0;
+	bool revcmp = (flags & MIPSM_REVCMP) != 0;
 
-	std::wstring op;
+	std::wstring op;
 	if (bne || beq)
 	{
 		const wchar_t* templateNeEq = LR"(
@@ -5176,13 +5176,13 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroBranch(Parser& parser, MipsR
 				li		r1,%imm%
 				%op%	%rs%,r1,%dest%
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templateNeEq;
+		selectedTemplate = templateNeEq;
 		if(likely)
-			op = bne ? L"bnel" : L"beql";
+			op = bne ? L"bnel" : L"beql";
 		else
-			op = bne ? L"bne" : L"beq";
+			op = bne ? L"bne" : L"beq";
 	} else if (immediate && (beqz || bnez))
 	{
 		const wchar_t* templateImmediate = LR"(
@@ -5198,13 +5198,13 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroBranch(Parser& parser, MipsR
 				slti%u%	r1,%rs%,%imm%
 			.endif
 			%op%	r1,%dest%
-		)";
+		)";
 
-		selectedTemplate = templateImmediate;
+		selectedTemplate = templateImmediate;
 		if(likely)
-			op = bnez ? L"bnezl" : L"beqzl";
+			op = bnez ? L"bnezl" : L"beqzl";
 		else
-			op = bnez ? L"bnez" : L"beqz";
+			op = bnez ? L"bnez" : L"beqz";
 	} else if (beqz || bnez)
 	{
 		const wchar_t* templateRegister = LR"(
@@ -5214,18 +5214,18 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroBranch(Parser& parser, MipsR
 				slt%u%	r1,%rs%,%rt%
 			.endif
 			%op%	r1,%dest%
-		)";
+		)";
 
-		selectedTemplate = templateRegister;
+		selectedTemplate = templateRegister;
 		if(likely)
-			op = bnez ? L"bnezl" : L"beqzl";
+			op = bnez ? L"bnezl" : L"beqzl";
 		else
-			op = bnez ? L"bnez" : L"beqz";
+			op = bnez ? L"bnez" : L"beqz";
 	} else {
-		return nullptr;
+		return nullptr;
 	}
 
-	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
+	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%op%",		op },
 			{ L"%u%",		unsigned_ ? L"u" : L""},
@@ -5234,22 +5234,22 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroBranch(Parser& parser, MipsR
 			{ L"%rt%",		registers.grt.name },
 			{ L"%imm%",		immediates.primary.expression.toString() },
 			{ L"%dest%",	immediates.secondary.expression.toString() },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroSet(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
 {
-	const wchar_t* selectedTemplate;
+	const wchar_t* selectedTemplate;
 
-	int type = flags & MIPSM_CONDITIONMASK;
+	int type = flags & MIPSM_CONDITIONMASK;
 
-	bool ne = type == MIPSM_NE;
-	bool eq = type == MIPSM_EQ;
-	bool ge = type == MIPSM_GE || type == MIPSM_GEU;
-	bool lt = type == MIPSM_LT || type == MIPSM_LTU;
-	bool unsigned_ = type == MIPSM_GEU || type == MIPSM_LTU;
-	bool immediate = (flags & MIPSM_IMM) != 0;
-	bool revcmp = (flags & MIPSM_REVCMP) != 0;
+	bool ne = type == MIPSM_NE;
+	bool eq = type == MIPSM_EQ;
+	bool ge = type == MIPSM_GE || type == MIPSM_GEU;
+	bool lt = type == MIPSM_LT || type == MIPSM_LTU;
+	bool unsigned_ = type == MIPSM_GEU || type == MIPSM_LTU;
+	bool immediate = (flags & MIPSM_IMM) != 0;
+	bool revcmp = (flags & MIPSM_REVCMP) != 0;
 
 	if (immediate && (ne || eq))
 	{
@@ -5265,9 +5265,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroSet(Parser& parser, MipsRegi
 			.else
 				sltu	%rd%,r0,%rd%
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templateImmediateEqNe;
+		selectedTemplate = templateImmediateEqNe;
 	} else if (ne || eq)
 	{
 		const wchar_t* templateEqNe = LR"(
@@ -5277,9 +5277,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroSet(Parser& parser, MipsRegi
 			.else
 				sltu	%rd%,r0,%rd%
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templateEqNe;
+		selectedTemplate = templateEqNe;
 	} else if (immediate && (ge || lt))
 	{
 		const wchar_t* templateImmediateGeLt = LR"(
@@ -5297,9 +5297,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroSet(Parser& parser, MipsRegi
 			.if %ge%
 				xori	%rd%,%rd%,1
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templateImmediateGeLt;
+		selectedTemplate = templateImmediateGeLt;
 	} else if (ge)
 	{
 		const wchar_t* templateGe = LR"(
@@ -5309,15 +5309,15 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroSet(Parser& parser, MipsRegi
 				slt%u%	%rd%,%rs%,%rt%
 			.endif
 			xori	%rd%,%rd%,1
-		)";
+		)";
 
-		selectedTemplate = templateGe;
+		selectedTemplate = templateGe;
 	} else
 	{
-		return nullptr;
+		return nullptr;
 	}
 
-	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
+	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%u%",		unsigned_ ? L"u" : L""},
 			{ L"%eq%",		eq ? L"1" : L"0" },
@@ -5327,16 +5327,16 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroSet(Parser& parser, MipsRegi
 			{ L"%rs%",		registers.grs.name },
 			{ L"%rt%",		registers.grt.name },
 			{ L"%imm%",		immediates.secondary.expression.toString() },
-	});
+	});
 }
 
 std::unique_ptr<CAssemblerCommand> generateMipsMacroRotate(Parser& parser, MipsRegisterData& registers, MipsImmediateData& immediates, int flags)
 {
-	bool left = (flags & MIPSM_LEFT) != 0;
-	bool immediate = (flags & MIPSM_IMM) != 0;
-	bool psp = Mips.GetVersion() == MARCH_PSP;
+	bool left = (flags & MIPSM_LEFT) != 0;
+	bool immediate = (flags & MIPSM_IMM) != 0;
+	bool psp = Mips.GetVersion() == MARCH_PSP;
 
-	const wchar_t* selectedTemplate;
+	const wchar_t* selectedTemplate;
 	if (psp && immediate)
 	{
 		const wchar_t* templatePspImmediate = LR"(
@@ -5349,9 +5349,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroRotate(Parser& parser, MipsR
 			.else
 				move	%rd%,%rs%
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templatePspImmediate;
+		selectedTemplate = templatePspImmediate;
 	} else if (psp)
 	{
 		const wchar_t* templatePspRegister = LR"(
@@ -5361,9 +5361,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroRotate(Parser& parser, MipsR
 			.else
 				rotrv	%rd%,%rs%,%rt%
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templatePspRegister;
+		selectedTemplate = templatePspRegister;
 	} else if (immediate)
 	{
 		const wchar_t* templateImmediate = LR"(
@@ -5379,9 +5379,9 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroRotate(Parser& parser, MipsR
 			.else
 				move	%rd%,%rs%
 			.endif
-		)";
+		)";
 
-		selectedTemplate = templateImmediate;
+		selectedTemplate = templateImmediate;
 	} else {
 		const wchar_t* templateRegister = LR"(
 			negu	r1,%rt%
@@ -5393,19 +5393,19 @@ std::unique_ptr<CAssemblerCommand> generateMipsMacroRotate(Parser& parser, MipsR
 				srlv	%rd%,%rs%,%rt%
 			.endif
 			or	%rd%,%rd%,r1
-		)";
+		)";
 
-		selectedTemplate = templateRegister;
+		selectedTemplate = templateRegister;
 	}
 
-	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
+	std::wstring macroText = preprocessMacro(selectedTemplate,immediates);
 	return createMacro(parser,macroText,flags, {
 			{ L"%left%",	left ? L"1" : L"0" },
 			{ L"%rd%",		registers.grd.name },
 			{ L"%rs%",		registers.grs.name },
 			{ L"%rt%",		registers.grt.name },
 			{ L"%amount%",	immediates.primary.expression.toString() },
-	});
+	});
 }
 
 /* Placeholders
@@ -5588,7 +5588,7 @@ const MipsMacroDefinition mipsMacros[] = {
 	{ L"ror",	L"d,s,i",	&generateMipsMacroRotate,			MIPSM_RIGHT|MIPSM_IMM },
 
 	{ nullptr,	nullptr,	nullptr,							0 }
-};
+};
 
 // file: Archs/MIPS/MipsOpcodes.cpp
 
@@ -6619,7 +6619,7 @@ const tMipsOpcode MipsOpcodes[] = {
 	{"stv",		"RtRo,(s)",		MIPS_RSP_SWC2(0x0b),		MA_RSP,		MO_RSP_QWOFFSET },
 	// END
 	{ nullptr,	nullptr,		0,							0,			0 },
-};
+};
 
 const MipsArchDefinition mipsArchs[] = {
 	// MARCH_PSX
@@ -6634,224 +6634,224 @@ const MipsArchDefinition mipsArchs[] = {
 	{ "RSP",		MA_MIPS1|MA_RSP,					MA_EXRSP,	0 },
 	// MARCH_INVALID
 	{ "Invalid",	0,									0,			0 },
-};
+};
 
 // file: Parser/ExpressionParser.h
 
-Expression parseExpression(Tokenizer& tokenizer, bool inUnknownOrFalseBlock);
-void allowFunctionCallExpression(bool allow);
+Expression parseExpression(Tokenizer& tokenizer, bool inUnknownOrFalseBlock);
+void allowFunctionCallExpression(bool allow);
 
 // file: Archs/MIPS/PsxRelocator.h
 
-enum class PsxRelocationType { WordLiteral, UpperImmediate, LowerImmediate, FunctionCall };
-enum class PsxRelocationRefType { SymblId, SegmentOffset };
+enum class PsxRelocationType { WordLiteral, UpperImmediate, LowerImmediate, FunctionCall };
+enum class PsxRelocationRefType { SymblId, SegmentOffset };
 
 struct PsxRelocation
 {
-	PsxRelocationType type;
-	PsxRelocationRefType refType;
-	int segmentOffset;
-	int referenceId;
-	int referencePos;
-	int relativeOffset;
-	int filePos;
-};
+	PsxRelocationType type;
+	PsxRelocationRefType refType;
+	int segmentOffset;
+	int referenceId;
+	int referencePos;
+	int relativeOffset;
+	int filePos;
+};
 
 struct PsxSegment
 {
-	std::wstring name;
-	int id;
-	ByteArray data;
-	std::vector<PsxRelocation> relocations;
-};
+	std::wstring name;
+	int id;
+	ByteArray data;
+	std::vector<PsxRelocation> relocations;
+};
 
 
-enum class PsxSymbolType { Internal, InternalID, External, BSS, Function };
+enum class PsxSymbolType { Internal, InternalID, External, BSS, Function };
 
 struct PsxSymbol
 {
-	PsxSymbolType type;
-	std::wstring name;
-	int segment;
-	int offset;
-	int id;
-	int size;
-	std::shared_ptr<Label> label;
-};
+	PsxSymbolType type;
+	std::wstring name;
+	int segment;
+	int offset;
+	int id;
+	int size;
+	std::shared_ptr<Label> label;
+};
 
 struct PsxRelocatorFile
 {
-	std::wstring name;
-	std::vector<PsxSegment> segments;
-	std::vector<PsxSymbol> symbols;
-};
+	std::wstring name;
+	std::vector<PsxSegment> segments;
+	std::vector<PsxSymbol> symbols;
+};
 
 class PsxRelocator
 {
 public:
-	bool init(const std::wstring& inputName);
-	bool relocate(int& memoryAddress);
-	bool hasDataChanged() { return dataChanged; };
-	const ByteArray& getData() const { return outputData; };
-	void writeSymbols(SymbolData& symData) const;
+	bool init(const std::wstring& inputName);
+	bool relocate(int& memoryAddress);
+	bool hasDataChanged() { return dataChanged; };
+	const ByteArray& getData() const { return outputData; };
+	void writeSymbols(SymbolData& symData) const;
 private:
-	size_t loadString(ByteArray& data, size_t pos, std::wstring& dest);
-	bool parseObject(ByteArray data, PsxRelocatorFile& dest);
-	bool relocateFile(PsxRelocatorFile& file, int& relocationAddress);
+	size_t loadString(ByteArray& data, size_t pos, std::wstring& dest);
+	bool parseObject(ByteArray data, PsxRelocatorFile& dest);
+	bool relocateFile(PsxRelocatorFile& file, int& relocationAddress);
 
-	ByteArray outputData;
-	std::vector<PsxRelocatorFile> files;
-	MipsElfRelocator* reloc;
-	bool dataChanged;
-};
+	ByteArray outputData;
+	std::vector<PsxRelocatorFile> files;
+	MipsElfRelocator* reloc;
+	bool dataChanged;
+};
 
 class DirectivePsxObjImport: public CAssemblerCommand
 {
 public:
-	DirectivePsxObjImport(const std::wstring& fileName);
-	~DirectivePsxObjImport() { };
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const { };
-	virtual void writeSymData(SymbolData& symData) const;
+	DirectivePsxObjImport(const std::wstring& fileName);
+	~DirectivePsxObjImport() { };
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const { };
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	PsxRelocator rel;
-};
+	PsxRelocator rel;
+};
 
 // file: Commands/CDirectiveFile.h
 
-class GenericAssemblerFile;
+class GenericAssemblerFile;
 
 class CDirectiveFile: public CAssemblerCommand
 {
 public:
-	enum class Type { Invalid, Open, Create, Copy, Close };
+	enum class Type { Invalid, Open, Create, Copy, Close };
 
-	CDirectiveFile();
-	void initOpen(const std::wstring& fileName, int64_t memory);
-	void initCreate(const std::wstring& fileName, int64_t memory);
-	void initCopy(const std::wstring& inputName, const std::wstring& outputName, int64_t memory);
-	void initClose();
+	CDirectiveFile();
+	void initOpen(const std::wstring& fileName, int64_t memory);
+	void initCreate(const std::wstring& fileName, int64_t memory);
+	void initCopy(const std::wstring& inputName, const std::wstring& outputName, int64_t memory);
+	void initClose();
 
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	Type type;
-	int64_t virtualAddress;
-	std::shared_ptr<GenericAssemblerFile> file;
-	std::shared_ptr<AssemblerFile> closeFile;
-};
+	Type type;
+	int64_t virtualAddress;
+	std::shared_ptr<GenericAssemblerFile> file;
+	std::shared_ptr<AssemblerFile> closeFile;
+};
 
 class CDirectivePosition: public CAssemblerCommand
 {
 public:
-	enum Type { Physical, Virtual };
-	CDirectivePosition(Expression value, Type type);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const { };
+	enum Type { Physical, Virtual };
+	CDirectivePosition(Expression value, Type type);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const { };
 private:
-	void exec() const;
-	Expression expression;
-	Type type;
-	int64_t position;
-	int64_t virtualAddress;
-};
+	void exec() const;
+	Expression expression;
+	Type type;
+	int64_t position;
+	int64_t virtualAddress;
+};
 
 class CDirectiveIncbin: public CAssemblerCommand
 {
 public:
-	CDirectiveIncbin(const std::wstring& fileName);
-	void setStart(Expression& exp) { startExpression = exp; };
-	void setSize(Expression& exp) { sizeExpression = exp; };
+	CDirectiveIncbin(const std::wstring& fileName);
+	void setStart(Expression& exp) { startExpression = exp; };
+	void setSize(Expression& exp) { sizeExpression = exp; };
 
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	std::wstring fileName;
-	int64_t fileSize;
+	std::wstring fileName;
+	int64_t fileSize;
 
-	Expression startExpression;
-	Expression sizeExpression;
-	int64_t size;
-	int64_t start;
-	int64_t virtualAddress;
-};
+	Expression startExpression;
+	Expression sizeExpression;
+	int64_t size;
+	int64_t start;
+	int64_t virtualAddress;
+};
 
 class CDirectiveAlignFill: public CAssemblerCommand
 {
 public:
-	enum Mode { AlignPhysical, AlignVirtual, Fill };
+	enum Mode { AlignPhysical, AlignVirtual, Fill };
 
-	CDirectiveAlignFill(int64_t value, Mode mode);
-	CDirectiveAlignFill(Expression& value, Mode mode);
-	CDirectiveAlignFill(Expression& value, Expression& fillValue, Mode mode);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	CDirectiveAlignFill(int64_t value, Mode mode);
+	CDirectiveAlignFill(Expression& value, Mode mode);
+	CDirectiveAlignFill(Expression& value, Expression& fillValue, Mode mode);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	Mode mode;
-	Expression valueExpression;
-	Expression fillExpression;
-	int64_t value;
-	int64_t finalSize;
-	int8_t fillByte;
-	int64_t virtualAddress;
-};
+	Mode mode;
+	Expression valueExpression;
+	Expression fillExpression;
+	int64_t value;
+	int64_t finalSize;
+	int8_t fillByte;
+	int64_t virtualAddress;
+};
 
 class CDirectiveSkip: public CAssemblerCommand
 {
 public:
-	CDirectiveSkip(Expression& value);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const { };
+	CDirectiveSkip(Expression& value);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const { };
 private:
-	Expression expression;
-	int64_t value;
-	int64_t virtualAddress;
-};
+	Expression expression;
+	int64_t value;
+	int64_t virtualAddress;
+};
 
 class CDirectiveHeaderSize: public CAssemblerCommand
 {
 public:
-	CDirectiveHeaderSize(Expression expression);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const { };
+	CDirectiveHeaderSize(Expression expression);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const { };
 private:
-	void exec() const;
-	Expression expression;
-	int64_t headerSize;
-	int64_t virtualAddress;
-};
+	void exec() const;
+	Expression expression;
+	int64_t headerSize;
+	int64_t virtualAddress;
+};
 
 class DirectiveObjImport: public CAssemblerCommand
 {
 public:
-	DirectiveObjImport(const std::wstring& inputName);
-	DirectiveObjImport(const std::wstring& inputName, const std::wstring& ctorName);
-	~DirectiveObjImport() { };
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	DirectiveObjImport(const std::wstring& inputName);
+	DirectiveObjImport(const std::wstring& inputName, const std::wstring& ctorName);
+	~DirectiveObjImport() { };
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	ElfRelocator rel;
-	std::unique_ptr<CAssemblerCommand> ctor;
-};
+	ElfRelocator rel;
+	std::unique_ptr<CAssemblerCommand> ctor;
+};
 
 // file: Archs/MIPS/MipsParser.cpp
 
-#define CHECK(exp) if (!(exp)) return false;
+#define CHECK(exp) if (!(exp)) return false;
 
 const MipsRegisterDescriptor mipsRegisters[] = {
 	{ L"r0", 0 },		{ L"zero", 0},		{ L"at", 1 },		{ L"r1", 1 },
@@ -6871,7 +6871,7 @@ const MipsRegisterDescriptor mipsRegisters[] = {
 	{ L"gp", 28 },		{ L"r28", 28 },		{ L"sp", 29 },		{ L"r29", 29 },
 	{ L"fp", 30 },		{ L"r30", 30 },		{ L"ra", 31 },		{ L"r31", 31 },
 	{ L"s8", 30 },
-};
+};
 
 const MipsRegisterDescriptor mipsFloatRegisters[] = {
 	{ L"f0", 0 },		{ L"f1", 1 },		{ L"f2", 2 },		{ L"f3", 3 },
@@ -6885,11 +6885,11 @@ const MipsRegisterDescriptor mipsFloatRegisters[] = {
 	{ L"f22", 22 },		{ L"f23", 23 },		{ L"f24", 24 },		{ L"f25", 25 },
 	{ L"f26", 26 },		{ L"f27", 27 },		{ L"f28", 28 },		{ L"f29", 29 },
 	{ L"f30", 30 },		{ L"f31", 31 },
-};
+};
 
 const MipsRegisterDescriptor mipsFpuControlRegisters[] = {
 	{ L"fir", 0 },		{ L"fcr0", 0 },		{ L"fcsr", 31 },	{ L"fcr31", 31 },
-};
+};
 
 const MipsRegisterDescriptor mipsCop0Registers[] = {
 	{ L"index", 0},			{ L"random", 1 }, 		{ L"entrylo", 2 },
@@ -6902,7 +6902,7 @@ const MipsRegisterDescriptor mipsCop0Registers[] = {
 	{ L"xcontext", 20 },	{ L"badpaddr", 23 },	{ L"ecc", 26 },
 	{ L"perr", 26},			{ L"cacheerr", 27 },	{ L"taglo", 28 },
 	{ L"taghi", 29 },		{ L"errorepc", 30 },
-};
+};
 
 const MipsRegisterDescriptor mipsPs2Cop2FpRegisters[] = {
 	{ L"vf0", 0 },		{ L"vf1", 1 },		{ L"vf2", 2 },		{ L"vf3", 3 },
@@ -6916,7 +6916,7 @@ const MipsRegisterDescriptor mipsPs2Cop2FpRegisters[] = {
 	{ L"vf22", 22 },	{ L"vf23", 23 },	{ L"vf24", 24 },	{ L"vf25", 25 },
 	{ L"vf26", 26 },	{ L"vf27", 27 },	{ L"vf28", 28 },	{ L"vf29", 29 },
 	{ L"vf30", 30 },	{ L"vf31", 31 },
-};
+};
 
 const MipsRegisterDescriptor mipsPsxCop2DataRegisters[] = {
 	{ L"vxy0", 0 },		{ L"vz0", 1 },		{ L"vxy1", 2 },		{ L"vz1", 3 },
@@ -6927,7 +6927,7 @@ const MipsRegisterDescriptor mipsPsxCop2DataRegisters[] = {
 	{ L"rgb0", 20 },	{ L"rgb1", 21 },	{ L"rgb2", 22 },	{ L"res1", 23 },
 	{ L"mac0", 24 },	{ L"mac1", 25 },	{ L"mac2", 26 },	{ L"mac3", 27 },
 	{ L"irgb", 28 },	{ L"orgb", 29 },	{ L"lzcs", 30 },	{ L"lzcr", 31 },
-};
+};
 
 const MipsRegisterDescriptor mipsPsxCop2ControlRegisters[] = {
 	{ L"rt0", 0 },		{ L"rt1", 1 },		{ L"rt2", 2 },		{ L"rt3", 3 },
@@ -6938,7 +6938,7 @@ const MipsRegisterDescriptor mipsPsxCop2ControlRegisters[] = {
 	{ L"lcm4", 20 },	{ L"rfc", 21 },		{ L"gfc", 22 },		{ L"bfc", 23 },
 	{ L"ofx", 24 },		{ L"ofy", 25 },		{ L"h", 26 },		{ L"dqa", 27 },
 	{ L"dqb", 28 },		{ L"zsf3", 29 },	{ L"zsf4", 30 },	{ L"flag", 31 },
-};
+};
 
 const MipsRegisterDescriptor mipsRspCop0Registers[] = {
 	{ L"sp_mem_addr", 0 },	{ L"sp_dram_addr", 1 }, { L"sp_rd_len", 2 },
@@ -6947,11 +6947,11 @@ const MipsRegisterDescriptor mipsRspCop0Registers[] = {
 	{ L"dpc_end", 9 },		{ L"dpc_current", 10 },	{ L"dpc_status", 11 },
 	{ L"dpc_clock", 12 },	{ L"dpc_bufbusy", 13 },	{ L"dpc_pipebusy", 14 },
 	{ L"dpc_tmem", 15 },
-};
+};
 
 const MipsRegisterDescriptor mipsRspVectorControlRegisters[] = {
 	{ L"vco", 0 },		{ L"vcc", 1 }, 		{ L"vce", 2 },
-};
+};
 
 const MipsRegisterDescriptor mipsRspVectorRegisters[] = {
 	{ L"v0", 0 },		{ L"v1", 1 },		{ L"v2", 2 },		{ L"v3", 3 },
@@ -6965,71 +6965,71 @@ const MipsRegisterDescriptor mipsRspVectorRegisters[] = {
 	{ L"v22", 22 },		{ L"v23", 23 },		{ L"v24", 24 },		{ L"v25", 25 },
 	{ L"v26", 26 },		{ L"v27", 27 },		{ L"v28", 28 },		{ L"v29", 29 },
 	{ L"v30", 30 },		{ L"v31", 31 },
-};
+};
 
 std::unique_ptr<CAssemblerCommand> parseDirectiveResetDelay(Parser& parser, int flags)
 {
-	Mips.SetIgnoreDelay(true);
-	return ::make_unique<DummyCommand>();
+	Mips.SetIgnoreDelay(true);
+	return ::make_unique<DummyCommand>();
 }
 
 std::unique_ptr<CAssemblerCommand> parseDirectiveFixLoadDelay(Parser& parser, int flags)
 {
-	Mips.SetFixLoadDelay(true);
-	return ::make_unique<DummyCommand>();
+	Mips.SetFixLoadDelay(true);
+	return ::make_unique<DummyCommand>();
 }
 
 std::unique_ptr<CAssemblerCommand> parseDirectiveLoadElf(Parser& parser, int flags)
 {
-	std::vector<Expression> list;
+	std::vector<Expression> list;
 	if (parser.parseExpressionList(list,1,2) == false)
-		return nullptr;
+		return nullptr;
 
-	std::wstring inputName, outputName;
+	std::wstring inputName, outputName;
 	if (list[0].evaluateString(inputName,true) == false)
-		return nullptr;
+		return nullptr;
 
 	if (list.size() == 2)
 	{
 		if (list[1].evaluateString(outputName,true) == false)
-			return nullptr;
-		return ::make_unique<DirectiveLoadMipsElf>(inputName,outputName);
+			return nullptr;
+		return ::make_unique<DirectiveLoadMipsElf>(inputName,outputName);
 	} else {
-		return ::make_unique<DirectiveLoadMipsElf>(inputName);
+		return ::make_unique<DirectiveLoadMipsElf>(inputName);
 	}
 }
 
 std::unique_ptr<CAssemblerCommand> parseDirectiveImportObj(Parser& parser, int flags)
 {
-	const Token& start = parser.peekToken();
+	const Token& start = parser.peekToken();
 
-	std::vector<Expression> list;
+	std::vector<Expression> list;
 	if (parser.parseExpressionList(list,1,2) == false)
-		return nullptr;
+		return nullptr;
 
-	std::wstring inputName;
+	std::wstring inputName;
 	if (list[0].evaluateString(inputName,true) == false)
-		return nullptr;
+		return nullptr;
 
 	if (list.size() == 2)
 	{
-		std::wstring ctorName;
+		std::wstring ctorName;
 		if (list[1].evaluateIdentifier(ctorName) == false)
-			return nullptr;
+			return nullptr;
 
 		if (Mips.GetVersion() == MARCH_PSX)
 		{
-			parser.printError(start,L"Constructor not supported for PSX libraries");
-			return ::make_unique<InvalidCommand>();
+			parser.printError(start,L"Constructor not supported for PSX libraries");
+			return ::make_unique<InvalidCommand>();
 		}
 
-		return ::make_unique<DirectiveObjImport>(inputName,ctorName);
+		return ::make_unique<DirectiveObjImport>(inputName,ctorName);
 	}
 
 	if (Mips.GetVersion() == MARCH_PSX)
-		return ::make_unique<DirectivePsxObjImport>(inputName);
+		return ::make_unique<DirectivePsxObjImport>(inputName);
 	else
-		return ::make_unique<DirectiveObjImport>(inputName);
+		return ::make_unique<DirectiveObjImport>(inputName);
 }
 
 const DirectiveMap mipsDirectives = {
@@ -7038,11 +7038,11 @@ const DirectiveMap mipsDirectives = {
 	{ L".loadelf",			{ &parseDirectiveLoadElf,		0 } },
 	{ L".importobj",		{ &parseDirectiveImportObj,		0 } },
 	{ L".importlib",		{ &parseDirectiveImportObj,		0 } },
-};
+};
 
 std::unique_ptr<CAssemblerCommand> MipsParser::parseDirective(Parser& parser)
 {
-	return parser.parseDirective(mipsDirectives);
+	return parser.parseDirective(mipsDirectives);
 }
 
 bool MipsParser::parseRegisterNumber(Parser& parser, MipsRegisterValue& dest, int numValues)
@@ -7050,142 +7050,142 @@ bool MipsParser::parseRegisterNumber(Parser& parser, MipsRegisterValue& dest, in
 	// check for $0 and $1
 	if (parser.peekToken().type == TokenType::Dollar)
 	{
-		const Token& number = parser.peekToken(1);
+		const Token& number = parser.peekToken(1);
 		if (number.type == TokenType::Integer && number.intValue < numValues)
 		{
-			dest.name = formatString(L"$%d", number.intValue);
-			dest.num = (int) number.intValue;
+			dest.name = formatString(L"$%d", number.intValue);
+			dest.num = (int) number.intValue;
 
-			parser.eatTokens(2);
-			return true;
+			parser.eatTokens(2);
+			return true;
 		}
 	}
 
-	return false;
+	return false;
 }
 
 bool MipsParser::parseRegisterTable(Parser& parser, MipsRegisterValue& dest, const MipsRegisterDescriptor* table, size_t count)
 {
-	int offset = 0;
-	bool hasDollar = parser.peekToken().type == TokenType::Dollar;
+	int offset = 0;
+	bool hasDollar = parser.peekToken().type == TokenType::Dollar;
 	if (hasDollar)
-		offset = 1;
+		offset = 1;
 
-	const Token &token = parser.peekToken(offset);
+	const Token &token = parser.peekToken(offset);
 
 	if (token.type != TokenType::Identifier)
-		return false;
+		return false;
 
-	const std::wstring stringValue = token.getStringValue();
-	for (size_t i = 0; i < count; i++)
+	const std::wstring stringValue = token.getStringValue();
+	for (size_t i = 0; i < count; i++)
 	{
 		if (stringValue == table[i].name)
 		{
-			dest.name = stringValue;
-			dest.num = table[i].num;
-			parser.eatTokens(hasDollar ? 2 : 1);
-			return true;
+			dest.name = stringValue;
+			dest.num = table[i].num;
+			parser.eatTokens(hasDollar ? 2 : 1);
+			return true;
 		}
 	}
 
-	return false;
+	return false;
 }
 
 bool MipsParser::parseRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::Normal;
+	dest.type = MipsRegisterType::Normal;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsRegisters,ARRAY_SIZE(mipsRegisters));
+	return parseRegisterTable(parser,dest,mipsRegisters,ARRAY_SIZE(mipsRegisters));
 }
 
 bool MipsParser::parseFpuRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::Float;
+	dest.type = MipsRegisterType::Float;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsFloatRegisters,ARRAY_SIZE(mipsFloatRegisters));
+	return parseRegisterTable(parser,dest,mipsFloatRegisters,ARRAY_SIZE(mipsFloatRegisters));
 }
 
 bool MipsParser::parseFpuControlRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::FpuControl;
+	dest.type = MipsRegisterType::FpuControl;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsFpuControlRegisters,ARRAY_SIZE(mipsFpuControlRegisters));
+	return parseRegisterTable(parser,dest,mipsFpuControlRegisters,ARRAY_SIZE(mipsFpuControlRegisters));
 }
 
 bool MipsParser::parseCop0Register(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::Cop0;
+	dest.type = MipsRegisterType::Cop0;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsCop0Registers,ARRAY_SIZE(mipsCop0Registers));
+	return parseRegisterTable(parser,dest,mipsCop0Registers,ARRAY_SIZE(mipsCop0Registers));
 }
 
 bool MipsParser::parsePs2Cop2Register(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::Ps2Cop2;
-	return parseRegisterTable(parser,dest,mipsPs2Cop2FpRegisters,ARRAY_SIZE(mipsPs2Cop2FpRegisters));
+	dest.type = MipsRegisterType::Ps2Cop2;
+	return parseRegisterTable(parser,dest,mipsPs2Cop2FpRegisters,ARRAY_SIZE(mipsPs2Cop2FpRegisters));
 }
 
 bool MipsParser::parsePsxCop2DataRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::PsxCop2Data;
+	dest.type = MipsRegisterType::PsxCop2Data;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsPsxCop2DataRegisters,ARRAY_SIZE(mipsPsxCop2DataRegisters));
+	return parseRegisterTable(parser,dest,mipsPsxCop2DataRegisters,ARRAY_SIZE(mipsPsxCop2DataRegisters));
 }
 
 bool MipsParser::parsePsxCop2ControlRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::PsxCop2Control;
+	dest.type = MipsRegisterType::PsxCop2Control;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsPsxCop2ControlRegisters,ARRAY_SIZE(mipsPsxCop2ControlRegisters));
+	return parseRegisterTable(parser,dest,mipsPsxCop2ControlRegisters,ARRAY_SIZE(mipsPsxCop2ControlRegisters));
 }
 
 bool MipsParser::parseRspCop0Register(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::RspCop0;
+	dest.type = MipsRegisterType::RspCop0;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsRspCop0Registers,ARRAY_SIZE(mipsRspCop0Registers));
+	return parseRegisterTable(parser,dest,mipsRspCop0Registers,ARRAY_SIZE(mipsRspCop0Registers));
 }
 
 bool MipsParser::parseRspVectorControlRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::RspVectorControl;
+	dest.type = MipsRegisterType::RspVectorControl;
 
 	if (parseRegisterNumber(parser, dest, 32))
-		return true;
+		return true;
 
-	return parseRegisterTable(parser,dest,mipsRspVectorControlRegisters,ARRAY_SIZE(mipsRspVectorControlRegisters));
+	return parseRegisterTable(parser,dest,mipsRspVectorControlRegisters,ARRAY_SIZE(mipsRspVectorControlRegisters));
 }
 
 bool MipsParser::parseRspVectorRegister(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::RspVector;
-	return parseRegisterTable(parser,dest,mipsRspVectorRegisters,ARRAY_SIZE(mipsRspVectorRegisters));
+	dest.type = MipsRegisterType::RspVector;
+	return parseRegisterTable(parser,dest,mipsRspVectorRegisters,ARRAY_SIZE(mipsRspVectorRegisters));
 }
 
 bool MipsParser::parseRspVectorElement(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::RspVectorElement;
+	dest.type = MipsRegisterType::RspVectorElement;
 
 	if (parser.peekToken().type == TokenType::LBrack)
 	{
@@ -7196,153 +7196,153 @@ bool MipsParser::parseRspVectorElement(Parser& parser, MipsRegisterValue& dest)
 			{ L"3w", 11 },		{ L"3", 11 },		{ L"4w", 12 },		{ L"4", 12 },
 			{ L"5w", 13 },		{ L"5", 13 },		{ L"6w", 14 },		{ L"6", 14 },
 			{ L"7w", 15 },		{ L"7", 15 },
-		};
+		};
 
-		parser.eatToken();
+		parser.eatToken();
 
 		if (parseRegisterNumber(parser, dest, 16))
-			return parser.nextToken().type == TokenType::RBrack;
+			return parser.nextToken().type == TokenType::RBrack;
 
-		const Token& token = parser.nextToken();
+		const Token& token = parser.nextToken();
 
 		if (token.type != TokenType::Integer && token.type != TokenType::NumberString)
-			return false;
+			return false;
 
 		//ignore the numerical values, just use the original text as an identifier
-		std::wstring stringValue = token.getOriginalText();
+		std::wstring stringValue = token.getOriginalText();
 		if (std::any_of(stringValue.begin(), stringValue.end(), iswupper))
 		{
-			std::transform(stringValue.begin(), stringValue.end(), stringValue.begin(), towlower);
+			std::transform(stringValue.begin(), stringValue.end(), stringValue.begin(), towlower);
 		}
 
-		for (size_t i = 0; i < ARRAY_SIZE(rspElementNames); i++)
+		for (size_t i = 0; i < ARRAY_SIZE(rspElementNames); i++)
 		{
 			if (stringValue == rspElementNames[i].name)
 			{
-				dest.num = rspElementNames[i].num;
-				dest.name = rspElementNames[i].name;
+				dest.num = rspElementNames[i].num;
+				dest.name = rspElementNames[i].name;
 
-				return parser.nextToken().type == TokenType::RBrack;
+				return parser.nextToken().type == TokenType::RBrack;
 			}
 		}
 
-		return false;
+		return false;
 	}
 
-	dest.num = 0;
-	dest.name = L"";
+	dest.num = 0;
+	dest.name = L"";
 
-	return true;
+	return true;
 
 }
 
 bool MipsParser::parseRspScalarElement(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::RspScalarElement;
+	dest.type = MipsRegisterType::RspScalarElement;
 
 	if (parser.nextToken().type != TokenType::LBrack)
-		return false;
+		return false;
 
-	const Token &token = parser.nextToken();
+	const Token &token = parser.nextToken();
 
 	if (token.type != TokenType::Integer || token.intValue >= 8)
-		return false;
+		return false;
 
-	dest.name = formatString(L"%d", token.intValue);
-	dest.num = token.intValue + 8;
+	dest.name = formatString(L"%d", token.intValue);
+	dest.num = token.intValue + 8;
 
-	return parser.nextToken().type == TokenType::RBrack;
+	return parser.nextToken().type == TokenType::RBrack;
 }
 
 bool MipsParser::parseRspOffsetElement(Parser& parser, MipsRegisterValue& dest)
 {
-	dest.type = MipsRegisterType::RspOffsetElement;
+	dest.type = MipsRegisterType::RspOffsetElement;
 
 	if (parser.peekToken().type == TokenType::LBrack)
 	{
-		parser.eatToken();
+		parser.eatToken();
 
-		const Token &token = parser.nextToken();
+		const Token &token = parser.nextToken();
 
 		if (token.type != TokenType::Integer || token.intValue >= 16)
-			return false;
+			return false;
 
-		dest.name = formatString(L"%d", token.intValue);
-		dest.num = token.intValue;
+		dest.name = formatString(L"%d", token.intValue);
+		dest.num = token.intValue;
 
-		return parser.nextToken().type == TokenType::RBrack;
+		return parser.nextToken().type == TokenType::RBrack;
 	}
 
-	dest.num = 0;
-	dest.name = L"";
+	dest.num = 0;
+	dest.name = L"";
 
-	return true;
+	return true;
 }
 
 static bool decodeDigit(wchar_t digit, int& dest)
 {
 	if (digit >= '0' && digit <= '9')
 	{
-		dest = digit-'0';
-		return true;
+		dest = digit-'0';
+		return true;
 	}
-	return false;
+	return false;
 }
 
 bool MipsParser::parseVfpuRegister(Parser& parser, MipsRegisterValue& reg, int size)
 {
-	const Token& token = parser.peekToken();
-	const std::wstring stringValue = token.getStringValue();
+	const Token& token = parser.peekToken();
+	const std::wstring stringValue = token.getStringValue();
 	if (token.type != TokenType::Identifier || stringValue.size() != 4)
-		return false;
+		return false;
 
-	int mtx,col,row;
-	if (decodeDigit(stringValue[1],mtx) == false) return false;
-	if (decodeDigit(stringValue[2],col) == false) return false;
-	if (decodeDigit(stringValue[3],row) == false) return false;
-	wchar_t mode = towlower(stringValue[0]);
+	int mtx,col,row;
+	if (decodeDigit(stringValue[1],mtx) == false) return false;
+	if (decodeDigit(stringValue[2],col) == false) return false;
+	if (decodeDigit(stringValue[3],row) == false) return false;
+	wchar_t mode = towlower(stringValue[0]);
 
 	if (size < 0 || size > 3)
-		return false;
+		return false;
 
 	if (row > 3 || col > 3 || mtx > 7)
-		return false;
+		return false;
 
-	reg.num = 0;
+	reg.num = 0;
 	switch (mode)
 	{
 	case 'r':					// transposed vector
-		reg.num |= (1 << 5);
-		std::swap(col,row);		// fallthrough
+		reg.num |= (1 << 5);
+		std::swap(col,row);		// fallthrough
 	case 'c':					// vector
-		reg.type = MipsRegisterType::VfpuVector;
+		reg.type = MipsRegisterType::VfpuVector;
 
 		switch (size)
 		{
 		case 1:	// pair
 		case 3: // quad
 			if (row & 1)
-				return false;
-			break;
+				return false;
+			break;
 		case 2:	// triple
 			if (row & 2)
-				return false;
-			row <<= 1;
-			break;
+				return false;
+			row <<= 1;
+			break;
 		default:
-			return false;
+			return false;
 		}
-		break;
+		break;
 	case 's':					// single
-		reg.type = MipsRegisterType::VfpuVector;
+		reg.type = MipsRegisterType::VfpuVector;
 
 		if (size != 0)
-			return false;
-		break;
+			return false;
+		break;
 	case 'e':					// transposed matrix
-		reg.num |= (1 << 5);	// fallthrough
+		reg.num |= (1 << 5);	// fallthrough
 	case 'm':					// matrix
-		reg.type = MipsRegisterType::VfpuMatrix;
+		reg.type = MipsRegisterType::VfpuMatrix;
 
 		// check size
 		switch (size)
@@ -7350,28 +7350,28 @@ bool MipsParser::parseVfpuRegister(Parser& parser, MipsRegisterValue& reg, int s
 		case 1:	// 2x2
 		case 3:	// 4x4
 			if (row & 1)
-				return false;
-			break;
+				return false;
+			break;
 		case 2:	// 3x3
 			if (row & ~1)
-				return false;
-			row <<= 1;
-			break;
+				return false;
+			row <<= 1;
+			break;
 		default:
-			return false;
+			return false;
 		}
-		break;
+		break;
 	default:
-		return false;
+		return false;
 	}
 
-	reg.num |= mtx << 2;
-	reg.num |= col;
-	reg.num |= row << 5;
+	reg.num |= mtx << 2;
+	reg.num |= col;
+	reg.num |= row << 5;
 
-	reg.name = stringValue;
-	parser.eatToken();
-	return true;
+	reg.name = stringValue;
+	parser.eatToken();
+	return true;
 }
 
 bool MipsParser::parseVfpuControlRegister(Parser& parser, MipsRegisterValue& reg)
@@ -7381,54 +7381,54 @@ bool MipsParser::parseVfpuControlRegister(Parser& parser, MipsRegisterValue& reg
 		L"inf4",	L"rsv5",	L"rsv6",	L"rev",
 		L"rcx0",	L"rcx1",	L"rcx2",	L"rcx3",
 		L"rcx4",	L"rcx5",	L"rcx6",	L"rcx7",
-	};
+	};
 
-	const Token& token = parser.peekToken();
-	const std::wstring stringValue = token.getStringValue();
+	const Token& token = parser.peekToken();
+	const std::wstring stringValue = token.getStringValue();
 
 	if (token.type == TokenType::Identifier)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
 			if (stringValue == vfpuCtrlNames[i])
 			{
-				reg.num = i;
-				reg.name = vfpuCtrlNames[i];
+				reg.num = i;
+				reg.name = vfpuCtrlNames[i];
 
-				parser.eatToken();
-				return true;
+				parser.eatToken();
+				return true;
 			}
 		}
 	} else if (token.type == TokenType::Integer && token.intValue <= 15)
 	{
-		reg.num = (int) token.intValue;
-		reg.name = vfpuCtrlNames[reg.num];
+		reg.num = (int) token.intValue;
+		reg.name = vfpuCtrlNames[reg.num];
 
-		parser.eatToken();
-		return true;
+		parser.eatToken();
+		return true;
 	}
 
-	return false;
+	return false;
 }
 
 bool MipsParser::parseImmediate(Parser& parser, Expression& dest)
 {
 	// check for (reg) or reg sequence
-	TokenizerPosition pos = parser.getTokenizer()->getPosition();
+	TokenizerPosition pos = parser.getTokenizer()->getPosition();
 
-	bool hasParen = parser.peekToken().type == TokenType::LParen;
+	bool hasParen = parser.peekToken().type == TokenType::LParen;
 	if (hasParen)
-		parser.eatToken();
+		parser.eatToken();
 
-	MipsRegisterValue tempValue;
-	bool isRegister = parseRegister(parser,tempValue);
-	parser.getTokenizer()->setPosition(pos);
+	MipsRegisterValue tempValue;
+	bool isRegister = parseRegister(parser,tempValue);
+	parser.getTokenizer()->setPosition(pos);
 
 	if (isRegister)
-		return false;
+		return false;
 
-	dest = parser.parseExpression();
-	return dest.isLoaded();
+	dest = parser.parseExpression();
+	return dest.isLoaded();
 }
 
 bool MipsParser::matchSymbol(Parser& parser, wchar_t symbol)
@@ -7436,19 +7436,19 @@ bool MipsParser::matchSymbol(Parser& parser, wchar_t symbol)
 	switch (symbol)
 	{
 	case '(':
-		return parser.matchToken(TokenType::LParen);
+		return parser.matchToken(TokenType::LParen);
 	case ')':
-		return parser.matchToken(TokenType::RParen);
+		return parser.matchToken(TokenType::RParen);
 	case ',':
-		return parser.matchToken(TokenType::Comma);
+		return parser.matchToken(TokenType::Comma);
 	}
 
-	return false;
+	return false;
 }
 
 bool MipsParser::parseVcstParameter(Parser& parser, int& result)
 {
-	static TokenSequenceParser sequenceParser;
+	static TokenSequenceParser sequenceParser;
 
 	// initialize on first use
 	if (sequenceParser.getEntryCount() == 0)
@@ -7457,212 +7457,212 @@ bool MipsParser::parseVcstParameter(Parser& parser, int& result)
 		sequenceParser.addEntry(1,
 			{TokenType::Identifier},
 			{L"maxfloat"}
-		);
+		);
 		// sqrt(2)
 		sequenceParser.addEntry(2,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::RParen},
 			{L"sqrt", INT64_C(2)}
-		);
+		);
 		// sqrt(1/2)
 		sequenceParser.addEntry(3,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::Div, TokenType::Integer, TokenType::RParen},
 			{L"sqrt", INT64_C(1), INT64_C(2)}
-		);
+		);
 		// sqrt(0.5)
 		sequenceParser.addEntry(3,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Float, TokenType::RParen},
 			{L"sqrt", 0.5}
-		);
+		);
 		// 2/sqrt(pi)
 		sequenceParser.addEntry(4,
 			{TokenType::Integer, TokenType::Div, TokenType::Identifier, TokenType::LParen, TokenType::Identifier, TokenType::RParen},
 			{INT64_C(2), L"sqrt", L"pi"}
-		);
+		);
 		// 2/pi
 		sequenceParser.addEntry(5,
 			{TokenType::Integer, TokenType::Div, TokenType::Identifier},
 			{INT64_C(2), L"pi"}
-		);
+		);
 		// 1/pi
 		sequenceParser.addEntry(6,
 			{TokenType::Integer, TokenType::Div, TokenType::Identifier},
 			{INT64_C(1), L"pi"}
-		);
+		);
 		// pi/4
 		sequenceParser.addEntry(7,
 			{TokenType::Identifier, TokenType::Div, TokenType::Integer},
 			{L"pi", INT64_C(4)}
-		);
+		);
 		// pi/2
 		sequenceParser.addEntry(8,
 			{TokenType::Identifier, TokenType::Div, TokenType::Integer},
 			{L"pi", INT64_C(2)}
-		);
+		);
 		// pi/6 - early because "pi" is a prefix of it
 		sequenceParser.addEntry(16,
 			{TokenType::Identifier, TokenType::Div, TokenType::Integer},
 			{L"pi", INT64_C(6)}
-		);
+		);
 		// pi
 		sequenceParser.addEntry(9,
 			{TokenType::Identifier},
 			{L"pi"}
-		);
+		);
 		// e
 		sequenceParser.addEntry(10,
 			{TokenType::Identifier},
 			{L"e"}
-		);
+		);
 		// log2(e)
 		sequenceParser.addEntry(11,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Identifier, TokenType::RParen},
 			{L"log2", L"e"}
-		);
+		);
 		// log10(e)
 		sequenceParser.addEntry(12,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Identifier, TokenType::RParen},
 			{L"log10", L"e"}
-		);
+		);
 		// ln(2)
 		sequenceParser.addEntry(13,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::RParen},
 			{L"ln", INT64_C(2)}
-		);
+		);
 		// ln(10)
 		sequenceParser.addEntry(14,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::RParen},
 			{L"ln", INT64_C(10)}
-		);
+		);
 		// 2*pi
 		sequenceParser.addEntry(15,
 			{TokenType::Integer, TokenType::Mult, TokenType::Identifier},
 			{INT64_C(2), L"pi"}
-		);
+		);
 		// log10(2)
 		sequenceParser.addEntry(17,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::RParen},
 			{L"log10", INT64_C(2)}
-		);
+		);
 		// log2(10)
 		sequenceParser.addEntry(18,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::RParen},
 			{L"log2", INT64_C(10)}
-		);
+		);
 		// sqrt(3)/2
 		sequenceParser.addEntry(19,
 			{TokenType::Identifier, TokenType::LParen, TokenType::Integer, TokenType::RParen, TokenType::Div, TokenType::Integer},
 			{L"sqrt", INT64_C(3), INT64_C(2)}
-		);
+		);
 	}
 
-	return sequenceParser.parse(parser,result);
+	return sequenceParser.parse(parser,result);
 }
 
 bool MipsParser::parseVfpuVrot(Parser& parser, int& result, int size)
 {
-	int sin = -1;
-	int cos = -1;
-	bool negSine = false;
-	int sineCount = 0;
+	int sin = -1;
+	int cos = -1;
+	bool negSine = false;
+	int sineCount = 0;
 
 	if (parser.nextToken().type != TokenType::LBrack)
-		return false;
+		return false;
 
-	int numElems = size+1;
-	for (int i = 0; i < numElems; i++)
+	int numElems = size+1;
+	for (int i = 0; i < numElems; i++)
 	{
-		const Token* tokenFinder = &parser.nextToken();
+		const Token* tokenFinder = &parser.nextToken();
 
 		if (i != 0)
 		{
 			if (tokenFinder->type != TokenType::Comma)
-				return false;
+				return false;
 
-			tokenFinder = &parser.nextToken();
+			tokenFinder = &parser.nextToken();
 		}
 
-		bool isNeg = tokenFinder->type == TokenType::Minus;
+		bool isNeg = tokenFinder->type == TokenType::Minus;
 		if (isNeg)
-			tokenFinder = &parser.nextToken();
+			tokenFinder = &parser.nextToken();
 
-		const Token& token = *tokenFinder;
+		const Token& token = *tokenFinder;
 
-		const std::wstring stringValue = token.getStringValue();
+		const std::wstring stringValue = token.getStringValue();
 		if (token.type != TokenType::Identifier || stringValue.size() != 1)
-			return false;
+			return false;
 
 		switch (stringValue[0])
 		{
 		case 's':
 			// if one is negative, all have to be
 			if ((!isNeg && negSine) || (isNeg && !negSine && sineCount > 0))
-				return false;
+				return false;
 
-			negSine = negSine || isNeg;
-			sin = i;
-			sineCount++;
-			break;
+			negSine = negSine || isNeg;
+			sin = i;
+			sineCount++;
+			break;
 		case 'c':
 			// can't be negative, or happen twice
 			if (isNeg || cos != -1)
-				return false;
-			cos = i;
-			break;
+				return false;
+			cos = i;
+			break;
 		case '0':
 			if (isNeg)
-				return false;
-			break;
+				return false;
+			break;
 		default:
-			return false;
+			return false;
 		}
 	}
 
 	if (parser.nextToken().type != TokenType::RBrack)
-		return false;
+		return false;
 
-	result = negSine ? 0x10 : 0;
+	result = negSine ? 0x10 : 0;
 
 	if (sin == -1 && cos == -1)
 	{
-		return false;
+		return false;
 	} else if (sin == -1)
 	{
 		if (numElems == 4)
-			return false;
+			return false;
 
-		result |= cos;
-		result |= ((size+1) << 2);
+		result |= cos;
+		result |= ((size+1) << 2);
 	} else if (cos == -1)
 	{
 		if (numElems == 4)
-			return false;
+			return false;
 
 		if (sineCount == 1)
 		{
-			result |= (size+1);
-			result |= (sin << 2);
+			result |= (size+1);
+			result |= (sin << 2);
 		} else if (sineCount == numElems)
 		{
-			result |= (size+1);
-			result |= ((size+1) << 2);
+			result |= (size+1);
+			result |= ((size+1) << 2);
 		} else {
-			return false;
+			return false;
 		}
 	} else {
 		if (sineCount > 1)
 		{
 			if (sineCount+1 != numElems)
-				return false;
+				return false;
 
-			result |= cos;
-			result |= (cos << 2);
+			result |= cos;
+			result |= (cos << 2);
 		} else {
-			result |= cos;
-			result |= (sin << 2);
+			result |= cos;
+			result |= (sin << 2);
 		}
 	}
 
-	return true;
+	return true;
 }
 
 bool MipsParser::parseVfpuCondition(Parser& parser, int& result)
@@ -7670,118 +7670,118 @@ bool MipsParser::parseVfpuCondition(Parser& parser, int& result)
 	static const wchar_t* conditions[] = {
 		L"fl", L"eq", L"lt", L"le", L"tr", L"ne", L"ge", L"gt",
 		L"ez", L"en", L"ei", L"es", L"nz", L"nn", L"ni", L"ns"
-	};
+	};
 
-	const Token& token = parser.nextToken();
+	const Token& token = parser.nextToken();
 	if (token.type != TokenType::Identifier)
-		return false;
+		return false;
 
-	const std::wstring stringValue = token.getStringValue();
-	for (size_t i = 0; i < ARRAY_SIZE(conditions); i++)
+	const std::wstring stringValue = token.getStringValue();
+	for (size_t i = 0; i < ARRAY_SIZE(conditions); i++)
 	{
 		if (stringValue == conditions[i])
 		{
-			result = i;
-			return true;
+			result = i;
+			return true;
 		}
 	}
 
-	return false;
+	return false;
 }
 
 bool MipsParser::parseVpfxsParameter(Parser& parser, int& result)
 {
-	static TokenSequenceParser sequenceParser;
+	static TokenSequenceParser sequenceParser;
 
 	// initialize on first use
 	if (sequenceParser.getEntryCount() == 0)
 	{
 		// 0
-		sequenceParser.addEntry(0, {TokenType::Integer}, {INT64_C(0)} );
+		sequenceParser.addEntry(0, {TokenType::Integer}, {INT64_C(0)} );
 		// 1
-		sequenceParser.addEntry(1, {TokenType::Integer}, {INT64_C(1)} );
+		sequenceParser.addEntry(1, {TokenType::Integer}, {INT64_C(1)} );
 		// 2
-		sequenceParser.addEntry(2, {TokenType::Integer}, {INT64_C(2)} );
+		sequenceParser.addEntry(2, {TokenType::Integer}, {INT64_C(2)} );
 		// 1/2
-		sequenceParser.addEntry(3, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(2)} );
+		sequenceParser.addEntry(3, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(2)} );
 		// 3
-		sequenceParser.addEntry(4, {TokenType::Integer}, {INT64_C(3)} );
+		sequenceParser.addEntry(4, {TokenType::Integer}, {INT64_C(3)} );
 		// 1/3
-		sequenceParser.addEntry(5, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(3)} );
+		sequenceParser.addEntry(5, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(3)} );
 		// 1/4
-		sequenceParser.addEntry(6, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(4)} );
+		sequenceParser.addEntry(6, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(4)} );
 		// 1/6
-		sequenceParser.addEntry(7, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(6)} );
+		sequenceParser.addEntry(7, {TokenType::Integer, TokenType::Div, TokenType::Integer}, {INT64_C(1), INT64_C(6)} );
 	}
 
 	if (parser.nextToken().type != TokenType::LBrack)
-		return false;
+		return false;
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		const Token *tokenFinder = &parser.nextToken();
+		const Token *tokenFinder = &parser.nextToken();
 
 		if (i != 0)
 		{
 			if (tokenFinder->type != TokenType::Comma)
-				return false;
+				return false;
 
-			tokenFinder = &parser.nextToken();
+			tokenFinder = &parser.nextToken();
 		}
 
 		// negation
 		if (tokenFinder->type == TokenType::Minus)
 		{
-			result |= 1 << (16+i);
-			tokenFinder = &parser.nextToken();
+			result |= 1 << (16+i);
+			tokenFinder = &parser.nextToken();
 		}
 
 		// abs
-		bool abs = false;
+		bool abs = false;
 		if (tokenFinder->type == TokenType::BitOr)
 		{
-			result |= 1 << (8+i);
-			abs = true;
-			tokenFinder = &parser.nextToken();
+			result |= 1 << (8+i);
+			abs = true;
+			tokenFinder = &parser.nextToken();
 		}
 
-		const Token& token = *tokenFinder;
+		const Token& token = *tokenFinder;
 
 		// check for register
-		const wchar_t* reg;
-		static const wchar_t* vpfxstRegisters = L"xyzw";
-		const std::wstring stringValue = token.getStringValue();
+		const wchar_t* reg;
+		static const wchar_t* vpfxstRegisters = L"xyzw";
+		const std::wstring stringValue = token.getStringValue();
 		if (stringValue.size() == 1 && (reg = wcschr(vpfxstRegisters,stringValue[0])) != nullptr)
 		{
-			result |= (reg-vpfxstRegisters) << (i*2);
+			result |= (reg-vpfxstRegisters) << (i*2);
 
 			if (abs && parser.nextToken().type != TokenType::BitOr)
-				return false;
+				return false;
 
-			continue;
+			continue;
 		}
 
 		// abs is invalid with constants
 		if (abs)
-			return false;
+			return false;
 
-		result |= 1 << (12+i);
+		result |= 1 << (12+i);
 
-		int constNum = -1;
+		int constNum = -1;
 		if (sequenceParser.parse(parser,constNum) == false)
-			return false;
+			return false;
 
-		result |= (constNum & 3) << (i*2);
+		result |= (constNum & 3) << (i*2);
 		if (constNum & 4)
-			result |= 1 << (8+i);
+			result |= 1 << (8+i);
 	}
 
-	return parser.nextToken().type == TokenType::RBrack;
+	return parser.nextToken().type == TokenType::RBrack;
 }
 
 bool MipsParser::parseVpfxdParameter(Parser& parser, int& result)
 {
-	static TokenSequenceParser sequenceParser;
+	static TokenSequenceParser sequenceParser;
 
 	// initialize on first use
 	if (sequenceParser.getEntryCount() == 0)
@@ -7789,62 +7789,62 @@ bool MipsParser::parseVpfxdParameter(Parser& parser, int& result)
 		// 0-1
 		sequenceParser.addEntry(1,
 			{TokenType::Integer, TokenType::Minus, TokenType::Integer},
-			{INT64_C(0), INT64_C(1)} );
+			{INT64_C(0), INT64_C(1)} );
 		// 0-1
 		sequenceParser.addEntry(-1,
 			{TokenType::Integer, TokenType::Minus, TokenType::NumberString},
-			{INT64_C(0), L"1m"} );
+			{INT64_C(0), L"1m"} );
 		// 0:1
 		sequenceParser.addEntry(1,
 			{TokenType::Integer, TokenType::Colon, TokenType::Integer},
-			{INT64_C(0), INT64_C(1)} );
+			{INT64_C(0), INT64_C(1)} );
 		// 0:1
 		sequenceParser.addEntry(-1,
 			{TokenType::Integer, TokenType::Colon, TokenType::NumberString},
-			{INT64_C(0), L"1m"} );
+			{INT64_C(0), L"1m"} );
 		// -1-1
 		sequenceParser.addEntry(3,
 			{TokenType::Minus, TokenType::Integer, TokenType::Minus, TokenType::Integer},
-			{INT64_C(1), INT64_C(1)} );
+			{INT64_C(1), INT64_C(1)} );
 		// -1-1m
 		sequenceParser.addEntry(-3,
 			{TokenType::Minus, TokenType::Integer, TokenType::Minus, TokenType::NumberString},
-			{INT64_C(1), L"1m"} );
+			{INT64_C(1), L"1m"} );
 		// -1:1
 		sequenceParser.addEntry(3,
 			{TokenType::Minus, TokenType::Integer, TokenType::Colon, TokenType::Integer},
-			{INT64_C(1), INT64_C(1)} );
+			{INT64_C(1), INT64_C(1)} );
 		// -1:1m
 		sequenceParser.addEntry(-3,
 			{TokenType::Minus, TokenType::Integer, TokenType::Colon, TokenType::NumberString},
-			{INT64_C(1), L"1m"} );
+			{INT64_C(1), L"1m"} );
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (i != 0)
 		{
 			if (parser.nextToken().type != TokenType::Comma)
-				return false;
+				return false;
 		}
 
-		parser.eatToken();
+		parser.eatToken();
 
-		int num = 0;
+		int num = 0;
 		if (sequenceParser.parse(parser,num) == false)
-			return false;
+			return false;
 
 		// m versions
 		if (num < 0)
 		{
-			result |= 1 << (8+i);
-			num = abs(num);
+			result |= 1 << (8+i);
+			num = abs(num);
 		}
 
-		result |= num << (2*i);
+		result |= num << (2*i);
 	}
 
-	return parser.nextToken().type == TokenType::RBrack;
+	return parser.nextToken().type == TokenType::RBrack;
 }
 
 
@@ -7854,15 +7854,15 @@ bool MipsParser::decodeCop2BranchCondition(const std::wstring& text, size_t& pos
 	{
 		if (startsWith(text,L"any",pos))
 		{
-			result = 4;
-			pos += 3;
-			return true;
+			result = 4;
+			pos += 3;
+			return true;
 		}
 		if (startsWith(text,L"all",pos))
 		{
-			result = 5;
-			pos += 3;
-			return true;
+			result = 5;
+			pos += 3;
+			return true;
 		}
 	} else if (pos+1 == text.size())
 	{
@@ -7870,578 +7870,578 @@ bool MipsParser::decodeCop2BranchCondition(const std::wstring& text, size_t& pos
 		{
 		case 'x':
 		case '0':
-			result = 0;
-			return true;
+			result = 0;
+			return true;
 		case 'y':
 		case '1':
-			result = 1;
-			return true;
+			result = 1;
+			return true;
 		case 'z':
 		case '2':
-			result = 2;
-			return true;
+			result = 2;
+			return true;
 		case 'w':
 		case '3':
-			result = 3;
-			return true;
+			result = 3;
+			return true;
 		case '4':
-			result = 4;
-			return true;
+			result = 4;
+			return true;
 		case '5':
-			result = 5;
-			return true;
+			result = 5;
+			return true;
 		}
 
 		// didn't match it
-		pos--;
+		pos--;
 	}
 
-	return false;
+	return false;
 }
 
 bool MipsParser::parseCop2BranchCondition(Parser& parser, int& result)
 {
-	const Token& token = parser.nextToken();
+	const Token& token = parser.nextToken();
 
 	if (token.type == TokenType::Integer)
 	{
-		result = (int) token.intValue;
-		return token.intValue <= 5;
+		result = (int) token.intValue;
+		return token.intValue <= 5;
 	}
 
 	if (token.type != TokenType::Identifier)
-		return false;
+		return false;
 
-	size_t pos = 0;
-	return decodeCop2BranchCondition(token.getStringValue(),pos,result);
+	size_t pos = 0;
+	return decodeCop2BranchCondition(token.getStringValue(),pos,result);
 }
 
 bool MipsParser::parseWb(Parser& parser)
 {
-	const Token& token = parser.nextToken();
+	const Token& token = parser.nextToken();
 	if (token.type != TokenType::Identifier)
-		return false;
+		return false;
 
-	return token.getStringValue() == L"wb";
+	return token.getStringValue() == L"wb";
 }
 
 static bool decodeImmediateSize(const char*& encoding, MipsImmediateType& dest)
 {
 	if (*encoding == 'h')	// half float
 	{
-		encoding++;
-		dest = MipsImmediateType::ImmediateHalfFloat;
+		encoding++;
+		dest = MipsImmediateType::ImmediateHalfFloat;
 	} else {
-		int num = 0;
+		int num = 0;
 		while (*encoding >= '0' && *encoding <= '9')
 		{
-			num = num*10 + *encoding-'0';
-			encoding++;
+			num = num*10 + *encoding-'0';
+			encoding++;
 		}
 
 		switch (num)
 		{
 		case 5:
-			dest = MipsImmediateType::Immediate5;
-			break;
+			dest = MipsImmediateType::Immediate5;
+			break;
 		case 7:
-			dest = MipsImmediateType::Immediate7;
-			break;
+			dest = MipsImmediateType::Immediate7;
+			break;
 		case 10:
-			dest = MipsImmediateType::Immediate10;
-			break;
+			dest = MipsImmediateType::Immediate10;
+			break;
 		case 16:
-			dest = MipsImmediateType::Immediate16;
-			break;
+			dest = MipsImmediateType::Immediate16;
+			break;
 		case 20:
-			dest = MipsImmediateType::Immediate20;
-			break;
+			dest = MipsImmediateType::Immediate20;
+			break;
 		case 25:
-			dest = MipsImmediateType::Immediate25;
-			break;
+			dest = MipsImmediateType::Immediate25;
+			break;
 		case 26:
-			dest = MipsImmediateType::Immediate26;
-			break;
+			dest = MipsImmediateType::Immediate26;
+			break;
 		default:
-			return false;
+			return false;
 		}
 	}
 
-	return true;
+	return true;
 }
 
 bool MipsParser::decodeVfpuType(const std::wstring& name, size_t& pos, int& dest)
 {
 	if (pos >= name.size())
-		return false;
+		return false;
 
 	switch (name[pos++])
 	{
 	case 's':
-		dest = 0;
-		return true;
+		dest = 0;
+		return true;
 	case 'p':
-		dest = 1;
-		return true;
+		dest = 1;
+		return true;
 	case 't':
-		dest = 2;
-		return true;
+		dest = 2;
+		return true;
 	case 'q':
-		dest = 3;
-		return true;
+		dest = 3;
+		return true;
 	}
 
-	pos--;
-	return false;
+	pos--;
+	return false;
 }
 
 bool MipsParser::decodeOpcode(const std::wstring& name, const tMipsOpcode& opcode)
 {
-	const char* encoding = opcode.name;
-	size_t pos = 0;
+	const char* encoding = opcode.name;
+	size_t pos = 0;
 
-	registers.reset();
-	immediate.reset();
-	opcodeData.reset();
-	hasFixedSecondaryImmediate = false;
+	registers.reset();
+	immediate.reset();
+	opcodeData.reset();
+	hasFixedSecondaryImmediate = false;
 
 	while (*encoding != 0)
 	{
 		switch (*encoding++)
 		{
 		case 'S':
-			CHECK(decodeVfpuType(name,pos,opcodeData.vfpuSize));
-			break;
+			CHECK(decodeVfpuType(name,pos,opcodeData.vfpuSize));
+			break;
 		case 'B':
-			CHECK(decodeCop2BranchCondition(name,pos,immediate.secondary.originalValue));
-			immediate.secondary.type = MipsImmediateType::Cop2BranchType;
-			immediate.secondary.value = immediate.secondary.originalValue;
-			hasFixedSecondaryImmediate = true;
-			break;
+			CHECK(decodeCop2BranchCondition(name,pos,immediate.secondary.originalValue));
+			immediate.secondary.type = MipsImmediateType::Cop2BranchType;
+			immediate.secondary.value = immediate.secondary.originalValue;
+			hasFixedSecondaryImmediate = true;
+			break;
 		default:
-			CHECK(pos < name.size());
-			CHECK(*(encoding-1) == name[pos++]);
-			break;
+			CHECK(pos < name.size());
+			CHECK(*(encoding-1) == name[pos++]);
+			break;
 		}
 	}
 
-	return pos >= name.size();
+	return pos >= name.size();
 }
 
 void MipsParser::setOmittedRegisters(const tMipsOpcode& opcode)
 {
 	// copy over omitted registers
 	if (opcode.flags & MO_RSD)
-		registers.grd = registers.grs;
+		registers.grd = registers.grs;
 
 	if (opcode.flags & MO_RST)
-		registers.grt = registers.grs;
+		registers.grt = registers.grs;
 
 	if (opcode.flags & MO_RDT)
-		registers.grt = registers.grd;
+		registers.grt = registers.grd;
 
 	if (opcode.flags & MO_FRSD)
-		registers.frd = registers.frs;
+		registers.frd = registers.frs;
 
 	if (opcode.flags & MO_RSPVRSD)
-		registers.rspvrd = registers.rspvrs;
+		registers.rspvrd = registers.rspvrs;
 }
 
 bool MipsParser::parseParameters(Parser& parser, const tMipsOpcode& opcode)
 {
-	const char* encoding = opcode.encoding;
+	const char* encoding = opcode.encoding;
 
 	// initialize opcode variables
-	immediate.primary.type = MipsImmediateType::None;
+	immediate.primary.type = MipsImmediateType::None;
 	if (!hasFixedSecondaryImmediate)
-		immediate.secondary.type = MipsImmediateType::None;
+		immediate.secondary.type = MipsImmediateType::None;
 
 	if (opcodeData.vfpuSize == -1)
 	{
 		if (opcode.flags & MO_VFPU_SINGLE)
-			opcodeData.vfpuSize = 0;
+			opcodeData.vfpuSize = 0;
 		else if (opcode.flags & MO_VFPU_PAIR)
-			opcodeData.vfpuSize = 1;
+			opcodeData.vfpuSize = 1;
 		else if (opcode.flags & MO_VFPU_TRIPLE)
-			opcodeData.vfpuSize = 2;
+			opcodeData.vfpuSize = 2;
 		else if (opcode.flags & MO_VFPU_QUAD)
-			opcodeData.vfpuSize = 3;
+			opcodeData.vfpuSize = 3;
 	}
 
 	// parse parameters
-	MipsRegisterValue tempRegister;
-	int actualSize = opcodeData.vfpuSize;
+	MipsRegisterValue tempRegister;
+	int actualSize = opcodeData.vfpuSize;
 
 	while (*encoding != 0)
 	{
 		switch (*encoding++)
 		{
 		case 't':	// register
-			CHECK(parseRegister(parser,registers.grt));
-			break;
+			CHECK(parseRegister(parser,registers.grt));
+			break;
 		case 'd':	// register
-			CHECK(parseRegister(parser,registers.grd));
-			break;
+			CHECK(parseRegister(parser,registers.grd));
+			break;
 		case 's':	// register
-			CHECK(parseRegister(parser,registers.grs));
-			break;
+			CHECK(parseRegister(parser,registers.grs));
+			break;
 		case 'T':	// float register
-			CHECK(parseFpuRegister(parser,registers.frt));
-			break;
+			CHECK(parseFpuRegister(parser,registers.frt));
+			break;
 		case 'D':	// float register
-			CHECK(parseFpuRegister(parser,registers.frd));
-			break;
+			CHECK(parseFpuRegister(parser,registers.frd));
+			break;
 		case 'S':	// float register
-			CHECK(parseFpuRegister(parser,registers.frs));
-			break;
+			CHECK(parseFpuRegister(parser,registers.frs));
+			break;
 		case 'f':	// fpu control register
-			CHECK(parseFpuControlRegister(parser,registers.frs));
-			break;
+			CHECK(parseFpuControlRegister(parser,registers.frs));
+			break;
 		case 'z':	// cop0 register
-			CHECK(parseCop0Register(parser,registers.grd));
-			break;
+			CHECK(parseCop0Register(parser,registers.grd));
+			break;
 		case 'v':	// psp vfpu reg
 			if (*encoding == 'S')
 			{
-				encoding++;
-				actualSize = 0;
+				encoding++;
+				actualSize = 0;
 			}
 
 			switch (*encoding++)
 			{
 			case 's':
-				CHECK(parseVfpuRegister(parser,registers.vrs,actualSize));
-				CHECK(registers.vrs.type == MipsRegisterType::VfpuVector);
-				if (opcode.flags & MO_VFPU_6BIT) CHECK(!(registers.vrs.num & 0x40));
-				break;
+				CHECK(parseVfpuRegister(parser,registers.vrs,actualSize));
+				CHECK(registers.vrs.type == MipsRegisterType::VfpuVector);
+				if (opcode.flags & MO_VFPU_6BIT) CHECK(!(registers.vrs.num & 0x40));
+				break;
 			case 't':
-				CHECK(parseVfpuRegister(parser,registers.vrt,actualSize));
-				CHECK(registers.vrt.type == MipsRegisterType::VfpuVector);
-				if (opcode.flags & MO_VFPU_6BIT) CHECK(!(registers.vrt.num & 0x40));
-				break;
+				CHECK(parseVfpuRegister(parser,registers.vrt,actualSize));
+				CHECK(registers.vrt.type == MipsRegisterType::VfpuVector);
+				if (opcode.flags & MO_VFPU_6BIT) CHECK(!(registers.vrt.num & 0x40));
+				break;
 			case 'd':
-				CHECK(parseVfpuRegister(parser,registers.vrd,actualSize));
-				CHECK(registers.vrd.type == MipsRegisterType::VfpuVector);
-				if (opcode.flags & MO_VFPU_6BIT) CHECK(!(registers.vrd.num & 0x40));
-				break;
+				CHECK(parseVfpuRegister(parser,registers.vrd,actualSize));
+				CHECK(registers.vrd.type == MipsRegisterType::VfpuVector);
+				if (opcode.flags & MO_VFPU_6BIT) CHECK(!(registers.vrd.num & 0x40));
+				break;
 			case 'c':
-				CHECK(parseVfpuControlRegister(parser,registers.vrd));
-				break;
+				CHECK(parseVfpuControlRegister(parser,registers.vrd));
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'm':	// vfpu matrix register
 			switch (*encoding++)
 			{
 			case 's':
-				CHECK(parseVfpuRegister(parser,registers.vrs,opcodeData.vfpuSize));
-				CHECK(registers.vrs.type == MipsRegisterType::VfpuMatrix);
+				CHECK(parseVfpuRegister(parser,registers.vrs,opcodeData.vfpuSize));
+				CHECK(registers.vrs.type == MipsRegisterType::VfpuMatrix);
 				if (opcode.flags & MO_TRANSPOSE_VS)
-					registers.vrs.num ^= 0x20;
-				break;
+					registers.vrs.num ^= 0x20;
+				break;
 			case 't':
-				CHECK(parseVfpuRegister(parser,registers.vrt,opcodeData.vfpuSize));
-				CHECK(registers.vrt.type == MipsRegisterType::VfpuMatrix);
-				break;
+				CHECK(parseVfpuRegister(parser,registers.vrt,opcodeData.vfpuSize));
+				CHECK(registers.vrt.type == MipsRegisterType::VfpuMatrix);
+				break;
 			case 'd':
-				CHECK(parseVfpuRegister(parser,registers.vrd,opcodeData.vfpuSize));
-				CHECK(registers.vrd.type == MipsRegisterType::VfpuMatrix);
-				break;
+				CHECK(parseVfpuRegister(parser,registers.vrd,opcodeData.vfpuSize));
+				CHECK(registers.vrd.type == MipsRegisterType::VfpuMatrix);
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'V':	// ps2 vector reg
 			switch (*encoding++)
 			{
 			case 't':	// register
-				CHECK(parsePs2Cop2Register(parser,registers.ps2vrt));
-				break;
+				CHECK(parsePs2Cop2Register(parser,registers.ps2vrt));
+				break;
 			case 'd':	// register
-				CHECK(parsePs2Cop2Register(parser,registers.ps2vrd));
-				break;
+				CHECK(parsePs2Cop2Register(parser,registers.ps2vrd));
+				break;
 			case 's':	// register
-				CHECK(parsePs2Cop2Register(parser,registers.ps2vrs));
-				break;
+				CHECK(parsePs2Cop2Register(parser,registers.ps2vrs));
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'g':	// psx cop2 reg
 			switch (*encoding++)
 			{
 			case 't':	// gte data register
-				CHECK(parsePsxCop2DataRegister(parser,registers.grt));
-				break;
+				CHECK(parsePsxCop2DataRegister(parser,registers.grt));
+				break;
 			case 's':	// gte data register
-				CHECK(parsePsxCop2DataRegister(parser,registers.grd));
-				break;
+				CHECK(parsePsxCop2DataRegister(parser,registers.grd));
+				break;
 			case 'c':	// gte control register
-				CHECK(parsePsxCop2ControlRegister(parser,registers.grd));
-				break;
+				CHECK(parsePsxCop2ControlRegister(parser,registers.grd));
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'r':	// forced register
-			CHECK(parseRegister(parser,tempRegister));
-			CHECK(tempRegister.num == *encoding++);
-			break;
+			CHECK(parseRegister(parser,tempRegister));
+			CHECK(tempRegister.num == *encoding++);
+			break;
 		case 'R':	// rsp register
 			switch (*encoding++)
 			{
 			case 'z':	// cop0 register
-				CHECK(parseRspCop0Register(parser,registers.grd));
-				break;
+				CHECK(parseRspCop0Register(parser,registers.grd));
+				break;
 			case 'c':	// vector control register
-				CHECK(parseRspVectorControlRegister(parser,registers.grd));
-				break;
+				CHECK(parseRspVectorControlRegister(parser,registers.grd));
+				break;
 			case 't':	// vector register
-				CHECK(parseRspVectorRegister(parser,registers.rspvrt));
-				break;
+				CHECK(parseRspVectorRegister(parser,registers.rspvrt));
+				break;
 			case 'd':	// vector register
-				CHECK(parseRspVectorRegister(parser,registers.rspvrd));
-				break;
+				CHECK(parseRspVectorRegister(parser,registers.rspvrd));
+				break;
 			case 's':	// vector register
-				CHECK(parseRspVectorRegister(parser,registers.rspvrs));
-				break;
+				CHECK(parseRspVectorRegister(parser,registers.rspvrs));
+				break;
 			case 'e':	// vector element
-				CHECK(parseRspVectorElement(parser,registers.rspve));
-				break;
+				CHECK(parseRspVectorElement(parser,registers.rspve));
+				break;
 			case 'l':	// scalar element
-				CHECK(parseRspScalarElement(parser,registers.rspve));
-				break;
+				CHECK(parseRspScalarElement(parser,registers.rspve));
+				break;
 			case 'm':	// scalar destination element
-				CHECK(parseRspScalarElement(parser,registers.rspvde));
-				break;
+				CHECK(parseRspScalarElement(parser,registers.rspvde));
+				break;
 			case 'o':	// byte offset element
-				CHECK(parseRspOffsetElement(parser,registers.rspvealt));
-				break;
+				CHECK(parseRspOffsetElement(parser,registers.rspvealt));
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'i':	// primary immediate
-			CHECK(parseImmediate(parser,immediate.primary.expression));
-			allowFunctionCallExpression(*encoding != '(');
-			CHECK(decodeImmediateSize(encoding,immediate.primary.type));
-			allowFunctionCallExpression(true);
-			break;
+			CHECK(parseImmediate(parser,immediate.primary.expression));
+			allowFunctionCallExpression(*encoding != '(');
+			CHECK(decodeImmediateSize(encoding,immediate.primary.type));
+			allowFunctionCallExpression(true);
+			break;
 		case 'j':	// secondary immediate
 			switch (*encoding++)
 			{
 			case 'c':
-				CHECK(parseImmediate(parser,immediate.secondary.expression));
-				immediate.secondary.type = MipsImmediateType::CacheOp;
-				break;
+				CHECK(parseImmediate(parser,immediate.secondary.expression));
+				immediate.secondary.type = MipsImmediateType::CacheOp;
+				break;
 			case 'e':
-				CHECK(parseImmediate(parser,immediate.secondary.expression));
-				immediate.secondary.type = MipsImmediateType::Ext;
-				break;
+				CHECK(parseImmediate(parser,immediate.secondary.expression));
+				immediate.secondary.type = MipsImmediateType::Ext;
+				break;
 			case 'i':
-				CHECK(parseImmediate(parser,immediate.secondary.expression));
-				immediate.secondary.type = MipsImmediateType::Ins;
-				break;
+				CHECK(parseImmediate(parser,immediate.secondary.expression));
+				immediate.secondary.type = MipsImmediateType::Ins;
+				break;
 			case 'b':
-				CHECK(parseCop2BranchCondition(parser,immediate.secondary.originalValue));
-				immediate.secondary.type = MipsImmediateType::Cop2BranchType;
-				immediate.secondary.value = immediate.secondary.originalValue;
-				break;
+				CHECK(parseCop2BranchCondition(parser,immediate.secondary.originalValue));
+				immediate.secondary.type = MipsImmediateType::Cop2BranchType;
+				immediate.secondary.value = immediate.secondary.originalValue;
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'C':	// vfpu condition
-			CHECK(parseVfpuCondition(parser,opcodeData.vectorCondition));
-			break;
+			CHECK(parseVfpuCondition(parser,opcodeData.vectorCondition));
+			break;
 		case 'W':	// vfpu argument
 			switch (*encoding++)
 			{
 			case 's':
-				CHECK(parseVpfxsParameter(parser,immediate.primary.originalValue));
-				immediate.primary.value = immediate.primary.originalValue;
-				immediate.primary.type = MipsImmediateType::Immediate20_0;
-				break;
+				CHECK(parseVpfxsParameter(parser,immediate.primary.originalValue));
+				immediate.primary.value = immediate.primary.originalValue;
+				immediate.primary.type = MipsImmediateType::Immediate20_0;
+				break;
 			case 'd':
-				CHECK(parseVpfxdParameter(parser,immediate.primary.originalValue));
-				immediate.primary.value = immediate.primary.originalValue;
-				immediate.primary.type = MipsImmediateType::Immediate16;
-				break;
+				CHECK(parseVpfxdParameter(parser,immediate.primary.originalValue));
+				immediate.primary.value = immediate.primary.originalValue;
+				immediate.primary.type = MipsImmediateType::Immediate16;
+				break;
 			case 'c':
-				CHECK(parseVcstParameter(parser,immediate.primary.originalValue));
-				immediate.primary.value = immediate.primary.originalValue;
-				immediate.primary.type = MipsImmediateType::Immediate5;
-				break;
+				CHECK(parseVcstParameter(parser,immediate.primary.originalValue));
+				immediate.primary.value = immediate.primary.originalValue;
+				immediate.primary.type = MipsImmediateType::Immediate5;
+				break;
 			case 'r':
-				CHECK(parseVfpuVrot(parser,immediate.primary.originalValue,opcodeData.vfpuSize));
-				immediate.primary.value = immediate.primary.originalValue;
-				immediate.primary.type = MipsImmediateType::Immediate5;
-				break;
+				CHECK(parseVfpuVrot(parser,immediate.primary.originalValue,opcodeData.vfpuSize));
+				immediate.primary.value = immediate.primary.originalValue;
+				immediate.primary.type = MipsImmediateType::Immediate5;
+				break;
 			default:
-				return false;
+				return false;
 			}
-			break;
+			break;
 		case 'w':	// 'wb' characters
-			CHECK(parseWb(parser));
-			break;
+			CHECK(parseWb(parser));
+			break;
 		default:
-			CHECK(matchSymbol(parser,*(encoding-1)));
-			break;
+			CHECK(matchSymbol(parser,*(encoding-1)));
+			break;
 		}
 	}
 
-	opcodeData.opcode = opcode;
-	setOmittedRegisters(opcode);
+	opcodeData.opcode = opcode;
+	setOmittedRegisters(opcode);
 
 	// the next token has to be a separator, else the parameters aren't
 	// completely parsed
 
-	return parser.nextToken().type == TokenType::Separator;
+	return parser.nextToken().type == TokenType::Separator;
 
 }
 
 std::unique_ptr<CMipsInstruction> MipsParser::parseOpcode(Parser& parser)
 {
 	if (parser.peekToken().type != TokenType::Identifier)
-		return nullptr;
+		return nullptr;
 
-	const Token &token = parser.nextToken();
+	const Token &token = parser.nextToken();
 
-	bool paramFail = false;
-	const MipsArchDefinition& arch = mipsArchs[Mips.GetVersion()];
-	const std::wstring stringValue = token.getStringValue();
+	bool paramFail = false;
+	const MipsArchDefinition& arch = mipsArchs[Mips.GetVersion()];
+	const std::wstring stringValue = token.getStringValue();
 
-	for (int z = 0; MipsOpcodes[z].name != nullptr; z++)
+	for (int z = 0; MipsOpcodes[z].name != nullptr; z++)
 	{
 		if ((MipsOpcodes[z].archs & arch.supportSets) == 0)
-			continue;
+			continue;
 		if ((MipsOpcodes[z].archs & arch.excludeMask) != 0)
-			continue;
+			continue;
 
 		if ((MipsOpcodes[z].flags & MO_64BIT) && !(arch.flags & MO_64BIT))
-			continue;
+			continue;
 		if ((MipsOpcodes[z].flags & MO_FPU) && !(arch.flags & MO_FPU))
-			continue;
+			continue;
 		if ((MipsOpcodes[z].flags & MO_DFPU) && !(arch.flags & MO_DFPU))
-			continue;
+			continue;
 
 		if (decodeOpcode(stringValue,MipsOpcodes[z]) == true)
 		{
-			TokenizerPosition tokenPos = parser.getTokenizer()->getPosition();
+			TokenizerPosition tokenPos = parser.getTokenizer()->getPosition();
 
 			if (parseParameters(parser,MipsOpcodes[z]) == true)
 			{
 				// success, return opcode
-				return ::make_unique<CMipsInstruction>(opcodeData,immediate,registers);
+				return ::make_unique<CMipsInstruction>(opcodeData,immediate,registers);
 			}
 
-			parser.getTokenizer()->setPosition(tokenPos);
-			paramFail = true;
+			parser.getTokenizer()->setPosition(tokenPos);
+			paramFail = true;
 		}
 	}
 
 	if (paramFail == true)
-		parser.printError(token,L"MIPS parameter failure");
+		parser.printError(token,L"MIPS parameter failure");
 	else
-		parser.printError(token,L"Invalid MIPS opcode '%s'",stringValue);
+		parser.printError(token,L"Invalid MIPS opcode '%s'",stringValue);
 
-	return nullptr;
+	return nullptr;
 }
 
 bool MipsParser::parseMacroParameters(Parser& parser, const MipsMacroDefinition& macro)
 {
-	const wchar_t* encoding = (const wchar_t*) macro.args;
+	const wchar_t* encoding = (const wchar_t*) macro.args;
 
 	while (*encoding != 0)
 	{
 		switch (*encoding++)
 		{
 		case 't':	// register
-			CHECK(parseRegister(parser,registers.grt));
-			break;
+			CHECK(parseRegister(parser,registers.grt));
+			break;
 		case 'd':	// register
-			CHECK(parseRegister(parser,registers.grd));
-			break;
+			CHECK(parseRegister(parser,registers.grd));
+			break;
 		case 's':	// register
-			CHECK(parseRegister(parser,registers.grs));
-			break;
+			CHECK(parseRegister(parser,registers.grs));
+			break;
 		case 'S':	// register
-			CHECK(parseFpuRegister(parser,registers.frs));
-			break;
+			CHECK(parseFpuRegister(parser,registers.frs));
+			break;
 		case 'i':	// primary immediate
-			allowFunctionCallExpression(*encoding != '(');
-			CHECK(parseImmediate(parser,immediate.primary.expression));
-			allowFunctionCallExpression(true);
-			break;
+			allowFunctionCallExpression(*encoding != '(');
+			CHECK(parseImmediate(parser,immediate.primary.expression));
+			allowFunctionCallExpression(true);
+			break;
 		case 'I':	// secondary immediate
-			allowFunctionCallExpression(*encoding != '(');
-			CHECK(parseImmediate(parser,immediate.secondary.expression));
-			allowFunctionCallExpression(true);
-			break;
+			allowFunctionCallExpression(*encoding != '(');
+			CHECK(parseImmediate(parser,immediate.secondary.expression));
+			allowFunctionCallExpression(true);
+			break;
 		default:
-			CHECK(matchSymbol(parser,*(encoding-1)));
-			break;
+			CHECK(matchSymbol(parser,*(encoding-1)));
+			break;
 		}
 	}
 
 	// lw rx,imm is a prefix of lw rx,imm(ry)
 	if (parser.peekToken().type == TokenType::LParen)
-		return false;
+		return false;
 
 	// the next token has to be a separator, else the parameters aren't
 	// completely parsed
-	return parser.nextToken().type == TokenType::Separator;
+	return parser.nextToken().type == TokenType::Separator;
 }
 
 std::unique_ptr<CAssemblerCommand> MipsParser::parseMacro(Parser& parser)
 {
-	TokenizerPosition startPos = parser.getTokenizer()->getPosition();
+	TokenizerPosition startPos = parser.getTokenizer()->getPosition();
 
 	// Cannot be a reference (we eat below.)
-	const Token token = parser.peekToken();
+	const Token token = parser.peekToken();
 	if (token.type != TokenType::Identifier)
-		return nullptr;
+		return nullptr;
 
-	parser.eatToken();
-	const std::wstring stringValue = token.getStringValue();
-	for (int z = 0; mipsMacros[z].name != nullptr; z++)
+	parser.eatToken();
+	const std::wstring stringValue = token.getStringValue();
+	for (int z = 0; mipsMacros[z].name != nullptr; z++)
 	{
 		if (stringValue == mipsMacros[z].name)
 		{
-			TokenizerPosition tokenPos = parser.getTokenizer()->getPosition();
+			TokenizerPosition tokenPos = parser.getTokenizer()->getPosition();
 
 			if (parseMacroParameters(parser,mipsMacros[z]) == true)
 			{
-				return mipsMacros[z].function(parser,registers,immediate,mipsMacros[z].flags);
+				return mipsMacros[z].function(parser,registers,immediate,mipsMacros[z].flags);
 			}
 
-			parser.getTokenizer()->setPosition(tokenPos);
+			parser.getTokenizer()->setPosition(tokenPos);
 		}
 	}
 
 	// no matching macro found, restore state
-	parser.getTokenizer()->setPosition(startPos);
-	return nullptr;
+	parser.getTokenizer()->setPosition(startPos);
+	return nullptr;
 }
 
 void MipsOpcodeFormatter::handleOpcodeName(const MipsOpcodeData& opData)
 {
-	const char* encoding = opData.opcode.name;
+	const char* encoding = opData.opcode.name;
 
 	while (*encoding != 0)
 	{
 		switch (*encoding++)
 		{
 		case 'S':
-			buffer += "sptq"[opData.vfpuSize];
-			break;
+			buffer += "sptq"[opData.vfpuSize];
+			break;
 		case 'B':
 			// TODO
-			break;
+			break;
 		default:
-			buffer += *(encoding-1);
-			break;
+			buffer += *(encoding-1);
+			break;
 		}
 	}
 }
@@ -8451,99 +8451,99 @@ void MipsOpcodeFormatter::handleImmediate(MipsImmediateType type, unsigned int o
 	switch (type)
 	{
 	case MipsImmediateType::ImmediateHalfFloat:
-		buffer += formatString(L"%f", bitsToFloat(originalValue));
-		break;
+		buffer += formatString(L"%f", bitsToFloat(originalValue));
+		break;
 	case MipsImmediateType::Immediate16:
 		if (!(opcodeFlags & MO_IPCR) && originalValue & 0x8000)
-			buffer += formatString(L"-0x%X", 0x10000-(originalValue & 0xFFFF));
+			buffer += formatString(L"-0x%X", 0x10000-(originalValue & 0xFFFF));
 		else
-			buffer += formatString(L"0x%X", originalValue);
-		break;
+			buffer += formatString(L"0x%X", originalValue);
+		break;
 	default:
-		buffer += formatString(L"0x%X", originalValue);
-		break;
+		buffer += formatString(L"0x%X", originalValue);
+		break;
 	}
 }
 
 void MipsOpcodeFormatter::handleOpcodeParameters(const MipsOpcodeData& opData, const MipsRegisterData& regData,
 	const MipsImmediateData& immData)
 {
-	const char* encoding = opData.opcode.encoding;
+	const char* encoding = opData.opcode.encoding;
 
-	MipsImmediateType type;
+	MipsImmediateType type;
 	while (*encoding != 0)
 	{
 		switch (*encoding++)
 		{
 		case 'r':	// forced register
-			buffer += formatString(L"r%d",*encoding);
-			encoding += 1;
-			break;
+			buffer += formatString(L"r%d",*encoding);
+			encoding += 1;
+			break;
 		case 's':	// register
-			buffer += regData.grs.name;
-			break;
+			buffer += regData.grs.name;
+			break;
 		case 'd':	// register
-			buffer += regData.grd.name;
-			break;
+			buffer += regData.grd.name;
+			break;
 		case 't':	// register
-			buffer += regData.grt.name;
-			break;
+			buffer += regData.grt.name;
+			break;
 		case 'S':	// fpu register
-			buffer += regData.frs.name;
-			break;
+			buffer += regData.frs.name;
+			break;
 		case 'D':	// fpu register
-			buffer += regData.frd.name;
-			break;
+			buffer += regData.frd.name;
+			break;
 		case 'T':	// fpu register
-			buffer += regData.frt.name;
-			break;
+			buffer += regData.frt.name;
+			break;
 		case 'v':	// psp vfpu reg
 		case 'm':	// vfpu matrix register
 			switch (*encoding++)
 			{
 			case 'd':
-				buffer += regData.vrd.name;
-				break;
+				buffer += regData.vrd.name;
+				break;
 			case 's':
-				buffer += regData.vrs.name;
-				break;
+				buffer += regData.vrs.name;
+				break;
 			case 't':
-				buffer += regData.vrt.name;
-				break;
+				buffer += regData.vrt.name;
+				break;
 			}
-			break;
+			break;
 		case 'V':	// ps2 vector reg
 			switch (*encoding++)
 			{
 			case 'd':
-				buffer += regData.ps2vrd.name;
-				break;
+				buffer += regData.ps2vrd.name;
+				break;
 			case 's':
-				buffer += regData.ps2vrs.name;
-				break;
+				buffer += regData.ps2vrs.name;
+				break;
 			case 't':
-				buffer += regData.ps2vrt.name;
-				break;
+				buffer += regData.ps2vrt.name;
+				break;
 			}
-			break;
+			break;
 		case 'i':	// primary immediate
-			decodeImmediateSize(encoding,type);
-			handleImmediate(immData.primary.type,immData.primary.originalValue,opData.opcode.flags);
-			break;
+			decodeImmediateSize(encoding,type);
+			handleImmediate(immData.primary.type,immData.primary.originalValue,opData.opcode.flags);
+			break;
 		case 'j':	// secondary immediate
-			handleImmediate(immData.secondary.type,immData.secondary.originalValue, opData.opcode.flags);
-			encoding++;
-			break;
+			handleImmediate(immData.secondary.type,immData.secondary.originalValue, opData.opcode.flags);
+			encoding++;
+			break;
 		case 'C':	// vfpu condition
 		case 'W':	// vfpu argument
 			// TODO
-			break;
+			break;
 		case 'w':	// 'wb' characters
-			buffer += L"wb";
-			break;
+			buffer += L"wb";
+			break;
 		default:
-			buffer += *(encoding-1);
-			break;
+			buffer += *(encoding-1);
+			break;
 		}
 	}
 }
@@ -8551,14 +8551,14 @@ void MipsOpcodeFormatter::handleOpcodeParameters(const MipsOpcodeData& opData, c
 const std::wstring& MipsOpcodeFormatter::formatOpcode(const MipsOpcodeData& opData, const MipsRegisterData& regData,
 	const MipsImmediateData& immData)
 {
-	buffer = L"   ";
-	handleOpcodeName(opData);
+	buffer = L"   ";
+	handleOpcodeName(opData);
 
 	while (buffer.size() < 11)
-		buffer += ' ';
+		buffer += ' ';
 
-	handleOpcodeParameters(opData,regData,immData);
-	return buffer;
+	handleOpcodeParameters(opData,regData,immData);
+	return buffer;
 }
 
 // file: Archs/MIPS/PsxRelocator.cpp
@@ -8566,528 +8566,528 @@ const std::wstring& MipsOpcodeFormatter::formatOpcode(const MipsOpcodeData& opDa
 
 struct PsxLibEntry
 {
-	std::wstring name;
-	ByteArray data;
-};
+	std::wstring name;
+	ByteArray data;
+};
 
-const unsigned char psxObjectFileMagicNum[6] = { 'L', 'N', 'K', '\x02', '\x2E', '\x07' };
+const unsigned char psxObjectFileMagicNum[6] = { 'L', 'N', 'K', '\x02', '\x2E', '\x07' };
 
 std::vector<PsxLibEntry> loadPsxLibrary(const std::wstring& inputName)
 {
-	ByteArray input = ByteArray::fromFile(inputName);
-	std::vector<PsxLibEntry> result;
+	ByteArray input = ByteArray::fromFile(inputName);
+	std::vector<PsxLibEntry> result;
 
 	if (input.size() == 0)
-		return result;
+		return result;
 
 	if (memcmp(input.data(),psxObjectFileMagicNum,sizeof(psxObjectFileMagicNum)) == 0)
 	{
-		PsxLibEntry entry;
-		entry.name = getFileNameFromPath(inputName);
-		entry.data = input;
-		result.push_back(entry);
-		return result;
+		PsxLibEntry entry;
+		entry.name = getFileNameFromPath(inputName);
+		entry.data = input;
+		result.push_back(entry);
+		return result;
 	}
 
 	if (memcmp(input.data(),"LIB\x01",4) != 0)
-		return result;
+		return result;
 
-	size_t pos = 4;
+	size_t pos = 4;
 	while (pos < input.size())
 	{
-		PsxLibEntry entry;
+		PsxLibEntry entry;
 
-		for (int i = 0; i < 16 && input[pos+i] != ' '; i++)
+		for (int i = 0; i < 16 && input[pos+i] != ' '; i++)
 		{
-			entry.name += input[pos+i];
+			entry.name += input[pos+i];
 		}
 
-		int size = input.getDoubleWord(pos+16);
-		int skip = 20;
+		int size = input.getDoubleWord(pos+16);
+		int skip = 20;
 
 		while (input[pos+skip] != 0)
 		{
-			skip += 1+input[pos+skip];
+			skip += 1+input[pos+skip];
 		}
 
-		skip++;
+		skip++;
 
-		entry.data = input.mid(pos+skip,size-skip);
-		pos += size;
+		entry.data = input.mid(pos+skip,size-skip);
+		pos += size;
 
-		result.push_back(entry);
+		result.push_back(entry);
 	}
 
-	return result;
+	return result;
 }
 
 size_t PsxRelocator::loadString(ByteArray& data, size_t pos, std::wstring& dest)
 {
-	dest = L"";
-	int len = data[pos++];
+	dest = L"";
+	int len = data[pos++];
 
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
-		dest += data[pos++];
+		dest += data[pos++];
 	}
 
-	return len+1;
+	return len+1;
 }
 
 bool PsxRelocator::parseObject(ByteArray data, PsxRelocatorFile& dest)
 {
 	if (memcmp(data.data(),psxObjectFileMagicNum,sizeof(psxObjectFileMagicNum)) != 0)
-		return false;
+		return false;
 
-	size_t pos = 6;
+	size_t pos = 6;
 
-	std::vector<PsxSegment>& segments = dest.segments;
-	std::vector<PsxSymbol>& syms = dest.symbols;
+	std::vector<PsxSegment>& segments = dest.segments;
+	std::vector<PsxSymbol>& syms = dest.symbols;
 
-	int activeSegment = -1;
-	int lastSegmentPartStart = -1;
+	int activeSegment = -1;
+	int lastSegmentPartStart = -1;
 	while (pos < data.size())
 	{
 		switch (data[pos])
 		{
 		case 0x10:	// segment definition
 			{
-				PsxSegment seg;
-				seg.id = data.getDoubleWord(pos+1);
-				segments.push_back(seg);
-				pos += 5;
+				PsxSegment seg;
+				seg.id = data.getDoubleWord(pos+1);
+				segments.push_back(seg);
+				pos += 5;
 
 				if (data[pos] != 8)
-					return false;
+					return false;
 
-				std::wstring& name = segments[segments.size()-1].name;
-				pos += 1 + loadString(data,pos+1,name);
+				std::wstring& name = segments[segments.size()-1].name;
+				pos += 1 + loadString(data,pos+1,name);
 			}
-			break;
+			break;
 		case 0x14:	// group?
-			pos += data[pos+4]+5;
-			break;
+			pos += data[pos+4]+5;
+			break;
 		case 0x1C:	// source file name
-			pos += data[pos+3]+4;
-			break;
+			pos += data[pos+3]+4;
+			break;
 
 		case 0x06:	// set segment id
 			{
-				int id = data.getWord(pos+1);
-				pos += 3;
+				int id = data.getWord(pos+1);
+				pos += 3;
 
-				int num = -1;
-				for (size_t i = 0; i < segments.size(); i++)
+				int num = -1;
+				for (size_t i = 0; i < segments.size(); i++)
 					{
 					if (segments[i].id == id)
 					{
-						num = (int) i;
-						break;
+						num = (int) i;
+						break;
 					}
 				}
 
-				activeSegment = num;
+				activeSegment = num;
 			}
-			break;
+			break;
 		case 0x02:	// append to data segment
 			{
-				int size = data.getWord(pos+1);
-				pos += 3;
+				int size = data.getWord(pos+1);
+				pos += 3;
 
-				ByteArray d = data.mid(pos,size);
-				pos += size;
+				ByteArray d = data.mid(pos,size);
+				pos += size;
 
-				lastSegmentPartStart = (int) segments[activeSegment].data.size();
-				segments[activeSegment].data.append(d);
+				lastSegmentPartStart = (int) segments[activeSegment].data.size();
+				segments[activeSegment].data.append(d);
 			}
-			break;
+			break;
 		case 0x08:	// append zeroes data segment
 			{
-				int size = data.getWord(pos+1);
-				pos += 3;
+				int size = data.getWord(pos+1);
+				pos += 3;
 
-				ByteArray d;
-				d.reserveBytes(size);
-				segments[activeSegment].data.append(d);
+				ByteArray d;
+				d.reserveBytes(size);
+				segments[activeSegment].data.append(d);
 			}
-			break;
+			break;
 		case 0x0A:	// relocation data
 			{
-				int type = data[pos+1];
-				pos += 2;
+				int type = data[pos+1];
+				pos += 2;
 
-				PsxRelocation rel;
-				rel.relativeOffset = 0;
-				rel.filePos = (int) pos-2;
+				PsxRelocation rel;
+				rel.relativeOffset = 0;
+				rel.filePos = (int) pos-2;
 
 				switch (type)
 				{
 				case 0x10:	// 32 bit word
-					rel.type = PsxRelocationType::WordLiteral;
-					rel.segmentOffset = data.getWord(pos);
-					pos += 2;
-					break;
+					rel.type = PsxRelocationType::WordLiteral;
+					rel.segmentOffset = data.getWord(pos);
+					pos += 2;
+					break;
 				case 0x4A:	// jal
-					rel.type = PsxRelocationType::FunctionCall;
-					rel.segmentOffset = data.getWord(pos);
-					pos += 2;
-					break;
+					rel.type = PsxRelocationType::FunctionCall;
+					rel.segmentOffset = data.getWord(pos);
+					pos += 2;
+					break;
 				case 0x52:	// upper immerdiate
-					rel.type = PsxRelocationType::UpperImmediate;
-					rel.segmentOffset = data.getWord(pos);
-					pos += 2;
-					break;
+					rel.type = PsxRelocationType::UpperImmediate;
+					rel.segmentOffset = data.getWord(pos);
+					pos += 2;
+					break;
 				case 0x54:	// lower immediate (add)
-					rel.type = PsxRelocationType::LowerImmediate;
-					rel.segmentOffset = data.getWord(pos);
-					pos += 2;
-					break;
+					rel.type = PsxRelocationType::LowerImmediate;
+					rel.segmentOffset = data.getWord(pos);
+					pos += 2;
+					break;
 				default:
-					return false;
+					return false;
 				}
 
-				rel.segmentOffset += lastSegmentPartStart;
+				rel.segmentOffset += lastSegmentPartStart;
 checkothertype:
-				int otherType = data[pos++];
+				int otherType = data[pos++];
 				switch (otherType)
 				{
 				case 0x02:	// reference to symbol with id num
-					rel.refType = PsxRelocationRefType::SymblId;
-					rel.referenceId = data.getWord(pos);
-					pos += 2;
-					break;
+					rel.refType = PsxRelocationRefType::SymblId;
+					rel.referenceId = data.getWord(pos);
+					pos += 2;
+					break;
 				case 0x2C:	// ref to other segment?
-					rel.refType = PsxRelocationRefType::SegmentOffset;
+					rel.refType = PsxRelocationRefType::SegmentOffset;
 
 					switch (data[pos++])
 					{
 					case 0x00:
-						rel.relativeOffset = data.getDoubleWord(pos);
-						pos += 4;
-						goto checkothertype;
+						rel.relativeOffset = data.getDoubleWord(pos);
+						pos += 4;
+						goto checkothertype;
 					case 0x04:
-						rel.referenceId = data.getWord(pos);	// segment id
-						pos += 2;
+						rel.referenceId = data.getWord(pos);	// segment id
+						pos += 2;
 
 						if (data[pos++] != 0x00)
 						{
-							return false;
+							return false;
 						}
 
-						rel.referencePos = data.getDoubleWord(pos);
-						pos += 4;
-						break;
+						rel.referencePos = data.getDoubleWord(pos);
+						pos += 4;
+						break;
 					default:
-						return false;
+						return false;
 					}
-					break;
+					break;
 				case 0x2E:	// negative ref?
-					rel.refType = PsxRelocationRefType::SegmentOffset;
+					rel.refType = PsxRelocationRefType::SegmentOffset;
 
 					switch (data[pos++])
 					{
 					case 0x00:
-						rel.relativeOffset = -data.getDoubleWord(pos);
-						pos += 4;
-						goto checkothertype;
+						rel.relativeOffset = -data.getDoubleWord(pos);
+						pos += 4;
+						goto checkothertype;
 					default:
-						return false;
+						return false;
 					}
-					break;
+					break;
 				default:
-					return false;
+					return false;
 				}
 
-				segments[activeSegment].relocations.push_back(rel);
+				segments[activeSegment].relocations.push_back(rel);
 			}
-			break;
+			break;
 		case 0x12:	// internal symbol
 			{
-				PsxSymbol sym;
-				sym.type = PsxSymbolType::Internal;
-				sym.segment = data.getWord(pos+1);
-				sym.offset = data.getDoubleWord(pos+3);
-				pos += 7 + loadString(data,pos+7,sym.name);
-				syms.push_back(sym);
+				PsxSymbol sym;
+				sym.type = PsxSymbolType::Internal;
+				sym.segment = data.getWord(pos+1);
+				sym.offset = data.getDoubleWord(pos+3);
+				pos += 7 + loadString(data,pos+7,sym.name);
+				syms.push_back(sym);
 			}
-			break;
+			break;
 		case 0x0E:	// external symbol
 			{
-				PsxSymbol sym;
-				sym.type = PsxSymbolType::External;
-				sym.id = data.getWord(pos+1);
-				pos += 3 + loadString(data,pos+3,sym.name);
-				syms.push_back(sym);
+				PsxSymbol sym;
+				sym.type = PsxSymbolType::External;
+				sym.id = data.getWord(pos+1);
+				pos += 3 + loadString(data,pos+3,sym.name);
+				syms.push_back(sym);
 			}
-			break;
+			break;
 		case 0x30:	// bss symbol?
 			{
-				PsxSymbol sym;
-				sym.type = PsxSymbolType::BSS;
-				sym.id = data.getWord(pos+1);
-				sym.segment = data.getWord(pos+3);
-				sym.size = data.getDoubleWord(pos+5);
-				pos += 9 + loadString(data,pos+9,sym.name);
-				syms.push_back(sym);
+				PsxSymbol sym;
+				sym.type = PsxSymbolType::BSS;
+				sym.id = data.getWord(pos+1);
+				sym.segment = data.getWord(pos+3);
+				sym.size = data.getDoubleWord(pos+5);
+				pos += 9 + loadString(data,pos+9,sym.name);
+				syms.push_back(sym);
 			}
-			break;
+			break;
 		case 0x0C:	// internal with id
 			{
-				PsxSymbol sym;
-				sym.type = PsxSymbolType::InternalID;
-				sym.id = data.getWord(pos+1);
-				sym.segment = data.getWord(pos+3);
-				sym.offset = data.getDoubleWord(pos+5);
-				pos += 9 + loadString(data,pos+9,sym.name);
-				syms.push_back(sym);
+				PsxSymbol sym;
+				sym.type = PsxSymbolType::InternalID;
+				sym.id = data.getWord(pos+1);
+				sym.segment = data.getWord(pos+3);
+				sym.offset = data.getDoubleWord(pos+5);
+				pos += 9 + loadString(data,pos+9,sym.name);
+				syms.push_back(sym);
 			}
-			break;
+			break;
 		case 0x4A:	// function
 			{
-				PsxSymbol sym;
-				sym.type = PsxSymbolType::Function;
-				sym.segment = data.getWord(pos+1);
-				sym.offset = data.getDoubleWord(pos+3);
-				pos += 0x1D + loadString(data,pos+0x1D,sym.name);
-				syms.push_back(sym);
+				PsxSymbol sym;
+				sym.type = PsxSymbolType::Function;
+				sym.segment = data.getWord(pos+1);
+				sym.offset = data.getDoubleWord(pos+3);
+				pos += 0x1D + loadString(data,pos+0x1D,sym.name);
+				syms.push_back(sym);
 			}
-			break;
+			break;
 		case 0x4C:	// function size
-			pos += 11;
-			break;
+			pos += 11;
+			break;
 		case 0x3C:	// ??
-			pos += 3;
-			break;
+			pos += 3;
+			break;
 		case 0x00:	// ??
-			pos++;
-			break;
+			pos++;
+			break;
 		case 0x32:	// ??
-			pos += 3;
-			break;
+			pos += 3;
+			break;
 		case 0x3A:	// ??
-			pos += 9;
-			break;
+			pos += 9;
+			break;
 		default:
-			return false;
+			return false;
 		}
 	}
 
-	return true;
+	return true;
 }
 
 bool PsxRelocator::init(const std::wstring& inputName)
 {
-	auto inputFiles = loadPsxLibrary(inputName);
+	auto inputFiles = loadPsxLibrary(inputName);
 	if (inputFiles.size() == 0)
 	{
-		Logger::printError(Logger::Error,L"Could not load library");
-		return false;
+		Logger::printError(Logger::Error,L"Could not load library");
+		return false;
 	}
 
-	reloc = new MipsElfRelocator();
+	reloc = new MipsElfRelocator();
 
 	for (PsxLibEntry& entry: inputFiles)
 	{
-		PsxRelocatorFile file;
-		file.name = entry.name;
+		PsxRelocatorFile file;
+		file.name = entry.name;
 
 		if (parseObject(entry.data,file) == false)
 		{
-			Logger::printError(Logger::Error,L"Could not load object file %s",entry.name);
-			return false;
+			Logger::printError(Logger::Error,L"Could not load object file %s",entry.name);
+			return false;
 		}
 
 		// init symbols
 		for (PsxSymbol& sym: file.symbols)
 		{
-			std::wstring lowered = sym.name;
-			std::transform(lowered.begin(), lowered.end(), lowered.begin(), ::towlower);
+			std::wstring lowered = sym.name;
+			std::transform(lowered.begin(), lowered.end(), lowered.begin(), ::towlower);
 
-			sym.label = Global.symbolTable.getLabel(lowered,-1,-1);
+			sym.label = Global.symbolTable.getLabel(lowered,-1,-1);
 			if (sym.label == nullptr)
 			{
-				Logger::printError(Logger::Error,L"Invalid label name \"%s\"",sym.name);
-				continue;
+				Logger::printError(Logger::Error,L"Invalid label name \"%s\"",sym.name);
+				continue;
 			}
 
 			if (sym.label->isDefined() && sym.type != PsxSymbolType::External)
 			{
-				Logger::printError(Logger::Error,L"Label \"%s\" already defined",sym.name);
-				continue;
+				Logger::printError(Logger::Error,L"Label \"%s\" already defined",sym.name);
+				continue;
 			}
 
-			sym.label->setOriginalName(sym.name);
+			sym.label->setOriginalName(sym.name);
 		}
 
-		files.push_back(file);
+		files.push_back(file);
 	}
 
-	return true;
+	return true;
 }
 
 bool PsxRelocator::relocateFile(PsxRelocatorFile& file, int& relocationAddress)
 {
-	std::map<int,int> relocationOffsets;
-	std::map<int,int> symbolOffsets;
-	int start = relocationAddress;
+	std::map<int,int> relocationOffsets;
+	std::map<int,int> symbolOffsets;
+	int start = relocationAddress;
 
 	// assign addresses to segments
 	for (PsxSegment& seg: file.segments)
 	{
-		int index = seg.id;
-		size_t size = seg.data.size();
+		int index = seg.id;
+		size_t size = seg.data.size();
 
-		relocationOffsets[index] = relocationAddress;
-		relocationAddress += (int) size;
+		relocationOffsets[index] = relocationAddress;
+		relocationAddress += (int) size;
 
 		while (relocationAddress % 4)
-			relocationAddress++;
+			relocationAddress++;
 	}
 
 	// parse/add/relocate symbols
-	bool error = false;
+	bool error = false;
 	for (PsxSymbol& sym: file.symbols)
 	{
-		int pos;
+		int pos;
 		switch (sym.type)
 		{
 		case PsxSymbolType::Internal:
 		case PsxSymbolType::Function:
-			sym.label->setValue(relocationOffsets[sym.segment]+sym.offset);
-			sym.label->setDefined(true);
-			break;
+			sym.label->setValue(relocationOffsets[sym.segment]+sym.offset);
+			sym.label->setDefined(true);
+			break;
 		case PsxSymbolType::InternalID:
-			pos = relocationOffsets[sym.segment]+sym.offset;
-			sym.label->setValue(pos);
-			sym.label->setDefined(true);
-			symbolOffsets[sym.id] = pos;
-			break;
+			pos = relocationOffsets[sym.segment]+sym.offset;
+			sym.label->setValue(pos);
+			sym.label->setDefined(true);
+			symbolOffsets[sym.id] = pos;
+			break;
 		case PsxSymbolType::BSS:
-			sym.label->setValue(relocationAddress);
-			sym.label->setDefined(true);
-			symbolOffsets[sym.id] = relocationAddress;
-			relocationAddress += sym.size;
+			sym.label->setValue(relocationAddress);
+			sym.label->setDefined(true);
+			symbolOffsets[sym.id] = relocationAddress;
+			relocationAddress += sym.size;
 
 			while (relocationAddress % 4)
-				relocationAddress++;
-			break;
+				relocationAddress++;
+			break;
 		case PsxSymbolType::External:
 			if (sym.label->isDefined() == false)
 			{
-				Logger::queueError(Logger::Error,L"Undefined external symbol %s in file %s",sym.name,file.name);
-				error = true;
-				continue;
+				Logger::queueError(Logger::Error,L"Undefined external symbol %s in file %s",sym.name,file.name);
+				error = true;
+				continue;
 			}
 
-			symbolOffsets[sym.id] = (int) sym.label->getValue();
-			break;
+			symbolOffsets[sym.id] = (int) sym.label->getValue();
+			break;
 		}
 	}
 
 	if (error)
-		return false;
+		return false;
 
-	size_t dataStart = outputData.size();
-	outputData.reserveBytes(relocationAddress-start);
+	size_t dataStart = outputData.size();
+	outputData.reserveBytes(relocationAddress-start);
 
 	// load code and data
 	for (PsxSegment& seg: file.segments)
 	{
 		// relocate
-		ByteArray sectionData = seg.data;
+		ByteArray sectionData = seg.data;
 
-		std::vector<RelocationAction> relocationActions;
+		std::vector<RelocationAction> relocationActions;
 		for (PsxRelocation& rel: seg.relocations)
 		{
-			RelocationData relData;
-			int pos = rel.segmentOffset;
-			relData.opcodeOffset = pos;
-			relData.opcode = sectionData.getDoubleWord(pos);
+			RelocationData relData;
+			int pos = rel.segmentOffset;
+			relData.opcodeOffset = pos;
+			relData.opcode = sectionData.getDoubleWord(pos);
 
 			switch (rel.refType)
 			{
 			case PsxRelocationRefType::SymblId:
-				relData.relocationBase = symbolOffsets[rel.referenceId]+rel.relativeOffset;
-				break;
+				relData.relocationBase = symbolOffsets[rel.referenceId]+rel.relativeOffset;
+				break;
 			case PsxRelocationRefType::SegmentOffset:
-				relData.relocationBase = relocationOffsets[rel.referenceId] + rel.referencePos+rel.relativeOffset;
-				break;
+				relData.relocationBase = relocationOffsets[rel.referenceId] + rel.referencePos+rel.relativeOffset;
+				break;
 			}
 
-			std::vector<std::wstring> errors;
-			bool result = false;
+			std::vector<std::wstring> errors;
+			bool result = false;
 
 			switch (rel.type)
 			{
 			case PsxRelocationType::WordLiteral:
-				result = reloc->relocateOpcode(R_MIPS_32,relData, relocationActions, errors);
-				break;
+				result = reloc->relocateOpcode(R_MIPS_32,relData, relocationActions, errors);
+				break;
 			case PsxRelocationType::UpperImmediate:
-				result = reloc->relocateOpcode(R_MIPS_HI16,relData, relocationActions, errors);
-				break;
+				result = reloc->relocateOpcode(R_MIPS_HI16,relData, relocationActions, errors);
+				break;
 			case PsxRelocationType::LowerImmediate:
-				result = reloc->relocateOpcode(R_MIPS_LO16,relData, relocationActions, errors);
-				break;
+				result = reloc->relocateOpcode(R_MIPS_LO16,relData, relocationActions, errors);
+				break;
 			case PsxRelocationType::FunctionCall:
-				result = reloc->relocateOpcode(R_MIPS_26,relData, relocationActions, errors);
-				break;
+				result = reloc->relocateOpcode(R_MIPS_26,relData, relocationActions, errors);
+				break;
 			}
 
 			if (!result)
 			{
 				for (const std::wstring& error : errors)
 				{
-					Logger::queueError(Logger::Error, error);
+					Logger::queueError(Logger::Error, error);
 				}
-				error = true;
+				error = true;
 			}
 		}
 
 		// finish any dangling relocations
-		std::vector<std::wstring> errors;
+		std::vector<std::wstring> errors;
 		if (!reloc->finish(relocationActions, errors))
 		{
 			for (const std::wstring& error : errors)
 			{
-				Logger::queueError(Logger::Error, error);
+				Logger::queueError(Logger::Error, error);
 			}
-			error = true;
+			error = true;
 		}
 
 		// now actually write the relocated values
 		for (const RelocationAction& action : relocationActions)
 		{
-			sectionData.replaceDoubleWord(action.offset, action.newValue);
+			sectionData.replaceDoubleWord(action.offset, action.newValue);
 		}
 
-		size_t arrayStart = dataStart+relocationOffsets[seg.id]-start;
-		memcpy(outputData.data(arrayStart),sectionData.data(),sectionData.size());
+		size_t arrayStart = dataStart+relocationOffsets[seg.id]-start;
+		memcpy(outputData.data(arrayStart),sectionData.data(),sectionData.size());
 	}
 
-	return !error;
+	return !error;
 }
 
 bool PsxRelocator::relocate(int& memoryAddress)
 {
-	int oldCrc = getCrc32(outputData.data(),outputData.size());
-	outputData.clear();
-	dataChanged = false;
+	int oldCrc = getCrc32(outputData.data(),outputData.size());
+	outputData.clear();
+	dataChanged = false;
 
-	bool error = false;
-	int start = memoryAddress;
+	bool error = false;
+	int start = memoryAddress;
 
 	for (PsxRelocatorFile& file: files)
 	{
 		if (relocateFile(file,memoryAddress) == false)
-			error = true;
+			error = true;
 	}
 
-	int newCrc = getCrc32(outputData.data(),outputData.size());
+	int newCrc = getCrc32(outputData.data(),outputData.size());
 	if (oldCrc != newCrc)
-		dataChanged = true;
+		dataChanged = true;
 
-	memoryAddress -= start;
-	return !error;
+	memoryAddress -= start;
+	return !error;
 }
 
 
@@ -9098,7 +9098,7 @@ void PsxRelocator::writeSymbols(SymbolData& symData) const
 		for (const PsxSymbol& sym: file.symbols)
 		{
 			if (sym.type != PsxSymbolType::External)
-				symData.addLabel(sym.label->getValue(),sym.name.c_str());
+				symData.addLabel(sym.label->getValue(),sym.name.c_str());
 		}
 	}
 }
@@ -9116,57 +9116,57 @@ DirectivePsxObjImport::DirectivePsxObjImport(const std::wstring& fileName)
 
 bool DirectivePsxObjImport::Validate()
 {
-	int memory = (int) g_fileManager->getVirtualAddress();
-	rel.relocate(memory);
-	g_fileManager->advanceMemory(memory);
-	return rel.hasDataChanged();
+	int memory = (int) g_fileManager->getVirtualAddress();
+	rel.relocate(memory);
+	g_fileManager->advanceMemory(memory);
+	return rel.hasDataChanged();
 }
 
 void DirectivePsxObjImport::Encode() const
 {
-	const ByteArray& data = rel.getData();
-	g_fileManager->write(data.data(),data.size());
+	const ByteArray& data = rel.getData();
+	g_fileManager->write(data.data(),data.size());
 }
 
 void DirectivePsxObjImport::writeSymData(SymbolData& symData) const
 {
-	rel.writeSymbols(symData);
+	rel.writeSymbols(symData);
 }
 
 // file: Archs/Architecture.cpp
 
-CInvalidArchitecture InvalidArchitecture;
+CInvalidArchitecture InvalidArchitecture;
 
 ArchitectureCommand::ArchitectureCommand(const std::wstring& tempText, const std::wstring& symText)
 {
-	this->tempText = tempText;
-	this->symText = symText;
-	this->endianness = Arch->getEndianness();
+	this->tempText = tempText;
+	this->symText = symText;
+	this->endianness = Arch->getEndianness();
 }
 
 bool ArchitectureCommand::Validate()
 {
-	position = g_fileManager->getVirtualAddress();
-	g_fileManager->setEndianness(endianness);
-	return false;
+	position = g_fileManager->getVirtualAddress();
+	g_fileManager->setEndianness(endianness);
+	return false;
 }
 
 void ArchitectureCommand::Encode() const
 {
-	g_fileManager->setEndianness(endianness);
+	g_fileManager->setEndianness(endianness);
 }
 
 void ArchitectureCommand::writeTempData(TempData& tempData) const
 {
 	if (tempText.size() != 0)
 	{
-		std::wstringstream stream(tempText);
+		std::wstringstream stream(tempText);
 
-		std::wstring line;
+		std::wstring line;
 		while (std::getline(stream,line,L'\n'))
 		{
 			if (line.size() != 0)
-				tempData.writeLine(position,line);
+				tempData.writeLine(position,line);
 		}
 	}
 }
@@ -9175,32 +9175,32 @@ void ArchitectureCommand::writeSymData(SymbolData& symData) const
 {
 	// TODO: find a less ugly way to check for undefined memory positions
 	if (position == -1)
-		return;
+		return;
 
 	if (symText.size() != 0)
-		symData.addLabel(position,symText);
+		symData.addLabel(position,symText);
 }
 
 
 void CInvalidArchitecture::NextSection()
 {
-	Logger::printError(Logger::FatalError,L"No architecture specified");
+	Logger::printError(Logger::FatalError,L"No architecture specified");
 }
 
 void CInvalidArchitecture::Pass2()
 {
-	Logger::printError(Logger::FatalError,L"No architecture specified");
+	Logger::printError(Logger::FatalError,L"No architecture specified");
 }
 
 void CInvalidArchitecture::Revalidate()
 {
-	Logger::printError(Logger::FatalError,L"No architecture specified");
+	Logger::printError(Logger::FatalError,L"No architecture specified");
 }
 
 std::unique_ptr<IElfRelocator> CInvalidArchitecture::getElfRelocator()
 {
-	Logger::printError(Logger::FatalError,L"No architecture specified");
-	return nullptr;
+	Logger::printError(Logger::FatalError,L"No architecture specified");
+	return nullptr;
 }
 
 
@@ -9208,119 +9208,119 @@ std::unique_ptr<IElfRelocator> CInvalidArchitecture::getElfRelocator()
 
 CAssemblerCommand::CAssemblerCommand()
 {
-	FileNum = Global.FileInfo.FileNum;
-	FileLine = Global.FileInfo.LineNumber;
-	section = Global.Section;
+	FileNum = Global.FileInfo.FileNum;
+	FileLine = Global.FileInfo.LineNumber;
+	section = Global.Section;
 }
 
 void CAssemblerCommand::applyFileInfo()
 {
-	Global.FileInfo.FileNum = FileNum;
-	Global.FileInfo.LineNumber = FileLine;
+	Global.FileInfo.FileNum = FileNum;
+	Global.FileInfo.LineNumber = FileLine;
 }
 
 // file: Commands/CAssemblerLabel.h
 
-class Label;
+class Label;
 
 class CAssemblerLabel: public CAssemblerCommand
 {
 public:
-	CAssemblerLabel(const std::wstring& name, const std::wstring& originalName);
-	CAssemblerLabel(const std::wstring& name, const std::wstring& originalName, Expression& value);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
+	CAssemblerLabel(const std::wstring& name, const std::wstring& originalName);
+	CAssemblerLabel(const std::wstring& name, const std::wstring& originalName, Expression& value);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
 private:
-	Expression labelValue;
-	std::shared_ptr<Label> label;
-	bool defined;
-};
+	Expression labelValue;
+	std::shared_ptr<Label> label;
+	bool defined;
+};
 
 class CDirectiveFunction: public CAssemblerCommand
 {
 public:
-	CDirectiveFunction(const std::wstring& name, const std::wstring& originalName);
-	virtual bool Validate();
-	virtual void Encode() const;
-	virtual void writeTempData(TempData& tempData) const;
-	virtual void writeSymData(SymbolData& symData) const;
-	void setContent(std::unique_ptr<CAssemblerCommand> content) { this->content = std::move(content); }
+	CDirectiveFunction(const std::wstring& name, const std::wstring& originalName);
+	virtual bool Validate();
+	virtual void Encode() const;
+	virtual void writeTempData(TempData& tempData) const;
+	virtual void writeSymData(SymbolData& symData) const;
+	void setContent(std::unique_ptr<CAssemblerCommand> content) { this->content = std::move(content); }
 private:
-	std::unique_ptr<CAssemblerLabel> label;
-	std::unique_ptr<CAssemblerCommand> content;
-	int64_t start, end;
-};
+	std::unique_ptr<CAssemblerLabel> label;
+	std::unique_ptr<CAssemblerCommand> content;
+	int64_t start, end;
+};
 
 // file: Commands/CAssemblerLabel.cpp
 
 CAssemblerLabel::CAssemblerLabel(const std::wstring& name, const std::wstring& originalName)
 {
-	this->defined = false;
-	this->label = nullptr;
+	this->defined = false;
+	this->label = nullptr;
 
 	if (Global.symbolTable.isLocalSymbol(name) == false)
-		updateSection(++Global.Section);
+		updateSection(++Global.Section);
 
-	label = Global.symbolTable.getLabel(name, FileNum, getSection());
+	label = Global.symbolTable.getLabel(name, FileNum, getSection());
 	if (label == nullptr)
 	{
-		Logger::printError(Logger::Error, L"Invalid label name \"%s\"", name);
-		return;
+		Logger::printError(Logger::Error, L"Invalid label name \"%s\"", name);
+		return;
 	}
 
-	label->setOriginalName(originalName);
+	label->setOriginalName(originalName);
 
 	// does this need to be in validate?
 	if (label->getUpdateInfo())
 	{
 #ifdef ARMIPS_ARM
 		if (Arch == &Arm && Arm.GetThumbMode())
-			label->setInfo(1);
+			label->setInfo(1);
 		else
 #endif
-			label->setInfo(0);
+			label->setInfo(0);
 	}
 }
 
 CAssemblerLabel::CAssemblerLabel(const std::wstring& name, const std::wstring& originalName, Expression& value)
 	: CAssemblerLabel(name,originalName)
 {
-	labelValue = value;
+	labelValue = value;
 }
 
 bool CAssemblerLabel::Validate()
 {
-	bool result = false;
+	bool result = false;
 	if (defined == false)
 	{
 		if (label->isDefined())
 		{
-			Logger::queueError(Logger::Error, L"Label \"%s\" already defined", label->getName());
-			return false;
+			Logger::queueError(Logger::Error, L"Label \"%s\" already defined", label->getName());
+			return false;
 		}
 
-		label->setDefined(true);
-		defined = true;
-		result = true;
+		label->setDefined(true);
+		defined = true;
+		result = true;
 	}
 
-	bool hasPhysicalValue = false;
-	int64_t virtualValue = 0;
-	int64_t physicalValue = 0;
+	bool hasPhysicalValue = false;
+	int64_t virtualValue = 0;
+	int64_t physicalValue = 0;
 
 	if (labelValue.isLoaded())
 	{
 		// label value is given by expression
 		if (labelValue.evaluateInteger(virtualValue) == false)
 		{
-			Logger::printError(Logger::Error, L"Invalid expression");
-			return result;
+			Logger::printError(Logger::Error, L"Invalid expression");
+			return result;
 		}
 	} else {
 		// label value is given by current address
-		virtualValue = g_fileManager->getVirtualAddress();
+		virtualValue = g_fileManager->getVirtualAddress();
 		physicalValue = g_fileManager->getPhysicalAddress();
 		hasPhysicalValue = true;
 	}

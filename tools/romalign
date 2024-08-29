@@ -1,18 +1,18 @@
 #!/usr/bin/perl
 
-die "Usage: romalign file align\n" unless $#ARGV >= 1;
+die "Usage: romalign file align\n" unless $#ARGV >= 1;
 
-$in = $ARGV[0];
-$align = $ARGV[1];
+$in = $ARGV[0];
+$align = $ARGV[1];
 
-@s = stat($in);
-$insize = $s[7];
+@s = stat($in);
+$insize = $s[7];
 
-open(OUT, ">> $in") or die "Can't open $in for output: $!";
+open(OUT, ">> $in") or die "Can't open $in for output: $!";
 
-$frag = $insize % $align;
-$fill = pack("C", 0);
-for($i = 0; $i < ($align-$frag)%$align; $i++) {
-    syswrite(OUT, $fill, 1);
+$frag = $insize % $align;
+$fill = pack("C", 0);
+for($i = 0; $i < ($align-$frag)%$align; $i++) {
+    syswrite(OUT, $fill, 1);
 }
-close OUT;
+close OUT;

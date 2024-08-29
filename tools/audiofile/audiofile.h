@@ -2,18 +2,18 @@
 	Audio File Library
 	Copyright (C) 1998-2000, 2010-2013 Michael Pruett <michael@68k.org>
 
-	This library is free software; you can redistribute it and/or
+	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
+	License as published by the Free Software Foundation; either
 	version 2.1 of the License, or (at your option) any later version.
 
 	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 	Lesser General Public License for more details.
 
 	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the
+	License along with this library; if not, write to the
 	Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 	Boston, MA  02110-1301  USA
 */
@@ -45,11 +45,11 @@ extern "C" {
 #define AFAPI
 #endif
 
-typedef struct _AFvirtualfile AFvirtualfile;
+typedef struct _AFvirtualfile AFvirtualfile;
 
-typedef struct _AFfilesetup *AFfilesetup;
-typedef struct _AFfilehandle *AFfilehandle;
-typedef void (*AFerrfunc)(long, const char *);
+typedef struct _AFfilesetup *AFfilesetup;
+typedef struct _AFfilehandle *AFfilehandle;
+typedef void (*AFerrfunc)(long, const char *);
 
 // Define AFframecount and AFfileoffset as 64-bit signed integers.
 #if defined(__FreeBSD__) || \
@@ -61,12 +61,12 @@ typedef void (*AFerrfunc)(long, const char *);
 	(defined(__linux__) && defined(__LP64__))
 // BSD and IRIX systems define off_t as a 64-bit signed integer.
 // Linux defines off_t as a 64-bit signed integer in LP64 mode.
-typedef off_t AFframecount;
-typedef off_t AFfileoffset;
+typedef off_t AFframecount;
+typedef off_t AFfileoffset;
 #else
 // For all other systems, use int64_t.
-typedef int64_t AFframecount;
-typedef int64_t AFfileoffset;
+typedef int64_t AFframecount;
+typedef int64_t AFfileoffset;
 #endif
 
 #define AF_NULL_FILESETUP	((struct _AFfilesetup *) 0)
@@ -77,23 +77,23 @@ typedef int64_t AFfileoffset;
 enum
 {
 	AF_DEFAULT_TRACK = 1001
-};
+};
 
 enum
 {
 	AF_DEFAULT_INST = 2001
-};
+};
 
 enum
 {
 	AF_NUM_UNLIMITED = 99999
-};
+};
 
 enum
 {
 	AF_BYTEORDER_BIGENDIAN = 501,
 	AF_BYTEORDER_LITTLEENDIAN = 502
-};
+};
 
 enum
 {
@@ -116,14 +116,14 @@ enum
 	AF_FILE_SOUNDFONT2 = 14,	/* not implemented */
 	AF_FILE_CAF = 15,
 	AF_FILE_FLAC = 16
-};
+};
 
 enum
 {
 	AF_LOOP_MODE_NOLOOP = 0,
 	AF_LOOP_MODE_FORW = 1,
 	AF_LOOP_MODE_FORWBAKW = 2
-};
+};
 
 enum
 {
@@ -131,14 +131,14 @@ enum
 	AF_SAMPFMT_UNSIGNED = 402, /* unsigned integer */
 	AF_SAMPFMT_FLOAT = 403, /* 32-bit IEEE floating-point */
 	AF_SAMPFMT_DOUBLE = 404 /* 64-bit IEEE double-precision floating-point */
-};
+};
 
 enum
 {
 	AF_INST_LOOP_OFF = 0,			/* no looping */
 	AF_INST_LOOP_CONTINUOUS = 1,	/* loop continuously through decay */
 	AF_INST_LOOP_SUSTAIN = 3		/* loop during sustain, then continue */
-};
+};
 
 enum
 {
@@ -159,7 +159,7 @@ enum
 	AF_INST_SAMP_RATE = 315,		/* sample rate of this inst's sample */
 	AF_INST_PRESETID = 316,			/* ID of preset containing this inst */
 	AF_INST_PRESET_NAME = 317		/* name of preset containing this inst */
-};
+};
 
 enum
 {
@@ -179,7 +179,7 @@ enum
 	AF_MISC_ICMT = AF_MISC_COMMENT,	/* comments chunk (WAVE format) */
 	AF_MISC_ICRD = 211,  /* creation date (WAVE format) */
 	AF_MISC_ISFT = 212  /* software name (WAVE format) */
-};
+};
 
 enum
 {
@@ -207,7 +207,7 @@ enum
 
 	AF_COMPRESSION_FLAC = 530,
 	AF_COMPRESSION_ALAC = 540
-};
+};
 
 /* tokens for afQuery() -- see the man page for instructions */
 /* level 1 selectors */
@@ -221,7 +221,7 @@ enum
 	AF_QUERYTYPE_INST = 505,
 	AF_QUERYTYPE_MARK = 506,
 	AF_QUERYTYPE_LOOP = 507
-};
+};
 
 /* level 2 selectors */
 enum
@@ -241,7 +241,7 @@ enum
 	AF_QUERY_SQUISHFAC = 611,	/* 1.0 means variable */
 	AF_QUERY_MAX_NUMBER = 612,	/* max allowed in file */
 	AF_QUERY_SUPPORTED = 613	/* insts, loops, etc., supported? */
-};
+};
 
 /* level 2 selectors which have sub-selectors */
 enum
@@ -251,14 +251,14 @@ enum
 	AF_QUERY_SAMPLE_SIZES = 622,
 	AF_QUERY_SAMPLE_FORMATS = 623,
 	AF_QUERY_COMPRESSION_TYPES = 624
-};
+};
 
 /* level 3 sub-selectors */
 enum
 {
 	AF_QUERY_VALUE_COUNT = 650,	/* number of values of the above */
 	AF_QUERY_VALUES = 651	/* array of those values */
-};
+};
 
 
 /*
@@ -345,7 +345,7 @@ enum
 	AF_BAD_AIFF_MARK = 114,	/* failed to parse MARK chunk */
 	AF_BAD_AIFF_SKIP = 115,	/* failed to skip unsupported chunk */
 	AF_BAD_AIFF_LOOPMODE = 116	/* unrecognized loop mode (forw, etc)*/
-};
+};
 
 /* new error codes which may be retrieved via dmGetError() */
 /* The old error tokens continue to be retrievable via the AFerrorhandler */
@@ -416,192 +416,192 @@ enum
 	AF_ERR_BAD_AIFF_MARK = 72+AF_ERR_BASE,	/* failed to parse MARK chunk */
 	AF_ERR_BAD_AIFF_SKIP = 73+AF_ERR_BASE,	/* failed to skip unsupported chunk */
 	AF_ERR_BAD_AIFF_LOOPMODE = 74+AF_ERR_BASE	/* unrecognized loop mode (forw, etc) */
-};
+};
 
 
 /* global routines */
-AFAPI AFerrfunc afSetErrorHandler (AFerrfunc efunc);
+AFAPI AFerrfunc afSetErrorHandler (AFerrfunc efunc);
 
 /* query routines */
-AFAPI AUpvlist afQuery (int querytype, int arg1, int arg2, int arg3, int arg4);
-AFAPI long afQueryLong (int querytype, int arg1, int arg2, int arg3, int arg4);
-AFAPI double afQueryDouble (int querytype, int arg1, int arg2, int arg3, int arg4);
-AFAPI void *afQueryPointer (int querytype, int arg1, int arg2, int arg3, int arg4);
+AFAPI AUpvlist afQuery (int querytype, int arg1, int arg2, int arg3, int arg4);
+AFAPI long afQueryLong (int querytype, int arg1, int arg2, int arg3, int arg4);
+AFAPI double afQueryDouble (int querytype, int arg1, int arg2, int arg3, int arg4);
+AFAPI void *afQueryPointer (int querytype, int arg1, int arg2, int arg3, int arg4);
 
 /* basic operations on file handles and file setups */
-AFAPI AFfilesetup afNewFileSetup (void);
-AFAPI void afFreeFileSetup (AFfilesetup);
-AFAPI int afIdentifyFD (int);
-AFAPI int afIdentifyNamedFD (int, const char *filename, int *implemented);
+AFAPI AFfilesetup afNewFileSetup (void);
+AFAPI void afFreeFileSetup (AFfilesetup);
+AFAPI int afIdentifyFD (int);
+AFAPI int afIdentifyNamedFD (int, const char *filename, int *implemented);
 
 AFAPI AFfilehandle afOpenFile (const char *filename, const char *mode,
-	AFfilesetup setup);
+	AFfilesetup setup);
 AFAPI AFfilehandle afOpenVirtualFile (AFvirtualfile *vfile, const char *mode,
-	AFfilesetup setup);
-AFAPI AFfilehandle afOpenFD (int fd, const char *mode, AFfilesetup setup);
+	AFfilesetup setup);
+AFAPI AFfilehandle afOpenFD (int fd, const char *mode, AFfilesetup setup);
 AFAPI AFfilehandle afOpenNamedFD (int fd, const char *mode, AFfilesetup setup,
-	const char *filename);
+	const char *filename);
 
-AFAPI void afSaveFilePosition (AFfilehandle file);
-AFAPI void afRestoreFilePosition (AFfilehandle file);
-AFAPI int afSyncFile (AFfilehandle file);
-AFAPI int afCloseFile (AFfilehandle file);
+AFAPI void afSaveFilePosition (AFfilehandle file);
+AFAPI void afRestoreFilePosition (AFfilehandle file);
+AFAPI int afSyncFile (AFfilehandle file);
+AFAPI int afCloseFile (AFfilehandle file);
 
-AFAPI void afInitFileFormat (AFfilesetup, int format);
-AFAPI int afGetFileFormat (AFfilehandle, int *version);
+AFAPI void afInitFileFormat (AFfilesetup, int format);
+AFAPI int afGetFileFormat (AFfilehandle, int *version);
 
 /* track */
-AFAPI void afInitTrackIDs (AFfilesetup, const int *trackids, int trackCount);
-AFAPI int afGetTrackIDs (AFfilehandle, int *trackids);
+AFAPI void afInitTrackIDs (AFfilesetup, const int *trackids, int trackCount);
+AFAPI int afGetTrackIDs (AFfilehandle, int *trackids);
 
 /* track data: reading, writng, seeking, sizing frames */
-AFAPI int afReadFrames (AFfilehandle, int track, void *buffer, int frameCount);
-AFAPI int afWriteFrames (AFfilehandle, int track, const void *buffer, int frameCount);
-AFAPI AFframecount afSeekFrame (AFfilehandle, int track, AFframecount frameoffset);
-AFAPI AFframecount afTellFrame (AFfilehandle, int track);
-AFAPI AFfileoffset afGetTrackBytes (AFfilehandle, int track);
-AFAPI float afGetFrameSize (AFfilehandle, int track, int expand3to4);
-AFAPI float afGetVirtualFrameSize (AFfilehandle, int track, int expand3to4);
+AFAPI int afReadFrames (AFfilehandle, int track, void *buffer, int frameCount);
+AFAPI int afWriteFrames (AFfilehandle, int track, const void *buffer, int frameCount);
+AFAPI AFframecount afSeekFrame (AFfilehandle, int track, AFframecount frameoffset);
+AFAPI AFframecount afTellFrame (AFfilehandle, int track);
+AFAPI AFfileoffset afGetTrackBytes (AFfilehandle, int track);
+AFAPI float afGetFrameSize (AFfilehandle, int track, int expand3to4);
+AFAPI float afGetVirtualFrameSize (AFfilehandle, int track, int expand3to4);
 
 /* track data: AES data */
 /* afInitAESChannelData is obsolete -- use afInitAESChannelDataTo() */
-AFAPI void afInitAESChannelData (AFfilesetup, int track); /* obsolete */
-AFAPI void afInitAESChannelDataTo (AFfilesetup, int track, int willBeData);
-AFAPI int afGetAESChannelData (AFfilehandle, int track, unsigned char buf[24]);
-AFAPI void afSetAESChannelData (AFfilehandle, int track, unsigned char buf[24]);
+AFAPI void afInitAESChannelData (AFfilesetup, int track); /* obsolete */
+AFAPI void afInitAESChannelDataTo (AFfilesetup, int track, int willBeData);
+AFAPI int afGetAESChannelData (AFfilehandle, int track, unsigned char buf[24]);
+AFAPI void afSetAESChannelData (AFfilehandle, int track, unsigned char buf[24]);
 
 /* track data: byte order */
-AFAPI void afInitByteOrder (AFfilesetup, int track, int byteOrder);
-AFAPI int afGetByteOrder (AFfilehandle, int track);
-AFAPI int afSetVirtualByteOrder (AFfilehandle, int track, int byteOrder);
-AFAPI int afGetVirtualByteOrder (AFfilehandle, int track);
+AFAPI void afInitByteOrder (AFfilesetup, int track, int byteOrder);
+AFAPI int afGetByteOrder (AFfilehandle, int track);
+AFAPI int afSetVirtualByteOrder (AFfilehandle, int track, int byteOrder);
+AFAPI int afGetVirtualByteOrder (AFfilehandle, int track);
 
 /* track data: number of channels */
-AFAPI void afInitChannels (AFfilesetup, int track, int nchannels);
-AFAPI int afGetChannels (AFfilehandle, int track);
-AFAPI int afSetVirtualChannels (AFfilehandle, int track, int channelCount);
-AFAPI int afGetVirtualChannels (AFfilehandle, int track);
-AFAPI void afSetChannelMatrix (AFfilehandle, int track, double *matrix);
+AFAPI void afInitChannels (AFfilesetup, int track, int nchannels);
+AFAPI int afGetChannels (AFfilehandle, int track);
+AFAPI int afSetVirtualChannels (AFfilehandle, int track, int channelCount);
+AFAPI int afGetVirtualChannels (AFfilehandle, int track);
+AFAPI void afSetChannelMatrix (AFfilehandle, int track, double *matrix);
 
 /* track data: sample format and sample width */
 AFAPI void afInitSampleFormat (AFfilesetup, int track, int sampleFormat,
-	int sampleWidth);
+	int sampleWidth);
 AFAPI void afGetSampleFormat (AFfilehandle file, int track, int *sampleFormat,
-	int *sampleWidth);
+	int *sampleWidth);
 AFAPI int afSetVirtualSampleFormat (AFfilehandle, int track,
-	int sampleFormat, int sampleWidth);
+	int sampleFormat, int sampleWidth);
 AFAPI void afGetVirtualSampleFormat (AFfilehandle, int track,
-	int *sampleFormat, int *sampleWidth);
+	int *sampleFormat, int *sampleWidth);
 
 /* track data: sampling rate */
-AFAPI void afInitRate (AFfilesetup, int track, double rate);
-AFAPI double afGetRate (AFfilehandle, int track);
+AFAPI void afInitRate (AFfilesetup, int track, double rate);
+AFAPI double afGetRate (AFfilehandle, int track);
 
 #if 0
-int afSetVirtualRate (AFfilehandle, int track, double rate);
-double afGetVirtualRate (AFfilehandle, int track);
+int afSetVirtualRate (AFfilehandle, int track, double rate);
+double afGetVirtualRate (AFfilehandle, int track);
 #endif
 
 /* track data: compression */
-AFAPI void afInitCompression (AFfilesetup, int track, int compression);
+AFAPI void afInitCompression (AFfilesetup, int track, int compression);
 #if 0
 void afInitCompressionParams (AFfilesetup, int track, int compression
-	AUpvlist params, int parameterCount);
+	AUpvlist params, int parameterCount);
 #endif
 
-AFAPI int afGetCompression (AFfilehandle, int track);
+AFAPI int afGetCompression (AFfilehandle, int track);
 #if 0
 void afGetCompressionParams (AFfilehandle, int track, int *compression,
-	AUpvlist params, int parameterCount);
+	AUpvlist params, int parameterCount);
 
-int afSetVirtualCompression (AFfilesetup, int track, int compression);
+int afSetVirtualCompression (AFfilesetup, int track, int compression);
 void afSetVirtualCompressionParams (AFfilehandle, int track, int compression,
-	AUpvlist params, int parameterCount);
+	AUpvlist params, int parameterCount);
 
-int afGetVirtualCompression (AFfilesetup, int track, int compression);
+int afGetVirtualCompression (AFfilesetup, int track, int compression);
 void afGetVirtualCompressionParams (AFfilehandle, int track, int *compression,
-	AUpvlist params, int parameterCount);
+	AUpvlist params, int parameterCount);
 #endif
 
 /* track data: pcm mapping */
 AFAPI void afInitPCMMapping (AFfilesetup filesetup, int track,
-	double slope, double intercept, double minClip, double maxClip);
+	double slope, double intercept, double minClip, double maxClip);
 AFAPI void afGetPCMMapping (AFfilehandle file, int track,
-	double *slope, double *intercept, double *minClip, double *maxClip);
+	double *slope, double *intercept, double *minClip, double *maxClip);
 /* NOTE: afSetTrackPCMMapping() is special--it does not set the virtual  */
-/* format; it changes what the AF thinks the track format is! Be careful. */
+/* format; it changes what the AF thinks the track format is! Be careful. */
 AFAPI int afSetTrackPCMMapping (AFfilehandle file, int track,
-	double slope, double intercept, double minClip, double maxClip);
+	double slope, double intercept, double minClip, double maxClip);
 /* NOTE: afSetVirtualPCMMapping() is different from afSetTrackPCMMapping(): */
 /* see comment for afSetTrackPCMMapping(). */
 AFAPI int afSetVirtualPCMMapping (AFfilehandle file, int track,
-	double slope, double intercept, double minClip, double maxClip);
+	double slope, double intercept, double minClip, double maxClip);
 AFAPI void afGetVirtualPCMMapping (AFfilehandle file, int track,
-	double *slope, double *intercept, double *minClip, double *maxClip);
+	double *slope, double *intercept, double *minClip, double *maxClip);
 
 /* track data: data offset within the file */
 /* initialize for raw reading only */
-AFAPI void afInitDataOffset(AFfilesetup, int track, AFfileoffset offset);
-AFAPI AFfileoffset afGetDataOffset (AFfilehandle, int track);
+AFAPI void afInitDataOffset(AFfilesetup, int track, AFfileoffset offset);
+AFAPI AFfileoffset afGetDataOffset (AFfilehandle, int track);
 
 /* track data: count of frames in file */
-AFAPI void afInitFrameCount (AFfilesetup, int track, AFframecount frameCount);
-AFAPI AFframecount afGetFrameCount (AFfilehandle file, int track);
+AFAPI void afInitFrameCount (AFfilesetup, int track, AFframecount frameCount);
+AFAPI AFframecount afGetFrameCount (AFfilehandle file, int track);
 
 /* loop operations */
-AFAPI void afInitLoopIDs (AFfilesetup, int instid, const int *ids, int nids);
-AFAPI int afGetLoopIDs (AFfilehandle, int instid, int loopids[]);
-AFAPI void afSetLoopMode (AFfilehandle, int instid, int loop, int mode);
-AFAPI int afGetLoopMode (AFfilehandle, int instid, int loopid);
-AFAPI int afSetLoopCount (AFfilehandle, int instid, int loop, int count);
-AFAPI int afGetLoopCount (AFfilehandle, int instid, int loopid);
-AFAPI void afSetLoopStart (AFfilehandle, int instid, int loopid, int markerid);
-AFAPI int afGetLoopStart (AFfilehandle, int instid, int loopid);
-AFAPI void afSetLoopEnd (AFfilehandle, int instid, int loopid, int markerid);
-AFAPI int afGetLoopEnd (AFfilehandle, int instid, int loopid);
+AFAPI void afInitLoopIDs (AFfilesetup, int instid, const int *ids, int nids);
+AFAPI int afGetLoopIDs (AFfilehandle, int instid, int loopids[]);
+AFAPI void afSetLoopMode (AFfilehandle, int instid, int loop, int mode);
+AFAPI int afGetLoopMode (AFfilehandle, int instid, int loopid);
+AFAPI int afSetLoopCount (AFfilehandle, int instid, int loop, int count);
+AFAPI int afGetLoopCount (AFfilehandle, int instid, int loopid);
+AFAPI void afSetLoopStart (AFfilehandle, int instid, int loopid, int markerid);
+AFAPI int afGetLoopStart (AFfilehandle, int instid, int loopid);
+AFAPI void afSetLoopEnd (AFfilehandle, int instid, int loopid, int markerid);
+AFAPI int afGetLoopEnd (AFfilehandle, int instid, int loopid);
 
 AFAPI int afSetLoopStartFrame (AFfilehandle, int instid, int loop,
-	AFframecount startFrame);
-AFAPI AFframecount afGetLoopStartFrame (AFfilehandle, int instid, int loop);
+	AFframecount startFrame);
+AFAPI AFframecount afGetLoopStartFrame (AFfilehandle, int instid, int loop);
 AFAPI int afSetLoopEndFrame (AFfilehandle, int instid, int loop,
-	AFframecount startFrame);
-AFAPI AFframecount afGetLoopEndFrame (AFfilehandle, int instid, int loop);
+	AFframecount startFrame);
+AFAPI AFframecount afGetLoopEndFrame (AFfilehandle, int instid, int loop);
 
-AFAPI void afSetLoopTrack (AFfilehandle, int instid, int loopid, int trackid);
-AFAPI int afGetLoopTrack (AFfilehandle, int instid, int loopid);
+AFAPI void afSetLoopTrack (AFfilehandle, int instid, int loopid, int trackid);
+AFAPI int afGetLoopTrack (AFfilehandle, int instid, int loopid);
 
 /* marker operations */
-AFAPI void afInitMarkIDs (AFfilesetup, int trackid, const int *ids, int nids);
-AFAPI int afGetMarkIDs (AFfilehandle file, int trackid, int markids[]);
+AFAPI void afInitMarkIDs (AFfilesetup, int trackid, const int *ids, int nids);
+AFAPI int afGetMarkIDs (AFfilehandle file, int trackid, int markids[]);
 AFAPI void afSetMarkPosition (AFfilehandle file, int trackid, int markid,
-	AFframecount markpos);
-AFAPI AFframecount afGetMarkPosition (AFfilehandle file, int trackid, int markid);
-AFAPI void afInitMarkName (AFfilesetup, int trackid, int marker, const char *name);
+	AFframecount markpos);
+AFAPI AFframecount afGetMarkPosition (AFfilehandle file, int trackid, int markid);
+AFAPI void afInitMarkName (AFfilesetup, int trackid, int marker, const char *name);
 AFAPI void afInitMarkComment (AFfilesetup, int trackid, int marker,
-	const char *comment);
-AFAPI char *afGetMarkName (AFfilehandle file, int trackid, int markid);
-AFAPI char *afGetMarkComment (AFfilehandle file, int trackid, int markid);
+	const char *comment);
+AFAPI char *afGetMarkName (AFfilehandle file, int trackid, int markid);
+AFAPI char *afGetMarkComment (AFfilehandle file, int trackid, int markid);
 
 /* instrument operations */
-AFAPI void afInitInstIDs (AFfilesetup, const int *ids, int nids);
-AFAPI int afGetInstIDs (AFfilehandle file, int *instids);
+AFAPI void afInitInstIDs (AFfilesetup, const int *ids, int nids);
+AFAPI int afGetInstIDs (AFfilehandle file, int *instids);
 AFAPI void afGetInstParams (AFfilehandle file, int instid, AUpvlist pvlist,
-	int nparams);
+	int nparams);
 AFAPI void afSetInstParams (AFfilehandle file, int instid, AUpvlist pvlist,
-	int nparams);
-AFAPI long afGetInstParamLong (AFfilehandle file, int instid, int param);
-AFAPI void afSetInstParamLong (AFfilehandle file, int instid, int param, long value);
+	int nparams);
+AFAPI long afGetInstParamLong (AFfilehandle file, int instid, int param);
+AFAPI void afSetInstParamLong (AFfilehandle file, int instid, int param, long value);
 
 /* miscellaneous data operations */
-AFAPI void afInitMiscIDs (AFfilesetup, const int *ids, int nids);
-AFAPI int afGetMiscIDs (AFfilehandle, int *ids);
-AFAPI void afInitMiscType (AFfilesetup, int miscellaneousid, int type);
-AFAPI int afGetMiscType (AFfilehandle, int miscellaneousid);
-AFAPI void afInitMiscSize (AFfilesetup, int miscellaneousid, int size);
-AFAPI int afGetMiscSize (AFfilehandle, int miscellaneousid);
-AFAPI int afWriteMisc (AFfilehandle, int miscellaneousid, const void *buf, int bytes);
-AFAPI int afReadMisc (AFfilehandle, int miscellaneousid, void *buf, int bytes);
-AFAPI int afSeekMisc (AFfilehandle, int miscellaneousid, int offset);
+AFAPI void afInitMiscIDs (AFfilesetup, const int *ids, int nids);
+AFAPI int afGetMiscIDs (AFfilehandle, int *ids);
+AFAPI void afInitMiscType (AFfilesetup, int miscellaneousid, int type);
+AFAPI int afGetMiscType (AFfilehandle, int miscellaneousid);
+AFAPI void afInitMiscSize (AFfilesetup, int miscellaneousid, int size);
+AFAPI int afGetMiscSize (AFfilehandle, int miscellaneousid);
+AFAPI int afWriteMisc (AFfilehandle, int miscellaneousid, const void *buf, int bytes);
+AFAPI int afReadMisc (AFfilehandle, int miscellaneousid, void *buf, int bytes);
+AFAPI int afSeekMisc (AFfilehandle, int miscellaneousid, int offset);
 
 #undef AFAPI
 

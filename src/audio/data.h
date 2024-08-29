@@ -22,7 +22,7 @@
 #endif
 
 #ifdef EXPAND_AUDIO_HEAP
-// Vanilla US/JP uses 7; Vanilla EU opts for 10 here effectively, though that one gets generated at runtime and doesn't use this value.
+// Vanilla US/JP uses 7; Vanilla EU opts for 10 here effectively, though that one gets generated at runtime and doesn't use this value.
 // Total memory usage is calculated by 24*(2^VOL_RAMPING_EXPONENT) bytes. This is not technically on the heap, but it's memory nonetheless.
 #define VOL_RAMPING_EXPONENT 9
 
@@ -47,99 +47,99 @@
 
 // constant .data
 #if defined(VERSION_EU) || defined(VERSION_SH)
-extern struct AudioSessionSettingsEU gAudioSessionPresets[];
-extern struct ReverbSettingsEU sReverbSettings[8];
+extern struct AudioSessionSettingsEU gAudioSessionPresets[];
+extern struct ReverbSettingsEU sReverbSettings[8];
 #else
-extern struct AudioSessionSettings gAudioSessionSettings;
-extern struct ReverbSettingsUS gReverbSettings[18];
+extern struct AudioSessionSettings gAudioSessionSettings;
+extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
 #ifdef BETTER_REVERB
-extern u8 gBetterReverbPresetCount;
-extern struct BetterReverbSettings gBetterReverbSettings[];
+extern u8 gBetterReverbPresetCount;
+extern struct BetterReverbSettings gBetterReverbSettings[];
 #ifdef PUPPYPRINT_DEBUG
-extern struct BetterReverbSettings gDebugBetterReverbSettings[2];
-extern u32 sReverbDelaysArr[][NUM_ALLPASS];
-extern u8 sReverbMultsArr[][NUM_ALLPASS / 3];
-extern u8 gReverbDelaysArrCount;
-extern u8 gReverbMultsArrCount;
+extern struct BetterReverbSettings gDebugBetterReverbSettings[2];
+extern u32 sReverbDelaysArr[][NUM_ALLPASS];
+extern u8 sReverbMultsArr[][NUM_ALLPASS / 3];
+extern u8 gReverbDelaysArrCount;
+extern u8 gReverbMultsArrCount;
 #endif // PUPPYPRINT_DEBUG
 #endif // BETTER_REVERB
 
-extern f32 gPitchBendFrequencyScale[256];
-extern f32 gNoteFrequencies[128];
+extern f32 gPitchBendFrequencyScale[256];
+extern f32 gNoteFrequencies[128];
 
-extern u8 gDefaultShortNoteVelocityTable[16];
-extern u8 gDefaultShortNoteDurationTable[16];
-extern s8 gVibratoCurve[16];
-extern struct AdsrEnvelope gDefaultEnvelope[3];
+extern u8 gDefaultShortNoteVelocityTable[16];
+extern u8 gDefaultShortNoteDurationTable[16];
+extern s8 gVibratoCurve[16];
+extern struct AdsrEnvelope gDefaultEnvelope[3];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-extern s16 gEuUnknownWave7[256];
-extern s16 *gWaveSamples[6];
+extern s16 gEuUnknownWave7[256];
+extern s16 *gWaveSamples[6];
 #else
-extern s16 *gWaveSamples[4];
+extern s16 *gWaveSamples[4];
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-extern u8 euUnknownData_8030194c[4];
+extern u8 euUnknownData_8030194c[4];
 #ifdef VERSION_EU
-extern u16 gHeadsetPanQuantization[0x10];
+extern u16 gHeadsetPanQuantization[0x10];
 #else
-extern u16 gHeadsetPanQuantization[0x40];
+extern u16 gHeadsetPanQuantization[0x40];
 #endif
-extern s16 euUnknownData_80301950[64];
-extern struct NoteSubEu gZeroNoteSub;
-extern struct NoteSubEu gDefaultNoteSub;
+extern s16 euUnknownData_80301950[64];
+extern struct NoteSubEu gZeroNoteSub;
+extern struct NoteSubEu gDefaultNoteSub;
 #else
 #ifdef ENABLE_STEREO_HEADSET_EFFECTS
-extern u16 gHeadsetPanQuantization[10];
+extern u16 gHeadsetPanQuantization[10];
 #endif
 #endif
 #ifdef ENABLE_STEREO_HEADSET_EFFECTS
-extern f32 gHeadsetPanVolume[128];
-extern f32 gStereoPanVolume[128];
+extern f32 gHeadsetPanVolume[128];
+extern f32 gStereoPanVolume[128];
 #endif
-extern f32 gDefaultPanVolume[128];
+extern f32 gDefaultPanVolume[128];
 
-extern f32 gVolRampingLhs136[1 << VOL_RAMPING_EXPONENT];
-extern f32 gVolRampingRhs136[1 << VOL_RAMPING_EXPONENT];
-extern f32 gVolRampingLhs144[1 << VOL_RAMPING_EXPONENT];
-extern f32 gVolRampingRhs144[1 << VOL_RAMPING_EXPONENT];
-extern f32 gVolRampingLhs128[1 << VOL_RAMPING_EXPONENT];
-extern f32 gVolRampingRhs128[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingLhs136[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingRhs136[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingLhs144[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingRhs144[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingLhs128[1 << VOL_RAMPING_EXPONENT];
+extern f32 gVolRampingRhs128[1 << VOL_RAMPING_EXPONENT];
 
 // non-constant .data
-extern s16 gTatumsPerBeat;
-extern s32 gAudioHeapSize; // AUDIO_HEAP_SIZE
-extern s32 gAudioInitPoolSize; // AUDIO_INIT_POOL_SIZE
-extern volatile s32 gAudioLoadLock;
+extern s16 gTatumsPerBeat;
+extern s32 gAudioHeapSize; // AUDIO_HEAP_SIZE
+extern s32 gAudioInitPoolSize; // AUDIO_INIT_POOL_SIZE
+extern volatile s32 gAudioLoadLock;
 
 // .bss
-extern volatile s32 gAudioFrameCount;
+extern volatile s32 gAudioFrameCount;
 
 // number of DMAs performed during this frame
 #if defined(VERSION_EU) || defined(VERSION_SH)
-extern s32 gCurrAudioFrameDmaCount;
+extern s32 gCurrAudioFrameDmaCount;
 #else
-extern volatile s32 gCurrAudioFrameDmaCount;
+extern volatile s32 gCurrAudioFrameDmaCount;
 #endif
 
-extern s32 gAudioTaskIndex;
-extern s32 gCurrAiBufferIndex;
+extern s32 gAudioTaskIndex;
+extern s32 gCurrAiBufferIndex;
 
-extern u64 *gAudioCmdBuffers[2];
-extern u64 *gAudioCmd;
+extern u64 *gAudioCmdBuffers[2];
+extern u64 *gAudioCmd;
 
-extern struct SPTask *gAudioTask;
-extern struct SPTask gAudioTasks[2];
+extern struct SPTask *gAudioTask;
+extern struct SPTask gAudioTasks[2];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-extern f32 D_EU_802298D0;
-extern s32 gRefreshRate;
+extern f32 D_EU_802298D0;
+extern s32 gRefreshRate;
 #endif
 
-extern s16 *gAiBuffers[NUMAIBUFFERS];
-extern s16 gAiBufferLengths[NUMAIBUFFERS];
+extern s16 *gAiBuffers[NUMAIBUFFERS];
+extern s16 gAiBufferLengths[NUMAIBUFFERS];
 #if defined(VERSION_SH)
 #define AIBUFFER_LEN 0xb00
 #elif defined(VERSION_EU)
@@ -148,7 +148,7 @@ extern s16 gAiBufferLengths[NUMAIBUFFERS];
 #define AIBUFFER_LEN (0xa0 * 16)
 #endif
 
-extern u32 gAudioRandom;
+extern u32 gAudioRandom;
 
 #if defined(VERSION_US) || defined(VERSION_JP)
 #define NOTES_BUFFER_SIZE \
@@ -174,28 +174,28 @@ extern u32 gAudioRandom;
 #endif
 
 #ifdef VERSION_SH
-extern f32 unk_sh_data_1[];
+extern f32 unk_sh_data_1[];
 
-extern volatile u32 gAudioLoadLockSH;
+extern volatile u32 gAudioLoadLockSH;
 
-extern u8 D_SH_80350F18;
-extern u8 D_SH_80350F19;
+extern u8 D_SH_80350F18;
+extern u8 D_SH_80350F19;
 
-extern OSMesg D_SH_80350F1C[1];
-extern OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
-extern OSMesgQueue *D_SH_80350F38;
+extern OSMesg D_SH_80350F1C[1];
+extern OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
+extern OSMesgQueue *D_SH_80350F38;
 
-extern OSMesg D_SH_80350F40[4];
-extern OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
-extern OSMesgQueue *D_SH_80350F68;
+extern OSMesg D_SH_80350F40[4];
+extern OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
+extern OSMesgQueue *D_SH_80350F68;
 
-extern OSMesg D_SH_80350F6C[1];
-extern OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
-extern OSMesgQueue *D_SH_80350F88;
+extern OSMesg D_SH_80350F6C[1];
+extern OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
+extern OSMesgQueue *D_SH_80350F88;
 
-extern OSMesg D_SH_80350F8C[1];
-extern OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
-extern OSMesgQueue *D_SH_80350FA8;
+extern OSMesg D_SH_80350F8C[1];
+extern OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
+extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -208,10 +208,10 @@ extern OSMesgQueue *D_SH_80350FA8;
 #define AUDIO_HEAP_SIZE (SEQ_BANK_MEM + AUDIO_INIT_POOL_SIZE + NOTES_BUFFER_SIZE + BETTER_REVERB_SIZE + REVERB_WINDOW_HEAP_SIZE)
 
 #ifdef VERSION_SH
-extern u32 D_SH_80315EF0;
-extern u16 D_SH_80315EF4;
-extern u16 D_SH_80315EF8;
-extern u16 D_SH_80315EFC;
+extern u32 D_SH_80315EF0;
+extern u16 D_SH_80315EF4;
+extern u16 D_SH_80315EF8;
+extern u16 D_SH_80315EFC;
 #endif
 
 #endif // AUDIO_DATA_H
