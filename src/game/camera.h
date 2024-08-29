@@ -8,6 +8,7 @@
 #include "engine/geo_layout.h"
 #include "engine/graph_node.h"
 #include "puppycam2.h"
+#include "camera/camera_geo.h"
 
 #include "level_table.h"
 
@@ -728,7 +729,6 @@ void update_camera(struct Camera *c);
 void reset_camera(struct Camera *c);
 void init_camera(struct Camera *c);
 void select_mario_cam_mode(void);
-Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context);
 void object_pos_to_vec3f(Vec3f dst, struct Object *obj);
 void vec3f_to_object_pos(struct Object *obj, Vec3f src);
 s32 cam_select_alt_mode(s32 angle);
@@ -811,8 +811,6 @@ s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos);
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw);
 #endif
-
-Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context);
 
 extern s16 sYawSpeed;
 extern struct PlayerCameraState *sMarioCamState;

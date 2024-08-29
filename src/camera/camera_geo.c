@@ -9,7 +9,7 @@
 /**
  * Add a cyclic offset to the camera's field of view based on a cosine wave
  */
-void shake_camera_fov(struct GraphNodePerspective *perspective) {
+static void shake_camera_fov(struct GraphNodePerspective *perspective) {
     if (sFOVState.shakeAmplitude != 0.f) {
         sFOVState.fovOffset = coss(sFOVState.shakePhase) * sFOVState.shakeAmplitude / 0x100;
         sFOVState.shakePhase += sFOVState.shakeSpeed;
@@ -20,23 +20,23 @@ void shake_camera_fov(struct GraphNodePerspective *perspective) {
     }
 }
 
-void set_fov_30(UNUSED struct MarioState *m) {
+static void set_fov_30(UNUSED struct MarioState *m) {
     sFOVState.fov = 30.f;
 }
 
-void approach_fov_20(UNUSED struct MarioState *m) {
+static void approach_fov_20(UNUSED struct MarioState *m) {
     camera_approach_f32_symmetric_bool(&sFOVState.fov, 20.f, 0.3f);
 }
 
-void set_fov_45(UNUSED struct MarioState *m) {
+static void set_fov_45(UNUSED struct MarioState *m) {
     sFOVState.fov = 45.f;
 }
 
-void set_fov_29(UNUSED struct MarioState *m) {
+static void set_fov_29(UNUSED struct MarioState *m) {
     sFOVState.fov = 29.f;
 }
 
-void zoom_fov_30(UNUSED struct MarioState *m) {
+static void zoom_fov_30(UNUSED struct MarioState *m) {
     // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you,
     // Nintendo.
     camera_approach_f32_symmetric_bool(&sFOVState.fov, 30.f, (30.f - sFOVState.fov) / 60.f);
@@ -46,7 +46,7 @@ void zoom_fov_30(UNUSED struct MarioState *m) {
  * This is the default fov function. It makes fov approach 45 degrees, and it handles zooming in when
  * Mario falls a sleep.
  */
-void fov_default(struct MarioState *m) {
+static void fov_default(struct MarioState *m) {
     sStatusFlags &= ~CAM_FLAG_SLEEPING;
 
     if ((m->action == ACT_SLEEPING) || (m->action == ACT_START_SLEEPING)) {
@@ -61,15 +61,15 @@ void fov_default(struct MarioState *m) {
     }
 }
 
-void approach_fov_30(UNUSED struct MarioState *m) {
+static void approach_fov_30(UNUSED struct MarioState *m) {
     camera_approach_f32_symmetric_bool(&sFOVState.fov, 30.f, 1.f);
 }
 
-void approach_fov_60(UNUSED struct MarioState *m) {
+static void approach_fov_60(UNUSED struct MarioState *m) {
     camera_approach_f32_symmetric_bool(&sFOVState.fov, 60.f, 1.f);
 }
 
-void approach_fov_45(struct MarioState *m) {
+static void approach_fov_45(struct MarioState *m) {
     f32 targetFoV = sFOVState.fov;
 
     if (m->area->camera->mode == CAMERA_MODE_FIXED && m->area->camera->cutscene == 0) {
@@ -81,7 +81,7 @@ void approach_fov_45(struct MarioState *m) {
     sFOVState.fov = approach_f32(sFOVState.fov, targetFoV, 2.f, 2.f);
 }
 
-void approach_fov_80(UNUSED struct MarioState *m) {
+static void approach_fov_80(UNUSED struct MarioState *m) {
     camera_approach_f32_symmetric_bool(&sFOVState.fov, 80.f, 3.5f);
 }
 
@@ -89,7 +89,7 @@ void approach_fov_80(UNUSED struct MarioState *m) {
  * Sets the fov in BBH.
  * If there's a cutscene, sets fov to 45. Otherwise sets fov to 60.
  */
-void set_fov_bbh(struct MarioState *m) {
+static void set_fov_bbh(struct MarioState *m) {
     f32 targetFoV = sFOVState.fov;
 
     if (m->area->camera->mode == CAMERA_MODE_FIXED && m->area->camera->cutscene == 0) {
@@ -158,7 +158,7 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
 /**
  * Allocate the GraphNodeCamera's config.camera, and copy `c`'s focus to the Camera's area center point.
  */
-void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
+static void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
 #ifdef FORCED_CAMERA_MODE
     gc->config.mode = FORCED_CAMERA_MODE;
 #endif
@@ -192,7 +192,7 @@ void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
  *      This isolates the lower 16 'area' bits, subtracts 1 because areas are 1-indexed, and effectively
  *      modulo-4's the result, because each 8-bit mask only has 4 area bits for each level
  */
-void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
+static void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
     s16 yaw;
     s32 areaMaskIndex = gCurrLevelArea / 32;
     s32 areaBit = 1 << (((gCurrLevelArea & 0x10) / 4) + (((gCurrLevelArea & 0xF) - 1) & 3));
@@ -227,7 +227,7 @@ void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
 /**
  * Copy Lakitu's pos and foc into `gc`
  */
-void update_graph_node_camera(struct GraphNodeCamera *gc) {
+static void update_graph_node_camera(struct GraphNodeCamera *gc) {
     gc->rollScreen = gLakituState.roll;
     vec3f_copy(gc->pos, gLakituState.pos);
     vec3f_copy(gc->focus, gLakituState.focus);
