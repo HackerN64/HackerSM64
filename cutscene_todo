@@ -1,6 +1,0 @@
-- globals:
-cutscene_mario_dialog
-cutscene_death_stomach_start
-cutscene_double_doors_end
-
-- maybe consolidate death cutscene files?

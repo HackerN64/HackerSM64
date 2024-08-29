@@ -13,10 +13,9 @@
 #include "level_table.h"
 
 /**
- * @file camera.c
- * TODO: rewrite this lol
- * Implements the camera system, including C-button input, camera modes, camera triggers, and cutscenes.
- *
+ * @file camera.h
+ * Constants, defines, and structs used by the camera system.
+ * 
  * When working with the camera, you should be familiar with sm64's coordinate system.
  * Relative to the camera, the coordinate system follows the right hand rule:
  *          +X points right.
@@ -60,12 +59,6 @@
 
 // X position of the mirror
 #define CASTLE_MIRROR_X 4331.53f
-
-/**
- * @file camera.h
- * Constants, defines, and structs used by the camera system.
- * @see camera.c
- */
 
 #ifndef ABS2
 #define ABS2(x) ((x) >= 0.f ? (x) : -(x))
@@ -739,8 +732,6 @@ s32 update_camera_hud_status(struct Camera *c);
 s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius);
 void clamp_pitch(Vec3f from, Vec3f to, s16 maxPitch, s16 minPitch);
 s32 is_within_100_units_of_mario(f32 posX, f32 posY, f32 posZ);
-s32 set_or_approach_f32_asymptotic(f32 *dst, f32 goal, f32 scale);
-
 void set_camera_pitch_shake(s16 mag, s16 decay, s16 inc);
 void set_camera_yaw_shake(s16 mag, s16 decay, s16 inc);
 void set_camera_roll_shake(s16 mag, s16 decay, s16 inc);
@@ -749,7 +740,6 @@ void shake_camera_pitch(Vec3f pos, Vec3f focus);
 void shake_camera_yaw(Vec3f pos, Vec3f focus);
 void shake_camera_roll(s16 *roll);
 s32 offset_yaw_outward_radial(struct Camera *c, s16 areaYaw);
-
 void play_camera_buzz_if_cdown(void);
 void play_camera_buzz_if_cbutton(void);
 void play_camera_buzz_if_c_sideways(void);
@@ -759,9 +749,6 @@ void play_sound_cbutton_side(void);
 void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);
 void play_sound_if_cam_switched_to_lakitu_or_mario(void);
-
-void radial_camera_input(struct Camera *c);
-
 void pan_camera(struct Camera *c, s16 incPitch, s16 incYaw);
 void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc);
@@ -771,9 +758,7 @@ void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset);
 s16 camera_course_processing(struct Camera *c);
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
-
 s32 snap_to_45_degrees(s16 angle);
-
 void set_camera_mode(struct Camera *c, s16 mode, s16 frames);
 s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z);
 void set_camera_mode_8_directions(struct Camera *c);
@@ -781,11 +766,9 @@ void set_camera_mode_boss_fight(struct Camera *c);
 void set_camera_mode_close_cam(u8 *mode);
 void set_camera_mode_radial(struct Camera *c, s16 transitionTime);
 void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames);
-
 void set_fov_function(u8 func);
 void set_fov_shake_from_point_preset(u8 preset, f32 posX, f32 posY, f32 posZ);
 void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16 yawOff, s16 pitchDiv, s16 yawDiv);
-
 void set_mode_c_up(struct Camera *c);
 
 s16 update_slide_camera(struct Camera *c);

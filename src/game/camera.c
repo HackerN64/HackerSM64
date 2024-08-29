@@ -36,7 +36,6 @@
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
-// BSS
 /**
  * Stores Lakitu's position from the last frame, used for transitioning in next_lakitu_state()
  */
