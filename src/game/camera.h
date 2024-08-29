@@ -724,7 +724,6 @@ void set_camera_shake_from_hit(s16 shake);
 void set_environmental_camera_shake(s16 shake);
 void set_camera_shake_from_point(s16 shake, f32 posX, f32 posY, f32 posZ);
 void transition_next_state(UNUSED struct Camera *c, s16 frames);
-void set_camera_mode(struct Camera *c, s16 mode, s16 frames);
 void update_camera(struct Camera *c);
 void reset_camera(struct Camera *c);
 void init_camera(struct Camera *c);
@@ -770,22 +769,20 @@ void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation);
 s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc, Vec3f oldPos, Vec3f oldFoc, s16 yaw);
 void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset);
 s16 camera_course_processing(struct Camera *c);
-void resolve_geometry_collisions(Vec3f pos);
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
 
 s32 snap_to_45_degrees(s16 angle);
 
+void set_camera_mode(struct Camera *c, s16 mode, s16 frames);
 s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z);
 void set_camera_mode_8_directions(struct Camera *c);
 void set_camera_mode_boss_fight(struct Camera *c);
 void set_camera_mode_close_cam(u8 *mode);
 void set_camera_mode_radial(struct Camera *c, s16 transitionTime);
 void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames);
-void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw);
 
 void set_fov_function(u8 func);
-void cutscene_set_fov_shake_preset(u8 preset);
 void set_fov_shake_from_point_preset(u8 preset, f32 posX, f32 posY, f32 posZ);
 void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16 yawOff, s16 pitchDiv, s16 yawDiv);
 
@@ -829,7 +826,6 @@ extern s16 sSelectionFlags;
 extern s16 s2ndRotateFlags;
 extern s16 sCameraSoundFlags;
 extern u16 sCButtonsPressed;
-extern s16 sCutsceneDialogID;
 extern struct LakituState gLakituState;
 extern s16 sAreaYaw;
 extern s16 sAreaYawChange;

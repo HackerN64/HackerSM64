@@ -8,6 +8,20 @@
 #include "camera_math.h"
 
 /**
+ * A copy of gDialogID, the dialog displayed during the cutscene.
+ */
+s16 sCutsceneDialogID;
+
+/**
+ * Mario's response to a dialog.
+ * 0 = No response yet
+ * 1 = Yes
+ * 2 = No
+ * 3 = Dialog doesn't have a response
+ */
+u8 sCutsceneDialogResponse = DIALOG_RESPONSE_NONE;
+
+/**
  * A cutscene that plays when the player interacts with an object
  */
 u8 sObjectCutscene = CUTSCENE_NONE;

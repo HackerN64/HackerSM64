@@ -116,10 +116,6 @@ s16 sCameraSoundFlags;
  * Stores what C-Buttons are pressed this frame.
  */
 u16 sCButtonsPressed;
-/**
- * A copy of gDialogID, the dialog displayed during the cutscene.
- */
-s16 sCutsceneDialogID;
 
 /**
  * The angle of the direction vector from the area's center to Mario's position.
@@ -222,14 +218,7 @@ f32 gCameraZoomDist = 800.0f;
  * When it reaches 8, it sets gRecentCutscene to 0.
  */
 u8 sFramesSinceCutsceneEnded = 0;
-/**
- * Mario's response to a dialog.
- * 0 = No response yet
- * 1 = Yes
- * 2 = No
- * 3 = Dialog doesn't have a response
- */
-u8 sCutsceneDialogResponse = DIALOG_RESPONSE_NONE;
+
 struct PlayerCameraState *sMarioCamState = &gPlayerCameraState[0];
 Vec3f sFixedModeBasePosition    = { 646.0f, 143.0f, -1513.0f };
 
@@ -2004,44 +1993,6 @@ s16 camera_course_processing(struct Camera *c) {
         c->mode = oldMode;
     }
     return c->mode;
-}
-
-/**
- * Move `pos` between the nearest floor and ceiling
- */
-void resolve_geometry_collisions(Vec3f pos) {
-    struct Surface *surf;
-
-    f32_find_wall_collision(&pos[0], &pos[1], &pos[2], 0.f, 100.f);
-    f32 floorY = find_floor(pos[0], pos[1] + 50.f, pos[2], &surf);
-    f32 ceilY = find_ceil(pos[0], pos[1] - 50.f, pos[2], &surf);
-
-    if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT == ceilY)) {
-        if (pos[1] < (floorY += 125.f)) {
-            pos[1] = floorY;
-        }
-    }
-
-    if ((FLOOR_LOWER_LIMIT == floorY) && (CELL_HEIGHT_LIMIT != ceilY)) {
-        if (pos[1] > (ceilY -= 125.f)) {
-            pos[1] = ceilY;
-        }
-    }
-
-    if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT != ceilY)) {
-        floorY += 125.f;
-        ceilY -= 125.f;
-
-        if ((pos[1] <= floorY) && (pos[1] < ceilY)) {
-            pos[1] = floorY;
-        }
-        if ((pos[1] > floorY) && (pos[1] >= ceilY)) {
-            pos[1] = ceilY;
-        }
-        if ((pos[1] <= floorY) && (pos[1] >= ceilY)) {
-            pos[1] = (floorY + ceilY) * 0.5f;
-        }
-    }
 }
 
 /**

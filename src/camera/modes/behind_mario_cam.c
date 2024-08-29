@@ -6,6 +6,44 @@
 #include "game/level_update.h"
 #include "game/camera.h"
 
+/**
+ * Move `pos` between the nearest floor and ceiling
+ * REVIEWERS: is this a better fit for camera_math? it's only used here
+ */
+static void set_floor_ceiling_midpoint(Vec3f pos) {
+    struct Surface *surf;
+
+    f32_find_wall_collision(&pos[0], &pos[1], &pos[2], 0.f, 100.f);
+    f32 floorY = find_floor(pos[0], pos[1] + 50.f, pos[2], &surf);
+    f32 ceilY = find_ceil(pos[0], pos[1] - 50.f, pos[2], &surf);
+
+    if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT == ceilY)) {
+        if (pos[1] < (floorY += 125.f)) {
+            pos[1] = floorY;
+        }
+    }
+
+    if ((FLOOR_LOWER_LIMIT == floorY) && (CELL_HEIGHT_LIMIT != ceilY)) {
+        if (pos[1] > (ceilY -= 125.f)) {
+            pos[1] = ceilY;
+        }
+    }
+
+    if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT != ceilY)) {
+        floorY += 125.f;
+        ceilY -= 125.f;
+
+        if ((pos[1] <= floorY) && (pos[1] < ceilY)) {
+            pos[1] = floorY;
+        }
+        if ((pos[1] > floorY) && (pos[1] >= ceilY)) {
+            pos[1] = ceilY;
+        }
+        if ((pos[1] <= floorY) && (pos[1] >= ceilY)) {
+            pos[1] = (floorY + ceilY) * 0.5f;
+        }
+    }
+}
 
 /**
  * Updates the camera in BEHIND_MARIO mode.
@@ -186,7 +224,7 @@ s32 mode_behind_mario(struct Camera *c) {
         gCameraMovementFlags &= ~CAM_MOVE_SUBMERGED;
     }
 
-    resolve_geometry_collisions(c->pos);
+    set_floor_ceiling_midpoint(c->pos);
     // Prevent camera getting too far away
     vec3f_get_dist_and_angle(c->focus, c->pos, &distCamToFocus, &camPitch, &camYaw);
     if (distCamToFocus > 800.f) {

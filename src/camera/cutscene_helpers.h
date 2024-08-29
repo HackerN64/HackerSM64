@@ -24,21 +24,23 @@ struct Cutscene {
     s16 duration;
 };
 
+extern u8 sCutsceneDialogResponse;
+extern u8 sObjectCutscene;
+extern u8 gRecentCutscene;
+extern u8 sCutsceneDialogResponse;
+extern s16 sCutsceneDialogID;
 extern s16 gCutsceneTimer;
 extern s16 sCutsceneShot;
-extern struct CutsceneVariable sCutsceneVars[10];
-
-extern u8 sObjectCutscene;
+extern s16 sCutsceneSplineSegment;
 extern s32 gObjCutsceneDone;
 extern u32 gCutsceneObjSpawn;
-extern u8 sCutsceneDialogResponse;
-extern s16 sCutsceneSplineSegment;
 extern f32 sCutsceneSplineSegmentProgress;
-extern struct Object *gCutsceneFocus;
-extern u8 gRecentCutscene;
 extern Vec3f sPlayer2FocusOffset;
+extern struct CutsceneVariable sCutsceneVars[10];
+extern struct Object *gCutsceneFocus;
 
 // Cutscene Interface
+void init_cutscene_vars();
 void reset_cutscene_vars();
 void start_cutscene(struct Camera *c, u8 cutscene);
 void play_cutscene(struct Camera *c);
@@ -70,6 +72,8 @@ void trigger_cutscene_dialog(s32 trigger);
 u8 get_cutscene_from_mario_status(struct Camera *c);
 void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
 void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax);
+void cutscene_set_fov_shake_preset(u8 preset);
+void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw);
 
 // Object cutscene functions
 s16 cutscene_object(u8 cutscene, struct Object *obj);
