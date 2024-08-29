@@ -744,7 +744,7 @@ void reset_camera(struct Camera *c) {
     s2ndRotateFlags = 0;
     sStatusFlags = 0;
 
-    reset_cutscene_system();
+    reset_cutscene_vars();
     gSecondCameraFocus = NULL;
     sCButtonsPressed = 0;
     vec3f_copy(sModeTransition.marioPos, sMarioCamState->pos);
@@ -789,10 +789,7 @@ void init_camera(struct Camera *c) {
     Vec3f marioOffset;
     s32 i;
 
-    // todo: init_camera_modes
-    // sCreditsPlayer2Pitch = 0;
-    // sCreditsPlayer2Yaw = 0;
-    // vec3_zero(sPlayer2FocusOffset);
+    init_cutscene_vars();
     gPrevLevel = gCurrLevelArea / 16;
     gCurrLevelArea = gCurrLevelNum * 16 + gCurrentArea->index;
     sSelectionFlags &= CAM_MODE_MARIO_SELECTED;

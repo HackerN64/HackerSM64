@@ -62,7 +62,13 @@ s16 sCreditsPlayer2Pitch;
  */
 s16 sCreditsPlayer2Yaw;
 
-void reset_cutscene_system() {
+void init_cutscene_vars() {
+    sCreditsPlayer2Pitch = 0;
+    sCreditsPlayer2Yaw = 0;
+    vec3_zero(sPlayer2FocusOffset);
+}
+
+void reset_cutscene_vars() {
     gCutsceneTimer = 0;
     sCutsceneShot = 0;
     gCutsceneObjSpawn = CUTSCENE_OBJ_NONE;
@@ -282,7 +288,7 @@ void cutscene_exit_to_castle_grounds_end(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     gCutsceneTimer = CUTSCENE_STOP;
     c->cutscene = 0;
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -306,9 +312,8 @@ void cutscene_shake_explosion(UNUSED struct Camera *c) {
 
 /**
  * Update the camera's yaw and nextYaw. This is called from cutscenes to ignore the camera mode's yaw.
- * TODO: cutscene_update_camera_yaw
  */
-void update_camera_yaw(struct Camera *c) {
+void cutscene_update_camera_yaw(struct Camera *c) {
     c->nextYaw = calculate_yaw(c->focus, c->pos);
     c->yaw = c->nextYaw;
 }

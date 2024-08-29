@@ -82,7 +82,7 @@ void cutscene_non_painting_end(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     transition_next_state(c, 60);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -172,7 +172,7 @@ void cutscene_exit_painting(struct Camera *c) {
         vec3f_set(c->pos, -296.f, 1261.f, 3521.f);
     }
 
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -188,7 +188,7 @@ void cutscene_exit_painting_end(struct Camera *c) {
     gCutsceneTimer = CUTSCENE_STOP;
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT;
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -272,7 +272,7 @@ void cutscene_exit_non_painting_succ(struct Camera *c) {
     cutscene_event(cutscene_exit_bowser_succ_focus_left, c, 18, -1);
     cutscene_event(cutscene_non_painting_set_cam_focus, c, 0, -1);
     cutscene_event(cutscene_exit_succ_shake_landing, c, 41, 41);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -324,7 +324,7 @@ void cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
 void cutscene_exit_waterfall(struct Camera *c) {
     cutscene_event(cutscene_exit_waterfall_warp, c, 0, 0);
     cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 void cutscene_exit_fall_to_castle_grounds_warp(struct Camera *c) {
@@ -338,7 +338,7 @@ void cutscene_exit_fall_to_castle_grounds_warp(struct Camera *c) {
 void cutscene_exit_fall_to_castle_grounds(struct Camera *c) {
     cutscene_event(cutscene_exit_fall_to_castle_grounds_warp, c, 0, 0);
     cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -363,7 +363,7 @@ void cutscene_unused_exit_focus_mario(struct Camera *c) {
     vec3f_set(focus, sMarioCamState->pos[0], sMarioCamState->pos[1] + 125.f, sMarioCamState->pos[2]);
     set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
     approach_vec3f_asymptotic(c->focus, focus, 0.02f, 0.001f, 0.02f);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**

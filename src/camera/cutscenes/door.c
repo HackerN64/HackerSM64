@@ -65,7 +65,7 @@ void cutscene_door_follow_mario(struct Camera *c) {
     vec3f_get_dist_and_angle(c->focus, c->pos, &dist, &pitch, &yaw);
     camera_approach_f32_symmetric_bool(&dist, 150.f, 7.f);
     vec3f_set_dist_and_angle(c->focus, c->pos, dist, pitch, yaw);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**
@@ -83,7 +83,7 @@ void cutscene_door_end(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT;
     set_flag_post_door(c);
-    update_camera_yaw(c);
+    cutscene_update_camera_yaw(c);
 }
 
 /**

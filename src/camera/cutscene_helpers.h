@@ -39,7 +39,7 @@ extern u8 gRecentCutscene;
 extern Vec3f sPlayer2FocusOffset;
 
 // Cutscene Interface
-void reset_cutscene_system();
+void reset_cutscene_vars();
 void start_cutscene(struct Camera *c, u8 cutscene);
 void play_cutscene(struct Camera *c);
 void cutscene_reset_spline(void);
@@ -50,7 +50,7 @@ void stop_cutscene_and_retrieve_stored_info(struct Camera *c);
 void cutscene_goto_cvar_pos(struct Camera *c, f32 goalDist, s16 goalPitch, s16 rotPitch, s16 rotYaw);
 void cutscene_soften_music(UNUSED struct Camera *c);
 void cutscene_unsoften_music(UNUSED struct Camera *c);
-void update_camera_yaw(struct Camera *c);
+void cutscene_update_camera_yaw(struct Camera *c);
 s16 cutscene_common_set_dialog_state(s32 state);
 void cutscene_stop_dialog(UNUSED struct Camera *c);
 void cutscene_shake_explosion(UNUSED struct Camera *c);
