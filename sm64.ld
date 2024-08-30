@@ -239,7 +239,7 @@ SECTIONS
    BEGIN_SEG(engine, .)
    {
       BUILD_DIR/src/game*.o(.text*);
-      BUILD_DIR/src/game/behavior_actions.o(.text*);
+      BUILD_DIR/src/game/behaviors*.o(.text*);
       BUILD_DIR/src/game/obj_behaviors.o(.text*);
       BUILD_DIR/src/game/object_helpers.o(.text*);
       BUILD_DIR/src/game/rendering_graph_node.o(.text*);
