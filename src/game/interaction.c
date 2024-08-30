@@ -1890,8 +1890,21 @@ void pss_end_slide(struct MarioState *m) {
     if (sPssSlideStarted) {
         u16 slideTime = level_control_timer(TIMER_CONTROL_STOP);
         if (slideTime < 630) {
+            Vec3f tmpHome;
+
+            // Back up Mario's home and update it to his current position. This is necessary just
+            // in case the timer star doesn't have a default star marker object assigned to it.
+            vec3f_copy(tmpHome, &m->marioObj->oHomeVec);
+            vec3f_copy(&m->marioObj->oHomeVec, &m->marioObj->oPosVec);
+
+            // Set Mario's bparam1 in order to spawn star ID 1
             m->marioObj->oBehParams = (1 << 24);
-            spawn_default_star(-6358.0f, -4300.0f, 4700.0f);
+
+            // Spawn pss timer star
+            spawn_default_star();
+
+            // Restore Mario's home position
+            vec3f_copy(&m->marioObj->oHomeVec, tmpHome);
         }
         sPssSlideStarted = FALSE;
     }

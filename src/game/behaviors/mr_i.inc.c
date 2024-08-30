@@ -130,7 +130,7 @@ void mr_i_body_act_spin_death(void) {
             o->oMrIScale = scaleModifier * 0.6f;
             if (o->oBehParams2ndByte != MR_I_BP_NORMAL) {
                 o->oPosY += 100.0f;
-                spawn_default_star(1370, 2000.0f, -320.0f);
+                spawn_default_star();
                 obj_mark_for_deletion(o);
             } else {
                 cur_obj_spawn_loot_blue_coin();

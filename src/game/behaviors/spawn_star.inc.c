@@ -123,8 +123,8 @@ void bhv_star_spawn_loop(void) {
     }
 }
 
-struct Object *spawn_star(struct Object *starObj, f32 x, f32 y, f32 z) {
-    starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
+struct Object *spawn_star(f32 x, f32 y, f32 z) {
+    struct Object *starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
     starObj->oBehParams = o->oBehParams;
     vec3f_set(&starObj->oHomeVec, x, y, z);
     starObj->oFaceAnglePitch = 0;
@@ -132,21 +132,28 @@ struct Object *spawn_star(struct Object *starObj, f32 x, f32 y, f32 z) {
     return starObj;
 }
 
-void spawn_default_star(f32 x, f32 y, f32 z) {
-    struct Object *starObj = NULL;
-    starObj = spawn_star(starObj, x, y, z);
+void spawn_default_star(void) {
+    f32 dist;
+    struct Object *starObj;
+    struct Object *starMarker = cur_obj_find_nearest_object_with_behavior_and_bparams(bhvDefaultStarMarker,
+            &dist, o->oBehParams, BPARAM_MASK(1) << BPARAM_NSHIFT(1, 1) /* 0xFF << 24 */);
+    
+    if (starMarker != NULL) {
+        starObj = spawn_star(starMarker->oPosX, starMarker->oPosY, starMarker->oPosZ);
+    } else {
+        starObj = spawn_star(o->oHomeX, (o->oHomeY + 240.0f), o->oHomeZ);
+    }
+
     starObj->oBehParams2ndByte = SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR;
 }
 
-void spawn_red_coin_cutscene_star(f32 x, f32 y, f32 z) {
-    struct Object *starObj = NULL;
-    starObj = spawn_star(starObj, x, y, z);
+void spawn_red_coin_cutscene_star(void) {
+    struct Object *starObj = spawn_star(o->oPosX, o->oPosY, o->oPosZ);
     starObj->oBehParams2ndByte = SPAWN_STAR_ARC_CUTSCENE_BP_HIDDEN_STAR;
 }
 
-void spawn_no_exit_star(f32 x, f32 y, f32 z) {
-    struct Object *starObj = NULL;
-    starObj = spawn_star(starObj, x, y, z);
+void spawn_no_exit_star(void) {
+    struct Object *starObj = spawn_star(o->oPosX, o->oPosY, o->oPosZ);
     starObj->oBehParams2ndByte = SPAWN_STAR_ARC_CUTSCENE_BP_HIDDEN_STAR;
     starObj->oInteractionSubtype |= INT_SUBTYPE_NO_EXIT;
 }
@@ -197,7 +204,7 @@ void bhv_hidden_red_coin_star_loop(void) {
 
         case HIDDEN_STAR_ACT_ACTIVE:
             if (o->oTimer > 2) {
-                spawn_red_coin_cutscene_star(o->oPosX, o->oPosY, o->oPosZ);
+                spawn_red_coin_cutscene_star();
                 spawn_mist_particles();
                 o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             }

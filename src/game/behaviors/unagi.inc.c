@@ -194,7 +194,7 @@ void bhv_unagi_subobject_loop(void) {
         if (o->oBehParams2ndByte == UNAGI_PART_BP_BACK) {
             if (o->parentObj->oAnimState != UNAGI_ANIM_STATE_NO_STAR && o->oDistanceToMario < 150.0f) {
                 o->oBehParams = o->parentObj->oBehParams;
-                spawn_default_star(6833.0f, -3654.0f, 2230.0f);
+                spawn_default_star();
                 o->parentObj->oAnimState = UNAGI_ANIM_STATE_NO_STAR;
             }
         } else {
