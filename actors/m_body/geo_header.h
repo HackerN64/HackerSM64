@@ -1,0 +1,13 @@
+extern const GeoLayout m_body_geo[];
+extern Lights1 m_body_body_v3_lights;
+extern Lights1 m_body_cap_v3_lights;
+extern u8 m_body_mario_button_rgba16[];
+extern u8 m_body_mario_cap_rgba16[];
+extern Vtx m_body_skinned_003_mesh_layer_1_vtx_0[184];
+extern Gfx m_body_skinned_003_mesh_layer_1_tri_0[];
+extern Vtx m_body_skinned_003_mesh_layer_1_vtx_1[31];
+extern Gfx m_body_skinned_003_mesh_layer_1_tri_1[];
+extern Gfx mat_m_body_body_v3[];
+extern Gfx mat_m_body_cap_v3[];
+extern Gfx m_body_skinned_003_mesh_layer_1[];
+extern Gfx m_body_material_revert_render_settings[];

@@ -1,0 +1,91 @@
+
+Vtx m_foot_l_skinned_018_mesh_layer_1_vtx_0[28] = {
+	{{ {-25, 39, 12}, 0, {-16, -16}, {129, 255, 254, 255} }},
+	{{ {-24, 40, -14}, 0, {-16, -16}, {129, 255, 254, 255} }},
+	{{ {-24, 23, -24}, 0, {-16, -16}, {129, 255, 254, 255} }},
+	{{ {-25, 23, 24}, 0, {-16, -16}, {129, 255, 254, 255} }},
+	{{ {-24, -21, -20}, 0, {-16, -16}, {129, 1, 254, 255} }},
+	{{ {-24, -21, 20}, 0, {-16, -16}, {129, 0, 254, 255} }},
+	{{ {-24, -35, -8}, 0, {-16, -16}, {129, 2, 254, 255} }},
+	{{ {-24, -36, 8}, 0, {-16, -16}, {129, 0, 255, 255} }},
+	{{ {-2, 14, 21}, 0, {-16, -16}, {75, 28, 99, 255} }},
+	{{ {-25, 23, 24}, 0, {-16, -16}, {33, 42, 115, 255} }},
+	{{ {-24, -21, 20}, 0, {-16, -16}, {14, 211, 118, 255} }},
+	{{ {-25, 39, 12}, 0, {-16, -16}, {51, 103, 55, 255} }},
+	{{ {-2, 33, -1}, 0, {-16, -16}, {89, 91, 249, 255} }},
+	{{ {8, 10, 1}, 0, {-16, -16}, {126, 17, 252, 255} }},
+	{{ {-2, -24, 16}, 0, {-16, -16}, {73, 201, 88, 255} }},
+	{{ {-24, -36, 8}, 0, {-16, -16}, {16, 140, 49, 255} }},
+	{{ {-24, -36, 8}, 0, {-16, -16}, {16, 140, 49, 255} }},
+	{{ {0, -34, -1}, 0, {-16, -16}, {83, 160, 252, 255} }},
+	{{ {-2, -24, 16}, 0, {-16, -16}, {73, 201, 88, 255} }},
+	{{ {-24, -35, -8}, 0, {-16, -16}, {15, 144, 199, 255} }},
+	{{ {-2, -25, -14}, 0, {-16, -16}, {76, 204, 168, 255} }},
+	{{ {-24, -21, -20}, 0, {-16, -16}, {19, 211, 139, 255} }},
+	{{ {-4, 14, -20}, 0, {-16, -16}, {72, 22, 153, 255} }},
+	{{ {-24, 23, -24}, 0, {-16, -16}, {38, 34, 140, 255} }},
+	{{ {-24, 40, -14}, 0, {-16, -16}, {55, 98, 198, 255} }},
+	{{ {-2, 33, -1}, 0, {-16, -16}, {89, 91, 249, 255} }},
+	{{ {-25, 39, 12}, 0, {-16, -16}, {51, 103, 55, 255} }},
+	{{ {8, 10, 1}, 0, {-16, -16}, {126, 17, 252, 255} }},
+};
+
+Gfx m_foot_l_skinned_018_mesh_layer_1_tri_0[] = {
+	gsSPVertex(m_foot_l_skinned_018_mesh_layer_1_vtx_0 + 0, 16, 0),
+	gsSP1Triangle(0, 1, 2, 0),
+	gsSP1Triangle(3, 0, 2, 0),
+	gsSP1Triangle(3, 2, 4, 0),
+	gsSP1Triangle(5, 3, 4, 0),
+	gsSP1Triangle(5, 4, 6, 0),
+	gsSP1Triangle(5, 6, 7, 0),
+	gsSP1Triangle(8, 9, 10, 0),
+	gsSP1Triangle(11, 9, 8, 0),
+	gsSP1Triangle(8, 12, 11, 0),
+	gsSP1Triangle(12, 8, 13, 0),
+	gsSP1Triangle(13, 8, 14, 0),
+	gsSP1Triangle(14, 8, 10, 0),
+	gsSP1Triangle(14, 10, 15, 0),
+	gsSPVertex(m_foot_l_skinned_018_mesh_layer_1_vtx_0 + 16, 12, 0),
+	gsSP1Triangle(0, 1, 2, 0),
+	gsSP1Triangle(1, 0, 3, 0),
+	gsSP1Triangle(3, 4, 1, 0),
+	gsSP1Triangle(3, 5, 4, 0),
+	gsSP1Triangle(6, 4, 5, 0),
+	gsSP1Triangle(6, 5, 7, 0),
+	gsSP1Triangle(6, 7, 8, 0),
+	gsSP1Triangle(8, 9, 6, 0),
+	gsSP1Triangle(9, 8, 10, 0),
+	gsSP1Triangle(11, 6, 9, 0),
+	gsSP1Triangle(4, 6, 11, 0),
+	gsSP1Triangle(1, 4, 11, 0),
+	gsSP1Triangle(11, 2, 1, 0),
+	gsSPEndDisplayList(),
+};
+
+
+Gfx mat_m_foot_l_shoes_v3_001[] = {
+	gsDPPipeSync(),
+	gsDPSetCombineLERP(0, 0, 0, SHADE, 0, 0, 0, ENVIRONMENT, 0, 0, 0, SHADE, 0, 0, 0, ENVIRONMENT),
+	gsSPTexture(65535, 65535, 0, 0, 1),
+    gsSPLightColor(LIGHT_1, 0x721c0eff),
+    gsSPLightColor(LIGHT_2, 0x350803ff),
+	gsSPEndDisplayList(),
+};
+
+Gfx m_foot_l_skinned_018_mesh_layer_1[] = {
+	gsSPDisplayList(mat_m_foot_l_shoes_v3_001),
+	gsSPDisplayList(m_foot_l_skinned_018_mesh_layer_1_tri_0),
+	gsSPEndDisplayList(),
+};
+
+Gfx m_foot_l_material_revert_render_settings[] = {
+	gsDPPipeSync(),
+	gsSPSetGeometryMode(G_LIGHTING),
+	gsSPClearGeometryMode(G_TEXTURE_GEN),
+	gsDPSetCombineLERP(0, 0, 0, SHADE, 0, 0, 0, ENVIRONMENT, 0, 0, 0, SHADE, 0, 0, 0, ENVIRONMENT),
+	gsSPTexture(65535, 65535, 0, 0, 0),
+	gsDPSetEnvColor(255, 255, 255, 255),
+	gsDPSetAlphaCompare(G_AC_NONE),
+	gsSPEndDisplayList(),
+};
+
