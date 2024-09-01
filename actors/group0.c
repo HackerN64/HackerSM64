@@ -31,6 +31,11 @@
 #include FONT_C_FILE
 #endif
 
+
+#include "physcube/model.inc.c"
+#include "physcube/collision.inc.c"
+#include "physsphere/model.inc.c"
+#include "physsphere/collision.inc.c"
 #include "m_body/model.inc.c"
 #include "m_head/model.inc.c"
 #include "m_shoulder_l/model.inc.c"
