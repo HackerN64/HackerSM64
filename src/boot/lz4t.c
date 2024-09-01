@@ -4,13 +4,39 @@
 
 #include "macros.h"
 
+// returns not 0 if last nibble was encountered
+static inline int lz4t_load_fresh_nibbles(int32_t* _nibbles, const uint8_t* restrict* _inbuf)
+{
+#define nibbles (*_nibbles)
+#define inbuf (*_inbuf)
+    if (!nibbles)
+    {
+        nibbles = GET_UNALIGNED4S(inbuf);
+        if (!nibbles)
+            return 1;
+
+        inbuf += 4;
+    }
+
+    return 0;
+#undef inbuf
+#undef nibbles
+}
+
+// DMA checks is checking whether dmaLimit will be exceeded after reading the data.
+// 'dma_async_ctx_read' will wait for the current DMA request and fire the next DMA request
+static inline void lz4t_dma_check(const uint8_t* check, const uint8_t** _dmaLimit, struct DMAAsyncCtx* ctx)
+{
+#define dmaLimit (*_dmaLimit)
+    if (check > dmaLimit)
+    {
+        dmaLimit = dma_async_ctx_read(ctx);
+    }
+#undef dmaLimit
+}
+
 OPTIMIZE_OS void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restrict dst, struct DMAAsyncCtx* ctx)
 {
-#define LOAD_FRESH_NIBBLES() if (nibbles == 0) { nibbles = GET_UNALIGNED4S(inbuf); if (!nibbles) { return; } inbuf += 4; }
-    // DMA checks is checking whether dmaLimit will be exceeded after reading the data.
-    // 'dma_async_ctx_read' will wait for the current DMA request and fire the next DMA request
-#define DMA_CHECK(v) if (v > dmaLimit) { dmaLimit = dma_async_ctx_read(ctx); }
-
     uint32_t shortOffsetMask = *(uint8_t*) (inbuf + 8);
     shortOffsetMask <<= 28;
     int matchMin = *(int8_t*) (inbuf + 9);
@@ -20,13 +46,14 @@ OPTIMIZE_OS void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restri
     while (1)
     {
         // we will need to read the data (literal or offset) so might as well do it unconditionally from the start
-        DMA_CHECK(inbuf);
+        lz4t_dma_check(inbuf, &dmaLimit, ctx);
 
         // matchLim will define the max amount of size encoded in a single nibble
         // If it is a match after guaranteed literal, it is 15, otherwise 7 (we checked for nibbles >= 0)
         int matchLim = 7;
 
-        LOAD_FRESH_NIBBLES();
+        if (lz4t_load_fresh_nibbles(&nibbles, &inbuf))
+            return;
 
         // Each nibble is either 0xxx or 1xxx, xxx is a length
         int len = 7 & (nibbles >> 28);
@@ -77,8 +104,9 @@ OPTIMIZE_OS void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restri
                 inbuf += len;
                 do
                 {
-                    // TODO: This is unnecessary for the first loop, we are already in the range
-                    DMA_CHECK(copySrc);
+                    // This is technically unnecessary for the first loop, we are already in the range
+                    // but keeping here to reduce a bit of code size
+                    lz4t_dma_check(copySrc, &dmaLimit, ctx);
                     const uint64_t data = GET_UNALIGNED8(copySrc);
                     copySrc += 8;
                     PUT_UNALIGNED8(data, dst);
@@ -92,17 +120,17 @@ OPTIMIZE_OS void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restri
 
             // here is a fallthru for matches with extended limit so clear out the nibble
             nibbles <<= 4;
-            LOAD_FRESH_NIBBLES();
+            if (lz4t_load_fresh_nibbles(&nibbles, &inbuf))
+                return;
 
             // match limit is 15 because it is after guaranteed literal
             matchLim = 15;
             // we are here after a literal was loaded so check DMA before loading offset in
-            DMA_CHECK(inbuf);
+            lz4t_dma_check(inbuf, &dmaLimit, ctx);
             // cast like this is valid - signed to unsigned will just properly overflow
             len = (((uint32_t) nibbles) >> 28);
         }
 
-matches:
         // pull in offset and potentially the first size
         uint32_t matchCombo = GET_UNALIGNED4(inbuf);
         inbuf += 2;
@@ -188,9 +216,6 @@ matches:
 
         // repeat the loop...
     }
-
-#undef DMA_CHECK
-#undef LOAD_FRESH_NIBBLES
 }
 
 #endif
