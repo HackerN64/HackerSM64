@@ -89,23 +89,18 @@ OPTIMIZE_OS void lz4t_unpack_slow(const uint8_t* restrict inbuf, uint8_t* restri
 
                 // ... and fallthru to matches with extended limit
             }
-        }
-        else
-        {
-            // This is ugly, but it is the easiest way to do it
-            goto matches;
-        }
 
-        // here is a fallthru for matches with extended limit so clear out the nibble
-        nibbles <<= 4;
-        LOAD_FRESH_NIBBLES();
+            // here is a fallthru for matches with extended limit so clear out the nibble
+            nibbles <<= 4;
+            LOAD_FRESH_NIBBLES();
 
-        // match limit is 15 because it is after guaranteed literal
-        matchLim = 15;
-        // we are here after a literal was loaded so check DMA before loading offset in
-        DMA_CHECK(inbuf);
-        // cast like this is valid - signed to unsigned will just properly overflow
-        len = (((uint32_t) nibbles) >> 28);
+            // match limit is 15 because it is after guaranteed literal
+            matchLim = 15;
+            // we are here after a literal was loaded so check DMA before loading offset in
+            DMA_CHECK(inbuf);
+            // cast like this is valid - signed to unsigned will just properly overflow
+            len = (((uint32_t) nibbles) >> 28);
+        }
 
 matches:
         // pull in offset and potentially the first size
