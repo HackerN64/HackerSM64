@@ -550,6 +550,21 @@
 #define MODEL_SILVER_COIN_NO_SHADOW       0xE3        // silver_coin_no_shadow_geo
 #endif
 
+#define MODEL_M_BODY           0x100
+#define MODEL_M_HEAD           0x101
+#define MODEL_M_SHOULDER_L           0x102
+#define MODEL_M_SHOULDER_R           0x103
+#define MODEL_M_ARM_L           0x104
+#define MODEL_M_ARM_R           0x105
+#define MODEL_M_HAND_L           0x106
+#define MODEL_M_HAND_R           0x107
+#define MODEL_M_THIGH_L           0x108
+#define MODEL_M_THIGH_R           0x109
+#define MODEL_M_LEG_L           0x10A
+#define MODEL_M_LEG_R           0x10B
+#define MODEL_M_FOOT_L           0x10C
+#define MODEL_M_FOOT_R           0x10D
+
 // Menu Models (overwrites Level Geometry IDs)
 #define MODEL_MAIN_MENU_MARIO_SAVE_BUTTON         MODEL_LEVEL_GEOMETRY_03   // main_menu_geo_0001D0
 #define MODEL_MAIN_MENU_RED_ERASE_BUTTON          MODEL_LEVEL_GEOMETRY_04   // main_menu_geo_000290
