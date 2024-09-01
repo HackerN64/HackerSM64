@@ -300,7 +300,7 @@ struct Object {
         const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
     } ptrData;
 #endif
-    /*0x1C8*/ u32 unused1;
+    /*0x1C8*/ struct RigidBody *rigidBody;
     /*0x1CC*/ const BehaviorScript *curBhvCommand;
     /*0x1D0*/ u32 bhvStackIndex;
     /*0x1D4*/ uintptr_t bhvStack[8];
