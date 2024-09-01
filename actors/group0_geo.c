@@ -17,6 +17,8 @@
 #include "sparkle_animation/geo.inc.c"
 #include "mario/geo.inc.c"
 
+#include "physcube/geo.inc.c"
+#include "physsphere/geo.inc.c"
 #include "m_body/geo.inc.c"
 #include "m_head/geo.inc.c"
 #include "m_shoulder_l/geo.inc.c"
