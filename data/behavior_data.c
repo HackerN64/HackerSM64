@@ -6074,4 +6074,24 @@ const BehaviorScript bhvIntroScene[] = {
     END_LOOP(),
 };
 
+const BehaviorScript bhvSampleCube[] = {
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO)),
+    LOAD_COLLISION_DATA(physcube_collision),
+    CALL_NATIVE(bhv_sample_cube_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_sample_cube_loop),
+        CALL_NATIVE(load_object_collision_model),
+    END_LOOP(),
+};
 
+const BehaviorScript bhvSampleSphere[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO)),
+    //LOAD_COLLISION_DATA(physsphere_collision),
+    CALL_NATIVE(bhv_sample_cube_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_sample_cube_loop),
+        //CALL_NATIVE(load_object_collision_model),
+    END_LOOP(),
+};
