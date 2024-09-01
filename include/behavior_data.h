@@ -542,3 +542,6 @@ extern const BehaviorScript bhvIntroScene[];
 extern const BehaviorScript bhvUnusedFakeStar[];
 
 #endif // BEHAVIOR_DATA_H
+
+extern const BehaviorScript bhvSampleCube[];
+extern const BehaviorScript bhvSampleSphere[];
