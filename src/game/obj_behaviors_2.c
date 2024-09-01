@@ -45,6 +45,7 @@
 #include "save_file.h"
 #include "seq_ids.h"
 #include "spawn_sound.h"
+#include "src/game/rigid_body.h"
 
 //! TODO: remove static
 
