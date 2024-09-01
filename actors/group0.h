@@ -331,6 +331,14 @@ extern const Gfx white_particle_small_dl_end[];
 extern const Gfx white_particle_small_dl[];
 extern const Gfx white_particle_small_unused_dl[];
 
+#include "physcube/geo_header.h"
+
+#include "physcube/collision_header.h"
+
+#include "physsphere/geo_header.h"
+
+#include "physsphere/collision_header.h"
+
 #include "m_body/geo_header.h"
 
 #include "m_head/geo_header.h"
