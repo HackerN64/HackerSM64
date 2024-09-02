@@ -1230,15 +1230,11 @@ s32 update_level(void) {
 }
 
 #ifdef PUPPYPRINT_DEBUG
-extern u8 gLoadLevel;
-extern u32 gLoadLevelAreaTime;
+extern u32 gInitLevelTime;
 #endif
 
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
-#ifdef PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
 
     set_play_mode(PLAY_MODE_NORMAL);
 
@@ -1329,7 +1325,11 @@ s32 init_level(void) {
     }
 
 #ifdef PUPPYPRINT_DEBUG
-    gLoadLevelAreaTime = osGetCount() - first;
+    if (gInitLevelTime) {
+        u32 totalTime = osGetCount() - gInitLevelTime;
+        append_puppyprint_log("Level loaded in %2.3fs.", (f64) (f32)((totalTime) / 46875000.0f));
+        gInitLevelTime = 0;
+    }
 #endif
 
     return TRUE;

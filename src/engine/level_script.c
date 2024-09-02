@@ -42,8 +42,7 @@
 #define NEXT_CMD ((struct LevelCommand *) ((sCurrentCmd->size << CMD_SIZE_SHIFT) + (u8 *) sCurrentCmd))
 
 #ifdef PUPPYPRINT_DEBUG
-u8 gLoadLevel;
-u32 gLoadLevelAreaTime;
+u32 gInitLevelTime;
 #endif
 
 struct LevelCommand {
@@ -328,7 +327,7 @@ static void level_cmd_change_area_skybox(void) {
 
 static void level_cmd_init_level(void) {
 #ifdef PUPPYPRINT_DEBUG
-    gLoadLevel = 1;
+    gInitLevelTime = osGetTime();
 #endif
 
     init_graph_node_start(NULL, (struct GraphNodeStart *) &gObjParentGraphNode);
@@ -951,22 +950,9 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
     sScriptStatus = SCRIPT_RUNNING;
     sCurrentCmd = cmd;
 
-#ifdef PUPPYPRINT_DEBUG
-    u32 first = osGetCount();
-#endif
-
     while (sScriptStatus == SCRIPT_RUNNING) {
         LevelScriptJumpTable[sCurrentCmd->type]();
     }
-
-#ifdef PUPPYPRINT_DEBUG
-    if (gLoadLevel && gLoadLevelAreaTime) {
-        u32 totalTime = gLoadLevelAreaTime + (osGetCount() - first);
-        append_puppyprint_log("Level loaded in %2.3fs.", (f64) (f32)((totalTime) / 46875000.0f));
-        gLoadLevel = FALSE;
-        gLoadLevelAreaTime = 0;
-    }
-#endif
 
     init_rcp(CLEAR_ZBUFFER);
     render_game();
