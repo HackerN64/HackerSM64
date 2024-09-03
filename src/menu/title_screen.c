@@ -35,6 +35,8 @@ static char sLevelSelectStageNames[64][16] = {
 #ifdef KEEP_MARIO_HEAD
 #ifndef DISABLE_DEMO
 static u16 sDemoCountdown = 0;
+static u16 gDemoLevel = 0;
+extern struct DemoInput *gDemoInputs[LEVEL_COUNT];
 #endif
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
@@ -56,20 +58,19 @@ s32 run_level_id_or_demo(s32 level) {
             // player is idle on PRESS START screen.
             if ((++sDemoCountdown) == PRESS_START_DEMO_TIMER) {
 
-                // start the Mario demo animation for the demo list.
-                load_patchable_table(&gDemoInputsBuf, gDemoInputListID);
-
-                // if the next demo sequence ID is the count limit, reset it back to
-                // the first sequence.
-                if (++gDemoInputListID == gDemoInputsBuf.dmaTable->count) {
-                    gDemoInputListID = 0;
+                // Find a non-null demo in the list
+                while (gDemoInputs[gDemoLevel] == NULL) {
+                    if (gDemoLevel >= LEVEL_COUNT) {
+                        gDemoLevel = 0;
+                    }
+                    gDemoLevel++;
                 }
 
                 // add 1 (+4) to the pointer to skip the first 4 bytes
                 // Use the first 4 bytes to store level ID,
                 // then use the rest of the values for inputs
-                gCurrDemoInput = ((struct DemoInput *) gDemoInputsBuf.bufTarget) + 1;
-                level = (s8)((struct DemoInput *) gDemoInputsBuf.bufTarget)->timer;
+                gCurrDemoInput = gDemoInputs[gDemoLevel];
+                level = gDemoLevel;
                 gCurrSaveFileNum = 1;
                 gCurrActNum = 1;
             }

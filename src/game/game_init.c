@@ -70,9 +70,7 @@ uintptr_t gPhysicalZBuffer;
 
 // Mario Anims and Demo allocation
 void *gMarioAnimsMemAlloc;
-void *gDemoInputsMemAlloc;
 struct DmaHandlerList gMarioAnimsBuf;
-struct DmaHandlerList gDemoInputsBuf;
 
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
@@ -94,7 +92,6 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
-u16 gDemoInputListID = 0;
 struct DemoInput gRecordedDemoInput = { 0 };
 
 // Display
@@ -748,10 +745,9 @@ void setup_game_memory(void) {
     set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
     set_segment_memory_printout(SEGMENT_DEMO_INPUTS, DEMO_INPUTS_POOL_SIZE);
 #endif
-    // Setup Demo Inputs List
-    gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
-    setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
+    // Setup Demo Inputs Memory
+    void *demoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) demoInputsMemAlloc);
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
     // Setup Segment 2 (Fonts, Text, etc)
