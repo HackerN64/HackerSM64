@@ -1327,7 +1327,7 @@ s32 init_level(void) {
 #ifdef PUPPYPRINT_DEBUG
     if (gInitLevelTime) {
         u32 totalTime = osGetCount() - gInitLevelTime;
-        append_puppyprint_log("Level loaded in %2.3fs.", (f64) (f32)((totalTime) / 46875000.0f));
+        append_puppyprint_log("Level loaded in %2.3fs.", (f64) OS_CYCLES_TO_USEC(totalTime) / 1000000.0f);
         gInitLevelTime = 0;
     }
 #endif
