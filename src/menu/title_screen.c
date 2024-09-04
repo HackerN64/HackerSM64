@@ -36,7 +36,7 @@ static char sLevelSelectStageNames[64][16] = {
 #ifndef DISABLE_DEMO
 static u16 sDemoCountdown = 0;
 struct DemoFile gDemos[LEVEL_COUNT] ALIGNED8;
-#endif
+#endif // DISABLE_DEMO
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
 
@@ -83,7 +83,7 @@ s32 run_level_id_or_demo(s32 level) {
                 dma_read((u8 *) demoBank, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
 
                 // Point the current input to the demo segment
-                // gCurrDemoInput = demoBank;
+                gCurrDemoInput = demoBank;
                 level = gDemoLevel + 1;
                 gCurrSaveFileNum = 1;
                 gCurrActNum = 1;
@@ -94,8 +94,8 @@ s32 run_level_id_or_demo(s32 level) {
     }
     return level;
 }
-#endif
-#endif
+#endif // DISABLE_DEMO
+#endif // KEEP_MARIO_HEAD
 
 
 u8 gLevelSelectHoldKeyIndex = 0;
@@ -205,13 +205,13 @@ s32 intro_regular(void) {
     if (gPlayer1Controller->buttonDown & L_TRIG) {
         gDebugLevelSelect = TRUE;
     }
-#endif
+#endif // DEBUG_LEVEL_SELECT
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
         queue_rumble_data(60, 70);
         queue_rumble_decay(1);
-#endif
+#endif // ENABLE_RUMBLE
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
@@ -222,7 +222,7 @@ s32 intro_regular(void) {
     return run_level_id_or_demo(level);
 #else
     return level;
-#endif
+#endif // DISABLE_DEMO && KEEP_MARIO_HEAD
 }
 
 /**
@@ -243,7 +243,7 @@ s32 intro_game_over(void) {
 #if ENABLE_RUMBLE
         queue_rumble_data(60, 70);
         queue_rumble_decay(1);
-#endif
+#endif // ENABLE_RUMBLE
         // same criteria as intro_regular
         level = LEVEL_FILE_SELECT + gDebugLevelSelect;
         sPlayMarioGameOver = TRUE;
@@ -252,10 +252,10 @@ s32 intro_game_over(void) {
     return run_level_id_or_demo(level);
 #else
     return level;
-#endif
+#endif // DISABLE_DEMO && KEEP_MARIO_HEAD
 }
 
-#endif
+#endif // KEEP_MARIO_HEAD
 
 /**
  * Plays the casual "It's a me mario" when the game stars.
@@ -275,16 +275,16 @@ s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
 #ifdef KEEP_MARIO_HEAD
         case LVL_INTRO_REGULAR:             return intro_regular();
         case LVL_INTRO_GAME_OVER:           return intro_game_over();
-#else
+#else // KEEP_MARIO_HEAD
         case LVL_INTRO_REGULAR:
 #ifdef DEBUG_LEVEL_SELECT
             if (gPlayer1Controller->buttonDown & L_TRIG) {
                 gDebugLevelSelect = TRUE;
             }
-#endif
+#endif // DEBUG_LEVEL_SELECT
             // fallthrough
         case LVL_INTRO_GAME_OVER:           return (LEVEL_FILE_SELECT + gDebugLevelSelect);
-#endif
+#endif // KEEP_MARIO_HEAD
         case LVL_INTRO_LEVEL_SELECT:        return intro_level_select();
         default: return LEVEL_NONE;
     }
