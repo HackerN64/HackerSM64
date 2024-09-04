@@ -512,8 +512,7 @@ void print_demo_input(struct DemoInput *d) {
         }
 
         u32 len = strlen(buttonStr);
-        buttonStr[len - 1] = 0;
-        buttonStr[len - 2] = 0;
+        buttonStr[len - 3] = 0; // Remove the trailing ' | '
     }
 
     sprintf(text, "for %3d frames;  stick %4d, %4d;  press %s\n",
