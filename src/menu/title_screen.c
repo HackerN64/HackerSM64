@@ -77,7 +77,6 @@ s32 run_level_id_or_demo(s32 level) {
                         sDemoCountdown = 0;
                         return level;
                     }
-                    osSyncPrintf("LLLEvel");
                 } while (gDemos[gDemoLevel].romStart == NULL);
 
                 struct DemoInput *demoBank = (struct DemoInput *) get_segment_base_addr(SEGMENT_DEMO_INPUTS);
