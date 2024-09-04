@@ -1,247 +1,286 @@
 #include <PR/os_cont.h>
 #include "demo_macros.inc"
 
-for  60 frames;  stick    0,    0;  press _
-for   1 frames;  stick    0,   12;  press _
-for   1 frames;  stick   16,   25;  press _
-for   1 frames;  stick   29,   39;  press _
-for   1 frames;  stick   38,   55;  press _
-for   1 frames;  stick   40,   73;  press _
-for   1 frames;  stick   29,   75;  press _
-for   2 frames;  stick   27,   75;  press _
-for   1 frames;  stick   17,   77;  press _
-for  12 frames;  stick    0,   80;  press _
-for   1 frames;  stick    0,   80;  press A
-for   1 frames;  stick   12,   80;  press A
-for   1 frames;  stick   23,   79;  press A
-for   4 frames;  stick   27,   77;  press A
-for   1 frames;  stick   39,   75;  press A
-for   1 frames;  stick   49,   72;  press A
-for   1 frames;  stick   56,   71;  press A
-for   1 frames;  stick   58,   71;  press A
-for   1 frames;  stick   58,   70;  press _
-for   1 frames;  stick   62,   69;  press _
-for  32 frames;  stick   63,   69;  press _
-for   1 frames;  stick   57,   69;  press _
-for   1 frames;  stick   40,   73;  press _
-for   2 frames;  stick   33,   73;  press _
-for   1 frames;  stick   33,   74;  press _
-for   1 frames;  stick   23,   76;  press _
-for   1 frames;  stick   16,   78;  press _
-for   1 frames;  stick    8,   79;  press _
-for  14 frames;  stick    0,   80;  press _
-for   8 frames;  stick   -8,   80;  press _
-for   1 frames;  stick  -12,   80;  press _
-for   1 frames;  stick  -15,   80;  press _
-for   2 frames;  stick  -17,   79;  press _
-for   1 frames;  stick  -19,   79;  press _
-for   1 frames;  stick  -24,   78;  press _
-for   1 frames;  stick  -26,   78;  press _
-for   1 frames;  stick  -32,   77;  press _
-for  17 frames;  stick  -33,   77;  press _
-for   1 frames;  stick  -28,   78;  press _
-for   1 frames;  stick  -21,   79;  press _
-for  42 frames;  stick  -18,   80;  press _
-for   1 frames;  stick  -17,   79;  press _
-for   1 frames;  stick  -27,   77;  press _
-for   1 frames;  stick  -41,   74;  press _
-for   1 frames;  stick  -52,   72;  press _
-for   4 frames;  stick  -54,   72;  press _
-for   1 frames;  stick  -56,   71;  press _
-for   5 frames;  stick  -58,   71;  press _
-for   1 frames;  stick  -58,   70;  press _
-for   1 frames;  stick  -53,   71;  press _
-for   1 frames;  stick  -45,   72;  press _
-for   1 frames;  stick  -39,   73;  press _
-for   1 frames;  stick  -35,   74;  press _
-for   1 frames;  stick  -26,   76;  press _
-for   1 frames;  stick    0,   79;  press _
-for  10 frames;  stick    0,   80;  press _
-for   1 frames;  stick   13,   80;  press _
-for   1 frames;  stick   28,   78;  press _
-for  34 frames;  stick   30,   77;  press _
-for   1 frames;  stick   34,   76;  press _
-for   1 frames;  stick   40,   75;  press _
-for   1 frames;  stick   48,   72;  press _
-for   6 frames;  stick   49,   72;  press _
-for   1 frames;  stick   52,   72;  press _
-for   5 frames;  stick   53,   72;  press _
-for   1 frames;  stick   51,   72;  press _
-for   1 frames;  stick   39,   73;  press _
-for   1 frames;  stick   27,   75;  press _
-for   1 frames;  stick   20,   77;  press _
-for   2 frames;  stick   19,   77;  press _
-for   1 frames;  stick   13,   78;  press _
-for   1 frames;  stick   11,   79;  press _
-for   8 frames;  stick    0,   80;  press _
-for   1 frames;  stick   10,   80;  press _
-for   9 frames;  stick   10,   80;  press A
-for   5 frames;  stick   13,   80;  press A
-for   1 frames;  stick   27,   79;  press A
-for   1 frames;  stick   31,   77;  press A
-for   1 frames;  stick   35,   77;  press A
-for   5 frames;  stick   36,   76;  press A
-for   1 frames;  stick   36,   76;  press _
-for   1 frames;  stick   53,   71;  press _
-for   2 frames;  stick   54,   71;  press _
-for   1 frames;  stick   53,   68;  press _
-for   1 frames;  stick   44,   55;  press _
-for  53 frames;  stick    0,    0;  press _
-for   1 frames;  stick    0,    9;  press _
-for   1 frames;  stick    0,   12;  press _
-for   1 frames;  stick    0,   24;  press _
-for   1 frames;  stick    0,   53;  press _
-for   5 frames;  stick    0,   82;  press _
-for   1 frames;  stick    0,   78;  press _
-for   1 frames;  stick    0,   65;  press _
-for  24 frames;  stick    0,    0;  press _
-for   1 frames;  stick    0,   17;  press _
-for   1 frames;  stick    0,   30;  press _
-for   1 frames;  stick    0,   46;  press _
-for   1 frames;  stick    0,   62;  press _
-for   1 frames;  stick    0,   69;  press _
-for   1 frames;  stick    0,   75;  press _
-for   1 frames;  stick    0,   77;  press _
-for   1 frames;  stick    0,   79;  press _
-for  23 frames;  stick    0,   80;  press _
-for   1 frames;  stick   11,   66;  press _
-for   1 frames;  stick   24,   38;  press _
-for   1 frames;  stick   23,   32;  press _
-for   1 frames;  stick    0,    8;  press _
-for  69 frames;  stick    0,    0;  press _
-for   1 frames;  stick  -11,   10;  press _
-for   1 frames;  stick  -20,   16;  press _
-for   1 frames;  stick  -29,   25;  press _
-for   1 frames;  stick  -42,   36;  press _
-for   1 frames;  stick  -43,   37;  press _
-for   3 frames;  stick  -45,   41;  press _
-for   2 frames;  stick  -46,   42;  press _
-for   1 frames;  stick  -46,   44;  press _
-for   1 frames;  stick  -46,   47;  press _
-for   6 frames;  stick  -46,   48;  press _
-for   1 frames;  stick  -46,   50;  press _
-for   1 frames;  stick  -35,   53;  press _
-for   1 frames;  stick  -10,   55;  press _
-for   6 frames;  stick    0,   60;  press _
-for   1 frames;  stick    0,   60;  press A
-for   1 frames;  stick    0,   61;  press A
-for   1 frames;  stick    0,   63;  press A
-for   1 frames;  stick  -28,   66;  press A
-for   1 frames;  stick  -29,   67;  press A
-for   3 frames;  stick  -29,   67;  press _
-for   1 frames;  stick  -38,   68;  press _
-for   6 frames;  stick  -45,   68;  press _
-for   1 frames;  stick  -45,   67;  press _
-for   1 frames;  stick  -40,   57;  press _
-for   1 frames;  stick  -37,   50;  press _
-for   1 frames;  stick  -34,   46;  press _
-for   1 frames;  stick  -21,   33;  press _
-for  73 frames;  stick    0,    0;  press _
-for   1 frames;  stick    0,  -15;  press _
-for   1 frames;  stick    0,  -21;  press _
-for   1 frames;  stick    0,  -26;  press _
-for   1 frames;  stick    0,  -28;  press _
-for   1 frames;  stick    0,  -31;  press _
-for   1 frames;  stick    0,  -34;  press _
-for   1 frames;  stick    0,  -40;  press _
-for   1 frames;  stick    0,  -42;  press _
-for   1 frames;  stick    0,  -51;  press _
-for   1 frames;  stick    0,  -69;  press _
-for  91 frames;  stick    0,  -81;  press _
-for   1 frames;  stick    0,  -61;  press _
-for   1 frames;  stick    0,  -27;  press _
-for  50 frames;  stick    0,    0;  press _
-for   1 frames;  stick    0,    8;  press _
-for   1 frames;  stick  -14,   17;  press _
-for   1 frames;  stick  -27,   30;  press _
-for   1 frames;  stick  -39,   41;  press _
-for   1 frames;  stick  -51,   53;  press _
-for   3 frames;  stick  -53,   55;  press _
-for   1 frames;  stick  -55,   55;  press _
-for   3 frames;  stick  -57,   56;  press _
-for   1 frames;  stick  -58,   56;  press _
-for   6 frames;  stick  -59,   56;  press _
-for   1 frames;  stick  -60,   56;  press _
-for   1 frames;  stick  -61,   56;  press _
-for   1 frames;  stick  -62,   56;  press _
+for  40 frames;  stick    0,    0;  press _
+for   1 frames;  stick    8,   70;  press _
+for  10 frames;  stick    8,   71;  press _
+for   1 frames;  stick    8,   71;  press Z
+for   1 frames;  stick    8,   71;  press A | Z
+for   1 frames;  stick   10,   71;  press A | Z
+for   1 frames;  stick   18,   68;  press A | Z
+for   1 frames;  stick   30,   61;  press A | Z
+for   2 frames;  stick   54,   55;  press A | Z
+for   2 frames;  stick   55,   54;  press A | Z
+for   1 frames;  stick   56,   54;  press A | Z
+for   1 frames;  stick   59,   44;  press A | Z
+for   1 frames;  stick   65,   23;  press A | Z
+for   1 frames;  stick   77,    0;  press A | Z
+for   1 frames;  stick   81,    0;  press A | Z
+for   1 frames;  stick   82,    0;  press Z
+for  20 frames;  stick   82,    0;  press _
+for   2 frames;  stick   81,    0;  press _
+for   1 frames;  stick   67,   27;  press _
+for   1 frames;  stick   61,   46;  press _
+for   2 frames;  stick   58,   53;  press _
+for   1 frames;  stick   53,   53;  press _
+for   1 frames;  stick   41,   57;  press _
+for   1 frames;  stick   33,   61;  press _
+for   1 frames;  stick   22,   62;  press _
+for   1 frames;  stick   11,   65;  press _
+for   3 frames;  stick    0,   78;  press Z
+for   4 frames;  stick    0,   78;  press A | Z
+for   1 frames;  stick   20,   65;  press A | Z
+for   1 frames;  stick   44,   58;  press Z
+for   2 frames;  stick   56,   54;  press Z
+for   1 frames;  stick   73,    9;  press Z
+for   1 frames;  stick   76,    0;  press Z
+for   1 frames;  stick   77,    0;  press Z
+for   1 frames;  stick   77,    0;  press _
+for   1 frames;  stick   74,    0;  press _
+for   1 frames;  stick   67,   21;  press _
+for   1 frames;  stick   61,   38;  press _
+for   1 frames;  stick   57,   52;  press _
+for   1 frames;  stick   54,   53;  press _
+for   1 frames;  stick   35,   60;  press _
+for   1 frames;  stick   12,   66;  press _
+for   2 frames;  stick    0,   81;  press _
+for  18 frames;  stick    0,   82;  press _
+for   2 frames;  stick    0,   82;  press Z
+for   4 frames;  stick    0,   79;  press A | Z
+for   1 frames;  stick    0,   78;  press A | Z
+for   3 frames;  stick    0,   79;  press A | Z
+for   2 frames;  stick    0,   80;  press A | Z
+for   6 frames;  stick    0,   81;  press A | Z
+for   1 frames;  stick    0,   82;  press A | Z
+for   1 frames;  stick    0,   81;  press A | Z
+for   1 frames;  stick    0,   82;  press A | Z
+for  13 frames;  stick    0,   82;  press _
+for   1 frames;  stick    0,   80;  press _
+for   1 frames;  stick  -14,   74;  press _
+for   1 frames;  stick  -23,   71;  press _
+for   1 frames;  stick  -32,   65;  press _
+for   3 frames;  stick  -61,   55;  press _
 for   1 frames;  stick  -62,   55;  press _
-for   1 frames;  stick  -63,   52;  press _
-for   1 frames;  stick  -65,   48;  press _
-for   1 frames;  stick  -66,   46;  press _
-for   2 frames;  stick  -66,   45;  press _
-for   1 frames;  stick  -67,   43;  press _
-for   1 frames;  stick  -68,   40;  press _
-for   1 frames;  stick  -69,   39;  press _
-for   1 frames;  stick  -69,   35;  press _
-for   1 frames;  stick  -70,   31;  press _
-for   1 frames;  stick  -71,   24;  press _
-for   1 frames;  stick  -72,   16;  press _
-for   1 frames;  stick  -73,    0;  press _
-for   1 frames;  stick  -73,   -8;  press _
-for   1 frames;  stick  -73,  -29;  press _
-for   1 frames;  stick  -68,  -60;  press _
-for   1 frames;  stick  -65,  -70;  press _
-for   4 frames;  stick  -65,  -69;  press _
-for  11 frames;  stick  -65,  -70;  press _
-for   1 frames;  stick  -65,  -69;  press _
-for   1 frames;  stick  -61,  -55;  press _
-for   1 frames;  stick  -42,  -29;  press _
-for   1 frames;  stick  -38,  -23;  press _
-for   1 frames;  stick  -35,  -10;  press _
-for   2 frames;  stick  -32,    0;  press _
-for   1 frames;  stick  -33,    0;  press _
-for   1 frames;  stick  -34,    0;  press _
-for   2 frames;  stick  -35,    0;  press _
-for   1 frames;  stick  -35,   14;  press _
-for   1 frames;  stick  -33,   20;  press _
-for   1 frames;  stick  -29,   24;  press _
-for   1 frames;  stick  -28,   24;  press _
-for   1 frames;  stick  -25,   23;  press _
-for   1 frames;  stick  -18,   19;  press _
-for   1 frames;  stick    0,   10;  press _
-for   7 frames;  stick    0,    0;  press _
-for   1 frames;  stick   14,   13;  press _
-for   1 frames;  stick   20,   22;  press _
-for   1 frames;  stick   22,   25;  press _
-for   1 frames;  stick   22,   28;  press _
-for   1 frames;  stick   29,   37;  press _
-for   1 frames;  stick   34,   43;  press _
-for   1 frames;  stick   38,   47;  press _
-for   1 frames;  stick   40,   49;  press _
-for   1 frames;  stick   45,   53;  press _
-for   1 frames;  stick   49,   56;  press _
-for   1 frames;  stick   49,   57;  press _
-for   1 frames;  stick   49,   58;  press _
-for   1 frames;  stick   49,   59;  press _
-for   1 frames;  stick   49,   61;  press _
-for   1 frames;  stick   49,   65;  press _
-for   1 frames;  stick   47,   71;  press _
-for   1 frames;  stick   44,   72;  press _
-for   9 frames;  stick   37,   73;  press _
-for   1 frames;  stick   35,   74;  press _
-for   1 frames;  stick   24,   76;  press _
-for   1 frames;  stick   18,   77;  press _
-for   1 frames;  stick   16,   77;  press _
-for   1 frames;  stick   13,   78;  press _
-for   3 frames;  stick    0,   79;  press _
-for   6 frames;  stick    0,   80;  press _
-for   1 frames;  stick   -9,   80;  press _
-for   1 frames;  stick  -15,   80;  press _
-for   3 frames;  stick  -21,   79;  press _
-for   2 frames;  stick  -29,   77;  press _
-for   1 frames;  stick  -33,   76;  press _
-for   1 frames;  stick  -39,   73;  press _
-for   3 frames;  stick  -56,   67;  press _
-for  20 frames;  stick  -56,   66;  press _
-for   1 frames;  stick  -56,   65;  press _
-for   1 frames;  stick  -54,   63;  press _
-for   1 frames;  stick  -50,   60;  press _
-for   1 frames;  stick  -48,   58;  press _
-for   1 frames;  stick  -47,   57;  press _
-for   9 frames;  stick  -46,   56;  press _
-for   1 frames;  stick  -42,   52;  press _
-for   1 frames;  stick  -40,   50;  press _
-for   1 frames;  stick  -36,   46;  press _
-for   1 frames;  stick  -29,   39;  press _
-for  60 frames;  stick    0,    0;  press _
+for   2 frames;  stick  -61,   55;  press _
+for   1 frames;  stick  -56,   55;  press _
+for   1 frames;  stick  -26,   64;  press _
+for   3 frames;  stick    0,   82;  press _
+for   1 frames;  stick    0,   77;  press _
+for   1 frames;  stick  -37,   63;  press _
+for   5 frames;  stick  -64,   55;  press _
+for   1 frames;  stick  -57,   55;  press _
+for   1 frames;  stick  -52,   58;  press _
+for   1 frames;  stick  -46,   60;  press _
+for   2 frames;  stick  -42,   62;  press _
+for   2 frames;  stick  -43,   62;  press _
+for   1 frames;  stick  -42,   62;  press _
+for   1 frames;  stick  -36,   62;  press _
+for   1 frames;  stick  -28,   64;  press _
+for   1 frames;  stick   -8,   73;  press _
+for   1 frames;  stick    0,   76;  press _
+for   1 frames;  stick    0,   80;  press _
+for   1 frames;  stick    0,   20;  press _
+for  31 frames;  stick    0,    0;  press _
+for   1 frames;  stick    0,   27;  press _
+for   1 frames;  stick    0,   79;  press _
+for  15 frames;  stick    0,   82;  press _
+for   1 frames;  stick   -8,   76;  press _
+for   1 frames;  stick  -18,   72;  press _
+for   1 frames;  stick  -39,   62;  press _
+for   1 frames;  stick  -52,   58;  press _
+for   1 frames;  stick  -56,   55;  press _
+for   2 frames;  stick  -57,   55;  press _
+for   1 frames;  stick  -59,   55;  press _
+for   1 frames;  stick  -59,   55;  press Z
+for   1 frames;  stick  -50,   59;  press A | Z
+for   1 frames;  stick  -44,   61;  press A | Z
+for   1 frames;  stick  -25,   67;  press A | Z
+for   1 frames;  stick    0,   83;  press A | Z
+for   4 frames;  stick    0,   84;  press A | Z
+for   2 frames;  stick    0,   82;  press A | Z
+for   1 frames;  stick    0,   73;  press A | Z
+for   1 frames;  stick   20,   65;  press A | Z
+for   1 frames;  stick   32,   62;  press A | Z
+for  10 frames;  stick   37,   61;  press A | Z
+for   1 frames;  stick   34,   60;  press A | Z
+for   1 frames;  stick   29,   61;  press A | Z
+for   1 frames;  stick   17,   63;  press A | Z
+for   1 frames;  stick   11,   65;  press A | Z
+for   1 frames;  stick    0,   74;  press A | Z
+for   2 frames;  stick    0,   81;  press A | Z
+for   1 frames;  stick    0,   79;  press A | Z
+for   1 frames;  stick  -14,   73;  press A | Z
+for   1 frames;  stick  -25,   66;  press A | Z
+for   1 frames;  stick  -31,   65;  press A | Z
+for   1 frames;  stick  -36,   63;  press A
+for   1 frames;  stick  -43,   62;  press _
+for   4 frames;  stick  -46,   61;  press _
+for   1 frames;  stick  -34,   63;  press _
+for   1 frames;  stick    0,   79;  press _
+for   1 frames;  stick    0,   81;  press _
+for   1 frames;  stick   26,   62;  press _
+for   4 frames;  stick   54,   54;  press _
+for   2 frames;  stick   52,   54;  press _
+for   1 frames;  stick   53,   54;  press _
+for   9 frames;  stick   54,   54;  press _
+for   1 frames;  stick   50,   54;  press _
+for   1 frames;  stick   48,   54;  press Z
+for   2 frames;  stick   48,   54;  press A | Z
+for   1 frames;  stick   44,   54;  press A | Z
+for   1 frames;  stick   11,   65;  press A | Z
+for   1 frames;  stick    0,   81;  press A | Z
+for   8 frames;  stick    0,   82;  press A | Z
+for   9 frames;  stick    0,   81;  press A | Z
+for   1 frames;  stick    0,   80;  press A | Z
+for   1 frames;  stick    0,   77;  press A | Z
+for   1 frames;  stick    0,   74;  press A | Z
+for   1 frames;  stick   11,   70;  press A | Z
+for   1 frames;  stick   22,   63;  press A | Z
+for   1 frames;  stick   42,   59;  press A | Z
+for   3 frames;  stick   53,   55;  press A | Z
+for   1 frames;  stick   54,   55;  press A | Z
+for   1 frames;  stick   54,   55;  press Z
+for   3 frames;  stick   54,   55;  press _
+for   1 frames;  stick   39,   57;  press _
+for   1 frames;  stick   20,   37;  press A
+for   4 frames;  stick    0,    0;  press A
+for   1 frames;  stick    0,    0;  press _
+for   1 frames;  stick    0,   49;  press _
+for   1 frames;  stick    0,   81;  press _
+for   6 frames;  stick    0,   82;  press _
+for   1 frames;  stick   -8,   75;  press _
+for   1 frames;  stick  -24,   69;  press _
+for   1 frames;  stick  -42,   63;  press _
+for   1 frames;  stick  -48,   61;  press _
+for   4 frames;  stick  -50,   60;  press _
+for   1 frames;  stick  -46,   60;  press _
+for   1 frames;  stick  -42,   61;  press _
+for   1 frames;  stick  -16,   71;  press _
+for  11 frames;  stick    0,   82;  press _
+for   3 frames;  stick    0,   82;  press A
+for   1 frames;  stick    0,   82;  press _
+for   1 frames;  stick    0,   80;  press _
+for   8 frames;  stick    0,   77;  press _
+for   3 frames;  stick    0,   77;  press B
+for   3 frames;  stick    0,   77;  press _
+for   1 frames;  stick    0,   73;  press _
+for   1 frames;  stick    8,   72;  press A
+for   4 frames;  stick   10,   71;  press A
+for   2 frames;  stick   10,   71;  press _
+for   1 frames;  stick    9,   71;  press _
+for   1 frames;  stick    0,   77;  press _
+for   1 frames;  stick    0,   81;  press _
+for   5 frames;  stick    0,   82;  press _
+for   4 frames;  stick    0,   82;  press A
+for   1 frames;  stick    0,   78;  press A
+for   1 frames;  stick   -8,   76;  press A
+for   1 frames;  stick  -12,   73;  press B
+for   3 frames;  stick  -13,   74;  press B
+for   1 frames;  stick   -8,   73;  press B
+for   1 frames;  stick    0,   80;  press _
+for   3 frames;  stick    0,   81;  press _
+for  11 frames;  stick    0,   82;  press _
+for   1 frames;  stick  -14,   73;  press A
+for   1 frames;  stick  -36,   63;  press A
+for   1 frames;  stick  -52,   59;  press A
+for   1 frames;  stick  -62,   53;  press A
+for   1 frames;  stick  -63,   51;  press _
+for   1 frames;  stick  -64,   50;  press _
+for   1 frames;  stick  -64,   52;  press _
+for   1 frames;  stick  -64,   54;  press _
+for   1 frames;  stick  -63,   54;  press _
+for   1 frames;  stick  -54,   56;  press _
+for   1 frames;  stick  -44,   61;  press _
+for   5 frames;  stick  -43,   61;  press _
+for   1 frames;  stick  -39,   62;  press _
+for   1 frames;  stick  -33,   63;  press _
+for   1 frames;  stick  -25,   65;  press _
+for   1 frames;  stick    0,   79;  press _
+for   1 frames;  stick    0,   80;  press _
+for   1 frames;  stick   10,   70;  press _
+for   1 frames;  stick   34,   61;  press _
+for   3 frames;  stick   35,   61;  press _
+for   3 frames;  stick   38,   60;  press _
+for   1 frames;  stick   24,   61;  press _
+for   1 frames;  stick    0,   71;  press _
+for   7 frames;  stick    0,   82;  press _
+for   1 frames;  stick    0,   81;  press _
+for   1 frames;  stick    0,   77;  press Z
+for   1 frames;  stick    0,   73;  press A | Z
+for   1 frames;  stick   10,   70;  press A | Z
+for   1 frames;  stick   21,   64;  press A | Z
+for   1 frames;  stick   38,   60;  press Z
+for   1 frames;  stick   54,   55;  press Z
+for   1 frames;  stick   56,   53;  press _
+for   1 frames;  stick   56,   47;  press _
+for   1 frames;  stick   62,   36;  press _
+for   1 frames;  stick   66,   23;  press _
+for   1 frames;  stick   68,   17;  press _
+for   5 frames;  stick   69,   17;  press _
+for   3 frames;  stick   69,   17;  press C_Left
+for   1 frames;  stick   65,   21;  press _
+for   1 frames;  stick   53,   53;  press _
+for   1 frames;  stick   46,   56;  press _
+for   1 frames;  stick   39,   58;  press _
+for   1 frames;  stick   33,   60;  press _
+for   1 frames;  stick   16,   64;  press _
+for   1 frames;  stick   13,   63;  press _
+for   2 frames;  stick   13,   64;  press _
+for   1 frames;  stick   17,   64;  press _
+for   1 frames;  stick   54,   55;  press _
+for   1 frames;  stick   54,   54;  press _
+for   1 frames;  stick   54,   55;  press _
+for  10 frames;  stick   54,   54;  press _
+for   1 frames;  stick   53,   54;  press C_Left
+for   1 frames;  stick   44,   55;  press C_Left
+for   1 frames;  stick   37,   58;  press _
+for   1 frames;  stick   17,   62;  press _
+for   1 frames;  stick   14,   64;  press _
+for   2 frames;  stick   13,   64;  press _
+for   2 frames;  stick   11,   64;  press _
+for   1 frames;  stick   32,   61;  press _
+for   3 frames;  stick   36,   61;  press _
+for   1 frames;  stick   33,   60;  press _
+for   2 frames;  stick   25,   61;  press _
+for   1 frames;  stick   41,   59;  press _
+for   1 frames;  stick   53,   54;  press _
+for   3 frames;  stick   54,   54;  press _
+for   1 frames;  stick   63,   34;  press _
+for   1 frames;  stick   69,   16;  press _
+for   2 frames;  stick   82,    0;  press _
+for   1 frames;  stick   80,    0;  press A
+for   1 frames;  stick   73,    0;  press A
+for   1 frames;  stick   63,   32;  press A
+for   2 frames;  stick   56,   53;  press _
+for   1 frames;  stick   35,   53;  press _
+for   1 frames;  stick  -34,   39;  press A
+for   1 frames;  stick  -80,    0;  press A
+for   1 frames;  stick  -84,    0;  press A
+for   6 frames;  stick  -83,    0;  press A
+for   6 frames;  stick  -84,    0;  press _
+for   1 frames;  stick  -83,    0;  press _
+for   1 frames;  stick  -11,   12;  press A
+for   1 frames;  stick   53,   53;  press A
+for   2 frames;  stick   58,   52;  press A
+for   5 frames;  stick   57,   52;  press A
+for   7 frames;  stick   56,   53;  press A
+for   1 frames;  stick   54,   53;  press A
+for   1 frames;  stick   54,   53;  press _
+for   2 frames;  stick   53,   53;  press _
+for   2 frames;  stick   51,   53;  press _
+for   9 frames;  stick   49,   54;  press _
+for   1 frames;  stick   51,   54;  press _
+for   2 frames;  stick   53,   54;  press _
+for   1 frames;  stick    0,    0;  press _
+for   1 frames;  stick  -70,  -35;  press _
+for   6 frames;  stick  -58,  -60;  press _
+for   1 frames;  stick  -59,  -60;  press _
+for   1 frames;  stick  -59,  -62;  press _
+for   2 frames;  stick  -58,  -62;  press _
+for   1 frames;  stick  -33,  -72;  press _
+for   1 frames;  stick   -9,  -80;  press _
+for   1 frames;  stick    0,  -84;  press _
+for   1 frames;  stick   55,  -61;  press _
+for   1 frames;  stick   55,    0;  press _
+for  30 frames;  stick    0,    0;  press _
 end_demo
