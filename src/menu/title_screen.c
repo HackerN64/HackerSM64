@@ -79,14 +79,21 @@ s32 run_level_id_or_demo(s32 level) {
                     }
                 } while (gDemos[gDemoLevel].romStart == NULL);
 
-                struct DemoInput *demoBank = (struct DemoInput *) get_segment_base_addr(SEGMENT_DEMO_INPUTS);
-                dma_read((u8 *) demoBank, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
+                if ((u32) gDemos[gDemoLevel].romEnd - (u32) gDemos[gDemoLevel].romStart > DEMO_INPUTS_POOL_SIZE) {
+                    // Failsafe since the equivalent assert wouldn't fit on the current crash screen.
+                    osSyncPrintf("[Demo System]: Tried to load a demo with too many inputs. Consider increasing DEMO_INPUTS_POOL_SIZE.\n");
+                    return level;
+                } else {
+                    struct DemoInput *demoBank = (struct DemoInput *) get_segment_base_addr(SEGMENT_DEMO_INPUTS);
 
-                // Point the current input to the demo segment
-                gCurrDemoInput = demoBank;
-                level = gDemoLevel + 1;
-                gCurrSaveFileNum = 1;
-                gCurrActNum = 1;
+                    dma_read((u8 *) demoBank, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
+                    // Point the current input to the demo segment
+                    gCurrDemoInput = demoBank;
+                    level = gDemoLevel + 1;
+                    gCurrSaveFileNum = 1;
+                    gCurrActNum = 1;
+                }
+
             }
         } else { // activity was detected, so reset the demo countdown.
             sDemoCountdown = 0;
