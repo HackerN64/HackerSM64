@@ -1,7 +1,6 @@
 #include <PR/os_cont.h>
 #include "demo_macros.inc"
 
-for  30 frames;  stick   0,   0;  press _
 for  42 frames;  stick   0,   0;  press _
 for   1 frames;  stick   0,   8;  press _
 for   1 frames;  stick   0,  13;  press _
