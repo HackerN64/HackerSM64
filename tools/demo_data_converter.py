@@ -26,6 +26,12 @@ def main():
                 level_list.append(f"stub_{stub_counter}")
                 stub_counter += 1
 
+    # Check that demo files actually correspond to a level
+    for level, filename in zip(available_levels, demo_files):
+        if level not in level_list:
+            print(f"Unknown Demo at {filename} - '{level}' is not a level name", file=sys.stderr)
+            sys.exit(1)
+
     print('#include <PR/os_cont.h>')
     print('#include "macros.inc"')
     print('#include "demo_macros.inc"')

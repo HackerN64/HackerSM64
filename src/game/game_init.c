@@ -93,6 +93,7 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
 struct DemoInput gRecordedDemoInput = { 0 };
+u16 gDemoLevel = 0;
 
 // Display
 // ----------------------------------------------------------------------------------------------------
@@ -752,8 +753,6 @@ void setup_game_memory(void) {
     // Setup Demo Inputs Memory, otherwise save 0x800 bytes
     void *demoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) demoInputsMemAlloc);
-    // Should always DMA in (LEVEL_COUNT * 8) bytes
-    dma_read((u8 *) gDemos, demoFile, demoFileEnd);
 #endif // DISABLE_DEMO
 
     // Setup Level Script Entry

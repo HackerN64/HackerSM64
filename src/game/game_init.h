@@ -80,6 +80,7 @@ extern struct DmaHandlerList gMarioAnimsBuf;
 extern u8 gMarioAnims[];
 
 extern struct DemoFile gDemos[LEVEL_COUNT];
+extern u16 gDemoLevel;
 extern u8 demoFile[], demoFileEnd[];
 
 extern u16 sRenderingFramebuffer;
