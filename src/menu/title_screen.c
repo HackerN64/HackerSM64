@@ -36,12 +36,14 @@ static char sLevelSelectStageNames[64][16] = {
 #ifndef DISABLE_DEMO
 static u16 sDemoCountdown = 0;
 static u16 gDemoLevel = 0;
-extern struct DemoInput *gDemoInputs[LEVEL_COUNT];
+struct DemoFile gDemos[LEVEL_COUNT] ALIGNED8;
 #endif
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
 
+
 #ifndef DISABLE_DEMO
+
 #define PRESS_START_DEMO_TIMER 800
 
 /**
@@ -57,19 +59,36 @@ s32 run_level_id_or_demo(s32 level) {
             // start the demo. 800 frames has passed while
             // player is idle on PRESS START screen.
             if ((++sDemoCountdown) == PRESS_START_DEMO_TIMER) {
+                u32 demoCount = 0;
 
                 // Find a non-null demo in the list
-                while (gDemoInputs[gDemoLevel] == NULL) {
-                    if (gDemoLevel >= LEVEL_COUNT) {
+                while (gDemos[gDemoLevel].romStart == NULL) {
+                    char dt[50];
+                    sprintf(dt, "Check LEVEL %d: %08X %08X\n", gDemoLevel, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
+                    osSyncPrintf(dt);
+                    if (gDemoLevel >= LEVEL_MAX) {
                         gDemoLevel = 0;
                     }
                     gDemoLevel++;
+                    demoCount++;
+                     // No demos installed in assets/demos/; continue playing the mario head
+                    if (demoCount > (LEVEL_MAX * 2)) {
+                        sDemoCountdown = 0;
+                        return level;
+                    }
                 }
+
+                char text[50];
+                sprintf(text, "Found LEVEL %d\n", gDemoLevel);
+                osSyncPrintf(text);
+
+                struct DemoInput *demoBank = (struct DemoInput *) get_segment_base_addr(SEGMENT_DEMO_INPUTS);
+                dma_read((u8 *) demoBank, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
 
                 // add 1 (+4) to the pointer to skip the first 4 bytes
                 // Use the first 4 bytes to store level ID,
                 // then use the rest of the values for inputs
-                gCurrDemoInput = gDemoInputs[gDemoLevel];
+                gCurrDemoInput = demoBank;
                 level = gDemoLevel;
                 gCurrSaveFileNum = 1;
                 gCurrActNum = 1;

@@ -1,3 +1,5 @@
+#pragma once
+
 /* Demo Macros */
 
 .macro start_demo name

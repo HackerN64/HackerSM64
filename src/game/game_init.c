@@ -743,11 +743,19 @@ void setup_game_memory(void) {
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
 #ifdef PUPPYPRINT_DEBUG
     set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
+#ifndef DISABLE_DEMO
     set_segment_memory_printout(SEGMENT_DEMO_INPUTS, DEMO_INPUTS_POOL_SIZE);
-#endif
-    // Setup Demo Inputs Memory
+#endif // DISABLE_DEMO
+#endif // PUPPYPRINT_DEBUG
+
+#ifndef DISABLE_DEMO
+    // Setup Demo Inputs Memory, otherwise save 0x800 bytes
     void *demoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) demoInputsMemAlloc);
+    // Should always DMA in (LEVEL_COUNT * 8) bytes
+    dma_read((u8 *) gDemos, demoFile, demoFileEnd);
+#endif // DISABLE_DEMO
+
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
     // Setup Segment 2 (Fonts, Text, etc)

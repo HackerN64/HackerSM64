@@ -75,7 +75,7 @@ uintptr_t set_segment_base_addr(s32 segment, void *addr) {
     return sSegmentTable[segment];
 }
 
-UNUSED void *get_segment_base_addr(s32 segment) {
+void *get_segment_base_addr(s32 segment) {
     return (void *) (sSegmentTable[segment] | 0x80000000);
 }
 
