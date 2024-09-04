@@ -83,7 +83,7 @@ s32 run_level_id_or_demo(s32 level) {
                 dma_read((u8 *) demoBank, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
 
                 // Point the current input to the demo segment
-                gCurrDemoInput = demoBank;
+                // gCurrDemoInput = demoBank;
                 level = gDemoLevel + 1;
                 gCurrSaveFileNum = 1;
                 gCurrActNum = 1;

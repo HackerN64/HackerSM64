@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -473,9 +474,60 @@ void display_and_vsync(void) {
 }
 
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
+void print_demo_input(struct DemoInput *d) {
+    char text[200];
+    char buttonStr[20];
+    char *buttonPtr = buttonStr;
+
+    if (d->buttonMask == 0) {
+        sprintf(buttonStr, "_");
+    } else {
+        u16 faceButtons = d->buttonMask << 8;
+        u16 cButtons = d->buttonMask & 0xF;
+
+        if (faceButtons & A_BUTTON) {
+            buttonPtr += sprintf(buttonPtr, "A | ");
+        }
+        if (faceButtons & B_BUTTON) {
+            buttonPtr += sprintf(buttonPtr, "B | ");
+        }
+        if (faceButtons & Z_TRIG) {
+            buttonPtr += sprintf(buttonPtr, "Z | ");
+        }
+        if (faceButtons & START_BUTTON) {
+            buttonPtr += sprintf(buttonPtr, "Start | ");
+        }
+
+        if (cButtons & U_CBUTTONS) {
+            buttonPtr += sprintf(buttonPtr, "C_Up | ");
+        }
+        if (cButtons & D_CBUTTONS) {
+            buttonPtr += sprintf(buttonPtr, "C_Down | ");
+        }
+        if (cButtons & L_CBUTTONS) {
+            buttonPtr += sprintf(buttonPtr, "C_Left | ");
+        }
+        if (cButtons & R_CBUTTONS) {
+            buttonPtr += sprintf(buttonPtr, "C_Right | ");
+        }
+
+        u32 len = strlen(buttonStr);
+        buttonStr[len - 1] = 0;
+        buttonStr[len - 2] = 0;
+    }
+
+    sprintf(text, "for %3d frames;  stick %4d, %4d;  press %s\n",
+        d->timer,
+        d->rawStickX,
+        d->rawStickY,
+        buttonStr
+    );
+
+    osSyncPrintf(text);
+}
 // this function records distinct inputs over a 255-frame interval to RAM locations and was likely
 // used to record the demo sequences seen in the final game. This function is unused.
-UNUSED static void record_demo(void) {
+void record_demo(void) {
     // record the player's button mask and current rawStickX and rawStickY.
     u8 buttonMask =
         ((gPlayer1Controller->buttonDown & (A_BUTTON | B_BUTTON | Z_TRIG | START_BUTTON)) >> 8)
@@ -497,6 +549,7 @@ UNUSED static void record_demo(void) {
     // If the timer hits 0xFF, reset the timer for the next demo input.
     if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
         || rawStickX != gRecordedDemoInput.rawStickX || rawStickY != gRecordedDemoInput.rawStickY) {
+        print_demo_input(&gRecordedDemoInput);
         gRecordedDemoInput.timer = 0;
         gRecordedDemoInput.buttonMask = buttonMask;
         gRecordedDemoInput.rawStickX = rawStickX;
@@ -645,6 +698,7 @@ void read_controller_inputs(s32 threadID) {
             controller->stickMag       = 0.0f;
         }
     }
+    record_demo();
 }
 
 /**
