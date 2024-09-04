@@ -1,41 +1,25 @@
 import sys, os
 
-fb = []
+fl = []
+with open(sys.argv[1]) as f:
+    fl = f.readlines()
 
-print("#include <PR/os_cont.h>")
-print('#include "demo_macros.inc"')
-print()
 
-with open(sys.argv[1], "rb") as f:
-    fb = f.read()
+with open(sys.argv[1], "w+") as f:
+    for line in fl:
+        if line.startswith("for"):
+            tokens = line.split()
+            # correct stick positions
+            stickx = int(tokens[4][:-1])
+            sticky = int(tokens[5][:-1])
+            if stickx > 127:
+                stickx = -(256 - stickx)
+            if sticky > 127:
+                sticky = -(256 - sticky)
 
-for i in range(len(fb))[:-4:4]:
-    holdcount = fb[i]
-    stickx = fb[i + 1]
-    sticky = fb[i + 2]
-    button = fb[i + 3]
-    buttonStr = "press "
-    if button & 0x80:
-        buttonStr += "A | "
-    if button & 0x40:
-        buttonStr += "B | "
-    if button & 0x20:
-        buttonStr += "Z | "
-    if button & 0x10:
-        buttonStr += "Start | "
-    if button & 0x08:
-        buttonStr += "C_Up | "
-    if button & 0x04:
-        buttonStr += "C_Down | "
-    if button & 0x02:
-        buttonStr += "C_Left | "
-    if button & 0x01:
-        buttonStr += "C_Right | "
+            buf = f"for {int(tokens[1]):3} frames;  stick {stickx:4}, {sticky:4};  press {tokens[-1]}\n"
+            f.write(buf)
+        else:
+            f.write(line)
 
-    if button == 0x00:
-        buttonStr = "press _"
-    else:
-        buttonStr = buttonStr[:-3]
-    print(f"for {holdcount:3} frames;  stick {stickx:3}, {sticky:3};  {buttonStr}")
 
-print("end_demo")
