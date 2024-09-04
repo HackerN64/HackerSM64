@@ -697,7 +697,6 @@ void read_controller_inputs(s32 threadID) {
             controller->stickMag       = 0.0f;
         }
     }
-    record_demo();
 }
 
 /**
