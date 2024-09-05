@@ -3,6 +3,7 @@
 #include "sm64.h"
 
 #include "buffers/buffers.h"
+#include "dma_async.h"
 #include "slidec.h"
 #include "game/game_init.h"
 #include "game/main.h"
@@ -14,6 +15,9 @@
 #endif
 #if defined(RNC1) || defined(RNC2)
 #include <rnc.h>
+#endif
+#ifdef LZ4T
+#include "lz4t.h"
 #endif
 #ifdef UNF
 #include "usb/usb.h"
@@ -367,6 +371,12 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
     return dest;
 }
 
+#if defined(LZ4T)
+#define DMA_ASYNC_HEADER_SIZE 16
+#else
+#define DMA_ASYNC_HEADER_SIZE 0
+#endif
+
 /**
  * Decompress the block of ROM data from srcStart to srcEnd and return a
  * pointer to an allocated buffer holding the decompressed data. Set the
@@ -393,7 +403,13 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
         dma_read(dest, srcStart, srcEnd);
 #else
+# if DMA_ASYNC_HEADER_SIZE
+        dma_read(compressed, srcStart, srcStart + DMA_ASYNC_HEADER_SIZE);
+        struct DMAAsyncCtx asyncCtx;
+        dma_async_ctx_init(&asyncCtx, compressed + DMA_ASYNC_HEADER_SIZE, srcStart + DMA_ASYNC_HEADER_SIZE, srcEnd);
+# else
         dma_read(compressed, srcStart, srcEnd);
+# endif
         dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
 #endif
         if (dest != NULL) {
@@ -408,6 +424,8 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
             slidstart(compressed, dest);
 #elif MIO0
             decompress(compressed, dest);
+#elif LZ4T
+            lz4t_unpack(compressed, dest, &asyncCtx);
 #endif
             osSyncPrintf("end decompress\n");
             set_segment_base_addr(segment, dest);

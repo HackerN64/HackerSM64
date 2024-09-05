@@ -139,4 +139,27 @@
 
 #define FORCE_CRASH { *(vs8*)0 = 0; }
 
+// Taken from Linux Kernel
+#define __GET_UNALIGNED_T(type, ptr)                                                                   \
+    ({                                                                                                 \
+        const struct {                                                                                 \
+            type x;                                                                                    \
+        } PACKED *__pptr = (typeof(__pptr)) (ptr);                                                     \
+        __pptr->x;                                                                                     \
+    })
+
+#define __PUT_UNALIGNED_T(type, val, ptr)                                                              \
+    do {                                                                                               \
+        struct {                                                                                       \
+            type x;                                                                                    \
+        } PACKED *__pptr = (typeof(__pptr)) (ptr);                                                     \
+        __pptr->x = (val);                                                                             \
+    } while (0)
+
+#define GET_UNALIGNED8(ptr) __GET_UNALIGNED_T(uint64_t, (ptr))
+#define PUT_UNALIGNED8(val, ptr) __PUT_UNALIGNED_T(uint64_t, (val), (ptr))
+#define GET_UNALIGNED4(ptr) __GET_UNALIGNED_T(uint32_t, (ptr))
+#define GET_UNALIGNED4S(ptr) __GET_UNALIGNED_T(int32_t, (ptr))
+#define PUT_UNALIGNED4(val, ptr) __PUT_UNALIGNED_T(uint32_t, (val), (ptr))
+
 #endif // MACROS_H

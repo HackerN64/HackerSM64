@@ -1229,11 +1229,12 @@ s32 update_level(void) {
     return changeLevel;
 }
 
+#ifdef PUPPYPRINT_DEBUG
+extern u32 gInitLevelTime;
+#endif
+
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
-#ifdef PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
 
     set_play_mode(PLAY_MODE_NORMAL);
 
@@ -1323,7 +1324,14 @@ s32 init_level(void) {
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
     }
 
-    append_puppyprint_log("Level loaded in %d" PP_CYCLE_STRING ".", (s32)(PP_CYCLE_CONV(osGetTime() - first)));
+#ifdef PUPPYPRINT_DEBUG
+    if (gInitLevelTime) {
+        u32 totalTime = osGetCount() - gInitLevelTime;
+        append_puppyprint_log("Level loaded in %2.3fs.", (f64) OS_CYCLES_TO_USEC(totalTime) / 1000000.0f);
+        gInitLevelTime = 0;
+    }
+#endif
+
     return TRUE;
 }
 
