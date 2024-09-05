@@ -15,6 +15,8 @@ void tox_box_move(f32 forwardVel, f32 a1, s16 deltaPitch, s16 deltaRoll);
 void play_penguin_walking_sound(s32 walk);
 s32 update_angle_from_move_flags(s32 *angle);
 void cur_obj_spawn_strong_wind_particles(s32 windSpread, f32 scale, f32 relPosX, f32 relPosY, f32 relPosZ);
+void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r);
+void set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound);
 
 //! Lots of these are duplicates
 void bhv_cap_switch_loop(void);
@@ -550,6 +552,10 @@ void bhv_intro_scene_loop(void);
 void bhv_dust_smoke_loop(void);
 void bhv_yoshi_loop(void);
 void bhv_volcano_trap_loop(void);
+void bhv_toad_message_loop(void);
+void bhv_toad_message_init(void);
+void bhv_unlock_door_star_init(void);
+void bhv_unlock_door_star_loop(void);
 
 Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
 

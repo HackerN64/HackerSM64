@@ -5,6 +5,28 @@
 
 #include "macros.h"
 #include "types.h"
+#include "object_list_processor.h"
+// TODO: remove dependency on these
+#include "obj_behaviors.h"
+#include "behavior_actions.h"
+
+extern struct Surface *sObjFloor;
+
+// enums for obj_perform_position_op
+enum ObjPositionOperation {
+    POS_OP_SAVE_POSITION,
+    POS_OP_COMPUTE_VELOCITY,
+    POS_OP_RESTORE_POSITION
+};
+
+enum ObjCollisionFlags {
+    OBJ_COL_FLAGS_NONE      = (0 << 0),
+    OBJ_COL_FLAG_GROUNDED   = (1 << 0),
+    OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
+    OBJ_COL_FLAG_UNDERWATER = (1 << 2),
+    OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
+    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+};
 
 // used for chain chomp and wiggler
 struct ChainSegment {
@@ -50,6 +72,18 @@ struct SpawnParticlesInfo {
     /*0x09*/ s8 dragStrength;
     /*0x0C*/ f32 sizeBase;
     /*0x10*/ f32 sizeRange;
+};
+
+enum AttackHandler {
+    ATTACK_HANDLER_NOP,
+    ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE,
+    ATTACK_HANDLER_KNOCKBACK,
+    ATTACK_HANDLER_SQUISHED,
+    ATTACK_HANDLER_SPECIAL_KOOPA_LOSE_SHELL,
+    ATTACK_HANDLER_SET_SPEED_TO_ZERO,
+    ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON,
+    ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED,
+    ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN
 };
 
 enum GeoUpdateLayerTransparencyModes {
@@ -200,6 +234,10 @@ void obj_translate_xz_random(struct Object *obj, f32 rangeLength);
 void cur_obj_set_pos_via_transform(void);
 void cur_obj_spawn_particles(struct SpawnParticlesInfo *info);
 s32 cur_obj_reflect_move_angle_off_wall(void);
+void shelled_koopa_attack_handler(s32 attackType);
+void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 scale, ModelID32 model,
+                   f32 startSpeed, f32 endSpeed, s16 movePitch);
+void obj_set_speed_to_zero(void);
 
 #define WAYPOINT_FLAGS_END -1
 #define WAYPOINT_FLAGS_NONE 0
@@ -277,5 +315,64 @@ s32 cur_obj_check_interacted(void);
 void cur_obj_spawn_loot_blue_coin(void);
 
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY);
+
+// exposed functions from obj_behaviors
+s16 object_step(void);
+s16 object_step_without_floor_orient(void);
+
+// migrated from obj_behaviors_2.h
+s32 obj_is_rendering_enabled(void);
+s16 obj_get_pitch_from_vel(void);
+s32 obj_update_race_proposition_dialog(s16 dialogID);
+void obj_set_dist_from_home(f32 distFromHome);
+s32 obj_is_near_to_and_facing_mario(f32 maxDist, s16 maxAngleDiff);
+void obj_perform_position_op(s32 op);
+void cur_obj_spin_all_dimensions(f32 pitchSpeed, f32 rollSpeed);
+void obj_rotate_yaw_and_bounce_off_walls(s16 targetYaw, s16 turnAmount);
+s16 obj_get_pitch_to_home(f32 latDistToHome);
+void obj_compute_vel_from_move_pitch(f32 speed);
+s32 clamp_s16(s16 *value, s16 minimum, s16 maximum);
+s32 clamp_f32(f32 *value, f32 minimum, f32 maximum);
+void cur_obj_init_anim_extend(s32 animIndex);
+s32 cur_obj_init_anim_and_check_if_end(s32 animIndex);
+s32 cur_obj_init_anim_check_frame(s32 animIndex, s32 frame);
+s32 cur_obj_set_anim_if_at_end(s32 animIndex);
+s32 cur_obj_play_sound_at_anim_range(s8 startFrame1, s8 startFrame2, u32 sound);
+s16 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount);
+s32 approach_f32_ptr(f32 *px, f32 target, f32 delta);
+s32 obj_forward_vel_approach(f32 target, f32 delta);
+s32 obj_y_vel_approach(f32 target, f32 delta);
+s32 obj_move_pitch_approach(s16 target, s16 delta);
+s32 obj_face_pitch_approach(s16 targetPitch, s16 deltaPitch);
+s32 obj_face_yaw_approach(s16 targetYaw, s16 deltaYaw);
+s32 obj_face_roll_approach(s16 targetRoll, s16 deltaRoll);
+s32 obj_smooth_turn(s16 *angleVel, s32 *angle, s16 targetAngle, f32 targetSpeedProportion,
+                    s16 accel, s16 minSpeed, s16 maxSpeed);
+void obj_roll_to_match_yaw_turn(s16 targetYaw, s16 maxRoll, s16 rollSpeed);
+s16 random_linear_offset(s16 base, s16 range);
+s16 random_mod_offset(s16 base, s16 step, s16 mod);
+s16 obj_random_fixed_turn(s16 delta);
+s32 obj_grow_then_shrink(f32 *scaleVel, f32 shootFireScale, f32 endScale);
+s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero, f32 accel, f32 slowdown);
+void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength);
+s32 obj_resolve_object_collisions(s32 *targetYaw);
+s32 obj_bounce_off_walls_edges_objects(s32 *targetYaw);
+s32 obj_resolve_collisions_and_turn(s16 targetYaw, s16 turnSpeed);
+void obj_die_if_health_non_positive(void);
+void obj_unused_die(void);
+void obj_set_knockback_action(s32 attackType);
+void obj_set_squished_action(void);
+s32 obj_die_if_above_lava_and_health_non_positive(void);
+s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction, u8 *attackHandlers);
+void obj_act_knockback(UNUSED f32 baseScale);
+void obj_act_squished(f32 baseScale);
+s32 obj_update_standard_actions(f32 scale);
+s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction);
+s32 obj_move_for_one_second(s32 endAction);
+void treat_far_home_as_mario(f32 threshold);
+
+
+// migrated from obj_behaviors.h
+void spawn_default_star(f32 x, f32 y, f32 z);
 
 #endif // OBJECT_HELPERS_H

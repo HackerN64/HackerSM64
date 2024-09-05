@@ -8,7 +8,7 @@
 #include "game_init.h"
 #include "main.h"
 #include "object_constants.h"
-#include "object_fields.h"
+#include "global_object_fields.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"
 #include "print.h"
