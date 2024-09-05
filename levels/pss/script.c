@@ -60,6 +60,7 @@ static const LevelScript script_pss_macro_objects[] = {
     OBJECT(/*model*/ MODEL_BLUE_COIN,        /*pos*/ -6263,  4150, -4009, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenBlueCoin),
     OBJECT(/*model*/ MODEL_YELLOW_COIN,      /*pos*/  1854, -2132, -4290, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvOneCoin),
     OBJECT(/*model*/ MODEL_EXCLAMATION_BOX,  /*pos*/ -6385, -4200,  5770, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_STAR_1 << 16), /*beh*/ bhvExclamationBox),
+    OBJECT(/*model*/ MODEL_NONE,             /*pos*/ -6358, -4300,  4700, /*angle*/ 0,   0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvDefaultStarMarker),
     RETURN(),
 };
 

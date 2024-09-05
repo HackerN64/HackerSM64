@@ -54,15 +54,14 @@ struct KoopaTheQuickProperties {
     s16 initText;
     s16 winText;
     Trajectory const *path;
-    Vec3s starPos;
 };
 
 /**
  * Properties for the BoB race and the THI race.
  */
 static struct KoopaTheQuickProperties sKoopaTheQuickProperties[] = {
-    { DIALOG_005, DIALOG_007, bob_seg7_trajectory_koopa, { 3030, 4500, -4600 } },
-    { DIALOG_009, DIALOG_031, thi_seg7_trajectory_koopa, { 7100, -1300, -6000 } },
+    { DIALOG_005, DIALOG_007, bob_seg7_trajectory_koopa },
+    { DIALOG_009, DIALOG_031, thi_seg7_trajectory_koopa },
 };
 
 /**
@@ -721,9 +720,7 @@ static void koopa_the_quick_act_after_race(void) {
             o->oTimer = 0;
         }
     } else if (o->parentObj->oKoopaRaceEndpointRaceStatus != KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON) {
-        spawn_default_star(sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].starPos[0],
-                           sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].starPos[1],
-                           sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].starPos[2]);
+        spawn_default_star();
 
         o->parentObj->oKoopaRaceEndpointRaceStatus = KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON;
     }

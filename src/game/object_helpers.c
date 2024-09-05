@@ -585,26 +585,17 @@ u32 get_object_list_from_behavior(const BehaviorScript *behavior) {
     return objectList;
 }
 
-struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavior) {
-    f32 dist;
-    return cur_obj_find_nearest_object_with_behavior(behavior, &dist);
-}
-
-f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript *behavior) {
-    f32 dist;
-    if (cur_obj_find_nearest_object_with_behavior(behavior, &dist) == NULL) dist = 15000.0f;
-    return dist;
-}
-
-struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *behavior, f32 *dist) {
+struct Object *cur_obj_find_nearest_object_with_behavior_and_bparams(const BehaviorScript *behavior, f32 *dist, u32 bparams, u32 bparamMask) {
     uintptr_t *behaviorAddr = segmented_to_virtual(behavior);
     struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
     struct Object *obj = (struct Object *) listHead->next;
     struct Object *closestObj = NULL;
     f32 minDist = 0x20000;
+    bparams &= bparamMask;
 
     while (obj != (struct Object *) listHead) {
         if (obj->behavior == behaviorAddr
+            && (obj->oBehParams & bparamMask) == bparams
             && obj->activeFlags != ACTIVE_FLAG_DEACTIVATED
             && obj != o
         ) {
@@ -620,6 +611,24 @@ struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *b
 
     *dist = minDist;
     return closestObj;
+}
+
+struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *behavior, f32 *dist) {
+    return cur_obj_find_nearest_object_with_behavior_and_bparams(behavior, dist, 0, 0);
+}
+
+struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavior) {
+    f32 dist;
+    return cur_obj_find_nearest_object_with_behavior_and_bparams(behavior, &dist, 0, 0);
+}
+
+f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript *behavior) {
+    f32 dist;
+    if (cur_obj_find_nearest_object_with_behavior_and_bparams(behavior, &dist, 0, 0) == NULL) {
+        return 15000.0f;
+    }
+
+    return dist;
 }
 
 struct Object *find_unimportant_object(void) {
@@ -2322,9 +2331,9 @@ void cur_obj_spawn_loot_blue_coin(void) {
     }
 }
 
-void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY) {
+void cur_obj_spawn_star_at_y_offset(f32 offsetY) {
     f32 objectPosY = o->oPosY;
     o->oPosY += offsetY + gDebugInfo[DEBUG_PAGE_ENEMYINFO][0];
-    spawn_default_star(targetX, targetY, targetZ);
+    spawn_default_star();
     o->oPosY = objectPosY;
 }

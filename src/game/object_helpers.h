@@ -113,9 +113,10 @@ void cur_obj_unhide(void);
 void cur_obj_hide(void);
 void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforward);
 u32 get_object_list_from_behavior(const BehaviorScript *behavior);
+struct Object *cur_obj_find_nearest_object_with_behavior_and_bparams(const BehaviorScript * behavior, f32 *dist, u32 bparams, u32 bparamMask);
+struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript * behavior, f32 *dist);
 struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavior);
 f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript* behavior);
-struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript * behavior, f32 *dist);
 struct Object *find_unimportant_object(void);
 s32 count_unimportant_objects(void);
 s32 count_objects_with_behavior(const BehaviorScript *behavior);
@@ -276,6 +277,6 @@ void disable_time_stop_including_mario(void);
 s32 cur_obj_check_interacted(void);
 void cur_obj_spawn_loot_blue_coin(void);
 
-void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY);
+void cur_obj_spawn_star_at_y_offset(f32 offsetY);
 
 #endif // OBJECT_HELPERS_H

@@ -166,7 +166,7 @@ void bhv_treasure_chest_jrb_loop(void) {
         case TREASURE_CHEST_ACT_REWARD:
             if (o->oTimer == 60) {
                 spawn_mist_particles();
-                spawn_default_star(-1800.0f, -2500.0f, -1700.0f);
+                spawn_default_star();
                 o->oAction = TREASURE_CHEST_ACT_END;
             }
             break;
@@ -198,7 +198,7 @@ void bhv_treasure_chest_loop(void) {
         case TREASURE_CHEST_ACT_REWARD:
             if (o->oTimer == 60) {
                 spawn_mist_particles();
-                spawn_default_star(-1900.0f, -4000.0f, -1400.0f);
+                spawn_default_star();
                 o->oAction = TREASURE_CHEST_ACT_END;
             }
             break;

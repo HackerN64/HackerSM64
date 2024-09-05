@@ -203,7 +203,7 @@ void bhv_snowmans_head_loop(void) {
         case SNOWMANS_HEAD_ACT_THANK:
             if (trigger_obj_dialog_when_facing(&o->oSnowmansHeadDialogActive, DIALOG_111, 700.0f, MARIO_DIALOG_LOOK_UP)) {
                 spawn_mist_particles();
-                spawn_default_star(-4700.0f, -1024.0f, 1890.0f);
+                spawn_default_star();
                 o->oAction = SNOWMANS_HEAD_ACT_NONE;
             }
             break;

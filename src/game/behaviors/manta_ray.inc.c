@@ -109,7 +109,7 @@ void bhv_manta_ray_loop(void) {
             // Spawn a star after collecting 5 rings.
             if (o->oWaterRingSpawnerRingsCollected == 5) {
                 spawn_mist_particles();
-                spawn_default_star(-3180.0f, -3600.0f, 120.0f);
+                spawn_default_star();
                 o->oAction = MANTA_ACT_NO_RINGS;
             }
             break;

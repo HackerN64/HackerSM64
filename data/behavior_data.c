@@ -1843,6 +1843,7 @@ const BehaviorScript bhvCcmTouchedStarSpawn[] = {
     OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HITBOX(/*Radius*/ 500, /*Height*/ 500),
     SET_INT(oIntangibleTimer, 0),
+    SET_HOME(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_ccm_touched_star_spawn_loop),
     END_LOOP(),
@@ -4042,6 +4043,7 @@ const BehaviorScript bhvBigChillBully[] = {
 
 const BehaviorScript bhvJetStreamRingSpawner[] = {
     BEGIN(OBJ_LIST_DEFAULT),
+    SET_HOME(),
     HIDE(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_jet_stream_ring_spawner_loop),
@@ -4450,6 +4452,7 @@ const BehaviorScript bhvSnowmansBottom[] = {
 const BehaviorScript bhvSnowmansHead[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
     DROP_TO_FLOOR(),
     SET_FLOAT(oGraphYOffset, 110),
     CALL_NATIVE(bhv_snowmans_head_init),
@@ -4552,6 +4555,12 @@ const BehaviorScript bhvStarSpawnCoordinates[] = {
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_star_spawn_loop),
     END_LOOP(),
+};
+
+const BehaviorScript bhvDefaultStarMarker[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BREAK(),
 };
 
 const BehaviorScript bhvHiddenRedCoinStar[] = {
@@ -4873,6 +4882,7 @@ const BehaviorScript bhvMantaRay[] = {
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, manta_seg5_anims_05008EB4),
     ANIMATE(MANTA_ANIM_SWIM),
+    SET_HOME(),
     CALL_NATIVE(bhv_manta_ray_init),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
@@ -4942,6 +4952,7 @@ const BehaviorScript bhvTreasureChestsShip[] = {
 const BehaviorScript bhvTreasureChestsJrb[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_HOME(),
     DROP_TO_FLOOR(),
     CALL_NATIVE(bhv_treasure_chest_jrb_init),
     BEGIN_LOOP(),
@@ -4952,6 +4963,7 @@ const BehaviorScript bhvTreasureChestsJrb[] = {
 const BehaviorScript bhvTreasureChests[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_HOME(),
     DROP_TO_FLOOR(),
     CALL_NATIVE(bhv_treasure_chest_init),
     BEGIN_LOOP(),
