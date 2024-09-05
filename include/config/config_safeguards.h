@@ -139,6 +139,27 @@
     #define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
 #endif // !FLYING_CAMERA_MODE
 
+// Reonucam overrides
+#ifdef REONUCAM
+    // Use course default mode
+    #ifndef USE_COURSE_DEFAULT_MODE
+    #define USE_COURSE_DEFAULT_MODE
+    #endif
+
+    // Force camera mode to 8 Dir
+    #ifdef FORCED_CAMERA_MODE
+    #undef FORCED_CAMERA_MODE
+    #endif
+    #define FORCED_CAMERA_MODE CAMERA_MODE_8_DIRECTIONS
+
+    // Disable vanilla cam processing
+    #undef ENABLE_VANILLA_CAM_PROCESSING
+
+    // Disable aglab cam
+    #undef PARALLEL_LAKITU_CAM
+#endif
+
+
 
 /*****************
  * config_game.h

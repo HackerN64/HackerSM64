@@ -1523,6 +1523,45 @@ void reset_red_coins_collected(void) {
     gRedCoinsCollected = 0;
 }
 
+#ifdef REONUCAM
+
+LangArray textReonucam1 = DEFINE_LANGUAGE_ARRAY(
+    "CAMERA SPEED: %d",
+    "VITESSE CAMÉRA: %d",
+    "KAMERA GESCHWINDIGKEIT: %d",
+    "カメラそくど: %d",
+    "VELOCIDAD DE CÁMARA: %d");
+
+LangArray textReonucam2 = DEFINE_LANGUAGE_ARRAY(
+    "DPAD TO CHANGE",
+    "CHANGER AVEC DPAD",
+    "DPAD ZU ÄNDERN",
+    "DPADでへんこう",
+    "DPAD PARA CAMBIAR");
+
+void render_reonucam_speed_setting(void) {
+    char buf[32];
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    sprintf(buf, LANG_ARRAY(textReonucam1), gReonucamState.speed +1 );
+
+    print_generic_string_aligned(310, 24, buf, TEXT_ALIGN_RIGHT);
+    print_generic_string_aligned(310, 8, LANG_ARRAY(textReonucam2), TEXT_ALIGN_RIGHT);
+
+
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
+    if (gPlayer1Controller->buttonPressed & R_JPAD) {
+        gReonucamState.speed++;
+    } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
+        gReonucamState.speed--;
+    }
+    gReonucamState.speed = (gReonucamState.speed + 5) % 5;
+    save_file_set_camera_speed(gReonucamState.speed);
+}
+#endif
+
+
 void change_dialog_camera_angle(void) {
     if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
         gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
@@ -2050,6 +2089,9 @@ s32 render_pause_courses_and_castle(void) {
     }
 #if defined(WIDE) && !defined(PUPPYCAM)
         render_widescreen_setting();
+#endif
+#ifdef REONUCAM
+        render_reonucam_speed_setting();
 #endif
     gDialogTextAlpha += 25;
     if (gDialogTextAlpha > 250) {
