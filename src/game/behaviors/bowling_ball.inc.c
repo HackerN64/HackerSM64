@@ -1,5 +1,9 @@
 // bowling_ball.inc.c
 
+// There is no good way to handle this
+#include "levels/bob/header.h"
+#include "levels/ttm/header.h"
+
 static struct ObjectHitbox sBowlingBallHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,
     /* downOffset:        */ 0,

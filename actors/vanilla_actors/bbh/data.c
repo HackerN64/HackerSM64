@@ -1,0 +1,27 @@
+#include <ultra64.h>
+#include "sm64.h"
+#include "surface_terrains.h"
+#include "moving_texture_macros.h"
+#include "surface_terrains.h"
+#include "textures.h"
+#include "dialog_ids.h"
+
+#include "make_const_nonconst.h"
+
+#include "actors/vanilla_actors/bbh/texture.inc.c"
+
+#include "actors/vanilla_actors/bbh/staircase_step/model.inc.c"
+#include "actors/vanilla_actors/bbh/tilting_trap_platform/model.inc.c"
+#include "actors/vanilla_actors/bbh/tumbling_platform_far/model.inc.c"
+#include "actors/vanilla_actors/bbh/tumbling_platform_near/model.inc.c"
+#include "actors/vanilla_actors/bbh/moving_bookshelf/model.inc.c"
+#include "actors/vanilla_actors/bbh/mesh_elevator/model.inc.c"
+#include "actors/vanilla_actors/bbh/merry_go_round/model.inc.c"
+#include "actors/vanilla_actors/bbh/coffin/model.inc.c"
+#include "actors/vanilla_actors/bbh/staircase_step/collision.inc.c"
+#include "actors/vanilla_actors/bbh/tilting_trap_platform/collision.inc.c"
+#include "actors/vanilla_actors/bbh/tumbling_platform_near/collision.inc.c"
+#include "actors/vanilla_actors/bbh/moving_bookshelf/collision.inc.c"
+#include "actors/vanilla_actors/bbh/mesh_elevator/collision.inc.c"
+#include "actors/vanilla_actors/bbh/merry_go_round/collision.inc.c"
+#include "actors/vanilla_actors/bbh/coffin/collision.inc.c"

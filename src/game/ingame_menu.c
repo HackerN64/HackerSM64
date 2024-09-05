@@ -1,6 +1,7 @@
 #include <ultra64.h>
 
 #include "actors/common1.h"
+#include "actors/vanilla_actors/castle_grounds/header.h"
 #include "area.h"
 #include "audio/external.h"
 #include "camera.h"
@@ -12,7 +13,6 @@
 #include "gfx_dimensions.h"
 #include "ingame_menu.h"
 #include "level_update.h"
-#include "levels/castle_grounds/header.h"
 #include "memory.h"
 #include "print.h"
 #include "save_file.h"

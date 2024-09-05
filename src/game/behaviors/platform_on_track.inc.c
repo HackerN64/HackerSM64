@@ -5,6 +5,12 @@
  * themselves as the platform moves past them.
  */
 
+#include "levels/bitfs/header.h"
+#include "levels/ccm/header.h"
+#include "levels/hmc/header.h"
+#include "levels/lll/header.h"
+#include "levels/rr/header.h"
+
 /**
  * Collision models for the different types of platforms.
  */

@@ -42,7 +42,7 @@ OUTPUT_ARCH (mips)
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_segment_7) \
-   BEGIN_SEG(name, 0x0E000000) \
+   BEGIN_SEG(name, 0x19000000) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
       KEEP(BUILD_DIR/levels/name/script.o(.text*)); \
@@ -80,6 +80,28 @@ OUTPUT_ARCH (mips)
    END_NOLOAD(name##_geo) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
+
+#define VANILLA_OBJECTS(name) \
+   BEGIN_SEG(vo_##name##_yay0, 0x0e000000) \
+   { \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/data.szp.o(.data*)); \
+      . = ALIGN(0x10); \
+   } \
+   END_SEG(vo_##name##_yay0) \
+   BEGIN_SEG(vo_##name##_geo, 0x1a000000) \
+   { \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.*data*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.rodata*)); \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.text*)); \
+   } \
+   END_SEG(vo_##name##_geo) \
+   BEGIN_NOLOAD(vo_##name##_geo) \
+   { \
+      KEEP(BUILD_DIR/actors/vanilla_actors/name/geo.o(.bss*)); \
+   } \
+   END_NOLOAD(vo_##name##_geo) \
+   _vo_##name##_mio0SegmentRomStart = _vo_##name##_yay0SegmentRomStart; \
+   _vo_##name##_mio0SegmentRomEnd = _vo_##name##_yay0SegmentRomEnd;
 
 SECTIONS
 {
@@ -300,18 +322,18 @@ SECTIONS
    YAY0_SEG(segment2, 0x02000000)
 
 #ifdef MULTILANG
-   YAY0_SEG(translation_en, 0x19000000)
+   YAY0_SEG(translation_en, 0x1B000000)
 #ifdef ENABLE_FRENCH
-   YAY0_SEG(translation_fr, 0x19000000)
+   YAY0_SEG(translation_fr, 0x1B000000)
 #endif
 #ifdef ENABLE_GERMAN
-   YAY0_SEG(translation_de, 0x19000000)
+   YAY0_SEG(translation_de, 0x1B000000)
 #endif
 #ifdef ENABLE_JAPANESE
-   YAY0_SEG(translation_jp, 0x19000000)
+   YAY0_SEG(translation_jp, 0x1B000000)
 #endif
 #ifdef ENABLE_SPANISH
-   YAY0_SEG(translation_es, 0x19000000)
+   YAY0_SEG(translation_es, 0x1B000000)
 #endif
 #endif
 
@@ -340,6 +362,28 @@ SECTIONS
    /* load the common actor groups */
    STANDARD_OBJECTS(common0, 0x08000000, 0x0F000000)
    STANDARD_OBJECTS(common1, 0x03000000, 0x16000000)
+
+   VANILLA_OBJECTS(bob)
+   VANILLA_OBJECTS(wf)
+   VANILLA_OBJECTS(jrb)
+   VANILLA_OBJECTS(ccm)
+   VANILLA_OBJECTS(bbh)
+   VANILLA_OBJECTS(hmc)
+   VANILLA_OBJECTS(lll)
+   VANILLA_OBJECTS(ssl)
+   VANILLA_OBJECTS(ddd)
+   VANILLA_OBJECTS(sl)
+   VANILLA_OBJECTS(wdw)
+   VANILLA_OBJECTS(ttm)
+   VANILLA_OBJECTS(thi)
+   VANILLA_OBJECTS(ttc)
+   VANILLA_OBJECTS(rr)
+   VANILLA_OBJECTS(bitdw)
+   VANILLA_OBJECTS(bitfs)
+   VANILLA_OBJECTS(bits)
+   VANILLA_OBJECTS(vcutm)
+   VANILLA_OBJECTS(castle_inside)
+   VANILLA_OBJECTS(castle_grounds)
 
    /* use segmented addressing for behaviors */
    BEGIN_SEG(behavior, 0x13000000)
