@@ -25,13 +25,6 @@ const GeoLayout ending_geo_area_1[] = {
             GEO_ASM(0, geo_exec_cake_end_screen),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
-      GEO_ZBUFFER(1),
-      GEO_OPEN_NODE(),
-         GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 12800, geo_camera_fov),
-         GEO_OPEN_NODE(),
-            GEO_CAMERA(CAMERA_MODE_RADIAL, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
-         GEO_CLOSE_NODE(),
-      GEO_CLOSE_NODE(),
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
