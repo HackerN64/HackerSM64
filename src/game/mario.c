@@ -1255,7 +1255,7 @@ void update_mario_joystick_inputs(struct MarioState *m) {
         m->intendedMag = mag / 8.0f;
     }
 
-    if (gCurrDemoInput != NULL) {
+    if (gCurrDemoInput != NULL && !(gMarioState->action & ACT_FLAG_SWIMMING)) {
         if (gCurrDemoInput->stickMag > 0.0f) {
             m->intendedMag = gCurrDemoInput->stickMag;
             m->intendedYaw = gCurrDemoInput->stickYaw;

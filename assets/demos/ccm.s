@@ -1,6 +1,5 @@
 #include "demo_macros.inc"
 
-for  60 frames;  mag 0.000000;  yaw  18930;  press _
 for  43 frames;  mag 0.000000;  yaw  25486;  press _
 for   1 frames;  mag 0.031250;  yaw  22442;  press _
 for   1 frames;  mag 2.820313;  yaw  22438;  press _

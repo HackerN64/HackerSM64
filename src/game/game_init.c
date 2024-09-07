@@ -10,6 +10,7 @@
 #include "buffers/zbuffer.h"
 #include "engine/level_script.h"
 #include "engine/math_util.h"
+#include "demo_system.h"
 #include "game_init.h"
 #include "main.h"
 #include "memory.h"
@@ -95,7 +96,6 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
 struct DemoInput gRecordedDemoInput = { 0 };
-u16 gDemoLevel = 0;
 
 // Display
 // ----------------------------------------------------------------------------------------------------
@@ -473,155 +473,6 @@ void display_and_vsync(void) {
     }
     gGlobalTimer++;
 }
-
-#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
-void print_demo_input(struct DemoInput *d) {
-    char buttonStr[20];
-    char *buttonPtr = buttonStr;
-
-    if (d->timer == 0) {
-        osSyncPrintf("end_demo\n");
-        return;
-    }
-
-    if (d->buttonMask == 0) {
-        sprintf(buttonStr, "_");
-    } else {
-        u16 faceButtons = d->buttonMask;
-        u16 cButtons = d->buttonMask;
-
-        if (faceButtons & A_BUTTON) {
-            buttonPtr += sprintf(buttonPtr, "A | ");
-        }
-        if (faceButtons & B_BUTTON) {
-            buttonPtr += sprintf(buttonPtr, "B | ");
-        }
-        if (faceButtons & Z_TRIG) {
-            buttonPtr += sprintf(buttonPtr, "Z | ");
-        }
-        if (faceButtons & START_BUTTON) {
-            buttonPtr += sprintf(buttonPtr, "Start | ");
-        }
-
-        if (cButtons & U_CBUTTONS) {
-            buttonPtr += sprintf(buttonPtr, "C_Up | ");
-        }
-        if (cButtons & D_CBUTTONS) {
-            buttonPtr += sprintf(buttonPtr, "C_Down | ");
-        }
-        if (cButtons & L_CBUTTONS) {
-            buttonPtr += sprintf(buttonPtr, "C_Left | ");
-        }
-        if (cButtons & R_CBUTTONS) {
-            buttonPtr += sprintf(buttonPtr, "C_Right | ");
-        }
-
-        u32 len = strlen(buttonStr);
-        buttonStr[len - 3] = 0; // Remove the trailing ' | '
-    }
-
-    if (gCamera) {
-        char text[200];
-
-        sprintf(text, "for %3d frames;  mag %f;  yaw %5d;  press %s\n",
-            d->timer,
-            d->stickMag,
-            d->stickYaw,
-            buttonStr
-        );
-        osSyncPrintf(text);
-    }
-
-}
-// this function records distinct inputs over a 255-frame interval to RAM locations and was likely
-// used to record the demo sequences seen in the final game. This function is unused.
-void record_demo(void) {
-    if (gMarioState == NULL) return;
-    // record the player's button mask and current rawStickX and rawStickY.
-    u16 buttonMask = gPlayer1Controller->buttonDown;
-    s16 intendedYaw = gMarioState->intendedYaw;
-    f32 stickMag = gMarioState->intendedMag;
-
-    // Rrecord the distinct input and timer so long as they are unique.
-    // If the timer hits 0xFF, reset the timer for the next demo input.
-    if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
-        || intendedYaw != gRecordedDemoInput.stickYaw || stickMag != gRecordedDemoInput.stickMag) {
-        print_demo_input(&gRecordedDemoInput);
-        gRecordedDemoInput.timer = 0;
-        gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.stickYaw = intendedYaw;
-        gRecordedDemoInput.stickMag = stickMag;
-    }
-    gRecordedDemoInput.timer++;
-}
-
-#define DEMO_BANK_INPUT_CAPACITY (DEMO_INPUTS_POOL_SIZE / sizeof(struct DemoInput))
-void *demoInputsMalloc = NULL;
-u32 gCurrentDemoSize = 0;
-u32 gCurrentDemoIdx = 0;
-
-void dma_new_demo_data() {
-    void *demoBank = get_segment_base_addr(SEGMENT_DEMO_INPUTS);
-
-    u8 *romStart = gDemos[gDemoLevel].romStart + (sizeof(struct DemoInput) * gCurrentDemoIdx);
-    u8 *romEnd;
-    if (gCurrentDemoIdx + DEMO_BANK_INPUT_CAPACITY > gCurrentDemoSize) {
-        romEnd = gDemos[gDemoLevel].romEnd;
-    }
-    else {
-        romEnd = romStart + DEMO_INPUTS_POOL_SIZE;
-    }
-
-    dma_read(demoBank, romStart, romEnd);
-}
-
-/**
- * If a demo sequence exists, this will run the demo input list until it is complete.
- */
-void run_demo_inputs(void) {
-    // Eliminate the unused bits.
-    gPlayer1Controller->controllerData->button &= VALID_BUTTONS;
-
-    // Check if a demo inputs list exists and if so,
-    // run the active demo input list.
-    if (gCurrDemoInput != NULL) {
-        // The timer variable being 0 at the current input means the demo is over.
-        // Set the button to the END_DEMO mask to end the demo.
-        if (gCurrDemoInput->timer == 0) {
-            gPlayer1Controller->controllerData->stick_x = 0;
-            gPlayer1Controller->controllerData->stick_y = 0;
-            gPlayer1Controller->controllerData->button = END_DEMO;
-        } else {
-            // Backup the start button if it is pressed, since we don't want the
-            // demo input to override the mask where start may have been pressed.
-            u16 startPushed = (gPlayer1Controller->controllerData->button & START_BUTTON);
-
-            // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            // gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
-            // gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
-
-            // To assign the demo input, the button information is stored in
-            // an 8-bit mask rather than a 16-bit mask. this is because only
-            // A, B, Z, Start, and the C-Buttons are used in a demo, as bits
-            // in that order. In order to assign the mask, we need to take the
-            // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
-            // match the correct input mask. We then add this to the masked
-            // lower 4 bits to get the correct button mask.
-            gPlayer1Controller->controllerData->button = gCurrDemoInput->buttonMask;
-
-            // If start was pushed, put it into the demo sequence being input to end the demo.
-            gPlayer1Controller->controllerData->button |= startPushed;
-
-            // Run the current demo input's timer down. if it hits 0, advance the demo input list.
-            if (--gCurrDemoInput->timer == 0) {
-                gCurrDemoInput++;
-                print_demo_input(gCurrDemoInput);
-            }
-        }
-    }
-}
-
-#endif
 
 /**
  * Take the updated controller struct and calculate the new x, y, and distance floats.

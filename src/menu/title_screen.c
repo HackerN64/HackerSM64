@@ -3,6 +3,7 @@
 #include "audio/external.h"
 #include "engine/math_util.h"
 #include "game/area.h"
+#include "game/demo_system.h"
 #include "game/game_init.h"
 #include "game/level_update.h"
 #include "game/main.h"
@@ -33,76 +34,9 @@ static char sLevelSelectStageNames[64][16] = {
 #undef DEFINE_LEVEL
 
 #ifdef KEEP_MARIO_HEAD
-#ifndef DISABLE_DEMO
-static u16 sDemoCountdown = 0;
-struct DemoFile gDemos[LEVEL_COUNT] ALIGNED8;
-#endif // DISABLE_DEMO
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
-
-
-#ifndef DISABLE_DEMO
-
-#define PRESS_START_DEMO_TIMER 30
-extern u32 gCurrentDemoSize;
-extern u32 gCurrentDemoIdx;
-extern void dma_new_demo_data();
-
-/**
- * Run the demo timer on the PRESS START screen after a number of frames.
- * This function returns the level ID from the first byte of a demo file.
- * It also returns the level ID from intro_regular (file select or level select menu)
- */
-s32 run_level_id_or_demo(s32 level) {
-    gCurrDemoInput = NULL;
-
-    if (level == LEVEL_NONE) {
-        if (!gPlayer1Controller->buttonDown && !gPlayer1Controller->stickMag) {
-            // start the demo. 800 frames has passed while
-            // player is idle on PRESS START screen.
-            if ((++sDemoCountdown) == PRESS_START_DEMO_TIMER) {
-                u32 demoCount = 0;
-
-                // DMA in the Level Demo List
-                // Should always DMA in (LEVEL_COUNT * 8) bytes
-                dma_read((u8 *) &gDemos, demoFile, demoFileEnd);
-
-                // Find a non-null demo in the list
-                // (If a demo played already, increment first before checking)
-                do {
-                    if (gDemoLevel >= LEVEL_MAX) {
-                        gDemoLevel = 0;
-                    }
-                    gDemoLevel++;
-                    demoCount++;
-                     // No demos installed in assets/demos/; continue playing the mario head
-                    if (demoCount > (LEVEL_MAX * 2)) {
-                        sDemoCountdown = 0;
-                        return level;
-                    }
-                } while (gDemos[gDemoLevel].romStart == NULL);
-
-                gCurrentDemoSize = (u32) gDemos[gDemoLevel].romEnd - (u32) gDemos[gDemoLevel].romStart;
-                gCurrentDemoIdx = 0;
-                dma_new_demo_data();
-
-                struct DemoInput *demoBank = get_segment_base_addr(SEGMENT_DEMO_INPUTS);
-
-                // Point the current input to the demo segment
-                gCurrDemoInput = demoBank;
-                level = gDemoLevel + 1;
-                gCurrSaveFileNum = 1;
-                gCurrActNum = 1;
-            }
-        } else { // activity was detected, so reset the demo countdown.
-            sDemoCountdown = 0;
-        }
-    }
-    return level;
-}
-#endif // DISABLE_DEMO
-#endif // KEEP_MARIO_HEAD
-
+#endif
 
 u8 gLevelSelectHoldKeyIndex = 0;
 u8 gLevelSelectHoldKeyTimer = 0;

@@ -8,6 +8,9 @@
     .half \seed
 .endm
 
+.macro stick x, y
+    .byte \x, \y
+.endm
 .macro yaw y
     .half \y
 .endm
@@ -25,10 +28,6 @@
 
 .macro mag m
     .float \m
-.endm
-
-.macro stick x, y
-    .byte \x, \y
 .endm
 
 .macro press b
