@@ -1,13 +1,19 @@
 #pragma once
+#include <PR/os_cont.h>
 
 /* Demo Macros */
 
-.macro start_demo name
-    .section .data
+.macro set_rng seed
+    .byte 0, 0
+    .half \seed
 .endm
 
-.macro end_demo name
-    .byte 0, 0, 0, 0
+.macro yaw y
+    .half \y
+.endm
+
+.macro end_demo
+    .word 0, 0, 0
 .endm
 
 .macro for holdcount_frames
@@ -17,19 +23,23 @@
 /* purely for legibility */
 #define frames
 
+.macro mag m
+    .float \m
+.endm
+
 .macro stick x, y
     .byte \x, \y
 .endm
 
 .macro press b
-    .byte \b
+    .half \b
 .endm
 
 /* Button macros are shifted weirdly */
-#define A A_BUTTON >> 8
-#define B B_BUTTON >> 8
-#define Z Z_TRIG >> 8
-#define Start START_BUTTON >> 8
+#define A A_BUTTON
+#define B B_BUTTON
+#define Z Z_TRIG
+#define Start START_BUTTON
 
 /* Might as well set pretty names for C buttons too */
 #define C_Up U_CBUTTONS

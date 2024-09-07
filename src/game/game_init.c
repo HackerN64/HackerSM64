@@ -13,6 +13,7 @@
 #include "game_init.h"
 #include "main.h"
 #include "memory.h"
+#include "level_update.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sound_init.h"
@@ -475,15 +476,14 @@ void display_and_vsync(void) {
 
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
 void print_demo_input(struct DemoInput *d) {
-    char text[200];
     char buttonStr[20];
     char *buttonPtr = buttonStr;
 
     if (d->buttonMask == 0) {
         sprintf(buttonStr, "_");
     } else {
-        u16 faceButtons = d->buttonMask << 8;
-        u16 cButtons = d->buttonMask & 0xF;
+        u16 faceButtons = d->buttonMask;
+        u16 cButtons = d->buttonMask;
 
         if (faceButtons & A_BUTTON) {
             buttonPtr += sprintf(buttonPtr, "A | ");
@@ -515,44 +515,37 @@ void print_demo_input(struct DemoInput *d) {
         buttonStr[len - 3] = 0; // Remove the trailing ' | '
     }
 
-    sprintf(text, "for %3d frames;  stick %4d, %4d;  press %s\n",
-        d->timer,
-        d->rawStickX,
-        d->rawStickY,
-        buttonStr
-    );
+    if (gCamera) {
+        char text[200];
 
-    osSyncPrintf(text);
+        sprintf(text, "for %3d frames;  mag %f;  yaw %5d;  press %s\n",
+            d->timer,
+            d->stickMag,
+            d->stickYaw,
+            buttonStr
+        );
+        osSyncPrintf(text);
+    }
+
 }
 // this function records distinct inputs over a 255-frame interval to RAM locations and was likely
 // used to record the demo sequences seen in the final game. This function is unused.
 void record_demo(void) {
+    if (gMarioState == NULL) return;
     // record the player's button mask and current rawStickX and rawStickY.
-    u8 buttonMask =
-        ((gPlayer1Controller->buttonDown & (A_BUTTON | B_BUTTON | Z_TRIG | START_BUTTON)) >> 8)
-        | (gPlayer1Controller->buttonDown & (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS));
-    s8 rawStickX = gPlayer1Controller->rawStickX;
-    s8 rawStickY = gPlayer1Controller->rawStickY;
-
-    // If the stick is in deadzone, set its value to 0 to
-    // nullify the effects. We do not record deadzone inputs.
-    if (rawStickX > -8 && rawStickX < 8) {
-        rawStickX = 0;
-    }
-
-    if (rawStickY > -8 && rawStickY < 8) {
-        rawStickY = 0;
-    }
+    u16 buttonMask = gPlayer1Controller->buttonDown;
+    s16 intendedYaw = gMarioState->intendedYaw;
+    f32 stickMag = gMarioState->intendedMag;
 
     // Rrecord the distinct input and timer so long as they are unique.
     // If the timer hits 0xFF, reset the timer for the next demo input.
     if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
-        || rawStickX != gRecordedDemoInput.rawStickX || rawStickY != gRecordedDemoInput.rawStickY) {
+        || intendedYaw != gRecordedDemoInput.stickYaw || stickMag != gRecordedDemoInput.stickMag) {
         print_demo_input(&gRecordedDemoInput);
         gRecordedDemoInput.timer = 0;
         gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.rawStickX = rawStickX;
-        gRecordedDemoInput.rawStickY = rawStickY;
+        gRecordedDemoInput.stickYaw = intendedYaw;
+        gRecordedDemoInput.stickMag = stickMag;
     }
     gRecordedDemoInput.timer++;
 }
@@ -579,8 +572,8 @@ void run_demo_inputs(void) {
             u16 startPushed = (gPlayer1Controller->controllerData->button & START_BUTTON);
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
-            gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
+            // gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
+            // gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
 
             // To assign the demo input, the button information is stored in
             // an 8-bit mask rather than a 16-bit mask. this is because only
@@ -589,8 +582,7 @@ void run_demo_inputs(void) {
             // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
             // match the correct input mask. We then add this to the masked
             // lower 4 bits to get the correct button mask.
-            gPlayer1Controller->controllerData->button =
-                ((gCurrDemoInput->buttonMask & 0xF0) << 8) + ((gCurrDemoInput->buttonMask & 0xF));
+            gPlayer1Controller->controllerData->button = gCurrDemoInput->buttonMask;
 
             // If start was pushed, put it into the demo sequence being input to end the demo.
             gPlayer1Controller->controllerData->button |= startPushed;
@@ -598,6 +590,7 @@ void run_demo_inputs(void) {
             // Run the current demo input's timer down. if it hits 0, advance the demo input list.
             if (--gCurrDemoInput->timer == 0) {
                 gCurrDemoInput++;
+                print_demo_input(gCurrDemoInput);
             }
         }
     }
@@ -697,6 +690,7 @@ void read_controller_inputs(s32 threadID) {
             controller->stickMag       = 0.0f;
         }
     }
+    // record_demo();
 }
 
 /**

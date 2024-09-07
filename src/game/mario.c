@@ -1255,7 +1255,15 @@ void update_mario_joystick_inputs(struct MarioState *m) {
         m->intendedMag = mag / 8.0f;
     }
 
-    if (m->intendedMag > 0.0f) {
+    if (gCurrDemoInput != NULL) {
+        if (gCurrDemoInput->stickMag > 0.0f) {
+            m->intendedMag = gCurrDemoInput->stickMag;
+            m->intendedYaw = gCurrDemoInput->stickYaw;
+            m->input |= INPUT_NONZERO_ANALOG;
+        } else {
+            m->intendedYaw = m->faceAngle[1];
+        }
+    } else if (m->intendedMag > 0.0f) {
         m->intendedYaw = atan2s(-controller->stickY, controller->stickX) + m->area->camera->yaw;
         m->input |= INPUT_NONZERO_ANALOG;
     } else {

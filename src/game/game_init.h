@@ -12,7 +12,7 @@
 #include "level_table.h"
 
 #define MARIO_ANIMS_POOL_SIZE 0x4000
-#define DEMO_INPUTS_POOL_SIZE 0x800
+#define DEMO_INPUTS_POOL_SIZE 0x2000
 
 struct GfxPool {
     Gfx buffer[GFX_POOL_SIZE];
@@ -26,9 +26,9 @@ struct DemoFile {
 
 struct DemoInput {
     u8 timer; // time until next input. if this value is 0, it means the demo is over
-    s8 rawStickX;
-    s8 rawStickY;
-    u8 buttonMask;
+    f32 stickMag;
+    s16 stickYaw;
+    u16 buttonMask;
 };
 
 enum ZBmodes {
