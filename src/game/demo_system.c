@@ -16,7 +16,7 @@ static u16 sDemoCountdown = 0;
 u16 gDemoLevel = 0;
 
 u8 player_action_reads_stick(struct MarioState *m) {
-    if (m->action & ACT_FLAG_SWIMMING) {
+    if (m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_ON_POLE)) {
         return TRUE;
     }
     return FALSE;
@@ -81,18 +81,25 @@ void print_demo_input(struct DemoInput *d) {
         buttonStr[len - 3] = 0; // Remove the trailing ' | '
     }
 
-    if (gCamera) {
-        char text[200];
+    char text[100];
 
-        sprintf(text, "for %3d frames;  mag %f;  yaw %5d;  press %s\n",
+    if (player_action_reads_stick(gMarioState)) {
+        sprintf(text, "for %3d frames;  mag %2f;  stick %3d, %3d;  press %s\n",
+            d->timer,
+            d->stickMag,
+            gPlayer1Controller->rawStickX,
+            gPlayer1Controller->rawStickY,
+            buttonStr
+        );
+    } else {
+        sprintf(text, "for %3d frames;  mag %2f;  yaw %6d;  press %s\n",
             d->timer,
             d->stickMag,
             d->stickYaw,
             buttonStr
         );
-        osSyncPrintf(text);
     }
-
+    osSyncPrintf(text);
 }
 // this function records distinct inputs over a 255-frame interval to RAM locations and was likely
 // used to record the demo sequences seen in the final game. This function is unused.
