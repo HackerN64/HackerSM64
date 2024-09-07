@@ -1,78 +1,61 @@
 #!/usr/bin/env python3
 import sys
-import re
-import json
+import os
+import glob
+
+def usage():
+    print(f"Usage: {sys.argv[0]} path/to/demo/folder/")
 
 def main():
-    need_help = False
-    defines = []
-    skip_next = 0
-    prog_args = []
-    for i, a in enumerate(sys.argv[1:], 1):
-        if skip_next > 0:
-            skip_next -= 1
-            continue
-        if a == "--help" or a == "-h":
-            need_help = True
-        if a == "-D":
-            defines.append(sys.argv[i + 1])
-            skip_next = 1
-        elif a.startswith("-D"):
-            defines.append(a[2:])
-        else:
-            prog_args.append(a)
+    if len(sys.argv) != 2:
+        usage()
+        sys.exit(1)
 
-    defines = [d.split("=")[0] for d in defines]
+    demo_folder = sys.argv[1]
+    demo_files = glob.glob(f"{demo_folder}/*.s")
+    available_levels = [os.path.basename(i).split(".")[0] for i in demo_files]
     
-    if len(prog_args) < 1 or need_help:
-        print("Usage: {} <demo_data.json> [-D <symbol>] > <demo_data.c>".format(sys.argv[0]))
-        sys.exit(0 if need_help else 1)
+    # Get available levels
+    level_list = []
+    stub_counter = 0
+    with open("levels/level_defines.h") as levelfile:
+        for line in levelfile:
+            if line.startswith("DEFINE_LEVEL("):
+                level_list.append(line.split(",")[3].strip())
+            elif line.startswith("STUB_LEVEL("):
+                level_list.append(f"stub_{stub_counter}")
+                stub_counter += 1
 
-    with open(prog_args[0], "r") as file:
-        descr = json.loads(re.sub(r"/\*[\w\W]*?\*/", "", file.read()))
+    # Check that demo files actually correspond to a level
+    for level, filename in zip(available_levels, demo_files):
+        if level not in level_list:
+            print(f"Unknown Demo at {filename} - '{level}' is not a level name", file=sys.stderr)
+            sys.exit(1)
 
-    table = []
-    for item in descr["table"]:
-        if not "ifdef" in item or any(d in defines for d in item["ifdef"]):
-            table.append(item)
+    print('#include <PR/os_cont.h>')
+    print('#include "macros.inc"')
+    print('#include "demo_macros.inc"')
+    print()
 
-    demofiles = []
-    for item in descr["demofiles"]:
-        if not "ifdef" in item or any(d in defines for d in item["ifdef"]):
-            demofiles.append(item)
+    print(".section .data")
+    print("glabel demoFile")
 
-    structdef = ["u32 numEntries;",
-                 "const void *addrPlaceholder;",
-                 "struct OffsetSizePair entries[" + str(len(table)) + "];"]
-    structobj = [str(len(table)) + ",",
-                 "NULL,"]
+    for level in level_list:
+        if level in available_levels:
+            print(f".word demo_{level}_start, demo_{level}_end")
+        else:
+            print(f".word 0, 0")
 
-    structobj.append("{")
-    for item in table:
-        offset_to_data = "offsetof(struct DemoInputsObj, " + item["demofile"] + ")"
-        size = "sizeof(gDemoInputs." + item["demofile"] + ")"
-        if "extraSize" in item:
-            size += " + " + str(item["extraSize"])
-        structobj.append("{" + offset_to_data + ", " + size + "},")
-    structobj.append("},")
+    print("glabel demoFileEnd")
+    print()
 
-    for item in demofiles:
-        with open("assets/demos/" + item["name"] + ".bin", "rb") as file:
-            demobytes = file.read()
-        structdef.append("u8 " + item["name"] + "[" + str(len(demobytes)) + "];")
-        structobj.append("{" + ",".join(hex(x) for x in demobytes) + "},")
+    # start actual data counting
+    for file, name in zip(demo_files, available_levels):
+        print(f"glabel demo_{name}_start")
+        print(f'#include "{file}"')
+        print(f"glabel demo_{name}_end")
 
-    print("#include \"game/memory.h\"")
-    print("#include <stddef.h>")
-    print("")
 
-    print("struct DemoInputsObj {")
-    for s in structdef:
-        print(s)
-    print("} gDemoInputs = {")
-    for s in structobj:
-        print(s)
-    print("};")
 
 if __name__ == "__main__":
     main()

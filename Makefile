@@ -397,7 +397,8 @@ CPP_FILES         := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
 LIBZ_C_FILES      := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
 GODDARD_C_FILES   := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
-GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/demo_data.c
+GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c
+GENERATED_S_FILES := $(BUILD_DIR)/assets/demo_data.s
 
 # Ignore all .inc.c files
 C_FILES           := $(filter-out %.inc.c,$(C_FILES))
@@ -421,6 +422,7 @@ O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
            $(foreach file,$(CPP_FILES),$(BUILD_DIR)/$(file:.cpp=.o)) \
            $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
+           $(foreach file,$(GENERATED_S_FILES),$(file:.s=.o)) \
            lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
 
 LIBZ_O_FILES := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
@@ -800,9 +802,9 @@ $(BUILD_DIR)/assets/mario_anim_data.c: $(wildcard assets/anims/*.inc.c)
 	$(V)$(PYTHON) $(TOOLS_DIR)/mario_anims_converter.py > $@
 
 # Generate demo input data
-$(BUILD_DIR)/assets/demo_data.c: assets/demo_data.json $(wildcard assets/demos/*.bin)
+$(BUILD_DIR)/assets/demo_data.s: $(wildcard assets/demos/*.s)
 	@$(PRINT) "$(GREEN)Generating demo data $(NO_COL)\n"
-	$(V)$(PYTHON) $(TOOLS_DIR)/demo_data_converter.py assets/demo_data.json $(DEF_INC_CFLAGS) > $@
+	$(V)$(PYTHON) $(TOOLS_DIR)/demo_data_converter.py assets/demos/ > $@
 
 # Level headers
 $(BUILD_DIR)/include/level_headers.h: levels/level_headers.h.in
@@ -838,6 +840,9 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 $(BUILD_DIR)/%.o: %.s
 	$(call print,Assembling:,$<,$@)
 	$(V)$(CROSS)gcc -c $(ASMFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
+$(BUILD_DIR)/%.o: $(BUILD_DIR)/%.s
+	$(call print,Assembling:,$<,$@)
+	$(V)$(CROSS)gcc -c $(ASMFLAGS) -U_LANGUAGE_C $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Assemble RSP assembly code
 $(BUILD_DIR)/rsp/%.bin $(BUILD_DIR)/rsp/%_data.bin: rsp/%.s

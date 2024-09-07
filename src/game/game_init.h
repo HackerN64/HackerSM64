@@ -9,6 +9,7 @@
 #include "types.h"
 #include "memory.h"
 #include "config.h"
+#include "level_table.h"
 
 #define MARIO_ANIMS_POOL_SIZE 0x4000
 #define DEMO_INPUTS_POOL_SIZE 0x800
@@ -20,9 +21,13 @@ struct GfxPool {
 
 struct DemoInput {
     u8 timer; // time until next input. if this value is 0, it means the demo is over
-    s8 rawStickX;
-    s8 rawStickY;
-    u8 buttonMask;
+    f32 stickMag;
+    // Yaw is sufficient for most situations, but some Mario actions read the stick
+    union {
+        s16 stickYaw;
+        u8 stickPos[2];
+    };
+    u16 buttonMask;
 };
 
 enum ZBmodes {
@@ -41,7 +46,6 @@ extern struct VblankHandler gGameVblankHandler;
 extern uintptr_t gPhysicalFramebuffers[3];
 extern uintptr_t gPhysicalZBuffer;
 extern void *gMarioAnimsMemAlloc;
-extern void *gDemoInputsMemAlloc;
 extern struct SPTask *gGfxSPTask;
 extern Gfx *gDisplayListHead;
 extern u8 *gGfxPoolEnd;
@@ -66,16 +70,13 @@ extern struct Controller* const gPlayer2Controller;
 extern struct Controller* const gPlayer3Controller;
 extern struct Controller* const gPlayer4Controller;
 extern struct DemoInput *gCurrDemoInput;
-extern u16 gDemoInputListID;
 extern struct DemoInput gRecordedDemoInput;
 
 // this area is the demo input + the header. when the demo is loaded in, there is a header the size
 // of a single word next to the input list. this word is the current ID count.
 extern struct DmaHandlerList gMarioAnimsBuf;
-extern struct DmaHandlerList gDemoInputsBuf;
 
 extern u8 gMarioAnims[];
-extern u8 gDemoInputs[];
 
 extern u16 sRenderingFramebuffer;
 extern u32 gGlobalTimer;

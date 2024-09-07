@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -9,9 +10,11 @@
 #include "buffers/zbuffer.h"
 #include "engine/level_script.h"
 #include "engine/math_util.h"
+#include "demo_system.h"
 #include "game_init.h"
 #include "main.h"
 #include "memory.h"
+#include "level_update.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sound_init.h"
@@ -70,9 +73,7 @@ uintptr_t gPhysicalZBuffer;
 
 // Mario Anims and Demo allocation
 void *gMarioAnimsMemAlloc;
-void *gDemoInputsMemAlloc;
 struct DmaHandlerList gMarioAnimsBuf;
-struct DmaHandlerList gDemoInputsBuf;
 
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
@@ -94,7 +95,6 @@ struct Controller* const gPlayer4Controller = &gControllers[3];
 
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
-u16 gDemoInputListID = 0;
 struct DemoInput gRecordedDemoInput = { 0 };
 
 // Display
@@ -474,87 +474,6 @@ void display_and_vsync(void) {
     gGlobalTimer++;
 }
 
-#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
-// this function records distinct inputs over a 255-frame interval to RAM locations and was likely
-// used to record the demo sequences seen in the final game. This function is unused.
-UNUSED static void record_demo(void) {
-    // record the player's button mask and current rawStickX and rawStickY.
-    u8 buttonMask =
-        ((gPlayer1Controller->buttonDown & (A_BUTTON | B_BUTTON | Z_TRIG | START_BUTTON)) >> 8)
-        | (gPlayer1Controller->buttonDown & (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS));
-    s8 rawStickX = gPlayer1Controller->rawStickX;
-    s8 rawStickY = gPlayer1Controller->rawStickY;
-
-    // If the stick is in deadzone, set its value to 0 to
-    // nullify the effects. We do not record deadzone inputs.
-    if (rawStickX > -8 && rawStickX < 8) {
-        rawStickX = 0;
-    }
-
-    if (rawStickY > -8 && rawStickY < 8) {
-        rawStickY = 0;
-    }
-
-    // Rrecord the distinct input and timer so long as they are unique.
-    // If the timer hits 0xFF, reset the timer for the next demo input.
-    if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
-        || rawStickX != gRecordedDemoInput.rawStickX || rawStickY != gRecordedDemoInput.rawStickY) {
-        gRecordedDemoInput.timer = 0;
-        gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.rawStickX = rawStickX;
-        gRecordedDemoInput.rawStickY = rawStickY;
-    }
-    gRecordedDemoInput.timer++;
-}
-
-/**
- * If a demo sequence exists, this will run the demo input list until it is complete.
- */
-void run_demo_inputs(void) {
-    // Eliminate the unused bits.
-    gPlayer1Controller->controllerData->button &= VALID_BUTTONS;
-
-    // Check if a demo inputs list exists and if so,
-    // run the active demo input list.
-    if (gCurrDemoInput != NULL) {
-        // The timer variable being 0 at the current input means the demo is over.
-        // Set the button to the END_DEMO mask to end the demo.
-        if (gCurrDemoInput->timer == 0) {
-            gPlayer1Controller->controllerData->stick_x = 0;
-            gPlayer1Controller->controllerData->stick_y = 0;
-            gPlayer1Controller->controllerData->button = END_DEMO;
-        } else {
-            // Backup the start button if it is pressed, since we don't want the
-            // demo input to override the mask where start may have been pressed.
-            u16 startPushed = (gPlayer1Controller->controllerData->button & START_BUTTON);
-
-            // Perform the demo inputs by assigning the current button mask and the stick inputs.
-            gPlayer1Controller->controllerData->stick_x = gCurrDemoInput->rawStickX;
-            gPlayer1Controller->controllerData->stick_y = gCurrDemoInput->rawStickY;
-
-            // To assign the demo input, the button information is stored in
-            // an 8-bit mask rather than a 16-bit mask. this is because only
-            // A, B, Z, Start, and the C-Buttons are used in a demo, as bits
-            // in that order. In order to assign the mask, we need to take the
-            // upper 4 bits (A, B, Z, and Start) and shift then left by 8 to
-            // match the correct input mask. We then add this to the masked
-            // lower 4 bits to get the correct button mask.
-            gPlayer1Controller->controllerData->button =
-                ((gCurrDemoInput->buttonMask & 0xF0) << 8) + ((gCurrDemoInput->buttonMask & 0xF));
-
-            // If start was pushed, put it into the demo sequence being input to end the demo.
-            gPlayer1Controller->controllerData->button |= startPushed;
-
-            // Run the current demo input's timer down. if it hits 0, advance the demo input list.
-            if (--gCurrDemoInput->timer == 0) {
-                gCurrDemoInput++;
-            }
-        }
-    }
-}
-
-#endif
-
 /**
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
@@ -647,6 +566,7 @@ void read_controller_inputs(s32 threadID) {
             controller->stickMag       = 0.0f;
         }
     }
+    // record_demo();
 }
 
 /**
@@ -746,12 +666,17 @@ void setup_game_memory(void) {
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
 #ifdef PUPPYPRINT_DEBUG
     set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
+#ifndef DISABLE_DEMO
     set_segment_memory_printout(SEGMENT_DEMO_INPUTS, DEMO_INPUTS_POOL_SIZE);
-#endif
-    // Setup Demo Inputs List
-    gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
-    setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
+#endif // DISABLE_DEMO
+#endif // PUPPYPRINT_DEBUG
+
+#ifndef DISABLE_DEMO
+    // Setup Demo Inputs Memory, otherwise save 0x800 bytes
+    demoInputsMalloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) demoInputsMalloc);
+#endif // DISABLE_DEMO
+
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
     // Setup Segment 2 (Fonts, Text, etc)

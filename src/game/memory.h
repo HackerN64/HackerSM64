@@ -42,6 +42,8 @@ struct DmaHandlerList {
 
 extern struct MemoryPool *gEffectsMemoryPool;
 
+void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
+
 uintptr_t set_segment_base_addr(s32 segment, void *addr);
 void *get_segment_base_addr(s32 segment);
 void *segmented_to_virtual(const void *addr);
