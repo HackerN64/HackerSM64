@@ -479,6 +479,11 @@ void print_demo_input(struct DemoInput *d) {
     char buttonStr[20];
     char *buttonPtr = buttonStr;
 
+    if (d->timer == 0) {
+        osSyncPrintf("end_demo\n");
+        return;
+    }
+
     if (d->buttonMask == 0) {
         sprintf(buttonStr, "_");
     } else {
@@ -548,6 +553,26 @@ void record_demo(void) {
         gRecordedDemoInput.stickMag = stickMag;
     }
     gRecordedDemoInput.timer++;
+}
+
+#define DEMO_BANK_INPUT_CAPACITY (DEMO_INPUTS_POOL_SIZE / sizeof(struct DemoInput))
+void *demoInputsMalloc = NULL;
+u32 gCurrentDemoSize = 0;
+u32 gCurrentDemoIdx = 0;
+
+void dma_new_demo_data() {
+    void *demoBank = get_segment_base_addr(SEGMENT_DEMO_INPUTS);
+
+    u8 *romStart = gDemos[gDemoLevel].romStart + (sizeof(struct DemoInput) * gCurrentDemoIdx);
+    u8 *romEnd;
+    if (gCurrentDemoIdx + DEMO_BANK_INPUT_CAPACITY > gCurrentDemoSize) {
+        romEnd = gDemos[gDemoLevel].romEnd;
+    }
+    else {
+        romEnd = romStart + DEMO_INPUTS_POOL_SIZE;
+    }
+
+    dma_read(demoBank, romStart, romEnd);
 }
 
 /**
@@ -797,8 +822,8 @@ void setup_game_memory(void) {
 
 #ifndef DISABLE_DEMO
     // Setup Demo Inputs Memory, otherwise save 0x800 bytes
-    void *demoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) demoInputsMemAlloc);
+    demoInputsMalloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) demoInputsMalloc);
 #endif // DISABLE_DEMO
 
     // Setup Level Script Entry

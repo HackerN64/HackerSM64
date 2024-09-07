@@ -43,7 +43,10 @@ static s16 sPlayMarioGameOver = TRUE;
 
 #ifndef DISABLE_DEMO
 
-#define PRESS_START_DEMO_TIMER 800
+#define PRESS_START_DEMO_TIMER 30
+extern u32 gCurrentDemoSize;
+extern u32 gCurrentDemoIdx;
+extern void dma_new_demo_data();
 
 /**
  * Run the demo timer on the PRESS START screen after a number of frames.
@@ -79,21 +82,17 @@ s32 run_level_id_or_demo(s32 level) {
                     }
                 } while (gDemos[gDemoLevel].romStart == NULL);
 
-                if ((u32) gDemos[gDemoLevel].romEnd - (u32) gDemos[gDemoLevel].romStart > DEMO_INPUTS_POOL_SIZE) {
-                    // Failsafe since the equivalent assert wouldn't fit on the current crash screen.
-                    osSyncPrintf("[Demo System]: Tried to load a demo with too many inputs. Consider increasing DEMO_INPUTS_POOL_SIZE.\n");
-                    return level;
-                } else {
-                    struct DemoInput *demoBank = (struct DemoInput *) get_segment_base_addr(SEGMENT_DEMO_INPUTS);
+                gCurrentDemoSize = (u32) gDemos[gDemoLevel].romEnd - (u32) gDemos[gDemoLevel].romStart;
+                gCurrentDemoIdx = 0;
+                dma_new_demo_data();
 
-                    dma_read((u8 *) demoBank, gDemos[gDemoLevel].romStart, gDemos[gDemoLevel].romEnd);
-                    // Point the current input to the demo segment
-                    gCurrDemoInput = demoBank;
-                    level = gDemoLevel + 1;
-                    gCurrSaveFileNum = 1;
-                    gCurrActNum = 1;
-                }
+                struct DemoInput *demoBank = get_segment_base_addr(SEGMENT_DEMO_INPUTS);
 
+                // Point the current input to the demo segment
+                gCurrDemoInput = demoBank;
+                level = gDemoLevel + 1;
+                gCurrSaveFileNum = 1;
+                gCurrActNum = 1;
             }
         } else { // activity was detected, so reset the demo countdown.
             sDemoCountdown = 0;
