@@ -131,7 +131,7 @@ void bhv_coin_loop(void) {
         }
     }
 
-    if (o->oVelY < 0) {
+    if (o->oVelY <= 0) {
         cur_obj_become_tangible();
     }
 
@@ -231,7 +231,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
 }
 
 void bhv_coin_formation_init(void) {
-    o->oCoinRespawnBits = GET_BPARAM3(o->oBehParams);
+    o->oCoinRespawnBits = o->respawnInfo;
 }
 
 void bhv_coin_formation_loop(void) {
@@ -258,8 +258,7 @@ void bhv_coin_formation_loop(void) {
             break;
     }
 
-    // Casting to u8 doesn't seem to match
-    set_object_respawn_info_bits(o, o->oCoinRespawnBits & RESPAWN_INFO_DONT_RESPAWN);
+    set_object_respawn_info_bits(o, o->oCoinRespawnBits);
 }
 
 void coin_inside_boo_act_dropped(void) {

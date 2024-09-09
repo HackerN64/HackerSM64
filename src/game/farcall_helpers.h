@@ -23,7 +23,6 @@
 #include "game_init.h"
 #include "obj_behaviors_2.h"
 #include "level_headers.h"
-#include "level_misc_macros.h"
 
 s32 obj_is_rendering_enabled(void);
 s32 obj_get_pitch_from_vel(void);

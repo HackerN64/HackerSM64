@@ -387,6 +387,11 @@ void save_file_load_all(void) {
                 break;
         }
     }
+
+#ifdef MULTILANG
+    // Failsafe in case the language in the save file isn't defined.
+    multilang_set_language(get_language_index(multilang_get_language()));
+#endif
 }
 
 #ifdef PUPPYCAM
@@ -742,15 +747,28 @@ void save_file_move_cap_to_default_location(void) {
     }
 }
 
-#if MULTILANG
-void eu_set_language(u16 language) {
+#ifdef MULTILANG
+void multilang_set_language(u32 language) {
     gSaveBuffer.menuData.language = language;
+    gInGameLanguage = language;
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
-u32 eu_get_language(void) {
+u32 multilang_get_language(void) {
     return gSaveBuffer.menuData.language;
+}
+
+/**
+ * Determines the array index of the saved language based on which languages are defined.
+ */
+u32 get_language_index(u32 language) {
+    for (u32 i = 0; i < LANGUAGE_COUNT; i++) {
+        if (language == gDefinedLanguages[i]) {
+            return i;
+        }
+    }
+    return LANGUAGE_ENGLISH;
 }
 #endif
 

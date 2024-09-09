@@ -20,7 +20,6 @@
 #include "geo_layout.h"
 #include "graph_node.h"
 #include "level_script.h"
-#include "level_misc_macros.h"
 #include "level_commands.h"
 #include "math_util.h"
 #include "surface_collision.h"
@@ -474,6 +473,7 @@ static void level_cmd_init_mario(void) {
 
     gMarioSpawnInfo->activeAreaIndex = -1;
     gMarioSpawnInfo->areaIndex = 0;
+    gMarioSpawnInfo->respawnInfo = RESPAWN_INFO_NONE;
     gMarioSpawnInfo->behaviorArg = CMD_GET(u32, 4);
     gMarioSpawnInfo->behaviorScript = CMD_GET(void *, 8);
     gMarioSpawnInfo->model = gLoadedGraphNodes[CMD_GET(ModelID16, 0x2)]; // u8, 3?
@@ -500,6 +500,7 @@ static void level_cmd_place_object(void) {
 
         spawnInfo->areaIndex = sCurrAreaIndex;
         spawnInfo->activeAreaIndex = sCurrAreaIndex;
+        spawnInfo->respawnInfo = RESPAWN_INFO_NONE;
 
         spawnInfo->behaviorArg = CMD_GET(u32, 16);
         spawnInfo->behaviorScript = CMD_GET(void *, 20);
@@ -661,22 +662,8 @@ static void level_cmd_set_rooms(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_set_macro_objects(void) {
-    if (sCurrAreaIndex != -1) {
-#ifndef NO_SEGMENTED_MEMORY
-        gAreas[sCurrAreaIndex].macroObjects = segmented_to_virtual(CMD_GET(void *, 4));
-#else
-        // The game modifies the macro object data (for example marking coins as taken),
-        // so it must be reset when the level reloads.
-        MacroObject *data = segmented_to_virtual(CMD_GET(void *, 4));
-        s32 len = 0;
-        while (data[len++] != MACRO_OBJECT_END()) {
-            len += 4;
-        }
-        gAreas[sCurrAreaIndex].macroObjects = alloc_only_pool_alloc(sLevelPool, len * sizeof(MacroObject));
-        memcpy(gAreas[sCurrAreaIndex].macroObjects, data, len * sizeof(MacroObject));
-#endif
-    }
+// Unused. Previously level_cmd_set_macro_objects
+static void level_cmd_39(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -928,7 +915,7 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_SET_MUSIC                   */ level_cmd_set_music,
     /*LEVEL_CMD_SET_MENU_MUSIC              */ level_cmd_set_menu_music,
     /*LEVEL_CMD_FADEOUT_MUSIC               */ level_cmd_fadeout_music,
-    /*LEVEL_CMD_SET_MACRO_OBJECTS           */ level_cmd_set_macro_objects,
+    /*LEVEL_CMD_39                          */ level_cmd_39, // previously level_cmd_set_macro_objects
     /*LEVEL_CMD_3A                          */ level_cmd_3A,
     /*LEVEL_CMD_CREATE_WHIRLPOOL            */ level_cmd_create_whirlpool,
     /*LEVEL_CMD_GET_OR_SET_VAR              */ level_cmd_get_or_set_var,

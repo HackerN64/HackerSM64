@@ -3,6 +3,7 @@
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
+#include "ingame_menu.h"
 
 extern void *puppyprint_font_lut[];
 extern void *puppyprint_kerning_lut[][82];
@@ -45,14 +46,19 @@ extern Gfx dl_paintings_env_mapped_begin[];
 extern Gfx dl_paintings_env_mapped_end[];
 extern s16 seg2_painting_triangle_mesh[];
 extern s16 seg2_painting_mesh_neighbor_tris[];
-extern Texture *main_hud_lut[58];
+extern struct AsciiCharLUTEntry main_hud_lut[];
+extern struct Utf8LUT main_hud_utf8_lut;
+extern Texture texture_hud_char_umlaut[];
 extern Gfx dl_hud_img_load_tex_block[];
 extern Gfx dl_hud_img_begin[];
 extern Gfx dl_hud_img_end[];
-extern void *main_font_lut[];
+extern struct DiacriticLUTEntry main_font_diacritic_lut[];
+extern struct AsciiCharLUTEntry main_font_lut[];
+extern struct Utf8LUT main_font_utf8_lut;
 extern Gfx dl_ia_text_tex_settings[];
+extern Gfx dl_ia_text_tex_settings_packed[];
 extern Gfx dl_rgba16_load_tex_block[];
-extern void *main_credits_font_lut[];
+extern struct AsciiCharLUTEntry main_credits_font_lut[];
 extern Texture *main_hud_camera_lut[6];
 extern Gfx dl_shade_screen_begin[];
 extern Gfx dl_shade_screen_end[];

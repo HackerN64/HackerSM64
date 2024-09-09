@@ -404,9 +404,9 @@ void render_hud_breath_meter(void) {
  * Renders the amount of lives Mario has.
  */
 void render_hud_mario_lives(void) {
-    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), HUD_TOP_Y, ","); // 'Mario Head' glyph
-    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(38), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y, "%d", gHudDisplay.lives);
+    char str[10];
+    sprintf(str, "☺×%d", gHudDisplay.lives);
+    print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), HUD_TOP_Y, str);
 }
 
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
@@ -416,7 +416,7 @@ void render_debug_mode(void) {
     print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
     print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
     print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
-    print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
+    print_text_fmt_int(10, 120, "ANG 0×%04x", (u16) gMarioState->faceAngle[1]);
     print_fps(10,80);
 }
 #endif
@@ -425,9 +425,9 @@ void render_debug_mode(void) {
  * Renders the amount of coins collected.
  */
 void render_hud_coins(void) {
-    print_text(HUD_COINS_X, HUD_TOP_Y, "$"); // 'Coin' glyph
-    print_text((HUD_COINS_X + 16), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int((HUD_COINS_X + 30), HUD_TOP_Y, "%d", gHudDisplay.coins);
+    char str[10];
+    sprintf(str, "✪×%d", gHudDisplay.coins);
+    print_text(HUD_COINS_X, HUD_TOP_Y, str);
 }
 
 /**
@@ -435,12 +435,14 @@ void render_hud_coins(void) {
  * Disables "X" glyph when Mario has 100 stars or more.
  */
 void render_hud_stars(void) {
+    char str[10];
     if (gHudFlash == HUD_FLASH_STARS && gGlobalTimer & 0x8) return;
-    s8 showX = (gHudDisplay.stars < 100);
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
-    if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int((showX * 14) + GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X - 16),
-                       HUD_TOP_Y, "%d", gHudDisplay.stars);
+    if (gHudDisplay.stars < 100) {
+        sprintf(str, "★×%d", gHudDisplay.stars);
+    } else {
+        sprintf(str, "★%d", gHudDisplay.stars);
+    }
+    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, str);
 }
 
 /**
@@ -455,34 +457,25 @@ void render_hud_keys(void) {
     }
 }
 
+LangArray textTime = DEFINE_LANGUAGE_ARRAY(
+    "TIME %0d'%02d\"%d",
+    "TEMPS %0d'%02d\"%d",
+    "ZEIT %0d'%02d\"%d",
+    "TIME %0d'%02d\"%d",
+    "TIEM. %0d'%02d\"%d");
+
 /**
  * Renders the timer when Mario start sliding in PSS.
  */
 void render_hud_timer(void) {
-    Texture *(*hudLUT)[58] = segmented_to_virtual(&main_hud_lut);
+    char str[20];
     u16 timerValFrames = gHudDisplay.timer;
     u16 timerMins = timerValFrames / (30 * 60);
     u16 timerSecs = (timerValFrames - (timerMins * 1800)) / 30;
     u16 timerFracSecs = ((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3;
 
-#if MULTILANG
-    switch (eu_get_language()) {
-        case LANGUAGE_ENGLISH: print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "TIME"); break;
-        case LANGUAGE_FRENCH:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(155), 185, "TEMPS"); break;
-        case LANGUAGE_GERMAN:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "ZEIT"); break;
-    }
-#else
-    print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185, "TIME");
-#endif
-
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), 185, "%0d", timerMins);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(71), 185, "%02d", timerSecs);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(37), 185, "%d", timerFracSecs);
-
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
-    render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(81), 32, (*hudLUT)[GLYPH_APOSTROPHE]);
-    render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(46), 32, (*hudLUT)[GLYPH_DOUBLE_QUOTE]);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
+    sprintf(str, LANG_ARRAY(textTime), timerMins, timerSecs, timerFracSecs);
+    print_text_aligned(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(28), 185, str, TEXT_ALIGN_RIGHT);
 }
 
 /**

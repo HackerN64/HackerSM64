@@ -20,9 +20,8 @@
 #include "ingame_menu.h"
 #include "obj_behaviors.h"
 #include "save_file.h"
-#if MULTILANG
+#ifdef MULTILANG
 #include "memory.h"
-#include "eu_translation.h"
 #include "segment_symbols.h"
 #endif
 #include "level_table.h"
@@ -200,7 +199,7 @@ void set_play_mode(s16 playMode) {
 }
 
 void warp_special(s32 arg) {
-    sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL;
+    set_play_mode(PLAY_MODE_CHANGE_LEVEL);
     sSpecialWarpDest = arg;
 }
 
@@ -1077,19 +1076,24 @@ s32 play_mode_paused(void) {
             fade_into_special_warp(WARP_SPECIAL_LEVEL_SELECT, 1);
         } else {
 #ifdef DEATH_ON_EXIT_COURSE
-            raise_background_noise(1);
-            gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
-            set_play_mode(PLAY_MODE_NORMAL);
-            level_trigger_warp(gMarioState, WARP_OP_DEATH);
-#else
+            struct ObjectWarpNode *warpNode = area_get_warp_node(WARP_NODE_DEATH);
+            assert(warpNode != NULL, "No death warp node could be found!");
+
+            initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
+                            warpNode->node.destNode, WARP_FLAGS_NONE);
+#else // DEATH_ON_EXIT_COURSE
             initiate_warp(EXIT_COURSE_LEVEL, EXIT_COURSE_AREA, EXIT_COURSE_NODE, WARP_FLAG_EXIT_COURSE);
-            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
             gSavedCourseNum = COURSE_NONE;
-#endif
+#endif // DEATH_ON_EXIT_COURSE
+
+            fade_into_special_warp(WARP_SPECIAL_NONE, 0);
+            if (sWarpDest.type != WARP_TYPE_CHANGE_LEVEL) {
+                set_play_mode(PLAY_MODE_CHANGE_AREA);
+            }
         }
 
         gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
-#endif
+#endif // DISABLE_EXIT_COURSE
     }
 
     return FALSE;
@@ -1318,25 +1322,38 @@ s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused) {
     return (initOrUpdate ? update_level() : init_level());
 }
 
-#if MULTILANG
+#ifdef MULTILANG
 void load_language_text(void) {
-    switch (gInGameLanguage - 1) {
+    switch (gInGameLanguage) {
         case LANGUAGE_ENGLISH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_en_yay0SegmentRomStart, _translation_en_yay0SegmentRomEnd);
             break;
+#ifdef ENABLE_FRENCH
         case LANGUAGE_FRENCH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_fr_yay0SegmentRomStart, _translation_fr_yay0SegmentRomEnd);
             break;
+#endif
+#ifdef ENABLE_GERMAN
         case LANGUAGE_GERMAN:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_de_yay0SegmentRomStart, _translation_de_yay0SegmentRomEnd);
             break;
+#endif
+#ifdef ENABLE_JAPANESE
+        case LANGUAGE_JAPANESE:
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_jp_yay0SegmentRomStart, _translation_jp_yay0SegmentRomEnd);
+            break;
+#endif
+#ifdef ENABLE_SPANISH
+        case LANGUAGE_SPANISH:
+            load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_es_yay0SegmentRomStart, _translation_es_yay0SegmentRomEnd);
+            break;
+#endif
     }
 }
 #endif
 
 s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
-#if MULTILANG
-    gInGameLanguage = eu_get_language()+1;
+#ifdef MULTILANG
     load_language_text();
 #endif
     sWarpDest.type = WARP_TYPE_NOT_WARPING;

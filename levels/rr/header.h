@@ -101,7 +101,6 @@ extern const Collision rr_seg7_collision_07029FA4[];
 extern const Collision rr_seg7_collision_0702A32C[];
 extern const Collision rr_seg7_collision_0702A6B4[];
 extern const Collision rr_seg7_collision_level[];
-extern const MacroObject rr_seg7_macro_objs[];
 extern const Trajectory rr_seg7_trajectory_0702EC3C[];
 extern const Trajectory rr_seg7_trajectory_0702ECC0[];
 extern const Trajectory rr_seg7_trajectory_0702ED9C[];

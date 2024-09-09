@@ -1063,6 +1063,7 @@ void init_reverb_us(s32 presetId) {
         betterReverbPreset = &gBetterReverbSettings[0];
     }
 
+    activeBetterReverbPreset = gBetterReverbPresetValue;
     betterReverbLightweight = betterReverbPreset->useLightweightSettings;
     betterReverbDownsampleRate = betterReverbPreset->downsampleRate;
     monoReverb = betterReverbPreset->isMono;

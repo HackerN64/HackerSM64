@@ -30,6 +30,7 @@ struct SpawnInfo {
     /*0x06*/ Vec3s startAngle;
     /*0x0C*/ s8 areaIndex;
     /*0x0D*/ s8 activeAreaIndex;
+    /*0x0E*/ u8 respawnInfo;
     /*0x10*/ u32 behaviorArg;
     /*0x14*/ void *behaviorScript;
     /*0x18*/ struct GraphNode *model;
@@ -61,21 +62,20 @@ struct Area {
     /*0x04*/ struct GraphNodeRoot *graphNode; // geometry layout data
     /*0x08*/ TerrainData *terrainData; // collision data (set from level script cmd 0x2E)
     /*0x0C*/ RoomData *surfaceRooms; // (set from level script cmd 0x2F)
-    /*0x10*/ MacroObject *macroObjects; // Macro Objects Ptr (set from level script cmd 0x39)
-    /*0x14*/ struct ObjectWarpNode *warpNodes;
-    /*0x18*/ struct WarpNode *paintingWarpNodes;
-    /*0x1C*/ struct InstantWarp *instantWarps;
-    /*0x20*/ struct SpawnInfo *objectSpawnInfos;
-    /*0x24*/ struct Camera *camera;
-    /*0x28*/ struct UnusedArea28 *unused; // Filled by level script 0x3A, but is unused.
-    /*0x2C*/ struct Whirlpool *whirlpools[2];
-    /*0x34*/ u8 dialog[2]; // Level start dialog number (set by level script cmd 0x30)
-    /*0x36*/ u16 musicParam;
-    /*0x38*/ u16 musicParam2;
-    /*0x3A*/ u8 useEchoOverride; // Should area echo be overridden using echoOverride?
-    /*0x3B*/ s8 echoOverride; // Value used to override the area echo values defined in level_defines.h
+    /*0x10*/ struct ObjectWarpNode *warpNodes;
+    /*0x14*/ struct WarpNode *paintingWarpNodes;
+    /*0x18*/ struct InstantWarp *instantWarps;
+    /*0x1C*/ struct SpawnInfo *objectSpawnInfos;
+    /*0x20*/ struct Camera *camera;
+    /*0x24*/ struct UnusedArea28 *unused; // Filled by level script 0x3A, but is unused.
+    /*0x28*/ struct Whirlpool *whirlpools[2];
+    /*0x30*/ u8 dialog[2]; // Level start dialog number (set by level script cmd 0x30)
+    /*0x32*/ u16 musicParam;
+    /*0x34*/ u16 musicParam2;
+    /*0x36*/ u8 useEchoOverride; // Should area echo be overridden using echoOverride?
+    /*0x37*/ s8 echoOverride; // Value used to override the area echo values defined in level_defines.h
 #ifdef BETTER_REVERB
-    /*0x3C*/ u8 betterReverbPreset;
+    /*0x38*/ u8 betterReverbPreset;
 #endif
 };
 

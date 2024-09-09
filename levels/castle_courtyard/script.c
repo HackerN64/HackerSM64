@@ -3,6 +3,7 @@
 #include "behavior_data.h"
 #include "model_ids.h"
 #include "seq_ids.h"
+#include "dialog_ids.h"
 #include "segment_symbols.h"
 #include "level_commands.h"
 
@@ -15,14 +16,43 @@
 #include "make_const_nonconst.h"
 #include "levels/castle_courtyard/header.h"
 
-static const LevelScript script_func_local_1[] = {
+
+static const LevelScript script_castle_courtyard_macro_objects[] = {
+    // Macro objects
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,      /*pos*/  3180,    20,   330, /*angle*/ 0, 225, 0, /*behParam*/ (DIALOG_158 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,      /*pos*/ -3180,    20,   330, /*angle*/ 0, 135, 0, /*behParam*/ (DIALOG_159 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,      /*pos*/   300,     0, -3600, /*angle*/ 0,   0, 0, /*behParam*/ (DIALOG_102 << 16), /*beh*/ bhvMessagePanel),
+    OBJECT(/*model*/ MODEL_WOODEN_SIGNPOST,      /*pos*/  -300,     0, -3600, /*angle*/ 0,   0, 0, /*behParam*/ (DIALOG_160 << 16), /*beh*/ bhvMessagePanel),
+    // Special objects
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03,    /*pos*/     0,  2048,  2662, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  2272,  -214, -1432, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/   818,    10,   203, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  -820,    10,   201, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  1681,  -214,  -132, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  2382,  -214,  -843, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  -817,    10, -3630, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  2769,  -214, -1523, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  2444,  -214, -2330, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/  2042,  -214, -3032, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/   824,    10, -3633, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/ -2537,  -214,  -759, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/ -1640,  -214, -3228, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/ -2732,  -214, -2166, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/ -2446,  -214, -1786, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/ -2820,  -214, -1317, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_COURTYARD_SPIKY_TREE, /*pos*/ -1868,  -214,   -45, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_CASTLE_WOODEN_DOOR,   /*pos*/     0,     0,   461, /*angle*/ 0,   0, 0, /*behParam*/  (1 << 16), /*beh*/ bhvDoorWarp),
+    RETURN(),
+};
+
+static const LevelScript script_castle_courtyard_objects_1[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/     0, 200, -1652, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvAmbientSounds),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2700,   0, -1652, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvBirdsSoundLoop),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  2700,   0, -1652, /*angle*/ 0, 0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvBirdsSoundLoop),
     RETURN(),
 };
 
-static const LevelScript script_func_local_2[] = {
+static const LevelScript script_castle_courtyard_objects_2[] = {
     OBJECT(/*model*/ MODEL_BOO, /*pos*/ -3217, 100,  -101, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCourtyardBooTriplet),
     OBJECT(/*model*/ MODEL_BOO, /*pos*/  3317, 100, -1701, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCourtyardBooTriplet),
     OBJECT(/*model*/ MODEL_BOO, /*pos*/   -71,   1, -1387, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCourtyardBooTriplet),
@@ -55,10 +85,10 @@ const LevelScript level_castle_courtyard_entry[] = {
         WARP_NODE(/*id*/ 0x0B, /*destLevel*/ LEVEL_CASTLE_COURTYARD, /*destArea*/ 0x01, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x02, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_1),
-        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_castle_courtyard_objects_1),
+        JUMP_LINK(script_castle_courtyard_objects_2),
         TERRAIN(/*terrainData*/ castle_courtyard_seg7_collision),
-        MACRO_OBJECTS(/*objList*/ castle_courtyard_seg7_macro_objs),
+        JUMP_LINK(script_castle_courtyard_macro_objects),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_SOUND_PLAYER),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),

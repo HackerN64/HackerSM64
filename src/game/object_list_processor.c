@@ -69,11 +69,6 @@ u32 gTimeStopState;
 struct Object gObjectPool[OBJECT_POOL_CAPACITY];
 
 /**
- * A special object whose purpose is to act as a parent for macro objects.
- */
-struct Object gMacroObjectDefaultParent;
-
-/**
  * A pointer to gObjectListArray.
  * Given an object list index idx, gObjectLists[idx] is the head of a doubly
  * linked list of all currently spawned objects in the list.
@@ -397,24 +392,11 @@ s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
 /**
  * OR the object's respawn info with bits << 8. If bits = 0xFF, this prevents
  * the object from respawning after leaving and re-entering the area.
- * For macro objects, respawnInfo points to the 16 bit entry in the macro object
- * list. For other objects, it points to the 32 bit behaviorArg in the
- * SpawnInfo.
  */
 void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
-    u32 *info32;
-    u16 *info16;
-
-    switch (obj->respawnInfoType) {
-        case RESPAWN_INFO_TYPE_NORMAL:
-            info32 = (u32 *) obj->respawnInfo;
-            *info32 |= bits << 8;
-            break;
-
-        case RESPAWN_INFO_TYPE_MACRO_OBJECT:
-            info16 = (u16 *) obj->respawnInfo;
-            *info16 |= bits << 8;
-            break;
+    obj->respawnInfo |= bits;
+    if (obj->respawnInfoPointer != NULL) {
+        *obj->respawnInfoPointer |= bits;
     }
 }
 
@@ -466,8 +448,7 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
         script = segmented_to_virtual(spawnInfo->behaviorScript);
 
         // If the object was previously killed/collected, don't respawn it
-        if ((spawnInfo->behaviorArg & (RESPAWN_INFO_DONT_RESPAWN << 8))
-            != (RESPAWN_INFO_DONT_RESPAWN << 8)) {
+        if ((spawnInfo->respawnInfo & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             object = create_object(script);
 
             // Behavior parameters are often treated as four separate bytes, but
@@ -481,8 +462,8 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
             object->unused1 = 0;
 
             // Record death/collection in the SpawnInfo
-            object->respawnInfoType = RESPAWN_INFO_TYPE_NORMAL;
-            object->respawnInfo = &spawnInfo->behaviorArg;
+            object->respawnInfo = spawnInfo->respawnInfo;
+            object->respawnInfoPointer = &spawnInfo->respawnInfo;
 
             // Usually this checks if bparam4 is 1 to decide if this is mario
             // This change allows any object to use that param

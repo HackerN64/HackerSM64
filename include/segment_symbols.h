@@ -148,12 +148,22 @@ DECLARE_COMPRESSED(title_screen_bg)
 // Segment 7 (level data)
 DECLARE_COMPRESSED(debug_level_select)
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 // Segment 25 (languages)
-DECLARE_COMPRESSED(translation_de)
 DECLARE_COMPRESSED(translation_en)
+#ifdef ENABLE_FRENCH
 DECLARE_COMPRESSED(translation_fr)
-#endif // VERSION_EU
+#endif
+#ifdef ENABLE_GERMAN
+DECLARE_COMPRESSED(translation_de)
+#endif
+#ifdef ENABLE_JAPANESE
+DECLARE_COMPRESSED(translation_jp)
+#endif
+#ifdef ENABLE_SPANISH
+DECLARE_COMPRESSED(translation_es)
+#endif
+#endif // MULTILANG
 
 #endif // !NO_SEGMENTED_MEMORY
 

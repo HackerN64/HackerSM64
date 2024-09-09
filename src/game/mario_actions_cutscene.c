@@ -74,24 +74,6 @@ static Vec4s sJumboStarKeyframes[27] = {
     { 0, -3500, 2100, -2000 },  { 0, -2000, 2200, -3500 },  { 0, 0, 2300, -4000 },
 };
 
-/**
- * get_credits_str_width: Calculate width of a Credits String
- * Loop over each character in a credits string and increment the length. If the
- * character is a space, increment by 4; otherwise increment by 7. Once the next
- * character is a null character (equal to 0), stop counting the length since
- * that's the end of the string.
- */
-s32 get_credits_str_width(char *str) {
-    u32 c;
-    s32 length = 0;
-
-    while ((c = *str++) != 0) {
-        length += (c == ' ' ? 4 : 7);
-    }
-
-    return length;
-}
-
 #define CREDIT_TEXT_MARGIN_X ((s32)(GFX_DIMENSIONS_ASPECT_RATIO * 21))
 #define CREDIT_TEXT_X_LEFT GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(CREDIT_TEXT_MARGIN_X)
 #define CREDIT_TEXT_X_RIGHT GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(CREDIT_TEXT_MARGIN_X)
@@ -120,33 +102,33 @@ void print_displaying_credits_entry(void) {
         s16 lineHeight = 16;
 
         dl_rgba16_begin_cutscene_msg_fade();
-        print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY, titleStr);
+        print_credits_string(CREDIT_TEXT_X_LEFT, strY, titleStr);
 
         switch (numLines) {
             case 4:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
                 numLines = 2;
                 lineHeight = 24;
                 break;
             case 5:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
                 numLines = 3;
                 break;
 #ifdef VERSION_EU
             case 6:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
                 numLines = 3;
                 break;
             case 7:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
                 numLines = 3;
                 break;
 #endif
         }
 
         while (numLines-- > 0) {
-            print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr), strY, *currStrPtr);
+            print_credits_string_aligned(CREDIT_TEXT_X_RIGHT, strY, *currStrPtr, TEXT_ALIGN_RIGHT);
 
             strY += lineHeight;
 
@@ -437,7 +419,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
             if (GET_HIGH_U16_OF_32(actionArg) == 0) {
                 create_dialog_box(GET_LOW_U16_OF_32(actionArg));
             } else {
-                create_dialog_box_with_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg));
+                create_dialog_box_with_int_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg));
             }
         }
         // wait until dialog is done
@@ -517,6 +499,10 @@ s32 act_debug_free_move(struct MarioState *m) {
     struct WallCollisionData wallData;
     struct Surface *floor, *ceil;
     Vec3f pos;
+
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+        m->health = 0x880;
+    }
 
     f32 speed = (gPlayer1Controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f;
     if (gPlayer1Controller->buttonDown & Z_TRIG) speed = 0.01f;
@@ -2212,7 +2198,7 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
             break;
 
         case END_PEACH_CUTSCENE_DIALOG_1_TIME_5:
-            set_cutscene_message(160, 227, 0, 30);
+            set_cutscene_message(0, 30);
 #ifndef VERSION_JP
             seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
             play_sound(SOUND_PEACH_MARIO, sEndPeachObj->header.gfx.cameraToObject);
@@ -2225,7 +2211,7 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
             break;
 
         case END_PEACH_CUTSCENE_DIALOG_1_TIME_7:
-            set_cutscene_message(160, 227, 1, 60);
+            set_cutscene_message(1, 60);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_POWER_OF_THE_STARS, sEndPeachObj->header.gfx.cameraToObject);
 #endif
@@ -2269,7 +2255,7 @@ static void end_peach_cutscene_dialog_2(struct MarioState *m) {
 
     switch (m->actionTimer) {
         case END_PEACH_CUTSCENE_DIALOG_2_TIME_1:
-            set_cutscene_message(160, 227, 2, 30);
+            set_cutscene_message(2, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_THANKS_TO_YOU, sEndPeachObj->header.gfx.cameraToObject);
 #endif
@@ -2280,14 +2266,14 @@ static void end_peach_cutscene_dialog_2(struct MarioState *m) {
             break;
 
         case END_PEACH_CUTSCENE_DIALOG_2_TIME_3:
-            set_cutscene_message(160, 227, 3, 30);
+            set_cutscene_message(3, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_THANK_YOU_MARIO, sEndPeachObj->header.gfx.cameraToObject);
 #endif
             break;
 
         case TIMER_SOMETHING_SPECIAL:
-            set_cutscene_message(160, 227, 4, 40);
+            set_cutscene_message(4, 40);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_SOMETHING_SPECIAL, sEndPeachObj->header.gfx.cameraToObject);
 #endif
@@ -2410,18 +2396,18 @@ static void end_peach_cutscene_dialog_3(struct MarioState *m) {
             sEndToadAnims[END_TOAD_INDEX_WEST] = TOAD_ANIM_WEST_WAVE_THEN_TURN;
             sEndToadAnims[END_TOAD_INDEX_EAST] = TOAD_ANIM_EAST_NOD_THEN_TURN;
             sPeachIsBlinking = TRUE;
-            set_cutscene_message(160, 227, 5, 30);
+            set_cutscene_message(5, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_BAKE_A_CAKE, sEndPeachObj->header.gfx.cameraToObject);
 #endif
             break;
 
         case 55:
-            set_cutscene_message(160, 227, 6, 40);
+            set_cutscene_message(6, 40);
             break;
 
         case 130:
-            set_cutscene_message(160, 227, 7, 50);
+            set_cutscene_message(7, 50);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_FOR_MARIO, sEndPeachObj->header.gfx.cameraToObject);
 #endif
@@ -2445,7 +2431,7 @@ static void end_peach_cutscene_run_to_castle(struct MarioState *m) {
     }
 
     if (m->actionTimer == 95) {
-        set_cutscene_message(160, 227, 0, 40);
+        set_cutscene_message(8, 40);
 #ifndef VERSION_JP
         play_sound(SOUND_PEACH_MARIO2, sEndPeachObj->header.gfx.cameraToObject);
 #endif

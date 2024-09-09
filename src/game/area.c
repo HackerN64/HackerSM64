@@ -88,13 +88,12 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-#if MULTILANG
-const char *gNoControllerMsg[] = {
+LangArray gNoControllerMsg = DEFINE_LANGUAGE_ARRAY(
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
     "CONTROLLER FEHLT",
-};
-#endif
+    "NO CONTROLLER",
+    "NO HAY MANDO");
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
@@ -114,23 +113,12 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#if MULTILANG
-    s32 language = eu_get_language();
-#endif
     if ((gGlobalTimer & 31) < 20) {
         if (gControllerBits == 0) {
-#if MULTILANG
-            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
-#endif
+            print_text_aligned(SCREEN_CENTER_X, 20, LANG_ARRAY(gNoControllerMsg), TEXT_ALIGN_CENTER);
         } else {
-#ifdef VERSION_EU
-            print_text(20, 20, "START");
-#else
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
-#endif
+            print_text_aligned(60, 38, "PRESS", TEXT_ALIGN_CENTER);
+            print_text_aligned(60, 20, "START", TEXT_ALIGN_CENTER);
         }
     }
 }
@@ -196,7 +184,6 @@ void clear_areas(void) {
         gAreaData[i].graphNode = NULL;
         gAreaData[i].terrainData = NULL;
         gAreaData[i].surfaceRooms = NULL;
-        gAreaData[i].macroObjects = NULL;
         gAreaData[i].warpNodes = NULL;
         gAreaData[i].paintingWarpNodes = NULL;
         gAreaData[i].instantWarps = NULL;
@@ -253,8 +240,7 @@ void load_area(s32 index) {
         gMarioCurrentRoom = 0;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
-                              gCurrentArea->macroObjects);
+            load_area_terrain(gCurrentArea->terrainData, gCurrentArea->surfaceRooms);
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {

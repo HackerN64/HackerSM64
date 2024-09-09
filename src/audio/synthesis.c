@@ -44,6 +44,7 @@
 #ifdef BETTER_REVERB
 // Do not touch these values manually, unless you want potential for problems.
 u8 gBetterReverbPresetValue = 0;
+u8 activeBetterReverbPreset = 0;
 u8 toggleBetterReverb = FALSE;
 u8 betterReverbLightweight = FALSE;
 u8 monoReverb;

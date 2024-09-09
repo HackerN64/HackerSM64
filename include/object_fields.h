@@ -177,11 +177,6 @@
 #define /*0x108*/ oPathedTargetPitch       OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oPathedTargetYaw         OBJECT_FIELD_S32(0x21)
 
-/* Special Object Macro */
-#define /*0x108*/ oMacroUnk108 OBJECT_FIELD_F32(0x20)
-#define /*0x10C*/ oMacroUnk10C OBJECT_FIELD_F32(0x21)
-#define /*0x110*/ oMacroUnk110 OBJECT_FIELD_F32(0x22)
-
 /* Mario */
 #define /*0x0F4*/ oMarioParticleFlags    OBJECT_FIELD_S32(0x1B)
 #define /*0x108*/ oMarioReadingSignDYaw  OBJECT_FIELD_S32(0x20)

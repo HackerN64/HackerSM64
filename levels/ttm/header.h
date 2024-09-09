@@ -77,7 +77,6 @@ extern const Gfx ttm_seg7_dl_07013608[];
 extern const Collision ttm_seg7_collision_pitoune_2[];
 extern const Collision ttm_seg7_collision_ukiki_cage[];
 extern const Collision ttm_seg7_area_1_collision[];
-extern const MacroObject ttm_seg7_area_1_macro_objs[];
 extern const Trajectory ttm_seg7_trajectory_070170A0[];
 extern const struct MovtexQuadCollection ttm_movtex_puddle[];
 extern Movtex ttm_movtex_tris_begin_waterfall[];
@@ -104,9 +103,6 @@ extern const Collision ttm_seg7_area_2_collision[];
 extern const Collision ttm_seg7_area_3_collision[];
 extern const Collision ttm_seg7_area_4_collision[];
 extern const Collision ttm_seg7_collision_podium_warp[];
-extern const MacroObject ttm_seg7_area_2_macro_objs[];
-extern const MacroObject ttm_seg7_area_3_macro_objs[];
-extern const MacroObject ttm_seg7_area_4_macro_objs[];
 
 // script
 extern const LevelScript level_ttm_entry[];
