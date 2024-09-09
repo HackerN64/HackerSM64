@@ -41,6 +41,4 @@
 #define SEG_POOL_START   _framebuffersSegmentBssEnd // 0x0165000 in size
 #define POOL_SIZE        RAM_END - SEG_POOL_START
 
-#define MAP_PARSER_ADDRESS 0x80345678
-
 #endif // SEGMENTS_H

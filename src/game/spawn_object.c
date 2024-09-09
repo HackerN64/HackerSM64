@@ -124,8 +124,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
         // If no unimportant object exists, then the object pool is exhausted.
         if (unimportantObj == NULL) {
             // We've met with a terrible fate.
-            while (TRUE) {
-            }
+            ERROR(ASSERT_PREFIX_LEVEL"OBJECT POOL EXCEEDED");
         } else {
             // If an unimportant object does exist, unload it and take its slot.
             unload_object(unimportantObj);

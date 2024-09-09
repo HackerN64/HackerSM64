@@ -2172,7 +2172,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     void **actNameTbl    = segmented_to_virtual(gLanguageTables[gInGameLanguage].act_name_table);
     void **courseNameTbl = segmented_to_virtual(gLanguageTables[gInGameLanguage].course_name_table);
 
-    if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
+    if ((gLastCompletedCourseNum != COURSE_NONE) && (gLastCompletedCourseNum <= COURSE_STAGES_MAX)) { // Main courses
         print_hud_course_complete_coins(COURSE_COMPLETE_COINS_X, COURSE_COMPLETE_COINS_Y);
         play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
 

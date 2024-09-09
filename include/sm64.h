@@ -14,13 +14,7 @@
 #include "surface_terrains.h"
 #include "macros.h"
 #include "segments.h"
-
-// Crash handler enhancement
-#ifdef CRASH_SCREEN_INCLUDED
-#define DEBUG_ASSERT(exp) do { if (!(exp)) _n64_assert(__FILE__, __LINE__, #exp, 1); } while (0)
-#else
-#define DEBUG_ASSERT(exp)
-#endif
+#include "game/assert.h"
 
 // Pointer casting is technically UB, and avoiding it gets rid of endian issues as well as a nice side effect.
 #define GET_HIGH_U16_OF_32(var) ((u16)((var) >> 16))

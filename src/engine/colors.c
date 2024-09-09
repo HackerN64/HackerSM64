@@ -5,6 +5,24 @@
 #include "math_util.h"
 #include "colors.h"
 
+// RGBA16
+
+/**
+ * A fast lerp function between two RGBA16 colors.
+ */
+RGBA16 rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac) {
+    RGBA16 ds, d = MSK_RGBA16_A;
+    RGBA16 s = (MSK_RGBA16_C << SIZ_RGBA16_A);
+
+    for (s32 i = 0; i < 3; i++) {
+        ds = (a & s);
+        d |= ((((fac * ((b & s) - ds)) >> 8) + ds) & s);
+        s <<= SIZ_RGBA16_C;
+    }
+
+    return d;
+}
+
 // ColorRGB
 
 void rgba16_to_colorRGB(ColorRGB dst, RGBA16 src) {
@@ -113,24 +131,30 @@ RGBA32 colorRGBAf_to_rgba32(ColorRGBAf src) {
 }
 
 Bool32 colorRGBA_average_2(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2) {
-    if ((dst[3] = (c1[3] + c2[3])) > 0) {
-        s32 i;
-        for (i = 0; i < 3; i++) {
+    dst[3] = (c1[3] + c2[3]);
+
+    if (dst[3] > 0) {
+        for (s32 i = 0; i < 3; i++) {
             dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3])) / dst[3]);
         }
+
         return TRUE;
     }
+
     return FALSE;
 }
 
 Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA c3) {
-    if ((dst[3] = (c1[3] + c2[3] + c3[3])) > 0) {
-        s32 i;
-        for (i = 0; i < 3; i++) {
+    dst[3] = (c1[3] + c2[3] + c3[3]);
+
+    if (dst[3] > 0) {
+        for (s32 i = 0; i < 3; i++) {
             dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3]) + (c3[i] * c3[3])) / dst[3]);
         }
+
         return TRUE;
     }
+
     return FALSE;
 }
 

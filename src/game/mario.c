@@ -1711,6 +1711,11 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
     vec3f_copy(gMarioState->prevPos, gMarioState->pos);
 
     if (gMarioState->action) {
+#ifdef DEBUG_FORCE_CRASH_ON_L
+        if (gPlayer1Controller->buttonDown & L_TRIG) {
+            FORCE_CRASH();
+        }
+#endif
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
             (gMarioState->controller->buttonDown & U_JPAD) &&
@@ -1801,6 +1806,8 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
  **************************************************/
 
 void init_mario(void) {
+    DEBUG_ASSERT((gMarioObject != NULL), ASSERT_PREFIX_LEVEL"Mario spawn object is missing!");
+
     gMarioState->actionTimer = 0;
     gMarioState->framesSinceA = 0xFF;
     gMarioState->framesSinceB = 0xFF;

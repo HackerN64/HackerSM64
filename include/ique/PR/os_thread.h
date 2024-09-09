@@ -106,6 +106,8 @@ typedef struct OSThread_s {
 #define	OS_PRIORITY_APPMAX	127
 #define OS_PRIORITY_IDLE	  0	/* Must be 0 */
 
+#define OS_PRIORITY_THREADTAIL -1
+
 #ifdef BBPLAYER
 /* BB Player thread IDs */
 #define OS_TID_RMONMAIN     3201

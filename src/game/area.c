@@ -135,14 +135,21 @@ u32 get_mario_spawn_type(struct Object *obj) {
     return MARIO_SPAWN_NONE;
 }
 
+extern const char* get_warp_node_name(const enum WarpNodes id);
+
 struct ObjectWarpNode *area_get_warp_node(u8 id) {
     struct ObjectWarpNode *node = NULL;
+
+    DEBUG_ASSERTF((gCurrentArea != NULL), ASSERT_PREFIX_LEVEL"Warp destination is in invalid or unloaded area %d!\nNode ID: 0x%02X %s",
+        sWarpDest.areaIdx, id, get_warp_node_name(id)
+    );
 
     for (node = gCurrentArea->warpNodes; node != NULL; node = node->next) {
         if (node->node.id == id) {
             break;
         }
     }
+
     return node;
 }
 
@@ -216,6 +223,14 @@ void clear_area_graph_nodes(void) {
 }
 
 void load_area(s32 index) {
+    // load_area() is called with index == -1 when not trying to load an area.
+    // This check prevents gAreaData[index] from reading outside the array's bounds.
+    if ((index < 0) || (index >= AREA_COUNT)) {
+        return;
+    }
+
+    DEBUG_ASSERTF((gAreaData[index].graphNode != NULL), ASSERT_PREFIX_LEVEL"Tried to load invalid area %d", index);
+
     if (gCurrentArea == NULL && gAreaData[index].graphNode != NULL) {
         gCurrentArea = &gAreaData[index];
         gCurrAreaIndex = gCurrentArea->index;

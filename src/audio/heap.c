@@ -1,5 +1,6 @@
 #include <ultra64.h>
 
+#include "sm64.h"
 #include "heap.h"
 #include "data.h"
 #include "load.h"
@@ -1056,9 +1057,9 @@ void init_reverb_us(s32 presetId) {
 #else
     if (gBetterReverbPresetValue >= gBetterReverbPresetCount) {
 #endif
-        aggress(gBetterReverbPresetCount > 0, "No BETTER_REVERB presets exist!");
+        ASSERT((gBetterReverbPresetCount > 0), "No BETTER_REVERB presets exist!");
 
-        assert(gBetterReverbPresetValue < gBetterReverbPresetCount, "BETTER_REVERB preset value exceeds total number of available presets!");
+        DEBUG_ASSERTF((gBetterReverbPresetValue < gBetterReverbPresetCount), "BETTER_REVERB preset value (%d) exceeds total number of available presets!", gBetterReverbPresetValue);
         betterReverbPreset = &gBetterReverbSettings[0];
     }
 

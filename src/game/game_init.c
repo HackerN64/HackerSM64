@@ -409,13 +409,9 @@ void draw_reset_bars(void) {
  */
 void render_init(void) {
 #ifdef DEBUG_FORCE_CRASH_ON_BOOT
-    FORCE_CRASH
+    FORCE_CRASH();
 #endif
-    gGfxPool = &gGfxPools[0];
-    set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
-    gGfxSPTask = &gGfxPool->spTask;
-    gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
+    select_gfx_pool(0);
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
@@ -433,12 +429,14 @@ void render_init(void) {
 /**
  * Selects the location of the F3D output buffer (gDisplayListHead).
  */
-void select_gfx_pool(void) {
-    gGfxPool = &gGfxPools[gGlobalTimer % ARRAY_COUNT(gGfxPools)];
+void select_gfx_pool(s32 index) {
+    gGfxPool = &gGfxPools[index];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
+    sSegmentROMTable[SEGMENT_RENDER] = OS_K0_TO_PHYSICAL(gGfxPool->buffer);
+    set_segment_size(SEGMENT_RENDER, GFX_POOL_SIZE);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
 }
 
 /**
@@ -732,6 +730,8 @@ void init_controllers(void) {
 void setup_game_memory(void) {
     // Setup general Segment 0
     set_segment_base_addr(SEGMENT_MAIN, (void *)RAM_START);
+    sSegmentROMTable[SEGMENT_MAIN] = (uintptr_t)_mainSegmentRomStart;
+    set_segment_size(SEGMENT_MAIN, ((uintptr_t)SEG_POOL_START - (uintptr_t)RAM_START)); // Is this correct?
     // Create Mesg Queues
     osCreateMesgQueue(&gGfxVblankQueue, gGfxMesgBuf, ARRAY_COUNT(gGfxMesgBuf));
     osCreateMesgQueue(&gGameVblankQueue, gGameMesgBuf, ARRAY_COUNT(gGameMesgBuf));
@@ -743,6 +743,8 @@ void setup_game_memory(void) {
     // Setup Mario Animations
     gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
+    sSegmentROMTable[SEGMENT_MARIO_ANIMS] = (uintptr_t)gMarioAnims;
+    set_segment_size(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
 #ifdef PUPPYPRINT_DEBUG
     set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
@@ -751,6 +753,8 @@ void setup_game_memory(void) {
     // Setup Demo Inputs List
     gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
+    sSegmentROMTable[SEGMENT_DEMO_INPUTS] = (uintptr_t)gDemoInputs;
+    set_segment_size(SEGMENT_DEMO_INPUTS, DEMO_INPUTS_POOL_SIZE);
     setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
@@ -798,7 +802,7 @@ void thread5_game_loop(UNUSED void *arg) {
             continue;
         }
 #ifdef PUPPYPRINT_DEBUG
-    bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
+        bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
 #endif
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -810,7 +814,7 @@ void thread5_game_loop(UNUSED void *arg) {
         }
 
         audio_game_loop_tick();
-        select_gfx_pool();
+        select_gfx_pool(gGlobalTimer % ARRAY_COUNT(gGfxPools));
         read_controller_inputs(THREAD_5_GAME_LOOP);
         profiler_update(PROFILER_TIME_CONTROLLERS, 0);
         profiler_collision_reset();

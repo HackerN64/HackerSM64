@@ -9,24 +9,34 @@ enum VIModes {
     MODE_PAL,
 };
 
-#define THREAD1_STACK 0x100
-#define THREAD2_STACK 0x800
-#define THREAD3_STACK 0x200
-#define THREAD4_STACK 0x2000
-#define THREAD5_STACK 0x2000
-#define THREAD6_STACK 0x400
+#define THREAD1_STACK 0x0100 // Idle thread.
+#define THREAD2_STACK 0x0000 // Unused (previously crash screen).
+#define THREAD3_STACK 0x0200 // Main thread.
+#define THREAD4_STACK 0x2000 // Sound thread (or libultra scheduler thread).
+#define THREAD5_STACK 0x2000 // Game Loop thread.
+#define THREAD6_STACK 0x0400 // Rumble thread.
+
+#define THREAD1000_STACK 0x0400 // Crash screen.
 
 enum ThreadID {
-    THREAD_0,
-    THREAD_1_IDLE,
-    THREAD_2_CRASH_SCREEN,
-    THREAD_3_MAIN,
-    THREAD_4_SOUND,
-    THREAD_5_GAME_LOOP,
-    THREAD_6_RUMBLE,
-    THREAD_7_HVQM,
-    THREAD_8_TIMEKEEPER,
-    THREAD_9_DA_COUNTER,
+    THREAD_0,               // Various libultra threads.
+    THREAD_1_IDLE,          // Initial thread created by main_func. Sets up various things then creates main thread and goes idle.
+    THREAD_2,               // Unused (previously crash screen).
+    THREAD_3_MAIN,          // Main thread.
+    THREAD_4_SOUND,         // Sound thread. //! TODO: Change this to 2 because the libultra scheduler thread uses id 4.
+    THREAD_5_GAME_LOOP,     // Main game loop thread.
+    THREAD_6_RUMBLE,        // Rumble thread (see src/game/rumble_init.c).
+    THREAD_7_HVQM,          // HVQM main thread (see HVQM_THREAD_ID in src/hvqm/hvqm.h).
+    THREAD_8_TIMEKEEPER,    // HVQM timekeeper thread (see TIMEKEEPER_THREAD_ID in src/hvqm/hvqm.h).
+    THREAD_9_DA_COUNTER,    // HVQM DA counterthread (see DA_COUNTER_THREAD_ID in src/hvqm/hvqm.h).
+    THREAD_13_FAULT = 13,   // UNF debug thread (see FAULT_THREAD_ID in src/usb/debug.h).
+    THREAD_14_USB   = 14,   // UNF USB thread (see USB_THREAD_ID in src/usb/debug.h).
+    THREAD_15_RDB   = 15,   // UNF RDB thread (see RDB_THREAD_ID in src/usb/debug.h).
+
+    // Crash screen threads (the crash screen has its own crash thread):
+    THREAD_1000_CRASH_SCREEN_0 = 1000,  // Initial crash screen thread for the normal game. Can be repurposed as a crash screen for the crash screen.
+    THREAD_1001_CRASH_SCREEN_1,         // Created when THREAD_1000_CRASH_SCREEN_0 starts and becomes the new crash screen if it crashes.
+    THREAD_1002_CRASH_SCREEN_2,         // Same as THREAD_1001_CRASH_SCREEN_1. If this crashes, cycles back to THREAD_1000_CRASH_SCREEN_0.
 };
 
 struct RumbleData {
@@ -46,6 +56,8 @@ struct RumbleSettings {
     s16 vibrate;
     s16 decay;
 };
+
+extern OSViMode VI;
 
 extern struct Config gConfig;
 
@@ -106,6 +118,7 @@ typedef struct {
     u8 started;
     OSTimer timer;
 } OSTimerEx;
+
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
 void dispatch_audio_sptask(struct SPTask *spTask);

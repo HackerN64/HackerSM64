@@ -8,7 +8,7 @@
     // Settings
     #define DEBUG_MODE        1   // Enable/Disable debug mode
     #define DEBUG_INIT_MSG    1   // Print a message when debug mode has initialized
-    #define USE_FAULTTHREAD   1   // Create a fault detection thread (libultra only)
+    #define USE_FAULTTHREAD   0   // Create a fault detection thread (libultra only) (not compatible with other crash handlers)
     // #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf (defined in makefile - libultra_rom does not have osSyncPrintf)
     #define MAX_COMMANDS      25  // The max amount of user defined commands possible
     
@@ -35,6 +35,13 @@
         ==============================*/
         
         extern void debug_initialize();
+
+        /*==============================
+            debug_is_initialized
+            Checks Whether the debug and USB library is initialized.
+            @return Whether the debug and USB library is initialized.
+        ==============================*/
+        extern int debug_is_initialized();
         
         
         /*==============================
@@ -71,12 +78,12 @@
         
         
         /*==============================
-            debug_assert
+            debug_debug_assert
             Halts the program if the expression fails.
             @param The expression to test
         ==============================*/
         
-        #define debug_assert(expr) (expr) ? ((void)0) : _debug_assert(#expr, __FILE__, __LINE__)
+        #define debug_debug_assert(expr) (expr) ? ((void)0) : _debug_assert(#expr, __FILE__, __LINE__)
         
         
         /*==============================
@@ -134,7 +141,14 @@
         ==============================*/
         
         extern void debug_printcommands();
-
+        
+        
+        /*==============================
+            debug_printcontext
+            Prints various thread info to the developer's command prompt.
+        ==============================*/
+        extern void debug_printcontext(void* threadPtr);
+        
         
         // Ignore this, use the macro instead
         extern void _debug_assert(const char* expression, const char* file, int line);
@@ -145,10 +159,11 @@
     #else
         
         // Overwrite library functions with useless macros if debug mode is disabled
-        #define debug_initialize() 
+        #define debug_initialize()
+        #define debug_is_initialized() 0
         #define debug_printf
         #define debug_screenshot(a, b, c)
-        #define debug_assert(a)
+        #define debug_debug_assert(a)
         #define debug_pollcommands()
         #define debug_addcommand(a, b, c)
         #define debug_parsecommand(a) NULL

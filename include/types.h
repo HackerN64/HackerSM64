@@ -8,9 +8,17 @@
 #include "macros.h"
 #include "config.h"
 
-#define BIT(i)  (1 << (i))
-#define BITMASK(size) ((BIT(size)) - 1)
-#define SHIFTED_BITMASK(size, shift) (BITMASK(size) << shift)
+#define BIT(i)                          (1LL << (i))
+#define BITMASK(size)                   ((BIT(size)) - 1)
+#define SHIFTED_BITMASK(size, shift)    (BITMASK(size) << (shift))
+
+// Signed shift (inverts shift direction if the shift amount is negative).
+#define SSHIFTL(src, shift) (((shift) < 0) ? ((src) >> -(shift)) : ((src) << (shift)))
+#define SSHIFTR(src, shift) (((shift) < 0) ? ((src) << -(shift)) : ((src) >> (shift)))
+
+// Equivalent to (([bitfield] & [flag]) != 0) but avoids branching. Best used only with constants and if [flag] is a single bit.
+// If [flag] is not a single bit, OR the result with 0x1 afterward to use the rightmost 1 bit of [flag].
+#define BITFLAG_BOOL(bitfield, flag) (((bitfield) & (flag)) >> CTZ(flag))
 
 // #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
 #define COND_BIT(cond, dst, flag) { \
@@ -21,8 +29,63 @@
     }                               \
 }
 
-#define SCREEN_CENTER_X (SCREEN_WIDTH  / 2)
-#define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
+typedef union {
+    struct PACKED {
+        /*0x00*/ u8 hi; // HI byte.
+        /*0x01*/ u8 lo; // LO byte.
+    }; /*0x02*/
+    u16 raw;
+} HiLo16; /*0x02*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ u16 hi; // HI byte.
+        /*0x01*/ u16 lo; // LO byte.
+    }; /*0x02*/
+    u32 raw;
+} HiLo32; /*0x02*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ u32 hi; // HI byte.
+        /*0x01*/ u32 lo; // LO byte.
+    }; /*0x02*/
+    u64 raw;
+} HiLo64; /*0x02*/
+
+#define HI_OF_16(_x)        ((HiLo16){ .raw = _x }).hi
+#define LO_OF_16(_x)        ((HiLo16){ .raw = _x }).lo
+#define HI_LO_16(_hi, _lo)  ((HiLo16){ .hi = _hi, .lo = _lo }).raw
+
+#define HI_OF_32(_x)        ((HiLo32){ .raw = _x }).hi
+#define LO_OF_32(_x)        ((HiLo32){ .raw = _x }).lo
+#define HI_LO_32(_hi, _lo)  ((HiLo16){ .hi = _hi, .lo = _lo }).raw
+
+#define HI_OF_64(_x)        ((HiLo64){ .raw = _x }).hi
+#define LO_OF_64(_x)        ((HiLo64){ .raw = _x }).lo
+#define HI_LO_64(_hi, _lo)  ((HiLo64){ .hi = _hi, .lo = _lo }).raw
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ u32 sign     :  1;
+        /*0x00*/ u32 exponent :  8;
+        /*0x01*/ u32 mantissa : 23;
+    }; /*0x04*/
+    s32 asS32;
+    u32 asU32;
+    f32 asF32;
+} IEEE754_f32; /*0x04*/
+
+typedef union {
+    struct PACKED {
+        /*0x00*/ u64 sign     :  1;
+        /*0x00*/ u64 exponent : 11;
+        /*0x01*/ u64 mantissa : 52;
+    }; /*0x08*/
+    s64 asS64;
+    u64 asU64;
+    f64 asF64;
+} IEEE754_f64; /*0x08*/
 
 struct Config {
     f32 audioFrequency;
@@ -46,8 +109,24 @@ typedef struct Controller {
     /*0x20*/ s32 port;                    // The port index this controller is plugged into [0, 3].
 } Controller; /*0x24*/
 
-// -- Booleans --
+// -- Memory --
+typedef u8  Byte;
+typedef u16 Halfword;
+typedef u32 Word;
+typedef u64 Doubleword;
 
+typedef uintptr_t Address; //! TODO: 64 bit addressing mode.
+
+typedef union {
+    Byte byte[4];
+    Halfword halfword[2];
+    Word word;
+} Word_4Bytes;
+
+// -- String --
+typedef char* String;
+
+// -- Booleans --
 typedef u8  Bool8;
 typedef u16 Bool16;
 typedef u32 Bool32;
@@ -174,6 +253,22 @@ typedef u8 uchar;
 
 // Required for backwards compatibility with Fast64
 #define MACRO_OBJECT_END() 0
+
+typedef union {
+    struct PACKED {
+        Color red;
+        Color green;
+        Color blue;
+        Color alpha;
+    };
+    RGBA32 rgba32;
+    Color arr[4];
+    union {
+        u32 asU32[1];
+        u16 asU16[2];
+        u8 asU8[4];
+    } raw;
+} ColorRGBA32;
 
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,

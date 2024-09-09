@@ -30,7 +30,6 @@
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "level_commands.h"
-#include "debug.h"
 
 #include "config.h"
 
@@ -347,16 +346,15 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
     set_mario_initial_cap_powerup(m);
 }
 
+extern const char* get_warp_node_name(const enum WarpNodes id);
+
 void init_mario_after_warp(void) {
     struct Object *object = get_destination_warp_object(sWarpDest.nodeId);
 
-#ifdef DEBUG_ASSERTIONS
-    if (!object) {
-        char errorMsg[40];
-        sprintf(errorMsg, "No dest warp object found for: 0x%02X", sWarpDest.nodeId);
-        error(errorMsg);
-    }
-#endif
+    DEBUG_ASSERTF((object != NULL), ASSERT_PREFIX_LEVEL"Couldn't find destination warp object!\nNode ID: 0x%02X %s",
+        sWarpDest.nodeId, get_warp_node_name(sWarpDest.nodeId)
+    );
+
     u32 marioSpawnType = get_mario_spawn_type(object);
 
     if (gMarioState->action != ACT_UNINITIALIZED) {
@@ -578,16 +576,11 @@ void check_instant_warp(void) {
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
 
-#ifdef DEBUG_ASSERTIONS
-    if (!warpNode) {
-        char errorMsg[40];
-        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) arg);
-        error(errorMsg);
-    }
-#endif
+    DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
+        (u8)arg, get_warp_node_name(arg)
+    );
 
-    s16 levelNum = warpNode->node.destLevel & 0x7F;
-
+    s16 levelNum = (warpNode->node.destLevel & 0x7F);
     s16 destArea = warpNode->node.destArea;
     s16 unchanged = TRUE;
 
@@ -783,7 +776,7 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 #else
                         sSourceWarpNodeId = WARP_NODE_DEATH;
 #endif
-                    }                    
+                    }
                 }
 
                 sDelayedWarpTimer = 20;
@@ -913,13 +906,9 @@ void initiate_delayed_warp(void) {
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
 
-#ifdef DEBUG_ASSERTIONS
-                    if (!warpNode) {
-                        char errorMsg[40];
-                        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) sSourceWarpNodeId);
-                        error(errorMsg);
-                    }
-#endif
+                    DEBUG_ASSERTF((warpNode != NULL), ASSERT_PREFIX_LEVEL"Couldn't find source warp node!\nNode ID: 0x%02X %s",
+                        (u8)sSourceWarpNodeId, get_warp_node_name(sSourceWarpNodeId)
+                    );
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);

@@ -88,7 +88,7 @@ void make_viewport_clip_rect(Vp *viewport);
 void init_rcp(s32 resetZB);
 void end_master_display_list(void);
 void render_init(void);
-void select_gfx_pool(void);
+void select_gfx_pool(s32 index);
 void display_and_vsync(void);
 
 #endif // GAME_INIT_H

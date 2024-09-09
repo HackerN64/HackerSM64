@@ -1,6 +1,7 @@
 #ifndef VERSION_SH
 #include <ultra64.h>
 
+#include "sm64.h"
 #include "synthesis.h"
 #include "heap.h"
 #include "data.h"
@@ -206,7 +207,7 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
         }
     }
 
-    aggress(bufOffset * sizeof(s16) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
+    ASSERT(((bufOffset * sizeof(s16)) <= (BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE)), "BETTER_REVERB_SIZE is too small for this preset!");
 
     bzero(allpassIdx, sizeof(allpassIdx));
 }

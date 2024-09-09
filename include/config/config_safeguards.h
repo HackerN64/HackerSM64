@@ -68,7 +68,10 @@
     #undef UNLOCK_FPS
     #undef VANILLA_DEBUG
     #undef DEBUG_FORCE_CRASH_ON_BOOT
+    #undef DEBUG_FORCE_CRASH_ON_L
     #undef DEBUG_ASSERTIONS
+    #undef INCLUDE_DEBUG_MAP
+    #undef FUNNY_CRASH_SOUND
 #endif // DISABLE_ALL
 
 #ifdef DEBUG_ALL

@@ -1,17 +1,11 @@
 .include "macros.inc"
 .section .data
 .balign 16
-glabel gMapEntries
+glabel gMapSymbols
 .incbin "bin/addr.bin"
-glabel gMapEntryEnd
+glabel gMapSymbolsEnd
 
 .balign 16
 glabel gMapStrings
 .incbin "bin/name.bin"
 glabel gMapStringsEnd
-
-.balign 16
-glabel gMapEntrySize
-.word (gMapEntryEnd - gMapEntries) / 4
-glabel gMapStringSize
-.word (gMapStringsEnd - gMapStrings)

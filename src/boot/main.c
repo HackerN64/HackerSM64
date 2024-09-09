@@ -12,6 +12,7 @@
 #include "game/sound_init.h"
 #include "buffers/buffers.h"
 #include "segments.h"
+#include "crash_screen/cs_main.h"
 #include "game/main.h"
 #include "game/rumble_init.h"
 #include "game/version.h"
@@ -291,6 +292,7 @@ void handle_sp_complete(void) {
 }
 
 void handle_dp_complete(void) {
+    ASSERTF((sCurrentDisplaySPTask != NULL), ASSERT_PREFIX_RCP"NULL SP task in handle_dp_complete.");
     // Gfx SP task is completely done.
     if (sCurrentDisplaySPTask->msgqueue != NULL) {
         osSendMesg(sCurrentDisplaySPTask->msgqueue, sCurrentDisplaySPTask->msg, OS_MESG_NOBLOCK);
@@ -313,7 +315,7 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    error("RCP is HUNG UP!! Oh! MY GOD!!");
+    ERRORF(ASSERT_PREFIX_RCP"RCP is HUNG UP!! Oh! MY GOD!!");
 }
 
 /**
@@ -324,39 +326,38 @@ void alert_rcp_hung_up(void) {
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
-    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.")
+    DEBUG_ASSERT((gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1]), "Thread 1 stack overflow.")
     gThread3Stack[0]++;
     gThread3Stack[THREAD3_STACK - 1]++;
-    assert(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.")
+    DEBUG_ASSERT((gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1]), "Thread 3 stack overflow.")
     gThread4Stack[0]++;
     gThread4Stack[THREAD4_STACK - 1]++;
-    assert(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.")
+    DEBUG_ASSERT((gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1]), "Thread 4 stack overflow.")
     gThread5Stack[0]++;
     gThread5Stack[THREAD5_STACK - 1]++;
-    assert(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
+    DEBUG_ASSERT((gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1]), "Thread 5 stack overflow.")
 #if ENABLE_RUMBLE
     gThread6Stack[0]++;
     gThread6Stack[THREAD6_STACK - 1]++;
-    assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
+    DEBUG_ASSERT((gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1]), "Thread 6 stack overflow.")
 #endif
 }
 #endif
 
-
-extern void crash_screen_init(void);
-extern OSViMode VI;
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
-    load_engine_code_segment();
+    load_code_segment(_engineSegmentStart, _engineSegmentEnd, _engineSegmentRomStart, _engineSegmentRomEnd);
+    load_code_segment(_crashScreenSegmentStart, _crashScreenSegmentEnd, _crashScreenSegmentRomStart, _crashScreenSegmentRomEnd);
     detect_emulator();
-#ifndef UNF
-    crash_screen_init();
-#endif
-
+    create_crash_screen_thread();
 #ifdef UNF
-    debug_initialize();
-#endif
+    // Most emulators do not handle UNF properly.
+    //! TODO: Update this for any emulators that have proper support.
+    if (gEmulator & (EMU_CONSOLE)) {
+        debug_initialize();
+    }
+#endif // UNF
 
 #ifdef DEBUG
     osSyncPrintf("Super Mario 64\n");
@@ -373,8 +374,7 @@ void thread3_main(UNUSED void *arg) {
         VI.comRegs.vSync = 525*20;   
         change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
         osViSetMode(&VI);
-        osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
-        osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
+        osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON | OS_VI_GAMMA_OFF);
 #endif
     } else {
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
@@ -486,10 +486,10 @@ void turn_off_audio(void) {
 }
 
 void change_vi(OSViMode *mode, int width, int height) {
-    mode->comRegs.width  = width;
+    mode->comRegs.width = width;
     mode->comRegs.xScale = ((width * 512) / 320);
     if (height > 240) {
-        mode->comRegs.ctrl     |= 0x40;
+        mode->comRegs.ctrl |= VI_CTRL_SERRATE_ON;
         mode->fldRegs[0].origin = (width * 2);
         mode->fldRegs[1].origin = (width * 4);
         mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
@@ -543,8 +543,7 @@ void thread1_idle(UNUSED void *arg) {
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
     osViSetMode(&VI);
     osViBlack(TRUE);
-    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
-    osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
+    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON | OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
     create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, gThread3Stack + THREAD3_STACK, 100);
     osStartThread(&gMainThread);

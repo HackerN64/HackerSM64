@@ -5,7 +5,6 @@
 #include "math_util.h"
 #include "game/memory.h"
 #include "graph_node.h"
-#include "game/debug.h"
 
 typedef void (*GeoLayoutCommandProc)(void);
 
@@ -751,6 +750,9 @@ void geo_layout_cmd_node_culling_radius(void) {
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
+extern const char* get_segment_name(u8 segmentId);
+extern const char* get_segment_sub_name(u8 segmentId);
+
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     // set by register_scene_graph_node when gCurGraphNodeIndex is 0
     // and gCurRootGraphNode is NULL
@@ -772,7 +774,13 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoLayoutStack[1] = 0;
 
     while (gGeoLayoutCommand != NULL) {
-        assert((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT), "Invalid or unloaded geo layout detected.");
+        DEBUG_ASSERTF((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT),
+            ASSERT_PREFIX_LEVEL"Invalid/unloaded geo layout!\n CMD: 0x%02X\nIn segment %d (%s)\n %s",
+            gGeoLayoutCommand[0x00],
+            ((u32)segptr >> 24),
+            get_segment_name((u32)segptr >> 24),
+            get_segment_sub_name((u32)segptr >> 24)
+        );
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }
 
