@@ -642,6 +642,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 }
 
                 if (validColor) {
+                    gDPPipeSync(gDisplayListHead++);
                     gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                     strPos += sizeof(color) * 2;
                 }
@@ -650,6 +651,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             // Color reset control character
             case HEX(CONTROL_CHAR_RESET): // '\034'
                 bcopy(sActiveTextColor, color, sizeof(color));
+                gDPPipeSync(gDisplayListHead++);
                 gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                 break;
 
