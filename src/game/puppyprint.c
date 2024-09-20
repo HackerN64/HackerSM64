@@ -1595,7 +1595,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     lines = 0;
     
     shakeTablePos = gGlobalTimer % sizeof(sTextShakeTable);
-    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '\n') {
@@ -1643,7 +1643,6 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
         }
 
         get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = textX == 256 ? 1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1658,7 +1657,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                                                         (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos))) << 2,
                                                         (x + textPos[0] + (s16)((shakePos[0] + (widthX * textSizeTotal)))) << 2,
                                                         (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + textOffsets[1]))) << 2,
-                                                        G_TX_RENDERTILE, (textX << 6) + goddamnJMeasure, 0, textTempScale, textTempScale);
+                                                        G_TX_RENDERTILE, ((textX << 1) % fnt->imW) << 5, ((textX << 1) / fnt->imW * fnt->txH) << 5, textTempScale, textTempScale);
         }
         textPos[0] += (spaceX + 1) * textSizeTotal;
     }
@@ -1717,7 +1716,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     }
 
     lines = 0;
-    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '\n') {
@@ -1736,7 +1735,6 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
         }
 
         get_char_from_byte(&textX, &textPos[0], str[i], &widthX, &spaceX, &offsetY, font);
-        s32 goddamnJMeasure = textX == 256 ? 1 : 0; // Hack to fix a rendering bug.
         if (str[i] != ' ' && str[i] != '\t') {
             if (xlu != prevxlu) {
                 prevxlu = xlu;
@@ -1751,7 +1749,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
                                                         (y + textPos[1] + offsetY) << 2,
                                                         (x + textPos[0] + widthX) << 2,
                                                         (y + textPos[1] + offsetY + fnt->txH) << 2,
-                                                        G_TX_RENDERTILE, (textX << 6) + goddamnJMeasure, 0, 1024, 1024);
+                                                        G_TX_RENDERTILE, ((textX << 1) % fnt->imW) << 5, ((textX << 1) / fnt->imW * fnt->txH) << 5, 1024, 1024);
         }
         textPos[0] += (spaceX + 1);
     }
