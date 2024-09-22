@@ -643,6 +643,7 @@ typedef struct
    int bin_truncate;
    int pal_truncate;
    int rotate_envmap;
+   int word_swap;
 } graphics_config;
 
 static const graphics_config default_config =
@@ -661,6 +662,7 @@ static const graphics_config default_config =
    .bin_truncate = 1,
    .pal_truncate = 1,
    .rotate_envmap = 0,
+   .word_swap = 0,
 };
 
 typedef struct
@@ -743,7 +745,7 @@ static int parse_encoding(write_encoding *encoding, const char *str)
 
 static void print_usage(void)
 {
-   ERROR("Usage: n64graphics -e/-i BIN_FILE -g IMG_FILE [-p PAL_FILE] [-o BIN_OFFSET] [-P PAL_OFFSET] [-f FORMAT] [-c CI_FORMAT] [-w WIDTH] [-h HEIGHT] [-r ROTATE] [-V]\n"
+   ERROR("Usage: n64graphics -e/-i BIN_FILE -g IMG_FILE [-p PAL_FILE] [-o BIN_OFFSET] [-P PAL_OFFSET] [-f FORMAT] [-c CI_FORMAT] [-w WIDTH] [-h HEIGHT] [-r ROTATE] [-S] [-V]\n"
          "\n"
          "n64graphics v" N64GRAPHICS_VERSION ": N64 graphics manipulator\n"
          "\n"
@@ -758,6 +760,7 @@ static void print_usage(void)
          " -w WIDTH      export texture width (default: %d)\n"
          " -h HEIGHT     export texture height (default: %d)\n"
          " -r ROTATE     rotate envmap texture for rgba extraction only (default: false)\n"
+         " -S            swap words on odd lines (importing only, does not support ci4, ci8, or ia1 formats)\n"
          "CI arguments:\n"
          " -c CI_FORMAT  CI palette format: rgba16, ia16 (default: %s)\n"
          " -p PAL_FILE   palette binary file to import/export from/to\n"
@@ -844,6 +847,9 @@ static int parse_arguments(int argc, char *argv[], graphics_config *config)
                   return 0;
                }
                break;
+            case 'S':
+               config->word_swap = 1;
+               break;
             case 'v':
                g_verbosity = 1;
                break;
@@ -900,22 +906,6 @@ int main(int argc, char *argv[])
    }
 
    if (config.mode == MODE_IMPORT) {
-      if (0 == strcmp("-", config.bin_filename)) {
-         bin_fp = stdout;
-      } else {
-         if (config.bin_truncate) {
-            bin_fp = fopen(config.bin_filename, "wb");
-         } else {
-            bin_fp = fopen(config.bin_filename, "r+b");
-         }
-      }
-      if (!bin_fp) {
-         ERROR("Error opening \"%s\"\n", config.bin_filename);
-         return -1;
-      }
-      if (!config.bin_truncate) {
-         fseek(bin_fp, config.bin_offset, SEEK_SET);
-      }
       switch (config.format.format) {
          case IMG_FORMAT_RGBA:
             imgr = png2rgba(config.img_filename, &config.width, &config.height);
@@ -1025,6 +1015,56 @@ int main(int argc, char *argv[])
       if (length <= 0) {
          ERROR("Error converting to raw format\n");
          return EXIT_FAILURE;
+      }
+      if (config.word_swap) {
+         if (config.format.depth == 1) {
+            ERROR("Word swapping unavailable for IA1 texture format\n");
+            return EXIT_FAILURE;
+         } else if (config.format.format == IMG_FORMAT_CI) {
+            ERROR("Word swapping unavailable for CI texture formats\n");
+            return EXIT_FAILURE;
+         }
+
+         int swap_bytes = (config.format.depth == 32) ? 8 : 4;
+         int required_width = 2 * swap_bytes * 8;
+         if ((config.width * config.format.depth) % required_width == 0) {
+            uint8_t tmp;
+            int line_size = config.width * config.format.depth / 8;
+            for (int line = 1; line < config.height; line += 2) {
+               for (int x = 0; x < line_size; x += 2 * swap_bytes) {
+                  int word_offset = line * line_size + x;
+                  for (int i = 0; i < swap_bytes; i++) {
+                     tmp = raw[word_offset + i];
+                     raw[word_offset + i] = raw[word_offset + swap_bytes + i];
+                     raw[word_offset + swap_bytes + i] = tmp;
+                  }
+               }
+            }
+         } else {
+            for (unsigned i = 0; i < DIM(format_table); i++) {
+               if (format_table[i].format.format == config.format.format && format_table[i].format.depth == config.format.depth) {
+                  ERROR("Image must be a multiple of %d pixels wide to create pre-swapped %s texture\n", required_width / config.format.depth, format_table[i].name);
+                  break;
+               }
+            }
+            return EXIT_FAILURE;
+         }
+      }
+      if (0 == strcmp("-", config.bin_filename)) {
+         bin_fp = stdout;
+      } else {
+         if (config.bin_truncate) {
+            bin_fp = fopen(config.bin_filename, "wb");
+         } else {
+            bin_fp = fopen(config.bin_filename, "r+b");
+         }
+      }
+      if (!bin_fp) {
+         ERROR("Error opening \"%s\"\n", config.bin_filename);
+         return -1;
+      }
+      if (!config.bin_truncate) {
+         fseek(bin_fp, config.bin_offset, SEEK_SET);
       }
       INFO("Writing 0x%X bytes to offset 0x%X of \"%s\"\n", length, config.bin_offset, config.bin_filename);
       flength = fprint_write_output(bin_fp, config.encoding, raw, length);
