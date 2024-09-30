@@ -857,7 +857,6 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     guMtxF2L(gCameraTransform, viewMtx);
 #endif
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
-    setup_global_light();
 
     if (node->fnNode.node.children != 0) {
         gCurGraphNodeCamera = node;
