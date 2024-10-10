@@ -775,7 +775,7 @@ void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u
     gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = red;
     gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = green;
     gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = blue;
-    gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 8 : constantFalloff;
+    gPointLights[gPointLightCount].l.pl.constant_attenuation = MAX(constantFalloff, 8U);
     gPointLights[gPointLightCount].l.pl.linear_attenuation = linearFalloff;
     gPointLights[gPointLightCount].l.pl.quadratic_attenuation = quadraticFalloff;
     gPointLights[gPointLightCount].worldPos[0] = pos[0];
@@ -1507,7 +1507,7 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
 
             node->light->l.pl.quadratic_attenuation = node->a;
             node->light->l.pl.linear_attenuation = node->b;
-            node->light->l.pl.constant_attenuation = (node->c == 0) ? 8 : node->c;
+            node->light->l.pl.constant_attenuation = MAX(node->c, 8U);
             break;
         case LIGHT_TYPE_AMBIENT:
             if (!gOverrideAmbientLight)

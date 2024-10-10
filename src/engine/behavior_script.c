@@ -770,13 +770,13 @@ static s32 bhv_cmd_set_light_color(void) {
 // Command 0x39: Sets an object's light falloff
 // Usage: SET_LIGHT_FALLOFF(constant, linear, quadratic)
 static s32 bhv_cmd_set_light_falloff(void) {
-    s32 constantFalloff = BHV_CMD_GET_2ND_S16(0);
-    s32 linearFalloff = BHV_CMD_GET_1ST_S16(1);
-    s32 quadraticFalloff = BHV_CMD_GET_2ND_S16(1);
+    u32 constantFalloff = BHV_CMD_GET_2ND_S16(0);
+    u32 linearFalloff = BHV_CMD_GET_1ST_S16(1);
+    u32 quadraticFalloff = BHV_CMD_GET_2ND_S16(1);
 
     gCurrentObject->oLightQuadraticFalloff = quadraticFalloff;
     gCurrentObject->oLightLinearFalloff = linearFalloff;
-    gCurrentObject->oLightConstantFalloff = constantFalloff;
+    gCurrentObject->oLightConstantFalloff = MAX(constantFalloff, 8U);
 
     gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
