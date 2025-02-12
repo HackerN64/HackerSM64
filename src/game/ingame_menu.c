@@ -722,7 +722,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                 renderX = curX;
                 renderY = curY - 4;
                 gDPSetTextureImage(gfx++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
-                gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES));
+                gDPLoadBlock(gfx++, G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES));
                 gSPTextureRectangle(gfx++, renderX << 2, renderY << 2, (renderX + 16) << 2,
                             (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 gDPPipeSync(gfx++);
