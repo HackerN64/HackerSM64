@@ -80,22 +80,11 @@ void print_text_aligned(s32 x, s32 y, char *str, u32 alignment) {
  */
 void render_text_labels(void) {
     s32 i;
-    Mtx *mtx;
 
     if (sTextLabelsCount == 0) {
         return;
     }
-
-    mtx = alloc_display_list(sizeof(*mtx));
-
-    if (mtx == NULL) {
-        sTextLabelsCount = 0;
-        return;
-    }
-
-    guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
-    gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
 
     for (i = 0; i < sTextLabelsCount; i++) {
