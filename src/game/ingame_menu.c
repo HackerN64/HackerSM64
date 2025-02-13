@@ -1545,7 +1545,7 @@ void render_reonucam_speed_setting(void) {
     char buf[32];
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-    sprintf(buf, LANG_ARRAY(textReonucam1), gReonucamState.speed +1 );
+    sprintf(buf, LANG_ARRAY(textReonucam1), gReonucamState.speed + 1);
 
     print_generic_string_aligned(310, 24, buf, TEXT_ALIGN_RIGHT);
     print_generic_string_aligned(310, 8, LANG_ARRAY(textReonucam2), TEXT_ALIGN_RIGHT);
@@ -1558,7 +1558,7 @@ void render_reonucam_speed_setting(void) {
     } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
         gReonucamState.speed--;
     }
-    gReonucamState.speed = (gReonucamState.speed + 5) % 5;
+    gReonucamState.speed = (gReonucamState.speed + ARRAY_COUNT(cameraSpeeds)) % ARRAY_COUNT(cameraSpeeds);
     save_file_set_camera_speed(gReonucamState.speed);
 }
 #endif
