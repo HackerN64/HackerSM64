@@ -8159,11 +8159,7 @@ envelope_goto 2
 .envelope_341C:
 envelope_line 25 32760
 envelope_line 60 10000
-#ifdef VERSION_SH
-  envelope_hang
-#else
-  envelope_goto 2
-#endif
+envelope_hang
 
 .envelope_3428:
 envelope_line 1 10000
