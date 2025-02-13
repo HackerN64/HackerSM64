@@ -8170,7 +8170,7 @@ envelope_goto 2
 .envelope_3438:
 envelope_line 23 32760
 envelope_line 80 15000
-envelope_goto 2
+envelope_hang
 
 .envelope_3444:
 envelope_line 22 32760
