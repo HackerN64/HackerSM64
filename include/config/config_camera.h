@@ -53,12 +53,12 @@
 
 // Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that doesn't use a single button more than the vanilla camera. 
 // An explanation the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k (please note that the analog feature shown at the end is no longer present)
-//#define REONUCAM
+//# define REONUCAM
 
 /**
  * Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
  */
-//#define PUPPYCAM
+// #define PUPPYCAM
 
 /**********************************/
 /***** Vanilla config options *****/
