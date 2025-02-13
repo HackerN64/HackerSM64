@@ -1189,7 +1189,9 @@ void eight_dir_collision_handler(struct Camera *c) {
 f32 cameraSpeeds[] = {0.5f, 1.f, 1.5f, 2.f, 3.5f}; // The camera speed settings, from slowest to fastest.
 #define R_DOUBLE_TAP_WINDOW 5 // How many frames the player has to double tap R in order to ender Mario cam mode.
 
-void reonucam_handler(void) {
+void reonucam_handler(struct Camera *c) {
+    Vec3f pos;
+    s16 oldAreaYaw = sAreaYaw;
     // Get the camera speed based on the user's setting
     f32 cameraSpeed = cameraSpeeds[gReonucamState.speed];
     
@@ -1234,9 +1236,17 @@ void reonucam_handler(void) {
         }
      }
 
-    print_text_fmt_int(20, 40, "R %d", gReonucamState.rButtonCounter);
-    print_text_fmt_int(20, 20, "R %d", gReonucamState.rButtonCounter2);
-    
+    radial_camera_input(c);
+
+    lakitu_zoom(400.f, 0x900);
+    c->nextYaw = update_8_directions_camera(c, c->focus, pos);
+
+    set_camera_height(c, pos[1]);
+
+    c->pos[0] = pos[0];
+    c->pos[2] = pos[2];
+    sAreaYawChange = sAreaYaw - oldAreaYaw;
+    eight_dir_collision_handler(c);
 }
 #endif
 
@@ -1247,8 +1257,7 @@ void mode_8_directions_camera(struct Camera *c) {
     Vec3f pos;
     s16 oldAreaYaw = sAreaYaw;
 #ifdef REONUCAM
-    reonucam_handler();
-    radial_camera_input(c);
+    reonucam_handler(c);
 #else
     radial_camera_input(c);
 
@@ -1276,21 +1285,16 @@ void mode_8_directions_camera(struct Camera *c) {
         s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
     }
 #endif
-#endif
     lakitu_zoom(400.f, 0x900);
     c->nextYaw = update_8_directions_camera(c, c->focus, pos);
-#ifdef REONUCAM
-    set_camera_height(c, pos[1]);
-#endif
     c->pos[0] = pos[0];
     c->pos[2] = pos[2];
     sAreaYawChange = sAreaYaw - oldAreaYaw;
 #ifdef EIGHT_DIR_CAMERA_COLLISION
     eight_dir_collision_handler(c);
 #endif
-#ifndef REONUCAM
     set_camera_height(c, pos[1]);
-#endif
+    #endif
 }
 
 /**
