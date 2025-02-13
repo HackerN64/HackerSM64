@@ -5371,11 +5371,7 @@ void set_camera_mode_8_directions(struct Camera *c) {
     if (c->mode != CAMERA_MODE_8_DIRECTIONS) {
         c->mode = CAMERA_MODE_8_DIRECTIONS;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
-#ifdef REONUCAM
-        s8DirModeBaseYaw = snap_to_45_degrees(s8DirModeBaseYaw);
-#else
         s8DirModeBaseYaw = 0;
-#endif
         s8DirModeYawOffset = 0;
     }
 }
