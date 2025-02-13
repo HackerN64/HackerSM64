@@ -6985,42 +6985,7 @@ sound_ref .chan_2D18
 sound_ref .sound_menu_power_meter
 sound_ref .sound_menu_camera_buzz
 sound_ref .sound_menu_camera_turn
-
-// Crash screen error sfx
-
 sound_ref .sound_menu_critical_error
-
-.envelope_critical_error:
-envelope_line 1 32760
-envelope_line 128 0
-envelope_line 500 500
-envelope_goto 4
-
-.layer_critical_error_0:
-layer_note1 3, 0x3f, 115
-layer_end
-
-.layer_critical_error_1:
-layer_note1 15, 0x3f, 115 
-layer_end
-
-.layer_critical_error_2:
-layer_note1 34, 0x3f, 115 
-layer_end
-
-.layer_critical_error_3:
-layer_note1 39, 0x3f, 115 
-layer_end
-
-.sound_menu_critical_error:
-chan_setbank 9
-chan_setinstr 0
-chan_setenvelope .envelope_critical_error
-chan_setlayer 0, .layer_critical_error_0
-chan_setlayer 1, .layer_critical_error_1
-chan_setlayer 2, .layer_critical_error_2
-chan_setlayer 3, .layer_critical_error_3
-chan_end
 
 .sound_menu_change_select:
 chan_setbank 9
@@ -7872,6 +7837,32 @@ chan_end
 .layer_31A0:
 layer_transpose 0
 layer_note1 32, 0x7f, 115
+layer_end
+
+.sound_menu_critical_error:
+chan_setbank 9
+chan_setinstr 0
+chan_setenvelope .envelope_340C
+chan_setlayer 0, .layer_critical_error_0
+chan_setlayer 1, .layer_critical_error_1
+chan_setlayer 2, .layer_critical_error_2
+chan_setlayer 3, .layer_critical_error_3
+chan_end
+
+.layer_critical_error_0:
+layer_note1 3, 0x3f, 103
+layer_end
+
+.layer_critical_error_1:
+layer_note1 15, 0x3f, 103
+layer_end
+
+.layer_critical_error_2:
+layer_note1 34, 0x3f, 103
+layer_end
+
+.layer_critical_error_3:
+layer_note1 39, 0x3f, 103
 layer_end
 
 .sound_general_bird_chirp2:

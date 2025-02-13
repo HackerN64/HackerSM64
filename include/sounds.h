@@ -555,7 +555,7 @@ enum SoundBank {
 #define SOUND_MENU_HIGH_SCORE                    /* 0x70222081 */ SOUND_ARG_LOAD(SOUND_BANK_MENU,     0x22, 0x20, SOUND_DISCRETE) // unverified
 #define SOUND_MENU_STAR_SOUND_OKEY_DOKEY         /* 0x7023FF81 */ SOUND_ARG_LOAD(SOUND_BANK_MENU,     0x23, 0xFF, SOUND_DISCRETE)
 #define SOUND_MENU_STAR_SOUND_LETS_A_GO          /* 0x7024FF81 */ SOUND_ARG_LOAD(SOUND_BANK_MENU,     0x24, 0xFF, SOUND_DISCRETE)
-#define SOUND_MENU_CRITICAL_ERROR                                 SOUND_ARG_LOAD(SOUND_BANK_MENU,     0x40, 0xFF, SOUND_DISCRETE)
+#define SOUND_MENU_CRITICAL_ERROR                /* 0x7040FF81 */ SOUND_ARG_LOAD(SOUND_BANK_MENU,     0x40, 0xFF, SOUND_DISCRETE)
 
 // US/EU only; an index between 0-7 or 0-4 is added to the sound ID before
 // playing, producing the same sound with different pitch.
