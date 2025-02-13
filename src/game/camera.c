@@ -4902,7 +4902,6 @@ void handle_c_button_movement(struct Camera *c) {
     }
 }
 
-
 /**
  * Zero the 10 cvars.
  */
