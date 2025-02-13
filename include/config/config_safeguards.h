@@ -157,6 +157,11 @@
 
     // Disable aglab cam
     #undef PARALLEL_LAKITU_CAM
+    
+    // Disable camera sounds
+    #define play_sound_cbutton_up()
+    #define play_sound_cbutton_down()
+    #define play_sound_cbutton_side()
 #endif
 
 
