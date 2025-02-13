@@ -142,7 +142,8 @@
 // Reonucam overrides
 #ifdef REONUCAM
     // Use course default mode
-    #ifndef USE_COURSE_DEFAULT_MODE
+    #ifdef USE_COURSE_DEFAULT_MODE
+    #undef USE_COURSE_DEFAULT_MODE
     #define USE_COURSE_DEFAULT_MODE
     #endif
 
