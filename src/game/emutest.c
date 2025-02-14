@@ -162,9 +162,14 @@ void detect_emulator() {
         }
         // This looks like it should be the expected result considering what we got when we
         // requested the whole word, but that's actually wrong. Later versions of mupen
-        // (and the Simple64 fork of it) get this wrong.
+        // (and the Simple64 fork of it) get this wrong, as does Gopher64
         case 0x0104:
-            gEmulator = check_cache_emulation() ? EMU_SIMPLE64 : EMU_MUPEN64PLUS_NEXT;
+            if (!check_cache_emulation()) {
+                gEmulator = EMU_MUPEN64PLUS_NEXT;
+                return;
+            }
+
+            gEmulator = *((const volatile u32*)0xA3F00200) ? EMU_SIMPLE64 : EMU_GOPHER64;
             return;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function

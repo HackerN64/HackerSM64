@@ -16,7 +16,8 @@ enum Emulator {
     EMU_SIMPLE64 = 0x0100,
     EMU_PARALLELN64 = 0x0200, // ParallelN64 2.12 or later
     EMU_ARES = 0x0400,
-    EMU_CONSOLE = 0x0800
+    EMU_CONSOLE = 0x0800,
+    EMU_GOPHER64 = 0x1000
 };
 
 // initializes gEmulator

@@ -950,7 +950,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
 
-#define NO_CULLING_EMULATOR_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+#define NO_CULLING_EMULATOR_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64 | EMU_GOPHER64)
 
 s32 obj_is_in_view(struct GraphNodeObject *node) {
     struct GraphNode *geo = node->sharedChild;

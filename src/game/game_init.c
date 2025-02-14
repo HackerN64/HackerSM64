@@ -33,7 +33,7 @@
 #include "emutest.h"
 
 // Emulators that the Instant Input patch should not be applied to
-#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64 | EMU_GOPHER64)
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
