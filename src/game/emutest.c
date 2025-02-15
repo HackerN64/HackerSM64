@@ -22,10 +22,10 @@ extern void __osSiRelAccess(void);
 extern void __osPiGetAccess(void);
 extern void __osPiRelAccess(void);
 
-enum Emulator gEmulator = EMU_CONSOLE;
+u32 gEmulator = EMU_CONSOLE;
 u8 gSupportsLibpl = FALSE;
 
-static inline enum Emulator get_pj64_version() {
+static inline u32 get_pj64_version() {
     // When calling this function, we know that the emulator is some version of Project 64,
     // up to version 3.0. We need to determine which version it is.
 
@@ -74,11 +74,10 @@ static u8 check_cache_emulation() {
     return cacheEmulated;
 }
 
-void detect_emulator() {
+u32 detect_emulator() {
     // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
-        gEmulator = EMU_CONSOLE;
-        return;
+        return EMU_CONSOLE;
     }
     
     /*
@@ -93,9 +92,8 @@ void detect_emulator() {
     const FloatRoundingMode roundingMode = fcr_get_rounding_mode();
     fcr_set_rounding_mode(FCR_RM_ROUND_TO_NEAREST);
     if (1.0f != round_double_to_float(0.9999999999999999)) {
-        gEmulator = EMU_WIIVC;
         fcr_set_rounding_mode(roundingMode);
-        return;
+        return EMU_WIIVC;
     }
     fcr_set_rounding_mode(roundingMode);
 
@@ -105,17 +103,15 @@ void detect_emulator() {
     osPiReadIo(0x1ffb0000u, &magic);
     if (magic == 0x00500000u) {
         // libpl is supported. Must be ParallelN64
-        gEmulator = EMU_PL;
 #ifdef LIBPL
         gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
 #endif
-        return;
+        return EMU_PL;
     }
 
     // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
     if (check_cache_emulation()) {
-        gEmulator = EMU_OTHER;
-        return;
+        return EMU_OTHER;
     }
 
     // Perform a read from unmapped PIF ram.
@@ -125,12 +121,10 @@ void detect_emulator() {
     osPiReadIo(0x1fd00104u, &magic);
     if (magic == 0u) {
         // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
-        gEmulator = EMU_MUPEN_OLD;
-        return;
+        return EMU_MUPEN_OLD;
     } else if (magic != 0x01040104u) {
         // cen64 does... something. The result is consistent, but not what it should be
-        gEmulator = EMU_OTHER;
-        return;
+        return EMU_OTHER;
     }
     
     __osPiGetAccess();
@@ -144,18 +138,15 @@ void detect_emulator() {
         // requested the whole word, but that's actually wrong. Later versions of mupen
         // (and the Simple64 fork of it) get this wrong.
         case 0x0104:
-            gEmulator = EMU_MUPEN_NEW;
-            return;
+            return EMU_MUPEN_NEW;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function
         // to find out which version we're dealing with.
         case 0x0000:
-            gEmulator = get_pj64_version();
-            return;
+            return get_pj64_version();
     }
 
     // This is an emulator, but is not Project64 (up to 3.0) or ParallelN64.
     // Note that Project64 4.0 will be detected here.
-    gEmulator = EMU_OTHER;
-    return;
+    return EMU_OTHER;
 } 

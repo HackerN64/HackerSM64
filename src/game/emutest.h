@@ -17,7 +17,7 @@ enum Emulator {
 };
 
 // initializes gEmulator
-extern void detect_emulator();
+extern u32 detect_emulator();
 
 /* gEmulator is an enum that identifies the current emulator.
  * The enum values work as a bitfield, so you can use the & and | operators
@@ -34,7 +34,7 @@ extern void detect_emulator();
  * Test for Console, Ares, or ParallelN64:
  * if (gEmulator & (EMU_CONSOLE | EMU_ARES | EMU_PARALLELN64))
  */
-extern enum Emulator gEmulator;
+extern u32 gEmulator;
 
 // determines whether libpl is safe to use
 extern u8 gSupportsLibpl;
