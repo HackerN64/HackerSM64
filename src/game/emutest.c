@@ -25,24 +25,9 @@ extern void __osPiRelAccess(void);
 enum Emulator gEmulator = EMU_CONSOLE;
 u8 gSupportsLibpl = FALSE;
 
-u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
-u32 emux_detect(void); // defined in asm/emux.s
-
-static inline u32 check_count_factor() {
-    const u32 saved = __osDisableInt();
-    const u32 cf = pj64_get_count_factor_asm();
-    __osRestoreInt(saved);
-    return cf;
-}
-
 static inline enum Emulator get_pj64_version() {
     // When calling this function, we know that the emulator is some version of Project 64,
-    // and it isn't using the PJ64 4.0 interpreter core. Figure out which version it is.
-    
-    // PJ64 4.0 dynarec core doesn't update the COUNT register correctly within recompiled functions
-    if (check_count_factor() == 0) {
-        return EMU_PROJECT64_4;
-    }
+    // up to version 3.0. We need to determine which version it is.
 
     // Instead of implementing this PIF command correctly, PJ64 versions prior to 3.0 just have
     // a set of hardcoded values for some requests. At least one of these hardcoded values has a
@@ -73,25 +58,10 @@ static inline enum Emulator get_pj64_version() {
     return (pifCheck == 0xB0) ? EMU_PROJECT64_1_OR_2 : EMU_PROJECT64_3;
 }
 
-static u8 check_cache_emulation() {
-    // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
-    u32 saved = __osDisableInt();
-    // Create a variable with an initial value of 1. This value will remain cached.
-    volatile u8 sCachedValue = 1;
-    // Overwrite the variable directly in RDRAM without going through cache.
-    // This should preserve its value of 1 in dcache if dcache is emulated correctly.
-    *(u8*)(K0_TO_K1(&sCachedValue)) = 0;
-    // Read the variable back from dcache, if it's still 1 then cache is emulated correctly.
-    // If it's zero, then dcache is not emulated correctly.
-    const u8 cacheEmulated = sCachedValue;
-    // Restore interrupts
-    __osRestoreInt(saved);
-    return cacheEmulated;
-}
-
 void detect_emulator() {
+    // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
-        gEmulator = emux_detect() ? EMU_ARES : EMU_CONSOLE;
+        gEmulator = EMU_CONSOLE;
         return;
     }
     
@@ -119,13 +89,9 @@ void detect_emulator() {
     // So in this case, it should result in 0x01040104
     u32 magic;
     osPiReadIo(0x1fd00104u, &magic);
-    if (magic == 0u) {
-        // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
-        gEmulator = EMU_MUPEN_OLD;
-        return;
-    } else if (magic != 0x01040104u) {
-        // cen64 does... something. The result is consistent, but not what it should be
-        gEmulator = EMU_CEN64;
+    if (magic != 0x01040104u) {
+        // Some emulators like Cen64 and older versions of Mupen fail here
+        gEmulator = EMU_OTHER;
         return;
     }
     
@@ -143,38 +109,24 @@ void detect_emulator() {
             osPiReadIo(0x1ffb0000u, &magic);
             if (magic == 0x00500000u) {
                 // libpl is supported. Must be ParallelN64
-                gEmulator = EMU_PARALLELN64;
+                gEmulator = EMU_PL;
 #ifdef LIBPL
                 gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
 #endif
                 return;
             }
-            
-            // If the cache is emulated, it's Ares
-            if (check_cache_emulation()) {
-                gEmulator = EMU_ARES;
-                return;
-            }
-
-            // its the Project64 4.0 interpreter core
-            gEmulator = EMU_PROJECT64_4;
-            return;
+            break;
         }
-        // This looks like it should be the expected result considering what we got when we
-        // requested the whole word, but that's actually wrong. Later versions of mupen
-        // (and the Simple64 fork of it) get this wrong.
-        case 0x0104:
-            gEmulator = check_cache_emulation() ? EMU_SIMPLE64 : EMU_MUPEN64PLUS_NEXT;
-            return;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function
         // to find out which version we're dealing with.
         case 0x0000:
             gEmulator = get_pj64_version();
             return;
-        // No known emulator gives any other value. If we somehow manage to get here, just return 0
-        default:
-            gEmulator = 0;
-            return;
     }
+
+    // This is an emulator, but is not Project64 (up to 3.0) or ParallelN64.
+    // Note that Project64 4.0 will be detected here.
+    gEmulator = EMU_OTHER;
+    return;
 } 

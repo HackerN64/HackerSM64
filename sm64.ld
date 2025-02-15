@@ -160,8 +160,6 @@ SECTIONS
 #ifdef EEP
       KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
 #endif
-      KEEP(BUILD_DIR/asm/emux.o(.text*));
-      KEEP(BUILD_DIR/asm/pj64_get_count_factor_asm.o(.text*));
       KEEP(BUILD_DIR/asm/round.o(.text*));
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
