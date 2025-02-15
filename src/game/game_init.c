@@ -33,7 +33,7 @@
 #include "emutest.h"
 
 // Emulators that the Instant Input patch should be applied to
-#define INSTANT_INPUT_WHITELIST (EMU_PL | EMU_PROJECT64_ANY)
+#define INSTANT_INPUT_WHITELIST (EMU_PL | EMU_PROJECT64_ANY | EMU_MUPEN_BASED)
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -422,7 +422,7 @@ void render_init(void) {
     exec_display_list(&gGfxPool->spTask);
 
     // Skip incrementing the initial framebuffer index on certain emulators so that they display immediately as the Gfx task finishes
-    // This will break accurate emulators, so only enable on Project64 and Parallel Launcher
+    // This will break accurate emulators, so only enable on Project64, Parallel Launcher and Mupen.
     if (!(gEmulator & INSTANT_INPUT_WHITELIST)) {
         sRenderingFramebuffer++;
     }
@@ -461,7 +461,7 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
+    // Skip swapping buffers on some inaccurate emulators so that they display immediately as the Gfx task finishes
     if (!(gEmulator & INSTANT_INPUT_WHITELIST)) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;

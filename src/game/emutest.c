@@ -58,6 +58,22 @@ static inline enum Emulator get_pj64_version() {
     return (pifCheck == 0xB0) ? EMU_PROJECT64_1_OR_2 : EMU_PROJECT64_3;
 }
 
+static u8 check_cache_emulation() {
+    // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
+    u32 saved = __osDisableInt();
+    // Create a variable with an initial value of 1. This value will remain cached.
+    volatile u8 sCachedValue = 1;
+    // Overwrite the variable directly in RDRAM without going through cache.
+    // This should preserve its value of 1 in dcache if dcache is emulated correctly.
+    *(u8*)(K0_TO_K1(&sCachedValue)) = 0;
+    // Read the variable back from dcache, if it's still 1 then cache is emulated correctly.
+    // If it's zero, then dcache is not emulated correctly.
+    const u8 cacheEmulated = sCachedValue;
+    // Restore interrupts
+    __osRestoreInt(saved);
+    return cacheEmulated;
+}
+
 void detect_emulator() {
     // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
@@ -83,14 +99,36 @@ void detect_emulator() {
     }
     fcr_set_rounding_mode(roundingMode);
 
+    // Test to see if the libpl emulator extension is present.
+    u32 magic;
+    osPiWriteIo(0x1ffb0000u, 0u);
+    osPiReadIo(0x1ffb0000u, &magic);
+    if (magic == 0x00500000u) {
+        // libpl is supported. Must be ParallelN64
+        gEmulator = EMU_PL;
+#ifdef LIBPL
+        gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
+#endif
+        return;
+    }
+
+    // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
+    if (check_cache_emulation()) {
+        gEmulator = EMU_OTHER;
+        return;
+    }
+
     // Perform a read from unmapped PIF ram.
     // On console and well behaved emulators, this echos back the lower half of
     // the requested memory address, repeating it if a whole word is requested.
     // So in this case, it should result in 0x01040104
-    u32 magic;
     osPiReadIo(0x1fd00104u, &magic);
-    if (magic != 0x01040104u) {
-        // Some emulators like Cen64 and older versions of Mupen fail here
+    if (magic == 0u) {
+        // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
+        gEmulator = EMU_MUPEN_OLD;
+        return;
+    } else if (magic != 0x01040104u) {
+        // cen64 does... something. The result is consistent, but not what it should be
         gEmulator = EMU_OTHER;
         return;
     }
@@ -102,21 +140,12 @@ void detect_emulator() {
 
     // Now do a halfword read instead.
     switch (halfMagic) {
-        // This is the correct result (echo back the lower half of the requested address)
-        case 0x0106: {
-            // Test to see if the libpl emulator extension is present.
-            osPiWriteIo(0x1ffb0000u, 0u);
-            osPiReadIo(0x1ffb0000u, &magic);
-            if (magic == 0x00500000u) {
-                // libpl is supported. Must be ParallelN64
-                gEmulator = EMU_PL;
-#ifdef LIBPL
-                gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
-#endif
-                return;
-            }
-            break;
-        }
+        // This looks like it should be the expected result considering what we got when we
+        // requested the whole word, but that's actually wrong. Later versions of mupen
+        // (and the Simple64 fork of it) get this wrong.
+        case 0x0104:
+            gEmulator = EMU_MUPEN_NEW;
+            return;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function
         // to find out which version we're dealing with.
