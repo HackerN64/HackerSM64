@@ -1,3 +1,4 @@
+#include "segment_names.h"
 #ifdef SKYBOX_SYMBOLS
 #define DEFINE_SKYBOX(symbol, enumeration) extern SkyboxTexture symbol##_skybox_ptrlist;
 #endif
@@ -13,7 +14,7 @@
 #endif
 
 #ifdef SKYBOX_LD
-#define DEFINE_SKYBOX(symbol, enumeration) YAY0_SEG(symbol##_skybox, 0x0A000000)
+#define DEFINE_SKYBOX(symbol, enumeration) YAY0_SEG(symbol##_skybox, SEGMENT_SKYBOX << 24)
 #endif
 
 /**
