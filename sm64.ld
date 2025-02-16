@@ -521,16 +521,9 @@ SECTIONS
    }
    END_SEG(scripts)
 
-   YAY0_SEG(water_skybox,       0x0A000000)
-   YAY0_SEG(ccm_skybox,         0x0A000000)
-   YAY0_SEG(clouds_skybox,      0x0A000000)
-   YAY0_SEG(bitfs_skybox,       0x0A000000)
-   YAY0_SEG(wdw_skybox,         0x0A000000)
-   YAY0_SEG(cloud_floor_skybox, 0x0A000000)
-   YAY0_SEG(ssl_skybox,         0x0A000000)
-   YAY0_SEG(bbh_skybox,         0x0A000000)
-   YAY0_SEG(bidw_skybox,        0x0A000000)
-   YAY0_SEG(bits_skybox,        0x0A000000)
+#define SKYBOX_LD
+#include "skyboxes.h"
+#undef SKYBOX_LD
 
    // Texture bins
    YAY0_SEG(fire,     0x09000000)
