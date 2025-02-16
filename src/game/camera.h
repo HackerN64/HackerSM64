@@ -786,7 +786,7 @@ void play_sound_cbutton_up(void);
 void play_sound_cbutton_down(void);
 void play_sound_cbutton_side(void);
 #else
-extern f32 cameraSpeeds[5];
+extern f32 reonucamSpeeds[5];
 #endif
 void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);

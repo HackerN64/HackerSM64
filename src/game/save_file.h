@@ -63,7 +63,7 @@ struct MainMenuSaveData {
     u8 language: 3;
 #endif
 #ifdef REONUCAM
-    u8 cameraSpeedSetting: 3;
+    u8 reonucamSpeedsetting: 3;
 #endif
 #ifdef WIDE
     u8 wideMode: 1;

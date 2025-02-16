@@ -1558,7 +1558,7 @@ void render_reonucam_speed_setting(void) {
     } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
         gReonucamState.speed--;
     }
-    gReonucamState.speed = (gReonucamState.speed + ARRAY_COUNT(cameraSpeeds)) % ARRAY_COUNT(cameraSpeeds);
+    gReonucamState.speed = (gReonucamState.speed + ARRAY_COUNT(reonucamSpeeds)) % ARRAY_COUNT(reonucamSpeeds);
     save_file_set_camera_speed(gReonucamState.speed);
 }
 #endif

@@ -1188,14 +1188,14 @@ void eight_dir_collision_handler(struct Camera *c) {
 #endif
 
 #ifdef REONUCAM
-f32 cameraSpeeds[5] = {0.5f, 1.f, 1.5f, 2.f, 3.5f}; // The camera speed settings, from slowest to fastest.
+f32 reonucamSpeeds[5] = {0.5f, 1.f, 1.5f, 2.f, 3.5f}; // The camera speed settings, from slowest to fastest.
 #define R_DOUBLE_TAP_WINDOW 5 // How many frames the player has to double tap R in order to ender Mario cam mode.
 
 void reonucam_handler(struct Camera *c) {
     Vec3f pos;
     s16 oldAreaYaw = sAreaYaw;
     // Get the camera speed based on the user's setting
-    f32 cameraSpeed = cameraSpeeds[gReonucamState.speed];
+    f32 cameraSpeed = reonucamSpeeds[gReonucamState.speed];
     
     //45º rotations
     if ((gPlayer1Controller->buttonPressed & L_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {

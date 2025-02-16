@@ -237,7 +237,7 @@ static void wipe_main_menu_data(void) {
     gSaveBuffer.menuData.coinScoreAges[2] = 0x15555555;
 
 #ifdef REONUCAM
-    gSaveBuffer.menuData.cameraSpeedSetting = 2; // Set default Reonucam speed to medium on first boot
+    gSaveBuffer.menuData.reonucamSpeedsetting = 2; // Set default Reonucam speed to medium on first boot
 #endif
 
     gMainMenuDataModified = TRUE;
@@ -736,13 +736,13 @@ u32 save_file_get_sound_mode(void) {
 
 #ifdef REONUCAM
 void save_file_set_camera_speed(u8 speed) {
-    gSaveBuffer.menuData.cameraSpeedSetting = speed;
+    gSaveBuffer.menuData.reonucamSpeedsetting = speed;
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
 u8 save_file_get_camera_speed(void) {
-    return gSaveBuffer.menuData.cameraSpeedSetting;
+    return gSaveBuffer.menuData.reonucamSpeedsetting;
 }
 
 #endif
