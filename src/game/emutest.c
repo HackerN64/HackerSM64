@@ -75,6 +75,18 @@ static u8 check_cache_emulation() {
 }
 
 u32 detect_emulator() {
+    // Test to see if the libpl emulator extension is present.
+    u32 magic;
+    osPiWriteIo(0x1ffb0000u, 0u);
+    osPiReadIo(0x1ffb0000u, &magic);
+    if (magic == 0x00500000u) {
+        // libpl is supported. Must be ParallelN64
+#ifdef LIBPL
+        gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
+#endif
+        return EMU_PARALLEL_LAUNCHER;
+    }
+
     // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
         return EMU_CONSOLE;
@@ -97,18 +109,6 @@ u32 detect_emulator() {
     }
     fcr_set_rounding_mode(roundingMode);
 
-    // Test to see if the libpl emulator extension is present.
-    u32 magic;
-    osPiWriteIo(0x1ffb0000u, 0u);
-    osPiReadIo(0x1ffb0000u, &magic);
-    if (magic == 0x00500000u) {
-        // libpl is supported. Must be ParallelN64
-#ifdef LIBPL
-        gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
-#endif
-        return EMU_PL;
-    }
-
     // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
     if (check_cache_emulation()) {
         return EMU_OTHER;
@@ -121,7 +121,7 @@ u32 detect_emulator() {
     osPiReadIo(0x1fd00104u, &magic);
     if (magic == 0u) {
         // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
-        return EMU_MUPEN_OLD;
+        return EMU_MUPEN;
     } else if (magic != 0x01040104u) {
         // cen64 does... something. The result is consistent, but not what it should be
         return EMU_OTHER;
@@ -138,7 +138,7 @@ u32 detect_emulator() {
         // requested the whole word, but that's actually wrong. Later versions of mupen
         // (and the Simple64 fork of it) get this wrong.
         case 0x0104:
-            return EMU_MUPEN_NEW;
+            return EMU_MUPEN;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function
         // to find out which version we're dealing with.
