@@ -163,6 +163,7 @@
     #define play_sound_cbutton_up()
     #define play_sound_cbutton_down()
     #define play_sound_cbutton_side()
+    #define play_sound_if_cam_switched_to_lakitu_or_mario()
 #endif
 
 

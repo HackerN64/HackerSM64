@@ -785,12 +785,12 @@ void play_camera_buzz_if_c_sideways(void);
 void play_sound_cbutton_up(void);
 void play_sound_cbutton_down(void);
 void play_sound_cbutton_side(void);
+void play_sound_if_cam_switched_to_lakitu_or_mario(void);
 #else
 extern f32 reonucamSpeeds[5];
 #endif
 void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);
-void play_sound_if_cam_switched_to_lakitu_or_mario(void);
 void radial_camera_input(struct Camera *c);
 void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);

@@ -3040,9 +3040,7 @@ void update_camera(struct Camera *c) {
 #endif
             }
         }
-#ifndef REONUCAM
         play_sound_if_cam_switched_to_lakitu_or_mario();
-#endif
     }
 
     // Initialize the camera
@@ -4709,15 +4707,6 @@ void play_sound_cbutton_down(void) {
 void play_sound_cbutton_side(void) {
     play_sound(SOUND_MENU_CAMERA_TURN, gGlobalSoundSource);
 }
-#endif
-
-void play_sound_button_change_blocked(void) {
-    play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
-}
-
-void play_sound_rbutton_changed(void) {
-    play_sound(SOUND_MENU_CLICK_CHANGE_VIEW, gGlobalSoundSource);
-}
 
 void play_sound_if_cam_switched_to_lakitu_or_mario(void) {
     if (sCameraSoundFlags & CAM_SOUND_MARIO_ACTIVE) {
@@ -4727,6 +4716,16 @@ void play_sound_if_cam_switched_to_lakitu_or_mario(void) {
         play_sound_rbutton_changed();
     }
     sCameraSoundFlags &= ~(CAM_SOUND_MARIO_ACTIVE | CAM_SOUND_NORMAL_ACTIVE);
+}
+
+#endif
+
+void play_sound_button_change_blocked(void) {
+    play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
+}
+
+void play_sound_rbutton_changed(void) {
+    play_sound(SOUND_MENU_CLICK_CHANGE_VIEW, gGlobalSoundSource);
 }
 
 /**
