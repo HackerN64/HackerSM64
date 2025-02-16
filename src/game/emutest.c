@@ -22,7 +22,7 @@ extern void __osSiRelAccess(void);
 extern void __osPiGetAccess(void);
 extern void __osPiRelAccess(void);
 
-u32 gEmulator = EMU_CONSOLE;
+u8 gEmulator = EMU_CONSOLE;
 u8 gSupportsLibpl = FALSE;
 
 static inline u32 get_pj64_version() {

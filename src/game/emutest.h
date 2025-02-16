@@ -32,7 +32,7 @@ extern u32 detect_emulator();
  * Test for Console or Parallel Launcher:
  * if (gEmulator & (EMU_CONSOLE | EMU_PARALLEL_LAUNCHER))
  */
-extern u32 gEmulator;
+extern u8 gEmulator;
 
 // determines whether libpl is safe to use
 extern u8 gSupportsLibpl;
