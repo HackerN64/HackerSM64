@@ -1178,9 +1178,11 @@ void eight_dir_collision_handler(struct Camera *c) {
         thick[2] = coss(yaw) * distFromSurf;
         vec3f_add(hitpos,thick);
         vec3f_copy(c->pos,hitpos);
+        c->yaw = yaw;
     }
-
-    c->yaw = atan2s(c->pos[2] - gMarioState->pos[2], c->pos[0] - gMarioState->pos[0]);
+    else {
+        c->yaw = atan2s(c->pos[2] - gMarioState->pos[2], c->pos[0] - gMarioState->pos[0]);
+    }
 
 }
 #endif
@@ -4706,6 +4708,7 @@ void play_sound_cbutton_down(void) {
 
 void play_sound_cbutton_side(void) {
     play_sound(SOUND_MENU_CAMERA_TURN, gGlobalSoundSource);
+}
 #endif
 void play_sound_button_change_blocked(void) {
     play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
