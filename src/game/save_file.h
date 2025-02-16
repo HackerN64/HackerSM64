@@ -59,14 +59,14 @@ struct MainMenuSaveData {
     // on the high score screen.
     u32 coinScoreAges[NUM_SAVE_FILES];
     u8 soundMode: 2;
-#ifdef WIDE
-    u8 wideMode: 1;
-#endif
 #ifdef MULTILANG
     u8 language: 3;
 #endif
 #ifdef REONUCAM
     u8 cameraSpeedSetting: 3;
+#endif
+#ifdef WIDE
+    u8 wideMode: 1;
 #endif
 #ifdef PUPPYCAM
     u8 firstBoot;
