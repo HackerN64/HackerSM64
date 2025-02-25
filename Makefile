@@ -135,7 +135,7 @@ endif
 #==============================================================================#
 
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS = -Ofast -falign-functions=32
+DEFAULT_OPT_FLAGS = -Ofast -falign-functions=32 -ffinite-math-only -fno-signed-zeros -fno-math-errno
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # TODO: Figure out how to allow -fassociative-math to be enabled
@@ -269,8 +269,8 @@ BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
-COMPRESS ?= yay0
-$(eval $(call validate-option,COMPRESS,mio0 yay0 gzip rnc1 rnc2 uncomp))
+COMPRESS ?= lz4t
+$(eval $(call validate-option,COMPRESS,mio0 yay0 lz4t gzip rnc1 rnc2 uncomp))
 ifeq ($(COMPRESS),gzip)
   DEFINES += GZIP=1
   LIBZRULE := $(BUILD_DIR)/libz.a
@@ -283,6 +283,8 @@ else ifeq ($(COMPRESS),yay0)
   DEFINES += YAY0=1
 else ifeq ($(COMPRESS),mio0)
   DEFINES += MIO0=1
+else ifeq ($(COMPRESS),lz4t)
+  DEFINES += LZ4T=1
 else ifeq ($(COMPRESS),uncomp)
   DEFINES += UNCOMPRESSED=1
 endif
@@ -448,6 +450,8 @@ else ifneq ($(call find-command,mips64-none-elf-ld),)
   CROSS := mips64-none-elf-
 else ifneq ($(call find-command,mips-ld),)
   CROSS := mips-
+else ifneq ($(call find-command,mips-suse-linux-ld ),)
+  CROSS := mips-suse-linux-
 else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
@@ -468,16 +472,18 @@ else ifeq ($(COMPILER),clang)
   CC      := clang
   CXX     := clang++
 endif
-# Prefer gcc's cpp if installed on the system
-ifneq (,$(call find-command,cpp-10))
-  CPP     := cpp-10
+
+ARCH := $(shell uname -p)
+
+# Check processor architecture. ARM users need a different binutils package.
+ifeq ($(ARCH), arm)
+  LD := tools/mips64-elf-ld-arm
 else
-  CPP     := cpp
-endif
-ifneq ($(call find-command,mips-n64-ld),)
-LD        := mips-n64-ld
-else
-LD        := tools/mips64-elf-ld
+  ifneq ($(call find-command,mips-n64-ld),)
+    LD        := mips-n64-ld
+  else
+    LD        := tools/mips64-elf-ld
+  endif
 endif
 AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
@@ -503,6 +509,18 @@ endif
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 
+# Prefer gcc's cpp if installed on the system
+ifneq (,$(call find-command,clang))
+  CPP     := clang
+  CPPFLAGS := -E -P -x c -Wno-trigraphs $(DEF_INC_CFLAGS)
+else ifneq (,$(call find-command,cpp-10))
+  CPP     := cpp-10
+  CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
+else
+  CPP     := cpp
+  CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
+endif
+
 # C compiler options
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 ifeq ($(COMPILER),gcc)
@@ -520,7 +538,6 @@ ASFLAGS     := -march=vr4300 -mabi=32 $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(fore
 RSPASMFLAGS := $(foreach d,$(DEFINES),-definelabel $(subst =, ,$(d)))
 
 # C preprocessor flags
-CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
 
 #==============================================================================#
 # Miscellaneous Tools                                                          #
@@ -529,6 +546,7 @@ CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
 # N64 tools
 YAY0TOOL              := $(TOOLS_DIR)/slienc
 MIO0TOOL              := $(TOOLS_DIR)/mio0
+LZ4TPACK              := $(TOOLS_DIR)/lz4tpack
 RNCPACK               := $(TOOLS_DIR)/rncpack
 FILESIZER             := $(TOOLS_DIR)/filesizer
 N64CKSUM              := $(TOOLS_DIR)/n64cksum
@@ -562,10 +580,19 @@ endif
 
 EMU_FLAGS =
 
+# Adding a txt file to this location will then reference a UNFLoader path specified in the file, instead of locally.
+# This is expecially important for WSL users because UNFLoader.exe is incredibly slow when run within WSL's filesystem, so this can be used to point to the C drive.
+# The file should only contain the directory path that contains UNFLoader[.exe] (do not specify the filename).
+LOADER_DIR_FILE_SPECIFICATION_PATH = ~/.local/share/HackerSM64/UNFLoader-dir.txt
+LOADER_DIR = ./$(TOOLS_DIR)
+
+ifneq (,$(wildcard $(LOADER_DIR_FILE_SPECIFICATION_PATH)))
+  LOADER_DIR = $(shell cat $(LOADER_DIR_FILE_SPECIFICATION_PATH))
+endif
 ifneq (,$(call find-command,wslview))
-    LOADER = ./$(TOOLS_DIR)/UNFLoader.exe
+  LOADER_EXEC = $(LOADER_DIR)/UNFLoader.exe
 else
-    LOADER = ./$(TOOLS_DIR)/UNFLoader
+  LOADER_EXEC = $(LOADER_DIR)/UNFLoader
 endif
 
 SHA1SUM = sha1sum
@@ -621,26 +648,33 @@ test-pj64: $(ROM)
 # someone2639
 
 # download and extract most recent unfloader build if needed
-$(LOADER):
-ifeq (,$(wildcard $(LOADER)))
+$(LOADER_EXEC):
+ifeq (,$(wildcard $(LOADER_EXEC)))
 	@$(PRINT) "Downloading latest UNFLoader...$(NO_COL)\n"
-	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(TOOLS_DIR)
+	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(LOADER_DIR)
 endif
 
-load: $(ROM) $(LOADER)
-	$(LOADER) -r $<
+load: $(ROM) $(LOADER_EXEC)
+	$(LOADER_EXEC) -r $<
 
-unf: $(ROM) $(LOADER)
-	$(LOADER) -d -r $<
+unf: $(ROM) $(LOADER_EXEC)
+	$(LOADER_EXEC) -d -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
 
 patch: $(ROM)
-	$(FLIPS) --create --bps "$(shell python3 tools/detect_baseroms.py $(VERSION))" "$(ROM)" "$(BUILD_DIR)/$(TARGET_STRING).bps"
+  ifeq ($(shell uname), Darwin)
+    ifeq ($(MAKECMDGOALS), patch)
+      $(error "The 'make patch' command is not supported on macOS.")
+    endif
+  else
+	  $(FLIPS) --create --bps "$(shell python3 tools/detect_baseroms.py $(VERSION))" "$(ROM)" "$(BUILD_DIR)/$(TARGET_STRING).bps"
+  endif
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
 $(BUILD_DIR)/src/game/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
+$(BUILD_DIR)/src/game/fasttext.o:     $(FASTTEXT_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
 $(SOUND_BIN_DIR)/sound_data.o:        $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/sequences.bin $(SOUND_BIN_DIR)/bank_sets
@@ -720,9 +754,13 @@ $(BUILD_DIR)/%: %.png
 	$(call print,Converting:,$<,$@)
 	$(V)$(N64GRAPHICS) -s raw -i $@ -g $< -f $(lastword $(subst ., ,$@))
 
+$(BUILD_DIR)/%.preswap.inc.c: %.preswap.png
+	$(call print,Converting:,$<,$@)
+	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$*)) -S
+
 $(BUILD_DIR)/%.inc.c: %.png
 	$(call print,Converting:,$<,$@)
-	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$(basename $<)))
+	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$*))
 
 # Color Index CI8
 $(BUILD_DIR)/%.ci8.inc.c: %.ci8.png
@@ -770,6 +808,8 @@ else ifeq ($(COMPRESS),yay0)
 include compression/yay0rules.mk
 else ifeq ($(COMPRESS),mio0)
 include compression/mio0rules.mk
+else ifeq ($(COMPRESS),lz4t)
+include compression/lz4trules.mk
 else ifeq ($(COMPRESS),uncomp)
 include compression/uncomprules.mk
 endif

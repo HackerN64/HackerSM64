@@ -2278,7 +2278,7 @@ s32 player_performed_grab_escape_action(void) {
         sPlayerGrabReleaseState = FALSE;
     }
 
-    if (sPlayerGrabReleaseState && (gPlayer1Controller->stickMag > 40.0f)) {
+    if (!sPlayerGrabReleaseState && (gPlayer1Controller->stickMag > 40.0f)) {
         sPlayerGrabReleaseState = TRUE;
         return TRUE;
     }

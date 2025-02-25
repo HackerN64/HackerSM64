@@ -1595,7 +1595,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     lines = 0;
     
     shakeTablePos = gGlobalTimer % sizeof(sTextShakeTable);
-    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4bS(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '\n') {
@@ -1717,7 +1717,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     }
 
     lines = 0;
-    gDPLoadTextureBlock_4b(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4bS(gDisplayListHead++, fnt->tex, fnt->fmt, fnt->imW, fnt->imH, 0, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '\n') {

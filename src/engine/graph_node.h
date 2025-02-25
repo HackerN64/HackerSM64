@@ -253,14 +253,18 @@ struct GraphNodeAnimatedPart {
 };
 
 /** A GraphNode that draws a display list rotated in a way to always face the
- *  camera. Note that if the entire object is a billboard (like a coin or 1-up)
- *  then it simply sets the billboard flag for the entire object, this node is
- *  used for billboard parts (like a chuckya or goomba body).
+ *  camera. Cylindrical billboarding can be used instead via 'isCylindrical',
+ *  which rotates the display list only around the axis vector.
+ *  Note that if the entire object is a billboard (like a coin or 1-up) then it
+ *  simply sets the billboard flag for the entire object, this node is used for
+ *  billboard parts (like a chuckya or goomba body).
  */
 struct GraphNodeBillboard {
     /*0x00*/ struct GraphNode node;
     /*0x14*/ void *displayList;
     /*0x18*/ Vec3s translation;
+    /*0x1E*/ Vec3s axis;
+    /*0x24*/ u8 isCylindrical;
 };
 
 /** A GraphNode that simply draws a display list without doing any
@@ -376,7 +380,7 @@ struct GraphNodeScale               *init_graph_node_scale               (struct
 struct GraphNodeObject              *init_graph_node_object              (struct AllocOnlyPool *pool, struct GraphNodeObject              *graphNode, struct GraphNode *sharedChild, Vec3f pos, Vec3s angle, Vec3f scale);
 struct GraphNodeCullingRadius       *init_graph_node_culling_radius      (struct AllocOnlyPool *pool, struct GraphNodeCullingRadius       *graphNode, s16 radius);
 struct GraphNodeAnimatedPart        *init_graph_node_animated_part       (struct AllocOnlyPool *pool, struct GraphNodeAnimatedPart        *graphNode, s32 drawingLayer, void *displayList, Vec3s translation);
-struct GraphNodeBillboard           *init_graph_node_billboard           (struct AllocOnlyPool *pool, struct GraphNodeBillboard           *graphNode, s32 drawingLayer, void *displayList, Vec3s translation);
+struct GraphNodeBillboard           *init_graph_node_billboard           (struct AllocOnlyPool *pool, struct GraphNodeBillboard           *graphNode, s32 drawingLayer, void *displayList, Vec3s translation, Vec3s axis, u8 isCylindrical);
 struct GraphNodeDisplayList         *init_graph_node_display_list        (struct AllocOnlyPool *pool, struct GraphNodeDisplayList         *graphNode, s32 drawingLayer, void *displayList);
 struct GraphNodeShadow              *init_graph_node_shadow              (struct AllocOnlyPool *pool, struct GraphNodeShadow              *graphNode, s16 shadowScale, u8 shadowSolidity, u8 shadowType);
 struct GraphNodeObjectParent        *init_graph_node_object_parent       (struct AllocOnlyPool *pool, struct GraphNodeObjectParent        *graphNode, struct GraphNode *sharedChild);
