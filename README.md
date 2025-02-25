@@ -6,7 +6,7 @@ HackerSM64 now has a discord server! https://discord.gg/brETAakcXr
 
 This repo requires BOTH a US ROM and a JP ROM in order to build. Place baserom.us.z64 in the repo as usual and ALSO include baserom.jp.z64.
 
-This repo needs gcc in order to be able to build it. To install it, run `sudo apt install gcc-mips-linux-gnu`
+[How to install everything needed and build HackerSM64](https://github.com/HackerN64/HackerSM64/wiki/Installing-HackerSM64)
 
 This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in the config files):
 
@@ -139,23 +139,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Separate defines for emulator and console black border height.
 - Getting HVQM FMV support to work with the game is WIP.
 
-Requirements are the same as regular SM64, however a GCC MIPS cross compiler is also required. If you're on Debian-like Linux, you can use the ``gcc-mips-linux-gnu`` package. The toolchain that comes with my SDK is also supported.
-
-## Additional Prerequisites
-
-BinPNG (the CI texture converter) requires some python3 dependencies. Use pip to install them.
-
-``pip install pypng bitstring``
-
-## UNFLoader support
-
-The repository supports UNFLoader for debugging.
-To build with UNF, run make with ``UNF=1``.
-
-Further instructions can be found at the [official repository](https://github.com/buu342/N64-UNFLoader)
-
-**NOTE: Closing the UNFLoader window will result in your game eventually hanging due to lacking a USB device to send messages to, so beware of that**
-
 ## Multi-Save support
 The repository supports SRAM in addition to EEPROM. The standard save data functions are #ifdef'd to accommedate this.
 To build with SRAM support, run make with ``SAVETYPE=sram``.
@@ -207,7 +190,3 @@ Thanks to "someone2639" for this hacky-ass idea
 Q: Will this allow me to use FlashRAM/Transfer Pak/microcode swapping/Other Cool N64 Features?
 
 A: Theoretically, all yes.
-
-## Installation help
-
-Go read the original SM64 repo README.md
