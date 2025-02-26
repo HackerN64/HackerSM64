@@ -139,6 +139,15 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Separate defines for emulator and console black border height.
 - Getting HVQM FMV support to work with the game is WIP.
 
+## UNFLoader support
+
+The repository supports UNFLoader for debugging.
+To build with UNF, run make with ``UNF=1``.
+
+Further instructions can be found at the [official repository](https://github.com/buu342/N64-UNFLoader)
+
+**NOTE: Closing the UNFLoader window will result in your game eventually hanging due to lacking a USB device to send messages to, so beware of that**
+
 ## Multi-Save support
 The repository supports SRAM in addition to EEPROM. The standard save data functions are #ifdef'd to accommedate this.
 To build with SRAM support, run make with ``SAVETYPE=sram``.
