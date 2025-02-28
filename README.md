@@ -4,7 +4,7 @@
 
 HackerSM64 now has a discord server! https://discord.gg/brETAakcXr
 
-This repo requires BOTH a US ROM and a JP ROM in order to build. Place baserom.us.z64 in the repo as usual and ALSO include baserom.jp.z64.
+This repo requires a US ROM in order to build. JP/EU ROMs are optional for some assets.
 
 [How to install everything needed and build HackerSM64](https://github.com/HackerN64/HackerSM64/wiki/Installing-HackerSM64)
 
