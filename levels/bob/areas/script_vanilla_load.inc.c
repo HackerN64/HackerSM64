@@ -1,3 +1,4 @@
+LOAD_YAY0(        /*seg*/ 0x07, _bob_segment_7SegmentRomStart, _bob_segment_7SegmentRomEnd),
 LOAD_VANILLA_OBJECTS(0, bob, generic),
 LOAD_YAY0(        /*seg*/ 0x0A, _water_skybox_yay0SegmentRomStart, _water_skybox_yay0SegmentRomEnd),
 LOAD_YAY0(        /*seg*/ 0x05, _group3_yay0SegmentRomStart, _group3_yay0SegmentRomEnd),

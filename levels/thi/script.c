@@ -220,10 +220,10 @@ static const LevelScript script_thi_area_2_objects_3[] = {
 
 const LevelScript level_thi_entry[] = {
     INIT_LEVEL(),
-#include "levels/thi/areas/script_vanilla.inc.c"
+#include "levels/thi/areas/script_vanilla_load.inc.c"
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-#include "levels/thi/areas/script_vanilla_load.inc.c"
+#include "levels/thi/areas/script_vanilla.inc.c"
 
     AREA(/*index*/ 1, thi_geo_000608),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ -7372, -1969,  7373, /*angle*/ 0, 149, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),

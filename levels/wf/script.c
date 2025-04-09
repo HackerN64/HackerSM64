@@ -146,10 +146,10 @@ static const LevelScript script_wf_objects_4[] = {
 
 const LevelScript level_wf_entry[] = {
     INIT_LEVEL(),
-#include "levels/wf/areas/script_vanilla.inc.c"
+#include "levels/wf/areas/script_vanilla_load.inc.c"
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-#include "levels/wf/areas/script_vanilla_load.inc.c"
+#include "levels/wf/areas/script_vanilla.inc.c"
 
     AREA(/*index*/ 1, wf_geo_000BF8),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/  2600, 1256,  5120, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),

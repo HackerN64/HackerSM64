@@ -122,10 +122,10 @@ static const LevelScript script_bitfs_objects_3[] = {
 
 const LevelScript level_bitfs_entry[] = {
     INIT_LEVEL(),
-#include "levels/bitfs/areas/script_vanilla.inc.c"
+#include "levels/bitfs/areas/script_vanilla_load.inc.c"
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-#include "levels/bitfs/areas/script_vanilla_load.inc.c"
+#include "levels/bitfs/areas/script_vanilla.inc.c"
 
     AREA(/*index*/ 1, bitfs_geo_0007A0),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ -7577, -1764,  0, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvAirborneWarp),
