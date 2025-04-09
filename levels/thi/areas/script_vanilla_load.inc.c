@@ -1,4 +1,3 @@
-JUMP_LINK(script_func_global_1),
 JUMP_LINK(script_func_global_12),
 JUMP_LINK(script_func_global_15),
 JUMP_LINK(script_func_vo_thi),

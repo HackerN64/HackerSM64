@@ -1,4 +1,3 @@
-JUMP_LINK(script_func_global_1),
 JUMP_LINK(script_func_global_11),
 JUMP_LINK(script_func_global_16),
 JUMP_LINK(script_func_vo_castle_grounds),

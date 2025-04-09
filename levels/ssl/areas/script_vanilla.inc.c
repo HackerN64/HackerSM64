@@ -1,4 +1,3 @@
-JUMP_LINK(script_func_global_1),
 JUMP_LINK(script_func_global_6),
 JUMP_LINK(script_func_vo_ssl),
 LOAD_MODEL_FROM_GEO(MODEL_SSL_PALM_TREE,           palm_tree_geo),

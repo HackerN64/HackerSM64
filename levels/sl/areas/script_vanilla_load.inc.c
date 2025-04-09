@@ -6,5 +6,3 @@ LOAD_YAY0(        /*seg*/ 0x05, _group7_yay0SegmentRomStart, _group7_yay0Segment
 LOAD_RAW(         /*seg*/ 0x0C, _group7_geoSegmentRomStart,  _group7_geoSegmentRomEnd),
 LOAD_YAY0(        /*seg*/ 0x06, _group16_yay0SegmentRomStart, _group16_yay0SegmentRomEnd),
 LOAD_RAW(         /*seg*/ 0x0D, _group16_geoSegmentRomStart,  _group16_geoSegmentRomEnd),
-LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),

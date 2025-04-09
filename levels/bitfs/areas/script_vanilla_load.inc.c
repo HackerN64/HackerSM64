@@ -1,6 +1,5 @@
 JUMP_LINK(script_func_global_3),
 JUMP_LINK(script_func_global_18),
-JUMP_LINK(script_func_global_1),
 JUMP_LINK(script_func_vo_bitfs),
 LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,             bitfs_geo_0004B0),
 LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04,             bitfs_geo_0004C8),

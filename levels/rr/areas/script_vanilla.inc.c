@@ -1,5 +1,4 @@
 JUMP_LINK(script_func_global_12),
-JUMP_LINK(script_func_global_1),
 JUMP_LINK(script_func_vo_rr),
 LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,           rr_geo_000660),
 LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04,           rr_geo_000678),
