@@ -11,7 +11,7 @@
 #include "float.h"
 
 #ifdef LIBPL
-#include "lib/libpl/libpl-emu.h"
+#include "lib/libpl2/libpl2-init.h"
 #endif
 
 extern OSMesgQueue gSIEventMesgQueue;
@@ -23,7 +23,7 @@ extern void __osPiGetAccess(void);
 extern void __osPiRelAccess(void);
 
 enum Emulator gEmulator = EMU_CONSOLE;
-u8 gSupportsLibpl = FALSE;
+int gLibplABI = 0;
 
 u32 pj64_get_count_factor_asm(void); // defined in asm/pj64_get_count_factor_asm.s
 u32 emux_detect(void); // defined in asm/emux.s
@@ -145,7 +145,13 @@ void detect_emulator() {
                 // libpl is supported. Must be ParallelN64
                 gEmulator = EMU_PARALLELN64;
 #ifdef LIBPL
-                gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
+                lpl2_err err;
+                if( lpl2_init( LIBPL_ABI_VERSION_CURRENT, &err ) ) {
+                    gLibplABI = LIBPL_ABI_VERSION_CURRENT;
+                } else if( err == LPL2_ERR_LIBPL_OLD_ABI ) {
+                    gLibplABI = LIBPL_ABI_VERSION_CURRENT;
+                    while( --gLibplABI > 0 && !lpl2_init( gLibplABI, NULL ) );
+                }
 #endif
                 return;
             }

@@ -18,11 +18,6 @@ ALIGNED8 static const Texture ttm_seg7_texture_07001800[] = {
 #include "levels/ttm/3.rgba16.inc.c"
 };
 
-// 0x07002000 - 0x07003000
-ALIGNED8 static const Texture ttm_seg7_texture_07002000[] = {
-#include "levels/ttm/4.rgba16.inc.c"
-};
-
 // 0x07002800 - 0x07003800
 ALIGNED8 static const Texture ttm_seg7_texture_07002800[] = {
 #include "levels/ttm/5.rgba16.inc.c"

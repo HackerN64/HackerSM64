@@ -7,6 +7,10 @@
  * flag.
  */
 
+// There is no good solution for this - just keep paths in BOB and THI for now
+#include "levels/bob/header.h"
+#include "levels/thi/header.h"
+
 /**
  * Hitbox for koopa - this is used for every form except Koopa the Quick, which
  * uses a hardcoded soft hitbox.

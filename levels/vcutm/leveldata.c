@@ -5,11 +5,4 @@
 #include "textures.h"
 
 #include "make_const_nonconst.h"
-#include "levels/vcutm/texture.inc.c"
-#include "levels/vcutm/areas/1/1/model.inc.c"
-#include "levels/vcutm/areas/1/2/model.inc.c"
-#include "levels/vcutm/areas/1/3/model.inc.c"
-#include "levels/vcutm/areas/1/4/model.inc.c"
-#include "levels/vcutm/seesaw/model.inc.c"
-#include "levels/vcutm/areas/1/collision.inc.c"
-#include "levels/vcutm/seesaw/collision.inc.c"
+#include "levels/vcutm/leveldata.inc.c"

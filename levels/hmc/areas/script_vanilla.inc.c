@@ -1,0 +1,7 @@
+JUMP_LINK(script_func_global_1),
+JUMP_LINK(script_func_global_7),
+JUMP_LINK(script_func_global_18),
+JUMP_LINK(script_func_vo_hmc),
+LOAD_MODEL_FROM_GEO(MODEL_HMC_WOODEN_DOOR,          wooden_door_geo),
+LOAD_MODEL_FROM_GEO(MODEL_HMC_METAL_DOOR,           metal_door_geo),
+LOAD_MODEL_FROM_GEO(MODEL_HMC_HAZY_MAZE_DOOR,       hazy_maze_door_geo),

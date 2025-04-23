@@ -1,0 +1,7 @@
+#include "levels/ccm/areas/1/6/geo.inc.c"
+#include "levels/ccm/areas/1/7/geo.inc.c"
+#include "levels/ccm/areas/1/8/geo.inc.c"
+#include "levels/ccm/areas/1/9/geo.inc.c"
+#include "levels/ccm/areas/1/10/geo.inc.c"
+#include "levels/ccm/areas/1/geo.inc.c"
+#include "levels/ccm/areas/2/geo.inc.c"
