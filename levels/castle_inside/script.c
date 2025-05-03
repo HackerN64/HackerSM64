@@ -283,7 +283,7 @@ const LevelScript level_castle_inside_entry[] = {
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_2_rooms),
         MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_2_macro_objs),
         #ifndef UNLOCK_ALL
-        INSTANT_WARP(/*index*/ 0, /*destArea*/ 2, /*displace*/ 0, -205, 410),
+            INSTANT_WARP(/*index*/ 0, /*destArea*/ 2, /*displace*/ 0, -205, 410),
         #endif
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
