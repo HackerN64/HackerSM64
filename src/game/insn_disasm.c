@@ -66,14 +66,18 @@ typedef struct PACKED {
     u32 arbitraryParam;
     u16 function : 6;
     u8 name[10];
-} FloatInsnTemplate;
+} COPzInsnTemplate;
 
 InsnTemplate insn_db[] = {
+    // C0 instructions; these can just be unimplemented
+    {COP0, PARAM_NONE, 0b010000, 0, "COP0"},
+
     // all branch instructions where rt is the branch type
     {BRANCH, PARAM_NONE, 0b000001, 0, "BRANCH"},
 
     // all float instructions
     {COP1, PARAM_NONE, 0b010001, 0, "COP1"},
+
 
     // arithmetic
     {R_TYPE, PARAM_NONE, 0, 0b100000, "ADD"},
@@ -114,17 +118,11 @@ InsnTemplate insn_db[] = {
     {R_TYPE, PARAM_NONE, 0, 0b100110, "XOR"},
     {I_TYPE, PARAM_NONE, 0b001110, 0, "XORI"},
     {R_TYPE, PARAM_BITSHIFT, 0, 0b100110, "SLL"},
-    {R_TYPE, PARAM_BITSHIFT, 0, 0b111100, "DSLL32"},
     {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000100, "SLLV"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010100, "DSLLV"},
     {R_TYPE, PARAM_BITSHIFT, 0, 0b000010, "SRL"},
-    {R_TYPE, PARAM_BITSHIFT, 0, 0b111110, "DSRL32"},
     {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000110, "SRLV"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010110, "DSRLV"},
     {R_TYPE, PARAM_BITSHIFT, 0, 0b000011, "SRA"},
-    {R_TYPE, PARAM_BITSHIFT, 0, 0b111111, "DSRA32"},
     {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000111, "SRAV"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010111, "DSRAV"},
     {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b100111, "NOR"},
 
     // load/store
@@ -161,12 +159,20 @@ InsnTemplate insn_db[] = {
     {R_TYPE, PARAM_NONE, 0, 0b001001, "JALR"},
     {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
 
-    {R_TYPE, PARAM_NONE, 0, 0b110100, "TEQ"},
+    {R_TYPE, PARAM_TRAP, 0, 0b110100, "TEQ"},
     {R_TYPE, PARAM_EMUX, 0, 0b110110, "TNE"},
 
     // jal (special)
     {J_TYPE, PARAM_JAL, 0b000011, 0, "JAL"},
     {J_TYPE, PARAM_JUMP, 0b000010, 0, "J"},
+
+    // instructions involving doubles (deprioritized on the list)
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010100, "DSLLV"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b111100, "DSLL32"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b111110, "DSRL32"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010110, "DSRLV"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b111111, "DSRA32"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010111, "DSRAV"},
 };
 
 
