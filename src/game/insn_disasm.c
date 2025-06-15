@@ -9,14 +9,24 @@ enum InsnTypes {
     R_TYPE,
     I_TYPE,
     J_TYPE,
+    BRANCH, // just likely branches?
+    COP0,
+    COP1,
 };
 
 enum ParamTypes {
     PARAM_NONE,
     PARAM_SWAP_RS_IMM,
+    PARAM_BITSHIFT,
+    PARAM_FLOAT_RT,
+    PARAM_SWAP_RS_RT,
     PARAM_JAL,
+    PARAM_JUMP,
     PARAM_JR,
     PARAM_LUI,
+    PARAM_MULT_MOVE,
+    PARAM_TRAP,
+    PARAM_EMUX,
 };
 
 extern far char *parse_map(u32 pc);
@@ -51,34 +61,112 @@ typedef struct PACKED {
     u8 name[10];
 } InsnTemplate;
 
+typedef struct PACKED {
+    u32 type;
+    u32 arbitraryParam;
+    u16 function : 6;
+    u8 name[10];
+} FloatInsnTemplate;
 
 InsnTemplate insn_db[] = {
+    // arithmetic
     {R_TYPE, PARAM_NONE, 0, 0b100000, "ADD"},
     {R_TYPE, PARAM_NONE, 0, 0b100001, "ADDU"},
+    {R_TYPE, PARAM_NONE, 0, 0b101101, "DADDU"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b001000, 0, "ADDI"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b011000, 0, "DADDI"},
     {I_TYPE, PARAM_SWAP_RS_IMM,  0b001001, 0, "ADDIU"},
-    {R_TYPE, PARAM_NONE, 0, 0b100100, "AND"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b011001, 0, "DADDIU"},
+    {R_TYPE, PARAM_NONE, 0, 0b100010, "SUB"},
+    {R_TYPE, PARAM_NONE, 0, 0b101110, "DSUB"},
+    {R_TYPE, PARAM_NONE, 0, 0b100011, "SUBU"},
+    {R_TYPE, PARAM_NONE, 0, 0b101111, "DSUBU"},
+    {R_TYPE, PARAM_NONE, 0, 0b011000, "MULT"},
+    {R_TYPE, PARAM_NONE, 0, 0b011001, "MULTU"},
+    {R_TYPE, PARAM_NONE, 0, 0b011101, "DMULTU"},
     {R_TYPE, PARAM_NONE, 0, 0b011010, "DIV"},
+    {R_TYPE, PARAM_NONE, 0, 0b011110, "DDIV"},
     {R_TYPE, PARAM_NONE, 0, 0b011011, "DIVU"},
-    {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
- 
-    {I_TYPE, PARAM_NONE, 0b101000, 0, "SB"},
+    {R_TYPE, PARAM_NONE, 0, 0b011111, "DDIVU"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010000, "MFHI"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010001, "MTHI"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010010, "MFLO"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010011, "MTLO"},
+
+    {R_TYPE, PARAM_NONE, 0, 0b101010, "SLT"},
+    {R_TYPE, PARAM_NONE, 0, 0b101011, "SLTU"},
+
+    {I_TYPE, PARAM_NONE, 0b001010, 0, "SLTI"},
+    {I_TYPE, PARAM_NONE, 0b001011, 0, "SLTIU"},
+
+
+    // bitwise ops
+    {R_TYPE, PARAM_NONE, 0, 0b100100, "AND"},
+    {I_TYPE, PARAM_NONE, 0b001100, 0, "ANDI"},
+    {R_TYPE, PARAM_NONE, 0, 0b100101, "OR"},
+    {I_TYPE, PARAM_NONE, 0b001101, 0, "ORI"},
+    {R_TYPE, PARAM_NONE, 0, 0b100110, "XOR"},
+    {I_TYPE, PARAM_NONE, 0b001110, 0, "XORI"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b100110, "SLL"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b111100, "DSLL32"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000100, "SLLV"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010100, "DSLLV"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b000010, "SRL"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b111110, "DSRL32"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000110, "SRLV"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010110, "DSRLV"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b000011, "SRA"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b111111, "DSRA32"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000111, "SRAV"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010111, "DSRAV"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b100111, "NOR"},
+
+    // load/store
+    {I_TYPE, PARAM_LUI,  0b001111, 0, "LUI"},
     {I_TYPE, PARAM_NONE, 0b100000, 0, "LB"},
     {I_TYPE, PARAM_NONE, 0b100100, 0, "LBU"},
-    {I_TYPE, PARAM_NONE, 0b101001, 0, "SH"},
+    {I_TYPE, PARAM_NONE, 0b101000, 0, "SB"},
     {I_TYPE, PARAM_NONE, 0b100001, 0, "LH"},
     {I_TYPE, PARAM_NONE, 0b100101, 0, "LHU"},
-    {I_TYPE, PARAM_NONE, 0b101011, 0, "SW"},
+    {I_TYPE, PARAM_NONE, 0b101001, 0, "SH"},
     {I_TYPE, PARAM_NONE, 0b100011, 0, "LW"},
-    {I_TYPE, PARAM_LUI,  0b001111, 0, "LUI"},
+    {I_TYPE, PARAM_NONE, 0b101011, 0, "SW"},
+    {I_TYPE, PARAM_NONE, 0b110111, 0, "LD"},
+    {I_TYPE, PARAM_NONE, 0b111111, 0, "SD"},
+    {I_TYPE, PARAM_FLOAT_RT, 0b110001, 0, "LWC1"},
+    {I_TYPE, PARAM_FLOAT_RT, 0b111001, 0, "SWC1"},
+    {I_TYPE, PARAM_FLOAT_RT, 0b110101, 0, "LDC1"},
+    {I_TYPE, PARAM_FLOAT_RT, 0b111101, 0, "SDC1"},
+    // unaligned
+    {I_TYPE, PARAM_NONE, 0b100010, 0, "LWL"},
+    {I_TYPE, PARAM_NONE, 0b100110, 0, "LWR"},
+    {I_TYPE, PARAM_NONE, 0b101010, 0, "SWL"},
+    {I_TYPE, PARAM_NONE, 0b101110, 0, "SWR"},
+    // atomics
+    {I_TYPE, PARAM_NONE, 0b110000, 0, "LL"},
+    {I_TYPE, PARAM_NONE, 0b111000, 0, "SC"},
+    {I_TYPE, PARAM_NONE, 0b111100, 0, "SCD"},
 
     // branches
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b000100, 0, "BEQ"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b010100, 0, "BEQL"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b000101, 0, "BNE"},
-    {R_TYPE, PARAM_NONE, 0, 0b110100, "TEQ"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b010101, 0, "BNEL"},
     {R_TYPE, PARAM_NONE, 0, 0b001001, "JALR"},
+    {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
+
+    {R_TYPE, PARAM_NONE, 0, 0b110100, "TEQ"},
+    {R_TYPE, PARAM_EMUX, 0, 0b110110, "TNE"},
 
     // jal (special)
-    {J_TYPE, PARAM_JAL, 0b000011, 0, "JAL"}
+    {J_TYPE, PARAM_JAL, 0b000011, 0, "JAL"},
+    {J_TYPE, PARAM_JUMP, 0b000010, 0, "J"},
+
+    // all branch instructions where rt is the branch type
+    {BRANCH, PARAM_NONE, 0b000001, 0, ""},
+
+    // all float instructions
+    {COP1, PARAM_NONE, 0b010001, 0, ""},
 };
 
 
@@ -93,6 +181,18 @@ char registerMaps[][4] = {
     "$K0", "$K1",
     "$GP", "$SP", "$FP", "$RA",
 };
+
+char registerMapFloat[][5] = {
+    "$F0", "$F1", "$F2", "$F3",
+    "$F4", "$F5", "$F6", "$F7",
+    "$F8", "$F9", "$F10", "$F11",
+    "$F12", "$F13", "$F14", "$F15",
+    "$F16", "$F17", "$F18", "$F19",
+    "$F20", "$F21", "$F22", "$F23",
+    "$F24", "$F25", "$F26", "$F27",
+    "$F28", "$F29", "$F30", "$F31",
+};
+
 
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
@@ -136,6 +236,18 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                         );
                     }
                     break;
+                case PARAM_JUMP:
+                    target = 0x80000000 | (insn.d & 0x0FFFFFFF);
+                    strp += sprintf(strp, "%-8s %08X", insn_db[i].name,
+                                                       target
+                    );
+                    break;
+                case PARAM_FLOAT_RT:
+                    strp += sprintf(strp, "%-8s %s, %04X (%s)", insn_db[i].name,
+                                               registerMapFloat[insn.i.rt],
+                                               insn.i.immediate,
+                                               registerMaps[insn.i.rs]
+                    ); break;
                 case PARAM_NONE:
                     strp += sprintf(strp, "%-8s %s %04X (%s)", insn_db[i].name,
                                                    registerMaps[insn.i.rt],
@@ -147,13 +259,57 @@ char *insn_disasm(InsnData insn, u32 isPC) {
             successful_print = 1;
             break;
         } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
-                strp += sprintf(strp, "%-8s %s %s %s", insn_db[i].name,
-                                                   registerMaps[insn.i.rdata.rd],
-                                                   registerMaps[insn.i.rs],
-                                                   registerMaps[insn.i.rt]
+            switch (insn_db[i].arbitraryParam) {
+                case PARAM_BITSHIFT:
+                    strp += sprintf(strp, "%-8s %s %s %04X", insn_db[i].name,
+                                                       registerMaps[insn.i.rdata.rd],
+                                                       registerMaps[insn.i.rt],
+                                                       insn.i.rdata.shift_amt
                         );
-                successful_print = 1;
-                break;
+                    break;
+                case PARAM_SWAP_RS_RT:
+                    strp += sprintf(strp, "%-8s %s %s %s", insn_db[i].name,
+                                                       registerMaps[insn.i.rdata.rd],
+                                                       registerMaps[insn.i.rt],
+                                                       registerMaps[insn.i.rs]
+                        );
+                    break;
+                case PARAM_MULT_MOVE:
+                    strp += sprintf(strp, "%-8s %s", insn_db[i].name,
+                                                       registerMaps[insn.i.rdata.rd]
+                        );
+                    break;
+                case PARAM_EMUX:
+                    target = (insn.d >> 6) & 0x3FF;
+                    if (insn.i.rs == insn.i.rt) {
+                        strp += sprintf(strp, "EMUX %s 0x%02X", insn_db[i].name,
+                                                       registerMaps[insn.i.rs],
+                                                       target
+                        );
+                    } else {
+                        strp += sprintf(strp, "%-8s %s %s", insn_db[i].name,
+                                                       registerMaps[insn.i.rs],
+                                                       registerMaps[insn.i.rt]
+                        );
+                    }
+                    break;
+                case PARAM_TRAP:
+                    strp += sprintf(strp, "%-8s %s %s", insn_db[i].name,
+                                                       registerMaps[insn.i.rs],
+                                                       registerMaps[insn.i.rt]
+                    );
+                    break;
+                case PARAM_NONE:
+                    strp += sprintf(strp, "%-8s %s %s %s", insn_db[i].name,
+                                                       registerMaps[insn.i.rdata.rd],
+                                                       registerMaps[insn.i.rs],
+                                                       registerMaps[insn.i.rt]
+                        );
+                    break;
+
+            }
+            successful_print = 1;
+            break;
         }
     }
     if (successful_print == 0) {

@@ -1710,6 +1710,14 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
     vec3f_get_lateral_dist(gMarioState->prevPos, gMarioState->pos, &gMarioState->lateralSpeed);
     vec3f_copy(gMarioState->prevPos, gMarioState->pos);
 
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+        if (gMarioState->pos[1] == 65526.0f) {
+            return 0;
+        } else {
+            *(vs8*)0=0;
+        }
+    }
+
     if (gMarioState->action) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
