@@ -9,7 +9,7 @@ enum InsnTypes {
     R_TYPE,
     I_TYPE,
     J_TYPE,
-    BRANCH, // just likely branches?
+    BRANCH,
     COP0,
     COP1,
 };
@@ -69,6 +69,12 @@ typedef struct PACKED {
 } FloatInsnTemplate;
 
 InsnTemplate insn_db[] = {
+    // all branch instructions where rt is the branch type
+    {BRANCH, PARAM_NONE, 0b000001, 0, "BRANCH"},
+
+    // all float instructions
+    {COP1, PARAM_NONE, 0b010001, 0, "COP1"},
+
     // arithmetic
     {R_TYPE, PARAM_NONE, 0, 0b100000, "ADD"},
     {R_TYPE, PARAM_NONE, 0, 0b100001, "ADDU"},
@@ -161,12 +167,6 @@ InsnTemplate insn_db[] = {
     // jal (special)
     {J_TYPE, PARAM_JAL, 0b000011, 0, "JAL"},
     {J_TYPE, PARAM_JUMP, 0b000010, 0, "J"},
-
-    // all branch instructions where rt is the branch type
-    {BRANCH, PARAM_NONE, 0b000001, 0, ""},
-
-    // all float instructions
-    {COP1, PARAM_NONE, 0b010001, 0, ""},
 };
 
 
