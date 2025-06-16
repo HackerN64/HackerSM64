@@ -160,6 +160,10 @@ InsnTemplate insn_db[] = {
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b010100, 0, "BEQL"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b000101, 0, "BNE"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b010101, 0, "BNEL"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b000111, 0, "BGTZ"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b010111, 0, "BGTZL"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b000110, 0, "BLEZ"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b010110, 0, "BLEZL"},
     {R_TYPE, PARAM_NONE, 0, 0b001001, "JALR"},
     {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
     {R_TYPE, PARAM_TRAP, 0, 0b110100, "TEQ"},
@@ -210,26 +214,42 @@ char registerMapFloat[][5] = {
     "$F28", "$F29", "$F30", "$F31",
 };
 
-char *c0_insn_disasm(InsnData insn, u32 isPC) {
+char *c0_insn_disasm(UNUSED InsnData insn, UNUSED u32 isPC) {
     return "COP0 UNIMPL";
 }
 
-char *c1_insn_disasm(InsnData insn, u32 isPC) {
+char *c1_insn_disasm(UNUSED InsnData insn, UNUSED u32 isPC) {
+    // char *strp = &insn_as_string[0];
+    // for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
     return "COP1 UNIMPL";
 }
 
 char *branch_insn_disasm(InsnData insn, u32 isPC) {
-    return "BRANCH UNIMPL";
+    static char *insn_names[] = {
+        [0b00001] = "BGEZ",
+        [0b00011] = "BGEZL",
+        [0b10001] = "BGEZAL",
+        [0b10011] = "BGEZALL",
+        [0b00000] = "BLTZ",
+        [0b00010] = "BLTZL",
+        [0b10000] = "BLTZAL",
+        [0b10010] = "BLTZALL",
+    };
+    char *strp = &insn_as_string[0];
+    char *rs = registerMaps[insn.b.rs];
+    u16 offset = insn.b.offset;
+
+    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
+
+    sprintf(strp, "%-8s %s %04X %s", insn_names[insn.b.sub], rs, offset, isPC ? "<-- CRASH" : "");
+
+    return insn_as_string;
 }
 
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
     int successful_print = 0;
     u32 target;
-
-    char IN[50];
-    sprintf(IN, "%02x\n", insn.d >> 26);
-    osSyncPrintf(IN);
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
