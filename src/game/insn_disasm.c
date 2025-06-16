@@ -288,7 +288,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                 case PARAM_EMUX:
                     target = (insn.d >> 6) & 0x3FF;
                     if (insn.i.rs == insn.i.rt) {
-                        strp += sprintf(strp, "EMUX %s 0x%02X", insn_db[i].name,
+                        strp += sprintf(strp, "EMUX %s 0x%02X",
                                                        registerMaps[insn.i.rs],
                                                        target
                         );
