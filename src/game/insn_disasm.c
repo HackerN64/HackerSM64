@@ -9,9 +9,9 @@ enum InsnTypes {
     R_TYPE,
     I_TYPE,
     J_TYPE,
-    BRANCH,
-    COP0,
-    COP1,
+    // BRANCH,
+    // COP0,
+    // COP1,
 };
 
 enum ParamTypes {
@@ -48,8 +48,26 @@ typedef struct PACKED {
     };
 } Insn;
 
+typedef struct PACKED {
+    u16 opcode : 6;
+    u16 fmt    : 5;
+    u16 ft     : 5;
+    u16 fs     : 5;
+    u16 fd     : 5;
+    u16 func   : 6;
+} CzInsn;
+
+typedef struct PACKED {
+    u16 regimm : 6;
+    u16 rs     : 5;
+    u16 sub    : 5;
+    u16 offset;
+} BranchInsn;
+
 typedef union {
     Insn i;
+    CzInsn f;
+    BranchInsn b;
     u32  d;
 } InsnData;
 
@@ -68,36 +86,22 @@ typedef struct PACKED {
     u8 name[10];
 } COPzInsnTemplate;
 
+#define OP_COP0 0b010000
+#define OP_COP1 0b010001
+#define OP_BRANCH 0b000001 // technically "REGIMM"
+
 InsnTemplate insn_db[] = {
-    // C0 instructions; these can just be unimplemented
-    {COP0, PARAM_NONE, 0b010000, 0, "COP0"},
-
-    // all branch instructions where rt is the branch type
-    {BRANCH, PARAM_NONE, 0b000001, 0, "BRANCH"},
-
-    // all float instructions
-    {COP1, PARAM_NONE, 0b010001, 0, "COP1"},
-
-
     // arithmetic
     {R_TYPE, PARAM_NONE, 0, 0b100000, "ADD"},
     {R_TYPE, PARAM_NONE, 0, 0b100001, "ADDU"},
-    {R_TYPE, PARAM_NONE, 0, 0b101101, "DADDU"},
     {I_TYPE, PARAM_SWAP_RS_IMM,  0b001000, 0, "ADDI"},
-    {I_TYPE, PARAM_SWAP_RS_IMM,  0b011000, 0, "DADDI"},
     {I_TYPE, PARAM_SWAP_RS_IMM,  0b001001, 0, "ADDIU"},
-    {I_TYPE, PARAM_SWAP_RS_IMM,  0b011001, 0, "DADDIU"},
     {R_TYPE, PARAM_NONE, 0, 0b100010, "SUB"},
-    {R_TYPE, PARAM_NONE, 0, 0b101110, "DSUB"},
     {R_TYPE, PARAM_NONE, 0, 0b100011, "SUBU"},
-    {R_TYPE, PARAM_NONE, 0, 0b101111, "DSUBU"},
     {R_TYPE, PARAM_NONE, 0, 0b011000, "MULT"},
     {R_TYPE, PARAM_NONE, 0, 0b011001, "MULTU"},
-    {R_TYPE, PARAM_NONE, 0, 0b011101, "DMULTU"},
     {R_TYPE, PARAM_NONE, 0, 0b011010, "DIV"},
-    {R_TYPE, PARAM_NONE, 0, 0b011110, "DDIV"},
     {R_TYPE, PARAM_NONE, 0, 0b011011, "DIVU"},
-    {R_TYPE, PARAM_NONE, 0, 0b011111, "DDIVU"},
     {R_TYPE, PARAM_MULT_MOVE, 0, 0b010000, "MFHI"},
     {R_TYPE, PARAM_MULT_MOVE, 0, 0b010001, "MTHI"},
     {R_TYPE, PARAM_MULT_MOVE, 0, 0b010010, "MFLO"},
@@ -158,7 +162,6 @@ InsnTemplate insn_db[] = {
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b010101, 0, "BNEL"},
     {R_TYPE, PARAM_NONE, 0, 0b001001, "JALR"},
     {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
-
     {R_TYPE, PARAM_TRAP, 0, 0b110100, "TEQ"},
     {R_TYPE, PARAM_EMUX, 0, 0b110110, "TNE"},
 
@@ -167,6 +170,14 @@ InsnTemplate insn_db[] = {
     {J_TYPE, PARAM_JUMP, 0b000010, 0, "J"},
 
     // instructions involving doubles (deprioritized on the list)
+    {R_TYPE, PARAM_NONE, 0, 0b101101, "DADDU"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b011000, 0, "DADDI"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b011001, 0, "DADDIU"},
+    {R_TYPE, PARAM_NONE, 0, 0b101110, "DSUB"},
+    {R_TYPE, PARAM_NONE, 0, 0b101111, "DSUBU"},
+    {R_TYPE, PARAM_NONE, 0, 0b011101, "DMULTU"},
+    {R_TYPE, PARAM_NONE, 0, 0b011110, "DDIV"},
+    {R_TYPE, PARAM_NONE, 0, 0b011111, "DDIVU"},
     {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b010100, "DSLLV"},
     {R_TYPE, PARAM_BITSHIFT, 0, 0b111100, "DSLL32"},
     {R_TYPE, PARAM_BITSHIFT, 0, 0b111110, "DSRL32"},
@@ -199,11 +210,26 @@ char registerMapFloat[][5] = {
     "$F28", "$F29", "$F30", "$F31",
 };
 
+char *c0_insn_disasm(InsnData insn, u32 isPC) {
+    return "COP0 UNIMPL";
+}
+
+char *c1_insn_disasm(InsnData insn, u32 isPC) {
+    return "COP1 UNIMPL";
+}
+
+char *branch_insn_disasm(InsnData insn, u32 isPC) {
+    return "BRANCH UNIMPL";
+}
 
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
     int successful_print = 0;
     u32 target;
+
+    char IN[50];
+    sprintf(IN, "%02x\n", insn.d >> 26);
+    osSyncPrintf(IN);
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
@@ -211,6 +237,16 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         } else {
             return "NOP";
         }
+    }
+
+    if (insn.i.opcode == OP_BRANCH) {
+        return branch_insn_disasm(insn, isPC);
+    }
+    if (insn.i.opcode == OP_COP0) {
+        return c0_insn_disasm(insn, isPC);
+    }
+    if (insn.i.opcode == OP_COP1) {
+        return c1_insn_disasm(insn, isPC);
     }
 
     for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
