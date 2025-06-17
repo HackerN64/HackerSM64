@@ -265,6 +265,14 @@ ifeq ($(LIBPL),1)
   SRC_DIRS += $(LIBPL_DIR)
 endif
 
+# USE_RTC - whether to support the realtime clock and include librtc or not
+USE_RTC ?= 0
+$(eval $(call validate-option,USE_RTC,0 1))
+ifeq ($(USE_RTC),1)
+  DEFINES += USE_RTC=1
+  SRC_DIRS += lib/librtc
+endif
+
 BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
