@@ -45,7 +45,10 @@ char *parse_map(u32 pc) {
 	u32 i;
 
 	for (i = 0; i < gMapEntrySize; i++) {
-		if (gMapEntries[i].addr >= pc) break;
+		if (gMapEntries[i].addr == pc) {
+			return (char*) ((u32)gMapStrings + gMapEntries[i].nm_offset);
+		}
+		else if (gMapEntries[i].addr > pc) break;
 	}
 
 	if (i == gMapEntrySize - 1) {

@@ -364,8 +364,8 @@ char *insn_disasm(InsnData *addr, u32 isPC) {
                 case PARAM_JAL:
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
                     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-                        strp += sprintf(strp, "%-9s %s", insn_db[i].name,
-                                                         parse_map(target)
+                        strp += sprintf(strp, "%-9s %s(%08X)", insn_db[i].name,
+                                                         parse_map(target), target
                         );
                     } else {
                         strp += sprintf(strp, "%-9s %08X", insn_db[i].name,

@@ -26,8 +26,11 @@ for line in symbols:
 	tokens = line.split()
 	if len(tokens) >= 3 and len(tokens[-2]) == 1:
 		addr = int(tokens[0], 16)
-		if addr & 0x80000000 and tokens[-2].lower() == "t":
-			symNames.append(MapEntry(tokens[-1], addr))
+		if addr & 0x80000000:
+			if (tokens[-2].lower() == "t"):
+				if (".part." not in tokens[-1]):
+					if (".constprop." not in tokens[-1]):
+						symNames.append(MapEntry(tokens[-1], addr))
 
 
 
