@@ -358,15 +358,20 @@ void draw_disasm(OSThread *thread) {
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
     }
-    crash_screen_print(LEFT_MARGIN, 25, "DISASM %08X", sProgramPosition);
+    crash_screen_print(LEFT_MARGIN, 25, "Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
 
 
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
-        u32 toDisasm = *(u32*)(addr);
 
-        crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%s", insn_disasm(addr, (addr == tc->pc)));
+        char *disasm = insn_disasm(addr, (addr == tc->pc));
+        if (disasm[0] == 0) {
+            crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%08X", addr);
+        } else {
+            crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%s", disasm);
+        }
+
     }
 
     osWritebackDCacheAll();
