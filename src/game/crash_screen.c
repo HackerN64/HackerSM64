@@ -38,8 +38,11 @@ u8 gCrashScreenCharToGlyph[128] = {
     23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
 };
 
+#define GLYPH_HEIGHT 7
+#define GLYPH_WIDTH 5
+#define FONT_ROWS 9
 // A height of seven pixels for each Character * nine rows of characters + one row unused.
-u32 gCrashScreenFont[7 * 9 + 1] = {
+u32 gCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
@@ -113,18 +116,18 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
     u32 rowMask;
     s32 i, j;
 
-    data = &gCrashScreenFont[glyph / 5 * 7];
+    data = &gCrashScreenFont[glyph / GLYPH_WIDTH * GLYPH_HEIGHT];
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
 
-    for (i = 0; i < 7; i++) {
-        bit = 0x80000000U >> ((glyph % 5) * 6);
+    for (i = 0; i < GLYPH_HEIGHT; i++) {
+        bit = 0x80000000U >> ((glyph % (GLYPH_WIDTH)) * (GLYPH_WIDTH + 1));
         rowMask = *data++;
 
-        for (j = 0; j < 6; j++) {
+        for (j = 0; j < (GLYPH_WIDTH + 1); j++) {
             *ptr++ = (bit & rowMask) ? 0xffff : 1;
             bit >>= 1;
         }
-        ptr += gCrashScreen.width - 6;
+        ptr += gCrashScreen.width - (GLYPH_WIDTH + 1);
     }
 }
 
