@@ -16,7 +16,12 @@
 
 #include "printf.h"
 
+// Configurable Defines
 #define X_KERNING 6
+#define GLYPH_WIDTH 8
+#define GLYPH_HEIGHT 12
+#define FONT_ROWS 16
+#define LEFT_MARGIN 10 // for crash screen prints
 
 enum crashPages {
     PAGE_CONTEXT,
@@ -29,20 +34,28 @@ enum crashPages {
     PAGE_COUNT
 };
 
-u8 gCrashScreenCharToGlyph[128] = {
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 41, -1, -1, -1, 43, -1, -1, 37, 38, -1, 42,
-    -1, 39, 44, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 36, -1, -1, -1, -1, 40, -1, 10,
-    11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-    33, 34, 35, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-    23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
+char *crashPageNames[] = {
+    [PAGE_CONTEXT] = "(Context)",
+#ifdef PUPPYPRINT_DEBUG
+    [PAGE_LOG] = "(Log)",
+#endif
+    [PAGE_STACKTRACE] = "(Stack Trace)",
+    [PAGE_DISASM] = "(Disassembly)",
+    [PAGE_ASSERTS] = "(Assert)",
 };
 
-#define GLYPH_HEIGHT 7
-#define GLYPH_WIDTH 5
-#define FONT_ROWS 9
-// A height of seven pixels for each Character * nine rows of characters + one row unused.
-u32 gCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS + 1] = {
+u8 gCrashScreenCharToGlyph[128] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+    64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+    80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+};
+
+u32 gCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS * 2 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
@@ -101,8 +114,7 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
-            // 0xe738 = 0b1110011100111000
-            *ptr = ((*ptr & 0xe738) >> 2) | 1;
+            *ptr = 0x0001;
             ptr++;
         }
         ptr += gCrashScreen.width - w;
@@ -116,18 +128,22 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
     u32 rowMask;
     s32 i, j;
 
-    data = &gCrashScreenFont[glyph / GLYPH_WIDTH * GLYPH_HEIGHT];
+    if (glyph > 0x7F) return;
+
+    data = &gCrashScreenFont[((glyph&0xF)*GLYPH_HEIGHT * 2) + (glyph >= 64)];
+
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
 
     for (i = 0; i < GLYPH_HEIGHT; i++) {
-        bit = 0x80000000U >> ((glyph % (GLYPH_WIDTH)) * (GLYPH_WIDTH + 1));
+        bit = 0x80000000U >> ((glyph >> 4) * GLYPH_WIDTH);
         rowMask = *data++;
+        data ++;
 
-        for (j = 0; j < (GLYPH_WIDTH + 1); j++) {
-            *ptr++ = (bit & rowMask) ? 0xffff : 1;
+        for (j = 0; j < (GLYPH_WIDTH); j++) {
+            *ptr++ = (bit & rowMask) ? 0xFFFF : 1;
             bit >>= 1;
         }
-        ptr += gCrashScreen.width - (GLYPH_WIDTH + 1);
+        ptr += gCrashScreen.width - (GLYPH_WIDTH);
     }
 }
 
@@ -235,43 +251,43 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(25, 20, 270, 210);
-    crash_screen_print(30, 20, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
-    crash_screen_print(30, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
+    crash_screen_draw_rect(0, 20, 320, 240);
+    crash_screen_print(LEFT_MARGIN, 20, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
+    crash_screen_print(LEFT_MARGIN, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print(30, 40, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
+        crash_screen_print(LEFT_MARGIN, 40, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
     }
-    crash_screen_print(30,  50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
-    crash_screen_print(30,  60, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
-    crash_screen_print(30,  70, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
-    crash_screen_print(30,  80, "T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
-    crash_screen_print(30,  90, "T5:%08XH   T6:%08XH   T7:%08XH", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
-    crash_screen_print(30, 100, "S0:%08XH   S1:%08XH   S2:%08XH", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
-    crash_screen_print(30, 110, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
-    crash_screen_print(30, 120, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
-    crash_screen_print(30, 130, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(30, 140, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+    crash_screen_print(LEFT_MARGIN,  50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
+    crash_screen_print(LEFT_MARGIN,  60, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
+    crash_screen_print(LEFT_MARGIN,  70, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
+    crash_screen_print(LEFT_MARGIN,  80, "T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
+    crash_screen_print(LEFT_MARGIN,  90, "T5:%08XH   T6:%08XH   T7:%08XH", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
+    crash_screen_print(LEFT_MARGIN, 100, "S0:%08XH   S1:%08XH   S2:%08XH", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
+    crash_screen_print(LEFT_MARGIN, 110, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
+    crash_screen_print(LEFT_MARGIN, 120, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
+    crash_screen_print(LEFT_MARGIN, 130, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
+    crash_screen_print(LEFT_MARGIN, 140, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
-    crash_screen_print_float_reg( 30, 170,  0, &tc->fp0.f.f_even);
-    crash_screen_print_float_reg(120, 170,  2, &tc->fp2.f.f_even);
-    crash_screen_print_float_reg(210, 170,  4, &tc->fp4.f.f_even);
-    crash_screen_print_float_reg( 30, 180,  6, &tc->fp6.f.f_even);
-    crash_screen_print_float_reg(120, 180,  8, &tc->fp8.f.f_even);
-    crash_screen_print_float_reg(210, 180, 10, &tc->fp10.f.f_even);
-    crash_screen_print_float_reg( 30, 190, 12, &tc->fp12.f.f_even);
-    crash_screen_print_float_reg(120, 190, 14, &tc->fp14.f.f_even);
-    crash_screen_print_float_reg(210, 190, 16, &tc->fp16.f.f_even);
-    crash_screen_print_float_reg( 30, 200, 18, &tc->fp18.f.f_even);
-    crash_screen_print_float_reg(120, 200, 20, &tc->fp20.f.f_even);
-    crash_screen_print_float_reg(210, 200, 22, &tc->fp22.f.f_even);
-    crash_screen_print_float_reg( 30, 210, 24, &tc->fp24.f.f_even);
-    crash_screen_print_float_reg(120, 210, 26, &tc->fp26.f.f_even);
-    crash_screen_print_float_reg(210, 210, 28, &tc->fp28.f.f_even);
-    crash_screen_print_float_reg( 30, 220, 30, &tc->fp30.f.f_even);
+    crash_screen_print_float_reg( 10, 170,  0, &tc->fp0.f.f_even);
+    crash_screen_print_float_reg(100, 170,  2, &tc->fp2.f.f_even);
+    crash_screen_print_float_reg(190, 170,  4, &tc->fp4.f.f_even);
+    crash_screen_print_float_reg( 10, 180,  6, &tc->fp6.f.f_even);
+    crash_screen_print_float_reg(100, 180,  8, &tc->fp8.f.f_even);
+    crash_screen_print_float_reg(190, 180, 10, &tc->fp10.f.f_even);
+    crash_screen_print_float_reg( 10, 190, 12, &tc->fp12.f.f_even);
+    crash_screen_print_float_reg(100, 190, 14, &tc->fp14.f.f_even);
+    crash_screen_print_float_reg(190, 190, 16, &tc->fp16.f.f_even);
+    crash_screen_print_float_reg( 10, 200, 18, &tc->fp18.f.f_even);
+    crash_screen_print_float_reg(100, 200, 20, &tc->fp20.f.f_even);
+    crash_screen_print_float_reg(190, 200, 22, &tc->fp22.f.f_even);
+    crash_screen_print_float_reg( 10, 210, 24, &tc->fp24.f.f_even);
+    crash_screen_print_float_reg(100, 210, 26, &tc->fp26.f.f_even);
+    crash_screen_print_float_reg(190, 210, 28, &tc->fp28.f.f_even);
+    crash_screen_print_float_reg( 10, 220, 30, &tc->fp30.f.f_even);
 }
 
 
@@ -296,18 +312,18 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     u32 temp_sp = (tc->sp + 0x14);
 
     crash_screen_draw_rect(25, 20, 270, 210);
-    crash_screen_print(30, 25, "STACK TRACE FROM %08X:", temp_sp);
+    crash_screen_print(LEFT_MARGIN, 25, "STACK TRACE FROM %08X:", temp_sp);
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
-        crash_screen_print(30, 35, "CURRFUNC: NONE");
+        crash_screen_print(LEFT_MARGIN, 35, "CURRFUNC: NONE");
     } else {
-        crash_screen_print(30, 35, "CURRFUNC: %s", parse_map(tc->pc));
+        crash_screen_print(LEFT_MARGIN, 35, "CURRFUNC: %s", parse_map(tc->pc));
     }
 
     osWritebackDCacheAll();
 
     for (int i = 0; i < 18; i++) {
         if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            crash_screen_print(30, (45 + (i * 10)), "STACK TRACE DISABLED");
+            crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "STACK TRACE DISABLED");
             break;
         } else {
             if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
@@ -316,9 +332,9 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
             char *fname = find_function_in_stack(&temp_sp);
             if ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
-                crash_screen_print(30, (45 + (i * 10)), "%08X: UNKNOWN", temp_sp);
+                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: UNKNOWN", temp_sp);
             } else {
-                crash_screen_print(30, (45 + (i * 10)), "%08X: %s", temp_sp, fname);
+                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: %s", temp_sp, fname);
             }
         }
     }
@@ -334,7 +350,7 @@ void draw_disasm(OSThread *thread) {
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
     }
-    crash_screen_print(30, 25, "DISASM %08X", sProgramPosition);
+    crash_screen_print(LEFT_MARGIN, 25, "DISASM %08X", sProgramPosition);
     osWritebackDCacheAll();
 
 
@@ -342,7 +358,7 @@ void draw_disasm(OSThread *thread) {
         u32 addr = (sProgramPosition + (i * 4));
         u32 toDisasm = *(u32*)(addr);
 
-        crash_screen_print(30, (35 + (i * 10)), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
+        crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
     }
 
     osWritebackDCacheAll();
@@ -351,15 +367,14 @@ void draw_disasm(OSThread *thread) {
 void draw_assert(UNUSED OSThread *thread) {
     crash_screen_draw_rect(25, 20, 270, 210);
 
-    crash_screen_print(30, 25, "ASSERT PAGE");
+    crash_screen_print(LEFT_MARGIN, 25, "ASSERT PAGE");
 
     if (__n64Assert_Filename != NULL) {
-        crash_screen_print(30, 45, "FILE: %s", __n64Assert_Filename);
-        crash_screen_print(30, 55, "LINE: %d", __n64Assert_LineNum);
-        crash_screen_print(30, 75, "MESSAGE:", __n64Assert_Message);
-        crash_screen_print_with_newlines(36, 85, 30, __n64Assert_Message);
+        crash_screen_print(LEFT_MARGIN, 35, "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+        crash_screen_print(LEFT_MARGIN, 55, "MESSAGE:");
+        crash_screen_print(LEFT_MARGIN, 70, " %s", __n64Assert_Message);
     } else {
-        crash_screen_print(30, 45, "No failed assert to report.");
+        crash_screen_print(LEFT_MARGIN, 35, "no failed assert to report.");
     }
 
     osWritebackDCacheAll();
@@ -400,8 +415,8 @@ void draw_crash_screen(OSThread *thread) {
         crashPage = (PAGE_COUNT - 1);
     }
     if (updateBuffer) {
-        crash_screen_draw_rect(25, 8, 270, 12);
-        crash_screen_print(30, 10, "Page:%02d                L/Z: Left   R: Right", crashPage);
+        crash_screen_draw_rect(0, 0, 320, 20);
+        crash_screen_print(LEFT_MARGIN, 5, "Page:%02d %-14s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
             case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
 #ifdef PUPPYPRINT_DEBUG
