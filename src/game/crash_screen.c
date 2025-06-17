@@ -140,7 +140,11 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
         data ++;
 
         for (j = 0; j < (GLYPH_WIDTH); j++) {
-            *ptr++ = (bit & rowMask) ? 0xFFFF : 1;
+            // *ptr++ = (bit & rowMask) ? 0xFFFF : 1;
+            if (bit & rowMask) {
+                *ptr = 0xFFFF;
+            }
+            ptr++;
             bit >>= 1;
         }
         ptr += gCrashScreen.width - (GLYPH_WIDTH);
@@ -349,9 +353,8 @@ extern char *insn_disasm(u32 insn, u32 isPC);
 static u32 sProgramPosition = 0;
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    // u32 insn = *(u32*)tc->pc;
 
-    crash_screen_draw_rect(25, 20, 270, 210);
+    crash_screen_draw_rect(0, 20, 320, 240);
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
     }
@@ -363,7 +366,7 @@ void draw_disasm(OSThread *thread) {
         u32 addr = (sProgramPosition + (i * 4));
         u32 toDisasm = *(u32*)(addr);
 
-        crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
+        crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%s", insn_disasm(addr, (addr == tc->pc)));
     }
 
     osWritebackDCacheAll();
