@@ -35,35 +35,21 @@
     .ascii "E"                  /* NTSC-U (North America) */
 #endif
 
+#if defined(USE_RTC)
+    #define RTC_BIT 0x1
+#else
+    #define RTC_BIT 0x0
+#endif
+
 /* Savetype, region, and RTC */
 #if defined(SRAM)
-    #if defined(USE_RTC)
-    .byte  0x33
-    #else
-    .byte  0x32
-    #endif
+    .byte  0x32 | RTC_BIT
 #elif defined(EEP16K)
-    #if defined(USE_RTC)
-    .byte  0x23
-    #else
-    .byte  0x22
-    #endif
+    .byte  0x22 | RTC_BIT
 #elif defined(SRAM768K)
-    #if defined(USE_RTC)
-    .byte  0x43
-    #else
-    .byte  0x42
-    #endif
+    .byte  0x42 | RTC_BIT
 #elif defined(FLASHRAM)
-    #if defined(USE_RTC)
-    .byte  0x53
-    #else
-    .byte  0x52
-    #endif
+    .byte  0x52 | RTC_BIT
 #else
-    #if defined(USE_RTC)
-    .byte  0x13
-    #else
-    .byte  0x12
-    #endif
+    .byte  0x12 | RTC_BIT
 #endif
