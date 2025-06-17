@@ -109,6 +109,7 @@ static long long s_wait_start;
 static long long s_wait_end;
 
 static long long s_offset = 0ll;
+static int s_tod_offset = 0;
 
 __attribute__((always_inline))
 static inline void librtc_copy( librtc_time *dest, const librtc_time *src ) {
@@ -379,12 +380,14 @@ librtc_bool librtc_get_time_raw( librtc_time *tm ) {
 
 void librtc_set_offset( long long offset ) {
 	s_offset = offset;
+	s_tod_offset = (int)(offset % LIBRTC_SECONDS_IN_DAY);
 }
 
 long long librtc_set_time( const librtc_time *now ) {
 	librtc_time epoch;
 	if( librtc_get_time_raw( &epoch ) ) {
 		s_offset = librtc_time_diff( &epoch, now );
+		s_tod_offset = (int)(s_offset % LIBRTC_SECONDS_IN_DAY);
 	}
 
 	return s_offset;
@@ -474,6 +477,25 @@ librtc_bool librtc_from_unix_time( long long unixTime, librtc_time *tm ) {
 	if( tm->tm_wday < 0 ) tm->tm_wday += 7;
 
 	return true;
+}
+
+int librtc_get_time_of_day() {
+	librtc_time tm;
+	if( !librtc_get_time_raw( &tm ) ) {
+		return -1;
+	}
+
+	librtc_register int seconds = tm.tm_sec;
+	seconds += tm.tm_min * (int)LIBRTC_SECONDS_IN_MINUTE;
+	seconds += tm.tm_hour * (int)LIBRTC_SECONDS_IN_HOUR;
+	seconds += s_tod_offset;
+
+	seconds %= (int)LIBRTC_SECONDS_IN_DAY;
+	if( seconds < 0 ) {
+		seconds = (int)LIBRTC_SECONDS_IN_DAY - seconds;
+	}
+
+	return seconds;
 }
 
 static inline librtc_bool strftime_push_text( char *str, unsigned int *i, unsigned int count, const char *text ) {

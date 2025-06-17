@@ -115,6 +115,16 @@ long long librtc_to_unix_time( const librtc_time *tm );
 __attribute__((nonnull(2), access(write_only, 2)))
 librtc_bool librtc_from_unix_time( long long unixTime, librtc_time *tm );
 
+/* Returns the current time as the number of seconds since the start of the day [0-86399].
+ * This function takes the offset (set with librtc_set_offset or librtc_set_time) into account.
+ * This is more efficient than using librtc_get_time as it avoids needing to calculate leap days,
+ * nor does it need to perform any 64-bit arithmetic.
+ *
+ * Returns -1 if the flashcart or emulator does not support RTC.
+ */
+__attribute__((warn_unused_result))
+int librtc_get_time_of_day();
+
 /* Adds a number of seconds to the calendar time and normalizes it.
  * The passed in struct is modified, and a pointer to the same struct is returned.
  */
