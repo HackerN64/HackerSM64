@@ -438,7 +438,7 @@ librtc_bool librtc_from_unix_time( long long unixTime, librtc_time *tm ) {
 		tm->tm_hour = 0;
 		tm->tm_mday = 1;
 		tm->tm_mon = 0;
-		tm->tm_year = -0x8FFFFFFF;
+		tm->tm_year = -0x80000000;
 		tm->tm_wday = 4;
 		tm->tm_yday = 0;
 		return false;
