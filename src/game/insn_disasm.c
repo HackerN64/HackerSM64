@@ -10,8 +10,8 @@ enum InsnTypes {
     I_TYPE,
     J_TYPE,
     // BRANCH,
-    // COP0,
-    // COP1,
+    COP0,
+    COP1,
 };
 
 enum ParamTypes {
@@ -253,9 +253,9 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
-            return "NOP <-- CRASH";
+            return "nop <-- CRASH";
         } else {
-            return "NOP";
+            return "nop";
         }
     }
 
@@ -344,7 +344,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                 case PARAM_EMUX:
                     target = (insn.d >> 6) & 0x3FF;
                     if (insn.i.rs == insn.i.rt) {
-                        strp += sprintf(strp, "EMUX %s 0x%02X",
+                        strp += sprintf(strp, "emux %s 0x%02X",
                                                        registerMaps[insn.i.rs],
                                                        target
                         );

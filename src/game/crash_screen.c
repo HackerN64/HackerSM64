@@ -257,18 +257,23 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     osWritebackDCacheAll();
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print(LEFT_MARGIN, 40, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
+        crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
     }
-    crash_screen_print(LEFT_MARGIN,  50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
-    crash_screen_print(LEFT_MARGIN,  60, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
-    crash_screen_print(LEFT_MARGIN,  70, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
-    crash_screen_print(LEFT_MARGIN,  80, "T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
-    crash_screen_print(LEFT_MARGIN,  90, "T5:%08XH   T6:%08XH   T7:%08XH", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
-    crash_screen_print(LEFT_MARGIN, 100, "S0:%08XH   S1:%08XH   S2:%08XH", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
-    crash_screen_print(LEFT_MARGIN, 110, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
-    crash_screen_print(LEFT_MARGIN, 120, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
-    crash_screen_print(LEFT_MARGIN, 130, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(LEFT_MARGIN, 140, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+    crash_screen_print(LEFT_MARGIN,  52, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
+    crash_screen_print(LEFT_MARGIN,  62, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
+    crash_screen_print(LEFT_MARGIN,  72, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
+    crash_screen_print(LEFT_MARGIN,  82, "T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
+    crash_screen_print(LEFT_MARGIN,  92, "T5:%08XH   T6:%08XH   T7:%08XH", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
+    crash_screen_print(LEFT_MARGIN, 102, "S0:%08XH   S1:%08XH   S2:%08XH", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
+    crash_screen_print(LEFT_MARGIN, 112, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
+    crash_screen_print(LEFT_MARGIN, 122, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
+    crash_screen_print(LEFT_MARGIN, 132, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
+    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
+        char *fname = parse_map(tc->ra);
+        crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH (%s)",            (u32) tc->s8, (u32) tc->ra, fname);
+    } else {
+        crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+    }
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
@@ -332,7 +337,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
             char *fname = find_function_in_stack(&temp_sp);
             if ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
-                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: UNKNOWN", temp_sp);
+                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: Unknown", temp_sp);
             } else {
                 crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: %s", temp_sp, fname);
             }
@@ -416,7 +421,7 @@ void draw_crash_screen(OSThread *thread) {
     }
     if (updateBuffer) {
         crash_screen_draw_rect(0, 0, 320, 20);
-        crash_screen_print(LEFT_MARGIN, 5, "Page:%02d %-14s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
+        crash_screen_print(LEFT_MARGIN, 5, "Page:%02d %-22s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
             case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
 #ifdef PUPPYPRINT_DEBUG
