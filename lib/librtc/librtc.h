@@ -2,9 +2,6 @@
  * by Matt "falcobuster" Pharoah
  * https://gitlab.com/mpharoah/librtc
  * 
- * The proper 64 byte RTC commands needed to interface with the RTC were taken from libdragon
- * (https://github.com/DragonMinded/libdragon)
- * 
  * Public Domain (www.unlicense.org)
  * This is free and unencumbered software released into the public domain.
  * 
@@ -119,7 +116,7 @@ librtc_bool librtc_from_unix_time( long long unixTime, librtc_time *tm );
  * This function takes the offset (set with librtc_set_offset or librtc_set_time) into account.
  * This is more efficient than using librtc_get_time as it avoids needing to calculate leap days,
  * nor does it need to perform any 64-bit arithmetic.
- *
+ * 
  * Returns -1 if the flashcart or emulator does not support RTC.
  */
 __attribute__((warn_unused_result))

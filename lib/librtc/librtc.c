@@ -2,9 +2,6 @@
  * by Matt "falcobuster" Pharoah
  * https://gitlab.com/mpharoah/librtc
  *
- * The proper 64 byte RTC commands needed to interface with the RTC were taken from libdragon
- * (https://github.com/DragonMinded/libdragon)
- *
  * Public Domain (www.unlicense.org)
  * This is free and unencumbered software released into the public domain.
  *
@@ -74,25 +71,8 @@ static const int s_yday_table[12] = {
 	0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
 };
 
-static const unsigned int SI_GET_RTC_TIME_CMD[16] = {
-	0u, 0x02090702u, 0xffffffffu, 0xffffffffu, 0xfffe0000u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u ,0u ,0u, 1u
-};
-
-static const unsigned int SI_GET_RTC_STATUS_CMD[16] = {
-	0u, 0xff010306u, 0xfffffffeu, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u ,0u ,0u, 1u
-};
-
-static const unsigned int SI_GET_RTC_CTRL_CMD[16] = {
-	0u, 0x02090700u, 0xffffffffu, 0xffffffffu, 0xfffe0000u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u ,0u ,0u, 1u
-};
-
-static const unsigned int SI_SET_RTC_CTRL_CMD_TEMPLATE[16] = {
-	0u, 0x0a010800u, 0x03000000u, 0u, 0xfffe0000u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u ,0u ,0u, 1u
-};
-
-static const unsigned int SI_REENABLE_CONTROLLERS_CMD[16] = {
-	0xff010401u, 0xffffffffu, 0xff010401u, 0xffffffffu, 0xff010401u, 0xffffffffu, 0xff010401u, 0xffffffffu, 0xfe000000u, 0u, 0u, 0u, 0u, 0u, 0u, 1u
-};
+#define LIBRTC_GET_TIME_CMD 0x020907u
+#define LIBRTC_GET_STATUS_CMD 0x010306u
 
 static unsigned int s_si_buffer[16] __attribute__((aligned(16)));
 
@@ -165,11 +145,7 @@ static inline void __attribute__((always_inline)) si_wait_safe( librtc_bool yiel
 	}
 }
 
-static void librtc_exec( const unsigned int *cmd ) {
-	for( int i = 0; i < 16; i++ ) {
-		s_si_buffer[i] = cmd[i];
-	}
-
+static void librtc_send_cmd() {
 	__builtin_mips_cache( 0x19, &s_si_buffer[0] );
 	__builtin_mips_cache( 0x19, &s_si_buffer[4] );
 	__builtin_mips_cache( 0x19, &s_si_buffer[8] );
@@ -193,6 +169,34 @@ static void librtc_exec( const unsigned int *cmd ) {
 	asm volatile( "":::"memory" );
 
 	si_await_op();
+}
+
+static void librtc_exec( unsigned int cmd, unsigned char arg, unsigned int unk ) {
+	s_si_buffer[0] = 0u;
+	s_si_buffer[1] = (cmd << 8) | (unsigned int)arg;
+	s_si_buffer[2] = 0xFFFFFFFFu;
+	s_si_buffer[3] = 0xFFFFFFFFu;
+	s_si_buffer[4] = unk;
+	for( int i = 5; i < 15; i++ ) {
+		s_si_buffer[i] = 0u;
+	}
+	s_si_buffer[15] = 1u;
+
+	librtc_send_cmd();
+}
+
+static void librtc_done() {
+	for( int i = 0; i < 8; ) {
+		s_si_buffer[i++] = 0xff010401u;
+		s_si_buffer[i++] = 0xffffffffu;
+	}
+	s_si_buffer[8] = 0xfe000000u;
+	for( int i = 9; i < 15; i++ ) {
+		s_si_buffer[i] = 0u;
+	}
+	s_si_buffer[15] = 1u;
+
+	librtc_send_cmd();
 }
 
 static inline unsigned char decode_rtc_byte( unsigned char x ) {
@@ -286,27 +290,17 @@ librtc_bool librtc_init() {
 		}
 	}
 
+
 	si_wait_safe( intr );
 	s_rtc_state |= LIBRTC_INIT_CALLED;
 
-	librtc_exec( SI_GET_RTC_STATUS_CMD );
-	if( s_si_buffer[3] || (s_si_buffer[2] >> 8) != 0x1000u ) {
-		librtc_exec( SI_REENABLE_CONTROLLERS_CMD );
+	librtc_exec( LIBRTC_GET_STATUS_CMD, 0, 0u );
+	if( (s_si_buffer[1] & 0xFFu) || (s_si_buffer[2] >> 16) != 0x1000u ) {
 		librtc_set_interrupts( intr );
 		return false;
 	}
 
 	s_rtc_state |= LIBRTC_GOOD;
-	librtc_exec( SI_GET_RTC_CTRL_CMD );
-
-	unsigned int cmd[16];
-	for( int i = 0; i < 16; i++ ) {
-		cmd[i] = SI_SET_RTC_CTRL_CMD_TEMPLATE[i];
-	}
-	cmd[3] = s_si_buffer[3];
-
-	librtc_exec( cmd );
-
 	s_wait_start = librtc_clock();
 	s_wait_end = s_wait_start + (LIBRTC_CLOCKS_PER_SEC / 50u);
 
@@ -314,7 +308,7 @@ librtc_bool librtc_init() {
 		s_rtc_state |= LIBRTC_NOT_WAITING;
 	}
 
-	librtc_exec( SI_REENABLE_CONTROLLERS_CMD );
+	librtc_done();
 	librtc_set_interrupts( intr );
 	return true;
 }
@@ -357,7 +351,7 @@ librtc_bool librtc_get_time_raw( librtc_time *tm ) {
 	const librtc_bool intr = librtc_set_interrupts( false );
 	si_wait_safe( intr );
 
-	librtc_exec( SI_GET_RTC_TIME_CMD );
+	librtc_exec( LIBRTC_GET_TIME_CMD, 2, 0x80fe0000u );
 	const unsigned char *const data = (const unsigned char*)&s_si_buffer[2];
 	tm->tm_sec = (int)decode_rtc_byte( data[0] );
 	tm->tm_min = (int)decode_rtc_byte( data[1] );
@@ -373,7 +367,7 @@ librtc_bool librtc_get_time_raw( librtc_time *tm ) {
 		tm->tm_yday++;
 	}
 
-	librtc_exec( SI_REENABLE_CONTROLLERS_CMD );
+	librtc_done();
 	librtc_set_interrupts( intr );
 	return true;
 }
@@ -441,7 +435,7 @@ librtc_bool librtc_from_unix_time( long long unixTime, librtc_time *tm ) {
 		tm->tm_hour = 0;
 		tm->tm_mday = 1;
 		tm->tm_mon = 0;
-		tm->tm_year = -0x80000000;
+		tm->tm_year = -0x8FFFFFFF;
 		tm->tm_wday = 4;
 		tm->tm_yday = 0;
 		return false;
