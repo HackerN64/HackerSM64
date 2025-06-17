@@ -243,10 +243,10 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
     u32 bit = BIT(17);
 
-    crash_screen_print(30, 155, "FPCSR:%08XH", fpcsr);
+    crash_screen_print(100, 220, "FPCSR:%08XH", fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
-            crash_screen_print(132, 155, "(%s)", gFpcsrDesc[i]);
+            crash_screen_print(222, 220, "(%s)", gFpcsrDesc[i]);
             return;
         }
         bit >>= 1;
@@ -272,12 +272,12 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(LEFT_MARGIN, 112, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
     crash_screen_print(LEFT_MARGIN, 122, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
     crash_screen_print(LEFT_MARGIN, 132, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
+    crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->ra);
-        crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH (%s)",            (u32) tc->s8, (u32) tc->ra, fname);
-    } else {
-        crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+        crash_screen_print(LEFT_MARGIN, 152, "RA at: %s", fname);
     }
+
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
@@ -303,11 +303,11 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
-    crash_screen_draw_rect(25, 20, 270, 210);
+    crash_screen_draw_rect(0, 20, 320, 210);
     osWritebackDCacheAll();
 #define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
-        crash_screen_print(30, (LINE_HEIGHT - (i * 10)), consoleLogTable[i]);
+        crash_screen_print(LEFT_MARGIN, (LINE_HEIGHT - (i * 10)), consoleLogTable[i]);
     }
 #undef LINE_HEIGHT
 }
@@ -320,7 +320,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
 
-    crash_screen_draw_rect(25, 20, 270, 210);
+    crash_screen_draw_rect(0, 20, 320, 210);
     crash_screen_print(LEFT_MARGIN, 25, "STACK TRACE FROM %08X:", temp_sp);
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
         crash_screen_print(LEFT_MARGIN, 35, "CURRFUNC: NONE");
@@ -373,7 +373,7 @@ void draw_disasm(OSThread *thread) {
 }
 
 void draw_assert(UNUSED OSThread *thread) {
-    crash_screen_draw_rect(25, 20, 270, 210);
+    crash_screen_draw_rect(0, 20, 320, 210);
 
     crash_screen_print(LEFT_MARGIN, 25, "ASSERT PAGE");
 
