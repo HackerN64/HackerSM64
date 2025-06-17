@@ -71,7 +71,7 @@ librtc_bool librtc_init();
  * passed since the RTC was initialized. Otherwise, returns true, even if RTC is not supported by the flashcart or emulator.
  *
  * On console, there is a 20 millisecond delay between initializing the RTC and when the time can first be fetched.
- * This delay exists to wokraround some buggy flashcarts that do not properly set the RTC status. To ensure that the RTC has had
+ * This delay exists to workaround some buggy flashcarts that do not properly set the RTC status. To ensure that the RTC has had
  * enough time to initialize on these buggy flashcarts, a 20 millisecond delay is enforced to avoid returning garbage data.
  *
  * NOTE: The COUNT register on the CPU is used to determine the time passed. Since this counter overflows every ~90 seconds,
