@@ -12,6 +12,11 @@
  * compiled binary, for any purpose, commercial or non-commercial, and by any means.
  */
 
+// <HackerSM64>
+#include "config/config_rom.h"
+#ifdef USE_RTC
+// </HackerSM64>
+
 #include "librtc.h"
 
 #ifdef __cplusplus
@@ -720,3 +725,7 @@ unsigned int librtc_strftime( char *str, unsigned int count, const char *format,
 	str[count - 1] = '\0';
 	return librtc_strftime_internal( str, count, format, &tm );
 }
+
+// <HackerSM64>
+#endif
+// </HackerSM64>

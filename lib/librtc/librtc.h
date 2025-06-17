@@ -16,8 +16,9 @@
 #define LIBRTC_H
 
 // <HackerSM64>
+#include "config/config_rom.h"
 #ifndef USE_RTC
-#error "librtc.h was included without enabling the RTC. Please set USE_RTC to 1 in the Makefile."
+#error "librtc.h was included without enabling the RTC. Please uncomment the USE_RTC define in config_rom.h"
 #endif
 // </HackerSM64>
 
