@@ -204,12 +204,18 @@ bool elf_find_callsites(const char *elf)
         // Find the functions
         if (strstr(line, ">:")) {
             uint32_t addr = strtoul(line, NULL, 16);
-            symbol_add(elf, addr, true);
+            // Prevent segmented addresses for now
+            if ((addr & 0xFF000000) == 0x80000000) {
+                symbol_add(elf, addr, true);
+            }
         }
         // Find the callsites
         if (strstr(line, "\tjal\t") || strstr(line, "\tjalr\t") || strstr(line, "\tsyscall")) {
             uint32_t addr = strtoul(line, NULL, 16);
-            symbol_add(elf, addr, false);
+            // Prevent segmented addresses for now
+            if ((addr & 0xFF000000) == 0x80000000) {
+                symbol_add(elf, addr, false);
+            }
         }
     }
     free(line);
