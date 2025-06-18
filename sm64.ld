@@ -148,9 +148,6 @@ SECTIONS
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #ifndef DEBUG_MAP_STACKTRACE
       _mapDataSegmentRomStart = 0;
-      gMapEntries   = 0;
-      gMapEntrySize = 0;
-      gMapStrings   = 0;
 #endif
 
    BEGIN_SEG(main, .) SUBALIGN(16)
@@ -529,7 +526,7 @@ SECTIONS
 #endif
 
 #ifdef DEBUG_MAP_STACKTRACE
-   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
+   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) ALIGN(16) {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));
    }
    END_SEG(mapData)

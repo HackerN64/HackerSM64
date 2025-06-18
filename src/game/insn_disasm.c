@@ -90,43 +90,7 @@ typedef struct PACKED {
 #define OP_BRANCH 0b000001 // technically "REGIMM"
 
 InsnTemplate insn_db[] = {
-    // arithmetic
-    {R_TYPE, PARAM_NONE, 0, 0b100000, "add"},
-    {R_TYPE, PARAM_NONE, 0, 0b100001, "addu"},
-    {I_TYPE, PARAM_SWAP_RS_IMM,  0b001000, 0, "addi"},
-    {I_TYPE, PARAM_SWAP_RS_IMM,  0b001001, 0, "addiu"},
-    {R_TYPE, PARAM_NONE, 0, 0b100010, "sub"},
-    {R_TYPE, PARAM_NONE, 0, 0b100011, "subu"},
-    {R_TYPE, PARAM_NONE, 0, 0b011000, "mult"},
-    {R_TYPE, PARAM_NONE, 0, 0b011001, "multu"},
-    {R_TYPE, PARAM_NONE, 0, 0b011010, "div"},
-    {R_TYPE, PARAM_NONE, 0, 0b011011, "divu"},
-    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010000, "mfhi"},
-    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010001, "mthi"},
-    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010010, "mflo"},
-    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010011, "mtlo"},
-
-    {R_TYPE, PARAM_NONE, 0, 0b101010, "slt"},
-    {R_TYPE, PARAM_NONE, 0, 0b101011, "sltu"},
-
-    {I_TYPE, PARAM_NONE, 0b001010, 0, "slti"},
-    {I_TYPE, PARAM_NONE, 0b001011, 0, "sltiu"},
-
-
-    // bitwise ops
-    {R_TYPE, PARAM_NONE, 0, 0b100100, "and"},
-    {I_TYPE, PARAM_NONE, 0b001100, 0, "andi"},
-    {R_TYPE, PARAM_NONE, 0, 0b100101, "or"},
-    {I_TYPE, PARAM_NONE, 0b001101, 0, "ori"},
-    {R_TYPE, PARAM_NONE, 0, 0b100110, "xor"},
-    {I_TYPE, PARAM_NONE, 0b001110, 0, "xori"},
-    {R_TYPE, PARAM_BITSHIFT, 0, 0b000000, "sll"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000100, "sllv"},
-    {R_TYPE, PARAM_BITSHIFT, 0, 0b000010, "srl"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000110, "srlv"},
-    {R_TYPE, PARAM_BITSHIFT, 0, 0b000011, "sra"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000111, "srav"},
-    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b100111, "nor"},
+    // We want instructions with opcodes first (prioritized)
 
     // load/store
     {I_TYPE, PARAM_LUI,  0b001111, 0, "lui"},
@@ -144,6 +108,7 @@ InsnTemplate insn_db[] = {
     {I_TYPE, PARAM_FLOAT_RT, 0b111001, 0, "swc1"},
     {I_TYPE, PARAM_FLOAT_RT, 0b110101, 0, "ldc1"},
     {I_TYPE, PARAM_FLOAT_RT, 0b111101, 0, "sdc1"},
+
     // unaligned
     {I_TYPE, PARAM_NONE, 0b100010, 0, "lwl"},
     {I_TYPE, PARAM_NONE, 0b100110, 0, "lwr"},
@@ -153,7 +118,6 @@ InsnTemplate insn_db[] = {
     {I_TYPE, PARAM_NONE, 0b110000, 0, "ll"},
     {I_TYPE, PARAM_NONE, 0b111000, 0, "sc"},
     {I_TYPE, PARAM_NONE, 0b111100, 0, "scd"},
-
     // branches
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b000100, 0, "beq"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b010100, 0, "beql"},
@@ -163,19 +127,59 @@ InsnTemplate insn_db[] = {
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b010111, 0, "bgtzl"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b000110, 0, "blez"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b010110, 0, "blezl"},
-    {R_TYPE, PARAM_NONE, 0, 0b001001, "jalr"},
-    {R_TYPE, PARAM_NONE, 0, 0b001000, "jr"},
-    {R_TYPE, PARAM_TRAP, 0, 0b110100, "teq"},
-    {R_TYPE, PARAM_EMUX, 0, 0b110110, "tne"},
+    {I_TYPE, PARAM_NONE, 0b001010, 0, "slti"},
+    {I_TYPE, PARAM_NONE, 0b001011, 0, "sltiu"},
 
     // jal (special)
     {J_TYPE, PARAM_JAL, 0b000011, 0, "jal"},
     {J_TYPE, PARAM_JUMP, 0b000010, 0, "j"},
 
-    // instructions involving doubles (deprioritized on the list)
-    {R_TYPE, PARAM_NONE, 0, 0b101101, "daddu"},
+    // bitwise ops (which are opcodes)
+    {I_TYPE, PARAM_NONE, 0b001100, 0, "andi"},
+    {I_TYPE, PARAM_NONE, 0b001101, 0, "ori"},
+    {I_TYPE, PARAM_NONE, 0b001110, 0, "xori"},
+
+
+    // arithmetic
     {I_TYPE, PARAM_SWAP_RS_IMM,  0b011000, 0, "daddi"},
     {I_TYPE, PARAM_SWAP_RS_IMM,  0b011001, 0, "daddiu"},
+    // and now the ones with 0 for the opcode
+    {R_TYPE, PARAM_NONE, 0, 0b100000, "add"},
+    {R_TYPE, PARAM_NONE, 0, 0b100001, "addu"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b001000, 0, "addi"},
+    {I_TYPE, PARAM_SWAP_RS_IMM,  0b001001, 0, "addiu"},
+    {R_TYPE, PARAM_NONE, 0, 0b100010, "sub"},
+    {R_TYPE, PARAM_NONE, 0, 0b100011, "subu"},
+    {R_TYPE, PARAM_NONE, 0, 0b011000, "mult"},
+    {R_TYPE, PARAM_NONE, 0, 0b011001, "multu"},
+    {R_TYPE, PARAM_NONE, 0, 0b011010, "div"},
+    {R_TYPE, PARAM_NONE, 0, 0b011011, "divu"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010000, "mfhi"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010001, "mthi"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010010, "mflo"},
+    {R_TYPE, PARAM_MULT_MOVE, 0, 0b010011, "mtlo"},
+    {R_TYPE, PARAM_NONE, 0, 0b101010, "slt"},
+    {R_TYPE, PARAM_NONE, 0, 0b101011, "sltu"},
+
+    // bitwise ops (which are functions)
+    {R_TYPE, PARAM_NONE, 0, 0b100100, "and"},
+    {R_TYPE, PARAM_NONE, 0, 0b100101, "or"},
+    {R_TYPE, PARAM_NONE, 0, 0b100110, "xor"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b000000, "sll"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000100, "sllv"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b000010, "srl"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000110, "srlv"},
+    {R_TYPE, PARAM_BITSHIFT, 0, 0b000011, "sra"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b000111, "srav"},
+    {R_TYPE, PARAM_SWAP_RS_RT, 0, 0b100111, "nor"},
+
+    {R_TYPE, PARAM_NONE, 0, 0b001001, "jalr"},
+    {R_TYPE, PARAM_NONE, 0, 0b001000, "jr"},
+    {R_TYPE, PARAM_TRAP, 0, 0b110100, "teq"},
+    {R_TYPE, PARAM_EMUX, 0, 0b110110, "tne"},
+
+    // instructions involving doubles (deprioritized on the list)
+    {R_TYPE, PARAM_NONE, 0, 0b101101, "daddu"},
     {R_TYPE, PARAM_NONE, 0, 0b101110, "dsub"},
     {R_TYPE, PARAM_NONE, 0, 0b101111, "dsubu"},
     {R_TYPE, PARAM_NONE, 0, 0b011101, "dmultu"},
@@ -214,9 +218,7 @@ char __mips_fpreg[][5] = {
     "$f28", "$f29", "$f30", "$f31",
 };
 
-char* __symbolize(void *vaddr, char *buf, int size) {
-    return parse_map((u32)vaddr);
-}
+extern char* __symbolize(void *vaddr, char *buf, int size);
 
 // Last Resort C0/C1 disassembler, from libdragon
 static void c1_disasm(u32 *ptr, char *out, int n) {
@@ -395,7 +397,7 @@ char *insn_disasm(InsnData *addr, u32 isPC) {
             }
             successful_print = 1;
             break;
-        } else if (   (insn.i.rdata.function == 0 && insn.i.opcode == 0)
+        } else if (   (insn.i.rdata.function == 0 && insn.i.opcode == 0) // specifically catch `sll`
                    || (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function)
         ) {
             switch (insn_db[i].arbitraryParam) {

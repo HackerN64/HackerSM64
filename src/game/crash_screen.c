@@ -314,38 +314,26 @@ void draw_crash_log(void) {
 #endif
 
 
-// prints any function pointers it finds in the stack format:
-// SP address: function name
+extern void inspector_print_backtrace(void *bt, int n, int bt_skip);
+int backtrace(void **buffer, int size);
+
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
 
     crash_screen_draw_rect(0, 20, 320, 210);
-    crash_screen_print(LEFT_MARGIN, 25, "STACK TRACE FROM %08X:", temp_sp);
-    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
-        crash_screen_print(LEFT_MARGIN, 35, "CURRFUNC: NONE");
-    } else {
-        crash_screen_print(LEFT_MARGIN, 35, "CURRFUNC: %s", parse_map(tc->pc));
-    }
+    crash_screen_print(LEFT_MARGIN, 25, "Backtrace from %08X:", temp_sp);
 
     osWritebackDCacheAll();
+    if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+        crash_screen_print(LEFT_MARGIN, (45), "STACK TRACE DISABLED");
+    } else {
+        #define LINE_COUNT 10
+        void *lines[LINE_COUNT];
+        int bt_skip = 0; // how many frames to skip
+        backtrace(lines, LINE_COUNT);
 
-    for (int i = 0; i < 18; i++) {
-        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "STACK TRACE DISABLED");
-            break;
-        } else {
-            if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-                return;
-            }
-
-            char *fname = find_function_in_stack(&temp_sp);
-            if ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
-                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: Unknown", temp_sp);
-            } else {
-                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X: %s", temp_sp, fname);
-            }
-        }
+        inspector_print_backtrace(lines, LINE_COUNT, bt_skip);
     }
 }
 
@@ -478,9 +466,9 @@ void thread2_crash_screen(UNUSED void *arg) {
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {
-                if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
-                    map_data_init();
-                }
+                // if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
+                //     map_data_init();
+                // }
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
                 stop_background_music(sBackgroundMusicQueue[0].seqId);
