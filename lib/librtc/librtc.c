@@ -84,7 +84,7 @@ typedef enum {
 	LIBRTC_READY = LIBRTC_INIT_CALLED | LIBRTC_NOT_WAITING
 } librtc_state_t;
 
-static librtc_state_t s_rtc_state;
+static librtc_state_t s_rtc_state = 0;
 static long long s_wait_start;
 static long long s_wait_end;
 
@@ -151,22 +151,22 @@ static void librtc_send_cmd() {
 	__builtin_mips_cache( 0x19, &s_si_buffer[8] );
 	__builtin_mips_cache( 0x19, &s_si_buffer[12] );
 
-	*((volatile unsigned int*)0xa4800000u) = (unsigned int)s_si_buffer;
+	*((volatile unsigned int*)0xa4800000u) = (unsigned int)s_si_buffer & 0x1FFFFFFFu;
 	asm volatile( "":::"memory" );
 	*((volatile unsigned int*)0xa4800010u) = 0x1fc007c0u;
 	asm volatile( "":::"memory" );
 
 	si_await_op();
 
+	*((volatile unsigned int*)0xa4800000u) = (unsigned int)s_si_buffer & 0x1FFFFFFFu;
+	asm volatile( "":::"memory" );
+	*((volatile unsigned int*)0xa4800004u) = 0x1fc007c0u;
+	asm volatile( "":::"memory" );
+
 	__builtin_mips_cache( 0x11, &s_si_buffer[0] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[4] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[8] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[12] );
-
-	*((volatile unsigned int*)0xa4800000u) = (unsigned int)s_si_buffer;
-	asm volatile( "":::"memory" );
-	*((volatile unsigned int*)0xa4800004u) = 0x1fc007c0u;
-	asm volatile( "":::"memory" );
 
 	si_await_op();
 }
@@ -272,25 +272,6 @@ librtc_bool librtc_init() {
 		return s_rtc_state != LIBRTC_READY;
 	}
 
-	const librtc_bool isEmulator = librtc_is_emulator();
-	if( isEmulator ) {
-		// Check for Project 64 specifically. This emulator has a major bug that causes all controller inputs to stop working if
-		// attempting to initialize the RTC after the controllers, so we should avoid attempting to interface with the RTC at all
-		// on Project 64. (Project 64 doesn't support RTC anyway) This bug is present on all versions of PJ64 so far.
-		// No other emulator has this bug, and it is safe on console. It's just yet another PJ64 bug.
-
-		// This is one of the few PJ64 checks that doesn't result in PJ64 halting, crashing, or breaking input
-		if(
-			*((const volatile unsigned int*)0xbfd00104) == 0x01040104u && // expected behaviour
-			*((const volatile unsigned short*)0xbfd00106) == 0u // PJ64 specific behaviour
-		) {
-			s_rtc_state = LIBRTC_READY;
-			librtc_set_interrupts( intr );
-			return false;
-		}
-	}
-
-
 	si_wait_safe( intr );
 	s_rtc_state |= LIBRTC_INIT_CALLED;
 
@@ -304,7 +285,7 @@ librtc_bool librtc_init() {
 	s_wait_start = librtc_clock();
 	s_wait_end = s_wait_start + (LIBRTC_CLOCKS_PER_SEC / 50u);
 
-	if( isEmulator ) {
+	if( librtc_is_emulator() ) {
 		s_rtc_state |= LIBRTC_NOT_WAITING;
 	}
 
