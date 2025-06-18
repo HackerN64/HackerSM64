@@ -261,7 +261,7 @@ static inline void librtc_set_month_and_day( long long year, int yday, int *mon,
 	} else for( int month = (yday + 4) >> 5;; month++ ) {
 		if( yday < s_yday_table[month+1] ) {
 			*mon = month;
-			*mday = yday - s_yday_table[month];
+			*mday = yday + 1 - s_yday_table[month];
 			return;
 		}
 	}
@@ -665,7 +665,7 @@ unsigned int librtc_strftime_internal( char *str, unsigned int count, const char
 				break;
 			case 'e':
 				if( i >= count - 2 ) return 0;
-				if( alt || tp->tm_mday >= 9) {
+				if( alt || tp->tm_mday > 9) {
 					str[i++] = '0' + (char)(tp->tm_mday / 10);
 					str[i++] = '0' + (char)(tp->tm_mday % 10);
 				} else {
