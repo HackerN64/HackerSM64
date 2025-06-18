@@ -71,10 +71,9 @@ static const int s_yday_table[12] = {
 	0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
 };
 
-#define LIBRTC_GET_TIME_CMD 0x020907u
-#define LIBRTC_GET_STATUS_CMD 0x010306u
-
 static unsigned int s_si_buffer[16] __attribute__((aligned(16)));
+static volatile unsigned int s_si_backup[16] __attribute__((aligned(16)));
+static unsigned int s_prev_dma_addr;
 
 typedef enum {
 	LIBRTC_INIT_CALLED = 0x1,
@@ -90,6 +89,11 @@ static long long s_wait_end;
 
 static long long s_offset = 0ll;
 static int s_tod_offset = 0;
+
+__attribute__((always_inline))
+static inline void librtc_zero_words( unsigned int *addr, unsigned int numWords ) {
+	for( unsigned int i = 0; i < numWords; i++ ) addr[i] = 0u;
+}
 
 __attribute__((always_inline))
 static inline void librtc_copy( librtc_time *dest, const librtc_time *src ) {
@@ -145,6 +149,36 @@ static inline void __attribute__((always_inline)) si_wait_safe( librtc_bool yiel
 	}
 }
 
+static void librtc_pif_save() {
+	s_prev_dma_addr = *((volatile unsigned int*)0xa4800000u);
+
+	// Save the state of PIF RAM to memory to restore it later.
+	// The joybus is only executed when using an SI DMA read, and not when doing
+	// a direct read via the memory-mapped address. Thus, this has no side effects.
+
+	volatile unsigned int *si_pif_ram = (volatile unsigned int *)0xbfc007c0u;
+	for( int i = 0; i < 16; i++ ) {
+		s_si_backup[i] = si_pif_ram[i];
+	}
+	
+	s_si_backup[15] |= 1u;
+}
+
+static void librtc_pif_restore() {
+	__builtin_mips_cache( 0x19, &s_si_backup[0] );
+	__builtin_mips_cache( 0x19, &s_si_backup[4] );
+	__builtin_mips_cache( 0x19, &s_si_backup[8] );
+	__builtin_mips_cache( 0x19, &s_si_backup[12] );
+
+	*((volatile unsigned int*)0xa4800000u) = (unsigned int)s_si_backup & 0x1FFFFFFFu;
+	asm volatile( "":::"memory" );
+	*((volatile unsigned int*)0xa4800010u) = 0x1fc007c0u;
+	asm volatile( "":::"memory" );
+	si_await_op();
+	
+	*((volatile unsigned int*)0xa4800000u) = s_prev_dma_addr;
+}
+
 static void librtc_send_cmd() {
 	__builtin_mips_cache( 0x19, &s_si_buffer[0] );
 	__builtin_mips_cache( 0x19, &s_si_buffer[4] );
@@ -163,40 +197,12 @@ static void librtc_send_cmd() {
 	*((volatile unsigned int*)0xa4800004u) = 0x1fc007c0u;
 	asm volatile( "":::"memory" );
 
+	si_await_op();
+
 	__builtin_mips_cache( 0x11, &s_si_buffer[0] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[4] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[8] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[12] );
-
-	si_await_op();
-}
-
-static void librtc_exec( unsigned int cmd, unsigned char arg, unsigned int unk ) {
-	s_si_buffer[0] = 0u;
-	s_si_buffer[1] = (cmd << 8) | (unsigned int)arg;
-	s_si_buffer[2] = 0xFFFFFFFFu;
-	s_si_buffer[3] = 0xFFFFFFFFu;
-	s_si_buffer[4] = unk;
-	for( int i = 5; i < 15; i++ ) {
-		s_si_buffer[i] = 0u;
-	}
-	s_si_buffer[15] = 1u;
-
-	librtc_send_cmd();
-}
-
-static void librtc_done() {
-	for( int i = 0; i < 8; ) {
-		s_si_buffer[i++] = 0xff010401u;
-		s_si_buffer[i++] = 0xffffffffu;
-	}
-	s_si_buffer[8] = 0xfe000000u;
-	for( int i = 9; i < 15; i++ ) {
-		s_si_buffer[i] = 0u;
-	}
-	s_si_buffer[15] = 1u;
-
-	librtc_send_cmd();
 }
 
 static inline unsigned char decode_rtc_byte( unsigned char x ) {
@@ -274,15 +280,38 @@ librtc_bool librtc_init() {
 
 	si_wait_safe( intr );
 	s_rtc_state |= LIBRTC_INIT_CALLED;
+	librtc_pif_save();
 
-	librtc_exec( LIBRTC_GET_STATUS_CMD, 0, 0u );
-	if( (s_si_buffer[1] & 0xFFu) || (s_si_buffer[2] >> 16) != 0x1000u ) {
-		librtc_done();
+	s_si_buffer[0] = 0u;
+	s_si_buffer[1] = 0xff010306u;
+	s_si_buffer[2] = 0xfffffffeu;
+	librtc_zero_words( &s_si_buffer[3], 12 );
+	s_si_buffer[15] = 1u;
+	librtc_send_cmd();
+
+	if( s_si_buffer[2] >> 8 != 0x001000u ) {
+		librtc_pif_restore();
 		librtc_set_interrupts( intr );
 		return false;
 	}
 
 	s_rtc_state |= LIBRTC_GOOD;
+
+	s_si_buffer[0] = 0u;
+	s_si_buffer[1] = 0x02090700u;
+	s_si_buffer[2] = 0u;
+	s_si_buffer[3] = 0u;
+	s_si_buffer[4] = 0x00fe0000u;
+	librtc_zero_words( &s_si_buffer[5], 10 );
+	s_si_buffer[15] = 1u;
+	librtc_send_cmd();
+
+	s_si_buffer[1] = 0x0a010800u;
+	s_si_buffer[2] = 0x03000000u;
+	s_si_buffer[4] = 0x00fe0000u;
+	s_si_buffer[15] = 1u;
+	librtc_send_cmd();
+
 	s_wait_start = librtc_clock();
 	s_wait_end = s_wait_start + (LIBRTC_CLOCKS_PER_SEC / 50u);
 
@@ -290,7 +319,7 @@ librtc_bool librtc_init() {
 		s_rtc_state |= LIBRTC_NOT_WAITING;
 	}
 
-	librtc_done();
+	librtc_pif_restore();
 	librtc_set_interrupts( intr );
 	return true;
 }
@@ -332,8 +361,17 @@ librtc_bool librtc_get_time_raw( librtc_time *tm ) {
 
 	const librtc_bool intr = librtc_set_interrupts( false );
 	si_wait_safe( intr );
+	librtc_pif_save();
 
-	librtc_exec( LIBRTC_GET_TIME_CMD, 2, 0x80fe0000u );
+	s_si_buffer[0] = 0u;
+	s_si_buffer[1] = 0x02090702u;
+	s_si_buffer[2] = 0x00008001u;
+	s_si_buffer[3] = 0x04017000u;
+	s_si_buffer[4] = 0x80fe0000u;
+	librtc_zero_words( &s_si_buffer[5], 10 );
+	s_si_buffer[15] = 1u;
+	librtc_send_cmd();
+
 	const unsigned char *const data = (const unsigned char*)&s_si_buffer[2];
 	tm->tm_sec = (int)decode_rtc_byte( data[0] );
 	tm->tm_min = (int)decode_rtc_byte( data[1] );
@@ -349,7 +387,7 @@ librtc_bool librtc_get_time_raw( librtc_time *tm ) {
 		tm->tm_yday++;
 	}
 
-	librtc_done();
+	librtc_pif_restore();
 	librtc_set_interrupts( intr );
 	return true;
 }
