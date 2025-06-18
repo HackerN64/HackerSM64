@@ -277,6 +277,7 @@ librtc_bool librtc_init() {
 
 	librtc_exec( LIBRTC_GET_STATUS_CMD, 0, 0u );
 	if( (s_si_buffer[1] & 0xFFu) || (s_si_buffer[2] >> 16) != 0x1000u ) {
+		librtc_done();
 		librtc_set_interrupts( intr );
 		return false;
 	}
