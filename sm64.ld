@@ -535,6 +535,7 @@ SECTIONS
       Symbols in the DWARF debugging sections are relative to the beginning
       of the section so we begin them at 0.  */
    .debug_rnglists 0 : { *(.debug_rnglists) }
+   .debug_line_str 0 : { *(.debug_line_str) }
    /* DWARF 1 */
    .debug          0 : { *(.debug) }
    .line           0 : { *(.line) }

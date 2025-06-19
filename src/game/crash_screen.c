@@ -274,11 +274,12 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         int line = -1;
         char *t = search_symbol(tc->pc, &line);
         if (line != -1) {
-            crash_screen_print(LEFT_MARGIN, 60, "File: %s", t+1);
+            crash_screen_print(LEFT_MARGIN, 60, "File: %s", t);
+            crash_screen_print(LEFT_MARGIN, 72, "Line: %d", line);
         }
     }
 
-    crash_screen_print(LEFT_MARGIN, 72, "Address: 0x%08X", tc->pc);
+    crash_screen_print(LEFT_MARGIN, 84, "Address: 0x%08X", tc->pc);
 
     // do a lil backtrace
 }

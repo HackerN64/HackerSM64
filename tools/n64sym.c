@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "common/subprocess.h"
 #include "common/polyfill.h"
@@ -45,6 +46,8 @@ void usage(const char *progname)
 
 char *stringtable = NULL;
 struct { char *key; int value; } *string_hash = NULL;
+// For non-callsites, make sure only one entry per line gets in
+struct { char *key; int value; } *linedb = NULL;
 
 int stringtable_add(char *word)
 {
@@ -196,6 +199,120 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
     getline(&line_buf, &line_buf_size, addr2line_r);
 }
 
+void line_add(const char *elf, uint32_t addr) {
+    // We keep one addr2line process open for the last ELF file we processed.
+    // This allows to convert multiple symbols very fast, avoiding spawning a
+    // new process for each symbol.
+    // NOTE: we cannot use popen() here because on some platforms (eg. glibc)
+    // it only allows a single direction pipe, and we need both directions.
+    // So we rely on the subprocess library for this.
+    static char *addrbin = NULL;
+    static struct subprocess_s subp;
+    static FILE *addr2line_w = NULL, *addr2line_r = NULL;
+    static const char *cur_elf = NULL;
+    static char *line_buf = NULL;
+    static size_t line_buf_size = 0;
+
+    // Check if this is a new ELF file (or it's the first time we run this function)
+    if (!cur_elf || strcmp(cur_elf, elf)) {
+        if (cur_elf) {
+            subprocess_terminate(&subp);
+            cur_elf = NULL; addr2line_r = addr2line_w = NULL;
+        }
+        if (!addrbin)
+            asprintf(&addrbin, "/usr/bin/%saddr2line", cross_prefix);
+
+        const char *cmd_addr[16] = {0}; int i = 0;
+        cmd_addr[i++] = addrbin;
+        cmd_addr[i++] = "--addresses";
+        cmd_addr[i++] = "--functions";
+        cmd_addr[i++] = "--demangle";
+        if (flag_inlines) cmd_addr[i++] = "--inlines";
+        cmd_addr[i++] = "--exe";
+        cmd_addr[i++] = elf;
+
+        if (subprocess_create(cmd_addr, subprocess_option_no_window, &subp) != 0) {
+            fprintf(stderr, "Error: cannot run: %s\n", addrbin);
+            exit(1);
+        }
+        addr2line_w = subprocess_stdin(&subp);
+        addr2line_r = subprocess_stdout(&subp);
+        cur_elf = elf;
+    }
+
+    // Send the address to addr2line and fetch back the symbol and the function name
+    // Since we activated the "--inlines" option, addr2line produces an unknown number
+    // of output lines. This is a problem with pipes, as we don't know when to stop.
+    // Thus, we always add a dummy second address (0xffffffff) so that we stop when we see the
+    // reply for it. NOTE: we can't use 0x0 as dummy address as DSOs are partially
+    // linked so there are really symbols at 0.
+    fprintf(addr2line_w, "%08x\n0xffffffff\n", addr);
+    fflush(addr2line_w);
+
+    // First line is the address. It's just an echo, so ignore it.
+    int n = getline(&line_buf, &line_buf_size, addr2line_r);
+    assert(n >= 2 && strncmp(line_buf, "0x", 2) == 0);
+
+    // Add one symbol for each inlined function
+    bool at_least_one = false;
+    while (1) {
+        // First line is the function name. If instead it's the dummy 0x0 address,
+        // it means that we're done.
+        int n = getline(&line_buf, &line_buf_size, addr2line_r);
+        if (strncmp(line_buf, "0xffffffff", 10) == 0) break;
+        n--;
+        if (line_buf[n-1] == '\r') n--; // Remove trailing \r (Windows)
+
+        // If the function of name is longer than 64 bytes, truncate it. This also
+        // avoid paradoxically long function names like in C++ that can even be
+        // several thousands of characters long.
+        char *func = strndup(line_buf, MIN(n, flag_max_sym_len));
+        if (n > flag_max_sym_len) strcpy(&func[flag_max_sym_len-3], "...");
+
+        // Second line is the file name and line number
+        int ret = getline(&line_buf, &line_buf_size, addr2line_r);
+        assert(ret != -1);
+        char *colon = strrchr(line_buf, ':');
+        char *file = strndup(line_buf, colon - line_buf);
+        char *backup = file;
+        file = strstr(file, "src/");
+        if (file == NULL) {
+            file = strstr(backup, "asm/");
+            if (file == NULL) {
+                file = backup;
+            }
+        }
+        int line = atoi(colon + 1);
+
+        char fileline_key[PATH_MAX];
+        sprintf(fileline_key, "%s:%d", file, line);
+
+        // Add the addr to the list, only if that line entry doesn't already exist
+        if (stbds_shgetp_null(linedb, fileline_key) == NULL) {
+            verbose("New line: %d\n", line);
+            stbds_arrput(symtable, ((struct symtable_s) {
+                .uuid = stbds_arrlen(symtable),
+                .addr = addr,
+                .func = func,
+                .file = file,
+                .line = line,
+                .is_func = false,
+                .is_inline = true,
+            }));
+
+            stbds_shput(linedb, fileline_key, line);
+        }
+        at_least_one = true;
+    }
+    assert(at_least_one);
+    symtable[stbds_arrlen(symtable)-1].is_inline = false;
+
+    // Read and skip the two remaining lines (function and file position)
+    // that refers to the dummy 0x0 address
+    getline(&line_buf, &line_buf_size, addr2line_r);
+    getline(&line_buf, &line_buf_size, addr2line_r);
+}
+
 bool elf_find_callsites(const char *elf)
 {
     // Start objdump to parse the disassembly of the ELF file
@@ -212,6 +329,8 @@ bool elf_find_callsites(const char *elf)
     char *line = NULL; size_t line_size = 0;
     while (getline(&line, &line_size, disasm) != -1) {
         // Find the functions
+        // format:
+        // 807fe800 <render_100_coin_star>:
         if (strstr(line, ">:")) {
             uint32_t addr = strtoul(line, NULL, 16);
             // Prevent segmented addresses for now
@@ -225,6 +344,14 @@ bool elf_find_callsites(const char *elf)
             // Prevent segmented addresses for now
             if ((addr & 0xFF000000) == 0x80000000) {
                 symbol_add(elf, addr, false);
+            }
+        }
+        // See if adding every single text address is worth
+        if (line[8] == ':') {
+            uint32_t addr = strtoul(line, NULL, 16);
+            // Prevent segmented addresses for now
+            if ((addr & 0xFF000000) == 0x80000000) {
+                line_add(elf, addr);
             }
         }
     }
