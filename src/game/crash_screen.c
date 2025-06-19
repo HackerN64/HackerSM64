@@ -345,7 +345,7 @@ void draw_crash_log(void) {
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    u32 temp_sp = (tc->sp + 0x14);
+    u32 temp_sp = (tc->sp - 0x24);
 
     crash_screen_draw_rect(0, 20, 320, 240);
     crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", temp_sp);
@@ -368,11 +368,12 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
             int line = -1;
             char *fname = find_function_in_stack(&temp_sp, &line);
-            if ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
-                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%08X)", temp_sp, *(u32*)temp_sp);
-            } else {
-                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%s:%d)", temp_sp, fname, line);
+            while ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
+                // crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%08X)", temp_sp, *(u32*)temp_sp);
+                fname = find_function_in_stack(&temp_sp, &line);
             }
+
+            crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%s:%d)", temp_sp, fname, line);
         }
     }
 }

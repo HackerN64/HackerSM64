@@ -401,7 +401,7 @@ char *find_function_in_stack(u32 *sp, int *line) {
     char *ret = NULL;
     u32 val = *sp;
 
-    #define CALLSITE_OFFSET 0
+    #define CALLSITE_OFFSET 8
     for (int i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
         val = *sp;
         val = *(u32 *)val;
