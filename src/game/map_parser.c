@@ -833,9 +833,9 @@ char *search_symbol(void *vaddr, int *line) {
         u32 addr = (u32)vaddr;
         int idx = 0;
         addrtable_entry_t a = symt_addrtab_search(&symt, addr, &idx);
-        while (!ADDRENTRY_IS_FUNC(a)) {
-            a = symt_addrtab_entry(&symt, --idx);
-        }
+        // while (!ADDRENTRY_IS_FUNC(a)) {
+        //     a = symt_addrtab_entry(&symt, --idx);
+        // }
 
         symtable_entry_t ALIGNED16 entry;
         // Read the symbol name

@@ -16,6 +16,8 @@
 
 #include "printf.h"
 
+extern char *strstr(char *, char *);
+extern char *search_symbol(u32 vaddr, int *line);
 extern void inspector_print_backtrace(void *bt, int n, int bt_skip);
 int backtrace(void **buffer, int size);
 
@@ -263,18 +265,17 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
     crash_screen_draw_rect(0, 20, 320, 240);
 
+    crash_screen_print(LEFT_MARGIN, 20, "Thread %d (%s)", thread->id, gCauseDesc[cause]);
+
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
         crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
     }
 
-    char *search_symbol(u32 vaddr, int *line);
-
     int line = -1;
     char *t = search_symbol(tc->pc, &line);
-
-    crash_screen_print(LEFT_MARGIN, 60, t);
-    crash_screen_print(LEFT_MARGIN, 72, "Line %d", line);
+    crash_screen_print(LEFT_MARGIN, 60, "File: %s", t+1);
+    crash_screen_print(LEFT_MARGIN, 72, "Address: 0x%08X", tc->pc);
 
 }
 
@@ -376,9 +377,16 @@ void draw_disasm(OSThread *thread) {
 
         char *disasm = insn_disasm(addr, (addr == tc->pc));
         if (disasm[0] == 0) {
-            crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%08X", addr);
+            crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
-            crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%s", disasm);
+            if (strstr(disasm, "j")) {
+                int line = -1;
+                search_symbol(addr, &line);
+                if (line != -1) {
+                    crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", line);
+                }
+            }
+            crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%s", disasm);
         }
 
     }

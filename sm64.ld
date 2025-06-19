@@ -534,16 +534,7 @@ SECTIONS
    /* DWARF debug sections.
       Symbols in the DWARF debugging sections are relative to the beginning
       of the section so we begin them at 0.  */
-   .eh_frame_hdr : { *(.eh_frame_hdr) }
-   .eh_frame : { 
-        __EH_FRAME_BEGIN__ = .; /* Define symbol for accessing eh_frame section */
-        KEEP (*(.eh_frame)) 
-    }
-   .gcc_except_table : { *(.gcc_except_table*) } 
-   .jcr : { KEEP (*(.jcr)) }
-   .debug_loclists 0 : { *(.debug_loclists) }
    .debug_rnglists 0 : { *(.debug_rnglists) }
-   .debug_line_str 0 : { *(.debug_line_str) }
    /* DWARF 1 */
    .debug          0 : { *(.debug) }
    .line           0 : { *(.line) }
