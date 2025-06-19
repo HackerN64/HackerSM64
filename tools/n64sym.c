@@ -16,6 +16,7 @@ bool flag_verbose = false;
 int flag_max_sym_len = 64;
 bool flag_inlines = true;
 const char *n64_inst = NULL;
+const char *cross_prefix = NULL;
 
 // Printf if verbose
 void verbose(const char *fmt, ...) {
@@ -34,11 +35,12 @@ void usage(const char *progname)
     fprintf(stderr, "Usage: %s [flags] <program.elf> [<program.sym>]\n", progname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Command-line flags:\n");
+    fprintf(stderr, "   -c/--cross <triple>   Cross compilation toolchain (e.g. `mips-linux-gnu-`)\n");
     fprintf(stderr, "   -v/--verbose          Verbose output\n");
     fprintf(stderr, "   -m/--max-len <N>      Maximum symbol length (default: 64)\n");
     fprintf(stderr, "   --no-inlines          Do not export inlined symbols\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "This program requires a libdragon toolchain installed in $N64_INST.\n");
+    // fprintf(stderr, "This program requires a libdragon toolchain installed in $N64_INST.\n");
 }
 
 char *stringtable = NULL;
@@ -109,7 +111,7 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
             cur_elf = NULL; addr2line_r = addr2line_w = NULL;
         }
         if (!addrbin)
-            asprintf(&addrbin, "%s/bin/mips64-elf-addr2line", n64_inst);
+            asprintf(&addrbin, "/usr/bin/%saddr2line", cross_prefix);
 
         const char *cmd_addr[16] = {0}; int i = 0;
         cmd_addr[i++] = addrbin;
@@ -163,6 +165,14 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
         assert(ret != -1);
         char *colon = strrchr(line_buf, ':');
         char *file = strndup(line_buf, colon - line_buf);
+        char *backup = file;
+        file = strstr(file, "/src/");
+        if (file == NULL) {
+            file = strstr(backup, "/asm/");
+            if (file == NULL) {
+                file = backup;
+            }
+        }
         int line = atoi(colon + 1);
 
         // Add the callsite to the list
@@ -190,7 +200,7 @@ bool elf_find_callsites(const char *elf)
 {
     // Start objdump to parse the disassembly of the ELF file
     char *cmd = NULL;
-    asprintf(&cmd, "%s/bin/mips64-elf-objdump -d %s", n64_inst, elf);
+    asprintf(&cmd, "/usr/bin/%sobjdump -d %s", cross_prefix, elf);
     verbose("Running: %s\n", cmd);
     FILE *disasm = popen(cmd, "r");
     if (!disasm) {
@@ -375,6 +385,12 @@ int main(int argc, char *argv[])
                 return 1;
             }
             flag_max_sym_len = atoi(argv[i]);
+        } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--cross")) {
+            if (++i == argc) {
+                fprintf(stderr, "missing argument for %s\n", argv[i-1]);
+                return 1;
+            }
+            cross_prefix = argv[i];
         } else {
             fprintf(stderr, "invalid flag: %s\n", argv[i]);
             return 1;
@@ -383,15 +399,6 @@ int main(int argc, char *argv[])
 
     if (i == argc) {
         fprintf(stderr, "missing input filename\n");
-        return 1;
-    }
-
-    // Find n64 installation directory
-    n64_inst = n64_toolchain_dir();
-    if (!n64_inst) {
-        // Do not mention N64_GCCPREFIX in the error message, since it is
-        // a seldom used configuration.
-        fprintf(stderr, "Error: N64_INST environment variable not set\n");
         return 1;
     }
 

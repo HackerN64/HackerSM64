@@ -541,6 +541,9 @@ SECTIONS
     }
    .gcc_except_table : { *(.gcc_except_table*) } 
    .jcr : { KEEP (*(.jcr)) }
+   .debug_loclists 0 : { *(.debug_loclists) }
+   .debug_rnglists 0 : { *(.debug_rnglists) }
+   .debug_line_str 0 : { *(.debug_line_str) }
    /* DWARF 1 */
    .debug          0 : { *(.debug) }
    .line           0 : { *(.line) }

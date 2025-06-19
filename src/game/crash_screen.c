@@ -16,6 +16,9 @@
 
 #include "printf.h"
 
+extern void inspector_print_backtrace(void *bt, int n, int bt_skip);
+int backtrace(void **buffer, int size);
+
 // Configurable Defines
 #define X_KERNING 6
 #define GLYPH_WIDTH 8
@@ -24,6 +27,7 @@
 #define LEFT_MARGIN 10 // for crash screen prints
 
 enum crashPages {
+    PAGE_SIMPLE,
     PAGE_CONTEXT,
 #ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
@@ -35,6 +39,7 @@ enum crashPages {
 };
 
 char *crashPageNames[] = {
+    [PAGE_SIMPLE] = "(Overview)",
     [PAGE_CONTEXT] = "(Context)",
 #ifdef PUPPYPRINT_DEBUG
     [PAGE_LOG] = "(Log)",
@@ -253,6 +258,26 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     }
 }
 
+void draw_crash_overview(OSThread *thread, s32 cause) {
+    __OSThreadContext *tc = &thread->context;
+
+    crash_screen_draw_rect(0, 20, 320, 240);
+
+    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
+        char *fname = parse_map(tc->pc);
+        crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
+    }
+
+    char *search_symbol(u32 vaddr, int *line);
+
+    int line = -1;
+    char *t = search_symbol(tc->pc, &line);
+
+    crash_screen_print(LEFT_MARGIN, 60, t);
+    crash_screen_print(LEFT_MARGIN, 72, "Line %d", line);
+
+}
+
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
     crash_screen_draw_rect(0, 20, 320, 240);
@@ -312,10 +337,6 @@ void draw_crash_log(void) {
 #undef LINE_HEIGHT
 }
 #endif
-
-
-extern void inspector_print_backtrace(void *bt, int n, int bt_skip);
-int backtrace(void **buffer, int size);
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
@@ -419,6 +440,7 @@ void draw_crash_screen(OSThread *thread) {
         crash_screen_draw_rect(0, 0, 320, 20);
         crash_screen_print(LEFT_MARGIN, 5, "Page:%02d %-22s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
+            case PAGE_SIMPLE:     draw_crash_overview(thread, cause); break;
             case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
 #ifdef PUPPYPRINT_DEBUG
             case PAGE_LOG: 		  draw_crash_log(); break;

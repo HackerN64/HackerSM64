@@ -361,7 +361,6 @@ static char* symt_entry_file(symtable_header_t *symt, symtable_entry_t *entry, u
     return symt_string(symt, entry->file_sidx, entry->file_len, buf, size);
 }
 
-symtable_entry_t ALIGNED16 entry;
 char* __symbolize(void *vaddr, char *buf, int size) {
     symtable_header_t symt = symt_open(vaddr);
     if (symt.head[0]) {
@@ -372,6 +371,7 @@ char* __symbolize(void *vaddr, char *buf, int size) {
             a = symt_addrtab_entry(&symt, --idx);
         }
 
+        symtable_entry_t ALIGNED16 entry;
         // Read the symbol name
         symt_entry_fetch(&symt, &entry, idx);
         char *func = symt_entry_func(&symt, &entry, addr, buf, size-12);
@@ -576,9 +576,11 @@ static void backtrace_foreach(void (*cb)(void *arg, void *ptr), void *arg, u32 *
             return;
 
         #if 1
-        osSyncPrintf("backtrace: %s, ra=%p, sp=%p, fp=%p ra_offset=%d, fp_offset=%d, stack_size=%d\n", 
+        char debug[200];
+        sprintf(debug, "backtrace: %s, ra=%p, sp=%p, fp=%p ra_offset=%d, fp_offset=%d, stack_size=%d\n", 
             func.type == BT_FUNCTION ? "BT_FUNCTION" : (func.type == BT_EXCEPTION ? "BT_EXCEPTION" : (func.type == BT_FUNCTION_FRAMEPOINTER ? "BT_FRAMEPOINTER" : "BT_LEAF")),
             ra, sp, fp, func.ra_offset, func.fp_offset, func.stack_size);
+        osSyncPrintf(debug);
         #endif
 
         switch (func.type) {
@@ -821,6 +823,32 @@ void backtrace_frame_print_compact(backtrace_frame_t *frame, char *out, int widt
     if (frame->func == UNKNOWN_SYMBOL || source_file == UNKNOWN_SYMBOL)
         out += sprintf(out, "[0x%08lx]", frame->addr);
     // out += sprintf(out, "\n");
+}
+
+char *search_symbol(void *vaddr, int *line) {
+    static char filebuf[100];
+
+    symtable_header_t symt = symt_open(vaddr);
+    if (symt.head[0]) {
+        u32 addr = (u32)vaddr;
+        int idx = 0;
+        addrtable_entry_t a = symt_addrtab_search(&symt, addr, &idx);
+        while (!ADDRENTRY_IS_FUNC(a)) {
+            a = symt_addrtab_entry(&symt, --idx);
+        }
+
+        symtable_entry_t ALIGNED16 entry;
+        // Read the symbol name
+
+        filebuf[0] = 0;
+        symt_entry_fetch(&symt, &entry, idx);
+        *line = entry.line;
+        char *file = symt_entry_file(&symt, &entry, addr, filebuf, 100);
+        // char *ret = file;
+        // file += sprintf(file, ":%d", entry.line);
+        return file;
+    }
+    return UNKNOWN_SYMBOL;
 }
 
 

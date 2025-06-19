@@ -958,7 +958,7 @@ $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 
 $(BUILD_DIR)/asm/debug/map.o: $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Assembling:,$<,$@)
-	$(V)tools/n64sym $(BUILD_DIR)/sm64_prelim.elf
+	$(V)tools/n64sym --cross $(CROSS) $(BUILD_DIR)/sm64_prelim.elf
 	$(LD) -r -b binary -o $@ $(BUILD_DIR)/sm64_prelim.sym
 
 # Link SM64 ELF file
