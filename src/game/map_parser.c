@@ -9,6 +9,7 @@
 #include "cop0.h"
 
 extern u32 strstr(char *, char *);
+char *search_symbol(void *vaddr, int *line);
 
 /**
  * @brief Exception codes
@@ -396,23 +397,36 @@ char *get_filename(u32 addr) {
     return file_name;
 }
 
-char *find_function_in_stack(u32 *sp) {
+char *find_function_in_stack(u32 *sp, int *line) {
+    char *ret = NULL;
+    u32 val = *sp;
+
+    #define CALLSITE_OFFSET 0
     for (int i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        u32 val = *sp;
+        val = *sp;
         val = *(u32 *)val;
         *sp += 4;
 
+
         if ((val >= (u32)_mainSegmentStart) && (val <= (u32)_mainSegmentTextEnd)) {
-            return parse_map(val);
+            ret = parse_map(val + CALLSITE_OFFSET);
+            break;
         }
         else if ((val >= (u32)_engineSegmentStart) && (val <= (u32)_engineSegmentTextEnd)) {
-            return parse_map(val);
+            ret = parse_map(val + CALLSITE_OFFSET);
+            break;
         }
         else if ((val >= (u32)_goddardSegmentStart) && (val <= (u32)_goddardSegmentTextEnd)) {
-            return parse_map(val);
+            ret = parse_map(val + CALLSITE_OFFSET);
+            break;
         }
     }
-    return NULL;
+
+    if (ret) {
+        search_symbol((void*)(val + CALLSITE_OFFSET), line);
+    }
+
+    return ret;
 }
 
 

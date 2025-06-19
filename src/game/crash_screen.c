@@ -102,7 +102,7 @@ char *gFpcsrDesc[6] = {
 extern u64 osClockRate;
 extern far char *parse_map(u32 pc);
 extern far void map_data_init(void);
-extern far char *find_function_in_stack(u32 *sp);
+extern far char *find_function_in_stack(u32 *sp, int *line);
 
 struct {
     OSThread thread;
@@ -270,13 +270,17 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
         crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
+
+        int line = -1;
+        char *t = search_symbol(tc->pc, &line);
+        if (line != -1) {
+            crash_screen_print(LEFT_MARGIN, 60, "File: %s", t+1);
+        }
     }
 
-    int line = -1;
-    char *t = search_symbol(tc->pc, &line);
-    crash_screen_print(LEFT_MARGIN, 60, "File: %s", t+1);
     crash_screen_print(LEFT_MARGIN, 72, "Address: 0x%08X", tc->pc);
 
+    // do a lil backtrace
 }
 
 void draw_crash_context(OSThread *thread, s32 cause) {
@@ -343,19 +347,33 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
 
-    crash_screen_draw_rect(0, 20, 320, 210);
-    crash_screen_print(LEFT_MARGIN, 25, "Backtrace from %08X:", temp_sp);
+    crash_screen_draw_rect(0, 20, 320, 240);
+    crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", temp_sp);
+    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
+        crash_screen_print(LEFT_MARGIN, 35, "Curr Func: None");
+    } else {
+        crash_screen_print(LEFT_MARGIN, 35, "Curr Func: %s", parse_map(tc->pc));
+    }
 
     osWritebackDCacheAll();
-    if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-        crash_screen_print(LEFT_MARGIN, (45), "STACK TRACE DISABLED");
-    } else {
-        #define LINE_COUNT 10
-        void *lines[LINE_COUNT];
-        int bt_skip = 0; // how many frames to skip
-        backtrace(lines, LINE_COUNT);
 
-        inspector_print_backtrace(lines, LINE_COUNT, bt_skip);
+    for (int i = 0; i < 18; i++) {
+        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+            crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "Stack Trace Disabled");
+            break;
+        } else {
+            if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+                return;
+            }
+
+            int line = -1;
+            char *fname = find_function_in_stack(&temp_sp, &line);
+            if ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
+                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%08X)", temp_sp, *(u32*)temp_sp);
+            } else {
+                crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%s:%d)", temp_sp, fname, line);
+            }
+        }
     }
 }
 
