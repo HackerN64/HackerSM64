@@ -90,6 +90,8 @@ static long long s_wait_end;
 static long long s_offset = 0ll;
 static int s_tod_offset = 0;
 
+static librtc_bool s_exec_on_write_bug = false;
+
 __attribute__((always_inline))
 static inline void librtc_zero_words( unsigned int *addr, unsigned int numWords ) {
 	for( unsigned int i = 0; i < numWords; i++ ) addr[i] = 0u;
@@ -149,6 +151,33 @@ static inline void __attribute__((always_inline)) si_wait_safe( librtc_bool yiel
 	}
 }
 
+__attribute__((always_inline))
+static inline void librtc_sanitize_saved_pif_ram() {
+	unsigned char *p = (unsigned char*)s_si_backup;
+	unsigned char *const end = p + 63;
+
+	while( p < end ) {
+		const unsigned char tx = *p;
+		if( tx == 0xfe ) break;
+
+		if( tx == 0 || tx >= 0xfd ) {
+			p++;
+			continue;
+		}
+
+		p++;
+
+		if( p >= end ) break;
+		*p &= 0x3f; // clear response status flags from output length byte
+
+		p += *p;
+		p += tx;
+		p++;
+	}
+
+	*end |= 1; // allow joybus to re-parse the command buffer
+}
+
 static void librtc_pif_save() {
 	s_prev_dma_addr = *((volatile unsigned int*)0xa4800000u);
 
@@ -160,8 +189,15 @@ static void librtc_pif_save() {
 	for( int i = 0; i < 16; i++ ) {
 		s_si_backup[i] = si_pif_ram[i];
 	}
-	
-	s_si_backup[15] |= 1u;
+
+	if( s_exec_on_write_bug ) {
+		// The emulator incorrectly executes the joybus on a DMA write instead of a read
+		// Clear the command register so it doesn't execute again
+		s_si_backup[15] &= 0xffffff00u;
+	} else {
+		asm volatile( "":::"memory" );
+		librtc_sanitize_saved_pif_ram();
+	}
 }
 
 static void librtc_pif_restore() {
@@ -175,11 +211,11 @@ static void librtc_pif_restore() {
 	*((volatile unsigned int*)0xa4800010u) = 0x1fc007c0u;
 	asm volatile( "":::"memory" );
 	si_await_op();
-	
+
 	*((volatile unsigned int*)0xa4800000u) = s_prev_dma_addr;
 }
 
-static void librtc_send_cmd() {
+static void librtc_dma_write() {
 	__builtin_mips_cache( 0x19, &s_si_buffer[0] );
 	__builtin_mips_cache( 0x19, &s_si_buffer[4] );
 	__builtin_mips_cache( 0x19, &s_si_buffer[8] );
@@ -191,7 +227,9 @@ static void librtc_send_cmd() {
 	asm volatile( "":::"memory" );
 
 	si_await_op();
+}
 
+static void librtc_dma_read() {
 	*((volatile unsigned int*)0xa4800000u) = (unsigned int)s_si_buffer & 0x1FFFFFFFu;
 	asm volatile( "":::"memory" );
 	*((volatile unsigned int*)0xa4800004u) = 0x1fc007c0u;
@@ -203,6 +241,12 @@ static void librtc_send_cmd() {
 	__builtin_mips_cache( 0x11, &s_si_buffer[4] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[8] );
 	__builtin_mips_cache( 0x11, &s_si_buffer[12] );
+}
+
+__attribute__((always_inline))
+static inline void librtc_exec() {
+	librtc_dma_write();
+	librtc_dma_read();
 }
 
 static inline unsigned char decode_rtc_byte( unsigned char x ) {
@@ -287,7 +331,18 @@ librtc_bool librtc_init() {
 	s_si_buffer[2] = 0xfffffffeu;
 	librtc_zero_words( &s_si_buffer[3], 12 );
 	s_si_buffer[15] = 1u;
-	librtc_send_cmd();
+	librtc_dma_write();
+
+	if(
+		*((volatile unsigned char*)0xbfc007c6u) != 0x03 ||
+		*((volatile unsigned char*)0xbfc007c8u) != 0xff
+	) {
+		// On hardware (and accurate emulators such as Ares), writing to the joybus merely causes it to parse the command.
+		// The commands are not actually executed until a DMA read is performed. So only the final byte should have changed.
+		s_exec_on_write_bug = true;
+	}
+
+	librtc_dma_read();
 
 	if( s_si_buffer[2] >> 8 != 0x001000u ) {
 		librtc_pif_restore();
@@ -304,13 +359,13 @@ librtc_bool librtc_init() {
 	s_si_buffer[4] = 0x00fe0000u;
 	librtc_zero_words( &s_si_buffer[5], 10 );
 	s_si_buffer[15] = 1u;
-	librtc_send_cmd();
+	librtc_exec();
 
 	s_si_buffer[1] = 0x0a010800u;
 	s_si_buffer[2] = 0x03000000u;
 	s_si_buffer[4] = 0x00fe0000u;
 	s_si_buffer[15] = 1u;
-	librtc_send_cmd();
+	librtc_exec();
 
 	s_wait_start = librtc_clock();
 	s_wait_end = s_wait_start + (LIBRTC_CLOCKS_PER_SEC / 50u);
@@ -370,7 +425,7 @@ librtc_bool librtc_get_time_raw( librtc_time *tm ) {
 	s_si_buffer[4] = 0x80fe0000u;
 	librtc_zero_words( &s_si_buffer[5], 10 );
 	s_si_buffer[15] = 1u;
-	librtc_send_cmd();
+	librtc_exec();
 
 	const unsigned char *const data = (const unsigned char*)&s_si_buffer[2];
 	tm->tm_sec = (int)decode_rtc_byte( data[0] );
