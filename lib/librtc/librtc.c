@@ -151,33 +151,6 @@ static inline void __attribute__((always_inline)) si_wait_safe( librtc_bool yiel
 	}
 }
 
-__attribute__((always_inline))
-static inline void librtc_sanitize_saved_pif_ram() {
-	unsigned char *p = (unsigned char*)s_si_backup;
-	unsigned char *const end = p + 63;
-
-	while( p < end ) {
-		const unsigned char tx = *p;
-		if( tx == 0xfe ) break;
-
-		if( tx == 0 || tx >= 0xfd ) {
-			p++;
-			continue;
-		}
-
-		p++;
-
-		if( p >= end ) break;
-		*p &= 0x3f; // clear response status flags from output length byte
-
-		p += *p;
-		p += tx;
-		p++;
-	}
-
-	*end |= 1; // allow joybus to re-parse the command buffer
-}
-
 static void librtc_pif_save() {
 	s_prev_dma_addr = *((volatile unsigned int*)0xa4800000u);
 
@@ -195,8 +168,8 @@ static void librtc_pif_save() {
 		// Clear the command register so it doesn't execute again
 		s_si_backup[15] &= 0xffffff00u;
 	} else {
-		asm volatile( "":::"memory" );
-		librtc_sanitize_saved_pif_ram();
+		// Re-parse the stored PIF RAM state
+		s_si_backup[15] |= 1u;
 	}
 }
 
