@@ -4,17 +4,16 @@
 #include <string.h>
 #include "buffers/framebuffers.h"
 #include "types.h"
-#include "puppyprint.h"
+#include "game/puppyprint.h"
 #include "audio/external.h"
 #include "farcall.h"
-#include "game_init.h"
-#include "main.h"
-#include "debug.h"
-#include "rumble_init.h"
+#include "game/game_init.h"
+#include "game/main.h"
+#include "game/debug.h"
+#include "game/rumble_init.h"
+#include "game/printf.h"
 
 #include "sm64.h"
-
-#include "printf.h"
 
 extern char *strstr(char *, char *);
 extern char *search_symbol(u32 vaddr, int *line);
@@ -399,7 +398,7 @@ void draw_disasm(OSThread *thread) {
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
-            if (strstr(disasm, "j")) {
+            if (disasm[0] == 'j') {
                 int line = -1;
                 search_symbol(addr, &line);
                 if (line != -1) {

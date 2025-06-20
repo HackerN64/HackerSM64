@@ -184,6 +184,6 @@ char *symt_entry_func(symtable_header_t *symt, symtable_entry_t *entry, u32 addr
 }
 
 // Fetch the file name of an entry
-char *symt_entry_file(symtable_header_t *symt, symtable_entry_t *entry, u32 addr, char *buf, int size) {
+char *symt_entry_file(symtable_header_t *symt, symtable_entry_t *entry, char *buf, int size) {
     return symt_string(symt, entry->file_sidx, entry->file_len, buf, size);
 }

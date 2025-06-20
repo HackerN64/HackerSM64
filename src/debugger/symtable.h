@@ -73,4 +73,4 @@ addrtable_entry_t symt_addrtab_search(symtable_header_t *symt, u32 addr, int *id
 char *symt_string(symtable_header_t *symt, int sidx, int slen, char *buf, int size);
 void symt_entry_fetch(symtable_header_t *symt, symtable_entry_t *entry, int idx);
 char *symt_entry_func(symtable_header_t *symt, symtable_entry_t *entry, u32 addr, char *buf, int size);
-char *symt_entry_file(symtable_header_t *symt, symtable_entry_t *entry, u32 addr, char *buf, int size);
+char *symt_entry_file(symtable_header_t *symt, symtable_entry_t *entry, char *buf, int size);

@@ -95,7 +95,7 @@ char *search_symbol(void *vaddr, int *line) {
         filebuf[0] = 0;
         symt_entry_fetch(&symt, &entry, idx);
         *line = entry.line;
-        char *file = symt_entry_file(&symt, &entry, addr, filebuf, sizeof(filebuf));
+        char *file = symt_entry_file(&symt, &entry, filebuf, sizeof(filebuf));
         return file;
     }
     return UNKNOWN_SYMBOL;
