@@ -290,7 +290,7 @@ char *insn_disasm(InsnData *addr) {
                     }
                     break;
                 case PARAM_JUMP:
-                    target = 0x80000000 | (insn.d & 0x0FFFFFFF);
+                    target = 0x80000000 | (insn.d & 0x03FFFFFF);
                     strp += sprintf(strp, "%-9s %08X", insn_db[i].name,
                                                        target
                     );

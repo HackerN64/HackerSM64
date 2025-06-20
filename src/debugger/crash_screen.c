@@ -112,6 +112,15 @@ struct {
     u16 height;
 } gCrashScreen;
 
+static u16 gCrashScreenColor = 0xFFFF;
+
+static void set_text_color(u32 r, u32 g, u32 b) {
+    gCrashScreenColor = GPACK_RGBA5551(r, g, b, 255);
+}
+static void reset_text_color(void) {
+    gCrashScreenColor = 0xFFFF;
+}
+
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     u16 *ptr;
     s32 i, j;
@@ -139,15 +148,16 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
 
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
 
+    u16 color = gCrashScreenColor;
+
     for (i = 0; i < GLYPH_HEIGHT; i++) {
         bit = 0x80000000U >> ((glyph >> 4) * GLYPH_WIDTH);
         rowMask = *data++;
         data ++;
 
         for (j = 0; j < (GLYPH_WIDTH); j++) {
-            // *ptr++ = (bit & rowMask) ? 0xFFFF : 1;
             if (bit & rowMask) {
-                *ptr = 0xFFFF;
+                *ptr = color;
             }
             ptr++;
             bit >>= 1;
@@ -404,6 +414,11 @@ void draw_disasm(OSThread *thread) {
         u32 addr = (sProgramPosition + (i * 4));
 
         char *disasm = insn_disasm((InsnData *)addr);
+
+        if (addr == tc->pc) {
+            set_text_color(255, 0, 0);
+        }
+
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
@@ -421,6 +436,7 @@ void draw_disasm(OSThread *thread) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%s", disasm);
         }
 
+        reset_text_color();
     }
 
     osWritebackDCacheAll();
