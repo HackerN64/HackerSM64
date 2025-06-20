@@ -95,10 +95,11 @@ FIXLIGHTS ?= 1
 # Export symbols and stack trace data for crash screen
 DEBUG_EXPORT_SYMBOLS_FLAG := -D DEBUG_EXPORT_SYMBOLS
 # Include line data, at the cost of a significantly longer link time
-# DEBUG_EXPORT_ALL_LINES := -D DEBUG_EXPORT_ALL_LINES
+DEBUG_EXPORT_ALL_LINES := 1
 
-ifneq ($(DEBUG_EXPORT_ALL_LINES),)
+ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
 	DEBUG_EXPORT_ALL_LINES_FLAG += --all-lines
+	DEFINES += DEBUG_EXPORT_ALL_LINES=1
 endif
 
 TARGET := sm64

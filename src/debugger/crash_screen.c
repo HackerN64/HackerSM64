@@ -415,9 +415,6 @@ void draw_disasm(OSThread *thread) {
 
         char *disasm = insn_disasm((InsnData *)addr);
 
-        if (addr == tc->pc) {
-            set_text_color(255, 0, 0);
-        }
 
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
@@ -428,17 +425,24 @@ void draw_disasm(OSThread *thread) {
                 int line = -1;
                 search_symbol(addr, &line);
                 if (line != -1) {
+                    set_text_color(200, 200, 200);
                     crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", line);
+                    reset_text_color();
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
             }
 #endif // DEBUG_EXPORT_ALL_LINES
+            if (addr == tc->pc) {
+                set_text_color(255, 0, 0);
+            } else {
+                reset_text_color();
+            }
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%s", disasm);
         }
 
-        reset_text_color();
     }
 
+    reset_text_color();
     osWritebackDCacheAll();
 }
 
