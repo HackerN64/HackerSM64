@@ -78,18 +78,21 @@ char *find_function_in_stack(u32 *sp, int *line) {
     }
 
     if (ret) {
-        search_symbol(val + CALLSITE_OFFSET, line);
+        symtable_info_t info = get_symbol_info(val + CALLSITE_OFFSET);
+        *line = info.line;
     }
 
     return ret;
 }
 
-char *search_symbol(u32 addr, int *line) {
+symtable_info_t get_symbol_info(u32 addr) {
     static char filebuf[100];
     void *vaddr = (void *)addr;
-
     symtable_header_t symt = symt_open();
+
+
     if (symt.head[0]) {
+        symtable_info_t info;
         u32 addr = (u32)vaddr;
         int idx = 0;
         symt_addrtab_search(&symt, addr, &idx);
@@ -99,9 +102,12 @@ char *search_symbol(u32 addr, int *line) {
         // Read the symbol name
         filebuf[0] = 0;
         symt_entry_fetch(&symt, &entry, idx);
-        *line = entry.line;
-        char *file = symt_entry_file(&symt, &entry, filebuf, sizeof(filebuf));
-        return file;
+        info.line = entry.line;
+        info.func_offset = entry.func_off;
+        info.file = symt_entry_file(&symt, &entry, filebuf, sizeof(filebuf));
+        info.func = parse_map(addr, TRUE);
+
+        return info;
     }
-    return UNKNOWN_SYMBOL;
+    return (symtable_info_t){.line = -1};
 }

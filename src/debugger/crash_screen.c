@@ -276,14 +276,15 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     crash_screen_print(LEFT_MARGIN, 20, "Thread %d (%s)", thread->id, gCauseDesc[cause]);
 
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->pc, TRUE);
-        crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
+        symtable_info_t info = get_symbol_info(tc->pc);
 
-        int line = -1;
-        char *t = search_symbol(tc->pc, &line);
-        if (line != -1) {
-            crash_screen_print(LEFT_MARGIN, 60, "File: %s", t);
-            crash_screen_print(LEFT_MARGIN, 72, "Line: %d", line);
+        crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", info.func == NULL ? "Unknown" : info.func);
+        if (info.line != -1) {
+            crash_screen_print(LEFT_MARGIN, 60, "File: %s", info.file);
+#ifndef DEBUG_EXPORT_ALL_LINES
+            // This line only shows the correct value if every line is in the sym file
+            crash_screen_print(LEFT_MARGIN, 72, "Line: %d", info.line);
+#endif // DEBUG_EXPORT_ALL_LINES
         }
     }
 
@@ -369,11 +370,9 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
         crash_screen_print(LEFT_MARGIN, 45, "0x%08X", tc->ra);
     } else {
         u32 ra = tc->ra;
-        int line = -1;
-        char *fname = parse_map(ra, FALSE);
+        symtable_info_t info = get_symbol_info(ra);
 
-        search_symbol(ra, &line);
-        crash_screen_print(LEFT_MARGIN, 45, "%08X (%s:%d)", ra, fname, line);
+        crash_screen_print(LEFT_MARGIN, 45, "%08X (%s:%d)", ra, info.func, info.line);
     }
 
     osWritebackDCacheAll();
@@ -419,15 +418,15 @@ void draw_disasm(OSThread *thread) {
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
+            symtable_info_t info = get_symbol_info(addr);
 #ifndef DEBUG_EXPORT_ALL_LINES
             // catch `jal` and `jalr` callsites
             if (disasm[0] == 'j' && disasm[1] == 'a') {
 #endif // DEBUG_EXPORT_ALL_LINES
-                int line = -1;
-                search_symbol(addr, &line);
-                if (line != -1) {
+
+                if (info.line != -1) {
                     set_text_color(200, 200, 200);
-                    crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", line);
+                    crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", info.line);
                     reset_text_color();
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
