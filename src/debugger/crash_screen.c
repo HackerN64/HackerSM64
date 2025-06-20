@@ -407,13 +407,17 @@ void draw_disasm(OSThread *thread) {
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
-            // if (disasm[0] == 'j') {
+#ifndef DEBUG_EXPORT_ALL_LINES
+            if (disasm[0] == 'j') {
+#endif // DEBUG_EXPORT_ALL_LINES
                 int line = -1;
                 search_symbol(addr, &line);
                 if (line != -1) {
                     crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", line);
                 }
-            // }
+#ifndef DEBUG_EXPORT_ALL_LINES
+            }
+#endif // DEBUG_EXPORT_ALL_LINES
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%s", disasm);
         }
 
