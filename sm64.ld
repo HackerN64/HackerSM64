@@ -146,7 +146,7 @@ SECTIONS
 #endif
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
-#ifndef DEBUG_MAP_STACKTRACE
+#ifndef DEBUG_EXPORT_SYMBOLS
       _mapDataSegmentRomStart = 0;
 #endif
 
@@ -164,6 +164,7 @@ SECTIONS
       BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
+      BUILD_DIR/src/debugger*.o(.text*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.text*);
 #endif
@@ -187,6 +188,7 @@ SECTIONS
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
+      BUILD_DIR/src/debugger*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
 #endif
@@ -206,6 +208,7 @@ SECTIONS
       BUILD_DIR/src/boot*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
+      BUILD_DIR/src/debugger*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.rodata*);
 #endif
@@ -226,6 +229,7 @@ SECTIONS
       BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
+      BUILD_DIR/src/debugger*.o(.*bss*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*bss*);
 #endif
@@ -525,9 +529,9 @@ SECTIONS
 	END_SEG(capcom)
 #endif
 
-#ifdef DEBUG_MAP_STACKTRACE
+#ifdef DEBUG_EXPORT_SYMBOLS
    BEGIN_SEG(mapData, (RAM_END - 0x00100000)) ALIGN(16) {
-      KEEP(BUILD_DIR/asm/debug/map.o(.data*));
+      KEEP(BUILD_DIR/sm64.sym.o(.data*));
    }
    END_SEG(mapData)
 #endif

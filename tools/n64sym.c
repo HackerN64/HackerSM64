@@ -16,6 +16,7 @@
 bool flag_verbose = false;
 int flag_max_sym_len = 64;
 bool flag_inlines = true;
+bool flag_all_lines = false;
 const char *n64_inst = NULL;
 const char *cross_prefix = NULL;
 
@@ -39,6 +40,7 @@ void usage(const char *progname)
     fprintf(stderr, "   -c/--cross <triple>   Cross compilation toolchain (e.g. `mips-linux-gnu-`)\n");
     fprintf(stderr, "   -v/--verbose          Verbose output\n");
     fprintf(stderr, "   -m/--max-len <N>      Maximum symbol length (default: 64)\n");
+    fprintf(stderr, "   -a/--all-lines        Generate full address->line info (Can take seconds on its own)\n");
     fprintf(stderr, "   --no-inlines          Do not export inlined symbols\n");
     fprintf(stderr, "\n");
     // fprintf(stderr, "This program requires a libdragon toolchain installed in $N64_INST.\n");
@@ -199,7 +201,7 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
     getline(&line_buf, &line_buf_size, addr2line_r);
 }
 
-void line_add(const char *elf, uint32_t addr) {
+void address_add(const char *elf, uint32_t addr) {
     // We keep one addr2line process open for the last ELF file we processed.
     // This allows to convert multiple symbols very fast, avoiding spawning a
     // new process for each symbol.
@@ -289,7 +291,6 @@ void line_add(const char *elf, uint32_t addr) {
 
         // Add the addr to the list, only if that line entry doesn't already exist
         if (stbds_shgetp_null(linedb, fileline_key) == NULL) {
-            verbose("New line: %d\n", line);
             stbds_arrput(symtable, ((struct symtable_s) {
                 .uuid = stbds_arrlen(symtable),
                 .addr = addr,
@@ -346,12 +347,14 @@ bool elf_find_callsites(const char *elf)
                 symbol_add(elf, addr, false);
             }
         }
-        // See if adding every single text address is worth
-        if (line[8] == ':') {
-            uint32_t addr = strtoul(line, NULL, 16);
-            // Prevent segmented addresses for now
-            if ((addr & 0xFF000000) == 0x80000000) {
-                line_add(elf, addr);
+
+        if (flag_all_lines) {
+            if (line[8] == ':') {
+                uint32_t addr = strtoul(line, NULL, 16);
+                // Prevent segmented addresses for now
+                if ((addr & 0xFF000000) == 0x80000000) {
+                    address_add(elf, addr);
+                }
             }
         }
     }
@@ -500,6 +503,8 @@ int main(int argc, char *argv[])
             flag_verbose = true;
         } else if (!strcmp(argv[i], "--no-inlines")) {
             flag_inlines = false;
+        } else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--all-lines")) {
+            flag_all_lines = true;
         } else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--output")) {
             if (++i == argc) {
                 fprintf(stderr, "missing argument for %s\n", argv[i-1]);
