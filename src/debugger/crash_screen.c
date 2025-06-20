@@ -13,10 +13,12 @@
 #include "game/rumble_init.h"
 #include "game/printf.h"
 
+#include "map_parser.h"
+#include "disasm.h"
+
 #include "sm64.h"
 
 extern char *strstr(char *, char *);
-extern char *search_symbol(u32 vaddr, int *line);
 extern void inspector_print_backtrace(void *bt, int n, int bt_skip);
 int backtrace(void **buffer, int size);
 
@@ -99,9 +101,6 @@ char *gFpcsrDesc[6] = {
 
 
 extern u64 osClockRate;
-extern far char *parse_map(u32 pc);
-extern far void map_data_init(void);
-extern far char *find_function_in_stack(u32 *sp, int *line);
 
 struct {
     OSThread thread;
@@ -267,7 +266,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     crash_screen_print(LEFT_MARGIN, 20, "Thread %d (%s)", thread->id, gCauseDesc[cause]);
 
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->pc);
+        char *fname = parse_map(tc->pc, TRUE);
         crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
 
         int line = -1;
@@ -279,18 +278,16 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     }
 
     crash_screen_print(LEFT_MARGIN, 84, "Address: 0x%08X", tc->pc);
-
-    // do a lil backtrace
 }
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
     crash_screen_draw_rect(0, 20, 320, 240);
-    crash_screen_print(LEFT_MARGIN, 20, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
+    crash_screen_print(LEFT_MARGIN, 20, "Thread:%d (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_print(LEFT_MARGIN, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->pc);
+        char *fname = parse_map(tc->pc, TRUE);
         crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
     }
     crash_screen_print(LEFT_MARGIN,  52, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
@@ -304,7 +301,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(LEFT_MARGIN, 132, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
     crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->ra);
+        char *fname = parse_map(tc->ra, TRUE);
         crash_screen_print(LEFT_MARGIN, 152, "RA at: %s", fname);
     }
 
@@ -345,21 +342,35 @@ void draw_crash_log(void) {
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    u32 temp_sp = (tc->sp - 0x24);
+    u32 temp_sp = (tc->sp + 0x24);
 
     crash_screen_draw_rect(0, 20, 320, 240);
     crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", temp_sp);
+
+    // Current Func (EPC)
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
-        crash_screen_print(LEFT_MARGIN, 35, "Curr Func: None");
+        crash_screen_print(LEFT_MARGIN, 35, "%08X", tc->pc);
     } else {
-        crash_screen_print(LEFT_MARGIN, 35, "Curr Func: %s", parse_map(tc->pc));
+        crash_screen_print(LEFT_MARGIN, 35, "%08X (%s)", tc->pc, parse_map(tc->pc, TRUE));
+    }
+
+    // Previous Func (RA)
+    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
+        crash_screen_print(LEFT_MARGIN, 45, "0x%08X", tc->ra);
+    } else {
+        u32 ra = tc->ra;
+        int line = -1;
+        char *fname = parse_map(ra, FALSE);
+
+        search_symbol(ra, &line);
+        crash_screen_print(LEFT_MARGIN, 45, "%08X (%s:%d)", ra, fname, line);
     }
 
     osWritebackDCacheAll();
 
-    for (int i = 0; i < 18; i++) {
+    for (int i = 0; i < 17; i++) {
         if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "Stack Trace Disabled");
+            crash_screen_print(LEFT_MARGIN, (55 + (i * 10)), "Stack Trace Disabled");
             break;
         } else {
             if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
@@ -369,16 +380,14 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
             int line = -1;
             char *fname = find_function_in_stack(&temp_sp, &line);
             while ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
-                // crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%08X)", temp_sp, *(u32*)temp_sp);
                 fname = find_function_in_stack(&temp_sp, &line);
             }
 
-            crash_screen_print(LEFT_MARGIN, (45 + (i * 10)), "%08X (%s:%d)", temp_sp, fname, line);
+            crash_screen_print(LEFT_MARGIN, (55 + (i * 10)), "%08X (%s:%d)", temp_sp, fname, line);
         }
     }
 }
 
-extern char *insn_disasm(u32 insn, u32 isPC);
 static u32 sProgramPosition = 0;
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
@@ -394,17 +403,17 @@ void draw_disasm(OSThread *thread) {
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
 
-        char *disasm = insn_disasm(addr, (addr == tc->pc));
+        char *disasm = insn_disasm((InsnData *)addr);
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
-            if (disasm[0] == 'j') {
+            // if (disasm[0] == 'j') {
                 int line = -1;
                 search_symbol(addr, &line);
                 if (line != -1) {
                     crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", line);
                 }
-            }
+            // }
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%s", disasm);
         }
 
@@ -416,14 +425,14 @@ void draw_disasm(OSThread *thread) {
 void draw_assert(UNUSED OSThread *thread) {
     crash_screen_draw_rect(0, 20, 320, 210);
 
-    crash_screen_print(LEFT_MARGIN, 25, "ASSERT PAGE");
+    crash_screen_print(LEFT_MARGIN, 25, "Assert Page");
 
     if (__n64Assert_Filename != NULL) {
-        crash_screen_print(LEFT_MARGIN, 35, "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
-        crash_screen_print(LEFT_MARGIN, 55, "MESSAGE:");
+        crash_screen_print(LEFT_MARGIN, 35, "File: %s Line %d", __n64Assert_Filename, __n64Assert_LineNum);
+        crash_screen_print(LEFT_MARGIN, 55, "Message:");
         crash_screen_print(LEFT_MARGIN, 70, " %s", __n64Assert_Message);
     } else {
-        crash_screen_print(LEFT_MARGIN, 35, "no failed assert to report.");
+        crash_screen_print(LEFT_MARGIN, 35, "No failed assert to report.");
     }
 
     osWritebackDCacheAll();
@@ -448,13 +457,16 @@ void draw_crash_screen(OSThread *thread) {
         crashPage--;
         updateBuffer = TRUE;
     }
-    if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
-        sProgramPosition += 4;
-        updateBuffer = TRUE;
-    }
-    if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
-        sProgramPosition -= 4;
-        updateBuffer = TRUE;
+
+    if (crashPage == PAGE_DISASM) {
+        if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
+            sProgramPosition += 4;
+            updateBuffer = TRUE;
+        }
+        if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
+            sProgramPosition -= 4;
+            updateBuffer = TRUE;
+        }
     }
 
     if ((crashPage >= PAGE_COUNT) && (crashPage != 255)) {
@@ -515,9 +527,6 @@ void thread2_crash_screen(UNUSED void *arg) {
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {
-                // if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
-                //     map_data_init();
-                // }
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
                 stop_background_music(sBackgroundMusicQueue[0].seqId);

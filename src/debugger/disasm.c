@@ -5,6 +5,9 @@
 #include "macros.h"
 #include "farcall.h"
 #include "disasm.h"
+#include "map_parser.h"
+
+static char insn_as_string[100];
 
 InsnTemplate insn_db[] = {
     // We want instructions with opcodes first (prioritized)
@@ -278,7 +281,7 @@ char *insn_disasm(InsnData *addr) {
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
                     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
                         strp += sprintf(strp, "%-9s %s(%08X)", insn_db[i].name,
-                                                         parse_map(target), target
+                                                         parse_map(target, FALSE), target
                         );
                     } else {
                         strp += sprintf(strp, "%-9s %08X", insn_db[i].name,

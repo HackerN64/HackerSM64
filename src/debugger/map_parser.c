@@ -19,7 +19,7 @@ extern u8 _engineSegmentTextEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
-char* __symbolize(void *vaddr, char *buf, int size) {
+char* __symbolize(void *vaddr, char *buf, int size, u32 andOffset) {
     symtable_header_t symt = symt_open();
     if (symt.head[0]) {
         u32 addr = (u32)vaddr;
@@ -34,16 +34,20 @@ char* __symbolize(void *vaddr, char *buf, int size) {
         symt_entry_fetch(&symt, &entry, idx);
         char *func = symt_entry_func(&symt, &entry, addr, buf, size-12);
         char lbuf[12];
-        sprintf(lbuf, "+0x%lx", addr - ADDRENTRY_ADDR(a));
+        if (andOffset) {
+            sprintf(lbuf, "+0x%lx", addr - ADDRENTRY_ADDR(a));
+        } else {
+            lbuf[0] = 0;
+        }
         return strcat(func, lbuf);
     }
     sprintf(buf, "%s", UNKNOWN_SYMBOL);
     return buf;
 }
 
-char *parse_map(u32 addr) {
+char *parse_map(u32 addr, u32 andOffset) {
     static char map_name[64] ALIGNED16;
-    __symbolize((u32*)addr, map_name, sizeof(map_name));
+    __symbolize((u32*)addr, map_name, sizeof(map_name), andOffset);
 
     return map_name;
 }
@@ -60,28 +64,29 @@ char *find_function_in_stack(u32 *sp, int *line) {
 
 
         if ((val >= (u32)_mainSegmentStart) && (val <= (u32)_mainSegmentTextEnd)) {
-            ret = parse_map(val + CALLSITE_OFFSET);
+            ret = parse_map(val + CALLSITE_OFFSET, FALSE);
             break;
         }
         else if ((val >= (u32)_engineSegmentStart) && (val <= (u32)_engineSegmentTextEnd)) {
-            ret = parse_map(val + CALLSITE_OFFSET);
+            ret = parse_map(val + CALLSITE_OFFSET, FALSE);
             break;
         }
         else if ((val >= (u32)_goddardSegmentStart) && (val <= (u32)_goddardSegmentTextEnd)) {
-            ret = parse_map(val + CALLSITE_OFFSET);
+            ret = parse_map(val + CALLSITE_OFFSET, FALSE);
             break;
         }
     }
 
     if (ret) {
-        search_symbol((void*)(val + CALLSITE_OFFSET), line);
+        search_symbol(val + CALLSITE_OFFSET, line);
     }
 
     return ret;
 }
 
-char *search_symbol(void *vaddr, int *line) {
+char *search_symbol(u32 addr, int *line) {
     static char filebuf[100];
+    void *vaddr = (void *)addr;
 
     symtable_header_t symt = symt_open();
     if (symt.head[0]) {

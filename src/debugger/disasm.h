@@ -23,9 +23,6 @@ enum ParamTypes {
     PARAM_EMUX,
 };
 
-extern far char *parse_map(u32 pc);
-static char insn_as_string[100];
-
 typedef struct PACKED {
     u16 rd        : 5;
     u16 shift_amt : 5;
@@ -83,4 +80,6 @@ typedef struct PACKED {
 #define OP_COP0 0b010000
 #define OP_COP1 0b010001
 #define OP_BRANCH 0b000001 // technically "REGIMM"
+
+extern char *insn_disasm(InsnData *insn);
 
