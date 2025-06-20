@@ -4,90 +4,7 @@
 #include "sm64.h"
 #include "macros.h"
 #include "farcall.h"
-
-enum InsnTypes {
-    R_TYPE,
-    I_TYPE,
-    J_TYPE,
-    COP0,
-    COP1,
-};
-
-enum ParamTypes {
-    PARAM_NONE,
-    PARAM_SWAP_RS_IMM,
-    PARAM_BITSHIFT,
-    PARAM_FLOAT_RT,
-    PARAM_SWAP_RS_RT,
-    PARAM_JAL,
-    PARAM_JUMP,
-    PARAM_JR,
-    PARAM_LUI,
-    PARAM_MULT_MOVE,
-    PARAM_TRAP,
-    PARAM_EMUX,
-};
-
-extern far char *parse_map(u32 pc);
-static char insn_as_string[100];
-
-typedef struct PACKED {
-    u16 rd        : 5;
-    u16 shift_amt : 5;
-    u16 function  : 6;
-} RTypeData;
-
-typedef struct PACKED {
-    u16 opcode : 6;
-    u16 rs     : 5;
-    u16 rt     : 5;
-    union {
-        RTypeData rdata;
-        u16 immediate;
-    };
-} Insn;
-
-typedef struct PACKED {
-    u16 opcode : 6;
-    u16 fmt    : 5;
-    u16 ft     : 5;
-    u16 fs     : 5;
-    u16 fd     : 5;
-    u16 func   : 6;
-} CzInsn;
-
-typedef struct PACKED {
-    u16 regimm : 6;
-    u16 rs     : 5;
-    u16 sub    : 5;
-    u16 offset;
-} BranchInsn;
-
-typedef union {
-    Insn i;
-    CzInsn f;
-    BranchInsn b;
-    u32  d;
-} InsnData;
-
-typedef struct PACKED {
-    u32 type;
-    u32 arbitraryParam;
-    u16 opcode   : 6;
-    u16 function : 6;
-    u8 name[10];
-} InsnTemplate;
-
-typedef struct PACKED {
-    u32 type;
-    u32 arbitraryParam;
-    u16 function : 6;
-    u8 name[10];
-} COPzInsnTemplate;
-
-#define OP_COP0 0b010000
-#define OP_COP1 0b010001
-#define OP_BRANCH 0b000001 // technically "REGIMM"
+#include "disasm.h"
 
 InsnTemplate insn_db[] = {
     // We want instructions with opcodes first (prioritized)
@@ -221,7 +138,7 @@ char __mips_fpreg[][5] = {
 extern char* __symbolize(void *vaddr, char *buf, int size);
 
 // Last Resort C0/C1 disassembler, from libdragon
-static void c1_disasm(u32 *ptr, char *out, int n) {
+static void c1_disasm(u32 *ptr, char *out) {
     static const char *fpu_ops[64]= {
         "radd", "rsub", "rmul", "rdiv", "ssqrt", "sabs", "smov", "sneg",
         "sround.l", "strunc.l", "sceil.l", "sfloor.l", "sround.w", "strunc.w", "sceil.w", "sfloor.w",
@@ -292,15 +209,13 @@ static void c1_disasm(u32 *ptr, char *out, int n) {
     }
 }
 
-char *cop1_insn_disasm(InsnData *pc, u32 isPC) {
-    char *strp = &insn_as_string[0];
-    
-    c1_disasm((u32 *)pc, insn_as_string, 100);
+char *cop1_insn_disasm(InsnData *pc) {
+    c1_disasm((u32 *)pc, insn_as_string);
 
     return insn_as_string;
 }
 
-char *branch_insn_disasm(InsnData insn, u32 isPC) {
+char *branch_insn_disasm(InsnData insn) {
     static char *insn_names[] = {
         [0b00001] = "bgez",
         [0b00011] = "bgezl",
@@ -317,33 +232,29 @@ char *branch_insn_disasm(InsnData insn, u32 isPC) {
 
     for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
 
-    sprintf(strp, "%-9s %s %04X %s", insn_names[insn.b.sub], rs, offset, isPC ? "<-- CRASH" : "");
+    sprintf(strp, "%-9s %s %04X", insn_names[insn.b.sub], rs, offset);
 
     return insn_as_string;
 }
 
-char *insn_disasm(InsnData *addr, u32 isPC) {
+char *insn_disasm(InsnData *addr) {
     InsnData insn = *addr;
     char *strp = &insn_as_string[0];
     int successful_print = 0;
     u32 target;
 
     if (insn.d == 0) { // trivial case
-        if (isPC) {
-            return "nop <-- CRASH";
-        } else {
-            return "nop";
-        }
+        return "nop";
     }
 
     if (insn.i.opcode == OP_BRANCH) {
-        return branch_insn_disasm(insn, isPC);
+        return branch_insn_disasm(insn);
     }
     if (insn.i.opcode == OP_COP0) {
         return "cop0 (UNIMPL)";
     }
     if (insn.i.opcode == OP_COP1) {
-        return cop1_insn_disasm(addr, isPC);
+        return cop1_insn_disasm(addr);
     }
 
     for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
@@ -455,10 +366,6 @@ char *insn_disasm(InsnData *addr, u32 isPC) {
     }
     if (successful_print == 0) {
         strp += sprintf(strp, "unimpl %08X", insn.d);
-    }
-
-    if (isPC) {
-        sprintf(strp, " <-- CRASH");
     }
 
     return insn_as_string;
