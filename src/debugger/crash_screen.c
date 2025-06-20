@@ -420,7 +420,8 @@ void draw_disasm(OSThread *thread) {
             crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
         } else {
 #ifndef DEBUG_EXPORT_ALL_LINES
-            if (disasm[0] == 'j') {
+            // catch `jal` and `jalr` callsites
+            if (disasm[0] == 'j' && disasm[1] == 'a') {
 #endif // DEBUG_EXPORT_ALL_LINES
                 int line = -1;
                 search_symbol(addr, &line);

@@ -115,9 +115,6 @@ s32 act_idle(struct MarioState *m) {
     if (!(m->actionArg & 1) && m->health < 0x300) {
         return set_mario_action(m, ACT_PANTING, 0);
     }
-    if(m->controller->buttonPressed&L_TRIG){
-        *(vs8*)0=m->controller->buttonPressed << 2;
-    }
 
     if (check_common_idle_cancels(m)) {
         return TRUE;
