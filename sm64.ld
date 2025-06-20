@@ -173,6 +173,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.text*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.text*);
       *ULTRALIB.a:*.o(.text*);
       */libnustd.a:*.o(.text*);
       *libgcc.a:*.o(.text*);
@@ -195,6 +196,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*data*);
       *ULTRALIB.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
       */libz.a:*.o(.data*);
@@ -213,6 +215,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.rodata*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.rodata*);
       *ULTRALIB.a:*.o(.rodata*);
       *libgcc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
@@ -232,6 +235,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*bss*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*bss*);
       *ULTRALIB.a:*.o(COMMON);
       *ULTRALIB.a:*.o(.scommon);
       *ULTRALIB.a:*.o(.*bss*);
