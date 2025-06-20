@@ -72,7 +72,7 @@ static const int s_yday_table[12] = {
 };
 
 static unsigned int s_si_buffer[16] __attribute__((aligned(16)));
-static volatile unsigned int s_si_backup[16] __attribute__((aligned(16)));
+static unsigned int s_si_backup[16] __attribute__((aligned(16)));
 static unsigned int s_prev_dma_addr;
 
 typedef enum {
@@ -162,7 +162,9 @@ static void librtc_pif_save() {
 	for( int i = 0; i < 16; i++ ) {
 		s_si_backup[i] = si_pif_ram[i];
 	}
+}
 
+static void librtc_pif_restore() {
 	if( s_exec_on_write_bug ) {
 		// The emulator incorrectly executes the joybus on a DMA write instead of a read
 		// Clear the command register so it doesn't execute again
@@ -171,9 +173,7 @@ static void librtc_pif_save() {
 		// Re-parse the stored PIF RAM state
 		s_si_backup[15] |= 1u;
 	}
-}
 
-static void librtc_pif_restore() {
 	__builtin_mips_cache( 0x19, &s_si_backup[0] );
 	__builtin_mips_cache( 0x19, &s_si_backup[4] );
 	__builtin_mips_cache( 0x19, &s_si_backup[8] );
