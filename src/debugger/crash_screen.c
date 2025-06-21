@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include <PR/os_internal_error.h>
+#include <PR/os_system.h>
 #include <stdarg.h>
 #include <string.h>
 #include "buffers/framebuffers.h"
@@ -18,9 +19,12 @@
 
 #include "sm64.h"
 
+extern u16 sRenderedFramebuffer;
+extern struct SequenceQueueItem sBackgroundMusicQueue[6];
+extern void audio_signal_game_loop_tick(void);
+extern void stop_sounds_in_continuous_banks(void);
+extern void read_controller_inputs(s32 threadID);
 extern char *strstr(char *, char *);
-extern void inspector_print_backtrace(void *bt, int n, int bt_skip);
-int backtrace(void **buffer, int size);
 
 // Configurable Defines
 #define X_KERNING 6
@@ -41,7 +45,7 @@ enum crashPages {
     PAGE_COUNT
 };
 
-char *crashPageNames[] = {
+static char *crashPageNames[] = {
     [PAGE_SIMPLE] = "(Overview)",
     [PAGE_CONTEXT] = "(Context)",
 #ifdef PUPPYPRINT_DEBUG
@@ -52,7 +56,7 @@ char *crashPageNames[] = {
     [PAGE_ASSERTS] = "(Assert)",
 };
 
-u8 gCrashScreenCharToGlyph[128] = {
+static u8 sCrashScreenCharToGlyph[128] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -63,14 +67,19 @@ u8 gCrashScreenCharToGlyph[128] = {
     80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
 };
 
-u32 gCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS * 2 + 1] = {
+static u32 sCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS * 2 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
+<<<<<<< HEAD
 u8 crashPage = 0;
 u8 updateBuffer = TRUE;
 
 static char crashScreenBuf[0x200];
+=======
+static u8 crashPage = 0;
+static u8 updateBuffer = TRUE;
+>>>>>>> 108056920 (actually generate line tables when generating symbols; fix function name heuristic in disasm)
 
 char *gCauseDesc[18] = {
     "Interrupt",
@@ -98,11 +107,9 @@ char *gFpcsrDesc[6] = {
     "Inexact operation",
 };
 
-
-
-extern u64 osClockRate;
-
-struct {
+static u32 sProgramPosition = 0;
+static u16 gCrashScreenTextColor = 0xFFFF;
+static struct {
     OSThread thread;
     u64 stack[THREAD2_STACK / sizeof(u64)];
     OSMesgQueue mesgQueue;
@@ -112,13 +119,12 @@ struct {
     u16 height;
 } gCrashScreen;
 
-static u16 gCrashScreenColor = 0xFFFF;
-
 static void set_text_color(u32 r, u32 g, u32 b) {
-    gCrashScreenColor = GPACK_RGBA5551(r, g, b, 255);
+    gCrashScreenTextColor = GPACK_RGBA5551(r, g, b, 255);
 }
+
 static void reset_text_color(void) {
-    gCrashScreenColor = 0xFFFF;
+    gCrashScreenTextColor = 0xFFFF;
 }
 
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
@@ -144,11 +150,11 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
 
     if (glyph > 0x7F) return;
 
-    data = &gCrashScreenFont[((glyph&0xF)*GLYPH_HEIGHT * 2) + (glyph >= 64)];
+    data = &sCrashScreenFont[((glyph&0xF)*GLYPH_HEIGHT * 2) + (glyph >= 64)];
 
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
 
-    u16 color = gCrashScreenColor;
+    u16 color = gCrashScreenTextColor;
 
     for (i = 0; i < GLYPH_HEIGHT; i++) {
         bit = 0x80000000U >> ((glyph >> 4) * GLYPH_WIDTH);
@@ -397,7 +403,6 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     }
 }
 
-static u32 sProgramPosition = 0;
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
@@ -422,7 +427,7 @@ void draw_disasm(OSThread *thread) {
         } else {
             symtable_info_t info = get_symbol_info(addr);
 
-            if (info.func_offset == 0 && currline != info.line) {
+            if (info.func_offset == 0 && info.distance == 0 && currline != info.line) {
                 currline = info.line;
                 set_text_color(239, 196, 15);
                 crash_screen_print(LEFT_MARGIN, 35 + (skiplines * 10) + (i * 10), "<%s:>", info.func);
@@ -541,12 +546,6 @@ OSThread *get_crashed_thread(void) {
     }
     return NULL;
 }
-
-extern u16 sRenderedFramebuffer;
-extern void audio_signal_game_loop_tick(void);
-extern void stop_sounds_in_continuous_banks(void);
-extern void read_controller_inputs(s32 threadID);
-extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;

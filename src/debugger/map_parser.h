@@ -6,6 +6,7 @@ typedef struct {
     char *file;
     char *func;
     int line;
+    u16 distance;
     u16 func_offset;
 } symtable_info_t;
 

@@ -110,8 +110,10 @@ symtable_info_t get_symbol_info(u32 addr) {
         symt_entry_fetch(&symt, &entry, idx);
         info.line = entry.line;
         info.func_offset = entry.func_off;
+        addrtable_entry_t a = symt_addrtab_entry(&symt, idx);
+        info.distance = addr - ADDRENTRY_ADDR(a);
         info.file = symt_entry_file(&symt, &entry, filebuf, sizeof(filebuf));
-        info.func = parse_map(addr, (info.func_offset != 0));
+        info.func = parse_map(addr, (info.distance != 0));
 
         return info;
     }
