@@ -16,6 +16,7 @@
 
 #include "map_parser.h"
 #include "disasm.h"
+#include "assert.h"
 
 #include "sm64.h"
 
@@ -463,12 +464,15 @@ void draw_disasm(OSThread *thread) {
 void draw_assert(UNUSED OSThread *thread) {
     crash_screen_draw_rect(0, 20, 320, 210);
 
-    crash_screen_print(LEFT_MARGIN, 25, "Assert Page");
+    crash_screen_print(LEFT_MARGIN, 25, "Assert");
 
     if (__n64Assert_Filename != NULL) {
-        crash_screen_print(LEFT_MARGIN, 35, "File: %s Line %d", __n64Assert_Filename, __n64Assert_LineNum);
-        crash_screen_print(LEFT_MARGIN, 55, "Message:");
-        crash_screen_print(LEFT_MARGIN, 70, " %s", __n64Assert_Message);
+        crash_screen_print(LEFT_MARGIN, 35, "File: %s", __n64Assert_Filename);
+        crash_screen_print(LEFT_MARGIN, 45, "Line %d", __n64Assert_LineNum);
+        crash_screen_print(LEFT_MARGIN, 55, "Condition:");
+        crash_screen_print(LEFT_MARGIN, 65, "(%s)", __n64Assert_Condition);
+        crash_screen_print(LEFT_MARGIN, 75, "Message:");
+        crash_screen_print(LEFT_MARGIN, 85, " %s", __n64Assert_MessageBuf);
     } else {
         crash_screen_print(LEFT_MARGIN, 35, "No failed assert to report.");
     }
@@ -489,10 +493,12 @@ void draw_crash_screen(OSThread *thread) {
 
     if (gPlayer1Controller->buttonPressed & R_TRIG) {
         crashPage++;
+        if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage++;
         updateBuffer = TRUE;
     }
     if (gPlayer1Controller->buttonPressed & (L_TRIG | Z_TRIG)) {
         crashPage--;
+        if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
         updateBuffer = TRUE;
     }
 
@@ -512,6 +518,7 @@ void draw_crash_screen(OSThread *thread) {
     }
     if (crashPage == 255) {
         crashPage = (PAGE_COUNT - 1);
+        if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
     }
     if (updateBuffer) {
         crash_screen_draw_rect(0, 0, 320, 20);
@@ -567,6 +574,9 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
+                if (thread->context.cause == EXC_SYSCALL) {
+                    crashPage = PAGE_ASSERTS;
+                }
                 continue;
             }
         } else {

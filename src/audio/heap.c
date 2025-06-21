@@ -1058,7 +1058,7 @@ void init_reverb_us(s32 presetId) {
 #endif
         aggress(gBetterReverbPresetCount > 0, "No BETTER_REVERB presets exist!");
 
-        assert(gBetterReverbPresetValue < gBetterReverbPresetCount, "BETTER_REVERB preset value exceeds total number of available presets!");
+        assertf(gBetterReverbPresetValue < gBetterReverbPresetCount, "BETTER_REVERB preset value exceeds total number of available presets!");
         betterReverbPreset = &gBetterReverbSettings[0];
     }
 

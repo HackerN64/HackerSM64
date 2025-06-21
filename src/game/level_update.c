@@ -5,6 +5,7 @@
 #include "dialog_ids.h"
 #include "audio/external.h"
 #include "audio/synthesis.h"
+#include "debugger/assert.h"
 #include "level_update.h"
 #include "game_init.h"
 #include "level_update.h"
