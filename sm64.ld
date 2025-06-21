@@ -160,8 +160,6 @@ SECTIONS
 #ifdef EEP
       KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
 #endif
-      KEEP(BUILD_DIR/asm/emux.o(.text*));
-      KEEP(BUILD_DIR/asm/pj64_get_count_factor_asm.o(.text*));
       KEEP(BUILD_DIR/asm/round.o(.text*));
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
@@ -175,6 +173,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.text*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.text*);
       *ULTRALIB.a:*.o(.text*);
       */libnustd.a:*.o(.text*);
       *libgcc.a:*.o(.text*);
@@ -197,6 +196,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*data*);
       *ULTRALIB.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
       */libz.a:*.o(.data*);
@@ -215,6 +215,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.rodata*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.rodata*);
       *ULTRALIB.a:*.o(.rodata*);
       *libgcc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
@@ -234,6 +235,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*bss*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*bss*);
       *ULTRALIB.a:*.o(COMMON);
       *ULTRALIB.a:*.o(.scommon);
       *ULTRALIB.a:*.o(.*bss*);

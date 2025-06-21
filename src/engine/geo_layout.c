@@ -576,24 +576,36 @@ void geo_layout_cmd_node_animated_part(void) {
 }
 
 /*
-  0x14: Create billboarding node with optional display list
+  0x14: Create billboarding node with optional display list. Axis vector must
+  be non-zero when using cylindrical billboarding.
    cmd+0x01: u8 params
      (params & 0x80): if set, enable displayList field and drawingLayer
      (params & 0x0F): drawingLayer
-   cmd+0x02: s16 xTranslation
-   cmd+0x04: s16 yTranslation
-   cmd+0x06: s16 zTranslation
-  [cmd+0x08: void *displayList]
+   cmd+0x02: u8 isCylindrical: if set, use cylindrical billboarding
+   cmd+0x04: s16 xTranslation
+   cmd+0x06: s16 yTranslation
+   cmd+0x08: s16 zTranslation
+   cmd+0x0A: s16 xAxis
+   cmd+0x0C: s16 yAxis
+   cmd+0x0E: s16 zAxis
+  [cmd+0x10: void *displayList]
 */
 void geo_layout_cmd_node_billboard(void) {
     struct GraphNodeBillboard *graphNode;
     Vec3s translation;
+    Vec3s axis;
     s16 drawingLayer = LAYER_FIRST;
     s16 params = cur_geo_cmd_u8(0x01);
+    u8 isCylindrical = cur_geo_cmd_u8(0x02);
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
     void *displayList = NULL;
 
-    cmdPos = read_vec3s(translation, &cmdPos[1]);
+    cmdPos = read_vec3s(translation, &cmdPos[2]);
+    cmdPos = read_vec3s(axis, &cmdPos[0]);
+
+    if (isCylindrical) {
+        assert(axis[0] != 0 || axis[1] != 0 || axis[2] != 0, "Axis vector for cylindrical billboard\nmust be non-zero");
+    }
 
     if (params & 0x80) {
         displayList = *(void **) &cmdPos[0];
@@ -601,7 +613,7 @@ void geo_layout_cmd_node_billboard(void) {
         cmdPos += 2 << CMD_SIZE_SHIFT;
     }
 
-    graphNode = init_graph_node_billboard(gGraphNodePool, NULL, drawingLayer, displayList, translation);
+    graphNode = init_graph_node_billboard(gGraphNodePool, NULL, drawingLayer, displayList, translation, axis, isCylindrical);
 
     register_scene_graph_node(&graphNode->node);
 

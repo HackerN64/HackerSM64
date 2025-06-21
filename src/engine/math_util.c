@@ -273,25 +273,45 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
 }
 
 /**
- * Set 'dest' to a transformation matrix that turns an object to face the camera.
+ * Set 'dest' to a transformation matrix that turns an object to face the camera using either spherical or cylindrical billboarding.
  * 'mtx' is the look-at matrix from the camera.
+ * 'camera' is the camera's look direction, only used for cylindrical billboarding
+ * 'axis' is the direction of the fixed axis around which the object will be rotated, if using cylindrical billboarding
  * 'position' is the position of the object in the world.
  * 'scale' is the scale of the object.
  * 'angle' rotates the object while still facing the camera.
+ * 'isCylindrical' determines which type of billboarding to use.
  */
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle) {
+void mtxf_billboard_generic(Mat4 dest, Mat4 mtx, Vec3f camera, Vec3f axis, Vec3f position, Vec3f scale, s16 angle, s32 isCylindrical) {
     PUPPYPRINT_ADD_COUNTER(gPuppyCallCounter.matrix);
     s32 i;
     f32 sx = scale[0];
     f32 sy = scale[1];
     f32 sz = scale[2];
-    Mat4* cameraMat = &gCameraTransform;
-    for (i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            dest[i][j] = (*cameraMat)[j][i];
+
+    if (isCylindrical) {
+        Vec3f rotAxis;
+        vec3f_copy(rotAxis, axis);
+        vec3f_normalize(rotAxis);
+        Vec3f rightAxis;
+        vec3f_cross(rightAxis, camera, rotAxis);
+        vec3f_normalize(rightAxis);
+        Vec3f forwardAxis;
+        vec3f_cross(forwardAxis, rightAxis, rotAxis);
+
+        vec3f_copy(dest[0], rightAxis);
+        vec3f_copy(dest[1], rotAxis);
+        vec3f_copy(dest[2], forwardAxis);
+    } else {
+        Mat4* cameraMat = &gCameraTransform;
+        for (i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                dest[i][j] = (*cameraMat)[j][i];
+            }
+            dest[i][3] = 0.0f;
         }
-        dest[i][3] = 0.0f;
     }
+
     if (angle != 0x0) {
         float m00 = dest[0][0];
         float m01 = dest[0][1];

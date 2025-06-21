@@ -32,8 +32,8 @@
 #include "profiling.h"
 #include "emutest.h"
 
-// Emulators that the Instant Input patch should not be applied to
-#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+// Emulators that the Instant Input patch should be applied to
+#define INSTANT_INPUT_WHITELIST (EMU_PARALLEL_LAUNCHER | EMU_PROJECT64 | EMU_MUPEN)
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -421,10 +421,9 @@ void render_init(void) {
     end_master_display_list();
     exec_display_list(&gGfxPool->spTask);
 
-    // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
-    // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    // Currently, Ares and Simple64 have issues with single buffering so disable it there as well.
-    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
+    // Skip incrementing the initial framebuffer index on certain emulators so that they display immediately as the Gfx task finishes
+    // This will break accurate emulators, so only enable on Project64, Parallel Launcher and Mupen.
+    if (!(gEmulator & INSTANT_INPUT_WHITELIST)) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -462,8 +461,8 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
-    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
+    // Skip swapping buffers on some inaccurate emulators so that they display immediately as the Gfx task finishes
+    if (!(gEmulator & INSTANT_INPUT_WHITELIST)) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }

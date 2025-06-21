@@ -15,6 +15,8 @@
 #include "sm64.h"
 #include "types.h"
 
+char gAssertionStr[0x200];
+
 #ifdef VANILLA_DEBUG
 
 enum DebugInfoFlags {

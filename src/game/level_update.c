@@ -350,14 +350,8 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
 
 void init_mario_after_warp(void) {
     struct Object *object = get_destination_warp_object(sWarpDest.nodeId);
+    assert_args(object, "No dest warp object found for: 0x%02X", sWarpDest.nodeId);
 
-#ifdef DEBUG_ASSERTIONS
-    if (!object) {
-        char errorMsg[40];
-        sprintf(errorMsg, "No dest warp object found for: 0x%02X", sWarpDest.nodeId);
-        error(errorMsg);
-    }
-#endif
     u32 marioSpawnType = get_mario_spawn_type(object);
 
     if (gMarioState->action != ACT_UNINITIALIZED) {
@@ -578,14 +572,7 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
-
-#ifdef DEBUG_ASSERTIONS
-    if (!warpNode) {
-        char errorMsg[40];
-        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) arg);
-        error(errorMsg);
-    }
-#endif
+    assert_args(warpNode, "No source warp node found for: 0x%02X", (u8) arg);
 
     s16 levelNum = warpNode->node.destLevel & 0x7F;
 
@@ -913,14 +900,7 @@ void initiate_delayed_warp(void) {
 
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
-
-#ifdef DEBUG_ASSERTIONS
-                    if (!warpNode) {
-                        char errorMsg[40];
-                        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) sSourceWarpNodeId);
-                        error(errorMsg);
-                    }
-#endif
+                    assert_args(warpNode, "No source warp node found for: 0x%02X", (u8) sSourceWarpNodeId);
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);

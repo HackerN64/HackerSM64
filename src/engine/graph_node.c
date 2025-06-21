@@ -361,7 +361,9 @@ struct GraphNodeAnimatedPart *init_graph_node_animated_part(struct AllocOnlyPool
 struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool,
                                                      struct GraphNodeBillboard *graphNode,
                                                      s32 drawingLayer, void *displayList,
-                                                     Vec3s translation) {
+                                                     Vec3s translation,
+                                                     Vec3s axis,
+                                                     u8 isCylindrical) {
     if (pool != NULL) {
         graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeBillboard));
     }
@@ -369,8 +371,10 @@ struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool,
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_BILLBOARD);
         vec3s_copy(graphNode->translation, translation);
+        vec3s_copy(graphNode->axis, axis);
         SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
         graphNode->displayList = displayList;
+        graphNode->isCylindrical = isCylindrical;
     }
 
     return graphNode;
