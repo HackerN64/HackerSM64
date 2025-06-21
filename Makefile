@@ -90,16 +90,20 @@ endif
 # FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
 FIXLIGHTS ?= 1
 
-# Debug Switches - Comment these out to remove the functionality
-
+# Debug Switches - Comment these out to remove the functionality, then run `make clean`
 # Export symbols and stack trace data for crash screen
-DEBUG_EXPORT_SYMBOLS_FLAG := -D DEBUG_EXPORT_SYMBOLS
+DEBUG_EXPORT_SYMBOLS := 1
 # Include line data, at the cost of a significantly longer link time
 DEBUG_EXPORT_ALL_LINES := 0
 
 ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
 	DEBUG_EXPORT_ALL_LINES_FLAG += --all-lines
 	DEFINES += DEBUG_EXPORT_ALL_LINES=1
+  DEFAULT_OPT_FLAGS += -g -gdwarf-4
+endif
+ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
+  DEBUG_EXPORT_SYMBOLS_FLAG := -D DEBUG_EXPORT_SYMBOLS
+  DEFAULT_OPT_FLAGS += -gdwarf-4
 endif
 
 TARGET := sm64

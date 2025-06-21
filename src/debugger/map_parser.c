@@ -39,6 +39,8 @@ char* __symbolize(void *vaddr, char *buf, int size, u32 andOffset) {
         } else {
             lbuf[0] = 0;
         }
+        entry.func_off = addr - ADDRENTRY_ADDR(a);
+
         return strcat(func, lbuf);
     }
     sprintf(buf, "%s", UNKNOWN_SYMBOL);
@@ -47,16 +49,21 @@ char* __symbolize(void *vaddr, char *buf, int size, u32 andOffset) {
 
 char *parse_map(u32 addr, u32 andOffset) {
     static char map_name[64] ALIGNED16;
+    char *ret = map_name;
+
     __symbolize((u32*)addr, map_name, sizeof(map_name), andOffset);
 
-    return map_name;
+    if (ret[0] == ' ') {
+        ret++;
+    }
+    return ret;
 }
 
 char *find_function_in_stack(u32 *sp, int *line) {
     char *ret = NULL;
     u32 val = *sp;
 
-    #define CALLSITE_OFFSET 8
+    #define CALLSITE_OFFSET 0
     for (int i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
         val = *sp;
         val = *(u32 *)val;
@@ -90,7 +97,6 @@ symtable_info_t get_symbol_info(u32 addr) {
     void *vaddr = (void *)addr;
     symtable_header_t symt = symt_open();
 
-
     if (symt.head[0]) {
         symtable_info_t info;
         u32 addr = (u32)vaddr;
@@ -105,7 +111,7 @@ symtable_info_t get_symbol_info(u32 addr) {
         info.line = entry.line;
         info.func_offset = entry.func_off;
         info.file = symt_entry_file(&symt, &entry, filebuf, sizeof(filebuf));
-        info.func = parse_map(addr, TRUE);
+        info.func = parse_map(addr, (info.func_offset != 0));
 
         return info;
     }

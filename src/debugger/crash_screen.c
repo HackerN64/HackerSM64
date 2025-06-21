@@ -281,7 +281,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", info.func == NULL ? "Unknown" : info.func);
         if (info.line != -1) {
             crash_screen_print(LEFT_MARGIN, 60, "File: %s", info.file);
-#ifndef DEBUG_EXPORT_ALL_LINES
+#ifdef DEBUG_EXPORT_ALL_LINES
             // This line only shows the correct value if every line is in the sym file
             crash_screen_print(LEFT_MARGIN, 72, "Line: %d", info.line);
 #endif // DEBUG_EXPORT_ALL_LINES
@@ -408,6 +408,8 @@ void draw_disasm(OSThread *thread) {
     crash_screen_print(LEFT_MARGIN, 25, "Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
 
+    int skiplines = 0;
+    int currline = 0;
 
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
@@ -416,17 +418,24 @@ void draw_disasm(OSThread *thread) {
 
 
         if (disasm[0] == 0) {
-            crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%08X", addr);
+            crash_screen_print(LEFT_MARGIN + 22, 35 + (skiplines * 10) + (i * 10), "%08X", addr);
         } else {
             symtable_info_t info = get_symbol_info(addr);
+
+            if (info.func_offset == 0 && currline != info.line) {
+                currline = info.line;
+                set_text_color(239, 196, 15);
+                crash_screen_print(LEFT_MARGIN, 35 + (skiplines * 10) + (i * 10), "<%s:>", info.func);
+                reset_text_color();
+                skiplines++;
+            }
 #ifndef DEBUG_EXPORT_ALL_LINES
             // catch `jal` and `jalr` callsites
             if (disasm[0] == 'j' && disasm[1] == 'a') {
 #endif // DEBUG_EXPORT_ALL_LINES
-
                 if (info.line != -1) {
                     set_text_color(200, 200, 200);
-                    crash_screen_print(LEFT_MARGIN, (35 + (i * 10)), "%d:", info.line);
+                    crash_screen_print(LEFT_MARGIN, 35 + (skiplines * 10) + (i * 10), "%d:", info.line);
                     reset_text_color();
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
@@ -437,7 +446,7 @@ void draw_disasm(OSThread *thread) {
             } else {
                 reset_text_color();
             }
-            crash_screen_print(LEFT_MARGIN + 22, (35 + (i * 10)), "%s", disasm);
+            crash_screen_print(LEFT_MARGIN + 22, 35 + (skiplines * 10) + (i * 10), "%s", disasm);
         }
 
     }
