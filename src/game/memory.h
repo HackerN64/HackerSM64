@@ -45,7 +45,11 @@ struct MainPoolRegion {
     u8* end;
 };
 
-#define MAIN_POOL_REGIONS_COUNT 2
+enum RegionId {
+    MAIN_POOL_REGION_MAIN = 0,
+
+    MAIN_POOL_REGIONS_COUNT,
+};
 
 struct MainPoolContext {
     struct MainPoolRegion regions[MAIN_POOL_REGIONS_COUNT];
@@ -99,10 +103,26 @@ static ALWAYS_INLINE void* _main_pool_region_alloc_from_start(int region_idx, u3
  |+++++--|   |----|  |-------------------|
   ^
   returned pointer, no extra memory overhead
+
+ The common usecase for multiple regions is using FB/ZB splitting.
+ One of the layouts that can be used is have 2 regions: MAIN + COLD with the following layout:
+
+   0x80000400+0x25800                  0x80700000-0x25800    0x80700000+0x25800
+           |                                         |             |
+           V                                         V             V
+      | ZB | buffers+text+data+bss | fb0 | MAIN pool | fb 1 | fb 2 | COLD pool x godddard |
+      ^                            ^                        ^                             ^
+      |                            |                        |                             |
+  0x80000400                  0x802xxxxx               0x80700000                    0x80800000
+
+ Such layouts allows to have ZB in bank 0, FB0 in bank 2, FB1 in bank 6 and FB2 in bank 7.
+ You need to adjust 'main_pool_init' to initialize COLD region using 'main_pool_region_init'.
+ For cold data add wrapper to invoke 'main_pool_region_alloc_from_start(MAIN_POOL_REGION_COLD, size, alignment, try)'.
+ An example of COLD data in SM64 engine are level scripts, warp nodes, unparsed geometry layouts (group segments), main pool states
  */
 void main_pool_init(void);
 
-#define main_pool_alloc(size) main_pool_region_alloc_from_start(0, ALIGN4(size), MAIN_POOL_ALIGNMENT_DISABLE, MAIN_POOL_ALLOC_FORCE)
+#define main_pool_alloc(size) main_pool_region_alloc_from_start(MAIN_POOL_REGION_MAIN, ALIGN4(size), MAIN_POOL_ALIGNMENT_DISABLE, MAIN_POOL_ALLOC_FORCE)
 
 void *main_pool_alloc_ex(int region, u32 size, u32 alignment);
 static inline void *main_pool_alloc_aligned(u32 size, u32 alignment)

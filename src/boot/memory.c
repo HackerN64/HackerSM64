@@ -124,7 +124,7 @@ static void main_pool_region_init(struct MainPoolRegion* region, u8* start, u8* 
  * freeing the object that was most recently allocated from a side.
  */
 void main_pool_init() {
-    main_pool_region_init(&gMainPool.regions[0], __mainPoolStart, (void*) RAM_END);
+    main_pool_region_init(&gMainPool.regions[MAIN_POOL_REGION_MAIN], __mainPoolStart, (void*) RAM_END);
 }
 
 // This function behaves similar to main_pool_region_alloc_from_start but it is used for freeable memory allocated from the end.
@@ -164,13 +164,25 @@ void main_pool_alloc_failed(int region_idx, u32 size, int freeable, int line, co
 {
     struct MainPoolRegion* region = &gMainPool.regions[region_idx];
     char errmsg[70];
+    // TODO: replace with gAssertionStr when 2.4 is merged
     sprintf(errmsg, "%salloc failed for %d bytes in region %d\n%x-%x", freeable ? "freeable " : "", size, region_idx, region->start, region->end);
     __n64Assert((char*) file, line, errmsg);
 }
 
 void *main_pool_alloc_ex(int region, u32 size, u32 alignment) {
-    void* buf = region ? main_pool_region_alloc_from_start(region, size, alignment, MAIN_POOL_ALLOC_TRY) : NULL;
-    return buf ?: main_pool_region_alloc_from_start(0, size, alignment, MAIN_POOL_ALLOC_FORCE);
+    if (region)
+    {
+        // Try to allocate from the given region and fallback to main, if failed
+        void* buf = main_pool_region_alloc_from_start(region, size, alignment, MAIN_POOL_ALLOC_TRY);
+        if (buf)
+            return buf;
+
+        return main_pool_region_alloc_from_start(MAIN_POOL_REGION_MAIN, size, alignment, MAIN_POOL_ALLOC_FORCE);
+    }
+    else
+    {
+        return main_pool_region_alloc_from_start(MAIN_POOL_REGION_MAIN, size, alignment, MAIN_POOL_ALLOC_FORCE);
+    }
 }
 
 void *main_pool_alloc_freeable(u32 size) {
@@ -182,7 +194,7 @@ void *main_pool_alloc_aligned_freeable(u32 size, u32 alignment) {
         alignment = 16;
 
     size = ALIGN4(size);
-    return main_pool_region_alloc_from_end_freeable(0, size, MAIN_POOL_ALIGNMENT_DISABLE, MAIN_POOL_ALLOC_FORCE);
+    return main_pool_region_alloc_from_end_freeable(MAIN_POOL_REGION_MAIN, size, MAIN_POOL_ALIGNMENT_DISABLE, MAIN_POOL_ALLOC_FORCE);
 }
 
 /**
