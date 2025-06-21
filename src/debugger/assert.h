@@ -25,11 +25,17 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 #define __assert_wrapper(cond) __n64Assert(__FILE__, __LINE__, (cond))
 
 /**
- * Will always cause a crash if cond is not true (handle with care)
+ * `aggress` and `aggressf` will always cause a crash if `cond` is not true (handle with care)
  */
-#define aggress(cond, message) do {\
+#define aggressf(cond, ...) do {\
     if ((cond) == FALSE) { \
-        sprintf(__n64Assert_MessageBuf, message); \
+        sprintf(__n64Assert_MessageBuf, __VA_ARGS__); \
+        __assert_wrapper(#cond); \
+    } \
+} while (0);
+#define aggress(cond) do {\
+    if ((cond) == FALSE) { \
+        __n64Assert_MessageBuf[0] = 0; \
         __assert_wrapper(#cond); \
     } \
 } while (0);

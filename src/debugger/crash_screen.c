@@ -462,7 +462,7 @@ void draw_disasm(OSThread *thread) {
 }
 
 void draw_assert(UNUSED OSThread *thread) {
-    crash_screen_draw_rect(0, 20, 320, 210);
+    crash_screen_draw_rect(0, 20, 320, 240);
 
     crash_screen_print(LEFT_MARGIN, 25, "Assert");
 
@@ -471,8 +471,10 @@ void draw_assert(UNUSED OSThread *thread) {
         crash_screen_print(LEFT_MARGIN, 45, "Line %d", __n64Assert_LineNum);
         crash_screen_print(LEFT_MARGIN, 55, "Condition:");
         crash_screen_print(LEFT_MARGIN, 65, "(%s)", __n64Assert_Condition);
-        crash_screen_print(LEFT_MARGIN, 75, "Message:");
-        crash_screen_print(LEFT_MARGIN, 85, " %s", __n64Assert_MessageBuf);
+        if (__n64Assert_MessageBuf[0] != 0) {
+            crash_screen_print(LEFT_MARGIN, 75, "Message:");
+            crash_screen_print(LEFT_MARGIN, 85, " %s", __n64Assert_MessageBuf);
+        }
     } else {
         crash_screen_print(LEFT_MARGIN, 35, "No failed assert to report.");
     }
