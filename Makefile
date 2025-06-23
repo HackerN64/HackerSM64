@@ -102,7 +102,7 @@ ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
   DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
 endif
 ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
-  DEBUG_EXPORT_SYMBOLS_FLAG := -D DEBUG_EXPORT_SYMBOLS
+  DEFINES += DEBUG_EXPORT_SYMBOLS=1
   DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
 endif
 
@@ -945,7 +945,7 @@ $(BUILD_DIR)/rsp/%.bin $(BUILD_DIR)/rsp/%_data.bin: rsp/%.s
 # Run linker script through the C preprocessor
 $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT) $(BUILD_DIR)/goddard.txt
 	$(call print,Preprocessing linker script:,$<,$@)
-	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) $(DEBUG_EXPORT_SYMBOLS_FLAG) -MMD -MP -MT $@ -MF $@.d -o $@ $<
+	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
 # Link libgoddard
 $(BUILD_DIR)/libgoddard.a: $(GODDARD_O_FILES)

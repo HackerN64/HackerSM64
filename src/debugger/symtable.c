@@ -44,7 +44,6 @@ void map_parser_dma(void *dst, void *src, size_t size) {
 symtable_header_t symt_open(void) {
     SYMT_ROM = (u32)_mapDataSegmentRomStart;
 
-    // We don't _need_ to pass by value for this right
     symtable_header_t ALIGNED8 symt_header;
     
     if (SYMT_ROM == 0) {
@@ -118,7 +117,6 @@ addrtable_entry_t symt_addrtab_search(symtable_header_t *symt, u32 addr, int *id
     }
     return entry;
 }
-
 
 /**
  * @brief Fetch a string from the string table

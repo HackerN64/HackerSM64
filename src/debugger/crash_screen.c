@@ -17,6 +17,7 @@
 #include "map_parser.h"
 #include "disasm.h"
 #include "assert.h"
+#include "stacktrace.h"
 
 #include "sm64.h"
 
@@ -360,10 +361,9 @@ void draw_crash_log(void) {
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    u32 temp_sp = (tc->sp + 0x24);
 
     crash_screen_draw_rect(0, 20, 320, 240);
-    crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", temp_sp);
+    crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", tc->sp);
 
     // Current Func (EPC)
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
@@ -384,22 +384,17 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
     osWritebackDCacheAll();
 
-    for (int i = 0; i < 17; i++) {
-        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            crash_screen_print(LEFT_MARGIN, (55 + (i * 10)), "Stack Trace Disabled");
-            break;
-        } else {
-            if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
-                return;
-            }
+    if ((u32) generate_stack == MAP_PARSER_ADDRESS) {
+        crash_screen_print(LEFT_MARGIN, 55, "Stack Trace Disabled");
+    } else {
+        static u32 generated = 0;
 
-            int line = -1;
-            char *fname = find_function_in_stack(&temp_sp, &line);
-            while ((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0)) {
-                fname = find_function_in_stack(&temp_sp, &line);
-            }
-
-            crash_screen_print(LEFT_MARGIN, (55 + (i * 10)), "%08X (%s:%d)", temp_sp, fname, line);
+        if (stackTraceGenerated == FALSE) {
+            generated = generate_stack(thread);
+            stackTraceGenerated = TRUE;
+        }
+        for (u32 i = 0; i < generated; i++) {
+            crash_screen_print(LEFT_MARGIN, 55 + (i * 10), get_stack_entry(i));
         }
     }
 }

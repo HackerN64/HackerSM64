@@ -41,7 +41,9 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 } while (0);
 
 /**
- * Will cause a crash if cond is not true, and DEBUG is defined (allows for quick removal of littered asserts)
+ * Will cause a crash if cond is not true, and DEBUG is defined.
+ *  If disabled, `!cond` is marked as unreachable, which should
+ *  improve codegen on release builds
  */
 #ifdef DEBUG_ASSERTIONS
 #define assertf(cond, ...) do {\
