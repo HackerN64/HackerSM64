@@ -363,7 +363,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
     crash_screen_draw_rect(0, 20, 320, 240);
-    crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", tc->sp);
+    crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", (u32) tc->sp);
 
     // Current Func (EPC)
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {

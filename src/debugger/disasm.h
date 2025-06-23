@@ -21,6 +21,7 @@ enum ParamTypes {
     PARAM_MULT_MOVE,
     PARAM_TRAP,
     PARAM_EMUX,
+    PARAM_SYSCALL,
 };
 
 typedef struct PACKED {

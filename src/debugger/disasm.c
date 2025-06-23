@@ -98,6 +98,8 @@ InsnTemplate insn_db[] = {
     {R_TYPE, PARAM_TRAP, 0, 0b110100, "teq"},
     {R_TYPE, PARAM_EMUX, 0, 0b110110, "tne"},
 
+    {0, PARAM_SYSCALL, 0, 0b001100, "syscall"},
+
     // instructions involving doubles (deprioritized on the list)
     {R_TYPE, PARAM_NONE, 0, 0b101101, "daddu"},
     {R_TYPE, PARAM_NONE, 0, 0b101110, "dsub"},
@@ -358,6 +360,11 @@ char *insn_disasm(InsnData *addr) {
                     strp += sprintf(strp, "%-9s %s %s", insn_db[i].name,
                                                        __mips_gpr[insn.i.rs],
                                                        __mips_gpr[insn.i.rt]
+                    );
+                    break;
+                case PARAM_SYSCALL:
+                    strp += sprintf(strp, "%-9s %d", insn_db[i].name,
+                                                    (insn.d & 0x03FFFFC0) >> 6
                     );
                     break;
                 case PARAM_NONE:
