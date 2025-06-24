@@ -74,15 +74,10 @@ static u32 sCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS * 2 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
-<<<<<<< HEAD
 u8 crashPage = 0;
 u8 updateBuffer = TRUE;
 
 static char crashScreenBuf[0x200];
-=======
-static u8 crashPage = 0;
-static u8 updateBuffer = TRUE;
->>>>>>> 108056920 (actually generate line tables when generating symbols; fix function name heuristic in disasm)
 
 char *gCauseDesc[18] = {
     "Interrupt",
@@ -199,7 +194,7 @@ void crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const ch
                 xOffset = xNewline;
             }
 
-            glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
+            glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
 
             if (*ptr == '\n') {
                 y += 10;
@@ -232,7 +227,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
         ptr = crashScreenBuf;
 
         while (*ptr && size-- > 0) {
-            glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
+            glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
 
             if (glyph != 0xff) {
                 crash_screen_draw_glyph(x, y, glyph);

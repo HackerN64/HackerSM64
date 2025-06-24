@@ -7,6 +7,7 @@
 #include "buffers/gfx_output_buffer.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
+#include "debugger/assert.h"
 #include "engine/level_script.h"
 #include "engine/math_util.h"
 #include "game_init.h"
@@ -351,7 +352,7 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
 
     // NOTE: 'entries' is not representative of the right-side allocations coming from the GFX pool; do not use that variable here.
-    assert_args((u8*) gDisplayListHead <= gGfxPoolEnd, "GFX pool exceeded: %d command(s) over!", ((s32) gGfxPoolEnd - (s32) gDisplayListHead) / sizeof(Gfx));
+    assertf((u8*) gDisplayListHead <= gGfxPoolEnd, "GFX pool exceeded: %d command(s) over!", ((s32) gGfxPoolEnd - (s32) gDisplayListHead) / sizeof(Gfx));
 }
 
 /**

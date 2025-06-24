@@ -605,7 +605,7 @@ void geo_layout_cmd_node_billboard(void) {
     cmdPos = read_vec3s(axis, &cmdPos[0]);
 
     if (isCylindrical) {
-        assert(axis[0] != 0 || axis[1] != 0 || axis[2] != 0, "Axis vector for cylindrical billboard\nmust be non-zero");
+        assertf(axis[0] != 0 || axis[1] != 0 || axis[2] != 0, "Axis vector for cylindrical billboard\nmust be non-zero");
     }
 
     if (params & 0x80) {

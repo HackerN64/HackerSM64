@@ -687,7 +687,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     task->yield_data_ptr = NULL;
     task->yield_data_size = 0;
 
-    assert_args(writtenCmds <= gMaxAudioCmds, "Audio RSP pool exceeded: %d command(s) over!", (s32) gMaxAudioCmds - (s32) writtenCmds);
+    assertf(writtenCmds <= gMaxAudioCmds, "Audio RSP pool exceeded: %d command(s) over!", (s32) gMaxAudioCmds - (s32) writtenCmds);
 
     decrease_sample_dma_ttls();
 
