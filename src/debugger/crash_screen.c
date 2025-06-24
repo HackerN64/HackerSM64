@@ -3,6 +3,7 @@
 #include <PR/os_system.h>
 #include <stdarg.h>
 #include <string.h>
+#include "config/config_debug.h"
 #include "buffers/framebuffers.h"
 #include "types.h"
 #include "game/puppyprint.h"
@@ -365,6 +366,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     crash_screen_draw_rect(0, 20, 320, 240);
     crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", (u32) tc->sp);
 
+#ifdef DEBUG_FULL_STACK_TRACE
     // Current Func (EPC)
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
         crash_screen_print(LEFT_MARGIN, 35, "%08X", tc->pc);
@@ -397,6 +399,15 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
             crash_screen_print(LEFT_MARGIN, 55 + (i * 10), get_stack_entry(i));
         }
     }
+#else // DEBUG_FULL_STACK_TRACE
+    // simple stack trace
+    u32 sp = tc->sp;
+
+    for (int i = 0; i < STACK_LINE_COUNT; i++) {
+        crash_screen_print(LEFT_MARGIN, 55 + (i * 10), "%3d: %08X", i, *((u32*)(sp + (i * 4))));
+        crash_screen_print(120, 55 + (i * 10), "%3d: %08X", i + STACK_LINE_COUNT, *((u32*)(sp + ((i + STACK_LINE_COUNT) * 4))));
+    }
+#endif // DEBUG_FULL_STACK_TRACE
 }
 
 void draw_disasm(OSThread *thread) {
@@ -571,6 +582,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
+                // If an assert happened, go straight to that page
                 if (thread->context.cause == EXC_SYSCALL) {
                     crashPage = PAGE_ASSERTS;
                 }

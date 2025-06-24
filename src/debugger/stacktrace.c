@@ -2,6 +2,8 @@
 #include <macros.h>
 #include <string.h>
 
+#include "config/config_debug.h"
+
 #include "map_parser.h"
 #include "symtable.h"
 #include "segment_symbols.h"
@@ -9,6 +11,8 @@
 #include "disasm.h"
 
 extern void __osCleanupThread();
+
+#ifdef DEBUG_FULL_STACK_TRACE
 
 static StackFrame stack[STACK_LINE_COUNT];
 static u32 stackIdx;
@@ -113,3 +117,5 @@ u32 generate_stack(OSThread *thread) {
 
     return stackIdx;
 }
+
+#endif // DEBUG_FULL_STACK_TRACE

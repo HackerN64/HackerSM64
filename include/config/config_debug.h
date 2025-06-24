@@ -94,3 +94,9 @@
  * Intentionally crash the game whenever a runtime assertion fails (also invoked by the DEBUG define in the Makefile).
  */
 #define DEBUG_ASSERTIONS
+
+/**
+ * Crash Screen: enable symbol-assisted stack trace
+ *  If disabled, stack trace will just dump memory, and you can figure it out yourself.
+ */
+#define DEBUG_FULL_STACK_TRACE
