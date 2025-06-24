@@ -92,7 +92,7 @@ FIXLIGHTS ?= 1
 
 # Debug Switches - Comment these out to remove the functionality, then run `make clean`
 # Export symbols and stack trace data for crash screen
-DEBUG_EXPORT_SYMBOLS := 1
+DEBUG_EXPORT_SYMBOLS := 0
 # Include line data, at the cost of a significantly longer link time
 DEBUG_EXPORT_ALL_LINES := 0
 
@@ -103,6 +103,7 @@ ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
   endif
   DEFINES += DEBUG_EXPORT_SYMBOLS=1
   DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
+  SYMBOL_TABLE = $(BUILD_DIR)/sm64.sym.o
 endif
 
 TARGET := sm64
@@ -969,14 +970,14 @@ $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Getting Goddard size...)
 	$(V)python3 tools/getGoddardSize.py $(BUILD_DIR)/sm64_prelim.map $(VERSION)
 
-$(BUILD_DIR)/sm64.sym.o: $(BUILD_DIR)/sm64_prelim.elf
+$(SYMBOL_TABLE): $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Generating symbol table:,$(@F))
 	$(V)tools/n64sym $(DEBUG_EXPORT_ALL_LINES_FLAG) --cross $(CROSS) $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Assembling:,$@)
 	$(LD) -r -b binary -o $@ $(BUILD_DIR)/sm64_prelim.sym
 
 # Link SM64 ELF file
-$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/sm64.sym.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
+$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(SYMBOL_TABLE) $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
 

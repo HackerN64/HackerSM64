@@ -409,7 +409,9 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 
     int skiplines = 0;
+#ifdef DEBUG_EXPORT_SYMBOLS
     int currline = 0;
+#endif // DEBUG_EXPORT_SYMBOLS
 
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
