@@ -8,6 +8,8 @@
 #include "map_parser.h"
 #include "symtable.h"
 
+#ifdef DEBUG_EXPORT_SYMBOLS
+
 #define UNKNOWN_SYMBOL "???"
 
 char* __symbolize(void *vaddr, char *buf, int size, u32 andOffset) {
@@ -77,3 +79,5 @@ symtable_info_t get_symbol_info(u32 addr) {
     }
     return (symtable_info_t){.line = -1};
 }
+
+#endif // DEBUG_EXPORT_SYMBOLS

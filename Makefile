@@ -96,12 +96,11 @@ DEBUG_EXPORT_SYMBOLS := 1
 # Include line data, at the cost of a significantly longer link time
 DEBUG_EXPORT_ALL_LINES := 0
 
-ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
-	DEBUG_EXPORT_ALL_LINES_FLAG += --all-lines
-	DEFINES += DEBUG_EXPORT_ALL_LINES=1
-  DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
-endif
 ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
+  ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
+  	DEBUG_EXPORT_ALL_LINES_FLAG += --all-lines
+  	DEFINES += DEBUG_EXPORT_ALL_LINES=1
+  endif
   DEFINES += DEBUG_EXPORT_SYMBOLS=1
   DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
 endif

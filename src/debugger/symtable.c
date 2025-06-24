@@ -8,6 +8,8 @@
 
 #include "symtable.h"
 
+#ifdef DEBUG_EXPORT_SYMBOLS
+
 u32 SYMT_ROM = 0xFFFFFFFF;
 extern u8 _mapDataSegmentRomStart[];
 // The start and end of the exception vector
@@ -185,3 +187,5 @@ char *symt_entry_func(symtable_header_t *symt, symtable_entry_t *entry, u32 addr
 char *symt_entry_file(symtable_header_t *symt, symtable_entry_t *entry, char *buf, int size) {
     return symt_string(symt, entry->file_sidx, entry->file_len, buf, size);
 }
+
+#endif // DEBUG_EXPORT_SYMBOLS

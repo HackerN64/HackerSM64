@@ -12,7 +12,7 @@
 
 extern void __osCleanupThread();
 
-#ifdef DEBUG_FULL_STACK_TRACE
+#if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
 
 static StackFrame stack[STACK_LINE_COUNT];
 static u32 stackIdx;
@@ -118,4 +118,4 @@ u32 generate_stack(OSThread *thread) {
     return stackIdx;
 }
 
-#endif // DEBUG_FULL_STACK_TRACE
+#endif // DEBUG_EXPORT_SYMBOLS && DEBUG_FULL_STACK_TRACE

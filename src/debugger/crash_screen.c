@@ -284,18 +284,18 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
     crash_screen_print(LEFT_MARGIN, 20, "Thread %d (%s)", thread->id, gCauseDesc[cause]);
 
-    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        symtable_info_t info = get_symbol_info(tc->pc);
+#ifdef DEBUG_EXPORT_SYMBOLS
+    symtable_info_t info = get_symbol_info(tc->pc);
 
-        crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", info.func == NULL ? "Unknown" : info.func);
-        if (info.line != -1) {
-            crash_screen_print(LEFT_MARGIN, 60, "File: %s", info.file);
+    crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", info.func == NULL ? "Unknown" : info.func);
+    if (info.line != -1) {
+        crash_screen_print(LEFT_MARGIN, 60, "File: %s", info.file);
 #ifdef DEBUG_EXPORT_ALL_LINES
-            // This line only shows the correct value if every line is in the sym file
-            crash_screen_print(LEFT_MARGIN, 72, "Line: %d", info.line);
+        // This line only shows the correct value if every line is in the sym file
+        crash_screen_print(LEFT_MARGIN, 72, "Line: %d", info.line);
 #endif // DEBUG_EXPORT_ALL_LINES
-        }
     }
+#endif // DEBUG_EXPORT_SYMBOLS
 
     crash_screen_print(LEFT_MARGIN, 84, "Address: 0x%08X", tc->pc);
 }
@@ -306,10 +306,10 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(LEFT_MARGIN, 20, "Thread:%d (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_print(LEFT_MARGIN, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
-    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->pc, TRUE);
-        crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
-    }
+#ifdef DEBUG_EXPORT_SYMBOLS
+    char *fname = parse_map(tc->pc, TRUE);
+    crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
+#endif // DEBUG_EXPORT_SYMBOLS
     crash_screen_print(LEFT_MARGIN,  52, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
     crash_screen_print(LEFT_MARGIN,  62, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
     crash_screen_print(LEFT_MARGIN,  72, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
@@ -320,10 +320,10 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(LEFT_MARGIN, 122, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
     crash_screen_print(LEFT_MARGIN, 132, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
     crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
-    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->ra, TRUE);
-        crash_screen_print(LEFT_MARGIN, 152, "RA at: %s", fname);
-    }
+#ifdef DEBUG_EXPORT_SYMBOLS
+    fname = parse_map(tc->ra, TRUE);
+    crash_screen_print(LEFT_MARGIN, 152, "RA at: %s", fname == NULL ? "Unknown" : fname);
+#endif // DEBUG_EXPORT_SYMBOLS
 
     crash_screen_print_fpcsr(tc->fpcsr);
 
@@ -366,40 +366,28 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     crash_screen_draw_rect(0, 20, 320, 240);
     crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", (u32) tc->sp);
 
-#ifdef DEBUG_FULL_STACK_TRACE
+#if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     // Current Func (EPC)
-    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
-        crash_screen_print(LEFT_MARGIN, 35, "%08X", tc->pc);
-    } else {
-        crash_screen_print(LEFT_MARGIN, 35, "%08X (%s)", tc->pc, parse_map(tc->pc, TRUE));
-    }
+    crash_screen_print(LEFT_MARGIN, 35, "%08X (%s)", tc->pc, parse_map(tc->pc, TRUE));
 
     // Previous Func (RA)
-    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
-        crash_screen_print(LEFT_MARGIN, 45, "0x%08X", tc->ra);
-    } else {
-        u32 ra = tc->ra;
-        symtable_info_t info = get_symbol_info(ra);
+    u32 ra = tc->ra;
+    symtable_info_t info = get_symbol_info(ra);
 
-        crash_screen_print(LEFT_MARGIN, 45, "%08X (%s:%d)", ra, info.func, info.line);
-    }
+    crash_screen_print(LEFT_MARGIN, 45, "%08X (%s:%d)", ra, info.func, info.line);
 
     osWritebackDCacheAll();
 
-    if ((u32) generate_stack == MAP_PARSER_ADDRESS) {
-        crash_screen_print(LEFT_MARGIN, 55, "Stack Trace Disabled");
-    } else {
-        static u32 generated = 0;
+    static u32 generated = 0;
 
-        if (stackTraceGenerated == FALSE) {
-            generated = generate_stack(thread);
-            stackTraceGenerated = TRUE;
-        }
-        for (u32 i = 0; i < generated; i++) {
-            crash_screen_print(LEFT_MARGIN, 55 + (i * 10), get_stack_entry(i));
-        }
+    if (stackTraceGenerated == FALSE) {
+        generated = generate_stack(thread);
+        stackTraceGenerated = TRUE;
     }
-#else // DEBUG_FULL_STACK_TRACE
+    for (u32 i = 0; i < generated; i++) {
+        crash_screen_print(LEFT_MARGIN, 55 + (i * 10), get_stack_entry(i));
+    }
+#else // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     // simple stack trace
     u32 sp = tc->sp;
 
@@ -407,7 +395,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
         crash_screen_print(LEFT_MARGIN, 55 + (i * 10), "%3d: %08X", i, *((u32*)(sp + (i * 4))));
         crash_screen_print(120, 55 + (i * 10), "%3d: %08X", i + STACK_LINE_COUNT, *((u32*)(sp + ((i + STACK_LINE_COUNT) * 4))));
     }
-#endif // DEBUG_FULL_STACK_TRACE
+#endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
 }
 
 void draw_disasm(OSThread *thread) {
@@ -432,6 +420,7 @@ void draw_disasm(OSThread *thread) {
         if (disasm[0] == 0) {
             crash_screen_print(LEFT_MARGIN + 22, 35 + (skiplines * 10) + (i * 10), "%08X", addr);
         } else {
+#ifdef DEBUG_EXPORT_SYMBOLS
             symtable_info_t info = get_symbol_info(addr);
 
             if (info.func_offset == 0 && info.distance == 0 && currline != info.line) {
@@ -453,6 +442,8 @@ void draw_disasm(OSThread *thread) {
 #ifndef DEBUG_EXPORT_ALL_LINES
             }
 #endif // DEBUG_EXPORT_ALL_LINES
+
+#endif // DEBUG_EXPORT_SYMBOLS
             if (addr == tc->pc) {
                 set_text_color(255, 0, 0);
             } else {

@@ -198,7 +198,15 @@ static void c1_disasm(u32 *ptr, char *out) {
         }
     }
     switch (*opn) {
-    /* op tgt26 */        case 'j': sprintf(out, "%-9s %08x <%s>", opn+1, tgt26, __symbolize((void*)tgt26, symbuf, sizeof(symbuf), FALSE)); break;
+#ifdef DEBUG_EXPORT_SYMBOLS
+    /* op tgt26 */        case 'j': sprintf(out, "%-9s %08x <%s>", opn+1, tgt26, parse_map(tgt26, FALSE)); break;
+    /* op rs, rt, tgt16 */case 'b': sprintf(out, "%-9s %s, %s, %08x <%s>", opn+1, rs, rt, tgt16, parse_map(tgt16, TRUE)); break;
+    /* op tgt16 */        case 'y': sprintf(out, "%-9s %08x <%s>", opn+1, tgt16, parse_map(tgt16, TRUE)); break;
+#else
+    /* op tgt26 */        case 'j': sprintf(out, "%-9s %08x", opn+1, tgt26); break;
+    /* op rs, rt, tgt16 */case 'b': sprintf(out, "%-9s %s, %s, %08x", opn+1, rs, rt, tgt16); break;
+    /* op tgt16 */        case 'y': sprintf(out, "%-9s %08x", opn+1, tgt16); break;
+#endif // DEBUG_EXPORT_SYMBOLS
     /* op rt, rs, imm */  case 'i': sprintf(out, "%-9s %s, %s, %d", opn+1, rt, rs, (s16)op); break;
     /* op rt, imm */      case 'k': sprintf(out, "%-9s %s, %d", opn+1, rt, (s16)op); break;
     /* op rt, imm(rs) */  case 'm': sprintf(out, "%-9s %s, %d(%s)", opn+1, rt, (s16)op, rs); break;
@@ -206,8 +214,6 @@ static void c1_disasm(u32 *ptr, char *out) {
     /* op rd, rs, rt  */  case 'r': sprintf(out, "%-9s %s, %s, %s", opn+1, rd, rs, rt); break;
     /* op rd, rs */       case 's': sprintf(out, "%-9s %s, %s", opn+1, rd, rs); break;
     /* op rd, rt, sa  */  case 'e': sprintf(out, "%-9s %s, %s, %ld", opn+1, rd, rt, (op >> 6) & 0x1F); break;
-    /* op rs, rt, tgt16 */case 'b': sprintf(out, "%-9s %s, %s, %08x <%s>", opn+1, rs, rt, tgt16, __symbolize((void*)tgt16, symbuf, sizeof(symbuf), TRUE)); break;
-    /* op tgt16 */        case 'y': sprintf(out, "%-9s %08x <%s>", opn+1, tgt16, __symbolize((void*)tgt16, symbuf, sizeof(symbuf), TRUE)); break;
     /* op rs */           case 'w': sprintf(out, "%-9s %s", opn+1, rs); break;
     /* op rd */           case 'c': sprintf(out, "%-9s %s", opn+1, rd); break;
     /* op */              case 'z': sprintf(out, "%-9s", opn+1); break;
@@ -287,15 +293,15 @@ char *insn_disasm(InsnData *addr) {
                     break;
                 case PARAM_JAL:
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
-                    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
+#ifdef DEBUG_EXPORT_SYMBOLS
                         strp += sprintf(strp, "%-9s %s(%08X)", insn_db[i].name,
                                                          parse_map(target, FALSE), target
                         );
-                    } else {
+#else
                         strp += sprintf(strp, "%-9s %08X", insn_db[i].name,
                                                            target
                         );
-                    }
+#endif // DEBUG_EXPORT_SYMBOLS
                     break;
                 case PARAM_JUMP:
                     target = 0x80000000 | (insn.d & 0x03FFFFFF);
