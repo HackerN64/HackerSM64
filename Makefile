@@ -92,7 +92,7 @@ FIXLIGHTS ?= 1
 
 # Debug Switches - Comment these out to remove the functionality, then run `make clean`
 # Export symbols and stack trace data for crash screen
-DEBUG_EXPORT_SYMBOLS := 0
+DEBUG_EXPORT_SYMBOLS := 1
 # Include line data, at the cost of a significantly longer link time
 DEBUG_EXPORT_ALL_LINES := 0
 

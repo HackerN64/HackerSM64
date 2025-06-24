@@ -530,7 +530,7 @@ SECTIONS
 #endif
 
 #ifdef DEBUG_EXPORT_SYMBOLS
-   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) ALIGN(16) {
+   BEGIN_SEG(mapData, 0) ALIGN(16) {
 #ifndef PRELIMINARY
       KEEP(BUILD_DIR/sm64.sym.o(.data*));
 #endif
