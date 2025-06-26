@@ -12,6 +12,14 @@ LIBAUDIOFILE := audiofile/libaudiofile.a
 
 OS := $(shell uname)
 
+ifneq (,$(findstring Windows_NT,$(OS)))
+  OS := Windows_NT
+else ifneq (,$(findstring MSYS,$(OS)))
+  OS := Windows_NT
+else ifneq (,$(findstring MINGW,$(OS)))
+  OS := Windows_NT
+endif
+
 ifneq ($(OS), Darwin)
   ALL_PROGRAMS += flips
 endif

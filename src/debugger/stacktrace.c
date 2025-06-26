@@ -66,7 +66,7 @@ u32 generate_stack(OSThread *thread) {
     breadcrumb = tc->ra;
 
     while (1) { // dont know the end goal yet
-        sp++;
+        sp += 4;
 
         u32 val = *(u32*)sp;
 
@@ -86,7 +86,7 @@ u32 generate_stack(OSThread *thread) {
             }
 
             // get the start of the current frame's func
-            while (!ADDRENTRY_IS_FUNC(funcstart)) {
+            while (!ADDRENTRY_IS_FUNC(funcstart) && !ADDRENTRY_IS_INLINE(funcstart)) {
                 funcstart = symt_addrtab_entry(&symt, --idx);
             }
 

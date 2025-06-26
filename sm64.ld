@@ -173,7 +173,7 @@ SECTIONS
 #endif
       BUILD_DIR/lib/librtc*.o(.text*);
       *ULTRALIB.a:*.o(.text*);
-      */libnustd.a:*.o(.text*);
+      *libnustd.a:*.o(.text*);
       *libgcc.a:*.o(.text*);
       */libz.a:*.o(.text*);
       */libhvqm2.a:*.o(.text*);

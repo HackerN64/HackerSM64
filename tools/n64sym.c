@@ -18,7 +18,8 @@ int flag_max_sym_len = 64;
 bool flag_inlines = true;
 bool flag_all_lines = false;
 const char *n64_inst = NULL;
-const char *cross_prefix = NULL;
+const char *addr2line_exe = NULL;
+const char *objdump_exe = NULL;
 
 // Printf if verbose
 void verbose(const char *fmt, ...) {
@@ -37,7 +38,8 @@ void usage(const char *progname)
     fprintf(stderr, "Usage: %s [flags] <program.elf> [<program.sym>]\n", progname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Command-line flags:\n");
-    fprintf(stderr, "   -c/--cross <triple>   Cross compilation toolchain (e.g. `mips-linux-gnu-`)\n");
+    fprintf(stderr, "   -j/--objdump <Path>   Path to the objdump exe\n");
+    fprintf(stderr, "   -c/--addr2line <Path> Path to the addr2line exe\n");
     fprintf(stderr, "   -v/--verbose          Verbose output\n");
     fprintf(stderr, "   -m/--max-len <N>      Maximum symbol length (default: 64)\n");
     fprintf(stderr, "   -a/--all-lines        Generate full address->line info (Can take seconds on its own)\n");
@@ -116,7 +118,7 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
             cur_elf = NULL; addr2line_r = addr2line_w = NULL;
         }
         if (!addrbin)
-            asprintf(&addrbin, "/usr/bin/%saddr2line", cross_prefix);
+            asprintf(&addrbin, "%s", addr2line_exe);
 
         const char *cmd_addr[16] = {0}; int i = 0;
         cmd_addr[i++] = addrbin;
@@ -127,7 +129,7 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
         cmd_addr[i++] = "--exe";
         cmd_addr[i++] = elf;
 
-        if (subprocess_create(cmd_addr, subprocess_option_no_window, &subp) != 0) {
+        if (subprocess_create(cmd_addr, subprocess_option_inherit_environment | subprocess_option_no_window, &subp) != 0) {
             fprintf(stderr, "Error: cannot run: %s\n", addrbin);
             exit(1);
         }
@@ -222,7 +224,7 @@ void address_add(const char *elf, uint32_t addr) {
             cur_elf = NULL; addr2line_r = addr2line_w = NULL;
         }
         if (!addrbin)
-            asprintf(&addrbin, "/usr/bin/%saddr2line", cross_prefix);
+            asprintf(&addrbin, "%s", addr2line_exe);
 
         const char *cmd_addr[16] = {0}; int i = 0;
         cmd_addr[i++] = addrbin;
@@ -233,7 +235,7 @@ void address_add(const char *elf, uint32_t addr) {
         cmd_addr[i++] = "--exe";
         cmd_addr[i++] = elf;
 
-        if (subprocess_create(cmd_addr, subprocess_option_no_window, &subp) != 0) {
+        if (subprocess_create(cmd_addr, subprocess_option_inherit_environment | subprocess_option_no_window, &subp) != 0) {
             fprintf(stderr, "Error: cannot run: %s\n", addrbin);
             exit(1);
         }
@@ -318,7 +320,7 @@ bool elf_find_callsites(const char *elf)
 {
     // Start objdump to parse the disassembly of the ELF file
     char *cmd = NULL;
-    asprintf(&cmd, "/usr/bin/%sobjdump -d %s", cross_prefix, elf);
+    asprintf(&cmd, "%s -d %s", objdump_exe, elf);
     verbose("Running: %s\n", cmd);
     FILE *disasm = popen(cmd, "r");
     if (!disasm) {
@@ -517,12 +519,18 @@ int main(int argc, char *argv[])
                 return 1;
             }
             flag_max_sym_len = atoi(argv[i]);
-        } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--cross")) {
+        } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--addr2line")) {
             if (++i == argc) {
                 fprintf(stderr, "missing argument for %s\n", argv[i-1]);
                 return 1;
             }
-            cross_prefix = argv[i];
+            addr2line_exe = argv[i];
+        } else if (!strcmp(argv[i], "-j") || !strcmp(argv[i], "--objdump")) {
+            if (++i == argc) {
+                fprintf(stderr, "missing argument for %s\n", argv[i-1]);
+                return 1;
+            }
+            objdump_exe = argv[i];
         } else {
             fprintf(stderr, "invalid flag: %s\n", argv[i]);
             return 1;
