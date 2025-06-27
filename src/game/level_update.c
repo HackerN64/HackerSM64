@@ -1117,7 +1117,7 @@ s32 play_mode_frame_advance(void) {
  */
 void level_set_transition(s16 length, void (*updateFunction)()) {
     sTransitionTimer = length;
-    sTransitionUpdate = updateFunction;
+    sTransitionUpdate = (typeof(sTransitionUpdate)) updateFunction;
 }
 
 /**
