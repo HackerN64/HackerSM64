@@ -449,17 +449,6 @@ DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(B
 # Compiler Options                                                             #
 #==============================================================================#
 
-# Attempt to figure out OS
-OS := $(shell uname)
-
-ifneq (,$(findstring Windows_NT,$(OS)))
-  OS := Windows_NT
-else ifneq (,$(findstring MSYS,$(OS)))
-  OS := Windows_NT
-else ifneq (,$(findstring MINGW,$(OS)))
-  OS := Windows_NT
-endif
-
 # detect prefix for MIPS toolchain
 ifneq ($(call find-command,mips64-elf-ld),)
   CROSS := mips64-elf-
@@ -513,12 +502,8 @@ endif
 AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
 OBJCOPY   := $(CROSS)objcopy
-ifeq ($(OS),Windows_NT)
-  ADDR2LINE := addr2line
-else
-  ADDR2LINE := $(shell which $(CROSS)addr2line)
-  OBJDUMP_EXE := $(shell which $(OBJDUMP))
-endif
+ADDR2LINE := addr2line
+OBJDUMP_EXE := $(OBJDUMP)
 
 ifeq ($(LD), tools/mips64-elf-ld)
   ifeq ($(shell ls -la tools/mips64-elf-ld | awk '{print $1}' | grep x),)

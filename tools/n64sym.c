@@ -129,7 +129,7 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
         cmd_addr[i++] = "--exe";
         cmd_addr[i++] = elf;
 
-        if (subprocess_create(cmd_addr, subprocess_option_inherit_environment | subprocess_option_no_window, &subp) != 0) {
+        if (subprocess_create(cmd_addr, subprocess_option_search_user_path | subprocess_option_inherit_environment | subprocess_option_no_window, &subp) != 0) {
             fprintf(stderr, "Error: cannot run: %s\n", addrbin);
             exit(1);
         }
