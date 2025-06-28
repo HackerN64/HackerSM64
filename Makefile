@@ -503,7 +503,6 @@ AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
 OBJCOPY   := $(CROSS)objcopy
 ADDR2LINE := addr2line
-OBJDUMP_EXE := $(OBJDUMP)
 
 ifeq ($(LD), tools/mips64-elf-ld)
   ifeq ($(shell ls -la tools/mips64-elf-ld | awk '{print $1}' | grep x),)
@@ -974,7 +973,7 @@ $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 
 $(SYMBOL_TABLE): $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Generating symbol table:,$(@F))
-	$(V)tools/n64sym $(DEBUG_EXPORT_ALL_LINES_FLAG) --objdump $(OBJDUMP_EXE) --addr2line $(ADDR2LINE) $(BUILD_DIR)/sm64_prelim.elf
+	$(V)tools/n64sym $(DEBUG_EXPORT_ALL_LINES_FLAG) --objdump $(OBJDUMP) --addr2line $(ADDR2LINE) $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Assembling:,$@)
 	$(LD) -r -b binary -o $@ $(BUILD_DIR)/sm64_prelim.sym
 
