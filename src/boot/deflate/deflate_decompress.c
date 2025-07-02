@@ -1030,6 +1030,7 @@ __attribute__((optimize("Os"))) static bool
 build_litlen_decode_table(struct libdeflate_decompressor *d,
 			  unsigned num_litlen_syms, unsigned num_offset_syms)
 {
+	(void) num_offset_syms;
 	/* When you change TABLEBITS, you must change ENOUGH, and vice versa! */
 	STATIC_ASSERT(LITLEN_TABLEBITS == 11 && LITLEN_ENOUGH == 2342);
 

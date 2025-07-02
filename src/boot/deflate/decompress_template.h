@@ -42,7 +42,7 @@
 #endif
 
 extern void* dma_async_ctx_read(void* ctx);
-static forceinline void libdeflate_dma_check(const uint8_t* check, const uint8_t** _dmaLimit, struct DMAAsyncCtx* ctx)
+static forceinline void libdeflate_dma_check(const uint8_t* check, const uint8_t** _dmaLimit, void* ctx)
 {
 #define dmaLimit (*_dmaLimit)
     if (check > dmaLimit)
@@ -236,8 +236,7 @@ next_block:
 				rep_count = 11 + (bitbuf & BITMASK(7));
 				bitbuf >>= 7;
 				bitsleft -= 7;
-				int left_reps = rep_count;
-				int off = i;
+				unsigned int off = i;
 				i += rep_count;
 				while (off < i) {
 					store_u64_unaligned(0, (u32 *)&d->u.l.lens[off]);
@@ -282,7 +281,7 @@ next_block:
 		SAFETY_CHECK(len <= in_end - in_next);
 
 		u8* out_cur = out_next;
-		u8* in_cur = in_next;
+		const u8* in_cur = in_next;
 		in_next += len;
 		out_next += len;
 		while (out_cur < out_next) {
@@ -557,7 +556,7 @@ have_decode_tables:
 		offset += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
 
 		/* Validate the match offset; needed even in the fastloop. */
-		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
+		SAFETY_CHECK((int) offset <= out_next - (const u8 *)out);
 		src = out_next - offset;
 		dst = out_next;
 		out_next += length;
@@ -670,7 +669,7 @@ generic_loop:
 		bitbuf >>= (u8)entry;
 		bitsleft -= entry;
 
-		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
+		SAFETY_CHECK((int) offset <= out_next - (const u8 *)out);
 		src = out_next - offset;
 		dst = out_next;
 		out_next += length;
