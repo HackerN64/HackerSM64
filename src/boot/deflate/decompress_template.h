@@ -277,7 +277,6 @@ next_block:
 		nlen = get_unaligned_le16(in_next + 2);
 		in_next += 4;
 
-		SAFETY_CHECK(len == (u16)~nlen);
 		SAFETY_CHECK(len <= in_end - in_next);
 
 		u8* out_cur = out_next;
