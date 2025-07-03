@@ -16,8 +16,13 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
  */
 #define error(message) { \
     sprintf(__n64Assert_MessageBuf, message); \
-    __n64Assert(__FILE__, __LINE__, "Unconditional"); \
+    __n64Assert(__FILE__, __LINE__, " error() called "); \
 }
+#define errorf(message, ...) { \
+    sprintf(__n64Assert_MessageBuf, message, __VA_ARGS__); \
+    __n64Assert(__FILE__, __LINE__, " errorf() called "); \
+}
+
 
 /**
  * Wrapper for assert/aggress
