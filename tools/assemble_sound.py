@@ -15,9 +15,91 @@ STACK_TRACES = False
 DUMP_INDIVIDUAL_BINS = False
 ENDIAN_MARKER = ">"
 WORD_BYTES = 4
+VERBOSE = False
 
 orderedJsonDecoder = JSONDecoder(object_pairs_hook=OrderedDict)
 
+# Support current, legacy, and Refresh 16 instrument names from decomp for
+# cross-compatibility (instruments sample bank only)
+VALID_INSTRUMENT_NAMES = [
+#   ----------HackerSM64----------Legacy------------Refresh 16-------------
+    ["00",                         "00",  "00_banjo_D2"                   ],
+    ["01_banjo_1",                 "01",  "01_banjo_A2"                   ],
+    ["02",                         "02",  "02_violin_B2"                  ],
+    ["03_human_whistle",           "03",  "03_human_whistle_C3"           ],
+    ["04_bright_piano",            "04",  "04_bright_piano_G#3"           ],
+    ["05_acoustic_bass",           "05",  "05_acoustic_bass_A1"           ],
+    ["06_kick_drum_1",             "06",  "06_kick_drum_1"                ],
+    ["07_rimshot",                 "07",  "07_rimshot"                    ],
+    ["08",                         "08",  "08"                            ],
+    ["09",                         "09",  "09"                            ],
+    ["0A_tambourine",              "0A",  "0A_tambourine"                 ],
+    ["0B",                         "0B",  "0B"                            ],
+    ["0C_conga_stick",             "0C",  "0C_conga_stick"                ],
+    ["0D_clave",                   "0D",  "0D_clave"                      ],
+    ["0E_hihat_closed",            "0E",  "0E_hihat_closed"               ],
+    ["0F_hihat_open",              "0F",  "0F_hihat_open"                 ],
+    ["10_cymbal_bell",             "10",  "10_cymbal_bell"                ],
+    ["11_splash_cymbal",           "11",  "11_splash_cymbal"              ],
+    ["12_snare_drum_1",            "12",  "12_snare_drum_1"               ],
+    ["13_snare_drum_2",            "13",  "13_snare_drum_2"               ],
+    ["14_strings_5",               "14",  "14_strings_Eb2"                ],
+    ["15_strings_4",               "15",  "15_strings_B3"                 ],
+    ["16_french_horns",            "16",  "16_french_horns_C3"            ],
+    ["17_trumpet",                 "17",  "17_trumpet_C#3"                ],
+    ["18_timpani",                 "18",  "18_timpani"                    ],
+    ["19_brass",                   "19",  "19_brass_Eb3"                  ],
+    ["1A_slap_bass",               "1A",  "1A_slap_bass_G#2"              ],
+    ["1B_organ_2",                 "1B",  "1B_percussive_synth_Eb3"       ],
+    ["1C",                         "1C",  "1C_les_paul_guitar_E2"         ],
+    ["1D",                         "1D",  "1D"                            ],
+    ["1E_closed_triangle",         "1E",  "1E_closed_triangle"            ],
+    ["1F_open_triangle",           "1F",  "1F_open_triangle"              ],
+    ["20_cabasa",                  "20",  "20_cabasa"                     ],
+    ["21_sine_bass",               "21",  "21_sine_bass_Bb2"              ],
+    ["22_boys_choir",              "22",  "22_boys_choir_Bb4"             ],
+    ["23_strings_1",               "23",  "23_strings_Eb2"                ],
+    ["24_strings_2",               "24",  "24_strings_G#2"                ],
+    ["25_strings_3",               "25",  "25_strings_F#3"                ],
+    ["26_crystal_rhodes",          "26",  "26_crystal_rhodes_C4"          ],
+    ["27_harpsichord",             "27",  "27_harpsichord_F3"             ],
+    ["28_sitar_1",                 "28",  "28_sitar_1_A2"                 ],
+    ["29_orchestra_hit",           "29",  "29_orchestra_hit_C3"           ],
+    ["2A",                         "2A",  "2A_tabla_riff_1"               ],
+    ["2B",                         "2B",  "2B_tabla_riff_2"               ],
+    ["2C",                         "2C",  "2C_tabla_riff_3"               ],
+    ["2D_trombone",                "2D",  "2D_trombone_Bb2"               ],
+    ["2E_accordion",               "2E",  "2E_accordion_C4"               ],
+    ["2F_sleigh_bells",            "2F",  "2F_sleigh_bells"               ],
+    ["30_rarefaction-lahna",       "30",  "30_rarefaction-lahna_E4"       ],
+    ["31_rarefaction-convolution", "31",  "31_rarefaction-convolution_Eb2"],
+    ["32_metal_rimshot",           "32",  "32_metal_rimshot"              ],
+    ["33_kick_drum_2",             "33",  "33_kick_drum_2"                ],
+    ["34_alto_flute",              "34",  "34_alto_flute_A4"              ],
+    ["34b_organ",                  "34b", "34b_organ_C3"                  ],
+    ["34c_organ_lq",               "34c", "34c_organ_C4"                  ],
+    ["35_gospel_organ",            "35",  "35_gospel_organ_F4"            ],
+    ["36_sawtooth_synth",          "36",  "36_sawtooth_synth_Eb1"         ],
+    ["37_square_synth",            "37",  "37_square_synth_C5"            ],
+    ["38_electric_kick_drum",      "38",  "38_electric_kick_drum"         ],
+    ["39_sitar_2",                 "39",  "39_sitar_2_C#3"                ],
+    ["3A_music_box",               "3A",  "3A_music_box_C5"               ],
+    ["3B_banjo_2",                 "3B",  "3B_acoustic_guitar_A1"         ],
+    ["3C_acoustic_guitar",         "3C",  "3C_acoustic_guitar_E3"         ],
+    ["3D",                         "3D",  "3D_acoustic_guitar_B6"         ],
+    ["3E_monk_choir",              "3E",  "3E_monk_choir_B2"              ],
+    ["3F",                         "3F",  "3F_small_gamelan"              ],
+    ["40_bell",                    "40",  "40_fu_yin_gong_C4"             ],
+    ["41_pan_flute",               "41",  "41_pan_flute_C3"               ],
+    ["42_vibraphone",              "42",  "42_vibraphone_F#4"             ],
+    ["43_harmonica",               "43",  "43_harmonica_C4"               ],
+    ["44_grand_piano",             "44",  "44_grand_piano_F#5"            ],
+    ["45_french_horns_lq",         "45",  "45_french_horns_C4"            ],
+    ["45b_la",                     "45b", "45b_la_E3"                     ],
+    ["46_pizzicato_strings_1",     "46",  "46_pizzicato_strings_Bb2"      ],
+    ["47_pizzicato_strings_2",     "47",  "47_pizzicato_strings_Bb3"      ],
+    ["48_steel_drum",              "48",  "48_steel_drum_C#3"             ],
+]
 
 class Aifc:
     def __init__(self, name, fname, data, sample_rate, book, loop):
@@ -271,10 +353,29 @@ def validate_int_in_range(val, lo, hi, msg, forstr=""):
     )
 
 
-def validate_sound(json, sample_bank, forstr=""):
+def attempt_instrument_name_remap(filename, json, sample_bank_name, sample_bank):
+    if sample_bank_name != "instruments":
+        return False
+    sample_name = json["sample"]
+    if sample_name in sample_bank.name_to_entry:
+        return False
+    for value in VALID_INSTRUMENT_NAMES:
+        if sample_name not in value:
+            continue
+        for new_sample in value:
+            if new_sample in sample_bank.name_to_entry:
+                if VERBOSE:
+                    print(filename + ": \"" + sample_name + "\" -> \"" + new_sample + "\"")
+                json["sample"] = new_sample
+                return True
+    return False
+
+
+def validate_sound(filename, json, sample_bank_name, sample_bank, forstr=""):
     validate_json_format(json, {"sample": str}, forstr)
     if "tuning" in json:
         validate_json_format(json, {"tuning": float}, forstr)
+    attempt_instrument_name_remap(filename, json, sample_bank_name, sample_bank)
     validate(
         json["sample"] in sample_bank.name_to_entry,
         "reference to sound {} which isn't found in sample bank {}".format(
@@ -313,7 +414,8 @@ def normalize_sound_json(json):
             obj[key] = {"sample": obj[key]}
 
 
-def validate_bank(json, sample_bank):
+def validate_bank(filename, json, sample_bank_name, name_to_sample_bank):
+    sample_bank = name_to_sample_bank[sample_bank_name]
     if "date" in json:
         validate(
             isinstance(json["date"], str)
@@ -369,7 +471,7 @@ def validate_bank(json, sample_bank):
             drum,
             {"release_rate": [0, 255], "pan": [0, 128], "envelope": str, "sound": dict},
         )
-        validate_sound(drum["sound"], sample_bank)
+        validate_sound(filename, drum["sound"], sample_bank_name, sample_bank)
         validate(
             drum["envelope"] in json["envelopes"],
             "reference to non-existent envelope " + drum["envelope"],
@@ -429,7 +531,7 @@ def validate_bank(json, sample_bank):
             if inst[key] is no_sound:
                 del inst[key]
             else:
-                validate_sound(inst[key], sample_bank, forstr)
+                validate_sound(filename, inst[key], sample_bank_name, sample_bank, forstr)
 
     seen_instruments = set()
     for inst in json["instrument_list"]:
@@ -896,6 +998,7 @@ def main():
     global DUMP_INDIVIDUAL_BINS
     global ENDIAN_MARKER
     global WORD_BYTES
+    global VERBOSE
     need_help = False
     skip_next = 0
     cpp_command = None
@@ -951,6 +1054,8 @@ def main():
             sound_bank_dir = sys.argv[i + 4]
             sequence_json = sys.argv[i + 5]
             skip_next = 5
+        elif a == "-V" or a == "-v" or a == "--verbose":
+            VERBOSE = True
         elif a.startswith("-"):
             print("Unrecognized option " + a)
             sys.exit(1)
@@ -978,6 +1083,7 @@ def main():
             "Usage: {} <samples dir> <sound bank dir>"
             " <out .ctl file> <out .ctl Shindou header file>"
             " <out .tbl file> <out .tbl Shindou header file>"
+            " [--verbose]"
             " [--cpp <preprocessor>]"
             " [-D <symbol>]"
             " [--stack-trace]"
@@ -1051,7 +1157,7 @@ def main():
             )
             sample_bank = name_to_sample_bank[sample_bank_name]
 
-            validate_bank(bank_json, sample_bank)
+            validate_bank(f, bank_json, sample_bank_name, name_to_sample_bank)
 
             bank = Bank(f[:-5], sample_bank, bank_json)
             mark_sample_bank_uses(bank)

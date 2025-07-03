@@ -11,7 +11,7 @@
 #include "segment_symbols.h"
 #include "segments.h"
 #ifdef GZIP
-#include <gzip.h>
+#include "deflate/libdeflate.h"
 #endif
 #if defined(RNC1) || defined(RNC2)
 #include <rnc.h>
@@ -371,7 +371,7 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
     return dest;
 }
 
-#if defined(LZ4T)
+#if defined(LZ4T) || defined(GZIP)
 #define DMA_ASYNC_HEADER_SIZE 16
 #else
 #define DMA_ASYNC_HEADER_SIZE 0
@@ -385,19 +385,10 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
 void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
 
-#ifdef GZIP
-    u32 compSize = (srcEnd - 4 - srcStart);
-#else
     u32 compSize = ALIGN16(srcEnd - srcStart);
-#endif
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
-#ifdef GZIP
-    // Decompressed size from end of gzip
-    u32 *size = (u32 *) (compressed + compSize);
-#else
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *) (compressed + 4);
-#endif
     if (compressed != NULL) {
 #ifdef UNCOMPRESSED
         dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
@@ -415,7 +406,9 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
 #ifdef GZIP
-            expand_gzip(compressed, dest, compSize, (u32)size);
+            struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
+            libdeflate_deflate_decompress(dec, compressed + 16, *(u32*) (compressed + 8), dest, &asyncCtx);
+            libdeflate_free_decompressor(dec);
 #elif RNC1
             Propack_UnpackM1(compressed, dest);
 #elif RNC2
