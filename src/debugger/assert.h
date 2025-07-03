@@ -58,7 +58,7 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
     } \
 } while (0);
 #else
-#define assertf(cond, ...) if ((cond) == FALSE) { __builtin_unreachable(); }
+#define assertf(cond, ...)
 #endif
 
 #ifdef DEBUG_ASSERTIONS
@@ -69,7 +69,7 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
     } \
 } while (0);
 #else
-#define assert(cond) if ((cond) == FALSE) { __builtin_unreachable(); }
+#define assert(cond)
 #endif
 
 #endif // ASSEMBLER
