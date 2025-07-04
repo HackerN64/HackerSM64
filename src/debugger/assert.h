@@ -12,17 +12,24 @@ extern char __n64Assert_MessageBuf[ASSERT_MESGBUF_SIZE + 1];
 extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 
 /**
+ * Stops the program
+ */
+#define abort() { \
+    __n64Assert_MessageBuf[0] = 0; \
+    __n64Assert(__FILE__, __LINE__, " abort() "); \
+}
+
+/**
  * Will always cause a crash with your message of choice
  */
 #define error(message) { \
     sprintf(__n64Assert_MessageBuf, message); \
-    __n64Assert(__FILE__, __LINE__, " error() called "); \
+    __n64Assert(__FILE__, __LINE__, " error() "); \
 }
 #define errorf(message, ...) { \
-    sprintf(__n64Assert_MessageBuf, message, __VA_ARGS__); \
-    __n64Assert(__FILE__, __LINE__, " errorf() called "); \
+    sprintf(__n64Assert_MessageBuf, message __VA_OPT__(, __VA_ARGS__)); \
+    __n64Assert(__FILE__, __LINE__, " errorf() "); \
 }
-
 
 /**
  * Wrapper for assert/aggress
