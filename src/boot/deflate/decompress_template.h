@@ -249,7 +249,7 @@ next_block:
 		SAFETY_CHECK(i == num_litlen_syms + num_offset_syms);
 
 	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
-		u16 len, nlen;
+		u16 len;
 
 		/*
 		 * Uncompressed block: copy 'len' bytes literally from the input
@@ -274,7 +274,7 @@ next_block:
 
 		SAFETY_CHECK(in_end - in_next >= 4);
 		len = get_unaligned_le16(in_next);
-		nlen = get_unaligned_le16(in_next + 2);
+		get_unaligned_le16(in_next + 2);
 		in_next += 4;
 
 		SAFETY_CHECK(len <= in_end - in_next);
