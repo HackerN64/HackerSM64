@@ -14,13 +14,13 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 /**
  * Will always cause a crash with your message of choice
  */
-#define error(message) { \
-    sprintf(__n64Assert_MessageBuf, message); \
-    __n64Assert(__FILE__, __LINE__, " error() "); \
-}
 #define errorf(message, ...) { \
     sprintf(__n64Assert_MessageBuf, message ## __VA_ARGS__); \
     __n64Assert(__FILE__, __LINE__, " errorf() "); \
+}
+#define error(message) { \
+    sprintf(__n64Assert_MessageBuf, message); \
+    __n64Assert(__FILE__, __LINE__, " error() "); \
 }
 
 /**
