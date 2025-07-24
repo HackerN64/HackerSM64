@@ -386,6 +386,9 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
 
     u32 compSize = ALIGN16(srcEnd - srcStart);
+#ifdef GZIP
+    struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
+#endif
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *) (compressed + 4);
@@ -406,7 +409,6 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
 #ifdef GZIP
-            struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
             libdeflate_deflate_decompress(dec, compressed + 16, *(u32*) (compressed + 8), dest, &asyncCtx);
             libdeflate_free_decompressor(dec);
 #elif RNC1
