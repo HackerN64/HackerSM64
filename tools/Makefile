@@ -20,6 +20,8 @@ endif
 
 default: all
 
+BUILD_PROGRAMS := $(ALL_PROGRAMS)
+
 filesizer_SOURCES	:= filesizer.c
 
 rncpack_SOURCES	:= rncpack.c
