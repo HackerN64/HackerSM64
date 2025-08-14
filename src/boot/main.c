@@ -22,9 +22,7 @@
 #include "game/puppyprint.h"
 #include "game/profiling.h"
 #include "game/emutest.h"
-#ifdef F3DEX_GBI_3
 #include "game/f3dex3.h"
-#endif
 
 // Message IDs
 enum MessageIDs {

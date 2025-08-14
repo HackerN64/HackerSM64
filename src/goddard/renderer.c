@@ -1972,9 +1972,15 @@ void gd_dl_flush_vertices(void) {
         // load triangle data
         for (i = 0; i < sTriangleBufCount; i++) {
             if (sTriangleBufCount - i > 1) {
-                gSP2Triangles(&sCurrentGdDl->gfx[sCurrentGdDl->curGfxIdx++], sTriangleBuf[i][0] - sVertexBufStartIndex, sTriangleBuf[i][1] - sVertexBufStartIndex, sTriangleBuf[i][2] - sVertexBufStartIndex, 0,
-                                        sTriangleBuf[i + 1][0] - sVertexBufStartIndex, sTriangleBuf[i + 1][1] - sVertexBufStartIndex, sTriangleBuf[i + 1][2] - sVertexBufStartIndex, 0);
-                                        i++;
+                gSP2Triangles(&sCurrentGdDl->gfx[sCurrentGdDl->curGfxIdx++],
+                                  sTriangleBuf[i][0] - sVertexBufStartIndex, sTriangleBuf[i][1] - sVertexBufStartIndex,
+                                  sTriangleBuf[i][2] - sVertexBufStartIndex,
+                                  0,
+                                  sTriangleBuf[i + 1][0] - sVertexBufStartIndex,
+                                  sTriangleBuf[i + 1][1] - sVertexBufStartIndex,
+                                  sTriangleBuf[i + 1][2] - sVertexBufStartIndex, 0
+                              );
+                i++;
             } else {
                 gSP1Triangle(&sCurrentGdDl->gfx[sCurrentGdDl->curGfxIdx++], sTriangleBuf[i][0] - sVertexBufStartIndex, sTriangleBuf[i][1] - sVertexBufStartIndex, sTriangleBuf[i][2] - sVertexBufStartIndex, 0);
             }

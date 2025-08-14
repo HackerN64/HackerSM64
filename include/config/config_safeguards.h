@@ -59,7 +59,7 @@
     #elif F3DEX_VERSION == 3
         #define F3DEX_GBI_3
     #else
-        #error "Invalid microcode selection. Valid options are 1-3 inclusive."
+        #error "Invalid microcode selection. Valid options are 2-3 inclusive."
     #endif
 #else
     #error "F3DEX_VERSION is not defined in config/config_graphics.h"

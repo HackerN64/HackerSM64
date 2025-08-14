@@ -20,10 +20,7 @@
 #include "string.h"
 #include "color_presets.h"
 #include "emutest.h"
-
-#ifdef F3DEX3_LIGHTING_ENGINE
 #include "f3dex3.h"
-#endif
 
 #include "config.h"
 #include "config/config_world.h"

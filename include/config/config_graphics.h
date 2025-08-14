@@ -162,7 +162,6 @@
  * A built-in profiler is available for F3DEX3 and can be enabled inside config/config_debug.h
  * under DEBUG_F3DEX3_PROFILER.
  */
-
 #define F3DEX_VERSION 2
 
 /**
@@ -178,6 +177,5 @@
  * See README.md and src/game/f3dex3.c for more details.
  * NOTE: Game looks visually identical if not setup.
  */
-
 #define F3DEX3_LIGHTING_ENGINE
 

@@ -24,9 +24,7 @@
 #ifdef SRAM
 #include "sram.h"
 #endif
-#ifdef F3DEX_GBI_3
 #include "f3dex3.h"
-#endif
 #include "puppyprint.h"
 #include "puppycam2.h"
 #include "debug_box.h"
