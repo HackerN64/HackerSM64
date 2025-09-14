@@ -10,7 +10,7 @@
 // #define DEBUG_ALL
 
 /**
- * Disables all debug options (except PUPPYPRINT).
+ * Disables all debug options (except PUPPYPRINT and DEBUG_FULL_STACK_TRACE).
  */
 // #define DISABLE_ALL
 
@@ -96,7 +96,7 @@
 #define DEBUG_ASSERTIONS
 
 /**
- * Crash Screen: enable symbol-assisted stack trace
- *  If disabled, stack trace will just dump memory, and you can figure it out yourself.
+ * Crash Screen: enable symbol-assisted stack trace. Adds a bit more code to (somewhat) intelligently walk the stack.
+ *  If disabled, stack trace will just dump the memory at the stack pointer, from which one can cross-reference with the function map.
  */
 #define DEBUG_FULL_STACK_TRACE
