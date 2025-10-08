@@ -15,6 +15,7 @@
 #include "game/rumble_init.h"
 #include "game/printf.h"
 
+#include "crash_screen.h"
 #include "map_parser.h"
 #include "disasm.h"
 #include "assert.h"
@@ -28,25 +29,6 @@ extern void audio_signal_game_loop_tick(void);
 extern void stop_sounds_in_continuous_banks(void);
 extern void read_controller_inputs(s32 threadID);
 extern char *strstr(char *, char *);
-
-// Configurable Defines
-#define X_KERNING 6
-#define GLYPH_WIDTH 8
-#define GLYPH_HEIGHT 12
-#define FONT_ROWS 16
-#define LEFT_MARGIN 10 // for crash screen prints
-
-enum crashPages {
-    PAGE_SIMPLE,
-    PAGE_CONTEXT,
-#ifdef PUPPYPRINT_DEBUG
-    PAGE_LOG,
-#endif
-    PAGE_STACKTRACE,
-    PAGE_DISASM,
-    PAGE_ASSERTS,
-    PAGE_COUNT
-};
 
 static char *crashPageNames[] = {
     [PAGE_SIMPLE] = "(Overview)",
@@ -74,8 +56,8 @@ static u32 sCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS * 2 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
-u8 crashPage = 0;
-u8 updateBuffer = TRUE;
+static u8 crashPage = 0;
+static u8 updateBuffer = TRUE;
 
 static char crashScreenBuf[0x200];
 
