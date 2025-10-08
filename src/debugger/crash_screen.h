@@ -8,7 +8,7 @@
 #define FONT_ROWS 16
 #define LEFT_MARGIN 10 // for crash screen prints
 
-enum crashPages {
+enum CrashPages {
     PAGE_SIMPLE,
     PAGE_CONTEXT,
 #ifdef PUPPYPRINT_DEBUG
