@@ -90,10 +90,15 @@ endif
 # FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
 FIXLIGHTS ?= 1
 
+#----------------
 # Debug Switches - Comment these out to remove the functionality, then run `make clean`
+#----------------
 # Export symbols and stack trace data for crash screen
 DEBUG_EXPORT_SYMBOLS := 1
-# Include line data, at the cost of a significantly longer link time
+# Crash Screen: enable symbol-assisted stack trace. Adds a bit more code to (somewhat) intelligently walk the stack.
+# If disabled, stack trace will just dump the memory at the stack pointer, from which one can cross-reference with the function map.
+DEBUG_FULL_STACK_TRACE := 1
+# Include line data, at the cost of a significantly longer link time and a few extra megabytes of ROM
 DEBUG_EXPORT_ALL_LINES := 0
 
 ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
@@ -104,6 +109,9 @@ ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
   DEFINES += DEBUG_EXPORT_SYMBOLS=1
   DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
   SYMBOL_TABLE = $(BUILD_DIR)/sm64.sym.o
+endif
+ifeq ($(DEBUG_FULL_STACK_TRACE),1)
+  DEFINES += DEBUG_FULL_STACK_TRACE
 endif
 
 TARGET := sm64
