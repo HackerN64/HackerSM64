@@ -7,6 +7,7 @@
 #include "sm64.h"
 #include "audio/external.h"
 #include "debugger/assert.h"
+#include "debugger/crash_screen.h"
 #include "game/game_init.h"
 #include "game/debug.h"
 #include "game/memory.h"
@@ -344,7 +345,6 @@ void check_stack_validity(void) {
 #endif
 
 
-extern void crash_screen_init(void);
 extern OSViMode VI;
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
