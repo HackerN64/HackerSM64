@@ -1,5 +1,16 @@
 # util.mk - Miscellaneous utility functions for use in Makefiles
 
+# Checks if the assets have been extracted
+define extract-assets
+  ifneq (,$$(shell python3 tools/detect_baseroms.py $1))
+      $(warning "Extracting assets from $1 ROM...\n")
+      DUMMY != $$(PYTHON) extract_assets.py $1 >&2 || echo FAIL
+      ifeq ($$(DUMMY),FAIL)
+        $$(error Failed to extract assets from $1 ROM)
+      endif
+  endif
+endef
+
 # Throws an error if the value of the variable named by $(1) is not in the list given by $(2)
 define validate-option
   # value must be part of the list

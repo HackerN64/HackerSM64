@@ -314,28 +314,10 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
   # Make sure assets exist
   NOEXTRACT ?= 0
   ifeq ($(NOEXTRACT),0)
-    DUMMY != $(PYTHON) extract_assets.py us >&2 || echo FAIL
-    ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets from US ROM)
-    endif
-    ifneq (,$(shell python3 tools/detect_baseroms.py jp))
-      DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
-      ifeq ($(DUMMY),FAIL)
-        $(error Failed to extract assets from JP ROM)
-      endif
-    endif
-    ifneq (,$(shell python3 tools/detect_baseroms.py eu))
-      DUMMY != $(PYTHON) extract_assets.py eu >&2 || echo FAIL
-      ifeq ($(DUMMY),FAIL)
-        $(error Failed to extract assets from EU ROM)
-      endif
-    endif
-    ifneq (,$(shell python3 tools/detect_baseroms.py sh))
-      DUMMY != $(PYTHON) extract_assets.py sh >&2 || echo FAIL
-      ifeq ($(DUMMY),FAIL)
-        $(error Failed to extract assets from SH ROM)
-      endif
-    endif
+    $(eval $(call extract-assets,us))
+    $(eval $(call extract-assets,jp))
+    $(eval $(call extract-assets,eu))
+    $(eval $(call extract-assets,sh))
   endif
 
   # Make tools if out of date
