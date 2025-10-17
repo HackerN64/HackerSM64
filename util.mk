@@ -3,11 +3,11 @@
 # Checks if the assets have been extracted
 define extract-assets
   ifneq (,$$(shell python3 tools/detect_baseroms.py $1))
-      $(warning "Extracting assets from $1 ROM...\n")
-      DUMMY != $$(PYTHON) extract_assets.py $1 >&2 || echo FAIL
-      ifeq ($$(DUMMY),FAIL)
-        $$(error Failed to extract assets from $1 ROM)
-      endif
+    $(warning "Extracting assets from $1 ROM...\n")
+    DUMMY != $$(PYTHON) extract_assets.py $1 >&2 || echo FAIL
+    ifeq ($$(DUMMY),FAIL)
+      $$(error Failed to extract assets from $1 ROM)
+    endif
   endif
 endef
 
