@@ -57,6 +57,8 @@ def get_rom_candidates():
             continue
     return foundVersions
 
+def list_rom_candidates():
+    return [version for version in get_rom_candidates()]
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -66,7 +68,7 @@ if __name__ == "__main__":
     version = sys.argv[1]
 
     if version == "list":
-        print(" ".join([version for version in gamelist]))
+        print(" ".join(list_rom_candidates()))
     elif version in gamelist:
         print(gamelist[version])
 
