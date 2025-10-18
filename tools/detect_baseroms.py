@@ -30,15 +30,15 @@ def get_rom_candidates():
 
     foundVersions = {}
 
-    for f in fileArray:
+    for baseromCandidate in fileArray:
         try:
             sha1sum = 0
-            with open(f, "rb") as romFile:
+            with open(baseromCandidate, "rb") as romFile:
                 sha1sum = sha1(romFile.read()).hexdigest()
 
             for k, v in sha1_LUT.items():
                 if v == sha1sum:
-                    foundVersions[k] = f
+                    foundVersions[k] = baseromCandidate
 
             for version, sha in sha1_swapLUT.items():
                 if sha == sha1sum: # the ROM is swapped!
@@ -47,7 +47,7 @@ def get_rom_candidates():
                         subprocess.run(
                             [
                                 "dd","conv=swab",
-                                "if=%s" % f,
+                                f"if={baseromCandidate}",
                                 f"of=/tmp/baserom.{version}.swapped.z64"
                             ],
                             stderr=subprocess.PIPE,
