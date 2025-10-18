@@ -134,7 +134,7 @@ def main():
         sys.exit(1)
 
     # Late imports (to optimize startup perf)
-    import hashlib
+    # import hashlib
     import tempfile
     from collections import defaultdict
 

@@ -36,9 +36,9 @@ def get_rom_candidates():
             with open(baseromCandidate, "rb") as romFile:
                 sha1sum = sha1(romFile.read()).hexdigest()
 
-            for k, v in sha1_LUT.items():
-                if v == sha1sum:
-                    foundVersions[k] = baseromCandidate
+            for version, sha in sha1_LUT.items():
+                if sha == sha1sum:
+                    foundVersions[version] = baseromCandidate
 
             for version, sha in sha1_swapLUT.items():
                 if sha == sha1sum: # the ROM is swapped!

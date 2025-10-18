@@ -4,7 +4,6 @@
 # Appends the EXTRACT_ASSETS_VERSIONS variable if rom version is found
 define find-rom
   ifneq (,$$(shell python3 tools/detect_baseroms.py $1))
-    $(info Locating ROM for region $1...)
     EXTRACT_ASSETS_VERSIONS += $1
   endif
 endef
