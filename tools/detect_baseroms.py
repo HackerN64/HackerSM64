@@ -19,6 +19,9 @@ sha1_swapLUT = {
     "us": "1002dd7b56aa0a59a9103f1fb3d57d6b161f8da7",
 }
 
+def usage():
+    print(f"Usage: {sys.argv[0]} command (find-baserom list-available-versions) version (us jp eu sh)")
+
 def get_rom_candidates():
     fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
     if os.path.exists(ROMS_DIR):
@@ -55,7 +58,7 @@ def get_rom_candidates():
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} version (us jp eu sh)")
+        usage()
         sys.exit(1)
     gamelist = get_rom_candidates();
     version = sys.argv[1]

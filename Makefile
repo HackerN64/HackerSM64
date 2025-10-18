@@ -311,13 +311,17 @@ PYTHON := python3
 
 ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
 
-  # Make sure assets exist
+  # Extract assets if necessary
   NOEXTRACT ?= 0
   ifeq ($(NOEXTRACT),0)
-    $(eval $(call extract-assets,us))
-    $(eval $(call extract-assets,jp))
-    $(eval $(call extract-assets,eu))
-    $(eval $(call extract-assets,sh))
+    $(eval $(call find-rom,us))
+    $(eval $(call find-rom,jp))
+    $(eval $(call find-rom,eu))
+    $(eval $(call find-rom,sh))
+    DUMMY != $(PYTHON) extract_assets.py $(EXTRACT_ASSETS_VERSIONS) >&2 || echo FAIL
+    ifeq ($(DUMMY),FAIL)
+      $$(error Failed to extract assets from $1 ROM)
+    endif
   endif
 
   # Make tools if out of date
