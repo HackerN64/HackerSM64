@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+from hashlib import sha1
 
 XDG_DATA_DIR=os.environ.get("XDG_DATA_HOME") or "~/.local/share"
 ROMS_DIR=os.path.expanduser(os.path.join(XDG_DATA_DIR, "HackerSM64"))
@@ -20,7 +21,7 @@ sha1_swapLUT = {
 }
 
 def usage():
-    print(f"Usage: {sys.argv[0]} command (find-baserom list-available-versions) version (us jp eu sh)")
+    print(f"Usage: {sys.argv[0]} command version (us jp eu sh)")
 
 def get_rom_candidates():
     fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
@@ -31,26 +32,27 @@ def get_rom_candidates():
 
     for f in fileArray:
         try:
-            p = subprocess.Popen(
-                ["sha1sum", f],
-                stdout=subprocess.PIPE
-            )
-            sha1sum = p.communicate()[0].decode('ascii').split()[0]
+            sha1sum = 0
+            with open(f, "rb") as romFile:
+                sha1sum = sha1(romFile.read()).hexdigest()
+
             for k, v in sha1_LUT.items():
                 if v == sha1sum:
                     foundVersions[k] = f
 
-            for k, v in sha1_swapLUT.items():
-                if v == sha1sum: # the ROM is swapped!
-                    subprocess.run(
-                        [
-                            "dd","conv=swab",
-                            "if=%s" % f,
-                            "of=/tmp/baserom.%s.swapped.z64" % k
-                        ],
-                        stderr=subprocess.PIPE,
-                    )
-                    foundVersions[k] = "/tmp/baserom.%s.swapped.z64" % k
+            for version, sha in sha1_swapLUT.items():
+                if sha == sha1sum: # the ROM is swapped!
+                    if not os.path.isfile(f"/tmp/baserom.{version}.swapped.z64"):
+                        # Only swap the ROM if it doesn't exist
+                        subprocess.run(
+                            [
+                                "dd","conv=swab",
+                                "if=%s" % f,
+                                f"of=/tmp/baserom.{version}.swapped.z64"
+                            ],
+                            stderr=subprocess.PIPE,
+                        )
+                    foundVersions[version] = f"/tmp/baserom.{version}.swapped.z64"
         except Exception as e:
             continue
     return foundVersions

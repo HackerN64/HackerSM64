@@ -318,6 +318,7 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
     $(eval $(call find-rom,jp))
     $(eval $(call find-rom,eu))
     $(eval $(call find-rom,sh))
+    $(info Found Baseroms: [$(EXTRACT_ASSETS_VERSIONS)])
     DUMMY != $(PYTHON) extract_assets.py $(EXTRACT_ASSETS_VERSIONS) >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
       $$(error Failed to extract assets from $1 ROM)

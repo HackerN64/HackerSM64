@@ -1,13 +1,11 @@
 # util.mk - Miscellaneous utility functions for use in Makefiles
 
-# Checks if the assets have been extracted
-define extract-assets
+# Usage: $(call find-rom,[us|eu|jp|sh])
+# Appends the EXTRACT_ASSETS_VERSIONS variable if rom version is found
+define find-rom
   ifneq (,$$(shell python3 tools/detect_baseroms.py $1))
-    $(warning "Extracting assets from $1 ROM...\n")
-    DUMMY != $$(PYTHON) extract_assets.py $1 >&2 || echo FAIL
-    ifeq ($$(DUMMY),FAIL)
-      $$(error Failed to extract assets from $1 ROM)
-    endif
+    $(info Locating ROM for region $1...)
+    EXTRACT_ASSETS_VERSIONS += $1
   endif
 endef
 
