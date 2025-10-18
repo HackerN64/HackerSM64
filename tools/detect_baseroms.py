@@ -21,7 +21,7 @@ sha1_swapLUT = {
 }
 
 def usage():
-    print(f"Usage: {sys.argv[0]} command version (us jp eu sh)")
+    print(f"Usage: {sys.argv[0]} version (us jp eu sh list)")
 
 def get_rom_candidates():
     fileArray = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f)]
@@ -65,7 +65,9 @@ if __name__ == "__main__":
     gamelist = get_rom_candidates();
     version = sys.argv[1]
 
-    if version in gamelist:
+    if version == "list":
+        print(" ".join([version for version in gamelist]))
+    elif version in gamelist:
         print(gamelist[version])
 
 
