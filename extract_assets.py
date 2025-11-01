@@ -125,7 +125,7 @@ def main():
     romLUT = get_rom_candidates()
 
     if not langs:
-        langs = [version for version in romLUT]
+        langs = romLUT.keys()
 
     # verify the correct rom
     for lang in langs:
