@@ -67,7 +67,7 @@ else ifeq ($(SAVETYPE),sram)
   DEFINES += SRAM=1
 endif
 
-DEFINES += NO_ERRNO_H=1 NO_GZIP=1
+DEFINES += NO_ERRNO_H=1
 
 # VERSION - selects the version of the game to build
 #   jp - builds the 1996 Japanese version
@@ -135,7 +135,7 @@ endif
 #==============================================================================#
 
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS = -Ofast -falign-functions=32
+DEFAULT_OPT_FLAGS = -Ofast -falign-functions=32 -ffinite-math-only -fno-signed-zeros -fno-math-errno
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # TODO: Figure out how to allow -fassociative-math to be enabled
@@ -269,12 +269,10 @@ BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 
-COMPRESS ?= yay0
-$(eval $(call validate-option,COMPRESS,mio0 yay0 gzip rnc1 rnc2 uncomp))
+COMPRESS ?= lz4t
+$(eval $(call validate-option,COMPRESS,mio0 yay0 lz4t gzip rnc1 rnc2 uncomp))
 ifeq ($(COMPRESS),gzip)
   DEFINES += GZIP=1
-  LIBZRULE := $(BUILD_DIR)/libz.a
-  LIBZLINK := -lz
 else ifeq ($(COMPRESS),rnc1)
   DEFINES += RNC1=1
 else ifeq ($(COMPRESS),rnc2)
@@ -283,12 +281,11 @@ else ifeq ($(COMPRESS),yay0)
   DEFINES += YAY0=1
 else ifeq ($(COMPRESS),mio0)
   DEFINES += MIO0=1
+else ifeq ($(COMPRESS),lz4t)
+  DEFINES += LZ4T=1
 else ifeq ($(COMPRESS),uncomp)
   DEFINES += UNCOMPRESSED=1
 endif
-
-GZIPVER ?= std
-$(eval $(call validate-option,GZIPVER,std libdef))
 
 # Whether to hide commands or not
 VERBOSE ?= 0
@@ -373,7 +370,6 @@ BUILD_DIR_BASE := build
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 ROM            := $(BUILD_DIR)/$(TARGET_STRING).z64
 ELF            := $(BUILD_DIR)/$(TARGET_STRING).elf
-LIBZ           := $(BUILD_DIR)/libz.a
 LD_SCRIPT      := sm64.ld
 YAY0_DIR       := $(BUILD_DIR)/bin
 SOUND_BIN_DIR  := $(BUILD_DIR)/sound
@@ -382,7 +378,7 @@ ACTOR_DIR      := actors
 LEVEL_DIRS     := $(patsubst levels/%,%,$(dir $(wildcard levels/*/header.h)))
 
 # Directories containing source files
-SRC_DIRS += src src/boot src/game src/engine src/audio src/menu src/buffers actors levels bin data assets asm lib sound
+SRC_DIRS += src src/boot src/boot/deflate src/game src/engine src/audio src/menu src/buffers lib/librtc actors levels bin data assets asm lib sound
 LIBZ_SRC_DIRS := src/libz
 GODDARD_SRC_DIRS := src/goddard src/goddard/dynlists
 BIN_DIRS := bin bin/$(VERSION)
@@ -394,7 +390,6 @@ include Makefile.split
 LEVEL_C_FILES     := $(wildcard levels/*/leveldata.c) $(wildcard levels/*/script.c) $(wildcard levels/*/geo.c)
 C_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(LEVEL_C_FILES)
 CPP_FILES         := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
-LIBZ_C_FILES      := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
 GODDARD_C_FILES   := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/demo_data.c
@@ -423,11 +418,10 @@ O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
            lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
 
-LIBZ_O_FILES := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
 # Automatic dependency files
-DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(BUILD_DIR)/$(LD_SCRIPT).d
+DEP_FILES := $(O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(BUILD_DIR)/$(LD_SCRIPT).d
 
 #==============================================================================#
 # Compiler Options                                                             #
@@ -435,7 +429,7 @@ DEP_FILES := $(O_FILES:.o=.d) $(LIBZ_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(B
 
 CROSS := $(call find-mips-toolchain)
 
-LIBRARIES := nustd hvqm2 z goddard
+LIBRARIES := nustd hvqm2 goddard
 
 LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
@@ -451,16 +445,18 @@ else ifeq ($(COMPILER),clang)
   CC      := clang
   CXX     := clang++
 endif
-# Prefer gcc's cpp if installed on the system
-ifneq (,$(call find-command,cpp-10))
-  CPP     := cpp-10
+
+ARCH := $(shell uname -p)
+
+# Check processor architecture. ARM users need a different binutils package.
+ifeq ($(ARCH), arm)
+  LD := tools/mips64-elf-ld-arm
 else
-  CPP     := cpp
-endif
-ifneq ($(call find-command,mips-n64-ld),)
-LD        := mips-n64-ld
-else
-LD        := tools/mips64-elf-ld
+  ifneq ($(call find-command,mips-n64-ld),)
+    LD        := mips-n64-ld
+  else
+    LD        := tools/mips64-elf-ld
+  endif
 endif
 AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
@@ -486,6 +482,18 @@ endif
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 
+# Prefer gcc's cpp if installed on the system
+ifneq (,$(call find-command,clang))
+  CPP     := clang
+  CPPFLAGS := -E -P -x c -Wno-trigraphs $(DEF_INC_CFLAGS)
+else ifneq (,$(call find-command,cpp-10))
+  CPP     := cpp-10
+  CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
+else
+  CPP     := cpp
+  CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
+endif
+
 # C compiler options
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 ifeq ($(COMPILER),gcc)
@@ -503,7 +511,6 @@ ASFLAGS     := -march=vr4300 -mabi=32 $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(fore
 RSPASMFLAGS := $(foreach d,$(DEFINES),-definelabel $(subst =, ,$(d)))
 
 # C preprocessor flags
-CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
 
 #==============================================================================#
 # Miscellaneous Tools                                                          #
@@ -512,6 +519,8 @@ CPPFLAGS := -P -Wno-trigraphs $(DEF_INC_CFLAGS)
 # N64 tools
 YAY0TOOL              := $(TOOLS_DIR)/slienc
 MIO0TOOL              := $(TOOLS_DIR)/mio0
+LZ4TPACK              := $(TOOLS_DIR)/lz4tpack
+DEFLATEPACK           := $(TOOLS_DIR)/deflatepack
 RNCPACK               := $(TOOLS_DIR)/rncpack
 FILESIZER             := $(TOOLS_DIR)/filesizer
 N64CKSUM              := $(TOOLS_DIR)/n64cksum
@@ -525,11 +534,6 @@ EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
 SKYCONV               := $(TOOLS_DIR)/skyconv
 FIXLIGHTS_PY          := $(TOOLS_DIR)/fixlights.py
 FLIPS                 := $(TOOLS_DIR)/flips
-ifeq ($(GZIPVER),std)
-GZIP                  := gzip
-else
-GZIP                  := libdeflate-gzip
-endif
 # Use the system installed armips if available. Otherwise use the one provided with this repository.
 ifneq (,$(call find-command,armips))
   RSPASM              := armips
@@ -545,10 +549,19 @@ endif
 
 EMU_FLAGS =
 
+# Adding a txt file to this location will then reference a UNFLoader path specified in the file, instead of locally.
+# This is expecially important for WSL users because UNFLoader.exe is incredibly slow when run within WSL's filesystem, so this can be used to point to the C drive.
+# The file should only contain the directory path that contains UNFLoader[.exe] (do not specify the filename).
+LOADER_DIR_FILE_SPECIFICATION_PATH = ~/.local/share/HackerSM64/UNFLoader-dir.txt
+LOADER_DIR = ./$(TOOLS_DIR)
+
+ifneq (,$(wildcard $(LOADER_DIR_FILE_SPECIFICATION_PATH)))
+  LOADER_DIR = $(shell cat $(LOADER_DIR_FILE_SPECIFICATION_PATH))
+endif
 ifneq (,$(call find-command,wslview))
-    LOADER = ./$(TOOLS_DIR)/UNFLoader.exe
+  UNFLOADER_EXEC = $(LOADER_DIR)/UNFLoader.exe
 else
-    LOADER = ./$(TOOLS_DIR)/UNFLoader
+  UNFLOADER_EXEC = $(LOADER_DIR)/UNFLoader
 endif
 
 SHA1SUM = sha1sum
@@ -604,26 +617,33 @@ test-pj64: $(ROM)
 # someone2639
 
 # download and extract most recent unfloader build if needed
-$(LOADER):
-ifeq (,$(wildcard $(LOADER)))
+$(UNFLOADER_EXEC):
+ifeq (,$(wildcard $(UNFLOADER_EXEC)))
 	@$(PRINT) "Downloading latest UNFLoader...$(NO_COL)\n"
-	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(TOOLS_DIR)
+	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(LOADER_DIR)
 endif
 
-load: $(ROM) $(LOADER)
-	$(LOADER) -r $<
+load: $(ROM) $(UNFLOADER_EXEC)
+	$(UNFLOADER_EXEC) -r $<
 
-unf: $(ROM) $(LOADER)
-	$(LOADER) -d -r $<
+unf: $(ROM) $(UNFLOADER_EXEC)
+	$(UNFLOADER_EXEC) -d -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
 
 patch: $(ROM)
-	$(FLIPS) --create --bps $(shell python3 tools/detect_baseroms.py $(VERSION)) $(ROM) $(BUILD_DIR)/$(TARGET_STRING).bps
+  ifeq ($(shell uname), Darwin)
+    ifeq ($(MAKECMDGOALS), patch)
+      $(error "The 'make patch' command is not supported on macOS.")
+    endif
+  else
+	  $(FLIPS) --create --bps "$(shell python3 tools/detect_baseroms.py $(VERSION))" "$(ROM)" "$(BUILD_DIR)/$(TARGET_STRING).bps"
+  endif
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
 $(BUILD_DIR)/src/game/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
+$(BUILD_DIR)/src/game/fasttext.o:     $(FASTTEXT_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
 $(SOUND_BIN_DIR)/sound_data.o:        $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/sequences.bin $(SOUND_BIN_DIR)/bank_sets
@@ -634,11 +654,6 @@ ifeq ($(VERSION),sh)
 endif
 
 $(CRASH_TEXTURE_C_FILES): TEXTURE_ENCODING := u32
-
-ifeq ($(COMPILER),gcc)
-$(BUILD_DIR)/src/libz/%.o: OPT_FLAGS := -Os
-$(BUILD_DIR)/src/libz/%.o: CFLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-pointer-sign
-endif
 
 ifeq ($(VERSION),eu)
   TEXT_DIRS := text/de text/us text/fr
@@ -680,7 +695,7 @@ $(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := $(GRAPH_NODE_OPT_FLAG
 # $(info MATH_UTIL_OPT_FLAGS:  $(MATH_UTIL_OPT_FLAGS))
 # $(info GRAPH_NODE_OPT_FLAGS: $(GRAPH_NODE_OPT_FLAGS))
 
-ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(LIBZ_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
+ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
 
 # Make sure build directory exists before compiling anything
 DUMMY != mkdir -p $(ALL_DIRS)
@@ -703,9 +718,13 @@ $(BUILD_DIR)/%: %.png
 	$(call print,Converting:,$<,$@)
 	$(V)$(N64GRAPHICS) -s raw -i $@ -g $< -f $(lastword $(subst ., ,$@))
 
+$(BUILD_DIR)/%.preswap.inc.c: %.preswap.png
+	$(call print,Converting:,$<,$@)
+	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$*)) -S
+
 $(BUILD_DIR)/%.inc.c: %.png
 	$(call print,Converting:,$<,$@)
-	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$(basename $<)))
+	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$*))
 
 # Color Index CI8
 $(BUILD_DIR)/%.ci8.inc.c: %.ci8.png
@@ -753,6 +772,8 @@ else ifeq ($(COMPRESS),yay0)
 include compression/yay0rules.mk
 else ifeq ($(COMPRESS),mio0)
 include compression/mio0rules.mk
+else ifeq ($(COMPRESS),lz4t)
+include compression/lz4trules.mk
 else ifeq ($(COMPRESS),uncomp)
 include compression/uncomprules.mk
 endif
@@ -881,13 +902,8 @@ $(BUILD_DIR)/libgoddard.a: $(GODDARD_O_FILES)
 	@$(PRINT) "$(GREEN)Linking libgoddard:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(AR) rcs -o $@ $(GODDARD_O_FILES)
 
-# Link libz
-$(BUILD_DIR)/libz.a: $(LIBZ_O_FILES)
-	@$(PRINT) "$(GREEN)Linking libz:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(AR) rcs -o $@ $(LIBZ_O_FILES)
-
 # SS2: Goddard rules to get size
-$(BUILD_DIR)/sm64_prelim.ld: sm64.ld $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/libgoddard.a $(BUILD_DIR)/libz.a
+$(BUILD_DIR)/sm64_prelim.ld: sm64.ld $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/libgoddard.a
 	$(call print,Preprocessing preliminary linker script:,$<,$@)
 	$(V)$(CPP) $(CPPFLAGS) -DPRELIMINARY=1 -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
@@ -905,7 +921,7 @@ $(BUILD_DIR)/asm/debug/map.o: asm/debug/map.s $(BUILD_DIR)/sm64_prelim.elf
 	$(V)$(CROSS)gcc -c $(ASMFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Link SM64 ELF file
-$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
+$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
 

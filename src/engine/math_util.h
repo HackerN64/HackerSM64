@@ -73,13 +73,7 @@ extern f32 gSineTable[];
     _x > 0 ? _x : -_x; })
 #define absi ABS
 #define abss ABS
-
-// Absolute value of a float (faster than using the above macro)
-ALWAYS_INLINE f32 absf(f32 in) {
-    f32 out;
-    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
-    return out;
-}
+#define absf ABS
 
 // Get the minimum / maximum of a set of numbers
 #undef MIN
@@ -635,7 +629,8 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s16 angle);
+void mtxf_billboard_generic(Mat4 dest, Mat4 mtx, Vec3f camera, Vec3f axis, Vec3f position, Vec3f scale, s16 angle, s32 isCylindrical);
+#define mtxf_billboard(dest, mtx, position, scale, angle) mtxf_billboard_generic(dest, mtx, gVec3fZero, gVec3fZero, position, scale, angle, FALSE)
 void mtxf_shadow(Mat4 dest, Vec3f upDir, Vec3f pos, Vec3f scale, s16 yaw);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius);

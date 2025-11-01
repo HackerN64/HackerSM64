@@ -1,8 +1,10 @@
 /aifc_decode
 /aiff_extract_codebook
 /armips
+/deflatepack
 /extract_data_for_mio
 /filesizer
+/lz4tpack
 /mio0
 /n64cksum
 /n64graphics

@@ -320,7 +320,7 @@ void alert_rcp_hung_up(void) {
  * Increment the first and last values of the stack.
  * If they're different, that means an error has occured, so trigger a crash.
 */
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
@@ -349,7 +349,7 @@ void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
     load_engine_code_segment();
-    detect_emulator();
+    gEmulator = detect_emulator();
 #ifndef UNF
     crash_screen_init();
 #endif
@@ -379,7 +379,7 @@ void thread3_main(UNUSED void *arg) {
     } else {
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
     gIdleThreadStack[0] = 0;
     gIdleThreadStack[THREAD1_STACK - 1] = 0;
     gThread3Stack[0] = 0;
@@ -403,7 +403,7 @@ void thread3_main(UNUSED void *arg) {
     while (TRUE) {
         OSMesg msg;
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
         check_stack_validity();
 #endif
         switch ((uintptr_t) msg) {

@@ -122,6 +122,11 @@
  * config_camera.h
  */
 
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
+    #undef FORCED_CAMERA_MODE
+    #undef USE_COURSE_DEFAULT_MODE
+#endif // ENABLE_VANILLA_CAM_PROCESSING
+
 #ifdef FORCED_CAMERA_MODE
     #undef USE_COURSE_DEFAULT_MODE
     #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode.

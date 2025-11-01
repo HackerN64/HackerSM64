@@ -16,6 +16,8 @@
 
 #include "printf.h"
 
+#define X_KERNING 6
+
 enum crashPages {
     PAGE_CONTEXT,
 #ifdef PUPPYPRINT_DEBUG
@@ -44,6 +46,7 @@ u32 gCrashScreenFont[7 * 9 + 1] = {
 u8 crashPage = 0;
 u8 updateBuffer = TRUE;
 
+static char crashScreenBuf[0x200];
 
 char *gCauseDesc[18] = {
     "Interrupt",
@@ -129,34 +132,67 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
+void crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const char *fmt, ...) {
     char *ptr;
     u32 glyph;
     s32 size;
     s32 xOffset = x;
-    char buf[0x108];
-    bzero(&buf, sizeof(buf));
 
     va_list args;
     va_start(args, fmt);
 
-    size = _Printf(write_to_buf, buf, fmt, args);
+    size = _Printf(write_to_buf, crashScreenBuf, fmt, args);
 
     if (size > 0) {
-        ptr = buf;
+        ptr = crashScreenBuf;
 
-        while (*ptr) {
+        while (*ptr && size-- > 0) {
+            if (xOffset >= SCREEN_WIDTH - (xNewline + X_KERNING)) {
+                y += 10;
+                xOffset = xNewline;
+            }
+
             glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
 
             if (*ptr == '\n') {
-                xOffset = x;
                 y += 10;
+                xOffset = x;
+                ptr++;
+                continue;
             } else if (glyph != 0xff) {
                 crash_screen_draw_glyph(xOffset, y, glyph);
             }
 
             ptr++;
-            xOffset += 6;
+            xOffset += X_KERNING;
+        }
+    }
+
+    va_end(args);
+}
+
+void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
+    char *ptr;
+    u32 glyph;
+    s32 size;
+
+    va_list args;
+    va_start(args, fmt);
+
+    size = _Printf(write_to_buf, crashScreenBuf, fmt, args);
+
+    if (size > 0) {
+        ptr = crashScreenBuf;
+
+        while (*ptr && size-- > 0) {
+            glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
+
+            if (glyph != 0xff) {
+                crash_screen_draw_glyph(x, y, glyph);
+            }
+
+            ptr++;
+            x += X_KERNING;
         }
     }
 
@@ -196,11 +232,10 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(15, 20, 270, 210);
+    crash_screen_draw_rect(25, 20, 270, 210);
     crash_screen_print(30, 20, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_print(30, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
-    crash_screen_draw_rect(15, 45, 270, 185);
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
         crash_screen_print(30, 40, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
@@ -316,11 +351,12 @@ void draw_assert(UNUSED OSThread *thread) {
     crash_screen_print(30, 25, "ASSERT PAGE");
 
     if (__n64Assert_Filename != NULL) {
-        crash_screen_print(30, 35, "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
-        crash_screen_print(30, 55, "MESSAGE:");
-        crash_screen_print(30, 70, " %s", __n64Assert_Message);
+        crash_screen_print(30, 45, "FILE: %s", __n64Assert_Filename);
+        crash_screen_print(30, 55, "LINE: %d", __n64Assert_LineNum);
+        crash_screen_print(30, 75, "MESSAGE:", __n64Assert_Message);
+        crash_screen_print_with_newlines(36, 85, 30, __n64Assert_Message);
     } else {
-        crash_screen_print(30, 35, "no failed assert to report.");
+        crash_screen_print(30, 45, "No failed assert to report.");
     }
 
     osWritebackDCacheAll();

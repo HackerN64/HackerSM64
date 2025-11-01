@@ -206,7 +206,7 @@ void set_better_reverb_buffers(u32 *inputDelaysL, u32 *inputDelaysR) {
         }
     }
 
-    aggress(bufOffset * sizeof(s16) <= BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE, "BETTER_REVERB_SIZE is too small for this preset!");
+    aggress_args(bufOffset * sizeof(s16) + BETTER_REVERB_PTR_SIZE <= BETTER_REVERB_SIZE, "BETTER_REVERB_SIZE is too small for this preset!\nSize should be at least 0x%06x!", bufOffset * sizeof(s16) + BETTER_REVERB_PTR_SIZE);
 
     bzero(allpassIdx, sizeof(allpassIdx));
 }

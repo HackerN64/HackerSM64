@@ -204,7 +204,7 @@ void play_painting_eject_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void play_infinite_stairs_music(void) {
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) && !defined(UNLOCK_ALL)
     u8 shouldPlay = FALSE;
 
     /* Infinite stairs? */
