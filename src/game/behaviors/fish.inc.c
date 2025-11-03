@@ -24,7 +24,7 @@ static void fish_spawner_act_spawn(void) {
     }
 
     // Spawn and animate the schoolQuantity of fish if Mario enters render distance
-    // or the stage is Secret Aquarium.
+    // or if the stage is fully submerged like Secret Aquarium.
     // Fish moves randomly within a range of 700.0f.
     if (o->oDistanceToMario < minDistToMario || (o->oBehParams2ndByte & FISH_BP_FLAG_LEVEL_IS_ALL_WATER)) {
         struct Object *fishObject;
@@ -70,7 +70,7 @@ void bhv_fish_spawner_loop(void) {
  */
 static void fish_vertical_roam(s32 speed) {
     f32 parentY = o->parentObj->oPosY;
-    // If the stage is Secret Aquarium, the fish can
+    // If the stage is fully submerged, the fish can
     // travel as far vertically as they wish.
     if (o->oBehParams2ndByte & FISH_BP_FLAG_LEVEL_IS_ALL_WATER) {
         if (500.0f < absf(o->oPosY - o->oFishGoalY)) {
@@ -211,7 +211,7 @@ void bhv_fish_loop(void) {
     cur_obj_scale(1.0f);
 
     // oFishWaterLevel tracks if a fish has roamed out of water.
-    // This can't happen in Secret Aquarium, so set it to 0.
+    // This can't happen in fully-submerged levels, so set it to 0.
     o->oFishWaterLevel = find_water_level(o->oPosX, o->oPosZ);
     if (o->oBehParams2ndByte & FISH_BP_FLAG_LEVEL_IS_ALL_WATER) {
         o->oFishWaterLevel = 0.0f;
