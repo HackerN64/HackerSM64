@@ -24,6 +24,7 @@ extern void __osPiRelAccess(void);
 
 u8 gEmulator = EMU_CONSOLE;
 u8 gSupportsLibpl = FALSE;
+u32 gSystemCapabilities = 0;
 
 static inline u32 get_pj64_version() {
     // When calling this function, we know that the emulator is some version of Project 64,
@@ -150,3 +151,15 @@ u32 detect_emulator() {
     // Note that Project64 4.0 will be detected here.
     return EMU_OTHER;
 } 
+
+void self_test_system_capabilities(void) {
+    if (check_cache_emulation()) {
+        gSystemCapabilities |= SYS_SUPPORTS_CACHE;
+    }
+#ifdef LIBPL
+    if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
+        gSystemCapabilities |= SYS_SUPPORTS_LIBPL;
+    }
+#endif // LIBPL
+
+}

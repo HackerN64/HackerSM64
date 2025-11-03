@@ -14,6 +14,16 @@ enum Emulator {
     EMU_OTHER                = (1 << 6), // Any other emulator
 };
 
+enum SystemCapabilities {
+    SYS_SUPPORTS_CACHE = (1 << 0),
+    SYS_SUPPORTS_FLOAT_ROUNDING_MODE = (1 << 1),
+    SYS_SUPPORTS_LIBPL = (1 << 2),
+    SYS_SUPPORTS_DMA_TIMING = (1 << 3),
+    SYS_SUPPORTS_RSP_PIPELINE_STALL_TIMING = (1 << 4),
+    SYS_SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 5),
+    SYS_SUPPORTS_EMUX = (1 << 6),
+};
+
 // initializes gEmulator
 extern u32 detect_emulator();
 
@@ -36,6 +46,12 @@ extern u8 gEmulator;
 
 // determines whether libpl is safe to use
 extern u8 gSupportsLibpl;
+
+/**
+ * Bitflag that lists all system capabilities, for more granular
+ * feature detection than gEmulator.
+ */
+extern u32 gSystemCapabilities;
 
 // Included for backwards compatibility when upgrading from HackerSM64 2.0
 #define gIsConsole ((gEmulator & EMU_CONSOLE) != 0)
