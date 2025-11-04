@@ -470,7 +470,7 @@ void draw_assert(UNUSED OSThread *thread) {
         crash_screen_print(LEFT_MARGIN, 35, "File: ");
         reset_text_color();
         // print this on the same line as `File: ` but to its right
-        crash_screen_truncate_string(__n64Assert_Filename, 42);
+        crash_screen_truncate_string(__n64Assert_Filename, 41);
         crash_screen_print(LEFT_MARGIN + (6 * GLYPH_WIDTH), 35, "%s", __n64Assert_Filename);
 
 
