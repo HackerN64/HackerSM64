@@ -156,11 +156,19 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-void crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const char *fmt, ...) {
+/**
+ * crash_screen_print, but automatically places a newline
+ *  if text is xNewline units away from the right edge of the screen.
+ *  Also respects newline characters in the evaluated string.
+ * 
+ * Returns the number of newlines that were in the string, or created.
+ */
+int crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const char *fmt, ...) {
     char *ptr;
     u32 glyph;
     s32 size;
     s32 xOffset = x;
+    int numNewlines = 0;
 
     va_list args;
     va_start(args, fmt);
@@ -174,6 +182,7 @@ void crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const ch
             if (xOffset >= SCREEN_WIDTH - (xNewline + X_KERNING)) {
                 y += 10;
                 xOffset = xNewline;
+                numNewlines += 1;
             }
 
             glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
@@ -182,6 +191,7 @@ void crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const ch
                 y += 10;
                 xOffset = x;
                 ptr++;
+                numNewlines += 1;
                 continue;
             } else if (glyph != 0xff) {
                 crash_screen_draw_glyph(xOffset, y, glyph);
@@ -193,6 +203,8 @@ void crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const ch
     }
 
     va_end(args);
+
+    return numNewlines;
 }
 
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
@@ -440,16 +452,25 @@ void draw_disasm(OSThread *thread) {
 void draw_assert(UNUSED OSThread *thread) {
     crash_screen_draw_rect(0, 20, 320, 240);
 
-    crash_screen_print(LEFT_MARGIN, 25, "Assert");
+    set_text_color(0xFF, 0, 0);
+    crash_screen_print(LEFT_MARGIN, 25, "Assert Failed!");
+    reset_text_color();
 
     if (__n64Assert_Filename != NULL) {
         crash_screen_print(LEFT_MARGIN, 35, "File: %s", __n64Assert_Filename);
         crash_screen_print(LEFT_MARGIN, 45, "Line %d", __n64Assert_LineNum);
-        crash_screen_print(LEFT_MARGIN, 55, "Condition:");
-        crash_screen_print(LEFT_MARGIN, 65, "(%s)", __n64Assert_Condition);
+        crash_screen_print(LEFT_MARGIN, 60, "Condition:");
+        crash_screen_print(LEFT_MARGIN + 32, 70, "(%s)", __n64Assert_Condition);
         if (__n64Assert_MessageBuf[0] != 0) {
-            crash_screen_print(LEFT_MARGIN, 75, "Message:");
-            crash_screen_print(LEFT_MARGIN, 85, " %s", __n64Assert_MessageBuf);
+            crash_screen_print(LEFT_MARGIN, 85, "Message:");
+            UNUSED int numNewlines = 
+                crash_screen_print_with_newlines(
+                    LEFT_MARGIN + 32,
+                    95,
+                    LEFT_MARGIN,
+                    "%s",
+                    __n64Assert_MessageBuf
+                );
         }
     } else {
         crash_screen_print(LEFT_MARGIN, 35, "No failed assert to report.");
