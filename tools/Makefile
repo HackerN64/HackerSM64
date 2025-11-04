@@ -68,6 +68,7 @@ n64cksum_CFLAGS  := -DN64CKSUM_STANDALONE
 textconv_SOURCES := textconv.c utf8.c hashtable.c
 
 n64sym_SOURCES := n64sym.c
+n64sym_CFLAGS  := -Wno-unused-result
 
 patch_elf_32bit_SOURCES := patch_elf_32bit.c
 

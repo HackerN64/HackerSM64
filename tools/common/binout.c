@@ -108,7 +108,13 @@ struct placeholder_data *__placeholder_get_data(const char *name)
 	}
 	ptrdiff_t index = stbds_shgeti(placeholder_hash, name);
 	if(index == -1) {
-		struct placeholder_data default_value = {-1, NULL};
+		struct placeholder_data default_value = {
+			.offset = -1,
+			.pending_offsets_64 = NULL,
+			.pending_offsets_32 = NULL,
+			.pending_offsets_16 = NULL,
+			.pending_offsets_8 = NULL,
+		};
 		index = stbds_shlen(placeholder_hash);
 		stbds_shput(placeholder_hash, name, default_value);
 	}
