@@ -1152,14 +1152,12 @@ void mode_8_directions_camera(struct Camera *c) {
 #endif // ENABLE_DEBUG_FREE_MOVE
             s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
         }
-
         if (gPlayer1Controller->buttonDown & L_JPAD) {
             s8DirModeYawOffset -= DEGREES(2);
         } 
         if (gPlayer1Controller->buttonDown & R_JPAD) {
             s8DirModeYawOffset += DEGREES(2);
         }
-        
 #ifdef PUPPYPRINT_DEBUG
     }
 #endif // PUPPYPRINT_DEBUG

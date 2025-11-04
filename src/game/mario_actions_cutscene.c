@@ -532,6 +532,7 @@ s32 act_debug_free_move(struct MarioState *m) {
 
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
+
 #ifdef USE_PROFILER
     if (
         !(gPlayer1Controller->buttonDown & L_TRIG)
