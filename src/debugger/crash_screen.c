@@ -457,8 +457,18 @@ void draw_assert(UNUSED OSThread *thread) {
     reset_text_color();
 
     if (__n64Assert_Filename != NULL) {
-        crash_screen_print(LEFT_MARGIN, 35, "File: %s", __n64Assert_Filename);
-        crash_screen_print(LEFT_MARGIN, 45, "Line %d", __n64Assert_LineNum);
+        set_text_color(241, 196, 15);
+        crash_screen_print(LEFT_MARGIN, 35, "File: ");
+        reset_text_color();
+        // print this on the same line as `File: ` but to its right
+        crash_screen_print(LEFT_MARGIN + (6 * GLYPH_WIDTH), 35, "%s", __n64Assert_Filename);
+
+
+        set_text_color(241, 196, 15);
+        crash_screen_print(LEFT_MARGIN, 45, "Line: ");
+        reset_text_color();
+        // print this on the same line as `Line: ` but to its right
+        crash_screen_print(LEFT_MARGIN + (6 * GLYPH_WIDTH), 45, "%d", __n64Assert_LineNum);
 
         // Print the assert condition that failed.
         set_text_color(241, 196, 15);
