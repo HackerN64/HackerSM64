@@ -6,7 +6,7 @@
 #define GLYPH_WIDTH 8
 #define GLYPH_HEIGHT 12
 #define FONT_ROWS 16
-#define LEFT_MARGIN 10 // for crash screen prints
+#define LEFT_MARGIN 16 // for crash screen prints
 
 enum CrashPages {
     PAGE_SIMPLE,

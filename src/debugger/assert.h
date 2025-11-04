@@ -1,6 +1,6 @@
 #pragma once
 
-#define ASSERT_MESGBUF_SIZE 256
+#define ASSERT_MESGBUF_SIZE 512
 
 
 #ifndef __ASSEMBLER__
