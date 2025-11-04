@@ -460,13 +460,20 @@ void draw_assert(UNUSED OSThread *thread) {
         crash_screen_print(LEFT_MARGIN, 35, "File: %s", __n64Assert_Filename);
         crash_screen_print(LEFT_MARGIN, 45, "Line %d", __n64Assert_LineNum);
         crash_screen_print(LEFT_MARGIN, 60, "Condition:");
-        crash_screen_print(LEFT_MARGIN + 32, 70, "(%s)", __n64Assert_Condition);
+        int numNewlines = crash_screen_print_with_newlines(
+                              LEFT_MARGIN + 32,
+                              70,
+                              LEFT_MARGIN,
+                              "(%s)",
+                              __n64Assert_Condition
+                          );
+
         if (__n64Assert_MessageBuf[0] != 0) {
-            crash_screen_print(LEFT_MARGIN, 85, "Message:");
-            UNUSED int numNewlines = 
+            crash_screen_print(LEFT_MARGIN, 85 + (numNewlines * GLYPH_HEIGHT), "Message:");
+            UNUSED int _newlines = 
                 crash_screen_print_with_newlines(
                     LEFT_MARGIN + 32,
-                    95,
+                    95 + (numNewlines * GLYPH_HEIGHT),
                     LEFT_MARGIN,
                     "%s",
                     __n64Assert_MessageBuf
