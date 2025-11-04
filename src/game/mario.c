@@ -1699,6 +1699,10 @@ void queue_rumble_particles(struct MarioState *m) {
 }
 #endif
 
+#ifdef PUPPYPRINT_DEBUG
+extern u8 sDebugMenu;
+#endif
+
 /**
  * Main function for executing Mario's behavior. Returns particleFlags.
  */
@@ -1713,13 +1717,19 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
     if (gMarioState->action) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (
+#ifdef PUPPYPRINT_DEBUG
+            !sDebugMenu &&
+#endif // PUPPYPRINT_DEBUG
+            (gMarioState->action != ACT_DEBUG_FREE_MOVE) &&
             (gMarioState->controller->buttonDown & U_JPAD) &&
             !(gMarioState->controller->buttonDown & L_TRIG)
         ) {
-            set_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+            if (gMarioState->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) {
+                set_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+            }
             set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
         }
-#endif
+#endif // ENABLE_DEBUG_FREE_MOVE
 #ifdef ENABLE_CREDITS_BENCHMARK
         static s32 startedBenchmark = FALSE;
         if (!startedBenchmark) {

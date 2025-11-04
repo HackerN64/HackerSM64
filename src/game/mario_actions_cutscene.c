@@ -513,6 +513,10 @@ s32 act_reading_sign(struct MarioState *m) {
     return FALSE;
 }
 
+#ifdef PUPPYPRINT_DEBUG
+extern u8 sDebugMenu;
+#endif
+
 s32 act_debug_free_move(struct MarioState *m) {
     struct WallCollisionData wallData;
     struct Surface *floor, *ceil;
@@ -528,18 +532,32 @@ s32 act_debug_free_move(struct MarioState *m) {
 
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
+#ifdef USE_PROFILER
+    if (
+        !(gPlayer1Controller->buttonDown & L_TRIG)
+#ifdef PUPPYPRINT_DEBUG
+        && !sDebugMenu
+#endif // PUPPYPRINT_DEBUG
+    ) {
+#endif // USE_PROFILER
+        if (gPlayer1Controller->buttonDown & U_JPAD) {
+            pos[1] += 16.0f * speed;
+        }
+        if (gPlayer1Controller->buttonDown & D_JPAD) {
+            pos[1] -= 16.0f * speed;
+        }
+#ifdef USE_PROFILER
+    }
+#endif
 
-    if (gPlayer1Controller->buttonDown & U_JPAD) {
-        pos[1] += 16.0f * speed;
-    }
-    if (gPlayer1Controller->buttonDown & D_JPAD) {
-        pos[1] -= 16.0f * speed;
-    }
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         vec3_zero(m->vel);
         m->forwardVel = 0.0f;
-
-        set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+        
+        if (m->area->camera->mode != m->area->camera->defMode) {
+            set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+        }
+        
         m->input &= ~INPUT_A_PRESSED;
         if (m->pos[1] <= (m->waterLevel - 100)) {
             return set_mario_action(m, ACT_WATER_IDLE, 0);
