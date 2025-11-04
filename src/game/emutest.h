@@ -18,10 +18,12 @@ enum SystemCapabilities {
     SYS_SUPPORTS_CACHE = (1 << 0),
     SYS_SUPPORTS_FLOAT_ROUNDING_MODE = (1 << 1),
     SYS_SUPPORTS_LIBPL = (1 << 2),
-    SYS_SUPPORTS_DMA_TIMING = (1 << 3),
-    SYS_SUPPORTS_RSP_PIPELINE_STALL_TIMING = (1 << 4),
-    SYS_SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 5),
-    SYS_SUPPORTS_EMUX = (1 << 6),
+    SYS_SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
+    SYS_SUPPORTS_EMUX = (1 << 4),
+
+    // idk how to implement the following lol
+    // SYS_SUPPORTS_DMA_TIMING = 0,
+    // SYS_SUPPORTS_RSP_PIPELINE_STALL_TIMING = 0,
 };
 
 // initializes gEmulator

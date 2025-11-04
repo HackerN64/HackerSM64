@@ -84,6 +84,9 @@ u32 detect_emulator() {
         // libpl is supported. Must be ParallelN64
 #ifdef LIBPL
         gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
+        if (gSupportsLibpl) {
+            gSystemCapabilities |= SYS_SUPPORTS_LIBPL;
+        }
 #endif
         return EMU_PARALLEL_LAUNCHER;
     }
@@ -107,11 +110,14 @@ u32 detect_emulator() {
     if (1.0f != round_double_to_float(0.9999999999999999)) {
         fcr_set_rounding_mode(roundingMode);
         return EMU_WIIVC;
+    } else {
+        gSystemCapabilities |= SYS_SUPPORTS_FLOAT_ROUNDING_MODE;
     }
     fcr_set_rounding_mode(roundingMode);
 
     // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
     if (check_cache_emulation()) {
+        gSystemCapabilities |= SYS_SUPPORTS_CACHE;
         return EMU_OTHER;
     }
 
@@ -151,15 +157,3 @@ u32 detect_emulator() {
     // Note that Project64 4.0 will be detected here.
     return EMU_OTHER;
 } 
-
-void self_test_system_capabilities(void) {
-    if (check_cache_emulation()) {
-        gSystemCapabilities |= SYS_SUPPORTS_CACHE;
-    }
-#ifdef LIBPL
-    if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
-        gSystemCapabilities |= SYS_SUPPORTS_LIBPL;
-    }
-#endif // LIBPL
-
-}
