@@ -99,6 +99,15 @@ static struct {
     u16 height;
 } gCrashScreen;
 
+static void crash_screen_truncate_string(char *str, u32 maxLen) {
+    if (strlen(__n64Assert_Filename) > maxLen) {
+        __n64Assert_Filename[maxLen - 3] = '.';
+        __n64Assert_Filename[maxLen - 2] = '.';
+        __n64Assert_Filename[maxLen - 1] = '.';
+        __n64Assert_Filename[maxLen] = 0;
+    }
+}
+
 static void set_text_color(u32 r, u32 g, u32 b) {
     gCrashScreenTextColor = GPACK_RGBA5551(r, g, b, 255);
 }
@@ -461,6 +470,7 @@ void draw_assert(UNUSED OSThread *thread) {
         crash_screen_print(LEFT_MARGIN, 35, "File: ");
         reset_text_color();
         // print this on the same line as `File: ` but to its right
+        crash_screen_truncate_string(__n64Assert_Filename, 42);
         crash_screen_print(LEFT_MARGIN + (6 * GLYPH_WIDTH), 35, "%s", __n64Assert_Filename);
 
 
