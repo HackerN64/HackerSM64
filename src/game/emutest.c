@@ -23,7 +23,6 @@ extern void __osPiGetAccess(void);
 extern void __osPiRelAccess(void);
 
 u8 gEmulator = EMU_CONSOLE;
-u8 gSupportsLibpl = FALSE;
 u32 gSystemCapabilities = 0;
 
 static inline u32 get_pj64_version() {
@@ -83,8 +82,7 @@ u32 detect_emulator() {
     if (magic == 0x00500000u) {
         // libpl is supported. Must be ParallelN64
 #ifdef LIBPL
-        gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
-        if (gSupportsLibpl) {
+        if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
             gSystemCapabilities |= SYS_SUPPORTS_LIBPL;
         }
 #endif

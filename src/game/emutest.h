@@ -47,7 +47,7 @@ extern u32 detect_emulator();
 extern u8 gEmulator;
 
 // determines whether libpl is safe to use
-extern u8 gSupportsLibpl;
+#define gSupportsLibpl (gSystemCapabilities & SYS_SUPPORTS_LIBPL)
 
 /**
  * Bitflag that lists all system capabilities, for more granular
