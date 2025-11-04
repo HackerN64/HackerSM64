@@ -459,7 +459,11 @@ void draw_assert(UNUSED OSThread *thread) {
     if (__n64Assert_Filename != NULL) {
         crash_screen_print(LEFT_MARGIN, 35, "File: %s", __n64Assert_Filename);
         crash_screen_print(LEFT_MARGIN, 45, "Line %d", __n64Assert_LineNum);
+
+        // Print the assert condition that failed.
+        set_text_color(241, 196, 15);
         crash_screen_print(LEFT_MARGIN, 60, "Condition:");
+        reset_text_color();
         int numNewlines = crash_screen_print_with_newlines(
                               LEFT_MARGIN + 32,
                               70,
@@ -468,8 +472,11 @@ void draw_assert(UNUSED OSThread *thread) {
                               __n64Assert_Condition
                           );
 
+        // Print the message, if assertf/aggressf/errorf were used.
         if (__n64Assert_MessageBuf[0] != 0) {
+            set_text_color(241, 196, 15);
             crash_screen_print(LEFT_MARGIN, 85 + (numNewlines * GLYPH_HEIGHT), "Message:");
+            reset_text_color();
             UNUSED int _newlines = 
                 crash_screen_print_with_newlines(
                     LEFT_MARGIN + 32,
