@@ -23,6 +23,7 @@
 #include "moving_texture.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"
+#include "puppyprint.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sound_init.h"
@@ -512,10 +513,6 @@ s32 act_reading_sign(struct MarioState *m) {
     vec3s_set(marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     return FALSE;
 }
-
-#ifdef PUPPYPRINT_DEBUG
-extern u8 sDebugMenu;
-#endif
 
 s32 act_debug_free_move(struct MarioState *m) {
     struct WallCollisionData wallData;

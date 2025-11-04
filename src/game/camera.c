@@ -1116,10 +1116,6 @@ s32 snap_to_45_degrees(s16 angle) {
     return angle;
 }
 
-#ifdef PUPPYPRINT_DEBUG
-extern u8 sDebugMenu;
-#endif
-
 /**
  * A mode that only has 8 camera angles, 45 degrees apart
  */

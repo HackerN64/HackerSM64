@@ -29,6 +29,7 @@
 #include "object_helpers.h"
 #include "object_list_processor.h"
 #include "print.h"
+#include "puppyprint.h"
 #include "save_file.h"
 #include "sound_init.h"
 #include "rumble_init.h"
@@ -1697,10 +1698,6 @@ void queue_rumble_particles(struct MarioState *m) {
         reset_rumble_timers_slip();
     }
 }
-#endif
-
-#ifdef PUPPYPRINT_DEBUG
-extern u8 sDebugMenu;
 #endif
 
 /**
