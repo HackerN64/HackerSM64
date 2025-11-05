@@ -67,33 +67,6 @@ ColorRGBA gCurrEnvCol;
 
 #ifdef PUPPYPRINT_DEBUG
 
-s8 logViewer    = FALSE;
-u8 sPPDebugPage = 0;
-u8 sDebugMenu   = FALSE;
-u8 sDebugOption = 0;
-s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = { 0 };
-s32 mempool;
-u32 gPoolMem;
-u32 gPPSegScroll = 0;
-u32 gMiscMem = 0;
-struct CallCounter gPuppyCallCounter;
-
-#define NUM_RAM_CHARS 32
-
-// Another epic lookup table, for text this time.
-const char ramNames[][NUM_RAM_CHARS] = {
-    "Buffers",
-    "Main",
-    "Engine",
-    "Framebuffers",
-    "ZBuffer",
-    "Goddard",
-    "Pools",
-    "Collision",
-    "Misc",
-    "Audio Heap"
-};
-
 enum RamNames {
     RAM_BUFFERS,
     RAM_MAIN,
@@ -103,50 +76,80 @@ enum RamNames {
     RAM_GODDARD,
     RAM_POOLS,
     RAM_COLLISION,
-    RAM_MISC,
-    RAM_AUDIO
+    RAM_AUDIO,
+
+    RAMNAMES_COUNT
 };
 
-const char segNames[][NUM_RAM_CHARS] = {
-    "HUD",
-    "Common1 GFX",
-    "Group0 GFX",
-    "GroupA GFX",
-    "GroupB GFX",
-    "Level GFX",
-    "Common0 GFX",
-    "Textures",
-    "Skybox",
-    "Effects",
-    "GroupA Geo",
-    "GroupB Geo",
-    "Level Geo",
-    "Common0 Geo",
-    "Entry",
-    "Mario Anims",
-    "Demos",
-    "Bhv Scripts",
-    "Menu",
-    "Level Scripts",
-    "Common1 Geo",
-    "Group0 Geo",
-    "",
-    "Languages"
+s8 logViewer    = FALSE;
+u8 sPPDebugPage = 0;
+u8 sDebugMenu   = FALSE;
+u8 sDebugOption = 0;
+s32 ramSegmentSizes[RAMNAMES_COUNT] = { 0 };
+s32 tlbSegmentSizes[NUM_TLB_SEGMENTS] = { 0 };
+s32 mempool;
+u32 gPoolMem;
+u32 gPPSegScroll = 0;
+struct CallCounter gPuppyCallCounter;
+
+// Another epic lookup table, for text this time.
+const char *ramNames[RAMNAMES_COUNT] = {
+    [RAM_BUFFERS]      = "Buffers",
+    [RAM_MAIN]         = "Main",
+    [RAM_ENGINE]       = "Engine",
+    [RAM_FRAMEBUFFERS] = "Framebuffers",
+    [RAM_ZBUFFER]      = "ZBuffer",
+    [RAM_GODDARD]      = "Goddard",
+    [RAM_POOLS]        = "Pools",
+    [RAM_COLLISION]    = "Collision",
+    [RAM_AUDIO]        = "Audio Heap"
 };
 
-const s8 nameTable = sizeof(ramNames) / NUM_RAM_CHARS;
+const char *segNames[NUM_TLB_SEGMENTS] = {
+    [SEGMENT_MAIN]                = "Main",           // Never set
+    [SEGMENT_RENDER]              = "Render",         // Never set
+    [SEGMENT_SEGMENT2]            = "Segment2",
+    [SEGMENT_COMMON1_YAY0]        = "Common1 GFX",
+    [SEGMENT_GROUP0_YAY0]         = "Group0 GFX",
+    [SEGMENT_GROUPA_YAY0]         = "GroupA GFX",
+    [SEGMENT_GROUPB_YAY0]         = "GroupB GFX",
+    [SEGMENT_LEVEL_DATA]          = "Level Data",
+    [SEGMENT_COMMON0_YAY0]        = "Common0 GFX",
+    [SEGMENT_TEXTURE]             = "Textures",
+    [SEGMENT_SKYBOX]              = "Skybox",
+    [SEGMENT_EFFECT_YAY0]         = "Effects GFX",
+    [SEGMENT_GROUPA_GEO]          = "GroupA Geo",
+    [SEGMENT_GROUPB_GEO]          = "GroupB Geo",
+    [SEGMENT_VANILLA_OBJECTS]     = "Vanilla GFX",
+    [SEGMENT_COMMON0_GEO]         = "Common0 Geo",
+    [SEGMENT_LEVEL_ENTRY]         = "Entry Scripts",
+    [SEGMENT_MARIO_ANIMS]         = "Mario Anims",
+    [SEGMENT_UNKNOWN_18]          = "UNK_18",           // Unused
+    [SEGMENT_BEHAVIOR_DATA]       = "Bhv Scripts",
+    [SEGMENT_MENU_INTRO]          = "Menu Scripts",
+    [SEGMENT_GLOBAL_LEVEL_SCRIPT] = "Global Scripts",
+    [SEGMENT_COMMON1_GEO]         = "Common1 Geo",
+    [SEGMENT_GROUP0_GEO]          = "Group0 Geo",
+    [SEGMENT_DEMO_INPUTS]         = "Demo Data",
+    [SEGMENT_LEVEL_SCRIPT]        = "Level Scripts",
+    [SEGMENT_VANILLA_GEO]         = "Vanilla Geo",
+    [SEGMENT_EU_TRANSLATION]      = "Languages",        // Only used with multilang
+    [SEGMENT_UNKNOWN_28]          = "UNK_28",           // Unused
+    [SEGMENT_UNKNOWN_29]          = "UNK_29",           // Unused
+    [SEGMENT_UNKNOWN_30]          = "UNK_30",           // Unused
+    [SEGMENT_UNKNOWN_31]          = "UNK_31",           // Unused
+};
 
 void puppyprint_calculate_ram_usage(void) {
-    ramsizeSegment[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - gAudioHeapSize;
-    ramsizeSegment[RAM_MAIN] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
-    ramsizeSegment[RAM_ENGINE] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
-    ramsizeSegment[RAM_FRAMEBUFFERS] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
-    ramsizeSegment[RAM_ZBUFFER] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
-    ramsizeSegment[RAM_GODDARD] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
-    ramsizeSegment[RAM_POOLS] = gPoolMem;
-    ramsizeSegment[RAM_COLLISION] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
-    ramsizeSegment[RAM_MISC] = gMiscMem;
-    ramsizeSegment[RAM_AUDIO] = gAudioHeapSize;
+    ramSegmentSizes[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - gAudioHeapSize;
+    ramSegmentSizes[RAM_MAIN] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
+    ramSegmentSizes[RAM_ENGINE] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
+    ramSegmentSizes[RAM_FRAMEBUFFERS] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
+    ramSegmentSizes[RAM_ZBUFFER] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
+    ramSegmentSizes[RAM_GODDARD] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
+    ramSegmentSizes[RAM_POOLS] = gPoolMem;
+    ramSegmentSizes[RAM_COLLISION] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
+    ramSegmentSizes[RAM_AUDIO] = gAudioHeapSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -206,18 +209,18 @@ void swapu(u8* xp, u8* yp)
     *yp = temp;
 }
 
-void sort_numbers(s32 *values, u8 *values2)
+void sort_numbers(s32 *values, u8 *values2, s32 arraySize)
 {
     int i, j, min_idx;
 
     // One by one move boundary of unsorted subarray
-    for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
+    for (i = 0; i < arraySize; i++) {
 
         if (values[i] == 0)
             continue;
         // Find the minimum element in unsorted array
         min_idx = i;
-        for (j = i + 1; j < NUM_TLB_SEGMENTS; j++)
+        for (j = i + 1; j < arraySize; j++)
             if (values[j] > values[min_idx])
                 min_idx = j;
 
@@ -229,22 +232,33 @@ void sort_numbers(s32 *values, u8 *values2)
 }
 
 void set_segment_memory_printout(u32 segment, u32 amount) {
-    ramsizeSegment[segment + nameTable - 2] = amount;
+    tlbSegmentSizes[segment] = amount;
 }
 
 void print_ram_overview(void) {
     char textBytes[64];
-    s32 y = 56;
-    f32 ramSize = RAM_END - 0x80000000;
-    s32 tempNums[32];
-    u8 tempPos[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
+    s32 y = 64;
+    s32 ramSizes[RAMNAMES_COUNT];
+    u8 ramPos[RAMNAMES_COUNT];
+    s32 segSizes[NUM_TLB_SEGMENTS];
+    u8 segPos[NUM_TLB_SEGMENTS];
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 168);
     finish_blank_box();
 
-    memcpy(tempNums, &ramsizeSegment, 32 * 4);
+    for (s32 i = 0; i < ARRAY_COUNT(ramPos); i++) {
+        ramPos[i] = i;
+    }
+    for (s32 i = 0; i < ARRAY_COUNT(segPos); i++) {
+        segPos[i] = i;
+    }
 
-    sort_numbers(tempNums, tempPos);
+    puppyprint_calculate_ram_usage();
+    memcpy(ramSizes, ramSegmentSizes, sizeof(ramSegmentSizes));
+    memcpy(segSizes, tlbSegmentSizes, sizeof(tlbSegmentSizes));
+
+    sort_numbers(ramSizes, ramPos, ARRAY_COUNT(ramSizes));
+    sort_numbers(segSizes, segPos, ARRAY_COUNT(segSizes));
 
     print_set_envcolour(255, 255, 255, 255);
     sprintf(textBytes, "Total:");
@@ -265,20 +279,37 @@ void print_ram_overview(void) {
     print_small_text_light(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "(%2.3f%%)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
     print_small_text_light(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
-    for (u8 i = 0; i < NUM_TLB_SEGMENTS; i++) {
-        if (tempNums[i] == 0) {
+
+    print_small_text_light(SCREEN_CENTER_X, y - gPPSegScroll, "Calculated RAM Sizes", PRINT_TEXT_ALIGN_CENTER, PRINT_ALL, FONT_DEFAULT);
+    y += 12;
+    for (u8 i = 0; i < ARRAY_COUNT(ramSizes); i++) {
+        if (ramSizes[i] == 0) {
             continue;
         }
         if (y - gPPSegScroll > 0 && y - gPPSegScroll < SCREEN_HEIGHT) {
-            if (tempPos[i] < nameTable) {
-                sprintf(textBytes, "%s:", ramNames[tempPos[i]]);
-            } else {
-                sprintf(textBytes, "%s:", segNames[tempPos[i] - nameTable]);
-            }
+            sprintf(textBytes, "%s:", ramNames[ramPos[i]]);
             print_small_text_light(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-            sprintf(textBytes, "0x%X", tempNums[i]);
+            sprintf(textBytes, "0x%X", ramSizes[i]);
             print_small_text_light(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-            sprintf(textBytes, "(%2.3f%%)", ((f32)tempNums[i] / ramSize) * 100.0f);
+            sprintf(textBytes, "(%2.3f%%)", ((f32)ramSizes[i] / (RAM_END - 0x80000000)) * 100.0f);
+            print_small_text_light(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+        }
+        y += 12;
+    }
+
+    y += 12;
+    print_small_text_light(SCREEN_CENTER_X, y - gPPSegScroll, "Allocated Segment Sizes", PRINT_TEXT_ALIGN_CENTER, PRINT_ALL, FONT_DEFAULT);
+    y += 12;
+    for (u8 i = 0; i < ARRAY_COUNT(segSizes); i++) {
+        if (segSizes[i] == 0) {
+            continue;
+        }
+        if (y - gPPSegScroll > 0 && y - gPPSegScroll < SCREEN_HEIGHT) {
+            sprintf(textBytes, "%s:", segNames[segPos[i]]);
+            print_small_text_light(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+            sprintf(textBytes, "0x%X", segSizes[i]);
+            print_small_text_light(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+            sprintf(textBytes, "(%2.3f%%)", ((f32)segSizes[i] / (RAM_END - 0x80000000)) * 100.0f);
             print_small_text_light(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
         }
         y += 12;
