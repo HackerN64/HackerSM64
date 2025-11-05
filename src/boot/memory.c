@@ -5,6 +5,7 @@
 #include "buffers/buffers.h"
 #include "dma_async.h"
 #include "slidec.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/main.h"
 #include "game/memory.h"
@@ -389,6 +390,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 
 #ifdef GZIP
     struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
+    aggress(dec != NULL, "Failed to allocate GZIP decompressor!");
 #endif
 
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
@@ -430,7 +432,9 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     }
 
 #ifdef GZIP
-    libdeflate_free_decompressor(dec);
+    if (dec) {
+        libdeflate_free_decompressor(dec);
+    }
 #endif
 
 #ifdef PUPPYPRINT_DEBUG
