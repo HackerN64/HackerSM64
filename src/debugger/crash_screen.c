@@ -89,6 +89,8 @@ char *gFpcsrDesc[6] = {
 
 static u32 sProgramPosition = 0;
 static u16 gCrashScreenTextColor = 0xFFFF;
+static u32 sCrashScreenPrintRow_Pixels = 0;
+static u32 sCrashScreenPrintLnHeight_Pixels = GLYPH_HEIGHT;
 static struct {
     OSThread thread;
     u64 stack[THREAD2_STACK / sizeof(u64)];
@@ -99,12 +101,17 @@ static struct {
     u16 height;
 } gCrashScreen;
 
-static void crash_screen_truncate_string(char *str, u32 maxLen) {
-    if (strlen(__n64Assert_Filename) > maxLen) {
-        __n64Assert_Filename[maxLen - 3] = '.';
-        __n64Assert_Filename[maxLen - 2] = '.';
-        __n64Assert_Filename[maxLen - 1] = '.';
-        __n64Assert_Filename[maxLen] = 0;
+/**
+ * Splits a path string by the containing folder and the name of the file itself.
+ */
+static void crash_screen_split_filepath(char *path, char **folder, char **filename) {
+    *folder = path;
+
+    for (int i = strlen(path) - 1; i > 0; i--) {
+        if ((path[i] == '/') || (path[i] == '\\')) {
+            *filename = &path[i + 1];
+            break;
+        }
     }
 }
 
@@ -114,6 +121,22 @@ static void set_text_color(u32 r, u32 g, u32 b) {
 
 static void reset_text_color(void) {
     gCrashScreenTextColor = 0xFFFF;
+}
+
+/**
+ * Sets the screen row, in pixels, at which the next print
+ *  will be placed on the Y axis.
+ */
+static void crash_screen_set_print_top(u32 row) {
+    sCrashScreenPrintRow_Pixels = row;
+}
+
+static void crash_screen_set_println_height(u32 height_pixels) {
+    sCrashScreenPrintLnHeight_Pixels = height_pixels;
+}
+
+static void crash_screen_reset_println_height(void) {
+    sCrashScreenPrintLnHeight_Pixels = GLYPH_HEIGHT;
 }
 
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
@@ -244,6 +267,37 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     va_end(args);
 }
 
+void crash_screen_println(const char *fmt, ...) {
+    char *ptr;
+    u32 glyph;
+    s32 size;
+    s32 x = LEFT_MARGIN;
+    s32 y = sCrashScreenPrintRow_Pixels;
+
+    va_list args;
+    va_start(args, fmt);
+
+    size = _Printf(write_to_buf, crashScreenBuf, fmt, args);
+
+    if (size > 0) {
+        ptr = crashScreenBuf;
+
+        while (*ptr && size-- > 0) {
+            glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
+
+            if (glyph != 0xff) {
+                crash_screen_draw_glyph(x, y, glyph);
+            }
+
+            ptr++;
+            x += X_KERNING;
+        }
+    }
+
+    va_end(args);
+    sCrashScreenPrintRow_Pixels += sCrashScreenPrintLnHeight_Pixels;
+}
+
 void crash_screen_sleep(s32 ms) {
     u64 cycles = ms * 1000LL * osClockRate / 1000000ULL;
     osSetTime(0);
@@ -265,7 +319,7 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
     u32 bit = BIT(17);
 
-    crash_screen_print(100, 220, "FPCSR:%08XH", fpcsr);
+    crash_screen_print(LEFT_MARGIN + 90, 220, "FPCSR:%08XH", fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
             crash_screen_print(222, 220, "(%s)", gFpcsrDesc[i]);
@@ -278,81 +332,85 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 void draw_crash_overview(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, 20, 320, 240);
+    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    crash_screen_print(LEFT_MARGIN, 20, "Thread %d (%s)", thread->id, gCauseDesc[cause]);
+    crash_screen_println("Thread %d (%s)", thread->id, gCauseDesc[cause]);
 
 #ifdef DEBUG_EXPORT_SYMBOLS
     symtable_info_t info = get_symbol_info(tc->pc);
 
-    crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", info.func == NULL ? "Unknown" : info.func);
+    crash_screen_println("Crash at: %s", info.func == NULL ? "Unknown" : info.func);
     if (info.line != -1) {
-        crash_screen_print(LEFT_MARGIN, 60, "File: %s", info.file);
+        crash_screen_println("File: %s", info.file);
 #ifdef DEBUG_EXPORT_ALL_LINES
         // This line only shows the correct value if every line is in the sym file
-        crash_screen_print(LEFT_MARGIN, 72, "Line: %d", info.line);
+        crash_screen_println("Line: %d", info.line);
 #endif // DEBUG_EXPORT_ALL_LINES
     }
 #endif // DEBUG_EXPORT_SYMBOLS
 
-    crash_screen_print(LEFT_MARGIN, 84, "Address: 0x%08X", tc->pc);
+    crash_screen_println("Address: 0x%08X", tc->pc);
 }
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(0, 20, 320, 240);
-    crash_screen_print(LEFT_MARGIN, 20, "Thread:%d (%s)", thread->id, gCauseDesc[cause]);
-    crash_screen_print(LEFT_MARGIN, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
+    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    crash_screen_println("Thread:%d (%s)", thread->id, gCauseDesc[cause]);
+    crash_screen_set_println_height(10);
+    crash_screen_println("PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
 #ifdef DEBUG_EXPORT_SYMBOLS
     char *fname = parse_map(tc->pc, TRUE);
-    crash_screen_print(LEFT_MARGIN, 40, "Crash at: %s", fname == NULL ? "Unknown" : fname);
+    crash_screen_println("Crash at: %s", fname == NULL ? "Unknown" : fname);
 #endif // DEBUG_EXPORT_SYMBOLS
-    crash_screen_print(LEFT_MARGIN,  52, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
-    crash_screen_print(LEFT_MARGIN,  62, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
-    crash_screen_print(LEFT_MARGIN,  72, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
-    crash_screen_print(LEFT_MARGIN,  82, "T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
-    crash_screen_print(LEFT_MARGIN,  92, "T5:%08XH   T6:%08XH   T7:%08XH", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
-    crash_screen_print(LEFT_MARGIN, 102, "S0:%08XH   S1:%08XH   S2:%08XH", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
-    crash_screen_print(LEFT_MARGIN, 112, "S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
-    crash_screen_print(LEFT_MARGIN, 122, "S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
-    crash_screen_print(LEFT_MARGIN, 132, "T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(LEFT_MARGIN, 142, "S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
+    crash_screen_println("AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
+    crash_screen_println("A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
+    crash_screen_println("A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
+    crash_screen_println("T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
+    crash_screen_println("T5:%08XH   T6:%08XH   T7:%08XH", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
+    crash_screen_println("S0:%08XH   S1:%08XH   S2:%08XH", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
+    crash_screen_println("S3:%08XH   S4:%08XH   S5:%08XH", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
+    crash_screen_println("S6:%08XH   S7:%08XH   T8:%08XH", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
+    crash_screen_println("T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
+    crash_screen_println("S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
 #ifdef DEBUG_EXPORT_SYMBOLS
     fname = parse_map(tc->ra, TRUE);
-    crash_screen_print(LEFT_MARGIN, 152, "RA at: %s", fname == NULL ? "Unknown" : fname);
+    crash_screen_println("RA at: %s", fname == NULL ? "Unknown" : fname);
 #endif // DEBUG_EXPORT_SYMBOLS
 
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
-    crash_screen_print_float_reg( 10, 170,  0, &tc->fp0.f.f_even);
-    crash_screen_print_float_reg(100, 170,  2, &tc->fp2.f.f_even);
-    crash_screen_print_float_reg(190, 170,  4, &tc->fp4.f.f_even);
-    crash_screen_print_float_reg( 10, 180,  6, &tc->fp6.f.f_even);
-    crash_screen_print_float_reg(100, 180,  8, &tc->fp8.f.f_even);
-    crash_screen_print_float_reg(190, 180, 10, &tc->fp10.f.f_even);
-    crash_screen_print_float_reg( 10, 190, 12, &tc->fp12.f.f_even);
-    crash_screen_print_float_reg(100, 190, 14, &tc->fp14.f.f_even);
-    crash_screen_print_float_reg(190, 190, 16, &tc->fp16.f.f_even);
-    crash_screen_print_float_reg( 10, 200, 18, &tc->fp18.f.f_even);
-    crash_screen_print_float_reg(100, 200, 20, &tc->fp20.f.f_even);
-    crash_screen_print_float_reg(190, 200, 22, &tc->fp22.f.f_even);
-    crash_screen_print_float_reg( 10, 210, 24, &tc->fp24.f.f_even);
-    crash_screen_print_float_reg(100, 210, 26, &tc->fp26.f.f_even);
-    crash_screen_print_float_reg(190, 210, 28, &tc->fp28.f.f_even);
-    crash_screen_print_float_reg( 10, 220, 30, &tc->fp30.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +   0, 170,  0, &tc->fp0.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +  90, 170,  2, &tc->fp2.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN + 180, 170,  4, &tc->fp4.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +   0, 180,  6, &tc->fp6.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +  90, 180,  8, &tc->fp8.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN + 180, 180, 10, &tc->fp10.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +   0, 190, 12, &tc->fp12.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +  90, 190, 14, &tc->fp14.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN + 180, 190, 16, &tc->fp16.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +   0, 200, 18, &tc->fp18.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +  90, 200, 20, &tc->fp20.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN + 180, 200, 22, &tc->fp22.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +   0, 210, 24, &tc->fp24.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +  90, 210, 26, &tc->fp26.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN + 180, 210, 28, &tc->fp28.f.f_even);
+    crash_screen_print_float_reg(LEFT_MARGIN +   0, 220, 30, &tc->fp30.f.f_even);
+
+    crash_screen_reset_println_height();
 }
 
 
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
-    crash_screen_draw_rect(0, 20, 320, 210);
+    crash_screen_draw_rect(0, 20, SCREEN_WIDTH, 210);
     osWritebackDCacheAll();
 #define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
-        crash_screen_print(LEFT_MARGIN, (LINE_HEIGHT - (i * 10)), consoleLogTable[i]);
+        crash_screen_println(consoleLogTable[i]);
     }
 #undef LINE_HEIGHT
 }
@@ -361,18 +419,18 @@ void draw_crash_log(void) {
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, 20, 320, 240);
-    crash_screen_print(LEFT_MARGIN, 25, "Stack Trace from %08X:", (u32) tc->sp);
+    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_println("Stack Trace from %08X:", (u32) tc->sp);
 
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     // Current Func (EPC)
-    crash_screen_print(LEFT_MARGIN, 35, "%08X (%s)", tc->pc, parse_map(tc->pc, TRUE));
+    crash_screen_println("%08X (%s)", tc->pc, parse_map(tc->pc, TRUE));
 
     // Previous Func (RA)
     u32 ra = tc->ra;
     symtable_info_t info = get_symbol_info(ra);
 
-    crash_screen_print(LEFT_MARGIN, 45, "%08X (%s:%d)", ra, info.func, info.line);
+    crash_screen_println("%08X (%s:%d)", ra, info.func, info.line);
 
     osWritebackDCacheAll();
 
@@ -383,7 +441,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
         stackTraceGenerated = TRUE;
     }
     for (u32 i = 0; i < generated; i++) {
-        crash_screen_print(LEFT_MARGIN, 55 + (i * 10), get_stack_entry(i));
+        crash_screen_println(get_stack_entry(i));
     }
 #else // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     // simple stack trace
@@ -399,17 +457,19 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, 20, 320, 240);
+    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
     }
-    crash_screen_print(LEFT_MARGIN, 25, "Program Counter: %08X", sProgramPosition);
+    crash_screen_println("Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
 
     int skiplines = 0;
 #ifdef DEBUG_EXPORT_SYMBOLS
     int currline = 0;
 #endif // DEBUG_EXPORT_SYMBOLS
+
+    u32 basePositionY = sCrashScreenPrintRow_Pixels;
 
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
@@ -418,7 +478,7 @@ void draw_disasm(OSThread *thread) {
 
 
         if (disasm[0] == 0) {
-            crash_screen_print(LEFT_MARGIN + 22, 35 + (skiplines * 10) + (i * 10), "%08X", addr);
+            crash_screen_print(LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%08X", addr);
         } else {
 #ifdef DEBUG_EXPORT_SYMBOLS
             symtable_info_t info = get_symbol_info(addr);
@@ -426,7 +486,7 @@ void draw_disasm(OSThread *thread) {
             if (info.func_offset == 0 && info.distance == 0 && currline != info.line) {
                 currline = info.line;
                 set_text_color(239, 196, 15);
-                crash_screen_print(LEFT_MARGIN, 35 + (skiplines * 10) + (i * 10), "<%s:>", info.func);
+                crash_screen_print(LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "<%s:>", info.func);
                 reset_text_color();
                 skiplines++;
             }
@@ -436,7 +496,7 @@ void draw_disasm(OSThread *thread) {
 #endif // DEBUG_EXPORT_ALL_LINES
                 if (info.line != -1) {
                     set_text_color(200, 200, 200);
-                    crash_screen_print(LEFT_MARGIN, 35 + (skiplines * 10) + (i * 10), "%d:", info.line);
+                    crash_screen_print(LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "%d:", info.line);
                     reset_text_color();
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
@@ -449,7 +509,7 @@ void draw_disasm(OSThread *thread) {
             } else {
                 reset_text_color();
             }
-            crash_screen_print(LEFT_MARGIN + 22, 35 + (skiplines * 10) + (i * 10), "%s", disasm);
+            crash_screen_print(LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%s", disasm);
         }
 
     }
@@ -459,55 +519,63 @@ void draw_disasm(OSThread *thread) {
 }
 
 void draw_assert(UNUSED OSThread *thread) {
-    crash_screen_draw_rect(0, 20, 320, 240);
+    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_set_print_top(35);
 
     set_text_color(0xFF, 0, 0);
-    crash_screen_print(LEFT_MARGIN, 25, "Assert Failed!");
+    crash_screen_println("Assert Failed!");
     reset_text_color();
+
 
     if (__n64Assert_Filename != NULL) {
         set_text_color(241, 196, 15);
-        crash_screen_print(LEFT_MARGIN, 35, "File: ");
+        crash_screen_println("File: ");
         reset_text_color();
         // print this on the same line as `File: ` but to its right
-        crash_screen_truncate_string(__n64Assert_Filename, 41);
-        crash_screen_print(LEFT_MARGIN + (6 * GLYPH_WIDTH), 35, "%s", __n64Assert_Filename);
+        char *foldername = NULL;
+        char *filename = NULL;
+        crash_screen_split_filepath(__n64Assert_Filename, &foldername, &filename);
+        if (filename) {
+            crash_screen_println("      %s", filename);
+        }
 
 
         set_text_color(241, 196, 15);
-        crash_screen_print(LEFT_MARGIN, 45, "Line: ");
+        crash_screen_println("Line: ");
         reset_text_color();
         // print this on the same line as `Line: ` but to its right
-        crash_screen_print(LEFT_MARGIN + (6 * GLYPH_WIDTH), 45, "%d", __n64Assert_LineNum);
+        crash_screen_println("      %d", __n64Assert_LineNum);
 
         // Print the assert condition that failed.
         set_text_color(241, 196, 15);
-        crash_screen_print(LEFT_MARGIN, 60, "Condition:");
+        crash_screen_println("Condition:");
         reset_text_color();
         int numNewlines = crash_screen_print_with_newlines(
                               LEFT_MARGIN + 32,
-                              70,
+                              sCrashScreenPrintRow_Pixels,
                               LEFT_MARGIN,
                               "(%s)",
                               __n64Assert_Condition
                           );
 
+        sCrashScreenPrintRow_Pixels += ((numNewlines + 1) * GLYPH_HEIGHT);
+
         // Print the message, if assertf/aggressf/errorf were used.
         if (__n64Assert_MessageBuf[0] != 0) {
             set_text_color(241, 196, 15);
-            crash_screen_print(LEFT_MARGIN, 85 + (numNewlines * GLYPH_HEIGHT), "Message:");
+            crash_screen_println("Message:");
             reset_text_color();
             UNUSED int _newlines = 
                 crash_screen_print_with_newlines(
                     LEFT_MARGIN + 32,
-                    95 + (numNewlines * GLYPH_HEIGHT),
+                    sCrashScreenPrintRow_Pixels,
                     LEFT_MARGIN,
                     "%s",
                     __n64Assert_MessageBuf
                 );
         }
     } else {
-        crash_screen_print(LEFT_MARGIN, 35, "No failed assert to report.");
+        crash_screen_println("No failed assert to report.");
     }
 
     osWritebackDCacheAll();
@@ -554,8 +622,9 @@ void draw_crash_screen(OSThread *thread) {
         if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
     }
     if (updateBuffer) {
-        crash_screen_draw_rect(0, 0, 320, 20);
-        crash_screen_print(LEFT_MARGIN, 5, "Page:%02d %-22s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
+        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, RECT_BOUNDARY_Y);
+        crash_screen_set_print_top(TOP_MARGIN);
+        crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
             case PAGE_SIMPLE:     draw_crash_overview(thread, cause); break;
             case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;

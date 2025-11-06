@@ -6,7 +6,13 @@
 #define GLYPH_WIDTH 8
 #define GLYPH_HEIGHT 12
 #define FONT_ROWS 16
-#define LEFT_MARGIN 16 // for crash screen prints
+
+// Margins for crash screen prints
+#define LEFT_MARGIN 16
+#define  TOP_MARGIN 16
+
+// Where to stop drawing the Header rectangle and where to start drawing the Body rectangle.
+#define RECT_BOUNDARY_Y TOP_MARGIN + GLYPH_HEIGHT + 5
 
 enum CrashPages {
     PAGE_SIMPLE,
