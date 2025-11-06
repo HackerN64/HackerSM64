@@ -140,15 +140,35 @@ struct DisplayListNode {
     struct DisplayListNode *next;
 };
 
+struct DisplayListLinks {
+    struct DisplayListNode* head;
+    struct DisplayListNode* tail;
+};
+
+struct BatchDisplayLists {
+    const void* startDl;
+    const void* endDl;
+};
+
+struct BatchArray {
+    int count;
+    const struct BatchDisplayLists* batchDLs;
+    struct DisplayListLinks batches[0];
+};
+
+struct MasterLayer {
+    struct DisplayListLinks list;
+    struct BatchArray* objects;
+};
+
 /** GraphNode that manages the 8 top-level display lists that will be drawn
  *  Each list has its own render mode, so for example water is drawn in a
  *  different master list than opaque objects.
  *  It also sets the z-buffer on before rendering and off after.
  */
 struct GraphNodeMasterList {
-    /*0x00*/ struct GraphNode node;
-    /*0x14*/ struct DisplayListNode *listHeads[LAYER_COUNT];
-    /*0x34*/ struct DisplayListNode *listTails[LAYER_COUNT];
+    struct GraphNode node;
+    struct MasterLayer layers[LAYER_COUNT];
 };
 
 /** Simply used as a parent to group multiple children.

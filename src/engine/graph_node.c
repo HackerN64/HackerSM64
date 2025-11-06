@@ -8,6 +8,7 @@
 #include "game/rendering_graph_node.h"
 #include "game/area.h"
 #include "geo_layout.h"
+#include "batch_list.h"
 
 /**
  * Initialize a geo node with a given type. Sets all links such that there
@@ -122,6 +123,13 @@ struct GraphNodeMasterList *init_graph_node_master_list(struct AllocOnlyPool *po
 
         if (on) {
             graphNode->node.flags |= GRAPH_RENDER_Z_BUFFER;
+            for (int layer = 0; layer < LAYER_COUNT; layer++) {
+                graphNode->layers[layer].objects = batch_list_objects_alloc(pool, layer);
+            }
+        } else {
+            for (int layer = 0; layer < LAYER_COUNT; layer++) {
+                graphNode->layers[layer].objects = NULL;
+            }
         }
     }
 
