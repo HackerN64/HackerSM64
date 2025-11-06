@@ -163,9 +163,6 @@ char *symt_string(symtable_header_t *symt, int sidx, int slen, char *buf, int si
 void symt_entry_fetch(symtable_header_t *symt, symtable_entry_t *entry, int idx) {
     osWritebackDCache(entry, sizeof(symtable_entry_t));
 
-    // char dbg[100];
-    // sprintf(dbg,"symt_entry_fetch %d\n", idx);
-    // osSyncPrintf(dbg);
     map_parser_dma(
         entry,
         (uintptr_t *)(SYMT_ROM + symt->symtab_off + idx * sizeof(symtable_entry_t)),
