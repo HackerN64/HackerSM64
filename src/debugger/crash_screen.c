@@ -615,12 +615,20 @@ void draw_crash_screen(OSThread *thread) {
     }
 
     if (crashPage == PAGE_DISASM) {
+        u32 sNewProgramPosition = sProgramPosition;
         if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
-            sProgramPosition += 4;
-            updateBuffer = TRUE;
+            sNewProgramPosition += 4;
         }
         if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
-            sProgramPosition -= 4;
+            sNewProgramPosition -= 4;
+        }
+
+        if (is_text_addr(sNewProgramPosition) && (sNewProgramPosition != sProgramPosition)) {
+            // Hold B to speed up scrolling
+            if (!(gPlayer1Controller->buttonDown & B_BUTTON)) {
+                crash_screen_sleep(30);
+            }
+            sProgramPosition = sNewProgramPosition;
             updateBuffer = TRUE;
         }
     }
