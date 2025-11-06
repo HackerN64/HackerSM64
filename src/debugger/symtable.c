@@ -34,6 +34,8 @@ static u32 headless_pi_status(void) {
 // end of code provided by Wiseguy
 
 void map_parser_dma(void *dst, void *src, size_t size) {
+    osWritebackDCacheAll();
+    osInvalICache(dst, size);
     headless_dma((u32)src, dst, size);
     while (headless_pi_status() & PI_STATUS_IO_BUSY);
 }

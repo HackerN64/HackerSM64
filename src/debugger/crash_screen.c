@@ -186,6 +186,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
         }
         ptr += gCrashScreen.width - (GLYPH_WIDTH);
     }
+    osWritebackDCacheAll();
 }
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
