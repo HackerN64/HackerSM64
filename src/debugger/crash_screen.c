@@ -88,6 +88,8 @@ char *gFpcsrDesc[6] = {
 };
 
 static u32 sProgramPosition = 0;
+static u32 sCrashScreenStackTraceCount = 0;
+
 static u16 gCrashScreenTextColor = 0xFFFF;
 static u32 sCrashScreenPrintRow_Pixels = 0;
 static u32 sCrashScreenPrintLnHeight_Pixels = GLYPH_HEIGHT;
@@ -100,6 +102,8 @@ static struct {
     u16 width;
     u16 height;
 } gCrashScreen;
+
+
 
 /**
  * Splits a path string by the containing folder and the name of the file itself.
@@ -339,14 +343,31 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
     crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    crash_screen_println("Thread %d (%s)", thread->id, gCauseDesc[cause]);
+    set_text_color(0xFF, 0, 0);
+    crash_screen_println("Game crashed!");
+    reset_text_color();
+
+    crash_screen_println("Thread: %d", thread->id);
+    crash_screen_println("Cause: %s", gCauseDesc[cause]);
 
 #ifdef DEBUG_EXPORT_SYMBOLS
     symtable_info_t info = get_symbol_info(tc->pc);
 
-    crash_screen_println("Crash at: %s", info.func == NULL ? "Unknown" : info.func);
     if (info.line != -1) {
-        crash_screen_println("File: %s", info.file);
+        char *filename, *foldername;
+        crash_screen_split_filepath(info.file, &foldername, &filename);
+        if (foldername) {
+            set_text_color(241, 196, 15);
+            crash_screen_println("Folder: ");
+            reset_text_color();
+            crash_screen_println("      %s", foldername);
+        }
+        if (filename) {
+            set_text_color(241, 196, 15);
+            crash_screen_println("File: ");
+            reset_text_color();
+            crash_screen_println("      %s", filename);
+        }
 #ifdef DEBUG_EXPORT_ALL_LINES
         // This line only shows the correct value if every line is in the sym file
         crash_screen_println("Line: %d", info.line);
@@ -354,7 +375,26 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     }
 #endif // DEBUG_EXPORT_SYMBOLS
 
+#if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
+    if (stackTraceGenerated) {
+        set_text_color(241, 196, 15);
+        crash_screen_println("Stack Trace: ");
+        reset_text_color();
+
+        // print current func
+        crash_screen_println("%08X: %s", tc->pc, info.func == NULL ? "Unknown" : info.func);
+        // print last func
+        u32 ret_addr = tc->ra;
+        symtable_info_t ra_info = get_symbol_info(ret_addr);
+        crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func == NULL ? "Unknown" : ra_info.func, ra_info.line);
+        // print up to 3 more
+        for (u32 i = 0; i < MIN(3, sCrashScreenStackTraceCount); i++) {
+            crash_screen_println(get_stack_entry(i));
+        }
+    }
+#else // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     crash_screen_println("Address: 0x%08X", tc->pc);
+#endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
 }
 
 void draw_crash_context(OSThread *thread, s32 cause) {
@@ -439,13 +479,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
     osWritebackDCacheAll();
 
-    static u32 generated = 0;
-
-    if (stackTraceGenerated == FALSE) {
-        generated = generate_stack(thread);
-        stackTraceGenerated = TRUE;
-    }
-    for (u32 i = 0; i < generated; i++) {
+    for (u32 i = 0; i < sCrashScreenStackTraceCount; i++) {
         crash_screen_println(get_stack_entry(i));
     }
 #else // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
@@ -695,6 +729,10 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
+                if (stackTraceGenerated == FALSE) {
+                    sCrashScreenStackTraceCount = generate_stack(thread);
+                    stackTraceGenerated = TRUE;
+                }
                 // If an assert happened, go straight to that page
                 if (thread->context.cause == EXC_SYSCALL) {
                     crashPage = PAGE_ASSERTS;

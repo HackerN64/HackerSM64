@@ -173,9 +173,9 @@ void symbol_add(const char *elf, uint32_t addr, bool is_func)
         char *colon = strrchr(line_buf, ':');
         char *file = strndup(line_buf, colon - line_buf);
         char *backup = file;
-        file = strstr(file, "/src/");
+        file = strstr(file, "src/");
         if (file == NULL) {
-            file = strstr(backup, "/asm/");
+            file = strstr(backup, "asm/");
             if (file == NULL) {
                 file = backup;
             }
