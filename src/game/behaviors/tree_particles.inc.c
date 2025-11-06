@@ -49,8 +49,8 @@ void bhv_snow_leaf_particle_spawn_init(void) {
     struct Object *nearestTree = cur_obj_nearest_object_with_behavior(bhvTree);
     if (nearestTree == NULL) return;
     isSnow =
-        nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_CCM_SNOW_TREE]
-        || nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SL_SNOW_TREE];
+        nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SNOW_TREE]
+        || nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SNOW_TREE];
 
     if (isSnow) {
         if (random_float() < 0.5f) {

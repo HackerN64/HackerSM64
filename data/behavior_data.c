@@ -2005,7 +2005,7 @@ const BehaviorScript bhvBowser[] = {
     SET_HOME(),
     LOAD_ANIMATIONS(oAnimations, bowser_seg6_anims_06057690),
     SPAWN_CHILD(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBowserBodyAnchor),
-    SPAWN_CHILD(/*Model*/ MODEL_BOWSER_BOMB_CHILD_OBJ, /*Behavior*/ bhvBowserFlameSpawn),
+    SPAWN_CHILD(/*Model*/ MODEL_BOWSER_BOMB, /*Behavior*/ bhvBowserFlameSpawn),
     SPAWN_OBJ(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBowserTailAnchor),
     // Beta leftover that spawn 50 coins when Bowser is defeated
     SET_INT(oNumLootCoins, 50),

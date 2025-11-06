@@ -2,7 +2,7 @@
 
 struct FloorSwitchTriggeredAnimationFrame {
     const Collision *collision;
-    ModelID16 model;
+    ModelID model;
 };
 
 struct FloorSwitchTriggeredAnimationFrame sFloorSwitchTriggeredAnimationFrames[][5] = {

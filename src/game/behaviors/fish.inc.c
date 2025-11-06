@@ -11,7 +11,7 @@
 static void fish_spawner_act_spawn(void) {
     s32 i;
     s32 schoolQuantity;
-    ModelID16 model;
+    ModelID model;
     f32 minDistToMario;
     const struct Animation *const *fishAnimation;
 

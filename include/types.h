@@ -144,9 +144,7 @@ typedef u32   Texture32;
 typedef s16   TextureCoord;
 
 // -- Models --
-
-typedef u8  ModelID8;
-typedef u16 ModelID16;
+typedef u16 ModelID;
 typedef u32 ModelID32;
 
 // -- Animations --

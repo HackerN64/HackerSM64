@@ -833,19 +833,19 @@ void cur_obj_get_dropped(void) {
     cur_obj_move_after_thrown_or_dropped(0.0f, 0.0f);
 }
 
-void obj_set_model(struct Object *obj, ModelID16 modelID) {
+void obj_set_model(struct Object *obj, ModelID modelID) {
     obj->header.gfx.sharedChild = gLoadedGraphNodes[modelID];
 }
 
-void cur_obj_set_model(ModelID16 modelID) {
+void cur_obj_set_model(ModelID modelID) {
     o->header.gfx.sharedChild = gLoadedGraphNodes[modelID];
 }
 
-s32 obj_has_model(struct Object *obj, ModelID16 modelID) {
+s32 obj_has_model(struct Object *obj, ModelID modelID) {
     return (obj->header.gfx.sharedChild == gLoadedGraphNodes[modelID]);
 }
 
-s32 cur_obj_has_model(ModelID16 modelID) {
+s32 cur_obj_has_model(ModelID modelID) {
     return (o->header.gfx.sharedChild == gLoadedGraphNodes[modelID]);
 }
 
@@ -1258,7 +1258,7 @@ void cur_obj_set_hurtbox_radius_and_height(f32 radius, f32 height) {
 
 static void obj_spawn_loot_coins(struct Object *obj, s32 numCoins, f32 baseYVel,
                                     const BehaviorScript *coinBehavior,
-                                    s16 posJitter, ModelID16 model) {
+                                    s16 posJitter, ModelID model) {
     s32 i;
     struct Surface *floor;
     struct Object *coin;

@@ -60,7 +60,7 @@ static const LevelScript script_thi_area_1_macro_objects[] = {
     OBJECT(/*model*/ MODEL_BUTTERFLY,        /*pos*/ -3111,  -511,  2400, /*angle*/ 0,   0, 0, /*behParam*/ (TRIPLET_BUTTERFLY_BP_0 << 16), /*beh*/ bhvTripletButterfly),
     OBJECT(/*model*/ MODEL_BUTTERFLY,        /*pos*/  4844,  -533,  2266, /*angle*/ 0,   0, 0, /*behParam*/ (TRIPLET_BUTTERFLY_BP_0 << 16), /*beh*/ bhvTripletButterfly),
     // Special objects
-    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,  /*pos*/  4813,  -511,  2254, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BUBBLY_TREE,  /*pos*/  4813,  -511,  2254, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
     RETURN(),
 };
 
@@ -136,7 +136,7 @@ static const LevelScript script_thi_area_2_macro_objects[] = {
     OBJECT(/*model*/ MODEL_GOOMBA,            /*pos*/ -2020,  -890,  1720, /*angle*/ 0,   0, 0, /*behParam*/ (GOOMBA_SIZE_TINY << 16), /*beh*/ bhvGoomba),
     // Special objects
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03, /*pos*/   -40,  -767, -4494, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
-    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,   /*pos*/  1444,  -153,   676, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BUBBLY_TREE,   /*pos*/  1444,  -153,   676, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
     RETURN(),
 };
 
@@ -199,9 +199,9 @@ static const LevelScript script_thi_area_2_objects_2[] = {
 };
 
 static const LevelScript script_thi_area_1_objects_3[] = {
-    OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/  6656, -1536, -5632, /*angle*/ 0, 0, 0, /*behParam*/ 0x00320000, /*beh*/ bhvWarpPipe),
-    OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/ -5888, -2048, -5888, /*angle*/ 0, 0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvWarpPipe),
-    OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/ -3072,   512, -3840, /*angle*/ 0, 0, 0, /*behParam*/ 0x00340000, /*beh*/ bhvWarpPipe),
+    OBJECT(/*model*/ MODEL_WARP_PIPE, /*pos*/  6656, -1536, -5632, /*angle*/ 0, 0, 0, /*behParam*/ 0x00320000, /*beh*/ bhvWarpPipe),
+    OBJECT(/*model*/ MODEL_WARP_PIPE, /*pos*/ -5888, -2048, -5888, /*angle*/ 0, 0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvWarpPipe),
+    OBJECT(/*model*/ MODEL_WARP_PIPE, /*pos*/ -3072,   512, -3840, /*angle*/ 0, 0, 0, /*behParam*/ 0x00340000, /*beh*/ bhvWarpPipe),
     WARP_NODE(/*id*/ 0x32, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x02, /*destNode*/ 0x32, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x33, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x02, /*destNode*/ 0x33, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x34, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x02, /*destNode*/ 0x34, /*flags*/ WARP_NO_CHECKPOINT),
@@ -209,9 +209,9 @@ static const LevelScript script_thi_area_1_objects_3[] = {
 };
 
 static const LevelScript script_thi_area_2_objects_3[] = {
-    OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/  1997, -461, -1690, /*angle*/ 0, 0, 0, /*behParam*/ 0x00320000, /*beh*/ bhvWarpPipe),
-    OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/ -1766, -614, -1766, /*angle*/ 0, 0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvWarpPipe),
-    OBJECT(/*model*/ MODEL_THI_WARP_PIPE, /*pos*/  -922,  154, -1152, /*angle*/ 0, 0, 0, /*behParam*/ 0x00340000, /*beh*/ bhvWarpPipe),
+    OBJECT(/*model*/ MODEL_WARP_PIPE, /*pos*/  1997, -461, -1690, /*angle*/ 0, 0, 0, /*behParam*/ 0x00320000, /*beh*/ bhvWarpPipe),
+    OBJECT(/*model*/ MODEL_WARP_PIPE, /*pos*/ -1766, -614, -1766, /*angle*/ 0, 0, 0, /*behParam*/ 0x00330000, /*beh*/ bhvWarpPipe),
+    OBJECT(/*model*/ MODEL_WARP_PIPE, /*pos*/  -922,  154, -1152, /*angle*/ 0, 0, 0, /*behParam*/ 0x00340000, /*beh*/ bhvWarpPipe),
     WARP_NODE(/*id*/ 0x32, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x01, /*destNode*/ 0x32, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x33, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x01, /*destNode*/ 0x33, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x34, /*destLevel*/ LEVEL_THI, /*destArea*/ 0x01, /*destNode*/ 0x34, /*flags*/ WARP_NO_CHECKPOINT),

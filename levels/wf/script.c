@@ -67,7 +67,7 @@ static const LevelScript script_wf_macro_objects[] = {
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_0F, /*pos*/  4608,   256,  1792, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_11, /*pos*/ -2499,  1792,  -261, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_12, /*pos*/ -2661,   384,   640, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
-    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE,   /*pos*/  2560,   256,  4608, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BUBBLY_TREE,   /*pos*/  2560,   256,  4608, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
     RETURN(),
 };
 

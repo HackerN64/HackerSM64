@@ -141,7 +141,7 @@ static void pokey_act_uninitialized(void) {
     struct Object *bodyPart;
 
     if (o->oDistanceToMario < o->oDrawingDistance) {
-        ModelID16 partModel = MODEL_POKEY_HEAD;
+        ModelID partModel = MODEL_POKEY_HEAD;
         s32 i;
 
         for (i = 0; i < POKEY_NUM_SEGMENTS; i++) {

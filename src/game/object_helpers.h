@@ -25,7 +25,7 @@ enum WaterDropletFlags {
 // Call spawn_water_droplet with this struct to spawn an object.
 struct WaterDropletParams {
     s16 flags; // Droplet spawn flags, see defines above
-    ModelID16 model;
+    ModelID model;
     const BehaviorScript *behavior;
     s16 moveAngleRange; // Only used for RAND_ANGLE_INCR flags
     s16 moveRange;      // Only used for RAND_OFFSET flags
@@ -40,7 +40,7 @@ struct WaterDropletParams {
 struct SpawnParticlesInfo {
     /*0x00*/ s8 behParam;
     /*0x01*/ s8 count;
-    /*0x02*/ ModelID16 model;
+    /*0x02*/ ModelID model;
     /*0x03*/ s8 offsetY;
     /*0x04*/ s8 forwardVelBase;
     /*0x05*/ s8 forwardVelRange;
@@ -135,10 +135,10 @@ void cur_obj_set_y_vel_and_animation(f32 yVel, s32 animIndex);
 void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action);
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction);
 void cur_obj_get_dropped(void);
-void obj_set_model(struct Object *obj, ModelID16 modelID);
-void cur_obj_set_model(ModelID16 modelID);
-s32 obj_has_model(struct Object *obj, ModelID16 modelID);
-s32 cur_obj_has_model(ModelID16 modelID);
+void obj_set_model(struct Object *obj, ModelID modelID);
+void cur_obj_set_model(ModelID modelID);
+s32 obj_has_model(struct Object *obj, ModelID modelID);
+s32 cur_obj_has_model(ModelID modelID);
 ModelID32 obj_get_model_id(struct Object *obj);
 void mario_set_flag(s32 flag);
 s32 cur_obj_clear_interact_status_flag(s32 flag);

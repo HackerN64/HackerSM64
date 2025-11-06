@@ -127,8 +127,8 @@ static const LevelScript script_wdw_area_2_macro_objects[] = {
     OBJECT(/*model*/ MODEL_NONE,            /*pos*/  -770,  -320,  2820, /*angle*/ 0,   0, 0, /*behParam*/ ((COIN_FORMATION_FLAG_NONE                             ) << 16), /*beh*/ bhvCoinFormation),
     OBJECT(/*model*/ MODEL_EXCLAMATION_BOX, /*pos*/  1655, -2160, -1293, /*angle*/ 0,   0, 0, /*behParam*/ (EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY << 16), /*beh*/ bhvExclamationBox),
     // Special objects
-    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE, /*pos*/  1664, -2457,  -946, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
-    OBJECT(/*model*/ MODEL_BOB_BUBBLY_TREE, /*pos*/  1664, -2457, -1637, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BUBBLY_TREE, /*pos*/  1664, -2457,  -946, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
+    OBJECT(/*model*/ MODEL_BUBBLY_TREE, /*pos*/  1664, -2457, -1637, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvTree),
     RETURN(),
 };
 

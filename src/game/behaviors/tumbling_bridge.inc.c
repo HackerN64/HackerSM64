@@ -4,7 +4,7 @@ struct TumblingBridgeParams {
     s16 numBridgeSections;
     s16 bridgeRelativeStartingXorZ;
     s16 platformWidth;
-    ModelID16 model;
+    ModelID model;
     const Collision *collision;
 };
 
