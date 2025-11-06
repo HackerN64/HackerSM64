@@ -105,11 +105,15 @@ static struct {
  * Splits a path string by the containing folder and the name of the file itself.
  */
 static void crash_screen_split_filepath(char *path, char **folder, char **filename) {
-    *folder = path;
-
+    static char folderpath[256];
     for (int i = strlen(path) - 1; i > 0; i--) {
         if ((path[i] == '/') || (path[i] == '\\')) {
             *filename = &path[i + 1];
+            for (int copy = 0; copy <= i; copy++) {
+                folderpath[copy] = path[copy];
+            }
+            folderpath[i + 1] = 0;
+            *folder = folderpath;
             break;
         }
     }
@@ -528,14 +532,20 @@ void draw_assert(UNUSED OSThread *thread) {
 
 
     if (__n64Assert_Filename != NULL) {
-        set_text_color(241, 196, 15);
-        crash_screen_println("File: ");
-        reset_text_color();
         // print this on the same line as `File: ` but to its right
         char *foldername = NULL;
         char *filename = NULL;
         crash_screen_split_filepath(__n64Assert_Filename, &foldername, &filename);
+        if (foldername) {
+            set_text_color(241, 196, 15);
+            crash_screen_println("Folder: ");
+            reset_text_color();
+            crash_screen_println("      %s", foldername);
+        }
         if (filename) {
+            set_text_color(241, 196, 15);
+            crash_screen_println("File: ");
+            reset_text_color();
             crash_screen_println("      %s", filename);
         }
 
