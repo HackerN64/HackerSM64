@@ -557,7 +557,8 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-void draw_assert(UNUSED OSThread *thread) {
+void draw_assert(OSThread *thread) {
+    __OSThreadContext *tc = &thread->context;
     crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_set_print_top(35);
 
@@ -610,7 +611,7 @@ void draw_assert(UNUSED OSThread *thread) {
             set_text_color(241, 196, 15);
             crash_screen_println("Message:");
             reset_text_color();
-            UNUSED int _newlines = 
+            numNewlines += 
                 crash_screen_print_with_newlines(
                     LEFT_MARGIN + 32,
                     sCrashScreenPrintRow_Pixels,
@@ -619,6 +620,30 @@ void draw_assert(UNUSED OSThread *thread) {
                     __n64Assert_MessageBuf
                 );
         }
+        sCrashScreenPrintRow_Pixels += ((numNewlines + 1) * GLYPH_HEIGHT);
+#if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
+        if (stackTraceGenerated) {
+            set_text_color(241, 196, 15);
+            crash_screen_println("Stack Trace:");
+            reset_text_color();
+
+            // Print last func (we know the current func is __n64Assert)
+            u32 ret_addr = tc->ra;
+            symtable_info_t ra_info = get_symbol_info(ret_addr);
+            crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func == NULL ? "Unknown" : ra_info.func, ra_info.line);
+            // Print up to 3 more
+            for (u32 i = 0; i < MIN(3, sCrashScreenStackTraceCount); i++) {
+                crash_screen_println(get_stack_entry(i));
+            }
+        }
+#else // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
+    // Print address of last func (we know the current func is __n64Assert)
+    u32 ret_addr = tc->ra;
+    set_text_color(241, 196, 15);
+    crash_screen_println("Called From:");
+    reset_text_color();
+    crash_screen_println("      0x%08X", ret_addr);
+#endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     } else {
         crash_screen_println("No failed assert to report.");
     }
