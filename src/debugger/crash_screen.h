@@ -1,6 +1,8 @@
 #ifndef CRASH_SCREEN_H
 #define CRASH_SCREEN_H
 
+#define MAX_PATH 256
+
 // Configurable Defines
 #define X_KERNING 6
 #define GLYPH_WIDTH 8
@@ -17,6 +19,9 @@
 
 // Where to stop drawing the Header rectangle and where to start drawing the Body rectangle.
 #define RECT_BOUNDARY_Y TOP_MARGIN + GLYPH_HEIGHT + 5
+
+// Max length of string before prepending a "(...)"
+#define ELLISION_LENGTH 45
 
 enum CrashPages {
     PAGE_SIMPLE,

@@ -108,19 +108,19 @@ static struct {
 /**
  * Splits a path string by the containing folder and the name of the file itself.
  */
-static void crash_screen_split_filepath(char *path, char **folder, char **filename) {
-    static char folderpath[256];
-    for (int i = strlen(path) - 1; i > 0; i--) {
-        if ((path[i] == '/') || (path[i] == '\\')) {
-            *filename = &path[i + 1];
-            for (int copy = 0; copy <= i; copy++) {
-                folderpath[copy] = path[copy];
-            }
-            folderpath[i + 1] = 0;
-            *folder = folderpath;
-            break;
-        }
+static char *crash_screen_ellide_string(char *str, u32 truncateLength) {
+    u32 string_length = strlen(str);
+
+    if (truncateLength >= string_length) {
+        return str;
     }
+
+    str[string_length - truncateLength - 4] = '(';
+    str[string_length - truncateLength - 3] = '.';
+    str[string_length - truncateLength - 2] = '.';
+    str[string_length - truncateLength - 1] = '.';
+    str[string_length - truncateLength - 0] = ')';
+    return &str[string_length - truncateLength - 4];
 }
 
 static void set_text_color(u32 r, u32 g, u32 b) {
@@ -372,24 +372,19 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     symtable_info_t info = get_symbol_info(tc->pc);
 
     if (info.line != -1) {
-        char *filename, *foldername;
-        crash_screen_split_filepath(info.file, &foldername, &filename);
-        if (foldername) {
-            set_text_color(241, 196, 15);
-            crash_screen_println("Folder: ");
-            reset_text_color();
-            crash_screen_println("\t%s", foldername);
-        }
-        if (filename) {
-            set_text_color(241, 196, 15);
-            crash_screen_println("File: ");
-            reset_text_color();
-            crash_screen_println("\t%s", filename);
-        }
+        char file_line[MAX_PATH];
+
+        set_text_color(241, 196, 15);
 #ifdef DEBUG_EXPORT_ALL_LINES
-        // This line only shows the correct value if every line is in the sym file
-        crash_screen_println("Line: %d", info.line);
+        sprintf(file_line, "%s:%d", info.file, info.line);
+        crash_screen_println("File/Line: ");
+#else  // DEBUG_EXPORT_ALL_LINES
+        sprintf(file_line, "%s", info.file);
+        crash_screen_println("File: ");
 #endif // DEBUG_EXPORT_ALL_LINES
+        
+        reset_text_color();
+        crash_screen_println("%s", crash_screen_ellide_string(file_line, ELLISION_LENGTH));
     }
 #endif // DEBUG_EXPORT_SYMBOLS
 
@@ -587,22 +582,12 @@ void draw_assert(OSThread *thread) {
 
     if (__n64Assert_Filename != NULL) {
         // print this on the same line as `File: ` but to its right
-        char *foldername = NULL;
-        char *filename = NULL;
-        crash_screen_split_filepath(__n64Assert_Filename, &foldername, &filename);
-        if (foldername) {
-            set_text_color(241, 196, 15);
-            crash_screen_println("Folder: ");
-            reset_text_color();
-            crash_screen_println("\t%s", foldername);
-        }
-        if (filename) {
-            set_text_color(241, 196, 15);
-            crash_screen_println("File: ");
-            reset_text_color();
-            crash_screen_println("\t%s", filename);
-        }
-
+        char file_line[MAX_PATH];
+        sprintf(file_line, "%s:%d", __n64Assert_Filename, __n64Assert_LineNum);
+        set_text_color(241, 196, 15);
+        crash_screen_println("File/Line: ");
+        reset_text_color();
+        crash_screen_println("%s", crash_screen_ellide_string(file_line, ELLISION_LENGTH));
 
         set_text_color(241, 196, 15);
         crash_screen_println("Line: ");
