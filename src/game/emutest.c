@@ -79,9 +79,9 @@ static void check_emux_support(void) {
 
     asm volatile(
         "tne %0, %0"
-    : "=r" (hasExtensions) // Outputs
-    : "r" (hasExtensions) // Inputs
-    : // no clobbers
+        : "=r" (hasExtensions) // Outputs
+        : "r" (hasExtensions) // Inputs
+        : // no clobbers
     );
 
     if (hasExtensions) {
