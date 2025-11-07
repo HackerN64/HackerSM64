@@ -234,6 +234,13 @@ int crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const cha
                 ptr++;
                 numNewlines += 1;
                 continue;
+            } else if (*ptr == '\t') {
+                osSyncPrintf("TAB %d ->", xOffset);
+                xOffset += GLYPH_WIDTH * (TAB_WIDTH_CHARS - 1);
+                osSyncPrintf("%d\n", xOffset);
+
+                ptr++;
+                continue;
             } else if (glyph != 0xff) {
                 crash_screen_draw_glyph(xOffset, y, glyph);
             }
@@ -262,6 +269,11 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
         ptr = crashScreenBuf;
 
         while (*ptr && size-- > 0) {
+            if (*ptr == '\t') {
+                ptr++;
+                x += GLYPH_WIDTH * (TAB_WIDTH_CHARS - 1);
+                continue;
+            }
             glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
 
             if (glyph != 0xff) {
@@ -292,6 +304,12 @@ void crash_screen_println(const char *fmt, ...) {
         ptr = crashScreenBuf;
 
         while (*ptr && size-- > 0) {
+            if (*ptr == '\t') {
+                ptr++;
+                x += GLYPH_WIDTH * (TAB_WIDTH_CHARS - 1);
+                continue;
+            }
+
             glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
 
             if (glyph != 0xff) {
@@ -360,13 +378,13 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
             set_text_color(241, 196, 15);
             crash_screen_println("Folder: ");
             reset_text_color();
-            crash_screen_println("      %s", foldername);
+            crash_screen_println("\t%s", foldername);
         }
         if (filename) {
             set_text_color(241, 196, 15);
             crash_screen_println("File: ");
             reset_text_color();
-            crash_screen_println("      %s", filename);
+            crash_screen_println("\t%s", filename);
         }
 #ifdef DEBUG_EXPORT_ALL_LINES
         // This line only shows the correct value if every line is in the sym file
@@ -576,13 +594,13 @@ void draw_assert(OSThread *thread) {
             set_text_color(241, 196, 15);
             crash_screen_println("Folder: ");
             reset_text_color();
-            crash_screen_println("      %s", foldername);
+            crash_screen_println("\t%s", foldername);
         }
         if (filename) {
             set_text_color(241, 196, 15);
             crash_screen_println("File: ");
             reset_text_color();
-            crash_screen_println("      %s", filename);
+            crash_screen_println("\t%s", filename);
         }
 
 
@@ -590,7 +608,7 @@ void draw_assert(OSThread *thread) {
         crash_screen_println("Line: ");
         reset_text_color();
         // print this on the same line as `Line: ` but to its right
-        crash_screen_println("      %d", __n64Assert_LineNum);
+        crash_screen_println("\t%d", __n64Assert_LineNum);
 
         // Print the assert condition that failed.
         set_text_color(241, 196, 15);
@@ -642,7 +660,7 @@ void draw_assert(OSThread *thread) {
     set_text_color(241, 196, 15);
     crash_screen_println("Called From:");
     reset_text_color();
-    crash_screen_println("      0x%08X", ret_addr);
+    crash_screen_println("\t0x%08X", ret_addr);
 #endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     } else {
         crash_screen_println("No failed assert to report.");

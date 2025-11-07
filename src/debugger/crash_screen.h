@@ -11,6 +11,10 @@
 #define LEFT_MARGIN 16
 #define  TOP_MARGIN 16
 
+// Tab width ('\t') for crash screen prints, in characters.
+//  Note that we only treat tabs as a wide space.
+#define TAB_WIDTH_CHARS 4
+
 // Where to stop drawing the Header rectangle and where to start drawing the Body rectangle.
 #define RECT_BOUNDARY_Y TOP_MARGIN + GLYPH_HEIGHT + 5
 
