@@ -75,11 +75,11 @@ static u8 check_cache_emulation() {
 }
 
 static void check_emux_support(void) {
-    u64 hasExtensions = 0;
+    volatile u32 hasExtensions = 0;
 
     asm volatile(
         "tne %0, %0"
-    : // no outputs
+    : "=r" (hasExtensions) // Outputs
     : "r" (hasExtensions) // Inputs
     : // no clobbers
     );
