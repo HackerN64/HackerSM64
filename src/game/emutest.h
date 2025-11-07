@@ -15,15 +15,15 @@ enum Emulator {
 };
 
 enum SystemCapabilities {
-    SYS_SUPPORTS_CACHE = (1 << 0),
-    SYS_SUPPORTS_FLOAT_ROUNDING_MODE = (1 << 1),
-    SYS_SUPPORTS_LIBPL = (1 << 2),
-    SYS_SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
-    SYS_SUPPORTS_EMUX = (1 << 4),
+    SYSCAP_CACHE = (1 << 0),
+    SYSCAP_FLOAT_ROUNDING_MODE = (1 << 1),
+    SYSCAP_LIBPL = (1 << 2),
+    SYSCAP_SOFTWARE_FRAMEBUFFER = (1 << 3),
+    SYSCAP_EMUX = (1 << 4),
 
     // idk how to implement the following lol
-    // SYS_SUPPORTS_DMA_TIMING = 0,
-    // SYS_SUPPORTS_RSP_PIPELINE_STALL_TIMING = 0,
+    // SYSCAP_DMA_TIMING = 0,
+    // SYSCAP_RSP_PIPELINE_STALL_TIMING = 0,
 };
 
 // initializes gEmulator
@@ -47,7 +47,7 @@ extern u32 detect_emulator();
 extern u8 gEmulator;
 
 // determines whether libpl is safe to use
-#define gSupportsLibpl (gSystemCapabilities & SYS_SUPPORTS_LIBPL)
+#define gSupportsLibpl (gSystemCapabilities & SYSCAP_LIBPL)
 
 /**
  * Bitflag that lists all system capabilities, for more granular
