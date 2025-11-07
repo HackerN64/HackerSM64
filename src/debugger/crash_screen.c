@@ -589,12 +589,6 @@ void draw_assert(OSThread *thread) {
         reset_text_color();
         crash_screen_println("%s", crash_screen_ellide_string(file_line, ELLISION_LENGTH));
 
-        set_text_color(241, 196, 15);
-        crash_screen_println("Line: ");
-        reset_text_color();
-        // print this on the same line as `Line: ` but to its right
-        crash_screen_println("\t%d", __n64Assert_LineNum);
-
         // Print the assert condition that failed.
         set_text_color(241, 196, 15);
         crash_screen_println("Condition:");
