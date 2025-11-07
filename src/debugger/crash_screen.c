@@ -382,6 +382,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 #else  // DEBUG_EXPORT_ALL_LINES
         sprintf(file_line, "%s", info.file);
 #endif // DEBUG_EXPORT_ALL_LINES
+        sCrashScreenPrintRow_Pixels += 5;
         crash_screen_println("File: ");
         reset_text_color();
         
