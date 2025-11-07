@@ -77,6 +77,7 @@ static u8 check_cache_emulation() {
 static void check_emux_support(void) {
     volatile u32 hasExtensions = 0;
 
+    // run `emux detect`
     asm volatile(
         "tne %0, %0"
         : "=r" (hasExtensions) // Outputs
