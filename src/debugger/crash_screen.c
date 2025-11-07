@@ -585,39 +585,46 @@ void draw_assert(OSThread *thread) {
         char file_line[MAX_PATH];
         sprintf(file_line, "%s:%d", __n64Assert_Filename, __n64Assert_LineNum);
         set_text_color(241, 196, 15);
-        crash_screen_println("File/Line: ");
+        crash_screen_println("File/Line:");
         reset_text_color();
-        crash_screen_println("%s", crash_screen_ellide_string(file_line, ELLISION_LENGTH));
+        int numNewlines = crash_screen_print_with_newlines(
+                            LEFT_MARGIN + (GLYPH_WIDTH * 8),
+                            sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
+                            LEFT_MARGIN,
+                            file_line
+                          );
+
+        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
 
         // Print the assert condition that failed.
         set_text_color(241, 196, 15);
         crash_screen_println("Condition:");
         reset_text_color();
-        int numNewlines = crash_screen_print_with_newlines(
-                              LEFT_MARGIN + 32,
-                              sCrashScreenPrintRow_Pixels,
+        numNewlines = crash_screen_print_with_newlines(
+                              LEFT_MARGIN + (GLYPH_WIDTH * 8),
+                              sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
                               LEFT_MARGIN,
                               "(%s)",
                               __n64Assert_Condition
                           );
 
-        sCrashScreenPrintRow_Pixels += ((numNewlines + 1) * GLYPH_HEIGHT);
+        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
 
         // Print the message, if assertf/aggressf/errorf were used.
         if (__n64Assert_MessageBuf[0] != 0) {
             set_text_color(241, 196, 15);
             crash_screen_println("Message:");
             reset_text_color();
-            numNewlines += 
+            numNewlines = 
                 crash_screen_print_with_newlines(
-                    LEFT_MARGIN + 32,
-                    sCrashScreenPrintRow_Pixels,
+                    LEFT_MARGIN + (GLYPH_WIDTH * 7),
+                    sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
                     LEFT_MARGIN,
                     "%s",
                     __n64Assert_MessageBuf
                 );
         }
-        sCrashScreenPrintRow_Pixels += ((numNewlines + 1) * GLYPH_HEIGHT);
+        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
         if (stackTraceGenerated) {
             set_text_color(241, 196, 15);
