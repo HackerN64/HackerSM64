@@ -20,9 +20,6 @@
 // Where to stop drawing the Header rectangle and where to start drawing the Body rectangle.
 #define RECT_BOUNDARY_Y TOP_MARGIN + GLYPH_HEIGHT + 5
 
-// Max length of string before prepending a "(...)"
-#define ELLISION_LENGTH 45
-
 enum CrashPages {
     PAGE_SIMPLE,
     PAGE_CONTEXT,
