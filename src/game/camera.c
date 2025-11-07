@@ -823,7 +823,7 @@ void pan_ahead_of_player(struct Camera *c) {
     vec3f_add(c->focus, pan);
 }
 
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
 s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
     switch (gCurrLevelArea) {
         case AREA_WDW_MAIN:
@@ -841,7 +841,7 @@ s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
     }
     return yaw;
 }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
 /**
  * Rotates the camera around the area's center point.
@@ -858,9 +858,9 @@ s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     sAreaYaw = camYaw - sModeOffsetYaw;
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
     focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     camYaw = find_in_bounds_yaw_wdw_bob_thi(pos, focus, camYaw);
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     return camYaw;
 }
 
@@ -879,11 +879,11 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
     focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
     pan_ahead_of_player(c);
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelArea == AREA_DDD_SUB) {
         camYaw = clamp_positions_and_find_yaw(pos, focus, 6839.f, 995.f, 5994.f, -3945.f);
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     return camYaw;
 }
 
@@ -1135,20 +1135,29 @@ void mode_8_directions_camera(struct Camera *c) {
     }
 #ifdef PARALLEL_LAKITU_CAM
     // extra functionality
-    else if (gPlayer1Controller->buttonPressed & U_JPAD) {
-        s8DirModeYawOffset = 0;
-        s8DirModeYawOffset = gMarioState->faceAngle[1] - 0x8000;
+#ifdef PUPPYPRINT_DEBUG
+    if (!sDebugMenu) {
+#endif // PUPPYPRINT_DEBUG    
+#ifndef ENABLE_DEBUG_FREE_MOVE
+        if (gPlayer1Controller->buttonPressed & U_JPAD) {
+            s8DirModeYawOffset = 0;
+            s8DirModeYawOffset = gMarioState->faceAngle[1] - 0x8000;
+        } else if (gPlayer1Controller->buttonPressed & D_JPAD) {
+#else
+        if ((gPlayer1Controller->buttonPressed & D_JPAD) && (gMarioState->action != ACT_DEBUG_FREE_MOVE)) {
+#endif // ENABLE_DEBUG_FREE_MOVE
+            s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
+        }
+        if (gPlayer1Controller->buttonDown & L_JPAD) {
+            s8DirModeYawOffset -= DEGREES(2);
+        } 
+        if (gPlayer1Controller->buttonDown & R_JPAD) {
+            s8DirModeYawOffset += DEGREES(2);
+        }
+#ifdef PUPPYPRINT_DEBUG
     }
-    else if (gPlayer1Controller->buttonDown & L_JPAD) {
-        s8DirModeYawOffset -= DEGREES(2);
-    }
-    else if (gPlayer1Controller->buttonDown & R_JPAD) {
-        s8DirModeYawOffset += DEGREES(2);
-    }
-    else if (gPlayer1Controller->buttonPressed & D_JPAD) {
-        s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
-    }
-#endif
+#endif // PUPPYPRINT_DEBUG
+#endif // PARALLEL_LAKITU_CAM
 
     lakitu_zoom(400.f, 0x900);
     c->nextYaw = update_8_directions_camera(c, c->focus, pos);
@@ -1534,7 +1543,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
         nz = floor->normal.z;
         oo = floor->originOffset;
         pos[1] = 300.f - (nx * pos[0] + nz * pos[2] + oo) / ny;
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
         switch (gCurrLevelArea) {
             case AREA_BOB:
                 pos[1] += 125.f;
@@ -1543,14 +1552,14 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
             case AREA_WF:
                 pos[1] += 125.f;
         }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     }
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     // Prevent the camera from going to the ground in the outside boss fight
     if (gCurrLevelNum == LEVEL_BBH) {
         pos[1] = 2047.f;
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     // Rotate from C-Button input
     if (sCSideButtonYaw < 0) {
         sModeOffsetYaw += 0x200;
@@ -1635,13 +1644,13 @@ void mode_parallel_tracking_camera(struct Camera *c) {
  * Fixed camera mode, the camera rotates around a point and looks and zooms toward Mario.
  */
 void mode_fixed_camera(struct Camera *c) {
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelNum == LEVEL_BBH) {
         set_fov_function(CAM_FOV_BBH);
     } else {
         set_fov_function(CAM_FOV_APP_45);
     }
-#else
+#else // ENABLE_VANILLA_CAM_PROCESSING
     set_fov_function(CAM_FOV_APP_45);
 #endif
     c->nextYaw = update_fixed_camera(c, c->focus, c->pos);
@@ -1778,7 +1787,7 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
         dist = 300.f;
     }
     vec3f_set_dist_and_angle(focus, pos, dist, pitch, yaw);
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelArea == AREA_WDW_MAIN) {
         yaw = clamp_positions_and_find_yaw(pos, focus, 4508.f, -3739.f, 4508.f, -3739.f);
     }
@@ -1788,7 +1797,7 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     if (gCurrLevelArea == AREA_THI_TINY) {
         yaw = clamp_positions_and_find_yaw(pos, focus, 2458.f, -2458.f, 2458.f, -2458.f);
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
     return yaw;
 }
@@ -2202,11 +2211,11 @@ s16 update_default_camera(struct Camera *c) {
     }
     if ((gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
         posHeight = 610.f;
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
         if (gCurrLevelArea == AREA_SSL_PYRAMID || gCurrLevelNum == LEVEL_CASTLE) {
             posHeight /= 2;
         }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     }
 
     // Make Lakitu fly above the gas
@@ -2262,11 +2271,11 @@ s16 update_default_camera(struct Camera *c) {
             c->pos[1] = ceilHeight;
         }
     }
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelArea == AREA_WDW_TOWN) {
         yaw = clamp_positions_and_find_yaw(c->pos, c->focus, 2254.f, -3789.f, 3790.f, -2253.f);
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     return yaw;
 }
 
@@ -2920,11 +2929,9 @@ void update_camera(struct Camera *c) {
     c->nextYaw = gLakituState.nextYaw;
     c->mode = gLakituState.mode;
     c->defMode = gLakituState.defMode;
-#ifdef ENABLE_VANILLA_CAM_PROCESSING
+
     camera_course_processing(c);
-#else
-    if (gCurrDemoInput != NULL) camera_course_processing(c);
-#endif
+
     sCButtonsPressed = find_c_buttons_pressed(sCButtonsPressed, gPlayer1Controller->buttonPressed, gPlayer1Controller->buttonDown);
 
     if (c->cutscene != CUTSCENE_NONE) {
@@ -3035,9 +3042,9 @@ void update_camera(struct Camera *c) {
 #ifdef PUPPYCAM
     if (!gPuppyCam.enabled || c->cutscene != 0 || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
 #endif
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelNum != LEVEL_CASTLE) {
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
         // If fixed camera is selected as the alternate mode, then fix the camera as long as the right
         // trigger is held
         if ((c->cutscene == CUTSCENE_NONE &&
@@ -3067,13 +3074,13 @@ void update_camera(struct Camera *c) {
                 sCameraSoundFlags &= ~CAM_SOUND_FIXED_ACTIVE;
             }
         }
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     } else {
         if ((gPlayer1Controller->buttonPressed & R_TRIG) && (cam_select_alt_mode(0) == CAM_SELECTION_FIXED)) {
             play_sound_button_change_blocked();
         }
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
     update_lakitu(c);
 #ifdef PUPPYCAM
@@ -3371,11 +3378,11 @@ void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
                 camera->focus[2] = gCamera->areaCenZ;
                 vec3f_get_yaw(camera->focus, sMarioCamState->pos, &yaw);
                 vec3f_set_dist_and_angle(sMarioCamState->pos, camera->pos, 6000.f, 0x1000, yaw);
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
                 if (gCurrLevelNum != LEVEL_THI) {
                     find_in_bounds_yaw_wdw_bob_thi(camera->pos, camera->focus, 0);
                 }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
             }
         } else {
             sFramesPaused++;
@@ -5300,26 +5307,23 @@ void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset) {
  *      Only block area mode changes if Mario is in a cannon,
  *      or if the camera is in Mario mode and Mario is not swimming or in water with the metal cap
  */
-#ifdef ENABLE_VANILLA_CAM_PROCESSING
 void check_blocking_area_processing(const u8 *mode) {
     if (sMarioCamState->action & ACT_FLAG_METAL_WATER ||
                         *mode == DEEP_WATER_CAMERA_MODE || *mode == WATER_SURFACE_CAMERA_MODE) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
-
+    
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelNum == LEVEL_DDD || gCurrLevelNum == LEVEL_WDW || gCurrLevelNum == LEVEL_COTMC) {
         sStatusFlags &= ~CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
     if ((*mode == DEEP_WATER_CAMERA_MODE &&
             !(sMarioCamState->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))) ||
          *mode == CAMERA_MODE_INSIDE_CANNON) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
-#else
-void check_blocking_area_processing(UNUSED const u8 *mode) {
-    sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
-#endif
 }
 
 void cam_rr_exit_building_side(struct Camera *c) {
@@ -5847,9 +5851,11 @@ void surface_type_modes_thi(struct Camera *c) {
  * exit. Using hyperspeed, the earlier area can be directly exited from, keeping the changes it applies.
  */
 struct CameraTrigger sCamSL[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_sl_snowman_head_8dir, 1119, 3584, 1125, 1177, 358, 358, -0x1D27 },
     // This trigger surrounds the previous one
     { 1, cam_sl_free_roam, 1119, 3584, 1125, 4096, 4096, 4096, -0x1D27 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5859,8 +5865,10 @@ struct CameraTrigger sCamSL[] = {
  * tunnel. Both sides achieve their effect by editing the camera yaw.
  */
 struct CameraTrigger sCamTHI[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_thi_move_cam_through_tunnel, -4609, -2969, 6448, 100, 300, 300, 0 },
     { 1, cam_thi_look_through_tunnel,     -4809, -2969, 6448, 100, 300, 300, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5869,12 +5877,14 @@ struct CameraTrigger sCamTHI[] = {
  * start the cutscene for entering the CotMC pool.
  */
 struct CameraTrigger sCamHMC[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_hmc_enter_maze, 1996, 102, 0, 205, 100, 205, 0 },
     { 1, cam_castle_hmc_start_pool_cutscene, 3350, -4689, 4800, 600, 50, 600, 0 },
     { 1, cam_hmc_elevator_black_hole, -3278, 1236, 1379, 358, 200, 358, 0 },
     { 1, cam_hmc_elevator_maze_emergency_exit, -2816, 2055, -2560, 358, 200, 358, 0 },
     { 1, cam_hmc_elevator_lake, -3532, 1543, -7040, 358, 200, 358, 0 },
     { 1, cam_hmc_elevator_maze, -972, 1543, -7347, 358, 200, 358, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5884,10 +5894,12 @@ struct CameraTrigger sCamHMC[] = {
  * radial.
  */
 struct CameraTrigger sCamSSL[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_ssl_enter_pyramid_top, -2048, 1080, -1024, 150, 150, 150, 0 },
     { 2, cam_ssl_pyramid_center, 0, -104, -104, 1248, 1536, 2950, 0 },
     { 2, cam_ssl_pyramid_center, 0, 2500, 256, 515, 5000, 515, 0 },
     { 3, cam_ssl_boss_room, 0, -1534, -2040, 1000, 800, 1000, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5896,12 +5908,14 @@ struct CameraTrigger sCamSSL[] = {
  * the end of the ride.
  */
 struct CameraTrigger sCamRR[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_rr_exit_building_side, -4197, 3819, -3087, 1769, 1490, 342, 0 },
     { 1, cam_rr_enter_building_side, -4197, 3819, -3771, 769, 490, 342, 0 },
     { 1, cam_rr_enter_building_window, -5603, 4834, -5209, 300, 600, 591, 0 },
     { 1, cam_rr_enter_building, -2609, 3730, -5463, 300, 650, 577, 0 },
     { 1, cam_rr_exit_building_top, -4196, 7343, -5155, 4500, 1000, 4500, 0 },
     { 1, cam_rr_enter_building, -4196, 6043, -5155, 500, 300, 500, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER,
 };
 
@@ -5913,8 +5927,10 @@ struct CameraTrigger sCamRR[] = {
  * to free_roam when Mario is not walking up the tower.
  */
 struct CameraTrigger sCamBOB[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     {  1, cam_bob_tower, 2468, 2720, -4608, 3263, 1696, 3072, 0 },
     { -1, cam_bob_default_free_roam, 0, 0, 0, 0, 0, 0, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5922,7 +5938,9 @@ struct CameraTrigger sCamBOB[] = {
  * The CotMC trigger is only used to prevent fix Lakitu in place when Mario exits through the waterfall.
  */
 struct CameraTrigger sCamCotMC[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_cotmc_exit_waterfall, 0, 1500, 3500, 550, 10000, 1500, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5930,8 +5948,10 @@ struct CameraTrigger sCamCotMC[] = {
  * The CCM triggers are used to set the flag that says when Mario is in the slide shortcut.
  */
 struct CameraTrigger sCamCCM[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 2, cam_ccm_enter_slide_shortcut, -4846, 2061, 27, 1229, 1342, 396, 0 },
     { 2, cam_ccm_leave_slide_shortcut, -6412, -3917, -6246, 307, 185, 132, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5943,6 +5963,7 @@ struct CameraTrigger sCamCCM[] = {
  * and one trigger that starts the enter pool cutscene when Mario enters HMC.
  */
 struct CameraTrigger sCamCastle[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_castle_close_mode, -1100, 657, -1346, 300, 150, 300, 0 },
     { 1, cam_castle_enter_lobby, -1099, 657, -803, 300, 150, 300, 0 },
     { 1, cam_castle_close_mode, -2304, -264, -4072, 140, 150, 140, 0 },
@@ -5979,6 +6000,7 @@ struct CameraTrigger sCamCastle[] = {
     { 1, cam_castle_basement_look_downstairs, -1027, -587, -718, 318, 486, 577, 0 },
     { 1, cam_castle_lobby_entrance, -1023, 376, 1830, 300, 400, 300, 0 },
     { 3, cam_castle_hmc_start_pool_cutscene, 2485, -1689, -2659, 600, 50, 600, 0 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -5989,6 +6011,7 @@ struct CameraTrigger sCamCastle[] = {
  * The triggers are also responsible for warping the camera below platforms.
  */
 struct CameraTrigger sCamBBH[] = {
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     { 1, cam_bbh_enter_front_door, 742, 0, 2369, 200, 200, 200, 0 },
     { 1, cam_bbh_leave_front_door, 741, 0, 1827, 200, 200, 200, 0 },
     { 1, cam_bbh_room_1, 222, 0, 1458, 200, 200, 200, 0 },
@@ -6049,6 +6072,7 @@ struct CameraTrigger sCamBBH[] = {
     { 1, cam_bbh_room_12_upper, -2939, -205, 5367, 300, 100, 300, 0 },
     { 1, cam_bbh_room_12_upper, -2332, -204, 4714, 250, 200, 250, 0x6000 },
     { 1, cam_bbh_room_0_back_entrance, -1939, -204, 4340, 250, 200, 250, 0x6000 },
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     NULL_TRIGGER
 };
 
@@ -6250,7 +6274,7 @@ s16 camera_course_processing(struct Camera *c) {
             b++;
         }
     }
-#if defined(ENABLE_VANILLA_CAM_PROCESSING) && !defined(FORCED_CAMERA_MODE) && !defined(USE_COURSE_DEFAULT_MODE)
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     // Area-specific camera processing
     if (!(sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
         switch (gCurrLevelArea) {
@@ -6358,7 +6382,7 @@ s16 camera_course_processing(struct Camera *c) {
                 break;
         }
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
     sStatusFlags &= ~CAM_FLAG_BLOCK_AREA_PROCESSING;
     if (oldMode == CAMERA_MODE_C_UP) {
@@ -7423,7 +7447,7 @@ void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
  * Store the camera's focus in cvar9.
  */
 void cutscene_dance_closeup_start(struct Camera *c) {
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if ((gLastCompletedStarNum == 4) && (gCurrCourseNum == COURSE_JRB)) {
         star_dance_bound_yaw(c, 0x0, 0x4000);
     }
@@ -7433,7 +7457,7 @@ void cutscene_dance_closeup_start(struct Camera *c) {
     if ((gLastCompletedStarNum == 5) && (gCurrCourseNum == COURSE_WDW)) {
         star_dance_bound_yaw(c, 0x8000, 0x800);
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
     vec3f_copy(sCutsceneVars[9].point, c->focus);
     //! cvar8 is unused in the closeup cutscene
@@ -7458,12 +7482,12 @@ void cutscene_dance_closeup_fly_above(struct Camera *c) {
     s16 pitch, yaw;
     f32 dist;
     s16 goalPitch = 0x1800;
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if ((gLastCompletedStarNum == 6 && gCurrCourseNum == COURSE_SL) ||
         (gLastCompletedStarNum == 4 && gCurrCourseNum == COURSE_TTC)) {
         goalPitch = 0x800;
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     vec3f_get_dist_and_angle(sMarioCamState->pos, c->pos, &dist, &pitch, &yaw);
     approach_f32_asymptotic_bool(&dist, 800.f, 0.05f);
     approach_s16_asymptotic_bool(&pitch, goalPitch, 16);
@@ -7539,7 +7563,7 @@ void cutscene_dance_fly_away_start(struct Camera *c) {
         c->nextYaw = c->yaw;
     }
 
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     // Restrict the camera yaw in tight spaces
     if ((gLastCompletedStarNum == 6) && (gCurrCourseNum == COURSE_CCM)) {
         star_dance_bound_yaw(c, 0x5600, 0x800);
@@ -7553,7 +7577,7 @@ void cutscene_dance_fly_away_start(struct Camera *c) {
     if ((gLastCompletedStarNum == 3) && (gCurrCourseNum == COURSE_RR)) {
         star_dance_bound_yaw(c, 0x0,    0x800);
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 }
 
 void cutscene_dance_fly_away_approach_mario(struct Camera *c) {
@@ -8082,12 +8106,12 @@ void cutscene_goto_cvar_pos(struct Camera *c, f32 goalDist, s16 goalPitch, s16 r
         nextPitch = goalPitch;
         vec3f_copy(sCutsceneVars[0].point, sCutsceneVars[3].point);
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
         if (gCurrLevelNum == LEVEL_TTM) {
             nextYaw = atan2s(sCutsceneVars[3].point[2] - c->areaCenZ,
                              sCutsceneVars[3].point[0] - c->areaCenX);
         }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
     } else {
         if (c->cutscene == CUTSCENE_PREPARE_CANNON) {
             vec3f_get_dist_and_angle(c->pos, sCutsceneVars[0].point, &curDist, &curPitch, &curYaw);
@@ -8365,14 +8389,14 @@ void cutscene_suffocation(struct Camera *c) {
 void cutscene_enter_pool_start(struct Camera *c) {
     vec3f_copy(sCutsceneVars[3].point, sMarioCamState->pos);
 
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gCurrLevelNum == LEVEL_CASTLE) { // entering HMC
         vec3f_set(sCutsceneVars[3].point, 2485.f, -1589.f, -2659.f);
     }
     if (gCurrLevelNum == LEVEL_HMC) { // entering CotMC
         vec3f_set(sCutsceneVars[3].point, 3350.f, -4589.f, 4800.f);
     }
-#endif
+#endif // ENABLE_VANILLA_CAM_PROCESSING
 
     vec3f_copy(sCutsceneVars[0].point, c->focus);
 }
@@ -10021,13 +10045,10 @@ struct Cutscene sCutsceneCredits[] = {
  * Cutscene that plays when Mario pulls open a door.
  */
 struct Cutscene sCutsceneDoorPull[] = {
-// HackerSM64 TODO: Properly transition when moving through doors
-#ifndef FORCED_CAMERA_MODE
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 30 },
     { cutscene_door_move_behind_mario, 1 },
     { cutscene_door_follow_mario, 50 },
-#endif
     { cutscene_door_end, 0 }
 };
 
@@ -10035,13 +10056,10 @@ struct Cutscene sCutsceneDoorPull[] = {
  * Cutscene that plays when Mario pushes open a door.
  */
 struct Cutscene sCutsceneDoorPush[] = {
-// HackerSM64 TODO: Properly transition when moving through doors
-#ifndef FORCED_CAMERA_MODE
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 20 },
     { cutscene_door_move_behind_mario, 1 },
     { cutscene_door_follow_mario, 50 },
-#endif
     { cutscene_door_end, 0 }
 };
 
@@ -10050,11 +10068,8 @@ struct Cutscene sCutsceneDoorPush[] = {
  * side.
  */
 struct Cutscene sCutsceneDoorPullMode[] = {
-// HackerSM64 TODO: Properly transition when moving through doors
-#ifndef FORCED_CAMERA_MODE
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 30 },
-#endif
     { cutscene_door_mode, CUTSCENE_LOOP }
 };
 
@@ -10063,11 +10078,8 @@ struct Cutscene sCutsceneDoorPullMode[] = {
  * side.
  */
 struct Cutscene sCutsceneDoorPushMode[] = {
-// HackerSM64 TODO: Properly transition when moving through doors
-#ifndef FORCED_CAMERA_MODE
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 20 },
-#endif
     { cutscene_door_mode, CUTSCENE_LOOP }
 };
 

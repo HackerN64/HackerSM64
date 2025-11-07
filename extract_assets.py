@@ -4,7 +4,7 @@ import os
 import json
 import subprocess
 
-from tools.detect_baseroms import get_rom_candidates
+from tools.detect_baseroms import get_rom_candidates, ROMS_DIR
 
 envmap_table = set([
     "actors/mario/mario_metal.rgba16.png",
@@ -73,6 +73,15 @@ def clean_assets(local_asset_file):
         except FileNotFoundError:
             pass
 
+def usage():
+    all_langs = ["jp", "us", "eu", "sh"]
+    langs_str = " ".join("[" + lang + "]" for lang in all_langs)
+    print("Usage: ")
+    print(f"    Show this help message:          {sys.argv[0]} --help")
+    print(f"    Extract from all found baseroms: {sys.argv[0]}")
+    print(f"    Extract from specified versions: {sys.argv[0]} {langs_str}")
+    print(f"        (For each version, its ROM file must exist,")
+    print(f"            either in this folder or {ROMS_DIR}/)")
 
 def main():
     # In case we ever need to change formats of generated files, we keep a
@@ -90,6 +99,9 @@ def main():
     langs = sys.argv[1:]
     if langs == ["--clean"]:
         clean_assets(local_asset_file)
+        sys.exit(0)
+    elif langs == ["--help"] or langs == ["-h"]:
+        usage()
         sys.exit(0)
 
     asset_map = read_asset_map()
@@ -112,6 +124,8 @@ def main():
 
     romLUT = get_rom_candidates()
 
+    if not langs:
+        langs = romLUT.keys()
 
     # verify the correct rom
     for lang in langs:
@@ -134,7 +148,6 @@ def main():
         sys.exit(1)
 
     # Late imports (to optimize startup perf)
-    import hashlib
     import tempfile
     from collections import defaultdict
 

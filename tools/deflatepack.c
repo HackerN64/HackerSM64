@@ -34,14 +34,14 @@ static struct SizedBuffer readFile(const char* filename, int margin)
     }
 
     fseek(in, 0, SEEK_END);
-    int size = ftell(in);
+    long size = ftell(in);
     fseek(in, 0, SEEK_SET);
     char* buffer = malloc(size + margin);
     size_t fread_result = fread(buffer, size, 1, in);
     fclose(in);
     if (1 != fread_result)
     {
-        printf("Failed to read input file '%s': %d != %d\n", filename, fread_result, size);
+        printf("Failed to read input file '%s': %lu != %ld\n", filename, fread_result, size);
         abort();
     }
 

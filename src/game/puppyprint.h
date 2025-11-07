@@ -119,7 +119,10 @@ enum PuppyFont {
     FONT_NUM
 };
 
+#ifdef PUPPYPRINT_DEBUG
+extern u8 sDebugMenu;
 extern u8 sPPDebugPage;
+#endif
 extern u8 gPuppyFont;
 extern ColorRGBA gCurrEnvCol;
 extern s32 ramsizeSegment[33];

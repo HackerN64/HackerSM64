@@ -5,6 +5,7 @@
 #include "buffers/buffers.h"
 #include "dma_async.h"
 #include "slidec.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/main.h"
 #include "game/memory.h"
@@ -386,6 +387,12 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
 
     u32 compSize = ALIGN16(srcEnd - srcStart);
+
+#ifdef GZIP
+    struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
+    aggress(dec != NULL, "Failed to allocate GZIP decompressor!");
+#endif
+
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *) (compressed + 4);
@@ -406,9 +413,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
 #ifdef GZIP
-            struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
             libdeflate_deflate_decompress(dec, compressed + 16, *(u32*) (compressed + 8), dest, &asyncCtx);
-            libdeflate_free_decompressor(dec);
 #elif RNC1
             Propack_UnpackM1(compressed, dest);
 #elif RNC2
@@ -425,6 +430,13 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
             main_pool_free(compressed);
         }
     }
+
+#ifdef GZIP
+    if (dec) {
+        libdeflate_free_decompressor(dec);
+    }
+#endif
+
 #ifdef PUPPYPRINT_DEBUG
     u32 ppSize = ALIGN16((u32)*size) + 16;
     set_segment_memory_printout(segment, ppSize);

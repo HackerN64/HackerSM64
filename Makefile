@@ -333,30 +333,12 @@ PYTHON := python3
 
 ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
 
-  # Make sure assets exist
+  # Extract assets if necessary
   NOEXTRACT ?= 0
   ifeq ($(NOEXTRACT),0)
-    DUMMY != $(PYTHON) extract_assets.py us >&2 || echo FAIL
+    DUMMY != $(PYTHON) extract_assets.py >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets from US ROM)
-    endif
-    ifneq (,$(shell python3 tools/detect_baseroms.py jp))
-      DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
-      ifeq ($(DUMMY),FAIL)
-        $(error Failed to extract assets from JP ROM)
-      endif
-    endif
-    ifneq (,$(shell python3 tools/detect_baseroms.py eu))
-      DUMMY != $(PYTHON) extract_assets.py eu >&2 || echo FAIL
-      ifeq ($(DUMMY),FAIL)
-        $(error Failed to extract assets from EU ROM)
-      endif
-    endif
-    ifneq (,$(shell python3 tools/detect_baseroms.py sh))
-      DUMMY != $(PYTHON) extract_assets.py sh >&2 || echo FAIL
-      ifeq ($(DUMMY),FAIL)
-        $(error Failed to extract assets from SH ROM)
-      endif
+      $(error Failed to extract assets from found baseroms)
     endif
   endif
 
@@ -449,26 +431,7 @@ DEP_FILES := $(O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(BUILD_DIR)/$(LD_SCRIPT)
 # Compiler Options                                                             #
 #==============================================================================#
 
-# detect prefix for MIPS toolchain
-ifneq ($(call find-command,mips64-elf-ld),)
-  CROSS := mips64-elf-
-else ifneq ($(call find-command,mips-n64-ld),)
-  CROSS := mips-n64-
-else ifneq ($(call find-command,mips64-ld),)
-  CROSS := mips64-
-else ifneq ($(call find-command,mips-linux-gnu-ld),)
-  CROSS := mips-linux-gnu-
-else ifneq ($(call find-command,mips64-linux-gnu-ld),)
-  CROSS := mips64-linux-gnu-
-else ifneq ($(call find-command,mips64-none-elf-ld),)
-  CROSS := mips64-none-elf-
-else ifneq ($(call find-command,mips-ld),)
-  CROSS := mips-
-else ifneq ($(call find-command,mips-suse-linux-ld ),)
-  CROSS := mips-suse-linux-
-else
-  $(error Unable to detect a suitable MIPS toolchain installed)
-endif
+CROSS := $(call find-mips-toolchain)
 
 LIBRARIES := nustd hvqm2 goddard
 
@@ -537,7 +500,7 @@ else
 endif
 
 # C compiler options
-CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
+CFLAGS = -std=gnu17 -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 ifeq ($(COMPILER),gcc)
   CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
   CFLAGS += -Wno-missing-braces
