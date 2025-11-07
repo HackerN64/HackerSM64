@@ -35,6 +35,10 @@ enum CrashPages {
     PAGE_COUNT
 };
 
+// Exports for the debugger/ system
+char *crash_screen_ellide_string(char *str, u32 truncateLength);
+
+// Exports for the rest of the game
 void crash_screen_init(void);
 
 #endif // CRASH_SCREEN_H

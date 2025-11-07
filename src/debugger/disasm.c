@@ -4,6 +4,8 @@
 #include "sm64.h"
 #include "macros.h"
 #include "farcall.h"
+
+#include "crash_screen.h"
 #include "disasm.h"
 #include "map_parser.h"
 
@@ -291,18 +293,19 @@ char *insn_disasm(InsnData *addr) {
                                                insn.i.immediate
                     ); break;
                     break;
-                case PARAM_JAL:
+                case PARAM_JAL: {
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
 #ifdef DEBUG_EXPORT_SYMBOLS
-                        strp += sprintf(strp, "%-9s %s(%08X)", insn_db[i].name,
-                                                         parse_map(target, FALSE), target
-                        );
+                    char symBuffer[MAX_PATH];
+                    sprintf(symBuffer, "%s(%08X)", parse_map(target, FALSE), target);
+                    strp += sprintf(strp, "%-9s %s", insn_db[i].name, crash_screen_ellide_string(symBuffer, 30));
 #else
-                        strp += sprintf(strp, "%-9s %08X", insn_db[i].name,
-                                                           target
-                        );
+                    strp += sprintf(strp, "%-9s %08X", insn_db[i].name,
+                                                       target
+                    );
 #endif // DEBUG_EXPORT_SYMBOLS
                     break;
+                }
                 case PARAM_JUMP:
                     target = 0x80000000 | (insn.d & 0x03FFFFFF);
                     strp += sprintf(strp, "%-9s %08X", insn_db[i].name,

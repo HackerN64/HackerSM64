@@ -108,7 +108,7 @@ static struct {
 /**
  * Splits a path string by the containing folder and the name of the file itself.
  */
-static char *crash_screen_ellide_string(char *str, u32 truncateLength) {
+char *crash_screen_ellide_string(char *str, u32 truncateLength) {
     u32 string_length = strlen(str);
 
     if (truncateLength >= string_length) {
