@@ -367,8 +367,13 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     crash_screen_println("Game crashed!");
     reset_text_color();
 
-    crash_screen_println("Thread: %d", thread->id);
-    crash_screen_println("Cause: %s", gCauseDesc[cause]);
+    set_text_color(241, 196, 15);
+    crash_screen_println("Thread:");
+    crash_screen_println("Cause:");
+    reset_text_color();
+    sCrashScreenPrintRow_Pixels -= (2 * GLYPH_HEIGHT);
+    crash_screen_println("        %d", thread->id);
+    crash_screen_println("       %s", gCauseDesc[cause]);
 
 #ifdef DEBUG_EXPORT_SYMBOLS
     symtable_info_t info = get_symbol_info(tc->pc);
