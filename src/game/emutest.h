@@ -19,7 +19,7 @@ enum SystemCapabilities {
     SYSCAP_FLOAT_ROUNDING_MODE = (1 << 1),
     SYSCAP_LIBPL = (1 << 2),
     SYSCAP_SOFTWARE_FRAMEBUFFER = (1 << 3),
-    SYSCAP_EMUX = (1 << 4),
+    SYSCAP_EMULATOR_EXTENSIONS = (1 << 4), // i.e. `emux`
 
     // idk how to implement the following lol
     // SYSCAP_DMA_TIMING = 0,
