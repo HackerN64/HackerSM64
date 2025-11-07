@@ -359,6 +359,8 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 void draw_crash_overview(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
+    int numNewlines = 0;
+
     crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     set_text_color(0xFF, 0, 0);
@@ -377,14 +379,19 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         set_text_color(241, 196, 15);
 #ifdef DEBUG_EXPORT_ALL_LINES
         sprintf(file_line, "%s:%d", info.file, info.line);
-        crash_screen_println("File/Line: ");
 #else  // DEBUG_EXPORT_ALL_LINES
         sprintf(file_line, "%s", info.file);
-        crash_screen_println("File: ");
 #endif // DEBUG_EXPORT_ALL_LINES
-        
+        crash_screen_println("File: ");
         reset_text_color();
-        crash_screen_println("%s", crash_screen_ellide_string(file_line, ELLISION_LENGTH));
+        
+        numNewlines = crash_screen_print_with_newlines(
+                                    LEFT_MARGIN + (GLYPH_WIDTH * 5),
+                                    sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
+                                    LEFT_MARGIN,
+                                    file_line
+                      );
+        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
     }
 #endif // DEBUG_EXPORT_SYMBOLS
 
