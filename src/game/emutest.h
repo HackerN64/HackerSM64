@@ -49,14 +49,15 @@ extern u32 check_emux_support();
  */
 extern u8 gEmulator;
 
-// determines whether libpl is safe to use
-#define gSupportsLibpl (gSystemCapabilities & SUPPORTS_LIBPL)
-
 /**
  * Bitflag that lists all system capabilities, for more granular
  * feature detection than gEmulator.
  */
 extern u32 gSystemCapabilities;
+
+// Whether the emulator supports libpl.
+// Left for backwards compatibility
+#define gSupportsLibpl (gSystemCapabilities & SUPPORTS_LIBPL)
 
 // Included for backwards compatibility when upgrading from HackerSM64 2.0
 #define gIsConsole ((gEmulator & EMU_CONSOLE) != 0)
