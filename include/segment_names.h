@@ -27,7 +27,7 @@
 #define SEGMENT_EFFECT_YAY0          0x0B // | Segment 11 | effect_yay0
 #define SEGMENT_GROUPA_GEO           0x0C // | Segment 12 | Actor group A geo (group1  - group11)
 #define SEGMENT_GROUPB_GEO           0x0D // | Segment 13 | Actor group B geo (group12 - group17)
-#define SEGMENT_LEVEL_SCRIPT         0x0E // | Segment 14 | level_ending_entry (/levels/ending/), DEFINE_LEVEL
+#define SEGMENT_VANILLA_OBJECTS      0x0E // | Segment 14 | Vanilla Objects needed to be referenced from dl
 #define SEGMENT_COMMON0_GEO          0x0F // | Segment 15 | /actors/common0_geo
 #define SEGMENT_LEVEL_ENTRY          0x10 // | Segment 16 | Level Script Entry
 #define SEGMENT_MARIO_ANIMS          0x11 // | Segment 17 | Mario Animations
@@ -38,9 +38,9 @@
 #define SEGMENT_COMMON1_GEO          0x16 // | Segment 22 | /actors/common1_geo
 #define SEGMENT_GROUP0_GEO           0x17 // | Segment 23 | /actors/group0_geo
 #define SEGMENT_DEMO_INPUTS          0x18 // | Segment 24 | Demo Inputs List
-#define SEGMENT_EU_TRANSLATION       0x19 // | Segment 25 | EU language translations
-#define SEGMENT_UNKNOWN_26           0x1A // | Segment 26 | Unknown/Unused?
-#define SEGMENT_UNKNOWN_27           0x1B // | Segment 27 | Unknown/Unused?
+#define SEGMENT_LEVEL_SCRIPT         0x19 // | Segment 25 | level_ending_entry (/levels/ending/), DEFINE_LEVEL
+#define SEGMENT_VANILLA_GEO          0x1A // | Segment 26 | Geolayouts for vanilla objects
+#define SEGMENT_EU_TRANSLATION       0x1B // | Segment 27 | EU language translations
 #define SEGMENT_UNKNOWN_28           0x1C // | Segment 28 | Unknown/Unused?
 #define SEGMENT_UNKNOWN_29           0x1D // | Segment 29 | Unknown/Unused?
 #define SEGMENT_UNKNOWN_30           0x1E // | Segment 30 | Unknown/Unused?

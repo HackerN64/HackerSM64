@@ -13,8 +13,5 @@
 
 #include "levels/sl/header.h"
 
-#include "levels/sl/unused_cracked_ice/geo.inc.c"
-#include "levels/sl/unused_ice_shard/geo.inc.c"
-#include "levels/sl/snow_mound/geo.inc.c"
 #include "levels/sl/areas/1/geo.inc.c"
 #include "levels/sl/areas/2/geo.inc.c"

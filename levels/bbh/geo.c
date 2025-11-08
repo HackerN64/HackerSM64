@@ -13,12 +13,4 @@
 
 #include "levels/bbh/header.h"
 
-#include "levels/bbh/staircase_step/geo.inc.c"
-#include "levels/bbh/tilting_trap_platform/geo.inc.c"
-#include "levels/bbh/tumbling_platform_far/geo.inc.c"
-#include "levels/bbh/tumbling_platform_near/geo.inc.c"
-#include "levels/bbh/moving_bookshelf/geo.inc.c"
-#include "levels/bbh/mesh_elevator/geo.inc.c"
-#include "levels/bbh/merry_go_round/geo.inc.c"
-#include "levels/bbh/coffin/geo.inc.c"
-#include "levels/bbh/areas/1/geo.inc.c"
+#include "levels/bbh/geo.inc.c"

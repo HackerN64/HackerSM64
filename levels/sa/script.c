@@ -51,18 +51,10 @@ static const LevelScript script_sa_objects_2[] = {
 
 const LevelScript level_sa_entry[] = {
     INIT_LEVEL(),
-    LOAD_YAY0(        /*seg*/ 0x07, _sa_segment_7SegmentRomStart, _sa_segment_7SegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _inside_yay0SegmentRomStart, _inside_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x0A, _cloud_floor_skybox_yay0SegmentRomStart, _cloud_floor_skybox_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x0B, _effect_yay0SegmentRomStart, _effect_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x05, _group4_yay0SegmentRomStart, _group4_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group4_geoSegmentRomStart,  _group4_geoSegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x06, _group13_yay0SegmentRomStart, _group13_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0D, _group13_geoSegmentRomStart,  _group13_geoSegmentRomEnd),
+#include "levels/sa/areas/script_vanilla_load.inc.c"
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-    JUMP_LINK(script_func_global_5),
-    JUMP_LINK(script_func_global_14),
+#include "levels/sa/areas/script_vanilla.inc.c"
 
     AREA(/*index*/ 1, sa_geo_000170),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1535, 0, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSwimmingWarp),

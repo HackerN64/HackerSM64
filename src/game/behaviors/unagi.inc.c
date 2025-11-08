@@ -1,5 +1,7 @@
 // unagi.inc.c
 
+#include "actors/group4.h"
+
 struct ObjectHitbox sUnagiHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,
     /* downOffset:        */ 50,

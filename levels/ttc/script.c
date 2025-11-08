@@ -149,31 +149,10 @@ static const LevelScript script_ttc_objects_2[] = {
 
 const LevelScript level_ttc_entry[] = {
     INIT_LEVEL(),
-    LOAD_YAY0(        /*seg*/ 0x07, _ttc_segment_7SegmentRomStart, _ttc_segment_7SegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _machine_yay0SegmentRomStart, _machine_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x05, _group1_yay0SegmentRomStart, _group1_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group1_geoSegmentRomStart,  _group1_geoSegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+#include "levels/ttc/areas/script_vanilla_load.inc.c"
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-    JUMP_LINK(script_func_global_1),
-    JUMP_LINK(script_func_global_2),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_ROTATING_CUBE,     ttc_geo_000240),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_ROTATING_PRISM,    ttc_geo_000258),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_PENDULUM,          ttc_geo_000270),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_LARGE_TREADMILL,   ttc_geo_000288),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_SMALL_TREADMILL,   ttc_geo_0002A8),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_PUSH_BLOCK,        ttc_geo_0002C8),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_ROTATING_HEXAGON,  ttc_geo_0002E0),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_ROTATING_TRIANGLE, ttc_geo_0002F8),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_PIT_BLOCK,         ttc_geo_000310),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_PIT_BLOCK_UNUSED,  ttc_geo_000328),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_ELEVATOR_PLATFORM, ttc_geo_000340),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_CLOCK_HAND,        ttc_geo_000358),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_SPINNER,           ttc_geo_000370),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_SMALL_GEAR,        ttc_geo_000388),
-    LOAD_MODEL_FROM_GEO(MODEL_TTC_LARGE_GEAR,        ttc_geo_0003A0),
+#include "levels/ttc/areas/script_vanilla.inc.c"
 
     AREA(/*index*/ 1, ttc_geo_0003B8),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/ 1417, -3822, -548, /*angle*/ 0, 316, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),

@@ -25,4 +25,26 @@ extern const LevelScript script_func_global_16[];
 extern const LevelScript script_func_global_17[];
 extern const LevelScript script_func_global_18[];
 
+extern const LevelScript script_func_vo_bob[];
+extern const LevelScript script_func_vo_wf[];
+extern const LevelScript script_func_vo_jrb[];
+extern const LevelScript script_func_vo_ccm[];
+extern const LevelScript script_func_vo_bbh[];
+extern const LevelScript script_func_vo_hmc[];
+extern const LevelScript script_func_vo_lll[];
+extern const LevelScript script_func_vo_ssl[];
+extern const LevelScript script_func_vo_ddd[];
+extern const LevelScript script_func_vo_sl[];
+extern const LevelScript script_func_vo_wdw[];
+extern const LevelScript script_func_vo_ttm[];
+extern const LevelScript script_func_vo_thi[];
+extern const LevelScript script_func_vo_ttc[];
+extern const LevelScript script_func_vo_rr[];
+extern const LevelScript script_func_vo_bitdw[];
+extern const LevelScript script_func_vo_bitfs[];
+extern const LevelScript script_func_vo_bits[];
+extern const LevelScript script_func_vo_vcutm[];
+extern const LevelScript script_func_vo_castle_inside[];
+extern const LevelScript script_func_vo_castle_grounds[];
+
 #endif
