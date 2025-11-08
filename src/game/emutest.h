@@ -24,7 +24,7 @@ enum SystemCapabilities {
     // Whether the system supports changing how floats get rounded
     SUPPORTS_FLOAT_ROUNDING_MODE = (1 << 1),
 
-    // Whether the system can access libpl functionality
+    // Whether the system supports the `libpl` API on Parallel Launcher
     SUPPORTS_LIBPL = (1 << 2),
 
     // Whether the system can edit the framebuffer in software
