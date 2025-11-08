@@ -109,17 +109,21 @@ u32 emulator_supports_trap_instructions(u32 emulator) {
 // Tests various system quirks and initializes gEmulator to the detected emulator(s).
 //  Also initializes gSystemCapabilities.
 u32 detect_emulator() {
-    // Test to see if the libpl emulator extension is present.
     u32 magic;
+    // Test to see if the libpl emulator extension is present.
+#ifdef LIBPL
+    // We have libpl downloaded as a submodule, just use the API call.
+    if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
+#else // LIBPL
+    // libpl interacts with the hardware register at 0x1FFB0000,
+    //  so we can still _detect_ it by clearing the register and
+    //  seeing if we get a specific value back.
     osPiWriteIo(0x1ffb0000u, 0u);
     osPiReadIo(0x1ffb0000u, &magic);
     if (magic == 0x00500000u) {
-        // libpl is supported. Must be ParallelN64
-#ifdef LIBPL
-        if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
-            gSystemCapabilities |= SUPPORTS_LIBPL;
-        }
-#endif
+#endif // LIBPL
+        gSystemCapabilities |= SUPPORTS_LIBPL;
+        // If libpl is supported, we're on Parallel Launcher
         return EMU_PARALLEL_LAUNCHER;
     }
 
