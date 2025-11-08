@@ -421,17 +421,15 @@ static void check_fbe(s32 frameIndex) {
     const s32 fbePixelOffset = 13;
     const u16 fbePixelVal = 0xFF01;
 
-    if (!(gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER)) {
-        if (frameIndex == 0) {
-            // Write pixel to the framebuffer
-            gFramebuffers[sRenderingFramebuffer][fbePixelOffset] = fbePixelVal;
+    if (frameIndex == 0) {
+        // Write pixel to the framebuffer
+        gFramebuffers[sRenderingFramebuffer][fbePixelOffset] = fbePixelVal;
+    } else {
+        // Check if pixel persisted in the framebuffer after executing the display list that clears it (but before updating sRenderingFramebuffer!)
+        if (gFramebuffers[sRenderingFramebuffer][fbePixelOffset] == fbePixelVal) {
+            gSystemCapabilities &= ~SUPPORTS_SOFTWARE_FRAMEBUFFER;
         } else {
-            // Check if pixel persisted in the framebuffer after executing the display list that clears it (but before updating sRenderingFramebuffer!)
-            if (gFramebuffers[sRenderingFramebuffer][fbePixelOffset] == fbePixelVal) {
-                gSystemCapabilities &= ~SUPPORTS_SOFTWARE_FRAMEBUFFER;
-            } else {
-                gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
-            }
+            gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
         }
     }
 }
