@@ -42,7 +42,7 @@ extern u32 detect_emulator();
 
 extern u32 emulator_supports_trap_instructions(u32 emulator);
 
-extern u32 check_emux_support();
+extern void check_emux_support();
 
 /* gEmulator is an enum that identifies the current emulator.
  * The enum values work as a bitfield, so you can use the & and | operators

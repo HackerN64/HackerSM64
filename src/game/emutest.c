@@ -96,10 +96,10 @@ void check_emux_support(void) {
 //  Thus, we need to guard running `emux` detection behind valid systems.
 // Returns TRUE if an emulator won't crash trying to detect `emux` functionality.
 u32 emulator_supports_trap_instructions(u32 emulator) {
-    if (gEmulator & EMU_PROJECT64_1_OR_2) {
+    if (emulator & EMU_PROJECT64_1_OR_2) {
         return FALSE;
     }
-    if (gEmulator & EMU_WIIVC) {
+    if (emulator & EMU_WIIVC) {
         return FALSE;
     }
 
