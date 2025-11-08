@@ -19,19 +19,19 @@ enum Emulator {
  */
 enum SystemCapabilities {
     // Whether the system caches instructions and data
-    SUPPORTS_CACHING = (1 << 0),
+    SUPPORTS_CACHING              = (1 << 0),
 
     // Whether the system supports changing how floats get rounded
-    SUPPORTS_FLOAT_ROUNDING_MODE = (1 << 1),
+    SUPPORTS_FLOAT_ROUNDING_MODE  = (1 << 1),
 
     // Whether the system supports the `libpl` API on Parallel Launcher
-    SUPPORTS_LIBPL = (1 << 2),
+    SUPPORTS_LIBPL                = (1 << 2),
 
     // Whether the system can edit the framebuffer in software
     SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
 
     // Whether the system supports emulator-specific extensions through the `emux` API
-    SUPPORTS_EMULATOR_EXTENSIONS = (1 << 4), // i.e. `emux`
+    SUPPORTS_EMULATOR_EXTENSIONS  = (1 << 4), // i.e. `emux`
 
     // TODO: Figure out what these mean and implement them too
     // SUPPORTS_DMA_TIMING = 0,
