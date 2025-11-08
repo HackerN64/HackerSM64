@@ -74,7 +74,9 @@ static u8 check_cache_emulation() {
     return cacheEmulated;
 }
 
-static void check_emux_support(void) {
+// Checks if current system is an emulator that supports extensions.
+//  Sets (gSystemCapabilities & SUPPORTS_EMULATOR_EXTENSIONS)
+void check_emux_support(void) {
     volatile u32 hasExtensions = 0;
 
     // run `emux detect`
@@ -86,10 +88,26 @@ static void check_emux_support(void) {
     );
 
     if (hasExtensions) {
-        gSystemCapabilities |= SYSCAP_EMULATOR_EXTENSIONS;
+        gSystemCapabilities |= SUPPORTS_EMULATOR_EXTENSIONS;
     }
 }
 
+// Some emulators will straight up crash if you run a trap instruction.
+//  Make sure 
+// Returns TRUE if an emulator won't crash trying to detect `emux` functionality.
+u32 emulator_supports_trap_instructions(u32 emulator) {
+    if (gEmulator & EMU_PROJECT64_1_OR_2) {
+        return FALSE;
+    }
+    if (gEmulator & EMU_WIIVC) {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+// Tests various system quirks and initializes gEmulator to the detected emulator(s).
+//  Also initializes gSystemCapabilities.
 u32 detect_emulator() {
     // Test to see if the libpl emulator extension is present.
     u32 magic;
@@ -99,7 +117,7 @@ u32 detect_emulator() {
         // libpl is supported. Must be ParallelN64
 #ifdef LIBPL
         if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
-            gSystemCapabilities |= SYSCAP_LIBPL;
+            gSystemCapabilities |= SUPPORTS_LIBPL;
         }
 #endif
         return EMU_PARALLEL_LAUNCHER;
@@ -107,7 +125,6 @@ u32 detect_emulator() {
 
     // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
-        check_emux_support();
         return EMU_CONSOLE;
     }
     
@@ -126,14 +143,13 @@ u32 detect_emulator() {
         fcr_set_rounding_mode(roundingMode);
         return EMU_WIIVC;
     } else {
-        gSystemCapabilities |= SYSCAP_FLOAT_ROUNDING_MODE;
+        gSystemCapabilities |= SUPPORTS_FLOAT_ROUNDING_MODE;
     }
     fcr_set_rounding_mode(roundingMode);
 
     // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
     if (check_cache_emulation()) {
-        gSystemCapabilities |= SYSCAP_CACHE;
-        check_emux_support();
+        gSystemCapabilities |= SUPPORTS_CACHE;
         return EMU_OTHER;
     }
 
@@ -143,11 +159,9 @@ u32 detect_emulator() {
     // So in this case, it should result in 0x01040104
     osPiReadIo(0x1fd00104u, &magic);
     if (magic == 0u) {
-        check_emux_support();
         // Older versions of mupen (and pre-2.12 ParallelN64) just always read 0
         return EMU_MUPEN;
     } else if (magic != 0x01040104u) {
-        check_emux_support();
         // cen64 does... something. The result is consistent, but not what it should be
         return EMU_OTHER;
     }
@@ -163,7 +177,6 @@ u32 detect_emulator() {
         // requested the whole word, but that's actually wrong. Later versions of mupen
         // (and the Simple64 fork of it) get this wrong.
         case 0x0104:
-            check_emux_support();
             return EMU_MUPEN;
         // If reading a word gives the correct response, but reading a halfword always gives 0,
         // then we are dealing with some version of Project 64. Call into this helper function
