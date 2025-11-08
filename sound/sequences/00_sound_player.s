@@ -6985,6 +6985,7 @@ sound_ref .chan_2D18
 sound_ref .sound_menu_power_meter
 sound_ref .sound_menu_camera_buzz
 sound_ref .sound_menu_camera_turn
+sound_ref .sound_menu_critical_error
 
 .sound_menu_change_select:
 chan_setbank 9
@@ -7838,6 +7839,32 @@ layer_transpose 0
 layer_note1 32, 0x7f, 115
 layer_end
 
+.sound_menu_critical_error:
+chan_setbank 9
+chan_setinstr 0
+chan_setenvelope .envelope_340C
+chan_setlayer 0, .layer_critical_error_0
+chan_setlayer 1, .layer_critical_error_1
+chan_setlayer 2, .layer_critical_error_2
+chan_setlayer 3, .layer_critical_error_3
+chan_end
+
+.layer_critical_error_0:
+layer_note1 3, 0x3f, 103
+layer_end
+
+.layer_critical_error_1:
+layer_note1 15, 0x3f, 103
+layer_end
+
+.layer_critical_error_2:
+layer_note1 34, 0x3f, 103
+layer_end
+
+.layer_critical_error_3:
+layer_note1 39, 0x3f, 103
+layer_end
+
 .sound_general_bird_chirp2:
 chan_setbank 5
 chan_setinstr 9
@@ -8132,11 +8159,7 @@ envelope_goto 2
 .envelope_341C:
 envelope_line 25 32760
 envelope_line 60 10000
-#ifdef VERSION_SH
-  envelope_hang
-#else
-  envelope_goto 2
-#endif
+envelope_hang
 
 .envelope_3428:
 envelope_line 1 10000
@@ -8147,7 +8170,7 @@ envelope_goto 2
 .envelope_3438:
 envelope_line 23 32760
 envelope_line 80 15000
-envelope_goto 2
+envelope_hang
 
 .envelope_3444:
 envelope_line 22 32760
