@@ -15,7 +15,7 @@ enum Emulator {
 };
 
 enum SystemCapabilities {
-    SUPPORTS_CACHE = (1 << 0),
+    SUPPORTS_CACHING = (1 << 0),
     SUPPORTS_FLOAT_ROUNDING_MODE = (1 << 1),
     SUPPORTS_LIBPL = (1 << 2),
     SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),

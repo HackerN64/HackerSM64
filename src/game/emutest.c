@@ -93,7 +93,7 @@ void check_emux_support(void) {
 }
 
 // Some emulators will straight up crash if you run a trap instruction.
-//  Make sure 
+//  Thus, we need to guard running `emux` detection behind valid systems.
 // Returns TRUE if an emulator won't crash trying to detect `emux` functionality.
 u32 emulator_supports_trap_instructions(u32 emulator) {
     if (gEmulator & EMU_PROJECT64_1_OR_2) {
@@ -149,7 +149,7 @@ u32 detect_emulator() {
 
     // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
     if (check_cache_emulation()) {
-        gSystemCapabilities |= SUPPORTS_CACHE;
+        gSystemCapabilities |= SUPPORTS_CACHING;
         return EMU_OTHER;
     }
 
