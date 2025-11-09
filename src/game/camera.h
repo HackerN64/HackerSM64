@@ -90,6 +90,18 @@
 #define CAM_MODE_LAKITU_WAS_ZOOMED_OUT  0x02
 #define CAM_MODE_MARIO_SELECTED         0x04
 
+#ifdef REONUCAM
+struct ReonucamState {
+    s8 speed;
+    u8 waterCamOverride;
+    u8 flyingCamOverride;
+    u8 keepCliffCam;
+    u16 rButtonCounter;
+    u16 rButtonCounter2;
+};
+extern struct ReonucamState gReonucamState;
+#endif
+
 enum CameraSelection {
     CAM_SELECTION_NONE,
     CAM_SELECTION_MARIO,
@@ -769,12 +781,16 @@ s32 offset_yaw_outward_radial(struct Camera *c, s16 areaYaw);
 void play_camera_buzz_if_cdown(void);
 void play_camera_buzz_if_cbutton(void);
 void play_camera_buzz_if_c_sideways(void);
+#ifndef REONUCAM
 void play_sound_cbutton_up(void);
 void play_sound_cbutton_down(void);
 void play_sound_cbutton_side(void);
+void play_sound_if_cam_switched_to_lakitu_or_mario(void);
+#else
+extern f32 reonucamSpeeds[5];
+#endif
 void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);
-void play_sound_if_cam_switched_to_lakitu_or_mario(void);
 void radial_camera_input(struct Camera *c);
 void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
