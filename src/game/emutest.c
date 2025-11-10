@@ -114,6 +114,12 @@ u32 detect_emulator() {
 #ifdef LIBPL
     // We have libpl downloaded as a submodule, just use the API call.
     if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
+        const lpl_plugin_info *plugin_info = libpl_get_graphics_plugin();
+
+        // We can query framebuffer emulation from libpl
+        if (plugin_info->capabilities & LPL_FRAMEBUFFER_EMULATION) {
+            gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
+        }
 #else // LIBPL
     // libpl interacts with the hardware register at 0x1FFB0000,
     //  so we can still _detect_ it by clearing the register and
@@ -129,6 +135,8 @@ u32 detect_emulator() {
 
     // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
+        // Assume we have the ability to manipulate the framebuffer too.
+        gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
         return EMU_CONSOLE;
     }
     

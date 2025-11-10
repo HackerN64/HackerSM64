@@ -449,15 +449,23 @@ void render_init(void) {
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
-    check_fbe(0);
+
+    // Skip the FBE check if system is already determined to be console/Ares
+    if (!(gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER)) {
+        check_fbe(0);
+    }
+
     exec_display_list(&gGfxPool->spTask);
 
-    // Wait for frame rendering to complete to prevent race condition with FBE check
-    osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-    check_fbe(1);
+    // Skip the FBE check if system is already determined to be console/Ares
+    if (!(gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER)) {
+        // Wait for frame rendering to complete to prevent race condition with FBE check
+        osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        check_fbe(1);
 
-    // Send message back to queue to prevent locking up
-    osSendMesg(&gGfxVblankQueue, gMainReceivedMesg, OS_MESG_BLOCK);
+        // Send message back to queue to prevent locking up
+        osSendMesg(&gGfxVblankQueue, gMainReceivedMesg, OS_MESG_BLOCK);
+    }
 
     // Skip incrementing the initial framebuffer index on certain emulators so that they display immediately as the Gfx task finishes
     // This will break accurate emulators, so only enable on Project64, Parallel Launcher and Mupen.

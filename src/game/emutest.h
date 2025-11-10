@@ -44,7 +44,8 @@ extern u32 emulator_supports_trap_instructions(u32 emulator);
 
 extern void check_emux_support();
 
-/* gEmulator is an enum that identifies the current emulator.
+/**
+ * gEmulator is an enum that identifies the current emulator.
  * The enum values work as a bitfield, so you can use the & and | operators
  * to test for multiple emulators or versions at once.
  * 
@@ -67,8 +68,10 @@ extern u8 gEmulator;
  */
 extern u32 gSystemCapabilities;
 
-// Whether the emulator supports libpl.
-// Left for backwards compatibility
+/**
+ * Whether the emulator supports libpl.
+ *  Left in for backwards compatibility.
+ */
 #define gSupportsLibpl (gSystemCapabilities & SUPPORTS_LIBPL)
 
 // Included for backwards compatibility when upgrading from HackerSM64 2.0
