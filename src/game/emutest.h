@@ -30,7 +30,9 @@ enum SystemCapabilities {
     // Whether the system can edit the framebuffer in software
     SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
 
-    // Whether the system supports emulator-specific extensions through the `emux` API
+    // Whether the system supports emulator-specific extensions through the `emux` API.
+    //  (Nothing in HackerSM64 currently uses this, but it's here due to
+    //   being easy to detect)
     SUPPORTS_EMULATOR_EXTENSIONS  = (1 << 4), // i.e. `emux`
 
     // TODO: Figure out what these mean and implement them too
