@@ -167,10 +167,16 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
     u32 bit;
     u32 rowMask;
     s32 i, j;
+    u32 startOfGlyphData = 0;
 
     if (glyph > 0x7F) return;
 
-    data = &sCrashScreenFont[((glyph&0xF)*GLYPH_HEIGHT * 2) + (glyph >= 64)];
+    startOfGlyphData = (glyph & 0xF) * GLYPH_HEIGHT * 2;
+    if (glyph >= 64) {
+        startOfGlyphData++;
+    }
+
+    data = &sCrashScreenFont[startOfGlyphData];
 
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
 
@@ -179,7 +185,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
     for (i = 0; i < GLYPH_HEIGHT; i++) {
         bit = 0x80000000U >> ((glyph >> 4) * GLYPH_WIDTH);
         rowMask = *data++;
-        data ++;
+        data++;
 
         for (j = 0; j < (GLYPH_WIDTH); j++) {
             if (bit & rowMask) {
