@@ -22,6 +22,7 @@
 #include "game/puppyprint.h"
 #include "game/profiling.h"
 #include "game/emutest.h"
+#include "game/f3dex3.h"
 
 // Message IDs
 enum MessageIDs {
@@ -294,6 +295,9 @@ void handle_dp_complete(void) {
     }
     sCurrentDisplaySPTask->state = SPTASK_STATE_FINISHED_DP;
     sCurrentDisplaySPTask = NULL;
+#ifdef DEBUG_F3DEX3_PROFILER
+    extract_f3dex3_profiler_data();
+#endif
 }
 
 OSTimerEx RCPHangTimer;

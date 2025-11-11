@@ -31,11 +31,20 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
 - **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector
+- **Sauraen**: Creating the F3DEX3 microcode. HackerSM64 implementation by red.
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
-**Lighting Engine by Wiseguy**
-- Lighting Engine is available on a separate branch ([base/lighting-engine](https://github.com/Reonu/HackerSM64/tree/base/lighting-engine)). Instructions on how to use it are in the readme of that branch.
+**Lighting Engine by red**
+- A new lighting engine for the F3DEX3 is included with the repository. Enable `F3DEX3_LIGHTING_ENGINE` within `config_graphics.h` to use.
+- Improvements to the older lighting engine by wiseguy:
+    - Support for variable number of directional lights at once.
+    - Support for vanilla actors.
+        - Limits you to up to 7 extra lights when setup this way (`gLightNumBase = NUMLIGHTS_3`), but for scenes tailored specifically for a lighting engine (`gLightNumBase = NUMLIGHTS_1`), you can have up to 9 variable lights.
+        - Ambient light does not count towards the light limit.
+        - F3DEX3 fixes point lights with kc < 8, allowing for more expressive lighting.
+        - F3DEX3 also fixes point light behavior when close to triangles.
+- See `src/game/f3dex3.c` for more details.
 
 **Puppycam**
 - Puppycam is available on the master branch now, you can toggle it in `config/config_camera.h`. *
@@ -137,7 +146,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
   This does mean that any framebuffer effects will have to be done on buffer 0 if targeting emulators
 - Automatic console and emulator detection: Use the `gEmulator` variable to wrap your code in an emulator check.
 - Separate defines for emulator and console black border height.
-- Getting HVQM FMV support to work with the game is WIP.
 
 Requirements are the same as regular SM64, however a GCC MIPS cross compiler is also required. If you're on Debian-like Linux, you can use the ``gcc-mips-linux-gnu`` package. The toolchain that comes with my SDK is also supported.
 

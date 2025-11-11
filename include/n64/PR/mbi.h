@@ -80,7 +80,7 @@
 #define	M_AUDTASK	2
 #define	M_VIDTASK	3
 #define M_HVQTASK	6
-#define M_HVQMTASK	7
+#define	M_HVQMTASK	7
 
 /**************************************************************************
  *

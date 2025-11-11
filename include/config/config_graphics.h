@@ -152,3 +152,30 @@
  * Only use this if you can test the difference of your hack with and without this change on console.
  */
 // #define USE_FRUSTRATIO2
+
+/**
+ * Primary graphics microcode selection
+ * Define F3DEX_VERSION as one of the following to select the primary graphics microcode:
+ * 2 - F3DZEX2 - (Majora's Mask version). HLE emulator compatible, good console performance.
+ * 3 - F3DEX3  - Created by Sauraen. Better console performance in most situations.
+ * All microcodes provided by HackerSM64 use the "NoN" (no near-field clipping) variants.
+ * A built-in profiler is available for F3DEX3 and can be enabled inside config/config_debug.h
+ * under DEBUG_F3DEX3_PROFILER.
+ */
+#define F3DEX_VERSION 2
+
+/**
+ * Enables usage of the line microcode. It can be loaded with gSPLoadUcode within a display list.
+ * This feature is not available for use with F3DEX3.
+ */
+
+// #define ENABLE_LINE_UCODE
+
+/**
+ * Enables F3DEX3 point lighting engine.
+ * Replaces the lighting engine branch.
+ * See README.md and src/game/f3dex3.c for more details.
+ * NOTE: Game looks visually identical if not setup.
+ */
+#define F3DEX3_LIGHTING_ENGINE
+

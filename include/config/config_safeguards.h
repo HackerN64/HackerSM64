@@ -50,6 +50,33 @@
 #endif
 
 /*****************
+ * config_graphics.h
+ */
+
+#ifdef F3DEX_VERSION
+    #if F3DEX_VERSION == 2
+        #define F3DEX_GBI_2
+    #elif F3DEX_VERSION == 3
+        #define F3DEX_GBI_3
+    #else
+        #error "Invalid microcode selection. Valid options are 2-3 inclusive."
+    #endif
+#else
+    #error "F3DEX_VERSION is not defined in config/config_graphics.h"
+#endif
+
+#ifdef ENABLE_LINE_UCODE
+    #if F3DEX_VERSION > 2
+        #undef ENABLE_LINE_UCODE
+        #warning "F3DEX3 does not support ENABLE_LINE_UCODE, so it will be disabled."
+    #endif
+#endif
+
+#if !defined(F3DEX_GBI_3) && defined(F3DEX3_LIGHTING_ENGINE)
+    #undef F3DEX3_LIGHTING_ENGINE
+#endif // F3DEX3_LIGHTING_ENGINE
+
+/*****************
  * config_debug.h
  */
 
@@ -111,6 +138,15 @@
     #undef UNLOCK_ALL
     #define UNLOCK_ALL
 #endif // COMPLETE_SAVE_FILE
+
+#ifdef DEBUG_F3DEX3_PROFILER
+    #ifdef F3DEX_GBI_3
+        #undef PUPPYPRINT
+        #define PUPPYPRINT
+    #else
+        #undef DEBUG_F3DEX3_PROFILER
+    #endif
+#endif // DEBUG_F3DEX3_PROFILER
 
 #ifdef DEBUG
     #undef DEBUG_ASSERTIONS
@@ -206,3 +242,4 @@
     #undef BORDER_HEIGHT_EMULATOR
     #define BORDER_HEIGHT_EMULATOR 0
 #endif // !TARGET_N64
+

@@ -138,25 +138,6 @@ SECTIONS
 
    . = _buffersSegmentBssEnd;
 
-#ifdef HVQM
-   BEGIN_NOLOAD(hvqmwork)
-   {
-      BUILD_DIR/src/buffers/hvqmwork.o(.bss*);
-   }
-   END_NOLOAD(hvqmwork)
-   BEGIN_NOLOAD(adpcmbuf)
-   {
-      BUILD_DIR/src/buffers/adpcmbuf.o(.bss*);
-   }
-   END_NOLOAD(adpcmbuf)
-   BEGIN_NOLOAD(hvqbuf)
-   {
-      BUILD_DIR/src/buffers/hvqbuf.o(.bss*);
-   }
-   END_NOLOAD(hvqbuf)
-
-   . = _hvqbufSegmentBssEnd;
-#endif
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #ifndef DEBUG_MAP_STACKTRACE
@@ -179,12 +160,8 @@ SECTIONS
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
-      BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
-#ifdef S2DEX_TEXT_ENGINE
-      BUILD_DIR/src/s2d_engine*.o(.text*);
-#endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.text*);
 #endif
@@ -193,40 +170,27 @@ SECTIONS
       */libnustd.a:*.o(.text*);
       *libgcc.a:*.o(.text*);
       */libz.a:*.o(.text*);
-      */libhvqm2.a:*.o(.text*);
-      lib/rspboot.o(.text*);
-#include "rsptext.inc.ld"
-      BUILD_DIR/lib/aspMain.o(.text*);
-      lib/PR/audio/n_aspMain.o(.text*);
-      lib/PR/hvqm/hvqm2sp1.o(.text*);
+      . = ALIGN(0x10);
+      BUILD_DIR/lib/rsp.o(.text*);
       _mainSegmentTextEnd = .;
 
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
-#ifdef S2DEX_TEXT_ENGINE
-      BUILD_DIR/src/s2d_engine*.o(.*data*);
-#endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
       BUILD_DIR/lib/librtc*.o(.*data*);
-      *ULTRALIB.a:*.o(.data*);
-      */libhvqm2.a:*.o(.data*);
+      */ULTRALIB.a:*.o(.data*);
       */libz.a:*.o(.data*);
-#include "rspdata.inc.ld"
-      BUILD_DIR/lib/aspMain.o(.data*);
-      lib/PR/audio/n_aspMain.o(.data*);
-      lib/PR/hvqm/hvqm2sp1.o(.data*);
+      . = ALIGN(0x10);
+      BUILD_DIR/lib/rsp.o(.data*);
 
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
-#ifdef S2DEX_TEXT_ENGINE
-      BUILD_DIR/src/s2d_engine*.o(.rodata*);
-#endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.rodata*);
 #endif
@@ -235,18 +199,13 @@ SECTIONS
       *libgcc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
 
-      lib/PR/hvqm/hvqm2sp1.o(.rodata*);
    }
    END_SEG(main)
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/boot*.o(.*bss*);
-      BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
-#ifdef S2DEX_TEXT_ENGINE
-      BUILD_DIR/src/s2d_engine*.o(.*bss*);
-#endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*bss*);
 #endif
@@ -254,7 +213,6 @@ SECTIONS
       *ULTRALIB.a:*.o(COMMON);
       *ULTRALIB.a:*.o(.scommon);
       *ULTRALIB.a:*.o(.*bss*);
-      */libhvqm2.a:*.o(.bss*);
       */libz.a:*.o(.bss*);
       . = ALIGN(0x8);
    }
@@ -561,13 +519,6 @@ SECTIONS
       KEEP(BUILD_DIR/sound/sound_data.o(.data*));
    }
    END_SEG(assets)
-#ifdef HVQM
-   BEGIN_SEG(capcom, __romPos) SUBALIGN(2)
-   {
-      KEEP(BUILD_DIR/data/capcom.o(.data*));
-   }
-	END_SEG(capcom)
-#endif
 
 #ifdef DEBUG_MAP_STACKTRACE
    BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
