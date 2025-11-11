@@ -425,10 +425,9 @@ static void check_fbe(s32 frameIndex) {
         // Write pixel to the framebuffer
         gFramebuffers[sRenderingFramebuffer][fbePixelOffset] = fbePixelVal;
     } else {
-        // Check if pixel persisted in the framebuffer after executing the display list that clears it (but before updating sRenderingFramebuffer!)
-        if (gFramebuffers[sRenderingFramebuffer][fbePixelOffset] == fbePixelVal) {
-            gSystemCapabilities &= ~SUPPORTS_SOFTWARE_FRAMEBUFFER;
-        } else {
+        // Check if pixel persisted in the framebuffer after executing the display list
+        //  that clears it (but before updating sRenderingFramebuffer!)
+        if (gFramebuffers[sRenderingFramebuffer][fbePixelOffset] != fbePixelVal) {
             gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
         }
     }
@@ -450,15 +449,15 @@ void render_init(void) {
     clear_framebuffer(0);
     end_master_display_list();
 
-    // Skip the FBE check if system is already determined to be console/Ares
-    if (!(gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER)) {
+    // Skip the FBE check if system is console,
+    //  or had already been determined to support framebuffer emulation.
+    if (gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER) {
+        exec_display_list(&gGfxPool->spTask);
+    } else {
         check_fbe(0);
-    }
 
-    exec_display_list(&gGfxPool->spTask);
+        exec_display_list(&gGfxPool->spTask);
 
-    // Skip the FBE check if system is already determined to be console/Ares
-    if (!(gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER)) {
         // Wait for frame rendering to complete to prevent race condition with FBE check
         osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         check_fbe(1);
