@@ -15,7 +15,7 @@ enum Emulator {
 };
 
 /**
- * Various detectable 
+ * Various detectable system capabilities
  */
 enum SystemCapabilities {
     // Whether the system caches instructions and data
