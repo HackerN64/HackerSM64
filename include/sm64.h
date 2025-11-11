@@ -262,6 +262,10 @@ enum MarioActionFlags {
     ACT_FLAG_THROWING                   = /* 0x80000000 */ (1 << 31),
 };
 
+/*  State Machine Results */
+#define ACTION_CONTINUE TRUE   // Continues running action logic, e.g. after Mario's action changes
+#define ACTION_FINISH   FALSE  // Finishes running action logic for the current frame
+
 #define ACT_UNINITIALIZED              0x00000000 // (0x000)
 
 // group 0x000: stationary actions
