@@ -660,12 +660,12 @@ void draw_assert(OSThread *thread) {
             }
         }
 #else // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
-    // Print address of last func (we know the current func is __n64Assert)
-    u32 ret_addr = tc->ra;
-    set_text_color(241, 196, 15);
-    crash_screen_println("Called From:");
-    reset_text_color();
-    crash_screen_println("\t0x%08X", ret_addr);
+        // Print address of last func (we know the current func is __n64Assert)
+        u32 ret_addr = tc->ra;
+        set_text_color(241, 196, 15);
+        crash_screen_println("Called From:");
+        reset_text_color();
+        crash_screen_println("\t0x%08X", ret_addr);
 #endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     } else {
         crash_screen_println("No failed assert to report.");
