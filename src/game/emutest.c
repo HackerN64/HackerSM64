@@ -74,38 +74,6 @@ static u8 check_cache_emulation() {
     return cacheEmulated;
 }
 
-// Checks if current system is an emulator that supports extensions.
-//  Sets (gSystemCapabilities & SUPPORTS_EMULATOR_EXTENSIONS)
-void check_emux_support(void) {
-    volatile u32 hasExtensions = 0;
-
-    // run `emux detect`
-    asm volatile(
-        "tne %0, %0"
-        : "=r" (hasExtensions) // Outputs
-        : "r" (hasExtensions) // Inputs
-        : // no clobbers
-    );
-
-    if (hasExtensions) {
-        gSystemCapabilities |= SUPPORTS_EMULATOR_EXTENSIONS;
-    }
-}
-
-// Some emulators will straight up crash if you run a trap instruction.
-//  Thus, we need to guard running `emux` detection behind valid systems.
-// Returns TRUE if an emulator won't crash trying to detect `emux` functionality.
-u32 emulator_supports_trap_instructions(u32 emulator) {
-    if (emulator & EMU_PROJECT64_1_OR_2) {
-        return FALSE;
-    }
-    if (emulator & EMU_WIIVC) {
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
 // Tests various system quirks and initializes gEmulator to the detected emulator(s).
 //  Also initializes gSystemCapabilities.
 u32 detect_emulator() {

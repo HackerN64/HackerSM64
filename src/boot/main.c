@@ -350,9 +350,6 @@ void thread3_main(UNUSED void *arg) {
     alloc_pool();
     load_engine_code_segment();
     gEmulator = detect_emulator();
-    if (emulator_supports_trap_instructions(gEmulator)) {
-        check_emux_support();
-    }
 #ifndef UNF
     crash_screen_init();
 #endif

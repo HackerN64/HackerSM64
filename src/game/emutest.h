@@ -30,10 +30,8 @@ enum SystemCapabilities {
     // Whether the system can edit the framebuffer in software
     SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
 
-    // Whether the system supports emulator-specific extensions through the `emux` API.
-    //  (Nothing in HackerSM64 currently uses this, but it's here due to
-    //   being easy to detect)
-    SUPPORTS_EMULATOR_EXTENSIONS  = (1 << 4), // i.e. `emux`
+    // TODO: `emux` is a developing standard.
+    // SUPPORTS_EMULATOR_EXTENSIONS  = (1 << 4), // i.e. `emux`
 
     // TODO: Figure out what these mean and implement them too
     // SUPPORTS_DMA_TIMING = 0,
@@ -41,10 +39,6 @@ enum SystemCapabilities {
 };
 
 extern u32 detect_emulator();
-
-extern u32 emulator_supports_trap_instructions(u32 emulator);
-
-extern void check_emux_support();
 
 /**
  * gEmulator is an enum that identifies the current emulator.
