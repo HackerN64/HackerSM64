@@ -14,7 +14,7 @@
       "textureConvert": "G_TC_FILT",
       "textureFilter": "G_TF_BILERP",
       "perspectiveCorrection": "G_TP_PERSP",
-      "pipelineMode": "G_PM_1PRIMITIVE"
+      "pipelineMode": "G_PM_NPRIMITIVE"
     },
     "otherModeL": {},
     "other": {}
