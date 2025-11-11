@@ -31,14 +31,14 @@ extern void read_controller_inputs(s32 threadID);
 extern char *strstr(char *, char *);
 
 static char *crashPageNames[] = {
-    [PAGE_SIMPLE] = "(Overview)",
-    [PAGE_CONTEXT] = "(Context)",
+    [CRASH_SCREEN_PAGE_SIMPLE] = "(Overview)",
+    [CRASH_SCREEN_PAGE_CONTEXT] = "(Context)",
+    [CRASH_SCREEN_PAGE_STACKTRACE] = "(Stack Trace)",
 #ifdef PUPPYPRINT_DEBUG
-    [PAGE_LOG] = "(Log)",
+    [CRASH_SCREEN_PAGE_LOG] = "(Log)",
 #endif
-    [PAGE_STACKTRACE] = "(Stack Trace)",
-    [PAGE_DISASM] = "(Disassembly)",
-    [PAGE_ASSERTS] = "(Assert)",
+    [CRASH_SCREEN_PAGE_DISASM] = "(Disassembly)",
+    [CRASH_SCREEN_PAGE_ASSERTS] = "(Assert)",
 };
 
 static u8 sCrashScreenCharToGlyph[128] = {
@@ -681,16 +681,16 @@ void draw_crash_screen(OSThread *thread) {
 
     if (gPlayer1Controller->buttonPressed & R_TRIG) {
         crashPage++;
-        if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage++;
+        if (crashPage == CRASH_SCREEN_PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage++;
         updateBuffer = TRUE;
     }
     if (gPlayer1Controller->buttonPressed & (L_TRIG | Z_TRIG)) {
         crashPage--;
-        if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
+        if (crashPage == CRASH_SCREEN_PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
         updateBuffer = TRUE;
     }
 
-    if (crashPage == PAGE_DISASM) {
+    if (crashPage == CRASH_SCREEN_PAGE_DISASM) {
         u32 sNewProgramPosition = sProgramPosition;
         if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
             sNewProgramPosition += 4;
@@ -709,26 +709,27 @@ void draw_crash_screen(OSThread *thread) {
         }
     }
 
-    if ((crashPage >= PAGE_COUNT) && (crashPage != 255)) {
+    if ((crashPage >= CRASH_SCREEN_PAGE_COUNT) && (crashPage != 255)) {
         crashPage = 0;
     }
     if (crashPage == 255) {
-        crashPage = (PAGE_COUNT - 1);
-        if (crashPage == PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
+        crashPage = (CRASH_SCREEN_PAGE_COUNT - 1);
+        // Do not navigate to the assert page if an assert didn't happen
+        if (crashPage == CRASH_SCREEN_PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
     }
     if (updateBuffer) {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, RECT_BOUNDARY_Y);
         crash_screen_set_print_top(TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
-            case PAGE_SIMPLE:     draw_crash_overview(thread, cause); break;
-            case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
+            case CRASH_SCREEN_PAGE_SIMPLE:     draw_crash_overview(thread, cause); break;
+            case CRASH_SCREEN_PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
 #ifdef PUPPYPRINT_DEBUG
-            case PAGE_LOG: 		  draw_crash_log(); break;
+            case CRASH_SCREEN_PAGE_LOG: 		  draw_crash_log(); break;
 #endif
-            case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
-            case PAGE_DISASM:     draw_disasm(thread); break;
-            case PAGE_ASSERTS:    draw_assert(thread); break;
+            case CRASH_SCREEN_PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
+            case CRASH_SCREEN_PAGE_DISASM:     draw_disasm(thread); break;
+            case CRASH_SCREEN_PAGE_ASSERTS:    draw_assert(thread); break;
         }
 
         osWritebackDCacheAll();
@@ -777,7 +778,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 }
                 // If an assert happened, go straight to that page
                 if (thread->context.cause == EXC_SYSCALL) {
-                    crashPage = PAGE_ASSERTS;
+                    crashPage = CRASH_SCREEN_PAGE_ASSERTS;
                 }
                 continue;
             }
