@@ -118,7 +118,6 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - This repo supports a much better implementation of reverb over vanilla's fake echo reverb. Great for caves or eerie levels, as well as just a better audio experience in general. See `audio/synthesis.c` for more details and configuration info. (By ArcticJaguar725) *
 - Fazana's "puppyprint" text engine. *
   - Use `print_small_text` to print normal text. The two last params are aligment and how many characters to print (-1 means PRINT_ALL).
-  - Use `render_multi_image` to draw large texture rectangles consisting of multiple images on the screen.
   - More info in `puppyprint.c`
 - Wiseguy's Farcall TLB mapping allows to store executable code inside uncompressed segments, that can be loaded and ran as needed, instead of it having to be loaded at all times. See `farcall.h` in the include folder for instructions and details.
 - Red Coin Stars now support up to 99 red coins! In addition, multi-area red coin missions can now be created by setting the 2nd behavior paramater of the red coin star to the number of reds required for the star to spawn.
