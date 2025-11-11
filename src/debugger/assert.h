@@ -12,7 +12,7 @@ extern char __n64Assert_MessageBuf[ASSERT_MESGBUF_SIZE + 1];
 extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 
 /**
- * Will always cause a crash with your message of choice
+ * Will always halt with your message of choice
  */
 #define errorf(message, ...) { \
     sprintf(__n64Assert_MessageBuf, message ## __VA_ARGS__); \
@@ -29,7 +29,7 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 #define __assert_wrapper(cond) __n64Assert(__FILE__, __LINE__, (cond))
 
 /**
- * `aggress` and `aggressf` will always cause a crash if `cond` is not true (handle with care)
+ * `aggress` and `aggressf` will always halt if `cond` is not true (handle with care)
  */
 #define aggressf(cond, ...) do {\
     if ((cond) == FALSE) { \
@@ -45,19 +45,8 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
 } while (0);
 
 /**
- * Will cause a crash if `cond` is not true, and DEBUG is defined.
+ * Asserts will halt the game if `cond` is not true, and DEBUG is defined.
  */
-#ifdef DEBUG_ASSERTIONS
-#define assertf(cond, ...) do {\
-    if ((cond) == FALSE) { \
-        sprintf(__n64Assert_MessageBuf, __VA_ARGS__); \
-        __assert_wrapper(#cond); \
-    } \
-} while (0);
-#else
-#define assertf(cond, ...)
-#endif
-
 #ifdef DEBUG_ASSERTIONS
 #define assert(cond) do {\
     if ((cond) == FALSE) { \
@@ -65,8 +54,15 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *cond);
         __assert_wrapper(#cond); \
     } \
 } while (0);
-#else
+#define assertf(cond, ...) do {\
+    if ((cond) == FALSE) { \
+        sprintf(__n64Assert_MessageBuf, __VA_ARGS__); \
+        __assert_wrapper(#cond); \
+    } \
+} while (0);
+#else // DEBUG_ASSERTIONS
 #define assert(cond)
-#endif
+#define assertf(cond, ...)
+#endif // DEBUG_ASSERTIONS
 
 #endif // ASSEMBLER
