@@ -1,24 +1,24 @@
 #ifndef CRASH_SCREEN_H
 #define CRASH_SCREEN_H
 
-#define MAX_PATH 256
+#define CRASH_SCREEN_MAX_PATH 256
 
 // Configurable Defines
-#define X_KERNING 6
-#define GLYPH_WIDTH 8
-#define GLYPH_HEIGHT 12
-#define FONT_ROWS 16
+#define CRASH_SCREEN_X_KERNING 6
+#define CRASH_SCREEN_GLYPH_WIDTH 8
+#define CRASH_SCREEN_GLYPH_HEIGHT 12
+#define CRASH_SCREEN_FONT_ROWS 16
 
 // Margins for crash screen prints
-#define LEFT_MARGIN 16
-#define  TOP_MARGIN 16
+#define CRASH_SCREEN_LEFT_MARGIN 16
+#define  CRASH_SCREEN_TOP_MARGIN 16
 
 // Tab width ('\t') for crash screen prints, in characters.
 //  Note that we only treat tabs as a wide space.
-#define TAB_WIDTH_CHARS 4
+#define CRASH_SCREEN_TAB_WIDTH_CHARS 4
 
 // Where to stop drawing the Header rectangle and where to start drawing the Body rectangle.
-#define RECT_BOUNDARY_Y TOP_MARGIN + GLYPH_HEIGHT + 5
+#define CRASH_SCREEN_RECT_BOUNDARY_Y CRASH_SCREEN_TOP_MARGIN + CRASH_SCREEN_GLYPH_HEIGHT + 5
 
 enum CrashPages {
     CRASH_SCREEN_PAGE_SIMPLE,

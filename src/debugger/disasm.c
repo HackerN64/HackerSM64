@@ -296,7 +296,7 @@ char *insn_disasm(InsnData *addr) {
                 case PARAM_JAL: {
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
 #ifdef DEBUG_EXPORT_SYMBOLS
-                    char symBuffer[MAX_PATH];
+                    char symBuffer[CRASH_SCREEN_MAX_PATH];
                     sprintf(symBuffer, "%s(%08X)", parse_map(target, FALSE), target);
                     strp += sprintf(strp, "%-9s %s", insn_db[i].name, crash_screen_ellide_string(symBuffer, 30));
 #else

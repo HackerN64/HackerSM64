@@ -52,7 +52,7 @@ static u8 sCrashScreenCharToGlyph[128] = {
     80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
 };
 
-static u32 sCrashScreenFont[GLYPH_HEIGHT * FONT_ROWS * 2 + 1] = {
+static u32 sCrashScreenFont[CRASH_SCREEN_GLYPH_HEIGHT * CRASH_SCREEN_FONT_ROWS * 2 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
@@ -92,7 +92,7 @@ static u32 sCrashScreenStackTraceCount = 0;
 
 static u16 gCrashScreenTextColor = 0xFFFF;
 static u32 sCrashScreenPrintRow_Pixels = 0;
-static u32 sCrashScreenPrintLnHeight_Pixels = GLYPH_HEIGHT;
+static u32 sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
 static struct {
     OSThread thread;
     u64 stack[THREAD2_STACK / sizeof(u64)];
@@ -144,7 +144,7 @@ static void crash_screen_set_println_height(u32 height_pixels) {
 }
 
 static void crash_screen_reset_println_height(void) {
-    sCrashScreenPrintLnHeight_Pixels = GLYPH_HEIGHT;
+    sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
 }
 
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
@@ -171,7 +171,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
 
     if (glyph > 0x7F) return;
 
-    startOfGlyphData = (glyph & 0xF) * GLYPH_HEIGHT * 2;
+    startOfGlyphData = (glyph & 0xF) * CRASH_SCREEN_GLYPH_HEIGHT * 2;
     if (glyph >= 64) {
         startOfGlyphData++;
     }
@@ -182,19 +182,19 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
 
     u16 color = gCrashScreenTextColor;
 
-    for (i = 0; i < GLYPH_HEIGHT; i++) {
-        bit = 0x80000000U >> ((glyph >> 4) * GLYPH_WIDTH);
+    for (i = 0; i < CRASH_SCREEN_GLYPH_HEIGHT; i++) {
+        bit = 0x80000000U >> ((glyph >> 4) * CRASH_SCREEN_GLYPH_WIDTH);
         rowMask = *data++;
         data++;
 
-        for (j = 0; j < (GLYPH_WIDTH); j++) {
+        for (j = 0; j < (CRASH_SCREEN_GLYPH_WIDTH); j++) {
             if (bit & rowMask) {
                 *ptr = color;
             }
             ptr++;
             bit >>= 1;
         }
-        ptr += gCrashScreen.width - (GLYPH_WIDTH);
+        ptr += gCrashScreen.width - (CRASH_SCREEN_GLYPH_WIDTH);
     }
     osWritebackDCacheAll();
 }
@@ -226,7 +226,7 @@ int crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const cha
         ptr = crashScreenBuf;
 
         while (*ptr && size-- > 0) {
-            if (xOffset >= SCREEN_WIDTH - (xNewline + X_KERNING)) {
+            if (xOffset >= SCREEN_WIDTH - (xNewline + CRASH_SCREEN_X_KERNING)) {
                 y += 10;
                 xOffset = xNewline;
                 numNewlines += 1;
@@ -242,7 +242,7 @@ int crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const cha
                 continue;
             } else if (*ptr == '\t') {
                 osSyncPrintf("TAB %d ->", xOffset);
-                xOffset += GLYPH_WIDTH * (TAB_WIDTH_CHARS - 1);
+                xOffset += CRASH_SCREEN_GLYPH_WIDTH * (CRASH_SCREEN_TAB_WIDTH_CHARS - 1);
                 osSyncPrintf("%d\n", xOffset);
 
                 ptr++;
@@ -252,7 +252,7 @@ int crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const cha
             }
 
             ptr++;
-            xOffset += X_KERNING;
+            xOffset += CRASH_SCREEN_X_KERNING;
         }
     }
 
@@ -277,7 +277,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
         while (*ptr && size-- > 0) {
             if (*ptr == '\t') {
                 ptr++;
-                x += GLYPH_WIDTH * (TAB_WIDTH_CHARS - 1);
+                x += CRASH_SCREEN_GLYPH_WIDTH * (CRASH_SCREEN_TAB_WIDTH_CHARS - 1);
                 continue;
             }
             glyph = sCrashScreenCharToGlyph[*ptr & 0x7f];
@@ -287,7 +287,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
             }
 
             ptr++;
-            x += X_KERNING;
+            x += CRASH_SCREEN_X_KERNING;
         }
     }
 
@@ -298,7 +298,7 @@ void crash_screen_println(const char *fmt, ...) {
     char *ptr;
     u32 glyph;
     s32 size;
-    s32 x = LEFT_MARGIN;
+    s32 x = CRASH_SCREEN_LEFT_MARGIN;
     s32 y = sCrashScreenPrintRow_Pixels;
 
     va_list args;
@@ -312,7 +312,7 @@ void crash_screen_println(const char *fmt, ...) {
         while (*ptr && size-- > 0) {
             if (*ptr == '\t') {
                 ptr++;
-                x += GLYPH_WIDTH * (TAB_WIDTH_CHARS - 1);
+                x += CRASH_SCREEN_GLYPH_WIDTH * (CRASH_SCREEN_TAB_WIDTH_CHARS - 1);
                 continue;
             }
 
@@ -323,7 +323,7 @@ void crash_screen_println(const char *fmt, ...) {
             }
 
             ptr++;
-            x += X_KERNING;
+            x += CRASH_SCREEN_X_KERNING;
         }
     }
 
@@ -352,7 +352,7 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
     u32 bit = BIT(17);
 
-    crash_screen_print(LEFT_MARGIN + 90, 220, "FPCSR:%08XH", fpcsr);
+    crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 90, 220, "FPCSR:%08XH", fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
             crash_screen_print(222, 220, "(%s)", gFpcsrDesc[i]);
@@ -367,7 +367,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
     int numNewlines = 0;
 
-    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     set_text_color(0xFF, 0, 0);
     crash_screen_println("Game crashed!");
@@ -377,7 +377,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     crash_screen_println("Thread:");
     crash_screen_println("Cause:");
     reset_text_color();
-    sCrashScreenPrintRow_Pixels -= (2 * GLYPH_HEIGHT);
+    sCrashScreenPrintRow_Pixels -= (2 * CRASH_SCREEN_GLYPH_HEIGHT);
     crash_screen_println("        %d", thread->id);
     crash_screen_println("       %s", gCauseDesc[cause]);
 
@@ -385,7 +385,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     symtable_info_t info = get_symbol_info(tc->pc);
 
     if (info.line != -1) {
-        char file_line[MAX_PATH];
+        char file_line[CRASH_SCREEN_MAX_PATH];
 
         set_text_color(241, 196, 15);
 #ifdef DEBUG_EXPORT_ALL_LINES
@@ -398,12 +398,12 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         reset_text_color();
         
         numNewlines = crash_screen_print_with_newlines(
-                                    LEFT_MARGIN + (GLYPH_WIDTH * 5),
-                                    sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
-                                    LEFT_MARGIN,
+                                    CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 5),
+                                    sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
+                                    CRASH_SCREEN_LEFT_MARGIN,
                                     file_line
                       );
-        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
+        sCrashScreenPrintRow_Pixels += (numNewlines * CRASH_SCREEN_GLYPH_HEIGHT);
     }
 #endif // DEBUG_EXPORT_SYMBOLS
 
@@ -431,7 +431,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     crash_screen_println("Thread:%d (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_set_println_height(10);
@@ -459,22 +459,22 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
-    crash_screen_print_float_reg(LEFT_MARGIN +   0, 170,  0, &tc->fp0.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +  90, 170,  2, &tc->fp2.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN + 180, 170,  4, &tc->fp4.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +   0, 180,  6, &tc->fp6.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +  90, 180,  8, &tc->fp8.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN + 180, 180, 10, &tc->fp10.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +   0, 190, 12, &tc->fp12.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +  90, 190, 14, &tc->fp14.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN + 180, 190, 16, &tc->fp16.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +   0, 200, 18, &tc->fp18.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +  90, 200, 20, &tc->fp20.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN + 180, 200, 22, &tc->fp22.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +   0, 210, 24, &tc->fp24.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +  90, 210, 26, &tc->fp26.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN + 180, 210, 28, &tc->fp28.f.f_even);
-    crash_screen_print_float_reg(LEFT_MARGIN +   0, 220, 30, &tc->fp30.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +   0, 170,  0, &tc->fp0.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +  90, 170,  2, &tc->fp2.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN + 180, 170,  4, &tc->fp4.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +   0, 180,  6, &tc->fp6.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +  90, 180,  8, &tc->fp8.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN + 180, 180, 10, &tc->fp10.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +   0, 190, 12, &tc->fp12.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +  90, 190, 14, &tc->fp14.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN + 180, 190, 16, &tc->fp16.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +   0, 200, 18, &tc->fp18.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +  90, 200, 20, &tc->fp20.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN + 180, 200, 22, &tc->fp22.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +   0, 210, 24, &tc->fp24.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +  90, 210, 26, &tc->fp26.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN + 180, 210, 28, &tc->fp28.f.f_even);
+    crash_screen_print_float_reg(CRASH_SCREEN_LEFT_MARGIN +   0, 220, 30, &tc->fp30.f.f_even);
 
     crash_screen_reset_println_height();
 }
@@ -496,7 +496,7 @@ void draw_crash_log(void) {
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_println("Stack Trace from %08X:", (u32) tc->sp);
 
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
@@ -519,7 +519,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     u32 sp = tc->sp;
 
     for (int i = 0; i < STACK_LINE_COUNT; i++) {
-        crash_screen_print(LEFT_MARGIN, 55 + (i * 10), "%3d: %08X", i, *((u32*)(sp + (i * 4))));
+        crash_screen_print(CRASH_SCREEN_LEFT_MARGIN, 55 + (i * 10), "%3d: %08X", i, *((u32*)(sp + (i * 4))));
         crash_screen_print(120, 55 + (i * 10), "%3d: %08X", i + STACK_LINE_COUNT, *((u32*)(sp + ((i + STACK_LINE_COUNT) * 4))));
     }
 #endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
@@ -528,7 +528,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
     }
@@ -549,7 +549,7 @@ void draw_disasm(OSThread *thread) {
 
 
         if (disasm[0] == 0) {
-            crash_screen_print(LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%08X", addr);
+            crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%08X", addr);
         } else {
 #ifdef DEBUG_EXPORT_SYMBOLS
             symtable_info_t info = get_symbol_info(addr);
@@ -557,7 +557,7 @@ void draw_disasm(OSThread *thread) {
             if (info.func_offset == 0 && info.distance == 0 && currline != info.line) {
                 currline = info.line;
                 set_text_color(239, 196, 15);
-                crash_screen_print(LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "<%s:>", info.func);
+                crash_screen_print(CRASH_SCREEN_LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "<%s:>", info.func);
                 reset_text_color();
                 skiplines++;
             }
@@ -567,7 +567,7 @@ void draw_disasm(OSThread *thread) {
 #endif // DEBUG_EXPORT_ALL_LINES
                 if (info.line != -1) {
                     set_text_color(200, 200, 200);
-                    crash_screen_print(LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "%d:", info.line);
+                    crash_screen_print(CRASH_SCREEN_LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "%d:", info.line);
                     reset_text_color();
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
@@ -580,7 +580,7 @@ void draw_disasm(OSThread *thread) {
             } else {
                 reset_text_color();
             }
-            crash_screen_print(LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%s", disasm);
+            crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%s", disasm);
         }
 
     }
@@ -591,7 +591,7 @@ void draw_disasm(OSThread *thread) {
 
 void draw_assert(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(0, RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
+    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_set_print_top(35);
 
     set_text_color(0xFF, 0, 0);
@@ -601,33 +601,33 @@ void draw_assert(OSThread *thread) {
 
     if (__n64Assert_Filename != NULL) {
         // print this on the same line as `File: ` but to its right
-        char file_line[MAX_PATH];
+        char file_line[CRASH_SCREEN_MAX_PATH];
         sprintf(file_line, "%s:%d", __n64Assert_Filename, __n64Assert_LineNum);
         set_text_color(241, 196, 15);
         crash_screen_println("File/Line:");
         reset_text_color();
         int numNewlines = crash_screen_print_with_newlines(
-                            LEFT_MARGIN + (GLYPH_WIDTH * 8),
-                            sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
-                            LEFT_MARGIN,
+                            CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 8),
+                            sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
+                            CRASH_SCREEN_LEFT_MARGIN,
                             file_line
                           );
 
-        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
+        sCrashScreenPrintRow_Pixels += (numNewlines * CRASH_SCREEN_GLYPH_HEIGHT);
 
         // Print the assert condition that failed.
         set_text_color(241, 196, 15);
         crash_screen_println("Condition:");
         reset_text_color();
         numNewlines = crash_screen_print_with_newlines(
-                              LEFT_MARGIN + (GLYPH_WIDTH * 8),
-                              sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
-                              LEFT_MARGIN,
+                              CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 8),
+                              sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
+                              CRASH_SCREEN_LEFT_MARGIN,
                               "(%s)",
                               __n64Assert_Condition
                           );
 
-        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
+        sCrashScreenPrintRow_Pixels += (numNewlines * CRASH_SCREEN_GLYPH_HEIGHT);
 
         // Print the message, if assertf/aggressf/errorf were used.
         if (__n64Assert_MessageBuf[0] != 0) {
@@ -636,14 +636,14 @@ void draw_assert(OSThread *thread) {
             reset_text_color();
             numNewlines = 
                 crash_screen_print_with_newlines(
-                    LEFT_MARGIN + (GLYPH_WIDTH * 7),
-                    sCrashScreenPrintRow_Pixels - GLYPH_HEIGHT,
-                    LEFT_MARGIN,
+                    CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 7),
+                    sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
+                    CRASH_SCREEN_LEFT_MARGIN,
                     "%s",
                     __n64Assert_MessageBuf
                 );
         }
-        sCrashScreenPrintRow_Pixels += (numNewlines * GLYPH_HEIGHT);
+        sCrashScreenPrintRow_Pixels += (numNewlines * CRASH_SCREEN_GLYPH_HEIGHT);
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
         if (stackTraceGenerated) {
             set_text_color(241, 196, 15);
@@ -724,8 +724,8 @@ void draw_crash_screen(OSThread *thread) {
         if (crashPage == CRASH_SCREEN_PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
     }
     if (updateBuffer) {
-        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, RECT_BOUNDARY_Y);
-        crash_screen_set_print_top(TOP_MARGIN);
+        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
+        crash_screen_set_print_top(CRASH_SCREEN_TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
             case CRASH_SCREEN_PAGE_SIMPLE:     draw_crash_overview(thread, cause); break;
