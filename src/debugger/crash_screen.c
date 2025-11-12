@@ -730,10 +730,10 @@ void draw_crash_screen(OSThread *thread) {
         switch (crashPage) {
             case CRASH_SCREEN_PAGE_SIMPLE:     draw_crash_overview(thread, cause); break;
             case CRASH_SCREEN_PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
+            case CRASH_SCREEN_PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
 #ifdef PUPPYPRINT_DEBUG
             case CRASH_SCREEN_PAGE_LOG:        draw_crash_log(); break;
 #endif
-            case CRASH_SCREEN_PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
             case CRASH_SCREEN_PAGE_DISASM:     draw_disasm(thread); break;
             case CRASH_SCREEN_PAGE_ASSERTS:    draw_assert(thread); break;
         }
