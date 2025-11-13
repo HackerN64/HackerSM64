@@ -61,25 +61,31 @@ static u8 updateBuffer = TRUE;
 
 static char crashScreenBuf[0x200];
 
+/**
+ * Verbose descriptions for exception causes.
+ */
 char *gCauseDesc[18] = {
-    "Interrupt",
-    "TLB modification",
-    "TLB exception on load",
-    "TLB exception on store",
-    "Address error on load",
-    "Address error on store",
-    "Bus error on inst.",
-    "Bus error on data",
-    "Failed Assert: See Assert Page",
-    "Breakpoint exception",
-    "Reserved instruction",
-    "Coprocessor unusable",
-    "Arithmetic overflow",
-    "Trap exception",
-    "Virtual coherency on inst.",
-    "Floating point exception",
-    "Watchpoint exception",
-    "Virtual coherency on data",
+    [EXC_INT     >> 2] = "Interrupt",
+    [EXC_MOD     >> 2] = "TLB modification",
+    [EXC_RMISS   >> 2] = "TLB exception on load",
+    [EXC_WMISS   >> 2] = "TLB exception on store",
+    [EXC_RADE    >> 2] = "Address error on load",
+    [EXC_WADE    >> 2] = "Address error on store",
+    [EXC_IBE     >> 2] = "Bus error on inst.",
+    [EXC_DBE     >> 2] = "Bus error on data",
+    [EXC_SYSCALL >> 2] = "Failed Assert: See Assert Page",
+    [EXC_BREAK   >> 2] = "Breakpoint exception",
+    [EXC_II      >> 2] = "Reserved instruction",
+    [EXC_CPU     >> 2] = "Coprocessor unusable",
+    [EXC_OV      >> 2] = "Arithmetic overflow",
+    [EXC_TRAP    >> 2] = "Trap exception",
+    [EXC_VCEI    >> 2] = "Virtual coherency on inst.",
+    [EXC_FPE     >> 2] = "Floating point exception",
+    // These two exceptions are not enumerated like the ones above.
+    //  They take values 23 and 31, respectively, so here they're just placed
+    //   after the ones that do enumerate nicely.
+    /*EXC_WATCH       */ "Watchpoint exception",
+    /*EXC_VCED        */ "Virtual coherency on data",
 };
 
 char *gFpcsrDesc[6] = {
