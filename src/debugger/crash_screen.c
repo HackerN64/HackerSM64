@@ -154,7 +154,8 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
-            *ptr = 0x0001;
+            // 0xe738 = 0b1110011100111000
+            *ptr = ((*ptr & 0xe738) >> 2) | 1;
             ptr++;
         }
         ptr += gCrashScreen.width - w;
