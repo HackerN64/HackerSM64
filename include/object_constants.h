@@ -624,6 +624,8 @@ enum oSubActionBowserActQuickJump { // BOWSER_ACT_QUICK_JUMP
     #define FISH_SPAWNER_BP_FEW_BLUE                        0x1
     #define FISH_SPAWNER_BP_MANY_CYAN                       0x2
     #define FISH_SPAWNER_BP_FEW_CYAN                        0x3
+    // Use this flag for fish in fully submerged levels, such as Secret Aquarium
+    #define FISH_BP_FLAG_IN_FULL_WATER_LEVEL                 (1 << 4)
     /* oAction */
     #define FISH_SPAWNER_ACT_SPAWN                          0x0
     #define FISH_SPAWNER_ACT_IDLE                           0x1

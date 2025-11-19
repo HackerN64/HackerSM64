@@ -8,7 +8,7 @@ const MacroObject sa_seg7_macro_objs[] = {
     MACRO_OBJECT(/*preset*/ macro_red_coin,                    /*yaw*/   0, /*pos*/ -1500, -2200,     0),
     MACRO_OBJECT(/*preset*/ macro_red_coin,                    /*yaw*/   0, /*pos*/     0, -2200,  1500),
     MACRO_OBJECT(/*preset*/ macro_red_coin,                    /*yaw*/   0, /*pos*/  1500, -2200,     0),
-    MACRO_OBJECT(/*preset*/ macro_fish_group,                  /*yaw*/   0, /*pos*/  1927, -2909,     0),
+    MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ macro_fish_group,                  /*yaw*/   0, /*pos*/  1927, -2909,     0, /*behParam*/ FISH_BP_FLAG_IN_FULL_WATER_LEVEL),
     MACRO_OBJECT(/*preset*/ macro_coin_ring_vertical,          /*yaw*/  90, /*pos*/     0, -2400, -1500),
     MACRO_OBJECT(/*preset*/ macro_coin_ring_vertical,          /*yaw*/   0, /*pos*/ -1500, -2400,     0),
     MACRO_OBJECT(/*preset*/ macro_coin_ring_vertical,          /*yaw*/  90, /*pos*/     0, -2400,  1500),
