@@ -160,6 +160,13 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
+            /**
+             * Instead of setting the framebuffer pixels fully dark,
+             * SM64 "darkens" the RGBA5551 pixel. This is done by
+             * shifting every RGB component right by 2 in one operation,
+             * essentially setting the brightness to 1/4.
+             */
+
             // 0xe738 = 0b1110011100111000
             *ptr = ((*ptr & 0xe738) >> 2) | 1;
             ptr++;
