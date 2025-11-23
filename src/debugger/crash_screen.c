@@ -650,7 +650,7 @@ void draw_assert(OSThread *thread) {
             reset_text_color();
             numNewlines = 
                 crash_screen_print_with_newlines(
-                    CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 7),
+                    CRASH_SCREEN_LEFT_MARGIN + 8 + (CRASH_SCREEN_GLYPH_WIDTH * 7),
                     sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
                     CRASH_SCREEN_LEFT_MARGIN,
                     "%s",
