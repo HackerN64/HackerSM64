@@ -497,7 +497,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
-    crash_screen_draw_rect(0, 20, SCREEN_WIDTH, 210);
+    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     osWritebackDCacheAll();
 #define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
