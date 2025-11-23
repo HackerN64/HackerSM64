@@ -550,11 +550,6 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 
     int skiplines = 0;
-#ifdef DEBUG_EXPORT_SYMBOLS
-    int currline = 0;
-#endif // DEBUG_EXPORT_SYMBOLS
-
-    u32 basePositionY = sCrashScreenPrintRow_Pixels;
 
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
@@ -563,15 +558,14 @@ void draw_disasm(OSThread *thread) {
 
 
         if (disasm[0] == 0) {
-            crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%08X", addr);
+            crash_screen_println("    %08X", addr);
         } else {
 #ifdef DEBUG_EXPORT_SYMBOLS
             symtable_info_t info = get_symbol_info(addr);
 
-            if (info.func_offset == 0 && info.distance == 0 && currline != info.line) {
-                currline = info.line;
+            if (info.func_offset == 0 && info.distance == 0) {
                 set_text_color(239, 196, 15);
-                crash_screen_print(CRASH_SCREEN_LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "<%s:>", info.func);
+                crash_screen_println("<%s:>", info.func);
                 reset_text_color();
                 skiplines++;
             }
@@ -581,20 +575,24 @@ void draw_disasm(OSThread *thread) {
 #endif // DEBUG_EXPORT_ALL_LINES
                 if (info.line != -1) {
                     set_text_color(200, 200, 200);
-                    crash_screen_print(CRASH_SCREEN_LEFT_MARGIN, basePositionY + (skiplines * 10) + (i * 10), "%d:", info.line);
+                    crash_screen_println("%d:", info.line);
+
                     reset_text_color();
+                    sCrashScreenPrintRow_Pixels -= sCrashScreenPrintLnHeight_Pixels;
+                    crash_screen_println("    %s", disasm);
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
             }
 #endif // DEBUG_EXPORT_ALL_LINES
-
 #endif // DEBUG_EXPORT_SYMBOLS
-            if (addr == tc->pc) {
-                set_text_color(255, 0, 0);
-            } else {
-                reset_text_color();
+            else {
+                if (addr == tc->pc) {
+                    set_text_color(255, 0, 0);
+                } else {
+                    reset_text_color();
+                }
+                crash_screen_println("    %s", disasm);
             }
-            crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 22, basePositionY + (skiplines * 10) + (i * 10), "%s", disasm);
         }
 
     }
