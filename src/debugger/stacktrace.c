@@ -79,7 +79,6 @@ u32 generate_stack(OSThread *thread) {
 
                 if (insn_is_jal((Insn *) &jal)) {
                     u32 jalTarget = 0x80000000 | ((jal & 0x03FFFFFF) * 4);
-                    osSyncPrintf("jal target %08X\n", jalTarget);
 
                     // make sure JAL is to the current func
                     if (jalTarget == ADDRENTRY_ADDR(funcstart)) {
