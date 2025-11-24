@@ -79,11 +79,23 @@ u32 generate_stack(OSThread *thread) {
 
                 if (insn_is_jal((Insn *) &jal)) {
                     u32 jalTarget = 0x80000000 | ((jal & 0x03FFFFFF) * 4);
+                    osSyncPrintf("jal target %08X\n", jalTarget);
 
                     // make sure JAL is to the current func
                     if (jalTarget == ADDRENTRY_ADDR(funcstart)) {
                         add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
                         breadcrumb = val;
+                    } else {
+                        // Just in case we're on a weird boundary, find the _previous_
+                        //  function start and see if we jal'd to there instead.
+                        do {
+                            funcstart = symt_addrtab_entry(&symt, --idx);
+                        } while (!ADDRENTRY_IS_FUNC(funcstart) && !ADDRENTRY_IS_INLINE(funcstart));
+
+                        if (jalTarget == ADDRENTRY_ADDR(funcstart)) {
+                            add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
+                            breadcrumb = val;
+                        }
                     }
                 } else if (insn_is_jalr((Insn *) &jal)) {
                     // Always add a JALR to the stack, in absence of a better heuristic
