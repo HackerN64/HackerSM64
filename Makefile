@@ -107,7 +107,8 @@ ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
   	DEFINES += DEBUG_EXPORT_ALL_LINES=1
   endif
   DEFINES += DEBUG_EXPORT_SYMBOLS=1
-  DEFAULT_OPT_FLAGS += -g1 -gdwarf-4
+  GENERATE_DWARF := -g1 -gdwarf-4
+  DEFAULT_OPT_FLAGS += $(GENERATE_DWARF)
   SYMBOL_TABLE = $(BUILD_DIR)/sm64.sym.o
 endif
 ifeq ($(DEBUG_FULL_STACK_TRACE),1)
@@ -683,13 +684,13 @@ else
   endif
 endif
 
-$(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := $(GENERATE_DWARF) -O0
 $(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
-$(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := $(GENERATE_DWARF) -O0
 $(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
 # File specific opt flags
-$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := $(GENERATE_DWARF) -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := $(GENERATE_DWARF) -Os -fno-jump-tables
 
 $(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := $(COLLISION_OPT_FLAGS)
 $(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := $(MATH_UTIL_OPT_FLAGS)
