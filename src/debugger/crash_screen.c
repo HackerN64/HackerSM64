@@ -499,11 +499,9 @@ void draw_crash_log(void) {
     s32 i;
     crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     osWritebackDCacheAll();
-#define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
-        crash_screen_println(consoleLogTable[i]);
+        crash_screen_println(consoleLogTable[LOG_BUFFER_SIZE - i]);
     }
-#undef LINE_HEIGHT
 }
 #endif
 
