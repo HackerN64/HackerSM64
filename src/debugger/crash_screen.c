@@ -403,16 +403,16 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
         set_text_color(241, 196, 15);
 #ifdef DEBUG_EXPORT_ALL_LINES
-        sprintf(file_line, "%s:%d", info.file, info.line);
+        sprintf(file_line, "      %s:%d", info.file, info.line);
 #else  // DEBUG_EXPORT_ALL_LINES
-        sprintf(file_line, "%s", info.file);
+        sprintf(file_line, "      %s", info.file);
 #endif // DEBUG_EXPORT_ALL_LINES
         sCrashScreenPrintRow_Pixels += 5;
         crash_screen_println("File: ");
         reset_text_color();
         
         numNewlines = crash_screen_print_with_newlines(
-                                    CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 5),
+                                    CRASH_SCREEN_LEFT_MARGIN,
                                     sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
                                     CRASH_SCREEN_LEFT_MARGIN,
                                     file_line
@@ -614,12 +614,12 @@ void draw_assert(OSThread *thread) {
     if (__n64Assert_Filename != NULL) {
         // print this on the same line as `File: ` but to its right
         char file_line[CRASH_SCREEN_MAX_PATH];
-        sprintf(file_line, "%s:%d", __n64Assert_Filename, __n64Assert_LineNum);
+        sprintf(file_line,   "           %s:%d", __n64Assert_Filename, __n64Assert_LineNum);
         set_text_color(241, 196, 15);
         crash_screen_println("File/Line:");
         reset_text_color();
         int numNewlines = crash_screen_print_with_newlines(
-                            CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 8),
+                            CRASH_SCREEN_LEFT_MARGIN,
                             sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
                             CRASH_SCREEN_LEFT_MARGIN,
                             file_line
@@ -632,10 +632,10 @@ void draw_assert(OSThread *thread) {
         crash_screen_println("Condition:");
         reset_text_color();
         numNewlines = crash_screen_print_with_newlines(
-                              CRASH_SCREEN_LEFT_MARGIN + (CRASH_SCREEN_GLYPH_WIDTH * 8),
+                              CRASH_SCREEN_LEFT_MARGIN,
                               sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
                               CRASH_SCREEN_LEFT_MARGIN,
-                              "(%s)",
+                              "           (%s)",
                               __n64Assert_Condition
                           );
 
@@ -648,10 +648,10 @@ void draw_assert(OSThread *thread) {
             reset_text_color();
             numNewlines = 
                 crash_screen_print_with_newlines(
-                    CRASH_SCREEN_LEFT_MARGIN + 8 + (CRASH_SCREEN_GLYPH_WIDTH * 7),
+                    CRASH_SCREEN_LEFT_MARGIN,
                     sCrashScreenPrintRow_Pixels - CRASH_SCREEN_GLYPH_HEIGHT,
                     CRASH_SCREEN_LEFT_MARGIN,
-                    "%s",
+                    "         %s",
                     __n64Assert_MessageBuf
                 );
         }
