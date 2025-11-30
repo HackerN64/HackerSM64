@@ -1177,7 +1177,7 @@ void print_menu_cursor(void) {
  * Takes a number between 0 and 3 and formats the corresponding file letter A to D into a buffer.
  * If the language is set to Japanese, the letter is written in full-width digits.
  */
-void string_format_file_letter(char *buf, char *str, s32 fileIndex) {
+void string_format_file_letter(char *buf, const char *str, s32 fileIndex) {
     char letterBuf[4];
 #ifdef ENABLE_JAPANESE
     if (gInGameLanguage == LANGUAGE_JAPANESE) {
@@ -1199,7 +1199,7 @@ void string_format_file_letter(char *buf, char *str, s32 fileIndex) {
 /**
  * Prints a hud string with text fade properties.
  */
-void print_hud_lut_string_fade(s16 x, s16 y, char *text, u32 alignment) {
+void print_hud_lut_string_fade(s16 x, s16 y, const char *text, u32 alignment) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDialogTextAlpha -= sTextFadeAlpha;
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
@@ -1211,7 +1211,7 @@ void print_hud_lut_string_fade(s16 x, s16 y, char *text, u32 alignment) {
 /**
  * Prints a generic white string with text fade properties.
  */
-void print_generic_string_fade(s16 x, s16 y, char *text, u32 alignment) {
+void print_generic_string_fade(s16 x, s16 y, const char *text, u32 alignment) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDialogTextAlpha -= sTextFadeAlpha;
     set_text_color(255, 255, 255);

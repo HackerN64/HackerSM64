@@ -132,7 +132,7 @@ struct MarioState gMarioStates[1];
 struct HudDisplay gHudDisplay;
 s16 sCurrPlayMode;
 s16 sTransitionTimer;
-void (*sTransitionUpdate)(s16 *);
+void (*sTransitionUpdate)(void);
 struct WarpDest sWarpDest;
 s16 sSpecialWarpDest;
 s16 sDelayedWarpOp;
@@ -1134,7 +1134,7 @@ s32 play_mode_frame_advance(void) {
  * but before it actually occurs. If updateFunction is not NULL, it will be
  * called each frame during the transition.
  */
-void level_set_transition(s16 length, void (*updateFunction)()) {
+void level_set_transition(s16 length, void (*updateFunction)(void)) {
     sTransitionTimer = length;
     sTransitionUpdate = updateFunction;
 }
@@ -1146,7 +1146,7 @@ s32 play_mode_change_area(void) {
     // sm64ex-alo
     // Change function to have similar change_level defines
     if (sTransitionUpdate != NULL) {
-        sTransitionUpdate(&sTransitionTimer);
+        sTransitionUpdate();
     }
 
     if (--sTransitionTimer == -1) {
@@ -1164,7 +1164,7 @@ s32 play_mode_change_area(void) {
  */
 s32 play_mode_change_level(void) {
     if (sTransitionUpdate != NULL) {
-        sTransitionUpdate(&sTransitionTimer);
+        sTransitionUpdate();
     }
 
     if (--sTransitionTimer == -1) {

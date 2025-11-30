@@ -32,7 +32,7 @@ s16 sTextLabelsCount = 0;
  * Takes a number, formats the number, and prints it
  * at the given X & Y coordinates.
  */
-void print_text_fmt_int(s32 x, s32 y, char *str, s32 n) {
+void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
     char buffer[MAX_TEXT_LABEL_SIZE];
     sprintf(buffer, str, n);
     print_text(x, y, buffer);
@@ -41,7 +41,7 @@ void print_text_fmt_int(s32 x, s32 y, char *str, s32 n) {
 /**
  * Prints text in the colorful lettering at given X, Y coordinates.
  */
-void print_text(s32 x, s32 y, char *str) {
+void print_text(s32 x, s32 y, const char *str) {
     // Don't continue if there is no memory to do so.
     if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
                                                         sizeof(struct TextLabel))) == NULL) {
@@ -64,7 +64,7 @@ void print_text(s32 x, s32 y, char *str) {
 /**
  * Prints text in the colorful lettering, allowing for text alignment.
  */
-void print_text_aligned(s32 x, s32 y, char *str, u32 alignment) {
+void print_text_aligned(s32 x, s32 y, const char *str, u32 alignment) {
     s32 strLength = get_string_width(str, main_hud_lut, &main_hud_utf8_lut);
     if (alignment == TEXT_ALIGN_RIGHT) {
         x -= strLength;
