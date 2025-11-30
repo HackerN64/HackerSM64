@@ -224,7 +224,7 @@ void create_dl_ortho_matrix(void) {
  * Returns the table entry of the relevant character.
  * Also increments the string position by the correct amount to reach the next character.
  */
-struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos) {
+struct Utf8CharLUTEntry *utf8_lookup(const struct Utf8LUT *lut, const char *str, s32 *strPos) {
     u32 codepoint;
     struct Utf8CharLUTEntry *usedLUT;
     u32 length;
@@ -291,7 +291,7 @@ static s32 hex_char_to_value(char c) {
  * Convert two hexadecimal text characters into an integer. Returns -1 if either of the two characters
  * aren't hexadecimal values.
  */
-static s32 hex_pair_to_value(char *str, s32 strPos) {
+static s32 hex_pair_to_value(const char *str, s32 strPos) {
     s32 firstDigit = hex_char_to_value(str[strPos]);
     s32 secondDigit = hex_char_to_value(str[strPos + 1]);
 
@@ -305,7 +305,7 @@ static s32 hex_pair_to_value(char *str, s32 strPos) {
 /**
  * Determine if the characters following a color command are a valid hex color code.
  */
-static s32 is_color_code_valid(char *str, s32 strPos) {
+static s32 is_color_code_valid(const char *str, s32 strPos) {
     for (u32 i = 0; i < sizeof(gDialogCarryoverColor) * 2; i++) {
         if (hex_char_to_value(str[strPos + i]) == -1) {
             if (i < sizeof(ColorRGB) * 2) return FALSE;
@@ -332,7 +332,7 @@ void set_text_color(u32 r, u32 g, u32 b) {
 /**
  * Get the exact width of the line of a string of any font in pixels, using the given ASCII and UTF-8 tables.
  */
-s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
+s32 get_string_width(const char *str, const struct AsciiCharLUTEntry *asciiLut, const struct Utf8LUT *utf8LUT) {
     char c;
     s32 width = 0;
     s32 maxWidth = 0;
@@ -371,7 +371,7 @@ s32 get_string_width(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8L
 /**
  * Get the value to shift the X position of a string by, given a specific alignment.
  */
-static s32 get_alignment_x_offset(char *str, u32 alignment, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
+static s32 get_alignment_x_offset(const char *str, u32 alignment, const struct AsciiCharLUTEntry *asciiLut, const struct Utf8LUT *utf8LUT) {
     if (alignment == TEXT_ALIGN_LEFT) {
         return 0;
     }
@@ -455,7 +455,7 @@ static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
  * Renders a single ASCII character in the generic font.
  */
 static u32 render_generic_ascii_char(char c) {
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
+    const struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
     const Texture *texture = fontLUT[ASCII_LUT_INDEX(c)].texture;
 
     if (texture != NULL) {
@@ -470,7 +470,7 @@ static u32 render_generic_ascii_char(char c) {
 /**
  * Renders a single UTF-8 character in the generic font.
  */
-static u32 render_generic_unicode_char(char *str, s32 *strPos) {
+static u32 render_generic_unicode_char(const char *str, s32 *strPos) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
 
     if (utf8Entry->texture == NULL) {
@@ -537,7 +537,7 @@ static u32 render_generic_unicode_char(char *str, s32 *strPos) {
  * Uses the global variables sGenericFontLineHeight and sGenericFontLineAlignment 
  * to control printing.
  */
-static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
+static s32 render_main_font_text(s16 x, s16 y, const char *str, s32 maxLines) {
     char c;
     s8 kerning = 0;
     u8 queuedSpaces = 0; // Optimization to only have one translation matrix if there are multiple spaces in a row.
@@ -686,21 +686,21 @@ render_character:
 /**
  * Prints a generic white string.
  */
-void print_generic_string(s16 x, s16 y, char *str) {
+void print_generic_string(s16 x, s16 y, const char *str) {
     print_generic_string_aligned(x, y, str, TEXT_ALIGN_LEFT);
 }
 
 /**
  * Prints a hud string in the colorful font.
  */
-void print_hud_lut_string(s16 x, s16 y, char *str) {
+void print_hud_lut_string(s16 x, s16 y, const char *str) {
     s32 strPos = 0;
     char c;
-    struct AsciiCharLUTEntry *hudLUT = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
+    const struct AsciiCharLUTEntry *hudLUT = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
     u32 curX = x;
     u32 curY = y;
     u32 renderX, renderY;
-    struct Utf8CharLUTEntry *utf8Entry;
+    const struct Utf8CharLUTEntry *utf8Entry;
     const Texture *texture;
     u32 kerning;
     Gfx *gfx = gDisplayListHead;
@@ -766,7 +766,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
  * Renders a single ASCII character in the menu font.
  */
 static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
+    const struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
     const Texture *texture = fontLUT[ASCII_LUT_INDEX(c)].texture;
 
     if (texture != NULL) {
@@ -783,7 +783,7 @@ static u32 render_menu_ascii_char(char c, u32 curX, u32 curY) {
 /**
  * Renders a single UTF-8 character in the menu font.
  */
-static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) {
+static u32 render_menu_unicode_char(const char *str, s32 *strPos, u32 curX, u32 curY) {
     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, strPos);
 
     if (utf8Entry->texture == NULL) {
@@ -811,7 +811,7 @@ static u32 render_menu_unicode_char(char *str, s32 *strPos, u32 curX, u32 curY) 
  * Prints a menu white string in the smaller font.
  * Only available in the file select and star select menus.
  */
-void print_menu_generic_string(s16 x, s16 y, char *str) {
+void print_menu_generic_string(s16 x, s16 y, const char *str) {
     s32 strPos = 0;
     char c;
     u32 curX = x;
@@ -833,10 +833,10 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
 /**
  * Prints a string in the green credits font.
  */
-void print_credits_string(s16 x, s16 y, char *str) {
+void print_credits_string(s16 x, s16 y, const char *str) {
     s32 strPos = 0;
     char c;
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
+    const struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
     u32 curX = x;
     u32 curY = y;
 
@@ -865,23 +865,23 @@ void print_credits_string(s16 x, s16 y, char *str) {
 /**
  * Variants of the above that allow for text alignment.
  */
-void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
+void print_generic_string_aligned(s16 x, s16 y, const char *str, u32 alignment) {
     sGenericFontLineHeight = DIALOG_LINE_HEIGHT_EN;
     sGenericFontLineAlignment = alignment;
     render_main_font_text(x, y, str, -1);
 }
 
-void print_hud_lut_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
+void print_hud_lut_string_aligned(s16 x, s16 y, const char *str, u32 alignment) {
     x += get_alignment_x_offset(str, alignment, main_hud_lut, &main_hud_utf8_lut);
     print_hud_lut_string(x, y, str);
 }
 
-void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
+void print_menu_generic_string_aligned(s16 x, s16 y, const char *str, u32 alignment) {
     x += get_alignment_x_offset(str, alignment, menu_font_lut, &menu_font_utf8_lut);
     print_menu_generic_string(x, y, str);
 }
 
-void print_credits_string_aligned(s16 x, s16 y, char *str, u32 alignment) {
+void print_credits_string_aligned(s16 x, s16 y, const char *str, u32 alignment) {
     x += get_alignment_x_offset(str, alignment, main_credits_font_lut, NULL);
     print_credits_string(x, y, str);
 }
@@ -975,7 +975,7 @@ void create_dialog_box_with_int_var(s16 dialog, s32 dialogVar) {
 /**
  * Initialise a dialog box with a string variable to be displayed with %s.
  */
-void create_dialog_box_with_str_var(s16 dialog, char *dialogVar) {
+void create_dialog_box_with_str_var(s16 dialog, const char *dialogVar) {
     DialogVariable var = { .asStr = dialogVar };
     create_dialog_box_with_var(dialog, var);
 }
@@ -1025,7 +1025,7 @@ void reset_dialog_render_state(void) {
     gDialogResponse = DIALOG_RESPONSE_NONE;
 }
 
-void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
+void render_dialog_box_type(const struct DialogEntry *dialog, s8 linesPerBox) {
     create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog->leftOffset, dialog->width, 0);
 
     switch (gDialogBoxType) {
@@ -1058,8 +1058,8 @@ u32 ensure_nonnegative(s16 value) {
     return ((value < 0) ? 0 : value);
 }
 
-static void handle_dialog_text_and_pages(struct DialogEntry *dialog) {
-    char *str = segmented_to_virtual(dialog->str);
+static void handle_dialog_text_and_pages(const struct DialogEntry *dialog) {
+    const char *str = segmented_to_virtual(dialog->str);
     s8 totalLines;
     s32 printResult;
     s16 yPos = 2 - DIALOG_LINE_HEIGHT;
@@ -1269,8 +1269,8 @@ s8  gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8  gDialogCourseActNum     =  1;
 
 void render_dialog_entries(void) {
-    void **dialogTable = segmented_to_virtual(gLanguageTables[gInGameLanguage].dialog_table);
-    struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
+    const void **dialogTable = segmented_to_virtual(gLanguageTables[gInGameLanguage].dialog_table);
+    const struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
 
     // if the dialog entry is invalid, set the ID to DIALOG_NONE.
     if (segmented_to_virtual(NULL) == dialog) {
@@ -1450,8 +1450,8 @@ void do_cutscene_handler(void) {
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
     void **dialogTable = segmented_to_virtual(gLanguageTables[gInGameLanguage].dialog_table);
-    struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
-    char *str = segmented_to_virtual(dialog->str);
+    const struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
+    const char *str = segmented_to_virtual(dialog->str);
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 97.0f, 118.0f, 0);
 
@@ -1676,7 +1676,7 @@ void render_pause_my_score_coins(void) {
 
     set_text_color(255, 255, 255);
 
-    char *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
+    const char *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
         char courseNumText[8];
@@ -1684,7 +1684,7 @@ void render_pause_my_score_coins(void) {
         sprintf(str, LANG_ARRAY(textCourseX), courseNumText);
         print_generic_string_aligned(PAUSE_MENU_LEFT_X, PAUSE_MENU_COURSE_Y, str, TEXT_ALIGN_RIGHT);
 
-        char *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
+        const char *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
 
         if (starFlags & (1 << (gDialogCourseActNum - 1))) {
             print_generic_string_aligned(PAUSE_MENU_LEFT_X, PAUSE_MENU_ACT_Y, "★", TEXT_ALIGN_RIGHT);
@@ -1862,7 +1862,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
     s16 hasStar = 0;
 
     char str[30];
-    char *entries[6];
+    const char *entries[6];
 
     u8 starFlags = save_file_get_star_flags(fileIndex, courseIndex);
     u16 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
@@ -2171,7 +2171,7 @@ LangArray textClear = DEFINE_LANGUAGE_ARRAY(
 #define CONGRATULATIONS_COINS_Y 111
 
 void render_course_complete_lvl_info_and_hud_str(void) {
-    char *name;
+    const char *name;
 
     char str[20];
     char courseNumText[8];
