@@ -81,6 +81,24 @@ void print_fps(s32 x, s32 y) {
  * Most of the primitive display list commands will still need to be set manually outside of this function
  * (e.g. combiner, envcolor, texture filter, etc.)
  * 
+ * Note that 1-cycle must be used with this function, as it will not render correctly with copy mode.
+ * 
+ * Display List Example Setup:
+ *   gDPPipeSync        (gDisplayListHead++);
+ *   gDPSetTexturePersp (gDisplayListHead++, G_TP_NONE);
+ *   gDPSetCombineMode  (gDisplayListHead++, G_CC_FADEA, G_CC_FADEA);
+ *   gDPSetTextureFilter(gDisplayListHead++, G_TF_POINT);
+ *   gDPSetCycleType    (gDisplayListHead++, G_CYC_1CYCLE);
+ *   gDPSetRenderMode   (gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+ *   gDPSetEnvColor     (gDisplayListHead++, 255, 255, 255, alpha);
+ *
+ *   draw_sprite(&gDisplayListHead, ...);
+ *
+ *   gDPPipeSync        (gDisplayListHead++);
+ *   gDPSetTexturePersp (gDisplayListHead++, G_TP_PERSP);
+ *   gDPSetCombineMode  (gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
+ *   gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
+ * 
  * Helper function initially provided by devwizard (this has since been modified).
  * 
  * @param dl The address of the display list head to use. Most commonly, this will be "&gDisplayListHead".
