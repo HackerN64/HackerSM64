@@ -10,9 +10,7 @@ LDFLAGS      := -lm
 ALL_PROGRAMS := armips filesizer lz4tpack deflatepack rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv
 LIBAUDIOFILE := audiofile/libaudiofile.a
 
-OS := $(shell uname)
-
-ifneq ($(OS), Darwin)
+ifneq ($(shell uname), Darwin)
   ALL_PROGRAMS += flips
 endif
 
@@ -61,7 +59,7 @@ textconv_SOURCES := textconv.c utf8.c hashtable.c
 
 aifc_decode_SOURCES := aifc_decode.c
 
-aiff_extract_codebook: $(LIBAUDIOFILE)
+aiff_extract_codebook$(EXT): $(LIBAUDIOFILE)
 aiff_extract_codebook_SOURCES := aiff_extract_codebook.c sdk-tools/tabledesign/codebook.c sdk-tools/tabledesign/estimate.c sdk-tools/tabledesign/print.c sdk-tools/tabledesign/tabledesign.c
 aiff_extract_codebook_CFLAGS  := -DEXTRACT_CODEBOOK -Iaudiofile -Wno-uninitialized
 aiff_extract_codebook_LDFLAGS := -Laudiofile -laudiofile -lstdc++
@@ -109,7 +107,7 @@ all: all-except-recomp
 clean:
 	$(RM) $(ALL_PROGRAMS)
 	$(RM) UNFLoader*
-	$(MAKE) -C audiofile clean
+	"$(MAKE)" -C audiofile clean
 
 distclean: clean
 
@@ -121,6 +119,6 @@ endef
 $(foreach p,$(BUILD_PROGRAMS),$(eval $(call COMPILE,$(p))))
 
 $(LIBAUDIOFILE):
-	@$(MAKE) -C audiofile
+	@"$(MAKE)" -C audiofile
 
 .PHONY: all all-except-recomp clean distclean default
