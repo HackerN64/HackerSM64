@@ -14,14 +14,14 @@
  *                      WALLS                     *
  **************************************************/
 
-static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
-    f32 v = ((d11 * d20) - (d01 * d21)) * invDenom;
-    if (v < 0.0f || v > 1.0f) {
+static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 mult) {
+    f32 v = ((d11 * d20) - (d01 * d21));
+    if (v < 0.0f || v > mult) {
         return TRUE;
     }
 
-    f32 w = ((d00 * d21) - (d01 * d20)) * invDenom;
-    if (w < 0.0f || w > 1.0f || v + w > 1.0f) {
+    f32 w = ((d00 * d21) - (d01 * d20));
+    if (w < 0.0f || w > mult || v + w > mult) {
         return TRUE;
     }
 
@@ -59,7 +59,6 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     Vec3f pos = { data->x, data->y + data->offsetY, data->z };
     Vec3f v0, v1, v2;
     f32 d00, d01, d11, d20, d21;
-    f32 invDenom;
     TerrainData type = SURFACE_DEFAULT;
     s32 numCols = 0;
 
@@ -110,17 +109,14 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         d20 = vec3_dot(v2, v0);
         d21 = vec3_dot(v2, v1);
 
-        invDenom = (d00 * d11) - (d01 * d01);
-        if (FLT_IS_NONZERO(invDenom)) {
-            invDenom = 1.0f / invDenom;
-        }
-
-        if (check_wall_vw(d00, d01, d11, d20, d21, invDenom)) {
+        f32 mult = (d00 * d11) - (d01 * d01);
+        if (check_wall_vw(d00, d01, d11, d20, d21, mult)) {
             if (offset < 0) {
                 continue;
             }
 
             // Edge 1-2
+            f32 invDenom;
             if (check_wall_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                 // Edge 1-3
                 if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
