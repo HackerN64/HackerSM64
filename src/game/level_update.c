@@ -362,6 +362,11 @@ void init_mario_after_warp(void) {
         gPlayerSpawnInfos[0].startAngle[0] = 0;
         gPlayerSpawnInfos[0].startAngle[1] = object->oMoveAngleYaw;
         gPlayerSpawnInfos[0].startAngle[2] = 0;
+        
+        struct Surface *floor;
+        gMarioState->lastSafePos[0] = object->oPosX;
+        gMarioState->lastSafePos[1] = find_floor(object->oPosX, object->oPosY, object->oPosZ, &floor);
+        gMarioState->lastSafePos[2] = object->oPosZ;
 
         if (marioSpawnType == MARIO_SPAWN_DOOR_WARP) {
             init_door_warp(&gPlayerSpawnInfos[0], sWarpDest.arg);
