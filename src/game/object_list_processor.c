@@ -280,6 +280,12 @@ void bhv_mario_update(void) {
 
         i++;
     }
+
+    // H64 TODO: Add config opt & check if floor is slippery
+    u32 actGroup = gMarioState->action & ACT_GROUP_MASK;
+    if ((actGroup == ACT_GROUP_STATIONARY || actGroup == ACT_GROUP_MOVING) && !SURFACE_IS_UNSAFE(gMarioState->floor->type)) {
+        vec3f_copy(gMarioState->lastSafePos, gMarioState->pos);
+    }
 }
 
 /**
