@@ -1754,6 +1754,12 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
             return ACTIVE_PARTICLE_NONE;
         }
 
+        // H64 TODO: Add config opt & check if floor is slippery
+        u32 actGroup = gMarioState->action & ACT_GROUP_MASK;
+        if ((actGroup == ACT_GROUP_STATIONARY || actGroup == ACT_GROUP_MOVING) && !SURFACE_IS_UNSAFE(gMarioState->floor->type)) {
+            vec3f_copy(gMarioState->lastSafePos, gMarioState->pos);
+        }
+
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
