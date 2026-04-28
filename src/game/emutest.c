@@ -23,7 +23,7 @@ extern void __osPiGetAccess(void);
 extern void __osPiRelAccess(void);
 
 u8 gEmulator = EMU_CONSOLE;
-u8 gSupportsLibpl = FALSE;
+u32 gSystemCapabilities = 0;
 
 static inline u32 get_pj64_version() {
     // When calling this function, we know that the emulator is some version of Project 64,
@@ -74,21 +74,37 @@ static u8 check_cache_emulation() {
     return cacheEmulated;
 }
 
+// Tests various system quirks and initializes gEmulator to the detected emulator(s).
+//  Also initializes gSystemCapabilities.
 u32 detect_emulator() {
-    // Test to see if the libpl emulator extension is present.
     u32 magic;
+    // Test to see if the libpl emulator extension is present.
+#ifdef LIBPL
+    // We have libpl downloaded as a submodule, just use the API call.
+    if (libpl_is_supported(LPL_ABI_VERSION_CURRENT)) {
+        const lpl_plugin_info *plugin_info = libpl_get_graphics_plugin();
+
+        // We can query framebuffer emulation from libpl
+        if (plugin_info->capabilities & LPL_FRAMEBUFFER_EMULATION) {
+            gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
+        }
+#else // LIBPL
+    // libpl interacts with the hardware register at 0x1FFB0000,
+    //  so we can still _detect_ it by clearing the register and
+    //  seeing if we get a specific value back.
     osPiWriteIo(0x1ffb0000u, 0u);
     osPiReadIo(0x1ffb0000u, &magic);
     if (magic == 0x00500000u) {
-        // libpl is supported. Must be ParallelN64
-#ifdef LIBPL
-        gSupportsLibpl = libpl_is_supported(LPL_ABI_VERSION_CURRENT);
-#endif
+#endif // LIBPL
+        gSystemCapabilities |= SUPPORTS_LIBPL;
+        // If libpl is supported, we're on Parallel Launcher
         return EMU_PARALLEL_LAUNCHER;
     }
 
     // If DPC registers are emulated, this is either console or a very accurate emulator
     if ((u32)IO_READ(DPC_PIPEBUSY_REG) | (u32)IO_READ(DPC_TMEM_REG) | (u32)IO_READ(DPC_BUFBUSY_REG)) {
+        // Assume we have the ability to manipulate the framebuffer too.
+        gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
         return EMU_CONSOLE;
     }
     
@@ -106,11 +122,14 @@ u32 detect_emulator() {
     if (1.0f != round_double_to_float(0.9999999999999999)) {
         fcr_set_rounding_mode(roundingMode);
         return EMU_WIIVC;
+    } else {
+        gSystemCapabilities |= SUPPORTS_FLOAT_ROUNDING_MODE;
     }
     fcr_set_rounding_mode(roundingMode);
 
     // If cache is emulated, then this is likely Simple64, or some other accurate emulator.
     if (check_cache_emulation()) {
+        gSystemCapabilities |= SUPPORTS_CACHING;
         return EMU_OTHER;
     }
 

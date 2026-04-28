@@ -4,8 +4,6 @@ Includes a few printing functions to fit any purpose.
 print_small_text is intended to replace print_generic_string in use, as it uses a far more optimised way of doing things,
 supports real time ascii conversion, and also supports many fun effects to spice up the text.
 Any usage of gDPSetEnvColor should ideally be replaced with print_set_envcolour because it helps with some optimisations.
-render_multi_image can be used to draw large texture rectangles consisting of multiple images on the screen.
-You only need have the single image in its full form, with no need for splitting it, and simply just load it.
 
 As for the profiler, you can hold dpad up, and press L to toggle the display.
 Inside this display, if you press up on the dpad again, you can switch between performance, and memory view.
@@ -2012,111 +2010,6 @@ void puppyprint_print_deferred(void) {
 
     //Reset the position back to zero, effectively clearing the buffer.
     sPuppyprintTextBufferPos = 0;
-}
-
-void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
-    s32 posW, posH, imW, imH, modeSC, mOne;
-    s32 i     = 0;
-    s32 num   = 256;
-    s32 maskW = 1;
-    s32 maskH = 1;
-
-    if (mode == G_CYC_COPY) {
-        gDPSetCycleType( gDisplayListHead++, mode);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP2);
-        modeSC = 4;
-        mOne   = 1;
-    } else {
-        gDPSetCycleType( gDisplayListHead++, mode);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
-        modeSC = 1;
-        mOne   = 0;
-    }
-
-    // Find how best to seperate the horizontal. Keep going until it finds a whole value.
-    while (TRUE) {
-        f32 val = (f32)width / (f32)num;
-
-        if ((s32)val == val && (s32) val >= 1) {
-            imW = num;
-            break;
-        }
-        num /= 2;
-        if (num == 1) {
-            print_text(32, 32, "IMAGE WIDTH FAILURE");
-            return;
-        }
-    }
-    // Find the tile height
-    imH = 64 / (imW / 32); // This gets the vertical amount.
-
-    num = 2;
-    // Find the width mask
-    while (TRUE) {
-        if ((s32) num == imW) {
-            break;
-        }
-        num *= 2;
-        maskW++;
-        if (maskW == 9) {
-            print_text(32, 32, "WIDTH MASK FAILURE");
-            return;
-        }
-    }
-    num = 2;
-    // Find the height mask
-    while (TRUE) {
-        if ((s32) num == imH) {
-            break;
-        }
-        num *= 2;
-        maskH++;
-        if (maskH == 9) {
-            print_text(32, 32, "HEIGHT MASK FAILURE");
-            return;
-        }
-    }
-    num = height;
-    // Find the height remainder
-    s32 peakH  = height - (height % imH);
-    s32 cycles = (width * peakH) / (imW * imH);
-
-    // Pass 1
-    for (i = 0; i < cycles; i++) {
-        posW = 0;
-        posH = i * imH;
-        while (posH >= peakH) {
-            posW += imW;
-            posH -= peakH;
-        }
-
-        gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++,
-            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++,
-            ((x + posW) << 2),
-            ((y + posH) << 2),
-            (((x + posW + imW) - mOne) << 2),
-            (((y + posH + imH) - mOne) << 2),
-            G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
-    }
-    // If there's a remainder on the vertical side, then it will cycle through that too.
-    if (height-peakH != 0) {
-        posW = 0;
-        posH = peakH;
-        for (i = 0; i < (width / imW); i++) {
-            posW = i * imW;
-            gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++,
-                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++,
-                (x + posW) << 2,
-                (y + posH) << 2,
-                ((x + posW + imW) - mOne) << 2,
-                ((y + posH + imH) - mOne) << 2,
-                G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
-        }
-    }
 }
 
 #endif

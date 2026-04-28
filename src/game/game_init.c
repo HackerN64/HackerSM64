@@ -410,6 +410,31 @@ void draw_reset_bars(void) {
 }
 
 /**
+ * Check if we are emulating the framebuffer
+ * 
+ * s32 frameIndex:
+ *  0: Write to the framebuffer, wait to process displaylist
+ *  1: Check whether the framebuffer write persisted
+ */
+static void check_fbe(s32 frameIndex) {
+    // NOTE: For whatever reason, checking against pixel index 12 fails on some versions of GlideN64 (pain).
+    // So apparently, this value being set to 13 actually matters...???
+    const s32 fbePixelOffset = 13;
+    const u16 fbePixelVal = 0xFF01;
+
+    if (frameIndex == 0) {
+        // Write pixel to the framebuffer
+        gFramebuffers[sRenderingFramebuffer][fbePixelOffset] = fbePixelVal;
+    } else {
+        // Check if pixel persisted in the framebuffer after executing the display list
+        //  that clears it (but before updating sRenderingFramebuffer!)
+        if (gFramebuffers[sRenderingFramebuffer][fbePixelOffset] != fbePixelVal) {
+            gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
+        }
+    }
+}
+
+/**
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
@@ -424,7 +449,23 @@ void render_init(void) {
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
-    exec_display_list(&gGfxPool->spTask);
+
+    // Skip the FBE check if system is console,
+    //  or had already been determined to support framebuffer emulation.
+    if (gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER) {
+        exec_display_list(&gGfxPool->spTask);
+    } else {
+        check_fbe(0);
+
+        exec_display_list(&gGfxPool->spTask);
+
+        // Wait for frame rendering to complete to prevent race condition with FBE check
+        osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        check_fbe(1);
+
+        // Send message back to queue to prevent locking up
+        osSendMesg(&gGfxVblankQueue, gMainReceivedMesg, OS_MESG_BLOCK);
+    }
 
     // Skip incrementing the initial framebuffer index on certain emulators so that they display immediately as the Gfx task finishes
     // This will break accurate emulators, so only enable on Project64, Parallel Launcher and Mupen.

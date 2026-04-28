@@ -345,7 +345,7 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
 
   # Make tools if out of date
   $(info Building tools...)
-  DUMMY != $(MAKE) -s -C $(TOOLS_DIR) >&2 || echo FAIL
+  DUMMY != "$(MAKE)" -s -C $(TOOLS_DIR) >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
       $(error Failed to build tools)
     endif
@@ -608,12 +608,12 @@ clean:
 	$(RM) -r $(BUILD_DIR_BASE)
 
 rebuildtools:
-	$(MAKE) -C tools distclean
-	$(MAKE) -C tools
+	"$(MAKE)" -C tools distclean
+	"$(MAKE)" -C tools
 
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
-	$(MAKE) -C $(TOOLS_DIR) clean
+	"$(MAKE)" -C $(TOOLS_DIR) clean
 
 test: $(ROM)
 	$(EMULATOR) $(EMU_FLAGS) $<
@@ -919,7 +919,7 @@ $(BUILD_DIR)/sm64_prelim.elf: $(BUILD_DIR)/sm64_prelim.ld
 
 $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Getting Goddard size...)
-	$(V)python3 tools/getGoddardSize.py $(BUILD_DIR)/sm64_prelim.map $(VERSION)
+	$(V)python3 tools/getGoddardSize.py $(BUILD_DIR)/sm64_prelim.map $(BUILD_DIR)
 
 $(SYMBOL_TABLE): $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Generating symbol table:,$(@F))

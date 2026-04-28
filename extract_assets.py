@@ -65,13 +65,17 @@ def remove_file(fname):
 def clean_assets(local_asset_file):
     assets = set(read_asset_map().keys())
     assets.update(read_local_asset_list(local_asset_file))
-    for fname in list(assets) + [".assets-local.txt"]:
+    for fname in list(assets):
         if fname.startswith("@"):
             continue
         try:
             remove_file(fname)
         except FileNotFoundError:
             pass
+
+    if local_asset_file is not None:
+        local_asset_file.close()
+        remove_file(".assets-local.txt")
 
 def usage():
     all_langs = ["jp", "us", "eu", "sh"]

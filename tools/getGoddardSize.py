@@ -1,12 +1,17 @@
-import sys, os
+import os
+import sys
 
-with open(sys.argv[1]) as f:
-	for line in f:
-		if "GODDARD_SIZE" in line:
-			tokens=line.split()
-			with open("build/%s_n64/goddard.txt" % sys.argv[2], "w+") as f:
-				sz = int(tokens[0], 16)
-				sz += 16
-				sz &= 0xFFFFFFF0
-				f.write("GODDARD_SIZE = 0x%X;" % sz)
-				
+preliminaryMapPath: str = sys.argv[1]
+buildFolder: str = sys.argv[2]
+
+with open(preliminaryMapPath) as mapFile:
+    line: str
+    for line in mapFile:
+        if "GODDARD_SIZE" in line:
+            tokens: list[str] = line.split()
+            with open(f"{buildFolder}/goddard.txt", "w+") as outputFile:
+                sz: int = int(tokens[0], 16)
+                sz += 16
+                sz &= 0xFFFFFFF0
+                outputFile.write(f"GODDARD_SIZE = 0x{sz:X};\n")
+                sys.exit(0)
