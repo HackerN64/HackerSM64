@@ -99,7 +99,7 @@ static u32 sCrashScreenStackTraceCount = 0;
 static u16 gCrashScreenTextColor = 0xFFFF;
 static u32 sCrashScreenPrintRow_Pixels = 0;
 static u32 sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
-static struct {
+struct {
     OSThread thread;
     u64 stack[THREAD2_STACK / sizeof(u64)];
     OSMesgQueue mesgQueue;
@@ -776,7 +776,7 @@ void thread2_crash_screen(UNUSED void *arg) {
     osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
     while (TRUE) {
         if (thread == NULL) {
-            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
+            osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {

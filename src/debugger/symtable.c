@@ -55,9 +55,10 @@ symtable_header_t symt_open(void) {
     }
 
     osWritebackDCache(&symt_header, sizeof(symt_header));
+    osInvalDCache(&symt_header, sizeof(symt_header));
     map_parser_dma(
         &symt_header,
-        (uintptr_t *)SYMT_ROM,
+        (void *)SYMT_ROM,
         sizeof(symtable_header_t)
     );
 
