@@ -1797,7 +1797,6 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
         queue_rumble_particles(gMarioState);
 #endif
 
-        // H64 TODO: Add config opt & check if floor is slippery
         u32 actGroup = gMarioState->action & ACT_GROUP_MASK;
         if ((actGroup == ACT_GROUP_STATIONARY || actGroup == ACT_GROUP_MOVING) && 
             gMarioState->floor != NULL && 
