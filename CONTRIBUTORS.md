@@ -2,7 +2,7 @@
 - **CowQuack**: Adjustable skybox sizes, area-specific skybox function
 - **thecozies**: Water surface types, general maintenance, and time
 - **MrComit**: General use object defines, JUMP_KICK_FIX
-- **aglab2**: Bugfixes (particularly puppycam), refactor stuff
+- **aglab2**: LZ4T/deflate integration, MinGW tooling, basic VC compatibility
 - **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
 - **Arthurtilly**: Platform Displacement 2
 - **Fazana**: PuppyLib, ucode swapping, audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
