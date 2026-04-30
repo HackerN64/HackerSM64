@@ -101,13 +101,17 @@ DEBUG_FULL_STACK_TRACE := 1
 # Include line data, at the cost of a significantly longer link time and a few extra megabytes of ROM
 DEBUG_EXPORT_ALL_LINES := 0
 
+# Default gcc debug info level.
+# Valid values are: [-g1, -g2, -g3, -ggdb3].
+DEBUG_LEVEL_FLAG := -g1
+
 ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
   ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
   	DEBUG_EXPORT_ALL_LINES_FLAG += --all-lines
   	DEFINES += DEBUG_EXPORT_ALL_LINES=1
   endif
   DEFINES += DEBUG_EXPORT_SYMBOLS=1
-  GENERATE_DWARF := -g1 -gdwarf-4
+  GENERATE_DWARF := $(DEBUG_LEVEL_FLAG) -gdwarf-4
   DEFAULT_OPT_FLAGS += $(GENERATE_DWARF)
   SYMBOL_TABLE = $(BUILD_DIR)/sm64.sym.o
 endif
@@ -157,8 +161,13 @@ endif
 # Optimization flags                                                           #
 #==============================================================================#
 
+# The general code optimization flag that governs the compiler's overall strategy.
+# Some valid values are: [-O0, -O1, -O2, -O3, -Ofast, -Os]
+# Set to -O0 (or comment out) to turn off code optimization, then run `make clean`
+GENERAL_OPTIMIZATION_LEVEL := -Os
+
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS += -Os -ffinite-math-only -fno-signed-zeros -fno-math-errno
+DEFAULT_OPT_FLAGS += $(GENERAL_OPTIMIZATION_LEVEL) -ffinite-math-only -fno-signed-zeros -fno-math-errno
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # TODO: Figure out how to allow -fassociative-math to be enabled
