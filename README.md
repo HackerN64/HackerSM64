@@ -1,18 +1,18 @@
 # ![](https://i.imgur.com/CeOukzk.gif) HackerSM64 ![](https://i.imgur.com/s0LUbTo.gif)
 
-HackerSM64 is a base for Super Mario 64 rom hack projects. It includes many useful features for rom hackers, improvements that are commonly applied in rom hacks, and bug fixes for some gameplay annoyances.
+HackerSM64 is a commonly used base repository for Super Mario 64 rom hacking projects. It includes many useful features for rom hackers, improvements that are commonly applied in rom hacks, software optimizations, and bug fixes for some gameplay annoyances.
 
 # Setup Guide
 
-A guide to install tools and dependencies, and to build HackerSM64 can be found [on the project wiki](https://github.com/HackerN64/HackerSM64/wiki/Installing-HackerSM64).
+A guide to install tools and dependencies, and to build HackerSM64 can be found [on the HackerSM64 Wiki](https://github.com/HackerN64/HackerSM64/wiki/Installing-HackerSM64).
 
 This repo requires a US ROM in order to build. JP/EU ROMs are optional for some assets.
 
 # Features
 
-HackerSM64 adds a lot of new features and makes several improvements to the game engine, so there are too many to list all of them here, but the more significant and often-used features/changes are listed below.
+HackerSM64 adds a lot of new features and makes several improvements to the game engine, so there are far too many to list all of them here. Some of the more significant and often-used features/changes are listed below.
 
-Many of these tweaks and features can be turned on or off by editing the files in the `include/config` folder, and **it's strongly recommended that you look through those files before making any of your own changes.**
+Many of these tweaks and features may be toggled by editing the files in the `include/config` folder. _It's strongly recommended that you look through these when starting a brand new project, and before doing anything else in the repo._
 
 ### Common Hack Changes
 - Extended boundaries (1x/2x/4x)
@@ -20,21 +20,6 @@ Many of these tweaks and features can be turned on or off by editing the files i
 - Mario head skip
 - Peach letter cutscene skip
 - Toggles for fall damage, lives, 100 coin stars, and other vanilla mechanics
-
-### Bug Fixes/Physics Improvements
-- Fixes for common collision issues, like slope fix, exposed ceilings fix, false ledgegrabs fix
-- Hanging fix (Mario can grab hangable ceilings from any state, instead of only jump or double jump)
-- Better wall collision with rounded corners
-
-### Lighting Engine
-- Allows for the use of dynamic lights in your levels.
-- Ambient, directional, and point lights are supported.
-- Available on a separate branch ([base/lighting-engine](https://github.com/HackerN64/HackerSM64/tree/base/lighting-engine)). Instructions on how to use it can be found in the readme of that branch.
-
-### Colored Text Support
-- Add colors to text boxes by adding `@RRGGBBAA` to the text, where each letter is a hex digit representing red, green, blue, and alpha (transparency).
-- Reset the color by adding `@--------`. It is not mandatory to do this, but text will need to be recolored each time it scrolls in a dialog box, or the custom color will reset.
-- For example: `"@FF0000FFRED @00FF00FFGREEN @0000FFFFBLUE @FFFFFF00INVISIBLE @--------NORMAL"`
 
 ### Features for Hackers
 - Rich debug features: debug fly mode, a much improved crash screen, visual surface and object hitbox debug, live display of several game state variables, and detailed performance profiling information.
@@ -48,10 +33,24 @@ Many of these tweaks and features can be turned on or off by editing the files i
 - An option to show Mario's silhouette when behind most surfaces
 - Farcall TLB mapping allows to store executable code inside uncompressed segments, that can be loaded and ran as needed, instead of it having to be loaded at all times. See `include/farcall.h` for instructions and details.
 
+### Bug Fixes/Physics Improvements
+- Fixes for common collision issues, such as slope fix, exposed ceilings fix, and false ledgegrabs fix
+- Improved wall collision with rounded corners, which also helps to reduce potential softlocks in custom levels
+
+### Colored Text Support
+- Add colors to text boxes by adding `@RRGGBBAA` to the text, where each letter is a hex digit representing red, green, blue, and alpha (transparency).
+- Reset the color by adding `@--------`. It is not mandatory to do this, but text will need to be recolored each time it scrolls in a dialog box, or the custom color will reset.
+- For example: `"@FF0000FFRED @00FF00FFGREEN @0000FFFFBLUE @FFFFFF00INVISIBLE @--------NORMAL"`
+
+### Lighting Engine
+- Allows for the use of dynamic lights in your levels.
+- Ambient, directional, and point lights are supported.
+- Available on a separate branch ([base/lighting-engine](https://github.com/HackerN64/HackerSM64/tree/base/lighting-engine)). Instructions on how to use it can be found in the readme of that branch.
+
 # FAQ
 
-### Should I use HackerSM64 or UltraSM64 for my rom hack?
-HackerSM64 is best used for rom hacks with custom levels and content. If you want to make a rom hack based on the levels in the original game, [UltraSM64](https://github.com/CrashOveride95/ultrasm64) may be a better choice for your project.
+### Should I use HackerSM64 or UltraSM64 for my ROM hack?
+HackerSM64 is best suited for ROM hacks with custom levels and content. If you want to make a rom hack that is TAS-accurate to the vanilla game and its levels, [UltraSM64](https://github.com/CrashOveride95/ultrasm64) may be a better choice for your project.
 
 ### How do I make my own levels?
 You can use Blender with the [Fast64 plugin](https://github.com/Fast-64/fast64) to create and export levels as 3D models. 
@@ -59,7 +58,7 @@ You can use Blender with the [Fast64 plugin](https://github.com/Fast-64/fast64) 
 
 # Still Have Questions?
 
-If you have any questions about HackerSM64, want to discuss its development, or are having trouble with your own project that uses it, feel free to join the HackerN64 discord server: https://discord.gg/brETAakcXr
+If you have any questions about HackerSM64, want to discuss its development, or are having trouble with your own project that uses it, feel free to join the [HackerN64 Discord Server](https://discord.gg/brETAakcXr).
 
 # Credits
 
