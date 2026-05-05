@@ -199,6 +199,7 @@ SECTIONS
 #endif
       BUILD_DIR/lib/librtc*.o(.*data*);
       *ULTRALIB.a:*.o(.data*);
+      *libnustd.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
 #include "rspdata.inc.ld"
       BUILD_DIR/lib/aspMain.o(.data*);
@@ -217,6 +218,7 @@ SECTIONS
 #endif
       BUILD_DIR/lib/librtc*.o(.rodata*);
       *ULTRALIB.a:*.o(.rodata*);
+      *libnustd.a:*.o(.rodata*);
       *libgcc.a:*.o(.rodata*);
 
       lib/PR/hvqm/hvqm2sp1.o(.rodata*);
@@ -238,6 +240,7 @@ SECTIONS
       *ULTRALIB.a:*.o(COMMON);
       *ULTRALIB.a:*.o(.scommon);
       *ULTRALIB.a:*.o(.*bss*);
+      *libnustd.a:*.o(.bss*);
       */libhvqm2.a:*.o(.bss*);
       . = ALIGN(0x8);
    }
