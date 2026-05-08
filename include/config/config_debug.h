@@ -76,6 +76,12 @@
 // #define COMPLETE_SAVE_FILE
 
 /**
+ * Mute all level and secondary music. Useful for still being able to listen to game sound effects
+ * during development without being subject to the same old music over and over and over and over...
+ */
+// #define MUTE_MUSIC_PLAYERS
+
+/**
  * Removes the limit on FPS.
  */
 // #define UNLOCK_FPS

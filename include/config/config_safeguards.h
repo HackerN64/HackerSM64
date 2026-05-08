@@ -65,6 +65,7 @@
     #undef VISUAL_DEBUG
     #undef UNLOCK_ALL
     #undef COMPLETE_SAVE_FILE
+    #undef MUTE_MUSIC_PLAYERS
     #undef UNLOCK_FPS
     #undef VANILLA_DEBUG
     #undef DEBUG_FORCE_CRASH_ON_BOOT
