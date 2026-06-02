@@ -9127,7 +9127,6 @@ void cutscene_unlock_key_door(UNUSED struct Camera *c) {
 s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplinePoint positionSpline[],
                   struct CutsceneSplinePoint focusSpline[]) {
     Vec3f offset;
-    s32 posReturn = 0;
     s32 focusReturn = 0;
 
     /**
@@ -9135,7 +9134,7 @@ s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplin
      * updated. Otherwise position would move two frames ahead, and c->focus would always be one frame
      * further along the spline than c->pos.
      */
-    posReturn = move_point_along_spline(c->pos, positionSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
+    move_point_along_spline(c->pos, positionSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     focusReturn = move_point_along_spline(c->focus, focusSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
 
     // The two splines used by this function are reflected in the horizontal plane for some reason,
@@ -9147,7 +9146,6 @@ s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplin
     vec3f_add(c->focus, offset);
     vec3f_add(c->pos, offset);
 
-    posReturn += focusReturn; // Unused
     return focusReturn;
 }
 
