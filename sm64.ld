@@ -190,6 +190,8 @@ SECTIONS
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
+      BUILD_DIR/src/hvqm*.o(.*data*);
+      BUILD_DIR/src/usb*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
@@ -208,6 +210,7 @@ SECTIONS
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
+      BUILD_DIR/src/hvqm*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.rodata*);

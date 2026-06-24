@@ -19,6 +19,10 @@
 #include "puppyprint.h"
 #include "profiling.h"
 
+#ifdef HVQM
+#include <hvqm/hvqm.h>
+#endif
+
 #include "config/config_audio.h"
 
 #define MUSIC_NONE 0xFFFF
@@ -373,7 +377,11 @@ void thread4_sound(UNUSED void *arg) {
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
         profiler_audio_started(); // also starts PROFILER_TIME_SUB_AUDIO_UPDATE inside
+#ifdef HVQM
+        if (gResetTimer < 25 && gHvqmPlayState == 0) {
+#else
         if (gResetTimer < 25) {
+#endif
             struct SPTask *spTask = create_next_audio_frame_task();
             if (spTask != NULL) {
                 dispatch_audio_sptask(spTask);

@@ -802,6 +802,10 @@ void setup_game_memory(void) {
     load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }
 
+
+
+extern struct SPTask *sCurrentDisplaySPTask;
+
 /**
  * Main game loop thread. Runs forever as long as the game continues.
  */
@@ -858,7 +862,9 @@ void thread5_game_loop(UNUSED void *arg) {
         read_controller_inputs(THREAD_5_GAME_LOOP);
         profiler_update(PROFILER_TIME_CONTROLLERS, 0);
         profiler_collision_reset();
+
         addr = level_script_execute(addr);
+
         profiler_collision_completed();
 #if !defined(PUPPYPRINT_DEBUG) && defined(VISUAL_DEBUG)
         debug_box_input();
@@ -874,12 +880,6 @@ void thread5_game_loop(UNUSED void *arg) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
             print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
-        }
-#endif
-#if 0
-        if (gPlayer1Controller->buttonPressed & L_TRIG) {
-            osStartThread(&hvqmThread);
-            osRecvMesg(&gDmaMesgQueue, NULL, OS_MESG_BLOCK);
         }
 #endif
     }

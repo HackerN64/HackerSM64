@@ -13,6 +13,7 @@
 #include <HVQM2File.h>
 #include "hvqm.h"
 #include "buffers/framebuffers.h"
+#include "game/debug.h"
 
 /***********************************************************************
  * Array maintaining the state of the frame buffer
@@ -98,12 +99,15 @@ int
 get_cfb()
 {
   int cfbno;
+  int loop_count = 0;
 
   for ( ; ; ) {
     for ( cfbno = 0; cfbno < NUM_CFBs; cfbno++ )
       if ( cfb_status[cfbno] == 0 )
 	return cfbno;
     osYieldThread();
+    loop_count++;
+    aggress(loop_count < 1000000, "HVQM: get_cfb: all framebuffers busy for too long");
   }
 }
 

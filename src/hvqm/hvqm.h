@@ -1,6 +1,9 @@
 #ifndef HVQM_H
 #define HVQM_H
 
+#include <PR/ultratypes.h>
+#include <HVQM2File.h>
+
 
 /*
  * Size of the data area for the HVQ microcode
@@ -114,5 +117,13 @@ int get_cfb();
 typedef u32 (*tkAudioProc)(void *pcmbuf);
 typedef tkAudioProc (*tkRewindProc)(void);
 
+extern OSMesgQueue gHvqmDoneQueue;
+extern OSMesgQueue hvqmMesgQ;
+extern volatile s32 gHvqmPlayState;
+
+extern u8 _capcomSegmentRomStart[];
+#define MOVIE_CAPCOM _capcomSegmentRomStart
+
+void play_hvqm(u8 *romStart);
 
 #endif // HVQM_H

@@ -14,7 +14,7 @@
     #define DEBUG_INIT_MSG    1   // Print a message when debug mode has initialized
     #define AUTOPOLL_ENABLED  0   // Automatically poll the USB on a timer
     #define AUTOPOLL_TIME     200 // Time (in milliseconds) between auto polls
-    #define USE_FAULTTHREAD   1   // Create a fault detection thread (libultra only)
+    #define USE_FAULTTHREAD   0   // Create a fault detection thread (libultra only)
     #define USE_RDBTHREAD     0   // Create a remote debugger thread
     // #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf (defined in makefile - libultra_rom does not have osSyncPrintf)
     #define MAX_COMMANDS      25  // The max amount of user defined commands possible
