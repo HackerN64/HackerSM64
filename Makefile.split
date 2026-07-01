@@ -58,71 +58,30 @@ YAY0_OBJ_FILES := $(YAY0_FILES:.szp=.szp.o)
 # Actor Rules
 # --------------------------------------
 
-# Actor Directories
-KOOPA_DIRS       := koopa_flag poundable_pole koopa piranha_plant whomp chain_ball chain_chomp
-CAPSWITCH_DIRS   := capswitch springboard
-CHILLYCHIEF_DIRS := chillychief moneybag
-BULLY_DIRS       := bully blargg
-SPINDRIFT_DIRS   := spindrift penguin snowman
-KING_BOBOMB_DIRS := king_bobomb water_bubble
-BOO_DIRS         := bookend book chair small_key mad_piano boo haunted_cage
-MR_I_DIRS        := mr_i_eyeball mr_i_iris swoop snufit dorrie scuttlebug
-HOOT_DIRS        := yellow_sphere_small hoot yoshi_egg thwomp bullet_bill heave_ho
-COINS_DIRS       := mist explosion butterfly coin warp_pipe door bowser_key flame blue_fish pebble leaves mario_cap breath_meter power_meter mushroom_1up star sand dirt transparent_star white_particle wooden_signpost tree
-BUBBA_DIRS       := bubba wiggler wiggler_body_part lakitu_enemy spiny_egg spiny
-SKEETER_DIRS     := skeeter seaweed water_mine cyan_fish bub water_ring treasure_chest
-KLEPTO_DIRS      := klepto eyerok pokey tornado
-SEA_DIRS         := clam_shell manta sushi unagi whirlpool
-AMP_DIRS         := blue_coin_switch amp cannon_lid cannon_base cannon_barrel chuckya purple_switch checkerboard_platform heart flyguy breakable_box exclamation_box goomba bobomb metal_box exclamation_box_outline test_platform koopa_shell
-MOLE_DIRS        := monty_mole_hole monty_mole smoke ukiki fwoosh
-LAKITU_DIRS      := lakitu_cameraman toad mips boo_castle
-PEACH_DIRS       := bird peach yoshi
-BOWSER_DIRS      := bowser_flame impact_ring yellow_sphere bowser bomb impact_smoke
-MARIO_DIRS       := mario bubble walk_smoke burn_smoke small_water_splash water_wave sparkle water_splash white_particle_small sparkle_animation
-
-# Actor Textures
-AMP_CHUCKYA_TEXTURES            := $(foreach dir,$(AMP_DIRS),        $(wildcard actors/$(dir)/*.png))
-BOBOMBS_BUBBLE_TEXTURES         := $(foreach dir,$(KING_BOBOMB_DIRS),$(wildcard actors/$(dir)/*.png))
-BOO_BOOKEND_TEXTURES            := $(foreach dir,$(BOO_DIRS),        $(wildcard actors/$(dir)/*.png))
-CAPSWITCH_SPRINGBOARD_TEXTURES  := $(foreach dir,$(CAPSWITCH_DIRS),  $(wildcard actors/$(dir)/*.png))
-COINS_PIPE_TEXTURES             := $(foreach dir,$(COINS_DIRS),      $(wildcard actors/$(dir)/*.png))
-BOWSER_FLAMES_TEXTURES          := $(foreach dir,$(BOWSER_DIRS),     $(wildcard actors/$(dir)/*.png))
-BUBBA_WIGGLER_TEXTURES          := $(foreach dir,$(BUBBA_DIRS),      $(wildcard actors/$(dir)/*.png))
-BULLY_BLARGG_TEXTURES           := $(foreach dir,$(BULLY_DIRS),      $(wildcard actors/$(dir)/*.png))
-CHILLYCHIEF_TEXTURES            := $(foreach dir,$(CHILLYCHIEF_DIRS),$(wildcard actors/$(dir)/*.png))
-HOOT_THWOMP_TEXTURES            := $(foreach dir,$(HOOT_DIRS),       $(wildcard actors/$(dir)/*.png))
-KOOPA_LOG_TEXTURES              := $(foreach dir,$(KOOPA_DIRS),      $(wildcard actors/$(dir)/*.png))
-KLEPTO_EYEROK_TEXTURES          := $(foreach dir,$(KLEPTO_DIRS),     $(wildcard actors/$(dir)/*.png))
-LAKITU_TOAD_TEXTURES            := $(foreach dir,$(LAKITU_DIRS),     $(wildcard actors/$(dir)/*.png))
-MARIO_WATER_TEXTURES            := $(foreach dir,$(MARIO_DIRS),      $(wildcard actors/$(dir)/*.png))
-MOLE_UKIKI_TEXTURES             := $(foreach dir,$(MOLE_DIRS),       $(wildcard actors/$(dir)/*.png))
-MR_I_SWOOP_TEXTURES             := $(foreach dir,$(MR_I_DIRS),       $(wildcard actors/$(dir)/*.png))
-PEACH_TOADSTOOL_TEXTURES        := $(foreach dir,$(PEACH_DIRS),      $(wildcard actors/$(dir)/*.png))
-SEA_CREATURES_TEXTURES          := $(foreach dir,$(SEA_DIRS),        $(wildcard actors/$(dir)/*.png))
-SKEETER_FISH_TEXTURES           := $(foreach dir,$(SKEETER_DIRS),    $(wildcard actors/$(dir)/*.png))
-SPINDRIFT_PENGUIN_TEXTURES      := $(foreach dir,$(SPINDRIFT_DIRS),  $(wildcard actors/$(dir)/*.png))
+ACTOR_TEXTURES := $(wildcard actors/*/*.png)
+ACTOR_TEXTURES_INC_C := $(ACTOR_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
 
 # Actor dependencies
-$(BUILD_DIR)/actors/group0.o:  $(MARIO_WATER_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group1.o:  $(HOOT_THWOMP_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group2.o:  $(BULLY_BLARGG_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group3.o:  $(BOBOMBS_BUBBLE_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group4.o:  $(SEA_CREATURES_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group5.o:  $(KLEPTO_EYEROK_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group6.o:  $(MOLE_UKIKI_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group7.o:  $(SPINDRIFT_PENGUIN_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group8.o:  $(CAPSWITCH_SPRINGBOARD_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group9.o:  $(BOO_BOOKEND_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group10.o: $(PEACH_TOADSTOOL_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group11.o: $(BUBBA_WIGGLER_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group12.o: $(BOWSER_FLAMES_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group13.o: $(SKEETER_FISH_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group14.o: $(KOOPA_LOG_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group15.o: $(LAKITU_TOAD_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group16.o: $(CHILLYCHIEF_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/group17.o: $(MR_I_SWOOP_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/common0.o: $(AMP_CHUCKYA_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
-$(BUILD_DIR)/actors/common1.o: $(COINS_PIPE_TEXTURES:%.png=$(BUILD_DIR)/%.inc.c)
+$(BUILD_DIR)/actors/group0.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group1.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group2.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group3.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group4.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group5.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group6.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group7.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group8.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group9.o:  | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group10.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group11.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group12.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group13.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group14.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group15.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group16.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/group17.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/common0.o: | $(ACTOR_TEXTURES_INC_C)
+$(BUILD_DIR)/actors/common1.o: | $(ACTOR_TEXTURES_INC_C)
 
 # Actor Elf Files
 $(BUILD_DIR)/actors/group0.elf:  SEGMENT_ADDRESS := 0x04000000
