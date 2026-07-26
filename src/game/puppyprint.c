@@ -535,7 +535,7 @@ void render_coverage_map(void) {
 void puppycamera_debug_view(void) {
     char textBytes[80];
     // Very little point printing useless info if Mayro doesn't even exist.
-    if (gMarioState->marioObj) {
+    if (gMarioObject) {
         sprintf(textBytes, "Mario Pos\nX: %d\nY: %d\nZ: %d\nD: %X\nA: %x",
             (s32)(gMarioState->pos[0]),
             (s32)(gMarioState->pos[1]),
@@ -1006,7 +1006,7 @@ void puppyprint_render_general_vars(void) {
 
 #ifndef ENABLE_CREDITS_BENCHMARK
     // Very little point printing useless info if Mario doesn't even exist.
-    if (gMarioState->marioObj) {
+    if (gMarioObject) {
         sprintf(textBytes, "Mario\n\nX: %d\nY: %d\nZ: %d\nYaw: 0x%04X\n\nfVel: %1.1f\nyVel: %1.1f\n\nHealth: %03X\nAction: 0x%02X\nFloor Type: 0x%02X\nWater Height: %d",
             (s32)(gMarioState->pos[0]),
             (s32)(gMarioState->pos[1]),
