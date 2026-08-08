@@ -695,28 +695,25 @@ $(BUILD_DIR)/src/game/puppycam2.o:   $(BUILD_DIR)/include/text_strings.h
 #==============================================================================#
 TEXTURE_ENCODING := u8
 
-# Convert PNGs to RGBA32, RGBA16, IA16, IA8, IA4, IA1, I8, I4 binary files
+define convert_texture
+$$(BUILD_DIR)/%$(1).inc.c: %$(1).png
+	$$(call print,Converting:,$$<,$$@)
+	$$(V)$$(N64GRAPHICS) -s $$(TEXTURE_ENCODING) -i $$@ -g $$< $(2)
+$$(BUILD_DIR)/%$(1).preswap.inc.c: %$(1).preswap.png
+	$$(call print,Converting:,$$<,$$@)
+	$$(V)$$(N64GRAPHICS) -s $$(TEXTURE_ENCODING) -i $$@ -g $$< $(2) -S
+endef
+
+$(eval $(call convert_texture,,-f $$(lastword ,$$(subst ., ,$$*))))
+$(eval $(call convert_texture,.ci4_rgba16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci4 -c rgba16))
+$(eval $(call convert_texture,.ci8_rgba16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci8 -c rgba16))
+$(eval $(call convert_texture,.ci4_ia16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci4 -c ia16))
+$(eval $(call convert_texture,.ci8_ia16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci8 -c ia16))
+
+# Convert image files to binary - used primarily for IPL3 "IA1" textures
 $(BUILD_DIR)/%: %.png
 	$(call print,Converting:,$<,$@)
 	$(V)$(N64GRAPHICS) -s raw -i $@ -g $< -f $(lastword $(subst ., ,$@))
-
-$(BUILD_DIR)/%.preswap.inc.c: %.preswap.png
-	$(call print,Converting:,$<,$@)
-	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$*)) -S
-
-$(BUILD_DIR)/%.inc.c: %.png
-	$(call print,Converting:,$<,$@)
-	$(V)$(N64GRAPHICS) -s $(TEXTURE_ENCODING) -i $@ -g $< -f $(lastword ,$(subst ., ,$*))
-
-# Color Index CI8
-$(BUILD_DIR)/%.ci8.inc.c: %.ci8.png
-	$(call print,Converting CI:,$<,$@)
-	$(V)$(BINPNG) $< $@ 8
-
-# Color Index CI4
-$(BUILD_DIR)/%.ci4.inc.c: %.ci4.png
-	$(call print,Converting CI:,$<,$@)
-	$(V)$(BINPNG) $< $@ 4
 
 
 #==============================================================================#

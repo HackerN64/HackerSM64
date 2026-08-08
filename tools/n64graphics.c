@@ -760,7 +760,7 @@ static void print_usage(void)
          " -w WIDTH      export texture width (default: %d)\n"
          " -h HEIGHT     export texture height (default: %d)\n"
          " -r ROTATE     rotate envmap texture for rgba extraction only (default: false)\n"
-         " -S            swap words on odd lines (importing only, does not support ci4, ci8, or ia1 formats)\n"
+         " -S            swap words on odd lines (importing only, does not support ia1 format)\n"
          "CI arguments:\n"
          " -c CI_FORMAT  CI palette format: rgba16, ia16 (default: %s)\n"
          " -p PAL_FILE   palette binary file to import/export from/to\n"
@@ -1019,9 +1019,6 @@ int main(int argc, char *argv[])
       if (config.word_swap) {
          if (config.format.depth == 1) {
             ERROR("Word swapping unavailable for IA1 texture format\n");
-            return EXIT_FAILURE;
-         } else if (config.format.format == IMG_FORMAT_CI) {
-            ERROR("Word swapping unavailable for CI texture formats\n");
             return EXIT_FAILURE;
          }
 
