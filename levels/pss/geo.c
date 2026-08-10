@@ -13,4 +13,4 @@
 
 #include "levels/pss/header.h"
 
-#include "levels/pss/areas/1/geo.inc.c"
+#include "levels/pss/geo.inc.c"

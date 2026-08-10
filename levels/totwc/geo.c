@@ -13,5 +13,4 @@
 
 #include "levels/totwc/header.h"
 
-#include "levels/totwc/cloud/geo.inc.c"
-#include "levels/totwc/areas/1/geo.inc.c"
+#include "levels/totwc/geo.inc.c"

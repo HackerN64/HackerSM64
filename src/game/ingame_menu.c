@@ -1,6 +1,7 @@
 #include <ultra64.h>
 
 #include "actors/common1.h"
+#include "actors/vanilla_actors/castle_grounds/header.h"
 #include "area.h"
 #include "audio/external.h"
 #include "camera.h"
@@ -12,7 +13,6 @@
 #include "gfx_dimensions.h"
 #include "ingame_menu.h"
 #include "level_update.h"
-#include "levels/castle_grounds/header.h"
 #include "memory.h"
 #include "print.h"
 #include "save_file.h"
@@ -642,6 +642,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
                 }
 
                 if (validColor) {
+                    gDPPipeSync(gDisplayListHead++);
                     gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                     strPos += sizeof(color) * 2;
                 }
@@ -650,6 +651,7 @@ static s32 render_main_font_text(s16 x, s16 y, char *str, s32 maxLines) {
             // Color reset control character
             case HEX(CONTROL_CHAR_RESET): // '\034'
                 bcopy(sActiveTextColor, color, sizeof(color));
+                gDPPipeSync(gDisplayListHead++);
                 gDPSetEnvColor(gDisplayListHead++, color[0], color[1], color[2], color[3]);
                 break;
 
@@ -676,6 +678,7 @@ render_character:
     }
 
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    gDPPipeSync(gDisplayListHead++);
     gLastDialogLineNum = lineNum; // Used for rendering the choice triangle during dialog boxes
     return -1;
 }
@@ -700,13 +703,15 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     struct Utf8CharLUTEntry *utf8Entry;
     const Texture *texture;
     u32 kerning;
+    Gfx *gfx = gDisplayListHead;
 
     if (str == NULL) {
         return;
     }
 
+    gSPDisplayList(gfx++, dl_rgba16_load_tex_block);
     while ((c = str[strPos]) != '\0') {
-        gDPPipeSync(gDisplayListHead++);
+        gDPPipeSync(gfx++);
 
         if (!(c & 0x80)) {
             texture = hudLUT[ASCII_LUT_INDEX(c)].texture;
@@ -716,18 +721,19 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
             if ((utf8Entry->flags & TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
                 renderX = curX;
                 renderY = curY - 4;
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
-                gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
-                gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
+                gDPSetTextureImage(gfx++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
+                gDPLoadBlock(gfx++, G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES));
+                gSPTextureRectangle(gfx++, renderX << 2, renderY << 2, (renderX + 16) << 2,
                             (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                gDPPipeSync(gDisplayListHead++);
+                gDPPipeSync(gfx++);
             }
             texture = utf8Entry->texture;
             kerning = utf8Entry->kerning;
         }
 
         if (texture != NULL) {
-            gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+            gDPSetTextureImage(gfx++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+            gDPLoadBlock(gfx++, G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES));
 
             renderX = curX;
             renderY = curY;
@@ -745,14 +751,15 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                 renderY += 1;
             }
 
-            gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
-            gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
+            gSPTextureRectangle(gfx++, renderX << 2, renderY << 2, (renderX + 16) << 2,
                                 (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
         }
 
         curX += kerning;
         strPos++;
     }
+
+    gDisplayListHead = gfx;
 }
 
 /**

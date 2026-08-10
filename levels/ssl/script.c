@@ -188,26 +188,10 @@ static const LevelScript script_ssl_area_3_objects_1[] = {
 
 const LevelScript level_ssl_entry[] = {
     INIT_LEVEL(),
-    LOAD_YAY0(        /*seg*/ 0x07, _ssl_segment_7SegmentRomStart, _ssl_segment_7SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x0A, _ssl_skybox_yay0SegmentRomStart, _ssl_skybox_yay0SegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _generic_yay0SegmentRomStart, _generic_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x05, _group5_yay0SegmentRomStart, _group5_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group5_geoSegmentRomStart,  _group5_geoSegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+#include "levels/ssl/areas/script_vanilla_load.inc.c"
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-    JUMP_LINK(script_func_global_1),
-    JUMP_LINK(script_func_global_6),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_PALM_TREE,           palm_tree_geo),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,       ssl_geo_0005C0),
-    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04,       ssl_geo_0005D8),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_PYRAMID_TOP,         ssl_geo_000618),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_GRINDEL,             ssl_geo_000734),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_SPINDEL,             ssl_geo_000764),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_MOVING_PYRAMID_WALL, ssl_geo_000794),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_PYRAMID_ELEVATOR,    ssl_geo_0007AC),
-    LOAD_MODEL_FROM_GEO(MODEL_SSL_TOX_BOX,             ssl_geo_000630),
+#include "levels/ssl/areas/script_vanilla.inc.c"
 
     AREA(/*index*/ 1, ssl_geo_000648),
         OBJECT(/*model*/ MODEL_NONE, /*pos*/   653, 1038,  6566, /*angle*/ 0,  90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSpinAirborneWarp),

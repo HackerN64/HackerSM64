@@ -1,5 +1,7 @@
 // bowser_falling_platform.inc.c
 
+#include "levels/bowser_3/header.h"
+
 struct BowserFallingPlatformData {
     const Collision *collision;
     s16 posX;

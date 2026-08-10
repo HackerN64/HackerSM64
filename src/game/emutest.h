@@ -39,8 +39,9 @@ extern void detect_emulator();
  */
 extern enum Emulator gEmulator;
 
-// determines whether libpl is safe to use
-extern u8 gSupportsLibpl;
+// determines the most recent libpl ABI version supported (0 if not supported)
+// Set LIBPL ?= 1 in your Makefile to enable libpl support
+extern int gLibplABI;
 
 // Included for backwards compatibility when upgrading from HackerSM64 2.0
 #define gIsConsole ((gEmulator & EMU_CONSOLE) != 0)

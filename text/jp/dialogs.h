@@ -132,7 +132,7 @@ DEFINE_DIALOG(DIALOG_008, NO_SOUND, 5, 30, 200, "\
 わたったひだりのはやしに\n\
 スターがでます。")
 
-DEFINE_DIALOG(SOUND_OBJ_KOOPA_TALK, 1, 5, 30, 200, "\
+DEFINE_DIALOG(DIALOG_009, SOUND_OBJ_KOOPA_TALK, 5, 30, 200, "\
 ひっさしぶりッス！　いま\n\
 ちょーどかえったとこッス。\n\
 パワースターのせいか\n\
@@ -785,7 +785,7 @@ DEFINE_DIALOG(DIALOG_066, NO_SOUND, 5, 30, 200, "\
 \n\
 もういちどＢボタンよ！")
 
-DEFINE_DIALOG(SOUND_OBJ_BOWSER_LAUGH, 1, 4, 30, 200, "\
+DEFINE_DIALOG(DIALOG_067, SOUND_OBJ_BOWSER_LAUGH, 4, 30, 200, "\
 ざんねんだったなマリオ！\n\
 ここには　ピーチちゃんは\n\
 いませんでした。\n\

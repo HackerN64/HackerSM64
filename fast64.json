@@ -1,0 +1,28 @@
+{
+  "version": 1.0,
+  "autoLoad": true,
+  "microcode": "F3DEX2/LX2",
+  "rdpDefaults": {
+    "geometryMode": {
+      "zBuffer": true,
+      "shade": true,
+      "cullBack": true,
+      "lighting": true,
+      "shadeSmooth": true
+    },
+    "otherModeH": {
+      "textureConvert": "G_TC_FILT",
+      "textureFilter": "G_TF_BILERP",
+      "perspectiveCorrection": "G_TP_PERSP",
+      "pipelineMode": "G_PM_1PRIMITIVE"
+    },
+    "otherModeL": {},
+    "other": {}
+  },
+  "sm64": {
+    "refresh_version": "HackerSM64 2.3.0",
+    "compression_format": "yay0",
+    "force_extended_ram": false,
+    "matstack_fix": true
+  }
+}

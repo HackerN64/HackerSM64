@@ -667,7 +667,7 @@ void setup_game_memory(void) {
     gPhysicalFramebuffers[1] = VIRTUAL_TO_PHYSICAL(gFramebuffer1);
     gPhysicalFramebuffers[2] = VIRTUAL_TO_PHYSICAL(gFramebuffer2);
     // Setup Mario Animations
-    gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
+    gMarioAnimsMemAlloc = main_pool_alloc_aligned(MARIO_ANIMS_POOL_SIZE, 0);
     set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
 #ifdef PUPPYPRINT_DEBUG
@@ -684,7 +684,7 @@ void setup_game_memory(void) {
 #endif // ENABLE_DEMO_SYSTEM
 
     // Setup Level Script Entry
-    load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
+    load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, NULL, NULL);
     // Setup Segment 2 (Fonts, Text, etc)
     load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }

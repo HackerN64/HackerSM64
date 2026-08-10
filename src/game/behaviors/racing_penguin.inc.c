@@ -1,5 +1,7 @@
 // racing_penguin.inc.c
 
+#include "levels/ccm/header.h"
+
 struct RacingPenguinData {
     s16 text;
     f32 radius;

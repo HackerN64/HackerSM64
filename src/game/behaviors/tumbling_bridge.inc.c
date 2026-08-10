@@ -1,10 +1,5 @@
 // tumbling_bridge.inc.c
 
-#include "levels/wf/header.h"
-#include "levels/bbh/header.h"
-#include "levels/lll/header.h"
-#include "levels/bitfs/header.h"
-
 struct TumblingBridgeParams {
     s16 numBridgeSections;
     s16 bridgeRelativeStartingXorZ;
