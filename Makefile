@@ -707,6 +707,8 @@ $(eval $(call convert_texture,.ci4_rgba16,-p $$(patsubst %.inc.c,%.pal,$$@) -f c
 $(eval $(call convert_texture,.ci8_rgba16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci8 -c rgba16))
 $(eval $(call convert_texture,.ci4_ia16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci4 -c ia16))
 $(eval $(call convert_texture,.ci8_ia16,-p $$(patsubst %.inc.c,%.pal,$$@) -f ci8 -c ia16))
+$(eval $(call convert_texture,.ci4,-p $$(patsubst %.ci4.inc.c,%.rgba16.pal,$$@) -f ci4 -c rgba16))
+$(eval $(call convert_texture,.ci8,-p $$(patsubst %.ci8.inc.c,%.rgba16.pal,$$@) -f ci8 -c rgba16))
 
 # Convert image files to binary - used primarily for IPL3 "IA1" textures
 $(BUILD_DIR)/%: %.png
