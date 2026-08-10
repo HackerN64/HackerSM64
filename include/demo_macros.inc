@@ -26,7 +26,7 @@
     .half 0
 .endm
 
-/* Pretty names since pressing every button on a frame might overrun a buffer*/
+/* Pretty names to save string buffer space in RAM */
 #define A A_BUTTON
 #define B B_BUTTON
 #define Z Z_TRIG
