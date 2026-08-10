@@ -14,7 +14,7 @@ const LevelScript level_script_entry[] = {
     INIT_LEVEL(),
     SLEEP(/*frames*/ 2),
     BLACKOUT(/*active*/ FALSE),
-#ifdef TEST_LEVEL
+#if defined(TEST_LEVEL) || defined(DEMO_RECORDING_MODE)
     SET_REG(/*value*/ TEST_LEVEL),
     EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, /*script*/ _scriptsSegmentRomStart, /*scriptEnd*/ _scriptsSegmentRomEnd, /*entry*/ level_main_scripts_entry),
 #else

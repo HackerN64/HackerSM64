@@ -6,6 +6,7 @@
 #include "audio/external.h"
 #include "audio/synthesis.h"
 #include "level_update.h"
+#include "demo_system.h"
 #include "game_init.h"
 #include "level_update.h"
 #include "main.h"
@@ -1004,17 +1005,22 @@ void basic_update(void) {
 }
 
 s32 play_mode_normal(void) {
-#ifndef DISABLE_DEMO
+#ifdef ENABLE_DEMO_SYSTEM
     if (gCurrDemoInput != NULL) {
         print_intro_text();
         if (gPlayer1Controller->buttonPressed & END_DEMO) {
-            level_trigger_warp(gMarioState, gCurrLevelNum == LEVEL_PSS ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
+            level_trigger_warp(gMarioState, gCurrLevelNum == gFinalDemoLevel ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
         } else if (!gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
                    && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
             level_trigger_warp(gMarioState, WARP_OP_DEMO_NEXT);
         }
     }
 #endif
+#ifdef DEMO_RECORDING_MODE
+    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
+        warp_special(WARP_SPECIAL_ENDING);
+    }
+#endif // DEMO_RECORDING_MODE
 
     warp_area();
     check_instant_warp();
@@ -1270,6 +1276,9 @@ s32 init_level(void) {
         if (gPlayerSpawnInfos[0].areaIndex >= 0) {
             load_mario_area();
             init_mario();
+#ifdef ENABLE_DEMO_SYSTEM
+            gDemoActive = TRUE;
+#endif // ENABLE_DEMO_SYSTEM
         }
 
         if (gCurrentArea != NULL) {
@@ -1323,6 +1332,16 @@ s32 init_level(void) {
     }
 
     append_puppyprint_log("Level loaded in %d" PP_CYCLE_STRING ".", (s32)(PP_CYCLE_CONV(osGetTime() - first)));
+
+#ifdef DEMO_RECORDING_MODE
+    print_demo_header();
+    set_random_seed(0);
+#else // DEMO_RECORDING_MODE
+    if (gCurrDemoInput != NULL) {
+        set_random_seed(0);
+    }
+#endif // DEMO_RECORDING_MODE
+
     return TRUE;
 }
 
@@ -1399,6 +1418,11 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
         return FALSE;
     }
+
+#ifdef DEMO_RECORDING_MODE
+    return FALSE;
+#endif // DEMO_RECORDING_MODE
+
 
     if (gCurrLevelNum != LEVEL_BOWSER_1 && gCurrLevelNum != LEVEL_BOWSER_2 && gCurrLevelNum != LEVEL_BOWSER_3) {
         gMarioState->numCoins = 0;

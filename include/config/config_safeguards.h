@@ -139,7 +139,6 @@
     #define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
 #endif // !FLYING_CAMERA_MODE
 
-
 /*****************
  * config_game.h
  */
@@ -166,10 +165,15 @@
 
 #ifndef KEEP_MARIO_HEAD
     #undef GODDARD_EASTER_EGG
-
-    #undef DISABLE_DEMO
-    #define DISABLE_DEMO
+    #undef ENABLE_DEMO_SYSTEM // Demos only play back on the title screen
 #endif // !KEEP_MARIO_HEAD
+
+#ifdef DEMO_RECORDING_MODE
+    #ifndef TEST_LEVEL
+// assume user is testing the start level
+        #define TEST_LEVEL START_LEVEL
+    #endif
+#endif
 
 
 /*****************

@@ -623,6 +623,7 @@ ALWAYS_INLINE s32 roundf(f32 in) {
     ((u32 *)(mtx))[15] = FLOAT_ONE;             \
 }
 
+void set_random_seed(u16 seed);
 u16 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);

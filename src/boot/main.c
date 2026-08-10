@@ -355,7 +355,7 @@ void thread3_main(UNUSED void *arg) {
     debug_initialize();
 #endif
 
-#ifdef DEBUG
+#if !defined(DEMO_RECORDING_MODE) && defined(DEBUG)
     osSyncPrintf("Super Mario 64\n");
 #if 0 // if your PC username isn't your real name feel free to uncomment
     osSyncPrintf("Built by: %s\n", __username__);
