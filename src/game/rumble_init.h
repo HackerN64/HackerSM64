@@ -22,6 +22,21 @@ void cancel_rumble(void);
 void create_thread_6(void);
 void rumble_thread_update_vi(void);
 
+#else
+
+#define init_rumble_pak_scheduler_queue()
+#define block_until_rumble_pak_free()
+#define release_rumble_pak_control()
+#define queue_rumble_data(time, level)
+#define queue_rumble_decay(decay)
+#define is_rumble_finished_and_queue_empty() FALSE
+#define reset_rumble_timers_slip()
+#define reset_rumble_timers_vibrate(level)
+#define queue_rumble_submerged()
+#define cancel_rumble()
+#define create_thread_6()
+#define rumble_thread_update_vi()
+
 #endif // ENABLE_RUMBLE
 
 #endif // RUMBLE_INIT_H

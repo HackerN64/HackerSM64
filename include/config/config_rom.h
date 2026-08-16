@@ -26,7 +26,7 @@
 /**
  * Enables Rumble Pak Support.
  */
-// #define ENABLE_RUMBLE (1 || VERSION_SH)
+// #define ENABLE_RUMBLE 1
 
 /**
  * The maximum number of supported players/controllers. 1-4.

@@ -647,9 +647,7 @@ void read_controller_inputs(s32 threadID) {
             osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         }
         osContGetReadDataEx(gControllerPads);
-#if ENABLE_RUMBLE
         release_rumble_pak_control();
-#endif
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
@@ -807,13 +805,9 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     setup_game_memory();
-#if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
-#endif
     init_controllers();
-#if ENABLE_RUMBLE
     create_thread_6();
-#endif
 #ifdef HVQM
     createHvqmThread();
 #endif
@@ -847,9 +841,7 @@ void thread5_game_loop(UNUSED void *arg) {
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
         if (gControllerBits) {
-#if ENABLE_RUMBLE
             block_until_rumble_pak_free();
-#endif
             osContStartReadDataEx(&gSIEventMesgQueue);
         }
 

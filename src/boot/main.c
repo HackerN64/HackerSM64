@@ -229,9 +229,7 @@ void handle_vblank(void) {
             profiler_rsp_started(PROFILER_RSP_GFX);
         }
     }
-#if ENABLE_RUMBLE
     rumble_thread_update_vi();
-#endif
 
     // Notify the game loop about the vblank.
     if (gVblankHandler1 != NULL) osSendMesg(gVblankHandler1->queue, gVblankHandler1->msg, OS_MESG_NOBLOCK);
