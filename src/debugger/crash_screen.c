@@ -56,7 +56,7 @@ static u32 sCrashScreenFont[CRASH_SCREEN_GLYPH_HEIGHT * CRASH_SCREEN_FONT_ROWS *
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
-static u8 crashPage = 0;
+static u8 crashPage = CRASH_SCREEN_PAGE_SIMPLE;
 static u8 updateBuffer = TRUE;
 
 static char crashScreenBuf[0x200];
@@ -366,10 +366,10 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
     u32 bit = BIT(17);
 
-    crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 90, 220, "FPCSR:%08XH", fpcsr);
-    for (i = 0; i < 6; i++) {
+    crash_screen_print(CRASH_SCREEN_LEFT_MARGIN + 90, 220, "FPCSR:%08X", fpcsr);
+    for (i = 0; i < ARRAY_COUNT(gFpcsrDesc); i++) {
         if (fpcsr & bit) {
-            crash_screen_print(222, 220, "(%s)", gFpcsrDesc[i]);
+            crash_screen_print(192, 220, "(%s)", gFpcsrDesc[i]);
             return;
         }
         bit >>= 1;
