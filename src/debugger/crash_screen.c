@@ -431,11 +431,11 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         reset_text_color();
 
         // print current func
-        crash_screen_println("%08X: %s", tc->pc, info.func == NULL ? "Unknown" : info.func);
+        crash_screen_println("%08X: %s", tc->pc, info.func);
         // print last func
         u32 ret_addr = tc->ra;
         symtable_info_t ra_info = get_symbol_info(ret_addr);
-        crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func == NULL ? "Unknown" : ra_info.func, ra_info.line);
+        crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func, ra_info.line);
         // print up to 3 more
         for (u32 i = 0; i < MIN(3, sCrashScreenStackTraceCount); i++) {
             crash_screen_println(get_stack_entry(i));
@@ -558,8 +558,6 @@ void draw_disasm(OSThread *thread) {
     crash_screen_println("Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
 
-    // int skiplines = 0;
-
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
 
@@ -576,7 +574,6 @@ void draw_disasm(OSThread *thread) {
                 set_text_color(239, 196, 15);
                 crash_screen_println("<%s:>", info.func);
                 reset_text_color();
-                // skiplines++;
             }
 #ifndef DEBUG_EXPORT_ALL_LINES
             // catch `jal` and `jalr` callsites
@@ -593,16 +590,19 @@ void draw_disasm(OSThread *thread) {
 #ifndef DEBUG_EXPORT_ALL_LINES
             }
 #endif // DEBUG_EXPORT_ALL_LINES
+            else {
 #endif // DEBUG_EXPORT_SYMBOLS
-            if (addr == tc->pc) {
-                set_text_color(255, 0, 0);
-            } else {
-                reset_text_color();
+                if (addr == tc->pc) {
+                    set_text_color(255, 0, 0);
+                } else {
+                    reset_text_color();
+                }
+                crash_screen_println("    %s", disasm);
+#ifdef DEBUG_EXPORT_SYMBOLS
             }
-            crash_screen_println("    %s", disasm);
+#endif // DEBUG_EXPORT_SYMBOLS
         }
     }
-
 
     reset_text_color();
     osWritebackDCacheAll();
@@ -672,7 +672,7 @@ void draw_assert(OSThread *thread) {
             // Print last func (we know the current func is __n64Assert)
             u32 ret_addr = tc->ra;
             symtable_info_t ra_info = get_symbol_info(ret_addr);
-            crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func == NULL ? "Unknown" : ra_info.func, ra_info.line);
+            crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func, ra_info.line);
             // Print up to 3 more
             for (u32 i = 0; i < MIN(3, sCrashScreenStackTraceCount); i++) {
                 crash_screen_println(get_stack_entry(i));
