@@ -98,8 +98,10 @@ u32 generate_stack(OSThread *thread) {
                     }
                 } else if (insn_is_jalr((Insn *) &jal)) {
                     // Always add a JALR to the stack, in absence of a better heuristic
-                    add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
-                    breadcrumb = val;
+                    if (stack[stackIdx - 1].func != (val + CALLSITE_OFFSET)) {
+                        add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
+                        breadcrumb = val;
+                    }
                 }
             }
 
