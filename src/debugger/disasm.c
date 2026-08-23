@@ -156,7 +156,9 @@ u8 insn_is_jalr(Insn *i) {
 
 // Last Resort C0/C1 disassembler, from libdragon
 static void c1_disasm(u32 *ptr, char *out) {
+#ifdef DEBUG_EXPORT_SYMBOLS
     char funcname_buf[64];
+#endif // DEBUG_EXPORT_SYMBOLS
     static const char *fpu_ops[64]= {
         "radd", "rsub", "rmul", "rdiv", "ssqrt", "sabs", "smov", "sneg",
         "sround.l", "strunc.l", "sceil.l", "sfloor.l", "sround.w", "strunc.w", "sceil.w", "sfloor.w",
@@ -266,7 +268,6 @@ char *insn_disasm(InsnData *addr) {
     char *strp = &insn_as_string[0];
     int successful_print = 0;
     u32 target;
-    char funcname_buf[64];
 
     if (insn.d == 0) { // trivial case
         return "nop";
@@ -302,6 +303,7 @@ char *insn_disasm(InsnData *addr) {
                 case PARAM_JAL: {
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
 #ifdef DEBUG_EXPORT_SYMBOLS
+                    char funcname_buf[64];
                     char symBuffer[CRASH_SCREEN_MAX_PATH];
                     sprintf(symBuffer, "%s(%08X)", parse_map(funcname_buf, sizeof(funcname_buf), target, FALSE), target);
                     strp += sprintf(strp, "%-9s %s", insn_db[i].name, crash_screen_ellide_string(symBuffer, 30));

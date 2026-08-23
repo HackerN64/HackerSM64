@@ -93,8 +93,11 @@ char *gFpcsrDesc[6] = {
     "Inexact operation",
 };
 
+
 static u32 sProgramPosition = 0;
+#if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
 static u32 sCrashScreenStackTraceCount = 0;
+#endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
 
 static u16 gCrashScreenTextColor = 0xFFFF;
 static u32 sCrashScreenPrintRow_Pixels = 0;
@@ -379,8 +382,6 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 void draw_crash_overview(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
-    int numNewlines = 0;
-
     crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     set_text_color(0xFF, 0, 0);
@@ -396,6 +397,8 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
     crash_screen_println("       %s", gCauseDesc[cause]);
 
 #ifdef DEBUG_EXPORT_SYMBOLS
+    int numNewlines = 0;
+
     symtable_info_t info = get_symbol_info(tc->pc);
 
     if (info.line != -1) {
@@ -444,7 +447,9 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 }
 
 void draw_crash_context(OSThread *thread, s32 cause) {
+#ifdef DEBUG_EXPORT_SYMBOLS
     char symbolname_scratch[64];
+#endif // DEBUG_EXPORT_SYMBOLS
 
     __OSThreadContext *tc = &thread->context;
     crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -508,7 +513,10 @@ void draw_crash_log(void) {
 #endif
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
+#ifdef DEBUG_EXPORT_SYMBOLS
     char symbolname_scratch[64];
+#endif // DEBUG_EXPORT_SYMBOLS
+
     __OSThreadContext *tc = &thread->context;
 
     crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -550,7 +558,7 @@ void draw_disasm(OSThread *thread) {
     crash_screen_println("Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
 
-    int skiplines = 0;
+    // int skiplines = 0;
 
     for (int i = 0; i < 19; i++) {
         u32 addr = (sProgramPosition + (i * 4));
@@ -568,7 +576,7 @@ void draw_disasm(OSThread *thread) {
                 set_text_color(239, 196, 15);
                 crash_screen_println("<%s:>", info.func);
                 reset_text_color();
-                skiplines++;
+                // skiplines++;
             }
 #ifndef DEBUG_EXPORT_ALL_LINES
             // catch `jal` and `jalr` callsites
@@ -586,17 +594,15 @@ void draw_disasm(OSThread *thread) {
             }
 #endif // DEBUG_EXPORT_ALL_LINES
 #endif // DEBUG_EXPORT_SYMBOLS
-            else {
-                if (addr == tc->pc) {
-                    set_text_color(255, 0, 0);
-                } else {
-                    reset_text_color();
-                }
-                crash_screen_println("    %s", disasm);
+            if (addr == tc->pc) {
+                set_text_color(255, 0, 0);
+            } else {
+                reset_text_color();
             }
+            crash_screen_println("    %s", disasm);
         }
-
     }
+
 
     reset_text_color();
     osWritebackDCacheAll();
@@ -791,10 +797,12 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
+#if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
                 if (stackTraceGenerated == FALSE) {
                     sCrashScreenStackTraceCount = generate_stack(thread);
                     stackTraceGenerated = TRUE;
                 }
+#endif // defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
                 // If an assert happened, go straight to that page
                 if (thread->context.cause == EXC_SYSCALL) {
                     crashPage = CRASH_SCREEN_PAGE_ASSERTS;
