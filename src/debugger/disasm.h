@@ -83,6 +83,7 @@ typedef struct PACKED {
 #define OP_BRANCH 0b000001 // technically "REGIMM"
 
 extern char *insn_disasm(InsnData *insn);
+extern u8 insn_is_j(Insn *i);
 extern u8 insn_is_jal(Insn *i);
 extern u8 insn_is_jalr(Insn *i);
 

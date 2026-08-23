@@ -52,6 +52,21 @@ char *parse_map(u32 addr, u32 andOffset) {
     return ret;
 }
 
+u32 get_start_of_func(u32 addr) {
+    symtable_header_t symt = symt_open();
+    if (symt.head[0]) {
+        int idx = 0;
+        addrtable_entry_t a = symt_addrtab_search(&symt, addr, &idx);
+        while (!ADDRENTRY_IS_FUNC(a)) {
+            a = symt_addrtab_entry(&symt, --idx);
+        }
+
+        addr -= (addr - ADDRENTRY_ADDR(a));
+        return addr;
+    }
+    return addr;
+}
+
 symtable_info_t get_symbol_info(u32 addr) {
     static char filebuf[100];
     void *vaddr = (void *)addr;

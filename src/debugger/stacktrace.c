@@ -69,16 +69,16 @@ u32 generate_stack(OSThread *thread) {
             }
 
             // get the start of the current frame's func
-            while (!ADDRENTRY_IS_FUNC(funcstart) && !ADDRENTRY_IS_INLINE(funcstart)) {
-                funcstart = symt_addrtab_entry(&symt, --idx);
-            }
+            funcstart = get_start_of_func(funcstart);
 
             // Make sure the address is an actual callsite
             if (info.distance == 0) {
                 u32 jal = *(u32*)(val + CALLSITE_OFFSET);
+                osSyncPrintf("Candidate: %08X %s\n", val + CALLSITE_OFFSET, insn_disasm(&(InsnData){.d = jal}));
 
                 if (insn_is_jal((Insn *) &jal)) {
                     u32 jalTarget = 0x80000000 | ((jal & 0x03FFFFFF) * 4);
+                    // osSyncPrintf("  TARGET %08X WE %s\n", jalTarget, parse_map(funcstart, TRUE));
 
                     // make sure JAL is to the current func
                     if (jalTarget == ADDRENTRY_ADDR(funcstart)) {
@@ -87,9 +87,7 @@ u32 generate_stack(OSThread *thread) {
                     } else {
                         // Just in case we're on a weird boundary, find the _previous_
                         //  function start and see if we jal'd to there instead.
-                        do {
-                            funcstart = symt_addrtab_entry(&symt, --idx);
-                        } while (!ADDRENTRY_IS_FUNC(funcstart) && !ADDRENTRY_IS_INLINE(funcstart));
+                        funcstart = get_start_of_func(funcstart - 4);
 
                         if (jalTarget == ADDRENTRY_ADDR(funcstart)) {
                             add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
@@ -98,6 +96,11 @@ u32 generate_stack(OSThread *thread) {
                     }
                 } else if (insn_is_jalr((Insn *) &jal)) {
                     // Always add a JALR to the stack, in absence of a better heuristic
+                    if (stack[stackIdx - 1].func != (val + CALLSITE_OFFSET)) {
+                        add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
+                        breadcrumb = val;
+                    }
+                } else if (insn_is_j((Insn *) &jal)) {
                     if (stack[stackIdx - 1].func != (val + CALLSITE_OFFSET)) {
                         add_entry_to_stack(val + CALLSITE_OFFSET, breadcrumb, &info);
                         breadcrumb = val;

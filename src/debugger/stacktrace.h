@@ -12,10 +12,10 @@ typedef struct {
     char funcname[100];
 } StackFrame;
 
-#define STACK_TRAVERSAL_LIMIT 100
-#define STACK_LINE_COUNT 17
+#define STACK_TRAVERSAL_LIMIT (100)
+#define STACK_LINE_COUNT (17)
 // RA points to 2 instructions past any given callsite
-#define CALLSITE_OFFSET -8
+#define CALLSITE_OFFSET (-8)
 
 extern u32 stackTraceGenerated;
 

@@ -142,6 +142,10 @@ char __mips_fpreg[][5] = {
     "$f28", "$f29", "$f30", "$f31",
 };
 
+u8 insn_is_j(Insn *i) {
+    return (i->opcode == 0b000010);
+}
+
 u8 insn_is_jal(Insn *i) {
     return (i->opcode == 0b000011);
 }
