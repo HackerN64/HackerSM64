@@ -12,7 +12,7 @@
 /**
  * Uncomment to help diagnose issues with stacktrace implementation
  **/
-#define STACKTRACE_DEBUG
+// #define STACKTRACE_DEBUG
 
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
 
