@@ -40,16 +40,18 @@ char* __symbolize(void *vaddr, char *buf, int size, u32 andOffset) {
     return buf;
 }
 
-char *parse_map(u32 addr, u32 andOffset) {
-    static char map_name[64] ALIGNED16;
-    char *ret = map_name;
-
-    __symbolize((u32*)addr, map_name, sizeof(map_name), andOffset);
-
-    if (ret[0] == ' ') {
-        ret++;
+char *parse_map(char *buf, u32 size, u32 addr, u32 andOffset) {
+    if (buf == NULL) {
+        return NULL;
     }
-    return ret;
+
+    __symbolize((u32*)addr, buf, size, andOffset);
+
+    if (buf[0] == ' ') {
+        return buf + 1;
+    } else {
+        return buf;
+    }
 }
 
 u32 get_start_of_func(u32 addr) {
@@ -88,7 +90,7 @@ symtable_info_t get_symbol_info(u32 addr) {
         addrtable_entry_t a = symt_addrtab_entry(&symt, idx);
         info.distance = addr - ADDRENTRY_ADDR(a);
         info.file = symt_entry_file(&symt, &entry, filebuf, sizeof(filebuf));
-        info.func = parse_map(addr, FALSE);
+        parse_map(info.func, sizeof(info.func), addr, FALSE);
 
         return info;
     }

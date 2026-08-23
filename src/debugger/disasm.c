@@ -156,6 +156,7 @@ u8 insn_is_jalr(Insn *i) {
 
 // Last Resort C0/C1 disassembler, from libdragon
 static void c1_disasm(u32 *ptr, char *out) {
+    char funcname_buf[64];
     static const char *fpu_ops[64]= {
         "radd", "rsub", "rmul", "rdiv", "ssqrt", "sabs", "smov", "sneg",
         "sround.l", "strunc.l", "sceil.l", "sfloor.l", "sround.w", "strunc.w", "sceil.w", "sfloor.w",
@@ -205,9 +206,9 @@ static void c1_disasm(u32 *ptr, char *out) {
     }
     switch (*opn) {
 #ifdef DEBUG_EXPORT_SYMBOLS
-    /* op tgt26 */        case 'j': sprintf(out, "%-9s %08x <%s>", opn+1, tgt26, parse_map(tgt26, FALSE)); break;
-    /* op rs, rt, tgt16 */case 'b': sprintf(out, "%-9s %s, %s, %08x <%s>", opn+1, rs, rt, tgt16, parse_map(tgt16, TRUE)); break;
-    /* op tgt16 */        case 'y': sprintf(out, "%-9s %08x <%s>", opn+1, tgt16, parse_map(tgt16, TRUE)); break;
+    /* op tgt26 */        case 'j': sprintf(out, "%-9s %08x <%s>", opn+1, tgt26, parse_map(funcname_buf, sizeof(funcname_buf), tgt26, FALSE)); break;
+    /* op rs, rt, tgt16 */case 'b': sprintf(out, "%-9s %s, %s, %08x <%s>", opn+1, rs, rt, tgt16, parse_map(funcname_buf, sizeof(funcname_buf), tgt16, TRUE)); break;
+    /* op tgt16 */        case 'y': sprintf(out, "%-9s %08x <%s>", opn+1, tgt16, parse_map(funcname_buf, sizeof(funcname_buf), tgt16, TRUE)); break;
 #else
     /* op tgt26 */        case 'j': sprintf(out, "%-9s %08x", opn+1, tgt26); break;
     /* op rs, rt, tgt16 */case 'b': sprintf(out, "%-9s %s, %s, %08x", opn+1, rs, rt, tgt16); break;
@@ -265,6 +266,7 @@ char *insn_disasm(InsnData *addr) {
     char *strp = &insn_as_string[0];
     int successful_print = 0;
     u32 target;
+    char funcname_buf[64];
 
     if (insn.d == 0) { // trivial case
         return "nop";
@@ -301,7 +303,7 @@ char *insn_disasm(InsnData *addr) {
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
 #ifdef DEBUG_EXPORT_SYMBOLS
                     char symBuffer[CRASH_SCREEN_MAX_PATH];
-                    sprintf(symBuffer, "%s(%08X)", parse_map(target, FALSE), target);
+                    sprintf(symBuffer, "%s(%08X)", parse_map(funcname_buf, sizeof(funcname_buf), target, FALSE), target);
                     strp += sprintf(strp, "%-9s %s", insn_db[i].name, crash_screen_ellide_string(symBuffer, 30));
 #else
                     strp += sprintf(strp, "%-9s %08X", insn_db[i].name,

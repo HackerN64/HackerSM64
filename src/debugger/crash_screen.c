@@ -444,6 +444,8 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 }
 
 void draw_crash_context(OSThread *thread, s32 cause) {
+    char symbolname_scratch[64];
+
     __OSThreadContext *tc = &thread->context;
     crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -452,7 +454,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_println("PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
 #ifdef DEBUG_EXPORT_SYMBOLS
-    char *fname = parse_map(tc->pc, TRUE);
+    char *fname = parse_map(symbolname_scratch, sizeof(symbolname_scratch), tc->pc, TRUE);
     crash_screen_println("Crash at: %s", fname == NULL ? "Unknown" : fname);
 #endif // DEBUG_EXPORT_SYMBOLS
     crash_screen_println("AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
@@ -466,7 +468,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_println("T9:%08XH   GP:%08XH   SP:%08XH", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
     crash_screen_println("S8:%08XH   RA:%08XH",            (u32) tc->s8, (u32) tc->ra);
 #ifdef DEBUG_EXPORT_SYMBOLS
-    fname = parse_map(tc->ra, TRUE);
+    fname = parse_map(symbolname_scratch, sizeof(symbolname_scratch), tc->ra, TRUE);
     crash_screen_println("RA at: %s", fname == NULL ? "Unknown" : fname);
 #endif // DEBUG_EXPORT_SYMBOLS
 
@@ -506,6 +508,7 @@ void draw_crash_log(void) {
 #endif
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
+    char symbolname_scratch[64];
     __OSThreadContext *tc = &thread->context;
 
     crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -513,7 +516,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
     // Current Func (EPC)
-    crash_screen_println("%08X (%s)", tc->pc, parse_map(tc->pc, TRUE));
+    crash_screen_println("%08X (%s)", tc->pc, parse_map(symbolname_scratch, sizeof(symbolname_scratch), tc->pc, TRUE));
 
     // Previous Func (RA)
     u32 ra = tc->ra;
