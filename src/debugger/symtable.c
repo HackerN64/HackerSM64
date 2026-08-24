@@ -136,6 +136,8 @@ addrtable_entry_t symt_addrtab_search(symtable_header_t *symt, u32 addr, int *id
 char *symt_string(symtable_header_t *symt, int sidx, int slen, char *buf, int size) {
     // Align 2-byte phase of the RAM buffer with the ROM address. This is required
     // for map_parser_dma.
+    size -= 1;
+
     int tweak = (sidx ^ (u32)buf) & 1;
     char *func = buf + tweak; size -= tweak;
     int nbytes = MIN(slen, size);
