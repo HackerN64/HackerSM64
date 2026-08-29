@@ -6,7 +6,7 @@
 #include "rumble_init.h"
 #include "config.h"
 
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
 
 OSThread gRumblePakThread;
 
