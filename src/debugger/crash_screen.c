@@ -258,9 +258,7 @@ int crash_screen_print_with_newlines(s32 x, s32 y, const s32 xNewline, const cha
                 numNewlines += 1;
                 continue;
             } else if (*ptr == '\t') {
-                osSyncPrintf("TAB %d ->", xOffset);
                 xOffset += CRASH_SCREEN_GLYPH_WIDTH * (CRASH_SCREEN_TAB_WIDTH_CHARS - 1);
-                osSyncPrintf("%d\n", xOffset);
 
                 ptr++;
                 continue;
@@ -430,12 +428,14 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         crash_screen_println("Stack Trace: ");
         reset_text_color();
 
+        #define CRASH_SCREEN_FUNCTION_PRINT_LENGTH (20)
+
         // print current func
-        crash_screen_println("%08X: %s", tc->pc, info.func);
+        crash_screen_println("%08X: %s", tc->pc, crash_screen_ellide_string(info.func, CRASH_SCREEN_FUNCTION_PRINT_LENGTH));
         // print last func
         u32 ret_addr = tc->ra;
         symtable_info_t ra_info = get_symbol_info(ret_addr);
-        crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func, ra_info.line);
+        crash_screen_println("%08X: %s:%d", ret_addr, crash_screen_ellide_string(info.func, CRASH_SCREEN_FUNCTION_PRINT_LENGTH), ra_info.line);
         // print up to 3 more
         for (u32 i = 0; i < MIN(3, sCrashScreenStackTraceCount); i++) {
             crash_screen_println(get_stack_entry(i));
