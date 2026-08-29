@@ -2,6 +2,7 @@
   "version": 1.0,
   "autoLoad": true,
   "microcode": "F3DEX2/LX2",
+  "textureNameIncludesCiFormat": true,
   "rdpDefaults": {
     "geometryMode": {
       "zBuffer": true,

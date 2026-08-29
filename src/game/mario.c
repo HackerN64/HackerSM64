@@ -1797,6 +1797,14 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
         queue_rumble_particles(gMarioState);
 #endif
 
+        u32 actGroup = gMarioState->action & ACT_GROUP_MASK;
+        if ((actGroup == ACT_GROUP_STATIONARY || actGroup == ACT_GROUP_MOVING) && 
+            gMarioState->floor != NULL && 
+            !SURFACE_IS_UNSAFE(gMarioState->floor->type) &&
+            !mario_floor_is_slippery(gMarioState)) {
+            vec3f_copy(gMarioState->lastSafePos, gMarioState->pos);
+        }
+
         return gMarioState->particleFlags;
     }
 

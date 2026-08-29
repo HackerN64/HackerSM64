@@ -315,11 +315,6 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
 
     vec3f_set(m->pos, nextPos[0], floorHeight, nextPos[2]);
 
-    // H64 TODO: Add config opt & check if floor is slippery
-    if (!SURFACE_IS_UNSAFE(floor->type)) {
-        vec3f_copy(m->lastSafePos, m->pos);
-    }
-
     set_mario_floor(m, floor, floorHeight);
 
     if (m->wall != NULL) {
