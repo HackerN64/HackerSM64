@@ -20,5 +20,6 @@
 - **anonymous_moose**: porting falco's extended bounds to decomp
 - **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
 - **devwizard**: the PJ64 pre-v3.0 detection part of the emulator detector
+- **Lucretia**: Cylindrical billboarding, debug fly improvements, build system improvements, bug fixes
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
