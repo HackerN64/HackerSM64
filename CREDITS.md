@@ -1,3 +1,5 @@
+# Credits
+
 - **ArcticJaguar725**: Most audio configuration and layout changes, colored ia4 text, floombas, various bugfixes, and more
 - **CowQuack**: Adjustable skybox sizes, area-specific skybox function
 - **thecozies**: Water surface types, general maintenance, and time

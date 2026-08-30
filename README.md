@@ -1,6 +1,6 @@
 # ![](https://i.imgur.com/CeOukzk.gif) HackerSM64 ![](https://i.imgur.com/s0LUbTo.gif)
 
-HackerSM64 is a commonly used base repository for Super Mario 64 rom hacking projects. It includes many useful features for rom hackers, improvements that are commonly applied in rom hacks, software optimizations, and bug fixes for some gameplay annoyances.
+HackerSM64 is a commonly used base repository for Super Mario 64 ROM hacking projects. It includes many useful features for ROM hackers, improvements that are commonly applied in ROM hacks, software optimizations, and bug fixes for some gameplay annoyances.
 
 # Setup Guide
 
@@ -50,7 +50,7 @@ Many of these tweaks and features may be toggled by editing the files in the `in
 # FAQ
 
 ### Should I use HackerSM64 or UltraSM64 for my ROM hack?
-HackerSM64 is best suited for ROM hacks with custom levels and content. If you want to make a rom hack that is TAS-accurate to the vanilla game and its levels, [UltraSM64](https://github.com/CrashOveride95/ultrasm64) may be a better choice for your project.
+HackerSM64 is best suited for ROM hacks with custom levels and content. If you want to make a ROM hack that is TAS-accurate to the vanilla game and its levels, [UltraSM64](https://github.com/CrashOveride95/ultrasm64) may be a better choice for your project.
 
 ### How do I make my own levels?
 You can use Blender with the [Fast64 plugin](https://github.com/Fast-64/fast64) to create and export levels as 3D models. 
@@ -62,4 +62,4 @@ If you have any questions about HackerSM64, want to discuss its development, or 
 
 # Credits
 
-HackerSM64 is a community effort, and many people have contributed to its features. A list of major contributors can be found in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+HackerSM64 is a community effort, and many people have contributed to its features. A list of major contributors can be found in [CREDITS.md](CREDITS.md).
