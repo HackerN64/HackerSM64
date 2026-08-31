@@ -1469,7 +1469,7 @@ void update_mario_health(struct MarioState *m) {
         // Play a noise to alert the player when Mario is close to drowning.
         if (((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) && (m->health < 0x300)) {
             play_sound(SOUND_MOVING_ALMOST_DROWNING, gGlobalSoundSource);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
             if (gRumblePakTimer == 0) {
                 gRumblePakTimer = 36;
                 if (is_rumble_finished_and_queue_empty()) {
@@ -1492,7 +1492,7 @@ void update_mario_breath(struct MarioState *m) {
             if (m->breath < 0x300) {
                 // Play a noise to alert the player when Mario is close to drowning.
                 play_sound(SOUND_MOVING_ALMOST_DROWNING, gGlobalSoundSource);
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
                 if (gRumblePakTimer == 0) {
                     gRumblePakTimer = 36;
                     if (is_rumble_finished_and_queue_empty()) {
@@ -1685,8 +1685,8 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
     }
 }
 
-#if ENABLE_RUMBLE
-void queue_rumble_particles(struct MarioState *m) {
+#ifdef ENABLE_RUMBLE
+static void queue_rumble_particles(struct MarioState *m) {
     if (m->particleFlags & PARTICLE_HORIZONTAL_STAR) {
         queue_rumble_data(5, 80);
     } else if (m->particleFlags & PARTICLE_VERTICAL_STAR) {
@@ -1698,6 +1698,8 @@ void queue_rumble_particles(struct MarioState *m) {
         reset_rumble_timers_slip();
     }
 }
+#else
+#define queue_rumble_particles(m)
 #endif
 
 /**
@@ -1793,9 +1795,7 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
 
         play_infinite_stairs_music();
         gMarioState->marioObj->oInteractStatus = INT_STATUS_NONE;
-#if ENABLE_RUMBLE
         queue_rumble_particles(gMarioState);
-#endif
 
         u32 actGroup = gMarioState->action & ACT_GROUP_MASK;
         if ((actGroup == ACT_GROUP_STATIONARY || actGroup == ACT_GROUP_MOVING) && 

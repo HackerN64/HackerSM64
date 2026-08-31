@@ -1239,9 +1239,7 @@ s32 act_riding_shell_ground(struct MarioState *m) {
     }
 
     adjust_sound_for_speed(m);
-#if ENABLE_RUMBLE
     reset_rumble_timers_slip();
-#endif
     return FALSE;
 }
 
@@ -1343,9 +1341,7 @@ s32 act_burning_ground(struct MarioState *m) {
     }
 
     m->marioBodyState->eyeState = MARIO_EYES_DEAD;
-#if ENABLE_RUMBLE
     reset_rumble_timers_slip();
-#endif
     return FALSE;
 }
 
@@ -1359,9 +1355,7 @@ void tilt_body_butt_slide(struct MarioState *m) {
 void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32 animation) {
     play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
 
-#if ENABLE_RUMBLE
     reset_rumble_timers_slip();
-#endif
 
     adjust_sound_for_speed(m);
 
@@ -1491,9 +1485,7 @@ s32 act_crouch_slide(struct MarioState *m) {
 
 s32 act_slide_kick_slide(struct MarioState *m) {
     if (m->input & INPUT_A_PRESSED) {
-#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
-#endif
         return set_jumping_action(m, ACT_FORWARD_ROLLOUT, 0);
     }
 
@@ -1523,9 +1515,7 @@ s32 act_slide_kick_slide(struct MarioState *m) {
 s32 stomach_slide_action(struct MarioState *m, u32 stopAction, u32 airAction, s32 animation) {
     if (m->actionTimer == 5) {
         if (!(m->input & INPUT_ABOVE_SLIDE) && (m->input & (INPUT_A_PRESSED | INPUT_B_PRESSED))) {
-#if ENABLE_RUMBLE
             queue_rumble_data(5, 80);
-#endif
             return drop_and_set_mario_action(
                 m, m->forwardVel >= 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
         }
@@ -1555,9 +1545,7 @@ s32 act_hold_stomach_slide(struct MarioState *m) {
 
 s32 act_dive_slide(struct MarioState *m) {
     if (!(m->input & INPUT_ABOVE_SLIDE) && (m->input & (INPUT_A_PRESSED | INPUT_B_PRESSED))) {
-#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
-#endif
         return set_mario_action(m, m->forwardVel > 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT,
                                 0);
     }
