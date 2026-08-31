@@ -70,7 +70,7 @@ static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
 
                 if (
 #ifndef MUTE_MUSIC_PLAYERS
-                    (gMuteMusicPlayers == FALSE) ||
+                    !gMuteMusicPlayers ||
 #endif
                     seqChannel->seqPlayer == &gSequencePlayers[SEQ_PLAYER_SFX]
                 ) {
