@@ -48,10 +48,12 @@ char *parse_map(char *buf, u32 size, u32 addr, u32 andOffset) {
     __symbolize((u32*)addr, buf, size, andOffset);
 
     if (buf[0] == ' ') {
-        return buf + 1;
-    } else {
-        return buf;
+        char swap[size];
+
+        memcpy(swap, buf, size);
+        memcpy(buf, swap + 1, size - 1);
     }
+    return buf;
 }
 
 u32 get_start_of_func(u32 addr) {
