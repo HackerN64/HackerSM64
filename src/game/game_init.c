@@ -34,9 +34,6 @@
 #include "debug.h"
 #include "emutest.h"
 
-// Emulators that the Instant Input patch should be applied to
-#define INSTANT_INPUT_WHITELIST (EMU_PARALLEL_LAUNCHER | EMU_PROJECT64 | EMU_MUPEN)
-
 // Gfx handlers
 struct SPTask *gGfxSPTask;
 Gfx *gDisplayListHead;

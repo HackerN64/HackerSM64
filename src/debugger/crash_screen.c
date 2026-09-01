@@ -39,6 +39,7 @@ static char *crashPageNames[] = {
 #endif
     [CRASH_SCREEN_PAGE_DISASM] = "(Disassembly)",
     [CRASH_SCREEN_PAGE_ASSERTS] = "(Assert)",
+    [CRASH_SCREEN_PAGE_LAST_FRAME] = "(Last Frame)"
 };
 
 static u8 sCrashScreenCharToGlyph[128] = {
@@ -58,6 +59,9 @@ static u32 sCrashScreenFont[CRASH_SCREEN_GLYPH_HEIGHT * CRASH_SCREEN_FONT_ROWS *
 
 static u8 crashPage = CRASH_SCREEN_PAGE_SIMPLE;
 static u8 updateBuffer = TRUE;
+
+static u8 most_recent_framebuffer = 0;
+static u8 any_stale_framebuffer = 0;
 
 static char crashScreenBuf[0x200];
 
@@ -171,7 +175,7 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
              */
 
             // 0xe738 = 0b1110011100111000
-            *ptr = ((*ptr & 0xe738) >> 2) | 1;
+            *ptr = 0x0001;
             ptr++;
         }
         ptr += gCrashScreen.width - w;
@@ -741,6 +745,14 @@ void draw_crash_screen(OSThread *thread) {
         if (crashPage == CRASH_SCREEN_PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
     }
     if (updateBuffer) {
+        if (crashPage == CRASH_SCREEN_PAGE_LAST_FRAME) {
+            memcpy(
+                gCrashScreen.framebuffer,
+                gFramebuffers[most_recent_framebuffer],
+                sizeof(gFramebuffers[most_recent_framebuffer])
+            );
+        }
+
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
         crash_screen_set_print_top(CRASH_SCREEN_TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
@@ -753,6 +765,7 @@ void draw_crash_screen(OSThread *thread) {
 #endif
             case CRASH_SCREEN_PAGE_DISASM:     draw_disasm(thread); break;
             case CRASH_SCREEN_PAGE_ASSERTS:    draw_assert(thread); break;
+            default: break;
         }
 
         osWritebackDCacheAll();
@@ -785,7 +798,7 @@ void thread2_crash_screen(UNUSED void *arg) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
             thread = get_crashed_thread();
-            gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
+            gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[any_stale_framebuffer];
             if (thread) {
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
@@ -819,7 +832,15 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
+    if (gEmulator & INSTANT_INPUT_WHITELIST) {
+        most_recent_framebuffer = 0;
+        any_stale_framebuffer = 1;
+    } else {
+        most_recent_framebuffer = sRenderedFramebuffer;
+        any_stale_framebuffer = sRenderingFramebuffer;
+    }
+
+    gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[any_stale_framebuffer];
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
