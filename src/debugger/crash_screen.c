@@ -39,7 +39,6 @@ static char *crashPageNames[] = {
 #endif
     [CRASH_SCREEN_PAGE_DISASM] = "(Disassembly)",
     [CRASH_SCREEN_PAGE_ASSERTS] = "(Assert)",
-    [CRASH_SCREEN_PAGE_LAST_FRAME] = "(Last Frame)"
 };
 
 static u8 sCrashScreenCharToGlyph[128] = {
@@ -61,7 +60,8 @@ static u8 crashPage = CRASH_SCREEN_PAGE_SIMPLE;
 static u8 updateBuffer = TRUE;
 
 static u8 most_recent_framebuffer = 0;
-static u8 any_stale_framebuffer = 0;
+static u8 stale_framebuffers[2] = {0, 0};
+static u8 crash_screen_cfb_index = 0;
 
 static char crashScreenBuf[0x200];
 
@@ -134,6 +134,12 @@ char *crash_screen_ellide_string(char *str, u32 truncateLength) {
     str[string_length - truncateLength - 1] = '.';
     str[string_length - truncateLength - 0] = ')';
     return &str[string_length - truncateLength - 4];
+}
+
+static void crash_screen_update_framebuffer_indices(void) {
+    most_recent_framebuffer = sRenderedFramebuffer;
+    stale_framebuffers[0] = (sRenderedFramebuffer + 1) % 3;
+    stale_framebuffers[1] = (sRenderedFramebuffer + 2) % 3;
 }
 
 static void set_text_color(u32 r, u32 g, u32 b) {
@@ -384,8 +390,6 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 void draw_crash_overview(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
-
     set_text_color(0xFF, 0, 0);
     crash_screen_println("Game crashed!");
     reset_text_color();
@@ -454,7 +458,6 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 #endif // DEBUG_EXPORT_SYMBOLS
 
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     crash_screen_println("Thread:%d (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_set_println_height(10);
@@ -506,7 +509,6 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
-    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     osWritebackDCacheAll();
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
         crash_screen_println(consoleLogTable[LOG_BUFFER_SIZE - i]);
@@ -521,7 +523,6 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_println("Stack Trace from %08X:", (u32) tc->sp);
 
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
@@ -553,7 +554,6 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
     }
@@ -612,7 +612,6 @@ void draw_disasm(OSThread *thread) {
 
 void draw_assert(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_draw_rect(0, CRASH_SCREEN_RECT_BOUNDARY_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
     crash_screen_set_print_top(35);
 
     set_text_color(0xFF, 0, 0);
@@ -751,7 +750,6 @@ void draw_crash_screen(OSThread *thread) {
             sizeof(gFramebuffers[most_recent_framebuffer])
         );
 
-        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
         crash_screen_set_print_top(CRASH_SCREEN_TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
@@ -769,6 +767,8 @@ void draw_crash_screen(OSThread *thread) {
         osWritebackDCacheAll();
         osViBlack(FALSE);
         osViSwapBuffer(gCrashScreen.framebuffer);
+        crash_screen_cfb_index ^= 1;
+        gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
         updateBuffer = FALSE;
     }
 }
@@ -796,7 +796,9 @@ void thread2_crash_screen(UNUSED void *arg) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
             thread = get_crashed_thread();
-            gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[any_stale_framebuffer];
+
+            crash_screen_update_framebuffer_indices();
+
             if (thread) {
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
@@ -806,6 +808,13 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
+
+                // Draw a dark overlay on the last rendered frame, so we don't have to draw rectangles again
+                gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[most_recent_framebuffer];
+                crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+                gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
+
 #if defined(DEBUG_EXPORT_SYMBOLS) && defined(DEBUG_FULL_STACK_TRACE)
                 if (stackTraceGenerated == FALSE) {
                     sCrashScreenStackTraceCount = generate_stack(thread);
@@ -830,10 +839,8 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    most_recent_framebuffer = sRenderedFramebuffer;
-    any_stale_framebuffer = (sRenderedFramebuffer + 1) % 3;
-
-    gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[any_stale_framebuffer];
+    crash_screen_update_framebuffer_indices();
+    gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
