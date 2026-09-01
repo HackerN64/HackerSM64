@@ -749,6 +749,7 @@ void draw_crash_screen(OSThread *thread) {
             gFramebuffers[most_recent_framebuffer],
             sizeof(gFramebuffers[most_recent_framebuffer])
         );
+        osWritebackDCacheAll();
 
         crash_screen_set_print_top(CRASH_SCREEN_TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
@@ -797,9 +798,8 @@ void thread2_crash_screen(UNUSED void *arg) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
             thread = get_crashed_thread();
 
-            crash_screen_update_framebuffer_indices();
-
             if (thread) {
+                crash_screen_update_framebuffer_indices();
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
                 stop_background_music(sBackgroundMusicQueue[0].seqId);
