@@ -167,6 +167,20 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
+            *ptr = 0x0001;
+            ptr++;
+        }
+        ptr += gCrashScreen.width - w;
+    }
+}
+
+void crash_screen_draw_rect_transparent(s32 x, s32 y, s32 w, s32 h) {
+    u16 *ptr;
+    s32 i, j;
+
+    ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
+    for (i = 0; i < h; i++) {
+        for (j = 0; j < w; j++) {
             /**
              * Instead of setting the framebuffer pixels fully dark,
              * SM64 "darkens" the RGBA5551 pixel. This is done by
@@ -175,7 +189,7 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
              */
 
             // 0xe738 = 0b1110011100111000
-            *ptr = 0x0001;
+            *ptr = ((*ptr & 0xe738) >> 2) | 1;
             ptr++;
         }
         ptr += gCrashScreen.width - w;
@@ -753,7 +767,11 @@ void draw_crash_screen(OSThread *thread) {
             );
         }
 
-        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
+        if (crashPage == CRASH_SCREEN_PAGE_LAST_FRAME) {
+            crash_screen_draw_rect_transparent(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
+        } else {
+            crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
+        }
         crash_screen_set_print_top(CRASH_SCREEN_TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
