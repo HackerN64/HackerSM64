@@ -167,20 +167,6 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
-            *ptr = 0x0001;
-            ptr++;
-        }
-        ptr += gCrashScreen.width - w;
-    }
-}
-
-void crash_screen_draw_rect_transparent(s32 x, s32 y, s32 w, s32 h) {
-    u16 *ptr;
-    s32 i, j;
-
-    ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
-    for (i = 0; i < h; i++) {
-        for (j = 0; j < w; j++) {
             /**
              * Instead of setting the framebuffer pixels fully dark,
              * SM64 "darkens" the RGBA5551 pixel. This is done by
@@ -759,19 +745,13 @@ void draw_crash_screen(OSThread *thread) {
         if (crashPage == CRASH_SCREEN_PAGE_ASSERTS && tc->cause != EXC_SYSCALL) crashPage--;
     }
     if (updateBuffer) {
-        if (crashPage == CRASH_SCREEN_PAGE_LAST_FRAME) {
-            memcpy(
-                gCrashScreen.framebuffer,
-                gFramebuffers[most_recent_framebuffer],
-                sizeof(gFramebuffers[most_recent_framebuffer])
-            );
-        }
+        memcpy(
+            gCrashScreen.framebuffer,
+            gFramebuffers[most_recent_framebuffer],
+            sizeof(gFramebuffers[most_recent_framebuffer])
+        );
 
-        if (crashPage == CRASH_SCREEN_PAGE_LAST_FRAME) {
-            crash_screen_draw_rect_transparent(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
-        } else {
-            crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
-        }
+        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, CRASH_SCREEN_RECT_BOUNDARY_Y);
         crash_screen_set_print_top(CRASH_SCREEN_TOP_MARGIN);
         crash_screen_println("Page:%02d %-19s L/Z: Left   R: Right", crashPage, crashPageNames[crashPage]);
         switch (crashPage) {
@@ -850,13 +830,8 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    if (gEmulator & INSTANT_INPUT_WHITELIST) {
-        most_recent_framebuffer = 0;
-        any_stale_framebuffer = 1;
-    } else {
-        most_recent_framebuffer = sRenderedFramebuffer;
-        any_stale_framebuffer = sRenderingFramebuffer;
-    }
+    most_recent_framebuffer = sRenderedFramebuffer;
+    any_stale_framebuffer = (sRenderedFramebuffer + 1) % 3;
 
     gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[any_stale_framebuffer];
     gCrashScreen.width = SCREEN_WIDTH;
