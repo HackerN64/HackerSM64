@@ -433,7 +433,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
         // print last func
         u32 ret_addr = tc->ra;
         symtable_info_t ra_info = get_symbol_info(ret_addr);
-        crash_screen_println("%08X: %s:%d", ret_addr, info.func, ra_info.line);
+        crash_screen_println("%08X: %s:%d", ret_addr, ra_info.func, ra_info.line);
         // print up to 3 more
         for (u32 i = 0; i < MIN(3, sCrashScreenStackTraceCount); i++) {
             crash_screen_println(get_stack_entry(i));
@@ -526,9 +526,9 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
     // Previous Func (RA)
     u32 ra = tc->ra;
-    symtable_info_t info = get_symbol_info(ra);
+    symtable_info_t ra_info = get_symbol_info(ra);
 
-    crash_screen_println("%08X (%s:%d)", ra, info.func, info.line);
+    crash_screen_println("%08X (%s:%d)", ra, ra_info.func, ra_info.line);
 
     osWritebackDCacheAll();
 
