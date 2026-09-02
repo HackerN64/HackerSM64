@@ -2,8 +2,6 @@
 #include <macros.h>
 #include <string.h>
 
-#include "segment_symbols.h"
-
 #include "config/config_debug.h"
 
 #include "map_parser.h"
