@@ -43,7 +43,7 @@ void try_print_debug_mario_level_info(void);
 extern char *__n64Assert_Filename;
 extern u32   __n64Assert_LineNum;
 extern char *__n64Assert_Message;
-extern void __n64Assert(char *fileName, u32 lineNum, char *message);
+extern void __n64Assert(char *fileName, u32 lineNum, char *message) __attribute__((noreturn));
 
 /**
  * Will always cause a crash with your message of choice

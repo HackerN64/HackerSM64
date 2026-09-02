@@ -122,6 +122,7 @@ void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
     gDPPipeSync(tempGfxHead++);
     gDPSetTextureImage(tempGfxHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
     gSPDisplayList(tempGfxHead++, &dl_hud_img_load_tex_block);
+    gDPLoadBlock(tempGfxHead++, G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES));
     gSPTextureRectangle(tempGfxHead++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2,
                         G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
 

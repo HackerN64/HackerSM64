@@ -4,6 +4,7 @@
 
 #include "buffers/buffers.h"
 #include "slidec.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/main.h"
 #include "game/memory.h"
@@ -21,17 +22,24 @@
 #endif
 #include "game/puppyprint.h"
 
+#define DOWN(s, align) (((u32)(s)) & ~((align)-1))
+#define DOWN4(s) DOWN(s, 4)
 
 struct MainPoolState {
-    u32 freeSpace;
-    struct MainPoolBlock *listHeadL;
-    struct MainPoolBlock *listHeadR;
-    struct MainPoolState *prev;
+    struct MainPoolContext ctx;
+    struct MainPoolState* prev;
 };
 
-struct MainPoolBlock {
-    struct MainPoolBlock *prev;
-    struct MainPoolBlock *next;
+// Multichar constants AL and AR
+#define MAIN_POOL_FREEABLE_HEADER_MAGIC_LEFT 0x414c
+#define MAIN_POOL_FREEABLE_HEADER_MAGIC_RIGHT 0x4152
+
+struct MainPoolFreeableHeader {
+    u16 magic;
+    u16 id;
+    // either a pointer to 'start' or 'end'
+    u8* ptr;
+    u8 data[0];
 };
 
 struct MemoryBlock {
@@ -46,12 +54,6 @@ struct MemoryPool {
 };
 
 extern uintptr_t sSegmentTable[32];
-extern u32 sPoolFreeSpace;
-extern u8 *sPoolStart;
-extern u8 *sPoolEnd;
-extern struct MainPoolBlock *sPoolListHeadL;
-extern struct MainPoolBlock *sPoolListHeadR;
-
 
 /**
  * Memory pool for small graphical effects that aren't connected to Objects.
@@ -61,13 +63,7 @@ struct MemoryPool *gEffectsMemoryPool;
 
 
 uintptr_t sSegmentTable[32];
-u32 sPoolFreeSpace;
-u8 *sPoolStart;
-u8 *sPoolEnd;
-struct MainPoolBlock *sPoolListHeadL;
-struct MainPoolBlock *sPoolListHeadR;
-
-
+struct MainPoolContext gMainPool;
 static struct MainPoolState *gMainPoolState = NULL;
 
 uintptr_t set_segment_base_addr(s32 segment, void *addr) {
@@ -115,101 +111,102 @@ void move_segment_table_to_dmem(void) {
 }
 #endif
 
-/**
- * Initialize the main memory pool. This pool is conceptually a pair of stacks
- * that grow inward from the left and right. It therefore only supports
- * freeing the object that was most recently allocated from a side.
- */
-void main_pool_init(void *start, void *end) {
-    sPoolStart = (u8 *) ALIGN16((uintptr_t) start) + 16;
-    sPoolEnd = (u8 *) ALIGN16((uintptr_t) end - 15) - 16;
-    sPoolFreeSpace = sPoolEnd - sPoolStart;
+extern u8 __mainPoolStart[];
 
-    sPoolListHeadL = (struct MainPoolBlock *) (sPoolStart - 16);
-    sPoolListHeadR = (struct MainPoolBlock *) sPoolEnd;
-    sPoolListHeadL->prev = NULL;
-    sPoolListHeadL->next = NULL;
-    sPoolListHeadR->prev = NULL;
-    sPoolListHeadR->next = NULL;
-#ifdef PUPPYPRINT_DEBUG
-    mempool = sPoolFreeSpace;
-#endif
+static void main_pool_region_init(struct MainPoolRegion* region, u8* start, u8* end) {
+    region->start = (u8 *) ALIGN4((uintptr_t)(start));
+    region->end = (u8 *) DOWN4((uintptr_t)(end));
 }
 
 /**
- * Allocate a block of memory from the pool of given size, and from the
- * specified side of the pool (MEMORY_POOL_LEFT or MEMORY_POOL_RIGHT).
- * If there is not enough space, return NULL.
+ * Initialize the main memory pool. This pool is conceptually regions
+ * that grow inward from the left and right. It therefore only supports
+ * freeing the object that was most recently allocated from a side.
  */
-void *main_pool_alloc(u32 size, u32 side) {
-    struct MainPoolBlock *newListHead;
-    void *addr = NULL;
+void main_pool_init() {
+    main_pool_region_init(&gMainPool.regions[MAIN_POOL_REGION_MAIN], __mainPoolStart, (void*) RAM_END);
+}
 
-    size = ALIGN16(size) + 16;
-    if (size != 0 && sPoolFreeSpace >= size) {
-        sPoolFreeSpace -= size;
-        if (side == MEMORY_POOL_LEFT) {
-            newListHead = (struct MainPoolBlock *) ((u8 *) sPoolListHeadL + size);
-            sPoolListHeadL->next = newListHead;
-            newListHead->prev = sPoolListHeadL;
-            newListHead->next = NULL;
-            addr = (u8 *) sPoolListHeadL + 16;
-            sPoolListHeadL = newListHead;
-        } else {
-            newListHead = (struct MainPoolBlock *) ((u8 *) sPoolListHeadR - size);
-            sPoolListHeadR->prev = newListHead;
-            newListHead->next = sPoolListHeadR;
-            newListHead->prev = NULL;
-            sPoolListHeadR = newListHead;
-            addr = (u8 *) sPoolListHeadR + 16;
-        }
+// This function behaves similar to main_pool_region_alloc_from_start but it is used for freeable memory allocated from the end.
+#define main_pool_region_alloc_from_end_freeable(region, size, alignment, try) _main_pool_region_alloc_from_end_freeable(region, size, alignment, try, __LINE__, __FILE__)
+static ALWAYS_INLINE void* _main_pool_region_alloc_from_end_freeable(int region_idx, u32 size, s32 alignment, int try, int line, const char* file) {
+    struct MainPoolRegion* region = &gMainPool.regions[region_idx];
+    u8* region_end = region->end;
+    u8* new_end;
+    if (alignment > 0)
+        new_end = (u8*) DOWN(region_end - size, alignment) - sizeof(struct MainPoolFreeableHeader);
+    else
+        new_end = region_end - size - sizeof(struct MainPoolFreeableHeader);
+
+    if (try) {
+        if (new_end < region->start)
+            return NULL;
+    } else {
+#ifdef DEBUG_MEMORY_ALLOC
+        if (new_end < region->start)
+            main_pool_alloc_failed(region_idx, size, TRUE, line, file);
+#else
+        (void) line; (void) file;
+#endif
     }
-    return addr;
+
+    struct MainPoolFreeableHeader* header = (struct MainPoolFreeableHeader*) new_end;
+    header->magic = MAIN_POOL_FREEABLE_HEADER_MAGIC_RIGHT;
+    header->id = region_idx;
+    header->ptr = region_end;
+
+    region->end = new_end;
+
+    return header->data;
+}
+
+void main_pool_alloc_failed(int region_idx, u32 size, int freeable, int line, const char* file)
+{
+    struct MainPoolRegion* region = &gMainPool.regions[region_idx];
+    char errmsg[70];
+    // TODO: replace with gAssertionStr when 2.4 is merged
+    sprintf(errmsg, "%salloc failed for %d bytes in region %d\n%x-%x", freeable ? "freeable " : "", size, region_idx, region->start, region->end);
+    __n64Assert((char*) file, line, errmsg);
+}
+
+void *main_pool_alloc_ex(int region, u32 size, u32 alignment) {
+    if (region)
+    {
+        // Try to allocate from the given region and fallback to main, if failed
+        void* buf = main_pool_region_alloc_from_start(region, size, alignment, MAIN_POOL_ALLOC_TRY);
+        if (buf)
+            return buf;
+
+        return main_pool_region_alloc_from_start(MAIN_POOL_REGION_MAIN, size, alignment, MAIN_POOL_ALLOC_FORCE);
+    }
+    else
+    {
+        return main_pool_region_alloc_from_start(MAIN_POOL_REGION_MAIN, size, alignment, MAIN_POOL_ALLOC_FORCE);
+    }
+}
+
+void *main_pool_alloc_freeable(u32 size) {
+    return main_pool_region_alloc_from_end_freeable(0, size, MAIN_POOL_ALIGNMENT_DISABLE, MAIN_POOL_ALLOC_FORCE);
+}
+
+void *main_pool_alloc_aligned_freeable(u32 size, u32 alignment) {
+    if (!alignment)
+        alignment = 16;
+
+    size = ALIGN4(size);
+    return main_pool_region_alloc_from_end_freeable(MAIN_POOL_REGION_MAIN, size, MAIN_POOL_ALIGNMENT_DISABLE, MAIN_POOL_ALLOC_FORCE);
 }
 
 /**
  * Free a block of memory that was allocated from the pool. The block must be
  * the most recently allocated block from its end of the pool, otherwise all
  * newer blocks are freed as well.
- * Return the amount of free space left in the pool.
  */
-u32 main_pool_free(void *addr) {
-    struct MainPoolBlock *block = (struct MainPoolBlock *) ((u8 *) addr - 16);
-    struct MainPoolBlock *oldListHead = (struct MainPoolBlock *) ((u8 *) addr - 16);
-
-    if (oldListHead < sPoolListHeadL) {
-        while (oldListHead->next != NULL) {
-            oldListHead = oldListHead->next;
-        }
-        sPoolListHeadL = block;
-        sPoolListHeadL->next = NULL;
-        sPoolFreeSpace += (uintptr_t) oldListHead - (uintptr_t) sPoolListHeadL;
-    } else {
-        while (oldListHead->prev != NULL) {
-            oldListHead = oldListHead->prev;
-        }
-        sPoolListHeadR = block->next;
-        sPoolListHeadR->prev = NULL;
-        sPoolFreeSpace += (uintptr_t) sPoolListHeadR - (uintptr_t) oldListHead;
-    }
-    return sPoolFreeSpace;
-}
-
-/**
- * Resize a block of memory that was allocated from the left side of the pool.
- * If the block is increasing in size, it must be the most recently allocated
- * block from the left side.
- * The block does not move.
- */
-void *main_pool_realloc(void *addr, u32 size) {
-    void *newAddr = NULL;
-    struct MainPoolBlock *block = (struct MainPoolBlock *) ((u8 *) addr - 16);
-
-    if (block->next == sPoolListHeadL) {
-        main_pool_free(addr);
-        newAddr = main_pool_alloc(size, MEMORY_POOL_LEFT);
-    }
-    return newAddr;
+void main_pool_free(void *addr) {
+    const struct MainPoolFreeableHeader* header = (struct MainPoolFreeableHeader*) ((u8*) addr - sizeof(struct MainPoolFreeableHeader));
+    aggress(header->magic == MAIN_POOL_FREEABLE_HEADER_MAGIC_RIGHT, "Incorrect magic for free");
+    struct MainPoolRegion* region = &gMainPool.regions[header->id];
+    region->end = header->ptr;
 }
 
 /**
@@ -217,37 +214,35 @@ void *main_pool_realloc(void *addr, u32 size) {
  * pool.
  */
 u32 main_pool_available(void) {
-    return sPoolFreeSpace - 16;
+    s32 size = 0;
+    for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
+        struct MainPoolRegion* region = &gMainPool.regions[i];
+        size += region->end - region->start;
+    }
+
+    return size;
 }
 
 /**
  * Push pool state, to be restored later. Return the amount of free space left
  * in the pool.
  */
-u32 main_pool_push_state(void) {
+void main_pool_push_state(void) {
     struct MainPoolState *prevState = gMainPoolState;
-    u32 freeSpace = sPoolFreeSpace;
-    struct MainPoolBlock *lhead = sPoolListHeadL;
-    struct MainPoolBlock *rhead = sPoolListHeadR;
+    struct MainPoolContext ctx = gMainPool;
 
-    gMainPoolState = main_pool_alloc(sizeof(*gMainPoolState), MEMORY_POOL_LEFT);
-    gMainPoolState->freeSpace = freeSpace;
-    gMainPoolState->listHeadL = lhead;
-    gMainPoolState->listHeadR = rhead;
+    gMainPoolState = main_pool_alloc(sizeof(*gMainPoolState));
+    gMainPoolState->ctx = ctx;
     gMainPoolState->prev = prevState;
-    return sPoolFreeSpace;
 }
 
 /**
  * Restore pool state from a previous call to main_pool_push_state. Return the
  * amount of free space left in the pool.
  */
-u32 main_pool_pop_state(void) {
-    sPoolFreeSpace = gMainPoolState->freeSpace;
-    sPoolListHeadL = gMainPoolState->listHeadL;
-    sPoolListHeadR = gMainPoolState->listHeadR;
+void main_pool_pop_state(void) {
+    gMainPool = gMainPoolState->ctx;
     gMainPoolState = gMainPoolState->prev;
-    return sPoolFreeSpace;
 }
 
 /**
@@ -275,19 +270,25 @@ void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
  * Perform a DMA read from ROM, allocating space in the memory pool to write to.
  * Return the destination address.
  */
-void *dynamic_dma_read(u8 *srcStart, u8 *srcEnd, u32 side, u32 alignment, u32 bssLength) {
+static void *dynamic_dma_read(u8 *srcStart, u8 *srcEnd, u32 alignment, u32 bssLength) {
     u32 size = ALIGN16(srcEnd - srcStart);
-    u32 offset = 0;
-
-    if (alignment && side == MEMORY_POOL_LEFT) {
-        offset = ALIGN(((uintptr_t)sPoolListHeadL + 16), alignment) - ((uintptr_t)sPoolListHeadL + 16);
-    }
-
-    void *dest = main_pool_alloc((offset + size + bssLength), side);
+    void* dest = main_pool_alloc_aligned(size + bssLength, alignment);
     if (dest != NULL) {
-        dma_read(((u8 *)dest + offset), srcStart, srcEnd);
+        dma_read(((u8 *)dest), srcStart, srcEnd);
         if (bssLength) {
-            bzero(((u8 *)dest + offset + size), bssLength);
+            bzero(((u8 *)dest + size), bssLength);
+        }
+    }
+    return dest;
+}
+
+static void *dynamic_dma_read_freeable(u8 *srcStart, u8 *srcEnd, u32 alignment, u32 bssLength) {
+    u32 size = ALIGN16(srcEnd - srcStart);
+    void* dest = main_pool_alloc_aligned_freeable(size + bssLength, alignment);
+    if (dest != NULL) {
+        dma_read(((u8 *)dest), srcStart, srcEnd);
+        if (bssLength) {
+            bzero(((u8 *)dest + size), bssLength);
         }
     }
     return dest;
@@ -320,24 +321,24 @@ void mapTLBPages(uintptr_t virtualAddress, uintptr_t physicalAddress, s32 length
  * Load data from ROM into a newly allocated block, and set the segment base
  * address to this block.
  */
-void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart, u8 *bssEnd) {
+void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u8 *bssStart, u8 *bssEnd) {
     void *addr;
 
-    if ((bssStart != NULL) && (side == MEMORY_POOL_LEFT)) {
-        addr = dynamic_dma_read(srcStart, srcEnd, side, TLB_PAGE_SIZE, ((uintptr_t)bssEnd - (uintptr_t)bssStart));
+    if ((bssStart != NULL)) {
+        addr = dynamic_dma_read(srcStart, srcEnd, TLB_PAGE_SIZE, ((uintptr_t)bssEnd - (uintptr_t)bssStart));
         if (addr != NULL) {
             u8 *realAddr = (u8 *)ALIGN((uintptr_t)addr, TLB_PAGE_SIZE);
             set_segment_base_addr(segment, realAddr);
             mapTLBPages((segment << 24), VIRTUAL_TO_PHYSICAL(realAddr), ((srcEnd - srcStart) + ((uintptr_t)bssEnd - (uintptr_t)bssStart)), segment);
         }
     } else {
-        addr = dynamic_dma_read(srcStart, srcEnd, side, 0, 0);
+        addr = dynamic_dma_read(srcStart, srcEnd, 0, 0);
         if (addr != NULL) {
             set_segment_base_addr(segment, addr);
         }
     }
 #ifdef PUPPYPRINT_DEBUG
-    u32 ppSize = ALIGN16(srcEnd - srcStart) + 16;
+    u32 ppSize = ALIGN16(srcEnd - srcStart);
     set_segment_memory_printout(segment, ppSize);
 #endif
     return addr;
@@ -352,10 +353,17 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
 void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
     u32 srcSize = ALIGN16(srcEnd - srcStart);
-    u32 destSize = ALIGN16((u8 *) sPoolListHeadR - destAddr);
+    u32 destSize = ALIGN16((u8 *) RAM_END - destAddr);
 
     if (srcSize <= destSize) {
-        dest = main_pool_alloc(destSize, MEMORY_POOL_RIGHT);
+        for (int i = 0; i < MAIN_POOL_REGIONS_COUNT; i++) {
+            if (!(gMainPool.regions[i].start <= destAddr && destAddr + destSize <= gMainPool.regions[i].end))
+                continue;
+
+            gMainPool.regions[i].end = destAddr;
+        }
+
+        dest = destAddr;
         if (dest != NULL) {
             bzero(dest, destSize);
             osWritebackDCacheAll();
@@ -380,7 +388,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #else
     u32 compSize = ALIGN16(srcEnd - srcStart);
 #endif
-    u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
+    u8 *compressed = main_pool_alloc_aligned_freeable(compSize, 0);
 #ifdef GZIP
     // Decompressed size from end of gzip
     u32 *size = (u32 *) (compressed + compSize);
@@ -390,11 +398,11 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #endif
     if (compressed != NULL) {
 #ifdef UNCOMPRESSED
-        dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
+        dest = main_pool_alloc_aligned(compSize);
         dma_read(dest, srcStart, srcEnd);
 #else
         dma_read(compressed, srcStart, srcEnd);
-        dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
+        dest = main_pool_alloc_aligned(*size, 0);
 #endif
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
@@ -435,71 +443,17 @@ void load_engine_code_segment(void) {
 #endif
 
 /**
- * Allocate an allocation-only pool from the main pool. This pool doesn't
- * support freeing allocated memory.
- * Return NULL if there is not enough space in the main pool.
- */
-struct AllocOnlyPool *alloc_only_pool_init(u32 size, u32 side) {
-    void *addr;
-    struct AllocOnlyPool *subPool = NULL;
-
-    size = ALIGN4(size);
-    addr = main_pool_alloc(size + sizeof(struct AllocOnlyPool), side);
-    if (addr != NULL) {
-        subPool = (struct AllocOnlyPool *) addr;
-        subPool->totalSpace = size;
-        subPool->usedSpace = 0;
-        subPool->startPtr = (u8 *) addr + sizeof(struct AllocOnlyPool);
-        subPool->freePtr = (u8 *) addr + sizeof(struct AllocOnlyPool);
-    }
-    return subPool;
-}
-
-/**
- * Allocate from an allocation-only pool.
- * Return NULL if there is not enough space.
- */
-void *alloc_only_pool_alloc(struct AllocOnlyPool *pool, s32 size) {
-    void *addr = NULL;
-
-    size = ALIGN4(size);
-    if (size > 0 && pool->usedSpace + size <= pool->totalSpace) {
-        addr = pool->freePtr;
-        pool->freePtr += size;
-        pool->usedSpace += size;
-    }
-    return addr;
-}
-
-/**
- * Resize an allocation-only pool.
- * If the pool is increasing in size, the pool must be the last thing allocated
- * from the left end of the main pool.
- * The pool does not move.
- */
-struct AllocOnlyPool *alloc_only_pool_resize(struct AllocOnlyPool *pool, u32 size) {
-    struct AllocOnlyPool *newPool;
-
-    size = ALIGN4(size);
-    newPool = main_pool_realloc(pool, size + sizeof(struct AllocOnlyPool));
-    if (newPool != NULL) {
-        pool->totalSpace = size;
-    }
-    return newPool;
-}
-
-/**
  * Allocate a memory pool from the main pool. This pool supports arbitrary
  * order for allocation/freeing.
  * Return NULL if there is not enough space in the main pool.
  */
-struct MemoryPool *mem_pool_init(u32 size, u32 side) {
+struct MemoryPool *mem_pool_init(u32 size) {
     void *addr;
     struct MemoryBlock *block;
     struct MemoryPool *pool = NULL;
 
     size = ALIGN4(size);
-    addr = main_pool_alloc(size + sizeof(struct MemoryPool), side);
+    addr = main_pool_alloc(size + sizeof(struct MemoryPool));
     if (addr != NULL) {
         pool = (struct MemoryPool *) addr;
 
@@ -598,13 +552,12 @@ void *alloc_display_list(u32 size) {
 }
 
 static struct DmaTable *load_dma_table_address(u8 *srcAddr) {
-    struct DmaTable *table = dynamic_dma_read(srcAddr, srcAddr + sizeof(u32),
-                                                             MEMORY_POOL_LEFT, 0, 0);
+    struct DmaTable *table = dynamic_dma_read_freeable(srcAddr, srcAddr + sizeof(u32), 0, 0);
     u32 size = table->count * sizeof(struct OffsetSizePair) +
         sizeof(struct DmaTable) - sizeof(struct OffsetSizePair);
     main_pool_free(table);
 
-    table = dynamic_dma_read(srcAddr, srcAddr + size, MEMORY_POOL_LEFT, 0, 0);
+    table = dynamic_dma_read(srcAddr, srcAddr + size, 0, 0);
     table->srcAddr = srcAddr;
     return table;
 }

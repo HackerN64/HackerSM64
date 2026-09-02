@@ -158,12 +158,12 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
 /**
  * Allocate the GraphNodeCamera's config.camera, and copy `c`'s focus to the Camera's area center point.
  */
-static void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
+static void create_camera(struct GraphNodeCamera *gc) {
 #ifdef FORCED_CAMERA_MODE
     gc->config.mode = FORCED_CAMERA_MODE;
 #endif
     s16 mode = gc->config.mode;
-    struct Camera *c = alloc_only_pool_alloc(pool, sizeof(struct Camera));
+    struct Camera *c = main_pool_alloc(sizeof(struct Camera));
 
     gc->config.camera = c;
     c->mode = mode;
@@ -234,11 +234,11 @@ static void update_graph_node_camera(struct GraphNodeCamera *gc) {
     zoom_out_if_paused_and_outside(gc);
 }
 
-Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context) {
+Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *) {
     struct GraphNodeCamera *gc = (struct GraphNodeCamera *) g;
     switch (callContext) {
         case GEO_CONTEXT_CREATE:
-            create_camera(gc, context);
+            create_camera(gc);
             break;
         case GEO_CONTEXT_RENDER:
             update_graph_node_camera(gc);

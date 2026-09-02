@@ -188,6 +188,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.text*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.text*);
       *ULTRALIB.a:*.o(.text*);
       */libnustd.a:*.o(.text*);
       *libgcc.a:*.o(.text*);
@@ -210,6 +211,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*data*);
       *ULTRALIB.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
       */libz.a:*.o(.data*);
@@ -228,6 +230,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.rodata*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.rodata*);
       *ULTRALIB.a:*.o(.rodata*);
       *libgcc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
@@ -247,6 +250,7 @@ SECTIONS
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*bss*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*bss*);
       *ULTRALIB.a:*.o(COMMON);
       *ULTRALIB.a:*.o(.scommon);
       *ULTRALIB.a:*.o(.*bss*);
@@ -526,16 +530,9 @@ SECTIONS
    }
    END_SEG(scripts)
 
-   YAY0_SEG(water_skybox,       0x0A000000)
-   YAY0_SEG(ccm_skybox,         0x0A000000)
-   YAY0_SEG(clouds_skybox,      0x0A000000)
-   YAY0_SEG(bitfs_skybox,       0x0A000000)
-   YAY0_SEG(wdw_skybox,         0x0A000000)
-   YAY0_SEG(cloud_floor_skybox, 0x0A000000)
-   YAY0_SEG(ssl_skybox,         0x0A000000)
-   YAY0_SEG(bbh_skybox,         0x0A000000)
-   YAY0_SEG(bidw_skybox,        0x0A000000)
-   YAY0_SEG(bits_skybox,        0x0A000000)
+#define SKYBOX_LD
+#include "skyboxes.h"
+#undef SKYBOX_LD
 
    // Texture bins
    YAY0_SEG(fire,     0x09000000)

@@ -510,7 +510,7 @@ void clear_objects(void) {
         geo_reset_object_node(&gObjectPool[i].header.gfx);
     }
 
-    gObjectMemoryPool = mem_pool_init(OBJECT_MEMORY_POOL, MEMORY_POOL_LEFT);
+    gObjectMemoryPool = mem_pool_init(OBJECT_MEMORY_POOL);
     gObjectLists = gObjectListArray;
 
     clear_dynamic_surfaces();

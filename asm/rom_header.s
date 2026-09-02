@@ -22,7 +22,7 @@
 .word  0x00000000               /* Unknown */
 #endif
 .word  0x0000004E               /* Cartridge */
-#if defined(EEP4K) && !defined(EMU_DEFAULT_TO_GCN)
+#if defined(EEP4K) && !defined(EMU_DEFAULT_TO_GCN) && !defined(USE_RTC)
 .ascii "SM"                     /* Cartridge ID */
 #else
 .ascii "ED"                     /* Cartridge ID */
@@ -35,14 +35,21 @@
     .ascii "E"                  /* NTSC-U (North America) */
 #endif
 
-#if defined(SRAM)
-    .byte  0x32                 /* Version */
-#elif defined(EEP16K)
-    .byte  0x22                 /* Version */
-#elif defined(SRAM768K)
-    .byte  0x42                 /* Version */
-#elif defined(FLASHRAM)
-    .byte  0x52                 /* Version */
+#if defined(USE_RTC)
+    #define RTC_BIT 0x1
 #else
-    .byte  0x12                 /* Version */
+    #define RTC_BIT 0x0
+#endif
+
+/* Savetype, region, and RTC */
+#if defined(SRAM)
+    .byte  0x32 | RTC_BIT
+#elif defined(EEP16K)
+    .byte  0x22 | RTC_BIT
+#elif defined(SRAM768K)
+    .byte  0x42 | RTC_BIT
+#elif defined(FLASHRAM)
+    .byte  0x52 | RTC_BIT
+#else
+    .byte  0x12 | RTC_BIT
 #endif

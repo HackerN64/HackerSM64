@@ -929,6 +929,7 @@ void init_camera(struct Camera *c) {
 void select_mario_cam_mode(void) {
     sSelectionFlags = CAM_MODE_MARIO_SELECTED;
 }
+
 /**
  * If `selection` is 0, just get the current selection
  * If `selection` is 1, select 'Mario' as the alt mode.

@@ -106,17 +106,6 @@ DECLARE_LEVEL_SEGMENT(ending)
 
 DECLARE_SEGMENT(segment2_yay0)
 
-DECLARE_SEGMENT(water_skybox_yay0)
-DECLARE_SEGMENT(ccm_skybox_yay0)
-DECLARE_SEGMENT(clouds_skybox_yay0)
-DECLARE_SEGMENT(bitfs_skybox_yay0)
-DECLARE_SEGMENT(wdw_skybox_yay0)
-DECLARE_SEGMENT(cloud_floor_skybox_yay0)
-DECLARE_SEGMENT(ssl_skybox_yay0)
-DECLARE_SEGMENT(bbh_skybox_yay0)
-DECLARE_SEGMENT(bidw_skybox_yay0)
-DECLARE_SEGMENT(bits_skybox_yay0)
-
 DECLARE_SEGMENT(fire_yay0)
 DECLARE_SEGMENT(spooky_yay0)
 DECLARE_SEGMENT(generic_yay0)
@@ -137,17 +126,6 @@ DECLARE_SEGMENT(debug_level_select_yay0)
 //added for compatibility
 DECLARE_SEGMENT(segment2_mio0)
 
-DECLARE_SEGMENT(water_skybox_mio0)
-DECLARE_SEGMENT(ccm_skybox_mio0)
-DECLARE_SEGMENT(clouds_skybox_mio0)
-DECLARE_SEGMENT(bitfs_skybox_mio0)
-DECLARE_SEGMENT(wdw_skybox_mio0)
-DECLARE_SEGMENT(cloud_floor_skybox_mio0)
-DECLARE_SEGMENT(ssl_skybox_mio0)
-DECLARE_SEGMENT(bbh_skybox_mio0)
-DECLARE_SEGMENT(bidw_skybox_mio0)
-DECLARE_SEGMENT(bits_skybox_mio0)
-
 DECLARE_SEGMENT(fire_mio0)
 DECLARE_SEGMENT(spooky_mio0)
 DECLARE_SEGMENT(generic_mio0)
@@ -164,6 +142,12 @@ DECLARE_SEGMENT(effect_mio0)
 DECLARE_SEGMENT(title_screen_bg_mio0)
 
 DECLARE_SEGMENT(debug_level_select_mio0)
+
+// skyboxes
+
+#define SKYBOX_SYMBOLS_ROM
+#include "skyboxes.h"
+#undef SKYBOX_SYMBOLS_ROM
 
 #ifdef MULTILANG
 DECLARE_SEGMENT(translation_en_yay0)
