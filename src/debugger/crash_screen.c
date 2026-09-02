@@ -553,9 +553,24 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
+    u32 crashed_addr = tc->pc;
 
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - 36);
+
+        if (!is_text_addr(sProgramPosition)) {
+            crashed_addr = tc->ra + CALLSITE_OFFSET;
+            sProgramPosition = (tc->ra - 36);
+
+            if (!is_text_addr(sProgramPosition)) {
+                sProgramPosition = 0;
+                crash_screen_println("what did you do?");
+                crash_screen_println("PC: %08X", tc->pc);
+                crash_screen_println("RA: %08X", tc->ra);
+                osWritebackDCacheAll();
+                return;
+            }
+        }
     }
     crash_screen_println("Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
@@ -587,6 +602,11 @@ void draw_disasm(OSThread *thread) {
 
                     reset_text_color();
                     sCrashScreenPrintRow_Pixels -= sCrashScreenPrintLnHeight_Pixels;
+                    if (addr == crashed_addr) {
+                        set_text_color(255, 0, 0);
+                    } else {
+                        reset_text_color();
+                    }
                     crash_screen_println("    %s", disasm);
                 }
 #ifndef DEBUG_EXPORT_ALL_LINES
@@ -594,7 +614,7 @@ void draw_disasm(OSThread *thread) {
 #endif // DEBUG_EXPORT_ALL_LINES
             else {
 #endif // DEBUG_EXPORT_SYMBOLS
-                if (addr == tc->pc) {
+                if (addr == crashed_addr) {
                     set_text_color(255, 0, 0);
                 } else {
                     reset_text_color();
