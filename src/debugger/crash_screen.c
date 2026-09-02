@@ -560,7 +560,7 @@ void draw_disasm(OSThread *thread) {
     crash_screen_println("Program Counter: %08X", sProgramPosition);
     osWritebackDCacheAll();
 
-    for (int i = 0; i < 19; i++) {
+    for (int i = 0; i < 16; i++) {
         u32 addr = (sProgramPosition + (i * 4));
 
         char *disasm = insn_disasm((InsnData *)addr);
