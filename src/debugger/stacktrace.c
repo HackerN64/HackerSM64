@@ -2,6 +2,8 @@
 #include <macros.h>
 #include <string.h>
 
+#include "segment_symbols.h"
+
 #include "config/config_debug.h"
 
 #include "map_parser.h"
@@ -39,7 +41,11 @@ static void add_entry_to_stack(u32 addr, u32 ra, symtable_info_t *info) {
 char *get_stack_entry(u32 idx) {
     static char stackbuf[100];
 
-    sprintf(stackbuf, "%08X: %s:%d", stack[idx].func, stack[idx].funcname, stack[idx].line);
+    if (stack[idx].line >= 0) {
+        sprintf(stackbuf, "%08X: %s:%d", stack[idx].func, stack[idx].funcname, stack[idx].line);
+    } else {
+        sprintf(stackbuf, "%08X: %s", stack[idx].func, stack[idx].funcname);
+    }
 
     return stackbuf;
 }
@@ -52,6 +58,14 @@ u32 generate_stack(OSThread *thread) {
 
     u32 sp = tc->sp;
     breadcrumb = tc->ra;
+
+    // If we're going to dereference any kind of bad address, bail
+    if ((sp & 0xDF000000) != 0x80000000) {
+        stack[0].line = stack[1].line = -1;
+        sprintf(stack[0].funcname, "You corrupted the stack pointer...");
+        sprintf(stack[1].funcname, "SP: %08X", sp);
+        return 2;
+    }
 
     while (1) { // dont know the end goal yet
         sp += 4;
