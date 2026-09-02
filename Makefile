@@ -383,7 +383,8 @@ LEVEL_DIRS     := $(patsubst levels/%,%,$(dir $(wildcard levels/*/header.h)))
 VNL_ACTRS_DIRS := $(patsubst actors/vanilla_actors/%,%,$(dir $(wildcard actors/vanilla_actors/*/header.h)))
 
 # Directories containing source files
-SRC_DIRS += src src/boot src/game src/engine src/audio src/menu src/buffers lib/librtc actors levels bin data assets asm lib sound
+CAMERA_DIRS += src/camera src/camera/level_specific src/camera/cutscenes src/camera/modes
+SRC_DIRS += src src/boot src/game $(CAMERA_DIRS) src/engine src/audio src/menu src/buffers lib/librtc actors levels bin data assets asm lib sound
 LIBZ_SRC_DIRS := src/libz
 GODDARD_SRC_DIRS := src/goddard src/goddard/dynlists
 BIN_DIRS := bin bin/$(VERSION)
