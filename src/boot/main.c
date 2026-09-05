@@ -313,7 +313,7 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    error("RCP is HUNG UP!! Oh! MY GOD!!");
+    error("RCP Timeout! (sound/gfx crash)!! Good LUCK debugging!!!!");
 }
 
 /**
