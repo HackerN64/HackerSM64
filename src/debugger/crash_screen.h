@@ -54,6 +54,6 @@ char *crash_screen_ellide_string(char *str, u32 truncateLength);
 
 // Exports for the rest of the game
 void crash_screen_init(void);
-void crash_screen_set_framebuffer_shade_level(int num_passes);
+void crash_screen_set_framebuffer_shade_level(u16 num_passes);
 
 #endif // CRASH_SCREEN_H

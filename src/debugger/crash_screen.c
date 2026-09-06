@@ -108,7 +108,7 @@ static u32 sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
 
 struct FaultInfo gCrashScreen;
 
-void crash_screen_set_framebuffer_shade_level(int num_passes) {
+void crash_screen_set_framebuffer_shade_level(u16 num_passes) {
     gCrashScreen.num_shade_passes = num_passes;
 }
 
