@@ -17,6 +17,8 @@
 //  Note that we only treat tabs as a wide space.
 #define CRASH_SCREEN_TAB_WIDTH_CHARS 4
 
+#define CRASH_SCREEN_NUM_CFBs (2)
+
 // Where to stop drawing the Header rectangle and where to start drawing the Body rectangle.
 #define CRASH_SCREEN_RECT_BOUNDARY_Y CRASH_SCREEN_TOP_MARGIN + CRASH_SCREEN_GLYPH_HEIGHT + 5
 

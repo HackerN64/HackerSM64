@@ -564,7 +564,8 @@ void draw_disasm(OSThread *thread) {
 
             if (!is_text_addr(sProgramPosition)) {
                 sProgramPosition = 0;
-                crash_screen_println("what did you do?");
+                crash_screen_println("Corrupted crash location!");
+                crash_screen_println("Disassembly will not work!");
                 crash_screen_println("PC: %08X", tc->pc);
                 crash_screen_println("RA: %08X", tc->ra);
                 osWritebackDCacheAll();
@@ -788,7 +789,7 @@ void draw_crash_screen(OSThread *thread) {
         osWritebackDCacheAll();
         osViBlack(FALSE);
         osViSwapBuffer(gCrashScreen.framebuffer);
-        crash_screen_cfb_index ^= 1;
+        crash_screen_cfb_index = (crash_screen_cfb_index + 1) % CRASH_SCREEN_NUM_CFBs;
         gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
         updateBuffer = FALSE;
     }
@@ -799,7 +800,7 @@ OSThread *get_crashed_thread(void) {
 
     while (thread->priority != -1) {
         if (thread->priority > OS_PRIORITY_IDLE && thread->priority < OS_PRIORITY_APPMAX
-            && ((thread->flags & (BIT(0) | BIT(1))) != 0)) {
+            && ((thread->flags & (OS_FLAG_CPU_BREAK | OS_FLAG_FAULT)) != 0)) {
             return thread;
         }
         thread = thread->tlnext;
