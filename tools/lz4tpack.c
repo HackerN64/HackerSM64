@@ -434,7 +434,7 @@ static int LZ4T_unpack_size(struct SizedBuffer* in, int* _giganticCounts)
 #undef giganticCounts
 }
 
-// TODO: Take in compressedSize
+// HACKERSM64_DO: Take in compressedSize
 // !!! Make sure to avoid all LZ4 constants, it should be all packed in the header
 static char* LZ4T_unpack(struct SizedBuffer in)
 {

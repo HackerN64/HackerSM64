@@ -747,7 +747,7 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
 /**
  * Finds the height of water at a given location.
  */
-s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
+s32 find_water_level(s32 x, s32 z) { // HACKERSM64_DO: Allow y pos
     s32 val;
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;

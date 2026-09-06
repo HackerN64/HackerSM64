@@ -35,7 +35,7 @@ s32 is_cap_ukiki_and_mario_has_normal_cap_on_head(void) {
 Gfx *geo_update_projectile_pos_from_parent_copy(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        // TODO: change global type to Object pointer
+        // HACKERSM64_DO: change global type to Object pointer
         struct Object *obj = (struct Object *) gCurGraphNodeObject;
 
         if (obj->prevObj != NULL) {

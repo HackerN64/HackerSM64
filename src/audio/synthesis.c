@@ -229,16 +229,16 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
             item = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
 
             // Touches both left and right since they are adjacent in memory
-            osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
+            osInvalDCache(item->toBeDownsampledLeft, DEFAULT_LEN_2CH);
 
             for (srcPos = 0, dstPos = 0; dstPos < item->lengthA / 2;
                  srcPos += gReverbDownsampleRate, dstPos++) {
-                gSynthesisReverb.ringBuffer.left[dstPos + item->startPos] = item->toDownsampleLeft[srcPos];
-                gSynthesisReverb.ringBuffer.right[dstPos + item->startPos] = item->toDownsampleRight[srcPos];
+                gSynthesisReverb.ringBuffer.left[dstPos + item->startPos] = item->toBeDownsampledLeft[srcPos];
+                gSynthesisReverb.ringBuffer.right[dstPos + item->startPos] = item->toBeDownsampledRight[srcPos];
             }
             for (dstPos = 0; dstPos < item->lengthB / 2; srcPos += gReverbDownsampleRate, dstPos++) {
-                gSynthesisReverb.ringBuffer.left[dstPos] = item->toDownsampleLeft[srcPos];
-                gSynthesisReverb.ringBuffer.right[dstPos] = item->toDownsampleRight[srcPos];
+                gSynthesisReverb.ringBuffer.left[dstPos] = item->toBeDownsampledLeft[srcPos];
+                gSynthesisReverb.ringBuffer.right[dstPos] = item->toBeDownsampledRight[srcPos];
             }
         }
 #ifdef BETTER_REVERB
@@ -254,10 +254,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
             loopCounts[1] = item->lengthB / 2;
 
             if (gReverbDownsampleRate != 1) {
-                // NOTE: / HACKERSM64 TODO: Commenting this check seems to improve runtime by about 100 microseconds (per 30fps frame),
-                // but idk enough about why it was added here in vanilla to comfortably remove it. Is it supposed to act as an
-                // optimization (that isn't actually an optimization) or is it a safety measure since it's loaded from the RSP?
-                osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
+                osInvalDCache(item->toBeDownsampledLeft, DEFAULT_LEN_2CH);
             }
             
             betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][0] = &gSynthesisReverb.ringBuffer.left[item->startPos];
@@ -265,10 +262,10 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
             betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][0] = &gSynthesisReverb.ringBuffer.right[item->startPos];
             betterReverbSampleBuffers[SYNTH_CHANNEL_RIGHT][1] = &gSynthesisReverb.ringBuffer.right[0];
             if (gReverbDownsampleRate > 1) {
-                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][0] = &item->toDownsampleLeft[0];
-                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][1] = &item->toDownsampleLeft[loopCounts[0] * gReverbDownsampleRate];
-                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][0] = &item->toDownsampleRight[0];
-                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][1] = &item->toDownsampleRight[loopCounts[0] * gReverbDownsampleRate];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][0] = &item->toBeDownsampledLeft[0];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][1] = &item->toBeDownsampledLeft[loopCounts[0] * gReverbDownsampleRate];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][0] = &item->toBeDownsampledRight[0];
+                betterReverbDownsampleBuffers[SYNTH_CHANNEL_RIGHT][1] = &item->toBeDownsampledRight[loopCounts[0] * gReverbDownsampleRate];
             } else {
                 betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][0] = betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][0];
                 betterReverbDownsampleBuffers[SYNTH_CHANNEL_LEFT][1] = betterReverbSampleBuffers[SYNTH_CHANNEL_LEFT][1];
@@ -473,7 +470,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, u32 bufLen, u64 *cmd, s32 updateI
             // Downsampling is done later by CPU when RSP is done, therefore we need to have double
             // buffering. Left and right buffers are adjacent in memory.
             aSetBuffer(cmd++, 0, 0, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
-            aSaveBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex].toDownsampleLeft));
+            aSaveBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex].toBeDownsampledLeft));
             gSynthesisReverb.resampleFlags = 0;
         }
     }

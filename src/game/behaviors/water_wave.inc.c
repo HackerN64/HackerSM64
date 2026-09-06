@@ -1,5 +1,5 @@
 // water_wave.inc.c
-// TODO: Rename to avoid confusion with water_splashes_and_waves
+// HACKERSM64_DO: Rename to avoid confusion with water_splashes_and_waves
 
 void bhv_object_water_wave_init(void) {
     o->oPosY = find_water_level(o->oPosX, o->oPosZ);

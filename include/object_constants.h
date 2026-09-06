@@ -1397,7 +1397,7 @@ enum oActionsIntroPeach {
     PEACH_ACT_UNFADE,
     PEACH_ACT_FADE_2,
 };
-enum animIDsPeach { //! TODO: anim names 0-3 & 6-8
+enum animIDsPeach { //! HACKERSM64_DO: anim names 0-3 & 6-8
     PEACH_ANIM_0,
     PEACH_ANIM_1,
     PEACH_ANIM_2,
@@ -2087,7 +2087,7 @@ enum oActionsSnowmansBottom {
     #define TTC_COG_BP_SHAPE_HEXAGON                        (0 << 1)
     #define TTC_COG_BP_SHAPE_TRIANGLE                       (1 << 1)
     #define TTC_COG_BP_DIR_MASK                             0x01
-    #define TTC_COG_BP_DIR_CCW                              (0 << 0) // TODO: Check these
+    #define TTC_COG_BP_DIR_CCW                              (0 << 0) // HACKERSM64_DO: Check these
     #define TTC_COG_BP_DIR_CW                               (1 << 0)
 
 /* TTC Pit Block */

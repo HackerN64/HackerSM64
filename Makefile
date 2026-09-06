@@ -138,7 +138,7 @@ endif
 DEFAULT_OPT_FLAGS = -Os -ffinite-math-only -fno-signed-zeros -fno-math-errno
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
-# TODO: Figure out how to allow -fassociative-math to be enabled
+# HACKERSM64_DO: Figure out how to allow -fassociative-math to be enabled
 SAFETY_OPT_FLAGS = -ftrapping-math -fno-associative-math
 
 # Main opt flags
@@ -721,7 +721,7 @@ $(BUILD_DIR)/%: %.png
 #==============================================================================#
 
 # Link segment file to resolve external labels
-# TODO: ideally this would be `-Trodata-segment=0x07000000` but that doesn't set the address
+# HACKERSM64_DO: ideally this would be `-Trodata-segment=0x07000000` but that doesn't set the address
 $(BUILD_DIR)/%.elf: $(BUILD_DIR)/%.o
 	$(call print,Linking ELF file:,$<,$@)
 	$(V)$(LD) -e 0 -Ttext=$(SEGMENT_ADDRESS) -Map $@.map -o $@ $<

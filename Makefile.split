@@ -111,7 +111,7 @@ $(BUILD_DIR)/actors/common1.elf: SEGMENT_ADDRESS := 0x03000000
 
 $(BUILD_DIR)/levels/%/leveldata.elf: SEGMENT_ADDRESS := 0x07000000
 
-# TODO: Generate these rules from the level configs?
+# HACKERSM64_DO: Generate these rules from the level configs?
 
 define level_rules =
     $(1)_SEG7_FILES     := $$(patsubst %.png,%.inc.c,$$(wildcard levels/$(1)/*.png))

@@ -26,7 +26,7 @@ enum IntroBackgroundTypes {
 
 struct GraphNodeMore {
     /*0x00*/ struct GraphNode node;
-    /*0x14*/ void *todo;
+    /*0x14*/ void *unk14;
     /*0x18*/ u32 bgTableID;
 };
 
@@ -183,7 +183,7 @@ static s8 *introBackgroundTables[] = { introBackgroundIndexTable };
  */
 Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeMore *graphNode = (struct GraphNodeMore *) node;
-    s32 index = graphNode->bgTableID & 0xff; // TODO: word at offset 0x18 of struct GraphNode (always ends up being 0)
+    s32 index = graphNode->bgTableID & 0xff; // HACKERSM64_DO: word at offset 0x18 of struct GraphNode (always ends up being 0)
     s8 *backgroundTable = introBackgroundTables[index];
     Gfx *dl = NULL;
     Gfx *dlIter = NULL;

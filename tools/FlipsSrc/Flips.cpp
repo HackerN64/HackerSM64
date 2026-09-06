@@ -20,7 +20,7 @@ extern "C" void __cxa_pure_virtual() { abort(); }
 #endif
 #endif
 
-//TODO: source ROM chooser
+//FLIPS_DO: source ROM chooser
 //given a target, from all known source ROMs with same extension, find the most similar
 // read 1MB from each; check how many bytes are same and same location as target
 //  (only counting offsets where both source and target bytes are different from previous, to avoid false positives on long runs of 00)
@@ -31,7 +31,7 @@ extern "C" void __cxa_pure_virtual() { abort(); }
 // fail
 //this goes on a separate thread
 
-//TODO: more manual GUI
+//FLIPS_DO: more manual GUI
 // has three text fields, for patch / source / target, and 'pick' buttons nearby that open file dialogs
 // also Create / Apply / ApplyRun buttons at the bottom
 //auto selection (only if target field is blank):
@@ -51,7 +51,7 @@ extern "C" void __cxa_pure_virtual() { abort(); }
 // if first file isn't found, it tries using the entire field as filename, in case it actually contains semicolon
 
 
-//TODO: delete
+//FLIPS_DO: delete
 struct mem ReadWholeFile(LPCWSTR filename)
 {
 	return file::read(filename);
@@ -1165,7 +1165,7 @@ void usage()
 	  "  with --verbose, disassemble the entire patch\n"
 	  //"  also estimates how much of the source file is retained\n"
 	  //"  anything under 400 is fine, anything over 600 should be treated with suspicion\n"
-	  //(TODO: --info --verbose)
+	  //(FLIPS_DO: --info --verbose)
 	  "-i --ips, -b -B --bps --bps-delta, --bps-delta-moremem, --bps-linear:\n"
 	  "  create this patch format instead of guessing based on file extension\n"
 	  "  ignored when applying\n"

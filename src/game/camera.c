@@ -6664,7 +6664,7 @@ void init_spline_point(struct CutsceneSplinePoint *splinePoint, s8 index, u8 spe
     vec3s_copy(splinePoint->point, point);
 }
 
-// TODO: (Scrub C)
+// HACKERSM64_DO: (Scrub C)
 void copy_spline_segment(struct CutsceneSplinePoint dst[], struct CutsceneSplinePoint src[]) {
     s32 j = 0;
     s32 i = 0;
@@ -10360,7 +10360,7 @@ struct Cutscene sCutsceneReadMessage[] = {
     { cutscene_read_message_end, 0 }
 };
 
-/* TODO:
+/* HACKERSM64_DO:
  * The next two arrays are both related to levels, and they look generated.
  * These should be split into their own file.
  */
@@ -10435,7 +10435,7 @@ STATIC_ASSERT(ARRAY_COUNT(sZoomOutAreaMasks) - 1 == LEVEL_MAX / 2, "Make sure yo
 
 /*
  * credits spline paths.
- * TODO: Separate these into their own file(s)
+ * HACKERSM64_DO: Separate these into their own file(s)
  */
 
 struct CutsceneSplinePoint sBobCreditsSplinePositions[] = {

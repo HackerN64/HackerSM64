@@ -575,7 +575,7 @@ s32 act_debug_free_move(struct MarioState *m) {
         pos[2] += speed * coss(m->intendedYaw);
     }
 
-    // TODO: Add ability to ignore collision
+    // HACKERSM64_DO: Add ability to ignore collision
     //      - spawn pseudo floor object to prevent OOB death
     resolve_and_return_wall_collisions(pos, 60.0f, 50.0f, &wallData);
 
@@ -617,7 +617,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
                 }
 #endif
                 disable_background_sound();
-                //! TODO: Is this check necessary? Both seem to do the exact same thing.
+                //! HACKERSM64_DO: Is this check necessary? Both seem to do the exact same thing.
                 if (m->actionArg & 1) {
                     // No exit
                     play_course_clear(obj_has_model(celebStar, MODEL_BOWSER_KEY));

@@ -1,5 +1,5 @@
 // water_mist.inc.c
-// TODO: there is confusion with the earlier mist file. Clarify?
+// HACKERSM64_DO: there is confusion with the earlier mist file. Clarify?
 
 void bhv_water_mist_2_loop(void) {
     o->oPosY = find_water_level(o->oHomeX, o->oHomeZ) + 20.0f;

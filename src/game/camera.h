@@ -714,7 +714,7 @@ extern struct Object *gCutsceneFocus;
 extern struct Object *gSecondCameraFocus;
 extern u8 gRecentCutscene;
 
-// TODO: sort all of this extremely messy shit out after the split
+// HACKERSM64_DO: sort all of this extremely messy shit out after the split
 
 void set_camera_shake_from_hit(s16 shake);
 void set_environmental_camera_shake(s16 shake);

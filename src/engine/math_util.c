@@ -740,7 +740,7 @@ enum gSplineStates {
  * I suspect that the weight formulas will give a 3rd degree B-spline with the
  * common uniform clamped knot vector, e.g. for n points:
  * [0, 0, 0, 0, 1, 2, ... n-1, n, n, n, n]
- * TODO: verify the classification of the spline / figure out how polynomials were computed
+ * HACKERSM64_DO: verify the classification of the spline / figure out how polynomials were computed
  */
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
     f32 tinv  = 1 - t;

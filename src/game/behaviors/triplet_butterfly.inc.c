@@ -36,7 +36,7 @@ static void triplet_butterfly_act_init(void) {
             o->oTripletButterflySelectedButterfly = random_u16() % 3;
         }
 
-        //! TODO: Describe this glitch
+        //! HACKERSM64_DO: Describe this glitch
         if (o->parentObj->oTripletButterflySelectedButterfly == o->oBehParams2ndByte) {
             o->oTripletButterflyType = TRIPLET_BUTTERFLY_TYPE_SPAWN_1UP;
         } else if (o->parentObj->oBehParams2ndByte & TRIPLET_BUTTERFLY_BP_NO_BOMBS) {

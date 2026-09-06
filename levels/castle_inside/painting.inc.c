@@ -580,7 +580,7 @@ static const Vtx inside_castle_seg7_vertex_07022598[] = {
     {{{     0,    614,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
-// TODO: this is unused
+// HACKERSM64_DO: this is unused
 // 0x070225D8 - 0x07022610
 const Gfx inside_castle_seg7_dl_070225D8[] = {
     gsDPPipeSync(),
@@ -592,7 +592,7 @@ const Gfx inside_castle_seg7_dl_070225D8[] = {
     gsSPEndDisplayList(),
 };
 
-// TODO: this is unused
+// HACKERSM64_DO: this is unused
 // 0x07022610 - 0x07022640
 const Gfx inside_castle_seg7_dl_07022610[] = {
     gsSP1Triangle( 0,  1,  2, 0x0),

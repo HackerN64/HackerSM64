@@ -95,7 +95,7 @@ void func_801922FC(struct ObjNet *net) {
     UNUSED u8 filler[8];
 
     gGdSkinNet = net;
-    // TODO: netype constants?
+    // HACKERSM64_DO: netype constants?
     if (net->netType == 4) {
         if (net->shapePtr != NULL) {
             D_801B9E38 = &net->mat128;

@@ -211,7 +211,7 @@ void geo_layout_cmd_node_root(void) {
 
     graphNode = init_graph_node_root(gGraphNodePool, NULL, 0, x, y, width, height);
 
-    // TODO: check type
+    // HACKERSM64_DO: check type
     gGeoViews = alloc_only_pool_alloc(gGraphNodePool, gGeoNumViews * sizeof(struct GraphNode *));
 
     graphNode->views = gGeoViews;

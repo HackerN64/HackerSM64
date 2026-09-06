@@ -1,5 +1,5 @@
 // water_mist_particle.inc.c
-// TODO: Is this really "mist"?
+// HACKERSM64_DO: Is this really "mist"?
 
 void bhv_water_mist_spawn_loop(void) {
     clear_particle_flags(ACTIVE_PARTICLE_BREATH);

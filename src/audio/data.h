@@ -204,7 +204,6 @@ extern OSMesgQueue *D_SH_80350FA8;
 #define AUDIO_INIT_POOL_SIZE (0x2400 + (MAX_NUM_SOUNDBANKS * sizeof(s32)) + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
 
-// TODO: needs validation once EU can compile. EU is very likely incorrect!
 #define AUDIO_HEAP_SIZE (SEQ_BANK_MEM + AUDIO_INIT_POOL_SIZE + NOTES_BUFFER_SIZE + BETTER_REVERB_SIZE + REVERB_WINDOW_HEAP_SIZE)
 
 #ifdef VERSION_SH

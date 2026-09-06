@@ -3928,7 +3928,7 @@ void CMipsInstruction::encodeNormal() const
 		encoding |= immediateData.primary.value;
 		break;
 	default:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 
@@ -3945,7 +3945,7 @@ void CMipsInstruction::encodeNormal() const
 		encoding |= immediateData.secondary.value << 18;
 		break;
 	default:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 
@@ -3984,7 +3984,7 @@ void CMipsInstruction::encodeVfpu() const
 		encoding |= immediateData.primary.value << 0;
 		break;
 	default:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 
@@ -4365,7 +4365,7 @@ bool MipsElfFile::write(void* data, size_t length)
 
 	if (section != -1)
 	{
-		// TODO: segmentless sections
+		// ARMIPS_DO: segmentless sections
 		return false;
 	}
 
@@ -6316,7 +6316,7 @@ const tMipsOpcode MipsOpcodes[] = {
 	{ "vnsin.S",	"vd,vs",	MIPS_VFPU4_11(0x1a),		MA_PSP,		MO_VFPU },
 	{ "vrexp2.S",	"vd,vs",	MIPS_VFPU4_11(0x1c),		MA_PSP,		MO_VFPU },
 
-//     VFPU4 1.2: TODO: Unsure where vsBZ goes, no one uses it.
+//     VFPU4 1.2: ARMIPS_DO: Unsure where vsBZ goes, no one uses it.
 //     31-------------21-------16--------------------------------------0
 //     |= VF4-1.2      |   rt  |                                       |
 //     --------11----------5--------------------------------------------
@@ -6330,10 +6330,10 @@ const tMipsOpcode MipsOpcodes[] = {
 	{ "vrndi.S",	"vd",		MIPS_VFPU4_12(0x01),		MA_PSP,		MO_VFPU },
 	{ "vrndf1.S",	"vd",		MIPS_VFPU4_12(0x02),		MA_PSP,		MO_VFPU },
 	{ "vrndf2.S",	"vd",		MIPS_VFPU4_12(0x03),		MA_PSP,		MO_VFPU },
-	// TODO: vsBZ?
+	// ARMIPS_DO: vsBZ?
 	{ "vf2h.S",		"vd,vs",	MIPS_VFPU4_12(0x12),		MA_PSP,		MO_VFPU },
 	{ "vh2f.S",		"vd,vs",	MIPS_VFPU4_12(0x13),		MA_PSP,		MO_VFPU },
-	// TODO: vsBZ?
+	// ARMIPS_DO: vsBZ?
 	{ "vlgb.S",		"vd,vs",	MIPS_VFPU4_12(0x17),		MA_PSP,		MO_VFPU },
 	{ "vuc2i.S",	"vd,vs",	MIPS_VFPU4_12(0x18),		MA_PSP,		MO_VFPU },
 	{ "vc2i.S",		"vd,vs",	MIPS_VFPU4_12(0x19),		MA_PSP,		MO_VFPU },
@@ -8438,7 +8438,7 @@ void MipsOpcodeFormatter::handleOpcodeName(const MipsOpcodeData& opData)
 			buffer += "sptq"[opData.vfpuSize];
 			break;
 		case 'B':
-			// TODO
+			// ARMIPS_DO
 			break;
 		default:
 			buffer += *(encoding-1);
@@ -8537,7 +8537,7 @@ void MipsOpcodeFormatter::handleOpcodeParameters(const MipsOpcodeData& opData, c
 			break;
 		case 'C':	// vfpu condition
 		case 'W':	// vfpu argument
-			// TODO
+			// ARMIPS_DO
 			break;
 		case 'w':	// 'wb' characters
 			buffer += L"wb";
@@ -9174,7 +9174,7 @@ void ArchitectureCommand::writeTempData(TempData& tempData) const
 
 void ArchitectureCommand::writeSymData(SymbolData& symData) const
 {
-	// TODO: find a less ugly way to check for undefined memory positions
+	// ARMIPS_DO: find a less ugly way to check for undefined memory positions
 	if (position == -1)
 		return;
 
@@ -9354,7 +9354,7 @@ void CAssemblerLabel::writeTempData(TempData& tempData) const
 
 void CAssemblerLabel::writeSymData(SymbolData& symData) const
 {
-	// TODO: find a less ugly way to check for undefined memory positions
+	// ARMIPS_DO: find a less ugly way to check for undefined memory positions
 	if (label->getValue() == -1 || Global.symbolTable.isGeneratedLabel(label->getName()))
 		return;
 
@@ -10114,7 +10114,7 @@ void CDirectiveData::Encode() const
 		}
 		break;
 	case EncodingMode::Invalid:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 }
@@ -10172,7 +10172,7 @@ void CDirectiveData::writeTempData(TempData& tempData) const
 		}
 		break;
 	case EncodingMode::Invalid:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 
@@ -10205,7 +10205,7 @@ void CDirectiveData::writeSymData(SymbolData& symData) const
 		symData.addData(position,getDataSize(),SymbolData::Data64);
 		break;
 	case EncodingMode::Invalid:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 }
@@ -10298,7 +10298,7 @@ void CDirectiveFile::Encode() const
 		g_fileManager->closeFile();
 		break;
 	case Type::Invalid:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 }
@@ -10323,7 +10323,7 @@ void CDirectiveFile::writeTempData(TempData& tempData) const
 		str = L".close";
 		break;
 	case Type::Invalid:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 
@@ -10344,7 +10344,7 @@ void CDirectiveFile::writeSymData(SymbolData& symData) const
 			closeFile->endSymData(symData);
 		break;
 	case Type::Invalid:
-		// TODO: Assert?
+		// ARMIPS_DO: Assert?
 		break;
 	}
 }
@@ -19808,7 +19808,7 @@ bool SymbolTable::findEquation(const std::wstring& name, int file, int section, 
 	return true;
 }
 
-// TODO: better
+// ARMIPS_DO: better
 std::wstring SymbolTable::getUniqueLabelName(bool local)
 {
 	std::wstring name = formatString(L"__armips_label_%08x__",uniqueCount++);

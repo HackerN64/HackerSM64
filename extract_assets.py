@@ -164,7 +164,7 @@ def main():
         local_version = new_version
 
     # Create work list
-    todo = defaultdict(lambda: [])
+    to_do = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
         if exists and not (local_version == new_version or asset_needs_update(asset, local_version)):
@@ -176,7 +176,7 @@ def main():
             mio0 = None if len(pos) == 1 else pos[0]
             pos = pos[-1]
             if lang in langs:
-                todo[(lang, mio0)].append((asset, pos, size, meta))
+                to_do[(lang, mio0)].append((asset, pos, size, meta))
                 break
 
     # Load ROMs
@@ -206,12 +206,12 @@ def main():
 
     # Go through the assets in roughly alphabetical order (but assets in the same
     # mio0 file still go together).
-    keys = sorted(list(todo.keys()), key=lambda k: todo[k][0][0])
+    keys = sorted(list(to_do.keys()), key=lambda k: to_do[k][0][0])
 
     # Import new assets
     for key in keys:
 
-        assets = todo[key]
+        assets = to_do[key]
         lang, mio0 = key
         romname = romLUT[lang]
         if mio0 == "@sound":

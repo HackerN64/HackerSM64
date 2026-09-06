@@ -300,7 +300,7 @@ static void level_cmd_load_yay0(void) {
 
 static void level_cmd_load_mario_head(void) {
 #ifdef KEEP_MARIO_HEAD
-    // TODO: Fix these hardcoded sizes
+    // HACKERSM64_DO: Fix these hardcoded sizes
     void *addr = main_pool_alloc(DOUBLE_SIZE_ON_64_BIT(0xE1000), MEMORY_POOL_LEFT);
     if (addr != NULL) {
         gdm_init(addr, DOUBLE_SIZE_ON_64_BIT(0xE1000));

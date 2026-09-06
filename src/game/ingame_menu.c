@@ -87,7 +87,7 @@ enum DialogBoxType {
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
 
-u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
+u8 gDialogCharWidths[256] = { // HACKERSM64_DO: Is there a way to auto generate this?
     7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  6,  6,  6,  6,  6,
     6,  6,  5,  6,  6,  5,  8,  8,  6,  6,  6,  6,  6,  5,  6,  6,
     8,  7,  6,  6,  6,  5,  5,  6,  5,  5,  6,  5,  4,  5,  5,  3,
@@ -407,7 +407,7 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                                                     rgbaColors[2],
                                                     rgbaColors[3]);
                 } else if (customColor == 2) {
-                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
+                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // HACKERSM64_DO: Is it possible to retrieve the original color that was set before print_generic_string was called?
                     customColor = 0;
                 }
                 break;

@@ -31,7 +31,7 @@ static s32 clear_move_flag(u32 *bitSet, s32 flag);
 
 Gfx *geo_update_projectile_pos_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct Object *projObj = (struct Object *) gCurGraphNodeObject; // TODO: change global type to Object pointer
+        struct Object *projObj = (struct Object *) gCurGraphNodeObject; // HACKERSM64_DO: change global type to Object pointer
         if (projObj->prevObj) {
             obj_update_pos_from_parent_transformation(mtx, projObj->prevObj);
             obj_set_gfx_pos_from_pos(projObj->prevObj);
@@ -44,7 +44,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
     Gfx *dlStart = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct Object *objectGraphNode = (struct Object *) gCurGraphNodeObject; // TODO: change this to object pointer?
+        struct Object *objectGraphNode = (struct Object *) gCurGraphNodeObject; // HACKERSM64_DO: change this to object pointer?
         struct GraphNodeGenerated *currentGraphNode = (struct GraphNodeGenerated *) node;
         s32 parameter = currentGraphNode->parameter;
 

@@ -70,16 +70,16 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) 
             item = &reverb->items[reverb->curFrame][updateIndex];
 
             // Touches both left and right since they are adjacent in memory
-            osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
+            osInvalDCache(item->toBeDownsampledLeft, DEFAULT_LEN_2CH);
 
             for (srcPos = 0, dstPos = 0; dstPos < item->lengthA / 2;
                  srcPos += reverb->downsampleRate, dstPos++) {
-                reverb->ringBuffer.left[item->startPos + dstPos] = item->toDownsampleLeft[srcPos];
-                reverb->ringBuffer.right[item->startPos + dstPos] = item->toDownsampleRight[srcPos];
+                reverb->ringBuffer.left[item->startPos + dstPos] = item->toBeDownsampledLeft[srcPos];
+                reverb->ringBuffer.right[item->startPos + dstPos] = item->toBeDownsampledRight[srcPos];
             }
             for (dstPos = 0; dstPos < item->lengthB / 2; srcPos += reverb->downsampleRate, dstPos++) {
-                reverb->ringBuffer.left[dstPos] = item->toDownsampleLeft[srcPos];
-                reverb->ringBuffer.right[dstPos] = item->toDownsampleRight[srcPos];
+                reverb->ringBuffer.left[dstPos] = item->toBeDownsampledLeft[srcPos];
+                reverb->ringBuffer.right[dstPos] = item->toBeDownsampledRight[srcPos];
             }
         }
     }
@@ -149,7 +149,7 @@ void synthesis_load_note_subs_eu(s32 updateIndex) {
     }
 }
 
-// TODO: (Scrub C) pointless mask and whitespace
+// HACKERSM64_DO: (Scrub C) pointless mask and whitespace
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
     s32 i, j;
     u32 *aiBufPtr;
@@ -262,7 +262,7 @@ u64 *synthesis_save_reverb_samples(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
             // Downsampling is done later by CPU when RSP is done, therefore we need to have double
             // buffering. Left and right buffers are adjacent in memory.
             aSaveBuffer(cmd++, DMEM_ADDR_WET_LEFT_CH,
-                    VIRTUAL_TO_PHYSICAL2(gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex].toDownsampleLeft), DEFAULT_LEN_2CH);
+                    VIRTUAL_TO_PHYSICAL2(gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex].toBeDownsampledLeft), DEFAULT_LEN_2CH);
             break;
     }
     gSynthesisReverbs[reverbIndex].resampleFlags = 0;

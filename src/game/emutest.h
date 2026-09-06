@@ -30,10 +30,10 @@ enum SystemCapabilities {
     // Whether the system can edit the framebuffer in software
     SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
 
-    // TODO: `emux` is a developing standard.
+    // HACKERSM64_DO: `emux` is a developing standard.
     // SUPPORTS_EMULATOR_EXTENSIONS  = (1 << 4), // i.e. `emux`
 
-    // TODO: Figure out what these mean and implement them too
+    // HACKERSM64_DO: Figure out what these mean and implement them too
     // SUPPORTS_DMA_TIMING = 0,
     // SUPPORTS_RSP_PIPELINE_STALL_TIMING = 0,
 };
