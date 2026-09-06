@@ -175,13 +175,14 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
         for (j = 0; j < w; j++) {
             /**
              * Instead of setting the framebuffer pixels fully dark,
-             * SM64 "darkens" the RGBA5551 pixel. This is done by
-             * shifting every RGB component right by 2 in one operation,
-             * essentially setting the brightness to 1/4.
+             * we "darken" the RGBA5551 pixel. This is done by
+             * shifting every RGB component right by 1 in one operation,
+             * essentially setting the brightness to 1/2.
              */
+            #define COLOR_MASK (0b11110000)
+            #define PIXEL_MASK GPACK_RGBA5551(COLOR_MASK, COLOR_MASK, COLOR_MASK, 0)
 
-            // 0xe738 = 0b1110011100111000
-            *ptr = ((*ptr & 0xe738) >> 2) | 1;
+            *ptr = ((*ptr & PIXEL_MASK) / 2) | 1;
             ptr++;
         }
         ptr += gCrashScreen.width - w;
