@@ -145,10 +145,10 @@ void receive_new_tasks(void) {
     while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
-            case 2:
+            case M_AUDTASK:
                 sNextAudioSPTask = spTask;
                 break;
-            case 1:
+            case M_GFXTASK:
                 sNextDisplaySPTask = spTask;
                 break;
         }
@@ -313,7 +313,19 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    error("RCP Timeout! (sound/gfx crash)!! Good LUCK debugging!!!!");
+    if (gActiveSPTask && gActiveSPTask->task.t.type == M_AUDTASK) {
+        error("Timeout while waiting for hardware SP\n"
+              "task! This was probably caused by a broken\n"
+              "command somewhere in the audio pipeline.\n\n"
+              "RCP is HUNG UP!! Oh! MY GOD!!"
+        );
+    } else {
+        error("Timeout while waiting for hardware SP\n"
+              "task! This was probably caused by a broken\n"
+              "display list somewhere (i.e. bad model data).\n\n"
+              "RCP is HUNG UP!! Oh! MY GOD!!"
+        );
+    }
 }
 
 /**
