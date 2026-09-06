@@ -1,6 +1,8 @@
 #ifndef CRASH_SCREEN_H
 #define CRASH_SCREEN_H
 
+#include <ultra64.h>
+#include "config/config_debug.h"
 #include "game/main.h"
 
 #define CRASH_SCREEN_MAX_PATH 256
