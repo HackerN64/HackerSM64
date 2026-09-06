@@ -145,10 +145,10 @@ void receive_new_tasks(void) {
     while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
-            case 2:
+            case M_AUDTASK:
                 sNextAudioSPTask = spTask;
                 break;
-            case 1:
+            case M_GFXTASK:
                 sNextDisplaySPTask = spTask;
                 break;
         }
