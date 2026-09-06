@@ -313,7 +313,11 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    error("RCP Timeout! (sound/gfx crash)!! Good LUCK debugging!!!!");
+    error("Timeout while waiting for hardware\n"
+          "pipeline! This was probably caused by a broken\n"
+          "Display List somewhere (i.e. bad model data).\n\n"
+          "RCP is HUNG UP!! Oh! MY GOD!!"
+    );
 }
 
 /**
