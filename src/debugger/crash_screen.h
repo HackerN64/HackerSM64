@@ -1,6 +1,8 @@
 #ifndef CRASH_SCREEN_H
 #define CRASH_SCREEN_H
 
+#include "game/main.h"
+
 #define CRASH_SCREEN_MAX_PATH 256
 
 // Configurable Defines
@@ -34,10 +36,22 @@ enum CrashPages {
     CRASH_SCREEN_PAGE_COUNT
 };
 
+struct FaultInfo {
+    OSThread thread;
+    u64 stack[THREAD2_STACK / sizeof(u64)];
+    OSMesgQueue mesgQueue;
+    OSMesg mesg;
+    u16 *framebuffer;
+    u16 width;
+    u16 height;
+    u16 num_shade_passes;
+};
+
 // Exports for the debugger/ system
 char *crash_screen_ellide_string(char *str, u32 truncateLength);
 
 // Exports for the rest of the game
 void crash_screen_init(void);
+void crash_screen_set_framebuffer_shade_level(int num_passes);
 
 #endif // CRASH_SCREEN_H

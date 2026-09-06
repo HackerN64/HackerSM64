@@ -10,7 +10,6 @@
 #include "audio/external.h"
 #include "farcall.h"
 #include "game/game_init.h"
-#include "game/main.h"
 #include "game/debug.h"
 #include "game/rumble_init.h"
 #include "game/printf.h"
@@ -106,17 +105,12 @@ static u32 sCrashScreenStackTraceCount = 0;
 static u16 gCrashScreenTextColor = 0xFFFF;
 static u32 sCrashScreenPrintRow_Pixels = 0;
 static u32 sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
-struct {
-    OSThread thread;
-    u64 stack[THREAD2_STACK / sizeof(u64)];
-    OSMesgQueue mesgQueue;
-    OSMesg mesg;
-    u16 *framebuffer;
-    u16 width;
-    u16 height;
-} gCrashScreen;
 
+struct FaultInfo gCrashScreen;
 
+void crash_screen_set_framebuffer_shade_level(int num_passes) {
+    gCrashScreen.num_shade_passes = num_passes;
+}
 
 /**
  * Splits a path string by the containing folder and the name of the file itself.
@@ -166,26 +160,24 @@ static void crash_screen_reset_println_height(void) {
     sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
 }
 
-void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
-    u16 *ptr;
-    s32 i, j;
+void crash_screen_draw_rect(s32 x, s32 y, s32 width, s32 height) {
+    /**
+     * Instead of setting the framebuffer pixels fully dark,
+     * we "darken" the RGBA5551 pixel. This is done by
+     * 1. mask every component by COLOR_MASK
+     *    - This removes X low bits that might interfere with the next step
+     * 2. Shifting the entire pixel value right by X (i.e. divide every component by 2**x)
+     */
+    u16 fb_color_mask = ((0b11111) & ~((1 << gCrashScreen.num_shade_passes) - 1)) << 3;
+    u16 fb_pixel_mask = GPACK_RGBA5551(fb_color_mask, fb_color_mask, fb_color_mask, 0);
 
-    ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
-    for (i = 0; i < h; i++) {
-        for (j = 0; j < w; j++) {
-            /**
-             * Instead of setting the framebuffer pixels fully dark,
-             * we "darken" the RGBA5551 pixel. This is done by
-             * shifting every RGB component right by 1 in one operation,
-             * essentially setting the brightness to 1/2.
-             */
-            #define COLOR_MASK (0b11110000)
-            #define PIXEL_MASK GPACK_RGBA5551(COLOR_MASK, COLOR_MASK, COLOR_MASK, 0)
-
-            *ptr = ((*ptr & PIXEL_MASK) / 2) | 1;
+    u16 *ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
+    for (s32 i = 0; i < height; i++) {
+        for (s32 j = 0; j < width; j++) {
+            *ptr = ((*ptr & fb_pixel_mask) >> gCrashScreen.num_shade_passes) | 1;
             ptr++;
         }
-        ptr += gCrashScreen.width - w;
+        ptr += gCrashScreen.width - width;
     }
 }
 

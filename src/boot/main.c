@@ -363,6 +363,7 @@ void thread3_main(UNUSED void *arg) {
     gEmulator = detect_emulator();
 #ifndef UNF
     crash_screen_init();
+    crash_screen_set_framebuffer_shade_level((gEmulator & EMU_CONSOLE) ? 1 : 2);
 #endif
 
 #ifdef UNF
