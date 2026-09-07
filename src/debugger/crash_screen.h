@@ -46,7 +46,6 @@ struct FaultInfo {
     u16 *framebuffer;
     u16 width;
     u16 height;
-    u16 num_shade_passes;
 };
 
 // Exports for the debugger/ system

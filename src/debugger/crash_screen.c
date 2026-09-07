@@ -157,26 +157,33 @@ static void crash_screen_reset_println_height(void) {
     sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
 }
 
-void crash_screen_draw_rect(s32 x, s32 y, s32 width, s32 height) {
-    /**
-     * Instead of setting the framebuffer pixels fully dark,
-     * we "darken" the RGBA5551 pixel. This is done by
-     * 1. mask every component by COLOR_MASK
-     *    - This removes X low bits that might interfere with the next step
-     * 2. Shifting the entire pixel value right by X (i.e. divide every component by 2**x)
-     */
-    u16 fb_color_mask = ((0b11111) & ~((1 << gCrashScreen.num_shade_passes) - 1)) << 3;
-    u16 fb_pixel_mask = GPACK_RGBA5551(fb_color_mask, fb_color_mask, fb_color_mask, 0);
+#define MASK_5BIT 0x1F
+#define R_SHIFT 11
+#define G_SHIFT 6
+#define B_SHIFT 1
+#define A_SHIFT 0
+void crash_screen_darken_framebuffer(const f32 opacity) {
+    f32 mult = 1.0f - opacity;
+    if (mult < 0.0f) {
+        mult = 0.0f;
+    } else if (mult >= 1.0f) {
+        return;
+    }
 
-    u16 *ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
-    for (s32 i = 0; i < height; i++) {
-        for (s32 j = 0; j < width; j++) {
-            *ptr = ((*ptr & fb_pixel_mask) >> gCrashScreen.num_shade_passes) | 1;
-            ptr++;
-        }
-        ptr += gCrashScreen.width - width;
+    u32 r, g, b;
+    for (u16 *ptr = gCrashScreen.framebuffer; ptr < gCrashScreen.framebuffer + ARRAY_COUNT(gFramebuffers[0]); ptr++) {
+        r = (((*ptr) >> R_SHIFT) & MASK_5BIT) * mult;
+        g = (((*ptr) >> G_SHIFT) & MASK_5BIT) * mult;
+        b = (((*ptr) >> B_SHIFT) & MASK_5BIT) * mult;
+
+        *ptr = (r << R_SHIFT) | (g << G_SHIFT) | (b << B_SHIFT) | (1 << A_SHIFT);
     }
 }
+#undef A_SHIFT
+#undef B_SHIFT
+#undef G_SHIFT
+#undef R_SHIFT
+#undef MASK_5BIT
 
 void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
     const u32 *data;
@@ -822,7 +829,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 
                 // Draw a dark overlay on the last rendered frame, so we don't have to draw rectangles again
                 gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[most_recent_framebuffer];
-                crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                crash_screen_darken_framebuffer((gEmulator & EMU_CONSOLE) ? 0.667f : 0.75f);
 
                 gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
 
@@ -854,7 +861,6 @@ void crash_screen_init(void) {
     gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
-    gCrashScreen.num_shade_passes = (gEmulator & EMU_CONSOLE) ? 1 : 2;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
     osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
                    (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack),
