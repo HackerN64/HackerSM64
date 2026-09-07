@@ -435,9 +435,6 @@ static void check_fbe(s32 frameIndex) {
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
-#ifdef DEBUG_FORCE_CRASH_ON_BOOT
-    FORCE_CRASH
-#endif
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
