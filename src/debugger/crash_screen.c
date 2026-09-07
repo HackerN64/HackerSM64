@@ -11,6 +11,7 @@
 #include "farcall.h"
 #include "game/game_init.h"
 #include "game/debug.h"
+#include "game/emutest.h"
 #include "game/rumble_init.h"
 #include "game/printf.h"
 
@@ -107,10 +108,6 @@ static u32 sCrashScreenPrintRow_Pixels = 0;
 static u32 sCrashScreenPrintLnHeight_Pixels = CRASH_SCREEN_GLYPH_HEIGHT;
 
 struct FaultInfo gCrashScreen;
-
-void crash_screen_set_framebuffer_shade_level(u16 num_passes) {
-    gCrashScreen.num_shade_passes = num_passes;
-}
 
 /**
  * Splits a path string by the containing folder and the name of the file itself.
@@ -857,6 +854,7 @@ void crash_screen_init(void) {
     gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[stale_framebuffers[crash_screen_cfb_index]];
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
+    gCrashScreen.num_shade_passes = (gEmulator & EMU_CONSOLE) ? 1 : 2;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
     osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
                    (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack),
