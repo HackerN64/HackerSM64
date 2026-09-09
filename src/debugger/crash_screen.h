@@ -17,6 +17,8 @@
 #define CRASH_SCREEN_LEFT_MARGIN 16
 #define  CRASH_SCREEN_TOP_MARGIN 16
 
+#define CRASH_SCREEN_SPECIAL_CHAR_ELLIPSIS (127)
+
 // Tab width ('\t') for crash screen prints, in characters.
 //  Note that we only treat tabs as a wide space.
 #define CRASH_SCREEN_TAB_WIDTH_CHARS 4
