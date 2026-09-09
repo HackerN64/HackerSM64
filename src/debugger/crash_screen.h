@@ -17,6 +17,7 @@
 #define CRASH_SCREEN_LEFT_MARGIN 16
 #define  CRASH_SCREEN_TOP_MARGIN 16
 
+// Special characters not in the ASCII range
 #define CRASH_SCREEN_SPECIAL_CHAR_ELLIPSIS (127)
 
 // Tab width ('\t') for crash screen prints, in characters.
