@@ -54,6 +54,9 @@ typedef struct {
  */
 typedef u32 addrtable_entry_t;
 
+// symbol names in the table itself cant be longer than this
+#define SYMTABLE_MAX_SYMBOL_LEN (64)
+
 #define ADDRENTRY_ADDR(e)       ((e) & ~3)     ///< Address (without the flags)
 #define ADDRENTRY_IS_FUNC(e)    ((e) &  1)     ///< TRUE if the address is the start of a function
 #define ADDRENTRY_IS_INLINE(e)  ((e) &  2)     ///< TRUE if the address is an inline duplicate

@@ -141,15 +141,24 @@ char *symt_string(symtable_header_t *symt, int sidx, int slen, char *buf, int si
     char *func = buf + tweak; size -= tweak;
     int nbytes = MIN(slen, size - 1);
 
+    int offset = 0;
+
+    if (nbytes == size - 1) {
+        offset = slen - size + 1;
+    }
+
     osWritebackDCache(buf, size);
     map_parser_dma(
         func, 
-        (uintptr_t *)(SYMT_ROM + symt->strtab_off + sidx),
-        size
+        (uintptr_t *)(SYMT_ROM + symt->strtab_off + sidx + offset),
+        nbytes
     );
     func[nbytes] = 0;
-    if (nbytes == size - 1) {
+    if (slen == SYMTABLE_MAX_SYMBOL_LEN) {
         func[nbytes - 1] = CRASH_SCREEN_SPECIAL_CHAR_ELLIPSIS;
+    }
+    if (nbytes == size - 1) {
+        func[0] = CRASH_SCREEN_SPECIAL_CHAR_ELLIPSIS;
     }
 
     if (tweak) {
