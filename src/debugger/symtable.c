@@ -6,7 +6,6 @@
 #include "segments.h"
 #include "game/memory.h"
 
-#include "crash_screen.h"
 #include "symtable.h"
 
 #ifdef DEBUG_EXPORT_SYMBOLS
@@ -148,9 +147,6 @@ char *symt_string(symtable_header_t *symt, int sidx, int slen, char *buf, int si
         size
     );
     func[nbytes] = 0;
-    if (nbytes == size - 1) {
-        func[nbytes - 1] = CRASH_SCREEN_SPECIAL_CHAR_ELLIPSIS;
-    }
 
     if (tweak) {
         buf[0] = ' ';

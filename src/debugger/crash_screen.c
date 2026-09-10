@@ -119,8 +119,12 @@ char *crash_screen_ellide_string(char *str, u32 truncateLength) {
         return str;
     }
 
-    str[string_length - truncateLength] = CRASH_SCREEN_SPECIAL_CHAR_ELLIPSIS;
-    return &str[string_length - truncateLength];
+    str[string_length - truncateLength - 4] = '(';
+    str[string_length - truncateLength - 3] = '.';
+    str[string_length - truncateLength - 2] = '.';
+    str[string_length - truncateLength - 1] = '.';
+    str[string_length - truncateLength - 0] = ')';
+    return &str[string_length - truncateLength - 4];
 }
 
 static void crash_screen_update_framebuffer_indices(void) {
@@ -447,7 +451,7 @@ void draw_crash_overview(OSThread *thread, s32 cause) {
 
 void draw_crash_context(OSThread *thread, s32 cause) {
 #ifdef DEBUG_EXPORT_SYMBOLS
-    char symbolname_scratch[MAX_SYMBOL_LENGTH];
+    char symbolname_scratch[64];
 #endif // DEBUG_EXPORT_SYMBOLS
 
     __OSThreadContext *tc = &thread->context;
@@ -511,7 +515,7 @@ void draw_crash_log(void) {
 
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 #ifdef DEBUG_EXPORT_SYMBOLS
-    char symbolname_scratch[MAX_SYMBOL_LENGTH];
+    char symbolname_scratch[64];
 #endif // DEBUG_EXPORT_SYMBOLS
 
     __OSThreadContext *tc = &thread->context;
