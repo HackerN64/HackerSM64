@@ -90,7 +90,31 @@ endif
 # FIXLIGHTS - converts light objects to light color commands for assets, needed for vanilla-style lighting
 FIXLIGHTS ?= 1
 
-DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
+#----------------
+# Debug Switches - Comment these out to remove the functionality, then run `make clean`
+#----------------
+# Export symbols and stack trace data for crash screen
+DEBUG_EXPORT_SYMBOLS := 1
+# Include line data, at the cost of a significantly longer link time and a few extra megabytes of ROM
+DEBUG_EXPORT_ALL_LINES := 0
+# Crash Screen: enable symbol-assisted stack trace. Adds a bit more code to (somewhat) intelligently walk the stack.
+# Requires DEBUG_EXPORT_SYMBOLS to be enabled too
+# If disabled, stack trace will just dump the memory at the stack pointer, from which one can cross-reference with the function map.
+DEBUG_FULL_STACK_TRACE := 1
+
+ifeq ($(DEBUG_EXPORT_SYMBOLS),1)
+  ifeq ($(DEBUG_EXPORT_ALL_LINES),1)
+  	DEBUG_EXPORT_ALL_LINES_FLAG += --all-lines
+  	DEFINES += DEBUG_EXPORT_ALL_LINES=1
+  endif
+  DEFINES += DEBUG_EXPORT_SYMBOLS=1
+  GENERATE_DWARF := -gdwarf-4
+  DEFAULT_OPT_FLAGS += $(GENERATE_DWARF)
+  SYMBOL_TABLE = $(BUILD_DIR)/sm64.sym.o
+endif
+ifeq ($(DEBUG_FULL_STACK_TRACE),1)
+  DEFINES += DEBUG_FULL_STACK_TRACE=1
+endif
 
 TARGET := sm64
 
@@ -134,8 +158,13 @@ endif
 # Optimization flags                                                           #
 #==============================================================================#
 
+# The general code optimization flag that governs the compiler's overall strategy.
+# Some valid values are: [-O0, -O1, -O2, -O3, -Ofast, -Os]
+# Set to -O0 (or comment out) to turn off code optimization, then run `make clean`
+GENERAL_OPTIMIZATION_LEVEL := -Os
+
 # Default non-gcc opt flags
-DEFAULT_OPT_FLAGS = -Os -ffinite-math-only -fno-signed-zeros -fno-math-errno
+DEFAULT_OPT_FLAGS += $(GENERAL_OPTIMIZATION_LEVEL) -ffinite-math-only -fno-signed-zeros -fno-math-errno
 # Note: -fno-associative-math is used here to suppress warnings, ideally we would enable this as an optimization but
 # this conflicts with -ftrapping-math apparently.
 # HACKERSM64_DO: Figure out how to allow -fassociative-math to be enabled
@@ -360,7 +389,7 @@ ACTOR_DIR      := actors
 LEVEL_DIRS     := $(patsubst levels/%,%,$(dir $(wildcard levels/*/header.h)))
 
 # Directories containing source files
-SRC_DIRS += src src/boot src/boot/deflate src/game src/engine src/audio src/menu src/buffers lib/librtc actors levels bin data assets asm lib sound
+SRC_DIRS += src src/boot src/boot/deflate src/game src/engine src/audio src/menu src/buffers src/debugger lib/librtc actors levels bin data assets asm lib sound
 LIBZ_SRC_DIRS := src/libz
 GODDARD_SRC_DIRS := src/goddard src/goddard/dynlists
 BIN_DIRS := bin bin/$(VERSION)
@@ -443,6 +472,7 @@ endif
 AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
 OBJCOPY   := $(CROSS)objcopy
+ADDR2LINE := addr2line
 
 ifeq ($(LD), tools/mips64-elf-ld)
   ifeq ($(shell ls -la tools/mips64-elf-ld | awk '{print $1}' | grep x),)
@@ -622,8 +652,8 @@ patch: $(ROM)
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/ipl3.o:              $(IPL3_RAW_FILES)
-$(BUILD_DIR)/src/game/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/fasttext.o:     $(FASTTEXT_TEXTURE_C_FILES)
+$(BUILD_DIR)/src/debugger/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin
 $(SOUND_BIN_DIR)/sound_data.o:        $(SOUND_BIN_DIR)/sound_data.ctl $(SOUND_BIN_DIR)/sound_data.tbl $(SOUND_BIN_DIR)/sequences.bin $(SOUND_BIN_DIR)/bank_sets
@@ -658,13 +688,13 @@ else
   endif
 endif
 
-$(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := $(GENERATE_DWARF) -O0
 $(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
-$(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := $(GENERATE_DWARF) -O0
 $(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
 # File specific opt flags
-$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := $(GENERATE_DWARF) $(GENERAL_OPTIMIZATION_LEVEL) -fno-jump-tables
+$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := $(GENERATE_DWARF) $(GENERAL_OPTIMIZATION_LEVEL) -fno-jump-tables
 
 $(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := $(COLLISION_OPT_FLAGS)
 $(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := $(MATH_UTIL_OPT_FLAGS)
@@ -675,7 +705,7 @@ $(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := $(GRAPH_NODE_OPT_FLAG
 # $(info MATH_UTIL_OPT_FLAGS:  $(MATH_UTIL_OPT_FLAGS))
 # $(info GRAPH_NODE_OPT_FLAGS: $(GRAPH_NODE_OPT_FLAGS))
 
-ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
+ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(GODDARD_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
 
 # Make sure build directory exists before compiling anything
 DUMMY != mkdir -p $(ALL_DIRS)
@@ -874,7 +904,7 @@ $(BUILD_DIR)/rsp/%.bin $(BUILD_DIR)/rsp/%_data.bin: rsp/%.s
 # Run linker script through the C preprocessor
 $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT) $(BUILD_DIR)/goddard.txt
 	$(call print,Preprocessing linker script:,$<,$@)
-	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) $(DEBUG_MAP_STACKTRACE_FLAG) -MMD -MP -MT $@ -MF $@.d -o $@ $<
+	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -DULTRALIB=lib$(ULTRALIB) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
 # Link libgoddard
 $(BUILD_DIR)/libgoddard.a: $(GODDARD_O_FILES)
@@ -894,13 +924,14 @@ $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/sm64_prelim.elf
 	$(call print,Getting Goddard size...)
 	$(V)python3 tools/getGoddardSize.py $(BUILD_DIR)/sm64_prelim.map $(BUILD_DIR)
 
-$(BUILD_DIR)/asm/debug/map.o: asm/debug/map.s $(BUILD_DIR)/sm64_prelim.elf
-	$(call print,Assembling:,$<,$@)
-	$(V)python3 tools/mapPacker.py $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/bin/addr.bin $(BUILD_DIR)/bin/name.bin
-	$(V)$(CROSS)gcc -c $(ASMFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
+$(SYMBOL_TABLE): $(BUILD_DIR)/sm64_prelim.elf
+	$(call print,Generating symbol table:,$(@F))
+	$(V)tools/n64sym $(DEBUG_EXPORT_ALL_LINES_FLAG) --objdump $(OBJDUMP) --addr2line $(ADDR2LINE) $(BUILD_DIR)/sm64_prelim.elf
+	$(call print,Assembling:,$@)
+	$(LD) -r -b binary -o $@ $(BUILD_DIR)/sm64_prelim.sym
 
 # Link SM64 ELF file
-$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libgoddard.a
+$(ELF): $(BUILD_DIR)/sm64_prelim.elf $(SYMBOL_TABLE) $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
 	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
 

@@ -4,6 +4,7 @@
 #include "geo_layout.h"
 #include "math_util.h"
 #include "game/memory.h"
+#include "debugger/assert.h"
 #include "graph_node.h"
 #include "game/debug.h"
 
@@ -604,7 +605,7 @@ void geo_layout_cmd_node_billboard(void) {
     cmdPos = read_vec3s(axis, &cmdPos[0]);
 
     if (isCylindrical) {
-        assert(axis[0] != 0 || axis[1] != 0 || axis[2] != 0, "Axis vector for cylindrical billboard\nmust be non-zero");
+        assertf(axis[0] != 0 || axis[1] != 0 || axis[2] != 0, "Axis vector for cylindrical billboard\nmust be non-zero");
     }
 
     if (params & 0x80) {
@@ -784,7 +785,7 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoLayoutStack[1] = 0;
 
     while (gGeoLayoutCommand != NULL) {
-        assert((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT), "Invalid or unloaded geo layout detected.");
+        assertf((gGeoLayoutCommand[0x00] < GEO_CMD_COUNT), "Invalid or unloaded geo layout detected.");
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }
 

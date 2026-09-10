@@ -7,6 +7,7 @@
 #include "buffers/gfx_output_buffer.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
+#include "debugger/assert.h"
 #include "engine/level_script.h"
 #include "engine/math_util.h"
 #include "game_init.h"
@@ -32,9 +33,6 @@
 #include "profiling.h"
 #include "debug.h"
 #include "emutest.h"
-
-// Emulators that the Instant Input patch should be applied to
-#define INSTANT_INPUT_WHITELIST (EMU_PARALLEL_LAUNCHER | EMU_PROJECT64 | EMU_MUPEN)
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -351,7 +349,7 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
 
     // NOTE: 'entries' is not representative of the right-side allocations coming from the GFX pool; do not use that variable here.
-    assert_args((u8*) gDisplayListHead <= gGfxPoolEnd, "GFX pool exceeded: %d command(s) over!", ((s32) gGfxPoolEnd - (s32) gDisplayListHead) / sizeof(Gfx));
+    assertf((u8*) gDisplayListHead <= gGfxPoolEnd, "GFX pool exceeded: %d command(s) over!", ((s32) gGfxPoolEnd - (s32) gDisplayListHead) / sizeof(Gfx));
 }
 
 /**
@@ -437,9 +435,6 @@ static void check_fbe(s32 frameIndex) {
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
-#ifdef DEBUG_FORCE_CRASH_ON_BOOT
-    FORCE_CRASH
-#endif
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;

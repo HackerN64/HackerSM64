@@ -61,6 +61,13 @@
 #define OPTIMIZE_OFAST 
 #endif
 
+// Do not optimize the code when compiling a function
+#ifdef __GNUC__
+#define UNOPTIMIZED __attribute__((optimize("O0")))
+#else
+#define UNOPTIMIZED
+#endif
+
 // Ignore 4-byte alignment in structs.
 #ifdef __GNUC__
 #define PACKED __attribute__((packed))

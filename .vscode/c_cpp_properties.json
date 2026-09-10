@@ -27,6 +27,8 @@
                 "F3DEX_GBI_2=1",
                 "F3DZEX_NON_GBI_2=1",
                 "F3DEX_GBI_SHARED=1",
+                "DEBUG_EXPORT_SYMBOLS=1",
+                "DEBUG_FULL_STACK_TRACE=1",
                 "LIBPL=1"
             ],
             "compilerPath": "/usr/bin/mips-linux-gnu-gcc",
