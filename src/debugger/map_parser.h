@@ -2,7 +2,7 @@
 
 #include "farcall.h"
 
-#define MAX_SYMBOL_LENGTH (64)
+#define MAX_SYMBOL_LENGTH (48)
 
 typedef struct {
     char *file;

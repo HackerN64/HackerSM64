@@ -303,10 +303,10 @@ char *insn_disasm(InsnData *addr) {
                 case PARAM_JAL: {
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
 #ifdef DEBUG_EXPORT_SYMBOLS
-                    char funcname_buf[48];
+                    char funcname_buf[64];
                     char symBuffer[CRASH_SCREEN_MAX_PATH];
-                    sprintf(symBuffer, "%08X (%s)", target, parse_map(funcname_buf, sizeof(funcname_buf), target, FALSE));
-                    strp += sprintf(strp, "%-1s %s", insn_db[i].name, symBuffer);
+                    sprintf(symBuffer, "%s(%08X)", parse_map(funcname_buf, sizeof(funcname_buf), target, FALSE), target);
+                    strp += sprintf(strp, "%-9s %s", insn_db[i].name, crash_screen_ellide_string(symBuffer, 30));
 #else
                     strp += sprintf(strp, "%-9s %08X", insn_db[i].name,
                                                        target
