@@ -157,7 +157,7 @@ u8 insn_is_jalr(Insn *i) {
 // Last Resort C0/C1 disassembler, from libdragon
 static void c1_disasm(u32 *ptr, char *out) {
 #ifdef DEBUG_EXPORT_SYMBOLS
-    char funcname_buf[26]; // shorter to fit jal's on screen
+    char funcname_buf[64];
 #endif // DEBUG_EXPORT_SYMBOLS
     static const char *fpu_ops[64]= {
         "radd", "rsub", "rmul", "rdiv", "ssqrt", "sabs", "smov", "sneg",
