@@ -26,7 +26,7 @@ static Collision const *sActivatedBackAndForthPlatformCollisionModels[] = {
 /**
  * Activated back-and-forth platform initialization function.
  */
-//! TODO: Param names
+//! HACKERSM64_DO: Param names
 void bhv_activated_back_and_forth_platform_init(void) {
     // Equivalent to the first behavior param byte & 3 (last 2 bits of the byte).
     s32 platformType = GET_BPARAM1(o->oBehParams) & ACTIVATED_BF_PLAT_TYPES_MASK;

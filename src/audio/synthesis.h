@@ -110,8 +110,8 @@ STATIC_ASSERT(BETTER_REVERB_FILTER_COUNT_LIGHT <= NUM_ALLPASS, "BETTER_REVERB_FI
 struct ReverbRingBufferItem {
     s16 numSamplesAfterDownsampling;
     s16 chunkLen; // never read
-    s16 *toDownsampleLeft;
-    s16 *toDownsampleRight; // data pointed to by left and right are adjacent in memory
+    s16 *toBeDownsampledLeft;
+    s16 *toBeDownsampledRight; // data pointed to by left and right are adjacent in memory
     s32 startPos; // start pos in ring buffer
     s16 lengthA; // first length in ring buffer (from startPos, at most until end)
     s16 lengthB; // second length in ring buffer (from pos 0)

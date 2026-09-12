@@ -5,6 +5,7 @@
 #include "dialog_ids.h"
 #include "audio/external.h"
 #include "audio/synthesis.h"
+#include "debugger/assert.h"
 #include "level_update.h"
 #include "game_init.h"
 #include "level_update.h"
@@ -35,7 +36,7 @@
 
 #include "config.h"
 
-// TODO: Make these ifdefs better
+// HACKERSM64_DO: Make these ifdefs better
 const char *credits01[] = { "1GAME DIRECTOR", "SHIGERU MIYAMOTO" };
 const char *credits02[] = { "2ASSISTANT DIRECTORS", "YOSHIAKI KOIZUMI", "TAKASHI TEZUKA" };
 const char *credits03[] = { "2SYSTEM PROGRAMMERS", "YASUNARI NISHIDA", "YOSHINORI TANIMOTO" };
@@ -350,14 +351,8 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
 
 void init_mario_after_warp(void) {
     struct Object *object = get_destination_warp_object(sWarpDest.nodeId);
+    assertf(object, "No dest warp object found for: 0x%02X", sWarpDest.nodeId);
 
-#ifdef DEBUG_ASSERTIONS
-    if (!object) {
-        char errorMsg[40];
-        sprintf(errorMsg, "No dest warp object found for: 0x%02X", sWarpDest.nodeId);
-        error(errorMsg);
-    }
-#endif
     u32 marioSpawnType = get_mario_spawn_type(object);
 
     if (gMarioState->action != ACT_UNINITIALIZED) {
@@ -368,6 +363,11 @@ void init_mario_after_warp(void) {
         gPlayerSpawnInfos[0].startAngle[0] = 0;
         gPlayerSpawnInfos[0].startAngle[1] = object->oMoveAngleYaw;
         gPlayerSpawnInfos[0].startAngle[2] = 0;
+        
+        struct Surface *floor;
+        gMarioState->lastSafePos[0] = object->oPosX;
+        gMarioState->lastSafePos[1] = find_floor(object->oPosX, object->oPosY, object->oPosZ, &floor);
+        gMarioState->lastSafePos[2] = object->oPosZ;
 
         if (marioSpawnType == MARIO_SPAWN_DOOR_WARP) {
             init_door_warp(&gPlayerSpawnInfos[0], sWarpDest.arg);
@@ -578,14 +578,7 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
-
-#ifdef DEBUG_ASSERTIONS
-    if (!warpNode) {
-        char errorMsg[40];
-        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) arg);
-        error(errorMsg);
-    }
-#endif
+    assertf(warpNode, "No source warp node found for: 0x%02X", (u8) arg);
 
     s16 levelNum = warpNode->node.destLevel & 0x7F;
 
@@ -707,10 +700,9 @@ void initiate_painting_warp(void) {
 
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 fadeout_music(398);
-#if ENABLE_RUMBLE
+
                 queue_rumble_data(80, 70);
                 queue_rumble_decay(1);
-#endif
             }
         }
     }
@@ -913,14 +905,7 @@ void initiate_delayed_warp(void) {
 
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
-
-#ifdef DEBUG_ASSERTIONS
-                    if (!warpNode) {
-                        char errorMsg[40];
-                        sprintf(errorMsg, "No source warp node found for: 0x%02X", (u8) sSourceWarpNodeId);
-                        error(errorMsg);
-                    }
-#endif
+                    assertf(warpNode, "No source warp node found for: 0x%02X", (u8) sSourceWarpNodeId);
 
                     initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);
@@ -1064,9 +1049,7 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_CHANGE_AREA);
         } else if (pressed_pause()) {
             lower_background_noise(1);
-#if ENABLE_RUMBLE
             cancel_rumble();
-#endif
             gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN;
             set_play_mode(PLAY_MODE_PAUSED);
         }
@@ -1137,7 +1120,7 @@ s32 play_mode_frame_advance(void) {
  */
 void level_set_transition(s16 length, void (*updateFunction)()) {
     sTransitionTimer = length;
-    sTransitionUpdate = updateFunction;
+    sTransitionUpdate = (typeof(sTransitionUpdate)) updateFunction;
 }
 
 /**
@@ -1229,11 +1212,12 @@ s32 update_level(void) {
     return changeLevel;
 }
 
+#ifdef PUPPYPRINT_DEBUG
+extern u32 gInitLevelTime;
+#endif
+
 s32 init_level(void) {
     s32 fadeFromColor = FALSE;
-#ifdef PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
 
     set_play_mode(PLAY_MODE_NORMAL);
 
@@ -1313,17 +1297,22 @@ s32 init_level(void) {
             set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
         }
     }
-#if ENABLE_RUMBLE
     if (gCurrDemoInput == NULL) {
         cancel_rumble();
     }
-#endif
 
     if (gMarioState->action == ACT_INTRO_CUTSCENE) {
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
     }
 
-    append_puppyprint_log("Level loaded in %d" PP_CYCLE_STRING ".", (s32)(PP_CYCLE_CONV(osGetTime() - first)));
+#ifdef PUPPYPRINT_DEBUG
+    if (gInitLevelTime) {
+        u32 totalTime = osGetCount() - gInitLevelTime;
+        append_puppyprint_log("Level loaded in %2.3fs.", (f64) OS_CYCLES_TO_USEC(totalTime) / 1000000.0f);
+        gInitLevelTime = 0;
+    }
+#endif
+
     return TRUE;
 }
 

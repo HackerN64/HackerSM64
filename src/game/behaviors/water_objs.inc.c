@@ -1,5 +1,5 @@
 // water_objs.inc.c
-// TODO: Better name, please
+// HACKERSM64_DO: Better name, please
 
 void bhv_water_air_bubble_init(void) {
     cur_obj_scale(4.0f);

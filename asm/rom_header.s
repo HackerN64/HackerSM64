@@ -14,7 +14,7 @@
 .word  0x00000000               /* Checksum 2 */
 .word  0x00000000               /* Unknown */
 .word  0x00000000               /* Unknown */
-.ascii INTERNAL_ROM_NAME   /* Internal ROM name */
+.ascii INTERNAL_ROM_NAME        /* Internal ROM name */
 #if defined(EMU_DEFAULT_TO_GCN)
 /* Advanced homebrew ROM header bytes: https://n64brew.dev/wiki/ROM_Header#Advanced_Homebrew_ROM_Header */
 .word  0x82000000
@@ -22,11 +22,8 @@
 .word  0x00000000               /* Unknown */
 #endif
 .word  0x0000004E               /* Cartridge */
-#if defined(EEP4K) && !defined(EMU_DEFAULT_TO_GCN)
-.ascii "SM"                     /* Cartridge ID */
-#else
+
 .ascii "ED"                     /* Cartridge ID */
-#endif
 
 /* Region */
 #if defined(VERSION_JP) || defined(VERSION_SH)
@@ -35,14 +32,21 @@
     .ascii "E"                  /* NTSC-U (North America) */
 #endif
 
-#if defined(SRAM)
-    .byte  0x32                 /* Version */
-#elif defined(EEP16K)
-    .byte  0x22                 /* Version */
-#elif defined(SRAM768K)
-    .byte  0x42                 /* Version */
-#elif defined(FLASHRAM)
-    .byte  0x52                 /* Version */
+#if defined(USE_RTC)
+    #define RTC_BIT 0x1
 #else
-    .byte  0x12                 /* Version */
+    #define RTC_BIT 0x0
+#endif
+
+/* Savetype, region, and RTC */
+#if defined(SRAM)
+    .byte  0x32 | RTC_BIT
+#elif defined(EEP16K)
+    .byte  0x22 | RTC_BIT
+#elif defined(SRAM768K)
+    .byte  0x42 | RTC_BIT
+#elif defined(FLASHRAM)
+    .byte  0x52 | RTC_BIT
+#else
+    .byte  0x12 | RTC_BIT
 #endif

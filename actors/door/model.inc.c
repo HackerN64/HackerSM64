@@ -604,7 +604,7 @@ static const Vtx door_seg3_vertex_themed_handle_near_2[] = {
 };
 
 // 0x03014888 - 0x030149C0
-const Gfx door_seg3_sub_dl_themed_handle_near[] = { // TODO: Combine vertices
+const Gfx door_seg3_sub_dl_themed_handle_near[] = { // HACKERSM64_DO: Combine vertices
     gsSPVertex(door_seg3_vertex_themed_handle_near_1, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  6,  4, 0x0,  7,  6,  3, 0x0),

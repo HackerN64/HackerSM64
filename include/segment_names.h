@@ -8,9 +8,9 @@
  * If you change these numbers, make sure to also change them in Makefile.split,
  *  and in your level scripts (in places marked with *seg*).
  * 
- * TODO: Make this an enum without breaking sm64.ld
- * TODO: Find a way to use these with SEG_ADDRESS in sm64.ld without breaking Fast64
- * TODO: Find a way to use these with SEG_ADDRESS in Makefile.split
+ * HACKERSM64_DO: Make this an enum without breaking sm64.ld
+ * HACKERSM64_DO: Find a way to use these with SEG_ADDRESS in sm64.ld without breaking Fast64
+ * HACKERSM64_DO: Find a way to use these with SEG_ADDRESS in Makefile.split
  */
 
 #define SEGMENT_MAIN                 0x00 // | Segment  0 | General Segment, includes most of /src/ (engine, buffers, goddard, audio, etc.)

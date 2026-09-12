@@ -519,7 +519,7 @@ void imout(void) {
 
 /**
  * Returns a random floating point number between 0 and 1 (inclusive)
- * TODO: figure out type of rng generator?
+ * HACKERSM64_DO: figure out type of rng generator?
  */
 f32 gd_rand_float(void) {
     u32 temp;

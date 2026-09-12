@@ -19,8 +19,8 @@
 #include "config/config_objects.h"
 #include "config/config_rom.h"
 
-// Local config - include a gitignore'd config file that's specific to just the user (if the file exists)
-#if __has_include("config/config_local.h")
+// Local config - include a gitignore'd config file that's specific to just the user (if the file exists). Ignored for release builds.
+#if __has_include("config/config_local.h") && !defined(DISABLE_ALL)
     #include "config/config_local.h"
 #endif
 

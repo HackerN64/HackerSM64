@@ -6,7 +6,7 @@
 #include "gd_types.h"
 #include "macros.h"
 
-// TODO: make this an enum without causing bss reordering
+// HACKERSM64_DO: make this an enum without causing bss reordering
 #define COLOUR_BLACK     0
 #define COLOUR_WHITE     1
 #define COLOUR_RED       2

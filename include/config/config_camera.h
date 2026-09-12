@@ -6,10 +6,7 @@
 
 /**
  * Forces the camera mode to your choice (except when swimming or flying).
- * It does this by setting the area's camera->defMode to this mode, and also
- * changes hardcoded modes to use c->defMode.
- *      Note: removes door cutscenes due to the way they're designed to work with specific modes.
- *      Search for FORCED_CAMERA_MODE in camera.c for more information.
+ * It does this by setting the area's camera->defMode to this mode.
  */
 #define FORCED_CAMERA_MODE        CAMERA_MODE_8_DIRECTIONS
 
@@ -61,16 +58,8 @@
 /**********************************/
 
 /**
- * Included for ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS define.
- */
-#include "config_game.h"
-
-/**
  * Allow course specific camera processing.
  * You will likely want this disabled in non-vanilla hacks.
- * This is automatically enabled when ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS is enabled,
- * but feel free to override it if you really want to for some reason.
+ * Enabling this will automatically disable FORCED_CAMERA_MODE and USE_COURSE_DEFAULT_MODE.
  */
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    #define ENABLE_VANILLA_CAM_PROCESSING
-#endif
+// #define ENABLE_VANILLA_CAM_PROCESSING

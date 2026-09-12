@@ -23,6 +23,7 @@
 #include "moving_texture.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"
+#include "puppyprint.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sound_init.h"
@@ -529,17 +530,32 @@ s32 act_debug_free_move(struct MarioState *m) {
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
 
-    if (gPlayer1Controller->buttonDown & U_JPAD) {
-        pos[1] += 16.0f * speed;
+#ifdef USE_PROFILER
+    if (
+        !(gPlayer1Controller->buttonDown & L_TRIG)
+#ifdef PUPPYPRINT_DEBUG
+        && !sDebugMenu
+#endif // PUPPYPRINT_DEBUG
+    ) {
+#endif // USE_PROFILER
+        if (gPlayer1Controller->buttonDown & U_JPAD) {
+            pos[1] += 16.0f * speed;
+        }
+        if (gPlayer1Controller->buttonDown & D_JPAD) {
+            pos[1] -= 16.0f * speed;
+        }
+#ifdef USE_PROFILER
     }
-    if (gPlayer1Controller->buttonDown & D_JPAD) {
-        pos[1] -= 16.0f * speed;
-    }
+#endif
+
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         vec3_zero(m->vel);
         m->forwardVel = 0.0f;
-
-        set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+        
+        if (m->area->camera->mode != m->area->camera->defMode) {
+            set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+        }
+        
         m->input &= ~INPUT_A_PRESSED;
         if (m->pos[1] <= (m->waterLevel - 100)) {
             return set_mario_action(m, ACT_WATER_IDLE, 0);
@@ -559,7 +575,7 @@ s32 act_debug_free_move(struct MarioState *m) {
         pos[2] += speed * coss(m->intendedYaw);
     }
 
-    // TODO: Add ability to ignore collision
+    // HACKERSM64_DO: Add ability to ignore collision
     //      - spawn pseudo floor object to prevent OOB death
     resolve_and_return_wall_collisions(pos, 60.0f, 50.0f, &wallData);
 
@@ -601,7 +617,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
                 }
 #endif
                 disable_background_sound();
-                //! TODO: Is this check necessary? Both seem to do the exact same thing.
+                //! HACKERSM64_DO: Is this check necessary? Both seem to do the exact same thing.
                 if (m->actionArg & 1) {
                     // No exit
                     play_course_clear(obj_has_model(celebStar, MODEL_BOWSER_KEY));
@@ -1106,8 +1122,7 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
             set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_GENERAL_LAND
                                                      : MARIO_ANIM_LAND_FROM_SINGLE_JUMP);
             if (is_anim_past_end(m)) {
-                if (gLastCompletedCourseNum != COURSE_BITDW
-                    && gLastCompletedCourseNum != COURSE_BITFS) {
+                if (gStarModelLastCollected != MODEL_BOWSER_KEY) {
                     enable_time_stop();
                 }
 
@@ -1118,8 +1133,7 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                 if (!(m->flags & MARIO_CAP_ON_HEAD)) {
                     m->actionState = ACT_STATE_EXIT_LAND_SAVE_DIALOG_NO_CAP; // star exit without cap
                 }
-                if (gLastCompletedCourseNum == COURSE_BITDW
-                 || gLastCompletedCourseNum == COURSE_BITFS) {
+                if (gStarModelLastCollected == MODEL_BOWSER_KEY) {
                     m->actionState = ACT_STATE_EXIT_LAND_SAVE_DIALOG_KEY; // key exit
                 }
             }
@@ -1180,9 +1194,7 @@ s32 act_death_exit(struct MarioState *m) {
     if (15 < m->actionTimer++
         && launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, -32.0f)) {
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
-#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
-#endif
 #ifdef ENABLE_LIVES
         m->numLives--;
 #endif
@@ -1217,9 +1229,7 @@ s32 act_unused_death_exit(struct MarioState *m) {
 s32 act_falling_death_exit(struct MarioState *m) {
     if (launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
-#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
-#endif
 #ifdef ENABLE_LIVES
         m->numLives--;
 #endif
@@ -1272,9 +1282,7 @@ s32 act_special_death_exit(struct MarioState *m) {
     }
 
     if (launch_mario_until_land(m, ACT_HARD_BACKWARD_GROUND_KB, MARIO_ANIM_BACKWARD_AIR_KB, -24.0f)) {
-#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
-#endif
 #ifdef ENABLE_LIVES
         m->numLives--;
 #endif
@@ -1360,9 +1368,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
             m->flags &= ~MARIO_JUMPING;
             if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
                 level_trigger_warp(m, WARP_OP_SPIN_SHRINK);
-#if ENABLE_RUMBLE
                 queue_rumble_data(15, 80);
-#endif
                 m->actionState = ACT_STATE_BBH_ENTER_SPIN_END;
             }
             if (m->actionState == ACT_STATE_BBH_ENTER_SPIN_WAIT_FOR_ANIM) {
@@ -1424,12 +1430,10 @@ s32 act_teleport_fade_out(struct MarioState *m) {
     set_mario_animation(m, m->prevAction == ACT_CROUCHING ? MARIO_ANIM_CROUCHING
                                                           : MARIO_ANIM_FIRST_PERSON);
 
-#if ENABLE_RUMBLE
     if (m->actionTimer == 0) {
         queue_rumble_data(30, 70);
         queue_rumble_decay(2);
     }
-#endif
 
     m->flags |= MARIO_TELEPORTING;
 
@@ -1450,12 +1454,10 @@ s32 act_teleport_fade_in(struct MarioState *m) {
     play_sound_if_no_flag(m, SOUND_ACTION_TELEPORT, MARIO_ACTION_SOUND_PLAYED);
     set_mario_animation(m, MARIO_ANIM_FIRST_PERSON);
 
-#if ENABLE_RUMBLE
     if (m->actionTimer == 0) {
         queue_rumble_data(30, 70);
         queue_rumble_decay(2);
     }
-#endif
 
     if (m->actionTimer < 32) {
         m->flags |= MARIO_TELEPORTING;
@@ -1541,9 +1543,7 @@ s32 act_squished(struct MarioState *m) {
                 }
 
                 vec3f_set(m->marioObj->header.gfx.scale, 1.8f, 0.05f, 1.8f);
-#if ENABLE_RUMBLE
                 queue_rumble_data(10, 80);
-#endif
                 m->actionState = ACT_STATE_SQUISHED_CHECK_HEIGHT;
             }
             break;
@@ -1645,9 +1645,7 @@ void stuck_in_ground_handler(struct MarioState *m, s32 animation, s32 unstuckFra
     if (animFrame == -1) {
         play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STUCK_IN_GROUND, 1);
     } else if (animFrame == unstuckFrame) {
-#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
-#endif
         play_sound_and_spawn_particles(m, SOUND_ACTION_UNSTUCK_FROM_GROUND, 1);
     } else if (animFrame == target2 || animFrame == target3) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
@@ -2643,7 +2641,7 @@ static s32 check_for_instant_quicksand(struct MarioState *m) {
 }
 
 s32 mario_execute_cutscene_action(struct MarioState *m) {
-    s32 cancel;
+    s32 cancel = FALSE;
 
     if (check_for_instant_quicksand(m)) {
         return TRUE;

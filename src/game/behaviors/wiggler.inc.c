@@ -70,7 +70,7 @@ void bhv_wiggler_body_part_update(void) {
     o->oFaceAnglePitch = segment->angle[0];
     o->oFaceAngleYaw = segment->angle[1];
 
-    // TODO: What is this for?
+    // HACKERSM64_DO: What is this for?
     f32 posOffset = -37.5f * o->header.gfx.scale[0];
     d[1] = posOffset * coss(o->oFaceAnglePitch) - posOffset;
     f32 dxz = posOffset * sins(o->oFaceAnglePitch);
@@ -85,7 +85,7 @@ void bhv_wiggler_body_part_update(void) {
         //  the floor
         o->oPosY -= 30.0f;
         cur_obj_update_floor_height();
-        if (o->oFloorHeight > o->oPosY) { // TODO: Check ineq swap
+        if (o->oFloorHeight > o->oPosY) { // HACKERSM64_DO: Check ineq swap
             o->oPosY = o->oFloorHeight;
         }
     }

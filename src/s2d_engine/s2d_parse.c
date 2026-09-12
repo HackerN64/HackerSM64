@@ -94,7 +94,7 @@ static int s2d_snprint(int x, int y, int align, const char *str, uObjMtx *buf, i
 				drop_shadow = 1;
 
 				// WIP: drop shadow custom offset
-				// TODO: unique offset per string; fix negative offsets
+				// HACKERSM64_DO: unique offset per string; fix negative offsets
 				CH_SKIP(p);
 				drop_x = s2d_atoi(p, &p);
 				CH_SKIP(p);	CH_SKIP(p);

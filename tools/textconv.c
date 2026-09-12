@@ -14,7 +14,7 @@
 struct CharmapEntry
 {
     uint32_t unicode[3];
-    int length; // length of the unicode array. TODO: use dynamic memory allocation
+    int length; // length of the unicode array. HACKERSM64_DO: use dynamic memory allocation
     int bytesCount;
     uint8_t bytes[2]; // bytes to convert unicode array to, (e.g. 'A' = 0x0A)
 };
@@ -211,7 +211,7 @@ static void read_charmap(const char *filename)
                 }
                 else if(len == ARRAY_COUNT(entry.unicode))
                 {
-                    // TODO: Use dynamic memory allocation so this is unnecessary.
+                    // HACKERSM64_DO: Use dynamic memory allocation so this is unnecessary.
                     parse_error(filename, lineNum, "string limit exceeded");
                 }
                 else if (*line == '\\')

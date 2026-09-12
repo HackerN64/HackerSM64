@@ -15,6 +15,8 @@
 #include "sm64.h"
 #include "types.h"
 
+char gAssertionStr[0x200];
+
 #ifdef VANILLA_DEBUG
 
 enum DebugInfoFlags {
@@ -389,7 +391,7 @@ void try_modify_debug_controls(void) {
     }
 }
 
-// possibly a removed debug control (TODO: check DD)
+// possibly a removed debug control (HACKERSM64_DO: check DD)
 void stub_debug_control(void) {
 }
 
@@ -472,9 +474,9 @@ void try_do_mario_debug_object_spawn(void) {
     }
 }
 
-// TODO: figure out what this is
+// HACKERSM64_DO: figure out what this is
 void debug_print_obj_move_flags(void) {
-#ifndef VERSION_EU // TODO: Is there a better way to diff this? static EU doesn't seem to work.
+#ifndef VERSION_EU // HACKERSM64_DO: Is there a better way to diff this? static EU doesn't seem to work.
     if (gCurrentObject->oMoveFlags & OBJ_MOVE_LANDED) {
         print_debug_top_down_objectinfo("BOUND   %x", gCurrentObject->oMoveFlags);
     }

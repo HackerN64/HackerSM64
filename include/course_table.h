@@ -15,7 +15,7 @@
 enum CourseNum {
     #include "levels/course_defines.h"
     COURSE_END, // To mark end + 1 for marking max and count.
-                // TODO: clean this up. This is still bad. Which
+                // HACKERSM64_DO: clean this up. This is still bad. Which
                 // one is clearer? Need to get rid of one of these.
     COURSE_MAX = COURSE_END - 1,
     COURSE_COUNT = COURSE_MAX,

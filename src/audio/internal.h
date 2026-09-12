@@ -632,7 +632,7 @@ struct Note {
     // that results in messy US/EU ifdefs. Instead we cast to a struct pointer
     // when needed... This breaks alignment on non-N64 platforms, which we hack
     // around by skipping the padding in that case.
-    // TODO: use macros or something instead.
+    // HACKERSM64_DO: use macros or something instead.
 #ifdef TARGET_N64
     u8 pad0[12];
 #endif

@@ -216,7 +216,7 @@ enum BehaviorCommands {
 #define BIT_CLEAR(field, value) \
     BC_BBH(BHV_CMD_BIT_CLEAR, field, value)
 
-// TODO: this one needs a better name / labelling
+// HACKERSM64_DO: this one needs a better name / labelling
 // Gets a random short, right shifts it the specified amount and adds min to it, then sets the specified field to that value.
 #define SET_INT_RAND_RSHIFT(field, min, rshift) \
     BC_BBH(BHV_CMD_SET_INT_RAND_RSHIFT, field, min), \
@@ -237,7 +237,7 @@ enum BehaviorCommands {
     BC_BBH(BHV_CMD_ADD_RANDOM_FLOAT, field, min), \
     BC_H(range)
 
-// TODO: better name (unused anyway)
+// HACKERSM64_DO: better name (unused anyway)
 // Gets a random short, right shifts it the specified amount and adds min to it, then adds the value to the specified field. Unused.
 #define ADD_INT_RAND_RSHIFT(field, min, rshift) \
     BC_BBH(BHV_CMD_ADD_INT_RAND_RSHIFT, field, min), \

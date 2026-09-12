@@ -16,7 +16,7 @@ void s2d_reset_defer_index(void) {
 	s2d_charBuffer_index = 0;
 }
 
-// TODO: these DO NOT work
+// HACKERSM64_DO: these DO NOT work
 // pls debug :)
 void s2d_print_deferred(int x, int y, const char *str) {
 	s2d_charBuffer[s2d_charBuffer_index] = (char *) str;

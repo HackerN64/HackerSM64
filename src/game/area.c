@@ -181,6 +181,7 @@ void clear_areas(void) {
     gWarpTransition.isActive = FALSE;
     gWarpTransition.pauseRendering = FALSE;
     gMarioSpawnInfo->areaIndex = -1;
+    gCamera = NULL;
 
     for (i = 0; i < AREA_COUNT; i++) {
         gAreaData[i].index = i;
@@ -231,11 +232,16 @@ void clear_area_graph_nodes(void) {
 void load_area(s32 index) {
     if (gCurrentArea == NULL && gAreaData[index].graphNode != NULL) {
         gCurrentArea = &gAreaData[index];
+        gMarioState->area = gCurrentArea;
         gCurrAreaIndex = gCurrentArea->index;
         main_pool_pop_state();
         main_pool_push_state();
 
         gMarioCurrentRoom = 0;
+
+        if (gCurrentArea->surfaceRooms != NULL) {
+            bzero(gDoorAdjacentRooms, sizeof(gDoorAdjacentRooms));
+        }
 
         if (gCurrentArea->terrainData != NULL) {
             load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,

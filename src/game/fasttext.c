@@ -2,22 +2,16 @@
 // See the original repo for more details.
 
 #include <ultra64.h>
+#include "macros.h"
 
 #define TEX_ASCII_START '!'
 #define TAB_WIDTH 16
 
 #define G_CC_TEXT PRIMITIVE, 0, TEXEL0, 0, 0, 0, 0, TEXEL0
 
-__asm__(
- ".section \".rodata\", \"a\", @progbits\n"
- ".balign 16\n"
- ".global fast_font\n"
- "fast_font:\n"
- ".incbin \"src/game/newfont2_swapped.bin\"\n"
- ".previous\n"
-);
-
-extern u8 fast_font[];
+ALIGNED8 static const u8 fast_font[] = {
+#include "textures/fasttext/newfont2.ia4.preswap.inc.c"
+};
 
 int computeS(unsigned char letter) {
     int idx = letter;  

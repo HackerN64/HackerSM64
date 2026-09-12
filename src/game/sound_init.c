@@ -175,11 +175,9 @@ void play_menu_sounds(s16 soundMenuFlags) {
     if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
-#if ENABLE_RUMBLE
     if (soundMenuFlags & SOUND_MENU_FLAG_LETGOMARIOFACE) {
         queue_rumble_data(10, 60);
     }
-#endif
 }
 
 /**
@@ -204,7 +202,7 @@ void play_painting_eject_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void play_infinite_stairs_music(void) {
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) && !defined(UNLOCK_ALL)
     u8 shouldPlay = FALSE;
 
     /* Infinite stairs? */

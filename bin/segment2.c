@@ -12,16 +12,16 @@
 // SM64 (US/JP/EU/SH) Segment 02
 #ifdef PUPPYPRINT
 ALIGNED8 static const Texture small_font_default[] = {
-#include "textures/segment2/custom_text.i4.inc.c"
+#include "textures/segment2/custom_text.i4.preswap.inc.c"
 };
 ALIGNED8 static const Texture small_font_outline[] = {
-#include "textures/segment2/custom_text2.ia4.inc.c"
+#include "textures/segment2/custom_text2.ia4.preswap.inc.c"
 };
 ALIGNED8 static const Texture small_font_plain[] = {
-#include "textures/segment2/custom_text3.i4.inc.c"
+#include "textures/segment2/custom_text3.i4.preswap.inc.c"
 };
 ALIGNED8 static const Texture small_font_vanilla[] = {
-#include "textures/segment2/custom_text4.i4.inc.c"
+#include "textures/segment2/custom_text4.i4.preswap.inc.c"
 };
 
 const u8 small_font_kerning_default[] = {

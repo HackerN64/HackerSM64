@@ -15,7 +15,7 @@
 // #define DEBUG_ALL
 
 /**
- * Disables all debug options (except PUPPYPRINT).
+ * Disables all debug options (except PUPPYPRINT and DEBUG_FULL_STACK_TRACE).
  */
 // #define DISABLE_ALL
 
@@ -89,11 +89,6 @@
  * Includes vanilla debug functionality.
  */
 // #define VANILLA_DEBUG
-
-/**
- * Forces a crash when the game starts. Useful for debugging the crash screen.
- */
-// #define DEBUG_FORCE_CRASH_ON_BOOT
 
 /**
  * Intentionally crash the game whenever a runtime assertion fails (also invoked by the DEBUG define in the Makefile).

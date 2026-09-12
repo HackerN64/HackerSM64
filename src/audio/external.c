@@ -7,6 +7,7 @@
 #include "external.h"
 #include "playback.h"
 #include "synthesis.h"
+#include "debugger/assert.h"
 #include "game/debug.h"
 #include "game/main.h"
 #include "game/level_update.h"
@@ -138,7 +139,7 @@ u8 sSoundRequestCount = 0;
 // (e.g. "only if Mario's X position is between 100 and 300"), and finally a
 // fallback dynamic. Due to the encoding of the tables, the conditions must
 // come in the same order as the macros.
-// TODO: dynamic isn't a great term for this, it means other things in music...
+// HACKERSM64_DO: dynamic isn't a great term for this, it means other things in music...
 
 enum MusicDynConditionTypes {
     MARIO_X_GE,
@@ -261,55 +262,6 @@ u16 sLevelAcousticReaches[LEVEL_COUNT] = {
 #define VOLUME_RANGE_UNK1 0.9f
 #define VOLUME_RANGE_UNK2 0.8f
 #endif
-
-// sBackgroundMusicDefaultVolume represents the default volume for background music sequences using the level player (deprecated).
-// This code block is simply commented out for now as to not destroy compatibility with any streamed audio tools.
-// TODO: Delete this entirely once the unsupporting streamed tools or their builds are outdated.
-
-/*
-
-u8 sBackgroundMusicDefaultVolume[] = {
-    127, // SEQ_SOUND_PLAYER
-    80,  // SEQ_EVENT_CUTSCENE_COLLECT_STAR
-    80,  // SEQ_MENU_TITLE_SCREEN
-    75,  // SEQ_LEVEL_GRASS
-    70,  // SEQ_LEVEL_INSIDE_CASTLE
-    75,  // SEQ_LEVEL_WATER
-    75,  // SEQ_LEVEL_HOT
-    75,  // SEQ_LEVEL_BOSS_KOOPA
-    70,  // SEQ_LEVEL_SNOW
-    65,  // SEQ_LEVEL_SLIDE
-    80,  // SEQ_LEVEL_SPOOKY
-    65,  // SEQ_EVENT_PIRANHA_PLANT
-    85,  // SEQ_LEVEL_UNDERGROUND
-    75,  // SEQ_MENU_STAR_SELECT
-    65,  // SEQ_EVENT_POWERUP
-    70,  // SEQ_EVENT_METAL_CAP
-    65,  // SEQ_EVENT_KOOPA_MESSAGE
-    70,  // SEQ_LEVEL_KOOPA_ROAD
-    70,  // SEQ_EVENT_HIGH_SCORE
-    65,  // SEQ_EVENT_MERRY_GO_ROUND
-    80,  // SEQ_EVENT_RACE
-    70,  // SEQ_EVENT_CUTSCENE_STAR_SPAWN
-    85,  // SEQ_EVENT_BOSS
-    75,  // SEQ_EVENT_CUTSCENE_COLLECT_KEY
-    75,  // SEQ_EVENT_ENDLESS_STAIRS
-    85,  // SEQ_LEVEL_BOSS_KOOPA_FINAL
-    70,  // SEQ_EVENT_CUTSCENE_CREDITS
-    80,  // SEQ_EVENT_SOLVE_PUZZLE
-    80,  // SEQ_EVENT_TOAD_MESSAGE
-    70,  // SEQ_EVENT_PEACH_MESSAGE
-    75,  // SEQ_EVENT_CUTSCENE_INTRO
-    80,  // SEQ_EVENT_CUTSCENE_VICTORY
-    70,  // SEQ_EVENT_CUTSCENE_ENDING
-    65,  // SEQ_MENU_FILE_SELECT
-    0,   // SEQ_EVENT_CUTSCENE_LAKITU (not in JP)
-};
-
-STATIC_ASSERT(ARRAY_COUNT(sBackgroundMusicDefaultVolume) == SEQ_COUNT,
-              "change this array if you are adding sequences");
-
-*/
 
 u8 sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
 u8 sMusicDynamicDelay = 0;
@@ -686,6 +638,8 @@ struct SPTask *create_next_audio_frame_task(void) {
     task->yield_data_ptr = NULL;
     task->yield_data_size = 0;
 
+    assertf(writtenCmds <= gMaxAudioCmds, "Audio RSP pool exceeded: %d command(s) over!", (s32) gMaxAudioCmds - (s32) writtenCmds);
+
     decrease_sample_dma_ttls();
 
     return gAudioTask;
@@ -696,7 +650,7 @@ struct SPTask *create_next_audio_frame_task(void) {
  * Called from threads: thread5_game_loop
  */
 void play_sound(s32 soundBits, f32 *pos) {
-    assert(((soundBits & SOUNDARGS_MASK_SOUNDID) >> SOUNDARGS_SHIFT_SOUNDID) != 0xff, "Sfx tables do not support a sound id of 0xff!");
+    assertf(((soundBits & SOUNDARGS_MASK_SOUNDID) >> SOUNDARGS_SHIFT_SOUNDID) != 0xff, "Sfx tables do not support a sound id of 0xff!");
     sSoundRequests[sSoundRequestCount].soundBits = soundBits;
     sSoundRequests[sSoundRequestCount].position = pos;
     sSoundRequestCount++;

@@ -7,8 +7,12 @@ CC           := gcc
 CXX          := g++
 CFLAGS       := -I. -O2 -s
 LDFLAGS      := -lm
-ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv flips
+ALL_PROGRAMS := armips filesizer lz4tpack deflatepack rncpack n64graphics n64sym mio0 slienc n64cksum textconv aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv
 LIBAUDIOFILE := audiofile/libaudiofile.a
+
+ifneq ($(shell uname), Darwin)
+  ALL_PROGRAMS += flips
+endif
 
 ifeq ($(OS),Windows_NT)
   EXT := .exe
@@ -29,12 +33,16 @@ default: all
 
 filesizer_SOURCES	:= filesizer.c
 
+lz4tpack_SOURCES	:= lz4tpack.c
+lz4tpack_CFLAGS  := -DLZ4T -flto -O3 -fwhole-program
+
+deflatepack_SOURCES	:= deflatepack.c libdeflate/deflate_compress.c libdeflate/utils.c
+deflatepack_CFLAGS  := -flto -O3 -fwhole-program
+
 rncpack_SOURCES	:= rncpack.c
 
 n64graphics_SOURCES := n64graphics.c utils.c
 n64graphics_CFLAGS  := -DN64GRAPHICS_STANDALONE
-
-n64graphics_ci_SOURCES := n64graphics_ci_dir/n64graphics_ci.c n64graphics_ci_dir/exoquant/exoquant.c n64graphics_ci_dir/utils.c
 
 mio0_SOURCES := libmio0.c
 mio0_CFLAGS  := -DMIO0_STANDALONE
@@ -47,9 +55,14 @@ n64cksum_CFLAGS  := -DN64CKSUM_STANDALONE
 
 textconv_SOURCES := textconv.c utf8.c hashtable.c
 
+n64sym_SOURCES := n64sym.c
+n64sym_CFLAGS  := -Wno-unused-result
+
+patch_elf_32bit_SOURCES := patch_elf_32bit.c
+
 aifc_decode_SOURCES := aifc_decode.c
 
-aiff_extract_codebook: $(LIBAUDIOFILE)
+aiff_extract_codebook$(EXT): $(LIBAUDIOFILE)
 aiff_extract_codebook_SOURCES := aiff_extract_codebook.c sdk-tools/tabledesign/codebook.c sdk-tools/tabledesign/estimate.c sdk-tools/tabledesign/print.c sdk-tools/tabledesign/tabledesign.c
 aiff_extract_codebook_CFLAGS  := -DEXTRACT_CODEBOOK -Iaudiofile -Wno-uninitialized
 aiff_extract_codebook_LDFLAGS := -Laudiofile -laudiofile -lstdc++
@@ -97,7 +110,7 @@ all: all-except-recomp
 clean:
 	$(RM) $(ALL_PROGRAMS)
 	$(RM) UNFLoader*
-	$(MAKE) -C audiofile clean
+	"$(MAKE)" -C audiofile clean
 
 distclean: clean
 
@@ -109,6 +122,6 @@ endef
 $(foreach p,$(BUILD_PROGRAMS),$(eval $(call COMPILE,$(p))))
 
 $(LIBAUDIOFILE):
-	@$(MAKE) -C audiofile
+	@"$(MAKE)" -C audiofile
 
 .PHONY: all all-except-recomp clean distclean default

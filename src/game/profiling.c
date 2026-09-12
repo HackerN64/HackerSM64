@@ -182,7 +182,7 @@ static void update_rdp_timers() {
 }
 
 float profiler_get_fps() {
-    return (1000000.0f * PROFILING_BUFFER_SIZE) / (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_FPS].total));
+    return (1000000.0f * PROFILING_BUFFER_SIZE) / MAX(OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_FPS].total), 1);
 }
 
 u32 profiler_get_cpu_cycles() {
@@ -288,7 +288,7 @@ void profiler_print_times() {
             "RSP\t\t%d (%d%%)\n"
             " Gfx\t\t\t%d\n"
             " Audio\t\t\t%d\n",
-            1000000.0f / microseconds[PROFILER_TIME_FPS],
+            1000000.0f / MAX(microseconds[PROFILER_TIME_FPS], 1),
             total_cpu, total_cpu / 333, 
             microseconds[PROFILER_TIME_CONTROLLERS],
 #ifdef PUPPYPRINT_DEBUG
