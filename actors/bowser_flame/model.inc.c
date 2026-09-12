@@ -1,6 +1,6 @@
 // Bowser Flame
 
-// TODO: These 64x64 textures are referenced as two different texture addresses in the DLs
+// HACKERSM64_DO: These 64x64 textures are referenced as two different texture addresses in the DLs
 
 // 0x06000000
 ALIGNED8 static const Texture flame_seg6_texture_06000000[] = {

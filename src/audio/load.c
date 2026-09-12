@@ -250,7 +250,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
     transfer = dma->bufSize;
     dmaDevAddr = devAddr & ~0xF;
     dma->source = dmaDevAddr;
-#ifdef VERSION_US // TODO: Is there a reason this only exists in US?
+#ifdef VERSION_US // HACKERSM64_DO: Is there a reason this only exists in US?
     osInvalDCache(dma->buffer, transfer);
 #endif
     osPiStartDma(&gCurrAudioFrameDmaIoMesgBufs[gCurrAudioFrameDmaCount++], OS_MESG_PRI_NORMAL,
@@ -343,7 +343,7 @@ void patch_sound(UNUSED struct AudioBankSound *sound, UNUSED u8 *memBase, UNUSED
 #if defined(VERSION_EU)
         else if (sample->loaded == 0x80) {
             PATCH(sample->sampleAddr, offsetBase);
-            u8 *mem = soundAlloc(&gNotesAndBuffersPool, sample->sampleSize); // TODO: Memory issue most likely!
+            u8 *mem = soundAlloc(&gNotesAndBuffersPool, sample->sampleSize); // HACKERSM64_DO: Memory issue most likely!
             if (mem == NULL) {
                 sample->sampleAddr = patched;
                 sample->loaded = 1;

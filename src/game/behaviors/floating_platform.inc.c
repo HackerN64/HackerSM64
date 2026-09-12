@@ -20,7 +20,7 @@ void floating_platform_act_move_to_home(void) {
         f32 dz = gMarioObject->header.gfx.pos[2] - o->oPosZ;
         f32 cy = coss(-o->oMoveAngleYaw);
         f32 sy = sins(-o->oMoveAngleYaw);
-        o->oFaceAnglePitch = ((dz * cy) + (dx * sy)) * 2;
+        o->oFaceAnglePitch = ((dz * cy) - (dx * sy)) * 2;
         o->oFaceAngleRoll = -((dx * cy) + (dz * sy)) * 2;
         o->oVelY -= 1.0f;
         if (o->oVelY < 0.0f) {
@@ -56,7 +56,6 @@ void floating_platform_act_move_to_home(void) {
 void bhv_floating_platform_loop(void) {
     o->oHomeY = floating_platform_find_home_y();
 
-    // o->oAction = o->oFloatingPlatformIsOnFloor;
     if (o->oFloatingPlatformIsOnFloor) {
         o->oPosY = o->oHomeY;
     } else {

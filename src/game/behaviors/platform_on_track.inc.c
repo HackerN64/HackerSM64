@@ -149,7 +149,7 @@ void bhv_platform_on_track_init(void) {
 
         o->oPlatformOnTrackIsNotHMC = pathIndex - 4;
 
-        o->oBehParams2ndByte = o->oMoveAngleYaw; // TODO: Weird?
+        o->oBehParams2ndByte = o->oMoveAngleYaw; // HACKERSM64_DO: Weird?
 
         if (o->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CHECKERED) {
             o->header.gfx.scale[1] = 2.0f;

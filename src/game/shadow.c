@@ -179,7 +179,7 @@ static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
     gSPEndDisplayList(displayListHead);
 }
 
-//! TODO:
+//! HACKERSM64_DO:
 //      - Breakout create_shadow_below_xyz into multiple functions
 /**
  * Create a shadow at the absolute position given, with the given parameters.

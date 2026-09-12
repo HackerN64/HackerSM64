@@ -11,7 +11,7 @@
 
 /* bss */
 struct ObjWeight *sResetCurWeight;
-static Mat4f D_801B9EA8; // TODO: rename to sHead2Mtx?
+static Mat4f D_801B9EA8; // HACKERSM64_DO: rename to sHead2Mtx?
 static struct ObjJoint *D_801B9EE8;  // set but not used
 
 /* @ 22FDB0 for 0x180 */
@@ -45,7 +45,7 @@ void func_801815E0(Mat4f *mtx) {
 
 /* @ 22FF30 for 0xDC */
 /* called with ObjNext->unk1A8 (variable obj ptr?) ->unk20 or ->unk24 ptr*/
-// TODO: figure out the proper object type for a0
+// HACKERSM64_DO: figure out the proper object type for a0
 void scale_verts(struct ObjGroup *a0) {
     register f32 sp1C;
     register struct ListNode *link;

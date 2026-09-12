@@ -680,9 +680,13 @@ void geo_process_scale(struct GraphNodeScale *node) {
  */
 void geo_process_billboard(struct GraphNodeBillboard *node) {
     Vec3f translation;
+    Vec3f axis;
+    Vec3f camera;
     Vec3f scale = { 1.0f, 1.0f, 1.0f };
 
     vec3s_to_vec3f(translation, node->translation);
+    linear_mtxf_mul_vec3(gMatStack[gMatStackIndex], axis, node->axis);
+    vec3f_diff(camera, gCurGraphNodeCamera->focus, gCurGraphNodeCamera->pos);
 
     if (gCurGraphNodeHeldObject != NULL) {
         vec3f_copy(scale, gCurGraphNodeHeldObject->objNode->header.gfx.scale);
@@ -690,7 +694,11 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
         vec3f_copy(scale, gCurGraphNodeObject->scale);
     }
 
-    mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], translation, scale, gCurGraphNodeCamera->roll);
+    if (node->isCylindrical) {
+        mtxf_billboard_generic(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], camera, axis, translation, scale, gCurGraphNodeCamera->roll, TRUE);
+    } else {
+        mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], translation, scale, gCurGraphNodeCamera->roll);
+    }
 
     inc_mat_stack();
     append_dl_and_return((struct GraphNodeDisplayList *)node);
@@ -950,7 +958,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
 
-#define NO_CULLING_EMULATOR_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
+#define NO_CULLING_EMULATOR_WHITELIST (EMU_PROJECT64 | EMU_PARALLEL_LAUNCHER | EMU_MUPEN)
 
 s32 obj_is_in_view(struct GraphNodeObject *node) {
     struct GraphNode *geo = node->sharedChild;
@@ -977,8 +985,8 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     }
 
 #ifndef CULLING_ON_EMULATOR
-    // If an emulator is detected, skip any other culling.
-    if(!(gEmulator & NO_CULLING_EMULATOR_BLACKLIST)){
+    // If certain emulators are detected, skip any other culling.
+    if(gEmulator & NO_CULLING_EMULATOR_WHITELIST){
         return TRUE;
     }
 #endif
@@ -1176,32 +1184,32 @@ void geo_try_process_children(struct GraphNode *node) {
     }
 }
 
-typedef void (*GeoProcessFunc)();
+typedef void (*GeoProcessFunc)(struct GraphNode *);
 
 // See enum 'GraphNodeTypes' in 'graph_node.h'.
 static GeoProcessFunc GeoProcessJumpTable[] = {
-    [GRAPH_NODE_TYPE_ORTHO_PROJECTION    ] = geo_process_ortho_projection,
-    [GRAPH_NODE_TYPE_PERSPECTIVE         ] = geo_process_perspective,
-    [GRAPH_NODE_TYPE_MASTER_LIST         ] = geo_process_master_list,
-    [GRAPH_NODE_TYPE_LEVEL_OF_DETAIL     ] = geo_process_level_of_detail,
-    [GRAPH_NODE_TYPE_SWITCH_CASE         ] = geo_process_switch,
-    [GRAPH_NODE_TYPE_CAMERA              ] = geo_process_camera,
-    [GRAPH_NODE_TYPE_TRANSLATION_ROTATION] = geo_process_translation_rotation,
-    [GRAPH_NODE_TYPE_TRANSLATION         ] = geo_process_translation,
-    [GRAPH_NODE_TYPE_ROTATION            ] = geo_process_rotation,
-    [GRAPH_NODE_TYPE_OBJECT              ] = geo_process_object,
-    [GRAPH_NODE_TYPE_ANIMATED_PART       ] = geo_process_animated_part,
-    [GRAPH_NODE_TYPE_BILLBOARD           ] = geo_process_billboard,
-    [GRAPH_NODE_TYPE_DISPLAY_LIST        ] = geo_process_display_list,
-    [GRAPH_NODE_TYPE_SCALE               ] = geo_process_scale,
-    [GRAPH_NODE_TYPE_SHADOW              ] = geo_process_shadow,
-    [GRAPH_NODE_TYPE_OBJECT_PARENT       ] = geo_process_object_parent,
-    [GRAPH_NODE_TYPE_GENERATED_LIST      ] = geo_process_generated_list,
-    [GRAPH_NODE_TYPE_BACKGROUND          ] = geo_process_background,
-    [GRAPH_NODE_TYPE_HELD_OBJ            ] = geo_process_held_object,
-    [GRAPH_NODE_TYPE_CULLING_RADIUS      ] = geo_try_process_children,
-    [GRAPH_NODE_TYPE_ROOT                ] = geo_try_process_children,
-    [GRAPH_NODE_TYPE_START               ] = geo_try_process_children,
+    [GRAPH_NODE_TYPE_ORTHO_PROJECTION    ] = (GeoProcessFunc) geo_process_ortho_projection,
+    [GRAPH_NODE_TYPE_PERSPECTIVE         ] = (GeoProcessFunc) geo_process_perspective,
+    [GRAPH_NODE_TYPE_MASTER_LIST         ] = (GeoProcessFunc) geo_process_master_list,
+    [GRAPH_NODE_TYPE_LEVEL_OF_DETAIL     ] = (GeoProcessFunc) geo_process_level_of_detail,
+    [GRAPH_NODE_TYPE_SWITCH_CASE         ] = (GeoProcessFunc) geo_process_switch,
+    [GRAPH_NODE_TYPE_CAMERA              ] = (GeoProcessFunc) geo_process_camera,
+    [GRAPH_NODE_TYPE_TRANSLATION_ROTATION] = (GeoProcessFunc) geo_process_translation_rotation,
+    [GRAPH_NODE_TYPE_TRANSLATION         ] = (GeoProcessFunc) geo_process_translation,
+    [GRAPH_NODE_TYPE_ROTATION            ] = (GeoProcessFunc) geo_process_rotation,
+    [GRAPH_NODE_TYPE_OBJECT              ] = (GeoProcessFunc) geo_process_object,
+    [GRAPH_NODE_TYPE_ANIMATED_PART       ] = (GeoProcessFunc) geo_process_animated_part,
+    [GRAPH_NODE_TYPE_BILLBOARD           ] = (GeoProcessFunc) geo_process_billboard,
+    [GRAPH_NODE_TYPE_DISPLAY_LIST        ] = (GeoProcessFunc) geo_process_display_list,
+    [GRAPH_NODE_TYPE_SCALE               ] = (GeoProcessFunc) geo_process_scale,
+    [GRAPH_NODE_TYPE_SHADOW              ] = (GeoProcessFunc) geo_process_shadow,
+    [GRAPH_NODE_TYPE_OBJECT_PARENT       ] = (GeoProcessFunc) geo_process_object_parent,
+    [GRAPH_NODE_TYPE_GENERATED_LIST      ] = (GeoProcessFunc) geo_process_generated_list,
+    [GRAPH_NODE_TYPE_BACKGROUND          ] = (GeoProcessFunc) geo_process_background,
+    [GRAPH_NODE_TYPE_HELD_OBJ            ] = (GeoProcessFunc) geo_process_held_object,
+    [GRAPH_NODE_TYPE_CULLING_RADIUS      ] = (GeoProcessFunc) geo_try_process_children,
+    [GRAPH_NODE_TYPE_ROOT                ] = (GeoProcessFunc) geo_try_process_children,
+    [GRAPH_NODE_TYPE_START               ] = (GeoProcessFunc) geo_try_process_children,
 };
 
 /**

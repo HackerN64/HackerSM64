@@ -1199,7 +1199,7 @@ void animate_mario_head_gameover(struct ObjAnimator *self) {
  * Controls the normal animation of Mario's head. This functions like a state machine.
  */
 void animate_mario_head_normal(struct ObjAnimator *self) {
-    s32 state = 0; // TODO: label these states
+    s32 state = 0; // HACKERSM64_DO: label these states
     s32 aBtnPressed = gGdCtrl.dragging;
 
     switch (self->state) {

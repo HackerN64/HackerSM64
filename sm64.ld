@@ -2,8 +2,8 @@ OUTPUT_ARCH (mips)
 
 #define LINKER /* Removes externs from preprocessed script */
 #define TARGET_N64
-#include "segments.h"
-#include "config.h"
+#include "include/segments.h"
+#include "include/config.h"
 #undef LINKER
 
 #define BEGIN_SEG(name, addr) \
@@ -90,6 +90,8 @@ OUTPUT_ARCH (mips)
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
+#define LIBGODDARD_A BUILD_DIR[/\\]libgoddard.a
+
 SECTIONS
 {
    __romPos = 0;
@@ -146,11 +148,8 @@ SECTIONS
 #endif
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
-#ifndef DEBUG_MAP_STACKTRACE
+#ifndef DEBUG_EXPORT_SYMBOLS
       _mapDataSegmentRomStart = 0;
-      gMapEntries   = 0;
-      gMapEntrySize = 0;
-      gMapStrings   = 0;
 #endif
 
    BEGIN_SEG(main, .) SUBALIGN(16)
@@ -160,8 +159,6 @@ SECTIONS
 #ifdef EEP
       KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
 #endif
-      KEEP(BUILD_DIR/asm/emux.o(.text*));
-      KEEP(BUILD_DIR/asm/pj64_get_count_factor_asm.o(.text*));
       KEEP(BUILD_DIR/asm/round.o(.text*));
       KEEP(BUILD_DIR/asm/fcr31.o(.text*));
 
@@ -169,16 +166,17 @@ SECTIONS
       BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
+      BUILD_DIR/src/debugger*.o(.text*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.text*);
 #endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.text*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.text*);
       *ULTRALIB.a:*.o(.text*);
-      */libnustd.a:*.o(.text*);
+      *libnustd.a:*.o(.text*);
       *libgcc.a:*.o(.text*);
-      */libz.a:*.o(.text*);
       */libhvqm2.a:*.o(.text*);
       lib/rspboot.o(.text*);
 #include "rsptext.inc.ld"
@@ -191,15 +189,17 @@ SECTIONS
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
+      BUILD_DIR/src/debugger*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*data*);
 #endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*data*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*data*);
       *ULTRALIB.a:*.o(.data*);
+      *libnustd.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
-      */libz.a:*.o(.data*);
 #include "rspdata.inc.ld"
       BUILD_DIR/lib/aspMain.o(.data*);
       lib/PR/audio/n_aspMain.o(.data*);
@@ -209,15 +209,17 @@ SECTIONS
       BUILD_DIR/src/boot*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
+      BUILD_DIR/src/debugger*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.rodata*);
 #endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.rodata*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.rodata*);
       *ULTRALIB.a:*.o(.rodata*);
+      *libnustd.a:*.o(.rodata*);
       *libgcc.a:*.o(.rodata*);
-      */libz.a:*.o(.rodata*);
 
       lib/PR/hvqm/hvqm2sp1.o(.rodata*);
    }
@@ -228,17 +230,19 @@ SECTIONS
       BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
+      BUILD_DIR/src/debugger*.o(.*bss*);
 #ifdef S2DEX_TEXT_ENGINE
       BUILD_DIR/src/s2d_engine*.o(.*bss*);
 #endif
 #ifdef LIBPL
       BUILD_DIR/lib/libpl*.o(.*bss*);
 #endif
+      BUILD_DIR/lib/librtc*.o(.*bss*);
       *ULTRALIB.a:*.o(COMMON);
       *ULTRALIB.a:*.o(.scommon);
       *ULTRALIB.a:*.o(.*bss*);
+      *libnustd.a:*.o(.bss*);
       */libhvqm2.a:*.o(.bss*);
-      */libz.a:*.o(.bss*);
       . = ALIGN(0x8);
    }
    END_NOLOAD(main)
@@ -362,30 +366,30 @@ SECTIONS
       KEEP(BUILD_DIR/src/menu*.o(.data*));
       KEEP(BUILD_DIR/src/menu*.o(.rodata*));
 #ifdef KEEP_MARIO_HEAD
-      KEEP(BUILD_DIR/libgoddard.a:*.o(.text*));
-      KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:objects.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:particles.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:dynlist_proc.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:debug_utils.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:joints.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:shape_helper.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:renderer.o(.data*));
-      KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:gd_memory.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:objects.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:skin_movement.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:particles.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:dynlist_proc.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:old_menu.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:debug_utils.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:joints.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:skin.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:gd_math.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:shape_helper.o(.rodata*));
-      KEEP(BUILD_DIR/libgoddard.a:renderer.o(.rodata*));
+      KEEP(LIBGODDARD_A:*.o(.text*));
+      KEEP(LIBGODDARD_A:gd_main.o(.data*));
+      KEEP(LIBGODDARD_A:draw_objects.o(.data*));
+      KEEP(LIBGODDARD_A:objects.o(.data*));
+      KEEP(LIBGODDARD_A:particles.o(.data*));
+      KEEP(LIBGODDARD_A:dynlist_proc.o(.data*));
+      KEEP(LIBGODDARD_A:debug_utils.o(.data*));
+      KEEP(LIBGODDARD_A:joints.o(.data*));
+      KEEP(LIBGODDARD_A:shape_helper.o(.data*));
+      KEEP(LIBGODDARD_A:renderer.o(.data*));
+      KEEP(LIBGODDARD_A:gd_main.o(.rodata*));
+      KEEP(LIBGODDARD_A:gd_memory.o(.rodata*));
+      KEEP(LIBGODDARD_A:draw_objects.o(.rodata*));
+      KEEP(LIBGODDARD_A:objects.o(.rodata*));
+      KEEP(LIBGODDARD_A:skin_movement.o(.rodata*));
+      KEEP(LIBGODDARD_A:particles.o(.rodata*));
+      KEEP(LIBGODDARD_A:dynlist_proc.o(.rodata*));
+      KEEP(LIBGODDARD_A:old_menu.o(.rodata*));
+      KEEP(LIBGODDARD_A:debug_utils.o(.rodata*));
+      KEEP(LIBGODDARD_A:joints.o(.rodata*));
+      KEEP(LIBGODDARD_A:skin.o(.rodata*));
+      KEEP(LIBGODDARD_A:gd_math.o(.rodata*));
+      KEEP(LIBGODDARD_A:shape_helper.o(.rodata*));
+      KEEP(LIBGODDARD_A:renderer.o(.rodata*));
 #endif
       . = ALIGN(16);
    }
@@ -394,7 +398,7 @@ SECTIONS
    {
       KEEP(BUILD_DIR/src/menu*.o(.bss*));
 #ifdef KEEP_MARIO_HEAD
-      KEEP(BUILD_DIR/libgoddard.a:*.o(.bss*));
+      KEEP(LIBGODDARD_A:*.o(.bss*));
 #endif
       . = ALIGN(16);
    }
@@ -433,23 +437,23 @@ SECTIONS
 #ifdef KEEP_MARIO_HEAD
    BEGIN_SEG(gd_dynlists, 0x04000000)
    {
-      BUILD_DIR/libgoddard.a:dynlist_test_cube.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlist_unused.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlist_mario_face.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlists_mario_eyes.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlists_mario_eyebrows_mustache.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlist_mario_master.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_mario_mustache_right.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_mario_mustache_left.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_mario_lips_1.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_mario_lips_2.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_mario_eyebrows_1.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_group_1.o(.data*);
-      BUILD_DIR/libgoddard.a:anim_group_2.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlist_test_cube.o(.rodata*);
-      BUILD_DIR/libgoddard.a:dynlist_unused.o(.rodata*);
-      BUILD_DIR/libgoddard.a:*.o(.data*);
-      BUILD_DIR/libgoddard.a:*.o(.rodata*);
+      LIBGODDARD_A:dynlist_test_cube.o(.data*);
+      LIBGODDARD_A:dynlist_unused.o(.data*);
+      LIBGODDARD_A:dynlist_mario_face.o(.data*);
+      LIBGODDARD_A:dynlists_mario_eyes.o(.data*);
+      LIBGODDARD_A:dynlists_mario_eyebrows_mustache.o(.data*);
+      LIBGODDARD_A:dynlist_mario_master.o(.data*);
+      LIBGODDARD_A:anim_mario_mustache_right.o(.data*);
+      LIBGODDARD_A:anim_mario_mustache_left.o(.data*);
+      LIBGODDARD_A:anim_mario_lips_1.o(.data*);
+      LIBGODDARD_A:anim_mario_lips_2.o(.data*);
+      LIBGODDARD_A:anim_mario_eyebrows_1.o(.data*);
+      LIBGODDARD_A:anim_group_1.o(.data*);
+      LIBGODDARD_A:anim_group_2.o(.data*);
+      LIBGODDARD_A:dynlist_test_cube.o(.rodata*);
+      LIBGODDARD_A:dynlist_unused.o(.rodata*);
+      LIBGODDARD_A:*.o(.data*);
+      LIBGODDARD_A:*.o(.rodata*);
    }
    END_SEG(gd_dynlists)
 #endif
@@ -526,15 +530,19 @@ SECTIONS
 	END_SEG(capcom)
 #endif
 
-#ifdef DEBUG_MAP_STACKTRACE
-   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
-      KEEP(BUILD_DIR/asm/debug/map.o(.data*));
+#ifdef DEBUG_EXPORT_SYMBOLS
+   BEGIN_SEG(mapData, 0) ALIGN(16) {
+#ifndef PRELIMINARY
+      KEEP(BUILD_DIR/sm64.sym.o(.data*));
+#endif
    }
    END_SEG(mapData)
 #endif
    /* DWARF debug sections.
       Symbols in the DWARF debugging sections are relative to the beginning
       of the section so we begin them at 0.  */
+   .debug_rnglists 0 : { *(.debug_rnglists) }
+   .debug_line_str 0 : { *(.debug_line_str) }
    /* DWARF 1 */
    .debug          0 : { *(.debug) }
    .line           0 : { *(.line) }

@@ -126,7 +126,7 @@ static s32 bhv_cmd_spawn_obj(void) {
 
     struct Object *object = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
     obj_copy_pos_and_angle(object, gCurrentObject);
-    // TODO: Does this cmd need renaming? This line is the only difference between this and the above func.
+    // HACKERSM64_DO: Does this cmd need renaming? This line is the only difference between this and the above func.
     gCurrentObject->prevObj = object;
 
     gCurBhvCommand += 3;

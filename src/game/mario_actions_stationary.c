@@ -102,7 +102,7 @@ s32 check_common_hold_idle_cancels(struct MarioState *m) {
     return FALSE;
 }
 
-//! TODO: actionArg names
+//! HACKERSM64_DO: actionArg names
 s32 act_idle(struct MarioState *m) {
     if (m->quicksandDepth > 30.0f) {
         return set_mario_action(m, ACT_IN_QUICKSAND, 0);
@@ -765,16 +765,12 @@ s32 act_stop_crawling(struct MarioState *m) {
 
 s32 act_shockwave_bounce(struct MarioState *m) {
     if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_SHOCKWAVE) {
-#if ENABLE_RUMBLE
         queue_rumble_data(70, 40);
-#endif
         return hurt_and_set_mario_action(m, ACT_SHOCKED, 0, 4);
     }
 
     if (m->actionTimer == 0) {
-#if ENABLE_RUMBLE
         queue_rumble_data(70, 40);
-#endif
         if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_KNOCKBACK_DMG) {
             return hurt_and_set_mario_action(m, ACT_BACKWARD_GROUND_KB, 0, 0xc);
         }

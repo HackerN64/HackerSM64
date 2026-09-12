@@ -1,5 +1,5 @@
 #ifdef VERSION_SH
-// TODO: merge this with port_eu.c?
+// HACKERSM64_DO: merge this with port_eu.c?
 
 #include <ultra64.h>
 
@@ -445,7 +445,7 @@ UNUSED s32 func_sh_802f6900(void) {
     return sp18 == gAudioResetPresetIdToLoad;
 }
 
-// TODO: (Scrub C)
+// HACKERSM64_DO: (Scrub C)
 void func_sh_802f6958(OSMesg mesg) {
     s32 a;
     OSMesg recvMesg;

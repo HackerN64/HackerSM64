@@ -3,17 +3,22 @@
 #include "sm64.h"
 
 #include "buffers/buffers.h"
+#include "dma_async.h"
 #include "slidec.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/main.h"
 #include "game/memory.h"
 #include "segment_symbols.h"
 #include "segments.h"
 #ifdef GZIP
-#include <gzip.h>
+#include "deflate/libdeflate.h"
 #endif
 #if defined(RNC1) || defined(RNC2)
 #include <rnc.h>
+#endif
+#ifdef LZ4T
+#include "lz4t.h"
 #endif
 #ifdef UNF
 #include "usb/usb.h"
@@ -367,6 +372,12 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
     return dest;
 }
 
+#if defined(LZ4T) || defined(GZIP)
+#define DMA_ASYNC_HEADER_SIZE 16
+#else
+#define DMA_ASYNC_HEADER_SIZE 0
+#endif
+
 /**
  * Decompress the block of ROM data from srcStart to srcEnd and return a
  * pointer to an allocated buffer holding the decompressed data. Set the
@@ -375,31 +386,34 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
 void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     void *dest = NULL;
 
-#ifdef GZIP
-    u32 compSize = (srcEnd - 4 - srcStart);
-#else
     u32 compSize = ALIGN16(srcEnd - srcStart);
-#endif
-    u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
+
 #ifdef GZIP
-    // Decompressed size from end of gzip
-    u32 *size = (u32 *) (compressed + compSize);
-#else
+    struct libdeflate_decompressor *dec = libdeflate_alloc_decompressor();
+    aggress(dec != NULL, "Failed to allocate GZIP decompressor!");
+#endif
+
+    u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *) (compressed + 4);
-#endif
     if (compressed != NULL) {
 #ifdef UNCOMPRESSED
         dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
         dma_read(dest, srcStart, srcEnd);
 #else
+# if DMA_ASYNC_HEADER_SIZE
+        dma_read(compressed, srcStart, srcStart + DMA_ASYNC_HEADER_SIZE);
+        struct DMAAsyncCtx asyncCtx;
+        dma_async_ctx_init(&asyncCtx, compressed + DMA_ASYNC_HEADER_SIZE, srcStart + DMA_ASYNC_HEADER_SIZE, srcEnd);
+# else
         dma_read(compressed, srcStart, srcEnd);
+# endif
         dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
 #endif
         if (dest != NULL) {
             osSyncPrintf("start decompress\n");
 #ifdef GZIP
-            expand_gzip(compressed, dest, compSize, (u32)size);
+            libdeflate_deflate_decompress(dec, compressed + 16, *(u32*) (compressed + 8), dest, &asyncCtx);
 #elif RNC1
             Propack_UnpackM1(compressed, dest);
 #elif RNC2
@@ -408,12 +422,21 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
             slidstart(compressed, dest);
 #elif MIO0
             decompress(compressed, dest);
+#elif LZ4T
+            lz4t_unpack(compressed, dest, &asyncCtx);
 #endif
             osSyncPrintf("end decompress\n");
             set_segment_base_addr(segment, dest);
             main_pool_free(compressed);
         }
     }
+
+#ifdef GZIP
+    if (dec) {
+        libdeflate_free_decompressor(dec);
+    }
+#endif
+
 #ifdef PUPPYPRINT_DEBUG
     u32 ppSize = ALIGN16((u32)*size) + 16;
     set_segment_memory_printout(segment, ppSize);

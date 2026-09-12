@@ -10,7 +10,7 @@
 // Argument 11: Specify level camera table, if specified. _ for none.
 
 // NOTE: Be sure to edit sZoomOutAreaMasks in camera.c, as there isnt a good way to macro those right now.
-// TODO: Figure something out for sZoomOutAreaMasks?
+// HACKERSM64_DO: Figure something out for sZoomOutAreaMasks?
 
 STUB_LEVEL(  "",               LEVEL_UNKNOWN_1,        COURSE_NONE,                                 20000, 0x00, 0x00, 0x00, _,         _)
 STUB_LEVEL(  "",               LEVEL_UNKNOWN_2,        COURSE_NONE,                                 20000, 0x00, 0x00, 0x00, _,         _)

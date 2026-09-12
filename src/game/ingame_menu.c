@@ -87,7 +87,7 @@ enum DialogBoxType {
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
 
-u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
+u8 gDialogCharWidths[256] = { // HACKERSM64_DO: Is there a way to auto generate this?
     7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  6,  6,  6,  6,  6,
     6,  6,  5,  6,  6,  5,  8,  8,  6,  6,  6,  6,  6,  5,  6,  6,
     8,  7,  6,  6,  6,  5,  5,  6,  5,  5,  6,  5,  4,  5,  5,  3,
@@ -407,7 +407,7 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                                                     rgbaColors[2],
                                                     rgbaColors[3]);
                 } else if (customColor == 2) {
-                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
+                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // HACKERSM64_DO: Is it possible to retrieve the original color that was set before print_generic_string was called?
                     customColor = 0;
                 }
                 break;
@@ -2055,7 +2055,25 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     void **actNameTbl    = segmented_to_virtual(languageTable[gInGameLanguage][2]);
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
-    if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
+    if (gStarModelLastCollected == MODEL_BOWSER_KEY) { // Bowser courses
+        name = segmented_to_virtual(courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)]);
+
+        // Print course name and clear text
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+
+        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
+        print_generic_string(TXT_NAME_X1, 130, name);
+        print_generic_string(TXT_CLEAR_X1, 130, textClear);
+        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+        print_generic_string(TXT_NAME_X2, 132, name);
+        print_generic_string(TXT_CLEAR_X2, 132, textClear);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
+        print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
+        print_hud_course_complete_coins(118, 111);
+        play_star_fanfare_and_flash_hud(HUD_FLASH_KEYS, 0);
+        return;
+    } else if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
         print_hud_course_complete_coins(118, 103);
         play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
 
@@ -2079,24 +2097,6 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         print_generic_string(CRS_NUM_X3, 167, strCourseNum);
 
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
-        name = segmented_to_virtual(courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)]);
-
-        // Print course name and clear text
-        gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
-        print_generic_string(TXT_NAME_X1, 130, name);
-        print_generic_string(TXT_CLEAR_X1, 130, textClear);
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-        print_generic_string(TXT_NAME_X2, 132, name);
-        print_generic_string(TXT_CLEAR_X2, 132, textClear);
-        gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-
-        print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
-        print_hud_course_complete_coins(118, 111);
-        play_star_fanfare_and_flash_hud(HUD_FLASH_KEYS, 0);
-        return;
     } else { // Castle secret stars
         name = segmented_to_virtual(actNameTbl[COURSE_STAGES_MAX * 6]);
 

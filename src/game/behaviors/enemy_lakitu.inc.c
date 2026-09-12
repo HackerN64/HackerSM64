@@ -2,7 +2,7 @@
 /**
  * Behavior for bhvEnemyLakitu.
  * Lakitu comes before it spawned spinies in processing order.
- * TODO: bhvCloud processing oredr
+ * HACKERSM64_DO: bhvCloud processing order
  */
 
 /**
@@ -122,7 +122,7 @@ static void enemy_lakitu_sub_act_hold_spiny(void) {
     if (o->oEnemyLakituSpinyCooldown != 0) {
         o->oEnemyLakituSpinyCooldown--;
     }
-    // TODO: Check if anything interesting happens if we bypass this with speed
+    // HACKERSM64_DO: Check if anything interesting happens if we bypass this with speed
     else if (o->oDistanceToMario > o->oDrawingDistance - 100.0f
              || (o->oDistanceToMario < 500.0f
                  && abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x2000)) {

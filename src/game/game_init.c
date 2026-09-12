@@ -7,6 +7,7 @@
 #include "buffers/gfx_output_buffer.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
+#include "debugger/assert.h"
 #include "engine/level_script.h"
 #include "engine/math_util.h"
 #include "game_init.h"
@@ -30,10 +31,8 @@
 #include "debug_box.h"
 #include "vc_ultra.h"
 #include "profiling.h"
+#include "debug.h"
 #include "emutest.h"
-
-// Emulators that the Instant Input patch should not be applied to
-#define INSTANT_INPUT_BLACKLIST (EMU_CONSOLE | EMU_WIIVC | EMU_ARES | EMU_SIMPLE64 | EMU_CEN64)
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -348,6 +347,9 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.data_size = entries * sizeof(Gfx);
     gGfxSPTask->task.t.yield_data_ptr = (u64 *) gGfxSPTaskYieldBuffer;
     gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
+
+    // NOTE: 'entries' is not representative of the right-side allocations coming from the GFX pool; do not use that variable here.
+    assertf((u8*) gDisplayListHead <= gGfxPoolEnd, "GFX pool exceeded: %d command(s) over!", ((s32) gGfxPoolEnd - (s32) gDisplayListHead) / sizeof(Gfx));
 }
 
 /**
@@ -405,12 +407,34 @@ void draw_reset_bars(void) {
 }
 
 /**
+ * Check if we are emulating the framebuffer
+ * 
+ * s32 frameIndex:
+ *  0: Write to the framebuffer, wait to process displaylist
+ *  1: Check whether the framebuffer write persisted
+ */
+static void check_fbe(s32 frameIndex) {
+    // NOTE: For whatever reason, checking against pixel index 12 fails on some versions of GlideN64 (pain).
+    // So apparently, this value being set to 13 actually matters...???
+    const s32 fbePixelOffset = 13;
+    const u16 fbePixelVal = 0xFF01;
+
+    if (frameIndex == 0) {
+        // Write pixel to the framebuffer
+        gFramebuffers[sRenderingFramebuffer][fbePixelOffset] = fbePixelVal;
+    } else {
+        // Check if pixel persisted in the framebuffer after executing the display list
+        //  that clears it (but before updating sRenderingFramebuffer!)
+        if (gFramebuffers[sRenderingFramebuffer][fbePixelOffset] != fbePixelVal) {
+            gSystemCapabilities |= SUPPORTS_SOFTWARE_FRAMEBUFFER;
+        }
+    }
+}
+
+/**
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
-#ifdef DEBUG_FORCE_CRASH_ON_BOOT
-    FORCE_CRASH
-#endif
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
@@ -419,12 +443,27 @@ void render_init(void) {
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
-    exec_display_list(&gGfxPool->spTask);
 
-    // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
-    // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    // Currently, Ares and Simple64 have issues with single buffering so disable it there as well.
-    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
+    // Skip the FBE check if system is console,
+    //  or had already been determined to support framebuffer emulation.
+    if (gSystemCapabilities & SUPPORTS_SOFTWARE_FRAMEBUFFER) {
+        exec_display_list(&gGfxPool->spTask);
+    } else {
+        check_fbe(0);
+
+        exec_display_list(&gGfxPool->spTask);
+
+        // Wait for frame rendering to complete to prevent race condition with FBE check
+        osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        check_fbe(1);
+
+        // Send message back to queue to prevent locking up
+        osSendMesg(&gGfxVblankQueue, gMainReceivedMesg, OS_MESG_BLOCK);
+    }
+
+    // Skip incrementing the initial framebuffer index on certain emulators so that they display immediately as the Gfx task finishes
+    // This will break accurate emulators, so only enable on Project64, Parallel Launcher and Mupen.
+    if (!(gEmulator & INSTANT_INPUT_WHITELIST)) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -462,8 +501,8 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
-    if (gEmulator & INSTANT_INPUT_BLACKLIST) {
+    // Skip swapping buffers on some inaccurate emulators so that they display immediately as the Gfx task finishes
+    if (!(gEmulator & INSTANT_INPUT_WHITELIST)) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
@@ -603,9 +642,7 @@ void read_controller_inputs(s32 threadID) {
             osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         }
         osContGetReadDataEx(gControllerPads);
-#if ENABLE_RUMBLE
         release_rumble_pak_control();
-#endif
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
@@ -763,13 +800,9 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     setup_game_memory();
-#if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
-#endif
     init_controllers();
-#if ENABLE_RUMBLE
     create_thread_6();
-#endif
 #ifdef HVQM
     createHvqmThread();
 #endif
@@ -803,9 +836,7 @@ void thread5_game_loop(UNUSED void *arg) {
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
         if (gControllerBits) {
-#if ENABLE_RUMBLE
             block_until_rumble_pak_free();
-#endif
             osContStartReadDataEx(&gSIEventMesgQueue);
         }
 

@@ -2,7 +2,7 @@
 #include <PR/gs2dex.h>
 
 #define SCALE      "\x80" // SCALE (an integer percentage; 100 -> 100%, 25 -> 25%, etc.)
-#define ROTATE     "\x81" // ROTATE (degrees) // TODO: maybe add axis?
+#define ROTATE     "\x81" // ROTATE (degrees) // HACKERSM64_DO: maybe add axis?
 #define TRANSLATE  "\x82" // TRANSLATE (x) (y)
 #define COLOR      "\x83" // COLOR (r) (g) (b) (a)
 #define DROPSHADOW "\x84" // DROPSHADOW (no args)

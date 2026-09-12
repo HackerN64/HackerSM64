@@ -5,6 +5,7 @@
 #include "graph_node.h"
 #include "behavior_script.h"
 #include "behavior_data.h"
+#include "debugger/assert.h"
 #include "game/memory.h"
 #include "game/object_helpers.h"
 #include "game/macro_special_objects.h"

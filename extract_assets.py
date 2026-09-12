@@ -4,7 +4,7 @@ import os
 import json
 import subprocess
 
-from tools.detect_baseroms import get_rom_candidates
+from tools.detect_baseroms import get_rom_candidates, ROMS_DIR
 
 envmap_table = set([
     "actors/mario/mario_metal.rgba16.png",
@@ -65,7 +65,7 @@ def remove_file(fname):
 def clean_assets(local_asset_file):
     assets = set(read_asset_map().keys())
     assets.update(read_local_asset_list(local_asset_file))
-    for fname in list(assets) + [".assets-local.txt"]:
+    for fname in list(assets):
         if fname.startswith("@"):
             continue
         try:
@@ -73,6 +73,19 @@ def clean_assets(local_asset_file):
         except FileNotFoundError:
             pass
 
+    if local_asset_file is not None:
+        local_asset_file.close()
+        remove_file(".assets-local.txt")
+
+def usage():
+    all_langs = ["jp", "us", "eu", "sh"]
+    langs_str = " ".join("[" + lang + "]" for lang in all_langs)
+    print("Usage: ")
+    print(f"    Show this help message:          {sys.argv[0]} --help")
+    print(f"    Extract from all found baseroms: {sys.argv[0]}")
+    print(f"    Extract from specified versions: {sys.argv[0]} {langs_str}")
+    print(f"        (For each version, its ROM file must exist,")
+    print(f"            either in this folder or {ROMS_DIR}/)")
 
 def main():
     # In case we ever need to change formats of generated files, we keep a
@@ -90,6 +103,9 @@ def main():
     langs = sys.argv[1:]
     if langs == ["--clean"]:
         clean_assets(local_asset_file)
+        sys.exit(0)
+    elif langs == ["--help"] or langs == ["-h"]:
+        usage()
         sys.exit(0)
 
     asset_map = read_asset_map()
@@ -112,6 +128,8 @@ def main():
 
     romLUT = get_rom_candidates()
 
+    if not langs:
+        langs = romLUT.keys()
 
     # verify the correct rom
     for lang in langs:
@@ -134,7 +152,6 @@ def main():
         sys.exit(1)
 
     # Late imports (to optimize startup perf)
-    import hashlib
     import tempfile
     from collections import defaultdict
 
@@ -147,7 +164,7 @@ def main():
         local_version = new_version
 
     # Create work list
-    todo = defaultdict(lambda: [])
+    to_do = defaultdict(lambda: [])
     for (asset, data, exists) in all_assets:
         # Leave existing assets alone if they have a compatible version.
         if exists and not (local_version == new_version or asset_needs_update(asset, local_version)):
@@ -159,7 +176,7 @@ def main():
             mio0 = None if len(pos) == 1 else pos[0]
             pos = pos[-1]
             if lang in langs:
-                todo[(lang, mio0)].append((asset, pos, size, meta))
+                to_do[(lang, mio0)].append((asset, pos, size, meta))
                 break
 
     # Load ROMs
@@ -189,12 +206,12 @@ def main():
 
     # Go through the assets in roughly alphabetical order (but assets in the same
     # mio0 file still go together).
-    keys = sorted(list(todo.keys()), key=lambda k: todo[k][0][0])
+    keys = sorted(list(to_do.keys()), key=lambda k: to_do[k][0][0])
 
     # Import new assets
     for key in keys:
 
-        assets = todo[key]
+        assets = to_do[key]
         lang, mio0 = key
         romname = romLUT[lang]
         if mio0 == "@sound":

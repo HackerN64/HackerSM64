@@ -6,6 +6,8 @@
 
 #include "sm64.h"
 #include "audio/external.h"
+#include "debugger/assert.h"
+#include "debugger/crash_screen.h"
 #include "game/game_init.h"
 #include "game/debug.h"
 #include "game/memory.h"
@@ -143,10 +145,10 @@ void receive_new_tasks(void) {
     while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
-            case 2:
+            case M_AUDTASK:
                 sNextAudioSPTask = spTask;
                 break;
-            case 1:
+            case M_GFXTASK:
                 sNextDisplaySPTask = spTask;
                 break;
         }
@@ -229,9 +231,7 @@ void handle_vblank(void) {
             profiler_rsp_started(PROFILER_RSP_GFX);
         }
     }
-#if ENABLE_RUMBLE
     rumble_thread_update_vi();
-#endif
 
     // Notify the game loop about the vblank.
     if (gVblankHandler1 != NULL) osSendMesg(gVblankHandler1->queue, gVblankHandler1->msg, OS_MESG_NOBLOCK);
@@ -313,43 +313,54 @@ void stop_rcp_hang_timer(void) {
 }
 
 void alert_rcp_hung_up(void) {
-    error("RCP is HUNG UP!! Oh! MY GOD!!");
+    if (gActiveSPTask && gActiveSPTask->task.t.type == M_AUDTASK) {
+        error("Timeout while waiting for hardware SP\n"
+              "task! This was probably caused by a broken\n"
+              "command somewhere in the audio pipeline.\n\n"
+              "RCP is HUNG UP!! Oh! MY GOD!!"
+        );
+    } else {
+        error("Timeout while waiting for hardware SP\n"
+              "task! This was probably caused by a broken\n"
+              "display list somewhere (i.e. bad model data).\n\n"
+              "RCP is HUNG UP!! Oh! MY GOD!!"
+        );
+    }
 }
 
 /**
  * Increment the first and last values of the stack.
  * If they're different, that means an error has occured, so trigger a crash.
 */
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
 void check_stack_validity(void) {
     gIdleThreadStack[0]++;
     gIdleThreadStack[THREAD1_STACK - 1]++;
-    assert(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.")
+    assertf(gIdleThreadStack[0] == gIdleThreadStack[THREAD1_STACK - 1], "Thread 1 stack overflow.");
     gThread3Stack[0]++;
     gThread3Stack[THREAD3_STACK - 1]++;
-    assert(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.")
+    assertf(gThread3Stack[0] == gThread3Stack[THREAD3_STACK - 1], "Thread 3 stack overflow.");
     gThread4Stack[0]++;
     gThread4Stack[THREAD4_STACK - 1]++;
-    assert(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.")
+    assertf(gThread4Stack[0] == gThread4Stack[THREAD4_STACK - 1], "Thread 4 stack overflow.");
     gThread5Stack[0]++;
     gThread5Stack[THREAD5_STACK - 1]++;
-    assert(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.")
-#if ENABLE_RUMBLE
+    assertf(gThread5Stack[0] == gThread5Stack[THREAD5_STACK - 1], "Thread 5 stack overflow.");
+#ifdef ENABLE_RUMBLE
     gThread6Stack[0]++;
     gThread6Stack[THREAD6_STACK - 1]++;
-    assert(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.")
+    assertf(gThread6Stack[0] == gThread6Stack[THREAD6_STACK - 1], "Thread 6 stack overflow.");
 #endif
 }
 #endif
 
 
-extern void crash_screen_init(void);
 extern OSViMode VI;
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
     load_engine_code_segment();
-    detect_emulator();
+    gEmulator = detect_emulator();
 #ifndef UNF
     crash_screen_init();
 #endif
@@ -379,7 +390,7 @@ void thread3_main(UNUSED void *arg) {
     } else {
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
     gIdleThreadStack[0] = 0;
     gIdleThreadStack[THREAD1_STACK - 1] = 0;
     gThread3Stack[0] = 0;
@@ -388,7 +399,7 @@ void thread3_main(UNUSED void *arg) {
     gThread4Stack[THREAD4_STACK - 1] = 0;
     gThread5Stack[0] = 0;
     gThread5Stack[THREAD5_STACK - 1] = 0;
-#if ENABLE_RUMBLE
+#ifdef ENABLE_RUMBLE
     gThread6Stack[0] = 0;
     gThread6Stack[THREAD6_STACK - 1] = 0;
 #endif
@@ -403,7 +414,7 @@ void thread3_main(UNUSED void *arg) {
     while (TRUE) {
         OSMesg msg;
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
-#ifdef DEBUG
+#ifdef DEBUG_ASSERTIONS
         check_stack_validity();
 #endif
         switch ((uintptr_t) msg) {

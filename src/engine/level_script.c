@@ -8,6 +8,7 @@
 #include "audio/synthesis.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
+#include "debugger/assert.h"
 #include "game/area.h"
 #include "game/debug.h"
 #include "game/game_init.h"
@@ -40,6 +41,10 @@
 // These are equal
 #define CMD_NEXT ((struct LevelCommand *) ((u8 *) sCurrentCmd + (sCurrentCmd->size << CMD_SIZE_SHIFT)))
 #define NEXT_CMD ((struct LevelCommand *) ((sCurrentCmd->size << CMD_SIZE_SHIFT) + (u8 *) sCurrentCmd))
+
+#ifdef PUPPYPRINT_DEBUG
+u32 gInitLevelTime;
+#endif
 
 struct LevelCommand {
     /*00*/ u8 type;
@@ -296,7 +301,7 @@ static void level_cmd_load_yay0(void) {
 
 static void level_cmd_load_mario_head(void) {
 #ifdef KEEP_MARIO_HEAD
-    // TODO: Fix these hardcoded sizes
+    // HACKERSM64_DO: Fix these hardcoded sizes
     void *addr = main_pool_alloc(DOUBLE_SIZE_ON_64_BIT(0xE1000), MEMORY_POOL_LEFT);
     if (addr != NULL) {
         gdm_init(addr, DOUBLE_SIZE_ON_64_BIT(0xE1000));
@@ -322,6 +327,10 @@ static void level_cmd_change_area_skybox(void) {
 }
 
 static void level_cmd_init_level(void) {
+#ifdef PUPPYPRINT_DEBUG
+    gInitLevelTime = osGetTime();
+#endif
+
     init_graph_node_start(NULL, (struct GraphNodeStart *) &gObjParentGraphNode);
     clear_objects();
     clear_areas();
@@ -431,7 +440,7 @@ static void level_cmd_load_model_from_dl(void) {
     s16 layer = CMD_GET(u16, 0x8);
     void *dl_ptr = CMD_GET(void *, 4);
 
-    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
+    assertf(model < MODEL_ID_COUNT, "Tried to load an invalid model ID: 0x%04X", model);
     if (model < MODEL_ID_COUNT) {
         gLoadedGraphNodes[model] =
             (struct GraphNode *) init_graph_node_display_list(sLevelPool, 0, layer, dl_ptr);
@@ -444,7 +453,7 @@ static void level_cmd_load_model_from_geo(void) {
     ModelID16 model = CMD_GET(ModelID16, 2);
     void *geo = CMD_GET(void *, 4);
 
-    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
+    assertf(model < MODEL_ID_COUNT, "Tried to load an invalid model ID: 0x%04X", model);
     if (model < MODEL_ID_COUNT) {
         gLoadedGraphNodes[model] = process_geo_layout(sLevelPool, geo);
     }
@@ -458,7 +467,7 @@ static void level_cmd_23(void) {
     void *dl  = CMD_GET(void *, 4);
     s32 scale = CMD_GET(s32, 8);
 
-    assert(model < MODEL_ID_COUNT, "Tried to load an invalid model ID.");
+    assertf(model < MODEL_ID_COUNT, "Tried to load an invalid model ID: 0x%04X", model);
     if (model < MODEL_ID_COUNT) {
         // GraphNodeScale has a GraphNode at the top. This
         // is being stored to the array, so cast the pointer.

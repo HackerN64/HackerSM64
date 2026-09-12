@@ -4,43 +4,71 @@
 #include "types.h"
 
 enum Emulator {
-    EMU_WIIVC = 0x0001,
-    EMU_PROJECT64_ANY = 0x001E,
-        EMU_PROJECT64_1_OR_2 = 0x0006, // PJ64 1.6 or similar (up to 2.3)
-        EMU_PROJECT64_3 = 0x0008, // PJ64 3.X
-        EMU_PROJECT64_4 = 0x0010, // PJ64 4.0 or later
-    EMU_MUPEN_BASED = 0x0060, // mupen64plus or pre-2.12 paralleln64, but NOT simple64 or new paralleln64
-        EMU_MUPEN_OLD = 0x0020, // Nemu64 and pre-2.12 paralleln64 will also get detected as this
-        EMU_MUPEN64PLUS_NEXT = 0x040,
-    EMU_CEN64 = 0x0080,
-    EMU_SIMPLE64 = 0x0100,
-    EMU_PARALLELN64 = 0x0200, // ParallelN64 2.12 or later
-    EMU_ARES = 0x0400,
-    EMU_CONSOLE = 0x0800
+    EMU_CONSOLE              = (1 << 0), // Also detects emulators accurate enough to emulate DPC registers
+    EMU_WIIVC                = (1 << 1),
+    EMU_PROJECT64_1_OR_2     = (1 << 2), // PJ64 1.6 to 2.3
+    EMU_PROJECT64_3          = (1 << 3), // PJ64 2.4 to 3.0
+        EMU_PROJECT64        = (EMU_PROJECT64_1_OR_2 | EMU_PROJECT64_3),
+    EMU_MUPEN                = (1 << 4), // Also includes pre-2.12 ParallelN64
+    EMU_PARALLEL_LAUNCHER    = (1 << 5), // Parallel Launcher (ParallelN64 core only)
+    EMU_OTHER                = (1 << 6), // Any other emulator
 };
 
-// initializes gEmulator
-extern void detect_emulator();
+/**
+ * Various detectable system capabilities
+ */
+enum SystemCapabilities {
+    // Whether the system caches instructions and data
+    SUPPORTS_CACHING              = (1 << 0),
 
-/* gEmulator is an enum that identifies the current emulator.
+    // Whether the system supports changing how floats get rounded
+    SUPPORTS_FLOAT_ROUNDING_MODE  = (1 << 1),
+
+    // Whether the system supports the `libpl` API on Parallel Launcher
+    SUPPORTS_LIBPL                = (1 << 2),
+
+    // Whether the system can edit the framebuffer in software
+    SUPPORTS_SOFTWARE_FRAMEBUFFER = (1 << 3),
+
+    // HACKERSM64_DO: `emux` is a developing standard.
+    // SUPPORTS_EMULATOR_EXTENSIONS  = (1 << 4), // i.e. `emux`
+
+    // HACKERSM64_DO: Figure out what these mean and implement them too
+    // SUPPORTS_DMA_TIMING = 0,
+    // SUPPORTS_RSP_PIPELINE_STALL_TIMING = 0,
+};
+
+extern u32 detect_emulator();
+
+/**
+ * gEmulator is an enum that identifies the current emulator.
  * The enum values work as a bitfield, so you can use the & and | operators
  * to test for multiple emulators or versions at once.
  * 
  * Examples:
  * 
  * Test for any version of PJ64:
- * if (gEmulator & EMU_PROJECT64_ANY)
+ * if (gEmulator & EMU_PROJECT64)
  * 
- * Test for only PJ64 < 3.0:
+ * Test for only PJ64 < 2.4:
  * if (gEmulator & EMU_PROJECT64_1_OR_2)
  * 
- * Test for Console, Ares, or ParallelN64:
- * if (gEmulator & (EMU_CONSOLE | EMU_ARES | EMU_PARALLELN64))
+ * Test for Console or Parallel Launcher:
+ * if (gEmulator & (EMU_CONSOLE | EMU_PARALLEL_LAUNCHER))
  */
-extern enum Emulator gEmulator;
+extern u8 gEmulator;
 
-// determines whether libpl is safe to use
-extern u8 gSupportsLibpl;
+/**
+ * Bitflag that lists all system capabilities, for more granular
+ * feature detection than gEmulator.
+ */
+extern u32 gSystemCapabilities;
+
+/**
+ * Whether the emulator supports libpl.
+ *  Left in for backwards compatibility.
+ */
+#define gSupportsLibpl (gSystemCapabilities & SUPPORTS_LIBPL)
 
 // Included for backwards compatibility when upgrading from HackerSM64 2.0
 #define gIsConsole ((gEmulator & EMU_CONSOLE) != 0)

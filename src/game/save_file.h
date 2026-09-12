@@ -151,7 +151,7 @@ enum StarFlags {
 
 // Variable for setting a warp checkpoint.
 
-// possibly a WarpDest struct where arg is a union. TODO: Check?
+// possibly a WarpDest struct where arg is a union. HACKERSM64_DO: Check?
 struct WarpCheckpoint {
     /*0x00*/ u8 actNum;
     /*0x01*/ u8 courseNum;

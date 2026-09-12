@@ -39,7 +39,7 @@ struct SeqOrBankEntry {
 struct PersistentPool {
     /*0x00*/ u32 numEntries;
     /*0x04*/ struct SoundAllocPool pool;
-#ifdef EXPAND_AUDIO_HEAP // TODO: Make this a configurable define rather than using static values
+#ifdef EXPAND_AUDIO_HEAP
     /*0x14*/ struct SeqOrBankEntry entries[64];
     // size = 0x314
 #else

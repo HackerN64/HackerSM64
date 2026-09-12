@@ -239,7 +239,7 @@ void bhv_water_bomb_shadow_update(void) {
     if (o->parentObj->oAction == WATER_BOMB_ACT_EXPLODE) {
         obj_mark_for_deletion(o);
     } else {
-        // TODO: What is happening here
+        // HACKERSM64_DO: What is happening here
         f32 bombHeight = o->parentObj->oPosY - o->parentObj->oFloorHeight;
         if (bombHeight > 500.0f) {
             bombHeight = 500.0f;

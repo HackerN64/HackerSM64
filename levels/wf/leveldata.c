@@ -61,7 +61,7 @@
 #include "levels/wf/breakable_wall_left/collision.inc.c"
 #include "levels/wf/kickable_board/collision.inc.c"
 #include "levels/wf/tower_door/collision.inc.c"
-#include "levels/wf/rotating_platform/collision.inc.c" // This is odd... TODO: investigate this.
+#include "levels/wf/rotating_platform/collision.inc.c" // This is odd... HACKERSM64_DO: investigate this.
 #include "levels/wf/areas/1/10/collision.inc.c"
 #include "levels/wf/areas/1/11/collision.inc.c"
 #include "levels/wf/areas/1/collision.inc.c"

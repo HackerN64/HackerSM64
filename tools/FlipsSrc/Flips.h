@@ -266,7 +266,7 @@ public:
 };
 extern config cfg;
 
-//TODO: rewrite these
+//FLIPS_DO: rewrite these
 struct mem GetRomList();
 void SetRomList(struct mem data);
 LPCWSTR FindRomForPatch(file* patch, bool * possibleToFind);
@@ -303,7 +303,7 @@ void usage();//does not return
 //provided by the OS port
 //several functions of file:: and filewrite:: also belong to the OS port
 
-//TODO: delete
+//FLIPS_DO: delete
 struct mem ReadWholeFile(LPCWSTR filename);
 bool WriteWholeFile(LPCWSTR filename, struct mem data);
 bool WriteWholeFileWithHeader(LPCWSTR filename, struct mem header, struct mem data);
@@ -436,7 +436,7 @@ enum bpserror bps_apply(struct mem patch, struct mem in, struct mem * out, struc
 //  {NULL,0} as metadata.
 enum bpserror bps_create_linear(struct mem source, struct mem target, struct mem metadata, struct mem * patch);
 
-#ifdef __cplusplus // TODO: make this functionality available from C and C-ABI-only languages
+#ifdef __cplusplus // FLIPS_DO: make this functionality available from C and C-ABI-only languages
 //Very similar to bps_create_linear; the difference is that this one takes longer to run, but
 //  generates smaller patches.
 //Because it can take much longer, a progress meter is supplied; total is guaranteed to be constant
