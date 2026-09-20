@@ -886,6 +886,7 @@ void audio_init() {
     gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
     // Should probably contain the sizes of the data banks, but those aren't
     // easily accessible from here.
+#ifndef DEMO_RECORDING_MODE
     osSyncPrintf("---------- Init Completed. ------------\n");
     osSyncPrintf(" Syndrv    :[%6d]\n", gSoundDataRaw - gSoundDataADSR); // gSoundDataADSR
 #ifndef VERSION_SH
@@ -895,5 +896,6 @@ void audio_init() {
 #endif
     osSyncPrintf(" audiodata :[%6d]\n", gMusicData - gSoundDataRaw); // gSoundDataRaw
     osSyncPrintf("---------------------------------------\n");
+#endif // DEMO_RECORDING_MODE
 }
 #endif

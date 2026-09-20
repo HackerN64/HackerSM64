@@ -76,7 +76,7 @@ uintptr_t set_segment_base_addr(s32 segment, void *addr) {
     return sSegmentTable[segment];
 }
 
-UNUSED void *get_segment_base_addr(s32 segment) {
+void *get_segment_base_addr(s32 segment) {
     return (void *) (sSegmentTable[segment] | 0x80000000);
 }
 
@@ -421,7 +421,10 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         dest = main_pool_alloc_aligned(*size, 0);
 #endif
         if (dest != NULL) {
+#ifndef DEMO_RECORDING_MODE
             osSyncPrintf("start decompress\n");
+#endif // DEMO_RECORDING_MODE
+
 #ifdef GZIP
             libdeflate_deflate_decompress(dec, compressed + 16, *(u32*) (compressed + 8), dest, &asyncCtx);
 #elif RNC1
@@ -435,7 +438,10 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #elif LZ4T
             lz4t_unpack(compressed, dest, &asyncCtx);
 #endif
+
+#ifndef DEMO_RECORDING_MODE
             osSyncPrintf("end decompress\n");
+#endif // DEMO_RECORDING_MODE
             set_segment_base_addr(segment, dest);
             main_pool_free(compressed);
         }

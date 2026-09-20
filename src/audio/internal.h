@@ -68,7 +68,7 @@ enum Codecs {
 // Since u8 and u16 fit losslessly in both, behavior is the same.
 #define FLOAT_CAST(x) (f32) (s32) (x)
 
-#if defined(ISVPRINT) || defined(UNF)
+#if (!defined(DEMO_RECORDING_MODE)) && (defined(ISVPRINT) || defined(UNF))
 #define stubbed_printf osSyncPrintf
 #else
 
