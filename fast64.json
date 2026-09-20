@@ -24,6 +24,8 @@
     "refresh_version": "HackerSM64 2.3.0",
     "compression_format": "yay0",
     "force_extended_ram": false,
-    "matstack_fix": true
+    "matstack_fix": true,
+    "camera_volume_path": "src/camera/level_specific/{level}.c",
+    "zoom_out_mask_path": "src/camera/zoom_out_masks.c"
   }
 }
