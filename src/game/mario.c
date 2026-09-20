@@ -967,7 +967,7 @@ u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
     m->actionState = 0;
     m->actionTimer = 0;
 
-    return TRUE;
+    return ACTION_CONTINUE;
 }
 
 /**
@@ -1022,7 +1022,7 @@ s32 set_jump_from_landing(struct MarioState *m) {
 
     m->doubleJumpTimer = 0;
 
-    return TRUE;
+    return ACTION_CONTINUE;
 }
 
 /**
@@ -1045,7 +1045,7 @@ s32 set_jumping_action(struct MarioState *m, u32 action, u32 actionArg) {
         set_mario_action(m, action, actionArg);
     }
 
-    return TRUE;
+    return ACTION_CONTINUE;
 }
 
 /**
@@ -1084,7 +1084,7 @@ s32 check_common_action_exits(struct MarioState *m) {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
     }
 
-    return FALSE;
+    return ACTION_FINISH;
 }
 
 /**
@@ -1096,7 +1096,7 @@ s32 check_common_hold_action_exits(struct MarioState *m) {
     if (m->input & INPUT_OFF_FLOOR     ) return set_mario_action(m, ACT_HOLD_FREEFALL,      0);
     if (m->input & INPUT_NONZERO_ANALOG) return set_mario_action(m, ACT_HOLD_WALKING,       0);
     if (m->input & INPUT_ABOVE_SLIDE   ) return set_mario_action(m, ACT_HOLD_BEGIN_SLIDING, 0);
-    return FALSE;
+    return ACTION_FINISH;
 }
 
 /**
