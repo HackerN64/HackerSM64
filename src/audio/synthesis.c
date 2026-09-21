@@ -10,6 +10,7 @@
 #include "external.h"
 #include "game/game_init.h"
 #include "game/debug.h"
+#include "debugger/assert.h"
 #include "engine/math_util.h"
 
 #define DMEM_ADDR_TEMP 0x0
