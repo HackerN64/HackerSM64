@@ -1072,7 +1072,7 @@ s32 play_mode_paused(void) {
         } else {
 #ifdef DEATH_ON_EXIT_COURSE
             struct ObjectWarpNode *warpNode = area_get_warp_node(WARP_NODE_DEATH);
-            assert(warpNode != NULL, "No death warp node could be found!");
+            assertf(warpNode != NULL, "No death warp node could be found!");
 
             initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
                             warpNode->node.destNode, WARP_FLAGS_NONE);

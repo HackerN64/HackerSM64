@@ -9,6 +9,7 @@
 #include "game/emutest.h"
 #include "game/puppyprint.h"
 #include "game/debug.h"
+#include "debugger/assert.h"
 #include "string.h"
 
 struct PoolSplit {
