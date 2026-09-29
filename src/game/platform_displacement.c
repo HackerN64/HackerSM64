@@ -17,6 +17,8 @@
 struct Object *gMarioPlatform = NULL;
 static struct PlatformDisplacementInfo sMarioDisplacementInfo;
 static Vec3f sMarioAmountDisplaced;
+static u8 sShouldApplyInertia = FALSE;
+static u8 sInertiaFirstFrame = FALSE;
 
 /**
  * Determine if Mario is standing on a platform object, meaning that he is
@@ -134,14 +136,13 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     // If the object is Mario, set inertia
     if (pos == gMarioState->pos) {
         vec3_diff(sMarioAmountDisplaced, pos, oldPos);
+        sInertiaFirstFrame = TRUE;
+        sShouldApplyInertia = TRUE;
     }
 }
 
 // Doesn't change in the code, set this to FALSE if you don't want inertia
 u8 gDoInertia = TRUE;
-
-static u8 sShouldApplyInertia = FALSE;
-static u8 sInertiaFirstFrame = FALSE;
 
 /**
  * Apply inertia based on Mario's last platform.
@@ -182,8 +183,6 @@ void apply_mario_platform_displacement(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL) {
         if (platform != NULL) {
             apply_platform_displacement(&sMarioDisplacementInfo, gMarioState->pos, &gMarioState->faceAngle[1], platform);
-            sShouldApplyInertia = TRUE;
-            sInertiaFirstFrame = TRUE;
         } else if (sShouldApplyInertia && gDoInertia) {
             apply_mario_inertia();
             sInertiaFirstFrame = FALSE;
