@@ -7,7 +7,7 @@
 #include "game/interaction.h"
 #include "game/behavior_actions.h"
 #include "game/mario_actions_cutscene.h"
-#include "game/mario_misc.h"
+#include "game/mario_geo.h"
 #include "game/object_helpers.h"
 #include "game/debug.h"
 #include "menu/file_select.h"
