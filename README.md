@@ -53,8 +53,15 @@ Many of these tweaks and features may be toggled by editing the files in the `in
 HackerSM64 is best suited for ROM hacks with custom levels and content. If you want to make a ROM hack that is TAS-accurate to the vanilla game and its levels, [UltraSM64](https://github.com/CrashOveride95/ultrasm64) may be a better choice for your project.
 
 ### How do I make my own levels?
-You can use Blender with the [Fast64 plugin](https://github.com/Fast-64/fast64) to create and export levels as 3D models. 
+You can use Blender with the [Fast64 plugin](https://github.com/Fast-64/fast64) to create and export levels as 3D models.
 
+### Does HackerSM64 use AI-generated code?
+HackerSM64 does not (knowingly) use or contain any AI-generated code. HackerSM64 is a passion project that has a lot of care and deliberate thought put into its development, and we take pride in the stability, quality, and integrity of our codebase. We're more interested in maintaining this status quo than we are stuffing this project with features.
+
+### Will HackerSM64 accept AI-generated code?
+As per the rules of HackerN64, we have a zero-tolerance policy when it comes to AI generation. Any pull requests containing indications of machine-generated code will be rejected out of principle, regardless of the code's quality, application, or significance. The moment we allow even one AI-generated change to make its way into the repository, we undermine the trust put into us by significant portions of our contributors, community, and userbase.
+
+Additionally, allowing such content sets up a new precedent when it comes to AI generation that is harder for us to maintain, and it can more easily lead to shifting of what we consider 'acceptable'. It's much easier for us to blanket-ban all use cases right off the bat.
 
 # Still Have Questions?
 
